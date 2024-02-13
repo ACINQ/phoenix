@@ -1,13 +1,13 @@
 package fr.acinq.phoenix.managers
 
 import fr.acinq.phoenix.utils.PlatformContext
+import fr.acinq.lightning.logging.LoggerFactory
+import fr.acinq.lightning.logging.debug
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
 import platform.Network.*
 import platform.darwin.dispatch_get_main_queue
 
@@ -17,7 +17,7 @@ actual class NetworkMonitor actual constructor(
     ctx: PlatformContext
 ) : CoroutineScope by MainScope() {
 
-    private val logger = newLogger(loggerFactory)
+    private val logger = loggerFactory.newLogger(this::class)
 
     private val _networkState = MutableStateFlow(NetworkState.NotAvailable)
     actual val networkState: StateFlow<NetworkState> = _networkState

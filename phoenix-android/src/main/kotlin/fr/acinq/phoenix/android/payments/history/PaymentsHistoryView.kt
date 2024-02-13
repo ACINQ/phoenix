@@ -47,7 +47,6 @@ import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.ItemCard
 import fr.acinq.phoenix.android.payments.details.PaymentLine
 import fr.acinq.phoenix.android.payments.details.PaymentLineLoading
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.WalletPaymentId
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -103,7 +102,6 @@ fun PaymentsHistoryView(
     onPaymentClick: (WalletPaymentId) -> Unit,
     onCsvExportClick: () -> Unit,
 ) {
-    val log = logger("PaymentsHistory")
     val listState = rememberLazyListState()
     val allPaymentsCount by business.paymentsManager.paymentsCount.collectAsState()
     val payments by paymentsViewModel.paymentsFlow.collectAsState()

@@ -18,9 +18,7 @@ package fr.acinq.phoenix.android.utils
 
 import android.content.Context
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import ch.qos.logback.classic.LoggerContext
@@ -33,28 +31,15 @@ import ch.qos.logback.core.rolling.RollingFileAppender
 import ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy
 import ch.qos.logback.core.util.FileSize
 import fr.acinq.phoenix.android.BuildConfig
-import fr.acinq.phoenix.android.PhoenixApplication
-import org.kodein.log.frontend.slf4jFrontend
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 
-@Composable
-fun logger(name: String? = null): org.kodein.log.Logger {
-    val context = LocalContext.current
-    val application = context.applicationContext
-    val tag = name?.let { org.kodein.log.Logger.Tag(BuildConfig.APPLICATION_ID, it) } ?: org.kodein.log.Logger.Tag(context::class)
 
-    return if (application !is PhoenixApplication) { // Preview mode
-        remember(tag) { org.kodein.log.LoggerFactory(slf4jFrontend).newLogger(tag) }
-    } else {
-        val businessState = application.business.collectAsState()
-        when (val business = businessState.value) {
-            null -> remember(tag) { org.kodein.log.LoggerFactory(slf4jFrontend).newLogger(tag) }
-            else -> remember(tag) { business.loggerFactory.newLogger(tag) }
-        }
-    }
+@Composable
+fun logger(name: String? = null): org.slf4j.Logger {
+    return remember(name) { LoggerFactory.getLogger(name) }
 }
 
 object Logging {

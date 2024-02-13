@@ -1,13 +1,13 @@
 package fr.acinq.phoenix.managers
 
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.phoenix.db.WalletPaymentOrderRow
+import fr.acinq.lightning.logging.debug
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
 import kotlin.time.Duration.Companion.seconds
 
 data class PaymentsPage(
@@ -32,7 +32,7 @@ class PaymentsPageFetcher(
     private val databaseManager: DatabaseManager
 ): CoroutineScope by MainScope() {
 
-    private val log = newLogger(loggerFactory)
+    private val log = loggerFactory.newLogger(this::class)
 
     private var offset: Int = 0
     private var count: Int = 0

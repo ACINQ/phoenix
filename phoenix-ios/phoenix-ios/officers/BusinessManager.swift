@@ -2,15 +2,13 @@ import UIKit
 import PhoenixShared
 import BackgroundTasks
 import Combine
-import os.log
 
+
+fileprivate let filename = "BusinessManager"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "BusinessManager"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
 enum WalletRestoreType {
@@ -84,10 +82,10 @@ class BusinessManager {
 	// --------------------------------------------------
 	// MARK: Init
 	// --------------------------------------------------
-
+	
 	private init() { // must use shared instance
 		
-		business = PhoenixBusiness(ctx: PlatformContext())
+		business = PhoenixBusiness(ctx: PlatformContext(logger: KotlinLogger.shared.logger))
 		BusinessManager._isTestnet = business.chain.isTestnet()
 	}
 	

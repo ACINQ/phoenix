@@ -46,7 +46,6 @@ import fr.acinq.phoenix.android.fiatRate
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.MempoolFeerate
@@ -60,7 +59,6 @@ fun LiquidityPolicyView(
     onAdvancedClick: () -> Unit,
     onRequestLiquidityClick: () -> Unit,
 ) {
-    val log = logger("LiquidityPolicyView")
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 

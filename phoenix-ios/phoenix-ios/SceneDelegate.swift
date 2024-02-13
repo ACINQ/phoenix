@@ -1,15 +1,13 @@
 import UIKit
 import SwiftUI
 import Combine
-import os.log
 
+
+fileprivate let filename = "SceneDelegate"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "SceneDelegate"
-)
+fileprivate let log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {

@@ -81,7 +81,6 @@ import fr.acinq.phoenix.android.utils.Converter.toMilliSatoshi
 import fr.acinq.phoenix.android.utils.Converter.toPlainString
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.Converter.toUnit
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.outlinedTextFieldColors
 import fr.acinq.phoenix.data.BitcoinUnit
@@ -390,7 +389,6 @@ fun AmountHeroInput(
     inputTextSize: TextUnit = 16.sp,
     enabled: Boolean = true,
 ) {
-    val log = logger("AmountHeroInput")
     val context = LocalContext.current
     val prefBitcoinUnit = LocalBitcoinUnit.current
     val prefFiat = LocalFiatCurrency.current

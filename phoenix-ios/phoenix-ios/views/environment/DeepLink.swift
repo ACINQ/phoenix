@@ -1,15 +1,11 @@
 import Foundation
-import os.log
 
+fileprivate let filename = "DeepLinkManager"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "DeepLinkManager"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
-
 
 enum DeepLink: String, Equatable {
 	case paymentHistory

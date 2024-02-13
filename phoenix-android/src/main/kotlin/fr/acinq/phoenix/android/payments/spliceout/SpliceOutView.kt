@@ -44,7 +44,6 @@ import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.MempoolFeerate
 
@@ -57,9 +56,6 @@ fun SendSpliceOutView(
     onBackClick: () -> Unit,
     onSpliceOutSuccess: () -> Unit,
 ) {
-    val log = logger("SendSpliceOut")
-    log.debug { "init splice-out with amount=$requestedAmount address=$address" }
-
     val context = LocalContext.current
     val prefBtcUnit = LocalBitcoinUnit.current
     val keyboardManager = LocalSoftwareKeyboardController.current

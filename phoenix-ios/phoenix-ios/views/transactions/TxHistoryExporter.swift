@@ -1,16 +1,12 @@
 import SwiftUI
 import PhoenixShared
-import os.log
 
+fileprivate let filename = "TxHistoryExporter"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "TxHistoryExporter"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
-
 
 struct TxHistoryExporter: View {
 	
@@ -291,6 +287,7 @@ struct TxHistoryExporter: View {
 			set: {
 				if !$0 {
 					if let tmpFileUrl = shareUrl {
+						shareUrl = nil
 						DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + 5.0) {
 							do {
 								try FileManager.default.removeItem(at: tmpFileUrl)
@@ -299,7 +296,6 @@ struct TxHistoryExporter: View {
 								log.error("Error deleting tmp file: \(error)")
 							}
 						}
-						shareUrl = nil
 					}
 				}
 			}

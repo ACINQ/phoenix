@@ -1,18 +1,14 @@
 import SwiftUI
 import PhoenixShared
-import os.log
 import CircularCheckmarkProgress
 import CloudKit
 
+fileprivate let filename = "AppStatusPopover"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "AppStatusPopover"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
-
 
 struct AppStatusPopover: View {
 

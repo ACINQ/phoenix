@@ -1,8 +1,12 @@
 package fr.acinq.phoenix.managers
 
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.SqliteAppDb
+import fr.acinq.lightning.logging.debug
+import fr.acinq.lightning.logging.error
+import fr.acinq.lightning.logging.info
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -11,10 +15,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -54,7 +55,7 @@ class CurrencyManager(
         httpClient = business.httpClient
     )
 
-    private val log = newLogger(loggerFactory)
+    private val log = loggerFactory.newLogger(this::class)
 
     private val json = Json {
         ignoreUnknownKeys = true

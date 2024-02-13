@@ -21,7 +21,7 @@ import fr.acinq.bitcoin.crypto.Digest
 import fr.acinq.bitcoin.crypto.Pack
 import fr.acinq.bitcoin.crypto.hmac
 import fr.acinq.lightning.crypto.LocalKeyManager
-import fr.acinq.phoenix.data.lnurl.Lnurl.Companion.log
+import fr.acinq.lightning.logging.debug
 import io.ktor.http.*
 
 data class LnurlAuth(
@@ -116,7 +116,6 @@ data class LnurlAuth(
             domain: String,
             hashingKey: ByteArray
         ): KeyPath {
-            log.debug { "creating auth derivation path for domain=$domain" }
             val fullHash = Digest.sha256().hmac(
                 key = hashingKey,
                 data = domain.encodeToByteArray(),

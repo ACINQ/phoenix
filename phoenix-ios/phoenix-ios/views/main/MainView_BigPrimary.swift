@@ -1,14 +1,11 @@
 import SwiftUI
 import PhoenixShared
-import os.log
 
+fileprivate let filename = "MainView_BigPrimary"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "MainView_BigPrimary"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
 fileprivate enum NavLinkTag: String {

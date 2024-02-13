@@ -20,18 +20,19 @@ import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.NodeUri
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.shared.BuildVersions
+import fr.acinq.lightning.logging.info
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
+
 
 class NodeParamsManager(
     loggerFactory: LoggerFactory,
@@ -47,7 +48,7 @@ class NodeParamsManager(
         appConfigurationManager = business.appConfigurationManager,
     )
 
-    private val log = newLogger(loggerFactory)
+    private val log = loggerFactory.newLogger(this::class)
 
     private val _nodeParams = MutableStateFlow<NodeParams?>(null)
     val nodeParams: StateFlow<NodeParams?> = _nodeParams

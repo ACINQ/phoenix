@@ -1,10 +1,11 @@
 package fr.acinq.phoenix.controllers.config
 
+import co.touchlab.kermit.Logger
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.managers.WalletManager
 import fr.acinq.phoenix.controllers.AppController
 import kotlinx.coroutines.launch
-import org.kodein.log.LoggerFactory
 
 
 class AppConfigurationController(

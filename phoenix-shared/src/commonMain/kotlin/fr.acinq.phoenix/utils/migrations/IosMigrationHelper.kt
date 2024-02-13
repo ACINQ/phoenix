@@ -27,17 +27,16 @@ import fr.acinq.lightning.channel.states.*
 import fr.acinq.lightning.io.WrappedChannelCommand
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sum
-import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.LocalChannelInfo
 import fr.acinq.phoenix.utils.Parser
 import fr.acinq.phoenix.utils.extensions.isBeingCreated
-import fr.acinq.phoenix.utils.extensions.localBalance
+import fr.acinq.lightning.logging.info
+import fr.acinq.lightning.logging.warning
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import org.kodein.log.newLogger
 
 object IosMigrationHelper {
 

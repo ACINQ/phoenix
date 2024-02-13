@@ -1,15 +1,17 @@
 package fr.acinq.phoenix.controllers
 
+import fr.acinq.lightning.logging.LoggerFactory
+import fr.acinq.lightning.logging.debug
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
 
 
-abstract class AppController<M : MVI.Model, I : MVI.Intent>(loggerFactory: LoggerFactory, firstModel: M) : MVI.Controller<M, I>(firstModel), CoroutineScope {
+abstract class AppController<M : MVI.Model, I : MVI.Intent>(
+    loggerFactory: LoggerFactory,
+    firstModel: M
+) : MVI.Controller<M, I>(firstModel), CoroutineScope {
 
     private val job = Job()
 

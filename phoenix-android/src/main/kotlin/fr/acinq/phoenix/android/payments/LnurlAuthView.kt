@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.controllers.payments.Scan
 import fr.acinq.phoenix.data.lnurl.LnurlAuth
 
@@ -43,8 +42,6 @@ fun LnurlAuthView(
     onLoginClick: (Scan.Intent.LnurlAuthFlow) -> Unit,
     onAuthSchemeInfoClick: () -> Unit
 ) {
-    val log = logger("LnurlAuthView")
-
     val context = LocalContext.current
     var showHowItWorks by remember { mutableStateOf(false) }
     val prefAuthScheme by UserPrefs.getLnurlAuthScheme(context).collectAsState(initial = null)

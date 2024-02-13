@@ -1,10 +1,11 @@
 package fr.acinq.phoenix.controllers.init
 
+import co.touchlab.kermit.Logger
 import fr.acinq.bitcoin.MnemonicCode
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.controllers.AppController
 import kotlinx.coroutines.launch
-import org.kodein.log.LoggerFactory
 
 
 class AppRestoreWalletController(

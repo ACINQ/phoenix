@@ -1,22 +1,25 @@
 package fr.acinq.phoenix.managers
 
+import co.touchlab.kermit.Logger
+import co.touchlab.kermit.Severity
+import co.touchlab.kermit.StaticConfig
 import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.db.ChannelsDb
 import fr.acinq.lightning.db.Databases
 import fr.acinq.lightning.db.PaymentsDb
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.db.SqliteChannelsDb
 import fr.acinq.phoenix.db.SqlitePaymentsDb
 import fr.acinq.phoenix.db.createChannelsDbDriver
 import fr.acinq.phoenix.db.createPaymentsDbDriver
 import fr.acinq.phoenix.utils.PlatformContext
+import fr.acinq.lightning.logging.debug
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
 
 class DatabaseManager(
     loggerFactory: LoggerFactory,
@@ -34,8 +37,7 @@ class DatabaseManager(
         currencyManager = business.currencyManager
     )
 
-    private val log = newLogger(loggerFactory)
-
+    private val log = loggerFactory.newLogger(this::class)
     private val _databases = MutableStateFlow<Databases?>(null)
     val databases: StateFlow<Databases?> = _databases
 
@@ -50,7 +52,7 @@ class DatabaseManager(
                     driver = createChannelsDbDriver(ctx, chain, nodeIdHash)
                 )
                 val paymentsDb = SqlitePaymentsDb(
-                    loggerFactory,
+                    loggerFactory = loggerFactory,
                     driver = createPaymentsDbDriver(ctx, chain, nodeIdHash),
                     currencyManager = currencyManager
                 )

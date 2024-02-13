@@ -18,6 +18,7 @@ import fr.acinq.lightning.channel.states.ChannelStateWithCommitments
 import fr.acinq.lightning.channel.states.Normal
 import fr.acinq.lightning.channel.states.Offline
 import fr.acinq.lightning.io.Peer
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.msat
@@ -28,11 +29,12 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.LocalChannelInfo
 import fr.acinq.phoenix.utils.extensions.isTerminated
 import fr.acinq.phoenix.utils.extensions.nextTimeout
+import fr.acinq.lightning.logging.debug
+import fr.acinq.lightning.logging.error
+import fr.acinq.lightning.logging.info
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import org.kodein.log.Logger
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
+
 
 class PeerManager(
     loggerFactory: LoggerFactory,
@@ -43,7 +45,7 @@ class PeerManager(
     private val electrumWatcher: ElectrumWatcher,
 ) : CoroutineScope by CoroutineScope(CoroutineName("peer") + SupervisorJob() + Dispatchers.Main + CoroutineExceptionHandler { _, e ->
     println("error in Peer coroutine scope: ${e.message}")
-    val logger = loggerFactory.newLogger(Logger.Tag(PeerManager::class))
+    val logger = loggerFactory.newLogger("PeerManager")
     logger.error(e) { "error in Peer scope: " }
 }) {
 
@@ -56,7 +58,7 @@ class PeerManager(
         electrumWatcher = business.electrumWatcher,
     )
 
-    private val logger = newLogger(loggerFactory)
+    private val logger = loggerFactory.newLogger(this::class)
 
     private val _peer = MutableStateFlow<Peer?>(null)
     val peerState: StateFlow<Peer?> = _peer

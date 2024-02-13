@@ -1,14 +1,14 @@
 package fr.acinq.phoenix.managers
 
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import fr.acinq.phoenix.utils.Cache
+import fr.acinq.lightning.logging.debug
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
 
@@ -39,7 +39,7 @@ class PaymentsFetcher(
         val info: WalletPaymentInfo?
     )
 
-    private val log = newLogger(loggerFactory)
+    private val log = loggerFactory.newLogger(this::class)
 
     // Using a strict cache to ensure eviction based on actual usage
     private var cache = Cache<String, Result>(sizeLimit = cacheSizeLimit)

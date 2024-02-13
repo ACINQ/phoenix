@@ -1,16 +1,13 @@
 import Foundation
 import Combine
-import os.log
 
+
+fileprivate let filename = "AppMigration"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "AppMigration"
-)
+fileprivate let log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
-
 
 class AppMigration {
 	

@@ -5,10 +5,10 @@ import fr.acinq.lightning.blockchain.electrum.ElectrumConnectionStatus
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.utils.ServerAddress
+import fr.acinq.phoenix.utils.testLoggerFactory
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
-import org.kodein.log.LoggerFactory
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertTrue
@@ -48,7 +48,7 @@ class ElectrumServersTest {
     fun connect_and_get_fee_mainnet() = runBlocking {
         val res = mainnetElectrumServers.map { server ->
             try {
-                val client = ElectrumClient(scope = this, loggerFactory = LoggerFactory.default, pingInterval = 30.seconds, rpcTimeout = 5.seconds)
+                val client = ElectrumClient(scope = this, loggerFactory = testLoggerFactory, pingInterval = 30.seconds, rpcTimeout = 5.seconds)
                 client.connect(socketBuilder = TcpSocket.Builder(), serverAddress = server)
                 withTimeout(5.seconds) {
                     client.connectionStatus.filterIsInstance<ElectrumConnectionStatus.Connected>().first()

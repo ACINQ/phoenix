@@ -42,7 +42,6 @@ import fr.acinq.phoenix.android.components.feedback.WarningMessage
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.annotatedStringResource
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.safeLet
 import kotlinx.coroutines.launch
@@ -50,7 +49,6 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun DisplaySeedView() {
-    val log = logger("DisplaySeedView")
     val nc = navController
     val context = LocalContext.current
     val internalData = application.internalDataRepository

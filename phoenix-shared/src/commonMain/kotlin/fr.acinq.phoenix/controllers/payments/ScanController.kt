@@ -16,10 +16,12 @@
 
 package fr.acinq.phoenix.controllers.payments
 
+import co.touchlab.kermit.Logger
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.*
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.io.SendPayment
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.PhoenixBusiness
@@ -30,12 +32,13 @@ import fr.acinq.phoenix.db.payments.WalletPaymentMetadataRow
 import fr.acinq.phoenix.managers.*
 import fr.acinq.phoenix.utils.Parser
 import fr.acinq.phoenix.utils.extensions.chain
+import fr.acinq.lightning.logging.error
+import fr.acinq.lightning.logging.info
 import io.ktor.http.Url
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.JsonObject
-import org.kodein.log.LoggerFactory
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
@@ -481,7 +484,7 @@ class AppScanController(
 
     /** Reads a lnurl and return either a lnurl-auth (i.e. a http query that must not be called automatically), or the actual url embedded in the lnurl (that can be called afterwards). */
     private fun readLnurl(input: String): Lnurl? = try {
-        Lnurl.extractLnurl(input)
+        Lnurl.extractLnurl(input, logger)
     } catch (t: Throwable) {
         null
     }
@@ -508,7 +511,7 @@ class AppScanController(
     private fun readLNURLFallback(input: String): Lnurl? = try {
         val url = Url(input)
         url.parameters["lightning"]?.let { fallback ->
-            Lnurl.extractLnurl(fallback)
+            Lnurl.extractLnurl(fallback, logger)
         }
     } catch (t: Throwable) {
         null

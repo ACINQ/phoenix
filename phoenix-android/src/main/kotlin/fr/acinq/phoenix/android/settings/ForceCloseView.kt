@@ -33,7 +33,6 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.utils.annotatedStringResource
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.monoTypo
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.controllers.config.CloseChannelsConfiguration
@@ -42,7 +41,6 @@ import fr.acinq.phoenix.controllers.config.CloseChannelsConfiguration
 fun ForceCloseView(
     onBackClick: () -> Unit
 ) {
-    val log = logger("ForceCloseView")
     var showConfirmationDialog by remember { mutableStateOf(false) }
 
     MVIView(CF::forceCloseChannelsConfiguration) { model, postIntent ->

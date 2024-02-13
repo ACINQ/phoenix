@@ -16,17 +16,16 @@
 
 package fr.acinq.phoenix.db
 
+import co.touchlab.kermit.Logger
 import com.squareup.sqldelight.EnumColumnAdapter
 import com.squareup.sqldelight.db.SqlDriver
 import com.squareup.sqldelight.runtime.coroutines.asFlow
-import com.squareup.sqldelight.runtime.coroutines.mapToList
-import com.squareup.sqldelight.runtime.coroutines.mapToOne
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
 import fr.acinq.bitcoin.TxId
-import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.channel.ChannelException
 import fr.acinq.lightning.db.*
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.utils.*
 import fr.acinq.lightning.wire.FailureMessage
@@ -43,8 +42,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
 
 class SqlitePaymentsDb(
     loggerFactory: LoggerFactory,
@@ -52,7 +49,7 @@ class SqlitePaymentsDb(
     private val currencyManager: CurrencyManager? = null
 ) : PaymentsDb {
 
-    private val log = newLogger(loggerFactory)
+    private val log = loggerFactory.newLogger(this::class)
 
     private val database = PaymentsDatabase(
         driver = driver,

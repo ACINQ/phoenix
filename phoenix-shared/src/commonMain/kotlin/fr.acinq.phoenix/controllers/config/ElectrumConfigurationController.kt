@@ -1,15 +1,15 @@
 package fr.acinq.phoenix.controllers.config
 
+import co.touchlab.kermit.Logger
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.managers.AppConfigurationManager
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
 import fr.acinq.phoenix.controllers.AppController
-import kotlinx.coroutines.flow.collect
+import fr.acinq.lightning.logging.LoggerFactory
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import org.kodein.log.LoggerFactory
 
 
 class AppElectrumConfigurationController(

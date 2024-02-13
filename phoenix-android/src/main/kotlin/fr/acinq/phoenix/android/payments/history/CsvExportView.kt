@@ -33,7 +33,6 @@ import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.utils.Converter.toBasicAbsoluteDateString
 import fr.acinq.phoenix.android.utils.copyToClipboard
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.android.utils.shareFile
 
@@ -42,7 +41,6 @@ import fr.acinq.phoenix.android.utils.shareFile
 fun CsvExportView(
     onBackClick: () -> Unit,
 ) {
-    val log = logger("CsvExportView")
     val context = LocalContext.current
     val vm: CsvExportViewModel = viewModel(
         factory = CsvExportViewModel.Factory(

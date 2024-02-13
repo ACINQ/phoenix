@@ -6,14 +6,15 @@ import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.channel.*
 import fr.acinq.lightning.channel.states.*
 import fr.acinq.lightning.io.WrappedChannelCommand
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.controllers.config.CloseChannelsConfiguration.Model.ChannelInfoStatus
 import fr.acinq.phoenix.utils.Parser
 import fr.acinq.phoenix.utils.extensions.localBalance
+import fr.acinq.lightning.logging.info
 import kotlinx.coroutines.launch
-import org.kodein.log.LoggerFactory
 
 class AppCloseChannelsConfigurationController(
     loggerFactory: LoggerFactory,

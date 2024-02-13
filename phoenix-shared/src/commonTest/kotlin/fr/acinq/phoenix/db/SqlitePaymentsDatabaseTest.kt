@@ -30,12 +30,12 @@ import fr.acinq.lightning.wire.TemporaryNodeFailure
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.runTest
 import fr.acinq.phoenix.utils.migrations.LegacyChannelCloseHelper
+import fr.acinq.phoenix.utils.testLoggerFactory
 import fr.acinq.secp256k1.Hex
-import org.kodein.log.LoggerFactory
 import kotlin.test.*
 
 class SqlitePaymentsDatabaseTest {
-    private val db = SqlitePaymentsDb(LoggerFactory.default, testPaymentsDriver())
+    private val db = SqlitePaymentsDb(testLoggerFactory, testPaymentsDriver())
 
     private val preimage1 = randomBytes32()
     private val paymentHash1 = Crypto.sha256(preimage1).toByteVector32()

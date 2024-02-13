@@ -6,10 +6,10 @@ import fr.acinq.lightning.serialization.Encryption.from
 import fr.acinq.lightning.serialization.Serialization
 import fr.acinq.lightning.wire.EncryptedChannelData
 import fr.acinq.phoenix.PhoenixBusiness
+import fr.acinq.lightning.logging.error
 import fr.acinq.secp256k1.Hex
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import org.kodein.log.newLogger
 
 
 object ChannelsImportHelper {

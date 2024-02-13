@@ -21,9 +21,6 @@ extension View {
 	func mock(_ mock: Initialization.Model) -> some View {
 		environment(\.controllerFactory, MockControllerFactory(mock))
 	}
-	func mock(_ mock: LogsConfiguration.Model) -> some View {
-		environment(\.controllerFactory, MockControllerFactory(mock))
-	}
 	func mock(_ mock: Receive.Model) -> some View {
 		environment(\.controllerFactory, MockControllerFactory(mock))
 	}
@@ -116,18 +113,6 @@ class MockControllerFactory : ControllerFactory {
 			return MVIControllerMock(model: mock)
 		} else {
 			return base.initialization()
-		}
-	}
-	
-	var mock_logsConfiguration: LogsConfiguration.Model? = nil
-	init(_ mock: LogsConfiguration.Model) {
-		mock_logsConfiguration = mock
-	}
-	func logsConfiguration() -> MVIController<LogsConfiguration.Model, LogsConfiguration.Intent> {
-		if let mock = mock_logsConfiguration {
-			return MVIControllerMock(model: mock)
-		} else {
-			return base.logsConfiguration()
 		}
 	}
 	

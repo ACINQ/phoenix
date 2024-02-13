@@ -5,12 +5,15 @@ import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.blockchain.electrum.HeaderSubscriptionResponse
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.io.TcpSocket
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.SqliteAppDb
+import fr.acinq.lightning.logging.debug
+import fr.acinq.lightning.logging.error
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -20,8 +23,6 @@ import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.json.*
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
 import kotlin.math.*
 import kotlin.time.*
 import kotlin.time.Duration.Companion.minutes
@@ -43,7 +44,7 @@ class AppConfigurationManager(
         electrumWatcher = business.electrumWatcher,
     )
 
-    private val logger = newLogger(loggerFactory)
+    private val logger = loggerFactory.newLogger(this::class)
 
     init {
         watchElectrumMessages()

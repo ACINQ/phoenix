@@ -37,7 +37,6 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.safeLet
 import fr.acinq.phoenix.controllers.payments.Scan
 import fr.acinq.phoenix.utils.extensions.isAmountlessTrampoline
@@ -49,9 +48,6 @@ fun SendLightningPaymentView(
     onBackClick: () -> Unit,
     onPayClick: (Scan.Intent.InvoiceFlow.SendInvoicePayment) -> Unit
 ) {
-    val log = logger("SendLightningPaymentView")
-    log.debug { "init sendview amount=${paymentRequest.amount} desc=${paymentRequest.description}" }
-
     val context = LocalContext.current
     val balance = business.balanceManager.balance.collectAsState(null).value
     val prefBitcoinUnit = LocalBitcoinUnit.current

@@ -18,7 +18,6 @@ typealias RestoreWalletController = MVI.Controller<RestoreWallet.Model, RestoreW
 typealias CloseChannelsConfigurationController = MVI.Controller<CloseChannelsConfiguration.Model, CloseChannelsConfiguration.Intent>
 typealias ConfigurationController = MVI.Controller<Configuration.Model, Configuration.Intent>
 typealias ElectrumConfigurationController = MVI.Controller<ElectrumConfiguration.Model, ElectrumConfiguration.Intent>
-typealias LogsConfigurationController = MVI.Controller<LogsConfiguration.Model, LogsConfiguration.Intent>
 
 /** Lets us define different implementation for the controllers, which is useful for mocks. */
 interface ControllerFactory {
@@ -30,7 +29,6 @@ interface ControllerFactory {
     fun restoreWallet(): RestoreWalletController
     fun configuration(): ConfigurationController
     fun electrumConfiguration(): ElectrumConfigurationController
-    fun logsConfiguration(): LogsConfigurationController
     fun closeChannelsConfiguration(): CloseChannelsConfigurationController
     fun forceCloseChannelsConfiguration(): CloseChannelsConfigurationController
 }

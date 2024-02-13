@@ -2,15 +2,12 @@ import SwiftUI
 import Combine
 import PhoenixShared
 import Network
-import os.log
 
+fileprivate let filename = "HomeView"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "HomeView"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
 fileprivate let PAGE_COUNT_START = 25

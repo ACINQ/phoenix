@@ -2,11 +2,15 @@ package fr.acinq.phoenix.managers
 
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.io.TcpSocket
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.ElectrumConfig
 import fr.acinq.phoenix.utils.TorHelper.connectionState
+import fr.acinq.lightning.logging.debug
+import fr.acinq.lightning.logging.error
+import fr.acinq.lightning.logging.info
 import fr.acinq.tor.Tor
 import fr.acinq.tor.TorState
 import kotlinx.coroutines.*
@@ -19,8 +23,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -49,7 +51,7 @@ class AppConnectionsDaemon(
         electrumClient = business.electrumClient
     )
 
-    private val logger = newLogger(loggerFactory)
+    private val logger = loggerFactory.newLogger(this::class)
 
     private var peerConnectionJob: Job? = null
     private var electrumConnectionJob: Job? = null

@@ -84,7 +84,6 @@ fun ScanDataView(
     onBackClick: () -> Unit,
     onAuthSchemeInfoClick: () -> Unit,
 ) {
-    val log = logger("ScanDataView")
     var initialInput = remember { input }
     val peer by business.peerManager.peerState.collectAsState()
     val trampolineFees = peer?.walletParams?.trampolineFees?.firstOrNull()
@@ -174,7 +173,6 @@ fun ReadDataView(
     onBackClick: () -> Unit,
     onScannedText: (String) -> Unit,
 ) {
-    val log = logger("ReadDataView")
     val context = LocalContext.current.applicationContext
 
     var showManualInputDialog by remember { mutableStateOf(false) }
@@ -248,7 +246,6 @@ fun BoxScope.ScannerView(
     onScanViewBinding: (DecoratedBarcodeView) -> Unit,
     onScannedText: (String) -> Unit
 ) {
-    val log = logger("ScannerView")
     // scanner view using a legacy binding
     AndroidViewBinding(
         modifier = Modifier.fillMaxWidth(),
@@ -264,7 +261,6 @@ fun BoxScope.ScannerView(
                     override fun barcodeResult(result: BarcodeResult?) {
                         result?.text?.trim()?.takeIf { it.isNotBlank() }?.let {
                             scanView.pause()
-                            log.debug { "scanned text=$it" }
                             onScannedText(it)
                         }
                     }

@@ -1,20 +1,17 @@
 package fr.acinq.phoenix.managers
 
-import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.TxId
-import fr.acinq.bitcoin.byteVector32
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.getConfirmations
 import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
 import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
-import fr.acinq.lightning.io.PaymentNotSent
-import fr.acinq.lightning.io.PaymentProgress
-import fr.acinq.lightning.io.PaymentSent
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.SqlitePaymentsDb
+import fr.acinq.lightning.logging.debug
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,8 +19,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
 
 
 class PaymentsManager(
@@ -42,7 +37,7 @@ class PaymentsManager(
         electrumClient = business.electrumClient
     )
 
-    private val log = newLogger(loggerFactory)
+    private val log = loggerFactory.newLogger(this::class)
 
     /**
      * A flow containing the total number of payments in the database,

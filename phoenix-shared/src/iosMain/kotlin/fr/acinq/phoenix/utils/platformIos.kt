@@ -1,8 +1,11 @@
 package fr.acinq.phoenix.utils
 
+import co.touchlab.kermit.Severity
 import platform.Foundation.*
 
-actual class PlatformContext
+actual class PlatformContext(
+    val logger: ((Severity, String, String) -> Unit)? = null
+)
 
 actual fun getApplicationFilesDirectoryPath(ctx: PlatformContext): String =
     NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true)[0] as String

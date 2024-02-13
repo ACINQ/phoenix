@@ -1,15 +1,12 @@
 import Foundation
 import PhoenixShared
 import Combine
-import os.log
 
+fileprivate let filename = "PhoenixManager"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "PhoenixManager"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
 typealias ConnectionsListener = (Connections) -> Void
@@ -51,18 +48,18 @@ typealias PaymentListener = (Lightning_kmpIncomingPayment) -> Void
 class PhoenixManager {
 	
 	public static let shared = PhoenixManager()
-	
+
 	private var connectionsListener: ConnectionsListener? = nil
 	private var paymentListener: PaymentListener? = nil
 	
 	private var business: PhoenixBusiness? = nil
 	private var oldBusiness: PhoenixBusiness? = nil
-	
+
 	private var cancellables = Set<AnyCancellable>()
 	private var oldCancellables = Set<AnyCancellable>()
-	
+
 	private var fiatExchangeRates: [ExchangeRate] = []
-	
+
 	private init() {} // Must use shared instance
 	
 	// --------------------------------------------------
@@ -75,7 +72,7 @@ class PhoenixManager {
 	) {
 		log.trace("register(::)")
 		assertMainThread()
-		
+
 		self.connectionsListener = connectionsListener
 		self.paymentListener = paymentListener
 		
@@ -86,7 +83,7 @@ class PhoenixManager {
 	public func unregister() {
 		log.trace("unregister()")
 		assertMainThread()
-		
+
 		self.connectionsListener = nil
 		self.paymentListener = nil
 		
@@ -105,17 +102,17 @@ class PhoenixManager {
 	private func setupBusiness() {
 		log.trace("setupBusiness()")
 		assertMainThread()
-		
+
 		guard business == nil else {
 			log.warning("ignoring: business != nil")
 			return
 		}
-		
+
 		let newBusiness = PhoenixBusiness(ctx: PlatformContext())
-		
+
 		newBusiness.networkMonitor.disable()
 		newBusiness.currencyManager.disableAutoRefresh()
-		
+
 		let electrumConfig = GroupPrefs.shared.electrumConfig
 		newBusiness.appConfigurationManager.updateElectrumConfig(server: electrumConfig?.serverAddress)
 		
@@ -127,7 +124,7 @@ class PhoenixManager {
 		newBusiness.appConfigurationManager.updatePreferredFiatCurrencies(
 			current: preferredFiatCurrencies
 		)
-		
+
 		let startupParams = StartupParams(
 			requestCheckLegacyChannels: false,
 			isTorEnabled: GroupPrefs.shared.isTorEnabled,
@@ -135,20 +132,20 @@ class PhoenixManager {
 			trustedSwapInTxs: Set()
 		)
 		newBusiness.start(startupParams: startupParams)
-		
+
 		newBusiness.currencyManager.refreshAll(targets: [primaryFiatCurrency], force: false)
-		
+
 		newBusiness.connectionsManager.connectionsPublisher().sink {
 			[weak self](connections: Connections) in
-			
+
 			self?.connectionsChanged(connections)
 		}
 		.store(in: &cancellables)
-		
+
 		let pushReceivedAt = Date()
 		newBusiness.paymentsManager.lastIncomingPaymentPublisher().sink {
 			[weak self](payment: Lightning_kmpIncomingPayment) in
-			
+
 			guard
 				let paymentReceivedAt = payment.received?.receivedAtDate,
 				paymentReceivedAt > pushReceivedAt
@@ -156,62 +153,62 @@ class PhoenixManager {
 				// Ignoring - this is the most recently received incomingPayment, but not a new one
 				return
 			}
-			
+
 			self?.didReceivePayment(payment)
 		}
 		.store(in: &cancellables)
-		
+
 		newBusiness.currencyManager.ratesPubliser().sink {
 			[weak self](rates: [ExchangeRate]) in
-			
+
 			assertMainThread() // var `fiatExchangeRates` should be accessed/updated only on main thread
 			self?.fiatExchangeRates = rates
 		}
 		.store(in: &cancellables)
-		
+
 		// Setup complete
 		business = newBusiness
 	}
-	
+
 	private func teardownBusiness() {
 		log.trace("teardownBusiness()")
 		assertMainThread()
-		
+
 		guard let currentBusiness = business else {
 			log.warning("ignoring: business == nil")
 			return
 		}
-		
+
 		if let prvBusiness = oldBusiness {
 			prvBusiness.stop()
 			oldBusiness = nil
 			oldCancellables.removeAll()
 		}
-		
+
 		oldBusiness = currentBusiness
 		business = nil
 		cancellables.removeAll()
-		
+
 		currentBusiness.connectionsManager.connectionsPublisher().sink {
 			[weak self](connections: Connections) in
-			
+
 			self?.oldConnectionsChanged(connections)
 		}
 		.store(in: &oldCancellables)
-		
+
 		currentBusiness.appConnectionsDaemon?.incrementDisconnectCount(
 			target: AppConnectionsDaemon.ControlTarget.companion.All
 		)
-		
+
 		// Safety mechanism: To make sure nothing falls between the cracks,
 		// and the oldBusiness doesn't get properly cleaned up.
 		oldConnectionsChanged(currentBusiness.connectionsManager.currentValue)
 	}
-	
+
 	// --------------------------------------------------
 	// MARK: Flow
 	// --------------------------------------------------
-	
+
 	private func unlock() {
 		log.trace("unlock()")
 		
@@ -266,22 +263,22 @@ class PhoenixManager {
 			log.warning("ignoring: business == nil")
 			return
 		}
-		
+
 		let seed = business.walletManager.mnemonicsToSeed(
 			mnemonics: recoveryPhrase.mnemonicsArray,
 			passphrase: ""
 		)
 		business.walletManager.loadWallet(seed: seed)
 	}
-	
+
 	// --------------------------------------------------
 	// MARK: Notifications
 	// --------------------------------------------------
-	
+
 	private func connectionsChanged(_ connections: Connections) {
 		log.trace("connectionsChanged(_)")
 		assertMainThread()
-		
+
 		if let listener = self.connectionsListener {
 			listener(connections)
 		}
@@ -290,19 +287,19 @@ class PhoenixManager {
 	private func didReceivePayment(_ payment: Lightning_kmpIncomingPayment) {
 		log.trace("didReceivePayment(_)")
 		assertMainThread()
-		
+
 		if let listener = self.paymentListener {
 			listener(payment)
 		}
 	}
-	
+
 	// --------------------------------------------------
 	// MARK: Cleanup
 	// --------------------------------------------------
-	
+
 	private func oldConnectionsChanged(_ connections: Connections) {
 		log.trace("oldConnectionsChanged(_)")
-		
+
 		switch connections.peer {
 			case is Lightning_kmpConnection.ESTABLISHED  : log.debug("oldConnections.peer = ESTABLISHED")
 			case is Lightning_kmpConnection.ESTABLISHING : log.debug("oldConnections.peer = ESTABLISHING")
@@ -315,7 +312,7 @@ class PhoenixManager {
 			case is Lightning_kmpConnection.CLOSED       : log.debug("oldConnections.electrum = CLOSED")
 			default                                      : log.debug("oldConnections.electrum = UNKNOWN")
 		}
-		
+
 		if connections.peer is Lightning_kmpConnection.CLOSED &&
 			connections.electrum is Lightning_kmpConnection.CLOSED
 		{
