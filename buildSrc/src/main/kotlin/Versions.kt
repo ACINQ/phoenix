@@ -46,7 +46,7 @@ object Versions {
         const val work = "2.8.1"
         const val viewpager = "1.0.0"
         const val eventbus = "3.1.1"
-        const val torWrapper = "0.0.5"
+        const val torWrapper = "0.0.6"
         const val torCtl = "0.4"
     }
 }

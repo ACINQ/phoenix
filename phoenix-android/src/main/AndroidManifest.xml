@@ -19,6 +19,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:hardwareAccelerated="true"
+        android:extractNativeLibs="true"
         android:theme="@style/default_theme"
         android:localeConfig="@xml/locales_config">
 

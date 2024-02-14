@@ -78,10 +78,10 @@ jobs:
     - name: Build Tor_Onion_Proxy_Library and install to local maven repo
       run: |
         cd tor-lib
-        ./gradlew install
         ./gradlew :universal:build
+        ./gradlew :universal:publishToMavenLocal
         ./gradlew :android:build
-        ./gradlew :android:publishToMaven
+        ./gradlew :android:publishToMavenLocal
 
     - name: Assemble new android app apk
       run: |
