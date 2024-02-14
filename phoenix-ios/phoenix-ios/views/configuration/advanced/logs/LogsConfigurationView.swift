@@ -130,7 +130,7 @@ struct LogsConfigurationView: View {
 		do {
 			let logsDirectory = try LoggerFactory.logsDirectory()
 			
-			let options: FileManager.DirectoryEnumerationOptions = [
+			let dirEnumOptions: FileManager.DirectoryEnumerationOptions = [
 				.skipsHiddenFiles,
 				.skipsPackageDescendants,
 				.skipsSubdirectoryDescendants
@@ -138,49 +138,21 @@ struct LogsConfigurationView: View {
 			let allUrls = try FileManager.default.contentsOfDirectory(
 				at: logsDirectory,
 				includingPropertiesForKeys: [],
-				options: options
+				options: dirEnumOptions
 			)
 			
 			let logFileUrls = allUrls.filter { $0.lastPathComponent.hasSuffix(".log") }
 			
-			// Architecture notes:
-			// Our primary concern here is not speed but memory usage.
-			// 
-			// Idea for future improvement:
-			// - Create an AsyncStream for each log file (that outputs LogFileEntryTimestamp items)
-			// - Combine multiple streams into a single AsyncStream
-			// - The combined stream simply outputs the earliest item from each substream
-			//
-			// This would drastically reduce memory pressure,
-			// and allow us to write to the temp file at the same time
-			// that we're reading from the log files.
-			
-			var allEntries: [LogFileEntryTimestamp] = []
-			for url in logFileUrls {
-				let entries = try await LogFileParser.lightParse(url)
+			let processAbbreviations = logFileUrls.map { url in
 				
 				let filename = url.lastPathComponent
-				let processAbbreviation: String
 				if filename.hasPrefix(LoggerFactory.friendlyProcessName_foreground) {
-					processAbbreviation = "FG"
+					return "FG"
 				} else if filename.hasPrefix(LoggerFactory.friendlyProcessName_background) {
-					processAbbreviation = "BG"
+					return "BG"
 				} else {
-					processAbbreviation = "??"
+					return "??"
 				}
-				
-				let updatedEntries = entries.map { entry in
-					LogFileEntryTimestamp(
-						raw: "[\(processAbbreviation)] \(entry.raw)",
-						timestamp: entry.timestamp
-					)
-				}
-				
-				allEntries.append(contentsOf: updatedEntries)
-			}
-			
-			allEntries.sort { (a, b) in
-				return a.timestamp < b.timestamp
 			}
 			
 			let random = UUID().uuidString
@@ -189,12 +161,27 @@ struct LogsConfigurationView: View {
 			
 			let tempDir = FileManager.default.temporaryDirectory
 			let tempFilename = "\(random).log"
-			let tempFile = tempDir.appendingPathComponent(tempFilename, isDirectory: false)
+			let tempFileUrl = tempDir.appendingPathComponent(tempFilename, isDirectory: false)
 			
-			let entriesData = allEntries.map { $0.raw }.joined(separator: "\n").data(using: .utf8)!
-			try entriesData.write(to: tempFile)
+			let writeOptions: Data.WritingOptions = .withoutOverwriting
+			try Data().write(to: tempFileUrl, options: writeOptions)
 			
-			await exportingFinished(tempFile)
+			let fileHandle = try FileHandle(forWritingTo: tempFileUrl)
+			
+			let channel = LogFileParser.asyncLightParseChannel(logFileUrls)
+			for try await wrapper in channel {
+				
+				let processAbbreviation = processAbbreviations[wrapper.urlIndex]
+				
+				let string = "[\(processAbbreviation)] \(wrapper.entry.raw)\n"
+				if let data = string.data(using: .utf8) {
+					
+					try await fileHandle.asyncWrite(data: data)
+				}
+			}
+			
+			try await fileHandle.asyncSyncAndClose()
+			await exportingFinished(tempFileUrl)
 			
 		} catch {
 			log.error("Error exporting logs: \(error)")

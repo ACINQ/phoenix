@@ -1,5 +1,6 @@
 import Foundation
 import Logging
+import AsyncAlgorithms
 
 fileprivate let filename = "LogFileParser"
 #if DEBUG && true
@@ -28,69 +29,215 @@ struct LogFileEntryTimestamp {
 	let timestamp: Date
 }
 
+struct LogFileEntryTimestampWrapper {
+	let urlIndex: Int
+	let entry: LogFileEntryTimestamp
+}
+
 
 class LogFileParser {
 	
-	/// An error may be thrown if there are IO errors when opening/reading the file.
-	/// Errors when attempting to parse particular log entries are ignored (but log messages are generated).
+	/// Parses multiple log files simulataneously, streaming entries from earliest to latest.
 	///
-	static func fullParse(_ url: URL) async throws -> [LogFileEntry] {
-		
-		let rawEntries = try await parseRawEntries(url)
-		let df = ISO8601DateFormatter()
-		
-		var entries: [LogFileEntry] = []
-		for rawEntry in rawEntries {
-			if let entry = parseEntry(rawEntry, df) {
-				entries.append(entry)
-			}
-		}
-		
-		return entries
-	}
-	
-	/// An error may be thrown if there are IO errors when opening/reading the file.
-	/// Errors when attempting to parse particular log entries are ignored (but log messages are generated).
+	/// This function is designed to minimize memory pressure, allowing dozens of log files to
+	/// be streamed, while only reading minimal information into memory during the streaming process.
 	///
-	static func lightParse(_ url: URL) async throws -> [LogFileEntryTimestamp] {
+	/// Since an AsyncChannel is being used, backpressure is properly implemented.
+	/// Meaning data from the underlying files will only be read as you request more items from this channel.
+	///
+	static func asyncLightParseChannel(
+		_ urls: [URL]
+	) -> AsyncThrowingChannel<LogFileEntryTimestampWrapper, Error> {
 		
-		let rawEntries = try await parseRawEntries(url)
-		let df = ISO8601DateFormatter()
+		let channel = AsyncThrowingChannel<LogFileEntryTimestampWrapper, Error>()
 		
-		var entries: [LogFileEntryTimestamp] = []
-		for rawEntry in rawEntries {
-			if let entry = parseLightEntry(rawEntry, df) {
-				entries.append(entry)
+		Task.detached {
+			
+			var iterators: [AsyncThrowingChannel<LogFileEntryTimestamp, Error>.Iterator] = []
+			for url in urls {
+				let channel = asyncLightParseChannel(url)
+				let iterator = channel.makeAsyncIterator()
+				
+				iterators.append(iterator)
 			}
-		}
-		
-		return entries
-	}
-	
-	private static func parseRawEntries(_ url: URL) async throws -> [String] {
-		
-		var rawEntries: [String] = []
-		
-		var buffer: String = ""
-		for try await line in url.lines {
-			if line.hasPrefix("[") {
-				if !buffer.isEmpty {
-					rawEntries.append(buffer)
+			
+			var entries: [Optional<LogFileEntryTimestamp>] = []
+			
+			for i in 0..<iterators.count {
+				var iterator = iterators[i]
+				let entry = try? await iterator.next() // func `next()` is a mutating operation
+				
+				entries.append(entry)
+				iterators[i] = iterator
+			}
+			
+			let nextEntry = {() -> (Int, LogFileEntryTimestamp)? in
+				
+				var minIndex: Int? = nil
+				var minEntry: LogFileEntryTimestamp? = nil
+				
+				for (index, entry) in entries.enumerated() {
+					if let entry {
+						if let currentMinEntry = minEntry {
+							if entry.timestamp < currentMinEntry.timestamp {
+								minIndex = index
+								minEntry = entry
+							}
+						} else {
+							minIndex = index
+							minEntry = entry
+						}
+					}
 				}
-				buffer = line
-			} else if !buffer.isEmpty {
-				buffer += line
+				
+				if let index = minIndex, let entry = minEntry {
+					return (index, entry)
+				} else {
+					return nil
+				}
+			}
+			
+			while let tuple = nextEntry() {
+				
+				let (index, entry) = tuple
+				let entryWrapper = LogFileEntryTimestampWrapper(urlIndex: index, entry: entry)
+				
+				await channel.send(entryWrapper)
+				
+				var iterator = iterators[index]
+				let nextEntry = try? await iterator.next()
+				
+				entries[index] = nextEntry
+				iterators[index] = iterator
+			}
+			
+			channel.finish()
+			
+		} // </Task>
+		
+		return channel
+	}
+	
+	/// Returns an AsyncThrowingChannel that can be used to read the log entries iteratively.
+	///
+	/// Since an AsyncChannel is being used, backpressure is properly implemented.
+	/// Meaning data from the underlying file will only be read as you request more items from this channel.
+	///
+	/// An error may be emitted on the channel if there are IO errors when opening/reading the file.
+	/// Errors when attempting to parse particular log entries are ignored (but log messages are generated).
+	///
+	static func asyncFullParseChannel(
+		_ url: URL
+	) -> AsyncThrowingChannel<LogFileEntry, Error> {
+		
+		let channel = AsyncThrowingChannel<LogFileEntry, Error>()
+		Task.detached {
+			do {
+				let df = ISO8601DateFormatter()
+				let rawEntriesChannel = asyncRawParseChannel(url)
+				
+				for try await rawEntry in rawEntriesChannel {
+					if let entry = parseEntry(rawEntry, df) {
+						await channel.send(entry)
+					}
+				}
+				
+				channel.finish()
+			} catch {
+				channel.fail(error)
 			}
 		}
 		
-		if !buffer.isEmpty {
-			rawEntries.append(buffer)
-		}
-		
-		return rawEntries
+		return channel
 	}
 	
-	private static func parseEntry(
+	/// Returns an AsyncThrowingChannel that can be used to read the log entries iteratively.
+	///
+	/// Since an AsyncChannel is being used, backpressure is properly implemented.
+	/// Meaning data from the underlying file will only be read as you request more items from this channel.
+	///
+	/// An error may be emitted on the channel if there are IO errors when opening/reading the file.
+	/// Errors when attempting to parse particular log entries are ignored (but log messages are generated).
+	///
+	static func asyncLightParseChannel(
+		_ url: URL
+	) -> AsyncThrowingChannel<LogFileEntryTimestamp, Error> {
+		
+		let channel = AsyncThrowingChannel<LogFileEntryTimestamp, Error>()
+		Task.detached {
+			do {
+				let df = ISO8601DateFormatter()
+				let rawEntriesChannel = asyncRawParseChannel(url)
+				
+				for try await rawEntry in rawEntriesChannel {
+					if let entry = parseLightEntry(rawEntry, df) {
+						await channel.send(entry)
+					}
+				}
+				
+				channel.finish()
+			} catch {
+				channel.fail(error)
+			}
+		}
+		
+		return channel
+	}
+	
+	/// Returns an AsyncThrowingChannel that can be used to read the log entries iteratively.
+	///
+	/// Since an AsyncChannel is being used, backpressure is properly implemented.
+	/// Meaning data from the underlying file will only be read as you request more items from this channel.
+	///
+	/// An error may be emitted on the channel if there are IO errors when opening/reading the file.
+	///
+	static func asyncRawParseChannel(
+		_ url: URL
+	) -> AsyncThrowingChannel<String, Error> {
+		
+		let channel = AsyncThrowingChannel<String, Error>()
+		Task.detached {
+			do {
+				// Does URL.lines properly support backpressure ?
+				//
+				// This question is important in our implementation,
+				// because we want to open all log files simultaneously,
+				// and combine them on the fly (sorted by timestamp).
+				//
+				// If URL.lines does NOT support backpressure,
+				// then it will immediately read the entire file into memory,
+				// and our "combine strategy" falls apart.
+				//
+				// However, after testing, I'm happy to report that it
+				// does indeed support backpressure (even though it's not
+				// explained in the documentation).
+				
+				var buffer: String = ""
+				for try await line in url.lines {
+					if line.hasPrefix("[") {
+						if !buffer.isEmpty {
+							await channel.send(buffer)
+						}
+						buffer = line
+					} else if !buffer.isEmpty {
+						buffer += line
+					}
+				}
+				
+				if !buffer.isEmpty {
+					await channel.send(buffer)
+				}
+				
+				channel.finish()
+			} catch {
+				channel.fail(error)
+			}
+		} // </Task>
+		
+		return channel
+	}
+	
+	static func parseEntry(
 		_ string: String,
 		_ df: ISO8601DateFormatter
 	) -> LogFileEntry? {
@@ -126,7 +273,7 @@ class LogFileParser {
 		)
 	}
 	
-	private static func parseLightEntry(
+	static func parseLightEntry(
 		_ string: String,
 		_ df: ISO8601DateFormatter
 	) -> LogFileEntryTimestamp? {
