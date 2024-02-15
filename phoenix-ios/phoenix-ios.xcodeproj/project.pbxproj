@@ -179,6 +179,7 @@
 		DC99E94025BA141000FB20F7 /* LocalWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC99E93F25BA141000FB20F7 /* LocalWebView.swift */; };
 		DC99E94D25BA258C00FB20F7 /* about.html in Resources */ = {isa = PBXBuildFile; fileRef = DC99E94825BA258C00FB20F7 /* about.html */; };
 		DC99E95825BA2BA800FB20F7 /* common.css in Resources */ = {isa = PBXBuildFile; fileRef = DC99E95625BA2BA800FB20F7 /* common.css */; };
+		DC9B15442B7D0DCB0023743B /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = DC9B15432B7D0DCB0023743B /* AsyncAlgorithms */; };
 		DC9B8EE225D72CC200E13818 /* ForceCloseChannelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9B8EE125D72CC200E13818 /* ForceCloseChannelsView.swift */; };
 		DC9E7EC32A12955300A5F1D0 /* LiquidityHTML.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9E7EC22A12955300A5F1D0 /* LiquidityHTML.swift */; };
 		DC9E7EC62A1295B100A5F1D0 /* liquidity.html in Resources */ = {isa = PBXBuildFile; fileRef = DC9E7EC82A1295B100A5F1D0 /* liquidity.html */; };
@@ -647,6 +648,7 @@
 			files = (
 				DCA5391A29F1DDE7001BD3D5 /* SegmentedPicker in Frameworks */,
 				DC26D0BB2A93BD0F006763B3 /* EffectsLibrary in Frameworks */,
+				DC9B15442B7D0DCB0023743B /* AsyncAlgorithms in Frameworks */,
 				DC46BAE426C6FDD300E760A6 /* CircularCheckmarkProgress in Frameworks */,
 				DCC9D99C267BEB3D00EA36DD /* CloudKit.framework in Frameworks */,
 				DC39D4E5286B4A7E0030F18D /* Popovers in Frameworks */,
@@ -1400,6 +1402,7 @@
 				DCA5391929F1DDE7001BD3D5 /* SegmentedPicker */,
 				DC26D0BA2A93BD0F006763B3 /* EffectsLibrary */,
 				DCCFE6AA2B6430AB002FFF11 /* Logging */,
+				DC9B15432B7D0DCB0023743B /* AsyncAlgorithms */,
 			);
 			productName = "phoenix-ios";
 			productReference = 7555FF7B242A565900829871 /* Phoenix.app */;
@@ -1531,6 +1534,7 @@
 				DCA5391729F1DAA3001BD3D5 /* XCRemoteSwiftPackageReference "SwiftySegmentedPicker" */,
 				DC26D0B82A93BA8C006763B3 /* XCRemoteSwiftPackageReference "effects-library" */,
 				DCCFE6A92B6430AB002FFF11 /* XCRemoteSwiftPackageReference "swift-log" */,
+				DC9B15422B7D0DCB0023743B /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
 			);
 			productRefGroup = 7555FF7C242A565900829871 /* Products */;
 			projectDirPath = "";
@@ -2451,6 +2455,14 @@
 				version = 9.1.0;
 			};
 		};
+		DC9B15422B7D0DCB0023743B /* XCRemoteSwiftPackageReference "swift-async-algorithms" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-async-algorithms.git";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 		DCA5391729F1DAA3001BD3D5 /* XCRemoteSwiftPackageReference "SwiftySegmentedPicker" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/KazaiMazai/SwiftySegmentedPicker.git";
@@ -2494,6 +2506,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DC72C2EA25A3CADC008A927A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseMessaging;
+		};
+		DC9B15432B7D0DCB0023743B /* AsyncAlgorithms */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DC9B15422B7D0DCB0023743B /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
+			productName = AsyncAlgorithms;
 		};
 		DCA5391829F1DAA3001BD3D5 /* SegmentedPicker */ = {
 			isa = XCSwiftPackageProductDependency;
