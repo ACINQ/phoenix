@@ -46,7 +46,6 @@ import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.monoTypo
 import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.controllers.config.CloseChannelsConfiguration
-import fr.acinq.phoenix.data.BitcoinAddressError
 import fr.acinq.phoenix.data.BitcoinUriError
 import fr.acinq.phoenix.utils.Parser
 

@@ -16,28 +16,21 @@
 
 package fr.acinq.phoenix.android.settings.walletinfo
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -45,7 +38,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.blockchain.electrum.WalletState
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.AddressLinkButton
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.CardHeader
@@ -54,7 +46,6 @@ import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.ItemCard
 import fr.acinq.phoenix.android.components.ProgressView
-import fr.acinq.phoenix.android.components.addressUrl
 import fr.acinq.phoenix.android.components.openLink
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.utils.BlockchainExplorer
@@ -69,40 +60,40 @@ fun SwapInAddresses(
     DefaultScreenLayout(isScrollable = false) {
         DefaultScreenHeader(
             onBackClick = onBackClick,
-            title = "Swap-in addresses",
+            title = stringResource(id = R.string.swapinaddresses_title),
         )
 
-            val addresses = vm.taprootAddresses
-            LazyColumn(modifier = Modifier.fillMaxWidth()) {
+        val addresses = vm.taprootAddresses
+        LazyColumn(modifier = Modifier.fillMaxWidth()) {
+            item {
+                CardHeader(text = stringResource(id = R.string.swapinaddresses_taproot))
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            if (addresses.isEmpty()) {
                 item {
-                    CardHeader(text = "Taproot")
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-                if (addresses.isEmpty()) {
-                    item {
-                        Card {
-                            ProgressView(text = "Synchronizing addresses...")
-                        }
-                    }
-                } else {
-                    itemsIndexed(addresses) { index, (address, state) ->
-                        ItemCard(index = index, maxItemsCount = addresses.size) {
-                            AddressStateView(address = address, state = state)
-                        }
+                    Card(modifier = Modifier.fillMaxWidth()) {
+                        ProgressView(text = stringResource(id = R.string.swapinaddresses_sync), padding = PaddingValues(horizontal = 16.dp, vertical = 12.dp))
                     }
                 }
-                vm.legacyAddress.value?.let { (address, state) ->
-                    item {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        CardHeader(text = "Legacy")
-                    }
-                    item {
-                        Card {
-                            AddressStateView(address = address, state = state)
-                        }
+            } else {
+                itemsIndexed(addresses) { index, (address, state) ->
+                    ItemCard(index = index, maxItemsCount = addresses.size) {
+                        AddressStateView(address = address, state = state)
                     }
                 }
             }
+            vm.legacyAddress.value?.let { (address, state) ->
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    CardHeader(text = stringResource(id = R.string.swapinaddresses_legacy))
+                }
+                item {
+                    Card {
+                        AddressStateView(address = address, state = state)
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -123,7 +114,7 @@ private fun AddressStateView(
             val meta = state.meta
             if (meta is WalletState.Companion.AddressMeta.Derived) {
                 Text(
-                    text = "#${meta.index}",
+                    text = meta.index.toString(),
                     modifier = Modifier.width(20.dp),
                     style = MaterialTheme.typography.caption,
                     textAlign = TextAlign.End,
@@ -133,7 +124,7 @@ private fun AddressStateView(
             Text(text = address, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
             Button(
                 icon = R.drawable.ic_copy,
-                onClick = { copyToClipboard(context, address, "copy address") },
+                onClick = { copyToClipboard(context, address, "Copy address") },
                 padding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
             )
         }

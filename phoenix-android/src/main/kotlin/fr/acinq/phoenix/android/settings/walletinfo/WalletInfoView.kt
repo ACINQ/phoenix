@@ -154,18 +154,14 @@ private fun SwapInWalletView(
         HSeparator(modifier = Modifier.padding(start = 16.dp), width = 50.dp)
 
         keyManager?.let {
-            val legacyDescriptor = it.swapInOnChainWallet.legacyDescriptor
             SettingWithCopy(
-                title = "Legacy descriptor",
-                value = legacyDescriptor,
+                title = stringResource(id = R.string.walletinfo_descriptor_legacy),
+                value = it.swapInOnChainWallet.legacyDescriptor,
                 maxLinesValue = 1
             )
-            // fixme: invalid descriptor
-            val publicDescriptor = "TODO"
-//                it.swapInOnChainWallet.getSwapInProtocol(0).descriptor(chain, DeterministicWallet.derivePublicKey(DeterministicWallet.publicKey(master), swapInUserRefundKeyPath(chain)))
             SettingWithCopy(
                 title = stringResource(id = R.string.walletinfo_descriptor),
-                value = publicDescriptor,
+                value = it.swapInOnChainWallet.publicDescriptor,
                 maxLinesValue = 1
             )
             SettingWithCopy(
@@ -174,7 +170,11 @@ private fun SwapInWalletView(
                 maxLinesValue = 1
             )
         }
-        MenuButton(text = "Swap addresses", onClick = onSwapInWalletInfoClick)
+        MenuButton(
+            text = stringResource(id = R.string.walletinfo_swapin_addresses),
+            icon = R.drawable.ic_list,
+            onClick = onSwapInWalletInfoClick
+        )
     }
 }
 
