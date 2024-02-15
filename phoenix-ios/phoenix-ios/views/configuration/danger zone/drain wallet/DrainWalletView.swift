@@ -335,16 +335,7 @@ struct DrainWalletView: MVIView {
 			
 			log.debug("result.error = \(error)")
 			
-			if let error = error as? BitcoinUriError.ChainMismatch {
-				detailedErrorMsg = String(format: NSLocalizedString(
-					"""
-					The address is not for %@
-					""",
-					comment: "Error message - parsing bitcoin address"),
-					error.expected.name
-				)
-			}
-			else if isScannedValue {
+			if isScannedValue {
 				// If the user scanned a non-bitcoin QRcode, we should notify them of the error
 				detailedErrorMsg = NSLocalizedString(
 					"The scanned QR code is not a bitcoin address",
@@ -359,10 +350,29 @@ struct DrainWalletView: MVIView {
 			
 		} else {
 			
-			log.debug("result.info = \(result.right!)")
+			let bitcoinUri = result.right!
+			log.debug("result.info = \(bitcoinUri)")
 			
-			parsedBitcoinAddress = result.right!.address
-			detailedErrorMsg = nil
+			// Check to make sure the bitcoin address is for the correct chain.
+			let parsedChain = bitcoinUri.chain
+			let expectedChain = Biz.business.chain
+			
+			if parsedChain != expectedChain {
+				
+				detailedErrorMsg = String(format: NSLocalizedString(
+					"""
+					The address is for %@, but you're on %@
+					""",
+					comment: "Error message - parsing bitcoin address"),
+					parsedChain.name, expectedChain.name
+				)
+				parsedBitcoinAddress = nil
+				
+			} else { // looks good
+				
+				parsedBitcoinAddress = bitcoinUri.address
+				detailedErrorMsg = nil
+			}
 		}
 		
 		if !isScannedValue && scannedValue != nil {

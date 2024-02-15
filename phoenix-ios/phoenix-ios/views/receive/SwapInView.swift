@@ -26,6 +26,10 @@ struct SwapInView: View {
 	let swapInWalletPublisher = Biz.business.balanceManager.swapInWalletPublisher()
 	@State var swapInWallet = Biz.business.balanceManager.swapInWalletValue()
 	
+	let swapInAddressPublisher = Biz.business.peerManager.peerStatePublisher().flatMap { $0.swapInWallet.swapInAddressPublisher()
+	}
+	@State var swapInAddressInfo: Lightning_kmpSwapInWallet.SwapInAddressInfo? = nil
+	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
@@ -314,28 +318,39 @@ struct SwapInView: View {
 	}
 	
 	// --------------------------------------------------
+	// MARK: View Helpers
+	// --------------------------------------------------
+	
+	func updateSwapInAddress() {
+		log.trace("updateSwapInAddress()")
+		
+		guard let keyManager = Biz.business.walletManager.keyManagerValue() else {
+			return
+		}
+		
+		let index = swapInAddressInfo?.index ?? Prefs.shared.swapInAddressIndex
+		let chain = Biz.business.chain
+		
+		let address = keyManager.swapInOnChainWallet
+			.getSwapInProtocol(addressIndex: Int32(index))
+			.address(chain: chain)
+		
+		if swapInAddress != address {
+			swapInAddress = address
+			
+			// Issue #196: Use uppercase lettering for invoices and address QRs
+			self.qrCode.generate(value: address.uppercased())
+		}
+	}
+	
+	// --------------------------------------------------
 	// MARK: Notifications
 	// --------------------------------------------------
 	
 	func onAppear() {
 		log.trace("onAppear()")
 		
-		Task { @MainActor in
-			
-			let peerManager = Biz.business.peerManager
-			do {
-				let peer = try await peerManager.getPeer()
-				let address = peer.swapInAddress
-				
-				self.swapInAddress = address
-			
-				// Issue #196: Use uppercase lettering for invoices and address QRs
-				self.qrCode.generate(value: address.uppercased())
-				
-			} catch {
-				log.error("Failed fetching swapInAddress: \(error)")
-			}
-		}
+		updateSwapInAddress()
 	}
 	
 	func swapInWalletChanged(_ newWallet: Lightning_kmpWalletState.WalletWithConfirmations) {
@@ -352,6 +367,19 @@ struct SwapInView: View {
 		swapInWallet = newWallet
 		if newBalance > oldBalance {
 			presentationMode.wrappedValue.dismiss()
+		}
+	}
+	
+	func swapInAddressChanged(_ newInfo: Lightning_kmpSwapInWallet.SwapInAddressInfo?) {
+		log.trace("swapInAddressChanged()")
+		
+		self.swapInAddressInfo = newInfo
+		updateSwapInAddress()
+		
+		if let newInfo {
+			if Prefs.shared.swapInAddressIndex < newInfo.index {
+				Prefs.shared.swapInAddressIndex = newInfo.index
+			}
 		}
 	}
 	

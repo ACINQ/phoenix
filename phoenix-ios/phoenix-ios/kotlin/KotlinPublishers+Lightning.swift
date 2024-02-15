@@ -98,3 +98,38 @@ extension Lightning_kmpNodeParams {
 		}
 	}
 }
+
+extension Lightning_kmpSwapInWallet {
+	
+	fileprivate struct _Key {
+		static var swapInAddressPublisher = 0
+	}
+	
+	struct SwapInAddressInfo {
+		let addr: String
+		let index: Int
+	}
+	
+	func swapInAddressPublisher() -> AnyPublisher<SwapInAddressInfo?, Never> {
+		
+		self.getSetAssociatedObject(storageKey: &_Key.swapInAddressPublisher) {
+			
+			/// Transforming from Kotlin:
+			/// `MutableStateFlow<Pair<String, Int>?>`
+			KotlinCurrentValueSubject<KotlinPair<NSString, KotlinInt>>(
+				self.swapInAddressFlow
+			)
+			.map {
+				if let pair = $0,
+				   let addr = pair.first as? String,
+				   let index = pair.second
+				{
+					return SwapInAddressInfo(addr: addr, index: index.intValue)
+				} else {
+					return nil
+				}
+			}
+			.eraseToAnyPublisher()
+		}
+	}
+}

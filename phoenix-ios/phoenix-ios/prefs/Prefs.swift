@@ -20,6 +20,7 @@ fileprivate enum Key: String {
 	case showOriginalFiatAmount
 	case recentPaymentsConfig
 	case hasMergedChannelsForSplicing
+	case swapInAddressIndex
 }
 
 fileprivate enum KeyDeprecated: String {
@@ -150,6 +151,11 @@ class Prefs {
 		set { defaults.isNewWallet = newValue }
 	}
 	
+	var swapInAddressIndex: Int {
+		get { defaults.swapInAddressIndex }
+		set { defaults.swapInAddressIndex = newValue }
+	}
+	
 	// --------------------------------------------------
 	// MARK: Recent Tips
 	// --------------------------------------------------
@@ -207,6 +213,7 @@ class Prefs {
 		defaults.removeObject(forKey: Key.showOriginalFiatAmount.rawValue)
 		defaults.removeObject(forKey: Key.recentPaymentsConfig.rawValue)
 		defaults.removeObject(forKey: Key.hasMergedChannelsForSplicing.rawValue)
+		defaults.removeObject(forKey: Key.swapInAddressIndex.rawValue)
 		
 		self.backupTransactions.resetWallet(encryptedNodeId: encryptedNodeId)
 		self.backupSeed.resetWallet(encryptedNodeId: encryptedNodeId)
@@ -300,5 +307,10 @@ extension UserDefaults {
 	@objc fileprivate var hasMergedChannelsForSplicing: Bool {
 		get { bool(forKey: Key.hasMergedChannelsForSplicing.rawValue) }
 		set { set(newValue, forKey: Key.hasMergedChannelsForSplicing.rawValue) }
+	}
+	
+	@objc fileprivate var swapInAddressIndex: Int {
+		get { integer(forKey: Key.swapInAddressIndex.rawValue) }
+		set { set(newValue, forKey: Key.swapInAddressIndex.rawValue) }
 	}
 }

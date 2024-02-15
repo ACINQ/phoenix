@@ -178,8 +178,8 @@ struct WalletInfoView: View {
 	@ViewBuilder
 	func subsection_swapInWallet_descriptor() -> some View {
 		
-		let keyManager = Biz.business.walletManager.getKeyManager()
-		let descriptor = keyManager?.swapInOnChainWallet.descriptor ?? "?"
+		let keyManager = Biz.business.walletManager.keyManagerValue()
+		let descriptor = keyManager?.swapInOnChainWallet.publicDescriptor ?? "?"
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
 			
@@ -261,7 +261,7 @@ struct WalletInfoView: View {
 	@ViewBuilder
 	func subsection_finalWallet_masterPublicKey() -> some View {
 		
-		let keyManager = Biz.business.walletManager.getKeyManager()
+		let keyManager = Biz.business.walletManager.keyManagerValue()
 		let keyPath = keyManager?.finalOnChainWalletPath ?? "?"
 		let xpub = keyManager?.finalOnChainWallet.xpub ?? "?"
 		

@@ -23036,6 +23036,7 @@
     },
     "The address is not for %@" : {
       "comment" : "Error message - parsing bitcoin address",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
