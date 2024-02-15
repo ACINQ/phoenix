@@ -17,6 +17,7 @@
 package fr.acinq.phoenix.controllers.payments
 
 import co.touchlab.kermit.Logger
+import fr.acinq.bitcoin.BitcoinError
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.*
 import fr.acinq.lightning.db.LightningOutgoingPayment
@@ -137,8 +138,8 @@ class AppScanController(
             is Either.Right -> Scan.Model.OnchainFlow(uri = result.value)
             is Either.Left -> {
                 val error = result.value
-                if (error is BitcoinAddressError.ChainMismatch) {
-                    Scan.Model.BadRequest(request = input, reason = Scan.BadRequestReason.ChainMismatch(expected = error.expected))
+                if (error is BitcoinAddressError.InvalidScript && error.error is BitcoinError.ChainHashMismatch) {
+                    Scan.Model.BadRequest(request = input, reason = Scan.BadRequestReason.ChainMismatch(expected = chain))
                 } else {
                     Scan.Model.BadRequest(request = input, reason = Scan.BadRequestReason.UnknownFormat)
                 }

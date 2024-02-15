@@ -128,26 +128,14 @@ object Parser {
             })
         }.build()
 
-        return when (Bitcoin.addressToPublicKeyScript(chain.chainHash, address)) {
-            is AddressToPublicKeyScriptResult.Success -> {
-                Either.Right(BitcoinUri(chain, address, label, message, amount, lightning, otherParams))
-            }
-            AddressToPublicKeyScriptResult.Failure.ChainHashMismatch -> {
-                Either.Left(BitcoinAddressError.ChainMismatch(chain))
-            }
-            AddressToPublicKeyScriptResult.Failure.InvalidAddress, AddressToPublicKeyScriptResult.Failure.InvalidBech32Address,
-            is AddressToPublicKeyScriptResult.Failure.InvalidWitnessVersion -> {
-                Either.Left(BitcoinAddressError.UnknownFormat)
-            }
+        return when (val res = Bitcoin.addressToPublicKeyScript(chain.chainHash, address)) {
+            is Either.Left -> Either.Left(BitcoinAddressError.InvalidScript(res.left))
+            is Either.Right -> Either.Right(BitcoinUri(chain, Script.write(res.right).toString(), label, message, amount, lightning, otherParams))
         }
     }
 
     /** Transforms a bitcoin address into a public key script if valid, otherwise returns null. */
-    fun addressToPublicKeyScript(chain: NodeParams.Chain, address: String): ByteArray? {
-        return readBitcoinAddress(chain, address).right?.let {
-            Bitcoin.addressToPublicKeyScript(chain.chainHash, it.address).result
-        }?.let {
-            Script.write(it)
-        }
+    fun addressToPublicKeyScriptOrNull(chain: NodeParams.Chain, address: String): ByteArray? {
+        return readBitcoinAddress(chain, address).right?.address?.encodeToByteArray()
     }
 }

@@ -94,7 +94,7 @@ class AppCloseChannelsConfigurationController(
                     val closableChannelsList = updatedChannelsList.filter {
                         isClosable(it.status)
                     }
-                    val address = peer.finalAddress
+                    val address = peer.finalWallet.finalAddress
                     model(CloseChannelsConfiguration.Model.Ready(
                         channels = closableChannelsList,
                         address = address
@@ -107,7 +107,7 @@ class AppCloseChannelsConfigurationController(
     override fun process(intent: CloseChannelsConfiguration.Intent) {
         var scriptPubKey : ByteArray? = null
         if (intent is CloseChannelsConfiguration.Intent.MutualCloseAllChannels) {
-            scriptPubKey = Parser.addressToPublicKeyScript(chain, intent.address)
+            scriptPubKey = Parser.addressToPublicKeyScriptOrNull(chain, intent.address)
             if (scriptPubKey == null) {
                 throw IllegalArgumentException(
                     "Address is invalid. Caller MUST validate user input via parseBitcoinAddress"

@@ -11,7 +11,6 @@ class CsvWriter {
         val includesDescription: Boolean,
         val includesNotes: Boolean,
         val includesOriginDestination: Boolean,
-        val swapInAddress: String
     )
 
     companion object {
@@ -128,7 +127,7 @@ class CsvWriter {
                             val inputs = origin.localInputs.takeIf { it.isNotEmpty() }?.joinToString("\n- ") {
                                 it.txid.toString()
                             }?.let { "\n$it" } ?: ""
-                            "Swap-in to ${config.swapInAddress}$inputs"
+                            "Swap-in inputs:$inputs"
                         }
                     }
                     is LightningOutgoingPayment -> when (val details = payment.details) {

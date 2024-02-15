@@ -54,11 +54,6 @@ class AppReceiveController(
                     model(Receive.Model.Generated(paymentRequest.write(), paymentRequest.paymentHash.toHex(), paymentRequest.amount, paymentRequest.description))
                 }
             }
-            Receive.Intent.RequestSwapIn -> {
-                launch {
-                    model(Receive.Model.SwapIn(peerManager.getPeer().swapInAddress))
-                }
-            }
         }
     }
 

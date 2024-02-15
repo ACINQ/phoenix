@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.data
 
+import fr.acinq.bitcoin.BitcoinError
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.payment.PaymentRequest
@@ -52,7 +53,7 @@ data class BitcoinUri(
 }
 
 sealed class BitcoinAddressError {
-    data class ChainMismatch(val expected: NodeParams.Chain): BitcoinAddressError()
+    data class InvalidScript(val error: BitcoinError): BitcoinAddressError()
     data class UnhandledRequiredParams(val parameters: List<Pair<String, String>>): BitcoinAddressError()
     object UnknownFormat: BitcoinAddressError()
 }
