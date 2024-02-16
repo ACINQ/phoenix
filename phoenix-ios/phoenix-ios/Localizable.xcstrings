@@ -2633,6 +2633,9 @@
         }
       }
     },
+    "A less efficient and less private format that does not rotate addresses. However, it is compatible with almost every service and wallet." : {
+
+    },
     "A new attempt is scheduled in a few hours." : {
       "localizations" : {
         "es" : {
@@ -4879,6 +4882,9 @@
           }
         }
       }
+    },
+    "Bitcoin address format" : {
+
     },
     "Bitcoin mempool is full and fees are high." : {
       "localizations" : {
@@ -8125,6 +8131,9 @@
           }
         }
       }
+    },
+    "Default format, with better privacy, cheaper fees and address rotation. Some older services or wallets may not understand this modern address format." : {
+
     },
     "Default payment description" : {
       "localizations" : {
@@ -13937,6 +13946,9 @@
           }
         }
       }
+    },
+    "Legacy" : {
+
     },
     "Legal" : {
       "localizations" : {
@@ -21487,6 +21499,9 @@
         }
       }
     },
+    "Share Text (bitcoin address)" : {
+
+    },
     "Share Text (lightning invoice)" : {
       "localizations" : {
         "es" : {
@@ -22916,6 +22931,9 @@
           }
         }
       }
+    },
+    "Taproot (recommended)" : {
+
     },
     "Terminate App" : {
       "localizations" : {

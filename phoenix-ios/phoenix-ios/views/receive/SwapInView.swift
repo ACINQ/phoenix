@@ -8,6 +8,18 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
+enum SwapInAddressType: CustomStringConvertible{
+	case taproot
+	case legacy
+	
+	var description: String {
+		switch self {
+			case .taproot : return "taproot"
+			case .legacy  : return "legacy"
+		}
+	}
+}
+
 struct SwapInView: View {
 	
 	enum ReceiveViewSheet {
@@ -18,6 +30,7 @@ struct SwapInView: View {
 	@ObservedObject var toast: Toast
 	
 	@State var swapInAddress: String? = nil
+	@State var swapInAddressType: SwapInAddressType = .taproot
 	
 	@StateObject var qrCode = QRCode()
 	
@@ -87,6 +100,7 @@ struct SwapInView: View {
 			HStack(alignment: VerticalAlignment.center, spacing: 30) {
 				copyButton()
 				shareButton()
+				editButton()
 			}
 			.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
 			.padding(.bottom)
@@ -118,6 +132,12 @@ struct SwapInView: View {
 		}
 		.onReceive(swapInWalletPublisher) {
 			swapInWalletChanged($0)
+		}
+		.onReceive(swapInAddressPublisher) {
+			swapInAddressChanged($0)
+		}
+		.onChange(of: swapInAddressType) {
+			swapInAddressTypeChanged($0)
 		}
 	}
 	
@@ -297,6 +317,26 @@ struct SwapInView: View {
 		.simultaneousGesture(TapGesture().onEnded {
 			didTapShareButton()
 		})
+		.accessibilityAction(named: "Share Text (bitcoin address)") {
+			shareTextToSystem()
+		}
+		.accessibilityAction(named: "Share Image (QR code)") {
+			shareImageToSystem()
+		}
+	}
+	
+	@ViewBuilder
+	func editButton() -> some View {
+		
+		actionButton(
+			text: NSLocalizedString("edit", comment: "button label - try to make it short"),
+			image: Image(systemName: "square.and.pencil"),
+			width: 19, height: 19,
+			xOffset: 1, yOffset: -1
+		) {
+			didTapEditButton()
+		}
+		.disabled(swapInAddress == nil)
 	}
 	
 	@ViewBuilder
@@ -328,12 +368,20 @@ struct SwapInView: View {
 			return
 		}
 		
-		let index = swapInAddressInfo?.index ?? Prefs.shared.swapInAddressIndex
 		let chain = Biz.business.chain
-		
-		let address = keyManager.swapInOnChainWallet
-			.getSwapInProtocol(addressIndex: Int32(index))
-			.address(chain: chain)
+		let address: String
+		switch swapInAddressType {
+		case .taproot:
+			let index = swapInAddressInfo?.index ?? Prefs.shared.swapInAddressIndex
+			address = keyManager.swapInOnChainWallet
+				.getSwapInProtocol(addressIndex: Int32(index))
+				.address(chain: chain)
+			
+		case .legacy:
+			address = keyManager.swapInOnChainWallet
+				.legacySwapInProtocol
+				.address(chain: chain)
+		}
 		
 		if swapInAddress != address {
 			swapInAddress = address
@@ -374,13 +422,19 @@ struct SwapInView: View {
 		log.trace("swapInAddressChanged()")
 		
 		self.swapInAddressInfo = newInfo
-		updateSwapInAddress()
-		
 		if let newInfo {
 			if Prefs.shared.swapInAddressIndex < newInfo.index {
 				Prefs.shared.swapInAddressIndex = newInfo.index
 			}
 		}
+		
+		updateSwapInAddress()
+	}
+	
+	func swapInAddressTypeChanged(_ newType: SwapInAddressType) {
+		log.trace("swapInAddressTypeChanged(new: \(newType)")
+		
+		updateSwapInAddress()
 	}
 	
 	// --------------------------------------------------
@@ -422,6 +476,15 @@ struct SwapInView: View {
 				shareText: { shareTextToSystem() },
 				shareImage: { shareImageToSystem() }
 			)
+		}
+	}
+	
+	func didTapEditButton() {
+		log.trace("didTapEditButton()")
+		
+		smartModalState.display(dismissable: true) {
+					
+			BtcAddrOptionsSheet(swapInAddressType: $swapInAddressType)
 		}
 	}
 	
