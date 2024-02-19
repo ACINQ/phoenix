@@ -322,6 +322,19 @@ class BusinessManager {
 				}
 				
 			}.store(in: &cancellables)
+		
+		// Keep Prefs.shared.swapInAddressIndex up-to-date
+		Biz.business.peerManager.peerStatePublisher()
+			.flatMap { $0.swapInWallet.swapInAddressPublisher() }
+			.sink { (newInfo: Lightning_kmpSwapInWallet.SwapInAddressInfo?) in
+				
+				if let newInfo {
+					if Prefs.shared.swapInAddressIndex < newInfo.index {
+						Prefs.shared.swapInAddressIndex = newInfo.index
+					}
+				}
+			}
+			.store(in: &cancellables)
 	}
 	
 	func startTasks() {

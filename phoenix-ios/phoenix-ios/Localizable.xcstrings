@@ -13950,6 +13950,9 @@
     "Legacy" : {
 
     },
+    "Legacy descriptor" : {
+
+    },
     "Legal" : {
       "localizations" : {
         "ar" : {
@@ -19036,6 +19039,9 @@
         }
       }
     },
+    "Public key" : {
+
+    },
     "QR code" : {
       "localizations" : {
         "es" : {
@@ -22694,6 +22700,9 @@
     "Support" : {
       "comment" : "HomeView: Tools menu: Label"
     },
+    "Swap addresses" : {
+
+    },
     "Swap Fees" : {
       "comment" : "Label in SummaryInfoGrid",
       "localizations" : {
@@ -22817,6 +22826,9 @@
         }
       }
     },
+    "Swap-in addresses" : {
+
+    },
     "Swap-in wallet" : {
       "comment" : "Navigation Bar Title",
       "localizations" : {
@@ -22931,6 +22943,9 @@
           }
         }
       }
+    },
+    "Taproot" : {
+
     },
     "Taproot (recommended)" : {
 

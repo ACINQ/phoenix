@@ -91,6 +91,7 @@
 		DC355E232A45FAF2008E8A8E /* NestedObservableObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC355E222A45FAF2008E8A8E /* NestedObservableObject.swift */; };
 		DC355E252A45FDD3008E8A8E /* NoticeMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC355E242A45FDD3008E8A8E /* NoticeMonitor.swift */; };
 		DC370A892B7FBD7C0093C56F /* BtcAddrOptionsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC370A882B7FBD7C0093C56F /* BtcAddrOptionsSheet.swift */; };
+		DC370A8B2B7FFFC70093C56F /* SwapInAddresses.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC370A8A2B7FFFC70093C56F /* SwapInAddresses.swift */; };
 		DC384D81265C12B700131772 /* Cache.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC384D80265C12B700131772 /* Cache.swift */; };
 		DC384D83265C32F100131772 /* TextField+Verbatim.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC384D82265C32F100131772 /* TextField+Verbatim.swift */; };
 		DC39A2662A12C04D00F59E39 /* LiquidityPolicyHelp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC39A2652A12C04D00F59E39 /* LiquidityPolicyHelp.swift */; };
@@ -462,6 +463,7 @@
 		DC355E222A45FAF2008E8A8E /* NestedObservableObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NestedObservableObject.swift; sourceTree = "<group>"; };
 		DC355E242A45FDD3008E8A8E /* NoticeMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoticeMonitor.swift; sourceTree = "<group>"; };
 		DC370A882B7FBD7C0093C56F /* BtcAddrOptionsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcAddrOptionsSheet.swift; sourceTree = "<group>"; };
+		DC370A8A2B7FFFC70093C56F /* SwapInAddresses.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwapInAddresses.swift; sourceTree = "<group>"; };
 		DC384D7C265BE41900131772 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = fr; path = fr.lproj/about.html; sourceTree = "<group>"; };
 		DC384D80265C12B700131772 /* Cache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Cache.swift; sourceTree = "<group>"; };
 		DC384D82265C32F100131772 /* TextField+Verbatim.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TextField+Verbatim.swift"; sourceTree = "<group>"; };
@@ -1362,6 +1364,7 @@
 				DCFAEFC82A72F48700330088 /* SwapInWalletDetails.swift */,
 				DC43096D2A7953F400E28995 /* FinalWalletDetails.swift */,
 				DC43096F2A795F9900E28995 /* UtxoWrapper.swift */,
+				DC370A8A2B7FFFC70093C56F /* SwapInAddresses.swift */,
 			);
 			path = wallet;
 			sourceTree = "<group>";
@@ -1707,6 +1710,7 @@
 				DCBA371B2758076F00610EC8 /* SyncSeedManager.swift in Sources */,
 				DC39D4F12874DDF40030F18D /* View+If.swift in Sources */,
 				DCB62F492A5E09F900912A71 /* SpliceOutProblem.swift in Sources */,
+				DC370A8B2B7FFFC70093C56F /* SwapInAddresses.swift in Sources */,
 				53BEFD54160278C5E393E319 /* HomeView.swift in Sources */,
 				DCD1208728663F4A00EB39C5 /* TransactionsView.swift in Sources */,
 				DC118BFC27B4504B0080BBAC /* ScanView.swift in Sources */,

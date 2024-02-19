@@ -422,12 +422,6 @@ struct SwapInView: View {
 		log.trace("swapInAddressChanged()")
 		
 		self.swapInAddressInfo = newInfo
-		if let newInfo {
-			if Prefs.shared.swapInAddressIndex < newInfo.index {
-				Prefs.shared.swapInAddressIndex = newInfo.index
-			}
-		}
-		
 		updateSwapInAddress()
 	}
 	
