@@ -22,8 +22,8 @@
     <string name="notification_channels_watcher_title">Channels watcher</string>
     <string name="notification_channels_watcher_desc">Shows up when you need to start Phoenix.</string>
 
-    <string name="notification_pending_settlement_title">Settlement pending</string>
-    <string name="notification_pending_settlement_desc">Tells you when Phoenix needs to be started to settle a payment.</string>
+    <string name="notification_pending_settlement_title">Payment finalisation</string>
+    <string name="notification_pending_settlement_desc">Tells you when Phoenix needs to be started to settle a pending payment.</string>
 
     <string name="notification_missed_payment_title">Payment rejected</string>
     <string name="notification_missed_payment_desc">Shows up when Phoenix cannot receive a payment because of a liquidity issue.</string>

@@ -150,24 +150,24 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
 
     companion object {
         private val log = LoggerFactory.getLogger(ChannelsWatcher::class.java)
-        private const val WATCHER_WORKER_TAG = BuildConfig.APPLICATION_ID + ".ChannelsWatcher"
+        const val TAG = BuildConfig.APPLICATION_ID + ".ChannelsWatcher"
         private const val ELECTRUM_TIMEOUT_MILLIS = 5 * 60_000L
 
         fun schedule(context: Context) {
             log.info("scheduling channels watcher")
-            val work = PeriodicWorkRequest.Builder(ChannelsWatcher::class.java, 36, TimeUnit.HOURS, 12, TimeUnit.HOURS)
-                .addTag(WATCHER_WORKER_TAG)
-            WorkManager.getInstance(context).enqueueUniquePeriodicWork(WATCHER_WORKER_TAG, ExistingPeriodicWorkPolicy.UPDATE, work.build())
+            val work = PeriodicWorkRequest.Builder(ChannelsWatcher::class.java, 36, TimeUnit.HOURS, 12, TimeUnit.HOURS).addTag(TAG)
+            WorkManager.getInstance(context).enqueueUniquePeriodicWork(TAG, ExistingPeriodicWorkPolicy.UPDATE, work.build())
         }
 
         fun scheduleASAP(context: Context) {
-            val work = OneTimeWorkRequest.Builder(ChannelsWatcher::class.java).addTag(WATCHER_WORKER_TAG).build()
-            WorkManager.getInstance(context).enqueueUniqueWork(WATCHER_WORKER_TAG, ExistingWorkPolicy.REPLACE, work)
+            val work = OneTimeWorkRequest.Builder(ChannelsWatcher::class.java).addTag(TAG).build()
+            WorkManager.getInstance(context).enqueueUniqueWork(TAG, ExistingWorkPolicy.REPLACE, work)
         }
 
         fun cancel(context: Context): Operation {
-            return WorkManager.getInstance(context).cancelAllWorkByTag(WATCHER_WORKER_TAG)
+            return WorkManager.getInstance(context).cancelAllWorkByTag(TAG)
         }
+
     }
 
     @Serializable

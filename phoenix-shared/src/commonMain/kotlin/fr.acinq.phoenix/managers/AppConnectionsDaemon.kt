@@ -147,7 +147,7 @@ class AppConnectionsDaemon(
             controlChanges.consumeEach { change ->
                 val newState = controlFlow.value.change()
                 if (newState.walletIsAvailable && (label == "peer" || label == "electrum")) {
-                    logger.info { "$label $newState" }
+                    logger.debug { "$label $newState" }
                 }
                 controlFlow.value = newState
             }

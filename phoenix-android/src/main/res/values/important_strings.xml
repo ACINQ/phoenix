@@ -30,6 +30,9 @@
     <string name="notif_pending_settlement_title">Please start Phoenix</string>
     <string name="notif_pending_settlement_message">An incoming settlement is pending.</string>
 
+    <string name="notif_inflight_payment_title">A payment is pending</string>
+    <string name="notif_inflight_payment_message">Start Phoenix so the payment can be finalised in due course.</string>
+
     <string name="notif_missed_title">Missed incoming payment</string>
     <string name="notif_missed_unavailable">Phoenix was unable to start in the background.</string>
 
