@@ -28,11 +28,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import fr.acinq.bitcoin.Bitcoin
+import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.Lightning
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.payment.Bolt11Invoice
-import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.utils.BitmapHelper
 import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
@@ -60,7 +60,7 @@ sealed class BitcoinAddressState {
 }
 
 class ReceiveViewModel(
-    private val chain: Bitcoin.Chain,
+    private val chain: Chain,
     private val peerManager: PeerManager,
     private val walletManager: WalletManager,
     private val internalDataRepository: InternalDataRepository,
@@ -137,7 +137,7 @@ class ReceiveViewModel(
     }
 
     class Factory(
-        private val chain: Bitcoin.Chain,
+        private val chain: Chain,
         private val peerManager: PeerManager,
         private val walletManager: WalletManager,
     ) : ViewModelProvider.Factory {

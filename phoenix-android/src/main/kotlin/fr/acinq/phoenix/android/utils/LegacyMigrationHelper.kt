@@ -18,8 +18,8 @@ package fr.acinq.phoenix.android.utils
 
 import android.content.Context
 import com.google.common.net.HostAndPort
-import fr.acinq.bitcoin.Bitcoin
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.TxId
@@ -332,7 +332,7 @@ object LegacyMigrationHelper {
         JavaConversions.asJavaCollection(payments).toList().groupBy { UUID.fromString(it.parentId().toString()) }
 
     fun modernizeLegacyOutgoingPayment(
-        chain: Bitcoin.Chain,
+        chain: Chain,
         parentId: UUID,
         listOfParts: List<fr.acinq.eclair.db.OutgoingPayment>,
         paymentMeta: PaymentMeta?,

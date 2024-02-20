@@ -1,7 +1,7 @@
 package fr.acinq.phoenix.utils
 
-import fr.acinq.bitcoin.Bitcoin
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.Crypto
 import fr.acinq.bitcoin.byteVector64
 import fr.acinq.bitcoin.scala.Block
@@ -26,7 +26,7 @@ class LnurlAuthTest {
         val legacyKeyManager = fr.acinq.eclair.crypto.LocalKeyManager(seed, Block.TestnetGenesisBlock().hash())
         val kmpKeyManager = LocalKeyManager(
             seed = seed.toArray().byteVector64(),
-            chain = Bitcoin.Chain.Testnet,
+            chain = Chain.Testnet,
             remoteSwapInExtendedPublicKey = "tpubDDt5vQap1awkyDXx1z1cP7QFKSZHDCCpbU8nSq9jy7X2grTjUVZDePexf6gc6AHtRRzkgfPW87K6EKUVV6t3Hu2hg7YkHkmMeLSfrP85x41"
         )
 
@@ -65,7 +65,7 @@ class LnurlAuthTest {
         val legacyKeyManager = fr.acinq.eclair.crypto.LocalKeyManager(seed, Block.LivenetGenesisBlock().hash())
         val kmpKeyManager = LocalKeyManager(
             seed = seed.toArray().byteVector64(),
-            chain = Bitcoin.Chain.Testnet,
+            chain = Chain.Testnet,
             remoteSwapInExtendedPublicKey = "tpubDDt5vQap1awkyDXx1z1cP7QFKSZHDCCpbU8nSq9jy7X2grTjUVZDePexf6gc6AHtRRzkgfPW87K6EKUVV6t3Hu2hg7YkHkmMeLSfrP85x41"
         )
 
