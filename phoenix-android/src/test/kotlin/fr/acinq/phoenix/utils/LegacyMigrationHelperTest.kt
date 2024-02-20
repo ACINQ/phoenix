@@ -19,11 +19,11 @@ package fr.acinq.phoenix.utils
 import com.squareup.sqldelight.EnumColumnAdapter
 import com.squareup.sqldelight.db.SqlDriver
 import com.squareup.sqldelight.sqlite.driver.JdbcSqliteDriver
+import fr.acinq.bitcoin.Bitcoin
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.byteVector32
 import fr.acinq.eclair.db.sqlite.SqlitePaymentsDb
-import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.ShortChannelId
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.payment.FinalFailure
@@ -90,7 +90,7 @@ class LegacyMigrationHelperTest {
         // transform legacy payments to modern OutgoingPayment objects
         val newOutgoingPayments = legacyOutgoingPayments.map {
             LegacyMigrationHelper.modernizeLegacyOutgoingPayment(
-                chainHash = NodeParams.Chain.Testnet.chainHash,
+                chainHash = Bitcoin.Chain.Testnet.chainHash,
                 parentId = it.key,
                 listOfParts = it.value,
                 paymentMeta = paymentMetaRepository.get(it.key.toString())

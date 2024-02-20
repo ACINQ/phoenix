@@ -18,11 +18,13 @@ package fr.acinq.phoenix.android.utils
 
 import android.content.Context
 import com.google.common.net.HostAndPort
+import fr.acinq.bitcoin.Bitcoin
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.TxId
 import fr.acinq.bitcoin.byteVector32
+import fr.acinq.bitcoin.utils.Either
 import fr.acinq.eclair.db.IncomingPaymentStatus
 import fr.acinq.eclair.db.OutgoingPaymentStatus
 import fr.acinq.eclair.db.PaymentType
@@ -35,6 +37,7 @@ import fr.acinq.lightning.*
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.io.TcpSocket
+import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.*
@@ -293,7 +296,7 @@ object LegacyMigrationHelper {
                 }
             } else {
                 IncomingPayment.Origin.Invoice(
-                    paymentRequest = PaymentRequest.read(fr.acinq.eclair.payment.PaymentRequest.write(payment.paymentRequest())).get()
+                    paymentRequest = Bolt11Invoice.read(fr.acinq.eclair.payment.PaymentRequest.write(payment.paymentRequest())).get()
                 )
             }
 
@@ -329,7 +332,7 @@ object LegacyMigrationHelper {
         JavaConversions.asJavaCollection(payments).toList().groupBy { UUID.fromString(it.parentId().toString()) }
 
     fun modernizeLegacyOutgoingPayment(
-        chain: NodeParams.Chain,
+        chain: Bitcoin.Chain,
         parentId: UUID,
         listOfParts: List<fr.acinq.eclair.db.OutgoingPayment>,
         paymentMeta: PaymentMeta?,
@@ -363,20 +366,20 @@ object LegacyMigrationHelper {
         }
 
         val paymentRequest = if (head.paymentRequest().isDefined) {
-            PaymentRequest.read(fr.acinq.eclair.payment.PaymentRequest.write(head.paymentRequest().get())).get()
+            Bolt11Invoice.read(fr.acinq.eclair.payment.PaymentRequest.write(head.paymentRequest().get())).get()
         } else null
 
         // retrieve details from the first payment in the list
         val details = if (paymentMeta?.swap_out_address != null) {
             LightningOutgoingPayment.Details.SwapOut(
                 address = paymentMeta.swap_out_address ?: "",
-                paymentRequest = paymentRequest ?: PaymentRequest.create(
+                paymentRequest = paymentRequest ?: Bolt11Invoice.create(
                     chainHash = chain.chainHash,
                     amount = head.recipientAmount().toLong().msat,
                     paymentHash = head.paymentHash().bytes().toArray().byteVector32(),
                     privateKey = Lightning.randomKey(),
                     description = Either.Left("swap-out to ${paymentMeta.swap_out_address} for ${paymentMeta.swap_out_feerate_per_byte} sat/b"),
-                    minFinalCltvExpiryDelta = PaymentRequest.DEFAULT_MIN_FINAL_EXPIRY_DELTA,
+                    minFinalCltvExpiryDelta = Bolt11Invoice.DEFAULT_MIN_FINAL_EXPIRY_DELTA,
                     features = Features.empty
                 ),
                 swapOutFee = paymentMeta.swap_out_fee_sat?.sat ?: 0.sat

@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.*
-import fr.acinq.lightning.payment.PaymentRequest
+import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sum
@@ -299,7 +299,7 @@ private fun DetailsForLightningOutgoingPayment(
     // -- details of the payment
     when (details) {
         is LightningOutgoingPayment.Details.Normal -> {
-            InvoiceSection(paymentRequest = details.paymentRequest)
+            InvoiceSection(invoice = details.paymentRequest)
         }
         is LightningOutgoingPayment.Details.SwapOut -> {
             TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_bitcoin_address_label), value = details.address)
@@ -402,7 +402,7 @@ private fun DetailsForIncoming(
     // -- details about the origin of the payment
     when (val origin = payment.origin) {
         is IncomingPayment.Origin.Invoice -> {
-            InvoiceSection(paymentRequest = origin.paymentRequest)
+            InvoiceSection(invoice = origin.paymentRequest)
             TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_preimage_label), value = payment.preimage.toHex())
         }
         is IncomingPayment.Origin.SwapIn -> {
@@ -502,9 +502,9 @@ private fun LightningPart(
 
 @Composable
 private fun InvoiceSection(
-    paymentRequest: PaymentRequest
+    invoice: Bolt11Invoice
 ) {
-    val requestedAmount = paymentRequest.amount
+    val requestedAmount = invoice.amount
     if (requestedAmount != null) {
         TechnicalRowAmount(
             label = stringResource(id = R.string.paymentdetails_invoice_requested_label),
@@ -513,15 +513,15 @@ private fun InvoiceSection(
         )
     }
 
-    val description = (paymentRequest.description ?: paymentRequest.descriptionHash?.toHex())?.takeIf { it.isNotBlank() }
+    val description = (invoice.description ?: invoice.descriptionHash?.toHex())?.takeIf { it.isNotBlank() }
     if (description != null) {
         TechnicalRow(label = stringResource(id = R.string.paymentdetails_payment_request_description_label)) {
             Text(text = description)
         }
     }
 
-    TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = paymentRequest.paymentHash.toHex())
-    TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_request_label), value = paymentRequest.write())
+    TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = invoice.paymentHash.toHex())
+    TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_request_label), value = invoice.write())
 }
 
 // ============== utility components for this view

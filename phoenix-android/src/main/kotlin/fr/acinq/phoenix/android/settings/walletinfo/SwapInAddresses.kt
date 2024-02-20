@@ -101,7 +101,7 @@ fun SwapInAddresses(
 @Composable
 private fun AddressStateView(
     address: String,
-    state: WalletState.Companion.AddressState,
+    state: WalletState.AddressState,
 ) {
     val context = LocalContext.current
     val link = business.blockchainExplorer.addressUrl(addr = address, website = BlockchainExplorer.Website.MempoolSpace)
@@ -112,10 +112,9 @@ private fun AddressStateView(
         ) {
             Spacer(modifier = Modifier.width(16.dp))
             val meta = state.meta
-            if (meta is WalletState.Companion.AddressMeta.Derived) {
+            if (meta is WalletState.AddressMeta.Derived) {
                 Text(
                     text = meta.index.toString(),
-                    modifier = Modifier.width(20.dp),
                     style = MaterialTheme.typography.caption,
                     textAlign = TextAlign.End,
                 )

@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.acinq.bitcoin.Bitcoin
 import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.NodeParams
 import fr.acinq.phoenix.android.LocalBitcoinUnit
@@ -95,7 +96,7 @@ class ResetWalletViewModel : ViewModel() {
 
     fun deleteWalletData(
         context: Context,
-        chain: NodeParams.Chain,
+        chain: Bitcoin.Chain,
         nodeIdHash: String,
         onShutdownBusiness: () -> Unit,
         onShutdownService: () -> Unit,

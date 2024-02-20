@@ -31,7 +31,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.TrampolineFees
-import fr.acinq.lightning.payment.PaymentRequest
+import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
@@ -42,17 +42,17 @@ import fr.acinq.phoenix.controllers.payments.Scan
 import fr.acinq.phoenix.utils.extensions.isAmountlessTrampoline
 
 @Composable
-fun SendLightningPaymentView(
-    paymentRequest: PaymentRequest,
+fun SendBolt11PaymentView(
+    invoice: Bolt11Invoice,
     trampolineFees: TrampolineFees?,
     onBackClick: () -> Unit,
-    onPayClick: (Scan.Intent.InvoiceFlow.SendInvoicePayment) -> Unit
+    onPayClick: (Scan.Intent.Bolt11InvoiceFlow.SendBolt11Invoice) -> Unit
 ) {
     val context = LocalContext.current
     val balance = business.balanceManager.balance.collectAsState(null).value
     val prefBitcoinUnit = LocalBitcoinUnit.current
 
-    val requestedAmount = paymentRequest.amount
+    val requestedAmount = invoice.amount
     var amount by remember { mutableStateOf(requestedAmount) }
     var amountErrorMessage by remember { mutableStateOf("") }
 
@@ -88,17 +88,17 @@ fun SendLightningPaymentView(
             )
         }
     ) {
-        paymentRequest.description?.takeIf { it.isNotBlank() }?.let {
+        invoice.description?.takeIf { it.isNotBlank() }?.let {
             SplashLabelRow(label = stringResource(R.string.send_description_label)) {
                 Text(text = it)
             }
         }
         SplashLabelRow(label = stringResource(R.string.send_destination_label), icon = R.drawable.ic_zap) {
             SelectionContainer {
-                Text(text = paymentRequest.nodeId.toHex(), maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text(text = invoice.nodeId.toHex(), maxLines = 2, overflow = TextOverflow.Ellipsis)
             }
         }
-        if (paymentRequest.isAmountlessTrampoline()) {
+        if (invoice.isAmountlessTrampoline()) {
             SplashLabelRow(label = "", helpMessage = stringResource(id = R.string.send_trampoline_amountless_warning_details)) {
                 Text(text = stringResource(id = R.string.send_trampoline_amountless_warning_label))
             }
@@ -123,7 +123,7 @@ fun SendLightningPaymentView(
                 enabled = mayDoPayments && amount != null && amountErrorMessage.isBlank() && trampolineFees != null,
             ) {
                 safeLet(amount, trampolineFees) { amt, fees ->
-                    onPayClick(Scan.Intent.InvoiceFlow.SendInvoicePayment(paymentRequest = paymentRequest, amount = amt, trampolineFees = fees))
+                    onPayClick(Scan.Intent.Bolt11InvoiceFlow.SendBolt11Invoice(invoice = invoice, amount = amt, trampolineFees = fees))
                 }
             }
         }

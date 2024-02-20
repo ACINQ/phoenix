@@ -34,8 +34,8 @@ class SwapInAddressesViewModel(private val peerManager: PeerManager) : ViewModel
 
     val log = LoggerFactory.getLogger(this::class.java)
 
-    val taprootAddresses = mutableStateListOf<Pair<String, WalletState.Companion.AddressState>>()
-    val legacyAddress = mutableStateOf<Pair<String, WalletState.Companion.AddressState>?>(null)
+    val taprootAddresses = mutableStateListOf<Pair<String, WalletState.AddressState>>()
+    val legacyAddress = mutableStateOf<Pair<String, WalletState.AddressState>?>(null)
 
     init {
         monitorSwapAddresses()
@@ -47,7 +47,7 @@ class SwapInAddressesViewModel(private val peerManager: PeerManager) : ViewModel
             peerManager.getPeer().swapInWallet.wallet.walletStateFlow.collect { walletState ->
                 val newAddresses = walletState.addresses.toList().sortedByDescending {
                     val meta = it.second.meta
-                    if (meta is WalletState.Companion.AddressMeta.Derived) {
+                    if (meta is WalletState.AddressMeta.Derived) {
                         meta.index
                     } else {
                         -1 // legacy address goes to the bottom
