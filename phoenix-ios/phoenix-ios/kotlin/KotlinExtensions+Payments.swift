@@ -250,7 +250,7 @@ extension Lightning_kmpOnChainOutgoingPayment {
 	}
 }
 
-extension Lightning_kmpPaymentRequest {
+extension Lightning_kmpBolt11Invoice {
 	
 	var timestampDate: Date {
 		return timestampSeconds.toDate(from: .seconds)
