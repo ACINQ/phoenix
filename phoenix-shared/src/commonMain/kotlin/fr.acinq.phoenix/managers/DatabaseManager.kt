@@ -1,6 +1,6 @@
 package fr.acinq.phoenix.managers
 
-import fr.acinq.bitcoin.Bitcoin
+import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.db.ChannelsDb
 import fr.acinq.lightning.db.Databases
@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 class DatabaseManager(
     loggerFactory: LoggerFactory,
     private val ctx: PlatformContext,
-    private val chain: Bitcoin.Chain,
+    private val chain: Chain,
     private val nodeParamsManager: NodeParamsManager,
     private val currencyManager: CurrencyManager
 ) : CoroutineScope by MainScope() {

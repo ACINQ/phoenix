@@ -20,7 +20,6 @@ import fr.acinq.bitcoin.*
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.bitcoin.utils.Try
 import fr.acinq.lightning.payment.Bolt11Invoice
-import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.data.*
 import io.ktor.http.*
@@ -83,7 +82,7 @@ object Parser {
      * @param input can range from a basic bitcoin address to a sophisticated Bitcoin URI with a prefix and parameters.
      */
     fun readBitcoinAddress(
-        chain: Bitcoin.Chain,
+        chain: Chain,
         input: String
     ): Either<BitcoinUriError, BitcoinUri> {
         val cleanInput = removeExcessInput(input)
@@ -135,7 +134,7 @@ object Parser {
     }
 
     /** Transforms a bitcoin address into a public key script if valid, otherwise returns null. */
-    fun addressToPublicKeyScriptOrNull(chain: Bitcoin.Chain, address: String): ByteVector? {
+    fun addressToPublicKeyScriptOrNull(chain: Chain, address: String): ByteVector? {
         return readBitcoinAddress(chain, address).right?.script
     }
 }

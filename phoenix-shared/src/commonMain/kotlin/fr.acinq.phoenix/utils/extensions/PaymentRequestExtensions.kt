@@ -16,7 +16,7 @@
 
 package fr.acinq.phoenix.utils.extensions
 
-import fr.acinq.bitcoin.Bitcoin
+import fr.acinq.bitcoin.Chain
 import fr.acinq.lightning.Feature
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.Bolt12Invoice
@@ -30,13 +30,13 @@ fun Bolt11Invoice.isAmountlessTrampoline() = this.amount == null && this.feature
  */
 fun Bolt11Invoice.desc(): String? = this.description
 
-val PaymentRequest.chain: Bitcoin.Chain
+val PaymentRequest.chain: Chain
     get() = when (this) {
         is Bolt11Invoice -> {
             when (prefix) {
-                "lnbc" -> Bitcoin.Chain.Mainnet
-                "lntb" -> Bitcoin.Chain.Testnet
-                "lnbcrt" -> Bitcoin.Chain.Regtest
+                "lnbc" -> Chain.Mainnet
+                "lntb" -> Chain.Testnet
+                "lnbcrt" -> Chain.Regtest
                 else -> throw IllegalArgumentException("unhandled invoice prefix=$prefix")
             }
         }

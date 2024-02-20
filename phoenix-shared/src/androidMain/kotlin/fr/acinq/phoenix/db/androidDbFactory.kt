@@ -18,7 +18,7 @@ package fr.acinq.phoenix.db
 
 import com.squareup.sqldelight.android.AndroidSqliteDriver
 import com.squareup.sqldelight.db.SqlDriver
-import fr.acinq.bitcoin.Bitcoin.Chain
+import fr.acinq.bitcoin.Chain
 import fr.acinq.phoenix.utils.PlatformContext
 import java.util.*
 

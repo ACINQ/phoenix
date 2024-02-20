@@ -16,8 +16,8 @@
 
 package fr.acinq.phoenix.controllers.payments
 
-import fr.acinq.bitcoin.Bitcoin
 import fr.acinq.bitcoin.BitcoinError
+import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.*
 import fr.acinq.lightning.db.LightningOutgoingPayment
@@ -51,7 +51,7 @@ class AppScanController(
     private val peerManager: PeerManager,
     private val lnurlManager: LnurlManager,
     private val databaseManager: DatabaseManager,
-    private val chain: Bitcoin.Chain,
+    private val chain: Chain,
 ) : AppController<Scan.Model, Scan.Intent>(
     loggerFactory = loggerFactory,
     firstModel = firstModel ?: Scan.Model.Ready
@@ -440,7 +440,7 @@ class AppScanController(
         val input = Parser.removeExcessInput(data)
 
         return Parser.readBolt11Invoice(input)?.let {
-            Scan.ClipboardContent.InvoiceRequest(it)
+            Scan.ClipboardContent.Bolt11InvoiceRequest(it)
         } ?: readLnurl(input)?.let {
             when (it) {
                 is LnurlAuth -> Scan.ClipboardContent.LoginRequest(it)

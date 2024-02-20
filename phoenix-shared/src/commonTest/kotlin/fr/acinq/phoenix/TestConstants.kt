@@ -16,10 +16,8 @@
 
 package fr.acinq.phoenix
 
-import fr.acinq.bitcoin.Bitcoin
-import fr.acinq.bitcoin.Block
+import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.MnemonicCode
-import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.*
 import fr.acinq.lightning.blockchain.fee.FeerateTolerance
 import fr.acinq.lightning.blockchain.fee.OnChainFeeConf
@@ -40,9 +38,9 @@ object TestConstants {
         private val entropy = Hex.decode("0202020202020202020202020202020202020202020202020202020202020202")
         val mnemonics = MnemonicCode.toMnemonics(entropy)
         val seed = MnemonicCode.toSeed(mnemonics, "").toByteVector32()
-        val keyManager = LocalKeyManager(seed, Bitcoin.Chain.Regtest, swapInServerXpub)
+        val keyManager = LocalKeyManager(seed, Chain.Regtest, swapInServerXpub)
         val nodeParams = NodeParams(
-            chain = Bitcoin.Chain.Regtest,
+            chain = Chain.Regtest,
             loggerFactory = testLoggerFactory,
             keyManager = keyManager,
         ).copy(

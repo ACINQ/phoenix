@@ -25,7 +25,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
 
 class WalletManager(
-    private val chain: Bitcoin.Chain
+    private val chain: Chain
 ) : CoroutineScope by MainScope() {
 
     private val _localKeyManager = MutableStateFlow<LocalKeyManager?>(null)
@@ -97,7 +97,7 @@ fun LocalKeyManager.cloudKeyHash(): String {
     return Crypto.hash160(cloudKey()).byteVector().toHex()
 }
 
-fun LocalKeyManager.isMainnet() = chain == Bitcoin.Chain.Mainnet
+fun LocalKeyManager.isMainnet() = chain == Chain.Mainnet
 
 val LocalKeyManager.finalOnChainWalletPath: String
     get() = (KeyManager.Bip84OnChainKeys.bip84BasePath(chain) / finalOnChainWallet.account).toString()

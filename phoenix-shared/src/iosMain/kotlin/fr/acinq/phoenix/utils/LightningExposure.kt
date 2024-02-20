@@ -1,8 +1,5 @@
 package fr.acinq.phoenix.utils
 
-import fr.acinq.bitcoin.Bitcoin
-import fr.acinq.bitcoin.Block
-import fr.acinq.bitcoin.BlockHash
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector64
 import fr.acinq.bitcoin.PrivateKey
@@ -465,21 +462,3 @@ suspend fun Peer._requestInboundLiquidity(
 
 val InboundLiquidityOutgoingPayment._lease: LiquidityAds_Lease
     get() = LiquidityAds_Lease(this.lease)
-
-data class Bitcoin_Chain(public val name: String, val hash: BlockHash) {
-    constructor(src: Bitcoin.Chain) : this(
-        name = src.name,
-        hash = src.chainHash
-    )
-
-    fun unwrap(): Bitcoin.Chain = when (this.hash) {
-        Block.RegtestGenesisBlock.hash -> Bitcoin.Chain.Regtest
-        Block.TestnetGenesisBlock.hash -> Bitcoin.Chain.Testnet
-        Block.SignetGenesisBlock.hash -> Bitcoin.Chain.Signet
-        Block.LivenetGenesisBlock.hash -> Bitcoin.Chain.Mainnet
-        else -> throw IllegalArgumentException("unsupported hash=${this.hash}")
-    }
-}
-
-val PhoenixBusiness._chain: Bitcoin_Chain
-    get() = Bitcoin_Chain(this.chain)

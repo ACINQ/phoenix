@@ -1,6 +1,6 @@
 package fr.acinq.phoenix.controllers.config
 
-import fr.acinq.bitcoin.Bitcoin
+import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.channel.*
 import fr.acinq.lightning.channel.states.*
@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 class AppCloseChannelsConfigurationController(
     loggerFactory: LoggerFactory,
     private val peerManager: PeerManager,
-    private val chain: Bitcoin.Chain,
+    private val chain: Chain,
     private val isForceClose: Boolean
 ) : AppController<CloseChannelsConfiguration.Model, CloseChannelsConfiguration.Intent>(
     loggerFactory = loggerFactory,

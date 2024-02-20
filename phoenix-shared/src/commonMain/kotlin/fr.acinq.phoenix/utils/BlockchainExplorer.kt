@@ -1,10 +1,10 @@
 package fr.acinq.phoenix.utils
 
-import fr.acinq.bitcoin.Bitcoin
+import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.TxId
 
 
-class BlockchainExplorer(private val chain: Bitcoin.Chain) {
+class BlockchainExplorer(private val chain: Chain) {
 
     sealed class Website(val base: String) {
         object MempoolSpace: Website("https://mempool.space")
@@ -15,18 +15,18 @@ class BlockchainExplorer(private val chain: Bitcoin.Chain) {
         return when (website) {
             Website.MempoolSpace -> {
                 when (chain) {
-                    Bitcoin.Chain.Mainnet -> "${website.base}/tx/$txId"
-                    Bitcoin.Chain.Testnet -> "${website.base}/testnet/tx/$txId"
-                    Bitcoin.Chain.Signet -> "${website.base}/signet/tx/$txId"
-                    Bitcoin.Chain.Regtest -> "${website.base}/_REGTEST_/tx/$txId"
+                    Chain.Mainnet -> "${website.base}/tx/$txId"
+                    Chain.Testnet -> "${website.base}/testnet/tx/$txId"
+                    Chain.Signet -> "${website.base}/signet/tx/$txId"
+                    Chain.Regtest -> "${website.base}/_REGTEST_/tx/$txId"
                 }
             }
             Website.BlockstreamInfo -> {
                 when (chain) {
-                    Bitcoin.Chain.Mainnet -> "${website.base}/tx/$txId"
-                    Bitcoin.Chain.Testnet -> "${website.base}/testnet/tx/$txId"
-                    Bitcoin.Chain.Signet -> "${website.base}/signet/tx/$txId"
-                    Bitcoin.Chain.Regtest -> "${website.base}/_REGTEST_/tx/$txId"
+                    Chain.Mainnet -> "${website.base}/tx/$txId"
+                    Chain.Testnet -> "${website.base}/testnet/tx/$txId"
+                    Chain.Signet -> "${website.base}/signet/tx/$txId"
+                    Chain.Regtest -> "${website.base}/_REGTEST_/tx/$txId"
                 }
             }
         }
@@ -36,18 +36,18 @@ class BlockchainExplorer(private val chain: Bitcoin.Chain) {
         return when (website) {
             Website.MempoolSpace -> {
                 when (chain) {
-                    Bitcoin.Chain.Mainnet -> "${website.base}/address/$addr"
-                    Bitcoin.Chain.Testnet -> "${website.base}/testnet/address/$addr"
-                    Bitcoin.Chain.Signet -> "${website.base}/signet/address/$addr"
-                    Bitcoin.Chain.Regtest -> "${website.base}/_REGTEST_/address/$addr"
+                    Chain.Mainnet -> "${website.base}/address/$addr"
+                    Chain.Testnet -> "${website.base}/testnet/address/$addr"
+                    Chain.Signet -> "${website.base}/signet/address/$addr"
+                    Chain.Regtest -> "${website.base}/_REGTEST_/address/$addr"
                 }
             }
             Website.BlockstreamInfo -> {
                 when (chain) {
-                    Bitcoin.Chain.Mainnet -> "${website.base}/address/$addr"
-                    Bitcoin.Chain.Testnet -> "${website.base}/testnet/address/$addr"
-                    Bitcoin.Chain.Signet -> "${website.base}/signet/address/$addr"
-                    Bitcoin.Chain.Regtest -> "${website.base}/_REGTEST_/address/$addr"
+                    Chain.Mainnet -> "${website.base}/address/$addr"
+                    Chain.Testnet -> "${website.base}/testnet/address/$addr"
+                    Chain.Signet -> "${website.base}/signet/address/$addr"
+                    Chain.Regtest -> "${website.base}/_REGTEST_/address/$addr"
                 }
             }
         }

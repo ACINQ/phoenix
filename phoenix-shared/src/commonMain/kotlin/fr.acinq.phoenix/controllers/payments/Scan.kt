@@ -17,6 +17,7 @@
 package fr.acinq.phoenix.controllers.payments
 
 import fr.acinq.bitcoin.Bitcoin
+import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.TrampolineFees
@@ -38,7 +39,7 @@ object Scan {
         object UnknownFormat : BadRequestReason()
         object AlreadyPaidInvoice : BadRequestReason()
         data class Expired(val timestampSeconds: Long, val expirySeconds: Long) : BadRequestReason()
-        data class ChainMismatch(val expected: Bitcoin.Chain) : BadRequestReason()
+        data class ChainMismatch(val expected: Chain) : BadRequestReason()
         data class ServiceError(val url: Url, val error: LnurlError.RemoteFailure) : BadRequestReason()
         data class InvalidLnurl(val url: Url) : BadRequestReason()
         data class UnsupportedLnurl(val url: Url) : BadRequestReason()
@@ -47,7 +48,7 @@ object Scan {
     sealed class LnurlPayError {
         data class RemoteError(val err: LnurlError.RemoteFailure) : LnurlPayError()
         data class BadResponseError(val err: LnurlError.Pay.Invoice) : LnurlPayError()
-        data class ChainMismatch(val expected: Bitcoin.Chain) : LnurlPayError()
+        data class ChainMismatch(val expected: Chain) : LnurlPayError()
         object AlreadyPaidInvoice : LnurlPayError()
     }
 
@@ -185,8 +186,8 @@ object Scan {
     }
 
     sealed class ClipboardContent {
-        data class InvoiceRequest(
-            val paymentRequest: PaymentRequest
+        data class Bolt11InvoiceRequest(
+            val invoice: Bolt11Invoice
         ): ClipboardContent()
 
         data class BitcoinRequest(

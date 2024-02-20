@@ -16,16 +16,15 @@
 
 package fr.acinq.phoenix.data
 
-import fr.acinq.bitcoin.Bitcoin
 import fr.acinq.bitcoin.BitcoinError
 import fr.acinq.bitcoin.ByteVector
+import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.payment.Bolt11Invoice
-import fr.acinq.lightning.payment.PaymentRequest
 import io.ktor.http.*
 
 data class BitcoinUri(
-    val chain: Bitcoin.Chain,
+    val chain: Chain,
     /** Actual Bitcoin address; may be different than the source, e.g. if the source is an URI like "bitcoin:xyz?param=123". */
     val address: String,
     val script: ByteVector,
