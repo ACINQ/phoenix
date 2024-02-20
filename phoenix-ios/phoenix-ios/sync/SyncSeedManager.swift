@@ -42,7 +42,7 @@ class SyncSeedManager: SyncManagerProtcol {
 	
 	/// The chain in use by PhoenixBusiness (e.g. Testnet)
 	///
-	private let chain: Bitcoin_kmpBitcoin.Chain
+	private let chain: Bitcoin_kmpChain
 	
 	/// The 12-word recovery phrase (and associated language) for the wallet.
 	///
@@ -73,7 +73,7 @@ class SyncSeedManager: SyncManagerProtcol {
 	
 	private var cancellables = Set<AnyCancellable>()
 	
-	init(chain: Bitcoin_kmpBitcoin.Chain, recoveryPhrase: RecoveryPhrase, encryptedNodeId: String) {
+	init(chain: Bitcoin_kmpChain, recoveryPhrase: RecoveryPhrase, encryptedNodeId: String) {
 		log.trace("init()")
 		
 		self.chain = chain
@@ -95,7 +95,7 @@ class SyncSeedManager: SyncManagerProtcol {
 	// ----------------------------------------
 	
 	public class func fetchSeeds(
-		chain: Bitcoin_kmpBitcoin.Chain
+		chain: Bitcoin_kmpChain
 	) -> PassthroughSubject<SeedBackup, FetchSeedsError> {
 		
 		let publisher = PassthroughSubject<SeedBackup, FetchSeedsError>()
@@ -524,7 +524,7 @@ class SyncSeedManager: SyncManagerProtcol {
 	// MARK: Utilities
 	// ----------------------------------------
 	
-	private class func record_table_name(chain: Bitcoin_kmpBitcoin.Chain) -> String {
+	private class func record_table_name(chain: Bitcoin_kmpChain) -> String {
 		
 		// From Apple's docs:
 		// > A record type must consist of one or more alphanumeric characters

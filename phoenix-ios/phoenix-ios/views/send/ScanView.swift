@@ -284,9 +284,9 @@ struct ScanView: View {
 
 		if clipboardContent != nil {
 			Group {
-				if let content = clipboardContent as? Scan.ClipboardContent_InvoiceRequest {
+				if let content = clipboardContent as? Scan.ClipboardContent_Bolt11InvoiceRequest {
 
-					let desc = content.paymentRequest.description_?.trimmingCharacters(in: .whitespaces) ?? ""
+					let desc = content.invoice.description_?.trimmingCharacters(in: .whitespaces) ?? ""
 
 					if let msat = content.paymentRequest.amount {
 						let amt = Utils.format(currencyPrefs, msat: msat)
@@ -440,7 +440,7 @@ struct ScanView: View {
 				ignoreScanner = false
 			}
 			
-		case _ as Scan.Model_InvoiceFlow,
+		case _ as Scan.Model_Bolt11InvoiceFlow,
 		     _ as Scan.Model_OnChainFlow,
 		     _ as Scan.Model_LnurlPayFlow,
 		     _ as Scan.Model_LnurlAuthFlow:

@@ -91,7 +91,7 @@ struct SendView: MVIView {
 			ScanView(location: location, mvi: mvi, toast: toast)
 				.zIndex(4)
 
-		case _ as Scan.Model_InvoiceFlow_InvoiceRequest,
+		case _ as Scan.Model_Bolt11InvoiceFlow_InvoiceRequest,
 		     _ as Scan.Model_OnChainFlow,
 		     _ as Scan.Model_LnurlPayFlow_LnurlPayRequest,
 		     _ as Scan.Model_LnurlPayFlow_LnurlPayFetch,
@@ -101,7 +101,7 @@ struct SendView: MVIView {
 			ValidateView(mvi: mvi)
 				.zIndex(3)
 
-		case _ as Scan.Model_InvoiceFlow_Sending,
+		case _ as Scan.Model_Bolt11InvoiceFlow_Sending,
 		     _ as Scan.Model_LnurlPayFlow_Sending:
 
 			PaymentInFlightView(mvi: mvi)
@@ -150,7 +150,7 @@ struct SendView: MVIView {
 				needsAcceptWarning = false
 			}
 			
-		case _ as Scan.Model_InvoiceFlow_InvoiceRequest,
+		case _ as Scan.Model_Bolt11InvoiceFlow_InvoiceRequest,
 		     _ as Scan.Model_OnChainFlow,
 		     _ as Scan.Model_LnurlPayFlow_LnurlPayRequest,
 		     _ as Scan.Model_LnurlPayFlow_LnurlPayFetch:
@@ -159,7 +159,7 @@ struct SendView: MVIView {
 				showSendPaymentWarning()
 			}
 			
-		case is Scan.Model_InvoiceFlow_Sending,
+		case is Scan.Model_Bolt11InvoiceFlow_Sending,
 		     is Scan.Model_LnurlPayFlow_Sending:
 			
 			// Pop self from NavigationStack; Back to HomeView

@@ -469,7 +469,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func paymentRequest_invoiceCreated(_ paymentRequest: Lightning_kmpPaymentRequest) -> some View {
+	func paymentRequest_invoiceCreated(_ paymentRequest: Lightning_kmpBolt11Invoice) -> some View {
 		let identifier: String = #function
 		
 		InfoGridRowWrapper(
@@ -485,7 +485,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func paymentRequest_invoiceDescription(_ paymentRequest: Lightning_kmpPaymentRequest) -> some View {
+	func paymentRequest_invoiceDescription(_ paymentRequest: Lightning_kmpBolt11Invoice) -> some View {
 		let identifier: String = #function
 		
 		InfoGridRowWrapper(

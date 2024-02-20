@@ -17145,6 +17145,7 @@
       }
     },
     "Pay " : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -17167,6 +17168,7 @@
       }
     },
     "Pay %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -17189,6 +17191,7 @@
       }
     },
     "Pay %@ " : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -17211,6 +17214,7 @@
       }
     },
     "Pay Invoice" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
