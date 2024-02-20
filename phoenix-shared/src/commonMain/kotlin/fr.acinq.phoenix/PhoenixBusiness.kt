@@ -16,7 +16,7 @@
 
 package fr.acinq.phoenix
 
-import fr.acinq.lightning.NodeParams
+import fr.acinq.bitcoin.Bitcoin
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.io.TcpSocket
@@ -74,7 +74,7 @@ class PhoenixBusiness(
         }
     }
 
-    val chain: NodeParams.Chain = NodeParamsManager.chain
+    val chain: Bitcoin.Chain = NodeParamsManager.chain
 
     val electrumClient by lazy { ElectrumClient(scope = MainScope(), loggerFactory = loggerFactory, pingInterval = 30.seconds, rpcTimeout = 10.seconds) }
     internal val electrumWatcher by lazy { ElectrumWatcher(electrumClient, MainScope(), loggerFactory) }

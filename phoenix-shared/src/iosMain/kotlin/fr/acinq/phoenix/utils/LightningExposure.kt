@@ -1,14 +1,14 @@
 package fr.acinq.phoenix.utils
 
+import fr.acinq.bitcoin.Bitcoin
+import fr.acinq.bitcoin.Block
+import fr.acinq.bitcoin.BlockHash
 import fr.acinq.bitcoin.ByteVector
-import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.ByteVector64
-import fr.acinq.bitcoin.Crypto
 import fr.acinq.bitcoin.PrivateKey
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.TxId
-import fr.acinq.bitcoin.io.ByteArrayOutput
 import fr.acinq.lightning.ChannelEvents
 import fr.acinq.lightning.DefaultSwapInParams
 import fr.acinq.lightning.LiquidityEvents
@@ -39,9 +39,8 @@ import fr.acinq.lightning.io.PeerEvent
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.Connection
-import fr.acinq.lightning.wire.LightningCodecs
 import fr.acinq.lightning.wire.LiquidityAds
-import fr.acinq.phoenix.db.payments.WalletPaymentMetadataRow
+import fr.acinq.phoenix.PhoenixBusiness
 
 /**
  * Class types from lightning-kmp & bitcoin-kmp are not exported to iOS unless we explicitly
@@ -466,3 +465,21 @@ suspend fun Peer._requestInboundLiquidity(
 
 val InboundLiquidityOutgoingPayment._lease: LiquidityAds_Lease
     get() = LiquidityAds_Lease(this.lease)
+
+data class Bitcoin_Chain(public val name: String, val hash: BlockHash) {
+    constructor(src: Bitcoin.Chain) : this(
+        name = src.name,
+        hash = src.chainHash
+    )
+
+    fun unwrap(): Bitcoin.Chain = when (this.hash) {
+        Block.RegtestGenesisBlock.hash -> Bitcoin.Chain.Regtest
+        Block.TestnetGenesisBlock.hash -> Bitcoin.Chain.Testnet
+        Block.SignetGenesisBlock.hash -> Bitcoin.Chain.Signet
+        Block.LivenetGenesisBlock.hash -> Bitcoin.Chain.Mainnet
+        else -> throw IllegalArgumentException("unsupported hash=${this.hash}")
+    }
+}
+
+val PhoenixBusiness._chain: Bitcoin_Chain
+    get() = Bitcoin_Chain(this.chain)

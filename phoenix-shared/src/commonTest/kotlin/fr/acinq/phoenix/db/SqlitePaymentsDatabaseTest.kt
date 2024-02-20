@@ -18,6 +18,7 @@ package fr.acinq.phoenix.db
 
 import com.squareup.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.*
+import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.*
 import fr.acinq.lightning.Lightning.randomBytes32
 import fr.acinq.lightning.channel.TooManyAcceptedHtlcs

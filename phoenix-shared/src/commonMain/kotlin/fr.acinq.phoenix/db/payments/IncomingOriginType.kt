@@ -25,7 +25,7 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.OutPoint
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.payment.PaymentRequest
+import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.phoenix.db.payments.DbTypesHelper.decodeBlob
 import fr.acinq.phoenix.db.serializers.v1.ByteVector32Serializer
 import fr.acinq.phoenix.db.serializers.v1.OutpointSerializer
@@ -69,7 +69,7 @@ sealed class IncomingOriginData {
         fun deserialize(typeVersion: IncomingOriginTypeVersion, blob: ByteArray): IncomingPayment.Origin = decodeBlob(blob) { json, format ->
             when (typeVersion) {
                 IncomingOriginTypeVersion.KEYSEND_V0 -> IncomingPayment.Origin.KeySend
-                IncomingOriginTypeVersion.INVOICE_V0 -> format.decodeFromString<Invoice.V0>(json).let { IncomingPayment.Origin.Invoice(PaymentRequest.read(it.paymentRequest).get()) }
+                IncomingOriginTypeVersion.INVOICE_V0 -> format.decodeFromString<Invoice.V0>(json).let { IncomingPayment.Origin.Invoice(Bolt11Invoice.read(it.paymentRequest).get()) }
                 IncomingOriginTypeVersion.SWAPIN_V0 -> format.decodeFromString<SwapIn.V0>(json).let { IncomingPayment.Origin.SwapIn(it.address) }
                 IncomingOriginTypeVersion.ONCHAIN_V0 -> format.decodeFromString<OnChain.V0>(json).let {
                     IncomingPayment.Origin.OnChain(TxId(it.txId), it.outpoints.toSet())

@@ -18,9 +18,9 @@ package fr.acinq.phoenix.data.lnurl
 
 import co.touchlab.kermit.Logger
 import fr.acinq.bitcoin.ByteVector
+import fr.acinq.bitcoin.utils.Try
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.payment.PaymentRequest
-import fr.acinq.lightning.utils.Try
+import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.phoenix.data.lnurl.Lnurl.Companion.format
 import fr.acinq.phoenix.db.cloud.b64Decode
 import io.ktor.http.*
@@ -68,7 +68,7 @@ sealed class LnurlPay : Lnurl.Qualified {
      */
     data class Invoice(
         override val initialUrl: Url,
-        val paymentRequest: PaymentRequest,
+        val invoice: Bolt11Invoice,
         val successAction: SuccessAction?
     ) : LnurlPay() {
         sealed class SuccessAction {
@@ -111,13 +111,13 @@ sealed class LnurlPay : Lnurl.Qualified {
         ): Invoice {
             try {
                 val pr = json["pr"]?.jsonPrimitive?.content ?: throw LnurlError.Pay.Invoice.Malformed(origin, "missing pr")
-                val paymentRequest = when (val res = PaymentRequest.read(pr)) {
+                val invoice = when (val res = Bolt11Invoice.read(pr)) {
                     is Try.Success -> res.result
                     is Try.Failure -> throw LnurlError.Pay.Invoice.Malformed(origin, res.error.message ?: res.error::class.toString())
                 }
 
                 val successAction = parseSuccessAction(origin, json)
-                return Invoice(intent.initialUrl, paymentRequest, successAction)
+                return Invoice(intent.initialUrl, invoice, successAction)
             } catch (t: Throwable) {
                 when (t) {
                     is LnurlError.Pay.Invoice -> throw t

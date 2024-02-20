@@ -17,7 +17,6 @@
 package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.*
-import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.crypto.KeyManager
 import fr.acinq.lightning.crypto.LocalKeyManager
 import fr.acinq.lightning.crypto.div
@@ -26,7 +25,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
 
 class WalletManager(
-    private val chain: NodeParams.Chain
+    private val chain: Bitcoin.Chain
 ) : CoroutineScope by MainScope() {
 
     private val _localKeyManager = MutableStateFlow<LocalKeyManager?>(null)
@@ -98,7 +97,7 @@ fun LocalKeyManager.cloudKeyHash(): String {
     return Crypto.hash160(cloudKey()).byteVector().toHex()
 }
 
-fun LocalKeyManager.isMainnet() = chain == NodeParams.Chain.Mainnet
+fun LocalKeyManager.isMainnet() = chain == Bitcoin.Chain.Mainnet
 
 val LocalKeyManager.finalOnChainWalletPath: String
     get() = (KeyManager.Bip84OnChainKeys.bip84BasePath(chain) / finalOnChainWallet.account).toString()

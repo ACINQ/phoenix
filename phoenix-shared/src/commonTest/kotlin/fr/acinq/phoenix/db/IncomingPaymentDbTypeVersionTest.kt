@@ -19,7 +19,7 @@ package fr.acinq.phoenix.db
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.payment.PaymentRequest
+import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.db.payments.*
@@ -35,12 +35,12 @@ class IncomingPaymentDbTypeVersionTest {
 
     val channelId1 = ByteVector32.fromValidHex("3b6208285563c9adb009781acf1626f1c2a3b1a3492d5ec312ead8282c7ad6da")
     val address1 = "tb1q97tpc0y4rvdnu9wm7nu354lmmzdm8du228u3g4"
-    val invoice1 =
-        PaymentRequest.read("lntb1500n1ps9u963pp5llphsu6evgmzgk8g2e73su44wn6txmwywdzwvtdwzrt9pqxc9f5sdpzxysy2umswfjhxum0yppk76twypgxzmnwvycqp7xqrrss9qy9qsqsp5qa7092geq6ptp24uzlfw0vj3w4whh2zuc9rquwca69acwx5khckqvslyw2n6dallc868vxu3uueyhw6pe00cmluynv7ca4tknz7g274rp9ucwqpx5ydejsmzl4xpegqtemcq6vwvu8alpxttlj82e7j26gspfj06gn").get()
+    val bolt11Invoice =
+        Bolt11Invoice.read("lntb1500n1ps9u963pp5llphsu6evgmzgk8g2e73su44wn6txmwywdzwvtdwzrt9pqxc9f5sdpzxysy2umswfjhxum0yppk76twypgxzmnwvycqp7xqrrss9qy9qsqsp5qa7092geq6ptp24uzlfw0vj3w4whh2zuc9rquwca69acwx5khckqvslyw2n6dallc868vxu3uueyhw6pe00cmluynv7ca4tknz7g274rp9ucwqpx5ydejsmzl4xpegqtemcq6vwvu8alpxttlj82e7j26gspfj06gn").get()
 
     @Test
     fun incoming_origin_invoice() {
-        val origin = IncomingPayment.Origin.Invoice(invoice1)
+        val origin = IncomingPayment.Origin.Invoice(bolt11Invoice)
         val deserialized = IncomingOriginData.deserialize(IncomingOriginTypeVersion.INVOICE_V0, origin.mapToDb().second)
         assertEquals(origin, deserialized)
     }

@@ -16,10 +16,9 @@
 
 package fr.acinq.phoenix.controllers.payments
 
-import co.touchlab.kermit.Logger
+import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.Lightning.randomBytes32
 import fr.acinq.lightning.logging.LoggerFactory
-import fr.acinq.lightning.utils.Either
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.managers.PeerManager

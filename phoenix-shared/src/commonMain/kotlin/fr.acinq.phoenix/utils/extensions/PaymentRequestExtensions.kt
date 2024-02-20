@@ -16,8 +16,36 @@
 
 package fr.acinq.phoenix.utils.extensions
 
+import fr.acinq.bitcoin.Bitcoin
 import fr.acinq.lightning.Feature
-import fr.acinq.lightning.Features
+import fr.acinq.lightning.payment.Bolt11Invoice
+import fr.acinq.lightning.payment.Bolt12Invoice
 import fr.acinq.lightning.payment.PaymentRequest
 
-fun PaymentRequest.isAmountlessTrampoline() = amount == null && !Features(features).hasFeature(Feature.TrampolinePayment)
+fun Bolt11Invoice.isAmountlessTrampoline() = this.amount == null && this.features.hasFeature(Feature.TrampolinePayment)
+
+/**
+ * In Objective-C, the function name `description()` is already in use (part of NSObject).
+ * So we need to alias it.
+ */
+fun Bolt11Invoice.desc(): String? = this.description
+
+val PaymentRequest.chain: Bitcoin.Chain
+    get() = when (this) {
+        is Bolt11Invoice -> {
+            when (prefix) {
+                "lnbc" -> Bitcoin.Chain.Mainnet
+                "lntb" -> Bitcoin.Chain.Testnet
+                "lnbcrt" -> Bitcoin.Chain.Regtest
+                else -> throw IllegalArgumentException("unhandled invoice prefix=$prefix")
+            }
+        }
+        is Bolt12Invoice -> TODO()
+    }
+
+fun PaymentRequest.write(): String {
+    return when (this) {
+        is Bolt11Invoice -> this.write()
+        is Bolt12Invoice -> this.write()
+    }
+}

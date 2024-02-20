@@ -20,13 +20,13 @@ import co.touchlab.sqliter.DatabaseConfiguration
 import com.squareup.sqldelight.db.SqlDriver
 import com.squareup.sqldelight.drivers.native.NativeSqliteDriver
 import com.squareup.sqldelight.drivers.native.wrapConnection
-import fr.acinq.lightning.NodeParams
+import fr.acinq.bitcoin.Bitcoin
 import fr.acinq.phoenix.utils.PlatformContext
 import fr.acinq.phoenix.utils.getDatabaseFilesDirectoryPath
 
 actual fun createChannelsDbDriver(
     ctx: PlatformContext,
-    chain: NodeParams.Chain,
+    chain: Bitcoin.Chain,
     nodeIdHash: String
 ): SqlDriver {
     val schema = ChannelsDatabase.Schema
@@ -55,7 +55,7 @@ actual fun createChannelsDbDriver(
 
 actual fun createPaymentsDbDriver(
     ctx: PlatformContext,
-    chain: NodeParams.Chain,
+    chain: Bitcoin.Chain,
     nodeIdHash: String
 ): SqlDriver {
     val schema = PaymentsDatabase.Schema

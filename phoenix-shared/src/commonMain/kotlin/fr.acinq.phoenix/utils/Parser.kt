@@ -18,9 +18,9 @@ package fr.acinq.phoenix.utils
 
 import fr.acinq.bitcoin.*
 import fr.acinq.bitcoin.utils.Either
-import fr.acinq.lightning.NodeParams
+import fr.acinq.bitcoin.utils.Try
+import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.PaymentRequest
-import fr.acinq.lightning.utils.Try
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.data.*
 import io.ktor.http.*
@@ -69,9 +69,9 @@ object Parser {
     }
 
     /** Reads a payment request after stripping prefixes. Return null if input is invalid. */
-    fun readPaymentRequest(
+    fun readBolt11Invoice(
         input: String
-    ): PaymentRequest? = when (val res = PaymentRequest.read(trimMatchingPrefix(removeExcessInput(input), lightningPrefixes))) {
+    ): Bolt11Invoice? = when (val res = Bolt11Invoice.read(trimMatchingPrefix(removeExcessInput(input), lightningPrefixes))) {
         is Try.Success -> res.get()
         is Try.Failure -> null
     }
@@ -83,7 +83,7 @@ object Parser {
      * @param input can range from a basic bitcoin address to a sophisticated Bitcoin URI with a prefix and parameters.
      */
     fun readBitcoinAddress(
-        chain: NodeParams.Chain,
+        chain: Bitcoin.Chain,
         input: String
     ): Either<BitcoinUriError, BitcoinUri> {
         val cleanInput = removeExcessInput(input)
@@ -117,7 +117,7 @@ object Parser {
         val label = url.parameters["label"]
         val message = url.parameters["message"]
         val lightning = url.parameters["lightning"]?.let {
-            when (val res = PaymentRequest.read(it)) {
+            when (val res = Bolt11Invoice.read(it)) {
                 is Try.Success -> res.get()
                 is Try.Failure -> null
             }
@@ -135,7 +135,7 @@ object Parser {
     }
 
     /** Transforms a bitcoin address into a public key script if valid, otherwise returns null. */
-    fun addressToPublicKeyScriptOrNull(chain: NodeParams.Chain, address: String): ByteVector? {
+    fun addressToPublicKeyScriptOrNull(chain: Bitcoin.Chain, address: String): ByteVector? {
         return readBitcoinAddress(chain, address).right?.script
     }
 }
