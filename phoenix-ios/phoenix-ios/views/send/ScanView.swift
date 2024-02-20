@@ -288,7 +288,7 @@ struct ScanView: View {
 
 					let desc = content.invoice.description_?.trimmingCharacters(in: .whitespaces) ?? ""
 
-					if let msat = content.paymentRequest.amount {
+					if let msat = content.invoice.amount {
 						let amt = Utils.format(currencyPrefs, msat: msat)
 
 						if desc.isEmpty {
