@@ -13,6 +13,7 @@ import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
 import fr.acinq.lightning.db.ChannelClosingType
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
+import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampSeconds
@@ -334,7 +335,7 @@ class CsvWriterTests {
      * So everything else can be fake.
      */
     private fun makePaymentRequest() =
-        PaymentRequest.create(
+        Bolt11Invoice.create(
             chainHash = Block.TestnetGenesisBlock.hash,
             amount = 10_000.msat,
             paymentHash = randomBytes32(),
