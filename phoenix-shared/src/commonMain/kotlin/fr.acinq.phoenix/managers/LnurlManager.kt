@@ -22,7 +22,6 @@ import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.lnurl.*
 import fr.acinq.lightning.logging.error
-import fr.acinq.phoenix.utils.extensions.write
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*

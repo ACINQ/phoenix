@@ -42,10 +42,3 @@ val PaymentRequest.chain: Chain
         }
         is Bolt12Invoice -> TODO()
     }
-
-fun PaymentRequest.write(): String {
-    return when (this) {
-        is Bolt11Invoice -> this.write()
-        is Bolt12Invoice -> this.write()
-    }
-}

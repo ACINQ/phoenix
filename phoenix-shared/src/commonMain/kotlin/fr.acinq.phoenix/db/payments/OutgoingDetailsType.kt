@@ -27,7 +27,6 @@ import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.phoenix.db.serializers.v1.ByteVector32Serializer
 import fr.acinq.phoenix.db.serializers.v1.SatoshiSerializer
-import fr.acinq.phoenix.utils.extensions.write
 import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
