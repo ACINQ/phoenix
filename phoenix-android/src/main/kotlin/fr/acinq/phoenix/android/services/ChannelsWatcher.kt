@@ -21,6 +21,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
+import androidx.work.Operation
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
@@ -162,6 +163,10 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
         fun scheduleASAP(context: Context) {
             val work = OneTimeWorkRequest.Builder(ChannelsWatcher::class.java).addTag(WATCHER_WORKER_TAG).build()
             WorkManager.getInstance(context).enqueueUniqueWork(WATCHER_WORKER_TAG, ExistingWorkPolicy.REPLACE, work)
+        }
+
+        fun cancel(context: Context): Operation {
+            return WorkManager.getInstance(context).cancelAllWorkByTag(WATCHER_WORKER_TAG)
         }
     }
 
