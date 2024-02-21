@@ -85,7 +85,7 @@ class BusinessManager {
 	
 	private init() { // must use shared instance
 		
-		business = PhoenixBusiness(ctx: PlatformContext(logger: KotlinLogger.shared.logger))
+		business = PhoenixBusiness(ctx: PlatformContext.default)
 		BusinessManager._isTestnet = business.chain.isTestnet()
 	}
 	
@@ -125,7 +125,7 @@ class BusinessManager {
 
 	public func reset() {
 
-		business = PhoenixBusiness(ctx: PlatformContext())
+		business = PhoenixBusiness(ctx: PlatformContext.default)
 		syncManager = nil
 		swapInRejectedPublisher.send(nil)
 		walletInfo = nil

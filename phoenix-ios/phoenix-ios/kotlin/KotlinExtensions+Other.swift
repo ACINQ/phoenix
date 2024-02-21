@@ -152,3 +152,10 @@ extension LnurlAuth {
 	}
 }
 
+extension PlatformContext {
+	
+	static var `default`: PlatformContext {
+		return PlatformContext(logger: KotlinLogger.shared.logger)
+	}
+}
+

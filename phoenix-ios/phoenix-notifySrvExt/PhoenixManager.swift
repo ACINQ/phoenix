@@ -108,7 +108,7 @@ class PhoenixManager {
 			return
 		}
 
-		let newBusiness = PhoenixBusiness(ctx: PlatformContext())
+		let newBusiness = PhoenixBusiness(ctx: PlatformContext.default)
 
 		newBusiness.networkMonitor.disable()
 		newBusiness.currencyManager.disableAutoRefresh()
