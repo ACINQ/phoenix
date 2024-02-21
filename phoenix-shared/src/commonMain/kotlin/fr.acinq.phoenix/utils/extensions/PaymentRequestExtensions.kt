@@ -17,6 +17,7 @@
 package fr.acinq.phoenix.utils.extensions
 
 import fr.acinq.bitcoin.Chain
+import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.Feature
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.Bolt12Invoice
@@ -41,4 +42,16 @@ val PaymentRequest.chain: Chain
             }
         }
         is Bolt12Invoice -> TODO()
+    }
+
+val PaymentRequest.nodeId: PublicKey
+    get() = when (this) {
+        is Bolt11Invoice -> this.nodeId
+        is Bolt12Invoice -> this.nodeId
+    }
+
+val PaymentRequest.desc: String?
+    get() = when (this) {
+        is Bolt11Invoice -> this.description
+        is Bolt12Invoice -> this.description
     }

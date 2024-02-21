@@ -31,6 +31,7 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.payment.Bolt11Invoice
+import fr.acinq.lightning.payment.Bolt12Invoice
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sum
@@ -299,7 +300,12 @@ private fun DetailsForLightningOutgoingPayment(
     // -- details of the payment
     when (details) {
         is LightningOutgoingPayment.Details.Normal -> {
-            InvoiceSection(invoice = details.paymentRequest)
+            when (val paymentRequest = details.paymentRequest) {
+                is Bolt11Invoice -> InvoiceSection(invoice = paymentRequest)
+                is Bolt12Invoice -> {
+                    // TODO
+                }
+            }
         }
         is LightningOutgoingPayment.Details.SwapOut -> {
             TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_bitcoin_address_label), value = details.address)

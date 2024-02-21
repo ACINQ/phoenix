@@ -1,7 +1,10 @@
 package fr.acinq.phoenix.utils
 
 import fr.acinq.lightning.db.*
+import fr.acinq.lightning.payment.Bolt11Invoice
+import fr.acinq.lightning.payment.Bolt12Invoice
 import fr.acinq.phoenix.data.WalletPaymentInfo
+import fr.acinq.phoenix.utils.extensions.nodeId
 import kotlinx.datetime.Instant
 
 class CsvWriter {
