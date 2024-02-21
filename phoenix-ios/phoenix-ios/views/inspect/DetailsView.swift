@@ -469,38 +469,44 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func paymentRequest_invoiceCreated(_ paymentRequest: Lightning_kmpBolt11Invoice) -> some View {
+	func paymentRequest_invoiceCreated(_ paymentRequest: Lightning_kmpPaymentRequest) -> some View {
 		let identifier: String = #function
 		
-		InfoGridRowWrapper(
-			identifier: identifier,
-			keyColumnWidth: keyColumnWidth(identifier: identifier)
-		) {
-			keyColumn("invoice created")
+		if let createdAtDate = paymentRequest.createdAtDate {
 			
-		} valueColumn: {
-			
-			commonValue_date(date: paymentRequest.timestampDate)
+			InfoGridRowWrapper(
+				identifier: identifier,
+				keyColumnWidth: keyColumnWidth(identifier: identifier)
+			) {
+				keyColumn("invoice created")
+				
+			} valueColumn: {
+				
+				commonValue_date(date: createdAtDate)
+			}
 		}
 	}
 	
 	@ViewBuilder
-	func paymentRequest_invoiceDescription(_ paymentRequest: Lightning_kmpBolt11Invoice) -> some View {
+	func paymentRequest_invoiceDescription(_ paymentRequest: Lightning_kmpPaymentRequest) -> some View {
 		let identifier: String = #function
 		
-		InfoGridRowWrapper(
-			identifier: identifier,
-			keyColumnWidth: keyColumnWidth(identifier: identifier)
-		) {
-			keyColumn("invoice description")
+		if let rawDescription = paymentRequest.invoiceDescription_ {
 			
-		} valueColumn: {
-			
-			let description = (paymentRequest.description_ ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
-			if description.isEmpty {
-				Text("empty").foregroundColor(.secondary)
-			} else {
-				Text(description)
+			InfoGridRowWrapper(
+				identifier: identifier,
+				keyColumnWidth: keyColumnWidth(identifier: identifier)
+			) {
+				keyColumn("invoice description")
+				
+			} valueColumn: {
+				
+				let description = rawDescription.trimmingCharacters(in: .whitespacesAndNewlines)
+				if description.isEmpty {
+					Text("empty").foregroundColor(.secondary)
+				} else {
+					Text(description)
+				}
 			}
 		}
 	}
