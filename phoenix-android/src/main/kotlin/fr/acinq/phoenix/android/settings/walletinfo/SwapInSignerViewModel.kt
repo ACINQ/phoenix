@@ -79,18 +79,15 @@ class SwapInSignerViewModel(
                 return@launch
             }
             val keyManager = walletManager.keyManager.filterNotNull().first()
-            val userSig = Transactions.signSwapInputUser(
+            val userSig = keyManager.swapInOnChainWallet.signSwapInputUserLegacy(
                 fundingTx = tx,
                 index = 0,
-                parentTxOut = TxOut(amount, ByteVector.empty),
-                userKey = keyManager.swapInOnChainWallet.userPrivateKey,
-                serverKey = keyManager.swapInOnChainWallet.remoteServerPublicKey,
-                refundDelay = 144 * 30 * 6
+                parentTxOuts = listOf(TxOut(amount, ByteVector.empty)),
             )
             state.value = SwapInSignerState.Signed(
                 amount = amount,
                 txId = tx.txid.toString(),
-                userSig = userSig.toString()
+                userSig = userSig.toString(),
             )
         }
     }

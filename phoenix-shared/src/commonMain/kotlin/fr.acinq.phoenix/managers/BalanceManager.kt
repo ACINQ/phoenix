@@ -86,13 +86,9 @@ class BalanceManager(
      */
     private suspend fun monitorSwapInBalance(peer: Peer) {
         val swapInParams = peer.walletParams.swapInParams
-        combine(peer.currentTipFlow.filterNotNull(), peer.channelsFlow, peer.swapInWallet.walletStateFlow) { (currentBlockHeight, _), channels, swapInWallet ->
+        combine(peer.currentTipFlow.filterNotNull(), peer.channelsFlow, peer.swapInWallet.wallet.walletStateFlow) { (currentBlockHeight, _), channels, swapInWallet ->
             val reservedInputs = SwapInManager.reservedWalletInputs(channels.values.filterIsInstance<PersistedChannelState>())
-            val walletWithoutReserved = WalletState(
-                addresses = swapInWallet.addresses.map { (address, unspent) ->
-                    address to unspent.filterNot { reservedInputs.contains(it.outPoint) }
-                }.toMap().filter { it.value.isNotEmpty() },
-            )
+            val walletWithoutReserved = swapInWallet.withoutReservedUtxos(reservedInputs)
             walletWithoutReserved.withConfirmations(
                 currentBlockHeight = currentBlockHeight,
                 swapInParams = swapInParams

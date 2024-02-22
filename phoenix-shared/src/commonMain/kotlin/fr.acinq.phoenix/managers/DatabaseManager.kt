@@ -1,10 +1,7 @@
 package fr.acinq.phoenix.managers
 
-import co.touchlab.kermit.Logger
-import co.touchlab.kermit.Severity
-import co.touchlab.kermit.StaticConfig
+import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.byteVector
-import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.db.ChannelsDb
 import fr.acinq.lightning.db.Databases
 import fr.acinq.lightning.db.PaymentsDb
@@ -24,7 +21,7 @@ import kotlinx.coroutines.launch
 class DatabaseManager(
     loggerFactory: LoggerFactory,
     private val ctx: PlatformContext,
-    private val chain: NodeParams.Chain,
+    private val chain: Chain,
     private val nodeParamsManager: NodeParamsManager,
     private val currencyManager: CurrencyManager
 ) : CoroutineScope by MainScope() {

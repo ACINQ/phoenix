@@ -110,8 +110,8 @@ class LnurlManager(
         val invoice = LnurlPay.parseLnurlPayInvoice(intent, origin, json)
 
         // SPECS: LN WALLET verifies that the amount in the provided invoice equals the amount previously specified by user.
-        if (amount != invoice.paymentRequest.amount) {
-            log.error { "rejecting invoice from $origin with amount_invoice=${invoice.paymentRequest.amount} requested_amount=$amount" }
+        if (amount != invoice.invoice.amount) {
+            log.error { "rejecting invoice from $origin with amount_invoice=${invoice.invoice.amount} requested_amount=$amount" }
             throw LnurlError.Pay.Invoice.InvalidAmount(origin)
         }
 

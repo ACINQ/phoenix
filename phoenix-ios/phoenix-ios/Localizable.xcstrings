@@ -2633,6 +2633,9 @@
         }
       }
     },
+    "A less efficient and less private format that does not rotate addresses. However, it is compatible with almost every service and wallet." : {
+
+    },
     "A new attempt is scheduled in a few hours." : {
       "localizations" : {
         "es" : {
@@ -4879,6 +4882,9 @@
           }
         }
       }
+    },
+    "Bitcoin address format" : {
+
     },
     "Bitcoin mempool is full and fees are high." : {
       "localizations" : {
@@ -8125,6 +8131,9 @@
           }
         }
       }
+    },
+    "Default format, with better privacy, cheaper fees and address rotation. Some older services or wallets may not understand this modern address format." : {
+
     },
     "Default payment description" : {
       "localizations" : {
@@ -13938,6 +13947,12 @@
         }
       }
     },
+    "Legacy" : {
+
+    },
+    "Legacy descriptor" : {
+
+    },
     "Legal" : {
       "localizations" : {
         "ar" : {
@@ -19024,6 +19039,9 @@
         }
       }
     },
+    "Public key" : {
+
+    },
     "QR code" : {
       "localizations" : {
         "es" : {
@@ -21487,6 +21505,9 @@
         }
       }
     },
+    "Share Text (bitcoin address)" : {
+
+    },
     "Share Text (lightning invoice)" : {
       "localizations" : {
         "es" : {
@@ -22679,6 +22700,9 @@
     "Support" : {
       "comment" : "HomeView: Tools menu: Label"
     },
+    "Swap addresses" : {
+
+    },
     "Swap Fees" : {
       "comment" : "Label in SummaryInfoGrid",
       "localizations" : {
@@ -22802,6 +22826,9 @@
         }
       }
     },
+    "Swap-in addresses" : {
+
+    },
     "Swap-in wallet" : {
       "comment" : "Navigation Bar Title",
       "localizations" : {
@@ -22916,6 +22943,12 @@
           }
         }
       }
+    },
+    "Taproot" : {
+
+    },
+    "Taproot (recommended)" : {
+
     },
     "Terminate App" : {
       "localizations" : {
@@ -23036,6 +23069,7 @@
     },
     "The address is not for %@" : {
       "comment" : "Error message - parsing bitcoin address",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {

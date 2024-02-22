@@ -7,16 +7,15 @@ extension Receive {
 	typealias Model_Awaiting = ModelAwaiting
 	typealias Model_Generating = ModelGenerating
 	typealias Model_Generated = ModelGenerated
-	typealias Model_SwapIn = ModelSwapIn
 }
 
 extension Scan {
 	typealias Model_Ready = ModelReady
 	typealias Model_BadRequest = ModelBadRequest
 
-	typealias Model_InvoiceFlow = ModelInvoiceFlow
-	typealias Model_InvoiceFlow_InvoiceRequest = ModelInvoiceFlowInvoiceRequest
-	typealias Model_InvoiceFlow_Sending = ModelInvoiceFlowSending
+	typealias Model_Bolt11InvoiceFlow = ModelBolt11InvoiceFlow
+	typealias Model_Bolt11InvoiceFlow_InvoiceRequest = ModelBolt11InvoiceFlowBolt11InvoiceRequest
+	typealias Model_Bolt11InvoiceFlow_Sending = ModelBolt11InvoiceFlowSending
 
 	typealias Model_OnChainFlow = ModelOnchainFlow
 
@@ -39,7 +38,7 @@ extension Scan {
 
 	typealias Intent_Parse = IntentParse
 
-	typealias Intent_InvoiceFlow_SendInvoicePayment = IntentInvoiceFlowSendInvoicePayment
+	typealias Intent_Bolt11InvoiceFlow_SendInvoicePayment = IntentBolt11InvoiceFlowSendBolt11Invoice
 
 	typealias Intent_CancelLnurlServiceFetch = IntentCancelLnurlServiceFetch
 
@@ -68,7 +67,7 @@ extension Scan {
 	typealias BadRequestReason_UnknownFormat = BadRequestReasonUnknownFormat
 	typealias BadRequestReason_UnsupportedLnurl = BadRequestReasonUnsupportedLnurl
 
-	typealias ClipboardContent_InvoiceRequest = ClipboardContentInvoiceRequest
+	typealias ClipboardContent_Bolt11InvoiceRequest = ClipboardContentBolt11InvoiceRequest
 	typealias ClipboardContent_BitcoinRequest = ClipboardContentBitcoinRequest
 	typealias ClipboardContent_LoginRequest = ClipboardContentLoginRequest
 	typealias ClipboardContent_LnurlRequest = ClipboardContentLnurlRequest

@@ -43,7 +43,7 @@ extension BalanceManager {
 
 extension WalletManager {
 	
-	func getKeyManager() -> Lightning_kmpLocalKeyManager? {
+	func keyManagerValue() -> Lightning_kmpLocalKeyManager? {
 		if let value = keyManager.value_ as? Lightning_kmpLocalKeyManager {
 			return value
 		} else {
@@ -149,6 +149,13 @@ extension LnurlAuth {
 			}
 		}
 		return LnurlAuth.defaultActionSuccessTitle
+	}
+}
+
+extension PlatformContext {
+	
+	static var `default`: PlatformContext {
+		return PlatformContext(logger: KotlinLogger.shared.logger)
 	}
 }
 

@@ -77,7 +77,7 @@ class PeerManager(
     /** Flow of the peer's final wallet [WalletState.WalletWithConfirmations]. */
     @OptIn(ExperimentalCoroutinesApi::class)
     val finalWallet = peerState.filterNotNull().flatMapLatest { peer ->
-        combine(peer.currentTipFlow.filterNotNull(), peer.finalWallet.walletStateFlow) { (currentBlockHeight, _), wallet ->
+        combine(peer.currentTipFlow.filterNotNull(), peer.finalWallet.wallet.walletStateFlow) { (currentBlockHeight, _), wallet ->
             wallet.withConfirmations(
                 currentBlockHeight = currentBlockHeight,
                 // the final wallet does not need to distinguish between weak/deep/locked txs
@@ -97,7 +97,7 @@ class PeerManager(
     /** Flow of the peer's swap-in wallet [WalletState.WalletWithConfirmations]. */
     @OptIn(ExperimentalCoroutinesApi::class)
     val swapInWallet = peerState.filterNotNull().flatMapLatest { peer ->
-        combine(peer.currentTipFlow.filterNotNull(), peer.swapInWallet.walletStateFlow) { (currentBlockHeight, _), wallet ->
+        combine(peer.currentTipFlow.filterNotNull(), peer.swapInWallet.wallet.walletStateFlow) { (currentBlockHeight, _), wallet ->
             wallet.withConfirmations(
                 currentBlockHeight = currentBlockHeight,
                 swapInParams = peer.walletParams.swapInParams

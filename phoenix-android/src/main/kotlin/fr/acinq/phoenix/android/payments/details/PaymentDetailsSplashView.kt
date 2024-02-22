@@ -62,7 +62,6 @@ import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.lnurl.LnurlPay
 import fr.acinq.phoenix.utils.extensions.WalletPaymentState
-import fr.acinq.phoenix.utils.extensions.errorMessage
 import fr.acinq.phoenix.utils.extensions.minDepthForFunding
 import fr.acinq.phoenix.utils.extensions.state
 import io.ktor.http.Url

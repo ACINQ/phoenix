@@ -439,8 +439,7 @@ struct TxHistoryExporter: View {
 				includesFiat: includeFiat,
 				includesDescription: includeDescription,
 				includesNotes: includeNotes,
-				includesOriginDestination: includeOriginDestination,
-				swapInAddress: peer.swapInAddress
+				includesOriginDestination: includeOriginDestination
 			)
 			
 			var done = false

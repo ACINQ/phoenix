@@ -16,8 +16,10 @@
 
 package fr.acinq.phoenix.utils.extensions
 
-import fr.acinq.lightning.NodeParams
+import fr.acinq.bitcoin.Bitcoin
 import fr.acinq.lightning.db.*
+import fr.acinq.lightning.payment.Bolt11Invoice
+import fr.acinq.lightning.payment.Bolt12Invoice
 import fr.acinq.lightning.payment.PaymentRequest
 
 /** Standardized location for extending types from: fr.acinq.lightning. */
@@ -72,24 +74,3 @@ fun WalletPayment.errorMessage(): String? = when (this) {
     }
     is IncomingPayment -> null
 }
-
-/**
- * In Objective-C, the function name `description()` is already in use (part of NSObject).
- * So we need to alias it.
- */
-fun PaymentRequest.desc(): String? = this.description
-
-/**
- * Since unix epoch
- */
-fun PaymentRequest.expiryTimestampSeconds(): Long? = this.expirySeconds?.let {
-    this.timestampSeconds + it
-}
-
-val PaymentRequest.chain: NodeParams.Chain
-    get() = when (prefix) {
-        "lnbc" -> NodeParams.Chain.Mainnet
-        "lntb" -> NodeParams.Chain.Testnet
-        "lnbcrt" -> NodeParams.Chain.Regtest
-        else -> throw IllegalArgumentException("unhandled invoice prefix=$prefix")
-    }

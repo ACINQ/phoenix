@@ -736,10 +736,10 @@ struct ValidateView: View {
 		return nil
 	}
 	
-	func paymentRequest() -> Lightning_kmpPaymentRequest? {
+	func paymentRequest() -> Lightning_kmpBolt11Invoice? {
 		
-		if let model = mvi.model as? Scan.Model_InvoiceFlow_InvoiceRequest {
-			return model.paymentRequest
+		if let model = mvi.model as? Scan.Model_Bolt11InvoiceFlow_InvoiceRequest {
+			return model.invoice
 		} else {
 			// Note: there's technically a `paymentRequest` within `Scan.Model_SwapOutFlow_Ready`.
 			// But this method is designed to only pull from `Scan.Model_InvoiceFlow_InvoiceRequest`.
@@ -982,7 +982,7 @@ struct ValidateView: View {
 		// * SwapOutFlow_Ready -> SwapOutFlow_Init       => remove minerFee from calculations
 		// * OnChainFlow -> InvoiceFlow_X                => range changed (e.g. minAmount)
 		//
-		if newModel is Scan.Model_InvoiceFlow {
+		if newModel is Scan.Model_Bolt11InvoiceFlow {
 			
 			refreshAltAmount()
 		}
@@ -1461,11 +1461,11 @@ struct ValidateView: View {
 			}
 		}
 		
-		if let model = mvi.model as? Scan.Model_InvoiceFlow_InvoiceRequest {
+		if let model = mvi.model as? Scan.Model_Bolt11InvoiceFlow_InvoiceRequest {
 			
 			saveTipPercentInPrefs()
-			mvi.intent(Scan.Intent_InvoiceFlow_SendInvoicePayment(
-				paymentRequest: model.paymentRequest,
+			mvi.intent(Scan.Intent_Bolt11InvoiceFlow_SendInvoicePayment(
+				invoice: model.invoice,
 				amount: Lightning_kmpMilliSatoshi(msat: msat),
 				trampolineFees: trampolineFees
 			))

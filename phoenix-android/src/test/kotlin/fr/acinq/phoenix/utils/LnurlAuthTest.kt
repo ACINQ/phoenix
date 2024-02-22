@@ -1,12 +1,11 @@
 package fr.acinq.phoenix.utils
 
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.Crypto
-import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.byteVector64
 import fr.acinq.bitcoin.scala.Block
 import fr.acinq.bitcoin.scala.`MnemonicCode$`
-import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.crypto.LocalKeyManager
 import fr.acinq.phoenix.data.lnurl.LnurlAuth
 import fr.acinq.phoenix.legacy.lnurl.LNUrlAuthFragment
@@ -27,7 +26,7 @@ class LnurlAuthTest {
         val legacyKeyManager = fr.acinq.eclair.crypto.LocalKeyManager(seed, Block.TestnetGenesisBlock().hash())
         val kmpKeyManager = LocalKeyManager(
             seed = seed.toArray().byteVector64(),
-            chain = NodeParams.Chain.Testnet,
+            chain = Chain.Testnet,
             remoteSwapInExtendedPublicKey = "tpubDDt5vQap1awkyDXx1z1cP7QFKSZHDCCpbU8nSq9jy7X2grTjUVZDePexf6gc6AHtRRzkgfPW87K6EKUVV6t3Hu2hg7YkHkmMeLSfrP85x41"
         )
 
@@ -66,7 +65,7 @@ class LnurlAuthTest {
         val legacyKeyManager = fr.acinq.eclair.crypto.LocalKeyManager(seed, Block.LivenetGenesisBlock().hash())
         val kmpKeyManager = LocalKeyManager(
             seed = seed.toArray().byteVector64(),
-            chain = NodeParams.Chain.Testnet,
+            chain = Chain.Testnet,
             remoteSwapInExtendedPublicKey = "tpubDDt5vQap1awkyDXx1z1cP7QFKSZHDCCpbU8nSq9jy7X2grTjUVZDePexf6gc6AHtRRzkgfPW87K6EKUVV6t3Hu2hg7YkHkmMeLSfrP85x41"
         )
 

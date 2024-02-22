@@ -96,22 +96,22 @@ fun ReceiveView(
     onScanDataClick: () -> Unit,
 ) {
     val context = LocalContext.current
-    val balanceManager = business.balanceManager
-    val vm: ReceiveViewModel = viewModel(factory = ReceiveViewModel.Factory(business.peerManager))
+//    val balanceManager = business.balanceManager
+    val vm: ReceiveViewModel = viewModel(factory = ReceiveViewModel.Factory(business.chain, business.peerManager, business.walletManager))
     val defaultInvoiceExpiry by UserPrefs.getInvoiceDefaultExpiry(context).collectAsState(null)
     val defaultInvoiceDesc by UserPrefs.getInvoiceDefaultDesc(context).collectAsState(null)
 
-    // When a on-chain payment has been received, go back to the home screen (via the onSwapInReceived callback)
-    LaunchedEffect(key1 = Unit) {
-        var previousBalance: WalletBalance = WalletBalance.empty()
-        balanceManager.swapInWalletBalance.collect {
-            if (previousBalance != WalletBalance.empty() && it.total > 0.sat && it != previousBalance) {
-                onSwapInReceived()
-            } else {
-                previousBalance = it
-            }
-        }
-    }
+//    // When a on-chain payment has been received, go back to the home screen (via the onSwapInReceived callback)
+//    LaunchedEffect(key1 = Unit) {
+//        var previousBalance: WalletBalance = WalletBalance.empty()
+//        balanceManager.swapInWalletBalance.collect {
+//            if (previousBalance != WalletBalance.empty() && it.total > 0.sat && it != previousBalance) {
+//                onSwapInReceived()
+//            } else {
+//                previousBalance = it
+//            }
+//        }
+//    }
 
     DefaultScreenLayout(horizontalAlignment = Alignment.CenterHorizontally, isScrollable = true) {
         DefaultScreenHeader(
@@ -175,7 +175,7 @@ private fun ReceiveViewPages(
             ) {
                 when (index) {
                     0 -> LightningInvoiceView(vm = vm, onFeeManagementClick = onFeeManagementClick, onScanDataClick = onScanDataClick, defaultDescription = defaultInvoiceDescription, expiry = defaultInvoiceExpiry, maxWidth = maxWidth)
-                    1 -> BitcoinAddressView(state = vm.bitcoinAddressState, maxWidth = maxWidth)
+                    1 -> BitcoinAddressView(vm = vm, maxWidth = maxWidth)
                 }
             }
         }
@@ -184,11 +184,11 @@ private fun ReceiveViewPages(
 
 @Composable
 fun InvoiceHeader(
-    label: String,
+    icon: Int,
     helpMessage: String,
-    icon: Int
+    content: @Composable RowScope.() -> Unit,
 ) {
-    Row {
+    Row(verticalAlignment = Alignment.CenterVertically) {
         IconPopup(
             icon = icon,
             iconSize = 24.dp,
@@ -198,64 +198,9 @@ fun InvoiceHeader(
             spaceLeft = null,
             popupMessage = helpMessage
         )
-        Text(text = label)
+        content()
     }
     Spacer(modifier = Modifier.height(16.dp))
-}
-
-
-
-@Composable
-private fun BitcoinAddressView(
-    state: ReceiveViewModel.BitcoinAddressState,
-    maxWidth: Dp
-) {
-    val context = LocalContext.current
-
-    InvoiceHeader(
-        label = stringResource(id = R.string.receive_bitcoin_title),
-        helpMessage = stringResource(id = R.string.receive_bitcoin_help),
-        icon = R.drawable.ic_chain
-    )
-
-    when (state) {
-        is ReceiveViewModel.BitcoinAddressState.Init -> {
-            QRCodeView(data = null, bitmap = null, maxWidth = maxWidth)
-            Spacer(modifier = Modifier.height(32.dp))
-            CopyShareEditButtons(onCopy = { }, onShare = { }, onEdit = null, maxWidth = maxWidth)
-        }
-        is ReceiveViewModel.BitcoinAddressState.Show -> {
-            QRCodeView(data = state.address, bitmap = state.image, maxWidth = maxWidth)
-            Spacer(modifier = Modifier.height(32.dp))
-            CopyShareEditButtons(
-                onCopy = { copyToClipboard(context, data = state.address) },
-                onShare = { share(context, "bitcoin:${state.address}", context.getString(R.string.receive_bitcoin_share_subject), context.getString(R.string.receive_bitcoin_share_title)) },
-                onEdit = null,
-                maxWidth = maxWidth,
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-            HSeparator(width = 50.dp)
-            Spacer(modifier = Modifier.height(16.dp))
-            QRCodeDetail(label = stringResource(id = R.string.receive_bitcoin_address_label), value = state.address)
-
-            val isFromLegacy by LegacyPrefsDatastore.hasMigratedFromLegacy(context).collectAsState(initial = false)
-            if (isFromLegacy) {
-                Spacer(modifier = Modifier.height(24.dp))
-                InfoMessage(
-                    header = stringResource(id = R.string.receive_onchain_legacy_warning_title),
-                    details = stringResource(id = R.string.receive_onchain_legacy_warning),
-                    detailsStyle = MaterialTheme.typography.subtitle2,
-                    alignment = Alignment.CenterHorizontally
-                )
-            }
-        }
-        is ReceiveViewModel.BitcoinAddressState.Error -> {
-            ErrorMessage(
-                header = stringResource(id = R.string.receive_bitcoin_error),
-                details = state.e.localizedMessage
-            )
-        }
-    }
 }
 
 @Composable

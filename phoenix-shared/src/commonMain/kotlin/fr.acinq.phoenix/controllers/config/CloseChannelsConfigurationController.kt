@@ -1,8 +1,7 @@
 package fr.acinq.phoenix.controllers.config
 
-import fr.acinq.bitcoin.ByteVector
+import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.channel.*
 import fr.acinq.lightning.channel.states.*
 import fr.acinq.lightning.io.WrappedChannelCommand
@@ -19,7 +18,7 @@ import kotlinx.coroutines.launch
 class AppCloseChannelsConfigurationController(
     loggerFactory: LoggerFactory,
     private val peerManager: PeerManager,
-    private val chain: NodeParams.Chain,
+    private val chain: Chain,
     private val isForceClose: Boolean
 ) : AppController<CloseChannelsConfiguration.Model, CloseChannelsConfiguration.Intent>(
     loggerFactory = loggerFactory,
@@ -94,7 +93,7 @@ class AppCloseChannelsConfigurationController(
                     val closableChannelsList = updatedChannelsList.filter {
                         isClosable(it.status)
                     }
-                    val address = peer.finalAddress
+                    val address = peer.finalWallet.finalAddress
                     model(CloseChannelsConfiguration.Model.Ready(
                         channels = closableChannelsList,
                         address = address
@@ -105,15 +104,13 @@ class AppCloseChannelsConfigurationController(
     }
 
     override fun process(intent: CloseChannelsConfiguration.Intent) {
-        var scriptPubKey : ByteArray? = null
-        if (intent is CloseChannelsConfiguration.Intent.MutualCloseAllChannels) {
-            scriptPubKey = Parser.addressToPublicKeyScript(chain, intent.address)
-            if (scriptPubKey == null) {
-                throw IllegalArgumentException(
-                    "Address is invalid. Caller MUST validate user input via parseBitcoinAddress"
-                )
+        val scriptPubKey = if (intent is CloseChannelsConfiguration.Intent.MutualCloseAllChannels) {
+            try {
+                Parser.readBitcoinAddress(chain, intent.address).right!!.script
+            } catch (e: Exception) {
+                throw IllegalArgumentException("Address is invalid. Caller MUST validate user input via readBitcoinAddress")
             }
-        }
+        } else null
 
         launch {
             val peer = peerManager.getPeer()
@@ -126,7 +123,7 @@ class AppCloseChannelsConfigurationController(
             filteredChannels.keys.forEach { channelId ->
                 val command: ChannelCommand = if (scriptPubKey != null) {
                     logger.info { "(mutual) closing channel=${channelId.toHex()}" }
-                    ChannelCommand.Close.MutualClose(scriptPubKey = ByteVector(scriptPubKey), feerates = null)
+                    ChannelCommand.Close.MutualClose(scriptPubKey = scriptPubKey, feerates = null)
                 } else {
                     logger.info { "(force) closing channel=${channelId.toHex()}" }
                     ChannelCommand.Close.ForceClose

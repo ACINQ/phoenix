@@ -23,6 +23,26 @@ extension Lightning_kmpConnection {
 	}
 }
 
+extension Lightning_kmpPaymentRequest {
+	
+	var createdAtDate: Date? {
+		
+		if let bolt11 = self as? Lightning_kmpBolt11Invoice {
+			return bolt11.timestampDate
+		} else { // todo: Bolt12
+			return nil
+		}
+	}
+	
+	var invoiceDescription_: String? {
+		if let bolt11 = self as? Lightning_kmpBolt11Invoice {
+			return bolt11.description_
+		} else { // todo: Bolt12
+			return nil
+		}
+	}
+}
+
 extension Lightning_kmpWalletState.WalletWithConfirmations {
 	
 	var unconfirmedBalance: Bitcoin_kmpSatoshi {

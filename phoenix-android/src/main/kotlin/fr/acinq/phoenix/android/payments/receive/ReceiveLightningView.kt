@@ -62,6 +62,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.msat
@@ -111,7 +112,7 @@ fun LightningInvoiceView(
     LaunchedEffect(key1 = Unit) {
         paymentsManager.lastCompletedPayment.collect {
             val state = vm.lightningInvoiceState
-            if (state is ReceiveViewModel.LightningInvoiceState.Show && it is IncomingPayment && state.paymentRequest.paymentHash == it.paymentHash) {
+            if (state is LightningInvoiceState.Show && it is IncomingPayment && state.invoice.paymentHash == it.paymentHash) {
                 vm.generateInvoice(amount = customAmount, description = customDesc, expirySeconds = expiry)
             }
         }
@@ -120,12 +121,11 @@ fun LightningInvoiceView(
     val onEdit = { vm.isEditingLightningInvoice = true }
 
     InvoiceHeader(
-        label = stringResource(id = R.string.receive_lightning_title),
+        icon = R.drawable.ic_zap,
         helpMessage = stringResource(id = R.string.receive_lightning_help),
-        icon = R.drawable.ic_zap
+        content = { Text(text = stringResource(id = R.string.receive_lightning_title)) },
     )
 
-    val navController = navController
     val state = vm.lightningInvoiceState
     val isEditing = vm.isEditingLightningInvoice
 
@@ -141,8 +141,8 @@ fun LightningInvoiceView(
                 onFeeManagementClick = onFeeManagementClick,
             )
         }
-        state is ReceiveViewModel.LightningInvoiceState.Init || state is ReceiveViewModel.LightningInvoiceState.Generating -> {
-            if (state is ReceiveViewModel.LightningInvoiceState.Init) {
+        state is LightningInvoiceState.Init || state is LightningInvoiceState.Generating -> {
+            if (state is LightningInvoiceState.Init) {
                 LaunchedEffect(key1 = Unit) {
                     vm.generateInvoice(amount = customAmount, description = customDesc, expirySeconds = expiry)
                 }
@@ -154,16 +154,16 @@ fun LightningInvoiceView(
             Spacer(modifier = Modifier.height(32.dp))
             CopyShareEditButtons(onCopy = { }, onShare = { }, onEdit = onEdit, maxWidth = maxWidth)
         }
-        state is ReceiveViewModel.LightningInvoiceState.Show -> {
+        state is LightningInvoiceState.Show -> {
             DisplayLightningInvoice(
-                paymentRequest = state.paymentRequest,
+                invoice = state.invoice,
                 bitmap = vm.lightningQRBitmap,
                 onFeeManagementClick = onFeeManagementClick,
                 onEdit = onEdit,
                 maxWidth = maxWidth,
             )
         }
-        state is ReceiveViewModel.LightningInvoiceState.Error -> {
+        state is LightningInvoiceState.Error -> {
             ErrorMessage(
                 header = stringResource(id = R.string.receive_lightning_error),
                 details = state.e.localizedMessage
@@ -171,7 +171,7 @@ fun LightningInvoiceView(
         }
     }
 
-    if ((state is ReceiveViewModel.LightningInvoiceState.Init || state is ReceiveViewModel.LightningInvoiceState.Show) && !isEditing) {
+    if ((state is LightningInvoiceState.Init || state is LightningInvoiceState.Show) && !isEditing) {
         Spacer(modifier = Modifier.height(24.dp))
         HSeparator(width = 50.dp)
         Spacer(modifier = Modifier.height(24.dp))
@@ -185,16 +185,16 @@ fun LightningInvoiceView(
 
 @Composable
 private fun DisplayLightningInvoice(
-    paymentRequest: PaymentRequest,
+    invoice: Bolt11Invoice,
     bitmap: ImageBitmap?,
     onEdit: () -> Unit,
     onFeeManagementClick: () -> Unit,
     maxWidth: Dp,
 ) {
     val context = LocalContext.current
-    val prString = remember(paymentRequest) { paymentRequest.write() }
-    val amount = paymentRequest.amount
-    val description = paymentRequest.description.takeUnless { it.isNullOrBlank() }
+    val prString = remember(invoice) { invoice.write() }
+    val amount = invoice.amount
+    val description = invoice.description.takeUnless { it.isNullOrBlank() }
 
     QRCodeView(data = prString, bitmap = bitmap, maxWidth = maxWidth)
 

@@ -85,7 +85,7 @@ class BusinessManager {
 	
 	private init() { // must use shared instance
 		
-		business = PhoenixBusiness(ctx: PlatformContext(logger: KotlinLogger.shared.logger))
+		business = PhoenixBusiness(ctx: PlatformContext.default)
 		BusinessManager._isTestnet = business.chain.isTestnet()
 	}
 	
@@ -119,13 +119,13 @@ class BusinessManager {
 	public func stop() {
 
 		cancellables.removeAll()
-		business.stop()
+		business.stop(includingDatabase: true)
 		syncManager?.shutdown()
 	}
 
 	public func reset() {
 
-		business = PhoenixBusiness(ctx: PlatformContext())
+		business = PhoenixBusiness(ctx: PlatformContext.default)
 		syncManager = nil
 		swapInRejectedPublisher.send(nil)
 		walletInfo = nil
@@ -322,6 +322,19 @@ class BusinessManager {
 				}
 				
 			}.store(in: &cancellables)
+		
+		// Keep Prefs.shared.swapInAddressIndex up-to-date
+		Biz.business.peerManager.peerStatePublisher()
+			.flatMap { $0.swapInWallet.swapInAddressPublisher() }
+			.sink { (newInfo: Lightning_kmpSwapInWallet.SwapInAddressInfo?) in
+				
+				if let newInfo {
+					if Prefs.shared.swapInAddressIndex < newInfo.index {
+						Prefs.shared.swapInAddressIndex = newInfo.index
+					}
+				}
+			}
+			.store(in: &cancellables)
 	}
 	
 	func startTasks() {

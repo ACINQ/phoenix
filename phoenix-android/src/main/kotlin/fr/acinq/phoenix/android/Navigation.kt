@@ -56,6 +56,7 @@ sealed class Screen(val route: String) {
     object Logs : Screen("settings/logs")
     object WalletInfo : Screen("settings/walletinfo") {
         object SwapInWallet: Screen("settings/walletinfo/swapin")
+        object SwapInAddresses: Screen("settings/walletinfo/swapinaddresses")
         object SwapInSigner: Screen("settings/walletinfo/swapinsigner")
         object FinalWallet: Screen("settings/walletinfo/final")
     }

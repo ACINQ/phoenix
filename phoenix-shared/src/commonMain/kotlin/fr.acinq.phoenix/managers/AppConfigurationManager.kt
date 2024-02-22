@@ -1,6 +1,6 @@
 package fr.acinq.phoenix.managers
 
-import fr.acinq.lightning.NodeParams
+import fr.acinq.bitcoin.Chain
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.blockchain.electrum.HeaderSubscriptionResponse
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
@@ -32,7 +32,7 @@ class AppConfigurationManager(
     private val appDb: SqliteAppDb,
     private val httpClient: HttpClient,
     private val electrumWatcher: ElectrumWatcher,
-    private val chain: NodeParams.Chain,
+    private val chain: Chain,
     loggerFactory: LoggerFactory
 ) : CoroutineScope by MainScope() {
 
@@ -163,9 +163,10 @@ class AppConfigurationManager(
     }
 
     fun randomElectrumServer() = when (chain) {
-        NodeParams.Chain.Mainnet -> mainnetElectrumServers.random()
-        NodeParams.Chain.Testnet -> testnetElectrumServers.random()
-        NodeParams.Chain.Regtest -> platformElectrumRegtestConf()
+        Chain.Mainnet -> mainnetElectrumServers.random()
+        Chain.Testnet -> testnetElectrumServers.random()
+        Chain.Signet -> TODO()
+        Chain.Regtest -> platformElectrumRegtestConf()
     }
 
     /** The flow containing the electrum header responses messages. */

@@ -11,6 +11,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.work.await
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import fr.acinq.bitcoin.TxId
@@ -203,9 +204,10 @@ class NodeService : Service() {
                 stopForeground(STOP_FOREGROUND_REMOVE)
             }
         }) {
+            ChannelsWatcher.cancel(applicationContext).await()
             log.info("starting node from service state=${_state.value?.name} with checkLegacyChannels=$requestCheckLegacyChannels")
             doStartBusiness(decryptedMnemonics, requestCheckLegacyChannels)
-            ChannelsWatcher.scheduleASAP(applicationContext)
+            ChannelsWatcher.schedule(applicationContext)
             _state.postValue(NodeServiceState.Running)
         }
     }

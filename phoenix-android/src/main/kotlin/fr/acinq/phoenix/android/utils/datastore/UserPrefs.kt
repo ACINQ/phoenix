@@ -170,6 +170,15 @@ object UserPrefs {
         }
     }
 
+    private val SWAP_ADDRESS_FORMAT = intPreferencesKey("SWAP_ADDRESS_FORMAT")
+    fun getSwapAddressFormat(context: Context): Flow<SwapAddressFormat> = prefs(context).map {
+        it[SWAP_ADDRESS_FORMAT]?.let { SwapAddressFormat.getFormatForCode(it) } ?: SwapAddressFormat.TAPROOT_ROTATE
+    }
+    suspend fun saveSwapAddressFormat(context: Context, format: SwapAddressFormat) = context.userPrefs.edit {
+        log.info("saving swap-address-format=$format")
+        it[SWAP_ADDRESS_FORMAT] = format.code
+    }
+
     // -- liquidity policy
 
     private val LIQUIDITY_POLICY = stringPreferencesKey("LIQUIDITY_POLICY")
@@ -265,6 +274,16 @@ enum class HomeAmountDisplayMode {
             FIAT.name -> FIAT
             REDACTED.name -> REDACTED
             else -> BTC
+        }
+    }
+}
+
+enum class SwapAddressFormat(val code: Int) {
+    LEGACY(0), TAPROOT_ROTATE(1);
+    companion object {
+        fun getFormatForCode(code: Int) = when (code) {
+            0 -> LEGACY
+            else -> TAPROOT_ROTATE
         }
     }
 }

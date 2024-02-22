@@ -108,15 +108,15 @@ fun ScanDataView(
                     onScannedText = { postIntent(Scan.Intent.Parse(request = it)) }
                 )
             }
-            is Scan.Model.InvoiceFlow.InvoiceRequest -> {
-                SendLightningPaymentView(
-                    paymentRequest = model.paymentRequest,
+            is Scan.Model.Bolt11InvoiceFlow.Bolt11InvoiceRequest -> {
+                SendBolt11PaymentView(
+                    invoice = model.invoice,
                     trampolineFees = trampolineFees,
                     onBackClick = onBackClick,
                     onPayClick = { postIntent(it) }
                 )
             }
-            Scan.Model.InvoiceFlow.Sending -> {
+            Scan.Model.Bolt11InvoiceFlow.Sending -> {
                 LaunchedEffect(key1 = Unit) { onBackClick() }
             }
             is Scan.Model.OnchainFlow -> {

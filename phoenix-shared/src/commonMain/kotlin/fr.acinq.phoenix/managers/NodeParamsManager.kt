@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.managers
 
+import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.NodeParams
@@ -36,7 +37,7 @@ import kotlinx.coroutines.launch
 
 class NodeParamsManager(
     loggerFactory: LoggerFactory,
-    chain: NodeParams.Chain,
+    chain: Chain,
     walletManager: WalletManager,
     appConfigurationManager: AppConfigurationManager,
 ) : CoroutineScope by MainScope() {
@@ -64,7 +65,6 @@ class NodeParamsManager(
                     loggerFactory = loggerFactory,
                     keyManager = keyManager,
                 ).copy(
-                    alias = "phoenix",
                     zeroConfPeers = setOf(trampolineNodeId),
                     liquidityPolicy = MutableStateFlow(startupParams.liquidityPolicy),
                 )
@@ -79,7 +79,7 @@ class NodeParamsManager(
     }
 
     companion object {
-        val chain = NodeParams.Chain.Testnet
+        val chain = Chain.Testnet
         val trampolineNodeId = PublicKey.fromHex("03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134")
         val trampolineNodeUri = NodeUri(id = trampolineNodeId, "13.248.222.197", 9735)
         const val remoteSwapInXpub = "tpubDAmCFB21J9ExKBRPDcVxSvGs9jtcf8U1wWWbS1xTYmnUsuUHPCoFdCnEGxLE3THSWcQE48GHJnyz8XPbYUivBMbLSMBifFd3G9KmafkM9og"

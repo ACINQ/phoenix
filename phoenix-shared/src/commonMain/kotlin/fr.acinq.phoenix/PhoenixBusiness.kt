@@ -16,7 +16,7 @@
 
 package fr.acinq.phoenix
 
-import fr.acinq.lightning.NodeParams
+import fr.acinq.bitcoin.Chain
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.io.TcpSocket
@@ -74,7 +74,7 @@ class PhoenixBusiness(
         }
     }
 
-    val chain: NodeParams.Chain = NodeParamsManager.chain
+    val chain: Chain = NodeParamsManager.chain
 
     val electrumClient by lazy { ElectrumClient(scope = MainScope(), loggerFactory = loggerFactory, pingInterval = 30.seconds, rpcTimeout = 10.seconds) }
     internal val electrumWatcher by lazy { ElectrumWatcher(electrumClient, MainScope(), loggerFactory) }
@@ -111,16 +111,20 @@ class PhoenixBusiness(
      * It's recommended that you close the network connections (electrum + peer)
      * BEFORE invoking this function, to ensure a clean disconnect from the server.
      */
-    fun stop() {
+    fun stop(includingDatabase: Boolean = true) {
         electrumClient.stop()
         electrumWatcher.stop()
         electrumWatcher.cancel()
         appConnectionsDaemon?.cancel()
-        appDb.close()
+        if (includingDatabase) {
+            appDb.close()
+        }
         networkMonitor.stop()
         walletManager.cancel()
         nodeParamsManager.cancel()
-        databaseManager.close()
+        if (includingDatabase) {
+            databaseManager.close()
+        }
         databaseManager.cancel()
         databaseManager.cancel()
         peerManager.cancel()

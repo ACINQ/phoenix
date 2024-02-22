@@ -45,7 +45,7 @@ import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.CardHeader
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
-import fr.acinq.phoenix.android.components.SettingButton
+import fr.acinq.phoenix.android.components.MenuButton
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.navigate
 import fr.acinq.phoenix.android.utils.negativeColor
@@ -82,12 +82,12 @@ fun SettingsView(
         // -- general
         CardHeader(text = stringResource(id = R.string.settings_general_title))
         Card {
-            SettingButton(text = stringResource(R.string.settings_about), icon = R.drawable.ic_help_circle, onClick = { nc.navigate(Screen.About) })
-            SettingButton(text = stringResource(R.string.settings_display_prefs), icon = R.drawable.ic_brush, onClick = { nc.navigate(Screen.Preferences) })
-            SettingButton(text = stringResource(R.string.settings_payment_settings), icon = R.drawable.ic_tool, onClick = { nc.navigate(Screen.PaymentSettings) })
-            SettingButton(text = stringResource(R.string.settings_liquidity_policy), icon = R.drawable.ic_settings, onClick = { nc.navigate(Screen.LiquidityPolicy) })
-            SettingButton(text = stringResource(R.string.settings_payment_history), icon = R.drawable.ic_list, onClick = { nc.navigate(Screen.PaymentsHistory) })
-            SettingButton(
+            MenuButton(text = stringResource(R.string.settings_about), icon = R.drawable.ic_help_circle, onClick = { nc.navigate(Screen.About) })
+            MenuButton(text = stringResource(R.string.settings_display_prefs), icon = R.drawable.ic_brush, onClick = { nc.navigate(Screen.Preferences) })
+            MenuButton(text = stringResource(R.string.settings_payment_settings), icon = R.drawable.ic_tool, onClick = { nc.navigate(Screen.PaymentSettings) })
+            MenuButton(text = stringResource(R.string.settings_liquidity_policy), icon = R.drawable.ic_settings, onClick = { nc.navigate(Screen.LiquidityPolicy) })
+            MenuButton(text = stringResource(R.string.settings_payment_history), icon = R.drawable.ic_list, onClick = { nc.navigate(Screen.PaymentsHistory) })
+            MenuButton(
                 text = stringResource(R.string.settings_notifications) + ((notices.size + notifications.value.size).takeIf { it > 0 }?.let { " ($it)"} ?: ""),
                 icon = R.drawable.ic_notification,
                 onClick = { nc.navigate(Screen.Notifications) }
@@ -97,25 +97,25 @@ fun SettingsView(
         // -- privacy & security
         CardHeader(text = stringResource(id = R.string.settings_security_title))
         Card {
-            SettingButton(text = stringResource(R.string.settings_access_control), icon = R.drawable.ic_unlock, onClick = { nc.navigate(Screen.AppLock) })
-            SettingButton(text = stringResource(R.string.settings_display_seed), icon = R.drawable.ic_key, onClick = { nc.navigate(Screen.DisplaySeed) })
-            SettingButton(text = stringResource(R.string.settings_electrum), icon = R.drawable.ic_chain, onClick = { nc.navigate(Screen.ElectrumServer) })
-            SettingButton(text = stringResource(R.string.settings_tor), icon = R.drawable.ic_tor_shield, onClick = { nc.navigate(Screen.TorConfig) })
+            MenuButton(text = stringResource(R.string.settings_access_control), icon = R.drawable.ic_unlock, onClick = { nc.navigate(Screen.AppLock) })
+            MenuButton(text = stringResource(R.string.settings_display_seed), icon = R.drawable.ic_key, onClick = { nc.navigate(Screen.DisplaySeed) })
+            MenuButton(text = stringResource(R.string.settings_electrum), icon = R.drawable.ic_chain, onClick = { nc.navigate(Screen.ElectrumServer) })
+            MenuButton(text = stringResource(R.string.settings_tor), icon = R.drawable.ic_tor_shield, onClick = { nc.navigate(Screen.TorConfig) })
         }
 
         // -- advanced
         CardHeader(text = stringResource(id = R.string.settings_advanced_title))
         Card {
-            SettingButton(text = stringResource(R.string.settings_wallet_info), icon = R.drawable.ic_box, onClick = { nc.navigate(Screen.WalletInfo) })
-            SettingButton(text = stringResource(R.string.settings_list_channels), icon = R.drawable.ic_zap, onClick = { nc.navigate(Screen.Channels) })
-            SettingButton(text = stringResource(R.string.settings_logs), icon = R.drawable.ic_text, onClick = { nc.navigate(Screen.Logs) })
+            MenuButton(text = stringResource(R.string.settings_wallet_info), icon = R.drawable.ic_box, onClick = { nc.navigate(Screen.WalletInfo) })
+            MenuButton(text = stringResource(R.string.settings_list_channels), icon = R.drawable.ic_zap, onClick = { nc.navigate(Screen.Channels) })
+            MenuButton(text = stringResource(R.string.settings_logs), icon = R.drawable.ic_text, onClick = { nc.navigate(Screen.Logs) })
         }
         // -- advanced
         CardHeader(text = stringResource(id = R.string.settings_danger_title))
         Card {
-            SettingButton(text = stringResource(R.string.settings_mutual_close), icon = R.drawable.ic_cross_circle, onClick = { nc.navigate(Screen.MutualClose) })
-            SettingButton(text = stringResource(id = R.string.settings_reset_wallet), icon = R.drawable.ic_trash, onClick = { nc.navigate(Screen.ResetWallet) })
-            SettingButton(
+            MenuButton(text = stringResource(R.string.settings_mutual_close), icon = R.drawable.ic_cross_circle, onClick = { nc.navigate(Screen.MutualClose) })
+            MenuButton(text = stringResource(id = R.string.settings_reset_wallet), icon = R.drawable.ic_trash, onClick = { nc.navigate(Screen.ResetWallet) })
+            MenuButton(
                 text = stringResource(R.string.settings_force_close),
                 textStyle = MaterialTheme.typography.button.copy(color = negativeColor),
                 icon = R.drawable.ic_alert_triangle,

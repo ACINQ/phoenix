@@ -11,6 +11,7 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 fileprivate enum NavLinkTag: String {
 	case SwapInWalletDetails
+	case SwapInAddresses
 	case FinalWalletDetails
 }
 
@@ -132,7 +133,12 @@ struct WalletInfoView: View {
 			navLink(.SwapInWalletDetails) {
 				subsection_swapInWallet_balance()
 			}
+			subsection_swapInWallet_legacyDescriptor()
 			subsection_swapInWallet_descriptor()
+			subsection_swapInWallet_publicKey()
+			navLink(.SwapInAddresses) {
+				subsection_swapInWallet_swapAddresses()
+			}
 			
 		} header: {
 			subsection_swapInWallet_header()
@@ -176,10 +182,37 @@ struct WalletInfoView: View {
 	}
 	
 	@ViewBuilder
+	func subsection_swapInWallet_legacyDescriptor() -> some View {
+		
+		let keyManager = Biz.business.walletManager.keyManagerValue()
+		let descriptor = keyManager?.swapInOnChainWallet.legacyDescriptor ?? "?"
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Text("Legacy descriptor")
+					.font(.headline.bold())
+				Spacer()
+				copyButton(descriptor)
+			}
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Text(descriptor)
+					.lineLimit(1)
+					.font(.callout.weight(.light))
+					.foregroundColor(.secondary)
+				Spacer(minLength: 0)
+				invisibleImage()
+			}
+			
+		} // </VStack>
+	}
+	
+	@ViewBuilder
 	func subsection_swapInWallet_descriptor() -> some View {
 		
-		let keyManager = Biz.business.walletManager.getKeyManager()
-		let descriptor = keyManager?.swapInOnChainWallet.descriptor ?? "?"
+		let keyManager = Biz.business.walletManager.keyManagerValue()
+		let descriptor = keyManager?.swapInOnChainWallet.publicDescriptor ?? "?"
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
 			
@@ -192,7 +225,7 @@ struct WalletInfoView: View {
 			
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 				Text(descriptor)
-					.lineLimit(2)
+					.lineLimit(1)
 					.font(.callout.weight(.light))
 					.foregroundColor(.secondary)
 				Spacer(minLength: 0)
@@ -200,6 +233,46 @@ struct WalletInfoView: View {
 			}
 			
 		} // </VStack>
+	}
+	
+	@ViewBuilder
+	func subsection_swapInWallet_publicKey() -> some View {
+		
+		let keyManager = Biz.business.walletManager.keyManagerValue()
+		let pubKeyHex = keyManager?.swapInOnChainWallet.userPublicKey.toHex() ?? "?"
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Text("Public key")
+					.font(.headline.bold())
+				Spacer()
+				copyButton(pubKeyHex)
+			}
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Text(pubKeyHex)
+					.lineLimit(1)
+					.font(.callout.weight(.light))
+					.foregroundColor(.secondary)
+				Spacer(minLength: 0)
+				invisibleImage()
+			}
+			
+		} // </VStack>
+	}
+	
+	@ViewBuilder
+	func subsection_swapInWallet_swapAddresses() -> some View {
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+			Text("Swap addresses")
+				.font(.headline.bold())
+			Image(systemName: "list.bullet")
+				.padding(.leading, 8)
+				.foregroundColor(.secondary)
+			Spacer()
+		}
 	}
 	
 	// --------------------------------------------------
@@ -261,7 +334,7 @@ struct WalletInfoView: View {
 	@ViewBuilder
 	func subsection_finalWallet_masterPublicKey() -> some View {
 		
-		let keyManager = Biz.business.walletManager.getKeyManager()
+		let keyManager = Biz.business.walletManager.keyManagerValue()
 		let keyPath = keyManager?.finalOnChainWalletPath ?? "?"
 		let xpub = keyManager?.finalOnChainWallet.xpub ?? "?"
 		
@@ -310,7 +383,7 @@ struct WalletInfoView: View {
 			
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 				Text(xpub)
-					.lineLimit(2)
+					.lineLimit(1)
 					.font(.callout.weight(.light))
 					.foregroundColor(.secondary)
 				Spacer(minLength: 0)
@@ -375,6 +448,7 @@ struct WalletInfoView: View {
 		
 		switch tag {
 			case .SwapInWalletDetails : SwapInWalletDetails(location: .embedded, popTo: popToWrapper)
+			case .SwapInAddresses     : SwapInAddresses()
 			case .FinalWalletDetails  : FinalWalletDetails()
 		}
 	}

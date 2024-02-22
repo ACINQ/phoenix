@@ -16,10 +16,9 @@
 
 package fr.acinq.phoenix.controllers.payments
 
-import co.touchlab.kermit.Logger
+import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.Lightning.randomBytes32
 import fr.acinq.lightning.logging.LoggerFactory
-import fr.acinq.lightning.utils.Either
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.managers.PeerManager
@@ -52,11 +51,6 @@ class AppReceiveController(
                         expirySeconds = intent.expirySeconds
                     )
                     model(Receive.Model.Generated(paymentRequest.write(), paymentRequest.paymentHash.toHex(), paymentRequest.amount, paymentRequest.description))
-                }
-            }
-            Receive.Intent.RequestSwapIn -> {
-                launch {
-                    model(Receive.Model.SwapIn(peerManager.getPeer().swapInAddress))
                 }
             }
         }
