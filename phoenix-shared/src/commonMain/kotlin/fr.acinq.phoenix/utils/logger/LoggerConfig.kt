@@ -30,7 +30,7 @@ import fr.acinq.phoenix.utils.PlatformContext
  */
 data class PhoenixLoggerConfig(private val platformContext: PlatformContext): LoggerConfig {
     override val logWriterList: List<LogWriter> = phoenixLogWriters(platformContext)
-    override val minSeverity: Severity = Severity.Debug
+    override val minSeverity: Severity = Severity.Info
 }
 
 /**
