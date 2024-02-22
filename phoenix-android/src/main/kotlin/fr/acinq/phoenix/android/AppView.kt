@@ -296,14 +296,16 @@ fun AppView(
                     if (paymentId != null) {
                         RequireStarted(walletState, nextUri = "phoenix:payments/${direction}/${id}") {
                             log.debug("navigating to payment-details id=$id")
+                            val fromEvent = it.arguments?.getBoolean("fromEvent") ?: false
                             PaymentDetailsView(
                                 paymentId = paymentId,
                                 onBackClick = {
-                                    if (!navController.popBackStack()) {
+                                    val previousNav = navController.previousBackStackEntry
+                                    if (!navController.popBackStack() || (fromEvent && previousNav?.destination?.route == Screen.ScanData.route)) {
                                         popToHome(navController)
                                     }
                                 },
-                                fromEvent = it.arguments?.getBoolean("fromEvent") ?: false
+                                fromEvent = fromEvent
                             )
                         }
                     }
