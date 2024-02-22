@@ -180,7 +180,7 @@ class PhoenixManager {
 		}
 
 		if let prvBusiness = oldBusiness {
-			prvBusiness.stop(includingDatabase: true)
+			prvBusiness.stop()
 			oldBusiness = nil
 			oldCancellables.removeAll()
 		}
@@ -317,7 +317,7 @@ class PhoenixManager {
 			connections.electrum is Lightning_kmpConnection.CLOSED
 		{
 			if let prvBusiness = oldBusiness {
-				prvBusiness.stop(includingDatabase: true)
+				prvBusiness.stop()
 				oldBusiness = nil
 				oldCancellables.removeAll()
 			}

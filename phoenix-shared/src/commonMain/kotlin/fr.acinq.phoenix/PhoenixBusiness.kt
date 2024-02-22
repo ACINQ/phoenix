@@ -111,20 +111,16 @@ class PhoenixBusiness(
      * It's recommended that you close the network connections (electrum + peer)
      * BEFORE invoking this function, to ensure a clean disconnect from the server.
      */
-    fun stop(includingDatabase: Boolean = true) {
+    fun stop() {
         electrumClient.stop()
         electrumWatcher.stop()
         electrumWatcher.cancel()
         appConnectionsDaemon?.cancel()
-        if (includingDatabase) {
-            appDb.close()
-        }
+        appDb.close()
         networkMonitor.stop()
         walletManager.cancel()
         nodeParamsManager.cancel()
-        if (includingDatabase) {
-            databaseManager.close()
-        }
+        databaseManager.close()
         databaseManager.cancel()
         databaseManager.cancel()
         peerManager.cancel()
