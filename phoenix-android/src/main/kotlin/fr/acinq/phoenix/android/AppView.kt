@@ -21,8 +21,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.text.format.DateUtils
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -171,10 +169,6 @@ fun AppView(
             NavHost(
                 navController = navController,
                 startDestination = "${Screen.Startup.route}?next={next}",
-                enterTransition = { EnterTransition.None },
-                exitTransition = { ExitTransition.None },
-                popEnterTransition = { EnterTransition.None },
-                popExitTransition = { ExitTransition.None },
             ) {
                 composable(
                     route = "${Screen.Startup.route}?next={next}",
