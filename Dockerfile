@@ -51,7 +51,7 @@ RUN apt-get update -y && \
     apt-get install -y software-properties-common locales && \
     apt-get update -y && \
     locale-gen en_US.UTF-8 && \
-    apt-get install -y openjdk-11-jdk wget git unzip dos2unix
+    apt-get install -y openjdk-17-jdk wget git unzip dos2unix
 
 # fetch and unpack the android sdk
 RUN mkdir /usr/local/android-sdk && \
