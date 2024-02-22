@@ -56,6 +56,7 @@ import androidx.navigation.navOptions
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.google.firebase.messaging.FirebaseMessaging
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.components.Button
@@ -445,7 +446,12 @@ fun AppView(
                             onShutdownBusiness = application::shutdownBusiness,
                             onShutdownService = nodeService::shutdown,
                             onPrefsClear = application::clearPreferences,
-                            onBusinessReset = application::resetBusiness,
+                            onBusinessReset = {
+                                application.resetBusiness()
+                                FirebaseMessaging.getInstance().deleteToken().addOnCompleteListener { task ->
+                                    if (task.isSuccessful) nodeService.refreshFcmToken()
+                                }
+                            },
                             onBackClick = { navController.popBackStack() }
                         )
                     }

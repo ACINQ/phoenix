@@ -85,7 +85,7 @@ class NodeService : Service() {
         log.debug("service created")
     }
 
-    private fun refreshFcmToken() {
+    internal fun refreshFcmToken() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
                 log.warn("fetching FCM registration token failed: ${task.exception?.localizedMessage}")
