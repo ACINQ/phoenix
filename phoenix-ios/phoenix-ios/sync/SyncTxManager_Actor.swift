@@ -1,13 +1,10 @@
 import Foundation
-import os.log
 
+fileprivate let filename = "SyncTxActor"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "SyncTxActor"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
 /// This class implements the state machine in a thread-safe actor.

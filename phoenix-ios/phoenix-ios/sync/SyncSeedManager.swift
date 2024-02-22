@@ -3,15 +3,12 @@ import PhoenixShared
 import CloudKit
 import Combine
 import Network
-import os.log
 
+fileprivate let filename = "SyncSeedManager"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "SyncSeedManager"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
 fileprivate let record_column_mnemonics = "mnemonics"
@@ -45,7 +42,7 @@ class SyncSeedManager: SyncManagerProtcol {
 	
 	/// The chain in use by PhoenixBusiness (e.g. Testnet)
 	///
-	private let chain: Lightning_kmpNodeParams.Chain
+	private let chain: Bitcoin_kmpChain
 	
 	/// The 12-word recovery phrase (and associated language) for the wallet.
 	///
@@ -76,7 +73,7 @@ class SyncSeedManager: SyncManagerProtcol {
 	
 	private var cancellables = Set<AnyCancellable>()
 	
-	init(chain: Lightning_kmpNodeParams.Chain, recoveryPhrase: RecoveryPhrase, encryptedNodeId: String) {
+	init(chain: Bitcoin_kmpChain, recoveryPhrase: RecoveryPhrase, encryptedNodeId: String) {
 		log.trace("init()")
 		
 		self.chain = chain
@@ -98,7 +95,7 @@ class SyncSeedManager: SyncManagerProtcol {
 	// ----------------------------------------
 	
 	public class func fetchSeeds(
-		chain: Lightning_kmpNodeParams.Chain
+		chain: Bitcoin_kmpChain
 	) -> PassthroughSubject<SeedBackup, FetchSeedsError> {
 		
 		let publisher = PassthroughSubject<SeedBackup, FetchSeedsError>()
@@ -527,7 +524,7 @@ class SyncSeedManager: SyncManagerProtcol {
 	// MARK: Utilities
 	// ----------------------------------------
 	
-	private class func record_table_name(chain: Lightning_kmpNodeParams.Chain) -> String {
+	private class func record_table_name(chain: Bitcoin_kmpChain) -> String {
 		
 		// From Apple's docs:
 		// > A record type must consist of one or more alphanumeric characters

@@ -117,14 +117,13 @@ private fun <T> PreferenceDialogItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 3.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(horizontal = 8.dp),
         ) {
             RadioButton(selected = selected, onClick = { onClick(item) })
-            Spacer(modifier = Modifier.width(2.dp))
-            Column {
+            Column(modifier = Modifier.padding(vertical = 12.dp)) {
                 Text(text = item.title)
                 item.description?.let {
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(text = it, style = MaterialTheme.typography.subtitle2)
                 }
             }

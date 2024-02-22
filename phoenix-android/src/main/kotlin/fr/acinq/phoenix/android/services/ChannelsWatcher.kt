@@ -21,6 +21,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
+import androidx.work.Operation
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
@@ -52,7 +53,7 @@ import java.util.concurrent.TimeUnit
 class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
-        log.info("starting channels watcher job")
+        log.info("starting channels-watcher job")
         var notificationsManager: NotificationsManager? = null
 
         val application = applicationContext as PhoenixApplication
@@ -64,8 +65,8 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
             return Result.success()
         }
 
+        val business = PhoenixBusiness(PlatformContext(applicationContext))
         try {
-            val business = PhoenixBusiness(PlatformContext(applicationContext))
             notificationsManager = business.notificationsManager
             when (val encryptedSeed = SeedManager.loadSeedFromDisk(applicationContext)) {
                 is EncryptedSeed.V2.NoAuth -> {
@@ -141,7 +142,9 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
             internalData.saveChannelsWatcherOutcome(Outcome.Unknown(currentTimestampMillis()))
             return Result.failure()
         } finally {
-
+            business.appConnectionsDaemon?.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.All)
+            business.stop()
+            log.info("stopped channels-watcher business")
         }
     }
 
@@ -160,6 +163,10 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
         fun scheduleASAP(context: Context) {
             val work = OneTimeWorkRequest.Builder(ChannelsWatcher::class.java).addTag(WATCHER_WORKER_TAG).build()
             WorkManager.getInstance(context).enqueueUniqueWork(WATCHER_WORKER_TAG, ExistingWorkPolicy.REPLACE, work)
+        }
+
+        fun cancel(context: Context): Operation {
+            return WorkManager.getInstance(context).cancelAllWorkByTag(WATCHER_WORKER_TAG)
         }
     }
 

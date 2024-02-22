@@ -23,15 +23,15 @@ fun gitCommitHash(): String {
 val chain: String by project
 
 android {
-  compileSdk = 33
+  namespace = "fr.acinq.phoenix.legacy"
+  compileSdk = 34
   ndkVersion = "23.1.7779620"
   defaultConfig {
     minSdk = 26
-    targetSdk = 33
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
   buildTypes {
-    val libCode = 75
+    val libCode = 76
     getByName("debug") {
       resValue("string", "CHAIN", chain)
       buildConfigField("String", "CHAIN", chain)
@@ -84,7 +84,6 @@ dependencies {
   // ANDROIDX
   implementation("androidx.core:core-ktx:${Versions.Android.coreKtx}")
   implementation("androidx.appcompat:appcompat:${Versions.AndroidLegacy.appCompat}")
-  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.serialization}")
   // ANDROIDX - navigation
   implementation("androidx.navigation:navigation-fragment-ktx:${Versions.AndroidLegacy.navigation}")
   implementation("androidx.navigation:navigation-ui-ktx:${Versions.AndroidLegacy.navigation}")

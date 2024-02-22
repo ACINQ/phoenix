@@ -2,7 +2,7 @@ package fr.acinq.phoenix.managers
 
 import fr.acinq.phoenix.utils.PlatformContext
 import kotlinx.coroutines.flow.StateFlow
-import org.kodein.log.LoggerFactory
+import fr.acinq.lightning.logging.LoggerFactory
 
 enum class NetworkState {
     Available,

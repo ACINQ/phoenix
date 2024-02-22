@@ -1,16 +1,12 @@
 import SwiftUI
 import PhoenixShared
-import os.log
 
+fileprivate let filename = "ScanView"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "ScanView"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
-
 
 struct ScanView: View {
 	
@@ -288,11 +284,11 @@ struct ScanView: View {
 
 		if clipboardContent != nil {
 			Group {
-				if let content = clipboardContent as? Scan.ClipboardContent_InvoiceRequest {
+				if let content = clipboardContent as? Scan.ClipboardContent_Bolt11InvoiceRequest {
 
-					let desc = content.paymentRequest.description_?.trimmingCharacters(in: .whitespaces) ?? ""
+					let desc = content.invoice.description_?.trimmingCharacters(in: .whitespaces) ?? ""
 
-					if let msat = content.paymentRequest.amount {
+					if let msat = content.invoice.amount {
 						let amt = Utils.format(currencyPrefs, msat: msat)
 
 						if desc.isEmpty {
@@ -444,7 +440,7 @@ struct ScanView: View {
 				ignoreScanner = false
 			}
 			
-		case _ as Scan.Model_InvoiceFlow,
+		case _ as Scan.Model_Bolt11InvoiceFlow,
 		     _ as Scan.Model_OnChainFlow,
 		     _ as Scan.Model_LnurlPayFlow,
 		     _ as Scan.Model_LnurlAuthFlow:

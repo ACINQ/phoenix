@@ -9,7 +9,6 @@ object Receive {
         object Awaiting : Model()
         object Generating: Model()
         data class Generated(val request: String, val paymentHash: String, val amount: MilliSatoshi?, val desc: String?): Model()
-        data class SwapIn(val address: String): Model()
     }
 
     sealed class Intent : MVI.Intent() {
@@ -18,7 +17,6 @@ object Receive {
             val desc: String?,
             val expirySeconds: Long = 3600 * 24 * 7 // 7 days
         ) : Intent()
-        object RequestSwapIn : Intent()
     }
 
 }

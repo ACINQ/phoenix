@@ -56,6 +56,8 @@ import androidx.navigation.navOptions
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.google.firebase.messaging.FirebaseMessaging
+import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Dialog
@@ -80,8 +82,9 @@ import fr.acinq.phoenix.android.settings.fees.AdvancedIncomingFeePolicy
 import fr.acinq.phoenix.android.settings.fees.LiquidityPolicyView
 import fr.acinq.phoenix.android.payments.liquidity.RequestLiquidityView
 import fr.acinq.phoenix.android.settings.walletinfo.FinalWalletInfo
+import fr.acinq.phoenix.android.settings.walletinfo.SwapInAddresses
 import fr.acinq.phoenix.android.settings.walletinfo.SwapInSignerView
-import fr.acinq.phoenix.android.settings.walletinfo.SwapInWalletInfo
+import fr.acinq.phoenix.android.settings.walletinfo.SwapInWallet
 import fr.acinq.phoenix.android.settings.walletinfo.WalletInfoView
 import fr.acinq.phoenix.android.startup.LegacySwitcherView
 import fr.acinq.phoenix.android.startup.StartupView
@@ -94,12 +97,10 @@ import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.walletPaymentId
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
-import fr.acinq.phoenix.utils.extensions.id
 import io.ktor.http.decodeURLPart
 import io.ktor.http.encodeURLParameter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import org.kodein.memory.util.currentTimestampMillis
 
 
 @Composable
@@ -120,7 +121,7 @@ fun AppView(
     navController: NavHostController,
 ) {
     val log = logger("Navigation")
-    log.debug { "init app view composition" }
+    log.debug("init app view composition")
 
     val context = LocalContext.current
     val isAmountInFiat = UserPrefs.getIsAmountInFiat(context).collectAsState(false)
@@ -166,7 +167,10 @@ fun AppView(
                 .fillMaxHeight()
         ) {
 
-            NavHost(navController = navController, startDestination = "${Screen.Startup.route}?next={next}") {
+            NavHost(
+                navController = navController,
+                startDestination = "${Screen.Startup.route}?next={next}",
+            ) {
                 composable(
                     route = "${Screen.Startup.route}?next={next}",
                     arguments = listOf(
@@ -190,10 +194,10 @@ fun AppView(
                         onBusinessStarted = {
                             val next = nextScreenLink?.takeUnless { it.isBlank() }?.let { Uri.parse(it) }
                             if (next == null || !navController.graph.hasDeepLink(next)) {
-                                log.debug { "redirecting from startup to home" }
+                                log.debug("redirecting from startup to home")
                                 popToHome(navController)
                             } else {
-                                log.debug { "redirecting from startup to $next" }
+                                log.debug("redirecting from startup to $next")
                                 navController.navigate(next, navOptions = navOptions {
                                     popUpTo(navController.graph.id) { inclusive = true }
                                 })
@@ -291,15 +295,17 @@ fun AppView(
                     val paymentId = if (id != null && direction != null) WalletPaymentId.create(direction, id) else null
                     if (paymentId != null) {
                         RequireStarted(walletState, nextUri = "phoenix:payments/${direction}/${id}") {
-                            log.debug { "navigating to payment-details id=$id" }
+                            log.debug("navigating to payment-details id=$id")
+                            val fromEvent = it.arguments?.getBoolean("fromEvent") ?: false
                             PaymentDetailsView(
                                 paymentId = paymentId,
                                 onBackClick = {
-                                    if (!navController.popBackStack()) {
+                                    val previousNav = navController.previousBackStackEntry
+                                    if (!navController.popBackStack() || (fromEvent && previousNav?.destination?.route == Screen.ScanData.route)) {
                                         popToHome(navController)
                                     }
                                 },
-                                fromEvent = it.arguments?.getBoolean("fromEvent") ?: false
+                                fromEvent = fromEvent
                             )
                         }
                     }
@@ -391,6 +397,7 @@ fun AppView(
                         onBackClick = { navController.popBackStack() },
                         onLightningWalletClick = { navController.navigate(Screen.Channels.route) },
                         onSwapInWalletClick = { navController.navigate(Screen.WalletInfo.SwapInWallet.route) },
+                        onSwapInWalletInfoClick = { navController.navigate(Screen.WalletInfo.SwapInAddresses.route) },
                         onFinalWalletClick = { navController.navigate(Screen.WalletInfo.FinalWallet.route) },
                     )
                 }
@@ -400,11 +407,14 @@ fun AppView(
                         navDeepLink { uriPattern = "phoenix:swapinwallet" }
                     )
                 ) {
-                    SwapInWalletInfo(
+                    SwapInWallet(
                         onBackClick = { navController.popBackStack() },
                         onViewChannelPolicyClick = { navController.navigate(Screen.LiquidityPolicy.route) },
                         onAdvancedClick = { navController.navigate(Screen.WalletInfo.SwapInSigner.route) },
                     )
+                }
+                composable(Screen.WalletInfo.SwapInAddresses.route) {
+                    SwapInAddresses(onBackClick = { navController.popBackStack() })
                 }
                 composable(Screen.WalletInfo.SwapInSigner.route) {
                     SwapInSignerView(onBackClick = { navController.popBackStack() })
@@ -438,7 +448,12 @@ fun AppView(
                             onShutdownBusiness = application::shutdownBusiness,
                             onShutdownService = nodeService::shutdown,
                             onPrefsClear = application::clearPreferences,
-                            onBusinessReset = application::resetBusiness,
+                            onBusinessReset = {
+                                application.resetBusiness()
+                                FirebaseMessaging.getInstance().deleteToken().addOnCompleteListener { task ->
+                                    if (task.isSuccessful) nodeService.refreshFcmToken()
+                                }
+                            },
                             onBackClick = { navController.popBackStack() }
                         )
                     }
@@ -450,7 +465,7 @@ fun AppView(
     val isDataMigrationExpected by LegacyPrefsDatastore.getDataMigrationExpected(context).collectAsState(initial = null)
     val lastCompletedPayment by business.paymentsManager.lastCompletedPayment.collectAsState()
     lastCompletedPayment?.let {
-        log.debug { "completed payment=${lastCompletedPayment?.id()} with data-migration=$isDataMigrationExpected" }
+//        log.debug { "completed payment=${lastCompletedPayment?.id()} with data-migration=$isDataMigrationExpected" }
         LaunchedEffect(key1 = it.walletPaymentId()) {
             if (isDataMigrationExpected == false) {
                 navigateToPaymentDetails(navController, id = it.walletPaymentId(), isFromEvent = true)
@@ -545,7 +560,6 @@ private fun RequireStarted(
     nextUri: String? = null,
     children: @Composable () -> Unit
 ) {
-    val log = logger("Navigation")
     if (serviceState == null) {
         // do nothing
     } else if (serviceState !is NodeServiceState.Running) {

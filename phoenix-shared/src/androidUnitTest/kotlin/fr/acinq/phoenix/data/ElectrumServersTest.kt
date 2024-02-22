@@ -1,14 +1,17 @@
 package fr.acinq.phoenix.data
 
+import co.touchlab.kermit.CommonWriter
+import co.touchlab.kermit.NoTagFormatter
+import co.touchlab.kermit.Severity
+import co.touchlab.kermit.loggerConfigInit
 import fr.acinq.lightning.io.JvmTcpSocket
 import fr.acinq.lightning.io.TcpSocket
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.utils.ServerAddress
 import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
 import io.ktor.network.tls.*
 import kotlinx.coroutines.Dispatchers
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
 import java.security.KeyStore
 import java.security.cert.CertificateException
 import java.security.cert.X509Certificate
@@ -18,7 +21,10 @@ import javax.net.ssl.X509TrustManager
 
 private object ElectrumServersTestHelper {
     val selectorManager = ActorSelectorManager(Dispatchers.IO)
-    val loggerFactory = LoggerFactory.default
+    val loggerFactory = LoggerFactory(loggerConfigInit(
+        logWriters = arrayOf(CommonWriter(NoTagFormatter)),
+        minSeverity = Severity.Info
+    ))
 }
 
 actual suspend fun connect(server: ServerAddress) {

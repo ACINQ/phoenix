@@ -41,8 +41,8 @@ import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.navController
+import fr.acinq.phoenix.android.utils.datastore.SwapAddressFormat
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.lnurl.LnurlAuth
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
@@ -51,7 +51,6 @@ import java.text.NumberFormat
 fun PaymentSettingsView(
     initialShowLnurlAuthSchemeDialog: Boolean = false,
 ) {
-    val log = logger("PaymentSettingsView")
     val nc = navController
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -62,8 +61,7 @@ fun PaymentSettingsView(
 
     val invoiceDefaultDesc by UserPrefs.getInvoiceDefaultDesc(LocalContext.current).collectAsState(initial = "")
     val invoiceDefaultExpiry by UserPrefs.getInvoiceDefaultExpiry(LocalContext.current).collectAsState(null)
-
-    val prefLnurlAuthSchemeState = UserPrefs.getLnurlAuthScheme(context).collectAsState(initial = null)
+    val swapAddressFormatState = UserPrefs.getSwapAddressFormat(context).collectAsState(initial = null)
 
     DefaultScreenLayout {
         DefaultScreenHeader(
@@ -89,8 +87,42 @@ fun PaymentSettingsView(
                 },
                 onClick = { showExpiryDialog = true }
             )
+
+            val swapAddressFormat = swapAddressFormatState.value
+            if (swapAddressFormat != null) {
+                val schemes = listOf(
+                    PreferenceItem(
+                        item = SwapAddressFormat.TAPROOT_ROTATE,
+                        title = stringResource(id = R.string.paymentsettings_swap_format_taproot_title),
+                        description = stringResource(id = R.string.paymentsettings_swap_format_taproot_desc)
+                    ),
+                    PreferenceItem(
+                        item = SwapAddressFormat.LEGACY,
+                        title = stringResource(id = R.string.paymentsettings_swap_format_legacy_title),
+                        description = stringResource(id = R.string.paymentsettings_swap_format_legacy_desc)
+                    ),
+                )
+                ListPreferenceButton(
+                    title = stringResource(id = R.string.paymentsettings_swap_format_title),
+                    subtitle = {
+                        when (swapAddressFormat) {
+                            SwapAddressFormat.LEGACY -> Text(text = stringResource(id = R.string.paymentsettings_swap_format_legacy_title))
+                            SwapAddressFormat.TAPROOT_ROTATE -> Text(text = stringResource(id = R.string.paymentsettings_swap_format_taproot_title))
+                            else -> Text(text = stringResource(id = R.string.utils_unknown))
+                        }
+                    },
+                    enabled = true,
+                    selectedItem = swapAddressFormat,
+                    preferences = schemes,
+                    onPreferenceSubmit = {
+                        scope.launch { UserPrefs.saveSwapAddressFormat(context, it.item) }
+                    },
+                    initialShowDialog = false
+                )
+            }
         }
 
+        val prefLnurlAuthSchemeState = UserPrefs.getLnurlAuthScheme(context).collectAsState(initial = null)
         val prefLnurlAuthScheme = prefLnurlAuthSchemeState.value
         if (prefLnurlAuthScheme != null) {
             CardHeader(text = stringResource(id = R.string.paymentsettings_category_lnurl))

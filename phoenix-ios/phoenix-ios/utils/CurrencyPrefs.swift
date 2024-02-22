@@ -1,17 +1,13 @@
 import Foundation
 import PhoenixShared
 import Combine
-import os.log
 
+fileprivate let filename = "CurrencyPrefs"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "CurrencyPrefs"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
-
 
 /// An ObservableObject that monitors the currently stored values in UserDefaults.
 /// Available as an EnvironmentObject:

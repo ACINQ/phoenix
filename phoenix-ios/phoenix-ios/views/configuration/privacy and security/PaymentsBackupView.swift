@@ -1,15 +1,11 @@
 import SwiftUI
-import os.log
 
+fileprivate let filename = "PaymentsBackupView"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "PaymentsBackupView"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
-
 
 struct PaymentsBackupView: View {
 	

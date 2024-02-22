@@ -41,7 +41,7 @@ class CoinView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
   private val log = LoggerFactory.getLogger(this::class.java)
   private var _amount: Option<MilliSatoshi> = Option.apply(null)
 
-  private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _: SharedPreferences, key: String ->
+  private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _: SharedPreferences, key: String? ->
     if (key == Prefs.PREFS_SHOW_AMOUNT_IN_FIAT) {
       refreshFields()
     }

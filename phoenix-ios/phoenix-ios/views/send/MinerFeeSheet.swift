@@ -1,17 +1,12 @@
 import SwiftUI
-
 import PhoenixShared
-import os.log
 
+fileprivate let filename = "MinerFeeSheet"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "MinerFeeSheet"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
-
 
 struct MinerFeeSheet: View {
 	
@@ -495,7 +490,7 @@ struct MinerFeeSheet: View {
 		guard
 			let satsPerByte_number = try? parsedSatsPerByte.get(),
 			let peer = Biz.business.peerManager.peerStateValue(),
-			let scriptBytes = Parser.shared.addressToPublicKeyScript(chain: Biz.business.chain, address: btcAddress)
+			let scriptVector = Parser.shared.addressToPublicKeyScriptOrNull(chain: Biz.business.chain, address: btcAddress)
 		else {
 			return
 		}
@@ -508,7 +503,6 @@ struct MinerFeeSheet: View {
 		}
 		
 		let originalSatsPerByte = satsPerByte
-		let scriptVector = Bitcoin_kmpByteVector(bytes: scriptBytes)
 		
 		let satsPerByte_satoshi = Bitcoin_kmpSatoshi(sat: satsPerByte_number.int64Value)
 		let feePerByte = Lightning_kmpFeeratePerByte(feerate: satsPerByte_satoshi)

@@ -2,15 +2,12 @@ import SwiftUI
 import Combine
 import CryptoKit
 import PhoenixShared
-import os.log
 
+fileprivate let filename = "ElectrumAddressSheet"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "ElectrumAddressSheet"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
 enum CertInfoType: Int {

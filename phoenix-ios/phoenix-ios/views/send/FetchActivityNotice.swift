@@ -1,13 +1,10 @@
 import SwiftUI
-import os.log
 
+fileprivate let filename = "FetchActivityNotice"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "FetchActivityNotice"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
 /// Designed to go into a small sub-view

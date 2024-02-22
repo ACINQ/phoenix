@@ -646,7 +646,6 @@
     <string name="splice_error_nochannels">Sie haben keine Kanäle</string>
     <string name="splice_error_aborted_by_peer">Abbruch durch Gegenstelle [%1$s]</string>
     <string name="splice_error_cannot_create_commit">Es kann keine neue Commitment erstellt werden</string>
-    <string name="splice_error_channel_not_idle">Kanal ist nicht verfügbar</string>
     <string name="splice_error_disconnected">Kanal ist nicht verbunden</string>
     <string name="splice_error_funding_error">Funding ist fehlgeschlagen [%1$s]</string>
     <string name="splice_error_insufficient_funds">Kein ausreichendes Guthaben</string>

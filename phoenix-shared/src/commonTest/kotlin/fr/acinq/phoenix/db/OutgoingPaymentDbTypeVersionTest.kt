@@ -18,11 +18,9 @@ package fr.acinq.phoenix.db
 
 import fr.acinq.lightning.Lightning.randomBytes32
 import fr.acinq.lightning.channel.InvalidFinalScript
-import fr.acinq.lightning.db.ChannelClosingType
 import fr.acinq.lightning.db.LightningOutgoingPayment
+import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.FinalFailure
-import fr.acinq.lightning.payment.PaymentRequest
-import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.wire.PermanentNodeFailure
 import fr.acinq.phoenix.db.payments.*
@@ -34,12 +32,12 @@ class OutgoingPaymentDbTypeVersionTest {
     val channelId1 = randomBytes32()
     val address1 = "tb1q97tpc0y4rvdnu9wm7nu354lmmzdm8du228u3g4"
     val preimage1 = randomBytes32()
-    val paymentRequest1 =
-        PaymentRequest.read("lntb1500n1ps9utezpp5xjfvpvgg3zykv2kdd9yws86xw5ww2kr60h9yphth2h6fly87a9gqdpzxysy2umswfjhxum0yppk76twypgxzmnwvycqp7xqrrss9qy9qsqsp5vm25lch9spq2m9fxqrgcxq0mxrgaehstd9javflyadsle5d97p9qmu9zsjn7l59lmps3568tz9ppla4xhawjptjyrw32jed84fe75z0ka0kmnntc9la95acvc0mjav6rdv5037y6zq9e0eqhenlt8y0yh8cpj467cl").get()
+    val bolt11Invoice =
+        Bolt11Invoice.read("lntb1500n1ps9utezpp5xjfvpvgg3zykv2kdd9yws86xw5ww2kr60h9yphth2h6fly87a9gqdpzxysy2umswfjhxum0yppk76twypgxzmnwvycqp7xqrrss9qy9qsqsp5vm25lch9spq2m9fxqrgcxq0mxrgaehstd9javflyadsle5d97p9qmu9zsjn7l59lmps3568tz9ppla4xhawjptjyrw32jed84fe75z0ka0kmnntc9la95acvc0mjav6rdv5037y6zq9e0eqhenlt8y0yh8cpj467cl").get()
 
     @Test
     fun outgoing_details_normal() {
-        val details = LightningOutgoingPayment.Details.Normal(paymentRequest1)
+        val details = LightningOutgoingPayment.Details.Normal(bolt11Invoice)
         val deserialized = OutgoingDetailsData.deserialize(OutgoingDetailsTypeVersion.NORMAL_V0, details.mapToDb().second)
         assertEquals(details, deserialized)
     }
@@ -53,7 +51,7 @@ class OutgoingPaymentDbTypeVersionTest {
 
     @Test
     fun outgoing_details_swapout() {
-        val details = LightningOutgoingPayment.Details.SwapOut(address1, paymentRequest1, 1_000.sat)
+        val details = LightningOutgoingPayment.Details.SwapOut(address1, bolt11Invoice, 1_000.sat)
         val deserialized = OutgoingDetailsData.deserialize(OutgoingDetailsTypeVersion.SWAPOUT_V0, details.mapToDb().second)
         assertEquals(details, deserialized)
     }

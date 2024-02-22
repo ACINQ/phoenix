@@ -1,15 +1,24 @@
 import SwiftUI
 import PhoenixShared
-import os.log
 
+fileprivate let filename = "SwapInView"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "SwapInView"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
+
+enum SwapInAddressType: CustomStringConvertible{
+	case taproot
+	case legacy
+	
+	var description: String {
+		switch self {
+			case .taproot : return "taproot"
+			case .legacy  : return "legacy"
+		}
+	}
+}
 
 struct SwapInView: View {
 	
@@ -21,6 +30,7 @@ struct SwapInView: View {
 	@ObservedObject var toast: Toast
 	
 	@State var swapInAddress: String? = nil
+	@State var swapInAddressType: SwapInAddressType = .taproot
 	
 	@StateObject var qrCode = QRCode()
 	
@@ -28,6 +38,10 @@ struct SwapInView: View {
 	
 	let swapInWalletPublisher = Biz.business.balanceManager.swapInWalletPublisher()
 	@State var swapInWallet = Biz.business.balanceManager.swapInWalletValue()
+	
+	let swapInAddressPublisher = Biz.business.peerManager.peerStatePublisher().flatMap { $0.swapInWallet.swapInAddressPublisher()
+	}
+	@State var swapInAddressInfo: Lightning_kmpSwapInWallet.SwapInAddressInfo? = nil
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
@@ -86,6 +100,7 @@ struct SwapInView: View {
 			HStack(alignment: VerticalAlignment.center, spacing: 30) {
 				copyButton()
 				shareButton()
+				editButton()
 			}
 			.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
 			.padding(.bottom)
@@ -117,6 +132,12 @@ struct SwapInView: View {
 		}
 		.onReceive(swapInWalletPublisher) {
 			swapInWalletChanged($0)
+		}
+		.onReceive(swapInAddressPublisher) {
+			swapInAddressChanged($0)
+		}
+		.onChange(of: swapInAddressType) {
+			swapInAddressTypeChanged($0)
 		}
 	}
 	
@@ -296,6 +317,26 @@ struct SwapInView: View {
 		.simultaneousGesture(TapGesture().onEnded {
 			didTapShareButton()
 		})
+		.accessibilityAction(named: "Share Text (bitcoin address)") {
+			shareTextToSystem()
+		}
+		.accessibilityAction(named: "Share Image (QR code)") {
+			shareImageToSystem()
+		}
+	}
+	
+	@ViewBuilder
+	func editButton() -> some View {
+		
+		actionButton(
+			text: NSLocalizedString("edit", comment: "button label - try to make it short"),
+			image: Image(systemName: "square.and.pencil"),
+			width: 19, height: 19,
+			xOffset: 1, yOffset: -1
+		) {
+			didTapEditButton()
+		}
+		.disabled(swapInAddress == nil)
 	}
 	
 	@ViewBuilder
@@ -317,28 +358,47 @@ struct SwapInView: View {
 	}
 	
 	// --------------------------------------------------
+	// MARK: View Helpers
+	// --------------------------------------------------
+	
+	func updateSwapInAddress() {
+		log.trace("updateSwapInAddress()")
+		
+		guard let keyManager = Biz.business.walletManager.keyManagerValue() else {
+			return
+		}
+		
+		let chain = Biz.business.chain
+		let address: String
+		switch swapInAddressType {
+		case .taproot:
+			let index = swapInAddressInfo?.index ?? Prefs.shared.swapInAddressIndex
+			address = keyManager.swapInOnChainWallet
+				.getSwapInProtocol(addressIndex: Int32(index))
+				.address(chain: chain)
+			
+		case .legacy:
+			address = keyManager.swapInOnChainWallet
+				.legacySwapInProtocol
+				.address(chain: chain)
+		}
+		
+		if swapInAddress != address {
+			swapInAddress = address
+			
+			// Issue #196: Use uppercase lettering for invoices and address QRs
+			self.qrCode.generate(value: address.uppercased())
+		}
+	}
+	
+	// --------------------------------------------------
 	// MARK: Notifications
 	// --------------------------------------------------
 	
 	func onAppear() {
 		log.trace("onAppear()")
 		
-		Task { @MainActor in
-			
-			let peerManager = Biz.business.peerManager
-			do {
-				let peer = try await peerManager.getPeer()
-				let address = peer.swapInAddress
-				
-				self.swapInAddress = address
-			
-				// Issue #196: Use uppercase lettering for invoices and address QRs
-				self.qrCode.generate(value: address.uppercased())
-				
-			} catch {
-				log.error("Failed fetching swapInAddress: \(error)")
-			}
-		}
+		updateSwapInAddress()
 	}
 	
 	func swapInWalletChanged(_ newWallet: Lightning_kmpWalletState.WalletWithConfirmations) {
@@ -356,6 +416,19 @@ struct SwapInView: View {
 		if newBalance > oldBalance {
 			presentationMode.wrappedValue.dismiss()
 		}
+	}
+	
+	func swapInAddressChanged(_ newInfo: Lightning_kmpSwapInWallet.SwapInAddressInfo?) {
+		log.trace("swapInAddressChanged()")
+		
+		self.swapInAddressInfo = newInfo
+		updateSwapInAddress()
+	}
+	
+	func swapInAddressTypeChanged(_ newType: SwapInAddressType) {
+		log.trace("swapInAddressTypeChanged(new: \(newType)")
+		
+		updateSwapInAddress()
 	}
 	
 	// --------------------------------------------------
@@ -397,6 +470,15 @@ struct SwapInView: View {
 				shareText: { shareTextToSystem() },
 				shareImage: { shareImageToSystem() }
 			)
+		}
+	}
+	
+	func didTapEditButton() {
+		log.trace("didTapEditButton()")
+		
+		smartModalState.display(dismissable: true) {
+					
+			BtcAddrOptionsSheet(swapInAddressType: $swapInAddressType)
 		}
 	}
 	

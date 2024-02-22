@@ -44,7 +44,6 @@ import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.MempoolFeerate
 
@@ -57,9 +56,6 @@ fun SendSpliceOutView(
     onBackClick: () -> Unit,
     onSpliceOutSuccess: () -> Unit,
 ) {
-    val log = logger("SendSpliceOut")
-    log.debug { "init splice-out with amount=$requestedAmount address=$address" }
-
     val context = LocalContext.current
     val prefBtcUnit = LocalBitcoinUnit.current
     val keyboardManager = LocalSoftwareKeyboardController.current
@@ -297,7 +293,8 @@ private fun SpliceOutFeeSummaryView(
 fun spliceFailureDetails(spliceFailure: ChannelCommand.Commitment.Splice.Response.Failure): String = when (spliceFailure) {
     is ChannelCommand.Commitment.Splice.Response.Failure.AbortedByPeer -> stringResource(id = R.string.splice_error_aborted_by_peer, spliceFailure.reason)
     is ChannelCommand.Commitment.Splice.Response.Failure.CannotCreateCommitTx -> stringResource(id = R.string.splice_error_cannot_create_commit)
-    is ChannelCommand.Commitment.Splice.Response.Failure.ChannelNotIdle -> stringResource(id = R.string.splice_error_channel_not_idle)
+    is ChannelCommand.Commitment.Splice.Response.Failure.ConcurrentRemoteSplice -> stringResource(id = R.string.splice_error_concurrent_remote)
+    is ChannelCommand.Commitment.Splice.Response.Failure.ChannelNotQuiescent -> stringResource(id = R.string.splice_error_channel_not_quiescent)
     is ChannelCommand.Commitment.Splice.Response.Failure.Disconnected -> stringResource(id = R.string.splice_error_disconnected)
     is ChannelCommand.Commitment.Splice.Response.Failure.FundingFailure -> stringResource(id = R.string.splice_error_funding_error, spliceFailure.reason.javaClass.simpleName)
     is ChannelCommand.Commitment.Splice.Response.Failure.InsufficientFunds -> stringResource(id = R.string.splice_error_insufficient_funds)

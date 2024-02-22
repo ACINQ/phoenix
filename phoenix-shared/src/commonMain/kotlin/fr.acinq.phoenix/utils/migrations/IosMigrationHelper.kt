@@ -27,17 +27,16 @@ import fr.acinq.lightning.channel.states.*
 import fr.acinq.lightning.io.WrappedChannelCommand
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sum
-import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.LocalChannelInfo
 import fr.acinq.phoenix.utils.Parser
 import fr.acinq.phoenix.utils.extensions.isBeingCreated
-import fr.acinq.phoenix.utils.extensions.localBalance
+import fr.acinq.lightning.logging.info
+import fr.acinq.lightning.logging.warning
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import org.kodein.log.newLogger
 
 object IosMigrationHelper {
 
@@ -90,8 +89,8 @@ object IosMigrationHelper {
             val log = loggerFactory.newLogger(this::class)
 
             val peer = peerManager.getPeer()
-            val swapInAddress = peer.swapInAddress
-            val closingScript = Parser.addressToPublicKeyScript(chain, swapInAddress)
+            val swapInAddress = peer.swapInWallet.swapInAddressFlow.filterNotNull().first().first
+            val closingScript = Parser.addressToPublicKeyScriptOrNull(chain, swapInAddress)
             if (closingScript == null) {
                 log.warning { "aborting: could not get a valid closing script" }
                 return IosMigrationResult.Failure.InvalidClosingScript
@@ -114,7 +113,7 @@ object IosMigrationHelper {
             log.info { "migrating ${channelsToMigrate.size} channels to $swapInAddress" }
             // Close all channels in parallel
             val command = ChannelCommand.Close.MutualClose(
-                scriptPubKey = ByteVector(closingScript),
+                scriptPubKey = closingScript,
                 feerates = null
             )
             channelsToMigrate.forEach {
@@ -137,10 +136,10 @@ object IosMigrationHelper {
                     log.info { "txid=${closingTx.tx.txid} ignored (dust)" }
                 }
             }
-            log.info { "${closingTxs.size} channels closed to ${closingScript.byteVector().toHex()}" }
+            log.info { "${closingTxs.size} channels closed to ${closingScript.toHex()}" }
 
             // Wait for all UTXOs to arrive in swap-in wallet.
-            peer.swapInWallet.walletStateFlow
+            peer.swapInWallet.wallet.walletStateFlow
                 .map { it.utxos.map { it.outPoint.txid } }
                 .first { txidsInWallet -> closingTxs.values.all { txid -> txidsInWallet.contains(txid) } }
             log.info { "all mutual-close txids found in swap-in wallet" }

@@ -1,15 +1,12 @@
 import SwiftUI
 import PhoenixShared
 import Popovers
-import os.log
 
+fileprivate let filename = "LiquidityAdsView"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "LiquidityAdsView"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
 struct LiquidityAdsView: View {
@@ -575,8 +572,10 @@ struct LiquidityAdsView: View {
 				Text("Invalid splice-out pubKeyScript")
 			} else if let _ = failure.asSpliceAlreadyInProgress() {
 				Text("Splice already in progress")
-			} else if let _ = failure.asChannelNotIdle() {
-				Text("Channel not idle")
+			} else if let _ = failure.asChannelNotQuiescent() {
+				Text("Splice has been aborted")
+			} else if let _ = failure.asConcurrentRemoteSplice() {
+				Text("Concurrent splice in progress")
 			} else if let _ = failure.asInvalidLiquidityAds() {
 				Text("Invalid liquidity ads")
 			} else if let _ = failure.asFundingFailure() {

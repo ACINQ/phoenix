@@ -16,10 +16,12 @@
 
 package fr.acinq.phoenix.controllers.payments
 
+import fr.acinq.bitcoin.Bitcoin
+import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.TrampolineFees
+import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.controllers.MVI
 import fr.acinq.phoenix.data.BitcoinUri
@@ -37,7 +39,7 @@ object Scan {
         object UnknownFormat : BadRequestReason()
         object AlreadyPaidInvoice : BadRequestReason()
         data class Expired(val timestampSeconds: Long, val expirySeconds: Long) : BadRequestReason()
-        data class ChainMismatch(val expected: NodeParams.Chain) : BadRequestReason()
+        data class ChainMismatch(val expected: Chain) : BadRequestReason()
         data class ServiceError(val url: Url, val error: LnurlError.RemoteFailure) : BadRequestReason()
         data class InvalidLnurl(val url: Url) : BadRequestReason()
         data class UnsupportedLnurl(val url: Url) : BadRequestReason()
@@ -46,7 +48,7 @@ object Scan {
     sealed class LnurlPayError {
         data class RemoteError(val err: LnurlError.RemoteFailure) : LnurlPayError()
         data class BadResponseError(val err: LnurlError.Pay.Invoice) : LnurlPayError()
-        data class ChainMismatch(val expected: NodeParams.Chain) : LnurlPayError()
+        data class ChainMismatch(val expected: Chain) : LnurlPayError()
         object AlreadyPaidInvoice : LnurlPayError()
     }
 
@@ -68,12 +70,12 @@ object Scan {
             val reason: BadRequestReason
         ) : Model()
 
-        sealed class InvoiceFlow : Model() {
-            data class InvoiceRequest(
+        sealed class Bolt11InvoiceFlow : Model() {
+            data class Bolt11InvoiceRequest(
                 val request: String,
-                val paymentRequest: PaymentRequest,
-            ): InvoiceFlow()
-            object Sending: InvoiceFlow()
+                val invoice: Bolt11Invoice,
+            ): Bolt11InvoiceFlow()
+            object Sending: Bolt11InvoiceFlow()
         }
 
         data class OnchainFlow(val uri: BitcoinUri): Model()
@@ -139,12 +141,12 @@ object Scan {
             val request: String
         ) : Intent()
 
-        sealed class InvoiceFlow : Intent() {
-            data class SendInvoicePayment(
-                val paymentRequest: PaymentRequest,
+        sealed class Bolt11InvoiceFlow : Intent() {
+            data class SendBolt11Invoice(
+                val invoice: Bolt11Invoice,
                 val amount: MilliSatoshi,
                 val trampolineFees: TrampolineFees
-            ) : InvoiceFlow()
+            ) : Bolt11InvoiceFlow()
         }
 
         object CancelLnurlServiceFetch : Intent()
@@ -184,8 +186,8 @@ object Scan {
     }
 
     sealed class ClipboardContent {
-        data class InvoiceRequest(
-            val paymentRequest: PaymentRequest
+        data class Bolt11InvoiceRequest(
+            val invoice: Bolt11Invoice
         ): ClipboardContent()
 
         data class BitcoinRequest(

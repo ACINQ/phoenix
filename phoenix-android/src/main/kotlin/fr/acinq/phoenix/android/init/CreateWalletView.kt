@@ -71,7 +71,7 @@ fun CreateWalletView(
                         is Initialization.Model.Ready -> {
                             val entropy = remember { Lightning.randomBytes(16) }
                             LaunchedEffect(key1 = entropy) {
-                                log.debug { "generating new wallet..." }
+                                log.debug("generating new wallet...")
                                 postIntent(Initialization.Intent.GenerateWallet(entropy))
                             }
                         }

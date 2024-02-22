@@ -1,17 +1,13 @@
 import SwiftUI
 import Combine
 import CloudKit
-import os.log
 
+fileprivate let filename = "RestoreView"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "RestoreView"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
-
 
 struct RestoreView: View {
 	

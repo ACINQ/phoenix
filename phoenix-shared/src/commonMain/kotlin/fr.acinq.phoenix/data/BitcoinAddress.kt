@@ -16,22 +16,25 @@
 
 package fr.acinq.phoenix.data
 
+import fr.acinq.bitcoin.BitcoinError
+import fr.acinq.bitcoin.ByteVector
+import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.Satoshi
-import fr.acinq.lightning.NodeParams
-import fr.acinq.lightning.payment.PaymentRequest
+import fr.acinq.lightning.payment.Bolt11Invoice
 import io.ktor.http.*
 
 data class BitcoinUri(
-    val chain: NodeParams.Chain,
+    val chain: Chain,
     /** Actual Bitcoin address; may be different than the source, e.g. if the source is an URI like "bitcoin:xyz?param=123". */
     val address: String,
+    val script: ByteVector,
     // Bip-21 parameters
     val label: String? = null,
     val message: String? = null,
     /** Amount requested in the URI. */
     val amount: Satoshi? = null,
     /** A Bitcoin URI may contain a Lightning payment request as an alternative way to make the payment. */
-    val paymentRequest: PaymentRequest? = null,
+    val paymentRequest: Bolt11Invoice? = null,
     /** Other bip-21 parameters in the URI that we do not handle. */
     val ignoredParams: Parameters = Parameters.Empty,
 ) {
@@ -51,8 +54,8 @@ data class BitcoinUri(
     }
 }
 
-sealed class BitcoinAddressError {
-    data class ChainMismatch(val expected: NodeParams.Chain): BitcoinAddressError()
-    data class UnhandledRequiredParams(val parameters: List<Pair<String, String>>): BitcoinAddressError()
-    object UnknownFormat: BitcoinAddressError()
+sealed class BitcoinUriError {
+    data class InvalidScript(val error: BitcoinError): BitcoinUriError()
+    data class UnhandledRequiredParams(val parameters: List<Pair<String, String>>): BitcoinUriError()
+    object InvalidUri: BitcoinUriError()
 }

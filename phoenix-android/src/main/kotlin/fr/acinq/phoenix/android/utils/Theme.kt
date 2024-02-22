@@ -257,7 +257,7 @@ val mutedTextColor @Composable get() = if (isDarkTheme) gray600 else gray200
 
 val mutedBgColor @Composable get() = if (isDarkTheme) gray950 else gray30
 
-val borderColor @Composable get() = if (isDarkTheme) gray800 else gray70
+val borderColor @Composable get() = if (isDarkTheme) gray800 else gray50
 
 private val systemStatusBarColor @Composable get() = topGradientColor
 

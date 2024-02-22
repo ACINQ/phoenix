@@ -1,16 +1,13 @@
 import UserNotifications
 import PhoenixShared
 import Combine
-import os.log
 import notify
 
+fileprivate let filename = "NotificationService"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "NotificationService"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
 /**

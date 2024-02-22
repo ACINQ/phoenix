@@ -19,13 +19,14 @@ fun gitCommitHash(): String {
 val chain: String by project
 
 android {
-    compileSdk = 33
+    namespace = "fr.acinq.phoenix.android"
+    compileSdk = 34
     defaultConfig {
         applicationId = "fr.acinq.phoenix.mainnet"
         minSdk = 26
-        targetSdk = 33
-        versionCode = 75
-        versionName = "2.1.3"
+        targetSdk = 34
+        versionCode = 76
+        versionName = gitCommitHash()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         resourceConfigurations.addAll(listOf("en", "fr", "de", "es", "b+es+419", "cs", "pt-rBR"))
     }
@@ -92,10 +93,6 @@ dependencies {
     api(project(":phoenix-legacy"))
 
     implementation("com.google.android.material:material:1.7.0")
-
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core") {
-        version { strictly(Versions.coroutines) }
-    }
 
     // -- AndroidX
     implementation("androidx.core:core-ktx:${Versions.Android.coreKtx}")

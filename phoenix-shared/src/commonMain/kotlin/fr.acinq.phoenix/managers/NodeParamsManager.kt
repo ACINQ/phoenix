@@ -16,26 +16,28 @@
 
 package fr.acinq.phoenix.managers
 
+import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.NodeUri
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.shared.BuildVersions
+import fr.acinq.lightning.logging.info
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
+
 
 class NodeParamsManager(
     loggerFactory: LoggerFactory,
-    chain: NodeParams.Chain,
+    chain: Chain,
     walletManager: WalletManager,
     appConfigurationManager: AppConfigurationManager,
 ) : CoroutineScope by MainScope() {
@@ -47,7 +49,7 @@ class NodeParamsManager(
         appConfigurationManager = business.appConfigurationManager,
     )
 
-    private val log = newLogger(loggerFactory)
+    private val log = loggerFactory.newLogger(this::class)
 
     private val _nodeParams = MutableStateFlow<NodeParams?>(null)
     val nodeParams: StateFlow<NodeParams?> = _nodeParams
@@ -63,7 +65,6 @@ class NodeParamsManager(
                     loggerFactory = loggerFactory,
                     keyManager = keyManager,
                 ).copy(
-                    alias = "phoenix",
                     zeroConfPeers = setOf(trampolineNodeId),
                     liquidityPolicy = MutableStateFlow(startupParams.liquidityPolicy),
                 )
@@ -78,7 +79,7 @@ class NodeParamsManager(
     }
 
     companion object {
-        val chain = NodeParams.Chain.Mainnet
+        val chain = Chain.Mainnet
         val trampolineNodeId = PublicKey.fromHex("03864ef025fde8fb587d989186ce6a4a186895ee44a926bfc370e2c366597a3f8f")
         val trampolineNodeUri = NodeUri(id = trampolineNodeId, "3.33.236.230", 9735)
         const val remoteSwapInXpub = "xpub69q3sDXXsLuHVbmTrhqmEqYqTTsXJKahdfawXaYuUt6muf1PbZBnvqzFcwiT8Abpc13hY8BFafakwpPbVkatg9egwiMjed1cRrPM19b2Ma7"

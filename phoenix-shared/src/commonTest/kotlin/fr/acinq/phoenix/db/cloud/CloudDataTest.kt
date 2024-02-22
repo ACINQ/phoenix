@@ -1,12 +1,13 @@
 package fr.acinq.phoenix.db.cloud
 
 import fr.acinq.bitcoin.*
+import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.*
 import fr.acinq.lightning.Lightning.randomBytes32
 import fr.acinq.lightning.Lightning.randomKey
 import fr.acinq.lightning.db.*
+import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.FinalFailure
-import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.runTest
 import fr.acinq.secp256k1.Hex
@@ -60,7 +61,7 @@ class CloudDataTest {
 
     @Test
     fun incoming__invoice() = runTest {
-        val invoice = createInvoice(preimage, 250_000.msat)
+        val invoice = createBolt11Invoice(preimage, 250_000.msat)
         testRoundtrip(
             IncomingPayment(
                 preimage = preimage,
@@ -94,7 +95,7 @@ class CloudDataTest {
 
     @Test
     fun incoming__receivedWith_lightning() = runTest {
-        val invoice = createInvoice(preimage, 250_000.msat)
+        val invoice = createBolt11Invoice(preimage, 250_000.msat)
         val receivedWith1 = IncomingPayment.ReceivedWith.LightningPayment(
             amount = 100_000.msat, channelId = channelId, htlcId = 1L
         )
@@ -112,7 +113,7 @@ class CloudDataTest {
 
     @Test
     fun incoming__receivedWith_newChannel() = runTest {
-        val invoice = createInvoice(preimage, 10_000_000.msat)
+        val invoice = createBolt11Invoice(preimage, 10_000_000.msat)
         val receivedWith = IncomingPayment.ReceivedWith.NewChannel(
             amount = 7_000_000.msat, miningFee = 2_000.sat, serviceFee = 1_000_000.msat, channelId = channelId, txId = TxId(randomBytes32()), confirmedAt = 500, lockedAt = 800
         )
@@ -149,7 +150,7 @@ class CloudDataTest {
 
     @Test
     fun outgoing__normal() = runTest {
-        val invoice = createInvoice(preimage, 1_000_000.msat)
+        val invoice = createBolt11Invoice(preimage, 1_000_000.msat)
         testRoundtrip(
             LightningOutgoingPayment(
                 id = uuid,
@@ -176,7 +177,7 @@ class CloudDataTest {
 
     @Test
     fun outgoing__swapOut() = runTest {
-        val invoice = createInvoice(preimage, 1_000_000.msat)
+        val invoice = createBolt11Invoice(preimage, 1_000_000.msat)
         testRoundtrip(
             LightningOutgoingPayment(
                 id = uuid,
@@ -230,7 +231,7 @@ class CloudDataTest {
     @Test
     fun outgoing__failed() = runTest {
         val recipientAmount = 500_000.msat
-        val invoice = createInvoice(preimage, recipientAmount)
+        val invoice = createBolt11Invoice(preimage, recipientAmount)
         val (a, b) = listOf(randomKey().publicKey(), randomKey().publicKey())
         val part = LightningOutgoingPayment.Part(
             id = UUID.randomUUID(),
@@ -266,7 +267,7 @@ class CloudDataTest {
     @Test
     fun outgoing__succeeded_offChain() = runTest {
         val recipientAmount = 500_000.msat
-        val invoice = createInvoice(preimage, recipientAmount)
+        val invoice = createBolt11Invoice(preimage, recipientAmount)
         val (a, b) = listOf(randomKey().publicKey(), randomKey().publicKey())
         val part1 = LightningOutgoingPayment.Part(
             id = UUID.randomUUID(),
@@ -421,8 +422,8 @@ class CloudDataTest {
             Feature.BasicMultiPartPayment to FeatureSupport.Optional
         )
 
-        private fun createInvoice(preimage: ByteVector32, amount: MilliSatoshi): PaymentRequest {
-            return PaymentRequest.create(
+        private fun createBolt11Invoice(preimage: ByteVector32, amount: MilliSatoshi): Bolt11Invoice {
+            return Bolt11Invoice.create(
                 chainHash = Block.LivenetGenesisBlock.hash,
                 amount = amount,
                 paymentHash = Crypto.sha256(preimage).toByteVector32(),

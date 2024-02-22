@@ -52,10 +52,12 @@ class InternalDataRepository(private val internalData: DataStore<Preferences>) {
         private val SHOW_INTRO = booleanPreferencesKey("SHOW_INTRO")
         private val FCM_TOKEN = stringPreferencesKey("FCM_TOKEN")
         private val CHANNELS_WATCHER_OUTCOME = stringPreferencesKey("CHANNELS_WATCHER_RESULT")
+        private val LAST_USED_SWAP_INDEX = intPreferencesKey("LAST_USED_SWAP_INDEX")
     }
 
     val log = LoggerFactory.getLogger(this::class.java)
 
+    /** Retrieve data stored in [internalData], with a fallback to empty data if prefs file can't be read. */
     private val safeData: Flow<Preferences> = internalData.data.catch { exception ->
         if (exception is IOException) {
             emit(emptyPreferences())
@@ -126,5 +128,8 @@ class InternalDataRepository(private val internalData: DataStore<Preferences>) {
         it[LAST_REJECTED_ONCHAIN_SWAP_AMOUNT] = liquidityEvent.amount.msat
         it[LAST_REJECTED_ONCHAIN_SWAP_TIMESTAMP] = currentTimestampMillis()
     }
+
+    val getLastUsedSwapIndex: Flow<Int> = safeData.map { it[LAST_USED_SWAP_INDEX] ?: 0 }
+    suspend fun saveLastUsedSwapIndex(index: Int) = internalData.edit { it[LAST_USED_SWAP_INDEX] = index }
 
 }

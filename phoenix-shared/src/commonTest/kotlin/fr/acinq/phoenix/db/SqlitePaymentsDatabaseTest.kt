@@ -18,10 +18,12 @@ package fr.acinq.phoenix.db
 
 import com.squareup.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.*
+import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.*
 import fr.acinq.lightning.Lightning.randomBytes32
 import fr.acinq.lightning.channel.TooManyAcceptedHtlcs
 import fr.acinq.lightning.db.*
+import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.payment.OutgoingPaymentFailure
 import fr.acinq.lightning.payment.PaymentRequest
@@ -30,12 +32,12 @@ import fr.acinq.lightning.wire.TemporaryNodeFailure
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.runTest
 import fr.acinq.phoenix.utils.migrations.LegacyChannelCloseHelper
+import fr.acinq.phoenix.utils.testLoggerFactory
 import fr.acinq.secp256k1.Hex
-import org.kodein.log.LoggerFactory
 import kotlin.test.*
 
 class SqlitePaymentsDatabaseTest {
-    private val db = SqlitePaymentsDb(LoggerFactory.default, testPaymentsDriver())
+    private val db = SqlitePaymentsDb(testLoggerFactory, testPaymentsDriver())
 
     private val preimage1 = randomBytes32()
     private val paymentHash1 = Crypto.sha256(preimage1).toByteVector32()
@@ -142,7 +144,7 @@ class SqlitePaymentsDatabaseTest {
     @Test
     fun incoming__is_expired() = runTest {
         val expiredInvoice =
-            PaymentRequest.read("lntb1p0ufamxpp5l23zy5f8h2dcr8hxynptkcyuzdygy36pz76hgayp7n9q45a3cwuqdqqxqyjw5q9qtzqqqqqq9qsqsp5vusneyeywvawt4d7sslx3kx0eh7kk68l7j26qr0ge7z04lxhe5ssrzjqwfn3p9278ttzzpe0e00uhyxhned3j5d9acqak5emwfpflp8z2cnfluw6cwxn8wdcyqqqqlgqqqqqeqqjqmjvx0y3cfw54syp4jqw6jlj73qt97vxftjd3w3ywx6v2jqkdx9uxw3hk9qq6st9qyfpu3nzrpefwye63vmnyyzn6z8n7nkqsjj6lsaspu2p3mm").get()
+            Bolt11Invoice.read("lntb1p0ufamxpp5l23zy5f8h2dcr8hxynptkcyuzdygy36pz76hgayp7n9q45a3cwuqdqqxqyjw5q9qtzqqqqqq9qsqsp5vusneyeywvawt4d7sslx3kx0eh7kk68l7j26qr0ge7z04lxhe5ssrzjqwfn3p9278ttzzpe0e00uhyxhned3j5d9acqak5emwfpflp8z2cnfluw6cwxn8wdcyqqqqlgqqqqqeqqjqmjvx0y3cfw54syp4jqw6jlj73qt97vxftjd3w3ywx6v2jqkdx9uxw3hk9qq6st9qyfpu3nzrpefwye63vmnyyzn6z8n7nkqsjj6lsaspu2p3mm").get()
         db.addIncomingPayment(preimage1, IncomingPayment.Origin.Invoice(expiredInvoice), 0)
         db.receivePayment(paymentHash1, receivedWith1, 10)
         assertTrue(db.getIncomingPayment(paymentHash1)!!.isExpired())
@@ -151,7 +153,7 @@ class SqlitePaymentsDatabaseTest {
     @Test
     fun incoming__purge_expired() = runTest {
         val expiredPreimage = randomBytes32()
-        val expiredInvoice = PaymentRequest.create(
+        val expiredInvoice = Bolt11Invoice.create(
             chainHash = Block.TestnetGenesisBlock.hash,
             amount = 150_000.msat,
             paymentHash = Crypto.sha256(expiredPreimage).toByteVector32(),
@@ -403,8 +405,8 @@ class SqlitePaymentsDatabaseTest {
         private fun createInvoice(
             preimage: ByteVector32,
             msat: MilliSatoshi = 150_000.msat
-        ): PaymentRequest {
-            return PaymentRequest.create(
+        ): Bolt11Invoice {
+            return Bolt11Invoice.create(
                 chainHash = Block.LivenetGenesisBlock.hash,
                 amount = msat,
                 paymentHash = Crypto.sha256(preimage).toByteVector32(),

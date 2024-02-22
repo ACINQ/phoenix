@@ -38,7 +38,6 @@ import kotlinx.coroutines.launch
 fun AppLockView(
     onBackClick: () -> Unit,
 ) {
-    val log = logger("AppLockView")
     val context = LocalContext.current
     val authStatus = BiometricsHelper.authStatus(context)
     val isScreenLockActive by UserPrefs.getIsScreenLockActive(context).collectAsState(null)

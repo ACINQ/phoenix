@@ -1,9 +1,11 @@
 package fr.acinq.phoenix.utils
 
 import fr.acinq.bitcoin.Block
+import fr.acinq.bitcoin.OutPoint
 import fr.acinq.bitcoin.PrivateKey
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.TxId
+import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.CltvExpiryDelta
 import fr.acinq.lightning.Lightning.randomBytes32
 import fr.acinq.lightning.MilliSatoshi
@@ -11,8 +13,8 @@ import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
 import fr.acinq.lightning.db.ChannelClosingType
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
+import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.PaymentRequest
-import fr.acinq.lightning.utils.Either
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampSeconds
 import fr.acinq.lightning.utils.msat
@@ -228,9 +230,10 @@ class CsvWriterTests {
 
     @Test
     fun testRow_Incoming_NewChannel_DualSwapIn() {
+        val input = OutPoint(TxId(randomBytes32()), 0)
         val payment = IncomingPayment(
             preimage = randomBytes32(),
-            origin = IncomingPayment.Origin.OnChain(txId = TxId(randomBytes32()), localInputs = setOf()),
+            origin = IncomingPayment.Origin.OnChain(txId = TxId(randomBytes32()), localInputs = setOf(input)),
             received = IncomingPayment.Received(
                 receivedWith = listOf(
                     IncomingPayment.ReceivedWith.NewChannel(
@@ -252,7 +255,7 @@ class CsvWriterTests {
             userNotes = "Via dual-funding flow"
         )
 
-        val expected = "2023-02-01T17:14:43.668Z,12000000,-3000000,2.7599 USD,-0.6899 USD,Swap-in to tb1qf72v4qyczf7ymmqtr8z3vfqn6dapzl3e7l6tjv,L1 Top-up,Via dual-funding flow\r\n"
+        val expected = "2023-02-01T17:14:43.668Z,12000000,-3000000,2.7599 USD,-0.6899 USD,Swap-in with inputs: [${input.txid}],L1 Top-up,Via dual-funding flow\r\n"
         val actual = CsvWriter.makeRow(
             info = WalletPaymentInfo(payment, metadata, WalletPaymentFetchOptions.All),
             localizedDescription = "L1 Top-up",
@@ -332,7 +335,7 @@ class CsvWriterTests {
      * So everything else can be fake.
      */
     private fun makePaymentRequest() =
-        PaymentRequest.create(
+        Bolt11Invoice.create(
             chainHash = Block.TestnetGenesisBlock.hash,
             amount = 10_000.msat,
             paymentHash = randomBytes32(),
@@ -379,6 +382,5 @@ class CsvWriterTests {
             includesDescription = true,
             includesNotes = true,
             includesOriginDestination = true,
-            swapInAddress = swapInAddress
         )
 }

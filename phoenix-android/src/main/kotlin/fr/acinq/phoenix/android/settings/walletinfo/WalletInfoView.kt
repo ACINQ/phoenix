@@ -35,10 +35,13 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import fr.acinq.bitcoin.DeterministicWallet
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.blockchain.electrum.WalletState
 import fr.acinq.lightning.blockchain.electrum.balance
+import fr.acinq.lightning.crypto.KeyManager.SwapInOnChainKeys.Companion.swapInUserRefundKeyPath
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnit
@@ -48,6 +51,7 @@ import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.monoTypo
 import fr.acinq.phoenix.android.utils.mutedTextColor
+import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.managers.finalOnChainWalletPath
 
 @Composable
@@ -55,12 +59,13 @@ fun WalletInfoView(
     onBackClick: () -> Unit,
     onLightningWalletClick: () -> Unit,
     onSwapInWalletClick: () -> Unit,
+    onSwapInWalletInfoClick: () -> Unit,
     onFinalWalletClick: () -> Unit,
 ) {
     DefaultScreenLayout {
         DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.walletinfo_title))
         OffChainWalletView(onLightningWalletClick)
-        SwapInWalletView(onSwapInWalletClick)
+        SwapInWalletView(onSwapInWalletClick, onSwapInWalletInfoClick)
         FinalWalletView(onFinalWalletClick)
     }
 }
@@ -100,7 +105,10 @@ private fun OffChainWalletView(onLightningWalletClick: () -> Unit) {
 }
 
 @Composable
-private fun SwapInWalletView(onSwapInWalletClick: () -> Unit) {
+private fun SwapInWalletView(
+    onSwapInWalletClick: () -> Unit,
+    onSwapInWalletInfoClick: () -> Unit,
+) {
     val swapInWallet by business.peerManager.swapInWallet.collectAsState()
     val keyManager by business.walletManager.keyManager.collectAsState()
 
@@ -108,29 +116,44 @@ private fun SwapInWalletView(onSwapInWalletClick: () -> Unit) {
         text = stringResource(id = R.string.walletinfo_onchain_swapin),
         helpMessage = stringResource(id = R.string.walletinfo_onchain_swapin_help),
     )
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        onClick = onSwapInWalletClick,
-    ) {
-        swapInWallet?.let { wallet ->
-            OnchainBalanceView(
-                confirmed = (wallet.deeplyConfirmed + wallet.lockedUntilRefund + wallet.readyForRefund).balance,
-                unconfirmed = wallet.unconfirmed.balance + wallet.weaklyConfirmed.balance
-            )
-        } ?: ProgressView(text = stringResource(id = R.string.walletinfo_loading_data))
+    Card(modifier = Modifier.fillMaxWidth()) {
+        MenuButton(
+            content = {
+                swapInWallet?.let {
+                    OnchainBalanceView(
+                        confirmed = (it.deeplyConfirmed + it.lockedUntilRefund + it.readyForRefund).balance,
+                        unconfirmed = (it.unconfirmed + it.weaklyConfirmed).balance
+                    )
+                } ?: ProgressView(text = stringResource(id = R.string.walletinfo_loading_data))
+            },
+            onClick = onSwapInWalletClick,
+            modifier = Modifier.fillMaxWidth(),
+        )
+
+        HSeparator(modifier = Modifier.padding(start = 16.dp), width = 50.dp)
+
         keyManager?.let {
-            HSeparator(modifier = Modifier.padding(start = 16.dp), width = 50.dp)
+            SettingWithCopy(
+                title = stringResource(id = R.string.walletinfo_descriptor_legacy),
+                value = it.swapInOnChainWallet.legacyDescriptor,
+                maxLinesValue = 1
+            )
             SettingWithCopy(
                 title = stringResource(id = R.string.walletinfo_descriptor),
-                value = it.swapInOnChainWallet.descriptor,
-                maxLinesValue = 2
+                value = it.swapInOnChainWallet.publicDescriptor,
+                maxLinesValue = 1
             )
             SettingWithCopy(
                 title = stringResource(id = R.string.walletinfo_swapin_user_pubkey),
                 value = it.swapInOnChainWallet.userPublicKey.toHex(),
-                maxLinesValue = 2
+                maxLinesValue = 1
             )
         }
+        MenuButton(
+            text = stringResource(id = R.string.walletinfo_swapin_addresses),
+            icon = R.drawable.ic_list,
+            onClick = onSwapInWalletInfoClick
+        )
     }
 }
 
@@ -143,13 +166,15 @@ private fun FinalWalletView(onFinalWalletClick: () -> Unit) {
         text = stringResource(id = R.string.walletinfo_onchain_final),
         helpMessage = stringResource(id = R.string.walletinfo_onchain_final_about)
     )
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        onClick = onFinalWalletClick,
-    ) {
-        finalWallet?.let { wallet ->
-            OnchainBalanceView(confirmed = wallet.deeplyConfirmed.balance, unconfirmed = wallet.unconfirmed.balance)
-        } ?: ProgressView(text = stringResource(id = R.string.walletinfo_loading_data))
+    Card(modifier = Modifier.fillMaxWidth()) {
+        MenuButton(
+            content = {
+                finalWallet?.let { wallet ->
+                    OnchainBalanceView(confirmed = wallet.deeplyConfirmed.balance, unconfirmed = wallet.unconfirmed.balance)
+                } ?: ProgressView(text = stringResource(id = R.string.walletinfo_loading_data))
+            },
+            onClick =onFinalWalletClick,
+        )
         keyManager?.let {
             HSeparator(modifier = Modifier.padding(start = 16.dp), width = 50.dp)
             SettingWithCopy(
@@ -186,9 +211,7 @@ private fun OnchainBalanceView(
     unconfirmed: Satoshi?,
 ) {
     val btcUnit = LocalBitcoinUnit.current
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .padding(16.dp)) {
+    Row(modifier = Modifier.fillMaxWidth()) {
         when (confirmed) {
             null -> Text(text = stringResource(id = R.string.walletinfo_loading_data), color = mutedTextColor)
             else -> {
@@ -205,6 +228,8 @@ private fun OnchainBalanceView(
                         text = stringResource(id = R.string.walletinfo_incoming_balance, it.toPrettyString(btcUnit, withUnit = true)),
                         style = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
                         modifier = Modifier.alignByBaseline(),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
             }

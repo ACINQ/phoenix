@@ -1,15 +1,12 @@
 import SwiftUI
 import PhoenixShared
 import Combine
-import os.log
 
+fileprivate let filename = "Prefs"
 #if DEBUG && false
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "Prefs"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
 fileprivate enum Key: String {
@@ -23,6 +20,7 @@ fileprivate enum Key: String {
 	case showOriginalFiatAmount
 	case recentPaymentsConfig
 	case hasMergedChannelsForSplicing
+	case swapInAddressIndex
 }
 
 fileprivate enum KeyDeprecated: String {
@@ -153,6 +151,11 @@ class Prefs {
 		set { defaults.isNewWallet = newValue }
 	}
 	
+	var swapInAddressIndex: Int {
+		get { defaults.swapInAddressIndex }
+		set { defaults.swapInAddressIndex = newValue }
+	}
+	
 	// --------------------------------------------------
 	// MARK: Recent Tips
 	// --------------------------------------------------
@@ -210,6 +213,7 @@ class Prefs {
 		defaults.removeObject(forKey: Key.showOriginalFiatAmount.rawValue)
 		defaults.removeObject(forKey: Key.recentPaymentsConfig.rawValue)
 		defaults.removeObject(forKey: Key.hasMergedChannelsForSplicing.rawValue)
+		defaults.removeObject(forKey: Key.swapInAddressIndex.rawValue)
 		
 		self.backupTransactions.resetWallet(encryptedNodeId: encryptedNodeId)
 		self.backupSeed.resetWallet(encryptedNodeId: encryptedNodeId)
@@ -303,5 +307,10 @@ extension UserDefaults {
 	@objc fileprivate var hasMergedChannelsForSplicing: Bool {
 		get { bool(forKey: Key.hasMergedChannelsForSplicing.rawValue) }
 		set { set(newValue, forKey: Key.hasMergedChannelsForSplicing.rawValue) }
+	}
+	
+	@objc fileprivate var swapInAddressIndex: Int {
+		get { integer(forKey: Key.swapInAddressIndex.rawValue) }
+		set { set(newValue, forKey: Key.swapInAddressIndex.rawValue) }
 	}
 }

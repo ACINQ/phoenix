@@ -19,6 +19,7 @@ package fr.acinq.phoenix.db.payments
 import com.squareup.sqldelight.ColumnAdapter
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.PublicKey
+import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.ShortChannelId
 import fr.acinq.lightning.channel.ChannelException

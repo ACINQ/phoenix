@@ -61,7 +61,7 @@ extension WalletPaymentInfo {
 			if let lightningPayment = payment as? Lightning_kmpLightningOutgoingPayment {
 			
 				if let normal = lightningPayment.details.asNormal() {
-					return sanitize(normal.paymentRequest.desc())
+					return sanitize(normal.paymentRequest.desc)
 				} else if let swapOut = lightningPayment.details.asSwapOut() {
 					return sanitize(swapOut.address)
 				}
@@ -250,7 +250,7 @@ extension Lightning_kmpOnChainOutgoingPayment {
 	}
 }
 
-extension Lightning_kmpPaymentRequest {
+extension Lightning_kmpBolt11Invoice {
 	
 	var timestampDate: Date {
 		return timestampSeconds.toDate(from: .seconds)

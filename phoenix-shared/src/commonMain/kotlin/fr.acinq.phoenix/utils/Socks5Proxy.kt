@@ -17,10 +17,10 @@
 package fr.acinq.phoenix.utils
 
 import fr.acinq.lightning.io.TcpSocket
+import fr.acinq.lightning.logging.LoggerFactory
+import fr.acinq.lightning.logging.info
 import fr.acinq.tor.Tor
 import fr.acinq.tor.socks.socks5Handshake
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
 
 class Socks5Proxy(
     private val socketBuilder: TcpSocket.Builder,
@@ -29,9 +29,14 @@ class Socks5Proxy(
     private val proxyPort: Int
 ): TcpSocket.Builder {
 
-    val logger = newLogger(loggerFactory)
+    val logger = loggerFactory.newLogger(this::class)
 
-    override suspend fun connect(host: String, port: Int, tls: TcpSocket.TLS, loggerFactory: LoggerFactory): TcpSocket {
+    override suspend fun connect(
+        host: String,
+        port: Int,
+        tls: TcpSocket.TLS,
+        loggerFactory: LoggerFactory,
+    ): TcpSocket {
         val socket = socketBuilder.connect(proxyHost, proxyPort, TcpSocket.TLS.DISABLED, loggerFactory)
         val (cHost, cPort) = socks5Handshake(
             destinationHost = host,
@@ -49,4 +54,11 @@ class Socks5Proxy(
     }
 }
 
-fun TcpSocket.Builder.torProxy(loggerFactory: LoggerFactory) = Socks5Proxy(this, loggerFactory, Tor.SOCKS_ADDRESS, Tor.SOCKS_PORT)
+fun TcpSocket.Builder.torProxy(
+    loggerFactory: LoggerFactory
+) = Socks5Proxy(
+    socketBuilder = this,
+    loggerFactory = loggerFactory,
+    proxyHost = Tor.SOCKS_ADDRESS,
+    proxyPort = Tor.SOCKS_PORT
+)

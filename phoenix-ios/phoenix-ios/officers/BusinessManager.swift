@@ -2,15 +2,13 @@ import UIKit
 import PhoenixShared
 import BackgroundTasks
 import Combine
-import os.log
 
+
+fileprivate let filename = "BusinessManager"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "BusinessManager"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
 enum WalletRestoreType {
@@ -84,10 +82,10 @@ class BusinessManager {
 	// --------------------------------------------------
 	// MARK: Init
 	// --------------------------------------------------
-
+	
 	private init() { // must use shared instance
 		
-		business = PhoenixBusiness(ctx: PlatformContext())
+		business = PhoenixBusiness(ctx: PlatformContext.default)
 		BusinessManager._isTestnet = business.chain.isTestnet()
 	}
 	
@@ -127,7 +125,7 @@ class BusinessManager {
 
 	public func reset() {
 
-		business = PhoenixBusiness(ctx: PlatformContext())
+		business = PhoenixBusiness(ctx: PlatformContext.default)
 		syncManager = nil
 		swapInRejectedPublisher.send(nil)
 		walletInfo = nil
@@ -324,6 +322,19 @@ class BusinessManager {
 				}
 				
 			}.store(in: &cancellables)
+		
+		// Keep Prefs.shared.swapInAddressIndex up-to-date
+		Biz.business.peerManager.peerStatePublisher()
+			.flatMap { $0.swapInWallet.swapInAddressPublisher() }
+			.sink { (newInfo: Lightning_kmpSwapInWallet.SwapInAddressInfo?) in
+				
+				if let newInfo {
+					if Prefs.shared.swapInAddressIndex < newInfo.index {
+						Prefs.shared.swapInAddressIndex = newInfo.index
+					}
+				}
+			}
+			.store(in: &cancellables)
 	}
 	
 	func startTasks() {

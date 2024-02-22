@@ -1,5 +1,5 @@
 # base image to build eclair-core
-FROM eclipse-temurin:11.0.21_9-jdk-alpine as ECLAIR_CORE_BUILD
+FROM eclipse-temurin:17.0.10_7-jdk-alpine as ECLAIR_CORE_BUILD
 
 # this is necessary to extract the eclair-core version that we need to clone for the build
 COPY ./buildSrc/src/main/kotlin/Versions.kt .
@@ -51,7 +51,7 @@ RUN apt-get update -y && \
     apt-get install -y software-properties-common locales && \
     apt-get update -y && \
     locale-gen en_US.UTF-8 && \
-    apt-get install -y openjdk-11-jdk wget git unzip dos2unix
+    apt-get install -y openjdk-17-jdk wget git unzip dos2unix
 
 # fetch and unpack the android sdk
 RUN mkdir /usr/local/android-sdk && \
@@ -69,10 +69,10 @@ RUN echo y | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "build-tools;${AN
 # build tor library
 RUN git clone https://github.com/ACINQ/Tor_Onion_Proxy_Library && \
     cd Tor_Onion_Proxy_Library && \
-    ./gradlew install && \
     ./gradlew :universal:build && \
+    ./gradlew :universal:publishToMavenLocal && \
     ./gradlew :android:build && \
-    ./gradlew :android:publishToMaven
+    ./gradlew :android:publishToMavenLocal
 
 # copy eclair-core dependency
 COPY --from=ECLAIR_CORE_BUILD /root/.m2/repository/fr/acinq/eclair /root/.m2/repository/fr/acinq/eclair

@@ -64,6 +64,7 @@
 		DC1B325029FC3D5900F7F45F /* OnChainDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1B324F29FC3D5900F7F45F /* OnChainDetails.swift */; };
 		DC1D2B4B2593EB860036AD38 /* Currency.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1D2B4A2593EB850036AD38 /* Currency.swift */; };
 		DC1D2B502594CE900036AD38 /* FormattedAmount.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1D2B4F2594CE900036AD38 /* FormattedAmount.swift */; };
+		DC1E75722B73DD500026F36E /* LogFileParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1E75712B73DD500026F36E /* LogFileParser.swift */; };
 		DC26D0BB2A93BD0F006763B3 /* EffectsLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = DC26D0BA2A93BD0F006763B3 /* EffectsLibrary */; };
 		DC27E4C42791C58C00C777CC /* PaymentsBackupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC27E4C32791C58C00C777CC /* PaymentsBackupView.swift */; };
 		DC27E4CB2791D17A00C777CC /* RecoveryPhraseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC27E4C92791D17A00C777CC /* RecoveryPhraseView.swift */; };
@@ -89,6 +90,8 @@
 		DC355E212A44D838008E8A8E /* NotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC355E202A44D838008E8A8E /* NotificationsView.swift */; };
 		DC355E232A45FAF2008E8A8E /* NestedObservableObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC355E222A45FAF2008E8A8E /* NestedObservableObject.swift */; };
 		DC355E252A45FDD3008E8A8E /* NoticeMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC355E242A45FDD3008E8A8E /* NoticeMonitor.swift */; };
+		DC370A892B7FBD7C0093C56F /* BtcAddrOptionsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC370A882B7FBD7C0093C56F /* BtcAddrOptionsSheet.swift */; };
+		DC370A8B2B7FFFC70093C56F /* SwapInAddresses.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC370A8A2B7FFFC70093C56F /* SwapInAddresses.swift */; };
 		DC384D81265C12B700131772 /* Cache.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC384D80265C12B700131772 /* Cache.swift */; };
 		DC384D83265C32F100131772 /* TextField+Verbatim.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC384D82265C32F100131772 /* TextField+Verbatim.swift */; };
 		DC39A2662A12C04D00F59E39 /* LiquidityPolicyHelp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC39A2652A12C04D00F59E39 /* LiquidityPolicyHelp.swift */; };
@@ -165,6 +168,7 @@
 		DC74174B270F332700F7E3E3 /* KotlinTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC74174A270F332700F7E3E3 /* KotlinTypes.swift */; };
 		DC74174D270F455D00F7E3E3 /* AES256.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC74174C270F455D00F7E3E3 /* AES256.swift */; };
 		DC784A112B31EA180018DC4A /* LiquidityAdsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC784A102B31EA180018DC4A /* LiquidityAdsView.swift */; };
+		DC7DA9F62AD84DF200F86B99 /* String+Substring.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC7DA9F52AD84DF200F86B99 /* String+Substring.swift */; };
 		DC81B79F25BF2AA200F5A52C /* MVI.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC81B79E25BF2AA200F5A52C /* MVI.swift */; };
 		DC82EED629789853007A5853 /* TxHistoryExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC82EED529789853007A5853 /* TxHistoryExporter.swift */; };
 		DC89857F25914747007B253F /* UIApplicationState+Phoenix.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC89857E25914747007B253F /* UIApplicationState+Phoenix.swift */; };
@@ -177,6 +181,7 @@
 		DC99E94025BA141000FB20F7 /* LocalWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC99E93F25BA141000FB20F7 /* LocalWebView.swift */; };
 		DC99E94D25BA258C00FB20F7 /* about.html in Resources */ = {isa = PBXBuildFile; fileRef = DC99E94825BA258C00FB20F7 /* about.html */; };
 		DC99E95825BA2BA800FB20F7 /* common.css in Resources */ = {isa = PBXBuildFile; fileRef = DC99E95625BA2BA800FB20F7 /* common.css */; };
+		DC9B15442B7D0DCB0023743B /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = DC9B15432B7D0DCB0023743B /* AsyncAlgorithms */; };
 		DC9B8EE225D72CC200E13818 /* ForceCloseChannelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9B8EE125D72CC200E13818 /* ForceCloseChannelsView.swift */; };
 		DC9E7EC32A12955300A5F1D0 /* LiquidityHTML.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9E7EC22A12955300A5F1D0 /* LiquidityHTML.swift */; };
 		DC9E7EC62A1295B100A5F1D0 /* liquidity.html in Resources */ = {isa = PBXBuildFile; fileRef = DC9E7EC82A1295B100A5F1D0 /* liquidity.html */; };
@@ -239,6 +244,24 @@
 		DCCD045F27EE0301007D57A5 /* SummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCD045E27EE0301007D57A5 /* SummaryView.swift */; };
 		DCCD046127EE045C007D57A5 /* DetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCD046027EE045C007D57A5 /* DetailsView.swift */; };
 		DCCD046327EE04E1007D57A5 /* WalletPaymentExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCD046227EE04E1007D57A5 /* WalletPaymentExtensions.swift */; };
+		DCCFE6A42B63021E002FFF11 /* KotlinLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCFE6A32B63021E002FFF11 /* KotlinLogger.swift */; };
+		DCCFE6A62B63028A002FFF11 /* UnfairLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCFE6A52B63028A002FFF11 /* UnfairLock.swift */; };
+		DCCFE6A72B630836002FFF11 /* KotlinLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCFE6A32B63021E002FFF11 /* KotlinLogger.swift */; };
+		DCCFE6A82B63083F002FFF11 /* UnfairLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCFE6A52B63028A002FFF11 /* UnfairLock.swift */; };
+		DCCFE6AB2B6430AB002FFF11 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = DCCFE6AA2B6430AB002FFF11 /* Logging */; };
+		DCCFE6AE2B64310E002FFF11 /* LoggerFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCFE6AD2B64310E002FFF11 /* LoggerFactory.swift */; };
+		DCCFE6B02B64326F002FFF11 /* OSLogHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCFE6AF2B64326F002FFF11 /* OSLogHandler.swift */; };
+		DCCFE6B22B6445F3002FFF11 /* LogFileHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCFE6B12B6445F3002FFF11 /* LogFileHandler.swift */; };
+		DCCFE6B32B680DF5002FFF11 /* LoggerFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCFE6AD2B64310E002FFF11 /* LoggerFactory.swift */; };
+		DCCFE6B42B680DF9002FFF11 /* OSLogHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCFE6AF2B64326F002FFF11 /* OSLogHandler.swift */; };
+		DCCFE6B72B682E22002FFF11 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = DCCFE6B62B682E22002FFF11 /* Logging */; };
+		DCCFE6B92B69A4FA002FFF11 /* LogFileInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCFE6B82B69A4FA002FFF11 /* LogFileInfo.swift */; };
+		DCCFE6BD2B69A610002FFF11 /* LogFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCFE6BC2B69A610002FFF11 /* LogFileManager.swift */; };
+		DCCFE6BE2B713FB8002FFF11 /* LogFileInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCFE6B82B69A4FA002FFF11 /* LogFileInfo.swift */; };
+		DCCFE6BF2B713FBB002FFF11 /* LogFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCFE6BC2B69A610002FFF11 /* LogFileManager.swift */; };
+		DCCFE6C02B713FBE002FFF11 /* LogFileHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCFE6B12B6445F3002FFF11 /* LogFileHandler.swift */; };
+		DCCFE6C22B7140FA002FFF11 /* LoggerFactory+Foreground.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCFE6C12B7140FA002FFF11 /* LoggerFactory+Foreground.swift */; };
+		DCCFE6C52B714226002FFF11 /* LoggerFactory+Background.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCFE6C32B714171002FFF11 /* LoggerFactory+Background.swift */; };
 		DCD1208728663F4A00EB39C5 /* TransactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD1208628663F4A00EB39C5 /* TransactionsView.swift */; };
 		DCD5FF4326A0D34B009CC666 /* EqualSizes.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD5FF4226A0D34B009CC666 /* EqualSizes.swift */; };
 		DCD777D226DE9FE800979A12 /* DelayedSave.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD777D126DE9FE800979A12 /* DelayedSave.swift */; };
@@ -416,6 +439,7 @@
 		DC1B324F29FC3D5900F7F45F /* OnChainDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnChainDetails.swift; sourceTree = "<group>"; };
 		DC1D2B4A2593EB850036AD38 /* Currency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Currency.swift; sourceTree = "<group>"; };
 		DC1D2B4F2594CE900036AD38 /* FormattedAmount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormattedAmount.swift; sourceTree = "<group>"; };
+		DC1E75712B73DD500026F36E /* LogFileParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogFileParser.swift; sourceTree = "<group>"; };
 		DC27E4C32791C58C00C777CC /* PaymentsBackupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentsBackupView.swift; sourceTree = "<group>"; };
 		DC27E4C92791D17A00C777CC /* RecoveryPhraseView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecoveryPhraseView.swift; sourceTree = "<group>"; };
 		DC27E4CA2791D17A00C777CC /* CloudBackupView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudBackupView.swift; sourceTree = "<group>"; };
@@ -439,6 +463,8 @@
 		DC355E202A44D838008E8A8E /* NotificationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsView.swift; sourceTree = "<group>"; };
 		DC355E222A45FAF2008E8A8E /* NestedObservableObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NestedObservableObject.swift; sourceTree = "<group>"; };
 		DC355E242A45FDD3008E8A8E /* NoticeMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoticeMonitor.swift; sourceTree = "<group>"; };
+		DC370A882B7FBD7C0093C56F /* BtcAddrOptionsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcAddrOptionsSheet.swift; sourceTree = "<group>"; };
+		DC370A8A2B7FFFC70093C56F /* SwapInAddresses.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwapInAddresses.swift; sourceTree = "<group>"; };
 		DC384D7C265BE41900131772 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = fr; path = fr.lproj/about.html; sourceTree = "<group>"; };
 		DC384D80265C12B700131772 /* Cache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Cache.swift; sourceTree = "<group>"; };
 		DC384D82265C32F100131772 /* TextField+Verbatim.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TextField+Verbatim.swift"; sourceTree = "<group>"; };
@@ -502,6 +528,7 @@
 		DC74174A270F332700F7E3E3 /* KotlinTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinTypes.swift; sourceTree = "<group>"; };
 		DC74174C270F455D00F7E3E3 /* AES256.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AES256.swift; sourceTree = "<group>"; };
 		DC784A102B31EA180018DC4A /* LiquidityAdsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidityAdsView.swift; sourceTree = "<group>"; };
+		DC7DA9F52AD84DF200F86B99 /* String+Substring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Substring.swift"; sourceTree = "<group>"; };
 		DC81B79E25BF2AA200F5A52C /* MVI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVI.swift; sourceTree = "<group>"; };
 		DC82EED529789853007A5853 /* TxHistoryExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TxHistoryExporter.swift; sourceTree = "<group>"; };
 		DC89857E25914747007B253F /* UIApplicationState+Phoenix.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplicationState+Phoenix.swift"; sourceTree = "<group>"; };
@@ -567,6 +594,15 @@
 		DCCD045E27EE0301007D57A5 /* SummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryView.swift; sourceTree = "<group>"; };
 		DCCD046027EE045C007D57A5 /* DetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailsView.swift; sourceTree = "<group>"; };
 		DCCD046227EE04E1007D57A5 /* WalletPaymentExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletPaymentExtensions.swift; sourceTree = "<group>"; };
+		DCCFE6A32B63021E002FFF11 /* KotlinLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinLogger.swift; sourceTree = "<group>"; };
+		DCCFE6A52B63028A002FFF11 /* UnfairLock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnfairLock.swift; sourceTree = "<group>"; };
+		DCCFE6AD2B64310E002FFF11 /* LoggerFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerFactory.swift; sourceTree = "<group>"; };
+		DCCFE6AF2B64326F002FFF11 /* OSLogHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OSLogHandler.swift; sourceTree = "<group>"; };
+		DCCFE6B12B6445F3002FFF11 /* LogFileHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogFileHandler.swift; sourceTree = "<group>"; };
+		DCCFE6B82B69A4FA002FFF11 /* LogFileInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogFileInfo.swift; sourceTree = "<group>"; };
+		DCCFE6BC2B69A610002FFF11 /* LogFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogFileManager.swift; sourceTree = "<group>"; };
+		DCCFE6C12B7140FA002FFF11 /* LoggerFactory+Foreground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LoggerFactory+Foreground.swift"; sourceTree = "<group>"; };
+		DCCFE6C32B714171002FFF11 /* LoggerFactory+Background.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LoggerFactory+Background.swift"; sourceTree = "<group>"; };
 		DCD1208628663F4A00EB39C5 /* TransactionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionsView.swift; sourceTree = "<group>"; };
 		DCD5FF4226A0D34B009CC666 /* EqualSizes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EqualSizes.swift; sourceTree = "<group>"; };
 		DCD777D126DE9FE800979A12 /* DelayedSave.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelayedSave.swift; sourceTree = "<group>"; };
@@ -616,10 +652,12 @@
 			files = (
 				DCA5391A29F1DDE7001BD3D5 /* SegmentedPicker in Frameworks */,
 				DC26D0BB2A93BD0F006763B3 /* EffectsLibrary in Frameworks */,
+				DC9B15442B7D0DCB0023743B /* AsyncAlgorithms in Frameworks */,
 				DC46BAE426C6FDD300E760A6 /* CircularCheckmarkProgress in Frameworks */,
 				DCC9D99C267BEB3D00EA36DD /* CloudKit.framework in Frameworks */,
 				DC39D4E5286B4A7E0030F18D /* Popovers in Frameworks */,
 				DCC46F1625C3521C005D32D9 /* FirebaseMessaging in Frameworks */,
+				DCCFE6AB2B6430AB002FFF11 /* Logging in Frameworks */,
 				DCB0DB8A255AE42F005B29C8 /* PhoenixShared.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -642,6 +680,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DCCFE6B72B682E22002FFF11 /* Logging in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -699,6 +738,7 @@
 				DCAEF8F627628BEB00015993 /* Either.swift */,
 				DCDD9ECD28637474001800A3 /* Orientation.swift */,
 				DC355E222A45FAF2008E8A8E /* NestedObservableObject.swift */,
+				DCCFE6A52B63028A002FFF11 /* UnfairLock.swift */,
 			);
 			path = utils;
 			sourceTree = "<group>";
@@ -787,6 +827,7 @@
 				DCACF6EE2566D0A60009B01E /* extensions */,
 				DCA6DEC42829BD060073C658 /* xpc */,
 				DCE3C7A92A6AD39E00F4D385 /* mempool */,
+				DCCFE6AC2B6430BD002FFF11 /* logging */,
 			);
 			path = "phoenix-ios";
 			sourceTree = "<group>";
@@ -889,6 +930,7 @@
 				DC2F431527B6983B0006FCC4 /* CopyOptionsSheet.swift */,
 				DC2F431727B698E20006FCC4 /* ShareOptionsSheet.swift */,
 				DC2F431927B699800006FCC4 /* ModifyInvoiceSheet.swift */,
+				DC370A882B7FBD7C0093C56F /* BtcAddrOptionsSheet.swift */,
 			);
 			path = receive;
 			sourceTree = "<group>";
@@ -911,6 +953,7 @@
 				DC46BAEF26CACCF700E760A6 /* KotlinPublishers+Phoenix.swift */,
 				DCB62F462A5DF19D00912A71 /* KotlinPublishers+Lightning.swift */,
 				DC74174A270F332700F7E3E3 /* KotlinTypes.swift */,
+				DCCFE6A32B63021E002FFF11 /* KotlinLogger.swift */,
 			);
 			path = kotlin;
 			sourceTree = "<group>";
@@ -1139,6 +1182,7 @@
 				DC422F3429392B0500E72253 /* Int+ToDate.swift */,
 				DCB493CA269F3B05001B0F09 /* Result+Deugly.swift */,
 				DC59377027516296003B4B53 /* Sequence+Sum.swift */,
+				DC7DA9F52AD84DF200F86B99 /* String+Substring.swift */,
 				DC09085725B5E43900A46136 /* String+VersionComparison.swift */,
 				DC384D82265C32F100131772 /* TextField+Verbatim.swift */,
 				DC89857E25914747007B253F /* UIApplicationState+Phoenix.swift */,
@@ -1234,6 +1278,29 @@
 			path = inspect;
 			sourceTree = "<group>";
 		};
+		DCCFE6AC2B6430BD002FFF11 /* logging */ = {
+			isa = PBXGroup;
+			children = (
+				DCCFE6AD2B64310E002FFF11 /* LoggerFactory.swift */,
+				DCCFE6C12B7140FA002FFF11 /* LoggerFactory+Foreground.swift */,
+				DCCFE6C32B714171002FFF11 /* LoggerFactory+Background.swift */,
+				DCCFE6AF2B64326F002FFF11 /* OSLogHandler.swift */,
+				DCCFE6BA2B69A502002FFF11 /* fileLogging */,
+			);
+			path = logging;
+			sourceTree = "<group>";
+		};
+		DCCFE6BA2B69A502002FFF11 /* fileLogging */ = {
+			isa = PBXGroup;
+			children = (
+				DCCFE6B82B69A4FA002FFF11 /* LogFileInfo.swift */,
+				DCCFE6BC2B69A610002FFF11 /* LogFileManager.swift */,
+				DCCFE6B12B6445F3002FFF11 /* LogFileHandler.swift */,
+				DC1E75712B73DD500026F36E /* LogFileParser.swift */,
+			);
+			path = fileLogging;
+			sourceTree = "<group>";
+		};
 		DCD1208528663F2D00EB39C5 /* transactions */ = {
 			isa = PBXGroup;
 			children = (
@@ -1299,6 +1366,7 @@
 				DCFAEFC82A72F48700330088 /* SwapInWalletDetails.swift */,
 				DC43096D2A7953F400E28995 /* FinalWalletDetails.swift */,
 				DC43096F2A795F9900E28995 /* UtxoWrapper.swift */,
+				DC370A8A2B7FFFC70093C56F /* SwapInAddresses.swift */,
 			);
 			path = wallet;
 			sourceTree = "<group>";
@@ -1339,6 +1407,8 @@
 				DC39D4E4286B4A7E0030F18D /* Popovers */,
 				DCA5391929F1DDE7001BD3D5 /* SegmentedPicker */,
 				DC26D0BA2A93BD0F006763B3 /* EffectsLibrary */,
+				DCCFE6AA2B6430AB002FFF11 /* Logging */,
+				DC9B15432B7D0DCB0023743B /* AsyncAlgorithms */,
 			);
 			productName = "phoenix-ios";
 			productReference = 7555FF7B242A565900829871 /* Phoenix.app */;
@@ -1414,6 +1484,9 @@
 				DC641C692820786600862DCD /* PBXTargetDependency */,
 			);
 			name = "phoenix-notifySrvExt";
+			packageProductDependencies = (
+				DCCFE6B62B682E22002FFF11 /* Logging */,
+			);
 			productName = "phoenix-notifySrvExt";
 			productReference = DCB511C7281AED58001BC525 /* phoenix-notifySrvExt.appex */;
 			productType = "com.apple.product-type.app-extension";
@@ -1466,6 +1539,8 @@
 				DC39D4E3286B4A7E0030F18D /* XCRemoteSwiftPackageReference "Popovers" */,
 				DCA5391729F1DAA3001BD3D5 /* XCRemoteSwiftPackageReference "SwiftySegmentedPicker" */,
 				DC26D0B82A93BA8C006763B3 /* XCRemoteSwiftPackageReference "effects-library" */,
+				DCCFE6A92B6430AB002FFF11 /* XCRemoteSwiftPackageReference "swift-log" */,
+				DC9B15422B7D0DCB0023743B /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
 			);
 			productRefGroup = 7555FF7C242A565900829871 /* Products */;
 			projectDirPath = "";
@@ -1571,8 +1646,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DCCFE6BD2B69A610002FFF11 /* LogFileManager.swift in Sources */,
 				DC09085825B5E43900A46136 /* String+VersionComparison.swift in Sources */,
 				DC355E212A44D838008E8A8E /* NotificationsView.swift in Sources */,
+				DC7DA9F62AD84DF200F86B99 /* String+Substring.swift in Sources */,
 				DC63BDF729AEB30C0067A361 /* BackgroundPaymentsConfig.swift in Sources */,
 				DC67E40B27F3798600496C04 /* AnimatedMenu.swift in Sources */,
 				DC2F431627B6983B0006FCC4 /* CopyOptionsSheet.swift in Sources */,
@@ -1584,6 +1661,7 @@
 				DC82EED629789853007A5853 /* TxHistoryExporter.swift in Sources */,
 				DC98D3982AF2AE41005BD177 /* ReceiveView.swift in Sources */,
 				DC9E7EC32A12955300A5F1D0 /* LiquidityHTML.swift in Sources */,
+				DCCFE6C22B7140FA002FFF11 /* LoggerFactory+Foreground.swift in Sources */,
 				7555FF7F242A565900829871 /* AppDelegate.swift in Sources */,
 				DC74174B270F332700F7E3E3 /* KotlinTypes.swift in Sources */,
 				DC142135261E72320075857A /* AboutHTML.swift in Sources */,
@@ -1610,6 +1688,7 @@
 				DCD777D226DE9FE800979A12 /* DelayedSave.swift in Sources */,
 				DCEE3E542931446A00EB4DFF /* Collections+AsInt.swift in Sources */,
 				DCACF70E256701870009B01E /* LockView.swift in Sources */,
+				DCCFE6B92B69A4FA002FFF11 /* LogFileInfo.swift in Sources */,
 				DC63BDF929AEB8180067A361 /* BackgroundPaymentsSelector.swift in Sources */,
 				DCB30E542A0AABAF00E7D7A2 /* InfoPopoverWindow.swift in Sources */,
 				DCA6DEC62829BDEB0073C658 /* CrossProcessCommunication.swift in Sources */,
@@ -1619,6 +1698,7 @@
 				DC49FE9B2AC49CB500D8D2E2 /* KotlinExtensions+Lightning.swift in Sources */,
 				DCACF6FA2566D0BA0009B01E /* KeyStoreError.swift in Sources */,
 				DC0E31BB26EFDED4002071C6 /* VSlider.swift in Sources */,
+				DC370A892B7FBD7C0093C56F /* BtcAddrOptionsSheet.swift in Sources */,
 				DC27E4CB2791D17A00C777CC /* RecoveryPhraseView.swift in Sources */,
 				DCB410892902D5BF00CE4FF9 /* PaymentsSection.swift in Sources */,
 				DCA6DED0282AB7E20073C658 /* KeychainConstants.swift in Sources */,
@@ -1634,6 +1714,7 @@
 				DCBA371B2758076F00610EC8 /* SyncSeedManager.swift in Sources */,
 				DC39D4F12874DDF40030F18D /* View+If.swift in Sources */,
 				DCB62F492A5E09F900912A71 /* SpliceOutProblem.swift in Sources */,
+				DC370A8B2B7FFFC70093C56F /* SwapInAddresses.swift in Sources */,
 				53BEFD54160278C5E393E319 /* HomeView.swift in Sources */,
 				DCD1208728663F4A00EB39C5 /* TransactionsView.swift in Sources */,
 				DC118BFC27B4504B0080BBAC /* ScanView.swift in Sources */,
@@ -1649,6 +1730,8 @@
 				DC118C0C27B561210080BBAC /* CurrencyAmount.swift in Sources */,
 				DC04C2632A9009890021F2E8 /* MergeChannelsView.swift in Sources */,
 				DC46BAF726CACCF700E760A6 /* KotlinExtensions+Conversion.swift in Sources */,
+				DCCFE6A42B63021E002FFF11 /* KotlinLogger.swift in Sources */,
+				DCCFE6AE2B64310E002FFF11 /* LoggerFactory.swift in Sources */,
 				DC49FE992AC49C6300D8D2E2 /* KotlinExtensions+Bitcoin.swift in Sources */,
 				DC142140261E72E40075857A /* AnyHTML.swift in Sources */,
 				DC2CE3AF29AFEB0500BA0B00 /* Bundle+Icon.swift in Sources */,
@@ -1701,6 +1784,7 @@
 				DC46BAF426CACCF700E760A6 /* KotlinFlow.swift in Sources */,
 				DCB493CD269F8531001B0F09 /* Int+TimeInterval.swift in Sources */,
 				DC118C0227B453110080BBAC /* PaymentRequestedView.swift in Sources */,
+				DCCFE6B22B6445F3002FFF11 /* LogFileHandler.swift in Sources */,
 				DC422F3529392B0500E72253 /* Int+ToDate.swift in Sources */,
 				DC384D83265C32F100131772 /* TextField+Verbatim.swift in Sources */,
 				DCFA8759260E6F2E00AE8953 /* IntroView.swift in Sources */,
@@ -1722,6 +1806,7 @@
 				DCAC5B7027726FC80077BB98 /* DeepLink.swift in Sources */,
 				DC9473FA261270B4008D7242 /* MVI+Mock.swift in Sources */,
 				DCDD9ECE28637474001800A3 /* Orientation.swift in Sources */,
+				DCCFE6B02B64326F002FFF11 /* OSLogHandler.swift in Sources */,
 				DCDD9ECB28637242001800A3 /* MainView.swift in Sources */,
 				DCDD9ED2286377C5001800A3 /* MainView_Small.swift in Sources */,
 				C8D7AFF5BC5754DBBEEB2688 /* ElectrumConfigurationView.swift in Sources */,
@@ -1733,6 +1818,7 @@
 				DCCC7FD526B0A006008ACD9B /* SquareSize.swift in Sources */,
 				DC2CE54D28A3D2F50070A2E1 /* TruncatableView.swift in Sources */,
 				DCDD9ED628637FD7001800A3 /* AppStatusButton.swift in Sources */,
+				DCCFE6A62B63028A002FFF11 /* UnfairLock.swift in Sources */,
 				DCB493D1269F890D001B0F09 /* SyncTxManager_PendingSettings.swift in Sources */,
 				DCAEF8F727628BEB00015993 /* Either.swift in Sources */,
 				DCA6DECC282AAA740073C658 /* SharedSecurity.swift in Sources */,
@@ -1741,6 +1827,7 @@
 				DCD7E0F128ED89A0009C30E5 /* GlobalEnvironment.swift in Sources */,
 				DC09086325B626B300A46136 /* AppStatusPopover.swift in Sources */,
 				DC0732EC263CA6C3004CB88D /* PaymentOptionsView.swift in Sources */,
+				DC1E75722B73DD500026F36E /* LogFileParser.swift in Sources */,
 				DC49DA8E258BB882005BC4BC /* ScaledButtonStyle.swift in Sources */,
 				DCAEF8D9275E69B000015993 /* SyncSeedManager_State.swift in Sources */,
 				DCB04685260D162C007FDA37 /* ViewName.swift in Sources */,
@@ -1824,7 +1911,10 @@
 				DCA6DED1282ABA930073C658 /* KeychainConstants.swift in Sources */,
 				DCEB2796282D7AAB0096B87E /* KotlinTypes.swift in Sources */,
 				DC9130A02AE045FA00F9B8C6 /* Sequence+Sum.swift in Sources */,
+				DCCFE6C02B713FBE002FFF11 /* LogFileHandler.swift in Sources */,
+				DCCFE6B42B680DF9002FFF11 /* OSLogHandler.swift in Sources */,
 				DCB511CA281AED58001BC525 /* NotificationService.swift in Sources */,
+				DCCFE6A82B63083F002FFF11 /* UnfairLock.swift in Sources */,
 				DCA6DEC82829C3150073C658 /* GenericPasswordStore.swift in Sources */,
 				DCA6DECD282AB10C0073C658 /* SharedSecurity.swift in Sources */,
 				DCEB2799282D7B260096B87E /* KotlinExtensions+Conversion.swift in Sources */,
@@ -1833,20 +1923,25 @@
 				DC641C7B2821726F00862DCD /* FormattedAmount.swift in Sources */,
 				DC641C77282171D200862DCD /* KotlinExtensions+Currency.swift in Sources */,
 				DC641C762821716A00862DCD /* UserDefaults+Serialization.swift in Sources */,
+				DCCFE6BF2B713FBB002FFF11 /* LogFileManager.swift in Sources */,
 				DCF9CFD52862656E001AD33F /* Asserts.swift in Sources */,
 				DC641C7C282172BB00862DCD /* DelayedSave.swift in Sources */,
 				DCA6DECE282AB12B0073C658 /* SecurityFile.swift in Sources */,
 				DC32FB3529A3D3FE009912AC /* XpcManager.swift in Sources */,
+				DCCFE6BE2B713FB8002FFF11 /* LogFileInfo.swift in Sources */,
 				DC49FE9C2AC49E0400D8D2E2 /* KotlinExtensions+Lightning.swift in Sources */,
 				DC6ACC592B10F4FE0079179B /* RecoveryPhrase.swift in Sources */,
 				DCA6DEC72829BFD70073C658 /* CrossProcessCommunication.swift in Sources */,
 				DC641C7428208BD600862DCD /* String+VersionComparison.swift in Sources */,
 				DCA6DEC92829C3180073C658 /* GenericPasswordConvertible.swift in Sources */,
+				DCCFE6A72B630836002FFF11 /* KotlinLogger.swift in Sources */,
 				DCEB2797282D7ADC0096B87E /* KotlinFlow.swift in Sources */,
 				DC641C78282171EA00862DCD /* KotlinAssociatedObject.swift in Sources */,
+				DCCFE6B32B680DF5002FFF11 /* LoggerFactory.swift in Sources */,
 				DCA6DECA2829C31B0073C658 /* KeyStoreError.swift in Sources */,
 				DC49FE9D2AC49E0800D8D2E2 /* KotlinExtensions+Bitcoin.swift in Sources */,
 				DC422F3629392C0000E72253 /* Int+ToDate.swift in Sources */,
+				DCCFE6C52B714226002FFF11 /* LoggerFactory+Background.swift in Sources */,
 				DC641C83282189AC00862DCD /* Utils.swift in Sources */,
 				DC0D2EA8293928E100284608 /* KotlinExtensions+Payments.swift in Sources */,
 			);
@@ -2376,12 +2471,28 @@
 				version = 9.1.0;
 			};
 		};
+		DC9B15422B7D0DCB0023743B /* XCRemoteSwiftPackageReference "swift-async-algorithms" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-async-algorithms.git";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 		DCA5391729F1DAA3001BD3D5 /* XCRemoteSwiftPackageReference "SwiftySegmentedPicker" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/KazaiMazai/SwiftySegmentedPicker.git";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 0.0.2;
+			};
+		};
+		DCCFE6A92B6430AB002FFF11 /* XCRemoteSwiftPackageReference "swift-log" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-log.git";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 1.5.4;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -2412,6 +2523,11 @@
 			package = DC72C2EA25A3CADC008A927A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseMessaging;
 		};
+		DC9B15432B7D0DCB0023743B /* AsyncAlgorithms */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DC9B15422B7D0DCB0023743B /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
+			productName = AsyncAlgorithms;
+		};
 		DCA5391829F1DAA3001BD3D5 /* SegmentedPicker */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = DCA5391729F1DAA3001BD3D5 /* XCRemoteSwiftPackageReference "SwiftySegmentedPicker" */;
@@ -2421,6 +2537,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DCA5391729F1DAA3001BD3D5 /* XCRemoteSwiftPackageReference "SwiftySegmentedPicker" */;
 			productName = SegmentedPicker;
+		};
+		DCCFE6AA2B6430AB002FFF11 /* Logging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DCCFE6A92B6430AB002FFF11 /* XCRemoteSwiftPackageReference "swift-log" */;
+			productName = Logging;
+		};
+		DCCFE6B62B682E22002FFF11 /* Logging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DCCFE6A92B6430AB002FFF11 /* XCRemoteSwiftPackageReference "swift-log" */;
+			productName = Logging;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

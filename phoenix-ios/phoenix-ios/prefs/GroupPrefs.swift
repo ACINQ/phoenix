@@ -1,17 +1,13 @@
 import Foundation
 import Combine
 import PhoenixShared
-import os.log
 
+fileprivate let filename = "GroupPrefs"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "GroupPrefs"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
-
 
 extension UserDefaults {
 	static var group: UserDefaults {

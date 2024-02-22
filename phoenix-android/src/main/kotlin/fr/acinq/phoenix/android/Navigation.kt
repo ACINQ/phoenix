@@ -18,8 +18,7 @@ package fr.acinq.phoenix.android
 
 import androidx.navigation.NavController
 import androidx.navigation.NavOptionsBuilder
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
+import org.slf4j.LoggerFactory
 
 
 sealed class Screen(val route: String) {
@@ -57,6 +56,7 @@ sealed class Screen(val route: String) {
     object Logs : Screen("settings/logs")
     object WalletInfo : Screen("settings/walletinfo") {
         object SwapInWallet: Screen("settings/walletinfo/swapin")
+        object SwapInAddresses: Screen("settings/walletinfo/swapinaddresses")
         object SwapInSigner: Screen("settings/walletinfo/swapinsigner")
         object FinalWallet: Screen("settings/walletinfo/final")
     }
@@ -68,17 +68,17 @@ sealed class Screen(val route: String) {
 }
 
 fun NavController.navigate(screen: Screen, arg: List<Any> = emptyList(), builder: NavOptionsBuilder.() -> Unit = {}) {
-    val log = newLogger(LoggerFactory.default)
+    val log = LoggerFactory.getLogger("NavController")
     val path = arg.joinToString{ "/$it" }
     val route = "${screen.route}$path"
-    log.debug { "navigating from ${currentDestination?.route} to $route" }
+    log.debug("navigating from ${currentDestination?.route} to $route")
     try {
         if (route == currentDestination?.route) {
-            log.warning { "cannot navigate to same route" }
+            log.warn("cannot navigate to same route")
         } else {
             navigate(route, builder)
         }
     } catch (e: Exception) {
-        log.error(e) { "failed to navigate to $route" }
+        log.error("failed to navigate to $route: " , e)
     }
 }

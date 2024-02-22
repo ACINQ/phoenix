@@ -111,6 +111,7 @@
     <string name="receive_bitcoin_title">Bitcoin</string>
     <string name="receive_bitcoin_help">This QR code is a classic Bitcoin address.\n\nIt can be read by almost any Bitcoin service/wallet, but payments will be slower to arrive.</string>
     <string name="receive_bitcoin_address_label">Address</string>
+    <string name="receive_bitcoin_generating">Synchronizing address…</string>
     <string name="receive_bitcoin_error">Could not generate a bitcoin address</string>
     <string name="receive_bitcoin_share_title">Bitcoin address</string>
     <string name="receive_bitcoin_share_subject">Share this Bitcoin address with…</string>
@@ -201,6 +202,7 @@
 
     <string name="accessibility_link">Open link in a browser</string>
     <string name="accessibility_explorer_link">Open transaction in an explorer</string>
+    <string name="accessibility_address_explorer_link">Open address in an explorer</string>
     <string name="validation_empty">This field cannot be blank</string>
     <string name="validation_invalid_amount">Please enter a valid amount</string>
     <string name="validation_invalid_number">Please enter a valid number</string>
@@ -628,6 +630,12 @@
 
     <string name="paymentsettings_lnurlauth_scheme_title">LNURL authentication scheme</string>
 
+    <string name="paymentsettings_swap_format_title">Bitcoin address format</string>
+    <string name="paymentsettings_swap_format_legacy_title">Legacy</string>
+    <string name="paymentsettings_swap_format_legacy_desc">A less efficient and less private format that does not rotate addresses. However, it is compatible with almost every services and wallets.</string>
+    <string name="paymentsettings_swap_format_taproot_title">Taproot (recommended)</string>
+    <string name="paymentsettings_swap_format_taproot_desc">Default format, with better privacy, cheaper fees and address rotation. Some services or wallets may however not understand the address.</string>
+
     <!-- settings: currencies -->
 
     <string name="currency_ars_official">Argentine Peso (official rate)</string>
@@ -669,10 +677,13 @@
     <!-- settings: wallet info -->
 
     <string name="walletinfo_title">Wallet info</string>
+    <string name="walletinfo_descriptor_legacy">Legacy descriptor</string>
     <string name="walletinfo_descriptor">Descriptor</string>
     <string name="walletinfo_swapin_user_pubkey">User public key</string>
+    <string name="walletinfo_swapin_addresses">Swap addresses</string>
     <string name="walletinfo_xpub">Master public key</string>
     <string name="walletinfo_path">(Path: %1$s)</string>
+
     <string name="walletinfo_swappable_title">Ready for swap</string>
     <string name="walletinfo_confirming_title">Waiting for %1$d confirmations</string>
     <string name="walletinfo_confirming_more">+%1$d more…</string>
@@ -680,6 +691,11 @@
     <string name="walletinfo_unconfirmed_title">Unconfirmed balance</string>
     <string name="walletinfo_incoming_balance">+%1$s incoming</string>
     <string name="walletinfo_loading_data">Loading wallet data…</string>
+
+    <string name="swapinaddresses_title">Swap-in addresses</string>
+    <string name="swapinaddresses_sync">Synchronizing…</string>
+    <string name="swapinaddresses_taproot">Taproot</string>
+    <string name="swapinaddresses_legacy">Legacy</string>
 
     <string name="walletinfo_lightning">Lightning</string>
     <string name="walletinfo_nodeid">Node id</string>
@@ -724,7 +740,8 @@
     <string name="splice_error_nochannels">You don\'t have any channels</string>
     <string name="splice_error_aborted_by_peer">Aborted by peer [%1$s]</string>
     <string name="splice_error_cannot_create_commit">Unable to create a new commitment</string>
-    <string name="splice_error_channel_not_idle">Channel is not available</string>
+    <string name="splice_error_concurrent_remote">There\'s another splice in progress</string>
+    <string name="splice_error_channel_not_quiescent">Aborted due to an error</string>
     <string name="splice_error_disconnected">Channel is disconnected</string>
     <string name="splice_error_funding_error">Funding has failed [%1$s]</string>
     <string name="splice_error_insufficient_funds">Not enough funds</string>

@@ -17,7 +17,6 @@
 package fr.acinq.phoenix.utils
 
 import fr.acinq.bitcoin.ByteVector
-import fr.acinq.lightning.Lightning
 import fr.acinq.lightning.utils.toByteVector
 import fr.acinq.phoenix.data.lnurl.LnurlPay
 import org.junit.Assert

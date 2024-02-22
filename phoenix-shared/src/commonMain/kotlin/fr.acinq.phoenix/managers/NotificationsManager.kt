@@ -17,19 +17,19 @@
 package fr.acinq.phoenix.managers
 
 import fr.acinq.lightning.LiquidityEvents
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.Notification
 import fr.acinq.phoenix.data.WatchTowerOutcome
 import fr.acinq.phoenix.db.SqliteAppDb
+import fr.acinq.lightning.logging.debug
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
 
 class NotificationsManager(
     private val loggerFactory: LoggerFactory,
@@ -41,7 +41,7 @@ class NotificationsManager(
         appDb = business.appDb,
     )
 
-    private val log = newLogger(loggerFactory)
+    private val log = loggerFactory.newLogger(this::class)
 
     private val _notifications = MutableStateFlow<List<Pair<Set<UUID>, Notification>>>(emptyList())
     /**

@@ -1,13 +1,10 @@
 import SwiftUI
-import os.log
 
+fileprivate let filename = "LockView"
 #if DEBUG && false
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "LockView"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
 struct LockView: View {

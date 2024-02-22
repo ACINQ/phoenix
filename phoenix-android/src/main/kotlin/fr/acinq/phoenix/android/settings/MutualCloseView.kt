@@ -32,6 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
+import fr.acinq.bitcoin.BitcoinError
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.utils.msat
 import fr.acinq.phoenix.android.*
@@ -42,12 +43,10 @@ import fr.acinq.phoenix.android.payments.CameraPermissionsView
 import fr.acinq.phoenix.android.payments.ScannerView
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.monoTypo
 import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.controllers.config.CloseChannelsConfiguration
-import fr.acinq.phoenix.controllers.payments.Scan
-import fr.acinq.phoenix.data.BitcoinAddressError
+import fr.acinq.phoenix.data.BitcoinUriError
 import fr.acinq.phoenix.utils.Parser
 
 
@@ -55,7 +54,6 @@ import fr.acinq.phoenix.utils.Parser
 fun MutualCloseView(
     onBackClick: () -> Unit,
 ) {
-    val log = logger("MutualCloseView")
     val context = LocalContext.current
     val balance by business.balanceManager.balance.collectAsState(0.msat)
 
@@ -162,8 +160,11 @@ fun MutualCloseView(
                                         is Either.Left -> {
                                             val error = validation.value
                                             addressErrorMessage = when (error) {
-                                                is BitcoinAddressError.ChainMismatch -> context.getString(R.string.mutualclose_error_chain_mismatch)
-                                                is BitcoinAddressError.UnhandledRequiredParams -> context.getString(R.string.mutualclose_error_chain_reqparams)
+                                                is BitcoinUriError.InvalidScript -> when (error.error) {
+                                                    is BitcoinError.ChainHashMismatch -> context.getString(R.string.mutualclose_error_chain_mismatch)
+                                                    else -> context.getString(R.string.mutualclose_error_chain_generic)
+                                                }
+                                                is BitcoinUriError.UnhandledRequiredParams -> context.getString(R.string.mutualclose_error_chain_reqparams)
                                                 else -> context.getString(R.string.mutualclose_error_chain_generic)
                                             }
                                         }

@@ -18,9 +18,8 @@ package fr.acinq.phoenix.utils
 
 import fr.acinq.bitcoin.*
 import fr.acinq.bitcoin.utils.Either
-import fr.acinq.lightning.NodeParams
-import fr.acinq.lightning.payment.PaymentRequest
-import fr.acinq.lightning.utils.Try
+import fr.acinq.bitcoin.utils.Try
+import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.data.*
 import io.ktor.http.*
@@ -69,9 +68,9 @@ object Parser {
     }
 
     /** Reads a payment request after stripping prefixes. Return null if input is invalid. */
-    fun readPaymentRequest(
+    fun readBolt11Invoice(
         input: String
-    ): PaymentRequest? = when (val res = PaymentRequest.read(trimMatchingPrefix(removeExcessInput(input), lightningPrefixes))) {
+    ): Bolt11Invoice? = when (val res = Bolt11Invoice.read(trimMatchingPrefix(removeExcessInput(input), lightningPrefixes))) {
         is Try.Success -> res.get()
         is Try.Failure -> null
     }
@@ -83,14 +82,14 @@ object Parser {
      * @param input can range from a basic bitcoin address to a sophisticated Bitcoin URI with a prefix and parameters.
      */
     fun readBitcoinAddress(
-        chain: NodeParams.Chain,
+        chain: Chain,
         input: String
-    ): Either<BitcoinAddressError, BitcoinUri> {
+    ): Either<BitcoinUriError, BitcoinUri> {
         val cleanInput = removeExcessInput(input)
         val url = try {
             Url(cleanInput)
         } catch (e: Exception) {
-            return Either.Left(BitcoinAddressError.UnknownFormat)
+            return Either.Left(BitcoinUriError.InvalidUri)
         }
 
         // -- get address
@@ -101,7 +100,7 @@ object Parser {
         // -- read parameters
         val requiredParams = url.parameters.entries().filter { it.key.startsWith("req-") }.map { it.key to it.value.joinToString(";") }
         if (requiredParams.isNotEmpty()) {
-            return Either.Left(BitcoinAddressError.UnhandledRequiredParams(requiredParams))
+            return Either.Left(BitcoinUriError.UnhandledRequiredParams(requiredParams))
         }
 
         val amountSplit = url.parameters["amount"]?.trim()?.split(".", ignoreCase = true, limit = 2)
@@ -117,7 +116,7 @@ object Parser {
         val label = url.parameters["label"]
         val message = url.parameters["message"]
         val lightning = url.parameters["lightning"]?.let {
-            when (val res = PaymentRequest.read(it)) {
+            when (val res = Bolt11Invoice.read(it)) {
                 is Try.Success -> res.get()
                 is Try.Failure -> null
             }
@@ -128,26 +127,14 @@ object Parser {
             })
         }.build()
 
-        return when (Bitcoin.addressToPublicKeyScript(chain.chainHash, address)) {
-            is AddressToPublicKeyScriptResult.Success -> {
-                Either.Right(BitcoinUri(chain, address, label, message, amount, lightning, otherParams))
-            }
-            AddressToPublicKeyScriptResult.Failure.ChainHashMismatch -> {
-                Either.Left(BitcoinAddressError.ChainMismatch(chain))
-            }
-            AddressToPublicKeyScriptResult.Failure.InvalidAddress, AddressToPublicKeyScriptResult.Failure.InvalidBech32Address,
-            is AddressToPublicKeyScriptResult.Failure.InvalidWitnessVersion -> {
-                Either.Left(BitcoinAddressError.UnknownFormat)
-            }
+        return when (val res = Bitcoin.addressToPublicKeyScript(chain.chainHash, address)) {
+            is Either.Left -> Either.Left(BitcoinUriError.InvalidScript(res.left))
+            is Either.Right -> Either.Right(BitcoinUri(chain, address, res.right.let { Script.write(it) }.byteVector(), label, message, amount, lightning, otherParams))
         }
     }
 
     /** Transforms a bitcoin address into a public key script if valid, otherwise returns null. */
-    fun addressToPublicKeyScript(chain: NodeParams.Chain, address: String): ByteArray? {
-        return readBitcoinAddress(chain, address).right?.let {
-            Bitcoin.addressToPublicKeyScript(chain.chainHash, it.address).result
-        }?.let {
-            Script.write(it)
-        }
+    fun addressToPublicKeyScriptOrNull(chain: Chain, address: String): ByteVector? {
+        return readBitcoinAddress(chain, address).right?.script
     }
 }

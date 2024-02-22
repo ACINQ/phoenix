@@ -3,15 +3,12 @@ import Network
 import Combine
 import CloudKit
 import PhoenixShared
-import os.log
 
+fileprivate let filename = "SyncManager"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "SyncManager"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
 /// Common code utilized by both:
@@ -28,7 +25,7 @@ class SyncManager {
 	private var cancellables = Set<AnyCancellable>()
 	
 	init(
-		chain: Lightning_kmpNodeParams.Chain,
+		chain: Bitcoin_kmpChain,
 		recoveryPhrase: RecoveryPhrase,
 		cloudKey: Bitcoin_kmpByteVector32,
 		encryptedNodeId: String

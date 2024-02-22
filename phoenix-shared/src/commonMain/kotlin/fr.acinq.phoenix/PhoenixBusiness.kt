@@ -16,10 +16,12 @@
 
 package fr.acinq.phoenix
 
-import fr.acinq.lightning.NodeParams
+import fr.acinq.bitcoin.Chain
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.io.TcpSocket
+import fr.acinq.lightning.logging.LoggerFactory
+import fr.acinq.lightning.logging.debug
 import fr.acinq.phoenix.controllers.*
 import fr.acinq.phoenix.controllers.config.*
 import fr.acinq.phoenix.controllers.init.AppInitController
@@ -34,6 +36,7 @@ import fr.acinq.phoenix.db.SqliteAppDb
 import fr.acinq.phoenix.db.createAppDbDriver
 import fr.acinq.phoenix.managers.*
 import fr.acinq.phoenix.utils.*
+import fr.acinq.phoenix.utils.logger.PhoenixLoggerConfig
 import fr.acinq.tor.Tor
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -43,24 +46,14 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.cancel
 import kotlinx.serialization.json.Json
-import org.kodein.log.LoggerFactory
-import org.kodein.log.frontend.defaultLogFrontend
-import org.kodein.log.newLogger
-import org.kodein.log.withShortPackageKeepLast
-import org.kodein.memory.file.Path
-import org.kodein.memory.file.resolve
 import kotlin.time.Duration.Companion.seconds
 
 class PhoenixBusiness(
     internal val ctx: PlatformContext
 ) {
-    internal val logMemory = LogMemory(Path(getApplicationFilesDirectoryPath(ctx)).resolve("logs"))
-
-    val loggerFactory = LoggerFactory(
-        defaultLogFrontend.withShortPackageKeepLast(1),
-        logMemory.withShortPackageKeepLast(1)
-    )
-
+    // this logger factory will be used throughout the project (including dependencies like lightning-kmp) to
+    // create new [Logger] instances, and output logs to platform dependent writers.
+    val loggerFactory = LoggerFactory(PhoenixLoggerConfig(ctx))
     private val logger = loggerFactory.newLogger(this::class)
 
     private val tcpSocketBuilder = TcpSocket.Builder()
@@ -81,7 +74,7 @@ class PhoenixBusiness(
         }
     }
 
-    val chain: NodeParams.Chain = NodeParamsManager.chain
+    val chain: Chain = NodeParamsManager.chain
 
     val electrumClient by lazy { ElectrumClient(scope = MainScope(), loggerFactory = loggerFactory, pingInterval = 30.seconds, rpcTimeout = 10.seconds) }
     internal val electrumWatcher by lazy { ElectrumWatcher(electrumClient, MainScope(), loggerFactory) }
@@ -136,7 +129,6 @@ class PhoenixBusiness(
         currencyManager.cancel()
         lnurlManager.cancel()
         notificationsManager.cancel()
-        logMemory.cancel()
     }
 
     // The (node_id, fcm_token) tuple only needs to be registered once.
@@ -171,9 +163,6 @@ class PhoenixBusiness(
 
         override fun electrumConfiguration(): ElectrumConfigurationController =
             AppElectrumConfigurationController(_this)
-
-        override fun logsConfiguration(): LogsConfigurationController =
-            AppLogsConfigurationController(_this)
 
         override fun closeChannelsConfiguration(): CloseChannelsConfigurationController =
             AppCloseChannelsConfigurationController(_this, isForceClose = false)

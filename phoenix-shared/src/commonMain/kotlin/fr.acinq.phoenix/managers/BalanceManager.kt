@@ -8,17 +8,17 @@ import fr.acinq.lightning.blockchain.electrum.balance
 import fr.acinq.lightning.channel.states.ChannelState
 import fr.acinq.lightning.channel.states.PersistedChannelState
 import fr.acinq.lightning.io.Peer
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.sum
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.utils.extensions.localBalance
+import fr.acinq.lightning.logging.debug
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
 
 class BalanceManager(
     loggerFactory: LoggerFactory,
@@ -32,7 +32,7 @@ class BalanceManager(
         databaseManager = business.databaseManager
     )
 
-    private val log = newLogger(loggerFactory)
+    private val log = loggerFactory.newLogger(this::class)
 
     /** The aggregated channels' balance. This is the user's LN funds in the wallet. See [ChannelState.localBalance] */
     private val _balance = MutableStateFlow<MilliSatoshi?>(null)
@@ -86,14 +86,9 @@ class BalanceManager(
      */
     private suspend fun monitorSwapInBalance(peer: Peer) {
         val swapInParams = peer.walletParams.swapInParams
-        combine(peer.currentTipFlow.filterNotNull(), peer.channelsFlow, peer.swapInWallet.walletStateFlow) { (currentBlockHeight, _), channels, swapInWallet ->
+        combine(peer.currentTipFlow.filterNotNull(), peer.channelsFlow, peer.swapInWallet.wallet.walletStateFlow) { (currentBlockHeight, _), channels, swapInWallet ->
             val reservedInputs = SwapInManager.reservedWalletInputs(channels.values.filterIsInstance<PersistedChannelState>())
-            val walletWithoutReserved = WalletState(
-                addresses = swapInWallet.addresses.map { (address, unspent) ->
-                    address to unspent.filterNot { reservedInputs.contains(it.outPoint) }
-                }.toMap().filter { it.value.isNotEmpty() },
-                parentTxs = swapInWallet.parentTxs,
-            )
+            val walletWithoutReserved = swapInWallet.withoutReservedUtxos(reservedInputs)
             walletWithoutReserved.withConfirmations(
                 currentBlockHeight = currentBlockHeight,
                 swapInParams = swapInParams

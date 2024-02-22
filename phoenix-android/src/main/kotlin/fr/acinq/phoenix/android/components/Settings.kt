@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -99,6 +100,7 @@ fun SettingWithCopy(
     }
 }
 
+/** Static setting with composable description, and decoration to the left of the title. */
 @Composable
 fun SettingWithDecoration(
     modifier: Modifier = Modifier,
@@ -162,7 +164,7 @@ fun SettingInteractive(
     Column(
         modifier
             .fillMaxWidth()
-            .clickable(onClick = { if (enabled) onClick() })
+            .clickable(onClickLabel = title, role = Role.Button, onClick = { if (enabled) onClick() })
             .enableOrFade(enabled)
             .padding(horizontal = 16.dp, vertical = 12.dp),
     ) {

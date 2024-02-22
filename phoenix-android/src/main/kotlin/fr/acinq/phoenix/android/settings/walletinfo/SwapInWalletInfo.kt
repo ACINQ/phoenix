@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 ACINQ SAS
+ * Copyright 2024 ACINQ SAS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,8 +69,9 @@ import java.text.DecimalFormat
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
+
 @Composable
-fun SwapInWalletInfo(
+fun SwapInWallet(
     onBackClick: () -> Unit,
     onViewChannelPolicyClick: () -> Unit,
     onAdvancedClick: () -> Unit,
@@ -90,7 +91,7 @@ fun SwapInWalletInfo(
                 IconPopup(
                     popupMessage = stringResource(id = R.string.walletinfo_onchain_swapin_help),
                     popupLink = stringResource(id = R.string.walletinfo_onchain_swapin_help_faq_link)
-                        to "https://phoenix.acinq.co/faq#can-i-deposit-funds-on-chain-to-phoenix-and-how-long-does-it-take-before-i-can-use-it"
+                            to "https://phoenix.acinq.co/faq#can-i-deposit-funds-on-chain-to-phoenix-and-how-long-does-it-take-before-i-can-use-it"
                 )
                 Spacer(Modifier.weight(1f))
                 Box(contentAlignment = Alignment.TopEnd) {

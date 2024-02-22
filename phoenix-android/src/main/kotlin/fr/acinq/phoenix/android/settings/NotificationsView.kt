@@ -50,7 +50,6 @@ import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.safeLet
 import fr.acinq.phoenix.data.Notification
 import fr.acinq.phoenix.data.WatchTowerOutcome
@@ -63,7 +62,6 @@ fun NotificationsView(
     noticesViewModel: NoticesViewModel,
     onBackClick: () -> Unit,
 ) {
-    val log = logger("NotificationsView")
     val notificationsManager = business.notificationsManager
     // TODO: filter rejected payments where the fee policy was X, but the fee policy is now Y
     val notices = noticesViewModel.notices.sortedBy { it.priority }

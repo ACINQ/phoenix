@@ -658,7 +658,6 @@
     <string name="splice_error_nochannels">Nemáte žádné kanály</string>
     <string name="splice_error_aborted_by_peer">Prerušeno peerem [%1$s]</string>
     <string name="splice_error_cannot_create_commit">Nelze vytvořit nový commitment</string>
-    <string name="splice_error_channel_not_idle">Kanál není dostupný</string>
     <string name="splice_error_disconnected">Kanál je odpojený</string>
     <string name="splice_error_funding_error">Financování selhalo [%1$s]</string>
     <string name="splice_error_insufficient_funds">Nedostatek prostředků</string>

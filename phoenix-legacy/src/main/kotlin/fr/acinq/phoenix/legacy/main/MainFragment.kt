@@ -72,7 +72,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
 
   private lateinit var blinkingAnimation: Animation
 
-  private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _: SharedPreferences, key: String ->
+  private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _: SharedPreferences, key: String? ->
     if (key == Prefs.PREFS_SHOW_AMOUNT_IN_FIAT) {
       refreshIncomingFundsAmountField()
     }

@@ -53,7 +53,6 @@ import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.payments.spliceout.spliceFailureDetails
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.data.BitcoinUnit
 
@@ -63,8 +62,6 @@ fun CpfpView(
     channelId: ByteVector32,
     onSuccess: () -> Unit,
 ) {
-    val logger = logger("CpfpView")
-
     val peerManager = business.peerManager
     val vm = viewModel<CpfpViewModel>(factory = CpfpViewModel.Factory(peerManager))
     val mempoolFeerate by business.appConfigurationManager.mempoolFeerate.collectAsState()

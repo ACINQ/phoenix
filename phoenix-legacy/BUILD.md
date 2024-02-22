@@ -21,8 +21,9 @@ Phoenix uses a library to manage the communication with the tor binary. This lib
 ```shell
 ./gradlew install
 ./gradlew :universal:build
+./gradlew :universal:publishToMavenLocal
 ./gradlew :android:build
-./gradlew :android:publishToMaven
+./gradlew :android:publishToMavenLocal
 ```
 
 ## Troubleshooting

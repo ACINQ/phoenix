@@ -1,15 +1,12 @@
 import Foundation
 import Combine
 import PhoenixShared
-import os.log
 
+fileprivate let filename = "KotlinPublishers+Lightning"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "KotlinPublishers+Lightning"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
 extension Lightning_kmpPeer {
@@ -97,6 +94,41 @@ extension Lightning_kmpNodeParams {
 				self.nodeEvents
 			)
 			.compactMap { $0 }
+			.eraseToAnyPublisher()
+		}
+	}
+}
+
+extension Lightning_kmpSwapInWallet {
+	
+	fileprivate struct _Key {
+		static var swapInAddressPublisher = 0
+	}
+	
+	struct SwapInAddressInfo {
+		let addr: String
+		let index: Int
+	}
+	
+	func swapInAddressPublisher() -> AnyPublisher<SwapInAddressInfo?, Never> {
+		
+		self.getSetAssociatedObject(storageKey: &_Key.swapInAddressPublisher) {
+			
+			/// Transforming from Kotlin:
+			/// `MutableStateFlow<Pair<String, Int>?>`
+			KotlinCurrentValueSubject<KotlinPair<NSString, KotlinInt>>(
+				self.swapInAddressFlow
+			)
+			.map {
+				if let pair = $0,
+				   let addr = pair.first as? String,
+				   let index = pair.second
+				{
+					return SwapInAddressInfo(addr: addr, index: index.intValue)
+				} else {
+					return nil
+				}
+			}
 			.eraseToAnyPublisher()
 		}
 	}

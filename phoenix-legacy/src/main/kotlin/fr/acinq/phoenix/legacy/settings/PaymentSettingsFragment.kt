@@ -48,7 +48,7 @@ class PaymentSettingsFragment : BaseFragment(stayIfNotStarted = true) {
   override val log: Logger = LoggerFactory.getLogger(this::class.java)
   private lateinit var mBinding: FragmentSettingsPaymentBinding
 
-  private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _: SharedPreferences, key: String ->
+  private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _: SharedPreferences, key: String? ->
     if (key == Prefs.PREFS_PAYMENT_DEFAULT_DESCRIPTION
       || key == Prefs.PREFS_PAYMENTS_EXPIRY_SEC
       || key == Prefs.PREFS_CUSTOM_MAX_BASE_TRAMPOLINE_FEE || key == Prefs.PREFS_CUSTOM_MAX_PROPORTIONAL_TRAMPOLINE_FEE

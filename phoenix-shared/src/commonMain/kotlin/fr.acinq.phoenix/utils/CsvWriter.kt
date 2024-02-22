@@ -1,7 +1,10 @@
 package fr.acinq.phoenix.utils
 
 import fr.acinq.lightning.db.*
+import fr.acinq.lightning.payment.Bolt11Invoice
+import fr.acinq.lightning.payment.Bolt12Invoice
 import fr.acinq.phoenix.data.WalletPaymentInfo
+import fr.acinq.phoenix.utils.extensions.nodeId
 import kotlinx.datetime.Instant
 
 class CsvWriter {
@@ -11,7 +14,6 @@ class CsvWriter {
         val includesDescription: Boolean,
         val includesNotes: Boolean,
         val includesOriginDestination: Boolean,
-        val swapInAddress: String
     )
 
     companion object {
@@ -124,11 +126,7 @@ class CsvWriter {
                         is IncomingPayment.Origin.KeySend -> "Incoming LN payment (keysend)"
                         is IncomingPayment.Origin.SwapIn -> "Swap-in to ${origin.address ?: "N/A"}"
                         is IncomingPayment.Origin.OnChain -> {
-                            // append txs ids if any, nothing otherwise
-                            val inputs = origin.localInputs.takeIf { it.isNotEmpty() }?.joinToString("\n- ") {
-                                it.txid.toString()
-                            }?.let { "\n$it" } ?: ""
-                            "Swap-in to ${config.swapInAddress}$inputs"
+                            "Swap-in with inputs: ${origin.localInputs.map { it.txid.toString() } }"
                         }
                     }
                     is LightningOutgoingPayment -> when (val details = payment.details) {

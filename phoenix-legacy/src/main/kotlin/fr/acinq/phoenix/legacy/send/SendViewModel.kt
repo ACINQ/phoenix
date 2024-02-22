@@ -81,7 +81,7 @@ class SendViewModel : ViewModel() {
 
   // ---- computed values from payment request
 
-  val description: LiveData<String> = Transformations.map(state) {
+  val description: LiveData<String> = state.map {
     when {
       it is SendState.Lightning && it.pr.description().isLeft -> it.pr.description().left().get()
       it is SendState.Lightning && it.pr.description().isRight -> it.pr.description().right().get().toString()
@@ -89,7 +89,7 @@ class SendViewModel : ViewModel() {
     }
   }
 
-  val destination: LiveData<String> = Transformations.map(state) {
+  val destination: LiveData<String> = state.map {
     when (it) {
       is SendState.Lightning -> it.pr.nodeId().toString()
       is SendState.Onchain -> it.uri.address
@@ -97,7 +97,7 @@ class SendViewModel : ViewModel() {
     }
   }
 
-  val isFormVisible: LiveData<Boolean> = Transformations.map(state) { state ->
+  val isFormVisible: LiveData<Boolean> = state.map { state ->
     state !is SendState.CheckingInvoice && state !is SendState.InvalidInvoice && state !is SendState.Onchain.SwapOutServiceDisabled
   }
 

@@ -22,9 +22,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.Satoshi
-import fr.acinq.bitcoin.byteVector
-import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.ChannelCommand
@@ -55,7 +54,7 @@ sealed class SpliceOutState {
     }
 }
 
-class SpliceOutViewModel(private val peerManager: PeerManager, private val chain: NodeParams.Chain): ViewModel() {
+class SpliceOutViewModel(private val peerManager: PeerManager, private val chain: Chain): ViewModel() {
     val log = LoggerFactory.getLogger(this::class.java)
     var state by mutableStateOf<SpliceOutState>(SpliceOutState.Init)
 
@@ -72,7 +71,7 @@ class SpliceOutViewModel(private val peerManager: PeerManager, private val chain
             state = SpliceOutState.Preparing(userAmount = amount, feeratePerByte = feeratePerByte)
             log.debug("preparing splice-out for amount=$amount feerate=${feeratePerByte}sat/vb address=$address")
             val userFeerate = FeeratePerKw(FeeratePerByte(feeratePerByte))
-            val scriptPubKey = Parser.addressToPublicKeyScript(chain, address)!!.byteVector()
+            val scriptPubKey = Parser.addressToPublicKeyScriptOrNull(chain, address)!!
             val res = peerManager.getPeer().estimateFeeForSpliceOut(
                 amount = amount,
                 targetFeerate = userFeerate,
@@ -107,7 +106,7 @@ class SpliceOutViewModel(private val peerManager: PeerManager, private val chain
             }) {
                 val response = peerManager.getPeer().spliceOut(
                     amount = amount,
-                    scriptPubKey = Parser.addressToPublicKeyScript(chain, address)!!.byteVector(),
+                    scriptPubKey = Parser.addressToPublicKeyScriptOrNull(chain, address)!!,
                     feerate = feerate,
                 )
                 when (response) {
@@ -129,7 +128,7 @@ class SpliceOutViewModel(private val peerManager: PeerManager, private val chain
     }
 
     class Factory(
-        private val peerManager: PeerManager, private val chain: NodeParams.Chain
+        private val peerManager: PeerManager, private val chain: Chain
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")

@@ -1,10 +1,10 @@
 package fr.acinq.phoenix.utils
 
+import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.TxId
-import fr.acinq.lightning.NodeParams
 
 
-class BlockchainExplorer(private val chain: NodeParams.Chain) {
+class BlockchainExplorer(private val chain: Chain) {
 
     sealed class Website(val base: String) {
         object MempoolSpace: Website("https://mempool.space")
@@ -15,16 +15,18 @@ class BlockchainExplorer(private val chain: NodeParams.Chain) {
         return when (website) {
             Website.MempoolSpace -> {
                 when (chain) {
-                    NodeParams.Chain.Mainnet -> "${website.base}/tx/$txId"
-                    NodeParams.Chain.Testnet -> "${website.base}/testnet/tx/$txId"
-                    NodeParams.Chain.Regtest -> "${website.base}/_REGTEST_/tx/$txId"
+                    Chain.Mainnet -> "${website.base}/tx/$txId"
+                    Chain.Testnet -> "${website.base}/testnet/tx/$txId"
+                    Chain.Signet -> "${website.base}/signet/tx/$txId"
+                    Chain.Regtest -> "${website.base}/_REGTEST_/tx/$txId"
                 }
             }
             Website.BlockstreamInfo -> {
                 when (chain) {
-                    NodeParams.Chain.Mainnet -> "${website.base}/tx/$txId"
-                    NodeParams.Chain.Testnet -> "${website.base}/testnet/tx/$txId"
-                    NodeParams.Chain.Regtest -> "${website.base}/_REGTEST_/tx/$txId"
+                    Chain.Mainnet -> "${website.base}/tx/$txId"
+                    Chain.Testnet -> "${website.base}/testnet/tx/$txId"
+                    Chain.Signet -> "${website.base}/signet/tx/$txId"
+                    Chain.Regtest -> "${website.base}/_REGTEST_/tx/$txId"
                 }
             }
         }
@@ -34,16 +36,18 @@ class BlockchainExplorer(private val chain: NodeParams.Chain) {
         return when (website) {
             Website.MempoolSpace -> {
                 when (chain) {
-                    NodeParams.Chain.Mainnet -> "${website.base}/address/$addr"
-                    NodeParams.Chain.Testnet -> "${website.base}/testnet/address/$addr"
-                    NodeParams.Chain.Regtest -> "${website.base}/_REGTEST_/address/$addr"
+                    Chain.Mainnet -> "${website.base}/address/$addr"
+                    Chain.Testnet -> "${website.base}/testnet/address/$addr"
+                    Chain.Signet -> "${website.base}/signet/address/$addr"
+                    Chain.Regtest -> "${website.base}/_REGTEST_/address/$addr"
                 }
             }
             Website.BlockstreamInfo -> {
                 when (chain) {
-                    NodeParams.Chain.Mainnet -> "${website.base}/address/$addr"
-                    NodeParams.Chain.Testnet -> "${website.base}/testnet/address/$addr"
-                    NodeParams.Chain.Regtest -> "${website.base}/_REGTEST_/address/$addr"
+                    Chain.Mainnet -> "${website.base}/address/$addr"
+                    Chain.Testnet -> "${website.base}/testnet/address/$addr"
+                    Chain.Signet -> "${website.base}/signet/address/$addr"
+                    Chain.Regtest -> "${website.base}/_REGTEST_/address/$addr"
                 }
             }
         }

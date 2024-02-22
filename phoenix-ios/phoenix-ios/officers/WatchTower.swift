@@ -2,13 +2,11 @@ import Foundation
 import BackgroundTasks
 import Combine
 import PhoenixShared
-import os.log
 
+
+fileprivate let filename = "WatchTower"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "WatchTower"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
 fileprivate var log = Logger(OSLog.disabled)
 #endif
