@@ -20,10 +20,12 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.channel.ChannelCommand
 import fr.acinq.lightning.channel.states.*
 import fr.acinq.lightning.json.JsonSerializers
 import fr.acinq.lightning.utils.msat
 import fr.acinq.phoenix.managers.PeerManager
+import fr.acinq.lightning.wire.UpdateFee
 import fr.acinq.phoenix.utils.extensions.*
 import kotlinx.serialization.encodeToString
 
@@ -100,6 +102,19 @@ data class LocalChannelInfo(
                 }.sortedByDescending { it.fundingTxIndex }
             }
             else -> emptyList()
+        }
+    }
+    /** Returns the count of payments being sent or received by this channel. */
+    val inflightPaymentsCount: Int by lazy {
+        when (state) {
+            is ChannelStateWithCommitments -> {
+                buildSet {
+                    state.commitments.latest.localCommit.spec.htlcs.forEach { add(it.add.paymentHash) }
+                    state.commitments.latest.remoteCommit.spec.htlcs.forEach { add(it.add.paymentHash) }
+                    state.commitments.latest.nextRemoteCommit?.commit?.spec?.htlcs?.forEach { add(it.add.paymentHash) }
+                }.size
+            }
+            else -> 0
         }
     }
     /** The channel's data serialized in a json string. */

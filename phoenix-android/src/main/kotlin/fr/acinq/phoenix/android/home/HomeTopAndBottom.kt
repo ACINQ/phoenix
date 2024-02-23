@@ -25,8 +25,10 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -38,17 +40,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.BorderButton
 import fr.acinq.phoenix.android.components.Button
+import fr.acinq.phoenix.android.components.Dialog
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.VSeparator
 import fr.acinq.phoenix.android.components.openLink
-import fr.acinq.phoenix.android.utils.borderColor
 import fr.acinq.phoenix.android.utils.isBadCertificate
 import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.android.utils.negativeColor
-import fr.acinq.phoenix.android.utils.orange
 import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.android.utils.warningColor
 import fr.acinq.phoenix.data.canRequestLiquidity
@@ -62,20 +62,12 @@ fun TopBar(
     electrumBlockheight: Int,
     onTorClick: () -> Unit,
     isTorEnabled: Boolean?,
+    inFlightPaymentsCount: Int,
+    showRequestLiquidity: Boolean,
     onRequestLiquidityClick: () -> Unit,
 ) {
-    val channelsState by business.peerManager.channelsFlow.collectAsState()
     val context = LocalContext.current
-    val connectionsTransition = rememberInfiniteTransition(label = "animateConnectionsBadge")
-    val connectionsButtonAlpha by connectionsTransition.animateFloat(
-        label = "animateConnectionsBadge",
-        initialValue = 0.3f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = keyframes { durationMillis = 500 },
-            repeatMode = RepeatMode.Reverse
-        ),
-    )
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -83,49 +75,21 @@ fun TopBar(
             .height(40.dp)
             .clipToBounds()
     ) {
-        if (connections.electrum !is Connection.ESTABLISHED || connections.peer !is Connection.ESTABLISHED) {
-            val electrumConnection = connections.electrum
-            val isBadElectrumCert = electrumConnection is Connection.CLOSED && electrumConnection.isBadCertificate()
-            FilledButton(
-                text = stringResource(id = if (isBadElectrumCert) R.string.home__connection__bad_cert else R.string.home__connection__connecting),
-                icon = if (isBadElectrumCert) R.drawable.ic_alert_triangle else R.drawable.ic_connection_lost,
-                iconTint = if (isBadElectrumCert) negativeColor else MaterialTheme.colors.onSurface,
-                onClick = onConnectionsStateButtonClick,
-                textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp, color = if (isBadElectrumCert) negativeColor else MaterialTheme.colors.onSurface),
-                backgroundColor = MaterialTheme.colors.surface,
-                space = 8.dp,
-                padding = PaddingValues(8.dp),
-                modifier = Modifier.alpha(connectionsButtonAlpha)
-            )
-        } else if (electrumBlockheight < 795_000) {
-            // FIXME use a dynamic blockheight ^
-            FilledButton(
-                text = stringResource(id = R.string.home__connection__electrum_late),
-                icon = R.drawable.ic_alert_triangle,
-                iconTint = warningColor,
-                onClick = onConnectionsStateButtonClick,
-                textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp),
-                backgroundColor = MaterialTheme.colors.surface,
-                space = 8.dp,
-                padding = PaddingValues(8.dp),
-                modifier = Modifier.alpha(connectionsButtonAlpha)
-            )
-        } else if (isTorEnabled == true) {
-            if (connections.tor is Connection.ESTABLISHED) {
-                FilledButton(
-                    text = stringResource(id = R.string.home__connection__tor_active),
-                    icon = R.drawable.ic_tor_shield_ok,
-                    iconTint = positiveColor,
-                    onClick = onTorClick,
-                    textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp),
-                    backgroundColor = mutedBgColor,
-                    space = 8.dp,
-                    padding = PaddingValues(8.dp)
-                )
-            }
+        ConnectionBadge(
+            onConnectionsStateButtonClick = onConnectionsStateButtonClick,
+            connections = connections,
+            electrumBlockheight = electrumBlockheight,
+            onTorClick = onTorClick,
+            isTorEnabled = isTorEnabled,
+        )
+
+        if (inFlightPaymentsCount > 0) {
+            InflightPaymentsBadge(inFlightPaymentsCount)
         }
+
         Spacer(modifier = Modifier.weight(1f))
-        if (channelsState.canRequestLiquidity()) {
+
+        if (showRequestLiquidity) {
             BorderButton(
                 text = stringResource(id = R.string.home_request_liquidity),
                 icon = R.drawable.ic_bucket,
@@ -137,6 +101,7 @@ fun TopBar(
             )
             Spacer(modifier = Modifier.width(4.dp))
         }
+
         FilledButton(
             text = stringResource(R.string.home__faq_button),
             icon = R.drawable.ic_help_circle,
@@ -147,6 +112,95 @@ fun TopBar(
             space = 8.dp,
             padding = PaddingValues(8.dp),
         )
+    }
+}
+
+@Composable
+private fun RowScope.ConnectionBadge(
+    onConnectionsStateButtonClick: () -> Unit,
+    connections: Connections,
+    electrumBlockheight: Int,
+    onTorClick: () -> Unit,
+    isTorEnabled: Boolean?,
+) {
+    val connectionsTransition = rememberInfiniteTransition(label = "animateConnectionsBadge")
+    val connectionsButtonAlpha by connectionsTransition.animateFloat(
+        label = "animateConnectionsBadge",
+        initialValue = 0.3f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = keyframes { durationMillis = 500 },
+            repeatMode = RepeatMode.Reverse
+        ),
+    )
+
+    if (connections.electrum !is Connection.ESTABLISHED || connections.peer !is Connection.ESTABLISHED) {
+        val electrumConnection = connections.electrum
+        val isBadElectrumCert = electrumConnection is Connection.CLOSED && electrumConnection.isBadCertificate()
+        FilledButton(
+            text = stringResource(id = if (isBadElectrumCert) R.string.home__connection__bad_cert else R.string.home__connection__connecting),
+            icon = if (isBadElectrumCert) R.drawable.ic_alert_triangle else R.drawable.ic_connection_lost,
+            iconTint = if (isBadElectrumCert) negativeColor else MaterialTheme.colors.onSurface,
+            onClick = onConnectionsStateButtonClick,
+            textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp, color = if (isBadElectrumCert) negativeColor else MaterialTheme.colors.onSurface),
+            backgroundColor = MaterialTheme.colors.surface,
+            space = 8.dp,
+            padding = PaddingValues(8.dp),
+            modifier = Modifier.alpha(connectionsButtonAlpha)
+        )
+    } else if (electrumBlockheight < 795_000) {
+        // FIXME use a dynamic blockheight ^
+        FilledButton(
+            text = stringResource(id = R.string.home__connection__electrum_late),
+            icon = R.drawable.ic_alert_triangle,
+            iconTint = warningColor,
+            onClick = onConnectionsStateButtonClick,
+            textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp),
+            backgroundColor = MaterialTheme.colors.surface,
+            space = 8.dp,
+            padding = PaddingValues(8.dp),
+            modifier = Modifier.alpha(connectionsButtonAlpha)
+        )
+    } else if (isTorEnabled == true) {
+        if (connections.tor is Connection.ESTABLISHED) {
+            FilledButton(
+                text = stringResource(id = R.string.home__connection__tor_active),
+                icon = R.drawable.ic_tor_shield_ok,
+                iconTint = positiveColor,
+                onClick = onTorClick,
+                textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp),
+                backgroundColor = mutedBgColor,
+                space = 8.dp,
+                padding = PaddingValues(8.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun RowScope.InflightPaymentsBadge(
+    count: Int,
+) {
+    var showInflightPaymentsDialog by remember { mutableStateOf(false) }
+
+    FilledButton(
+        text = "$count",
+        icon = R.drawable.ic_send,
+        iconTint = MaterialTheme.colors.onPrimary,
+        onClick = { showInflightPaymentsDialog = true },
+        textStyle = MaterialTheme.typography.body2.copy(fontSize = 12.sp, color = MaterialTheme.colors.onPrimary),
+        backgroundColor = MaterialTheme.colors.primary,
+        space = 8.dp,
+        padding = PaddingValues(8.dp),
+    )
+
+    if (showInflightPaymentsDialog) {
+        Dialog(onDismiss = { showInflightPaymentsDialog = false }) {
+            Text(
+                text = stringResource(id = R.string.home_inflight_payments, count),
+                modifier = Modifier.padding(24.dp)
+            )
+        }
     }
 }
 

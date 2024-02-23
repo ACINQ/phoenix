@@ -292,6 +292,7 @@
     <string name="home__connection__connecting">Connecting…</string>
     <string name="home__connection__tor_active">Tor enabled</string>
     <string name="home_request_liquidity">Request liquidity</string>
+    <string name="home_inflight_payments">You currently have %1$d payment(s) pending in your wallet.\n\nKeep the app open to make sure these payments settle properly without issues.</string>
 
     <!-- in-app notifications -->
 
