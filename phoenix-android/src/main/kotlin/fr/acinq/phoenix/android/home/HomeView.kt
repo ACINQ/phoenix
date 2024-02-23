@@ -59,6 +59,7 @@ import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.findActivity
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.canRequestLiquidity
+import fr.acinq.phoenix.data.inFlightPaymentsCount
 import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -88,7 +89,7 @@ fun HomeView(
     val connections by business.connectionsManager.connections.collectAsState()
     val electrumMessages by business.appConfigurationManager.electrumMessages.collectAsState()
     val channels by business.peerManager.channelsFlow.collectAsState()
-    val inFlightPaymentsCount = remember(channels) { channels?.values?.map { it.inflightPaymentsCount }?.sum() ?: 0 }
+    val inFlightPaymentsCount = remember(channels) { channels.inFlightPaymentsCount() }
 
     var showConnectionsDialog by remember { mutableStateOf(false) }
     if (showConnectionsDialog) {

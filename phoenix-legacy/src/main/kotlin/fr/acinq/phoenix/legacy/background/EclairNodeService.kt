@@ -21,17 +21,21 @@ import akka.actor.ActorSystem
 import akka.actor.Props
 import akka.pattern.Patterns
 import akka.util.Timeout
+import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.os.Binder
 import android.os.Handler
 import android.os.IBinder
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.LiveData
@@ -205,6 +209,7 @@ class EclairNodeService : Service() {
   }
 
   private val shutdownHandler = Handler()
+  @SuppressLint("MissingPermission")
   private val shutdownRunnable: Runnable = Runnable {
     if (isHeadless) {
       log.info("reached scheduled shutdown...")
@@ -212,7 +217,10 @@ class EclairNodeService : Service() {
         stopForeground(STOP_FOREGROUND_REMOVE)
       } else {
         stopForeground(STOP_FOREGROUND_DETACH)
-        notificationManager.notify(Constants.NOTIF_ID__HEADLESS, notificationBuilder.setAutoCancel(true).build())
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+        } else {
+          notificationManager.notify(Constants.NOTIF_ID__HEADLESS, notificationBuilder.setAutoCancel(true).build())
+        }
       }
       shutdown()
     }
@@ -932,6 +940,9 @@ class EclairNodeService : Service() {
   @Subscribe(threadMode = ThreadMode.BACKGROUND)
   fun handleEvent(event: MissedPayToOpenPayment) {
     val message = getString(R.string.legacy_notif__pay_to_open_missed_too_small_message)
+    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+      return
+    }
     notificationManager.notify(
       Constants.NOTIF_ID__MISSED_PAY_TO_OPEN, NotificationCompat.Builder(applicationContext, Constants.NOTIF_CHANNEL_ID__MISSED_PAY_TO_OPEN)
         .setSmallIcon(R.drawable.ic_phoenix_outline)
@@ -1001,6 +1012,7 @@ class EclairNodeService : Service() {
     updateNotification(title, message).also { startForeground(Constants.NOTIF_ID__HEADLESS, it) }
   }
 
+  @SuppressLint("MissingPermission")
   private fun updateNotification(title: String?, message: String?): Notification {
     title?.let { notificationBuilder.setContentTitle(it) }
     message?.let {
