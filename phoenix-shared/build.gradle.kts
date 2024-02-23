@@ -58,8 +58,9 @@ kotlin {
     listOf(iosX64(), iosArm64()).forEach {
         it.binaries {
             framework {
+                optimized = false
                 baseName = "PhoenixShared"
-                embedBitcode = Framework.BitcodeEmbeddingMode.DISABLE
+                embedBitcode(Framework.BitcodeEmbeddingMode.DISABLE)
             }
             configureEach {
                 it.compilations.all {
