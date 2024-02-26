@@ -69,6 +69,8 @@ class BusinessManager {
 	///
 	public let srvExtConnectedToPeer = CurrentValueSubject<Bool, Never>(false)
 	
+	private var isInBackground = false
+	
 	private var walletInfo: WalletManager.WalletInfo? = nil
 	private var pushToken: String? = nil
 	private var fcmToken: String? = nil
@@ -77,6 +79,7 @@ class BusinessManager {
 	private var longLivedTasks = [String: UIBackgroundTaskIdentifier]()
 	
 	private var paymentsPageFetchers = [String: PaymentsPageFetcher]()
+	private var appCancellables = Set<AnyCancellable>()
 	private var cancellables = Set<AnyCancellable>()
 	
 	// --------------------------------------------------
@@ -87,6 +90,22 @@ class BusinessManager {
 		
 		business = PhoenixBusiness(ctx: PlatformContext.default)
 		BusinessManager._isTestnet = business.chain.isTestnet()
+		
+		let nc = NotificationCenter.default
+		
+		nc.publisher(for: UIApplication.didFinishLaunchingNotification).sink { _ in
+			self.applicationDidFinishLaunching()
+		}.store(in: &appCancellables)
+		
+		nc.publisher(for: UIApplication.didEnterBackgroundNotification).sink { _ in
+			self.applicationDidEnterBackground()
+		}.store(in: &appCancellables)
+		
+		nc.publisher(for: UIApplication.willEnterForegroundNotification).sink { _ in
+			self.applicationWillEnterForeground()
+		}.store(in: &appCancellables)
+		
+		WatchTower.shared.prepare()
 	}
 	
 	// --------------------------------------------------
@@ -128,6 +147,7 @@ class BusinessManager {
 		business = PhoenixBusiness(ctx: PlatformContext.default)
 		syncManager = nil
 		swapInRejectedPublisher.send(nil)
+		canMergeChannelsForSplicingPublisher.send(false)
 		walletInfo = nil
 		peerConnectionState = nil
 		paymentsPageFetchers.removeAll()
@@ -310,13 +330,13 @@ class BusinessManager {
 				
 				if isConnected && !wasConnected {
 					log.debug("incrementDisconnectCount(target: Peer)")
-					Biz.business.appConnectionsDaemon?.incrementDisconnectCount(
+					self.business.appConnectionsDaemon?.incrementDisconnectCount(
 						target: AppConnectionsDaemon.ControlTarget.companion.Peer
 					)
 					
 				} else if !isConnected && wasConnected {
 					log.debug("decrementDisconnectCount(target: Peer)")
-					Biz.business.appConnectionsDaemon?.decrementDisconnectCount(
+					self.business.appConnectionsDaemon?.decrementDisconnectCount(
 						target: AppConnectionsDaemon.ControlTarget.companion.Peer
 					)
 				}
@@ -324,7 +344,7 @@ class BusinessManager {
 			}.store(in: &cancellables)
 		
 		// Keep Prefs.shared.swapInAddressIndex up-to-date
-		Biz.business.peerManager.peerStatePublisher()
+		business.peerManager.peerStatePublisher()
 			.flatMap { $0.swapInWallet.swapInAddressPublisher() }
 			.sink { (newInfo: Lightning_kmpSwapInWallet.SwapInAddressInfo?) in
 				
@@ -355,6 +375,36 @@ class BusinessManager {
 				log.error("peer.startWatchSwapInWallet(): error: \(error)")
 			}
 		} // </Task>
+	}
+	
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
+	
+	func applicationDidFinishLaunching() {
+		log.trace("### applicationDidFinishLaunching()")
+	}
+	
+	func applicationDidEnterBackground() {
+		log.trace("### applicationDidEnterBackground()")
+		
+		if !isInBackground {
+			business.appConnectionsDaemon?.incrementDisconnectCount(
+				target: AppConnectionsDaemon.ControlTarget.companion.All
+			)
+			isInBackground = true
+		}
+	}
+	
+	func applicationWillEnterForeground() {
+		log.trace("### applicationWillEnterForeground()")
+		
+		if isInBackground {
+			business.appConnectionsDaemon?.decrementDisconnectCount(
+				target: AppConnectionsDaemon.ControlTarget.companion.All
+			)
+			isInBackground = false
+		}
 	}
 	
 	// --------------------------------------------------
