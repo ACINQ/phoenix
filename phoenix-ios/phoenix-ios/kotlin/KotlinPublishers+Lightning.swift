@@ -80,23 +80,11 @@ extension Lightning_kmpElectrumWatcher {
 // MARK: -
 extension Lightning_kmpNodeParams {
 	
-	fileprivate struct _Key {
-		static var nodeEventsPublisher = 0
-	}
-	
-	func nodeEventsPublisher() -> AnyPublisher<Lightning_kmpNodeEvents, Never> {
+	func nodeEventsSequence() -> AnyAsyncSequence<Lightning_kmpNodeEvents> {
 		
-		self.getSetAssociatedObject(storageKey: &_Key.nodeEventsPublisher) {
-			
-			/// Transforming from Kotlin:
-			/// `nodeEvents: SharedFlow<NodeEvents>`
-			///
-			KotlinPassthroughSubject<AnyObject>(
-				self.nodeEvents._bridgeToObjectiveC()
-			)
-			.compactMap { $0 as? Lightning_kmpNodeEvents }
-			.eraseToAnyPublisher()
-		}
+		return self.nodeEvents
+			.compactMap { $0 }
+			.eraseToAnyAsyncSequence()
 	}
 }
 
@@ -111,15 +99,9 @@ extension Lightning_kmpSwapInWallet {
 		let index: Int
 	}
 	
-	func swapInAddressPublisher() -> AnyPublisher<SwapInAddressInfo?, Never> {
+	func swapInAddressSequence() -> AnyAsyncSequence<SwapInAddressInfo?> {
 		
-		self.getSetAssociatedObject(storageKey: &_Key.swapInAddressPublisher) {
-			
-			/// Transforming from Kotlin:
-			/// `MutableStateFlow<Pair<String, Int>?>`
-			KotlinCurrentValueSubject<AnyObject>(
-				self.swapInAddressFlow._bridgeToObjectiveC()
-			)
+		return self.swapInAddressFlow
 			.map {
 				var result: SwapInAddressInfo? = nil
 				if let pair = $0 as? KotlinPair<NSString, KotlinInt>,
@@ -130,7 +112,6 @@ extension Lightning_kmpSwapInWallet {
 				}
 				return result
 			}
-			.eraseToAnyPublisher()
-		}
+			.eraseToAnyAsyncSequence()
 	}
 }

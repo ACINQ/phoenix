@@ -134,13 +134,14 @@ class PhoenixManager {
 		newBusiness.start(startupParams: startupParams)
 
 		newBusiness.currencyManager.refreshAll(targets: [primaryFiatCurrency], force: false)
-
-		newBusiness.connectionsManager.connectionsPublisher().sink {
-			[weak self](connections: Connections) in
-
-			self?.connectionsChanged(connections)
-		}
-		.store(in: &cancellables)
+		
+		cancellables.insert(
+			Task { @MainActor [newBusiness, weak self] in
+				for await connections in newBusiness.connectionsManager.connectionsSequence() {
+					self?.connectionsChanged(connections)
+				}
+			}.autoCancellable()
+		)
 
 		let pushReceivedAt = Date()
 		newBusiness.paymentsManager.lastIncomingPaymentPublisher().sink {
@@ -157,14 +158,14 @@ class PhoenixManager {
 			self?.didReceivePayment(payment)
 		}
 		.store(in: &cancellables)
-
-		newBusiness.currencyManager.ratesPubliser().sink {
-			[weak self](rates: [ExchangeRate]) in
-
-			assertMainThread() // var `fiatExchangeRates` should be accessed/updated only on main thread
-			self?.fiatExchangeRates = rates
-		}
-		.store(in: &cancellables)
+		
+		cancellables.insert(
+			Task { @MainActor [newBusiness, weak self] in
+				for await rates in newBusiness.currencyManager.ratesSequence() {
+					self?.fiatExchangeRates = rates
+				}
+			}.autoCancellable()
+		)
 
 		// Setup complete
 		business = newBusiness
@@ -188,13 +189,15 @@ class PhoenixManager {
 		oldBusiness = currentBusiness
 		business = nil
 		cancellables.removeAll()
-
-		currentBusiness.connectionsManager.connectionsPublisher().sink {
-			[weak self](connections: Connections) in
-
-			self?.oldConnectionsChanged(connections)
-		}
-		.store(in: &oldCancellables)
+		
+		let _oldBusiness = currentBusiness
+		cancellables.insert(
+			Task { @MainActor [_oldBusiness, weak self] in
+				for await connections in _oldBusiness.connectionsManager.connectionsSequence() {
+					self?.oldConnectionsChanged(connections)
+				}
+			}.autoCancellable()
+		)
 
 		currentBusiness.appConnectionsDaemon?.incrementDisconnectCount(
 			target: AppConnectionsDaemon.ControlTarget.companion.All

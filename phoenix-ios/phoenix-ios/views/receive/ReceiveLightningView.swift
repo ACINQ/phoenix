@@ -57,7 +57,6 @@ struct ReceiveLightningView: View {
 	@EnvironmentObject var smartModalState: SmartModalState
 	
 	let lastIncomingPaymentPublisher = Biz.business.paymentsManager.lastIncomingPaymentPublisher()
-	let channelsPublisher = Biz.business.peerManager.channelsPublisher()
 	
 	// For the cicular buttons: [copy, share, edit]
 	enum MaxButtonWidth: Preference {}
@@ -108,9 +107,6 @@ struct ReceiveLightningView: View {
 		.onReceive(lastIncomingPaymentPublisher) {
 			lastIncomingPaymentChanged($0)
 		}
-		.onReceive(channelsPublisher) {
-			channelsChanged($0)
-		}
 		.onReceive(GroupPrefs.shared.liquidityPolicyPublisher) {
 			liquidityPolicyChanged($0)
 		}
@@ -133,6 +129,11 @@ struct ReceiveLightningView: View {
 				ActivityView(activityItems: items, applicationActivities: nil)
 			
 			} // </switch>
+		}
+		.task {
+			for await channels in Biz.business.peerManager.channelsArraySequence() {
+				channelsChanged(channels)
+			}
 		}
 		.task {
 			await fetchMempoolRecommendedFees()

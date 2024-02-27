@@ -12,9 +12,7 @@ struct ChannelsConfigurationView: View {
 	
 	@State var sharing: String? = nil
 	
-	let channelsPublisher = Biz.business.peerManager.channelsPublisher()
 	@State var channels: [LocalChannelInfo] = []
-	
 	@State var importChannelsOpen = false
 	
 	enum CapacityHeight: Preference {}
@@ -42,11 +40,13 @@ struct ChannelsConfigurationView: View {
 		content()
 			.sharing($sharing)
 			.frame(maxWidth: .infinity, maxHeight: .infinity)
-			.onReceive(channelsPublisher) {
-				channels = $0
-			}
 			.navigationTitle(NSLocalizedString("Payment channels", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
+			.task {
+				for await newChannels in Biz.business.peerManager.channelsArraySequence() {
+					channels = newChannels
+				}
+			}
 	}
 	
 	@ViewBuilder
