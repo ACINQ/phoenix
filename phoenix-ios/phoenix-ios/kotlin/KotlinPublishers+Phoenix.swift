@@ -100,10 +100,6 @@ extension NodeParamsManager {
 // MARK: -
 extension PhoenixShared.NotificationsManager {
 
-	fileprivate struct _Key {
-		static var notificationsPublisher = 0
-	}
-
 	struct NotificationItem: Identifiable {
 		let ids: Set<Lightning_kmpUUID>
 		let notification: PhoenixShared.Notification
@@ -147,113 +143,43 @@ extension PhoenixShared.NotificationsManager {
 			}
 			.eraseToAnyAsyncSequence()
 	}
-	
-	func notificationsPublisher() -> AnyPublisher<[NotificationItem], Never> {
-
-		self.getSetAssociatedObject(storageKey: &_Key.notificationsPublisher) {
-
-			// Transforming from Kotlin:
-			// `notifications = StateFlow<List<Pair<Set<UUID>, Notification>>>`
-			// 
-			KotlinCurrentValueSubject<AnyObject>(
-				self.notifications._bridgeToObjectiveC()
-			)
-			.compactMap { $0 as? Array<AnyObject> }
-			.map { originalArray in
-				let transformedArray: [NotificationItem] = originalArray.compactMap { value in
-					guard
-						let pair = value as? KotlinPair<AnyObject, AnyObject>,
-						let ids = pair.first as? Set<Lightning_kmpUUID>,
-						let notification = pair.second as? PhoenixShared.Notification
-					else {
-						return nil
-					}
-					return NotificationItem(ids: ids, notification: notification)
-				}
-				return transformedArray
-			}
-			.eraseToAnyPublisher()
-		}
-	}
 }
 
 // MARK: -
 extension PaymentsManager {
 	
-	fileprivate struct _Key {
-		static var paymentsCountPublisher = 0
-		static var lastCompletedPaymentPublisher = 0
-		static var lastIncomingPaymentPublisher = 0
-	}
-	
-	func paymentsCountPublisher() -> AnyPublisher<Int64, Never> {
+	func paymentsCountSequence() -> AnyAsyncSequence<Int64> {
 		
-		self.getSetAssociatedObject(storageKey: &_Key.paymentsCountPublisher) {
-			
-			// Transforming from Kotlin:
-			// `paymentsCount: StateFlow<Long>`
-			//
-			KotlinCurrentValueSubject<AnyObject>(
-				self.paymentsCount._bridgeToObjectiveC()
-			)
-			.compactMap { $0 as? KotlinLong }
+		return self.paymentsCount
+			.compactMap { $0 }
 			.map { $0.int64Value }
-			.eraseToAnyPublisher()
-		}
+			.eraseToAnyAsyncSequence()
 	}
 	
-	func lastCompletedPaymentPublisher() -> AnyPublisher<Lightning_kmpWalletPayment, Never> {
+	func lastCompletedPaymentSequence() -> AnyAsyncSequence<Lightning_kmpWalletPayment> {
 		
-		self.getSetAssociatedObject(storageKey: &_Key.lastCompletedPaymentPublisher) {
-			
-			// Transforming from Kotlin:
-			// `lastCompletedPayment: StateFlow<WalletPayment?>`
-			//
-			KotlinCurrentValueSubject<AnyObject>(
-				self.lastCompletedPayment._bridgeToObjectiveC()
-			)
-			.compactMap { $0 as? Lightning_kmpWalletPayment }
-			.eraseToAnyPublisher()
-		}
+		return self.lastCompletedPayment
+			.compactMap { $0 }
+			.eraseToAnyAsyncSequence()
 	}
 	
-	func lastIncomingPaymentPublisher() -> AnyPublisher<Lightning_kmpIncomingPayment, Never> {
+	func lastIncomingPaymentSequence() -> AnyAsyncSequence<Lightning_kmpIncomingPayment> {
 		
-		self.getSetAssociatedObject(storageKey: &_Key.lastIncomingPaymentPublisher) {
-		
-			// Transforming from Kotlin:
-			// `lastCompletedPayment: StateFlow<WalletPayment?>`
-			//
-			KotlinCurrentValueSubject<AnyObject>(
-				self.lastCompletedPayment._bridgeToObjectiveC()
-			)
-			.compactMap { $0 as? Lightning_kmpWalletPayment }
+		return self.lastCompletedPayment
+			.compactMap { $0 }
 			.compactMap { $0 as? Lightning_kmpIncomingPayment }
-			.eraseToAnyPublisher()
-		}
+			.eraseToAnyAsyncSequence()
 	}
 }
 
 // MARK: -
 extension PaymentsPageFetcher {
 	
-	fileprivate struct _Key {
-		static var paymentsPagePublisher = 0
-	}
-	
-	func paymentsPagePublisher() -> AnyPublisher<PaymentsPage, Never> {
+	func paymentsPageSequence() -> AnyAsyncSequence<PaymentsPage> {
 		
-		self.getSetAssociatedObject(storageKey: &_Key.paymentsPagePublisher) {
-			
-			// Transforming from Kotlin:
-			// `paymentsPage: StateFlow<PaymentsPage>`
-			//
-			KotlinCurrentValueSubject<AnyObject>(
-				self.paymentsPage._bridgeToObjectiveC()
-			)
-			.compactMap { $0 as? PaymentsPage }
-			.eraseToAnyPublisher()
-		}
+		return self.paymentsPage
+			.compactMap { $0 }
+			.eraseToAnyAsyncSequence()
 	}
 }
 
@@ -261,23 +187,11 @@ extension PaymentsPageFetcher {
 // MARK: -
 extension CloudKitDb {
 	
-	fileprivate struct _Key {
-		static var fetchQueueCountPublisher = 0
-	}
-	
-	func fetchQueueCountPublisher() -> AnyPublisher<Int64, Never> {
+	func fetchQueueCountSequence() -> AnyAsyncSequence<Int64> {
 		
-		self.getSetAssociatedObject(storageKey: &_Key.fetchQueueCountPublisher) {
-			
-			/// Transforming from Kotlin:
-			/// `queueCount: StateFlow<Long>`
-			///
-			KotlinCurrentValueSubject<AnyObject>(
-				self.queueCount._bridgeToObjectiveC()
-			)
-			.compactMap { $0 as? KotlinLong }
+		return self.queueCount
+			.compactMap { $0 }
 			.map { $0.int64Value }
-			.eraseToAnyPublisher()
-		}
+			.eraseToAnyAsyncSequence()
 	}
 }

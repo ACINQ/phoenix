@@ -74,7 +74,7 @@ class WatchTower {
 		let electrumTarget = AppConnectionsDaemon.ControlTarget.companion.Electrum
 		
 		var didDecrement = false
-		var upToDateListener: AnyCancellable? = nil
+		var upToDateListener: Task<Void, Never>? = nil
 		
 		var peer: Lightning_kmpPeer? = nil
 		var oldChannels = [Bitcoin_kmpByteVector32 : Lightning_kmpChannelState]()
@@ -188,8 +188,10 @@ class WatchTower {
 		// We setup a handler so we know when the WatchTower task has completed.
 		// I.e. when the channel subscriptions are considered up-to-date.
 		
-		upToDateListener = _peer.watcher.upToDatePublisher().sink { (millis: Int64) in
-			finishTask(true)
+		upToDateListener = Task { @MainActor in
+			for await _ in _peer.watcher.upToDateSequence() {
+				finishTask(true)
+			}
 		}
 	}
 }

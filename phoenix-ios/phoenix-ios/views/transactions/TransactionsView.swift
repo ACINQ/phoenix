@@ -18,10 +18,8 @@ struct TransactionsView: View {
 	
 	private let paymentsPageFetcher = Biz.getPaymentsPageFetcher(name: "TransactionsView")
 	
-	let paymentsCountPublisher = Biz.business.paymentsManager.paymentsCountPublisher()
 	@State var paymentsCount: Int64 = 0
 	
-	let paymentsPagePublisher: AnyPublisher<PaymentsPage, Never>
 	@State var paymentsPage = PaymentsPage(offset: 0, count: 0, rows: [])
 	@State var cachedRows: [WalletPaymentOrderRow] = []
 	@State var sections: [PaymentsSection] = []
@@ -40,14 +38,6 @@ struct TransactionsView: View {
 	
 	@EnvironmentObject var deviceInfo: DeviceInfo
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
-	
-	// --------------------------------------------------
-	// MARK: Init
-	// --------------------------------------------------
-	
-	init() {
-		paymentsPagePublisher = paymentsPageFetcher.paymentsPagePublisher()
-	}
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -141,11 +131,15 @@ struct TransactionsView: View {
 		.onAppear {
 			onAppear()
 		}
-		.onReceive(paymentsCountPublisher) {
-			paymentsCountChanged($0)
+		.task {
+			for await count in Biz.business.paymentsManager.paymentsCountSequence() {
+				paymentsCountChanged(count)
+			}
 		}
-		.onReceive(paymentsPagePublisher) {
-			paymentsPageChanged($0)
+		.task {
+			for await page in paymentsPageFetcher.paymentsPageSequence() {
+				paymentsPageChanged(page)
+			}
 		}
 		.onReceive(syncStatePublisher) {
 			syncStateChanged($0)

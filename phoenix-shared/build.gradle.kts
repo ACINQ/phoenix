@@ -201,9 +201,4 @@ skie {
     analytics {
         disableUpload.set(true)
     }
-    features {
-        group("fr.acinq.phoenix.utils.flow") {
-            FlowInterop.Enabled(false)
-        }
-    }
 }
