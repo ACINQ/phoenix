@@ -775,7 +775,6 @@
 
     <string name="swapin_signer_title">Swap-in signer</string>
     <string name="swapin_signer_instructions">This debugging tool lets you sign swap-in inputs. Only use if you understand what it does.</string>
-    <string name="swapin_signer_amount">Amount</string>
     <string name="swapin_signer_tx">Unsigned tx</string>
     <string name="swapin_signer_sign">Sign</string>
     <string name="swapin_signer_signing">Signing…</string>

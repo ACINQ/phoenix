@@ -67,7 +67,7 @@ fun SwapInSignerView(
     onBackClick: () -> Unit,
 ) {
     val context = LocalContext.current
-    val vm = viewModel<SwapInSignerViewModel>(factory = SwapInSignerViewModel.Factory(business.walletManager))
+    val vm = viewModel<SwapInSignerViewModel>(factory = SwapInSignerViewModel.Factory(business.walletManager, business.electrumClient))
 
     var amountInput by remember { mutableStateOf<MilliSatoshi?>(null) }
     var txInput by remember { mutableStateOf("") }
@@ -82,18 +82,6 @@ fun SwapInSignerView(
             val state = vm.state.value
             Text(text = stringResource(id = R.string.swapin_signer_instructions))
             Spacer(modifier = Modifier.height(16.dp))
-            AmountInput(
-                amount = amountInput,
-                onAmountChange = {
-                    amountInput = it?.amount
-                    if (state != SwapInSignerState.Init) vm.state.value = SwapInSignerState.Init
-                },
-                staticLabel = stringResource(id = R.string.swapin_signer_amount),
-                enabled = state !is SwapInSignerState.Signing,
-                modifier = Modifier.fillMaxWidth(),
-                forceUnit = BitcoinUnit.Sat,
-            )
-            Spacer(modifier = Modifier.height(8.dp))
             TextInput(
                 text = txInput,
                 onTextChange = {
@@ -116,7 +104,7 @@ fun SwapInSignerView(
                         icon = R.drawable.ic_check,
                         onClick = {
                             if (amountInput != null && txInput.isNotBlank()) {
-                                vm.sign(unsignedTx = txInput, amount = amountInput!!.truncateToSatoshi())
+                                vm.sign(unsignedTx = txInput)
                                 keyboardManager?.hide()
                             }
                         },
