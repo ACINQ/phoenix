@@ -54,7 +54,7 @@ extension Lightning_kmpSwapInWallet {
 		return self.swapInAddressFlow
 			.map {
 				var result: SwapInAddressInfo? = nil
-				if let pair = $0 as? KotlinPair<NSString, KotlinInt>,
+				if let pair = $0,
 					let addr = pair.first as? String,
 					let index = pair.second
 				{

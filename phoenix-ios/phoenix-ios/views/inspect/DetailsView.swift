@@ -803,7 +803,6 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				case Lightning_kmpChannelClosingType.remote  : Text(verbatim: "Remote")
 				case Lightning_kmpChannelClosingType.revoked : Text(verbatim: "Revoked")
 				case Lightning_kmpChannelClosingType.other   : Text(verbatim: "Other")
-				default                                                                  : Text(verbatim: "?")
 			}
 		}
 	}
