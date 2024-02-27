@@ -69,7 +69,6 @@ fun SwapInSignerView(
     val context = LocalContext.current
     val vm = viewModel<SwapInSignerViewModel>(factory = SwapInSignerViewModel.Factory(business.walletManager, business.electrumClient))
 
-    var amountInput by remember { mutableStateOf<MilliSatoshi?>(null) }
     var txInput by remember { mutableStateOf("") }
 
     DefaultScreenLayout(isScrollable = true) {
@@ -103,7 +102,7 @@ fun SwapInSignerView(
                         text = stringResource(id = R.string.swapin_signer_sign),
                         icon = R.drawable.ic_check,
                         onClick = {
-                            if (amountInput != null && txInput.isNotBlank()) {
+                            if (txInput.isNotBlank()) {
                                 vm.sign(unsignedTx = txInput)
                                 keyboardManager?.hide()
                             }
@@ -115,25 +114,26 @@ fun SwapInSignerView(
                     ProgressView(text = stringResource(id = R.string.swapin_signer_signing))
                 }
                 is SwapInSignerState.Signed -> {
-                    Column(modifier = Modifier.padding(PaddingValues(horizontal = 16.dp, vertical = 12.dp))) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Text(text = stringResource(id = R.string.swapin_signer_signed_sig), style = MaterialTheme.typography.body2, modifier = Modifier.width(100.dp))
+                    Row(
+                        modifier = Modifier.padding(PaddingValues(horizontal = 16.dp, vertical = 12.dp)),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Text(text = stringResource(id = R.string.swapin_signer_signed_sig), style = MaterialTheme.typography.body2, modifier = Modifier.width(100.dp))
+                        Column {
                             Text(text = state.userSig)
+                            Spacer(modifier = Modifier.height(16.dp))
+                            BorderButton(
+                                text = stringResource(id = R.string.btn_copy),
+                                icon = R.drawable.ic_copy,
+                                onClick = {
+                                    copyToClipboard(
+                                        context = context,
+                                        data = "user_sig=${state.userSig}",
+                                        dataLabel = "swap input signature"
+                                    )
+                                }
+                            )
                         }
-                        Spacer(modifier = Modifier.height(16.dp))
-                        BorderButton(
-                            text = stringResource(id = R.string.btn_copy),
-                            icon = R.drawable.ic_copy,
-                            onClick = {
-                                copyToClipboard(
-                                    context = context,
-                                    data = """
-                                        user_sig=${state.userSig}
-                                    """.trimIndent(),
-                                    dataLabel = "swap input signature"
-                                )
-                            }
-                        )
                     }
                 }
                 is SwapInSignerState.Failed.Error -> {

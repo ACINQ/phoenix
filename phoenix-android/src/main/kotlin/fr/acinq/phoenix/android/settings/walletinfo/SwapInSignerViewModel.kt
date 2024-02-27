@@ -70,12 +70,14 @@ class SwapInSignerViewModel(
                 return@launch
             }
             val input = if (tx.txIn.size == 1) tx.txIn.first() else throw RuntimeException("tx has ${tx.txIn.size} inputs")
-            val prevTx = electrumClient.getTx(input.outPoint.txid) ?: throw RuntimeException("parent tx not found by electrum")
+            val parentTxId = input.outPoint.txid
+            log.debug("retrieving parent_tx $parentTxId")
+            val parentTx = electrumClient.getTx(input.outPoint.txid) ?: throw RuntimeException("parent tx=$parentTxId not found by electrum")
             val keyManager = walletManager.keyManager.filterNotNull().first()
             val userSig = keyManager.swapInOnChainWallet.signSwapInputUserLegacy(
                 fundingTx = tx,
-                index = input.outPoint.index.toInt(),
-                parentTxOuts = prevTx.txOut,
+                index = 0,
+                parentTxOuts = parentTx.txOut,
             )
             state.value = SwapInSignerState.Signed(
                 txId = tx.txid.toString(),
