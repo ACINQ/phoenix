@@ -130,7 +130,8 @@ class WatchTower {
 				NotificationsManager.shared.displayLocalNotification_revokedCommit()
 				
 				let outcome = WatchTowerOutcome.RevokedFound(channels: revokedChannelIds)
-				business.notificationsManager.saveWatchTowerOutcome(outcome: outcome) { _ in
+				Task { @MainActor in
+					try await business.notificationsManager.saveWatchTowerOutcome(outcome: outcome)
 					task.setTaskCompleted(success: success)
 				}
 				
@@ -138,7 +139,8 @@ class WatchTower {
 				// WatchTower completed successfully, and no cheating by the other party was found.
 				
 				let outcome = WatchTowerOutcome.Nominal(channelsWatchedCount: Int32(newChannels.count))
-				business.notificationsManager.saveWatchTowerOutcome(outcome: outcome) { _ in
+				Task { @MainActor in
+					try await business.notificationsManager.saveWatchTowerOutcome(outcome: outcome)
 					task.setTaskCompleted(success: success)
 				}
 				
@@ -146,7 +148,8 @@ class WatchTower {
 				// The BGAppRefreshTask timed out (iOS only gives us ~30 seconds)
 				
 				let outcome = WatchTowerOutcome.Unknown()
-				business.notificationsManager.saveWatchTowerOutcome(outcome: outcome) { _ in
+				Task { @MainActor in
+					try await business.notificationsManager.saveWatchTowerOutcome(outcome: outcome)
 					task.setTaskCompleted(success: success)
 				}
 			}

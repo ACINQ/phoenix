@@ -218,7 +218,7 @@ class BusinessManager {
 			.sink { (event: Lightning_kmpNodeEvents) in
 				
 				if let rejected = event as? Lightning_kmpLiquidityEventsRejected,
-				   rejected.source == Lightning_kmpLiquidityEventsSource.onchainwallet
+				   rejected.source == Lightning_kmpLiquidityEventsSource.onChainWallet
 				{
 					log.debug("Received Lightning_kmpLiquidityEventsRejected: \(rejected)")
 					self.swapInRejectedPublisher.value = rejected
@@ -517,9 +517,11 @@ class BusinessManager {
 		
 		let token = self.fcmToken
 		log.debug("registering fcm token: \(token?.description ?? "<nil>")")
-		business.registerFcmToken(token: token) { error in
-			if let e = error {
-				log.error("failed to register fcm token: \(e.localizedDescription)")
+		Task { @MainActor in
+			do {
+				try await business.registerFcmToken(token: token)
+			} catch {
+				log.error("failed to register fcm token: \(error.localizedDescription)")
 			}
 		}
 		

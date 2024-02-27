@@ -22,10 +22,10 @@ extension Lightning_kmpPeer {
 			/// Transforming from Kotlin:
 			/// `eventsFlow: SharedFlow<PeerEvent>`
 			///
-			KotlinPassthroughSubject<Lightning_kmpPeerEvent>(
-				self.eventsFlow
+			KotlinPassthroughSubject<AnyObject>(
+				self.eventsFlow._bridgeToObjectiveC()
 			)
-			.compactMap { $0 }
+			.compactMap { $0 as? Lightning_kmpPeerEvent }
 			.eraseToAnyPublisher()
 		}
 	}
@@ -44,10 +44,10 @@ extension Lightning_kmpElectrumClient {
 			/// Transforming from Kotlin:
 			/// `notifications: Flow<ElectrumSubscriptionResponse>`
 			///
-			KotlinPassthroughSubject<Lightning_kmpElectrumSubscriptionResponse>(
-				self.notifications
+			KotlinPassthroughSubject<AnyObject>(
+				self.notifications._bridgeToObjectiveC()
 			)
-			.compactMap { $0 }
+			.compactMap { $0 as? Lightning_kmpElectrumSubscriptionResponse }
 			.eraseToAnyPublisher()
 		}
 	}
@@ -67,10 +67,11 @@ extension Lightning_kmpElectrumWatcher {
 			/// Transforming from Kotlin:
 			/// `openUpToDateFlow(): Flow<Long>`
 			///
-			KotlinPassthroughSubject<KotlinLong>(
-				self.openUpToDateFlow()
+			KotlinPassthroughSubject<AnyObject>(
+				self.openUpToDateFlow()._bridgeToObjectiveC()
 			)
-			.compactMap { $0?.int64Value }
+			.compactMap { $0 as? KotlinLong }
+			.map { $0.int64Value }
 			.eraseToAnyPublisher()
 		}
 	}
@@ -90,10 +91,10 @@ extension Lightning_kmpNodeParams {
 			/// Transforming from Kotlin:
 			/// `nodeEvents: SharedFlow<NodeEvents>`
 			///
-			KotlinPassthroughSubject<Lightning_kmpNodeEvents>(
-				self.nodeEvents
+			KotlinPassthroughSubject<AnyObject>(
+				self.nodeEvents._bridgeToObjectiveC()
 			)
-			.compactMap { $0 }
+			.compactMap { $0 as? Lightning_kmpNodeEvents }
 			.eraseToAnyPublisher()
 		}
 	}
@@ -116,18 +117,18 @@ extension Lightning_kmpSwapInWallet {
 			
 			/// Transforming from Kotlin:
 			/// `MutableStateFlow<Pair<String, Int>?>`
-			KotlinCurrentValueSubject<KotlinPair<NSString, KotlinInt>>(
-				self.swapInAddressFlow
+			KotlinCurrentValueSubject<AnyObject>(
+				self.swapInAddressFlow._bridgeToObjectiveC()
 			)
 			.map {
-				if let pair = $0,
-				   let addr = pair.first as? String,
-				   let index = pair.second
+				var result: SwapInAddressInfo? = nil
+				if let pair = $0 as? KotlinPair<NSString, KotlinInt>,
+					let addr = pair.first as? String,
+					let index = pair.second
 				{
-					return SwapInAddressInfo(addr: addr, index: index.intValue)
-				} else {
-					return nil
+					result = SwapInAddressInfo(addr: addr, index: index.intValue)
 				}
+				return result
 			}
 			.eraseToAnyPublisher()
 		}

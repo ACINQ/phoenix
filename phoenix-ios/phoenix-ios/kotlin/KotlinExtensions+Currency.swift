@@ -186,7 +186,7 @@ extension FiatCurrency {
 		case .tmt   : return "Turkmenistani Manat"
 		case .tnd   : return "Tunisian Dinar"
 		case .top   : return "Tongan Paʻanga"
-		case .try_  : return "Turkish Lira"
+		case .try   : return "Turkish Lira"
 		case .ttd   : return "Trinidad and Tobago Dollar"
 		case .twd   : return "Taiwan Dollar"
 		case .tzs   : return "Tanzanian Shilling"
@@ -344,7 +344,7 @@ extension FiatCurrency {
 		case .tmt   : return NSLocalizedString("TMT", tableName: "Currencies", comment: "Turkmenistani Manat")
 		case .tnd   : return NSLocalizedString("TND", tableName: "Currencies", comment: "Tunisian Dinar")
 		case .top   : return NSLocalizedString("TOP", tableName: "Currencies", comment: "Tongan Paʻanga")
-		case .try_  : return NSLocalizedString("TRY", tableName: "Currencies", comment: "Turkish Lira")
+		case .try   : return NSLocalizedString("TRY", tableName: "Currencies", comment: "Turkish Lira")
 		case .ttd   : return NSLocalizedString("TTD", tableName: "Currencies", comment: "Trinidad and Tobago Dollar")
 		case .twd   : return NSLocalizedString("TWD", tableName: "Currencies", comment: "Taiwan Dollar")
 		case .tzs   : return NSLocalizedString("TZS", tableName: "Currencies", comment: "Tanzanian Shilling")
@@ -421,7 +421,7 @@ extension FiatCurrency {
 		
 		let (selfCurrencyCode, _) = self.splitShortName
 		
-		return self.getSetAssociatedObject(storageKey: &_Key.matchingLocales) {
+		return self._bridgeToObjectiveC().getSetAssociatedObject(storageKey: &_Key.matchingLocales) {
 			
 			var matchingLocales = [Locale]()
 			for identifier in Locale.availableIdentifiers {
@@ -444,7 +444,7 @@ extension FiatCurrency {
 			return true
 		}
 		
-		return self.getSetAssociatedObject(storageKey: &_Key.usesCents) {
+		return self._bridgeToObjectiveC().getSetAssociatedObject(storageKey: &_Key.usesCents) {
 			
 			let formatter = NumberFormatter()
 			formatter.numberStyle = .currency
