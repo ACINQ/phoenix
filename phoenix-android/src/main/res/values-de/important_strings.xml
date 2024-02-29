@@ -31,7 +31,7 @@
     <string name="notif_pending_settlement_message">Eine eingehende Zahlung steht aus.</string>
 
     <string name="notif_inflight_payment_title">Eine Zahlung steht an</string>
-    <string name="notif_inflight_payment_message">Starten Sie Phoenix, damit die Zahlung irgendwann abgeschlossen werden kann.</string>
+    <string name="notif_inflight_payment_message">Starten Sie Phoenix, damit die Zahlung abgeschlossen werden kann.</string>
 
     <string name="notif_missed_title">Verpasste eingehende Zahlung</string>
     <string name="notif_missed_unavailable">Phoenix konnte nicht im Hintergrund gestartet werden.</string>
