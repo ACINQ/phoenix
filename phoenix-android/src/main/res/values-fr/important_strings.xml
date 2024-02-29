@@ -30,6 +30,9 @@
     <string name="notif_pending_settlement_title">Veuillez démarrer Phoenix</string>
     <string name="notif_pending_settlement_message">Un paiement en attente doit être finalisé.</string>
 
+    <string name="notif_inflight_payment_title">Un paiement est en cours</string>
+    <string name="notif_inflight_payment_message">Démarrez Phoenix pour que le paiement puisse à terme être finalisé.</string>
+
     <string name="notif_missed_title">Paiement entrant manqué</string>
     <string name="notif_missed_unavailable">Phoenix n\'a pas pu démarrer en arrière plan.</string>
 

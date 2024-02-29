@@ -30,6 +30,9 @@
     <string name="notif_pending_settlement_title">Spusťte prosím Phoenix</string>
     <string name="notif_pending_settlement_message">Čeká se na příchozí vyrovnání.</string>
 
+    <string name="notif_inflight_payment_title">Čeká se na platbu</string>
+    <string name="notif_inflight_payment_message">Spusťte službu Phoenix, aby bylo možné platbu nakonec dokončit.</string>.
+
     <string name="notif_missed_title">Zmeškaná příchozí platba</string>
     <string name="notif_missed_unavailable">Nepodařilo se spustit Phoenix na pozadí.</string>
 

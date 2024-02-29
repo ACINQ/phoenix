@@ -22,6 +22,7 @@ import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.logging.debug
+import fr.acinq.lightning.logging.info
 import fr.acinq.phoenix.controllers.*
 import fr.acinq.phoenix.controllers.config.*
 import fr.acinq.phoenix.controllers.init.AppInitController
@@ -112,6 +113,7 @@ class PhoenixBusiness(
      * BEFORE invoking this function, to ensure a clean disconnect from the server.
      */
     fun stop() {
+        logger.info { "stopping business" }
         electrumClient.stop()
         electrumWatcher.stop()
         electrumWatcher.cancel()
@@ -123,6 +125,7 @@ class PhoenixBusiness(
         databaseManager.close()
         databaseManager.cancel()
         databaseManager.cancel()
+        peerManager.peerState.value?.cancel()
         peerManager.cancel()
         paymentsManager.cancel()
         appConfigurationManager.cancel()

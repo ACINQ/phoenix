@@ -102,6 +102,19 @@ data class LocalChannelInfo(
             else -> emptyList()
         }
     }
+    /** Returns the count of payments being sent or received by this channel. */
+    val inFlightPaymentsCount: Int by lazy {
+        when (state) {
+            is ChannelStateWithCommitments -> {
+                buildSet {
+                    state.commitments.latest.localCommit.spec.htlcs.forEach { add(it.add.paymentHash) }
+                    state.commitments.latest.remoteCommit.spec.htlcs.forEach { add(it.add.paymentHash) }
+                    state.commitments.latest.nextRemoteCommit?.commit?.spec?.htlcs?.forEach { add(it.add.paymentHash) }
+                }.size
+            }
+            else -> 0
+        }
+    }
     /** The channel's data serialized in a json string. */
     val json: String by lazy { JsonSerializers.json.encodeToString(state) }
 
@@ -156,3 +169,7 @@ fun Map<ByteVector32, LocalChannelInfo>?.canRequestLiquidity(): Boolean {
     return this?.values?.any { it.isUsable } ?: false
 }
 
+/** Liquidity can be requested if you have at least 1 usable channel. */
+fun Map<ByteVector32, LocalChannelInfo>?.inFlightPaymentsCount(): Int {
+    return this?.values?.sumOf { it.inFlightPaymentsCount } ?: 0
+}
