@@ -246,7 +246,7 @@
     <string name="channeldetails_commitment_funding_capacity">Kapacita:</string>
     <string name="channeldetails_commitment_linked_payments">Vyvolané:</string>
 
-    <string name="channeldetails_json">Zobraziť holé dáta</string>
+    <string name="channeldetails_json">Zobraziť surové dáta</string>
     <string name="channeldetails_share">Zdieľať</string>
     <string name="channeldetails_share_subject">Dáta kanálov</string>
     <string name="channeldetails_share_title">Zdieľať dáta kanálov</string>
@@ -290,7 +290,7 @@
     <!-- settings: display seed -->
 
     <string name="displayseed_title">Obnovovacia fráza</string>
-    <string name="displayseed_loading">Odomýkám seed…</string>
+    <string name="displayseed_loading">Odomykám seed…</string>
     <string name="displayseed_error_details">Nepodarilo sa odomknúť seed</string>
     <string name="displayseed_derivation_path">Seed BIP39 so štandardnou odvodzovacou cestou BIP84</string>
     <string name="displayseed_loading_prefs">Načítavanie preferencií…</string>
