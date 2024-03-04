@@ -1,3 +1,4 @@
+import Foundation
 import Combine
 import PhoenixShared
 
@@ -15,27 +16,40 @@ import PhoenixShared
  * phoenix-shared/src/commonMain/kotlin/fr.acinq.phoenix/utils/SwiftFlow.kt
 */
 
-class KotlinPassthroughSubject<ObjCType: AnyObject>: Publisher {
+class KotlinPassthroughSubject<T: AnyObject>: Publisher {
 	
-	typealias Output = ObjCType?
+	typealias Output = T?
 	typealias Failure = Never
 	
-	private let wrapped: PassthroughSubject<ObjCType?, Failure>
+	private let wrapped: PassthroughSubject<T?, Failure>
 	private var watcher: Ktor_ioCloseable? = nil
 	
-	init(_ flow: Kotlinx_coroutines_coreFlow) {
-		
-		let flowWrapper = SwiftFlow<ObjCType>(origin: flow)
+	init(_ flowWrapper: SwiftFlow<T>) {
 		
 		// There's no need to retain the SwiftFlow instance variable,
 		// because the instance itself doesn't maintain any state.
 		// All state is encapsulated in the watch method.
 		
-		wrapped = PassthroughSubject<ObjCType?, Failure>()
+		wrapped = PassthroughSubject<T?, Failure>()
 		
-		watcher = flowWrapper.watch {[weak self](value: ObjCType?) in
+		watcher = flowWrapper.watch {[weak self](value: T?) in
 			self?.wrapped.send(value)
 		}
+	}
+	
+	convenience init(_ flow: PhoenixShared.SkieKotlinFlow<T>) {
+		
+		self.init(SwiftFlow<T>(origin: flow))
+	}
+	
+	convenience init(_ flow: PhoenixShared.SkieKotlinOptionalFlow<T>) {
+		
+		self.init(SwiftFlow<T>(origin: flow))
+	}
+	
+	convenience init(_ flow: PhoenixShared.SkieKotlinSharedFlow<T>) {
+		
+		self.init(SwiftFlow<T>(origin: flow))
 	}
 
 	deinit {
@@ -54,28 +68,41 @@ class KotlinPassthroughSubject<ObjCType: AnyObject>: Publisher {
 	}
 }
 
-class KotlinCurrentValueSubject<ObjCType: AnyObject>: Publisher {
+class KotlinCurrentValueSubject<T: AnyObject>: Publisher {
 	
-	typealias Output = ObjCType?
+	typealias Output = T?
 	typealias Failure = Never
 	
-	private let wrapped: CurrentValueSubject<ObjCType?, Failure>
+	private let wrapped: CurrentValueSubject<T?, Failure>
 	private var watcher: Ktor_ioCloseable? = nil
 	
-	init(_ stateFlow: Kotlinx_coroutines_coreStateFlow) {
-		
-		let stateFlowWrapper = SwiftStateFlow<ObjCType>(origin: stateFlow)
+	init(_ stateFlowWrapper: SwiftStateFlow<T>) {
 		
 		// There's no need to retain the SwiftStateFlow instance variable,
 		// because the instance itself doesn't maintain any state.
 		// All state is encapsulated in the watch method.
 		
-		let initialValue = stateFlowWrapper.value_
+		let initialValue = stateFlowWrapper.value
 		wrapped = CurrentValueSubject(initialValue)
 		
-		watcher = stateFlowWrapper.watch {[weak self](value: ObjCType?) in
+		watcher = stateFlowWrapper.watch {[weak self](value: T?) in
 			self?.wrapped.send(value)
 		}
+	}
+	
+	convenience init(_ stateFlow: PhoenixShared.SkieKotlinStateFlow<T>) {
+		
+		self.init(SwiftStateFlow<T>(origin: stateFlow))
+	}
+	
+	convenience init(_ stateFlow: PhoenixShared.SkieKotlinOptionalStateFlow<T>) {
+		
+		self.init(SwiftStateFlow<T>(origin: stateFlow))
+	}
+	
+	convenience init(_ stateFlow: PhoenixShared.SkieKotlinOptionalMutableStateFlow<T>) {
+		
+		self.init(SwiftStateFlow<T>(origin: stateFlow))
 	}
 	
 	deinit {

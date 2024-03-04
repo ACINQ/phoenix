@@ -262,7 +262,8 @@ class WatchTower {
 					NotificationsManager.shared.displayLocalNotification_revokedCommit()
 					
 					let outcome = WatchTowerOutcome.RevokedFound(channels: revokedChannelIds)
-					business.notificationsManager.saveWatchTowerOutcome(outcome: outcome) { _ in
+					Task { @MainActor in
+						try await business.notificationsManager.saveWatchTowerOutcome(outcome: outcome)
 						task.setTaskCompleted(success: true)
 					}
 					
@@ -270,7 +271,8 @@ class WatchTower {
 					// WatchTower completed successfully, and no cheating by the other party was found.
 					
 					let outcome = WatchTowerOutcome.Nominal(channelsWatchedCount: Int32(newChannels.count))
-					business.notificationsManager.saveWatchTowerOutcome(outcome: outcome) { _ in
+					Task { @MainActor in
+						try await business.notificationsManager.saveWatchTowerOutcome(outcome: outcome)
 						task.setTaskCompleted(success: true)
 					}
 					
@@ -278,7 +280,8 @@ class WatchTower {
 					// The BGAppRefreshTask timed out (iOS only gives us ~30 seconds)
 					
 					let outcome = WatchTowerOutcome.Unknown()
-					business.notificationsManager.saveWatchTowerOutcome(outcome: outcome) { _ in
+					Task { @MainActor in
+						try await business.notificationsManager.saveWatchTowerOutcome(outcome: outcome)
 						task.setTaskCompleted(success: false)
 					}
 				}
@@ -363,7 +366,7 @@ class WatchTower {
 			pendingTxHandler = Task { @MainActor in
 				
 				// Wait until we're connected
-				for try await connections in Biz.business.connectionsManager.asyncStream() {
+				for try await connections in Biz.business.connectionsManager.asyncStream {
 					if connections.targetsEstablished(target) {
 						break
 					}
@@ -378,7 +381,7 @@ class WatchTower {
 				// Check to see if the peer clears its pending TX's
 				async let subtask2 = Task { @MainActor in
 					for try await channels in Biz.business.peerManager.channelsPublisher().values {
-						if !hasInFlightTransactions(channels) {
+						if !self.hasInFlightTransactions(channels) {
 							break
 						}
 					}

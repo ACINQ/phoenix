@@ -757,16 +757,17 @@ struct HomeView : MVIView {
 	func lastCompletedPaymentChanged(_ payment: Lightning_kmpWalletPayment) {
 		log.trace("lastCompletedPaymentChanged()")
 		
+		let paymentsManager = Biz.business.paymentsManager
 		let paymentId = payment.walletPaymentId()
 		
 		// PaymentView will need `WalletPaymentFetchOptions.companion.All`,
 		// so as long as we're fetching from the database, we might as well fetch everything we need.
 		let options = WalletPaymentFetchOptions.companion.All
 		
-		Biz.business.paymentsManager.getPayment(id: paymentId, options: options) { result, _ in
-			
-			if activeSheet == nil, let result = result {
-				activeSheet = .paymentView(payment: result) // triggers display of PaymentView sheet
+		Task { @MainActor in
+			let result = try await paymentsManager.getPayment(id: paymentId, options: options)
+			if self.activeSheet == nil, let result = result {
+				self.activeSheet = .paymentView(payment: result) // triggers display of PaymentView sheet
 			}
 		}
 	}
@@ -800,7 +801,7 @@ struct HomeView : MVIView {
 		bizNotifications_payment = list.filter({ item in
 			if let paymentRejected = item.notification as? PhoenixShared.Notification.PaymentRejected {
 				// Remove items where source == onChain
-				if paymentRejected.source == Lightning_kmpLiquidityEventsSource.offchainpayment {
+				if paymentRejected.source == Lightning_kmpLiquidityEventsSource.offChainPayment {
 					return paymentRejected.createdAt > cutOffDate
 				} else {
 					return false
@@ -934,16 +935,16 @@ struct HomeView : MVIView {
 		}
 	}
 	
-	func didSelectPayment(row: WalletPaymentOrderRow) -> Void {
+	func didSelectPayment(row: WalletPaymentOrderRow) {
 		log.trace("didSelectPayment()")
 		
 		// pretty much guaranteed to be in the cache
 		let fetcher = Biz.business.paymentsManager.fetcher
 		let options = PaymentCell.fetchOptions
-		fetcher.getPayment(row: row, options: options) { (result: WalletPaymentInfo?, _) in
-			
-			if activeSheet == nil, let result = result {
-				activeSheet = .paymentView(payment: result)
+		Task { @MainActor in
+			let result = try await fetcher.getPayment(row: row, options: options)
+			if self.activeSheet == nil, let result = result {
+				self.activeSheet = .paymentView(payment: result)
 			}
 		}
 	}

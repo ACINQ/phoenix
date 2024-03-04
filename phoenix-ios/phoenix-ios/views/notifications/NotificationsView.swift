@@ -274,7 +274,7 @@ struct NotificationsView : View {
 		bizNotifications_payment = list.filter({ item in
 			if let paymentRejected = item.notification as? PhoenixShared.Notification.PaymentRejected {
 				// Remove items where source == onChain
-				return !(paymentRejected.source == Lightning_kmpLiquidityEventsSource.onchainwallet)
+				return !(paymentRejected.source == Lightning_kmpLiquidityEventsSource.onChainWallet)
 			} else {
 				return false
 			}

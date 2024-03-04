@@ -574,9 +574,9 @@ struct TransactionsView: View {
 		// pretty much guaranteed to be in the cache
 		let fetcher = Biz.business.paymentsManager.fetcher
 		let options = PaymentCell.fetchOptions
-		fetcher.getPayment(row: row, options: options) { (result: WalletPaymentInfo?, _) in
-			
-			if let result = result {
+		Task { @MainActor in
+			let result = try await fetcher.getPayment(row: row, options: options)
+			if let result {
 				selectedItem = result
 			}
 		}
