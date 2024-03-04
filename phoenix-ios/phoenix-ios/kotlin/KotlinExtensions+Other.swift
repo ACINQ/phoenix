@@ -130,7 +130,6 @@ extension LnurlAuth {
 				case .login    : return NSLocalizedString("Login",        comment: "lnurl-auth: login button title")
 				case .link     : return NSLocalizedString("Link",         comment: "lnurl-auth: login button title")
 				case .auth     : return NSLocalizedString("Authenticate", comment: "lnurl-auth: login button title")
-				default        : break
 			}
 		}
 		return LnurlAuth.defaultActionPromptTitle
@@ -147,7 +146,6 @@ extension LnurlAuth {
 				case .login    : return NSLocalizedString("Logged In",     comment: "lnurl-auth: success text")
 				case .link     : return NSLocalizedString("Linked",        comment: "lnurl-auth: success text")
 				case .auth     : return NSLocalizedString("Authenticated", comment: "lnurl-auth: success text")
-				default        : break
 			}
 		}
 		return LnurlAuth.defaultActionSuccessTitle

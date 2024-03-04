@@ -205,7 +205,6 @@ extension FiatCurrency {
 		case .yer   : return "Yemeni Rial"
 		case .zar   : return "South African Rand"
 		case .zmw   : return "Zambian Kwacha"
-		default     : return self.shortName
 	}}
 	
 	private var longName_manualTranslation: String { switch self {
@@ -363,7 +362,6 @@ extension FiatCurrency {
 		case .yer   : return NSLocalizedString("YER", tableName: "Currencies", comment: "Yemeni Rial")
 		case .zar   : return NSLocalizedString("ZAR", tableName: "Currencies", comment: "South African Rand")
 		case .zmw   : return NSLocalizedString("ZMW", tableName: "Currencies", comment: "Zambian Kwacha")
-		default     : return ""
 	}}
 	
 	private var longName_marketTranslation: String { switch self {
@@ -477,10 +475,7 @@ extension BitcoinUnit {
 			case BitcoinUnit.bit  : return "1 bit = 0.00\(s)000\(s)100 btc"
 			case BitcoinUnit.mbtc : return "1 mbtc = 0.00\(s)100 btc"
 			case BitcoinUnit.btc  : return "1 btc"
-			default               : break
 		}
-		
-		return self.name
 	}
 }
 
