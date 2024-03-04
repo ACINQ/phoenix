@@ -9,71 +9,25 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-extension Lightning_kmpPeer {
-	
-	fileprivate struct _Key {
-		static var eventsFlowPublisher = 0
-	}
-	
-	func eventsFlowPublisher() -> AnyPublisher<Lightning_kmpPeerEvent, Never> {
-		
-		self.getSetAssociatedObject(storageKey: &_Key.eventsFlowPublisher) {
-			
-			/// Transforming from Kotlin:
-			/// `eventsFlow: SharedFlow<PeerEvent>`
-			///
-			KotlinPassthroughSubject<AnyObject>(
-				self.eventsFlow._bridgeToObjectiveC()
-			)
-			.compactMap { $0 as? Lightning_kmpPeerEvent }
-			.eraseToAnyPublisher()
-		}
-	}
-}
-
 extension Lightning_kmpElectrumClient {
 	
-	fileprivate struct _Key {
-		static var notificationsPublisher = 0
-	}
-	
-	func notificationsPublisher() -> AnyPublisher<Lightning_kmpElectrumSubscriptionResponse, Never> {
+	func notificationsSequence() -> AnyAsyncSequence<Lightning_kmpElectrumSubscriptionResponse> {
 		
-		self.getSetAssociatedObject(storageKey: &_Key.notificationsPublisher) {
-			
-			/// Transforming from Kotlin:
-			/// `notifications: Flow<ElectrumSubscriptionResponse>`
-			///
-			KotlinPassthroughSubject<AnyObject>(
-				self.notifications._bridgeToObjectiveC()
-			)
-			.compactMap { $0 as? Lightning_kmpElectrumSubscriptionResponse }
-			.eraseToAnyPublisher()
-		}
+		return self.notifications
+			.compactMap { $0 }
+			.eraseToAnyAsyncSequence()
 	}
 }
 
 // MARK: -
 extension Lightning_kmpElectrumWatcher {
 	
-	fileprivate struct _Key {
-		static var upToDatePublisher = 0
-	}
-	
-	func upToDatePublisher() -> AnyPublisher<Int64, Never> {
+	func upToDateSequence() -> AnyAsyncSequence<Int64> {
 		
-		self.getSetAssociatedObject(storageKey: &_Key.upToDatePublisher) {
-			
-			/// Transforming from Kotlin:
-			/// `openUpToDateFlow(): Flow<Long>`
-			///
-			KotlinPassthroughSubject<AnyObject>(
-				self.openUpToDateFlow()._bridgeToObjectiveC()
-			)
-			.compactMap { $0 as? KotlinLong }
+		return self.openUpToDateFlow()
+			.compactMap { $0 }
 			.map { $0.int64Value }
-			.eraseToAnyPublisher()
-		}
+			.eraseToAnyAsyncSequence()
 	}
 }
 
@@ -89,10 +43,6 @@ extension Lightning_kmpNodeParams {
 }
 
 extension Lightning_kmpSwapInWallet {
-	
-	fileprivate struct _Key {
-		static var swapInAddressPublisher = 0
-	}
 	
 	struct SwapInAddressInfo {
 		let addr: String

@@ -229,7 +229,7 @@ class WatchTower {
 		}
 		
 		var didDecrement = false
-		var watchTowerListener: AnyCancellable? = nil
+		var watchTowerHandler: Task<Void, Error>? = nil
 		var pendingTxHandler: Task<Void, Error>? = nil
 		
 		var peer: Lightning_kmpPeer? = nil
@@ -242,7 +242,7 @@ class WatchTower {
 				appConnectionsDaemon?.incrementDisconnectCount(target: target)
 			}
 			
-			watchTowerListener?.cancel()
+			watchTowerHandler?.cancel()
 			pendingTxHandler?.cancel()
 
 			self.lastTaskFailed = didTimeout
@@ -354,10 +354,13 @@ class WatchTower {
 			// I.e. when the channel subscriptions are considered up-to-date.
 			
 			let minMillis = Date.now.toMilliseconds()
-			watchTowerListener = _peer.watcher.upToDatePublisher().sink { (millis: Int64) in
-				// millis => timestamp of when electrum watch was marked up-to-date
-				if millis > minMillis {
-					finishWatchTowerTask(/* didTimeout: */ false)
+			watchTowerHandler = Task { @MainActor in
+				for await millis in _peer.watcher.upToDateSequence() {
+					// millis => timestamp of when electrum watch was marked up-to-date
+					if millis > minMillis {
+						finishWatchTowerTask(/* didTimeout: */ false)
+						break
+					}
 				}
 			}
 		}
@@ -366,7 +369,7 @@ class WatchTower {
 			pendingTxHandler = Task { @MainActor in
 				
 				// Wait until we're connected
-				for try await connections in Biz.business.connectionsManager.asyncStream {
+				for try await connections in Biz.business.connectionsManager.connectionsSequence() {
 					if connections.targetsEstablished(target) {
 						break
 					}

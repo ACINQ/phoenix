@@ -71,30 +71,6 @@ extension ConnectionsManager {
 	var currentValue: Connections {
 		return connections.value
 	}
-	
-	var asyncStream: SkieSwiftStateFlow<Connections> {
-		
-		return self.connections
-		
-//		return AsyncStream<Connections>(bufferingPolicy: .bufferingNewest(1)) { continuation in
-//			
-//			let swiftFlow = SwiftFlow<Connections>(origin: self.connections)
-//
-//			let watcher = swiftFlow.watch {(connections: Connections?) in
-//				if let connections {
-//					continuation.yield(connections)
-//				}
-//			}
-//			
-//			continuation.onTermination = { _ in
-//				DispatchQueue.main.async {
-//					// I'm not sure what thread this will be called from.
-//					// And I've witnessed crashes when invoking `watcher.close()` from  a non-main thread.
-//					watcher.close()
-//				}
-//			}
-//		}
-	}
 }
 
 extension Connections {

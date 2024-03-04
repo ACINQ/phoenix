@@ -709,7 +709,7 @@ struct SummaryView: View {
 			return
 		}
 		
-		for await notification in Biz.business.electrumClient.notificationsPublisher().values {
+		for await notification in Biz.business.electrumClient.notificationsSequence() {
 			
 			if notification is Lightning_kmpHeaderSubscriptionResponse {
 				// A new block was mined !
