@@ -1,4 +1,4 @@
-package fr.acinq.phoenix.utils
+package fr.acinq.phoenix.utils.flow
 
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.*
 fun <T> Flow<T>.wrap() = SwiftFlow(this)
 */
 
-
+// @co.touchlab.skie.configuration.annotations.FlowInterop.Disabled
 class SwiftFlow<T>(private val origin: Flow<T>) : Flow<T> by origin {
     fun watch(block: (T) -> Unit): Closeable {
         val job = Job()
@@ -34,7 +34,7 @@ class SwiftFlow<T>(private val origin: Flow<T>) : Flow<T> by origin {
     }
 }
 
-
+// @co.touchlab.skie.configuration.annotations.FlowInterop.Disabled
 class SwiftStateFlow<T>(private val origin: StateFlow<T>) : StateFlow<T> by origin {
     fun watch(block: (T) -> Unit): Closeable {
         val job = Job()
