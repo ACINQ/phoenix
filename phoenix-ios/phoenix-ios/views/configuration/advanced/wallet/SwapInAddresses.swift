@@ -10,8 +10,6 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct SwapInAddresses: View {
 	
-	let swapInAddressPublisher = Biz.business.peerManager.peerStatePublisher().flatMap { $0.swapInWallet.swapInAddressPublisher()
-	}
 	@State var swapInAddressInfo: Lightning_kmpSwapInWallet.SwapInAddressInfo? = nil
 	
 	@StateObject var toast = Toast()
@@ -42,8 +40,13 @@ struct SwapInAddresses: View {
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
-		.onReceive(swapInAddressPublisher) {
-			swapInAddressChanged($0)
+		.task {
+			guard let peer = Biz.business.peerManager.peerStateValue() else {
+				return
+			}
+			for await info in peer.swapInWallet.swapInAddressSequence() {
+				swapInAddressChanged(info)
+			}
 		}
 	}
 	

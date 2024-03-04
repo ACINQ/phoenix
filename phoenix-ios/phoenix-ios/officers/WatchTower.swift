@@ -380,7 +380,7 @@ class WatchTower {
 				
 				// Check to see if the peer clears its pending TX's
 				async let subtask2 = Task { @MainActor in
-					for try await channels in Biz.business.peerManager.channelsPublisher().values {
+					for try await channels in Biz.business.peerManager.channelsArraySequence() {
 						if !self.hasInFlightTransactions(channels) {
 							break
 						}

@@ -37,11 +37,9 @@ struct HomeView : MVIView {
 	
 	let lastCompletedPaymentPublisher = Biz.business.paymentsManager.lastCompletedPaymentPublisher()
 	
-	let swapInWalletPublisher = Biz.business.balanceManager.swapInWalletPublisher()
 	@State var swapInWallet = Biz.business.balanceManager.swapInWalletValue()
 	
 	@State var channels: [LocalChannelInfo] = []
-	let channelsPublisher = Biz.business.peerManager.channelsPublisher()
 	
 	let incomingSwapScaleFactor_BIG: CGFloat = 1.2
 	@State var incomingSwapScaleFactor: CGFloat = 1.0
@@ -122,11 +120,15 @@ struct HomeView : MVIView {
 		.onReceive(lastCompletedPaymentPublisher) {
 			lastCompletedPaymentChanged($0)
 		}
-		.onReceive(swapInWalletPublisher) {
-			swapInWalletChanged($0)
+		.task {
+			for await wallet in Biz.business.balanceManager.swapInWalletSequence() {
+				swapInWalletChanged(wallet)
+			}
 		}
-		.onReceive(channelsPublisher) {
-			channelsChanged($0)
+		.task {
+			for await newChannels in Biz.business.peerManager.channelsArraySequence() {
+				channelsChanged(newChannels)
+			}
 		}
 		.onReceive(bizNotificationsPublisher) {
 			bizNotificationsChanged($0)
