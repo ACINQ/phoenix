@@ -22,7 +22,7 @@
     <string name="notification_channels_watcher_title">Sledovač kanálů</string>
     <string name="notification_channels_watcher_desc">Zobrazí se, když bude potřeba spustit Phoenix.</string>
 
-    <string name="notification_pending_settlement_title">Probíhá vyrovnání</string>
+    <string name="notification_pending_settlement_title">Dokončení platby</string>
     <string name="notification_pending_settlement_desc">Informuje vás, když je potřeba spustit Phoenix k vyrovnání platby.</string>
 
     <string name="notification_missed_payment_title">Platba zamítnuta</string>

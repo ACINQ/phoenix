@@ -119,25 +119,25 @@ fun SplashLabelRow(
     @DrawableRes icon: Int? = null,
     iconTint: Color = MaterialTheme.typography.subtitle1.color,
     helpMessage: String? = null,
+    helpLink: Pair<String, String>? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Row(
         modifier = Modifier.padding(vertical = 3.dp)
     ) {
-        Row(modifier = Modifier
-            .weight(1f)
-            .alignByBaseline(),
+        Row(
+            modifier = Modifier.weight(1f).alignByBaseline(),
+            horizontalArrangement = Arrangement.End
         ) {
-            Spacer(modifier = Modifier.weight(1f))
-
             Text(
                 text = label.uppercase(),
                 style = MaterialTheme.typography.subtitle1.copy(fontSize = 12.sp, textAlign = TextAlign.End),
                 maxLines = 2,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
             )
             if (helpMessage != null) {
-                IconPopup(modifier = Modifier.offset(y = (-3).dp), popupMessage = helpMessage, spaceLeft = 4.dp, spaceRight = 0.dp)
+                IconPopup(modifier = Modifier.offset(y = (-3).dp), popupMessage = helpMessage, popupLink = helpLink, spaceLeft = 4.dp, spaceRight = 0.dp)
             }
             if (icon != null) {
                 Spacer(modifier = Modifier.width(4.dp))

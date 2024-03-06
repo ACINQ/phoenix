@@ -20,16 +20,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import fr.acinq.bitcoin.ByteVector
-import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.Transaction
-import fr.acinq.bitcoin.TxOut
-import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.crypto.KeyManager
-import fr.acinq.lightning.crypto.LocalKeyManager
-import fr.acinq.lightning.transactions.Transactions
-import fr.acinq.phoenix.managers.NodeParamsManager
-import fr.acinq.phoenix.managers.PeerManager
+import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.phoenix.managers.WalletManager
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
@@ -42,7 +34,6 @@ sealed class SwapInSignerState {
     object Init : SwapInSignerState()
     object Signing : SwapInSignerState()
     data class Signed(
-        val amount: Satoshi,
         val txId: String,
         val userSig: String,
     ) : SwapInSignerState()
@@ -53,24 +44,24 @@ sealed class SwapInSignerState {
 }
 
 class SwapInSignerViewModel(
-    val walletManager: WalletManager,
+    private val walletManager: WalletManager,
+    private val electrumClient: ElectrumClient,
 ) : ViewModel() {
 
-    val log = LoggerFactory.getLogger(this::class.java)
+    private val log = LoggerFactory.getLogger(this::class.java)
     val state = mutableStateOf<SwapInSignerState>(SwapInSignerState.Init)
 
     fun sign(
         unsignedTx: String,
-        amount: Satoshi,
     ) {
         if (state.value == SwapInSignerState.Signing) return
         state.value = SwapInSignerState.Signing
 
         viewModelScope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, e ->
-            log.error("failed to sign tx=$unsignedTx for amount=$amount : ", e)
+            log.error("failed to sign tx=$unsignedTx: ", e)
             state.value = SwapInSignerState.Failed.Error(e)
         }) {
-            log.debug("signing tx=$unsignedTx amount=$amount")
+            log.debug("signing tx=$unsignedTx")
             val tx = try {
                 Transaction.read(unsignedTx)
             } catch (e: Exception) {
@@ -78,14 +69,17 @@ class SwapInSignerViewModel(
                 state.value = SwapInSignerState.Failed.InvalidTxInput(e)
                 return@launch
             }
+            val input = if (tx.txIn.size == 1) tx.txIn.first() else throw RuntimeException("tx has ${tx.txIn.size} inputs")
+            val parentTxId = input.outPoint.txid
+            log.debug("retrieving parent_tx $parentTxId")
+            val parentTx = electrumClient.getTx(input.outPoint.txid) ?: throw RuntimeException("parent tx=$parentTxId not found by electrum")
             val keyManager = walletManager.keyManager.filterNotNull().first()
             val userSig = keyManager.swapInOnChainWallet.signSwapInputUserLegacy(
                 fundingTx = tx,
                 index = 0,
-                parentTxOuts = listOf(TxOut(amount, ByteVector.empty)),
+                parentTxOuts = parentTx.txOut,
             )
             state.value = SwapInSignerState.Signed(
-                amount = amount,
                 txId = tx.txid.toString(),
                 userSig = userSig.toString(),
             )
@@ -94,10 +88,11 @@ class SwapInSignerViewModel(
 
     class Factory(
         private val walletManager: WalletManager,
+        private val electrumClient: ElectrumClient,
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return SwapInSignerViewModel(walletManager) as T
+            return SwapInSignerViewModel(walletManager, electrumClient) as T
         }
     }
 }

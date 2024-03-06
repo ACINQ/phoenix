@@ -30,6 +30,9 @@
     <string name="notif_pending_settlement_title">Por favor, inicie o Phoenix</string>
     <string name="notif_pending_settlement_message">Uma liquidação recebida está pendente.</string>
 
+    <string name="notif_inflight_payment_title">Um pagamento está pendente</string>
+    <string name="notif_inflight_payment_message">Iniciar a Phoenix para que o pagamento possa ser finalizado no devido tempo.</string>
+
     <string name="notif_missed_title">Pagamento recebido perdido</string>
     <string name="notif_missed_unavailable">O Phoenix não pôde ser iniciado em segundo plano.</string>
 

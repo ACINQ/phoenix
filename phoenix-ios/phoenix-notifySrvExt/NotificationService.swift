@@ -54,7 +54,8 @@ class NotificationService: UNNotificationServiceExtension {
 		let selfPtr = Unmanaged.passUnretained(self).toOpaque().debugDescription
 		
 		log.trace("instance => \(selfPtr)")
-		log.trace("didReceive(_:withContentHandler:)")
+		log.trace("didReceive(request:withContentHandler:)")
+		log.trace("request.content.userInfo: \(request.content.userInfo)")
 		
 		self.contentHandler = contentHandler
 		self.bestAttemptContent = (request.content.mutableCopy() as? UNMutableNotificationContent)
@@ -274,6 +275,42 @@ class NotificationService: UNNotificationServiceExtension {
 	// MARK: Finish
 	// --------------------------------------------------
 	
+	enum PushNotificationReason {
+		case incomingPayment
+		case pendingSettlement
+		case unknown
+	}
+	
+	private func pushNotificationReason() -> PushNotificationReason {
+		
+		// Example: request.content.userInfo:
+		// {
+		//   "gcm.message_id": 1605136272123442,
+		//   "google.c.sender.id": 458618232423,
+		//   "google.c.a.e": 1,
+		//   "google.c.fid": "dRLLO-mxUxbDvmV1urj5Tt",
+		//   "reason": "IncomingPayment",
+		//   "aps": {
+		//     "alert": {
+		//       "title": "Phoenix is running in the background",
+		//     },
+		//     "mutable-content": 1
+		//   }
+		// }
+		
+		if let userInfo = bestAttemptContent?.userInfo,
+		   let reason = userInfo["reason"] as? String
+		{
+			switch reason {
+				case "IncomingPayment"   : return .incomingPayment
+				case "PendingSettlement" : return .pendingSettlement
+				default                  : break
+			}
+		}
+		
+		return .unknown
+	}
+	
 	private func displayPushNotification() {
 		log.trace("displayPushNotification()")
 		assertMainThread()
@@ -300,7 +337,13 @@ class NotificationService: UNNotificationServiceExtension {
 		stopPhoenix()
 		
 		if receivedPayments.isEmpty {
-			bestAttemptContent.title = NSLocalizedString("Missed incoming payment", comment: "")
+			
+			if pushNotificationReason() == .pendingSettlement {
+				bestAttemptContent.title = NSLocalizedString("Please start Phoenix", comment: "")
+				bestAttemptContent.body = NSLocalizedString("An incoming settlement is pending.", comment: "")
+			} else {
+				bestAttemptContent.title = NSLocalizedString("Missed incoming payment", comment: "")
+			}
 			
 		} else { // received 1 or more payments
 			

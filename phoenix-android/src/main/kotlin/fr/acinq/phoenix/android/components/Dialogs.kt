@@ -29,8 +29,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -182,25 +182,23 @@ fun RowScope.IconPopup(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
     var showPopup by remember { mutableStateOf(false) }
-    spaceLeft?.let { Spacer(Modifier.width(it)) }
-    Box {
-        BorderButton(
-            icon = icon,
-            iconTint = if (showPopup) MaterialTheme.colors.onPrimary else colorAtRest,
-            backgroundColor = if (showPopup) MaterialTheme.colors.primary else MaterialTheme.colors.surface,
-            borderColor = if (showPopup) MaterialTheme.colors.primary else colorAtRest,
-            padding = PaddingValues(iconPadding),
-            modifier = modifier.size(iconSize),
-            interactionSource = interactionSource,
-            onClick = { showPopup = true }
-        )
-        if (showPopup) {
-            PopupDialog(onDismiss = { showPopup = false }, message = popupMessage, button = popupLink?.let { (text, link) ->
-                { WebLink(text = text, url = link, fontSize = 14.sp, modifier = Modifier.fillMaxWidth(), padding = PaddingValues(horizontal = 10.dp, vertical = 8.dp)) }
-            })
-        }
+    spaceLeft?.let { Spacer(Modifier.requiredWidth(it)) }
+    BorderButton(
+        icon = icon,
+        iconTint = if (showPopup) MaterialTheme.colors.onPrimary else colorAtRest,
+        backgroundColor = if (showPopup) MaterialTheme.colors.primary else MaterialTheme.colors.surface,
+        borderColor = if (showPopup) MaterialTheme.colors.primary else colorAtRest,
+        padding = PaddingValues(iconPadding),
+        modifier = modifier.requiredSize(iconSize),
+        interactionSource = interactionSource,
+        onClick = { showPopup = true }
+    )
+    if (showPopup) {
+        PopupDialog(onDismiss = { showPopup = false }, message = popupMessage, button = popupLink?.let { (text, link) ->
+            { WebLink(text = text, url = link, fontSize = 14.sp, modifier = Modifier.fillMaxWidth(), padding = PaddingValues(horizontal = 10.dp, vertical = 8.dp)) }
+        })
     }
-    spaceRight?.let { Spacer(Modifier.width(it)) }
+    spaceRight?.let { Spacer(Modifier.requiredWidth(it)) }
 }
 
 @Composable

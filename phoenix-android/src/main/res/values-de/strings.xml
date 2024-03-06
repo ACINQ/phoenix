@@ -22,7 +22,7 @@
     <string name="notification_channels_watcher_title">Kanal-Beobachtung</string>
     <string name="notification_channels_watcher_desc">Wird angezeigt, wenn Sie Phoenix öffnen müssen.</string>
 
-    <string name="notification_pending_settlement_title">Zahlung ausstehend</string>
+    <string name="notification_pending_settlement_title">Zahlung abschließen</string>
     <string name="notification_pending_settlement_desc">Wird angezeigt, wenn Sie Phoenix öffnen müssen, um eine Zahlung abzuwickeln.</string>
 
     <string name="notification_missed_payment_title">Zahlung abgelehnt</string>

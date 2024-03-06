@@ -27,7 +27,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 
 	private var appCancellables = Set<AnyCancellable>()
 	private var groupPrefsCancellables = Set<AnyCancellable>()
-	private var isInBackground = false
 
 	public var externalLightningUrlPublisher = PassthroughSubject<String, Never>()
 
@@ -82,8 +81,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		
 		FirebaseApp.configure()
 		Messaging.messaging().delegate = self
-	
-		WatchTower.registerBackgroundTasks()
 
 		let nc = NotificationCenter.default
 		
@@ -94,14 +91,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		
 		nc.publisher(for: UIApplication.willResignActiveNotification).sink { _ in
 			self._applicationWillResignActive(application)
-		}.store(in: &appCancellables)
-		
-		nc.publisher(for: UIApplication.didEnterBackgroundNotification).sink { _ in
-			self._applicationDidEnterBackground(application)
-		}.store(in: &appCancellables)
-		
-		nc.publisher(for: UIApplication.willEnterForegroundNotification).sink { _ in
-			self._applicationWillEnterForeground(application)
 		}.store(in: &appCancellables)
 
 		CrossProcessCommunication.shared.start(actor: .mainApp) { (_: XpcMessage) in
@@ -118,12 +107,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	
 	/// This function isn't called, because Firebase broke it with their stupid swizzling stuff.
 	func applicationWillResignActive(_ application: UIApplication) {/* :( */}
-	
-	/// This function isn't called, because Firebase broke it with their stupid swizzling stuff.
-	func applicationDidEnterBackground(_ application: UIApplication) {/* :( */}
-	
-	/// This function isn't called, because Firebase broke it with their stupid swizzling stuff.
-	func applicationWillEnterForeground(_ application: UIApplication) {/* :( */}
 	
 	func _applicationDidBecomeActive(_ application: UIApplication) {
 		log.trace("### applicationDidBecomeActive(_:)")
@@ -151,30 +134,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		log.trace("### applicationWillResignActive(_:)")
 
 		groupPrefsCancellables.removeAll()
-	}
-	
-	func _applicationDidEnterBackground(_ application: UIApplication) {
-		log.trace("### applicationDidEnterBackground(_:)")
-		
-		if !isInBackground {
-			Biz.business.appConnectionsDaemon?.incrementDisconnectCount(
-				target: AppConnectionsDaemon.ControlTarget.companion.All
-			)
-			isInBackground = true
-		}
-		
-		WatchTower.scheduleBackgroundTasks()
-	}
-	
-	func _applicationWillEnterForeground(_ application: UIApplication) {
-		log.trace("### applicationWillEnterForeground(_:)")
-		
-		if isInBackground {
-			Biz.business.appConnectionsDaemon?.decrementDisconnectCount(
-				target: AppConnectionsDaemon.ControlTarget.companion.All
-			)
-			isInBackground = false
-		}
 	}
 	
 	// --------------------------------------------------

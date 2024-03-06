@@ -160,6 +160,7 @@ private fun ReceiveViewPages(
             val maxWidth = maxWidth
             Column(
                 modifier = Modifier
+                    .fillMaxWidth()
                     .padding(
                         horizontal = when {
                             maxWidth <= 320.dp -> 6.dp

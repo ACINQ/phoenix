@@ -72,7 +72,7 @@ extension ConnectionsManager {
 		return connections.value_ as! Connections
 	}
 	
-	var asyncStream: AsyncStream<Connections> {
+	func asyncStream() -> AsyncStream<Connections> {
 		
 		return AsyncStream<Connections>(bufferingPolicy: .bufferingNewest(1)) { continuation in
 			
@@ -112,6 +112,30 @@ extension Connections {
 			return true
 		}
 		return false
+	}
+	
+	func targetsEstablished(_ target: AppConnectionsDaemon.ControlTarget) -> Bool {
+		
+		if !self.internet.isEstablished() {
+			return false
+		}
+		if target.containsPeer {
+			if !self.peer.isEstablished() {
+				return false
+			}
+		}
+		if target.containsElectrum {
+			if !self.electrum.isEstablished() {
+				return false
+			}
+		}
+		if target.containsTor && self.torEnabled {
+			if !self.tor.isEstablished() {
+				return false
+			}
+		}
+		
+		return true
 	}
 }
 
@@ -156,6 +180,21 @@ extension PlatformContext {
 	
 	static var `default`: PlatformContext {
 		return PlatformContext(logger: KotlinLogger.shared.logger)
+	}
+}
+
+extension AppConnectionsDaemon.ControlTargetCompanion {
+	
+	var ElectrumPlusTor: AppConnectionsDaemon.ControlTarget {
+		return AppConnectionsDaemon.ControlTarget.companion.Electrum.plus(other: AppConnectionsDaemon.ControlTarget.companion.Tor
+		)
+	}
+	
+	var AllMinusElectrum: AppConnectionsDaemon.ControlTarget {
+		var flags = AppConnectionsDaemon.ControlTarget.companion.All.flags
+		flags ^= AppConnectionsDaemon.ControlTarget.companion.Electrum.flags
+		
+		return AppConnectionsDaemon.ControlTarget(flags: flags)
 	}
 }
 

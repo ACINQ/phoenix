@@ -230,6 +230,21 @@ object SystemNotificationHelper {
         }
     }
 
+    fun notifyInFlightHtlc(context: Context): Notification {
+        return NotificationCompat.Builder(context, SETTLEMENT_PENDING_NOTIF_CHANNEL).apply {
+            setContentTitle(context.getString(R.string.notif_inflight_payment_title))
+            setContentText(context.getString(R.string.notif_inflight_payment_message))
+            setStyle(NotificationCompat.BigTextStyle().bigText(context.getString(R.string.notif_inflight_payment_message)))
+            setSmallIcon(R.drawable.ic_phoenix_outline)
+            setContentIntent(PendingIntent.getActivity(context, 0, Intent(context, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE))
+            setAutoCancel(true)
+        }.build().also {
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                NotificationManagerCompat.from(context).notify(SETTLEMENT_PENDING_NOTIF_ID, it)
+            }
+        }
+    }
+
     suspend fun notifyPaymentsReceived(
         context: Context,
         paymentHash: ByteVector32,

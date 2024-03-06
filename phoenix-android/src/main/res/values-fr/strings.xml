@@ -22,8 +22,8 @@
     <string name="notification_channels_watcher_title">Observation des canaux</string>
     <string name="notification_channels_watcher_desc">Affiché lorsqu\'il faut lancer Phoenix.</string>
 
-    <string name="notification_pending_settlement_title">Paiement en suspens</string>
-    <string name="notification_pending_settlement_desc">Affiché lorsque Phoenix doit être démarré pour terminer un paiement.</string>
+    <string name="notification_pending_settlement_title">Finalisation de paiement</string>
+    <string name="notification_pending_settlement_desc">Affiché lorsque Phoenix doit être démarré pour finaliser un paiement.</string>
 
     <string name="notification_missed_payment_title">Paiement rejeté</string>
     <string name="notification_missed_payment_desc">Affiché lorsqu\'un paiement est rejeté par insuffisance de liquidité.</string>

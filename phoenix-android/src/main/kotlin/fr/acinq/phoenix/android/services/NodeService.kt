@@ -1,17 +1,21 @@
 package fr.acinq.phoenix.android.services
 
+import android.app.Notification
 import android.app.Service
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.os.Binder
+import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.text.format.DateUtils
 import androidx.compose.runtime.mutableStateListOf
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.ServiceCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.work.await
+import androidx.work.WorkManager
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import fr.acinq.bitcoin.TxId
@@ -30,6 +34,7 @@ import fr.acinq.phoenix.android.utils.SystemNotificationHelper
 import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.data.StartupParams
+import fr.acinq.phoenix.data.inFlightPaymentsCount
 import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import fr.acinq.phoenix.managers.AppConfigurationManager
 import fr.acinq.phoenix.managers.CurrencyManager
@@ -44,8 +49,10 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
 import java.util.concurrent.locks.ReentrantLock
+import kotlin.time.Duration.Companion.hours
 
 class NodeService : Service() {
 
@@ -75,6 +82,7 @@ class NodeService : Service() {
     private var monitorPaymentsJob: Job? = null
     private var monitorNodeEventsJob: Job? = null
     private var monitorFcmTokenJob: Job? = null
+    private var monitorInFlightPaymentsJob: Job? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -143,22 +151,30 @@ class NodeService : Service() {
     /** Called when an intent is called for this service. */
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
-        log.debug("start service from intent [ intent=$intent, flag=$flags, startId=$startId ]")
+        log.info("start service from intent [ intent=$intent, flag=$flags, startId=$startId ]")
         val reason = intent?.getStringExtra(EXTRA_REASON)
+
+        fun startForeground(notif: Notification) {
+            if (Build.VERSION.SDK_INT >= 34) {
+                ServiceCompat.startForeground(this, SystemNotificationHelper.HEADLESS_NOTIF_ID, notif, ServiceInfo.FOREGROUND_SERVICE_TYPE_SHORT_SERVICE)
+            } else {
+                startForeground(SystemNotificationHelper.HEADLESS_NOTIF_ID, notif)
+            }
+        }
 
         val encryptedSeed = SeedManager.loadSeedFromDisk(applicationContext)
         when {
             _state.value is NodeServiceState.Running -> {
                 // NOTE: the notification will NOT be shown if the app is already running
                 val notif = SystemNotificationHelper.notifyRunningHeadless(applicationContext)
-                startForeground(SystemNotificationHelper.HEADLESS_NOTIF_ID, notif)
+                startForeground(notif)
             }
             encryptedSeed is EncryptedSeed.V2.NoAuth -> {
                 val seed = encryptedSeed.decrypt()
                 log.debug("successfully decrypted seed in the background, starting wallet...")
                 val notif = SystemNotificationHelper.notifyRunningHeadless(applicationContext)
-                startForeground(SystemNotificationHelper.HEADLESS_NOTIF_ID, notif)
                 startBusiness(seed, requestCheckLegacyChannels = false)
+                startForeground(notif)
             }
             else -> {
                 log.warn("unhandled incoming payment with seed=${encryptedSeed?.name()} reason=$reason")
@@ -167,11 +183,11 @@ class NodeService : Service() {
                     "PendingSettlement" -> SystemNotificationHelper.notifyPendingSettlement(applicationContext)
                     else -> SystemNotificationHelper.notifyRunningHeadless(applicationContext)
                 }
-                startForeground(SystemNotificationHelper.HEADLESS_NOTIF_ID, notif)
+                startForeground(notif)
             }
         }
         shutdownHandler.removeCallbacksAndMessages(null)
-        shutdownHandler.postDelayed(shutdownRunnable, 60 * 1000L) // push back shutdown by 60s
+        shutdownHandler.postDelayed(shutdownRunnable, 2 * 60 * 1000L) // service will shutdown in 2 minutes
         if (!isHeadless) {
             stopForeground(STOP_FOREGROUND_REMOVE)
         }
@@ -204,7 +220,14 @@ class NodeService : Service() {
                 stopForeground(STOP_FOREGROUND_REMOVE)
             }
         }) {
-            ChannelsWatcher.cancel(applicationContext).await()
+            log.info("cancel competing workers")
+            val wm = WorkManager.getInstance(applicationContext)
+            withContext(Dispatchers.IO) {
+                wm.getWorkInfosByTag(InflightPaymentsWatcher.TAG).get() + wm.getWorkInfosByTag(ChannelsWatcher.TAG).get()
+            }.forEach {
+                wm.cancelWorkById(it.id).result.get()
+            }
+
             log.info("starting node from service state=${_state.value?.name} with checkLegacyChannels=$requestCheckLegacyChannels")
             doStartBusiness(decryptedMnemonics, requestCheckLegacyChannels)
             ChannelsWatcher.schedule(applicationContext)
@@ -233,6 +256,7 @@ class NodeService : Service() {
         monitorPaymentsJob = serviceScope.launch { monitorPaymentsWhenHeadless(business.peerManager, business.currencyManager) }
         monitorNodeEventsJob = serviceScope.launch { monitorNodeEvents(business.peerManager, business.nodeParamsManager) }
         monitorFcmTokenJob = serviceScope.launch { monitorFcmToken(business) }
+        monitorInFlightPaymentsJob = serviceScope.launch { monitorInFlightPayments(business.peerManager) }
 
         // preparing business
         val seed = business.walletManager.mnemonicsToSeed(EncryptedSeed.toMnemonics(decryptedMnemonics))
@@ -322,13 +346,21 @@ class NodeService : Service() {
                             rates = currencyManager.ratesFlow.value,
                             isHeadless = isHeadless && receivedInBackground.size == 1
                         )
-
-                        // push back service shutdown by 60s - maybe we'll receive more payments?
-                        shutdownHandler.removeCallbacksAndMessages(null)
-                        shutdownHandler.postDelayed(shutdownRunnable, 60 * 1000)
                     }
                 }
                 else -> Unit
+            }
+        }
+    }
+
+    private suspend fun monitorInFlightPayments(peerManager: PeerManager) {
+        peerManager.channelsFlow.filterNotNull().collect {
+            val inFlightPaymentsCount = it.inFlightPaymentsCount()
+            internalData.saveInFlightPaymentsCount(inFlightPaymentsCount)
+            if (inFlightPaymentsCount == 0) {
+                InflightPaymentsWatcher.cancel(applicationContext)
+            } else {
+                InflightPaymentsWatcher.scheduleOnce(applicationContext, delay = 2.hours)
             }
         }
     }

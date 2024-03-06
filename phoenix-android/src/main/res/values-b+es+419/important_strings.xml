@@ -27,6 +27,9 @@
     <string name="notif_pending_settlement_title">Inicia Phoenix</string>
     <string name="notif_pending_settlement_message">Un pago entrante está pendiente.</string>
 
+    <string name="notif_inflight_payment_title">Hay un pago pendiente</string>.
+    <string name="notif_inflight_payment_message">Iniciar Phoenix para poder finalizar el pago a su debido tiempo.</string>
+
     <string name="notif_missed_title">Pasaste por alto un pago entrante</string>
     <string name="notif_missed_unavailable">No se pudo iniciar Phoenix en segundo plano.</string>
 

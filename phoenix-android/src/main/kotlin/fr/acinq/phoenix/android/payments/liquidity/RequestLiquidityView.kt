@@ -39,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -124,6 +125,7 @@ private fun RequestLiquidityTopSection(inboundLiquidity: MilliSatoshi?) {
             Text(
                 text = stringResource(id = R.string.liquidityads_header),
                 style = MaterialTheme.typography.h4,
+                textAlign = TextAlign.Center,
             )
             IconPopup(
                 popupMessage = stringResource(id = R.string.liquidityads_instructions),
@@ -274,7 +276,8 @@ private fun LeaseEstimationView(
     Spacer(modifier = Modifier.height(8.dp))
     SplashLabelRow(
         label = stringResource(id = R.string.liquidityads_estimate_details_duration),
-        helpMessage = stringResource(id = R.string.liquidityads_estimate_details_duration_help)
+        helpMessage = stringResource(id = R.string.liquidityads_estimate_details_duration_help),
+        helpLink = stringResource(id = R.string.liquidityads_faq_link) to "https://phoenix.acinq.co/faq#what-happens-after-a-year-of-reserving-liquidity",
     ) {
         Column {
             Text(
