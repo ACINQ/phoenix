@@ -155,7 +155,11 @@ class NodeService : Service() {
         val reason = intent?.getStringExtra(EXTRA_REASON)
 
         fun startForeground(notif: Notification) {
-            ServiceCompat.startForeground(this, SystemNotificationHelper.HEADLESS_NOTIF_ID, notif, if (Build.VERSION.SDK_INT >= 34) ServiceInfo.FOREGROUND_SERVICE_TYPE_SHORT_SERVICE else 0)
+            if (Build.VERSION.SDK_INT >= 34) {
+                ServiceCompat.startForeground(this, SystemNotificationHelper.HEADLESS_NOTIF_ID, notif, ServiceInfo.FOREGROUND_SERVICE_TYPE_SHORT_SERVICE)
+            } else {
+                startForeground(SystemNotificationHelper.HEADLESS_NOTIF_ID, notif)
+            }
         }
 
         val encryptedSeed = SeedManager.loadSeedFromDisk(applicationContext)
