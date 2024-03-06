@@ -1,0 +1,778 @@
+<!--
+  ~ Copyright 2024 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+
+    <string name="app_name">Phoenix Testnet</string>
+
+    <!-- system notification channels -->
+
+    <string name="notification_channels_watcher_title">Giám sát kênh</string>
+    <string name="notification_channels_watcher_desc">Hiển thị khi bạn cần khởi động Phoenix.</string>
+
+    <string name="notification_pending_settlement_title">Thanh toán đang chờ xử lý</string>
+    <string name="notification_pending_settlement_desc">Cho bạn biết khi nào Phoenix cần được khởi động để xử lý thanh toán.</string>
+
+    <string name="notification_missed_payment_title">Thanh toán bị từ chối</string>
+    <string name="notification_missed_payment_desc">Hiển thị khi Phoenix không thể nhận thanh toán do lỗi thanh khoản.</string>
+
+    <string name="notification_received_payment_title">Đã nhận được thanh toán</string>
+    <string name="notification_received_payment_desc">Hiển thị khi bạn nhận được thanh toán trong lúc ứng dụng đang chạy ở chế độ nền.</string>
+
+    <string name="notification_headless_title">Đang chạy ở chế độ nền</string>
+    <string name="notification_headless_desc">Cho bạn biết khi nào Phoenix đang chạy ở chế độ nền.</string>
+
+    <string name="notification_swap_timeout_title">Hết thời gian swap</string>
+    <string name="notification_swap_timeout_desc">Cho bạn biết khi một swap sắp hết giờ.</string>
+
+    <!-- init wallet / automated wallet creation -->
+
+    <string name="autocreate_generating">Đang tạo ví của bạn…</string>
+    <string name="autocreate_error">Tạo ví không thành công</string>
+
+    <string name="restore_title">Khôi phục ví của tôi</string>
+    <string name="restore_disclaimer_next">Tiếp Theo</string>
+    <string name="restore_in_progress">Đang khôi phục ví của bạn…</string>
+
+    <!-- Auth prompt (v2) -->
+
+    <string name="authprompt_title">Mở khóa để tiếp tục</string>
+
+    <!-- Startup -->
+
+    <string name="startup_binding_service">Binding dịch vụ…</string>
+    <string name="startup_wait">Đang chuẩn bị ví…</string>
+    <string name="startup_wait_legacy_check">Đang kiểm tra ví cũ…</string>
+    <string name="startup_manual_unlock_button">Mở khoá</string>
+    <string name="startup_checking_seed">Đang mở khoá…</string>
+    <string name="startup_unlocked">Quyền truy cập được chấp nhận…</string>
+    <string name="startup_unlock_failure">Mở khóa không thành công</string>
+    <string name="startup_unlock_failure_keystore">Lỗi kho khóa Android</string>
+    <string name="startup_unlock_failure_unhandled_version">Phiên bản hạt giống chưa được xử lý (%1$s)</string>
+    <string name="startup_unlock_failure_fallback">Mở khóa bằng hạt giống</string>
+
+    <string name="startup_fallback_instructions">Nhập 12 từ khôi phục để mở khóa ví của bạn.\n\nCác từ phải được nhập theo đúng thứ tự và cách nhau bằng một dấu cách.</string>
+    <string name="startup_fallback_input_label">Nhập từ #%1$d</string>
+    <string name="startup_fallback_input_label_error">Không vượt quá 12 từ!</string>
+    <string name="startup_fallback_incomplete">Nhập hạt giống hoàn chỉnh để tiếp tục.</string>
+    <string name="startup_fallback_invalid">Hạt giống này không hợp lệ. Hãy đảm bảo các từ chính xác và theo đúng thứ tự.</string>
+    <string name="startup_fallback_unlock_button">Mở khoá ví</string>
+    <string name="startup_fallback_checking">Đang kiểm tra hạt giống…</string>
+    <string name="startup_fallback_error_default">Đã xảy ra lỗi. Vui lòng thử lại.</string>
+    <string name="startup_fallback_error_incorrect_seed">Hạt giống này không khớp với ví của bạn.</string>
+    <string name="startup_fallback_success_match">Hạt giống đã khớp.\nĐang ghi nhớ vào ổ…</string>
+    <string name="startup_fallback_success_starting">Đang khởi động Phoenix…</string>
+
+    <string name="startup_starting">Đang khởi động…</string>
+    <string name="startup_error_generic">Ứng dụng không khởi động được.</string>
+
+    <!-- Switch between legacy/modern apps -->
+
+    <string name="legacyswitch_title">Ứng dụng cũ</string>
+    <string name="legacyswitch_restart">Khởi động ứng dụng cũ</string>
+
+    <!-- Payment line -->
+
+    <string name="paymentline_prefix_sent">-</string>
+    <string name="paymentline_prefix_received">+</string>
+    <string name="paymentline_desc_pending_onchain">Đang chờ xác nhận</string>
+    <string name="paymentline_desc_pending_offchain">Đang chờ thanh toán</string>
+    <string name="paymentline_desc_success_onchain">Xác nhận thanh toán</string>
+    <string name="paymentline_desc_success_offchain">Thanh toán đã hoàn tất</string>
+    <string name="paymentline_desc_failed">Thanh toán không thành công</string>
+
+    <!-- Receive screen -->
+
+    <string name="receive_help_qr">Mã QR của hóa đơn/địa chỉ</string>
+
+    <string name="receive_bitcoin_title">Bitcoin</string>
+    <string name="receive_bitcoin_help">Mã QR này là một địa chỉ Bitcoin thông thường.\n\nMã có thể đọc được bởi hầu hết mọi dịch vụ/ví Bitcoin, tuy nhiên thanh toán sẽ đến chậm hơn.</string>
+    <string name="receive_bitcoin_address_label">Địa chỉ</string>
+    <string name="receive_bitcoin_generating">Đang đồng bộ hóa địa chỉ…</string>
+    <string name="receive_bitcoin_error">Không thể tạo địa chỉ Bitcoin</string>
+    <string name="receive_bitcoin_share_title">Địa chỉ Bitcoin</string>
+    <string name="receive_bitcoin_share_subject">Chia sẻ địa chỉ Bitcoin này với…</string>
+
+    <string name="receive_lightning_title">Lightning</string>
+    <string name="receive_lightning_help">Mã QR này là 1 hóa đơn Lightning.\n\nThanh toán Lightning rất nhanh và thường rẻ hơn, tuy nhiên nó có thể chưa được hỗ trợ bởi một số loại ví và một số dịch vụ.\n\nTrong trường hợp đó, hãy vuốt sang phải để nhận địa chỉ Bitcoin thông thường.</string>
+    <string name="receive_lightning_generating">Đang tạo…</string>
+    <string name="receive_lightning_amount_label">Số tiền</string>
+    <string name="receive_lightning_desc_label">Mô tả</string>
+    <string name="receive_lightning_error">Không thể xuất hóa đơn</string>
+    <string name="receive_lightning_share_subject">Hoá đơn Lightning</string>
+    <string name="receive_lightning_share_title">Chia sẻ hóa đơn Lightning này với…</string>
+    <string name="receive_lnurl_button">Sử dụng liên kết LNURL</string>
+
+    <string name="receive_lightning_edit_button">Chỉnh sửa</string>
+    <string name="receive_lightning_edit_title">Chỉnh sửa hoá đơn</string>
+    <string name="receive_lightning_edit_amount_label">Số tiền (không bắt buộc)</string>
+    <string name="receive_lightning_edit_amount_placeholder">Số tiền sẽ nhận</string>
+    <string name="receive_lightning_edit_desc_label">Mô tả (không bắt buộc)</string>
+    <string name="receive_lightning_edit_desc_placeholder">Nhập mô tả cho hóa đơn này</string>
+    <string name="receive_lightning_edit_generate_button">Lập hoá đơn</string>
+
+
+    <!-- send -->
+
+    <string name="send_balance_prefix">Số dư:</string>
+    <string name="send_error_amount_too_large">Số tiền quá lớn.</string>
+    <string name="send_error_amount_negative">Số tiền không thể âm.</string>
+    <string name="send_error_amount_invalid">Số tiền này không hợp lệ.</string>
+    <string name="send_error_amount_over_balance">Số tiền này vượt quá số dư của bạn.</string>
+    <string name="send_error_amount_overpaying">Không thể thanh toán nhiều hơn %1$s.</string>
+    <string name="send_error_amount_below_requested">Số tiền này thấp hơn số tiền yêu cầu %1$s.</string>
+    <string name="send_destination_label">Gửi đến</string>
+    <string name="send_description_label">Mô tả</string>
+    <string name="send_trampoline_fee_label">Phí</string>
+    <string name="send_trampoline_fee_no_amount">Không áp dụng</string>
+    <string name="send_trampoline_fee_loading">Đang tải phí…</string>
+    <string name="send_trampoline_amountless_warning_label">Hoá đơn không có số tiền</string>
+    <string name="send_trampoline_amountless_warning_details">Hóa đơn cho khoản thanh toán này không điền số tiền cụ thể. Các nút mạng khác có thể lợi dụng điều này và lừa đảo bạn trong quá trình thanh toán.\n\nĐể tránh nguy cơ lừa đảo, <b>hãy yêu cầu người nhận ghi rõ số tiền</b> khi lập hóa đơn.</string>
+    <string name="send_connecting_button">Đang chờ các kênh…</string>
+    <string name="send_pay_button">Thanh toán</string>
+
+    <string name="send_paymentmode_onchain">Thanh toán on-chain</string>
+    <string name="send_paymentmode_onchain_desc">Giao dịch on-chain thường chậm hơn và phù hợp hơn cho các khoản thanh toán lớn.</string>
+    <string name="send_paymentmode_lightning">Thanh toán bằng Lightning</string>
+    <string name="send_paymentmode_lightning_desc">Thanh toán Lightning thường nhanh chóng và phù hợp nhất cho các khoản thanh toán nhỏ.</string>
+
+    <string name="send_spliceout_address_label">Địa chỉ</string>
+    <string name="send_spliceout_feerate_label">Mức phí</string>
+    <string name="send_spliceout_feerate_waiting_for_value">Đang truy xuất mức phí hiện tại…</string>
+
+    <string name="send_spliceout_error_invalid_feerate">Vui lòng nhập mức phí hợp lệ.</string>
+    <string name="send_spliceout_error_cannot_afford_fees">Tổng số vượt quá số dư của bạn</string>
+    <string name="send_spliceout_error_failure">Thanh toán không thành công</string>
+
+    <string name="send_spliceout_prepare_button">Chuẩn bị giao dịch</string>
+    <string name="send_spliceout_prepare_in_progress">Đang chuẩn bị giao dịch…</string>
+    <string name="send_spliceout_execute_in_progress">Đang thực hiện splice…</string>
+    <string name="send_spliceout_complete_recap_fee">Phí thợ đào</string>
+    <string name="send_spliceout_complete_recap_fee_details">Sử dụng một mức phí hợp lệ %1$s sat/vbyte.</string>
+    <string name="send_spliceout_complete_recap_total">Tổng số</string>
+
+    <!-- scan -->
+
+    <string name="scan_manual_input_button">Nhập bằng tay</string>
+    <string name="scan_paste_button">Dán dữ liệu từ bàn phím </string>
+    <string name="scan_request_camera_access">Nhấn để cho phép camera hoạt động</string>
+    <string name="scan_request_camera_access_denied">Quyền hoạt động của camera đã bị từ chối</string>
+
+    <string name="scan_lnurl_fetching">Đang lấy dữ liệu từ bên dịch vụ…</string>
+
+    <string name="scan_manual_input_title">Nhập bằng tay</string>
+    <string name="scan_manual_input_instructions">Nhập hóa đơn Lightning, LNURL hoặc địa chỉ Lightning bạn muốn gửi tiền tới.</string>
+    <string name="scan_manual_input_label">Địa chỉ hóa đơn hoặc địa chỉ Lightning</string>
+
+    <!-- utils: misc strings -->
+
+    <string name="utils_rounded">≈</string>
+    <string name="utils_converted_amount">≈ %1$s</string>
+    <string name="utils_unknown_amount" translatable="false">!?</string>
+    <string name="utils_no_conversion">Không có tỷ giá hối đoái Bitcoin</string>
+
+    <string name="utils_date_just_now">Ngay bây giờ</string>
+    <string name="utils_unknown">Không áp dụng</string>
+    <string name="utils_loading_data">Đang tải dữ liệu…</string>
+    <string name="utils_loading_prefs">Đang tải tùy chọn…</string>
+    <string name="utils_copied">Sao chép vào bàn phím!</string>
+
+    <string name="accessibility_link">Mở liên kết bằng trang trình duyệt mạng</string>
+    <string name="accessibility_explorer_link">Mở giao dịch bằng trình quản lý dữ liệu</string>
+    <string name="accessibility_address_explorer_link">Mở địa chỉ bằng trình quản lý dữ liệu</string>
+    <string name="validation_empty">Không được để trống mục này</string>
+    <string name="validation_invalid_amount">Vui lòng nhập số tiền hợp lệ</string>
+    <string name="validation_invalid_number">Vui lòng nhập một số hợp lệ</string>
+    <string name="validation_no_decimal">Trường này phải là số nguyên</string>
+
+    <string name="btn_back">Quay trở lại</string>
+    <string name="btn_next">Tiếp Theo</string>
+    <string name="btn_copy">Sao chép</string>
+    <string name="btn_ok">OK</string>
+    <string name="btn_save">Lưu</string>
+    <string name="btn_confirm">Xác nhận</string>
+    <string name="btn_cancel">Hủy</string>
+    <string name="btn_close">Đóng</string>
+
+    <!-- mutual close -->
+
+    <string name="mutualclose_title">Rút trống ví của tôi</string>
+    <string name="mutualclose_loading">Đang tải…</string>
+    <string name="mutualclose_checking_balance">Đang kiểm tra số dư…</string>
+    <string name="mutualclose_balance">Số dư: <b>%1$s</b> (≈ %2$s)</string>
+    <string name="mutualclose_no_channels">Ví này không có kênh nào đủ điều kiện để đóng.</string>
+    <string name="mutualclose_button">Rút trống ví của tôi</string>
+    <string name="mutualclose_error_chain_mismatch">Địa chỉ này sử dụng một blockchain khác</string>
+    <string name="mutualclose_error_chain_reqparams">Địa chỉ này sử dụng các tính năng không được hỗ trợ</string>
+    <string name="mutualclose_error_chain_generic">Địa chỉ này không được hỗ trợ</string>
+    <string name="mutualclose_done">(Các) Kênh %1$d đã được đóng. Bạn có thể tìm thấy thông tin chi tiết trên trang chủ.</string>
+
+    <string name="forceclose_no_channels">Không kênh nào đủ điều kiện đóng.</string>
+
+    <!-- channels view -->
+
+    <string name="channelsview_title">Kênh thanh toán</string>
+    <string name="channelsview_menu_import_channels">Nhập các kênh</string>
+    <string name="channelsview_header">Tổng quan</string>
+    <string name="channelsview_balance">Số dư</string>
+    <string name="channelsview_balance_about"><b>Số dư</b> là số dư tổng hợp của tất các kênh đang hoạt động của bạn. Đó là số tiền bạn có thể dùng trên Lightning.</string>
+    <string name="channelsview_inbound">Thanh khoản đầu vào</string>
+    <string name="channelsview_inbound_about"><b>Thanh khoản đầu vào</b> là số tiền mà kênh của bạn có thể nhận được qua Lightning mà không cần phải dùng on-chain và trả phí.</string>
+    <string name="channelsview_loading_channels">Đang tải dữ liệu kênh…</string>
+    <string name="channelsview_no_channels">Bạn chưa có kênh nào.\n\nMột kênh thanh toán mới sẽ tự động được tạo nên khi cần thiết.</string>
+
+    <!-- channels details -->
+
+    <string name="channeldetails_title">Chi tiết kênh</string>
+    <string name="channeldetails_not_found">Không có kênh nào đang hoạt động dưới mã định danh này.</string>
+    <string name="channeldetails_channel_id">Mã dịnh danh của kênh</string>
+    <string name="channeldetails_state">Trạng thái</string>
+    <string name="channeldetails_spendable">Số dư</string>
+    <string name="channeldetails_receivable">Thanh khoản đầu vào</string>
+
+    <string name="channeldetails_commitments">Các cam kết đang có hiệu lực</string>
+    <string name="channeldetails_inactive_commitments">Các cam kết vô hiệu</string>
+    <string name="channeldetails_commitment_funding_tx_id">Giao dịch nạp vốn:</string>
+    <string name="channeldetails_commitment_balance">Số dư:</string>
+    <string name="channeldetails_commitment_funding_capacity">Dung lượng:</string>
+    <string name="channeldetails_commitment_linked_payments">Kích hoạt bởi:</string>
+
+    <string name="channeldetails_json">Hiển thị dữ liệu thô</string>
+    <string name="channeldetails_share">Chia sẻ</string>
+    <string name="channeldetails_share_subject">Dữ liệu các kênh</string>
+    <string name="channeldetails_share_title">Chia sẻ dữ liệu kênh</string>
+
+    <!-- manual channels data import -->
+
+    <string name="channelimport_title">Nhập dữ liệu thô của kênh </string>
+    <string name="channelimport_instructions">Màn hình này là một công cụ gỡ lỗi mà bạn có thể nhập bằng tay các dữ liệu mã hóa của các kênh.\n\nHãy thận trọng khi sử dụng.</string>
+    <string name="channelimport_input_label">Dữ liệu đối tượng nhị phân lớn</string>
+    <string name="channelimport_import_button">Nhập</string>
+    <string name="channelimport_importing">Đang nhập dữ liệu…</string>
+    <string name="channelimport_success">Nhập thành công</string>
+    <string name="channelimport_success_restart">Bạn cần khởi động lại Phoenix ngay bây giờ.</string>
+    <string name="channelimport_error_title">Nhập không thành công</string>
+    <string name="channelimport_error_malformed">Dữ liệu không đúng định dạng. Phải là định dạng hex đối tượng nhị phân lớn đã được mã hoá.</string>
+    <string name="channelimport_error_decryption">Dữ liệu không thể giải mã được bằng ví này.</string>
+    <string name="channelimport_error_unknown_version">Phiên bản %1$d không đuợc hỗ trợ</string>
+
+    <!-- home: balance section & misc -->
+
+    <string name="home__balance_loading">Đang tải…</string>
+    <string name="home__onchain_incoming">+%1$s</string>
+
+    <string name="home__faq_button">Câu hỏi thường gặp</string>
+    <string name="home__payments_none">Sử dụng các nút Nhận và Gửi ở cuối màn hình này để bắt đầu!</string>
+    <string name="home__payments_more_button">Hiển thị tất cả các khoản thanh toán…</string>
+    <string name="home__connection__electrum_late">Electrum muộn</string>
+    <string name="home__connection__bad_cert">Chứng nhận Electrum</string>
+    <string name="home__connection__connecting">Đang kết nối…</string>
+    <string name="home__connection__tor_active">Tor đã được bật</string>
+    <string name="home_request_liquidity">Yêu cầu thanh khoản</string>
+
+    <!-- in-app notifications -->
+
+    <string name="inappnotif_title">Thông báo</string>
+    <string name="inappnotif_notices_title">Tin nhắn quan trọng</string>
+    <string name="inappnotif_payments_title">Hoạt động gần đây</string>
+    <string name="inappnotif_empty">Không có thông báo nào</string>
+
+    <!-- settings: display seed -->
+
+    <string name="displayseed_title">Cụm từ khôi phục</string>
+    <string name="displayseed_loading">Mở khoá hạt giống…</string>
+    <string name="displayseed_error_details">Không thể mở khóa hạt giống</string>
+    <string name="displayseed_derivation_path">Hạt giống BIP39 với đường dẫn nguồn BIP84 chuẩn</string>
+    <string name="displayseed_loading_prefs">Đang tải tùy chọn…</string>
+    <string name="displayseed_backup_title">Xác nhận sao lưu</string>
+
+    <!-- settings: logs -->
+
+    <string name="logs_title">Nhật ký ứng dụng</string>
+    <string name="logs_exporting">Truy xuất nhật ký…</string>
+    <string name="logs_failed">Báo lỗi: không thể truy xuất nhật ký</string>
+    <string name="logs_view_button">Xem nhật ký…</string>
+    <string name="logs_view_with">Xem nhật ký bằng…</string>
+    <string name="logs_share_button">Chia sẻ nhật ký…</string>
+    <string name="logs_share_subject">Nhật ký ứng dụng Phoenix</string>
+    <string name="logs_share_title">Chia sẻ nhật ký ứng dụng Phoenix…</string>
+
+    <!-- payment details -->
+
+    <string name="paymentdetails_loading">Đang tải chi tiết thanh toán…</string>
+    <string name="paymentdetails_error">Không tìm thấy chi tiết thanh toán</string>
+
+    <string name="paymentdetails_status_inbound_liquidity_success"><b>THANH KHOẢN ĐÃ ĐƯỢC THÊM VÀO</b> %1$s</string>
+    <string name="paymentdetails_status_channelclose_confirmed"><b>HOÀN THÀNH</b> %1$s</string>
+    <string name="paymentdetails_status_sent_successful"><b>ĐÃ GỬI</b> %1$s</string>
+    <string name="paymentdetails_status_sent_pending">Đang chờ xử lý…</string>
+    <string name="paymentdetails_status_sent_failed"><b>THẤT BẠI</b>\nChưa có khoản tiền nào được gửi.</string>
+
+    <string name="paymentdetails_status_received_pending">Chưa nhận được.</string>
+    <string name="paymentdetails_status_received_paytoopen_pending">Đang chờ kênh mở</string>
+    <string name="paymentdetails_status_received_successful"><b>ĐÃ NHẬN ĐƯỢC</b> %1$s</string>
+
+    <string name="paymentdetails_status_unconfirmed">Đang chờ xác nhận</string>
+    <string name="paymentdetails_status_unconfirmed_fetching">Đang tải thông tin trạng thái…</string>
+    <string name="paymentdetails_status_unconfirmed_zero">0 xác nhận</string>
+    <string name="paymentdetails_status_unconfirmed_zero_bump">Nhấn để tăng tốc</string>
+    <string name="paymentdetails_status_unconfirmed_default">%1$d (các) xác nhận</string>
+    <string name="paymentdetails_status_unconfirmed_with_depth">%1$d/%2$d (các) xác nhận</string>
+    <string name="paymentdetails_status_confirmed">Đã xác nhận on-chain</string>
+
+    <string name="paymentdetails_lnurlpay_service">Dịch vụ cung cấp bởi</string>
+    <string name="paymentdetails_lnurlpay_action_message_label">Tin nhắn</string>
+    <string name="paymentdetails_lnurlpay_action_url_label">Đường link</string>
+    <string name="paymentdetails_lnurlpay_action_url_button">Mở đường link</string>
+    <string name="paymentdetails_lnurlpay_action_aes_label">Tin nhắn</string>
+    <string name="paymentdetails_lnurlpay_action_aes_decrypting">Đang giải mã tin nhắn…</string>
+
+    <string name="paymentdetails_desc_label">Mô tả</string>
+    <string name="paymentdetails_destination_label">Đã gửi tới</string>
+    <string name="paymentdetails_destination_cpfp_value">Thợ đào Bitcoin</string>
+    <string name="paymentdetails_fees_label">Phí</string>
+    <string name="paymentdetails_error_label">Báo lỗi</string>
+    <string name="paymentdetails_no_description">Không có mô tả</string>
+    <string name="paymentdetails_info_uniclose">Khoản thanh toán này phát sinh do đã có xung đột trên 1 kênh nào đó.</string>
+
+    <string name="paymentdetails_desc_splice_out">Thanh toán on-chain</string>
+    <string name="paymentdetails_desc_closing_channel">Đang đóng kênh</string>
+    <string name="paymentdetails_desc_legacy_migration">Di chuyển từ ứng dụng cũ</string>
+    <string name="paymentdetails_desc_cpfp">Các giao dịch tăng đột biến</string>
+    <string name="paymentdetails_desc_inbound_liquidity">+%1$s thanh khoản đầu vào</string>
+    <string name="paymentdetails_desc_keysend">Quyên góp</string>
+    <string name="paymentdetails_desc_swapout">Swap-out thành %1$s</string>
+    <string name="paymentdetails_desc_swapin">Tiền cọc on-chain</string>
+    <string name="paymentdetails_desc_identifier">Khoản thanh toán cho %1$s</string>
+
+    <string name="paymentdetails_edit_dialog_title">Thêm mô tả tùy chọn cho khoản thanh toán này</string>
+    <string name="paymentdetails_edit_dialog_input_label">Mô tả</string>
+    <string name="paymentdetails_attach_desc_button">Đính kèm ghi chú</string>
+    <string name="paymentdetails_edit_desc_button">Chỉnh sửa ghi chú</string>
+    <string name="paymentdetails_details_button">Chi tiết kỹ thuật</string>
+
+    <!-- payment details: technicals data -->
+
+    <string name="paymentdetails_technical_title">Chi tiết kỹ thuật</string>
+    <string name="paymentdetails_payment_type_label">Hình thức thanh toán</string>
+    <string name="paymentdetails_closing">Thanh toán đóng kênh</string>
+    <string name="paymentdetails_splice_outgoing">Thanh toán splice đầu ra</string>
+    <string name="paymentdetails_splice_cpfp_outgoing">Tăng tốc các giao dịch on-chain</string>
+    <string name="paymentdetails_inbound_liquidity">Yêu cầu thanh khoản đầu vào</string>
+    <string name="paymentdetails_normal_outgoing">Thanh toán đầu ra Lightning thông thường</string>
+    <string name="paymentdetails_normal_incoming">Thanh toán đầu vào Lightning thông thường</string>
+    <string name="paymentdetails_swapin">Swap-in tiền cọc Bitcoin</string>
+    <string name="paymentdetails_swapout">Swap-out đến địa chỉ Bitcoin</string>
+    <string name="paymentdetails_keysend">Keysend (thanh toán tự phát)</string>
+    <string name="paymentdetails_swapin_address_label">Địa chỉ tiền cọc</string>
+    <string name="paymentdetails_bitcoin_address_label">Điạ chỉ Bitcoin</string>
+
+    <string name="paymentdetails_splice_out_channel_label">Kênh đã splice </string>
+    <string name="paymentdetails_dualswapin_tx_label">Giao dịch</string>
+    <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
+
+    <string name="paymentdetails_liquidity_amount_label">Số tiền yêu cầu</string>
+    <string name="paymentdetails_liquidity_signature_label">Chữ ký</string>
+
+    <string name="paymentdetails_closing_type_label">Hình thức đóng</string>
+    <string name="paymentdetails_closing_type_mutual">Đồng thuận</string>
+    <string name="paymentdetails_closing_type_local">Địa phương</string>
+    <string name="paymentdetails_closing_type_remote">Từ xa</string>
+    <string name="paymentdetails_closing_type_revoked">Đã thu hồi</string>
+    <string name="paymentdetails_closing_type_other">Hình thức khác</string>
+
+    <string name="paymentdetails_pubkey_label">Mục tiêu khóa công khai</string>
+    <string name="paymentdetails_payment_request_description_label">Mô tả hoá đơn</string>
+    <string name="paymentdetails_payment_hash_label">Thanh toán băm</string>
+    <string name="paymentdetails_payment_request_label">Hoá đơn</string>
+    <string name="paymentdetails_preimage_label">Nghịch ảnh</string>
+
+    <string name="paymentdetails_status_label">Trạng thái thanh toán</string>
+    <string name="paymentdetails_status_success">Thành công</string>
+    <string name="paymentdetails_status_confirming">Đang xác nhận</string>
+    <string name="paymentdetails_status_pending">Đang chờ</string>
+    <string name="paymentdetails_status_failed">Thất bại</string>
+
+    <string name="paymentdetails_parts_label">Các phần thanh toán(%1$d)</string>
+    <string name="paymentdetails_part_label">Từng phần</string>
+    <string name="paymentdetails_part_hops_label">Các bước nhảy</string>
+
+    <string name="paymentdetails_received_with_label">Nhận được qua</string>
+    <string name="paymentdetails_received_with_splicein">Splice-in (thêm vào kênh có sẵn)</string>
+    <string name="paymentdetails_received_with_channel">Kênh mới (tự động tạo nên)</string>
+    <string name="paymentdetails_received_with_lightning">Thanh toán Lightning</string>
+    <string name="paymentdetails_channel_id_label">Mã nhận dạng kênh</string>
+    <string name="paymentdetails_tx_id_label">Giao dịch</string>
+
+    <string name="paymentdetails_created_at_label">Lập nên vào</string>
+    <string name="paymentdetails_completed_at_label">Hoàn thành vào</string>
+    <string name="paymentdetails_elapsed_label">Thời gian trôi qua</string>
+    <string name="paymentdetails_elapsed">%1$s ms</string>
+
+    <string name="paymentdetails_invoice_requested_label">Số tiền yêu cầu</string>
+    <string name="paymentdetails_amount_sent_label">Số tiền đã gửi (đã bao gồm phí)</string>
+    <string name="paymentdetails_amount_received_label">Số tiền đã nhận</string>
+    <string name="paymentdetails_amount_rate_now">≈ %1$s (lúc này)</string>
+    <string name="paymentdetails_amount_rate_then">≈ %1$s (sau đó)</string>
+
+    <!-- settings: access control -->
+
+    <string name="accessctrl_title">Quyền truy cập ứng dụng</string>
+    <string name="accessctrl_loading">Đang tải dữ liệu…</string>
+
+    <string name="accessctrl_auth_error_header">Không thể bật chế độ khóa màn hình</string>
+    <string name="accessctrl_auth_error_no_hw">Thiết bị này không có phần cứng xác thực nào phù hợp.</string>
+    <string name="accessctrl_auth_error_hw_unavailable">Không có phần cứng nhận dạng sinh trắc học. Vui lòng thử lại sau.</string>
+    <string name="accessctrl_auth_error_none_enrolled">Vui lòng đăng ký mã PIN/lược đồ cá nhân/vân tay trên Android trước tiên.</string>
+    <string name="accessctrl_auth_error_update_required">Phần cứng không an toàn. Bảo mật Android cần được cập nhật.</string>
+    <string name="accessctrl_auth_error_unsupported">Không được hỗ trợ bởi phiên bản Android này.</string>
+    <string name="accessctrl_auth_error_lockout">Quá nhiều lần thử, vui lòng thử lại sau.</string>
+    <string name="accessctrl_auth_error_vendor">Lỗi do nhà cung cấp phần cứng chưa được xử lý</string>
+    <string name="accessctrl_auth_error_timeout">Đã hết thời gian xác thực</string>
+    <string name="accessctrl_auth_error_cancelled">Xác thực đã bị hủy</string>
+    <string name="accessctrl_auth_error_too_old">Phiên bản Android này không tương thích.</string>
+    <string name="accessctrl_auth_error_unhandled">Lỗi mã chưa được xử lý: %1$d</string>
+
+    <string name="accessctrl_screen_lock_switch">Khóa màn hình</string>
+    <string name="accessctrl_screen_lock_switch_desc">Khóa quyền truy cập vào ứng dụng bằng khóa màn hình/khoá vân tay của Android</string>
+
+    <!-- lnurl-auth -->
+
+    <string name="lnurl_auth_legacy_notice">Chế độ cũ</string>
+    <string name="lnurl_auth_help">Nhấn để biết thêm thông tin</string>
+    <string name="lnurl_auth_help_dialog_title">Cơ chế vận hành</string>
+    <string name="lnurl_auth_help_dialog_general_details">Phoenix xác thực bằng một khóa duy nhất tới <b>%1$s</b>. Khóa duy nhất này sẽ trở thành mật khẩu cho tài khoản của bạn tại đó.</string>
+    <string name="lnurl_auth_help_dialog_privacy_title">Quyền riêng tư</string>
+    <string name="lnurl_auth_help_dialog_privacy_details">Bên dịch vụ sẽ không có quyền truy cập vào bất cứ ví nào của bạn. Họ không thể thấy số dư, khoản thanh toán hoặc chìa khóa của bạn.</string>
+    <string name="lnurl_auth_help_dialog_compat_title">Chế độ cũ</string>
+    <string name="lnurl_auth_help_dialog_compat_details">Phoenix sử dụng một cơ chế khác chuẩn trên dịch vụ này để có thể tương thích với các phiên bản cũ của ứng dụng. Tài khoản liên kết sẽ không được chuyển sang các ví khác.</string>
+    <string name="lnurl_auth_help_dialog_compat_button">Thay đổi cơ chế</string>
+    <string name="lnurl_auth_button">Đăng nhập</string>
+    <string name="lnurl_auth_try_again_button">Hãy thử lại</string>
+    <string name="lnurl_auth_in_progress">Đang đăng nhập vào \n<b>%1$s</b></string>
+    <string name="lnurl_auth_success">Xác thực thành công.</string>
+    <string name="lnurl_auth_failure">Xác thực không thành công:</string>
+    <string name="lnurl_auth_error_network">Lỗi mạng. Hãy kiểm tra kết nối Internet của bạn và thử lại.</string>
+    <string name="lnurl_auth_error_other">Đã xảy ra lỗi không xác định. Hãy thử lại.</string>
+
+    <!-- lnurl-auth settings: scheme types -->
+
+    <string name="lnurl_auth_scheme_default">Mặc định</string>
+    <string name="lnurl_auth_scheme_default_desc">Sử dụng một cơ chế cơ bản tuân thủ các thông số kỹ thuật của LNURL. Đây là tùy chọn nên cài cho các ví mới và cũng là tuỳ chọn đang được dùng cho ứng dụng Phoenix iOS.</string>
+    <string name="lnurl_auth_scheme_legacy">Bản Android cũ</string>
+    <string name="lnurl_auth_scheme_legacy_desc">Sử dụng cơ chế cũ để kết nối với các tài khoản được tạo bởi ứng dụng Phoenix Android cũ.</string>
+
+    <!-- lnurl-withdraw -->
+
+    <string name="lnurl_withdraw_confirm_button">Chuộc lại</string>
+    <string name="lnurl_withdraw_wait">Đang yêu cầu vốn…</string>
+    <string name="lnurl_withdraw_amount_below_min">Số tiền ít nhất phải là %1$s.</string>
+    <string name="lnurl_withdraw_amount_above_max">Số tiền không được vượt quá %1$s.</string>
+    <string name="lnurl_withdraw_error_header">Yêu cầu rút không thành công:</string>
+
+    <!-- lnurl: common remote error messages -->
+
+    <string name="lnurl_error_remote_details">Bên dịch vụ <b>%1$s</b> đã phản hồi có lỗi:\n\n<i>%2$s</i>\n\nHãy liên hệ với bộ phận hỗ trợ của họ nếu cần.</string>
+    <string name="lnurl_error_remote_code">Bên dịch vụ <b>%1$s</b> đã báo lỗi HTTP (%2$s).\n\nHãy liên hệ với bộ phận hỗ trợ của họ nếu cần.</string>
+    <string name="lnurl_error_remote_unreadable">Bên dịch vụ <b>%1$s</b> đã báo lỗi có một tin nhắn không đúng định dạng.</string>
+    <string name="lnurl_error_remote_connection">Không thể kết nối với bên dịch vụ <b>%1$s</b>.</string>
+
+    <!-- lnurl-pay -->
+
+    <string name="lnurl_pay_domain">Phục vụ bởi</string>
+    <string name="lnurl_pay_meta_description">Mô tả</string>
+    <string name="lnurl_pay_comment_add_button">Đính kèm tin nhắn</string>
+    <string name="lnurl_pay_comment_label">Tin nhắn của tôi</string>
+    <string name="lnurl_pay_comment_instructions">Bạn có thể đính kèm tin nhắn vào khoản thanh toán. Tin nhắn này sẽ được gửi đến người nhận.</string>
+    <string name="lnurl_pay_pay_button">Thanh toán</string>
+    <string name="lnurl_pay_requesting_invoice">Đang yêu cầu hoá đơn…</string>
+
+    <string name="lnurl_pay_amount_below_min">Số tiền ít nhất phải là %1$s</string>
+    <string name="lnurl_pay_amount_above_max">Số tiền nhiều nhất chỉ được là %1$s</string>
+
+    <string name="lnurl_pay_error_header">Thanh toán không thành công.</string>
+    <string name="lnurl_pay_error_invalid_chain">Hóa đơn trả lại bởi <b>%1$s</b> không sử dụng cùng chuỗi với ví của bạn.</string>
+    <string name="lnurl_pay_error_already_paid">Hóa đơn trả lại bởi <b>%1$s</b> đã được thanh toán.</string>
+    <string name="lnurl_pay_error_invalid_amount">Hóa đơn trả lại bởi <b>%1$s</b> ghi không đúng số tiền.</string>
+    <string name="lnurl_pay_error_invalid_malformed">Hóa đơn trả lại bởi <b>%1$s</b> không đúng định dạng.</string>
+
+    <!-- settings: display preferences -->
+
+    <string name="prefs_display_title">Tùy chọn hiển thị</string>
+    <string name="prefs_display_coin_label">Đơn vị Bitcoin</string>
+    <string name="prefs_display_coin_sat_label">Satoshi (sat)</string>
+    <string name="prefs_display_coin_sat_desc">1 sat bằng 0.00000001 btc</string>
+    <string name="prefs_display_coin_bit_label">Bit (bit)</string>
+    <string name="prefs_display_coin_bit_desc">1 bit bằng 0.000001 btc</string>
+    <string name="prefs_display_coin_mbtc_label">Milli-Bitcoin (mbtc)</string>
+    <string name="prefs_display_coin_mbtc_desc">1 mbtc bằng 0.001 btc</string>
+    <string name="prefs_display_coin_btc_label">Bitcoin (btc)</string>
+    <string name="prefs_display_fiat_label">Tiền tệ pháp định</string>
+    <string name="prefs_display_theme_label">Giao diện ứng dụng</string>
+    <string name="prefs_display_theme_dark_label">Giao diện tối</string>
+    <string name="prefs_display_theme_light_label">Giao diện sáng</string>
+    <string name="prefs_display_theme_system_label">Theo dõi hệ thống</string>
+    <string name="prefs_locale_label">Ngôn ngữ ứng dụng</string>
+
+    <!-- settings: electrum server -->
+
+    <string name="electrum_title">Máy chủ Electrum</string>
+    <string name="electrum_about">Để bảo mật các kênh thanh toán của bạn, Phoenix giám sát Bitcoin blockchain thông qua các máy chủ Electrum.\n\nTheo mặc định, các máy chủ được sử dụng một cách ngẫu nhiên. Bạn cũng có thể chỉnh cấu hình của Phoenix để kết nối với chỉ riêng máy chủ của bạn.</string>
+    <string name="electrum_block_height_label">Độ cao của khối</string>
+    <string name="electrum_connection_dialog_tls_port">Sử dụng cổng TLS (mặc định 50002).</string>
+    <string name="electrum_connection_dialog_onion_port">Sử dụng cổng TCP thuần, không dùng cổng TLS vì đây là một dịch vụ onion.</string>
+
+    <string name="electrum_connection_closed_with_random">Đã ngắt kết nối khỏi Electrum</string>
+    <string name="electrum_connection_closed_with_custom">Đã ngắt kết nối khỏi %1$s</string>
+    <string name="electrum_connection_connecting_to_random">Đang kết nối tới (ngẫu nhiên) %1$s</string>
+    <string name="electrum_connection_connecting_to_custom">Đang kết nối tới %1$s</string>
+    <string name="electrum_connection_connected">Đã kết nối tới %1$s</string>
+
+    <string name="electrum_description_custom">Bạn đang sử dụng máy chủ tùy chỉnh</string>
+    <string name="electrum_description_bad_certificate">Máy chủ này đã cung cấp một chứng nhận không xác định. Kết nối bị từ chối.</string>
+
+    <string name="electrum_dialog_checkbox">Sử dụng máy chủ tùy chỉnh</string>
+    <string name="electrum_dialog_input">Địa chỉ máy chủ (host:port)</string>
+    <string name="electrum_dialog_invalid_input">Địa chỉ này không hợp lệ.</string>
+    <string name="electrum_dialog_cert_check_button">Kết nối</string>
+    <string name="electrum_dialog_cert_checking">Đang kiểm tra chứng nhận…</string>
+    <string name="electrum_dialog_cert_failure">Kết nối không thành công</string>
+    <string name="electrum_dialog_cert_unresolved">Địa chỉ này không xử lý được.</string>
+    <string name="electrum_dialog_cert_header">Chứng nhận không đáng tin cậy</string>
+    <string name="electrum_dialog_cert_sha1">Dấu vân tay SHA1</string>
+    <string name="electrum_dialog_cert_sha256">Dấu vân tay SHA256</string>
+    <string name="electrum_dialog_cert_issuer">Bên phát hành</string>
+    <string name="electrum_dialog_cert_subject">Tiêu đề</string>
+    <string name="electrum_dialog_cert_expiration">Có thời hạn đến</string>
+    <string name="electrum_dialog_cert_copy">Sao chép chứng nhận</string>
+    <string name="electrum_dialog_cert_accept">Tin tưởng chứng nhận</string>
+
+    <!-- settings: Tor -->
+
+    <string name="tor_settings_title">Tor</string>
+    <string name="tor_settings_unknown">Đang kiểm tra tùy chọn…</string>
+    <string name="tor_settings_enabled">Đã bật Tor</string>
+    <string name="tor_settings_disabled">Đã tắt Tor</string>
+    <string name="tor_settings_state_unknown">Proxy của Tor chưa được khởi động.</string>
+    <string name="tor_settings_state_closed">Proxy của Tor đang bị đóng.\nVui lòng chờ đợi và kiểm tra kết nối mạng Internet của bạn.</string>
+    <string name="tor_settings_state_starting">Đang khởi động Proxy của Tor…</string>
+    <string name="tor_settings_state_started">Tor đang kết nối trực tuyến</string>
+    <string name="tor_settings_state_about_perfs">Lưu ý rằng mạng Tor là một mạng mở và chạy bằng tiền quyên góp. Vì vậy, mạng đôi khi có thể rất chậm và ảnh hưởng đến chất lượng vận hành của ứng dụng.</string>
+
+    <!-- home: connectivity dialog -->
+
+    <string name="conndialog_title">Trạng thái kết nối</string>
+    <string name="conndialog_summary_not_ok">Ứng dụng sẽ không hoạt động chuẩn xác cho đến khi tất cả các kết nối được thiết lập.</string>
+    <string name="conndialog_network">Thiết bị của bạn không có kết nối Internet. Ứng dụng sẽ không hoạt động hiệu quả.\n\nVui lòng kiểm tra cài đặt thiết bị của bạn.</string>
+    <string name="conndialog_internet">Internet</string>
+    <string name="conndialog_electrum">Electrum</string>
+    <string name="conndialog_tor">Tor</string>
+    <string name="conndialog_lightning">Máy ngang hàng</string>
+    <string name="conndialog_accessibility_desc">Quản lý kết nối cho %1$s</string>
+    <string name="conndialog_connecting">Đang kết nối…</string>
+    <string name="conndialog_connected">Đã kết nối</string>
+    <string name="conndialog_connected_electrum_behind">Máy chủ Electrum bị chậm (khối $1$d)</string>
+    <string name="conndialog_closed">Đã ngắt kết nối</string>
+    <string name="conndialog_closed_bad_cert">Chứng nhận tồi</string>
+
+    <!-- settings: about -->
+
+    <string name="about_title">Giới thiệu về Phoenix</string>
+    <string name="about_version">Phoenix phiên bản: <b>%1$s</b></string>
+    <string name="about_faq_link">Bạn có thắc mắc? Hãy xem mục Câu hỏi thường gặp</string>
+    <string name="about_support_link">Hỗ trợ</string>
+    <string name="about_privacy_link">Quyền riêng tư</string>
+    <string name="about_terms_link">Các điều khoản</string>
+
+    <!-- settings: options for payments -->
+
+    <string name="paymentsettings_title">Các lựa chọn thanh toán</string>
+
+    <string name="paymentsettings_category_incoming">Thanh toán đến</string>
+    <string name="paymentsettings_category_lnurl">LNURL</string>
+
+    <string name="paymentsettings_defaultdesc_title">Mô tả hóa đơn</string>
+    <string name="paymentsettings_defaultdesc_none">Không có mô tả nào…</string>
+    <string name="paymentsettings_defaultdesc_dialog_title">Mô tả mặc định</string>
+    <string name="paymentsettings_defaultdesc_dialog_description">Các hóa đơn của bạn theo mặc định sẽ sử dụng mô tả này. Bạn có thể thay đổi mô tả cho từng hoá đơn riêng lẻ nếu muốn.</string>
+    <string name="paymentsettings_defaultdesc_dialog_label">Mô tả hóa đơn</string>
+
+    <string name="paymentsettings_expiry_title">Hóa đơn hết hạn</string>
+    <string name="paymentsettings_expiry_dialog_title">Hóa đơn hết hạn</string>
+    <string name="paymentsettings_expiry_dialog_description">Hóa đơn bạn tạo đã hết hạn sau khoảng trì hoãn này. Thời hạn mặc định là 1 tuần.</string>
+    <string name="paymentsettings_expiry_one_week">1 tuần</string>
+    <string name="paymentsettings_expiry_two_weeks">2 tuần</string>
+    <string name="paymentsettings_expiry_three_weeks">3 tuần</string>
+    <string name="paymentsettings_expiry_value">%1$s giây</string>
+
+    <string name="paymentsettings_lnurlauth_scheme_title">Cơ chế xác thực LNURL</string>
+
+    <string name="paymentsettings_swap_format_title">Định dạng địa chỉ Bitcoin</string>
+    <string name="paymentsettings_swap_format_legacy_title">Bản cũ</string>
+    <string name="paymentsettings_swap_format_legacy_desc">Một định dạng kém hiệu quả, kém riêng tư hơn, và không giúp quay vòng địa chỉ. Tuy nhiên, nó lại tương thích với hầu hết mọi loại dịch vụ và mọi loại ví.</string>
+    <string name="paymentsettings_swap_format_taproot_title">Taproot (khuyến khích dùng)</string>
+    <string name="paymentsettings_swap_format_taproot_desc">Định dạng mặc định, có tính riêng tư hơn, phí rẻ hơn và giúp quay vòng địa chỉ. Tuy nhiên, một số dịch vụ hoặc một số loại ví có thể không nhận dạng được địa chỉ cuả nó.</string>
+
+    <!-- settings: currencies -->
+
+    <string name="currency_ars_official">Argentine Peso (tỷ giá chính thức)</string>
+    <string name="currency_ars_bm">Argentine Peso</string>
+    <string name="currency_cup_official">Cuban Peso (tỷ giá chính thức)</string>
+    <string name="currency_cup_fm">Cuban Peso</string>
+    <string name="currency_lbp_official">Lebanese Pound (tỷ giá chính thức)</string>
+    <string name="currency_lbp_bm">Lebanese Pound</string>
+
+    <!-- payments history -->
+
+    <string name="payments_history_title">Thanh toán địa phương (%1$d)</string>
+    <string name="payments_history_export_button">Truy xuất</string>
+    <string name="payments_history_today">Ngày hôm nay</string>
+    <string name="payments_history_yesterday">Ngày hôm qua</string>
+    <string name="payments_history_thisweek">Đầu tuần này</string>
+    <string name="payments_history_lastweek">Tuần trước</string>
+    <string name="payments_export_title">Truy xuất các thanh toán</string>
+    <string name="payments_export_instructions">Truy xuất các thanh toán địa phương đã thành công của bạn dưới định dạng CSV (giá trị phân tách bằng dấu phẩy).</string>
+    <string name="payments_export_start_label">Ngày bắt đầu</string>
+    <string name="payments_export_end_label">Ngày kết thúc</string>
+    <string name="payments_export_context_label">Bao gồm điểm đi/điểm đến</string>
+    <string name="payments_export_description_label">Bao gồm mô tả</string>
+    <string name="payments_export_generate_button">Truy xuất</string>
+    <string name="payments_export_no_payments">Chưa có khoản thanh toán thành công nào</string>
+    <string name="payments_export_invalid_timestamps">Vui lòng chọn ngày bắt đầu/kết thúc hợp lệ</string>
+    <string name="payments_export_in_progress">Đang truy xuất thanh toán #%1$d</string>
+    <string name="payments_export_success">Các thanh toán %1$d đã được truy xuất thành công</string>
+    <string name="payments_export_share_subject">Phoenix - các thanh toán từ %1$s tới %2$s</string>
+    <string name="payments_export_share_title">Chia sẻ các thanh toán Phoenix…</string>
+    <string name="payments_export_share_button">Chia sẻ tập tin</string>
+    <string name="payments_export_error">Truy xuất không thành công.</string>
+    <string name="payments_export_no_data">Không tìm thấy khoản thanh toán nào.</string>
+
+    <!-- components -->
+
+    <string name="component_calendar_inclusive">(bao gồm tất cả)</string>
+
+    <!-- settings: wallet info -->
+
+    <string name="walletinfo_title">Thông tin ví</string>
+    <string name="walletinfo_descriptor_legacy">Bộ mô tả cũ</string>
+    <string name="walletinfo_descriptor">Bộ mô tả</string>
+    <string name="walletinfo_swapin_user_pubkey">Khóa công khai của người dùng</string>
+    <string name="walletinfo_swapin_addresses">Địa chỉ Swap</string>
+    <string name="walletinfo_xpub">Khóa chủ công khai</string>
+    <string name="walletinfo_path">(Đường dẫn: %1$s)</string>
+
+    <string name="walletinfo_swappable_title">Sẵn sàng swap</string>
+    <string name="walletinfo_confirming_title">Đang chờ xác nhận %1$d</string>
+    <string name="walletinfo_confirming_more">Thêm +%1$d…</string>
+    <string name="walletinfo_confirmed_title">Số dư đã xác nhận</string>
+    <string name="walletinfo_unconfirmed_title">Số dư chưa xác nhận</string>
+    <string name="walletinfo_incoming_balance">+%1$s đang tới</string>
+    <string name="walletinfo_loading_data">Đang tải dữ liệu ví…</string>
+
+    <string name="swapinaddresses_title">Địa chỉ Swap-in</string>
+    <string name="swapinaddresses_sync">Đang đồng bộ hóa…</string>
+    <string name="swapinaddresses_taproot">Taproot</string>
+    <string name="swapinaddresses_legacy">Bản cũ</string>
+
+    <string name="walletinfo_lightning">Lightning</string>
+    <string name="walletinfo_nodeid">Nhận dạng nút mạng</string>
+    <string name="walletinfo_legacy_nodeid_toggle">Hiển thị mã nhận dạng của nút mạng cũ</string>
+    <string name="walletinfo_legacy_nodeid">Mã nhận dạng của nút mạng cũ</string>
+
+    <string name="walletinfo_onchain_final">Ví cuối cùng</string>
+
+    <!-- settings: liquidity policy for channels creation -->
+
+    <string name="liquiditypolicy_title">Quản lý kênh</string>
+    <string name="liquiditypolicy_fees_estimation_loading">Đang truy xuất mức phí…</string>
+    <string name="liquiditypolicy_fees_header">Cài đặt phí của tôi</string>
+    <string name="liquiditypolicy_advanced_title">Quản lý kênh nâng cao</string>
+    <string name="liquiditypolicy_loading">Đang truy xuất chính sách…</string>
+
+    <!-- CPFP splices -->
+
+    <string name="cpfp_feerate_label">Mức phí</string>
+    <string name="cpfp_feerate_value">%1$s sat/vbyte</string>
+
+    <string name="cpfp_prepare_button">Chuẩn bị khoản thanh toán</string>
+    <string name="cpfp_estimating">Đang ước tính phí…</string>
+    <string name="cpfp_estimation">Bạn sẽ thanh toán <b>%1$s</b> cho thợ đào Bitcoin</string>
+    <string name="cpfp_execute_button">Thực hiện thanh toán</string>
+    <string name="cpfp_executing">Đang thanh toán…</string>
+    <string name="cpfp_success">Hoàn tất thanh toán</string>
+    <string name="cpfp_failure_title">Thanh toán không thành công</string>
+    <string name="cpfp_error_title">Không thể tiếp tục</string>
+
+    <!-- mempool -->
+
+    <string name="mempool_unknown_feerate_title">Trạng thái mempool không xác định</string>
+    <string name="mempool_unknown_feerate_details">Phoenix không thể truy xuất trạng thái hiện tại của mempool và không thể ước tính tốc độ cho các giao dịch của bạn.\n\nHãy tự kiểm tra mempool trên 1 trình quản lý dữ liệu và dùng một giá trị tương ứng!</string>
+    <string name="mempool_fastest">≈ 10 phút</string>
+    <string name="mempool_halfhour">≈ 30 phút</string>`
+    <string name="mempool_hour">≈ 1 giờ</string>
+    <string name="mempool_slow">Mức phí thấp</string>
+
+    <!-- splice errors -->
+
+    <string name="splice_error_nochannels">Bạn không có bất kỳ kênh nào</string>
+    <string name="splice_error_aborted_by_peer">Bị hủy bỏ bởi máy ngang hàng [%1$s]</string>
+    <string name="splice_error_cannot_create_commit">Không thể tạo cam kết mới</string>
+    <string name="splice_error_concurrent_remote">Có một splice khác đang được tiến hành</string>
+    <string name="splice_error_channel_not_quiescent">Bị hủy do có lỗi</string>
+    <string name="splice_error_disconnected">Kênh bị ngắt kết nối</string>
+    <string name="splice_error_funding_error">Cấp vốn không thành công [%1$s]</string>
+    <string name="splice_error_insufficient_funds">Quỹ vốn không đủ tiền</string>
+    <string name="splice_error_cannot_start_session">Không thể bắt đầu phiên giao dịch với máy ngang hàng</string>
+    <string name="splice_error_interactive_session">Phiên giao dịch tương tác không thành công [%1$s]</string>
+    <string name="splice_error_invalid_pubkey">Tập lệnh khóa công khai splice-out không hợp lệ</string>
+    <string name="splice_error_splice_in_progress">Một khoản thanh toán splice đang được tiến hành</string>
+    <string name="splice_error_invalid_liquidity_ads">Yêu cầu thanh khoản ads không hợp lệ: [%1$s]</string>
+
+    <!-- reset wallet -->
+
+    <string name="reset_wallet_title">Đặt lại ví</string>
+    <string name="reset_wallet_instructions_header">Xóa tất cả dữ liệu ví khỏi thiết bị này</string>
+    <string name="reset_wallet_instructions_details">Thao tác này sẽ đặt lại ứng dụng về trạng thái ban đầu, như lúc bạn mới cài đặt nó.</string>
+    <string name="reset_wallet_review_button">Kiểm tra lại</string>
+
+    <string name="reset_wallet_confirm_title">Xác nhận đặt lại</string>
+    <string name="reset_wallet_confirm_header">Ví sẽ bị xóa hoàn toàn khỏi <b>thiết bị này</b>.</string>
+    <string name="reset_wallet_confirm_details">Thao tác này sẽ đặt lại ứng dụng. Mọi lịch sử thanh toán của bạn sẽ bị xoá. Một màn hình Giới thiệu sẽ hiện ra và nhắc bạn tạo ví mới hoặc khôi phục lại ví.</string>
+    <string name="reset_wallet_confirm_seed_balance">Đừng để mất quỹ vốn của bạn:\n%1$s (≈ %2$s).</string>
+    <string name="reset_wallet_confirm_seed_responsibility">Bạn có trách nhiệm lưu trữ cụm từ khôi phục của mình.</string>
+    <string name="reset_wallet_confirm_button">Xóa ví</string>
+    <string name="reset_wallet_shutting_down">Đang tắt…</string>
+    <string name="reset_wallet_deleting_prefs">Đang xóa tùy chọn…</string>
+    <string name="reset_wallet_deleting_seed">Đang xoá hạt giống…</string>
+    <string name="reset_wallet_deleting_db">Đang xóa kho dữ liệu…</string>
+    <string name="reset_wallet_success">Ví đã được đặt lại thành công.</string>
+    <string name="reset_wallet_failure_title">Đặt lại không thành công</string>
+
+    <!-- swap input signer tool -->
+
+    <string name="swapin_signer_title">Người ký Swap-in</string>
+    <string name="swapin_signer_instructions">Công cụ gỡ lỗi này cho phép bạn ký các swap-in đầu vào. Chỉ sử dụng nếu bạn hiểu hết công dụng của nó.</string>
+    <string name="swapin_signer_amount">Khoản tiền</string>
+    <string name="swapin_signer_tx">Giao dịch chưa ký</string>
+    <string name="swapin_signer_sign">Ký</string>
+    <string name="swapin_signer_signing">Đang ký…</string>
+    <string name="swapin_signer_signed_sig">Chữ ký người dùng</string>
+    <string name="swapin_signer_invalid_tx_header">Giao dịch chưa ký không hợp lệ</string>
+    <string name="swapin_signer_invalid_tx_details">Kiểm tra thông tin nhập đã đầy đủ và không thiếu ký tự nào.</string>
+    <string name="swapin_signer_error_header">Đăng nhập đầu vào không thành công</string>
+
+
+</resources>

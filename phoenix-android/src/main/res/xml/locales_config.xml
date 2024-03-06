@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2023 ACINQ SAS
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,11 +15,13 @@
   -->
 
 <locale-config xmlns:android="http://schemas.android.com/apk/res/android">
-    <locale android:name="en-US"/>
-    <locale android:name="fr"/>
-    <locale android:name="de"/>
-    <locale android:name="es"/>
-    <locale android:name="es_419"/>
-    <locale android:name="cs"/>
-    <locale android:name="pt-BR"/>
+    <locale android:name="en-US" />
+    <locale android:name="fr" />
+    <locale android:name="de" />
+    <locale android:name="es" />
+    <locale android:name="es_419" />
+    <locale android:name="cs" />
+    <locale android:name="pt-BR" />
+    <locale android:name="sk" />
+    <locale android:name="vi" />
 </locale-config>
