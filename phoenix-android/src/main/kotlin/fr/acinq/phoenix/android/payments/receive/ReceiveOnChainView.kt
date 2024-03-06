@@ -85,7 +85,7 @@ fun BitcoinAddressView(
                     details = stringResource(id = R.string.receive_onchain_legacy_warning),
                     detailsStyle = MaterialTheme.typography.subtitle2,
                     alignment = Alignment.CenterHorizontally
-                    )
+                )
             }
         }
         is BitcoinAddressState.Error -> {
