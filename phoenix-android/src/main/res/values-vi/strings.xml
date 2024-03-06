@@ -765,7 +765,6 @@
 
     <string name="swapin_signer_title">Người ký Swap-in</string>
     <string name="swapin_signer_instructions">Công cụ gỡ lỗi này cho phép bạn ký các swap-in đầu vào. Chỉ sử dụng nếu bạn hiểu hết công dụng của nó.</string>
-    <string name="swapin_signer_amount">Khoản tiền</string>
     <string name="swapin_signer_tx">Giao dịch chưa ký</string>
     <string name="swapin_signer_sign">Ký</string>
     <string name="swapin_signer_signing">Đang ký…</string>
