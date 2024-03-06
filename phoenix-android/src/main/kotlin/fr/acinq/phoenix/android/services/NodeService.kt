@@ -187,7 +187,7 @@ class NodeService : Service() {
             }
         }
         shutdownHandler.removeCallbacksAndMessages(null)
-        shutdownHandler.postDelayed(shutdownRunnable, 60 * 1000L) // push back shutdown by 60s
+        shutdownHandler.postDelayed(shutdownRunnable, 2 * 60 * 1000L) // service will shutdown in 2 minutes
         if (!isHeadless) {
             stopForeground(STOP_FOREGROUND_REMOVE)
         }
@@ -346,10 +346,6 @@ class NodeService : Service() {
                             rates = currencyManager.ratesFlow.value,
                             isHeadless = isHeadless && receivedInBackground.size == 1
                         )
-
-                        // push back service shutdown by 60s - maybe we'll receive more payments?
-                        shutdownHandler.removeCallbacksAndMessages(null)
-                        shutdownHandler.postDelayed(shutdownRunnable, 60 * 1000)
                     }
                 }
                 else -> Unit
