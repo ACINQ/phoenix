@@ -31,7 +31,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -49,7 +48,6 @@ import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.launch
 
 
 /** Button for navigation purpose, with the back arrow. */
