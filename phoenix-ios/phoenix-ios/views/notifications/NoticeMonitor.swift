@@ -50,17 +50,21 @@ class NoticeMonitor: ObservableObject {
 			}
 			.store(in: &cancellables)
 		
-		Biz.business.appConfigurationManager.walletContextPublisher()
-			.sink {[weak self](context: WalletContext) in
-				self?.walletContext = context
-			}
-			.store(in: &cancellables)
+		cancellables.insert(
+			Task { @MainActor [weak self] in
+				for await context in Biz.business.appConfigurationManager.walletContextSequence() {
+					self?.walletContext = context
+				}
+			}.autoCancellable()
+		)
 		
-		Biz.business.balanceManager.swapInWalletPublisher()
-			.sink {[weak self](wallet: Lightning_kmpWalletState.WalletWithConfirmations) in
-				self?.swapInWallet = wallet
-			}
-			.store(in: &cancellables)
+		cancellables.insert(
+			Task { @MainActor [weak self] in
+				for await wallet in Biz.business.balanceManager.swapInWalletSequence() {
+					self?.swapInWallet = wallet
+				}
+			}.autoCancellable()
+		)
 		
 		NotificationsManager.shared.permissions
 			.sink {[weak self](permissions: NotificationPermissions) in

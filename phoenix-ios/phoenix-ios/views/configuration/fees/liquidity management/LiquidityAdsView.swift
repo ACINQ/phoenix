@@ -130,11 +130,15 @@ struct LiquidityAdsView: View {
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
-		.onReceive(Biz.business.peerManager.channelsPublisher()) {
-			channelsChanged($0)
+		.task {
+			for await newChannels in Biz.business.peerManager.channelsArraySequence() {
+				channelsChanged(newChannels)
+			}
 		}
-		.onReceive(Biz.business.balanceManager.balancePublisher()) {
-			balanceChanged($0)
+		.task {
+			for await newBalance in Biz.business.balanceManager.balanceSequence() {
+				balanceChanged(newBalance)
+			}
 		}
 		.task {
 			await fetchMempoolRecommendedFees()

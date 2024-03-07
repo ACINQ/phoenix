@@ -56,9 +56,6 @@ struct ReceiveLightningView: View {
 	@EnvironmentObject var popoverState: PopoverState
 	@EnvironmentObject var smartModalState: SmartModalState
 	
-	let lastIncomingPaymentPublisher = Biz.business.paymentsManager.lastIncomingPaymentPublisher()
-	let channelsPublisher = Biz.business.peerManager.channelsPublisher()
-	
 	// For the cicular buttons: [copy, share, edit]
 	enum MaxButtonWidth: Preference {}
 	let maxButtonWidthReader = GeometryPreferenceReader(
@@ -105,11 +102,10 @@ struct ReceiveLightningView: View {
 		.onChange(of: mvi.model) { newModel in
 			onModelChange(model: newModel)
 		}
-		.onReceive(lastIncomingPaymentPublisher) {
-			lastIncomingPaymentChanged($0)
-		}
-		.onReceive(channelsPublisher) {
-			channelsChanged($0)
+		.task {
+			for await payment in Biz.business.paymentsManager.lastIncomingPaymentSequence() {
+				lastIncomingPaymentChanged(payment)
+			}
 		}
 		.onReceive(GroupPrefs.shared.liquidityPolicyPublisher) {
 			liquidityPolicyChanged($0)
@@ -133,6 +129,11 @@ struct ReceiveLightningView: View {
 				ActivityView(activityItems: items, applicationActivities: nil)
 			
 			} // </switch>
+		}
+		.task {
+			for await channels in Biz.business.peerManager.channelsArraySequence() {
+				channelsChanged(channels)
+			}
 		}
 		.task {
 			await fetchMempoolRecommendedFees()
@@ -748,7 +749,7 @@ struct ReceiveLightningView: View {
 		}
 		
 		let state = lastIncomingPayment.state()
-		if state == WalletPaymentState.successonchain || state == WalletPaymentState.successoffchain {
+		if state == WalletPaymentState.successOnChain || state == WalletPaymentState.successOffChain {
 			if lastIncomingPayment.paymentHash.toHex() == model.paymentHash {
 				presentationMode.wrappedValue.dismiss()
 			}

@@ -288,16 +288,20 @@ struct EditInfoView: View {
 		
 		if (originalDescText != newDesc) || (originalNotesText != newNotes) {
 		
-			let business = Biz.business
-			business.databaseManager.paymentsDb { (paymentsDb: SqlitePaymentsDb?, _) in
-				
-				paymentsDb?.updateMetadata(id: paymentId, userDescription: newDesc, userNotes: newNotes) { (err) in
-					
-					if let err = err {
-						log.error("paymentsDb.updateMetadata: \(String(describing: err))")
-					}
+			let databaseManager = Biz.business.databaseManager
+			Task { @MainActor in
+				do {
+					let paymentsDb = try await databaseManager.paymentsDb()
+					try await paymentsDb.updateMetadata(
+						id: paymentId,
+						userDescription: newDesc,
+						userNotes: newNotes
+					)
+				} catch {
+					log.error("paymentsDb.updateMetadata: \(error)")
 				}
 			}
+			
 		} else {
 			log.debug("no changes - nothing to save")
 		}

@@ -6,11 +6,11 @@ import Combine
 extension PeerManager {
 	
 	func peerStateValue() -> Lightning_kmpPeer? {
-		return peerState.value_ as? Lightning_kmpPeer
+		return self.peerState.value
 	}
 	
 	func channelsFlowValue() -> [Bitcoin_kmpByteVector32: LocalChannelInfo] {
-		if let value = self.channelsFlow.value_ as? [Bitcoin_kmpByteVector32: LocalChannelInfo] {
+		if let value = self.channelsFlow.value {
 			return value
 		} else {
 			return [:]
@@ -22,7 +22,7 @@ extension PeerManager {
 	}
 	
 	func finalWalletValue() -> Lightning_kmpWalletState.WalletWithConfirmations {
-		if let value = self.finalWallet.value_ as? Lightning_kmpWalletState.WalletWithConfirmations {
+		if let value = self.finalWallet.value {
 			return value
 		} else {
 			return Lightning_kmpWalletState.WalletWithConfirmations.empty()
@@ -33,7 +33,7 @@ extension PeerManager {
 extension BalanceManager {
 	
 	func swapInWalletValue() -> Lightning_kmpWalletState.WalletWithConfirmations {
-		if let value = self.swapInWallet.value_ as? Lightning_kmpWalletState.WalletWithConfirmations {
+		if let value = self.swapInWallet.value {
 			return value
 		} else {
 			return Lightning_kmpWalletState.WalletWithConfirmations.empty()
@@ -44,7 +44,7 @@ extension BalanceManager {
 extension WalletManager {
 	
 	func keyManagerValue() -> Lightning_kmpLocalKeyManager? {
-		if let value = keyManager.value_ as? Lightning_kmpLocalKeyManager {
+		if let value = keyManager.value {
 			return value
 		} else {
 			return nil
@@ -69,29 +69,7 @@ extension PhoenixShared.Notification {
 extension ConnectionsManager {
 	
 	var currentValue: Connections {
-		return connections.value_ as! Connections
-	}
-	
-	func asyncStream() -> AsyncStream<Connections> {
-		
-		return AsyncStream<Connections>(bufferingPolicy: .bufferingNewest(1)) { continuation in
-			
-			let swiftFlow = SwiftFlow<Connections>(origin: self.connections)
-
-			let watcher = swiftFlow.watch {(connections: Connections?) in
-				if let connections {
-					continuation.yield(connections)
-				}
-			}
-			
-			continuation.onTermination = { _ in
-				DispatchQueue.main.async {
-					// I'm not sure what thread this will be called from.
-					// And I've witnessed crashes when invoking `watcher.close()` from  a non-main thread.
-					watcher.close()
-				}
-			}
-		}
+		return connections.value
 	}
 }
 
@@ -148,11 +126,10 @@ extension LnurlAuth {
 	var actionPromptTitle: String {
 		if let action = self.action {
 			switch action {
-				case .register_ : return NSLocalizedString("Register",     comment: "lnurl-auth: login button title")
-				case .login     : return NSLocalizedString("Login",        comment: "lnurl-auth: login button title")
-				case .link      : return NSLocalizedString("Link",         comment: "lnurl-auth: login button title")
-				case .auth      : return NSLocalizedString("Authenticate", comment: "lnurl-auth: login button title")
-				default         : break
+				case .register : return NSLocalizedString("Register",     comment: "lnurl-auth: login button title")
+				case .login    : return NSLocalizedString("Login",        comment: "lnurl-auth: login button title")
+				case .link     : return NSLocalizedString("Link",         comment: "lnurl-auth: login button title")
+				case .auth     : return NSLocalizedString("Authenticate", comment: "lnurl-auth: login button title")
 			}
 		}
 		return LnurlAuth.defaultActionPromptTitle
@@ -165,11 +142,10 @@ extension LnurlAuth {
 	var actionSuccessTitle: String {
 		if let action = self.action {
 			switch action {
-				case .register_ : return NSLocalizedString("Registered",    comment: "lnurl-auth: success text")
-				case .login     : return NSLocalizedString("Logged In",     comment: "lnurl-auth: success text")
-				case .link      : return NSLocalizedString("Linked",        comment: "lnurl-auth: success text")
-				case .auth      : return NSLocalizedString("Authenticated", comment: "lnurl-auth: success text")
-				default         : break
+				case .register : return NSLocalizedString("Registered",    comment: "lnurl-auth: success text")
+				case .login    : return NSLocalizedString("Logged In",     comment: "lnurl-auth: success text")
+				case .link     : return NSLocalizedString("Linked",        comment: "lnurl-auth: success text")
+				case .auth     : return NSLocalizedString("Authenticated", comment: "lnurl-auth: success text")
 			}
 		}
 		return LnurlAuth.defaultActionSuccessTitle
