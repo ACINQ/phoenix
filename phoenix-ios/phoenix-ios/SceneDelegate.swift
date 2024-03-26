@@ -265,7 +265,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 			// - advanced security => biometrics required to unlock both the UI and the seed
 
 			if recoveryPhrase == nil && enabledSecurity.isEmpty && error == nil {
-
 				// The user doesn't have a wallet yet.
 				LockState.shared.walletExistence = .doesNotExist
 				

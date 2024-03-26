@@ -264,6 +264,10 @@ class PhoenixManager {
 			log.warning("ignoring: recoveryPhrase == nil")
 			return
 		}
+		guard let language = recoveryPhrase.language else {
+			log.warning("ignoring: recoveryPhrase.language == nil")
+			return
+		}
 		guard let business = business else {
 			log.warning("ignoring: business == nil")
 			return
@@ -271,6 +275,7 @@ class PhoenixManager {
 
 		let seed = business.walletManager.mnemonicsToSeed(
 			mnemonics: recoveryPhrase.mnemonicsArray,
+			wordList: language.wordlist(),
 			passphrase: ""
 		)
 		business.walletManager.loadWallet(seed: seed)

@@ -174,3 +174,62 @@ extension AppConnectionsDaemon.ControlTargetCompanion {
 	}
 }
 
+extension MnemonicLanguage {
+	
+	var flag: String { switch self {
+		case .english : return "🇬🇧"
+		case .spanish : return "🇪🇸"
+		case .french  : return "🇫🇷"
+		case .czech   : return "🇨🇿"
+	}}
+	
+	var displayName: String {
+		
+		if let result = Locale.current.localizedString(forLanguageCode: self.code) {
+			return result
+		}
+		
+		switch self {
+			case .english : return "English"
+			case .spanish : return "Spanish"
+			case .french  : return "French"
+			case .czech   : return "Czech"
+		}
+	}
+
+	static func fromLanguageCode(_ code: String) -> MnemonicLanguage? {
+		
+		return MnemonicLanguage.allCases
+			.first(where: { $0.code.caseInsensitiveCompare(code) == .orderedSame })
+	}
+
+	static var defaultCase: MnemonicLanguage {
+		
+		let available = self.allCases
+		
+		// Locale.preferredLanguages returns an ordered list,
+		// according to the user's configured preferences within the OS.
+		//
+		// For example:
+		// - [0] Arabic
+		// - [1] Spanish
+		// - [2] Portuguese
+		//
+		// Thus, absent a MnemonicLanguage for Arabic, we would choose Spanish.
+		
+		for identifier in Locale.preferredLanguages {
+			
+			let locale = Locale(identifier: identifier)
+			if let code = locale.languageCode {
+				
+				for lang in available {
+					if lang.code.caseInsensitiveCompare(code) == .orderedSame {
+						return lang
+					}
+				}
+			}
+		}
+		
+		return .english
+	}
+}

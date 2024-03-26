@@ -16,8 +16,6 @@ struct ManualRestoreView: MVIView {
 	var factory: ControllerFactory { return factoryEnv }
 	
 	@State var acceptedWarning = false
-	@State var mnemonics = [String]()
-	@State var autocomplete = [String]()
 	
 	@EnvironmentObject var deviceInfo: DeviceInfo
 	
@@ -69,12 +67,8 @@ struct ManualRestoreView: MVIView {
 				.zIndex(1)
 				.transition(.move(edge: .bottom))
 		} else {
-			EnterSeedView(
-				mvi: mvi,
-				mnemonics: $mnemonics,
-				autocomplete: $autocomplete
-			)
-			.zIndex(0)
+			EnterSeedView(mvi: mvi)
+				.zIndex(0)
 		}
 	}
 	
@@ -89,7 +83,10 @@ struct ManualRestoreView: MVIView {
 	func finishAndRestoreWallet(model: RestoreWallet.ModelValidMnemonics) -> Void {
 		log.trace("finishAndRestoreWallet()")
 		
-		let recoveryPhrase = RecoveryPhrase(mnemonics : model.mnemonics)
+		let recoveryPhrase = RecoveryPhrase(
+			mnemonics : model.mnemonics,
+			language  : model.language
+		)
 
 		AppSecurity.shared.addKeychainEntry(recoveryPhrase: recoveryPhrase) { (error: Error?) in
 			if error == nil {
@@ -164,15 +161,17 @@ struct WarningView: View {
 	}
 }
 
-struct EnterSeedView: View {
+struct EnterSeedView: View, ViewName {
 	
 	@ObservedObject var mvi: MVIState<RestoreWallet.Model, RestoreWallet.Intent>
-
-	@Binding var mnemonics: [String]
-	@Binding var autocomplete: [String]
+	
+	@State var mnemonics = [String]()
+	@State var autocomplete = [String]()
 	
 	@State var wordInput: String = ""
 	@State var isProcessingPaste = false
+	
+	@State var selectedLanguage: MnemonicLanguage = MnemonicLanguage.english
 	
 	@Namespace var topID
 	@Namespace var inputID
@@ -189,29 +188,7 @@ struct EnterSeedView: View {
 		
 		ScrollViewReader { scrollViewProxy in
 			ScrollView {
-				ZStack {
-					
-					// This interfers with tapping on buttons.
-					// It only seems to affect the device (not the simulator)
-					//
-					// A better solution is to use keyboardDismissMode, as below.
-					//
-//					Color(UIColor.clear)
-//						.frame(maxWidth: .infinity, maxHeight: .infinity)
-//						.contentShape(Rectangle())
-//						.onTapGesture {
-//							// dismiss keyboard if visible
-//							let keyWindow = UIApplication.shared.connectedScenes
-//								.filter({ $0.activationState == .foregroundActive })
-//								.map({ $0 as? UIWindowScene })
-//								.compactMap({ $0 })
-//								.first?.windows
-//								.filter({ $0.isKeyWindow }).first
-//							keyWindow?.endEditing(true)
-//						}
-					
-					main(scrollViewProxy)
-				}
+				main(scrollViewProxy)
 			}
 		}
 		.onAppear {
@@ -226,12 +203,27 @@ struct EnterSeedView: View {
 
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 				Spacer()
-				Text("Your wallet's seed is a list of 12 English words.")
+				Text("Your recovery phrase is a list of 12 words in:")
 					.id(topID)
 					.accessibilitySortPriority(202)
 				Spacer()
 			}
-			.padding([.leading, .trailing], 16)
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Spacer()
+				Menu {
+					ForEach(MnemonicLanguage.allCases, id: \.code) { lang in
+						Button {
+							changeLanguage(lang)
+						} label: {
+							Text(verbatim: "\(lang.flag) \(lang.displayName)")
+						}
+					}
+				} label: {
+					Text(verbatim: "\(selectedLanguage.flag) \(selectedLanguage.displayName)")
+				}
+				Spacer()
+			}
 			
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 				TextField(
@@ -541,7 +533,7 @@ struct EnterSeedView: View {
 	}
 	
 	func updateAutocompleteList() {
-		log.trace("[RestoreView] updateAutocompleteList()")
+		log.trace("[\(viewName)] updateAutocompleteList()")
 		
 		// Some keyboards will inject the entire word plus a space.
 		//
@@ -553,15 +545,17 @@ struct EnterSeedView: View {
 		
 		let tokens = wordInput.trimmingCharacters(in: .whitespaces).split(separator: " ")
 		if let firstToken = tokens.first {
-			log.debug("[RestoreView] Requesting autocomplete for: '\(firstToken)'")
+			log.debug("[\(viewName)] Requesting autocomplete for: '\(firstToken)'")
 			mvi.intent(RestoreWallet.IntentFilterWordList(
 				predicate: String(firstToken),
+				language: selectedLanguage,
 				uuid: UUID().uuidString
 			))
 		} else {
-			log.debug("[RestoreView] Clearing autocomplete list")
+			log.debug("[\(viewName)] Clearing autocomplete list")
 			mvi.intent(RestoreWallet.IntentFilterWordList(
 				predicate: "",
+				language: selectedLanguage,
 				uuid: UUID().uuidString
 			))
 		}
@@ -572,7 +566,7 @@ struct EnterSeedView: View {
 	// --------------------------------------------------
 	
 	func onModelChange(model: RestoreWallet.Model) -> Void {
-		log.trace("[RestoreView] onModelChange()")
+		log.trace("[\(viewName)] onModelChange()")
 		
 		if let model = model as? RestoreWallet.ModelFilteredWordlist {
 			log.debug("ModelFilteredWordlist.words = \(model.words)")
@@ -592,7 +586,7 @@ struct EnterSeedView: View {
 	}
 	
 	func onInput() -> Void {
-		log.trace("[RestoreView] onInput(): \"\(wordInput)\"")
+		log.trace("[\(viewName)] onInput(): \"\(wordInput)\"")
 		
 		// When the user hits space, we auto-accept the first mnemonic in the autocomplete list
 		if maybeSelectMnemonic(isAutocompleteTrigger: false) {
@@ -603,7 +597,7 @@ struct EnterSeedView: View {
 	}
 	
 	func onAutocompleteListChanged() {
-		log.trace("[RestoreView] onAutocompleteListChanged()")
+		log.trace("[\(viewName)] onAutocompleteListChanged()")
 		
 		// Example flow that gets us here:
 		//
@@ -620,7 +614,7 @@ struct EnterSeedView: View {
 	
 	@discardableResult
 	func maybeSelectMnemonic(isAutocompleteTrigger: Bool) -> Bool {
-		log.trace("[RestoreView] maybeSelectMnemonic(isAutocompleteTrigger = \(isAutocompleteTrigger))")
+		log.trace("[\(viewName)] maybeSelectMnemonic(isAutocompleteTrigger = \(isAutocompleteTrigger))")
 		
 		if isAutocompleteTrigger && autocomplete.count >= 1 {
 			
@@ -642,7 +636,7 @@ struct EnterSeedView: View {
 						// - let's process each token until we reach the end or a non-match
 						
 						isProcessingPaste = true
-						log.debug("[RestoreView] isProcessingPaste = true")
+						log.debug("[\(viewName)] isProcessingPaste = true")
 					}
 					
 					if isProcessingPaste {
@@ -656,7 +650,7 @@ struct EnterSeedView: View {
 		
 		if isAutocompleteTrigger && isProcessingPaste {
 			isProcessingPaste = false
-			log.debug("[RestoreView] isProcessingPaste = false")
+			log.debug("[\(viewName)] isProcessingPaste = false")
 		}
 		
 		if wordInput.hasSuffix(" "),
@@ -686,6 +680,23 @@ struct EnterSeedView: View {
 	// MARK: Actions
 	// --------------------------------------------------
 	
+	func changeLanguage(_ newLang: MnemonicLanguage) {
+		log.trace("[\(viewName)] changeLanguage: \(newLang.code)")
+		
+		guard selectedLanguage != newLang else {
+			log.trace("[\(viewName)] ignoring: same language")
+			return
+		}
+		
+		mnemonics = []
+		autocomplete = []
+		selectedLanguage = newLang
+		
+		if !wordInput.isEmpty {
+			onInput()
+		}
+	}
+
 	func selectMnemonic(_ word: String) -> Void {
 		log.trace("[RestoreView] selectMnemonic()")
 		
@@ -700,61 +711,21 @@ struct EnterSeedView: View {
 			input.removeSubrange(wordInput.startIndex ..< range.upperBound)
 			input = input.trimmingCharacters(in: .whitespaces)
 			
-			log.debug("[RestoreView] Remaining wordInput: \"\(input)\"")
+			log.debug("[\(viewName)] Remaining wordInput: \"\(input)\"")
 			wordInput = input
 			
 		} else {
-			log.debug("[RestoreView] Remaining wordInput: \"\"")
+			log.debug("[\(viewName)] Remaining wordInput: \"\"")
 			wordInput = ""
 		}
 	}
 	
 	func onImportButtonTapped() -> Void {
-		log.trace("[RestoreView] onImportButtonTapped()")
+		log.trace("[\(viewName)] onImportButtonTapped()")
 		
-		mvi.intent(RestoreWallet.IntentValidate(mnemonics: self.mnemonics))
-	}
-}
-
-class ManualRestoreView_Previews: PreviewProvider {
-	
-	static let filteredWordList1 = [
-		"abc", "abandon", "ability", "able", "about", "above", "absent", "absorb", "abstract", "absurd", "abuse", "access"
-	]
-	
-	static let filteredWordList2 = [
-		"abandon", "ability", "able", "about", "above", "absent", "absorb", "abstract", "absurd", "abuse", "access", "accident", "account"
-	]
-	
-	static let filteredWordList3 = [
-		"abc", "abandon", "ability", "able", "about", "above", "absent", "absorb", "abstract", "absurd", "abuse", "access", "accident", "account", "accuse", "achieve", "acid"
-	]
-
-	static var previews: some View {
-		
-		ManualRestoreView().mock(
-			RestoreWallet.ModelReady()
-		)
-		.previewDevice("iPhone 11")
-		
-		ManualRestoreView().mock(
-			RestoreWallet.ModelInvalidMnemonics()
-		)
-		.previewDevice("iPhone 11")
-		
-		ManualRestoreView().mock(
-			RestoreWallet.ModelFilteredWordlist(uuid: "", predicate: "ab", words: filteredWordList1)
-		)
-		.previewDevice("iPhone 11")
-		
-		ManualRestoreView().mock(
-			RestoreWallet.ModelFilteredWordlist(uuid: "", predicate: "ab", words: filteredWordList2)
-		)
-		.previewDevice("iPhone 11")
-		
-		ManualRestoreView().mock(
-			RestoreWallet.ModelFilteredWordlist(uuid: "", predicate: "ab", words: filteredWordList3)
-		)
-		.previewDevice("iPhone 11")
+		mvi.intent(RestoreWallet.IntentValidate(
+			mnemonics: self.mnemonics,
+			language: self.selectedLanguage
+		))
 	}
 }

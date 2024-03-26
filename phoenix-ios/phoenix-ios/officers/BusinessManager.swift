@@ -68,6 +68,10 @@ class BusinessManager {
 	/// (otherwise doing so would force-disconnect the notifySrvExt, which may be processing an incoming payment)
 	///
 	public let srvExtConnectedToPeer = CurrentValueSubject<Bool, Never>(false)
+
+	/// For creating a new wallet
+	/// 
+	public let mnemonicLanguagePublisher = CurrentValueSubject<MnemonicLanguage, Never>(MnemonicLanguage.english)
 	
 	private var isInBackground = false
 	
@@ -434,8 +438,13 @@ class BusinessManager {
 			return false
 		}
 		
+		guard let language = recoveryPhrase.language else {
+			return false
+		}
+		
 		let seed = knownSeed ?? business.walletManager.mnemonicsToSeed(
 			mnemonics  : recoveryPhrase.mnemonicsArray,
+			wordList   : language.wordlist(),
 			passphrase : ""
 		)
 		let _walletInfo = business.walletManager.loadWallet(seed: seed)

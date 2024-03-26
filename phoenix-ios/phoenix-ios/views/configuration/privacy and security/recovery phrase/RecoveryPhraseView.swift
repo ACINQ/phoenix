@@ -1,6 +1,7 @@
 import SwiftUI
 import CloudKit
 import CircularCheckmarkProgress
+import PhoenixShared
 
 fileprivate let filename = "RecoveryPhraseView"
 #if DEBUG && true
@@ -170,7 +171,7 @@ struct RecoveryPhraseList: View {
 			VStack(alignment: .leading, spacing: 35) {
 				Text(
 					"""
-					The recovery phrase (sometimes called a seed), is a list of 12 English words. \
+					The recovery phrase (sometimes called a seed), is a list of 12 words. \
 					It allows you to recover full access to your funds if needed.
 					"""
 				)
@@ -667,9 +668,21 @@ fileprivate struct SyncErrorDetails: View, ViewName {
 fileprivate struct RecoveryPhraseReveal: View {
 	
 	@Binding var isShowing: Bool
+	
 	let recoveryPhrase: RecoveryPhrase
+	let language: MnemonicLanguage
 	
 	@State var truncationDetected: Bool = false
+	
+	@StateObject var toast = Toast()
+	
+	@Environment(\.colorScheme) var colorScheme: ColorScheme
+	
+	init(isShowing: Binding<Bool>, recoveryPhrase: RecoveryPhrase) {
+		self._isShowing = isShowing
+		self.recoveryPhrase = recoveryPhrase
+		self.language = recoveryPhrase.language ?? MnemonicLanguage.english
+	}
 	
 	func mnemonic(_ idx: Int) -> String {
 		let mnemonics = recoveryPhrase.mnemonicsArray
@@ -688,16 +701,19 @@ fileprivate struct RecoveryPhraseReveal: View {
 				}
 			}
 			
-			// (required for landscapse mode, where swipe to dismiss isn't possible)
-			closeButton()
+			header()
+			toast.view()
 		}
 	}
 	
 	@ViewBuilder
-	func closeButton() -> some View {
+	func header() -> some View {
 		
 		VStack {
-			HStack {
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Text(verbatim: "\(language.flag) \(language.displayName)")
+					.font(.callout)
+					.foregroundColor(.secondary)
 				Spacer()
 				Button {
 					close()
@@ -747,6 +763,9 @@ fileprivate struct RecoveryPhraseReveal: View {
 			Spacer()
 			Spacer()
 			
+			copyButton()
+				.padding(.bottom, 6)
+
 			Text("BIP39 seed with standard BIP84 derivation path")
 				.font(.footnote)
 				.foregroundColor(.secondary)
@@ -788,8 +807,8 @@ fileprivate struct RecoveryPhraseReveal: View {
 						self.wasTruncated(visibleIdx: idx+1)
 					}
 					.padding(.bottom, 2)
-				}
-			}
+				} // </ForEach>
+			} // </VStack>
 			.padding(.trailing, 4) // boost spacing a wee bit
 			
 			Spacer()
@@ -818,8 +837,8 @@ fileprivate struct RecoveryPhraseReveal: View {
 						self.wasTruncated(visibleIdx: idx+1)
 					}
 					.padding(.bottom, 2)
-				}
-			}
+				} // </ForEach>
+			} // </VStack>
 			
 			Spacer()
 		}
@@ -851,12 +870,47 @@ fileprivate struct RecoveryPhraseReveal: View {
 		} // </HStack>
 	}
 	
+	@ViewBuilder
+	func copyButton() -> some View {
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+			Spacer()
+				
+			Button {
+				copyRecoveryPhrase()
+			} label: {
+				Text("Copy").font(.title3)
+			}
+			
+			Spacer()
+		} // </HStack>
+	}
+
+	
 	func wasTruncated(visibleIdx: Int) {
 		log.trace("[RecoverySeedReveal] wasTruncated(#: \(visibleIdx))")
 		
 		DispatchQueue.main.async {
 			truncationDetected = true
 		}
+	}
+	
+	func copyRecoveryPhrase() {
+		log.trace("[RecoverySeedReveal] copyRecoveryPhrase()")
+		
+		copy(recoveryPhrase.mnemonics)
+	}
+	
+	private func copy(_ string: String) {
+		log.trace("[RecoverySeedReveal] copy()")
+		
+		UIPasteboard.general.string = string
+		AppDelegate.get().clearPasteboardOnReturnToApp = true
+		toast.pop(
+			"Pasteboard will be cleared when you return to Phoenix.",
+			colorScheme: colorScheme.opposite,
+			duration: 4.0 // seconds
+		)
 	}
 	
 	func close() {
