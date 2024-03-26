@@ -30,6 +30,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 
 	public var externalLightningUrlPublisher = PassthroughSubject<String, Never>()
 
+	public var clearPasteboardOnReturnToApp: Bool = false
+
+	
 	override init() {
 	#if DEBUG
 		setenv("CFNETWORK_DIAGNOSTICS", "3", 1);
@@ -128,6 +131,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		// but it's safe to always clear the badge here anyways.
 		//
 		UIApplication.shared.applicationIconBadgeNumber = 0
+		
+		if clearPasteboardOnReturnToApp {
+			if UIPasteboard.general.hasStrings {
+				UIPasteboard.general.string = ""
+			}
+			clearPasteboardOnReturnToApp = false
+		}
 	}
 	
 	func _applicationWillResignActive(_ application: UIApplication) {

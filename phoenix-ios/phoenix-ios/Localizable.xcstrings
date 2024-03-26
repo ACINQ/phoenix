@@ -802,6 +802,16 @@
         }
       }
     },
+    "(recommended)" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(recomendado)"
+          }
+        }
+      }
+    },
     "(requires authentication)" : {
       "localizations" : {
         "ar" : {
@@ -2907,6 +2917,12 @@
         }
       }
     },
+    "Account extended private key (%@)" : {
+
+    },
+    "Account extended public key (%@)" : {
+
+    },
     "active commitments" : {
       "localizations" : {
         "es" : {
@@ -4740,6 +4756,9 @@
           }
         }
       }
+    },
+    "BIP39 Mnemonic" : {
+
     },
     "BIP39 seed with standard BIP84 derivation path" : {
       "localizations" : {
@@ -6926,7 +6945,7 @@
       }
     },
     "Connected" : {
-      "comment" : "Connection status\nConnection state",
+      "comment" : "Connection state\nConnection status",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -7101,7 +7120,7 @@
       }
     },
     "Connecting…" : {
-      "comment" : "Connection status\nConnection state",
+      "comment" : "Connection state\nConnection status",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -7620,6 +7639,9 @@
           }
         }
       }
+    },
+    "Copy…" : {
+
     },
     "Could not connect to host:" : {
       "localizations" : {
@@ -16488,7 +16510,7 @@
       }
     },
     "Offline" : {
-      "comment" : "Connection status\nConnection state",
+      "comment" : "Connection state\nConnection status",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -19662,6 +19684,9 @@
           }
         }
       }
+    },
+    "Recovery phrase (12 words)" : {
+
     },
     "Recovery Seed" : {
       "comment" : "Navigation bar title",
@@ -23740,7 +23765,7 @@
         }
       }
     },
-    "The recovery phrase (sometimes called a seed), is a list of 12 English words. It allows you to recover full access to your funds if needed." : {
+    "The recovery phrase (sometimes called a seed), is a list of 12 words. It allows you to recover full access to your funds if needed." : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -23751,13 +23776,13 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Obnovovací fráze (někdy nazývaná Seed) je seznam 12 anglických slov. V případě potřeby umožňuje obnovit plný přístup k finančním prostředkům."
+            "value" : "Obnovovací fráze (někdy nazývaná Seed) je seznam 12 slov. V případě potřeby umožňuje obnovit plný přístup k finančním prostředkům."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La frase de recuperación (a veces llamada semilla), es una lista de 12 palabras en inglés. Le permite recuperar el acceso completo a sus fondos si es necesario"
+            "value" : "La frase de recuperación (a veces llamada semilla), es una lista de 12 palabras. Le permite recuperar el acceso completo a sus fondos si es necesario"
           }
         },
         "es-419" : {
@@ -23769,7 +23794,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La clé de sauvegarde (parfois appelée “seed”) est une phrase de douze mots anglais. Elle vous permet de récupérer vos fonds en cas de besoin."
+            "value" : "La clé de sauvegarde (parfois appelée “seed”) est une phrase de douze mots. Elle vous permet de récupérer vos fonds en cas de besoin."
           }
         }
       }
@@ -26861,6 +26886,12 @@
         }
       }
     },
+    "Wallet Creation" : {
+
+    },
+    "Wallet creation options" : {
+
+    },
     "Wallet info" : {
       "comment" : "Navigation Bar Title",
       "localizations" : {
@@ -27188,6 +27219,9 @@
           }
         }
       }
+    },
+    "What would you like to copy?" : {
+
     },
     "What's new:" : {
       "localizations" : {
@@ -28571,6 +28605,32 @@
         }
       }
     },
+    "Your recovery phrase is 12 words, generated using the BIP39 standard.\n\nEnglish is recommended. If you prefer another language, we provide recovery instructions on our website.\n\nYour selection here does **not** affect your ability to send or receive bitcoin within Phoenix." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Su frase de recuperación es de 12 palabras, generada utilizando el estándar BIP39.\n\nSe recomienda inglés. Si prefiere otro idioma, le proporcionamos instrucciones de recuperación en nuestro sitio web.\n\nSu selección aquí **no** afecta su capacidad para enviar o recibir bitcoins dentro de Phoenix."
+          }
+        }
+      }
+    },
+    "Your recovery phrase is a list of 12 words in:" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Su frase de recuperación es una lista de 12 palabras en:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre clé de sauvegarde est une liste de 12 mots dans :"
+          }
+        }
+      }
+    },
     "Your recovery phrase is stored in iCloud." : {
       "localizations" : {
         "ar" : {
@@ -28685,7 +28745,8 @@
         }
       }
     },
-    "Your wallet's seed is a list of 12 English words." : {
+    "Your wallet's seed is a list of 12 words." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -28696,13 +28757,13 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Seed vaší peněženky je seznam 12 anglických slov."
+            "value" : "Seed vaší peněženky je seznam 12 slov."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La semilla de su billetera es una lista de 12 palabras en inglés."
+            "value" : "La semilla de su billetera es una lista de 12 palabras."
           }
         },
         "es-419" : {
@@ -28714,7 +28775,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La clé de votre portefeuille est une liste de 12 mots anglais."
+            "value" : "La clé de votre portefeuille est une liste de 12 mots."
           }
         }
       }
