@@ -238,6 +238,7 @@ struct ValidateView: View {
 				.disableAutocorrection(true)
 				.fixedSize()
 				.font(.title)
+                .disabled(paymentRequest()?.amount != nil)
 				.multilineTextAlignment(.trailing)
 				.minimumScaleFactor(0.95) // SwiftUI bugs: truncating text in RTL
 				.foregroundColor(isInvalidAmount() ? Color.appNegative : Color.primaryForeground)
