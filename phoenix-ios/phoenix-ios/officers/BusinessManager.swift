@@ -93,10 +93,6 @@ class BusinessManager {
 		
 		let nc = NotificationCenter.default
 		
-		nc.publisher(for: UIApplication.didFinishLaunchingNotification).sink { _ in
-			self.applicationDidFinishLaunching()
-		}.store(in: &appCancellables)
-		
 		nc.publisher(for: UIApplication.didEnterBackgroundNotification).sink { _ in
 			self.applicationDidEnterBackground()
 		}.store(in: &appCancellables)
@@ -131,8 +127,7 @@ class BusinessManager {
 		)
 		business.start(startupParams: startupParams)
 		
-		registerForNotifications()
-		startTasks()
+		setup()
 	}
 
 	public func stop() {
@@ -156,11 +151,11 @@ class BusinessManager {
 	}
 	
 	// --------------------------------------------------
-	// MARK: Startup
+	// MARK: Setup
 	// --------------------------------------------------
 	
-	private func registerForNotifications() {
-		log.trace("registerForNotifications()")
+	private func setup() {
+		log.trace("setup()")
 		
 		// Connection status observer
 		cancellables.insert(
@@ -363,10 +358,6 @@ class BusinessManager {
 				}
 			}.autoCancellable()
 		)
-	}
-	
-	func startTasks() {
-		log.trace("startTasks()")
 		
 		cancellables.insert(
 			// Start watching the SwapIn wallet (once the channels are loaded from DB)
@@ -390,10 +381,6 @@ class BusinessManager {
 	// --------------------------------------------------
 	// MARK: Notifications
 	// --------------------------------------------------
-	
-	func applicationDidFinishLaunching() {
-		log.trace("### applicationDidFinishLaunching()")
-	}
 	
 	func applicationDidEnterBackground() {
 		log.trace("### applicationDidEnterBackground()")

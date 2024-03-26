@@ -24,10 +24,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	//	}
 		return UIApplication.shared.delegate as! AppDelegate
 	}
-
+	
 	private var appCancellables = Set<AnyCancellable>()
 	private var groupPrefsCancellables = Set<AnyCancellable>()
 
+	private var isInBackground = false
+	private var xpc: CrossProcessCommunication? = nil
+	
 	public var externalLightningUrlPublisher = PassthroughSubject<String, Never>()
 
 	override init() {
@@ -47,7 +50,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		_ application: UIApplication,
 		didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
 	) -> Bool {
-
+		log.trace("### application(_:didFinishLaunchingWithOptions:)")
+		
 		let navBarAppearance = UINavigationBarAppearance()
 		navBarAppearance.backgroundColor = .primaryBackground
 		navBarAppearance.shadowColor = .clear // no separator line between navBar & content
@@ -93,20 +97,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			self._applicationWillResignActive(application)
 		}.store(in: &appCancellables)
 
-		CrossProcessCommunication.shared.start(actor: .mainApp) { (_: XpcMessage) in
+		nc.publisher(for: UIApplication.willEnterForegroundNotification).sink { _ in
+			self._applicationWillEnterForeground()
+		}.store(in: &appCancellables)
+		
+		nc.publisher(for: UIApplication.didEnterBackgroundNotification).sink { _ in
+			self._applicationDidEnterBackground()
+		}.store(in: &appCancellables)
+		
+		xpc = CrossProcessCommunication(actor: .mainApp, receivedMessage: {(_: XpcMessage) in
 			self.didReceivePaymentViaAppExtension()
-		}
+		})
 		
 		NotificationsManager.shared.requestPermissionForProvisionalNotifications()
 		
 		return true
 	}
 	
-	/// This function isn't called, because Firebase broke it with their stupid swizzling stuff.
+	// The following functions are not called,
+	// because Firebase broke it with their stupid swizzling stuff.
+	// 
 	func applicationDidBecomeActive(_ application: UIApplication) {/* :( */}
-	
-	/// This function isn't called, because Firebase broke it with their stupid swizzling stuff.
 	func applicationWillResignActive(_ application: UIApplication) {/* :( */}
+//	func applicationWillEnterForeground(_ application: UIApplication) {/* :( */}
+//	func applicationDidEnterBackground(_ application: UIApplication) {/* :( */}
 	
 	func _applicationDidBecomeActive(_ application: UIApplication) {
 		log.trace("### applicationDidBecomeActive(_:)")
@@ -134,6 +148,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		log.trace("### applicationWillResignActive(_:)")
 		
 		groupPrefsCancellables.removeAll()
+	}
+	
+	func _applicationWillEnterForeground() {
+		log.trace("### applicationWillEnterForeground()")
+		
+		if isInBackground {
+			isInBackground = false
+			xpc?.resume()
+		}
+	}
+	
+	func _applicationDidEnterBackground() {
+		log.trace("### applicationDidEnterBackground()")
+		
+		if !isInBackground {
+			isInBackground = true
+			xpc?.suspend()
+		}
 	}
 	
 	// --------------------------------------------------
