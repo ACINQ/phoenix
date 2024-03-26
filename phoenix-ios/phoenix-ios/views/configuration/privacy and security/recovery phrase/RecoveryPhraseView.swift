@@ -672,7 +672,6 @@ fileprivate struct RecoveryPhraseReveal: View {
 	let recoveryPhrase: RecoveryPhrase
 	let language: MnemonicLanguage
 	
-	@State var showCopyOptions: Bool = false
 	@State var truncationDetected: Bool = false
 	
 	@StateObject var toast = Toast()
@@ -874,32 +873,13 @@ fileprivate struct RecoveryPhraseReveal: View {
 	@ViewBuilder
 	func copyButton() -> some View {
 		
-		let xprv = BusinessManager.isTestnet ? "vprv" : "zprv"
-		let xpub = BusinessManager.isTestnet ? "vpub" : "zpub"
-		
 		HStack(alignment: VerticalAlignment.center, spacing: 0) {
 			Spacer()
 				
 			Button {
-				showCopyOptions = true
+				copyRecoveryPhrase()
 			} label: {
-				Text("Copy…").font(.title3)
-			}
-			.confirmationDialog("What would you like to copy?",
-				isPresented: $showCopyOptions,
-				titleVisibility: .automatic
-			) {
-				// Note: confirmationDialog strips all formatting from Text items.
-				// So we don't get to play with fonts or colors here.
-				Button("Recovery phrase (12 words)") {
-					copyRecoveryPhrase()
-				}
-				Button("Account extended private key (\(xprv))") {
-					copyExtPrivKey()
-				}
-				Button("Account extended public key (\(xpub))") {
-					copyExtPubKey()
-				}
+				Text("Copy").font(.title3)
 			}
 			
 			Spacer()
@@ -919,28 +899,6 @@ fileprivate struct RecoveryPhraseReveal: View {
 		log.trace("[RecoverySeedReveal] copyRecoveryPhrase()")
 		
 		copy(recoveryPhrase.mnemonics)
-	}
-	
-	func copyExtPrivKey() {
-		log.trace("[RecoverySeedReveal] copyExtPrivKey()")
-		
-		let xprv = Biz.business.walletManager_finalOnChainWallet_xprv(
-			mnemonics: recoveryPhrase.mnemonicsArray,
-			wordList: language.wordlist(),
-			passphrase: ""
-		)
-		if let xprv {
-			copy(xprv)
-		}
-	}
-	
-	func copyExtPubKey() {
-		log.trace("[RecoverySeedReveal] copyExtPubKey()")
-		
-		let keyManager = Biz.business.walletManager.keyManagerValue()
-		if let xpub = keyManager?.finalOnChainWallet.xpub {
-			copy(xpub)
-		}
 	}
 	
 	private func copy(_ string: String) {

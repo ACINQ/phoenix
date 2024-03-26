@@ -2917,12 +2917,6 @@
         }
       }
     },
-    "Account extended private key (%@)" : {
-
-    },
-    "Account extended public key (%@)" : {
-
-    },
     "active commitments" : {
       "localizations" : {
         "es" : {
@@ -7639,9 +7633,6 @@
           }
         }
       }
-    },
-    "Copy…" : {
-
     },
     "Could not connect to host:" : {
       "localizations" : {
@@ -19685,9 +19676,6 @@
         }
       }
     },
-    "Recovery phrase (12 words)" : {
-
-    },
     "Recovery Seed" : {
       "comment" : "Navigation bar title",
       "extractionState" : "manual",
@@ -27219,9 +27207,6 @@
           }
         }
       }
-    },
-    "What would you like to copy?" : {
-
     },
     "What's new:" : {
       "localizations" : {
