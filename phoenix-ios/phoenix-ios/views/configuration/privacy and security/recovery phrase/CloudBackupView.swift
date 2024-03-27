@@ -11,60 +11,34 @@ struct CloudBackupView: View {
 	
 	@Binding var backupSeed_enabled: Bool
 	
-	@State var toggle_enabled: Bool
+	@State var toggle_enabled: Bool = false
 	
-	@State var legal_appleRisk: Bool
-	@State var legal_governmentRisk: Bool
+	@State var original_appleRisk: Bool = false
+	@State var original_governmentRisk: Bool = false
+	@State var original_advancedDataProtection: Bool = false
+	
+	@State var legal_1_appleRisk: Bool = false
+	@State var legal_1_governmentRisk: Bool = false
+	@State var legal_2_advancedDataProtection: Bool = false
 	
 	@State var animatingLegalToggleColor = false
 	
 	let encryptedNodeId: String
-	let originalName: String
-	@State var name: String
+	@State var originalName: String = ""
+	@State var name: String = ""
 	
+	@Environment(\.openURL) var openURL
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
-	var hasChanges: Bool {
-		if name != originalName {
-			return true
-		}
-		if backupSeed_enabled {
-			// Currently enabled.
-			return !toggle_enabled || !legal_appleRisk || !legal_governmentRisk
-		} else {
-			// Currently disabled.
-			return toggle_enabled || legal_appleRisk || legal_governmentRisk
-		}
-	}
-	
-	var canSave: Bool {
-		if backupSeed_enabled {
-			// Currently enabled.
-			// Saving to disable: user only needs to disable the toggle
-			// Saving to change name: newName != oldName
-			return !toggle_enabled || (name != originalName)
-		} else {
-			// Currently disabled.
-			// To enable, user must enable the toggle, and accept the legal risks.
-			return toggle_enabled && legal_appleRisk && legal_governmentRisk
-		}
-	}
-	
 	init(backupSeed_enabled: Binding<Bool>) {
+		
 		self._backupSeed_enabled = backupSeed_enabled
-		let enabled = backupSeed_enabled.wrappedValue
-		
-		self._toggle_enabled = State<Bool>(initialValue: enabled)
-		self._legal_appleRisk = State<Bool>(initialValue: enabled)
-		self._legal_governmentRisk = State<Bool>(initialValue: enabled)
-		
-		let encryptedNodeId = Biz.encryptedNodeId!
-		let originalName = Prefs.shared.backupSeed.name(encryptedNodeId: encryptedNodeId) ?? ""
-		
-		self.encryptedNodeId = encryptedNodeId
-		self.originalName = originalName
-		self._name = State<String>(initialValue: originalName)
+		self.encryptedNodeId = Biz.encryptedNodeId!
 	}
+	
+	// --------------------------------------------------
+	// MARK: View Builders
+	// --------------------------------------------------
 	
 	@ViewBuilder
 	var body: some View {
@@ -74,6 +48,21 @@ struct CloudBackupView: View {
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationBarBackButtonHidden(true)
 			.navigationBarItems(leading: backButton())
+			.onAppear {
+				onAppear()
+			}
+			.onChange(of: toggle_enabled) { _ in
+				checkAnimation()
+			}
+			.onChange(of: legal_1_appleRisk) { _ in
+				checkAnimation()
+			}
+			.onChange(of: legal_1_governmentRisk) { _ in
+				checkAnimation()
+			}
+			.onChange(of: legal_2_advancedDataProtection) { _ in
+				checkAnimation()
+			}
 	}
 	
 	@ViewBuilder
@@ -110,7 +99,8 @@ struct CloudBackupView: View {
 		
 		List {
 			section_toggle()
-			section_legal()
+			section_legal_1()
+			section_legal_2()
 			section_name()
 		}
 		.listStyle(.insetGrouped)
@@ -145,17 +135,20 @@ struct CloudBackupView: View {
 	}
 	
 	@ViewBuilder
-	func section_legal() -> some View {
+	func section_legal_1() -> some View {
 		
-		Section(header: Text("Legal")) {
+		Section(header: Text("Legal: Option 1")) {
 			
-			Toggle(isOn: $legal_appleRisk) {
+			let strikethroughActive = legal_2_advancedDataProtection
+			
+			Toggle(isOn: $legal_1_appleRisk) {
 				Text(
 					"""
 					I understand that certain Apple employees may be able \
 					to access my iCloud data.
 					"""
 				)
+				.strikethrough(strikethroughActive)
 				.lineLimit(nil)
 				.alignmentGuide(VerticalAlignment.center) { d in
 					d[VerticalAlignment.firstTextBaseline]
@@ -167,13 +160,14 @@ struct CloudBackupView: View {
 			))
 			.padding(.vertical, 5)
 			
-			Toggle(isOn: $legal_governmentRisk) {
+			Toggle(isOn: $legal_1_governmentRisk) {
 				Text(
 					"""
 					I understand that Apple may share my iCloud data \
 					with government agencies upon request.
 					"""
 				)
+				.strikethrough(strikethroughActive)
 				.lineLimit(nil)
 				.alignmentGuide(VerticalAlignment.center) { d in
 					d[VerticalAlignment.firstTextBaseline]
@@ -186,9 +180,44 @@ struct CloudBackupView: View {
 			.padding(.vertical, 5)
 			
 		} // </Section>
-		.onChange(of: toggle_enabled) { newValue in
-			didToggleEnabled(newValue)
-		}
+	}
+	
+	@ViewBuilder
+	func section_legal_2() -> some View {
+		
+		Section {
+			
+			Toggle(isOn: $legal_2_advancedDataProtection) {
+				Text(
+					"""
+					I have enabled "Advanced Data Protection" for iCloud.
+					"""
+				)
+				.lineLimit(nil)
+				.alignmentGuide(VerticalAlignment.center) { d in
+					d[VerticalAlignment.firstTextBaseline]
+				}
+			}
+			.toggleStyle(CheckboxToggleStyle(
+				onImage: onImage(),
+				offImage: offImage()
+			))
+			.padding(.vertical, 5)
+			
+		} header: {
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Text("Legal: Option 2")
+				Spacer()
+				Button {
+					openAdvancedDataProtectionLink()
+				} label: {
+					Image(systemName: "info.circle")
+				}
+				.foregroundColor(.secondary)
+			} // </HStack>
+			
+		} // </Section>
 	}
 	
 	@ViewBuilder
@@ -237,37 +266,158 @@ struct CloudBackupView: View {
 	@ViewBuilder
 	func offImage() -> some View {
 		if toggle_enabled {
+			let useRed = animatingLegalToggleColor && (!legal_1 && !legal_2)
 			Image(systemName: "square")
 				.renderingMode(.template)
 				.imageScale(.large)
-				.foregroundColor(animatingLegalToggleColor ? Color.red : Color.primary)
+				.foregroundColor(useRed ? Color.red : Color.primary)
 		} else {
 			Image(systemName: "square")
 				.imageScale(.large)
 		}
 	}
 	
-	func didToggleEnabled(_ value: Bool) {
-		log.trace("didToggleEnabled")
+	// --------------------------------------------------
+	// MARK: View Helpers
+	// --------------------------------------------------
+	
+	var legal_1: Bool {
+		return legal_1_appleRisk && legal_1_governmentRisk
+	}
+	
+	var legal_2: Bool {
+		return legal_2_advancedDataProtection
+	}
+	
+	var hasChanges: Bool {
+		if name != originalName {
+			return true
+		}
+		if legal_1_appleRisk != original_appleRisk {
+			return true
+		}
+		if legal_1_governmentRisk != original_governmentRisk {
+			return true
+		}
+		if legal_2_advancedDataProtection != original_advancedDataProtection {
+			return true
+		}
 		
-		if value {
-			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-				if toggle_enabled {
-					withAnimation(Animation.linear(duration: 1.0).repeatForever(autoreverses: true)) {
-						animatingLegalToggleColor = true
-					}
+		if backupSeed_enabled {
+			// Original state == enabled
+			// Did user disabled backup ?
+			return !toggle_enabled
+		} else {
+			// Original state == disabled
+			// Did user enable backup ?
+			return toggle_enabled
+		}
+	}
+	
+	var canSave: Bool {
+		if backupSeed_enabled {
+			// Original state == enabled
+			
+			if !toggle_enabled {
+				// Saving to disable: user only needs to disable the toggle
+				return true
+			}
+			if !legal_1 && !legal_2 {
+				// Cannot save without accepting legal
+				return false
+			}
+			
+			// Otherwise can save as long as there's changes
+			return hasChanges
+			
+		} else {
+			// Original state == disabled
+			// To enable, user must enable the toggle, and accept the legal risks.
+			return toggle_enabled && (legal_1 || legal_2)
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
+	
+	func onAppear() {
+		log.trace("onAppear()")
+		
+		let enabled = backupSeed_enabled
+		toggle_enabled = enabled
+		
+		let advancedDataProtection = Prefs.shared.advancedDataProtectionEnabled
+		
+		original_appleRisk = enabled && !advancedDataProtection
+		original_governmentRisk = enabled && !advancedDataProtection
+		original_advancedDataProtection = enabled && advancedDataProtection
+		
+		legal_1_appleRisk = original_appleRisk
+		legal_1_governmentRisk = original_governmentRisk
+		legal_2_advancedDataProtection = original_advancedDataProtection
+		
+		originalName = Prefs.shared.backupSeed.name(encryptedNodeId: encryptedNodeId) ?? ""
+		name = originalName
+	}
+	
+	// --------------------------------------------------
+	// MARK: Animations
+	// --------------------------------------------------
+	
+	func checkAnimation() {
+		log.trace("checkAnimation()")
+		
+		if toggle_enabled && (!legal_1 && !legal_2) {
+			startAnimatingLegalToggleColor()
+		} else {
+			stopAnimatingLegalToggleColor()
+		}
+	}
+	
+	func startAnimatingLegalToggleColor() {
+		log.trace("startAnimatingLegalToggleColor()")
+		
+		DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+			if toggle_enabled {
+				log.debug("animatingLegalToggleColor: starting animation...")
+				withAnimation(Animation.linear(duration: 1.0).repeatForever(autoreverses: true)) {
+					animatingLegalToggleColor = true
 				}
 			}
-		} else {
-			animatingLegalToggleColor = false
+		}
+	}
+	
+	func stopAnimatingLegalToggleColor() {
+		log.trace("stopAnimatingLegalToggleColor()")
+		
+		animatingLegalToggleColor = false
+	}
+	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
+	
+	func openAdvancedDataProtectionLink() {
+		log.trace("openAdvancedDataProtectionLink")
+		
+		if let url = URL(string: "https://support.apple.com/en-us/108756") {
+			openURL(url)
 		}
 	}
 	
 	func didTapBackButton() {
 		log.trace("didTapBackButton()")
 		
-		if canSave {
+		if hasChanges && canSave {
+			
 			backupSeed_enabled = toggle_enabled
+			
+			if toggle_enabled {
+				Prefs.shared.advancedDataProtectionEnabled = legal_2_advancedDataProtection
+			} else {
+				Prefs.shared.advancedDataProtectionEnabled = false
+			}
 			
 			// Subtle optimizations:
 			// - changing backupSeed_isEnabled causes upload/delete
@@ -283,6 +433,8 @@ struct CloudBackupView: View {
 				Prefs.shared.backupSeed.isEnabled = toggle_enabled
 				Prefs.shared.backupSeed.setName(name, encryptedNodeId: encryptedNodeId)
 			}
+		} else {
+			log.trace("!hasChanges || !canSave")
 		}
 		presentationMode.wrappedValue.dismiss()
 	}

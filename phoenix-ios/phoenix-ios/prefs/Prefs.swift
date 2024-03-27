@@ -21,6 +21,8 @@ fileprivate enum Key: String {
 	case recentPaymentsConfig
 	case hasMergedChannelsForSplicing
 	case swapInAddressIndex
+	case hasUpgradedSeedCloudBackups
+	case advancedDataProtectionEnabled
 }
 
 fileprivate enum KeyDeprecated: String {
@@ -131,6 +133,16 @@ class Prefs {
 		set { defaults.hasMergedChannelsForSplicing = newValue }
 	}
 	
+	var hasUpgradedSeedCloudBackups: Bool {
+		get { defaults.hasUpgradedSeedCloudBackups }
+		set { defaults.hasUpgradedSeedCloudBackups = newValue }
+	}
+	
+	var advancedDataProtectionEnabled: Bool {
+		get { defaults.advancedDataProtectionEnabled }
+		set { defaults.advancedDataProtectionEnabled = newValue }
+	}
+	
 	// --------------------------------------------------
 	// MARK: Wallet State
 	// --------------------------------------------------
@@ -214,6 +226,8 @@ class Prefs {
 		defaults.removeObject(forKey: Key.recentPaymentsConfig.rawValue)
 		defaults.removeObject(forKey: Key.hasMergedChannelsForSplicing.rawValue)
 		defaults.removeObject(forKey: Key.swapInAddressIndex.rawValue)
+		defaults.removeObject(forKey: Key.hasUpgradedSeedCloudBackups.rawValue)
+		defaults.removeObject(forKey: Key.advancedDataProtectionEnabled.rawValue)
 		
 		self.backupTransactions.resetWallet(encryptedNodeId: encryptedNodeId)
 		self.backupSeed.resetWallet(encryptedNodeId: encryptedNodeId)
@@ -312,5 +326,15 @@ extension UserDefaults {
 	@objc fileprivate var swapInAddressIndex: Int {
 		get { integer(forKey: Key.swapInAddressIndex.rawValue) }
 		set { set(newValue, forKey: Key.swapInAddressIndex.rawValue) }
+	}
+
+	@objc fileprivate var hasUpgradedSeedCloudBackups: Bool {
+		get { bool(forKey: Key.hasUpgradedSeedCloudBackups.rawValue) }
+		set { set(newValue, forKey: Key.hasUpgradedSeedCloudBackups.rawValue) }
+	}
+	
+	@objc fileprivate var advancedDataProtectionEnabled: Bool {
+		get { bool(forKey: Key.advancedDataProtectionEnabled.rawValue) }
+		set { set(newValue, forKey: Key.advancedDataProtectionEnabled.rawValue) }
 	}
 }

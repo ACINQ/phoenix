@@ -10,4 +10,8 @@ extension Task where Success == Never, Failure == Never {
 			try await Task.sleep(nanoseconds: nanoseconds)
 		}
 	}
+	
+	static func sleep(hours: Int) async throws {
+		try await sleep(seconds: TimeInterval(hours) * 60 * 60)
+	}
 }
