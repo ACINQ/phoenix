@@ -11,16 +11,17 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-fileprivate let record_column_mnemonics = "mnemonics"
-fileprivate let record_column_language = "language"
 fileprivate let record_column_name = "name"
+fileprivate let record_column_language = "language"
+fileprivate let record_column_mnemonics_deprecated = "mnemonics" // record[key]
+fileprivate let record_column_mnemonics_encrypted = "mnemonics2" // record.encryptedValues[key]
 
 struct SeedBackup {
 	let recordID: CKRecord.ID
-	let mnemonics: String
-	let language: String
-	let name: String?
 	let created: Date
+	let name: String?
+	let language: String
+	let mnemonics: String
 }
 
 enum FetchSeedsError: Error {
@@ -140,16 +141,20 @@ class SyncSeedManager: SyncManagerProtcol {
 							
 							if case .success(let record) = result {
 								
-								if let mnemonics = record[record_column_mnemonics] as? String,
+								let mnemonics =
+									record.encryptedValues[record_column_mnemonics_encrypted] as? String ??
+									record[record_column_mnemonics_deprecated] as? String
+								
+								if let name = record[record_column_name] as? String?,
 									let language = record[record_column_language] as? String,
-									let name = record[record_column_name] as? String?
+									let mnemonics
 								{
 									let item = SeedBackup(
 										recordID: recordID,
-										mnemonics: mnemonics,
-										language: language,
+										created: record.creationDate ?? Date.distantPast,
 										name: name,
-										created: record.creationDate ?? Date.distantPast
+										language: language,
+										mnemonics: mnemonics
 									)
 									
 									publisher.send(item)
@@ -347,9 +352,9 @@ class SyncSeedManager: SyncManagerProtcol {
 						recordID: recordID()
 					)
 					
-					record[record_column_mnemonics] = recoveryPhrase.mnemonics
-					record[record_column_language] = recoveryPhrase.languageCode
 					record[record_column_name] = uploadedName
+					record[record_column_language] = recoveryPhrase.languageCode
+					record.encryptedValues[record_column_mnemonics_encrypted] = recoveryPhrase.mnemonics
 					
 					let started = Date.now
 					let (saveResults, _) = try await database.modifyRecords(
