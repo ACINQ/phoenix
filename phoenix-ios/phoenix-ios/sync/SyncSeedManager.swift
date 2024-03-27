@@ -73,6 +73,7 @@ class SyncSeedManager: SyncManagerProtcol {
 	private var consecutiveErrorCount = 0
 	
 	private var cancellables = Set<AnyCancellable>()
+	private var upgradeTask: Task<Void, Error>? = nil
 	
 	init(chain: Bitcoin_kmpChain, recoveryPhrase: RecoveryPhrase, encryptedNodeId: String) {
 		log.trace("init()")
@@ -89,6 +90,8 @@ class SyncSeedManager: SyncManagerProtcol {
 		
 		startPreferencesMonitor()
 		startNameMonitor()
+		
+		startUpgradeTask()
 	}
 	
 	// ----------------------------------------
@@ -188,6 +191,222 @@ class SyncSeedManager: SyncManagerProtcol {
 		} // </Task>
 		
 		return publisher
+	}
+	
+	// ----------------------------------------
+	// MARK: Upgrade Seeds
+	// ----------------------------------------
+	
+	private func startUpgradeTask() {
+		
+		let chain = self.chain
+		upgradeTask = Task { @MainActor in
+			
+			if Prefs.shared.hasUpgradedSeedCloudBackups {
+				return
+			}
+			
+			// Give priority to other tasks during app launch
+			try await Task.sleep(seconds: 4.0)
+			
+			let container = CKContainer.default()
+			let zoneID = CKRecordZone.default().zoneID
+			
+			let configuration = CKOperation.Configuration()
+			configuration.allowsCellularAccess = true
+			
+			// Step 1 of 2:
+			// Find all the records that need to be upgraded
+			
+			var needsUpgrade: [String: SeedBackup] = [:]
+			
+			var fetchDone = false
+			repeat {
+				do {
+					needsUpgrade = try await SyncSeedManager.upgradeSeeds_fetch(
+						container, zoneID, configuration, chain
+					)
+					fetchDone = true
+					
+				} catch {
+					log.debug("upgradeSeeds(): fetch.error = \(error)")
+					try await Task.sleep(hours: 4)
+				}
+			} while !fetchDone
+			
+			// Step 2 of 2:
+			// Upgrade all outdated records
+			
+			log.debug("upgradeSeeds(): \(needsUpgrade.count) upgrades needed")
+			
+			while let (recordName, seedBackup) = needsUpgrade.randomElement() {
+				do {
+					let didUpgrade = try await SyncSeedManager.upgradeSeeds_modify(
+						container, zoneID, configuration, chain, recordName, seedBackup
+					)
+					if didUpgrade {
+						needsUpgrade.removeValue(forKey: recordName)
+						log.debug("upgradeSeeds(): \(needsUpgrade.count) upgrades needed")
+					}
+					
+				} catch {
+					log.debug("upgradeSeeds(): modify.error = \(error)")
+					try await Task.sleep(hours: 4)
+				}
+			}
+			
+			log.debug("upgradeSeeds(): Done!")
+			Prefs.shared.hasUpgradedSeedCloudBackups = true
+		}
+	}
+	
+	private class func upgradeSeeds_fetch(
+		_ container: CKContainer,
+		_ zoneID: CKRecordZone.ID,
+		_ configuration: CKOperation.Configuration,
+		_ chain: Lightning_kmpNodeParams.Chain
+	) async throws -> [String: SeedBackup] {
+		
+		log.trace("upgradeSeeds_fetch()")
+		
+		return try await container.privateCloudDatabase.configuredWith(configuration: configuration) { database in
+				
+			log.debug("upgradeSeeds_fetch(): configured")
+			
+			let query = CKQuery(
+				recordType: record_table_name(chain: chain),
+				predicate: NSPredicate(format: "TRUEPREDICATE")
+			)
+			query.sortDescriptors = [
+				NSSortDescriptor(key: "creationDate", ascending: false)
+			]
+			
+			// ^ It would be more efficient if we could query for "mnemonics_deprecated != nil",
+			//   but that would require adding an index on a deprecated property.
+			//   I don't think that's worth it, especially when most users have very few backups.
+			
+			var needsUpgrade: [String: SeedBackup] = [:]
+			
+			var done = false
+			var cursor: CKQueryOperation.Cursor? = nil
+			
+			while !done {
+				do {
+					
+					log.debug("upgradeSeeds_fetch(): sending query...")
+					
+					let results: [(CKRecord.ID, Result<CKRecord, Error>)]
+					if let prvCursor = cursor {
+						(results, cursor) = try await database.records(continuingMatchFrom: prvCursor)
+					} else {
+						(results, cursor) = try await database.records(matching: query, inZoneWith: zoneID)
+					}
+					
+					for (recordID, result) in results {
+						
+						if case .success(let record) = result {
+							
+							if let mnemonics = record[record_column_mnemonics_deprecated] as? String,
+								let name = record[record_column_name] as? String?,
+								let language = record[record_column_language] as? String
+							{
+								let item = SeedBackup(
+									recordID: recordID,
+									created: record.creationDate ?? Date.distantPast,
+									name: name,
+									language: language,
+									mnemonics: mnemonics
+								)
+								
+								needsUpgrade[recordID.recordName] = item
+							}
+						}
+					}
+					
+					if cursor == nil {
+						log.debug("upgradeSeeds_fetch(): moreInCloud = false")
+						done = true
+						
+					} else {
+						log.debug("upgradeSeeds_fetch(): moreInCloud = true")
+					}
+					
+				} catch {
+					
+					if let ckerror = error as? CKError,
+						let retryAfterSeconds = ckerror.retryAfterSeconds,
+						(ckerror.code == CKError.Code.requestRateLimited || ckerror.code == CKError.Code.zoneBusy)
+					{
+						log.debug("upgradeSeeds_fetch(): CKError.retryAfterSeconds = \(retryAfterSeconds)")
+						try await Task.sleep(seconds: retryAfterSeconds)
+						
+					} else {
+						throw error
+					}
+				}
+				
+			} // </while !done>
+			
+			return needsUpgrade
+		} // </configuredWith>
+	}
+	
+	private class func upgradeSeeds_modify(
+		_ container: CKContainer,
+		_ zoneID: CKRecordZone.ID,
+		_ configuration: CKOperation.Configuration,
+		_ chain: Lightning_kmpNodeParams.Chain,
+		_ recordName: String,
+		_ seedBackup: SeedBackup
+	) async throws -> Bool {
+		
+		log.trace("upgradeSeeds_modify()")
+		
+		return try await container.privateCloudDatabase.configuredWith(configuration: configuration) { database in
+			do {
+				log.debug("upgradeSeeds_modify(): sending query...")
+				
+				let recordID = CKRecord.ID(recordName: recordName, zoneID: zoneID)
+				let record = CKRecord(
+					recordType: SyncSeedManager.record_table_name(chain: chain),
+					recordID: recordID
+				)
+				
+				record[record_column_name] = seedBackup.name ?? ""
+				record[record_column_language] = seedBackup.language
+				record.encryptedValues[record_column_mnemonics_encrypted] = seedBackup.mnemonics
+				
+				let (saveResults, _) = try await database.modifyRecords(
+					saving: [record],
+					deleting: [],
+					savePolicy: .changedKeys
+				)
+				
+				let result = saveResults[recordID]!
+				
+				if case let .failure(error) = result {
+					log.debug("upgradeSeeds_modify(): perRecordResult: failure")
+					throw error
+				} else {
+					log.debug("upgradeSeeds_modify(): perRecordResult: success")
+					return true
+				}
+				
+			} catch {
+				
+				if let ckerror = error as? CKError,
+					let retryAfterSeconds = ckerror.retryAfterSeconds,
+					(ckerror.code == CKError.Code.requestRateLimited || ckerror.code == CKError.Code.zoneBusy)
+				{
+					log.debug("upgradeSeeds_modify(): CKError.retryAfterSeconds = \(retryAfterSeconds)")
+					try await Task.sleep(seconds: retryAfterSeconds)
+					return false
+					
+				} else {
+					throw error
+				}
+			}
+		} // </configuredWith>
 	}
 	
 	// ----------------------------------------
@@ -309,6 +528,8 @@ class SyncSeedManager: SyncManagerProtcol {
 		}
 		
 		cancellables.removeAll()
+		upgradeTask?.cancel()
+		upgradeTask = nil
 	}
 	
 	// ----------------------------------------
