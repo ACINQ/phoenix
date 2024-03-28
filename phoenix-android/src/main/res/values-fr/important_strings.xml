@@ -93,7 +93,7 @@
     <string name="initwallet_restore">Restaurer mon wallet</string>
 
     <string name="restore_disclaimer_message">Phoenix ne restaure que les fonds off-chain qu\'il avait déjà gérés.\n\nImporter une seed qui n\'a pas été créée par Phoenix ne restaurera aucun fonds.\n\nVeuillez également vous assurer que cette seed n\'est pas déjà utilisée sur un autre wallet Phoenix.</string>
-    <string name="restore_disclaimer_checkbox">Je comprends.</string>
+    <string name="utils_ack">Je comprends.</string>
 
     <string name="restore_instructions">La clé (ou seed) de votre wallet est une liste de 12 mots en anglais. Entrez chaque mot de cette liste dans la zone de saisie ci-dessous.</string>
     <string name="restore_input_label">Saisie du mot %1$s</string>
@@ -130,9 +130,6 @@
     <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Des frais de %1$s sont estimés pour recevoir ce montant, ce qui représente plus de %2$s%% du montant.\n\nAugmentez cette limite, ou bien demandez de la liquidité supplémentaire.</string>
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Votre liquidité entrante est insuffisante pour ce montant, et la gestion automatisée des channels est désactivée.</string>
-
-    <string name="receive_onchain_legacy_warning_title">Note suite à la migration</string>
-    <string name="receive_onchain_legacy_warning">Il s\'agit de votre nouvelle adresse. Ne réutilisez pas vos anciennes adresses Bitcoin d\'avant la migration !</string>
 
     <!-- scanning errors -->
 
@@ -372,9 +369,9 @@
 
     <!-- low feerate disclaimer -->
 
-    <string name="send_low_feerate_dialog_title">Frais faibles!</string>
-    <string name="send_low_feerate_dialog_body1">Les transactions utilisant des frais trop faibles peuvent rester en attente de confirmation pendant des jours, voire des semaines.</string>
-    <string name="send_low_feerate_dialog_body2">Le choix des frais est de votre responsabilité. Une fois envoyé, ce paiement ne pourra pas être annulé, seulement accéléré en utilisant des frais plus élevés.</string>
-    <string name="send_low_feerate_dialog_body3">Êtes-vous sûr de vouloir continuer ?</string>
+    <string name="spliceout_low_feerate_dialog_title">Frais faibles!</string>
+    <string name="spliceout_low_feerate_dialog_body1">Les transactions utilisant des frais trop faibles peuvent rester en attente de confirmation pendant des jours, voire des semaines.</string>
+    <string name="spliceout_low_feerate_dialog_body2">Le choix des frais est de votre responsabilité. Une fois envoyé, ce paiement ne pourra pas être annulé, seulement accéléré en utilisant des frais plus élevés.</string>
+    <string name="spliceout_low_feerate_dialog_body3">Êtes-vous sûr de vouloir continuer ?</string>
 
 </resources>

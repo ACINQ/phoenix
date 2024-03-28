@@ -93,7 +93,7 @@
     <string name="initwallet_restore">Obnoviť moju peňaženku</string>
 
     <string name="restore_disclaimer_message">Phoenix môže obnoviť len off-chain prostriedky, ktoré boli spravované touto aplikáciou.\n\nImportom obnovovacej frázy, ktorá NEBOLA vytvorená aplikáciou Phoenix, sa neobnovia žiadne prostriedky.\n\nUistite sa tiež, že už nie je spustená iná aplikácia Phoenix s tou istou obnovovacou frázou.</string>
-    <string name="restore_disclaimer_checkbox">Rozumiem.</string>
+    <string name="utils_ack">Rozumiem.</string>
 
     <string name="restore_instructions">Obnovovacia fráza (seed) vašej peňaženky je zoznam 12 anglických slov. Každé slovo z tohto zoznamu napíšte do nižšie uvedeného poľa.</string>
     <string name="restore_input_label">Zadajte slovo #%1$s</string>
@@ -129,9 +129,6 @@
     <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Očakáva sa, že tento poplatok bude vo výške %1$s, a tento poplatok je vyšší než %2$s% sumy.\n\nZvýšte tento limit v nastavení správy kanálov alebo požiadajte o dodatočnú likviditu.</string>
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Prichádzajúca likvidita nie je dostatočná a máte zakázanú automatickú správu kanálov.</string>
-
-    <string name="receive_onchain_legacy_warning_title">Oznámenie o migrácii</string>
-    <string name="receive_onchain_legacy_warning">Toto je vaša nová adresa. Neopakujte použitie svojich starých Bitcoin adres z doby pred migráciou!</string>
 
     <!-- scanning errors -->
 
@@ -372,9 +369,9 @@
 
     <!-- low feerate disclaimer -->
 
-    <string name="send_low_feerate_dialog_title">Nízke poplatky!</string>
-    <string name="send_low_feerate_dialog_body1">Platby s nízkymi poplatkami môžu trvať niekoľko dní alebo týždňov bez potvrdenia.</string>
-    <string name="send_low_feerate_dialog_body2">Výber poplatkov je na vašu zodpovednosť. Po odoslaní nemožno túto platbu zrušiť, iba urýchliť vyššími poplatkami.</string>
-    <string name="send_low_feerate_dialog_body3">Ste si istí, že chcete pokračovať?</string>
+    <string name="spliceout_low_feerate_dialog_title">Nízke poplatky!</string>
+    <string name="spliceout_low_feerate_dialog_body1">Platby s nízkymi poplatkami môžu trvať niekoľko dní alebo týždňov bez potvrdenia.</string>
+    <string name="spliceout_low_feerate_dialog_body2">Výber poplatkov je na vašu zodpovednosť. Po odoslaní nemožno túto platbu zrušiť, iba urýchliť vyššími poplatkami.</string>
+    <string name="spliceout_low_feerate_dialog_body3">Ste si istí, že chcete pokračovať?</string>
 
 </resources>

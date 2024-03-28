@@ -117,7 +117,7 @@ private fun DisclaimerView(
             Text(stringResource(R.string.restore_disclaimer_message))
         }
         Checkbox(
-            text = stringResource(R.string.restore_disclaimer_checkbox),
+            text = stringResource(R.string.utils_ack),
             checked = hasCheckedWarning,
             onCheckedChange = { hasCheckedWarning = it },
         )

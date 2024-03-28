@@ -93,7 +93,7 @@
     <string name="initwallet_restore">Meine Wallet wiederherstellen</string>
 
     <string name="restore_disclaimer_message">Phoenix kann nur off-chain-Guthaben wiederherstellen, das von dieser App verwaltet wurde.\n\nEin Seed, der nicht von Phoenix generiert wurde, kann nicht importiert werden.\n\nStellen Sie außerdem sicher, dass Sie nicht bereits eine andere Phoenix-Wallet mit demselben Seed betreiben.</string>
-    <string name="restore_disclaimer_checkbox">Ich verstehe.</string>
+    <string name="utils_ack">Ich verstehe.</string>
 
     <string name="restore_instructions">Der Seed für deine Wallet ist eine Liste mit 12 englischen Wörtern. Schreiben Sie jedes Wort dieser Liste in die folgende Box.</string>
     <string name="restore_input_label">Wort #%1$s eingeben</string>
@@ -129,9 +129,6 @@
     <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Eine Gebühr von %1$s wird für den Erhalt dieses Betrages geschätzt, und diese Gebühren übersteigen %2$s%% des Betrags.\n\nErhöhen Sie dieses Limit oder fordern Sie zusätzliche Liquidität an.</string>
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Eingangskapazität ist unzureichend und automatisches Kanal-Management ist deaktiviert.</string>
-
-    <string name="receive_onchain_legacy_warning_title">Hinweis zur Migration</string>
-    <string name="receive_onchain_legacy_warning">Dies ist Ihre neue Adresse. Verwenden Sie Ihre alten Bitcoin-Adressen von vor der Migration nicht wieder!</string>
 
 	<!-- scanning errors -->
 
@@ -372,9 +369,9 @@
 
     <!-- low feerate disclaimer -->
 
-    <string name="send_low_feerate_dialog_title">Niedrige Gebühren!</string>
-    <string name="send_low_feerate_dialog_body1">Zahlungen mit niedrigen Gebühren können sich über Tage oder Wochen hinziehen, ohne bestätigt zu werden.</string>
-    <string name="send_low_feerate_dialog_body2">Die Auswahl der Gebühren liegt in Ihrer Verantwortung. Einmal abgeschickt, kann diese Zahlung nicht mehr storniert, sondern nur noch mit höheren Gebühren beschleunigt werden.</string>
-    <string name="send_low_feerate_dialog_body3">Sind Sie sicher, dass Sie fortfahren möchten?</string>
+    <string name="spliceout_low_feerate_dialog_title">Niedrige Gebühren!</string>
+    <string name="spliceout_low_feerate_dialog_body1">Zahlungen mit niedrigen Gebühren können sich über Tage oder Wochen hinziehen, ohne bestätigt zu werden.</string>
+    <string name="spliceout_low_feerate_dialog_body2">Die Auswahl der Gebühren liegt in Ihrer Verantwortung. Einmal abgeschickt, kann diese Zahlung nicht mehr storniert, sondern nur noch mit höheren Gebühren beschleunigt werden.</string>
+    <string name="spliceout_low_feerate_dialog_body3">Sind Sie sicher, dass Sie fortfahren möchten?</string>
 
 </resources>

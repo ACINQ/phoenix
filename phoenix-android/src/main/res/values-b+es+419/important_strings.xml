@@ -90,7 +90,7 @@
     <string name="initwallet_restore">Restaurar mi billetera</string>
 
     <string name="restore_disclaimer_message">Phoenix solo puede restaurar los fondos fuera de la cadena que hayan sido gestionados por esta aplicación.\n\nSi importas una semilla que NO haya sido creada por Phoenix, no se restaurará ningún fondo.\n\nAsegúrate además de no estar usando otra billetera Phoenix con la misma semilla.</string>
-    <string name="restore_disclaimer_checkbox">Entiendo.</string>
+    <string name="utils_ack">Entiendo.</string>
 
     <string name="restore_instructions">La semilla de la billetera es una lista de 12 palabras en inglés. Escribe cada palabra de esta lista en la siguiente casilla.</string>
     <string name="restore_input_label">Ingresa la palabra #%1$s</string>
@@ -127,9 +127,6 @@
     <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Se estiman unas comisiones de %1$s para recibir este importe, y estas comisiones superan el %2$s%% del importe.\n\nAumente este límite o solicite liquidez adicional.</string>
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">La liquidez entrante es insuficiente y tienes desactivada la gestión automatizada de canales.</string>
-
-    <string name="receive_onchain_legacy_warning_title">Aviso de migración</string>
-    <string name="receive_onchain_legacy_warning">Esta es tu nueva dirección. No reutilices las direcciones antiguas de Bitcoin que tenías antes de la migración.</string>
 
     <!-- scanning errors -->
 
@@ -360,9 +357,9 @@
 
     <!-- low feerate disclaimer -->
 
-    <string name="send_low_feerate_dialog_title">¡Baja comisión!</string>
-    <string name="send_low_feerate_dialog_body1">Los pagos con comisiones bajas pueden pasar días o semanas sin confirmarse.</string>
-    <string name="send_low_feerate_dialog_body2">La selección de comisiones es su responsabilidad. Una vez enviado, este pago no puede ser cancelado, sólo acelerado con comisiones más altas.</string>
-    <string name="send_low_feerate_dialog_body3">¿Está seguro de que desea continuar?</string>
+    <string name="spliceout_low_feerate_dialog_title">¡Baja comisión!</string>
+    <string name="spliceout_low_feerate_dialog_body1">Los pagos con comisiones bajas pueden pasar días o semanas sin confirmarse.</string>
+    <string name="spliceout_low_feerate_dialog_body2">La selección de comisiones es su responsabilidad. Una vez enviado, este pago no puede ser cancelado, sólo acelerado con comisiones más altas.</string>
+    <string name="spliceout_low_feerate_dialog_body3">¿Está seguro de que desea continuar?</string>
 
 </resources>

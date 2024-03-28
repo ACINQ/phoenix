@@ -16,13 +16,21 @@
 
 package fr.acinq.phoenix.android.payments.spliceout
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -42,13 +50,14 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
+import fr.acinq.phoenix.android.internalData
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.MempoolFeerate
+import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SendSpliceOutView(
     requestedAmount: Satoshi?,
@@ -86,10 +95,14 @@ fun SendSpliceOutView(
                         balance != null && newAmount > balance.truncateToSatoshi() -> {
                             amountErrorMessage = context.getString(R.string.send_error_amount_over_balance)
                         }
+
                         requestedAmount != null && newAmount < requestedAmount -> {
-                            amountErrorMessage = context.getString(R.string.send_error_amount_below_requested,
-                                (requestedAmount).toMilliSatoshi().toPrettyString(prefBtcUnit, withUnit = true))
+                            amountErrorMessage = context.getString(
+                                R.string.send_error_amount_below_requested,
+                                (requestedAmount).toMilliSatoshi().toPrettyString(prefBtcUnit, withUnit = true)
+                            )
                         }
+
                         newAmount < 546.sat -> {
                             amountErrorMessage = context.getString(R.string.validation_below_min, 546.sat.toPrettyString(BitcoinUnit.Sat, withUnit = true))
                         }
@@ -144,10 +157,12 @@ fun SendSpliceOutView(
                     }
                 )
             }
+
             is SpliceOutState.Preparing -> {
                 Spacer(modifier = Modifier.height(24.dp))
                 ProgressView(text = stringResource(id = R.string.send_spliceout_prepare_in_progress))
             }
+
             is SpliceOutState.ReadyToSend -> {
                 SpliceOutReadyView(
                     state = state,
@@ -158,13 +173,16 @@ fun SendSpliceOutView(
                     onExecute = { vm.executeSpliceOut(state.userAmount, state.actualFeerate, address) },
                 )
             }
+
             is SpliceOutState.Executing -> {
                 Spacer(modifier = Modifier.height(24.dp))
                 ProgressView(text = stringResource(id = R.string.send_spliceout_execute_in_progress))
             }
+
             is SpliceOutState.Complete.Success -> {
                 LaunchedEffect(key1 = Unit) { onSpliceOutSuccess() }
             }
+
             is SpliceOutState.Complete.Failure -> {
                 Spacer(modifier = Modifier.height(24.dp))
                 ErrorMessage(
@@ -187,6 +205,7 @@ private fun SpliceOutErrorView(state: SpliceOutState) {
                 alignment = Alignment.CenterHorizontally,
             )
         }
+
         is SpliceOutState.Error.NoChannels -> {
             ErrorMessage(
                 header = stringResource(id = R.string.send_spliceout_error_failure),
@@ -194,6 +213,7 @@ private fun SpliceOutErrorView(state: SpliceOutState) {
                 alignment = Alignment.CenterHorizontally,
             )
         }
+
         else -> {}
     }
 }
@@ -217,56 +237,16 @@ private fun SpliceOutReadyView(
 
     Spacer(modifier = Modifier.height(24.dp))
 
-    var showDisclaimer by remember { mutableStateOf(false) }
-    if (showDisclaimer) {
-        Dialog(
-            onDismiss = { showDisclaimer = false },
-            buttons = null,
-            title = stringResource(id = R.string.send_low_feerate_dialog_title)
-        ) {
-            Column(modifier = Modifier.padding(horizontal = 24.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(text = annotatedStringResource(id = R.string.send_low_feerate_dialog_body1))
-                Text(text = stringResource(id = R.string.send_low_feerate_dialog_body2))
-                Text(text = stringResource(id = R.string.send_low_feerate_dialog_body3))
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
-            ) {
-                Button(
-                    text = stringResource(id = R.string.btn_cancel),
-                    onClick = { showDisclaimer = false },
-                )
-                Button(
-                    text = stringResource(id = R.string.btn_confirm),
-                    onClick = onExecute,
-                    icon = R.drawable.ic_check_circle,
-                    space = 8.dp,
-                )
-            }
-        }
-    }
-
     if (balance == null || total.toMilliSatoshi() > balance) {
         ErrorMessage(
             header = stringResource(R.string.send_spliceout_error_cannot_afford_fees),
             alignment = Alignment.CenterHorizontally,
         )
     } else {
-        FilledButton(
-            text = if (!mayDoPayments) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.send_pay_button),
-            icon = R.drawable.ic_send,
-            enabled = mayDoPayments && isAmountValid,
-            onClick = {
-                if (mempoolFeerate != null && FeeratePerByte(state.userFeerate).feerate < mempoolFeerate.hour.feerate) {
-                    showDisclaimer = true
-                } else {
-                    showDisclaimer = false
-                    onExecute()
-                }
-            },
-        )
+        // low feerate == below 1 hour estimate
+        val isUsingLowFeerate = mempoolFeerate != null && FeeratePerByte(state.userFeerate).feerate < mempoolFeerate.hour.feerate
+        val showSpliceoutCapacityDisclaimer = internalData.getSpliceoutCapacityDisclaimer.collectAsState(initial = true).value
+        ReviewSpliceOutAndConfirm(onExecute, mayDoPayments, isAmountValid, isUsingLowFeerate, showSpliceoutCapacityDisclaimer)
     }
 }
 
@@ -287,6 +267,149 @@ private fun SpliceOutFeeSummaryView(
         AmountWithFiatBelow(amount = total.toMilliSatoshi(), amountTextStyle = MaterialTheme.typography.body2)
     }
     // TODO: show a warning if the fee is too large
+}
+
+@Composable
+fun ColumnScope.LowFeerateWarning(onConfirm: () -> Unit, onCancel: () -> Unit) {
+    Text(text = stringResource(id = R.string.spliceout_low_feerate_dialog_title), style = MaterialTheme.typography.h4)
+    Spacer(modifier = Modifier.height(12.dp))
+    Text(text = annotatedStringResource(id = R.string.spliceout_low_feerate_dialog_body1))
+    Spacer(modifier = Modifier.height(8.dp))
+    Text(text = stringResource(id = R.string.spliceout_low_feerate_dialog_body2))
+
+    Spacer(modifier = Modifier.height(24.dp))
+    FilledButton(
+        text = stringResource(id = R.string.btn_confirm),
+        onClick = onConfirm,
+        icon = R.drawable.ic_check_circle,
+        space = 8.dp,
+        modifier = Modifier.align(Alignment.End),
+    )
+    Spacer(modifier = Modifier.height(8.dp))
+    Button(
+        text = stringResource(id = R.string.btn_cancel),
+        onClick = onCancel,
+        modifier = Modifier.align(Alignment.End),
+        shape = CircleShape,
+    )
+}
+
+@Composable
+fun ColumnScope.SpliceOutCapacityDisclaimer(onConfirm: () -> Unit, onCancel: () -> Unit) {
+    val scope = rememberCoroutineScope()
+    var skipDisclaimerChecked by remember { mutableStateOf(false) }
+    val internalData = internalData
+
+    Text(text = stringResource(id = R.string.spliceout_capacity_disclaimer_title), style = MaterialTheme.typography.h4)
+    Spacer(modifier = Modifier.height(12.dp))
+    Text(text = stringResource(id = R.string.spliceout_capacity_disclaimer_body1))
+    Spacer(modifier = Modifier.height(8.dp))
+    Text(text = stringResource(id = R.string.spliceout_capacity_disclaimer_body2))
+    Spacer(modifier = Modifier.height(8.dp))
+    Checkbox(
+        text = stringResource(id = R.string.spliceout_capacity_disclaimer_checkbox),
+        checked = skipDisclaimerChecked,
+        onCheckedChange = {
+            skipDisclaimerChecked = it
+            scope.launch { internalData.saveSpliceoutCapacityDisclaimer(!it) }
+        },
+    )
+
+    Spacer(modifier = Modifier.height(24.dp))
+    FilledButton(
+        text = stringResource(id = R.string.btn_confirm),
+        onClick = onConfirm,
+        icon = R.drawable.ic_check_circle,
+        space = 8.dp,
+        modifier = Modifier.align(Alignment.End),
+    )
+    Spacer(modifier = Modifier.height(8.dp))
+    Button(
+        text = stringResource(id = R.string.btn_cancel),
+        onClick = onCancel,
+        modifier = Modifier.align(Alignment.End),
+        shape = CircleShape,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@Composable
+private fun ReviewSpliceOutAndConfirm(
+    onExecute: () -> Unit,
+    mayDoPayments: Boolean,
+    isAmountValid: Boolean,
+    isUsingLowFeerate: Boolean,
+    showSpliceoutCapacityDisclaimer: Boolean,
+) {
+    val scope = rememberCoroutineScope()
+    val sheetState = rememberModalBottomSheetState()
+    var showSheet by remember { mutableStateOf(false) }
+
+    if (showSheet) {
+        ModalBottomSheet(
+            sheetState = sheetState,
+            onDismissRequest = {
+                // executed when user click outside the sheet, and after sheet has been hidden thru state.
+                showSheet = false
+            },
+            modifier = Modifier.heightIn(max = 700.dp),
+            containerColor = MaterialTheme.colors.surface,
+            contentColor = MaterialTheme.colors.onSurface,
+            scrimColor = MaterialTheme.colors.onBackground.copy(alpha = 0.1f),
+        ) {
+            val pagerState = rememberPagerState(
+                initialPage = when {
+                    isUsingLowFeerate && showSpliceoutCapacityDisclaimer -> 0
+                    isUsingLowFeerate -> 0
+                    showSpliceoutCapacityDisclaimer -> 1
+                    else -> 2
+                },
+                pageCount = { 2 },
+            )
+            HorizontalPager(
+                modifier = Modifier.fillMaxHeight(),
+                state = pagerState,
+                verticalAlignment = Alignment.Top,
+                userScrollEnabled = false,
+            ) {
+                Column(
+                    modifier = Modifier
+                        .verticalScroll(rememberScrollState())
+                        .padding(top = 0.dp, start = 24.dp, end = 24.dp, bottom = 50.dp)
+                ) {
+                    when (it) {
+                        0 -> LowFeerateWarning(
+                            onConfirm = {
+                                if (showSpliceoutCapacityDisclaimer) {
+                                    scope.launch { pagerState.scrollToPage(1, 0f) }
+                                } else {
+                                    onExecute()
+                                }
+                            },
+                            onCancel = { showSheet = false }
+                        )
+                        1 -> SpliceOutCapacityDisclaimer(onConfirm = onExecute, onCancel = { showSheet = false })
+                        else -> showSheet = false
+                    }
+                }
+            }
+        }
+    }
+
+    FilledButton(
+        text = if (!mayDoPayments) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.send_pay_button),
+        icon = R.drawable.ic_send,
+        enabled = mayDoPayments && isAmountValid,
+        modifier = Modifier.enableOrFade(!showSheet),
+        onClick = {
+            if (isUsingLowFeerate || showSpliceoutCapacityDisclaimer) {
+                showSheet = true
+            } else {
+                showSheet = false
+                onExecute()
+            }
+        },
+    )
 }
 
 @Composable
