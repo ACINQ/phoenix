@@ -558,11 +558,12 @@ private fun UnitDropdown(
     Box(modifier = modifier.wrapContentSize(Alignment.TopStart)) {
         Button(
             text = units[selectedIndex].displayCode,
-            icon = R.drawable.ic_chevron_down,
+            icon = if (enabled) R.drawable.ic_chevron_down else null,
             onClick = { expanded = true },
             padding = internalPadding,
-            space = 8.dp,
+            space = if (enabled) 8.dp else 0.dp,
             enabled = enabled,
+            enabledEffect = false,
         )
         DropdownMenu(
             expanded = expanded,

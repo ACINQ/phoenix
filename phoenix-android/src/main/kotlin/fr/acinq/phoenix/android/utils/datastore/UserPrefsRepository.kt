@@ -77,6 +77,7 @@ class UserPrefsRepository(private val data: DataStore<Preferences>) {
         private val TRAMPOLINE_MAX_PROPORTIONAL_FEE = longPreferencesKey("TRAMPOLINE_MAX_PROPORTIONAL_FEE")
         private val SWAP_ADDRESS_FORMAT = intPreferencesKey("SWAP_ADDRESS_FORMAT")
         private val LNURL_AUTH_SCHEME = intPreferencesKey("LNURL_AUTH_SCHEME")
+        private val IS_OVERPAYMENT_ENABLED = booleanPreferencesKey("IS_OVERPAYMENT_ENABLED")
         // liquidity policy & channels management
         private val LIQUIDITY_POLICY = stringPreferencesKey("LIQUIDITY_POLICY")
         private val INCOMING_MAX_SAT_FEE_INTERNAL_TRACKER = longPreferencesKey("INCOMING_MAX_SAT_FEE_INTERNAL_TRACKER")
@@ -236,6 +237,9 @@ class UserPrefsRepository(private val data: DataStore<Preferences>) {
             it[LNURL_AUTH_SCHEME] = scheme.id
         }
     }
+
+    val getIsOverpaymentEnabled: Flow<Boolean> = safeData.map { it[IS_OVERPAYMENT_ENABLED] ?: false }
+    suspend fun saveIsOverpaymentEnabled(enabled: Boolean) = data.edit { it[IS_OVERPAYMENT_ENABLED] = enabled }
 
     val getIsTorEnabled: Flow<Boolean> = safeData.map { it[IS_TOR_ENABLED] ?: false }
     suspend fun saveIsTorEnabled(isEnabled: Boolean) = data.edit { it[IS_TOR_ENABLED] = isEnabled }

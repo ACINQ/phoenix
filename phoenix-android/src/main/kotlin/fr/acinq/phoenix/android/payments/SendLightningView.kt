@@ -36,6 +36,7 @@ import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.safeLet
 import fr.acinq.phoenix.controllers.payments.Scan
@@ -55,13 +56,14 @@ fun SendBolt11PaymentView(
     val requestedAmount = invoice.amount
     var amount by remember { mutableStateOf(requestedAmount) }
     var amountErrorMessage by remember { mutableStateOf("") }
+    val isOverpaymentEnabled by userPrefs.getIsOverpaymentEnabled.collectAsState(initial = false)
 
     SplashLayout(
         header = { BackButtonWithBalance(onBackClick = onBackClick, balance = balance) },
         topContent = {
             AmountHeroInput(
                 initialAmount = amount,
-                enabled = amount == null,
+                enabled = requestedAmount == null || isOverpaymentEnabled,
                 onAmountChange = { newAmount ->
                     amountErrorMessage = ""
                     when {

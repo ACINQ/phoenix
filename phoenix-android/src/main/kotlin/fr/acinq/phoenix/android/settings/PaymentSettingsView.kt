@@ -53,9 +53,7 @@ fun PaymentSettingsView(
 ) {
     val nc = navController
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
     val userPrefs = userPrefs
-    val btcUnit = LocalBitcoinUnit.current
 
     var showDescriptionDialog by rememberSaveable { mutableStateOf(false) }
     var showExpiryDialog by rememberSaveable { mutableStateOf(false) }
@@ -109,7 +107,6 @@ fun PaymentSettingsView(
                         when (swapAddressFormat) {
                             SwapAddressFormat.LEGACY -> Text(text = stringResource(id = R.string.paymentsettings_swap_format_legacy_title))
                             SwapAddressFormat.TAPROOT_ROTATE -> Text(text = stringResource(id = R.string.paymentsettings_swap_format_taproot_title))
-                            else -> Text(text = stringResource(id = R.string.utils_unknown))
                         }
                     },
                     enabled = true,
@@ -121,6 +118,20 @@ fun PaymentSettingsView(
                     initialShowDialog = false
                 )
             }
+        }
+
+        val isOverpaymentEnabled by userPrefs.getIsOverpaymentEnabled.collectAsState(initial = false)
+        CardHeader(text = stringResource(id = R.string.paymentsettings_category_outgoing))
+        Card {
+            SettingSwitch(
+                title = stringResource(id = R.string.paymentsettings_overpayment_title),
+                description = stringResource(id = if (isOverpaymentEnabled) R.string.paymentsettings_overpayment_enabled else R.string.paymentsettings_overpayment_disabled),
+                enabled = true,
+                isChecked = isOverpaymentEnabled,
+                onCheckChangeAttempt = {
+                    scope.launch { userPrefs.saveIsOverpaymentEnabled(it) }
+                }
+            )
         }
 
         val prefLnurlAuthSchemeState = userPrefs.getLnurlAuthScheme.collectAsState(initial = null)
