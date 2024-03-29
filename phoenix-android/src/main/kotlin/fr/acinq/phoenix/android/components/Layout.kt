@@ -36,16 +36,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.FirstBaseline
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.borderColor
 import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import kotlinx.coroutines.flow.firstOrNull
 
@@ -83,8 +82,7 @@ fun BackButtonWithBalance(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        val context = LocalContext.current
-        val balanceDisplayMode by UserPrefs.getHomeAmountDisplayMode(context).collectAsState(initial = HomeAmountDisplayMode.REDACTED)
+        val balanceDisplayMode by userPrefs.getHomeAmountDisplayMode.collectAsState(initial = HomeAmountDisplayMode.REDACTED)
 
         BackButton(onClick = onBackClick)
         Row(modifier = Modifier.padding(horizontal = 16.dp)) {
@@ -96,13 +94,13 @@ fun BackButtonWithBalance(
             Spacer(modifier = Modifier.width(4.dp))
             balance?.let {
                 AmountView(amount = it, modifier = Modifier.alignBy(FirstBaseline), isRedacted = balanceDisplayMode==HomeAmountDisplayMode.REDACTED,
-                    onClick = { context, inFiat ->
-                        val mode = UserPrefs.getHomeAmountDisplayMode(context).firstOrNull()
+                    onClick = { userPrefs, inFiat ->
+                        val mode = userPrefs.getHomeAmountDisplayMode.firstOrNull()
                         when {
-                            inFiat && mode == HomeAmountDisplayMode.BTC -> UserPrefs.saveHomeAmountDisplayMode(context, HomeAmountDisplayMode.REDACTED)
-                            mode == HomeAmountDisplayMode.BTC -> UserPrefs.saveHomeAmountDisplayMode(context, HomeAmountDisplayMode.FIAT)
-                            mode == HomeAmountDisplayMode.FIAT -> UserPrefs.saveHomeAmountDisplayMode(context, HomeAmountDisplayMode.REDACTED)
-                            mode == HomeAmountDisplayMode.REDACTED -> UserPrefs.saveHomeAmountDisplayMode(context, HomeAmountDisplayMode.BTC)
+                            inFiat && mode == HomeAmountDisplayMode.BTC -> userPrefs.saveHomeAmountDisplayMode(HomeAmountDisplayMode.REDACTED)
+                            mode == HomeAmountDisplayMode.BTC -> userPrefs.saveHomeAmountDisplayMode(HomeAmountDisplayMode.FIAT)
+                            mode == HomeAmountDisplayMode.FIAT -> userPrefs.saveHomeAmountDisplayMode(HomeAmountDisplayMode.REDACTED)
+                            mode == HomeAmountDisplayMode.REDACTED -> userPrefs.saveHomeAmountDisplayMode(HomeAmountDisplayMode.BTC)
                             else -> Unit
                         }
                     })

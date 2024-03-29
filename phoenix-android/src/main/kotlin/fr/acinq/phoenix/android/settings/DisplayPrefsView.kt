@@ -16,7 +16,6 @@
 
 package fr.acinq.phoenix.android.settings
 
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -32,8 +31,9 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.navController
+import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.UserTheme
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
+import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
 import fr.acinq.phoenix.android.utils.label
 import fr.acinq.phoenix.android.utils.labels
 import fr.acinq.phoenix.data.BitcoinUnit
@@ -46,23 +46,23 @@ import java.util.Locale
 @Composable
 fun DisplayPrefsView() {
     val nc = navController
-    val context = LocalContext.current
+    val userPrefs = userPrefs
     val scope = rememberCoroutineScope()
     DefaultScreenLayout {
         DefaultScreenHeader(onBackClick = { nc.popBackStack() }, title = stringResource(id = R.string.prefs_display_title))
         Card {
-            BitcoinUnitPreference(context = context, scope = scope)
-            FiatCurrencyPreference(context = context, scope = scope)
-            UserThemePreference(context = context, scope = scope)
+            BitcoinUnitPreference(userPrefs = userPrefs, scope = scope)
+            FiatCurrencyPreference(userPrefs = userPrefs, scope = scope)
+            UserThemePreference(userPrefs = userPrefs, scope = scope)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                AppLocaleSetting(context = context)
+                AppLocaleSetting()
             }
         }
     }
 }
 
 @Composable
-private fun BitcoinUnitPreference(context: Context, scope: CoroutineScope) {
+private fun BitcoinUnitPreference(userPrefs: UserPrefsRepository, scope: CoroutineScope) {
     var prefsEnabled by remember { mutableStateOf(true) }
     val preferences = listOf(
         PreferenceItem(item = BitcoinUnit.Sat, title = BitcoinUnit.Sat.label(), description = stringResource(id = R.string.prefs_display_coin_sat_desc)),
@@ -80,7 +80,7 @@ private fun BitcoinUnitPreference(context: Context, scope: CoroutineScope) {
         onPreferenceSubmit = {
             prefsEnabled = false
             scope.launch {
-                UserPrefs.saveBitcoinUnit(context, it.item)
+                userPrefs.saveBitcoinUnit(it.item)
                 prefsEnabled = true
             }
         }
@@ -88,7 +88,7 @@ private fun BitcoinUnitPreference(context: Context, scope: CoroutineScope) {
 }
 
 @Composable
-private fun FiatCurrencyPreference(context: Context, scope: CoroutineScope) {
+private fun FiatCurrencyPreference(userPrefs: UserPrefsRepository, scope: CoroutineScope) {
     var prefEnabled by remember { mutableStateOf(true) }
 
     val preferences = FiatCurrency.values.map {
@@ -108,7 +108,7 @@ private fun FiatCurrencyPreference(context: Context, scope: CoroutineScope) {
         onPreferenceSubmit = {
             prefEnabled = false
             scope.launch {
-                UserPrefs.saveFiatCurrency(context, it.item)
+                userPrefs.saveFiatCurrency(it.item)
                 appConfigurationManager.updatePreferredFiatCurrencies(AppConfigurationManager.PreferredFiatCurrencies(primary = it.item, others = emptySet()))
                 prefEnabled = true
             }
@@ -117,12 +117,12 @@ private fun FiatCurrencyPreference(context: Context, scope: CoroutineScope) {
 }
 
 @Composable
-private fun UserThemePreference(context: Context, scope: CoroutineScope) {
+private fun UserThemePreference(userPrefs: UserPrefsRepository, scope: CoroutineScope) {
     var prefEnabled by remember { mutableStateOf(true) }
     val preferences = UserTheme.values().map {
         PreferenceItem(it, title = it.label())
     }
-    val currentPref by UserPrefs.getUserTheme(context).collectAsState(initial = UserTheme.SYSTEM)
+    val currentPref by userPrefs.getUserTheme.collectAsState(initial = UserTheme.SYSTEM)
     ListPreferenceButton(
         title = stringResource(id = R.string.prefs_display_theme_label),
         subtitle = { Text(text = currentPref.label()) },
@@ -132,7 +132,7 @@ private fun UserThemePreference(context: Context, scope: CoroutineScope) {
         onPreferenceSubmit = {
             prefEnabled = false
             scope.launch {
-                UserPrefs.saveUserTheme(context, it.item)
+                userPrefs.saveUserTheme(it.item)
                 prefEnabled = true
             }
         }
@@ -141,7 +141,8 @@ private fun UserThemePreference(context: Context, scope: CoroutineScope) {
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
-private fun AppLocaleSetting(context: Context) {
+private fun AppLocaleSetting() {
+    val context = LocalContext.current
     SettingInteractive(
         title = stringResource(id = R.string.prefs_locale_label),
         description = Locale.getDefault().displayLanguage.replaceFirstChar { it.uppercase() }, // context.getSystemService(LocaleManager::class.java).applicationLocales.get(0).language,

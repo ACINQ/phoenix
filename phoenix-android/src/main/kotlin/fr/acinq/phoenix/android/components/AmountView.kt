@@ -16,7 +16,6 @@
 
 package fr.acinq.phoenix.android.components
 
-import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -28,7 +27,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.FirstBaseline
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
@@ -40,7 +38,7 @@ import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
+import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
 import fr.acinq.phoenix.data.CurrencyUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import kotlinx.coroutines.launch
@@ -57,10 +55,10 @@ fun AmountView(
     unitTextStyle: TextStyle = MaterialTheme.typography.body1,
     separatorSpace: Dp = 4.dp,
     mSatDisplayPolicy: MSatDisplayPolicy = MSatDisplayPolicy.HIDE,
-    onClick: (suspend (Context, Boolean) -> Unit)? = { context, inFiat -> UserPrefs.saveIsAmountInFiat(context, !inFiat) }
+    onClick: (suspend (UserPrefsRepository, Boolean) -> Unit)? = { userPrefs, inFiat -> userPrefs.saveIsAmountInFiat(!inFiat) }
 ) {
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val userPrefs = userPrefs
     val unit = forceUnit ?: if (LocalShowInFiat.current) {
         LocalFiatCurrency.current
     } else {
@@ -76,7 +74,7 @@ fun AmountView(
                 interactionSource = interactionSource,
                 indication = null,
                 role = Role.Button,
-                onClick = { scope.launch { onClick(context, inFiat) } }
+                onClick = { scope.launch { onClick(userPrefs, inFiat) } }
             ) else Modifier)
     ) {
         if (!isRedacted && prefix != null && amount > MilliSatoshi(0)) {

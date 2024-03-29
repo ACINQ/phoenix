@@ -49,7 +49,6 @@ import fr.acinq.phoenix.android.services.ChannelsWatcher
 import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.safeLet
 import fr.acinq.phoenix.data.Notification
 import fr.acinq.phoenix.data.WatchTowerOutcome
@@ -119,6 +118,7 @@ private fun PermamentNotice(
 ) {
     val context = LocalContext.current
     val internalData = application.internalDataRepository
+    val userPrefs = application.userPrefs
     val nc = LocalNavController.current
     val scope = rememberCoroutineScope()
 
@@ -173,7 +173,7 @@ private fun PermamentNotice(
                         confirmStateChange = {
                             if (it == DismissValue.DismissedToEnd || it == DismissValue.DismissedToStart) {
                                 scope.launch {
-                                    UserPrefs.saveShowNotificationPermissionReminder(context, false)
+                                    userPrefs.saveShowNotificationPermissionReminder(false)
                                 }
                             }
                             true

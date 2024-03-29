@@ -55,7 +55,6 @@ import fr.acinq.phoenix.android.components.PrimarySeparator
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.findActivity
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.canRequestLiquidity
@@ -83,8 +82,9 @@ fun HomeView(
     val context = LocalContext.current
 
     val internalData = application.internalDataRepository
-    val torEnabledState = UserPrefs.getIsTorEnabled(context).collectAsState(initial = null)
-    val balanceDisplayMode by UserPrefs.getHomeAmountDisplayMode(context).collectAsState(initial = HomeAmountDisplayMode.REDACTED)
+    val userPrefs = application.userPrefs
+    val torEnabledState = userPrefs.getIsTorEnabled.collectAsState(initial = null)
+    val balanceDisplayMode by userPrefs.getHomeAmountDisplayMode.collectAsState(initial = HomeAmountDisplayMode.REDACTED)
 
     val connections by business.connectionsManager.connections.collectAsState()
     val electrumMessages by business.appConfigurationManager.electrumMessages.collectAsState()

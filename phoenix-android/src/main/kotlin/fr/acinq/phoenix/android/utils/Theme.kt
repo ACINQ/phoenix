@@ -27,7 +27,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -41,7 +40,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import fr.acinq.phoenix.android.LocalTheme
 import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.isDarkTheme
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
+import fr.acinq.phoenix.android.userPrefs
 
 // primary for testnet
 val horizon = Color(0xff91b4d1)
@@ -211,8 +210,7 @@ fun PhoenixAndroidTheme(
     navController: NavController,
     content: @Composable () -> Unit
 ) {
-    val context = LocalContext.current
-    val userTheme by UserPrefs.getUserTheme(context).collectAsState(initial = UserTheme.SYSTEM)
+    val userTheme by userPrefs.getUserTheme.collectAsState(initial = UserTheme.SYSTEM)
     val systemUiController = rememberSystemUiController()
 
     CompositionLocalProvider(

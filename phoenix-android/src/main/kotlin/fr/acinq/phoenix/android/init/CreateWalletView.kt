@@ -41,6 +41,7 @@ import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.controllers.init.Initialization
 import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
+import fr.acinq.phoenix.utils.MnemonicLanguage
 
 
 @Composable
@@ -72,7 +73,7 @@ fun CreateWalletView(
                             val entropy = remember { Lightning.randomBytes(16) }
                             LaunchedEffect(key1 = entropy) {
                                 log.debug("generating new wallet...")
-                                postIntent(Initialization.Intent.GenerateWallet(entropy))
+                                postIntent(Initialization.Intent.GenerateWallet(entropy, MnemonicLanguage.English))
                             }
                         }
                         is Initialization.Model.GeneratedWallet -> {

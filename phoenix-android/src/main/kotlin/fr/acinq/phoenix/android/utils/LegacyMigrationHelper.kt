@@ -39,11 +39,9 @@ import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.FinalFailure
-import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.WalletPaymentId
@@ -74,7 +72,10 @@ object LegacyMigrationHelper {
     ) {
         log.info("started migrating legacy user preferences")
 
-        val (business, internalData) = (context as PhoenixApplication).run { business.filterNotNull().first() to internalDataRepository }
+        val application = context as PhoenixApplication
+        val internalData = application.internalDataRepository
+        val userPrefs = application.userPrefs
+        val business = application.business.filterNotNull().first()
         val appConfigurationManager = business.appConfigurationManager
 
         // -- utils
@@ -88,30 +89,30 @@ object LegacyMigrationHelper {
 
         // -- display
 
-        UserPrefs.saveUserTheme(
-            context, when (Prefs.getTheme(context)) {
+        userPrefs.saveUserTheme(
+            when (Prefs.getTheme(context)) {
                 ThemeHelper.darkMode -> UserTheme.DARK
                 ThemeHelper.lightMode -> UserTheme.LIGHT
                 else -> UserTheme.SYSTEM
             }
         )
-        UserPrefs.saveBitcoinUnit(
-            context, when (Prefs.getCoinUnit(context).code()) {
+        userPrefs.saveBitcoinUnit(
+            when (Prefs.getCoinUnit(context).code()) {
                 "sat" -> BitcoinUnit.Sat
                 "bits" -> BitcoinUnit.Bit
                 "mbtc" -> BitcoinUnit.MBtc
                 else -> BitcoinUnit.Btc
             }
         )
-        UserPrefs.saveHomeAmountDisplayMode(context, if (Prefs.showBalanceHome(context)) HomeAmountDisplayMode.BTC else HomeAmountDisplayMode.REDACTED)
-        UserPrefs.saveIsAmountInFiat(context, Prefs.getShowAmountInFiat(context))
-        UserPrefs.saveFiatCurrency(context, FiatCurrency.valueOfOrNull(Prefs.getFiatCurrency(context)) ?: FiatCurrency.USD)
+        userPrefs.saveHomeAmountDisplayMode(if (Prefs.showBalanceHome(context)) HomeAmountDisplayMode.BTC else HomeAmountDisplayMode.REDACTED)
+        userPrefs.saveIsAmountInFiat(Prefs.getShowAmountInFiat(context))
+        userPrefs.saveFiatCurrency(FiatCurrency.valueOfOrNull(Prefs.getFiatCurrency(context)) ?: FiatCurrency.USD)
 
         // -- security & tor
 
-        UserPrefs.saveIsScreenLockActive(context, Prefs.isScreenLocked(context))
+        userPrefs.saveIsScreenLockActive(Prefs.isScreenLocked(context))
         Prefs.isTorEnabled(context).let {
-            UserPrefs.saveIsTorEnabled(context, it)
+            userPrefs.saveIsTorEnabled(it)
             appConfigurationManager.updateTorUsage(it)
         }
 
@@ -122,23 +123,23 @@ object LegacyMigrationHelper {
             // TODO: handle onion addresses and TOR
             ServerAddress(hostPort.host, hostPort.port, TcpSocket.TLS.TRUSTED_CERTIFICATES())
         }?.let {
-            UserPrefs.saveElectrumServer(context, it)
+            userPrefs.saveElectrumServer(it)
             appConfigurationManager.updateElectrumConfig(it)
         }
 
         // -- payment settings
 
-        UserPrefs.saveInvoiceDefaultDesc(context, Prefs.getDefaultPaymentDescription(context))
-        UserPrefs.saveInvoiceDefaultExpiry(context, Prefs.getPaymentsExpirySeconds(context))
+        userPrefs.saveInvoiceDefaultDesc(Prefs.getDefaultPaymentDescription(context))
+        userPrefs.saveInvoiceDefaultExpiry(Prefs.getPaymentsExpirySeconds(context))
 
         Prefs.getMaxTrampolineCustomFee(context)?.let {
             TrampolineFees(feeBase = Satoshi(it.feeBase.toLong()), feeProportional = it.feeProportionalMillionths, cltvExpiryDelta = CltvExpiryDelta(it.cltvExpiry.toInt()))
         }?.let {
-            UserPrefs.saveTrampolineMaxFee(context, it)
+            userPrefs.saveTrampolineMaxFee(it)
         }
 
         // use the default scheme when migrating from legacy, instead of the default one
-        UserPrefs.saveLnurlAuthScheme(context, LnurlAuth.Scheme.ANDROID_LEGACY_SCHEME)
+        userPrefs.saveLnurlAuthScheme(LnurlAuth.Scheme.ANDROID_LEGACY_SCHEME)
 
         business.appConnectionsDaemon?.forceReconnect(AppConnectionsDaemon.ControlTarget.All)
 
