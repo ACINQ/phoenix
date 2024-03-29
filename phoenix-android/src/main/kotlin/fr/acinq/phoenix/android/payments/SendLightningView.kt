@@ -16,9 +16,12 @@
 
 package fr.acinq.phoenix.android.payments
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -55,40 +58,67 @@ fun SendBolt11PaymentView(
 
     val requestedAmount = invoice.amount
     var amount by remember { mutableStateOf(requestedAmount) }
-    var amountErrorMessage by remember { mutableStateOf("") }
+    val amountErrorMessage: String = remember(amount) {
+        val currentAmount = amount
+        when {
+            currentAmount == null -> ""
+            balance != null && currentAmount > balance -> context.getString(R.string.send_error_amount_over_balance)
+            requestedAmount != null && currentAmount < requestedAmount -> context.getString(
+                R.string.send_error_amount_below_requested,
+                (requestedAmount).toPrettyString(prefBitcoinUnit, withUnit = true)
+            )
+            requestedAmount != null && currentAmount > requestedAmount * 2 -> context.getString(
+                R.string.send_error_amount_overpaying,
+                (requestedAmount * 2).toPrettyString(prefBitcoinUnit, withUnit = true)
+            )
+            else -> ""
+        }
+    }
     val isOverpaymentEnabled by userPrefs.getIsOverpaymentEnabled.collectAsState(initial = false)
 
     SplashLayout(
         header = { BackButtonWithBalance(onBackClick = onBackClick, balance = balance) },
         topContent = {
             AmountHeroInput(
-                initialAmount = amount,
+                amount = amount,
                 enabled = requestedAmount == null || isOverpaymentEnabled,
-                onAmountChange = { newAmount ->
-                    amountErrorMessage = ""
-                    when {
-                        newAmount == null -> {}
-                        balance != null && newAmount.amount > balance -> {
-                            amountErrorMessage = context.getString(R.string.send_error_amount_over_balance)
-                        }
-                        requestedAmount != null && newAmount.amount < requestedAmount -> {
-                            amountErrorMessage = context.getString(
-                                R.string.send_error_amount_below_requested,
-                                (requestedAmount).toPrettyString(prefBitcoinUnit, withUnit = true)
-                            )
-                        }
-                        requestedAmount != null && newAmount.amount > requestedAmount * 2 -> {
-                            amountErrorMessage = context.getString(
-                                R.string.send_error_amount_overpaying,
-                                (requestedAmount * 2).toPrettyString(prefBitcoinUnit, withUnit = true)
-                            )
-                        }
-                    }
-                    amount = newAmount?.amount
-                },
+                onAmountChange = { newAmount -> amount = newAmount?.amount },
                 validationErrorMessage = amountErrorMessage,
                 inputTextSize = 42.sp,
             )
+            Spacer(modifier = Modifier.height(16.dp))
+            if (requestedAmount != null) {
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Button(
+                        text = "5%",
+                        icon = R.drawable.ic_minus_circle,
+                        onClick = {
+                            amount = amount?.let {
+                                it - requestedAmount * 0.05
+                            }?.coerceAtLeast(requestedAmount) ?: requestedAmount
+                        },
+                        enabled = amount?.let { it > requestedAmount } ?: false,
+                        padding = PaddingValues(horizontal = 8.dp, vertical = 6.dp),
+                        space = 6.dp,
+                        textStyle = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
+                        shape = CircleShape,
+                    )
+                    Button(
+                        text = "5%",
+                        icon = R.drawable.ic_plus_circle,
+                        onClick = {
+                            amount = amount?.let {
+                                it + requestedAmount * 0.05
+                            }?.coerceAtMost(requestedAmount * 2) ?: requestedAmount
+                        },
+                        enabled = amount?.let { it < requestedAmount * 2 } ?: false,
+                        padding = PaddingValues(horizontal = 8.dp, vertical = 6.dp),
+                        space = 6.dp,
+                        textStyle = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
+                        shape = CircleShape,
+                    )
+                }
+            }
         }
     ) {
         invoice.description?.takeIf { it.isNotBlank() }?.let {

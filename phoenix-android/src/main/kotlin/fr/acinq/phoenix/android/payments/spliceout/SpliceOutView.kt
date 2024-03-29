@@ -74,7 +74,7 @@ fun SendSpliceOutView(
         header = { BackButtonWithBalance(onBackClick = onBackClick, balance = balance) },
         topContent = {
             AmountHeroInput(
-                initialAmount = amount?.toMilliSatoshi(),
+                amount = amount?.toMilliSatoshi(),
                 onAmountChange = {
                     amountErrorMessage = ""
                     val newAmount = it?.amount?.truncateToSatoshi()

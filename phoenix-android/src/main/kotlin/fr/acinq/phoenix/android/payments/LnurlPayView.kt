@@ -69,7 +69,7 @@ fun LnurlPayView(
         header = { BackButtonWithBalance(onBackClick = onBackClick, balance = balance) },
         topContent = {
             AmountHeroInput(
-                initialAmount = amount,
+                amount = amount,
                 onAmountChange = { newAmount ->
                     amountErrorMessage = ""
                     when {

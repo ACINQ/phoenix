@@ -377,10 +377,9 @@ private enum class SlotsEnum { Input, Unit, DashedLine }
  * This input is designed to be in the center stage of a screen. It uses a customised basic input
  * instead of a standard, material-design input.
  */
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun AmountHeroInput(
-    initialAmount: MilliSatoshi?,
+    amount: MilliSatoshi?,
     onAmountChange: (ComplexAmount?) -> Unit,
     validationErrorMessage: String,
     modifier: Modifier = Modifier,
@@ -398,8 +397,8 @@ fun AmountHeroInput(
     val keyboardController = LocalSoftwareKeyboardController.current
 
     var unit: CurrencyUnit by remember { mutableStateOf(prefBitcoinUnit) }
-    var inputValue by remember { mutableStateOf(TextFieldValue(initialAmount?.toUnit(prefBitcoinUnit).toPlainString())) }
-    var convertedValue: String by remember { mutableStateOf(initialAmount?.toPrettyString(prefFiat, rate, withUnit = true) ?: "") }
+    var inputValue by remember(amount) { mutableStateOf(TextFieldValue(amount?.toUnit(prefBitcoinUnit).toPlainString())) }
+    var convertedValue: String by remember(amount) { mutableStateOf(amount?.toPrettyString(prefFiat, rate, withUnit = true) ?: "") }
 
     var internalErrorMessage: String by remember { mutableStateOf(validationErrorMessage) }
     val errorMessage = validationErrorMessage.ifBlank { internalErrorMessage.ifBlank { null } }
@@ -540,7 +539,6 @@ fun AmountHeroInput(
             )
         }
     }
-
 }
 
 @Composable

@@ -58,7 +58,7 @@ fun LnurlWithdrawView(
             Text(text = annotatedStringResource(R.string.lnurl_withdraw_header, model.lnurlWithdraw.initialUrl.host), textAlign = TextAlign.Center)
             Spacer(modifier = Modifier.height(16.dp))
             AmountHeroInput(
-                initialAmount = amount,
+                amount = amount,
                 onAmountChange = { newAmount ->
                     amountErrorMessage = ""
                     when {
