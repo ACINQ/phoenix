@@ -2610,6 +2610,7 @@
       }
     },
     "A fee of %@ (≈ %@) may be needed to receive this payment." : {
+      "extractionState" : "stale",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
@@ -2639,6 +2640,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Des frais de %1$@ (≈ %2$@) seront peut être nécessaires à la réception de ce paiement."
+          }
+        }
+      }
+    },
+    "A fee of %@ is expected to receive this amount, and that fee is above your limit of %@.\n\nIncrease this limit in the channel management settings, or request additional liquidity." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "A fee of %1$@ is expected to receive this amount, and that fee is above your limit of %2$@.\n\nIncrease this limit in the channel management settings, or request additional liquidity."
+          }
+        }
+      }
+    },
+    "A fee of %@ is expected to receive this amount, and that fee is above your limit of %@.\n\nIncrease this limit in the channel management settings." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "A fee of %1$@ is expected to receive this amount, and that fee is above your limit of %2$@.\n\nIncrease this limit in the channel management settings."
+          }
+        }
+      }
+    },
+    "A fee of %@ is expected to receive this amount, and that fee is more than %@ of the amount.\n\nIncrease this limit in the channel management settings, or request additional liquidity." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "A fee of %1$@ is expected to receive this amount, and that fee is more than %2$@ of the amount.\n\nIncrease this limit in the channel management settings, or request additional liquidity."
+          }
+        }
+      }
+    },
+    "A fee of %@ is expected to receive this amount, and that fee is more than %@ of the amount.\n\nIncrease this limit in the channel management settings." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "A fee of %1$@ is expected to receive this amount, and that fee is more than %2$@ of the amount.\n\nIncrease this limit in the channel management settings."
           }
         }
       }
@@ -3737,6 +3778,12 @@
           }
         }
       }
+    },
+    "An on-chain operation will be likely required for you to receive this amount.\n\nThe fee is estimated to be around %@." : {
+
+    },
+    "An on-chain operation will likely be required for you to receive this amount." : {
+
     },
     "An on-chain wallet derived from your seed.\n\nThe final wallet is where funds are sent by default when your lightning channels are closed." : {
       "localizations" : {
@@ -6706,6 +6753,9 @@
         }
       }
     },
+    "Configure fee limit" : {
+
+    },
     "Configure fee settings" : {
       "localizations" : {
         "es" : {
@@ -9659,6 +9709,9 @@
         }
       }
     },
+    "Enable automated channels" : {
+
+    },
     "Enable iCloud backup" : {
       "localizations" : {
         "ar" : {
@@ -10540,6 +10593,7 @@
       }
     },
     "Fee expected" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -12899,6 +12953,7 @@
 
     },
     "Inbound liquidity is insufficient and you have disabled automated channel management." : {
+      "extractionState" : "stale",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
@@ -12926,7 +12981,11 @@
         }
       }
     },
+    "Inbound liquidity is insufficient for this amount, and you have disabled automated channel management." : {
+
+    },
     "Inbound liquidity is insufficient." : {
+      "extractionState" : "stale",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
@@ -16613,6 +16672,9 @@
           }
         }
       }
+    },
+    "On-chain fee expected" : {
+
     },
     "On-chain funds pending (+%@)" : {
       "localizations" : {
@@ -23484,6 +23546,7 @@
       }
     },
     "The fee will probably be above your max limit (%@)." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
