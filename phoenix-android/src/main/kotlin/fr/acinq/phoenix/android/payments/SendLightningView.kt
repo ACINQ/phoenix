@@ -79,8 +79,9 @@ fun SendBolt11PaymentView(
     SplashLayout(
         header = { BackButtonWithBalance(onBackClick = onBackClick, balance = balance) },
         topContent = {
+            var inputForcedAmount by remember { mutableStateOf(requestedAmount) }
             AmountHeroInput(
-                amount = amount,
+                initialAmount = inputForcedAmount,
                 enabled = requestedAmount == null || isOverpaymentEnabled,
                 onAmountChange = { newAmount -> amount = newAmount?.amount },
                 validationErrorMessage = amountErrorMessage,
@@ -93,9 +94,12 @@ fun SendBolt11PaymentView(
                         text = "5%",
                         icon = R.drawable.ic_minus_circle,
                         onClick = {
-                            amount = amount?.let {
+                            val newAmount = amount?.let {
                                 it - requestedAmount * 0.05
                             }?.coerceAtLeast(requestedAmount) ?: requestedAmount
+
+                            inputForcedAmount = newAmount
+                            amount = newAmount
                         },
                         enabled = amount?.let { it > requestedAmount } ?: false,
                         padding = PaddingValues(horizontal = 8.dp, vertical = 6.dp),
@@ -107,9 +111,12 @@ fun SendBolt11PaymentView(
                         text = "5%",
                         icon = R.drawable.ic_plus_circle,
                         onClick = {
-                            amount = amount?.let {
+                            val newAmount = amount?.let {
                                 it + requestedAmount * 0.05
                             }?.coerceAtMost(requestedAmount * 2) ?: requestedAmount
+
+                            inputForcedAmount = newAmount
+                            amount = newAmount
                         },
                         enabled = amount?.let { it < requestedAmount * 2 } ?: false,
                         padding = PaddingValues(horizontal = 8.dp, vertical = 6.dp),
