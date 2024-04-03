@@ -4,7 +4,7 @@ import java.io.ByteArrayOutputStream
 plugins {
     kotlin("multiplatform")
     id("kotlinx-serialization")
-    id("com.squareup.sqldelight")
+    id("app.cash.sqldelight")
     if (System.getProperty("includeAndroid")?.toBoolean() == true) {
         id("com.android.library")
     }
@@ -93,8 +93,8 @@ kotlin {
                 implementation("io.ktor:ktor-serialization-kotlinx-json:${Versions.ktor}")
                 implementation("io.ktor:ktor-client-content-negotiation:${Versions.ktor}")
                 // sqldelight
-                implementation("com.squareup.sqldelight:runtime:${Versions.sqlDelight}")
-                implementation("com.squareup.sqldelight:coroutines-extensions:${Versions.sqlDelight}")
+                implementation("app.cash.sqldelight:runtime:${Versions.sqlDelight}")
+                implementation("app.cash.sqldelight:coroutines-extensions:${Versions.sqlDelight}")
             }
         }
 
@@ -115,7 +115,7 @@ kotlin {
                     implementation("io.ktor:ktor-network:${Versions.ktor}")
                     implementation("io.ktor:ktor-network-tls:${Versions.ktor}")
                     implementation("io.ktor:ktor-client-android:${Versions.ktor}")
-                    implementation("com.squareup.sqldelight:android-driver:${Versions.sqlDelight}")
+                    implementation("app.cash.sqldelight:android-driver:${Versions.sqlDelight}")
                 }
             }
             val androidUnitTest by getting {
@@ -131,7 +131,7 @@ kotlin {
                         else -> error("Unsupported OS $currentOs")
                     }
                     implementation("fr.acinq.secp256k1:secp256k1-kmp-jni-jvm-$target:${Versions.secp256k1}")
-                    implementation("com.squareup.sqldelight:sqlite-driver:${Versions.sqlDelight}")
+                    implementation("app.cash.sqldelight:sqlite-driver:${Versions.sqlDelight}")
                 }
             }
         }
@@ -140,13 +140,13 @@ kotlin {
         val iosMain by creating {
             dependencies {
                 implementation("io.ktor:ktor-client-ios:${Versions.ktor}")
-                implementation("com.squareup.sqldelight:native-driver:${Versions.sqlDelight}")
+                implementation("app.cash.sqldelight:native-driver:${Versions.sqlDelight}")
             }
         }
 
         val iosTest by creating {
             dependencies {
-                implementation("com.squareup.sqldelight:native-driver:${Versions.sqlDelight}")
+                implementation("app.cash.sqldelight:native-driver:${Versions.sqlDelight}")
             }
         }
 
@@ -157,17 +157,19 @@ kotlin {
 }
 
 sqldelight {
-    database("ChannelsDatabase") {
-        packageName = "fr.acinq.phoenix.db"
-        sourceFolders = listOf("channelsdb")
-    }
-    database("PaymentsDatabase") {
-        packageName = "fr.acinq.phoenix.db"
-        sourceFolders = listOf("paymentsdb")
-    }
-    database("AppDatabase") {
-        packageName = "fr.acinq.phoenix.db"
-        sourceFolders = listOf("appdb")
+    databases {
+        create("ChannelsDatabase") {
+            packageName.set("fr.acinq.phoenix.db")
+            srcDirs.from("src/commonMain/channelsdb")
+        }
+        create("PaymentsDatabase") {
+            packageName.set("fr.acinq.phoenix.db")
+            srcDirs.from("src/commonMain/paymentsdb")
+        }
+        create("AppDatabase") {
+            packageName.set("fr.acinq.phoenix.db")
+            srcDirs.from("src/commonMain/appdb")
+        }
     }
 }
 

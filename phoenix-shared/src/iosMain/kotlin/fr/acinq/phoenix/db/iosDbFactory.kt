@@ -17,9 +17,9 @@
 package fr.acinq.phoenix.db
 
 import co.touchlab.sqliter.DatabaseConfiguration
-import com.squareup.sqldelight.db.SqlDriver
-import com.squareup.sqldelight.drivers.native.NativeSqliteDriver
-import com.squareup.sqldelight.drivers.native.wrapConnection
+import app.cash.sqldelight.db.SqlDriver
+import app.cash.sqldelight.driver.native.NativeSqliteDriver
+import app.cash.sqldelight.driver.native.wrapConnection
 import fr.acinq.bitcoin.Chain
 import fr.acinq.phoenix.utils.PlatformContext
 import fr.acinq.phoenix.utils.getDatabaseFilesDirectoryPath
@@ -38,7 +38,7 @@ actual fun createChannelsDbDriver(
     val dbDir = getDatabaseFilesDirectoryPath(ctx)
     val configuration = DatabaseConfiguration(
         name = name,
-        version = schema.version,
+        version = schema.version.toInt(),
         extendedConfig = DatabaseConfiguration.Extended(
             basePath = dbDir,
             foreignKeyConstraints = true
@@ -47,7 +47,7 @@ actual fun createChannelsDbDriver(
             wrapConnection(connection) { schema.create(it) }
         },
         upgrade = { connection, oldVersion, newVersion ->
-            wrapConnection(connection) { schema.migrate(it, oldVersion, newVersion) }
+            wrapConnection(connection) { schema.migrate(it, oldVersion.toLong(), newVersion.toLong()) }
         }
     )
     return NativeSqliteDriver(configuration)
@@ -64,7 +64,7 @@ actual fun createPaymentsDbDriver(
     val dbDir = getDatabaseFilesDirectoryPath(ctx)
     val configuration = DatabaseConfiguration(
         name = name,
-        version = schema.version,
+        version = schema.version.toInt(),
         extendedConfig = DatabaseConfiguration.Extended(
             basePath = dbDir,
             foreignKeyConstraints = true
@@ -73,7 +73,7 @@ actual fun createPaymentsDbDriver(
             wrapConnection(connection) { schema.create(it) }
         },
         upgrade = { connection, oldVersion, newVersion ->
-            wrapConnection(connection) { schema.migrate(it, oldVersion, newVersion) }
+            wrapConnection(connection) { schema.migrate(it, oldVersion.toLong(), newVersion.toLong()) }
         }
     )
     return NativeSqliteDriver(configuration)
@@ -88,7 +88,7 @@ actual fun createAppDbDriver(
     val dbDir = getDatabaseFilesDirectoryPath(ctx)
     val configuration = DatabaseConfiguration(
         name = name,
-        version = schema.version,
+        version = schema.version.toInt(),
         extendedConfig = DatabaseConfiguration.Extended(
             basePath = dbDir,
             foreignKeyConstraints = true
@@ -97,7 +97,7 @@ actual fun createAppDbDriver(
             wrapConnection(connection) { schema.create(it) }
         },
         upgrade = { connection, oldVersion, newVersion ->
-            wrapConnection(connection) { schema.migrate(it, oldVersion, newVersion) }
+            wrapConnection(connection) { schema.migrate(it, oldVersion.toLong(), newVersion.toLong()) }
         }
     )
     return NativeSqliteDriver(configuration)
