@@ -40,6 +40,7 @@ import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
 import fr.acinq.phoenix.managers.NotificationsManager
+import fr.acinq.phoenix.utils.MnemonicLanguage
 import fr.acinq.phoenix.utils.PlatformContext
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -70,7 +71,7 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
             notificationsManager = business.notificationsManager
             when (val encryptedSeed = SeedManager.loadSeedFromDisk(applicationContext)) {
                 is EncryptedSeed.V2.NoAuth -> {
-                    val seed = business.walletManager.mnemonicsToSeed(EncryptedSeed.toMnemonics(encryptedSeed.decrypt()))
+                    val seed = business.walletManager.mnemonicsToSeed(EncryptedSeed.toMnemonics(encryptedSeed.decrypt()), wordList = MnemonicLanguage.English.wordlist())
                     business.walletManager.loadWallet(seed)
 
                     val isTorEnabled = UserPrefs.getIsTorEnabled(applicationContext).first()
