@@ -89,12 +89,17 @@ fun AmountHeroInput(
     var unit: CurrencyUnit by remember { mutableStateOf(prefBitcoinUnit) }
     var inputValue by remember(initialAmount) {
         mutableStateOf(TextFieldValue(
-            if (unit is FiatCurrency && rate != null) {
-                initialAmount?.toFiat(rate.price).toPlainString(limitDecimal = true)
-            } else {
-                initialAmount?.toUnit(prefBitcoinUnit).toPlainString()
+            when (val u = unit) {
+                is FiatCurrency -> {
+                    if (rate != null) {
+                        initialAmount?.toFiat(rate.price).toPlainString(limitDecimal = true)
+                    } else "?!"
+                }
+                is BitcoinUnit -> {
+                    initialAmount?.toUnit(u).toPlainString()
+                }
+                else -> "?!"
             }
-
         ))
     }
     var convertedValue: String by remember(initialAmount) {
@@ -154,17 +159,25 @@ fun AmountHeroInput(
                     onConverted = { },
                     onError = { }
                 )?.amount
+                // update the actual input value to the converted amount
                 when (newUnit) {
                     is FiatCurrency -> {
-                        inputValue = TextFieldValue(if (rate == null) "?!" else currentAmount?.toFiat(rate.price).toPlainString(limitDecimal = true))
-                        convertedValue = currentAmount?.toPrettyString(prefBitcoinUnit, withUnit = true) ?: ""
+                        inputValue = TextFieldValue(if (rate == null) "?!" else currentAmount?.toFiat(rate.price).toPlainString(limitDecimal = false))
                     }
                     is BitcoinUnit -> {
                         inputValue = TextFieldValue(currentAmount?.toUnit(newUnit).toPlainString())
-                        convertedValue = currentAmount?.toPrettyString(prefFiat, rate, withUnit = true) ?: ""
                     }
                 }
                 unit = newUnit
+                AmountInputHelper.convertToComplexAmount(
+                    context = context,
+                    input = inputValue.text,
+                    unit = unit,
+                    prefBitcoinUnit = prefBitcoinUnit,
+                    rate = rate,
+                    onConverted = { convertedValue = it },
+                    onError = { internalErrorMessage = it }
+                ).let { onAmountChange(it) }
             },
             onDismiss = { },
             modifier = dropdownModifier,
