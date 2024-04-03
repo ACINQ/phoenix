@@ -32,7 +32,7 @@ struct InboundFeeSheet: View {
 			Group {
 				switch warning.type {
 				case .willFail:
-					Text("Payment may fail")
+					Text("Payment will fail")
 				case .feeExpected:
 					Text("On-chain fee expected")
 				}
