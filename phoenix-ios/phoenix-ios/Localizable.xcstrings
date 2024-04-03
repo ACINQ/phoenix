@@ -17651,6 +17651,7 @@
       }
     },
     "Payment may fail" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {

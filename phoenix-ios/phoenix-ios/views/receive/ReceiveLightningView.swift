@@ -840,11 +840,11 @@ struct ReceiveLightningView: View {
 	}
 	
 	func calculateInboundFeeWarning() -> InboundFeeWarning? {
-		
-		let availableForReceiveMsat = channels.map { $0.availableForReceive?.msat ?? Int64(0) }.sum()
+
+		let availableForReceiveMsat = channels.availableForReceive()?.msat ?? Int64(0)
 		let hasNoLiquidity = availableForReceiveMsat == 0
 		
-		let canRequestLiquidity = channels.contains { $0.isUsable }
+		let canRequestLiquidity = channels.canRequestLiquidity()
 		
 		let invoiceAmountMsat = invoiceAmount()?.msat
 		
