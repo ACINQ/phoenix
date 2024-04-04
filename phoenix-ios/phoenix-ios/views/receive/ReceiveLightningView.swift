@@ -8,12 +8,6 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-struct InboundFeeWarning {
-	let title: LocalizedStringKey
-	let message: LocalizedStringKey
-	let showButton: Bool
-}
-
 struct ReceiveLightningView: View {
 	
 	@ObservedObject var mvi: MVIState<Receive.Model, Receive.Intent>
@@ -45,6 +39,8 @@ struct ReceiveLightningView: View {
 	@State var currencyConverterOpen = false
 	
 	@State var mempoolRecommendedResponse: MempoolRecommendedResponse? = nil
+	
+	@State var inboundFeeWarning: InboundFeeWarning? = nil
 	
 	@Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
 	@Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
@@ -99,8 +95,8 @@ struct ReceiveLightningView: View {
 		.navigationStackDestination(isPresented: $currencyConverterOpen) { // For iOS 16+
 			currencyConverterView()
 		}
-		.onChange(of: mvi.model) { newModel in
-			onModelChange(model: newModel)
+		.onChange(of: mvi.model) {
+			modelChanged($0)
 		}
 		.task {
 			for await payment in Biz.business.paymentsManager.lastIncomingPaymentSequence() {
@@ -189,6 +185,10 @@ struct ReceiveLightningView: View {
 			
 			qrCodeWrapperView()
 			
+			if let warning = inboundFeeWarning {
+				inboundFeeInfo(warning)
+			}
+			
 			VStack(alignment: .center) {
 			
 				invoiceAmountView()
@@ -218,9 +218,6 @@ struct ReceiveLightningView: View {
 			
 			if notificationPermissions == .disabled {
 				backgroundPaymentsDisabledWarning()
-			}
-			if let warning = inboundFeeWarning() {
-				inboundFeeInfo(warning)
 			}
 			
 			Spacer()
@@ -265,7 +262,7 @@ struct ReceiveLightningView: View {
 					backgroundPaymentsDisabledWarning()
 						.padding(.top, 8)
 				}
-				if let warning = inboundFeeWarning() {
+				if let warning = inboundFeeWarning {
 					inboundFeeInfo(warning)
 						.padding(.top, 8)
 				}
@@ -574,27 +571,27 @@ struct ReceiveLightningView: View {
 	@ViewBuilder
 	func inboundFeeInfo(_ warning: InboundFeeWarning) -> some View {
 		
-		VStack(alignment: HorizontalAlignment.center, spacing: 10) {
+		Button {
+			showInboundFeeWarning(warning)
+		} label: {
 			Label {
-				Text(warning.title)
+				switch warning.type {
+				case .willFail:
+					Text("Payment will fail")
+				case .feeExpected:
+					Text("On-chain fee expected")
+				}
 			} icon: {
-				Image(systemName: "info.circle").foregroundColor(.appAccent)
-			}
-			.font(.headline)
-			
-			Text(warning.message)
-				.multilineTextAlignment(.center)
-				.font(.callout)
-			
-			if warning.showButton {
-				Button {
-					navigateToLiquiditySettings()
-				} label: {
-					Text("Check fee settings")
-						.font(.callout)
+				switch warning.type {
+				case .willFail:
+					Image(systemName: "exclamationmark.triangle").foregroundColor(.appNegative)
+				case .feeExpected:
+					Image(systemName: "info.circle").foregroundColor(.appAccent)
 				}
 			}
+			.font(.headline)
 		}
+		.padding(.top)
 		.padding(.horizontal)
 	}
 	
@@ -612,10 +609,10 @@ struct ReceiveLightningView: View {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
-	func invoiceAmountMsat() -> Int64? {
+	func invoiceAmount() -> Lightning_kmpMilliSatoshi? {
 		
 		if let model = mvi.model as? Receive.Model_Generated {
-			return model.amount?.msat
+			return model.amount
 		} else {
 			return nil
 		}
@@ -635,76 +632,7 @@ struct ReceiveLightningView: View {
 			return "..."
 		}
 	}
-	
-	func inboundFeeWarning() -> InboundFeeWarning? {
-		
-		let hasNoChannels = channels.filter { !$0.isTerminated }.isEmpty
-		if hasNoChannels && !liquidityPolicy.enabled {
-			
-			// strong warning => no channels + fee policy is disabled
-			return InboundFeeWarning(
-				title: "Payment will fail",
-				message: "Inbound liquidity is insufficient and you have disabled automated channel management.",
-				showButton: true
-			)
-		}
-		
-		let availableForReceive = channels.map { $0.availableForReceive?.msat ?? Int64(0) }.sum()
-		var liquidityIsShort = false
-		if let invoiceAmount = invoiceAmountMsat() {
-			liquidityIsShort = invoiceAmount >= availableForReceive
-		}
-		
-		if hasNoChannels || liquidityIsShort {
-			
-			if !liquidityPolicy.enabled {
-				
-				// no fee policy => strong warning
-				return InboundFeeWarning(
-					title: "Payment may fail",
-					message: "Inbound liquidity is insufficient and you have disabled automated channel management.",
-					showButton: true
-				)
-			}
-			
-			guard let swapFee = mempoolRecommendedResponse?.swapEstimationFee(hasNoChannels: hasNoChannels) else {
-				
-				// no fee information available => basic warning
-				return InboundFeeWarning(
-					title: "Fee expected",
-					message: "Inbound liquidity is insufficient.",
-					showButton: true // mostly because the message is hard to understand
-				)
-			}
-			
-			if swapFee.sat > liquidityPolicy.effectiveMaxFeeSats {
-				
-				let limit = Utils.format(currencyPrefs, sat: liquidityPolicy.effectiveMaxFeeSats)
-				
-				// fee policy is short => light warning
-				return InboundFeeWarning(
-					title: "Payment may fail",
-					message: "The fee will probably be above your max limit (\(limit.string)).",
-					showButton: true
-				)
-				
-			} else {
-				
-				let btcAmt = Utils.formatBitcoin(currencyPrefs, sat: swapFee)
-				let fiatAmt = Utils.formatFiat(currencyPrefs, sat: swapFee)
-				
-				// fee policy is within bounds => light warning
-				return InboundFeeWarning(
-					title: "Fee expected",
-					message: "A fee of \(btcAmt.string) (≈ \(fiatAmt.string)) may be needed to receive this payment.",
-					showButton: false
-				)
-			}
-		}
-		
-		return nil
-	}
-	
+
 	// --------------------------------------------------
 	// MARK: View Transitions
 	// --------------------------------------------------
@@ -724,14 +652,16 @@ struct ReceiveLightningView: View {
 			desc: defaultDesc,
 			expirySeconds: Prefs.shared.invoiceExpirationSeconds
 		))
+		
+		refreshInboundFeeWarning()
 	}
 	
 	// --------------------------------------------------
 	// MARK: Notifications
 	// --------------------------------------------------
 	
-	func onModelChange(model: Receive.Model) -> Void {
-		log.trace("onModelChange()")
+	func modelChanged(_ model: Receive.Model) {
+		log.trace("modelChanged()")
 		
 		if let m = model as? Receive.Model_Generated {
 			log.debug("updating qr code...")
@@ -739,6 +669,8 @@ struct ReceiveLightningView: View {
 			// Issue #196: Use uppercase lettering for invoices and address QRs
 			qrCode.generate(value: m.request.uppercased())
 		}
+		
+		refreshInboundFeeWarning()
 	}
 	
 	func lastIncomingPaymentChanged(_ lastIncomingPayment: Lightning_kmpIncomingPayment) {
@@ -760,12 +692,14 @@ struct ReceiveLightningView: View {
 		log.trace("channelsChanged()")
 		
 		self.channels = channels
+		refreshInboundFeeWarning()
 	}
 	
 	func liquidityPolicyChanged(_ newValue: LiquidityPolicy) {
 		log.trace("liquidityPolicyChanged()")
 		
 		self.liquidityPolicy = newValue
+		refreshInboundFeeWarning()
 	}
 	
 	func notificationPermissionsChanged(_ newValue: NotificationPermissions) {
@@ -888,9 +822,92 @@ struct ReceiveLightningView: View {
 		deepLinkManager.broadcast(DeepLink.liquiditySettings)
 	}
 	
+	func showInboundFeeWarning(_ warning: InboundFeeWarning) {
+		
+		smartModalState.display(dismissable: true) {
+			InboundFeeSheet(warning: warning)
+		}
+	}
+	
 	// --------------------------------------------------
 	// MARK: Utilities
 	// --------------------------------------------------
+	
+	func refreshInboundFeeWarning() {
+		log.trace("refreshInboundFeeWarning()")
+		
+		inboundFeeWarning = calculateInboundFeeWarning()
+	}
+	
+	func calculateInboundFeeWarning() -> InboundFeeWarning? {
+
+		let availableForReceiveMsat = channels.availableForReceive()?.msat ?? Int64(0)
+		let hasNoLiquidity = availableForReceiveMsat == 0
+		
+		let canRequestLiquidity = channels.canRequestLiquidity()
+		
+		let invoiceAmountMsat = invoiceAmount()?.msat
+		
+		var liquidityIsShort = false
+		if let invoiceAmountMsat {
+			liquidityIsShort = invoiceAmountMsat >= availableForReceiveMsat
+		}
+		
+		if hasNoLiquidity || liquidityIsShort {
+			
+			if !liquidityPolicy.enabled {
+				
+				return InboundFeeWarning.liquidityPolicyDisabled
+				
+			} else {
+				
+				let hasNoChannels = channels.filter { !$0.isTerminated }.isEmpty
+				let swapFeeSats = mempoolRecommendedResponse?.swapEstimationFee(hasNoChannels: hasNoChannels).sat
+				
+				if let swapFeeSats {
+					
+					// Check absolute fee
+					
+					if swapFeeSats > liquidityPolicy.effectiveMaxFeeSats
+						&& !liquidityPolicy.effectiveSkipAbsoluteFeeCheck
+					{
+						return InboundFeeWarning.overAbsoluteFee(
+							canRequestLiquidity: canRequestLiquidity,
+							maxAbsoluteFeeSats: liquidityPolicy.effectiveMaxFeeSats,
+							swapFeeSats: swapFeeSats
+						)
+					}
+					
+					// Check relative fee
+					
+					if let invoiceAmountMsat, invoiceAmountMsat > availableForReceiveMsat {
+						
+						let swapFeeMsat = Utils.toMsat(sat: swapFeeSats)
+						
+						let maxFeePercent = Double(liquidityPolicy.effectiveMaxFeeBasisPoints) / Double(10_000)
+						let maxFeeMsat = Int64(Double(invoiceAmountMsat) * maxFeePercent)
+						
+						if swapFeeMsat > maxFeeMsat {
+							return InboundFeeWarning.overRelativeFee(
+								canRequestLiquidity: canRequestLiquidity,
+								maxRelativeFeePercent: maxFeePercent,
+								swapFeeSats: swapFeeSats
+							)
+						}
+					}
+				}
+				
+				if let swapFeeSats {
+					return InboundFeeWarning.feeExpected(swapFeeSats: swapFeeSats)
+				} else {
+					return InboundFeeWarning.unknownFeeExpected
+				}
+				
+			} // </else: liquidityPolicy.enabled>
+		} // </if hasNoLiquidity || liquidityIsShort>
+		
+		return nil
+	}
 	
 	func copyTextToPasteboard() -> Void {
 		log.trace("copyTextToPasteboard()")
