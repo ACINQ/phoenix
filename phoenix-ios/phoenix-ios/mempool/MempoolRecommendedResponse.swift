@@ -80,4 +80,9 @@ struct MempoolRecommendedResponse: Equatable, Codable {
 		
 		return self.toKotlin().swapEstimationFee(hasNoChannels: hasNoChannels)
 	}
+	
+	func payToOpenEstimationFee(amount: Lightning_kmpMilliSatoshi, hasNoChannels: Bool) -> Bitcoin_kmpSatoshi {
+		
+		return self.toKotlin().payToOpenEstimationFee(amount: amount, hasNoChannels: hasNoChannels)
+	}
 }
