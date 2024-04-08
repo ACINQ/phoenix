@@ -264,7 +264,7 @@ class SyncSeedManager: SyncManagerProtcol {
 		_ container: CKContainer,
 		_ zoneID: CKRecordZone.ID,
 		_ configuration: CKOperation.Configuration,
-		_ chain: Lightning_kmpNodeParams.Chain
+		_ chain: Bitcoin_kmpChain
 	) async throws -> [String: SeedBackup] {
 		
 		log.trace("upgradeSeeds_fetch()")
@@ -355,7 +355,7 @@ class SyncSeedManager: SyncManagerProtcol {
 		_ container: CKContainer,
 		_ zoneID: CKRecordZone.ID,
 		_ configuration: CKOperation.Configuration,
-		_ chain: Lightning_kmpNodeParams.Chain,
+		_ chain: Bitcoin_kmpChain,
 		_ recordName: String,
 		_ seedBackup: SeedBackup
 	) async throws -> Bool {

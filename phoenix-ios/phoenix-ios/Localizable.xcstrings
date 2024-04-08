@@ -12074,6 +12074,9 @@
         }
       }
     },
+    "I have enabled \"Advanced Data Protection\" for iCloud." : {
+
+    },
     "I have saved my recovery phrase somewhere safe." : {
       "localizations" : {
         "ar" : {
@@ -14052,6 +14055,12 @@
           }
         }
       }
+    },
+    "Legal: Option 1" : {
+
+    },
+    "Legal: Option 2" : {
+
     },
     "Less options" : {
       "localizations" : {
