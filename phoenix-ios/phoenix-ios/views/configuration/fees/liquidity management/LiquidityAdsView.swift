@@ -30,6 +30,7 @@ struct LiquidityAdsView: View {
 	@State var isPurchasing: Bool = false
 	@State var isPurchased: Bool = false
 	@State var channelsNotAvailable: Bool = false
+	@State var iUnderstand: Bool = false
 	
 	@State var showHelpSheet = false
 	
@@ -292,6 +293,11 @@ struct LiquidityAdsView: View {
 				Divider()
 					.frame(maxWidth: 175)
 				
+				subsection_finePrint()
+				
+				Divider()
+					.frame(maxWidth: 175)
+				
 				subsection_purchaseButton()
 					.padding(.bottom, 10)
 			}
@@ -302,11 +308,11 @@ struct LiquidityAdsView: View {
 	@ViewBuilder
 	func subsection_costDetails(_ feeInfo: LiquidityFeeInfo) -> some View {
 		
-	//	if #available(iOS 16.0, *) {
-	//		subsection_costDetails_ios16(feeInfo)
-	//	} else {
+		if #available(iOS 16.0, *) {
+			subsection_costDetails_ios16(feeInfo)
+		} else {
 			subsection_costDetails_ios15(feeInfo)
-	//	}
+		}
 	}
 	
 	@ViewBuilder
@@ -383,7 +389,12 @@ struct LiquidityAdsView: View {
 					}
 					.popover(present: $popoverPresent_duration) {
 						InfoPopoverWindow {
-							Text("The additional capacity will be preserved for that duration.")
+							Text(
+								"""
+								This liquidity can be consumed over 1 year. \
+								What has not been used after 1 year will be recovered by the service.
+								"""
+							)
 						}
 					}
 				} // </HStack>
@@ -405,6 +416,34 @@ struct LiquidityAdsView: View {
 	}
 	
 	@ViewBuilder
+	func subsection_finePrint() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 15) {
+			Text(
+				"""
+				Liquidity is not static. As you receive funds over Lightning, \
+				this new liquidity will be consumed and become your balance. \
+				Your channel's overall capacity will however remain the same.
+				
+				After one year, the liquidity that has not been consumed will \
+				be recovered by the service.
+				"""
+			)
+			.multilineTextAlignment(.center)
+			
+			Toggle(isOn: $iUnderstand) {
+				Text("I understand")
+					.foregroundColor(.appAccent)
+					.bold()
+			}
+			.toggleStyle(CheckboxToggleStyle(
+				onImage: onImage(),
+				offImage: offImage()
+			))
+		}
+	}
+	
+	@ViewBuilder
 	func subsection_purchaseButton() -> some View {
 		
 		let _insufficientFunds = insufficientFunds()
@@ -423,7 +462,7 @@ struct LiquidityAdsView: View {
 				}
 			}
 			.buttonStyle(.borderless) // prevents trigger when row tapped
-			.disabled(isPurchasing || popoverPresent || _insufficientFunds)
+			.disabled(isPurchasing || popoverPresent || _insufficientFunds || !iUnderstand)
 			.font(.headline)
 			
 			if channelsNotAvailable {
@@ -598,6 +637,18 @@ struct LiquidityAdsView: View {
 				Text("Unknown reason")
 			}
 		}
+	}
+	
+	@ViewBuilder
+	func onImage() -> some View {
+		Image(systemName: "checkmark.square.fill")
+			.imageScale(.large)
+	}
+	
+	@ViewBuilder
+	func offImage() -> some View {
+		Image(systemName: "square")
+			.imageScale(.large)
 	}
 	
 	// --------------------------------------------------
