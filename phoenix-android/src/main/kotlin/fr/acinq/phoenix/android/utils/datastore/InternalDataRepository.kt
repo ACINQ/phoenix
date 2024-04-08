@@ -54,6 +54,7 @@ class InternalDataRepository(private val internalData: DataStore<Preferences>) {
         private val CHANNELS_WATCHER_OUTCOME = stringPreferencesKey("CHANNELS_WATCHER_RESULT")
         private val LAST_USED_SWAP_INDEX = intPreferencesKey("LAST_USED_SWAP_INDEX")
         private val INFLIGHT_PAYMENTS_COUNT = intPreferencesKey("INFLIGHT_PAYMENTS_COUNT")
+        private val SHOW_PAYTOOPEN_FEE_CHANGE_NOTICE = booleanPreferencesKey("SHOW_PAYTOOPEN_FEE_CHANGE_NOTICE")
     }
 
     val log = LoggerFactory.getLogger(this::class.java)
@@ -135,5 +136,8 @@ class InternalDataRepository(private val internalData: DataStore<Preferences>) {
 
     val getInFlightPaymentsCount: Flow<Int> = safeData.map { it[INFLIGHT_PAYMENTS_COUNT] ?: 0 }
     suspend fun saveInFlightPaymentsCount(count: Int) = internalData.edit { it[INFLIGHT_PAYMENTS_COUNT] = count }
+
+    val showPayToOpenFeeChangeNotice: Flow<Boolean> = safeData.map { it[SHOW_PAYTOOPEN_FEE_CHANGE_NOTICE] ?: true }
+    suspend fun saveShowPayToOpenChangeNotice(show: Boolean) = internalData.edit { it[SHOW_PAYTOOPEN_FEE_CHANGE_NOTICE] = show }
 
 }

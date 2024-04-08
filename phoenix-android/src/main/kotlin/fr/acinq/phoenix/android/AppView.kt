@@ -542,6 +542,16 @@ private fun MonitorNotices(
     }
 
     LaunchedEffect(Unit) {
+        internalData.showPayToOpenFeeChangeNotice.filterNotNull().collect {
+            if (it) {
+                vm.addNotice(Notice.PayToOpenFeeChange)
+            } else {
+                vm.removeNotice<Notice.PayToOpenFeeChange>()
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
         if (LegacyPrefsDatastore.hasMigratedFromLegacy(context).first()) {
             internalData.getLegacyMigrationMessageShown.collect { shown ->
                 if (!shown) {
