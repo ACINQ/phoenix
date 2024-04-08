@@ -244,7 +244,7 @@ extension Array where Element == LocalChannelInfo {
 		return LocalChannelInfo.companion.canRequestLiquidity(channels: self)
 	}
 	
-	func inFlightPaymentsCount() -> Int {
+	func inFlightPaymentsCount() -> Int32 {
 		return LocalChannelInfo.companion.inFlightPaymentsCount(channels: self)
 	}
 }

@@ -15,11 +15,9 @@ struct CloudBackupView: View {
 	
 	@State var original_appleRisk: Bool = false
 	@State var original_governmentRisk: Bool = false
-	@State var original_advancedDataProtection: Bool = false
 	
-	@State var legal_1_appleRisk: Bool = false
-	@State var legal_1_governmentRisk: Bool = false
-	@State var legal_2_advancedDataProtection: Bool = false
+	@State var legal_appleRisk: Bool = false
+	@State var legal_governmentRisk: Bool = false
 	
 	@State var animatingLegalToggleColor = false
 	
@@ -54,13 +52,10 @@ struct CloudBackupView: View {
 			.onChange(of: toggle_enabled) { _ in
 				checkAnimation()
 			}
-			.onChange(of: legal_1_appleRisk) { _ in
+			.onChange(of: legal_appleRisk) { _ in
 				checkAnimation()
 			}
-			.onChange(of: legal_1_governmentRisk) { _ in
-				checkAnimation()
-			}
-			.onChange(of: legal_2_advancedDataProtection) { _ in
+			.onChange(of: legal_governmentRisk) { _ in
 				checkAnimation()
 			}
 	}
@@ -99,8 +94,7 @@ struct CloudBackupView: View {
 		
 		List {
 			section_toggle()
-			section_legal_1()
-			section_legal_2()
+			section_legal()
 			section_name()
 		}
 		.listStyle(.insetGrouped)
@@ -135,20 +129,17 @@ struct CloudBackupView: View {
 	}
 	
 	@ViewBuilder
-	func section_legal_1() -> some View {
+	func section_legal() -> some View {
 		
-		Section(header: Text("Legal: Option 1")) {
+		Section(header: Text("Legal")) {
 			
-			let strikethroughActive = legal_2_advancedDataProtection
-			
-			Toggle(isOn: $legal_1_appleRisk) {
+			Toggle(isOn: $legal_appleRisk) {
 				Text(
 					"""
 					I understand that certain Apple employees may be able \
 					to access my iCloud data.
 					"""
 				)
-				.strikethrough(strikethroughActive)
 				.lineLimit(nil)
 				.alignmentGuide(VerticalAlignment.center) { d in
 					d[VerticalAlignment.firstTextBaseline]
@@ -160,14 +151,13 @@ struct CloudBackupView: View {
 			))
 			.padding(.vertical, 5)
 			
-			Toggle(isOn: $legal_1_governmentRisk) {
+			Toggle(isOn: $legal_governmentRisk) {
 				Text(
 					"""
 					I understand that Apple may share my iCloud data \
 					with government agencies upon request.
 					"""
 				)
-				.strikethrough(strikethroughActive)
 				.lineLimit(nil)
 				.alignmentGuide(VerticalAlignment.center) { d in
 					d[VerticalAlignment.firstTextBaseline]
@@ -179,43 +169,12 @@ struct CloudBackupView: View {
 			))
 			.padding(.vertical, 5)
 			
-		} // </Section>
-	}
-	
-	@ViewBuilder
-	func section_legal_2() -> some View {
-		
-		Section {
-			
-			Toggle(isOn: $legal_2_advancedDataProtection) {
-				Text(
-					"""
-					I have enabled "Advanced Data Protection" for iCloud.
-					"""
-				)
-				.lineLimit(nil)
-				.alignmentGuide(VerticalAlignment.center) { d in
-					d[VerticalAlignment.firstTextBaseline]
-				}
+			Label {
+				Text("If you enable [Advanced Data Protection](https://support.apple.com/en-us/108756) for iCloud, your recovery phrase will be encrypted end-to-end, and Apple cannot access it.")
+			} icon: {
+				Image(systemName: "lightbulb")
 			}
-			.toggleStyle(CheckboxToggleStyle(
-				onImage: onImage(),
-				offImage: offImage()
-			))
-			.padding(.vertical, 5)
-			
-		} header: {
-			
-			HStack(alignment: VerticalAlignment.center, spacing: 0) {
-				Text("Legal: Option 2")
-				Spacer()
-				Button {
-					openAdvancedDataProtectionLink()
-				} label: {
-					Image(systemName: "info.circle")
-				}
-				.foregroundColor(.secondary)
-			} // </HStack>
+
 			
 		} // </Section>
 	}
@@ -266,7 +225,7 @@ struct CloudBackupView: View {
 	@ViewBuilder
 	func offImage() -> some View {
 		if toggle_enabled {
-			let useRed = animatingLegalToggleColor && (!legal_1 && !legal_2)
+			let useRed = animatingLegalToggleColor && !legal
 			Image(systemName: "square")
 				.renderingMode(.template)
 				.imageScale(.large)
@@ -281,25 +240,18 @@ struct CloudBackupView: View {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
-	var legal_1: Bool {
-		return legal_1_appleRisk && legal_1_governmentRisk
-	}
-	
-	var legal_2: Bool {
-		return legal_2_advancedDataProtection
+	var legal: Bool {
+		return legal_appleRisk && legal_governmentRisk
 	}
 	
 	var hasChanges: Bool {
 		if name != originalName {
 			return true
 		}
-		if legal_1_appleRisk != original_appleRisk {
+		if legal_appleRisk != original_appleRisk {
 			return true
 		}
-		if legal_1_governmentRisk != original_governmentRisk {
-			return true
-		}
-		if legal_2_advancedDataProtection != original_advancedDataProtection {
+		if legal_governmentRisk != original_governmentRisk {
 			return true
 		}
 		
@@ -322,7 +274,7 @@ struct CloudBackupView: View {
 				// Saving to disable: user only needs to disable the toggle
 				return true
 			}
-			if !legal_1 && !legal_2 {
+			if !legal {
 				// Cannot save without accepting legal
 				return false
 			}
@@ -333,7 +285,7 @@ struct CloudBackupView: View {
 		} else {
 			// Original state == disabled
 			// To enable, user must enable the toggle, and accept the legal risks.
-			return toggle_enabled && (legal_1 || legal_2)
+			return toggle_enabled && legal
 		}
 	}
 	
@@ -347,15 +299,11 @@ struct CloudBackupView: View {
 		let enabled = backupSeed_enabled
 		toggle_enabled = enabled
 		
-		let advancedDataProtection = Prefs.shared.advancedDataProtectionEnabled
+		original_appleRisk = enabled
+		original_governmentRisk = enabled
 		
-		original_appleRisk = enabled && !advancedDataProtection
-		original_governmentRisk = enabled && !advancedDataProtection
-		original_advancedDataProtection = enabled && advancedDataProtection
-		
-		legal_1_appleRisk = original_appleRisk
-		legal_1_governmentRisk = original_governmentRisk
-		legal_2_advancedDataProtection = original_advancedDataProtection
+		legal_appleRisk = original_appleRisk
+		legal_governmentRisk = original_governmentRisk
 		
 		originalName = Prefs.shared.backupSeed.name(encryptedNodeId: encryptedNodeId) ?? ""
 		name = originalName
@@ -368,7 +316,7 @@ struct CloudBackupView: View {
 	func checkAnimation() {
 		log.trace("checkAnimation()")
 		
-		if toggle_enabled && (!legal_1 && !legal_2) {
+		if toggle_enabled && !legal {
 			startAnimatingLegalToggleColor()
 		} else {
 			stopAnimatingLegalToggleColor()
@@ -412,12 +360,6 @@ struct CloudBackupView: View {
 		if hasChanges && canSave {
 			
 			backupSeed_enabled = toggle_enabled
-			
-			if toggle_enabled {
-				Prefs.shared.advancedDataProtectionEnabled = legal_2_advancedDataProtection
-			} else {
-				Prefs.shared.advancedDataProtectionEnabled = false
-			}
 			
 			// Subtle optimizations:
 			// - changing backupSeed_isEnabled causes upload/delete
