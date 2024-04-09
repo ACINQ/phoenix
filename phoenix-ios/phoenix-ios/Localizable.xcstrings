@@ -12616,6 +12616,9 @@
         }
       }
     },
+    "If you enable [Advanced Data Protection](https://support.apple.com/en-us/108756) for iCloud, your recovery phrase will be encrypted end-to-end, and Apple cannot access it." : {
+
+    },
     "If you enable background payments, then you can receive payments as long as your device is connected to the internet." : {
       "localizations" : {
         "es" : {
