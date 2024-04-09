@@ -343,13 +343,13 @@
     <string name="liquidityads_estimate_details_service_fees_help">This fee goes to the service providing the liquidity.</string>
     <string name="liquidityads_estimate_details_duration">Duration</string>
     <string name="liquidityads_estimate_details_duration_value">1 year</string>
-    <string name="liquidityads_estimate_details_duration_help">This liquidity can be consumed over 1 year. What has not been used after 1 year will be recovered by the service.</string>
+    <string name="liquidityads_estimate_details_duration_help">As you receive funds, liquidity will be consumed and become your balance. After one year, the remaining unused liquidity will be reclaimed by the service.</string>
     <string name="liquidityads_estimate_above_25">The total fee is more than 25% of the liquidity amount requested.</string>
     <string name="liquidityads_over_balance">The total fees exceed your balance.</string>
 
     <string name="liquidityads_review_button">Review</string>
-    <string name="liquidityads_disclaimer_body1">Liquidity is not static. As you receive funds over Lightning, this new liquidity will be consumed and become your balance. Your channel\'s overall capacity will however remain the same.</string>
-    <string name="liquidityads_disclaimer_body2">After one year, the liquidity that has not been consumed will be recovered by the service.</string>
+    <string name="liquidityads_disclaimer_body1">You are requesting an <b>initial</b> amount of liquidity. Liquidity is not constant over time: as you receive funds over Lightning, the liquidity will be consumed and become your balance.</string>
+    <string name="liquidityads_disclaimer_body2">After one year, the remaining unused liquidity will be reclaimed by the service.</string>
 
     <string name="liquidityads_request_button">Accept</string>
     <string name="liquidityads_requesting_spinner">Processing splice…</string>
@@ -383,9 +383,8 @@
 
     <!-- spliceout: capacity disclaimer -->
 
-    <string name="spliceout_capacity_disclaimer_title">Capacity impacted</string>
-    <string name="spliceout_capacity_disclaimer_body1">By sending funds on-chain (splice-out), you automatically diminish your channel\'s capacity (but your inbound liquidity remains the same).</string>
-    <string name="spliceout_capacity_disclaimer_body2">To send on-chain but keep capacity intact, make a swap through third-party services. Note however that this usually ends up being more expensive.</string>
+    <string name="spliceout_capacity_disclaimer_title">Channel size impacted</string>
+    <string name="spliceout_capacity_disclaimer_body1">Funds sent on-chain are taken from your side of the channel, reducing the channel size by the same amount. Your inbound liquidity remains unchanged.</string>
     <string name="spliceout_capacity_disclaimer_checkbox">Don\'t show that message again.</string>
 
 </resources>

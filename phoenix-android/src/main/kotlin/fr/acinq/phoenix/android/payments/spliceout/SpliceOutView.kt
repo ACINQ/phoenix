@@ -304,8 +304,6 @@ fun ColumnScope.SpliceOutCapacityDisclaimer(onConfirm: () -> Unit, onCancel: () 
     Spacer(modifier = Modifier.height(12.dp))
     Text(text = stringResource(id = R.string.spliceout_capacity_disclaimer_body1))
     Spacer(modifier = Modifier.height(8.dp))
-    Text(text = stringResource(id = R.string.spliceout_capacity_disclaimer_body2))
-    Spacer(modifier = Modifier.height(8.dp))
     Checkbox(
         text = stringResource(id = R.string.spliceout_capacity_disclaimer_checkbox),
         checked = skipDisclaimerChecked,

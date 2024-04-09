@@ -79,6 +79,7 @@ import fr.acinq.phoenix.android.components.feedback.InfoMessage
 import fr.acinq.phoenix.android.components.feedback.SuccessMessage
 import fr.acinq.phoenix.android.payments.spliceout.spliceFailureDetails
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.annotatedStringResource
 
 object LiquidityLimits {
     val liquidityOptions = arrayOf(
@@ -335,7 +336,7 @@ private fun ReviewLiquidityRequest(
                     .verticalScroll(rememberScrollState())
                     .padding(top = 0.dp, start = 24.dp, end = 24.dp, bottom = 50.dp)
             ) {
-                Text(text = stringResource(id = R.string.liquidityads_disclaimer_body1))
+                Text(text = annotatedStringResource(id = R.string.liquidityads_disclaimer_body1))
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(text = stringResource(id = R.string.liquidityads_disclaimer_body2))
                 Spacer(modifier = Modifier.height(8.dp))
