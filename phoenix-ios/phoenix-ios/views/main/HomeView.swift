@@ -27,6 +27,7 @@ struct HomeView : MVIView {
 	var factory: ControllerFactory { return factoryEnv }
 	
 	@StateObject var noticeMonitor = NoticeMonitor()
+	@StateObject var serverMessageMonitor = ServerMessageMonitor()
 	@StateObject var syncState = DownloadMonitor()
 	
 	let recentPaymentsConfigPublisher = Prefs.shared.recentPaymentsConfigPublisher
@@ -365,6 +366,14 @@ struct HomeView : MVIView {
 				.padding([.leading, .trailing, .bottom], 10)
 			}
 			
+			if let serverMessage = serverMessageMonitor.serverMessage {
+				NoticeBox {
+					notice_serverMessage_content(serverMessage)
+				}
+				.frame(maxWidth: deviceInfo.textColumnMaxWidth)
+				.padding([.leading, .trailing, .bottom], 10)
+			}
+			
 			let count_other = notificationCount_other()
 			if count_other > 0 {
 				Group {
@@ -513,6 +522,34 @@ struct HomeView : MVIView {
 		.font(.caption)
 		.accessibilityElement(children: .combine)
 		.accessibilityAddTraits(.isButton)
+		.accessibilitySortPriority(47)
+	}
+	
+	@ViewBuilder
+	func notice_serverMessage_content(_ serverMessage: ServerMessage) -> some View {
+		
+		HStack(alignment: VerticalAlignment.top, spacing: 0) {
+			Image(systemName: "info.circle")
+				.imageScale(.large)
+				.padding(.trailing, 10)
+				.accessibilityHidden(true)
+				.accessibilityLabel("Message")
+			
+			VStack(alignment: HorizontalAlignment.leading, spacing: 5) {
+				
+				Text(serverMessage.message)
+				HStack(alignment: VerticalAlignment.center, spacing: 0) {
+					Spacer()
+					Button {
+						dismissServerMessage(index: serverMessage.index)
+					} label: {
+						Text("OK").bold()
+					}
+				}
+			}
+			
+		} // </HStack>
+		.font(.caption)
 		.accessibilitySortPriority(47)
 	}
 	
@@ -687,11 +724,6 @@ struct HomeView : MVIView {
 		count += bizNotifications_watchtower.count
 		
 		return count
-	}
-	
-	func notificationCount_total() -> Int {
-		
-		return notificationCount_missedLightningPayments() + notificationCount_other()
 	}
 	
 	func showAddLiquidityButton() -> Bool {
@@ -894,6 +926,12 @@ struct HomeView : MVIView {
 		} else if currencyPrefs.currencyType == .fiat {
 			currencyPrefs.toggleHideAmounts()
 		}
+	}
+	
+	func dismissServerMessage(index: Int) {
+		log.trace("dismissServerMessage(index: \(index))")
+		
+		Prefs.shared.serverMessageReadIndex = index
 	}
 	
 	func openNotificationsSheet() {

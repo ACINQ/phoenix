@@ -862,7 +862,10 @@ struct ReceiveLightningView: View {
 			} else {
 				
 				let hasNoChannels = channels.filter { !$0.isTerminated }.isEmpty
-				let swapFeeSats = mempoolRecommendedResponse?.swapEstimationFee(hasNoChannels: hasNoChannels).sat
+				let swapFeeSats = mempoolRecommendedResponse?.payToOpenEstimationFee(
+					amount: Lightning_kmpMilliSatoshi(msat: invoiceAmountMsat ?? 0),
+					hasNoChannels: hasNoChannels
+				).sat
 				
 				if let swapFeeSats {
 					

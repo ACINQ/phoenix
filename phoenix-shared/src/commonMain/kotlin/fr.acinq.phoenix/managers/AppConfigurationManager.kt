@@ -53,6 +53,7 @@ class AppConfigurationManager(
     // Called from AppConnectionsDaemon
     internal fun enableNetworkAccess() {
         startWalletContextJob()
+        startWalletNoticeJob()
         monitorMempoolFeerate()
     }
 
@@ -66,6 +67,7 @@ class AppConfigurationManager(
         launch {
             mempoolFeerateJob?.cancelAndJoin()
             walletContextPollingJob?.cancelAndJoin()
+            walletNoticePollingJob?.cancelAndJoin()
         }
     }
 
@@ -124,6 +126,58 @@ class AppConfigurationManager(
                 )
             } catch (e: Exception) {
                 logger.error { "could not parse wallet-context response: ${e.message}" }
+                null
+            }
+        }
+    }
+
+    private val _walletNotice = MutableStateFlow<WalletNotice?>(null)
+    val walletNotice = _walletNotice.asStateFlow()
+
+    /** Track the job that polls the wallet-context endpoint, so that we can cancel/restart it when needed. */
+    private var walletNoticePollingJob: Job? = null
+
+    /** Starts a coroutine that continuously polls the wallet-notice endpoint. The coroutine is tracked in [walletNoticePollingJob]. */
+    private fun startWalletNoticeJob() {
+        launch {
+            walletNoticePollingJob = launch {
+                var pause = 30.seconds
+                while (isActive) {
+                    pause = (pause * 2).coerceAtMost(10.minutes)
+                    fetchWalletNotice()?.let {
+                        _walletNotice.value = it
+                        pause = 180.minutes
+                    }
+                    delay(pause)
+                }
+            }
+        }
+    }
+
+    /** Fetches and parses the wallet context from the wallet context remote endpoint. Returns null if resource is unavailable or unreadable. */
+    private suspend fun fetchWalletNotice(): WalletNotice? {
+        return try {
+            httpClient.get("https://acinq.co/phoenix/walletnotice.json")
+        } catch (e1: Exception) {
+            try {
+                httpClient.get("https://s3.eu-west-1.amazonaws.com/acinq.co/phoenix/walletnotice.json")
+            } catch (e2: Exception) {
+                null
+            }
+        }?.let { response ->
+            try {
+                if (response.status.isSuccess()) {
+                    val json = Json.decodeFromString<JsonObject>(response.bodyAsText())
+                    logger.debug { "fetched wallet-notice=$json" }
+                    val notice = json["notice"]!!
+                    val message = notice.jsonObject["message"]!!.jsonPrimitive.content
+                    val index = notice.jsonObject["index"]!!.jsonPrimitive.int
+                    WalletNotice(message = message, index = index)
+                } else {
+                    null
+                }
+            } catch (e: Exception) {
+                logger.debug { "failed to read wallet-notice response: ${e.message}" }
                 null
             }
         }
