@@ -55,33 +55,83 @@ fileprivate let msgUnavailable_notifySrvExt: UInt64 = 0b1100
  */
 class CrossProcessCommunication {
 	
-	public static let shared = CrossProcessCommunication()
+	private let actor: XpcActor
+	private let receivedMessage: ((XpcMessage) -> Void)
 	
 	private let queue = DispatchQueue(label: "CrossProcessCommunication")
 	private let channelPrefix = "co.acinq.phoenix"
 	private let groupIdentifier = "group.co.acinq.phoenix"
 	
-	private var actor: XpcActor? = nil
-	private var receivedMessage: ((XpcMessage) -> Void)? = nil
 	private var channel: String? = nil
-	
 	private var notifyToken: Int32 = NOTIFY_TOKEN_INVALID
-	private var suspendCount: UInt32 = 0
+	private var pendingSuspendCount: UInt32 = 0
 	
-	/// Must use static `shared` instance
-	private init() {}
-	
-	public func start(actor: XpcActor, receivedMessage: @escaping (XpcMessage) -> Void) {
-		log.trace("start()")
+	init(
+		actor: XpcActor,
+		receivedMessage: @escaping (XpcMessage) -> Void
+	) {
+		log.trace("init()")
 		
-		queue.async {
-			self.actor = actor
-			self.receivedMessage = receivedMessage
-		}
+		self.actor = actor
+		self.receivedMessage = receivedMessage
+		
 		DispatchQueue.global(qos: .utility).async {
 			self.readChannelID()
 		}
 	}
+	
+	deinit {
+		log.trace("deinit()")
+		
+		if notify_is_valid_token(notifyToken) {
+			notify_cancel(notifyToken)
+			notifyToken = NOTIFY_TOKEN_INVALID
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Public Functions
+	// --------------------------------------------------
+	
+	public func suspend() {
+		
+		queue.async {
+			
+			if notify_is_valid_token(self.notifyToken) {
+				switch self.actor {
+					case .mainApp      : self.sendMessage(msgUnavailable_mainApp)
+					case .notifySrvExt : self.sendMessage(msgUnavailable_notifySrvExt)
+				}
+				log.debug("notify_suspend()")
+				notify_suspend(self.notifyToken)
+			} else {
+				if (self.pendingSuspendCount < UInt32.max) {
+					log.debug("pendingSuspendCount += 1")
+					self.pendingSuspendCount += 1
+				}
+			}
+		}
+	}
+	
+	public func resume() {
+		
+		queue.async {
+			
+			if notify_is_valid_token(self.notifyToken) {
+				log.debug("notify_resume()")
+				notify_resume(self.notifyToken)
+			} else {
+				if (self.pendingSuspendCount > 0) {
+					log.debug("pendingSuspendCount -= 1")
+					self.pendingSuspendCount -= 1
+				}
+			}
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Logic
+	// --------------------------------------------------
 	
 	private func readChannelID() {
 		log.trace("readChannelID()")
@@ -142,11 +192,11 @@ class CrossProcessCommunication {
 		
 		let channelID = uuid.uuidString
 		queue.async {
-			self.register(channelID)
+			self.registerChannel(channelID)
 		}
 	}
 	
-	private func register(_ channelID: String) {
+	private func registerChannel(_ channelID: String) {
 		log.trace("register()")
 		
 		guard !notify_is_valid_token(notifyToken) else {
@@ -175,13 +225,13 @@ class CrossProcessCommunication {
 		
 		if notify_is_valid_token(notifyToken) {
 			
-			if suspendCount > 0 {
+			if pendingSuspendCount > 0 {
 				
-				for _ in 0 ..< suspendCount {
+				for _ in 0 ..< pendingSuspendCount {
 					log.debug("notify_suspend()")
 					notify_suspend(notifyToken)
 				}
-				suspendCount = 0
+				pendingSuspendCount = 0
 				
 			} else {
 				
@@ -197,11 +247,6 @@ class CrossProcessCommunication {
 	private func receiveMessage(_ msg: UInt64) {
 		
 		let msgStr = messageToString(msg)
-		guard let actor else {
-			log.warning("receiveMessage(\(msgStr)): ignored: actor == nil")
-			return
-		}
-		
 		switch actor {
 		case .mainApp:
 			
@@ -268,6 +313,10 @@ class CrossProcessCommunication {
 		notify_post((channel as NSString).utf8String)
 	}
 	
+	// --------------------------------------------------
+	// MARK: Utilities
+	// --------------------------------------------------
+	
 	private func messageToString(_ msg: UInt64) -> String {
 		
 		switch msg {
@@ -284,47 +333,8 @@ class CrossProcessCommunication {
 	private func notifyReceivedMessage(_ msg: XpcMessage) {
 		log.trace("notifyReceivedMessage()")
 		
-		if let receivedMessage {
-			DispatchQueue.main.async {
-				receivedMessage(msg)
-			}
-		}
-	}
-	
-	public func suspend() {
-		
-		queue.async {
-			
-			if notify_is_valid_token(self.notifyToken) {
-				switch self.actor {
-					case .mainApp      : self.sendMessage(msgUnavailable_mainApp)
-					case .notifySrvExt : self.sendMessage(msgUnavailable_notifySrvExt)
-					default            : break
-				}
-				log.debug("notify_suspend()")
-				notify_suspend(self.notifyToken)
-			} else {
-				if (self.suspendCount < UInt32.max) {
-					log.debug("suspendCount += 1")
-					self.suspendCount += 1
-				}
-			}
-		}
-	}
-	
-	public func resume() {
-		
-		queue.async {
-			
-			if notify_is_valid_token(self.notifyToken) {
-				log.debug("notify_resume()")
-				notify_resume(self.notifyToken)
-			} else {
-				if (self.suspendCount > 0) {
-					log.debug("suspendCount -= 1")
-					self.suspendCount -= 1
-				}
-			}
+		DispatchQueue.main.async {
+			self.receivedMessage(msg)
 		}
 	}
 }

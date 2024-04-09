@@ -56,6 +56,7 @@ import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.controllers.init.RestoreWallet
+import fr.acinq.phoenix.utils.MnemonicLanguage
 
 sealed class RestoreWalletViewState {
     object Disclaimer : RestoreWalletViewState()
@@ -195,7 +196,7 @@ private fun SeedInputView(
                             WordInputView(
                                 wordIndex = enteredWords.size + 1,
                                 filteredWords = filteredWords,
-                                onInputChange = { postIntent(RestoreWallet.Intent.FilterWordList(it)) },
+                                onInputChange = { postIntent(RestoreWallet.Intent.FilterWordList(it, MnemonicLanguage.English)) },
                                 onWordSelected = { vm.appendWordToMnemonic(it) },
                             )
                         }
@@ -246,7 +247,7 @@ private fun SeedInputView(
                         icon = R.drawable.ic_check_circle,
                         onClick = {
                             focusManager.clearFocus()
-                            postIntent(RestoreWallet.Intent.Validate(vm.mnemonics.filterNotNull()))
+                            postIntent(RestoreWallet.Intent.Validate(vm.mnemonics.filterNotNull(), MnemonicLanguage.English))
                         },
                         enabled = isSeedValid == true,
                     )

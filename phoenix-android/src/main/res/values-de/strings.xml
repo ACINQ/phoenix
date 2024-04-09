@@ -83,7 +83,7 @@
     <string name="receive_bitcoin_share_subject">Teile diese Bitcoin-Adresse mit…</string>
 
     <string name="receive_lightning_title">Lightning</string>
-    <string name="receive_lightning_help">Dieser QR-Code ist eine Lightning-Rechnung.\n\nLightning-Zahlungen sind sehr schnell und normalerweise günstiger, werden aber von manchen Wallets nicht unterstützt.\n\nIn diesem Fall bitte nach rechts wischen, um eine klassische Bitcoin-Adresse zu verwenden.</string>
+    <string name="receive_lightning_help">Dieser QR-Code ist eine Lightning-Rechnung.\n\nLightning-Zahlungen sind sehr schnell und normalerweise günstiger, werden aber von manchen Wallets nicht unterstützt.\n\nIn diesem Fall bitte nach links wischen, um eine klassische Bitcoin-Adresse zu verwenden.</string>
     <string name="receive_lightning_generating">Wird erstellt…</string>
     <string name="receive_lightning_amount_label">Betrag</string>
     <string name="receive_lightning_error">Rechnung konnte nicht erstellt werden</string>

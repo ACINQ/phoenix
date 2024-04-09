@@ -138,33 +138,37 @@ class SyncTxManager {
 	private func startQueueCountMonitor() {
 		log.trace("startQueueCountMonitor()")
 		
-		// Kotlin suspend functions are currently only supported on the main thread
-		assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
-		
-		self.cloudKitDb.fetchQueueCountPublisher().sink {[weak self] (queueCount: Int64) in
-			log.debug("fetchQueueCountPublisher().sink(): count = \(queueCount)")
-			
-			guard let self = self else {
-				return
-			}
-			
-			let count = Int(clamping: queueCount)
-			
-			let wait: SyncTxManager_State_Waiting?
-			if Prefs.shared.backupTransactions.useUploadDelay {
-				let delay = TimeInterval.random(in: 10 ..< 900)
-				wait = SyncTxManager_State_Waiting(kind: .randomizedUploadDelay, parent: self, delay: delay)
-			} else {
-				wait = nil
-			}
-			
-			Task {
-				if let newState = await self.actor.queueCountChanged(count, wait: wait) {
-					self.handleNewState(newState)
+		cancellables.insert(
+			Task { @MainActor [cloudKitDb, weak self] in
+				for await queueCount in cloudKitDb.fetchQueueCountSequence() {
+					
+					guard let self = self else {
+						return
+					}
+					
+					let count = Int(clamping: queueCount)
+					
+					let wait: SyncTxManager_State_Waiting?
+					if Prefs.shared.backupTransactions.useUploadDelay {
+						let delay = TimeInterval.random(in: 10 ..< 900)
+						wait = SyncTxManager_State_Waiting(
+							kind: .randomizedUploadDelay,
+							parent: self,
+							delay: delay
+						)
+					} else {
+						wait = nil
+					}
+					
+					Task {
+						if let newState = await self.actor.queueCountChanged(count, wait: wait) {
+							self.handleNewState(newState)
+						}
+					}
 				}
-			}
-
-		}.store(in: &cancellables)
+				
+			}.autoCancellable()
+		)
 	}
 	
 	private func startPreferencesMonitor() {

@@ -20,8 +20,11 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
+import fr.acinq.phoenix.data.WalletNotice
 import fr.acinq.phoenix.managers.AppConfigurationManager
 import fr.acinq.phoenix.managers.PeerManager
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
@@ -31,6 +34,7 @@ sealed class Notice() {
     sealed class ShowInHome(override val priority: Int) : Notice()
 
     object MigrationFromLegacy : ShowInHome(1)
+    data class RemoteMessage(val notice: WalletNotice) : ShowInHome(1)
     object CriticalUpdateAvailable : ShowInHome(2)
     object SwapInCloseToTimeout : ShowInHome(3)
     object BackupSeedReminder : ShowInHome(5)
@@ -43,14 +47,15 @@ sealed class Notice() {
     object WatchTowerLate : DoNotShowInHome()
 }
 
-class NoticesViewModel(val appConfigurationManager: AppConfigurationManager, val peerManager: PeerManager) : ViewModel() {
-    val log = LoggerFactory.getLogger(this::class.java)
+class NoticesViewModel(val appConfigurationManager: AppConfigurationManager, val peerManager: PeerManager, val internalDataRepository: InternalDataRepository) : ViewModel() {
+    private val log = LoggerFactory.getLogger(this::class.java)
 
     val notices = mutableStateListOf<Notice>()
 
     init {
         viewModelScope.launch { monitorWalletContext() }
         viewModelScope.launch { monitorSwapInCloseToTimeout() }
+        viewModelScope.launch { monitorWalletNotice() }
     }
 
     fun addNotice(notice: Notice) {
@@ -89,6 +94,19 @@ class NoticesViewModel(val appConfigurationManager: AppConfigurationManager, val
         }
     }
 
+    private suspend fun monitorWalletNotice() {
+        combine(appConfigurationManager.walletNotice, internalDataRepository.getLastReadWalletNoticeIndex) { notice, lastReadIndex ->
+            notice to lastReadIndex
+        }.collect { (notice, lastReadIndex) ->
+            log.debug("collecting wallet-notice=$notice")
+            if (notice != null && notice.index > lastReadIndex) {
+                addNotice(Notice.RemoteMessage(notice))
+            } else {
+                removeNotice<Notice.RemoteMessage>()
+            }
+        }
+    }
+
     private suspend fun monitorSwapInCloseToTimeout() {
         peerManager.swapInNextTimeout.filterNotNull().collect { (_, nextTimeoutRemainingBlocks) ->
             when {
@@ -100,11 +118,12 @@ class NoticesViewModel(val appConfigurationManager: AppConfigurationManager, val
 
     class Factory(
         private val appConfigurationManager: AppConfigurationManager,
-        private val peerManager: PeerManager
+        private val peerManager: PeerManager,
+        private val internalDataRepository: InternalDataRepository,
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return NoticesViewModel(appConfigurationManager, peerManager) as T
+            return NoticesViewModel(appConfigurationManager, peerManager, internalDataRepository) as T
         }
     }
 }

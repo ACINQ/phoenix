@@ -145,12 +145,11 @@ struct PaymentCell : View {
 		Group {
 			if let payment = fetched?.payment {
 				switch payment.state() {
-					case WalletPaymentState.successonchain  : Image(systemName: "link.circle.fill")
-					case WalletPaymentState.successoffchain : Image(systemName: "checkmark.circle.fill")
-					case WalletPaymentState.pendingonchain  : Image(systemName: "clock.fill")
-					case WalletPaymentState.pendingoffchain : Image(systemName: "clock.fill")
+					case WalletPaymentState.successOnChain  : Image(systemName: "link.circle.fill")
+					case WalletPaymentState.successOffChain : Image(systemName: "checkmark.circle.fill")
+					case WalletPaymentState.pendingOnChain  : Image(systemName: "clock.fill")
+					case WalletPaymentState.pendingOffChain : Image(systemName: "clock.fill")
 					case WalletPaymentState.failure         : Image(systemName: "x.circle.fill")
-					default                                 : Image(systemName: "magnifyingglass.circle.fill")
 				}
 			} else {
 				Image(systemName: "magnifyingglass.circle.fill")
@@ -286,12 +285,11 @@ struct PaymentCell : View {
 		
 		if fetched == nil || fetchedIsStale {
 			
-			paymentsManager.fetcher.getPayment(
-				row: row,
-				options: PaymentCell.fetchOptions
-			) { (result: WalletPaymentInfo?, _) in
-				
-				self.fetched = result
+			Task { @MainActor in
+				self.fetched = try await paymentsManager.fetcher.getPayment(
+					row: row,
+					options: PaymentCell.fetchOptions
+				)
 			}
 		}
 		

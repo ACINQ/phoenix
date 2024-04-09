@@ -117,7 +117,7 @@
     <string name="receive_bitcoin_share_subject">Share this Bitcoin address with…</string>
 
     <string name="receive_lightning_title">Lightning</string>
-    <string name="receive_lightning_help">This QR code is a Lightning invoice.\n\nLightning payments are very fast and usually cheaper, but some wallets and services may not support them yet.\n\nIn that case, swipe to the right to get a regular Bitcoin address.</string>
+    <string name="receive_lightning_help">This QR code is a Lightning invoice.\n\nLightning payments are very fast and usually cheaper, but some wallets and services may not support them yet.\n\nIn that case, swipe to the left to get a regular Bitcoin address.</string>
     <string name="receive_lightning_generating">Generating…</string>
     <string name="receive_lightning_amount_label">Amount</string>
     <string name="receive_lightning_desc_label">Desc</string>

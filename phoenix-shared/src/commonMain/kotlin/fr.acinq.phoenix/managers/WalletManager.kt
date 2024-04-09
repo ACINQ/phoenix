@@ -36,9 +36,10 @@ class WalletManager(
     /** Validates and converts a mnemonics list (stored app side) into a seed (usable by lightning-kmp). */
     fun mnemonicsToSeed(
         mnemonics: List<String>,
+        wordList: List<String>,
         passphrase: String = ""
     ): ByteArray {
-        MnemonicCode.validate(mnemonics = mnemonics, wordlist = MnemonicCode.englishWordlist)
+        MnemonicCode.validate(mnemonics = mnemonics, wordlist = wordList)
         return MnemonicCode.toSeed(mnemonics, passphrase)
     }
 

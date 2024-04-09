@@ -47,6 +47,7 @@ import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import fr.acinq.phoenix.managers.AppConfigurationManager
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
+import fr.acinq.phoenix.utils.MnemonicLanguage
 import fr.acinq.phoenix.utils.PlatformContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -226,7 +227,7 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
         val preferredFiatCurrency = UserPrefs.getFiatCurrency(applicationContext).first()
 
         // preparing business
-        val seed = business.walletManager.mnemonicsToSeed(EncryptedSeed.toMnemonics(mnemonics))
+        val seed = business.walletManager.mnemonicsToSeed(EncryptedSeed.toMnemonics(mnemonics), wordList = MnemonicLanguage.English.wordlist())
         business.walletManager.loadWallet(seed)
         business.appConfigurationManager.updateElectrumConfig(electrumServer)
         business.appConfigurationManager.updatePreferredFiatCurrencies(

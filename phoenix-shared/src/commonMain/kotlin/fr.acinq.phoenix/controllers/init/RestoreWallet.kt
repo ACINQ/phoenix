@@ -1,6 +1,7 @@
 package fr.acinq.phoenix.controllers.init
 
 import fr.acinq.phoenix.controllers.MVI
+import fr.acinq.phoenix.utils.MnemonicLanguage
 
 object RestoreWallet {
 
@@ -16,7 +17,11 @@ object RestoreWallet {
         }
 
         object InvalidMnemonics : Model()
-        data class ValidMnemonics(val mnemonics: List<String>, val seed: ByteArray) : Model() {
+        data class ValidMnemonics(
+            val mnemonics: List<String>,
+            val language: MnemonicLanguage,
+            val seed: ByteArray
+        ) : Model() {
 
             // Kotlin recommends equals & hashCode for data classes with array props
             override fun equals(other: Any?): Boolean {
@@ -38,11 +43,12 @@ object RestoreWallet {
     sealed class Intent : MVI.Intent() {
         data class FilterWordList(
             val predicate: String,
+            val language: MnemonicLanguage,
             val uuid: String = "" // See note below
         ) : Intent() {
             // We are using StateFlow to handle model changes.
             // The problem is that StateFlow is conflated,
-            // so it will silently drop notifications if the model changes.
+            // so it will silently drop notifications if the model doesn't change.
             // As per issue #109, we encountered problems with this.
             // For example, if the user pastes in a seed such as "hammer hammer ...",
             // then what happens is:
@@ -62,7 +68,10 @@ object RestoreWallet {
 
             override fun toString() = ".".repeat(predicate.length)
         }
-        data class Validate(val mnemonics: List<String>) : Intent() {
+        data class Validate(
+            val mnemonics: List<String>,
+            val language: MnemonicLanguage
+        ) : Intent() {
             override fun toString() = "Validate"
         }
     }

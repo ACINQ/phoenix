@@ -12,6 +12,7 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 fileprivate enum NavLinkTag: String {
 	// General
 	case About
+	case WalletCreationOptions
 	case DisplayConfiguration
 	case PaymentOptions
 	case Notifications
@@ -64,6 +65,7 @@ fileprivate struct ConfigurationList: View {
 	@State var biometricSupport = AppSecurity.shared.deviceBiometricSupport()
 	
 	@Namespace var linkID_About
+	@Namespace var linkID_WalletCreationOptions
 	@Namespace var linkID_DisplayConfiguration
 	@Namespace var linkID_PaymentOptions
 	@Namespace var linkID_ChannelManagement
@@ -146,6 +148,17 @@ fileprivate struct ConfigurationList: View {
 	func section_general(_ hasWallet: Bool) -> some View {
 		
 		Section(header: Text("General")) {
+			
+		#if DEBUG
+			if !hasWallet {
+				navLink(.WalletCreationOptions) {
+					Label { Text("Wallet creation options") } icon: {
+						Image(systemName: "quote.bubble")
+					}
+				}
+				.id(linkID_WalletCreationOptions)
+			}
+		#endif
 			
 			navLink(.About) {
 				Label { Text("About") } icon: {
@@ -394,6 +407,7 @@ fileprivate struct ConfigurationList: View {
 		switch tag {
 		// General
 			case .About                 : AboutView()
+			case .WalletCreationOptions : WalletCreationOptions()
 			case .DisplayConfiguration  : DisplayConfigurationView()
 			case .PaymentOptions        : PaymentOptionsView()
 			case .Notifications         : NotificationsView(location: .embedded)
@@ -580,6 +594,7 @@ fileprivate struct ConfigurationList: View {
 		
 		switch navLinkTag {
 			case .About                 : return linkID_About
+			case .WalletCreationOptions : return linkID_WalletCreationOptions
 			case .DisplayConfiguration  : return linkID_DisplayConfiguration
 			case .PaymentOptions        : return linkID_PaymentOptions
 			case .ChannelManagement     : return linkID_ChannelManagement

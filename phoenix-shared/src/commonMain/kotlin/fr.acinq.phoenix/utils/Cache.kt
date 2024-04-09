@@ -54,10 +54,10 @@ class Cache<Key, Value>(sizeLimit: Int) {
                 while (_map.size > _sizeLimit) {
 
                     // To get to this code branch:
-                    // - _countLimit > 0
-                    // - _dict.size > _countLimit
+                    // - _sizeLimit > 0
+                    // - _map.size > _sizeLimit
                     //
-                    // Thus: _dict.size >= 2, meaning:
+                    // Thus: _map.size > 1, meaning:
                     // - leastRecentCacheItem is non-null
                     // - leastRecentCacheItem.prev is non-null
 

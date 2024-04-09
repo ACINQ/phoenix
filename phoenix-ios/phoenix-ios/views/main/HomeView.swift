@@ -27,27 +27,22 @@ struct HomeView : MVIView {
 	var factory: ControllerFactory { return factoryEnv }
 	
 	@StateObject var noticeMonitor = NoticeMonitor()
+	@StateObject var serverMessageMonitor = ServerMessageMonitor()
 	@StateObject var syncState = DownloadMonitor()
 	
 	let recentPaymentsConfigPublisher = Prefs.shared.recentPaymentsConfigPublisher
 	@State var recentPaymentsConfig = Prefs.shared.recentPaymentsConfig
 	
-	let paymentsPagePublisher: AnyPublisher<PaymentsPage, Never>
 	@State var paymentsPage = PaymentsPage(offset: 0, count: 0, rows: [])
 	
-	let lastCompletedPaymentPublisher = Biz.business.paymentsManager.lastCompletedPaymentPublisher()
-	
-	let swapInWalletPublisher = Biz.business.balanceManager.swapInWalletPublisher()
 	@State var swapInWallet = Biz.business.balanceManager.swapInWalletValue()
 	
 	@State var channels: [LocalChannelInfo] = []
-	let channelsPublisher = Biz.business.peerManager.channelsPublisher()
 	
 	let incomingSwapScaleFactor_BIG: CGFloat = 1.2
 	@State var incomingSwapScaleFactor: CGFloat = 1.0
 	@State var incomingSwapAnimationsRemaining = 0
 	
-	let bizNotificationsPublisher = Biz.business.notificationsManager.notificationsPublisher()
 	@State var bizNotifications_payment: [PhoenixShared.NotificationsManager.NotificationItem] = []
 	@State var bizNotifications_watchtower: [PhoenixShared.NotificationsManager.NotificationItem] = []
 	
@@ -85,7 +80,6 @@ struct HomeView : MVIView {
 	) {
 		self.showSwapInWallet = showSwapInWallet
 		self.showLiquidityAds = showLiquidityAds
-		self.paymentsPagePublisher = paymentsPageFetcher.paymentsPagePublisher()
 	}
 	
 	// --------------------------------------------------
@@ -116,20 +110,30 @@ struct HomeView : MVIView {
 		.onReceive(recentPaymentsConfigPublisher) {
 			recentPaymentsConfigChanged($0)
 		}
-		.onReceive(paymentsPagePublisher) {
-			paymentsPageChanged($0)
+		.task {
+			for await page in paymentsPageFetcher.paymentsPageSequence() {
+				paymentsPageChanged(page)
+			}
 		}
-		.onReceive(lastCompletedPaymentPublisher) {
-			lastCompletedPaymentChanged($0)
+		.task {
+			for await payment in Biz.business.paymentsManager.lastCompletedPaymentSequence() {
+				lastCompletedPaymentChanged(payment)
+			}
 		}
-		.onReceive(swapInWalletPublisher) {
-			swapInWalletChanged($0)
+		.task {
+			for await wallet in Biz.business.balanceManager.swapInWalletSequence() {
+				swapInWalletChanged(wallet)
+			}
 		}
-		.onReceive(channelsPublisher) {
-			channelsChanged($0)
+		.task {
+			for await newChannels in Biz.business.peerManager.channelsArraySequence() {
+				channelsChanged(newChannels)
+			}
 		}
-		.onReceive(bizNotificationsPublisher) {
-			bizNotificationsChanged($0)
+		.task {
+			for await notifications in Biz.business.notificationsManager.notificationsSequence() {
+				bizNotificationsChanged(notifications)
+			}
 		}
 	}
 
@@ -362,6 +366,14 @@ struct HomeView : MVIView {
 				.padding([.leading, .trailing, .bottom], 10)
 			}
 			
+			if let serverMessage = serverMessageMonitor.serverMessage {
+				NoticeBox {
+					notice_serverMessage_content(serverMessage)
+				}
+				.frame(maxWidth: deviceInfo.textColumnMaxWidth)
+				.padding([.leading, .trailing, .bottom], 10)
+			}
+			
 			let count_other = notificationCount_other()
 			if count_other > 0 {
 				Group {
@@ -510,6 +522,34 @@ struct HomeView : MVIView {
 		.font(.caption)
 		.accessibilityElement(children: .combine)
 		.accessibilityAddTraits(.isButton)
+		.accessibilitySortPriority(47)
+	}
+	
+	@ViewBuilder
+	func notice_serverMessage_content(_ serverMessage: ServerMessage) -> some View {
+		
+		HStack(alignment: VerticalAlignment.top, spacing: 0) {
+			Image(systemName: "info.circle")
+				.imageScale(.large)
+				.padding(.trailing, 10)
+				.accessibilityHidden(true)
+				.accessibilityLabel("Message")
+			
+			VStack(alignment: HorizontalAlignment.leading, spacing: 5) {
+				
+				Text(serverMessage.message)
+				HStack(alignment: VerticalAlignment.center, spacing: 0) {
+					Spacer()
+					Button {
+						dismissServerMessage(index: serverMessage.index)
+					} label: {
+						Text("OK").bold()
+					}
+				}
+			}
+			
+		} // </HStack>
+		.font(.caption)
 		.accessibilitySortPriority(47)
 	}
 	
@@ -686,11 +726,6 @@ struct HomeView : MVIView {
 		return count
 	}
 	
-	func notificationCount_total() -> Int {
-		
-		return notificationCount_missedLightningPayments() + notificationCount_other()
-	}
-	
 	func showAddLiquidityButton() -> Bool {
 		
 		let hasNoChannels = channels.filter { !$0.isTerminated }.isEmpty
@@ -757,16 +792,17 @@ struct HomeView : MVIView {
 	func lastCompletedPaymentChanged(_ payment: Lightning_kmpWalletPayment) {
 		log.trace("lastCompletedPaymentChanged()")
 		
+		let paymentsManager = Biz.business.paymentsManager
 		let paymentId = payment.walletPaymentId()
 		
 		// PaymentView will need `WalletPaymentFetchOptions.companion.All`,
 		// so as long as we're fetching from the database, we might as well fetch everything we need.
 		let options = WalletPaymentFetchOptions.companion.All
 		
-		Biz.business.paymentsManager.getPayment(id: paymentId, options: options) { result, _ in
-			
-			if activeSheet == nil, let result = result {
-				activeSheet = .paymentView(payment: result) // triggers display of PaymentView sheet
+		Task { @MainActor in
+			let result = try await paymentsManager.getPayment(id: paymentId, options: options)
+			if self.activeSheet == nil, let result = result {
+				self.activeSheet = .paymentView(payment: result) // triggers display of PaymentView sheet
 			}
 		}
 	}
@@ -800,7 +836,7 @@ struct HomeView : MVIView {
 		bizNotifications_payment = list.filter({ item in
 			if let paymentRejected = item.notification as? PhoenixShared.Notification.PaymentRejected {
 				// Remove items where source == onChain
-				if paymentRejected.source == Lightning_kmpLiquidityEventsSource.offchainpayment {
+				if paymentRejected.source == Lightning_kmpLiquidityEventsSource.offChainPayment {
 					return paymentRejected.createdAt > cutOffDate
 				} else {
 					return false
@@ -892,6 +928,12 @@ struct HomeView : MVIView {
 		}
 	}
 	
+	func dismissServerMessage(index: Int) {
+		log.trace("dismissServerMessage(index: \(index))")
+		
+		Prefs.shared.serverMessageReadIndex = index
+	}
+	
 	func openNotificationsSheet() {
 		log.trace("openNotificationSheet()")
 		
@@ -934,16 +976,16 @@ struct HomeView : MVIView {
 		}
 	}
 	
-	func didSelectPayment(row: WalletPaymentOrderRow) -> Void {
+	func didSelectPayment(row: WalletPaymentOrderRow) {
 		log.trace("didSelectPayment()")
 		
 		// pretty much guaranteed to be in the cache
 		let fetcher = Biz.business.paymentsManager.fetcher
 		let options = PaymentCell.fetchOptions
-		fetcher.getPayment(row: row, options: options) { (result: WalletPaymentInfo?, _) in
-			
-			if activeSheet == nil, let result = result {
-				activeSheet = .paymentView(payment: result)
+		Task { @MainActor in
+			let result = try await fetcher.getPayment(row: row, options: options)
+			if self.activeSheet == nil, let result = result {
+				self.activeSheet = .paymentView(payment: result)
 			}
 		}
 	}
