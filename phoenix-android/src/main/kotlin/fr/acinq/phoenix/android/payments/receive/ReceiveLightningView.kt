@@ -326,7 +326,7 @@ private fun EvaluateLiquidityIssuesForPayment(
     val availableForReceive = remember(channelsMap) { channelsMap.availableForReceive() }
 
     val mempoolFeerate by business.appConfigurationManager.mempoolFeerate.collectAsState()
-    val swapFee = remember(mempoolFeerate) { mempoolFeerate?.payToOpenEstimationFee(amount = amount ?: 0.msat, hasNoChannels = channelsMap?.values?.filterNot { it.isTerminated }.isNullOrEmpty()) }
+    val swapFee = remember(mempoolFeerate, amount) { mempoolFeerate?.payToOpenEstimationFee(amount = amount ?: 0.msat, hasNoChannels = channelsMap?.values?.filterNot { it.isTerminated }.isNullOrEmpty()) }
 
     val liquidityPolicyPrefs = UserPrefs.getLiquidityPolicy(context).collectAsState(null)
 
