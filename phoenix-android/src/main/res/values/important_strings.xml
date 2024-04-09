@@ -133,9 +133,6 @@
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Inbound liquidity is insufficient for this amount, and you have disabled automated channel management.</string>
 
-    <string name="receive_onchain_fees_title">Expect fees</string>
-    <string name="receive_onchain_fees_body1">On-chain deposits always incur on-chain fees. They do not use your inbound liquidity.</string>
-
     <!-- scanning errors -->
 
     <string name="scan_error_expired">This invoice is expired.</string>

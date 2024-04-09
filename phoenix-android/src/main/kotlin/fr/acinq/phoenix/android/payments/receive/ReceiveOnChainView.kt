@@ -76,14 +76,6 @@ fun BitcoinAddressView(
             HSeparator(width = 50.dp)
             Spacer(modifier = Modifier.height(16.dp))
             QRCodeDetail(label = stringResource(id = R.string.receive_bitcoin_address_label), value = state.currentAddress)
-
-            Spacer(modifier = Modifier.height(24.dp))
-            InfoMessage(
-                header = stringResource(id = R.string.receive_onchain_fees_title),
-                details = stringResource(id = R.string.receive_onchain_fees_body1),
-                detailsStyle = MaterialTheme.typography.subtitle2,
-                alignment = Alignment.CenterHorizontally
-            )
         }
         is BitcoinAddressState.Error -> {
             ErrorMessage(
