@@ -188,9 +188,6 @@
     <string name="inappnotif_mempool_full_message">On-chain fees are high.</string>
     <string name="inappnotif_mempool_full_action">See how Phoenix is affected</string>
 
-    <string name="inappnotif_paytoopen_fee_title">Fee schedule update</string>
-    <string name="inappnotif_paytoopen_fee_message">Creating/resizing a Lightning channel now incurs a 1% fee, in addition to the mining fee.</string>
-
     <string name="inappnotif_payment_onchain_pending_title">On-chain funds pending (+%1$s)</string>
     <string name="inappnotif_payments_rejection_overview_one">An incoming payment has been recently rejected</string>
     <string name="inappnotif_payments_rejection_overview_many">%1$d incoming payments recently rejected</string>

@@ -30,18 +30,17 @@ sealed class Notice() {
     abstract val priority: Int
     sealed class ShowInHome(override val priority: Int) : Notice()
 
-    data object MigrationFromLegacy : ShowInHome(1)
-    data object CriticalUpdateAvailable : ShowInHome(2)
-    data object SwapInCloseToTimeout : ShowInHome(3)
-    data object BackupSeedReminder : ShowInHome(5)
-    data object PayToOpenFeeChange : ShowInHome(6)
-    data object MempoolFull : ShowInHome(10)
-    data object UpdateAvailable : ShowInHome(20)
-    data object NotificationPermission : ShowInHome(30)
+    object MigrationFromLegacy : ShowInHome(1)
+    object CriticalUpdateAvailable : ShowInHome(2)
+    object SwapInCloseToTimeout : ShowInHome(3)
+    object BackupSeedReminder : ShowInHome(5)
+    object MempoolFull : ShowInHome(10)
+    object UpdateAvailable : ShowInHome(20)
+    object NotificationPermission : ShowInHome(30)
 
     // less important notices
     sealed class DoNotShowInHome(override val priority: Int = 999) : Notice()
-    data object WatchTowerLate : DoNotShowInHome()
+    object WatchTowerLate : DoNotShowInHome()
 }
 
 class NoticesViewModel(val appConfigurationManager: AppConfigurationManager, val peerManager: PeerManager) : ViewModel() {

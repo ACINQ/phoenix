@@ -213,6 +213,7 @@ private fun PermamentNotice(
         }
 
         Notice.WatchTowerLate -> {
+            val scope = rememberCoroutineScope()
             ImportantNotification(
                 icon = R.drawable.ic_eye,
                 message = stringResource(id = R.string.inappnotif_watchtower_late_message),
@@ -229,15 +230,6 @@ private fun PermamentNotice(
                 message = stringResource(id = R.string.inappnotif_swapin_timeout_message),
                 actionText = stringResource(id = R.string.inappnotif_swapin_timeout_action),
                 onActionClick = { nc?.navigate(Screen.WalletInfo.SwapInWallet.route) },
-            )
-        }
-
-        is Notice.PayToOpenFeeChange -> {
-            ImportantNotification(
-                icon = R.drawable.ic_info,
-                message = stringResource(id = R.string.inappnotif_paytoopen_fee_title),
-                actionText = stringResource(id = R.string.inappnotif_paytoopen_fee_message),
-                onActionClick = { TODO() },
             )
         }
     }

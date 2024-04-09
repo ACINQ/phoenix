@@ -128,10 +128,6 @@ private fun FirstNoticeView(
             is Notice.SwapInCloseToTimeout -> onNavigateToSwapInWallet
 
             is Notice.MempoolFull -> onNavigateToNotificationsList
-
-            is Notice.PayToOpenFeeChange -> {
-                { TODO() }
-            }
         }
     } else {
         onNavigateToNotificationsList
@@ -180,10 +176,6 @@ private fun FirstNoticeView(
 
             is Notice.SwapInCloseToTimeout -> {
                 NoticeTextView(text = stringResource(id = R.string.inappnotif_swapin_timeout_message), icon = R.drawable.ic_alert_triangle)
-            }
-
-            is Notice.PayToOpenFeeChange -> {
-                NoticeTextView(text = stringResource(id = R.string.inappnotif_paytoopen_fee_title))
             }
         }
 
