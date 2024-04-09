@@ -61,7 +61,6 @@ fun SendBolt11PaymentView(
         topContent = {
             AmountHeroInput(
                 initialAmount = amount,
-                enabled = amount == null,
                 onAmountChange = { newAmount ->
                     amountErrorMessage = ""
                     when {
