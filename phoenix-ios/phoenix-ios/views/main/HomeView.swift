@@ -32,6 +32,7 @@ struct HomeView : MVIView {
 	
 	let recentPaymentsConfigPublisher = Prefs.shared.recentPaymentsConfigPublisher
 	@State var recentPaymentsConfig = Prefs.shared.recentPaymentsConfig
+	@State var lastCompletedPaymentId: WalletPaymentId? = nil
 	
 	@State var paymentsPage = PaymentsPage(offset: 0, count: 0, rows: [])
 	
@@ -794,6 +795,13 @@ struct HomeView : MVIView {
 		
 		let paymentsManager = Biz.business.paymentsManager
 		let paymentId = payment.walletPaymentId()
+		
+		if paymentId.isEqual(lastCompletedPaymentId) {
+			// Ignoring duplicate (rebroadcast when returning to this View)
+			return
+		} else {
+			lastCompletedPaymentId = paymentId
+		}
 		
 		// PaymentView will need `WalletPaymentFetchOptions.companion.All`,
 		// so as long as we're fetching from the database, we might as well fetch everything we need.
