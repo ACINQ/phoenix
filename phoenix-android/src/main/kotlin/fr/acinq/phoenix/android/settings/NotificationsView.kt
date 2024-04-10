@@ -213,7 +213,6 @@ private fun PermamentNotice(
         }
 
         Notice.WatchTowerLate -> {
-            val scope = rememberCoroutineScope()
             ImportantNotification(
                 icon = R.drawable.ic_eye,
                 message = stringResource(id = R.string.inappnotif_watchtower_late_message),
@@ -230,6 +229,19 @@ private fun PermamentNotice(
                 message = stringResource(id = R.string.inappnotif_swapin_timeout_message),
                 actionText = stringResource(id = R.string.inappnotif_swapin_timeout_action),
                 onActionClick = { nc?.navigate(Screen.WalletInfo.SwapInWallet.route) },
+            )
+        }
+
+        is Notice.RemoteMessage -> {
+            ImportantNotification(
+                icon = R.drawable.ic_info,
+                message = notice.notice.message,
+                actionText = stringResource(id = R.string.btn_ok),
+                onActionClick = {
+                    scope.launch {
+                        internalData.saveLastReadWalletNoticeIndex(notice.notice.index)
+                    }
+                },
             )
         }
     }
@@ -328,11 +340,7 @@ private fun ImportantNotification(
         externalPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
     ) {
         Row(modifier = Modifier.padding(top = 12.dp, start = 16.dp, end = 16.dp)) {
-            PhoenixIcon(
-                resourceId = icon, tint = MaterialTheme.colors.primary, modifier = Modifier
-                    .size(18.dp)
-                    .offset(y = 2.dp)
-            )
+            PhoenixIcon(resourceId = icon, tint = MaterialTheme.colors.primary, modifier = Modifier.size(18.dp))
             Spacer(modifier = Modifier.width(10.dp))
             Column(modifier = Modifier.alignByBaseline()) {
                 Text(text = message, style = MaterialTheme.typography.body1.copy(fontSize = 16.sp))

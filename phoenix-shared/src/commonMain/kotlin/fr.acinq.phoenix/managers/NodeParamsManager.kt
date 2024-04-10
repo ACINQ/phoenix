@@ -84,6 +84,7 @@ class NodeParamsManager(
         val trampolineNodeUri = NodeUri(id = trampolineNodeId, "13.248.222.197", 9735)
         const val remoteSwapInXpub = "tpubDAmCFB21J9ExKBRPDcVxSvGs9jtcf8U1wWWbS1xTYmnUsuUHPCoFdCnEGxLE3THSWcQE48GHJnyz8XPbYUivBMbLSMBifFd3G9KmafkM9og"
         val defaultLiquidityPolicy = LiquidityPolicy.Auto(maxAbsoluteFee = 5_000.sat, maxRelativeFeeBasisPoints = 50_00 /* 50% */, skipAbsoluteFeeCheck = false)
+        val payToOpenFeeBase = 100
 
         fun liquidityLeaseRate(amount: Satoshi): LiquidityAds.LeaseRate {
             // WARNING : THIS MUST BE KEPT IN SYNC WITH LSP OTHERWISE FUNDING REQUEST WILL BE REJECTED BY PHOENIX

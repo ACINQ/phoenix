@@ -128,6 +128,8 @@ private fun FirstNoticeView(
             is Notice.SwapInCloseToTimeout -> onNavigateToSwapInWallet
 
             is Notice.MempoolFull -> onNavigateToNotificationsList
+
+            is Notice.RemoteMessage -> onNavigateToNotificationsList
         }
     } else {
         onNavigateToNotificationsList
@@ -176,6 +178,10 @@ private fun FirstNoticeView(
 
             is Notice.SwapInCloseToTimeout -> {
                 NoticeTextView(text = stringResource(id = R.string.inappnotif_swapin_timeout_message), icon = R.drawable.ic_alert_triangle)
+            }
+
+            is Notice.RemoteMessage -> {
+                NoticeTextView(text = notice.notice.message, icon = R.drawable.ic_info)
             }
         }
 
@@ -236,9 +242,7 @@ private fun RowScope.NoticeTextView(
     icon: Int? = null,
 ) {
     if (icon != null) {
-        PhoenixIcon(resourceId = icon, tint = MaterialTheme.colors.primary, modifier = Modifier
-            .align(Alignment.Top)
-            .offset(y = (2).dp))
+        PhoenixIcon(resourceId = icon, tint = MaterialTheme.colors.primary, modifier = Modifier.align(Alignment.Top))
         Spacer(modifier = Modifier.width(10.dp))
     }
     Text(

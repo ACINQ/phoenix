@@ -21,6 +21,8 @@ fileprivate enum Key: String {
 	case recentPaymentsConfig
 	case hasMergedChannelsForSplicing
 	case swapInAddressIndex
+	case hasUpgradedSeedCloudBackups
+	case serverMessageReadIndex
 }
 
 fileprivate enum KeyDeprecated: String {
@@ -131,6 +133,31 @@ class Prefs {
 		set { defaults.hasMergedChannelsForSplicing = newValue }
 	}
 	
+  var hasUpgradedSeedCloudBackups: Bool {
+		get { defaults.hasUpgradedSeedCloudBackups }
+		set { defaults.hasUpgradedSeedCloudBackups = newValue }
+	}
+  
+	lazy private(set) var serverMessageReadIndexPublisher: AnyPublisher<Int?, Never> = {
+		defaults.publisher(for: \.serverMessageReadIndex, options: [.initial, .new])
+			.map({ (number: NSNumber?) -> Int? in
+				number?.intValue
+			})
+			.removeDuplicates()
+			.eraseToAnyPublisher()
+	}()
+	
+	var serverMessageReadIndex: Int? {
+		get { defaults.serverMessageReadIndex?.intValue }
+		set {
+			if let number = newValue {
+				defaults.serverMessageReadIndex = NSNumber(value: number)
+			} else {
+				defaults.serverMessageReadIndex = nil
+			}
+		}
+	}
+	
 	// --------------------------------------------------
 	// MARK: Wallet State
 	// --------------------------------------------------
@@ -214,6 +241,8 @@ class Prefs {
 		defaults.removeObject(forKey: Key.recentPaymentsConfig.rawValue)
 		defaults.removeObject(forKey: Key.hasMergedChannelsForSplicing.rawValue)
 		defaults.removeObject(forKey: Key.swapInAddressIndex.rawValue)
+		defaults.removeObject(forKey: Key.hasUpgradedSeedCloudBackups.rawValue)
+		defaults.removeObject(forKey: Key.serverMessageReadIndex.rawValue)
 		
 		self.backupTransactions.resetWallet(encryptedNodeId: encryptedNodeId)
 		self.backupSeed.resetWallet(encryptedNodeId: encryptedNodeId)
@@ -312,5 +341,15 @@ extension UserDefaults {
 	@objc fileprivate var swapInAddressIndex: Int {
 		get { integer(forKey: Key.swapInAddressIndex.rawValue) }
 		set { set(newValue, forKey: Key.swapInAddressIndex.rawValue) }
+	}
+  
+  @objc fileprivate var hasUpgradedSeedCloudBackups: Bool {
+		get { bool(forKey: Key.hasUpgradedSeedCloudBackups.rawValue) }
+		set { set(newValue, forKey: Key.hasUpgradedSeedCloudBackups.rawValue) }
+	}
+	
+	@objc fileprivate var serverMessageReadIndex: NSNumber? {
+		get { object(forKey: Key.serverMessageReadIndex.rawValue) as? NSNumber }
+		set { set(newValue, forKey: Key.serverMessageReadIndex.rawValue) }
 	}
 }

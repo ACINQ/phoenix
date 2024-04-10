@@ -1,7 +1,12 @@
 package fr.acinq.phoenix.utils
 
 import fr.acinq.bitcoin.Satoshi
+import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.phoenix.data.LocalChannelInfo
 import fr.acinq.phoenix.data.WalletPaymentId
+import fr.acinq.phoenix.data.availableForReceive
+import fr.acinq.phoenix.data.canRequestLiquidity
+import fr.acinq.phoenix.data.inFlightPaymentsCount
 import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import fr.acinq.phoenix.managers.NodeParamsManager
 
@@ -20,4 +25,22 @@ fun WalletPaymentOrderRow.kotlinId(): WalletPaymentId {
 fun NodeParamsManager.Companion._liquidityLeaseRate(amount: Satoshi): LiquidityAds_LeaseRate {
     val result = this.liquidityLeaseRate(amount)
     return LiquidityAds_LeaseRate(result)
+}
+
+fun LocalChannelInfo.Companion.availableForReceive(
+    channels: List<LocalChannelInfo>
+): MilliSatoshi? {
+    return channels.availableForReceive()
+}
+
+fun LocalChannelInfo.Companion.canRequestLiquidity(
+    channels: List<LocalChannelInfo>
+): Boolean {
+    return channels.canRequestLiquidity()
+}
+
+fun LocalChannelInfo.Companion.inFlightPaymentsCount(
+    channels: List<LocalChannelInfo>
+): Int {
+    return channels.inFlightPaymentsCount()
 }

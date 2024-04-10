@@ -125,6 +125,8 @@ data class LocalChannelInfo(
         val fundingAmount: Satoshi,
         val balanceForSend: MilliSatoshi,
     )
+
+    companion object { /* allow companion extensions; see PhoenixExposure.kt */ }
 }
 
 /**
@@ -142,12 +144,15 @@ data class LocalChannelInfo(
  *          - there's at least 1 NORMAL channel.
  */
 fun Map<ByteVector32, LocalChannelInfo>?.availableForReceive(): MilliSatoshi? {
-    val activeChannels = this?.values ?: return null
+    return this?.values?.availableForReceive() ?: null
+}
+
+fun Collection<LocalChannelInfo>.availableForReceive(): MilliSatoshi? {
     return when {
-        activeChannels.isEmpty() -> 0.msat
-        activeChannels.all { it.isBooting } -> null
-        activeChannels.all { it.state is Syncing } -> null
-        else -> activeChannels.map {
+        this.isEmpty() -> 0.msat
+        this.all { it.isBooting } -> null
+        this.all { it.state is Syncing } -> null
+        else -> this.map {
             if (it.state is Syncing || it.isBooting) {
                 null
             } else {
@@ -166,10 +171,17 @@ fun Map<ByteVector32, LocalChannelInfo>?.availableForReceive(): MilliSatoshi? {
 
 /** Liquidity can be requested if you have at least 1 usable channel. */
 fun Map<ByteVector32, LocalChannelInfo>?.canRequestLiquidity(): Boolean {
-    return this?.values?.any { it.isUsable } ?: false
+    return this?.values?.canRequestLiquidity() ?: false
 }
 
-/** Liquidity can be requested if you have at least 1 usable channel. */
+fun Collection<LocalChannelInfo>.canRequestLiquidity(): Boolean {
+    return this.any { it.isUsable }
+}
+
 fun Map<ByteVector32, LocalChannelInfo>?.inFlightPaymentsCount(): Int {
-    return this?.values?.sumOf { it.inFlightPaymentsCount } ?: 0
+    return this?.values?.inFlightPaymentsCount() ?: 0
+}
+
+fun Collection<LocalChannelInfo>.inFlightPaymentsCount(): Int {
+    return this.sumOf { it.inFlightPaymentsCount }
 }

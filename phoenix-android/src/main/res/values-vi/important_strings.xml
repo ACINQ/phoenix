@@ -40,6 +40,9 @@
     <string name="notif_missed_title">Thanh toán đến bị bỏ lỡ.</string>
     <string name="notif_missed_unavailable">Phoenix không thể khởi động trên nền.</string>
 
+    <string name="notif_inflight_payment_title">Một khoản thanh toán đang chờ xử lý</string>
+    <string name="notif_inflight_payment_message">Bắt đầu Phoenix để khoản thanh toán có thể được hoàn tất đúng hạn.</string>
+
     <string name="notif_rejected_deposit_title">Tiền cọc on-chain đang chờ được xử lý (+%1$s)</string>
     <string name="notif_rejected_payment_title">Thanh toán bị từ chối (+%1$s)</string>
     <string name="notif_rejected_policy_disabled">Chức năng quản lý kênh tự động bị tắt. Nhấn để biết thêm chi tiết.</string>

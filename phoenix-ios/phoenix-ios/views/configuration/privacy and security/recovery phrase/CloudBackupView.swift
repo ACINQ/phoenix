@@ -11,60 +11,32 @@ struct CloudBackupView: View {
 	
 	@Binding var backupSeed_enabled: Bool
 	
-	@State var toggle_enabled: Bool
+	@State var toggle_enabled: Bool = false
 	
-	@State var legal_appleRisk: Bool
-	@State var legal_governmentRisk: Bool
+	@State var original_appleRisk: Bool = false
+	@State var original_governmentRisk: Bool = false
+	
+	@State var legal_appleRisk: Bool = false
+	@State var legal_governmentRisk: Bool = false
 	
 	@State var animatingLegalToggleColor = false
 	
 	let encryptedNodeId: String
-	let originalName: String
-	@State var name: String
+	@State var originalName: String = ""
+	@State var name: String = ""
 	
+	@Environment(\.openURL) var openURL
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
-	var hasChanges: Bool {
-		if name != originalName {
-			return true
-		}
-		if backupSeed_enabled {
-			// Currently enabled.
-			return !toggle_enabled || !legal_appleRisk || !legal_governmentRisk
-		} else {
-			// Currently disabled.
-			return toggle_enabled || legal_appleRisk || legal_governmentRisk
-		}
-	}
-	
-	var canSave: Bool {
-		if backupSeed_enabled {
-			// Currently enabled.
-			// Saving to disable: user only needs to disable the toggle
-			// Saving to change name: newName != oldName
-			return !toggle_enabled || (name != originalName)
-		} else {
-			// Currently disabled.
-			// To enable, user must enable the toggle, and accept the legal risks.
-			return toggle_enabled && legal_appleRisk && legal_governmentRisk
-		}
-	}
-	
 	init(backupSeed_enabled: Binding<Bool>) {
+		
 		self._backupSeed_enabled = backupSeed_enabled
-		let enabled = backupSeed_enabled.wrappedValue
-		
-		self._toggle_enabled = State<Bool>(initialValue: enabled)
-		self._legal_appleRisk = State<Bool>(initialValue: enabled)
-		self._legal_governmentRisk = State<Bool>(initialValue: enabled)
-		
-		let encryptedNodeId = Biz.encryptedNodeId!
-		let originalName = Prefs.shared.backupSeed.name(encryptedNodeId: encryptedNodeId) ?? ""
-		
-		self.encryptedNodeId = encryptedNodeId
-		self.originalName = originalName
-		self._name = State<String>(initialValue: originalName)
+		self.encryptedNodeId = Biz.encryptedNodeId!
 	}
+	
+	// --------------------------------------------------
+	// MARK: View Builders
+	// --------------------------------------------------
 	
 	@ViewBuilder
 	var body: some View {
@@ -74,6 +46,18 @@ struct CloudBackupView: View {
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationBarBackButtonHidden(true)
 			.navigationBarItems(leading: backButton())
+			.onAppear {
+				onAppear()
+			}
+			.onChange(of: toggle_enabled) { _ in
+				checkAnimation()
+			}
+			.onChange(of: legal_appleRisk) { _ in
+				checkAnimation()
+			}
+			.onChange(of: legal_governmentRisk) { _ in
+				checkAnimation()
+			}
 	}
 	
 	@ViewBuilder
@@ -185,10 +169,14 @@ struct CloudBackupView: View {
 			))
 			.padding(.vertical, 5)
 			
+			Label {
+				Text("If you enable [Advanced Data Protection](https://support.apple.com/en-us/108756) for iCloud, your recovery phrase will be encrypted end-to-end, and Apple cannot access it.")
+			} icon: {
+				Image(systemName: "lightbulb")
+			}
+
+			
 		} // </Section>
-		.onChange(of: toggle_enabled) { newValue in
-			didToggleEnabled(newValue)
-		}
 	}
 	
 	@ViewBuilder
@@ -237,36 +225,140 @@ struct CloudBackupView: View {
 	@ViewBuilder
 	func offImage() -> some View {
 		if toggle_enabled {
+			let useRed = animatingLegalToggleColor && !legal
 			Image(systemName: "square")
 				.renderingMode(.template)
 				.imageScale(.large)
-				.foregroundColor(animatingLegalToggleColor ? Color.red : Color.primary)
+				.foregroundColor(useRed ? Color.red : Color.primary)
 		} else {
 			Image(systemName: "square")
 				.imageScale(.large)
 		}
 	}
 	
-	func didToggleEnabled(_ value: Bool) {
-		log.trace("didToggleEnabled")
+	// --------------------------------------------------
+	// MARK: View Helpers
+	// --------------------------------------------------
+	
+	var legal: Bool {
+		return legal_appleRisk && legal_governmentRisk
+	}
+	
+	var hasChanges: Bool {
+		if name != originalName {
+			return true
+		}
+		if legal_appleRisk != original_appleRisk {
+			return true
+		}
+		if legal_governmentRisk != original_governmentRisk {
+			return true
+		}
 		
-		if value {
-			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-				if toggle_enabled {
-					withAnimation(Animation.linear(duration: 1.0).repeatForever(autoreverses: true)) {
-						animatingLegalToggleColor = true
-					}
+		if backupSeed_enabled {
+			// Original state == enabled
+			// Did user disabled backup ?
+			return !toggle_enabled
+		} else {
+			// Original state == disabled
+			// Did user enable backup ?
+			return toggle_enabled
+		}
+	}
+	
+	var canSave: Bool {
+		if backupSeed_enabled {
+			// Original state == enabled
+			
+			if !toggle_enabled {
+				// Saving to disable: user only needs to disable the toggle
+				return true
+			}
+			if !legal {
+				// Cannot save without accepting legal
+				return false
+			}
+			
+			// Otherwise can save as long as there's changes
+			return hasChanges
+			
+		} else {
+			// Original state == disabled
+			// To enable, user must enable the toggle, and accept the legal risks.
+			return toggle_enabled && legal
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
+	
+	func onAppear() {
+		log.trace("onAppear()")
+		
+		let enabled = backupSeed_enabled
+		toggle_enabled = enabled
+		
+		original_appleRisk = enabled
+		original_governmentRisk = enabled
+		
+		legal_appleRisk = original_appleRisk
+		legal_governmentRisk = original_governmentRisk
+		
+		originalName = Prefs.shared.backupSeed.name(encryptedNodeId: encryptedNodeId) ?? ""
+		name = originalName
+	}
+	
+	// --------------------------------------------------
+	// MARK: Animations
+	// --------------------------------------------------
+	
+	func checkAnimation() {
+		log.trace("checkAnimation()")
+		
+		if toggle_enabled && !legal {
+			startAnimatingLegalToggleColor()
+		} else {
+			stopAnimatingLegalToggleColor()
+		}
+	}
+	
+	func startAnimatingLegalToggleColor() {
+		log.trace("startAnimatingLegalToggleColor()")
+		
+		DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+			if toggle_enabled {
+				log.debug("animatingLegalToggleColor: starting animation...")
+				withAnimation(Animation.linear(duration: 1.0).repeatForever(autoreverses: true)) {
+					animatingLegalToggleColor = true
 				}
 			}
-		} else {
-			animatingLegalToggleColor = false
+		}
+	}
+	
+	func stopAnimatingLegalToggleColor() {
+		log.trace("stopAnimatingLegalToggleColor()")
+		
+		animatingLegalToggleColor = false
+	}
+	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
+	
+	func openAdvancedDataProtectionLink() {
+		log.trace("openAdvancedDataProtectionLink")
+		
+		if let url = URL(string: "https://support.apple.com/en-us/108756") {
+			openURL(url)
 		}
 	}
 	
 	func didTapBackButton() {
 		log.trace("didTapBackButton()")
 		
-		if canSave {
+		if hasChanges && canSave {
+			
 			backupSeed_enabled = toggle_enabled
 			
 			// Subtle optimizations:
@@ -283,6 +375,8 @@ struct CloudBackupView: View {
 				Prefs.shared.backupSeed.isEnabled = toggle_enabled
 				Prefs.shared.backupSeed.setName(name, encryptedNodeId: encryptedNodeId)
 			}
+		} else {
+			log.trace("!hasChanges || !canSave")
 		}
 		presentationMode.wrappedValue.dismiss()
 	}

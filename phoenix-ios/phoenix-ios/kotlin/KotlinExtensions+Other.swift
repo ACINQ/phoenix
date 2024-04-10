@@ -233,3 +233,18 @@ extension MnemonicLanguage {
 		return .english
 	}
 }
+
+extension Array where Element == LocalChannelInfo {
+	
+	func availableForReceive() -> Lightning_kmpMilliSatoshi? {
+		return LocalChannelInfo.companion.availableForReceive(channels: self)
+	}
+	
+	func canRequestLiquidity() -> Bool {
+		return LocalChannelInfo.companion.canRequestLiquidity(channels: self)
+	}
+	
+	func inFlightPaymentsCount() -> Int32 {
+		return LocalChannelInfo.companion.inFlightPaymentsCount(channels: self)
+	}
+}
