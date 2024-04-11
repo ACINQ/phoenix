@@ -24,3 +24,7 @@ actual fun getDatabaseFilesDirectoryPath(ctx: PlatformContext): String? {
 
 actual fun getTemporaryDirectoryPath(ctx: PlatformContext): String =
     NSTemporaryDirectory()
+
+actual fun isMainThread(): Boolean {
+    return NSThread.isMainThread()
+}

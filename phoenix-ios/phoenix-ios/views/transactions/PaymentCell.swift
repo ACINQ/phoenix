@@ -286,13 +286,20 @@ struct PaymentCell : View {
 		
 		if fetched == nil || fetchedIsStale {
 			
-			paymentsManager.fetcher.getPayment(
-				row: row,
-				options: PaymentCell.fetchOptions
-			) { (result: WalletPaymentInfo?, _) in
-				
-				self.fetched = result
+			Task { @MainActor in
+				self.fetched = try await paymentsManager.fetcher.getPayment(
+					row: row,
+					options: PaymentCell.fetchOptions
+				)
 			}
+			
+//			paymentsManager.fetcher.getPayment(
+//				row: row,
+//				options: PaymentCell.fetchOptions
+//			) { (result: WalletPaymentInfo?, _) in
+//				
+//				self.fetched = result
+//			}
 		}
 		
 		if let didAppearCallback = didAppearCallback {

@@ -77,7 +77,8 @@ class Cache<Key, Value>(sizeLimit: Int) {
 
     operator fun get(key: Key): Value? {
 
-        return _map[key]?.let { item ->
+        checkMainThread()
+        val result = _map[key]?.let { item ->
 
             if (item !== mostRecentCacheItem) {
 
@@ -114,10 +115,14 @@ class Cache<Key, Value>(sizeLimit: Int) {
 
             item.value
         }
+
+        checkForInfiniteLoop()
+        return result
     }
 
     operator fun set(key: Key, value: Value): Unit {
 
+        checkMainThread()
         val existingItem = _map[key]
         if (existingItem != null) {
 
@@ -190,10 +195,12 @@ class Cache<Key, Value>(sizeLimit: Int) {
                 }
             }
         }
+        checkForInfiniteLoop()
     }
 
     fun remove(key: Key): Unit {
 
+        checkMainThread()
         _map[key]?.let { item ->
 
             if (mostRecentCacheItem === item) {
@@ -210,10 +217,12 @@ class Cache<Key, Value>(sizeLimit: Int) {
 
             _map.remove(key)
         }
+        checkForInfiniteLoop()
     }
 
     fun clear(): Unit {
 
+        checkMainThread()
         var item = leastRecentCacheItem
         while (item != null) {
 
@@ -226,12 +235,15 @@ class Cache<Key, Value>(sizeLimit: Int) {
         leastRecentCacheItem = null
         mostRecentCacheItem = null
         _map.clear()
+        checkForInfiniteLoop()
     }
 
     fun filteredKeys(
         isIncluded: (Key) -> Boolean
     ): List<Key> {
 
+        checkMainThread()
+        checkForInfiniteLoop()
         var results = mutableListOf<Key>()
 
         var item = mostRecentCacheItem
@@ -244,5 +256,41 @@ class Cache<Key, Value>(sizeLimit: Int) {
         }
 
         return results
+    }
+
+    fun checkMainThread() {
+        if (!isMainThread()) {
+            throw Exception("Not on main thread")
+        }
+    }
+
+    fun checkForInfiniteLoop() {
+
+        val limit = _map.size
+        var item: CacheItem<Key, Value>?
+
+        var forwardKeys = mutableListOf<Key>()
+        item = mostRecentCacheItem
+        while (item != null) {
+            forwardKeys.add(item.key)
+            if (forwardKeys.size > limit) {
+                throw Exception("forwardKeys.size > limit")
+            }
+            item = item.next
+        }
+
+        var backwardKeys = mutableListOf<Key>()
+        item = leastRecentCacheItem
+        while (item != null) {
+            backwardKeys.add(0, item.key)
+            if (backwardKeys.size > limit) {
+                throw Exception("backwardKeys.size > limit")
+            }
+            item = item.prev
+        }
+
+        if (forwardKeys != backwardKeys) {
+            throw Exception("forwardKeys != backwardKeys")
+        }
     }
 }

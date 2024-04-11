@@ -15,3 +15,8 @@ actual fun getApplicationCacheDirectoryPath(ctx: PlatformContext): String =
 
 actual fun getTemporaryDirectoryPath(ctx: PlatformContext): String =
     ctx.applicationContext.cacheDir.absolutePath
+
+actual fun isMainThread(): Boolean {
+    // This function is only used for iOS debugging
+    return true
+}
