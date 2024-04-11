@@ -341,7 +341,7 @@ struct BizNotificationCell: View {
 			case .Right(let reason): source = reason.source
 		}
 		
-		return source == Lightning_kmpLiquidityEventsSource.onChainWallet
+		return source == Lightning_kmpLiquidityEventsSource.onchainwallet
 	}
 	
 	func basisPointsAsPercent(_ basisPoints: Int32) -> String {

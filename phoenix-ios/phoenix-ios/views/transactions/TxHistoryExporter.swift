@@ -306,14 +306,19 @@ struct TxHistoryExporter: View {
 		log.trace("fetchOldestPaymentDate()")
 		
 		let databaseManager = Biz.business.databaseManager
-		Task { @MainActor in
+		databaseManager.paymentsDb { (result: SqlitePaymentsDb?, _) in
 			
-			let paymentsDb = try await databaseManager.paymentsDb()
-			let millis = try await paymentsDb.getOldestCompletedDate()
+			assertMainThread()
+			guard let paymentsDb = result else {
+				return
+			}
 			
-			if let oldestDate = self.millisToDate(millis) {
-				log.debug("oldestDate = \(oldestDate)")
-				startDate = oldestDate
+			paymentsDb.getOldestCompletedDate { (millis: KotlinLong?, _) in
+				
+				if let oldestDate = self.millisToDate(millis) {
+					log.debug("oldestDate = \(oldestDate)")
+					startDate = oldestDate
+				}
 			}
 		}
 	}
@@ -342,19 +347,24 @@ struct TxHistoryExporter: View {
 		let endMillis = sanitizeEndDate()
 		
 		let databaseManager = Biz.business.databaseManager
-		Task { @MainActor in
+		databaseManager.paymentsDb { (result: SqlitePaymentsDb?, _) in
 			
-			let paymentsDb = try await databaseManager.paymentsDb()
-			let result: KotlinLong? = try await paymentsDb.listRangeSuccessfulPaymentsCount(
+			assertMainThread()
+			guard let paymentsDb = result else {
+				return
+			}
+			
+			paymentsDb.listRangeSuccessfulPaymentsCount(
 				startDate: startMillis,
 				endDate: endMillis
-			)
-			
-			let count = result?.intValue ?? 0
-			if (startMillis == self.sanitizeStartDate()) && (endMillis == self.sanitizeEndDate()) {
-				paymentCount = count
-			} else {
-				// result no longer matches UI; user changed dates
+			) { (result: KotlinLong?, _) in
+				
+				let count = result?.intValue ?? 0
+				if (startMillis == self.sanitizeStartDate()) && (endMillis == self.sanitizeEndDate()) {
+					paymentCount = count
+				} else {
+					// result no longer matches UI; user changed dates
+				}
 			}
 		}
 	}
@@ -418,10 +428,12 @@ struct TxHistoryExporter: View {
 		exportedCount = 0
 		
 		let databaseManager = Biz.business.databaseManager
+		let peerManager = Biz.business.peerManager
 		let fetcher = Biz.business.paymentsManager.fetcher
 		
 		do {
 			let paymentsDb = try await databaseManager.paymentsDb()
+			let peer = try await peerManager.getPeer()
 			
 			let config = CsvWriter.Configuration(
 				includesFiat: includeFiat,

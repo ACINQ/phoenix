@@ -37,6 +37,9 @@ struct CurrencyConverterView: View {
 	@State var didAppear = false
 	@State var isRefreshingExchangeRates = false
 	
+	let refreshingExchangeRatesPublisher =
+		Biz.business.currencyManager.refreshPublisher()
+	
 	let timer = Timer.publish(every: 15 /* seconds */, on: .current, in: .common).autoconnect()
 	@State var currentDate = Date()
 	
@@ -153,10 +156,8 @@ struct CurrencyConverterView: View {
 		.onChange(of: parsedRow) { _ in
 			parsedRowDidChange()
 		}
-		.task {
-			for await flag in Biz.business.currencyManager.refreshSequence() {
-				refreshingExchangeRatesChanged(flag)
-			}
+		.onReceive(refreshingExchangeRatesPublisher) {
+			refreshingExchangeRatesChanged($0)
 		}
 		.onReceive(timer) { _ in
 			self.currentDate = Date()

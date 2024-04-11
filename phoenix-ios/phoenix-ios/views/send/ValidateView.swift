@@ -63,7 +63,8 @@ struct ValidateView: View {
 	
 	@State var didAppear = false
 	
-	@State var balanceMsat: Int64 = Biz.business.balanceManager.balance.value?.msat ?? 0
+	let balancePublisher = Biz.business.balanceManager.balancePublisher()
+	@State var balanceMsat: Int64 = 0
 	
 	@StateObject var connectionsMonitor = ObservableConnectionsMonitor()
 	
@@ -162,10 +163,8 @@ struct ValidateView: View {
 		.onChange(of: currencyPickerChoice) { _ in
 			currencyPickerDidChange()
 		}
-		.task {
-			for await balance in Biz.business.balanceManager.balance {
-				balanceDidChange(balance)
-			}
+		.onReceive(balancePublisher) {
+			balanceDidChange($0)
 		}
 		.task {
 			await fetchMempoolRecommendedFees()
@@ -560,7 +559,7 @@ struct ValidateView: View {
 	func requestDescription() -> String? {
 		
 		if let paymentRequest = paymentRequest() {
-			return paymentRequest.desc_()
+			return paymentRequest.desc()
 			
 		} else if let lnurlPay = lnurlPay() {
 			return lnurlPay.metadata.plainText
@@ -1010,16 +1009,10 @@ struct ValidateView: View {
 	func balanceDidChange(_ balance: Lightning_kmpMilliSatoshi?) {
 		log.trace("balanceDidChange()")
 		
-		let previousBalanceMsat = balanceMsat
-		if let balance {
+		if let balance = balance {
 			balanceMsat = balance.msat
 		} else {
 			balanceMsat = 0
-		}
-		
-		if previousBalanceMsat != balanceMsat {
-			// "Amount exceeds your balance" error may no longer apply
-			refreshAltAmount()
 		}
 	}
 	
