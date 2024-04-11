@@ -31,7 +31,10 @@ struct WalletInfoView: View {
 	@State var final_mpk_truncationDetected = false
 	
 	@State var swapInWallet = Biz.business.balanceManager.swapInWalletValue()
+	let swapInWalletPublisher = Biz.business.balanceManager.swapInWalletPublisher()
+	
 	@State var finalWallet = Biz.business.peerManager.finalWalletValue()
+	let finalWalletPublisher = Biz.business.peerManager.finalWalletPublisher()
 	
 	@State private var swiftUiBugWorkaround: NavLinkTag? = nil
 	@State private var swiftUiBugWorkaroundIdx = 0
@@ -78,15 +81,11 @@ struct WalletInfoView: View {
 		.onChange(of: navLinkTag) {
 			navLinkTagChanged($0)
 		}
-		.task {
-			for await wallet in Biz.business.balanceManager.swapInWalletSequence() {
-				swapInWalletChanged(wallet)
-			}
+		.onReceive(swapInWalletPublisher) {
+			swapInWalletChanged($0)
 		}
-		.task {
-			for await wallet in Biz.business.peerManager.finalWalletSequence() {
-				finalWalletChanged(wallet)
-			}
+		.onReceive(finalWalletPublisher) {
+			finalWalletChanged($0)
 		}
 	}
 	

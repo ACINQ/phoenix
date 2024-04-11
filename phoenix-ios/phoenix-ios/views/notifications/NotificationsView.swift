@@ -19,6 +19,8 @@ struct NotificationsView : View {
 	
 	@StateObject var noticeMonitor = NoticeMonitor()
 	
+	let bizNotificationsPublisher = Biz.business.notificationsManager.notificationsPublisher()
+	
 	@State var bizNotifications_payment: [PhoenixShared.NotificationsManager.NotificationItem] = []
 	@State var bizNotifications_watchtower: [PhoenixShared.NotificationsManager.NotificationItem] = []
 	
@@ -44,10 +46,8 @@ struct NotificationsView : View {
 				body_embedded()
 			}
 		}
-		.task {
-			for await notifications in Biz.business.notificationsManager.notificationsSequence() {
-				bizNotificationsChanged(notifications)
-			}
+		.onReceive(bizNotificationsPublisher) {
+			bizNotificationsChanged($0)
 		}
 	}
 	
@@ -274,7 +274,7 @@ struct NotificationsView : View {
 		bizNotifications_payment = list.filter({ item in
 			if let paymentRejected = item.notification as? PhoenixShared.Notification.PaymentRejected {
 				// Remove items where source == onChain
-				return !(paymentRejected.source == Lightning_kmpLiquidityEventsSource.onChainWallet)
+				return !(paymentRejected.source == Lightning_kmpLiquidityEventsSource.onchainwallet)
 			} else {
 				return false
 			}
