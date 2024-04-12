@@ -475,7 +475,7 @@ struct CpfpView: View {
 	func monitorBlockchain() async {
 		log.trace("monitorBlockchain()")
 		
-		for await notification in Biz.business.electrumClient.notificationsSequence() {
+		for await notification in Biz.business.electrumClient.notificationsPublisher().values {
 			
 			if notification is Lightning_kmpHeaderSubscriptionResponse {
 				// A new block was mined !

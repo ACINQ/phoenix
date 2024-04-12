@@ -134,40 +134,37 @@ class PhoenixManager {
 		newBusiness.start(startupParams: startupParams)
 
 		newBusiness.currencyManager.refreshAll(targets: [primaryFiatCurrency], force: false)
-		
-		cancellables.insert(
-			Task { @MainActor [newBusiness, weak self] in
-				for await connections in newBusiness.connectionsManager.connectionsSequence() {
-					self?.connectionsChanged(connections)
-				}
-			}.autoCancellable()
-		)
+
+		newBusiness.connectionsManager.connectionsPublisher().sink {
+			[weak self](connections: Connections) in
+
+			self?.connectionsChanged(connections)
+		}
+		.store(in: &cancellables)
 
 		let pushReceivedAt = Date()
-		cancellables.insert(
-			Task { @MainActor [newBusiness, weak self] in
-				for await payment in newBusiness.paymentsManager.lastIncomingPaymentSequence() {
-					
-					guard
-						let paymentReceivedAt = payment.received?.receivedAtDate,
-						paymentReceivedAt > pushReceivedAt
-					else {
-						// Ignoring - this is the most recently received incomingPayment, but not a new one
-						return
-					}
+		newBusiness.paymentsManager.lastIncomingPaymentPublisher().sink {
+			[weak self](payment: Lightning_kmpIncomingPayment) in
 
-					self?.didReceivePayment(payment)
-				}
-			}.autoCancellable()
-		)
-		
-		cancellables.insert(
-			Task { @MainActor [newBusiness, weak self] in
-				for await rates in newBusiness.currencyManager.ratesSequence() {
-					self?.fiatExchangeRates = rates
-				}
-			}.autoCancellable()
-		)
+			guard
+				let paymentReceivedAt = payment.received?.receivedAtDate,
+				paymentReceivedAt > pushReceivedAt
+			else {
+				// Ignoring - this is the most recently received incomingPayment, but not a new one
+				return
+			}
+
+			self?.didReceivePayment(payment)
+		}
+		.store(in: &cancellables)
+
+		newBusiness.currencyManager.ratesPubliser().sink {
+			[weak self](rates: [ExchangeRate]) in
+
+			assertMainThread() // var `fiatExchangeRates` should be accessed/updated only on main thread
+			self?.fiatExchangeRates = rates
+		}
+		.store(in: &cancellables)
 
 		// Setup complete
 		business = newBusiness
@@ -191,15 +188,13 @@ class PhoenixManager {
 		oldBusiness = currentBusiness
 		business = nil
 		cancellables.removeAll()
-		
-		let _oldBusiness = currentBusiness
-		cancellables.insert(
-			Task { @MainActor [_oldBusiness, weak self] in
-				for await connections in _oldBusiness.connectionsManager.connectionsSequence() {
-					self?.oldConnectionsChanged(connections)
-				}
-			}.autoCancellable()
-		)
+
+		currentBusiness.connectionsManager.connectionsPublisher().sink {
+			[weak self](connections: Connections) in
+
+			self?.oldConnectionsChanged(connections)
+		}
+		.store(in: &oldCancellables)
 
 		currentBusiness.appConnectionsDaemon?.incrementDisconnectCount(
 			target: AppConnectionsDaemon.ControlTarget.companion.All

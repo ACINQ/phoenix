@@ -17,6 +17,8 @@ struct PaymentRequestedView: View {
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
+	let lastIncomingPaymentPublisher = Biz.business.paymentsManager.lastIncomingPaymentPublisher()
+	
 	@ViewBuilder
 	var body: some View {
 		
@@ -36,10 +38,8 @@ struct PaymentRequestedView: View {
 		.edgesIgnoringSafeArea([.bottom, .leading, .trailing]) // top is nav bar
 		.navigationTitle(NSLocalizedString("Payment Requested", comment: "Navigation bar title"))
 		.navigationBarTitleDisplayMode(.inline)
-		.task {
-			for await payment in Biz.business.paymentsManager.lastIncomingPaymentSequence() {
-				lastIncomingPaymentChanged(payment)
-			}
+		.onReceive(lastIncomingPaymentPublisher) {
+			lastIncomingPaymentChanged($0)
 		}
 	}
 	
@@ -119,7 +119,7 @@ struct PaymentRequestedView: View {
 		log.debug("lastIncomingPayment.paymentHash = \(lastIncomingPayment.paymentHash.toHex())")
 		
 		let paymentState = lastIncomingPayment.state()
-		if paymentState == WalletPaymentState.successOnChain || paymentState == WalletPaymentState.successOffChain {
+		if paymentState == WalletPaymentState.successonchain || paymentState == WalletPaymentState.successoffchain {
 			if lastIncomingPayment.paymentHash.toHex() == model.paymentHash {
 				presentationMode.wrappedValue.dismiss()
 			}

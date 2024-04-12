@@ -293,14 +293,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		// that change the corresponding API, and aim to make it more accesible for us.
 
 		let business = Biz.business
-		Task { @MainActor in
-			let paymentsDb = try await business.databaseManager.paymentsDb()
-			
+		business.databaseManager.paymentsDb { paymentsDb, _ in
+		
 			let fakePaymentId = WalletPaymentId.IncomingPaymentId(paymentHash: Bitcoin_kmpByteVector32.random())
-			try await paymentsDb.deletePayment(paymentId: fakePaymentId)
+			paymentsDb?.deletePayment(paymentId: fakePaymentId) { _ in
+				// Nothing is actually deleted
+			}
 		}
-		Task { @MainActor in
-			try await business.appDb.deleteBitcoinRate(fiat: "FakeFiatCurrency")
+		business.appDb.deleteBitcoinRate(fiat: "FakeFiatCurrency") { _ in
+			// Nothing is actually deleted
 		}
 	}
 }
