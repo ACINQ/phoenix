@@ -56,13 +56,9 @@ class CurrencyPrefs: ObservableObject {
 		}.store(in: &cancellables)
 		
 		let business = Biz.business
-		cancellables.insert(
-			Task { @MainActor [weak self] in
-				for await rates in business.currencyManager.ratesSequence() {
-					self?.fiatExchangeRates = rates
-				}
-			}.autoCancellable()
-		)
+		business.currencyManager.ratesPubliser().sink {[weak self](rates: [ExchangeRate]) in
+			self?.fiatExchangeRates = rates
+		}.store(in: &cancellables)
 	}
 	
 	private init(

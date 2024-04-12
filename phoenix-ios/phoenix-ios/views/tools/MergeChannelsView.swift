@@ -75,15 +75,11 @@ struct MergeChannelsView: View {
 			
 		} // </VStack>
 		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
-		.task {
-			for await connections in Biz.business.connectionsManager.connectionsSequence() {
-				connectionsChanged(connections)
-			}
+		.onReceive(Biz.business.connectionsManager.connectionsPublisher()) {
+			connectionsChanged($0)
 		}
-		.task {
-			for await channels in Biz.business.peerManager.channelsArraySequence() {
-				channelsChanged(channels)
-			}
+		.onReceive(Biz.business.peerManager.channelsPublisher()) {
+			channelsChanged($0)
 		}
 	}
 	

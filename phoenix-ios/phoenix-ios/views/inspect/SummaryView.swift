@@ -160,8 +160,8 @@ struct SummaryView: View {
 		let payment = paymentInfo.payment
 		let paymentState = payment.state()
 		
-		if paymentState == WalletPaymentState.successOnChain ||
-		   paymentState == WalletPaymentState.successOffChain
+		if paymentState == WalletPaymentState.successonchain ||
+		   paymentState == WalletPaymentState.successoffchain
 		{
 			Image("ic_payment_sent")
 				.renderingMode(.template)
@@ -200,7 +200,7 @@ struct SummaryView: View {
 			}
 			.padding(.bottom, 30)
 			
-		} else if paymentState == WalletPaymentState.pendingOnChain {
+		} else if paymentState == WalletPaymentState.pendingonchain {
 			
 			Image(systemName: "hourglass.circle")
 				.renderingMode(.template)
@@ -224,7 +224,7 @@ struct SummaryView: View {
 			} // </VStack>
 			.padding(.bottom, 30)
 			
-		} else if paymentState == WalletPaymentState.pendingOffChain {
+		} else if paymentState == WalletPaymentState.pendingoffchain {
 			
 			Image("ic_payment_sending")
 				.renderingMode(.template)
@@ -709,7 +709,7 @@ struct SummaryView: View {
 			return
 		}
 		
-		for await notification in Biz.business.electrumClient.notificationsSequence() {
+		for await notification in Biz.business.electrumClient.notificationsPublisher().values {
 			
 			if notification is Lightning_kmpHeaderSubscriptionResponse {
 				// A new block was mined !
@@ -742,7 +742,7 @@ struct SummaryView: View {
 	func onAppear() {
 		log.trace("onAppear()")
 		
-		let paymentsManager = Biz.business.paymentsManager
+		let business = Biz.business
 		
 		if !didAppear {
 			didAppear = true
@@ -755,20 +755,20 @@ struct SummaryView: View {
 				// or the payment information is possibly stale, and needs to be refreshed.
 				
 				if let row = paymentInfo.toOrderRow() {
-					
-					Task { @MainActor in
-						let result = try await paymentsManager.fetcher.getPayment(row: row, options: fetchOptions)
-						if let result {
-							self.paymentInfo = result
+
+					business.paymentsManager.fetcher.getPayment(row: row, options: fetchOptions) { (result, _) in
+
+						if let result = result {
+							paymentInfo = result
 						}
 					}
 
 				} else {
 				
-					Task { @MainActor in
-						let result = try await paymentsManager.getPayment(id: paymentInfo.id(), options: fetchOptions)
-						if let result {
-							self.paymentInfo = result
+					business.paymentsManager.getPayment(id: paymentInfo.id(), options: fetchOptions) { (result, _) in
+						
+						if let result = result {
+							paymentInfo = result
 						}
 					}
 				}
@@ -780,8 +780,8 @@ struct SummaryView: View {
 			// The payment metadata may have changed (e.g. description/notes modified).
 			// So we need to refresh the payment info.
 			
-			Task { @MainActor in
-				let result = try await paymentsManager.getPayment(id: paymentInfo.id(), options: fetchOptions)
+			business.paymentsManager.getPayment(id: paymentInfo.id(), options: fetchOptions) { (result, _) in
+				
 				if let result = result {
 					paymentInfo = result
 				}
@@ -840,14 +840,14 @@ struct SummaryView: View {
 	func deletePayment() {
 		log.trace("deletePayment()")
 		
-		let databaseManager = Biz.business.databaseManager
-		Task { @MainActor in
-			do {
-				let paymentsDb = try await databaseManager.paymentsDb()
-				try await paymentsDb.deletePayment(paymentId: paymentInfo.id())
-			} catch {
-				log.error("Error deleting payment: \(error)")
-			}
+		Biz.business.databaseManager.paymentsDb { paymentsDb, _ in
+			
+			paymentsDb?.deletePayment(paymentId: paymentInfo.id(), completionHandler: { error in
+				
+				if let error = error {
+					log.error("Error deleting payment: \(String(describing: error))")
+				}
+			})
 		}
 		
 		switch location {

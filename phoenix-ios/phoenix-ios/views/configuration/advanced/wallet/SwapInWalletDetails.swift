@@ -21,6 +21,7 @@ struct SwapInWalletDetails: View {
 	@State var liquidityPolicy: LiquidityPolicy = GroupPrefs.shared.liquidityPolicy
 	
 	@State var swapInWallet = Biz.business.balanceManager.swapInWalletValue()
+	let swapInWalletPublisher = Biz.business.balanceManager.swapInWalletPublisher()
 	
 	let swapInRejectedPublisher = Biz.swapInRejectedPublisher
 	@State var swapInRejected: Lightning_kmpLiquidityEventsRejected? = nil
@@ -102,10 +103,8 @@ struct SwapInWalletDetails: View {
 		.onReceive(GroupPrefs.shared.liquidityPolicyPublisher) {
 			liquidityPolicyChanged($0)
 		}
-		.task {
-			for await wallet in Biz.business.balanceManager.swapInWalletSequence() {
-				swapInWalletChanged(wallet)
-			}
+		.onReceive(swapInWalletPublisher) {
+			swapInWalletChanged($0)
 		}
 		.onReceive(swapInRejectedPublisher) {
 			swapInRejectedStateChange($0)
