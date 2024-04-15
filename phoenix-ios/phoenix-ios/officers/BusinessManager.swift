@@ -132,6 +132,7 @@ class BusinessManager {
 		business.start(startupParams: startupParams)
 		
 		setup()
+		startTasks()
 	}
 
 	public func stop() {
