@@ -17,8 +17,8 @@
 package fr.acinq.phoenix.legacy.db
 
 import android.content.Context
-import com.squareup.sqldelight.EnumColumnAdapter
-import com.squareup.sqldelight.android.AndroidSqliteDriver
+import app.cash.sqldelight.EnumColumnAdapter
+import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 
 object AppDb {
   @Volatile

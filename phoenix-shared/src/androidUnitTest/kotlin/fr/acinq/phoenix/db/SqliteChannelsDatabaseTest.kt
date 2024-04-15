@@ -16,8 +16,8 @@
 
 package fr.acinq.phoenix.db
 
-import com.squareup.sqldelight.db.SqlDriver
-import com.squareup.sqldelight.sqlite.driver.JdbcSqliteDriver
+import app.cash.sqldelight.db.SqlDriver
+import app.cash.sqldelight.sqlite.driver.JdbcSqliteDriver
 
 actual fun testChannelsDriver(): SqlDriver {
     val driver: SqlDriver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)

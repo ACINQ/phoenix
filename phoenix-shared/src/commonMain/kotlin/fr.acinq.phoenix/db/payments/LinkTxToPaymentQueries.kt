@@ -16,18 +16,20 @@
 
 package fr.acinq.phoenix.db.payments
 
-import com.squareup.sqldelight.runtime.coroutines.asFlow
-import com.squareup.sqldelight.runtime.coroutines.mapToList
+import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.coroutines.mapToList
 import fr.acinq.bitcoin.TxId
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.db.PaymentsDatabase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.*
 
 class LinkTxToPaymentQueries(val database: PaymentsDatabase) {
     private val linkTxQueries = database.linkTxToPaymentQueries
 
     fun listUnconfirmedTxs(): Flow<List<ByteArray>> {
-        return linkTxQueries.listUnconfirmed().asFlow().mapToList()
+        return linkTxQueries.listUnconfirmed().asFlow().mapToList(Dispatchers.IO)
     }
 
     fun listWalletPaymentIdsForTx(txId: TxId): List<WalletPaymentId> {

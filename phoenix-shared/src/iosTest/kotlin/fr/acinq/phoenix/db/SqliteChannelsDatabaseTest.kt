@@ -17,9 +17,9 @@
 package fr.acinq.phoenix.db
 
 import co.touchlab.sqliter.DatabaseConfiguration
-import com.squareup.sqldelight.db.SqlDriver
-import com.squareup.sqldelight.drivers.native.NativeSqliteDriver
-import com.squareup.sqldelight.drivers.native.wrapConnection
+import app.cash.sqldelight.db.SqlDriver
+import app.cash.sqldelight.drivers.native.NativeSqliteDriver
+import app.cash.sqldelight.drivers.native.wrapConnection
 import fr.acinq.lightning.Lightning
 import fr.acinq.phoenix.utils.PlatformContext
 import fr.acinq.phoenix.utils.getDatabaseFilesDirectoryPath
