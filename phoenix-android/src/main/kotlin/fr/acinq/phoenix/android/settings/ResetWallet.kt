@@ -64,9 +64,13 @@ import fr.acinq.phoenix.android.fiatRate
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.negativeColor
+import fr.acinq.phoenix.managers.DatabaseManager
+import fr.acinq.phoenix.managers.NodeParamsManager
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 
@@ -95,8 +99,7 @@ class ResetWalletViewModel : ViewModel() {
 
     fun deleteWalletData(
         context: Context,
-        chain: Chain,
-        nodeIdHash: String,
+        nodeParamsManager: NodeParamsManager,
         onShutdownBusiness: () -> Unit,
         onShutdownService: () -> Unit,
         onPrefsClear: suspend () -> Unit,
@@ -115,8 +118,9 @@ class ResetWalletViewModel : ViewModel() {
 
             state.value = ResetWalletStep.Deleting.Databases
             context.deleteDatabase("appdb.sqlite")
-            context.deleteDatabase("payments-${chain.name.lowercase()}-$nodeIdHash.sqlite")
-            context.deleteDatabase("channels-${chain.name.lowercase()}-$nodeIdHash.sqlite")
+            val nodeParams = nodeParamsManager.nodeParams.filterNotNull().first()
+            context.deleteDatabase(DatabaseManager.paymentsDbName(nodeParams.chain, nodeParams.nodeId))
+            context.deleteDatabase(DatabaseManager.channelsDbName(nodeParams.chain, nodeParams.nodeId))
             delay(500)
 
             state.value = ResetWalletStep.Deleting.Prefs
@@ -167,14 +171,12 @@ fun ResetWallet(
             }
             ResetWalletStep.Confirm -> {
                 val context = LocalContext.current
-                val business = business
-                val nodeIdHash = business.nodeParamsManager.nodeParams.value!!.nodeId.hash160().byteVector().toHex()
+                val nodeParamsManager = business.nodeParamsManager
                 ReviewReset(
                     onConfirmClick = {
                         vm.deleteWalletData(
                             context = context,
-                            chain = business.chain,
-                            nodeIdHash = nodeIdHash,
+                            nodeParamsManager = nodeParamsManager,
                             onShutdownBusiness = onShutdownBusiness,
                             onShutdownService = onShutdownService,
                             onPrefsClear = onPrefsClear,
@@ -288,7 +290,9 @@ private fun ReviewReset(
 @Composable
 private fun DeletingWallet(state: ResetWalletStep.Deleting) {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 24.dp),
         verticalArrangement = Arrangement.spacedBy(2.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -324,7 +328,9 @@ private fun DeletingWallet(state: ResetWalletStep.Deleting) {
 private fun WalletDeleted() {
     val context = LocalContext.current
     Column(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 24.dp),
         verticalArrangement = Arrangement.spacedBy(2.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

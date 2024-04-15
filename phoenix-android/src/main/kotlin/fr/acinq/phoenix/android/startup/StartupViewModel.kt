@@ -26,6 +26,7 @@ import fr.acinq.lightning.crypto.LocalKeyManager
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.services.NodeService
+import fr.acinq.phoenix.managers.DatabaseManager
 import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.managers.nodeIdHash
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -96,9 +97,10 @@ class StartupViewModel : ViewModel() {
             decryptionState.value = StartupDecryptionState.SeedInputFallback.Error.Other(e)
         }) {
             val seed = MnemonicCode.toSeed(mnemonics = words.joinToString(" "), passphrase = "").byteVector()
-            val localKeyManager = LocalKeyManager(seed = seed, chain = NodeParamsManager.chain, remoteSwapInExtendedPublicKey = NodeParamsManager.remoteSwapInXpub)
-            val nodeIdHash = localKeyManager.nodeIdHash()
-            val channelsDbFile = context.getDatabasePath("channels-${NodeParamsManager.chain.name.lowercase()}-$nodeIdHash.sqlite")
+            val chain = NodeParamsManager.chain
+            val localKeyManager = LocalKeyManager(seed = seed, chain = chain, remoteSwapInExtendedPublicKey = NodeParamsManager.remoteSwapInXpub)
+            val nodeId = localKeyManager.nodeKeys.nodeKey.publicKey
+            val channelsDbFile = context.getDatabasePath(DatabaseManager.channelsDbName(chain, nodeId))
             if (channelsDbFile.exists()) {
                 decryptionState.value = StartupDecryptionState.SeedInputFallback.Success.MatchingData
                 val encodedSeed = EncryptedSeed.fromMnemonics(words)

@@ -1,6 +1,7 @@
 import kotlin.Boolean;
 
 PRAGMA foreign_keys = 1;
+PRAGMA journal_mode = WAL;
 
 -- channels table
 -- note: boolean are stored as INTEGER, with 0=false

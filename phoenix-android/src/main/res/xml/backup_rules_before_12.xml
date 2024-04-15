@@ -3,11 +3,11 @@
     <!--
         These backup rules are used by devices running on Android 11 and lower.
     -->
-    <!-- The phoenix backup file is transferred (encrypted, see utils/LocalBackupHelper). -->
+    <!-- The content of the phoenix backup folder is transferred (files are encrypted, see utils/LocalBackupHelper). -->
     <include
         requireFlags="clientSideEncryption"
         domain="file"
-        path="backup/phoenix.bak" />
+        path="phoenix-backup/" />
 
     <!-- Datastore for user preferences is backed-up (but not the internal datastore). -->
     <include

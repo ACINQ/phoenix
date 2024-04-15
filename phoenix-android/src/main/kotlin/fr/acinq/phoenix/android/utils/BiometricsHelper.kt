@@ -19,8 +19,6 @@ package fr.acinq.phoenix.android.utils
 import android.content.Context
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.FragmentActivity
 import fr.acinq.phoenix.android.R
 import org.slf4j.LoggerFactory
