@@ -18,8 +18,8 @@ package fr.acinq.phoenix.db
 
 import co.touchlab.sqliter.DatabaseConfiguration
 import app.cash.sqldelight.db.SqlDriver
-import app.cash.sqldelight.drivers.native.NativeSqliteDriver
-import app.cash.sqldelight.drivers.native.wrapConnection
+import app.cash.sqldelight.driver.native.NativeSqliteDriver
+import app.cash.sqldelight.driver.native.wrapConnection
 import fr.acinq.lightning.Lightning
 import fr.acinq.phoenix.utils.PlatformContext
 import fr.acinq.phoenix.utils.getDatabaseFilesDirectoryPath
@@ -40,7 +40,7 @@ actual fun testChannelsDriver(): SqlDriver {
     val dbDir = getDatabaseFilesDirectoryPath(PlatformContext())
     val configuration = DatabaseConfiguration(
         name = name,
-        version = schema.version,
+        version = schema.version.toInt(),
         extendedConfig = DatabaseConfiguration.Extended(
             basePath = dbDir,
             foreignKeyConstraints = true // <= official solution doesn't work :(
@@ -49,7 +49,13 @@ actual fun testChannelsDriver(): SqlDriver {
             wrapConnection(connection) { schema.create(it) }
         },
         upgrade = { connection, oldVersion, newVersion ->
-            wrapConnection(connection) { schema.migrate(it, oldVersion, newVersion) }
+            wrapConnection(connection) {
+                schema.migrate(
+                    driver = it,
+                    oldVersion = oldVersion.toLong(),
+                    newVersion = newVersion.toLong()
+                )
+            }
         }
     )
     return NativeSqliteDriver(configuration)
@@ -66,7 +72,7 @@ actual fun testPaymentsDriver(): SqlDriver {
     val dbDir = getDatabaseFilesDirectoryPath(PlatformContext())
     val configuration = DatabaseConfiguration(
         name = name,
-        version = schema.version,
+        version = schema.version.toInt(),
         extendedConfig = DatabaseConfiguration.Extended(
             basePath = dbDir,
             foreignKeyConstraints = true // <= official solution doesn't work :(
@@ -75,7 +81,13 @@ actual fun testPaymentsDriver(): SqlDriver {
             wrapConnection(connection) { schema.create(it) }
         },
         upgrade = { connection, oldVersion, newVersion ->
-            wrapConnection(connection) { schema.migrate(it, oldVersion, newVersion) }
+            wrapConnection(connection) {
+                schema.migrate(
+                    driver = it,
+                    oldVersion = oldVersion.toLong(),
+                    newVersion = newVersion.toLong()
+                )
+            }
         }
     )
     return NativeSqliteDriver(configuration)
