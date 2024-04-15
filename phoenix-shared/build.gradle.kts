@@ -176,10 +176,9 @@ sqldelight {
 if (includeAndroid) {
     extensions.configure<com.android.build.gradle.LibraryExtension>("android") {
         namespace = "fr.acinq.phoenix.shared"
-        compileSdk = 33
+        compileSdk = 34
         defaultConfig {
             minSdk = 26
-            targetSdk = 33
             testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }
 
