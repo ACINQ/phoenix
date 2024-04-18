@@ -387,8 +387,8 @@ struct LiquidityAdsView: View {
 						InfoPopoverWindow {
 							Text(
 								"""
-								This liquidity can be consumed over 1 year. \
-								What has not been used after 1 year will be recovered by the service.
+								As you receive funds, liquidity will be consumed and become your balance. \
+								After one year, the remaining unused liquidity will be reclaimed by the service.
 								"""
 							)
 						}
@@ -417,12 +417,13 @@ struct LiquidityAdsView: View {
 		VStack(alignment: HorizontalAlignment.center, spacing: 15) {
 			Text(
 				"""
-				Liquidity is not static. As you receive funds over Lightning, \
-				this new liquidity will be consumed and become your balance. \
-				Your channel's overall capacity will however remain the same.
+				You are requesting an **initial** amount of liquidity. \
+				Liquidity is not constant over time: as you receive funds \
+				over Lightning, the liquidity will be consumed and become \
+				your balance.
 				
-				After one year, the liquidity that has not been consumed will \
-				be recovered by the service.
+				After one year, the remaining unused liquidity will be \
+				reclaimed by the service.
 				"""
 			)
 			.multilineTextAlignment(.center)
