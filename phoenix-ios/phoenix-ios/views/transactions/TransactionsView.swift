@@ -18,8 +18,10 @@ struct TransactionsView: View {
 	
 	private let paymentsPageFetcher = Biz.getPaymentsPageFetcher(name: "TransactionsView")
 	
+	let paymentsCountPublisher = Biz.business.paymentsManager.paymentsCountPublisher()
 	@State var paymentsCount: Int64 = 0
 	
+	let paymentsPagePublisher: AnyPublisher<PaymentsPage, Never>
 	@State var paymentsPage = PaymentsPage(offset: 0, count: 0, rows: [])
 	@State var cachedRows: [WalletPaymentOrderRow] = []
 	@State var sections: [PaymentsSection] = []
@@ -38,6 +40,14 @@ struct TransactionsView: View {
 	
 	@EnvironmentObject var deviceInfo: DeviceInfo
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
+	
+	// --------------------------------------------------
+	// MARK: Init
+	// --------------------------------------------------
+	
+	init() {
+		paymentsPagePublisher = paymentsPageFetcher.paymentsPagePublisher()
+	}
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -131,15 +141,11 @@ struct TransactionsView: View {
 		.onAppear {
 			onAppear()
 		}
-		.task {
-			for await count in Biz.business.paymentsManager.paymentsCountSequence() {
-				paymentsCountChanged(count)
-			}
+		.onReceive(paymentsCountPublisher) {
+			paymentsCountChanged($0)
 		}
-		.task {
-			for await page in paymentsPageFetcher.paymentsPageSequence() {
-				paymentsPageChanged(page)
-			}
+		.onReceive(paymentsPagePublisher) {
+			paymentsPageChanged($0)
 		}
 		.onReceive(syncStatePublisher) {
 			syncStateChanged($0)
@@ -568,9 +574,9 @@ struct TransactionsView: View {
 		// pretty much guaranteed to be in the cache
 		let fetcher = Biz.business.paymentsManager.fetcher
 		let options = PaymentCell.fetchOptions
-		Task { @MainActor in
-			let result = try await fetcher.getPayment(row: row, options: options)
-			if let result {
+		fetcher.getPayment(row: row, options: options) { (result: WalletPaymentInfo?, _) in
+			
+			if let result = result {
 				selectedItem = result
 			}
 		}

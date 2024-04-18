@@ -36,7 +36,11 @@ struct SwapInView: View {
 	
 	@State var activeSheet: ReceiveViewSheet? = nil
 	
+	let swapInWalletPublisher = Biz.business.balanceManager.swapInWalletPublisher()
 	@State var swapInWallet = Biz.business.balanceManager.swapInWalletValue()
+	
+	let swapInAddressPublisher = Biz.business.peerManager.peerStatePublisher().flatMap { $0.swapInWallet.swapInAddressPublisher()
+	}
 	@State var swapInAddressInfo: Lightning_kmpSwapInWallet.SwapInAddressInfo? = nil
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
@@ -126,18 +130,11 @@ struct SwapInView: View {
 		.onAppear {
 			onAppear()
 		}
-		.task {
-			for await wallet in Biz.business.balanceManager.swapInWalletSequence() {
-				swapInWalletChanged(wallet)
-			}
+		.onReceive(swapInWalletPublisher) {
+			swapInWalletChanged($0)
 		}
-		.task {
-			guard let peer = Biz.business.peerManager.peerStateValue() else {
-				return
-			}
-			for await info in peer.swapInWallet.swapInAddressSequence() {
-				swapInAddressChanged(info)
-			}
+		.onReceive(swapInAddressPublisher) {
+			swapInAddressChanged($0)
 		}
 		.onChange(of: swapInAddressType) {
 			swapInAddressTypeChanged($0)

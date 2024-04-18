@@ -118,13 +118,11 @@ class WalletReset {
 		progress.send(.disconnecting)
 		
 		let connectionsManager = Biz.business.connectionsManager
-		cancellables.insert(
-			Task { @MainActor [weak self] in
-				for await connections in connectionsManager.connectionsSequence() {
-					self?.connectionsChanged(connections)
-				}
-			}.autoCancellable()
-		)
+		
+		connectionsManager.connectionsPublisher().sink { (connections: Connections) in
+			self.connectionsChanged(connections)
+		}
+		.store(in: &cancellables)
 		
 		Biz.business.appConnectionsDaemon?.incrementDisconnectCount(
 			target: AppConnectionsDaemon.ControlTarget.companion.All

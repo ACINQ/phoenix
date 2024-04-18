@@ -15,7 +15,7 @@ class ObservableConnectionsMonitor: ObservableObject {
 	@Published var disconnectedAt: Date? = nil
 	@Published var connectingAt: Date? = nil
 	
-	private var cancellables = Array<AnyCancellable>()
+	private var cancellables = Set<AnyCancellable>()
 	
 	init() {
 		let connectionsManager = Biz.business.connectionsManager
@@ -24,13 +24,10 @@ class ObservableConnectionsMonitor: ObservableObject {
 		connections = currentConnections
 		connectionsChanged(currentConnections)
 		
-		cancellables.append(
-			Task { @MainActor [weak self] in
-				for await newConnections in connectionsManager.connectionsSequence() {
-					self?.connectionsChanged(newConnections)
-				}
-			}.autoCancellable()
-		)
+		connectionsManager.connectionsPublisher().sink {[weak self](newConnections: Connections) in
+			self?.connectionsChanged(newConnections)
+			
+		}.store(in: &cancellables)
 	}
 	
 	#if DEBUG // For debugging UI: Force connection state
@@ -99,13 +96,10 @@ class CustomElectrumServerObserver: ObservableObject {
 	init() {
 		let connectionsManager = Biz.business.connectionsManager
 		
-		cancellables.insert(
-			Task { @MainActor [weak self] in
-				for await newConnections in connectionsManager.connectionsSequence() {
-					self?.connectionsChanged(newConnections)
-				}
-			}.autoCancellable()
-		)
+		connectionsManager.connectionsPublisher().sink {[weak self](newConnections: Connections) in
+			self?.connectionsChanged(newConnections)
+			
+		}.store(in: &cancellables)
 		
 		electrumConfig = GroupPrefs.shared.electrumConfig
 		GroupPrefs.shared.electrumConfigPublisher.sink {[weak self](config: ElectrumConfigPrefs?) in
