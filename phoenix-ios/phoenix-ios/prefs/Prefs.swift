@@ -23,6 +23,7 @@ fileprivate enum Key: String {
 	case swapInAddressIndex
 	case hasUpgradedSeedCloudBackups
 	case serverMessageReadIndex
+	case doNotShowChannelImpactWarning
 }
 
 fileprivate enum KeyDeprecated: String {
@@ -133,7 +134,7 @@ class Prefs {
 		set { defaults.hasMergedChannelsForSplicing = newValue }
 	}
 	
-  var hasUpgradedSeedCloudBackups: Bool {
+	var hasUpgradedSeedCloudBackups: Bool {
 		get { defaults.hasUpgradedSeedCloudBackups }
 		set { defaults.hasUpgradedSeedCloudBackups = newValue }
 	}
@@ -157,6 +158,11 @@ class Prefs {
 			}
 		}
 	}
+	
+	var doNotShowChannelImpactWarning: Bool {
+		 get { defaults.doNotShowChannelImpactWarning }
+		 set { defaults.doNotShowChannelImpactWarning = newValue }
+	 }
 	
 	// --------------------------------------------------
 	// MARK: Wallet State
@@ -243,6 +249,7 @@ class Prefs {
 		defaults.removeObject(forKey: Key.swapInAddressIndex.rawValue)
 		defaults.removeObject(forKey: Key.hasUpgradedSeedCloudBackups.rawValue)
 		defaults.removeObject(forKey: Key.serverMessageReadIndex.rawValue)
+		defaults.removeObject(forKey: Key.doNotShowChannelImpactWarning.rawValue)
 		
 		self.backupTransactions.resetWallet(encryptedNodeId: encryptedNodeId)
 		self.backupSeed.resetWallet(encryptedNodeId: encryptedNodeId)
@@ -351,5 +358,10 @@ extension UserDefaults {
 	@objc fileprivate var serverMessageReadIndex: NSNumber? {
 		get { object(forKey: Key.serverMessageReadIndex.rawValue) as? NSNumber }
 		set { set(newValue, forKey: Key.serverMessageReadIndex.rawValue) }
+	}
+	
+	@objc fileprivate var doNotShowChannelImpactWarning: Bool {
+		get { bool(forKey: Key.doNotShowChannelImpactWarning.rawValue) }
+		set { set(newValue, forKey: Key.doNotShowChannelImpactWarning.rawValue) }
 	}
 }
