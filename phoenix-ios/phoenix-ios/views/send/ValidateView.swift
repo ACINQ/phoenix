@@ -54,6 +54,8 @@ struct ValidateView: View {
 	@State var satsPerByte: String = ""
 	@State var parsedSatsPerByte: Result<NSNumber, TextFieldNumberStylerError> = Result.failure(.emptyInput)
 	
+	@State var allowOverpayment = Prefs.shared.allowOverpayment
+	
 	@State var mempoolRecommendedResponse: MempoolRecommendedResponse? = nil
 	
 	@State var comment: String = ""
@@ -163,6 +165,9 @@ struct ValidateView: View {
 		.onChange(of: currencyPickerChoice) { _ in
 			currencyPickerDidChange()
 		}
+		.onReceive(Prefs.shared.allowOverpaymentPublisher) {
+			allowOverpayment = $0
+		}
 		.onReceive(balancePublisher) {
 			balanceDidChange($0)
 		}
@@ -237,7 +242,7 @@ struct ValidateView: View {
 				.disableAutocorrection(true)
 				.fixedSize()
 				.font(.title)
-                .disabled(paymentRequest()?.amount != nil)
+				.disabled(isInvoiceWithAmount() && !allowOverpayment)
 				.multilineTextAlignment(.trailing)
 				.minimumScaleFactor(0.95) // SwiftUI bugs: truncating text in RTL
 				.foregroundColor(isInvalidAmount() ? Color.appNegative : Color.primaryForeground)
@@ -743,7 +748,7 @@ struct ValidateView: View {
 			return model.invoice
 		} else {
 			// Note: there's technically a `paymentRequest` within `Scan.Model_SwapOutFlow_Ready`.
-			// But this method is designed to only pull from `Scan.Model_InvoiceFlow_InvoiceRequest`.
+			// But this method is designed to only pull from `Scan.Model_Bolt11InvoiceFlow_InvoiceRequest`.
 			return nil
 		}
 	}
@@ -783,6 +788,14 @@ struct ValidateView: View {
 		} else {
 			return false
 		}
+	}
+	
+	/// Returns true if this is a Bolt 11 invoice with an (exact) amount.
+	/// When this is the case, we may disable manual editing of the amount field.
+	///
+	func isInvoiceWithAmount() -> Bool {
+		
+		return paymentRequest()?.amount != nil
 	}
 	
 	func priceRange() -> MsatRange? {
