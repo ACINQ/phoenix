@@ -14530,6 +14530,9 @@
     "liquidity amount" : {
 
     },
+    "Liquidity is not static. As you receive funds over Lightning, this new liquidity will be consumed and become your balance. Your channel's overall capacity will however remain the same.\n\nAfter one year, the liquidity that has not been consumed will be recovered by the service." : {
+
+    },
     "Liquidity successfully added!" : {
 
     },
@@ -24495,6 +24498,9 @@
           }
         }
       }
+    },
+    "This liquidity can be consumed over 1 year. What has not been used after 1 year will be recovered by the service." : {
+
     },
     "This means you will not be able to receive payments when Phoenix is in the background. To receive payments, Phoenix must be open and in the foreground." : {
       "extractionState" : "manual",
