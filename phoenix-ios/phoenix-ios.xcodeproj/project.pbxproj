@@ -189,6 +189,8 @@
 		DC9B8EE225D72CC200E13818 /* ForceCloseChannelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9B8EE125D72CC200E13818 /* ForceCloseChannelsView.swift */; };
 		DC9E7EC32A12955300A5F1D0 /* LiquidityHTML.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9E7EC22A12955300A5F1D0 /* LiquidityHTML.swift */; };
 		DC9E7EC62A1295B100A5F1D0 /* liquidity.html in Resources */ = {isa = PBXBuildFile; fileRef = DC9E7EC82A1295B100A5F1D0 /* liquidity.html */; };
+		DCA02B9D2BD065BF0080520F /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = DCA02B9C2BD065BF0080520F /* PrivacyInfo.xcprivacy */; };
+		DCA02B9E2BD069230080520F /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = DCA02B9C2BD065BF0080520F /* PrivacyInfo.xcprivacy */; };
 		DCA125752A27EDDB00DA2F7F /* MempoolRecommendedResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA125742A27EDDB00DA2F7F /* MempoolRecommendedResponse.swift */; };
 		DCA3B41F2A5471C900E6B231 /* MinerFeeInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA3B41E2A5471C900E6B231 /* MinerFeeInfo.swift */; };
 		DCA5391A29F1DDE7001BD3D5 /* SegmentedPicker in Frameworks */ = {isa = PBXBuildFile; productRef = DCA5391929F1DDE7001BD3D5 /* SegmentedPicker */; };
@@ -551,6 +553,7 @@
 		DC9B8EE125D72CC200E13818 /* ForceCloseChannelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForceCloseChannelsView.swift; sourceTree = "<group>"; };
 		DC9E7EC22A12955300A5F1D0 /* LiquidityHTML.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidityHTML.swift; sourceTree = "<group>"; };
 		DC9E7EC72A1295B100A5F1D0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/liquidity.html; sourceTree = "<group>"; };
+		DCA02B9C2BD065BF0080520F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		DCA125742A27EDDB00DA2F7F /* MempoolRecommendedResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MempoolRecommendedResponse.swift; sourceTree = "<group>"; };
 		DCA3B41E2A5471C900E6B231 /* MinerFeeInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinerFeeInfo.swift; sourceTree = "<group>"; };
 		DCA5391B29F7202F001BD3D5 /* ChannelInfoPopup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelInfoPopup.swift; sourceTree = "<group>"; };
@@ -823,6 +826,7 @@
 				DC6D68282AC1DD5C0099929F /* InfoPlist.xcstrings */,
 				DC72C2F025A3CBD6008A927A /* GoogleService-Info.plist */,
 				DC72C2B925A3A450008A927A /* Phoenix.entitlements */,
+				DCA02B9C2BD065BF0080520F /* PrivacyInfo.xcprivacy */,
 				7555FF86242A565B00829871 /* Preview Content */,
 				DC63BDF229AE440A0067A361 /* officers */,
 				53BEFD3C3C84A395C4A66297 /* views */,
@@ -1578,6 +1582,7 @@
 				DC99E95825BA2BA800FB20F7 /* common.css in Resources */,
 				DC6D68272AC1DD5C0099929F /* Localizable.xcstrings in Resources */,
 				7555FF88242A565B00829871 /* Preview Assets.xcassets in Resources */,
+				DCA02B9D2BD065BF0080520F /* PrivacyInfo.xcprivacy in Resources */,
 				DC6D68292AC1DD5C0099929F /* InfoPlist.xcstrings in Resources */,
 				DC67654E25655D93004D4263 /* Colors.xcassets in Resources */,
 				DC72C2F125A3CBD6008A927A /* GoogleService-Info.plist in Resources */,
@@ -1604,6 +1609,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DCA02B9E2BD069230080520F /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
