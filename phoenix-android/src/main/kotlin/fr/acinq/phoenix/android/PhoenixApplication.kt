@@ -21,9 +21,10 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.utils.Logging
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
 import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
+import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
 import fr.acinq.phoenix.legacy.AppContext
 import fr.acinq.phoenix.legacy.internalData
+import fr.acinq.phoenix.legacy.userPrefs
 import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
 import fr.acinq.phoenix.utils.PlatformContext
@@ -32,10 +33,11 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class PhoenixApplication : AppContext() {
 
-    private val _business = MutableStateFlow<PhoenixBusiness?>(null) // by lazy { MutableStateFlow(PhoenixBusiness(PlatformContext(applicationContext))) }
+    private val _business = MutableStateFlow<PhoenixBusiness?>(null)
     val business = _business.asStateFlow()
 
     lateinit var internalDataRepository: InternalDataRepository
+    lateinit var userPrefs: UserPrefsRepository
 
     override fun onCreate() {
         super.onCreate()
@@ -43,6 +45,7 @@ class PhoenixApplication : AppContext() {
         Logging.setupLogger(applicationContext)
         SystemNotificationHelper.registerNotificationChannels(applicationContext)
         internalDataRepository = InternalDataRepository(applicationContext.internalData)
+        userPrefs = UserPrefsRepository(applicationContext.userPrefs)
     }
 
     override fun onLegacyFinish() {
@@ -63,7 +66,7 @@ class PhoenixApplication : AppContext() {
 
     suspend fun clearPreferences() {
         internalDataRepository.clear()
-        UserPrefs.clear(applicationContext)
+        userPrefs.clear()
         LegacyPrefsDatastore.clear(applicationContext)
     }
 }

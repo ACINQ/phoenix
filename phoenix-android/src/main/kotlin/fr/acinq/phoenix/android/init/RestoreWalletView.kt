@@ -53,7 +53,6 @@ import fr.acinq.phoenix.android.controllerFactory
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.security.SeedFileState
 import fr.acinq.phoenix.android.security.SeedManager
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.controllers.init.RestoreWallet
 import fr.acinq.phoenix.utils.MnemonicLanguage

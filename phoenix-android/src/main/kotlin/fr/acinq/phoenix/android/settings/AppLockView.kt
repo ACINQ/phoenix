@@ -29,8 +29,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.*
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import kotlinx.coroutines.launch
 
 
@@ -40,7 +40,7 @@ fun AppLockView(
 ) {
     val context = LocalContext.current
     val authStatus = BiometricsHelper.authStatus(context)
-    val isScreenLockActive by UserPrefs.getIsScreenLockActive(context).collectAsState(null)
+    val isScreenLockActive by userPrefs.getIsScreenLockActive.collectAsState(null)
 
     DefaultScreenLayout {
         DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.accessctrl_title))
@@ -72,6 +72,7 @@ private fun AuthSwitch(
     isScreenLockActive: Boolean?,
 ) {
     val context = LocalContext.current
+    val userPrefs = userPrefs
     val activity = context.findActivity()
     val scope = rememberCoroutineScope()
     var errorMessage by remember { mutableStateOf("") }
@@ -91,7 +92,7 @@ private fun AuthSwitch(
                     if (it) {
                         BiometricsHelper
                         // if user wants to enable screen lock, we don't need to check authentication
-                        UserPrefs.saveIsScreenLockActive(context, true)
+                        userPrefs.saveIsScreenLockActive(true)
                     } else {
                         // if user wants to disable screen lock, we must first check his credentials
                         val promptInfo = BiometricPrompt.PromptInfo.Builder().apply {
@@ -101,7 +102,7 @@ private fun AuthSwitch(
                         BiometricsHelper.getPrompt(
                             activity = activity,
                             onSuccess = {
-                                scope.launch { UserPrefs.saveIsScreenLockActive(context, false) }
+                                scope.launch { userPrefs.saveIsScreenLockActive(false) }
                             },
                             onFailure = { errorCode ->
                                 errorMessage = errorCode?.let { BiometricsHelper.getAuthErrorMessage(context, code = it) } ?: ""

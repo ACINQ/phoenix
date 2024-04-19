@@ -41,8 +41,8 @@ import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.navController
+import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.datastore.SwapAddressFormat
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.data.lnurl.LnurlAuth
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
@@ -53,15 +53,14 @@ fun PaymentSettingsView(
 ) {
     val nc = navController
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
-    val btcUnit = LocalBitcoinUnit.current
+    val userPrefs = userPrefs
 
     var showDescriptionDialog by rememberSaveable { mutableStateOf(false) }
     var showExpiryDialog by rememberSaveable { mutableStateOf(false) }
 
-    val invoiceDefaultDesc by UserPrefs.getInvoiceDefaultDesc(LocalContext.current).collectAsState(initial = "")
-    val invoiceDefaultExpiry by UserPrefs.getInvoiceDefaultExpiry(LocalContext.current).collectAsState(null)
-    val swapAddressFormatState = UserPrefs.getSwapAddressFormat(context).collectAsState(initial = null)
+    val invoiceDefaultDesc by userPrefs.getInvoiceDefaultDesc.collectAsState(initial = "")
+    val invoiceDefaultExpiry by userPrefs.getInvoiceDefaultExpiry.collectAsState(null)
+    val swapAddressFormatState = userPrefs.getSwapAddressFormat.collectAsState(initial = null)
 
     DefaultScreenLayout {
         DefaultScreenHeader(
@@ -108,21 +107,34 @@ fun PaymentSettingsView(
                         when (swapAddressFormat) {
                             SwapAddressFormat.LEGACY -> Text(text = stringResource(id = R.string.paymentsettings_swap_format_legacy_title))
                             SwapAddressFormat.TAPROOT_ROTATE -> Text(text = stringResource(id = R.string.paymentsettings_swap_format_taproot_title))
-                            else -> Text(text = stringResource(id = R.string.utils_unknown))
                         }
                     },
                     enabled = true,
                     selectedItem = swapAddressFormat,
                     preferences = schemes,
                     onPreferenceSubmit = {
-                        scope.launch { UserPrefs.saveSwapAddressFormat(context, it.item) }
+                        scope.launch { userPrefs.saveSwapAddressFormat(it.item) }
                     },
                     initialShowDialog = false
                 )
             }
         }
 
-        val prefLnurlAuthSchemeState = UserPrefs.getLnurlAuthScheme(context).collectAsState(initial = null)
+        val isOverpaymentEnabled by userPrefs.getIsOverpaymentEnabled.collectAsState(initial = false)
+        CardHeader(text = stringResource(id = R.string.paymentsettings_category_outgoing))
+        Card {
+            SettingSwitch(
+                title = stringResource(id = R.string.paymentsettings_overpayment_title),
+                description = stringResource(id = if (isOverpaymentEnabled) R.string.paymentsettings_overpayment_enabled else R.string.paymentsettings_overpayment_disabled),
+                enabled = true,
+                isChecked = isOverpaymentEnabled,
+                onCheckChangeAttempt = {
+                    scope.launch { userPrefs.saveIsOverpaymentEnabled(it) }
+                }
+            )
+        }
+
+        val prefLnurlAuthSchemeState = userPrefs.getLnurlAuthScheme.collectAsState(initial = null)
         val prefLnurlAuthScheme = prefLnurlAuthSchemeState.value
         if (prefLnurlAuthScheme != null) {
             CardHeader(text = stringResource(id = R.string.paymentsettings_category_lnurl))
@@ -152,7 +164,7 @@ fun PaymentSettingsView(
                     selectedItem = prefLnurlAuthScheme,
                     preferences = schemes,
                     onPreferenceSubmit = {
-                        scope.launch { UserPrefs.saveLnurlAuthScheme(context, it.item) }
+                        scope.launch { userPrefs.saveLnurlAuthScheme(it.item) }
                     },
                     initialShowDialog = initialShowLnurlAuthSchemeDialog
                 )
@@ -165,7 +177,7 @@ fun PaymentSettingsView(
             description = invoiceDefaultDesc,
             onDismiss = { showDescriptionDialog = false },
             onConfirm = {
-                scope.launch { UserPrefs.saveInvoiceDefaultDesc(context, it) }
+                scope.launch { userPrefs.saveInvoiceDefaultDesc(it) }
                 showDescriptionDialog = false
             }
         )
@@ -177,7 +189,7 @@ fun PaymentSettingsView(
                 expiry = it,
                 onDismiss = { showExpiryDialog = false },
                 onConfirm = {
-                    scope.launch { UserPrefs.saveInvoiceDefaultExpiry(context, it.toLong()) }
+                    scope.launch { userPrefs.saveInvoiceDefaultExpiry(it.toLong()) }
                     showExpiryDialog = false
                 }
             )

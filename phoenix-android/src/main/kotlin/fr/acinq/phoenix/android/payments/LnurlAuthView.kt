@@ -24,14 +24,13 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
+import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.controllers.payments.Scan
 import fr.acinq.phoenix.data.lnurl.LnurlAuth
 
@@ -42,9 +41,8 @@ fun LnurlAuthView(
     onLoginClick: (Scan.Intent.LnurlAuthFlow) -> Unit,
     onAuthSchemeInfoClick: () -> Unit
 ) {
-    val context = LocalContext.current
     var showHowItWorks by remember { mutableStateOf(false) }
-    val prefAuthScheme by UserPrefs.getLnurlAuthScheme(context).collectAsState(initial = null)
+    val prefAuthScheme by userPrefs.getLnurlAuthScheme.collectAsState(initial = null)
     val isLegacyDomain = remember(model) { LnurlAuth.LegacyDomain.isEligible(model.auth.initialUrl) }
 
     Column(

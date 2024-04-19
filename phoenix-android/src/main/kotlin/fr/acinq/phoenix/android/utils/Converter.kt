@@ -92,9 +92,10 @@ object Converter {
         BitcoinUnit.Btc -> this.msat.toBigDecimal().movePointLeft(11).toDouble()
     }
 
-    /** Format the double as a String using [DecimalFormat]. */
-    fun Double?.toPlainString(): String = this?.takeIf { it > 0 }?.run {
-        DecimalFormat("0.########").format(this)
+    /** Format the [Double] as a String using [DecimalFormat]. */
+    fun Double?.toPlainString(limitDecimal: Boolean = false): String = this?.takeIf { it > 0 }?.run {
+        val df = if (limitDecimal) DecimalFormat("0.00") else DecimalFormat("0.########")
+        df.format(this)
     } ?: ""
 
     /** Converts [MilliSatoshi] to a fiat amount. */

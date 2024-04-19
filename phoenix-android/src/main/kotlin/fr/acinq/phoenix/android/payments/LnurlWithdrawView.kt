@@ -49,7 +49,8 @@ fun LnurlWithdrawView(
     val prefUnit = preferredAmountUnit
     val rate = fiatRate
 
-    var amount by remember { mutableStateOf<MilliSatoshi?>(model.lnurlWithdraw.maxWithdrawable) }
+    val maxWithdrawable = model.lnurlWithdraw.maxWithdrawable
+    var amount by remember { mutableStateOf<MilliSatoshi?>(maxWithdrawable) }
     var amountErrorMessage by remember { mutableStateOf("") }
 
     SplashLayout(
@@ -58,7 +59,7 @@ fun LnurlWithdrawView(
             Text(text = annotatedStringResource(R.string.lnurl_withdraw_header, model.lnurlWithdraw.initialUrl.host), textAlign = TextAlign.Center)
             Spacer(modifier = Modifier.height(16.dp))
             AmountHeroInput(
-                initialAmount = amount,
+                initialAmount = maxWithdrawable,
                 onAmountChange = { newAmount ->
                     amountErrorMessage = ""
                     when {

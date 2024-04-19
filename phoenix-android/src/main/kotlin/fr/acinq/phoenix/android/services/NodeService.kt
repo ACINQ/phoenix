@@ -32,7 +32,7 @@ import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.LegacyMigrationHelper
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
 import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
+import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
 import fr.acinq.phoenix.data.StartupParams
 import fr.acinq.phoenix.data.inFlightPaymentsCount
 import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
@@ -247,14 +247,16 @@ class NodeService : Service() {
         }
 
         // retrieve preferences before starting business
-        val business = (applicationContext as? PhoenixApplication)?.business?.first() ?: throw RuntimeException("invalid context type, should be PhoenixApplication")
-        val electrumServer = UserPrefs.getElectrumServer(applicationContext).first()
-        val isTorEnabled = UserPrefs.getIsTorEnabled(applicationContext).first()
-        val liquidityPolicy = UserPrefs.getLiquidityPolicy(applicationContext).first()
+        val application = (applicationContext as? PhoenixApplication) ?: throw RuntimeException("invalid context type, should be PhoenixApplication")
+        val userPrefs = application.userPrefs
+        val business = application.business.filterNotNull().first()
+        val electrumServer = userPrefs.getElectrumServer.first()
+        val isTorEnabled = userPrefs.getIsTorEnabled.first()
+        val liquidityPolicy = userPrefs.getLiquidityPolicy.first()
         val trustedSwapInTxs = LegacyPrefsDatastore.getMigrationTrustedSwapInTxs(applicationContext).first()
-        val preferredFiatCurrency = UserPrefs.getFiatCurrency(applicationContext).first()
+        val preferredFiatCurrency = userPrefs.getFiatCurrency.first()
 
-        monitorPaymentsJob = serviceScope.launch { monitorPaymentsWhenHeadless(business.peerManager, business.currencyManager) }
+        monitorPaymentsJob = serviceScope.launch { monitorPaymentsWhenHeadless(business.peerManager, business.currencyManager, userPrefs) }
         monitorNodeEventsJob = serviceScope.launch { monitorNodeEvents(business.peerManager, business.nodeParamsManager) }
         monitorFcmTokenJob = serviceScope.launch { monitorFcmToken(business) }
         monitorInFlightPaymentsJob = serviceScope.launch { monitorInFlightPayments(business.peerManager) }
@@ -334,7 +336,7 @@ class NodeService : Service() {
         }
     }
 
-    private suspend fun monitorPaymentsWhenHeadless(peerManager: PeerManager, currencyManager: CurrencyManager) {
+    private suspend fun monitorPaymentsWhenHeadless(peerManager: PeerManager, currencyManager: CurrencyManager, userPrefs: UserPrefsRepository) {
         peerManager.getPeer().eventsFlow.collect { event ->
             when (event) {
                 is PaymentReceived -> {
@@ -342,6 +344,7 @@ class NodeService : Service() {
                         receivedInBackground.add(event.received.amount)
                         SystemNotificationHelper.notifyPaymentsReceived(
                             context = applicationContext,
+                            userPrefs = userPrefs,
                             paymentHash = event.incomingPayment.paymentHash,
                             amount = event.received.amount,
                             rates = currencyManager.ratesFlow.value,

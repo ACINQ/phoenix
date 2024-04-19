@@ -16,7 +16,6 @@
 
 package fr.acinq.phoenix.android.payments.receive
 
-import android.content.Context
 import androidx.annotation.UiThread
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,7 +26,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
-import fr.acinq.bitcoin.Bitcoin
 import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.Lightning
@@ -37,7 +35,7 @@ import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.utils.BitmapHelper
 import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
 import fr.acinq.phoenix.android.utils.datastore.SwapAddressFormat
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
+import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.managers.WalletManager
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -64,7 +62,7 @@ class ReceiveViewModel(
     private val peerManager: PeerManager,
     private val walletManager: WalletManager,
     private val internalDataRepository: InternalDataRepository,
-    private val context: Context,
+    private val userPrefs: UserPrefsRepository
 ): ViewModel() {
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -111,7 +109,7 @@ class ReceiveViewModel(
     @UiThread
     private fun monitorCurrentSwapAddress() {
         viewModelScope.launch {
-            val swapAddressFormat = UserPrefs.getSwapAddressFormat(context).first()
+            val swapAddressFormat = userPrefs.getSwapAddressFormat.first()
             if (swapAddressFormat == SwapAddressFormat.LEGACY) {
                 val legacySwapInAddress = peerManager.getPeer().swapInWallet.legacySwapInAddress
                 val image = BitmapHelper.generateBitmap(legacySwapInAddress).asImageBitmap()
@@ -145,7 +143,7 @@ class ReceiveViewModel(
         override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
             val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as? PhoenixApplication)
             @Suppress("UNCHECKED_CAST")
-            return ReceiveViewModel(chain, peerManager, walletManager, application.internalDataRepository, application.applicationContext) as T
+            return ReceiveViewModel(chain, peerManager, walletManager, application.internalDataRepository, application.userPrefs) as T
         }
     }
 }

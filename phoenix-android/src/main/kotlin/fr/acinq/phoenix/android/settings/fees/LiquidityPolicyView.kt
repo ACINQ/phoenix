@@ -29,7 +29,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -43,16 +42,15 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.fiatRate
+import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.MempoolFeerate
 import fr.acinq.phoenix.data.canRequestLiquidity
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun LiquidityPolicyView(
     onBackClick: () -> Unit,
@@ -61,10 +59,11 @@ fun LiquidityPolicyView(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val userPrefs = userPrefs
 
-    val maxSatFeePrefsFlow = UserPrefs.getIncomingMaxSatFeeInternal(context).collectAsState(null)
-    val maxPropFeePrefsFlow = UserPrefs.getIncomingMaxPropFeeInternal(context).collectAsState(null)
-    val liquidityPolicyPrefsFlow = UserPrefs.getLiquidityPolicy(context).collectAsState(null)
+    val maxSatFeePrefsFlow = userPrefs.getIncomingMaxSatFeeInternal.collectAsState(null)
+    val maxPropFeePrefsFlow = userPrefs.getIncomingMaxPropFeeInternal.collectAsState(null)
+    val liquidityPolicyPrefsFlow = userPrefs.getLiquidityPolicy.collectAsState(null)
 
     val peerManager = business.peerManager
     val notificationsManager = business.notificationsManager
@@ -147,7 +146,7 @@ fun LiquidityPolicyView(
                         keyboardManager?.hide()
                         scope.launch {
                             if (newPolicy != null) {
-                                UserPrefs.saveLiquidityPolicy(context, newPolicy)
+                                userPrefs.saveLiquidityPolicy(newPolicy)
                                 peerManager.updatePeerLiquidityPolicy(newPolicy)
                                 notificationsManager.dismissAllNotifications()
                             }
