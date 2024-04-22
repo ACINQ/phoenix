@@ -96,7 +96,10 @@ public class ShortSheetState: ObservableObject {
 		itemPublisher.sink { (item: ShortSheetItem?) in
 			
 			if item == nil {
-				action()
+				// Attempting to display another ShortSheet won't work until the next RunLoop cycle.
+				DispatchQueue.main.async {
+					action()
+				}
 				cancellables.removeAll()
 			}
 			

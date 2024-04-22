@@ -59,6 +59,7 @@ struct ValidateView: View {
 	@State var comment: String = ""
 	@State var hasPromptedForComment = false
 	
+	@State var hasShownChannelCapacityWarning = false
 	@State var hasPickedSwapOutMode = false
 	
 	@State var didAppear = false
@@ -1442,6 +1443,28 @@ struct ValidateView: View {
 				parsedSatsPerByte: $parsedSatsPerByte,
 				mempoolRecommendedResponse: $mempoolRecommendedResponse
 			)
+		}
+		smartModalState.onNextDidDisappear {
+			maybeShowCapacityImpactWarning()
+		}
+	}
+	
+	func maybeShowCapacityImpactWarning() {
+		log.trace("maybeShowCapacityImpactWarning()")
+		
+		guard !Prefs.shared.doNotShowChannelImpactWarning else {
+			log.debug("Prefs.shared.doNotShowChannelImpact = true")
+			return
+		}
+		guard !hasShownChannelCapacityWarning else {
+			log.debug("hasShownChannelCapacityWarning = true")
+			return
+		}
+		
+		smartModalState.display(dismissable: false) {
+			ChannelSizeImpactWarning()
+		} onWillDisappear: {
+			hasShownChannelCapacityWarning = true
 		}
 	}
 	

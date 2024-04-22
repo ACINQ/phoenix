@@ -5788,6 +5788,9 @@
         }
       }
     },
+    "Channel size impacted" : {
+
+    },
     "Channels are not available, try again later" : {
 
     },
@@ -9242,6 +9245,9 @@
         }
       }
     },
+    "Don't show this message again" : {
+
+    },
     "Don't use addresses from the previous version." : {
       "localizations" : {
         "cs" : {
@@ -11580,6 +11586,9 @@
           }
         }
       }
+    },
+    "Funds sent on-chain are taken from your side of the channel, reducing the channel size by the same amount. Your inbound liquidity remains the same." : {
+
     },
     "Funds will eventually be sent to:" : {
       "localizations" : {
