@@ -43,7 +43,6 @@ import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.utils.*
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.controllers.config.ElectrumConfiguration
 import fr.acinq.phoenix.data.ElectrumConfig
 import fr.acinq.secp256k1.Hex
@@ -57,9 +56,9 @@ import java.text.NumberFormat
 @Composable
 fun ElectrumView() {
     val nc = navController
-    val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val electrumServerInPrefs by UserPrefs.getElectrumServer(context).collectAsState(initial = null)
+    val userPrefs = userPrefs
+    val electrumServerInPrefs by userPrefs.getElectrumServer.collectAsState(initial = null)
     var showCustomServerDialog by rememberSaveable { mutableStateOf(false) }
 
     DefaultScreenLayout {
@@ -78,7 +77,7 @@ fun ElectrumView() {
                         initialAddress = electrumServerInPrefs,
                         onConfirm = { address ->
                             scope.launch {
-                                UserPrefs.saveElectrumServer(context, address)
+                                userPrefs.saveElectrumServer(address)
                                 postIntent(ElectrumConfiguration.Intent.UpdateElectrumServer(address))
                                 showCustomServerDialog = false
                             }

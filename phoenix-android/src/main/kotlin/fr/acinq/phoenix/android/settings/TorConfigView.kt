@@ -25,7 +25,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.utils.Connection
@@ -33,7 +32,7 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.navController
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
+import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.orange
 import fr.acinq.phoenix.android.utils.positiveColor
@@ -41,11 +40,11 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun TorConfigView() {
-    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val business = business
     val nc = navController
-    val torEnabledState = UserPrefs.getIsTorEnabled(context).collectAsState(initial = null)
+    val userPrefs = userPrefs
+    val torEnabledState = userPrefs.getIsTorEnabled.collectAsState(initial = null)
     val connState = business.connectionsManager.connections.collectAsState()
 
     DefaultScreenLayout {
@@ -69,7 +68,7 @@ fun TorConfigView() {
                     onCheckChangeAttempt = {
                         scope.launch {
                             business.appConfigurationManager.updateTorUsage(it)
-                            UserPrefs.saveIsTorEnabled(context, it)
+                            userPrefs.saveIsTorEnabled(it)
                         }
                     }
                 )

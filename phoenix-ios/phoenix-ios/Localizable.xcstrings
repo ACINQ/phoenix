@@ -9777,6 +9777,9 @@
         }
       }
     },
+    "Enable overpayment" : {
+
+    },
     "End date" : {
       "localizations" : {
         "es" : {
@@ -17063,6 +17066,9 @@
           }
         }
       }
+    },
+    "Outgoing payments" : {
+
     },
     "Output" : {
       "comment" : "Label in SummaryInfoGrid",
@@ -28433,6 +28439,9 @@
           }
         }
       }
+    },
+    "You'll be able to overpay Lightning invoices up to 2 times the amount requested. Useful for manual tipping, or as a privacy measure." : {
+
     },
     "You've already paid this invoice. Paying it again could result in stolen funds." : {
       "comment" : "Error message - scanning lightning invoice",

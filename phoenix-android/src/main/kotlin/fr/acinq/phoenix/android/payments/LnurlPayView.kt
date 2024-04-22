@@ -62,14 +62,15 @@ fun LnurlPayView(
     val prefUnit = preferredAmountUnit
     val rate = fiatRate
 
-    var amount by remember { mutableStateOf<MilliSatoshi?>(model.paymentIntent.minSendable) }
+    val minRequestedAmount = model.paymentIntent.minSendable
+    var amount by remember { mutableStateOf<MilliSatoshi?>(minRequestedAmount) }
     var amountErrorMessage by remember { mutableStateOf("") }
 
     SplashLayout(
         header = { BackButtonWithBalance(onBackClick = onBackClick, balance = balance) },
         topContent = {
             AmountHeroInput(
-                initialAmount = amount,
+                initialAmount = minRequestedAmount,
                 onAmountChange = { newAmount ->
                     amountErrorMessage = ""
                     when {

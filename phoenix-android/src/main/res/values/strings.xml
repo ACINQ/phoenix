@@ -613,6 +613,7 @@
     <string name="paymentsettings_title">Payment options</string>
 
     <string name="paymentsettings_category_incoming">Incoming payments</string>
+    <string name="paymentsettings_category_outgoing">Outgoing payments</string>
     <string name="paymentsettings_category_lnurl">LNURL</string>
 
     <string name="paymentsettings_defaultdesc_title">Invoice description</string>
@@ -636,6 +637,10 @@
     <string name="paymentsettings_swap_format_legacy_desc">A less efficient and less private format that does not rotate addresses. However, it is compatible with almost every services and wallets.</string>
     <string name="paymentsettings_swap_format_taproot_title">Taproot (recommended)</string>
     <string name="paymentsettings_swap_format_taproot_desc">Default format, with better privacy, cheaper fees and address rotation. Some services or wallets may however not understand the address.</string>
+
+    <string name="paymentsettings_overpayment_title">Enable overpayment</string>
+    <string name="paymentsettings_overpayment_enabled">You\'ll be able to overpay Lightning invoices up to 2 times the amount requested. Useful for manual tipping, or as a privacy measure.</string>
+    <string name="paymentsettings_overpayment_disabled">Disabled (default)</string>
 
     <!-- settings: currencies -->
 

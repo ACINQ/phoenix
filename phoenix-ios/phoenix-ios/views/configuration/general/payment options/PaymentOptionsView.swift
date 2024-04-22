@@ -33,6 +33,8 @@ fileprivate struct PaymentOptionsList: View {
 	@State var invoiceExpirationDays: Int = Prefs.shared.invoiceExpirationDays
 	let invoiceExpirationDaysOptions = [7, 30, 60]
 
+	@State var allowOverpayment: Bool = Prefs.shared.allowOverpayment
+	
 	@State var notificationSettings = NotificationsManager.shared.settings.value
 	
 	@State var firstAppearance = true
@@ -41,6 +43,7 @@ fileprivate struct PaymentOptionsList: View {
 	@State private var swiftUiBugWorkaroundIdx = 0
 	
 	@Namespace var sectionID_incomingPayments
+	@Namespace var sectionID_outgoingPayments
 	@Namespace var sectionID_backgroundPayments
 	
 	@Environment(\.openURL) var openURL
@@ -65,6 +68,7 @@ fileprivate struct PaymentOptionsList: View {
 		
 		List {
 			section_incomingPayments()
+			section_outgoingPayments()
 			section_backgroundPayments()
 		}
 		.listStyle(.insetGrouped)
@@ -95,6 +99,37 @@ fileprivate struct PaymentOptionsList: View {
 			
 		} // </Section>
 		.id(sectionID_incomingPayments)
+	}
+	
+	@ViewBuilder
+	func section_outgoingPayments() -> some View {
+		
+		Section {
+			
+			Toggle(isOn: $allowOverpayment) {
+				Text("Enable overpayment")
+			}
+			.onChange(of: allowOverpayment) { newValue in
+				Prefs.shared.allowOverpayment = newValue
+			}
+
+			Text(
+				"""
+				You'll be able to overpay Lightning invoices up to 2 times the amount requested. \
+				Useful for manual tipping, or as a privacy measure.
+				"""
+			)
+			.font(.callout)
+			.fixedSize(horizontal: false, vertical: true) // SwiftUI truncation bugs
+			.foregroundColor(Color.secondary)
+			.padding(.top, 8)
+			.padding(.bottom, 4)
+			
+		} /* Section.*/header: {
+			Text("Outgoing payments")
+			
+		} // </Section>
+		.id(sectionID_outgoingPayments)
 	}
 	
 	@ViewBuilder

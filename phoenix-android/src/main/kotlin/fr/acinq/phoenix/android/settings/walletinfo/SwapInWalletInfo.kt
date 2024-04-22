@@ -36,7 +36,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -58,10 +57,10 @@ import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.IconPopup
 import fr.acinq.phoenix.android.components.TextWithIcon
+import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.data.Notification
 import fr.acinq.phoenix.utils.extensions.nextTimeout
@@ -76,10 +75,9 @@ fun SwapInWallet(
     onViewChannelPolicyClick: () -> Unit,
     onAdvancedClick: () -> Unit,
 ) {
-    val context = LocalContext.current
     val btcUnit = LocalBitcoinUnit.current
 
-    val liquidityPolicyInPrefs by UserPrefs.getLiquidityPolicy(context).collectAsState(null)
+    val liquidityPolicyInPrefs by userPrefs.getLiquidityPolicy.collectAsState(null)
     val swapInWallet by business.peerManager.swapInWallet.collectAsState()
     var showAdvancedMenuPopIn by remember { mutableStateOf(false) }
 

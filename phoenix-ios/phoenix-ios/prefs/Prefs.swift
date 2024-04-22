@@ -23,6 +23,7 @@ fileprivate enum Key: String {
 	case swapInAddressIndex
 	case hasUpgradedSeedCloudBackups
 	case serverMessageReadIndex
+	case allowOverpayment
 	case doNotShowChannelImpactWarning
 }
 
@@ -159,6 +160,17 @@ class Prefs {
 		}
 	}
 	
+	lazy private(set) var allowOverpaymentPublisher: AnyPublisher<Bool, Never> = {
+		defaults.publisher(for: \.allowOverpayment, options: [.initial, .new])
+			.removeDuplicates()
+			.eraseToAnyPublisher()
+	}()
+	
+	var allowOverpayment: Bool {
+		get { defaults.allowOverpayment }
+		set { defaults.allowOverpayment = newValue }
+	}
+
 	var doNotShowChannelImpactWarning: Bool {
 		 get { defaults.doNotShowChannelImpactWarning }
 		 set { defaults.doNotShowChannelImpactWarning = newValue }
@@ -249,6 +261,7 @@ class Prefs {
 		defaults.removeObject(forKey: Key.swapInAddressIndex.rawValue)
 		defaults.removeObject(forKey: Key.hasUpgradedSeedCloudBackups.rawValue)
 		defaults.removeObject(forKey: Key.serverMessageReadIndex.rawValue)
+		defaults.removeObject(forKey: Key.allowOverpayment.rawValue)
 		defaults.removeObject(forKey: Key.doNotShowChannelImpactWarning.rawValue)
 		
 		self.backupTransactions.resetWallet(encryptedNodeId: encryptedNodeId)
@@ -350,7 +363,7 @@ extension UserDefaults {
 		set { set(newValue, forKey: Key.swapInAddressIndex.rawValue) }
 	}
   
-  @objc fileprivate var hasUpgradedSeedCloudBackups: Bool {
+	@objc fileprivate var hasUpgradedSeedCloudBackups: Bool {
 		get { bool(forKey: Key.hasUpgradedSeedCloudBackups.rawValue) }
 		set { set(newValue, forKey: Key.hasUpgradedSeedCloudBackups.rawValue) }
 	}
@@ -360,6 +373,11 @@ extension UserDefaults {
 		set { set(newValue, forKey: Key.serverMessageReadIndex.rawValue) }
 	}
 	
+	@objc fileprivate var allowOverpayment: Bool {
+		get { bool(forKey: Key.allowOverpayment.rawValue) }
+		set { set(newValue, forKey: Key.allowOverpayment.rawValue) }
+	}
+
 	@objc fileprivate var doNotShowChannelImpactWarning: Bool {
 		get { bool(forKey: Key.doNotShowChannelImpactWarning.rawValue) }
 		set { set(newValue, forKey: Key.doNotShowChannelImpactWarning.rawValue) }

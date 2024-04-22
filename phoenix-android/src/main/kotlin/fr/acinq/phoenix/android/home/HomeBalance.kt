@@ -19,13 +19,11 @@ package fr.acinq.phoenix.android.home
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -42,9 +40,9 @@ import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.fiatRate
 import fr.acinq.phoenix.android.preferredAmountUnit
+import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.managers.WalletBalance
 import kotlinx.coroutines.flow.firstOrNull
 
@@ -73,13 +71,13 @@ fun HomeBalance(
                 amountTextStyle = MaterialTheme.typography.body2.copy(fontSize = 40.sp),
                 unitTextStyle = MaterialTheme.typography.h3.copy(fontWeight = FontWeight.Light, color = MaterialTheme.colors.primary),
                 isRedacted = isAmountRedacted,
-                onClick = { context, inFiat ->
-                    val mode = UserPrefs.getHomeAmountDisplayMode(context).firstOrNull()
+                onClick = { userPrefs, inFiat ->
+                    val mode = userPrefs.getHomeAmountDisplayMode.firstOrNull()
                     when {
-                        inFiat && mode == HomeAmountDisplayMode.BTC -> UserPrefs.saveHomeAmountDisplayMode(context, HomeAmountDisplayMode.REDACTED)
-                        mode == HomeAmountDisplayMode.BTC -> UserPrefs.saveHomeAmountDisplayMode(context, HomeAmountDisplayMode.FIAT)
-                        mode == HomeAmountDisplayMode.FIAT -> UserPrefs.saveHomeAmountDisplayMode(context, HomeAmountDisplayMode.REDACTED)
-                        mode == HomeAmountDisplayMode.REDACTED -> UserPrefs.saveHomeAmountDisplayMode(context, HomeAmountDisplayMode.BTC)
+                        inFiat && mode == HomeAmountDisplayMode.BTC -> userPrefs.saveHomeAmountDisplayMode(HomeAmountDisplayMode.REDACTED)
+                        mode == HomeAmountDisplayMode.BTC -> userPrefs.saveHomeAmountDisplayMode(HomeAmountDisplayMode.FIAT)
+                        mode == HomeAmountDisplayMode.FIAT -> userPrefs.saveHomeAmountDisplayMode(HomeAmountDisplayMode.REDACTED)
+                        mode == HomeAmountDisplayMode.REDACTED -> userPrefs.saveHomeAmountDisplayMode(HomeAmountDisplayMode.BTC)
                         else -> Unit
                     }
                 }
@@ -133,7 +131,7 @@ private fun IncomingBalance(
                 )
 
                 if (showSwapInHelp) {
-                    val liquidityPolicyInPrefs by UserPrefs.getLiquidityPolicy(LocalContext.current).collectAsState(null)
+                    val liquidityPolicyInPrefs by userPrefs.getLiquidityPolicy.collectAsState(null)
                     val bitcoinUnit = LocalBitcoinUnit.current
                     PopupDialog(
                         onDismiss = { showSwapInHelp = false },

@@ -830,6 +830,7 @@
 				DC6D68282AC1DD5C0099929F /* InfoPlist.xcstrings */,
 				DC72C2F025A3CBD6008A927A /* GoogleService-Info.plist */,
 				DC72C2B925A3A450008A927A /* Phoenix.entitlements */,
+				DCA02B9C2BD065BF0080520F /* PrivacyInfo.xcprivacy */,
 				7555FF86242A565B00829871 /* Preview Content */,
 				DC63BDF229AE440A0067A361 /* officers */,
 				53BEFD3C3C84A395C4A66297 /* views */,
@@ -1587,6 +1588,7 @@
 				DC99E95825BA2BA800FB20F7 /* common.css in Resources */,
 				DC6D68272AC1DD5C0099929F /* Localizable.xcstrings in Resources */,
 				7555FF88242A565B00829871 /* Preview Assets.xcassets in Resources */,
+				DCA02B9D2BD065BF0080520F /* PrivacyInfo.xcprivacy in Resources */,
 				DC6D68292AC1DD5C0099929F /* InfoPlist.xcstrings in Resources */,
 				DC67654E25655D93004D4263 /* Colors.xcassets in Resources */,
 				DC72C2F125A3CBD6008A927A /* GoogleService-Info.plist in Resources */,
@@ -1613,6 +1615,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DCA02B9E2BD069230080520F /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

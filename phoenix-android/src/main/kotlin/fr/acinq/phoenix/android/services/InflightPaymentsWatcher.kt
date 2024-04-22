@@ -39,7 +39,7 @@ import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
+import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
 import fr.acinq.phoenix.data.LocalChannelInfo
 import fr.acinq.phoenix.data.StartupParams
 import fr.acinq.phoenix.data.inFlightPaymentsCount
@@ -88,7 +88,9 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
 
         try {
 
-            val internalData = (applicationContext as PhoenixApplication).internalDataRepository
+            val application = (applicationContext as PhoenixApplication)
+            val internalData = application.internalDataRepository
+            val userPrefs = application.userPrefs
             val inFlightPaymentsCount = internalData.getInFlightPaymentsCount.first()
 
             if (inFlightPaymentsCount == 0) {
@@ -151,7 +153,7 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
 
                                     jobChannelsWatcher = launch {
                                         val mnemonics = encryptedSeed.decrypt()
-                                        business = startBusiness(mnemonics)
+                                        business = startBusiness(mnemonics, userPrefs)
 
                                         business?.connectionsManager?.connections?.first { it.global is Connection.ESTABLISHED }
                                         log.info("connections established, watching channels for in-flight payments...")
@@ -217,14 +219,14 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
         }
     }
 
-    private suspend fun startBusiness(mnemonics: ByteArray): PhoenixBusiness {
+    private suspend fun startBusiness(mnemonics: ByteArray, userPrefs: UserPrefsRepository): PhoenixBusiness {
         // retrieve preferences before starting business
         val business = PhoenixBusiness(PlatformContext(applicationContext))
-        val electrumServer = UserPrefs.getElectrumServer(applicationContext).first()
-        val isTorEnabled = UserPrefs.getIsTorEnabled(applicationContext).first()
-        val liquidityPolicy = UserPrefs.getLiquidityPolicy(applicationContext).first()
+        val electrumServer = userPrefs.getElectrumServer.first()
+        val isTorEnabled = userPrefs.getIsTorEnabled.first()
+        val liquidityPolicy = userPrefs.getLiquidityPolicy.first()
         val trustedSwapInTxs = LegacyPrefsDatastore.getMigrationTrustedSwapInTxs(applicationContext).first()
-        val preferredFiatCurrency = UserPrefs.getFiatCurrency(applicationContext).first()
+        val preferredFiatCurrency = userPrefs.getFiatCurrency.first()
 
         // preparing business
         val seed = business.walletManager.mnemonicsToSeed(EncryptedSeed.toMnemonics(mnemonics), wordList = MnemonicLanguage.English.wordlist())

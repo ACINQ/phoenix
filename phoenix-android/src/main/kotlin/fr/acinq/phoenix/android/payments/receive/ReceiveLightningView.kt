@@ -64,7 +64,6 @@ import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.LiquidityPolicy
-import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnit
@@ -82,12 +81,10 @@ import fr.acinq.phoenix.android.components.TextInput
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.feedback.InfoMessage
 import fr.acinq.phoenix.android.components.feedback.WarningMessage
-import fr.acinq.phoenix.android.navController
+import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.borderColor
 import fr.acinq.phoenix.android.utils.copyToClipboard
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.share
 import fr.acinq.phoenix.data.availableForReceive
 import fr.acinq.phoenix.data.canRequestLiquidity
@@ -318,9 +315,6 @@ private fun EvaluateLiquidityIssuesForPayment(
     onFeeManagementClick: () -> Unit,
     isEditing: Boolean, // do not show the dialog immediately when editing the invoice, it's annoying
 ) {
-    val log = logger("EvaluateLiquidity")
-    val context = LocalContext.current
-
     val channelsMap by business.peerManager.channelsFlow.collectAsState()
     val canRequestLiquidity = remember(channelsMap) { channelsMap.canRequestLiquidity() }
     val availableForReceive = remember(channelsMap) { channelsMap.availableForReceive() }
@@ -328,7 +322,7 @@ private fun EvaluateLiquidityIssuesForPayment(
     val mempoolFeerate by business.appConfigurationManager.mempoolFeerate.collectAsState()
     val swapFee = remember(mempoolFeerate, amount) { mempoolFeerate?.payToOpenEstimationFee(amount = amount ?: 0.msat, hasNoChannels = channelsMap?.values?.filterNot { it.isTerminated }.isNullOrEmpty()) }
 
-    val liquidityPolicyPrefs = UserPrefs.getLiquidityPolicy(context).collectAsState(null)
+    val liquidityPolicyPrefs = userPrefs.getLiquidityPolicy.collectAsState(null)
 
     when (val liquidityPolicy = liquidityPolicyPrefs.value) {
         null -> {}
