@@ -4168,6 +4168,9 @@
         }
       }
     },
+    "As you receive funds, liquidity will be consumed and become your balance. After one year, the remaining unused liquidity will be reclaimed by the service." : {
+
+    },
     "Attention: if the Bitcoin mempool feerate is high, incoming LN payments requiring an on-chain operation could be expensive." : {
       "localizations" : {
         "cs" : {
@@ -14530,9 +14533,6 @@
     "liquidity amount" : {
 
     },
-    "Liquidity is not static. As you receive funds over Lightning, this new liquidity will be consumed and become your balance. Your channel's overall capacity will however remain the same.\n\nAfter one year, the liquidity that has not been consumed will be recovered by the service." : {
-
-    },
     "Liquidity successfully added!" : {
 
     },
@@ -24499,9 +24499,6 @@
         }
       }
     },
-    "This liquidity can be consumed over 1 year. What has not been used after 1 year will be recovered by the service." : {
-
-    },
     "This means you will not be able to receive payments when Phoenix is in the background. To receive payments, Phoenix must be open and in the foreground." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -27677,6 +27674,9 @@
           }
         }
       }
+    },
+    "You are requesting an **initial** amount of liquidity. Liquidity is not constant over time: as you receive funds over Lightning, the liquidity will be consumed and become your balance.\n\nAfter one year, the remaining unused liquidity will be reclaimed by the service." : {
+
     },
     "You are responsible for backing up your recovery phrase." : {
       "extractionState" : "manual",
