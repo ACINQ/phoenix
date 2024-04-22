@@ -17,10 +17,12 @@
 package fr.acinq.phoenix.data
 
 import fr.acinq.bitcoin.Satoshi
+import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.transactions.Transactions
 import fr.acinq.lightning.utils.sat
+import fr.acinq.phoenix.managers.NodeParamsManager
 
 
 /** Inspired from https://mempool.space/api/v1/fees/recommended */
@@ -39,6 +41,10 @@ data class MempoolFeerate(
      */
     fun swapEstimationFee(hasNoChannels: Boolean): Satoshi {
         return Transactions.weight2fee(feerate = FeeratePerKw(hour), weight = DualFundingPayToSpliceWeight) + if (hasNoChannels) 1000.sat else 0.sat
+    }
+
+    fun payToOpenEstimationFee(amount: MilliSatoshi, hasNoChannels: Boolean): Satoshi {
+        return swapEstimationFee(hasNoChannels) + (amount * NodeParamsManager.payToOpenFeeBase / 10_000).truncateToSatoshi()
     }
 
     companion object {

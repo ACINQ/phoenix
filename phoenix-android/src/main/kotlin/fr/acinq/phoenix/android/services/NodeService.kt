@@ -40,6 +40,7 @@ import fr.acinq.phoenix.managers.AppConfigurationManager
 import fr.acinq.phoenix.managers.CurrencyManager
 import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.managers.PeerManager
+import fr.acinq.phoenix.utils.MnemonicLanguage
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -259,7 +260,7 @@ class NodeService : Service() {
         monitorInFlightPaymentsJob = serviceScope.launch { monitorInFlightPayments(business.peerManager) }
 
         // preparing business
-        val seed = business.walletManager.mnemonicsToSeed(EncryptedSeed.toMnemonics(decryptedMnemonics))
+        val seed = business.walletManager.mnemonicsToSeed(EncryptedSeed.toMnemonics(decryptedMnemonics), wordList = MnemonicLanguage.English.wordlist())
         business.walletManager.loadWallet(seed)
         business.appConfigurationManager.updateElectrumConfig(electrumServer)
         business.appConfigurationManager.updatePreferredFiatCurrencies(

@@ -9,59 +9,127 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
+extension Lightning_kmpPeer {
+	
+	fileprivate struct _Key {
+		static var eventsFlowPublisher = 0
+	}
+	
+	func eventsFlowPublisher() -> AnyPublisher<Lightning_kmpPeerEvent, Never> {
+		
+		self.getSetAssociatedObject(storageKey: &_Key.eventsFlowPublisher) {
+			
+			/// Transforming from Kotlin:
+			/// `eventsFlow: SharedFlow<PeerEvent>`
+			///
+			KotlinPassthroughSubject<Lightning_kmpPeerEvent>(
+				self.eventsFlow
+			)
+			.compactMap { $0 }
+			.eraseToAnyPublisher()
+		}
+	}
+}
+
 extension Lightning_kmpElectrumClient {
 	
-	func notificationsSequence() -> AnyAsyncSequence<Lightning_kmpElectrumSubscriptionResponse> {
+	fileprivate struct _Key {
+		static var notificationsPublisher = 0
+	}
+	
+	func notificationsPublisher() -> AnyPublisher<Lightning_kmpElectrumSubscriptionResponse, Never> {
 		
-		return self.notifications
+		self.getSetAssociatedObject(storageKey: &_Key.notificationsPublisher) {
+			
+			/// Transforming from Kotlin:
+			/// `notifications: Flow<ElectrumSubscriptionResponse>`
+			///
+			KotlinPassthroughSubject<Lightning_kmpElectrumSubscriptionResponse>(
+				self.notifications
+			)
 			.compactMap { $0 }
-			.eraseToAnyAsyncSequence()
+			.eraseToAnyPublisher()
+		}
 	}
 }
 
 // MARK: -
 extension Lightning_kmpElectrumWatcher {
 	
-	func upToDateSequence() -> AnyAsyncSequence<Int64> {
+	fileprivate struct _Key {
+		static var upToDatePublisher = 0
+	}
+	
+	func upToDatePublisher() -> AnyPublisher<Int64, Never> {
 		
-		return self.openUpToDateFlow()
-			.compactMap { $0 }
-			.map { $0.int64Value }
-			.eraseToAnyAsyncSequence()
+		self.getSetAssociatedObject(storageKey: &_Key.upToDatePublisher) {
+			
+			/// Transforming from Kotlin:
+			/// `openUpToDateFlow(): Flow<Long>`
+			///
+			KotlinPassthroughSubject<KotlinLong>(
+				self.openUpToDateFlow()
+			)
+			.compactMap { $0?.int64Value }
+			.eraseToAnyPublisher()
+		}
 	}
 }
 
 // MARK: -
 extension Lightning_kmpNodeParams {
 	
-	func nodeEventsSequence() -> AnyAsyncSequence<Lightning_kmpNodeEvents> {
+	fileprivate struct _Key {
+		static var nodeEventsPublisher = 0
+	}
+	
+	func nodeEventsPublisher() -> AnyPublisher<Lightning_kmpNodeEvents, Never> {
 		
-		return self.nodeEvents
+		self.getSetAssociatedObject(storageKey: &_Key.nodeEventsPublisher) {
+			
+			/// Transforming from Kotlin:
+			/// `nodeEvents: SharedFlow<NodeEvents>`
+			///
+			KotlinPassthroughSubject<Lightning_kmpNodeEvents>(
+				self.nodeEvents
+			)
 			.compactMap { $0 }
-			.eraseToAnyAsyncSequence()
+			.eraseToAnyPublisher()
+		}
 	}
 }
 
 extension Lightning_kmpSwapInWallet {
+	
+	fileprivate struct _Key {
+		static var swapInAddressPublisher = 0
+	}
 	
 	struct SwapInAddressInfo {
 		let addr: String
 		let index: Int
 	}
 	
-	func swapInAddressSequence() -> AnyAsyncSequence<SwapInAddressInfo?> {
+	func swapInAddressPublisher() -> AnyPublisher<SwapInAddressInfo?, Never> {
 		
-		return self.swapInAddressFlow
+		self.getSetAssociatedObject(storageKey: &_Key.swapInAddressPublisher) {
+			
+			/// Transforming from Kotlin:
+			/// `MutableStateFlow<Pair<String, Int>?>`
+			KotlinCurrentValueSubject<KotlinPair<NSString, KotlinInt>>(
+				self.swapInAddressFlow
+			)
 			.map {
-				var result: SwapInAddressInfo? = nil
 				if let pair = $0,
-					let addr = pair.first as? String,
-					let index = pair.second
+				   let addr = pair.first as? String,
+				   let index = pair.second
 				{
-					result = SwapInAddressInfo(addr: addr, index: index.intValue)
+					return SwapInAddressInfo(addr: addr, index: index.intValue)
+				} else {
+					return nil
 				}
-				return result
 			}
-			.eraseToAnyAsyncSequence()
+			.eraseToAnyPublisher()
+		}
 	}
 }

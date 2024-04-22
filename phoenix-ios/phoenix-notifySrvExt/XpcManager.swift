@@ -32,54 +32,76 @@ class XpcManager {
 	
 	public static let shared = XpcManager()
 	
-	private var mainAppIsRunning: Bool = false
-	
-	private var queue = DispatchQueue(label: "XpcManager")
 	private var listener: XpcListener? = nil
+	private var xpc: CrossProcessCommunication? = nil
 	
-	private init() {
-		log.trace("init()")
+	private init() {} // Must use shared instance
+	
+	// --------------------------------------------------
+	// MARK: Public Functions
+	// --------------------------------------------------
+	
+	public func register(mainAppIsRunning newListener: @escaping XpcListener) {
+		log.trace("register(mainAppIsRunning:)")
+		assertMainThread()
 		
-		CrossProcessCommunication.shared.start(actor: .notifySrvExt) {[weak self](msg: XpcMessage) in
-			self?.didReceiveXpcMessage(msg)
+		guard listener == nil else {
+			return
 		}
+		
+		listener = newListener
+		setupXpc()
 	}
+	
+	public func unregister() {
+		log.trace("unregister()")
+		assertMainThread()
+		
+		guard listener != nil else {
+			return
+		}
+		
+		listener = nil
+		teardownXpc()
+	}
+	
+	// --------------------------------------------------
+	// MARK: Business management
+	// --------------------------------------------------
+	
+	private func setupXpc() {
+		log.trace("setupXpc()")
+		assertMainThread()
+		
+		xpc = CrossProcessCommunication(
+			actor: .notifySrvExt,
+			receivedMessage: {[weak self](msg: XpcMessage) in
+				self?.didReceiveXpcMessage(msg)
+			}
+		)
+	}
+	
+	private func teardownXpc() {
+		log.trace("teardownXpc()")
+		assertMainThread()
+		
+		xpc = nil
+	}
+	
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
 	
 	private func didReceiveXpcMessage(_ msg: XpcMessage) {
 		log.trace("didReceiveXpcMessage()")
 		assertMainThread()
 		
 		// Receiving a message means the main phoenix app is running.
-		queue.async { [self] in
-			mainAppIsRunning = (msg == .available)
-			if mainAppIsRunning, let serviceListener = listener {
-				DispatchQueue.main.async {
-					serviceListener()
-				}
+		let mainAppIsRunning = (msg == .available)
+		if mainAppIsRunning, let serviceListener = listener {
+			DispatchQueue.main.async {
+				serviceListener()
 			}
-		}
-	}
-	
-	public func register(mainAppIsRunning newListener: @escaping XpcListener) {
-		log.trace("register(mainAppIsRunning:)")
-		
-		queue.async { [self] in
-			if listener == nil {
-				listener = newListener
-				if mainAppIsRunning {
-					DispatchQueue.main.async {
-						newListener()
-					}
-				}
-			}
-		}
-	}
-	
-	public func unregister() {
-		log.trace("unregister()")
-		
-		queue.async { [self] in
-			listener = nil
 		}
 	}
 }

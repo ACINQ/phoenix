@@ -20,37 +20,46 @@ class AppRestoreWalletController(
 
     override fun process(intent: RestoreWallet.Intent) {
         when (intent) {
-            is RestoreWallet.Intent.FilterWordList -> when {
-                intent.predicate.length > 1 -> launch {
-                    val words = MnemonicCode.englishWordlist.filter {
-                        it.startsWith(intent.predicate, ignoreCase = true)
-                    }
-                    model(
-                        RestoreWallet.Model.FilteredWordlist(
-                        uuid = intent.uuid,
-                        predicate = intent.predicate,
-                        words = words
-                    ))
-                }
-                else -> launch {
-                    model(
-                        RestoreWallet.Model.FilteredWordlist(
-                        uuid = intent.uuid,
-                        predicate = intent.predicate,
-                        words = emptyList()
-                    ))
-                }
+            is RestoreWallet.Intent.FilterWordList -> launch {
+                processIntent(intent)
             }
-            is RestoreWallet.Intent.Validate -> {
-                try {
-                    MnemonicCode.validate(intent.mnemonics)
-                    val seed = MnemonicCode.toSeed(intent.mnemonics, passphrase = "")
-                    launch { model(RestoreWallet.Model.ValidMnemonics(intent.mnemonics, seed)) }
-                } catch (e: IllegalArgumentException) {
-                    launch { model(RestoreWallet.Model.InvalidMnemonics) }
-                }
+            is RestoreWallet.Intent.Validate -> launch {
+                processIntent(intent)
             }
         }
     }
 
+    private suspend fun processIntent(
+        intent: RestoreWallet.Intent.FilterWordList
+    ) {
+        when {
+            intent.predicate.length > 1 -> {
+                val words = intent.language.matches(intent.predicate)
+                model(RestoreWallet.Model.FilteredWordlist(
+                    uuid = intent.uuid,
+                    predicate = intent.predicate,
+                    words = words
+                ))
+            }
+            else -> {
+                model(RestoreWallet.Model.FilteredWordlist(
+                    uuid = intent.uuid,
+                    predicate = intent.predicate,
+                    words = emptyList()
+                ))
+            }
+        }
+    }
+
+    private suspend fun processIntent(
+        intent: RestoreWallet.Intent.Validate
+    ) {
+        try {
+            MnemonicCode.validate(intent.mnemonics, intent.language.wordlist())
+            val seed = MnemonicCode.toSeed(intent.mnemonics, passphrase = "")
+            model(RestoreWallet.Model.ValidMnemonics(intent.mnemonics, intent.language, seed))
+        } catch (e: IllegalArgumentException) {
+            model(RestoreWallet.Model.InvalidMnemonics)
+        }
+    }
 }

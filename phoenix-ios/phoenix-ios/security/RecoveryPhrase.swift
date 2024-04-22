@@ -1,4 +1,5 @@
 import Foundation
+import PhoenixShared
 
 
 struct RecoveryPhrase: Codable {
@@ -7,6 +8,10 @@ struct RecoveryPhrase: Codable {
 	
 	var mnemonicsArray: [String] {
 		return mnemonics.split(separator: " ").map { String($0) }
+	}
+	
+	var language: MnemonicLanguage? {
+		return MnemonicLanguage.fromLanguageCode(languageCode)
 	}
 	
 	private init(mnemonicsArray: [String], mnemonicsString: String, languageCode: String) {
@@ -30,10 +35,20 @@ struct RecoveryPhrase: Codable {
 		let mnemonicsString = mnemonicsArray.joined(separator: " ")
 		self.init(mnemonicsArray: mnemonicsArray, mnemonicsString: mnemonicsString, languageCode: languageCode)
 	}
+
+	init(mnemonics mnemonicsArray: [String], language: MnemonicLanguage) {
+		
+		self.init(mnemonics: mnemonicsArray, languageCode: language.code)
+	}
 	
 	init(mnemonics mnemonicsString: String, languageCode: String = "en") {
 		
 		let mnemonicsArray = mnemonicsString.split(separator: " ").map { String($0) }
 		self.init(mnemonicsArray: mnemonicsArray, mnemonicsString: mnemonicsString, languageCode: languageCode)
+	}
+	
+	init(mnemonics mnemonicsString: String, language: MnemonicLanguage) {
+		
+		self.init(mnemonics: mnemonicsString, languageCode: language.code)
 	}
 }

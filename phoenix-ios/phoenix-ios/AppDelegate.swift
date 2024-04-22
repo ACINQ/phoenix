@@ -24,12 +24,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	//	}
 		return UIApplication.shared.delegate as! AppDelegate
 	}
-
+	
 	private var appCancellables = Set<AnyCancellable>()
 	private var groupPrefsCancellables = Set<AnyCancellable>()
 
+	private var isInBackground = false
+	private var xpc: CrossProcessCommunication? = nil
+	
 	public var externalLightningUrlPublisher = PassthroughSubject<String, Never>()
 
+	public var clearPasteboardOnReturnToApp: Bool = false
+
+	
 	override init() {
 	#if DEBUG
 		setenv("CFNETWORK_DIAGNOSTICS", "3", 1);
@@ -47,7 +53,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		_ application: UIApplication,
 		didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
 	) -> Bool {
-
+		log.trace("### application(_:didFinishLaunchingWithOptions:)")
+		
 		let navBarAppearance = UINavigationBarAppearance()
 		navBarAppearance.backgroundColor = .primaryBackground
 		navBarAppearance.shadowColor = .clear // no separator line between navBar & content
@@ -93,20 +100,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			self._applicationWillResignActive(application)
 		}.store(in: &appCancellables)
 
-		CrossProcessCommunication.shared.start(actor: .mainApp) { (_: XpcMessage) in
+		nc.publisher(for: UIApplication.willEnterForegroundNotification).sink { _ in
+			self._applicationWillEnterForeground()
+		}.store(in: &appCancellables)
+		
+		nc.publisher(for: UIApplication.didEnterBackgroundNotification).sink { _ in
+			self._applicationDidEnterBackground()
+		}.store(in: &appCancellables)
+		
+		xpc = CrossProcessCommunication(actor: .mainApp, receivedMessage: {(_: XpcMessage) in
 			self.didReceivePaymentViaAppExtension()
-		}
+		})
 		
 		NotificationsManager.shared.requestPermissionForProvisionalNotifications()
 		
 		return true
 	}
 	
-	/// This function isn't called, because Firebase broke it with their stupid swizzling stuff.
+	// The following functions are not called,
+	// because Firebase broke it with their stupid swizzling stuff.
+	// 
 	func applicationDidBecomeActive(_ application: UIApplication) {/* :( */}
-	
-	/// This function isn't called, because Firebase broke it with their stupid swizzling stuff.
 	func applicationWillResignActive(_ application: UIApplication) {/* :( */}
+//	func applicationWillEnterForeground(_ application: UIApplication) {/* :( */}
+//	func applicationDidEnterBackground(_ application: UIApplication) {/* :( */}
 	
 	func _applicationDidBecomeActive(_ application: UIApplication) {
 		log.trace("### applicationDidBecomeActive(_:)")
@@ -128,12 +145,37 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		// but it's safe to always clear the badge here anyways.
 		//
 		UIApplication.shared.applicationIconBadgeNumber = 0
+		
+		if clearPasteboardOnReturnToApp {
+			if UIPasteboard.general.hasStrings {
+				UIPasteboard.general.string = ""
+			}
+			clearPasteboardOnReturnToApp = false
+		}
 	}
 	
 	func _applicationWillResignActive(_ application: UIApplication) {
 		log.trace("### applicationWillResignActive(_:)")
 		
 		groupPrefsCancellables.removeAll()
+	}
+	
+	func _applicationWillEnterForeground() {
+		log.trace("### applicationWillEnterForeground()")
+		
+		if isInBackground {
+			isInBackground = false
+			xpc?.resume()
+		}
+	}
+	
+	func _applicationDidEnterBackground() {
+		log.trace("### applicationDidEnterBackground()")
+		
+		if !isInBackground {
+			isInBackground = true
+			xpc?.suspend()
+		}
 	}
 	
 	// --------------------------------------------------
@@ -251,14 +293,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		// that change the corresponding API, and aim to make it more accesible for us.
 
 		let business = Biz.business
-		Task { @MainActor in
-			let paymentsDb = try await business.databaseManager.paymentsDb()
-			
+		business.databaseManager.paymentsDb { paymentsDb, _ in
+		
 			let fakePaymentId = WalletPaymentId.IncomingPaymentId(paymentHash: Bitcoin_kmpByteVector32.random())
-			try await paymentsDb.deletePayment(paymentId: fakePaymentId)
+			paymentsDb?.deletePayment(paymentId: fakePaymentId) { _ in
+				// Nothing is actually deleted
+			}
 		}
-		Task { @MainActor in
-			try await business.appDb.deleteBitcoinRate(fiat: "FakeFiatCurrency")
+		business.appDb.deleteBitcoinRate(fiat: "FakeFiatCurrency") { _ in
+			// Nothing is actually deleted
 		}
 	}
 }

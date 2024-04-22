@@ -21,9 +21,12 @@ class AppInitController(
         when (intent) {
             is Initialization.Intent.GenerateWallet -> {
                 launch {
-                    val mnemonics = MnemonicCode.toMnemonics(intent.entropy)
+                    val mnemonics = MnemonicCode.toMnemonics(
+                        entropy = intent.entropy,
+                        wordlist = intent.language.wordlist()
+                    )
                     val seed = MnemonicCode.toSeed(mnemonics, "")
-                    model(Initialization.Model.GeneratedWallet(mnemonics, seed))
+                    model(Initialization.Model.GeneratedWallet(mnemonics, intent.language, seed))
                 }
             }
         }
