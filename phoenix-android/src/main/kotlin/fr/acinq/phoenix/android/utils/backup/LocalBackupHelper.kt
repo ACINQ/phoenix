@@ -161,12 +161,6 @@ object LocalBackupHelper {
 
         val fileName = getBackupFileName(keyManager)
 
-        log.debug("saving encrypted backup to private dir...")
-        val internalBackup = File(context.filesDir, "phoenix-backup")
-        val internalBackupFile = File(internalBackup, fileName)
-        internalBackupFile.writeBytes(encryptedBackup.write())
-        log.debug("encrypted backup successfully saved to private dir")
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             log.debug("saving encrypted backup to public dir through mediastore api...")
             val resolver = context.contentResolver
