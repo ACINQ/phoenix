@@ -16,6 +16,11 @@
 
 package fr.acinq.phoenix.android.initwallet.restore
 
+import android.content.Context
+import android.content.Intent
+import android.os.Build
+import android.provider.DocumentsContract
+import android.provider.MediaStore
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -52,7 +57,16 @@ fun RestorePaymentsBackupView(
     BackHandler { /* Disable back button */ }
 
     val filePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument(),
+        contract =  object : ActivityResultContracts.OpenDocument() {
+            override fun createIntent(context: Context, input: Array<String>): Intent {
+                val intent = super.createIntent(context, input)
+                return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY))
+                } else {
+                    intent
+                }
+            }
+        },
         onResult = { uri ->
             if (uri != null) {
                 vm.restorePaymentsBackup(context, words = words, uri = uri, onBackupRestoreDone = onBackupRestoreDone)
@@ -67,10 +81,10 @@ fun RestorePaymentsBackupView(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(text = "You can manually restore your payments history by importing a Phoenix backup file, if one exists.")
-        Text(text = "Look for a phoenix.bak file in your Documents folder. Note that older versions of Phoenix (before v2.3.0) did not generate backups.")
+        Text(text = "Look for a phoenix.bak file in your Documents folder.")
     }
 
-    Spacer(modifier = Modifier.height(16.dp))
+    Spacer(modifier = Modifier.height(32.dp))
 
     Column(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),

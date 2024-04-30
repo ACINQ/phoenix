@@ -33,8 +33,6 @@ import kotlinx.coroutines.flow.first
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
-import kotlin.time.Duration.Companion.seconds
-import kotlin.time.toJavaDuration
 
 class LocalBackupWorker(val context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
 
@@ -49,6 +47,7 @@ class LocalBackupWorker(val context: Context, workerParams: WorkerParameters) : 
             val keyManager = business.walletManager.keyManager.filterNotNull().first()
             LocalBackupHelper.saveBackupToDisk(context, keyManager)
             log.info("successfully saved backup file to disk")
+
             Result.success()
         } catch (e: Exception) {
             log.error("error when processing local-backup job: ", e)
@@ -71,7 +70,7 @@ class LocalBackupWorker(val context: Context, workerParams: WorkerParameters) : 
         /** Schedule a local-backup-worker job to run once. Existing schedules are replaced. */
         fun scheduleOnce(context: Context) {
             log.info("scheduling local-backup once")
-            val work = OneTimeWorkRequestBuilder<LocalBackupWorker>().setInitialDelay(10.seconds.toJavaDuration()).build()
+            val work = OneTimeWorkRequestBuilder<LocalBackupWorker>().build()
             WorkManager.getInstance(context).enqueueUniqueWork(TAG, ExistingWorkPolicy.REPLACE, work)
         }
 

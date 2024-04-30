@@ -18,6 +18,7 @@ package fr.acinq.phoenix.android.initwallet.restore
 
 import android.content.Context
 import android.net.Uri
+import android.os.Build
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -163,6 +164,10 @@ class RestoreWalletViewModel: InitWalletViewModel() {
                             LocalBackupHelper.restoreDbFile(context, paymentsDbEntry.key, paymentsDbEntry.value)
                             log.info("payments db has been restored")
                             restoreBackupState = RestoreBackupState.Done.BackupRestored
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                LocalBackupHelper.cleanUpOldBackupFile(context, keyManager, encryptedBackup, uri)
+                                log.debug("old backup file cleaned up")
+                            }
                             delay(1000)
                             viewModelScope.launch(Dispatchers.Main) {
                                 onBackupRestoreDone()

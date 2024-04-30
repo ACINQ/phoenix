@@ -19,9 +19,11 @@ package fr.acinq.phoenix.android.utils.backup
 import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.provider.DocumentsContract
 import android.provider.MediaStore
 import androidx.annotation.RequiresApi
 import fr.acinq.bitcoin.ByteVector
@@ -75,12 +77,12 @@ object LocalBackupHelper {
 
             val bos = ByteArrayOutputStream()
             ZipOutputStream(bos).use { zos ->
-                log.info("zipping channels db...")
+                log.debug("zipping channels db...")
                 FileInputStream(channelsDbFile).use { fis ->
                     zos.putNextEntry(ZipEntry(channelsDbFile.name))
                     zos.write(fis.readBytes())
                 }
-                log.info("zipping payments db file...")
+                log.debug("zipping payments db file...")
                 FileInputStream(paymentsDbFile).use { fis ->
                     zos.putNextEntry(ZipEntry(paymentsDbFile.name))
                     zos.write(fis.readBytes())
@@ -98,13 +100,13 @@ object LocalBackupHelper {
             put(MediaStore.MediaColumns.MIME_TYPE, "application/octet-stream")
             put(MediaStore.MediaColumns.RELATIVE_PATH, backupDir)
         }
-        return context.contentResolver.insert(MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL), values)
+        return context.contentResolver.insert(MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY), values)
             ?: throw RuntimeException("failed to insert uri record for backup file")
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun getBackupFileUri(context: Context, fileName: String): Pair<Long, Uri>? {
-        val contentUri = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)
+        val contentUri = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
         // columns to return -- we want the name & modified timestamp
         val projection = arrayOf(
             MediaStore.Files.FileColumns._ID,
@@ -112,7 +114,7 @@ object LocalBackupHelper {
             MediaStore.Files.FileColumns.DATE_MODIFIED,
         )
         // filter on the file's name
-        val selection = "${MediaStore.Files.FileColumns.DISPLAY_NAME} = ? AND ${MediaStore.Files.FileColumns.OWNER_PACKAGE_NAME}"
+        val selection = "${MediaStore.Files.FileColumns.DISPLAY_NAME} = ?"
         val selectionArgs = arrayOf(fileName)
         val resolver = context.contentResolver
 
@@ -130,7 +132,7 @@ object LocalBackupHelper {
                 val fileId = cursor.getLong(idColumn)
                 val actualFileName = cursor.getString(nameColumn)
                 val modifiedAt = cursor.getLong(modifiedAtColumn) * 1000
-                log.info("found backup file with name=$actualFileName modified_at=${modifiedAt.toAbsoluteDateTimeString()}")
+                log.debug("found backup file with name=$actualFileName modified_at=${modifiedAt.toAbsoluteDateTimeString()}")
                 modifiedAt to ContentUris.withAppendedId(contentUri, fileId)
             } else {
                 log.info("no backup file found for name=$fileName")
@@ -162,17 +164,22 @@ object LocalBackupHelper {
         val fileName = getBackupFileName(keyManager)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            log.debug("saving encrypted backup to public dir through mediastore api...")
-            val resolver = context.contentResolver
+            saveBackupThroughMediastore(context, encryptedBackup, fileName)
+        }
+    }
 
-            val uri = getBackupFileUri(context, fileName)?.second ?: createBackupFileUri(context, fileName)
-            resolver.openOutputStream(uri, "w")?.use { outputStream ->
-                val array = encryptedBackup.write()
-                outputStream.write(array)
-                log.debug("encrypted backup successfully saved to public dir ($uri)")
-            } ?: run {
-                log.error("public backup failed: cannot open output stream for uri=$uri")
-            }
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun saveBackupThroughMediastore(context: Context, encryptedBackup: EncryptedBackup, fileName: String) {
+        log.debug("saving encrypted backup to public dir through mediastore api...")
+        val resolver = context.contentResolver
+
+        val uri = getBackupFileUri(context, fileName)?.second ?: createBackupFileUri(context, fileName)
+        resolver.openOutputStream(uri, "w")?.use { outputStream ->
+            val array = encryptedBackup.write()
+            outputStream.write(array)
+            log.debug("encrypted backup successfully saved to public dir ($uri)")
+        } ?: run {
+            log.error("public backup failed: cannot open output stream for uri=$uri")
         }
     }
 
@@ -188,10 +195,22 @@ object LocalBackupHelper {
 
     fun resolveUriContent(context: Context, uri: Uri): EncryptedBackup? {
         val resolver = context.contentResolver
+        val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
         val data = resolver.openInputStream(uri)?.use {
             it.readBytes()
         }
         return data?.let { EncryptedBackup.read(it) }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    fun cleanUpOldBackupFile(context: Context, keyManager: LocalKeyManager, encryptedBackup: EncryptedBackup, oldBackupUri: Uri) {
+        val fileName = getBackupFileName(keyManager)
+        val resolver = context.contentResolver
+        // old backup file needs to be renamed otherwise it will prevent new file from being written -- and it cannot be moved/deleted
+        // later since the file is not attributed to this app installation
+        DocumentsContract.renameDocument(resolver, oldBackupUri, "$fileName.old")
+        // write a new file through the mediastore API so that it's attributed to this app installation
+        saveBackupThroughMediastore(context, encryptedBackup, fileName)
     }
 
     /** Extracts files from zip - folders are unhandled. */
