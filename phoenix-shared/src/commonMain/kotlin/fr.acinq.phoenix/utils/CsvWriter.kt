@@ -128,11 +128,14 @@ class CsvWriter {
                         is IncomingPayment.Origin.OnChain -> {
                             "Swap-in with inputs: ${origin.localInputs.map { it.txid.toString() } }"
                         }
+                        is IncomingPayment.Origin.Offer -> {
+                            "Incoming offer ${origin.metadata.offerId}"
+                        }
                     }
                     is LightningOutgoingPayment -> when (val details = payment.details) {
                         is LightningOutgoingPayment.Details.Normal -> "Outgoing LN payment to ${details.paymentRequest.nodeId.toHex()}"
-                        is LightningOutgoingPayment.Details.KeySend -> "Outgoing LN payment (keysend)"
                         is LightningOutgoingPayment.Details.SwapOut -> "Swap-out to ${details.address}"
+                        is LightningOutgoingPayment.Details.Blinded -> "Offer to ${details.payerKey.publicKey()}"
                     }
                     is SpliceOutgoingPayment -> "Outgoing splice to ${payment.address}"
                     is ChannelCloseOutgoingPayment -> "Channel closing to ${payment.address}"
