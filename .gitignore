@@ -25,3 +25,7 @@ apk
 phoenix-legacy/release
 phoenix-legacy/debug
 .cxx
+
+# LangTool
+.langtool/deepl.authtoken
+
