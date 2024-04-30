@@ -1,4 +1,4 @@
-<!--
+<?xml version="1.0"?><!--
   ~ Copyright 2023 ACINQ SAS
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,15 +12,12 @@
   ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
-  -->
-
-<!--
+  --><!--
   ~ This file contains string resources related to important messages in the app, and should be translated as a priority.
   ~ It should be kept as small as possible.
   ~
   ~ Most technical resource strings should stay in the default `strings.xml` file.
--->
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+--><resources>
 
     <!-- system notifications -->
 
@@ -49,20 +46,6 @@
     <string name="notif_watcher_revoked_commit_title">Bitte öffnen Sie Phoenix</string>
     <string name="notif_watcher_revoked_commit_message">Einige Ihrer Kanäle wurden möglicherweise geschlossen.</string>
 
-    <!-- home: swap help -->
-
-    <string name="home_swapin_help_pending">Wartet auf 3 Bestätigungen.</string>
-    <string name="home_swapin_help_ready_fee">Einzahlungen werden auf Lightning übertragen, wenn die Mining-Gebühren unter %1$s liegen.</string>
-    <string name="home_swapin_help_ready_disabled">Einlagen bleiben auf der Chain, da die automatische Kanalverwaltung deaktiviert ist.</string>
-    <string name="home_swapin_help_generic">On-Chain Guthaben wurde auf Ihre Wallet eingezahlt.</string>
-    <string name="home_swapin_help_button">Tippen Sie für Details</string>
-
-    <!-- home: bottom menu -->
-
-    <string name="menu_settings">Einstellungen</string>
-    <string name="menu_send">Senden</string>
-    <string name="menu_receive">Empfangen</string>
-
     <!-- settings list -->
 
     <string name="settings_general_title">Allgemein</string>
@@ -87,7 +70,21 @@
     <string name="settings_payment_history">Zahlungs-Historie</string>
     <string name="settings_notifications">Benachrichtigungen</string>
 
-	<!-- init wallet / automated wallet creation -->
+    <!-- home: swap help -->
+
+    <string name="home_swapin_help_pending">Wartet auf 3 Bestätigungen.</string>
+    <string name="home_swapin_help_ready_fee">Einzahlungen werden auf Lightning übertragen, wenn die Mining-Gebühren unter %1$s liegen.</string>
+    <string name="home_swapin_help_ready_disabled">Einlagen bleiben auf der Chain, da die automatische Kanalverwaltung deaktiviert ist.</string>
+    <string name="home_swapin_help_generic">On-Chain Guthaben wurde auf Ihre Wallet eingezahlt.</string>
+    <string name="home_swapin_help_button">Tippen Sie für Details</string>
+
+    <!-- home: bottom menu -->
+
+    <string name="menu_settings">Einstellungen</string>
+    <string name="menu_send">Senden</string>
+    <string name="menu_receive">Empfangen</string>
+
+    <!-- init wallet / automated wallet creation -->
 
     <string name="initwallet_create">Neue Wallet erstellen</string>
     <string name="initwallet_restore">Meine Wallet wiederherstellen</string>
@@ -104,13 +101,13 @@
     <string name="restore_seed_invalid_details">Stellen Sie sicher, dass Sie die richtigen Wörter in der richtigen Reihenfolge eingegeben haben.</string>
     <string name="restore_import_button">Wiederherstellen</string>
 
-	<!-- upgrade required dialog -->
+    <!-- upgrade required dialog -->
 
     <string name="upgraderequired_title">Update erforderlich</string>
     <string name="upgraderequired_message">Diese Version von Phoenix (v%1$s) ist nicht mit Ihrer Wallet kompatibel. Bitte aktualisieren Sie die App oder benutzen Sie eine kompatible Version.</string>
     <string name="upgraderequired_button">Update über Google Play</string>
-	
-	<!-- receive view: warning about fee/liquidity -->
+
+    <!-- receive view: warning about fee/liquidity -->
 
     <string name="receive_lightning_warning_title_surefail">Zahlung wird fehlschlagen</string>
     <string name="receive_lightning_warning_title_fee_expected">Gebühr erwartet</string>
@@ -121,7 +118,7 @@
     <string name="receive_lightning_sheet_button_configure">Höchstgebühren konfigurieren</string>
 
     <string name="receive_lightning_warning_message_fee_expected">Es wird wahrscheinlich eine On-Chain-Transaktion benötigen, um diesen Betrag zu erhalten. Die Gebühren werden ungefähr %1$s betragen.</string>
-    <string name="receive_lightning_warning_message_fee_expected_unknown">Es wird wahrscheinlich eine On-Chain-Transaktion notwendig sein, um diesen Betrag zu erhalten.</string>.
+    <string name="receive_lightning_warning_message_fee_expected_unknown">Es wird wahrscheinlich eine On-Chain-Transaktion notwendig sein, um diesen Betrag zu erhalten.</string>
 
     <string name="receive_lightning_warning_message_above_limit">Eine Gebühr von %1$s wird für den Erhalt dieses Betrages geschätzt, und diese Gebühr überschreitet Ihr genehmigtes Limit von %2$s.\n\nErhöhen Sie dieses Limit in den Kanal-Management-Einstellungen.</string>
     <string name="receive_lightning_warning_message_above_limit_or_liquidity">Eine Gebühr von %1$s wird für den Erhalt dieses Betrages geschätzt, und diese Gebühr überschreitet Ihr genehmigtes Limit von %2$s.\n\nErhöhen Sie dieses Limit oder fordern Sie zusätzliche Liquidität an.</string>
@@ -133,7 +130,7 @@
     <string name="receive_onchain_legacy_warning_title">Hinweis zur Migration</string>
     <string name="receive_onchain_legacy_warning">Dies ist Ihre neue Adresse. Verwenden Sie Ihre alten Bitcoin-Adressen von vor der Migration nicht wieder!</string>
 
-	<!-- scanning errors -->
+    <!-- scanning errors -->
 
     <string name="scan_error_expired">Die Rechnung ist abgelaufen.</string>
     <string name="scan_error_already_paid">Diese Zahlung wurde bereits getätigt.</string>
@@ -161,15 +158,15 @@
     <string name="forceclose_confirm_title">Force-Close bestätigen</string>
     <string name="forceclose_confirm_details">Das gesamte Guthaben wird nach einigen Tagen an Ihre finale Wallet gesendet.</string>
     <string name="forceclose_button">Schließung all meiner Kanäle erzwingen</string>
-	
-	<!-- in-app notifications -->
+
+    <!-- in-app notifications -->
 
     <string name="inappnotif_migration_from_legacy">Glückwunsch! Ihre Wallet wurde aktualisiert.</string>
     <string name="inappnotif_migration_from_legacy_action">Änderungen einsehen</string>
     <string name="inappnotif_migration_from_legacy_dialog_title">Ihre On-Chain Bitcoin-Adresse hat sich geändert</string>
     <string name="inappnotif_migration_from_legacy_dialog_body">Verwenden Sie Ihre alten Adressen NICHT wieder! Sie werden nicht mehr funktionieren.\n\nKontaktieren Sie den Support, wenn Sie dies versehentlich getan haben.</string>
-	
-	<string name="inappnotif_backup_seed_message">Erstellen Sie ein Backup Ihrer Wallet, um keine Bitcoins zu verlieren.</string>
+
+    <string name="inappnotif_backup_seed_message">Erstellen Sie ein Backup Ihrer Wallet, um keine Bitcoins zu verlieren.</string>
     <string name="inappnotif_backup_seed_action">Wallet-Backup erstellen</string>
 
     <string name="inappnotif_notification_permission_message">Benachrichtigungen sind in den Android-Einstellungen deaktiviert. Phoenix kann Sie nicht benachrichtigen, wenn eine Zahlung durchgeführt wird.</string>
@@ -204,8 +201,8 @@
     <string name="inappnotif_watchtower_nominal_description_many">%1$d Kanäle wurden erfolgreich geprüft am %2$s. Es wurden keine Probleme festgestellt.</string>
     <string name="inappnotif_watchtower_revokedfound_title">Watchtower-Alarm</string>
     <string name="inappnotif_watchtower_revokedfound_description">Revoked commitments wurden am %1$s für folgende(n) Kanal/Kanäle gefunden: %2$s. Dieser Kanal kann geschlossen werden.</string>
-	
-	<!-- settings: display seed -->
+
+    <!-- settings: display seed -->
 
     <string name="displayseed_instructions">Die Wiederherstellungsphrase (manchmal auch Seed genannt) ist eine Liste von 12 englischen Wörtern. Mit ihr können Sie bei Bedarf wieder vollen Zugriff auf Ihr Guthaben erlangen.\n\n<b>Nur Sie allein sind im Besitz dieses Seeds. Verwahren Sie ihn geschützt vor Zugriff durch Dritte.</b>\n\n<b>Geben Sie den Seed an niemanden weiter</b>.\nVorsicht vor Phishing! Die Entwickler von Phoenix werden Sie niemals nach Ihrem Seed fragen.\n\n<b>Verlieren Sie den Seed nicht</b>.\nVerwahren Sie ihn an einem sicheren Ort (nicht auf diesem Gerät). Wenn Sie den Seed und dieses Gerät verlieren, haben Sie Ihr Guthaben verloren.</string>
     <string name="displayseed_authenticate_button">Seed anzeigen</string>
@@ -267,14 +264,15 @@
     <string name="walletinfo_onchain_swapin_help">Phoenix ist eine Lightning Wallet. Guthaben, die auf der Chain eingehen, wird zunächst automatisch in Lightning umgewandelt, je nach Ihren Einstellungen für die Kanalverwaltung..</string>
     <string name="walletinfo_onchain_swapin_help_faq_link">Sehen Sie, wie es funktioniert</string>
     <string name="walletinfo_onchain_swapin_policy_view">Tippen, um dies zu konfigurieren.</string>
+    <string name="walletinfo_onchain_swapin_empty">Es sind keine Swaps in Bearbeitung.</string>
+
     <string name="walletinfo_onchain_swapin_policy_auto_details">On-Chain-Guthaben wird automatisch in Lightning umgewandelt, wenn die Gebühr <b>weniger als %1$s</b> beträgt.</string>
     <string name="walletinfo_onchain_swapin_policy_auto_details_timeout">Guthaben, die <b>nach %1$d Monaten</b> nicht getauscht wurden, können auf der Kette zurückgefordert werden.</string>
     <string name="walletinfo_onchain_swapin_policy_disabled_details">Die automatische Gebührenregelung <b>ist deaktiviert</b>. Guthaben werden nicht umgewandelt. Sie verbleiben in dieser Wallet.</string>
+
     <string name="walletinfo_onchain_swapin_last_attempt">Letzter Versuch (%1$s).</string>
     <string name="walletinfo_onchain_swapin_last_attempt_disabled">Die automatische Gebührenregelung ist deaktiviert.</string>
     <string name="walletinfo_onchain_swapin_last_attempt_channels_init">Channels were still initializing.</string>
-    <string name="walletinfo_onchain_swapin_empty">Es sind keine Swaps in Bearbeitung.</string>
-
     <string name="walletinfo_onchain_swapin_timeout_1day">Dieser Swap wird in einem Tag auslaufen!</string>
     <string name="walletinfo_onchain_swapin_timeout">Dieser Swap wird in %1$s Tagen auslaufen.</string>
 
@@ -345,7 +343,6 @@
     <string name="liquidityads_estimate_details_duration_help">Die zusätzliche Kapazität bleibt für diese Dauer erhalten.</string>
     <string name="liquidityads_estimate_above_25">Die Gesamtgebühr beträgt mehr als 25% des angeforderten Betrags.</string>
     <string name="liquidityads_over_balance">Die gesamten Gebühren übersteigen Ihr Guthaben.</string>
-
 
     <string name="liquidityads_request_button">Annehmen</string>
     <string name="liquidityads_requesting_spinner">Bearbeitung des Splice…</string>

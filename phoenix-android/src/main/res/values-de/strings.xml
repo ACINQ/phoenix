@@ -1,4 +1,4 @@
-<!--
+<?xml version="1.0"?><!--
   ~ Copyright 2019 ACINQ SAS
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,9 +12,7 @@
   ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
-  -->
-
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+  --><resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">Phoenix Testnet</string>
 
     <!-- system notification channels -->
@@ -47,12 +45,15 @@
 
     <string name="authprompt_title">Entsperren, um fortzufahren</string>
 
+    <!-- utils: placeholders -->
+
     <!-- Startup -->
 
     <string name="startup_binding_service">Dienst wird eingebunden…</string>
     <string name="startup_wait">Wallet wird vorbereitet…</string>
     <string name="startup_wait_legacy_check">Überprüfe Legacy-Wallet…</string>
     <string name="startup_checking_seed">Entsperren…</string>
+
     <string name="startup_starting">Starten…</string>
     <string name="startup_error_generic">Die App konnte nicht gestartet werden.</string>
 
@@ -225,6 +226,8 @@
     <string name="channeldetails_share_subject">Kanal-Daten</string>
     <string name="channeldetails_share_title">Teile Kanal-Daten</string>
 
+    <!-- manual channels data import -->
+
     <!-- home: balance section & misc -->
 
     <string name="home__balance_loading">Lädt…</string>
@@ -233,7 +236,7 @@
     <string name="home__faq_button">FAQ</string>
     <string name="home__payments_none">Verwenden Sie die Schaltflächen Empfangen und Senden unten auf diesem Fenster, um loszulegen!</string>
     <string name="home__payments_more_button">Alle Zahlungen anzeigen…</string>
-	<string name="home__connection__electrum_late">Electrum unsynchron</string>
+    <string name="home__connection__electrum_late">Electrum unsynchron</string>
     <string name="home__connection__bad_cert">Electrum-Zertifikat</string>
     <string name="home__connection__connecting">Verbinde…</string>
     <string name="home__connection__tor_active">Tor aktiviert</string>
@@ -267,7 +270,6 @@
 
     <string name="paymentdetails_loading">Lade Zahlungs-Details…</string>
     <string name="paymentdetails_error">Konnte Zahlungs-Details nicht finden</string>
-
     <string name="paymentdetails_status_channelclose_confirmed"><b>ABGESCHLOSSEN</b> %1$s</string>
     <string name="paymentdetails_status_sent_successful"><b>GESENDET</b> %1$s</string>
     <string name="paymentdetails_status_sent_pending">Ausstehend…</string>
@@ -284,7 +286,6 @@
     <string name="paymentdetails_status_unconfirmed_default">%1$d Bestätigung(en)</string>
     <string name="paymentdetails_status_unconfirmed_with_depth">%1$d/%2$d Bestätigung(en)</string>
     <string name="paymentdetails_status_confirmed">Bestätigt (On-Chain)</string>
-
     <string name="paymentdetails_destination_label">Gesendet an</string>
     <string name="paymentdetails_destination_cpfp_value">Bitcoin-Miner</string>
     <string name="paymentdetails_fees_label">Gebühren</string>
@@ -320,7 +321,6 @@
     <string name="paymentdetails_keysend">Keysend (unaufgeforderte Zahlung)</string>
     <string name="paymentdetails_swapin_address_label">Einzahlungs-Adresse</string>
     <string name="paymentdetails_bitcoin_address_label">Bitcoin-Adresse</string>
-
     <string name="paymentdetails_dualswapin_tx_label">Transaktionen</string>
     <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
 
@@ -330,7 +330,6 @@
     <string name="paymentdetails_closing_type_remote">Remote</string>
     <string name="paymentdetails_closing_type_revoked">Widerrufen</string>
     <string name="paymentdetails_closing_type_other">Andere</string>
-
     <string name="paymentdetails_payment_request_description_label">Rechnungs-Beschreibung</string>
     <string name="paymentdetails_payment_hash_label">Zahlungs-Hash</string>
     <string name="paymentdetails_payment_request_label">Rechnung</string>
@@ -597,6 +596,7 @@
     <string name="walletinfo_descriptor">Deskriptor</string>
     <string name="walletinfo_xpub">Master public key</string>
     <string name="walletinfo_path">(Pfad: %1$s)</string>
+
     <string name="walletinfo_swappable_title">Bereit für Swap</string>
     <string name="walletinfo_confirming_title">Warte auf %1$d Bestätigungen</string>
     <string name="walletinfo_confirmed_title">Bestätigtes Guthaben</string>
@@ -637,7 +637,7 @@
     <string name="mempool_unknown_feerate_title">Mempool-Status unbekannt</string>
     <string name="mempool_unknown_feerate_details">Phoenix konnte den aktuellen Zustand des Mempools nicht abrufen und kann die Geschwindigkeit Ihrer Transaktionen nicht einschätzen.\n\nÜberprüfen Sie den Mempool manuell mit einem Explorer und verwenden Sie eine angemessene Gebühr!</string>
     <string name="mempool_fastest">≈ Nächster Block</string>
-    <string name="mempool_halfhour">≈ 30 Minuten</string>
+    <string name="mempool_halfhour">≈ 30 Minuten</string>`
     <string name="mempool_hour">≈ 1 Stunde</string>
     <string name="mempool_slow">Niedrige Gebührenrate</string>
 
@@ -667,8 +667,9 @@
     <string name="reset_wallet_confirm_seed_balance">Verlieren Sie Ihr Guthaben nicht:\n%1$s (≈ %2$s).</string>
     <string name="reset_wallet_confirm_seed_responsibility">Sie sind für die Speicherung Ihrer Wiederherstellungsphrase verantwortlich.</string>
     <string name="reset_wallet_confirm_button">Wallet löschen</string>
-
     <string name="reset_wallet_success">Wallet wurde erfolgreich zurückgesetzt</string>
     <string name="reset_wallet_failure_title">Zurücksetzen fehlgeschlagen</string>
+
+    <!-- swap input signer tool -->
 
 </resources>
