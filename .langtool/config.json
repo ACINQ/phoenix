@@ -1,0 +1,6 @@
+{
+  "androidResDirectory" : "phoenix-android/src/main/res/",
+  "iosXcstringsFiles" : [
+    "phoenix-ios/phoenix-ios/Localizable.xcstrings"
+  ]
+}
