@@ -287,7 +287,7 @@
     <string name="walletinfo_onchain_swapin_locked_description">Những khoản vốn này sẽ có sẵn từ %1$s ngày trở đi.</string>
 
     <string name="walletinfo_onchain_swapin_refund_title">Vốn bị hủy</string>
-    <string name="walletinfo_onchain_swapin_refund_description">Những khoản tiền này đã không được swap kịp thời. Sử dụng bộ mô tả của ví để truy cập.</string>
+    <string name="walletinfo_onchain_swapin_refund_description">Những khoản tiền này đã không được swap kịp thời.</string>
 
     <string name="walletinfo_onchain_final_about">Ví cuối cùng là nơi tiền vốn sẽ được gửi tới, khi kênh Lightning của bạn bị đóng hoặc gặp sự cố. Bình thường ví này sẽ luôn trống.</string>
 

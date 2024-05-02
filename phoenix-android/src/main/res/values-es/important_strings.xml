@@ -280,7 +280,7 @@
     <string name="walletinfo_onchain_swapin_locked_description">Estos fondos estarán disponibles a partir de %1$s días.</string>
 
     <string name="walletinfo_onchain_swapin_refund_title">Cancelados</string>
-    <string name="walletinfo_onchain_swapin_refund_description">Estos fondos no fueron canjeados a tiempo. Utilice el descriptor de la cartera para acceder a ellos.</string>
+    <string name="walletinfo_onchain_swapin_refund_description">Estos fondos no fueron canjeados a tiempo.</string>
 
     <string name="walletinfo_onchain_final_about">Una cartera en la cadena derivada de su semilla.\n\nLa cartera final es donde se envían los fondos por defecto cuando se cierran sus canales Lightning.</string>
 

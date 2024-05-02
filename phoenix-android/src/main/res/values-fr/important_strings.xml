@@ -280,7 +280,7 @@
     <string name="walletinfo_onchain_swapin_locked_description">Ces fonds seront disponibles d\'ici %1$s jours.</string>
 
     <string name="walletinfo_onchain_swapin_refund_title">Annulés</string>
-    <string name="walletinfo_onchain_swapin_refund_description">Ces fonds n\'ont pas été swappés à temps. Utilisez le descriptor du wallet pour accéder à ces fonds.</string>
+    <string name="walletinfo_onchain_swapin_refund_description">Ces fonds n\'ont pas été swappés à temps.</string>
 
     <string name="walletinfo_onchain_final_about">Un wallet on-chain dérivé de votre clé.\n\nLe wallet final est par défaut là où les fonds seront envoyés lorsqu\'un canal de paiement ferme.</string>
 

@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory
 
 
 sealed class SpliceOutState {
-    object Init: SpliceOutState()
+    data object Init: SpliceOutState()
     data class Preparing(val userAmount: Satoshi, val feeratePerByte: Satoshi): SpliceOutState()
     data class ReadyToSend(val userAmount: Satoshi, val userFeerate: FeeratePerKw, val actualFeerate: FeeratePerKw, val estimatedFee: Satoshi): SpliceOutState()
     data class Executing(val userAmount: Satoshi, val feerate: FeeratePerKw): SpliceOutState()
@@ -50,7 +50,7 @@ sealed class SpliceOutState {
     }
     sealed class Error: SpliceOutState() {
         data class Thrown(val e: Throwable): Error()
-        object NoChannels: Error()
+        data object NoChannels: Error()
     }
 }
 

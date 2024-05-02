@@ -283,7 +283,7 @@
     <string name="walletinfo_onchain_swapin_locked_description">These funds will be available from %1$s days onwards.</string>
 
     <string name="walletinfo_onchain_swapin_refund_title">Cancelled funds</string>
-    <string name="walletinfo_onchain_swapin_refund_description">These funds were not swapped in time. Use the wallet\'s descriptor to access them.</string>
+    <string name="walletinfo_onchain_swapin_refund_description">These funds were not swapped in time. Tap to spend.</string>
 
     <string name="walletinfo_onchain_final_about">The final wallet is where funds are sent when your Lightning channels are closed or when there is a problem. It usually should be empty.</string>
 
@@ -387,5 +387,19 @@
     <string name="spliceout_capacity_disclaimer_title">Channel size impacted</string>
     <string name="spliceout_capacity_disclaimer_body1">Funds sent on-chain are taken from your side of the channel, reducing the channel size by the same amount. Your inbound liquidity remains unchanged.</string>
     <string name="spliceout_capacity_disclaimer_checkbox">Don\'t show that message again.</string>
+
+    <!-- Spend swap-in refund -->
+
+    <string name="swapinrefund_title">Spend cancelled swap-ins</string>
+    <string name="swapinrefund_none_available_label">You don\'t have any available funds from cancelled swap-ins.</string>
+    <string name="swapinrefund_available_label">Available: <b>%1$s</b> (%2$s)</string>
+    <string name="swapinrefund_instructions_1">Use this screen to spend your on-chain funds that were not swapped in time and have been cancelled. Make sure to use a valid address and a reasonable feerate.</string>
+    <string name="swapinrefund_send_button">Send</string>
+    <string name="swapinrefund_sending">Sending funds…</string>
+    <string name="swapinrefund_failed">Transaction error.</string>
+    <string name="swapinrefund_failed_address">This address is not valid.</string>
+    <string name="swapinrefund_failed_cannot_create">Cannot create the refund transaction. Try again.</string>
+    <string name="swapinrefund_success">Transaction published.</string>
+    <string name="swapinrefund_success_details">You can find the transaction spending the funds below. It will not appear in your payments history, so copy its ID now if needed.</string>
 
 </resources>

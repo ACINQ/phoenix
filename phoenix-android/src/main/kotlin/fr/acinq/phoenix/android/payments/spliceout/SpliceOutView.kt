@@ -124,7 +124,8 @@ fun SendSpliceOutView(
                         }
                         feerate = newFeerate
                     },
-                    mempoolFeerate = mempoolFeerate
+                    mempoolFeerate = mempoolFeerate,
+                    enabled = vm.state !is SpliceOutState.Executing || vm.state !is SpliceOutState.Preparing
                 )
             } ?: ProgressView(text = stringResource(id = R.string.send_spliceout_feerate_waiting_for_value), padding = PaddingValues(0.dp))
         }
