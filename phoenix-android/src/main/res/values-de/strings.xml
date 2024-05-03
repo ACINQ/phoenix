@@ -1,4 +1,4 @@
-<!--
+<?xml version="1.0"?><!--
   ~ Copyright 2019 ACINQ SAS
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,9 +12,7 @@
   ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
-  -->
-
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+  --><resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">Phoenix Testnet</string>
 
     <!-- system notification channels -->
@@ -34,6 +32,9 @@
     <string name="notification_headless_title">Läuft im Hintergrund</string>
     <string name="notification_headless_desc">Zeigt an, dass Phoenix im Hintergrund läuft.</string>
 
+    <string name="notification_swap_timeout_title">Swap-Timeout</string>
+    <string name="notification_swap_timeout_desc">Sagt dir, wann ein Swap eine Zeitüberschreitung haben wird.</string>
+
     <!-- init wallet / automated wallet creation -->
 
     <string name="autocreate_generating">Ihre Wallet wird erstellt…</string>
@@ -47,12 +48,33 @@
 
     <string name="authprompt_title">Entsperren, um fortzufahren</string>
 
+    <!-- utils: placeholders -->
+
     <!-- Startup -->
 
     <string name="startup_binding_service">Dienst wird eingebunden…</string>
     <string name="startup_wait">Wallet wird vorbereitet…</string>
     <string name="startup_wait_legacy_check">Überprüfe Legacy-Wallet…</string>
+    <string name="startup_manual_unlock_button">Freischalten</string>
     <string name="startup_checking_seed">Entsperren…</string>
+    <string name="startup_unlocked">Zugang gewährt..</string>
+    <string name="startup_unlock_failure">Entsperren fehlgeschlagen</string>
+    <string name="startup_unlock_failure_keystore">Android Keystore-Fehler</string>
+    <string name="startup_unlock_failure_unhandled_version">Unbehandelte Seed-Version (%1$s)</string>
+    <string name="startup_unlock_failure_fallback">Mit Saatgut freischalten</string>
+
+    <string name="startup_fallback_instructions">Gib deine 12 Wörter ein, um die Brieftasche zu entsperren.\n\nDie Wörter müssen in der richtigen Reihenfolge und mit einem Leerzeichen getrennt eingegeben werden.</string>
+    <string name="startup_fallback_input_label">Wort #%1$d eingeben</string>
+    <string name="startup_fallback_input_label_error">Nicht mehr als 12 Wörter!</string>
+    <string name="startup_fallback_incomplete">Gib den vollständigen Samen ein, um fortzufahren.</string>
+    <string name="startup_fallback_invalid">Dieses Saatgut ist nicht gültig. Achte darauf, dass die Wörter richtig und in der richtigen Reihenfolge sind.</string>
+    <string name="startup_fallback_unlock_button">Brieftasche entsperren</string>
+    <string name="startup_fallback_checking">Saatgut prüfen..</string>
+    <string name="startup_fallback_error_default">Es ist ein Fehler aufgetreten. Bitte versuche es noch einmal.</string>
+    <string name="startup_fallback_error_incorrect_seed">Dieses Saatgut passt nicht zu deinem Geldbeutel.</string>
+    <string name="startup_fallback_success_match">Suchtreffer.\nDas Schreiben auf die Festplatte..</string>
+    <string name="startup_fallback_success_starting">Ab Phoenix..</string>
+
     <string name="startup_starting">Starten…</string>
     <string name="startup_error_generic">Die App konnte nicht gestartet werden.</string>
 
@@ -78,6 +100,7 @@
     <string name="receive_bitcoin_title">Bitcoin</string>
     <string name="receive_bitcoin_help">Dieser QR-Code ist eine klassische Bitcoin-Adresse.\n\nEr kann von fast allen Bitcoin-Wallets gelesen werden, allerdings werden die Zahlungen langsamer sein.</string>
     <string name="receive_bitcoin_address_label">Adresse</string>
+    <string name="receive_bitcoin_generating">Adresse synchronisieren..</string>
     <string name="receive_bitcoin_error">Bitcoin-Adresse konnte nicht generiert werden</string>
     <string name="receive_bitcoin_share_title">Bitcoin-Adresse</string>
     <string name="receive_bitcoin_share_subject">Teile diese Bitcoin-Adresse mit…</string>
@@ -86,6 +109,7 @@
     <string name="receive_lightning_help">Dieser QR-Code ist eine Lightning-Rechnung.\n\nLightning-Zahlungen sind sehr schnell und normalerweise günstiger, werden aber von manchen Wallets nicht unterstützt.\n\nIn diesem Fall bitte nach links wischen, um eine klassische Bitcoin-Adresse zu verwenden.</string>
     <string name="receive_lightning_generating">Wird erstellt…</string>
     <string name="receive_lightning_amount_label">Betrag</string>
+    <string name="receive_lightning_desc_label">Desc</string>
     <string name="receive_lightning_error">Rechnung konnte nicht erstellt werden</string>
     <string name="receive_lightning_share_subject">Lightning-Rechnung</string>
     <string name="receive_lightning_share_title">Teile diese Lightning-Rechnung mit…</string>
@@ -166,6 +190,7 @@
 
     <string name="accessibility_link">Link im Browser öffnen</string>
     <string name="accessibility_explorer_link">Transaktion in einem Explorer öffnen</string>
+    <string name="accessibility_address_explorer_link">Adresse in einem Explorer öffnen</string>
     <string name="validation_empty">Dieses Feld darf nicht leer sein</string>
     <string name="validation_invalid_amount">Bitte geben Sie einen gültigen Betrag ein</string>
     <string name="validation_invalid_number">Bitte geben Sie eine gültige Zahl ein</string>
@@ -198,6 +223,8 @@
     <!-- channels view -->
 
     <string name="channelsview_title">Zahlungs-Kanäle</string>
+    <string name="channelsview_menu_import_channels">Kanäle importieren</string>
+    <string name="channelsview_header">Übersicht</string>
     <string name="channelsview_balance">Guthaben</string>
     <string name="channelsview_balance_about"><b>Guthaben</b> ist das gesamte Guthaben Ihrer aktiven Kanäle. Diesen Betrag können Sie über Lightning ausgeben.</string>
     <string name="channelsview_inbound">Inbound-Liquidität</string>
@@ -212,6 +239,7 @@
     <string name="channeldetails_channel_id">Kanal-ID</string>
     <string name="channeldetails_state">Status</string>
     <string name="channeldetails_spendable">Guthaben</string>
+    <string name="channeldetails_receivable">Inbound-Liquidität</string>
 
     <string name="channeldetails_commitments">Aktive Commitments</string>
     <string name="channeldetails_inactive_commitments">Inaktive Commitments</string>
@@ -225,6 +253,20 @@
     <string name="channeldetails_share_subject">Kanal-Daten</string>
     <string name="channeldetails_share_title">Teile Kanal-Daten</string>
 
+    <!-- manual channels data import -->
+
+    <string name="channelimport_title">Rohdaten der Kanäle importieren</string>
+    <string name="channelimport_instructions">Dieser Bildschirm ist ein Debugging-Tool, mit dem du verschlüsselte Kanaldaten manuell importieren kannst.</string>
+    <string name="channelimport_input_label">Datenblob</string>
+    <string name="channelimport_import_button">Importieren</string>
+    <string name="channelimport_importing">Daten importieren..</string>
+    <string name="channelimport_success">Import erfolgreich</string>
+    <string name="channelimport_success_restart">Du musst Phoenix jetzt neu starten.</string>
+    <string name="channelimport_error_title">Der Import ist fehlgeschlagen</string>
+    <string name="channelimport_error_malformed">Die Daten sind missgebildet. Es wird ein verschlüsselter Hex-Blob erwartet.</string>
+    <string name="channelimport_error_decryption">Die Daten konnten von dieser Wallet nicht entschlüsselt werden.</string>
+    <string name="channelimport_error_unknown_version">Version %1$d wird nicht unterstützt</string>
+
     <!-- home: balance section & misc -->
 
     <string name="home__balance_loading">Lädt…</string>
@@ -233,10 +275,12 @@
     <string name="home__faq_button">FAQ</string>
     <string name="home__payments_none">Verwenden Sie die Schaltflächen Empfangen und Senden unten auf diesem Fenster, um loszulegen!</string>
     <string name="home__payments_more_button">Alle Zahlungen anzeigen…</string>
-	<string name="home__connection__electrum_late">Electrum unsynchron</string>
+    <string name="home__connection__electrum_late">Electrum unsynchron</string>
     <string name="home__connection__bad_cert">Electrum-Zertifikat</string>
     <string name="home__connection__connecting">Verbinde…</string>
     <string name="home__connection__tor_active">Tor aktiviert</string>
+    <string name="home_request_liquidity">Liquidität anfordern</string>
+    <string name="home_inflight_payments">Du hast derzeit %1$d Zahlung(en) in deiner Brieftasche ausstehend.\n\nHalte die App geöffnet, um sicherzustellen, dass diese Zahlungen ohne Probleme abgerechnet werden.</string>
 
     <!-- in-app notifications -->
 
@@ -257,6 +301,8 @@
     <!-- settings: logs -->
 
     <string name="logs_title">App Logs</string>
+    <string name="logs_exporting">Protokolle exportieren..</string>
+    <string name="logs_failed">Fehler: Logs konnten nicht exportiert werden</string>
     <string name="logs_view_button">Logs anzeigen…</string>
     <string name="logs_view_with">Logs anzeigen mit…</string>
     <string name="logs_share_button">Logs teilen…</string>
@@ -268,6 +314,7 @@
     <string name="paymentdetails_loading">Lade Zahlungs-Details…</string>
     <string name="paymentdetails_error">Konnte Zahlungs-Details nicht finden</string>
 
+    <string name="paymentdetails_status_inbound_liquidity_success"><b>ZUGEFÜHRTE LIQUIDITÄT</b> %1$s</string>
     <string name="paymentdetails_status_channelclose_confirmed"><b>ABGESCHLOSSEN</b> %1$s</string>
     <string name="paymentdetails_status_sent_successful"><b>GESENDET</b> %1$s</string>
     <string name="paymentdetails_status_sent_pending">Ausstehend…</string>
@@ -285,6 +332,14 @@
     <string name="paymentdetails_status_unconfirmed_with_depth">%1$d/%2$d Bestätigung(en)</string>
     <string name="paymentdetails_status_confirmed">Bestätigt (On-Chain)</string>
 
+    <string name="paymentdetails_lnurlpay_service">Bedient von</string>
+    <string name="paymentdetails_lnurlpay_action_message_label">Nachricht</string>
+    <string name="paymentdetails_lnurlpay_action_url_label">Link</string>
+    <string name="paymentdetails_lnurlpay_action_url_button">Link öffnen</string>
+    <string name="paymentdetails_lnurlpay_action_aes_label">Nachricht</string>
+    <string name="paymentdetails_lnurlpay_action_aes_decrypting">Nachricht entschlüsseln..</string>
+
+    <string name="paymentdetails_desc_label">Desc.</string>
     <string name="paymentdetails_destination_label">Gesendet an</string>
     <string name="paymentdetails_destination_cpfp_value">Bitcoin-Miner</string>
     <string name="paymentdetails_fees_label">Gebühren</string>
@@ -296,9 +351,11 @@
     <string name="paymentdetails_desc_closing_channel">Kanal-Schließung</string>
     <string name="paymentdetails_desc_legacy_migration">Migration von Legacy-App</string>
     <string name="paymentdetails_desc_cpfp">Beschleunigte Transaktion</string>
+    <string name="paymentdetails_desc_inbound_liquidity">+%1$s eingehende Liquidität</string>
     <string name="paymentdetails_desc_keysend">Spende</string>
     <string name="paymentdetails_desc_swapout">Swap-out an %1$s</string>
     <string name="paymentdetails_desc_swapin">On-Chain Einzahlung</string>
+    <string name="paymentdetails_desc_identifier">Zahlung an %1$s</string>
 
     <string name="paymentdetails_edit_dialog_title">Fügen Sie eine eigene Beschreibung zu dieser Zahlung hinzu</string>
     <string name="paymentdetails_edit_dialog_input_label">Beschreibung</string>
@@ -313,6 +370,7 @@
     <string name="paymentdetails_closing">Kanal-Schließung</string>
     <string name="paymentdetails_splice_outgoing">Ausgehender Splice</string>
     <string name="paymentdetails_splice_cpfp_outgoing">Beschleunigte On-Chain Transaktion</string>
+    <string name="paymentdetails_inbound_liquidity">Inbound-Liquidität anfordern</string>
     <string name="paymentdetails_normal_outgoing">Standard ausgehende Lightning-Zahlung</string>
     <string name="paymentdetails_normal_incoming">Standard eingehende Lightning-Zahlung</string>
     <string name="paymentdetails_swapin">Swap-in Bitcoin-Einzahlung</string>
@@ -321,8 +379,12 @@
     <string name="paymentdetails_swapin_address_label">Einzahlungs-Adresse</string>
     <string name="paymentdetails_bitcoin_address_label">Bitcoin-Adresse</string>
 
+    <string name="paymentdetails_splice_out_channel_label">Gespleißter Kanal</string>
     <string name="paymentdetails_dualswapin_tx_label">Transaktionen</string>
     <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
+
+    <string name="paymentdetails_liquidity_amount_label">Geforderter Betrag</string>
+    <string name="paymentdetails_liquidity_signature_label">Unterschrift</string>
 
     <string name="paymentdetails_closing_type_label">Schließungs-Typ</string>
     <string name="paymentdetails_closing_type_mutual">Einvernehmlich</string>
@@ -331,6 +393,7 @@
     <string name="paymentdetails_closing_type_revoked">Widerrufen</string>
     <string name="paymentdetails_closing_type_other">Andere</string>
 
+    <string name="paymentdetails_pubkey_label">Öffentlicher Zielschlüssel</string>
     <string name="paymentdetails_payment_request_description_label">Rechnungs-Beschreibung</string>
     <string name="paymentdetails_payment_hash_label">Zahlungs-Hash</string>
     <string name="paymentdetails_payment_request_label">Rechnung</string>
@@ -461,12 +524,15 @@
     <string name="prefs_display_theme_dark_label">Dark Theme</string>
     <string name="prefs_display_theme_light_label">Light Theme</string>
     <string name="prefs_display_theme_system_label">Systemeinstellung verwenden</string>
+    <string name="prefs_locale_label">Sprache der Bewerbung</string>
 
     <!-- settings: electrum server -->
 
     <string name="electrum_title">Electrum-Server</string>
     <string name="electrum_about">Um Ihre Zahlungskanäle zu sichern, überwacht Phoenix die Bitcoin-Blockchain über Electrum-Server.\n\nStandardmäßig werden zufällige Server verwendet. Sie können Phoenix auch so konfigurieren, dass es sich nur mit Ihrem eigenen Server verbindet.</string>
     <string name="electrum_block_height_label">Blockhöhe</string>
+    <string name="electrum_connection_dialog_tls_port">Verwende den TLS-Port (Standard 50002).</string>
+    <string name="electrum_connection_dialog_onion_port">Verwende den normalen TCP-Port, nicht den TLS-Port, da es sich um einen Onion-Dienst handelt.</string>
 
     <string name="electrum_connection_closed_with_random">Keine Verbindung zu Electrum</string>
     <string name="electrum_connection_closed_with_custom">Keine Verbindung zu %1$s</string>
@@ -535,6 +601,7 @@
     <string name="paymentsettings_title">Zahlungs-Optionen</string>
 
     <string name="paymentsettings_category_incoming">Eingehende Zahlungen</string>
+    <string name="paymentsettings_category_outgoing">Ausgehende Zahlungen</string>
     <string name="paymentsettings_category_lnurl">LNURL</string>
 
     <string name="paymentsettings_defaultdesc_title">Rechnungs-Beschreibung</string>
@@ -552,6 +619,16 @@
     <string name="paymentsettings_expiry_value">%1$s Sekunden</string>
 
     <string name="paymentsettings_lnurlauth_scheme_title">LNURL Authentifizierungsverfahren</string>
+
+    <string name="paymentsettings_swap_format_title">Bitcoin Adressformat</string>
+    <string name="paymentsettings_swap_format_legacy_title">Erbe</string>
+    <string name="paymentsettings_swap_format_legacy_desc">Ein weniger effizientes und weniger privates Format, bei dem die Adressen nicht rotieren. Es ist jedoch mit fast allen Diensten und Geldbörsen kompatibel.</string>
+    <string name="paymentsettings_swap_format_taproot_title">Taproot (empfohlen)</string>
+    <string name="paymentsettings_swap_format_taproot_desc">Standardformat, mit besserem Datenschutz, günstigeren Gebühren und Adressrotation. Manche Dienste oder Geldbörsen verstehen die Adresse jedoch möglicherweise nicht.</string>
+
+    <string name="paymentsettings_overpayment_title">Überzahlung aktivieren</string>
+    <string name="paymentsettings_overpayment_enabled">Du kannst Blitzrechnungen bis zum 2-fachen des geforderten Betrags überbezahlen. Nützlich für manuelle Trinkgelder oder als Maßnahme zum Schutz der Privatsphäre.</string>
+    <string name="paymentsettings_overpayment_disabled">Deaktiviert (Standard)</string>
 
     <!-- settings: currencies -->
 
@@ -594,18 +671,29 @@
     <!-- settings: wallet info -->
 
     <string name="walletinfo_title">Wallet-Info</string>
+    <string name="walletinfo_descriptor_legacy">Legacy-Deskriptor</string>
     <string name="walletinfo_descriptor">Deskriptor</string>
+    <string name="walletinfo_swapin_user_pubkey">Öffentlicher Schlüssel des Benutzers</string>
+    <string name="walletinfo_swapin_addresses">Adressen tauschen</string>
     <string name="walletinfo_xpub">Master public key</string>
     <string name="walletinfo_path">(Pfad: %1$s)</string>
+
     <string name="walletinfo_swappable_title">Bereit für Swap</string>
     <string name="walletinfo_confirming_title">Warte auf %1$d Bestätigungen</string>
+    <string name="walletinfo_confirming_more">+%1$d mehr..</string>
     <string name="walletinfo_confirmed_title">Bestätigtes Guthaben</string>
     <string name="walletinfo_unconfirmed_title">Unbestätigtes Guthaben</string>
     <string name="walletinfo_incoming_balance">+%1$s eingehend</string>
     <string name="walletinfo_loading_data">Lade Wallet-Daten…</string>
 
+    <string name="swapinaddresses_title">Adressen tauschen</string>
+    <string name="swapinaddresses_sync">Synchronisieren..</string>
+    <string name="swapinaddresses_taproot">Taproot</string>
+    <string name="swapinaddresses_legacy">Erbe</string>
+
     <string name="walletinfo_lightning">Lightning</string>
     <string name="walletinfo_nodeid">Node-ID</string>
+    <string name="walletinfo_legacy_nodeid_toggle">Legacy-Knoten-ID anzeigen</string>
     <string name="walletinfo_legacy_nodeid">Legacy-Node-ID</string>
 
     <string name="walletinfo_onchain_final">Finale Wallet</string>
@@ -637,7 +725,7 @@
     <string name="mempool_unknown_feerate_title">Mempool-Status unbekannt</string>
     <string name="mempool_unknown_feerate_details">Phoenix konnte den aktuellen Zustand des Mempools nicht abrufen und kann die Geschwindigkeit Ihrer Transaktionen nicht einschätzen.\n\nÜberprüfen Sie den Mempool manuell mit einem Explorer und verwenden Sie eine angemessene Gebühr!</string>
     <string name="mempool_fastest">≈ Nächster Block</string>
-    <string name="mempool_halfhour">≈ 30 Minuten</string>
+    <string name="mempool_halfhour">≈ 30 Minuten</string>`
     <string name="mempool_hour">≈ 1 Stunde</string>
     <string name="mempool_slow">Niedrige Gebührenrate</string>
 
@@ -646,6 +734,8 @@
     <string name="splice_error_nochannels">Sie haben keine Kanäle</string>
     <string name="splice_error_aborted_by_peer">Abbruch durch Gegenstelle [%1$s]</string>
     <string name="splice_error_cannot_create_commit">Es kann keine neue Commitment erstellt werden</string>
+    <string name="splice_error_concurrent_remote">Da ist ein weiterer Spleiß in Arbeit</string>
+    <string name="splice_error_channel_not_quiescent">Abgebrochen aufgrund eines Fehlers</string>
     <string name="splice_error_disconnected">Kanal ist nicht verbunden</string>
     <string name="splice_error_funding_error">Funding ist fehlgeschlagen [%1$s]</string>
     <string name="splice_error_insufficient_funds">Kein ausreichendes Guthaben</string>
@@ -653,6 +743,7 @@
     <string name="splice_error_interactive_session">Interaktive TX-Sitzung fehlgeschlagen [%1$s]</string>
     <string name="splice_error_invalid_pubkey">Ungültiges splice-out pubkey Skript</string>
     <string name="splice_error_splice_in_progress">Eine Splice-Zahlung ist bereits im Gange</string>
+    <string name="splice_error_invalid_liquidity_ads">Ungültige Liquidity-Ads-Anfrage: [%1$s]</string>
 
     <!-- reset wallet -->
 
@@ -667,8 +758,23 @@
     <string name="reset_wallet_confirm_seed_balance">Verlieren Sie Ihr Guthaben nicht:\n%1$s (≈ %2$s).</string>
     <string name="reset_wallet_confirm_seed_responsibility">Sie sind für die Speicherung Ihrer Wiederherstellungsphrase verantwortlich.</string>
     <string name="reset_wallet_confirm_button">Wallet löschen</string>
-
+    <string name="reset_wallet_shutting_down">Abschalten..</string>
+    <string name="reset_wallet_deleting_prefs">Löschen von Voreinstellungen..</string>
+    <string name="reset_wallet_deleting_seed">Löschen von Saatgut..</string>
+    <string name="reset_wallet_deleting_db">Löschen von Datenbanken..</string>
     <string name="reset_wallet_success">Wallet wurde erfolgreich zurückgesetzt</string>
     <string name="reset_wallet_failure_title">Zurücksetzen fehlgeschlagen</string>
+
+    <!-- swap input signer tool -->
+
+    <string name="swapin_signer_title">Swap-in-Unterzeichner</string>
+    <string name="swapin_signer_instructions">Mit diesem Debugging-Tool kannst du Swap-In-Eingaben unterschreiben. Verwende es nur, wenn du verstehst, was es bewirkt.</string>
+    <string name="swapin_signer_tx">Vorzeichenlos tx</string>
+    <string name="swapin_signer_sign">Unterschreibe</string>
+    <string name="swapin_signer_signing">Unterschreiben..</string>
+    <string name="swapin_signer_signed_sig">Benutzerunterschrift</string>
+    <string name="swapin_signer_invalid_tx_header">Ungültige Transaktion ohne Vorzeichen</string>
+    <string name="swapin_signer_invalid_tx_details">Prüfe, ob die Eingabe vollständig ist und kein Zeichen fehlt.</string>
+    <string name="swapin_signer_error_header">Eingabe fehlgeschlagen</string>
 
 </resources>
