@@ -1,0 +1,358 @@
+import SwiftUI
+
+fileprivate let filename = "EditPinView"
+#if DEBUG && true
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
+#else
+fileprivate var log = LoggerFactory.shared.logger(filename, .info)
+#endif
+
+struct EditPinView: View {
+	
+	enum EndResult: CustomStringConvertible {
+		case UserCancelled
+		case PinChanged
+		case Failed;
+		
+		var description: String {
+			switch self {
+				case .UserCancelled : return "UserCancelled"
+				case .PinChanged    : return "PinChanged"
+				case .Failed        : return "Failed"
+			}
+		}
+	}
+	
+	let willClose: (EndResult) -> Void
+	let correctPin: String
+	
+	enum EditMode {
+		case Pin0
+		case Pin1
+		case Pin2
+	}
+	
+	@State var editMode: EditMode = .Pin0
+	@State var pin0: String = ""
+	@State var pin1: String = ""
+	@State var pin2: String = ""
+	
+	@State var numberPadDisabled: Bool = false
+	
+	@State var isInvalid: Bool = false
+	
+	@State var isMismatch: Bool = false
+	@State var mismatchIdx: Int = 0
+	
+	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+	
+	init(willClose: @escaping (EndResult) -> Void) {
+		self.willClose = willClose
+		self.correctPin = AppSecurity.shared.getCustomPin() ?? "1234567890"
+	}
+	
+	// --------------------------------------------------
+	// MARK: View Builders
+	// --------------------------------------------------
+	
+	@ViewBuilder
+	var body: some View {
+		
+		layers()
+			.navigationTitle(NSLocalizedString("Edit PIN", comment: "Navigation bar title"))
+			.navigationBarTitleDisplayMode(.inline)
+			.navigationBarBackButtonHidden(true)
+			.navigationBarItems(leading: cancelButton())
+	}
+	
+	@ViewBuilder
+	func layers() -> some View {
+		
+		ZStack {
+			Color.primaryBackground.edgesIgnoringSafeArea(.all)
+			content()
+		}
+	}
+	
+	@ViewBuilder
+	func content() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			prompt()
+			NumberPadView(
+				buttonPressed: numberPadButtonPressed,
+				showHideButton: false,
+				disabled: $numberPadDisabled
+			)
+		}
+		.padding(.bottom)
+	}
+	
+	@ViewBuilder
+	func prompt() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			Spacer()
+			
+			Group {
+				switch editMode {
+				case .Pin0:
+					if pin0.count < PIN_LENGTH {
+						Label {
+							Text("Enter PIN to confirm")
+						} icon: {
+							Image(systemName: "checkmark").foregroundStyle(Color.clear)
+						}
+					} else if pin0 == correctPin {
+						Label("Correct", systemImage: "checkmark").foregroundStyle(Color.appPositive)
+					} else {
+						Label("Incorrect", systemImage: "xmark").foregroundStyle(Color.appNegative)
+					}
+					
+				case .Pin1:
+					if isMismatch {
+						Text("PIN mismatch!").foregroundStyle(Color.appNegative)
+					} else {
+						Text("Enter new PIN")
+					}
+				case .Pin2:
+					if pin2.count < PIN_LENGTH {
+						Text("Confirm new PIN")
+					} else {
+						Text(verbatim: "✔️").foregroundStyle(Color.appPositive)
+					}
+				}
+			}
+			.font(.title2)
+			.padding(.bottom)
+			
+			promptCircles()
+			
+			Spacer()
+		} // </VStack>
+	}
+	
+	@ViewBuilder
+	func promptCircles() -> some View {
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 10) {
+			
+			let pinCount = self.pinCount
+			ForEach(0 ..< PIN_LENGTH, id: \.self) { idx in
+				if idx < pinCount {
+					filledCircle()
+				} else {
+					emptyCircle()
+				}
+			}
+			
+		} // </HStack>
+	}
+	
+	@ViewBuilder
+	func emptyCircle() -> some View {
+		
+		Image(systemName: "circle")
+			.renderingMode(.template)
+			.resizable()
+			.scaledToFit()
+			.frame(width: 24, height: 24)
+			.foregroundColor(circleColor)
+	}
+	
+	@ViewBuilder
+	func filledCircle() -> some View {
+		
+		Image(systemName: "circle.fill")
+			.renderingMode(.template)
+			.resizable()
+			.scaledToFit()
+			.frame(width: 24, height: 24)
+			.foregroundColor(circleColor)
+	}
+	
+	@ViewBuilder
+	func cancelButton() -> some View {
+		
+		Button {
+			didTapCancelButton()
+		} label: {
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Image(systemName: "chevron.backward")
+					.font(.headline.weight(.semibold))
+				Text("Cancel")
+					.padding(.leading, 3)
+			}
+			.foregroundColor(.appNegative)
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: View Helpers
+	// --------------------------------------------------
+	
+	var pinCount: Int {
+		switch editMode {
+			case .Pin0: return pin0.count
+			case .Pin1: return pin1.count
+			case .Pin2: return pin2.count
+		}
+	}
+	
+	var circleColor: Color {
+		return Color.primary.opacity(0.8)
+	}
+	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
+	
+	func numberPadButtonPressed(_ identifier: NumberPadButton) {
+		log.trace("numberPadButtonPressed()")
+		
+		if pin0.count < PIN_LENGTH {
+			if identifier == .delete {
+				pin0 = String(pin0.dropLast())
+			} else {
+				pin0 += identifier.rawValue
+			}
+			
+			if pin0.count == PIN_LENGTH {
+				verifyPin()
+			}
+			
+		} else if pin1.count < PIN_LENGTH {
+			if identifier == .delete {
+				pin1 = String(pin1.dropLast())
+			} else {
+				pin1 += identifier.rawValue
+			}
+			
+			if pin1.count == PIN_LENGTH {
+				nextPin()
+			}
+			if isMismatch { // user started typing new PIN; transition UI back to normal;
+				isMismatch = false
+				mismatchIdx += 1
+			}
+			
+		} else if pin2.count < PIN_LENGTH {
+			if identifier == .delete {
+				pin2 = String(pin2.dropLast())
+			} else {
+				pin2 += identifier.rawValue
+			}
+			
+			if pin2.count == PIN_LENGTH {
+				checkPin()
+			}
+		}
+	}
+		
+	func verifyPin() {
+		log.trace("verifyPin()")
+		
+		if pin0 == correctPin {
+			handleCorrectPin()
+		} else {
+			handleIncorrectPin()
+		}
+	}
+	
+	func handleIncorrectPin() {
+		log.trace("handleIncorrectPin()")
+		
+		numberPadDisabled = true
+		isInvalid = true
+		DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+			self.numberPadDisabled = false
+			self.isInvalid = false
+			self.pin0 = ""
+		}
+	}
+	
+	func handleCorrectPin() {
+		log.trace("handleCorrectPin()")
+		
+		numberPadDisabled = true
+		DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+			self.numberPadDisabled = false
+			self.editMode = .Pin1
+		}
+	}
+	
+	func nextPin() {
+		log.trace("nextPin()")
+		
+		// It looks weird to **immediately** transition the UI to Pin2.
+		// The last circle never gets filled in, and it doesn't feel complete.
+		// So it feels cleaner to do the transition on a timer.
+		
+		numberPadDisabled = true
+		DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
+			
+			self.numberPadDisabled = false
+			self.editMode = .Pin2
+		}
+	}
+	
+	func checkPin() {
+		log.trace("checkPin()")
+		
+		if pin1 == pin2 {
+			savePinAndDismiss()
+		} else {
+			triggerMismatch()
+		}
+	}
+	
+	func triggerMismatch() {
+		log.trace("triggerMismatch()")
+		
+		isMismatch = true
+		editMode = .Pin1
+		
+		numberPadDisabled = true
+		DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
+			
+			self.numberPadDisabled = false
+			self.pin1 = ""
+			self.pin2 = ""
+		}
+		
+		let idx = mismatchIdx
+		DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+			if idx == mismatchIdx {
+				mismatchIdx += 1
+				isMismatch = false
+			}
+		}
+	}
+	
+	func savePinAndDismiss() {
+		log.trace("savePinAndDismiss()")
+		
+		AppSecurity.shared.setCustomPin(pin: pin1) { error in
+			if error != nil {
+				self.dismissView(.Failed)
+			} else {
+				AppSecurity.shared.setPasscodeFallback(enabled: false) { error in
+					self.dismissView(.PinChanged)
+				}
+			}
+		}
+	}
+	
+	func didTapCancelButton() {
+		log.trace("didTapCancelButton()")
+		
+		dismissView(.UserCancelled)
+	}
+	
+	func dismissView(_ result: EndResult) {
+		log.info("dismissView(\(result))")
+		
+		willClose(result)
+		presentationMode.wrappedValue.dismiss()
+	}
+}

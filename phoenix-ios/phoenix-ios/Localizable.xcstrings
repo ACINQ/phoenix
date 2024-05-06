@@ -7010,6 +7010,9 @@
         }
       }
     },
+    "Change PIN" : {
+
+    },
     "Channel Balance Display:" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -8531,6 +8534,9 @@
         }
       }
     },
+    "Confirm new PIN" : {
+
+    },
     "Confirm Payment" : {
       "comment" : "Navigation bar title",
       "localizations" : {
@@ -9560,6 +9566,9 @@
         }
       }
     },
+    "Correct" : {
+
+    },
     "Could not connect to host:" : {
       "localizations" : {
         "ar" : {
@@ -9908,6 +9917,9 @@
           }
         }
       }
+    },
+    "Custom PIN" : {
+
     },
     "Customize amount" : {
       "extractionState" : "manual",
@@ -11037,6 +11049,9 @@
         }
       }
     },
+    "Disable PIN" : {
+      "comment" : "Navigation bar title"
+    },
     "Disabled" : {
       "localizations" : {
         "de" : {
@@ -11925,6 +11940,9 @@
         }
       }
     },
+    "Edit PIN" : {
+      "comment" : "Navigation bar title"
+    },
     "elapsed" : {
       "comment" : "Label in SummaryInfoGrid",
       "localizations" : {
@@ -12341,6 +12359,12 @@
           }
         }
       }
+    },
+    "Enter new PIN" : {
+
+    },
+    "Enter PIN to confirm" : {
+
     },
     "Error" : {
       "comment" : "Label in SummaryInfoGrid",
@@ -12940,6 +12964,9 @@
           }
         }
       }
+    },
+    "Face ID" : {
+
     },
     "FAILED" : {
       "localizations" : {
@@ -16508,6 +16535,9 @@
           }
         }
       }
+    },
+    "Incorrect" : {
+
     },
     "Increase value" : {
       "localizations" : {
@@ -23191,6 +23221,12 @@
         }
       }
     },
+    "PIN" : {
+
+    },
+    "PIN mismatch!" : {
+
+    },
     "Plan ahead to save money later" : {
       "localizations" : {
         "de" : {
@@ -24773,6 +24809,7 @@
       }
     },
     "Require Face ID" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -24813,6 +24850,7 @@
       }
     },
     "Require Touch ID" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -25062,6 +25100,9 @@
           }
         }
       }
+    },
+    "Retry in %@" : {
+
     },
     "Review" : {
       "localizations" : {
@@ -26459,6 +26500,9 @@
           }
         }
       }
+    },
+    "Set PIN" : {
+      "comment" : "Navigation bar title"
     },
     "Settings" : {
       "comment" : "Navigation bar title",
@@ -31556,6 +31600,9 @@
           }
         }
       }
+    },
+    "Touch ID" : {
+
     },
     "transaction" : {
       "localizations" : {

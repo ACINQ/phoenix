@@ -10,16 +10,29 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
+fileprivate enum NavLinkTag: String {
+	case SetCustomPinView
+	case EditCustomPinView
+	case DisableCustomPinView
+}
+
 struct AppAccessView : View {
 	
+	@State private var navLinkTag: NavLinkTag? = nil
+	
 	@State var biometricSupport = AppSecurity.shared.deviceBiometricSupport()
-	@State var biometricsEnabled: Bool
-	@State var passcodeFallbackEnabled: Bool
+	@State var biometricsEnabled: Bool = false
+	@State var passcodeFallbackEnabled: Bool = false
+	@State var customPinEnabled: Bool = false
+	@State var customPinSet: Bool = false
 	
 	@State var ignoreToggle_biometricsEnabled = false
 	@State var ignoreToggle_passcodeFallbackEnabled = false
+	@State var ignoreToggle_customPinEnabled = false
 	
 	@Environment(\.colorScheme) var colorScheme
+	
+	@EnvironmentObject var smartModalState: SmartModalState
 	
 	let willEnterForegroundPublisher = NotificationCenter.default.publisher(for:
 		UIApplication.willEnterForegroundNotification
@@ -30,6 +43,9 @@ struct AppAccessView : View {
 		
 		_biometricsEnabled = State(initialValue: enabledSecurity.contains(.biometrics))
 		_passcodeFallbackEnabled = State(initialValue: enabledSecurity.contains(.passcodeFallback))
+		_customPinEnabled = State(initialValue: enabledSecurity.contains(.customPin))
+		
+		_customPinSet = State(initialValue: AppSecurity.shared.hasCustomPin())
 	}
 	
 	// --------------------------------------------------
@@ -39,16 +55,44 @@ struct AppAccessView : View {
 	@ViewBuilder
 	var body: some View {
 		
-		content()
+		layers()
 			.navigationTitle(NSLocalizedString("App Access", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
+	}
+	
+	@ViewBuilder
+	func layers() -> some View {
+		
+		ZStack {
+			
+			if #unavailable(iOS 16.0) {
+				// iOS 14 & 15 have bugs when using NavigationLink.
+				// The suggested workarounds include using only a single NavigationLink.
+				NavigationLink(
+					destination: navLinkView(),
+					isActive: navLinkTagBinding()
+				) {
+					EmptyView()
+				}
+				.accessibilityHidden(true)
+				
+			} // else: uses.navigationStackDestination()
+			
+			content()
+			
+		} // </ZStack>
+		.navigationStackDestination(isPresented: navLinkTagBinding()) { // For iOS 16+
+			navLinkView()
+		}
 	}
 	
 	@ViewBuilder
 	func content() -> some View {
 		
 		List {
-			section_primary()
+			section_biometrics()
+			section_pin()
+		//	section_status()
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
@@ -61,7 +105,16 @@ struct AppAccessView : View {
 	}
 	
 	@ViewBuilder
-	func section_primary() -> some View {
+	func section_status() -> some View {
+		
+		Section {
+			statusLabel()
+				.padding(.top, 5)
+		}
+	}
+	
+	@ViewBuilder
+	func section_biometrics() -> some View {
 		
 		Section {
 			toggle_biometrics()
@@ -70,59 +123,33 @@ struct AppAccessView : View {
 			
 			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 				
-				statusLabel()
-					.padding(.top, 5)
-				
-				if biometricsEnabled {
-					passcodeFallbackOption()
-						.padding(.top, 30)
-				}
+				passcodeFallbackOption()
 				
 			} // </VStack>
-			.padding(.vertical, 10)
+			.padding(.top, 5)
+			.padding(.bottom, 10)
+			
+		} header: {
+			Text("Biometrics")
 			
 		} // </Section>
 	}
 	
 	@ViewBuilder
-	func toggle_biometrics() -> some View {
+	func section_pin() -> some View {
 		
-		Toggle(isOn: $biometricsEnabled) {
-			Label {
-				switch biometricSupport {
-				case .touchID_available:
-					Text("Require Touch ID")
-					
-				case .touchID_notAvailable:
-					Text("Require Touch ID") + Text(" (not available)").foregroundColor(.secondary)
-				
-				case .touchID_notEnrolled:
-					Text("Require Touch ID") + Text(" (not enrolled)").foregroundColor(.secondary)
-				
-				case .faceID_available:
-					Text("Require Face ID")
-				
-				case .faceID_notAvailable:
-					Text("Require Face ID") + Text(" (not available)").foregroundColor(.secondary)
-				
-				case .faceID_notEnrolled:
-					Text("Require Face ID") + Text(" (not enrolled)").foregroundColor(.secondary)
-				
-				default:
-					Text("Biometrics") + Text(" (not available)").foregroundColor(.secondary)
-				}
-			} icon: {
-				Image(systemName: isTouchID() ? "touchid" : "faceid")
-					.renderingMode(.template)
-					.imageScale(.medium)
-					.foregroundColor(Color.appAccent)
-			}
+		Section {
+			toggle_customPin()
 			
-		} // </Toggle>
-		.onChange(of: biometricsEnabled) { value in
-			self.toggleBiometrics(value)
-		}
-		.disabled(!biometricSupport.isAvailable())
+			// Implicit divider added here
+			
+			button_changePin()
+				.padding(.top, 5)
+				.padding(.bottom, 10)
+			
+		} header: {
+			Text("PIN")
+		} // </Section>
 	}
 	
 	@ViewBuilder
@@ -157,6 +184,47 @@ struct AppAccessView : View {
 					.foregroundColor(Color.appWarn)
 			}
 		}
+	}
+	
+	@ViewBuilder
+	func toggle_biometrics() -> some View {
+		
+		Toggle(isOn: $biometricsEnabled) {
+			Label {
+				switch biometricSupport {
+				case .touchID_available:
+					Text("Touch ID")
+					
+				case .touchID_notAvailable:
+					Text("Touch ID") + Text(" (not available)").foregroundColor(.secondary)
+				
+				case .touchID_notEnrolled:
+					Text("Touch ID") + Text(" (not enrolled)").foregroundColor(.secondary)
+				
+				case .faceID_available:
+					Text("Face ID")
+				
+				case .faceID_notAvailable:
+					Text("Face ID") + Text(" (not available)").foregroundColor(.secondary)
+				
+				case .faceID_notEnrolled:
+					Text("Face ID") + Text(" (not enrolled)").foregroundColor(.secondary)
+				
+				default:
+					Text("Biometrics") + Text(" (not available)").foregroundColor(.secondary)
+				}
+			} icon: {
+				Image(systemName: isTouchID() ? "touchid" : "faceid")
+					.renderingMode(.template)
+					.imageScale(.medium)
+					.foregroundColor(Color.appAccent)
+			}
+			
+		} // </Toggle>
+		.onChange(of: biometricsEnabled) { value in
+			self.toggleBiometrics(value)
+		}
+		.disabled(!biometricSupport.isAvailable())
 	}
 	
 	@ViewBuilder
@@ -200,6 +268,7 @@ struct AppAccessView : View {
 			
 			Toggle("", isOn: $passcodeFallbackEnabled)
 				.labelsHidden()
+				.disabled(!biometricsEnabled)
 				.padding(.trailing, 2)
 				.alignmentGuide(VerticalAlignment.centerTopLine) { (d: ViewDimensions) in
 					d[VerticalAlignment.center]
@@ -211,9 +280,73 @@ struct AppAccessView : View {
 		} // </HStack>
 	}
 	
+	@ViewBuilder
+	func toggle_customPin() -> some View {
+		
+		Toggle(isOn: $customPinEnabled) {
+			Label {
+				Text("Custom PIN")
+			} icon: {
+				Image(systemName: "circle.grid.3x3")
+					.renderingMode(.template)
+					.imageScale(.medium)
+					.foregroundColor(Color.appAccent)
+			}
+		} // </Toggle>
+		.onChange(of: customPinEnabled) { value in
+			self.toggleCustomPin(value)
+		}
+	}
+	
+	@ViewBuilder
+	func button_changePin() -> some View {
+		
+		Button {
+			changePin()
+		} label: {
+			Label {
+				Text("Change PIN")
+			} icon: {
+				Image(systemName: "arrow.triangle.2.circlepath")
+					.renderingMode(.template)
+					.imageScale(.medium)
+					.foregroundColor(Color.appAccent)
+			}
+		}
+		.disabled(!customPinEnabled || !customPinSet)
+	}
+	
+	@ViewBuilder
+	func navLinkView() -> some View {
+		
+		if let tag = self.navLinkTag {
+			navLinkView(tag)
+		} else {
+			EmptyView()
+		}
+	}
+	
+	@ViewBuilder
+	private func navLinkView(_ tag: NavLinkTag) -> some View {
+		
+		switch tag {
+			case .SetCustomPinView     : SetNewPinView(willClose: setNewPinView_willClose)
+			case .EditCustomPinView    : EditPinView(willClose: editPinView_willClose)
+			case .DisableCustomPinView : DisablePinView(willClose: disablePinView_willClose)
+		}
+	}
+	
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
+	
+	private func navLinkTagBinding() -> Binding<Bool> {
+		
+		return Binding<Bool>(
+			get: { navLinkTag != nil },
+			set: { if !$0 { navLinkTag = nil }}
+		)
+	}
 	
 	func isTouchID() -> Bool {
 		
@@ -240,12 +373,46 @@ struct AppAccessView : View {
 	}
 	
 	func onWillEnterForeground() -> Void {
-		print("onWillEnterForeground()")
+		log.trace("onWillEnterForeground()")
 		
 		// When the app returns from being in the background, the biometric status may have changed.
 		// For example: .touchID_notEnrolled => .touchID_available
 		
 		self.biometricSupport = AppSecurity.shared.deviceBiometricSupport()
+	}
+	
+	func setNewPinView_willClose(_ result: SetNewPinView.EndResult) {
+		log.trace("setNewPinView_willClose(\(result))")
+		
+		switch result {
+		case .Failed: fallthrough
+		case .UserCancelled:
+			ignoreToggle_customPinEnabled = true
+			customPinEnabled = false
+		
+		case .PinSet:
+			customPinSet = true
+		}
+	}
+	
+	func editPinView_willClose(_ result: EditPinView.EndResult) {
+		log.trace("editPinView_willClose()")
+		
+		// Nothing to do here (UI remains the same)
+	}
+	
+	func disablePinView_willClose(_ result: DisablePinView.EndResult) {
+		log.trace("disablePinView_willClose(\(result))")
+		
+		switch result {
+		case .Failed: fallthrough
+		case .UserCancelled:
+			ignoreToggle_customPinEnabled = true
+			customPinEnabled = true
+		
+		case .PinDisabled:
+			customPinSet = false
+		}
 	}
 	
 	// --------------------------------------------------
@@ -329,6 +496,27 @@ struct AppAccessView : View {
 				}
 			}
 		}
+	}
+	
+	func toggleCustomPin(_ flag: Bool) {
+		log.trace("toggleCustomPin()")
+		
+		if ignoreToggle_customPinEnabled {
+			ignoreToggle_customPinEnabled = false
+			return
+		}
+		
+		if flag {
+			navLinkTag = .SetCustomPinView
+		} else {
+			navLinkTag = .DisableCustomPinView
+		}
+	}
+	
+	func changePin() {
+		log.trace("changePin()")
+		
+		navLinkTag = .EditCustomPinView
 	}
 }
 
