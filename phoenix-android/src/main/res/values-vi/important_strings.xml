@@ -376,8 +376,30 @@
 
     <!-- Lightning payment errors -->
 
-    <string name="outgoing_finalfailure_alreadypaid">Hóa đơn này đã được thanh toán.</string>
-    <string name="outgoing_finalfailure_noroutefound">Không thể liên lạc được với người nhận hoặc người nhận không có đủ thanh khoản đầu vào.</string>
+    <string name="outgoing_failuremessage_channel_closing">Các kênh đang đóng.</string>
+    <string name="outgoing_failuremessage_channel_splicing">Các kênh đang xử lý một mối nối. Hãy thử lại sau.</string>
+    <string name="outgoing_failuremessage_not_enough_fee">Phí không đủ.</string>
+    <string name="outgoing_failuremessage_not_enough_balance">Khoản thanh toán này vượt quá số dư của bạn.</string>
+    <string name="outgoing_failuremessage_too_big">Số tiền thanh toán quá lớn - hãy thử chia thành nhiều phần.</string>
+    <string name="outgoing_failuremessage_too_small">Số tiền thanh toán quá nhỏ.</string>
+    <string name="outgoing_failuremessage_expiry_too_big">Thời hạn thanh toán này còn quá xa trong tương lai.</string>
+    <string name="outgoing_failuremessage_rejected_by_recipient">Khoản thanh toán đã bị người nhận từ chối. Hóa đơn cụ thể này có thể đã được thanh toán.</string>
+    <string name="outgoing_failuremessage_recipient_offline">Người nhận đang ngoại tuyến.</string>
+    <string name="outgoing_failuremessage_not_enough_liquidity">Không thể chuyển khoản thanh toán đến người nhận (có thể thanh khoản gửi đến không đủ).</string>
+    <string name="outgoing_failuremessage_temporary_failure">Đã xảy ra lỗi trên một nút trong lộ trình thanh toán. Việc thanh toán có thể thành công nếu bạn thử lại.</string>
+    <string name="outgoing_failuremessage_too_many_pending">Bạn có quá nhiều khoản thanh toán đang chờ xử lý. Hãy thử lại sau khi chúng được giải quyết xong.</string>
+
+    <string name="outgoing_failuremessage_invalid_id">ID của khoản thanh toán không hợp lệ. Hãy thử lại.</string>
+    <string name="outgoing_failuremessage_not_connected">Kênh của bạn chưa được kết nối. Đợi kết nối ổn định và thử lại.</string>
+    <string name="outgoing_failuremessage_channel_opening">Kênh của bạn vẫn đang trong quá trình mở. Hãy đợi và thử lại.</string>
+    <string name="outgoing_failuremessage_unsupported_features">Hóa đơn này sử dụng các tính năng không được hỗ trợ. Đảm bảo bạn đang dùng phiên bản Phoenix mới nhất.</string>
+    <string name="outgoing_failuremessage_invalid_amount">Số tiền thanh toán không hợp lệ.</string>
+    <string name="outgoing_failuremessage_no_available_channels">Không thể gửi khoản thanh toán qua các kênh hiện có của bạn.</string>
+    <string name="outgoing_failuremessage_unknown">Đã xảy ra lỗi không xác định và thanh toán không thành công.</string>
+    <string name="outgoing_failuremessage_restarted">Ví đã được khởi động lại trong khi thanh toán đang được xử lý.</string>
+
+    <string name="outgoing_failuremessage_alreadypaid">Hóa đơn này đã được thanh toán.</string>
+    <string name="outgoing_failuremessage_noroutefound">Không thể liên lạc được với người nhận hoặc người nhận không có đủ thanh khoản đầu vào.</string>
 
     <!-- low feerate disclaimer -->
 

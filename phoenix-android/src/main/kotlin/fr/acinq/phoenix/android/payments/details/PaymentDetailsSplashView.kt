@@ -42,10 +42,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.TxId
+import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.blockchain.electrum.ElectrumConnectionStatus
 import fr.acinq.lightning.blockchain.electrum.getConfirmations
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.payment.FinalFailure
+import fr.acinq.lightning.payment.OutgoingPaymentFailure
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sum
 import fr.acinq.lightning.wire.LiquidityAds
@@ -119,8 +121,8 @@ fun PaymentDetailsSplashView(
         }
 
         if (payment is LightningOutgoingPayment) {
-            (payment.status as? LightningOutgoingPayment.Status.Completed.Failed)?.let {
-                PaymentErrorView(status = it)
+            (payment.status as? LightningOutgoingPayment.Status.Completed.Failed)?.let { status ->
+                PaymentErrorView(status = status, failedParts = payment.parts.map { it.status }.filterIsInstance<LightningOutgoingPayment.Part.Status.Failed>())
             }
         }
 
@@ -594,8 +596,9 @@ private fun InboundLiquidityLeaseDetails(lease: LiquidityAds.Lease) {
 }
 
 @Composable
-private fun PaymentErrorView(status: LightningOutgoingPayment.Status.Completed.Failed) {
-    translatePaymentError(failure = status.reason)?.let {
+private fun PaymentErrorView(status: LightningOutgoingPayment.Status.Completed.Failed, failedParts: List<LightningOutgoingPayment.Part.Status.Failed>) {
+    val failure = remember(status, failedParts) { OutgoingPaymentFailure(status.reason, failedParts) }
+    translatePaymentError(failure).let {
         Spacer(modifier = Modifier.height(8.dp))
         SplashLabelRow(label = stringResource(id = R.string.paymentdetails_error_label)) {
             Text(text = it)
@@ -668,9 +671,7 @@ private fun ConfirmationView(
 
         suspend fun getConfirmations(): Int {
             val confirmations = electrumClient.getConfirmations(txId)
-//            log.debug { "retrieved confirmations=$confirmations from electrum for tx=$txId" }
             return confirmations ?: run {
-//                log.debug { "retrying getConfirmations from electrum in 5 sec" }
                 delay(5_000)
                 getConfirmations()
             }
@@ -749,20 +750,42 @@ private fun BumpTransactionDialog(
 }
 
 @Composable
-private fun translatePaymentError(failure: FinalFailure): String? {
-    return when (failure) {
-        FinalFailure.RetryExhausted -> stringResource(id = R.string.outgoing_finalfailure_noroutefound)
-        FinalFailure.NoRouteToRecipient -> stringResource(id = R.string.outgoing_finalfailure_noroutefound)
-        FinalFailure.RecipientUnreachable -> stringResource(id = R.string.outgoing_finalfailure_noroutefound)
-
-        FinalFailure.AlreadyPaid -> stringResource(id = R.string.outgoing_finalfailure_alreadypaid)
-
-        FinalFailure.NoAvailableChannels,
-        FinalFailure.InsufficientBalance,
-        FinalFailure.FeaturesNotSupported,
-        FinalFailure.InvalidPaymentAmount,
-        FinalFailure.InvalidPaymentId,
-        FinalFailure.UnknownError,
-        FinalFailure.WalletRestarted -> null
+private fun translatePaymentError(paymentFailure: OutgoingPaymentFailure): String {
+    return when (val result = paymentFailure.explain()) {
+        is Either.Left -> {
+            when (val partFailure = result.value) {
+                is LightningOutgoingPayment.Part.Status.Failure.Uninterpretable -> partFailure.message
+                LightningOutgoingPayment.Part.Status.Failure.ChannelIsClosing -> stringResource(id = R.string.outgoing_failuremessage_channel_closing)
+                LightningOutgoingPayment.Part.Status.Failure.ChannelIsSplicing -> stringResource(id = R.string.outgoing_failuremessage_channel_splicing)
+                LightningOutgoingPayment.Part.Status.Failure.NotEnoughFees -> stringResource(id = R.string.outgoing_failuremessage_not_enough_fee)
+                LightningOutgoingPayment.Part.Status.Failure.NotEnoughFunds -> stringResource(id = R.string.outgoing_failuremessage_not_enough_balance)
+                LightningOutgoingPayment.Part.Status.Failure.PaymentAmountTooBig -> stringResource(id = R.string.outgoing_failuremessage_too_big)
+                LightningOutgoingPayment.Part.Status.Failure.PaymentAmountTooSmall -> stringResource(id = R.string.outgoing_failuremessage_too_small)
+                LightningOutgoingPayment.Part.Status.Failure.PaymentExpiryTooBig -> stringResource(id = R.string.outgoing_failuremessage_expiry_too_big)
+                LightningOutgoingPayment.Part.Status.Failure.RecipientRejectedPayment -> stringResource(id = R.string.outgoing_failuremessage_rejected_by_recipient)
+                LightningOutgoingPayment.Part.Status.Failure.RecipientIsOffline -> stringResource(id = R.string.outgoing_failuremessage_recipient_offline)
+                LightningOutgoingPayment.Part.Status.Failure.RecipientLiquidityIssue -> stringResource(id = R.string.outgoing_failuremessage_not_enough_liquidity)
+                LightningOutgoingPayment.Part.Status.Failure.TemporaryRemoteFailure -> stringResource(id = R.string.outgoing_failuremessage_temporary_failure)
+                LightningOutgoingPayment.Part.Status.Failure.TooManyPendingPayments -> stringResource(id = R.string.outgoing_failuremessage_too_many_pending)
+            }
+        }
+        is Either.Right -> {
+            when (result.value) {
+                FinalFailure.InvalidPaymentId -> stringResource(id = R.string.outgoing_failuremessage_invalid_id)
+                FinalFailure.AlreadyPaid -> stringResource(id = R.string.outgoing_failuremessage_alreadypaid)
+                FinalFailure.ChannelClosing -> stringResource(id = R.string.outgoing_failuremessage_channel_closing)
+                FinalFailure.ChannelNotConnected -> stringResource(id = R.string.outgoing_failuremessage_not_connected)
+                FinalFailure.ChannelOpening -> stringResource(id = R.string.outgoing_failuremessage_channel_opening)
+                FinalFailure.FeaturesNotSupported -> stringResource(id = R.string.outgoing_failuremessage_unsupported_features)
+                FinalFailure.InsufficientBalance -> stringResource(id = R.string.outgoing_failuremessage_not_enough_balance)
+                FinalFailure.InvalidPaymentAmount -> stringResource(id = R.string.outgoing_failuremessage_invalid_amount)
+                FinalFailure.NoAvailableChannels -> stringResource(id = R.string.outgoing_failuremessage_not_enough_balance)
+                FinalFailure.NoRouteToRecipient -> stringResource(id = R.string.outgoing_failuremessage_noroutefound)
+                FinalFailure.RecipientUnreachable -> stringResource(id = R.string.outgoing_failuremessage_noroutefound)
+                FinalFailure.RetryExhausted -> stringResource(id = R.string.outgoing_failuremessage_noroutefound)
+                FinalFailure.UnknownError -> stringResource(id = R.string.outgoing_failuremessage_unknown)
+                FinalFailure.WalletRestarted -> stringResource(id = R.string.outgoing_failuremessage_restarted)
+            }
+        }
     }
 }

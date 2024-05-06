@@ -27,6 +27,7 @@ import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.data.FiatCurrency.Companion.valueOfOrNull
 import fr.acinq.phoenix.db.payments.DbTypesHelper.decodeBlob

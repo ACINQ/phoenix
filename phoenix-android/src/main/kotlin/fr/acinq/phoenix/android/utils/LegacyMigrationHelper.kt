@@ -417,8 +417,9 @@ object LegacyMigrationHelper {
                         amount = part.amount().toLong().msat + 0.msat, // must include the fee!!!
                         route = listOf(),
                         status = LightningOutgoingPayment.Part.Status.Failed(
-                            remoteFailureCode = null,
-                            details = JavaConverters.asJavaCollectionConverter(partStatus.failures()).asJavaCollection().toList().lastOrNull()?.failureMessage() ?: "error details unavailable",
+                            failure = LightningOutgoingPayment.Part.Status.Failure.Uninterpretable(
+                                message = JavaConverters.asJavaCollectionConverter(partStatus.failures()).asJavaCollection().toList().lastOrNull()?.failureMessage() ?: "error details unavailable",
+                            ),
                             completedAt = partStatus.completedAt()
                         ),
                         createdAt = part.createdAt()

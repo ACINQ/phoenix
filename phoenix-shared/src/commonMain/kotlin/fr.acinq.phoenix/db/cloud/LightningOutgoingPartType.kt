@@ -69,7 +69,7 @@ data class LightningOutgoingPartWrapper(
                 return when (status) {
                     is LightningOutgoingPayment.Part.Status.Pending -> null
                     is LightningOutgoingPayment.Part.Status.Failed -> {
-                        val (type, blob) = status.mapToDb()
+                        val (type, blob) = status.failure.mapToDb()
                         StatusWrapper(
                             ts = status.completedAt,
                             type = type.name,
