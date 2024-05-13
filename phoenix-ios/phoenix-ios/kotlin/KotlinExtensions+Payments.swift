@@ -88,13 +88,7 @@ extension WalletPaymentInfo {
 			
 		} else if let outgoingPayment = payment as? Lightning_kmpOutgoingPayment {
 			
-			if let lightningPayment = outgoingPayment as? Lightning_kmpLightningOutgoingPayment {
-				
-				if let _ = lightningPayment.details.asKeySend() {
-					return NSLocalizedString("Donation", comment: "Payment description for received KeySend")
-				}
-				
-			} else if let _ = outgoingPayment as? Lightning_kmpChannelCloseOutgoingPayment {
+			if let _ = outgoingPayment as? Lightning_kmpChannelCloseOutgoingPayment {
 				return NSLocalizedString("Channel closing", comment: "Payment description for channel closing")
 				
 			} else if let _ = outgoingPayment as? Lightning_kmpSpliceCpfpOutgoingPayment {

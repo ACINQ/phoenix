@@ -86,11 +86,6 @@ fun LightningOutgoingPayment.Details.asNormal(): LightningOutgoingPayment.Detail
     else -> null
 }
 
-fun LightningOutgoingPayment.Details.asKeySend(): LightningOutgoingPayment.Details.KeySend? = when (this) {
-    is LightningOutgoingPayment.Details.KeySend -> this
-    else -> null
-}
-
 fun LightningOutgoingPayment.Details.asSwapOut(): LightningOutgoingPayment.Details.SwapOut? = when (this) {
     is LightningOutgoingPayment.Details.SwapOut -> this
     else -> null

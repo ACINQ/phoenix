@@ -37,11 +37,6 @@ extension Lightning_kmpWalletPayment {
 				let exp = NSLocalizedString("layer 2 -> 1", comment: "Transaction Info: Explanation")
 				return (val, exp.lowercased())
 			}
-			if let _ = outgoingPayment.details.asKeySend() {
-				let val = NSLocalizedString("KeySend", comment: "Transaction Info: Value")
-				let exp = NSLocalizedString("non-invoice payment", comment: "Transaction Info: Explanation")
-				return (val, exp.lowercased())
-			}
 			
 		} else if let _ = self as? Lightning_kmpChannelCloseOutgoingPayment {
 			
