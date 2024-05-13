@@ -1008,6 +1008,11 @@ class AppSecurity {
 		if getPasscodeFallbackEnabled() {
 			// Biometrics + Passcode Fallback
 			policy = .deviceOwnerAuthentication
+		} else if hasCustomPin() {
+			// Biometrics + Custom PIN Fallback
+			policy = .deviceOwnerAuthenticationWithBiometrics
+			context.localizedFallbackTitle = "" // do not show (cancel button ==> custom pin)
+			context.localizedCancelTitle = String(localized: "Enter Phoenix PIN")
 		} else {
 			// Biometrics only
 			policy = .deviceOwnerAuthenticationWithBiometrics

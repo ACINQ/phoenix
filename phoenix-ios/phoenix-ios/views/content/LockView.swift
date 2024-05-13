@@ -1,7 +1,7 @@
 import SwiftUI
 
 fileprivate let filename = "LockView"
-#if DEBUG && false
+#if DEBUG && true
 fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
@@ -434,8 +434,12 @@ struct LockView: View {
 			switch result {
 			case .success(let recoveryPhrase):
 				closeLockView(recoveryPhrase)
+				
 			case .failure(let error):
 				log.debug("tryUnlockWithBiometrics: error: \(String(describing: error))")
+				if enabledSecurity.contains(.customPin) {
+					showPinPrompt()
+				}
 			}
 		}
 	}
