@@ -3663,6 +3663,7 @@
       }
     },
     "Access to Phoenix is protected" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5339,6 +5340,9 @@
           }
         }
       }
+    },
+    "Authenticate to disable passcode fallback." : {
+      "comment" : "User prompt"
     },
     "Authenticated" : {
       "comment" : "lnurl-auth: success text",
@@ -22911,6 +22915,7 @@
       }
     },
     "Phoenix can be accessed without credentials. Make sure that you have enabled adequate protections for iOS." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -30912,6 +30917,9 @@
         }
       }
     },
+    "To enable a custom PIN, you must first disable the \"allow passcode fallback\" option." : {
+
+    },
     "To enable background payments:" : {
       "localizations" : {
         "de" : {
@@ -30939,6 +30947,9 @@
           }
         }
       }
+    },
+    "To enable the \"allow passcode fallback\" option, you must first disable the custom PIN." : {
+
     },
     "To fix this re-enable Background App Refresh via: Settings -> General -> Background App Refresh" : {
       "extractionState" : "manual",
@@ -33922,6 +33933,9 @@
           }
         }
       }
+    },
+    "Which PIN?" : {
+
     },
     "will be sent to:" : {
       "localizations" : {

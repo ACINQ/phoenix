@@ -92,7 +92,6 @@ struct AppAccessView : View {
 		List {
 			section_biometrics()
 			section_pin()
-		//	section_status()
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
@@ -101,15 +100,6 @@ struct AppAccessView : View {
 		}
 		.onAppear {
 			onAppear()
-		}
-	}
-	
-	@ViewBuilder
-	func section_status() -> some View {
-		
-		Section {
-			statusLabel()
-				.padding(.top, 5)
 		}
 	}
 	
@@ -150,40 +140,6 @@ struct AppAccessView : View {
 		} header: {
 			Text("PIN")
 		} // </Section>
-	}
-	
-	@ViewBuilder
-	func statusLabel() -> some View {
-		
-		if biometricsEnabled {
-			
-			Label {
-				Text("Access to Phoenix is protected")
-					.fixedSize(horizontal: false, vertical: true) // SwiftUI truncating text
-			} icon: {
-				Image(systemName: "checkmark.shield")
-					.renderingMode(.template)
-					.imageScale(.medium)
-					.foregroundColor(Color.appAccent)
-			}
-			
-		} else {
-		
-			Label {
-				Text(
-					"""
-					Phoenix can be accessed without credentials. \
-					Make sure that you have enabled adequate protections for iOS.
-					"""
-				)
-				.fixedSize(horizontal: false, vertical: true) // SwiftUI truncating text
-			} icon: {
-				Image(systemName: "exclamationmark.triangle")
-					.renderingMode(.template)
-					.imageScale(.medium)
-					.foregroundColor(Color.appWarn)
-			}
-		}
 	}
 	
 	@ViewBuilder
@@ -478,23 +434,63 @@ struct AppAccessView : View {
 			return
 		}
 		
-		if flag { // toggle => ON
+		let failedToEnable = {
+			log.trace("togglePasscodeFallback: failedToEnable")
+			
+			self.ignoreToggle_passcodeFallbackEnabled = true
+			self.passcodeFallbackEnabled = false // failed to enable == disabled
+		}
+		
+		let failedToDisable = {
+			log.trace("togglePasscodeFallback: failedToDisable")
+			
+			self.ignoreToggle_passcodeFallbackEnabled = true
+			self.passcodeFallbackEnabled = true // failed to disable == enabled
+		}
+		
+		if flag && customPinEnabled {
+			
+			// User is trying to enable "system passcode fallback",
+			// but they already have the "custom pin" enabled.
+			
+			smartModalState.display(dismissable: true) {
+				WhichPinSheet(currentChoice: .customPin)
+			} onWillDisappear: {
+				failedToEnable()
+			}
+			
+		} else if flag { // toggle => ON
 			
 			AppSecurity.shared.setPasscodeFallback(enabled: true) { (error: Error?) in
 				if error != nil {
-					self.ignoreToggle_passcodeFallbackEnabled = true
-					self.passcodeFallbackEnabled = false // failed to enable == disabled
+					failedToEnable()
 				}
 			}
 			
 		} else { // toggle => OFF
 			
-			AppSecurity.shared.setPasscodeFallback(enabled: false) { (error: Error?) in
-				if error != nil {
-					self.ignoreToggle_passcodeFallbackEnabled = true
-					self.passcodeFallbackEnabled = true // failed to disable == enabled
-				}
-			}
+			// What should occur within the UI:
+			// - user is prompted for biometrics verification
+			// - if SUCCESS:
+			//   - switch remains disabled
+			// - if FAILURE:
+			//   - switch changes back to enabled
+			
+			let prompt = NSLocalizedString("Authenticate to disable passcode fallback.", comment: "User prompt")
+			
+			AppSecurity.shared.tryUnlockWithBiometrics(prompt: prompt) { result in
+				
+				switch result {
+				case .failure(_):
+					failedToDisable()
+				case .success(_):
+					AppSecurity.shared.setPasscodeFallback(enabled: false) { (error: Error?) in
+						if error != nil {
+							failedToDisable()
+						}
+					}
+				} // </switch>
+			} // </tryUnlockWithBiometrics>
 		}
 	}
 	
@@ -506,9 +502,23 @@ struct AppAccessView : View {
 			return
 		}
 		
-		if flag {
+		if flag && passcodeFallbackEnabled {
+			
+			// User is trying to enable "system passcode fallback",
+			// but they already have the "custom pin" enabled.
+			
+			smartModalState.display(dismissable: true) {
+				WhichPinSheet(currentChoice: .systemPasscode)
+				
+			} onWillDisappear: {
+				ignoreToggle_customPinEnabled = true
+				customPinEnabled = false
+			}
+			
+		} else if flag { // toggle => ON
 			navLinkTag = .SetCustomPinView
-		} else {
+			
+		} else { // toggle => OFF
 			navLinkTag = .DisableCustomPinView
 		}
 	}
