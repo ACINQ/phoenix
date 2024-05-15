@@ -85,12 +85,20 @@ struct NumberPadView: View {
 			Button {
 				buttonPressed(identifier)
 			} label: {
-				Image(systemName: "arrowshape.down")
-					.resizable()
-					.aspectRatio(contentMode: .fit)
-					.frame(width: 34, height: 34, alignment: .center)
-					.frame(width: buttonSize, height: buttonSize, alignment: .center)
-					.padding(.all, 10)
+				Group {
+					if #available(iOS 17, *) {
+						Image(systemName: "arrowshape.down")
+							.resizable()
+							.aspectRatio(contentMode: .fit)
+					} else {
+						Image(systemName: "arrowtriangle.down")
+							.resizable()
+							.aspectRatio(contentMode: .fit)
+					}
+				}
+				.frame(width: 34, height: 34, alignment: .center)
+				.frame(width: buttonSize, height: buttonSize, alignment: .center)
+				.padding(.all, 10)
 			} // </Button>
 			.tint(.secondary)
 			
