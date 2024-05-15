@@ -24,17 +24,16 @@ struct DisablePinView: View {
 	}
 	
 	let willClose: (EndResult) -> Void
-	let correctPin: String
 	
 	@State var pin: String = ""
+	@State var isCorrectPin: Bool = false
 	@State var numberPadDisabled: Bool = false
 	
-	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+	@State var vibrationTrigger: Int = 0
+	@State var shakeTrigger: Int = 0
+	@State var failCount: Int = 0
 	
-	init(willClose: @escaping (EndResult) -> Void) {
-		self.willClose = willClose
-		self.correctPin = AppSecurity.shared.getCustomPin() ?? "1234567890"
-	}
+	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -71,6 +70,7 @@ struct DisablePinView: View {
 			)
 		}
 		.padding(.bottom)
+		.vibrationFeedback(.error, trigger: vibrationTrigger)
 	}
 	
 	@ViewBuilder
@@ -81,12 +81,8 @@ struct DisablePinView: View {
 			
 			Group {
 				if pin.count < PIN_LENGTH {
-					Label {
-						Text("Enter PIN to confirm")
-					} icon: {
-						Image(systemName: "checkmark").foregroundStyle(Color.clear)
-					}
-				} else if pin == correctPin {
+					Text("Enter PIN to confirm")
+				} else if isCorrectPin {
 					Label("Correct", systemImage: "checkmark").foregroundStyle(Color.appPositive)
 				} else {
 					Label("Incorrect", systemImage: "xmark").foregroundStyle(Color.appNegative)
@@ -115,6 +111,7 @@ struct DisablePinView: View {
 			}
 			
 		} // </HStack>
+		.modifier(Shake(animatableData: CGFloat(shakeTrigger)))
 	}
 	
 	@ViewBuilder
@@ -160,7 +157,14 @@ struct DisablePinView: View {
 	// --------------------------------------------------
 	
 	var circleColor: Color {
-		return Color.primary.opacity(0.8)
+		
+		if pin.count < PIN_LENGTH {
+			return Color.primary.opacity(0.8)
+		} else if isCorrectPin {
+			return Color.appPositive
+		} else {
+			return Color.appNegative
+		}
 	}
 	
 	// --------------------------------------------------
@@ -186,6 +190,7 @@ struct DisablePinView: View {
 	func verifyPin() {
 		log.trace("verifyPin()")
 		
+		let correctPin = AppSecurity.shared.getCustomPin() ?? "1234567890"
 		if pin == correctPin {
 			handleCorrectPin()
 		} else {
@@ -196,20 +201,33 @@ struct DisablePinView: View {
 	func handleIncorrectPin() {
 		log.trace("handleIncorrectPin()")
 		
+		vibrationTrigger += 1
+		withAnimation {
+			shakeTrigger += 1
+		}
+		
+		failCount += 1
+		isCorrectPin = false
 		numberPadDisabled = true
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
-			self.dismissView(.UserCancelled)
+			if failCount < 2 {
+				pin = ""
+				numberPadDisabled = false
+			} else {
+				dismissView(.UserCancelled)
+			}
 		}
 	}
 	
 	func handleCorrectPin() {
 		log.trace("handleCorrectPin()")
 		
+		isCorrectPin = true
 		numberPadDisabled = true
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
 			AppSecurity.shared.setCustomPin(pin: nil) { error in
 				let result: EndResult = (error == nil) ? .PinDisabled : .Failed
-				self.dismissView(result)
+				dismissView(result)
 			}
 		}
 	}

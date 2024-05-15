@@ -24,7 +24,6 @@ struct EditPinView: View {
 	}
 	
 	let willClose: (EndResult) -> Void
-	let correctPin: String
 	
 	enum EditMode {
 		case Pin0
@@ -38,18 +37,13 @@ struct EditPinView: View {
 	@State var pin2: String = ""
 	
 	@State var numberPadDisabled: Bool = false
-	
-	@State var isInvalid: Bool = false
-	
+	@State var isCorrectPin: Bool = false
 	@State var isMismatch: Bool = false
-	@State var mismatchIdx: Int = 0
+	
+	@State var vibrationTrigger: Int = 0
+	@State var shakeTrigger: Int = 0
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-	
-	init(willClose: @escaping (EndResult) -> Void) {
-		self.willClose = willClose
-		self.correctPin = AppSecurity.shared.getCustomPin() ?? "1234567890"
-	}
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -86,6 +80,7 @@ struct EditPinView: View {
 			)
 		}
 		.padding(.bottom)
+		.vibrationFeedback(.error, trigger: vibrationTrigger)
 	}
 	
 	@ViewBuilder
@@ -98,12 +93,8 @@ struct EditPinView: View {
 				switch editMode {
 				case .Pin0:
 					if pin0.count < PIN_LENGTH {
-						Label {
-							Text("Enter PIN to confirm")
-						} icon: {
-							Image(systemName: "checkmark").foregroundStyle(Color.clear)
-						}
-					} else if pin0 == correctPin {
+						Text("Enter PIN to confirm")
+					} else if isCorrectPin {
 						Label("Correct", systemImage: "checkmark").foregroundStyle(Color.appPositive)
 					} else {
 						Label("Incorrect", systemImage: "xmark").foregroundStyle(Color.appNegative)
@@ -123,7 +114,6 @@ struct EditPinView: View {
 					}
 				}
 			}
-			.font(.title2)
 			.padding(.bottom)
 			
 			promptCircles()
@@ -147,6 +137,7 @@ struct EditPinView: View {
 			}
 			
 		} // </HStack>
+		.modifier(Shake(animatableData: CGFloat(shakeTrigger)))
 	}
 	
 	@ViewBuilder
@@ -200,7 +191,28 @@ struct EditPinView: View {
 	}
 	
 	var circleColor: Color {
-		return Color.primary.opacity(0.8)
+		
+		switch editMode {
+		case .Pin0:
+			if pin0.count < PIN_LENGTH {
+				return Color.primary.opacity(0.8)
+			} else if isCorrectPin {
+				return Color.appPositive
+			} else {
+				return Color.appNegative
+			}
+			
+		case .Pin1:
+			if isMismatch {
+				return Color.appNegative
+			} else {
+				return Color.primary.opacity(0.8)
+			}
+			
+		case .Pin2:
+			return Color.primary.opacity(0.8)
+			
+		}
 	}
 	
 	// --------------------------------------------------
@@ -231,10 +243,6 @@ struct EditPinView: View {
 			if pin1.count == PIN_LENGTH {
 				nextPin()
 			}
-			if isMismatch { // user started typing new PIN; transition UI back to normal;
-				isMismatch = false
-				mismatchIdx += 1
-			}
 			
 		} else if pin2.count < PIN_LENGTH {
 			if identifier == .delete {
@@ -252,6 +260,7 @@ struct EditPinView: View {
 	func verifyPin() {
 		log.trace("verifyPin()")
 		
+		let correctPin = AppSecurity.shared.getCustomPin() ?? "1234567890"
 		if pin0 == correctPin {
 			handleCorrectPin()
 		} else {
@@ -262,12 +271,16 @@ struct EditPinView: View {
 	func handleIncorrectPin() {
 		log.trace("handleIncorrectPin()")
 		
+		vibrationTrigger += 1
+		withAnimation {
+			shakeTrigger += 1
+		}
+		
 		numberPadDisabled = true
-		isInvalid = true
+		isCorrectPin = false
 		DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-			self.numberPadDisabled = false
-			self.isInvalid = false
-			self.pin0 = ""
+			numberPadDisabled = false
+			pin0 = ""
 		}
 	}
 	
@@ -275,9 +288,10 @@ struct EditPinView: View {
 		log.trace("handleCorrectPin()")
 		
 		numberPadDisabled = true
-		DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-			self.numberPadDisabled = false
-			self.editMode = .Pin1
+		isCorrectPin = true
+		DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
+			numberPadDisabled = false
+			editMode = .Pin1
 		}
 	}
 	
@@ -290,9 +304,8 @@ struct EditPinView: View {
 		
 		numberPadDisabled = true
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
-			
-			self.numberPadDisabled = false
-			self.editMode = .Pin2
+			numberPadDisabled = false
+			editMode = .Pin2
 		}
 	}
 	
@@ -309,23 +322,20 @@ struct EditPinView: View {
 	func triggerMismatch() {
 		log.trace("triggerMismatch()")
 		
-		isMismatch = true
-		editMode = .Pin1
-		
-		numberPadDisabled = true
-		DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
-			
-			self.numberPadDisabled = false
-			self.pin1 = ""
-			self.pin2 = ""
+		vibrationTrigger += 1
+		withAnimation {
+			shakeTrigger += 1
 		}
 		
-		let idx = mismatchIdx
-		DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-			if idx == mismatchIdx {
-				mismatchIdx += 1
-				isMismatch = false
-			}
+		editMode = .Pin1
+		isMismatch = true
+		numberPadDisabled = true
+		DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+			
+			isMismatch = false
+			numberPadDisabled = false
+			pin1 = ""
+			pin2 = ""
 		}
 	}
 	

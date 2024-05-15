@@ -35,9 +35,10 @@ struct SetNewPinView: View {
 	@State var pin2: String = ""
 	
 	@State var numberPadDisabled: Bool = false
-	
 	@State var isMismatch: Bool = false
-	@State var mismatchIdx: Int = 0
+	
+	@State var vibrationTrigger: Int = 0
+	@State var shakeTrigger: Int = 0
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
@@ -76,6 +77,7 @@ struct SetNewPinView: View {
 			)
 		}
 		.padding(.bottom)
+		.vibrationFeedback(.error, trigger: vibrationTrigger)
 	}
 	
 	@ViewBuilder
@@ -124,6 +126,7 @@ struct SetNewPinView: View {
 			}
 			
 		} // </HStack>
+		.modifier(Shake(animatableData: CGFloat(shakeTrigger)))
 	}
 	
 	@ViewBuilder
@@ -169,6 +172,7 @@ struct SetNewPinView: View {
 	// --------------------------------------------------
 	
 	var pinCount: Int {
+		
 		switch editMode {
 			case .Pin1: return pin1.count
 			case .Pin2: return pin2.count
@@ -176,7 +180,12 @@ struct SetNewPinView: View {
 	}
 	
 	var circleColor: Color {
-		return Color.primary.opacity(0.8)
+		
+		if isMismatch {
+			return Color.appNegative
+		} else {
+			return Color.primary.opacity(0.8)
+		}
 	}
 	
 	// --------------------------------------------------
@@ -195,10 +204,6 @@ struct SetNewPinView: View {
 			
 			if pin1.count == PIN_LENGTH {
 				nextPin()
-			}
-			if isMismatch { // user started typing new PIN; transition UI back to normal;
-				isMismatch = false
-				mismatchIdx += 1
 			}
 			
 		} else if pin2.count < PIN_LENGTH {
@@ -242,23 +247,20 @@ struct SetNewPinView: View {
 	func triggerMismatch() {
 		log.trace("triggerMismatch()")
 		
-		isMismatch = true
-		editMode = .Pin1
-		
-		numberPadDisabled = true
-		DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
-			
-			self.numberPadDisabled = false
-			self.pin1 = ""
-			self.pin2 = ""
+		vibrationTrigger += 1
+		withAnimation {
+			shakeTrigger += 1
 		}
 		
-		let idx = mismatchIdx
-		DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-			if idx == mismatchIdx {
-				mismatchIdx += 1
-				isMismatch = false
-			}
+		editMode = .Pin1
+		isMismatch = true
+		numberPadDisabled = true
+		DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+			
+			isMismatch = false
+			numberPadDisabled = false
+			pin1 = ""
+			pin2 = ""
 		}
 	}
 	
