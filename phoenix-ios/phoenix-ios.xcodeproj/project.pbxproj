@@ -37,6 +37,7 @@
 		DC09086325B626B300A46136 /* AppStatusPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC09086225B626B300A46136 /* AppStatusPopover.swift */; };
 		DC0994B0263A074C003031CA /* InfoGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0994AF263A074C003031CA /* InfoGrid.swift */; };
 		DC0C52662BF3C31700143831 /* WhichPinSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0C52652BF3C31700143831 /* WhichPinSheet.swift */; };
+		DC0C52682BF4FF6100143831 /* AuthenticateWithPinSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0C52672BF4FF6100143831 /* AuthenticateWithPinSheet.swift */; };
 		DC0D2EA52939269800284608 /* KotlinExtensions+CloudKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0D2EA42939269800284608 /* KotlinExtensions+CloudKit.swift */; };
 		DC0D2EA72939273B00284608 /* KotlinExtensions+Payments.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0D2EA62939273B00284608 /* KotlinExtensions+Payments.swift */; };
 		DC0D2EA8293928E100284608 /* KotlinExtensions+Payments.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0D2EA62939273B00284608 /* KotlinExtensions+Payments.swift */; };
@@ -428,6 +429,7 @@
 		DC09086225B626B300A46136 /* AppStatusPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStatusPopover.swift; sourceTree = "<group>"; };
 		DC0994AF263A074C003031CA /* InfoGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoGrid.swift; sourceTree = "<group>"; };
 		DC0C52652BF3C31700143831 /* WhichPinSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhichPinSheet.swift; sourceTree = "<group>"; };
+		DC0C52672BF4FF6100143831 /* AuthenticateWithPinSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticateWithPinSheet.swift; sourceTree = "<group>"; };
 		DC0D2EA42939269800284608 /* KotlinExtensions+CloudKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KotlinExtensions+CloudKit.swift"; sourceTree = "<group>"; };
 		DC0D2EA62939273B00284608 /* KotlinExtensions+Payments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KotlinExtensions+Payments.swift"; sourceTree = "<group>"; };
 		DC0E31B826EF85B4002071C6 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = cs; path = cs.lproj/about.html; sourceTree = "<group>"; };
@@ -939,6 +941,7 @@
 			children = (
 				DC27E4C92791D17A00C777CC /* RecoveryPhraseView.swift */,
 				DC27E4CA2791D17A00C777CC /* CloudBackupView.swift */,
+				DC0C52672BF4FF6100143831 /* AuthenticateWithPinSheet.swift */,
 			);
 			path = "recovery phrase";
 			sourceTree = "<group>";
@@ -1804,6 +1807,7 @@
 				DCD7E0AF28EC3C0D009C30E5 /* WatchTower.swift in Sources */,
 				DCB493CB269F3B06001B0F09 /* Result+Deugly.swift in Sources */,
 				DC71E7302723240E0063613D /* KotlinObservables.swift in Sources */,
+				DC0C52682BF4FF6100143831 /* AuthenticateWithPinSheet.swift in Sources */,
 				DC0D2EA52939269800284608 /* KotlinExtensions+CloudKit.swift in Sources */,
 				DC355E232A45FAF2008E8A8E /* NestedObservableObject.swift in Sources */,
 				DC5F1C4A28DDAA49007A55ED /* ResetWalletView_Confirm.swift in Sources */,
