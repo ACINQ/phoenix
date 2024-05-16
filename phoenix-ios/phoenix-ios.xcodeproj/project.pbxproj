@@ -600,6 +600,8 @@
 		DCB8762F2735AA7300657570 /* UserDefaults+Serialization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Serialization.swift"; sourceTree = "<group>"; };
 		DCB876312735AAB500657570 /* UserDefaults+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Codable.swift"; sourceTree = "<group>"; };
 		DCBA371A2758076F00610EC8 /* SyncSeedManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncSeedManager.swift; sourceTree = "<group>"; };
+		DCBDB8812BE154840097F940 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = de; path = de.lproj/about.html; sourceTree = "<group>"; };
+		DCBDB8822BE154840097F940 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = de; path = de.lproj/liquidity.html; sourceTree = "<group>"; };
 		DCC9D999267BD28600EA36DD /* SyncTxManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncTxManager.swift; sourceTree = "<group>"; };
 		DCC9D99B267BEB3D00EA36DD /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		DCCC7FD426B0A006008ACD9B /* SquareSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SquareSize.swift; sourceTree = "<group>"; };
@@ -1553,6 +1555,7 @@
 				es,
 				cs,
 				ar,
+				de,
 			);
 			mainGroup = 7555FF72242A565900829871;
 			packageReferences = (
@@ -2024,6 +2027,7 @@
 				DCAE99C12671928500D76E64 /* es */,
 				DC0E31B826EF85B4002071C6 /* cs */,
 				DCF9312F279F1BD900FD7776 /* ar */,
+				DCBDB8812BE154840097F940 /* de */,
 			);
 			name = about.html;
 			sourceTree = "<group>";
@@ -2034,6 +2038,7 @@
 				DC9E7EC72A1295B100A5F1D0 /* Base */,
 				968B38392AC34C260030DBF4 /* fr */,
 				96DB8DAF2AC4A260007D3D54 /* cs */,
+				DCBDB8822BE154840097F940 /* de */,
 			);
 			name = liquidity.html;
 			sourceTree = "<group>";

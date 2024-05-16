@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+	<style></style>
+</head>
+<body>
+<p>
+	Phoenix allows you to receive payments on bitcoin's blockchain
+	layer (L1) and bitcoin's lightning layer (L2).
+</p>
+<ul>
+	<li>
+		The blockchain layer (L1) is slower,
+		and generally much more expensive (requires miner fees)
+	</li>
+	<li>
+		The lightning layer (L2) is much faster,
+		and generally much cheaper (especially for smaller payments)
+	</li>
+</ul>
+<p>
+	When you receive a payment on L1, Phoenix will automatically
+	move the funds to L2 <b>IF</b> the fees adhere to your
+	configured fee policy.
+</p>
+<p>
+	Payments you receive on L2 can be received instantly and for
+	zero fees. However, occasionally an L1 operation is also
+	required in order to manage the L2 payment channel. This can
+	be done automatically <b>IF</b> the fees adhere to your
+	configured fee policy.
+</p>
+</body>
+</html>
