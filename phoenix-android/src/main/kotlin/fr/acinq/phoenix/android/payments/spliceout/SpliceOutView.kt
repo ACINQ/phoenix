@@ -369,13 +369,13 @@ private fun ReviewSpliceOutAndConfirm(
                 state = pagerState,
                 verticalAlignment = Alignment.Top,
                 userScrollEnabled = false,
-            ) {
+            ) { pageIndex ->
                 Column(
                     modifier = Modifier
                         .verticalScroll(rememberScrollState())
                         .padding(top = 0.dp, start = 24.dp, end = 24.dp, bottom = 50.dp)
                 ) {
-                    when (it) {
+                    when (pageIndex) {
                         0 -> LowFeerateWarning(
                             onConfirm = {
                                 if (showSpliceoutCapacityDisclaimer) {
