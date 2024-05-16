@@ -372,6 +372,8 @@ private fun ReviewLiquidityRequest(
 private fun LeaseSuccessDetails(liquidityDetails: ChannelCommand.Commitment.Splice.Response.Created) {
     SuccessMessage(
         header = stringResource(id = R.string.liquidityads_success),
-        details = "You added ${liquidityDetails.liquidityLease?.amount?.toPrettyString(unit = LocalBitcoinUnit.current, withUnit = true)}"
+        details = liquidityDetails.liquidityLease?.amount?.let {
+            stringResource(id = R.string.liquidityads_success_amount, it.toPrettyString(unit = LocalBitcoinUnit.current, withUnit = true))
+        }
     )
 }

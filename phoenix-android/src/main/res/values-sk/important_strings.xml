@@ -344,10 +344,15 @@
     <string name="liquidityads_estimate_above_25">Celkový poplatok je vyšší ako 25 % požadovanej sumy.</string>
     <string name="liquidityads_over_balance">Celkové poplatky presahujú váš zostatok.</string>
 
+    <string name="liquidityads_review_button">Preskúmanie žiadosti</string>
+    <string name="liquidityads_disclaimer_body1">Žiadate o počiatočnú sumu likvidity. Likvidita nie je v priebehu času konštantná: ako budete prijímať finančné prostriedky v priebehu Blesku, likvidita sa spotrebuje a stane sa vaším zostatkom.</string>
+    <string name="liquidityads_disclaimer_body2">Po jednom roku bude služba zvyšnú nevyužitú likviditu požadovať späť.</string>
+
     <string name="liquidityads_request_button">Prijať</string>
     <string name="liquidityads_requesting_spinner">Spracúva sa splice…</string>
 
     <string name="liquidityads_success">Likvidita bola úspešne pridaná!</string>
+    <string name="liquidityads_success_amount">Pridaná suma: %1$s</string>
 
     <string name="liquidityads_error_header">Žiadosť o likviditu zlyhala</string>
     <string name="liquidityads_error_channels_unavailable">Kanály nie sú k dispozícii. Skúste to neskôr.</string>
@@ -373,5 +378,11 @@
     <string name="spliceout_low_feerate_dialog_body1">Platby s nízkymi poplatkami môžu trvať niekoľko dní alebo týždňov bez potvrdenia.</string>
     <string name="spliceout_low_feerate_dialog_body2">Výber poplatkov je na vašu zodpovednosť. Po odoslaní nemožno túto platbu zrušiť, iba urýchliť vyššími poplatkami.</string>
     <string name="spliceout_low_feerate_dialog_body3">Ste si istí, že chcete pokračovať?</string>
+
+    <!-- spliceout: capacity disclaimer -->
+
+    <string name="spliceout_capacity_disclaimer_title">Vplyv na veľkosť kanála</string>
+    <string name="spliceout_capacity_disclaimer_body1">Finančné prostriedky odoslané sa odoberú z vašej strany kanála, čím sa zníži veľkosť kanála o rovnakú sumu. Vaša prichádzajúca likvidita zostáva nezmenená.</string>
+    <string name="spliceout_capacity_disclaimer_checkbox">Túto správu už nezobrazujte.</string>
 
 </resources>

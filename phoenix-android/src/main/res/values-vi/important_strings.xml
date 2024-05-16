@@ -351,10 +351,15 @@
     <string name="liquidityads_estimate_above_25">Tổng phí cao hơn 25% so với khoản thanh khoản đã yêu cầu.</string>
     <string name="liquidityads_over_balance">Tổng phí vượt quá số dư của bạn.</string>
 
+    <string name="liquidityads_review_button">Xem lại yêu cầu</string>
+    <string name="liquidityads_disclaimer_body1">Bạn đang yêu cầu một lượng thanh khoản ban đầu. Thanh khoản không cố định theo thời gian: khi bạn nhận được tiền qua Lightning, thanh khoản sẽ được tiêu thụ và trở thành số dư của bạn.</string>
+    <string name="liquidityads_disclaimer_body2">Sau một năm, thanh khoản còn lại chưa được sử dụng sẽ được dịch vụ thu hồi.</string>
+
     <string name="liquidityads_request_button">Chấp nhận</string>
     <string name="liquidityads_requesting_spinner">Đang xử lý splice…</string>
 
     <string name="liquidityads_success">Thanh khoản đã được thêm vào thành công!</string>
+    <string name="liquidityads_success_amount">Số tiền đã thêm: %1$s</string>
 
     <string name="liquidityads_error_header">Yêu cầu thanh khoản không thành công</string>
     <string name="liquidityads_error_channels_unavailable">Các kênh đang bận. Vui lòng thử lại sau.</string>
@@ -380,5 +385,11 @@
     <string name="spliceout_low_feerate_dialog_body1">Các giao dịch không đủ phí có thể ở trong tình trạng không được xác nhận trong nhiều ngày hoặc nhiều tuần.</string>
     <string name="spliceout_low_feerate_dialog_body2">Lựa chọn mức phí phù hợp là trách nhiệm của bạn. Sau khi gửi yêu cầu, giao dịch này không thể bị hủy, mà chỉ có thể được tăng tốc với mức phí cao hơn.</string>
     <string name="spliceout_low_feerate_dialog_body3">Bạn có chắc bạn muốn tiếp tục?</string>
+
+    <!-- spliceout: capacity disclaimer -->
+
+    <string name="spliceout_capacity_disclaimer_title">Kích thước kênh bị ảnh hưởng</string>
+    <string name="spliceout_capacity_disclaimer_body1">Số tiền gửi được lấy từ phía kênh của bạn, làm giảm quy mô kênh một lượng tương tự. Thanh khoản đầu vào của bạn không thay đổi.</string>
+    <string name="spliceout_capacity_disclaimer_checkbox">Đừng hiển thị lại thông báo đó.</string>
 
 </resources>

@@ -343,10 +343,15 @@
     <string name="liquidityads_estimate_above_25">Celkový poplatek je vyšší než 25 % požadované částky.</string>
     <string name="liquidityads_over_balance">Celkové poplatky přesahují váš zůstatek.</string>
 
+    <string name="liquidityads_review_button">Review</string>
+    <string name="liquidityads_disclaimer_body1">Žádáte o <b>počáteční</b> množství likvidity. Likvidita není v průběhu času konstantní: jak budete v průběhu Blesku přijímat finanční prostředky, likvidita se bude spotřebovávat a stane se vaším zůstatkem.</string>
+    <string name="liquidityads_disclaimer_body2">Po jednom roce bude zbývající nevyužitá likvidita službou vyžádána zpět.</string>
+
     <string name="liquidityads_request_button">Přijmout</string>
     <string name="liquidityads_requesting_spinner">Zpracovává se splice…</string>
 
     <string name="liquidityads_success">Likvidita byla úspěšně přidána!</string>
+    <string name="liquidityads_success_amount">Přidaná částka: %1$s</string>
 
     <string name="liquidityads_error_header">Žádost o likviditu se nezdařila</string>
     <string name="liquidityads_error_channels_unavailable">Kanály nejsou k dispozici. Zkuste to později.</string>
@@ -373,4 +378,9 @@
     <string name="spliceout_low_feerate_dialog_body2">Výběr poplatků je na vaši zodpovědnost. Po odeslání nelze tuto platbu zrušit, pouze urychlit vyššími poplatky.</string>
     <string name="spliceout_low_feerate_dialog_body3">Jste si jisti, že chcete pokračovat?</string>
 
+    <!-- spliceout: capacity disclaimer -->
+
+    <string name="spliceout_capacity_disclaimer_title">Vplyv na veľkosť kanála</string>
+    <string name="spliceout_capacity_disclaimer_body1">Financie odoslané sa odoberú z vašej strany kanála, čím sa veľkosť kanála zníži o rovnakú sumu. Vaša prichádzajúca likvidita zostáva nezmenená.</string>
+    <string name="spliceout_capacity_disclaimer_checkbox">Túto správu už nezobrazujte.</string>
 </resources>

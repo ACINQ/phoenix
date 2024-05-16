@@ -341,10 +341,15 @@
     <string name="liquidityads_estimate_above_25">Die Gesamtgebühr beträgt mehr als 25% des angeforderten Betrags.</string>
     <string name="liquidityads_over_balance">Die gesamten Gebühren übersteigen Ihr Guthaben.</string>
 
+    <string name="liquidityads_review_button">Review</string>
+    <string name="liquidityads_disclaimer_body1">Sie fordern einen <b>anfänglichen</b> Betrag an Liquidität an. Die Liquidität ist im Laufe der Zeit nicht konstant: Wenn Sie über Lightning Geld erhalten, wird die Liquidität verbraucht und zu Ihrem Guthaben.</string>
+    <string name="liquidityads_disclaimer_body2">Nach einem Jahr wird die verbleibende ungenutzte Liquidität vom Dienst zurückverlangt.</string>
+
     <string name="liquidityads_request_button">Annehmen</string>
     <string name="liquidityads_requesting_spinner">Bearbeitung des Splice…</string>
 
     <string name="liquidityads_success">Liquidität erfolgreich hinzugefügt!</string>
+    <string name="liquidityads_success_amount">Betrag hinzugefügt: %1$s</string>
 
     <string name="liquidityads_error_header">Liquiditätsanfrage ist fehlgeschlagen</string>
     <string name="liquidityads_error_channels_unavailable">Kanäle sind nicht verfügbar. Versuchen Sie es später erneut.</string>
@@ -370,5 +375,11 @@
     <string name="spliceout_low_feerate_dialog_body1">Zahlungen mit niedrigen Gebühren können sich über Tage oder Wochen hinziehen, ohne bestätigt zu werden.</string>
     <string name="spliceout_low_feerate_dialog_body2">Die Auswahl der Gebühren liegt in Ihrer Verantwortung. Einmal abgeschickt, kann diese Zahlung nicht mehr storniert, sondern nur noch mit höheren Gebühren beschleunigt werden.</string>
     <string name="spliceout_low_feerate_dialog_body3">Sind Sie sicher, dass Sie fortfahren möchten?</string>
+
+    <!-- spliceout: capacity disclaimer -->
+
+    <string name="spliceout_capacity_disclaimer_title">Kanalgröße beeinträchtigt</string>
+    <string name="spliceout_capacity_disclaimer_body1">Die gesendeten Gelder werden von Ihrer Seite des Kanals genommen, wodurch die Kanalgröße um den gleichen Betrag reduziert wird. Ihre eingehende Liquidität bleibt unverändert.</string>
+    <string name="spliceout_capacity_disclaimer_checkbox">Diese Meldung nicht mehr anzeigen.</string>
 
 </resources>

@@ -355,6 +355,7 @@
     <string name="liquidityads_requesting_spinner">Processing splice…</string>
 
     <string name="liquidityads_success">Liquidity successfully added!</string>
+    <string name="liquidityads_success_amount">Amount added: %1$s</string>
 
     <string name="liquidityads_error_header">Liquidity request has failed</string>
     <string name="liquidityads_error_channels_unavailable">Channels are not available. Try again later.</string>

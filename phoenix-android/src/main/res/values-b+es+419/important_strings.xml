@@ -332,10 +332,15 @@
     <string name="liquidityads_estimate_above_25">La comisión total es superior al 25% del importe solicitado.</string>
     <string name="liquidityads_over_balance">La comisión total supera el saldo.</string>
 
+    <string name="liquidityads_review_button">Validar</string>
+    <string name="liquidityads_disclaimer_body1">Estás solicitando una cantidad <b>inicial</b> de liquidez. La liquidez no es constante en el tiempo: a medida que reciba fondos a lo largo de Lightning, la liquidez se consumirá y se convertirá en su saldo.</string>
+    <string name="liquidityads_disclaimer_body2">Al cabo de un año, la liquidez restante no utilizada será reclamada por el servicio.</string>
+
     <string name="liquidityads_request_button">Aceptar</string>
     <string name="liquidityads_requesting_spinner">Procesando empalme…</string>
 
     <string name="liquidityads_success">La liquidez se agregó correctamente.</string>
+    <string name="liquidityads_success_amount">Importe añadido: %1$s</string>
 
     <string name="liquidityads_error_header">Error al solicitar liquidez</string>
     <string name="liquidityads_error_channels_unavailable">Los canales no están disponibles. Vuelve a intentarlo más tarde.</string>
@@ -361,5 +366,11 @@
     <string name="spliceout_low_feerate_dialog_body1">Los pagos con comisiones bajas pueden pasar días o semanas sin confirmarse.</string>
     <string name="spliceout_low_feerate_dialog_body2">La selección de comisiones es su responsabilidad. Una vez enviado, este pago no puede ser cancelado, sólo acelerado con comisiones más altas.</string>
     <string name="spliceout_low_feerate_dialog_body3">¿Está seguro de que desea continuar?</string>
+
+    <!-- spliceout: capacity disclaimer -->
+
+    <string name="spliceout_capacity_disclaimer_title">Tamaño del canal afectado</string>
+    <string name="spliceout_capacity_disclaimer_body1">Los fondos enviados se toman de tu lado del canal, reduciendo el tamaño del canal en la misma cantidad. Su liquidez entrante permanece sin cambios.</string>
+    <string name="spliceout_capacity_disclaimer_checkbox">No volver a mostrar ese mensaje.</string>
 
 </resources>
