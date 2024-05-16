@@ -1449,9 +1449,11 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				
 				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 					if showingOriginalFiatValue {
-						Text(" (original)").foregroundColor(.secondary)
+						Text(" (original)", comment: "translate: original")
+							.foregroundColor(.secondary)
 					} else {
-						Text(" (now)").foregroundColor(.secondary)
+						Text(" (now)", comment: "translate: now")
+							.foregroundColor(.secondary)
 					}
 					
 					if canShowOriginalFiatValue {
@@ -1482,7 +1484,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 						}
 						Text_CurrencyName(currency: display_fiatOriginal.currency, fontTextStyle: .callout)
 							.layoutPriority(1)
-						Text(" (original)")
+						Text(" (original)", comment: "translate: original")
 							.layoutPriority(1)
 							.foregroundColor(.secondary)
 						
@@ -1499,7 +1501,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 						}
 						Text_CurrencyName(currency: display_fiatCurrent.currency, fontTextStyle: .callout)
 							.layoutPriority(1)
-						Text(" (now)")
+						Text(" (now)", comment: "translate: now")
 							.layoutPriority(1)
 							.foregroundColor(.secondary)
 					}
