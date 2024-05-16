@@ -345,7 +345,7 @@
     <string name="liquidityads_over_balance">Le total des frais dépasse votre solde.</string>
 
     <string name="liquidityads_review_button">Valider</string>
-    <string name="liquidityads_disclaimer_body1">Cette demande est pour un montant <b>préliminaire</b> de liquidité. Cette liquidité n'est pas constante dans le temps : au fur et à mesure que vous recevrez des fonds, elle sera consommée et deviendra votre solde.</string>
+    <string name="liquidityads_disclaimer_body1">Cette demande est pour un montant <b>initial</b> de liquidité. Cette liquidité n\'est pas constante dans le temps : au fur et à mesure que vous recevrez des fonds, elle sera consommée et deviendra votre solde.</string>
     <string name="liquidityads_disclaimer_body2">Au bout d\'un an, la liquidité non consommée sera récupérée par le service.</string>
 
     <string name="liquidityads_request_button">Accepter</string>
