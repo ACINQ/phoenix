@@ -1544,7 +1544,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "**Imagine que ton portefeuille est un seau**, et que ton solde est l'eau du seau."
+            "value" : "**Imaginez que votre portefeuille soit un seau**, et que votre solde soit l'eau dans ce seau."
           }
         }
       }
@@ -4165,7 +4165,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Des frais de %1$@ sont attendus pour recevoir ce montant, et ces frais sont supérieurs à ta limite de %2$@.\n\nAugmente cette limite dans les paramètres de gestion des canaux, ou demande des liquidités supplémentaires."
+            "value" : "Des frais de %1$@ sont attendus pour recevoir ce montant, mais ces frais sont supérieurs à la limite de %2$@.\n\nAugmentez cette limite dans les paramètres de gestion des canaux, ou demandez de la liquidité supplémentaire."
           }
         }
       }
@@ -4245,7 +4245,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Des frais de %1$@ sont attendus pour recevoir ce montant, et ces frais représentent plus de %2$@ du montant.\n\nAugmente cette limite dans les paramètres de gestion des canaux, ou demande des liquidités supplémentaires."
+            "value" : "Des frais de %1$@ sont attendus pour recevoir ce montant, mais ils représentent plus de %2$@ du montant.\n\nAugmentez cette limite dans les paramètres de gestion des canaux, ou ajoutez de la liquidité à vos canaux."
           }
         }
       }
@@ -4285,7 +4285,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Des frais de %1$@ sont attendus pour recevoir ce montant, et ces frais représentent plus de %2$@ du montant.\n\nAugmente cette limite dans les paramètres de gestion des canaux."
+            "value" : "Des frais de %1$@ sont attendus pour recevoir ce montant, et ces frais représentent plus de %2$@ du montant.\n\nAugmentez cette limite dans les paramètres de gestion des canaux."
           }
         }
       }
@@ -4319,7 +4319,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Un format moins efficace et moins privé qui ne fait pas tourner les adresses. Cependant, il est compatible avec presque tous les services et portefeuilles."
+            "value" : "Un format moins efficace et moins privé qui ne fait pas tourner les adresses. Il est cependant compatible avec presque tous les services et portefeuilles."
           }
         }
       }
@@ -4513,7 +4513,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Abandonné par un pair"
+            "value" : "Abandonné par votre contrepartie"
           }
         }
       }
@@ -4709,7 +4709,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Place acceptable"
+            "value" : "Plage acceptable"
           }
         }
       }
@@ -5485,7 +5485,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "mont basé sur le taux d'échange actuel"
+            "value" : "montant basé sur le taux de change courant"
           }
         }
       }
@@ -6090,7 +6090,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Une opération on-chain sera probablement nécessaire pour que tu reçoives ce montant.\n\nLes frais sont estimés à environ %@."
+            "value" : "Une opération on-chain sera probablement nécessaire pour recevoir ce montant.\n\nLes frais sont estimés à environ %@."
           }
         }
       }
@@ -6124,7 +6124,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Une opération on-chain sera probablement nécessaire pour que tu reçoives ce montant."
+            "value" : "Une opération on-chain sera probablement nécessaire pour recevoir ce montant."
           }
         }
       }
@@ -8439,7 +8439,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pour accéder à la blockchain Bitcoin Phoenix se connecte à des serveurs Electrum choisis de façon aléatoire. Vous pouvez également choisir de ne vous connecter qu’à un seul serveur en particulier."
+            "value" : "Pour accéder à la blockchain Bitcoin, Phoenix se connecte à des serveurs Electrum choisis de façon aléatoire. Vous pouvez également choisir de ne vous connecter qu’à un seul serveur en particulier."
           }
         }
       }
@@ -10315,7 +10315,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Épissure simultanée en cours"
+            "value" : "Splice concurrent en cours"
           }
         }
       }
@@ -16389,7 +16389,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Feerate below minimum allowed by mempool : %@ sats/vByte"
+            "value" : "Les frais sont en deçà du minimum accepté par le mempool : %@ sats/vByte"
           }
         }
       }
@@ -16836,7 +16836,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Récupération du LNURL"
+            "value" : "Récupération du lien LNURL"
           }
         }
       }
@@ -19087,7 +19087,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Si Face ID échoue, tu peux entrer ton code d'accès iOS pour accéder à Phoenix."
+            "value" : "Si Face ID échoue, vous pourrez saisir votre code d'accès iOS pour accéder à Phoenix."
           }
         }
       }
@@ -19121,7 +19121,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Si le godet doit être redimensionné pour permettre d'accueillir plus d'eau, cela nécessitera une opération sur la chaîne avec une redevance minière."
+            "value" : "Si le seau doit être redimensionné pour recevoir davantage d'eau, une opération on-chain avec des frais de minage sera nécessaire."
           }
         }
       }
@@ -19202,7 +19202,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Si Touch ID échoue, tu peux entrer ton code d'accès iOS pour accéder à Phoenix."
+            "value" : "Si TouchID échoue, vous pourrez saisir votre code d'accès iOS pour accéder à Phoenix."
           }
         }
       }
@@ -19277,7 +19277,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Si tu actives la [Protection avancée des données] (https://support.apple.com/en-us/108756) pour iCloud, ta phrase de récupération sera cryptée de bout en bout, et Apple ne pourra pas y accéder."
+            "value" : "Si vous activez la [Protection avancée des données](https://support.apple.com/en-us/108756) pour iCloud, votre phrase de sauvegarde sera chiffrée de bout en bout, et Apple ne pourra pas y accéder."
           }
         }
       }
@@ -19599,7 +19599,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importer des chaînes"
+            "value" : "Importer des canaux"
           }
         }
       }
@@ -19948,7 +19948,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Les liquidités entrantes sont insuffisantes pour ce montant, et tu as désactivé la gestion automatisée des canaux."
+            "value" : "La liquidité entrante est insuffisante pour recevoir ce montant, et la gestion automatisée des canaux est désactivée."
           }
         }
       }
@@ -20309,7 +20309,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Les paiements entrants nécessitent parfois de faire des transactions sur la chaîne. Ceci n'arrive pas systématiquement, uniquement si besoin."
+            "value" : "Recevoir des paiements nécessite parfois de faire des transactions sur la chaîne. Cela n'est pas systématique et ne se fait que si nécessaire."
           }
         }
       }
@@ -20896,7 +20896,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Éclatement invalide pubKeyScript"
+            "value" : "Splice-out invalide pubKeyScript"
           }
         }
       }
@@ -21538,7 +21538,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Héritage"
+            "value" : "Ancienne version"
           }
         }
       }
@@ -24211,7 +24211,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Contribution aux frais d'exploitation minière pour la transaction sous-jacente sur la chaîne."
+            "value" : "Contribution aux frais de minage pour la transaction sous-jacente."
           }
         }
       }
@@ -28576,7 +28576,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Planifie à l'avance pour économiser de l'argent plus tard"
+            "value" : "Planifiez à l'avance pour éviter des frais plus tard"
           }
         }
       }
@@ -28698,7 +28698,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Veuillez activer Touch ID"
+            "value" : "Veuillez activer TouchID"
           }
         }
       }
@@ -30509,7 +30509,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Authentification par Touch ID"
+            "value" : "Authentification par TouchID"
           }
         }
       }
@@ -30993,7 +30993,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "L’utilisation de satoshis est recommandée car il est plus facile de travailler avec des nombres entiers que des fractions."
+            "value" : "Il est recommandé d'utiliser l'unité  'satoshi' car il est plus facile de raisonner avec des nombres entiers que des fractions."
           }
         }
       }
@@ -32763,7 +32763,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Texte du partage (adresse bitcoin)"
+            "value" : "Partager le texte (adresse bitcoin)"
           }
         }
       }
@@ -34493,7 +34493,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Recommence"
+            "value" : "Recommencer"
           }
         }
       }
@@ -36476,7 +36476,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Le swap-in wallet est une passerelle vers Lightning. Les fonds sur ce portefeuille seront automatiquement déplacés vers Lightning en fonction de ton paramètre de politique de liquidité."
+            "value" : "Ce wallet est une passerelle vers Lightning. Les fonds déposés sur ce portefeuille seront automatiquement basculés  (\"swap-in\") sur Lightning en fonction de vos paramètres de gestion."
           }
         }
       }
@@ -36510,7 +36510,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Le total des frais est supérieur à ton solde"
+            "value" : "Le total des frais est supérieur à votre solde"
           }
         }
       }
@@ -36630,7 +36630,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Une routine tourne régulièrement en arrière plan pour surveiller et s'assurer que vos canaux de paiement sont en sécurité."
+            "value" : "Une routine de tour de contrôle est régulièrement exécutée en arrière plan pour vérifier que vos canaux de paiement sont en sécurité."
           }
         }
       }
@@ -36952,7 +36952,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cette fonctionnalité n’est pas une solution miracle. Elle n’est disponible qu’en tant que mesure de sécurité, **à n’utiliser qu’en dernier recours.** Par exemple, si votre pair (ACINQ) venait à disparaître de façon permanente, vous empêchant ainsi d’accéder au réseau et de dépenser vos fonds. Dans tous les autres cas, **si vous rencontrez des difficultés à utiliser Phoenix, vous devriez plutôt contacter le support.**"
+            "value" : "Cette fonctionnalité n’est pas une solution miracle. Elle n’est disponible qu’en tant que mesure de sécurité, **à n’utiliser qu’en dernier recours.** Par exemple, si votre contrepartie (ACINQ) venait à disparaître de façon permanente, vous empêchant ainsi d’accéder au réseau et de dépenser vos fonds. Dans tous les autres cas, **si vous rencontrez des difficultés à utiliser Phoenix, vous devriez plutôt contacter le support.**"
           }
         }
       }
@@ -37027,7 +37027,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ces frais vont au service qui fournit les liquidités."
+            "value" : "Ces frais vont au service qui fournit la liquidité."
           }
         }
       }
@@ -37270,7 +37270,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cette méthode est moins sûre, mais plus durable. Touch ID peut cesser de fonctionner en cas de dommages matériels."
+            "value" : "Cette méthode est moins sûre, mais plus durable. TouchID peut cesser de fonctionner en cas de dommages matériels."
           }
         }
       }
@@ -37310,7 +37310,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Il ne s'agit pas d'une demande de retrait. Veux-tu **envoyer de l'argent** à quelqu'un ?"
+            "value" : "Il ne s'agit pas d'une demande de retrait. Voulez-vous plutôt **envoyer de l'argent** à quelqu'un ?"
           }
         }
       }
@@ -37432,7 +37432,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cela signifie que vous ne serez pas notifié si vous recevez un paiement alors que Phoenix est en arrière-plan."
+            "value" : "Cela signifie que vous ne serez pas notifié si vous recevez un paiement lorsque Phoenix est en arrière-plan."
           }
         }
       }
@@ -37712,7 +37712,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Au fil de l’application, vous pourrez taper sur la plupart des montants pour basculer l’affichage entre Bitcoin et votre devise fiduciaire."
+            "value" : "Vous pouvez presser sur la plupart des montants affichés dans l'application pour basculer entre Bitcoin et la devise fiduciaire. de votre choix"
           }
         }
       }
@@ -37752,7 +37752,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fonds à durée déterminée"
+            "value" : "Fonds expirés"
           }
         }
       }
@@ -38812,7 +38812,7 @@
         }
       }
     },
-    "Transactions with insufficient feerate may linger for days or weeks without confirming.\n\nChoosing the feerate is your responsibility. Once sent, this transaction cannot be cancelled, only accelerated with higer fees.\n\nAre you sure you want to proceed?" : {
+    "Transactions with insufficient feerate may linger for days or weeks without confirming.\n\nChoosing the feerate is your responsibility. Once sent, this transaction cannot be cancelled, only accelerated with higher fees.\n\nAre you sure you want to proceed?" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -38841,7 +38841,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Les transactions avec un feerate insuffisant peuvent s'attarder pendant des jours ou des semaines sans être confirmées.\n\nLe choix du taux est de ta responsabilité. Une fois envoyée, cette transaction ne peut pas être annulée, mais seulement accélérée avec des frais plus élevés.\n\nEs-tu sûr de vouloir continuer ?"
+            "value" : "Les transactions avec des frais trop faibles peuvent rester en attente de confirmation pendant des jours ou des semaines.\n\nLe choix de ces frais est votre responsabilité. Une fois envoyée, cette transaction ne pourra pas être annulée, seulement accélérée avec des frais plus élevés.\n\nÊtes-vous sûr de vouloir continuer ?"
           }
         }
       }
@@ -39369,7 +39369,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Biométrie inconnue"
+            "value" : "Identifiant biométrique inconnu"
           }
         }
       }
@@ -41443,7 +41443,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tour de contrôle n'a pas pu terminer"
+            "value" : "La routine de tour de contrôle ne s'est pas terminée correctement"
           }
         }
       }
@@ -41603,7 +41603,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quand cette option est activée, les paiements entrants Lightning ignoreront la limite max des frais. Seul un contrôle relatif en pourcentage sera fait."
+            "value" : "Quand cette option est activée, les paiements entrants Lightning ignoreront la limite max de frais. Seul un contrôle relatif en pourcentage sera fait."
           }
         }
       }
@@ -41927,7 +41927,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Souhaitez-vous être notifié quand quelqu’un vous enverra un paiement ?"
+            "value" : "Souhaitez-vous être notifié quand quelqu’un vous envoie un paiement ?"
           }
         }
       }
@@ -42002,7 +42002,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu as ajouté %@"
+            "value" : "Vous avez ajouté %@"
           }
         }
       }
@@ -42124,7 +42124,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vous êtes responsable de la sauvegarde de votre clé."
+            "value" : "La sauvegarde de votre clé est votre responsabilité."
           }
         }
       }
@@ -42971,7 +42971,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vous n’avez encore pas protégé votre clé de sauvegarde."
+            "value" : "Vous n’avez encore pas fait de sauvegarde de votre clé."
           }
         }
       }
@@ -43005,7 +43005,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu peux peut-être réduire tes frais en augmentant la taille de ton seau avant une série de paiements entrants."
+            "value" : "Vous pourrez peut-être réduire vos frais en augmentant préalablement la taille de ce seau avant de recevoir des paiements."
           }
         }
       }
@@ -43045,7 +43045,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu dois maintenant redémarrer Phoenix."
+            "value" : "Vous devez maintenant redémarrer Phoenix."
           }
         }
       }
@@ -43207,7 +43207,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu pourras surpayer les factures Lightning jusqu'à 2 fois le montant demandé. Utile pour les pourboires manuels, ou comme mesure de confidentialité."
+            "value" : "Vous pourrez surpayer les requêtes Lightning jusqu'à 2 fois le montant demandé. Utile pour les pourboires, ou comme mesure de confidentialité."
           }
         }
       }
@@ -43563,7 +43563,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ta phrase de récupération est composée de 12 mots, générés à l'aide de la norme BIP39.\n\nL'anglais est recommandé. Si tu préfères une autre langue, nous fournissons des instructions de récupération sur notre site Internet.\n\nTon choix ici n'a **aucune incidence** sur ta capacité à envoyer ou à recevoir des bitcoins au sein de Phoenix."
+            "value" : "Votre phrase de récupération est composée de 12 mots, générés suivant le standard BIP39.\n\nL'anglais est recommandé pour des raison de compatibilité. Si vous préférez une autre langue, nous fournissons des instructions sur notre site Internet.\n\nVotre choix ici n'a **aucune incidence** sur votre capacité à envoyer ou à recevoir des bitcoins depuis Phoenix."
           }
         }
       }
