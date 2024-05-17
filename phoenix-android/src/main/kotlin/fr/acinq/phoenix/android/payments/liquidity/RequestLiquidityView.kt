@@ -204,7 +204,15 @@ private fun RequestLiquidityBottomSection(
     Spacer(modifier = Modifier.height(16.dp))
 
     when (val state = vm.state.value) {
-        is RequestLiquidityState.Init -> {
+        is RequestLiquidityState.Init, is RequestLiquidityState.Complete.Failed -> {
+            if (state is RequestLiquidityState.Complete.Failed) {
+                ErrorMessage(
+                    header = stringResource(id = R.string.liquidityads_error_header),
+                    details = spliceFailureDetails(spliceFailure = state.response),
+                    alignment = Alignment.CenterHorizontally
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
             BorderButton(
                 text = if (!mayDoPayments) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.liquidityads_estimate_button),
                 icon = R.drawable.ic_inspect,
@@ -237,12 +245,6 @@ private fun RequestLiquidityBottomSection(
         }
         is RequestLiquidityState.Complete.Success -> {
             LeaseSuccessDetails(liquidityDetails = state.response)
-        }
-        is RequestLiquidityState.Complete.Failed -> {
-            ErrorMessage(
-                header = stringResource(id = R.string.liquidityads_error_header),
-                details = spliceFailureDetails(spliceFailure = state.response)
-            )
         }
         is RequestLiquidityState.Error.NoChannelsAvailable -> {
             ErrorMessage(
@@ -374,6 +376,7 @@ private fun LeaseSuccessDetails(liquidityDetails: ChannelCommand.Commitment.Spli
         header = stringResource(id = R.string.liquidityads_success),
         details = liquidityDetails.liquidityLease?.amount?.let {
             stringResource(id = R.string.liquidityads_success_amount, it.toPrettyString(unit = LocalBitcoinUnit.current, withUnit = true))
-        }
+        },
+        alignment = Alignment.CenterHorizontally,
     )
 }
