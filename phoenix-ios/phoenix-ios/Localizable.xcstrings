@@ -5230,6 +5230,9 @@
         }
       }
     },
+    "As you receive funds, liquidity will be consumed and become your balance. After one year, the remaining unused liquidity will be reclaimed by the service." : {
+
+    },
     "Attention: if the Bitcoin mempool feerate is high, incoming LN payments requiring an on-chain operation could be expensive." : {
       "localizations" : {
         "cs" : {
@@ -7237,6 +7240,9 @@
           }
         }
       }
+    },
+    "Channel size impacted" : {
+
     },
     "Channels are not available, try again later" : {
       "localizations" : {
@@ -11490,6 +11496,9 @@
         }
       }
     },
+    "Don't show this message again" : {
+
+    },
     "Don't use addresses from the previous version." : {
       "localizations" : {
         "cs" : {
@@ -14385,6 +14394,9 @@
           }
         }
       }
+    },
+    "Funds sent on-chain are taken from your side of the channel, reducing the channel size by the same amount. Your inbound liquidity remains the same." : {
+
     },
     "Funds will eventually be sent to:" : {
       "localizations" : {
@@ -34292,6 +34304,9 @@
           }
         }
       }
+    },
+    "You are requesting an **initial** amount of liquidity. Liquidity is not constant over time: as you receive funds over Lightning, the liquidity will be consumed and become your balance.\n\nAfter one year, the remaining unused liquidity will be reclaimed by the service." : {
+
     },
     "You are responsible for backing up your recovery phrase." : {
       "extractionState" : "manual",
