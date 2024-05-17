@@ -16,15 +16,16 @@
 
 package fr.acinq.phoenix.db.payments
 
-import com.squareup.sqldelight.runtime.coroutines.asFlow
-import com.squareup.sqldelight.runtime.coroutines.mapToList
+import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.coroutines.mapToList
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.byteVector32
-import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.db.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 
 class IncomingQueries(private val database: PaymentsDatabase) {
@@ -131,7 +132,7 @@ class IncomingQueries(private val database: PaymentsDatabase) {
     }
 
     fun listAllNotConfirmed(): Flow<List<IncomingPayment>> {
-        return queries.listAllNotConfirmed(::mapIncomingPayment).asFlow().mapToList()
+        return queries.listAllNotConfirmed(::mapIncomingPayment).asFlow().mapToList(Dispatchers.IO)
     }
 
     fun listExpiredPayments(fromCreatedAt: Long, toCreatedAt: Long): List<IncomingPayment> {

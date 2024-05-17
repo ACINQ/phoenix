@@ -16,10 +16,9 @@
 
 package fr.acinq.phoenix.db
 
-import co.touchlab.kermit.Logger
-import com.squareup.sqldelight.EnumColumnAdapter
-import com.squareup.sqldelight.db.SqlDriver
-import com.squareup.sqldelight.runtime.coroutines.asFlow
+import app.cash.sqldelight.EnumColumnAdapter
+import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
 import fr.acinq.bitcoin.TxId
