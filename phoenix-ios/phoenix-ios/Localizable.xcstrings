@@ -28842,6 +28842,9 @@
         }
       }
     },
+    "Please perform a backup before enabling any options here. If you lock yourself out of Phoenix without a backup of your recovery phrase, you will **lose your funds**!" : {
+
+    },
     "Please restart Phoenix" : {
       "localizations" : {
         "ar" : {
@@ -37263,6 +37266,7 @@
       }
     },
     "This is less secure, but more durable. Face ID can stop working due to hardware damage." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -37303,6 +37307,7 @@
       }
     },
     "This is less secure, but more durable. Touch ID can stop working due to hardware damage." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

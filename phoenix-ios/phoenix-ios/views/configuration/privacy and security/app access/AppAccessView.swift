@@ -30,6 +30,9 @@ struct AppAccessView : View {
 	@State var ignoreToggle_passcodeFallbackEnabled = false
 	@State var ignoreToggle_customPinEnabled = false
 	
+	@State private var backupSeedState: BackupSeedState = .safelyBackedUp
+	let backupSeedStatePublisher: AnyPublisher<BackupSeedState, Never>
+	
 	@Environment(\.colorScheme) var colorScheme
 	
 	@EnvironmentObject var smartModalState: SmartModalState
@@ -46,6 +49,12 @@ struct AppAccessView : View {
 		_customPinEnabled = State(initialValue: enabledSecurity.contains(.customPin))
 		
 		_customPinSet = State(initialValue: AppSecurity.shared.hasCustomPin())
+		
+		if let encryptedNodeId = Biz.encryptedNodeId {
+			backupSeedStatePublisher = Prefs.shared.backupSeedStatePublisher(encryptedNodeId)
+		} else {
+			backupSeedStatePublisher = PassthroughSubject<BackupSeedState, Never>().eraseToAnyPublisher()
+		}
 	}
 	
 	// --------------------------------------------------
@@ -90,17 +99,66 @@ struct AppAccessView : View {
 	func content() -> some View {
 		
 		List {
+			if !isRecoveryPhrasedBackedUp {
+				section_warning()
+			}
 			section_biometrics()
 			section_pin()
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
-		.onReceive(willEnterForegroundPublisher) { _ in
-			onWillEnterForeground()
-		}
 		.onAppear {
 			onAppear()
 		}
+		.onReceive(willEnterForegroundPublisher) { _ in
+			onWillEnterForeground()
+		}
+		.onReceive(backupSeedStatePublisher) {(state: BackupSeedState) in
+			backupSeedStateChanged(state)
+		}
+	}
+	
+	@ViewBuilder
+	func section_warning() -> some View {
+		
+		Section {
+			Label {
+				HStack(alignment: VerticalAlignment.center, spacing: 0) {
+					VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
+						Text(
+							"""
+							You have not backed up your recovery phrase!
+							"""
+						)
+						.font(.callout)
+						.bold()
+						
+						Text(
+							"""
+							Please perform a backup before enabling any options here. \
+							If you lock yourself out of Phoenix without a backup of your \
+							recovery phrase, you will **lose your funds**!
+							"""
+						)
+						.font(.subheadline)
+					} // </VStack>
+					Spacer() // ensure label takes up full width
+				}// </HStack>
+			} icon: {
+				Image(systemName: "exclamationmark.circle")
+					.renderingMode(.template)
+					.imageScale(.large)
+					.foregroundColor(Color.appWarn)
+			}
+			.padding()
+			.overlay(
+				RoundedRectangle(cornerRadius: 10)
+					.strokeBorder(Color.appWarn, lineWidth: 1)
+			)
+			.listRowBackground(Color.clear)
+			.listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+		
+		} // </Section>
 	}
 	
 	@ViewBuilder
@@ -180,7 +238,7 @@ struct AppAccessView : View {
 		.onChange(of: biometricsEnabled) { value in
 			self.toggleBiometrics(value)
 		}
-		.disabled(!biometricSupport.isAvailable())
+		.disabled(!biometricSupport.isAvailable() || !isRecoveryPhrasedBackedUp)
 	}
 	
 	@ViewBuilder
@@ -199,13 +257,9 @@ struct AppAccessView : View {
 						if isTouchID() {
 							Text("If Touch ID fails, you can enter your iOS passcode to access Phoenix.")
 								.padding(.top, 8)
-								.padding(.bottom, 16)
-							Text("This is less secure, but more durable. Touch ID can stop working due to hardware damage.")
 						} else {
 							Text("If Face ID fails, you can enter your iOS passcode to access Phoenix.")
 								.padding(.top, 8)
-								.padding(.bottom, 16)
-							Text("This is less secure, but more durable. Face ID can stop working due to hardware damage.")
 						}
 					}
 					.lineLimit(nil)
@@ -224,7 +278,7 @@ struct AppAccessView : View {
 			
 			Toggle("", isOn: $passcodeFallbackEnabled)
 				.labelsHidden()
-				.disabled(!biometricsEnabled)
+				.disabled(!biometricsEnabled || !isRecoveryPhrasedBackedUp)
 				.padding(.trailing, 2)
 				.alignmentGuide(VerticalAlignment.centerTopLine) { (d: ViewDimensions) in
 					d[VerticalAlignment.center]
@@ -249,6 +303,7 @@ struct AppAccessView : View {
 					.foregroundColor(Color.appAccent)
 			}
 		} // </Toggle>
+		.disabled(!isRecoveryPhrasedBackedUp)
 		.onChange(of: customPinEnabled) { value in
 			self.toggleCustomPin(value)
 		}
@@ -269,7 +324,7 @@ struct AppAccessView : View {
 					.foregroundColor(Color.appAccent)
 			}
 		}
-		.disabled(!customPinEnabled || !customPinSet)
+		.disabled(!customPinEnabled || !customPinSet || !isRecoveryPhrasedBackedUp)
 	}
 	
 	@ViewBuilder
@@ -318,6 +373,11 @@ struct AppAccessView : View {
 		}
 	}
 	
+	var isRecoveryPhrasedBackedUp: Bool {
+		
+		return backupSeedState == .safelyBackedUp
+	}
+	
 	// --------------------------------------------------
 	// MARK: Notifications
 	// --------------------------------------------------
@@ -335,6 +395,12 @@ struct AppAccessView : View {
 		// For example: .touchID_notEnrolled => .touchID_available
 		
 		self.biometricSupport = AppSecurity.shared.deviceBiometricSupport()
+	}
+	
+	func backupSeedStateChanged(_ newState: BackupSeedState) {
+		log.trace("backupSeedStateChanged()")
+		
+		backupSeedState = newState
 	}
 	
 	func setNewPinView_willClose(_ result: SetNewPinView.EndResult) {
