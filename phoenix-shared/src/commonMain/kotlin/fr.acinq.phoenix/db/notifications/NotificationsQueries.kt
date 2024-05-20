@@ -16,13 +16,15 @@
 
 package fr.acinq.phoenix.db.notifications
 
-import com.squareup.sqldelight.runtime.coroutines.asFlow
-import com.squareup.sqldelight.runtime.coroutines.mapToList
+import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.coroutines.mapToList
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.data.Notification
 import fr.acinq.phoenix.db.AppDatabase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -63,7 +65,7 @@ internal class NotificationsQueries(val database: AppDatabase) {
      * database (for example, to mark those notifications as read).
      */
     fun listUnread(): Flow<List<Pair<Set<UUID>, Notification>>> {
-        return queries.listUnread().asFlow().mapToList().map {
+        return queries.listUnread().asFlow().mapToList(Dispatchers.IO).map {
             val notifs = it.mapNotNull { row ->
                 val ids = row.grouped_ids.split(";").map { UUID.fromString(it) }.toSet()
                 val notif = mapToNotification(row.id, row.type_version, row.data_json, row.max ?: 0, null)

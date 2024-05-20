@@ -90,7 +90,7 @@
     <string name="initwallet_restore">Meine Wallet wiederherstellen</string>
 
     <string name="restore_disclaimer_message">Phoenix kann nur off-chain-Guthaben wiederherstellen, das von dieser App verwaltet wurde.\n\nEin Seed, der nicht von Phoenix generiert wurde, kann nicht importiert werden.\n\nStellen Sie außerdem sicher, dass Sie nicht bereits eine andere Phoenix-Wallet mit demselben Seed betreiben.</string>
-    <string name="restore_disclaimer_checkbox">Ich verstehe.</string>
+    <string name="utils_ack">Ich verstehe.</string>
 
     <string name="restore_instructions">Der Seed für deine Wallet ist eine Liste mit 12 englischen Wörtern. Schreiben Sie jedes Wort dieser Liste in die folgende Box.</string>
     <string name="restore_input_label">Wort #%1$s eingeben</string>
@@ -126,9 +126,6 @@
     <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Eine Gebühr von %1$s wird für den Erhalt dieses Betrages geschätzt, und diese Gebühren übersteigen %2$s%% des Betrags.\n\nErhöhen Sie dieses Limit oder fordern Sie zusätzliche Liquidität an.</string>
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Eingangskapazität ist unzureichend und automatisches Kanal-Management ist deaktiviert.</string>
-
-    <string name="receive_onchain_legacy_warning_title">Hinweis zur Migration</string>
-    <string name="receive_onchain_legacy_warning">Dies ist Ihre neue Adresse. Verwenden Sie Ihre alten Bitcoin-Adressen von vor der Migration nicht wieder!</string>
 
     <!-- scanning errors -->
 
@@ -344,10 +341,15 @@
     <string name="liquidityads_estimate_above_25">Die Gesamtgebühr beträgt mehr als 25% des angeforderten Betrags.</string>
     <string name="liquidityads_over_balance">Die gesamten Gebühren übersteigen Ihr Guthaben.</string>
 
+    <string name="liquidityads_review_button">Review</string>
+    <string name="liquidityads_disclaimer_body1">Sie fordern einen <b>anfänglichen</b> Betrag an Liquidität an. Die Liquidität ist im Laufe der Zeit nicht konstant: Wenn Sie über Lightning Geld erhalten, wird die Liquidität verbraucht und zu Ihrem Guthaben.</string>
+    <string name="liquidityads_disclaimer_body2">Nach einem Jahr wird die verbleibende ungenutzte Liquidität vom Dienst zurückverlangt.</string>
+
     <string name="liquidityads_request_button">Annehmen</string>
     <string name="liquidityads_requesting_spinner">Bearbeitung des Splice…</string>
 
     <string name="liquidityads_success">Liquidität erfolgreich hinzugefügt!</string>
+    <string name="liquidityads_success_amount">Betrag hinzugefügt: %1$s</string>
 
     <string name="liquidityads_error_header">Liquiditätsanfrage ist fehlgeschlagen</string>
     <string name="liquidityads_error_channels_unavailable">Kanäle sind nicht verfügbar. Versuchen Sie es später erneut.</string>
@@ -369,9 +371,15 @@
 
     <!-- low feerate disclaimer -->
 
-    <string name="send_low_feerate_dialog_title">Niedrige Gebühren!</string>
-    <string name="send_low_feerate_dialog_body1">Zahlungen mit niedrigen Gebühren können sich über Tage oder Wochen hinziehen, ohne bestätigt zu werden.</string>
-    <string name="send_low_feerate_dialog_body2">Die Auswahl der Gebühren liegt in Ihrer Verantwortung. Einmal abgeschickt, kann diese Zahlung nicht mehr storniert, sondern nur noch mit höheren Gebühren beschleunigt werden.</string>
-    <string name="send_low_feerate_dialog_body3">Sind Sie sicher, dass Sie fortfahren möchten?</string>
+    <string name="spliceout_low_feerate_dialog_title">Niedrige Gebühren!</string>
+    <string name="spliceout_low_feerate_dialog_body1">Zahlungen mit niedrigen Gebühren können sich über Tage oder Wochen hinziehen, ohne bestätigt zu werden.</string>
+    <string name="spliceout_low_feerate_dialog_body2">Die Auswahl der Gebühren liegt in Ihrer Verantwortung. Einmal abgeschickt, kann diese Zahlung nicht mehr storniert, sondern nur noch mit höheren Gebühren beschleunigt werden.</string>
+    <string name="spliceout_low_feerate_dialog_body3">Sind Sie sicher, dass Sie fortfahren möchten?</string>
+
+    <!-- spliceout: capacity disclaimer -->
+
+    <string name="spliceout_capacity_disclaimer_title">Kanalgröße beeinträchtigt</string>
+    <string name="spliceout_capacity_disclaimer_body1">Die gesendeten Gelder werden von Ihrer Seite des Kanals genommen, wodurch die Kanalgröße um den gleichen Betrag reduziert wird. Ihre eingehende Liquidität bleibt unverändert.</string>
+    <string name="spliceout_capacity_disclaimer_checkbox">Diese Meldung nicht mehr anzeigen.</string>
 
 </resources>

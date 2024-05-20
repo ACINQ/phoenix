@@ -24,6 +24,7 @@ fileprivate enum Key: String {
 	case hasUpgradedSeedCloudBackups
 	case serverMessageReadIndex
 	case allowOverpayment
+	case doNotShowChannelImpactWarning
 }
 
 fileprivate enum KeyDeprecated: String {
@@ -134,7 +135,7 @@ class Prefs {
 		set { defaults.hasMergedChannelsForSplicing = newValue }
 	}
 	
-  var hasUpgradedSeedCloudBackups: Bool {
+	var hasUpgradedSeedCloudBackups: Bool {
 		get { defaults.hasUpgradedSeedCloudBackups }
 		set { defaults.hasUpgradedSeedCloudBackups = newValue }
 	}
@@ -169,6 +170,11 @@ class Prefs {
 		get { defaults.allowOverpayment }
 		set { defaults.allowOverpayment = newValue }
 	}
+
+	var doNotShowChannelImpactWarning: Bool {
+		 get { defaults.doNotShowChannelImpactWarning }
+		 set { defaults.doNotShowChannelImpactWarning = newValue }
+	 }
 	
 	// --------------------------------------------------
 	// MARK: Wallet State
@@ -256,6 +262,7 @@ class Prefs {
 		defaults.removeObject(forKey: Key.hasUpgradedSeedCloudBackups.rawValue)
 		defaults.removeObject(forKey: Key.serverMessageReadIndex.rawValue)
 		defaults.removeObject(forKey: Key.allowOverpayment.rawValue)
+		defaults.removeObject(forKey: Key.doNotShowChannelImpactWarning.rawValue)
 		
 		self.backupTransactions.resetWallet(encryptedNodeId: encryptedNodeId)
 		self.backupSeed.resetWallet(encryptedNodeId: encryptedNodeId)
@@ -369,5 +376,10 @@ extension UserDefaults {
 	@objc fileprivate var allowOverpayment: Bool {
 		get { bool(forKey: Key.allowOverpayment.rawValue) }
 		set { set(newValue, forKey: Key.allowOverpayment.rawValue) }
+	}
+
+	@objc fileprivate var doNotShowChannelImpactWarning: Bool {
+		get { bool(forKey: Key.doNotShowChannelImpactWarning.rawValue) }
+		set { set(newValue, forKey: Key.doNotShowChannelImpactWarning.rawValue) }
 	}
 }

@@ -8,7 +8,7 @@ buildscript {
         classpath("com.android.tools.build:gradle:7.4.2")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}")
         classpath("org.jetbrains.kotlin:kotlin-serialization:${Versions.kotlin}")
-        classpath("com.squareup.sqldelight:gradle-plugin:${Versions.sqlDelight}")
+        classpath("app.cash.sqldelight:gradle-plugin:${Versions.sqlDelight}")
 
         if (System.getProperty("includeAndroid")?.toBoolean() == true) {
             // Plugins for the legacy android app

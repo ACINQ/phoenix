@@ -96,7 +96,10 @@ public class PopoverState: ObservableObject {
 		itemPublisher.sink { (item: PopoverItem?) in
 			
 			if item == nil {
-				action()
+				// Attempting to display another Popover won't work until the next RunLoop cycle.
+				DispatchQueue.main.async {
+					action()
+				}
 				cancellables.removeAll()
 			}
 			
