@@ -49,28 +49,30 @@ struct NumberPadView: View {
 	@ViewBuilder
 	var body: some View {
 		
+		let showAlphabet = isLatinScript
+		
 		VStack(alignment: HorizontalAlignment.trailing, spacing: 20) {
 			HStack(alignment: VerticalAlignment.center, spacing: 20) {
-				numberPadButton(._1)
-				numberPadButton(._2)
-				numberPadButton(._3)
+				numberPadButton(._1, showAlphabet)
+				numberPadButton(._2, showAlphabet)
+				numberPadButton(._3, showAlphabet)
 			}
 			HStack(alignment: VerticalAlignment.center, spacing: 20) {
-				numberPadButton(._4)
-				numberPadButton(._5)
-				numberPadButton(._6)
+				numberPadButton(._4, showAlphabet)
+				numberPadButton(._5, showAlphabet)
+				numberPadButton(._6, showAlphabet)
 			}
 			HStack(alignment: VerticalAlignment.center, spacing: 20) {
-				numberPadButton(._7)
-				numberPadButton(._8)
-				numberPadButton(._9)
+				numberPadButton(._7, showAlphabet)
+				numberPadButton(._8, showAlphabet)
+				numberPadButton(._9, showAlphabet)
 			}
 			HStack(alignment: VerticalAlignment.center, spacing: 20) {
 				if showHideButton {
-					numberPadButton(.hide)
+					numberPadButton(.hide, showAlphabet)
 				}
-				numberPadButton(._0)
-				numberPadButton(.delete)
+				numberPadButton(._0, showAlphabet)
+				numberPadButton(.delete, showAlphabet)
 			}
 		} // </VStack>
 		.assignMaxPreference(for: numberPadButtonWidthReader.key, to: $numberPadButtonWidth)
@@ -78,7 +80,7 @@ struct NumberPadView: View {
 	}
 	
 	@ViewBuilder
-	func numberPadButton(_ identifier: NumberPadButton) -> some View {
+	func numberPadButton(_ identifier: NumberPadButton, _ showAlphabet: Bool) -> some View {
 		
 		if identifier == .hide {
 			
@@ -126,9 +128,11 @@ struct NumberPadView: View {
 					
 					Text(verbatim: identifier.rawValue)
 						.font(.system(size: 34, weight: .medium))
+						.padding(showAlphabet ? 0 : 4)
 					
-					Group {
-						switch identifier {
+					if showAlphabet {
+						Group {
+							switch identifier {
 							case ._2 : Text(verbatim: "ABC")
 							case ._3 : Text(verbatim: "DEF")
 							case ._4 : Text(verbatim: "GHI")
@@ -138,10 +142,11 @@ struct NumberPadView: View {
 							case ._8 : Text(verbatim: "TUV")
 							case ._9 : Text(verbatim: "WXYZ")
 							default  : Text(verbatim: "-").foregroundStyle(.clear)
+							}
 						}
+						.font(.system(size: 12, weight: .regular))
+						.textTracking(1)
 					}
-					.font(.system(size: 12, weight: .regular))
-					.textTracking(1)
 				} // </VStack>
 				.opacity(disabled ? 0.5 : 1.0)
 				.read(numberPadButtonWidthReader)
@@ -170,6 +175,21 @@ struct NumberPadView: View {
 		}
 		
 		return max(numberPadButtonWidth, numberPadButtonHeight)
+	}
+	
+	var isLatinScript: Bool {
+		
+		if #available(iOS 16, *) {
+			if let script = Locale.current.language.script {
+				return script == Locale.Script.latin
+			}
+		} else { // iOS 15
+			if let scriptCode = Locale.current.scriptCode {
+				return scriptCode.caseInsensitiveCompare("Latin") == .orderedSame
+			}
+		}
+		
+		return false
 	}
 }
 
