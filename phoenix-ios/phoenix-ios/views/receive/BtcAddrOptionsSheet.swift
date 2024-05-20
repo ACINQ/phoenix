@@ -57,7 +57,7 @@ struct BtcAddrOptionsSheet: View {
 		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 			
 			Toggle(isOn: taprootBinding()) {
-				Text("Taproot (recommended)")
+				Text("Taproot (recommended)", comment: "translate: recommended")
 					.foregroundColor(.appAccent)
 					.bold()
 			}

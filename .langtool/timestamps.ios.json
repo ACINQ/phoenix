@@ -18914,7 +18914,7 @@
         "ts" : "2024-04-30T15:55:52Z"
       }
     },
-    "Transactions with insufficient feerate may linger for days or weeks without confirming.\n\nChoosing the feerate is your responsibility. Once sent, this transaction cannot be cancelled, only accelerated with higer fees.\n\nAre you sure you want to proceed?" : {
+    "Transactions with insufficient feerate may linger for days or weeks without confirming.\n\nChoosing the feerate is your responsibility. Once sent, this transaction cannot be cancelled, only accelerated with higher fees.\n\nAre you sure you want to proceed?" : {
       "en" : {
         "ts" : "2024-04-30T15:55:52Z"
       }

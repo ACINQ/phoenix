@@ -52,7 +52,7 @@ struct LowMinerFeeWarning: View {
 			Transactions with insufficient feerate may linger for days or weeks without confirming.
 			
 			Choosing the feerate is your responsibility. \
-			Once sent, this transaction cannot be cancelled, only accelerated with higer fees.
+			Once sent, this transaction cannot be cancelled, only accelerated with higher fees.
 			
 			Are you sure you want to proceed?
 			"""
