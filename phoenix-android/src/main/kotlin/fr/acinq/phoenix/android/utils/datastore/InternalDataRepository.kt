@@ -54,6 +54,7 @@ class InternalDataRepository(private val internalData: DataStore<Preferences>) {
         private val CHANNELS_WATCHER_OUTCOME = stringPreferencesKey("CHANNELS_WATCHER_RESULT")
         private val LAST_USED_SWAP_INDEX = intPreferencesKey("LAST_USED_SWAP_INDEX")
         private val INFLIGHT_PAYMENTS_COUNT = intPreferencesKey("INFLIGHT_PAYMENTS_COUNT")
+        private val SHOW_SPLICEOUT_CAPACITY_DISCLAIMER = booleanPreferencesKey("SHOW_SPLICEOUT_CAPACITY_DISCLAIMER")
         private val REMOTE_WALLET_NOTICE_READ_INDEX = intPreferencesKey("REMOTE_WALLET_NOTICE_READ_INDEX")
     }
 
@@ -136,6 +137,9 @@ class InternalDataRepository(private val internalData: DataStore<Preferences>) {
 
     val getInFlightPaymentsCount: Flow<Int> = safeData.map { it[INFLIGHT_PAYMENTS_COUNT] ?: 0 }
     suspend fun saveInFlightPaymentsCount(count: Int) = internalData.edit { it[INFLIGHT_PAYMENTS_COUNT] = count }
+
+    val getSpliceoutCapacityDisclaimer: Flow<Boolean> = safeData.map { it[SHOW_SPLICEOUT_CAPACITY_DISCLAIMER] ?: true }
+    suspend fun saveSpliceoutCapacityDisclaimer(show: Boolean) = internalData.edit { it[SHOW_SPLICEOUT_CAPACITY_DISCLAIMER] = show }
 
     val getLastReadWalletNoticeIndex: Flow<Int> = safeData.map { it[REMOTE_WALLET_NOTICE_READ_INDEX] ?: -1 }
     suspend fun saveLastReadWalletNoticeIndex(index: Int) = internalData.edit { it[REMOTE_WALLET_NOTICE_READ_INDEX] = index }

@@ -16,7 +16,7 @@
 
 package fr.acinq.phoenix.db
 
-import com.squareup.sqldelight.db.SqlDriver
+import app.cash.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.Chain
 import fr.acinq.phoenix.utils.PlatformContext
 

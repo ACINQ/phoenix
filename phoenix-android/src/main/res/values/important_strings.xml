@@ -22,6 +22,10 @@
 -->
 <resources>
 
+    <!-- generic -->
+
+    <string name="utils_ack">I understand.</string>
+
     <!-- system notifications -->
 
     <string name="notif_headless_title_default">Phoenix is running in the background</string>
@@ -93,7 +97,6 @@
     <string name="initwallet_restore">Restore my wallet</string>
 
     <string name="restore_disclaimer_message">Phoenix can only restore off-chain funds that were managed by this application.\n\nImporting a seed that was NOT created by Phoenix will not restore any funds.\n\nPlease also make sure you are not already running another Phoenix wallet with the same seed.</string>
-    <string name="restore_disclaimer_checkbox">I understand.</string>
 
     <string name="restore_instructions">Your wallet\'s seed is a list of 12 English words. Type-in each word of this list in the box below.</string>
     <string name="restore_input_label">Enter word #%1$s</string>
@@ -129,9 +132,6 @@
     <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">A fee of %1$s is expected to receive this amount, and that fee is more than %2$s%% of the amount.\n\nIncrease this limit in the channel management settings, or request additional liquidity.</string>
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Inbound liquidity is insufficient for this amount, and you have disabled automated channel management.</string>
-
-    <string name="receive_onchain_legacy_warning_title">Migration notice</string>
-    <string name="receive_onchain_legacy_warning">This is your new address. Do not reuse your old Bitcoin addresses from before migration!</string>
 
     <!-- scanning errors -->
 
@@ -343,14 +343,19 @@
     <string name="liquidityads_estimate_details_service_fees_help">This fee goes to the service providing the liquidity.</string>
     <string name="liquidityads_estimate_details_duration">Duration</string>
     <string name="liquidityads_estimate_details_duration_value">1 year</string>
-    <string name="liquidityads_estimate_details_duration_help">The additional capacity will be preserved for that duration.</string>
+    <string name="liquidityads_estimate_details_duration_help">As you receive funds, liquidity will be consumed and become your balance. After one year, the remaining unused liquidity will be reclaimed by the service.</string>
     <string name="liquidityads_estimate_above_25">The total fee is more than 25% of the liquidity amount requested.</string>
     <string name="liquidityads_over_balance">The total fees exceed your balance.</string>
+
+    <string name="liquidityads_review_button">Review</string>
+    <string name="liquidityads_disclaimer_body1">You are requesting an <b>initial</b> amount of liquidity. Liquidity is not constant over time: as you receive funds over Lightning, the liquidity will be consumed and become your balance.</string>
+    <string name="liquidityads_disclaimer_body2">After one year, the remaining unused liquidity will be reclaimed by the service.</string>
 
     <string name="liquidityads_request_button">Accept</string>
     <string name="liquidityads_requesting_spinner">Processing splice…</string>
 
     <string name="liquidityads_success">Liquidity successfully added!</string>
+    <string name="liquidityads_success_amount">Amount added: %1$s</string>
 
     <string name="liquidityads_error_header">Liquidity request has failed</string>
     <string name="liquidityads_error_channels_unavailable">Channels are not available. Try again later.</string>
@@ -370,11 +375,17 @@
     <string name="outgoing_finalfailure_alreadypaid">This invoice has already been paid.</string>
     <string name="outgoing_finalfailure_noroutefound">Recipient is not reachable, or does not have enough inbound liquidity.</string>
 
-    <!-- low feerate disclaimer -->
+    <!-- spliceout: low feerate disclaimer -->
 
-    <string name="send_low_feerate_dialog_title">Low feerate!</string>
-    <string name="send_low_feerate_dialog_body1">Transactions with insufficient feerate may linger for days or weeks without confirming.</string>
-    <string name="send_low_feerate_dialog_body2">Choosing the feerate is your responsibility. Once sent, this transaction cannot be cancelled, only accelerated with higher fees.</string>
-    <string name="send_low_feerate_dialog_body3">Are you sure you want to proceed?</string>
+    <string name="spliceout_low_feerate_dialog_title">Low feerate!</string>
+    <string name="spliceout_low_feerate_dialog_body1">Transactions with insufficient feerate may linger for days or weeks without confirming.</string>
+    <string name="spliceout_low_feerate_dialog_body2">Choosing the feerate is your responsibility. Once sent, this transaction cannot be cancelled, only accelerated with higher fees.</string>
+    <string name="spliceout_low_feerate_dialog_body3">Are you sure you want to proceed?</string>
+
+    <!-- spliceout: capacity disclaimer -->
+
+    <string name="spliceout_capacity_disclaimer_title">Channel size impacted</string>
+    <string name="spliceout_capacity_disclaimer_body1">Funds sent on-chain are taken from your side of the channel, reducing the channel size by the same amount. Your inbound liquidity remains unchanged.</string>
+    <string name="spliceout_capacity_disclaimer_checkbox">Don\'t show that message again.</string>
 
 </resources>

@@ -1,6 +1,6 @@
 package fr.acinq.phoenix.db
 
-import com.squareup.sqldelight.runtime.coroutines.asFlow
+import app.cash.sqldelight.coroutines.asFlow
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
