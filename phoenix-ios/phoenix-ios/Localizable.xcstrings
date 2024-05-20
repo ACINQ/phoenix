@@ -4715,6 +4715,7 @@
       }
     },
     "Access to Phoenix is protected" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -6739,6 +6740,9 @@
           }
         }
       }
+    },
+    "Authenticate to disable passcode fallback." : {
+      "comment" : "User prompt"
     },
     "Authenticated" : {
       "comment" : "lnurl-auth: success text",
@@ -8796,6 +8800,9 @@
         }
       }
     },
+    "Change PIN" : {
+
+    },
     "Channel closing" : {
       "comment" : "Payment description for channel closing",
       "localizations" : {
@@ -10521,6 +10528,9 @@
         }
       }
     },
+    "Confirm new PIN" : {
+
+    },
     "Confirm Payment" : {
       "comment" : "Navigation bar title",
       "localizations" : {
@@ -11736,6 +11746,9 @@
         }
       }
     },
+    "Correct" : {
+
+    },
     "Could not connect to host:" : {
       "localizations" : {
         "ar" : {
@@ -12174,6 +12187,9 @@
           }
         }
       }
+    },
+    "Custom PIN" : {
+
     },
     "Customize amount" : {
       "extractionState" : "manual",
@@ -13657,6 +13673,9 @@
         }
       }
     },
+    "Disable PIN" : {
+      "comment" : "Navigation bar title"
+    },
     "Disabled" : {
       "localizations" : {
         "ar" : {
@@ -14734,6 +14753,9 @@
         }
       }
     },
+    "Edit PIN" : {
+      "comment" : "Navigation bar title"
+    },
     "elapsed" : {
       "comment" : "Label in SummaryInfoGrid",
       "localizations" : {
@@ -15246,6 +15268,18 @@
           }
         }
       }
+    },
+    "Enter new PIN" : {
+
+    },
+    "Enter Phoenix PIN" : {
+
+    },
+    "Enter PIN to authenticate" : {
+
+    },
+    "Enter PIN to confirm" : {
+
     },
     "Error" : {
       "comment" : "Label in SummaryInfoGrid",
@@ -15966,6 +16000,9 @@
           }
         }
       }
+    },
+    "Face ID" : {
+
     },
     "FAILED" : {
       "localizations" : {
@@ -20405,6 +20442,9 @@
           }
         }
       }
+    },
+    "Incorrect" : {
+
     },
     "Increase value" : {
       "localizations" : {
@@ -28198,6 +28238,7 @@
       }
     },
     "Phoenix can be accessed without credentials. Make sure that you have enabled adequate protections for iOS." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -28558,6 +28599,12 @@
           }
         }
       }
+    },
+    "PIN" : {
+
+    },
+    "PIN mismatch!" : {
+
     },
     "Plan ahead to save money later" : {
       "localizations" : {
@@ -30447,6 +30494,7 @@
       }
     },
     "Require Face ID" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -30487,6 +30535,7 @@
       }
     },
     "Require Touch ID" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -30808,6 +30857,9 @@
           }
         }
       }
+    },
+    "Retry in %@" : {
+
     },
     "Review" : {
       "localizations" : {
@@ -32423,6 +32475,9 @@
           }
         }
       }
+    },
+    "Set PIN" : {
+      "comment" : "Navigation bar title"
     },
     "Settings" : {
       "comment" : "Navigation bar title",
@@ -37973,6 +38028,9 @@
         }
       }
     },
+    "To enable a custom PIN, you must first disable the \"allow passcode fallback\" option." : {
+
+    },
     "To enable background payments:" : {
       "localizations" : {
         "ar" : {
@@ -38012,6 +38070,9 @@
           }
         }
       }
+    },
+    "To enable the \"allow passcode fallback\" option, you must first disable the custom PIN." : {
+
     },
     "To fix this re-enable Background App Refresh via: Settings -> General -> Background App Refresh" : {
       "extractionState" : "manual",
@@ -38748,6 +38809,9 @@
           }
         }
       }
+    },
+    "Touch ID" : {
+
     },
     "transaction" : {
       "localizations" : {
@@ -41619,6 +41683,9 @@
           }
         }
       }
+    },
+    "Which PIN?" : {
+
     },
     "will be sent to:" : {
       "localizations" : {

@@ -519,7 +519,14 @@ struct LockView: View {
 			shakeTrigger += 1
 		}
 		
-		let newInvalidPin = invalidPin.increment()
+		let newInvalidPin: InvalidPin
+		if invalidPin.count > 0 && invalidPin.elapsed > 24.hours() {
+			// We reset the count after 24 hours
+			newInvalidPin = InvalidPin.one()
+		} else {
+			newInvalidPin = invalidPin.increment()
+		}
+		
 		AppSecurity.shared.setInvalidPin(invalidPin: newInvalidPin) { _ in }
 		invalidPin = newInvalidPin
 		currentDate = Date.now
