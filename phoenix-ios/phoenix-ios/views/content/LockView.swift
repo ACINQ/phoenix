@@ -96,6 +96,9 @@ struct LockView: View {
 		.onReceive(willEnterForegroundPublisher) { _ in
 			willEnterForeground()
 		}
+		.onChange(of: shakeTrigger) { _ in
+			shakeTriggerChanged()
+		}
 		.vibrationFeedback(.error, trigger: vibrationTrigger)
 	}
 	
@@ -343,6 +346,17 @@ struct LockView: View {
 		// NB: At this moment in time: UIApplication.shared.applicationState == .background
 	
 		refreshSettings(canPrompt: true)
+	}
+	
+	func shakeTriggerChanged() {
+		log.trace("shakeTriggerChanged()")
+		
+		// vibrationFeedback()/sensoryFeedback() is only available in iOS 17
+		// Use older API for earlier iOS versions.
+		if #unavailable(iOS 17.0) {
+			let generator = UINotificationFeedbackGenerator()
+			generator.notificationOccurred(.error)
+		}
 	}
 	
 	// --------------------------------------------------
