@@ -65,11 +65,7 @@ fun MutualCloseView(
     MVIView(CF::closeChannelsConfiguration) { model, postIntent ->
         if (showScannerView) {
             var scanView by remember { mutableStateOf<DecoratedBarcodeView?>(null) }
-            Box(
-                Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-            ) {
+            Box(Modifier.fillMaxSize()) {
                 ScannerView(
                     onScanViewBinding = { scanView = it },
                     onScannedText = {

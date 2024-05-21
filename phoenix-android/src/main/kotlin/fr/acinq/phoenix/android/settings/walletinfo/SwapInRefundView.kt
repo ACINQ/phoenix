@@ -24,13 +24,18 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,7 +47,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import fr.acinq.bitcoin.Satoshi
@@ -60,12 +67,12 @@ import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.Dialog
 import fr.acinq.phoenix.android.components.FeerateSlider
 import fr.acinq.phoenix.android.components.ProgressView
-import fr.acinq.phoenix.android.components.SplashLabelRow
 import fr.acinq.phoenix.android.components.TextInput
 import fr.acinq.phoenix.android.components.TransactionLinkButton
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.feedback.SuccessMessage
 import fr.acinq.phoenix.android.fiatRate
+import fr.acinq.phoenix.android.payments.CameraPermissionsView
 import fr.acinq.phoenix.android.payments.ScannerView
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
@@ -81,16 +88,12 @@ fun SendSwapInRefundView(
     val swapInWallet by peerManager.swapInWallet.collectAsState()
     val availableForRefund = swapInWallet?.readyForRefund?.balance
 
-    DefaultScreenLayout {
+    DefaultScreenLayout(isScrollable = false) {
         DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.swapinrefund_title))
 
         when (availableForRefund) {
             null -> {
-                Card(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp)) {
-                    ProgressView(text = stringResource(id = R.string.utils_loading_data), padding = PaddingValues(horizontal = 16.dp, vertical = 12.dp))
-                }
+                ProgressView(text = stringResource(id = R.string.utils_loading_data), padding = PaddingValues(horizontal = 16.dp, vertical = 12.dp))
             }
 
             else -> {
@@ -124,141 +127,157 @@ private fun AvailableForRefundView(
             onAddressChange = {
                 address = Parser.trimMatchingPrefix(Parser.removeExcessInput(it), Parser.bitcoinPrefixes)
                 addressErrorMessage = ""
+                showScannerView = false
             }
         )
     } else {
-
-        if (availableForRefund == 0.sat) {
-            Card(internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp), modifier = Modifier.fillMaxWidth(), ) {
-                Text(text = stringResource(id = R.string.swapinrefund_none_available_label))
-            }
-        } else {
-            Card(internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp), modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+            if (availableForRefund == 0.sat) {
                 Text(
-                    text = annotatedStringResource(
-                        id = R.string.swapinrefund_available_label,
-                        availableForRefund.toPrettyString(LocalBitcoinUnit.current, withUnit = true),
-                        availableForRefund.toPrettyString(LocalFiatCurrency.current, fiatRate, withUnit = true)
+                    text = stringResource(id = R.string.swapinrefund_none_available_label),
+                    style = MaterialTheme.typography.caption,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    textAlign = TextAlign.Center
+                )
+            } else {
+                Card(internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp), modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = annotatedStringResource(
+                            id = R.string.swapinrefund_available_label,
+                            availableForRefund.toPrettyString(LocalBitcoinUnit.current, withUnit = true),
+                            availableForRefund.toPrettyString(LocalFiatCurrency.current, fiatRate, withUnit = true)
+                        )
                     )
-                )
-            }
-
-            Card(internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp), modifier = Modifier.fillMaxWidth()) {
-
-                Text(text = stringResource(id = R.string.swapinrefund_instructions_1))
-                Spacer(modifier = Modifier.height(24.dp))
-
-                TextInput(
-                    text = address,
-                    onTextChange = {
-                        addressErrorMessage = ""
-                        vm.state = SwapInRefundState.Init
-                        address = it
-                    },
-                    staticLabel = stringResource(id = R.string.mutualclose_input_label),
-                    trailingIcon = {
-                        Button(
-                            onClick = { showScannerView = true },
-                            icon = R.drawable.ic_scan_qr,
-                            iconTint = MaterialTheme.colors.primary
-                        )
-                    },
-                    errorMessage = addressErrorMessage,
-                    maxLines = 3,
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = vm.state !is SwapInRefundState.Sending,
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                SplashLabelRow(label = stringResource(id = R.string.send_spliceout_feerate_label)) {
-                    feerate?.let { currentFeerate ->
-                        FeerateSlider(
-                            feerate = currentFeerate,
-                            onFeerateChange = { newFeerate ->
-                                if (vm.state != SwapInRefundState.Init && feerate != newFeerate) {
-                                    vm.state = SwapInRefundState.Init
-                                }
-                                feerate = newFeerate
-                            },
-                            mempoolFeerate = mempoolFeerate,
-                            enabled = vm.state !is SwapInRefundState.Sending
-                        )
-                    } ?: ProgressView(text = stringResource(id = R.string.send_spliceout_feerate_waiting_for_value), padding = PaddingValues(0.dp))
                 }
-            }
-        }
 
-        if (state is SwapInRefundState.Done.Failed) {
-            ErrorMessage(
-                header = stringResource(id = R.string.swapinrefund_failed),
-                details = when (state) {
-                    is SwapInRefundState.Done.Failed.InvalidAddress -> stringResource(id = R.string.swapinrefund_failed_address)
-                    is SwapInRefundState.Done.Failed.Error -> state.e.message
-                    is SwapInRefundState.Done.Failed.CannotCreateTx -> stringResource(id = R.string.swapinrefund_failed_cannot_create)
-                },
-                modifier = Modifier.fillMaxWidth(),
-                alignment = Alignment.CenterHorizontally,
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-        }
+                Card(internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp), modifier = Modifier.fillMaxWidth()) {
 
-        Card(modifier = Modifier.fillMaxWidth()) {
-            when (val currentState = vm.state) {
-                is SwapInRefundState.Init, is SwapInRefundState.Done.Failed -> {
-                    if (availableForRefund > 0.sat) {
-                        val keyboardManager = LocalSoftwareKeyboardController.current
-                        var showLowFeerateDialog by remember(feerate, mempoolFeerate) { mutableStateOf(false) }
+                    Text(text = stringResource(id = R.string.swapinrefund_instructions_1))
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = stringResource(id = R.string.swapinrefund_instructions_2))
+                    Spacer(modifier = Modifier.height(24.dp))
 
-                        if (showLowFeerateDialog) {
-                            ConfirmLowFeerate(
-                                onConfirm = {
-                                    feerate?.let {
-                                        vm.executeRefund(address = address, feerate = FeeratePerByte(it))
-                                        showLowFeerateDialog = false
-                                    }
-                                },
-                                onCancel = { showLowFeerateDialog = false }
+                    TextInput(
+                        text = address,
+                        onTextChange = {
+                            addressErrorMessage = ""
+                            vm.state = SwapInRefundState.Init
+                            address = it
+                        },
+                        staticLabel = stringResource(id = R.string.mutualclose_input_label),
+                        trailingIcon = {
+                            Button(
+                                onClick = { showScannerView = true },
+                                icon = R.drawable.ic_scan_qr,
+                                iconTint = MaterialTheme.colors.primary
                             )
-                        }
+                        },
+                        errorMessage = addressErrorMessage,
+                        maxLines = 3,
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = vm.state !is SwapInRefundState.Sending,
+                    )
 
-                        Button(
-                            text = stringResource(id = R.string.swapinrefund_send_button),
-                            icon = R.drawable.ic_send,
-                            enabled = feerate != null && address.isNotBlank(),
-                            onClick = {
-                                keyboardManager?.hide()
-                                val finalFeerate = feerate
-                                if (finalFeerate != null) {
-                                    val recommendedFeerate = mempoolFeerate?.hour
-                                    if (recommendedFeerate != null && finalFeerate < recommendedFeerate.feerate) {
-                                        showLowFeerateDialog = true
-                                    } else {
-                                        vm.executeRefund(address = address, feerate = FeeratePerByte(finalFeerate))
-                                    }
-                                }
-                            },
-                            padding = PaddingValues(16.dp),
-                            modifier = Modifier.fillMaxWidth(),
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Row {
+                        Text(
+                            text =  stringResource(id = R.string.send_spliceout_feerate_label),
+                            style = MaterialTheme.typography.body1.copy(fontSize = 14.sp, textAlign = TextAlign.End),
+                            modifier = Modifier.weight(1f),
                         )
+                        Spacer(Modifier.width(16.dp))
+                        feerate?.let { currentFeerate ->
+                            FeerateSlider(
+                                feerate = currentFeerate,
+                                onFeerateChange = { newFeerate ->
+                                    if (vm.state != SwapInRefundState.Init && feerate != newFeerate) {
+                                        vm.state = SwapInRefundState.Init
+                                    }
+                                    feerate = newFeerate
+                                },
+                                mempoolFeerate = mempoolFeerate,
+                                enabled = vm.state !is SwapInRefundState.Sending,
+                                modifier = Modifier.weight(2f),
+                            )
+                        } ?: ProgressView(text = stringResource(id = R.string.send_spliceout_feerate_waiting_for_value), padding = PaddingValues(0.dp))
                     }
                 }
+            }
 
-                SwapInRefundState.Sending -> {
-                    ProgressView(text = stringResource(id = R.string.swapinrefund_sending))
-                }
+            if (state is SwapInRefundState.Done.Failed) {
+                ErrorMessage(
+                    header = stringResource(id = R.string.swapinrefund_failed),
+                    details = when (state) {
+                        is SwapInRefundState.Done.Failed.InvalidAddress -> stringResource(id = R.string.swapinrefund_failed_address)
+                        is SwapInRefundState.Done.Failed.Error -> state.e.message
+                        is SwapInRefundState.Done.Failed.CannotCreateTx -> stringResource(id = R.string.swapinrefund_failed_cannot_create)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    alignment = Alignment.CenterHorizontally,
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
 
-                is SwapInRefundState.Done.Success -> {
-                    SuccessMessage(header = stringResource(id = R.string.swapinrefund_success), alignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth())
-                    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
-                        Text(text = stringResource(id = R.string.swapinrefund_success_details))
-                        Spacer(modifier = Modifier.height(8.dp))
-                        TransactionLinkButton(txId = currentState.tx.txid)
-                        Button(
-                            text = stringResource(id = R.string.btn_copy),
-                            icon = R.drawable.ic_copy,
-                            onClick = { copyToClipboard(context, data = currentState.tx.toString()) },
-                        )
+            Card(modifier = Modifier.fillMaxWidth()) {
+                when (val currentState = vm.state) {
+                    is SwapInRefundState.Init, is SwapInRefundState.Done.Failed -> {
+                        if (availableForRefund > 0.sat) {
+                            val keyboardManager = LocalSoftwareKeyboardController.current
+                            var showLowFeerateDialog by remember(feerate, mempoolFeerate) { mutableStateOf(false) }
+
+                            if (showLowFeerateDialog) {
+                                ConfirmLowFeerate(
+                                    onConfirm = {
+                                        feerate?.let {
+                                            vm.executeRefund(address = address, feerate = FeeratePerByte(it))
+                                            showLowFeerateDialog = false
+                                        }
+                                    },
+                                    onCancel = { showLowFeerateDialog = false }
+                                )
+                            }
+
+                            Button(
+                                text = stringResource(id = R.string.swapinrefund_send_button),
+                                icon = R.drawable.ic_send,
+                                enabled = feerate != null && address.isNotBlank(),
+                                onClick = {
+                                    keyboardManager?.hide()
+                                    val finalFeerate = feerate
+                                    if (finalFeerate != null) {
+                                        val recommendedFeerate = mempoolFeerate?.hour
+                                        if (recommendedFeerate != null && finalFeerate < recommendedFeerate.feerate) {
+                                            showLowFeerateDialog = true
+                                        } else {
+                                            vm.executeRefund(address = address, feerate = FeeratePerByte(finalFeerate))
+                                        }
+                                    }
+                                },
+                                padding = PaddingValues(16.dp),
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                        }
+                    }
+
+                    SwapInRefundState.Sending -> {
+                        ProgressView(text = stringResource(id = R.string.swapinrefund_sending))
+                    }
+
+                    is SwapInRefundState.Done.Success -> {
+                        SuccessMessage(header = stringResource(id = R.string.swapinrefund_success), alignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth())
+                        Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+                            Text(text = stringResource(id = R.string.swapinrefund_success_details))
+                            Spacer(modifier = Modifier.height(8.dp))
+                            TransactionLinkButton(txId = currentState.tx.txid)
+                            Button(
+                                text = stringResource(id = R.string.btn_copy),
+                                icon = R.drawable.ic_copy,
+                                onClick = { copyToClipboard(context, data = currentState.tx.toString()) },
+                            )
+                        }
                     }
                 }
             }
@@ -301,15 +320,15 @@ private fun SwapInRefundScanner(
     onAddressChange: (String) -> Unit,
 ) {
     var scanView by remember { mutableStateOf<DecoratedBarcodeView?>(null) }
-    Box(
-        Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
-    ) {
+    Box(Modifier.fillMaxSize()) {
         ScannerView(
             onScanViewBinding = { scanView = it },
             onScannedText = { onAddressChange(it) }
         )
+
+        CameraPermissionsView {
+            LaunchedEffect(Unit) { scanView?.resume() }
+        }
 
         // buttons at the bottom of the screen
         Column(
