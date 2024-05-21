@@ -501,7 +501,7 @@ struct LockView: View {
 	func verifyPin() {
 		log.trace("verifyPin()")
 		
-		let correctPin = AppSecurity.shared.getCustomPin() ?? "1234567890"
+		let correctPin = AppSecurity.shared.getCustomPin()
 		if pin == correctPin {
 			handleCorrectPin()
 		} else {
@@ -545,21 +545,12 @@ struct LockView: View {
 		invalidPin = newInvalidPin
 		currentDate = Date.now
 		
-		if let delay = newInvalidPin.waitTimeFrom(currentDate) {
-			
-			numberPadDisabled = true
-			DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-				numberPadDisabled = false
-				pin = ""
-			}
-			
-		} else {
-			
-			numberPadDisabled = true
-			DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
-				numberPadDisabled = false
-				pin = ""
-			}
+		let delay = newInvalidPin.waitTimeFrom(currentDate) ?? 0.75
+		
+		numberPadDisabled = true
+		DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+			numberPadDisabled = false
+			pin = ""
 		}
 	}
 	

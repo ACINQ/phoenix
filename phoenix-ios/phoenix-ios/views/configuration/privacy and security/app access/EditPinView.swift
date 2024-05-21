@@ -260,7 +260,7 @@ struct EditPinView: View {
 	func verifyPin() {
 		log.trace("verifyPin()")
 		
-		let correctPin = AppSecurity.shared.getCustomPin() ?? "1234567890"
+		let correctPin = AppSecurity.shared.getCustomPin()
 		if pin0 == correctPin {
 			handleCorrectPin()
 		} else {
