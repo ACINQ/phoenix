@@ -22,6 +22,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	var isAppLaunch = true
 	var firstUnlockAttempted = false
 
+	static func get() -> SceneDelegate {
+		
+		return UIApplication.shared.connectedScenes.first!.delegate as! SceneDelegate
+	}
+	
 	func scene(
 		_ scene: UIScene,
 		willConnectTo session: UISceneSession,
@@ -405,6 +410,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	// --------------------------------------------------
 	// MARK: Lock Window
 	// --------------------------------------------------
+	
+	func lockWallet() {
+		log.trace("lockWallet")
+		
+		LockState.shared.isUnlocked = false
+		showLockWindow()
+	}
 	
 	private func showLockWindow() {
 		log.trace("showLockWindow()")

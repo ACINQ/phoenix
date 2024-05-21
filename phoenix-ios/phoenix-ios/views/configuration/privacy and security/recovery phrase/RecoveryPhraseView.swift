@@ -49,6 +49,7 @@ struct RecoveryPhraseList: View {
 	@Namespace var sectionID_cloudBackup
 
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
+	@EnvironmentObject var smartModalState: SmartModalState
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
@@ -350,6 +351,21 @@ struct RecoveryPhraseList: View {
 			isDecrypting = false
 		}
 		
+		let AuthWithPin = {
+			smartModalState.display(dismissable: false) {
+				AuthenticateWithPinSheet { result in
+					switch result {
+					case .Authenticated(let recoveryPhrase):
+						Succeed(recoveryPhrase)
+					case .UserCancelled:
+						Fail()
+					case .Failed:
+						Fail()
+					}
+				}
+			}
+		}
+		
 		let enabledSecurity = AppSecurity.shared.enabledSecurityPublisher.value
 		if enabledSecurity == .none {
 			AppSecurity.shared.tryUnlockWithKeychain { (recoveryPhrase, _, _) in
@@ -360,17 +376,25 @@ struct RecoveryPhraseList: View {
 					Fail()
 				}
 			}
-		} else {
+		} else if enabledSecurity.contains(.biometrics) {
 			let prompt = NSLocalizedString("Unlock your seed.", comment: "Biometrics prompt")
 			
 			AppSecurity.shared.tryUnlockWithBiometrics(prompt: prompt) { result in
 				
 				if case .success(let recoveryPhrase) = result {
 					Succeed(recoveryPhrase)
+				} else if enabledSecurity.contains(.customPin) { // custom pin fallback
+					AuthWithPin()
 				} else {
 					Fail()
 				}
 			}
+		} else if enabledSecurity.contains(.customPin) {
+			AuthWithPin()
+			
+		} else {
+			log.error("Unhandled security configuration")
+			Fail()
 		}
 	}
 	
