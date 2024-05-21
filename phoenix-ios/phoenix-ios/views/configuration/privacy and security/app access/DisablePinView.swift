@@ -210,11 +210,12 @@ struct DisablePinView: View {
 		isCorrectPin = false
 		numberPadDisabled = true
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
-			if failCount < 2 {
+			if failCount < 3 {
 				pin = ""
 				numberPadDisabled = false
 			} else {
 				dismissView(.UserCancelled)
+				SceneDelegate.get().lockWallet()
 			}
 		}
 	}

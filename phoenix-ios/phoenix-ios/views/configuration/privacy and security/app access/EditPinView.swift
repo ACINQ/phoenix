@@ -42,6 +42,7 @@ struct EditPinView: View {
 	
 	@State var vibrationTrigger: Int = 0
 	@State var shakeTrigger: Int = 0
+	@State var failCount: Int = 0
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
@@ -276,11 +277,17 @@ struct EditPinView: View {
 			shakeTrigger += 1
 		}
 		
+		failCount += 1
 		numberPadDisabled = true
 		isCorrectPin = false
-		DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-			numberPadDisabled = false
-			pin0 = ""
+		DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
+			if failCount < 3 {
+				numberPadDisabled = false
+				pin0 = ""
+			} else {
+				dismissView(.UserCancelled)
+				SceneDelegate.get().lockWallet()
+			}
 		}
 	}
 	
