@@ -104,10 +104,14 @@ sealed class OutgoingStatusData {
             FinalFailure.InvalidPaymentId::class.simpleName -> FinalFailure.InvalidPaymentId
             FinalFailure.NoAvailableChannels::class.simpleName -> FinalFailure.NoAvailableChannels
             FinalFailure.InsufficientBalance::class.simpleName -> FinalFailure.InsufficientBalance
-            FinalFailure.NoRouteToRecipient::class.simpleName -> FinalFailure.NoRouteToRecipient
             FinalFailure.RecipientUnreachable::class.simpleName -> FinalFailure.RecipientUnreachable
             FinalFailure.RetryExhausted::class.simpleName -> FinalFailure.RetryExhausted
             FinalFailure.WalletRestarted::class.simpleName -> FinalFailure.WalletRestarted
+            FinalFailure.AlreadyPaid::class.simpleName -> FinalFailure.AlreadyPaid
+            FinalFailure.ChannelClosing::class.simpleName -> FinalFailure.ChannelClosing
+            FinalFailure.ChannelOpening::class.simpleName -> FinalFailure.ChannelOpening
+            FinalFailure.ChannelNotConnected::class.simpleName -> FinalFailure.ChannelNotConnected
+            FinalFailure.FeaturesNotSupported::class.simpleName -> FinalFailure.FeaturesNotSupported
             else -> FinalFailure.UnknownError
         }
     }

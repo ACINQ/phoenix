@@ -34,7 +34,7 @@ import kotlinx.serialization.json.Json
 
 enum class OutgoingPartStatusTypeVersion {
     SUCCEEDED_V0,
-    /* Obsolete, do not use anymore. Failed parts are now typed, with a code and an option string message. */
+    @Deprecated("Obsolete, do not use anymore. Failed parts are now typed, with a code and an option string message.")
     FAILED_V0,
     FAILED_V1,
 }
@@ -47,6 +47,7 @@ sealed class OutgoingPartStatusData {
     }
 
     sealed class Failed : OutgoingPartStatusData() {
+        @Deprecated("Use V1 instead")
         @Serializable
         data class V0(val remoteFailureCode: Int?, val details: String) : Failed()
 
@@ -100,21 +101,21 @@ fun LightningOutgoingPayment.Part.Status.Succeeded.mapToDb() = OutgoingPartStatu
         Json.encodeToString(OutgoingPartStatusData.Succeeded.V0(preimage)).toByteArray(Charsets.UTF_8)
 
 fun LightningOutgoingPayment.Part.Status.Failure.mapToDb(): Pair<OutgoingPartStatusTypeVersion, ByteArray> {
-    val code = when (this) {
-        is LightningOutgoingPayment.Part.Status.Failure.Uninterpretable -> 0
-        is LightningOutgoingPayment.Part.Status.Failure.PaymentAmountTooSmall -> 1
-        is LightningOutgoingPayment.Part.Status.Failure.PaymentAmountTooBig -> 2
-        is LightningOutgoingPayment.Part.Status.Failure.NotEnoughFunds -> 3
-        is LightningOutgoingPayment.Part.Status.Failure.NotEnoughFees -> 4
-        is LightningOutgoingPayment.Part.Status.Failure.PaymentExpiryTooBig -> 5
-        is LightningOutgoingPayment.Part.Status.Failure.TooManyPendingPayments -> 6
-        is LightningOutgoingPayment.Part.Status.Failure.ChannelIsSplicing -> 7
-        is LightningOutgoingPayment.Part.Status.Failure.ChannelIsClosing -> 8
-        is LightningOutgoingPayment.Part.Status.Failure.TemporaryRemoteFailure -> 9
-        is LightningOutgoingPayment.Part.Status.Failure.RecipientLiquidityIssue -> 10
-        is LightningOutgoingPayment.Part.Status.Failure.RecipientIsOffline -> 11
-        is LightningOutgoingPayment.Part.Status.Failure.RecipientRejectedPayment -> 12
+    val (code, details) = when (this) {
+        is LightningOutgoingPayment.Part.Status.Failure.Uninterpretable -> 0 to message
+        is LightningOutgoingPayment.Part.Status.Failure.PaymentAmountTooSmall -> 1 to null
+        is LightningOutgoingPayment.Part.Status.Failure.PaymentAmountTooBig -> 2 to null
+        is LightningOutgoingPayment.Part.Status.Failure.NotEnoughFunds -> 3 to null
+        is LightningOutgoingPayment.Part.Status.Failure.NotEnoughFees -> 4 to null
+        is LightningOutgoingPayment.Part.Status.Failure.PaymentExpiryTooBig -> 5 to null
+        is LightningOutgoingPayment.Part.Status.Failure.TooManyPendingPayments -> 6 to null
+        is LightningOutgoingPayment.Part.Status.Failure.ChannelIsSplicing -> 7 to null
+        is LightningOutgoingPayment.Part.Status.Failure.ChannelIsClosing -> 8 to null
+        is LightningOutgoingPayment.Part.Status.Failure.TemporaryRemoteFailure -> 9 to null
+        is LightningOutgoingPayment.Part.Status.Failure.RecipientLiquidityIssue -> 10 to null
+        is LightningOutgoingPayment.Part.Status.Failure.RecipientIsOffline -> 11 to null
+        is LightningOutgoingPayment.Part.Status.Failure.RecipientRejectedPayment -> 12 to null
     }
-    return OutgoingPartStatusTypeVersion.FAILED_V0 to
-            Json.encodeToString(OutgoingPartStatusData.Failed.V0(code, "")).toByteArray(Charsets.UTF_8)
+    return OutgoingPartStatusTypeVersion.FAILED_V1 to
+            Json.encodeToString(OutgoingPartStatusData.Failed.V1(code, details)).toByteArray(Charsets.UTF_8)
 }

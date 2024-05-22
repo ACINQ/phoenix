@@ -213,8 +213,7 @@ class CloudDataTest {
             amount = 500_005.msat,
             route = listOf(HopDesc(a, b)),
             status = LightningOutgoingPayment.Part.Status.Failed(
-                remoteFailureCode = 418,
-                details = "I'm a teapot"
+                LightningOutgoingPayment.Part.Status.Failure.Uninterpretable("I'm a teapot")
             )
         )
         val outgoingPayment = LightningOutgoingPayment(

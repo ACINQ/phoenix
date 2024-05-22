@@ -24,6 +24,8 @@ import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.wire.PermanentNodeFailure
 import fr.acinq.phoenix.db.payments.*
+import io.ktor.utils.io.charsets.Charsets
+import io.ktor.utils.io.core.toByteArray
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -64,17 +66,26 @@ class OutgoingPaymentDbTypeVersionTest {
     }
 
     @Test
-    fun outgoing_part_status_failed_channelexception() {
-        val status = LightningOutgoingPayment.Part.Status.Failed(null, InvalidFinalScript(channelId1).details(), completedAt = 123)
-        val deserialized = OutgoingPartStatusData.deserialize(OutgoingPartStatusTypeVersion.FAILED_V0, status.mapToDb().second, completedAt = 123)
+    fun outgoing_part_status_failed_part() {
+        val status = LightningOutgoingPayment.Part.Status.Failed(LightningOutgoingPayment.Part.Status.Failure.ChannelIsClosing, completedAt = 123)
+        val deserialized = OutgoingPartStatusData.deserialize(OutgoingPartStatusTypeVersion.FAILED_V1, status.failure.mapToDb().second, completedAt = 123)
         assertEquals(status, deserialized)
+
+        val status2 = LightningOutgoingPayment.Part.Status.Failed(LightningOutgoingPayment.Part.Status.Failure.Uninterpretable("lorem ipsum"), completedAt = 123)
+        val deserialized2 = OutgoingPartStatusData.deserialize(OutgoingPartStatusTypeVersion.FAILED_V1, status2.failure.mapToDb().second, completedAt = 123)
+        assertEquals(status2, deserialized2)
     }
 
     @Test
-    fun outgoing_part_status_failed_remotefailure() {
-        val status = LightningOutgoingPayment.Part.Status.Failed(PermanentNodeFailure.code, PermanentNodeFailure.message, completedAt = 345)
-        val deserialized = OutgoingPartStatusData.deserialize(OutgoingPartStatusTypeVersion.FAILED_V0, status.mapToDb().second, completedAt = 345)
-        assertEquals(status, deserialized)
+    fun outgoing_part_status_failed_channelexception_legacy() {
+        val serialized = """
+            {"remoteFailureCode":8243,"details":"payment fee was below the minimum required by the trampoline node"}
+        """.trimIndent()
+        val deserialized = OutgoingPartStatusData.deserialize(OutgoingPartStatusTypeVersion.FAILED_V0, serialized.toByteArray(Charsets.UTF_8), completedAt = 123)
+        val expected = LightningOutgoingPayment.Part.Status.Failed(
+            LightningOutgoingPayment.Part.Status.Failure.Uninterpretable("payment fee was below the minimum required by the trampoline node"), completedAt = 123
+        )
+        assertEquals(expected, deserialized)
     }
 
     @Test
