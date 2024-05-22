@@ -67,7 +67,7 @@ fun ReceiveView(
     onFeeManagementClick: () -> Unit,
     onScanDataClick: () -> Unit,
 ) {
-    val vm: ReceiveViewModel = viewModel(factory = ReceiveViewModel.Factory(business.chain, business.peerManager, business.walletManager))
+    val vm: ReceiveViewModel = viewModel(factory = ReceiveViewModel.Factory(business.chain, business.peerManager, business.nodeParamsManager, business.walletManager))
 
     DefaultScreenLayout(horizontalAlignment = Alignment.CenterHorizontally, isScrollable = true) {
         DefaultScreenHeader(
@@ -93,7 +93,7 @@ private fun ReceiveViewPages(
     onFeeManagementClick: () -> Unit,
     onScanDataClick: () -> Unit,
 ) {
-    val pagerState = rememberPagerState(pageCount = { 2 })
+    val pagerState = rememberPagerState(pageCount = { 3 })
     // we need to be responsive in some subcomponents, like the edit-invoice buttons
     BoxWithConstraints {
         HorizontalPager(
@@ -136,6 +136,7 @@ private fun ReceiveViewPages(
                         } ?: ProgressView(text = stringResource(id = R.string.utils_loading_prefs))
                     }
                     1 -> BitcoinAddressView(vm = vm, maxWidth = maxWidth)
+                    2 -> OfferView(state = vm.offerState, maxWidth = maxWidth)
                 }
             }
         }

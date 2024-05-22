@@ -36,6 +36,7 @@ import fr.acinq.phoenix.android.utils.BitmapHelper
 import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
 import fr.acinq.phoenix.android.utils.datastore.SwapAddressFormat
 import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
+import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.managers.WalletManager
 import fr.acinq.phoenix.managers.phoenixSwapInWallet
@@ -46,21 +47,27 @@ import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 
 sealed class LightningInvoiceState {
-    object Init : LightningInvoiceState()
-    object Generating : LightningInvoiceState()
+    data object Init : LightningInvoiceState()
+    data object Generating : LightningInvoiceState()
     data class Show(val invoice: Bolt11Invoice) : LightningInvoiceState()
     data class Error(val e: Throwable) : LightningInvoiceState()
 }
 
 sealed class BitcoinAddressState {
-    object Init : BitcoinAddressState()
+    data object Init : BitcoinAddressState()
     data class Show(val currentIndex: Int, val currentAddress: String, val image: ImageBitmap) : BitcoinAddressState()
     data class Error(val e: Throwable) : BitcoinAddressState()
+}
+
+sealed class OfferState {
+    data object Init : OfferState()
+    data class Show(val encoded: String, val bitmap: ImageBitmap) : OfferState()
 }
 
 class ReceiveViewModel(
     private val chain: Chain,
     private val peerManager: PeerManager,
+    private val nodeParamsManager: NodeParamsManager,
     private val walletManager: WalletManager,
     private val internalDataRepository: InternalDataRepository,
     private val userPrefs: UserPrefsRepository
@@ -69,6 +76,7 @@ class ReceiveViewModel(
 
     var lightningInvoiceState by mutableStateOf<LightningInvoiceState>(LightningInvoiceState.Init)
     var currentSwapAddress by mutableStateOf<BitcoinAddressState>(BitcoinAddressState.Init)
+    var offerState by mutableStateOf<OfferState>(OfferState.Init)
 
     /** Bitmap containing the LN invoice qr code. It is not stored in the state to avoid brutal transitions and flickering. */
     var lightningQRBitmap by mutableStateOf<ImageBitmap?>(null)
@@ -79,6 +87,7 @@ class ReceiveViewModel(
 
     init {
         monitorCurrentSwapAddress()
+        getDeterministicOffer()
     }
 
     @UiThread
@@ -135,16 +144,26 @@ class ReceiveViewModel(
         }
     }
 
+    private fun getDeterministicOffer() {
+        viewModelScope.launch {
+            val (_, offer) = nodeParamsManager.defaultOffer()
+            val encoded = offer.encode()
+            val image = BitmapHelper.generateBitmap(encoded).asImageBitmap()
+            offerState = OfferState.Show(encoded, image)
+        }
+    }
+
     class Factory(
         private val chain: Chain,
         private val peerManager: PeerManager,
+        private val nodeParamsManager: NodeParamsManager,
         private val walletManager: WalletManager,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
             val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as? PhoenixApplication)
             @Suppress("UNCHECKED_CAST")
-            return ReceiveViewModel(chain, peerManager, walletManager, application.internalDataRepository, application.userPrefs) as T
+            return ReceiveViewModel(chain, peerManager, nodeParamsManager, walletManager, application.internalDataRepository, application.userPrefs) as T
         }
     }
 }

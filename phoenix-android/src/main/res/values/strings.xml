@@ -126,6 +126,19 @@
     <string name="receive_lightning_share_title">Share this Lightning invoice with…</string>
     <string name="receive_lnurl_button">Use LNURL link</string>
 
+    <string name="receive_offer_title">Static invoice</string>
+    <string name="receive_offer_help">Use this static invoice to receive payments over Lightning. This invoice does not expire and can be reused and serve as a personal address on social networks or for your friends.</string>
+    <string name="receive_offer_invoice_label">Invoice</string>
+    <string name="receive_offer_share_title">Static Lightning invoice</string>
+    <string name="receive_offer_share_subject">Share this static Lightning invoice with…</string>
+
+    <string name="receive_offer_howto_title">How to use</string>
+    <string name="receive_offer_howto_subtitle">Tap here to know more.</string>
+    <string name="receive_offer_howto_details_1">This static invoice, also known as an \"offer\" or a \"BOLT 12 invoice\", uses new bleeding-edge tech.</string>
+    <string name="receive_offer_howto_details_2">Unlike regular Lightning invoices, it does not expire and can be reused at will. It can be used as a tipping address and for donations.</string>
+    <string name="receive_offer_howto_details_3">Currently, few wallets support paying this new type of invoice. If you have issues, use a regular Lightning invoice instead.</string>
+    <string name="receive_offer_howto_details_faq_link">Check the FAQ</string>
+
     <string name="receive_lightning_edit_button">Edit</string>
     <string name="receive_lightning_edit_title">Edit invoice</string>
     <string name="receive_lightning_edit_amount_label">Amount (optional)</string>
@@ -133,7 +146,6 @@
     <string name="receive_lightning_edit_desc_label">Description (optional)</string>
     <string name="receive_lightning_edit_desc_placeholder">Enter a description for this invoice</string>
     <string name="receive_lightning_edit_generate_button">Create invoice</string>
-
 
     <!-- send -->
 

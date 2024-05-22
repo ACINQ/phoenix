@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.managers
 
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.Satoshi
@@ -29,6 +30,7 @@ import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.shared.BuildVersions
 import fr.acinq.lightning.logging.info
+import fr.acinq.lightning.wire.OfferTypes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
@@ -76,6 +78,11 @@ class NodeParamsManager(
                 _nodeParams.value = it
             }
         }
+    }
+
+    /** See [NodeParams.defaultOffer]. */
+    suspend fun defaultOffer(): Pair<ByteVector32, OfferTypes.Offer> {
+        return nodeParams.filterNotNull().first().defaultOffer(trampolineNodeUri)
     }
 
     companion object {
