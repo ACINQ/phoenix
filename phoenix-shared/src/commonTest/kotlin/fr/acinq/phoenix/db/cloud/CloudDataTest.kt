@@ -72,17 +72,6 @@ class CloudDataTest {
     }
 
     @Test
-    fun incoming__keySend() = runTest {
-        testRoundtrip(
-            IncomingPayment(
-                preimage = preimage,
-                origin = IncomingPayment.Origin.KeySend,
-                received = null
-            )
-        )
-    }
-
-    @Test
     fun incoming__swapIn() = runTest {
         testRoundtrip(
             IncomingPayment(

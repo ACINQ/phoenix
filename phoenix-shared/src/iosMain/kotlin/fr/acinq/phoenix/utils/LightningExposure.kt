@@ -51,11 +51,6 @@ fun IncomingPayment.Origin.asInvoice(): IncomingPayment.Origin.Invoice? = when (
     else -> null
 }
 
-fun IncomingPayment.Origin.asKeySend(): IncomingPayment.Origin.KeySend? = when (this) {
-    is IncomingPayment.Origin.KeySend -> this
-    else -> null
-}
-
 fun IncomingPayment.Origin.asSwapIn(): IncomingPayment.Origin.SwapIn? = when (this) {
     is IncomingPayment.Origin.SwapIn -> this
     else -> null

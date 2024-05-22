@@ -78,9 +78,7 @@ extension WalletPaymentInfo {
 	
 		if let incomingPayment = payment as? Lightning_kmpIncomingPayment {
 			
-			if let _ = incomingPayment.origin.asKeySend() {
-				return NSLocalizedString("Donation", comment: "Payment description for received KeySend")
-			} else if let _ = incomingPayment.origin.asSwapIn() {
+			if let _ = incomingPayment.origin.asSwapIn() {
 				return NSLocalizedString("On-chain deposit", comment: "Payment description for received deposit")
 			} else if let _ = incomingPayment.origin.asOnChain() {
 				return NSLocalizedString("On-chain deposit", comment: "Payment description for received deposit")

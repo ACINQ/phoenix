@@ -324,7 +324,6 @@
     <string name="paymentdetails_desc_legacy_migration">Migration depuis l\'ancienne appli</string>
     <string name="paymentdetails_desc_cpfp">Accélération de transactions</string>
     <string name="paymentdetails_desc_inbound_liquidity">+%1$s de liquidité entrante</string>
-    <string name="paymentdetails_desc_keysend">Don</string>
     <string name="paymentdetails_desc_swapout">Swap-out vers %1$s</string>
     <string name="paymentdetails_desc_swapin">Dépôt on-chain</string>
     <string name="paymentdetails_desc_identifier">Paiement vers %1$s</string>
@@ -347,7 +346,6 @@
     <string name="paymentdetails_normal_incoming">Paiement Lightning entrant</string>
     <string name="paymentdetails_swapin">Dépôt on-chain (swap-in)</string>
     <string name="paymentdetails_swapout">Swap-out vers une adresse Bitcoin</string>
-    <string name="paymentdetails_keysend">Keysend (paiement spontané)</string>
     <string name="paymentdetails_swapin_address_label">Adresse de dépôt on-chain</string>
     <string name="paymentdetails_bitcoin_address_label">Adresse Bitcoin</string>
 

@@ -19,11 +19,6 @@ extension Lightning_kmpWalletPayment {
 				let exp = NSLocalizedString("layer 1 -> 2", comment: "Transaction Info: Explanation")
 				return (val, exp.lowercased())
 			}
-			if let _ = incomingPayment.origin.asKeySend() {
-				let val = NSLocalizedString("KeySend", comment: "Transaction Info: Value")
-				let exp = NSLocalizedString("non-invoice payment", comment: "Transaction Info: Explanation")
-				return (val, exp.lowercased())
-			}
 			if incomingPayment.isSpliceIn {
 				let val = NSLocalizedString("Splice-In", comment: "Transaction Info: Value")
 				let exp = NSLocalizedString("adding to existing channel", comment: "Transaction Info: Explanation")

@@ -46,13 +46,6 @@ class IncomingPaymentDbTypeVersionTest {
     }
 
     @Test
-    fun incoming_origin_keysend() {
-        val origin = IncomingPayment.Origin.KeySend
-        val deserialized = IncomingOriginData.deserialize(IncomingOriginTypeVersion.KEYSEND_V0, origin.mapToDb().second)
-        assertEquals(origin, deserialized)
-    }
-
-    @Test
     fun incoming_origin_swapin() {
         val origin = IncomingPayment.Origin.SwapIn(address1)
         val deserialized = IncomingOriginData.deserialize(IncomingOriginTypeVersion.SWAPIN_V0, origin.mapToDb().second)

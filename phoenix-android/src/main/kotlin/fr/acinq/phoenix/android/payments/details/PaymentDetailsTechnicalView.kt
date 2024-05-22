@@ -174,7 +174,6 @@ private fun HeaderForIncoming(
         Text(
             when (payment.origin) {
                 is IncomingPayment.Origin.Invoice -> stringResource(R.string.paymentdetails_normal_incoming)
-                is IncomingPayment.Origin.KeySend -> stringResource(R.string.paymentdetails_keysend)
                 is IncomingPayment.Origin.SwapIn -> stringResource(R.string.paymentdetails_swapin)
                 is IncomingPayment.Origin.OnChain -> stringResource(R.string.paymentdetails_swapin)
                 is IncomingPayment.Origin.Offer -> stringResource(id = R.string.paymentdetails_offer_incoming)
@@ -414,7 +413,6 @@ private fun DetailsForIncoming(
                 Text(origin.address ?: stringResource(id = R.string.utils_unknown))
             }
         }
-        is IncomingPayment.Origin.KeySend -> {}
         is IncomingPayment.Origin.OnChain -> {
             TechnicalRow(label = stringResource(id = R.string.paymentdetails_dualswapin_tx_label)) {
                 origin.localInputs.mapIndexed { index, outpoint ->
