@@ -43,13 +43,6 @@ class OutgoingPaymentDbTypeVersionTest {
     }
 
     @Test
-    fun outgoing_keysend_normal() {
-        val details = LightningOutgoingPayment.Details.KeySend(preimage1)
-        val deserialized = OutgoingDetailsData.deserialize(OutgoingDetailsTypeVersion.KEYSEND_V0, details.mapToDb().second)
-        assertEquals(details, deserialized)
-    }
-
-    @Test
     fun outgoing_details_swapout() {
         val details = LightningOutgoingPayment.Details.SwapOut(address1, bolt11Invoice, 1_000.sat)
         val deserialized = OutgoingDetailsData.deserialize(OutgoingDetailsTypeVersion.SWAPOUT_V0, details.mapToDb().second)

@@ -154,23 +154,9 @@ class CloudDataTest {
         testRoundtrip(
             LightningOutgoingPayment(
                 id = uuid,
-                amount = 1_000_000.msat,
-                recipient = publicKey,
-                invoice = invoice
-            )
-        )
-    }
-
-    @Test
-    fun outgoing__keySend() = runTest {
-        testRoundtrip(
-            LightningOutgoingPayment(
-                id = uuid,
                 recipientAmount = 1_000_000.msat,
                 recipient = publicKey,
-                status = LightningOutgoingPayment.Status.Pending,
-                parts = emptyList(),
-                details = LightningOutgoingPayment.Details.KeySend(preimage)
+                details = LightningOutgoingPayment.Details.Normal(invoice)
             )
         )
     }
