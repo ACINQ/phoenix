@@ -1141,8 +1141,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 						}
 					}
 					
-					let code = part_failed.remoteFailureCode?.description ?? "local"
-					Text(verbatim: "\(code): \(part_failed.details)")
+					Text(verbatim: "reason: \(part_failed.failure.description)")
 				}
 				
 			} else {

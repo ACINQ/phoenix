@@ -100,6 +100,8 @@ sealed class OutgoingPartStatusData {
 fun LightningOutgoingPayment.Part.Status.Succeeded.mapToDb() = OutgoingPartStatusTypeVersion.SUCCEEDED_V0 to
         Json.encodeToString(OutgoingPartStatusData.Succeeded.V0(preimage)).toByteArray(Charsets.UTF_8)
 
+fun LightningOutgoingPayment.Part.Status.Failed.mapToDb() = this.failure.mapToDb()
+
 fun LightningOutgoingPayment.Part.Status.Failure.mapToDb(): Pair<OutgoingPartStatusTypeVersion, ByteArray> {
     val (code, details) = when (this) {
         is LightningOutgoingPayment.Part.Status.Failure.Uninterpretable -> 0 to message

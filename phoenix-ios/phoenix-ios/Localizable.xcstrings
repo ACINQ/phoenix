@@ -25061,6 +25061,7 @@
     },
     "non-invoice payment" : {
       "comment" : "Transaction Info: Explanation",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
