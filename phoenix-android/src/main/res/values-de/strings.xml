@@ -352,7 +352,6 @@
     <string name="paymentdetails_desc_legacy_migration">Migration von Legacy-App</string>
     <string name="paymentdetails_desc_cpfp">Beschleunigte Transaktion</string>
     <string name="paymentdetails_desc_inbound_liquidity">+%1$s eingehende Liquidität</string>
-    <string name="paymentdetails_desc_keysend">Spende</string>
     <string name="paymentdetails_desc_swapout">Swap-out an %1$s</string>
     <string name="paymentdetails_desc_swapin">On-Chain Einzahlung</string>
     <string name="paymentdetails_desc_identifier">Zahlung an %1$s</string>
@@ -375,7 +374,6 @@
     <string name="paymentdetails_normal_incoming">Standard eingehende Lightning-Zahlung</string>
     <string name="paymentdetails_swapin">Swap-in Bitcoin-Einzahlung</string>
     <string name="paymentdetails_swapout">Swap-out an Bitcoin-Adresse</string>
-    <string name="paymentdetails_keysend">Keysend (unaufgeforderte Zahlung)</string>
     <string name="paymentdetails_swapin_address_label">Einzahlungs-Adresse</string>
     <string name="paymentdetails_bitcoin_address_label">Bitcoin-Adresse</string>
 

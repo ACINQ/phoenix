@@ -388,7 +388,7 @@ object LegacyMigrationHelper {
         } else if (paymentRequest != null) {
             LightningOutgoingPayment.Details.Normal(paymentRequest)
         } else {
-            LightningOutgoingPayment.Details.KeySend(preimage = Lightning.randomBytes32().sha256())
+            throw RuntimeException("unhandled outgoing payment details")
         }
 
         val parts = listOfParts.filter { it.paymentType() == PaymentType.Standard() }.map { part ->

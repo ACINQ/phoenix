@@ -14274,47 +14274,6 @@
         }
       }
     },
-    "Donation" : {
-      "comment" : "Payment description for received KeySend",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "التبرع"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dary"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Spende"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Donación"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Donación"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Don"
-          }
-        }
-      }
-    },
     "Done" : {
       "localizations" : {
         "ar" : {
@@ -21314,47 +21273,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "GARDEZ LA EN SÛRETÉ."
-          }
-        }
-      }
-    },
-    "KeySend" : {
-      "comment" : "Transaction Info: Value",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الدفع عبر KeySend"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "KeySend"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "KeySend"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "KeySend"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "KeySend"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "KeySend"
           }
         }
       }

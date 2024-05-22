@@ -182,6 +182,10 @@ if (includeAndroid) {
             testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }
 
+        lint {
+            disable.add("Deprecation")
+        }
+
         compileOptions {
             sourceCompatibility = JavaVersion.VERSION_1_8
             targetCompatibility = JavaVersion.VERSION_1_8

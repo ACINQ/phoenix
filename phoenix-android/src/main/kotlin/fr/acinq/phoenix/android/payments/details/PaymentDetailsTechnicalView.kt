@@ -28,10 +28,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.PrivateKey
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.Bolt12Invoice
+import fr.acinq.lightning.payment.OfferPaymentMetadata
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sum
@@ -133,7 +135,7 @@ private fun HeaderForOutgoing(
                 is LightningOutgoingPayment -> when (payment.details) {
                     is LightningOutgoingPayment.Details.Normal -> stringResource(R.string.paymentdetails_normal_outgoing)
                     is LightningOutgoingPayment.Details.SwapOut -> stringResource(R.string.paymentdetails_swapout)
-                    is LightningOutgoingPayment.Details.KeySend -> stringResource(R.string.paymentdetails_keysend)
+                    is LightningOutgoingPayment.Details.Blinded -> stringResource(id = R.string.paymentdetails_offer_outgoing)
                 }
                 is SpliceCpfpOutgoingPayment -> stringResource(id = R.string.paymentdetails_splice_cpfp_outgoing)
                 is InboundLiquidityOutgoingPayment -> stringResource(id = R.string.paymentdetails_inbound_liquidity)
@@ -172,9 +174,9 @@ private fun HeaderForIncoming(
         Text(
             when (payment.origin) {
                 is IncomingPayment.Origin.Invoice -> stringResource(R.string.paymentdetails_normal_incoming)
-                is IncomingPayment.Origin.KeySend -> stringResource(R.string.paymentdetails_keysend)
                 is IncomingPayment.Origin.SwapIn -> stringResource(R.string.paymentdetails_swapin)
                 is IncomingPayment.Origin.OnChain -> stringResource(R.string.paymentdetails_swapin)
+                is IncomingPayment.Origin.Offer -> stringResource(id = R.string.paymentdetails_offer_incoming)
             }
         )
     }
@@ -300,19 +302,14 @@ private fun DetailsForLightningOutgoingPayment(
     // -- details of the payment
     when (details) {
         is LightningOutgoingPayment.Details.Normal -> {
-            when (val paymentRequest = details.paymentRequest) {
-                is Bolt11Invoice -> InvoiceSection(invoice = paymentRequest)
-                is Bolt12Invoice -> {
-                    // TODO
-                }
-            }
+            Bolt11InvoiceSection(invoice = details.paymentRequest)
         }
         is LightningOutgoingPayment.Details.SwapOut -> {
             TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_bitcoin_address_label), value = details.address)
             TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = details.paymentHash.toHex())
         }
-        is LightningOutgoingPayment.Details.KeySend -> {
-            TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = details.paymentHash.toHex())
+        is LightningOutgoingPayment.Details.Blinded -> {
+            Bolt12InvoiceSection(invoice = details.paymentRequest, payerKey = details.payerKey)
         }
     }
 
@@ -408,7 +405,7 @@ private fun DetailsForIncoming(
     // -- details about the origin of the payment
     when (val origin = payment.origin) {
         is IncomingPayment.Origin.Invoice -> {
-            InvoiceSection(invoice = origin.paymentRequest)
+            Bolt11InvoiceSection(invoice = origin.paymentRequest)
             TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_preimage_label), value = payment.preimage.toHex())
         }
         is IncomingPayment.Origin.SwapIn -> {
@@ -416,7 +413,6 @@ private fun DetailsForIncoming(
                 Text(origin.address ?: stringResource(id = R.string.utils_unknown))
             }
         }
-        is IncomingPayment.Origin.KeySend -> {}
         is IncomingPayment.Origin.OnChain -> {
             TechnicalRow(label = stringResource(id = R.string.paymentdetails_dualswapin_tx_label)) {
                 origin.localInputs.mapIndexed { index, outpoint ->
@@ -427,6 +423,9 @@ private fun DetailsForIncoming(
                     }
                 }
             }
+        }
+        is IncomingPayment.Origin.Offer -> {
+            Bolt12MetadataSection(metadata = origin.metadata)
         }
     }
 }
@@ -507,7 +506,7 @@ private fun LightningPart(
 }
 
 @Composable
-private fun InvoiceSection(
+private fun Bolt11InvoiceSection(
     invoice: Bolt11Invoice
 ) {
     val requestedAmount = invoice.amount
@@ -528,6 +527,49 @@ private fun InvoiceSection(
 
     TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = invoice.paymentHash.toHex())
     TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_request_label), value = invoice.write())
+}
+
+@Composable
+private fun Bolt12InvoiceSection(
+    invoice: Bolt12Invoice,
+    payerKey: PrivateKey,
+) {
+    val requestedAmount = invoice.amount
+    if (requestedAmount != null) {
+        TechnicalRowAmount(
+            label = stringResource(id = R.string.paymentdetails_invoice_requested_label),
+            amount = requestedAmount,
+            rateThen = null
+        )
+    }
+
+    val description = invoice.description?.takeIf { it.isNotBlank() }
+    if (description != null) {
+        TechnicalRow(label = stringResource(id = R.string.paymentdetails_payment_request_description_label)) {
+            Text(text = description)
+        }
+    }
+
+    TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payerkey_label), value = payerKey.toHex())
+    TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = invoice.paymentHash.toHex())
+    TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_request_label), value = invoice.write())
+}
+
+@Composable
+private fun Bolt12MetadataSection(
+    metadata: OfferPaymentMetadata
+) {
+    TechnicalRowAmount(
+        label = stringResource(id = R.string.paymentdetails_invoice_requested_label),
+        amount = metadata.amount,
+        rateThen = null
+    )
+    TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = metadata.paymentHash.toHex())
+    TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_preimage_label), value = metadata.preimage.toHex())
+    TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_offerid_label), value = metadata.offerId.toHex())
+    if (metadata is OfferPaymentMetadata.V1) {
+        TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payerkey_label), value = metadata.payerKey.toHex())
+    }
 }
 
 // ============== utility components for this view

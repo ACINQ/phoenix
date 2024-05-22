@@ -364,10 +364,10 @@
     <string name="paymentdetails_desc_legacy_migration">Migration from legacy app</string>
     <string name="paymentdetails_desc_cpfp">Bump transactions</string>
     <string name="paymentdetails_desc_inbound_liquidity">+%1$s inbound liquidity</string>
-    <string name="paymentdetails_desc_keysend">Donation</string>
     <string name="paymentdetails_desc_swapout">Swap-out to %1$s</string>
     <string name="paymentdetails_desc_swapin">On-chain deposit</string>
     <string name="paymentdetails_desc_identifier">Payment to %1$s</string>
+    <string name="paymentdetails_desc_offer_incoming">Payment to %1$s</string>
 
     <string name="paymentdetails_edit_dialog_title">Add a custom description to this payment</string>
     <string name="paymentdetails_edit_dialog_input_label">Description</string>
@@ -387,7 +387,8 @@
     <string name="paymentdetails_normal_incoming">Standard incoming Lightning payment</string>
     <string name="paymentdetails_swapin">Swap-in Bitcoin deposit</string>
     <string name="paymentdetails_swapout">Swap-out to Bitcoin address</string>
-    <string name="paymentdetails_keysend">Keysend (spontaneous payment)</string>
+    <string name="paymentdetails_offer_outgoing">Offer outgoing Lightning payment</string>
+    <string name="paymentdetails_offer_incoming">Offer incoming Lightning payment</string>
     <string name="paymentdetails_swapin_address_label">Deposit address</string>
     <string name="paymentdetails_bitcoin_address_label">Bitcoin address</string>
 
@@ -410,6 +411,8 @@
     <string name="paymentdetails_payment_hash_label">Payment Hash</string>
     <string name="paymentdetails_payment_request_label">Invoice</string>
     <string name="paymentdetails_preimage_label">Preimage</string>
+    <string name="paymentdetails_payerkey_label">Payer key</string>
+    <string name="paymentdetails_offerid_label">Offer ID</string>
 
     <string name="paymentdetails_status_label">Payment status</string>
     <string name="paymentdetails_status_success">Successful</string>

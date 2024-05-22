@@ -78,9 +78,7 @@ extension WalletPaymentInfo {
 	
 		if let incomingPayment = payment as? Lightning_kmpIncomingPayment {
 			
-			if let _ = incomingPayment.origin.asKeySend() {
-				return NSLocalizedString("Donation", comment: "Payment description for received KeySend")
-			} else if let _ = incomingPayment.origin.asSwapIn() {
+			if let _ = incomingPayment.origin.asSwapIn() {
 				return NSLocalizedString("On-chain deposit", comment: "Payment description for received deposit")
 			} else if let _ = incomingPayment.origin.asOnChain() {
 				return NSLocalizedString("On-chain deposit", comment: "Payment description for received deposit")
@@ -88,13 +86,7 @@ extension WalletPaymentInfo {
 			
 		} else if let outgoingPayment = payment as? Lightning_kmpOutgoingPayment {
 			
-			if let lightningPayment = outgoingPayment as? Lightning_kmpLightningOutgoingPayment {
-				
-				if let _ = lightningPayment.details.asKeySend() {
-					return NSLocalizedString("Donation", comment: "Payment description for received KeySend")
-				}
-				
-			} else if let _ = outgoingPayment as? Lightning_kmpChannelCloseOutgoingPayment {
+			if let _ = outgoingPayment as? Lightning_kmpChannelCloseOutgoingPayment {
 				return NSLocalizedString("Channel closing", comment: "Payment description for channel closing")
 				
 			} else if let _ = outgoingPayment as? Lightning_kmpSpliceCpfpOutgoingPayment {
