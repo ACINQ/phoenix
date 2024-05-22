@@ -780,7 +780,6 @@ private fun translatePaymentError(paymentFailure: OutgoingPaymentFailure): Strin
                 FinalFailure.InsufficientBalance -> stringResource(id = R.string.outgoing_failuremessage_not_enough_balance)
                 FinalFailure.InvalidPaymentAmount -> stringResource(id = R.string.outgoing_failuremessage_invalid_amount)
                 FinalFailure.NoAvailableChannels -> stringResource(id = R.string.outgoing_failuremessage_not_enough_balance)
-                FinalFailure.NoRouteToRecipient -> stringResource(id = R.string.outgoing_failuremessage_noroutefound)
                 FinalFailure.RecipientUnreachable -> stringResource(id = R.string.outgoing_failuremessage_noroutefound)
                 FinalFailure.RetryExhausted -> stringResource(id = R.string.outgoing_failuremessage_noroutefound)
                 FinalFailure.UnknownError -> stringResource(id = R.string.outgoing_failuremessage_unknown)
