@@ -68,12 +68,19 @@ extension SecureEnclave.P256.Signing.PrivateKey: GenericPasswordConvertible {
 }
 
 extension ContiguousBytes {
-    /// A Data instance created safely from the contiguous bytes without making any copies.
-    var dataRepresentation: Data {
-        return self.withUnsafeBytes { bytes in
-            let cfdata = CFDataCreateWithBytesNoCopy(nil, bytes.baseAddress?.assumingMemoryBound(to: UInt8.self), bytes.count, kCFAllocatorNull)
-            return ((cfdata as NSData?) as Data?) ?? Data()
-        }
-    }
+	
+	/// A Data instance created from the contiguous bytes.
+	///
+	/// Note: In the original version of this code, Apple used `CFDataCreateWithBytesNoCopy`,
+	/// which creates non-owned pointer to the bytes.
+	/// However, this is unacceptably dangerous (could lead to dangling pointers), and has been removed.
+	/// During code analysis, we discovered that we were using `dataRepresentation` in certain cases,
+	/// where the resulting `Data` object would out-live the owner (such as as `ChaChaPoly.SealedBox`).
+	///
+	var dataRepresentation: Data {
+		return self.withUnsafeBytes { bytes in
+			Data(bytes: bytes.baseAddress!, count: bytes.count)
+		}
+	}
 }
 

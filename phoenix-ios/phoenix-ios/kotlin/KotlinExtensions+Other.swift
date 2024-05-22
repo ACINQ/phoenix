@@ -229,7 +229,7 @@ extension MnemonicLanguage {
 		
 		let iterator = all.iterator()
 		while iterator.hasNext() {
-			if let lang = iterator.next_() as? MnemonicLanguage {
+			if let lang = iterator.next() as? MnemonicLanguage {
 				if lang.code.caseInsensitiveCompare(code) == .orderedSame {
 					return lang
 				}
@@ -247,7 +247,7 @@ extension MnemonicLanguage {
 		
 		let iterator = all.iterator()
 		while iterator.hasNext() {
-			if let lang = iterator.next_() as? MnemonicLanguage {
+			if let lang = iterator.next() as? MnemonicLanguage {
 				result.append(lang)
 			}
 		}

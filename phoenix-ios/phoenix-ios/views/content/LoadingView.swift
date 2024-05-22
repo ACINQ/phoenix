@@ -41,18 +41,23 @@ struct LoadingView: View {
 		
 		GeometryReader { geometry in
 			
-			let topPadding = geometry.size.height / 4.0
-			
 			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+				
+				Spacer(minLength: 0)
+					.frame(minHeight: 0, maxHeight: geometry.size.height / 4.0)
+					.layoutPriority(-2)
+				
 				logoContent()
-					.padding(.bottom, 40)
+				
+				Spacer(minLength: 0)
+					.frame(minHeight: 0, maxHeight: 50)
+					.layoutPriority(-1)
+				
 				loadingContent()
 			}
-			.padding(.top, topPadding)
 			.frame(maxWidth: .infinity)
 		}
 		.background(Color(UIColor.systemBackground))
-		.edgesIgnoringSafeArea(.all)
 	}
 	
 	@ViewBuilder

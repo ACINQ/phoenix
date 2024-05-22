@@ -7,7 +7,7 @@ plugins {
   id("kotlin-parcelize")
   id("androidx.navigation.safeargs.kotlin")
   id("com.google.gms.google-services")
-  id("com.squareup.sqldelight")
+  id("app.cash.sqldelight")
   id("kotlinx-serialization")
 }
 
@@ -69,10 +69,11 @@ android {
 }
 
 sqldelight {
-  database("Database") {
-    packageName = "fr.acinq.phoenix.legacy.db"
-    sourceFolders = listOf("sqldelight")
-    schemaOutputDirectory = file("src/main/sqldelight/databases")
+  databases {
+    create("Database") {
+      packageName.set("fr.acinq.phoenix.legacy.db")
+      srcDirs.from("src/main/sqldelight")
+    }
   }
 }
 
@@ -110,7 +111,7 @@ dependencies {
   implementation("com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava")
 
   // SQLDelight
-  implementation("com.squareup.sqldelight:android-driver:${Versions.sqlDelight}")
+  implementation("app.cash.sqldelight:android-driver:${Versions.sqlDelight}")
 
   // logging
   implementation("org.slf4j:slf4j-api:${Versions.slf4j}")

@@ -93,7 +93,7 @@
     <string name="initwallet_restore">Obnovit moji peněženku</string>
 
     <string name="restore_disclaimer_message">Phoenix může obnovit pouze Off-Chain prostředky, které byly spravovány touto aplikací.\n\nImportem Seedu, který NEBYL vytvořen aplikací Phoenix, se neobnoví žádné prostředky.\n\nUjistěte se také, že již není spuštěna jiná aplikace Phoenix se stejným Seedem.</string>
-    <string name="restore_disclaimer_checkbox">Rozumím.</string>
+    <string name="utils_ack">Rozumím.</string>
 
     <string name="restore_instructions">Seed vaší peněženky je seznam 12 anglických slov. Každé slovo z tohoto seznamu napište do níže uvedeného pole.</string>
     <string name="restore_input_label">Zadejte slovo #%1$s</string>
@@ -129,9 +129,6 @@
     <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Očekává se, že tuto částku obdrží poplatek ve výši %1$s, a tento poplatek je vyšší než %2$s% částky.\n\nZvýšte tento limit v nastavení správy kanálů, nebo požádejte o dodatečnou likviditu.</string>
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Příchozí likvidita není dostatečná a máte zakázanou automatickou správu kanálů.</string>
-
-    <string name="receive_onchain_legacy_warning_title">Oznámení o migraci</string>
-    <string name="receive_onchain_legacy_warning">Toto je vaše nová adresa. Nepoužívejte znovu své staré Bitcoin adresy z doby před migrací!</string>
 
     <!-- scanning errors -->
 
@@ -346,10 +343,15 @@
     <string name="liquidityads_estimate_above_25">Celkový poplatek je vyšší než 25 % požadované částky.</string>
     <string name="liquidityads_over_balance">Celkové poplatky přesahují váš zůstatek.</string>
 
+    <string name="liquidityads_review_button">Review</string>
+    <string name="liquidityads_disclaimer_body1">Žádáte o <b>počáteční</b> množství likvidity. Likvidita není v průběhu času konstantní: jak budete v průběhu Blesku přijímat finanční prostředky, likvidita se bude spotřebovávat a stane se vaším zůstatkem.</string>
+    <string name="liquidityads_disclaimer_body2">Po jednom roce bude zbývající nevyužitá likvidita službou vyžádána zpět.</string>
+
     <string name="liquidityads_request_button">Přijmout</string>
     <string name="liquidityads_requesting_spinner">Zpracovává se splice…</string>
 
     <string name="liquidityads_success">Likvidita byla úspěšně přidána!</string>
+    <string name="liquidityads_success_amount">Přidaná částka: %1$s</string>
 
     <string name="liquidityads_error_header">Žádost o likviditu se nezdařila</string>
     <string name="liquidityads_error_channels_unavailable">Kanály nejsou k dispozici. Zkuste to později.</string>
@@ -371,9 +373,14 @@
 
     <!-- low feerate disclaimer -->
 
-    <string name="send_low_feerate_dialog_title">Nízké poplatky!</string>
-    <string name="send_low_feerate_dialog_body1">Platby za nízké poplatky mohou trvat několik dní nebo týdnů bez potvrzení.</string>
-    <string name="send_low_feerate_dialog_body2">Výběr poplatků je na vaši zodpovědnost. Po odeslání nelze tuto platbu zrušit, pouze urychlit vyššími poplatky.</string>
-    <string name="send_low_feerate_dialog_body3">Jste si jisti, že chcete pokračovat?</string>
+    <string name="spliceout_low_feerate_dialog_title">Nízké poplatky!</string>
+    <string name="spliceout_low_feerate_dialog_body1">Platby za nízké poplatky mohou trvat několik dní nebo týdnů bez potvrzení.</string>
+    <string name="spliceout_low_feerate_dialog_body2">Výběr poplatků je na vaši zodpovědnost. Po odeslání nelze tuto platbu zrušit, pouze urychlit vyššími poplatky.</string>
+    <string name="spliceout_low_feerate_dialog_body3">Jste si jisti, že chcete pokračovat?</string>
 
+    <!-- spliceout: capacity disclaimer -->
+
+    <string name="spliceout_capacity_disclaimer_title">Vplyv na veľkosť kanála</string>
+    <string name="spliceout_capacity_disclaimer_body1">Financie odoslané sa odoberú z vašej strany kanála, čím sa veľkosť kanála zníži o rovnakú sumu. Vaša prichádzajúca likvidita zostáva nezmenená.</string>
+    <string name="spliceout_capacity_disclaimer_checkbox">Túto správu už nezobrazujte.</string>
 </resources>

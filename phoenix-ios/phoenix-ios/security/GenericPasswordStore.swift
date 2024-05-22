@@ -36,9 +36,14 @@ import LocalAuthentication
 
 struct GenericPasswordStore {
 
-	/// Stores raw Data in the keychain.
+	// --------------------------------------------------
+	// MARK: Add
+	// --------------------------------------------------
+	
+	/// Adds a NEW entry in the keychain (with Data as the value).
+	/// If a matching entry already exists, an error is thrown.
 	///
-	func storeKey(
+	func addKey(
 		_ key       : Data,
 		account     : String,
 		accessGroup : String, // always required (see notes atop)
@@ -59,7 +64,126 @@ struct GenericPasswordStore {
 		}
 	}
 	
-	/// Stores a simple String in the keychain.
+	/// Adds a NEW entry in the keychcain (with a String as the value).
+	/// If a matching entry already exists, an error is thrown.
+	///
+	func addKey(
+		_ key       : String,
+		account     : String,
+		accessGroup : String,
+		mixins      : [String: Any]? = nil
+	) throws {
+		
+		guard let keyData = key.data(using: .utf8) else {
+			throw KeyStoreError("Unable to convert string to data using utf8")
+		}
+		
+		try addKey(keyData, account: account, accessGroup: accessGroup, mixins: mixins)
+	}
+	
+	/// Adds a NEW entry in the keychain (with a CryptoKit key as the value).
+	/// If a matching entry already exists, an error is thrown.
+	///
+	func addKey<T: GenericPasswordConvertible>(
+		_ key       : T,
+		account     : String,
+		accessGroup : String,
+		mixins      : [String: Any]? = nil
+	) throws {
+
+		let keyData = key.rawRepresentation
+		
+		try addKey(keyData, account: account, accessGroup: accessGroup, mixins: mixins)
+	}
+	
+	// --------------------------------------------------
+	// MARK: Update
+	// --------------------------------------------------
+	
+	/// Updates an entry in the keychain (with Data as the new value).
+	/// If a matching entry doesn't exist, an error is thrown.
+	///
+	func updateKey(
+		_ key       : Data,
+		account     : String,
+		accessGroup : String, // always required (see notes atop)
+		mixins      : [String: Any]? = nil
+	) throws {
+		
+		var query = mixins ?? [String: Any]()
+		query[kSecClass as String] = kSecClassGenericPassword
+		query[kSecAttrAccount as String] = account
+		query[kSecAttrAccessGroup as String] = accessGroup
+		query[kSecUseDataProtectionKeychain as String] = true
+		
+		var attributes = [String: Any]()
+		attributes[kSecValueData as String] = key
+		
+		// Add the key data.
+		let status = SecItemUpdate(query as CFDictionary, attributes as CFDictionary)
+		guard status == errSecSuccess else {
+			throw KeyStoreError("Unable to update item: \(status.message)")
+		}
+	}
+	
+	/// Updates an entry in the keychain (with a String as the new value).
+	/// If a matching entry doesn't exist, an error is thrown.
+	///
+	func updateKey(
+		_ key       : String,
+		account     : String,
+		accessGroup : String,
+		mixins      : [String: Any]? = nil
+	) throws {
+		
+		guard let keyData = key.data(using: .utf8) else {
+			throw KeyStoreError("Unable to convert string to data using utf8")
+		}
+		
+		try updateKey(keyData, account: account, accessGroup: accessGroup, mixins: mixins)
+	}
+	
+	/// Updates an entry in the keychain (with a CryptoKit key as the value).
+	/// If a matching entry doesn't exist, an error is thrown.
+	///
+	func updateKey<T: GenericPasswordConvertible>(
+		_ key       : T,
+		account     : String,
+		accessGroup : String,
+		mixins      : [String: Any]? = nil
+	) throws {
+
+		let keyData = key.rawRepresentation
+		
+		try updateKey(keyData, account: account, accessGroup: accessGroup, mixins: mixins)
+	}
+	
+	// --------------------------------------------------
+	// MARK: Store
+	// --------------------------------------------------
+	
+	/// Stores an entry in the keychain (with Data as the value).
+	/// If the entry doesn't exit, it's added to the keychain.
+	/// If it already exits, it's value is updated.
+	///
+	func storeKey(
+		_ key       : Data,
+		account     : String,
+		accessGroup : String, // always required (see notes atop)
+		mixins      : [String: Any]? = nil
+	) throws {
+		
+		let exists = try keyExists(account: account, accessGroup: accessGroup)
+		if exists {
+			try updateKey(key, account: account, accessGroup: accessGroup, mixins: mixins)
+		} else {
+			try addKey(key, account: account, accessGroup: accessGroup, mixins: mixins)
+		}
+	}
+	
+	/// Stores an entry in the keychcain (with a String as the value).
+	/// If the entry doesn't exit, it's added to the keychain.
+	/// If it already exits, it's value is updated.
 	///
 	func storeKey(
 		_ key       : String,
@@ -75,7 +199,9 @@ struct GenericPasswordStore {
 		try storeKey(keyData, account: account, accessGroup: accessGroup, mixins: mixins)
 	}
 	
-	/// Stores a CryptoKit key in the keychain.
+	/// Stores an entry in the keychain (with a CryptoKit key as the value).
+	/// If the entry doesn't exit, it's added to the keychain.
+	/// If it already exits, it's value is updated.
 	///
 	func storeKey<T: GenericPasswordConvertible>(
 		_ key       : T,
@@ -88,6 +214,10 @@ struct GenericPasswordStore {
 		
 		try storeKey(keyData, account: account, accessGroup: accessGroup, mixins: mixins)
 	}
+	
+	// --------------------------------------------------
+	// MARK: Exists
+	// --------------------------------------------------
 	
 	func keyExists(
 		account     : String,
@@ -115,6 +245,10 @@ struct GenericPasswordStore {
 		}
 	}
 
+	// --------------------------------------------------
+	// MARK: Read
+	// --------------------------------------------------
+	
 	/// Reads raw Data from the keychain.
 	///
 	func readKey(
@@ -168,6 +302,10 @@ struct GenericPasswordStore {
 		}
 		return nil
 	}
+	
+	// --------------------------------------------------
+	// MARK: Delete
+	// --------------------------------------------------
 	
 	/// Removes any existing key with the given account.
 	func deleteKey(

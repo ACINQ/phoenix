@@ -12,6 +12,8 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
+let PIN_LENGTH = 6
+
 /// Represents the availability of Biometrics on the current device.
 /// Devices either support TouchID or FaceID,
 /// but the user needs to have enabled and enrolled in the service.
@@ -139,6 +141,9 @@ class AppSecurity {
 				if getPasscodeFallbackEnabled() {
 					enabledSecurity.insert(.passcodeFallback)
 				}
+			}
+			if hasCustomPin() {
+				enabledSecurity.insert(.customPin)
 			}
 		}
 		
@@ -390,13 +395,6 @@ class AppSecurity {
 			// - then we can safely remove the old entries from the OS keychain (account=biometrics)
 			
 			let keychain = GenericPasswordStore()
-			
-			do {
-				try keychain.deleteKey(
-					account     : keychain_accountName_keychain,
-					accessGroup : self.sharedAccessGroup()
-				)
-			} catch {/* ignored */}
 			do {
 				// Access control considerations:
 				//
@@ -404,13 +402,14 @@ class AppSecurity {
 				// which we only need to do once when launching the app.
 				// So we shouldn't need access to the keychain item when the device is locked.
 				
-				var query = [String: Any]()
-				query[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+				var mixins = [String: Any]()
+				mixins[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
 				
 				try keychain.storeKey( lockingKey,
 				              account: keychain_accountName_keychain,
 				          accessGroup: self.sharedAccessGroup(),
-				               mixins: query)
+				               mixins: mixins)
+				
 			} catch {
 				log.error("keychain.storeKey(account: keychain): error: \(error)")
 				return fail(error)
@@ -429,6 +428,7 @@ class AppSecurity {
 					account     : keychain_accountName_biometrics,
 					accessGroup : self.privateAccessGroup()
 				)
+				
 			} catch {/* ignored */}
 			
 			succeed(securityFile)
@@ -440,6 +440,7 @@ class AppSecurity {
 		enabled    : Bool,
 		completion : @escaping (_ error: Error?) -> Void
 	) -> Void {
+		log.trace("setSoftBiometrics(\(enabled))")
 		
 		let succeed = {
 			let securityFile = self.readFromDisk()
@@ -462,16 +463,17 @@ class AppSecurity {
 			
 			let keychain = GenericPasswordStore()
 			let account = keychain_accountName_softBiometrics
+			let accessGroup = self.privateAccessGroup()
 			
 			if enabled {
 				do {
-					var query = [String: Any]()
-					query[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+					var mixins = [String: Any]()
+					mixins[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
 					
 					try keychain.storeKey( "true",
 					              account: account,
-					          accessGroup: self.privateAccessGroup(),
-					               mixins: query)
+					          accessGroup: accessGroup,
+					               mixins: mixins)
 					
 				} catch {
 					log.error("keychain.storeKey(account: softBiometrics): error: \(error)")
@@ -482,9 +484,8 @@ class AppSecurity {
 				do {
 					try keychain.deleteKey(
 						account     : account,
-						accessGroup : self.privateAccessGroup()
+						accessGroup : accessGroup
 					)
-				
 				} catch {
 					log.error("keychain.deleteKey(account: softBiometrics): error: \(error)")
 					return fail(error)
@@ -500,12 +501,13 @@ class AppSecurity {
 		
 		let keychain = GenericPasswordStore()
 		let account = keychain_accountName_softBiometrics
+		let accessGroup = self.privateAccessGroup()
 		
 		var enabled = false
 		do {
 			let value: String? = try keychain.readKey(
 				account     : account,
-				accessGroup : privateAccessGroup()
+				accessGroup : accessGroup
 			)
 			enabled = value != nil
 			
@@ -520,6 +522,7 @@ class AppSecurity {
 		enabled    : Bool,
 		completion : @escaping (_ error: Error?) -> Void
 	) -> Void {
+		log.trace("setPasscodeFallback(\(enabled))")
 		
 		let succeed = {
 			let securityFile = self.readFromDisk()
@@ -542,16 +545,17 @@ class AppSecurity {
 			
 			let keychain = GenericPasswordStore()
 			let account = keychain_accountName_passcodeFallback
+			let accessGroup = self.privateAccessGroup()
 			
 			if enabled {
 				do {
-					var query = [String: Any]()
-					query[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+					var mixins = [String: Any]()
+					mixins[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
 					
 					try keychain.storeKey( "true",
 									  account: account,
-								 accessGroup: self.privateAccessGroup(),
-										mixins: query)
+								 accessGroup: accessGroup,
+										mixins: mixins)
 					
 				} catch {
 					log.error("keychain.storeKey(account: passcodeFallback): error: \(error)")
@@ -562,7 +566,7 @@ class AppSecurity {
 				do {
 					try keychain.deleteKey(
 						account     : account,
-						accessGroup : self.privateAccessGroup()
+						accessGroup : accessGroup
 					)
 				
 				} catch {
@@ -580,12 +584,13 @@ class AppSecurity {
 		
 		let keychain = GenericPasswordStore()
 		let account = keychain_accountName_passcodeFallback
+		let accessGroup = privateAccessGroup()
 		
 		var enabled = false
 		do {
 			let value: String? = try keychain.readKey(
 				account     : account,
-				accessGroup : privateAccessGroup()
+				accessGroup : accessGroup
 			)
 			enabled = value != nil
 			
@@ -594,6 +599,201 @@ class AppSecurity {
 		}
 		
 		return enabled
+	}
+	
+	public func setCustomPin(
+		pin        : String?,
+		completion : @escaping (_ error: Error?) -> Void
+	) -> Void {
+		log.trace("setCustomPin(\(pin == nil ? "<nil>" : "<non-nil>"))")
+		
+		if let pin {
+			precondition(pin.isValidPIN, "Attempting to set invalid PIN")
+		}
+		
+		let succeed = {
+			let securityFile = self.readFromDisk()
+			DispatchQueue.main.async {
+				let newEnabledSecurity = self.calculateEnabledSecurity(securityFile)
+				self.publishEnabledSecurity(newEnabledSecurity)
+				completion(nil)
+			}
+		}
+		
+		let fail = {(_ error: Error) -> Void in
+			DispatchQueue.main.async {
+				completion(error)
+			}
+		}
+		
+		// Disk IO ahead - get off the main thread.
+		// Also - go thru the serial queue for proper thread safety.
+		queue.async {
+			
+			let keychain = GenericPasswordStore()
+			let account = keychain_accountName_customPin
+			let accessGroup = self.privateAccessGroup()
+			
+			if let pin {
+				do {
+					var mixins = [String: Any]()
+					mixins[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+					
+					try keychain.storeKey( pin,
+									  account: account,
+								 accessGroup: accessGroup,
+										mixins: mixins)
+					
+				} catch {
+					log.error("keychain.storeKey(account: customPin): error: \(error)")
+					return fail(error)
+				}
+				
+			} else {
+				do {
+					try keychain.deleteKey(
+						account     : account,
+						accessGroup : accessGroup
+					)
+				
+				} catch {
+					log.error("keychain.deleteKey(account: customPin): error: \(error)")
+					return fail(error)
+				}
+			}
+			
+			succeed()
+		
+		} // </queue.async>
+	}
+	
+	public func getCustomPin() -> String? {
+		
+		let keychain = GenericPasswordStore()
+		let account = keychain_accountName_customPin
+		let accessGroup = privateAccessGroup()
+		
+		var pin: String? = nil
+		do {
+			let value: String? = try keychain.readKey(
+				account     : account,
+				accessGroup : accessGroup
+			)
+			
+			if let value, value.isValidPIN {
+				pin = value
+			}
+			
+		} catch {
+			log.error("keychain.readKey(account: customPin): error: \(error)")
+		}
+		
+		return pin
+	}
+	
+	public func hasCustomPin() -> Bool {
+		
+		return getCustomPin() != nil
+	}
+	
+	public func setInvalidPin(
+		invalidPin : InvalidPin?,
+		completion : @escaping (_ error: Error?) -> Void
+	) -> Void {
+		if let invalidPin {
+			log.trace("setInvalidPin(<count = \(invalidPin.count)>)")
+		} else {
+			log.trace("setInvalidPin(<nil>)")
+		}
+		
+		let succeed = {
+			DispatchQueue.main.async {
+				completion(nil)
+			}
+		}
+		
+		let fail = {(_ error: Error) -> Void in
+			DispatchQueue.main.async {
+				completion(error)
+			}
+		}
+		
+		var invalidPinData: Data? = nil
+		if let invalidPin {
+			do {
+				invalidPinData = try JSONEncoder().encode(invalidPin)
+			} catch {
+				return fail(error)
+			}
+		}
+		
+		// Disk IO ahead - get off the main thread.
+		// Also - go thru the serial queue for proper thread safety.
+		queue.async {
+			
+			let keychain = GenericPasswordStore()
+			let account = keychain_accountName_invalidPin
+			let accessGroup = self.privateAccessGroup()
+			
+			if let invalidPinData {
+				do {
+					var mixins = [String: Any]()
+					mixins[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+					
+					try keychain.storeKey( invalidPinData,
+									  account: account,
+								 accessGroup: accessGroup,
+										mixins: mixins)
+					
+				} catch {
+					log.error("keychain.storeKey(account: invalidPin): error: \(error)")
+					return fail(error)
+				}
+				
+			} else {
+				do {
+					try keychain.deleteKey(
+						account     : account,
+						accessGroup : accessGroup
+					)
+				
+				} catch {
+					log.error("keychain.deleteKey(account: invalidPin): error: \(error)")
+					return fail(error)
+				}
+			}
+			
+			succeed()
+		
+		} // </queue.async>
+	}
+	
+	public func getInvalidPin() -> InvalidPin? {
+		
+		let keychain = GenericPasswordStore()
+		let account = keychain_accountName_invalidPin
+		let accessGroup = privateAccessGroup()
+		
+		var invalidPin: InvalidPin? = nil
+		do {
+			let value: Data? = try keychain.readKey(
+				account     : account,
+				accessGroup : accessGroup
+			)
+			
+			if let value {
+				do {
+					invalidPin = try JSONDecoder().decode(InvalidPin.self, from: value)
+				} catch {
+					log.error("JSON.decode(InvalidPin): error: \(error)")
+				}
+			}
+			
+		} catch {
+			log.error("keychain.readKey(account: invalidPin): error: \(error)")
+		}
+		
+		return invalidPin
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -680,8 +880,8 @@ class AppSecurity {
 		context.localizedReason = prompt ?? self.biometricsPrompt()
 		context.localizedFallbackTitle = "" // passcode fallback disbaled
 		
-		var query = [String: Any]()
-		query[kSecUseAuthenticationContext as String] = context
+		var mixins = [String: Any]()
+		mixins[kSecUseAuthenticationContext as String] = context
 		
 		let keychain = GenericPasswordStore()
 		let account = keychain_accountName_biometrics
@@ -691,7 +891,7 @@ class AppSecurity {
 			fetchedKey = try keychain.readKey(
 				account     : account,
 				accessGroup : self.privateAccessGroup(),
-				mixins      : query
+				mixins      : mixins
 			)
 		} catch {
 			return fail(error)
@@ -808,6 +1008,11 @@ class AppSecurity {
 		if getPasscodeFallbackEnabled() {
 			// Biometrics + Passcode Fallback
 			policy = .deviceOwnerAuthentication
+		} else if hasCustomPin() {
+			// Biometrics + Custom PIN Fallback
+			policy = .deviceOwnerAuthenticationWithBiometrics
+			context.localizedFallbackTitle = "" // do not show (cancel button ==> custom pin)
+			context.localizedCancelTitle = String(localized: "Enter Phoenix PIN")
 		} else {
 			// Biometrics only
 			policy = .deviceOwnerAuthenticationWithBiometrics
@@ -1003,8 +1208,8 @@ class AppSecurity {
 				log.error("keychain.deleteKey(account: keychain, group: shared): error: \(error)")
 			}
 			do {
-				var query = [String: Any]()
-				query[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+				var mixins = [String: Any]()
+				mixins[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
 				
 				// Step 3 of 4:
 				// - Copy the OLD keychain item to the NEW location.
@@ -1012,7 +1217,7 @@ class AppSecurity {
 				try keychain.storeKey( lockingKey,
 				              account: keychain_accountName_keychain,
 				          accessGroup: sharedAccessGroup(), // <- new location
-				               mixins: query
+				               mixins: mixins
 				)
 				migrated = true
 				

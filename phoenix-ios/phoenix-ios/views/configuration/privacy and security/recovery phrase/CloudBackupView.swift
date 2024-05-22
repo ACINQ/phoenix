@@ -187,10 +187,13 @@ struct CloudBackupView: View {
 			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 				
 				HStack(alignment: VerticalAlignment.center, spacing: 0) {
-					TextField("Wallet name (optional)", text: $name)
-						.onChange(of: name) {
-							name = String($0.prefix(64)) // limited to 64 characters
-						}
+					TextField(
+						NSLocalizedString("Wallet name (optional)", comment: "translate: optional"),
+						text: $name
+					)
+					.onChange(of: name) {
+						name = String($0.prefix(64)) // limited to 64 characters
+					}
 					
 					// Clear button (appears when TextField's text is non-empty)
 					Button {

@@ -49,7 +49,7 @@ struct WalletCreationOptions: View {
 						HStack(alignment: VerticalAlignment.centerTopLine, spacing: 6) {
 							Text(verbatim: "\(lang.flag) \(lang.displayName)")
 							if lang == MnemonicLanguage.english {
-								Text("(recommended)")
+								Text("(recommended)", comment: "translate: recommended")
 									.font(Font.subheadline)
 									.foregroundColor(Color.secondary)
 							}

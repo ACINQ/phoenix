@@ -240,7 +240,7 @@ struct BizNotificationCell: View {
 				}
 			} // </HStack>
 			
-			Text("Revoked commits found on \(reason.channels.count) channel(s)!")
+			Text("Revoked commits found on \(reason.channels.count) channel(s)!", comment: "translate: s")
 				.font(.callout)
 			
 			Text("Contact support if needed.")

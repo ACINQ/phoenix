@@ -97,7 +97,7 @@ struct TxHistoryExporter: View {
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 				Text("Start date")
 					.padding(.trailing, 4)
-				Text("(inclusive)")
+				Text("(inclusive)", comment: "translate: inclusive")
 					.foregroundColor(.secondary)
 				Spacer()
 				DatePicker("", selection: $startDate, displayedComponents: .date)
@@ -108,7 +108,7 @@ struct TxHistoryExporter: View {
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 				Text("End date")
 					.padding(.trailing, 4)
-				Text("(inclusive)")
+				Text("(inclusive)", comment: "translate: inclusive")
 					.foregroundColor(.secondary)
 				Spacer()
 				DatePicker("", selection: $endDate, displayedComponents: .date)

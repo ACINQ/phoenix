@@ -6,7 +6,7 @@ object Versions {
     const val kotlin = "1.9.22"
 
     const val ktor = "2.3.7"
-    const val sqlDelight = "1.5.5"
+    const val sqlDelight = "2.0.1"
 
     const val slf4j = "1.7.30"
     const val junit = "4.13"

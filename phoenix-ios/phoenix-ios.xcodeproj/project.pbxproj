@@ -36,6 +36,8 @@
 		DC09085825B5E43900A46136 /* String+VersionComparison.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC09085725B5E43900A46136 /* String+VersionComparison.swift */; };
 		DC09086325B626B300A46136 /* AppStatusPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC09086225B626B300A46136 /* AppStatusPopover.swift */; };
 		DC0994B0263A074C003031CA /* InfoGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0994AF263A074C003031CA /* InfoGrid.swift */; };
+		DC0C52662BF3C31700143831 /* WhichPinSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0C52652BF3C31700143831 /* WhichPinSheet.swift */; };
+		DC0C52682BF4FF6100143831 /* AuthenticateWithPinSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0C52672BF4FF6100143831 /* AuthenticateWithPinSheet.swift */; };
 		DC0D2EA52939269800284608 /* KotlinExtensions+CloudKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0D2EA42939269800284608 /* KotlinExtensions+CloudKit.swift */; };
 		DC0D2EA72939273B00284608 /* KotlinExtensions+Payments.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0D2EA62939273B00284608 /* KotlinExtensions+Payments.swift */; };
 		DC0D2EA8293928E100284608 /* KotlinExtensions+Payments.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0D2EA62939273B00284608 /* KotlinExtensions+Payments.swift */; };
@@ -73,6 +75,9 @@
 		DC27E4CC2791D17A00C777CC /* CloudBackupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC27E4CA2791D17A00C777CC /* CloudBackupView.swift */; };
 		DC27E4CF2792079600C777CC /* CenterTopLineAlignment.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC27E4CE2792079500C777CC /* CenterTopLineAlignment.swift */; };
 		DC27E4D1279753EC00C777CC /* TextFieldNumberStyler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC27E4D0279753EC00C777CC /* TextFieldNumberStyler.swift */; };
+		DC2ABAD52BEC092B00C11C9C /* InvalidPin.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2ABAD42BEC092B00C11C9C /* InvalidPin.swift */; };
+		DC2ABAD72BED081400C11C9C /* VibrationFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2ABAD62BED081400C11C9C /* VibrationFeedback.swift */; };
+		DC2ABAD92BED142900C11C9C /* ShakeEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2ABAD82BED142900C11C9C /* ShakeEffect.swift */; };
 		DC2CE3AF29AFEB0500BA0B00 /* Bundle+Icon.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2CE3AE29AFEB0500BA0B00 /* Bundle+Icon.swift */; };
 		DC2CE54D28A3D2F50070A2E1 /* TruncatableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2CE54C28A3D2F50070A2E1 /* TruncatableView.swift */; };
 		DC2CE55028A52AD90070A2E1 /* RecentPaymentsConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2CE54F28A52AD90070A2E1 /* RecentPaymentsConfig.swift */; };
@@ -122,6 +127,12 @@
 		DC49FE9B2AC49CB500D8D2E2 /* KotlinExtensions+Lightning.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC49FE9A2AC49CB500D8D2E2 /* KotlinExtensions+Lightning.swift */; };
 		DC49FE9C2AC49E0400D8D2E2 /* KotlinExtensions+Lightning.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC49FE9A2AC49CB500D8D2E2 /* KotlinExtensions+Lightning.swift */; };
 		DC49FE9D2AC49E0800D8D2E2 /* KotlinExtensions+Bitcoin.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC49FE982AC49C6300D8D2E2 /* KotlinExtensions+Bitcoin.swift */; };
+		DC4CF3C42BE583A6003A957F /* NumberPadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CF3C32BE583A6003A957F /* NumberPadView.swift */; };
+		DC4CF3C62BE59E4B003A957F /* TextTracking.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CF3C52BE59E4B003A957F /* TextTracking.swift */; };
+		DC4CF3CA2BE91FED003A957F /* SetNewPinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CF3C92BE91FED003A957F /* SetNewPinView.swift */; };
+		DC4CF3CC2BE93311003A957F /* String+PIN.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CF3CB2BE93311003A957F /* String+PIN.swift */; };
+		DC4CF3CE2BE96C36003A957F /* DisablePinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CF3CD2BE96C36003A957F /* DisablePinView.swift */; };
+		DC4CF3D02BEA8C13003A957F /* EditPinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CF3CF2BEA8C13003A957F /* EditPinView.swift */; };
 		DC59377127516297003B4B53 /* Sequence+Sum.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC59377027516296003B4B53 /* Sequence+Sum.swift */; };
 		DC5A935329846044004F19FD /* FileHandle+Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5A935229846043004F19FD /* FileHandle+Async.swift */; };
 		DC5CA4ED28F83C3B0048A737 /* DrainWalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5CA4EC28F83C3B0048A737 /* DrainWalletView.swift */; };
@@ -191,6 +202,7 @@
 		DC9E7EC62A1295B100A5F1D0 /* liquidity.html in Resources */ = {isa = PBXBuildFile; fileRef = DC9E7EC82A1295B100A5F1D0 /* liquidity.html */; };
 		DCA02B9D2BD065BF0080520F /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = DCA02B9C2BD065BF0080520F /* PrivacyInfo.xcprivacy */; };
 		DCA02B9E2BD069230080520F /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = DCA02B9C2BD065BF0080520F /* PrivacyInfo.xcprivacy */; };
+		DCA02BA02BD1A5FC0080520F /* ChannelSizeImpactWarning.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA02B9F2BD1A5FC0080520F /* ChannelSizeImpactWarning.swift */; };
 		DCA125752A27EDDB00DA2F7F /* MempoolRecommendedResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA125742A27EDDB00DA2F7F /* MempoolRecommendedResponse.swift */; };
 		DCA3B41F2A5471C900E6B231 /* MinerFeeInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA3B41E2A5471C900E6B231 /* MinerFeeInfo.swift */; };
 		DCA5391A29F1DDE7001BD3D5 /* SegmentedPicker in Frameworks */ = {isa = PBXBuildFile; productRef = DCA5391929F1DDE7001BD3D5 /* SegmentedPicker */; };
@@ -302,6 +314,7 @@
 		DCEE3E542931446A00EB4DFF /* Collections+AsInt.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEE3E532931446A00EB4DFF /* Collections+AsInt.swift */; };
 		DCEE8998288605FD00FE42DD /* PaymentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEE8997288605FD00FE42DD /* PaymentCell.swift */; };
 		DCEFD922276A796800001767 /* SyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEFD921276A796800001767 /* SyncManager.swift */; };
+		DCF8E3AC2BC4968D009299EE /* LowMinerFeeWarning.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCF8E3AB2BC4968D009299EE /* LowMinerFeeWarning.swift */; };
 		DCF9CFD52862656E001AD33F /* Asserts.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFC72032862237400D6B293 /* Asserts.swift */; };
 		DCFA8759260E6F2E00AE8953 /* IntroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA8758260E6F2E00AE8953 /* IntroView.swift */; };
 		DCFA876D260E91E600AE8953 /* IntroContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA876C260E91E600AE8953 /* IntroContainer.swift */; };
@@ -417,6 +430,8 @@
 		DC09085725B5E43900A46136 /* String+VersionComparison.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+VersionComparison.swift"; sourceTree = "<group>"; };
 		DC09086225B626B300A46136 /* AppStatusPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStatusPopover.swift; sourceTree = "<group>"; };
 		DC0994AF263A074C003031CA /* InfoGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoGrid.swift; sourceTree = "<group>"; };
+		DC0C52652BF3C31700143831 /* WhichPinSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhichPinSheet.swift; sourceTree = "<group>"; };
+		DC0C52672BF4FF6100143831 /* AuthenticateWithPinSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticateWithPinSheet.swift; sourceTree = "<group>"; };
 		DC0D2EA42939269800284608 /* KotlinExtensions+CloudKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KotlinExtensions+CloudKit.swift"; sourceTree = "<group>"; };
 		DC0D2EA62939273B00284608 /* KotlinExtensions+Payments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KotlinExtensions+Payments.swift"; sourceTree = "<group>"; };
 		DC0E31B826EF85B4002071C6 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = cs; path = cs.lproj/about.html; sourceTree = "<group>"; };
@@ -453,6 +468,9 @@
 		DC27E4CA2791D17A00C777CC /* CloudBackupView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudBackupView.swift; sourceTree = "<group>"; };
 		DC27E4CE2792079500C777CC /* CenterTopLineAlignment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CenterTopLineAlignment.swift; sourceTree = "<group>"; };
 		DC27E4D0279753EC00C777CC /* TextFieldNumberStyler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldNumberStyler.swift; sourceTree = "<group>"; };
+		DC2ABAD42BEC092B00C11C9C /* InvalidPin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvalidPin.swift; sourceTree = "<group>"; };
+		DC2ABAD62BED081400C11C9C /* VibrationFeedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VibrationFeedback.swift; sourceTree = "<group>"; };
+		DC2ABAD82BED142900C11C9C /* ShakeEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShakeEffect.swift; sourceTree = "<group>"; };
 		DC2CE3AE29AFEB0500BA0B00 /* Bundle+Icon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+Icon.swift"; sourceTree = "<group>"; };
 		DC2CE54C28A3D2F50070A2E1 /* TruncatableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TruncatableView.swift; sourceTree = "<group>"; };
 		DC2CE54F28A52AD90070A2E1 /* RecentPaymentsConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecentPaymentsConfig.swift; sourceTree = "<group>"; };
@@ -497,6 +515,12 @@
 		DC49DA8D258BB882005BC4BC /* ScaledButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScaledButtonStyle.swift; sourceTree = "<group>"; };
 		DC49FE982AC49C6300D8D2E2 /* KotlinExtensions+Bitcoin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KotlinExtensions+Bitcoin.swift"; sourceTree = "<group>"; };
 		DC49FE9A2AC49CB500D8D2E2 /* KotlinExtensions+Lightning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KotlinExtensions+Lightning.swift"; sourceTree = "<group>"; };
+		DC4CF3C32BE583A6003A957F /* NumberPadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberPadView.swift; sourceTree = "<group>"; };
+		DC4CF3C52BE59E4B003A957F /* TextTracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextTracking.swift; sourceTree = "<group>"; };
+		DC4CF3C92BE91FED003A957F /* SetNewPinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetNewPinView.swift; sourceTree = "<group>"; };
+		DC4CF3CB2BE93311003A957F /* String+PIN.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+PIN.swift"; sourceTree = "<group>"; };
+		DC4CF3CD2BE96C36003A957F /* DisablePinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisablePinView.swift; sourceTree = "<group>"; };
+		DC4CF3CF2BEA8C13003A957F /* EditPinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPinView.swift; sourceTree = "<group>"; };
 		DC59377027516296003B4B53 /* Sequence+Sum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+Sum.swift"; sourceTree = "<group>"; };
 		DC5A935229846043004F19FD /* FileHandle+Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FileHandle+Async.swift"; sourceTree = "<group>"; };
 		DC5CA4EC28F83C3B0048A737 /* DrainWalletView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrainWalletView.swift; sourceTree = "<group>"; };
@@ -554,6 +578,7 @@
 		DC9E7EC22A12955300A5F1D0 /* LiquidityHTML.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidityHTML.swift; sourceTree = "<group>"; };
 		DC9E7EC72A1295B100A5F1D0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/liquidity.html; sourceTree = "<group>"; };
 		DCA02B9C2BD065BF0080520F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		DCA02B9F2BD1A5FC0080520F /* ChannelSizeImpactWarning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelSizeImpactWarning.swift; sourceTree = "<group>"; };
 		DCA125742A27EDDB00DA2F7F /* MempoolRecommendedResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MempoolRecommendedResponse.swift; sourceTree = "<group>"; };
 		DCA3B41E2A5471C900E6B231 /* MinerFeeInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinerFeeInfo.swift; sourceTree = "<group>"; };
 		DCA5391B29F7202F001BD3D5 /* ChannelInfoPopup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelInfoPopup.swift; sourceTree = "<group>"; };
@@ -597,6 +622,8 @@
 		DCB8762F2735AA7300657570 /* UserDefaults+Serialization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Serialization.swift"; sourceTree = "<group>"; };
 		DCB876312735AAB500657570 /* UserDefaults+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Codable.swift"; sourceTree = "<group>"; };
 		DCBA371A2758076F00610EC8 /* SyncSeedManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncSeedManager.swift; sourceTree = "<group>"; };
+		DCBDB8812BE154840097F940 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = de; path = de.lproj/about.html; sourceTree = "<group>"; };
+		DCBDB8822BE154840097F940 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = de; path = de.lproj/liquidity.html; sourceTree = "<group>"; };
 		DCC9D999267BD28600EA36DD /* SyncTxManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncTxManager.swift; sourceTree = "<group>"; };
 		DCC9D99B267BEB3D00EA36DD /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		DCCC7FD426B0A006008ACD9B /* SquareSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SquareSize.swift; sourceTree = "<group>"; };
@@ -643,6 +670,7 @@
 		DCEE3E532931446A00EB4DFF /* Collections+AsInt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collections+AsInt.swift"; sourceTree = "<group>"; };
 		DCEE8997288605FD00FE42DD /* PaymentCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentCell.swift; sourceTree = "<group>"; };
 		DCEFD921276A796800001767 /* SyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncManager.swift; sourceTree = "<group>"; };
+		DCF8E3AB2BC4968D009299EE /* LowMinerFeeWarning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LowMinerFeeWarning.swift; sourceTree = "<group>"; };
 		DCF9312F279F1BD900FD7776 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = ar; path = ar.lproj/about.html; sourceTree = "<group>"; };
 		DCFA8758260E6F2E00AE8953 /* IntroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroView.swift; sourceTree = "<group>"; };
 		DCFA876C260E91E600AE8953 /* IntroContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroContainer.swift; sourceTree = "<group>"; };
@@ -899,6 +927,7 @@
 				DC118BFF27B4523B0080BBAC /* CommentSheet.swift */,
 				DCA3B41E2A5471C900E6B231 /* MinerFeeInfo.swift */,
 				DC1844022A2690BB004D9578 /* MinerFeeSheet.swift */,
+				DCF8E3AB2BC4968D009299EE /* LowMinerFeeWarning.swift */,
 				DC118BF727B44E6E0080BBAC /* LoginView.swift */,
 				DC118C0327B454720080BBAC /* PaymentInFlightView.swift */,
 				DC118C0127B453110080BBAC /* PaymentRequestedView.swift */,
@@ -908,6 +937,7 @@
 				DCB62F482A5E09F900912A71 /* SpliceOutProblem.swift */,
 				DC1771B32ABC99CE00B286C7 /* WebsiteLinkPopover.swift */,
 				DC98D3952AF170AC005BD177 /* PaymentWarningPopover.swift */,
+				DCA02B9F2BD1A5FC0080520F /* ChannelSizeImpactWarning.swift */,
 			);
 			path = send;
 			sourceTree = "<group>";
@@ -917,6 +947,7 @@
 			children = (
 				DC27E4C92791D17A00C777CC /* RecoveryPhraseView.swift */,
 				DC27E4CA2791D17A00C777CC /* CloudBackupView.swift */,
+				DC0C52672BF4FF6100143831 /* AuthenticateWithPinSheet.swift */,
 			);
 			path = "recovery phrase";
 			sourceTree = "<group>";
@@ -996,8 +1027,22 @@
 				DCCC7FD426B0A006008ACD9B /* SquareSize.swift */,
 				DCAEF8F4276131A600015993 /* CheckboxToggleStyle.swift */,
 				DC2CE54C28A3D2F50070A2E1 /* TruncatableView.swift */,
+				DC2ABAD82BED142900C11C9C /* ShakeEffect.swift */,
 			);
 			path = style;
+			sourceTree = "<group>";
+		};
+		DC4CF3C72BE91FAE003A957F /* app access */ = {
+			isa = PBXGroup;
+			children = (
+				DCACF7082566D0F00009B01E /* AppAccessView.swift */,
+				DC4CF3C92BE91FED003A957F /* SetNewPinView.swift */,
+				DC4CF3CF2BEA8C13003A957F /* EditPinView.swift */,
+				DC4CF3CD2BE96C36003A957F /* DisablePinView.swift */,
+				DC4CF3C32BE583A6003A957F /* NumberPadView.swift */,
+				DC0C52652BF3C31700143831 /* WhichPinSheet.swift */,
+			);
+			path = "app access";
 			sourceTree = "<group>";
 		};
 		DC591A2228D20D3800AE4D0A /* reset wallet */ = {
@@ -1151,6 +1196,8 @@
 				DC6CF35A2938F32E001837EE /* ListBackgroundColor.swift */,
 				DCAC9FC229675E1A0098D769 /* NavigationWrapper.swift */,
 				DCAC9FC5296879770098D769 /* NavigationStackDestination.swift */,
+				DC4CF3C52BE59E4B003A957F /* TextTracking.swift */,
+				DC2ABAD62BED081400C11C9C /* VibrationFeedback.swift */,
 			);
 			path = compatibility;
 			sourceTree = "<group>";
@@ -1179,7 +1226,7 @@
 		DCACF6E42566CF850009B01E /* privacy and security */ = {
 			isa = PBXGroup;
 			children = (
-				DCACF7082566D0F00009B01E /* AppAccessView.swift */,
+				DC4CF3C72BE91FAE003A957F /* app access */,
 				DC27E4CD2791D18600C777CC /* recovery phrase */,
 				DCA3B41C2A533B8600E6B231 /* electrum server */,
 				C8D7A2BD01ADA0DE6034AE0F /* TorConfigurationView.swift */,
@@ -1198,6 +1245,7 @@
 				DC422F3429392B0500E72253 /* Int+ToDate.swift */,
 				DCB493CA269F3B05001B0F09 /* Result+Deugly.swift */,
 				DC59377027516296003B4B53 /* Sequence+Sum.swift */,
+				DC4CF3CB2BE93311003A957F /* String+PIN.swift */,
 				DC7DA9F52AD84DF200F86B99 /* String+Substring.swift */,
 				DC09085725B5E43900A46136 /* String+VersionComparison.swift */,
 				DC384D82265C32F100131772 /* TextField+Verbatim.swift */,
@@ -1223,6 +1271,7 @@
 				DCACF6F52566D0BA0009B01E /* KeyStoreError.swift */,
 				DCE77A5527C5240500F0FA24 /* TLSConnectionCheck.swift */,
 				DC6ACC572B10F0220079179B /* RecoveryPhrase.swift */,
+				DC2ABAD42BEC092B00C11C9C /* InvalidPin.swift */,
 			);
 			path = security;
 			sourceTree = "<group>";
@@ -1547,6 +1596,7 @@
 				es,
 				cs,
 				ar,
+				de,
 			);
 			mainGroup = 7555FF72242A565900829871;
 			packageReferences = (
@@ -1669,6 +1719,8 @@
 				DC63A3762B965D54008E040E /* InboundFeeSheet.swift in Sources */,
 				DC355E212A44D838008E8A8E /* NotificationsView.swift in Sources */,
 				DC7DA9F62AD84DF200F86B99 /* String+Substring.swift in Sources */,
+				DC2ABAD52BEC092B00C11C9C /* InvalidPin.swift in Sources */,
+				DC4CF3C62BE59E4B003A957F /* TextTracking.swift in Sources */,
 				DC63BDF729AEB30C0067A361 /* BackgroundPaymentsConfig.swift in Sources */,
 				DC67E40B27F3798600496C04 /* AnimatedMenu.swift in Sources */,
 				DC2F431627B6983B0006FCC4 /* CopyOptionsSheet.swift in Sources */,
@@ -1735,6 +1787,7 @@
 				DCB62F492A5E09F900912A71 /* SpliceOutProblem.swift in Sources */,
 				DC370A8B2B7FFFC70093C56F /* SwapInAddresses.swift in Sources */,
 				53BEFD54160278C5E393E319 /* HomeView.swift in Sources */,
+				DC0C52662BF3C31700143831 /* WhichPinSheet.swift in Sources */,
 				DCD1208728663F4A00EB39C5 /* TransactionsView.swift in Sources */,
 				DC70A99C2BBB6093002DBFF8 /* InboundFeeWarning.swift in Sources */,
 				DC118BFC27B4504B0080BBAC /* ScanView.swift in Sources */,
@@ -1760,7 +1813,9 @@
 				DCD7E0AF28EC3C0D009C30E5 /* WatchTower.swift in Sources */,
 				DCB493CB269F3B06001B0F09 /* Result+Deugly.swift in Sources */,
 				DC71E7302723240E0063613D /* KotlinObservables.swift in Sources */,
+				DC0C52682BF4FF6100143831 /* AuthenticateWithPinSheet.swift in Sources */,
 				DC0D2EA52939269800284608 /* KotlinExtensions+CloudKit.swift in Sources */,
+				DCA02BA02BD1A5FC0080520F /* ChannelSizeImpactWarning.swift in Sources */,
 				DC355E232A45FAF2008E8A8E /* NestedObservableObject.swift in Sources */,
 				DC5F1C4A28DDAA49007A55ED /* ResetWalletView_Confirm.swift in Sources */,
 				DC1B325029FC3D5900F7F45F /* OnChainDetails.swift in Sources */,
@@ -1771,6 +1826,7 @@
 				DC175C1C28F008AE0086B9A6 /* WalletReset.swift in Sources */,
 				DC23F80F2B55923F00389A10 /* WalletCreationOptions.swift in Sources */,
 				53BEF981E71E3087871890F9 /* SendView.swift in Sources */,
+				DC4CF3D02BEA8C13003A957F /* EditPinView.swift in Sources */,
 				DC1D2B502594CE900036AD38 /* FormattedAmount.swift in Sources */,
 				DC18C418256FE22300A2D083 /* Prefs.swift in Sources */,
 				DCAEF8F5276131A600015993 /* CheckboxToggleStyle.swift in Sources */,
@@ -1815,6 +1871,7 @@
 				53BEFFEBEA9EBE7B27B53AF4 /* PaymentView.swift in Sources */,
 				C8D7A74B29EAFF2EBD73BC6B /* ConfigurationView.swift in Sources */,
 				DC46BAF826CACCF700E760A6 /* KotlinAssociatedObject.swift in Sources */,
+				DC4CF3C42BE583A6003A957F /* NumberPadView.swift in Sources */,
 				DC0994B0263A074C003031CA /* InfoGrid.swift in Sources */,
 				DC46BAF526CACCF700E760A6 /* KotlinPublishers+Phoenix.swift in Sources */,
 				C8D7ABB189B14D3104ABB50D /* AboutView.swift in Sources */,
@@ -1822,6 +1879,7 @@
 				C8D7AA4B09B32AD99C88BB5E /* DisplayConfigurationView.swift in Sources */,
 				DCE77A5827C671D600F0FA24 /* ElectrumAddressSheet.swift in Sources */,
 				DC384D81265C12B700131772 /* Cache.swift in Sources */,
+				DC4CF3CC2BE93311003A957F /* String+PIN.swift in Sources */,
 				DCB30E592A0C3F8200E7D7A2 /* LiquidityPolicyView.swift in Sources */,
 				DCEAE5B72943CC7400320C46 /* RangeSheet.swift in Sources */,
 				DCAC5B7027726FC80077BB98 /* DeepLink.swift in Sources */,
@@ -1852,6 +1910,7 @@
 				DC49DA8E258BB882005BC4BC /* ScaledButtonStyle.swift in Sources */,
 				DCAEF8D9275E69B000015993 /* SyncSeedManager_State.swift in Sources */,
 				DCB04685260D162C007FDA37 /* ViewName.swift in Sources */,
+				DC4CF3CE2BE96C36003A957F /* DisablePinView.swift in Sources */,
 				DCB30E522A0A948000E7D7A2 /* WalletInfoView.swift in Sources */,
 				DCFA876D260E91E600AE8953 /* IntroContainer.swift in Sources */,
 				DCA5391C29F7202F001BD3D5 /* ChannelInfoPopup.swift in Sources */,
@@ -1869,6 +1928,7 @@
 				DC5CA4ED28F83C3B0048A737 /* DrainWalletView.swift in Sources */,
 				DC784A112B31EA180018DC4A /* LiquidityAdsView.swift in Sources */,
 				DC6D26E329E76557006A7814 /* AnimatedClock.swift in Sources */,
+				DCF8E3AC2BC4968D009299EE /* LowMinerFeeWarning.swift in Sources */,
 				DCAC9FC329675E1A0098D769 /* NavigationWrapper.swift in Sources */,
 				DC65D86428E2F7D700686355 /* ResetWalletView_Action.swift in Sources */,
 				DC71E7332728645B0063613D /* CurrencyConverterView.swift in Sources */,
@@ -1878,12 +1938,15 @@
 				DCACF7092566D0F00009B01E /* AppAccessView.swift in Sources */,
 				DC27E4D1279753EC00C777CC /* TextFieldNumberStyler.swift in Sources */,
 				DC46CB1628D9F30500C4EAC7 /* LoadingView.swift in Sources */,
+				DC2ABAD92BED142900C11C9C /* ShakeEffect.swift in Sources */,
 				DCFBC55B2AEAC2B000E3A418 /* ImportChannelsView.swift in Sources */,
 				DCFB8DF72A94066100947698 /* Task+Sleep.swift in Sources */,
+				DC4CF3CA2BE91FED003A957F /* SetNewPinView.swift in Sources */,
 				DC39D4EF287497440030F18D /* SmartModal.swift in Sources */,
 				DC2F431A27B699800006FCC4 /* ModifyInvoiceSheet.swift in Sources */,
 				DCCCEAB528F6DA2A0047871A /* RootView.swift in Sources */,
 				DCDAA7402971C29700B406A8 /* RecentPaymentsSelector.swift in Sources */,
+				DC2ABAD72BED081400C11C9C /* VibrationFeedback.swift in Sources */,
 				DCD5FF4326A0D34B009CC666 /* EqualSizes.swift in Sources */,
 				DCB62F472A5DF19D00912A71 /* KotlinPublishers+Lightning.swift in Sources */,
 				DC355E252A45FDD3008E8A8E /* NoticeMonitor.swift in Sources */,
@@ -2016,6 +2079,7 @@
 				DCAE99C12671928500D76E64 /* es */,
 				DC0E31B826EF85B4002071C6 /* cs */,
 				DCF9312F279F1BD900FD7776 /* ar */,
+				DCBDB8812BE154840097F940 /* de */,
 			);
 			name = about.html;
 			sourceTree = "<group>";
@@ -2026,6 +2090,7 @@
 				DC9E7EC72A1295B100A5F1D0 /* Base */,
 				968B38392AC34C260030DBF4 /* fr */,
 				96DB8DAF2AC4A260007D3D54 /* cs */,
+				DCBDB8822BE154840097F940 /* de */,
 			);
 			name = liquidity.html;
 			sourceTree = "<group>";
