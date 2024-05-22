@@ -384,4 +384,19 @@
     <string name="spliceout_capacity_disclaimer_body1">Os fundos enviados são retirados do seu lado do canal, reduzindo o tamanho do canal na mesma quantidade. Sua liquidez de entrada permanece inalterada.</string>
     <string name="spliceout_capacity_disclaimer_checkbox">Não mostre essa mensagem novamente.</string>
 
+    <!-- Spend swap-in refund -->
+
+    <string name="swapinrefund_title">Gastar um swap-in expirado</string>
+    <string name="swapinrefund_none_available_label">Nenhum swap-in expirou.</string>
+    <string name="swapinrefund_available_label">Fundos disponíveis : <b>%1$s</b> (%2$s)</string>
+    <string name="swapinrefund_instructions_1">Use esta tela para gastar depósitos na cadeia que não tenham sido transferidos para o Lightning a tempo. Observe que isso não afeta seus canais Lightning de forma alguma.</string>
+    <string name="swapinrefund_instructions_2">Verifique se o endereço de destino está correto e se as cobranças são razoáveis.</string>
+    <string name="swapinrefund_send_button">Enviar</string>
+    <string name="swapinrefund_sending">Enviando…</string>
+    <string name="swapinrefund_failed">Erro de transação.</string>
+    <string name="swapinrefund_failed_address">Endereço inválido.</string>
+    <string name="swapinrefund_failed_cannot_create">Não foi possível criar a transação de cobrança. Por favor, tente novamente.</string>
+    <string name="swapinrefund_success">Transação publicada.</string>
+    <string name="swapinrefund_success_details">Você pode encontrar a transação abaixo. Ela não aparecerá em seu histórico de pagamentos, portanto, faça uma cópia agora, se necessário.</string>
+
 </resources>

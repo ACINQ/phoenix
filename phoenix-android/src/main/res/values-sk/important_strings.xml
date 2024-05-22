@@ -385,4 +385,19 @@
     <string name="spliceout_capacity_disclaimer_body1">Finančné prostriedky odoslané sa odoberú z vašej strany kanála, čím sa zníži veľkosť kanála o rovnakú sumu. Vaša prichádzajúca likvidita zostáva nezmenená.</string>
     <string name="spliceout_capacity_disclaimer_checkbox">Túto správu už nezobrazujte.</string>
 
+    <!-- Spend swap-in refund -->
+
+    <string name="swapinrefund_title">Stráviť výmenu, ktorej platnosť vypršala</string>
+    <string name="swapinrefund_none_available_label">Žiadny swap-in nevypršal.</string>
+    <string name="swapinrefund_available_label">Dostupné finančné prostriedky: <b>%1$s</b> (%2$s)</string>
+    <string name="swapinrefund_instructions_1">Na tejto obrazovke môžete minúť vklady v reťazci, ktoré neboli včas prevedené na Lightning. Upozorňujeme, že to nijako neovplyvňuje vaše kanály Lightning.</string>
+    <string name="swapinrefund_instructions_2">Uistite sa, že cieľová adresa je správna a poplatky primerané.</string>
+    <string name="swapinrefund_send_button">Odoslať</string>
+    <string name="swapinrefund_sending">Odoslanie…</string>
+    <string name="swapinrefund_failed">Chyba transakcie.</string>
+    <string name="swapinrefund_failed_address">Nesprávna adresa.</string>
+    <string name="swapinrefund_failed_cannot_create">Nie je možné vytvoriť transakciu inkasa. Skúste to prosím znova.</string>
+    <string name="swapinrefund_success">Zverejnená transakcia.</string>
+    <string name="swapinrefund_success_details">Transakciu nájdete nižšie. Nebude sa zobrazovať v histórii platieb, preto si teraz vytvorte jej kópiu, ak ju potrebujete.</string>
+
 </resources>

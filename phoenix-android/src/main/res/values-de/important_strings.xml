@@ -382,4 +382,19 @@
     <string name="spliceout_capacity_disclaimer_body1">Die gesendeten Gelder werden von Ihrer Seite des Kanals genommen, wodurch die Kanalgröße um den gleichen Betrag reduziert wird. Ihre eingehende Liquidität bleibt unverändert.</string>
     <string name="spliceout_capacity_disclaimer_checkbox">Diese Meldung nicht mehr anzeigen.</string>
 
+    <!-- Spend swap-in refund -->
+
+    <string name="swapinrefund_title">Ausgeben eines abgelaufenen Swap-ins</string>
+    <string name="swapinrefund_none_available_label">Keine abgelaufenen Swap-Ins.</string>
+    <string name="swapinrefund_available_label">Verfügbare Gelder : <b>%1$s</b> (%2$s)</string>
+    <string name="swapinrefund_instructions_1">Verwenden Sie diesen Screen, um on-chain Einlagen auszugeben, die nicht rechtzeitig auf Lightning umgeschaltet wurden. Beachten Sie, dass dies keine Auswirkungen auf Ihre Lightning-Kanäle hat.</string>
+    <string name="swapinrefund_instructions_2">Stellen Sie sicher, dass die Zieladresse korrekt ist und die Gebühren angemessen sind.</string>
+    <string name="swapinrefund_send_button">Senden</string>
+    <string name="swapinrefund_sending">Sendung in Bearbeitung…</string>
+    <string name="swapinrefund_failed">Fehler in der Transaktion.</string>
+    <string name="swapinrefund_failed_address">Die Adresse ist ungültig.</string>
+    <string name="swapinrefund_failed_cannot_create">Die Einzugstransaktion konnte nicht erstellt werden. Bitte versuchen Sie es erneut.</string>
+    <string name="swapinrefund_success">Transaktion veröffentlicht.</string>
+    <string name="swapinrefund_success_details">Sie können die Transaktion unten finden. Sie wird nicht in Ihrem Zahlungsverlauf erscheinen, also machen Sie bei Bedarf jetzt eine Kopie davon.</string>
+
 </resources>
