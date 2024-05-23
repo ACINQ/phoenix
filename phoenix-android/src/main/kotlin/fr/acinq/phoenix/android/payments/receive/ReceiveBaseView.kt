@@ -67,22 +67,7 @@ fun ReceiveView(
     onFeeManagementClick: () -> Unit,
     onScanDataClick: () -> Unit,
 ) {
-//    val balanceManager = business.balanceManager
     val vm: ReceiveViewModel = viewModel(factory = ReceiveViewModel.Factory(business.chain, business.peerManager, business.walletManager))
-    val defaultInvoiceExpiry by userPrefs.getInvoiceDefaultExpiry.collectAsState(null)
-    val defaultInvoiceDesc by userPrefs.getInvoiceDefaultDesc.collectAsState(null)
-
-//    // When a on-chain payment has been received, go back to the home screen (via the onSwapInReceived callback)
-//    LaunchedEffect(key1 = Unit) {
-//        var previousBalance: WalletBalance = WalletBalance.empty()
-//        balanceManager.swapInWalletBalance.collect {
-//            if (previousBalance != WalletBalance.empty() && it.total > 0.sat && it != previousBalance) {
-//                onSwapInReceived()
-//            } else {
-//                previousBalance = it
-//            }
-//        }
-//    }
 
     DefaultScreenLayout(horizontalAlignment = Alignment.CenterHorizontally, isScrollable = true) {
         DefaultScreenHeader(
@@ -97,9 +82,7 @@ fun ReceiveView(
                 }
             },
         )
-        safeLet(defaultInvoiceDesc, defaultInvoiceExpiry) { desc, exp ->
-            ReceiveViewPages(vm = vm, onFeeManagementClick = onFeeManagementClick, onScanDataClick = onScanDataClick, defaultInvoiceDescription = desc, defaultInvoiceExpiry = exp)
-        } ?: ProgressView(text = stringResource(id = R.string.utils_loading_prefs))
+        ReceiveViewPages(vm = vm, onFeeManagementClick = onFeeManagementClick, onScanDataClick = onScanDataClick)
     }
 }
 
@@ -109,8 +92,6 @@ private fun ReceiveViewPages(
     vm: ReceiveViewModel,
     onFeeManagementClick: () -> Unit,
     onScanDataClick: () -> Unit,
-    defaultInvoiceDescription: String,
-    defaultInvoiceExpiry: Long,
 ) {
     val pagerState = rememberPagerState(pageCount = { 2 })
     // we need to be responsive in some subcomponents, like the edit-invoice buttons
@@ -146,7 +127,14 @@ private fun ReceiveViewPages(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 when (index) {
-                    0 -> LightningInvoiceView(vm = vm, onFeeManagementClick = onFeeManagementClick, onScanDataClick = onScanDataClick, defaultDescription = defaultInvoiceDescription, expiry = defaultInvoiceExpiry, maxWidth = maxWidth)
+                    0 -> {
+                        val defaultInvoiceExpiry by userPrefs.getInvoiceDefaultExpiry.collectAsState(null)
+                        val defaultInvoiceDesc by userPrefs.getInvoiceDefaultDesc.collectAsState(null)
+                        safeLet(defaultInvoiceDesc, defaultInvoiceExpiry) { desc, expiry ->
+                            LightningInvoiceView(vm = vm, onFeeManagementClick = onFeeManagementClick, onScanDataClick = onScanDataClick,
+                                defaultDescription = desc, defaultExpiry = expiry, maxWidth = maxWidth, isPageActive = pagerState.currentPage == 0)
+                        } ?: ProgressView(text = stringResource(id = R.string.utils_loading_prefs))
+                    }
                     1 -> BitcoinAddressView(vm = vm, maxWidth = maxWidth)
                 }
             }
