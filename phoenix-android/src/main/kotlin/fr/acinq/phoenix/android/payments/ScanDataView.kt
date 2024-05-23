@@ -83,6 +83,7 @@ fun ScanDataView(
     input: String? = null,
     onBackClick: () -> Unit,
     onAuthSchemeInfoClick: () -> Unit,
+    onFeeManagementClick: () -> Unit,
 ) {
     var initialInput = remember { input }
     val peer by business.peerManager.peerState.collectAsState()
@@ -159,7 +160,7 @@ fun ScanDataView(
                 LnurlAuthView(model = model, onBackClick = onBackClick, onLoginClick = { postIntent(it) }, onAuthSchemeInfoClick = onAuthSchemeInfoClick)
             }
             is Scan.Model.LnurlWithdrawFlow -> {
-                LnurlWithdrawView(model = model, onBackClick = onBackClick, onWithdrawClick = { postIntent(it) })
+                LnurlWithdrawView(model = model, onBackClick = onBackClick, onWithdrawClick = { postIntent(it) }, onFeeManagementClick = onFeeManagementClick)
             }
         }
     }
