@@ -166,6 +166,10 @@
     <string name="send_connecting_button">Waiting for channels…</string>
     <string name="send_pay_button">Pay</string>
 
+    <string name="send_offer_fetching">Fetching payment details…</string>
+    <string name="send_offer_failure_title">Payment has failed</string>
+    <string name="send_offer_failure_timeout">Could not retrieve payment details within a reasonable time.\n\nThe recipient may be offline or unreachable.</string>
+
     <string name="send_paymentmode_onchain">Pay on-chain</string>
     <string name="send_paymentmode_onchain_desc">On-chain transactions are typically slower and best suited for large payments.</string>
     <string name="send_paymentmode_lightning">Pay with Lightning</string>

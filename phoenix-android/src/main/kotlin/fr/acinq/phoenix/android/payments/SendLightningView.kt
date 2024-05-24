@@ -145,13 +145,12 @@ fun SendBolt11PaymentView(
         }
         SplashLabelRow(label = stringResource(id = R.string.send_trampoline_fee_label)) {
             val amt = amount
-            val fees = trampolineFees
             if (amt == null) {
                 Text(stringResource(id = R.string.send_trampoline_fee_no_amount), style = MaterialTheme.typography.caption)
-            } else if (fees == null) {
+            } else if (trampolineFees == null) {
                 Text(stringResource(id = R.string.send_trampoline_fee_loading))
             } else {
-                AmountWithFiatRowView(amount = fees.calculateFees(amt))
+                AmountWithFiatRowView(amount = trampolineFees.calculateFees(amt))
             }
         }
         Spacer(modifier = Modifier.height(36.dp))

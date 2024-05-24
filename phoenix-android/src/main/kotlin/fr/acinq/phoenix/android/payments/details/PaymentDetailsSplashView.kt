@@ -749,7 +749,7 @@ private fun BumpTransactionDialog(
 }
 
 @Composable
-private fun translatePaymentError(paymentFailure: OutgoingPaymentFailure): String {
+fun translatePaymentError(paymentFailure: OutgoingPaymentFailure): String {
     return when (val result = paymentFailure.explain()) {
         is Either.Left -> {
             when (val partFailure = result.value) {

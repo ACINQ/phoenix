@@ -54,6 +54,7 @@ import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIControllerViewModel
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.databinding.ScanViewBinding
+import fr.acinq.phoenix.android.payments.offer.SendOfferView
 import fr.acinq.phoenix.android.payments.spliceout.SendSpliceOutView
 import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.controllers.ControllerFactory
@@ -82,6 +83,7 @@ class ScanDataViewModel(controller: ScanController) : MVIControllerViewModel<Sca
 fun ScanDataView(
     input: String? = null,
     onBackClick: () -> Unit,
+    onProcessingFinished: () -> Unit,
     onAuthSchemeInfoClick: () -> Unit,
     onFeeManagementClick: () -> Unit,
 ) {
@@ -120,6 +122,9 @@ fun ScanDataView(
             Scan.Model.Bolt11InvoiceFlow.Sending -> {
                 LaunchedEffect(key1 = Unit) { onBackClick() }
             }
+            is Scan.Model.OfferFlow -> {
+                SendOfferView(offer = model.offer, trampolineFees = trampolineFees, onBackClick = { postIntent(Scan.Intent.Reset) }, onPaymentSent = onProcessingFinished)
+            }
             is Scan.Model.OnchainFlow -> {
                 val paymentRequest = model.uri.paymentRequest
                 if (paymentRequest == null) {
@@ -127,7 +132,7 @@ fun ScanDataView(
                         requestedAmount = model.uri.amount,
                         address = model.uri.address,
                         onBackClick = onBackClick,
-                        onSpliceOutSuccess = onBackClick,
+                        onSpliceOutSuccess = onProcessingFinished,
                     )
                 } else {
                     var showPaymentModeDialog by remember { mutableStateOf(false) }
