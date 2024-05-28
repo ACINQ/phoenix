@@ -6,6 +6,7 @@ import fr.acinq.bitcoin.PrivateKey
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.TxId
+import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.ChannelEvents
 import fr.acinq.lightning.DefaultSwapInParams
 import fr.acinq.lightning.LiquidityEvents
@@ -34,7 +35,9 @@ import fr.acinq.lightning.io.PaymentSent
 import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.io.PeerEvent
 import fr.acinq.lightning.io.TcpSocket
+import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.payment.LiquidityPolicy
+import fr.acinq.lightning.payment.OutgoingPaymentFailure
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.PhoenixBusiness
@@ -74,6 +77,34 @@ fun IncomingPayment.ReceivedWith.asNewChannel(): IncomingPayment.ReceivedWith.Ne
 fun IncomingPayment.ReceivedWith.asSpliceIn(): IncomingPayment.ReceivedWith.SpliceIn? = when (this) {
     is IncomingPayment.ReceivedWith.SpliceIn -> this
     else -> null
+}
+
+fun LightningOutgoingPayment.outgoingPaymentFailure(): OutgoingPaymentFailure? {
+    return (status as? LightningOutgoingPayment.Status.Completed.Failed)?.let { status ->
+        OutgoingPaymentFailure(
+            reason = status.reason,
+            failures = parts.map { it.status }
+                .filterIsInstance<LightningOutgoingPayment.Part.Status.Failed>()
+        )
+    }
+}
+
+fun LightningOutgoingPayment.explainAsPartFailure(): LightningOutgoingPayment.Part.Status.Failure? {
+    return outgoingPaymentFailure()?.let { paymentFailure ->
+        when (val result = paymentFailure.explain()) {
+            is Either.Left -> result.value
+            else -> null
+        }
+    }
+}
+
+fun LightningOutgoingPayment.explainAsFinalFailure(): FinalFailure? {
+    return outgoingPaymentFailure()?.let { paymentFailure ->
+        when (val result = paymentFailure.explain()) {
+            is Either.Right -> result.value
+            else -> null
+        }
+    }
 }
 
 fun LightningOutgoingPayment.Details.asNormal(): LightningOutgoingPayment.Details.Normal? = when (this) {
@@ -326,6 +357,97 @@ fun PeerEvent.asPaymentNotSent(): PaymentNotSent? = when (this) {
     is PaymentNotSent -> this
     else -> null
 }
+
+fun FinalFailure.asAlreadyPaid(): FinalFailure.AlreadyPaid? =
+    (this as? FinalFailure.AlreadyPaid)
+
+fun FinalFailure.asInvalidPaymentAmount(): FinalFailure.InvalidPaymentAmount? =
+    (this as? FinalFailure.InvalidPaymentAmount)
+
+fun FinalFailure.asFeaturesNotSupported(): FinalFailure.FeaturesNotSupported? =
+    (this as? FinalFailure.FeaturesNotSupported)
+
+fun FinalFailure.asInvalidPaymentId(): FinalFailure.InvalidPaymentId? =
+    (this as? FinalFailure.InvalidPaymentId)
+
+fun FinalFailure.asChannelNotConnected(): FinalFailure.ChannelNotConnected? =
+    (this as? FinalFailure.ChannelNotConnected)
+
+fun FinalFailure.asChannelOpening (): FinalFailure.ChannelOpening? =
+    (this as? FinalFailure.ChannelOpening)
+
+fun FinalFailure.asChannelClosing (): FinalFailure.ChannelClosing? =
+    (this as? FinalFailure.ChannelClosing)
+
+fun FinalFailure.asNoAvailableChannels (): FinalFailure.NoAvailableChannels? =
+    (this as? FinalFailure.NoAvailableChannels)
+
+fun FinalFailure.asInsufficientBalance (): FinalFailure.InsufficientBalance? =
+    (this as? FinalFailure.InsufficientBalance)
+
+fun FinalFailure.asRecipientUnreachable (): FinalFailure.RecipientUnreachable? =
+    (this as? FinalFailure.RecipientUnreachable)
+
+fun FinalFailure.asRetryExhausted (): FinalFailure.RetryExhausted? =
+    (this as? FinalFailure.RetryExhausted)
+
+fun FinalFailure.asWalletRestarted (): FinalFailure.WalletRestarted? =
+    (this as? FinalFailure.WalletRestarted)
+
+fun FinalFailure.asUnknownError (): FinalFailure.UnknownError? =
+    (this as? FinalFailure.UnknownError)
+
+fun LightningOutgoingPayment.Part.Status.Failure.asUninterpretable():
+        LightningOutgoingPayment.Part.Status.Failure.Uninterpretable? =
+    (this as? LightningOutgoingPayment.Part.Status.Failure.Uninterpretable)
+
+fun LightningOutgoingPayment.Part.Status.Failure.asChannelIsClosing():
+        LightningOutgoingPayment.Part.Status.Failure.ChannelIsClosing? =
+    (this as? LightningOutgoingPayment.Part.Status.Failure.ChannelIsClosing)
+
+fun LightningOutgoingPayment.Part.Status.Failure.asChannelIsSplicing():
+        LightningOutgoingPayment.Part.Status.Failure.ChannelIsSplicing? =
+    (this as? LightningOutgoingPayment.Part.Status.Failure.ChannelIsSplicing)
+
+fun LightningOutgoingPayment.Part.Status.Failure.asNotEnoughFees():
+        LightningOutgoingPayment.Part.Status.Failure.NotEnoughFees? =
+    (this as? LightningOutgoingPayment.Part.Status.Failure.NotEnoughFees)
+
+fun LightningOutgoingPayment.Part.Status.Failure.asNotEnoughFunds():
+        LightningOutgoingPayment.Part.Status.Failure.NotEnoughFunds? =
+    (this as? LightningOutgoingPayment.Part.Status.Failure.NotEnoughFunds)
+
+fun LightningOutgoingPayment.Part.Status.Failure.asPaymentAmountTooBig():
+        LightningOutgoingPayment.Part.Status.Failure.PaymentAmountTooBig? =
+    (this as? LightningOutgoingPayment.Part.Status.Failure.PaymentAmountTooBig)
+
+fun LightningOutgoingPayment.Part.Status.Failure.asPaymentAmountTooSmall():
+        LightningOutgoingPayment.Part.Status.Failure.PaymentAmountTooSmall? =
+    (this as? LightningOutgoingPayment.Part.Status.Failure.PaymentAmountTooSmall)
+
+fun LightningOutgoingPayment.Part.Status.Failure.asPaymentExpiryTooBig():
+        LightningOutgoingPayment.Part.Status.Failure.PaymentExpiryTooBig? =
+    (this as? LightningOutgoingPayment.Part.Status.Failure.PaymentExpiryTooBig)
+
+fun LightningOutgoingPayment.Part.Status.Failure.asRecipientRejectedPayment():
+        LightningOutgoingPayment.Part.Status.Failure.RecipientRejectedPayment? =
+    (this as? LightningOutgoingPayment.Part.Status.Failure.RecipientRejectedPayment)
+
+fun LightningOutgoingPayment.Part.Status.Failure.asRecipientIsOffline():
+        LightningOutgoingPayment.Part.Status.Failure.RecipientIsOffline? =
+    (this as? LightningOutgoingPayment.Part.Status.Failure.RecipientIsOffline)
+
+fun LightningOutgoingPayment.Part.Status.Failure.asRecipientLiquidityIssue():
+        LightningOutgoingPayment.Part.Status.Failure.RecipientLiquidityIssue? =
+    (this as? LightningOutgoingPayment.Part.Status.Failure.RecipientLiquidityIssue)
+
+fun LightningOutgoingPayment.Part.Status.Failure.asTemporaryRemoteFailure():
+        LightningOutgoingPayment.Part.Status.Failure.TemporaryRemoteFailure? =
+    (this as? LightningOutgoingPayment.Part.Status.Failure.TemporaryRemoteFailure)
+
+fun LightningOutgoingPayment.Part.Status.Failure.asTooManyPendingPayments():
+        LightningOutgoingPayment.Part.Status.Failure.TooManyPendingPayments? =
+    (this as? LightningOutgoingPayment.Part.Status.Failure.TooManyPendingPayments)
 
 /**
  * The class LiquidityAds.LeaseRate is NOT exposed to iOS.

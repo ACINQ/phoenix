@@ -183,7 +183,7 @@ class SqlitePaymentsDb(
 
     override suspend fun completeOutgoingLightningPart(
         partId: UUID,
-        failure: Either<ChannelException, FailureMessage>,
+        failure: LightningOutgoingPayment.Part.Status.Failure,
         completedAt: Long
     ) {
         withContext(Dispatchers.Default) {
@@ -202,7 +202,7 @@ class SqlitePaymentsDb(
         completedAt: Long
     ) {
         withContext(Dispatchers.Default) {
-            val (statusType, statusData) = failedStatus.mapToDb()
+            val (statusType, statusData) = failedStatus.failure.mapToDb()
             outQueries.database.outgoingPaymentsQueries.updateLightningPart(
                 part_id = partId.toString(),
                 part_status_type = statusType,

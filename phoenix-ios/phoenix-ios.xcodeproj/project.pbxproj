@@ -99,6 +99,7 @@
 		DC355E252A45FDD3008E8A8E /* NoticeMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC355E242A45FDD3008E8A8E /* NoticeMonitor.swift */; };
 		DC370A892B7FBD7C0093C56F /* BtcAddrOptionsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC370A882B7FBD7C0093C56F /* BtcAddrOptionsSheet.swift */; };
 		DC370A8B2B7FFFC70093C56F /* SwapInAddresses.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC370A8A2B7FFFC70093C56F /* SwapInAddresses.swift */; };
+		DC3780392C04D60400937C8E /* KotlinEnums.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3780382C04D60400937C8E /* KotlinEnums.swift */; };
 		DC384D81265C12B700131772 /* Cache.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC384D80265C12B700131772 /* Cache.swift */; };
 		DC384D83265C32F100131772 /* TextField+Verbatim.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC384D82265C32F100131772 /* TextField+Verbatim.swift */; };
 		DC39A2662A12C04D00F59E39 /* LiquidityPolicyHelp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC39A2652A12C04D00F59E39 /* LiquidityPolicyHelp.swift */; };
@@ -491,6 +492,7 @@
 		DC355E242A45FDD3008E8A8E /* NoticeMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoticeMonitor.swift; sourceTree = "<group>"; };
 		DC370A882B7FBD7C0093C56F /* BtcAddrOptionsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcAddrOptionsSheet.swift; sourceTree = "<group>"; };
 		DC370A8A2B7FFFC70093C56F /* SwapInAddresses.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwapInAddresses.swift; sourceTree = "<group>"; };
+		DC3780382C04D60400937C8E /* KotlinEnums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinEnums.swift; sourceTree = "<group>"; };
 		DC384D7C265BE41900131772 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = fr; path = fr.lproj/about.html; sourceTree = "<group>"; };
 		DC384D80265C12B700131772 /* Cache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Cache.swift; sourceTree = "<group>"; };
 		DC384D82265C32F100131772 /* TextField+Verbatim.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TextField+Verbatim.swift"; sourceTree = "<group>"; };
@@ -999,6 +1001,7 @@
 				DCB62F462A5DF19D00912A71 /* KotlinPublishers+Lightning.swift */,
 				DC74174A270F332700F7E3E3 /* KotlinTypes.swift */,
 				DCCFE6A32B63021E002FFF11 /* KotlinLogger.swift */,
+				DC3780382C04D60400937C8E /* KotlinEnums.swift */,
 			);
 			path = kotlin;
 			sourceTree = "<group>";
@@ -1935,6 +1938,7 @@
 				DCA3B41F2A5471C900E6B231 /* MinerFeeInfo.swift in Sources */,
 				DCACF6F02566D0A60009B01E /* Data+Hexadecimal.swift in Sources */,
 				DCE3C7AB2A6AD3CC00F4D385 /* MempoolMonitor.swift in Sources */,
+				DC3780392C04D60400937C8E /* KotlinEnums.swift in Sources */,
 				DCACF7092566D0F00009B01E /* AppAccessView.swift in Sources */,
 				DC27E4D1279753EC00C777CC /* TextFieldNumberStyler.swift in Sources */,
 				DC46CB1628D9F30500C4EAC7 /* LoadingView.swift in Sources */,

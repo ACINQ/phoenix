@@ -417,8 +417,9 @@ object LegacyMigrationHelper {
                         amount = part.amount().toLong().msat + 0.msat, // must include the fee!!!
                         route = listOf(),
                         status = LightningOutgoingPayment.Part.Status.Failed(
-                            remoteFailureCode = null,
-                            details = JavaConverters.asJavaCollectionConverter(partStatus.failures()).asJavaCollection().toList().lastOrNull()?.failureMessage() ?: "error details unavailable",
+                            failure = LightningOutgoingPayment.Part.Status.Failure.Uninterpretable(
+                                message = JavaConverters.asJavaCollectionConverter(partStatus.failures()).asJavaCollection().toList().lastOrNull()?.failureMessage() ?: "error details unavailable",
+                            ),
                             completedAt = partStatus.completedAt()
                         ),
                         createdAt = part.createdAt()
@@ -463,11 +464,11 @@ object LegacyMigrationHelper {
                     val lastFailure = JavaConverters.asJavaCollectionConverter((it.last().status() as OutgoingPaymentStatus.Failed).failures()).asJavaCollection().toList().lastOrNull()
                     when {
                         lastFailure == null -> FinalFailure.UnknownError
-                        lastFailure.failureMessage().contains(TrampolineFeeInsufficient.message(), ignoreCase = true) -> FinalFailure.NoRouteToRecipient
+                        lastFailure.failureMessage().contains(TrampolineFeeInsufficient.message(), ignoreCase = true) -> FinalFailure.RecipientUnreachable
                         lastFailure.failureMessage().contains(TemporaryNodeFailure.message(), ignoreCase = true)
                                 || lastFailure.failureMessage().contains(UnknownNextPeer.message(), ignoreCase = true)
                                 || lastFailure.failureMessage().contains("is currently unavailable", ignoreCase = true) -> FinalFailure.RecipientUnreachable
-                        lastFailure.failureMessage().contains("incorrect payment details or unknown payment hash", ignoreCase = true) -> FinalFailure.NoRouteToRecipient
+                        lastFailure.failureMessage().contains("incorrect payment details or unknown payment hash", ignoreCase = true) -> FinalFailure.RecipientUnreachable
                         else -> FinalFailure.UnknownError
                     } to (it.last().status() as OutgoingPaymentStatus.Failed).completedAt()
                 }
