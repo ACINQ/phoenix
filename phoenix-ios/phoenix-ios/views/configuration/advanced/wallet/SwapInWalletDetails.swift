@@ -8,6 +8,10 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
+fileprivate enum NavLinkTag: String {
+	case SpendExpiredSwapIns
+}
+
 struct SwapInWalletDetails: View {
 	
 	enum Location {
@@ -17,6 +21,8 @@ struct SwapInWalletDetails: View {
 	
 	let location: Location
 	let popTo: (PopToDestination) -> Void
+	
+	@State private var navLinkTag: NavLinkTag? = nil
 	
 	@State var liquidityPolicy: LiquidityPolicy = GroupPrefs.shared.liquidityPolicy
 	
@@ -341,17 +347,41 @@ struct SwapInWalletDetails: View {
 		Section {
 			
 			let (btcAmt, fiatAmt) = cancelledBalance()
-			Text(verbatim: "\(btcAmt.string)") +
-			Text(verbatim: " ≈ \(fiatAmt.string)").foregroundColor(.secondary)
+			navLink(.SpendExpiredSwapIns) {
+				Text(verbatim: "\(btcAmt.string)") +
+				Text(verbatim: " ≈ \(fiatAmt.string)").foregroundColor(.secondary)
+			}
 			
-			Text("These funds were not swapped in time. Use the wallet's descriptor to access them.")
+			Text("These funds were not swapped in time. Tap to spend.")
 				.font(.callout)
 				.foregroundColor(.secondary)
 			
 		} header: {
-			Text("Cancelled Funds")
+			Text("Expired")
 			
 		} // </Section>
+	}
+	
+	@ViewBuilder
+	private func navLink<Content>(
+		_ tag: NavLinkTag,
+		label: () -> Content
+	) -> some View where Content: View {
+		
+		NavigationLink(
+			destination: navLinkView(tag),
+			tag: tag,
+			selection: $navLinkTag,
+			label: label
+		)
+	}
+	
+	@ViewBuilder
+	private func navLinkView(_ tag: NavLinkTag) -> some View {
+		
+		switch tag {
+			case .SpendExpiredSwapIns: SpendExpiredSwapIns()
+		}
 	}
 	
 	// --------------------------------------------------

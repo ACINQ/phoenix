@@ -6906,6 +6906,9 @@
         }
       }
     },
+    "Available" : {
+
+    },
     "Avoids payment correlation using timestamp metadata." : {
       "comment" : "Explanation for 'Randomize upload delays' toggle",
       "localizations" : {
@@ -8612,6 +8615,7 @@
       }
     },
     "Cancelled Funds" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -15719,6 +15723,9 @@
         }
       }
     },
+    "Expired" : {
+
+    },
     "Explore" : {
       "localizations" : {
         "ar" : {
@@ -20643,6 +20650,7 @@
       }
     },
     "Invalid bitcoin address" : {
+      "comment" : "Error message - parsing bitcoin address",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -24107,6 +24115,9 @@
         }
       }
     },
+    "Miner fee:" : {
+
+    },
     "miner fees" : {
       "localizations" : {
         "ar" : {
@@ -26109,6 +26120,9 @@
           }
         }
       }
+    },
+    "Options" : {
+
     },
     "other" : {
       "comment" : "Option in currency picker list. Sends user to Currency Converter",
@@ -29847,6 +29861,9 @@
         }
       }
     },
+    "Receive:" : {
+
+    },
     "RECEIVED" : {
       "localizations" : {
         "ar" : {
@@ -31870,6 +31887,9 @@
           }
         }
       }
+    },
+    "Sent" : {
+
     },
     "SENT" : {
       "comment" : "Confirm dialog that payment has been sent.",
@@ -34224,6 +34244,9 @@
           }
         }
       }
+    },
+    "Spend expired swap-ins" : {
+
     },
     "Spending = pouring water out\nReceiving = adding more water" : {
       "localizations" : {
@@ -36745,7 +36768,11 @@
         }
       }
     },
+    "These funds were not swapped in time. Tap to spend." : {
+
+    },
     "These funds were not swapped in time. Use the wallet's descriptor to access them." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -40215,6 +40242,9 @@
           }
         }
       }
+    },
+    "Use this screen to spend your on-chain funds that were not swapped in time. The swap-in request has now expired. " : {
+
     },
     "Version %@" : {
       "localizations" : {

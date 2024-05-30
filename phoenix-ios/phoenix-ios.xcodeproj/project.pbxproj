@@ -99,6 +99,11 @@
 		DC355E252A45FDD3008E8A8E /* NoticeMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC355E242A45FDD3008E8A8E /* NoticeMonitor.swift */; };
 		DC370A892B7FBD7C0093C56F /* BtcAddrOptionsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC370A882B7FBD7C0093C56F /* BtcAddrOptionsSheet.swift */; };
 		DC370A8B2B7FFFC70093C56F /* SwapInAddresses.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC370A8A2B7FFFC70093C56F /* SwapInAddresses.swift */; };
+		DC3780392C04D60400937C8E /* KotlinEnums.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3780382C04D60400937C8E /* KotlinEnums.swift */; };
+		DC37803B2C050F7000937C8E /* SpendExpiredSwapIns.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC37803A2C050F7000937C8E /* SpendExpiredSwapIns.swift */; };
+		DC37803D2C05215600937C8E /* ScanBitcoinAddressSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC37803C2C05215600937C8E /* ScanBitcoinAddressSheet.swift */; };
+		DC37803F2C06338000937C8E /* BtcAddressInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC37803E2C06338000937C8E /* BtcAddressInput.swift */; };
+		DC3780412C077E0300937C8E /* PriorityBoxStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3780402C077E0300937C8E /* PriorityBoxStyle.swift */; };
 		DC384D81265C12B700131772 /* Cache.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC384D80265C12B700131772 /* Cache.swift */; };
 		DC384D83265C32F100131772 /* TextField+Verbatim.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC384D82265C32F100131772 /* TextField+Verbatim.swift */; };
 		DC39A2662A12C04D00F59E39 /* LiquidityPolicyHelp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC39A2652A12C04D00F59E39 /* LiquidityPolicyHelp.swift */; };
@@ -491,6 +496,11 @@
 		DC355E242A45FDD3008E8A8E /* NoticeMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoticeMonitor.swift; sourceTree = "<group>"; };
 		DC370A882B7FBD7C0093C56F /* BtcAddrOptionsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcAddrOptionsSheet.swift; sourceTree = "<group>"; };
 		DC370A8A2B7FFFC70093C56F /* SwapInAddresses.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwapInAddresses.swift; sourceTree = "<group>"; };
+		DC3780382C04D60400937C8E /* KotlinEnums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinEnums.swift; sourceTree = "<group>"; };
+		DC37803A2C050F7000937C8E /* SpendExpiredSwapIns.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendExpiredSwapIns.swift; sourceTree = "<group>"; };
+		DC37803C2C05215600937C8E /* ScanBitcoinAddressSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanBitcoinAddressSheet.swift; sourceTree = "<group>"; };
+		DC37803E2C06338000937C8E /* BtcAddressInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcAddressInput.swift; sourceTree = "<group>"; };
+		DC3780402C077E0300937C8E /* PriorityBoxStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriorityBoxStyle.swift; sourceTree = "<group>"; };
 		DC384D7C265BE41900131772 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = fr; path = fr.lproj/about.html; sourceTree = "<group>"; };
 		DC384D80265C12B700131772 /* Cache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Cache.swift; sourceTree = "<group>"; };
 		DC384D82265C32F100131772 /* TextField+Verbatim.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TextField+Verbatim.swift"; sourceTree = "<group>"; };
@@ -927,6 +937,7 @@
 				DC118BFF27B4523B0080BBAC /* CommentSheet.swift */,
 				DCA3B41E2A5471C900E6B231 /* MinerFeeInfo.swift */,
 				DC1844022A2690BB004D9578 /* MinerFeeSheet.swift */,
+				DC3780402C077E0300937C8E /* PriorityBoxStyle.swift */,
 				DCF8E3AB2BC4968D009299EE /* LowMinerFeeWarning.swift */,
 				DC118BF727B44E6E0080BBAC /* LoginView.swift */,
 				DC118C0327B454720080BBAC /* PaymentInFlightView.swift */,
@@ -1061,6 +1072,8 @@
 				DC5CA4EC28F83C3B0048A737 /* DrainWalletView.swift */,
 				DC5F1C4728DDA539007A55ED /* DrainWalletView_Confirm.swift */,
 				DC5F1C4B28DDF702007A55ED /* DrainWalletView_Action.swift */,
+				DC37803E2C06338000937C8E /* BtcAddressInput.swift */,
+				DC37803C2C05215600937C8E /* ScanBitcoinAddressSheet.swift */,
 			);
 			path = "drain wallet";
 			sourceTree = "<group>";
@@ -1432,6 +1445,7 @@
 				DC43096D2A7953F400E28995 /* FinalWalletDetails.swift */,
 				DC43096F2A795F9900E28995 /* UtxoWrapper.swift */,
 				DC370A8A2B7FFFC70093C56F /* SwapInAddresses.swift */,
+				DC37803A2C050F7000937C8E /* SpendExpiredSwapIns.swift */,
 			);
 			path = wallet;
 			sourceTree = "<group>";
@@ -1727,6 +1741,7 @@
 				DCACF6FE2566D0BA0009B01E /* GenericPasswordConvertible.swift in Sources */,
 				DC949E6A2B45B1EC00E80BB5 /* LiquidityAdsHelp.swift in Sources */,
 				DC33369826BAF721000E3F49 /* ShortSheet.swift in Sources */,
+				DC3780412C077E0300937C8E /* PriorityBoxStyle.swift in Sources */,
 				DC99E90925B78FA800FB20F7 /* EnabledSecurity.swift in Sources */,
 				DCB493CF269F859E001B0F09 /* SyncTxManager_State.swift in Sources */,
 				DC82EED629789853007A5853 /* TxHistoryExporter.swift in Sources */,
@@ -1755,6 +1770,7 @@
 				DC81B79F25BF2AA200F5A52C /* MVI.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
 				DCFB8DF92A94112A00947698 /* Dictionary+MapKeys.swift in Sources */,
+				DC37803B2C050F7000937C8E /* SpendExpiredSwapIns.swift in Sources */,
 				DCB876322735AAB500657570 /* UserDefaults+Codable.swift in Sources */,
 				DCD777D226DE9FE800979A12 /* DelayedSave.swift in Sources */,
 				DCEE3E542931446A00EB4DFF /* Collections+AsInt.swift in Sources */,
@@ -1871,6 +1887,7 @@
 				53BEFFEBEA9EBE7B27B53AF4 /* PaymentView.swift in Sources */,
 				C8D7A74B29EAFF2EBD73BC6B /* ConfigurationView.swift in Sources */,
 				DC46BAF826CACCF700E760A6 /* KotlinAssociatedObject.swift in Sources */,
+				DC37803D2C05215600937C8E /* ScanBitcoinAddressSheet.swift in Sources */,
 				DC4CF3C42BE583A6003A957F /* NumberPadView.swift in Sources */,
 				DC0994B0263A074C003031CA /* InfoGrid.swift in Sources */,
 				DC46BAF526CACCF700E760A6 /* KotlinPublishers+Phoenix.swift in Sources */,
@@ -1898,6 +1915,7 @@
 				DC2CE54D28A3D2F50070A2E1 /* TruncatableView.swift in Sources */,
 				DCDD9ED628637FD7001800A3 /* AppStatusButton.swift in Sources */,
 				DCCFE6A62B63028A002FFF11 /* UnfairLock.swift in Sources */,
+				DC37803F2C06338000937C8E /* BtcAddressInput.swift in Sources */,
 				DCB493D1269F890D001B0F09 /* SyncTxManager_PendingSettings.swift in Sources */,
 				DCAEF8F727628BEB00015993 /* Either.swift in Sources */,
 				DCA6DECC282AAA740073C658 /* SharedSecurity.swift in Sources */,
