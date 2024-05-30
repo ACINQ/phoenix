@@ -472,56 +472,6 @@ struct SummaryView: View {
 	@ViewBuilder
 	func buttonList() -> some View {
 		
-		if paymentInfo.payment.state() == WalletPaymentState.failure {
-			buttonList_withDeleteOption()
-		} else {
-			buttonList_standardOptions()
-		}
-	}
-	
-	@ViewBuilder
-	func buttonList_standardOptions() -> some View {
-		
-		// Details | Edit
-		//         ^
-		//         And we want this line to be perfectly centered in the view.
-		
-		HStack(alignment: VerticalAlignment.center, spacing: 16) {
-		
-			NavigationLink(destination: detailsView()) {
-				Label {
-					Text("Details")
-				} icon: {
-					Image(systemName: "magnifyingglass").imageScale(.small)
-				}
-				.frame(minWidth: buttonWidth, alignment: Alignment.trailing)
-				.read(buttonWidthReader)
-				.read(buttonHeightReader)
-			}
-			
-			if let buttonHeight = buttonHeight {
-				Divider().frame(height: buttonHeight)
-			}
-			
-			NavigationLink(destination: editInfoView()) {
-				Label {
-					Text("Edit")
-				} icon: {
-					Image(systemName: "pencil.line").imageScale(.small)
-				}
-				.frame(minWidth: buttonWidth, alignment: Alignment.leading)
-				.read(buttonWidthReader)
-				.read(buttonHeightReader)
-			}
-		}
-		.padding([.top, .bottom])
-		.assignMaxPreference(for: buttonWidthReader.key, to: $buttonWidth)
-		.assignMaxPreference(for: buttonHeightReader.key, to: $buttonHeight)
-	}
-	
-	@ViewBuilder
-	func buttonList_withDeleteOption() -> some View {
-		
 		// Details | Edit | Delete
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 16) {
