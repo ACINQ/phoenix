@@ -1449,6 +1449,7 @@ struct ValidateView: View {
 		smartModalState.display(dismissable: true) {
 			
 			MinerFeeSheet(
+				target: .spliceOut,
 				amount: Bitcoin_kmpSatoshi(sat: sat),
 				btcAddress: model.uri.address,
 				minerFeeInfo: $minerFeeInfo,
