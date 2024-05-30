@@ -197,6 +197,16 @@ extension Lightning_kmpWalletPayment {
 				}
 			}
 			
+		} else if let _ = self as? Lightning_kmpChannelCloseOutgoingPayment {
+			
+			// Currently ACINQ pays the miner fees.
+			// But this will change soon, and the user will get to choose the feerate to pay.
+			// This will allow the user to control the speed of the closing transaction.
+			// And the UI will reflect this information.
+			// But for now we just don't want to show the miner fee for this TX type.
+			
+			return nil
+						
 		} else if let onChainOutgoingPayment = self as? Lightning_kmpOnChainOutgoingPayment {
 			
 			let sat = onChainOutgoingPayment.miningFees.sat
