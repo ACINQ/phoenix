@@ -1,0 +1,51 @@
+CREATE TABLE IF NOT EXISTS contacts (
+     id TEXT NOT NULL PRIMARY KEY,
+     name TEXT NOT NULL,
+     photo BLOB,
+     created_at INTEGER NOT NULL,
+     updated_at INTEGER DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS contact_offers (
+    offer_id BLOB NOT NULL PRIMARY KEY,
+    contact_id TEXT NOT NULL,
+    offer TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+
+    FOREIGN KEY(contact_id) REFERENCES contacts(id)
+);
+
+CREATE INDEX contact_id_index ON contact_offers(contact_id);
+
+getContact:
+SELECT id, name, photo, contacts.created_at, updated_at, group_concat(offer, ',') AS offers
+FROM contacts AS contacts
+JOIN contact_offers AS contact_offers ON contact_id = id
+WHERE id = :contactId
+ORDER BY contact_offers.created_at;
+
+getContactIdForOffer:
+SELECT offer_id, contact_id, offer, created_at
+FROM contact_offers
+WHERE offer_id=:offerId;
+
+insertContact:
+INSERT INTO contacts(id, name, photo, created_at, updated_at)
+VALUES (:id, :name, :photo, :createdAt, :updatedAt);
+
+updateContact:
+UPDATE contacts SET name=:name, photo=:photo, updated_at=:updatedAt
+WHERE id=:contactId;
+
+deleteContact:
+DELETE FROM contacts WHERE id=:contactId;
+
+insertOfferForContact:
+INSERT INTO contact_offers(offer_id, contact_id, offer, created_at)
+VALUES (:offerId, :contactId, :offer, :createdAt);
+
+deleteContactOfferForOfferId:
+DELETE FROM contact_offers WHERE offer_id=:offerId;
+
+deleteContactOfferForContactId:
+DELETE FROM contact_offers WHERE contact_id=:contactId;

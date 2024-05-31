@@ -95,6 +95,7 @@ class PhoenixBusiness(
     val connectionsManager by lazy { ConnectionsManager(this) }
     val lnurlManager by lazy { LnurlManager(this) }
     val notificationsManager by lazy { NotificationsManager(this) }
+    val contactsManager by lazy { ContactsManager(this) }
     val blockchainExplorer by lazy { BlockchainExplorer(chain) }
     val tor by lazy { Tor(getApplicationCacheDirectoryPath(ctx), TorHelper.torLogger(loggerFactory)) }
 
@@ -132,6 +133,7 @@ class PhoenixBusiness(
         currencyManager.cancel()
         lnurlManager.cancel()
         notificationsManager.cancel()
+        contactsManager.cancel()
     }
 
     // The (node_id, fcm_token) tuple only needs to be registered once.
