@@ -411,6 +411,8 @@
     <string name="swapinrefund_available_label">Verfügbare Gelder : <b>%1$s</b> (%2$s)</string>
     <string name="swapinrefund_instructions_1">Verwenden Sie diesen Screen, um on-chain Einlagen auszugeben, die nicht rechtzeitig auf Lightning umgeschaltet wurden. Beachten Sie, dass dies keine Auswirkungen auf Ihre Lightning-Kanäle hat.</string>
     <string name="swapinrefund_instructions_2">Stellen Sie sicher, dass die Zieladresse korrekt ist und die Gebühren angemessen sind.</string>
+    <string name="swapinrefund_estimate_button">Gebühren abschätzen</string>
+    <string name="swapinrefund_estimating">Gebührenvoranschlag…</string>
     <string name="swapinrefund_send_button">Senden</string>
     <string name="swapinrefund_sending">Sendung in Bearbeitung…</string>
     <string name="swapinrefund_failed">Fehler in der Transaktion.</string>

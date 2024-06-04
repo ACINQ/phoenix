@@ -413,6 +413,8 @@
     <string name="swapinrefund_available_label">Fundos disponíveis : <b>%1$s</b> (%2$s)</string>
     <string name="swapinrefund_instructions_1">Use esta tela para gastar depósitos na cadeia que não tenham sido transferidos para o Lightning a tempo. Observe que isso não afeta seus canais Lightning de forma alguma.</string>
     <string name="swapinrefund_instructions_2">Verifique se o endereço de destino está correto e se as cobranças são razoáveis.</string>
+    <string name="swapinrefund_estimate_button">Estimar taxas</string>
+    <string name="swapinrefund_estimating">Estimativa de taxas...</string>
     <string name="swapinrefund_send_button">Enviar</string>
     <string name="swapinrefund_sending">Enviando…</string>
     <string name="swapinrefund_failed">Erro de transação.</string>

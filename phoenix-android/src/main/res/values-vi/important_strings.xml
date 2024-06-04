@@ -421,6 +421,8 @@
     <string name="swapinrefund_available_label">Có sẵn: <b>%1$s</b> (%2$s)</string>
     <string name="swapinrefund_instructions_1">Sử dụng màn hình này để chi tiêu các khoản tiền gửi trên chuỗi không được hoán đổi kịp thời. Điều này không ảnh hưởng đến các kênh Lightning của bạn.</string>
     <string name="swapinrefund_instructions_2">Đảm bảo địa chỉ đích là hợp lệ và mức phí hợp lý.</string>
+    <string name="swapinrefund_estimate_button">Ước tính phí</string>
+    <string name="swapinrefund_estimating">Ước tính chi phí…</string>
     <string name="swapinrefund_send_button">Gửi</string>
     <string name="swapinrefund_sending">Đang gửi tiền…</string>
     <string name="swapinrefund_failed">Lỗi giao dịch.</string>

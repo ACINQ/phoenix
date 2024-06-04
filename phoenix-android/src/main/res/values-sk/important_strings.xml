@@ -414,6 +414,8 @@
     <string name="swapinrefund_available_label">Dostupné finančné prostriedky: <b>%1$s</b> (%2$s)</string>
     <string name="swapinrefund_instructions_1">Na tejto obrazovke môžete minúť vklady v reťazci, ktoré neboli včas prevedené na Lightning. Upozorňujeme, že to nijako neovplyvňuje vaše kanály Lightning.</string>
     <string name="swapinrefund_instructions_2">Uistite sa, že cieľová adresa je správna a poplatky primerané.</string>
+    <string name="swapinrefund_estimate_button">Odhad poplatkov</string>
+    <string name="swapinrefund_estimating">Odhad poplatkov…</string>
     <string name="swapinrefund_send_button">Odoslať</string>
     <string name="swapinrefund_sending">Odoslanie…</string>
     <string name="swapinrefund_failed">Chyba transakcie.</string>

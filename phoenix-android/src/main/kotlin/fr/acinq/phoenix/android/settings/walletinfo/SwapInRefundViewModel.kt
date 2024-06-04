@@ -22,12 +22,10 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import fr.acinq.bitcoin.ByteVector
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.Transaction
-import fr.acinq.bitcoin.scala.Satoshi
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
-import fr.acinq.lightning.blockchain.electrum.spendExpiredSwapIn
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.phoenix.data.BitcoinUriError
@@ -45,7 +43,9 @@ import org.slf4j.LoggerFactory
 
 sealed class SwapInRefundState {
     data object Init : SwapInRefundState()
-    data object Sending : SwapInRefundState()
+    data object GettingFee : SwapInRefundState()
+    data class ReviewFee(val fees: Satoshi, val transaction: Transaction): SwapInRefundState()
+    data class Publishing(val transaction: Transaction) : SwapInRefundState()
     sealed class Done : SwapInRefundState() {
         data class Success(val tx: Transaction) : Done()
         sealed class Failed : Done() {
@@ -66,12 +66,13 @@ class SwapInRefundViewModel(
 
     var state by mutableStateOf<SwapInRefundState>(SwapInRefundState.Init)
 
-    fun executeRefund(address: String, feerate: FeeratePerByte) {
-        if (state is SwapInRefundState.Sending) return
-        state = SwapInRefundState.Sending
+    fun getFeeForRefund(address: String, feerate: FeeratePerByte) {
+        if (state is SwapInRefundState.GettingFee) return
+        state = SwapInRefundState.GettingFee
 
         viewModelScope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, e ->
-            log.error("error when executing swap-in refund: ", e)
+            log.error("error when estimating swap-in refund fees: ", e)
+            state = SwapInRefundState.Done.Failed.Error(e)
         }) {
             when (val parseAddress = Parser.readBitcoinAddress(NodeParamsManager.chain, address)) {
                 is Either.Left -> {
@@ -80,25 +81,37 @@ class SwapInRefundViewModel(
                     return@launch
                 }
                 is Either.Right -> {
-                    val peer = peerManager.getPeer()
-                    peer.swapInWallet.wallet.walletStateFlow.filterNotNull().first()
                     val keyManager = walletManager.keyManager.filterNotNull().first()
                     val swapInWallet = peerManager.swapInWallet.filterNotNull().first()
-                    val tx = electrumClient.spendExpiredSwapIn(
+                    val res = swapInWallet.spendExpiredSwapIn(
                         swapInKeys = keyManager.swapInOnChainWallet,
-                        wallet = swapInWallet,
                         scriptPubKey = parseAddress.value.script,
                         feerate = FeeratePerKw(feerate)
                     )
-                    state = if (tx == null) {
-                        log.error("spendExpiredSwapIn returned a null tx")
+                    state = if (res == null) {
+                        log.error("could not generate a swap-in refund transaction")
                         SwapInRefundState.Done.Failed.CannotCreateTx
                     } else {
-                        log.info("successfully spent swap-in refund tx=$tx")
-                        SwapInRefundState.Done.Success(tx)
+                        val (tx, fee) = res
+                        log.info("estimated fee=$fee for swap-in refund")
+                        SwapInRefundState.ReviewFee(fees = fee, transaction = tx)
                     }
                 }
             }
+        }
+    }
+
+    fun executeRefund(tx: Transaction) {
+        if (state !is SwapInRefundState.ReviewFee) return
+        state = SwapInRefundState.Publishing(tx)
+
+        viewModelScope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, e ->
+            log.error("error when broadcasting swap-in refund tx=$tx: ", e)
+            state = SwapInRefundState.Done.Failed.Error(e)
+        }) {
+            electrumClient.broadcastTransaction(tx)
+            log.info("successfully broadcast tx=$tx for swap-in refund")
+            state = SwapInRefundState.Done.Success(tx)
         }
     }
 

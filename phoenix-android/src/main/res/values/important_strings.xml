@@ -416,11 +416,13 @@
     <string name="swapinrefund_available_label">Available: <b>%1$s</b> (%2$s)</string>
     <string name="swapinrefund_instructions_1">Use this screen to spend on-chain deposits that were not swapped in time. This does not affect your Lightning channels.</string>
     <string name="swapinrefund_instructions_2">Make sure the destination address is valid and the feerate reasonable.</string>
-    <string name="swapinrefund_send_button">Send</string>
-    <string name="swapinrefund_sending">Sending funds…</string>
+    <string name="swapinrefund_estimate_button">Estimate fees</string>
+    <string name="swapinrefund_estimating">Estimating fees…</string>
+    <string name="swapinrefund_send_button">Broadcast</string>
+    <string name="swapinrefund_sending">Broadcasting…</string>
     <string name="swapinrefund_failed">Transaction error.</string>
     <string name="swapinrefund_failed_address">This address is not valid.</string>
-    <string name="swapinrefund_failed_cannot_create">Cannot create the refund transaction. Try again.</string>
+    <string name="swapinrefund_failed_cannot_create">Cannot create the refund transaction.</string>
     <string name="swapinrefund_success">Transaction published.</string>
     <string name="swapinrefund_success_details">You can find the transaction spending the funds below. It will not appear in your payments history, so make a copy of its ID now if needed.</string>
 

@@ -413,6 +413,8 @@
     <string name="swapinrefund_available_label">Dostupné prostředky: <b>%1$s</b> (%2$s)</string>
     <string name="swapinrefund_instructions_1">Tato obrazovka slouží k utrácení vkladů v řetězci, které nebyly včas převedeny na Lightning. Všimněte si, že to nijak neovlivňuje vaše kanály Lightning.</string>
     <string name="swapinrefund_instructions_2">Ujistěte se, že cílová adresa je správná a poplatky přiměřené.</string>
+    <string name="swapinrefund_estimate_button">Odhad poplatků</string>
+    <string name="swapinrefund_estimating">Odhadní poplatky…</string>
     <string name="swapinrefund_send_button">Odeslat</string>
     <string name="swapinrefund_sending">Odesílání…</string>
     <string name="swapinrefund_failed">Chyba transakce.</string>

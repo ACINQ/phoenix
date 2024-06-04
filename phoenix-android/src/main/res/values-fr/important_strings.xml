@@ -414,7 +414,9 @@
     <string name="swapinrefund_available_label">Fonds disponibles : <b>%1$s</b> (%2$s)</string>
     <string name="swapinrefund_instructions_1">Utilisez cet écran pour dépenser des dépôts on-chain qui n\'ont pas été basculés sur Lightning à temps. Notez que cela n\'affecte en rien vos canaux Lightning.</string>
     <string name="swapinrefund_instructions_2">Assurez vous que l\'adresse de destination est correcte et les frais raisonnables.</string>
-    <string name="swapinrefund_send_button">Envoyer</string>
+    <string name="swapinrefund_estimate_button">Estimer les frais</string>
+    <string name="swapinrefund_estimating">Estimation des frais…</string>
+    <string name="swapinrefund_send_button">Publier</string>
     <string name="swapinrefund_sending">Envoi des fonds…</string>
     <string name="swapinrefund_failed">Erreur de transaction.</string>
     <string name="swapinrefund_failed_address">L\'adresse n\'est pas valide.</string>
