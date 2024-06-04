@@ -290,7 +290,6 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				onChain_broadcastAt(channelClosing)
 				onChain_confirmedAt(channelClosing)
 				common_amountSent(msat: outgoingPayment.amount)
-				onChain_minerFees(channelClosing)
 				common_amountReceived(sat: channelClosing.recipientAmount)
 				onChain_btcTxid(channelClosing)
 			}
