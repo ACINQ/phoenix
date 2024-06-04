@@ -50,6 +50,7 @@ import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.SplashLabelRow
 import fr.acinq.phoenix.android.components.SplashLayout
+import fr.acinq.phoenix.android.components.contact.ContactOrOfferView
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.payments.details.translatePaymentError
 import fr.acinq.phoenix.android.userPrefs
@@ -106,15 +107,14 @@ fun SendOfferView(
             SplashLabelRow(label = stringResource(R.string.send_description_label)) {
                 Text(text = it)
             }
+            Spacer(modifier = Modifier.height(8.dp))
         }
 
-        val sendTo = offer.nodeId?.toHex() ?: offer.encode()
-        SplashLabelRow(label = stringResource(R.string.send_destination_label), icon = R.drawable.ic_zap) {
-            SelectionContainer {
-                Text(text = sendTo, maxLines = 2, overflow = TextOverflow.Ellipsis)
-            }
+        SplashLabelRow(label = stringResource(id = R.string.send_destination_label)) {
+            ContactOrOfferView(offer = offer)
         }
 
+        Spacer(modifier = Modifier.height(8.dp))
         SplashLabelRow(label = stringResource(id = R.string.send_trampoline_fee_label)) {
             val amt = amount
             if (amt == null) {

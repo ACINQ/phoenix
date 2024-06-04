@@ -25,7 +25,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
@@ -66,13 +65,15 @@ fun SettingWithCopy(
     title: String,
     titleMuted: String? = null,
     value: String,
-    maxLinesValue: Int = Int.MAX_VALUE,
+    maxLines: Int = Int.MAX_VALUE,
 ) {
     val context = LocalContext.current
     Row {
-        Column(modifier = Modifier
-            .padding(start = 16.dp, top = 12.dp, bottom = 12.dp)
-            .weight(1f)) {
+        Column(
+            modifier = Modifier
+                .padding(start = 16.dp, top = 12.dp, bottom = 12.dp)
+                .weight(1f)
+        ) {
             Row {
                 Text(
                     text = title,
@@ -84,14 +85,13 @@ fun SettingWithCopy(
                     Text(
                         text = titleMuted,
                         style = MaterialTheme.typography.subtitle2.copy(fontSize = 12.sp),
-                        modifier = Modifier
-                            .alignByBaseline(),
+                        modifier = Modifier.alignByBaseline(),
                     )
                 }
 
             }
             Spacer(modifier = Modifier.height(2.dp))
-            Text(text = value, style = MaterialTheme.typography.subtitle2, maxLines = maxLinesValue, overflow = TextOverflow.Ellipsis)
+            Text(text = value, style = MaterialTheme.typography.subtitle2, maxLines = maxLines, overflow = TextOverflow.Ellipsis)
         }
         Button(
             icon = R.drawable.ic_copy,

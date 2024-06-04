@@ -552,6 +552,7 @@ private fun Bolt12InvoiceSection(
 
     TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payerkey_label), value = payerKey.toHex())
     TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = invoice.paymentHash.toHex())
+    TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_offer_label), value = invoice.invoiceRequest.offer.encode())
     TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_request_label), value = invoice.write())
 }
 
@@ -566,7 +567,7 @@ private fun Bolt12MetadataSection(
     )
     TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = metadata.paymentHash.toHex())
     TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_preimage_label), value = metadata.preimage.toHex())
-    TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_offerid_label), value = metadata.offerId.toHex())
+    TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_offer_metadata_label), value = metadata.encode().toHex())
     if (metadata is OfferPaymentMetadata.V1) {
         TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payerkey_label), value = metadata.payerKey.toHex())
     }

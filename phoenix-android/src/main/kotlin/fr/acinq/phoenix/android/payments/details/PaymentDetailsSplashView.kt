@@ -22,10 +22,16 @@ import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -54,6 +60,7 @@ import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.contact.ContactOrOfferView
 import fr.acinq.phoenix.android.payments.cpfp.CpfpView
 import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
@@ -437,39 +444,45 @@ private fun PaymentDescriptionView(
             false -> paymentDesc ?: customDesc
         }
 
-        Text(
-            text = finalDesc ?: stringResource(id = R.string.paymentdetails_no_description),
-            style = if (finalDesc == null) MaterialTheme.typography.caption.copy(fontStyle = FontStyle.Italic) else MaterialTheme.typography.body1
-        )
-
         if (isLegacyMigration == false) {
-            if (paymentDesc != null && customDesc != null) {
-                Spacer(modifier = Modifier.height(8.dp))
-                HSeparator(width = 50.dp)
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = customDesc)
-            }
-            Button(
-                text = stringResource(
-                    id = when (customDesc) {
-                        null -> R.string.paymentdetails_attach_desc_button
-                        else -> R.string.paymentdetails_edit_desc_button
+            Clickable(
+                onClick = { showEditDescriptionDialog = true },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .offset(x = (-8).dp),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Column(modifier = Modifier.padding(8.dp)) {
+                    Text(
+                        text = finalDesc ?: stringResource(id = R.string.paymentdetails_no_description),
+                        style = if (finalDesc == null) MaterialTheme.typography.caption.copy(fontStyle = FontStyle.Italic) else MaterialTheme.typography.body1
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    if (paymentDesc != null && customDesc != null) {
+                        HSeparator(width = 50.dp)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(text = customDesc, style = MaterialTheme.typography.body1.copy(fontStyle = FontStyle.Italic))
+                        Spacer(modifier = Modifier.height(8.dp))
                     }
-                ),
-                textStyle = MaterialTheme.typography.caption.copy(fontSize = 12.sp),
-                modifier = Modifier.offset(x = (-8).dp),
-                icon = R.drawable.ic_text,
-                iconTint = MaterialTheme.typography.caption.color,
-                space = 6.dp,
-                shape = CircleShape,
-                padding = PaddingValues(8.dp),
-                onClick = { showEditDescriptionDialog = true }
-            )
+                    TextWithIcon(
+                        text = stringResource(
+                            id = when (customDesc) {
+                                null -> R.string.paymentdetails_attach_desc_button
+                                else -> R.string.paymentdetails_edit_desc_button
+                            }
+                        ),
+                        textStyle = MaterialTheme.typography.subtitle2,
+                        icon = R.drawable.ic_edit,
+                        iconTint = MaterialTheme.typography.subtitle2.color,
+                        space = 6.dp,
+                    )
+                }
+            }
         }
     }
 
     if (showEditDescriptionDialog) {
-        EditPaymentDetails(
+        CustomNoteDialog(
             initialDescription = data.metadata.userDescription,
             onConfirm = {
                 onMetadataDescriptionUpdate(data.id(), it?.trim()?.takeIf { it.isNotBlank() })
@@ -500,12 +513,21 @@ private fun PaymentDestinationView(data: WalletPaymentInfo) {
             }
         }
         is LightningOutgoingPayment -> {
-            data.metadata.lnurl?.pay?.metadata?.lnid?.takeIf { it.isNotBlank() }?.let { lnid ->
+            val lnId = data.metadata.lnurl?.pay?.metadata?.lnid?.takeIf { it.isNotBlank() }
+            if (lnId != null) {
                 Spacer(modifier = Modifier.height(8.dp))
                 SplashLabelRow(label = stringResource(id = R.string.paymentdetails_destination_label), icon = R.drawable.ic_zap) {
                     SelectionContainer {
-                        Text(text = lnid)
+                        Text(text = lnId)
                     }
+                }
+            }
+
+            val details = payment.details
+            if (details is LightningOutgoingPayment.Details.Blinded) {
+                val offer = details.paymentRequest.invoiceRequest.offer
+                SplashLabelRow(label = stringResource(id = R.string.paymentdetails_offer_label)) {
+                    ContactOrOfferView(offer = offer)
                 }
             }
         }
@@ -605,38 +627,51 @@ private fun PaymentErrorView(status: LightningOutgoingPayment.Status.Completed.F
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun EditPaymentDetails(
+private fun CustomNoteDialog(
     initialDescription: String?,
     onConfirm: (String?) -> Unit,
     onDismiss: () -> Unit
 ) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     var description by rememberSaveable { mutableStateOf(initialDescription) }
-    Dialog(
-        onDismiss = onDismiss,
-        buttons = {
-            Button(onClick = onDismiss, text = stringResource(id = R.string.btn_cancel))
-            Button(
-                onClick = { onConfirm(description) },
-                text = stringResource(id = R.string.btn_save)
-            )
-        }
+
+    ModalBottomSheet(
+        sheetState = sheetState,
+        onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colors.surface,
+        contentColor = MaterialTheme.colors.onSurface,
+        scrimColor = MaterialTheme.colors.onBackground.copy(alpha = 0.1f),
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp)
+                .verticalScroll(rememberScrollState())
+                .padding(top = 0.dp, start = 24.dp, end = 24.dp, bottom = 70.dp),
         ) {
-            Text(text = stringResource(id = R.string.paymentdetails_edit_dialog_title))
+            Text(text = stringResource(id = R.string.paymentdetails_edit_dialog_title), style = MaterialTheme.typography.body2)
             Spacer(modifier = Modifier.height(16.dp))
             TextInput(
                 modifier = Modifier.fillMaxWidth(),
                 text = description ?: "",
                 onTextChange = { description = it.takeIf { it.isNotBlank() } },
+                minLines = 2,
                 maxLines = 6,
                 maxChars = 280,
                 staticLabel = stringResource(id = R.string.paymentdetails_edit_dialog_input_label)
             )
+            Spacer(modifier = Modifier.height(24.dp))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                Button(onClick = onDismiss, text = stringResource(id = R.string.btn_cancel), shape = CircleShape)
+                Button(
+                    onClick = { onConfirm(description) },
+                    text = stringResource(id = R.string.btn_save),
+                    icon = R.drawable.ic_check,
+                    enabled = description != initialDescription,
+                    space = 8.dp,
+                    shape = CircleShape
+                )
+            }
         }
     }
 }

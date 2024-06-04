@@ -399,12 +399,12 @@
     <string name="paymentdetails_splice_outgoing">Outgoing splice payment</string>
     <string name="paymentdetails_splice_cpfp_outgoing">Accelerate on-chain transactions</string>
     <string name="paymentdetails_inbound_liquidity">Request inbound liquidity</string>
-    <string name="paymentdetails_normal_outgoing">Standard outgoing Lightning payment</string>
-    <string name="paymentdetails_normal_incoming">Standard incoming Lightning payment</string>
+    <string name="paymentdetails_normal_outgoing">Outgoing Lightning payment (standard)</string>
+    <string name="paymentdetails_normal_incoming">Incoming Lightning payment (standard)</string>
     <string name="paymentdetails_swapin">Swap-in Bitcoin deposit</string>
     <string name="paymentdetails_swapout">Swap-out to Bitcoin address</string>
-    <string name="paymentdetails_offer_outgoing">Offer outgoing Lightning payment</string>
-    <string name="paymentdetails_offer_incoming">Offer incoming Lightning payment</string>
+    <string name="paymentdetails_offer_outgoing">Outgoing Lightning payment (offer)</string>
+    <string name="paymentdetails_offer_incoming">Incoming Lightning payment (offer)</string>
     <string name="paymentdetails_swapin_address_label">Deposit address</string>
     <string name="paymentdetails_bitcoin_address_label">Bitcoin address</string>
 
@@ -428,7 +428,8 @@
     <string name="paymentdetails_payment_request_label">Invoice</string>
     <string name="paymentdetails_preimage_label">Preimage</string>
     <string name="paymentdetails_payerkey_label">Payer key</string>
-    <string name="paymentdetails_offerid_label">Offer ID</string>
+    <string name="paymentdetails_offer_label">Offer</string>
+    <string name="paymentdetails_offer_metadata_label">Metadata</string>
 
     <string name="paymentdetails_status_label">Payment status</string>
     <string name="paymentdetails_status_success">Successful</string>
@@ -457,6 +458,18 @@
     <string name="paymentdetails_amount_received_label">Amount received</string>
     <string name="paymentdetails_amount_rate_now">≈ %1$s (now)</string>
     <string name="paymentdetails_amount_rate_then">≈ %1$s (then)</string>
+
+    <!-- offer contact -->
+
+    <string name="contact_not_found">No contact found for this offer</string>
+    <string name="contact_add_contact">Add contact</string>
+    <string name="contact_edit_contact">Edit contact</string>
+    <string name="contact_save_button">Save</string>
+    <string name="contact_delete_button">Delete</string>
+
+    <string name="contact_name_label">Name</string>
+    <string name="contact_photo_label">Photo</string>
+    <string name="contact_offer_label">Offer</string>
 
     <!-- settings: access control -->
 

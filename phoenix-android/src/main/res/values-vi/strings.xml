@@ -371,8 +371,8 @@
     <string name="paymentdetails_splice_outgoing">Thanh toán splice đầu ra</string>
     <string name="paymentdetails_splice_cpfp_outgoing">Tăng tốc các giao dịch on-chain</string>
     <string name="paymentdetails_inbound_liquidity">Yêu cầu thanh khoản đầu vào</string>
-    <string name="paymentdetails_normal_outgoing">Thanh toán đầu ra Lightning thông thường</string>
-    <string name="paymentdetails_normal_incoming">Thanh toán đầu vào Lightning thông thường</string>
+    <string name="paymentdetails_normal_outgoing">Thanh toán đầu ra Lightning (tiêu chuẩn)</string>
+    <string name="paymentdetails_normal_incoming">Thanh toán đầu vào Lightning (tiêu chuẩn)</string>
     <string name="paymentdetails_swapin">Swap-in tiền cọc Bitcoin</string>
     <string name="paymentdetails_swapout">Swap-out đến địa chỉ Bitcoin</string>
     <string name="paymentdetails_swapin_address_label">Địa chỉ tiền cọc</string>

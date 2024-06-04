@@ -342,8 +342,8 @@
     <string name="paymentdetails_splice_outgoing">Splice sortant</string>
     <string name="paymentdetails_splice_cpfp_outgoing">Accélération de transactions on-chain</string>
     <string name="paymentdetails_inbound_liquidity">Requête de liquidité entrante</string>
-    <string name="paymentdetails_normal_outgoing">Paiement Lightning sortant</string>
-    <string name="paymentdetails_normal_incoming">Paiement Lightning entrant</string>
+    <string name="paymentdetails_normal_outgoing">Paiement Lightning sortant (standard)</string>
+    <string name="paymentdetails_normal_incoming">Paiement Lightning entrant (standard)</string>
     <string name="paymentdetails_swapin">Dépôt on-chain (swap-in)</string>
     <string name="paymentdetails_swapout">Swap-out vers une adresse Bitcoin</string>
     <string name="paymentdetails_swapin_address_label">Adresse de dépôt on-chain</string>

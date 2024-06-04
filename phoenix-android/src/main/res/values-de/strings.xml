@@ -370,8 +370,8 @@
     <string name="paymentdetails_splice_outgoing">Ausgehender Splice</string>
     <string name="paymentdetails_splice_cpfp_outgoing">Beschleunigte On-Chain Transaktion</string>
     <string name="paymentdetails_inbound_liquidity">Inbound-Liquidität anfordern</string>
-    <string name="paymentdetails_normal_outgoing">Standard ausgehende Lightning-Zahlung</string>
-    <string name="paymentdetails_normal_incoming">Standard eingehende Lightning-Zahlung</string>
+    <string name="paymentdetails_normal_outgoing">Ausgehende Lightning-Zahlung (standard)</string>
+    <string name="paymentdetails_normal_incoming">Eingehende Lightning-Zahlung (standard)</string>
     <string name="paymentdetails_swapin">Swap-in Bitcoin-Einzahlung</string>
     <string name="paymentdetails_swapout">Swap-out an Bitcoin-Adresse</string>
     <string name="paymentdetails_swapin_address_label">Einzahlungs-Adresse</string>

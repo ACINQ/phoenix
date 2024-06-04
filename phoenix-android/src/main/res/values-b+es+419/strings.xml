@@ -361,8 +361,8 @@
     <string name="paymentdetails_closing">Pago por cierre de canal</string>
     <string name="paymentdetails_splice_outgoing">Pago por empalme saliente</string>
     <string name="paymentdetails_splice_cpfp_outgoing">Acelerar transacciones en la cadena</string>
-    <string name="paymentdetails_normal_outgoing">Pago estándar saliente de Lightning</string>
-    <string name="paymentdetails_normal_incoming">Pago estándar entrante de Lightning</string>
+    <string name="paymentdetails_normal_outgoing">Pago saliente de Lightning (estándar)</string>
+    <string name="paymentdetails_normal_incoming">Pago entrante de Lightning (estándar)</string>
     <string name="paymentdetails_swapin">Depósito de Bitcoin para intercambio</string>
     <string name="paymentdetails_swapout">Intercambio a dirección de Bitcoin</string>
     <string name="paymentdetails_swapin_address_label">Dirección de depósito</string>
