@@ -26,6 +26,7 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import fr.acinq.lightning.blockchain.electrum.WalletState
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.managers.PeerManager
+import fr.acinq.phoenix.managers.phoenixSwapInWallet
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 
@@ -44,7 +45,7 @@ class SwapInAddressesViewModel(private val peerManager: PeerManager) : ViewModel
     @UiThread
     private fun monitorSwapAddresses() {
         viewModelScope.launch {
-            peerManager.getPeer().swapInWallet.wallet.walletStateFlow.collect { walletState ->
+            peerManager.getPeer().phoenixSwapInWallet.wallet.walletStateFlow.collect { walletState ->
                 val newAddresses = walletState.addresses.toList().sortedByDescending {
                     val meta = it.second.meta
                     if (meta is WalletState.AddressMeta.Derived) {

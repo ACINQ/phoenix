@@ -52,6 +52,7 @@ import fr.acinq.phoenix.legacy.utils.Prefs
 import fr.acinq.phoenix.legacy.utils.ThemeHelper
 import fr.acinq.phoenix.legacy.utils.Wallet
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
+import fr.acinq.phoenix.managers.phoenixSwapInWallet
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import org.slf4j.Logger
@@ -498,7 +499,7 @@ fun WalletPaymentInfo.isLegacyMigration(peer: Peer?): Boolean? {
     return when {
         p !is ChannelCloseOutgoingPayment -> false
         peer == null -> null
-        p.address == peer.swapInWallet.legacySwapInAddress && metadata.userDescription == LegacyMigrationHelper.migrationDescFlag -> true
+        p.address == peer.phoenixSwapInWallet.legacySwapInAddress && metadata.userDescription == LegacyMigrationHelper.migrationDescFlag -> true
         else -> false
     }
 }

@@ -38,6 +38,7 @@ import fr.acinq.phoenix.android.utils.datastore.SwapAddressFormat
 import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.managers.WalletManager
+import fr.acinq.phoenix.managers.phoenixSwapInWallet
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -111,7 +112,7 @@ class ReceiveViewModel(
         viewModelScope.launch {
             val swapAddressFormat = userPrefs.getSwapAddressFormat.first()
             if (swapAddressFormat == SwapAddressFormat.LEGACY) {
-                val legacySwapInAddress = peerManager.getPeer().swapInWallet.legacySwapInAddress
+                val legacySwapInAddress = peerManager.getPeer().phoenixSwapInWallet.legacySwapInAddress
                 val image = BitmapHelper.generateBitmap(legacySwapInAddress).asImageBitmap()
                 currentSwapAddress = BitcoinAddressState.Show(0, legacySwapInAddress, image)
             } else {
@@ -124,7 +125,7 @@ class ReceiveViewModel(
                 log.info("starting with swap-in address $startAddress:$startIndex")
 
                 // monitor the actual address from the swap-in wallet -- might take some time since the wallet must check all previous addresses
-                peerManager.getPeer().swapInWallet.swapInAddressFlow.filterNotNull().collect { (newAddress, newIndex) ->
+                peerManager.getPeer().phoenixSwapInWallet.swapInAddressFlow.filterNotNull().collect { (newAddress, newIndex) ->
                     log.info("swap-in wallet current address update: $newAddress:$newIndex")
                     val newImage = BitmapHelper.generateBitmap(newAddress).asImageBitmap()
                     internalDataRepository.saveLastUsedSwapIndex(newIndex)
