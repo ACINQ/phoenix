@@ -305,7 +305,6 @@
     <string name="paymentdetails_desc_closing_channel">Zavírání kanálu</string>
     <string name="paymentdetails_desc_legacy_migration">Migrace ze staré aplikace</string>
     <string name="paymentdetails_desc_cpfp">Postrčit transakci</string>
-    <string name="paymentdetails_desc_keysend">Darovat</string>
     <string name="paymentdetails_desc_swapout">Swap-out do %1$s</string>
     <string name="paymentdetails_desc_swapin">On-Chain vklad</string>
     <string name="paymentdetails_desc_identifier">Platba pro %1$s</string>
@@ -327,7 +326,6 @@
     <string name="paymentdetails_normal_incoming">Standardní příchozí Lightning platba</string>
     <string name="paymentdetails_swapin">Swap-in vklad Bitcoinu</string>
     <string name="paymentdetails_swapout">Swap-out na Bitcoinovou adresu</string>
-    <string name="paymentdetails_keysend">Keysend (spontánní platba)</string>
     <string name="paymentdetails_swapin_address_label">Adresa vkladu</string>
     <string name="paymentdetails_bitcoin_address_label">Bitcoinová adresa</string>
 

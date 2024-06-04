@@ -6062,6 +6062,9 @@
         }
       }
     },
+    "An error occurred on a node in the payment route. The payment may succeed if you try again." : {
+
+    },
     "An on-chain operation will be likely required for you to receive this amount.\n\nThe fee is estimated to be around %@." : {
       "localizations" : {
         "ar" : {
@@ -6209,6 +6212,9 @@
           }
         }
       }
+    },
+    "An unknown error occurred and payment has failed." : {
+
     },
     "An unknown error occurred." : {
       "comment" : "error details",
@@ -9013,6 +9019,12 @@
       }
     },
     "Channel size impacted" : {
+
+    },
+    "Channels are already processing a splice. Try again later." : {
+
+    },
+    "Channels are closing." : {
 
     },
     "Channels are not available, try again later" : {
@@ -14278,47 +14290,6 @@
         }
       }
     },
-    "Donation" : {
-      "comment" : "Payment description for received KeySend",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "التبرع"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dary"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Spende"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Donación"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Donación"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Don"
-          }
-        }
-      }
-    },
     "Done" : {
       "localizations" : {
         "ar" : {
@@ -16332,6 +16303,9 @@
           }
         }
       }
+    },
+    "Fee is insufficient." : {
+
     },
     "Fee rate" : {
       "localizations" : {
@@ -21326,47 +21300,6 @@
         }
       }
     },
-    "KeySend" : {
-      "comment" : "Transaction Info: Value",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الدفع عبر KeySend"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "KeySend"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "KeySend"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "KeySend"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "KeySend"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "KeySend"
-          }
-        }
-      }
-    },
     "know when fees may occur" : {
       "localizations" : {
         "ar" : {
@@ -25154,6 +25087,7 @@
     },
     "non-invoice payment" : {
       "comment" : "Transaction Info: Explanation",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -27040,6 +26974,9 @@
         }
       }
     },
+    "Payment Failed" : {
+
+    },
     "payment hash" : {
       "comment" : "Label in DetailsView_IncomingPayment",
       "localizations" : {
@@ -27365,6 +27302,7 @@
     },
     "Payment Parts" : {
       "comment" : "Title in DetailsView_IncomingPayment",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -30066,6 +30004,9 @@
         }
       }
     },
+    "Recipient is not reachable, or does not have enough inbound liquidity." : {
+
+    },
     "recipient pubkey" : {
       "comment" : "Label in DetailsView_IncomingPayment",
       "localizations" : {
@@ -31527,6 +31468,7 @@
     },
     "Send Failed" : {
       "comment" : "Title in DetailsView_IncomingPayment",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -35690,6 +35632,9 @@
         }
       }
     },
+    "The expiry of this payment is too far in the future." : {
+
+    },
     "The fee is **%@%%** with a minimum fee of **%@**." : {
       "comment" : "IntroView",
       "extractionState" : "manual",
@@ -35996,6 +35941,9 @@
         }
       }
     },
+    "The ID of the payment is not valid. Try again." : {
+
+    },
     "The invoice doesn't include an amount. This can be dangerous: malicious nodes may be able to steal your payment. To be safe, **ask the payee to specify an amount** in the payment request." : {
       "comment" : "SendView",
       "extractionState" : "manual",
@@ -36247,6 +36195,27 @@
           }
         }
       }
+    },
+    "The payment amount is invalid." : {
+
+    },
+    "The payment amount is too big - try splitting it in several parts." : {
+
+    },
+    "The payment amount is too small." : {
+
+    },
+    "The payment could not be relayed to the recipient (probably insufficient inbound liquidity)." : {
+
+    },
+    "The payment could not be sent through your existing channels." : {
+
+    },
+    "The payment was rejected by the recipient. This particular invoice may have already been paid." : {
+
+    },
+    "The recipient is offline." : {
+
     },
     "The recovery phrase (sometimes called a seed), is a list of 12 words. It allows you to recover full access to your funds if needed." : {
       "localizations" : {
@@ -36647,6 +36616,9 @@
           }
         }
       }
+    },
+    "The wallet was restarted while the payment was processing." : {
+
     },
     "The wallet will be completely deleted from **this device**." : {
       "localizations" : {
@@ -37251,6 +37223,12 @@
         }
       }
     },
+    "This invoice has already been paid." : {
+
+    },
+    "This invoice uses unsupported features. Make sure you're on the latest Phoenix version." : {
+
+    },
     "This is a swap address. It is not controlled by your wallet. On-chain deposits sent to this address will be converted to Lightning channels." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -37535,6 +37513,9 @@
           }
         }
       }
+    },
+    "This payment exceeds your balance." : {
+
     },
     "This screen is a debugging tool that can be used to manually import encrypted channels data.\n\nUse with caution." : {
       "localizations" : {
@@ -43093,6 +43074,9 @@
         }
       }
     },
+    "You have too many pending payments. Try again once they are settled." : {
+
+    },
     "You may be able to reduce your fees by increasing your bucket size ahead of a series of incoming payments." : {
       "localizations" : {
         "ar" : {
@@ -43449,6 +43433,12 @@
           }
         }
       }
+    },
+    "Your channel are not connected yet. Wait for a stable connection and try again." : {
+
+    },
+    "Your channel is still in the process of being opened. Wait and try again." : {
+
     },
     "Your comment will be sent when you pay." : {
       "localizations" : {

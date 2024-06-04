@@ -369,8 +369,30 @@
 
     <!-- Lightning payment errors -->
 
-    <string name="outgoing_finalfailure_alreadypaid">Ce paiement a déjà été réglé.</string>
-    <string name="outgoing_finalfailure_noroutefound">Le destinataire de ce paiement n\'est pas joignable, ou bien ne dispose pas de suffisamment de liquidité entrante.</string>
+    <string name="outgoing_failuremessage_channel_closing">Les canaux de paiements sont en clôture.</string>
+    <string name="outgoing_failuremessage_channel_splicing">Un splice est déjà en cours de traitement. Réessayez plus tard.</string>
+    <string name="outgoing_failuremessage_not_enough_fee">Les frais sont insuffisants.</string>
+    <string name="outgoing_failuremessage_not_enough_balance">Ce paiement dépasse votre solde.</string>
+    <string name="outgoing_failuremessage_too_big">Le montant du paiement est trop élevé - essayez de le diviser en plusieurs parties.</string>
+    <string name="outgoing_failuremessage_too_small">Le montant du paiement est trop faible.</string>
+    <string name="outgoing_failuremessage_expiry_too_big">L\'échéance de ce paiement est trop lointaine.</string>
+    <string name="outgoing_failuremessage_rejected_by_recipient">Le paiement a été rejeté par le destinataire. Il se peut que ce paiement ait déjà été payée.</string>
+    <string name="outgoing_failuremessage_recipient_offline">Le destinataire est hors ligne.</string>
+    <string name="outgoing_failuremessage_not_enough_liquidity">Le paiement n\'a pas pu être transmis au destinataire. Il est probable qu\'il n\'ait pas suffisamment de liquidité entrante.</string>
+    <string name="outgoing_failuremessage_temporary_failure">Une erreur est survenue sur le trajet du paiement. Le paiement peut réussir si vous réessayez.</string>
+    <string name="outgoing_failuremessage_too_many_pending">Vous avez trop de paiements en attente. Réessayez une fois qu\'il sont terminés.</string>
+
+    <string name="outgoing_failuremessage_invalid_id">L\'identifiant du paiement n\'est pas valide. Réessayez.</string>
+    <string name="outgoing_failuremessage_not_connected">Votre canal de paiement n\'est pas encore connecté. Réessayez une fois que la connexion est stable.</string>
+    <string name="outgoing_failuremessage_channel_opening">Votre canal de paiement est toujours en cours d\'ouverture. Attendez et réessayez.</string>
+    <string name="outgoing_failuremessage_unsupported_features">Cette requête de paiement utilise des fonctionnalités non supportées. Assurez-vous que Phoenix soit à jour.</string>
+    <string name="outgoing_failuremessage_invalid_amount">Le montant du paiement n\'est pas valide.</string>
+    <string name="outgoing_failuremessage_no_available_channels">Le paiement n\'a pas pu être envoyé via les canaux disponibles.</string>
+    <string name="outgoing_failuremessage_unknown">Une erreur inconnue s\'est produite et le paiement a échoué.</string>
+    <string name="outgoing_failuremessage_restarted">Le portefeuille a été redémarré pendant le traitement du paiement.</string>
+
+    <string name="outgoing_failuremessage_alreadypaid">Ce paiement a déjà été réglé.</string>
+    <string name="outgoing_failuremessage_noroutefound">Le destinataire de ce paiement n\'est pas joignable, ou bien ne dispose pas de suffisamment de liquidité entrante.</string>
 
     <!-- low feerate disclaimer -->
 

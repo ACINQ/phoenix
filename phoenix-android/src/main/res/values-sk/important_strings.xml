@@ -369,8 +369,30 @@
 
     <!-- Lightning payment errors -->
 
-    <string name="outgoing_finalfailure_alreadypaid">Táto platba už bola uhradená.</string>
-    <string name="outgoing_finalfailure_noroutefound">Príjemca nie je dosiahnuteľný alebo nemá dostatočnú prichádzajúcu likviditu.</string>
+    <string name="outgoing_failuremessage_channel_closing">Kanály sa zatvárajú.</string>
+    <string name="outgoing_failuremessage_channel_splicing">Kanály už spracovávajú splicing. Skúste to neskôr.</string>
+    <string name="outgoing_failuremessage_not_enough_fee">Poplatok je nedostatočný.</string>
+    <string name="outgoing_failuremessage_not_enough_balance">Táto platba presahuje váš zostatok.</string>
+    <string name="outgoing_failuremessage_too_big">Suma platby je príliš veľká - skúste ju rozdeliť na viac častí.</string>
+    <string name="outgoing_failuremessage_too_small">Suma platby je príliš malá.</string>
+    <string name="outgoing_failuremessage_expiry_too_big">Uplynutie platnosti tejto platby je príliš ďaleko v budúcnosti.</string>
+    <string name="outgoing_failuremessage_rejected_by_recipient">Príjemca platbu odmietol. Táto konkrétna faktúra už mohla byť zaplatená.</string>
+    <string name="outgoing_failuremessage_recipient_offline">Príjemca je offline.</string>
+    <string name="outgoing_failuremessage_not_enough_liquidity">Platba nemohla byť postúpená príjemcovi (pravdepodobne nedostatočná likvidita na príchode).</string>
+    <string name="outgoing_failuremessage_temporary_failure">Na uzle v platobnej trase došlo k chybe. Platba môže byť úspešná, ak sa o to pokúsite znova.</string>
+    <string name="outgoing_failuremessage_too_many_pending">Máte príliš veľa čakajúcich platieb. Skúste to znova, keď budú vyrovnané.</string>
+
+    <string name="outgoing_failuremessage_invalid_id">Identifikátor platby nie je platný. Skúste to znova.</string>
+    <string name="outgoing_failuremessage_not_connected">Váš kanál ešte nie je pripojený. Počkajte na stabilné pripojenie a skúste to znova.</string>
+    <string name="outgoing_failuremessage_channel_opening">Váš kanál je stále v procese otvárania. Počkajte a skúste to znova.</string>
+    <string name="outgoing_failuremessage_unsupported_features">Táto faktúra používa nepodporované funkcie. Uistite sa, že používate najnovšiu verziu programu Phoenix.</string>
+    <string name="outgoing_failuremessage_invalid_amount">Suma platby je neplatná.</string>
+    <string name="outgoing_failuremessage_no_available_channels">Platbu nebolo možné odoslať prostredníctvom existujúcich kanálov.</string>
+    <string name="outgoing_failuremessage_unknown">Nastala neznáma chyba a platba zlyhala.</string>
+    <string name="outgoing_failuremessage_restarted">Peňaženka bola reštartovaná počas spracovania platby.</string>
+
+    <string name="outgoing_failuremessage_alreadypaid">Táto platba už bola uhradená.</string>
+    <string name="outgoing_failuremessage_noroutefound">Príjemca nie je dosiahnuteľný alebo nemá dostatočnú prichádzajúcu likviditu.</string>
 
     <!-- low feerate disclaimer -->
 

@@ -1010,6 +1010,7 @@
 				DCB62F462A5DF19D00912A71 /* KotlinPublishers+Lightning.swift */,
 				DC74174A270F332700F7E3E3 /* KotlinTypes.swift */,
 				DCCFE6A32B63021E002FFF11 /* KotlinLogger.swift */,
+				DC3780382C04D60400937C8E /* KotlinEnums.swift */,
 			);
 			path = kotlin;
 			sourceTree = "<group>";
@@ -1953,6 +1954,7 @@
 				DCA3B41F2A5471C900E6B231 /* MinerFeeInfo.swift in Sources */,
 				DCACF6F02566D0A60009B01E /* Data+Hexadecimal.swift in Sources */,
 				DCE3C7AB2A6AD3CC00F4D385 /* MempoolMonitor.swift in Sources */,
+				DC3780392C04D60400937C8E /* KotlinEnums.swift in Sources */,
 				DCACF7092566D0F00009B01E /* AppAccessView.swift in Sources */,
 				DC27E4D1279753EC00C777CC /* TextFieldNumberStyler.swift in Sources */,
 				DC46CB1628D9F30500C4EAC7 /* LoadingView.swift in Sources */,

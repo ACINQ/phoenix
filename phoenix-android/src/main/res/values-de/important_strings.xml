@@ -366,8 +366,30 @@
 
     <!-- Lightning payment errors -->
 
-    <string name="outgoing_finalfailure_alreadypaid">Diese Zahlung wurde bereits getätigt.</string>
-    <string name="outgoing_finalfailure_noroutefound">Der Empfänger ist nicht erreichbar oder hat nicht genügend Liquidität im Eingang.</string>
+    <string name="outgoing_failuremessage_channel_closing">Kanäle werden geschlossen.</string>
+    <string name="outgoing_failuremessage_channel_splicing">Kanäle verarbeiten bereits einen Splice. Versuchen Sie es später noch einmal.</string>
+    <string name="outgoing_failuremessage_not_enough_fee">Gebühr ist nicht ausreichend.</string>
+    <string name="outgoing_failuremessage_not_enough_balance">Diese Zahlung übersteigt Ihr Guthaben.</string>
+    <string name="outgoing_failuremessage_too_big">Der Zahlungsbetrag ist zu groß - versuchen Sie, ihn in mehrere Teile aufzuteilen.</string>
+    <string name="outgoing_failuremessage_too_small">Der Zahlungsbetrag ist zu klein.</string>
+    <string name="outgoing_failuremessage_expiry_too_big">Der Verfall dieser Zahlung liegt zu weit in der Zukunft.</string>
+    <string name="outgoing_failuremessage_rejected_by_recipient">Die Zahlung wurde vom Empfänger abgelehnt. Möglicherweise wurde diese Rechnung bereits bezahlt.</string>
+    <string name="outgoing_failuremessage_recipient_offline">Der Empfänger ist offline.</string>
+    <string name="outgoing_failuremessage_not_enough_liquidity">Die Zahlung konnte nicht an den Empfänger weitergeleitet werden (wahrscheinlich unzureichende eingehende Liquidität).</string>
+    <string name="outgoing_failuremessage_temporary_failure">Ein Fehler ist an einem Knoten in der Zahlungsroute aufgetreten. Die Zahlung kann erfolgreich sein, wenn Sie es erneut versuchen.</string>
+    <string name="outgoing_failuremessage_too_many_pending">Sie haben zu viele ausstehende Zahlungen. Versuchen Sie es erneut, sobald sie abgewickelt sind.</string>
+
+    <string name="outgoing_failuremessage_alreadypaid">Diese Zahlung wurde bereits getätigt.</string>
+    <string name="outgoing_failuremessage_noroutefound">Der Empfänger ist nicht erreichbar oder hat nicht genügend Liquidität im Eingang.</string>
+
+    <string name="outgoing_failuremessage_invalid_id">Die ID der Zahlung ist nicht gültig. Versuchen Sie es erneut.</string>
+    <string name="outgoing_failuremessage_not_connected">Ihr Kanal ist noch nicht verbunden. Warte auf eine stabile Verbindung und versuche es erneut.</string>
+    <string name="outgoing_failuremessage_channel_opening">Ihr Kanal wird noch geöffnet. Warten Sie und versuchen Sie es erneut.</string>
+    <string name="outgoing_failuremessage_unsupported_features">Diese Rechnung verwendet nicht unterstützte Funktionen. Stellen Sie sicher, dass Sie die neueste Phoenix-Version verwenden.</string>
+    <string name="outgoing_failuremessage_invalid_amount">Der Zahlungsbetrag ist ungültig.</string>
+    <string name="outgoing_failuremessage_no_available_channels">Die Zahlung konnte nicht über Ihre vorhandenen Kanäle gesendet werden.</string>
+    <string name="outgoing_failuremessage_unknown">Ein unbekannter Fehler ist aufgetreten und die Zahlung ist fehlgeschlagen.</string>
+    <string name="outgoing_failuremessage_restarted">Die Brieftasche wurde neu gestartet, während die Zahlung bearbeitet wurde.</string>
 
     <!-- low feerate disclaimer -->
 

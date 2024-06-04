@@ -368,8 +368,30 @@
 
     <!-- Lightning payment errors -->
 
-    <string name="outgoing_finalfailure_alreadypaid">Este pagamento já foi pago.</string>
-    <string name="outgoing_finalfailure_noroutefound">O destinatário não está contactável ou não tem liquidez de entrada suficiente.</string>
+    <string name="outgoing_failuremessage_channel_closing">Os canais estão sendo fechados.</string>
+    <string name="outgoing_failuremessage_channel_splicing">Os canais já estão processando uma splice. Tente novamente mais tarde.</string>
+    <string name="outgoing_failuremessage_not_enough_fee">A taxa é insuficiente.</string>
+    <string name="outgoing_failuremessage_not_enough_balance">Este pagamento excede seu saldo.</string>
+    <string name="outgoing_failuremessage_too_big">O valor do pagamento é muito grande - tente dividi-lo em várias partes.</string>
+    <string name="outgoing_failuremessage_too_small">O valor do pagamento é muito pequeno.</string>
+    <string name="outgoing_failuremessage_expiry_too_big">O vencimento desse pagamento está muito distante no futuro.</string>
+    <string name="outgoing_failuremessage_rejected_by_recipient">O pagamento foi rejeitado pelo destinatário. Essa fatura específica pode já ter sido paga.</string>
+    <string name="outgoing_failuremessage_recipient_offline">O destinatário está off-line.</string>
+    <string name="outgoing_failuremessage_not_enough_liquidity">O pagamento não pôde ser retransmitido para o destinatário (provavelmente por falta de liquidez na entrada).</string>
+    <string name="outgoing_failuremessage_temporary_failure">Ocorreu um erro em um nó na rota de pagamento. O pagamento poderá ser bem-sucedido se você tentar novamente.</string>
+    <string name="outgoing_failuremessage_too_many_pending">Você tem muitos pagamentos pendentes. Tente novamente assim que eles forem liquidados.</string>
+
+    <string name="outgoing_failuremessage_invalid_id">O ID do pagamento não é válido. Tente novamente.</string>
+    <string name="outgoing_failuremessage_not_connected">Seu canal ainda não está conectado. Aguarde uma conexão estável e tente novamente.</string>
+    <string name="outgoing_failuremessage_channel_opening">Seu canal ainda está em processo de abertura. Aguarde e tente novamente.</string>
+    <string name="outgoing_failuremessage_unsupported_features">Esta fatura usa recursos não suportados. Verifique se você está usando a versão mais recente do Phoenix.</string>
+    <string name="outgoing_failuremessage_invalid_amount">O valor do pagamento é inválido.</string>
+    <string name="outgoing_failuremessage_no_available_channels">Não foi possível enviar o pagamento por meio de seus canais existentes.</string>
+    <string name="outgoing_failuremessage_unknown">Ocorreu um erro desconhecido e o pagamento falhou.</string>
+    <string name="outgoing_failuremessage_restarted">A carteira foi reiniciada enquanto o pagamento estava sendo processado.</string>
+
+    <string name="outgoing_failuremessage_alreadypaid">Este pagamento já foi pago.</string>
+    <string name="outgoing_failuremessage_noroutefound">O destinatário não está contactável ou não tem liquidez de entrada suficiente.</string>
 
     <!-- low feerate disclaimer -->
 

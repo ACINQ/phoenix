@@ -344,7 +344,6 @@
     <string name="paymentdetails_desc_closing_channel">Canal de cierre</string>
     <string name="paymentdetails_desc_legacy_migration">Migración desde aplicación heredada</string>
     <string name="paymentdetails_desc_cpfp">Impulsar transacciones</string>
-    <string name="paymentdetails_desc_keysend">Donación</string>
     <string name="paymentdetails_desc_swapout">Intercambiar a %1$s</string>
     <string name="paymentdetails_desc_swapin">Depósito en la cadena</string>
     <string name="paymentdetails_desc_identifier">Pago a %1$s</string>
@@ -366,7 +365,6 @@
     <string name="paymentdetails_normal_incoming">Pago estándar entrante de Lightning</string>
     <string name="paymentdetails_swapin">Depósito de Bitcoin para intercambio</string>
     <string name="paymentdetails_swapout">Intercambio a dirección de Bitcoin</string>
-    <string name="paymentdetails_keysend">Keysend (pago espontáneo)</string>
     <string name="paymentdetails_swapin_address_label">Dirección de depósito</string>
     <string name="paymentdetails_bitcoin_address_label">Dirección de Bitcoin</string>
 
