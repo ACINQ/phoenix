@@ -60,7 +60,6 @@
     <string name="startup_unlocked">Zugang gewährt..</string>
     <string name="startup_unlock_failure">Entsperren fehlgeschlagen</string>
     <string name="startup_unlock_failure_keystore">Android Keystore-Fehler</string>
-    <string name="startup_unlock_failure_unhandled_version">Unbehandelte Seed-Version (%1$s)</string>
     <string name="startup_unlock_failure_fallback">Mit Saatgut freischalten</string>
 
     <string name="startup_fallback_instructions">Gib deine 12 Wörter ein, um die Brieftasche zu entsperren.\n\nDie Wörter müssen in der richtigen Reihenfolge und mit einem Leerzeichen getrennt eingegeben werden.</string>

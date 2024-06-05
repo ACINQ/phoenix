@@ -71,7 +71,6 @@
     <string name="startup_unlocked">Access granted…</string>
     <string name="startup_unlock_failure">Unlock failed</string>
     <string name="startup_unlock_failure_keystore">Android keystore error</string>
-    <string name="startup_unlock_failure_unhandled_version">Unhandled seed version (%1$s)</string>
     <string name="startup_unlock_failure_fallback">Unlock with seed</string>
 
     <string name="startup_fallback_instructions">Enter your 12-words recovery to unlock the wallet.\n\nWords must be entered in the correct order, and separated with a single space.</string>

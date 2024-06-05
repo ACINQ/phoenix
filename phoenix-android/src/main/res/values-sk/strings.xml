@@ -60,7 +60,6 @@
     <string name="startup_unlocked">Prístup povolený…</string>
     <string name="startup_unlock_failure">Odomknutie zlyhalo</string>
     <string name="startup_unlock_failure_keystore">Chyba Android keystore</string>
-    <string name="startup_unlock_failure_unhandled_version">Neznáma verzia seedu (%1$s)</string>
     <string name="startup_unlock_failure_fallback">Odomknutie pomocou seedu</string>
 
     <string name="startup_fallback_instructions">Zadajte svojich 12 slov obnovovacej frázy na odomknutie peňaženky.\n\nSlová musia byť zadané v správnom poradí a oddelené jednou medzerou.</string>

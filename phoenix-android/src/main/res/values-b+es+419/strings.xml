@@ -59,7 +59,6 @@
     <string name="startup_unlocked">Acceso concedido…</string>
     <string name="startup_unlock_failure">Error al desbloquear</string>
     <string name="startup_unlock_failure_keystore">Error de Android Keystore</string>
-    <string name="startup_unlock_failure_unhandled_version">Versión de semilla no controlada (%1$s)</string>
     <string name="startup_unlock_failure_fallback">Desbloquear con semilla</string>
 
     <string name="startup_fallback_instructions">Ingresa tus 12 palabras de recuperación para desbloquear la billetera.\n\nLas palabras deben ingresarse en el orden correcto y estar separadas por un solo espacio.</string>

@@ -34,9 +34,6 @@ object KeystoreHelper {
   /** This key does not require the user to be authenticated */
   const val KEY_NO_AUTH = "PHOENIX_KEY_NO_AUTH"
 
-  /** This key requires the user to be authenticated (with schema, pin, fingerprint...) */
-  const val KEY_WITH_AUTH = "PHOENIX_KEY_REQUIRE_AUTH"
-
   private val ENC_ALGO = KeyProperties.KEY_ALGORITHM_AES
   private val ENC_BLOCK_MODE = KeyProperties.BLOCK_MODE_CBC
   private val ENC_PADDING = KeyProperties.ENCRYPTION_PADDING_PKCS7
@@ -54,21 +51,6 @@ object KeystoreHelper {
       setKeySize(256)
       setUserAuthenticationRequired(false)
       setInvalidatedByBiometricEnrollment(false)
-    }
-    return generateKeyWithSpec(spec)
-  }
-
-  private fun getOrCreateKeyWithAuth(): SecretKey {
-    keyStore.getKey(KEY_WITH_AUTH, null)?.let { return it as SecretKey }
-    val spec = KeyGenParameterSpec.Builder(KEY_WITH_AUTH, KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT).apply {
-      setBlockModes(ENC_BLOCK_MODE)
-      setEncryptionPaddings(ENC_PADDING)
-      setRandomizedEncryptionRequired(true)
-      setKeySize(256)
-      setUserAuthenticationRequired(true)
-      if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-        setUnlockedDeviceRequired(true)
-      }
     }
     return generateKeyWithSpec(spec)
   }
@@ -96,7 +78,6 @@ object KeystoreHelper {
 
   private fun getKeyForName(keyName: String): SecretKey = when (keyName) {
     KEY_NO_AUTH -> getOrCreateKeyNoAuthRequired()
-    KEY_WITH_AUTH -> getOrCreateKeyWithAuth()
     else -> throw IllegalArgumentException("unhandled key=$keyName")
   }
 

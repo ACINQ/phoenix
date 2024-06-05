@@ -61,7 +61,6 @@
     <string name="startup_unlocked">Quyền truy cập được chấp nhận…</string>
     <string name="startup_unlock_failure">Mở khóa không thành công</string>
     <string name="startup_unlock_failure_keystore">Lỗi kho khóa Android</string>
-    <string name="startup_unlock_failure_unhandled_version">Phiên bản hạt giống chưa được xử lý (%1$s)</string>
     <string name="startup_unlock_failure_fallback">Mở khóa bằng hạt giống</string>
 
     <string name="startup_fallback_instructions">Nhập 12 từ khôi phục để mở khóa ví của bạn.\n\nCác từ phải được nhập theo đúng thứ tự và cách nhau bằng một dấu cách.</string>

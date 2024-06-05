@@ -246,12 +246,10 @@ private fun DecryptionFailure(
     val context = LocalContext.current
     ErrorMessage(
         header = when (state) {
-            is StartupDecryptionState.DecryptionError.UnhandledVersion -> stringResource(id = R.string.startup_unlock_failure_unhandled_version, state.name)
             is StartupDecryptionState.DecryptionError.Other -> stringResource(id = R.string.startup_unlock_failure)
             is StartupDecryptionState.DecryptionError.KeystoreFailure -> stringResource(id = R.string.startup_unlock_failure_keystore)
         },
         details = when (state) {
-            is StartupDecryptionState.DecryptionError.UnhandledVersion -> stringResource(id = R.string.startup_unlock_failure_unhandled_version)
             is StartupDecryptionState.DecryptionError.Other -> "[${state.cause::class.java.simpleName}] ${state.cause.localizedMessage ?: ""}"
             is StartupDecryptionState.DecryptionError.KeystoreFailure -> "[${state.cause::class.java.simpleName}] ${state.cause.localizedMessage ?: ""}" +
                     (state.cause.cause?.localizedMessage?.take(80) ?: "")
