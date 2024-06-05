@@ -346,12 +346,12 @@ class WatchTower {
 		appConnectionsDaemon?.decrementDisconnectCount(target: target)
 		didDecrement = true
 		
-		if performWatchTowerTask, let electrumWatcher = _peer.watcher as? Lightning_kmpElectrumWatcher {
+		if performWatchTowerTask {
 			// We setup a handler so we know when the WatchTower task has completed.
 			// I.e. when the channel subscriptions are considered up-to-date.
 			
 			let minMillis = Date.now.toMilliseconds()
-			watchTowerListener = electrumWatcher.upToDatePublisher().sink { (millis: Int64) in
+			watchTowerListener = Biz.business.electrumWatcher.upToDatePublisher().sink { (millis: Int64) in
 				// millis => timestamp of when electrum watch was marked up-to-date
 				if millis > minMillis {
 					finishWatchTowerTask(/* didTimeout: */ false)
