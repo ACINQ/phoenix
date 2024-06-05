@@ -446,7 +446,8 @@ struct SpendExpiredSwapIns: View {
 		}
 		
 		isSending = true
-		let electrumClient = peer.watcher.client
+		let electrumWatcher = peer.watcher as! Lightning_kmpElectrumWatcher
+		let electrumClient = electrumWatcher.client
 		Task { @MainActor in
 			do {
 				let txId = try await electrumClient.broadcastTransaction(tx: tx)

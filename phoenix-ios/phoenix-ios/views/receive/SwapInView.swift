@@ -39,8 +39,9 @@ struct SwapInView: View {
 	let swapInWalletPublisher = Biz.business.balanceManager.swapInWalletPublisher()
 	@State var swapInWallet = Biz.business.balanceManager.swapInWalletValue()
 	
-	let swapInAddressPublisher = Biz.business.peerManager.peerStatePublisher().flatMap { $0.swapInWallet.swapInAddressPublisher()
-	}
+	let swapInAddressPublisher = Biz.business.peerManager.peerStatePublisher()
+		.compactMap { $0.swapInWallet }
+		.flatMap { $0.swapInAddressPublisher() }
 	@State var swapInAddressInfo: Lightning_kmpSwapInWallet.SwapInAddressInfo? = nil
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme

@@ -18,7 +18,6 @@ import fr.acinq.lightning.SwapInParams
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.ElectrumMiniWallet
 import fr.acinq.lightning.blockchain.electrum.WalletState
-import fr.acinq.lightning.blockchain.electrum.getConfirmations
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.ChannelCommand
 import fr.acinq.lightning.channel.states.Aborted
