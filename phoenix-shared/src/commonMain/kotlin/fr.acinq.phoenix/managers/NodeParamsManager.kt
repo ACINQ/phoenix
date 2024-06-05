@@ -81,7 +81,7 @@ class NodeParamsManager(
     }
 
     /** See [NodeParams.defaultOffer]. */
-    suspend fun defaultOffer(): Pair<ByteVector32, OfferTypes.Offer> {
+    suspend fun defaultOffer(): OfferTypes.Offer {
         return nodeParams.filterNotNull().first().defaultOffer(trampolineNodeUri)
     }
 
