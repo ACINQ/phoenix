@@ -31,8 +31,11 @@ object KeystoreHelper {
 
   private val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-  /** This key does not require the user to be authenticated */
+  /** The alias of the key used to encrypt an [EncryptedSeed.V2] seed. */
   const val KEY_NO_AUTH = "PHOENIX_KEY_NO_AUTH"
+
+  /** The alias of the key used to encrypt a [EncryptedPin.V1] PIN. */
+  const val KEY_FOR_PINCODE_V1 = "PHOENIX_KEY_FOR_PINCODE_V1"
 
   private val ENC_ALGO = KeyProperties.KEY_ALGORITHM_AES
   private val ENC_BLOCK_MODE = KeyProperties.BLOCK_MODE_CBC
@@ -78,6 +81,7 @@ object KeystoreHelper {
 
   private fun getKeyForName(keyName: String): SecretKey = when (keyName) {
     KEY_NO_AUTH -> getOrCreateKeyNoAuthRequired()
+    KEY_FOR_PINCODE_V1 -> getOrCreateKeyNoAuthRequired()
     else -> throw IllegalArgumentException("unhandled key=$keyName")
   }
 

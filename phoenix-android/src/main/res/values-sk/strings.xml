@@ -48,14 +48,13 @@
 
     <!-- Auth prompt (v2) -->
 
-    <string name="authprompt_title">Pre pokračovanie odomknite</string>
+    <string name="lockprompt_title">Pre pokračovanie odomknite</string>
 
     <!-- Startup -->
 
     <string name="startup_binding_service">Pripájanie služby…</string>
     <string name="startup_wait">Pripravovanie peňaženky…</string>
     <string name="startup_wait_legacy_check">Kontrola staršej peňaženky…</string>
-    <string name="startup_manual_unlock_button">Odomknúť</string>
     <string name="startup_checking_seed">Odomykanie…</string>
     <string name="startup_unlocked">Prístup povolený…</string>
     <string name="startup_unlock_failure">Odomknutie zlyhalo</string>
@@ -471,7 +470,6 @@
     <!-- settings: access control -->
 
     <string name="accessctrl_title">Prístup k aplikácii</string>
-    <string name="accessctrl_loading">Získavanie dát…</string>
 
     <string name="accessctrl_auth_error_header">Zámok obrazovky nie je možné povoliť</string>
     <string name="accessctrl_auth_error_no_hw">V tomto zariadení nie je vhodný overovací hardvér.</string>
@@ -486,8 +484,8 @@
     <string name="accessctrl_auth_error_too_old">Táto verzia systému Android nie je kompatibilná.</string>
     <string name="accessctrl_auth_error_unhandled">Neošetrená chyba: %1$d</string>
 
-    <string name="accessctrl_screen_lock_switch">Zámok obrazovky</string>
-    <string name="accessctrl_screen_lock_switch_desc">Zamknúť prístup k aplikácii pomocou zámku obrazovky/odtlačku prsta</string>
+    <string name="accessctrl_biometric_lock_switch_label">Zámok obrazovky systému</string>
+    <string name="accessctrl_biometric_lock_switch_desc">Zamknúť prístup k aplikácii pomocou zámku obrazovky/odtlačku prsta</string>
 
     <!-- lnurl-auth -->
 

@@ -19,7 +19,9 @@ package fr.acinq.phoenix.android
 
 import android.content.ComponentName
 import android.content.ServiceConnection
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
@@ -27,14 +29,19 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import fr.acinq.phoenix.android.services.NodeService
 import fr.acinq.phoenix.android.services.NodeServiceState
 import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
+import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 
 class AppViewModel(
-    private val internalDataRepository: InternalDataRepository
+    private val internalData: InternalDataRepository,
+    private val userPrefs: UserPrefsRepository,
 ) : ViewModel() {
     val log = LoggerFactory.getLogger(AppViewModel::class.java)
 
@@ -62,8 +69,38 @@ class AppViewModel(
 
     val isScreenLocked = mutableStateOf(true)
 
-    fun saveIsScreenLocked(isLocked: Boolean) {
-        isScreenLocked.value = isLocked
+    private val autoLockHandler = Handler(Looper.getMainLooper())
+    private val autoLockRunnable: Runnable = Runnable { lockScreen() }
+
+    init {
+        monitorUserLockPrefs()
+        scheduleAutoLock()
+    }
+
+    fun scheduleAutoLock() {
+        autoLockHandler.removeCallbacksAndMessages(null)
+        autoLockHandler.postDelayed(autoLockRunnable, 10 * 60 * 1000L)
+    }
+
+    private fun monitorUserLockPrefs() {
+        viewModelScope.launch {
+            combine(userPrefs.getIsBiometricLockEnabled, userPrefs.getIsCustomPinLockEnabled) { isBiometricEnabled, isCustomPinEnabled ->
+                isBiometricEnabled to isCustomPinEnabled
+            }.collect { (isBiometricEnabled, isCustomPinEnabled) ->
+                if (!isBiometricEnabled && !isCustomPinEnabled) {
+                    unlockScreen()
+                }
+            }
+        }
+    }
+
+    fun unlockScreen() {
+        isScreenLocked.value = false
+        scheduleAutoLock()
+    }
+
+    fun lockScreen() {
+        isScreenLocked.value = true
     }
 
     override fun onCleared() {
@@ -76,10 +113,15 @@ class AppViewModel(
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
                 val application = checkNotNull(extras[APPLICATION_KEY] as? PhoenixApplication)
-                return AppViewModel(application.internalDataRepository) as T
+                return AppViewModel(application.internalDataRepository, application.userPrefs) as T
             }
         }
     }
+}
+
+sealed class LockState {
+    data object SettingUp: LockState()
+
 }
 
 class ServiceStateLiveData(service: MutableLiveData<NodeService?>) : MediatorLiveData<NodeServiceState>() {

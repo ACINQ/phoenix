@@ -45,7 +45,7 @@
 
     <!-- Auth prompt (v2) -->
 
-    <string name="authprompt_title">Pro pokračování odemkněte</string>
+    <string name="lockprompt_title">Pro pokračování odemkněte</string>
 
     <!-- Startup -->
 
@@ -425,7 +425,6 @@
     <!-- settings: access control -->
 
     <string name="accessctrl_title">Přístup k aplikaci</string>
-    <string name="accessctrl_loading">Získávání dat…</string>
 
     <string name="accessctrl_auth_error_header">Zámek obrazovky nelze povolit</string> 
     <string name="accessctrl_auth_error_no_hw">V tomto zařízení není vhodný ověřovací hardware.</string>
@@ -440,8 +439,8 @@
     <string name="accessctrl_auth_error_too_old">Tato verze systému Android není kompatibilní.</string>
     <string name="accessctrl_auth_error_unhandled">Neošetřená chyba: %1$d</string>
 
-    <string name="accessctrl_screen_lock_switch">Zámek obrazovky</string>
-    <string name="accessctrl_screen_lock_switch_desc">Zamknout přístup k aplikaci pomocí zámku obrazoky/otisku prstu</string>
+    <string name="accessctrl_biometric_lock_switch_label">Zámek obrazovky systému</string>
+    <string name="accessctrl_biometric_lock_switch_desc">Zamknout přístup k aplikaci pomocí zámku obrazoky/otisku prstu</string>
 
     <!-- lnurl-auth -->
 

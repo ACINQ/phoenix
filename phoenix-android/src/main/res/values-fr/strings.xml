@@ -45,14 +45,13 @@
 
     <!-- Auth prompt (v2) -->
 
-    <string name="authprompt_title">Déverrouiller pour continuer</string>
+    <string name="lockprompt_title">Déverrouillez pour continuer</string>
 
     <!-- Startup -->
 
     <string name="startup_binding_service">Liaison au service…</string>
     <string name="startup_wait">Préparation du portefeuille…</string>
     <string name="startup_wait_legacy_check">Vérification de l\'ancien portefeuille…</string>
-    <string name="startup_manual_unlock_button">Déverrouiller</string>
     <string name="startup_checking_seed">Déverrouillage…</string>
     <string name="startup_starting">Démarrage…</string>
     <string name="startup_error_generic">L\'application n\'a pas pu démarrer.</string>
@@ -402,7 +401,6 @@
     <!-- settings: access control -->
 
     <string name="accessctrl_title">Contrôle d\'accès</string>
-    <string name="accessctrl_loading">Récupération des données…</string>
 
     <string name="accessctrl_auth_error_header">Le verrouillage ne peut pas être activé</string>
     <string name="accessctrl_auth_error_no_hw">Cet appareil ne dispose pas d\'équipement biométrique adéquat.</string>
@@ -417,8 +415,8 @@
     <string name="accessctrl_auth_error_too_old">Cette version d\'Android est incompatible.</string>
     <string name="accessctrl_auth_error_unhandled">Code d\'erreur non géré : %1$d</string>
 
-    <string name="accessctrl_screen_lock_switch">Verrouillage écran</string>
-    <string name="accessctrl_screen_lock_switch_desc">Contrôle l\'accès à l\'application via le système de verrouillage système d\'Android.</string>
+    <string name="accessctrl_biometric_lock_switch_label">Verrouillage écran système</string>
+    <string name="accessctrl_biometric_lock_switch_desc">Contrôle l\'accès à l\'application via le système de verrouillage système d\'Android.</string>
 
     <!-- lnurl-auth -->
 
