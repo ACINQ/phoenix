@@ -6022,7 +6022,14 @@
       }
     },
     "An error occurred on a node in the payment route. The payment may succeed if you try again." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حدث خطأ في عقدة في مسار الدفع. قد تنجح عملية الدفع إذا حاولت مرة أخرى."
+          }
+        }
+      }
     },
     "An on-chain operation will be likely required for you to receive this amount.\n\nThe fee is estimated to be around %@." : {
       "localizations" : {
@@ -6173,7 +6180,14 @@
       }
     },
     "An unknown error occurred and payment has failed." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حدث خطأ غير معروف وفشل الدفع."
+          }
+        }
+      }
     },
     "An unknown error occurred." : {
       "comment" : "error details",
@@ -6582,7 +6596,14 @@
       }
     },
     "As you receive funds, liquidity will be consumed and become your balance. After one year, the remaining unused liquidity will be reclaimed by the service." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عندما تتلقى الأموال، سيتم استهلاك السيولة وتصبح رصيدك. بعد مرور عام واحد، ستستعيد الخدمة السيولة المتبقية غير المستخدمة."
+          }
+        }
+      }
     },
     "Attention: if the Bitcoin mempool feerate is high, incoming LN payments requiring an on-chain operation could be expensive." : {
       "localizations" : {
@@ -6707,7 +6728,15 @@
       }
     },
     "Authenticate to disable passcode fallback." : {
-      "comment" : "User prompt"
+      "comment" : "User prompt",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المصادقة لتعطيل رمز المرور الاحتياطي."
+          }
+        }
+      }
     },
     "Authenticated" : {
       "comment" : "lnurl-auth: success text",
@@ -6872,7 +6901,14 @@
       }
     },
     "Available" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "متوفرة"
+          }
+        }
+      }
     },
     "Avoids payment correlation using timestamp metadata." : {
       "comment" : "Explanation for 'Randomize upload delays' toggle",
@@ -8729,7 +8765,14 @@
       }
     },
     "Change PIN" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تغيير رقم التعريف الشخصي"
+          }
+        }
+      }
     },
     "Channel closing" : {
       "comment" : "Payment description for channel closing",
@@ -8937,13 +8980,34 @@
       }
     },
     "Channel size impacted" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تأثر حجم القناة المتأثر"
+          }
+        }
+      }
     },
     "Channels are already processing a splice. Try again later." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "القنوات تعالج بالفعل عملية الربط. حاول مرة أخرى في وقت لاحق."
+          }
+        }
+      }
     },
     "Channels are closing." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "القنوات تغلق"
+          }
+        }
+      }
     },
     "Channels are not available, try again later" : {
       "localizations" : {
@@ -10463,7 +10527,14 @@
       }
     },
     "Confirm new PIN" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تأكيد رقم التعريف الشخصي الجديد"
+          }
+        }
+      }
     },
     "Confirm Payment" : {
       "comment" : "Navigation bar title",
@@ -11681,7 +11752,14 @@
       }
     },
     "Correct" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "صحيح"
+          }
+        }
+      }
     },
     "Could not connect to host:" : {
       "localizations" : {
@@ -12123,7 +12201,14 @@
       }
     },
     "Custom PIN" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "رقم التعريف الشخصي المخصص"
+          }
+        }
+      }
     },
     "Customize amount" : {
       "extractionState" : "manual",
@@ -13608,7 +13693,15 @@
       }
     },
     "Disable PIN" : {
-      "comment" : "Navigation bar title"
+      "comment" : "Navigation bar title",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعطيل رقم التعريف الشخصي"
+          }
+        }
+      }
     },
     "Disabled" : {
       "localizations" : {
@@ -14166,7 +14259,14 @@
       }
     },
     "Don't show this message again" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا تعرض هذه الرسالة مرة أخرى"
+          }
+        }
+      }
     },
     "Don't use addresses from the previous version." : {
       "localizations" : {
@@ -14647,7 +14747,15 @@
       }
     },
     "Edit PIN" : {
-      "comment" : "Navigation bar title"
+      "comment" : "Navigation bar title",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحرير رقم التعريف الشخصي"
+          }
+        }
+      }
     },
     "elapsed" : {
       "comment" : "Label in SummaryInfoGrid",
@@ -15163,16 +15271,44 @@
       }
     },
     "Enter new PIN" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أدخل رقم تعريف شخصي جديد"
+          }
+        }
+      }
     },
     "Enter Phoenix PIN" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أدخل رقم التعريف الشخصي لفينيكس"
+          }
+        }
+      }
     },
     "Enter PIN to authenticate" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أدخل رقم التعريف الشخصي للمصادقة"
+          }
+        }
+      }
     },
     "Enter PIN to confirm" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أدخل رقم التعريف الشخصي للتأكيد"
+          }
+        }
+      }
     },
     "Error" : {
       "comment" : "Label in SummaryInfoGrid",
@@ -15613,7 +15749,14 @@
       }
     },
     "Expired" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "منتهية الصلاحية"
+          }
+        }
+      }
     },
     "Explore" : {
       "localizations" : {
@@ -15898,7 +16041,14 @@
       }
     },
     "Face ID" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "معرّف الوجه"
+          }
+        }
+      }
     },
     "FAILED" : {
       "localizations" : {
@@ -16223,7 +16373,14 @@
       }
     },
     "Fee is insufficient." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الرسوم غير كافية."
+          }
+        }
+      }
     },
     "Fee rate" : {
       "localizations" : {
@@ -17669,7 +17826,14 @@
       }
     },
     "Funds sent on-chain are taken from your side of the channel, reducing the channel size by the same amount. Your inbound liquidity remains the same." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يتم أخذ الأموال المرسلة على السلسلة من جانبك من القناة، مما يقلل من حجم القناة بنفس المقدار. تظل سيولتك الواردة كما هي."
+          }
+        }
+      }
     },
     "Funds will eventually be sent to:" : {
       "localizations" : {
@@ -20343,7 +20507,14 @@
       }
     },
     "Incorrect" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "غير صحيح"
+          }
+        }
+      }
     },
     "Increase value" : {
       "localizations" : {
@@ -23967,7 +24138,14 @@
       }
     },
     "Miner fee:" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "رسوم عامل المنجم:"
+          }
+        }
+      }
     },
     "miner fees" : {
       "localizations" : {
@@ -25932,7 +26110,14 @@
       }
     },
     "Options" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الخيارات"
+          }
+        }
+      }
     },
     "other" : {
       "comment" : "Option in currency picker list. Sends user to Currency Converter",
@@ -26851,7 +27036,14 @@
       }
     },
     "Payment Failed" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "فشل الدفع"
+          }
+        }
+      }
     },
     "payment hash" : {
       "comment" : "Label in DetailsView_IncomingPayment",
@@ -28346,10 +28538,24 @@
       }
     },
     "PIN" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "رقم التعريف الشخصي"
+          }
+        }
+      }
     },
     "PIN mismatch!" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عدم تطابق رقم التعريف الشخصي"
+          }
+        }
+      }
     },
     "Plan ahead to save money later" : {
       "localizations" : {
@@ -28588,7 +28794,14 @@
       }
     },
     "Please perform a backup before enabling any options here. If you lock yourself out of Phoenix without a backup of your recovery phrase, you will **lose your funds**!" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يرجى إجراء نسخة احتياطية قبل تمكين أي خيارات هنا. إذا قمت بحبس نفسك خارج فينيكس دون إجراء نسخة احتياطية من عبارة الاسترداد الخاصة بك، فسوف ** تخسر أموالك**!"
+          }
+        }
+      }
     },
     "Please restart Phoenix" : {
       "localizations" : {
@@ -29593,7 +29806,14 @@
       }
     },
     "Receive:" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "استلم:"
+          }
+        }
+      }
     },
     "RECEIVED" : {
       "localizations" : {
@@ -29798,7 +30018,14 @@
       }
     },
     "Recipient is not reachable, or does not have enough inbound liquidity." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا يمكن الوصول إلى المتلقي، أو ليس لديه سيولة واردة كافية."
+          }
+        }
+      }
     },
     "recipient pubkey" : {
       "comment" : "Label in DetailsView_IncomingPayment",
@@ -30531,7 +30758,14 @@
       }
     },
     "Retry in %@" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إعادة المحاولة في %@"
+          }
+        }
+      }
     },
     "Review" : {
       "localizations" : {
@@ -31500,7 +31734,14 @@
       }
     },
     "Sent" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم الإرسال"
+          }
+        }
+      }
     },
     "SENT" : {
       "comment" : "Confirm dialog that payment has been sent.",
@@ -32111,7 +32352,15 @@
       }
     },
     "Set PIN" : {
-      "comment" : "Navigation bar title"
+      "comment" : "Navigation bar title",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعيين رقم التعريف الشخصي"
+          }
+        }
+      }
     },
     "Settings" : {
       "comment" : "Navigation bar title",
@@ -33857,7 +34106,14 @@
       }
     },
     "Spend expired swap-ins" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مبادلات منتهية الصلاحية منتهية الصلاحية"
+          }
+        }
+      }
     },
     "Spending = pouring water out\nReceiving = adding more water" : {
       "localizations" : {
@@ -35302,7 +35558,14 @@
       }
     },
     "The expiry of this payment is too far in the future." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "انتهاء هذه الدفعة بعيد جداً في المستقبل."
+          }
+        }
+      }
     },
     "The fee is **%@%%** with a minimum fee of **%@**." : {
       "comment" : "IntroView",
@@ -35611,7 +35874,14 @@
       }
     },
     "The ID of the payment is not valid. Try again." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "معرف الدفع غير صالح. حاول مرة أخرى."
+          }
+        }
+      }
     },
     "The invoice doesn't include an amount. This can be dangerous: malicious nodes may be able to steal your payment. To be safe, **ask the payee to specify an amount** in the payment request." : {
       "comment" : "SendView",
@@ -35866,25 +36136,74 @@
       }
     },
     "The payment amount is invalid." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مبلغ الدفع غير صالح."
+          }
+        }
+      }
     },
     "The payment amount is too big - try splitting it in several parts." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مبلغ الدفع كبير جداً - حاول تقسيمه على عدة أجزاء."
+          }
+        }
+      }
     },
     "The payment amount is too small." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مبلغ الدفع صغير للغاية."
+          }
+        }
+      }
     },
     "The payment could not be relayed to the recipient (probably insufficient inbound liquidity)." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعذر ترحيل الدفعة إلى المستلم (ربما لعدم كفاية السيولة الواردة)."
+          }
+        }
+      }
     },
     "The payment could not be sent through your existing channels." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا يمكن إرسال الدفعة من خلال قنواتك الحالية."
+          }
+        }
+      }
     },
     "The payment was rejected by the recipient. This particular invoice may have already been paid." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم رفض الدفع من قبل المستلم. قد تكون هذه الفاتورة المحددة قد تم دفعها بالفعل."
+          }
+        }
+      }
     },
     "The recipient is offline." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المستلم غير متصل بالإنترنت."
+          }
+        }
+      }
     },
     "The recovery phrase (sometimes called a seed), is a list of 12 words. It allows you to recover full access to your funds if needed." : {
       "localizations" : {
@@ -36287,7 +36606,14 @@
       }
     },
     "The wallet was restarted while the payment was processing." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تمت إعادة تشغيل المحفظة أثناء معالجة عملية الدفع."
+          }
+        }
+      }
     },
     "The wallet will be completely deleted from **this device**." : {
       "localizations" : {
@@ -36410,7 +36736,14 @@
       }
     },
     "These funds were not swapped in time. Tap to spend." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لم يتم تبديل هذه الأموال في الوقت المناسب. انقر للإنفاق."
+          }
+        }
+      }
     },
     "These funds will be available from %lld days onwards." : {
       "localizations" : {
@@ -36852,10 +37185,24 @@
       }
     },
     "This invoice has already been paid." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم دفع هذه الفاتورة بالفعل."
+          }
+        }
+      }
     },
     "This invoice uses unsupported features. Make sure you're on the latest Phoenix version." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تستخدم هذه الفاتورة ميزات غير مدعومة. تأكد من أنك تستخدم أحدث إصدار من Phoenix."
+          }
+        }
+      }
     },
     "This is a swap address. It is not controlled by your wallet. On-chain deposits sent to this address will be converted to Lightning channels." : {
       "extractionState" : "manual",
@@ -37061,7 +37408,14 @@
       }
     },
     "This payment exceeds your balance." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هذه الدفعة تتجاوز رصيدك."
+          }
+        }
+      }
     },
     "This screen is a debugging tool that can be used to manually import encrypted channels data.\n\nUse with caution." : {
       "localizations" : {
@@ -37588,7 +37942,14 @@
       }
     },
     "To enable a custom PIN, you must first disable the \"allow passcode fallback\" option." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لتمكين رقم تعريف شخصي مخصص، يجب عليك أولاً تعطيل خيار \"السماح بالرمز الاحتياطي لرمز المرور\"."
+          }
+        }
+      }
     },
     "To enable background payments:" : {
       "localizations" : {
@@ -37631,7 +37992,14 @@
       }
     },
     "To enable the \"allow passcode fallback\" option, you must first disable the custom PIN." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لتمكين خيار \"السماح بالرمز الاحتياطي لرمز المرور\"، يجب عليك أولاً تعطيل رقم التعريف الشخصي المخصص."
+          }
+        }
+      }
     },
     "To fix this re-enable Background App Refresh via: Settings -> General -> Background App Refresh" : {
       "extractionState" : "manual",
@@ -38370,7 +38738,14 @@
       }
     },
     "Touch ID" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "معرّف اللمس"
+          }
+        }
+      }
     },
     "transaction" : {
       "localizations" : {
@@ -39771,7 +40146,14 @@
       }
     },
     "Use this screen to spend your on-chain funds that were not swapped in time. The swap-in request has now expired. " : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "استخدم هذه الشاشة لإنفاق أموالك في السلسلة التي لم يتم تبديلها في الوقت المناسب. انتهت صلاحية طلب المبادلة الآن. "
+          }
+        }
+      }
     },
     "Version %@" : {
       "localizations" : {
@@ -41247,7 +41629,14 @@
       }
     },
     "Which PIN?" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أي رقم تعريف شخصي؟"
+          }
+        }
+      }
     },
     "will be sent to:" : {
       "localizations" : {
@@ -41731,6 +42120,12 @@
     },
     "You are requesting an **initial** amount of liquidity. Liquidity is not constant over time: as you receive funds over Lightning, the liquidity will be consumed and become your balance.\n\nAfter one year, the remaining unused liquidity will be reclaimed by the service." : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أنت تطلب **مبلغًا مبدئيًا** من السيولة. السيولة ليست ثابتة بمرور الوقت: عندما تتلقى أموالاً على البرق، سيتم استهلاك السيولة وتصبح رصيدك.\n\nبعد مرور عام واحد، ستستعيد الخدمة السيولة المتبقية غير المستخدمة."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -42628,7 +43023,14 @@
       }
     },
     "You have too many pending payments. Try again once they are settled." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لديك الكثير من المدفوعات المعلقة. حاول مرة أخرى بمجرد تسويتها."
+          }
+        }
+      }
     },
     "You may be able to reduce your fees by increasing your bucket size ahead of a series of incoming payments." : {
       "localizations" : {
@@ -42988,10 +43390,24 @@
       }
     },
     "Your channel are not connected yet. Wait for a stable connection and try again." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "قناتك غير متصلة بعد. انتظر اتصالاً مستقراً وحاول مرة أخرى."
+          }
+        }
+      }
     },
     "Your channel is still in the process of being opened. Wait and try again." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا تزال قناتك في طور الفتح. انتظر وحاول مرة أخرى."
+          }
+        }
+      }
     },
     "Your comment will be sent when you pay." : {
       "localizations" : {
