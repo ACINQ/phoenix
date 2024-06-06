@@ -6034,6 +6034,12 @@
             "state" : "translated",
             "value" : "V uzlu na trase platby došlo k chybě. Platba může být úspěšná, pokud se o ni pokusíte znovu."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bei einem Knoten in der Zahlungsroute ist ein Fehler aufgetreten. Die Zahlung kann erfolgreich sein, wenn Sie es erneut versuchen."
+          }
         }
       }
     },
@@ -6197,6 +6203,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Došlo k neznámé chybě a platba se nezdařila."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein unbekannter Fehler ist aufgetreten und die Zahlung ist fehlgeschlagen."
           }
         }
       }
@@ -6620,6 +6632,12 @@
             "state" : "translated",
             "value" : "Jakmile obdržíte finanční prostředky, likvidita se spotřebuje a stane se vaším zůstatkem. Po jednom roce bude zbývající nespotřebovaná likvidita službou vyžádána zpět."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sobald Sie Geld erhalten, wird die Liquidität verbraucht und zu Ihrem Guthaben. Nach einem Jahr wird die verbleibende ungenutzte Liquidität vom Dienst zurückgefordert."
+          }
         }
       }
     },
@@ -6758,6 +6776,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ověření pravosti pro vypnutí zpětného přístupu k přístupovému kódu."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authentifizieren, um den Passcode-Fallback zu deaktivieren."
           }
         }
       }
@@ -6936,6 +6960,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dostupné na"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verfügbar"
           }
         }
       }
@@ -8807,6 +8837,12 @@
             "state" : "translated",
             "value" : "Změna kódu PIN"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN ändern"
+          }
         }
       }
     },
@@ -9028,6 +9064,12 @@
             "state" : "translated",
             "value" : "Ovlivněná velikost kanálu"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Größe des Kanals beeinträchtigt"
+          }
         }
       }
     },
@@ -9044,6 +9086,12 @@
             "state" : "translated",
             "value" : "Kanály již zpracovávají spoje. Zkuste to později."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Kanäle verarbeiten bereits einen Spleiß. Versuchen Sie es später noch einmal."
+          }
         }
       }
     },
@@ -9059,6 +9107,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kanály se uzavírají."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Kanäle schließen sich."
           }
         }
       }
@@ -10593,6 +10647,12 @@
             "state" : "translated",
             "value" : "Potvrzení nového kódu PIN"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bestätigen Sie die neue PIN"
+          }
         }
       }
     },
@@ -11824,6 +11884,12 @@
             "state" : "translated",
             "value" : "Správně"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Richtig"
+          }
         }
       }
     },
@@ -12278,6 +12344,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vlastní kód PIN"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benutzerdefinierte PIN"
           }
         }
       }
@@ -13778,6 +13850,12 @@
             "state" : "translated",
             "value" : "Zakázat kód PIN"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN deaktivieren"
+          }
         }
       }
     },
@@ -14349,6 +14427,12 @@
             "state" : "translated",
             "value" : "Nezobrazujte tuto zprávu znovu"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Meldung nicht mehr anzeigen"
+          }
         }
       }
     },
@@ -14843,6 +14927,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Upravit kód PIN"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN bearbeiten"
           }
         }
       }
@@ -15373,6 +15463,12 @@
             "state" : "translated",
             "value" : "Zadejte nový kód PIN"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neue PIN eingeben"
+          }
         }
       }
     },
@@ -15388,6 +15484,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zadejte kód PIN Phoenix"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phoenix-PIN eingeben"
           }
         }
       }
@@ -15405,6 +15507,12 @@
             "state" : "translated",
             "value" : "Zadejte PIN pro ověření"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN zur Authentifizierung eingeben"
+          }
         }
       }
     },
@@ -15420,6 +15528,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zadejte PIN pro potvrzení"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN zur Bestätigung eingeben"
           }
         }
       }
@@ -15875,6 +15989,12 @@
             "state" : "translated",
             "value" : "Vypršela platnost"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abgelaufen"
+          }
         }
       }
     },
@@ -16172,6 +16292,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ID obličeje"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesichtserkennung"
           }
         }
       }
@@ -16510,6 +16636,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Poplatek je nedostatečný."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Gebühr ist unzureichend."
           }
         }
       }
@@ -17969,6 +18101,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Prostředky odeslané v řetězci se odeberou z vaší strany kanálu, čímž se velikost kanálu sníží o stejnou částku. Vaše příchozí likvidita zůstává stejná."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die auf der Kette gesendeten Mittel werden von Ihrer Seite des Kanals entnommen, wodurch sich die Kanalgröße um denselben Betrag verringert. Ihre eingehende Liquidität bleibt die gleiche."
           }
         }
       }
@@ -20656,6 +20794,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nesprávné"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Falsch"
           }
         }
       }
@@ -24294,6 +24438,12 @@
             "state" : "translated",
             "value" : "Poplatek pro horníky:"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bergwerksgebühr:"
+          }
         }
       }
     },
@@ -26272,6 +26422,12 @@
             "state" : "translated",
             "value" : "Možnosti"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Optionen"
+          }
         }
       }
     },
@@ -27203,6 +27359,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Platba se nezdařila"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zahlung fehlgeschlagen"
           }
         }
       }
@@ -28712,6 +28874,12 @@
             "state" : "translated",
             "value" : "PIN"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN"
+          }
         }
       }
     },
@@ -28727,6 +28895,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Neshoda PIN!"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die PIN stimmt nicht überein!"
           }
         }
       }
@@ -28979,6 +29153,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Před povolením jakýchkoli možností zde proveďte zálohování. Pokud se zablokujete ve Phoenixu bez zálohy fráze pro obnovení, **přijdete o své prostředky**!"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bitte erstellen Sie eine Sicherungskopie, bevor Sie die Optionen hier aktivieren. Wenn Sie sich ohne ein Backup Ihrer Wiederherstellungsphrase aus Phoenix aussperren, werden Sie Ihr Geld **verlieren**!"
           }
         }
       }
@@ -29998,6 +30178,12 @@
             "state" : "translated",
             "value" : "Přijímejte:"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empfangen:"
+          }
         }
       }
     },
@@ -30215,6 +30401,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Příjemce není dosažitelný nebo nemá dostatečnou příchozí likviditu."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Empfänger ist nicht erreichbar oder hat nicht genügend eingehende Liquidität."
           }
         }
       }
@@ -30961,6 +31153,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Opakování pokusu v %@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wiederholungsversuch in %@"
           }
         }
       }
@@ -31944,6 +32142,12 @@
             "state" : "translated",
             "value" : "Odesláno"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesendet"
+          }
         }
       }
     },
@@ -32568,6 +32772,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nastavení kódu PIN"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN einstellen"
           }
         }
       }
@@ -34328,6 +34538,12 @@
             "state" : "translated",
             "value" : "Utratit prošlé výměnné balíčky"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abgelaufene Swap-ins ausgeben"
+          }
         }
       }
     },
@@ -35786,6 +36002,12 @@
             "state" : "translated",
             "value" : "Platnost této platby je příliš vzdálená."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Auslaufen dieser Zahlung liegt zu weit in der Zukunft."
+          }
         }
       }
     },
@@ -36108,6 +36330,12 @@
             "state" : "translated",
             "value" : "ID platby není platné. Zkuste to znovu."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die ID der Zahlung ist nicht gültig. Versuchen Sie es erneut."
+          }
         }
       }
     },
@@ -36376,6 +36604,12 @@
             "state" : "translated",
             "value" : "Částka platby je neplatná."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Zahlungsbetrag ist ungültig."
+          }
         }
       }
     },
@@ -36391,6 +36625,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Částka platby je příliš vysoká - zkuste ji rozdělit na několik částí."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Zahlungsbetrag ist zu hoch - versuchen Sie, ihn in mehrere Teile aufzuteilen."
           }
         }
       }
@@ -36408,6 +36648,12 @@
             "state" : "translated",
             "value" : "Výše platby je příliš nízká."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Zahlungsbetrag ist zu gering."
+          }
         }
       }
     },
@@ -36423,6 +36669,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Platbu se nepodařilo předat příjemci (pravděpodobně nedostatečná příchozí likvidita)."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Zahlung konnte nicht an den Empfänger weitergeleitet werden (wahrscheinlich unzureichende Liquidität im Eingang)."
           }
         }
       }
@@ -36440,6 +36692,12 @@
             "state" : "translated",
             "value" : "Platbu nebylo možné odeslat prostřednictvím vašich stávajících kanálů."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Zahlung konnte nicht über Ihre bestehenden Kanäle übermittelt werden."
+          }
         }
       }
     },
@@ -36456,6 +36714,12 @@
             "state" : "translated",
             "value" : "Příjemce platbu odmítl. Tato konkrétní faktura již mohla být uhrazena."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Zahlung wurde vom Empfänger abgelehnt. Die betreffende Rechnung wurde möglicherweise bereits bezahlt."
+          }
         }
       }
     },
@@ -36471,6 +36735,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Příjemce je offline."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Empfänger ist offline."
           }
         }
       }
@@ -36888,6 +37158,12 @@
             "state" : "translated",
             "value" : "Během zpracování platby byla peněženka restartována."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Brieftasche wurde neu gestartet, während die Zahlung verarbeitet wurde."
+          }
         }
       }
     },
@@ -37023,6 +37299,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tyto prostředky nebyly včas vyměněny. Klepněte na tlačítko utratit."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Mittel wurden nicht rechtzeitig umgetauscht. Zum Ausgeben antippen."
           }
         }
       }
@@ -37479,6 +37761,12 @@
             "state" : "translated",
             "value" : "Tato faktura již byla uhrazena."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Rechnung wurde bereits beglichen."
+          }
         }
       }
     },
@@ -37494,6 +37782,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tato faktura používá nepodporované funkce. Ujistěte se, že používáte nejnovější verzi Phoenixu."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Rechnung verwendet nicht unterstützte Funktionen. Stellen Sie sicher, dass Sie die neueste Phoenix-Version verwenden."
           }
         }
       }
@@ -37713,6 +38007,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tato platba převyšuje váš zůstatek."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Zahlung übersteigt Ihren Saldo."
           }
         }
       }
@@ -38254,6 +38554,12 @@
             "state" : "translated",
             "value" : "Chcete-li povolit vlastní kód PIN, musíte nejprve zakázat možnost \"povolit zpětný přístupový kód\"."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um eine benutzerdefinierte PIN zu aktivieren, müssen Sie zunächst die Option \"Passcode-Fallback zulassen\" deaktivieren."
+          }
         }
       }
     },
@@ -38309,6 +38615,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Chcete-li povolit možnost \"povolit zpětný přístupový kód\", musíte nejprve zakázat vlastní kód PIN."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um die Option \"Passcode-Fallback zulassen\" zu aktivieren, müssen Sie zunächst die benutzerdefinierte PIN deaktivieren."
           }
         }
       }
@@ -39058,6 +39370,12 @@
           }
         },
         "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touch ID"
+          }
+        },
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Touch ID"
@@ -40475,6 +40793,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Na této obrazovce můžete utratit prostředky v řetězci, které nebyly včas vyměněny. Platnost žádosti o výměnu již vypršela. "
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwenden Sie diesen Bildschirm, um Ihre On-Chain-Gelder auszugeben, die nicht rechtzeitig getauscht wurden. Die Swap-In-Anforderung ist jetzt abgelaufen. "
           }
         }
       }
@@ -41965,6 +42289,12 @@
             "state" : "translated",
             "value" : "Který PIN?"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welche PIN?"
+          }
         }
       }
     },
@@ -42460,6 +42790,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Žádáte o **počáteční** částku likvidity. Likvidita není v průběhu času konstantní: jak budete v průběhu Blesku přijímat finanční prostředky, likvidita se bude spotřebovávat a stane se vaším zůstatkem.\n\nPo jednom roce bude zbývající nevyužitá likvidita službou vyžádána zpět."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie fordern einen **anfänglichen** Betrag an Liquidität an. Die Liquidität ist im Laufe der Zeit nicht konstant: Wenn Sie im Laufe des Blitzes Geld erhalten, wird die Liquidität verbraucht und zu Ihrem Saldo.\n\nNach einem Jahr wird die verbleibende ungenutzte Liquidität vom Dienst zurückverlangt."
           }
         },
         "fr" : {
@@ -43371,6 +43707,12 @@
             "state" : "translated",
             "value" : "Máte příliš mnoho nevyřízených plateb. Zkuste to znovu, jakmile budou uhrazeny."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie haben zu viele ausstehende Zahlungen. Versuchen Sie es erneut, sobald diese beglichen sind."
+          }
         }
       }
     },
@@ -43744,6 +44086,12 @@
             "state" : "translated",
             "value" : "Váš kanál ještě není připojen. Počkejte na stabilní připojení a zkuste to znovu."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihr Kanal ist noch nicht verbunden. Warten Sie auf eine stabile Verbindung und versuchen Sie es erneut."
+          }
         }
       }
     },
@@ -43759,6 +44107,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Váš kanál je stále v procesu otevírání. Počkejte a zkuste to znovu."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihr Kanal wird noch nicht geöffnet. Warten Sie und versuchen Sie es erneut."
           }
         }
       }
