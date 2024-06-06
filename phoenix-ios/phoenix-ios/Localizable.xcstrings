@@ -6028,6 +6028,12 @@
             "state" : "translated",
             "value" : "حدث خطأ في عقدة في مسار الدفع. قد تنجح عملية الدفع إذا حاولت مرة أخرى."
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "V uzlu na trase platby došlo k chybě. Platba může být úspěšná, pokud se o ni pokusíte znovu."
+          }
         }
       }
     },
@@ -6185,6 +6191,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "حدث خطأ غير معروف وفشل الدفع."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Došlo k neznámé chybě a platba se nezdařila."
           }
         }
       }
@@ -6602,6 +6614,12 @@
             "state" : "translated",
             "value" : "عندما تتلقى الأموال، سيتم استهلاك السيولة وتصبح رصيدك. بعد مرور عام واحد، ستستعيد الخدمة السيولة المتبقية غير المستخدمة."
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jakmile obdržíte finanční prostředky, likvidita se spotřebuje a stane se vaším zůstatkem. Po jednom roce bude zbývající nespotřebovaná likvidita službou vyžádána zpět."
+          }
         }
       }
     },
@@ -6734,6 +6752,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "المصادقة لتعطيل رمز المرور الاحتياطي."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ověření pravosti pro vypnutí zpětného přístupu k přístupovému kódu."
           }
         }
       }
@@ -6906,6 +6930,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "متوفرة"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dostupné na"
           }
         }
       }
@@ -8771,6 +8801,12 @@
             "state" : "translated",
             "value" : "تغيير رقم التعريف الشخصي"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Změna kódu PIN"
+          }
         }
       }
     },
@@ -8986,6 +9022,12 @@
             "state" : "translated",
             "value" : "تأثر حجم القناة المتأثر"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ovlivněná velikost kanálu"
+          }
         }
       }
     },
@@ -8996,6 +9038,12 @@
             "state" : "translated",
             "value" : "القنوات تعالج بالفعل عملية الربط. حاول مرة أخرى في وقت لاحق."
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kanály již zpracovávají spoje. Zkuste to později."
+          }
         }
       }
     },
@@ -9005,6 +9053,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "القنوات تغلق"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kanály se uzavírají."
           }
         }
       }
@@ -10533,6 +10587,12 @@
             "state" : "translated",
             "value" : "تأكيد رقم التعريف الشخصي الجديد"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Potvrzení nového kódu PIN"
+          }
         }
       }
     },
@@ -11758,6 +11818,12 @@
             "state" : "translated",
             "value" : "صحيح"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Správně"
+          }
         }
       }
     },
@@ -12206,6 +12272,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "رقم التعريف الشخصي المخصص"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vlastní kód PIN"
           }
         }
       }
@@ -13700,6 +13772,12 @@
             "state" : "translated",
             "value" : "تعطيل رقم التعريف الشخصي"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zakázat kód PIN"
+          }
         }
       }
     },
@@ -14265,6 +14343,12 @@
             "state" : "translated",
             "value" : "لا تعرض هذه الرسالة مرة أخرى"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nezobrazujte tuto zprávu znovu"
+          }
         }
       }
     },
@@ -14753,6 +14837,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تحرير رقم التعريف الشخصي"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upravit kód PIN"
           }
         }
       }
@@ -15277,6 +15367,12 @@
             "state" : "translated",
             "value" : "أدخل رقم تعريف شخصي جديد"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zadejte nový kód PIN"
+          }
         }
       }
     },
@@ -15286,6 +15382,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "أدخل رقم التعريف الشخصي لفينيكس"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zadejte kód PIN Phoenix"
           }
         }
       }
@@ -15297,6 +15399,12 @@
             "state" : "translated",
             "value" : "أدخل رقم التعريف الشخصي للمصادقة"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zadejte PIN pro ověření"
+          }
         }
       }
     },
@@ -15306,6 +15414,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "أدخل رقم التعريف الشخصي للتأكيد"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zadejte PIN pro potvrzení"
           }
         }
       }
@@ -15755,6 +15869,12 @@
             "state" : "translated",
             "value" : "منتهية الصلاحية"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vypršela platnost"
+          }
         }
       }
     },
@@ -16046,6 +16166,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "معرّف الوجه"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID obličeje"
           }
         }
       }
@@ -16378,6 +16504,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "الرسوم غير كافية."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Poplatek je nedostatečný."
           }
         }
       }
@@ -17831,6 +17963,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "يتم أخذ الأموال المرسلة على السلسلة من جانبك من القناة، مما يقلل من حجم القناة بنفس المقدار. تظل سيولتك الواردة كما هي."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prostředky odeslané v řetězci se odeberou z vaší strany kanálu, čímž se velikost kanálu sníží o stejnou částku. Vaše příchozí likvidita zůstává stejná."
           }
         }
       }
@@ -20512,6 +20650,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "غير صحيح"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nesprávné"
           }
         }
       }
@@ -24144,6 +24288,12 @@
             "state" : "translated",
             "value" : "رسوم عامل المنجم:"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Poplatek pro horníky:"
+          }
         }
       }
     },
@@ -26116,6 +26266,12 @@
             "state" : "translated",
             "value" : "الخيارات"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Možnosti"
+          }
         }
       }
     },
@@ -27041,6 +27197,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "فشل الدفع"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Platba se nezdařila"
           }
         }
       }
@@ -28544,6 +28706,12 @@
             "state" : "translated",
             "value" : "رقم التعريف الشخصي"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN"
+          }
         }
       }
     },
@@ -28553,6 +28721,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "عدم تطابق رقم التعريف الشخصي"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neshoda PIN!"
           }
         }
       }
@@ -28799,6 +28973,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "يرجى إجراء نسخة احتياطية قبل تمكين أي خيارات هنا. إذا قمت بحبس نفسك خارج فينيكس دون إجراء نسخة احتياطية من عبارة الاسترداد الخاصة بك، فسوف ** تخسر أموالك**!"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Před povolením jakýchkoli možností zde proveďte zálohování. Pokud se zablokujete ve Phoenixu bez zálohy fráze pro obnovení, **přijdete o své prostředky**!"
           }
         }
       }
@@ -29812,6 +29992,12 @@
             "state" : "translated",
             "value" : "استلم:"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Přijímejte:"
+          }
         }
       }
     },
@@ -30023,6 +30209,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "لا يمكن الوصول إلى المتلقي، أو ليس لديه سيولة واردة كافية."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Příjemce není dosažitelný nebo nemá dostatečnou příchozí likviditu."
           }
         }
       }
@@ -30763,6 +30955,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "إعادة المحاولة في %@"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opakování pokusu v %@"
           }
         }
       }
@@ -31740,6 +31938,12 @@
             "state" : "translated",
             "value" : "تم الإرسال"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odesláno"
+          }
         }
       }
     },
@@ -32358,6 +32562,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تعيين رقم التعريف الشخصي"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nastavení kódu PIN"
           }
         }
       }
@@ -34112,6 +34322,12 @@
             "state" : "translated",
             "value" : "مبادلات منتهية الصلاحية منتهية الصلاحية"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utratit prošlé výměnné balíčky"
+          }
         }
       }
     },
@@ -35564,6 +35780,12 @@
             "state" : "translated",
             "value" : "انتهاء هذه الدفعة بعيد جداً في المستقبل."
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Platnost této platby je příliš vzdálená."
+          }
         }
       }
     },
@@ -35880,6 +36102,12 @@
             "state" : "translated",
             "value" : "معرف الدفع غير صالح. حاول مرة أخرى."
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID platby není platné. Zkuste to znovu."
+          }
         }
       }
     },
@@ -36142,6 +36370,12 @@
             "state" : "translated",
             "value" : "مبلغ الدفع غير صالح."
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Částka platby je neplatná."
+          }
         }
       }
     },
@@ -36151,6 +36385,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "مبلغ الدفع كبير جداً - حاول تقسيمه على عدة أجزاء."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Částka platby je příliš vysoká - zkuste ji rozdělit na několik částí."
           }
         }
       }
@@ -36162,6 +36402,12 @@
             "state" : "translated",
             "value" : "مبلغ الدفع صغير للغاية."
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Výše platby je příliš nízká."
+          }
         }
       }
     },
@@ -36171,6 +36417,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تعذر ترحيل الدفعة إلى المستلم (ربما لعدم كفاية السيولة الواردة)."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Platbu se nepodařilo předat příjemci (pravděpodobně nedostatečná příchozí likvidita)."
           }
         }
       }
@@ -36182,6 +36434,12 @@
             "state" : "translated",
             "value" : "لا يمكن إرسال الدفعة من خلال قنواتك الحالية."
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Platbu nebylo možné odeslat prostřednictvím vašich stávajících kanálů."
+          }
         }
       }
     },
@@ -36192,6 +36450,12 @@
             "state" : "translated",
             "value" : "تم رفض الدفع من قبل المستلم. قد تكون هذه الفاتورة المحددة قد تم دفعها بالفعل."
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Příjemce platbu odmítl. Tato konkrétní faktura již mohla být uhrazena."
+          }
         }
       }
     },
@@ -36201,6 +36465,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "المستلم غير متصل بالإنترنت."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Příjemce je offline."
           }
         }
       }
@@ -36612,6 +36882,12 @@
             "state" : "translated",
             "value" : "تمت إعادة تشغيل المحفظة أثناء معالجة عملية الدفع."
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Během zpracování platby byla peněženka restartována."
+          }
         }
       }
     },
@@ -36741,6 +37017,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "لم يتم تبديل هذه الأموال في الوقت المناسب. انقر للإنفاق."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tyto prostředky nebyly včas vyměněny. Klepněte na tlačítko utratit."
           }
         }
       }
@@ -37191,6 +37473,12 @@
             "state" : "translated",
             "value" : "تم دفع هذه الفاتورة بالفعل."
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tato faktura již byla uhrazena."
+          }
         }
       }
     },
@@ -37200,6 +37488,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تستخدم هذه الفاتورة ميزات غير مدعومة. تأكد من أنك تستخدم أحدث إصدار من Phoenix."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tato faktura používá nepodporované funkce. Ujistěte se, že používáte nejnovější verzi Phoenixu."
           }
         }
       }
@@ -37413,6 +37707,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "هذه الدفعة تتجاوز رصيدك."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tato platba převyšuje váš zůstatek."
           }
         }
       }
@@ -37948,6 +38248,12 @@
             "state" : "translated",
             "value" : "لتمكين رقم تعريف شخصي مخصص، يجب عليك أولاً تعطيل خيار \"السماح بالرمز الاحتياطي لرمز المرور\"."
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chcete-li povolit vlastní kód PIN, musíte nejprve zakázat možnost \"povolit zpětný přístupový kód\"."
+          }
         }
       }
     },
@@ -37997,6 +38303,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "لتمكين خيار \"السماح بالرمز الاحتياطي لرمز المرور\"، يجب عليك أولاً تعطيل رقم التعريف الشخصي المخصص."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chcete-li povolit možnost \"povolit zpětný přístupový kód\", musíte nejprve zakázat vlastní kód PIN."
           }
         }
       }
@@ -38743,6 +39055,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "معرّف اللمس"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touch ID"
           }
         }
       }
@@ -40151,6 +40469,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "استخدم هذه الشاشة لإنفاق أموالك في السلسلة التي لم يتم تبديلها في الوقت المناسب. انتهت صلاحية طلب المبادلة الآن. "
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Na této obrazovce můžete utratit prostředky v řetězci, které nebyly včas vyměněny. Platnost žádosti o výměnu již vypršela. "
           }
         }
       }
@@ -41635,6 +41959,12 @@
             "state" : "translated",
             "value" : "أي رقم تعريف شخصي؟"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Který PIN?"
+          }
         }
       }
     },
@@ -42124,6 +42454,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "أنت تطلب **مبلغًا مبدئيًا** من السيولة. السيولة ليست ثابتة بمرور الوقت: عندما تتلقى أموالاً على البرق، سيتم استهلاك السيولة وتصبح رصيدك.\n\nبعد مرور عام واحد، ستستعيد الخدمة السيولة المتبقية غير المستخدمة."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Žádáte o **počáteční** částku likvidity. Likvidita není v průběhu času konstantní: jak budete v průběhu Blesku přijímat finanční prostředky, likvidita se bude spotřebovávat a stane se vaším zůstatkem.\n\nPo jednom roce bude zbývající nevyužitá likvidita službou vyžádána zpět."
           }
         },
         "fr" : {
@@ -43029,6 +43365,12 @@
             "state" : "translated",
             "value" : "لديك الكثير من المدفوعات المعلقة. حاول مرة أخرى بمجرد تسويتها."
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Máte příliš mnoho nevyřízených plateb. Zkuste to znovu, jakmile budou uhrazeny."
+          }
         }
       }
     },
@@ -43396,6 +43738,12 @@
             "state" : "translated",
             "value" : "قناتك غير متصلة بعد. انتظر اتصالاً مستقراً وحاول مرة أخرى."
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Váš kanál ještě není připojen. Počkejte na stabilní připojení a zkuste to znovu."
+          }
         }
       }
     },
@@ -43405,6 +43753,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "لا تزال قناتك في طور الفتح. انتظر وحاول مرة أخرى."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Váš kanál je stále v procesu otevírání. Počkejte a zkuste to znovu."
           }
         }
       }
