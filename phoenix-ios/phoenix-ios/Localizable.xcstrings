@@ -6046,6 +6046,12 @@
             "state" : "translated",
             "value" : "Se ha producido un error en un nodo de la ruta de pago. El pago puede tener éxito si lo intentas de nuevo."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une erreur s'est produite sur un nœud de l'itinéraire de paiement. Le paiement peut réussir si vous réessayez."
+          }
         }
       }
     },
@@ -6221,6 +6227,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Se ha producido un error desconocido y el pago ha fallado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une erreur inconnue s'est produite et le paiement a échoué."
           }
         }
       }
@@ -6656,6 +6668,12 @@
             "state" : "translated",
             "value" : "A medida que recibas fondos, la liquidez se consumirá y se convertirá en tu saldo. Al cabo de un año, la liquidez restante no utilizada será reclamada por el servicio."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Au fur et à mesure que vous recevez des fonds, les liquidités sont consommées et deviennent votre solde. Au bout d'un an, les liquidités non utilisées seront récupérées par le service."
+          }
         }
       }
     },
@@ -6806,6 +6824,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Autentificar para desactivar el código de acceso."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authentifier pour désactiver le repli par code d'accès."
           }
         }
       }
@@ -6993,6 +7017,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disponible"
+          }
+        },
+        "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Disponible"
@@ -8879,6 +8909,12 @@
             "state" : "translated",
             "value" : "Cambiar PIN"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier le code PIN"
+          }
         }
       }
     },
@@ -9112,6 +9148,12 @@
             "state" : "translated",
             "value" : "Tamaño del canal afectado"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Taille du chenal affectée"
+          }
         }
       }
     },
@@ -9140,6 +9182,12 @@
             "state" : "translated",
             "value" : "Los canales ya están procesando un empalme. Vuelve a intentarlo más tarde."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les canaux sont déjà en train de traiter une épissure. Réessayez plus tard."
+          }
         }
       }
     },
@@ -9167,6 +9215,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Los canales se cierran."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les canaux se ferment."
           }
         }
       }
@@ -10713,6 +10767,12 @@
             "state" : "translated",
             "value" : "Confirmar nuevo PIN"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirmez le nouveau code PIN"
+          }
         }
       }
     },
@@ -11956,6 +12016,12 @@
             "state" : "translated",
             "value" : "Correcto"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Correct"
+          }
         }
       }
     },
@@ -12422,6 +12488,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "PIN personalizado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN personnalisé"
           }
         }
       }
@@ -13934,6 +14006,12 @@
             "state" : "translated",
             "value" : "Desactivar PIN"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Désactiver le code PIN"
+          }
         }
       }
     },
@@ -14517,6 +14595,12 @@
             "state" : "translated",
             "value" : "No vuelvas a mostrar este mensaje"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ne plus afficher ce message"
+          }
         }
       }
     },
@@ -15023,6 +15107,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Editar PIN"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier le code PIN"
           }
         }
       }
@@ -15565,6 +15655,12 @@
             "state" : "translated",
             "value" : "Introducir nuevo PIN"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez un nouveau code PIN"
+          }
         }
       }
     },
@@ -15592,6 +15688,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Introduce el PIN de Phoenix"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez le code PIN de Phoenix"
           }
         }
       }
@@ -15621,6 +15723,12 @@
             "state" : "translated",
             "value" : "Introduce el PIN para autentificarte"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez le code PIN pour vous authentifier"
+          }
         }
       }
     },
@@ -15648,6 +15756,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Introduce el PIN para confirmar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez le code PIN pour confirmer"
           }
         }
       }
@@ -16115,6 +16229,12 @@
             "state" : "translated",
             "value" : "Caducado"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expiré"
+          }
         }
       }
     },
@@ -16421,6 +16541,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Face ID"
+          }
+        },
+        "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Face ID"
@@ -16774,6 +16900,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La tasa es insuficiente."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La redevance est insuffisante."
           }
         }
       }
@@ -18245,6 +18377,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Los fondos enviados en cadena se toman de tu lado del canal, reduciendo el tamaño del canal en la misma cantidad. Tu liquidez entrante sigue siendo la misma."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les fonds envoyés sur la chaîne sont prélevés de votre côté du canal, ce qui réduit la taille du canal du même montant. Vos liquidités entrantes restent les mêmes."
           }
         }
       }
@@ -20944,6 +21082,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Incorrecto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Incorrect"
           }
         }
       }
@@ -24594,6 +24738,12 @@
             "state" : "translated",
             "value" : "Tasa de minero:"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frais de minage :"
+          }
         }
       }
     },
@@ -26584,6 +26734,12 @@
             "state" : "translated",
             "value" : "Opciones"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Options"
+          }
         }
       }
     },
@@ -27527,6 +27683,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pago fallido"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Échec du paiement"
           }
         }
       }
@@ -29048,6 +29210,12 @@
             "state" : "translated",
             "value" : "PIN"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN"
+          }
         }
       }
     },
@@ -29075,6 +29243,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "¡PIN incorrecto!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur de code PIN !"
           }
         }
       }
@@ -29339,6 +29513,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Por favor, realiza una copia de seguridad antes de activar cualquier opción aquí. ¡Si te bloqueas en Phoenix sin una copia de seguridad de tu frase de recuperación, **perderás tus fondos**!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veuillez effectuer une sauvegarde avant d'activer l'une ou l'autre des options proposées ici. Si vous vous enfermez hors de Phoenix sans avoir sauvegardé votre phrase de récupération, vous **perdrez vos fonds** !"
           }
         }
       }
@@ -30370,6 +30550,12 @@
             "state" : "translated",
             "value" : "Recibe:"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recevoir :"
+          }
         }
       }
     },
@@ -30599,6 +30785,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "El destinatario no está localizable, o no tiene suficiente liquidez entrante."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le destinataire n'est pas joignable ou ne dispose pas de suffisamment de liquidités entrantes."
           }
         }
       }
@@ -31357,6 +31549,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reintento en %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réessai dans %@"
           }
         }
       }
@@ -32352,6 +32550,12 @@
             "state" : "translated",
             "value" : "Enviado"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoyé"
+          }
         }
       }
     },
@@ -32988,6 +33192,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Establecer PIN"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Définir le code PIN"
           }
         }
       }
@@ -34760,6 +34970,12 @@
             "state" : "translated",
             "value" : "Gastar intercambios caducados"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dépensez les swap-ins périmés"
+          }
         }
       }
     },
@@ -36230,6 +36446,12 @@
             "state" : "translated",
             "value" : "El vencimiento de este pago está demasiado lejos en el futuro."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'échéance de ce paiement est trop lointaine."
+          }
         }
       }
     },
@@ -36564,6 +36786,12 @@
             "state" : "translated",
             "value" : "El ID del pago no es válido. Inténtalo de nuevo."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'identifiant du paiement n'est pas valide. Réessayez."
+          }
         }
       }
     },
@@ -36844,6 +37072,12 @@
             "state" : "translated",
             "value" : "El importe del pago no es válido."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le montant du paiement n'est pas valide."
+          }
         }
       }
     },
@@ -36871,6 +37105,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "El importe del pago es demasiado grande - intenta dividirlo en varias partes."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le montant du paiement est trop élevé - essayez de le diviser en plusieurs parties."
           }
         }
       }
@@ -36900,6 +37140,12 @@
             "state" : "translated",
             "value" : "El importe del pago es demasiado pequeño."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le montant du paiement est trop faible."
+          }
         }
       }
     },
@@ -36927,6 +37173,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "El pago no pudo ser retransmitido al destinatario (probablemente insuficiente liquidez de entrada)."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le paiement n'a pas pu être transmis au destinataire (probablement manque de liquidités entrantes)."
           }
         }
       }
@@ -36956,6 +37208,12 @@
             "state" : "translated",
             "value" : "No se ha podido enviar el pago a través de tus canales existentes."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le paiement n'a pas pu être envoyé par vos canaux existants."
+          }
         }
       }
     },
@@ -36984,6 +37242,12 @@
             "state" : "translated",
             "value" : "El pago fue rechazado por el destinatario. Es posible que esta factura en concreto ya se haya pagado."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le paiement a été rejeté par le destinataire. Il se peut que cette facture ait déjà été payée."
+          }
         }
       }
     },
@@ -37011,6 +37275,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "El destinatario está desconectado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le destinataire est hors ligne."
           }
         }
       }
@@ -37440,6 +37710,12 @@
             "state" : "translated",
             "value" : "El monedero se reinició mientras se procesaba el pago."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le portefeuille a été redémarré pendant le traitement du paiement."
+          }
         }
       }
     },
@@ -37587,6 +37863,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Estos fondos no se intercambiaron a tiempo. Toca para gastar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ces fonds n'ont pas été échangés à temps. Tapez pour dépenser."
           }
         }
       }
@@ -38055,6 +38337,12 @@
             "state" : "translated",
             "value" : "Esta factura ya ha sido pagada."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette facture a déjà été payée."
+          }
         }
       }
     },
@@ -38082,6 +38370,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Esta factura utiliza funciones no compatibles. Asegúrate de que estás en la última versión de Phoenix."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette facture utilise des fonctionnalités non prises en charge. Assurez-vous que vous disposez de la dernière version de Phoenix."
           }
         }
       }
@@ -38313,6 +38607,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Este pago supera tu saldo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce paiement dépasse votre solde."
           }
         }
       }
@@ -38866,6 +39166,12 @@
             "state" : "translated",
             "value" : "Para activar un PIN personalizado, primero debes desactivar la opción \"Permitir código de acceso alternativo\"."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour activer un code PIN personnalisé, vous devez d'abord désactiver l'option \"Allow passcode fallback\"."
+          }
         }
       }
     },
@@ -38933,6 +39239,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Para activar la opción \"permitir código de acceso alternativo\", primero debes desactivar el PIN personalizado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour activer l'option \"autoriser le code de secours\", vous devez d'abord désactiver le code PIN personnalisé."
           }
         }
       }
@@ -39694,6 +40006,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touch ID"
+          }
+        },
+        "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Touch ID"
@@ -41123,6 +41441,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Utiliza esta pantalla para gastar tus fondos en la cadena que no fueron canjeados a tiempo. La solicitud de canje ha caducado. "
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utilisez cet écran pour dépenser vos fonds sur la chaîne qui n'ont pas été échangés à temps. La demande de swap-in a maintenant expiré. "
           }
         }
       }
@@ -42625,6 +42949,12 @@
             "state" : "translated",
             "value" : "¿Qué PIN?"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quel code PIN ?"
+          }
         }
       }
     },
@@ -44055,6 +44385,12 @@
             "state" : "translated",
             "value" : "Tienes demasiados pagos pendientes. Vuelve a intentarlo cuando se hayan liquidado."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous avez trop de paiements en attente. Réessayez une fois qu'ils seront réglés."
+          }
         }
       }
     },
@@ -44440,6 +44776,12 @@
             "state" : "translated",
             "value" : "Tu canal aún no está conectado. Espera a tener una conexión estable e inténtalo de nuevo."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vos canaux ne sont pas encore connectés. Attendez une connexion stable et réessayez."
+          }
         }
       }
     },
@@ -44467,6 +44809,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tu canal aún está en proceso de apertura. Espera e inténtalo de nuevo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre canal est encore en cours d'ouverture. Attendez et réessayez."
           }
         }
       }
