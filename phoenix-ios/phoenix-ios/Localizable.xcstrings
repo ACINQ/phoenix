@@ -2633,7 +2633,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "+(amount.string) liquidités entrantes"
+            "value" : "+(amount.string) liquidité entrante"
           }
         }
       }
@@ -4858,7 +4858,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ajoute des liquidités"
+            "value" : "Ajouter de la liquidité"
           }
         }
       }
@@ -4892,7 +4892,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ajouter des liquidités"
+            "value" : "Ajouter de la liquidité"
           }
         }
       }
@@ -4926,7 +4926,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "L'ajout de liquidités a échoué !"
+            "value" : "L'ajout de liquidité a échoué !"
           }
         }
       }
@@ -4960,7 +4960,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ajoute des liquidités :"
+            "value" : "Liquidité additionnelle"
           }
         }
       }
@@ -12159,7 +12159,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Liquidités entrantes actuelles :"
+            "value" : "Liquidité entrante courante :"
           }
         }
       }
@@ -15486,7 +15486,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Estimation du coût des liquidités"
+            "value" : "Estimation du coût de la liquidité"
           }
         }
       }
@@ -20775,7 +20775,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Annonces de liquidités non valides"
+            "value" : "Demande de liquidité non valide"
           }
         }
       }
@@ -21565,7 +21565,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Descripteur de l'héritage"
+            "value" : "Ancien descripteur"
           }
         }
       }
@@ -22322,7 +22322,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "montant des liquidités"
+            "value" : "montant de la liquidité"
           }
         }
       }
@@ -24563,7 +24563,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nouvelles liquidités entrantes :"
+            "value" : "Nouvelle liquidité entrante :"
           }
         }
       }
@@ -28587,7 +28587,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Planifiez à l'avance pour éviter des frais plus tard"
+            "value" : "Planifiez votre liquidité à l'avance afin éviter des frais on-chain dans le futur"
           }
         }
       }
@@ -31220,7 +31220,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Scanner le retrait"
+            "value" : "Scanner un lien de retrait"
           }
         }
       }
@@ -34798,7 +34798,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Échanger les adresses"
+            "value" : "Adresses de swap"
           }
         }
       }
@@ -35152,7 +35152,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Racine pivotante"
+            "value" : "Taproot"
           }
         }
       }
@@ -42184,7 +42184,14 @@
       }
     },
     "You are requesting an **initial** amount of liquidity. Liquidity is not constant over time: as you receive funds over Lightning, the liquidity will be consumed and become your balance.\n\nAfter one year, the remaining unused liquidity will be reclaimed by the service." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette demande est faite pour un montant de liquidité **initial**. Celle-ci ne va pas rester constante : au fur et à mesure que vous recevrez des fonds via Lightning, cette liquidité sera consommée et deviendra votre solde.\n\nAu bout d'un an, la liquidité non consommée sera recouvrée par le fournisseur de liquidité."
+          }
+        }
+      }
     },
     "You are responsible for backing up your recovery phrase." : {
       "extractionState" : "manual",
@@ -43106,7 +43113,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vous pourrez peut-être réduire vos frais en augmentant préalablement la taille de ce seau avant de recevoir des paiements."
+            "value" : "En augmentant préalablement la taille de ce seau avant de recevoir de nouveaux paiements, vous pourrez vous éviter d'avoir à payer des frais plus tard."
           }
         }
       }
