@@ -4714,47 +4714,6 @@
         }
       }
     },
-    "Access to Phoenix is protected" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الوصول إلى فينيكس محمي"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Přístup do Phoenixu je chráněn"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Zugang zu Phoenix ist geschützt"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El acceso a Phoenix está protegido"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El acceso a Phoenix está protegido"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "L'accès à Phoenix est protégé"
-          }
-        }
-      }
-    },
     "active commitments" : {
       "localizations" : {
         "ar" : {
@@ -8616,47 +8575,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Annuler"
-          }
-        }
-      }
-    },
-    "Cancelled Funds" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الأموال الملغاة"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zrušené fondy"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gestrichene Mittel"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fondos cancelados"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fondos cancelados"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fonds annulés"
           }
         }
       }
@@ -25085,48 +25003,6 @@
         }
       }
     },
-    "non-invoice payment" : {
-      "comment" : "Transaction Info: Explanation",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "دفع بدون فاتورة"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Platba bez faktury"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "rechnungslose Zahlung"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pago sin factura"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "pago sin factura"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "paiement spontané"
-          }
-        }
-      }
-    },
     "None" : {
       "comment" : "TextField placeholder",
       "localizations" : {
@@ -27300,48 +27176,6 @@
         }
       }
     },
-    "Payment Parts" : {
-      "comment" : "Title in DetailsView_IncomingPayment",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "أجزاء الدفعة"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Platební části"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zahlungsteile"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Partes de pago"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Partes del pago"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tranches de paiement"
-          }
-        }
-      }
-    },
     "payment preimage" : {
       "localizations" : {
         "ar" : {
@@ -28185,47 +28019,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Phoenix"
-          }
-        }
-      }
-    },
-    "Phoenix can be accessed without credentials. Make sure that you have enabled adequate protections for iOS." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "يمكن الوصول إلى Phoenix بدون وسائل امان. تأكد من أنك قمت بتمكين الحماية الكافية لنظام iOS."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Phoenix je přístupný bez přihlašovacích údajů. Ujistěte se, že jste pro iOS povolili příslušné ochrany."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Auf Phoenix kann ohne Anmeldedaten zugegriffen werden. Vergewissere dich, dass du angemessene Schutzmaßnahmen für iOS aktiviert hast."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Se puede acceder a Phoenix sin credenciales. Asegúrese de haber habilitado las protecciones adecuadas para iOS."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Se puede acceder a Phoenix sin credenciales. Asegúrate de haber activado las protecciones adecuadas para iOS."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Phoenix peut être ouvert sans contrôle d'accès. Assurez-vous d’avoir mis en place des mesure de sécurité adéquate dans iOS."
           }
         }
       }
@@ -30454,88 +30247,6 @@
         }
       }
     },
-    "Require Face ID" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تمكين Face ID"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vyžadováno Face ID"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Face ID voraussetzen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Requiere Face ID"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Requerir Face ID"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Authentification par Face ID"
-          }
-        }
-      }
-    },
-    "Require Touch ID" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تمكين بصمة الاصبع"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vyžadováno Touch ID"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Touch ID erforderlich machen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Requiere Touch ID"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Requerir Touch ID"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Authentification par TouchID"
-          }
-        }
-      }
-    },
     "Reset user preferences" : {
       "localizations" : {
         "ar" : {
@@ -31462,48 +31173,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Envoyez tous vos fonds vers une adresse Bitcoin"
-          }
-        }
-      }
-    },
-    "Send Failed" : {
-      "comment" : "Title in DetailsView_IncomingPayment",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "فشل الإرسال"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Odeslání se nezdařilo"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Senden fehlgeschlagen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Envío fallido"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Error de envío"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Envoi échoué"
           }
         }
       }
@@ -36743,47 +36412,6 @@
     "These funds were not swapped in time. Tap to spend." : {
 
     },
-    "These funds were not swapped in time. Use the wallet's descriptor to access them." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "لم يتم تبديل هذه الأموال في الوقت المناسب. استخدم واصف المحفظة للوصول إليها."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tyto prostředky nebyly včas vyměněny. Pro přístup k nim použijte deskriptor peněženky."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Diese Gelder wurden nicht rechtzeitig getauscht. Verwende den Deskriptor der Brieftasche, um auf sie zuzugreifen."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Estos fondos no se intercambiaron a tiempo. Utiliza el descriptor del monedero para acceder a ellos."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Estos fondos no se intercambiaron a tiempo. Usa el descriptor de la billetera para acceder a ellos."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ces fonds n'ont pas été échangés à temps. Utilise le descripteur du portefeuille pour y accéder."
-          }
-        }
-      }
-    },
     "These funds will be available from %lld days onwards." : {
       "localizations" : {
         "ar" : {
@@ -37266,88 +36894,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ceci est une adresse de swap. Elle n’est pas contrôlée par votre portefeuille. Les dépôts on-chain seront convertis en canaux de paiement Lightning."
-          }
-        }
-      }
-    },
-    "This is less secure, but more durable. Face ID can stop working due to hardware damage." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "هذا أقل أماناً، ولكنه أكثر متانة. يمكن أن يتوقف معرّف الوجه عن العمل بسبب تلف الأجهزة."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Je méně bezpečný, ale odolnější. Face ID může přestat fungovat kvůli poškození hardwaru."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Das ist weniger sicher, aber haltbarer. Face ID kann aufgrund von Hardwareschäden nicht mehr funktionieren."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esto es menos seguro, pero más duradero. Face ID puede dejar de funcionar debido a daños en el hardware."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esto es menos seguro, pero más duradero. Face ID puede dejar de funcionar si se daña el hardware."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cette méthode est moins sécurisée, mais plus durable. Face ID peut cesser de fonctionner en cas de dommages matériels."
-          }
-        }
-      }
-    },
-    "This is less secure, but more durable. Touch ID can stop working due to hardware damage." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "هذا أقل أماناً، ولكنه أكثر متانة. يمكن أن يتوقف معرّف اللمس عن العمل بسبب تلف الأجهزة."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Je méně bezpečný, ale odolnější. Touch ID může přestat fungovat kvůli poškození hardwaru."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Das ist weniger sicher, aber haltbarer. Touch ID kann aufgrund von Hardwareschäden nicht mehr funktionieren."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esto es menos seguro, pero más duradero. Touch ID puede dejar de funcionar debido a daños en el hardware."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esto es menos seguro, pero más duradero. Touch ID puede dejar de funcionar si se daña el hardware."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cette méthode est moins sûre, mais plus durable. TouchID peut cesser de fonctionner en cas de dommages matériels."
           }
         }
       }
