@@ -274,7 +274,8 @@ fun AppView(
                         ScanDataView(
                             input = input,
                             onBackClick = { popToHome(navController) },
-                            onAuthSchemeInfoClick = { navController.navigate("${Screen.PaymentSettings.route}/true") }
+                            onAuthSchemeInfoClick = { navController.navigate("${Screen.PaymentSettings.route}/true") },
+                            onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) },
                         )
                     }
                 }

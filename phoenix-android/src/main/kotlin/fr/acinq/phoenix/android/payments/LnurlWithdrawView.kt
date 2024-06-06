@@ -33,6 +33,7 @@ import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.fiatRate
+import fr.acinq.phoenix.android.payments.receive.EvaluateLiquidityIssuesForPayment
 import fr.acinq.phoenix.android.preferredAmountUnit
 import fr.acinq.phoenix.android.utils.Converter.toPrettyStringWithFallback
 import fr.acinq.phoenix.android.utils.annotatedStringResource
@@ -43,7 +44,8 @@ import fr.acinq.phoenix.data.lnurl.LnurlError
 fun LnurlWithdrawView(
     model: Scan.Model.LnurlWithdrawFlow,
     onBackClick: () -> Unit,
-    onWithdrawClick: (Scan.Intent.LnurlWithdrawFlow) -> Unit
+    onWithdrawClick: (Scan.Intent.LnurlWithdrawFlow) -> Unit,
+    onFeeManagementClick: () -> Unit,
 ) {
     val context = LocalContext.current
     val prefUnit = preferredAmountUnit
@@ -111,6 +113,13 @@ fun LnurlWithdrawView(
                         )
                     }
                 }
+
+                EvaluateLiquidityIssuesForPayment(
+                    amount = amount,
+                    onFeeManagementClick = onFeeManagementClick,
+                    showDialogImmediately = true,
+                    onDialogShown = {},
+                )
             }
             is Scan.Model.LnurlWithdrawFlow.LnurlWithdrawFetch -> {
                 ProgressView(text = stringResource(id = R.string.lnurl_withdraw_wait))
