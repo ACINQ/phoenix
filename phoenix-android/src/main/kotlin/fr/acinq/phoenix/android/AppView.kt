@@ -82,6 +82,7 @@ import fr.acinq.phoenix.android.settings.fees.AdvancedIncomingFeePolicy
 import fr.acinq.phoenix.android.settings.fees.LiquidityPolicyView
 import fr.acinq.phoenix.android.payments.liquidity.RequestLiquidityView
 import fr.acinq.phoenix.android.settings.walletinfo.FinalWalletInfo
+import fr.acinq.phoenix.android.settings.walletinfo.SendSwapInRefundView
 import fr.acinq.phoenix.android.settings.walletinfo.SwapInAddresses
 import fr.acinq.phoenix.android.settings.walletinfo.SwapInSignerView
 import fr.acinq.phoenix.android.settings.walletinfo.SwapInWallet
@@ -411,6 +412,7 @@ fun AppView(
                         onBackClick = { navController.popBackStack() },
                         onViewChannelPolicyClick = { navController.navigate(Screen.LiquidityPolicy.route) },
                         onAdvancedClick = { navController.navigate(Screen.WalletInfo.SwapInSigner.route) },
+                        onSpendRefundable = { navController.navigate(Screen.WalletInfo.SwapInRefund.route) },
                     )
                 }
                 composable(Screen.WalletInfo.SwapInAddresses.route) {
@@ -418,6 +420,9 @@ fun AppView(
                 }
                 composable(Screen.WalletInfo.SwapInSigner.route) {
                     SwapInSignerView(onBackClick = { navController.popBackStack() })
+                }
+                composable(Screen.WalletInfo.SwapInRefund.route) {
+                    SendSwapInRefundView(onBackClick = { navController.popBackStack() })
                 }
                 composable(Screen.WalletInfo.FinalWallet.route) {
                     FinalWalletInfo(onBackClick = { navController.popBackStack() })

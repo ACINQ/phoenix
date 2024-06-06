@@ -345,7 +345,8 @@ class BusinessManager {
 		
 		// Keep Prefs.shared.swapInAddressIndex up-to-date
 		business.peerManager.peerStatePublisher()
-			.flatMap { $0.swapInWallet.swapInAddressPublisher() }
+			.compactMap { $0.swapInWallet }
+			.flatMap { $0.swapInAddressPublisher() }
 			.sink { (newInfo: Lightning_kmpSwapInWallet.SwapInAddressInfo?) in
 				
 				if let newInfo {

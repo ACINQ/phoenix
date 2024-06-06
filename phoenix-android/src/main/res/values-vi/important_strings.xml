@@ -287,7 +287,7 @@
     <string name="walletinfo_onchain_swapin_locked_description">Những khoản vốn này sẽ có sẵn từ %1$s ngày trở đi.</string>
 
     <string name="walletinfo_onchain_swapin_refund_title">Vốn bị hủy</string>
-    <string name="walletinfo_onchain_swapin_refund_description">Những khoản tiền này đã không được swap kịp thời. Sử dụng bộ mô tả của ví để truy cập.</string>
+    <string name="walletinfo_onchain_swapin_refund_description">Những khoản tiền này đã không được swap kịp thời.</string>
 
     <string name="walletinfo_onchain_final_about">Ví cuối cùng là nơi tiền vốn sẽ được gửi tới, khi kênh Lightning của bạn bị đóng hoặc gặp sự cố. Bình thường ví này sẽ luôn trống.</string>
 
@@ -413,5 +413,22 @@
     <string name="spliceout_capacity_disclaimer_title">Kích thước kênh bị ảnh hưởng</string>
     <string name="spliceout_capacity_disclaimer_body1">Số tiền gửi được lấy từ phía kênh của bạn, làm giảm quy mô kênh một lượng tương tự. Thanh khoản đầu vào của bạn không thay đổi.</string>
     <string name="spliceout_capacity_disclaimer_checkbox">Đừng hiển thị lại thông báo đó.</string>
+
+    <!-- Spend swap-in refund -->
+
+    <string name="swapinrefund_title">Chi tiêu các khoản hoán đổi đã bị hủy</string>
+    <string name="swapinrefund_none_available_label">Chưa có giao dịch hoán đổi nào bị hủy.</string>
+    <string name="swapinrefund_available_label">Có sẵn: <b>%1$s</b> (%2$s)</string>
+    <string name="swapinrefund_instructions_1">Sử dụng màn hình này để chi tiêu các khoản tiền gửi trên chuỗi không được hoán đổi kịp thời. Điều này không ảnh hưởng đến các kênh Lightning của bạn.</string>
+    <string name="swapinrefund_instructions_2">Đảm bảo địa chỉ đích là hợp lệ và mức phí hợp lý.</string>
+    <string name="swapinrefund_estimate_button">Ước tính phí</string>
+    <string name="swapinrefund_estimating">Ước tính chi phí…</string>
+    <string name="swapinrefund_send_button">Gửi</string>
+    <string name="swapinrefund_sending">Đang gửi tiền…</string>
+    <string name="swapinrefund_failed">Lỗi giao dịch.</string>
+    <string name="swapinrefund_failed_address">Địa chỉ này không hợp lệ.</string>
+    <string name="swapinrefund_failed_cannot_create">Không thể tạo giao dịch hoàn tiền. Hãy thử lại.</string>
+    <string name="swapinrefund_success">Giao dịch đã được công bố.</string>
+    <string name="swapinrefund_success_details">Bạn có thể tìm thấy giao dịch chi tiêu số tiền bên dưới. Nó sẽ không xuất hiện trong lịch sử thanh toán của bạn, vì vậy hãy tạo bản sao ID của nó ngay bây giờ nếu cần.</string>
 
 </resources>

@@ -5,6 +5,7 @@ import fr.acinq.bitcoin.ByteVector64
 import fr.acinq.bitcoin.PrivateKey
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.Satoshi
+import fr.acinq.bitcoin.Transaction
 import fr.acinq.bitcoin.TxId
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.ChannelEvents
@@ -17,7 +18,6 @@ import fr.acinq.lightning.SwapInParams
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.ElectrumMiniWallet
 import fr.acinq.lightning.blockchain.electrum.WalletState
-import fr.acinq.lightning.blockchain.electrum.getConfirmations
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.ChannelCommand
 import fr.acinq.lightning.channel.states.Aborted
@@ -25,6 +25,7 @@ import fr.acinq.lightning.channel.states.ChannelState
 import fr.acinq.lightning.channel.states.Closed
 import fr.acinq.lightning.channel.states.Closing
 import fr.acinq.lightning.channel.states.Offline
+import fr.acinq.lightning.crypto.KeyManager
 import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
@@ -574,3 +575,11 @@ suspend fun Peer._requestInboundLiquidity(
 
 val InboundLiquidityOutgoingPayment._lease: LiquidityAds_Lease
     get() = LiquidityAds_Lease(this.lease)
+
+fun WalletState.WalletWithConfirmations._spendExpiredSwapIn(
+    swapInKeys: KeyManager.SwapInOnChainKeys,
+    scriptPubKey: ByteVector,
+    feerate: FeeratePerKw
+): Pair<Transaction, Satoshi>? {
+    return this.spendExpiredSwapIn(swapInKeys, scriptPubKey, feerate)
+}

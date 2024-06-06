@@ -279,7 +279,7 @@
     <string name="walletinfo_onchain_swapin_locked_description">Tyto prostředky budou k dispozici za %1$s dní.</string>
 
     <string name="walletinfo_onchain_swapin_refund_title">Zrušené prostředky</string>
-    <string name="walletinfo_onchain_swapin_refund_description">Tyto prostředky nebyly včas vyměněny. Pro jejich zpřístupnění použijte deskriptor peněženky.</string>
+    <string name="walletinfo_onchain_swapin_refund_description">Tyto prostředky nebyly včas vyměněny.</string>
 
     <string name="walletinfo_onchain_final_about">On-Chain peněženka odvozená od vašeho seedu.\n\nKonečná peněženka je místo, kam se ve výchozím nastavení posílají prostředky, když jsou vaše Lightning kanály uzavřeny.</string>
 
@@ -405,4 +405,22 @@
     <string name="spliceout_capacity_disclaimer_title">Vplyv na veľkosť kanála</string>
     <string name="spliceout_capacity_disclaimer_body1">Financie odoslané sa odoberú z vašej strany kanála, čím sa veľkosť kanála zníži o rovnakú sumu. Vaša prichádzajúca likvidita zostáva nezmenená.</string>
     <string name="spliceout_capacity_disclaimer_checkbox">Túto správu už nezobrazujte.</string>
+
+    <!-- Spend swap-in refund -->
+
+    <string name="swapinrefund_title">Utratit prošlou výměnu</string>
+    <string name="swapinrefund_none_available_label">Žádný swap-in neprošel.</string>
+    <string name="swapinrefund_available_label">Dostupné prostředky: <b>%1$s</b> (%2$s)</string>
+    <string name="swapinrefund_instructions_1">Tato obrazovka slouží k utrácení vkladů v řetězci, které nebyly včas převedeny na Lightning. Všimněte si, že to nijak neovlivňuje vaše kanály Lightning.</string>
+    <string name="swapinrefund_instructions_2">Ujistěte se, že cílová adresa je správná a poplatky přiměřené.</string>
+    <string name="swapinrefund_estimate_button">Odhad poplatků</string>
+    <string name="swapinrefund_estimating">Odhadní poplatky…</string>
+    <string name="swapinrefund_send_button">Odeslat</string>
+    <string name="swapinrefund_sending">Odesílání…</string>
+    <string name="swapinrefund_failed">Chyba transakce.</string>
+    <string name="swapinrefund_failed_address">Neplatná adresa.</string>
+    <string name="swapinrefund_failed_cannot_create">Nepodařilo se vytvořit transakci sběru. Zkuste to prosím znovu.</string>
+    <string name="swapinrefund_success">Zveřejněná transakce.</string>
+    <string name="swapinrefund_success_details">Transakci naleznete níže. Nebude se zobrazovat v historii plateb, proto si ji nyní v případě potřeby zkopírujte.</string>
+
 </resources>

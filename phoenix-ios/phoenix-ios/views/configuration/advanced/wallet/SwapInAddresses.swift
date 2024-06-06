@@ -10,8 +10,9 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct SwapInAddresses: View {
 	
-	let swapInAddressPublisher = Biz.business.peerManager.peerStatePublisher().flatMap { $0.swapInWallet.swapInAddressPublisher()
-	}
+	let swapInAddressPublisher = Biz.business.peerManager.peerStatePublisher()
+		.compactMap { $0.swapInWallet }
+		.flatMap { $0.swapInAddressPublisher() }
 	@State var swapInAddressInfo: Lightning_kmpSwapInWallet.SwapInAddressInfo? = nil
 	
 	@StateObject var toast = Toast()

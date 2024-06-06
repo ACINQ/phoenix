@@ -20,13 +20,8 @@ struct DrainWalletView: MVIView {
 	
 	@State var didAppear = false
 	@State var popToDestination: PopToDestination? = nil
-	
-	@State var textFieldValue: String = ""
-	@State var scannedValue: String? = nil
-	@State var parsedBitcoinAddress: String? = nil
-	@State var detailedErrorMsg: String? = nil
-	
-	@State var isScanningQrCode = false
+
+	@State var btcAddressInputResult: Result<BitcoinUri, BtcAddressInput.DetailedError> = .failure(.emptyInput)
 	
 	@State var reviewRequested = false
 	
@@ -145,54 +140,12 @@ struct DrainWalletView: MVIView {
 					.foregroundColor(.primary)
 					.fixedSize(horizontal: false, vertical: true)
 				
-				//  [(TextField:BtcAddr) (Button::X)] [Button::ScanQrCode]
-				HStack(alignment: VerticalAlignment.center, spacing: 10) {
-					
-					// [TextField::BtcAddr (Button::X)]
-					HStack(alignment: VerticalAlignment.center, spacing: 2) {
-						
-						// TextField::BtcAddr
-						TextField(
-							NSLocalizedString("Bitcoin address", comment: "TextField placeholder"),
-							text: $textFieldValue
-						)
-						.onChange(of: textFieldValue) { _ in
-							checkBitcoinAddress()
-						}
-						
-						// Button::X
-						if !textFieldValue.isEmpty {
-							Button {
-								clearTextField()
-							} label: {
-								Image(systemName: "multiply.circle.fill")
-									.foregroundColor(.secondary)
-							}
-							.buttonStyle(BorderlessButtonStyle()) // prevents trigger when row tapped
-							.accessibilityLabel("Clear textfield")
-						}
-						
-					} // </HStack>
-					.padding(.all, 8)
-					.overlay(
-						RoundedRectangle(cornerRadius: 8)
-							.stroke(Color.textFieldBorder, lineWidth: 1)
-					)
-					
-					// [Button::ScanQrCode]
-					Button {
-						didTapScanQrCodeButton()
-					} label: {
-						Image(systemName: "qrcode.viewfinder")
-							.resizable()
-							.frame(width: 30, height: 30)
-					}
-					.buttonStyle(BorderlessButtonStyle()) // prevents trigger when row tapped
-					
-				} // </HStack>
+				BtcAddressInput(result: $btcAddressInputResult)
 				
-				if let detailedErrorMsg = detailedErrorMsg {
-					Text(detailedErrorMsg)
+				if case let .failure(reason) = btcAddressInputResult,
+				   let errorMessage = reason.localizedErrorMessage()
+				{
+					Text(errorMessage)
 						.foregroundColor(Color.appNegative)
 				}
 				
@@ -203,10 +156,6 @@ struct DrainWalletView: MVIView {
 			} // </VStack>
 			
 		} // </Section>
-		.sheet(isPresented: $isScanningQrCode) {
-			
-			ScanBitcoinAddressSheet(didScanQrCode: self.didScanQrCode)
-		}
 	}
 	
 	@ViewBuilder
@@ -215,10 +164,7 @@ struct DrainWalletView: MVIView {
 		Section {
 			
 			VStack(alignment: HorizontalAlignment.center, spacing: 5) {
-					
-				let missingBitcoinAddress = parsedBitcoinAddress == nil
-				let invalidBitcoinAddress = missingBitcoinAddress && !textFieldValue.isEmpty
-					
+				
 				Button {
 					reviewButtonTapped()
 				} label: {
@@ -228,14 +174,8 @@ struct DrainWalletView: MVIView {
 							.imageScale(.small)
 					}
 				}
-				.disabled(missingBitcoinAddress || invalidBitcoinAddress)
+				.disabled(btcAddressInputResult.isError)
 				.font(.title3.weight(.medium))
-					
-				if invalidBitcoinAddress {
-					Text("Invalid bitcoin address")
-						.font(.callout)
-						.foregroundColor(.appNegative)
-				}
 					
 			} // </VStack>
 			.frame(maxWidth: .infinity)
@@ -245,10 +185,10 @@ struct DrainWalletView: MVIView {
 	@ViewBuilder
 	func reviewScreen() -> some View {
 		
-		if let bitcoinAddress = parsedBitcoinAddress {
+		if case .success(let bitcoinUri) = btcAddressInputResult {
 			DrainWalletView_Confirm(
 				mvi: mvi,
-				bitcoinAddress: bitcoinAddress,
+				bitcoinAddress: bitcoinUri.address,
 				popTo: popToWrapper
 			)
 		}
@@ -308,138 +248,8 @@ struct DrainWalletView: MVIView {
 	// MARK: Actions
 	// --------------------------------------------------
 	
-	func didTapScanQrCodeButton() -> Void {
-		log.trace("didTapScanQrCodeButton()")
-		
-		scannedValue = nil
-		isScanningQrCode = true
-	}
-	
-	func didScanQrCode(result: String) -> Void {
-		log.trace("didScanQrCode()")
-		
-		isScanningQrCode = false
-		scannedValue = result
-		textFieldValue = result
-	}
-	
-	func checkBitcoinAddress() -> Void {
-		log.trace("checkBitcoinAddress()")
-		
-		let isScannedValue = textFieldValue == scannedValue
-		
-		let business = Biz.business
-		let result = Parser.shared.readBitcoinAddress(chain: business.chain, input: textFieldValue)
-		
-		if let error = result.left {
-			
-			log.debug("result.error = \(error)")
-			
-			if isScannedValue {
-				// If the user scanned a non-bitcoin QRcode, we should notify them of the error
-				detailedErrorMsg = NSLocalizedString(
-					"The scanned QR code is not a bitcoin address",
-					comment: "Error message - parsing bitcoin address"
-				)
-			}
-			else {
-				detailedErrorMsg = nil
-			}
-			
-			parsedBitcoinAddress = nil
-			
-		} else {
-			
-			let bitcoinUri = result.right!
-			log.debug("result.info = \(bitcoinUri)")
-			
-			// Check to make sure the bitcoin address is for the correct chain.
-			let parsedChain = bitcoinUri.chain
-			let expectedChain = Biz.business.chain
-			
-			if parsedChain != expectedChain {
-				
-				detailedErrorMsg = String(format: NSLocalizedString(
-					"""
-					The address is for %@, but you're on %@
-					""",
-					comment: "Error message - parsing bitcoin address"),
-					parsedChain.name, expectedChain.name
-				)
-				parsedBitcoinAddress = nil
-				
-			} else { // looks good
-				
-				parsedBitcoinAddress = bitcoinUri.address
-				detailedErrorMsg = nil
-			}
-		}
-		
-		if !isScannedValue && scannedValue != nil {
-			// The user has changed the textFieldValue,
-			// so we're no longer dealing with the scanned value
-			scannedValue = nil
-		}
-	}
-	
-	func clearTextField() {
-		log.trace("clearTextField()")
-		
-		textFieldValue = ""
-	}
-	
 	func reviewButtonTapped() {
 		log.trace("reviewButtonTapped()")
 		reviewRequested = true
-	}
-}
-
-// --------------------------------------------------
-// MARK: -
-// --------------------------------------------------
-
-fileprivate struct ScanBitcoinAddressSheet: View, ViewName {
-	
-	let didScanQrCode: (String) -> Void
-	
-	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-	
-	var body: some View {
-		
-		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-			
-			HStack(alignment: VerticalAlignment.center, spacing: 0) {
-				
-				Spacer()
-					.frame(width: 30)
-				
-				Spacer() // Text should be centered
-				Text("Scan Bitcoin Address")
-					.font(.headline)
-				Spacer() // Text should be centered
-				
-				Button {
-					didTapClose()
-				} label: {
-					Image("ic_cross")
-						.resizable()
-						.frame(width: 30, height: 30)
-				}
-			
-			} // </HStack>
-			.padding([.leading, .trailing], 20)
-			.padding([.top, .bottom], 8)
-			
-			QrCodeScannerView {(request: String) in
-				didScanQrCode(request)
-			}
-		
-		} // </VStack>
-	}
-	
-	func didTapClose() -> Void {
-		log.trace("[\(viewName)] didTapClose()")
-		
-		presentationMode.wrappedValue.dismiss()
 	}
 }

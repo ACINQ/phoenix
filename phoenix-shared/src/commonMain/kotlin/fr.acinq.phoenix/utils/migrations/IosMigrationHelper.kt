@@ -33,6 +33,7 @@ import fr.acinq.phoenix.utils.Parser
 import fr.acinq.phoenix.utils.extensions.isBeingCreated
 import fr.acinq.lightning.logging.info
 import fr.acinq.lightning.logging.warning
+import fr.acinq.phoenix.managers.phoenixSwapInWallet
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -89,7 +90,7 @@ object IosMigrationHelper {
             val log = loggerFactory.newLogger(this::class)
 
             val peer = peerManager.getPeer()
-            val swapInAddress = peer.swapInWallet.swapInAddressFlow.filterNotNull().first().first
+            val swapInAddress = peer.phoenixSwapInWallet.swapInAddressFlow.filterNotNull().first().first
             val closingScript = Parser.addressToPublicKeyScriptOrNull(chain, swapInAddress)
             if (closingScript == null) {
                 log.warning { "aborting: could not get a valid closing script" }
@@ -139,7 +140,7 @@ object IosMigrationHelper {
             log.info { "${closingTxs.size} channels closed to ${closingScript.toHex()}" }
 
             // Wait for all UTXOs to arrive in swap-in wallet.
-            peer.swapInWallet.wallet.walletStateFlow
+            peer.phoenixSwapInWallet.wallet.walletStateFlow
                 .map { it.utxos.map { it.outPoint.txid } }
                 .first { txidsInWallet -> closingTxs.values.all { txid -> txidsInWallet.contains(txid) } }
             log.info { "all mutual-close txids found in swap-in wallet" }

@@ -280,7 +280,7 @@
     <string name="walletinfo_onchain_swapin_locked_description">Estos fondos estarán disponibles a partir de %1$s días.</string>
 
     <string name="walletinfo_onchain_swapin_refund_title">Cancelados</string>
-    <string name="walletinfo_onchain_swapin_refund_description">Estos fondos no fueron canjeados a tiempo. Utilice el descriptor de la cartera para acceder a ellos.</string>
+    <string name="walletinfo_onchain_swapin_refund_description">Estos fondos no fueron canjeados a tiempo.</string>
 
     <string name="walletinfo_onchain_final_about">Una cartera en la cadena derivada de su semilla.\n\nLa cartera final es donde se envían los fondos por defecto cuando se cierran sus canales Lightning.</string>
 
@@ -406,5 +406,22 @@
     <string name="spliceout_capacity_disclaimer_title">Tamaño del canal afectado</string>
     <string name="spliceout_capacity_disclaimer_body1">Los fondos enviados se toman de tu lado del canal, reduciendo el tamaño del canal en la misma cantidad. Su liquidez entrante permanece sin cambios.</string>
     <string name="spliceout_capacity_disclaimer_checkbox">No volver a mostrar ese mensaje.</string>
+
+    <!-- Spend swap-in refund -->
+
+    <string name="swapinrefund_title">Gastar un intercambio caducado</string>
+    <string name="swapinrefund_none_available_label">No hay swap-in caducado.</string>
+    <string name="swapinrefund_available_label">Fondos disponibles : <b>%1$s</b> (%2$s)</string>
+    <string name="swapinrefund_instructions_1">Utiliza esta pantalla para gastar depósitos on-chain que no hayan sido cambiados a Lightning a tiempo. Tenga en cuenta que esto no afecta en modo alguno a sus canales Lightning.</string>
+    <string name="swapinrefund_instructions_2">Asegúrese de que la dirección de destino es correcta y los gastos razonables.</string>
+    <string name="swapinrefund_estimate_button">Estimar las tasas</string>
+    <string name="swapinrefund_estimating">Estimación de tasas…</string>
+    <string name="swapinrefund_send_button">Enviar</string>
+    <string name="swapinrefund_sending">Envío de fondos…</string>
+    <string name="swapinrefund_failed">Error de transacción.</string>
+    <string name="swapinrefund_failed_address">Dirección no válida.</string>
+    <string name="swapinrefund_failed_cannot_create">No se ha podido crear la transacción de cobro. Por favor, inténtelo de nuevo.</string>
+    <string name="swapinrefund_success">Transacción publicada.</string>
+    <string name="swapinrefund_success_details">Puede encontrar la transacción a continuación. No aparecerá en su historial de pagos, así que haga una copia ahora si lo necesita.</string>
 
 </resources>

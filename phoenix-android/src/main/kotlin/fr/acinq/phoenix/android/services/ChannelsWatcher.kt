@@ -104,7 +104,7 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
 
             // connect electrum (and only electrum), and wait for the watcher to catch-up
             withTimeout(ELECTRUM_TIMEOUT_MILLIS) {
-                peer.watcher.openUpToDateFlow().first()
+                business.electrumWatcher.openUpToDateFlow().first()
             }
             log.info("electrum watcher is up-to-date")
             business.appConnectionsDaemon?.decrementDisconnectCount(AppConnectionsDaemon.ControlTarget.Electrum)

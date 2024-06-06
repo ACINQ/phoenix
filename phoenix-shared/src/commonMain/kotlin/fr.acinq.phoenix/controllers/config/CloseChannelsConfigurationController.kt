@@ -13,6 +13,7 @@ import fr.acinq.phoenix.controllers.config.CloseChannelsConfiguration.Model.Chan
 import fr.acinq.phoenix.utils.Parser
 import fr.acinq.phoenix.utils.extensions.localBalance
 import fr.acinq.lightning.logging.info
+import fr.acinq.phoenix.managers.phoenixFinalWallet
 import kotlinx.coroutines.launch
 
 class AppCloseChannelsConfigurationController(
@@ -93,7 +94,7 @@ class AppCloseChannelsConfigurationController(
                     val closableChannelsList = updatedChannelsList.filter {
                         isClosable(it.status)
                     }
-                    val address = peer.finalWallet.finalAddress
+                    val address = peer.phoenixFinalWallet.finalAddress
                     model(CloseChannelsConfiguration.Model.Ready(
                         channels = closableChannelsList,
                         address = address

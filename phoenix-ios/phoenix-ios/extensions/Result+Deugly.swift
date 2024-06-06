@@ -27,3 +27,19 @@ extension Result where Success == Void {
 		return .success(())
 	}
 }
+
+// These should exist in the standard library, but they don't.
+extension Result {
+	
+	var isSuccess: Bool {
+		if case .success = self {
+			return true
+		} else {
+			return false
+		}
+	}
+
+	var isError: Bool {
+		return !isSuccess
+	}
+}

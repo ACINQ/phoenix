@@ -351,7 +351,7 @@ class WatchTower {
 			// I.e. when the channel subscriptions are considered up-to-date.
 			
 			let minMillis = Date.now.toMilliseconds()
-			watchTowerListener = _peer.watcher.upToDatePublisher().sink { (millis: Int64) in
+			watchTowerListener = Biz.business.electrumWatcher.upToDatePublisher().sink { (millis: Int64) in
 				// millis => timestamp of when electrum watch was marked up-to-date
 				if millis > minMillis {
 					finishWatchTowerTask(/* didTimeout: */ false)
