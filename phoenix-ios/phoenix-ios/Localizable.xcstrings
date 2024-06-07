@@ -4714,47 +4714,6 @@
         }
       }
     },
-    "Access to Phoenix is protected" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الوصول إلى فينيكس محمي"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Přístup do Phoenixu je chráněn"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Zugang zu Phoenix ist geschützt"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El acceso a Phoenix está protegido"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El acceso a Phoenix está protegido"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "L'accès à Phoenix est protégé"
-          }
-        }
-      }
-    },
     "active commitments" : {
       "localizations" : {
         "ar" : {
@@ -6063,7 +6022,38 @@
       }
     },
     "An error occurred on a node in the payment route. The payment may succeed if you try again." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حدث خطأ في عقدة في مسار الدفع. قد تنجح عملية الدفع إذا حاولت مرة أخرى."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "V uzlu na trase platby došlo k chybě. Platba může být úspěšná, pokud se o ni pokusíte znovu."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bei einem Knoten in der Zahlungsroute ist ein Fehler aufgetreten. Die Zahlung kann erfolgreich sein, wenn Sie es erneut versuchen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se ha producido un error en un nodo de la ruta de pago. El pago puede tener éxito si lo intentas de nuevo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une erreur s'est produite sur un nœud de l'itinéraire de paiement. Le paiement peut réussir si vous réessayez."
+          }
+        }
+      }
     },
     "An on-chain operation will be likely required for you to receive this amount.\n\nThe fee is estimated to be around %@." : {
       "localizations" : {
@@ -6214,7 +6204,38 @@
       }
     },
     "An unknown error occurred and payment has failed." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حدث خطأ غير معروف وفشل الدفع."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Došlo k neznámé chybě a platba se nezdařila."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein unbekannter Fehler ist aufgetreten und die Zahlung ist fehlgeschlagen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se ha producido un error desconocido y el pago ha fallado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une erreur inconnue s'est produite et le paiement a échoué."
+          }
+        }
+      }
     },
     "An unknown error occurred." : {
       "comment" : "error details",
@@ -6623,7 +6644,38 @@
       }
     },
     "As you receive funds, liquidity will be consumed and become your balance. After one year, the remaining unused liquidity will be reclaimed by the service." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عندما تتلقى الأموال، سيتم استهلاك السيولة وتصبح رصيدك. بعد مرور عام واحد، ستستعيد الخدمة السيولة المتبقية غير المستخدمة."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jakmile obdržíte finanční prostředky, likvidita se spotřebuje a stane se vaším zůstatkem. Po jednom roce bude zbývající nespotřebovaná likvidita službou vyžádána zpět."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sobald Sie Geld erhalten, wird die Liquidität verbraucht und zu Ihrem Guthaben. Nach einem Jahr wird die verbleibende ungenutzte Liquidität vom Dienst zurückgefordert."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A medida que recibas fondos, la liquidez se consumirá y se convertirá en tu saldo. Al cabo de un año, la liquidez restante no utilizada será reclamada por el servicio."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Au fur et à mesure que vous recevez des fonds, les liquidités sont consommées et deviennent votre solde. Au bout d'un an, les liquidités non utilisées seront récupérées par le service."
+          }
+        }
+      }
     },
     "Attention: if the Bitcoin mempool feerate is high, incoming LN payments requiring an on-chain operation could be expensive." : {
       "localizations" : {
@@ -6748,7 +6800,39 @@
       }
     },
     "Authenticate to disable passcode fallback." : {
-      "comment" : "User prompt"
+      "comment" : "User prompt",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المصادقة لتعطيل رمز المرور الاحتياطي."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ověření pravosti pro vypnutí zpětného přístupu k přístupovému kódu."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authentifizieren, um den Passcode-Fallback zu deaktivieren."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autentificar para desactivar el código de acceso."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authentifier pour désactiver le repli par code d'accès."
+          }
+        }
+      }
     },
     "Authenticated" : {
       "comment" : "lnurl-auth: success text",
@@ -6913,7 +6997,38 @@
       }
     },
     "Available" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "متوفرة"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dostupné na"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verfügbar"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disponible"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disponible"
+          }
+        }
+      }
     },
     "Avoids payment correlation using timestamp metadata." : {
       "comment" : "Explanation for 'Randomize upload delays' toggle",
@@ -8620,47 +8735,6 @@
         }
       }
     },
-    "Cancelled Funds" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الأموال الملغاة"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zrušené fondy"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gestrichene Mittel"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fondos cancelados"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fondos cancelados"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fonds annulés"
-          }
-        }
-      }
-    },
     "Cannot create commit tx" : {
       "localizations" : {
         "ar" : {
@@ -8811,7 +8885,38 @@
       }
     },
     "Change PIN" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تغيير رقم التعريف الشخصي"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Změna kódu PIN"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN ändern"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar PIN"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier le code PIN"
+          }
+        }
+      }
     },
     "Channel closing" : {
       "comment" : "Payment description for channel closing",
@@ -9019,13 +9124,106 @@
       }
     },
     "Channel size impacted" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تأثر حجم القناة المتأثر"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ovlivněná velikost kanálu"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Größe des Kanals beeinträchtigt"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamaño del canal afectado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Taille du chenal affectée"
+          }
+        }
+      }
     },
     "Channels are already processing a splice. Try again later." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "القنوات تعالج بالفعل عملية الربط. حاول مرة أخرى في وقت لاحق."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kanály již zpracovávají spoje. Zkuste to později."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Kanäle verarbeiten bereits einen Spleiß. Versuchen Sie es später noch einmal."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los canales ya están procesando un empalme. Vuelve a intentarlo más tarde."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les canaux sont déjà en train de traiter une épissure. Réessayez plus tard."
+          }
+        }
+      }
     },
     "Channels are closing." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "القنوات تغلق"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kanály se uzavírají."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Kanäle schließen sich."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los canales se cierran."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les canaux se ferment."
+          }
+        }
+      }
     },
     "Channels are not available, try again later" : {
       "localizations" : {
@@ -10545,7 +10743,38 @@
       }
     },
     "Confirm new PIN" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تأكيد رقم التعريف الشخصي الجديد"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Potvrzení nového kódu PIN"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bestätigen Sie die neue PIN"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirmar nuevo PIN"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirmez le nouveau code PIN"
+          }
+        }
+      }
     },
     "Confirm Payment" : {
       "comment" : "Navigation bar title",
@@ -11763,7 +11992,38 @@
       }
     },
     "Correct" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "صحيح"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Správně"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Richtig"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Correcto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Correct"
+          }
+        }
+      }
     },
     "Could not connect to host:" : {
       "localizations" : {
@@ -12205,7 +12465,38 @@
       }
     },
     "Custom PIN" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "رقم التعريف الشخصي المخصص"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vlastní kód PIN"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benutzerdefinierte PIN"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN personalizado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN personnalisé"
+          }
+        }
+      }
     },
     "Customize amount" : {
       "extractionState" : "manual",
@@ -13690,7 +13981,39 @@
       }
     },
     "Disable PIN" : {
-      "comment" : "Navigation bar title"
+      "comment" : "Navigation bar title",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعطيل رقم التعريف الشخصي"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zakázat kód PIN"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN deaktivieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desactivar PIN"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Désactiver le code PIN"
+          }
+        }
+      }
     },
     "Disabled" : {
       "localizations" : {
@@ -14248,7 +14571,38 @@
       }
     },
     "Don't show this message again" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا تعرض هذه الرسالة مرة أخرى"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nezobrazujte tuto zprávu znovu"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Meldung nicht mehr anzeigen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No vuelvas a mostrar este mensaje"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ne plus afficher ce message"
+          }
+        }
+      }
     },
     "Don't use addresses from the previous version." : {
       "localizations" : {
@@ -14729,7 +15083,39 @@
       }
     },
     "Edit PIN" : {
-      "comment" : "Navigation bar title"
+      "comment" : "Navigation bar title",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحرير رقم التعريف الشخصي"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upravit kód PIN"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN bearbeiten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar PIN"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier le code PIN"
+          }
+        }
+      }
     },
     "elapsed" : {
       "comment" : "Label in SummaryInfoGrid",
@@ -15245,16 +15631,140 @@
       }
     },
     "Enter new PIN" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أدخل رقم تعريف شخصي جديد"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zadejte nový kód PIN"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neue PIN eingeben"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Introducir nuevo PIN"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez un nouveau code PIN"
+          }
+        }
+      }
     },
     "Enter Phoenix PIN" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أدخل رقم التعريف الشخصي لفينيكس"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zadejte kód PIN Phoenix"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phoenix-PIN eingeben"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Introduce el PIN de Phoenix"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez le code PIN de Phoenix"
+          }
+        }
+      }
     },
     "Enter PIN to authenticate" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أدخل رقم التعريف الشخصي للمصادقة"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zadejte PIN pro ověření"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN zur Authentifizierung eingeben"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Introduce el PIN para autentificarte"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez le code PIN pour vous authentifier"
+          }
+        }
+      }
     },
     "Enter PIN to confirm" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أدخل رقم التعريف الشخصي للتأكيد"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zadejte PIN pro potvrzení"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN zur Bestätigung eingeben"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Introduce el PIN para confirmar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez le code PIN pour confirmer"
+          }
+        }
+      }
     },
     "Error" : {
       "comment" : "Label in SummaryInfoGrid",
@@ -15695,7 +16205,38 @@
       }
     },
     "Expired" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "منتهية الصلاحية"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vypršela platnost"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abgelaufen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Caducado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expiré"
+          }
+        }
+      }
     },
     "Explore" : {
       "localizations" : {
@@ -15980,7 +16521,38 @@
       }
     },
     "Face ID" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "معرّف الوجه"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID obličeje"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesichtserkennung"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Face ID"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Face ID"
+          }
+        }
+      }
     },
     "FAILED" : {
       "localizations" : {
@@ -16305,7 +16877,38 @@
       }
     },
     "Fee is insufficient." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الرسوم غير كافية."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Poplatek je nedostatečný."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Gebühr ist unzureichend."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La tasa es insuficiente."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La redevance est insuffisante."
+          }
+        }
+      }
     },
     "Fee rate" : {
       "localizations" : {
@@ -17751,7 +18354,38 @@
       }
     },
     "Funds sent on-chain are taken from your side of the channel, reducing the channel size by the same amount. Your inbound liquidity remains the same." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يتم أخذ الأموال المرسلة على السلسلة من جانبك من القناة، مما يقلل من حجم القناة بنفس المقدار. تظل سيولتك الواردة كما هي."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prostředky odeslané v řetězci se odeberou z vaší strany kanálu, čímž se velikost kanálu sníží o stejnou částku. Vaše příchozí likvidita zůstává stejná."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die auf der Kette gesendeten Mittel werden von Ihrer Seite des Kanals entnommen, wodurch sich die Kanalgröße um denselben Betrag verringert. Ihre eingehende Liquidität bleibt die gleiche."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los fondos enviados en cadena se toman de tu lado del canal, reduciendo el tamaño del canal en la misma cantidad. Tu liquidez entrante sigue siendo la misma."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les fonds envoyés sur la chaîne sont prélevés de votre côté du canal, ce qui réduit la taille du canal du même montant. Vos liquidités entrantes restent les mêmes."
+          }
+        }
+      }
     },
     "Funds will eventually be sent to:" : {
       "localizations" : {
@@ -20425,7 +21059,38 @@
       }
     },
     "Incorrect" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "غير صحيح"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nesprávné"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Falsch"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Incorrecto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Incorrect"
+          }
+        }
+      }
     },
     "Increase value" : {
       "localizations" : {
@@ -24049,7 +24714,38 @@
       }
     },
     "Miner fee:" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "رسوم عامل المنجم:"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Poplatek pro horníky:"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bergwerksgebühr:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tasa de minero:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frais de minage :"
+          }
+        }
+      }
     },
     "miner fees" : {
       "localizations" : {
@@ -25085,48 +25781,6 @@
         }
       }
     },
-    "non-invoice payment" : {
-      "comment" : "Transaction Info: Explanation",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "دفع بدون فاتورة"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Platba bez faktury"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "rechnungslose Zahlung"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pago sin factura"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "pago sin factura"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "paiement spontané"
-          }
-        }
-      }
-    },
     "None" : {
       "comment" : "TextField placeholder",
       "localizations" : {
@@ -26056,7 +26710,38 @@
       }
     },
     "Options" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الخيارات"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Možnosti"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Optionen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opciones"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Options"
+          }
+        }
+      }
     },
     "other" : {
       "comment" : "Option in currency picker list. Sends user to Currency Converter",
@@ -26975,7 +27660,38 @@
       }
     },
     "Payment Failed" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "فشل الدفع"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Platba se nezdařila"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zahlung fehlgeschlagen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pago fallido"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Échec du paiement"
+          }
+        }
+      }
     },
     "payment hash" : {
       "comment" : "Label in DetailsView_IncomingPayment",
@@ -27296,48 +28012,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tranche de paiement #%lld"
-          }
-        }
-      }
-    },
-    "Payment Parts" : {
-      "comment" : "Title in DetailsView_IncomingPayment",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "أجزاء الدفعة"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Platební části"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zahlungsteile"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Partes de pago"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Partes del pago"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tranches de paiement"
           }
         }
       }
@@ -28189,47 +28863,6 @@
         }
       }
     },
-    "Phoenix can be accessed without credentials. Make sure that you have enabled adequate protections for iOS." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "يمكن الوصول إلى Phoenix بدون وسائل امان. تأكد من أنك قمت بتمكين الحماية الكافية لنظام iOS."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Phoenix je přístupný bez přihlašovacích údajů. Ujistěte se, že jste pro iOS povolili příslušné ochrany."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Auf Phoenix kann ohne Anmeldedaten zugegriffen werden. Vergewissere dich, dass du angemessene Schutzmaßnahmen für iOS aktiviert hast."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Se puede acceder a Phoenix sin credenciales. Asegúrese de haber habilitado las protecciones adecuadas para iOS."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Se puede acceder a Phoenix sin credenciales. Asegúrate de haber activado las protecciones adecuadas para iOS."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Phoenix peut être ouvert sans contrôle d'accès. Assurez-vous d’avoir mis en place des mesure de sécurité adéquate dans iOS."
-          }
-        }
-      }
-    },
     "Phoenix can restore your funds automatically." : {
       "localizations" : {
         "ar" : {
@@ -28553,10 +29186,72 @@
       }
     },
     "PIN" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "رقم التعريف الشخصي"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN"
+          }
+        }
+      }
     },
     "PIN mismatch!" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عدم تطابق رقم التعريف الشخصي"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neshoda PIN!"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die PIN stimmt nicht überein!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡PIN incorrecto!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur de code PIN !"
+          }
+        }
+      }
     },
     "Plan ahead to save money later" : {
       "localizations" : {
@@ -28795,7 +29490,38 @@
       }
     },
     "Please perform a backup before enabling any options here. If you lock yourself out of Phoenix without a backup of your recovery phrase, you will **lose your funds**!" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يرجى إجراء نسخة احتياطية قبل تمكين أي خيارات هنا. إذا قمت بحبس نفسك خارج فينيكس دون إجراء نسخة احتياطية من عبارة الاسترداد الخاصة بك، فسوف ** تخسر أموالك**!"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Před povolením jakýchkoli možností zde proveďte zálohování. Pokud se zablokujete ve Phoenixu bez zálohy fráze pro obnovení, **přijdete o své prostředky**!"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bitte erstellen Sie eine Sicherungskopie, bevor Sie die Optionen hier aktivieren. Wenn Sie sich ohne ein Backup Ihrer Wiederherstellungsphrase aus Phoenix aussperren, werden Sie Ihr Geld **verlieren**!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Por favor, realiza una copia de seguridad antes de activar cualquier opción aquí. ¡Si te bloqueas en Phoenix sin una copia de seguridad de tu frase de recuperación, **perderás tus fondos**!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veuillez effectuer une sauvegarde avant d'activer l'une ou l'autre des options proposées ici. Si vous vous enfermez hors de Phoenix sans avoir sauvegardé votre phrase de récupération, vous **perdrez vos fonds** !"
+          }
+        }
+      }
     },
     "Please restart Phoenix" : {
       "localizations" : {
@@ -29800,7 +30526,38 @@
       }
     },
     "Receive:" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "استلم:"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Přijímejte:"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empfangen:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recibe:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recevoir :"
+          }
+        }
+      }
     },
     "RECEIVED" : {
       "localizations" : {
@@ -30005,7 +30762,38 @@
       }
     },
     "Recipient is not reachable, or does not have enough inbound liquidity." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا يمكن الوصول إلى المتلقي، أو ليس لديه سيولة واردة كافية."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Příjemce není dosažitelný nebo nemá dostatečnou příchozí likviditu."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Empfänger ist nicht erreichbar oder hat nicht genügend eingehende Liquidität."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El destinatario no está localizable, o no tiene suficiente liquidez entrante."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le destinataire n'est pas joignable ou ne dispose pas de suffisamment de liquidités entrantes."
+          }
+        }
+      }
     },
     "recipient pubkey" : {
       "comment" : "Label in DetailsView_IncomingPayment",
@@ -30454,88 +31242,6 @@
         }
       }
     },
-    "Require Face ID" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تمكين Face ID"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vyžadováno Face ID"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Face ID voraussetzen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Requiere Face ID"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Requerir Face ID"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Authentification par Face ID"
-          }
-        }
-      }
-    },
-    "Require Touch ID" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تمكين بصمة الاصبع"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vyžadováno Touch ID"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Touch ID erforderlich machen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Requiere Touch ID"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Requerir Touch ID"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Authentification par TouchID"
-          }
-        }
-      }
-    },
     "Reset user preferences" : {
       "localizations" : {
         "ar" : {
@@ -30820,7 +31526,38 @@
       }
     },
     "Retry in %@" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إعادة المحاولة في %@"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opakování pokusu v %@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wiederholungsversuch in %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reintento en %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réessai dans %@"
+          }
+        }
+      }
     },
     "Review" : {
       "localizations" : {
@@ -31466,48 +32203,6 @@
         }
       }
     },
-    "Send Failed" : {
-      "comment" : "Title in DetailsView_IncomingPayment",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "فشل الإرسال"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Odeslání se nezdařilo"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Senden fehlgeschlagen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Envío fallido"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Error de envío"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Envoi échoué"
-          }
-        }
-      }
-    },
     "Send Funds" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -31831,7 +32526,38 @@
       }
     },
     "Sent" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم الإرسال"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odesláno"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesendet"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoyé"
+          }
+        }
+      }
     },
     "SENT" : {
       "comment" : "Confirm dialog that payment has been sent.",
@@ -32442,7 +33168,39 @@
       }
     },
     "Set PIN" : {
-      "comment" : "Navigation bar title"
+      "comment" : "Navigation bar title",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعيين رقم التعريف الشخصي"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nastavení kódu PIN"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN einstellen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Establecer PIN"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Définir le code PIN"
+          }
+        }
+      }
     },
     "Settings" : {
       "comment" : "Navigation bar title",
@@ -34188,7 +34946,38 @@
       }
     },
     "Spend expired swap-ins" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مبادلات منتهية الصلاحية منتهية الصلاحية"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utratit prošlé výměnné balíčky"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abgelaufene Swap-ins ausgeben"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gastar intercambios caducados"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dépensez les swap-ins périmés"
+          }
+        }
+      }
     },
     "Spending = pouring water out\nReceiving = adding more water" : {
       "localizations" : {
@@ -35633,7 +36422,38 @@
       }
     },
     "The expiry of this payment is too far in the future." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "انتهاء هذه الدفعة بعيد جداً في المستقبل."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Platnost této platby je příliš vzdálená."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Auslaufen dieser Zahlung liegt zu weit in der Zukunft."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El vencimiento de este pago está demasiado lejos en el futuro."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'échéance de ce paiement est trop lointaine."
+          }
+        }
+      }
     },
     "The fee is **%@%%** with a minimum fee of **%@**." : {
       "comment" : "IntroView",
@@ -35942,7 +36762,38 @@
       }
     },
     "The ID of the payment is not valid. Try again." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "معرف الدفع غير صالح. حاول مرة أخرى."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID platby není platné. Zkuste to znovu."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die ID der Zahlung ist nicht gültig. Versuchen Sie es erneut."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El ID del pago no es válido. Inténtalo de nuevo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'identifiant du paiement n'est pas valide. Réessayez."
+          }
+        }
+      }
     },
     "The invoice doesn't include an amount. This can be dangerous: malicious nodes may be able to steal your payment. To be safe, **ask the payee to specify an amount** in the payment request." : {
       "comment" : "SendView",
@@ -36197,25 +37048,242 @@
       }
     },
     "The payment amount is invalid." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مبلغ الدفع غير صالح."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Částka platby je neplatná."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Zahlungsbetrag ist ungültig."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El importe del pago no es válido."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le montant du paiement n'est pas valide."
+          }
+        }
+      }
     },
     "The payment amount is too big - try splitting it in several parts." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مبلغ الدفع كبير جداً - حاول تقسيمه على عدة أجزاء."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Částka platby je příliš vysoká - zkuste ji rozdělit na několik částí."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Zahlungsbetrag ist zu hoch - versuchen Sie, ihn in mehrere Teile aufzuteilen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El importe del pago es demasiado grande - intenta dividirlo en varias partes."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le montant du paiement est trop élevé - essayez de le diviser en plusieurs parties."
+          }
+        }
+      }
     },
     "The payment amount is too small." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مبلغ الدفع صغير للغاية."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Výše platby je příliš nízká."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Zahlungsbetrag ist zu gering."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El importe del pago es demasiado pequeño."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le montant du paiement est trop faible."
+          }
+        }
+      }
     },
     "The payment could not be relayed to the recipient (probably insufficient inbound liquidity)." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعذر ترحيل الدفعة إلى المستلم (ربما لعدم كفاية السيولة الواردة)."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Platbu se nepodařilo předat příjemci (pravděpodobně nedostatečná příchozí likvidita)."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Zahlung konnte nicht an den Empfänger weitergeleitet werden (wahrscheinlich unzureichende Liquidität im Eingang)."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El pago no pudo ser retransmitido al destinatario (probablemente insuficiente liquidez de entrada)."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le paiement n'a pas pu être transmis au destinataire (probablement manque de liquidités entrantes)."
+          }
+        }
+      }
     },
     "The payment could not be sent through your existing channels." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا يمكن إرسال الدفعة من خلال قنواتك الحالية."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Platbu nebylo možné odeslat prostřednictvím vašich stávajících kanálů."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Zahlung konnte nicht über Ihre bestehenden Kanäle übermittelt werden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se ha podido enviar el pago a través de tus canales existentes."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le paiement n'a pas pu être envoyé par vos canaux existants."
+          }
+        }
+      }
     },
     "The payment was rejected by the recipient. This particular invoice may have already been paid." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم رفض الدفع من قبل المستلم. قد تكون هذه الفاتورة المحددة قد تم دفعها بالفعل."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Příjemce platbu odmítl. Tato konkrétní faktura již mohla být uhrazena."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Zahlung wurde vom Empfänger abgelehnt. Die betreffende Rechnung wurde möglicherweise bereits bezahlt."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El pago fue rechazado por el destinatario. Es posible que esta factura en concreto ya se haya pagado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le paiement a été rejeté par le destinataire. Il se peut que cette facture ait déjà été payée."
+          }
+        }
+      }
     },
     "The recipient is offline." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المستلم غير متصل بالإنترنت."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Příjemce je offline."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Empfänger ist offline."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El destinatario está desconectado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le destinataire est hors ligne."
+          }
+        }
+      }
     },
     "The recovery phrase (sometimes called a seed), is a list of 12 words. It allows you to recover full access to your funds if needed." : {
       "localizations" : {
@@ -36618,7 +37686,38 @@
       }
     },
     "The wallet was restarted while the payment was processing." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تمت إعادة تشغيل المحفظة أثناء معالجة عملية الدفع."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Během zpracování platby byla peněženka restartována."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Brieftasche wurde neu gestartet, während die Zahlung verarbeitet wurde."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El monedero se reinició mientras se procesaba el pago."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le portefeuille a été redémarré pendant le traitement du paiement."
+          }
+        }
+      }
     },
     "The wallet will be completely deleted from **this device**." : {
       "localizations" : {
@@ -36741,45 +37840,35 @@
       }
     },
     "These funds were not swapped in time. Tap to spend." : {
-
-    },
-    "These funds were not swapped in time. Use the wallet's descriptor to access them." : {
-      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "لم يتم تبديل هذه الأموال في الوقت المناسب. استخدم واصف المحفظة للوصول إليها."
+            "value" : "لم يتم تبديل هذه الأموال في الوقت المناسب. انقر للإنفاق."
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tyto prostředky nebyly včas vyměněny. Pro přístup k nim použijte deskriptor peněženky."
+            "value" : "Tyto prostředky nebyly včas vyměněny. Klepněte na tlačítko utratit."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Diese Gelder wurden nicht rechtzeitig getauscht. Verwende den Deskriptor der Brieftasche, um auf sie zuzugreifen."
+            "value" : "Diese Mittel wurden nicht rechtzeitig umgetauscht. Zum Ausgeben antippen."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Estos fondos no se intercambiaron a tiempo. Utiliza el descriptor del monedero para acceder a ellos."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Estos fondos no se intercambiaron a tiempo. Usa el descriptor de la billetera para acceder a ellos."
+            "value" : "Estos fondos no se intercambiaron a tiempo. Toca para gastar."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ces fonds n'ont pas été échangés à temps. Utilise le descripteur du portefeuille pour y accéder."
+            "value" : "Ces fonds n'ont pas été échangés à temps. Tapez pour dépenser."
           }
         }
       }
@@ -37224,10 +38313,72 @@
       }
     },
     "This invoice has already been paid." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم دفع هذه الفاتورة بالفعل."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tato faktura již byla uhrazena."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Rechnung wurde bereits beglichen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta factura ya ha sido pagada."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette facture a déjà été payée."
+          }
+        }
+      }
     },
     "This invoice uses unsupported features. Make sure you're on the latest Phoenix version." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تستخدم هذه الفاتورة ميزات غير مدعومة. تأكد من أنك تستخدم أحدث إصدار من Phoenix."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tato faktura používá nepodporované funkce. Ujistěte se, že používáte nejnovější verzi Phoenixu."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Rechnung verwendet nicht unterstützte Funktionen. Stellen Sie sicher, dass Sie die neueste Phoenix-Version verwenden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta factura utiliza funciones no compatibles. Asegúrate de que estás en la última versión de Phoenix."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette facture utilise des fonctionnalités non prises en charge. Assurez-vous que vous disposez de la dernière version de Phoenix."
+          }
+        }
+      }
     },
     "This is a swap address. It is not controlled by your wallet. On-chain deposits sent to this address will be converted to Lightning channels." : {
       "extractionState" : "manual",
@@ -37266,88 +38417,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ceci est une adresse de swap. Elle n’est pas contrôlée par votre portefeuille. Les dépôts on-chain seront convertis en canaux de paiement Lightning."
-          }
-        }
-      }
-    },
-    "This is less secure, but more durable. Face ID can stop working due to hardware damage." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "هذا أقل أماناً، ولكنه أكثر متانة. يمكن أن يتوقف معرّف الوجه عن العمل بسبب تلف الأجهزة."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Je méně bezpečný, ale odolnější. Face ID může přestat fungovat kvůli poškození hardwaru."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Das ist weniger sicher, aber haltbarer. Face ID kann aufgrund von Hardwareschäden nicht mehr funktionieren."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esto es menos seguro, pero más duradero. Face ID puede dejar de funcionar debido a daños en el hardware."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esto es menos seguro, pero más duradero. Face ID puede dejar de funcionar si se daña el hardware."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cette méthode est moins sécurisée, mais plus durable. Face ID peut cesser de fonctionner en cas de dommages matériels."
-          }
-        }
-      }
-    },
-    "This is less secure, but more durable. Touch ID can stop working due to hardware damage." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "هذا أقل أماناً، ولكنه أكثر متانة. يمكن أن يتوقف معرّف اللمس عن العمل بسبب تلف الأجهزة."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Je méně bezpečný, ale odolnější. Touch ID může přestat fungovat kvůli poškození hardwaru."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Das ist weniger sicher, aber haltbarer. Touch ID kann aufgrund von Hardwareschäden nicht mehr funktionieren."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esto es menos seguro, pero más duradero. Touch ID puede dejar de funcionar debido a daños en el hardware."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esto es menos seguro, pero más duradero. Touch ID puede dejar de funcionar si se daña el hardware."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cette méthode est moins sûre, mais plus durable. TouchID peut cesser de fonctionner en cas de dommages matériels."
           }
         }
       }
@@ -37515,7 +38584,38 @@
       }
     },
     "This payment exceeds your balance." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هذه الدفعة تتجاوز رصيدك."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tato platba převyšuje váš zůstatek."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Zahlung übersteigt Ihren Saldo."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este pago supera tu saldo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce paiement dépasse votre solde."
+          }
+        }
+      }
     },
     "This screen is a debugging tool that can be used to manually import encrypted channels data.\n\nUse with caution." : {
       "localizations" : {
@@ -38042,7 +39142,38 @@
       }
     },
     "To enable a custom PIN, you must first disable the \"allow passcode fallback\" option." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لتمكين رقم تعريف شخصي مخصص، يجب عليك أولاً تعطيل خيار \"السماح بالرمز الاحتياطي لرمز المرور\"."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chcete-li povolit vlastní kód PIN, musíte nejprve zakázat možnost \"povolit zpětný přístupový kód\"."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um eine benutzerdefinierte PIN zu aktivieren, müssen Sie zunächst die Option \"Passcode-Fallback zulassen\" deaktivieren."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para activar un PIN personalizado, primero debes desactivar la opción \"Permitir código de acceso alternativo\"."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour activer un code PIN personnalisé, vous devez d'abord désactiver l'option \"Allow passcode fallback\"."
+          }
+        }
+      }
     },
     "To enable background payments:" : {
       "localizations" : {
@@ -38085,7 +39216,38 @@
       }
     },
     "To enable the \"allow passcode fallback\" option, you must first disable the custom PIN." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لتمكين خيار \"السماح بالرمز الاحتياطي لرمز المرور\"، يجب عليك أولاً تعطيل رقم التعريف الشخصي المخصص."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chcete-li povolit možnost \"povolit zpětný přístupový kód\", musíte nejprve zakázat vlastní kód PIN."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um die Option \"Passcode-Fallback zulassen\" zu aktivieren, müssen Sie zunächst die benutzerdefinierte PIN deaktivieren."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para activar la opción \"permitir código de acceso alternativo\", primero debes desactivar el PIN personalizado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour activer l'option \"autoriser le code de secours\", vous devez d'abord désactiver le code PIN personnalisé."
+          }
+        }
+      }
     },
     "To fix this re-enable Background App Refresh via: Settings -> General -> Background App Refresh" : {
       "extractionState" : "manual",
@@ -38824,7 +39986,38 @@
       }
     },
     "Touch ID" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "معرّف اللمس"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touch ID"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touch ID"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touch ID"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touch ID"
+          }
+        }
+      }
     },
     "transaction" : {
       "localizations" : {
@@ -40225,7 +41418,38 @@
       }
     },
     "Use this screen to spend your on-chain funds that were not swapped in time. The swap-in request has now expired. " : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "استخدم هذه الشاشة لإنفاق أموالك في السلسلة التي لم يتم تبديلها في الوقت المناسب. انتهت صلاحية طلب المبادلة الآن. "
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Na této obrazovce můžete utratit prostředky v řetězci, které nebyly včas vyměněny. Platnost žádosti o výměnu již vypršela. "
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwenden Sie diesen Bildschirm, um Ihre On-Chain-Gelder auszugeben, die nicht rechtzeitig getauscht wurden. Die Swap-In-Anforderung ist jetzt abgelaufen. "
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utiliza esta pantalla para gastar tus fondos en la cadena que no fueron canjeados a tiempo. La solicitud de canje ha caducado. "
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utilisez cet écran pour dépenser vos fonds sur la chaîne qui n'ont pas été échangés à temps. La demande de swap-in a maintenant expiré. "
+          }
+        }
+      }
     },
     "Version %@" : {
       "localizations" : {
@@ -41701,7 +42925,38 @@
       }
     },
     "Which PIN?" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أي رقم تعريف شخصي؟"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Který PIN?"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welche PIN?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Qué PIN?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quel code PIN ?"
+          }
+        }
+      }
     },
     "will be sent to:" : {
       "localizations" : {
@@ -42185,6 +43440,30 @@
     },
     "You are requesting an **initial** amount of liquidity. Liquidity is not constant over time: as you receive funds over Lightning, the liquidity will be consumed and become your balance.\n\nAfter one year, the remaining unused liquidity will be reclaimed by the service." : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أنت تطلب **مبلغًا مبدئيًا** من السيولة. السيولة ليست ثابتة بمرور الوقت: عندما تتلقى أموالاً على البرق، سيتم استهلاك السيولة وتصبح رصيدك.\n\nبعد مرور عام واحد، ستستعيد الخدمة السيولة المتبقية غير المستخدمة."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Žádáte o **počáteční** částku likvidity. Likvidita není v průběhu času konstantní: jak budete v průběhu Blesku přijímat finanční prostředky, likvidita se bude spotřebovávat a stane se vaším zůstatkem.\n\nPo jednom roce bude zbývající nevyužitá likvidita službou vyžádána zpět."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie fordern einen **anfänglichen** Betrag an Liquidität an. Die Liquidität ist im Laufe der Zeit nicht konstant: Wenn Sie im Laufe des Blitzes Geld erhalten, wird die Liquidität verbraucht und zu Ihrem Saldo.\n\nNach einem Jahr wird die verbleibende ungenutzte Liquidität vom Dienst zurückverlangt."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estás solicitando una cantidad **inicial** de liquidez. La liquidez no es constante a lo largo del tiempo: a medida que recibas fondos durante el Rayo, la liquidez se consumirá y se convertirá en tu saldo.\n\nAl cabo de un año, la liquidez restante no utilizada será reclamada por el servicio."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -43082,7 +44361,38 @@
       }
     },
     "You have too many pending payments. Try again once they are settled." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لديك الكثير من المدفوعات المعلقة. حاول مرة أخرى بمجرد تسويتها."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Máte příliš mnoho nevyřízených plateb. Zkuste to znovu, jakmile budou uhrazeny."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie haben zu viele ausstehende Zahlungen. Versuchen Sie es erneut, sobald diese beglichen sind."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tienes demasiados pagos pendientes. Vuelve a intentarlo cuando se hayan liquidado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous avez trop de paiements en attente. Réessayez une fois qu'ils seront réglés."
+          }
+        }
+      }
     },
     "You may be able to reduce your fees by increasing your bucket size ahead of a series of incoming payments." : {
       "localizations" : {
@@ -43442,10 +44752,72 @@
       }
     },
     "Your channel are not connected yet. Wait for a stable connection and try again." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "قناتك غير متصلة بعد. انتظر اتصالاً مستقراً وحاول مرة أخرى."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Váš kanál ještě není připojen. Počkejte na stabilní připojení a zkuste to znovu."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihr Kanal ist noch nicht verbunden. Warten Sie auf eine stabile Verbindung und versuchen Sie es erneut."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu canal aún no está conectado. Espera a tener una conexión estable e inténtalo de nuevo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vos canaux ne sont pas encore connectés. Attendez une connexion stable et réessayez."
+          }
+        }
+      }
     },
     "Your channel is still in the process of being opened. Wait and try again." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا تزال قناتك في طور الفتح. انتظر وحاول مرة أخرى."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Váš kanál je stále v procesu otevírání. Počkejte a zkuste to znovu."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihr Kanal wird noch nicht geöffnet. Warten Sie und versuchen Sie es erneut."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu canal aún está en proceso de apertura. Espera e inténtalo de nuevo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre canal est encore en cours d'ouverture. Attendez et réessayez."
+          }
+        }
+      }
     },
     "Your comment will be sent when you pay." : {
       "localizations" : {

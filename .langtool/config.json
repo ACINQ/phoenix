@@ -1,5 +1,16 @@
 {
   "androidResDirectory" : "phoenix-android/src/main/res/",
+  "deepL" : {
+    "es" : {
+      "formality" : "prefer_less"
+    },
+    "es-419" : {
+      "formality" : "prefer_less"
+    },
+    "fr" : {
+      "formality" : "prefer_more"
+    }
+  },
   "iosXcstringsFiles" : [
     "phoenix-ios/phoenix-ios/Localizable.xcstrings"
   ]
