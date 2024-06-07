@@ -277,7 +277,7 @@
     <string name="walletinfo_onchain_swapin_locked_description">Diese Guthaben werden ab %1$s Tagen verfügbar sein.</string>
 
     <string name="walletinfo_onchain_swapin_refund_title">Abgebrochen</string>
-    <string name="walletinfo_onchain_swapin_refund_description">Diese Guthaben konnten nicht rechtzeitig getauscht werden.</string>
+    <string name="walletinfo_onchain_swapin_refund_description">Diese Guthaben konnten nicht rechtzeitig getauscht werden. Tippen Sie auf, um diese Guthaben auszugeben.</string>
 
     <string name="walletinfo_onchain_final_about">Eine On-Chain-Wallet, die von Ihrem Seed abgeleitet ist.\n\nWenn Ihre Lightning-Kanäle geschlossen werden, werden die entsprechenden Guthaben standardmäßig an die finale Wallet gesendet.</string>
 

@@ -278,7 +278,7 @@
     <string name="walletinfo_onchain_swapin_locked_description">Estos fondos estarán disponibles dentro de %1$s días.</string>
 
     <string name="walletinfo_onchain_swapin_refund_title">Fondos cancelados</string>
-    <string name="walletinfo_onchain_swapin_refund_description">Estos fondos no se intercambiaron a tiempo.</string>
+    <string name="walletinfo_onchain_swapin_refund_description">Estos fondos no se intercambiaron a tiempo. Toque para gastar estos fondos.</string>
 
     <string name="walletinfo_onchain_final_about">Una billetera en la cadena derivada de tu semilla.\n\nLa billetera final es adonde se envían los fondos de forma predeterminada cuando se cierren tus canales de Lightning.</string>
 

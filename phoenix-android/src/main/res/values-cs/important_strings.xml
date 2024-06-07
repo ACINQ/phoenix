@@ -279,7 +279,7 @@
     <string name="walletinfo_onchain_swapin_locked_description">Tyto prostředky budou k dispozici za %1$s dní.</string>
 
     <string name="walletinfo_onchain_swapin_refund_title">Zrušené prostředky</string>
-    <string name="walletinfo_onchain_swapin_refund_description">Tyto prostředky nebyly včas vyměněny.</string>
+    <string name="walletinfo_onchain_swapin_refund_description">Tyto prostředky nebyly včas vyměněny. Klepnutím na tlačítko tyto prostředky utratíte.</string>
 
     <string name="walletinfo_onchain_final_about">On-Chain peněženka odvozená od vašeho seedu.\n\nKonečná peněženka je místo, kam se ve výchozím nastavení posílají prostředky, když jsou vaše Lightning kanály uzavřeny.</string>
 
