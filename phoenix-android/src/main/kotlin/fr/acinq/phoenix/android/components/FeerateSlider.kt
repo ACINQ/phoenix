@@ -36,10 +36,12 @@ import fr.acinq.phoenix.data.MempoolFeerate
 fun FeerateSlider(
     feerate: Satoshi,
     onFeerateChange: (Satoshi) -> Unit,
-    mempoolFeerate: MempoolFeerate?
+    mempoolFeerate: MempoolFeerate?,
+    enabled: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     var showUnknownMempoolStateDialog by remember { mutableStateOf(false) }
-    Column {
+    Column(modifier = modifier) {
         // the actual value of the feerate, in sat/vbyte
         Text(text = stringResource(id = R.string.cpfp_feerate_value, feerate.sat), style = MaterialTheme.typography.body2)
 
@@ -72,13 +74,13 @@ fun FeerateSlider(
             CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.body1.copy(fontSize = 14.sp)) {
                 when {
                     feerate >= mempoolFeerate.fastest.feerate -> {
-                        Text(text = stringResource(id = R.string.mempool_fastest), maxLines = 1)
+                        Text(text = stringResource(id = R.string.mempool_fastest), maxLines = 1, modifier = Modifier.padding(vertical = 1.dp))
                     }
                     feerate >= mempoolFeerate.halfHour.feerate -> {
-                        Text(text = stringResource(id = R.string.mempool_halfhour), maxLines = 1)
+                        Text(text = stringResource(id = R.string.mempool_halfhour), maxLines = 1, modifier = Modifier.padding(vertical = 1.dp))
                     }
                     feerate >= mempoolFeerate.hour.feerate -> {
-                        Text(text = stringResource(id = R.string.mempool_hour), maxLines = 1)
+                        Text(text = stringResource(id = R.string.mempool_hour), maxLines = 1, modifier = Modifier.padding(vertical = 1.dp))
                     }
                     else -> {
                         TextWithIcon(text = stringResource(id = R.string.mempool_slow), icon = R.drawable.ic_alert_triangle, iconTint = MaterialTheme.colors.onSurface, space = 4.dp, maxLines = 1)
@@ -94,7 +96,8 @@ fun FeerateSlider(
             amount = feerate,
             onAmountChange = onFeerateChange,
             minAmount = mempoolFeerate?.minimum?.feerate ?: 1.sat,
-            maxAmount = mempoolFeerate?.fastest?.feerate?.times(2) ?: 500.sat
+            maxAmount = mempoolFeerate?.fastest?.feerate?.times(2) ?: 500.sat,
+            enabled = enabled
         )
     }
 }

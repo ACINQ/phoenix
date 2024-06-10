@@ -36,7 +36,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -58,10 +57,10 @@ import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.IconPopup
 import fr.acinq.phoenix.android.components.TextWithIcon
+import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.data.Notification
 import fr.acinq.phoenix.utils.extensions.nextTimeout
@@ -75,11 +74,11 @@ fun SwapInWallet(
     onBackClick: () -> Unit,
     onViewChannelPolicyClick: () -> Unit,
     onAdvancedClick: () -> Unit,
+    onSpendRefundable: () -> Unit,
 ) {
-    val context = LocalContext.current
     val btcUnit = LocalBitcoinUnit.current
 
-    val liquidityPolicyInPrefs by UserPrefs.getLiquidityPolicy(context).collectAsState(null)
+    val liquidityPolicyInPrefs by userPrefs.getLiquidityPolicy.collectAsState(null)
     val swapInWallet by business.peerManager.swapInWallet.collectAsState()
     var showAdvancedMenuPopIn by remember { mutableStateOf(false) }
 
@@ -163,7 +162,7 @@ fun SwapInWallet(
                 }
 
                 if (wallet.readyForRefund.balance > 0.sat) {
-                    RefundView(wallet = wallet)
+                    RefundView(wallet = wallet, onSpendRefundable = onSpendRefundable)
                 }
             }
         }
@@ -284,7 +283,7 @@ private fun LockedView(
         }
         Text(
             text = stringResource(id = R.string.walletinfo_onchain_swapin_locked_description, (closestRefundBlockWait.toDouble() / 144).roundToInt()),
-            style = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
+            style = MaterialTheme.typography.body1.copy(fontSize = 14.sp),
         )
     }
 }
@@ -292,17 +291,20 @@ private fun LockedView(
 @Composable
 private fun RefundView(
     wallet: WalletState.WalletWithConfirmations,
+    onSpendRefundable: () -> Unit,
 ) {
     CardHeader(text = stringResource(id = R.string.walletinfo_onchain_swapin_refund_title))
     Card(
         modifier = Modifier.fillMaxWidth(),
-        internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+        onClick = onSpendRefundable,
     ) {
-        BalanceRow(balance = wallet.readyForRefund.balance.toMilliSatoshi())
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = stringResource(id = R.string.walletinfo_onchain_swapin_refund_description),
-            style = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
-        )
+        Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+            BalanceRow(balance = wallet.readyForRefund.balance.toMilliSatoshi())
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = stringResource(id = R.string.walletinfo_onchain_swapin_refund_description),
+                style = MaterialTheme.typography.body1.copy(fontSize = 14.sp),
+            )
+        }
     }
 }

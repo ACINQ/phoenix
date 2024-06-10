@@ -34,10 +34,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
@@ -51,9 +49,7 @@ import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.SettingSwitch
 import fr.acinq.phoenix.android.components.feedback.WarningMessage
 import fr.acinq.phoenix.android.components.enableOrFade
-import fr.acinq.phoenix.android.utils.Converter.toPrettyString
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
-import fr.acinq.phoenix.data.BitcoinUnit
+import fr.acinq.phoenix.android.userPrefs
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -61,14 +57,14 @@ import kotlin.math.roundToInt
 fun AdvancedIncomingFeePolicy(
     onBackClick: () -> Unit
 ) {
-    val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val userPrefs = userPrefs
     val peerManager = business.peerManager
     val notificationsManager = business.notificationsManager
 
-    val maxSatFeePrefsFlow = UserPrefs.getIncomingMaxSatFeeInternal(context).collectAsState(null)
-    val maxPropFeePrefsFlow = UserPrefs.getIncomingMaxPropFeeInternal(context).collectAsState(null)
-    val liquidityPolicyInPrefsFlow = UserPrefs.getLiquidityPolicy(context).collectAsState(null)
+    val maxSatFeePrefsFlow = userPrefs.getIncomingMaxSatFeeInternal.collectAsState(null)
+    val maxPropFeePrefsFlow = userPrefs.getIncomingMaxPropFeeInternal.collectAsState(null)
+    val liquidityPolicyInPrefsFlow = userPrefs.getLiquidityPolicy.collectAsState(null)
 
     DefaultScreenLayout {
         DefaultScreenHeader(
@@ -128,7 +124,7 @@ fun AdvancedIncomingFeePolicy(
                         onClick = {
                             scope.launch {
                                 newPolicy?.let {
-                                    UserPrefs.saveLiquidityPolicy(context, newPolicy)
+                                    userPrefs.saveLiquidityPolicy(newPolicy)
                                     peerManager.updatePeerLiquidityPolicy(newPolicy)
                                     notificationsManager.dismissAllNotifications()
                                 }

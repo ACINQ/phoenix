@@ -93,7 +93,7 @@
     <string name="initwallet_restore">Restaurer mon wallet</string>
 
     <string name="restore_disclaimer_message">Phoenix ne restaure que les fonds off-chain qu\'il avait déjà gérés.\n\nImporter une seed qui n\'a pas été créée par Phoenix ne restaurera aucun fonds.\n\nVeuillez également vous assurer que cette seed n\'est pas déjà utilisée sur un autre wallet Phoenix.</string>
-    <string name="restore_disclaimer_checkbox">Je comprends.</string>
+    <string name="utils_ack">Je comprends.</string>
 
     <string name="restore_instructions">La clé (ou seed) de votre wallet est une liste de 12 mots en anglais. Entrez chaque mot de cette liste dans la zone de saisie ci-dessous.</string>
     <string name="restore_input_label">Saisie du mot %1$s</string>
@@ -130,9 +130,6 @@
     <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Des frais de %1$s sont estimés pour recevoir ce montant, ce qui représente plus de %2$s%% du montant.\n\nAugmentez cette limite, ou bien demandez de la liquidité supplémentaire.</string>
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Votre liquidité entrante est insuffisante pour ce montant, et la gestion automatisée des channels est désactivée.</string>
-
-    <string name="receive_onchain_legacy_warning_title">Note suite à la migration</string>
-    <string name="receive_onchain_legacy_warning">Il s\'agit de votre nouvelle adresse. Ne réutilisez pas vos anciennes adresses Bitcoin d\'avant la migration !</string>
 
     <!-- scanning errors -->
 
@@ -283,7 +280,7 @@
     <string name="walletinfo_onchain_swapin_locked_description">Ces fonds seront disponibles d\'ici %1$s jours.</string>
 
     <string name="walletinfo_onchain_swapin_refund_title">Annulés</string>
-    <string name="walletinfo_onchain_swapin_refund_description">Ces fonds n\'ont pas été swappés à temps. Utilisez le descriptor du wallet pour accéder à ces fonds.</string>
+    <string name="walletinfo_onchain_swapin_refund_description">Ces fonds n\'ont pas été swappés à temps. Cliquez ici pour dépenser ces fonds.</string>
 
     <string name="walletinfo_onchain_final_about">Un wallet on-chain dérivé de votre clé.\n\nLe wallet final est par défaut là où les fonds seront envoyés lorsqu\'un canal de paiement ferme.</string>
 
@@ -347,10 +344,15 @@
     <string name="liquidityads_estimate_above_25">Le total des frais est supérieur à 25% du montant de liquidité demandé.</string>
     <string name="liquidityads_over_balance">Le total des frais dépasse votre solde.</string>
 
+    <string name="liquidityads_review_button">Valider</string>
+    <string name="liquidityads_disclaimer_body1">Cette demande est pour un montant <b>initial</b> de liquidité. Cette liquidité n\'est pas constante dans le temps : au fur et à mesure que vous recevrez des fonds, elle sera consommée et deviendra votre solde.</string>
+    <string name="liquidityads_disclaimer_body2">Au bout d\'un an, la liquidité non consommée sera récupérée par le service.</string>
+
     <string name="liquidityads_request_button">Accepter</string>
     <string name="liquidityads_requesting_spinner">Traitement du splice…</string>
 
     <string name="liquidityads_success">Liquidité ajoutée avec succès!</string>
+    <string name="liquidityads_success_amount">Montant ajouté : %1$s</string>
 
     <string name="liquidityads_error_header">La demande de liquidité a échoué</string>
     <string name="liquidityads_error_channels_unavailable">Vos canaux ne sont pas disponibles. Réessayez plus tard.</string>
@@ -367,14 +369,59 @@
 
     <!-- Lightning payment errors -->
 
-    <string name="outgoing_finalfailure_alreadypaid">Ce paiement a déjà été réglé.</string>
-    <string name="outgoing_finalfailure_noroutefound">Le destinataire de ce paiement n\'est pas joignable, ou bien ne dispose pas de suffisamment de liquidité entrante.</string>
+    <string name="outgoing_failuremessage_channel_closing">Les canaux de paiements sont en clôture.</string>
+    <string name="outgoing_failuremessage_channel_splicing">Un splice est déjà en cours de traitement. Réessayez plus tard.</string>
+    <string name="outgoing_failuremessage_not_enough_fee">Les frais sont insuffisants.</string>
+    <string name="outgoing_failuremessage_not_enough_balance">Ce paiement dépasse votre solde.</string>
+    <string name="outgoing_failuremessage_too_big">Le montant du paiement est trop élevé - essayez de le diviser en plusieurs parties.</string>
+    <string name="outgoing_failuremessage_too_small">Le montant du paiement est trop faible.</string>
+    <string name="outgoing_failuremessage_expiry_too_big">L\'échéance de ce paiement est trop lointaine.</string>
+    <string name="outgoing_failuremessage_rejected_by_recipient">Le paiement a été rejeté par le destinataire. Il se peut que ce paiement ait déjà été payée.</string>
+    <string name="outgoing_failuremessage_recipient_offline">Le destinataire est hors ligne.</string>
+    <string name="outgoing_failuremessage_not_enough_liquidity">Le paiement n\'a pas pu être transmis au destinataire. Il est probable qu\'il n\'ait pas suffisamment de liquidité entrante.</string>
+    <string name="outgoing_failuremessage_temporary_failure">Une erreur est survenue sur le trajet du paiement. Le paiement peut réussir si vous réessayez.</string>
+    <string name="outgoing_failuremessage_too_many_pending">Vous avez trop de paiements en attente. Réessayez une fois qu\'il sont terminés.</string>
+
+    <string name="outgoing_failuremessage_invalid_id">L\'identifiant du paiement n\'est pas valide. Réessayez.</string>
+    <string name="outgoing_failuremessage_not_connected">Votre canal de paiement n\'est pas encore connecté. Réessayez une fois que la connexion est stable.</string>
+    <string name="outgoing_failuremessage_channel_opening">Votre canal de paiement est toujours en cours d\'ouverture. Attendez et réessayez.</string>
+    <string name="outgoing_failuremessage_unsupported_features">Cette requête de paiement utilise des fonctionnalités non supportées. Assurez-vous que Phoenix soit à jour.</string>
+    <string name="outgoing_failuremessage_invalid_amount">Le montant du paiement n\'est pas valide.</string>
+    <string name="outgoing_failuremessage_no_available_channels">Le paiement n\'a pas pu être envoyé via les canaux disponibles.</string>
+    <string name="outgoing_failuremessage_unknown">Une erreur inconnue s\'est produite et le paiement a échoué.</string>
+    <string name="outgoing_failuremessage_restarted">Le portefeuille a été redémarré pendant le traitement du paiement.</string>
+
+    <string name="outgoing_failuremessage_alreadypaid">Ce paiement a déjà été réglé.</string>
+    <string name="outgoing_failuremessage_noroutefound">Le destinataire de ce paiement n\'est pas joignable, ou bien ne dispose pas de suffisamment de liquidité entrante.</string>
 
     <!-- low feerate disclaimer -->
 
-    <string name="send_low_feerate_dialog_title">Frais faibles!</string>
-    <string name="send_low_feerate_dialog_body1">Les transactions utilisant des frais trop faibles peuvent rester en attente de confirmation pendant des jours, voire des semaines.</string>
-    <string name="send_low_feerate_dialog_body2">Le choix des frais est de votre responsabilité. Une fois envoyé, ce paiement ne pourra pas être annulé, seulement accéléré en utilisant des frais plus élevés.</string>
-    <string name="send_low_feerate_dialog_body3">Êtes-vous sûr de vouloir continuer ?</string>
+    <string name="spliceout_low_feerate_dialog_title">Frais faibles!</string>
+    <string name="spliceout_low_feerate_dialog_body1">Les transactions utilisant des frais trop faibles peuvent rester en attente de confirmation pendant des jours, voire des semaines.</string>
+    <string name="spliceout_low_feerate_dialog_body2">Le choix des frais est de votre responsabilité. Une fois envoyé, ce paiement ne pourra pas être annulé, seulement accéléré en utilisant des frais plus élevés.</string>
+    <string name="spliceout_low_feerate_dialog_body3">Êtes-vous sûr de vouloir continuer ?</string>
+
+    <!-- spliceout: capacity disclaimer -->
+
+    <string name="spliceout_capacity_disclaimer_title">Capacité impactée</string>
+    <string name="spliceout_capacity_disclaimer_body1">Les fonds envoyés proviennent de votre côté du canal, ce qui mécaniquement réduit le canal du même montant. La liquidité entrante reste inchangée.</string>
+    <string name="spliceout_capacity_disclaimer_checkbox">Ne plus afficher ce message.</string>
+
+    <!-- Spend swap-in refund -->
+
+    <string name="swapinrefund_title">Dépenser un swap-in expiré</string>
+    <string name="swapinrefund_none_available_label">Aucun swap-in expiré.</string>
+    <string name="swapinrefund_available_label">Fonds disponibles : <b>%1$s</b> (%2$s)</string>
+    <string name="swapinrefund_instructions_1">Utilisez cet écran pour dépenser des dépôts on-chain qui n\'ont pas été basculés sur Lightning à temps. Notez que cela n\'affecte en rien vos canaux Lightning.</string>
+    <string name="swapinrefund_instructions_2">Assurez vous que l\'adresse de destination est correcte et les frais raisonnables.</string>
+    <string name="swapinrefund_estimate_button">Estimer les frais</string>
+    <string name="swapinrefund_estimating">Estimation des frais…</string>
+    <string name="swapinrefund_send_button">Publier</string>
+    <string name="swapinrefund_sending">Envoi des fonds…</string>
+    <string name="swapinrefund_failed">Erreur de transaction.</string>
+    <string name="swapinrefund_failed_address">L\'adresse n\'est pas valide.</string>
+    <string name="swapinrefund_failed_cannot_create">Impossible de créer la transaction de recouvrement. Veuillez réessayer.</string>
+    <string name="swapinrefund_success">Transaction publiée.</string>
+    <string name="swapinrefund_success_details">Vous pouvez trouver la transaction ci-dessous. Elle n\'apparaîtra pas dans votre historique de paiements, donc faites en copie maintenant si besoin.</string>
 
 </resources>

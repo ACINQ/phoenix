@@ -61,7 +61,6 @@ import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.phoenix.android.AppViewModel
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.BorderButton
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Card
@@ -69,12 +68,13 @@ import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
+import fr.acinq.phoenix.android.internalData
 import fr.acinq.phoenix.android.security.SeedFileState
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.services.NodeServiceState
+import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.BiometricsHelper
 import fr.acinq.phoenix.android.utils.Logging
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.errorOutlinedTextFieldColors
 import fr.acinq.phoenix.android.utils.findActivity
 import fr.acinq.phoenix.android.utils.logger
@@ -94,8 +94,8 @@ fun StartupView(
 ) {
     val context = LocalContext.current
     val serviceState by appVM.serviceState.observeAsState()
-    val showIntro by application.internalDataRepository.getShowIntro.collectAsState(initial = null)
-    val isLockActiveState by UserPrefs.getIsScreenLockActive(context).collectAsState(initial = null)
+    val showIntro by internalData.getShowIntro.collectAsState(initial = null)
+    val isLockActiveState by userPrefs.getIsScreenLockActive.collectAsState(initial = null)
 
     Column(
         modifier = Modifier

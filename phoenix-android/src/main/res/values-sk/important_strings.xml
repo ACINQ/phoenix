@@ -93,7 +93,7 @@
     <string name="initwallet_restore">Obnoviť moju peňaženku</string>
 
     <string name="restore_disclaimer_message">Phoenix môže obnoviť len off-chain prostriedky, ktoré boli spravované touto aplikáciou.\n\nImportom obnovovacej frázy, ktorá NEBOLA vytvorená aplikáciou Phoenix, sa neobnovia žiadne prostriedky.\n\nUistite sa tiež, že už nie je spustená iná aplikácia Phoenix s tou istou obnovovacou frázou.</string>
-    <string name="restore_disclaimer_checkbox">Rozumiem.</string>
+    <string name="utils_ack">Rozumiem.</string>
 
     <string name="restore_instructions">Obnovovacia fráza (seed) vašej peňaženky je zoznam 12 anglických slov. Každé slovo z tohto zoznamu napíšte do nižšie uvedeného poľa.</string>
     <string name="restore_input_label">Zadajte slovo #%1$s</string>
@@ -129,9 +129,6 @@
     <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Očakáva sa, že tento poplatok bude vo výške %1$s, a tento poplatok je vyšší než %2$s% sumy.\n\nZvýšte tento limit v nastavení správy kanálov alebo požiadajte o dodatočnú likviditu.</string>
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Prichádzajúca likvidita nie je dostatočná a máte zakázanú automatickú správu kanálov.</string>
-
-    <string name="receive_onchain_legacy_warning_title">Oznámenie o migrácii</string>
-    <string name="receive_onchain_legacy_warning">Toto je vaša nová adresa. Neopakujte použitie svojich starých Bitcoin adres z doby pred migráciou!</string>
 
     <!-- scanning errors -->
 
@@ -282,7 +279,7 @@
     <string name="walletinfo_onchain_swapin_locked_description">Tieto prostriedky budú k dispozícii za %1$s dní.</string>
 
     <string name="walletinfo_onchain_swapin_refund_title">Zrušené prostriedky</string>
-    <string name="walletinfo_onchain_swapin_refund_description">Tieto prostriedky neboli včas vymenené. Pre ich získanie použite deskriptor peňaženky.</string>
+    <string name="walletinfo_onchain_swapin_refund_description">Tieto prostriedky neboli včas vymenené. Klepnutím na minúť tieto prostriedky.</string>
 
     <string name="walletinfo_onchain_final_about">On-chain peňaženka odvodená z vášho seedu.\n\nKonečná peňaženka je miesto, kam sa v predvolenom nastavení posielajú prostriedky, keď sú vaše Lightning kanály zatvorené.</string>
 
@@ -347,10 +344,15 @@
     <string name="liquidityads_estimate_above_25">Celkový poplatok je vyšší ako 25 % požadovanej sumy.</string>
     <string name="liquidityads_over_balance">Celkové poplatky presahujú váš zostatok.</string>
 
+    <string name="liquidityads_review_button">Preskúmanie žiadosti</string>
+    <string name="liquidityads_disclaimer_body1">Žiadate o počiatočnú sumu likvidity. Likvidita nie je v priebehu času konštantná: ako budete prijímať finančné prostriedky v priebehu Blesku, likvidita sa spotrebuje a stane sa vaším zostatkom.</string>
+    <string name="liquidityads_disclaimer_body2">Po jednom roku bude služba zvyšnú nevyužitú likviditu požadovať späť.</string>
+
     <string name="liquidityads_request_button">Prijať</string>
     <string name="liquidityads_requesting_spinner">Spracúva sa splice…</string>
 
     <string name="liquidityads_success">Likvidita bola úspešne pridaná!</string>
+    <string name="liquidityads_success_amount">Pridaná suma: %1$s</string>
 
     <string name="liquidityads_error_header">Žiadosť o likviditu zlyhala</string>
     <string name="liquidityads_error_channels_unavailable">Kanály nie sú k dispozícii. Skúste to neskôr.</string>
@@ -367,14 +369,59 @@
 
     <!-- Lightning payment errors -->
 
-    <string name="outgoing_finalfailure_alreadypaid">Táto platba už bola uhradená.</string>
-    <string name="outgoing_finalfailure_noroutefound">Príjemca nie je dosiahnuteľný alebo nemá dostatočnú prichádzajúcu likviditu.</string>
+    <string name="outgoing_failuremessage_channel_closing">Kanály sa zatvárajú.</string>
+    <string name="outgoing_failuremessage_channel_splicing">Kanály už spracovávajú splicing. Skúste to neskôr.</string>
+    <string name="outgoing_failuremessage_not_enough_fee">Poplatok je nedostatočný.</string>
+    <string name="outgoing_failuremessage_not_enough_balance">Táto platba presahuje váš zostatok.</string>
+    <string name="outgoing_failuremessage_too_big">Suma platby je príliš veľká - skúste ju rozdeliť na viac častí.</string>
+    <string name="outgoing_failuremessage_too_small">Suma platby je príliš malá.</string>
+    <string name="outgoing_failuremessage_expiry_too_big">Uplynutie platnosti tejto platby je príliš ďaleko v budúcnosti.</string>
+    <string name="outgoing_failuremessage_rejected_by_recipient">Príjemca platbu odmietol. Táto konkrétna faktúra už mohla byť zaplatená.</string>
+    <string name="outgoing_failuremessage_recipient_offline">Príjemca je offline.</string>
+    <string name="outgoing_failuremessage_not_enough_liquidity">Platba nemohla byť postúpená príjemcovi (pravdepodobne nedostatočná likvidita na príchode).</string>
+    <string name="outgoing_failuremessage_temporary_failure">Na uzle v platobnej trase došlo k chybe. Platba môže byť úspešná, ak sa o to pokúsite znova.</string>
+    <string name="outgoing_failuremessage_too_many_pending">Máte príliš veľa čakajúcich platieb. Skúste to znova, keď budú vyrovnané.</string>
+
+    <string name="outgoing_failuremessage_invalid_id">Identifikátor platby nie je platný. Skúste to znova.</string>
+    <string name="outgoing_failuremessage_not_connected">Váš kanál ešte nie je pripojený. Počkajte na stabilné pripojenie a skúste to znova.</string>
+    <string name="outgoing_failuremessage_channel_opening">Váš kanál je stále v procese otvárania. Počkajte a skúste to znova.</string>
+    <string name="outgoing_failuremessage_unsupported_features">Táto faktúra používa nepodporované funkcie. Uistite sa, že používate najnovšiu verziu programu Phoenix.</string>
+    <string name="outgoing_failuremessage_invalid_amount">Suma platby je neplatná.</string>
+    <string name="outgoing_failuremessage_no_available_channels">Platbu nebolo možné odoslať prostredníctvom existujúcich kanálov.</string>
+    <string name="outgoing_failuremessage_unknown">Nastala neznáma chyba a platba zlyhala.</string>
+    <string name="outgoing_failuremessage_restarted">Peňaženka bola reštartovaná počas spracovania platby.</string>
+
+    <string name="outgoing_failuremessage_alreadypaid">Táto platba už bola uhradená.</string>
+    <string name="outgoing_failuremessage_noroutefound">Príjemca nie je dosiahnuteľný alebo nemá dostatočnú prichádzajúcu likviditu.</string>
 
     <!-- low feerate disclaimer -->
 
-    <string name="send_low_feerate_dialog_title">Nízke poplatky!</string>
-    <string name="send_low_feerate_dialog_body1">Platby s nízkymi poplatkami môžu trvať niekoľko dní alebo týždňov bez potvrdenia.</string>
-    <string name="send_low_feerate_dialog_body2">Výber poplatkov je na vašu zodpovednosť. Po odoslaní nemožno túto platbu zrušiť, iba urýchliť vyššími poplatkami.</string>
-    <string name="send_low_feerate_dialog_body3">Ste si istí, že chcete pokračovať?</string>
+    <string name="spliceout_low_feerate_dialog_title">Nízke poplatky!</string>
+    <string name="spliceout_low_feerate_dialog_body1">Platby s nízkymi poplatkami môžu trvať niekoľko dní alebo týždňov bez potvrdenia.</string>
+    <string name="spliceout_low_feerate_dialog_body2">Výber poplatkov je na vašu zodpovednosť. Po odoslaní nemožno túto platbu zrušiť, iba urýchliť vyššími poplatkami.</string>
+    <string name="spliceout_low_feerate_dialog_body3">Ste si istí, že chcete pokračovať?</string>
+
+    <!-- spliceout: capacity disclaimer -->
+
+    <string name="spliceout_capacity_disclaimer_title">Vplyv na veľkosť kanála</string>
+    <string name="spliceout_capacity_disclaimer_body1">Finančné prostriedky odoslané sa odoberú z vašej strany kanála, čím sa zníži veľkosť kanála o rovnakú sumu. Vaša prichádzajúca likvidita zostáva nezmenená.</string>
+    <string name="spliceout_capacity_disclaimer_checkbox">Túto správu už nezobrazujte.</string>
+
+    <!-- Spend swap-in refund -->
+
+    <string name="swapinrefund_title">Stráviť výmenu, ktorej platnosť vypršala</string>
+    <string name="swapinrefund_none_available_label">Žiadny swap-in nevypršal.</string>
+    <string name="swapinrefund_available_label">Dostupné finančné prostriedky: <b>%1$s</b> (%2$s)</string>
+    <string name="swapinrefund_instructions_1">Na tejto obrazovke môžete minúť vklady v reťazci, ktoré neboli včas prevedené na Lightning. Upozorňujeme, že to nijako neovplyvňuje vaše kanály Lightning.</string>
+    <string name="swapinrefund_instructions_2">Uistite sa, že cieľová adresa je správna a poplatky primerané.</string>
+    <string name="swapinrefund_estimate_button">Odhad poplatkov</string>
+    <string name="swapinrefund_estimating">Odhad poplatkov…</string>
+    <string name="swapinrefund_send_button">Odoslať</string>
+    <string name="swapinrefund_sending">Odoslanie…</string>
+    <string name="swapinrefund_failed">Chyba transakcie.</string>
+    <string name="swapinrefund_failed_address">Nesprávna adresa.</string>
+    <string name="swapinrefund_failed_cannot_create">Nie je možné vytvoriť transakciu inkasa. Skúste to prosím znova.</string>
+    <string name="swapinrefund_success">Zverejnená transakcia.</string>
+    <string name="swapinrefund_success_details">Transakciu nájdete nižšie. Nebude sa zobrazovať v histórii platieb, preto si teraz vytvorte jej kópiu, ak ju potrebujete.</string>
 
 </resources>

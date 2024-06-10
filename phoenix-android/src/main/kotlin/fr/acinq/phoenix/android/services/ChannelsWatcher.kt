@@ -33,7 +33,6 @@ import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.data.StartupParams
 import fr.acinq.phoenix.data.WatchTowerOutcome
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
@@ -59,6 +58,7 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
 
         val application = applicationContext as PhoenixApplication
         val internalData = application.internalDataRepository
+        val userPrefs = application.userPrefs
         val legacyAppStatus = LegacyPrefsDatastore.getLegacyAppStatus(applicationContext).filterNotNull().first()
         if (legacyAppStatus !is LegacyAppStatus.NotRequired) {
             log.info("aborting channels-watcher service in state=${legacyAppStatus.name()}")
@@ -74,9 +74,9 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
                     val seed = business.walletManager.mnemonicsToSeed(EncryptedSeed.toMnemonics(encryptedSeed.decrypt()), wordList = MnemonicLanguage.English.wordlist())
                     business.walletManager.loadWallet(seed)
 
-                    val isTorEnabled = UserPrefs.getIsTorEnabled(applicationContext).first()
-                    val liquidityPolicy = UserPrefs.getLiquidityPolicy(applicationContext).first()
-                    val electrumServer = UserPrefs.getElectrumServer(applicationContext).first()
+                    val isTorEnabled = userPrefs.getIsTorEnabled.first()
+                    val liquidityPolicy = userPrefs.getLiquidityPolicy.first()
+                    val electrumServer = userPrefs.getElectrumServer.first()
 
                     business.appConfigurationManager.updateElectrumConfig(electrumServer)
                     business.start(StartupParams(requestCheckLegacyChannels = false, isTorEnabled = isTorEnabled, liquidityPolicy = liquidityPolicy, trustedSwapInTxs = emptySet()))
@@ -104,7 +104,7 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
 
             // connect electrum (and only electrum), and wait for the watcher to catch-up
             withTimeout(ELECTRUM_TIMEOUT_MILLIS) {
-                peer.watcher.openUpToDateFlow().first()
+                business.electrumWatcher.openUpToDateFlow().first()
             }
             log.info("electrum watcher is up-to-date")
             business.appConnectionsDaemon?.decrementDisconnectCount(AppConnectionsDaemon.ControlTarget.Electrum)

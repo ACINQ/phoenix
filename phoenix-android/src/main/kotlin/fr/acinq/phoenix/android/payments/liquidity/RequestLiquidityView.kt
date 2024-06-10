@@ -22,13 +22,20 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -41,7 +48,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
@@ -57,6 +63,8 @@ import fr.acinq.phoenix.android.components.AmountView
 import fr.acinq.phoenix.android.components.AmountWithFiatBelow
 import fr.acinq.phoenix.android.components.BackButtonWithBalance
 import fr.acinq.phoenix.android.components.BorderButton
+import fr.acinq.phoenix.android.components.Button
+import fr.acinq.phoenix.android.components.Checkbox
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.IconPopup
@@ -64,11 +72,14 @@ import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.SatoshiSlider
 import fr.acinq.phoenix.android.components.SplashLabelRow
 import fr.acinq.phoenix.android.components.SplashLayout
+import fr.acinq.phoenix.android.components.enableOrFade
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.feedback.InfoMessage
 import fr.acinq.phoenix.android.components.feedback.SuccessMessage
 import fr.acinq.phoenix.android.payments.spliceout.spliceFailureDetails
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.annotatedStringResource
+import fr.acinq.phoenix.android.utils.orange
 
 object LiquidityLimits {
     val liquidityOptions = arrayOf(
@@ -193,7 +204,15 @@ private fun RequestLiquidityBottomSection(
     Spacer(modifier = Modifier.height(16.dp))
 
     when (val state = vm.state.value) {
-        is RequestLiquidityState.Init -> {
+        is RequestLiquidityState.Init, is RequestLiquidityState.Complete.Failed -> {
+            if (state is RequestLiquidityState.Complete.Failed) {
+                ErrorMessage(
+                    header = stringResource(id = R.string.liquidityads_error_header),
+                    details = spliceFailureDetails(spliceFailure = state.response),
+                    alignment = Alignment.CenterHorizontally
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
             BorderButton(
                 text = if (!mayDoPayments) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.liquidityads_estimate_button),
                 icon = R.drawable.ic_inspect,
@@ -213,17 +232,11 @@ private fun RequestLiquidityBottomSection(
             Spacer(modifier = Modifier.height(24.dp))
             if (state.fees.serviceFee + state.fees.miningFee.toMilliSatoshi() > balance) {
                 ErrorMessage(header = stringResource(id = R.string.liquidityads_over_balance))
+            } else if (isAmountError) {
+                ErrorMessage(header = stringResource(id = R.string.validation_invalid_amount))
             } else {
-                FilledButton(
-                    text = stringResource(id = R.string.liquidityads_request_button),
-                    icon = R.drawable.ic_check_circle,
-                    enabled = !isAmountError,
-                    onClick = {
-                        vm.requestInboundLiquidity(
-                            amount = state.amount,
-                            feerate = state.actualFeerate,
-                        )
-                    },
+                ReviewLiquidityRequest(
+                    onConfirm = { vm.requestInboundLiquidity(amount = state.amount, feerate = state.actualFeerate) }
                 )
             }
         }
@@ -232,12 +245,6 @@ private fun RequestLiquidityBottomSection(
         }
         is RequestLiquidityState.Complete.Success -> {
             LeaseSuccessDetails(liquidityDetails = state.response)
-        }
-        is RequestLiquidityState.Complete.Failed -> {
-            ErrorMessage(
-                header = stringResource(id = R.string.liquidityads_error_header),
-                details = spliceFailureDetails(spliceFailure = state.response)
-            )
         }
         is RequestLiquidityState.Error.NoChannelsAvailable -> {
             ErrorMessage(
@@ -297,19 +304,82 @@ private fun LeaseEstimationView(
         label = stringResource(id = R.string.send_spliceout_complete_recap_total),
     ) {
         AmountWithFiatBelow(amount = totalFees, amountTextStyle = MaterialTheme.typography.body2)
-        if (totalFees > amountRequested.toMilliSatoshi() * 0.25) {
+    }
+
+    if (totalFees >= amountRequested.toMilliSatoshi() * 0.25) {
+        SplashLabelRow(label = "", icon = R.drawable.ic_alert_triangle, iconTint = orange) {
             Text(
                 text = stringResource(id = R.string.liquidityads_estimate_above_25),
-                style = MaterialTheme.typography.body1.copy(fontSize = 14.sp)
+                modifier = Modifier.widthIn(max = 250.dp)
             )
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ReviewLiquidityRequest(
+    onConfirm: () -> Unit,
+) {
+    val sheetState = rememberModalBottomSheetState()
+    var showSheet by remember { mutableStateOf(false) }
+    var confirmLiquidity by remember { mutableStateOf(false) }
+    if (showSheet) {
+        ModalBottomSheet(
+            sheetState = sheetState,
+            onDismissRequest = {
+                // executed when user click outside the sheet, and after sheet has been hidden thru state.
+                showSheet = false
+            },
+            modifier = Modifier.heightIn(max = 700.dp),
+            containerColor = MaterialTheme.colors.surface,
+            contentColor = MaterialTheme.colors.onSurface,
+            scrimColor = MaterialTheme.colors.onBackground.copy(alpha = 0.1f),
+        ) {
+            Column(
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState())
+                    .padding(top = 0.dp, start = 24.dp, end = 24.dp, bottom = 50.dp)
+            ) {
+                Text(text = annotatedStringResource(id = R.string.liquidityads_disclaimer_body1))
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = stringResource(id = R.string.liquidityads_disclaimer_body2))
+                Spacer(modifier = Modifier.height(8.dp))
+                Checkbox(text = stringResource(id = R.string.utils_ack), checked = confirmLiquidity, onCheckedChange = { confirmLiquidity = it })
+
+                Spacer(modifier = Modifier.height(24.dp))
+                FilledButton(
+                    text = stringResource(id = R.string.btn_confirm),
+                    icon = R.drawable.ic_check,
+                    onClick = onConfirm,
+                    enabled = confirmLiquidity,
+                    modifier = Modifier.align(Alignment.End),
+                )
+                Button(
+                    text = stringResource(id = R.string.btn_cancel),
+                    onClick = { showSheet = false },
+                    shape = CircleShape,
+                    modifier = Modifier.align(Alignment.End),
+                )
+            }
+        }
+    }
+
+    BorderButton(
+        text = stringResource(id = R.string.liquidityads_review_button),
+        icon = R.drawable.ic_text,
+        onClick = { showSheet = true },
+        modifier = Modifier.enableOrFade(!showSheet)
+    )
 }
 
 @Composable
 private fun LeaseSuccessDetails(liquidityDetails: ChannelCommand.Commitment.Splice.Response.Created) {
     SuccessMessage(
         header = stringResource(id = R.string.liquidityads_success),
-        details = "You added ${liquidityDetails.liquidityLease?.amount?.toPrettyString(unit = LocalBitcoinUnit.current, withUnit = true)}"
+        details = liquidityDetails.liquidityLease?.amount?.let {
+            stringResource(id = R.string.liquidityads_success_amount, it.toPrettyString(unit = LocalBitcoinUnit.current, withUnit = true))
+        },
+        alignment = Alignment.CenterHorizontally,
     )
 }

@@ -11,7 +11,11 @@ import fr.acinq.lightning.SwapInParams
 import fr.acinq.lightning.TrampolineFees
 import fr.acinq.lightning.UpgradeRequired
 import fr.acinq.lightning.WalletParams
+import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
+import fr.acinq.lightning.blockchain.electrum.FinalWallet
+import fr.acinq.lightning.blockchain.electrum.IElectrumClient
+import fr.acinq.lightning.blockchain.electrum.SwapInWallet
 import fr.acinq.lightning.blockchain.electrum.WalletState
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.states.ChannelStateWithCommitments
@@ -42,6 +46,7 @@ class PeerManager(
     private val databaseManager: DatabaseManager,
     private val configurationManager: AppConfigurationManager,
     private val notificationsManager: NotificationsManager,
+    private val electrumClient: ElectrumClient,
     private val electrumWatcher: ElectrumWatcher,
 ) : CoroutineScope by CoroutineScope(CoroutineName("peer") + SupervisorJob() + Dispatchers.Main + CoroutineExceptionHandler { _, e ->
     println("error in Peer coroutine scope: ${e.message}")
@@ -55,6 +60,7 @@ class PeerManager(
         databaseManager = business.databaseManager,
         configurationManager = business.appConfigurationManager,
         notificationsManager = business.notificationsManager,
+        electrumClient = business.electrumClient,
         electrumWatcher = business.electrumWatcher,
     )
 
@@ -77,7 +83,7 @@ class PeerManager(
     /** Flow of the peer's final wallet [WalletState.WalletWithConfirmations]. */
     @OptIn(ExperimentalCoroutinesApi::class)
     val finalWallet = peerState.filterNotNull().flatMapLatest { peer ->
-        combine(peer.currentTipFlow.filterNotNull(), peer.finalWallet.wallet.walletStateFlow) { (currentBlockHeight, _), wallet ->
+        combine(peer.currentTipFlow.filterNotNull(), peer.phoenixFinalWallet.wallet.walletStateFlow) { currentBlockHeight, wallet ->
             wallet.withConfirmations(
                 currentBlockHeight = currentBlockHeight,
                 // the final wallet does not need to distinguish between weak/deep/locked txs
@@ -97,7 +103,7 @@ class PeerManager(
     /** Flow of the peer's swap-in wallet [WalletState.WalletWithConfirmations]. */
     @OptIn(ExperimentalCoroutinesApi::class)
     val swapInWallet = peerState.filterNotNull().flatMapLatest { peer ->
-        combine(peer.currentTipFlow.filterNotNull(), peer.swapInWallet.wallet.walletStateFlow) { (currentBlockHeight, _), wallet ->
+        combine(peer.currentTipFlow.filterNotNull(), peer.phoenixSwapInWallet.wallet.walletStateFlow) { currentBlockHeight, wallet ->
             wallet.withConfirmations(
                 currentBlockHeight = currentBlockHeight,
                 swapInParams = peer.walletParams.swapInParams
@@ -175,6 +181,7 @@ class PeerManager(
                 initTlvStream = initTlvs,
                 nodeParams = nodeParams,
                 walletParams = walletParams,
+                client = electrumClient,
                 watcher = electrumWatcher,
                 db = databaseManager.databases.filterNotNull().first(),
                 trustedSwapInTxs = startupParams.trustedSwapInTxs,
@@ -256,3 +263,12 @@ class PeerManager(
         }
     }
 }
+
+
+/** The peer's swap-in wallet for Phoenix is always not null, because the client is always an [IElectrumClient] (see how this Peer is built in `PeerManager.init`). */
+val Peer.phoenixSwapInWallet: SwapInWallet
+    get() = this.swapInWallet!!
+
+/** The peer's final wallet for Phoenix is always not null, because the client is always an [IElectrumClient] (see how this Peer is built in `PeerManager.init`). */
+val Peer.phoenixFinalWallet: FinalWallet
+    get() = this.finalWallet!!

@@ -81,7 +81,8 @@ fun CpfpView(
                     if (feerate != it) vm.state = CpfpState.Init
                     feerate = it
                 },
-                mempoolFeerate = mempoolFeerate
+                mempoolFeerate = mempoolFeerate,
+                enabled = true
             )
         }
     }

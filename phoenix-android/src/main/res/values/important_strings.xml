@@ -22,6 +22,10 @@
 -->
 <resources>
 
+    <!-- generic -->
+
+    <string name="utils_ack">I understand.</string>
+
     <!-- system notifications -->
 
     <string name="notif_headless_title_default">Phoenix is running in the background</string>
@@ -93,7 +97,6 @@
     <string name="initwallet_restore">Restore my wallet</string>
 
     <string name="restore_disclaimer_message">Phoenix can only restore off-chain funds that were managed by this application.\n\nImporting a seed that was NOT created by Phoenix will not restore any funds.\n\nPlease also make sure you are not already running another Phoenix wallet with the same seed.</string>
-    <string name="restore_disclaimer_checkbox">I understand.</string>
 
     <string name="restore_instructions">Your wallet\'s seed is a list of 12 English words. Type-in each word of this list in the box below.</string>
     <string name="restore_input_label">Enter word #%1$s</string>
@@ -129,9 +132,6 @@
     <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">A fee of %1$s is expected to receive this amount, and that fee is more than %2$s%% of the amount.\n\nIncrease this limit in the channel management settings, or request additional liquidity.</string>
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Inbound liquidity is insufficient for this amount, and you have disabled automated channel management.</string>
-
-    <string name="receive_onchain_legacy_warning_title">Migration notice</string>
-    <string name="receive_onchain_legacy_warning">This is your new address. Do not reuse your old Bitcoin addresses from before migration!</string>
 
     <!-- scanning errors -->
 
@@ -283,7 +283,7 @@
     <string name="walletinfo_onchain_swapin_locked_description">These funds will be available from %1$s days onwards.</string>
 
     <string name="walletinfo_onchain_swapin_refund_title">Cancelled funds</string>
-    <string name="walletinfo_onchain_swapin_refund_description">These funds were not swapped in time. Use the wallet\'s descriptor to access them.</string>
+    <string name="walletinfo_onchain_swapin_refund_description">These funds were not swapped in time. Tap to spend.</string>
 
     <string name="walletinfo_onchain_final_about">The final wallet is where funds are sent when your Lightning channels are closed or when there is a problem. It usually should be empty.</string>
 
@@ -343,14 +343,19 @@
     <string name="liquidityads_estimate_details_service_fees_help">This fee goes to the service providing the liquidity.</string>
     <string name="liquidityads_estimate_details_duration">Duration</string>
     <string name="liquidityads_estimate_details_duration_value">1 year</string>
-    <string name="liquidityads_estimate_details_duration_help">The additional capacity will be preserved for that duration.</string>
+    <string name="liquidityads_estimate_details_duration_help">As you receive funds, liquidity will be consumed and become your balance. After one year, the remaining unused liquidity will be reclaimed by the service.</string>
     <string name="liquidityads_estimate_above_25">The total fee is more than 25% of the liquidity amount requested.</string>
     <string name="liquidityads_over_balance">The total fees exceed your balance.</string>
+
+    <string name="liquidityads_review_button">Review</string>
+    <string name="liquidityads_disclaimer_body1">You are requesting an <b>initial</b> amount of liquidity. Liquidity is not constant over time: as you receive funds over Lightning, the liquidity will be consumed and become your balance.</string>
+    <string name="liquidityads_disclaimer_body2">After one year, the remaining unused liquidity will be reclaimed by the service.</string>
 
     <string name="liquidityads_request_button">Accept</string>
     <string name="liquidityads_requesting_spinner">Processing splice…</string>
 
     <string name="liquidityads_success">Liquidity successfully added!</string>
+    <string name="liquidityads_success_amount">Amount added: %1$s</string>
 
     <string name="liquidityads_error_header">Liquidity request has failed</string>
     <string name="liquidityads_error_channels_unavailable">Channels are not available. Try again later.</string>
@@ -367,14 +372,58 @@
 
     <!-- Lightning payment errors -->
 
-    <string name="outgoing_finalfailure_alreadypaid">This invoice has already been paid.</string>
-    <string name="outgoing_finalfailure_noroutefound">Recipient is not reachable, or does not have enough inbound liquidity.</string>
+    <string name="outgoing_failuremessage_channel_closing">Channels are closing.</string>
+    <string name="outgoing_failuremessage_channel_splicing">Channels are already processing a splice. Try again later.</string>
+    <string name="outgoing_failuremessage_not_enough_fee">Fee is insufficient.</string>
+    <string name="outgoing_failuremessage_not_enough_balance">This payment exceeds your balance.</string>
+    <string name="outgoing_failuremessage_too_big">The payment amount is too big - try splitting it in several parts.</string>
+    <string name="outgoing_failuremessage_too_small">The payment amount is too small.</string>
+    <string name="outgoing_failuremessage_expiry_too_big">The expiry of this payment is too far in the future.</string>
+    <string name="outgoing_failuremessage_rejected_by_recipient">The payment was rejected by the recipient. This particular invoice may have already been paid.</string>
+    <string name="outgoing_failuremessage_recipient_offline">The recipient is offline.</string>
+    <string name="outgoing_failuremessage_not_enough_liquidity">The payment could not be relayed to the recipient (probably insufficient inbound liquidity).</string>
+    <string name="outgoing_failuremessage_temporary_failure">An error occurred on a node in the payment route. The payment may succeed if you try again.</string>
+    <string name="outgoing_failuremessage_too_many_pending">You have too many pending payments. Try again once they are settled.</string>
 
-    <!-- low feerate disclaimer -->
+    <string name="outgoing_failuremessage_invalid_id">The ID of the payment is not valid. Try again.</string>
+    <string name="outgoing_failuremessage_alreadypaid">This invoice has already been paid.</string>
+    <string name="outgoing_failuremessage_not_connected">Your channel is not connected yet. Wait for a stable connection and try again.</string>
+    <string name="outgoing_failuremessage_channel_opening">Your channel is still in the process of being opened. Wait and try again.</string>
+    <string name="outgoing_failuremessage_unsupported_features">This invoice uses unsupported features. Make sure you\'re on the latest Phoenix version.</string>
+    <string name="outgoing_failuremessage_invalid_amount">The payment amount is invalid.</string>
+    <string name="outgoing_failuremessage_no_available_channels">The payment could not be sent through your existing channels.</string>
+    <string name="outgoing_failuremessage_noroutefound">Recipient is not reachable, or does not have enough inbound liquidity.</string>
+    <string name="outgoing_failuremessage_unknown">An unknown error occurred and payment has failed.</string>
+    <string name="outgoing_failuremessage_restarted">The wallet was restarted while the payment was processing.</string>
 
-    <string name="send_low_feerate_dialog_title">Low feerate!</string>
-    <string name="send_low_feerate_dialog_body1">Transactions with insufficient feerate may linger for days or weeks without confirming.</string>
-    <string name="send_low_feerate_dialog_body2">Choosing the feerate is your responsibility. Once sent, this transaction cannot be cancelled, only accelerated with higher fees.</string>
-    <string name="send_low_feerate_dialog_body3">Are you sure you want to proceed?</string>
+    <!-- spliceout: low feerate disclaimer -->
+
+    <string name="spliceout_low_feerate_dialog_title">Low feerate!</string>
+    <string name="spliceout_low_feerate_dialog_body1">Transactions with insufficient feerate may linger for days or weeks without confirming.</string>
+    <string name="spliceout_low_feerate_dialog_body2">Choosing the feerate is your responsibility. Once sent, this transaction cannot be cancelled, only accelerated with higher fees.</string>
+    <string name="spliceout_low_feerate_dialog_body3">Are you sure you want to proceed?</string>
+
+    <!-- spliceout: capacity disclaimer -->
+
+    <string name="spliceout_capacity_disclaimer_title">Channel size impacted</string>
+    <string name="spliceout_capacity_disclaimer_body1">Funds sent on-chain are taken from your side of the channel, reducing the channel size by the same amount. Your inbound liquidity remains unchanged.</string>
+    <string name="spliceout_capacity_disclaimer_checkbox">Don\'t show that message again.</string>
+
+    <!-- Spend swap-in refund -->
+
+    <string name="swapinrefund_title">Spend cancelled swap-ins</string>
+    <string name="swapinrefund_none_available_label">No cancelled swap-ins yet.</string>
+    <string name="swapinrefund_available_label">Available: <b>%1$s</b> (%2$s)</string>
+    <string name="swapinrefund_instructions_1">Use this screen to spend on-chain deposits that were not swapped in time. This does not affect your Lightning channels.</string>
+    <string name="swapinrefund_instructions_2">Make sure the destination address is valid and the feerate reasonable.</string>
+    <string name="swapinrefund_estimate_button">Estimate fees</string>
+    <string name="swapinrefund_estimating">Estimating fees…</string>
+    <string name="swapinrefund_send_button">Broadcast</string>
+    <string name="swapinrefund_sending">Broadcasting…</string>
+    <string name="swapinrefund_failed">Transaction error.</string>
+    <string name="swapinrefund_failed_address">This address is not valid.</string>
+    <string name="swapinrefund_failed_cannot_create">Cannot create the refund transaction.</string>
+    <string name="swapinrefund_success">Transaction published.</string>
+    <string name="swapinrefund_success_details">You can find the transaction spending the funds below. It will not appear in your payments history, so make a copy of its ID now if needed.</string>
 
 </resources>

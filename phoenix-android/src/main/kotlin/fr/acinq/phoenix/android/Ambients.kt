@@ -25,6 +25,7 @@ import androidx.navigation.NavController
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.utils.UserTheme
 import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
+import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
 import fr.acinq.phoenix.controllers.ControllerFactory
 import fr.acinq.phoenix.data.*
 
@@ -74,6 +75,10 @@ val fiatRate: ExchangeRate.BitcoinPriceRate?
 val internalData: InternalDataRepository
     @Composable
     get() = application.internalDataRepository
+
+val userPrefs: UserPrefsRepository
+    @Composable
+    get() = application.userPrefs
 
 val controllerFactory: ControllerFactory
     @Composable

@@ -25,8 +25,8 @@ android {
         applicationId = "fr.acinq.phoenix.mainnet"
         minSdk = 26
         targetSdk = 34
-        versionCode = 78
-        versionName = "2.2.2"
+        versionCode = 79
+        versionName = gitCommitHash()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         resourceConfigurations.addAll(listOf("en", "fr", "de", "es", "b+es+419", "cs", "pt-rBR", "sk", "vi"))
     }
@@ -140,7 +140,7 @@ dependencies {
     implementation("com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava")
 
     testImplementation("junit:junit:${Versions.junit}")
-    testImplementation("com.squareup.sqldelight:sqlite-driver:${Versions.sqlDelight}")
+    testImplementation("app.cash.sqldelight:sqlite-driver:${Versions.sqlDelight}")
     androidTestImplementation("androidx.test.ext:junit:1.1.4")
     androidTestImplementation("androidx.test.espresso:espresso-core:${Versions.Android.espresso}")
 }

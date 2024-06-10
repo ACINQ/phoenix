@@ -82,6 +82,7 @@ import fr.acinq.phoenix.android.settings.fees.AdvancedIncomingFeePolicy
 import fr.acinq.phoenix.android.settings.fees.LiquidityPolicyView
 import fr.acinq.phoenix.android.payments.liquidity.RequestLiquidityView
 import fr.acinq.phoenix.android.settings.walletinfo.FinalWalletInfo
+import fr.acinq.phoenix.android.settings.walletinfo.SendSwapInRefundView
 import fr.acinq.phoenix.android.settings.walletinfo.SwapInAddresses
 import fr.acinq.phoenix.android.settings.walletinfo.SwapInSignerView
 import fr.acinq.phoenix.android.settings.walletinfo.SwapInWallet
@@ -89,7 +90,6 @@ import fr.acinq.phoenix.android.settings.walletinfo.WalletInfoView
 import fr.acinq.phoenix.android.startup.LegacySwitcherView
 import fr.acinq.phoenix.android.startup.StartupView
 import fr.acinq.phoenix.android.utils.appBackground
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
@@ -124,9 +124,9 @@ fun AppView(
     log.debug("init app view composition")
 
     val context = LocalContext.current
-    val isAmountInFiat = UserPrefs.getIsAmountInFiat(context).collectAsState(false)
-    val fiatCurrency = UserPrefs.getFiatCurrency(context).collectAsState(initial = FiatCurrency.USD)
-    val bitcoinUnit = UserPrefs.getBitcoinUnit(context).collectAsState(initial = BitcoinUnit.Sat)
+    val isAmountInFiat = userPrefs.getIsAmountInFiat.collectAsState(false)
+    val fiatCurrency = userPrefs.getFiatCurrency.collectAsState(initial = FiatCurrency.USD)
+    val bitcoinUnit = userPrefs.getBitcoinUnit.collectAsState(initial = BitcoinUnit.Sat)
     val fiatRates by business.currencyManager.ratesFlow.collectAsState(emptyList())
 
     CompositionLocalProvider(
@@ -274,7 +274,8 @@ fun AppView(
                         ScanDataView(
                             input = input,
                             onBackClick = { popToHome(navController) },
-                            onAuthSchemeInfoClick = { navController.navigate("${Screen.PaymentSettings.route}/true") }
+                            onAuthSchemeInfoClick = { navController.navigate("${Screen.PaymentSettings.route}/true") },
+                            onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) },
                         )
                     }
                 }
@@ -412,6 +413,7 @@ fun AppView(
                         onBackClick = { navController.popBackStack() },
                         onViewChannelPolicyClick = { navController.navigate(Screen.LiquidityPolicy.route) },
                         onAdvancedClick = { navController.navigate(Screen.WalletInfo.SwapInSigner.route) },
+                        onSpendRefundable = { navController.navigate(Screen.WalletInfo.SwapInRefund.route) },
                     )
                 }
                 composable(Screen.WalletInfo.SwapInAddresses.route) {
@@ -419,6 +421,9 @@ fun AppView(
                 }
                 composable(Screen.WalletInfo.SwapInSigner.route) {
                     SwapInSignerView(onBackClick = { navController.popBackStack() })
+                }
+                composable(Screen.WalletInfo.SwapInRefund.route) {
+                    SendSwapInRefundView(onBackClick = { navController.popBackStack() })
                 }
                 composable(Screen.WalletInfo.FinalWallet.route) {
                     FinalWalletInfo(onBackClick = { navController.popBackStack() })
@@ -498,7 +503,8 @@ private fun MonitorNotices(
     vm: NoticesViewModel
 ) {
     val context = LocalContext.current
-    val internalData = application.internalDataRepository
+    val internalData = internalData
+    val userPrefs = userPrefs
 
     LaunchedEffect(Unit) {
         internalData.showSeedBackupNotice.collect {
@@ -514,7 +520,7 @@ private fun MonitorNotices(
         val notificationPermission = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
         if (!notificationPermission.status.isGranted) {
             LaunchedEffect(Unit) {
-                if (UserPrefs.getShowNotificationPermissionReminder(context).first()) {
+                if (userPrefs.getShowNotificationPermissionReminder.first()) {
                     vm.addNotice(Notice.NotificationPermission)
                 }
             }
@@ -522,7 +528,7 @@ private fun MonitorNotices(
             vm.removeNotice<Notice.NotificationPermission>()
         }
         LaunchedEffect(Unit) {
-            UserPrefs.getShowNotificationPermissionReminder(context).collect {
+            userPrefs.getShowNotificationPermissionReminder.collect {
                 if (it && !notificationPermission.status.isGranted) {
                     vm.addNotice(Notice.NotificationPermission)
                 } else {

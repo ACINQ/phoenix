@@ -55,7 +55,7 @@
     <string name="initwallet_restore">Restaurar mi cartera</string>
 
     <string name="restore_disclaimer_message">Phoenix sólo puede restaurar los fondos fuera de la cadena que fueron gestionados por esta aplicación.\n\nImportar una semilla que no fue creada por Phoenix no restaurará ningún fondo.\n\nPor favor, asegúrese también de que no está ejecutando otra cartera Phoenix con la misma semilla.</string>
-    <string name="restore_disclaimer_checkbox">Entiendo.</string>
+    <string name="utils_ack">Entiendo.</string>
 
     <string name="restore_instructions">La semilla de tu cartera es una lista de 12 palabras en inglés. Escribe cada palabra de esta lista en la casilla de abajo.</string>
     <string name="restore_input_label">Introducir palabra #%1$s</string>
@@ -130,9 +130,6 @@
     <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Se estiman unas tasas de %1$s para recibir este importe, y estas tasas superan el %2$s%% del importe.\n\nAumente este límite o solicite liquidez adicional.</string>
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">La liquidez entrante es insuficiente y tienes desactivada la gestión automatizada de canales.</string>
-
-    <string name="receive_onchain_legacy_warning_title">Aviso de migración</string>
-    <string name="receive_onchain_legacy_warning">Esta es su nueva dirección. No reutilice sus antiguas direcciones Bitcoin anteriores a la migración.</string>
 
     <!-- scanning errors -->
 
@@ -283,7 +280,7 @@
     <string name="walletinfo_onchain_swapin_locked_description">Estos fondos estarán disponibles a partir de %1$s días.</string>
 
     <string name="walletinfo_onchain_swapin_refund_title">Cancelados</string>
-    <string name="walletinfo_onchain_swapin_refund_description">Estos fondos no fueron canjeados a tiempo. Utilice el descriptor de la cartera para acceder a ellos.</string>
+    <string name="walletinfo_onchain_swapin_refund_description">Estos fondos no fueron canjeados a tiempo. Toque para gastar estos fondos.</string>
 
     <string name="walletinfo_onchain_final_about">Una cartera en la cadena derivada de su semilla.\n\nLa cartera final es donde se envían los fondos por defecto cuando se cierran sus canales Lightning.</string>
 
@@ -347,10 +344,15 @@
     <string name="liquidityads_estimate_above_25">La tasa total es superior al 25% del importe solicitado.</string>
     <string name="liquidityads_over_balance">El total de tasas supera tu saldo.</string>
 
+    <string name="liquidityads_review_button">Validar</string>
+    <string name="liquidityads_disclaimer_body1">Estás solicitando una cantidad <b>inicial</b> de liquidez. La liquidez no es constante en el tiempo: a medida que reciba fondos a lo largo de Lightning, la liquidez se consumirá y se convertirá en su saldo.</string>
+    <string name="liquidityads_disclaimer_body2">Al cabo de un año, la liquidez restante no utilizada será reclamada por el servicio.</string>
+
     <string name="liquidityads_request_button">Aceptar</string>
     <string name="liquidityads_requesting_spinner">Procesando empalme…</string>
 
     <string name="liquidityads_success">¡Liquidez añadida con éxito!</string>
+    <string name="liquidityads_success_amount">Importe añadido: %1$s</string>
 
     <string name="liquidityads_error_header">Solicitud de liquidez fallida</string>
     <string name="liquidityads_error_channels_unavailable">Los canales no están disponibles. Vuelva a intentarlo más tarde.</string>
@@ -367,14 +369,59 @@
 
     <!-- Lightning payment errors -->
 
-    <string name="outgoing_finalfailure_alreadypaid">Esta factura ya ha sido pagada.</string>
-    <string name="outgoing_finalfailure_noroutefound">El destinatario no está localizable o no tiene suficiente liquidez entrante.</string>
+    <string name="outgoing_failuremessage_channel_closing">Los canales se están cerrando.</string>
+    <string name="outgoing_failuremessage_channel_splicing">Los canales ya están procesando un Splice. Inténtelo de nuevo más tarde.</string>
+    <string name="outgoing_failuremessage_not_enough_fee">La tarifa es insuficiente.</string>
+    <string name="outgoing_failuremessage_not_enough_balance">Este pago supera su saldo.</string>
+    <string name="outgoing_failuremessage_too_big">El importe del pago es demasiado grande - intente dividirlo en varias partes.</string>
+    <string name="outgoing_failuremessage_too_small">El importe del pago es demasiado pequeño.</string>
+    <string name="outgoing_failuremessage_expiry_too_big">El vencimiento de este pago es demasiado lejano.</string>
+    <string name="outgoing_failuremessage_rejected_by_recipient">El pago ha sido rechazado por el destinatario. Es posible que esta factura en concreto ya se haya pagado.</string>
+    <string name="outgoing_failuremessage_recipient_offline">El destinatario no está conectado.</string>
+    <string name="outgoing_failuremessage_not_enough_liquidity">El pago no se ha podido retransmitir al destinatario (probablemente liquidez entrante insuficiente).</string>
+    <string name="outgoing_failuremessage_temporary_failure">Se ha producido un error en un nodo de la ruta de pago. El pago puede tener éxito si lo intentas de nuevo.</string>
+    <string name="outgoing_failuremessage_too_many_pending">Tienes demasiados pagos pendientes. Vuelva a intentarlo una vez que se hayan liquidado.</string>
+
+    <string name="outgoing_failuremessage_invalid_id">El ID del pago no es válido. Inténtelo de nuevo.</string>
+    <string name="outgoing_failuremessage_not_connected">Tu canal aún no está conectado. Espere a tener una conexión estable e inténtelo de nuevo.</string>
+    <string name="outgoing_failuremessage_channel_opening">Tu canal aún está en proceso de apertura. Espere e inténtelo de nuevo.</string>
+    <string name="outgoing_failuremessage_unsupported_features">Esta factura utiliza funciones no compatibles. Asegúrate de que estás en la última versión de Phoenix.</string>
+    <string name="outgoing_failuremessage_invalid_amount">El importe del pago no es válido.</string>
+    <string name="outgoing_failuremessage_no_available_channels">El pago no se ha podido enviar a través de sus canales existentes.</string>
+    <string name="outgoing_failuremessage_unknown">Se ha producido un error desconocido y el pago ha fallado.</string>
+    <string name="outgoing_failuremessage_restarted">La cartera se ha reiniciado mientras se procesaba el pago.</string>
+
+    <string name="outgoing_failuremessage_alreadypaid">Esta factura ya ha sido pagada.</string>
+    <string name="outgoing_failuremessage_noroutefound">El destinatario no está localizable o no tiene suficiente liquidez entrante.</string>
 
     <!-- low feerate disclaimer -->
 
-    <string name="send_low_feerate_dialog_title">¡Baja tasa!</string>
-    <string name="send_low_feerate_dialog_body1">Los pagos con tasas bajas pueden pasar días o semanas sin confirmarse.</string>
-    <string name="send_low_feerate_dialog_body2">La selección de comisiones es su responsabilidad. Una vez enviado, este pago no puede ser cancelado, sólo acelerado con tasas más altas.</string>
-    <string name="send_low_feerate_dialog_body3">¿Está seguro de que desea continuar?</string>
+    <string name="spliceout_low_feerate_dialog_title">¡Baja tasa!</string>
+    <string name="spliceout_low_feerate_dialog_body1">Los pagos con tasas bajas pueden pasar días o semanas sin confirmarse.</string>
+    <string name="spliceout_low_feerate_dialog_body2">La selección de comisiones es su responsabilidad. Una vez enviado, este pago no puede ser cancelado, sólo acelerado con tasas más altas.</string>
+    <string name="spliceout_low_feerate_dialog_body3">¿Está seguro de que desea continuar?</string>
+
+    <!-- spliceout: capacity disclaimer -->
+
+    <string name="spliceout_capacity_disclaimer_title">Tamaño del canal afectado</string>
+    <string name="spliceout_capacity_disclaimer_body1">Los fondos enviados se toman de tu lado del canal, reduciendo el tamaño del canal en la misma cantidad. Su liquidez entrante permanece sin cambios.</string>
+    <string name="spliceout_capacity_disclaimer_checkbox">No volver a mostrar ese mensaje.</string>
+
+    <!-- Spend swap-in refund -->
+
+    <string name="swapinrefund_title">Gastar un intercambio caducado</string>
+    <string name="swapinrefund_none_available_label">No hay swap-in caducado.</string>
+    <string name="swapinrefund_available_label">Fondos disponibles : <b>%1$s</b> (%2$s)</string>
+    <string name="swapinrefund_instructions_1">Utiliza esta pantalla para gastar depósitos on-chain que no hayan sido cambiados a Lightning a tiempo. Tenga en cuenta que esto no afecta en modo alguno a sus canales Lightning.</string>
+    <string name="swapinrefund_instructions_2">Asegúrese de que la dirección de destino es correcta y los gastos razonables.</string>
+    <string name="swapinrefund_estimate_button">Estimar las tasas</string>
+    <string name="swapinrefund_estimating">Estimación de tasas…</string>
+    <string name="swapinrefund_send_button">Enviar</string>
+    <string name="swapinrefund_sending">Envío de fondos…</string>
+    <string name="swapinrefund_failed">Error de transacción.</string>
+    <string name="swapinrefund_failed_address">Dirección no válida.</string>
+    <string name="swapinrefund_failed_cannot_create">No se ha podido crear la transacción de cobro. Por favor, inténtelo de nuevo.</string>
+    <string name="swapinrefund_success">Transacción publicada.</string>
+    <string name="swapinrefund_success_details">Puede encontrar la transacción a continuación. No aparecerá en su historial de pagos, así que haga una copia ahora si lo necesita.</string>
 
 </resources>

@@ -64,7 +64,7 @@ import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.LiquidityPolicy
-import fr.acinq.lightning.payment.PaymentRequest
+import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnit
@@ -82,12 +82,10 @@ import fr.acinq.phoenix.android.components.TextInput
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.feedback.InfoMessage
 import fr.acinq.phoenix.android.components.feedback.WarningMessage
-import fr.acinq.phoenix.android.navController
+import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.borderColor
 import fr.acinq.phoenix.android.utils.copyToClipboard
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.share
 import fr.acinq.phoenix.data.availableForReceive
 import fr.acinq.phoenix.data.canRequestLiquidity
@@ -101,33 +99,35 @@ fun LightningInvoiceView(
     onFeeManagementClick: () -> Unit,
     onScanDataClick: () -> Unit,
     defaultDescription: String,
-    expiry: Long,
+    defaultExpiry: Long,
     maxWidth: Dp,
+    isPageActive: Boolean,
 ) {
-    val paymentsManager = business.paymentsManager
     var customDesc by remember { mutableStateOf(defaultDescription) }
     var customAmount by remember { mutableStateOf<MilliSatoshi?>(null) }
+    var feeWarningDialogShownTimestamp by remember { mutableStateOf(0L) }
+
+    val onEdit = { vm.isEditingLightningInvoice = true }
+
+    val state = vm.lightningInvoiceState
+    val isEditing = vm.isEditingLightningInvoice
 
     // refresh LN invoice when it has been paid
+    val paymentsManager = business.paymentsManager
     LaunchedEffect(key1 = Unit) {
         paymentsManager.lastCompletedPayment.collect {
-            val state = vm.lightningInvoiceState
             if (state is LightningInvoiceState.Show && it is IncomingPayment && state.invoice.paymentHash == it.paymentHash) {
-                vm.generateInvoice(amount = customAmount, description = customDesc, expirySeconds = expiry)
+                vm.generateInvoice(amount = customAmount, description = customDesc, expirySeconds = defaultExpiry)
+                feeWarningDialogShownTimestamp = 0 // reset the dialog tracker to show it asap for a new invoice
             }
         }
     }
-
-    val onEdit = { vm.isEditingLightningInvoice = true }
 
     InvoiceHeader(
         icon = R.drawable.ic_zap,
         helpMessage = stringResource(id = R.string.receive_lightning_help),
         content = { Text(text = stringResource(id = R.string.receive_lightning_title)) },
     )
-
-    val state = vm.lightningInvoiceState
-    val isEditing = vm.isEditingLightningInvoice
 
     when {
         isEditing -> {
@@ -137,14 +137,15 @@ fun LightningInvoiceView(
                 onAmountChange = { customAmount = it },
                 onDescriptionChange = { customDesc = it },
                 onCancel = { vm.isEditingLightningInvoice = false },
-                onSubmit = { vm.generateInvoice(amount = customAmount, description = customDesc, expirySeconds = expiry) },
+                onSubmit = { vm.generateInvoice(amount = customAmount, description = customDesc, expirySeconds = defaultExpiry) },
                 onFeeManagementClick = onFeeManagementClick,
+                onDialogShown = { feeWarningDialogShownTimestamp = currentTimestampMillis() }
             )
         }
         state is LightningInvoiceState.Init || state is LightningInvoiceState.Generating -> {
             if (state is LightningInvoiceState.Init) {
                 LaunchedEffect(key1 = Unit) {
-                    vm.generateInvoice(amount = customAmount, description = customDesc, expirySeconds = expiry)
+                    vm.generateInvoice(amount = customAmount, description = customDesc, expirySeconds = defaultExpiry)
                 }
             }
             Box(contentAlignment = Alignment.Center) {
@@ -161,6 +162,8 @@ fun LightningInvoiceView(
                 onFeeManagementClick = onFeeManagementClick,
                 onEdit = onEdit,
                 maxWidth = maxWidth,
+                showDialogImmediately = isPageActive && currentTimestampMillis() - feeWarningDialogShownTimestamp > 30_000,
+                onDialogShown = { feeWarningDialogShownTimestamp = currentTimestampMillis() }
             )
         }
         state is LightningInvoiceState.Error -> {
@@ -190,6 +193,8 @@ private fun DisplayLightningInvoice(
     onEdit: () -> Unit,
     onFeeManagementClick: () -> Unit,
     maxWidth: Dp,
+    showDialogImmediately: Boolean,
+    onDialogShown: () -> Unit,
 ) {
     val context = LocalContext.current
     val prString = remember(invoice) { invoice.write() }
@@ -201,7 +206,8 @@ private fun DisplayLightningInvoice(
     EvaluateLiquidityIssuesForPayment(
         amount = amount,
         onFeeManagementClick = onFeeManagementClick,
-        isEditing = false,
+        showDialogImmediately = showDialogImmediately,
+        onDialogShown = onDialogShown,
     )
 
     if (amount != null || description != null) {
@@ -250,6 +256,7 @@ private fun EditInvoiceView(
     onCancel: () -> Unit,
     onSubmit: () -> Unit,
     onFeeManagementClick: () -> Unit,
+    onDialogShown: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -308,19 +315,18 @@ private fun EditInvoiceView(
     EvaluateLiquidityIssuesForPayment(
         amount = amount,
         onFeeManagementClick = onFeeManagementClick,
-        isEditing = true
+        showDialogImmediately = false, // do not show the dialog immediately when editing the invoice, it's annoying
+        onDialogShown = onDialogShown,
     )
 }
 
 @Composable
-private fun EvaluateLiquidityIssuesForPayment(
+fun EvaluateLiquidityIssuesForPayment(
     amount: MilliSatoshi?,
     onFeeManagementClick: () -> Unit,
-    isEditing: Boolean, // do not show the dialog immediately when editing the invoice, it's annoying
+    showDialogImmediately: Boolean,
+    onDialogShown: () -> Unit,
 ) {
-    val log = logger("EvaluateLiquidity")
-    val context = LocalContext.current
-
     val channelsMap by business.peerManager.channelsFlow.collectAsState()
     val canRequestLiquidity = remember(channelsMap) { channelsMap.canRequestLiquidity() }
     val availableForReceive = remember(channelsMap) { channelsMap.availableForReceive() }
@@ -328,7 +334,7 @@ private fun EvaluateLiquidityIssuesForPayment(
     val mempoolFeerate by business.appConfigurationManager.mempoolFeerate.collectAsState()
     val swapFee = remember(mempoolFeerate, amount) { mempoolFeerate?.payToOpenEstimationFee(amount = amount ?: 0.msat, hasNoChannels = channelsMap?.values?.filterNot { it.isTerminated }.isNullOrEmpty()) }
 
-    val liquidityPolicyPrefs = UserPrefs.getLiquidityPolicy(context).collectAsState(null)
+    val liquidityPolicyPrefs = userPrefs.getLiquidityPolicy.collectAsState(null)
 
     when (val liquidityPolicy = liquidityPolicyPrefs.value) {
         null -> {}
@@ -341,7 +347,8 @@ private fun EvaluateLiquidityIssuesForPayment(
                         header = stringResource(id = R.string.receive_lightning_warning_title_surefail),
                         message = stringResource(id = R.string.receive_lightning_warning_fee_policy_disabled_insufficient_liquidity),
                         onFeeManagementClick = onFeeManagementClick,
-                        showDialogImmediately = !isEditing,
+                        showDialogImmediately = showDialogImmediately,
+                        onDialogShown = onDialogShown,
                         isSevere = true,
                         useEnablePolicyWording = true,
                     )
@@ -372,7 +379,8 @@ private fun EvaluateLiquidityIssuesForPayment(
                             stringResource(id = R.string.receive_lightning_warning_message_above_limit, swapFee.toPrettyString(btcUnit, withUnit = true), liquidityPolicy.maxAbsoluteFee.toPrettyString(btcUnit, withUnit = true))
                         },
                         onFeeManagementClick = onFeeManagementClick,
-                        showDialogImmediately = !isEditing,
+                        showDialogImmediately = showDialogImmediately,
+                        onDialogShown = onDialogShown,
                         isSevere = true,
                         useEnablePolicyWording = false,
                     )
@@ -395,7 +403,8 @@ private fun EvaluateLiquidityIssuesForPayment(
                             stringResource(id = R.string.receive_lightning_warning_message_above_limit_percent, swapFee.toPrettyString(btcUnit, withUnit = true), prettyPercent)
                         },
                         onFeeManagementClick = onFeeManagementClick,
-                        showDialogImmediately = !isEditing,
+                        showDialogImmediately = showDialogImmediately,
+                        onDialogShown = onDialogShown,
                         isSevere = true,
                         useEnablePolicyWording = false,
                     )
@@ -417,7 +426,8 @@ private fun EvaluateLiquidityIssuesForPayment(
                             stringResource(id = R.string.receive_lightning_warning_message_fee_expected, swapFee.toPrettyString(btcUnit, withUnit = true))
                         },
                         onFeeManagementClick = onFeeManagementClick,
-                        showDialogImmediately = !isEditing,
+                        showDialogImmediately = showDialogImmediately,
+                        onDialogShown = onDialogShown,
                         isSevere = false,
                         useEnablePolicyWording = false,
                     )
@@ -433,7 +443,8 @@ private fun EvaluateLiquidityIssuesForPayment(
                             stringResource(id = R.string.receive_lightning_warning_message_fee_expected, swapFee.toPrettyString(btcUnit, withUnit = true))
                         },
                         onFeeManagementClick = onFeeManagementClick,
-                        showDialogImmediately = !isEditing,
+                        showDialogImmediately = showDialogImmediately,
+                        onDialogShown = onDialogShown,
                         isSevere = false,
                         useEnablePolicyWording = false,
                     )
@@ -452,6 +463,7 @@ private fun IncomingLiquidityWarning(
     message: String,
     onFeeManagementClick: () -> Unit,
     showDialogImmediately: Boolean,
+    onDialogShown: () -> Unit,
     isSevere: Boolean,
     useEnablePolicyWording: Boolean,
 ) {
@@ -470,6 +482,7 @@ private fun IncomingLiquidityWarning(
             contentColor = MaterialTheme.colors.onSurface,
             scrimColor = MaterialTheme.colors.onBackground.copy(alpha = 0.1f),
         ) {
+            LaunchedEffect(key1 = Unit) { onDialogShown() }
             Column(
                 modifier = Modifier
                     .verticalScroll(rememberScrollState())

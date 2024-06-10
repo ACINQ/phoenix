@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -33,6 +34,7 @@ import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.fiatRate
+import fr.acinq.phoenix.android.payments.receive.EvaluateLiquidityIssuesForPayment
 import fr.acinq.phoenix.android.preferredAmountUnit
 import fr.acinq.phoenix.android.utils.Converter.toPrettyStringWithFallback
 import fr.acinq.phoenix.android.utils.annotatedStringResource
@@ -43,13 +45,15 @@ import fr.acinq.phoenix.data.lnurl.LnurlError
 fun LnurlWithdrawView(
     model: Scan.Model.LnurlWithdrawFlow,
     onBackClick: () -> Unit,
-    onWithdrawClick: (Scan.Intent.LnurlWithdrawFlow) -> Unit
+    onWithdrawClick: (Scan.Intent.LnurlWithdrawFlow) -> Unit,
+    onFeeManagementClick: () -> Unit,
 ) {
     val context = LocalContext.current
     val prefUnit = preferredAmountUnit
     val rate = fiatRate
 
-    var amount by remember { mutableStateOf<MilliSatoshi?>(model.lnurlWithdraw.maxWithdrawable) }
+    val maxWithdrawable = model.lnurlWithdraw.maxWithdrawable
+    var amount by remember { mutableStateOf<MilliSatoshi?>(maxWithdrawable) }
     var amountErrorMessage by remember { mutableStateOf("") }
 
     SplashLayout(
@@ -58,7 +62,7 @@ fun LnurlWithdrawView(
             Text(text = annotatedStringResource(R.string.lnurl_withdraw_header, model.lnurlWithdraw.initialUrl.host), textAlign = TextAlign.Center)
             Spacer(modifier = Modifier.height(16.dp))
             AmountHeroInput(
-                initialAmount = amount,
+                initialAmount = maxWithdrawable,
                 onAmountChange = { newAmount ->
                     amountErrorMessage = ""
                     when {
@@ -89,9 +93,9 @@ fun LnurlWithdrawView(
                 if (error != null && error is Scan.LnurlWithdrawError.RemoteError) {
                     ErrorMessage(
                         header = stringResource(id = R.string.lnurl_withdraw_error_header),
-                        details = getRemoteErrorMessage(error = error.err)
+                        details = getRemoteErrorMessage(error = error.err),
+                        alignment = Alignment.CenterHorizontally,
                     )
-                    Spacer(modifier = Modifier.height(32.dp))
                 }
 
                 val mayDoPayments by business.peerManager.mayDoPayments.collectAsState()
@@ -110,6 +114,13 @@ fun LnurlWithdrawView(
                         )
                     }
                 }
+
+                EvaluateLiquidityIssuesForPayment(
+                    amount = amount,
+                    onFeeManagementClick = onFeeManagementClick,
+                    showDialogImmediately = true,
+                    onDialogShown = {},
+                )
             }
             is Scan.Model.LnurlWithdrawFlow.LnurlWithdrawFetch -> {
                 ProgressView(text = stringResource(id = R.string.lnurl_withdraw_wait))

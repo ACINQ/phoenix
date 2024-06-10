@@ -24,9 +24,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
 import android.text.format.DateUtils
-import androidx.compose.ui.res.stringResource
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -42,7 +40,7 @@ import fr.acinq.phoenix.android.MainActivity
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateString
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
+import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency
@@ -51,7 +49,6 @@ import kotlinx.coroutines.flow.first
 import org.slf4j.LoggerFactory
 import java.text.DecimalFormat
 import java.util.Random
-import kotlin.math.ceil
 
 object SystemNotificationHelper {
     private const val PAYMENT_FAILED_NOTIF_ID = 354319
@@ -247,16 +244,17 @@ object SystemNotificationHelper {
 
     suspend fun notifyPaymentsReceived(
         context: Context,
+        userPrefs: UserPrefsRepository,
         paymentHash: ByteVector32,
         amount: MilliSatoshi,
         rates: List<ExchangeRate>,
         isHeadless: Boolean,
     ): Notification {
-        val isFiat = UserPrefs.getIsAmountInFiat(context).first() && rates.isNotEmpty()
+        val isFiat = userPrefs.getIsAmountInFiat.first() && rates.isNotEmpty()
         val unit = if (isFiat) {
-            UserPrefs.getFiatCurrency(context).first()
+            userPrefs.getFiatCurrency.first()
         } else {
-            UserPrefs.getBitcoinUnit(context).first()
+            userPrefs.getBitcoinUnit.first()
         }
         val rate = if (isFiat) {
             when (val rate = rates.find { it.fiatCurrency == unit }) {

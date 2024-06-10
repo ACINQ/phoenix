@@ -100,7 +100,7 @@
     <string name="initwallet_restore">Khôi phục ví của tôi</string>
 
     <string name="restore_disclaimer_message">Phoenix chỉ có thể khôi phục các khoản vốn off-chain được quản lý bởi ứng dụng này. \n\nNhập hạt giống KHÔNG tạo ra bởi Phoenix sẽ không khôi phục được bất cứ khoản tiền nào. \n\nNgoài ra, xin vui lòng đảm bảo rằng bạn chưa dùng ví Phoenix nào khác có chung hạt giống này.</string>
-    <string name="restore_disclaimer_checkbox">Tôi đã hiểu.</string>
+    <string name="utils_ack">Tôi đã hiểu.</string>
 
     <string name="restore_instructions">Hạt giống ví của bạn là một danh sách gồm 12 từ tiếng Anh. Nhập các từ này vào ô dưới đây.</string>
     <string name="restore_input_label">Nhập từ #%1$s</string>
@@ -136,9 +136,6 @@
     <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Khoản phí để nhận được khoản tiền này là %1$s và cao hơn %2$s%% so với khoản tiền sẽ nhận được.\n\nHãy tăng mức phí giới hạn trong mục Quản Lý Kênh, hoặc yêu cầu bổ sung thanh khoản.</string>
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Tính thanh khoản đầu vào không đủ cho khoản tiền này, ngoài ra bạn đã tắt chế độ quản lý kênh tự động.</string>
-
-    <string name="receive_onchain_legacy_warning_title">Thông báo di chuyển dữ liệu</string>
-    <string name="receive_onchain_legacy_warning">Đây là địa chỉ mới của bạn. Không sử dụng lại địa chỉ Bitcoin cũ trước lúc bạn di chuyển dữ liệu!</string>
 
     <!-- scanning errors -->
 
@@ -290,7 +287,7 @@
     <string name="walletinfo_onchain_swapin_locked_description">Những khoản vốn này sẽ có sẵn từ %1$s ngày trở đi.</string>
 
     <string name="walletinfo_onchain_swapin_refund_title">Vốn bị hủy</string>
-    <string name="walletinfo_onchain_swapin_refund_description">Những khoản tiền này đã không được swap kịp thời. Sử dụng bộ mô tả của ví để truy cập.</string>
+    <string name="walletinfo_onchain_swapin_refund_description">Những khoản tiền này đã không được swap kịp thời. Nhấn để chi tiêu số tiền này.</string>
 
     <string name="walletinfo_onchain_final_about">Ví cuối cùng là nơi tiền vốn sẽ được gửi tới, khi kênh Lightning của bạn bị đóng hoặc gặp sự cố. Bình thường ví này sẽ luôn trống.</string>
 
@@ -354,10 +351,15 @@
     <string name="liquidityads_estimate_above_25">Tổng phí cao hơn 25% so với khoản thanh khoản đã yêu cầu.</string>
     <string name="liquidityads_over_balance">Tổng phí vượt quá số dư của bạn.</string>
 
+    <string name="liquidityads_review_button">Xem lại yêu cầu</string>
+    <string name="liquidityads_disclaimer_body1">Bạn đang yêu cầu một lượng thanh khoản ban đầu. Thanh khoản không cố định theo thời gian: khi bạn nhận được tiền qua Lightning, thanh khoản sẽ được tiêu thụ và trở thành số dư của bạn.</string>
+    <string name="liquidityads_disclaimer_body2">Sau một năm, thanh khoản còn lại chưa được sử dụng sẽ được dịch vụ thu hồi.</string>
+
     <string name="liquidityads_request_button">Chấp nhận</string>
     <string name="liquidityads_requesting_spinner">Đang xử lý splice…</string>
 
     <string name="liquidityads_success">Thanh khoản đã được thêm vào thành công!</string>
+    <string name="liquidityads_success_amount">Số tiền đã thêm: %1$s</string>
 
     <string name="liquidityads_error_header">Yêu cầu thanh khoản không thành công</string>
     <string name="liquidityads_error_channels_unavailable">Các kênh đang bận. Vui lòng thử lại sau.</string>
@@ -374,14 +376,59 @@
 
     <!-- Lightning payment errors -->
 
-    <string name="outgoing_finalfailure_alreadypaid">Hóa đơn này đã được thanh toán.</string>
-    <string name="outgoing_finalfailure_noroutefound">Không thể liên lạc được với người nhận hoặc người nhận không có đủ thanh khoản đầu vào.</string>
+    <string name="outgoing_failuremessage_channel_closing">Các kênh đang đóng.</string>
+    <string name="outgoing_failuremessage_channel_splicing">Các kênh đang xử lý một mối nối. Hãy thử lại sau.</string>
+    <string name="outgoing_failuremessage_not_enough_fee">Phí không đủ.</string>
+    <string name="outgoing_failuremessage_not_enough_balance">Khoản thanh toán này vượt quá số dư của bạn.</string>
+    <string name="outgoing_failuremessage_too_big">Số tiền thanh toán quá lớn - hãy thử chia thành nhiều phần.</string>
+    <string name="outgoing_failuremessage_too_small">Số tiền thanh toán quá nhỏ.</string>
+    <string name="outgoing_failuremessage_expiry_too_big">Thời hạn thanh toán này còn quá xa trong tương lai.</string>
+    <string name="outgoing_failuremessage_rejected_by_recipient">Khoản thanh toán đã bị người nhận từ chối. Hóa đơn cụ thể này có thể đã được thanh toán.</string>
+    <string name="outgoing_failuremessage_recipient_offline">Người nhận đang ngoại tuyến.</string>
+    <string name="outgoing_failuremessage_not_enough_liquidity">Không thể chuyển khoản thanh toán đến người nhận (có thể thanh khoản gửi đến không đủ).</string>
+    <string name="outgoing_failuremessage_temporary_failure">Đã xảy ra lỗi trên một nút trong lộ trình thanh toán. Việc thanh toán có thể thành công nếu bạn thử lại.</string>
+    <string name="outgoing_failuremessage_too_many_pending">Bạn có quá nhiều khoản thanh toán đang chờ xử lý. Hãy thử lại sau khi chúng được giải quyết xong.</string>
+
+    <string name="outgoing_failuremessage_invalid_id">ID của khoản thanh toán không hợp lệ. Hãy thử lại.</string>
+    <string name="outgoing_failuremessage_not_connected">Kênh của bạn chưa được kết nối. Đợi kết nối ổn định và thử lại.</string>
+    <string name="outgoing_failuremessage_channel_opening">Kênh của bạn vẫn đang trong quá trình mở. Hãy đợi và thử lại.</string>
+    <string name="outgoing_failuremessage_unsupported_features">Hóa đơn này sử dụng các tính năng không được hỗ trợ. Đảm bảo bạn đang dùng phiên bản Phoenix mới nhất.</string>
+    <string name="outgoing_failuremessage_invalid_amount">Số tiền thanh toán không hợp lệ.</string>
+    <string name="outgoing_failuremessage_no_available_channels">Không thể gửi khoản thanh toán qua các kênh hiện có của bạn.</string>
+    <string name="outgoing_failuremessage_unknown">Đã xảy ra lỗi không xác định và thanh toán không thành công.</string>
+    <string name="outgoing_failuremessage_restarted">Ví đã được khởi động lại trong khi thanh toán đang được xử lý.</string>
+
+    <string name="outgoing_failuremessage_alreadypaid">Hóa đơn này đã được thanh toán.</string>
+    <string name="outgoing_failuremessage_noroutefound">Không thể liên lạc được với người nhận hoặc người nhận không có đủ thanh khoản đầu vào.</string>
 
     <!-- low feerate disclaimer -->
 
-    <string name="send_low_feerate_dialog_title">Phí thấp!</string>
-    <string name="send_low_feerate_dialog_body1">Các giao dịch không đủ phí có thể ở trong tình trạng không được xác nhận trong nhiều ngày hoặc nhiều tuần.</string>
-    <string name="send_low_feerate_dialog_body2">Lựa chọn mức phí phù hợp là trách nhiệm của bạn. Sau khi gửi yêu cầu, giao dịch này không thể bị hủy, mà chỉ có thể được tăng tốc với mức phí cao hơn.</string>
-    <string name="send_low_feerate_dialog_body3">Bạn có chắc bạn muốn tiếp tục?</string>
+    <string name="spliceout_low_feerate_dialog_title">Phí thấp!</string>
+    <string name="spliceout_low_feerate_dialog_body1">Các giao dịch không đủ phí có thể ở trong tình trạng không được xác nhận trong nhiều ngày hoặc nhiều tuần.</string>
+    <string name="spliceout_low_feerate_dialog_body2">Lựa chọn mức phí phù hợp là trách nhiệm của bạn. Sau khi gửi yêu cầu, giao dịch này không thể bị hủy, mà chỉ có thể được tăng tốc với mức phí cao hơn.</string>
+    <string name="spliceout_low_feerate_dialog_body3">Bạn có chắc bạn muốn tiếp tục?</string>
+
+    <!-- spliceout: capacity disclaimer -->
+
+    <string name="spliceout_capacity_disclaimer_title">Kích thước kênh bị ảnh hưởng</string>
+    <string name="spliceout_capacity_disclaimer_body1">Số tiền gửi được lấy từ phía kênh của bạn, làm giảm quy mô kênh một lượng tương tự. Thanh khoản đầu vào của bạn không thay đổi.</string>
+    <string name="spliceout_capacity_disclaimer_checkbox">Đừng hiển thị lại thông báo đó.</string>
+
+    <!-- Spend swap-in refund -->
+
+    <string name="swapinrefund_title">Chi tiêu các khoản hoán đổi đã bị hủy</string>
+    <string name="swapinrefund_none_available_label">Chưa có giao dịch hoán đổi nào bị hủy.</string>
+    <string name="swapinrefund_available_label">Có sẵn: <b>%1$s</b> (%2$s)</string>
+    <string name="swapinrefund_instructions_1">Sử dụng màn hình này để chi tiêu các khoản tiền gửi trên chuỗi không được hoán đổi kịp thời. Điều này không ảnh hưởng đến các kênh Lightning của bạn.</string>
+    <string name="swapinrefund_instructions_2">Đảm bảo địa chỉ đích là hợp lệ và mức phí hợp lý.</string>
+    <string name="swapinrefund_estimate_button">Ước tính phí</string>
+    <string name="swapinrefund_estimating">Ước tính chi phí…</string>
+    <string name="swapinrefund_send_button">Gửi</string>
+    <string name="swapinrefund_sending">Đang gửi tiền…</string>
+    <string name="swapinrefund_failed">Lỗi giao dịch.</string>
+    <string name="swapinrefund_failed_address">Địa chỉ này không hợp lệ.</string>
+    <string name="swapinrefund_failed_cannot_create">Không thể tạo giao dịch hoàn tiền. Hãy thử lại.</string>
+    <string name="swapinrefund_success">Giao dịch đã được công bố.</string>
+    <string name="swapinrefund_success_details">Bạn có thể tìm thấy giao dịch chi tiêu số tiền bên dưới. Nó sẽ không xuất hiện trong lịch sử thanh toán của bạn, vì vậy hãy tạo bản sao ID của nó ngay bây giờ nếu cần.</string>
 
 </resources>

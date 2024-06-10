@@ -53,7 +53,6 @@ import fr.acinq.phoenix.android.controllerFactory
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.security.SeedFileState
 import fr.acinq.phoenix.android.security.SeedManager
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.controllers.init.RestoreWallet
 import fr.acinq.phoenix.utils.MnemonicLanguage
@@ -118,7 +117,7 @@ private fun DisclaimerView(
             Text(stringResource(R.string.restore_disclaimer_message))
         }
         Checkbox(
-            text = stringResource(R.string.restore_disclaimer_checkbox),
+            text = stringResource(R.string.utils_ack),
             checked = hasCheckedWarning,
             onCheckedChange = { hasCheckedWarning = it },
         )

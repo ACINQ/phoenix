@@ -19,11 +19,6 @@ extension Lightning_kmpWalletPayment {
 				let exp = NSLocalizedString("layer 1 -> 2", comment: "Transaction Info: Explanation")
 				return (val, exp.lowercased())
 			}
-			if let _ = incomingPayment.origin.asKeySend() {
-				let val = NSLocalizedString("KeySend", comment: "Transaction Info: Value")
-				let exp = NSLocalizedString("non-invoice payment", comment: "Transaction Info: Explanation")
-				return (val, exp.lowercased())
-			}
 			if incomingPayment.isSpliceIn {
 				let val = NSLocalizedString("Splice-In", comment: "Transaction Info: Value")
 				let exp = NSLocalizedString("adding to existing channel", comment: "Transaction Info: Explanation")
@@ -35,11 +30,6 @@ extension Lightning_kmpWalletPayment {
 			if let _ = outgoingPayment.details.asSwapOut() {
 				let val = NSLocalizedString("Swap-Out", comment: "Transaction Info: Value")
 				let exp = NSLocalizedString("layer 2 -> 1", comment: "Transaction Info: Explanation")
-				return (val, exp.lowercased())
-			}
-			if let _ = outgoingPayment.details.asKeySend() {
-				let val = NSLocalizedString("KeySend", comment: "Transaction Info: Value")
-				let exp = NSLocalizedString("non-invoice payment", comment: "Transaction Info: Explanation")
 				return (val, exp.lowercased())
 			}
 			
@@ -207,6 +197,16 @@ extension Lightning_kmpWalletPayment {
 				}
 			}
 			
+		} else if let _ = self as? Lightning_kmpChannelCloseOutgoingPayment {
+			
+			// Currently ACINQ pays the miner fees.
+			// But this will change soon, and the user will get to choose the feerate to pay.
+			// This will allow the user to control the speed of the closing transaction.
+			// And the UI will reflect this information.
+			// But for now we just don't want to show the miner fee for this TX type.
+			
+			return nil
+						
 		} else if let onChainOutgoingPayment = self as? Lightning_kmpOnChainOutgoingPayment {
 			
 			let sat = onChainOutgoingPayment.miningFees.sat

@@ -10,6 +10,12 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct MinerFeeSheet: View {
 	
+	enum Target {
+		case spliceOut
+		case expiredSwapIn
+	}
+	
+	let target: Target
 	let amount: Bitcoin_kmpSatoshi
 	let btcAddress: String
 	
@@ -487,55 +493,19 @@ struct MinerFeeSheet: View {
 		log.trace("satsPerByteChanged(): \(satsPerByte)")
 		
 		minerFeeInfo = nil
-		guard
-			let satsPerByte_number = try? parsedSatsPerByte.get(),
-			let peer = Biz.business.peerManager.peerStateValue(),
-			let scriptVector = Parser.shared.addressToPublicKeyScriptOrNull(chain: Biz.business.chain, address: btcAddress)
-		else {
+		guard let satsPerByte_number = try? parsedSatsPerByte.get() else {
 			return
 		}
 		
 		if let mrr = mempoolRecommendedResponse, mrr.minimumFee > satsPerByte_number.doubleValue {
 			feeBelowMinimum = true
-			return
 		} else {
 			feeBelowMinimum = false
-		}
-		
-		let originalSatsPerByte = satsPerByte
-		
-		let satsPerByte_satoshi = Bitcoin_kmpSatoshi(sat: satsPerByte_number.int64Value)
-		let feePerByte = Lightning_kmpFeeratePerByte(feerate: satsPerByte_satoshi)
-		let feePerKw = Lightning_kmpFeeratePerKw(feeratePerByte: feePerByte)
-		
-		Task { @MainActor in
-			do {
-				let pair = try await peer.estimateFeeForSpliceOut(
-					amount: amount,
-					scriptPubKey: scriptVector,
-					targetFeerate: feePerKw
-				)
-				
-				if let pair = pair,
-				   let updatedFeePerKw: Lightning_kmpFeeratePerKw = pair.first,
-				   let fees: Lightning_kmpChannelCommand.CommitmentSpliceFees = pair.second
-				{
-					if self.satsPerByte == originalSatsPerByte {
-						self.minerFeeInfo = MinerFeeInfo(
-							pubKeyScript: scriptVector,
-							feerate: updatedFeePerKw,
-							minerFee: fees.miningFee
-						)
-					}
-				} else {
-					log.error("Error: peer.estimateFeeForSpliceOut() == nil")
-				}
-				
-			} catch {
-				log.error("Error: \(error)")
+			switch target {
+				case .spliceOut     : updateMinerFeeInfo_SpliceOut(satsPerByte_number)
+				case .expiredSwapIn : updateMinerFeeInfo_ExpiredSwapIn(satsPerByte_number)
 			}
-			
-		} // </Task>
+		}
 	}
 	
 	func mempoolRecommendedResponseChanged() {
@@ -567,121 +537,97 @@ struct MinerFeeSheet: View {
 			smartModalState.close()
 		}
 	}
-}
-
-// MARK: -
-
-struct LowMinerFeeWarning: View {
 	
-	@Binding var showLowMinerFeeWarning: Bool
+	// --------------------------------------------------
+	// MARK: Utilities
+	// --------------------------------------------------
 	
-	@EnvironmentObject var smartModalState: SmartModalState
-	
-	@ViewBuilder
-	var body: some View {
+	func updateMinerFeeInfo_SpliceOut(_ satsPerByte_number: NSNumber) {
+		log.trace("updateMinerFeeInfo_SpliceOut()")
 		
-		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-			header()
-			content()
-			footer()
+		let chain = Biz.business.chain
+		guard
+			let peer = Biz.business.peerManager.peerStateValue(),
+			let scriptVector = Parser.shared.addressToPublicKeyScriptOrNull(chain: chain, address: btcAddress)
+		else {
+			return
 		}
-	}
-	
-	@ViewBuilder
-	func header() -> some View {
 		
-		HStack(alignment: VerticalAlignment.center, spacing: 0) {
-			Text("Low feerate!")
-				.font(.title3)
-				.accessibilityAddTraits(.isHeader)
-				.accessibilitySortPriority(100)
-			Spacer()
-		}
-		.padding(.horizontal)
-		.padding(.vertical, 8)
-		.background(
-			Color(UIColor.secondarySystemBackground)
-				.cornerRadius(15, corners: [.topLeft, .topRight])
-		)
-		.padding(.bottom, 4)
-	}
-	
-	@ViewBuilder
-	func content() -> some View {
+		let originalSatsPerByte = satsPerByte
 		
-		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-			
-			Text(
-			"""
-			Transactions with insufficient feerate may linger for days or weeks without confirming.
-			
-			Choosing the feerate is your responsibility. \
-			Once sent, this transaction cannot be cancelled, only accelerated with higer fees.
-			
-			Are you sure you want to proceed?
-			"""
-			)
-		}
-		.padding(.horizontal)
-		.padding(.top)
-	}
-	
-	@ViewBuilder
-	func footer() -> some View {
+		let satsPerByte_satoshi = Bitcoin_kmpSatoshi(sat: satsPerByte_number.int64Value)
+		let feePerByte = Lightning_kmpFeeratePerByte(feerate: satsPerByte_satoshi)
+		let feePerKw = Lightning_kmpFeeratePerKw(feeratePerByte: feePerByte)
 		
-		HStack(alignment: .center, spacing: 0) {
-			Spacer()
-			
-			Button("Back") {
-				cancelButtonTapped()
-			}
-			.padding(.trailing)
+		Task { @MainActor in
+			do {
+				let pair = try await peer.estimateFeeForSpliceOut(
+					amount: amount,
+					scriptPubKey: scriptVector,
+					targetFeerate: feePerKw
+				)
 				
-			Button("I understand") {
-				confirmButtonTapped()
+				if let pair = pair,
+					let updatedFeePerKw: Lightning_kmpFeeratePerKw = pair.first,
+					let fees: Lightning_kmpChannelCommand.CommitmentSpliceFees = pair.second
+				{
+					if self.satsPerByte == originalSatsPerByte {
+						self.minerFeeInfo = MinerFeeInfo(
+							pubKeyScript: scriptVector,
+							feerate: updatedFeePerKw,
+							minerFee: fees.miningFee
+						)
+					}
+				} else {
+					log.error("Error: peer.estimateFeeForSpliceOut() == nil")
+				}
+				
+			} catch {
+				log.error("Error: \(error)")
 			}
+			
+		} // </Task>
+	}
+	
+	func updateMinerFeeInfo_ExpiredSwapIn(_ satsPerByte_number: NSNumber) {
+		log.trace("updateMinerFeeInfo_ExpiredSwapIn()")
+		
+		let chain = Biz.business.chain
+		guard
+			let keyManager = Biz.business.walletManager.keyManagerValue(),
+			let scriptVector = Parser.shared.addressToPublicKeyScriptOrNull(chain: chain, address: btcAddress)
+		else {
+			return
 		}
-		.font(.title3)
-		.padding()
-		.padding(.top)
-	}
-	
-	func cancelButtonTapped() {
-		log.trace("[LowMinerFeeWarning] cancelButtonTapped()")
-		showLowMinerFeeWarning = false
-	}
-	
-	func confirmButtonTapped() {
-		log.trace("[LowMinerFeeWarning] confirmButtonTapped()")
-		smartModalState.close()
-	}
-}
-
-// MARK: -
-
-struct PriorityBoxStyle: GroupBoxStyle {
-	
-	let width: CGFloat?
-	let disabled: Bool
-	let selected: Bool
-	let tapped: () -> Void
-	
-	func makeBody(configuration: GroupBoxStyleConfiguration) -> some View {
-		VStack(alignment: HorizontalAlignment.center, spacing: 4) {
-			configuration.label
-				.font(.headline)
-			configuration.content
+		
+		let satsPerByte_satoshi = Bitcoin_kmpSatoshi(sat: satsPerByte_number.int64Value)
+		let feePerByte = Lightning_kmpFeeratePerByte(feerate: satsPerByte_satoshi)
+		let feePerKw = Lightning_kmpFeeratePerKw(feeratePerByte: feePerByte)
+		
+	#if DEBUG
+		let siw = Biz.business.balanceManager.swapInWalletValue()
+	//	let swapInWallet = siw.fakeBlockHeight(plus: Int32(144 * 30 * 6)) // 6 months: test readyForRefund
+		let swapInWallet = siw
+	#else
+		let swapInWallet = Biz.business.balanceManager.swapInWalletValue()
+	#endif
+		
+		let pair: KotlinPair<Bitcoin_kmpTransaction, Bitcoin_kmpSatoshi>? =
+			swapInWallet._spendExpiredSwapIn(
+				swapInKeys: keyManager.swapInOnChainWallet,
+				scriptPubKey: scriptVector,
+				feerate: feePerKw
+			)
+		
+		guard let minerFee = pair?.second else {
+			log.debug("updateMinerFeeInfo_ExpiredSwapIn: swapInWallet.spendExpiredSwapIn() returned null")
+			return
 		}
-		.frame(width: width?.advanced(by: -16.0))
-		.padding(.all, 8)
-		.background(RoundedRectangle(cornerRadius: 8, style: .continuous)
-			.fill(Color(UIColor.quaternarySystemFill)))
-		.overlay(
-			RoundedRectangle(cornerRadius: 8)
-				.stroke(selected ? Color.appAccent : Color(UIColor.quaternarySystemFill), lineWidth: 1)
+		
+		minerFeeInfo = MinerFeeInfo(
+			pubKeyScript: scriptVector,
+			feerate: feePerKw,
+			minerFee: minerFee
 		)
-		.onTapGesture {
-			tapped()
-		}
 	}
 }

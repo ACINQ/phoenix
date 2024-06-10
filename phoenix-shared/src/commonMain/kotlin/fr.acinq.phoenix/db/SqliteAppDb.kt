@@ -1,9 +1,8 @@
 package fr.acinq.phoenix.db
 
-import com.squareup.sqldelight.EnumColumnAdapter
-import com.squareup.sqldelight.db.SqlDriver
-import com.squareup.sqldelight.runtime.coroutines.asFlow
-import com.squareup.sqldelight.runtime.coroutines.mapToList
+import app.cash.sqldelight.EnumColumnAdapter
+import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.db.SqlDriver
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.data.ExchangeRate

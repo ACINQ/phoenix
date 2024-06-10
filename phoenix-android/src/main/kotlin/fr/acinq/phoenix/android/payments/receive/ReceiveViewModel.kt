@@ -16,7 +16,6 @@
 
 package fr.acinq.phoenix.android.payments.receive
 
-import android.content.Context
 import androidx.annotation.UiThread
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,7 +26,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
-import fr.acinq.bitcoin.Bitcoin
 import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.Lightning
@@ -37,9 +35,10 @@ import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.utils.BitmapHelper
 import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
 import fr.acinq.phoenix.android.utils.datastore.SwapAddressFormat
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
+import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.managers.WalletManager
+import fr.acinq.phoenix.managers.phoenixSwapInWallet
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -64,7 +63,7 @@ class ReceiveViewModel(
     private val peerManager: PeerManager,
     private val walletManager: WalletManager,
     private val internalDataRepository: InternalDataRepository,
-    private val context: Context,
+    private val userPrefs: UserPrefsRepository
 ): ViewModel() {
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -111,9 +110,9 @@ class ReceiveViewModel(
     @UiThread
     private fun monitorCurrentSwapAddress() {
         viewModelScope.launch {
-            val swapAddressFormat = UserPrefs.getSwapAddressFormat(context).first()
+            val swapAddressFormat = userPrefs.getSwapAddressFormat.first()
             if (swapAddressFormat == SwapAddressFormat.LEGACY) {
-                val legacySwapInAddress = peerManager.getPeer().swapInWallet.legacySwapInAddress
+                val legacySwapInAddress = peerManager.getPeer().phoenixSwapInWallet.legacySwapInAddress
                 val image = BitmapHelper.generateBitmap(legacySwapInAddress).asImageBitmap()
                 currentSwapAddress = BitcoinAddressState.Show(0, legacySwapInAddress, image)
             } else {
@@ -126,7 +125,7 @@ class ReceiveViewModel(
                 log.info("starting with swap-in address $startAddress:$startIndex")
 
                 // monitor the actual address from the swap-in wallet -- might take some time since the wallet must check all previous addresses
-                peerManager.getPeer().swapInWallet.swapInAddressFlow.filterNotNull().collect { (newAddress, newIndex) ->
+                peerManager.getPeer().phoenixSwapInWallet.swapInAddressFlow.filterNotNull().collect { (newAddress, newIndex) ->
                     log.info("swap-in wallet current address update: $newAddress:$newIndex")
                     val newImage = BitmapHelper.generateBitmap(newAddress).asImageBitmap()
                     internalDataRepository.saveLastUsedSwapIndex(newIndex)
@@ -145,7 +144,7 @@ class ReceiveViewModel(
         override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
             val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as? PhoenixApplication)
             @Suppress("UNCHECKED_CAST")
-            return ReceiveViewModel(chain, peerManager, walletManager, application.internalDataRepository, application.applicationContext) as T
+            return ReceiveViewModel(chain, peerManager, walletManager, application.internalDataRepository, application.userPrefs) as T
         }
     }
 }

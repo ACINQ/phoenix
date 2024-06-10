@@ -16,7 +16,7 @@
 
 package fr.acinq.phoenix.db
 
-import com.squareup.sqldelight.db.SqlDriver
+import app.cash.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.*
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.*
@@ -255,17 +255,17 @@ class SqlitePaymentsDatabaseTest {
         val onePartFailed = p.copy(
             parts = listOf(
                 p.parts[0].copy(
-                    status = LightningOutgoingPayment.Part.Status.Failed(TemporaryNodeFailure.code, TemporaryNodeFailure.message, 110)
+                    status = LightningOutgoingPayment.Part.Status.Failed(LightningOutgoingPayment.Part.Status.Failure.TemporaryRemoteFailure, 110)
                 ),
                 p.parts[1]
             )
         )
-        db.completeOutgoingLightningPart(p.parts[0].id, Either.Right(TemporaryNodeFailure), 110)
+        db.completeOutgoingLightningPart(p.parts[0].id, LightningOutgoingPayment.Part.Status.Failure.TemporaryRemoteFailure, 110)
         assertEquals(onePartFailed, db.getLightningOutgoingPayment(p.id))
         p.parts.forEach { assertEquals(onePartFailed, db.getLightningOutgoingPaymentFromPartId(it.id)) }
 
         // Updating non-existing parts should fail.
-        assertFalse { db.outQueries.updateLightningPart(UUID.randomUUID(), Either.Right(TemporaryNodeFailure), 110) }
+        assertFalse { db.outQueries.updateLightningPart(UUID.randomUUID(), LightningOutgoingPayment.Part.Status.Failure.TemporaryRemoteFailure, 110) }
         assertFalse { db.outQueries.updateLightningPart(UUID.randomUUID(), randomBytes32(), 110) }
 
         // Additional parts must have a unique id.
@@ -373,17 +373,17 @@ class SqlitePaymentsDatabaseTest {
         val channelId = randomBytes32()
         val partsFailed = p.copy(
             parts = listOf(
-                p.parts[0].copy(status = OutgoingPaymentFailure.convertFailure(Either.Right(TemporaryNodeFailure), 110)),
-                p.parts[1].copy(status = OutgoingPaymentFailure.convertFailure(Either.Left(TooManyAcceptedHtlcs(channelId, 10)), 111)),
+                p.parts[0].copy(status = LightningOutgoingPayment.Part.Status.Failed(LightningOutgoingPayment.Part.Status.Failure.TemporaryRemoteFailure, 110)),
+                p.parts[1].copy(status = LightningOutgoingPayment.Part.Status.Failed(LightningOutgoingPayment.Part.Status.Failure.TooManyPendingPayments, 111)),
             )
         )
-        db.completeOutgoingLightningPart(p.parts[0].id, Either.Right(TemporaryNodeFailure), 110)
-        db.completeOutgoingLightningPart(p.parts[1].id, Either.Left(TooManyAcceptedHtlcs(channelId, 10)), 111)
+        db.completeOutgoingLightningPart(p.parts[0].id, LightningOutgoingPayment.Part.Status.Failure.TemporaryRemoteFailure, 110)
+        db.completeOutgoingLightningPart(p.parts[1].id, LightningOutgoingPayment.Part.Status.Failure.TooManyPendingPayments, 111)
         assertEquals(partsFailed, db.getLightningOutgoingPayment(p.id))
         p.parts.forEach { assertEquals(partsFailed, db.getLightningOutgoingPaymentFromPartId(it.id)) }
 
         val paymentStatus = LightningOutgoingPayment.Status.Completed.Failed(
-            reason = FinalFailure.NoRouteToRecipient,
+            reason = FinalFailure.RecipientUnreachable,
             completedAt = 120
         )
         val paymentFailed = partsFailed.copy(status = paymentStatus)

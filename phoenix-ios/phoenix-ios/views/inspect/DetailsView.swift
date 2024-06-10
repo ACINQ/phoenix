@@ -249,20 +249,13 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			} else if let failed = lightningPayment.status.asFailed() {
 				
 				InlineSection {
-					header("Send Failed")
+					header("Payment Failed")
 				} content: {
 					failed_failedAt(failed)
-					failed_reason(failed)
-				}
-			}
-			
-			if lightningPayment.parts.count > 0 {
-				
-				InlineSection {
-					header("Payment Parts")
-				} content: {
-					ForEach(lightningPayment.parts.indices, id: \.self) { index in
-						lightningPart_row(lightningPayment.parts[index])
+					if let finalFailure = lightningPayment.explainAsFinalFailure() {
+						failed_explain_finalFailure(finalFailure)
+					} else if let partFailure = lightningPayment.explainAsPartFailure() {
+						failed_explain_partFailure(partFailure)
 					}
 				}
 			}
@@ -297,7 +290,6 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				onChain_broadcastAt(channelClosing)
 				onChain_confirmedAt(channelClosing)
 				common_amountSent(msat: outgoingPayment.amount)
-				onChain_minerFees(channelClosing)
 				common_amountReceived(sat: channelClosing.recipientAmount)
 				onChain_btcTxid(channelClosing)
 			}
@@ -1043,7 +1035,9 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func failed_reason(_ failed: Lightning_kmpLightningOutgoingPayment.StatusCompletedFailed) -> some View {
+	func failed_explain_finalFailure(
+		_ finalFailure: Lightning_kmpFinalFailure
+	) -> some View {
 		let identifier: String = #function
 		
 		InfoGridRowWrapper(
@@ -1053,114 +1047,31 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			keyColumn("reason")
 			
 		} valueColumn: {
-			Text(failed.reason.description)
+			
+			let localizedErrMsg = finalFailure.localizedDescription()
+			Text(verbatim: localizedErrMsg)
 			
 		} // </InfoGridRowWrapper>
 	}
 	
 	@ViewBuilder
-	func lightningPart_row(
-		_ part: Lightning_kmpLightningOutgoingPayment.Part
+	func failed_explain_partFailure(
+		_ partFailure: Lightning_kmpLightningOutgoingPayment.PartStatusFailure
 	) -> some View {
 		let identifier: String = #function
-		let imgSize: CGFloat = 20
 		
 		InfoGridRowWrapper(
 			identifier: identifier,
 			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
-			
-			if let part_succeeded = part.status as? Lightning_kmpLightningOutgoingPayment.PartStatusSucceeded {
-				keyColumn(verbatim: shortDisplayTime(date: part_succeeded.completedAtDate))
-				
-			} else if let part_failed = part.status as? Lightning_kmpLightningOutgoingPayment.PartStatusFailed {
-				keyColumn(verbatim: shortDisplayTime(date: part_failed.completedAtDate))
-				
-			} else {
-				keyColumn(verbatim: shortDisplayTime(date: part.createdAtDate))
-			}
+			keyColumn("reason")
 			
 		} valueColumn: {
-		
-			if let _ = part.status as? Lightning_kmpLightningOutgoingPayment.PartStatusSucceeded {
-				
-				VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
-					HStack(alignment: VerticalAlignment.center, spacing: 4) {
-						Image("ic_payment_sent")
-							.renderingMode(.template)
-							.resizable()
-							.aspectRatio(contentMode: .fit)
-							.frame(width: imgSize, height: imgSize)
-							.foregroundColor(Color.appPositive)
-						
-						let formatted = Utils.formatBitcoin(
-							msat        : part.amount,
-							bitcoinUnit : currencyPrefs.bitcoinUnit,
-							policy      : .showMsatsIfNonZero
-						)
-						if formatted.hasSubFractionDigits { // e.g.: has visible millisatoshi's
-							Text(verbatim: formatted.integerDigits)
-							+	Text(verbatim: formatted.decimalSeparator)
-									.foregroundColor(formatted.hasStdFractionDigits ? .primary : .secondary)
-							+	Text(verbatim: formatted.stdFractionDigits)
-							+	Text(verbatim: formatted.subFractionDigits)
-									.foregroundColor(.secondary)
-							+	Text(verbatim: " \(formatted.type)")
-						} else {
-							Text(verbatim: formatted.string)
-						}
-					}
-				}
-				
-			} else if let part_failed = part.status as? Lightning_kmpLightningOutgoingPayment.PartStatusFailed {
-				
-				VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
-					HStack(alignment: VerticalAlignment.center, spacing: 4) {
-						Image(systemName: "xmark.circle")
-							.renderingMode(.template)
-							.resizable()
-							.aspectRatio(contentMode: .fit)
-							.frame(width: imgSize, height: imgSize)
-							.foregroundColor(.appNegative)
-						
-						let formatted = Utils.formatBitcoin(
-							msat        : part.amount,
-							bitcoinUnit : currencyPrefs.bitcoinUnit,
-							policy      : .showMsatsIfNonZero
-						)
-						if formatted.hasSubFractionDigits { // e.g.: has visible millisatoshi's
-							Text(verbatim: formatted.integerDigits)
-							+	Text(verbatim: formatted.decimalSeparator)
-									.foregroundColor(formatted.hasStdFractionDigits ? .primary : .secondary)
-							+	Text(verbatim: formatted.stdFractionDigits)
-							+	Text(verbatim: formatted.subFractionDigits)
-									.foregroundColor(.secondary)
-							+	Text(verbatim: " \(formatted.type)")
-						} else {
-							Text(verbatim: formatted.string)
-						}
-					}
-					
-					let code = part_failed.remoteFailureCode?.description ?? "local"
-					Text(verbatim: "\(code): \(part_failed.details)")
-				}
-				
-			} else {
-				
-				VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
-					HStack(alignment: VerticalAlignment.center, spacing: 4) {
-						Image("ic_payment_sending")
-							.renderingMode(.template)
-							.resizable()
-							.aspectRatio(contentMode: .fit)
-							.frame(width: imgSize, height: imgSize)
-							.foregroundColor(Color.borderColor)
-						
-						Text("pending")
-					}
-				}
-			}
-		}
+			
+			let localizedErrMsg = partFailure.localizedDescription()
+			Text(verbatim: localizedErrMsg)
+			
+		} // </InfoGridRowWrapper>
 	}
 	
 	@ViewBuilder
@@ -1449,9 +1360,11 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				
 				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 					if showingOriginalFiatValue {
-						Text(" (original)").foregroundColor(.secondary)
+						Text(" (original)", comment: "translate: original")
+							.foregroundColor(.secondary)
 					} else {
-						Text(" (now)").foregroundColor(.secondary)
+						Text(" (now)", comment: "translate: now")
+							.foregroundColor(.secondary)
 					}
 					
 					if canShowOriginalFiatValue {
@@ -1482,7 +1395,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 						}
 						Text_CurrencyName(currency: display_fiatOriginal.currency, fontTextStyle: .callout)
 							.layoutPriority(1)
-						Text(" (original)")
+						Text(" (original)", comment: "translate: original")
 							.layoutPriority(1)
 							.foregroundColor(.secondary)
 						
@@ -1499,7 +1412,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 						}
 						Text_CurrencyName(currency: display_fiatCurrent.currency, fontTextStyle: .callout)
 							.layoutPriority(1)
-						Text(" (now)")
+						Text(" (now)", comment: "translate: now")
 							.layoutPriority(1)
 							.foregroundColor(.secondary)
 					}

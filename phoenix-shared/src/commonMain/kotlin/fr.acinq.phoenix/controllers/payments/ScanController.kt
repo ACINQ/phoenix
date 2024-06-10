@@ -21,6 +21,7 @@ import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.*
 import fr.acinq.lightning.db.LightningOutgoingPayment
+import fr.acinq.lightning.io.PayInvoice
 import fr.acinq.lightning.io.SendPayment
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.utils.*
@@ -222,11 +223,10 @@ class AppScanController(
         }
 
         peer.send(
-            SendPayment(
+            PayInvoice(
                 paymentId = paymentId,
                 amount = amountToSend,
-                recipient = invoice.nodeId,
-                paymentRequest = invoice,
+                paymentDetails = LightningOutgoingPayment.Details.Normal(paymentRequest = invoice),
                 trampolineFeesOverride = listOf(trampolineFees)
             )
         )

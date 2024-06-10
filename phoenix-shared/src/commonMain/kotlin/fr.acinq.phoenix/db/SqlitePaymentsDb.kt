@@ -16,10 +16,9 @@
 
 package fr.acinq.phoenix.db
 
-import co.touchlab.kermit.Logger
-import com.squareup.sqldelight.EnumColumnAdapter
-import com.squareup.sqldelight.db.SqlDriver
-import com.squareup.sqldelight.runtime.coroutines.asFlow
+import app.cash.sqldelight.EnumColumnAdapter
+import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
 import fr.acinq.bitcoin.TxId
@@ -184,7 +183,7 @@ class SqlitePaymentsDb(
 
     override suspend fun completeOutgoingLightningPart(
         partId: UUID,
-        failure: Either<ChannelException, FailureMessage>,
+        failure: LightningOutgoingPayment.Part.Status.Failure,
         completedAt: Long
     ) {
         withContext(Dispatchers.Default) {
@@ -203,7 +202,7 @@ class SqlitePaymentsDb(
         completedAt: Long
     ) {
         withContext(Dispatchers.Default) {
-            val (statusType, statusData) = failedStatus.mapToDb()
+            val (statusType, statusData) = failedStatus.failure.mapToDb()
             outQueries.database.outgoingPaymentsQueries.updateLightningPart(
                 part_id = partId.toString(),
                 part_status_type = statusType,

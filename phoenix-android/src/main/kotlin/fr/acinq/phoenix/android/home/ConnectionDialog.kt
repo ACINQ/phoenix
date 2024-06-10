@@ -32,7 +32,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
@@ -42,7 +41,7 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.Dialog
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.TextWithIcon
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
+import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.isBadCertificate
 import fr.acinq.phoenix.android.utils.monoTypo
 import fr.acinq.phoenix.android.utils.negativeColor
@@ -59,8 +58,6 @@ fun ConnectionDialog(
     onTorClick: () -> Unit,
     onElectrumClick: () -> Unit,
 ) {
-    val context = LocalContext.current
-
     Dialog(title = stringResource(id = R.string.conndialog_title), onDismiss = onClose) {
         Column {
             if (connections.internet != Connection.ESTABLISHED) {
@@ -77,7 +74,7 @@ fun ConnectionDialog(
                 ConnectionDialogLine(label = stringResource(id = R.string.conndialog_internet), connection = connections.internet)
                 HSeparator()
 
-                val isTorEnabled = UserPrefs.getIsTorEnabled(context).collectAsState(initial = null).value
+                val isTorEnabled = userPrefs.getIsTorEnabled.collectAsState(initial = null).value
                 if (isTorEnabled != null && isTorEnabled) {
                     ConnectionDialogLine(label = stringResource(id = R.string.conndialog_tor), connection = connections.tor, onClick = onTorClick)
                     HSeparator()

@@ -16,7 +16,7 @@
 
 package fr.acinq.phoenix.db.payments
 
-import com.squareup.sqldelight.ColumnAdapter
+import app.cash.sqldelight.ColumnAdapter
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.utils.Either
@@ -126,11 +126,11 @@ class OutgoingQueries(val database: PaymentsDatabase) {
 
     fun updateLightningPart(
         partId: UUID,
-        failure: Either<ChannelException, FailureMessage>,
+        failure: LightningOutgoingPayment.Part.Status.Failure,
         completedAt: Long
     ): Boolean {
         var result = true
-        val (statusTypeVersion, statusData) = OutgoingPaymentFailure.convertFailure(failure).mapToDb()
+        val (statusTypeVersion, statusData) = failure.mapToDb()
         database.transaction {
             queries.updateLightningPart(
                 part_id = partId.toString(),

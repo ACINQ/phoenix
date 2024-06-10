@@ -21,27 +21,20 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,33 +53,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.payment.LiquidityPolicy
-import fr.acinq.lightning.payment.PaymentRequest
-import fr.acinq.lightning.utils.msat
-import fr.acinq.lightning.utils.sat
-import fr.acinq.lightning.utils.sum
-import fr.acinq.phoenix.android.LocalBitcoinUnit
-import fr.acinq.phoenix.android.LocalFiatCurrency
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
-import fr.acinq.phoenix.android.components.feedback.ErrorMessage
-import fr.acinq.phoenix.android.components.feedback.InfoMessage
-import fr.acinq.phoenix.android.fiatRate
-import fr.acinq.phoenix.android.navController
-import fr.acinq.phoenix.android.utils.Converter.toPrettyString
-import fr.acinq.phoenix.android.utils.borderColor
+import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.copyToClipboard
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.safeLet
-import fr.acinq.phoenix.android.utils.share
-import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
-import fr.acinq.phoenix.managers.WalletBalance
-import kotlinx.coroutines.launch
 
 @Composable
 fun ReceiveView(
@@ -95,23 +67,7 @@ fun ReceiveView(
     onFeeManagementClick: () -> Unit,
     onScanDataClick: () -> Unit,
 ) {
-    val context = LocalContext.current
-//    val balanceManager = business.balanceManager
     val vm: ReceiveViewModel = viewModel(factory = ReceiveViewModel.Factory(business.chain, business.peerManager, business.walletManager))
-    val defaultInvoiceExpiry by UserPrefs.getInvoiceDefaultExpiry(context).collectAsState(null)
-    val defaultInvoiceDesc by UserPrefs.getInvoiceDefaultDesc(context).collectAsState(null)
-
-//    // When a on-chain payment has been received, go back to the home screen (via the onSwapInReceived callback)
-//    LaunchedEffect(key1 = Unit) {
-//        var previousBalance: WalletBalance = WalletBalance.empty()
-//        balanceManager.swapInWalletBalance.collect {
-//            if (previousBalance != WalletBalance.empty() && it.total > 0.sat && it != previousBalance) {
-//                onSwapInReceived()
-//            } else {
-//                previousBalance = it
-//            }
-//        }
-//    }
 
     DefaultScreenLayout(horizontalAlignment = Alignment.CenterHorizontally, isScrollable = true) {
         DefaultScreenHeader(
@@ -126,9 +82,7 @@ fun ReceiveView(
                 }
             },
         )
-        safeLet(defaultInvoiceDesc, defaultInvoiceExpiry) { desc, exp ->
-            ReceiveViewPages(vm = vm, onFeeManagementClick = onFeeManagementClick, onScanDataClick = onScanDataClick, defaultInvoiceDescription = desc, defaultInvoiceExpiry = exp)
-        } ?: ProgressView(text = stringResource(id = R.string.utils_loading_prefs))
+        ReceiveViewPages(vm = vm, onFeeManagementClick = onFeeManagementClick, onScanDataClick = onScanDataClick)
     }
 }
 
@@ -138,8 +92,6 @@ private fun ReceiveViewPages(
     vm: ReceiveViewModel,
     onFeeManagementClick: () -> Unit,
     onScanDataClick: () -> Unit,
-    defaultInvoiceDescription: String,
-    defaultInvoiceExpiry: Long,
 ) {
     val pagerState = rememberPagerState(pageCount = { 2 })
     // we need to be responsive in some subcomponents, like the edit-invoice buttons
@@ -175,7 +127,14 @@ private fun ReceiveViewPages(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 when (index) {
-                    0 -> LightningInvoiceView(vm = vm, onFeeManagementClick = onFeeManagementClick, onScanDataClick = onScanDataClick, defaultDescription = defaultInvoiceDescription, expiry = defaultInvoiceExpiry, maxWidth = maxWidth)
+                    0 -> {
+                        val defaultInvoiceExpiry by userPrefs.getInvoiceDefaultExpiry.collectAsState(null)
+                        val defaultInvoiceDesc by userPrefs.getInvoiceDefaultDesc.collectAsState(null)
+                        safeLet(defaultInvoiceDesc, defaultInvoiceExpiry) { desc, expiry ->
+                            LightningInvoiceView(vm = vm, onFeeManagementClick = onFeeManagementClick, onScanDataClick = onScanDataClick,
+                                defaultDescription = desc, defaultExpiry = expiry, maxWidth = maxWidth, isPageActive = pagerState.currentPage == 0)
+                        } ?: ProgressView(text = stringResource(id = R.string.utils_loading_prefs))
+                    }
                     1 -> BitcoinAddressView(vm = vm, maxWidth = maxWidth)
                 }
             }

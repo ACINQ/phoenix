@@ -69,7 +69,7 @@ struct ModifyInvoiceSheet: View {
 
 			HStack {
 				TextField(
-					NSLocalizedString("Amount (optional)", comment: "TextField placeholder"),
+					NSLocalizedString("Amount (optional)", comment: "TextField placeholder; translate: optional"),
 					text: currencyStyler().amountProxy
 				)
 				.keyboardType(.decimalPad)
@@ -105,7 +105,7 @@ struct ModifyInvoiceSheet: View {
 
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 				TextField(
-					NSLocalizedString("Description (optional)", comment: "TextField placeholder"),
+					NSLocalizedString("Description (optional)", comment: "TextField placeholder; translate: optional"),
 					text: $desc
 				)
 				

@@ -5,9 +5,9 @@ FROM eclipse-temurin:17.0.10_7-jdk-alpine as ECLAIR_CORE_BUILD
 COPY ./buildSrc/src/main/kotlin/Versions.kt .
 RUN cat Versions.kt | grep "const val eclair =" | cut -d '"' -f 2 > eclair-core-version.txt
 
-ARG MAVEN_VERSION=3.9.6
+ARG MAVEN_VERSION=3.9.7
 ARG USER_HOME_DIR="/root"
-ARG SHA=706f01b20dec0305a822ab614d51f32b07ee11d0218175e55450242e49d2156386483b506b3a4e8a03ac8611bae96395fd5eec15f50d3013d5deed6d1ee18224
+ARG SHA=f64913f89756264f2686e241f3f4486eca5d0dfdbb97077b0efc389cad376053824d58caa35c39648453ca58639f85335f9be9c8f217bfdb0c2d5ff2a9428fac
 ARG BASE_URL=https://apache.osuosl.org/maven/maven-3/${MAVEN_VERSION}/binaries
 
 RUN apk add --no-cache curl tar bash git
