@@ -418,10 +418,88 @@
     <string name="accessctrl_screen_lock_switch">Verrouillage écran</string>
     <string name="accessctrl_screen_lock_switch_desc">Contrôle l\'accès à l\'application via le système de verrouillage système d\'Android.</string>
 
+    <!-- lnurl-auth -->
+
+    <string name="lnurl_auth_legacy_notice">Mode de compatibilité</string>
+    <string name="lnurl_auth_help">Voir ici pour plus d\'infos</string>
+    <string name="lnurl_auth_help_dialog_title">Comment cela fonctionne-t-il?</string>
+    <string name="lnurl_auth_help_dialog_general_details">Phoenix s\'authentifie en utilisant une clé spécifique à <b>%1$s</b>. Cette clé unique est en quelque sorte le mot de passe de votre compte sur ce service.</string>
+    <string name="lnurl_auth_help_dialog_privacy_title">Condidentialité</string>
+    <string name="lnurl_auth_help_dialog_privacy_details">Ce service n\'aura en aucun cas accès à votre wallet Phoenix. Ils ne pourront pas voir votre solde, vos paiements ou votre clé privée.</string>
+    <string name="lnurl_auth_help_dialog_compat_title">Mode de compatibilité</string>
+    <string name="lnurl_auth_help_dialog_compat_details">Phoenix va utiliser un schéma non standard pour ce service, afin de rester compatible avec des comptes créés via d\'anciennes versions de Phoenix. Les comptes liés à ce mode ne seront pas utilisables sur d\'autres wallets.</string>
+    <string name="lnurl_auth_help_dialog_compat_button">Changer le schéma</string>
+    <string name="lnurl_auth_button">S\'authentifier</string>
+    <string name="lnurl_auth_try_again_button">Essayer de nouveau</string>
+    <string name="lnurl_auth_in_progress">Authentification en cours sur\n<b>%1$s</b></string>
+    <string name="lnurl_auth_success">Authentification réussie.</string>
+    <string name="lnurl_auth_failure">Authentification échouée :</string>
+    <string name="lnurl_auth_error_network">Erreur réseau. Veuillez vérifier votre connexion internet et réessayez.</string>
+    <string name="lnurl_auth_error_other">Une erreur inconnue est survenue. Veuillez réessayer.</string>
+
+    <!-- lnurl-auth settings: scheme types -->
+
+    <string name="lnurl_auth_scheme_default">Défaut</string>
+    <string name="lnurl_auth_scheme_default_desc">Utilise un schéma standard conforme aux spécifications LNURL. C\'est l\'option recommandée pour les nouveaux wallets, et l\'option utilisée par Phoenix iOS.</string>
+    <string name="lnurl_auth_scheme_legacy">Mode de compatibilité</string>
+    <string name="lnurl_auth_scheme_legacy_desc">Utilise un schéma compatible avec les vieux comptes crées via l\'ancienne version de Phoenix Android.</string>
+
+    <!-- lnurl-withdraw -->
+
+    <string name="lnurl_withdraw_confirm_button">Retirer les fonds</string>
+    <string name="lnurl_withdraw_wait">Retrait en cours…</string>
+    <string name="lnurl_withdraw_amount_below_min">Le montant doit être au moins %1$s.</string>
+    <string name="lnurl_withdraw_amount_above_max">Le montant ne peut excéder %1$s.</string>
+    <string name="lnurl_withdraw_error_header">Le retrait a échoué :</string>
+
+    <!-- lnurl: common remote error messages -->
+
+    <string name="lnurl_error_remote_details">Le service <b>%1$s</b> a renvoyé une erreur. Contacter leur service d\'assistance si ce problème persiste.\n\n\Détails du message du service : \"<i>%2$s</i>\"</string>
+    <string name="lnurl_error_remote_code">Le service <b>%1$s</b> a renvoyé une erreur HTTP (%2$s). Contacter leur service d\'assistance si ce problème persiste.</string>
+    <string name="lnurl_error_remote_unreadable">Le service <b>%1$s</b> a renvoyé un message mal formatté.</string>
+    <string name="lnurl_error_remote_connection">Échec de la connexion au service <b>%1$s</b>.</string>
+
+    <!-- lnurl-pay -->
+
+    <string name="lnurl_pay_domain">Servi par</string>
+    <string name="lnurl_pay_meta_description">Description</string>
+    <string name="lnurl_pay_comment_add_button">Joindre un message</string>
+    <string name="lnurl_pay_comment_label">Mon message</string>
+    <string name="lnurl_pay_comment_instructions">Vous pouvez joindre un message à ce paiement. Le message sera envoyé au destinataire.</string>
+    <string name="lnurl_pay_pay_button">Payer</string>
+    <string name="lnurl_pay_requesting_invoice">Récupération des détails du paiement…</string>
+
+    <string name="lnurl_pay_amount_below_min">Le montant doit être au moins %1$s</string>
+    <string name="lnurl_pay_amount_above_max">Le montant ne peut excéder %1$s</string>
+
+    <string name="lnurl_pay_error_header">Le paiement a échoué.</string>
+    <string name="lnurl_pay_error_invalid_chain">La requête de paiement renvoyée par <b>%1$s</b> n\'utilise pas la même chaîne que votre wallet.</string>
+    <string name="lnurl_pay_error_already_paid">La requête de paiement renvoyée par <b>%1$s</b> a déjà été réglée.</string>
+    <string name="lnurl_pay_error_invalid_amount">Le montant de la requête de paiement renvoyée par <b>%1$s</b> est incorrect.</string>
+    <string name="lnurl_pay_error_invalid_malformed">La requête de paiement renvoyée par <b>%1$s</b> est malformée.</string>
+
+    <!-- settings: display preferences -->
+
+    <string name="prefs_display_title">Options d\'affichage</string>
+    <string name="prefs_display_coin_label">Dénomination Bitcoin</string>
+    <string name="prefs_display_coin_sat_label">Satoshi (sat)</string>
+    <string name="prefs_display_coin_sat_desc">1 sat = 0.00000001 btc</string>
+    <string name="prefs_display_coin_bit_label">Bit (bit)</string>
+    <string name="prefs_display_coin_bit_desc">1 bit = 0.000001 btc</string>
+    <string name="prefs_display_coin_mbtc_label">Milli-Bitcoin (mbtc)</string>
+    <string name="prefs_display_coin_mbtc_desc">1 mbtc = 0.001 btc</string>
+    <string name="prefs_display_coin_btc_label">Bitcoin (btc)</string>
+    <string name="prefs_display_fiat_label">Monnaie fiduciare</string>
+    <string name="prefs_display_theme_label">Thème de l\'application</string>
+    <string name="prefs_display_theme_dark_label">Thème sombre</string>
+    <string name="prefs_display_theme_light_label">Thème clair</string>
+    <string name="prefs_display_theme_system_label">Iso système</string>
+    <string name="prefs_locale_label">Langue de l\'application</string>
+
     <!-- mempool -->
 
-    <string name="mempool_unknown_feerate_title">Frais mempool introuvables</string>
-    <string name="mempool_unknown_feerate_details">Phoenix n\'a pas pu vérifier l\'état actuel du mempool Bitcoin, et ne peut donc pas estimer la rapidité des transactions.\n\nVérifiez le mempool manuellement via un explorateur, et utilisez une valeur pertinente.</string>
+    <string name="mempool_unknown_feerate_title">Frais mempool inconnus</string>
+    <string name="mempool_unknown_feerate_details">Phoenix n\'a pas pu vérifier l\'état actuel du mempool Bitcoin, et ne peut donc pas estimer la vélocité des transactions.\n\nVérifiez le mempool manuellement via un explorateur, et utilisez une valeur pertinente.</string>
     <string name="mempool_fastest">≈ 10 minutes</string>
     <string name="mempool_halfhour">≈ 30 minutes</string>`
     <string name="mempool_hour">≈ 1 heure</string>
