@@ -23,7 +23,7 @@
     <string name="notification_channels_watcher_desc">Zobrazí se, když bude potřeba spustit Phoenix.</string>
 
     <string name="notification_pending_settlement_title">Dokončení platby</string>
-    <string name="notification_pending_settlement_desc">Informuje vás, když je potřeba spustit Phoenix k vyrovnání platby.</string>
+    <string name="notification_pending_settlement_desc">Informuje vás, když je potřeba spustit Phoenix k vyrovnání probíhající platby.</string>
 
     <string name="notification_missed_payment_title">Platba zamítnuta</string>
     <string name="notification_missed_payment_desc">Zobrazí se, když Phoenix nemůže přijmout platbu kvůli problému s likviditou.</string>
@@ -83,7 +83,7 @@
     <string name="receive_bitcoin_share_subject">Sdílet tuto Bitcoinovou adresu s…</string>
 
     <string name="receive_lightning_title">Lightning</string>                                                                                                                                          
-    <string name="receive_lightning_help">Tento QR kód je Lightningová faktura.\n\nLightningové platby jsou velmi rychlé a obvykle levnější, ale některé peněženky a služby je nemusí zatím podporovat.\n\nV takovém případě přejeďte prstem doprava a získáte běžnou Bitcoinovou adresu.</string>
+    <string name="receive_lightning_help">Tento QR kód je Lightningová faktura.\n\nLightningové platby jsou velmi rychlé a obvykle levnější, ale některé peněženky a služby je nemusí zatím podporovat.\n\nV takovém případě přejeďte prstem doleva a získáte běžnou Bitcoinovou adresu.</string>
     <string name="receive_lightning_generating">Vytváření…</string>
     <string name="receive_lightning_amount_label">Částka</string>
     <string name="receive_lightning_desc_label">Popis</string>
@@ -308,6 +308,7 @@
     <string name="paymentdetails_desc_swapout">Swap-out do %1$s</string>
     <string name="paymentdetails_desc_swapin">On-Chain vklad</string>
     <string name="paymentdetails_desc_identifier">Platba pro %1$s</string>
+    <string name="paymentdetails_desc_offer_incoming">Payment pro %1$s</string>
 
     <string name="paymentdetails_edit_dialog_title">Přidat vlastní popis k této platbě</string>
     <string name="paymentdetails_edit_dialog_input_label">Popis</string>
@@ -322,10 +323,15 @@
     <string name="paymentdetails_closing">Platba uzavírající kanál</string>
     <string name="paymentdetails_splice_outgoing">Odchozí splice platba</string>
     <string name="paymentdetails_splice_cpfp_outgoing">Zrychlení On-Chain transakcí</string>
+    <string name="paymentdetails_inbound_liquidity">Vyžádat příchozí likviditu</string>
     <string name="paymentdetails_normal_outgoing">Standardní odchozí Lightning platba</string>
     <string name="paymentdetails_normal_incoming">Standardní příchozí Lightning platba</string>
     <string name="paymentdetails_swapin">Swap-in vklad Bitcoinu</string>
     <string name="paymentdetails_swapout">Swap-out na Bitcoinovou adresu</string>
+
+    <string name="paymentdetails_offer_outgoing">Odchozí platba Lightning Nabídky</string>
+    <string name="paymentdetails_offer_incoming">Příchozí platba Lightning Nabídky</string>
+
     <string name="paymentdetails_swapin_address_label">Adresa vkladu</string>
     <string name="paymentdetails_bitcoin_address_label">Bitcoinová adresa</string>
 
@@ -344,7 +350,9 @@
     <string name="paymentdetails_payment_request_description_label">Popis faktury</string>
     <string name="paymentdetails_payment_hash_label">Hash platby</string>
     <string name="paymentdetails_payment_request_label">Faktura</string>
-    <string name="paymentdetails_preimage_label">Preimage</string>
+    <string name="paymentdetails_preimage_label">Předobraz</string>
+    <string name="paymentdetails_payerkey_label">Plátcův klíč</string>
+    <string name="paymentdetails_offerid_label">ID Nabídky</string>
 
     <string name="paymentdetails_status_label">Stav platby</string>
     <string name="paymentdetails_status_success">Úspěšná</string>
@@ -535,7 +543,7 @@
 
     <string name="about_title">O Phoenixu</string>
     <string name="about_version">Verze Phoenix: <b>%1$s</b></string>
-    <string name="about_faq_link">máte otázky? Podívejte se na časté dotazy</string>
+    <string name="about_faq_link">Máte otázky? Podívejte se na časté dotazy</string>
     <string name="about_support_link">Podpora</string>
     <string name="about_privacy_link">Soukromí</string>
     <string name="about_terms_link">Podmínky</string>
@@ -545,6 +553,7 @@
     <string name="paymentsettings_title">Nastavení &amp; poplatky</string>
 
     <string name="paymentsettings_category_incoming">Příchozí platby</string>
+    <string name="paymentsettings_category_outgoing">Odchozí platby</string>
     <string name="paymentsettings_category_lnurl">LNURL</string>
 
     <string name="paymentsettings_defaultdesc_title">Popis faktury</string>
@@ -562,6 +571,16 @@
     <string name="paymentsettings_expiry_value">%1$s sekund</string>
 
     <string name="paymentsettings_lnurlauth_scheme_title">LNURL ověřovací schéma</string>
+
+    <string name="paymentsettings_swap_format_title">Formát Bitcoinové adresy</string>
+    <string name="paymentsettings_swap_format_legacy_title">Legacy</string>
+    <string name="paymentsettings_swap_format_legacy_desc">Méně efektivní a méně soukromý formát, který nemá rotující adresy, ale je kompatibilní skoro se všemi službami a peněženkami.</string>
+    <string name="paymentsettings_swap_format_taproot_title">Taproot (doporučený)</string>
+    <string name="paymentsettings_swap_format_taproot_desc">Výchozí formát s lepším soukromím, levnějšími poplatky a rotací adres, ale některé služby a peněženky nerozumí tomuto formátu.</string>
+
+    <string name="paymentsettings_overpayment_title">Povolit přeplacení</string>
+    <string name="paymentsettings_overpayment_enabled">Budete moci přeplatit Lightning fakturu dvakrát o požadovanou částku. Užitečné na nastavení dýška nebo pro ochranu soukromí.</string>
+    <string name="paymentsettings_overpayment_disabled">Vypnuté (výchozí)</string>
 
     <!-- settings: currencies -->
 
@@ -605,10 +624,14 @@
 
     <string name="walletinfo_title">Informace o peněžence</string>
     <string name="walletinfo_descriptor">Descriptor</string>
+    <string name="walletinfo_swapin_user_pubkey">Uživatelův veřejný klíč</string>
+    <string name="walletinfo_swapin_addresses">Swap adresy</string>
     <string name="walletinfo_xpub">Hlavní veřejný klíč</string>
     <string name="walletinfo_path">(Cesta: %1$s)</string>
+
     <string name="walletinfo_swappable_title">Připraveno na swap</string>
     <string name="walletinfo_confirming_title">Čekání na %1$d potvrzení</string>
+    <string name="walletinfo_confirming_more">+%1$d dalších…</string>
     <string name="walletinfo_confirmed_title">Potvrzený zůstatek</string>
     <string name="walletinfo_unconfirmed_title">Nepotvrzený zůstatek</string>
     <string name="walletinfo_incoming_balance">Přichází +%1$s</string>
@@ -666,10 +689,10 @@
 
     <!-- reset wallet -->
 
-    <string name="reset_wallet_title">Smazat peněženku</string>
+    <string name="reset_wallet_title">Resetovat peněženku</string>
     <string name="reset_wallet_instructions_header">Smazat veškerá data peněženky z tohoto zařízení</string>
     <string name="reset_wallet_instructions_details">Toto resetuje aplikaci tak, jako byste ji právě nainstalovali.</string>
-    <string name="reset_wallet_review_button">Zhodnotit</string>
+    <string name="reset_wallet_review_button">Zobrazit</string>
 
     <string name="reset_wallet_confirm_title">Potvrdit reset</string>
     <string name="reset_wallet_confirm_header">Peněženka bude kompletně smazána z <b>tohoto zařízení</b>.</string>
@@ -677,8 +700,23 @@
     <string name="reset_wallet_confirm_seed_balance">Neztraťte své prostředky:\n%1$s (≈ %2$s).</string>
     <string name="reset_wallet_confirm_seed_responsibility">Za uložení obnovovací fráze jste zodpovědní vy.</string>
     <string name="reset_wallet_confirm_button">Smazat peněženku</string>
-
+    <string name="reset_wallet_shutting_down">Vypínání…</string>
+    <string name="reset_wallet_deleting_prefs">Mazání předvoleb…</string>
+    <string name="reset_wallet_deleting_seed">Mázání seedu…</string>
+    <string name="reset_wallet_deleting_db">Mazání databáze…</string>
     <string name="reset_wallet_success">Peněženka byla úspěšně resetována</string>
     <string name="reset_wallet_failure_title">Reset selhal</string>
+
+    <!-- swap input signer tool -->
+
+    <string name="swapin_signer_title">Swap-in podepisovač</string>
+    <string name="swapin_signer_instructions">Tento debugovací nástroj vás nechá podepsat swap-in vstupy. Používejte pouze pokud víte, co děláte.</string>
+    <string name="swapin_signer_tx">Nepodepsaná transakce</string>
+    <string name="swapin_signer_sign">Podepsat</string>
+    <string name="swapin_signer_signing">Podepisování…</string>
+    <string name="swapin_signer_signed_sig">Uživatelův podpis</string>
+    <string name="swapin_signer_invalid_tx_header">Neplatná nepodepsaná transakce</string>
+    <string name="swapin_signer_invalid_tx_details">Zkontrolujte, že vstup je celý a nechybí žádný znak.</string>
+    <string name="swapin_signer_error_header">Podepisování vstupu selhalo</string>
 
 </resources>
