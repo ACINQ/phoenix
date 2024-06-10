@@ -387,7 +387,7 @@
 
     <string name="outgoing_failuremessage_invalid_id">The ID of the payment is not valid. Try again.</string>
     <string name="outgoing_failuremessage_alreadypaid">This invoice has already been paid.</string>
-    <string name="outgoing_failuremessage_not_connected">Your channel are not connected yet. Wait for a stable connection and try again.</string>
+    <string name="outgoing_failuremessage_not_connected">Your channel is not connected yet. Wait for a stable connection and try again.</string>
     <string name="outgoing_failuremessage_channel_opening">Your channel is still in the process of being opened. Wait and try again.</string>
     <string name="outgoing_failuremessage_unsupported_features">This invoice uses unsupported features. Make sure you\'re on the latest Phoenix version.</string>
     <string name="outgoing_failuremessage_invalid_amount">The payment amount is invalid.</string>

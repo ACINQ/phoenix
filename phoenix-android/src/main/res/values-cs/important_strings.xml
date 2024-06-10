@@ -31,7 +31,7 @@
     <string name="notif_pending_settlement_message">Čeká se na příchozí vyrovnání.</string>
 
     <string name="notif_inflight_payment_title">Čeká se na platbu</string>
-    <string name="notif_inflight_payment_message">Spusťte službu Phoenix, aby bylo možné platbu nakonec dokončit.</string>.
+    <string name="notif_inflight_payment_message">Spusťte Phoenix, aby byla platba včas dokončena.</string>.
 
     <string name="notif_missed_title">Zmeškaná příchozí platba</string>
     <string name="notif_missed_unavailable">Nepodařilo se spustit Phoenix na pozadí.</string>
@@ -76,9 +76,9 @@
     <!-- home: swap help -->
 
     <string name="home_swapin_help_pending">Čekání na 3 potvrzení.</string>
-    <string name="home_swapin_help_ready_fee">Vklady se přidají do Lightningu, když jsou poplatky za těžbu nižší než %1$s.</string>
+    <string name="home_swapin_help_ready_fee">Vklady se přidají do Lightningu, až budou poplatky za těžbu nižší než %1$s.</string>
     <string name="home_swapin_help_ready_disabled">Vklady zůstanou on-chain, protože automatická správa kanálů je vypnutá.</string>
-    <string name="home_swapin_help_generic">On-chain peníze byly vloženy do vaší peněženky.</string>
+    <string name="home_swapin_help_generic">On-chain prostředky byly vloženy do vaší peněženky.</string>
     <string name="home_swapin_help_button">Klikněte pro podrobnosti</string>
 
     <!-- home: bottom menu -->
@@ -112,21 +112,21 @@
 
     <!-- receive view: warning about fee/liquidity -->
 
-    <string name="receive_lightning_warning_title_surefail">Platba se nezdaří</string>
+    <string name="receive_lightning_warning_title_surefail">Platba selže</string>
     <string name="receive_lightning_warning_title_fee_expected">Očekávaný poplatek</string>
     <string name="receive_lightning_warning_hint_show_details">Více informací</string>
 
-    <string name="receive_lightning_sheet_dismiss">Zavření</string>
+    <string name="receive_lightning_sheet_dismiss">Zavřít</string>
     <string name="receive_lightning_sheet_button_enable">Povolit automatické kanály</string>
-    <string name="receive_lightning_sheet_button_configure">Nastavení limitu poplatků</string>
+    <string name="receive_lightning_sheet_button_configure">Nastavit limit poplatků</string>
 
-    <string name="receive_lightning_warning_message_fee_expected">Pro příjem této částky bude pravděpodobně nutná operace v řetězci.\n\nPoplatek se odhaduje na přibližně %1$s.</string>
-    <string name="receive_lightning_warning_message_fee_expected_unknown">Pro obdržení této částky bude pravděpodobně nutná operace na řetězci.</string>
+    <string name="receive_lightning_warning_message_fee_expected">Pro příjem této částky bude pravděpodobně nutná on-chain transakce.\n\nPoplatek se odhaduje přibližně na %1$s.</string>
+    <string name="receive_lightning_warning_message_fee_expected_unknown">Pro příjem této částky bude pravděpodobně nutná on-chain transakce.</string>
 
-    <string name="receive_lightning_warning_message_above_limit">Pro obdržení této částky se očekává poplatek ve výši %1$s a tento poplatek je vyšší než váš limit %2$s.\n\nZvyšte tento limit v nastavení správy kanálů.</string>
-    <string name="receive_lightning_warning_message_above_limit_or_liquidity">Pro obdržení této částky se očekává poplatek ve výši %1$s a tento poplatek je vyšší než váš limit %2$s.\n\nZvýšte tento limit v nastavení správy kanálů nebo požádejte o dodatečnou likviditu.</string>
-    <string name="receive_lightning_warning_message_above_limit_percent">Očekává se, že tuto částku obdrží poplatek ve výši %1$s, a tento poplatek je vyšší než %2$s% částky.\n\nZvyšte tento limit v nastavení správy kanálů.</string>
-    <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Očekává se, že tuto částku obdrží poplatek ve výši %1$s, a tento poplatek je vyšší než %2$s% částky.\n\nZvýšte tento limit v nastavení správy kanálů, nebo požádejte o dodatečnou likviditu.</string>
+    <string name="receive_lightning_warning_message_above_limit">Pro příjem této částky se očekává poplatek %1$s, ale tento poplatek je vyšší než váš limit %2$s.\n\nZvyšte tento limit v nastavení správy kanálů.</string>
+    <string name="receive_lightning_warning_message_above_limit_or_liquidity">Pro příjem této částky se očekává poplatek %1$s, ale tento poplatek je vyšší než váš limit %2$s.\n\nZvyšte tento limit v nastavení správy kanálů nebo požádejte o dodatečnou likviditu.</string>
+    <string name="receive_lightning_warning_message_above_limit_percent">Pro příjem této částky se očekává poplatek %1$s, ale tento poplatek je vyšší než váš limit %2$s%.\n\nZvyšte tento limit v nastavení správy kanálů.</string>
+    <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Očekává se, že tuto částku obdrží poplatek ve výši %1$s, a tento poplatek je vyšší než %2$s% částky.\n\nZvyšte tento limit v nastavení správy kanálů nebo požádejte o dodatečnou likviditu.</string>
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Příchozí likvidita není dostatečná a máte zakázanou automatickou správu kanálů.</string>
 
@@ -237,9 +237,9 @@
 
     <!-- about -->
 
-    <string name="about_general_content">Phoenix je Bitcoin peněženka využívající síť Lightning pro odesílání a přijímání plateb.\n\nJedná se o bezplatný software s otevřeným zdrojovým kódem, který vyvinula společnost <a href="https://phoenix.acinq.co">ACINQ</a> pod <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">licencí Apache 2.0</a>.</string>
+    <string name="about_general_content">Phoenix je Bitcoinová peněženka využívající síť Lightning pro odesílání a přijímání plateb.\n\nJedná se o bezplatný software s otevřeným zdrojovým kódem, který vyvinula společnost <a href="https://phoenix.acinq.co">ACINQ</a> pod <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">licencí Apache 2.0</a>.</string>
     <string name="about_seed_title">Zabezpečení klíče</string>
-    <string name="about_seed_content">Tuto peněženku si spravujete sami (self-custody): <b>Vy jediní jste zodpovědni za správu 12-ti slovného Seed klíče</b>.\n\nTento klíč umožňuje přístup k vašim prostředkům. Nikomu ho neprozrazujte a dejte si pozor na phishing.</string>
+    <string name="about_seed_content">Tuto peněženku si spravujete sami (self-custody): <b>Vy jediní jste zodpovědni za správu 12-ti slovného klíče (Seedu)</b>.\n\nTento klíč umožňuje přístup k vašim prostředkům. Nikomu ho neprozrazujte a dejte si pozor na phishing.</string>
     <string name="about_rates_title">Směnné kurzy</string>
     <string name="about_rates_content">Směnné kurzy bitcoinu/fiatu jsou získávány z různých rozhraní API třetích stran:\n\n- Blockchain.info\n- powered by Coindesk.com\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nTyto sazby nemusí být přesné. Před odesláním platby vždy zkontrolujte skutečnou částku v bitcoinech.</string>
 
@@ -273,15 +273,15 @@
     <string name="walletinfo_onchain_swapin_empty">Neprobíhají žádné výměny.</string>
 
     <string name="walletinfo_onchain_swapin_timeout_1day">Platnost této výměny vyprší za den!</string>
-    <string name="walletinfo_onchain_swapin_timeout">Tento swap vyprší za %1$s dní.</string>
+    <string name="walletinfo_onchain_swapin_timeout">Tato výměna vyprší za %1$s dní.</string>
 
     <string name="walletinfo_onchain_swapin_locked_title">Vyčerpané prostředky</string>
     <string name="walletinfo_onchain_swapin_locked_description">Tyto prostředky budou k dispozici za %1$s dní.</string>
 
     <string name="walletinfo_onchain_swapin_refund_title">Zrušené prostředky</string>
-    <string name="walletinfo_onchain_swapin_refund_description">Tyto prostředky nebyly včas vyměněny. Klepnutím na tlačítko tyto prostředky utratíte.</string>
+    <string name="walletinfo_onchain_swapin_refund_description">Tyto prostředky nebyly převedeny včas. Klepnutím na tlačítko tyto prostředky utratíte.</string>
 
-    <string name="walletinfo_onchain_final_about">On-Chain peněženka odvozená od vašeho seedu.\n\nKonečná peněženka je místo, kam se ve výchozím nastavení posílají prostředky, když jsou vaše Lightning kanály uzavřeny.</string>
+    <string name="walletinfo_onchain_final_about">On-Chain peněženka odvozená od vašeho seedu.\n\nKonečná peněženka je místo, kam se ve výchozím nastavení posílají prostředky, když jsou vaše Lightning kanály uzavřeny (obvykle je prázdná).</string>
 
     <!-- settings: liquidity policy for channels creation -->
 
@@ -339,13 +339,13 @@
     <string name="liquidityads_estimate_details_service_fees_help">Tento poplatek jde službě poskytující likviditu.</string>
     <string name="liquidityads_estimate_details_duration">Doba trvání</string>
     <string name="liquidityads_estimate_details_duration_value">1 rok</string>
-    <string name="liquidityads_estimate_details_duration_help">Dodatečná kapacita bude zachována po tuto dobu.</string>
+    <string name="liquidityads_estimate_details_duration_help">Jak budete přijímat prostředky, likvidita bude spotřebovávána a stane se součástí vašeho zůstatku. Po jednom roce bude zbývající nevyužitá likvidita vrácena poskytovateli.</string>
     <string name="liquidityads_estimate_above_25">Celkový poplatek je vyšší než 25 % požadované částky.</string>
     <string name="liquidityads_over_balance">Celkové poplatky přesahují váš zůstatek.</string>
 
-    <string name="liquidityads_review_button">Review</string>
-    <string name="liquidityads_disclaimer_body1">Žádáte o <b>počáteční</b> množství likvidity. Likvidita není v průběhu času konstantní: jak budete v průběhu Blesku přijímat finanční prostředky, likvidita se bude spotřebovávat a stane se vaším zůstatkem.</string>
-    <string name="liquidityads_disclaimer_body2">Po jednom roce bude zbývající nevyužitá likvidita službou vyžádána zpět.</string>
+    <string name="liquidityads_review_button">Zhodnotit</string>
+    <string name="liquidityads_disclaimer_body1">Žádáte o <b>počáteční</b> množství likvidity. Likvidita není v průběhu času konstantní: jak budete v průběhu přijímat prostředky přes Lightning, likvidita se bude spotřebovávat a stane se vaším zůstatkem.</string>
+    <string name="liquidityads_disclaimer_body2">Po jednom roce bude zbývající nevyužitá likvidita vrácena poskytovateli.</string>
 
     <string name="liquidityads_request_button">Přijmout</string>
     <string name="liquidityads_requesting_spinner">Zpracovává se splice…</string>
@@ -372,55 +372,55 @@
     <string name="outgoing_failuremessage_channel_splicing">Kanály již zpracovávají splicing. Zkuste to později.</string>
     <string name="outgoing_failuremessage_not_enough_fee">Poplatek je nedostatečný.</string>
     <string name="outgoing_failuremessage_not_enough_balance">Tato platba přesahuje váš zůstatek.</string>
-    <string name="outgoing_failuremessage_too_big">Suma platby je příliš velká - zkuste ji rozdělit na více částí.</string>
-    <string name="outgoing_failuremessage_too_small">Suma platby je příliš malá.</string>
-    <string name="outgoing_failuremessage_expiry_too_big">Ukončení platnosti této platby je příliš daleko v budoucnosti.</string>
+    <string name="outgoing_failuremessage_too_big">Částka je příliš velká - zkuste ji rozdělit na více částí.</string>
+    <string name="outgoing_failuremessage_too_small">Částka je příliš malá.</string>
+    <string name="outgoing_failuremessage_expiry_too_big">Konec platnosti této platby je příliš daleko v budoucnosti.</string>
     <string name="outgoing_failuremessage_rejected_by_recipient">Příjemce platbu odmítl. Tato konkrétní faktura již mohla být uhrazena.</string>
     <string name="outgoing_failuremessage_recipient_offline">Příjemce je offline.</string>
     <string name="outgoing_failuremessage_not_enough_liquidity">Platbu nebylo možné předat příjemci (pravděpodobně nedostatečná příchozí likvidita).</string>
     <string name="outgoing_failuremessage_temporary_failure">Na uzlu v platební trase došlo k chybě. Platba může být úspěšná, pokud se o ni pokusíte znovu.</string>
     <string name="outgoing_failuremessage_too_many_pending">Máte příliš mnoho čekajících plateb. Zkuste to znovu, jakmile budou vypořádány.</string>
 
-    <string name="outgoing_failuremessage_invalid_id">Identifikátor platby není platný. Zkuste to znovu.</string>
+    <string name="outgoing_failuremessage_invalid_id">ID platby není platný. Zkuste to znovu.</string>
+    <string name="outgoing_failuremessage_alreadypaid">Tato faktura již byla uhrazena.</string>
     <string name="outgoing_failuremessage_not_connected">Váš kanál ještě není připojen. Počkejte na stabilní připojení a zkuste to znovu.</string>
     <string name="outgoing_failuremessage_channel_opening">Váš kanál je stále v procesu otevírání. Počkejte a zkuste to znovu.</string>
-    <string name="outgoing_failuremessage_unsupported_features">Tato faktura používá nepodporované funkce. Ujistěte se, že používáte nejnovější verzi systému Phoenix.</string>
+    <string name="outgoing_failuremessage_unsupported_features">Tato faktura používá nepodporované funkce. Ujistěte se, že používáte nejnovější verzi Phoenix.</string>
     <string name="outgoing_failuremessage_invalid_amount">Částka platby je neplatná.</string>
     <string name="outgoing_failuremessage_no_available_channels">Platba nemohla být odeslána prostřednictvím vašich stávajících kanálů.</string>
+    <string name="outgoing_failuremessage_noroutefound">Příjemce není dosažitelný nebo nemá dostatečnou příchozí likviditu.</string>
     <string name="outgoing_failuremessage_unknown">Došlo k neznámé chybě a platba se nezdařila.</string>
     <string name="outgoing_failuremessage_restarted">Peněženka byla restartována během zpracování platby.</string>
 
-    <string name="outgoing_failuremessage_alreadypaid">Tato platba již byla uhrazena.</string>
-    <string name="outgoing_failuremessage_noroutefound">Příjemce není dosažitelný nebo nemá dostatečnou příchozí likviditu.</string>
 
     <!-- low feerate disclaimer -->
 
-    <string name="spliceout_low_feerate_dialog_title">Nízké poplatky!</string>
-    <string name="spliceout_low_feerate_dialog_body1">Platby za nízké poplatky mohou trvat několik dní nebo týdnů bez potvrzení.</string>
-    <string name="spliceout_low_feerate_dialog_body2">Výběr poplatků je na vaši zodpovědnost. Po odeslání nelze tuto platbu zrušit, pouze urychlit vyššími poplatky.</string>
+    <string name="spliceout_low_feerate_dialog_title">Nízký poplatek!</string>
+    <string name="spliceout_low_feerate_dialog_body1">Platby s nízkým poplatkem mohou zůstat několik dní nebo týdnů bez potvrzení.</string>
+    <string name="spliceout_low_feerate_dialog_body2">Nastavení poplatku je na vaši zodpovědnost. Po odeslání nelze tuto platbu zrušit, pouze urychlit vyššími poplatky.</string>
     <string name="spliceout_low_feerate_dialog_body3">Jste si jisti, že chcete pokračovat?</string>
 
     <!-- spliceout: capacity disclaimer -->
 
-    <string name="spliceout_capacity_disclaimer_title">Vplyv na veľkosť kanála</string>
-    <string name="spliceout_capacity_disclaimer_body1">Financie odoslané sa odoberú z vašej strany kanála, čím sa veľkosť kanála zníži o rovnakú sumu. Vaša prichádzajúca likvidita zostáva nezmenená.</string>
-    <string name="spliceout_capacity_disclaimer_checkbox">Túto správu už nezobrazujte.</string>
+    <string name="spliceout_capacity_disclaimer_title">Ovlivněna velikost kanálu</string>
+    <string name="spliceout_capacity_disclaimer_body1">Odeslané prostředky se odeberou z vaší strany kanálu, čímž se velikost kanálu sníží o danou sumu. Vaše příchozí likvidita zůstává nezměněná.</string>
+    <string name="spliceout_capacity_disclaimer_checkbox">Tuto zprávu již nezobrazovat.</string>
 
     <!-- Spend swap-in refund -->
 
-    <string name="swapinrefund_title">Utratit prošlou výměnu</string>
-    <string name="swapinrefund_none_available_label">Žádný swap-in neprošel.</string>
+    <string name="swapinrefund_title">Utratit zrušené swap-ins</string>
+    <string name="swapinrefund_none_available_label">Žádné zrušené swap-ins.</string>
     <string name="swapinrefund_available_label">Dostupné prostředky: <b>%1$s</b> (%2$s)</string>
-    <string name="swapinrefund_instructions_1">Tato obrazovka slouží k utrácení vkladů v řetězci, které nebyly včas převedeny na Lightning. Všimněte si, že to nijak neovlivňuje vaše kanály Lightning.</string>
+    <string name="swapinrefund_instructions_1">Tato obrazovka slouží k utracení on-chain vkladů, které nebyly včas převedeny na Lightning. Vaše kanály nebudou ovlivněny.</string>
     <string name="swapinrefund_instructions_2">Ujistěte se, že cílová adresa je správná a poplatky přiměřené.</string>
     <string name="swapinrefund_estimate_button">Odhad poplatků</string>
-    <string name="swapinrefund_estimating">Odhadní poplatky…</string>
+    <string name="swapinrefund_estimating">Odhadování poplatků…</string>
     <string name="swapinrefund_send_button">Odeslat</string>
     <string name="swapinrefund_sending">Odesílání…</string>
     <string name="swapinrefund_failed">Chyba transakce.</string>
     <string name="swapinrefund_failed_address">Neplatná adresa.</string>
-    <string name="swapinrefund_failed_cannot_create">Nepodařilo se vytvořit transakci sběru. Zkuste to prosím znovu.</string>
-    <string name="swapinrefund_success">Zveřejněná transakce.</string>
-    <string name="swapinrefund_success_details">Transakci naleznete níže. Nebude se zobrazovat v historii plateb, proto si ji nyní v případě potřeby zkopírujte.</string>
+    <string name="swapinrefund_failed_cannot_create">Nepodařilo se vytvořit refund transakci. Zkuste to prosím znovu.</string>
+    <string name="swapinrefund_success">Transakce odeslána.</string>
+    <string name="swapinrefund_success_details">Transakci naleznete níže. Nebude se zobrazovat v historii plateb, proto si nyní v případě potřeby zkopírujte její ID.</string>
 
 </resources>
