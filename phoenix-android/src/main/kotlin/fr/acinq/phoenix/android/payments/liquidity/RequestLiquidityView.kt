@@ -48,7 +48,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
@@ -80,6 +79,7 @@ import fr.acinq.phoenix.android.components.feedback.SuccessMessage
 import fr.acinq.phoenix.android.payments.spliceout.spliceFailureDetails
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
+import fr.acinq.phoenix.android.utils.orange
 
 object LiquidityLimits {
     val liquidityOptions = arrayOf(
@@ -304,10 +304,13 @@ private fun LeaseEstimationView(
         label = stringResource(id = R.string.send_spliceout_complete_recap_total),
     ) {
         AmountWithFiatBelow(amount = totalFees, amountTextStyle = MaterialTheme.typography.body2)
-        if (totalFees > amountRequested.toMilliSatoshi() * 0.25) {
+    }
+
+    if (totalFees >= amountRequested.toMilliSatoshi() * 0.25) {
+        SplashLabelRow(label = "", icon = R.drawable.ic_alert_triangle, iconTint = orange) {
             Text(
                 text = stringResource(id = R.string.liquidityads_estimate_above_25),
-                style = MaterialTheme.typography.body1.copy(fontSize = 14.sp)
+                modifier = Modifier.widthIn(max = 250.dp)
             )
         }
     }
