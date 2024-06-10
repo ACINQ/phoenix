@@ -480,7 +480,7 @@
 
     <!-- lnurl: common remote error messages -->
 
-    <string name="lnurl_error_remote_details">Služba <b>%1$s</b> odpovedala s chybou:\n\n<i>%2$s</i>.\n\nV prípade potreby kontaktujte ich podporu.</string>
+    <string name="lnurl_error_remote_details">Služba <b>%1$s</b> odpovedala s chybou. V prípade potreby kontaktujte ich podporu.\n\nPodrobnosti o servisnej správe: \"<i>%2$s</i>\"</string>
     <string name="lnurl_error_remote_code">Služba <b>%1$s</b> vrátila HTTP chybu (%2$s).\n\nV prípade potreby kontaktujte ich podporu.</string>
     <string name="lnurl_error_remote_unreadable">Služba <b>%1$s</b> vrátila chybnú správu.</string>
     <string name="lnurl_error_remote_connection">Nepodarilo sa pripojiť ku službe <b>%1$s</b>.</string>

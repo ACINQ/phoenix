@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -92,9 +93,9 @@ fun LnurlWithdrawView(
                 if (error != null && error is Scan.LnurlWithdrawError.RemoteError) {
                     ErrorMessage(
                         header = stringResource(id = R.string.lnurl_withdraw_error_header),
-                        details = getRemoteErrorMessage(error = error.err)
+                        details = getRemoteErrorMessage(error = error.err),
+                        alignment = Alignment.CenterHorizontally,
                     )
-                    Spacer(modifier = Modifier.height(32.dp))
                 }
 
                 val mayDoPayments by business.peerManager.mayDoPayments.collectAsState()

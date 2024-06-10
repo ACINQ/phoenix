@@ -482,7 +482,7 @@
 
     <!-- lnurl: common remote error messages -->
 
-    <string name="lnurl_error_remote_details">Der Service <b>%1$s</b> hat mit einem Fehler geantwortet:\n\n<i>%2$s</i>.\n\nWenden Sie sich bei Bedarf an deren Support.</string>
+    <string name="lnurl_error_remote_details">Der Service <b>%1$s</b> hat mit einem Fehler geantwortet. Wenden Sie sich bei Bedarf an deren Support.\n\nDetails der Meldung des Service: \"<i>%2$s</i>\"</string>
     <string name="lnurl_error_remote_code">Der Service <b>%1$s</b> hat mit einem HTTP-Fehler (%2$s) geantwortet.\n\nWenden Sie sich bei Bedarf an deren Support.</string>
     <string name="lnurl_error_remote_unreadable">Der Service <b>%1$s</b> hat eine fehlerhafte Antwort zurückgegeben.</string>
     <string name="lnurl_error_remote_connection">Verbindung mit Service <b>%1$s</b> konnte nicht hergestellt werden.</string>

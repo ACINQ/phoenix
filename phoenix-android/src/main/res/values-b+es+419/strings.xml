@@ -470,7 +470,7 @@
 
     <!-- lnurl: common remote error messages -->
 
-    <string name="lnurl_error_remote_details">El servicio <b>%1$s</b> respondió con un error:\n\n<i>%2$s</i>\n\nPonte en contacto con su servicio de ayuda si es necesario.</string>
+    <string name="lnurl_error_remote_details">El servicio <b>%1$s</b> respondió con un error. Ponte en contacto con su servicio de ayuda si es necesario.\n\nDetalles del mensaje del servicio : \"<i>%2$s</i>\"</string>
     <string name="lnurl_error_remote_code">El servicio <b>%1$s</b> devolvió un error HTTP (%2$s).\n\nPonte en contacto con su servicio de ayuda si es necesario.</string>
     <string name="lnurl_error_remote_unreadable">El servicio <b>%1$s</b> devolvió un mensaje con formato incorrecto.</string>
     <string name="lnurl_error_remote_connection">No se pudo conectar con el servicio <b>%1$s</b>.</string>

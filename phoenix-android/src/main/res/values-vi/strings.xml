@@ -483,7 +483,7 @@
 
     <!-- lnurl: common remote error messages -->
 
-    <string name="lnurl_error_remote_details">Bên dịch vụ <b>%1$s</b> đã phản hồi có lỗi:\n\n<i>%2$s</i>\n\nHãy liên hệ với bộ phận hỗ trợ của họ nếu cần.</string>
+    <string name="lnurl_error_remote_details">Bên dịch vụ <b>%1$s</b> đã phản hồi có lỗi. Hãy liên hệ với bộ phận hỗ trợ của họ nếu cần.\n\nChi tiết tin nhắn dịch vụ : \"<i>%2$s</i>\"</string>
     <string name="lnurl_error_remote_code">Bên dịch vụ <b>%1$s</b> đã báo lỗi HTTP (%2$s).\n\nHãy liên hệ với bộ phận hỗ trợ của họ nếu cần.</string>
     <string name="lnurl_error_remote_unreadable">Bên dịch vụ <b>%1$s</b> đã báo lỗi có một tin nhắn không đúng định dạng.</string>
     <string name="lnurl_error_remote_connection">Không thể kết nối với bên dịch vụ <b>%1$s</b>.</string>
