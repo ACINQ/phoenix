@@ -244,8 +244,14 @@ class AppConfigurationManager(
                 try {
                     logger.debug { "fetching mempool.space feerate" }
                     // FIXME: use our own endpoint
-                    // always use Mainnet, even on Testnet
-                    val response = httpClient.get("https://mempool.space/api/v1/fees/recommended")
+                    val response = httpClient.get(
+                        // TODO: after switching to testnet4, consider using the Mainnet endpoint even on Testnet
+                        if (chain is Chain.Mainnet) {
+                            "https://mempool.space/api/v1/fees/recommended"
+                        } else {
+                            "https://mempool.space/testnet/api/v1/fees/recommended"
+                        }
+                    )
                     if (response.status.isSuccess()) {
                         val json = Json.decodeFromString<JsonObject>(response.bodyAsText(Charsets.UTF_8))
                         logger.debug { "mempool.space feerate endpoint returned json=$json" }
