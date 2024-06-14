@@ -39,11 +39,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Clickable
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.SplashLabelRow
+import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.data.ContactInfo
 import kotlinx.coroutines.launch
 
@@ -62,6 +64,7 @@ private sealed class OfferContactState {
 fun ContactOrOfferView(offer: OfferTypes.Offer) {
     val contactsManager = business.contactsManager
     val contactState = remember { mutableStateOf<OfferContactState>(OfferContactState.Init) }
+    val navController = navController
     LaunchedEffect(Unit) {
         contactState.value = contactsManager.getContactForOffer(offer)?.let { OfferContactState.Found(it) } ?: OfferContactState.NotFound
     }
@@ -76,6 +79,9 @@ fun ContactOrOfferView(offer: OfferTypes.Offer) {
                 currentOffer = offer,
                 onContactChange = {
                     contactState.value = if (it == null) OfferContactState.NotFound else OfferContactState.Found(it)
+                },
+                onExecuteOffer = {
+                    navController.navigate("${Screen.ScanData.route}?input=${it.encode()}")
                 }
             )
         }

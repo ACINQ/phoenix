@@ -16,6 +16,8 @@
 
 package fr.acinq.phoenix.db.notifications
 
+import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.coroutines.mapToList
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.utils.Try
 import fr.acinq.lightning.utils.UUID
@@ -24,6 +26,10 @@ import fr.acinq.lightning.utils.toByteVector
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.db.AppDatabase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class ContactQueries(val database: AppDatabase) {
 
@@ -70,6 +76,19 @@ class ContactQueries(val database: AppDatabase) {
                 } else {
                     ContactInfo(UUID.fromString(it.id), it.name, it.photo?.toByteVector(), offers = offers)
                 }
+            }
+        }
+    }
+
+    fun listContacts(): Flow<List<ContactInfo>> {
+        return queries.listContacts().asFlow().mapToList(Dispatchers.IO).map { list ->
+            list.map {
+                val offers = it.offers?.split(",")?.map {
+                    OfferTypes.Offer.decode(it)
+                }?.filterIsInstance<Try.Success<OfferTypes.Offer>>()?.map {
+                    it.get()
+                } ?: emptyList()
+                ContactInfo(UUID.fromString(it.id), it.name, it.photo?.toByteVector(), offers = offers)
             }
         }
     }

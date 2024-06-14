@@ -17,6 +17,13 @@ CREATE TABLE IF NOT EXISTS contact_offers (
 
 CREATE INDEX contact_id_index ON contact_offers(contact_id);
 
+listContacts:
+SELECT id, name, photo, contacts.created_at, updated_at, group_concat(offer, ',') AS offers
+FROM contacts AS contacts
+LEFT OUTER JOIN contact_offers AS contact_offers ON contact_id = id
+GROUP BY id
+ORDER BY contacts.name DESC;
+
 getContact:
 SELECT id, name, photo, contacts.created_at, updated_at, group_concat(offer, ',') AS offers
 FROM contacts AS contacts

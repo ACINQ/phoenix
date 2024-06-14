@@ -82,7 +82,7 @@ class NodeParamsManager(
 
     /** See [NodeParams.defaultOffer]. */
     suspend fun defaultOffer(): OfferTypes.Offer {
-        return nodeParams.filterNotNull().first().defaultOffer(trampolineNodeUri)
+        return nodeParams.filterNotNull().first().defaultOffer(trampolineNodeId).first
     }
 
     companion object {

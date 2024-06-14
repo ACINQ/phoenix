@@ -79,10 +79,12 @@ fun SendOfferView(
                 R.string.send_error_amount_below_requested,
                 (requestedAmount).toPrettyString(prefBitcoinUnit, withUnit = true)
             )
+
             requestedAmount != null && currentAmount > requestedAmount * 2 -> context.getString(
                 R.string.send_error_amount_overpaying,
                 (requestedAmount * 2).toPrettyString(prefBitcoinUnit, withUnit = true)
             )
+
             else -> ""
         }
     }
@@ -127,7 +129,7 @@ fun SendOfferView(
         }
         Spacer(modifier = Modifier.height(36.dp))
 
-        SendOfferButton(
+        SendOfferStateButton(
             state = vm.state,
             offer = offer,
             amount = amount,
@@ -139,7 +141,7 @@ fun SendOfferView(
 }
 
 @Composable
-private fun SendOfferButton(
+private fun SendOfferStateButton(
     state: OfferState,
     offer: OfferTypes.Offer,
     amount: MilliSatoshi?,
@@ -165,7 +167,13 @@ private fun SendOfferButton(
             val mayDoPayments by business.peerManager.mayDoPayments.collectAsState()
             Row(verticalAlignment = Alignment.CenterVertically) {
                 FilledButton(
-                    text = if (!mayDoPayments) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.send_pay_button),
+                    text = if (!mayDoPayments) {
+                        stringResource(id = R.string.send_connecting_button)
+                    } else if (state is OfferState.Complete.Failed) {
+                        stringResource(id = R.string.send_pay_retry_button)
+                    } else {
+                        stringResource(id = R.string.send_pay_button)
+                    },
                     icon = R.drawable.ic_send,
                     enabled = mayDoPayments && amount != null && !isAmountInError,
                 ) {
@@ -173,9 +181,11 @@ private fun SendOfferButton(
                 }
             }
         }
+
         is OfferState.FetchingInvoice -> {
             ProgressView(text = stringResource(id = R.string.send_offer_fetching))
         }
+
         is OfferState.Complete.SendingOffer -> {
             LaunchedEffect(key1 = Unit) { onPaymentSent() }
         }

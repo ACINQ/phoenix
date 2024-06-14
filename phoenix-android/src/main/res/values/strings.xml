@@ -165,6 +165,7 @@
     <string name="send_trampoline_amountless_warning_details">The invoice for this payment does not request a specific amount. This may be exploited by malicious nodes during the payment.\n\nTo be safe, <b>ask the recipient to specify an amount</b> when generating the invoice.</string>
     <string name="send_connecting_button">Waiting for channels…</string>
     <string name="send_pay_button">Pay</string>
+    <string name="send_pay_retry_button">Try again</string>
 
     <string name="send_offer_fetching">Fetching payment details…</string>
     <string name="send_offer_failure_title">Payment has failed</string>
@@ -383,7 +384,7 @@
     <string name="paymentdetails_desc_swapout">Swap-out to %1$s</string>
     <string name="paymentdetails_desc_swapin">On-chain deposit</string>
     <string name="paymentdetails_desc_identifier">Payment to %1$s</string>
-    <string name="paymentdetails_desc_offer_incoming">Payment to %1$s</string>
+    <string name="paymentdetails_desc_offer_incoming">Offer</string>
 
     <string name="paymentdetails_edit_dialog_title">Add a custom description to this payment</string>
     <string name="paymentdetails_edit_dialog_input_label">Description</string>
@@ -463,13 +464,14 @@
 
     <string name="contact_not_found">No contact found for this offer</string>
     <string name="contact_add_contact">Add contact</string>
+    <string name="contact_attach_existing_contact">Existing contact…</string>
     <string name="contact_edit_contact">Edit contact</string>
     <string name="contact_save_button">Save</string>
     <string name="contact_delete_button">Delete</string>
 
     <string name="contact_name_label">Name</string>
     <string name="contact_photo_label">Photo</string>
-    <string name="contact_offer_label">Offer</string>
+    <string name="contact_offer_label">Static invoice</string>
 
     <!-- settings: access control -->
 

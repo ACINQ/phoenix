@@ -129,7 +129,7 @@ fun WalletPayment.smartDescription(context: Context): String? = when (this) {
     is IncomingPayment -> when (val origin = this.origin) {
         is IncomingPayment.Origin.Invoice -> origin.paymentRequest.description
         is IncomingPayment.Origin.SwapIn, is IncomingPayment.Origin.OnChain -> context.getString(R.string.paymentdetails_desc_swapin)
-        is IncomingPayment.Origin.Offer -> context.getString(R.string.paymentdetails_desc_offer_incoming, origin.metadata.offerId.toHex())
+        is IncomingPayment.Origin.Offer -> context.getString(R.string.paymentdetails_desc_offer_incoming)
     }
     is SpliceOutgoingPayment -> context.getString(R.string.paymentdetails_desc_splice_out)
     is ChannelCloseOutgoingPayment -> context.getString(R.string.paymentdetails_desc_closing_channel)

@@ -26,6 +26,9 @@ import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.db.SqliteAppDb
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 
 class ContactsManager(
@@ -39,6 +42,13 @@ class ContactsManager(
     )
 
     private val log = loggerFactory.newLogger(this::class)
+
+    private val _contactsList = MutableStateFlow<List<ContactInfo>>(emptyList())
+    val contactsList = _contactsList.asStateFlow()
+
+    init {
+        launch { appDb.listContacts().collect { _contactsList.value = it } }
+    }
 
     suspend fun getContactForOffer(offer: OfferTypes.Offer): ContactInfo? {
         return appDb.getContactForOffer(offer.offerId)

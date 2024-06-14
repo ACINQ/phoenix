@@ -248,7 +248,11 @@ fun AppView(
                     )
                 }
                 composable(
-                    Screen.ScanData.route, deepLinks = listOf(
+                    route = "${Screen.ScanData.route}?input={input}",
+                    arguments = listOf(
+                        navArgument("input") { type = NavType.StringType ; nullable = true },
+                    ),
+                    deepLinks = listOf(
                         navDeepLink { uriPattern = "lightning:{data}" },
                         navDeepLink { uriPattern = "bitcoin:{data}" },
                         navDeepLink { uriPattern = "lnurl:{data}" },
@@ -260,6 +264,7 @@ fun AppView(
                         navDeepLink { uriPattern = "scanview:{data}" },
                     )
                 ) {
+                    log.info("input arg=${it.arguments?.getString("input")}")
                     val intent = try {
                         it.arguments?.getParcelable<Intent>(NavController.KEY_DEEP_LINK_INTENT)
                     } catch (e: Exception) {
@@ -270,7 +275,7 @@ fun AppView(
                             // prevents forwarding an internal deeplink intent coming from androidx-navigation framework.
                             // TODO properly parse deeplinks following f0ae90444a23cc17d6d7407dfe43c0c8d20e62fc
                             !it.contains("androidx.navigation")
-                        }
+                        } ?: it.arguments?.getString("input")
                         ScanDataView(
                             input = input,
                             onBackClick = { popToHome(navController) },
@@ -464,6 +469,12 @@ fun AppView(
                             onBackClick = { navController.popBackStack() }
                         )
                     }
+                }
+                composable(Screen.Contacts.route) {
+                    SettingsContactsView(
+                        onBackClick = { navController.popBackStack() },
+                        onExecuteOffer = { navController.navigate("${Screen.ScanData.route}?input=${it.encode()}") }
+                    )
                 }
             }
         }

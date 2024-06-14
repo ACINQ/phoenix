@@ -176,6 +176,10 @@ class SqliteAppDb(private val driver: SqlDriver) {
         contactQueries.getContactForOffer(offerId)
     }
 
+    suspend fun listContacts(): Flow<List<ContactInfo>> = withContext(Dispatchers.Default) {
+        contactQueries.listContacts()
+    }
+
     suspend fun saveContact(contact: ContactInfo) = withContext(Dispatchers.Default) {
         contactQueries.saveContact(contact)
     }

@@ -35,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -42,6 +43,7 @@ import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.TextInput
+import fr.acinq.phoenix.data.ContactInfo
 
 
 /**
@@ -57,7 +59,7 @@ fun SaveNewContactDialog(
     onDismiss: () -> Unit,
     onSave: (String, ByteArray?, OfferTypes.Offer) -> Unit,
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     var name by remember { mutableStateOf("") }
     var photo by remember { mutableStateOf<ByteArray?>(null) }
@@ -67,7 +69,7 @@ fun SaveNewContactDialog(
         onDismissRequest = onDismiss,
         containerColor = MaterialTheme.colors.surface,
         contentColor = MaterialTheme.colors.onSurface,
-        scrimColor = MaterialTheme.colors.onBackground.copy(alpha = 0.1f),
+        scrimColor = MaterialTheme.colors.onBackground.copy(alpha = 0.2f),
     ) {
         Column(
             modifier = Modifier
@@ -85,7 +87,6 @@ fun SaveNewContactDialog(
                 textStyle = MaterialTheme.typography.h3,
                 staticLabel = stringResource(id = R.string.contact_name_label),
             )
-
             TextInput(
                 text = offer.encode(),
                 onTextChange = {},
@@ -102,6 +103,15 @@ fun SaveNewContactDialog(
                 onClick = { onSave(name, photo, offer) },
                 shape = CircleShape,
                 modifier = Modifier.align(Alignment.End),
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            FilledButton(
+                text = stringResource(id = R.string.contact_attach_existing_contact),
+                icon = R.drawable.ic_user_search,
+                onClick = {  },
+                shape = CircleShape,
+                modifier = Modifier.align(Alignment.End),
+                backgroundColor = Color.Transparent,
             )
         }
     }

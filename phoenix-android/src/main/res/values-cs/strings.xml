@@ -308,7 +308,7 @@
     <string name="paymentdetails_desc_swapout">Swap-out do %1$s</string>
     <string name="paymentdetails_desc_swapin">On-Chain vklad</string>
     <string name="paymentdetails_desc_identifier">Platba pro %1$s</string>
-    <string name="paymentdetails_desc_offer_incoming">Payment pro %1$s</string>
+    <string name="paymentdetails_desc_offer_incoming">Offer</string>
 
     <string name="paymentdetails_edit_dialog_title">Přidat vlastní popis k této platbě</string>
     <string name="paymentdetails_edit_dialog_input_label">Popis</string>
@@ -352,7 +352,6 @@
     <string name="paymentdetails_payment_request_label">Faktura</string>
     <string name="paymentdetails_preimage_label">Předobraz</string>
     <string name="paymentdetails_payerkey_label">Plátcův klíč</string>
-    <string name="paymentdetails_offerid_label">ID Nabídky</string>
 
     <string name="paymentdetails_status_label">Stav platby</string>
     <string name="paymentdetails_status_success">Úspěšná</string>

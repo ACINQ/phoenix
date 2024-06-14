@@ -75,6 +75,7 @@
     <string name="settings_about">About</string>
     <string name="settings_payment_settings">Payment options</string>
     <string name="settings_payment_history">Payment history</string>
+    <string name="settings_contacts">My contacts</string>
     <string name="settings_notifications">Notifications</string>
 
     <!-- home: swap help -->

@@ -1,0 +1,22 @@
+-- Migration: v4 -> v5
+--
+-- Changes:
+-- * add contacts table
+-- * add contact_offers table
+
+CREATE TABLE IF NOT EXISTS contacts (
+     id TEXT NOT NULL PRIMARY KEY,
+     name TEXT NOT NULL,
+     photo BLOB,
+     created_at INTEGER NOT NULL,
+     updated_at INTEGER DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS contact_offers (
+    offer_id BLOB NOT NULL PRIMARY KEY,
+    contact_id TEXT NOT NULL,
+    offer TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+
+    FOREIGN KEY(contact_id) REFERENCES contacts(id)
+);
