@@ -28,6 +28,7 @@ import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.ChannelCommand
 import fr.acinq.lightning.utils.msat
+import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.managers.PeerManager
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
@@ -76,7 +77,7 @@ class CpfpViewModel(val peerManager: PeerManager) : ViewModel() {
                     val (actualFeerate, fees) = res
                     if (actualFeerate <= userFeerate * 1.10) {
                         CpfpState.Error.FeerateTooLow(userFeerate = userFeerate, actualFeerate = actualFeerate)
-                    } else if (fees.serviceFee > 0.msat) {
+                    } else if (fees.serviceFee > 0.sat) {
                         throw IllegalArgumentException("service fee above 0")
                     } else {
                         CpfpState.ReadyToExecute(userFeerate = userFeerate, actualFeerate = res.first, fee = fees.miningFee)

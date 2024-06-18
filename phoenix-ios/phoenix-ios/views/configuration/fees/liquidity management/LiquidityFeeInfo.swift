@@ -9,7 +9,7 @@ struct LiquidityFeeParams {
 
 struct LiquidityFeeEstimate {
 	let minerFee: Bitcoin_kmpSatoshi
-	let serviceFee: Lightning_kmpMilliSatoshi
+	let serviceFee: Bitcoin_kmpSatoshi
 }
 
 struct LiquidityFeeInfo {

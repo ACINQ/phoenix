@@ -350,8 +350,7 @@ struct LiquidityAdsView: View {
 					.gridColumnAlignment(.trailing)
 				
 				let (amtBtc, amtFiat) = formattedBalances(
-					msats: feeInfo.estimate.serviceFee,
-					policy: .showMsatsIfNonZero
+					sats: feeInfo.estimate.serviceFee
 				)
 				HStack(alignment: VerticalAlignment.top, spacing: 8) {
 					VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
@@ -735,7 +734,7 @@ struct LiquidityAdsView: View {
 		}
 		
 		let minerMsat = Utils.toMsat(sat: feeInfo.estimate.minerFee)
-		let serviceMsat = feeInfo.estimate.serviceFee.msat
+		let serviceMsat = Utils.toMsat(sat: feeInfo.estimate.serviceFee)
 		
 		let totalFeeMsat = minerMsat + serviceMsat
 		return totalFeeMsat > balanceMsat
@@ -815,7 +814,7 @@ struct LiquidityAdsView: View {
 			
 			var pair: KotlinPair<
 				Lightning_kmpFeeratePerKw,
-				Lightning_kmpChannelCommand.CommitmentSpliceFees>? = nil
+				Lightning_kmpChannelManagementFees>? = nil
 			
 			var _channelsNotAvailable = false
 			do {
@@ -843,7 +842,7 @@ struct LiquidityAdsView: View {
 			
 			if let pair = pair,
 			   let feerate: Lightning_kmpFeeratePerKw = pair.first,
-			   let fees: Lightning_kmpChannelCommand.CommitmentSpliceFees = pair.second
+			   let fees: Lightning_kmpChannelManagementFees = pair.second
 			{
 				feeInfo = LiquidityFeeInfo(
 					params: LiquidityFeeParams(amount: amount, feerate: feerate, leaseRate: leaseRate),
@@ -1027,8 +1026,7 @@ fileprivate struct FeeInfo_Grid: InfoGridView {
 		} valueColumn: {
 			
 			let (amtBtc, amtFiat) = formattedBalances(
-				msats: feeInfo.estimate.serviceFee,
-				policy: .showMsatsIfNonZero
+				sats: feeInfo.estimate.serviceFee
 			)
 			HStack(alignment: VerticalAlignment.top, spacing: 8) {
 				VStack(alignment: HorizontalAlignment.leading, spacing: 4) {

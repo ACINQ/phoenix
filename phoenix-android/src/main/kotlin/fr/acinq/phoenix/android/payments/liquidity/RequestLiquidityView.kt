@@ -53,6 +53,7 @@ import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.ChannelCommand
+import fr.acinq.lightning.channel.ChannelManagementFees
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.sum
 import fr.acinq.lightning.utils.toMilliSatoshi
@@ -230,7 +231,7 @@ private fun RequestLiquidityBottomSection(
             }
             LeaseEstimationView(amountRequested = amount, leaseFees = state.fees, actualFeerate = state.actualFeerate)
             Spacer(modifier = Modifier.height(24.dp))
-            if (state.fees.serviceFee + state.fees.miningFee.toMilliSatoshi() > balance) {
+            if ((state.fees.serviceFee + state.fees.miningFee).toMilliSatoshi() > balance) {
                 ErrorMessage(header = stringResource(id = R.string.liquidityads_over_balance))
             } else if (isAmountError) {
                 ErrorMessage(header = stringResource(id = R.string.validation_invalid_amount))
@@ -264,7 +265,7 @@ private fun RequestLiquidityBottomSection(
 @Composable
 private fun LeaseEstimationView(
     amountRequested: Satoshi,
-    leaseFees: ChannelCommand.Commitment.Splice.Fees,
+    leaseFees: ChannelManagementFees,
     actualFeerate: FeeratePerKw
 ) {
     SplashLabelRow(
@@ -278,7 +279,7 @@ private fun LeaseEstimationView(
         label = stringResource(id = R.string.liquidityads_estimate_details_service_fees),
         helpMessage = stringResource(id = R.string.liquidityads_estimate_details_service_fees_help)
     ) {
-        AmountWithFiatBelow(amount = leaseFees.serviceFee, amountTextStyle = MaterialTheme.typography.body2)
+        AmountWithFiatBelow(amount = leaseFees.serviceFee.toMilliSatoshi(), amountTextStyle = MaterialTheme.typography.body2)
     }
     Spacer(modifier = Modifier.height(8.dp))
     SplashLabelRow(
@@ -294,7 +295,7 @@ private fun LeaseEstimationView(
         }
     }
 
-    val totalFees = leaseFees.miningFee.toMilliSatoshi() + leaseFees.serviceFee
+    val totalFees = leaseFees.miningFee + leaseFees.serviceFee
     SplashLabelRow(label = "") {
         Spacer(modifier = Modifier.height(8.dp))
         HSeparator(width = 60.dp)
@@ -303,10 +304,10 @@ private fun LeaseEstimationView(
     SplashLabelRow(
         label = stringResource(id = R.string.send_spliceout_complete_recap_total),
     ) {
-        AmountWithFiatBelow(amount = totalFees, amountTextStyle = MaterialTheme.typography.body2)
+        AmountWithFiatBelow(amount = totalFees.toMilliSatoshi(), amountTextStyle = MaterialTheme.typography.body2)
     }
 
-    if (totalFees >= amountRequested.toMilliSatoshi() * 0.25) {
+    if (totalFees >= amountRequested * 0.25) {
         SplashLabelRow(label = "", icon = R.drawable.ic_alert_triangle, iconTint = orange) {
             Text(
                 text = stringResource(id = R.string.liquidityads_estimate_above_25),

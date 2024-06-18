@@ -376,7 +376,7 @@ object LegacyMigrationHelper {
             LightningOutgoingPayment.Details.SwapOut(
                 address = paymentMeta.swap_out_address ?: "",
                 paymentRequest = paymentRequest ?: Bolt11Invoice.create(
-                    chainHash = chain.chainHash,
+                    chain = chain,
                     amount = head.recipientAmount().toLong().msat,
                     paymentHash = head.paymentHash().bytes().toArray().byteVector32(),
                     privateKey = Lightning.randomKey(),
