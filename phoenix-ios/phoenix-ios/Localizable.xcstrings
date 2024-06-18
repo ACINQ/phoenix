@@ -6672,7 +6672,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Au fur et à mesure que vous recevez des fonds, les liquidités sont consommées et deviennent votre solde. Au bout d'un an, les liquidités non utilisées seront récupérées par le service."
+            "value" : "Au fur et à mesure que vous recevez des fonds, la liquidité est consommée et devient votre solde. Au bout d'un an, la liquidité non utilisée sera récupérée par le service."
           }
         }
       }
@@ -8173,7 +8173,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bitcoin déchaîné"
+            "value" : "Bitcoin supercharged"
           }
         }
       }
@@ -9152,7 +9152,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Taille du chenal affectée"
+            "value" : "Capacité du canal impactée"
           }
         }
       }
@@ -18382,7 +18382,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Les fonds envoyés sur la chaîne sont prélevés de votre côté du canal, ce qui réduit la taille du canal du même montant. Vos liquidités entrantes restent les mêmes."
+            "value" : "Les fonds envoyés on-chain sont prélevés de votre côté du canal de paiement, ce qui réduit la taille du canal du même montant. Votre liquidité entrante reste la même."
           }
         }
       }
@@ -30790,7 +30790,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Le destinataire n'est pas joignable ou ne dispose pas de suffisamment de liquidités entrantes."
+            "value" : "Le destinataire n'est pas joignable ou ne dispose pas de suffisamment de liquidité entrante."
           }
         }
       }
@@ -37178,7 +37178,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Le paiement n'a pas pu être transmis au destinataire (probablement manque de liquidités entrantes)."
+            "value" : "Le paiement n'a pas pu être transmis au destinataire (probablement manque de liquidité entrante)."
           }
         }
       }
@@ -38307,7 +38307,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ce taux de frais est en deçà de ce que vos transactions utilisent déjà. Il doit être plus élevé afin d'avoir un quelconque effet."
+            "value" : "Ces frais sont en deçà de ce que vos transactions utilisent déjà. Ils doivent être plus élevés pour avoir un quelconque effet."
           }
         }
       }
@@ -40123,7 +40123,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Les transactions avec des frais trop faibles peuvent rester en attente de confirmation pendant des jours ou des semaines.\n\nLe choix de ces frais est votre responsabilité. Une fois envoyée, cette transaction ne pourra pas être annulée, seulement accélérée avec des frais plus élevés.\n\nÊtes-vous sûr de vouloir continuer ?"
+            "value" : "Les transactions avec des frais trop faibles peuvent rester en attente de confirmation pendant des jours voire des semaines.\n\nLe choix de ces frais est de votre responsabilité. Une fois envoyée, cette transaction ne pourra pas être annulée, seulement accélérée avec des frais plus élevés.\n\nÊtes-vous sûr de vouloir continuer ?"
           }
         }
       }
@@ -42759,7 +42759,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La routine de tour de contrôle ne s'est pas terminée correctement"
+            "value" : "La routine de contrôle ne s'est pas terminée correctement"
           }
         }
       }
