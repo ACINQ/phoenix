@@ -6,7 +6,6 @@ plugins {
   id("kotlin-kapt")
   id("kotlin-parcelize")
   id("androidx.navigation.safeargs.kotlin")
-  id("com.google.gms.google-services")
   id("app.cash.sqldelight")
   id("kotlinx-serialization")
 }
@@ -31,7 +30,7 @@ android {
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
   buildTypes {
-    val libCode = 79
+    val libCode = 80
     getByName("debug") {
       resValue("string", "CHAIN", chain)
       buildConfigField("String", "CHAIN", chain)

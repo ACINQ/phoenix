@@ -28,6 +28,7 @@ import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.ChannelCommand
 import fr.acinq.lightning.utils.msat
+import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.utils.Parser
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -82,7 +83,7 @@ class SpliceOutViewModel(private val peerManager: PeerManager, private val chain
                 else -> {
                     val (actualFeerate, fee) = res
                     log.info("received actual feerate=$actualFeerate from splice-out estimate fee")
-                    if (fee.serviceFee > 0.msat) {
+                    if (fee.serviceFee > 0.sat) {
                         throw IllegalArgumentException("service fee above 0")
                     } else {
                         SpliceOutState.ReadyToSend(amount, userFeerate, actualFeerate, estimatedFee = fee.miningFee)

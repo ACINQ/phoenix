@@ -20,6 +20,7 @@ import fr.acinq.lightning.blockchain.electrum.ElectrumMiniWallet
 import fr.acinq.lightning.blockchain.electrum.WalletState
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.ChannelCommand
+import fr.acinq.lightning.channel.ChannelManagementFees
 import fr.acinq.lightning.channel.states.Aborted
 import fr.acinq.lightning.channel.states.ChannelState
 import fr.acinq.lightning.channel.states.Closed
@@ -561,7 +562,7 @@ suspend fun Peer._estimateFeeForInboundLiquidity(
     amount: Satoshi,
     targetFeerate: FeeratePerKw,
     leaseRate: LiquidityAds_LeaseRate
-): Pair<FeeratePerKw, ChannelCommand.Commitment.Splice.Fees>? {
+): Pair<FeeratePerKw, ChannelManagementFees>? {
     return this.estimateFeeForInboundLiquidity(amount, targetFeerate, leaseRate.unwrap())
 }
 

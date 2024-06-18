@@ -23,6 +23,7 @@ import androidx.lifecycle.viewModelScope
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.ChannelCommand
+import fr.acinq.lightning.channel.ChannelManagementFees
 import fr.acinq.phoenix.managers.AppConfigurationManager
 import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.managers.PeerManager
@@ -37,7 +38,7 @@ import org.slf4j.LoggerFactory
 sealed class RequestLiquidityState {
     object Init: RequestLiquidityState()
     object Estimating: RequestLiquidityState()
-    data class Estimation(val amount: Satoshi, val fees: ChannelCommand.Commitment.Splice.Fees, val actualFeerate: FeeratePerKw): RequestLiquidityState()
+    data class Estimation(val amount: Satoshi, val fees: ChannelManagementFees, val actualFeerate: FeeratePerKw): RequestLiquidityState()
     object Requesting: RequestLiquidityState()
     sealed class Complete: RequestLiquidityState() {
         abstract val response: ChannelCommand.Commitment.Splice.Response

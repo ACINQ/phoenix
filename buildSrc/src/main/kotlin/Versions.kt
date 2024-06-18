@@ -1,5 +1,5 @@
 object Versions {
-    const val lightningKmp = "1.6.2"
+    const val lightningKmp = "1.6.3"
     const val secp256k1 = "0.14.0"
     const val torMobile = "0.2.0"
 
@@ -11,7 +11,7 @@ object Versions {
     const val slf4j = "1.7.30"
     const val junit = "4.13"
 
-    const val fcmPlugin = "4.3.10"
+    const val fcmPlugin = "4.4.2"
 
     object Android {
         const val coreKtx = "1.9.0"
@@ -26,7 +26,7 @@ object Versions {
         const val biometrics = "1.1.0"
 
         const val zxing = "4.1.0"
-        const val fcm = "22.0.0"
+        const val fcm = "24.0.0"
         const val logback = "2.0.0"
 
         const val testRunner = "1.3.0"
