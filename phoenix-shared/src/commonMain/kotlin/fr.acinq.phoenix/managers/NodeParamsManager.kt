@@ -30,7 +30,7 @@ import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.shared.BuildVersions
 import fr.acinq.lightning.logging.info
-import fr.acinq.lightning.wire.OfferTypes
+import fr.acinq.phoenix.data.OfferData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
@@ -80,9 +80,11 @@ class NodeParamsManager(
         }
     }
 
-    /** See [NodeParams.defaultOffer]. */
-    suspend fun defaultOffer(): OfferTypes.Offer {
-        return nodeParams.filterNotNull().first().defaultOffer(trampolineNodeId).first
+    /** See [NodeParams.defaultOffer]. Returns an [OfferData] object. */
+    suspend fun defaultOffer(): OfferData {
+        return nodeParams.filterNotNull().first().defaultOffer(trampolineNodeId).let {
+            OfferData(it.first, it.second)
+        }
     }
 
     companion object {
