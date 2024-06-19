@@ -52,7 +52,6 @@ fun ContactCompactView(
     contact: ContactInfo,
     currentOffer: OfferTypes.Offer,
     onContactChange: (ContactInfo?) -> Unit,
-    onExecuteOffer: (OfferTypes.Offer) -> Unit,
 ) {
     var showSheet by remember { mutableStateOf(false) }
 
@@ -78,7 +77,6 @@ fun ContactCompactView(
             currentOffer = currentOffer,
             onDismiss = { showSheet = false },
             onContactChange = onContactChange,
-            onExecuteOffer = onExecuteOffer,
         )
     }
 }

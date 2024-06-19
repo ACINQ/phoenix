@@ -23,13 +23,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import fr.acinq.lightning.db.*
+import fr.acinq.lightning.payment.OfferPaymentMetadata
 import fr.acinq.lightning.utils.Connection
+import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.utils.extensions.desc
+import fr.acinq.phoenix.utils.extensions.payerNote
 import java.security.cert.CertificateException
 import java.util.*
 import kotlin.contracts.ExperimentalContracts
@@ -129,7 +132,7 @@ fun WalletPayment.smartDescription(context: Context): String? = when (this) {
     is IncomingPayment -> when (val origin = this.origin) {
         is IncomingPayment.Origin.Invoice -> origin.paymentRequest.description
         is IncomingPayment.Origin.SwapIn, is IncomingPayment.Origin.OnChain -> context.getString(R.string.paymentdetails_desc_swapin)
-        is IncomingPayment.Origin.Offer -> context.getString(R.string.paymentdetails_desc_offer_incoming)
+        is IncomingPayment.Origin.Offer -> origin.metadata.payerNote ?: context.getString(R.string.paymentdetails_desc_offer_incoming)
     }
     is SpliceOutgoingPayment -> context.getString(R.string.paymentdetails_desc_splice_out)
     is ChannelCloseOutgoingPayment -> context.getString(R.string.paymentdetails_desc_closing_channel)

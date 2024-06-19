@@ -278,7 +278,7 @@ fun AppView(
                         } ?: it.arguments?.getString("input")
                         ScanDataView(
                             input = input,
-                            onBackClick = { popToHome(navController) },
+                            onBackClick = { navController.popBackStack() },
                             onAuthSchemeInfoClick = { navController.navigate("${Screen.PaymentSettings.route}/true") },
                             onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) },
                             onProcessingFinished = { popToHome(navController) },
@@ -471,10 +471,7 @@ fun AppView(
                     }
                 }
                 composable(Screen.Contacts.route) {
-                    SettingsContactsView(
-                        onBackClick = { navController.popBackStack() },
-                        onExecuteOffer = { navController.navigate("${Screen.ScanData.route}?input=${it.encode()}") }
-                    )
+                    SettingsContactsView(onBackClick = { navController.popBackStack() })
                 }
             }
         }

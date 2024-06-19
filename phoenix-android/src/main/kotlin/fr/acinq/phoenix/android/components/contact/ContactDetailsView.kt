@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -52,13 +51,15 @@ import androidx.compose.ui.unit.sp
 import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Clickable
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.TextInput
+import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.copyToClipboard
-import fr.acinq.phoenix.android.utils.discreteOutlinedTextFieldColors
+import fr.acinq.phoenix.android.utils.invisibleOutlinedTextFieldColors
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.data.ContactInfo
 import kotlinx.coroutines.launch
@@ -77,7 +78,6 @@ fun ContactDetailsView(
     currentOffer: OfferTypes.Offer?,
     onDismiss: () -> Unit,
     onContactChange: (ContactInfo?) -> Unit,
-    onExecuteOffer: (OfferTypes.Offer) -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val contactsManager = business.contactsManager
@@ -110,7 +110,7 @@ fun ContactDetailsView(
                     onTextChange = { name = it },
                     textStyle = MaterialTheme.typography.h3.copy(textAlign = TextAlign.Center),
                     staticLabel = null,
-                    defaultOutlineColors = discreteOutlinedTextFieldColors(),
+                    textFieldColors = invisibleOutlinedTextFieldColors(),
                     showResetButton = false
                 )
 
@@ -175,11 +175,12 @@ fun ContactDetailsView(
             }
 
             if (showAllDetails) {
+                val navController = navController
                 Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                     contact.offers.forEach { offer ->
                         OfferAttachedToContactRow(
                             offer = offer,
-                            onOfferClick = onExecuteOffer,
+                            onOfferClick = { navController.navigate("${Screen.ScanData.route}?input=${it.encode()}") },
                             onDelete = { scope.launch { contactsManager.detachOfferFromContact(offerId = offer.offerId) } }
                         )
                     }

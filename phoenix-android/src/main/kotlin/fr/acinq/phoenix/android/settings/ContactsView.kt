@@ -27,19 +27,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.contact.ContactDetailsView
 import fr.acinq.phoenix.android.components.contact.ContactsListView
+import fr.acinq.phoenix.android.components.contact.SaveNewContactDialog
 import fr.acinq.phoenix.data.ContactInfo
+import kotlinx.coroutines.launch
 
 @Composable
 fun SettingsContactsView(
     onBackClick: () -> Unit,
-    onExecuteOffer: (OfferTypes.Offer) -> Unit,
 ) {
     var selectedContact by remember { mutableStateOf<ContactInfo?>(null) }
+    var isAddingNewContact by remember { mutableStateOf(false) }
+    var showInfoMessage by remember { mutableStateOf(false) }
 
     DefaultScreenLayout(isScrollable = false) {
         DefaultScreenHeader(
@@ -49,17 +53,17 @@ fun SettingsContactsView(
                 Spacer(modifier = Modifier.weight(1f))
                 Button(
                     icon = R.drawable.ic_plus,
-                    onClick = { /*TODO*/ },
+                    onClick = { isAddingNewContact = true },
                     shape = CircleShape
                 )
                 Button(
                     icon = R.drawable.ic_help_circle,
-                    onClick = { /*TODO*/ },
+                    onClick = { showInfoMessage = true },
                     shape = CircleShape
                 )
             }
         )
-        ContactsListView(onContactClick = { selectedContact = it }, onExecuteOffer = onExecuteOffer)
+        ContactsListView(onEditContact = { selectedContact = it }, canEditContact = true, isOnSurface = false)
     }
 
     selectedContact?.let {
@@ -68,7 +72,12 @@ fun SettingsContactsView(
             currentOffer = null,
             onDismiss = { selectedContact = null },
             onContactChange = {},
-            onExecuteOffer = onExecuteOffer
         )
+    } ?: run {
+        if (isAddingNewContact) {
+            SaveNewContactDialog(initialOffer = null, onDismiss = { isAddingNewContact = false }, onSaved = { isAddingNewContact = false })
+        } else if (showInfoMessage) {
+
+        }
     }
 }

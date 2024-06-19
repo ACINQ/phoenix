@@ -123,7 +123,6 @@ fun PaymentsHistoryView(
 
     DefaultScreenLayout(
         isScrollable = false,
-        backgroundColor = MaterialTheme.colors.background,
     ) {
         DefaultScreenHeader(
             content = {
@@ -165,9 +164,7 @@ fun PaymentsHistoryView(
         ) {
             groupedPayments.forEach { (header, payments) ->
                 stickyHeader {
-                    Column(modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colors.background)) {
+                    Column(modifier = Modifier.fillMaxWidth()) {
                         CardHeader(
                             text = when (header) {
                                 PaymentsGroup.Today -> stringResource(id = R.string.payments_history_today)

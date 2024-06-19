@@ -56,12 +56,13 @@ fun TextInput(
     maxChars: Int? = null,
     staticLabel: String?,
     placeholder: @Composable (() -> Unit)? = null,
+    leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     errorMessage: String? = null,
     enabled: Boolean = true,
     enabledEffect: Boolean = true,
     onTextChange: (String) -> Unit,
-    defaultOutlineColors: TextFieldColors = outlinedTextFieldColors(),
+    textFieldColors: TextFieldColors = outlinedTextFieldColors(),
     showResetButton: Boolean = true,
 ) {
     val charsCount by remember(text) { mutableStateOf(text.length) }
@@ -84,6 +85,7 @@ fun TextInput(
             ),
             label = null,
             placeholder = placeholder,
+            leadingIcon = leadingIcon,
             trailingIcon = if (!showResetButton && trailingIcon == null) {
                 null
             } else {
@@ -106,7 +108,7 @@ fun TextInput(
             },
             enabled = enabled,
             keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-            colors = if (errorMessage.isNullOrBlank()) defaultOutlineColors else errorOutlinedTextFieldColors(),
+            colors = if (errorMessage.isNullOrBlank()) textFieldColors else errorOutlinedTextFieldColors(),
             shape = RoundedCornerShape(8.dp),
             interactionSource = interactionSource,
             modifier = Modifier

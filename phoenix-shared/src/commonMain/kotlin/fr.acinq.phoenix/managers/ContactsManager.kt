@@ -28,6 +28,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 
@@ -45,6 +47,9 @@ class ContactsManager(
 
     private val _contactsList = MutableStateFlow<List<ContactInfo>>(emptyList())
     val contactsList = _contactsList.asStateFlow()
+    val contactsWithOfferList = _contactsList.map { contacts ->
+        contacts.filter { it.offers.isNotEmpty()  }
+    }
 
     init {
         launch { appDb.listContacts().collect { _contactsList.value = it } }

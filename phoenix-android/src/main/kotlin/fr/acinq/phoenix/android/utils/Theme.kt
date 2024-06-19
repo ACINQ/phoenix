@@ -273,14 +273,9 @@ fun systemNavBarColor(entry: NavBackStackEntry?): Color {
     }
 }
 
-@Composable
-fun textFieldColors() = TextFieldDefaults.textFieldColors(
-    focusedLabelColor = MaterialTheme.colors.primary,
-    backgroundColor = MaterialTheme.colors.surface,
-)
 
 @Composable
-fun discreteOutlinedTextFieldColors() = TextFieldDefaults.outlinedTextFieldColors(
+fun invisibleOutlinedTextFieldColors() = TextFieldDefaults.outlinedTextFieldColors(
     focusedLabelColor = MaterialTheme.colors.primary,
     unfocusedLabelColor = MaterialTheme.typography.body1.color,
     focusedBorderColor = MaterialTheme.colors.primary,
@@ -299,6 +294,19 @@ fun outlinedTextFieldColors() = TextFieldDefaults.outlinedTextFieldColors(
     unfocusedBorderColor = MaterialTheme.colors.primary,
     disabledTextColor = MaterialTheme.colors.onSurface,
     disabledBorderColor = mutedBgColor,
+    disabledLabelColor = mutedTextColor,
+    disabledPlaceholderColor = mutedTextColor,
+)
+
+@Composable
+fun mutedTextFieldColors() = TextFieldDefaults.outlinedTextFieldColors(
+    backgroundColor = mutedTextColor.copy(alpha = 0.2f),
+    focusedLabelColor = MaterialTheme.colors.primary,
+    unfocusedLabelColor = MaterialTheme.typography.body1.color,
+    focusedBorderColor = mutedTextColor.copy(alpha = 0.7f),
+    unfocusedBorderColor = Color.Transparent,
+    disabledTextColor = MaterialTheme.colors.onSurface,
+    disabledBorderColor = Color.Transparent,
     disabledLabelColor = mutedTextColor,
     disabledPlaceholderColor = mutedTextColor,
 )

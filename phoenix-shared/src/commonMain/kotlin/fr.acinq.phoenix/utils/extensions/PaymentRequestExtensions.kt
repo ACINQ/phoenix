@@ -44,12 +44,6 @@ val PaymentRequest.chain: Chain
         is Bolt12Invoice -> TODO()
     }
 
-val PaymentRequest.nodeId: PublicKey
-    get() = when (this) {
-        is Bolt11Invoice -> this.nodeId
-        is Bolt12Invoice -> this.nodeId
-    }
-
 val PaymentRequest.desc: String?
     get() = when (this) {
         is Bolt11Invoice -> this.description

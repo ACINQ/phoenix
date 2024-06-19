@@ -436,6 +436,7 @@ private fun PaymentDescriptionView(
     val peer by business.peerManager.peerState.collectAsState()
     val paymentDesc = data.metadata.lnurl?.description ?: data.payment.smartDescription(LocalContext.current)
     val customDesc = remember(data) { data.metadata.userDescription?.takeIf { it.isNotBlank() } }
+
     SplashLabelRow(label = stringResource(id = R.string.paymentdetails_desc_label)) {
         val isLegacyMigration = data.isLegacyMigration(peer)
         val finalDesc = when (isLegacyMigration) {

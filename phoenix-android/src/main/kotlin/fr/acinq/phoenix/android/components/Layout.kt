@@ -51,14 +51,14 @@ import kotlinx.coroutines.flow.firstOrNull
 
 /** Button for navigation purpose, with the back arrow. */
 @Composable
-fun BackButton(onClick: () -> Unit) {
+fun BackButton(onClick: () -> Unit, backgroundColor: Color = Color.Transparent) {
     BackHandler(onBack = onClick)
     Button(
         onClick = onClick,
         shape = RoundedCornerShape(topStart = 0.dp, topEnd = 50.dp, bottomEnd = 50.dp, bottomStart = 0.dp),
         contentPadding = PaddingValues(start = 20.dp, top = 8.dp, bottom = 8.dp, end = 12.dp),
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = Color.Unspecified,
+            backgroundColor = backgroundColor,
             disabledBackgroundColor = Color.Unspecified,
             contentColor = MaterialTheme.colors.onSurface,
             disabledContentColor = mutedTextColor,

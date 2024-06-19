@@ -64,7 +64,6 @@ private sealed class OfferContactState {
 fun ContactOrOfferView(offer: OfferTypes.Offer) {
     val contactsManager = business.contactsManager
     val contactState = remember { mutableStateOf<OfferContactState>(OfferContactState.Init) }
-    val navController = navController
     LaunchedEffect(Unit) {
         contactState.value = contactsManager.getContactForOffer(offer)?.let { OfferContactState.Found(it) } ?: OfferContactState.NotFound
     }
@@ -80,9 +79,6 @@ fun ContactOrOfferView(offer: OfferTypes.Offer) {
                 onContactChange = {
                     contactState.value = if (it == null) OfferContactState.NotFound else OfferContactState.Found(it)
                 },
-                onExecuteOffer = {
-                    navController.navigate("${Screen.ScanData.route}?input=${it.encode()}")
-                }
             )
         }
         is OfferContactState.NotFound -> {

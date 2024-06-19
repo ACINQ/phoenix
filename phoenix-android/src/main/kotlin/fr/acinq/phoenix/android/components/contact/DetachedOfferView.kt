@@ -73,14 +73,9 @@ fun DetachedOfferView(
 
     if (showSaveContactDialog) {
         SaveNewContactDialog(
-            offer = offer,
+            initialOffer = offer,
             onDismiss = { showSaveContactDialog = false },
-            onSave = { name, photo, offer ->
-                scope.launch {
-                    val contact = contactsManager.saveNewContact(name, photo, offer)
-                    onContactSaved(contact)
-                }
-            },
+            onSaved = { onContactSaved(it) },
         )
     }
 }

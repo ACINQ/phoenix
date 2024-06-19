@@ -51,6 +51,7 @@ import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.contact.ContactsListModal
 import fr.acinq.phoenix.android.components.mvi.MVIControllerViewModel
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.databinding.ScanViewBinding
@@ -123,7 +124,7 @@ fun ScanDataView(
                 LaunchedEffect(key1 = Unit) { onBackClick() }
             }
             is Scan.Model.OfferFlow -> {
-                SendOfferView(offer = model.offer, trampolineFees = trampolineFees, onBackClick = { postIntent(Scan.Intent.Reset) }, onPaymentSent = onProcessingFinished)
+                SendOfferView(offer = model.offer, trampolineFees = trampolineFees, onBackClick = onBackClick, onPaymentSent = onProcessingFinished)
             }
             is Scan.Model.OnchainFlow -> {
                 val paymentRequest = model.uri.paymentRequest
@@ -181,6 +182,7 @@ fun ReadDataView(
 ) {
     val context = LocalContext.current.applicationContext
 
+    var showContactsList by remember { mutableStateOf(false) }
     var showManualInputDialog by remember { mutableStateOf(false) }
     var scanView by remember { mutableStateOf<DecoratedBarcodeView?>(null) }
 
@@ -201,6 +203,10 @@ fun ReadDataView(
             }
         }
 
+        Column(modifier = Modifier.align(Alignment.TopStart).padding(top = 16.dp)) {
+            BackButton(onClick = onBackClick, backgroundColor = MaterialTheme.colors.surface)
+        }
+
         // buttons at the bottom of the screen
         Column(
             Modifier
@@ -210,6 +216,12 @@ fun ReadDataView(
                 .background(MaterialTheme.colors.surface)
         ) {
             if (model is Scan.Model.Ready) {
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    icon = R.drawable.ic_user_search,
+                    text = "My contacts...",
+                    onClick = { showContactsList = true },
+                )
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     icon = R.drawable.ic_input,
@@ -223,12 +235,6 @@ fun ReadDataView(
                     onClick = { readClipboard(context)?.let { onScannedText(it) } },
                 )
             }
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                text = stringResource(id = R.string.btn_cancel),
-                icon = R.drawable.ic_arrow_back,
-                onClick = onBackClick
-            )
         }
 
         if (model is Scan.Model.BadRequest) {
@@ -243,6 +249,10 @@ fun ReadDataView(
 
         if (showManualInputDialog) {
             ManualInputDialog(onInputConfirm = onScannedText, onDismiss = { showManualInputDialog = false })
+        }
+
+        if (showContactsList) {
+            ContactsListModal(onDismiss = { showContactsList = false })
         }
     }
 }
@@ -276,15 +286,6 @@ fun BoxScope.ScannerView(
             }
             binding
         }
-    )
-    // visor
-    Box(
-        Modifier
-            .width(dimensionResource(id = R.dimen.scanner_size))
-            .height(dimensionResource(id = R.dimen.scanner_size))
-            .clip(RoundedCornerShape(24.dp))
-            .background(Color(0x33ffffff))
-            .align(Alignment.Center)
     )
 }
 

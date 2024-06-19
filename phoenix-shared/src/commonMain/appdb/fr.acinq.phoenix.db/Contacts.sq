@@ -22,7 +22,7 @@ SELECT id, name, photo, contacts.created_at, updated_at, group_concat(offer, ','
 FROM contacts AS contacts
 LEFT OUTER JOIN contact_offers AS contact_offers ON contact_id = id
 GROUP BY id
-ORDER BY contacts.name DESC;
+ORDER BY contacts.name ASC;
 
 getContact:
 SELECT id, name, photo, contacts.created_at, updated_at, group_concat(offer, ',') AS offers
