@@ -16,12 +16,22 @@
 
 package fr.acinq.phoenix.android.payments.offer
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -33,7 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -46,10 +56,12 @@ import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountHeroInput
 import fr.acinq.phoenix.android.components.AmountWithFiatRowView
 import fr.acinq.phoenix.android.components.BackButtonWithBalance
+import fr.acinq.phoenix.android.components.Clickable
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.SplashLabelRow
 import fr.acinq.phoenix.android.components.SplashLayout
+import fr.acinq.phoenix.android.components.TextInput
 import fr.acinq.phoenix.android.components.contact.ContactOrOfferView
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.payments.details.translatePaymentError
@@ -67,7 +79,7 @@ fun SendOfferView(
     val balance = business.balanceManager.balance.collectAsState(null).value
     val prefBitcoinUnit = LocalBitcoinUnit.current
 
-    val vm = viewModel<SendOfferViewModel>(factory = SendOfferViewModel.Factory(business.peerManager))
+    val vm = viewModel<SendOfferViewModel>(factory = SendOfferViewModel.Factory(business.peerManager, business.nodeParamsManager))
     val requestedAmount = offer.amount
     var amount by remember { mutableStateOf(requestedAmount) }
     val amountErrorMessage: String = remember(amount) {
@@ -89,6 +101,9 @@ fun SendOfferView(
         }
     }
     val isOverpaymentEnabled by userPrefs.getIsOverpaymentEnabled.collectAsState(initial = false)
+
+    var message by remember { mutableStateOf("") }
+    var showMessageDialog by remember { mutableStateOf(false) }
 
     SplashLayout(
         header = { BackButtonWithBalance(onBackClick = onBackClick, balance = balance) },
@@ -112,8 +127,25 @@ fun SendOfferView(
             Spacer(modifier = Modifier.height(8.dp))
         }
 
-        SplashLabelRow(label = stringResource(id = R.string.send_destination_label)) {
+        SplashLabelRow(label = stringResource(id = R.string.send_destination_label), icon = R.drawable.ic_zap) {
             ContactOrOfferView(offer = offer)
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+        SplashLabelRow(label = stringResource(id = R.string.send_offer_payer_note_label), icon = R.drawable.ic_message_circle) {
+            Clickable(
+                onClick = { showMessageDialog = true },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .offset(x = (-8).dp),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Column(modifier = Modifier.padding(8.dp)) {
+                    message.takeIf { it.isNotBlank() }?.let {
+                        Text(text = it)
+                    } ?: Text(text = stringResource(id = R.string.send_offer_payer_note_placeholder), style = MaterialTheme.typography.caption)
+                }
+            }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -134,9 +166,13 @@ fun SendOfferView(
             offer = offer,
             amount = amount,
             isAmountInError = amountErrorMessage.isNotBlank(),
-            onSendClick = { amount, offer -> vm.sendOffer(amount, offer) },
+            onSendClick = { amount, offer -> vm.sendOffer(amount, message, offer) },
             onPaymentSent = onPaymentSent,
         )
+    }
+
+    if (showMessageDialog) {
+        PayerNoteInput(initialMessage = message, onMessageChange = { message = it }, onDismiss = { showMessageDialog = false })
     }
 }
 
@@ -158,6 +194,7 @@ private fun SendOfferStateButton(
                         is OfferState.Complete.Failed.CouldNotGetInvoice -> stringResource(id = R.string.send_offer_failure_timeout)
                         is OfferState.Complete.Failed.PaymentNotSent -> translatePaymentError(paymentFailure = state.reason)
                         is OfferState.Complete.Failed.Error -> state.throwable.message
+                        is OfferState.Complete.Failed.PayerNoteTooLong -> "The message is too long (max. 64 chars)"
                     },
                     alignment = Alignment.CenterHorizontally,
                 )
@@ -188,6 +225,46 @@ private fun SendOfferStateButton(
 
         is OfferState.Complete.SendingOffer -> {
             LaunchedEffect(key1 = Unit) { onPaymentSent() }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun PayerNoteInput(
+    initialMessage: String,
+    onMessageChange: (String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    ModalBottomSheet(
+        sheetState = sheetState,
+        onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colors.surface,
+        contentColor = MaterialTheme.colors.onSurface,
+        scrimColor = MaterialTheme.colors.onBackground.copy(alpha = 0.2f),
+    ) {
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 32.dp)
+                .sizeIn(minHeight = 400.dp, maxHeight = 600.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = "Attach a custom message", style = MaterialTheme.typography.h4, textAlign = TextAlign.Center)
+            Text(text = "The recipient will see this message along with the payment", style = MaterialTheme.typography.caption, textAlign = TextAlign.Center)
+            Spacer(modifier = Modifier.height(16.dp))
+            TextInput(
+                text = initialMessage,
+                staticLabel = null,
+                onTextChange = onMessageChange,
+                placeholder = { Text(text = "Enter a message" )},
+                maxChars = 64,
+                singleLine = true
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            FilledButton(text = stringResource(id = R.string.btn_ok), onClick = onDismiss, modifier = Modifier.align(Alignment.End))
         }
     }
 }

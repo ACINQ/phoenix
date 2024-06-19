@@ -146,8 +146,8 @@ class ReceiveViewModel(
 
     private fun getDeterministicOffer() {
         viewModelScope.launch {
-            val offer = nodeParamsManager.defaultOffer()
-            val encoded = offer.encode()
+            val offerData = nodeParamsManager.defaultOffer()
+            val encoded = offerData.defaultOffer.encode()
             val image = BitmapHelper.generateBitmap(encoded).asImageBitmap()
             offerState = OfferState.Show(encoded, image)
         }

@@ -167,6 +167,8 @@
     <string name="send_pay_button">Pay</string>
     <string name="send_pay_retry_button">Try again</string>
 
+    <string name="send_offer_payer_note_label">Message</string>
+    <string name="send_offer_payer_note_placeholder">Tap to attach a message…</string>
     <string name="send_offer_fetching">Fetching payment details…</string>
     <string name="send_offer_failure_title">Payment has failed</string>
     <string name="send_offer_failure_timeout">Could not retrieve payment details within a reasonable time.\n\nThe recipient may be offline or unreachable.</string>

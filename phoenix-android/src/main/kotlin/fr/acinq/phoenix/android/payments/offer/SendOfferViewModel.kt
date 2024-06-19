@@ -30,6 +30,7 @@ import fr.acinq.lightning.io.PaymentNotSent
 import fr.acinq.lightning.io.PaymentSent
 import fr.acinq.lightning.payment.OutgoingPaymentFailure
 import fr.acinq.lightning.wire.OfferTypes
+import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.managers.PeerManager
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
@@ -46,27 +47,30 @@ sealed class OfferState {
             data class Error(val throwable: Throwable) : Failed()
             data object CouldNotGetInvoice: Failed()
             data class PaymentNotSent(val reason : OutgoingPaymentFailure): Failed()
+            data object PayerNoteTooLong: Failed()
         }
     }
 }
 
-class SendOfferViewModel(val peerManager: PeerManager) : ViewModel() {
+class SendOfferViewModel(val peerManager: PeerManager, val nodeParamsManager: NodeParamsManager) : ViewModel() {
     private val log = LoggerFactory.getLogger(this::class.java)
 
     var state by mutableStateOf<OfferState>(OfferState.Init)
 
-    fun sendOffer(amount: MilliSatoshi, offer: OfferTypes.Offer) {
+    fun sendOffer(amount: MilliSatoshi, message: String, offer: OfferTypes.Offer) {
         if (state is OfferState.FetchingInvoice) return
         state = OfferState.FetchingInvoice
         viewModelScope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, e ->
             log.error("error when paying offer payment: ", e)
         }) {
             val peer = peerManager.getPeer()
-            log.info("sending amount=$amount for offer=$offer")
+            val payerNote = message.takeIf { it.isNotBlank() }
+            log.info("sending amount=$amount message=$message for offer=$offer")
             val paymentResult = peer.payOffer(
                 amount = amount,
                 offer = offer,
-                payerKey = Lightning.randomKey(), // payer-key will prove the payment was received
+                payerKey = payerNote?.let { nodeParamsManager.defaultOffer().payerKey } ?: Lightning.randomKey(),
+                payerNote = payerNote,
                 fetchInvoiceTimeout = 30.seconds,
                 // FIXME: this method should accept a trampolineFees parameter
             )
@@ -79,11 +83,12 @@ class SendOfferViewModel(val peerManager: PeerManager) : ViewModel() {
     }
 
     class Factory(
-        private val peerManager: PeerManager
+        private val peerManager: PeerManager,
+        private val nodeParamsManager: NodeParamsManager,
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return SendOfferViewModel(peerManager) as T
+            return SendOfferViewModel(peerManager, nodeParamsManager) as T
         }
     }
 }
