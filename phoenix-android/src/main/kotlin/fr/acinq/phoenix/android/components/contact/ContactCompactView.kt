@@ -50,24 +50,26 @@ import fr.acinq.phoenix.data.ContactInfo
 @Composable
 fun ContactCompactView(
     contact: ContactInfo,
-    currentOffer: OfferTypes.Offer,
+    currentOffer: OfferTypes.Offer?,
     onContactChange: (ContactInfo?) -> Unit,
 ) {
     var showSheet by remember { mutableStateOf(false) }
 
     Clickable(
         onClick = { showSheet = true },
-        modifier = Modifier.offset(x = (-6).dp),
+        modifier = Modifier.offset(x = (-8).dp),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Column(modifier = Modifier.padding(6.dp)) {
+        Column(modifier = Modifier.padding(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 ContactPhotoView(image = contact.photo?.toByteArray(), name = contact.name, onChange = null, imageSize = 28.dp, borderSize = 2.dp)
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(text = contact.name, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(text = currentOffer.encode(), maxLines = 2, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.subtitle2)
+            currentOffer?.let {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text = it.encode(), maxLines = 2, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.subtitle2)
+            }
         }
     }
 

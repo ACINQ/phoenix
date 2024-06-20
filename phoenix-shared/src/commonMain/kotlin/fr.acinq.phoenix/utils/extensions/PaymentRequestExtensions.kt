@@ -17,7 +17,6 @@
 package fr.acinq.phoenix.utils.extensions
 
 import fr.acinq.bitcoin.Chain
-import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.Feature
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.Bolt12Invoice

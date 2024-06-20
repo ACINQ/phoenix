@@ -249,22 +249,24 @@ private fun PayerNoteInput(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 32.dp)
-                .sizeIn(minHeight = 400.dp, maxHeight = 600.dp),
+                .sizeIn(maxHeight = 600.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "Attach a custom message", style = MaterialTheme.typography.h4, textAlign = TextAlign.Center)
-            Text(text = "The recipient will see this message along with the payment", style = MaterialTheme.typography.caption, textAlign = TextAlign.Center)
+            Text(text = stringResource(id = R.string.send_offer_payer_note_dialog_title), style = MaterialTheme.typography.h4, textAlign = TextAlign.Center)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = stringResource(id = R.string.send_offer_payer_note_dialog_subtitle), style = MaterialTheme.typography.caption, textAlign = TextAlign.Center)
             Spacer(modifier = Modifier.height(16.dp))
             TextInput(
                 text = initialMessage,
                 staticLabel = null,
                 onTextChange = onMessageChange,
-                placeholder = { Text(text = "Enter a message" )},
+                placeholder = { Text(text = stringResource(id = R.string.send_offer_payer_note_dialog_placeholder) )},
                 maxChars = 64,
                 singleLine = true
             )
             Spacer(modifier = Modifier.height(16.dp))
-            FilledButton(text = stringResource(id = R.string.btn_ok), onClick = onDismiss, modifier = Modifier.align(Alignment.End))
+            FilledButton(text = stringResource(id = R.string.btn_ok), icon = R.drawable.ic_check, onClick = onDismiss, modifier = Modifier.align(Alignment.End))
+            Spacer(modifier = Modifier.height(80.dp))
         }
     }
 }

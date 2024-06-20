@@ -34,6 +34,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,6 +47,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
@@ -61,10 +63,12 @@ import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.android.utils.smartDescription
+import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.walletPaymentId
 import fr.acinq.phoenix.utils.extensions.WalletPaymentState
+import fr.acinq.phoenix.utils.extensions.offerMetadata
 import fr.acinq.phoenix.utils.extensions.state
 
 
@@ -177,6 +181,19 @@ private fun PaymentDescription(paymentInfo: WalletPaymentInfo, modifier: Modifie
                 stringResource(id = R.string.paymentdetails_desc_identifier, it)
             }
             ?: metadata.lnurl?.description
+            ?: payment.offerMetadata()?.let { offerMetadata ->
+                val contactsManager = business.contactsManager
+                val contactForOffer = produceState<Either<Unit, ContactInfo>?>(initialValue = null, producer = {
+                    value = contactsManager.findContactForPayer(offerMetadata.payerKey)?.let { Either.Right(it) } ?: Either.Left(Unit)
+                })
+
+                when (val contact = contactForOffer.value) {
+                    null, is Either.Left -> stringResource(id = R.string.paymentdetails_desc_offer_incoming)
+                    is Either.Right -> {
+                        offerMetadata.payerNote ?: "payment from ${contact.value.name}"
+                    }
+                }
+            }
             ?: payment.smartDescription(context)
     }
 

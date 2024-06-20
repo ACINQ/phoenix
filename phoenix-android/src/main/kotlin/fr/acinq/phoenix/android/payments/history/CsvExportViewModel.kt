@@ -94,7 +94,7 @@ class CsvExportViewModel(
                 includesNotes = includesNotes,
                 includesOriginDestination = includesOriginDestination,
             )
-            log.debug("exporting payments data between start=${startTimestampMillis?.toAbsoluteDateTimeString()} end=${endTimestampMillis.toAbsoluteDateTimeString()} config=$csvConfig")
+            log.debug("exporting payments data between start={} end={} config={}", startTimestampMillis?.toAbsoluteDateTimeString(), endTimestampMillis.toAbsoluteDateTimeString(), csvConfig)
             val batchSize = 32
             var batchOffset = 0
             var fetching = true

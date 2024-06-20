@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -120,7 +121,7 @@ fun ContactPhotoView(
                 modifier = Modifier.size(imageSize)
             )
             if (cameraAccessDenied) {
-                Text(text = "No camera permission", style = MaterialTheme.typography.subtitle2)
+                Text(text = stringResource(id = R.string.scan_request_camera_access_denied), style = MaterialTheme.typography.subtitle2)
             }
         } else {
             Image(

@@ -104,7 +104,6 @@ fun ScanDataView(
                 ReadDataView(
                     initialInput = initialInput,
                     model = model,
-                    onBackClick = onBackClick,
                     onFeedbackDismiss = {
                         initialInput = ""
                         postIntent(Scan.Intent.Reset)
@@ -177,7 +176,6 @@ fun ReadDataView(
     initialInput: String?,
     model: Scan.Model,
     onFeedbackDismiss: () -> Unit,
-    onBackClick: () -> Unit,
     onScannedText: (String) -> Unit,
 ) {
     val context = LocalContext.current.applicationContext
@@ -201,10 +199,6 @@ fun ReadDataView(
                     }
                 }
             }
-        }
-
-        Column(modifier = Modifier.align(Alignment.TopStart).padding(top = 16.dp)) {
-            BackButton(onClick = onBackClick, backgroundColor = MaterialTheme.colors.surface)
         }
 
         // buttons at the bottom of the screen

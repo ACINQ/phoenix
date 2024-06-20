@@ -25,17 +25,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import fr.acinq.lightning.wire.OfferTypes
+import androidx.compose.ui.res.stringResource
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
+import fr.acinq.phoenix.android.components.IconPopup
 import fr.acinq.phoenix.android.components.contact.ContactDetailsView
 import fr.acinq.phoenix.android.components.contact.ContactsListView
 import fr.acinq.phoenix.android.components.contact.SaveNewContactDialog
 import fr.acinq.phoenix.data.ContactInfo
-import kotlinx.coroutines.launch
 
 @Composable
 fun SettingsContactsView(
@@ -43,22 +42,17 @@ fun SettingsContactsView(
 ) {
     var selectedContact by remember { mutableStateOf<ContactInfo?>(null) }
     var isAddingNewContact by remember { mutableStateOf(false) }
-    var showInfoMessage by remember { mutableStateOf(false) }
 
     DefaultScreenLayout(isScrollable = false) {
         DefaultScreenHeader(
             onBackClick = onBackClick,
             content = {
-                Text(text = "My contacts")
+                Text(text = stringResource(id = R.string.settings_contacts_title))
+                IconPopup(popupMessage = stringResource(id = R.string.settings_contacts_help))
                 Spacer(modifier = Modifier.weight(1f))
                 Button(
                     icon = R.drawable.ic_plus,
                     onClick = { isAddingNewContact = true },
-                    shape = CircleShape
-                )
-                Button(
-                    icon = R.drawable.ic_help_circle,
-                    onClick = { showInfoMessage = true },
                     shape = CircleShape
                 )
             }
@@ -76,8 +70,6 @@ fun SettingsContactsView(
     } ?: run {
         if (isAddingNewContact) {
             SaveNewContactDialog(initialOffer = null, onDismiss = { isAddingNewContact = false }, onSaved = { isAddingNewContact = false })
-        } else if (showInfoMessage) {
-
         }
     }
 }

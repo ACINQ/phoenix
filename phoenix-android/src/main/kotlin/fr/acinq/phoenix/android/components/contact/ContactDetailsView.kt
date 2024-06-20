@@ -69,7 +69,7 @@ import kotlinx.coroutines.launch
  * A contact detail is a bottom sheet dialog that display the contact's name, photo, and
  * associated offers/lnids.
  *
- * The contact can be edited and deleted from that screen.
+ * The contact may be edited and deleted from that screen.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,7 +77,7 @@ fun ContactDetailsView(
     contact: ContactInfo,
     currentOffer: OfferTypes.Offer?,
     onDismiss: () -> Unit,
-    onContactChange: (ContactInfo?) -> Unit,
+    onContactChange: ((ContactInfo?) -> Unit)?,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val contactsManager = business.contactsManager
@@ -103,7 +103,11 @@ fun ContactDetailsView(
                 modifier = Modifier.padding(top = 0.dp, start = 24.dp, end = 24.dp, bottom = 0.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                ContactPhotoView(image = photo, name = contact.name, onChange = { photo = it })
+                if (onContactChange != null) {
+                    ContactPhotoView(image = photo, name = contact.name, onChange = { photo = it })
+                } else {
+                    ContactPhotoView(image = photo, name = contact.name, onChange = null)
+                }
                 Spacer(modifier = Modifier.height(24.dp))
                 TextInput(
                     text = name,
@@ -111,37 +115,41 @@ fun ContactDetailsView(
                     textStyle = MaterialTheme.typography.h3.copy(textAlign = TextAlign.Center),
                     staticLabel = null,
                     textFieldColors = invisibleOutlinedTextFieldColors(),
-                    showResetButton = false
+                    showResetButton = false,
+                    enabled = onContactChange != null,
+                    enabledEffect = false,
                 )
 
-                Row(horizontalArrangement = Arrangement.Center) {
-                    Button(
-                        text = stringResource(id = R.string.contact_delete_button),
-                        icon = R.drawable.ic_trash,
-                        iconTint = negativeColor,
-                        onClick = {
-                            scope.launch {
-                                contactsManager.deleteContact(contact.id)
-                                onContactChange(null)
-                                onDismiss()
-                            }
-                        },
-                        shape = CircleShape,
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Button(
-                        text = stringResource(id = R.string.contact_save_button),
-                        icon = R.drawable.ic_check,
-                        enabled = contact.name != name || contact.photo != photo?.byteVector(),
-                        onClick = {
-                            scope.launch {
-                                val newContact = contactsManager.updateContact(contact.id, name, photo, contact.offers)
-                                onContactChange(newContact)
-                                onDismiss()
-                            }
-                        },
-                        shape = CircleShape,
-                    )
+                if (onContactChange != null) {
+                    Row(horizontalArrangement = Arrangement.Center) {
+                        Button(
+                            text = stringResource(id = R.string.contact_delete_button),
+                            icon = R.drawable.ic_trash,
+                            iconTint = negativeColor,
+                            onClick = {
+                                scope.launch {
+                                    contactsManager.deleteContact(contact.id)
+                                    onContactChange(null)
+                                    onDismiss()
+                                }
+                            },
+                            shape = CircleShape,
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Button(
+                            text = stringResource(id = R.string.contact_save_button),
+                            icon = R.drawable.ic_check,
+                            enabled = contact.name != name || contact.photo != photo?.byteVector(),
+                            onClick = {
+                                scope.launch {
+                                    val newContact = contactsManager.updateContact(contact.id, name, photo, contact.offers)
+                                    onContactChange(newContact)
+                                    onDismiss()
+                                }
+                            },
+                            shape = CircleShape,
+                        )
+                    }
                 }
 
                 if (currentOffer != null) {
@@ -161,7 +169,7 @@ fun ContactDetailsView(
                 Box(contentAlignment = Alignment.Center) {
                     HSeparator()
                     Button(
-                        text = "Known offers for this contact",
+                        text = stringResource(id = R.string.contact_offers_list_title),
                         textStyle = MaterialTheme.typography.caption.copy(fontSize = 12.sp),
                         icon = if (showAllDetails) R.drawable.ic_chevron_up else R.drawable.ic_chevron_down,
                         iconTint = MaterialTheme.typography.caption.color,

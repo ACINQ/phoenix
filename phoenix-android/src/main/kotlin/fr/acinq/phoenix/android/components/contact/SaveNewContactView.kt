@@ -44,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -74,6 +75,7 @@ fun SaveNewContactDialog(
     onDismiss: () -> Unit,
     onSaved: (ContactInfo) -> Unit,
 ) {
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -109,7 +111,7 @@ fun SaveNewContactDialog(
                     .padding(top = 0.dp, start = 24.dp, end = 24.dp, bottom = 100.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text(text = "Attach a contact to an invoice", style = MaterialTheme.typography.h4, textAlign = TextAlign.Center)
+                Text(text = stringResource(id = R.string.contact_add_title), style = MaterialTheme.typography.h4, textAlign = TextAlign.Center)
                 Spacer(modifier = Modifier.height(24.dp))
                 ContactPhotoView(image = photo, name = name, onChange = { photo = it })
                 Spacer(modifier = Modifier.height(24.dp))
@@ -138,7 +140,7 @@ fun SaveNewContactDialog(
                 )
                 Spacer(modifier = Modifier.height(24.dp))
                 FilledButton(
-                    text = stringResource(id = R.string.contact_add_contact),
+                    text = stringResource(id = R.string.contact_add_contact_button),
                     icon = R.drawable.ic_check,
                     onClick = {
                         scope.launch {
@@ -149,18 +151,18 @@ fun SaveNewContactDialog(
                                         val decodedOffer = res.result
                                         val existingContact = contactsManager.getContactForOffer(decodedOffer)
                                         if (existingContact != null) {
-                                            offerErrorMessage = "Offer already known (${existingContact.name})"
+                                            offerErrorMessage = context.getString(R.string.contact_error_offer_known, existingContact.name)
                                         } else {
                                             val contact = contactsManager.saveNewContact(name, photo, res.result)
                                             onSaved(contact)
                                         }
                                     }
-                                    is Try.Failure -> { offerErrorMessage = "invalid offer" }
+                                    is Try.Failure -> { offerErrorMessage = context.getString(R.string.contact_error_offer_invalid) }
                                 }
                             } else {
                                 val existingContact = contactsManager.getContactForOffer(initialOffer)
                                 if (existingContact != null) {
-                                    offerErrorMessage = "Offer already known (${existingContact.name})"
+                                    offerErrorMessage = context.getString(R.string.contact_error_offer_known, existingContact.name)
                                 } else {
                                     val contact = contactsManager.saveNewContact(name, photo, initialOffer)
                                     onSaved(contact)
@@ -171,15 +173,6 @@ fun SaveNewContactDialog(
                     },
                     shape = CircleShape,
                     modifier = Modifier.align(Alignment.End),
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                FilledButton(
-                    text = stringResource(id = R.string.contact_attach_existing_contact),
-                    icon = R.drawable.ic_user_search,
-                    onClick = {  },
-                    shape = CircleShape,
-                    modifier = Modifier.align(Alignment.End),
-                    backgroundColor = Color.Transparent,
                 )
             }
         }

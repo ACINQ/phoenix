@@ -74,13 +74,24 @@ class ContactQueries(val database: AppDatabase) {
                 if (offers.isEmpty()) {
                     null
                 } else {
-                    ContactInfo(UUID.fromString(it.id), it.name, it.photo?.toByteVector(), offers = offers)
+                    ContactInfo(UUID.fromString(it.id), it.name, it.photo, offers)
                 }
             }
         }
     }
 
-    fun listContacts(): Flow<List<ContactInfo>> {
+    fun listContacts(): List<ContactInfo> {
+        return queries.listContacts().executeAsList().map {
+            val offers = it.offers?.split(",")?.map {
+                OfferTypes.Offer.decode(it)
+            }?.filterIsInstance<Try.Success<OfferTypes.Offer>>()?.map {
+                it.get()
+            } ?: emptyList()
+            ContactInfo(UUID.fromString(it.id), it.name, it.photo, offers)
+        }
+    }
+
+    fun monitorContactsFlow(): Flow<List<ContactInfo>> {
         return queries.listContacts().asFlow().mapToList(Dispatchers.IO).map { list ->
             list.map {
                 val offers = it.offers?.split(",")?.map {
@@ -88,7 +99,7 @@ class ContactQueries(val database: AppDatabase) {
                 }?.filterIsInstance<Try.Success<OfferTypes.Offer>>()?.map {
                     it.get()
                 } ?: emptyList()
-                ContactInfo(UUID.fromString(it.id), it.name, it.photo?.toByteVector(), offers = offers)
+                ContactInfo(UUID.fromString(it.id), it.name, it.photo, offers)
             }
         }
     }

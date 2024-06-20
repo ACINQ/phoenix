@@ -17,7 +17,10 @@
 package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.PrivateKey
+import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.logging.LoggerFactory
+import fr.acinq.lightning.payment.OfferPaymentMetadata
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.toByteVector
 import fr.acinq.lightning.wire.OfferTypes
@@ -52,7 +55,7 @@ class ContactsManager(
     }
 
     init {
-        launch { appDb.listContacts().collect { _contactsList.value = it } }
+        launch { appDb.monitorContacts().collect { _contactsList.value = it } }
     }
 
     suspend fun getContactForOffer(offer: OfferTypes.Offer): ContactInfo? {
@@ -64,7 +67,7 @@ class ContactsManager(
         photo: ByteArray?,
         offer: OfferTypes.Offer
     ): ContactInfo {
-        val contact = ContactInfo(id = UUID.randomUUID(), name = name, photo = photo?.toByteVector(), offers = listOf(offer))
+        val contact = ContactInfo(id = UUID.randomUUID(), name = name, photo = photo, offers = listOf(offer))
         appDb.saveContact(contact)
         return contact
     }
@@ -75,9 +78,13 @@ class ContactsManager(
         photo: ByteArray?,
         offers: List<OfferTypes.Offer>
     ): ContactInfo {
-        val contact = ContactInfo(id = contactId, name = name, photo = photo?.toByteVector(), offers = offers)
+        val contact = ContactInfo(id = contactId, name = name, photo = photo, offers = offers)
         appDb.updateContact(contact)
         return contact
+    }
+
+    suspend fun findContactForPayer(payerPubkey: PublicKey): ContactInfo? {
+        return appDb.listContacts().firstOrNull { it.publicKeys.contains(payerPubkey) }
     }
 
     suspend fun deleteContact(contactId: UUID) {

@@ -169,6 +169,9 @@
 
     <string name="send_offer_payer_note_label">Message</string>
     <string name="send_offer_payer_note_placeholder">Tap to attach a message…</string>
+    <string name="send_offer_payer_note_dialog_title">Attach a custom message</string>
+    <string name="send_offer_payer_note_dialog_subtitle">The recipient will see this message</string>
+    <string name="send_offer_payer_note_dialog_placeholder">Enter a message…</string>
     <string name="send_offer_fetching">Fetching payment details…</string>
     <string name="send_offer_failure_title">Payment has failed</string>
     <string name="send_offer_failure_timeout">Could not retrieve payment details within a reasonable time.\n\nThe recipient may be offline or unreachable.</string>
@@ -363,6 +366,10 @@
     <string name="paymentdetails_status_unconfirmed_with_depth">%1$d/%2$d confirmation(s)</string>
     <string name="paymentdetails_status_confirmed">Confirmed on-chain</string>
 
+    <string name="paymentdetails_offer_note_label">Message</string>
+    <string name="paymentdetails_offer_sender_label">Sent by</string>
+    <string name="paymentdetails_offer_sender_unknown">Unknown</string>
+
     <string name="paymentdetails_lnurlpay_service">Serviced by</string>
     <string name="paymentdetails_lnurlpay_action_message_label">Message</string>
     <string name="paymentdetails_lnurlpay_action_url_label">Link</string>
@@ -431,7 +438,8 @@
     <string name="paymentdetails_payment_request_label">Invoice</string>
     <string name="paymentdetails_preimage_label">Preimage</string>
     <string name="paymentdetails_payerkey_label">Payer key</string>
-    <string name="paymentdetails_offer_label">Offer</string>
+    <string name="paymentdetails_offer_label">Static invoice</string>
+    <string name="paymentdetails_bolt12_label">Bolt12 invoice</string>
     <string name="paymentdetails_offer_metadata_label">Metadata</string>
 
     <string name="paymentdetails_status_label">Payment status</string>
@@ -464,16 +472,21 @@
 
     <!-- offer contact -->
 
-    <string name="contact_not_found">No contact found for this offer</string>
-    <string name="contact_add_contact">Add contact</string>
-    <string name="contact_attach_existing_contact">Existing contact…</string>
-    <string name="contact_edit_contact">Edit contact</string>
+    <string name="contact_add_contact_button">Add contact…</string>
+    <string name="contact_error_offer_invalid">Invalid offer</string>
+    <string name="contact_error_offer_known">Invoice already attached to %1$s</string>
     <string name="contact_save_button">Save</string>
     <string name="contact_delete_button">Delete</string>
 
+    <string name="contact_add_title">Attach a contact to an invoice</string>
     <string name="contact_name_label">Name</string>
     <string name="contact_photo_label">Photo</string>
     <string name="contact_offer_label">Static invoice</string>
+    <string name="contact_offers_list_title">Known offers for this contact</string>
+
+
+    <string name="contact_search_name">Search by name</string>
+    <string name="contact_none">No contacts found…</string>
 
     <!-- settings: access control -->
 
@@ -824,5 +837,10 @@
     <string name="swapin_signer_invalid_tx_header">Invalid unsigned transaction</string>
     <string name="swapin_signer_invalid_tx_details">Check that the input is complete and not missing any character.</string>
     <string name="swapin_signer_error_header">Failed to sign input</string>
+
+    <!-- settings: contacts list -->
+
+    <string name="settings_contacts_title">My contacts</string>
+    <string name="settings_contacts_help">Contacts allows you to link a name to a static invoice. They are stored locally.</string>
 
 </resources>

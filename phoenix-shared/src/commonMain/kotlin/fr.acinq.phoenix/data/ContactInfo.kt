@@ -17,6 +17,9 @@
 package fr.acinq.phoenix.data
 
 import fr.acinq.bitcoin.ByteVector
+import fr.acinq.bitcoin.PublicKey
+import fr.acinq.bitcoin.byteVector
+import fr.acinq.bitcoin.utils.Try
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.wire.OfferTypes
 
@@ -25,4 +28,16 @@ data class ContactInfo(
     val name: String,
     val photo: ByteVector?,
     val offers: List<OfferTypes.Offer>,
-)
+    val publicKeys: List<PublicKey>,
+) {
+    constructor(id: UUID, name: String, photo: ByteArray?, offers: List<OfferTypes.Offer>) : this(
+        id = id,
+        name = name,
+        photo = photo?.byteVector(),
+        offers = offers,
+        publicKeys = offers.map { it.contactNodeIds }.flatten()
+    )
+
+    // TODO: order the offers listed by the group_concat in the sql query, and take the most recently added one
+    val mostRelevantOffer: OfferTypes.Offer? by lazy { offers.firstOrNull() }
+}

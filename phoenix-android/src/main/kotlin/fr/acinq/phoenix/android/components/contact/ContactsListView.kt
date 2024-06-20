@@ -35,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.R
@@ -69,7 +70,7 @@ fun ContactsListView(
             text = nameFilterInput,
             staticLabel = null,
             leadingIcon = { PhoenixIcon(resourceId = R.drawable.ic_inspect, tint = MaterialTheme.typography.caption.color) },
-            placeholder = { Text(text = "Search by name") },
+            placeholder = { Text(text = stringResource(id = R.string.contact_search_name)) },
             singleLine = true,
             onTextChange = { nameFilterInput = it },
             textFieldColors = mutedTextFieldColors(),
@@ -86,7 +87,7 @@ fun ContactsListView(
             },
             isOnSurface = isOnSurface
         )
-    } ?: ProgressView(text = "Fetching contacts...")
+    } ?: ProgressView(text = stringResource(id = R.string.utils_loading_data))
 }
 
 @Composable
@@ -101,7 +102,7 @@ private fun ContactsList(
 
     if (contacts.isEmpty()) {
         Text(
-            text = "No contacts found...",
+            text = stringResource(id = R.string.contact_none),
             modifier = Modifier.padding(16.dp),
             style = MaterialTheme.typography.caption
         )
@@ -109,8 +110,7 @@ private fun ContactsList(
         LazyColumn(state = listState) {
             itemsIndexed(contacts) { index, contact ->
                 val onClick = {
-                    // TODO order the offers listed by the group_concat in the sql query, take most recent one
-                    contact.offers.firstOrNull()?.let {
+                    contact.mostRelevantOffer?.let {
                         navController.navigate("${Screen.ScanData.route}?input=${it.encode()}")
                     } ?: run { if (canEditContact) { onEditContact(contact) } }
                 }
@@ -154,7 +154,7 @@ private fun ContactRow(contact: ContactInfo, canEditContact: Boolean, onEditCont
             Button(
                 icon = R.drawable.ic_edit,
                 onClick = { onEditContact(contact) },
-                padding = PaddingValues(horizontal = 12.dp, vertical = 16.dp),
+                padding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
             )
         }
     }

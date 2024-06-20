@@ -17,14 +17,12 @@
 package fr.acinq.phoenix.android.components.contact
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -32,7 +30,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -40,14 +37,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Clickable
-import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.data.ContactInfo
-import kotlinx.coroutines.launch
 
 @Composable
 fun DetachedOfferView(
@@ -55,8 +48,6 @@ fun DetachedOfferView(
     onContactSaved: (ContactInfo) -> Unit
 ) {
     var showSaveContactDialog by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
-    val contactsManager = business.contactsManager
 
     val encoded = remember(offer) { offer.encode() }
     Clickable(onClick = { showSaveContactDialog = true }, shape = RoundedCornerShape(12.dp), modifier = Modifier.offset((-8).dp)) {
@@ -66,7 +57,7 @@ fun DetachedOfferView(
             Row {
                 PhoenixIcon(resourceId = R.drawable.ic_user, tint = mutedTextColor)
                 Spacer(modifier = Modifier.width(6.dp))
-                Text(text = stringResource(id = R.string.contact_add_contact), style = MaterialTheme.typography.subtitle2)
+                Text(text = stringResource(id = R.string.contact_add_contact_button), style = MaterialTheme.typography.subtitle2)
             }
         }
     }
