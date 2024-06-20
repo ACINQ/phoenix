@@ -74,7 +74,7 @@ import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.lnurl.LnurlPay
 import fr.acinq.phoenix.utils.extensions.WalletPaymentState
 import fr.acinq.phoenix.utils.extensions.minDepthForFunding
-import fr.acinq.phoenix.utils.extensions.offerMetadata
+import fr.acinq.phoenix.utils.extensions.incomingOfferMetadata
 import fr.acinq.phoenix.utils.extensions.state
 import io.ktor.http.Url
 import kotlinx.coroutines.delay
@@ -124,7 +124,7 @@ fun PaymentDetailsSplashView(
             LnurlPayInfoView(data.payment as LightningOutgoingPayment, data.metadata.lnurl!!)
         }
 
-        payment.offerMetadata()?.let { meta ->
+        payment.incomingOfferMetadata()?.let { meta ->
             meta.payerNote?.let {
                 OfferPayerNote(payerNote = it)
                 Spacer(modifier = Modifier.height(8.dp))
@@ -451,7 +451,7 @@ private fun OfferPayerContact(payerPubkey: PublicKey?) {
     val contactsManager = business.contactsManager
     val contactForOffer = produceState<Either<Unit, ContactInfo>?>(initialValue = null, producer = {
         value = payerPubkey?.let {
-            contactsManager.findContactForPayer(it)?.let {
+            contactsManager.getContactForPayerPubkey(it)?.let {
                 Either.Right(it)
             } ?: Either.Left(Unit)
         } ?: Either.Left(Unit)
@@ -460,7 +460,11 @@ private fun OfferPayerContact(payerPubkey: PublicKey?) {
     SplashLabelRow(label = stringResource(id = R.string.paymentdetails_offer_sender_label)) {
         when (val contact = contactForOffer.value){
             null -> Text(text = stringResource(id = R.string.utils_loading_data))
-            is Either.Left -> Text(text = stringResource(id = R.string.paymentdetails_offer_sender_unknown))
+            is Either.Left -> {
+                Text(text = stringResource(id = R.string.paymentdetails_offer_sender_unknown))
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text = stringResource(id = R.string.paymentdetails_offer_sender_unknown_details), style = MaterialTheme.typography.subtitle2)
+            }
             is Either.Right -> {
                 ContactCompactView(contact = contact.value, currentOffer = null, onContactChange = {})
             }
@@ -569,7 +573,7 @@ private fun PaymentDestinationView(data: WalletPaymentInfo) {
             val details = payment.details
             if (details is LightningOutgoingPayment.Details.Blinded) {
                 val offer = details.paymentRequest.invoiceRequest.offer
-                SplashLabelRow(label = stringResource(id = R.string.paymentdetails_offer_label)) {
+                SplashLabelRow(label = stringResource(id = R.string.paymentdetails_destination_label)) {
                     ContactOrOfferView(offer = offer)
                 }
             }

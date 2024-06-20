@@ -326,7 +326,7 @@
     <string name="paymentdetails_desc_inbound_liquidity">+%1$s de liquidité entrante</string>
     <string name="paymentdetails_desc_swapout">Swap-out vers %1$s</string>
     <string name="paymentdetails_desc_swapin">Dépôt on-chain</string>
-    <string name="paymentdetails_desc_identifier">Paiement vers %1$s</string>
+    <string name="paymentdetails_desc_to">Paiement vers %1$s</string>
 
     <string name="paymentdetails_edit_dialog_title">Ajouter une description personnalisée à ce paiement</string>
     <string name="paymentdetails_edit_dialog_input_label">Description</string>

@@ -369,6 +369,7 @@
     <string name="paymentdetails_offer_note_label">Message</string>
     <string name="paymentdetails_offer_sender_label">Sent by</string>
     <string name="paymentdetails_offer_sender_unknown">Unknown</string>
+    <string name="paymentdetails_offer_sender_unknown_details">Be careful with messages from unknown sources</string>
 
     <string name="paymentdetails_lnurlpay_service">Serviced by</string>
     <string name="paymentdetails_lnurlpay_action_message_label">Message</string>
@@ -392,7 +393,8 @@
     <string name="paymentdetails_desc_inbound_liquidity">+%1$s inbound liquidity</string>
     <string name="paymentdetails_desc_swapout">Swap-out to %1$s</string>
     <string name="paymentdetails_desc_swapin">On-chain deposit</string>
-    <string name="paymentdetails_desc_identifier">Payment to %1$s</string>
+    <string name="paymentdetails_desc_to">Payment to %1$s</string>
+    <string name="paymentdetails_desc_from">Payment from %1$s</string>
     <string name="paymentdetails_desc_offer_incoming">Offer</string>
 
     <string name="paymentdetails_edit_dialog_title">Add a custom description to this payment</string>
@@ -690,6 +692,9 @@
     <string name="paymentsettings_overpayment_title">Enable overpayment</string>
     <string name="paymentsettings_overpayment_enabled">You\'ll be able to overpay Lightning invoices up to 2 times the amount requested. Useful for manual tipping, or as a privacy measure.</string>
     <string name="paymentsettings_overpayment_disabled">Disabled (default)</string>
+
+    <string name="paymentsettings_random_payer_key_title">Random payer key</string>
+    <string name="paymentsettings_random_payer_key_desc">Enable if you don\'t want BOLT12 recipients to know that payments come from your wallet.</string>
 
     <!-- settings: currencies -->
 

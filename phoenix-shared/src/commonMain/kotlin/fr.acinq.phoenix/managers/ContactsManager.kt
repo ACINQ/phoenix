@@ -17,12 +17,9 @@
 package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.bitcoin.PrivateKey
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.logging.LoggerFactory
-import fr.acinq.lightning.payment.OfferPaymentMetadata
 import fr.acinq.lightning.utils.UUID
-import fr.acinq.lightning.utils.toByteVector
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.ContactInfo
@@ -31,7 +28,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -83,7 +79,7 @@ class ContactsManager(
         return contact
     }
 
-    suspend fun findContactForPayer(payerPubkey: PublicKey): ContactInfo? {
+    suspend fun getContactForPayerPubkey(payerPubkey: PublicKey): ContactInfo? {
         return appDb.listContacts().firstOrNull { it.publicKeys.contains(payerPubkey) }
     }
 

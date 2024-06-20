@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
 import fr.acinq.lightning.Lightning
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.LightningOutgoingPayment
@@ -30,10 +31,13 @@ import fr.acinq.lightning.io.PaymentNotSent
 import fr.acinq.lightning.io.PaymentSent
 import fr.acinq.lightning.payment.OutgoingPaymentFailure
 import fr.acinq.lightning.wire.OfferTypes
+import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
 import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.managers.PeerManager
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import kotlin.time.Duration.Companion.seconds
@@ -52,7 +56,7 @@ sealed class OfferState {
     }
 }
 
-class SendOfferViewModel(val peerManager: PeerManager, val nodeParamsManager: NodeParamsManager) : ViewModel() {
+class SendOfferViewModel(val peerManager: PeerManager, val nodeParamsManager: NodeParamsManager, val userPrefs: UserPrefsRepository) : ViewModel() {
     private val log = LoggerFactory.getLogger(this::class.java)
 
     var state by mutableStateOf<OfferState>(OfferState.Init)
@@ -65,11 +69,12 @@ class SendOfferViewModel(val peerManager: PeerManager, val nodeParamsManager: No
         }) {
             val peer = peerManager.getPeer()
             val payerNote = message.takeIf { it.isNotBlank() }
+            val payerKey = if (userPrefs.getPayOfferWithRandomKey.first()) Lightning.randomKey() else nodeParamsManager.defaultOffer().payerKey
             log.info("sending amount=$amount message=$message for offer=$offer")
             val paymentResult = peer.payOffer(
                 amount = amount,
                 offer = offer,
-                payerKey = payerNote?.let { nodeParamsManager.defaultOffer().payerKey } ?: Lightning.randomKey(),
+                payerKey = payerKey,
                 payerNote = payerNote,
                 fetchInvoiceTimeout = 30.seconds,
                 // FIXME: this method should accept a trampolineFees parameter
@@ -86,9 +91,10 @@ class SendOfferViewModel(val peerManager: PeerManager, val nodeParamsManager: No
         private val peerManager: PeerManager,
         private val nodeParamsManager: NodeParamsManager,
     ) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
+            val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as? PhoenixApplication)
             @Suppress("UNCHECKED_CAST")
-            return SendOfferViewModel(peerManager, nodeParamsManager) as T
+            return SendOfferViewModel(peerManager, nodeParamsManager, application.userPrefs) as T
         }
     }
 }

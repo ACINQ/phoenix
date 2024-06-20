@@ -66,10 +66,6 @@ fun ContactCompactView(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(text = contact.name, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
-            currentOffer?.let {
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(text = it.encode(), maxLines = 2, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.subtitle2)
-            }
         }
     }
 
