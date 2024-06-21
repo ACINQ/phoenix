@@ -103,6 +103,7 @@
     <string name="settings_payment_settings">Opciones de pago</string>
     <string name="settings_payment_history">Historial de pagos</string>
     <string name="settings_notifications">Notificaciones</string>
+    <string name="settings_contacts">Mis contactos</string>
 
     <!-- upgrade required dialog -->
 
@@ -130,6 +131,20 @@
     <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Se estiman unas tasas de %1$s para recibir este importe, y estas tasas superan el %2$s%% del importe.\n\nAumente este límite o solicite liquidez adicional.</string>
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">La liquidez entrante es insuficiente y tienes desactivada la gestión automatizada de canales.</string>
+
+    <!-- receive: offer labels -->
+
+    <string name="receive_offer_howto_title">Cómo funciona</string>
+    <string name="receive_offer_howto_details_1">Este código QR es una dirección estática para Lightning, también conocida como \"offer\" o \"BOLT 12\".</string>
+    <string name="receive_offer_howto_details_2">A diferencia de las solicitudes de pago Lightning tradicionales, ésta no caduca y puede reutilizarse a voluntad. Puede utilizarse para propinas o para pagar a amigos.</string>
+    <string name="receive_offer_howto_details_3">Por el momento, pocos servicios admiten este nuevo tipo de dirección. Si no puedes cobrar con ella, utiliza en su lugar una solicitud Lightning normal.</string>
+    <string name="receive_offer_howto_details_faq_link">Para saber más</string>
+
+    <!-- receive : Tor warnings -->
+
+    <string name="receive_tor_warning_title">Tor está activado</string>
+    <string name="receive_tor_warning_dialog_content_1">Phoenix no puede recibir pagos en segundo plano.</string>
+    <string name="receive_tor_warning_dialog_content_2">Para evitar fallos en los pagos, utilice Orbot, o asegúrese de que Phoenix permanece visible en primer plano cuando se le envíen los pagos.</string>
 
     <!-- scanning errors -->
 
@@ -235,6 +250,10 @@
     <!-- Tor -->
 
     <string name="tor_settings_subtitle">Phoenix puede utilizar Tor para proteger su IP de los otros nodos de la Red Lightning y de los servidores de Electrum.\n\nActivar Tor mejorará su privacidad, pero puede causar problemas de pago si su conexión es inestable.</string>
+
+    <string name="tor_confirm_dialog_title">¿Habilitar Tor?</string>
+    <string name="tor_confirm_dialog_details_1">Tor es lento y afectará al rendimiento de tus pagos.</string>
+    <string name="tor_confirm_dialog_details_2">Específicamente, <b>no podrá recibir pagos</b> si Phoenix está en segundo plano, o si está cerrado.</string>
 
     <!-- about -->
 

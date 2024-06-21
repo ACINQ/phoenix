@@ -30,6 +30,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,7 +46,9 @@ import fr.acinq.phoenix.android.components.BorderButton
 import fr.acinq.phoenix.android.components.Clickable
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.feedback.InfoMessage
+import fr.acinq.phoenix.android.components.feedback.WarningMessage
 import fr.acinq.phoenix.android.components.openLink
+import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.share
 
@@ -76,8 +79,56 @@ fun OfferView(
             Spacer(modifier = Modifier.height(24.dp))
             HSeparator(width = 50.dp)
             Spacer(modifier = Modifier.height(16.dp))
-            QRCodeDetail(label = stringResource(id = R.string.receive_offer_invoice_label), value = state.encoded, maxLines = 3)
+            QRCodeDetail(label = stringResource(id = R.string.receive_offer_invoice_label), value = state.encoded, maxLines = 2)
+            Spacer(modifier = Modifier.height(16.dp))
+            TorWarning()
             HowToOffer()
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TorWarning() {
+    val isTorEnabled by userPrefs.getIsTorEnabled.collectAsState(initial = null)
+
+    if (isTorEnabled == true) {
+
+        var showTorWarningDialog by remember { mutableStateOf(false) }
+        val sheetState = rememberModalBottomSheetState()
+
+        Clickable(onClick = { showTorWarningDialog = true }, shape = RoundedCornerShape(12.dp)) {
+            WarningMessage(
+                header = stringResource(id = R.string.receive_tor_warning_title),
+                details = null,
+                alignment = Alignment.CenterHorizontally,
+            )
+        }
+
+        if (showTorWarningDialog) {
+            ModalBottomSheet(
+                sheetState = sheetState,
+                onDismissRequest = {
+                    // executed when user click outside the sheet, and after sheet has been hidden thru state.
+                    showTorWarningDialog = false
+                },
+                containerColor = MaterialTheme.colors.surface,
+                contentColor = MaterialTheme.colors.onSurface,
+                scrimColor = MaterialTheme.colors.onBackground.copy(alpha = 0.1f),
+            ) {
+                Column(
+                    modifier = Modifier
+                        .verticalScroll(rememberScrollState())
+                        .heightIn(min = 200.dp)
+                        .padding(top = 0.dp, start = 24.dp, end = 24.dp, bottom = 90.dp)
+                ) {
+                    Text(text = stringResource(id = R.string.receive_tor_warning_title), style = MaterialTheme.typography.h4)
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(text = stringResource(id = R.string.receive_tor_warning_dialog_content_1))
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(text = stringResource(id = R.string.receive_tor_warning_dialog_content_2))
+                }
+            }
         }
     }
 }
@@ -87,12 +138,9 @@ fun OfferView(
 private fun HowToOffer() {
     var showHowToDialog by remember { mutableStateOf(false) }
 
-    Spacer(modifier = Modifier.height(24.dp))
     Clickable(onClick = { showHowToDialog = true }, shape = RoundedCornerShape(12.dp)) {
         InfoMessage(
             header = stringResource(id = R.string.receive_offer_howto_title),
-            details = stringResource(id = R.string.receive_offer_howto_subtitle),
-            detailsStyle = MaterialTheme.typography.subtitle2,
             alignment = Alignment.CenterHorizontally,
         )
     }
@@ -117,15 +165,17 @@ private fun HowToOffer() {
                     .verticalScroll(rememberScrollState())
                     .padding(top = 0.dp, start = 24.dp, end = 24.dp, bottom = 90.dp)
             ) {
+                Text(text = stringResource(id = R.string.receive_offer_title), style = MaterialTheme.typography.h4)
+                Spacer(modifier = Modifier.height(12.dp))
                 Text(text = stringResource(id = R.string.receive_offer_howto_details_1))
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(12.dp))
                 Text(text = stringResource(id = R.string.receive_offer_howto_details_2))
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(12.dp))
                 Text(text = stringResource(id = R.string.receive_offer_howto_details_3))
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(32.dp))
                 BorderButton(
                     text = stringResource(id = R.string.receive_offer_howto_details_faq_link),
-                    icon = R.drawable.ic_help,
+                    icon = R.drawable.ic_help_circle,
                     onClick = { openLink(context, "https://phoenix.acinq.co/faq") },
                     modifier = Modifier.align(Alignment.End)
                 )

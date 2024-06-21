@@ -175,7 +175,8 @@ fun LightningInvoiceView(
     }
 
     if ((state is LightningInvoiceState.Init || state is LightningInvoiceState.Show) && !isEditing) {
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
+        TorWarning()
         HSeparator(width = 50.dp)
         Spacer(modifier = Modifier.height(24.dp))
         BorderButton(

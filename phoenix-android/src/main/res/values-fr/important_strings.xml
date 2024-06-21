@@ -72,6 +72,7 @@
     <string name="settings_payment_settings">Options de paiement</string>
     <string name="settings_payment_history">Historique des paiements</string>
     <string name="settings_notifications">Notifications</string>
+    <string name="settings_contacts">Mes contacts</string>
 
     <!-- home: swap help -->
 
@@ -130,6 +131,20 @@
     <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Des frais de %1$s sont estimés pour recevoir ce montant, ce qui représente plus de %2$s%% du montant.\n\nAugmentez cette limite, ou bien demandez de la liquidité supplémentaire.</string>
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Votre liquidité entrante est insuffisante pour ce montant, et la gestion automatisée des channels est désactivée.</string>
+
+    <!-- receive: offer labels -->
+
+    <string name="receive_offer_howto_title">Comment ça marche</string>
+    <string name="receive_offer_howto_details_1">Ce QR code est une adresse de paiement Lightning statique, également connue sous le nom de \"offer\" ou \"BOLT 12\".</string>
+    <string name="receive_offer_howto_details_2">À la différence des requêtes de paiement Lightning classiques, celle-ci n\'expire pas et peut être réutilisée à volonté. Elle peut servir pour des pourboires ou des dons.</string>
+    <string name="receive_offer_howto_details_3">Pour l\'instant, peu de services prennent en charge ce nouveau type d\'adresse. Si vous ne pouvez pas vous faire payer avec, utilisez plutôt une requête Lightning normale.</string>
+    <string name="receive_offer_howto_details_faq_link">En savoir plus</string>
+
+    <!-- receive : Tor warnings -->
+
+    <string name="receive_tor_warning_title">Tor est activé</string>
+    <string name="receive_tor_warning_dialog_content_1">Phoenix ne peut pas recevoir de paiements en arrière-plan.</string>
+    <string name="receive_tor_warning_dialog_content_2">Pour éviter des échecs de paiements, utilisez Orbot, ou bien assurez-vous que Phoenix reste visible au premier plan lorsque des paiements vous sont envoyés.</string>
 
     <!-- scanning errors -->
 
@@ -236,11 +251,15 @@
 
     <string name="tor_settings_subtitle">Phoenix peut utiliser Tor pour cacher votre IP des autres noeuds du réseau Lightning et des serveurs Electrum.\n\nActiver Tor améliorera votre vie privée mais peut causer des difficultés de paiement si votre connexion est instable.</string>
 
+    <string name="tor_confirm_dialog_title">Activer Tor ?</string>
+    <string name="tor_confirm_dialog_details_1">Tor est lent et va impacter les performances de vos paiements.</string>
+    <string name="tor_confirm_dialog_details_2">En particulier, vous <b>ne pourrez pas recevoir de paiements</b> si Phoenix est en arrière-plan, ou est fermée.</string>
+
     <!-- about -->
 
     <string name="about_general_content">Phoenix est un wallet Bitcoin qui utilise le réseau Lightning pour envoyer et recevoir des paiements.\n\nC\'est un logiciel libre et en source ouverte, développé par <a href="https://phoenix.acinq.co">ACINQ</a> sous licence <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a>.</string>
     <string name="about_seed_title">Sauvegarde de votre clé</string>
-    <string name="about_seed_content">Ce wallet est dit souverain (aussi appelé "self-custodial") : <b>vous seul détenez la clé de 12 mots contrôlant les fonds du wallet</b>.\n\nCette clé donne accès aux fonds. Ne la révélez à personne. Faites attention aux tentatives de hameçonnage.</string>
+    <string name="about_seed_content">Ce wallet est dit souverain (aussi appelé "self-custodial") : <b>vous seul détenez la clé de 12 mots contrôlant le wallet</b>.\n\nCette clé donne accès aux fonds. Ne la révélez à personne. Faites attention aux arnaques.</string>
     <string name="about_rates_title">Conversion fiduciaire</string>
     <string name="about_rates_content">La conversion Bitcoin/monnaie fiduciaire est faite par l\'intermédiaire de plateformes tierces :\n\n- Blockchain.info\n- powered by Coindesk.com\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nCes taux de conversion peuvent être imprécis. Vérifiez toujours le montant effectif en Bitcoin avant d\'envoyer un paiement.</string>
 

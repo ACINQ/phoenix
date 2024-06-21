@@ -72,6 +72,7 @@
     <string name="settings_payment_settings">Opções de pagamento</string>
     <string name="settings_payment_history">Histórico de pagamentos</string>
     <string name="settings_notifications">Notificações</string>
+    <string name="settings_contacts">Meus contatos</string>
 
     <!-- home: swap help -->
 
@@ -128,6 +129,20 @@
     <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Estima-se uma taxa de %1$s para receber esse valor, e essas taxas excedem %2$s%% do valor.\n\nAumente esse limite ou solicite liquidez adicional.</string>
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">A liquidez recebida é insuficiente e você desativou o gerenciamento automatizado de canais.</string>
+
+    <!-- receive: offer labels -->
+
+    <string name="receive_offer_howto_title">Como funciona</string>
+    <string name="receive_offer_howto_details_1">Esse código QR é um endereço de pagamento estático para o Lightning, também conhecido como \"offer\" ou \"BOLT 12\".</string>
+    <string name="receive_offer_howto_details_2">Ao contrário das solicitações de pagamento Lightning tradicionais, essa não expira e pode ser reutilizada à vontade. Ele pode ser usado para gorjetas ou para pagar amigos.</string>
+    <string name="receive_offer_howto_details_3">No momento, poucos serviços oferecem suporte a esse novo tipo de endereço. Se você não puder receber pagamentos com ele, use uma solicitação Lightning normal.</string>
+    <string name="receive_offer_howto_details_faq_link">Para saber mais</string>
+
+    <!-- receive: Tor warning -->
+
+    <string name="receive_tor_warning_title">O Tor está ativado</string>
+    <string name="receive_tor_warning_dialog_content_1">O Phoenix não pode receber pagamentos em segundo plano.</string>
+    <string name="receive_tor_warning_dialog_content_2">Para evitar falhas nos pagamentos, use o Orbot ou certifique-se de que o Phoenix permaneça visível em primeiro plano quando os pagamentos forem enviados a você.</string>
 
     <!-- scanning errors -->
 
