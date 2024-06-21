@@ -567,7 +567,6 @@
     <string name="tor_settings_state_closed">Der Tor-Proxy wird abgeschaltet.\nBitte warten Sie und überprüfen Sie Ihre Internetverbindung.</string>
     <string name="tor_settings_state_starting">Starte Tor-Proxy…</string>
     <string name="tor_settings_state_started">Tor ist online</string>
-    <string name="tor_settings_state_about_perfs">Beachten Sie, dass das Tor-Netzwerk ein Open-Source-Projekt ist, das auf Spendenbasis läuft. Es kann manchmal sehr langsam sein, was die Leistung der App beeinträchtigen kann.</string>
 
     <!-- home: connectivity dialog -->
 

@@ -553,7 +553,6 @@
     <string name="tor_settings_state_closed">El proxy de Tor está apagado. \nEspera y comprueba tu conexión a Internet.</string>
     <string name="tor_settings_state_starting">Iniciando proxy de Tor…</string>
     <string name="tor_settings_state_started">Tor está en línea</string>
-    <string name="tor_settings_state_about_perfs">Ten en cuenta que la red Tor es un proyecto abierto que funciona con donaciones. En ocasiones, puede ser muy lento, lo que afectará al rendimiento de la aplicación.</string>
 
     <!-- home: connectivity dialog -->
 

@@ -568,7 +568,6 @@
     <string name="tor_settings_state_closed">Proxy của Tor đang bị đóng.\nVui lòng chờ đợi và kiểm tra kết nối mạng Internet của bạn.</string>
     <string name="tor_settings_state_starting">Đang khởi động Proxy của Tor…</string>
     <string name="tor_settings_state_started">Tor đang kết nối trực tuyến</string>
-    <string name="tor_settings_state_about_perfs">Lưu ý rằng mạng Tor là một mạng mở và chạy bằng tiền quyên góp. Vì vậy, mạng đôi khi có thể rất chậm và ảnh hưởng đến chất lượng vận hành của ứng dụng.</string>
 
     <!-- home: connectivity dialog -->
 

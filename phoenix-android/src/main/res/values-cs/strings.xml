@@ -520,7 +520,6 @@
     <string name="tor_settings_state_closed">Tor proxy server je vypnutý.\nPočkejte prosím a zkontrolujte své internetové připojení.</string>
     <string name="tor_settings_state_starting">Zapínání Tor proxy serveru…</string>
     <string name="tor_settings_state_started">Tor je připojen</string>
-    <string name="tor_settings_state_about_perfs">Pamatujte, že síť Tor je otevřený projekt fungující z darů. Někdy může být velmi pomalý, což ovlivní výkon aplikace.</string>
 
     <!-- home: connectivity dialog -->
 
