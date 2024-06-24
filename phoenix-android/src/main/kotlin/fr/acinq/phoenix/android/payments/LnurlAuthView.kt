@@ -39,7 +39,8 @@ fun LnurlAuthView(
     model: Scan.Model.LnurlAuthFlow,
     onBackClick: () -> Unit,
     onLoginClick: (Scan.Intent.LnurlAuthFlow) -> Unit,
-    onAuthSchemeInfoClick: () -> Unit
+    onAuthSchemeInfoClick: () -> Unit,
+    onAuthDone: () -> Unit,
 ) {
     var showHowItWorks by remember { mutableStateOf(false) }
     val prefAuthScheme by userPrefs.getLnurlAuthScheme.collectAsState(initial = null)
@@ -131,7 +132,7 @@ fun LnurlAuthView(
                         Text(text = stringResource(id = R.string.lnurl_auth_success, model.auth.initialUrl.host), textAlign = TextAlign.Center)
                     }
                     Spacer(Modifier.height(32.dp))
-                    FilledButton(text = stringResource(id = R.string.btn_ok), icon = R.drawable.ic_check, onClick = onBackClick)
+                    FilledButton(text = stringResource(id = R.string.btn_ok), icon = R.drawable.ic_check, onClick = onAuthDone)
                 }
             }
         }

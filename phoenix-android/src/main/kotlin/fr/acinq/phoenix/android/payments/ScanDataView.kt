@@ -162,10 +162,21 @@ fun ScanDataView(
                 )
             }
             is Scan.Model.LnurlAuthFlow -> {
-                LnurlAuthView(model = model, onBackClick = onBackClick, onLoginClick = { postIntent(it) }, onAuthSchemeInfoClick = onAuthSchemeInfoClick)
+                LnurlAuthView(
+                    model = model,
+                    onBackClick = onBackClick,
+                    onLoginClick = { postIntent(it) },
+                    onAuthSchemeInfoClick = onAuthSchemeInfoClick,
+                    onAuthDone = onProcessingFinished,
+                )
             }
             is Scan.Model.LnurlWithdrawFlow -> {
-                LnurlWithdrawView(model = model, onBackClick = onBackClick, onWithdrawClick = { postIntent(it) }, onFeeManagementClick = onFeeManagementClick)
+                LnurlWithdrawView(
+                    model = model,
+                    onWithdrawClick = { postIntent(it) },
+                    onFeeManagementClick = onFeeManagementClick,
+                    onWithdrawDone = onProcessingFinished,
+                )
             }
         }
     }
