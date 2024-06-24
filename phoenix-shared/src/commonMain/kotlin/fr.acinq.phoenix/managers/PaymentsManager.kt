@@ -3,6 +3,8 @@ package fr.acinq.phoenix.managers
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
+import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.logging.LoggerFactory
@@ -87,8 +89,11 @@ class PaymentsManager(
             if (index > 0) {
                 for (row in list) {
                     val paymentInfo = fetcher.getPayment(row, WalletPaymentFetchOptions.None)
-                    if (paymentInfo?.payment is InboundLiquidityOutgoingPayment || paymentInfo?.payment is SpliceCpfpOutgoingPayment) {
-                        // ignore cpfp/inbound
+                    val payment = paymentInfo?.payment
+                    if (payment is InboundLiquidityOutgoingPayment || payment is SpliceCpfpOutgoingPayment
+                        || (payment is LightningOutgoingPayment && payment.details is LightningOutgoingPayment.Details.Blinded)
+                    ) {
+                        // ignore cpfp/inbound/blinded
                     } else {
                         val completedAt = paymentInfo?.payment?.completedAt
                         if (completedAt != null && completedAt > appLaunchTimestamp) {

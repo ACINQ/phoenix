@@ -57,6 +57,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.firebase.messaging.FirebaseMessaging
+import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.components.Button
@@ -89,6 +90,7 @@ import fr.acinq.phoenix.android.settings.walletinfo.SwapInWallet
 import fr.acinq.phoenix.android.settings.walletinfo.WalletInfoView
 import fr.acinq.phoenix.android.startup.LegacySwitcherView
 import fr.acinq.phoenix.android.startup.StartupView
+import fr.acinq.phoenix.android.utils.SystemNotificationHelper
 import fr.acinq.phoenix.android.utils.appBackground
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.BitcoinUnit
@@ -479,11 +481,18 @@ fun AppView(
 
     val isDataMigrationExpected by LegacyPrefsDatastore.getDataMigrationExpected(context).collectAsState(initial = null)
     val lastCompletedPayment by business.paymentsManager.lastCompletedPayment.collectAsState()
-    lastCompletedPayment?.let {
-//        log.debug { "completed payment=${lastCompletedPayment?.id()} with data-migration=$isDataMigrationExpected" }
-        LaunchedEffect(key1 = it.walletPaymentId()) {
+    val userPrefs = userPrefs
+    val exchangeRates = fiatRates
+    lastCompletedPayment?.let { payment ->
+        LaunchedEffect(key1 = payment.walletPaymentId()) {
             if (isDataMigrationExpected == false) {
-                navigateToPaymentDetails(navController, id = it.walletPaymentId(), isFromEvent = true)
+                if (payment is IncomingPayment && payment.origin is IncomingPayment.Origin.Offer) {
+                    SystemNotificationHelper.notifyPaymentsReceived(
+                        context, userPrefs, paymentHash = payment.paymentHash, amount = payment.amount, rates = exchangeRates, isHeadless = false
+                    )
+                } else {
+                    navigateToPaymentDetails(navController, id = payment.walletPaymentId(), isFromEvent = true)
+                }
             }
         }
     }
