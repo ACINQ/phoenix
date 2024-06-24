@@ -68,7 +68,7 @@ import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.walletPaymentId
 import fr.acinq.phoenix.utils.extensions.WalletPaymentState
 import fr.acinq.phoenix.utils.extensions.incomingOfferMetadata
-import fr.acinq.phoenix.utils.extensions.outgoingOfferData
+import fr.acinq.phoenix.utils.extensions.outgoingInvoiceRequest
 import fr.acinq.phoenix.utils.extensions.state
 
 
@@ -191,13 +191,14 @@ private fun PaymentDescription(paymentInfo: WalletPaymentInfo, modifier: Modifie
                     offerMetadata.payerNote ?: stringResource(id = R.string.paymentdetails_desc_from, it.name)
                 }
             }
-            ?: payment.outgoingOfferData()?.let {
+            ?: payment.outgoingInvoiceRequest()?.let { request ->
+                val offer = request.offer
                 val contactsManager = business.contactsManager
                 val contactForOffer = produceState<ContactInfo?>(initialValue = null, producer = {
-                    value = contactsManager.getContactForOffer(it)
+                    value = contactsManager.getContactForOffer(offer)
                 })
 
-                contactForOffer.value?.let { stringResource(id = R.string.paymentdetails_desc_to, it.name) }
+                request.payerNote ?: contactForOffer.value?.let { stringResource(id = R.string.paymentdetails_desc_to, it.name) }
             }
             ?: payment.smartDescription(context)
     }

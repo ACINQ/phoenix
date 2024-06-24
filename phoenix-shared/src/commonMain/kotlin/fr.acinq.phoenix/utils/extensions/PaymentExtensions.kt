@@ -23,6 +23,7 @@ import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.db.OnChainOutgoingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
+import fr.acinq.lightning.payment.Bolt12Invoice
 import fr.acinq.lightning.payment.OfferPaymentMetadata
 import fr.acinq.lightning.wire.OfferTypes
 
@@ -80,4 +81,4 @@ fun WalletPayment.errorMessage(): String? = when (this) {
 }
 
 fun WalletPayment.incomingOfferMetadata(): OfferPaymentMetadata.V1? = ((this as? IncomingPayment)?.origin as? IncomingPayment.Origin.Offer)?.metadata as? OfferPaymentMetadata.V1
-fun WalletPayment.outgoingOfferData(): OfferTypes.Offer? = ((this as? LightningOutgoingPayment)?.details as? LightningOutgoingPayment.Details.Blinded)?.paymentRequest?.invoiceRequest?.offer
+fun WalletPayment.outgoingInvoiceRequest(): OfferTypes.InvoiceRequest? = ((this as? LightningOutgoingPayment)?.details as? LightningOutgoingPayment.Details.Blinded)?.paymentRequest?.invoiceRequest
