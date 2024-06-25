@@ -18,37 +18,42 @@ struct MetadataSheet: View {
 	var body: some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-			HStack(alignment: VerticalAlignment.center, spacing: 0) {
-				Text("Metadata")
-					.font(.title3)
-					.accessibilityAddTraits(.isHeader)
-				
-				Spacer()
-				
-				Button {
-					closeButtonTapped()
-				} label: {
-					Image("ic_cross")
-						.resizable()
-						.frame(width: 30, height: 30)
-				}
-				.accessibilityLabel("Close")
-				.accessibilityHidden(smartModalState.dismissable)
-			}
-			.padding(.horizontal)
-			.padding(.vertical, 8)
-			.background(
-				Color(UIColor.secondarySystemBackground)
-					.cornerRadius(15, corners: [.topLeft, .topRight])
-			)
-			.padding(.bottom, 4)
-			
-			content
+			header()
+			content()
 		}
 	}
 	
 	@ViewBuilder
-	var content: some View {
+	func header() -> some View {
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+			Text("Metadata")
+				.font(.title3)
+				.accessibilityAddTraits(.isHeader)
+			
+			Spacer()
+			
+			Button {
+				closeButtonTapped()
+			} label: {
+				Image("ic_cross")
+					.resizable()
+					.frame(width: 30, height: 30)
+			}
+			.accessibilityLabel("Close")
+			.accessibilityHidden(smartModalState.dismissable)
+		}
+		.padding(.horizontal)
+		.padding(.vertical, 8)
+		.background(
+			Color(UIColor.secondarySystemBackground)
+				.cornerRadius(15, corners: [.topLeft, .topRight])
+		)
+		.padding(.bottom, 4)
+	}
+	
+	@ViewBuilder
+	func content() -> some View {
 		
 		ScrollView {
 			VStack(alignment: HorizontalAlignment.leading, spacing: 20) {
