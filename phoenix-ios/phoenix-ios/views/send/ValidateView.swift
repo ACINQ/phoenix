@@ -54,6 +54,8 @@ struct ValidateView: View {
 	@State var hasShownChannelCapacityWarning = false
 	@State var hasPickedSwapOutMode = false
 	
+	@State var contact: ContactInfo? = nil
+	
 	@State var didAppear = false
 	
 	let balancePublisher = Biz.business.balanceManager.balancePublisher()
@@ -1458,7 +1460,7 @@ struct ValidateView: View {
 		
 		dismissKeyboardIfVisible()
 		smartModalState.display(dismissable: false) {
-			AddContactSheet(offer: offer)
+			AddContactSheet(offer: offer, contact: $contact)
 		}
 	}
 	

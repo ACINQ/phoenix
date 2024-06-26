@@ -94,6 +94,7 @@
 		DC32FB3529A3D3FE009912AC /* XpcManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC32FB3429A3D3FE009912AC /* XpcManager.swift */; };
 		DC33369826BAF721000E3F49 /* ShortSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC33369726BAF721000E3F49 /* ShortSheet.swift */; };
 		DC3345D02C2B4C1200EDD2D4 /* AddContactSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3345CF2C2B4C1200EDD2D4 /* AddContactSheet.swift */; };
+		DC3345D22C2C761800EDD2D4 /* CameraPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3345D12C2C761800EDD2D4 /* CameraPicker.swift */; };
 		DC33C5632A7C15D40053D785 /* MainView_BigPrimary.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC33C5622A7C15D40053D785 /* MainView_BigPrimary.swift */; };
 		DC34399F276CEFB600CAA73A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7555FF84242A565B00829871 /* Assets.xcassets */; };
 		DC355E1D2A4398A8008E8A8E /* NoticeBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC355E1C2A4398A8008E8A8E /* NoticeBox.swift */; };
@@ -497,6 +498,7 @@
 		DC32FB3429A3D3FE009912AC /* XpcManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XpcManager.swift; sourceTree = "<group>"; };
 		DC33369726BAF721000E3F49 /* ShortSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortSheet.swift; sourceTree = "<group>"; };
 		DC3345CF2C2B4C1200EDD2D4 /* AddContactSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddContactSheet.swift; sourceTree = "<group>"; };
+		DC3345D12C2C761800EDD2D4 /* CameraPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPicker.swift; sourceTree = "<group>"; };
 		DC33C5622A7C15D40053D785 /* MainView_BigPrimary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView_BigPrimary.swift; sourceTree = "<group>"; };
 		DC355E1C2A4398A8008E8A8E /* NoticeBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoticeBox.swift; sourceTree = "<group>"; };
 		DC355E1E2A44A235008E8A8E /* NotificationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationCell.swift; sourceTree = "<group>"; };
@@ -770,6 +772,7 @@
 				DC39D4F02874DDF40030F18D /* View+If.swift */,
 				DC6D26E229E76557006A7814 /* AnimatedClock.swift */,
 				DCB30E532A0AABAF00E7D7A2 /* InfoPopoverWindow.swift */,
+				DC3345D12C2C761800EDD2D4 /* CameraPicker.swift */,
 			);
 			path = widgets;
 			sourceTree = "<group>";
@@ -1852,6 +1855,7 @@
 				DC49FE992AC49C6300D8D2E2 /* KotlinExtensions+Bitcoin.swift in Sources */,
 				DC142140261E72E40075857A /* AnyHTML.swift in Sources */,
 				DC2CE3AF29AFEB0500BA0B00 /* Bundle+Icon.swift in Sources */,
+				DC3345D22C2C761800EDD2D4 /* CameraPicker.swift in Sources */,
 				DCE443AC2B3482C800CABA96 /* LiquidityFeeInfo.swift in Sources */,
 				DC1916B029CB6C1D00917F06 /* Text_CurrencyName.swift in Sources */,
 				DCD7E0AF28EC3C0D009C30E5 /* WatchTower.swift in Sources */,
