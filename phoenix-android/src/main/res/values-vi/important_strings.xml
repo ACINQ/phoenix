@@ -197,6 +197,8 @@
     <string name="inappnotif_swapin_timeout_message">Một khoản vốn sẽ sớm hết hạn.</string>
     <string name="inappnotif_swapin_timeout_action">Xem chi tiết</string>
 
+    <string name="inappnotif_powersaver">Chế độ tiết kiệm năng lượng được bật. Thanh toán nền có thể sẽ không thành công.</string>
+
     <string name="inappnotif_watchtower_late_message">Phoenix thường xuyên quản lý blockchain khi ở chế độ chạy trên nền, nhưng gần đây Phoenix không thể thực hiện việc này.\n\nHãy đảm bảo rằng Android không chặn Phoenix và Phoenix có thể kết nối với Electrum.</string>
     <string name="inappnotif_watchtower_late_action">Huỷ</string>
 

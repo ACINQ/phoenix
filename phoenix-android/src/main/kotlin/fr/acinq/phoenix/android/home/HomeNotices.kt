@@ -130,6 +130,8 @@ private fun FirstNoticeView(
             is Notice.MempoolFull -> onNavigateToNotificationsList
 
             is Notice.RemoteMessage -> onNavigateToNotificationsList
+
+            is Notice.PowerSaverMode -> onNavigateToNotificationsList
         }
     } else {
         onNavigateToNotificationsList
@@ -182,6 +184,10 @@ private fun FirstNoticeView(
 
             is Notice.RemoteMessage -> {
                 NoticeTextView(text = notice.notice.message, icon = R.drawable.ic_info)
+            }
+
+            is Notice.PowerSaverMode -> {
+                NoticeTextView(text = stringResource(id = R.string.inappnotif_powersaver))
             }
         }
 

@@ -189,6 +189,8 @@
     <string name="inappnotif_swapin_timeout_message">Um depósito expirará em breve.</string>
     <string name="inappnotif_swapin_timeout_action">Ver detalhes</string>
 
+    <string name="inappnotif_powersaver">O modo de economia de energia está ativado. Os pagamentos em segundo plano provavelmente falharão.</string>
+
     <string name="inappnotif_watchtower_late_message">O Phoenix monitora regularmente o blockchain quando está em segundo plano, mas não conseguiu fazer isso nos últimos dias.\n\nCertifique-se de que o Android não bloqueie o Phoenix e que ele possa se conectar à Electrum.</string>
     <string name="inappnotif_watchtower_late_action">Dispensar</string>
 

@@ -186,7 +186,9 @@
     <string name="inappnotif_swapin_timeout_message">Un dépôt va bientôt expirer.</string>
     <string name="inappnotif_swapin_timeout_action">Voir les détails</string>
 
-    <string name="inappnotif_watchtower_late_message">Phoenix vérifie périodiquement la blockchain lorsque l\'application est éteinte. Ces derniers jours elle n\'a pas pu le faire.\n\nAssurez vous qu\'Android ne restreigne pas Phoenix, et que l\'application puisse se connecter à Electrum.</string>
+    <string name="inappnotif_powersaver">Le mode d\'économie d\'énergie est activé. Les paiements en arrière-plan vont probablement échouer.</string>
+
+    <string name="inappnotif_watchtower_late_message">Phoenix vérifie périodiquement la blockchain lorsque l\'application est éteinte. Dernièrement, elle n\'a pas pu le faire.\n\nAssurez vous qu\'Android n\'applique pas de restrictions à Phoenix, et que l\'application puisse se connecter à Electrum.</string>
     <string name="inappnotif_watchtower_late_action">Fermer</string>
 
     <string name="inappnotif_upgrade_message">Mise à jour disponible</string>

@@ -188,6 +188,8 @@
     <string name="inappnotif_swapin_timeout_message">Pronto vencerá un depósito.</string>
     <string name="inappnotif_swapin_timeout_action">Ver detalles</string>
 
+    <string name="inappnotif_powersaver">El modo de ahorro de energía está activado. Los pagos en segundo plano probablemente fallarán.</string>
+
     <string name="inappnotif_watchtower_late_message">Phoenix monitorea regularmente la cadena de bloques cuando está funcionando en segundo plano, pero no ha podido hacerlo en los últimos días.\n\nComprueba que Android no bloquee Phoenix y que la billetera pueda conectarse a Electrum.</string>
     <string name="inappnotif_watchtower_late_action">Ignorar</string>
 

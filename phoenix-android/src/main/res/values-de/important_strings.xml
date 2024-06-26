@@ -187,6 +187,8 @@
     <string name="inappnotif_swapin_timeout_message">Eine Einzahlung wird bald ablaufen.</string>
     <string name="inappnotif_swapin_timeout_action">Details ansehen</string>
 
+    <string name="inappnotif_powersaver">Der Energiesparmodus ist aktiviert. Zahlungen im Hintergrund werden wahrscheinlich fehlschlagen.</string>
+
     <string name="inappnotif_watchtower_late_message">Phoenix beobachtet die Blockchain regelmäßig im Hintergrund, war aber in den letzten Tagen nicht in der Lage, dies zu tun.\n\nStellen Sie sicher, dass Phoenix nicht durch Android blockiert wird, sodass eine Verbindung zu Electrum möglich ist.</string>
     <string name="inappnotif_watchtower_late_action">Schließen</string>
 

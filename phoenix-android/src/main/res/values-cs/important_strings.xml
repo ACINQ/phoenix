@@ -190,6 +190,8 @@
     <string name="inappnotif_swapin_timeout_message">Záloha brzy vyprší.</string>
     <string name="inappnotif_swapin_timeout_action">Zobrazit podrobnosti</string>
 
+    <string name="inappnotif_powersaver">Je povolen úsporný režim. Platby na pozadí pravděpodobně selžou.</string>
+
     <string name="inappnotif_watchtower_late_message">Phoenix pravidelně monitoruje Blockchain na pozadí, ale v posledních dnech se mu to nedařilo.\n\nUjistěte se, že systém Android neblokuje aplikaci Phoenix a že se může připojit ke službě Electrum.</string>
     <string name="inappnotif_watchtower_late_action">Odmítnout</string>
 

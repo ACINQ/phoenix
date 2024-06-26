@@ -193,6 +193,8 @@
     <string name="inappnotif_swapin_timeout_message">A deposit will expire soon.</string>
     <string name="inappnotif_swapin_timeout_action">View details</string>
 
+    <string name="inappnotif_powersaver">Power saver mode is enabled. Background payments will likely fail.</string>
+
     <string name="inappnotif_watchtower_late_message">Phoenix regularly monitors the blockchain when in the background, but was unable to do so the last few days.\n\nMake sure Android does not block Phoenix, and that it can connect to Electrum.</string>
     <string name="inappnotif_watchtower_late_action">Dismiss</string>
 
