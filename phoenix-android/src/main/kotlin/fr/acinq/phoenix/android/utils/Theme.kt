@@ -224,7 +224,7 @@ fun PhoenixAndroidTheme(
             shapes = shapes
         ) {
             val entry = navController.currentBackStackEntryAsState()
-            val statusBarColor = systemStatusBarColor
+            val statusBarColor = systemStatusBarColor(entry.value)
             val navBarColor = systemNavBarColor(entry.value)
             LaunchedEffect(navBarColor, statusBarColor) {
                 systemUiController.run {
@@ -257,11 +257,17 @@ val mutedBgColor @Composable get() = if (isDarkTheme) gray950 else gray30
 
 val borderColor @Composable get() = if (isDarkTheme) gray800 else gray50
 
-private val systemStatusBarColor @Composable get() = topGradientColor
-
 /** top gradient is darker/lighter than the background, but not quite black/white */
 private val topGradientColor @Composable get() = if (isDarkTheme) gray1000 else gray10
 private val bottomGradientColor @Composable get() = MaterialTheme.colors.background
+
+@Composable
+private fun systemStatusBarColor(entry: NavBackStackEntry?): Color {
+    return when {
+        entry?.destination?.route == Screen.PaymentsHistory.route -> MaterialTheme.colors.background
+        else -> topGradientColor
+    }
+}
 
 @Composable
 fun systemNavBarColor(entry: NavBackStackEntry?): Color {

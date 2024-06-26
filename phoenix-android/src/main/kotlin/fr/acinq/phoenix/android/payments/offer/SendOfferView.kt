@@ -124,14 +124,12 @@ fun SendOfferView(
             SplashLabelRow(label = stringResource(R.string.send_description_label)) {
                 Text(text = it)
             }
-            Spacer(modifier = Modifier.height(8.dp))
         }
 
         SplashLabelRow(label = stringResource(id = R.string.send_destination_label), icon = R.drawable.ic_zap) {
             ContactOrOfferView(offer = offer)
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
         SplashLabelRow(label = stringResource(id = R.string.send_offer_payer_note_label), icon = R.drawable.ic_message_circle) {
             Clickable(
                 onClick = { showMessageDialog = true },

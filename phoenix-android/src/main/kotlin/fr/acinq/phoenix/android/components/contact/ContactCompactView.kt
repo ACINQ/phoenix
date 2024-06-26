@@ -37,6 +37,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.android.components.Clickable
+import fr.acinq.phoenix.android.components.SplashClickableContent
 import fr.acinq.phoenix.data.ContactInfo
 
 
@@ -55,17 +56,11 @@ fun ContactCompactView(
 ) {
     var showSheet by remember { mutableStateOf(false) }
 
-    Clickable(
-        onClick = { showSheet = true },
-        modifier = Modifier.offset(x = (-8).dp),
-        shape = RoundedCornerShape(12.dp)
-    ) {
-        Column(modifier = Modifier.padding(8.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                ContactPhotoView(image = contact.photo?.toByteArray(), name = contact.name, onChange = null, imageSize = 28.dp, borderSize = 2.dp)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(text = contact.name, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            }
+    SplashClickableContent(onClick = { showSheet = true }) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            ContactPhotoView(image = contact.photo?.toByteArray(), name = contact.name, onChange = null, imageSize = 28.dp, borderSize = 2.dp)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(text = contact.name, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
     }
 

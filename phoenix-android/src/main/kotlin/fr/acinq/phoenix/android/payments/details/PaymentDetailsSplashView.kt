@@ -378,6 +378,7 @@ private fun PaymentStatusIcon(
 
 @Composable
 private fun LnurlPayInfoView(payment: LightningOutgoingPayment, metadata: LnurlPayMetadata) {
+    Spacer(modifier = Modifier.height(8.dp))
     SplashLabelRow(label = stringResource(id = R.string.paymentdetails_lnurlpay_service)) {
         SelectionContainer {
             Text(text = metadata.pay.callback.host)
@@ -390,6 +391,7 @@ private fun LnurlPayInfoView(payment: LightningOutgoingPayment, metadata: LnurlP
 
 @Composable
 private fun LnurlSuccessAction(payment: LightningOutgoingPayment, action: LnurlPay.Invoice.SuccessAction) {
+    Spacer(modifier = Modifier.height(8.dp))
     when (action) {
         is LnurlPay.Invoice.SuccessAction.Message -> {
             SplashLabelRow(label = stringResource(id = R.string.paymentdetails_lnurlpay_action_message_label)) {
@@ -441,6 +443,7 @@ private fun LnurlSuccessAction(payment: LightningOutgoingPayment, action: LnurlP
 
 @Composable
 private fun OfferPayerNote(payerNote: String) {
+    Spacer(modifier = Modifier.height(8.dp))
     SplashLabelRow(label = stringResource(id = R.string.paymentdetails_offer_note_label)) {
         Text(text = payerNote)
     }
@@ -458,7 +461,7 @@ private fun OfferPayerContact(payerPubkey: PublicKey?) {
     })
 
     SplashLabelRow(label = stringResource(id = R.string.paymentdetails_offer_sender_label)) {
-        when (val contact = contactForOffer.value){
+        when (val contact = contactForOffer.value) {
             null -> Text(text = stringResource(id = R.string.utils_loading_data))
             is Either.Left -> {
                 Text(text = stringResource(id = R.string.paymentdetails_offer_sender_unknown))
@@ -466,7 +469,11 @@ private fun OfferPayerContact(payerPubkey: PublicKey?) {
                 Text(text = stringResource(id = R.string.paymentdetails_offer_sender_unknown_details), style = MaterialTheme.typography.subtitle2)
             }
             is Either.Right -> {
-                ContactCompactView(contact = contact.value, currentOffer = null, onContactChange = {})
+                ContactCompactView(
+                    contact = contact.value,
+                    currentOffer = null,
+                    onContactChange = {},
+                )
             }
         }
     }
@@ -483,6 +490,7 @@ private fun PaymentDescriptionView(
     val paymentDesc = data.metadata.lnurl?.description ?: data.payment.smartDescription(LocalContext.current)
     val customDesc = remember(data) { data.metadata.userDescription?.takeIf { it.isNotBlank() } }
 
+    Spacer(modifier = Modifier.height(8.dp))
     SplashLabelRow(label = stringResource(id = R.string.paymentdetails_desc_label)) {
         val isLegacyMigration = data.isLegacyMigration(peer)
         val finalDesc = when (isLegacyMigration) {
@@ -492,38 +500,30 @@ private fun PaymentDescriptionView(
         }
 
         if (isLegacyMigration == false) {
-            Clickable(
-                onClick = { showEditDescriptionDialog = true },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .offset(x = (-8).dp),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Column(modifier = Modifier.padding(8.dp)) {
-                    Text(
-                        text = finalDesc ?: stringResource(id = R.string.paymentdetails_no_description),
-                        style = if (finalDesc == null) MaterialTheme.typography.caption.copy(fontStyle = FontStyle.Italic) else MaterialTheme.typography.body1
-                    )
+            SplashClickableContent(onClick = { showEditDescriptionDialog = true }) {
+                Text(
+                    text = finalDesc ?: stringResource(id = R.string.paymentdetails_no_description),
+                    style = if (finalDesc == null) MaterialTheme.typography.caption.copy(fontStyle = FontStyle.Italic) else MaterialTheme.typography.body1
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                if (paymentDesc != null && customDesc != null) {
+                    HSeparator(width = 50.dp)
                     Spacer(modifier = Modifier.height(8.dp))
-                    if (paymentDesc != null && customDesc != null) {
-                        HSeparator(width = 50.dp)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(text = customDesc, style = MaterialTheme.typography.body1.copy(fontStyle = FontStyle.Italic))
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
-                    TextWithIcon(
-                        text = stringResource(
-                            id = when (customDesc) {
-                                null -> R.string.paymentdetails_attach_desc_button
-                                else -> R.string.paymentdetails_edit_desc_button
-                            }
-                        ),
-                        textStyle = MaterialTheme.typography.subtitle2,
-                        icon = R.drawable.ic_edit,
-                        iconTint = MaterialTheme.typography.subtitle2.color,
-                        space = 6.dp,
-                    )
+                    Text(text = customDesc, style = MaterialTheme.typography.body1.copy(fontStyle = FontStyle.Italic))
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
+                TextWithIcon(
+                    text = stringResource(
+                        id = when (customDesc) {
+                            null -> R.string.paymentdetails_attach_desc_button
+                            else -> R.string.paymentdetails_edit_desc_button
+                        }
+                    ),
+                    textStyle = MaterialTheme.typography.subtitle2,
+                    icon = R.drawable.ic_edit,
+                    iconTint = MaterialTheme.typography.subtitle2.color,
+                    space = 6.dp,
+                )
             }
         }
     }

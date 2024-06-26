@@ -133,16 +133,19 @@ fun SendBolt11PaymentView(
                 Text(text = it)
             }
         }
+        Spacer(modifier = Modifier.height(16.dp))
         SplashLabelRow(label = stringResource(R.string.send_destination_label), icon = R.drawable.ic_zap) {
             SelectionContainer {
                 Text(text = invoice.nodeId.toHex(), maxLines = 2, overflow = TextOverflow.Ellipsis)
             }
         }
         if (invoice.isAmountlessTrampoline()) {
+            Spacer(modifier = Modifier.height(16.dp))
             SplashLabelRow(label = "", helpMessage = stringResource(id = R.string.send_trampoline_amountless_warning_details)) {
                 Text(text = stringResource(id = R.string.send_trampoline_amountless_warning_label))
             }
         }
+        Spacer(modifier = Modifier.height(16.dp))
         SplashLabelRow(label = stringResource(id = R.string.send_trampoline_fee_label)) {
             val amt = amount
             if (amt == null) {

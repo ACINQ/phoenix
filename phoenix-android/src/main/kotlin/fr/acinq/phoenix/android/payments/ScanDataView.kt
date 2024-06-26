@@ -229,15 +229,15 @@ fun ReadDataView(
                 )
                 Button(
                     modifier = Modifier.fillMaxWidth(),
-                    icon = R.drawable.ic_input,
-                    text = stringResource(id = R.string.scan_manual_input_button),
-                    onClick = { showManualInputDialog = true },
-                )
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
                     icon = R.drawable.ic_clipboard,
                     text = stringResource(id = R.string.scan_paste_button),
                     onClick = { readClipboard(context)?.let { onScannedText(it) } },
+                )
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    icon = R.drawable.ic_input,
+                    text = stringResource(id = R.string.scan_manual_input_button),
+                    onClick = { showManualInputDialog = true },
                 )
             }
         }
