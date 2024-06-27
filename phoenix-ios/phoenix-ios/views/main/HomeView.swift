@@ -308,11 +308,11 @@ struct HomeView : MVIView {
 				}
 				
 				if currencyPrefs.hideAmounts {
-					Text("+\(formattedAmount.digits) incoming".lowercased()) // digits => "***"
+					Text("+\(formattedAmount.digits)".lowercased()) // digits => "***"
 						.accessibilityLabel("plus hidden amount incoming")
 					
 				} else {
-					Text("+\(formattedAmount.string) incoming".lowercased())
+					Text("+\(formattedAmount.string)".lowercased())
 				}
 			}
 			.font(.callout)
