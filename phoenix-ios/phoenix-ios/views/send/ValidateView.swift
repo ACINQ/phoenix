@@ -165,6 +165,9 @@ struct ValidateView: View {
 			balanceDidChange($0)
 		}
 		.task {
+			await fetchContact()
+		}
+		.task {
 			await fetchMempoolRecommendedFees()
 		}
 	}
@@ -659,6 +662,19 @@ struct ValidateView: View {
 	// --------------------------------------------------
 	// MARK: Tasks
 	// --------------------------------------------------
+	
+	func fetchContact() async {
+		
+		guard let offer = bolt12Offer() else {
+			return
+		}
+		let contactsManager = Biz.business.contactsManager
+		do {
+			contact = try await contactsManager.getContactForOffer(offer: offer)
+		} catch {
+			log.error("contactsManager: error: \(error)")
+		}
+	}
 	
 	func fetchMempoolRecommendedFees() async {
 		
@@ -1451,8 +1467,8 @@ struct ValidateView: View {
 		}
 	}
 	
-	func showAddContactSheet() {
-		log.trace("showAddContactSheet()")
+	func showManageContactSheet() {
+		log.trace("showManageContactSheet()")
 		
 		guard let offer = bolt12Offer() else {
 			return
@@ -1460,7 +1476,7 @@ struct ValidateView: View {
 		
 		dismissKeyboardIfVisible()
 		smartModalState.display(dismissable: false) {
-			AddContactSheet(offer: offer, contact: $contact)
+			ManageContactSheet(offer: offer, contact: $contact)
 		}
 	}
 	

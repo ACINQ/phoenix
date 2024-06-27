@@ -48,6 +48,9 @@ import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.payment.OutgoingPaymentFailure
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.lightning.utils.copyTo
+import fr.acinq.lightning.utils.toByteArray
+import fr.acinq.lightning.utils.toNSData
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.lightning.wire.OfferTypes
 import kotlinx.coroutines.CompletableDeferred
@@ -56,6 +59,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import platform.Foundation.NSData
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -469,6 +473,11 @@ fun LightningOutgoingPayment.Part.Status.Failure.asTooManyPendingPayments():
 fun Lightning_randomBytes32(): ByteVector32 = Lightning.randomBytes32()
 fun Lightning_randomBytes64(): ByteVector64 = Lightning.randomBytes64()
 fun Lightning_randomKey(): PrivateKey = Lightning.randomKey()
+
+fun NSData_toByteArray(data: NSData): ByteArray = data.toByteArray()
+fun NSData_copyTo(data: NSData, buffer: ByteArray, offset: Int = 0) = data.copyTo(buffer, offset)
+fun ByteArray_toNSDataSlice(buffer: ByteArray, offset: Int, length: Int): NSData = buffer.toNSData(offset = offset, length = length)
+fun ByteArray_toNSData(buffer: ByteArray): NSData = buffer.toNSData()
 
 /**
  * The class LiquidityAds.LeaseRate is NOT exposed to iOS.

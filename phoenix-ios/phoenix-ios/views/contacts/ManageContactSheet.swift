@@ -1,23 +1,25 @@
 import SwiftUI
 import PhoenixShared
 
-fileprivate let filename = "AddContactSheet"
+fileprivate let filename = "ManageContactSheet"
 #if DEBUG && true
 fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-struct AddContactSheet: View {
+struct ManageContactSheet: View {
 	
 	let offer: Lightning_kmpOfferTypesOffer
 	@Binding var contact: ContactInfo?
+	let isNewContact: Bool
 	
 	@StateObject var toast = Toast()
 	
+	@State var name: String
+	@State var image: UIImage?
+	
 	@State var showImageOptions: Bool = false
-	@State var imagePickerSelection: UIImage? = nil
-	@State var name: String = ""
 	@State var isSaving: Bool = false
 	
 	enum ActiveSheet {
@@ -38,6 +40,28 @@ struct AddContactSheet: View {
 	
 	@EnvironmentObject var smartModalState: SmartModalState
 	
+	init(offer: Lightning_kmpOfferTypesOffer, contact: Binding<ContactInfo?>) {
+		self.offer = offer
+		self._contact = contact
+		self.isNewContact = (contact.wrappedValue == nil)
+		
+		if let existingContact = contact.wrappedValue {
+			self._name = State(initialValue: existingContact.name)
+			if let photo = existingContact.photo {
+				self._image = State(initialValue: UIImage(data: photo.toSwiftData()))
+			} else {
+				self._image = State(initialValue: nil)
+			}
+		} else {
+			self._name = State(initialValue: "")
+			self._image = State(initialValue: nil)
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: View Builders
+	// --------------------------------------------------
+	
 	@ViewBuilder
 	var body: some View {
 		
@@ -52,10 +76,10 @@ struct AddContactSheet: View {
 		.sheet(isPresented: activeSheetBinding()) { // SwiftUI only allows for 1 ".sheet"
 			switch activeSheet! {
 			case .camera:
-				CameraPicker(image: $imagePickerSelection)
+				CameraPicker(image: $image)
 			
 			case .imagePicker:
-				ImagePicker(image: $imagePickerSelection)
+				ImagePicker(image: $image)
 			
 			} // </switch>
 		}
@@ -65,9 +89,15 @@ struct AddContactSheet: View {
 	func header() -> some View {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 0) {
-			Text("Add contact")
-				.font(.title3)
-				.accessibilityAddTraits(.isHeader)
+			Group {
+				if isNewContact {
+					Text("Add contact")
+				} else {
+					Text("Edit contact")
+				}
+			}
+			.font(.title3)
+			.accessibilityAddTraits(.isHeader)
 			
 			Spacer(minLength: 0)
 		}
@@ -96,7 +126,7 @@ struct AddContactSheet: View {
 	func content_image() -> some View {
 		
 		Group {
-			if let uiimage = imagePickerSelection {
+			if let uiimage = image {
 				Image(uiImage: uiimage)
 					.resizable()
 					.aspectRatio(contentMode: .fill) // FILL !
@@ -128,9 +158,9 @@ struct AddContactSheet: View {
 			} label: {
 				Text("Take photo")
 			}
-			if imagePickerSelection != nil {
+			if image != nil {
 				Button("Clear image", role: ButtonRole.destructive) {
-					imagePickerSelection = nil
+					image = nil
 				}
 			}
 		} // </confirmationDialog>
@@ -273,20 +303,25 @@ struct AddContactSheet: View {
 		Task { @MainActor in
 			
 			let c_name = trimmedName
-			let c_photo = imagePickerSelection?.jpegData(compressionQuality: 1.0)
+			let c_photo = image?.jpegData(compressionQuality: 1.0)?.toKotlinByteArray()
 			
 			let contactsManager = Biz.business.contactsManager
 			do {
 				let existingContact = try await contactsManager.getContactForOffer(offer: offer)
 				if let existingContact {
-					contact = existingContact
-				} else {
-					let newContact = try await contactsManager.saveNewContact(
+					contact = try await contactsManager.updateContact(
+						contactId: existingContact.id,
 						name: c_name,
-						photo: c_photo?.toKotlinByteArray(),
+						photo: c_photo,
+						offers: existingContact.offers
+					)
+					
+				} else {
+					contact = try await contactsManager.saveNewContact(
+						name: c_name,
+						photo: c_photo,
 						offer: offer
 					)
-					contact = newContact
 				}
 			} catch {
 				log.error("contactsManager: error: \(error)")
