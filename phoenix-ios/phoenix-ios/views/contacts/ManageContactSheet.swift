@@ -21,6 +21,7 @@ struct ManageContactSheet: View {
 	
 	@State var showImageOptions: Bool = false
 	@State var isSaving: Bool = false
+	@State var showDeleteContactConfirmationDialog: Bool = false
 	
 	enum ActiveSheet {
 		case camera
@@ -100,6 +101,18 @@ struct ManageContactSheet: View {
 			.accessibilityAddTraits(.isHeader)
 			
 			Spacer(minLength: 0)
+			
+			if !isNewContact {
+				Button {
+					showDeleteContactConfirmationDialog = true
+				} label: {
+					Image(systemName: "trash.fill")
+						.imageScale(.medium)
+						.font(.title2)
+						.foregroundColor(.appNegative)
+				}
+				.accessibilityLabel("Delete contact")
+			}
 		}
 		.padding(.horizontal)
 		.padding(.vertical, 8)
@@ -108,6 +121,14 @@ struct ManageContactSheet: View {
 				.cornerRadius(15, corners: [.topLeft, .topRight])
 		)
 		.padding(.bottom, 4)
+		.confirmationDialog("Delete contact?",
+			isPresented: $showDeleteContactConfirmationDialog,
+			titleVisibility: Visibility.hidden
+		) {
+			Button("Delete contact", role: ButtonRole.destructive) {
+				deleteContact()
+			}
+		}
 	}
 	
 	@ViewBuilder
@@ -331,6 +352,31 @@ struct ManageContactSheet: View {
 			if contact != nil {
 				smartModalState.close()
 			}
+			
+		} // </Task>
+	}
+	
+	func deleteContact() {
+		log.trace("deleteContact()")
+		
+		guard let cid = contact?.id else {
+			return
+		}
+		
+		isSaving = true
+		Task { @MainActor in
+			
+			let contactsManager = Biz.business.contactsManager
+			do {
+				try await contactsManager.deleteContact(contactId: cid)
+				contact = nil
+				
+			} catch {
+				log.error("contactsManager: error: \(error)")
+			}
+			
+			isSaving = false
+			smartModalState.close()
 			
 		} // </Task>
 	}
