@@ -82,7 +82,7 @@ fun SaveNewContactDialog(
     var offer by remember { mutableStateOf(initialOffer?.encode() ?: "") }
     var offerErrorMessage by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
-    var photo by remember { mutableStateOf<ByteArray?>(null) }
+    var photoUri by remember { mutableStateOf<String?>(null) }
 
     val contactsManager = business.contactsManager
 
@@ -113,7 +113,7 @@ fun SaveNewContactDialog(
             ) {
                 Text(text = stringResource(id = R.string.contact_add_title), style = MaterialTheme.typography.h4, textAlign = TextAlign.Center)
                 Spacer(modifier = Modifier.height(24.dp))
-                ContactPhotoView(image = photo, name = name, onChange = { photo = it })
+                ContactPhotoView(photoUri = photoUri, name = name, onChange = { photoUri = it })
                 Spacer(modifier = Modifier.height(24.dp))
                 TextInput(
                     text = name,
@@ -153,7 +153,7 @@ fun SaveNewContactDialog(
                                         if (existingContact != null) {
                                             offerErrorMessage = context.getString(R.string.contact_error_offer_known, existingContact.name)
                                         } else {
-                                            val contact = contactsManager.saveNewContact(name, photo, res.result)
+                                            val contact = contactsManager.saveNewContact(name, photoUri, res.result)
                                             onSaved(contact)
                                         }
                                     }
@@ -164,7 +164,7 @@ fun SaveNewContactDialog(
                                 if (existingContact != null) {
                                     offerErrorMessage = context.getString(R.string.contact_error_offer_known, existingContact.name)
                                 } else {
-                                    val contact = contactsManager.saveNewContact(name, photo, initialOffer)
+                                    val contact = contactsManager.saveNewContact(name, photoUri, initialOffer)
                                     onSaved(contact)
                                 }
 

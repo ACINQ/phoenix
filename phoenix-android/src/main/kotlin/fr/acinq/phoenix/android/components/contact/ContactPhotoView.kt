@@ -40,6 +40,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -53,26 +54,30 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.utils.BitmapHelper
+import fr.acinq.phoenix.android.utils.createContactPictureUri
 import fr.acinq.phoenix.android.utils.mutedBgColor
 import java.io.ByteArrayOutputStream
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun ContactPhotoView(
-    image: ByteArray?,
+    photoUri: String?,
     name: String?,
-    onChange: ((ByteArray?) -> Unit)?,
+    onChange: ((String?) -> Unit)?,
     imageSize: Dp = 96.dp,
     borderSize: Dp = 4.dp
 ) {
     val context = LocalContext.current
 
-    val bitmap = remember(image) {
-        image?.let {
-            try {
-                BitmapFactory.decodeByteArray(image, 0, it.size).asImageBitmap()
-            } catch (e: Exception) {
-                null
+    val tempPhotoUri by remember { mutableStateOf(photoUri?.let { Uri.parse(it) } ?: context.createContactPictureUri()) }
+    var realUri by remember { mutableStateOf<Uri?>(null) }
+    val bitmap: ImageBitmap? = remember(tempPhotoUri) {
+        realUri?.let { uri ->
+            // TODO: load image from URI
+            val contentResolver = context.contentResolver
+            contentResolver.openInputStream(uri)?.use {
+                BitmapFactory.decodeStream(it).asImageBitmap()
             }
         }
     }
@@ -81,14 +86,9 @@ fun ContactPhotoView(
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
 
     val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicturePreview(),
-        onResult = {
-            val bos = ByteArrayOutputStream()
-            it?.compress(Bitmap.CompressFormat.JPEG, 80, bos)
-            onChange?.let { it(bos.toByteArray()) }
-        }
+        contract = ActivityResultContracts.TakePicture(),
+        onResult = { realUri = tempPhotoUri }
     )
-
     Surface(
         shape = CircleShape,
         border = BorderStroke(width = borderSize, color = MaterialTheme.colors.surface),
@@ -98,7 +98,7 @@ fun ContactPhotoView(
                 role = Role.Button,
                 onClick = {
                     if (cameraPermissionState.status.isGranted) {
-                        cameraLauncher.launch()
+                        cameraLauncher.launch(tempPhotoUri)
                     } else {
                         cameraAccessDenied = cameraPermissionState.status.shouldShowRationale
                         if (cameraAccessDenied) {
@@ -113,6 +113,7 @@ fun ContactPhotoView(
             )
         } else Modifier
     ) {
+
         if (bitmap == null) {
             Image(
                 painter = painterResource(id = R.drawable.ic_contact_placeholder),

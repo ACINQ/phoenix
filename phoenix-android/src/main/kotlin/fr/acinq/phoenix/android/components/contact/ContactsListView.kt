@@ -141,7 +141,7 @@ private fun ContactRow(contact: ContactInfo, canEditContact: Boolean, onEditCont
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Spacer(modifier = Modifier.width(12.dp))
-        ContactPhotoView(image = contact.photo?.toByteArray(), name = contact.name, onChange = null, imageSize = 32.dp, borderSize = 0.dp)
+        ContactPhotoView(photoUri = contact.photoUri, name = contact.name, onChange = null, imageSize = 32.dp, borderSize = 0.dp)
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = contact.name,

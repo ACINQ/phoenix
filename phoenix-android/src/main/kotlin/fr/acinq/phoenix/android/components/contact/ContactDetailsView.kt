@@ -84,7 +84,7 @@ fun ContactDetailsView(
     val scope = rememberCoroutineScope()
 
     var name by remember(contact) { mutableStateOf(contact.name) }
-    var photo by remember(contact) { mutableStateOf(contact.photo?.toByteArray()) }
+    var photoUri by remember(contact) { mutableStateOf(contact.photoUri) }
     var showAllDetails by remember { mutableStateOf(false) }
 
     ModalBottomSheet(
@@ -104,9 +104,9 @@ fun ContactDetailsView(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 if (onContactChange != null) {
-                    ContactPhotoView(image = photo, name = contact.name, onChange = { photo = it })
+                    ContactPhotoView(photoUri = photoUri, name = contact.name, onChange = { photoUri = it })
                 } else {
-                    ContactPhotoView(image = photo, name = contact.name, onChange = null)
+                    ContactPhotoView(photoUri = photoUri, name = contact.name, onChange = null)
                 }
                 Spacer(modifier = Modifier.height(24.dp))
                 TextInput(
@@ -139,10 +139,10 @@ fun ContactDetailsView(
                         Button(
                             text = stringResource(id = R.string.contact_save_button),
                             icon = R.drawable.ic_check,
-                            enabled = contact.name != name || contact.photo != photo?.byteVector(),
+                            enabled = contact.name != name || contact.photoUri != photoUri,
                             onClick = {
                                 scope.launch {
-                                    val newContact = contactsManager.updateContact(contact.id, name, photo, contact.offers)
+                                    val newContact = contactsManager.updateContact(contact.id, name, photoUri, contact.offers)
                                     onContactChange(newContact)
                                     onDismiss()
                                 }
