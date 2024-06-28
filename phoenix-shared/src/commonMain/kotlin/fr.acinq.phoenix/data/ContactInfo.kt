@@ -26,14 +26,14 @@ import fr.acinq.lightning.wire.OfferTypes
 data class ContactInfo(
     val id: UUID,
     val name: String,
-    val photo: ByteVector?,
+    val photoUri: String?,
     val offers: List<OfferTypes.Offer>,
     val publicKeys: List<PublicKey>,
 ) {
-    constructor(id: UUID, name: String, photo: ByteArray?, offers: List<OfferTypes.Offer>) : this(
+    constructor(id: UUID, name: String, photoUri: String?, offers: List<OfferTypes.Offer>) : this(
         id = id,
         name = name,
-        photo = photo?.byteVector(),
+        photoUri = photoUri,
         offers = offers,
         publicKeys = offers.map { it.contactNodeIds }.flatten()
     )

@@ -40,7 +40,7 @@ class ContactQueries(val database: AppDatabase) {
             queries.insertContact(
                 id = contact.id.toString(),
                 name = contact.name,
-                photo = null,
+                photoUri = contact.photoUri,
                 createdAt = currentTimestampMillis(),
                 updatedAt = null
             )
@@ -56,7 +56,7 @@ class ContactQueries(val database: AppDatabase) {
     }
 
     fun updateContact(contact: ContactInfo) {
-        queries.updateContact(name = contact.name, photo = contact.photo?.toByteArray(), updatedAt = currentTimestampMillis(), contactId = contact.id.toString())
+        queries.updateContact(name = contact.name, photoUri = contact.photoUri, updatedAt = currentTimestampMillis(), contactId = contact.id.toString())
     }
 
     /** Retrieve a contact from a transaction ID - should be done in a transaction. */
@@ -74,7 +74,7 @@ class ContactQueries(val database: AppDatabase) {
                 if (offers.isEmpty()) {
                     null
                 } else {
-                    ContactInfo(UUID.fromString(it.id), it.name, it.photo, offers)
+                    ContactInfo(UUID.fromString(it.id), it.name, it.photo_uri, offers)
                 }
             }
         }
@@ -87,7 +87,7 @@ class ContactQueries(val database: AppDatabase) {
             }?.filterIsInstance<Try.Success<OfferTypes.Offer>>()?.map {
                 it.get()
             } ?: emptyList()
-            ContactInfo(UUID.fromString(it.id), it.name, it.photo, offers)
+            ContactInfo(UUID.fromString(it.id), it.name, it.photo_uri, offers)
         }
     }
 
@@ -99,7 +99,7 @@ class ContactQueries(val database: AppDatabase) {
                 }?.filterIsInstance<Try.Success<OfferTypes.Offer>>()?.map {
                     it.get()
                 } ?: emptyList()
-                ContactInfo(UUID.fromString(it.id), it.name, it.photo, offers)
+                ContactInfo(UUID.fromString(it.id), it.name, it.photo_uri, offers)
             }
         }
     }

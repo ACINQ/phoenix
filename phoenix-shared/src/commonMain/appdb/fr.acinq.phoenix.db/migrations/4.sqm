@@ -7,7 +7,7 @@
 CREATE TABLE IF NOT EXISTS contacts (
      id TEXT NOT NULL PRIMARY KEY,
      name TEXT NOT NULL,
-     photo BLOB,
+     photo_uri TEXT,
      created_at INTEGER NOT NULL,
      updated_at INTEGER DEFAULT NULL
 );
