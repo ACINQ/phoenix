@@ -130,10 +130,15 @@
 
     <!-- receive: offer labels -->
 
-    <string name="receive_offer_howto_title">Hinweise zur Verwendung</string>
-    <string name="receive_offer_howto_details_1">Dieser QR-Code ist eine statische Adresse für Lightning, auch bekannt als \"Offer\" oder \"BOLT 12\".</string>
-    <string name="receive_offer_howto_details_2">Im Gegensatz zu herkömmlichen Lightning-Rechnungen läuft er nicht ab und kann beliebig wiederverwendet werden. Sie kann für Trinkgelder oder zur Bezahlung von Freunden verwendet werden.</string>
-    <string name="receive_offer_howto_details_3">Zurzeit unterstützen nur wenige Dienste diese neue Art von Adresse. Wenn Sie damit nicht bezahlt werden können, verwenden Sie stattdessen eine normale Lightning-Rechnung.</string>
+    <string name="receive_offer_howto_intro_1">🎉 Ihr wiederverwendbarer QR-Code</string>
+    <string name="receive_offer_howto_intro_2">Tippen Sie hier, um zu erfahren, wie Sie ihn verwenden können</string>
+    <string name="receive_offer_howto_details_1">Dieser Bolt12-Code ist Ihre statische Adresse auf Lightning. Damit können Sie andere ganz einfach Bitcoins schicken.</string>
+    <string name="receive_offer_howto_details_2">Im Gegensatz zu herkömmlichen Lightning-Rechnungen läuft er nicht ab und kann wiederverwendet werden.</string>
+    <string name="receive_offer_howto_details_3">Teilen Sie sie weiter: Sie können sie für Spenden, Trinkgelder oder für die Bezahlung Ihrer Freunde verwenden.</string>
+    <string name="receive_offer_howto_details_4_title">🛟 Wer unterstützt Bolt12?</string>
+    <string name="receive_offer_howto_details_4">Im Moment unterstützen nur wenige Dienste Bolt12. Wenn ein Dienst diese Rechnung ablehnt, lassen Sie ihn wissen, dass er etwas verpasst!</string>
+    <string name="receive_offer_howto_details_5_title">😴 Einschränkungen für Batterien</string>
+    <string name="receive_offer_howto_details_5">Überprüfen Sie, dass Android keinen Batteriesparmodus auf Phoenix anwendet. Andernfalls können Sie keine Zahlungen empfangen, wenn die App geschlossen ist oder sich im Hintergrund befindet. Die Aktivierung von TOR in Phoenix kann ebenfalls zu Problemen führen.</string>
     <string name="receive_offer_howto_details_faq_link">Erfahren Sie mehr</string>
 
     <!-- receive: Tor warning -->

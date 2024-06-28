@@ -832,40 +832,44 @@ private fun BumpTransactionDialog(
 
 @Composable
 fun translatePaymentError(paymentFailure: OutgoingPaymentFailure): String {
-    return when (val result = paymentFailure.explain()) {
-        is Either.Left -> {
-            when (val partFailure = result.value) {
-                is LightningOutgoingPayment.Part.Status.Failure.Uninterpretable -> partFailure.message
-                LightningOutgoingPayment.Part.Status.Failure.ChannelIsClosing -> stringResource(id = R.string.outgoing_failuremessage_channel_closing)
-                LightningOutgoingPayment.Part.Status.Failure.ChannelIsSplicing -> stringResource(id = R.string.outgoing_failuremessage_channel_splicing)
-                LightningOutgoingPayment.Part.Status.Failure.NotEnoughFees -> stringResource(id = R.string.outgoing_failuremessage_not_enough_fee)
-                LightningOutgoingPayment.Part.Status.Failure.NotEnoughFunds -> stringResource(id = R.string.outgoing_failuremessage_not_enough_balance)
-                LightningOutgoingPayment.Part.Status.Failure.PaymentAmountTooBig -> stringResource(id = R.string.outgoing_failuremessage_too_big)
-                LightningOutgoingPayment.Part.Status.Failure.PaymentAmountTooSmall -> stringResource(id = R.string.outgoing_failuremessage_too_small)
-                LightningOutgoingPayment.Part.Status.Failure.PaymentExpiryTooBig -> stringResource(id = R.string.outgoing_failuremessage_expiry_too_big)
-                LightningOutgoingPayment.Part.Status.Failure.RecipientRejectedPayment -> stringResource(id = R.string.outgoing_failuremessage_rejected_by_recipient)
-                LightningOutgoingPayment.Part.Status.Failure.RecipientIsOffline -> stringResource(id = R.string.outgoing_failuremessage_recipient_offline)
-                LightningOutgoingPayment.Part.Status.Failure.RecipientLiquidityIssue -> stringResource(id = R.string.outgoing_failuremessage_not_enough_liquidity)
-                LightningOutgoingPayment.Part.Status.Failure.TemporaryRemoteFailure -> stringResource(id = R.string.outgoing_failuremessage_temporary_failure)
-                LightningOutgoingPayment.Part.Status.Failure.TooManyPendingPayments -> stringResource(id = R.string.outgoing_failuremessage_too_many_pending)
+    val context = LocalContext.current
+    val errorMessage = remember(key1 = paymentFailure) {
+        when (val result = paymentFailure.explain()) {
+            is Either.Left -> {
+                when (val partFailure = result.value) {
+                    is LightningOutgoingPayment.Part.Status.Failure.Uninterpretable -> partFailure.message
+                    LightningOutgoingPayment.Part.Status.Failure.ChannelIsClosing -> context.getString(R.string.outgoing_failuremessage_channel_closing)
+                    LightningOutgoingPayment.Part.Status.Failure.ChannelIsSplicing -> context.getString(R.string.outgoing_failuremessage_channel_splicing)
+                    LightningOutgoingPayment.Part.Status.Failure.NotEnoughFees -> context.getString(R.string.outgoing_failuremessage_not_enough_fee)
+                    LightningOutgoingPayment.Part.Status.Failure.NotEnoughFunds -> context.getString(R.string.outgoing_failuremessage_not_enough_balance)
+                    LightningOutgoingPayment.Part.Status.Failure.PaymentAmountTooBig -> context.getString(R.string.outgoing_failuremessage_too_big)
+                    LightningOutgoingPayment.Part.Status.Failure.PaymentAmountTooSmall -> context.getString(R.string.outgoing_failuremessage_too_small)
+                    LightningOutgoingPayment.Part.Status.Failure.PaymentExpiryTooBig -> context.getString(R.string.outgoing_failuremessage_expiry_too_big)
+                    LightningOutgoingPayment.Part.Status.Failure.RecipientRejectedPayment -> context.getString(R.string.outgoing_failuremessage_rejected_by_recipient)
+                    LightningOutgoingPayment.Part.Status.Failure.RecipientIsOffline -> context.getString(R.string.outgoing_failuremessage_recipient_offline)
+                    LightningOutgoingPayment.Part.Status.Failure.RecipientLiquidityIssue -> context.getString(R.string.outgoing_failuremessage_not_enough_liquidity)
+                    LightningOutgoingPayment.Part.Status.Failure.TemporaryRemoteFailure -> context.getString(R.string.outgoing_failuremessage_temporary_failure)
+                    LightningOutgoingPayment.Part.Status.Failure.TooManyPendingPayments -> context.getString(R.string.outgoing_failuremessage_too_many_pending)
+                }
             }
-        }
-        is Either.Right -> {
-            when (result.value) {
-                FinalFailure.InvalidPaymentId -> stringResource(id = R.string.outgoing_failuremessage_invalid_id)
-                FinalFailure.AlreadyPaid -> stringResource(id = R.string.outgoing_failuremessage_alreadypaid)
-                FinalFailure.ChannelClosing -> stringResource(id = R.string.outgoing_failuremessage_channel_closing)
-                FinalFailure.ChannelNotConnected -> stringResource(id = R.string.outgoing_failuremessage_not_connected)
-                FinalFailure.ChannelOpening -> stringResource(id = R.string.outgoing_failuremessage_channel_opening)
-                FinalFailure.FeaturesNotSupported -> stringResource(id = R.string.outgoing_failuremessage_unsupported_features)
-                FinalFailure.InsufficientBalance -> stringResource(id = R.string.outgoing_failuremessage_not_enough_balance)
-                FinalFailure.InvalidPaymentAmount -> stringResource(id = R.string.outgoing_failuremessage_invalid_amount)
-                FinalFailure.NoAvailableChannels -> stringResource(id = R.string.outgoing_failuremessage_no_available_channels)
-                FinalFailure.RecipientUnreachable -> stringResource(id = R.string.outgoing_failuremessage_noroutefound)
-                FinalFailure.RetryExhausted -> stringResource(id = R.string.outgoing_failuremessage_noroutefound)
-                FinalFailure.UnknownError -> stringResource(id = R.string.outgoing_failuremessage_unknown)
-                FinalFailure.WalletRestarted -> stringResource(id = R.string.outgoing_failuremessage_restarted)
+            is Either.Right -> {
+                when (result.value) {
+                    FinalFailure.InvalidPaymentId -> context.getString(R.string.outgoing_failuremessage_invalid_id)
+                    FinalFailure.AlreadyPaid -> context.getString(R.string.outgoing_failuremessage_alreadypaid)
+                    FinalFailure.ChannelClosing -> context.getString(R.string.outgoing_failuremessage_channel_closing)
+                    FinalFailure.ChannelNotConnected -> context.getString(R.string.outgoing_failuremessage_not_connected)
+                    FinalFailure.ChannelOpening -> context.getString(R.string.outgoing_failuremessage_channel_opening)
+                    FinalFailure.FeaturesNotSupported -> context.getString(R.string.outgoing_failuremessage_unsupported_features)
+                    FinalFailure.InsufficientBalance -> context.getString(R.string.outgoing_failuremessage_not_enough_balance)
+                    FinalFailure.InvalidPaymentAmount -> context.getString(R.string.outgoing_failuremessage_invalid_amount)
+                    FinalFailure.NoAvailableChannels -> context.getString(R.string.outgoing_failuremessage_no_available_channels)
+                    FinalFailure.RecipientUnreachable -> context.getString(R.string.outgoing_failuremessage_noroutefound)
+                    FinalFailure.RetryExhausted -> context.getString(R.string.outgoing_failuremessage_noroutefound)
+                    FinalFailure.UnknownError -> context.getString(R.string.outgoing_failuremessage_unknown)
+                    FinalFailure.WalletRestarted -> context.getString(R.string.outgoing_failuremessage_restarted)
+                }
             }
         }
     }
+    return errorMessage
 }

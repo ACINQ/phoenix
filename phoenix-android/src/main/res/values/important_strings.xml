@@ -136,10 +136,15 @@
 
     <!-- receive: offer labels -->
 
-    <string name="receive_offer_howto_title">How to use</string>
-    <string name="receive_offer_howto_details_1">This QR code is a static address for Lightning, also known as \"offer\" or \"BOLT 12\".</string>
-    <string name="receive_offer_howto_details_2">Unlike traditional Lightning invoices, it does not expire and can be reused at will. It can be used for tips or to pay your friends.</string>
-    <string name="receive_offer_howto_details_3">For the moment, few services support this new type of address. If you can\'t get paid with it, use a normal Lightning invoice instead.</string>
+    <string name="receive_offer_howto_intro_1">🎉 Here is your reusable QR code!</string>
+    <string name="receive_offer_howto_intro_2">Tap to learn how to use it</string>
+    <string name="receive_offer_howto_details_1">This Bolt2 code is your static address on Lightning. It lets others send you bitcoins super easily.</string>
+    <string name="receive_offer_howto_details_2">Unlike traditional Lightning invoices, it does not expire, and can be reused.</string>
+    <string name="receive_offer_howto_details_3">Share it widely : it can be used for donations, tips, or to get paid by your friends.</string>
+    <string name="receive_offer_howto_details_4_title">🛟 Who supports Bolt12?</string>
+    <string name="receive_offer_howto_details_4">For the moment, few services support Bolt12. If a service rejects this invoice, let them know they\'re missing out!</string>
+    <string name="receive_offer_howto_details_5_title">😴 Battery restrictions</string>
+    <string name="receive_offer_howto_details_5">Check that Android does not apply a battery saving mode to Phoenix. Otherwise, you won\'t be able to receive payments if the app is closed or in the background. Enabling TOR in Phoenix will also cause issues.</string>
     <string name="receive_offer_howto_details_faq_link">Learn more</string>
 
     <!-- receive: Tor warning -->

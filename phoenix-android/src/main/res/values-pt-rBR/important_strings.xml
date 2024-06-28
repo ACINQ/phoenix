@@ -132,11 +132,16 @@
 
     <!-- receive: offer labels -->
 
-    <string name="receive_offer_howto_title">Como funciona</string>
-    <string name="receive_offer_howto_details_1">Esse código QR é um endereço de pagamento estático para o Lightning, também conhecido como \"offer\" ou \"BOLT 12\".</string>
-    <string name="receive_offer_howto_details_2">Ao contrário das solicitações de pagamento Lightning tradicionais, essa não expira e pode ser reutilizada à vontade. Ele pode ser usado para gorjetas ou para pagar amigos.</string>
-    <string name="receive_offer_howto_details_3">No momento, poucos serviços oferecem suporte a esse novo tipo de endereço. Se você não puder receber pagamentos com ele, use uma solicitação Lightning normal.</string>
-    <string name="receive_offer_howto_details_faq_link">Para saber mais</string>
+    <string name="receive_offer_howto_intro_1">🎉 Aqui está seu código QR reutilizável!</string>
+    <string name="receive_offer_howto_intro_2">Toque para saber como usá-lo</string>
+    <string name="receive_offer_howto_details_1">Este código Bolt12 é seu endereço estático no Lightning. Ele permite que outras pessoas enviem bitcoins para você de forma superfácil.</string>
+    <string name="receive_offer_howto_details_2">Ao contrário das faturas tradicionais do Lightning, ele não expira e pode ser reutilizado.</string>
+    <string name="receive_offer_howto_details_3">Compartilhe-a amplamente: ela pode ser usada para doações, gorjetas ou para receber pagamentos de seus amigos.</string>
+    <string name="receive_offer_howto_details_4_title">🛟 Quem apóia o Bolt12?</string>
+    <string name="receive_offer_howto_details_4">No momento, poucos serviços oferecem suporte ao Bolt12. Se um serviço rejeitar essa fatura, informe-o de que está perdendo!</string>
+    <string name="receive_offer_howto_details_5_title">😴 Restrições de bateria</string>
+    <string name="receive_offer_howto_details_5">Verifique se o Android não aplica um modo de economia de bateria ao Phoenix. Caso contrário, você não poderá receber pagamentos se o aplicativo estiver fechado ou em segundo plano. A ativação do TOR no Phoenix também causará problemas.</string>
+    <string name="receive_offer_howto_details_faq_link">Saiba mais</string>
 
     <!-- receive: Tor warning -->
 

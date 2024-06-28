@@ -133,11 +133,16 @@
 
     <!-- receive: offer labels -->
 
-    <string name="receive_offer_howto_title">Jak používat</string>
-    <string name="receive_offer_howto_details_1">Tento QR kód je statická adresa pro Lightning, známá také jako \"offer\" nebo \"BOLT 12\".</string>
-    <string name="receive_offer_howto_details_2">Na rozdíl od tradičních faktur Lightning nevyprší její platnost a lze ji libovolně používat opakovaně. Lze ji použít na spropitné nebo na placení přátelům.</string>
-    <string name="receive_offer_howto_details_3">Prozatím tento nový typ adresy podporuje jen několik služeb. Pokud s ní nemůžete dostat zaplaceno, použijte místo ní běžnou fakturu Lightning.</string>
-    <string name="receive_offer_howto_details_faq_link">Zjistěte více</string>
+    <string name="receive_offer_howto_intro_1">🎉 Zde je váš opakovaně použitelný QR kód!</string>
+    <string name="receive_offer_howto_intro_2">Klepnutím se dozvíte, jak jej používat</string>
+    <string name="receive_offer_howto_details_1">Tento kód Bolt12 je vaše statická adresa v Lightning. Umožňuje ostatním posílat vám bitcoiny velmi snadno.</string>
+    <string name="receive_offer_howto_details_2">Na rozdíl od tradičních Lightning faktur nevyprší a lze je znovu použít.</string>
+    <string name="receive_offer_howto_details_3">Sdílejte jej široce: lze jej použít k darům, tipům nebo k výplatě od vašich přátel.</string>
+    <string name="receive_offer_howto_details_4_title">🛟 Kdo podporuje Bolt12?</string>
+    <string name="receive_offer_howto_details_4">V tuto chvíli podporuje Bolt12 jen několik služeb. Pokud služba odmítne tuto fakturu, dejte jí vědět, že o ni přichází!</string>
+    <string name="receive_offer_howto_details_5_title">😴 Omezení baterie</string>
+    <string name="receive_offer_howto_details_5">Zkontrolujte, zda Android na Phoenix nepoužívá režim úspory baterie. V opačném případě nebudete moci přijímat platby, pokud je aplikace zavřená nebo na pozadí. Povolení TOR ve Phoenixu také způsobí problémy.</string>
+    <string name="receive_offer_howto_details_faq_link">Další informace</string>
 
     <!-- scanning errors -->
 

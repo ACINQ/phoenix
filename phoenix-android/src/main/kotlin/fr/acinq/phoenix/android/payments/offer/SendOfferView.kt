@@ -126,11 +126,11 @@ fun SendOfferView(
             }
         }
 
-        SplashLabelRow(label = stringResource(id = R.string.send_destination_label), icon = R.drawable.ic_zap) {
+        SplashLabelRow(label = stringResource(id = R.string.send_destination_label)) {
             ContactOrOfferView(offer = offer)
         }
 
-        SplashLabelRow(label = stringResource(id = R.string.send_offer_payer_note_label), icon = R.drawable.ic_message_circle) {
+        SplashLabelRow(label = stringResource(id = R.string.send_offer_payer_note_label)) {
             Clickable(
                 onClick = { showMessageDialog = true },
                 modifier = Modifier

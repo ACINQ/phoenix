@@ -16,14 +16,21 @@
 
 package fr.acinq.phoenix.android.utils
 
+import android.content.ContentValues
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
 import android.graphics.Color
+import android.os.Build
+import android.provider.MediaStore
 import android.util.Base64
 import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import com.google.zxing.qrcode.encoder.Encoder
-import org.slf4j.Logger
+import fr.acinq.lightning.utils.currentTimestampMillis
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
 import java.util.*
 
@@ -48,7 +55,7 @@ object BitmapHelper {
                 i++
             }
         }
-        return Bitmap.createScaledBitmap(Bitmap.createBitmap(rgbArray, width, height, Bitmap.Config.RGB_565), 200, 200, false)
+        return Bitmap.createScaledBitmap(Bitmap.createBitmap(rgbArray, width, height, Bitmap.Config.RGB_565), 260, 260, false)
     }
 
     /** Decode a base 64 encoded JPG or PNG image and return a [Bitmap] object. This may be used by lnurl-pay services when they want to provide an image for a payment. */
@@ -59,5 +66,53 @@ object BitmapHelper {
         log.debug("source=${source.take(40)} is not a valid image: ", e)
         null
     }
-}
 
+    suspend fun saveQRToGallery(context: Context, bitmap: Bitmap) {
+        withContext(Dispatchers.IO) {
+            try {
+                val contentResolver = context.contentResolver
+                val imageName = "phoenix_${currentTimestampMillis()}.jpg"
+
+                val values = ContentValues().apply {
+                    put(MediaStore.Images.Media.DISPLAY_NAME, imageName)
+                    put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+                    put(MediaStore.Images.Media.DATE_ADDED, currentTimestampMillis() / 1000)
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        put(MediaStore.Images.Media.IS_PENDING, 1)
+                    }
+                }
+                val imageUri = contentResolver.insert(
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+                    } else {
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                    }, values)
+                    ?: return@withContext null
+
+                val padding = 15
+                val paddedBitmap = {
+                    val outputimage = Bitmap.createBitmap(bitmap.getWidth() + padding * 2, bitmap.getHeight() + padding * 2, Bitmap.Config.RGB_565)
+                    val canvas = Canvas(outputimage)
+                    canvas.drawARGB(0xff, 0xff, 0xff, 0xff)
+                    canvas.drawBitmap(bitmap, padding.toFloat(), padding.toFloat(), null)
+                    outputimage
+                }
+
+                contentResolver.openOutputStream(imageUri)?.use {
+                    paddedBitmap.invoke().compress(Bitmap.CompressFormat.JPEG, 90, it)
+                }
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    values.clear()
+                    values.put(MediaStore.Images.Media.IS_PENDING, 0)
+                    contentResolver.update(imageUri, values, null, null)
+                }
+                return@withContext imageUri
+            } catch (e: Exception) {
+                log.error("failed to save image to disk: ", e)
+                return@withContext null
+            }
+        }
+    }
+}

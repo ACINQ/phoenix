@@ -133,11 +133,16 @@
 
     <!-- receive: offer labels -->
 
-    <string name="receive_offer_howto_title">Ako používať</string>
-    <string name="receive_offer_howto_details_1">Tento QR kód je statická adresa pre Lightning, známa aj ako \"offer\" alebo \"BOLT 12\".</string>
-    <string name="receive_offer_howto_details_2">Na rozdiel od tradičných faktúr Lightning nevyprší jej platnosť a môže sa ľubovoľne opakovane používať. Môžete ju použiť na prepitné alebo na zaplatenie svojim priateľom.</string>
-    <string name="receive_offer_howto_details_3">Tento nový typ adresy zatiaľ podporuje len málo služieb. Ak s ňou nemôžete dostať zaplatené, použite namiesto nej normálnu faktúru Lightning.</string>
-    <string name="receive_offer_howto_details_faq_link">Zistite viac</string>
+    <string name="receive_offer_howto_intro_1">🎉 Tu je váš opakovane použiteľný QR kód!</string>
+    <string name="receive_offer_howto_intro_2">Klepnutím sa dozviete, ako ho používať</string>
+    <string name="receive_offer_howto_details_1">Tento kód Bolt12 je vaša statická adresa v Lightning. Umožňuje ostatným posielať vám bitcoiny veľmi jednoducho.</string>
+    <string name="receive_offer_howto_details_2">Na rozdiel od tradičných faktúr Lightning nevyprší platnosť a možno ich znova použiť.</string>
+    <string name="receive_offer_howto_details_3">Zdieľajte ho široko: možno ho použiť na dary, tipy alebo na zaplatenie od priateľov.</string>
+    <string name="receive_offer_howto_details_4_title">🛟 Kto podporuje Bolt12?</string>
+    <string name="receive_offer_howto_details_4">V súčasnosti podporuje Bolt12 len málo služieb. Ak služba odmietne túto faktúru, dajte jej vedieť, že o ňu prichádza!</string>
+    <string name="receive_offer_howto_details_5_title">😴 Obmedzenia batérie</string>
+    <string name="receive_offer_howto_details_5">Skontrolujte, či systém Android neaplikuje na Phoenix režim šetrenia batérie. V opačnom prípade nebudete môcť prijímať platby, ak je aplikácia zatvorená alebo na pozadí. Problémy spôsobí aj povolenie TOR vo Phoenixe.</string>
+    <string name="receive_offer_howto_details_faq_link">Viac informácií</string>
 
     <!-- receive: Tor warning -->
 

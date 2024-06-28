@@ -18,6 +18,7 @@ package fr.acinq.phoenix.android.utils
 
 import android.content.Context
 import android.util.TypedValue
+import android.view.WindowManager
 import androidx.annotation.AttrRes
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -334,6 +335,15 @@ fun getColor(context: Context, @AttrRes attrRes: Int): Int {
     val typedValue = TypedValue()
     context.theme.resolveAttribute(attrRes, typedValue, true)
     return typedValue.data
+}
+
+fun updateScreenBrightnesss(context: Context, toMax: Boolean) {
+    val activity = context.safeFindActivity() ?: return
+    activity.window.attributes.apply {
+        screenBrightness = if (toMax) 1.0f else WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+    }.let {
+        activity.window.attributes = it
+    }
 }
 
 @Composable

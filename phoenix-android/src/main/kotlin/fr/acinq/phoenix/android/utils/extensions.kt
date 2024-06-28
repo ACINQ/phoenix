@@ -58,6 +58,15 @@ inline fun <T, R> T.ifLet(block: (T) -> R): R {
     return block(this)
 }
 
+fun Context.safeFindActivity(): MainActivity? {
+    var context = this
+    while (context is ContextWrapper) {
+        if (context is MainActivity) return context
+        context = context.baseContext
+    }
+    return null
+}
+
 fun Context.findActivity(): MainActivity {
     var context = this
     while (context is ContextWrapper) {

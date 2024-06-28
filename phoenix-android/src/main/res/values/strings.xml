@@ -125,10 +125,9 @@
     <string name="receive_lightning_share_subject">Lightning invoice</string>
     <string name="receive_lightning_share_title">Share this Lightning invoice with…</string>
     <string name="receive_lnurl_button">Use LNURL link</string>
+    <string name="receive_toggle_offer_button">Show reusable QR</string>
+    <string name="receive_toggle_offer_new_overlay">NEW!</string>
 
-    <string name="receive_offer_title">Static invoice</string>
-    <string name="receive_offer_help">Use this static invoice to receive payments over Lightning. This invoice does not expire and can be reused and serve as a personal address on social networks or for your friends.</string>
-    <string name="receive_offer_invoice_label">Invoice</string>
     <string name="receive_offer_share_title">Static Lightning invoice</string>
     <string name="receive_offer_share_subject">Share this static Lightning invoice with…</string>
 
@@ -686,7 +685,7 @@
     <string name="paymentsettings_overpayment_disabled">Disabled (default)</string>
 
     <string name="paymentsettings_random_payer_key_title">Random payer key</string>
-    <string name="paymentsettings_random_payer_key_desc">Enable if you don\'t want BOLT12 recipients to know that payments come from your wallet.</string>
+    <string name="paymentsettings_random_payer_key_desc">Enable if you don\'t want Bolt12 recipients to know that payments come from your wallet.</string>
 
     <!-- settings: currencies -->
 

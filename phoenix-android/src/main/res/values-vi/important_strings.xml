@@ -140,10 +140,15 @@
 
     <!-- receive: offer labels -->
 
-    <string name="receive_offer_howto_title">Cách sử dụng</string>
-    <string name="receive_offer_howto_details_1">Mã QR này là địa chỉ tĩnh cho Lightning, còn được gọi là \"offer\" hoặc \"BOLT 12\".</string>
-    <string name="receive_offer_howto_details_2">Không giống như hóa đơn Lightning truyền thống, nó không hết hạn và có thể được sử dụng lại theo ý muốn. Nó có thể được sử dụng để lấy tiền boa hoặc trả tiền cho bạn bè của bạn.</string>
-    <string name="receive_offer_howto_details_3">Hiện tại, rất ít dịch vụ hỗ trợ loại địa chỉ mới này. Nếu bạn không thể nhận được thanh toán bằng nó, thay vào đó hãy sử dụng hóa đơn Lightning thông thường.</string>
+    <string name="receive_offer_howto_intro_1">🎉 Đây là mã QR có thể sử dụng lại của bạn!</string>
+    <string name="receive_offer_howto_intro_2">Nhấn để tìm hiểu cách sử dụng</string>
+    <string name="receive_offer_howto_details_1">Mã Bolt12 này là địa chỉ tĩnh của bạn trên Lightning. Nó cho phép người khác gửi bitcoin cho bạn một cách siêu dễ dàng.</string>
+    <string name="receive_offer_howto_details_2">Không giống như hóa đơn Lightning truyền thống, nó không hết hạn và có thể được sử dụng lại.</string>
+    <string name="receive_offer_howto_details_3">Chia sẻ rộng rãi: nó có thể được sử dụng để quyên góp, tiền boa hoặc để được bạn bè của bạn trả tiền.</string>
+    <string name="receive_offer_howto_details_4_title">🛟 Ai ủng hộ Bolt12?</string>
+    <string name="receive_offer_howto_details_4">Hiện tại, rất ít dịch vụ hỗ trợ Bolt12. Nếu một dịch vụ từ chối hóa đơn này, hãy cho họ biết họ đang bỏ lỡ!</string>
+    <string name="receive_offer_howto_details_5_title">😴 Hạn chế về pin</string>
+    <string name="receive_offer_howto_details_5">Kiểm tra xem Android có áp dụng chế độ tiết kiệm pin cho Phoenix hay không. Nếu không, bạn sẽ không thể nhận thanh toán nếu ứng dụng bị đóng hoặc chạy ở chế độ nền. Kích hoạt TOR ở Phoenix cũng sẽ gây ra sự cố.</string>
     <string name="receive_offer_howto_details_faq_link">Tìm hiểu thêm</string>
 
     <!-- receive: Tor warning -->
