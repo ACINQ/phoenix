@@ -5052,6 +5052,9 @@
         }
       }
     },
+    "Address Book" : {
+
+    },
     "address type" : {
       "comment" : "Label in DetailsView_IncomingPayment",
       "localizations" : {
@@ -11442,6 +11445,9 @@
           }
         }
       }
+    },
+    "Contacts" : {
+
     },
     "continue to next step" : {
       "comment" : "VoiceOver hint",

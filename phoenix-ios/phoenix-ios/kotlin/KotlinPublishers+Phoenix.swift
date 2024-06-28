@@ -168,6 +168,28 @@ extension ConnectionsManager {
 	}
 }
 
+extension ContactsManager {
+	
+	fileprivate struct _Key {
+		static var contactsListPublisher = 0
+	}
+	
+	func contactsListPublisher() -> AnyPublisher<[ContactInfo], Never> {
+		
+		self.getSetAssociatedObject(storageKey: &_Key.contactsListPublisher) {
+			
+			// Transforming from Kotlin:
+			// `contactsList: StateFlow<List<ContactInfo>>`
+			//
+			KotlinCurrentValueSubject<NSArray>(
+				self.contactsList
+			)
+			.compactMap { $0 as? [ContactInfo] }
+			.eraseToAnyPublisher()
+		}
+	}
+}
+
 // MARK: -
 extension CurrencyManager {
 	

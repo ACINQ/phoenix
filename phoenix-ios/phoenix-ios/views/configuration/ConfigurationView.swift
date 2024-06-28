@@ -15,6 +15,7 @@ fileprivate enum NavLinkTag: String {
 	case WalletCreationOptions
 	case DisplayConfiguration
 	case PaymentOptions
+	case ContactsList
 	case Notifications
 	// Fees
 	case ChannelManagement
@@ -68,6 +69,7 @@ fileprivate struct ConfigurationList: View {
 	@Namespace var linkID_WalletCreationOptions
 	@Namespace var linkID_DisplayConfiguration
 	@Namespace var linkID_PaymentOptions
+	@Namespace var linkID_ContactsList
 	@Namespace var linkID_ChannelManagement
 	@Namespace var linkID_LiquidityManagement
 	@Namespace var linkID_Notifications
@@ -192,6 +194,15 @@ fileprivate struct ConfigurationList: View {
 				}
 				.id(linkID_PaymentOptions)
 			} // </if hasWallet>
+			
+			if hasWallet {
+				navLink(.ContactsList) {
+					Label { Text("Contacts") } icon: {
+						Image(systemName: "person.2")
+					}
+				}
+				.id(linkID_ContactsList)
+			}
 			
 			if hasWallet {
 				navLink(.Notifications) {
@@ -410,6 +421,7 @@ fileprivate struct ConfigurationList: View {
 			case .WalletCreationOptions : WalletCreationOptions()
 			case .DisplayConfiguration  : DisplayConfigurationView()
 			case .PaymentOptions        : PaymentOptionsView()
+			case .ContactsList          : ContactsList()
 			case .Notifications         : NotificationsView(location: .embedded)
 		// Fees
 			case .ChannelManagement     : LiquidityPolicyView()
@@ -599,6 +611,7 @@ fileprivate struct ConfigurationList: View {
 			case .PaymentOptions        : return linkID_PaymentOptions
 			case .ChannelManagement     : return linkID_ChannelManagement
 			case .LiquidityManagement   : return linkID_LiquidityManagement
+			case .ContactsList          : return linkID_ContactsList
 			case .Notifications         : return linkID_Notifications
 			
 			case .AppAccess             : return linkID_AppAccess

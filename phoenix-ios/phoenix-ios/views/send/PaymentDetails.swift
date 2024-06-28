@@ -139,6 +139,7 @@ struct PaymentDetails: View {
 							Image(systemName: "person.circle")
 								.resizable()
 								.aspectRatio(contentMode: .fit)
+								.foregroundColor(.gray)
 						}
 					}
 					.frame(width: 32, height: 32)
