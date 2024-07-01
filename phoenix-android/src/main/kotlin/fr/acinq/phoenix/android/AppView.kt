@@ -310,8 +310,10 @@ fun AppView(
                                 paymentId = paymentId,
                                 onBackClick = {
                                     val previousNav = navController.previousBackStackEntry
-                                    if (!navController.popBackStack() || (fromEvent && previousNav?.destination?.route == Screen.ScanData.route)) {
+                                    if (fromEvent && previousNav?.destination?.route == Screen.ScanData.route) {
                                         popToHome(navController)
+                                    } else {
+                                        navController.popBackStack()
                                     }
                                 },
                                 fromEvent = fromEvent

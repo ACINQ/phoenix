@@ -214,7 +214,7 @@ fun BottomBar(
     Box(
         modifier
             .fillMaxWidth()
-            .height(78.dp)
+            .height(82.dp)
             .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
             .background(MaterialTheme.colors.surface)
     ) {

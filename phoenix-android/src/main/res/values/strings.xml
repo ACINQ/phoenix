@@ -164,6 +164,8 @@
     <string name="send_offer_payer_note_dialog_title">Attach a custom message</string>
     <string name="send_offer_payer_note_dialog_subtitle">The recipient will see this message</string>
     <string name="send_offer_payer_note_dialog_placeholder">Enter a message…</string>
+    <string name="send_offer_payer_key_label">Payer key</string>
+    <string name="send_offer_payer_key_help">If random, the recipient will not know who made the payment.</string>
     <string name="send_offer_fetching">Fetching payment details…</string>
     <string name="send_offer_failure_title">Payment has failed</string>
     <string name="send_offer_failure_timeout">Could not retrieve payment details within a reasonable time.\n\nThe recipient may be offline or unreachable.</string>
@@ -432,7 +434,7 @@
     <string name="paymentdetails_payment_request_label">Invoice</string>
     <string name="paymentdetails_preimage_label">Preimage</string>
     <string name="paymentdetails_payerkey_label">Payer key</string>
-    <string name="paymentdetails_offer_label">Static invoice</string>
+    <string name="paymentdetails_offer_label">Offer</string>
     <string name="paymentdetails_bolt12_label">Bolt12 invoice</string>
     <string name="paymentdetails_offer_metadata_label">Metadata</string>
 
@@ -475,7 +477,7 @@
     <string name="contact_add_title">Attach a contact to an invoice</string>
     <string name="contact_name_label">Name</string>
     <string name="contact_photo_label">Photo</string>
-    <string name="contact_offer_label">Static invoice</string>
+    <string name="contact_offer_label">Offer</string>
     <string name="contact_offers_list_title">Known offers for this contact</string>
 
 
@@ -836,7 +838,6 @@
 
     <!-- settings: contacts list -->
 
-    <string name="settings_contacts_title">My contacts</string>
-    <string name="settings_contacts_help">Contacts allows you to link a name to a static invoice. They are stored locally.</string>
+    <string name="settings_contacts_help">Contacts allows you to link a name to a static offer. They are stored locally.</string>
 
 </resources>

@@ -47,7 +47,7 @@ fun SettingsContactsView(
         DefaultScreenHeader(
             onBackClick = onBackClick,
             content = {
-                Text(text = stringResource(id = R.string.settings_contacts_title))
+                Text(text = stringResource(id = R.string.settings_contacts))
                 IconPopup(popupMessage = stringResource(id = R.string.settings_contacts_help))
                 Spacer(modifier = Modifier.weight(1f))
                 Button(

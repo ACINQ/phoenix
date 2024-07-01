@@ -49,18 +49,22 @@ fun SwitchView(
     val interactionSource = remember { MutableInteractionSource() }
 
     Row(
-        modifier = modifier.clickable(
-            interactionSource = interactionSource,
-            indication = null,
-            role = Role.Checkbox,
-            enabled = enabled
-        ) {
-            internalChecked = !internalChecked
-            onCheckedChange(internalChecked)
-        }.padding(vertical = 6.dp),
+        modifier = modifier
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                role = Role.Checkbox,
+                enabled = enabled
+            ) {
+                internalChecked = !internalChecked
+                onCheckedChange(internalChecked)
+            }
+            .padding(vertical = 6.dp),
     ) {
         Column(
-            modifier = Modifier.weight(1f).padding(end = 16.dp)
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 16.dp)
         ) {
             Text(text = text, style = textStyle)
             if (description != null) {
@@ -78,5 +82,46 @@ fun SwitchView(
                     indication = rememberRipple(bounded = false, color = if (isDarkTheme) gray300 else gray600, radius = 28.dp)
                 )
         )
+    }
+}
+
+@Composable
+fun BasicSwitchWithText(
+    text: String,
+    checked: Boolean,
+    onCheckedChange: ((Boolean) -> Unit),
+    modifier: Modifier = Modifier,
+    textStyle: TextStyle = MaterialTheme.typography.body1,
+    enabled: Boolean = true,
+) {
+    var internalChecked by rememberSaveable { mutableStateOf(checked) }
+    val interactionSource = remember { MutableInteractionSource() }
+
+    Row(
+        modifier = modifier
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                role = Role.Checkbox,
+                enabled = enabled
+            ) {
+                internalChecked = !internalChecked
+                onCheckedChange(internalChecked)
+            }
+            .padding(vertical = 6.dp),
+    ) {
+        Switch(
+            checked = checked,
+            onCheckedChange = null,
+            modifier = Modifier
+                .enableOrFade(enabled)
+                .offset(y = (-2).dp)
+                .indication(
+                    interactionSource = interactionSource,
+                    indication = rememberRipple(bounded = false, color = if (isDarkTheme) gray300 else gray600, radius = 28.dp)
+                )
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(text = text, style = textStyle)
     }
 }

@@ -56,6 +56,7 @@ import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountHeroInput
 import fr.acinq.phoenix.android.components.AmountWithFiatRowView
 import fr.acinq.phoenix.android.components.BackButtonWithBalance
+import fr.acinq.phoenix.android.components.BasicSwitchWithText
 import fr.acinq.phoenix.android.components.Clickable
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.ProgressView
@@ -79,7 +80,7 @@ fun SendOfferView(
     val balance = business.balanceManager.balance.collectAsState(null).value
     val prefBitcoinUnit = LocalBitcoinUnit.current
 
-    val vm = viewModel<SendOfferViewModel>(factory = SendOfferViewModel.Factory(business.peerManager, business.nodeParamsManager))
+    val vm = viewModel<SendOfferViewModel>(factory = SendOfferViewModel.Factory(offer, business.contactsManager, business.peerManager, business.nodeParamsManager))
     val requestedAmount = offer.amount
     var amount by remember { mutableStateOf(requestedAmount) }
     val amountErrorMessage: String = remember(amount) {
@@ -157,12 +158,20 @@ fun SendOfferView(
                 AmountWithFiatRowView(amount = trampolineFees.calculateFees(amt))
             }
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+        SplashLabelRow(label = stringResource(id = R.string.send_offer_payer_key_label), helpMessage = stringResource(id = R.string.send_offer_payer_key_help)) {
+            vm.useOfferKey?.let {
+                BasicSwitchWithText(text = if (it) "Use your key" else "Use a random key", checked = it, onCheckedChange = { vm.useOfferKey = it })
+            } ?: ProgressView(text = stringResource(id = R.string.utils_loading_data))
+        }
         Spacer(modifier = Modifier.height(36.dp))
 
         SendOfferStateButton(
             state = vm.state,
             offer = offer,
             amount = amount,
+            useOfferKey = vm.useOfferKey,
             isAmountInError = amountErrorMessage.isNotBlank(),
             onSendClick = { amount, offer -> vm.sendOffer(amount, message, offer) },
             onPaymentSent = onPaymentSent,
@@ -179,6 +188,7 @@ private fun SendOfferStateButton(
     state: OfferState,
     offer: OfferTypes.Offer,
     amount: MilliSatoshi?,
+    useOfferKey: Boolean?,
     isAmountInError: Boolean,
     onSendClick: (MilliSatoshi, OfferTypes.Offer) -> Unit,
     onPaymentSent: () -> Unit,
@@ -210,7 +220,7 @@ private fun SendOfferStateButton(
                         stringResource(id = R.string.send_pay_button)
                     },
                     icon = R.drawable.ic_send,
-                    enabled = mayDoPayments && amount != null && !isAmountInError,
+                    enabled = mayDoPayments && amount != null && useOfferKey != null && !isAmountInError,
                 ) {
                     amount?.let { onSendClick(it, offer) }
                 }

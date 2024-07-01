@@ -33,6 +33,8 @@ import fr.acinq.lightning.payment.OutgoingPaymentFailure
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
+import fr.acinq.phoenix.data.ContactInfo
+import fr.acinq.phoenix.managers.ContactsManager
 import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.managers.PeerManager
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -49,27 +51,53 @@ sealed class OfferState {
         data class SendingOffer(val payment: LightningOutgoingPayment) : Complete()
         sealed class Failed : Complete() {
             data class Error(val throwable: Throwable) : Failed()
-            data object CouldNotGetInvoice: Failed()
-            data class PaymentNotSent(val reason : OutgoingPaymentFailure): Failed()
-            data object PayerNoteTooLong: Failed()
+            data object CouldNotGetInvoice : Failed()
+            data class PaymentNotSent(val reason: OutgoingPaymentFailure) : Failed()
+            data object PayerNoteTooLong : Failed()
         }
     }
 }
 
-class SendOfferViewModel(val peerManager: PeerManager, val nodeParamsManager: NodeParamsManager, val userPrefs: UserPrefsRepository) : ViewModel() {
+class SendOfferViewModel(
+    val offer: OfferTypes.Offer,
+    val contactsManager: ContactsManager,
+    val peerManager: PeerManager,
+    val nodeParamsManager: NodeParamsManager,
+    val userPrefs: UserPrefsRepository
+) : ViewModel() {
     private val log = LoggerFactory.getLogger(this::class.java)
 
     var state by mutableStateOf<OfferState>(OfferState.Init)
+    var contactForOffer by mutableStateOf<ContactInfo?>(null)
+        private set
+
+    var useOfferKey by mutableStateOf<Boolean?>(null)
+
+    init {
+        getContactForOffer()
+    }
+
+    private fun getContactForOffer() {
+        viewModelScope.launch {
+            contactForOffer = contactsManager.getContactForOffer(offer)
+            useOfferKey = contactForOffer != null
+        }
+    }
 
     fun sendOffer(amount: MilliSatoshi, message: String, offer: OfferTypes.Offer) {
         if (state is OfferState.FetchingInvoice) return
         state = OfferState.FetchingInvoice
+
         viewModelScope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, e ->
             log.error("error when paying offer payment: ", e)
         }) {
             val peer = peerManager.getPeer()
             val payerNote = message.takeIf { it.isNotBlank() }
-            val payerKey = if (userPrefs.getPayOfferWithRandomKey.first()) Lightning.randomKey() else nodeParamsManager.defaultOffer().payerKey
+            val payerKey = when (useOfferKey) {
+                null -> return@launch
+                false -> Lightning.randomKey()
+                true -> nodeParamsManager.defaultOffer().payerKey
+            }
             log.info("sending amount=$amount message=$message for offer=$offer")
             val paymentResult = peer.payOffer(
                 amount = amount,
@@ -88,13 +116,15 @@ class SendOfferViewModel(val peerManager: PeerManager, val nodeParamsManager: No
     }
 
     class Factory(
+        private val offer: OfferTypes.Offer,
+        private val contactsManager: ContactsManager,
         private val peerManager: PeerManager,
         private val nodeParamsManager: NodeParamsManager,
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
             val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as? PhoenixApplication)
             @Suppress("UNCHECKED_CAST")
-            return SendOfferViewModel(peerManager, nodeParamsManager, application.userPrefs) as T
+            return SendOfferViewModel(offer, contactsManager, peerManager, nodeParamsManager, application.userPrefs) as T
         }
     }
 }

@@ -301,12 +301,10 @@ private fun DetailsForLightningOutgoingPayment(
     val details = payment.details
     val status = payment.status
 
-    // -- recipient's public key
-    TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_pubkey_label), value = payment.recipient.toHex())
-
     // -- details of the payment
     when (details) {
         is LightningOutgoingPayment.Details.Normal -> {
+            TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_pubkey_label), value = payment.recipient.toHex())
             Bolt11InvoiceSection(invoice = details.paymentRequest)
         }
         is LightningOutgoingPayment.Details.SwapOut -> {
@@ -529,7 +527,6 @@ private fun Bolt11InvoiceSection(
             Text(text = description)
         }
     }
-
     TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = invoice.paymentHash.toHex())
     TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_request_label), value = invoice.write())
 }
