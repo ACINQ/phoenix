@@ -28,7 +28,7 @@ struct CopyOptionsSheet: View {
 						.imageScale(.medium)
 					Text("Copy Text")
 					Spacer()
-					Text(verbatim: textType)
+					Text(textType)
 						.font(.footnote)
 						.foregroundColor(.secondary)
 				}

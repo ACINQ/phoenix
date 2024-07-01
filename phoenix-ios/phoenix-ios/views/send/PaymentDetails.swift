@@ -125,7 +125,7 @@ struct PaymentDetails: View {
 		GridRow(alignment: VerticalAlignment.firstTextBaseline) {
 			titleColumn("Send To")
 				
-			if let contact = parent.contact {
+			if CONTACTS_ENABLED, let contact = parent.contact {
 				
 				HStack(alignment: VerticalAlignment.center, spacing: 4) {
 					Group {
@@ -168,12 +168,14 @@ struct PaymentDetails: View {
 								Text("Copy")
 							}
 						}
-					Button {
-						parent.showManageContactSheet()
-					} label: {
-						HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 2) {
-							Image(systemName: "person")
-							Text("Add contact")
+					if CONTACTS_ENABLED {
+						Button {
+							parent.showManageContactSheet()
+						} label: {
+							HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 2) {
+								Image(systemName: "person")
+								Text("Add contact")
+							}
 						}
 					}
 				} // </VStack>

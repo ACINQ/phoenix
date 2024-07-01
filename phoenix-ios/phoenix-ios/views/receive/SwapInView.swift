@@ -448,7 +448,7 @@ struct SwapInView: View {
 		smartModalState.display(dismissable: true) {
 			
 			CopyOptionsSheet(
-				textType: NSLocalizedString("(Bitcoin address)", comment: "Type of text being copied"),
+				textType: String(localized: "(Bitcoin address)", comment: "Type of text being copied"),
 				copyText: {	copyTextToPasteboard() },
 				copyImage: { copyImageToPasteboard() }
 			)

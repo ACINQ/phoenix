@@ -6,6 +6,12 @@ class QRCode : ObservableObject {
 	@Published var cgImage: CGImage? = nil
 	@Published var image: Image? = nil
 
+	func clear() {
+		self.value = nil
+		self.cgImage = nil
+		self.image = nil
+	}
+	
 	func generate(value: String) {
 		if value == self.value { return }
 		self.value = value

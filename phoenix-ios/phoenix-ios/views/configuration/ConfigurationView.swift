@@ -195,7 +195,7 @@ fileprivate struct ConfigurationList: View {
 				.id(linkID_PaymentOptions)
 			} // </if hasWallet>
 			
-			if hasWallet {
+			if hasWallet && CONTACTS_ENABLED {
 				navLink(.ContactsList) {
 					Label { Text("Contacts") } icon: {
 						Image(systemName: "person.2")

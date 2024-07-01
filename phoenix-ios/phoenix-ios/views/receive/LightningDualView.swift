@@ -1,29 +1,31 @@
 import SwiftUI
 import PhoenixShared
 
-fileprivate let filename = "LightningInvoiceView"
+fileprivate let filename = "LightningDualView"
 #if DEBUG && true
 fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-struct LightningInvoiceView: View {
+struct LightningDualView: View {
 	
 	@ObservedObject var mvi: MVIState<Receive.Model, Receive.Intent>
 	@ObservedObject var inboundFeeState: InboundFeeState
 	@ObservedObject var toast: Toast
 	
 	@Binding var didAppear: Bool
-	
-	@StateObject var qrCode = QRCode()
 
+	@StateObject var qrCode = QRCode()
+	
+	@State var offerStr: String? = nil
 	@State var isFullScreenQrcode = false
 	
-	// To workaround a bug in SwiftUI, we're using multiple namespaces for our animation.
-	// In particular, animating the border around the qrcode doesn't work well.
-	@Namespace private var qrCodeAnimation_inner
-	@Namespace private var qrCodeAnimation_outer
+	enum LightningType {
+		case bolt11_invoice
+		case bolt12_offer
+	}
+	@State var activeType: LightningType = .bolt11_invoice
 	
 	enum ReceiveViewSheet {
 		case sharingUrl(url: String)
@@ -35,6 +37,11 @@ struct LightningInvoiceView: View {
 	
 	@State var modificationAmount: CurrencyAmount? = nil
 	@State var currencyConverterOpen = false
+	
+	// To workaround a bug in SwiftUI, we're using multiple namespaces for our animation.
+	// In particular, animating the border around the qrcode doesn't work well.
+	@Namespace private var qrCodeAnimation_inner
+	@Namespace private var qrCodeAnimation_outer
 	
 	@Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
 	@Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
@@ -117,6 +124,9 @@ struct LightningInvoiceView: View {
 			
 			} // </switch>
 		}
+		.task {
+			await generateQrCode()
+		}
 	}
 	
 	@ViewBuilder
@@ -149,19 +159,9 @@ struct LightningInvoiceView: View {
 	@ViewBuilder
 	func main() -> some View {
 		
-		if verticalSizeClass == UserInterfaceSizeClass.compact {
-			mainLandscape()
-		} else {
-			mainPortrait()
-		}
-	}
-	
-	@ViewBuilder
-	func mainPortrait() -> some View {
-		
 		VStack {
 			
-			Text("Lightning Invoice")
+			Text(title())
 				.font(.title3)
 				.foregroundColor(Color(UIColor.tertiaryLabel))
 				.padding(.top)
@@ -170,85 +170,32 @@ struct LightningInvoiceView: View {
 			
 			if let warning = inboundFeeState.calculateInboundFeeWarning(invoiceAmount: invoiceAmount()) {
 				inboundFeeInfo(warning)
+					.padding(.top)
+					.padding(.horizontal)
 			}
 			
-			VStack(alignment: .center) {
+			qrCodeInfo()
+				.padding(.horizontal, 20)
+				.padding(.vertical)
 			
-				invoiceAmountView()
-					.font(.footnote)
-					.foregroundColor(.secondary)
-					.padding(.bottom, 2)
+			actionButtons()
+				.padding(.bottom)
 			
-				Text(invoiceDescription())
-					.lineLimit(1)
-					.font(.footnote)
-					.foregroundColor(.secondary)
-					.padding(.bottom, 2)
+			switchTypeButton()
+			
+			if activeType == .bolt12_offer {
+				howToUseButton()
+					.padding(.top)
 			}
-			.padding([.leading, .trailing], 20)
-			.padding([.top, .bottom])
-			
-			HStack(alignment: VerticalAlignment.center, spacing: 30) {
-				copyButton()
-				shareButton()
-				editButton()
-			}
-			.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
 			
 			if notificationPermissions == .disabled {
 				backgroundPaymentsDisabledWarning()
+					.padding(.top)
 			}
 			
 			Spacer()
 			
 		} // </VStack>
-	}
-	
-	@ViewBuilder
-	func mainLandscape() -> some View {
-		
-		HStack {
-			
-			qrCodeWrapperView()
-				.padding([.top, .bottom])
-			
-			VStack(alignment: HorizontalAlignment.center, spacing: 20) {
-				copyButton()
-				shareButton()
-				editButton()
-			}
-			.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
-			.padding()
-			
-			VStack(alignment: HorizontalAlignment.center) {
-			
-				Spacer()
-				
-				invoiceAmountView()
-					.font(.footnote)
-					.foregroundColor(.secondary)
-					.padding(.bottom, 6)
-			
-				Text(invoiceDescription())
-					.lineLimit(1)
-					.font(.footnote)
-					.foregroundColor(.secondary)
-				
-				if notificationPermissions == .disabled {
-					backgroundPaymentsDisabledWarning()
-						.padding(.top, 8)
-				}
-				if let warning = inboundFeeState.calculateInboundFeeWarning(invoiceAmount: invoiceAmount()) {
-					inboundFeeInfo(warning)
-						.padding(.top, 8)
-				}
-				
-				Spacer()
-			}
-			.frame(width: 240) // match width of QRcode box
-			.padding([.top, .bottom])
-			
-		} // </HStack>
 	}
 	
 	@ViewBuilder
@@ -311,34 +258,24 @@ struct LightningInvoiceView: View {
 	@ViewBuilder
 	func qrCodeView() -> some View {
 		
-		if let m = mvi.model as? Receive.Model_Generated,
-		   let qrCodeValue = qrCode.value,
-		   qrCodeValue.caseInsensitiveCompare(m.request) == .orderedSame,
-		   let qrCodeImage = qrCode.image
-		{
+		if let qrCodeImage = qrCode.image {
 			qrCodeImage
 				.resizable()
 				.aspectRatio(contentMode: .fit)
 				.contextMenu {
-					Button(action: {
+					Button {
 						copyImageToPasteboard()
-					}) {
+					} label: {
 						Text("Copy")
 					}
-					Button(action: {
+					Button {
 						shareImageToSystem()
-					}) {
+					} label: {
 						Text("Share")
 					}
-					Button(action: {
-						// We add a delay here to give the contextMenu time to finish it's own animation.
-						// Otherwise the effect of the double-animations looks funky.
-						DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-							withAnimation {
-								isFullScreenQrcode = true
-							}
-						}
-					}) {
+					Button {
+						showFullScreenQRCode()
+					} label: {
 						Text("Full Screen")
 					}
 				} // </contextMenu>
@@ -346,7 +283,7 @@ struct LightningInvoiceView: View {
 				.accessibilityElement()
 				.accessibilityAddTraits(.isImage)
 				.accessibilityLabel("QR code")
-				.accessibilityHint("Lightning invoice")
+				.accessibilityHint("Lightning QR code")
 				.accessibilityAction(named: "Copy Image") {
 					copyImageToPasteboard()
 				}
@@ -354,9 +291,7 @@ struct LightningInvoiceView: View {
 					shareImageToSystem()
 				}
 				.accessibilityAction(named: "Full Screen") {
-					withAnimation {
-						isFullScreenQrcode = true
-					}
+					showFullScreenQRCode()
 				}
 			
 		} else {
@@ -371,6 +306,29 @@ struct LightningInvoiceView: View {
 					.font(.caption)
 			}
 			.accessibilityElement(children: .combine)
+		}
+	}
+	
+	@ViewBuilder
+	func qrCodeInfo() -> some View {
+		
+		VStack(alignment: .center, spacing: 10) {
+		
+			if activeType == .bolt11_invoice {
+				invoiceAmountView()
+					.font(.footnote)
+					.foregroundColor(.secondary)
+			
+				Text(invoiceDescription())
+					.lineLimit(1)
+					.font(.footnote)
+					.foregroundColor(.secondary)
+				
+			} else {
+				addressView()
+					.font(.footnote)
+					.foregroundColor(.secondary)
+			}
 		}
 	}
 	
@@ -397,6 +355,39 @@ struct LightningInvoiceView: View {
 		} else {
 			Text("...")
 		}
+	}
+	
+	@ViewBuilder
+	func addressView() -> some View {
+		
+		if let offerStr = qrCode.value {
+			Text(offerStr)
+				.lineLimit(2)
+				.multilineTextAlignment(.center)
+				.truncationMode(.middle)
+				.contextMenu {
+					Button {
+						didTapCopyButton()
+					} label: {
+						Text("Copy")
+					}
+				}
+		} else {
+			Text(verbatim: "…")
+		}
+	}
+	
+	@ViewBuilder
+	func actionButtons() -> some View {
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 30) {
+			copyButton()
+			shareButton()
+			if activeType == .bolt11_invoice {
+				editButton()
+			}
+		}
+		.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
 	}
 	
 	@ViewBuilder
@@ -510,6 +501,57 @@ struct LightningInvoiceView: View {
 	}
 	
 	@ViewBuilder
+	func switchTypeButton() -> some View {
+		
+		switch activeType {
+		case .bolt11_invoice:
+			ZStack(alignment: .topLeading) {
+				Button {
+					toggleActiveType()
+				} label: {
+					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 2) {
+						Image(systemName: "qrcode")
+						Text("Show reusable QR")
+					}
+				}
+				.buttonStyle(.bordered)
+				.buttonBorderShape(.capsule)
+				
+				Text("NEW")
+					.font(.footnote)
+					.padding(.vertical, 2.5)
+					.padding(.horizontal, 7.5)
+					.foregroundColor(.white)
+					.background(Capsule().fill(Color.appAccent))
+					.offset(x: -15, y: -20)
+					.rotationEffect(.degrees(-45))
+			}
+			
+		case .bolt12_offer:
+			Button {
+				toggleActiveType()
+			} label: {
+				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 2) {
+					Image(systemName: "qrcode")
+					Text("Show one-time invoice")
+				}
+			}
+			.buttonStyle(.bordered)
+			.buttonBorderShape(.capsule)
+		}
+	}
+	
+	@ViewBuilder
+	func howToUseButton() -> some View {
+		
+		Button {
+			showBolt12Sheet()
+		} label: {
+			Label("How to use", systemImage: "info.circle")
+		}
+	}
+	
+	@ViewBuilder
 	func backgroundPaymentsDisabledWarning() -> some View {
 		
 		// The user has disabled "background payments"
@@ -551,8 +593,6 @@ struct LightningInvoiceView: View {
 			}
 			.font(.headline)
 		}
-		.padding(.top)
-		.padding(.horizontal)
 	}
 	
 	@ViewBuilder
@@ -568,6 +608,26 @@ struct LightningInvoiceView: View {
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
+	
+	func title() -> String {
+		
+		switch activeType {
+		case .bolt11_invoice:
+			return String(localized: "Lightning Invoice", comment: "Secondary title")
+		case .bolt12_offer:
+			return String(localized: "Lightning Offer", comment: "Secondary title")
+		}
+	}
+	
+	func textType() -> String {
+		
+		switch activeType {
+		case .bolt11_invoice:
+			return String(localized: "(Lightning invoice)", comment: "Type of text being copied")
+		case .bolt12_offer:
+			return String(localized: "(Lightning offer)", comment: "Type of text being copied")
+		}
+	}
 	
 	func invoiceAmount() -> Lightning_kmpMilliSatoshi? {
 		
@@ -601,7 +661,7 @@ struct LightningInvoiceView: View {
 		log.trace("onAppear()")
 		
 		// Careful: this function may be called multiple times
-		if didAppear {
+		guard !didAppear else {
 			return
 		}
 		didAppear = true
@@ -615,13 +675,33 @@ struct LightningInvoiceView: View {
 	}
 	
 	// --------------------------------------------------
+	// MARK: Tasks
+	// --------------------------------------------------
+	
+	func generateQrCode() async {
+		
+		do {
+			let offerData = try await Biz.business.nodeParamsManager.defaultOffer()
+			let offerString = offerData.defaultOffer.encode()
+			
+			offerStr = offerString
+			if activeType == .bolt12_offer {
+				qrCode.generate(value: offerString)
+			}
+			
+		} catch {
+			log.error("nodeParamsManager.defaultOffer(): error: \(error)")
+		}
+	}
+	
+	// --------------------------------------------------
 	// MARK: Notifications
 	// --------------------------------------------------
 	
 	func modelChanged(_ model: Receive.Model) {
 		log.trace("modelChanged()")
 		
-		if let m = model as? Receive.Model_Generated {
+		if activeType == .bolt11_invoice, let m = model as? Receive.Model_Generated {
 			log.debug("updating qr code...")
 			
 			// Issue #196: Use uppercase lettering for invoices and address QRs
@@ -682,19 +762,31 @@ struct LightningInvoiceView: View {
 	// MARK: Actions
 	// --------------------------------------------------
 	
-	func didTapCopyButton() -> Void {
+	func showFullScreenQRCode() {
+		log.trace("showFullScreenQRCode()")
+		
+		// We add a delay here to give the contextMenu time to finish it's own animation.
+		// Otherwise the effect of the double-animations looks funky.
+		DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+			withAnimation {
+				isFullScreenQrcode = true
+			}
+		}
+	}
+	
+	func didTapCopyButton() {
 		log.trace("didTapCopyButton()")
 		
 		copyTextToPasteboard()
 	}
 	
-	func didLongPressCopyButton() -> Void {
+	func didLongPressCopyButton() {
 		log.trace("didLongPressCopyButton()")
 		
 		smartModalState.display(dismissable: true) {
 			
 			CopyOptionsSheet(
-				textType: NSLocalizedString("(Lightning invoice)", comment: "Type of text being copied"),
+				textType: textType(),
 				copyText: { copyTextToPasteboard() },
 				copyImage: { copyImageToPasteboard() }
 			)
@@ -713,7 +805,7 @@ struct LightningInvoiceView: View {
 		smartModalState.display(dismissable: true) {
 			
 			ShareOptionsSheet(
-				textType: NSLocalizedString("(Lightning invoice)", comment: "Type of text being copied"),
+				textType: textType(),
 				shareText: { shareTextToSystem() },
 				shareImage: { shareImageToSystem() }
 			)
@@ -722,6 +814,8 @@ struct LightningInvoiceView: View {
 	
 	func didTapEditButton() -> Void {
 		log.trace("didTapEditButton()")
+		
+		// The edit button is only displayed for Bolt 11 invoices.
 		
 		if let model = mvi.model as? Receive.Model_Generated {
 			
@@ -734,6 +828,33 @@ struct LightningInvoiceView: View {
 					desc: model.desc ?? "",
 					currencyConverterOpen: $currencyConverterOpen
 				)
+			}
+		}
+	}
+	
+	func toggleActiveType() {
+		log.trace("toggleActiveType()")
+		
+		switch activeType {
+		case .bolt11_invoice:
+			// Switching to Bolt 12 offer
+			activeType = .bolt12_offer
+			
+			if let offerStr {
+				qrCode.generate(value: offerStr)
+			} else {
+				qrCode.clear()
+			}
+			
+		case .bolt12_offer:
+			// Switching to Bolt 11 invoice
+			activeType = .bolt11_invoice
+			
+			if let m = mvi.model as? Receive.Model_Generated {
+				// Issue #196: Use uppercase lettering for invoices and address QRs
+				qrCode.generate(value: m.request.uppercased())
+			} else {
+				qrCode.clear()
 			}
 		}
 	}
@@ -757,6 +878,14 @@ struct LightningInvoiceView: View {
 		}
 	}
 	
+	func showBolt12Sheet() {
+		log.trace("showBolt12Sheet()")
+		
+		smartModalState.display(dismissable: true) {
+			Bolt12Sheet()
+		}
+	}
+	
 	// --------------------------------------------------
 	// MARK: Utilities
 	// --------------------------------------------------
@@ -764,8 +893,8 @@ struct LightningInvoiceView: View {
 	func copyTextToPasteboard() -> Void {
 		log.trace("copyTextToPasteboard()")
 		
-		if let m = mvi.model as? Receive.Model_Generated {
-			UIPasteboard.general.string = m.request
+		if let qrCodeValue = qrCode.value {
+			UIPasteboard.general.string = qrCodeValue
 			toast.pop(
 				NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
 				colorScheme: colorScheme.opposite,
@@ -777,11 +906,7 @@ struct LightningInvoiceView: View {
 	func copyImageToPasteboard() -> Void {
 		log.trace("copyImageToPasteboard()")
 		
-		if let m = mvi.model as? Receive.Model_Generated,
-		   let qrCodeValue = qrCode.value,
-		   qrCodeValue.caseInsensitiveCompare(m.request) == .orderedSame,
-			let qrCodeCgImage = qrCode.cgImage
-		{
+		if let qrCodeCgImage = qrCode.cgImage {
 			let uiImg = UIImage(cgImage: qrCodeCgImage)
 			UIPasteboard.general.image = uiImg
 			toast.pop(
@@ -794,9 +919,9 @@ struct LightningInvoiceView: View {
 	func shareTextToSystem() -> Void {
 		log.trace("shareTextToSystem()")
 		
-		if let m = mvi.model as? Receive.Model_Generated {
+		if let qrCodeValue = qrCode.value {
 			withAnimation {
-				let url = "lightning:\(m.request)"
+				let url = "lightning:\(qrCodeValue)"
 				activeSheet = ReceiveViewSheet.sharingUrl(url: url)
 			}
 		}
@@ -805,13 +930,10 @@ struct LightningInvoiceView: View {
 	func shareImageToSystem() -> Void {
 		log.trace("shareImageToSystem()")
 		
-		if let m = mvi.model as? Receive.Model_Generated,
-		   let qrCodeValue = qrCode.value,
-		   qrCodeValue.caseInsensitiveCompare(m.request) == .orderedSame,
-			let qrCodeCgImage = qrCode.cgImage
-		{
+		if let qrCodeCgImage = qrCode.cgImage {
 			let uiImg = UIImage(cgImage: qrCodeCgImage)
 			activeSheet = ReceiveViewSheet.sharingImg(img: uiImg)
 		}
 	}
 }
+
