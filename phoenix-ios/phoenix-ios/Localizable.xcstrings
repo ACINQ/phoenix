@@ -15396,6 +15396,9 @@
         }
       }
     },
+    "Enable if you don't want Bolt12 recipients to know that payments come from your wallet." : {
+
+    },
     "Enable notifications in the Notification Center" : {
       "localizations" : {
         "ar" : {
@@ -30149,6 +30152,9 @@
           }
         }
       }
+    },
+    "Random payer key" : {
+
     },
     "Random server" : {
       "comment" : "Connection info",

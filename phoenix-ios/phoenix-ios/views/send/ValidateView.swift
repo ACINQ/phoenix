@@ -1588,11 +1588,19 @@ struct ValidateView: View {
 				let paymentId = Lightning_kmpUUID.companion.randomUUID()
 				Biz.beginLongLivedTask(id: paymentId.description())
 				
+				let payerKey: Bitcoin_kmpPrivateKey
+				if Prefs.shared.randomPayerKey {
+					payerKey = Lightning_randomKey()
+				} else {
+					let offerData = try await Biz.business.nodeParamsManager.defaultOffer()
+					payerKey = offerData.payerKey
+				}
+				
 				let result: Lightning_kmpSendPaymentResult = try await peer.altPayOffer(
 					paymentId: paymentId,
 					amount: Lightning_kmpMilliSatoshi(msat: msat),
 					offer: model.offer,
-					payerKey: Lightning_randomKey(),
+					payerKey: payerKey,
 					payerNote: payerNote,
 					fetchInvoiceTimeoutInSeconds: 30
 				)
@@ -1624,7 +1632,7 @@ struct ValidateView: View {
 		_ model: Scan.Model_OfferFlow,
 		_ msat: Int64
 	) {
-		log.trace("sendPayment_bolt12Offer()_C")
+		log.trace("sendPayment_bolt12Offer_C()")
 		
 		guard
 			let peer = Biz.business.peerManager.peerStateValue(),
@@ -1643,11 +1651,19 @@ struct ValidateView: View {
 				let paymentId = Lightning_kmpUUID.companion.randomUUID()
 				Biz.beginLongLivedTask(id: paymentId.description())
 				
+				let payerKey: Bitcoin_kmpPrivateKey
+				if Prefs.shared.randomPayerKey {
+					payerKey = Lightning_randomKey()
+				} else {
+					let offerData = try await Biz.business.nodeParamsManager.defaultOffer()
+					payerKey = offerData.payerKey
+				}
+				
 				let response: Lightning_kmpOfferNotPaid? = try await peer.betterPayOffer(
 					paymentId: paymentId,
 					amount: Lightning_kmpMilliSatoshi(msat: msat),
 					offer: model.offer,
-					payerKey: Lightning_randomKey(),
+					payerKey: payerKey,
 					payerNote: payerNote,
 					fetchInvoiceTimeoutInSeconds: 30
 				)
