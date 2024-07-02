@@ -18,16 +18,17 @@ package fr.acinq.phoenix.utils
 
 import app.cash.sqldelight.EnumColumnAdapter
 import app.cash.sqldelight.db.SqlDriver
-import app.cash.sqldelight.sqlite.driver.JdbcSqliteDriver
+import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.PublicKey
+import fr.acinq.bitcoin.TxId
 import fr.acinq.bitcoin.byteVector32
 import fr.acinq.eclair.db.sqlite.SqlitePaymentsDb
 import fr.acinq.lightning.ShortChannelId
 import fr.acinq.lightning.db.*
+import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.FinalFailure
-import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
@@ -106,7 +107,7 @@ class LegacyMigrationHelperTest {
                 id = UUID.fromString("5a7d44be-725b-430b-8ce3-92c5ed296074"),
                 recipientAmount = 1000.msat,
                 recipient = PublicKey.fromHex("020ec0c6a0c4fe5d8a79928ead294c36234a76f6e0dca896c35413612a3fd8dbf8"),
-                details = LightningOutgoingPayment.Details.Normal(PaymentRequest.read("lntb10n1p3tnfjkpp5rrmp00akdvl35nnhh4gqfp5rhuaa0kryhkz0ky5z78u82c2p2tlqdqqcqzpgxqyz5vqsp5xmvvr6sfrxs5vjpqgxq5p7aznd2eusxmgcj9hag8d06lxmdwxe8s9qyyssqttpwlngy7qaj7jg0xa2uae2gcm9zp9g5ly3yp6gxyh0zlrw2pun4tlsw2mfjwt0vsjwhtmvvn6tl0u9fg5jfle0jvxtd59h82kfff4qqefnasg")),
+                details = LightningOutgoingPayment.Details.Normal(Bolt11Invoice.read("lntb10n1p3tnfjkpp5rrmp00akdvl35nnhh4gqfp5rhuaa0kryhkz0ky5z78u82c2p2tlqdqqcqzpgxqyz5vqsp5xmvvr6sfrxs5vjpqgxq5p7aznd2eusxmgcj9hag8d06lxmdwxe8s9qyyssqttpwlngy7qaj7jg0xa2uae2gcm9zp9g5ly3yp6gxyh0zlrw2pun4tlsw2mfjwt0vsjwhtmvvn6tl0u9fg5jfle0jvxtd59h82kfff4qqefnasg").get()),
                 parts = listOf(
                     LightningOutgoingPayment.Part(
                         id = UUID.fromString("91018192-5eeb-4e23-a494-8579009a6117"),
@@ -145,7 +146,7 @@ class LegacyMigrationHelperTest {
         Assert.assertEquals(
             LightningOutgoingPayment.Details.SwapOut(
                 address = "2N1sjnTPsAaG3oGMHTHonANbHEERuiqN6k6",
-                paymentRequest = PaymentRequest.read("lntb128400n1p3tndjapp5hhluw7tvph7e7mr5qm6zyerstxmwwc6ydg3jwj2t5dyjzuvjzcdqdrhxycrqvpsypekzarnyp6x7gpjfcchx6nw23g8xstpguek736dfp2ysmmwg98xyjz9g4f826t3fcmxkd3qwa5hg6pqvejk2unpw3jn6v3sypekzap0vfuhgegsp5s55kw5r85788n2aahjqpmzanvx83a2q5ftas7h76c4ymm7cw2uvsxqzjccqzpu9q2sqqqqqysgqcd3f6mn22c5hd7c3dd96z79duczy40rgfcpfetg4ckdkghjwylcqqlesa9adhvqvvkkkz4n2tq6lvx23ju4y2wl9mluf5mheq83mecsp68xkxx"),
+                paymentRequest = Bolt11Invoice.read("lntb128400n1p3tndjapp5hhluw7tvph7e7mr5qm6zyerstxmwwc6ydg3jwj2t5dyjzuvjzcdqdrhxycrqvpsypekzarnyp6x7gpjfcchx6nw23g8xstpguek736dfp2ysmmwg98xyjz9g4f826t3fcmxkd3qwa5hg6pqvejk2unpw3jn6v3sypekzap0vfuhgegsp5s55kw5r85788n2aahjqpmzanvx83a2q5ftas7h76c4ymm7cw2uvsxqzjccqzpu9q2sqqqqqysgqcd3f6mn22c5hd7c3dd96z79duczy40rgfcpfetg4ckdkghjwylcqqlesa9adhvqvvkkkz4n2tq6lvx23ju4y2wl9mluf5mheq83mecsp68xkxx").get(),
                 swapOutFee = 2_840.sat
             ),
             payment2.details
@@ -161,7 +162,7 @@ class LegacyMigrationHelperTest {
         val payment3 = newOutgoingPayments[2] as LightningOutgoingPayment
         Assert.assertEquals(
             LightningOutgoingPayment.Status.Completed.Failed(
-                reason = FinalFailure.NoRouteToRecipient,
+                reason = FinalFailure.RecipientUnreachable,
                 completedAt = 1656338125658
             ),
             payment3.status
@@ -188,7 +189,7 @@ class LegacyMigrationHelperTest {
                 address = "2NBPdqEiX2Wb9VNTqNBXBjgCAnHvhBD8sc3",
                 isSentToDefaultAddress = false,
                 miningFees = 0.sat,
-                txId = ByteVector32.fromValidHex("24893dcd47403242e86e86344acfe69042bb5c1466df11cf43696fad7d29dfe3"),
+                txId = TxId("24893dcd47403242e86e86344acfe69042bb5c1466df11cf43696fad7d29dfe3"),
                 createdAt = 1656403710302,
                 confirmedAt = 1656403710302,
                 channelId = ByteVector32.fromValidHex("3749642f6caa1a13a9026f966eb13bd5a970ee237fb173d78602b2b31b7bc804"),
@@ -245,7 +246,7 @@ class LegacyMigrationHelperTest {
                             serviceFee = 0.msat,
                             miningFee = 0.sat,
                             channelId = ByteVector32.Zeroes,
-                            txId = ByteVector32.Zeroes,
+                            txId = TxId(ByteVector32.Zeroes),
                             confirmedAt = 1656333657766,
                             lockedAt = 1656333657766,
                         )
@@ -262,7 +263,7 @@ class LegacyMigrationHelperTest {
             IncomingPayment(
                 preimage = ByteVector32.fromValidHex("9f700505f700dc346a6690672b086c2baeeda1b7a914fb4bfabd3730fd840ed3"),
                 origin = IncomingPayment.Origin.Invoice(
-                    paymentRequest = PaymentRequest.read("lntb1p3tndtzpp50z03lfnmhacfhmmslwdcdkhrxcnrta7nt3vsv6nvv0n2gneqhvwqdqqxqyjw5q9qtzqqqqqq9qsqsp5x3e73hu5lz6jt8jt26hvnhdczymzmphkj9lqst6g5w626rel7uyqrzjqwfn3p9278ttzzpe0e00uhyxhned3j5d9acqak5emwfpflp8z2cnflc47j47yxdcyvqqqqlgqqqqqeqqjqhj5w494f0taflevylkhhzk0wjt7gep60zvkm7cg00vc7ql66z9xjmklquzq78ca3yfvk09vt90eqss9anvmg5ppk3nualqcex64qc3cpzz6cy8")
+                    paymentRequest = Bolt11Invoice.read("lntb1p3tndtzpp50z03lfnmhacfhmmslwdcdkhrxcnrta7nt3vsv6nvv0n2gneqhvwqdqqxqyjw5q9qtzqqqqqq9qsqsp5x3e73hu5lz6jt8jt26hvnhdczymzmphkj9lqst6g5w626rel7uyqrzjqwfn3p9278ttzzpe0e00uhyxhned3j5d9acqak5emwfpflp8z2cnflc47j47yxdcyvqqqqlgqqqqqeqqjqhj5w494f0taflevylkhhzk0wjt7gep60zvkm7cg00vc7ql66z9xjmklquzq78ca3yfvk09vt90eqss9anvmg5ppk3nualqcex64qc3cpzz6cy8").get()
                 ),
                 received = IncomingPayment.Received(
                     receivedWith = listOf(
@@ -284,7 +285,7 @@ class LegacyMigrationHelperTest {
             IncomingPayment(
                 preimage = ByteVector32.fromValidHex("5dbb9d8be5fd2887128a878b38312e71419c884083ec8b4d080881e75f2cd529"),
                 origin = IncomingPayment.Origin.Invoice(
-                    paymentRequest = PaymentRequest.read("lntb2580n1p3tnd5cpp5vyrhevjunf4mgnc3l3lv3lvatfclju78sawspahq43dg78szr55sdz4v3jhxcmjd9c8g6t0dcsxgefqd3sjqun9w96u82n5v5sxgefqwpskjetdv4h8ggrpdfhh2axr49jjqctkv9h8gxqyjw5q9qtzqqqqqq9qsqsp5fyg2nucw7ylnxhq0tweqmayg40fpzyaam4yllgjurcp0um06l6sqrzjqwfn3p9278ttzzpe0e00uhyxhned3j5d9acqak5emwfpflp8z2cnflc47j47yxdcyvqqqqlgqqqqqeqqjqw87qyltfk38twf0duded5tcla7gyl9tftqhd50wekt2yflcq9gdsmdakwx5y8hlhzjmc8t55xcwdlc4f0qe0f2nlgkytx7u7xew9fzspse82tn")
+                    paymentRequest = Bolt11Invoice.read("lntb2580n1p3tnd5cpp5vyrhevjunf4mgnc3l3lv3lvatfclju78sawspahq43dg78szr55sdz4v3jhxcmjd9c8g6t0dcsxgefqd3sjqun9w96u82n5v5sxgefqwpskjetdv4h8ggrpdfhh2axr49jjqctkv9h8gxqyjw5q9qtzqqqqqq9qsqsp5fyg2nucw7ylnxhq0tweqmayg40fpzyaam4yllgjurcp0um06l6sqrzjqwfn3p9278ttzzpe0e00uhyxhned3j5d9acqak5emwfpflp8z2cnflc47j47yxdcyvqqqqlgqqqqqeqqjqw87qyltfk38twf0duded5tcla7gyl9tftqhd50wekt2yflcq9gdsmdakwx5y8hlhzjmc8t55xcwdlc4f0qe0f2nlgkytx7u7xew9fzspse82tn").get()
                 ),
                 received = IncomingPayment.Received(
                     receivedWith = listOf(
@@ -308,7 +309,7 @@ class LegacyMigrationHelperTest {
             IncomingPayment(
                 preimage = ByteVector32.fromValidHex("0aad090727a9b936703f139f8ebf6a00089ded54eb767d2701b47c4fe0f9c99b"),
                 origin = IncomingPayment.Origin.Invoice(
-                    paymentRequest = PaymentRequest.read("lntb1p3tn3vvpp59ynarkswknrea32cqm9h643rfpm0qlkn3x3aywv9lmfusg3442yqdq6wpshjgr5dusx7ur9dcs0p8u3jqxqyjw5q9qtzqqqqqq9qsqsp5twl37zl60tkgdtuyztrrsn6wtku4asr5dvqavz40rynswcl4tppsrzjqwfn3p9278ttzzpe0e00uhyxhned3j5d9acqak5emwfpflp8z2cnflc47j47yxdcyvqqqqlgqqqqqeqqjq9x2drlj03tjjt3m64whev6dukrzrqr5l09edhj55g30yruqz6fw3z5zc927nwy0wld686ua2mfzgz63vlwgmcamdld8wpjzrms8m4ygphfrpe0")
+                    paymentRequest = Bolt11Invoice.read("lntb1p3tn3vvpp59ynarkswknrea32cqm9h643rfpm0qlkn3x3aywv9lmfusg3442yqdq6wpshjgr5dusx7ur9dcs0p8u3jqxqyjw5q9qtzqqqqqq9qsqsp5twl37zl60tkgdtuyztrrsn6wtku4asr5dvqavz40rynswcl4tppsrzjqwfn3p9278ttzzpe0e00uhyxhned3j5d9acqak5emwfpflp8z2cnflc47j47yxdcyvqqqqlgqqqqqeqqjq9x2drlj03tjjt3m64whev6dukrzrqr5l09edhj55g30yruqz6fw3z5zc927nwy0wld686ua2mfzgz63vlwgmcamdld8wpjzrms8m4ygphfrpe0").get()
                 ),
                 received = IncomingPayment.Received(
                     receivedWith = listOf(
@@ -317,7 +318,7 @@ class LegacyMigrationHelperTest {
                             channelId = ByteVector32.Zeroes,
                             serviceFee = 3_000_000.msat,
                             miningFee = 0.sat,
-                            txId = ByteVector32.Zeroes,
+                            txId = TxId(ByteVector32.Zeroes),
                             confirmedAt = 1656341949234,
                             lockedAt = 1656341949234,
                         )
@@ -335,14 +336,15 @@ class LegacyMigrationHelperTest {
             IncomingPayment(
                 preimage = ByteVector32.fromValidHex("7812c06a3f2d73fd8e30c65fb4c41744a7d60856e011396aff566782904502ee"),
                 origin = IncomingPayment.Origin.Invoice(
-                    paymentRequest = PaymentRequest.read("lntb1p3t4dcdpp58whdhw5lq62q4plz7w9z9awwwgcze27qaa052l7663w935xray5qdqqxqyjw5q9qtzqqqqqq9qsqsp5p5krwc4thmcy8ahsyrx2dfyhp7d2dxsxxsmlqxvmwstznzzmv8kqrzjqwfn3p9278ttzzpe0e00uhyxhned3j5d9acqak5emwfpflp8z2cnflc47j47yxdcyvqqqqlgqqqqqeqqjqaednnnjuxh0kvpa8l4mtt2wsum0jxhywsu5ak4m436shxpg0cjc46y7973npskzqk4kl4lhqxr3zmqn3euzx6dy4q474awm26j9amgcpef0uwk")
+                    paymentRequest = Bolt11Invoice.read("lntb1p3t4dcdpp58whdhw5lq62q4plz7w9z9awwwgcze27qaa052l7663w935xray5qdqqxqyjw5q9qtzqqqqqq9qsqsp5p5krwc4thmcy8ahsyrx2dfyhp7d2dxsxxsmlqxvmwstznzzmv8kqrzjqwfn3p9278ttzzpe0e00uhyxhned3j5d9acqak5emwfpflp8z2cnflc47j47yxdcyvqqqqlgqqqqqeqqjqaednnnjuxh0kvpa8l4mtt2wsum0jxhywsu5ak4m436shxpg0cjc46y7973npskzqk4kl4lhqxr3zmqn3euzx6dy4q474awm26j9amgcpef0uwk").get()
                 ),
                 received = IncomingPayment.Received(
                     receivedWith = listOf(
                         IncomingPayment.ReceivedWith.NewChannel(
                             amount = 562_212_000.msat,
                             channelId = ByteVector32.Zeroes,
-                            txId = ByteVector32.Zeroes,
+                            txId = TxId(
+                                ByteVector32.Zeroes),
                             serviceFee = 5_678_000.msat,
                             miningFee = 0.sat,
                             confirmedAt = 1656403752448,

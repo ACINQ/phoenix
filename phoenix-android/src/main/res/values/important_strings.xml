@@ -76,6 +76,7 @@
     <string name="settings_payment_settings">Payment options</string>
     <string name="settings_payment_history">Payment history</string>
     <string name="settings_notifications">Notifications</string>
+    <string name="settings_contacts">My contacts</string>
 
     <!-- home: swap help -->
 
@@ -84,6 +85,14 @@
     <string name="home_swapin_help_ready_disabled">Deposits will remain on-chain because automated channels management is disabled.</string>
     <string name="home_swapin_help_generic">On-chain funds have been deposited into your wallet.</string>
     <string name="home_swapin_help_button">Tap for details</string>
+
+    <string name="home_background_restriction_title">Background processing restricted</string>
+    <string name="home_background_restriction_body_1">Phoenix will not be able to receive payments when it is in the background, or when it is closed.</string>
+    <string name="home_background_restriction_body_2">This happens because:</string>
+    <string name="home_background_restriction_tor">Tor is enabled</string>
+    <string name="home_background_restriction_powersaver">The device is in power saving mode</string>
+    <string name="home_background_restriction_fcm">FCM notifications unavailable</string>
+    <string name="home_background_restriction_fcm_details">If you\'re on GrapheneOS or CalyxOS, install Google Play Services to get FCM notifications. Check the FAQ for guidance.</string>
 
     <!-- home: bottom menu -->
 
@@ -132,6 +141,27 @@
     <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">A fee of %1$s is expected to receive this amount, and that fee is more than %2$s%% of the amount.\n\nIncrease this limit in the channel management settings, or request additional liquidity.</string>
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Inbound liquidity is insufficient for this amount, and you have disabled automated channel management.</string>
+
+    <!-- receive: offer labels -->
+
+    <string name="receive_toggle_offer_button">Show reusable QR code</string>
+
+    <string name="receive_offer_howto_intro_1">🎉 Here is your reusable payment request!</string>
+    <string name="receive_offer_howto_intro_2">Tap to learn how to use it</string>
+    <string name="receive_offer_howto_details_1">This Bolt12 payment request is the Lightning equivalent to a Bitcoin address.</string>
+    <string name="receive_offer_howto_details_2">Unlike traditional Lightning invoices, it does not expire and can be reused.</string>
+    <string name="receive_offer_howto_details_3">Share it widely : for donations, tips, or to get paid by your friends.</string>
+    <string name="receive_offer_howto_details_4_title">🛟 Who supports Bolt12?</string>
+    <string name="receive_offer_howto_details_4">For the moment, few services support Bolt12. If a service rejects this invoice, let them know they\'re missing out!</string>
+    <string name="receive_offer_howto_details_5_title">🔋 Battery restrictions</string>
+    <string name="receive_offer_howto_details_5">Check that Android does not apply a battery saving mode to Phoenix. Otherwise, you won\'t be able to receive payments if the app is closed or in the background. Enabling TOR in Phoenix will also cause issues.</string>
+    <string name="receive_offer_howto_details_faq_link">Learn more</string>
+
+    <!-- receive: Tor warning -->
+
+    <string name="receive_tor_warning_title">Tor is enabled</string>
+    <string name="receive_tor_warning_dialog_content_1">Phoenix cannot receive payments in the background.</string>
+    <string name="receive_tor_warning_dialog_content_2">To avoid payment failures, use Orbot instead, or make sure Phoenix remain visible in the foreground when payments are sent to you.</string>
 
     <!-- scanning errors -->
 
@@ -236,7 +266,11 @@
 
     <!-- Tor -->
 
-    <string name="tor_settings_subtitle">Phoenix can use Tor to shield your IP from the other nodes in the Lightning Network and Electrum servers.\n\nEnabling Tor will improve your privacy, but may cause payment issues if your connection is unstable.</string>
+    <string name="tor_settings_subtitle">Phoenix can use Tor to shield your IP from the other nodes in the Lightning Network and Electrum servers.</string>
+
+    <string name="tor_confirm_dialog_title">Enable Tor ?</string>
+    <string name="tor_confirm_dialog_details_1">Tor is slow and will impact the performance of your payments.</string>
+    <string name="tor_confirm_dialog_details_2">Specifically, you <b>will not be able to receive payments</b> if Phoenix is in the background, or if it\'s closed.</string>
 
     <!-- about -->
 

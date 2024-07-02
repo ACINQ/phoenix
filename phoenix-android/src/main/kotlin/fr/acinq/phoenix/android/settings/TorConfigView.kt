@@ -23,7 +23,11 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -33,6 +37,7 @@ import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.userPrefs
+import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.orange
 import fr.acinq.phoenix.android.utils.positiveColor
@@ -47,14 +52,13 @@ fun TorConfigView() {
     val torEnabledState = userPrefs.getIsTorEnabled.collectAsState(initial = null)
     val connState = business.connectionsManager.connections.collectAsState()
 
+    var showConfirmTorDialog by remember { mutableStateOf(false) }
+
     DefaultScreenLayout {
         DefaultScreenHeader(
             onBackClick = { nc.popBackStack() },
             title = stringResource(id = R.string.tor_settings_title),
         )
-        Card {
-            Text(text = stringResource(id = R.string.tor_settings_subtitle), modifier = Modifier.padding(16.dp))
-        }
         val isTorEnabled = torEnabledState.value
         Card {
             if (isTorEnabled == null) {
@@ -62,18 +66,24 @@ fun TorConfigView() {
             } else {
                 SettingSwitch(
                     title = stringResource(id = if (isTorEnabled) R.string.tor_settings_enabled else R.string.tor_settings_disabled),
+                    description = stringResource(id = R.string.tor_settings_subtitle),
                     icon = R.drawable.ic_tor_shield,
                     enabled = true,
                     isChecked = isTorEnabled,
-                    onCheckChangeAttempt = {
+                    onCheckChangeAttempt = { enableTor ->
                         scope.launch {
-                            business.appConfigurationManager.updateTorUsage(it)
-                            userPrefs.saveIsTorEnabled(it)
+                            if (enableTor) {
+                                showConfirmTorDialog = true
+                            } else {
+                                business.appConfigurationManager.updateTorUsage(false)
+                                userPrefs.saveIsTorEnabled(false)
+                            }
                         }
                     }
                 )
             }
         }
+
         if (isTorEnabled == true) {
             Card {
                 val torState = connState.value.tor
@@ -84,7 +94,6 @@ fun TorConfigView() {
                         Connection.ESTABLISHED -> stringResource(R.string.tor_settings_state_started)
                         else -> stringResource(R.string.tor_settings_state_unknown)
                     },
-                    description = { Text(text = stringResource(id = R.string.tor_settings_state_about_perfs)) },
                     decoration = {
                         Row(modifier = Modifier.width(width = ButtonDefaults.IconSize), horizontalArrangement = Arrangement.Center) {
                             Surface(
@@ -99,6 +108,38 @@ fun TorConfigView() {
                         }
                     }
                 )
+            }
+        }
+    }
+
+    if (showConfirmTorDialog) {
+        var hasReadMessage by remember { mutableStateOf(false) }
+        Dialog(
+            onDismiss = { showConfirmTorDialog = false },
+            title = stringResource(id = R.string.tor_confirm_dialog_title),
+            buttons = {
+                Button(text = stringResource(id = R.string.btn_cancel), onClick = { showConfirmTorDialog = false })
+                Spacer(modifier = Modifier.width(16.dp))
+                Button(
+                    text = stringResource(id = R.string.btn_confirm),
+                    icon = R.drawable.ic_check_circle,
+                    onClick = {
+                        scope.launch {
+                            business.appConfigurationManager.updateTorUsage(true)
+                            userPrefs.saveIsTorEnabled(true)
+                        }
+                        showConfirmTorDialog = false
+                    },
+                    enabled = hasReadMessage
+                )
+            }
+        ) {
+            Column(modifier = Modifier.padding(horizontal = 24.dp)) {
+                Text(text = stringResource(id = R.string.tor_confirm_dialog_details_1))
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(text = annotatedStringResource(id = R.string.tor_confirm_dialog_details_2))
+                Spacer(modifier = Modifier.height(12.dp))
+                Checkbox(text = stringResource(id = R.string.utils_ack), checked = hasReadMessage, onCheckedChange = { hasReadMessage = it })
             }
         }
     }

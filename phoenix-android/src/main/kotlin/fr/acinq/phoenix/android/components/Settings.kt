@@ -25,7 +25,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
@@ -66,13 +65,15 @@ fun SettingWithCopy(
     title: String,
     titleMuted: String? = null,
     value: String,
-    maxLinesValue: Int = Int.MAX_VALUE,
+    maxLines: Int = Int.MAX_VALUE,
 ) {
     val context = LocalContext.current
     Row {
-        Column(modifier = Modifier
-            .padding(start = 16.dp, top = 12.dp, bottom = 12.dp)
-            .weight(1f)) {
+        Column(
+            modifier = Modifier
+                .padding(start = 16.dp, top = 12.dp, bottom = 12.dp)
+                .weight(1f)
+        ) {
             Row {
                 Text(
                     text = title,
@@ -84,14 +85,13 @@ fun SettingWithCopy(
                     Text(
                         text = titleMuted,
                         style = MaterialTheme.typography.subtitle2.copy(fontSize = 12.sp),
-                        modifier = Modifier
-                            .alignByBaseline(),
+                        modifier = Modifier.alignByBaseline(),
                     )
                 }
 
             }
             Spacer(modifier = Modifier.height(2.dp))
-            Text(text = value, style = MaterialTheme.typography.subtitle2, maxLines = maxLinesValue, overflow = TextOverflow.Ellipsis)
+            Text(text = value, style = MaterialTheme.typography.subtitle2, maxLines = maxLines, overflow = TextOverflow.Ellipsis)
         }
         Button(
             icon = R.drawable.ic_copy,
@@ -211,8 +211,7 @@ fun SettingSwitch(
     Column(
         modifier
             .fillMaxWidth()
-            .clickable(onClick = { if (enabled) onCheckChangeAttempt(!isChecked) })
-            .enableOrFade(enabled)
+            .clickable(onClick = { if (enabled) onCheckChangeAttempt(!isChecked) }, enabled = enabled)
             .padding(horizontal = 16.dp, vertical = 12.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -220,9 +219,9 @@ fun SettingSwitch(
                 PhoenixIcon(it, Modifier.size(ButtonDefaults.IconSize))
                 Spacer(Modifier.width(12.dp))
             }
-            Text(text = title, style = MaterialTheme.typography.body2, modifier = Modifier.weight(1f))
+            Text(text = title, style = if (enabled) MaterialTheme.typography.body2 else MaterialTheme.typography.caption, modifier = Modifier.weight(1f))
             Spacer(Modifier.width(16.dp))
-            Switch(checked = isChecked, onCheckedChange = null)
+            Switch(checked = isChecked, onCheckedChange = null, enabled = enabled, modifier = Modifier.enableOrFade(enabled))
         }
         if (description != null) {
             Spacer(modifier = Modifier.height(2.dp))

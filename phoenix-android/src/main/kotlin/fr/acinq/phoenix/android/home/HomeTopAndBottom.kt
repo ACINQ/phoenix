@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -44,14 +45,13 @@ import fr.acinq.phoenix.android.components.BorderButton
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Dialog
 import fr.acinq.phoenix.android.components.FilledButton
+import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.VSeparator
 import fr.acinq.phoenix.android.components.openLink
 import fr.acinq.phoenix.android.utils.isBadCertificate
-import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.android.utils.warningColor
-import fr.acinq.phoenix.data.canRequestLiquidity
 import fr.acinq.phoenix.managers.Connections
 
 @Composable
@@ -62,6 +62,8 @@ fun TopBar(
     electrumBlockheight: Int,
     onTorClick: () -> Unit,
     isTorEnabled: Boolean?,
+    isFCMUnavailable: Boolean,
+    isPowerSaverMode: Boolean,
     inFlightPaymentsCount: Int,
     showRequestLiquidity: Boolean,
     onRequestLiquidityClick: () -> Unit,
@@ -87,6 +89,12 @@ fun TopBar(
             InflightPaymentsBadge(inFlightPaymentsCount)
         }
 
+        BackgroundRestrictionBadge(
+            isFCMUnavailable = isFCMUnavailable,
+            isTorEnabled = isTorEnabled == true,
+            isPowerSaverMode = isPowerSaverMode
+        )
+
         Spacer(modifier = Modifier.weight(1f))
 
         if (showRequestLiquidity) {
@@ -102,21 +110,17 @@ fun TopBar(
             Spacer(modifier = Modifier.width(4.dp))
         }
 
-        FilledButton(
+        TopBadgeButton(
             text = stringResource(R.string.home__faq_button),
             icon = R.drawable.ic_help_circle,
             iconTint = MaterialTheme.colors.onSurface,
             onClick = { openLink(context, "https://phoenix.acinq.co/faq") },
-            textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp),
-            backgroundColor = MaterialTheme.colors.surface,
-            space = 8.dp,
-            padding = PaddingValues(8.dp),
         )
     }
 }
 
 @Composable
-private fun RowScope.ConnectionBadge(
+private fun ConnectionBadge(
     onConnectionsStateButtonClick: () -> Unit,
     connections: Connections,
     electrumBlockheight: Int,
@@ -137,62 +141,122 @@ private fun RowScope.ConnectionBadge(
     if (connections.electrum !is Connection.ESTABLISHED || connections.peer !is Connection.ESTABLISHED) {
         val electrumConnection = connections.electrum
         val isBadElectrumCert = electrumConnection is Connection.CLOSED && electrumConnection.isBadCertificate()
-        FilledButton(
+        TopBadgeButton(
             text = stringResource(id = if (isBadElectrumCert) R.string.home__connection__bad_cert else R.string.home__connection__connecting),
             icon = if (isBadElectrumCert) R.drawable.ic_alert_triangle else R.drawable.ic_connection_lost,
             iconTint = if (isBadElectrumCert) negativeColor else MaterialTheme.colors.onSurface,
             onClick = onConnectionsStateButtonClick,
-            textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp, color = if (isBadElectrumCert) negativeColor else MaterialTheme.colors.onSurface),
-            backgroundColor = MaterialTheme.colors.surface,
-            space = 8.dp,
-            padding = PaddingValues(8.dp),
             modifier = Modifier.alpha(connectionsButtonAlpha)
         )
     } else if (electrumBlockheight < 795_000) {
         // FIXME use a dynamic blockheight ^
-        FilledButton(
+        TopBadgeButton(
             text = stringResource(id = R.string.home__connection__electrum_late),
             icon = R.drawable.ic_alert_triangle,
             iconTint = warningColor,
             onClick = onConnectionsStateButtonClick,
-            textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp),
-            backgroundColor = MaterialTheme.colors.surface,
-            space = 8.dp,
-            padding = PaddingValues(8.dp),
             modifier = Modifier.alpha(connectionsButtonAlpha)
         )
     } else if (isTorEnabled == true) {
         if (connections.tor is Connection.ESTABLISHED) {
-            FilledButton(
+            TopBadgeButton(
                 text = stringResource(id = R.string.home__connection__tor_active),
                 icon = R.drawable.ic_tor_shield_ok,
                 iconTint = positiveColor,
                 onClick = onTorClick,
-                textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp),
-                backgroundColor = mutedBgColor,
-                space = 8.dp,
-                padding = PaddingValues(8.dp)
             )
+        }
+    }
+
+    Spacer(modifier = Modifier.width(4.dp))
+}
+
+@Composable
+private fun TopBadgeButton(
+    text: String?,
+    icon: Int,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    iconTint: Color = MaterialTheme.colors.primary,
+) {
+    FilledButton(
+        text = text,
+        icon = icon,
+        iconTint = iconTint,
+        onClick = onClick,
+        textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp),
+        backgroundColor = MaterialTheme.colors.surface,
+        space = 8.dp,
+        padding = PaddingValues(8.dp),
+        modifier = modifier.widthIn(max = 120.dp),
+        maxLines = 1
+    )
+}
+
+@Composable
+private fun BackgroundRestrictionBadge(
+    isTorEnabled: Boolean,
+    isPowerSaverMode: Boolean,
+    isFCMUnavailable: Boolean,
+) {
+    if (isTorEnabled || isPowerSaverMode || isFCMUnavailable) {
+        var showDialog by remember { mutableStateOf(false) }
+
+        TopBadgeButton(
+            text = null,
+            icon = R.drawable.ic_alert_triangle,
+            iconTint = warningColor,
+            onClick = { showDialog = true },
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+
+        if (showDialog) {
+            Dialog(
+                onDismiss = { showDialog = false },
+                title = stringResource(id = R.string.home_background_restriction_title)
+            ) {
+                Column(
+                    modifier = Modifier.padding(horizontal = 24.dp)
+                ) {
+                    Text(text = stringResource(id = R.string.home_background_restriction_body_1))
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(text = stringResource(id = R.string.home_background_restriction_body_2))
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        if (isTorEnabled) {
+                            TextWithIcon(text = stringResource(id = R.string.home_background_restriction_tor), icon = R.drawable.ic_tor_shield_ok)
+                        }
+                        if (isPowerSaverMode) {
+                            TextWithIcon(text = stringResource(id = R.string.home_background_restriction_powersaver), icon = R.drawable.ic_battery_charging)
+                        }
+                        if (isFCMUnavailable) {
+                            TextWithIcon(text = stringResource(id = R.string.home_background_restriction_fcm), icon = R.drawable.ic_cloud_off)
+                            Text(
+                                text = stringResource(id = R.string.home_background_restriction_fcm_details),
+                                style = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
+                                modifier = Modifier.padding(start = 26.dp)
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
 @Composable
-private fun RowScope.InflightPaymentsBadge(
+private fun InflightPaymentsBadge(
     count: Int,
 ) {
     var showInflightPaymentsDialog by remember { mutableStateOf(false) }
 
-    FilledButton(
+    TopBadgeButton(
         text = "$count",
         icon = R.drawable.ic_send,
-        iconTint = MaterialTheme.colors.onPrimary,
         onClick = { showInflightPaymentsDialog = true },
-        textStyle = MaterialTheme.typography.body2.copy(fontSize = 12.sp, color = MaterialTheme.colors.onPrimary),
-        backgroundColor = MaterialTheme.colors.primary,
-        space = 8.dp,
-        padding = PaddingValues(8.dp),
     )
+    Spacer(modifier = Modifier.width(4.dp))
 
     if (showInflightPaymentsDialog) {
         Dialog(onDismiss = { showInflightPaymentsDialog = false }) {
@@ -214,7 +278,7 @@ fun BottomBar(
     Box(
         modifier
             .fillMaxWidth()
-            .height(78.dp)
+            .height(82.dp)
             .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
             .background(MaterialTheme.colors.surface)
     ) {

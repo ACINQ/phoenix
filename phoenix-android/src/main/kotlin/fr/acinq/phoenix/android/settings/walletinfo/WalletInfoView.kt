@@ -35,13 +35,10 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import fr.acinq.bitcoin.DeterministicWallet
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.blockchain.electrum.WalletState
 import fr.acinq.lightning.blockchain.electrum.balance
-import fr.acinq.lightning.crypto.KeyManager.SwapInOnChainKeys.Companion.swapInUserRefundKeyPath
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnit
@@ -51,7 +48,6 @@ import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.monoTypo
 import fr.acinq.phoenix.android.utils.mutedTextColor
-import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.managers.finalOnChainWalletPath
 
 @Composable
@@ -136,17 +132,17 @@ private fun SwapInWalletView(
             SettingWithCopy(
                 title = stringResource(id = R.string.walletinfo_descriptor_legacy),
                 value = it.swapInOnChainWallet.legacyDescriptor,
-                maxLinesValue = 1
+                maxLines = 1
             )
             SettingWithCopy(
                 title = stringResource(id = R.string.walletinfo_descriptor),
                 value = it.swapInOnChainWallet.publicDescriptor,
-                maxLinesValue = 1
+                maxLines = 1
             )
             SettingWithCopy(
                 title = stringResource(id = R.string.walletinfo_swapin_user_pubkey),
                 value = it.swapInOnChainWallet.userPublicKey.toHex(),
-                maxLinesValue = 1
+                maxLines = 1
             )
         }
         MenuButton(
@@ -181,7 +177,7 @@ private fun FinalWalletView(onFinalWalletClick: () -> Unit) {
                 title = stringResource(id = R.string.walletinfo_xpub),
                 titleMuted = stringResource(id = R.string.walletinfo_path, it.finalOnChainWalletPath),
                 value = it.finalOnChainWallet.xpub,
-                maxLinesValue = 2,
+                maxLines = 2,
             )
         }
     }
@@ -199,7 +195,7 @@ private fun LightningNodeIdView(
             SettingWithCopy(
                 title = stringResource(id = R.string.walletinfo_nodeid),
                 value = nodeId,
-                maxLinesValue = 2
+                maxLines = 2
             )
         }
     }

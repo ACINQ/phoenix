@@ -16,10 +16,19 @@
 
 package fr.acinq.phoenix.android
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.os.PowerManager
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
 import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
 import fr.acinq.phoenix.data.WalletNotice
 import fr.acinq.phoenix.managers.AppConfigurationManager
@@ -33,29 +42,52 @@ sealed class Notice() {
     abstract val priority: Int
     sealed class ShowInHome(override val priority: Int) : Notice()
 
-    object MigrationFromLegacy : ShowInHome(1)
+    data object MigrationFromLegacy : ShowInHome(1)
     data class RemoteMessage(val notice: WalletNotice) : ShowInHome(1)
-    object CriticalUpdateAvailable : ShowInHome(2)
-    object SwapInCloseToTimeout : ShowInHome(3)
-    object BackupSeedReminder : ShowInHome(5)
-    object MempoolFull : ShowInHome(10)
-    object UpdateAvailable : ShowInHome(20)
-    object NotificationPermission : ShowInHome(30)
+    data object CriticalUpdateAvailable : ShowInHome(2)
+    data object SwapInCloseToTimeout : ShowInHome(3)
+    data object BackupSeedReminder : ShowInHome(5)
+    data object MempoolFull : ShowInHome(10)
+    data object UpdateAvailable : ShowInHome(20)
+    data object NotificationPermission : ShowInHome(30)
 
     // less important notices
     sealed class DoNotShowInHome(override val priority: Int = 999) : Notice()
-    object WatchTowerLate : DoNotShowInHome()
+    data object WatchTowerLate : DoNotShowInHome()
 }
 
-class NoticesViewModel(val appConfigurationManager: AppConfigurationManager, val peerManager: PeerManager, val internalDataRepository: InternalDataRepository) : ViewModel() {
+class NoticesViewModel(
+    val appConfigurationManager: AppConfigurationManager,
+    val peerManager: PeerManager,
+    val internalDataRepository: InternalDataRepository,
+    val context: Context
+
+) : ViewModel() {
     private val log = LoggerFactory.getLogger(this::class.java)
 
     val notices = mutableStateListOf<Notice>()
+    var isPowerSaverModeOn by mutableStateOf(false)
+
+    private val receiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent?) {
+            val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+            log.info("power_saver=${powerManager.isPowerSaveMode}")
+            isPowerSaverModeOn = powerManager.isPowerSaveMode
+        }
+    }
 
     init {
         viewModelScope.launch { monitorWalletContext() }
         viewModelScope.launch { monitorSwapInCloseToTimeout() }
         viewModelScope.launch { monitorWalletNotice() }
+        val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+        isPowerSaverModeOn = powerManager.isPowerSaveMode
+        context.registerReceiver(receiver, IntentFilter(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED))
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        context.unregisterReceiver(receiver)
     }
 
     fun addNotice(notice: Notice) {
@@ -70,7 +102,7 @@ class NoticesViewModel(val appConfigurationManager: AppConfigurationManager, val
 
     private suspend fun monitorWalletContext() {
         appConfigurationManager.walletContext.collect {
-            log.debug("collecting wallet-context=$it")
+            log.debug("collecting wallet-context={}", it)
             val isMempoolFull = it?.isMempoolFull ?: false
             val isUpdateAvailable = it?.androidLatestVersion?.let { it > BuildConfig.VERSION_CODE } ?: false
             val isCriticalUpdateAvailable = it?.androidLatestCriticalVersion?.let { it > BuildConfig.VERSION_CODE } ?: false
@@ -98,7 +130,7 @@ class NoticesViewModel(val appConfigurationManager: AppConfigurationManager, val
         combine(appConfigurationManager.walletNotice, internalDataRepository.getLastReadWalletNoticeIndex) { notice, lastReadIndex ->
             notice to lastReadIndex
         }.collect { (notice, lastReadIndex) ->
-            log.debug("collecting wallet-notice=$notice")
+            log.debug("collecting wallet-notice={}", notice)
             if (notice != null && notice.index > lastReadIndex) {
                 addNotice(Notice.RemoteMessage(notice))
             } else {
@@ -119,11 +151,15 @@ class NoticesViewModel(val appConfigurationManager: AppConfigurationManager, val
     class Factory(
         private val appConfigurationManager: AppConfigurationManager,
         private val peerManager: PeerManager,
-        private val internalDataRepository: InternalDataRepository,
     ) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
+            val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as? PhoenixApplication)
             @Suppress("UNCHECKED_CAST")
-            return NoticesViewModel(appConfigurationManager, peerManager, internalDataRepository) as T
+            return NoticesViewModel(
+                appConfigurationManager, peerManager,
+                internalDataRepository = application.internalDataRepository,
+                application.applicationContext
+            ) as T
         }
     }
 }

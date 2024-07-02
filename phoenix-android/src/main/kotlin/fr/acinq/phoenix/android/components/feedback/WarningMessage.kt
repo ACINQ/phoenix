@@ -30,7 +30,7 @@ import fr.acinq.phoenix.android.utils.orange
 @Composable
 fun WarningMessage(
     header: String,
-    details: String,
+    details: String?,
     modifier: Modifier = Modifier,
     headerStyle: TextStyle = MaterialTheme.typography.body2,
     detailsStyle: TextStyle = MaterialTheme.typography.subtitle2,

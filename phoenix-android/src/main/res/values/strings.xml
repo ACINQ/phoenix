@@ -125,6 +125,10 @@
     <string name="receive_lightning_share_subject">Lightning invoice</string>
     <string name="receive_lightning_share_title">Share this Lightning invoice with…</string>
     <string name="receive_lnurl_button">Use LNURL link</string>
+    <string name="receive_toggle_offer_new_overlay">NEW!</string>
+
+    <string name="receive_offer_share_title">Static Lightning invoice</string>
+    <string name="receive_offer_share_subject">Share this static Lightning invoice with…</string>
 
     <string name="receive_lightning_edit_button">Edit</string>
     <string name="receive_lightning_edit_title">Edit invoice</string>
@@ -133,7 +137,6 @@
     <string name="receive_lightning_edit_desc_label">Description (optional)</string>
     <string name="receive_lightning_edit_desc_placeholder">Enter a description for this invoice</string>
     <string name="receive_lightning_edit_generate_button">Create invoice</string>
-
 
     <!-- send -->
 
@@ -153,6 +156,16 @@
     <string name="send_trampoline_amountless_warning_details">The invoice for this payment does not request a specific amount. This may be exploited by malicious nodes during the payment.\n\nTo be safe, <b>ask the recipient to specify an amount</b> when generating the invoice.</string>
     <string name="send_connecting_button">Waiting for channels…</string>
     <string name="send_pay_button">Pay</string>
+    <string name="send_pay_retry_button">Try again</string>
+
+    <string name="send_offer_payer_note_label">Message</string>
+    <string name="send_offer_payer_note_placeholder">Tap to attach a message…</string>
+    <string name="send_offer_payer_note_dialog_title">Attach a custom message</string>
+    <string name="send_offer_payer_note_dialog_subtitle">The recipient will see this message</string>
+    <string name="send_offer_payer_note_dialog_placeholder">Enter a message…</string>
+    <string name="send_offer_fetching">Fetching payment details…</string>
+    <string name="send_offer_failure_title">Payment has failed</string>
+    <string name="send_offer_failure_timeout">Could not retrieve payment details within a reasonable time.\n\nThe recipient may be offline or unreachable.</string>
 
     <string name="send_paymentmode_onchain">Pay on-chain</string>
     <string name="send_paymentmode_onchain_desc">On-chain transactions are typically slower and best suited for large payments.</string>
@@ -290,7 +303,7 @@
     <string name="home__connection__electrum_late">Electrum late</string>
     <string name="home__connection__bad_cert">Electrum certificate</string>
     <string name="home__connection__connecting">Connecting…</string>
-    <string name="home__connection__tor_active">Tor enabled</string>
+    <string name="home__connection__tor_active">Tor</string>
     <string name="home_request_liquidity">Request liquidity</string>
     <string name="home_inflight_payments">You currently have %1$d payment(s) pending in your wallet.\n\nKeep the app open to make sure these payments settle properly without issues.</string>
 
@@ -344,6 +357,11 @@
     <string name="paymentdetails_status_unconfirmed_with_depth">%1$d/%2$d confirmation(s)</string>
     <string name="paymentdetails_status_confirmed">Confirmed on-chain</string>
 
+    <string name="paymentdetails_offer_note_label">Message</string>
+    <string name="paymentdetails_offer_sender_label">Sent by</string>
+    <string name="paymentdetails_offer_sender_unknown">Unknown</string>
+    <string name="paymentdetails_offer_sender_unknown_details">Be careful with messages from unknown sources</string>
+
     <string name="paymentdetails_lnurlpay_service">Serviced by</string>
     <string name="paymentdetails_lnurlpay_action_message_label">Message</string>
     <string name="paymentdetails_lnurlpay_action_url_label">Link</string>
@@ -366,8 +384,14 @@
     <string name="paymentdetails_desc_inbound_liquidity">+%1$s inbound liquidity</string>
     <string name="paymentdetails_desc_swapout">Swap-out to %1$s</string>
     <string name="paymentdetails_desc_swapin">On-chain deposit</string>
-    <string name="paymentdetails_desc_identifier">Payment to %1$s</string>
-    <string name="paymentdetails_desc_offer_incoming">Payment to %1$s</string>
+
+    <string name="paymentdetails_desc_to">To %1$s</string>
+    <string name="paymentdetails_desc_to_with_note">To %1$s: %2$s</string>
+    <string name="paymentdetails_desc_to_unknown_with_note">To unknown: %1$s</string>
+    <string name="paymentdetails_desc_from">From %1$s</string>
+    <string name="paymentdetails_desc_from_with_note">From %1$s: %2$s</string>
+    <string name="paymentdetails_desc_from_unknown">From unknown</string>
+    <string name="paymentdetails_desc_from_unknown_with_note">From unknown: %1$s</string>
 
     <string name="paymentdetails_edit_dialog_title">Add a custom description to this payment</string>
     <string name="paymentdetails_edit_dialog_input_label">Description</string>
@@ -383,12 +407,12 @@
     <string name="paymentdetails_splice_outgoing">Outgoing splice payment</string>
     <string name="paymentdetails_splice_cpfp_outgoing">Accelerate on-chain transactions</string>
     <string name="paymentdetails_inbound_liquidity">Request inbound liquidity</string>
-    <string name="paymentdetails_normal_outgoing">Standard outgoing Lightning payment</string>
-    <string name="paymentdetails_normal_incoming">Standard incoming Lightning payment</string>
+    <string name="paymentdetails_normal_outgoing">Outgoing Lightning payment (standard)</string>
+    <string name="paymentdetails_normal_incoming">Incoming Lightning payment (standard)</string>
     <string name="paymentdetails_swapin">Swap-in Bitcoin deposit</string>
     <string name="paymentdetails_swapout">Swap-out to Bitcoin address</string>
-    <string name="paymentdetails_offer_outgoing">Offer outgoing Lightning payment</string>
-    <string name="paymentdetails_offer_incoming">Offer incoming Lightning payment</string>
+    <string name="paymentdetails_offer_outgoing">Outgoing Lightning payment (offer)</string>
+    <string name="paymentdetails_offer_incoming">Incoming Lightning payment (offer)</string>
     <string name="paymentdetails_swapin_address_label">Deposit address</string>
     <string name="paymentdetails_bitcoin_address_label">Bitcoin address</string>
 
@@ -412,7 +436,9 @@
     <string name="paymentdetails_payment_request_label">Invoice</string>
     <string name="paymentdetails_preimage_label">Preimage</string>
     <string name="paymentdetails_payerkey_label">Payer key</string>
-    <string name="paymentdetails_offerid_label">Offer ID</string>
+    <string name="paymentdetails_offer_label">Offer</string>
+    <string name="paymentdetails_bolt12_label">Bolt12 invoice</string>
+    <string name="paymentdetails_offer_metadata_label">Metadata</string>
 
     <string name="paymentdetails_status_label">Payment status</string>
     <string name="paymentdetails_status_success">Successful</string>
@@ -441,6 +467,24 @@
     <string name="paymentdetails_amount_received_label">Amount received</string>
     <string name="paymentdetails_amount_rate_now">≈ %1$s (now)</string>
     <string name="paymentdetails_amount_rate_then">≈ %1$s (then)</string>
+
+    <!-- offer contact -->
+
+    <string name="contact_add_contact_button">Add contact…</string>
+    <string name="contact_error_offer_invalid">Invalid offer</string>
+    <string name="contact_error_offer_known">Invoice already attached to %1$s</string>
+    <string name="contact_save_button">Save</string>
+    <string name="contact_delete_button">Delete</string>
+
+    <string name="contact_add_title">Attach a contact to an BOLT12 offer</string>
+    <string name="contact_name_label">Name</string>
+    <string name="contact_photo_label">Photo</string>
+    <string name="contact_offer_label">Offer</string>
+    <string name="contact_offers_list_title">Known offers for this contact</string>
+
+
+    <string name="contact_search_name">Search by name</string>
+    <string name="contact_none">No contacts found…</string>
 
     <!-- settings: access control -->
 
@@ -581,10 +625,9 @@
     <string name="tor_settings_enabled">Tor is enabled</string>
     <string name="tor_settings_disabled">Tor is disabled</string>
     <string name="tor_settings_state_unknown">The Tor proxy is not started yet.</string>
-    <string name="tor_settings_state_closed">The Tor proxy is shutdown.\nPlease wait and check your Internet connection.</string>
+    <string name="tor_settings_state_closed">The Tor proxy is shutdown.</string>
     <string name="tor_settings_state_starting">Starting Tor proxy…</string>
     <string name="tor_settings_state_started">Tor is online</string>
-    <string name="tor_settings_state_about_perfs">Note that the Tor network is an open project running on donations. It can sometimes be very slow, which will affect the app\'s performances.</string>
 
     <!-- home: connectivity dialog -->
 
@@ -644,6 +687,9 @@
     <string name="paymentsettings_overpayment_title">Enable overpayment</string>
     <string name="paymentsettings_overpayment_enabled">You\'ll be able to overpay Lightning invoices up to 2 times the amount requested. Useful for manual tipping, or as a privacy measure.</string>
     <string name="paymentsettings_overpayment_disabled">Disabled (default)</string>
+
+    <string name="paymentsettings_random_payer_key_title">Random payer key</string>
+    <string name="paymentsettings_random_payer_key_desc">If enabled, the recipient of a BOLT12 offer will not know who made the payment.</string>
 
     <!-- settings: currencies -->
 
@@ -738,7 +784,7 @@
     <!-- mempool -->
 
     <string name="mempool_unknown_feerate_title">Unknown mempool state</string>
-    <string name="mempool_unknown_feerate_details">Phoenix was unable to retrieve the current state of the mempool and cannot estimate the speed of your transactions.\n\nCheck the mempool manually on an explorer, and use a adequate value!</string>
+    <string name="mempool_unknown_feerate_details">Phoenix was unable to retrieve the current state of the mempool and cannot estimate the speed of your transactions.\n\nCheck the mempool manually on an explorer, and use an adequate value!</string>
     <string name="mempool_fastest">≈ 10 minutes</string>
     <string name="mempool_halfhour">≈ 30 minutes</string>`
     <string name="mempool_hour">≈ 1 hour</string>
@@ -791,5 +837,9 @@
     <string name="swapin_signer_invalid_tx_header">Invalid unsigned transaction</string>
     <string name="swapin_signer_invalid_tx_details">Check that the input is complete and not missing any character.</string>
     <string name="swapin_signer_error_header">Failed to sign input</string>
+
+    <!-- settings: contacts list -->
+
+    <string name="settings_contacts_help">Contacts allows you to link a name to a static offer. They are stored locally.</string>
 
 </resources>

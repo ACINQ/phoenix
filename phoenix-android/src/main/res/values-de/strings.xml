@@ -278,7 +278,7 @@
     <string name="home__connection__electrum_late">Electrum unsynchron</string>
     <string name="home__connection__bad_cert">Electrum-Zertifikat</string>
     <string name="home__connection__connecting">Verbinde…</string>
-    <string name="home__connection__tor_active">Tor aktiviert</string>
+    <string name="home__connection__tor_active">Tor</string>
     <string name="home_request_liquidity">Liquidität anfordern</string>
     <string name="home_inflight_payments">Du hast derzeit %1$d Zahlung(en) in deiner Brieftasche ausstehend.\n\nHalte die App geöffnet, um sicherzustellen, dass diese Zahlungen ohne Probleme abgerechnet werden.</string>
 
@@ -354,7 +354,7 @@
     <string name="paymentdetails_desc_inbound_liquidity">+%1$s eingehende Liquidität</string>
     <string name="paymentdetails_desc_swapout">Swap-out an %1$s</string>
     <string name="paymentdetails_desc_swapin">On-Chain Einzahlung</string>
-    <string name="paymentdetails_desc_identifier">Zahlung an %1$s</string>
+    <string name="paymentdetails_desc_to">Zahlung an %1$s</string>
 
     <string name="paymentdetails_edit_dialog_title">Fügen Sie eine eigene Beschreibung zu dieser Zahlung hinzu</string>
     <string name="paymentdetails_edit_dialog_input_label">Beschreibung</string>
@@ -370,8 +370,8 @@
     <string name="paymentdetails_splice_outgoing">Ausgehender Splice</string>
     <string name="paymentdetails_splice_cpfp_outgoing">Beschleunigte On-Chain Transaktion</string>
     <string name="paymentdetails_inbound_liquidity">Inbound-Liquidität anfordern</string>
-    <string name="paymentdetails_normal_outgoing">Standard ausgehende Lightning-Zahlung</string>
-    <string name="paymentdetails_normal_incoming">Standard eingehende Lightning-Zahlung</string>
+    <string name="paymentdetails_normal_outgoing">Ausgehende Lightning-Zahlung (standard)</string>
+    <string name="paymentdetails_normal_incoming">Eingehende Lightning-Zahlung (standard)</string>
     <string name="paymentdetails_swapin">Swap-in Bitcoin-Einzahlung</string>
     <string name="paymentdetails_swapout">Swap-out an Bitcoin-Adresse</string>
     <string name="paymentdetails_swapin_address_label">Einzahlungs-Adresse</string>
@@ -567,7 +567,6 @@
     <string name="tor_settings_state_closed">Der Tor-Proxy wird abgeschaltet.\nBitte warten Sie und überprüfen Sie Ihre Internetverbindung.</string>
     <string name="tor_settings_state_starting">Starte Tor-Proxy…</string>
     <string name="tor_settings_state_started">Tor ist online</string>
-    <string name="tor_settings_state_about_perfs">Beachten Sie, dass das Tor-Netzwerk ein Open-Source-Projekt ist, das auf Spendenbasis läuft. Es kann manchmal sehr langsam sein, was die Leistung der App beeinträchtigen kann.</string>
 
     <!-- home: connectivity dialog -->
 

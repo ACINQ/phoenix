@@ -18,12 +18,14 @@ package fr.acinq.phoenix.android.payments.details
 
 import android.text.format.DateUtils
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -44,12 +46,15 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.AmountView
 import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.CardHeader
+import fr.acinq.phoenix.android.components.Clickable
+import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.TransactionLinkButton
 import fr.acinq.phoenix.android.fiatRate
 import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
 import fr.acinq.phoenix.android.utils.Converter.toFiat
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
+import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.WalletPaymentInfo
 
@@ -296,12 +301,10 @@ private fun DetailsForLightningOutgoingPayment(
     val details = payment.details
     val status = payment.status
 
-    // -- recipient's public key
-    TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_pubkey_label), value = payment.recipient.toHex())
-
     // -- details of the payment
     when (details) {
         is LightningOutgoingPayment.Details.Normal -> {
+            TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_pubkey_label), value = payment.recipient.toHex())
             Bolt11InvoiceSection(invoice = details.paymentRequest)
         }
         is LightningOutgoingPayment.Details.SwapOut -> {
@@ -524,7 +527,6 @@ private fun Bolt11InvoiceSection(
             Text(text = description)
         }
     }
-
     TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = invoice.paymentHash.toHex())
     TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_request_label), value = invoice.write())
 }
@@ -552,7 +554,8 @@ private fun Bolt12InvoiceSection(
 
     TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payerkey_label), value = payerKey.toHex())
     TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = invoice.paymentHash.toHex())
-    TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_request_label), value = invoice.write())
+    TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_offer_label), value = invoice.invoiceRequest.offer.encode())
+    TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_bolt12_label), value = invoice.write())
 }
 
 @Composable
@@ -566,7 +569,7 @@ private fun Bolt12MetadataSection(
     )
     TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = metadata.paymentHash.toHex())
     TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_preimage_label), value = metadata.preimage.toHex())
-    TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_offerid_label), value = metadata.offerId.toHex())
+    TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_offer_metadata_label), value = metadata.encode().toHex())
     if (metadata is OfferPaymentMetadata.V1) {
         TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payerkey_label), value = metadata.payerKey.toHex())
     }
@@ -641,6 +644,25 @@ private fun TechnicalRowAmount(
         if (rateThen != null) {
             val fiatAmountThen = amount.toFiat(rateThen.price).toPrettyString(prefFiat, withUnit = true)
             Text(text = stringResource(id = R.string.paymentdetails_amount_rate_then, fiatAmountThen))
+        }
+    }
+}
+
+@Composable
+private fun TechnicalRowWithCopy(label: String, value: String) {
+    TechnicalRow(label = label) {
+        val context = LocalContext.current
+        Clickable(onClick = { copyToClipboard(context = context, data = value) }, modifier = Modifier.offset((-6).dp), shape = RoundedCornerShape(12.dp)) {
+            Column(modifier = Modifier.padding(6.dp)) {
+                Text(text = value, maxLines = 5, overflow = TextOverflow.Ellipsis)
+                Spacer(modifier = Modifier.height(8.dp))
+                TextWithIcon(
+                    text = stringResource(id = R.string.btn_copy),
+                    textStyle = MaterialTheme.typography.subtitle2,
+                    icon = R.drawable.ic_copy,
+                    iconTint = MaterialTheme.typography.subtitle2.color
+                )
+            }
         }
     }
 }

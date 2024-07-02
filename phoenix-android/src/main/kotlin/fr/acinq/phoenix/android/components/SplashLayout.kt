@@ -21,6 +21,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
@@ -35,6 +36,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -120,11 +122,10 @@ fun SplashLabelRow(
     iconTint: Color = MaterialTheme.typography.subtitle1.color,
     helpMessage: String? = null,
     helpLink: Pair<String, String>? = null,
+    space: Dp = 8.dp,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Row(
-        modifier = Modifier.padding(vertical = 3.dp)
-    ) {
+    Row {
         Row(
             modifier = Modifier.weight(1f).alignByBaseline(),
             horizontalArrangement = Arrangement.End
@@ -151,12 +152,30 @@ fun SplashLabelRow(
                 )
             }
         }
-        Spacer(Modifier.width(8.dp))
+        Spacer(Modifier.width(space))
         Column(
             modifier = Modifier
                 .weight(1.6f)
                 .alignByBaseline(),
         ) {
+            content()
+        }
+    }
+}
+
+@Composable
+fun SplashClickableContent(
+    onClick: () -> Unit,
+    content: @Composable () -> Unit,
+) {
+    Clickable(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .offset(x = (-8).dp),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(modifier = Modifier.padding(8.dp)) {
             content()
         }
     }

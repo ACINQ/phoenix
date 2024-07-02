@@ -6,5 +6,5 @@
     <dimen name="icon_size">18dp</dimen>
 
     <!-- scanner -->
-    <dimen name="scanner_size">250dp</dimen>
+    <dimen name="scanner_size">1000dp</dimen>
 </resources>

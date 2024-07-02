@@ -105,6 +105,7 @@ fun LnurlPayView(
         SplashLabelRow(label = stringResource(R.string.lnurl_pay_domain)) {
             Text(text = model.paymentIntent.callback.host, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
+        Spacer(modifier = Modifier.height(8.dp))
         SplashLabelRow(label = stringResource(R.string.lnurl_pay_meta_description)) {
             Text(
                 text = model.paymentIntent.metadata.longDesc ?: model.paymentIntent.metadata.plainText,
@@ -128,19 +129,11 @@ fun LnurlPayView(
                     },
                 )
             }
-            comment?.let {
-                SplashLabelRow(label = "", icon = R.drawable.ic_message_circle, iconTint = MaterialTheme.colors.primary) {
-                    Clickable(onClick = { showCommentDialog = true }) {
-                        Text(text = it)
-                    }
-                }
-            } ?: run {
-                SplashLabelRow(label = "", icon = R.drawable.ic_message_circle, iconTint = MaterialTheme.colors.primary) {
-                    Button(
-                        text = stringResource(id = R.string.lnurl_pay_comment_add_button),
-                        onClick = { showCommentDialog = true },
-                        padding = PaddingValues(horizontal = 0.dp, vertical = 8.dp),
-                        shape = RoundedCornerShape(16.dp),
+            SplashLabelRow(label = stringResource(id = R.string.paymentdetails_lnurlpay_action_message_label)) {
+                SplashClickableContent(onClick = { showCommentDialog = true }) {
+                    Text(
+                        text = comment ?: stringResource(id = R.string.lnurl_pay_comment_add_button),
+                        style = if (comment == null) MaterialTheme.typography.caption else MaterialTheme.typography.body1
                     )
                 }
             }

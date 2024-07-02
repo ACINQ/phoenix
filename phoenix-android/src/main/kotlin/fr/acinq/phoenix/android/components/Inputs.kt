@@ -24,9 +24,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
+import androidx.compose.material.TextFieldColors
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,6 +36,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -46,16 +49,21 @@ import fr.acinq.phoenix.android.utils.*
 fun TextInput(
     modifier: Modifier = Modifier,
     text: String,
+    textStyle: TextStyle = LocalTextStyle.current,
     minLines: Int = 1,
     maxLines: Int = 1,
     singleLine: Boolean = false,
     maxChars: Int? = null,
     staticLabel: String?,
     placeholder: @Composable (() -> Unit)? = null,
+    leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     errorMessage: String? = null,
     enabled: Boolean = true,
+    enabledEffect: Boolean = true,
     onTextChange: (String) -> Unit,
+    textFieldColors: TextFieldColors = outlinedTextFieldColors(),
+    showResetButton: Boolean = true,
 ) {
     val charsCount by remember(text) { mutableStateOf(text.length) }
     val focusManager = LocalFocusManager.current
@@ -63,10 +71,11 @@ fun TextInput(
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
 
-    Box(modifier = modifier.enableOrFade(enabled)) {
+    Box(modifier = modifier.enableOrFade(enabled || !enabledEffect)) {
         OutlinedTextField(
             value = text,
             onValueChange = { newValue -> onTextChange(newValue.take(maxChars ?: Int.MAX_VALUE)) },
+            textStyle = textStyle,
             minLines = minLines,
             maxLines = maxLines,
             singleLine = singleLine,
@@ -76,27 +85,35 @@ fun TextInput(
             ),
             label = null,
             placeholder = placeholder,
-            trailingIcon = {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (text.isNotBlank()) {
-                        FilledButton(
-                            onClick = { onTextChange("") },
-                            icon = R.drawable.ic_cross,
-                            enabled = enabled,
-                            backgroundColor = Color.Transparent,
-                            iconTint = MaterialTheme.colors.onSurface,
-                            padding = PaddingValues(12.dp),
-                        )
+            leadingIcon = leadingIcon,
+            trailingIcon = if (!showResetButton && trailingIcon == null) {
+                null
+            } else {
+                {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if (text.isNotBlank()) {
+                            FilledButton(
+                                onClick = { onTextChange("") },
+                                icon = R.drawable.ic_cross,
+                                enabled = enabled,
+                                enabledEffect = false,
+                                backgroundColor = Color.Transparent,
+                                iconTint = MaterialTheme.colors.onSurface,
+                                padding = PaddingValues(12.dp),
+                            )
+                        }
+                        trailingIcon?.let { it() }
                     }
-                    trailingIcon?.let { it() }
                 }
             },
             enabled = enabled,
             keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-            colors = if (errorMessage.isNullOrBlank()) outlinedTextFieldColors() else errorOutlinedTextFieldColors(),
+            colors = if (errorMessage.isNullOrBlank()) textFieldColors else errorOutlinedTextFieldColors(),
             shape = RoundedCornerShape(8.dp),
             interactionSource = interactionSource,
-            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp, top = if (staticLabel != null) 12.dp else 0.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp, top = if (staticLabel != null) 14.dp else 0.dp)
         )
 
         staticLabel?.let {
@@ -265,6 +282,8 @@ fun RowScope.InlineNumberInput(
         keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
         colors = outlinedTextFieldColors(),
         shape = RoundedCornerShape(8.dp),
-        modifier = modifier.alignByBaseline().enableOrFade(enabled)
+        modifier = modifier
+            .alignByBaseline()
+            .enableOrFade(enabled)
     )
 }

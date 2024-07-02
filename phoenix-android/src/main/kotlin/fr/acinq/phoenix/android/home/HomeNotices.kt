@@ -183,6 +183,7 @@ private fun FirstNoticeView(
             is Notice.RemoteMessage -> {
                 NoticeTextView(text = notice.notice.message, icon = R.drawable.ic_info)
             }
+
         }
 
         if (messagesCount > 1) {

@@ -127,9 +127,13 @@ fun SendSpliceOutView(
                     mempoolFeerate = mempoolFeerate,
                     enabled = vm.state !is SpliceOutState.Executing || vm.state !is SpliceOutState.Preparing
                 )
-            } ?: ProgressView(text = stringResource(id = R.string.send_spliceout_feerate_waiting_for_value), padding = PaddingValues(0.dp))
+            } ?: run {
+                ProgressView(text = stringResource(id = R.string.send_spliceout_feerate_waiting_for_value), padding = PaddingValues(0.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+            }
         }
 
+        Spacer(modifier = Modifier.height(8.dp))
         SplashLabelRow(label = stringResource(R.string.send_spliceout_address_label), icon = R.drawable.ic_chain) {
             SelectionContainer {
                 Text(text = address)
@@ -264,6 +268,7 @@ private fun SpliceOutFeeSummaryView(
     ) {
         AmountWithFiatBelow(amount = fee.toMilliSatoshi(), amountTextStyle = MaterialTheme.typography.body2)
     }
+    Spacer(modifier = Modifier.height(8.dp))
     SplashLabelRow(label = stringResource(id = R.string.send_spliceout_complete_recap_total)) {
         AmountWithFiatBelow(amount = total.toMilliSatoshi(), amountTextStyle = MaterialTheme.typography.body2)
     }

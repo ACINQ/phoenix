@@ -25,8 +25,8 @@ android {
         applicationId = "fr.acinq.phoenix.mainnet"
         minSdk = 26
         targetSdk = 34
-        versionCode = 80
-        versionName = "2.2.4"
+        versionCode = 81
+        versionName = gitCommitHash()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         resourceConfigurations.addAll(listOf("en", "fr", "de", "es", "b+es+419", "cs", "pt-rBR", "sk", "vi"))
     }
@@ -136,6 +136,7 @@ dependencies {
 
     // firebase cloud messaging
     implementation("com.google.firebase:firebase-messaging:${Versions.Android.fcm}")
+    implementation("com.google.android.gms:play-services-base:18.5.0")
 
     implementation("com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava")
 

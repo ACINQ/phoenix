@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -44,6 +45,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -51,6 +53,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.LocalContext
@@ -76,6 +79,7 @@ import fr.acinq.phoenix.android.components.BorderButton
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.Clickable
+import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.TextInput
@@ -86,6 +90,7 @@ import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.borderColor
 import fr.acinq.phoenix.android.utils.copyToClipboard
+import fr.acinq.phoenix.android.utils.red500
 import fr.acinq.phoenix.android.utils.share
 import fr.acinq.phoenix.data.availableForReceive
 import fr.acinq.phoenix.data.canRequestLiquidity
@@ -105,7 +110,7 @@ fun LightningInvoiceView(
 ) {
     var customDesc by remember { mutableStateOf(defaultDescription) }
     var customAmount by remember { mutableStateOf<MilliSatoshi?>(null) }
-    var feeWarningDialogShownTimestamp by remember { mutableStateOf(0L) }
+    var feeWarningDialogShownTimestamp by remember { mutableLongStateOf(0L) }
 
     val onEdit = { vm.isEditingLightningInvoice = true }
 
@@ -129,55 +134,76 @@ fun LightningInvoiceView(
         content = { Text(text = stringResource(id = R.string.receive_lightning_title)) },
     )
 
-    when {
-        isEditing -> {
-            EditInvoiceView(
-                amount = customAmount,
-                description = customDesc,
-                onAmountChange = { customAmount = it },
-                onDescriptionChange = { customDesc = it },
-                onCancel = { vm.isEditingLightningInvoice = false },
-                onSubmit = { vm.generateInvoice(amount = customAmount, description = customDesc, expirySeconds = defaultExpiry) },
-                onFeeManagementClick = onFeeManagementClick,
-                onDialogShown = { feeWarningDialogShownTimestamp = currentTimestampMillis() }
-            )
-        }
-        state is LightningInvoiceState.Init || state is LightningInvoiceState.Generating -> {
-            if (state is LightningInvoiceState.Init) {
-                LaunchedEffect(key1 = Unit) {
-                    vm.generateInvoice(amount = customAmount, description = customDesc, expirySeconds = defaultExpiry)
+    if (isEditing) {
+        EditInvoiceView(
+            amount = customAmount,
+            description = customDesc,
+            onAmountChange = { customAmount = it },
+            onDescriptionChange = { customDesc = it },
+            onCancel = { vm.isEditingLightningInvoice = false },
+            onSubmit = { vm.generateInvoice(amount = customAmount, description = customDesc, expirySeconds = defaultExpiry) },
+            onFeeManagementClick = onFeeManagementClick,
+            onDialogShown = { feeWarningDialogShownTimestamp = currentTimestampMillis() }
+        )
+    } else {
+        when (state) {
+            is LightningInvoiceState.Init, is LightningInvoiceState.Generating -> {
+                if (state is LightningInvoiceState.Init) {
+                    LaunchedEffect(key1 = Unit) {
+                        vm.generateInvoice(amount = customAmount, description = customDesc, expirySeconds = defaultExpiry)
+                    }
                 }
+                Box(contentAlignment = Alignment.Center) {
+                    QRCodeView(bitmap = vm.lightningQRBitmap, data = null, maxWidth = maxWidth)
+                    Card(shape = RoundedCornerShape(16.dp)) { ProgressView(text = stringResource(id = R.string.receive_lightning_generating)) }
+                }
+                Spacer(modifier = Modifier.height(32.dp))
+                CopyShareEditButtons(onCopy = { }, onShare = { }, onEdit = onEdit, maxWidth = maxWidth)
             }
-            Box(contentAlignment = Alignment.Center) {
-                QRCodeView(bitmap = vm.lightningQRBitmap, data = null, maxWidth = maxWidth)
-                Card(shape = RoundedCornerShape(16.dp)) { ProgressView(text = stringResource(id = R.string.receive_lightning_generating)) }
+            is LightningInvoiceState.Show -> {
+                DisplayLightningInvoice(
+                    invoice = state.invoice,
+                    bitmap = vm.lightningQRBitmap,
+                    onFeeManagementClick = onFeeManagementClick,
+                    onEdit = onEdit,
+                    maxWidth = maxWidth,
+                    showDialogImmediately = isPageActive && currentTimestampMillis() - feeWarningDialogShownTimestamp > 30_000,
+                    onDialogShown = { feeWarningDialogShownTimestamp = currentTimestampMillis() }
+                )
             }
-            Spacer(modifier = Modifier.height(32.dp))
-            CopyShareEditButtons(onCopy = { }, onShare = { }, onEdit = onEdit, maxWidth = maxWidth)
-        }
-        state is LightningInvoiceState.Show -> {
-            DisplayLightningInvoice(
-                invoice = state.invoice,
-                bitmap = vm.lightningQRBitmap,
-                onFeeManagementClick = onFeeManagementClick,
-                onEdit = onEdit,
-                maxWidth = maxWidth,
-                showDialogImmediately = isPageActive && currentTimestampMillis() - feeWarningDialogShownTimestamp > 30_000,
-                onDialogShown = { feeWarningDialogShownTimestamp = currentTimestampMillis() }
-            )
-        }
-        state is LightningInvoiceState.Error -> {
-            ErrorMessage(
-                header = stringResource(id = R.string.receive_lightning_error),
-                details = state.e.localizedMessage
-            )
+            is LightningInvoiceState.Error -> {
+                ErrorMessage(
+                    header = stringResource(id = R.string.receive_lightning_error),
+                    details = state.e.localizedMessage
+                )
+            }
         }
     }
 
+    var showOfferDialog by remember { mutableStateOf(false) }
+    if (showOfferDialog) {
+        DisplayOfferDialog(onDismiss = { showOfferDialog = false }, offerState = vm.offerState)
+    }
+
     if ((state is LightningInvoiceState.Init || state is LightningInvoiceState.Show) && !isEditing) {
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
+        TorWarning()
         HSeparator(width = 50.dp)
         Spacer(modifier = Modifier.height(24.dp))
+        Box {
+            FilledButton(
+                text = stringResource(id = R.string.receive_toggle_offer_button),
+                icon = R.drawable.ic_qrcode,
+                onClick = { showOfferDialog = true },
+            )
+            Text(
+                text = stringResource(id = R.string.receive_toggle_offer_new_overlay),
+                modifier = Modifier.rotate(-38f).offset((-9).dp, (-4).dp).background(red500).padding(horizontal = 4.dp, vertical = 2.dp),
+                color = MaterialTheme.colors.onPrimary,
+                fontSize = 12.sp
+            )
+        }
+        Spacer(modifier = Modifier.height(16.dp))
         BorderButton(
             text = stringResource(id = R.string.receive_lnurl_button),
             icon = R.drawable.ic_scan,

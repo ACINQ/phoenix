@@ -16,13 +16,12 @@
 
 package fr.acinq.phoenix.controllers.payments
 
-import fr.acinq.bitcoin.Bitcoin
 import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.TrampolineFees
 import fr.acinq.lightning.payment.Bolt11Invoice
-import fr.acinq.lightning.payment.PaymentRequest
+import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.controllers.MVI
 import fr.acinq.phoenix.data.BitcoinUri
 import fr.acinq.phoenix.data.lnurl.*
@@ -77,6 +76,8 @@ object Scan {
             ): Bolt11InvoiceFlow()
             object Sending: Bolt11InvoiceFlow()
         }
+
+        data class OfferFlow(val offer: OfferTypes.Offer) : Model()
 
         data class OnchainFlow(val uri: BitcoinUri): Model()
 
@@ -142,11 +143,7 @@ object Scan {
         ) : Intent()
 
         sealed class Bolt11InvoiceFlow : Intent() {
-            data class SendBolt11Invoice(
-                val invoice: Bolt11Invoice,
-                val amount: MilliSatoshi,
-                val trampolineFees: TrampolineFees
-            ) : Bolt11InvoiceFlow()
+            data class SendBolt11Invoice(val invoice: Bolt11Invoice, val amount: MilliSatoshi, val trampolineFees: TrampolineFees) : Bolt11InvoiceFlow()
         }
 
         object CancelLnurlServiceFetch : Intent()

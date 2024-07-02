@@ -276,7 +276,7 @@
     <string name="home__connection__electrum_late">Electrum mešká</string>
     <string name="home__connection__bad_cert">Electrum certifikát</string>
     <string name="home__connection__connecting">Pripájanie…</string>
-    <string name="home__connection__tor_active">Tor povolený</string>
+    <string name="home__connection__tor_active">Tor</string>
     <string name="home_request_liquidity">Vyžiadať likviditu</string>
     <string name="home_inflight_payments">Momentálne máte %1$d platieb nepotvrdených vo vašej peňaženke.\n\nNechajte aplikáciu otvorenú, aby ste sa uistili, že sa tieto platby správne a bez problémov vyrovnajú..</string>
 
@@ -352,7 +352,7 @@
     <string name="paymentdetails_desc_inbound_liquidity">+%1$s prichádzajúca likvidita</string>
     <string name="paymentdetails_desc_swapout">Swap-out na %1$s</string>
     <string name="paymentdetails_desc_swapin">On-chain vklad</string>
-    <string name="paymentdetails_desc_identifier">Platba pre %1$s</string>
+    <string name="paymentdetails_desc_to">Platba pre %1$s</string>
 
     <string name="paymentdetails_edit_dialog_title">Pridať vlastný popis k tejto platbe</string>
     <string name="paymentdetails_edit_dialog_input_label">Popis</string>
@@ -368,8 +368,8 @@
     <string name="paymentdetails_splice_outgoing">Odchádzajúca splice platba</string>
     <string name="paymentdetails_splice_cpfp_outgoing">Urýchlenie on-chain transakcií</string>
     <string name="paymentdetails_inbound_liquidity">Požiadavka na prichádzajúcu likviditu</string>
-    <string name="paymentdetails_normal_outgoing">Štandardná odchádzajúca Lightning platba</string>
-    <string name="paymentdetails_normal_incoming">Štandardná prichádzajúca Lightning platba</string>
+    <string name="paymentdetails_normal_outgoing">Odchádzajúca Lightning platba (štandard)</string>
+    <string name="paymentdetails_normal_incoming">Prichádzajúca Lightning platba (štandard)</string>
     <string name="paymentdetails_swapin">Swap-in vklad Bitcoinu</string>
     <string name="paymentdetails_swapout">Swap-out na Bitcoinovú adresu</string>
     <string name="paymentdetails_swapin_address_label">Adresa vkladu</string>
@@ -565,7 +565,6 @@
     <string name="tor_settings_state_closed">Tor proxy server je vypnutý.\nPočkajte prosím a skontrolujte svoje internetové pripojenie.</string>
     <string name="tor_settings_state_starting">Zapínanie Tor proxy servera…</string>
     <string name="tor_settings_state_started">Tor je pripojený</string>
-    <string name="tor_settings_state_about_perfs">Pamätajte, že sieť Tor je otvorený projekt fungujúci z darov. Niekedy môže byť veľmi pomalý, čo ovplyvní výkon aplikácie.</string>
 
     <!-- home: connectivity dialog -->
 

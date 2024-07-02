@@ -67,6 +67,7 @@ fun BorderButton(
     enabled: Boolean = true,
     enabledEffect: Boolean = true,
     space: Dp = 12.dp,
+    maxLines: Int = Int.MAX_VALUE,
     textStyle: TextStyle = MaterialTheme.typography.button,
     padding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
@@ -85,6 +86,7 @@ fun BorderButton(
         border = BorderStroke(ButtonDefaults.OutlinedBorderSize, if (enabled) borderColor else borderColor.copy(alpha = 0.4f)),
         textStyle = textStyle,
         padding = padding,
+        maxLines = maxLines,
         interactionSource = interactionSource,
         modifier = modifier
     )
@@ -99,6 +101,7 @@ fun FilledButton(
     iconTint: Color = MaterialTheme.colors.onPrimary,
     maxLines: Int = Int.MAX_VALUE,
     enabled: Boolean = true,
+    enabledEffect: Boolean = true,
     space: Dp = 12.dp,
     shape: Shape = CircleShape,
     textStyle: TextStyle = MaterialTheme.typography.button.copy(color = MaterialTheme.colors.onPrimary),
@@ -112,6 +115,7 @@ fun FilledButton(
         iconTint = iconTint,
         maxLines = maxLines,
         enabled = enabled,
+        enabledEffect = enabledEffect,
         space = space,
         onClick = onClick,
         shape = shape,
@@ -298,7 +302,7 @@ fun Button(
                 Row(
                     Modifier
                         .defaultMinSize(
-                            minWidth = 42.dp,
+                            minWidth = 0.dp,
                             minHeight = 0.dp
                         )
                         .indication(interactionSource, LocalIndication.current)
@@ -323,7 +327,7 @@ fun Button(
                         } else if (text != null) {
                             Text(text = text, maxLines = maxLines, overflow = TextOverflow.Ellipsis)
                         } else if (icon != null) {
-                            PhoenixIcon(resourceId = icon, tint = iconTint, modifier = Modifier.padding(vertical = 1.dp))
+                            PhoenixIcon(resourceId = icon, tint = iconTint)
                         }
                     }
                 )

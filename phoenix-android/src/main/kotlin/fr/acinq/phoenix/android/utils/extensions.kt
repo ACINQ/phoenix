@@ -16,20 +16,23 @@
 
 package fr.acinq.phoenix.android.utils
 
-import android.app.*
 import android.content.*
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.core.content.FileProvider
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.utils.Connection
+import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.utils.extensions.desc
+import java.io.File
 import java.security.cert.CertificateException
 import java.util.*
 import kotlin.contracts.ExperimentalContracts
@@ -59,6 +62,15 @@ inline fun <T, R> T.ifLet(block: (T) -> R): R {
     return block(this)
 }
 
+fun Context.safeFindActivity(): MainActivity? {
+    var context = this
+    while (context is ContextWrapper) {
+        if (context is MainActivity) return context
+        context = context.baseContext
+    }
+    return null
+}
+
 fun Context.findActivity(): MainActivity {
     var context = this
     while (context is ContextWrapper) {
@@ -66,6 +78,16 @@ fun Context.findActivity(): MainActivity {
         context = context.baseContext
     }
     throw IllegalStateException("not in the context of the main Phoenix activity")
+}
+
+fun Context.createContactPictureUri(
+    provider: String = "${BuildConfig.APPLICATION_ID}.provider",
+): Uri {
+    val contactDir = File(cacheDir, "contacts")
+    if (!contactDir.exists()) contactDir.mkdir()
+    val photoFile = File(contactDir, "contact_${currentTimestampMillis()}.jpg")
+    if (!photoFile.exists() || !photoFile.canWrite()) photoFile.createNewFile()
+    return FileProvider.getUriForFile(applicationContext, provider, photoFile)
 }
 
 @Composable
@@ -124,12 +146,12 @@ fun WalletPayment.smartDescription(context: Context): String? = when (this) {
     is LightningOutgoingPayment -> when (val details = this.details) {
         is LightningOutgoingPayment.Details.Normal -> details.paymentRequest.desc
         is LightningOutgoingPayment.Details.SwapOut -> context.getString(R.string.paymentdetails_desc_swapout, details.address)
-        is LightningOutgoingPayment.Details.Blinded -> details.paymentRequest.description
+        is LightningOutgoingPayment.Details.Blinded -> details.paymentRequest.invoiceRequest.payerNote ?: details.paymentRequest.description
     }
     is IncomingPayment -> when (val origin = this.origin) {
         is IncomingPayment.Origin.Invoice -> origin.paymentRequest.description
         is IncomingPayment.Origin.SwapIn, is IncomingPayment.Origin.OnChain -> context.getString(R.string.paymentdetails_desc_swapin)
-        is IncomingPayment.Origin.Offer -> context.getString(R.string.paymentdetails_desc_offer_incoming, origin.metadata.offerId.toHex())
+        is IncomingPayment.Origin.Offer -> null
     }
     is SpliceOutgoingPayment -> context.getString(R.string.paymentdetails_desc_splice_out)
     is ChannelCloseOutgoingPayment -> context.getString(R.string.paymentdetails_desc_closing_channel)

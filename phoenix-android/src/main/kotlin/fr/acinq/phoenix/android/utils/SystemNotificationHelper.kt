@@ -277,17 +277,10 @@ object SystemNotificationHelper {
         return NotificationCompat.Builder(context, PAYMENT_RECEIVED_NOTIF_CHANNEL).apply {
             setContentTitle(context.getString(R.string.notif_headless_received, amount.toPrettyString(unit, rate, withUnit = true)))
             setSmallIcon(R.drawable.ic_phoenix_outline)
-            setContentIntent(TaskStackBuilder.create(context).run {
-                addNextIntentWithParentStack(
-                    Intent(
-                        Intent.ACTION_VIEW,
-                        "phoenix:payments/${WalletPaymentId.DbType.INCOMING.value}/${paymentHash.toHex()}".toUri(),
-                        context,
-                        MainActivity::class.java
-                    )
-                )
-                getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-            })
+            val intent = Intent(Intent.ACTION_VIEW,"phoenix:payments/${WalletPaymentId.DbType.INCOMING.value}/${paymentHash.toHex()}".toUri(), context, MainActivity::class.java).apply {
+                Intent.FLAG_ACTIVITY_SINGLE_TOP
+            }
+            setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT))
             setAutoCancel(true)
         }.build().also {
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {

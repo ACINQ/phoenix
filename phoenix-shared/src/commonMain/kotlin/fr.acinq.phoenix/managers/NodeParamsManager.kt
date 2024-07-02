@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.managers
 
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.Satoshi
@@ -29,6 +30,7 @@ import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.shared.BuildVersions
 import fr.acinq.lightning.logging.info
+import fr.acinq.phoenix.data.OfferData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
@@ -75,6 +77,13 @@ class NodeParamsManager(
                 log.info { "lightning-kmp version=${BuildVersions.LIGHTNING_KMP_VERSION}" }
                 _nodeParams.value = it
             }
+        }
+    }
+
+    /** See [NodeParams.defaultOffer]. Returns an [OfferData] object. */
+    suspend fun defaultOffer(): OfferData {
+        return nodeParams.filterNotNull().first().defaultOffer(trampolineNodeId).let {
+            OfferData(it.first, it.second)
         }
     }
 
