@@ -163,8 +163,6 @@
     <string name="send_offer_payer_note_dialog_title">Attach a custom message</string>
     <string name="send_offer_payer_note_dialog_subtitle">The recipient will see this message</string>
     <string name="send_offer_payer_note_dialog_placeholder">Enter a message…</string>
-    <string name="send_offer_payer_key_label">Payer key</string>
-    <string name="send_offer_payer_key_help">If random, the recipient will not know who made the payment.</string>
     <string name="send_offer_fetching">Fetching payment details…</string>
     <string name="send_offer_failure_title">Payment has failed</string>
     <string name="send_offer_failure_timeout">Could not retrieve payment details within a reasonable time.\n\nThe recipient may be offline or unreachable.</string>
@@ -386,8 +384,8 @@
     <string name="paymentdetails_desc_inbound_liquidity">+%1$s inbound liquidity</string>
     <string name="paymentdetails_desc_swapout">Swap-out to %1$s</string>
     <string name="paymentdetails_desc_swapin">On-chain deposit</string>
-    <string name="paymentdetails_desc_to">Payment to %1$s</string>
-    <string name="paymentdetails_desc_from">Payment from %1$s</string>
+    <string name="paymentdetails_desc_to">To %1$s</string>
+    <string name="paymentdetails_desc_from">From %1$s</string>
     <string name="paymentdetails_desc_offer_incoming">Offer</string>
 
     <string name="paymentdetails_edit_dialog_title">Add a custom description to this payment</string>
@@ -686,7 +684,7 @@
     <string name="paymentsettings_overpayment_disabled">Disabled (default)</string>
 
     <string name="paymentsettings_random_payer_key_title">Random payer key</string>
-    <string name="paymentsettings_random_payer_key_desc">Enable if you don\'t want Bolt12 recipients to know that payments come from your wallet.</string>
+    <string name="paymentsettings_random_payer_key_desc">If random, the recipient of a BOLT12 offer will not know who made the payment. Disabled by default.</string>
 
     <!-- settings: currencies -->
 
