@@ -65,14 +65,21 @@ struct Bolt12Sheet: View {
 		
 		Text(
 			"""
-			This is a lightning offer (also known as a BOLT 12 invoice) which uses \
-			new bleeding-edge tech.
+			**This Bolt12 payment request is the Lightning equivalent to a Bitcoin address.**
 			
-			Unlike regular Lightning invoices, it does not expire \
-			and can be reused at will. It can be used as a tipping address and for donations.
+			Unlike traditional Lightning invoices, it does not expire and can be reused.
 			
-			Currently, few wallets support this new tech. If you have issues, \
-			use a regular Lightning invoice instead.
+			Share it widely : for donations, tips, or to get paid by your friends.
+			
+			🛟 **Who supports Bolt12?**
+			
+			For the moment, few services support Bolt12. If a service rejects this \
+			invoice, let them know they're missing out!
+			
+			🪫 **Restrictions**
+			
+			Your phone must be turned on and connected to the internet to receive a payment. \
+			Also enabling TOR in Phoenix may cause issues.
 			"""
 		)
 	}

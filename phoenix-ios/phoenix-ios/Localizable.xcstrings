@@ -1552,6 +1552,9 @@
         }
       }
     },
+    "**This Bolt12 payment request is the Lightning equivalent to a Bitcoin address.**\n\nUnlike traditional Lightning invoices, it does not expire and can be reused.\n\nShare it widely : for donations, tips, or to get paid by your friends.\n\n🛟 **Who supports Bolt12?**\n\nFor the moment, few services support Bolt12. If a service rejects this invoice, let them know they're missing out!\n\n🪫 **Restrictions**\n\nYour phone must be turned on and connected to the internet to receive a payment. Also enabling TOR in Phoenix may cause issues." : {
+
+    },
     "#%lld: %@" : {
       "localizations" : {
         "ar" : {
@@ -38456,9 +38459,6 @@
           }
         }
       }
-    },
-    "This is a lightning offer (also known as a BOLT 12 invoice) which uses new bleeding-edge tech.\n\nUnlike regular Lightning invoices, it does not expire and can be reused at will. It can be used as a tipping address and for donations.\n\nCurrently, few wallets support this new tech. If you have issues, use a regular Lightning invoice instead." : {
-
     },
     "This is a swap address. It is not controlled by your wallet. On-chain deposits sent to this address will be converted to Lightning channels." : {
       "extractionState" : "manual",
