@@ -689,7 +689,7 @@
     <string name="paymentsettings_overpayment_disabled">Disabled (default)</string>
 
     <string name="paymentsettings_random_payer_key_title">Random payer key</string>
-    <string name="paymentsettings_random_payer_key_desc">If random, the recipient of a BOLT12 offer will not know who made the payment. Disabled by default.</string>
+    <string name="paymentsettings_random_payer_key_desc">If enabled, the recipient of a BOLT12 offer will not know who made the payment.</string>
 
     <!-- settings: currencies -->
 

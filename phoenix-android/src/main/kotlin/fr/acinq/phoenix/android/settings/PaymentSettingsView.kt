@@ -118,6 +118,14 @@ fun PaymentSettingsView(
                     initialShowDialog = false
                 )
             }
+
+            SettingSwitch(
+                title = "Block BOLT12 payments from unknown sources",
+                description = "\uD83D\uDEA7 Coming soon",
+                enabled = false,
+                isChecked = false,
+                onCheckChangeAttempt = {}
+            )
         }
 
         val isOverpaymentEnabled by userPrefs.getIsOverpaymentEnabled.collectAsState(initial = false)

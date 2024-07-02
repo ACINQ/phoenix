@@ -211,8 +211,7 @@ fun SettingSwitch(
     Column(
         modifier
             .fillMaxWidth()
-            .clickable(onClick = { if (enabled) onCheckChangeAttempt(!isChecked) })
-            .enableOrFade(enabled)
+            .clickable(onClick = { if (enabled) onCheckChangeAttempt(!isChecked) }, enabled = enabled)
             .padding(horizontal = 16.dp, vertical = 12.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -220,9 +219,9 @@ fun SettingSwitch(
                 PhoenixIcon(it, Modifier.size(ButtonDefaults.IconSize))
                 Spacer(Modifier.width(12.dp))
             }
-            Text(text = title, style = MaterialTheme.typography.body2, modifier = Modifier.weight(1f))
+            Text(text = title, style = if (enabled) MaterialTheme.typography.body2 else MaterialTheme.typography.caption, modifier = Modifier.weight(1f))
             Spacer(Modifier.width(16.dp))
-            Switch(checked = isChecked, onCheckedChange = null)
+            Switch(checked = isChecked, onCheckedChange = null, enabled = enabled, modifier = Modifier.enableOrFade(enabled))
         }
         if (description != null) {
             Spacer(modifier = Modifier.height(2.dp))
