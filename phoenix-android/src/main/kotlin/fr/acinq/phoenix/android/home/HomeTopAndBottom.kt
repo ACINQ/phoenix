@@ -62,7 +62,7 @@ fun TopBar(
     electrumBlockheight: Int,
     onTorClick: () -> Unit,
     isTorEnabled: Boolean?,
-    hasFcmToken: Boolean,
+    isFCMUnavailable: Boolean,
     isPowerSaverMode: Boolean,
     inFlightPaymentsCount: Int,
     showRequestLiquidity: Boolean,
@@ -90,7 +90,7 @@ fun TopBar(
         }
 
         BackgroundRestrictionBadge(
-            isMissingFcmToken = !hasFcmToken,
+            isFCMUnavailable = isFCMUnavailable,
             isTorEnabled = isTorEnabled == true,
             isPowerSaverMode = isPowerSaverMode
         )
@@ -197,15 +197,15 @@ private fun TopBadgeButton(
 private fun BackgroundRestrictionBadge(
     isTorEnabled: Boolean,
     isPowerSaverMode: Boolean,
-    isMissingFcmToken: Boolean,
+    isFCMUnavailable: Boolean,
 ) {
-    if (isTorEnabled || isPowerSaverMode || isMissingFcmToken) {
+    if (isTorEnabled || isPowerSaverMode || isFCMUnavailable) {
         var showDialog by remember { mutableStateOf(false) }
 
         TopBadgeButton(
             text = null,
             icon = R.drawable.ic_alert_triangle,
-            iconTint = negativeColor,
+            iconTint = warningColor,
             onClick = { showDialog = true },
         )
         Spacer(modifier = Modifier.width(4.dp))
@@ -230,7 +230,7 @@ private fun BackgroundRestrictionBadge(
                         if (isPowerSaverMode) {
                             TextWithIcon(text = stringResource(id = R.string.home_background_restriction_powersaver), icon = R.drawable.ic_battery_charging)
                         }
-                        if (isMissingFcmToken) {
+                        if (isFCMUnavailable) {
                             TextWithIcon(text = stringResource(id = R.string.home_background_restriction_fcm), icon = R.drawable.ic_cloud_off)
                             Text(
                                 text = stringResource(id = R.string.home_background_restriction_fcm_details),
@@ -254,7 +254,6 @@ private fun InflightPaymentsBadge(
     TopBadgeButton(
         text = "$count",
         icon = R.drawable.ic_send,
-        iconTint = MaterialTheme.colors.onPrimary,
         onClick = { showInflightPaymentsDialog = true },
     )
     Spacer(modifier = Modifier.width(4.dp))

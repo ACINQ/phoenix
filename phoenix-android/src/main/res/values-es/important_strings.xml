@@ -74,6 +74,14 @@
     <string name="home_swapin_help_generic">Se han depositado fondos on-chain en tu cartera.</string>
     <string name="home_swapin_help_button">Ver detalles</string>
 
+    <string name="home_background_restriction_title">Procesamiento en segundo plano restringido</string>.
+    <string name="home_background_restriction_body_1">Phoenix no podrá recibir pagos cuando esté en segundo plano, o cuando esté cerrado.</string>
+    <string name="home_background_restriction_body_2">Esto ocurre porque:</string>
+    <string name="home_background_restriction_tor">Tor está activado</string>
+    <string name="home_background_restriction_powersaver">El dispositivo está en modo de ahorro de energía</string>
+    <string name="home_background_restriction_fcm">FCM notificaciones no disponibles</string>
+    <string name="home_background_restriction_fcm_details">Si utilizas GrapheneOS o CalyxOS, instala Google Play Services para recibir notificaciones de FCM. Consulta las preguntas frecuentes para obtener más información.</string>
+
     <!-- home: bottom menu -->
 
     <string name="menu_settings">Configuración</string>

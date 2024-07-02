@@ -89,6 +89,14 @@
     <string name="home_swapin_help_generic">Tiền vốn on-chain đã được ký gửi vào ví của bạn.</string>
     <string name="home_swapin_help_button">Nhấn để biết thêm chi tiết</string>
 
+    <string name="home_background_restriction_title">Hạn chế xử lý nền</string>
+    <string name="home_background_restriction_body_1">Phoenix sẽ không thể nhận thanh toán khi nó ở chế độ nền hoặc khi nó bị đóng.</string>
+    <string name="home_background_restriction_body_2">Điều này xảy ra vì:</string>
+    <string name="home_background_restriction_tor">Tor đã được bật</string>
+    <string name="home_background_restriction_powersaver">Thiết bị đang ở chế độ tiết kiệm năng lượng</string>
+    <string name="home_background_restriction_fcm">Thông báo FCM không khả dụng</string>
+    <string name="home_background_restriction_fcm_details">Nếu bạn đang sử dụng GrapheneOS hoặc CalyxOS, hãy cài đặt Dịch vụ Google Play để nhận thông báo FCM. Hãy xem Câu hỏi thường gặp để được trợ giúp.</string>
+
     <!-- home: bottom menu -->
 
     <string name="menu_settings">Cài đặt</string>

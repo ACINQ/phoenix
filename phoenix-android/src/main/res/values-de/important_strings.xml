@@ -79,6 +79,14 @@
     <string name="home_swapin_help_generic">On-Chain Guthaben wurde auf Ihre Wallet eingezahlt.</string>
     <string name="home_swapin_help_button">Tippen Sie für Details</string>
 
+    <string name="home_background_restriction_title">Hintergrundverarbeitung eingeschränkt</string>
+    <string name="home_background_restriction_body_1">Phoenix kann keine Zahlungen empfangen, wenn es im Hintergrund läuft oder geschlossen ist.</string>
+    <string name="home_background_restriction_body_2">Dies geschieht, weil:</string>
+    <string name="home_background_restriction_tor">Tor ist aktiviert</string>
+    <string name="home_background_restriction_powersaver">Das Gerät ist im Energiesparmodus</string>
+    <string name="home_background_restriction_fcm">FCM-Benachrichtigungen nicht verfügbar</string>
+    <string name="home_background_restriction_fcm_details">Wenn Sie GrapheneOS oder CalyxOS verwenden, installieren Sie Google Play Services, um FCM-Benachrichtigungen zu erhalten. Lesen Sie die FAQ für Hilfe.</string>
+
     <!-- home: bottom menu -->
 
     <string name="menu_settings">Einstellungen</string>

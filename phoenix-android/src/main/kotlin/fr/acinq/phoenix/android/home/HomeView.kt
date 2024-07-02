@@ -53,6 +53,7 @@ import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.Dialog
 import fr.acinq.phoenix.android.components.PrimarySeparator
 import fr.acinq.phoenix.android.components.mvi.MVIView
+import fr.acinq.phoenix.android.utils.FCMHelper
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
 import fr.acinq.phoenix.android.utils.findActivity
@@ -85,6 +86,7 @@ fun HomeView(
     val userPrefs = application.userPrefs
     val isPowerSaverModeOn = noticesViewModel.isPowerSaverModeOn
     val fcmToken by internalData.getFcmToken.collectAsState(initial = "")
+    val isFCMAvailable = remember { FCMHelper.isFCMAvailable(context) }
     val torEnabledState = userPrefs.getIsTorEnabled.collectAsState(initial = null)
     val balanceDisplayMode by userPrefs.getHomeAmountDisplayMode.collectAsState(initial = HomeAmountDisplayMode.REDACTED)
 
@@ -225,7 +227,7 @@ fun HomeView(
                     inFlightPaymentsCount = inFlightPaymentsCount,
                     isTorEnabled = torEnabledState.value,
                     onTorClick = onTorClick,
-                    hasFcmToken = fcmToken != null,
+                    isFCMUnavailable = fcmToken == null || !isFCMAvailable,
                     isPowerSaverMode = isPowerSaverModeOn,
                     showRequestLiquidity = channels.canRequestLiquidity(),
                     onRequestLiquidityClick = onRequestLiquidityClick,

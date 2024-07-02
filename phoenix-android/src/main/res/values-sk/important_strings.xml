@@ -82,6 +82,14 @@
     <string name="home_swapin_help_generic">On-chain peniaze boli vložené do vašej peňaženky.</string>
     <string name="home_swapin_help_button">Kliknite pre podrobnosti</string>
 
+    <string name="home_background_restriction_title">Omedzené spracovanie pozadia</string>
+    <string name="home_background_restriction_body_1">Fénix nebude môcť prijímať platby, keď je na pozadí alebo keď je zatvorený.</string>
+    <string name="home_background_restriction_body_2">Deje sa tak, pretože:</string>
+    <string name="home_background_restriction_tor">Tor je povolený</string>
+    <string name="home_background_restriction_powersaver">Zariadenie je v úspornom režime</string>
+    <string name="home_background_restriction_fcm">Oznamy FCM nie sú k dispozícii</string>
+    <string name="home_background_restriction_fcm_details">Ak používate GrapheneOS alebo CalyxOS, nainštalujte si Google Play Services, aby ste mohli dostávať oznámenia FCM. Pozrite si často kladené otázky, kde nájdete návod.</string>
+
     <!-- home: bottom menu -->
 
     <string name="menu_settings">Nastavenia</string>

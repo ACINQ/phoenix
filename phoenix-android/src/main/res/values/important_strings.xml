@@ -91,7 +91,7 @@
     <string name="home_background_restriction_body_2">This happens because:</string>
     <string name="home_background_restriction_tor">Tor is enabled</string>
     <string name="home_background_restriction_powersaver">The device is in power saving mode</string>
-    <string name="home_background_restriction_fcm">Cloud notifications unavailable</string>
+    <string name="home_background_restriction_fcm">FCM notifications unavailable</string>
     <string name="home_background_restriction_fcm_details">If you\'re on GrapheneOS or CalyxOS, install Google Play Services to get FCM notifications. Check the FAQ for guidance.</string>
 
     <!-- home: bottom menu -->
