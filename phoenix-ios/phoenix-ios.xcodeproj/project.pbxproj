@@ -93,6 +93,7 @@
 		DC2F431C27B69BB20006FCC4 /* LightningInvoiceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2F431B27B69BB20006FCC4 /* LightningInvoiceView.swift */; };
 		DC32FB3529A3D3FE009912AC /* XpcManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC32FB3429A3D3FE009912AC /* XpcManager.swift */; };
 		DC33369826BAF721000E3F49 /* ShortSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC33369726BAF721000E3F49 /* ShortSheet.swift */; };
+		DC3345D02C2B4C1200EDD2D4 /* AddContactSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3345CF2C2B4C1200EDD2D4 /* AddContactSheet.swift */; };
 		DC33C5632A7C15D40053D785 /* MainView_BigPrimary.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC33C5622A7C15D40053D785 /* MainView_BigPrimary.swift */; };
 		DC34399F276CEFB600CAA73A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7555FF84242A565B00829871 /* Assets.xcassets */; };
 		DC355E1D2A4398A8008E8A8E /* NoticeBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC355E1C2A4398A8008E8A8E /* NoticeBox.swift */; };
@@ -495,6 +496,7 @@
 		DC2F431B27B69BB20006FCC4 /* LightningInvoiceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightningInvoiceView.swift; sourceTree = "<group>"; };
 		DC32FB3429A3D3FE009912AC /* XpcManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XpcManager.swift; sourceTree = "<group>"; };
 		DC33369726BAF721000E3F49 /* ShortSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortSheet.swift; sourceTree = "<group>"; };
+		DC3345CF2C2B4C1200EDD2D4 /* AddContactSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddContactSheet.swift; sourceTree = "<group>"; };
 		DC33C5622A7C15D40053D785 /* MainView_BigPrimary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView_BigPrimary.swift; sourceTree = "<group>"; };
 		DC355E1C2A4398A8008E8A8E /* NoticeBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoticeBox.swift; sourceTree = "<group>"; };
 		DC355E1E2A44A235008E8A8E /* NotificationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationCell.swift; sourceTree = "<group>"; };
@@ -808,6 +810,7 @@
 				DCA3B41A2A5220A200E6B231 /* notifications */,
 				DC2F431227B696A40006FCC4 /* receive */,
 				DC118BF627B44E4C0080BBAC /* send */,
+				DC3345CE2C2B4BED00EDD2D4 /* contacts */,
 				DCCD045B27EE0101007D57A5 /* inspect */,
 				DCD1208528663F2D00EB39C5 /* transactions */,
 				DC71E7312728643C0063613D /* tools */,
@@ -1001,6 +1004,14 @@
 				DC2B74C22C121571001BA1FD /* Bolt12Sheet.swift */,
 			);
 			path = receive;
+			sourceTree = "<group>";
+		};
+		DC3345CE2C2B4BED00EDD2D4 /* contacts */ = {
+			isa = PBXGroup;
+			children = (
+				DC3345CF2C2B4C1200EDD2D4 /* AddContactSheet.swift */,
+			);
+			path = contacts;
 			sourceTree = "<group>";
 		};
 		DC46BAEC26CACCF700E760A6 /* kotlin */ = {
@@ -1868,6 +1879,7 @@
 				DC2F431827B698E20006FCC4 /* ShareOptionsSheet.swift in Sources */,
 				DC72C33425A51AAC008A927A /* CurrencyPrefs.swift in Sources */,
 				DCE6FB8C28D0B5F200054511 /* ResetWalletView.swift in Sources */,
+				DC3345D02C2B4C1200EDD2D4 /* AddContactSheet.swift in Sources */,
 				DCE7232E27AD68CD0017CF56 /* SyncTxManager_Actor.swift in Sources */,
 				DC16965F27FE0FAC003DE1DD /* KotlinExtensions+Currency.swift in Sources */,
 				DC65BBF22A58A40700EBA651 /* CpfpView.swift in Sources */,

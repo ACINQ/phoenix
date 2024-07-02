@@ -127,19 +127,30 @@ struct PaymentDetails: View {
 			titleColumn("Send To")
 			
 			let offer: String = model.offer.encode()
-			Text(offer)
-				.lineLimit(2)
-				.truncationMode(.middle)
-				.font(valueFont)
-				.gridCellColumns(2)
-				.gridColumnAlignment(.leading)
-				.contextMenu {
-					Button {
-						UIPasteboard.general.string = offer
-					} label: {
-						Text("Copy")
+			VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+				Text(offer)
+					.lineLimit(2)
+					.truncationMode(.middle)
+					.gridCellColumns(2)
+					.gridColumnAlignment(.leading)
+					.contextMenu {
+						Button {
+							UIPasteboard.general.string = offer
+						} label: {
+							Text("Copy")
+						}
+					}
+				Button {
+					parent.showAddContactSheet()
+				} label: {
+					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 2) {
+						Image(systemName: "person")
+						Text("Add contact")
 					}
 				}
+			} // </VStack>
+			.font(valueFont)
+			
 		} // </GridRow>
 		
 		GridRow(alignment: VerticalAlignment.firstTextBaseline) {

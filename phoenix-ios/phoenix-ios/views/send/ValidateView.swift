@@ -1449,6 +1449,19 @@ struct ValidateView: View {
 		}
 	}
 	
+	func showAddContactSheet() {
+		log.trace("showAddContactSheet()")
+		
+		guard let offer = bolt12Offer() else {
+			return
+		}
+		
+		dismissKeyboardIfVisible()
+		smartModalState.display(dismissable: false) {
+			AddContactSheet(offer: offer)
+		}
+	}
+	
 	func maybeShowCapacityImpactWarning() {
 		log.trace("maybeShowCapacityImpactWarning()")
 		
