@@ -136,6 +136,7 @@ dependencies {
 
     // firebase cloud messaging
     implementation("com.google.firebase:firebase-messaging:${Versions.Android.fcm}")
+    implementation("com.google.android.gms:play-services-base:18.5.0")
 
     implementation("com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava")
 

@@ -79,6 +79,7 @@
     <string name="settings_payment_settings">Phương thức thanh toán</string>
     <string name="settings_payment_history">Lịch sử thanh toán</string>
     <string name="settings_notifications">Thông báo</string>
+    <string name="settings_contacts">Danh bạ của tôi</string>
 
     <!-- home: swap help -->
 
@@ -87,6 +88,14 @@
     <string name="home_swapin_help_ready_disabled">Các khoản đặt cọc sẽ vẫn duy trì ở on-chain do chức năng quản lý kênh tự động đã bị tắt.</string>
     <string name="home_swapin_help_generic">Tiền vốn on-chain đã được ký gửi vào ví của bạn.</string>
     <string name="home_swapin_help_button">Nhấn để biết thêm chi tiết</string>
+
+    <string name="home_background_restriction_title">Hạn chế xử lý nền</string>
+    <string name="home_background_restriction_body_1">Phoenix sẽ không thể nhận thanh toán khi nó ở chế độ nền hoặc khi nó bị đóng.</string>
+    <string name="home_background_restriction_body_2">Điều này xảy ra vì:</string>
+    <string name="home_background_restriction_tor">Tor đã được bật</string>
+    <string name="home_background_restriction_powersaver">Thiết bị đang ở chế độ tiết kiệm năng lượng</string>
+    <string name="home_background_restriction_fcm">Thông báo FCM không khả dụng</string>
+    <string name="home_background_restriction_fcm_details">Nếu bạn đang sử dụng GrapheneOS hoặc CalyxOS, hãy cài đặt Dịch vụ Google Play để nhận thông báo FCM. Hãy xem Câu hỏi thường gặp để được trợ giúp.</string>
 
     <!-- home: bottom menu -->
 
@@ -136,6 +145,27 @@
     <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Khoản phí để nhận được khoản tiền này là %1$s và cao hơn %2$s%% so với khoản tiền sẽ nhận được.\n\nHãy tăng mức phí giới hạn trong mục Quản Lý Kênh, hoặc yêu cầu bổ sung thanh khoản.</string>
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Tính thanh khoản đầu vào không đủ cho khoản tiền này, ngoài ra bạn đã tắt chế độ quản lý kênh tự động.</string>
+
+    <!-- receive: offer labels -->
+
+    <string name="receive_toggle_offer_button">Hiển thị mã QR có thể sử dụng lại</string>
+
+    <string name="receive_offer_howto_intro_1">🎉 Đây là mã QR có thể sử dụng lại của bạn!</string>
+    <string name="receive_offer_howto_intro_2">Nhấn để tìm hiểu cách sử dụng</string>
+    <string name="receive_offer_howto_details_1">Yêu cầu thanh toán Bolt12 này tương đương với Lightning với địa chỉ Bitcoin.</string>
+    <string name="receive_offer_howto_details_2">Không giống như hóa đơn Lightning truyền thống, nó không hết hạn và có thể được sử dụng lại.</string>
+    <string name="receive_offer_howto_details_3">Chia sẻ rộng rãi: để quyên góp, mẹo hoặc để được bạn bè trả tiền.</string>
+    <string name="receive_offer_howto_details_4_title">🛟 Ai ủng hộ Bolt12?</string>
+    <string name="receive_offer_howto_details_4">Hiện tại, rất ít dịch vụ hỗ trợ Bolt12. Nếu một dịch vụ từ chối hóa đơn này, hãy cho họ biết họ đang bỏ lỡ!</string>
+    <string name="receive_offer_howto_details_5_title">🔋 Hạn chế về pin</string>
+    <string name="receive_offer_howto_details_5">Kiểm tra xem Android có áp dụng chế độ tiết kiệm pin cho Phoenix hay không. Nếu không, bạn sẽ không thể nhận thanh toán nếu ứng dụng bị đóng hoặc chạy ở chế độ nền. Kích hoạt TOR ở Phoenix cũng sẽ gây ra sự cố.</string>
+    <string name="receive_offer_howto_details_faq_link">Tìm hiểu thêm</string>
+
+    <!-- receive: Tor warning -->
+
+    <string name="receive_tor_warning_title">Tor đã được bật</string>
+    <string name="receive_tor_warning_dialog_content_1">Phoenix không thể nhận thanh toán ở chế độ nền.</string>
+    <string name="receive_tor_warning_dialog_content_2">Để tránh thanh toán thất bại, thay vào đó hãy sử dụng Orbot hoặc đảm bảo Phoenix vẫn hiển thị ở nền trước khi thanh toán được gửi cho bạn.</string>
 
     <!-- scanning errors -->
 
@@ -240,7 +270,11 @@
 
     <!-- Tor -->
 
-    <string name="tor_settings_subtitle">Phoenix có thể sử dụng Tor để bảo vệ IP của bạn khỏi các nút mạng khác trên mạng Lightning và máy chủ Electrum.\n\nBật Tor sẽ tăng quyền riêng tư của bạn nhưng lại có thể sẽ gây ra sự cố thanh toán nếu kết nối mạng của bạn không ổn định.</string>
+    <string name="tor_settings_subtitle">Phoenix có thể sử dụng Tor để bảo vệ IP của bạn khỏi các nút mạng khác trên mạng Lightning và máy chủ Electrum.</string>
+
+    <string name="tor_confirm_dialog_title">Bật Tor ?</string>
+    <string name="tor_confirm_dialog_details_1">Tor chạy chậm và sẽ ảnh hưởng đến hiệu suất thanh toán của bạn.</string>
+    <string name="tor_confirm_dialog_details_2">Đặc biệt, bạn <b>sẽ không thể nhận thanh toán</b> nếu Phoenix ở chế độ nền hoặc nếu nó bị đóng.</string>
 
     <!-- about -->
 

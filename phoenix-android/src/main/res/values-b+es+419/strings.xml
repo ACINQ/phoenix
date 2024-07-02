@@ -274,7 +274,7 @@
     <string name="home__connection__electrum_late">Retraso de Electrum</string>
     <string name="home__connection__bad_cert">Certificado de Electrum</string>
     <string name="home__connection__connecting">Conectando…</string>
-    <string name="home__connection__tor_active">Tor activado</string>
+    <string name="home__connection__tor_active">Tor</string>
 
     <!-- in-app notifications -->
 
@@ -346,7 +346,7 @@
     <string name="paymentdetails_desc_cpfp">Impulsar transacciones</string>
     <string name="paymentdetails_desc_swapout">Intercambiar a %1$s</string>
     <string name="paymentdetails_desc_swapin">Depósito en la cadena</string>
-    <string name="paymentdetails_desc_identifier">Pago a %1$s</string>
+    <string name="paymentdetails_desc_to">Pago a %1$s</string>
 
     <string name="paymentdetails_edit_dialog_title">Agregar una descripción personalizada para este pago</string>
     <string name="paymentdetails_edit_dialog_input_label">Descripción</string>
@@ -361,8 +361,8 @@
     <string name="paymentdetails_closing">Pago por cierre de canal</string>
     <string name="paymentdetails_splice_outgoing">Pago por empalme saliente</string>
     <string name="paymentdetails_splice_cpfp_outgoing">Acelerar transacciones en la cadena</string>
-    <string name="paymentdetails_normal_outgoing">Pago estándar saliente de Lightning</string>
-    <string name="paymentdetails_normal_incoming">Pago estándar entrante de Lightning</string>
+    <string name="paymentdetails_normal_outgoing">Pago saliente de Lightning (estándar)</string>
+    <string name="paymentdetails_normal_incoming">Pago entrante de Lightning (estándar)</string>
     <string name="paymentdetails_swapin">Depósito de Bitcoin para intercambio</string>
     <string name="paymentdetails_swapout">Intercambio a dirección de Bitcoin</string>
     <string name="paymentdetails_swapin_address_label">Dirección de depósito</string>
@@ -553,7 +553,6 @@
     <string name="tor_settings_state_closed">El proxy de Tor está apagado. \nEspera y comprueba tu conexión a Internet.</string>
     <string name="tor_settings_state_starting">Iniciando proxy de Tor…</string>
     <string name="tor_settings_state_started">Tor está en línea</string>
-    <string name="tor_settings_state_about_perfs">Ten en cuenta que la red Tor es un proyecto abierto que funciona con donaciones. En ocasiones, puede ser muy lento, lo que afectará al rendimiento de la aplicación.</string>
 
     <!-- home: connectivity dialog -->
 

@@ -133,25 +133,27 @@ fun SendBolt11PaymentView(
                 Text(text = it)
             }
         }
+        Spacer(modifier = Modifier.height(16.dp))
         SplashLabelRow(label = stringResource(R.string.send_destination_label), icon = R.drawable.ic_zap) {
             SelectionContainer {
                 Text(text = invoice.nodeId.toHex(), maxLines = 2, overflow = TextOverflow.Ellipsis)
             }
         }
         if (invoice.isAmountlessTrampoline()) {
+            Spacer(modifier = Modifier.height(16.dp))
             SplashLabelRow(label = "", helpMessage = stringResource(id = R.string.send_trampoline_amountless_warning_details)) {
                 Text(text = stringResource(id = R.string.send_trampoline_amountless_warning_label))
             }
         }
+        Spacer(modifier = Modifier.height(16.dp))
         SplashLabelRow(label = stringResource(id = R.string.send_trampoline_fee_label)) {
             val amt = amount
-            val fees = trampolineFees
             if (amt == null) {
                 Text(stringResource(id = R.string.send_trampoline_fee_no_amount), style = MaterialTheme.typography.caption)
-            } else if (fees == null) {
+            } else if (trampolineFees == null) {
                 Text(stringResource(id = R.string.send_trampoline_fee_loading))
             } else {
-                AmountWithFiatRowView(amount = fees.calculateFees(amt))
+                AmountWithFiatRowView(amount = trampolineFees.calculateFees(amt))
             }
         }
         Spacer(modifier = Modifier.height(36.dp))

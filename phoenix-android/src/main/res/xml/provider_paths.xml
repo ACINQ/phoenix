@@ -18,4 +18,5 @@
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
   <files-path name="logs_dir" path="logs" />
   <cache-path name="csv_export" path="payments/" />
+  <cache-path name="contacts" path="contacts/" />
 </paths>

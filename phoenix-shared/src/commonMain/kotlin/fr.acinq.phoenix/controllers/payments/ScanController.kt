@@ -22,7 +22,6 @@ import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.*
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.io.PayInvoice
-import fr.acinq.lightning.io.SendPayment
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.PhoenixBusiness
@@ -36,6 +35,7 @@ import fr.acinq.phoenix.utils.extensions.chain
 import fr.acinq.lightning.logging.error
 import fr.acinq.lightning.logging.info
 import fr.acinq.lightning.payment.Bolt11Invoice
+import fr.acinq.lightning.wire.OfferTypes
 import io.ktor.http.Url
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.filterNotNull
@@ -108,6 +108,8 @@ class AppScanController(
 
         Parser.readBolt11Invoice(input)?.let {
             processBolt11Invoice(it)
+        } ?: Parser.readOffer(input)?.let {
+            processOffer(it)
         } ?: readLnurl(input)?.let {
             processLnurl(it)
         } ?: readBitcoinAddress(input)?.let {
@@ -128,6 +130,15 @@ class AppScanController(
             invoice = invoice,
         )
         model(model)
+    }
+
+    /** Inspects the offer for errors and update the model with the adequate value. */
+    private suspend fun processOffer(offer: OfferTypes.Offer) {
+        if (!offer.chains.contains(chain.chainHash)) {
+            model(Scan.Model.BadRequest(request = offer.encode(), reason = Scan.BadRequestReason.ChainMismatch(expected = chain)))
+        } else {
+            model(Scan.Model.OfferFlow(offer))
+        }
     }
 
     /** Return the adequate model for a Bitcoin address result. */

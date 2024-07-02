@@ -65,6 +65,7 @@ sealed class Screen(val route: String) {
     data object LiquidityRequest: Screen("settings/requestliquidity")
     data object AdvancedLiquidityPolicy: Screen("settings/advancedliquiditypolicy")
     data object Notifications: Screen("notifications")
+    data object Contacts: Screen("settings/contacts")
     data object ResetWallet: Screen("settings/resetwallet")
 }
 

@@ -21,6 +21,7 @@ import fr.acinq.bitcoin.utils.Either
 import fr.acinq.bitcoin.utils.Try
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.utils.sat
+import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.data.*
 import io.ktor.http.*
 import io.ktor.util.*
@@ -68,11 +69,22 @@ object Parser {
     }
 
     /** Reads a payment request after stripping prefixes. Return null if input is invalid. */
-    fun readBolt11Invoice(
-        input: String
-    ): Bolt11Invoice? = when (val res = Bolt11Invoice.read(trimMatchingPrefix(removeExcessInput(input), lightningPrefixes))) {
-        is Try.Success -> res.get()
-        is Try.Failure -> null
+    fun readBolt11Invoice(input: String): Bolt11Invoice? {
+        return when (val res = Bolt11Invoice.read(trimMatchingPrefix(removeExcessInput(input), lightningPrefixes))) {
+            is Try.Success -> res.get()
+            is Try.Failure -> null
+        }
+    }
+
+    fun readOffer(input: String): OfferTypes.Offer? {
+        val cleanInput = trimMatchingPrefix(removeExcessInput(input), lightningPrefixes)
+        return when (val res = OfferTypes.Offer.decode(cleanInput)) {
+            is Try.Success -> res.get()
+            is Try.Failure -> {
+                println("invalid offer=$input")
+                null
+            }
+        }
     }
 
     /**

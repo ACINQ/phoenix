@@ -19,20 +19,38 @@ package fr.acinq.phoenix.android.payments
 
 import android.Manifest
 import android.content.Intent
-import android.net.*
-import android.provider.*
+import android.net.Uri
+import android.provider.Settings
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,21 +59,35 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.accompanist.permissions.*
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.ResultPoint
 import com.google.zxing.client.android.Intents
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
-import fr.acinq.phoenix.android.*
+import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.business
+import fr.acinq.phoenix.android.components.Button
+import fr.acinq.phoenix.android.components.Card
+import fr.acinq.phoenix.android.components.Clickable
+import fr.acinq.phoenix.android.components.Dialog
+import fr.acinq.phoenix.android.components.PhoenixIcon
+import fr.acinq.phoenix.android.components.ProgressView
+import fr.acinq.phoenix.android.components.TextInput
+import fr.acinq.phoenix.android.components.VSeparator
+import fr.acinq.phoenix.android.components.contact.ContactsListModal
 import fr.acinq.phoenix.android.components.mvi.MVIControllerViewModel
 import fr.acinq.phoenix.android.components.mvi.MVIView
+import fr.acinq.phoenix.android.controllerFactory
 import fr.acinq.phoenix.android.databinding.ScanViewBinding
+import fr.acinq.phoenix.android.payments.offer.SendOfferView
 import fr.acinq.phoenix.android.payments.spliceout.SendSpliceOutView
-import fr.acinq.phoenix.android.utils.*
+import fr.acinq.phoenix.android.utils.readClipboard
 import fr.acinq.phoenix.controllers.ControllerFactory
 import fr.acinq.phoenix.controllers.ScanController
 import fr.acinq.phoenix.controllers.payments.Scan
@@ -82,6 +114,7 @@ class ScanDataViewModel(controller: ScanController) : MVIControllerViewModel<Sca
 fun ScanDataView(
     input: String? = null,
     onBackClick: () -> Unit,
+    onProcessingFinished: () -> Unit,
     onAuthSchemeInfoClick: () -> Unit,
     onFeeManagementClick: () -> Unit,
 ) {
@@ -101,12 +134,12 @@ fun ScanDataView(
                 ReadDataView(
                     initialInput = initialInput,
                     model = model,
-                    onBackClick = onBackClick,
                     onFeedbackDismiss = {
                         initialInput = ""
                         postIntent(Scan.Intent.Reset)
                     },
-                    onScannedText = { postIntent(Scan.Intent.Parse(request = it)) }
+                    onScannedText = { postIntent(Scan.Intent.Parse(request = it)) },
+                    onBackClick = onBackClick,
                 )
             }
             is Scan.Model.Bolt11InvoiceFlow.Bolt11InvoiceRequest -> {
@@ -120,6 +153,9 @@ fun ScanDataView(
             Scan.Model.Bolt11InvoiceFlow.Sending -> {
                 LaunchedEffect(key1 = Unit) { onBackClick() }
             }
+            is Scan.Model.OfferFlow -> {
+                SendOfferView(offer = model.offer, trampolineFees = trampolineFees, onBackClick = onBackClick, onPaymentSent = onProcessingFinished)
+            }
             is Scan.Model.OnchainFlow -> {
                 val paymentRequest = model.uri.paymentRequest
                 if (paymentRequest == null) {
@@ -127,7 +163,7 @@ fun ScanDataView(
                         requestedAmount = model.uri.amount,
                         address = model.uri.address,
                         onBackClick = onBackClick,
-                        onSpliceOutSuccess = onBackClick,
+                        onSpliceOutSuccess = onProcessingFinished,
                     )
                 } else {
                     var showPaymentModeDialog by remember { mutableStateOf(false) }
@@ -157,10 +193,21 @@ fun ScanDataView(
                 )
             }
             is Scan.Model.LnurlAuthFlow -> {
-                LnurlAuthView(model = model, onBackClick = onBackClick, onLoginClick = { postIntent(it) }, onAuthSchemeInfoClick = onAuthSchemeInfoClick)
+                LnurlAuthView(
+                    model = model,
+                    onBackClick = onBackClick,
+                    onLoginClick = { postIntent(it) },
+                    onAuthSchemeInfoClick = onAuthSchemeInfoClick,
+                    onAuthDone = onProcessingFinished,
+                )
             }
             is Scan.Model.LnurlWithdrawFlow -> {
-                LnurlWithdrawView(model = model, onBackClick = onBackClick, onWithdrawClick = { postIntent(it) }, onFeeManagementClick = onFeeManagementClick)
+                LnurlWithdrawView(
+                    model = model,
+                    onWithdrawClick = { postIntent(it) },
+                    onFeeManagementClick = onFeeManagementClick,
+                    onWithdrawDone = onProcessingFinished,
+                )
             }
         }
     }
@@ -171,11 +218,12 @@ fun ReadDataView(
     initialInput: String?,
     model: Scan.Model,
     onFeedbackDismiss: () -> Unit,
-    onBackClick: () -> Unit,
     onScannedText: (String) -> Unit,
+    onBackClick: () -> Unit,
 ) {
     val context = LocalContext.current.applicationContext
 
+    var showContactsList by remember { mutableStateOf(false) }
     var showManualInputDialog by remember { mutableStateOf(false) }
     var scanView by remember { mutableStateOf<DecoratedBarcodeView?>(null) }
 
@@ -197,33 +245,43 @@ fun ReadDataView(
         }
 
         // buttons at the bottom of the screen
-        Column(
-            Modifier
+        Row(
+            modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(24.dp)
                 .clip(RoundedCornerShape(24.dp))
                 .background(MaterialTheme.colors.surface)
+                .height(IntrinsicSize.Min),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            if (model is Scan.Model.Ready) {
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    icon = R.drawable.ic_input,
-                    text = stringResource(id = R.string.scan_manual_input_button),
-                    onClick = { showManualInputDialog = true },
-                )
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    icon = R.drawable.ic_clipboard,
-                    text = stringResource(id = R.string.scan_paste_button),
-                    onClick = { readClipboard(context)?.let { onScannedText(it) } },
-                )
+            BackHandler(onBack = onBackClick)
+            Button(icon = R.drawable.ic_arrow_back, onClick = onBackClick, modifier = Modifier.fillMaxHeight(), padding = PaddingValues(horizontal = 12.dp))
+            VSeparator(height = 48.dp)
+            Column(modifier = Modifier.weight(1f)) {
+                if (model is Scan.Model.Ready) {
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        icon = R.drawable.ic_user_search,
+                        text = stringResource(id = R.string.settings_contacts),
+                        onClick = { showContactsList = true },
+                        maxLines = 1,
+                    )
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        icon = R.drawable.ic_clipboard,
+                        text = stringResource(id = R.string.scan_paste_button),
+                        onClick = { readClipboard(context)?.let { onScannedText(it) } },
+                        maxLines = 1,
+                    )
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        icon = R.drawable.ic_input,
+                        text = stringResource(id = R.string.scan_manual_input_button),
+                        onClick = { showManualInputDialog = true },
+                        maxLines = 1,
+                    )
+                }
             }
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                text = stringResource(id = R.string.btn_cancel),
-                icon = R.drawable.ic_arrow_back,
-                onClick = onBackClick
-            )
         }
 
         if (model is Scan.Model.BadRequest) {
@@ -238,6 +296,10 @@ fun ReadDataView(
 
         if (showManualInputDialog) {
             ManualInputDialog(onInputConfirm = onScannedText, onDismiss = { showManualInputDialog = false })
+        }
+
+        if (showContactsList) {
+            ContactsListModal(onDismiss = { showContactsList = false })
         }
     }
 }
@@ -271,15 +333,6 @@ fun BoxScope.ScannerView(
             }
             binding
         }
-    )
-    // visor
-    Box(
-        Modifier
-            .width(dimensionResource(id = R.dimen.scanner_size))
-            .height(dimensionResource(id = R.dimen.scanner_size))
-            .clip(RoundedCornerShape(24.dp))
-            .background(Color(0x33ffffff))
-            .align(Alignment.Center)
     )
 }
 

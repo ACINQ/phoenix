@@ -72,6 +72,7 @@
     <string name="settings_payment_settings">Options de paiement</string>
     <string name="settings_payment_history">Historique des paiements</string>
     <string name="settings_notifications">Notifications</string>
+    <string name="settings_contacts">Mes contacts</string>
 
     <!-- home: swap help -->
 
@@ -80,6 +81,14 @@
     <string name="home_swapin_help_ready_disabled">Les dépôts resteront sur la chaîne car la gestion automatique des canaux est désactivée.</string>
     <string name="home_swapin_help_generic">Des fonds on-chain on été déposés sur votre wallet.</string>
     <string name="home_swapin_help_button">Voir les détails</string>
+
+    <string name="home_background_restriction_title">Fonctionnement en arrière plan restreint</string>
+    <string name="home_background_restriction_body_1">Phoenix ne pourra pas recevoir de paiements quand l\'application est en arrière plan ou est fermée.</string>
+    <string name="home_background_restriction_body_2">Cela vient du fait que:</string>
+    <string name="home_background_restriction_tor">Tor est activé</string>
+    <string name="home_background_restriction_powersaver">Le téléphone est en mode économie d\'énergie</string>
+    <string name="home_background_restriction_fcm">Les notifications FCM sont indisponibles</string>
+    <string name="home_background_restriction_fcm_details">Si vous êtes sur GrapheneOS ou CalyxOS, installez les Google Play Services pour avoir accès aux notifications FCM. Consultez la FAQ pour plus d\'infos.</string>
 
     <!-- home: bottom menu -->
 
@@ -131,6 +140,27 @@
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Votre liquidité entrante est insuffisante pour ce montant, et la gestion automatisée des channels est désactivée.</string>
 
+    <!-- receive: offer labels -->
+
+    <string name="receive_toggle_offer_button">QR Code réutilisable</string>
+
+    <string name="receive_offer_howto_intro_1">🎉 Voici votre requête de paiement réutilisable</string>
+    <string name="receive_offer_howto_intro_2">Voir comment ça s\'utilise</string>
+    <string name="receive_offer_howto_details_1">Cette requête de paiement Bolt12 est l\'équivalent Lightning d\'une adresse Bitcoin.</string>
+    <string name="receive_offer_howto_details_2">À la différence des factures Lightning traditionnelles, elle n\'expire pas et peut être réutilisée.</string>
+    <string name="receive_offer_howto_details_3">Partagez-la largement : donations, pourboires, ou pour vous faire payer par vos amis.</string>
+    <string name="receive_offer_howto_details_4_title">🛟 Qui accepte Bolt12 aujourd\'hui?</string>
+    <string name="receive_offer_howto_details_4">Pour l\'instant, peu de services supportent Bolt12. Si des services rejettent ce code, faites-leur savoir qu\'ils passent à côté de quelque chose de génial!</string>
+    <string name="receive_offer_howto_details_5_title">🔋 Restrictions sur la batterie</string>
+    <string name="receive_offer_howto_details_5">Assurez-vous qu\'Android n\'applique pas à Phoenix un mode d\'économie de batterie. Si c\'est le cas, vous ne pourrez pas recevoir de paiements quand l\'application est fermée ou en arrière-plan. Activer TOR sur Phoenix pourra également poser problème.</string>
+    <string name="receive_offer_howto_details_faq_link">En savoir plus</string>
+
+    <!-- receive : Tor warnings -->
+
+    <string name="receive_tor_warning_title">Tor est activé</string>
+    <string name="receive_tor_warning_dialog_content_1">Phoenix ne peut pas recevoir de paiements en arrière-plan.</string>
+    <string name="receive_tor_warning_dialog_content_2">Pour éviter des échecs de paiements, utilisez Orbot, ou bien assurez-vous que Phoenix reste visible au premier plan lorsque des paiements vous sont envoyés.</string>
+
     <!-- scanning errors -->
 
     <string name="scan_error_expired">Cette requête a expiré.</string>
@@ -171,7 +201,7 @@
     <string name="inappnotif_swapin_timeout_message">Un dépôt va bientôt expirer.</string>
     <string name="inappnotif_swapin_timeout_action">Voir les détails</string>
 
-    <string name="inappnotif_watchtower_late_message">Phoenix vérifie périodiquement la blockchain lorsque l\'application est éteinte. Ces derniers jours elle n\'a pas pu le faire.\n\nAssurez vous qu\'Android ne restreigne pas Phoenix, et que l\'application puisse se connecter à Electrum.</string>
+    <string name="inappnotif_watchtower_late_message">Phoenix vérifie périodiquement la blockchain lorsque l\'application est éteinte. Dernièrement, elle n\'a pas pu le faire.\n\nAssurez vous qu\'Android n\'applique pas de restrictions à Phoenix, et que l\'application puisse se connecter à Electrum.</string>
     <string name="inappnotif_watchtower_late_action">Fermer</string>
 
     <string name="inappnotif_upgrade_message">Mise à jour disponible</string>
@@ -205,7 +235,7 @@
 
     <!-- settings: display seed -->
 
-    <string name="displayseed_instructions">La phrase de sauvegarde (aussi appelée clé, ou \"seed\"), est une liste de 12 mots en anglais. Elle permet de restaurer un accès complet aux fonds si besoin.\n\n<b>Vous seul avez possession de cette clé. Gardez la secrète.</b>\n\n<b>Ne la partagez avec personne</b>.\nFaîtes attention au hameçonnage et imposteurs. Les développeurs de Phoenix ne vous demanderont jamais de révéler cette clé.\n\n<b>Ne perdez pas cette clé</b>.\nSauvegardez-là en lieu sûr (pas sur ce téléphone). Si vous perdez cette clé et votre téléphone, vous perdez vos fonds.</string>
+    <string name="displayseed_instructions">La phrase de sauvegarde (aussi appelée clé, ou \"seed\"), est une liste de 12 mots en anglais. Elle permet de restaurer un accès complet aux fonds si besoin.\n\n<b>Vous seul avez possession de cette clé. Gardez la secrète.</b>\n\n<b>Ne la partagez avec personne</b>.\nFaîtes attention au hameçonnage et aux arnaques. Les développeurs de Phoenix ne vous demanderont jamais de révéler votre clé.\n\n<b>Ne perdez pas cette clé</b>.\nSauvegardez-là en lieu sûr (pas sur ce téléphone). Si vous perdez cette clé et votre téléphone, vous perdez vos fonds.</string>
     <string name="displayseed_authenticate_button">Voir ma clé</string>
     <string name="displayseed_dialog_header">GARDEZ CETTE CLÉ SECRÈTE.\nNE LA PARTAGEZ PAS.</string>
     <string name="displayseed_backup_notice_header">Vous n\'avez pas sauvegardé votre clé!</string>
@@ -234,13 +264,17 @@
 
     <!-- Tor -->
 
-    <string name="tor_settings_subtitle">Phoenix peut utiliser Tor pour cacher votre IP des autres noeuds du réseau Lightning et des serveurs Electrum.\n\nActiver Tor améliorera votre vie privée mais peut causer des difficultés de paiement si votre connexion est instable.</string>
+    <string name="tor_settings_subtitle">Phoenix peut utiliser Tor pour masquer votre IP des autres noeuds du réseau Lightning et des serveurs Electrum.</string>
+
+    <string name="tor_confirm_dialog_title">Activer Tor ?</string>
+    <string name="tor_confirm_dialog_details_1">Tor est lent et va impacter les performances de vos paiements.</string>
+    <string name="tor_confirm_dialog_details_2">En particulier, vous <b>ne pourrez pas recevoir de paiements</b> si Phoenix est en arrière-plan, ou est fermée.</string>
 
     <!-- about -->
 
     <string name="about_general_content">Phoenix est un wallet Bitcoin qui utilise le réseau Lightning pour envoyer et recevoir des paiements.\n\nC\'est un logiciel libre et en source ouverte, développé par <a href="https://phoenix.acinq.co">ACINQ</a> sous licence <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a>.</string>
     <string name="about_seed_title">Sauvegarde de votre clé</string>
-    <string name="about_seed_content">Ce wallet est dit souverain (aussi appelé "self-custodial") : <b>vous seul détenez la clé de 12 mots contrôlant les fonds du wallet</b>.\n\nCette clé donne accès aux fonds. Ne la révélez à personne. Faites attention aux tentatives de hameçonnage.</string>
+    <string name="about_seed_content">Ce wallet est dit souverain (aussi appelé "self-custodial") : <b>vous seul détenez la clé de 12 mots contrôlant le wallet</b>.\n\nCette clé donne accès aux fonds. Ne la révélez à personne. Faites attention aux arnaques.</string>
     <string name="about_rates_title">Conversion fiduciaire</string>
     <string name="about_rates_content">La conversion Bitcoin/monnaie fiduciaire est faite par l\'intermédiaire de plateformes tierces :\n\n- Blockchain.info\n- powered by Coindesk.com\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nCes taux de conversion peuvent être imprécis. Vérifiez toujours le montant effectif en Bitcoin avant d\'envoyer un paiement.</string>
 

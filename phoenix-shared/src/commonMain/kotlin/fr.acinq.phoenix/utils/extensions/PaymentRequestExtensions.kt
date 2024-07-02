@@ -17,10 +17,10 @@
 package fr.acinq.phoenix.utils.extensions
 
 import fr.acinq.bitcoin.Chain
-import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.Feature
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.Bolt12Invoice
+import fr.acinq.lightning.payment.OfferPaymentMetadata
 import fr.acinq.lightning.payment.PaymentRequest
 
 fun Bolt11Invoice.isAmountlessTrampoline() = this.amount == null && this.features.hasFeature(Feature.TrampolinePayment)
@@ -44,14 +44,14 @@ val PaymentRequest.chain: Chain
         is Bolt12Invoice -> TODO()
     }
 
-val PaymentRequest.nodeId: PublicKey
-    get() = when (this) {
-        is Bolt11Invoice -> this.nodeId
-        is Bolt12Invoice -> this.nodeId
-    }
-
 val PaymentRequest.desc: String?
     get() = when (this) {
         is Bolt11Invoice -> this.description
         is Bolt12Invoice -> this.description
+    }
+
+val OfferPaymentMetadata.payerNote: String?
+    get() = when {
+        this is OfferPaymentMetadata.V1 -> this.payerNote
+        else -> null
     }

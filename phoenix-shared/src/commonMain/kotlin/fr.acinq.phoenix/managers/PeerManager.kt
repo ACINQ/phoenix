@@ -15,12 +15,14 @@ import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.blockchain.electrum.FinalWallet
 import fr.acinq.lightning.blockchain.electrum.IElectrumClient
+import fr.acinq.lightning.blockchain.electrum.SwapInManager
 import fr.acinq.lightning.blockchain.electrum.SwapInWallet
 import fr.acinq.lightning.blockchain.electrum.WalletState
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.states.ChannelStateWithCommitments
 import fr.acinq.lightning.channel.states.Normal
 import fr.acinq.lightning.channel.states.Offline
+import fr.acinq.lightning.channel.states.PersistedChannelState
 import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.payment.LiquidityPolicy
@@ -100,11 +102,21 @@ class PeerManager(
         initialValue = null,
     )
 
-    /** Flow of the peer's swap-in wallet [WalletState.WalletWithConfirmations]. */
+    /**
+     * Flow of the peer's swap-in wallet [WalletState.WalletWithConfirmations], without the utxos reserved for channels.
+     *
+     * Utxos that are reserved for channels are excluded. This prevents a scenario where a channel is being created - and
+     * the Lightning balance is updated - but the utxos for this channel are not yet spent and are such still listed in
+     * the swap-in wallet flow. The UI would be incorrect for a while.
+     *
+     * See [SwapInManager.reservedWalletInputs] for details.
+     */
     @OptIn(ExperimentalCoroutinesApi::class)
     val swapInWallet = peerState.filterNotNull().flatMapLatest { peer ->
-        combine(peer.currentTipFlow.filterNotNull(), peer.phoenixSwapInWallet.wallet.walletStateFlow) { currentBlockHeight, wallet ->
-            wallet.withConfirmations(
+        combine(peer.currentTipFlow.filterNotNull(), peer.channelsFlow, peer.phoenixSwapInWallet.wallet.walletStateFlow) { currentBlockHeight, channels, swapInWallet ->
+            val reservedInputs = SwapInManager.reservedWalletInputs(channels.values.filterIsInstance<PersistedChannelState>())
+            val walletWithoutReserved = swapInWallet.withoutReservedUtxos(reservedInputs)
+            walletWithoutReserved.withConfirmations(
                 currentBlockHeight = currentBlockHeight,
                 swapInParams = peer.walletParams.swapInParams
             )

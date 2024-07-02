@@ -57,6 +57,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.firebase.messaging.FirebaseMessaging
+import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.components.Button
@@ -89,6 +90,7 @@ import fr.acinq.phoenix.android.settings.walletinfo.SwapInWallet
 import fr.acinq.phoenix.android.settings.walletinfo.WalletInfoView
 import fr.acinq.phoenix.android.startup.LegacySwitcherView
 import fr.acinq.phoenix.android.startup.StartupView
+import fr.acinq.phoenix.android.utils.SystemNotificationHelper
 import fr.acinq.phoenix.android.utils.appBackground
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.BitcoinUnit
@@ -149,7 +151,6 @@ fun AppView(
             factory = NoticesViewModel.Factory(
                 appConfigurationManager = business.appConfigurationManager,
                 peerManager = business.peerManager,
-                internalDataRepository = internalData
             )
         )
         MonitorNotices(vm = noticesViewModel)
@@ -248,7 +249,11 @@ fun AppView(
                     )
                 }
                 composable(
-                    Screen.ScanData.route, deepLinks = listOf(
+                    route = "${Screen.ScanData.route}?input={input}",
+                    arguments = listOf(
+                        navArgument("input") { type = NavType.StringType ; nullable = true },
+                    ),
+                    deepLinks = listOf(
                         navDeepLink { uriPattern = "lightning:{data}" },
                         navDeepLink { uriPattern = "bitcoin:{data}" },
                         navDeepLink { uriPattern = "lnurl:{data}" },
@@ -260,6 +265,7 @@ fun AppView(
                         navDeepLink { uriPattern = "scanview:{data}" },
                     )
                 ) {
+                    log.info("input arg=${it.arguments?.getString("input")}")
                     val intent = try {
                         it.arguments?.getParcelable<Intent>(NavController.KEY_DEEP_LINK_INTENT)
                     } catch (e: Exception) {
@@ -270,12 +276,13 @@ fun AppView(
                             // prevents forwarding an internal deeplink intent coming from androidx-navigation framework.
                             // TODO properly parse deeplinks following f0ae90444a23cc17d6d7407dfe43c0c8d20e62fc
                             !it.contains("androidx.navigation")
-                        }
+                        } ?: it.arguments?.getString("input")
                         ScanDataView(
                             input = input,
-                            onBackClick = { popToHome(navController) },
+                            onBackClick = { navController.popBackStack() },
                             onAuthSchemeInfoClick = { navController.navigate("${Screen.PaymentSettings.route}/true") },
                             onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) },
+                            onProcessingFinished = { popToHome(navController) },
                         )
                     }
                 }
@@ -303,8 +310,10 @@ fun AppView(
                                 paymentId = paymentId,
                                 onBackClick = {
                                     val previousNav = navController.previousBackStackEntry
-                                    if (!navController.popBackStack() || (fromEvent && previousNav?.destination?.route == Screen.ScanData.route)) {
+                                    if (fromEvent && previousNav?.destination?.route == Screen.ScanData.route) {
                                         popToHome(navController)
+                                    } else {
+                                        navController.popBackStack()
                                     }
                                 },
                                 fromEvent = fromEvent
@@ -464,17 +473,27 @@ fun AppView(
                         )
                     }
                 }
+                composable(Screen.Contacts.route) {
+                    SettingsContactsView(onBackClick = { navController.popBackStack() })
+                }
             }
         }
     }
 
     val isDataMigrationExpected by LegacyPrefsDatastore.getDataMigrationExpected(context).collectAsState(initial = null)
     val lastCompletedPayment by business.paymentsManager.lastCompletedPayment.collectAsState()
-    lastCompletedPayment?.let {
-//        log.debug { "completed payment=${lastCompletedPayment?.id()} with data-migration=$isDataMigrationExpected" }
-        LaunchedEffect(key1 = it.walletPaymentId()) {
+    val userPrefs = userPrefs
+    val exchangeRates = fiatRates
+    lastCompletedPayment?.let { payment ->
+        LaunchedEffect(key1 = payment.walletPaymentId()) {
             if (isDataMigrationExpected == false) {
-                navigateToPaymentDetails(navController, id = it.walletPaymentId(), isFromEvent = true)
+                if (payment is IncomingPayment && payment.origin is IncomingPayment.Origin.Offer) {
+                    SystemNotificationHelper.notifyPaymentsReceived(
+                        context, userPrefs, paymentHash = payment.paymentHash, amount = payment.amount, rates = exchangeRates, isHeadless = false
+                    )
+                } else {
+                    navigateToPaymentDetails(navController, id = payment.walletPaymentId(), isFromEvent = true)
+                }
             }
         }
     }

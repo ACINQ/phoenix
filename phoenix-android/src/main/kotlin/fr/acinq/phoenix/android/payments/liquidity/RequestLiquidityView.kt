@@ -274,14 +274,14 @@ private fun LeaseEstimationView(
     ) {
         AmountWithFiatBelow(amount = leaseFees.miningFee.toMilliSatoshi(), amountTextStyle = MaterialTheme.typography.body2)
     }
-    Spacer(modifier = Modifier.height(8.dp))
+    Spacer(modifier = Modifier.height(16.dp))
     SplashLabelRow(
         label = stringResource(id = R.string.liquidityads_estimate_details_service_fees),
         helpMessage = stringResource(id = R.string.liquidityads_estimate_details_service_fees_help)
     ) {
         AmountWithFiatBelow(amount = leaseFees.serviceFee.toMilliSatoshi(), amountTextStyle = MaterialTheme.typography.body2)
     }
-    Spacer(modifier = Modifier.height(8.dp))
+    Spacer(modifier = Modifier.height(16.dp))
     SplashLabelRow(
         label = stringResource(id = R.string.liquidityads_estimate_details_duration),
         helpMessage = stringResource(id = R.string.liquidityads_estimate_details_duration_help),
@@ -297,9 +297,9 @@ private fun LeaseEstimationView(
 
     val totalFees = leaseFees.miningFee + leaseFees.serviceFee
     SplashLabelRow(label = "") {
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
         HSeparator(width = 60.dp)
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
     }
     SplashLabelRow(
         label = stringResource(id = R.string.send_spliceout_complete_recap_total),

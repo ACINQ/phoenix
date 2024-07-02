@@ -2638,43 +2638,43 @@
         }
       }
     },
-    "+%@ incoming" : {
+    "+%@" : {
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "+ %@ وارد"
+            "value" : "+ %@"
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "+%@ příchozích"
+            "value" : "+%@"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "+%@ eingehend"
+            "value" : "+%@"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "+%@ entradas"
+            "value" : "+%@"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "+%@ entrantes"
+            "value" : "+%@"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "+%@ entrant"
+            "value" : "+%@"
           }
         }
       }

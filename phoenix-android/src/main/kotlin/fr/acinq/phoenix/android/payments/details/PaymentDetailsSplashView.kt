@@ -22,10 +22,15 @@ import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -41,6 +46,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.TxId
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.blockchain.electrum.ElectrumConnectionStatus
@@ -54,6 +60,9 @@ import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.contact.ContactCompactView
+import fr.acinq.phoenix.android.components.contact.ContactOrOfferView
+import fr.acinq.phoenix.android.components.contact.OfferContactState
 import fr.acinq.phoenix.android.payments.cpfp.CpfpView
 import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
@@ -64,6 +73,7 @@ import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.lnurl.LnurlPay
 import fr.acinq.phoenix.utils.extensions.WalletPaymentState
 import fr.acinq.phoenix.utils.extensions.minDepthForFunding
+import fr.acinq.phoenix.utils.extensions.incomingOfferMetadata
 import fr.acinq.phoenix.utils.extensions.state
 import io.ktor.http.Url
 import kotlinx.coroutines.delay
@@ -112,6 +122,15 @@ fun PaymentDetailsSplashView(
         if (data.payment is LightningOutgoingPayment && data.metadata.lnurl != null) {
             LnurlPayInfoView(data.payment as LightningOutgoingPayment, data.metadata.lnurl!!)
         }
+
+        payment.incomingOfferMetadata()?.let { meta ->
+            meta.payerNote?.let {
+                OfferPayerNote(payerNote = it)
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            OfferSentBy(payerPubkey = meta.payerKey)
+        }
+
         PaymentDescriptionView(data = data, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
         PaymentDestinationView(data = data)
         PaymentFeeView(payment = payment)
@@ -358,6 +377,7 @@ private fun PaymentStatusIcon(
 
 @Composable
 private fun LnurlPayInfoView(payment: LightningOutgoingPayment, metadata: LnurlPayMetadata) {
+    Spacer(modifier = Modifier.height(8.dp))
     SplashLabelRow(label = stringResource(id = R.string.paymentdetails_lnurlpay_service)) {
         SelectionContainer {
             Text(text = metadata.pay.callback.host)
@@ -370,6 +390,7 @@ private fun LnurlPayInfoView(payment: LightningOutgoingPayment, metadata: LnurlP
 
 @Composable
 private fun LnurlSuccessAction(payment: LightningOutgoingPayment, action: LnurlPay.Invoice.SuccessAction) {
+    Spacer(modifier = Modifier.height(8.dp))
     when (action) {
         is LnurlPay.Invoice.SuccessAction.Message -> {
             SplashLabelRow(label = stringResource(id = R.string.paymentdetails_lnurlpay_action_message_label)) {
@@ -420,6 +441,43 @@ private fun LnurlSuccessAction(payment: LightningOutgoingPayment, action: LnurlP
 }
 
 @Composable
+private fun OfferPayerNote(payerNote: String) {
+    Spacer(modifier = Modifier.height(8.dp))
+    SplashLabelRow(label = stringResource(id = R.string.paymentdetails_offer_note_label)) {
+        Text(text = payerNote)
+    }
+}
+
+@Composable
+private fun OfferSentBy(payerPubkey: PublicKey?) {
+    val contactsManager = business.contactsManager
+    val contactState = remember { mutableStateOf<OfferContactState>(OfferContactState.Init) }
+    LaunchedEffect(Unit) {
+        contactState.value = payerPubkey?.let {
+            contactsManager.getContactForPayerPubkey(it)
+        }?.let { OfferContactState.Found(it) } ?: OfferContactState.NotFound
+    }
+
+    SplashLabelRow(label = stringResource(id = R.string.paymentdetails_offer_sender_label)) {
+        when (val res = contactState.value) {
+            is OfferContactState.Init -> Text(text = stringResource(id = R.string.utils_loading_data))
+            is OfferContactState.NotFound -> {
+                Text(text = stringResource(id = R.string.paymentdetails_offer_sender_unknown))
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text = stringResource(id = R.string.paymentdetails_offer_sender_unknown_details), style = MaterialTheme.typography.subtitle2)
+            }
+            is OfferContactState.Found -> {
+                ContactCompactView(
+                    contact = res.contact,
+                    currentOffer = null,
+                    onContactChange = { contactState.value = if (it == null) OfferContactState.NotFound else OfferContactState.Found(it) },
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun PaymentDescriptionView(
     data: WalletPaymentInfo,
     onMetadataDescriptionUpdate: (WalletPaymentId, String?) -> Unit,
@@ -429,6 +487,8 @@ private fun PaymentDescriptionView(
     val peer by business.peerManager.peerState.collectAsState()
     val paymentDesc = data.metadata.lnurl?.description ?: data.payment.smartDescription(LocalContext.current)
     val customDesc = remember(data) { data.metadata.userDescription?.takeIf { it.isNotBlank() } }
+
+    Spacer(modifier = Modifier.height(8.dp))
     SplashLabelRow(label = stringResource(id = R.string.paymentdetails_desc_label)) {
         val isLegacyMigration = data.isLegacyMigration(peer)
         val finalDesc = when (isLegacyMigration) {
@@ -437,39 +497,37 @@ private fun PaymentDescriptionView(
             false -> paymentDesc ?: customDesc
         }
 
-        Text(
-            text = finalDesc ?: stringResource(id = R.string.paymentdetails_no_description),
-            style = if (finalDesc == null) MaterialTheme.typography.caption.copy(fontStyle = FontStyle.Italic) else MaterialTheme.typography.body1
-        )
-
         if (isLegacyMigration == false) {
-            if (paymentDesc != null && customDesc != null) {
+            SplashClickableContent(onClick = { showEditDescriptionDialog = true }) {
+                Text(
+                    text = finalDesc ?: stringResource(id = R.string.paymentdetails_no_description),
+                    style = if (finalDesc == null) MaterialTheme.typography.caption.copy(fontStyle = FontStyle.Italic) else MaterialTheme.typography.body1
+                )
                 Spacer(modifier = Modifier.height(8.dp))
-                HSeparator(width = 50.dp)
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = customDesc)
+                if (paymentDesc != null && customDesc != null) {
+                    HSeparator(width = 50.dp)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = customDesc, style = MaterialTheme.typography.body1.copy(fontStyle = FontStyle.Italic))
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+                TextWithIcon(
+                    text = stringResource(
+                        id = when (customDesc) {
+                            null -> R.string.paymentdetails_attach_desc_button
+                            else -> R.string.paymentdetails_edit_desc_button
+                        }
+                    ),
+                    textStyle = MaterialTheme.typography.subtitle2,
+                    icon = R.drawable.ic_edit,
+                    iconTint = MaterialTheme.typography.subtitle2.color,
+                    space = 6.dp,
+                )
             }
-            Button(
-                text = stringResource(
-                    id = when (customDesc) {
-                        null -> R.string.paymentdetails_attach_desc_button
-                        else -> R.string.paymentdetails_edit_desc_button
-                    }
-                ),
-                textStyle = MaterialTheme.typography.caption.copy(fontSize = 12.sp),
-                modifier = Modifier.offset(x = (-8).dp),
-                icon = R.drawable.ic_text,
-                iconTint = MaterialTheme.typography.caption.color,
-                space = 6.dp,
-                shape = CircleShape,
-                padding = PaddingValues(8.dp),
-                onClick = { showEditDescriptionDialog = true }
-            )
         }
     }
 
     if (showEditDescriptionDialog) {
-        EditPaymentDetails(
+        CustomNoteDialog(
             initialDescription = data.metadata.userDescription,
             onConfirm = {
                 onMetadataDescriptionUpdate(data.id(), it?.trim()?.takeIf { it.isNotBlank() })
@@ -500,12 +558,21 @@ private fun PaymentDestinationView(data: WalletPaymentInfo) {
             }
         }
         is LightningOutgoingPayment -> {
-            data.metadata.lnurl?.pay?.metadata?.lnid?.takeIf { it.isNotBlank() }?.let { lnid ->
+            val lnId = data.metadata.lnurl?.pay?.metadata?.lnid?.takeIf { it.isNotBlank() }
+            if (lnId != null) {
                 Spacer(modifier = Modifier.height(8.dp))
                 SplashLabelRow(label = stringResource(id = R.string.paymentdetails_destination_label), icon = R.drawable.ic_zap) {
                     SelectionContainer {
-                        Text(text = lnid)
+                        Text(text = lnId)
                     }
+                }
+            }
+
+            val details = payment.details
+            if (details is LightningOutgoingPayment.Details.Blinded) {
+                val offer = details.paymentRequest.invoiceRequest.offer
+                SplashLabelRow(label = stringResource(id = R.string.paymentdetails_destination_label)) {
+                    ContactOrOfferView(offer = offer)
                 }
             }
         }
@@ -605,38 +672,51 @@ private fun PaymentErrorView(status: LightningOutgoingPayment.Status.Completed.F
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun EditPaymentDetails(
+private fun CustomNoteDialog(
     initialDescription: String?,
     onConfirm: (String?) -> Unit,
     onDismiss: () -> Unit
 ) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     var description by rememberSaveable { mutableStateOf(initialDescription) }
-    Dialog(
-        onDismiss = onDismiss,
-        buttons = {
-            Button(onClick = onDismiss, text = stringResource(id = R.string.btn_cancel))
-            Button(
-                onClick = { onConfirm(description) },
-                text = stringResource(id = R.string.btn_save)
-            )
-        }
+
+    ModalBottomSheet(
+        sheetState = sheetState,
+        onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colors.surface,
+        contentColor = MaterialTheme.colors.onSurface,
+        scrimColor = MaterialTheme.colors.onBackground.copy(alpha = 0.1f),
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp)
+                .verticalScroll(rememberScrollState())
+                .padding(top = 0.dp, start = 24.dp, end = 24.dp, bottom = 70.dp),
         ) {
-            Text(text = stringResource(id = R.string.paymentdetails_edit_dialog_title))
+            Text(text = stringResource(id = R.string.paymentdetails_edit_dialog_title), style = MaterialTheme.typography.body2)
             Spacer(modifier = Modifier.height(16.dp))
             TextInput(
                 modifier = Modifier.fillMaxWidth(),
                 text = description ?: "",
                 onTextChange = { description = it.takeIf { it.isNotBlank() } },
+                minLines = 2,
                 maxLines = 6,
                 maxChars = 280,
                 staticLabel = stringResource(id = R.string.paymentdetails_edit_dialog_input_label)
             )
+            Spacer(modifier = Modifier.height(24.dp))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                Button(onClick = onDismiss, text = stringResource(id = R.string.btn_cancel), shape = CircleShape)
+                Button(
+                    onClick = { onConfirm(description) },
+                    text = stringResource(id = R.string.btn_save),
+                    icon = R.drawable.ic_check,
+                    enabled = description != initialDescription,
+                    space = 8.dp,
+                    shape = CircleShape
+                )
+            }
         }
     }
 }
@@ -749,41 +829,45 @@ private fun BumpTransactionDialog(
 }
 
 @Composable
-private fun translatePaymentError(paymentFailure: OutgoingPaymentFailure): String {
-    return when (val result = paymentFailure.explain()) {
-        is Either.Left -> {
-            when (val partFailure = result.value) {
-                is LightningOutgoingPayment.Part.Status.Failure.Uninterpretable -> partFailure.message
-                LightningOutgoingPayment.Part.Status.Failure.ChannelIsClosing -> stringResource(id = R.string.outgoing_failuremessage_channel_closing)
-                LightningOutgoingPayment.Part.Status.Failure.ChannelIsSplicing -> stringResource(id = R.string.outgoing_failuremessage_channel_splicing)
-                LightningOutgoingPayment.Part.Status.Failure.NotEnoughFees -> stringResource(id = R.string.outgoing_failuremessage_not_enough_fee)
-                LightningOutgoingPayment.Part.Status.Failure.NotEnoughFunds -> stringResource(id = R.string.outgoing_failuremessage_not_enough_balance)
-                LightningOutgoingPayment.Part.Status.Failure.PaymentAmountTooBig -> stringResource(id = R.string.outgoing_failuremessage_too_big)
-                LightningOutgoingPayment.Part.Status.Failure.PaymentAmountTooSmall -> stringResource(id = R.string.outgoing_failuremessage_too_small)
-                LightningOutgoingPayment.Part.Status.Failure.PaymentExpiryTooBig -> stringResource(id = R.string.outgoing_failuremessage_expiry_too_big)
-                LightningOutgoingPayment.Part.Status.Failure.RecipientRejectedPayment -> stringResource(id = R.string.outgoing_failuremessage_rejected_by_recipient)
-                LightningOutgoingPayment.Part.Status.Failure.RecipientIsOffline -> stringResource(id = R.string.outgoing_failuremessage_recipient_offline)
-                LightningOutgoingPayment.Part.Status.Failure.RecipientLiquidityIssue -> stringResource(id = R.string.outgoing_failuremessage_not_enough_liquidity)
-                LightningOutgoingPayment.Part.Status.Failure.TemporaryRemoteFailure -> stringResource(id = R.string.outgoing_failuremessage_temporary_failure)
-                LightningOutgoingPayment.Part.Status.Failure.TooManyPendingPayments -> stringResource(id = R.string.outgoing_failuremessage_too_many_pending)
+fun translatePaymentError(paymentFailure: OutgoingPaymentFailure): String {
+    val context = LocalContext.current
+    val errorMessage = remember(key1 = paymentFailure) {
+        when (val result = paymentFailure.explain()) {
+            is Either.Left -> {
+                when (val partFailure = result.value) {
+                    is LightningOutgoingPayment.Part.Status.Failure.Uninterpretable -> partFailure.message
+                    LightningOutgoingPayment.Part.Status.Failure.ChannelIsClosing -> context.getString(R.string.outgoing_failuremessage_channel_closing)
+                    LightningOutgoingPayment.Part.Status.Failure.ChannelIsSplicing -> context.getString(R.string.outgoing_failuremessage_channel_splicing)
+                    LightningOutgoingPayment.Part.Status.Failure.NotEnoughFees -> context.getString(R.string.outgoing_failuremessage_not_enough_fee)
+                    LightningOutgoingPayment.Part.Status.Failure.NotEnoughFunds -> context.getString(R.string.outgoing_failuremessage_not_enough_balance)
+                    LightningOutgoingPayment.Part.Status.Failure.PaymentAmountTooBig -> context.getString(R.string.outgoing_failuremessage_too_big)
+                    LightningOutgoingPayment.Part.Status.Failure.PaymentAmountTooSmall -> context.getString(R.string.outgoing_failuremessage_too_small)
+                    LightningOutgoingPayment.Part.Status.Failure.PaymentExpiryTooBig -> context.getString(R.string.outgoing_failuremessage_expiry_too_big)
+                    LightningOutgoingPayment.Part.Status.Failure.RecipientRejectedPayment -> context.getString(R.string.outgoing_failuremessage_rejected_by_recipient)
+                    LightningOutgoingPayment.Part.Status.Failure.RecipientIsOffline -> context.getString(R.string.outgoing_failuremessage_recipient_offline)
+                    LightningOutgoingPayment.Part.Status.Failure.RecipientLiquidityIssue -> context.getString(R.string.outgoing_failuremessage_not_enough_liquidity)
+                    LightningOutgoingPayment.Part.Status.Failure.TemporaryRemoteFailure -> context.getString(R.string.outgoing_failuremessage_temporary_failure)
+                    LightningOutgoingPayment.Part.Status.Failure.TooManyPendingPayments -> context.getString(R.string.outgoing_failuremessage_too_many_pending)
+                }
             }
-        }
-        is Either.Right -> {
-            when (result.value) {
-                FinalFailure.InvalidPaymentId -> stringResource(id = R.string.outgoing_failuremessage_invalid_id)
-                FinalFailure.AlreadyPaid -> stringResource(id = R.string.outgoing_failuremessage_alreadypaid)
-                FinalFailure.ChannelClosing -> stringResource(id = R.string.outgoing_failuremessage_channel_closing)
-                FinalFailure.ChannelNotConnected -> stringResource(id = R.string.outgoing_failuremessage_not_connected)
-                FinalFailure.ChannelOpening -> stringResource(id = R.string.outgoing_failuremessage_channel_opening)
-                FinalFailure.FeaturesNotSupported -> stringResource(id = R.string.outgoing_failuremessage_unsupported_features)
-                FinalFailure.InsufficientBalance -> stringResource(id = R.string.outgoing_failuremessage_not_enough_balance)
-                FinalFailure.InvalidPaymentAmount -> stringResource(id = R.string.outgoing_failuremessage_invalid_amount)
-                FinalFailure.NoAvailableChannels -> stringResource(id = R.string.outgoing_failuremessage_no_available_channels)
-                FinalFailure.RecipientUnreachable -> stringResource(id = R.string.outgoing_failuremessage_noroutefound)
-                FinalFailure.RetryExhausted -> stringResource(id = R.string.outgoing_failuremessage_noroutefound)
-                FinalFailure.UnknownError -> stringResource(id = R.string.outgoing_failuremessage_unknown)
-                FinalFailure.WalletRestarted -> stringResource(id = R.string.outgoing_failuremessage_restarted)
+            is Either.Right -> {
+                when (result.value) {
+                    FinalFailure.InvalidPaymentId -> context.getString(R.string.outgoing_failuremessage_invalid_id)
+                    FinalFailure.AlreadyPaid -> context.getString(R.string.outgoing_failuremessage_alreadypaid)
+                    FinalFailure.ChannelClosing -> context.getString(R.string.outgoing_failuremessage_channel_closing)
+                    FinalFailure.ChannelNotConnected -> context.getString(R.string.outgoing_failuremessage_not_connected)
+                    FinalFailure.ChannelOpening -> context.getString(R.string.outgoing_failuremessage_channel_opening)
+                    FinalFailure.FeaturesNotSupported -> context.getString(R.string.outgoing_failuremessage_unsupported_features)
+                    FinalFailure.InsufficientBalance -> context.getString(R.string.outgoing_failuremessage_not_enough_balance)
+                    FinalFailure.InvalidPaymentAmount -> context.getString(R.string.outgoing_failuremessage_invalid_amount)
+                    FinalFailure.NoAvailableChannels -> context.getString(R.string.outgoing_failuremessage_no_available_channels)
+                    FinalFailure.RecipientUnreachable -> context.getString(R.string.outgoing_failuremessage_noroutefound)
+                    FinalFailure.RetryExhausted -> context.getString(R.string.outgoing_failuremessage_noroutefound)
+                    FinalFailure.UnknownError -> context.getString(R.string.outgoing_failuremessage_unknown)
+                    FinalFailure.WalletRestarted -> context.getString(R.string.outgoing_failuremessage_restarted)
+                }
             }
         }
     }
+    return errorMessage
 }

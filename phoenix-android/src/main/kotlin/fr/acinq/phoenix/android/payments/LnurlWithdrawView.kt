@@ -44,9 +44,9 @@ import fr.acinq.phoenix.data.lnurl.LnurlError
 @Composable
 fun LnurlWithdrawView(
     model: Scan.Model.LnurlWithdrawFlow,
-    onBackClick: () -> Unit,
     onWithdrawClick: (Scan.Intent.LnurlWithdrawFlow) -> Unit,
     onFeeManagementClick: () -> Unit,
+    onWithdrawDone: () -> Unit,
 ) {
     val context = LocalContext.current
     val prefUnit = preferredAmountUnit
@@ -57,7 +57,7 @@ fun LnurlWithdrawView(
     var amountErrorMessage by remember { mutableStateOf("") }
 
     SplashLayout(
-        header = { DefaultScreenHeader(onBackClick = onBackClick) },
+        header = { DefaultScreenHeader(onBackClick = onWithdrawDone) },
         topContent = {
             Text(text = annotatedStringResource(R.string.lnurl_withdraw_header, model.lnurlWithdraw.initialUrl.host), textAlign = TextAlign.Center)
             Spacer(modifier = Modifier.height(16.dp))
@@ -131,7 +131,7 @@ fun LnurlWithdrawView(
                     textAlign = TextAlign.Center
                 )
                 Spacer(Modifier.height(12.dp))
-                BorderButton(text = stringResource(id = R.string.btn_ok), icon = R.drawable.ic_check_circle, onClick = onBackClick)
+                BorderButton(text = stringResource(id = R.string.btn_ok), icon = R.drawable.ic_check_circle, onClick = onWithdrawDone)
             }
         }
     }

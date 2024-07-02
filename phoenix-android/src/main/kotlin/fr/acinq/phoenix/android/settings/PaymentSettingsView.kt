@@ -118,9 +118,18 @@ fun PaymentSettingsView(
                     initialShowDialog = false
                 )
             }
+
+            SettingSwitch(
+                title = "Block BOLT12 payments from unknown sources",
+                description = "\uD83D\uDEA7 Coming soon",
+                enabled = false,
+                isChecked = false,
+                onCheckChangeAttempt = {}
+            )
         }
 
         val isOverpaymentEnabled by userPrefs.getIsOverpaymentEnabled.collectAsState(initial = false)
+        val isRandomPayerKey by userPrefs.getPayOfferWithRandomKey.collectAsState(initial = false)
         CardHeader(text = stringResource(id = R.string.paymentsettings_category_outgoing))
         Card {
             SettingSwitch(
@@ -130,6 +139,15 @@ fun PaymentSettingsView(
                 isChecked = isOverpaymentEnabled,
                 onCheckChangeAttempt = {
                     scope.launch { userPrefs.saveIsOverpaymentEnabled(it) }
+                }
+            )
+            SettingSwitch(
+                title = stringResource(id = R.string.paymentsettings_random_payer_key_title),
+                description = stringResource(id = R.string.paymentsettings_random_payer_key_desc),
+                enabled = true,
+                isChecked = isRandomPayerKey,
+                onCheckChangeAttempt = {
+                    scope.launch { userPrefs.savePayOfferWithRandomKey(it) }
                 }
             )
         }

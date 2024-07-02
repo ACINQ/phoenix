@@ -16,11 +16,16 @@
 
 package fr.acinq.phoenix.utils.extensions
 
-import fr.acinq.bitcoin.Bitcoin
-import fr.acinq.lightning.db.*
-import fr.acinq.lightning.payment.Bolt11Invoice
+import fr.acinq.bitcoin.PrivateKey
+import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
+import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.db.LightningOutgoingPayment
+import fr.acinq.lightning.db.OnChainOutgoingPayment
+import fr.acinq.lightning.db.OutgoingPayment
+import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.payment.Bolt12Invoice
-import fr.acinq.lightning.payment.PaymentRequest
+import fr.acinq.lightning.payment.OfferPaymentMetadata
+import fr.acinq.lightning.wire.OfferTypes
 
 /** Standardized location for extending types from: fr.acinq.lightning. */
 enum class WalletPaymentState { SuccessOnChain, SuccessOffChain, PendingOnChain, PendingOffChain, Failure }
@@ -74,3 +79,6 @@ fun WalletPayment.errorMessage(): String? = when (this) {
     }
     is IncomingPayment -> null
 }
+
+fun WalletPayment.incomingOfferMetadata(): OfferPaymentMetadata.V1? = ((this as? IncomingPayment)?.origin as? IncomingPayment.Origin.Offer)?.metadata as? OfferPaymentMetadata.V1
+fun WalletPayment.outgoingInvoiceRequest(): OfferTypes.InvoiceRequest? = ((this as? LightningOutgoingPayment)?.details as? LightningOutgoingPayment.Details.Blinded)?.paymentRequest?.invoiceRequest

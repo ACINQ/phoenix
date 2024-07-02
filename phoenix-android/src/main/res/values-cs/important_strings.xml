@@ -72,6 +72,7 @@
     <string name="settings_payment_settings">Možnosti platby</string>
     <string name="settings_payment_history">Historie plateb</string>
     <string name="settings_notifications">Oznámení</string>
+    <string name="settings_contacts">Moje kontakty</string>
 
     <!-- home: swap help -->
 
@@ -80,6 +81,14 @@
     <string name="home_swapin_help_ready_disabled">Vklady zůstanou on-chain, protože automatická správa kanálů je vypnutá.</string>
     <string name="home_swapin_help_generic">On-chain prostředky byly vloženy do vaší peněženky.</string>
     <string name="home_swapin_help_button">Klikněte pro podrobnosti</string>
+
+    <string name="home_background_restriction_title">Zpracování pozadí omezeno</string>
+    <string name="home_background_restriction_body_1">Fénix nebude moci přijímat platby, pokud je na pozadí nebo pokud je zavřený </string>.
+    <string name="home_background_restriction_body_2">Děje se tak, protože:</string>
+    <string name="home_background_restriction_tor">Tor je povolen</string>
+    <string name="home_background_restriction_powersaver">Zařízení je v úsporném režimu</string>
+    <string name="home_background_restriction_fcm">Oznámení FCM nejsou k dispozici</string>
+    <string name="home_background_restriction_fcm_details">Pokud používáte GrapheneOS nebo CalyxOS, nainstalujte si služby Google Play, abyste mohli dostávat oznámení FCM. Nápovědu naleznete v často kladených dotazech.</string>
 
     <!-- home: bottom menu -->
 
@@ -130,6 +139,21 @@
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Příchozí likvidita není dostatečná a máte zakázanou automatickou správu kanálů.</string>
 
+    <!-- receive: offer labels -->
+
+    <string name="receive_toggle_offer_button">Zobrazit opakovaně použitelný QR kód</string>
+
+    <string name="receive_offer_howto_intro_1">🎉 Zde je vaše žádost o opakovanou platbu!</string>
+    <string name="receive_offer_howto_intro_2">Klepnutím se dozvíte, jak jej používat</string>
+    <string name="receive_offer_howto_details_1">Tento požadavek na platbu Bolt12 je ekvivalentem adresy Bitcoin v systému Lightning.</string>
+    <string name="receive_offer_howto_details_2">Na rozdíl od tradičních faktur Lightning nevyprší její platnost a lze ji použít opakovaně.</string>
+    <string name="receive_offer_howto_details_3">Sdílejte ji široce : za dary, spropitné nebo aby vám zaplatili vaši přátelé.</string>
+    <string name="receive_offer_howto_details_4_title">🛟 Kdo podporuje Bolt12?</string>
+    <string name="receive_offer_howto_details_4">V tuto chvíli podporuje Bolt12 jen několik služeb. Pokud služba odmítne tuto fakturu, dejte jí vědět, že o ni přichází!</string>
+    <string name="receive_offer_howto_details_5_title">🔋 Omezení baterie</string>
+    <string name="receive_offer_howto_details_5">Zkontrolujte, zda Android na Phoenix nepoužívá režim úspory baterie. V opačném případě nebudete moci přijímat platby, pokud je aplikace zavřená nebo na pozadí. Povolení TOR ve Phoenixu také způsobí problémy.</string>
+    <string name="receive_offer_howto_details_faq_link">Další informace</string>
+
     <!-- scanning errors -->
 
     <string name="scan_error_expired">Platnost této faktury vypršela.</string>
@@ -138,6 +162,12 @@
     <string name="scan_error_lnurl_invalid">Tento LNURL odkaz se nepodařilo zpracovat. Ujistěte se, že je platný.</string>
     <string name="scan_error_lnurl_unsupported">Tento typ LNURL zatím není podporován.</string>
     <string name="scan_error_invalid_generic">Tato data používají neznámý formát a nelze je zpracovat.</string>
+
+    <!-- receive: Tor warning -->
+
+    <string name="receive_tor_warning_title">Tor je povolen</string>
+    <string name="receive_tor_warning_dialog_content_1">Fénix nemůže přijímat platby na pozadí </string>.
+    <string name="receive_tor_warning_dialog_content_2">Chcete-li se vyhnout selhání plateb, použijte místo toho Orbot nebo se ujistěte, že Fénix zůstává viditelný v popředí, když jsou vám odesílány platby.</string>
 
     <!-- validation -->
 
@@ -233,7 +263,11 @@
 
     <!-- Tor -->
 
-    <string name="tor_settings_subtitle">Phoenix může použít Tor ke skrytí vaší IP adresy od ostatních uzlů sítě Lightning Network a serverů Electrum.\n\nPovolením Toru se zlepší vaše soukromí, ale může způsobit problémy s platbami, pokud je vaše připojení nestabilní.</string>
+    <string name="tor_settings_subtitle">Phoenix může použít Tor ke skrytí vaší IP adresy od ostatních uzlů sítě Lightning Network a serverů Electrum.</string>
+
+    <string name="tor_confirm_dialog_title">Povolit Tor?</string>
+    <string name="tor_confirm_dialog_details_1">Tor je pomalý a ovlivní výkon vašich plateb.</string>
+    <string name="tor_confirm_dialog_details_2">Konkrétně <b>nebudete moci přijímat platby</b>, pokud je Phoenix na pozadí nebo pokud je zavřený.</string>
 
     <!-- about -->
 

@@ -34,6 +34,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,10 +62,13 @@ import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.android.utils.smartDescription
+import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.walletPaymentId
 import fr.acinq.phoenix.utils.extensions.WalletPaymentState
+import fr.acinq.phoenix.utils.extensions.incomingOfferMetadata
+import fr.acinq.phoenix.utils.extensions.outgoingInvoiceRequest
 import fr.acinq.phoenix.utils.extensions.state
 
 
@@ -174,9 +178,44 @@ private fun PaymentDescription(paymentInfo: WalletPaymentInfo, modifier: Modifie
         true -> stringResource(id = R.string.paymentdetails_desc_legacy_migration)
         false -> metadata.userDescription
             ?: metadata.lnurl?.pay?.metadata?.lnid?.takeIf { it.isNotBlank() }?.let {
-                stringResource(id = R.string.paymentdetails_desc_identifier, it)
+                stringResource(id = R.string.paymentdetails_desc_to, it)
             }
             ?: metadata.lnurl?.description
+            ?: payment.incomingOfferMetadata()?.let { offerMetadata ->
+                val contactsManager = business.contactsManager
+                val contactForKey = produceState<ContactInfo?>(initialValue = null, producer = {
+                    value = contactsManager.getContactForPayerPubkey(offerMetadata.payerKey)
+                })
+
+                when (val contact = contactForKey.value) {
+                    null -> when (val note = offerMetadata.payerNote) {
+                        null -> null
+                        else -> stringResource(id = R.string.paymentdetails_desc_from_unknown_with_note, note)
+                    }
+                    else -> when (val note = offerMetadata.payerNote) {
+                        null -> stringResource(id = R.string.paymentdetails_desc_from, contact.name)
+                        else -> stringResource(id = R.string.paymentdetails_desc_from_with_note, contact.name, note)
+                    }
+                }
+            }
+            ?: payment.outgoingInvoiceRequest()?.let { request ->
+                val offer = request.offer
+                val contactsManager = business.contactsManager
+                val contactForOffer = produceState<ContactInfo?>(initialValue = null, producer = {
+                    value = contactsManager.getContactForOffer(offer)
+                })
+
+                when (val contact = contactForOffer.value) {
+                    null -> when (val note = request.payerNote) {
+                        null -> null
+                        else -> stringResource(id = R.string.paymentdetails_desc_to_unknown_with_note, note)
+                    }
+                    else -> when (val note = request.payerNote) {
+                        null -> stringResource(id = R.string.paymentdetails_desc_to, contact.name)
+                        else -> stringResource(id = R.string.paymentdetails_desc_to_with_note, contact.name, note)
+                    }
+                }
+            }
             ?: payment.smartDescription(context)
     }
 

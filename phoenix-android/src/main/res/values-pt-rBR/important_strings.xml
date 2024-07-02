@@ -72,6 +72,7 @@
     <string name="settings_payment_settings">Opções de pagamento</string>
     <string name="settings_payment_history">Histórico de pagamentos</string>
     <string name="settings_notifications">Notificações</string>
+    <string name="settings_contacts">Meus contatos</string>
 
     <!-- home: swap help -->
 
@@ -80,6 +81,14 @@
     <string name="home_swapin_help_ready_disabled">Os depósitos permanecerão na cadeia porque o gerenciamento automatizado de canais está desativado.</string>
     <string name="home_swapin_help_generic">Os fundos on-chain foram depositados em sua carteira.</string>
     <string name="home_swapin_help_button">Toque para obter detalhes</string>
+
+    <string name="home_background_restriction_title">Processamento em segundo plano restrito</string>
+    <string name="home_background_restriction_body_1">O Phoenix não poderá receber pagamentos quando estiver em segundo plano ou quando estiver fechado.</string>
+    <string name="home_background_restriction_body_2">Isso acontece porque:</string>
+    <string name="home_background_restriction_tor">Tor está ativado</string>
+    <string name="home_background_restriction_powersaver">O dispositivo está no modo de economia de energia</string>
+    <string name="home_background_restriction_fcm">FCM notificações indisponíveis</string>
+    <string name="home_background_restriction_fcm_details">Se você estiver usando GrapheneOS ou CalyxOS, instale o Google Play Services para receber notificações FCM. Consulte as Perguntas frequentes para obter ajuda.</string>
 
     <!-- home: bottom menu -->
 
@@ -128,6 +137,27 @@
     <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Estima-se uma taxa de %1$s para receber esse valor, e essas taxas excedem %2$s%% do valor.\n\nAumente esse limite ou solicite liquidez adicional.</string>
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">A liquidez recebida é insuficiente e você desativou o gerenciamento automatizado de canais.</string>
+
+    <!-- receive: offer labels -->
+
+    <string name="receive_toggle_offer_button">Mostrar código QR reutilizável</string>
+
+    <string name="receive_offer_howto_intro_1">🎉 Aqui está sua solicitação de pagamento reutilizável!</string>
+    <string name="receive_offer_howto_intro_2">Toque para saber como usá-lo</string>
+    <string name="receive_offer_howto_details_1">Essa solicitação de pagamento Bolt12 é o equivalente do Lightning a um endereço Bitcoin.</string>
+    <string name="receive_offer_howto_details_2">Ao contrário das faturas tradicionais do Lightning, ela não expira e pode ser reutilizada.</string>
+    <string name="receive_offer_howto_details_3">Compartilhe-a amplamente: para doações, dicas ou para ser pago por seus amigos.</string>
+    <string name="receive_offer_howto_details_4_title">🛟 Quem apóia o Bolt12?</string>
+    <string name="receive_offer_howto_details_4">No momento, poucos serviços oferecem suporte ao Bolt12. Se um serviço rejeitar essa fatura, informe-o de que está perdendo!</string>
+    <string name="receive_offer_howto_details_5_title">🔋 Restrições de bateria</string>
+    <string name="receive_offer_howto_details_5">Verifique se o Android não aplica um modo de economia de bateria ao Phoenix. Caso contrário, você não poderá receber pagamentos se o aplicativo estiver fechado ou em segundo plano. A ativação do TOR no Phoenix também causará problemas.</string>
+    <string name="receive_offer_howto_details_faq_link">Saiba mais</string>
+
+    <!-- receive: Tor warning -->
+
+    <string name="receive_tor_warning_title">O Tor está ativado</string>
+    <string name="receive_tor_warning_dialog_content_1">O Phoenix não pode receber pagamentos em segundo plano.</string>
+    <string name="receive_tor_warning_dialog_content_2">Para evitar falhas nos pagamentos, use o Orbot ou certifique-se de que o Phoenix permaneça visível em primeiro plano quando os pagamentos forem enviados a você.</string>
 
     <!-- scanning errors -->
 
@@ -233,7 +263,7 @@
 
     <!-- Tor -->
 
-    <string name="tor_settings_subtitle">A Phoenix pode usar o Tor para proteger seu IP dos outros nós da Lightning Network e dos servidores da Electrum.\n\nA ativação do Tor melhorará sua privacidade, mas poderá causar problemas de pagamento se sua conexão for instável.</string>
+    <string name="tor_settings_subtitle">A Phoenix pode usar o Tor para proteger seu IP dos outros nós da Lightning Network e dos servidores da Electrum.</string>
 
     <!-- about -->
 

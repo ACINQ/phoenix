@@ -85,15 +85,7 @@ class BalanceManager(
      * See [SwapInManager.reservedWalletInputs] for details.
      */
     private suspend fun monitorSwapInBalance(peer: Peer) {
-        val swapInParams = peer.walletParams.swapInParams
-        combine(peer.currentTipFlow.filterNotNull(), peer.channelsFlow, peer.phoenixSwapInWallet.wallet.walletStateFlow) { currentBlockHeight, channels, swapInWallet ->
-            val reservedInputs = SwapInManager.reservedWalletInputs(channels.values.filterIsInstance<PersistedChannelState>())
-            val walletWithoutReserved = swapInWallet.withoutReservedUtxos(reservedInputs)
-            walletWithoutReserved.withConfirmations(
-                currentBlockHeight = currentBlockHeight,
-                swapInParams = swapInParams
-            )
-        }.collect { wallet ->
+        peerManager.swapInWallet.filterNotNull().collect { wallet ->
             _swapInWallet.value = wallet
             _swapInWalletBalance.value = WalletBalance(
                 deeplyConfirmed = wallet.deeplyConfirmed.balance,
