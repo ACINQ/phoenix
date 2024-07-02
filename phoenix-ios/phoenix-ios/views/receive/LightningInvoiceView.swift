@@ -11,10 +11,10 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 struct LightningInvoiceView: View {
 	
 	@ObservedObject var mvi: MVIState<Receive.Model, Receive.Intent>
+	@ObservedObject var inboundFeeState: InboundFeeState
 	@ObservedObject var toast: Toast
 	
 	@Binding var didAppear: Bool
-	@Binding var showSendView: Bool
 	
 	@StateObject var qrCode = QRCode()
 
@@ -31,16 +31,10 @@ struct LightningInvoiceView: View {
 	}
 	@State var activeSheet: ReceiveViewSheet? = nil
 	
-	@State var channels: [LocalChannelInfo] = []
-	@State var liquidityPolicy: LiquidityPolicy = GroupPrefs.shared.liquidityPolicy
 	@State var notificationPermissions = NotificationsManager.shared.permissions.value
 	
 	@State var modificationAmount: CurrencyAmount? = nil
 	@State var currencyConverterOpen = false
-	
-	@State var mempoolRecommendedResponse: MempoolRecommendedResponse? = nil
-	
-	@State var inboundFeeWarning: InboundFeeWarning? = nil
 	
 	@Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
 	@Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
@@ -53,7 +47,6 @@ struct LightningInvoiceView: View {
 	@EnvironmentObject var smartModalState: SmartModalState
 	
 	let lastIncomingPaymentPublisher = Biz.business.paymentsManager.lastIncomingPaymentPublisher()
-	let channelsPublisher = Biz.business.peerManager.channelsPublisher()
 	
 	// For the cicular buttons: [copy, share, edit]
 	enum MaxButtonWidth: Preference {}
@@ -104,12 +97,6 @@ struct LightningInvoiceView: View {
 		.onReceive(lastIncomingPaymentPublisher) {
 			lastIncomingPaymentChanged($0)
 		}
-		.onReceive(channelsPublisher) {
-			channelsChanged($0)
-		}
-		.onReceive(GroupPrefs.shared.liquidityPolicyPublisher) {
-			liquidityPolicyChanged($0)
-		}
 		.onReceive(NotificationsManager.shared.permissions) {
 			notificationPermissionsChanged($0)
 		}
@@ -129,9 +116,6 @@ struct LightningInvoiceView: View {
 				ActivityView(activityItems: items, applicationActivities: nil)
 			
 			} // </switch>
-		}
-		.task {
-			await fetchMempoolRecommendedFees()
 		}
 	}
 	
@@ -184,7 +168,7 @@ struct LightningInvoiceView: View {
 			
 			qrCodeWrapperView()
 			
-			if let warning = inboundFeeWarning {
+			if let warning = inboundFeeState.calculateInboundFeeWarning(invoiceAmount: invoiceAmount()) {
 				inboundFeeInfo(warning)
 			}
 			
@@ -210,10 +194,6 @@ struct LightningInvoiceView: View {
 				editButton()
 			}
 			.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
-			
-			scanWithdrawButton()
-				.padding([.top, .bottom])
-				.padding(.top, 5) // a little extra
 			
 			if notificationPermissions == .disabled {
 				backgroundPaymentsDisabledWarning()
@@ -254,14 +234,11 @@ struct LightningInvoiceView: View {
 					.font(.footnote)
 					.foregroundColor(.secondary)
 				
-				scanWithdrawButton()
-					.padding(.top, 8)
-				
 				if notificationPermissions == .disabled {
 					backgroundPaymentsDisabledWarning()
 						.padding(.top, 8)
 				}
-				if let warning = inboundFeeWarning {
+				if let warning = inboundFeeState.calculateInboundFeeWarning(invoiceAmount: invoiceAmount()) {
 					inboundFeeInfo(warning)
 						.padding(.top, 8)
 				}
@@ -533,22 +510,6 @@ struct LightningInvoiceView: View {
 	}
 	
 	@ViewBuilder
-	func scanWithdrawButton() -> some View {
-		
-		Button {
-			withAnimation {
-				showSendView = true
-			}
-		} label: {
-			Label {
-				Text("Scan withdraw")
-			} icon: {
-				Image(systemName: "qrcode.viewfinder")
-			}
-		}
-	}
-	
-	@ViewBuilder
 	func backgroundPaymentsDisabledWarning() -> some View {
 		
 		// The user has disabled "background payments"
@@ -651,8 +612,6 @@ struct LightningInvoiceView: View {
 			desc: defaultDesc,
 			expirySeconds: Prefs.shared.invoiceExpirationSeconds
 		))
-		
-		refreshInboundFeeWarning()
 	}
 	
 	// --------------------------------------------------
@@ -668,8 +627,6 @@ struct LightningInvoiceView: View {
 			// Issue #196: Use uppercase lettering for invoices and address QRs
 			qrCode.generate(value: m.request.uppercased())
 		}
-		
-		refreshInboundFeeWarning()
 	}
 	
 	func lastIncomingPaymentChanged(_ lastIncomingPayment: Lightning_kmpIncomingPayment) {
@@ -685,20 +642,6 @@ struct LightningInvoiceView: View {
 				presentationMode.wrappedValue.dismiss()
 			}
 		}
-	}
-	
-	func channelsChanged(_ channels: [LocalChannelInfo]) {
-		log.trace("channelsChanged()")
-		
-		self.channels = channels
-		refreshInboundFeeWarning()
-	}
-	
-	func liquidityPolicyChanged(_ newValue: LiquidityPolicy) {
-		log.trace("liquidityPolicyChanged()")
-		
-		self.liquidityPolicy = newValue
-		refreshInboundFeeWarning()
 	}
 	
 	func notificationPermissionsChanged(_ newValue: NotificationPermissions) {
@@ -732,20 +675,6 @@ struct LightningInvoiceView: View {
 				desc: desc ?? "",
 				currencyConverterOpen: $currencyConverterOpen
 			)
-		}
-	}
-	
-	// --------------------------------------------------
-	// MARK: Tasks
-	// --------------------------------------------------
-	
-	func fetchMempoolRecommendedFees() async {
-		
-		for try await response in MempoolMonitor.shared.stream() {
-			mempoolRecommendedResponse = response
-			if Task.isCancelled {
-				return
-			}
 		}
 	}
 	
@@ -831,85 +760,6 @@ struct LightningInvoiceView: View {
 	// --------------------------------------------------
 	// MARK: Utilities
 	// --------------------------------------------------
-	
-	func refreshInboundFeeWarning() {
-		log.trace("refreshInboundFeeWarning()")
-		
-		inboundFeeWarning = calculateInboundFeeWarning()
-	}
-	
-	func calculateInboundFeeWarning() -> InboundFeeWarning? {
-
-		let availableForReceiveMsat = channels.availableForReceive()?.msat ?? Int64(0)
-		let hasNoLiquidity = availableForReceiveMsat == 0
-		
-		let canRequestLiquidity = channels.canRequestLiquidity()
-		
-		let invoiceAmountMsat = invoiceAmount()?.msat
-		
-		var liquidityIsShort = false
-		if let invoiceAmountMsat {
-			liquidityIsShort = invoiceAmountMsat >= availableForReceiveMsat
-		}
-		
-		if hasNoLiquidity || liquidityIsShort {
-			
-			if !liquidityPolicy.enabled {
-				
-				return InboundFeeWarning.liquidityPolicyDisabled
-				
-			} else {
-				
-				let hasNoChannels = channels.filter { !$0.isTerminated }.isEmpty
-				let swapFeeSats = mempoolRecommendedResponse?.payToOpenEstimationFee(
-					amount: Lightning_kmpMilliSatoshi(msat: invoiceAmountMsat ?? 0),
-					hasNoChannels: hasNoChannels
-				).sat
-				
-				if let swapFeeSats {
-					
-					// Check absolute fee
-					
-					if swapFeeSats > liquidityPolicy.effectiveMaxFeeSats
-						&& !liquidityPolicy.effectiveSkipAbsoluteFeeCheck
-					{
-						return InboundFeeWarning.overAbsoluteFee(
-							canRequestLiquidity: canRequestLiquidity,
-							maxAbsoluteFeeSats: liquidityPolicy.effectiveMaxFeeSats,
-							swapFeeSats: swapFeeSats
-						)
-					}
-					
-					// Check relative fee
-					
-					if let invoiceAmountMsat, invoiceAmountMsat > availableForReceiveMsat {
-						
-						let swapFeeMsat = Utils.toMsat(sat: swapFeeSats)
-						
-						let maxFeePercent = Double(liquidityPolicy.effectiveMaxFeeBasisPoints) / Double(10_000)
-						let maxFeeMsat = Int64(Double(invoiceAmountMsat) * maxFeePercent)
-						
-						if swapFeeMsat > maxFeeMsat {
-							return InboundFeeWarning.overRelativeFee(
-								canRequestLiquidity: canRequestLiquidity,
-								maxRelativeFeePercent: maxFeePercent,
-								swapFeeSats: swapFeeSats
-							)
-						}
-					}
-				}
-				
-				if let swapFeeSats {
-					return InboundFeeWarning.feeExpected(swapFeeSats: swapFeeSats)
-				} else {
-					return InboundFeeWarning.unknownFeeExpected
-				}
-				
-			} // </else: liquidityPolicy.enabled>
-		} // </if hasNoLiquidity || liquidityIsShort>
-		
-		return nil
-	}
 	
 	func copyTextToPasteboard() -> Void {
 		log.trace("copyTextToPasteboard()")

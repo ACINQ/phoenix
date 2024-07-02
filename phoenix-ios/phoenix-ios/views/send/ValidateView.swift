@@ -43,7 +43,8 @@ struct ValidateView: View {
 	@State var altAmount: String = ""
 	@State var problem: Problem? = nil
 	
-	@State var spliceOutInProgress: Bool = false
+	@State var paymentInProgress: Bool = false
+	@State var payOfferProblem: PayOfferProblem? = nil
 	@State var spliceOutProblem: SpliceOutProblem? = nil
 	
 	@State var preTipAmountMsat: Int64? = nil
@@ -464,7 +465,7 @@ struct ValidateView: View {
 			backgroundFill: Color.appAccent,
 			disabledBackgroundFill: Color.gray
 		))
-		.disabled(problem != nil || isDisconnected || spliceOutInProgress)
+		.disabled(problem != nil || isDisconnected || paymentInProgress)
 		.accessibilityHint(paymentButtonHint())
 	}
 	
@@ -564,8 +565,11 @@ struct ValidateView: View {
 	
 	func requestDescription() -> String? {
 		
-		if let paymentRequest = paymentRequest() {
-			return paymentRequest.desc_()
+		if let invoice = bolt11Invoice() {
+			return invoice.desc_()
+			
+		} else if let offer = bolt12Offer() {
+			return offer.description_
 			
 		} else if let lnurlPay = lnurlPay() {
 			return lnurlPay.metadata.plainText
@@ -627,9 +631,12 @@ struct ValidateView: View {
 		if mvi.model is Scan.Model_OnChainFlow {
 			return true
 			
-		} else if let _ = paymentRequest() {
+		} else if let _ = bolt11Invoice() {
 			return true
 			
+		} else if let _ = bolt12Offer() {
+			return true
+		
 		} else if let _ = lnurlPay() {
 			return true
 			
@@ -722,8 +729,11 @@ struct ValidateView: View {
 	///
 	func initialAmount() -> Lightning_kmpMilliSatoshi? {
 		
-		if let paymentRequest = paymentRequest() {
-			return paymentRequest.amount
+		if let invoice = bolt11Invoice() {
+			return invoice.amount
+			
+		} else if let offer = bolt12Offer() {
+			return offer.amount
 			
 		} else if let lnurlPay = lnurlPay() {
 			return lnurlPay.minSendable
@@ -743,13 +753,20 @@ struct ValidateView: View {
 		return nil
 	}
 	
-	func paymentRequest() -> Lightning_kmpBolt11Invoice? {
+	func bolt11Invoice() -> Lightning_kmpBolt11Invoice? {
 		
 		if let model = mvi.model as? Scan.Model_Bolt11InvoiceFlow_InvoiceRequest {
 			return model.invoice
 		} else {
-			// Note: there's technically a `paymentRequest` within `Scan.Model_SwapOutFlow_Ready`.
-			// But this method is designed to only pull from `Scan.Model_Bolt11InvoiceFlow_InvoiceRequest`.
+			return nil
+		}
+	}
+	
+	func bolt12Offer() -> Lightning_kmpOfferTypesOffer? {
+		
+		if let model = mvi.model as? Scan.Model_OfferFlow {
+			return model.offer
+		} else {
 			return nil
 		}
 	}
@@ -777,15 +794,18 @@ struct ValidateView: View {
 	}
 	
 	/// Returns true if:
-	/// - this is a normal lightning invoice without a set amount
-	/// - this is an on-chain payment (i.e. splice-out)
+	/// - this is an on-chain payment
+	/// - this is a bolt 11 invoice without a set amount
+	/// - this is a bolt 12 offer without a set amount
 	///
 	func isAmountlessInvoice() -> Bool {
 		
 		if mvi.model is Scan.Model_OnChainFlow {
 			return true
-		} else if let paymentRequest = paymentRequest() {
-			return paymentRequest.amount == nil
+		} else if let invoice = bolt11Invoice() {
+			return invoice.amount == nil
+		} else if let offer = bolt12Offer() {
+			return offer.amount == nil
 		} else {
 			return false
 		}
@@ -796,13 +816,13 @@ struct ValidateView: View {
 	///
 	func isInvoiceWithAmount() -> Bool {
 		
-		return paymentRequest()?.amount != nil
+		return bolt11Invoice()?.amount != nil
 	}
 	
 	func priceRange() -> MsatRange? {
 		
-		if let paymentRequest = paymentRequest() {
-			if let min = paymentRequest.amount {
+		if let invoice = bolt11Invoice() {
+			if let min = invoice.amount {
 				return MsatRange(
 					min: min,
 					max: min.times(m: 2.0)
@@ -841,8 +861,8 @@ struct ValidateView: View {
 		}
 		
 		var preTipMsat: Int64? = nil
-		if let paymentRequest = paymentRequest() {
-			preTipMsat = paymentRequest.amount?.msat
+		if let invoice = bolt11Invoice() {
+			preTipMsat = invoice.amount?.msat
 		} else if let preTipAmountMsat = preTipAmountMsat {
 			preTipMsat = preTipAmountMsat
 		}
@@ -1312,17 +1332,17 @@ struct ValidateView: View {
 		var minMsat: Int64 = 0
 		var maxMsat: Int64 = 0
 		
-		if let paymentRequest = paymentRequest(), let paymentRequestAmt = paymentRequest.amount {
-			// This is a paymentRequest with a specific amount.
+		if let invoice = bolt11Invoice(), let invoiceAmt = invoice.amount {
+			// This is an invoice with a specific amount.
 			// So it doesn't matter what the user typed in.
-			// The min must be paymentRequest.amount.
+			// The min must be invoice.amount.
 			
-			minMsat = paymentRequestAmt.msat
-			maxMsat = paymentRequestAmt.msat * 2
+			minMsat = invoiceAmt.msat
+			maxMsat = invoiceAmt.msat * 2
 			
 		} else {
 			// Could be:
-			// - amountless paymentRequest
+			// - amountless invoice
 			// - lnurl-pay with range
 			//
 			// Either way, the user is typing in an amount, and then tapping the "tip" button.
@@ -1482,146 +1502,333 @@ struct ValidateView: View {
 		}
 	}
 	
+	func saveTipPercentInPrefs() {
+		log.trace("saveTipPercentInPrefs()")
+		
+		if let nums = paymentNumbers(), nums.tipMsat > 0 {
+			let tipPercent = Int(nums.tipPercent * 100.0)
+			Prefs.shared.addRecentTipPercent(tipPercent)
+		}
+	}
+	
 	func sendPayment() {
 		log.trace("sendPayment()")
 		
+		guard let msat = parsedAmountMsat() else {
+			log.debug("ignored: msat == nil")
+			return
+		}
+		
+		if let model = mvi.model as? Scan.Model_Bolt11InvoiceFlow_InvoiceRequest {
+			sendPayment_bolt11Invoice(model, msat)
+			
+		} else if let model = mvi.model as? Scan.Model_OfferFlow {
+			sendPayment_bolt12Offer_C(model, msat)
+			
+		} else if let model = mvi.model as? Scan.Model_OnChainFlow {
+			sendPayment_onChain(model, msat)
+			
+		} else if let model = mvi.model as? Scan.Model_LnurlPayFlow_LnurlPayRequest {
+			sendPayment_lnurlPay(model, msat)
+			
+		} else if let model = mvi.model as? Scan.Model_LnurlWithdrawFlow_LnurlWithdrawRequest {
+			sendPayment_lnurlWithdraw(model, msat)
+		}
+	}
+	
+	func sendPayment_bolt11Invoice(
+		_ model: Scan.Model_Bolt11InvoiceFlow_InvoiceRequest,
+		_ msat: Int64
+	) {
+		log.trace("sendPayment_bolt11Invoice")
+		
+		guard let trampolineFees = defaultTrampolineFees() else {
+			log.warning("ignore: trapolineFees == nil")
+			return
+		}
+		
+		saveTipPercentInPrefs()
+		mvi.intent(Scan.Intent_Bolt11InvoiceFlow_SendInvoicePayment(
+			invoice: model.invoice,
+			amount: Lightning_kmpMilliSatoshi(msat: msat),
+			trampolineFees: trampolineFees
+		))
+	}
+	
+	func sendPayment_bolt12Offer_A(
+		_ model: Scan.Model_OfferFlow,
+		_ msat: Int64
+	) {
+		log.trace("sendPayment_bolt12Offer_A()")
+		
 		guard
-			let msat = parsedAmountMsat(),
-			let trampolineFees = defaultTrampolineFees()
+			let peer = Biz.business.peerManager.peerStateValue(),
+			paymentInProgress == false
 		else {
 			return
 		}
 		
-		let saveTipPercentInPrefs = {
-			if let nums = paymentNumbers(), nums.tipMsat > 0 {
-				let tipPercent = Int(nums.tipPercent * 100.0)
-				Prefs.shared.addRecentTipPercent(tipPercent)
+		paymentInProgress = true
+		payOfferProblem = nil
+		
+		saveTipPercentInPrefs()
+		Task { @MainActor in
+			do {
+				let result: Lightning_kmpSendPaymentResult = try await peer.payOffer(
+					amount: Lightning_kmpMilliSatoshi(msat: msat),
+					offer: model.offer,
+					payerKey: Lightning_randomKey(),
+					fetchInvoiceTimeout: Int64(30 * 1_000_000_000) // Int64 =?= nanoseconds ? Doesn't work !!!
+				)
+				
+				self.paymentInProgress = false
+				
+				switch onEnum(of: result) {
+				case .offerNotPaid(let offerNotPaid):
+					let problem = PayOfferProblem.fromResponse(offerNotPaid)
+					self.payOfferProblem = problem
+					
+				case .paymentNotSent(_): fallthrough
+				case .paymentSent(_):
+					self.payOfferProblem = nil
+					self.presentationMode.wrappedValue.dismiss()
+				}
+				
+			} catch {
+				log.error("peer.payOffer(): error: \(error)")
+				
+				self.paymentInProgress = false
+				self.payOfferProblem = .other
 			}
+		} // </Task>
+	}
+	
+	func sendPayment_bolt12Offer_B(
+		_ model: Scan.Model_OfferFlow,
+		_ msat: Int64
+	) {
+		log.trace("sendPayment_bolt12Offer_B()")
+		
+		guard
+			let peer = Biz.business.peerManager.peerStateValue(),
+			paymentInProgress == false
+		else {
+			return
 		}
 		
-		if let model = mvi.model as? Scan.Model_Bolt11InvoiceFlow_InvoiceRequest {
-			
-			saveTipPercentInPrefs()
-			mvi.intent(Scan.Intent_Bolt11InvoiceFlow_SendInvoicePayment(
-				invoice: model.invoice,
-				amount: Lightning_kmpMilliSatoshi(msat: msat),
-				trampolineFees: trampolineFees
-			))
-			
-		} else if let _ = mvi.model as? Scan.Model_OnChainFlow {
-			
-			guard
-				let minerFeeInfo = minerFeeInfo,
-				let peer = Biz.business.peerManager.peerStateValue(),
-				spliceOutInProgress == false
-			else {
-				return
+		paymentInProgress = true
+		payOfferProblem = nil
+		
+		saveTipPercentInPrefs()
+		Task { @MainActor in
+			do {
+				let result: Lightning_kmpSendPaymentResult = try await peer.altPayOffer(
+					amount: Lightning_kmpMilliSatoshi(msat: msat),
+					offer: model.offer,
+					payerKey: Lightning_randomKey(),
+					fetchInvoiceTimeoutInSeconds: 30
+				)
+				
+				self.paymentInProgress = false
+				
+				switch onEnum(of: result) {
+				case .offerNotPaid(let offerNotPaid):
+					let problem = PayOfferProblem.fromResponse(offerNotPaid)
+					self.payOfferProblem = problem
+					
+				case .paymentNotSent(_): fallthrough
+				case .paymentSent(_):
+					self.payOfferProblem = nil
+					self.presentationMode.wrappedValue.dismiss()
+				}
+				
+			} catch {
+				log.error("peer.payOffer(): error: \(error)")
+				
+				self.paymentInProgress = false
+				self.payOfferProblem = .other
 			}
-			
-			spliceOutInProgress = true
-			spliceOutProblem = nil
-			
-			let amountSat = Bitcoin_kmpSatoshi(sat: Utils.truncateToSat(msat: msat))
-			Task { @MainActor in
-				do {
-					let response = try await peer.spliceOut(
-						amount: amountSat,
-						scriptPubKey: minerFeeInfo.pubKeyScript,
-						feerate: minerFeeInfo.feerate
-					)
-					
-					self.spliceOutInProgress = false
-					
-					if let problem = SpliceOutProblem.fromResponse(response) {
-						self.spliceOutProblem = problem
-						
-					} else {
-						self.spliceOutProblem = nil
-						self.presentationMode.wrappedValue.dismiss()
-					}
-					
-				} catch {
-					log.error("peer.spliceOut(): error: \(error)")
-					
-					self.spliceOutInProgress = false
-					self.spliceOutProblem = .other
-					
-				}
-			} // </Task>
-			
-		} else if let model = mvi.model as? Scan.Model_LnurlPayFlow_LnurlPayRequest {
-			
-			if showCommentButton() && comment.count == 0 && !hasPromptedForComment {
+		} // </Task>
+	}
+	
+	func sendPayment_bolt12Offer_C(
+		_ model: Scan.Model_OfferFlow,
+		_ msat: Int64
+	) {
+		log.trace("sendPayment_bolt12Offer()_C")
+		
+		guard
+			let peer = Biz.business.peerManager.peerStateValue(),
+			paymentInProgress == false
+		else {
+			return
+		}
+		
+		paymentInProgress = true
+		payOfferProblem = nil
+		
+		saveTipPercentInPrefs()
+		Task { @MainActor in
+			do {
+				let paymentId = Lightning_kmpUUID.companion.randomUUID()
+				let response: Lightning_kmpOfferNotPaid? = try await peer.betterPayOffer(
+					paymentId: paymentId,
+					amount: Lightning_kmpMilliSatoshi(msat: msat),
+					offer: model.offer,
+					payerKey: Lightning_randomKey(),
+					fetchInvoiceTimeoutInSeconds: 30
+				)
 				
-				let maxCommentLength = model.paymentIntent.maxCommentLength?.intValue ?? 140
+				self.paymentInProgress = false
 				
-				dismissKeyboardIfVisible()
-				smartModalState.display(dismissable: true) {
+				if let problem = PayOfferProblem.fromResponse(response) {
+					self.payOfferProblem = problem
 					
-					CommentSheet(
-						comment: $comment,
-						maxCommentLength: maxCommentLength,
-						sendButtonAction: { sendPayment() }
-					)
-				
-				} onWillDisappear: {
-					
-					log.debug("smartModalState.onWillDisappear {}")
-					hasPromptedForComment = true
-				}
-				
-			} else {
-				
-				saveTipPercentInPrefs()
-				
-				let updateMsat: Lightning_kmpMilliSatoshi
-				if currency.type == .bitcoin {
-					updateMsat = Lightning_kmpMilliSatoshi(msat: msat)
 				} else {
-					// Workaround for WalletOfSatoshi bug:
-					//
-					// It's common for a user to enter an amount in fiat,
-					// and a proper conversion will often yield an amount with non-zero msat component.
-					//
-					// For example: 1.00 USD ==> 3,652.451 sat
-					//                                 ^^^
-					//                                 non-zero millisats
-					//
-					// However, when making a LN payment to a Lightning address,
-					// the WoS service does not properly handle millisats and will generate an invoice
-					// whose amount is rounded UP to the nearest whole satoshi.
-					// In the example above, they would generate an invoice for 3,653 sat.
-					// 
-					// As such Phoenix correctly rejects the invoice, because the generated amount
-					// does not match the expected amount.
-					//
-					// Even though this is a bug in WoS, Phoenix is regularly blamed for the problem.
-					// So our workaround is to trim the msat component in this scenario.
-					//
-					// For more information:
-					// https://github.com/ACINQ/phoenix/issues/388
-					//
-					let truncatedToSat = Lightning_kmpMilliSatoshi(msat: msat).truncateToSatoshi()
-					updateMsat = Lightning_kmpMilliSatoshi(sat: truncatedToSat)
+					self.payOfferProblem = nil
+					self.presentationMode.wrappedValue.dismiss()
+				}
+			
+			} catch {
+				log.error("peer.payOffer(): error: \(error)")
+				
+				self.paymentInProgress = false
+				self.payOfferProblem = .other
+			}
+		} // </Task>
+	}
+	
+	func sendPayment_onChain(
+		_ model: Scan.Model_OnChainFlow,
+		_ msat: Int64
+	) {
+		log.trace("sendPayment_onChain()")
+		
+		guard
+			let minerFeeInfo = minerFeeInfo,
+			let peer = Biz.business.peerManager.peerStateValue(),
+			paymentInProgress == false
+		else {
+			return
+		}
+		
+		paymentInProgress = true
+		spliceOutProblem = nil
+		
+		let amountSat = Bitcoin_kmpSatoshi(sat: Utils.truncateToSat(msat: msat))
+		Task { @MainActor in
+			do {
+				let response = try await peer.spliceOut(
+					amount: amountSat,
+					scriptPubKey: minerFeeInfo.pubKeyScript,
+					feerate: minerFeeInfo.feerate
+				)
+				
+				self.paymentInProgress = false
+				
+				if let problem = SpliceOutProblem.fromResponse(response) {
+					self.spliceOutProblem = problem
+					
+				} else {
+					self.spliceOutProblem = nil
+					self.presentationMode.wrappedValue.dismiss()
 				}
 				
-				mvi.intent(Scan.Intent_LnurlPayFlow_RequestInvoice(
-					paymentIntent: model.paymentIntent,
-					amount: updateMsat,
-					trampolineFees: trampolineFees,
-					comment: comment
-				))
+			} catch {
+				log.error("peer.spliceOut(): error: \(error)")
+				
+				self.paymentInProgress = false
+				self.spliceOutProblem = .other
+			}
+		} // </Task>
+	}
+	
+	func sendPayment_lnurlPay(
+		_ model: Scan.Model_LnurlPayFlow_LnurlPayRequest,
+		_ msat: Int64
+	) {
+		log.trace("sendPayment_lnurlPay()")
+		
+		guard let trampolineFees = defaultTrampolineFees() else {
+			log.warning("ignore: trapolineFees == nil")
+			return
+		}
+		
+		if showCommentButton() && comment.count == 0 && !hasPromptedForComment {
+			
+			let maxCommentLength = model.paymentIntent.maxCommentLength?.intValue ?? 140
+			
+			dismissKeyboardIfVisible()
+			smartModalState.display(dismissable: true) {
+				
+				CommentSheet(
+					comment: $comment,
+					maxCommentLength: maxCommentLength,
+					sendButtonAction: { sendPayment() }
+				)
+			
+			} onWillDisappear: {
+				
+				log.debug("smartModalState.onWillDisappear {}")
+				hasPromptedForComment = true
 			}
 			
-		} else if let model = mvi.model as? Scan.Model_LnurlWithdrawFlow_LnurlWithdrawRequest {
+		} else {
 			
 			saveTipPercentInPrefs()
-			mvi.intent(Scan.Intent_LnurlWithdrawFlow_SendLnurlWithdraw(
-				lnurlWithdraw: model.lnurlWithdraw,
-				amount: Lightning_kmpMilliSatoshi(msat: msat),
-				description: nil
+			
+			let updateMsat: Lightning_kmpMilliSatoshi
+			if currency.type == .bitcoin {
+				updateMsat = Lightning_kmpMilliSatoshi(msat: msat)
+			} else {
+				// Workaround for WalletOfSatoshi bug:
+				//
+				// It's common for a user to enter an amount in fiat,
+				// and a proper conversion will often yield an amount with non-zero msat component.
+				//
+				// For example: 1.00 USD ==> 3,652.451 sat
+				//                                 ^^^
+				//                                 non-zero millisats
+				//
+				// However, when making a LN payment to a Lightning address,
+				// the WoS service does not properly handle millisats and will generate an invoice
+				// whose amount is rounded UP to the nearest whole satoshi.
+				// In the example above, they would generate an invoice for 3,653 sat.
+				//
+				// As such Phoenix correctly rejects the invoice, because the generated amount
+				// does not match the expected amount.
+				//
+				// Even though this is a bug in WoS, Phoenix is regularly blamed for the problem.
+				// So our workaround is to trim the msat component in this scenario.
+				//
+				// For more information:
+				// https://github.com/ACINQ/phoenix/issues/388
+				//
+				let truncatedToSat = Lightning_kmpMilliSatoshi(msat: msat).truncateToSatoshi()
+				updateMsat = Lightning_kmpMilliSatoshi(sat: truncatedToSat)
+			}
+			
+			mvi.intent(Scan.Intent_LnurlPayFlow_RequestInvoice(
+				paymentIntent: model.paymentIntent,
+				amount: updateMsat,
+				trampolineFees: trampolineFees,
+				comment: comment
 			))
 		}
+	}
+	
+	func sendPayment_lnurlWithdraw(
+		_ model: Scan.Model_LnurlWithdrawFlow_LnurlWithdrawRequest,
+		_ msat: Int64
+	) {
+		log.trace("sendPayment_lnurlWithdraw()")
+		
+		saveTipPercentInPrefs()
+		mvi.intent(Scan.Intent_LnurlWithdrawFlow_SendLnurlWithdraw(
+			lnurlWithdraw: model.lnurlWithdraw,
+			amount: Lightning_kmpMilliSatoshi(msat: msat),
+			description: nil
+		))
 	}
 	
 	func didCancelLnurlPayFetch() {

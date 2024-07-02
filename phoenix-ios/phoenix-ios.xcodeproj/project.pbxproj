@@ -57,6 +57,7 @@
 		DC142140261E72E40075857A /* AnyHTML.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC14213F261E72E40075857A /* AnyHTML.swift */; };
 		DC16965F27FE0FAC003DE1DD /* KotlinExtensions+Currency.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC16965E27FE0FAC003DE1DD /* KotlinExtensions+Currency.swift */; };
 		DC1706D926A71D8E00BAFCD0 /* UnlockErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1706D826A71D8E00BAFCD0 /* UnlockErrorView.swift */; };
+		DC1718A72C20BF8A000CCAF5 /* PayOfferProblem.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1718A62C20BF8A000CCAF5 /* PayOfferProblem.swift */; };
 		DC175C1C28F008AE0086B9A6 /* WalletReset.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC175C1B28F008AE0086B9A6 /* WalletReset.swift */; };
 		DC1771B42ABC99CE00B286C7 /* WebsiteLinkPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1771B32ABC99CE00B286C7 /* WebsiteLinkPopover.swift */; };
 		DC1844032A2690BB004D9578 /* MinerFeeSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1844022A2690BB004D9578 /* MinerFeeSheet.swift */; };
@@ -78,6 +79,7 @@
 		DC2ABAD52BEC092B00C11C9C /* InvalidPin.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2ABAD42BEC092B00C11C9C /* InvalidPin.swift */; };
 		DC2ABAD72BED081400C11C9C /* VibrationFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2ABAD62BED081400C11C9C /* VibrationFeedback.swift */; };
 		DC2ABAD92BED142900C11C9C /* ShakeEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2ABAD82BED142900C11C9C /* ShakeEffect.swift */; };
+		DC2B74C32C121571001BA1FD /* Bolt12Sheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2B74C22C121571001BA1FD /* Bolt12Sheet.swift */; };
 		DC2CE3AF29AFEB0500BA0B00 /* Bundle+Icon.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2CE3AE29AFEB0500BA0B00 /* Bundle+Icon.swift */; };
 		DC2CE54D28A3D2F50070A2E1 /* TruncatableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2CE54C28A3D2F50070A2E1 /* TruncatableView.swift */; };
 		DC2CE55028A52AD90070A2E1 /* RecentPaymentsConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2CE54F28A52AD90070A2E1 /* RecentPaymentsConfig.swift */; };
@@ -166,6 +168,7 @@
 		DC641C802821767D00862DCD /* Prefs+BackupTransactions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC641C7F2821767D00862DCD /* Prefs+BackupTransactions.swift */; };
 		DC641C82282188E700862DCD /* Utils+CurrencyPrefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC641C81282188E700862DCD /* Utils+CurrencyPrefs.swift */; };
 		DC641C83282189AC00862DCD /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC18C41C256FF91100A2D083 /* Utils.swift */; };
+		DC64F5B82C0FB5BD009D2B5F /* InboundFeeState.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC64F5B72C0FB5BD009D2B5F /* InboundFeeState.swift */; };
 		DC65BBF22A58A40700EBA651 /* CpfpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC65BBF12A58A40700EBA651 /* CpfpView.swift */; };
 		DC65D86428E2F7D700686355 /* ResetWalletView_Action.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC65D86328E2F7D700686355 /* ResetWalletView_Action.swift */; };
 		DC67654E25655D93004D4263 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DC67654D25655D93004D4263 /* Colors.xcassets */; };
@@ -457,6 +460,7 @@
 		DC14213F261E72E40075857A /* AnyHTML.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyHTML.swift; sourceTree = "<group>"; };
 		DC16965E27FE0FAC003DE1DD /* KotlinExtensions+Currency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KotlinExtensions+Currency.swift"; sourceTree = "<group>"; };
 		DC1706D826A71D8E00BAFCD0 /* UnlockErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnlockErrorView.swift; sourceTree = "<group>"; };
+		DC1718A62C20BF8A000CCAF5 /* PayOfferProblem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayOfferProblem.swift; sourceTree = "<group>"; };
 		DC175C1B28F008AE0086B9A6 /* WalletReset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletReset.swift; sourceTree = "<group>"; };
 		DC1771B32ABC99CE00B286C7 /* WebsiteLinkPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsiteLinkPopover.swift; sourceTree = "<group>"; };
 		DC1844022A2690BB004D9578 /* MinerFeeSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinerFeeSheet.swift; sourceTree = "<group>"; };
@@ -477,6 +481,7 @@
 		DC2ABAD42BEC092B00C11C9C /* InvalidPin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvalidPin.swift; sourceTree = "<group>"; };
 		DC2ABAD62BED081400C11C9C /* VibrationFeedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VibrationFeedback.swift; sourceTree = "<group>"; };
 		DC2ABAD82BED142900C11C9C /* ShakeEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShakeEffect.swift; sourceTree = "<group>"; };
+		DC2B74C22C121571001BA1FD /* Bolt12Sheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bolt12Sheet.swift; sourceTree = "<group>"; };
 		DC2CE3AE29AFEB0500BA0B00 /* Bundle+Icon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+Icon.swift"; sourceTree = "<group>"; };
 		DC2CE54C28A3D2F50070A2E1 /* TruncatableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TruncatableView.swift; sourceTree = "<group>"; };
 		DC2CE54F28A52AD90070A2E1 /* RecentPaymentsConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecentPaymentsConfig.swift; sourceTree = "<group>"; };
@@ -551,6 +556,7 @@
 		DC641C7D2821744000862DCD /* Currency+CurrencyPrefs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Currency+CurrencyPrefs.swift"; sourceTree = "<group>"; };
 		DC641C7F2821767D00862DCD /* Prefs+BackupTransactions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Prefs+BackupTransactions.swift"; sourceTree = "<group>"; };
 		DC641C81282188E700862DCD /* Utils+CurrencyPrefs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Utils+CurrencyPrefs.swift"; sourceTree = "<group>"; };
+		DC64F5B72C0FB5BD009D2B5F /* InboundFeeState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboundFeeState.swift; sourceTree = "<group>"; };
 		DC65BBF12A58A40700EBA651 /* CpfpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CpfpView.swift; sourceTree = "<group>"; };
 		DC65D86328E2F7D700686355 /* ResetWalletView_Action.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetWalletView_Action.swift; sourceTree = "<group>"; };
 		DC67654D25655D93004D4263 /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
@@ -947,10 +953,11 @@
 				DC118C0727B457520080BBAC /* FetchActivityNotice.swift */,
 				DC118C0927B457F70080BBAC /* LnurlFlowErrorNotice.swift */,
 				DCEAE5B82943D64B00320C46 /* MsatRange.swift */,
-				DCB62F482A5E09F900912A71 /* SpliceOutProblem.swift */,
 				DC1771B32ABC99CE00B286C7 /* WebsiteLinkPopover.swift */,
 				DC98D3952AF170AC005BD177 /* PaymentWarningPopover.swift */,
 				DCA02B9F2BD1A5FC0080520F /* ChannelSizeImpactWarning.swift */,
+				DCB62F482A5E09F900912A71 /* SpliceOutProblem.swift */,
+				DC1718A62C20BF8A000CCAF5 /* PayOfferProblem.swift */,
 			);
 			path = send;
 			sourceTree = "<group>";
@@ -990,6 +997,8 @@
 				DC370A882B7FBD7C0093C56F /* BtcAddrOptionsSheet.swift */,
 				DC70A99B2BBB6093002DBFF8 /* InboundFeeWarning.swift */,
 				DC63A3752B965D54008E040E /* InboundFeeSheet.swift */,
+				DC64F5B72C0FB5BD009D2B5F /* InboundFeeState.swift */,
+				DC2B74C22C121571001BA1FD /* Bolt12Sheet.swift */,
 			);
 			path = receive;
 			sourceTree = "<group>";
@@ -1763,6 +1772,7 @@
 				DC355E1F2A44A235008E8A8E /* NotificationCell.swift in Sources */,
 				DC1706D926A71D8E00BAFCD0 /* UnlockErrorView.swift in Sources */,
 				DC2DC8682906AC0B0079E570 /* BitcoinUnitSelector.swift in Sources */,
+				DC64F5B82C0FB5BD009D2B5F /* InboundFeeState.swift in Sources */,
 				DC118C0027B4523B0080BBAC /* CommentSheet.swift in Sources */,
 				DC4309702A795F9900E28995 /* UtxoWrapper.swift in Sources */,
 				DC355E1D2A4398A8008E8A8E /* NoticeBox.swift in Sources */,
@@ -1826,6 +1836,7 @@
 				DC46BAF726CACCF700E760A6 /* KotlinExtensions+Conversion.swift in Sources */,
 				DCCFE6A42B63021E002FFF11 /* KotlinLogger.swift in Sources */,
 				DCCFE6AE2B64310E002FFF11 /* LoggerFactory.swift in Sources */,
+				DC1718A72C20BF8A000CCAF5 /* PayOfferProblem.swift in Sources */,
 				DC49FE992AC49C6300D8D2E2 /* KotlinExtensions+Bitcoin.swift in Sources */,
 				DC142140261E72E40075857A /* AnyHTML.swift in Sources */,
 				DC2CE3AF29AFEB0500BA0B00 /* Bundle+Icon.swift in Sources */,
@@ -1945,6 +1956,7 @@
 				DC5A935329846044004F19FD /* FileHandle+Async.swift in Sources */,
 				DC118C0A27B457F70080BBAC /* LnurlFlowErrorNotice.swift in Sources */,
 				53BEF2924096C8E7976D46E3 /* shapes.swift in Sources */,
+				DC2B74C32C121571001BA1FD /* Bolt12Sheet.swift in Sources */,
 				DC0D2EA72939273B00284608 /* KotlinExtensions+Payments.swift in Sources */,
 				DC72C33925A663CA008A927A /* QRCode.swift in Sources */,
 				DC20D77A2BC5982400C37255 /* ServerMessageMonitor.swift in Sources */,

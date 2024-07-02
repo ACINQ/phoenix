@@ -12151,6 +12151,12 @@
         }
       }
     },
+    "Could not retrieve payment details within a reasonable time. The recipient may be offline or unreachable." : {
+
+    },
+    "Could not retrieve payment details. Received invalid response from node." : {
+
+    },
     "Create new wallet" : {
       "localizations" : {
         "ar" : {
@@ -19114,6 +19120,9 @@
         }
       }
     },
+    "How to use" : {
+
+    },
     "I have saved my recovery phrase somewhere safe." : {
       "localizations" : {
         "ar" : {
@@ -22130,6 +22139,9 @@
         }
       }
     },
+    "Learn more" : {
+
+    },
     "Learn more from our [blog post](https://acinq.co/blog/phoenix-splicing-update)." : {
       "localizations" : {
         "ar" : {
@@ -22768,6 +22780,9 @@
 
     },
     "Lightning Offer" : {
+
+    },
+    "Lightning Offers" : {
 
     },
     "Lightning payments are fast and best suited for smaller payments." : {
@@ -31932,6 +31947,7 @@
       }
     },
     "Scan withdraw" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -38389,6 +38405,9 @@
         }
       }
     },
+    "This is a lightning offer (also known as a BOLT 12 invoice) which uses new bleeding-edge tech.\n\nUnlike regular Lightning invoices, it does not expire and can be reused at will. It can be used as a tipping address and for donations.\n\nCurrently, few wallets support this new tech. If you have issues, use a regular Lightning invoice instead." : {
+
+    },
     "This is a swap address. It is not controlled by your wallet. On-chain deposits sent to this address will be converted to Lightning channels." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -40705,6 +40724,9 @@
           }
         }
       }
+    },
+    "Unknown offer error" : {
+
     },
     "Unknown reason" : {
       "localizations" : {

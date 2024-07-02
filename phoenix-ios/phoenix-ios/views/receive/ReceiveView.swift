@@ -15,20 +15,22 @@ struct ReceiveView: MVIView {
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
 	
-	enum Tab: Int, CaseIterable, Identifiable {
-		case lnOffer = 0
-		case lnInvoice = 1
-		case blockchain = 2
+	// The order of items within this enum controls the order in the UI.
+	// If you change the order, you might also consider changing the initial value for `selectedTab`.
+	enum Tab: CaseIterable, Identifiable {
+		case lnOffer
+		case lnInvoice
+		case blockchain
 
 		var id: Self { self }
 	}
 	
 	@State var selectedTab: Tab = .lnOffer
 	
-	@State var lightningOfferView_didAppear = false
 	@State var lightningInvoiceView_didAppear = false
 	@State var showSendView = false
 	
+	@StateObject var inboundFeeState = InboundFeeState()
 	@StateObject var toast = Toast()
 	
 	@Environment(\.colorScheme) var colorScheme
@@ -83,6 +85,7 @@ struct ReceiveView: MVIView {
 						removal: .opacity
 					)
 				)
+				.navigationBarItems(trailing: scanButton())
 		}
 	}
 	
@@ -92,27 +95,34 @@ struct ReceiveView: MVIView {
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 		
 			TabView(selection: $selectedTab) {
-				
-				LightningOfferView(
-					mvi: mvi,
-					toast: toast,
-					didAppear: $lightningOfferView_didAppear,
-					showSendView: $showSendView
-				)
-				
-				LightningInvoiceView(
-					mvi: mvi,
-					toast: toast,
-					didAppear: $lightningInvoiceView_didAppear,
-					showSendView: $showSendView
-				)
-				.tag(Tab.lnInvoice)
-				
-				SwapInView(
-					toast: toast
-				)
-				.tag(Tab.blockchain)
-			}
+				ForEach(Tab.allCases) { tab in
+					
+					switch tab {
+					case .lnOffer:
+						LightningOfferView(
+							inboundFeeState: inboundFeeState,
+							toast: toast
+						)
+						.tag(Tab.lnOffer)
+						
+					case .lnInvoice:
+						LightningInvoiceView(
+							mvi: mvi,
+							inboundFeeState: inboundFeeState,
+							toast: toast,
+							didAppear: $lightningInvoiceView_didAppear
+						)
+						.tag(Tab.lnInvoice)
+						
+					case .blockchain:
+						SwapInView(
+							toast: toast
+						)
+						.tag(Tab.blockchain)
+						
+					} // </switch>
+				} // </ForEach>
+			} // </TabView>
 			.tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
 			
 			customTabViewStyle()
@@ -146,7 +156,7 @@ struct ReceiveView: MVIView {
 			} label: {
 				Image(systemName: "chevron.backward")
 			}
-			.disabled(selectedTab == Tab.lnInvoice)
+			.disabled(selectedTab == Tab.allCases.first!)
 			
 			Spacer()
 			customTabViewStyle_Icons()
@@ -157,7 +167,7 @@ struct ReceiveView: MVIView {
 			} label: {
 				Image(systemName: "chevron.forward")
 			}
-			.disabled(selectedTab == Tab.blockchain)
+			.disabled(selectedTab == Tab.allCases.last!)
 			
 		} // </HStack>
 	}
@@ -212,6 +222,18 @@ struct ReceiveView: MVIView {
 				} // </switch tab>
 			} // </ForEach>
 		} // </HStack>
+	}
+	
+	@ViewBuilder
+	func scanButton() -> some View {
+		
+		Button {
+			withAnimation {
+				showSendView = true
+			}
+		} label: {
+			Image(systemName: "qrcode.viewfinder")
+		}
 	}
 	
 	// --------------------------------------------------

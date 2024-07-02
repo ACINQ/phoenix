@@ -1,6 +1,7 @@
 package fr.acinq.phoenix.utils
 
 import fr.acinq.bitcoin.ByteVector
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.ByteVector64
 import fr.acinq.bitcoin.PrivateKey
 import fr.acinq.bitcoin.PublicKey
@@ -10,6 +11,7 @@ import fr.acinq.bitcoin.TxId
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.ChannelEvents
 import fr.acinq.lightning.DefaultSwapInParams
+import fr.acinq.lightning.Lightning
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.NodeEvents
@@ -31,18 +33,31 @@ import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.io.NativeSocketException
+import fr.acinq.lightning.io.OfferInvoiceReceived
+import fr.acinq.lightning.io.OfferNotPaid
 import fr.acinq.lightning.io.PaymentNotSent
 import fr.acinq.lightning.io.PaymentProgress
 import fr.acinq.lightning.io.PaymentSent
+import fr.acinq.lightning.io.PayOffer
 import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.io.PeerEvent
+import fr.acinq.lightning.io.SendPaymentResult
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.payment.OutgoingPaymentFailure
 import fr.acinq.lightning.utils.Connection
+import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.wire.LiquidityAds
-import fr.acinq.phoenix.PhoenixBusiness
+import fr.acinq.lightning.wire.OfferTypes
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Class types from lightning-kmp & bitcoin-kmp are not exported to iOS unless we explicitly
@@ -451,6 +466,10 @@ fun LightningOutgoingPayment.Part.Status.Failure.asTooManyPendingPayments():
         LightningOutgoingPayment.Part.Status.Failure.TooManyPendingPayments? =
     (this as? LightningOutgoingPayment.Part.Status.Failure.TooManyPendingPayments)
 
+fun Lightning_randomBytes32(): ByteVector32 = Lightning.randomBytes32()
+fun Lightning_randomBytes64(): ByteVector64 = Lightning.randomBytes64()
+fun Lightning_randomKey(): PrivateKey = Lightning.randomKey()
+
 /**
  * The class LiquidityAds.LeaseRate is NOT exposed to iOS.
  * That is, it's exposed via Objective-C, but cannot be mapped to Swift.
@@ -583,4 +602,41 @@ fun WalletState.WalletWithConfirmations._spendExpiredSwapIn(
     feerate: FeeratePerKw
 ): Pair<Transaction, Satoshi>? {
     return this.spendExpiredSwapIn(swapInKeys, scriptPubKey, feerate)
+}
+
+suspend fun Peer.altPayOffer(
+    amount: MilliSatoshi,
+    offer: OfferTypes.Offer,
+    payerKey: PrivateKey,
+    fetchInvoiceTimeoutInSeconds: Int
+): SendPaymentResult {
+    return this.payOffer(
+        amount = amount,
+        offer = offer,
+        payerKey = payerKey,
+        fetchInvoiceTimeout = fetchInvoiceTimeoutInSeconds.seconds
+    )
+}
+
+suspend fun Peer.betterPayOffer(
+    paymentId: UUID,
+    amount: MilliSatoshi,
+    offer: OfferTypes.Offer,
+    payerKey: PrivateKey,
+    fetchInvoiceTimeoutInSeconds: Int
+): OfferNotPaid? {
+    val res = CompletableDeferred<OfferNotPaid?>()
+    launch {
+        eventsFlow.collect {
+            if (it is OfferNotPaid && it.request.paymentId == paymentId) {
+                res.complete(it)
+                cancel()
+            } else if (it is OfferInvoiceReceived && it.request.paymentId == paymentId) {
+                res.complete(null)
+                cancel()
+            }
+        }
+    }
+    send(PayOffer(paymentId, payerKey, amount, offer, fetchInvoiceTimeoutInSeconds.seconds))
+    return res.await()
 }
