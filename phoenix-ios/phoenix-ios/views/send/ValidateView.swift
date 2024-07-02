@@ -372,7 +372,7 @@ struct ValidateView: View {
 			width: 20, height: 20,
 			xOffset: 0, yOffset: 0
 		) {
-			commentButtonTapped()
+			showCommentSheet()
 		}
 	}
 	
@@ -724,6 +724,8 @@ struct ValidateView: View {
 		if let model = mvi.model as? Scan.Model_LnurlPayFlow {
 			return model.paymentIntent
 		} else if let model = mvi.model as? Scan.Model_LnurlPayFlow_LnurlPayFetch {
+			return model.paymentIntent
+		} else if let model = mvi.model as? Scan.Model_LnurlPayFlow_LnurlPayRequest {
 			return model.paymentIntent
 		} else {
 			return nil
@@ -1391,14 +1393,21 @@ struct ValidateView: View {
 		}
 	}
 	
-	func commentButtonTapped() {
-		log.trace("commentButtonTapped()")
+	func showCommentSheet() {
+		log.trace("showCommentSheet()")
 		
-		guard let lnurlPay = lnurlPay() else {
-			return
+		var maxCommentLength: Int? = nil
+		if let _ = bolt12Offer() {
+			maxCommentLength = 64
+			
+		} else if let lnurlPay = lnurlPay() {
+			maxCommentLength = lnurlPay.maxCommentLength?.intValue ?? 140
 		}
 		
-		let maxCommentLength = lnurlPay.maxCommentLength?.intValue ?? 140
+		guard let maxCommentLength else {
+			log.warning("showCommentSheet(): ignored: unknown state")
+			return
+		}
 		
 		dismissKeyboardIfVisible()
 		smartModalState.display(dismissable: true) {

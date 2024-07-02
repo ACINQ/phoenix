@@ -140,7 +140,38 @@ struct PaymentDetails: View {
 						Text("Copy")
 					}
 				}
-		}
+		} // </GridRow>
+		
+		GridRow(alignment: VerticalAlignment.firstTextBaseline) {
+			titleColumn("Message")
+			
+			Group {
+				let comment = parent.comment
+				if comment.isEmpty {
+					Button {
+						parent.showCommentSheet()
+					} label: {
+						Text("Attach a message")
+					}
+				} else {
+					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 4) {
+						Text(comment)
+							.lineLimit(3)
+							.truncationMode(.tail)
+						Button {
+							parent.showCommentSheet()
+						} label: {
+							Image(systemName: "square.and.pencil").font(.body)
+						}
+					}
+				}
+			} // </Group>
+			.font(valueFont)
+			.gridCellColumns(2)
+			.gridColumnAlignment(.leading)
+			.gridCellAnchor(.leading)
+			
+		} // </GridRow>
 	}
 	
 	@ViewBuilder

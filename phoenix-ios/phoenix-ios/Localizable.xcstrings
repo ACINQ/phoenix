@@ -6680,6 +6680,9 @@
         }
       }
     },
+    "Attach a message" : {
+
+    },
     "Attention: if the Bitcoin mempool feerate is high, incoming LN payments requiring an on-chain operation could be expensive." : {
       "localizations" : {
         "ar" : {
