@@ -1081,6 +1081,9 @@
         }
       }
     },
+    "(Lightning offer)" : {
+      "comment" : "Type of text being copied"
+    },
     "(Phoenix can be running in the background.)" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -22760,6 +22763,12 @@
           }
         }
       }
+    },
+    "Lightning offer" : {
+
+    },
+    "Lightning Offer" : {
+
     },
     "Lightning payments are fast and best suited for smaller payments." : {
       "localizations" : {

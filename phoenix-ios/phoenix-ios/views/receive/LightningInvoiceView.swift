@@ -1,14 +1,14 @@
 import SwiftUI
 import PhoenixShared
 
-fileprivate let filename = "ReceiveLightningView"
+fileprivate let filename = "LightningInvoiceView"
 #if DEBUG && true
 fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-struct ReceiveLightningView: View {
+struct LightningInvoiceView: View {
 	
 	@ObservedObject var mvi: MVIState<Receive.Model, Receive.Intent>
 	@ObservedObject var toast: Toast

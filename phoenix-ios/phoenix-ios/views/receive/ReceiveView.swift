@@ -16,15 +16,17 @@ struct ReceiveView: MVIView {
 	var factory: ControllerFactory { return factoryEnv }
 	
 	enum Tab: Int, CaseIterable, Identifiable {
-		case lightning = 0
-		case blockchain = 1
+		case lnOffer = 0
+		case lnInvoice = 1
+		case blockchain = 2
 
 		var id: Self { self }
 	}
 	
-	@State var selectedTab: Tab = .lightning
+	@State var selectedTab: Tab = .lnOffer
 	
-	@State var receiveLightningView_didAppear = false
+	@State var lightningOfferView_didAppear = false
+	@State var lightningInvoiceView_didAppear = false
 	@State var showSendView = false
 	
 	@StateObject var toast = Toast()
@@ -91,13 +93,20 @@ struct ReceiveView: MVIView {
 		
 			TabView(selection: $selectedTab) {
 				
-				ReceiveLightningView(
+				LightningOfferView(
 					mvi: mvi,
 					toast: toast,
-					didAppear: $receiveLightningView_didAppear,
+					didAppear: $lightningOfferView_didAppear,
 					showSendView: $showSendView
 				)
-				.tag(Tab.lightning)
+				
+				LightningInvoiceView(
+					mvi: mvi,
+					toast: toast,
+					didAppear: $lightningInvoiceView_didAppear,
+					showSendView: $showSendView
+				)
+				.tag(Tab.lnInvoice)
 				
 				SwapInView(
 					toast: toast
@@ -137,7 +146,7 @@ struct ReceiveView: MVIView {
 			} label: {
 				Image(systemName: "chevron.backward")
 			}
-			.disabled(selectedTab == Tab.lightning)
+			.disabled(selectedTab == Tab.lnInvoice)
 			
 			Spacer()
 			customTabViewStyle_Icons()
@@ -164,11 +173,23 @@ struct ReceiveView: MVIView {
 				let imageColor: Color = isSelected ? Color.primary : Color.secondary
 				
 				switch tab {
-				case .lightning:
+				case .lnOffer:
 					Button {
 						selectTabWithAnimation(tab)
 					} label: {
 						Image(systemName: "bolt")
+							.resizable()
+							.scaledToFill()
+							.frame(width: imageSize, height: imageSize)
+							.foregroundColor(imageColor)
+					}
+					.disabled(isSelected)
+					
+				case .lnInvoice:
+					Button {
+						selectTabWithAnimation(tab)
+					} label: {
+						Image(systemName: "tag")
 							.resizable()
 							.scaledToFill()
 							.frame(width: imageSize, height: imageSize)
@@ -201,8 +222,9 @@ struct ReceiveView: MVIView {
 		log.trace("moveToPreviousTab()")
 		
 		switch selectedTab {
-			case Tab.lightning  : break
-			case Tab.blockchain : selectTabWithAnimation(.lightning)
+			case Tab.lnOffer    : break
+			case Tab.lnInvoice  : selectTabWithAnimation(.lnOffer)
+			case Tab.blockchain : selectTabWithAnimation(.lnInvoice)
 		}
 	}
 	
@@ -210,7 +232,8 @@ struct ReceiveView: MVIView {
 		log.trace("moveToNextTab()")
 		
 		switch selectedTab {
-			case Tab.lightning  : selectTabWithAnimation(.blockchain)
+			case Tab.lnOffer    : selectTabWithAnimation(.lnInvoice)
+			case Tab.lnInvoice  : selectTabWithAnimation(.blockchain)
 			case Tab.blockchain : break
 		}
 	}
@@ -228,7 +251,8 @@ struct ReceiveView: MVIView {
 	// --------------------------------------------------
 	
 	/// Shared logic. Used by:
-	/// - ReceiveLightningView
+	/// - LightningOfferView
+	/// - LightningInvoiceView
 	/// - SwapInView
 	///
 	static func qrCodeBorderColor(_ colorScheme: ColorScheme) -> Color {
