@@ -144,11 +144,11 @@
 
     <string name="receive_toggle_offer_button">QR Code réutilisable</string>
 
-    <string name="receive_offer_howto_intro_1">🎉 Voici votre QR réutilisable!</string>
-    <string name="receive_offer_howto_intro_2">Cliquez pour voir comment ça s\'utilise</string>
-    <string name="receive_offer_howto_details_1">Ce code Bolt12 est votre adresse statique sur Lightning. Il permet à d\'autres de vous envoyer des bitcoins très facilement.</string>
-    <string name="receive_offer_howto_details_2">Contrairement aux factures Lightning traditionnelles, ce code n\'expire pas et peut être réutilisé.</string>
-    <string name="receive_offer_howto_details_3">Partagez-le largement : il peut être servir pour des dons, des pourboires, ou pour vous faire payer par vos amis.</string>
+    <string name="receive_offer_howto_intro_1">🎉 Voici votre requête de paiement réutilisable</string>
+    <string name="receive_offer_howto_intro_2">Voir comment ça s\'utilise</string>
+    <string name="receive_offer_howto_details_1">Cette requête de paiement Bolt12 est l\'équivalent Lightning d\'une adresse Bitcoin.</string>
+    <string name="receive_offer_howto_details_2">À la différence des factures Lightning traditionnelles, elle n\'expire pas et peut être réutilisée.</string>
+    <string name="receive_offer_howto_details_3">Partagez-la largement : donations, pourboires, ou pour vous faire payer par vos amis.</string>
     <string name="receive_offer_howto_details_4_title">🛟 Qui accepte Bolt12 aujourd\'hui?</string>
     <string name="receive_offer_howto_details_4">Pour l\'instant, peu de services supportent Bolt12. Si des services rejettent ce code, faites-leur savoir qu\'ils passent à côté de quelque chose de génial!</string>
     <string name="receive_offer_howto_details_5_title">🔋 Restrictions sur la batterie</string>

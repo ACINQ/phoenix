@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.BorderButton
 import fr.acinq.phoenix.android.components.Clickable
+import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.openLink
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.copyToClipboard
@@ -112,7 +113,7 @@ fun HowToOffer() {
         Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(text = stringResource(id = R.string.receive_offer_howto_intro_1), textAlign = TextAlign.Center, style = MaterialTheme.typography.body2)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = stringResource(id = R.string.receive_offer_howto_intro_2), textAlign = TextAlign.Center)
+            TextWithIcon(text = stringResource(id = R.string.receive_offer_howto_intro_2), icon = R.drawable.ic_info)
         }
     }
 

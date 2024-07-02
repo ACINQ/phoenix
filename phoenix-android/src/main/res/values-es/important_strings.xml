@@ -144,12 +144,12 @@
 
     <string name="receive_toggle_offer_button">Mostrar código QR reutilizable</string>
 
-    <string name="receive_offer_howto_intro_1">🎉¡Aquí tienes tu código QR reutilizable!</string>
+    <string name="receive_offer_howto_intro_1">🎉 Aquí tiene su solicitud de pago reutilizable</string>
     <string name="receive_offer_howto_intro_2">Toca para aprender a usarlo</string>
-    <string name="receive_offer_howto_details_1">Este código Bolt12 es tu dirección estática en Lightning. Permite que otros te envíen bitcoins de forma súper sencilla.</string>
-    <string name="receive_offer_howto_details_2">A diferencia de las facturas tradicionales de Lightning, no caduca y se puede reutilizar.</string>
-    <string name="receive_offer_howto_details_3">Compártela ampliamente: se puede utilizar para donaciones, propinas o para que te paguen tus amigos.</string>
-    <string name="receive_offer_howto_details_4_title">🛟 ¿Quién apoya a Bolt12?</string>
+    <string name="receive_offer_howto_details_1">Esta solicitud de pago Bolt12 es el equivalente Lightning a una dirección Bitcoin.</string>
+    <string name="receive_offer_howto_details_2">A diferencia de las facturas Lightning tradicionales, no caduca y se puede reutilizar.</string>
+    <string name="receive_offer_howto_details_3">Compártela ampliamente: para donaciones, propinas o para que te paguen tus amigos.</string>
+    <string name="receive_offer_howto_details_4_title">🛟 ¿Quién acepta a Bolt12?</string>
     <string name="receive_offer_howto_details_4">Por el momento, pocos servicios admiten Bolt12. Si un servicio rechaza esta factura, ¡hágale saber que se lo está perdiendo!</string>
     <string name="receive_offer_howto_details_5_title">🔋 Restricciones de la batería</string>
     <string name="receive_offer_howto_details_5">Comprueba que Android no aplica un modo de ahorro de batería a Phoenix. De lo contrario, no podrás recibir pagos si la aplicación está cerrada o en segundo plano. Activar TOR en Phoenix también causará problemas.</string>

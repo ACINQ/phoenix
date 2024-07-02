@@ -143,11 +143,11 @@
 
     <string name="receive_toggle_offer_button">Zobraziť opakovane použiteľný QR kód</string>
 
-    <string name="receive_offer_howto_intro_1">🎉 Tu je váš opakovane použiteľný QR kód!</string>
+    <string name="receive_offer_howto_intro_1">🎉 Tu je vaša žiadosť o opakovanú platbu!</string>
     <string name="receive_offer_howto_intro_2">Klepnutím sa dozviete, ako ho používať</string>
-    <string name="receive_offer_howto_details_1">Tento kód Bolt12 je vaša statická adresa v Lightning. Umožňuje ostatným posielať vám bitcoiny veľmi jednoducho.</string>
-    <string name="receive_offer_howto_details_2">Na rozdiel od tradičných faktúr Lightning nevyprší platnosť a možno ich znova použiť.</string>
-    <string name="receive_offer_howto_details_3">Zdieľajte ho široko: možno ho použiť na dary, tipy alebo na zaplatenie od priateľov.</string>
+    <string name="receive_offer_howto_details_1">Táto požiadavka na platbu Bolt12 je ekvivalentom adresy Bitcoin v službe Lightning.</string>
+    <string name="receive_offer_howto_details_2">Na rozdiel od tradičných faktúr Lightning nevyprší jej platnosť a môže sa použiť opakovane.</string>
+    <string name="receive_offer_howto_details_3">Široké zdieľanie : za dary, prepitné alebo aby vám zaplatili vaši priatelia.</string>
     <string name="receive_offer_howto_details_4_title">🛟 Kto podporuje Bolt12?</string>
     <string name="receive_offer_howto_details_4">V súčasnosti podporuje Bolt12 len málo služieb. Ak služba odmietne túto faktúru, dajte jej vedieť, že o ňu prichádza!</string>
     <string name="receive_offer_howto_details_5_title">🔋 Obmedzenia batérie</string>

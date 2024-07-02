@@ -140,11 +140,11 @@
 
     <string name="receive_toggle_offer_button">Wiederverwendbaren QR-Code anzeigen</string>
 
-    <string name="receive_offer_howto_intro_1">🎉 Ihr wiederverwendbarer QR-Code</string>
+    <string name="receive_offer_howto_intro_1">🎉 Ihr wiederverwendbarer Zahlungsanforderung</string>
     <string name="receive_offer_howto_intro_2">Tippen Sie hier, um zu erfahren, wie Sie ihn verwenden können</string>
-    <string name="receive_offer_howto_details_1">Dieser Bolt12-Code ist Ihre statische Adresse auf Lightning. Damit können Sie andere ganz einfach Bitcoins schicken.</string>
-    <string name="receive_offer_howto_details_2">Im Gegensatz zu herkömmlichen Lightning-Rechnungen läuft er nicht ab und kann wiederverwendet werden.</string>
-    <string name="receive_offer_howto_details_3">Teilen Sie sie weiter: Sie können sie für Spenden, Trinkgelder oder für die Bezahlung Ihrer Freunde verwenden.</string>
+    <string name="receive_offer_howto_details_1">Diese Bolt12-Zahlungsanforderung ist das Lightning-Äquivalent zu einer Bitcoin-Adresse.</string>
+    <string name="receive_offer_howto_details_2">Im Gegensatz zu herkömmlichen Lightning-Rechnungen läuft sie nicht ab und kann wiederverwendet werden.</string>
+    <string name="receive_offer_howto_details_3">Teilen Sie es weiter: für Spenden, Trinkgelder oder um von Ihren Freunden bezahlt zu werden.</string>
     <string name="receive_offer_howto_details_4_title">🛟 Wer unterstützt Bolt12?</string>
     <string name="receive_offer_howto_details_4">Im Moment unterstützen nur wenige Dienste Bolt12. Wenn ein Dienst diese Rechnung ablehnt, lassen Sie ihn wissen, dass er etwas verpasst!</string>
     <string name="receive_offer_howto_details_5_title">🔋 Einschränkungen für Batterien</string>

@@ -207,7 +207,7 @@ private fun PaymentDescription(paymentInfo: WalletPaymentInfo, modifier: Modifie
 
                 when (val contact = contactForOffer.value) {
                     null -> when (val note = request.payerNote) {
-                        null -> stringResource(id = R.string.paymentdetails_desc_to_unknown)
+                        null -> null
                         else -> stringResource(id = R.string.paymentdetails_desc_to_unknown_with_note, note)
                     }
                     else -> when (val note = request.payerNote) {

@@ -146,11 +146,11 @@
 
     <string name="receive_toggle_offer_button">Show reusable QR code</string>
 
-    <string name="receive_offer_howto_intro_1">🎉 Here is your reusable QR code!</string>
+    <string name="receive_offer_howto_intro_1">🎉 Here is your reusable payment request!</string>
     <string name="receive_offer_howto_intro_2">Tap to learn how to use it</string>
-    <string name="receive_offer_howto_details_1">This Bolt2 code is your static address on Lightning. It lets others send you bitcoins super easily.</string>
-    <string name="receive_offer_howto_details_2">Unlike traditional Lightning invoices, it does not expire, and can be reused.</string>
-    <string name="receive_offer_howto_details_3">Share it widely : it can be used for donations, tips, or to get paid by your friends.</string>
+    <string name="receive_offer_howto_details_1">This Bolt12 payment request is the Lightning equivalent to a Bitcoin address.</string>
+    <string name="receive_offer_howto_details_2">Unlike traditional Lightning invoices, it does not expire and can be reused.</string>
+    <string name="receive_offer_howto_details_3">Share it widely : for donations, tips, or to get paid by your friends.</string>
     <string name="receive_offer_howto_details_4_title">🛟 Who supports Bolt12?</string>
     <string name="receive_offer_howto_details_4">For the moment, few services support Bolt12. If a service rejects this invoice, let them know they\'re missing out!</string>
     <string name="receive_offer_howto_details_5_title">🔋 Battery restrictions</string>
