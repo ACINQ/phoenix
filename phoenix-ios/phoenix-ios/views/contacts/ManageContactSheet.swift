@@ -48,8 +48,9 @@ struct ManageContactSheet: View {
 		
 		if let existingContact = contact.wrappedValue {
 			self._name = State(initialValue: existingContact.name)
-			if let photo = existingContact.photo {
-				self._image = State(initialValue: UIImage(data: photo.toSwiftData()))
+			if let photoUri = existingContact.photoUri {
+				let uiimage = UIImage(contentsOfFile: photoUri)
+				self._image = State(initialValue: uiimage)
 			} else {
 				self._image = State(initialValue: nil)
 			}
@@ -334,7 +335,8 @@ struct ManageContactSheet: View {
 		Task { @MainActor in
 			
 			let c_name = trimmedName
-			let c_photo = image?.jpegData(compressionQuality: 1.0)?.toKotlinByteArray()
+			let _ = image?.jpegData(compressionQuality: 1.0)
+			// Todo: save to disk
 			
 			let contactsManager = Biz.business.contactsManager
 			do {
@@ -343,14 +345,14 @@ struct ManageContactSheet: View {
 					contact = try await contactsManager.updateContact(
 						contactId: existingContact.uuid,
 						name: c_name,
-						photo: c_photo,
+						photoUri: nil,
 						offers: existingContact.offers
 					)
 					
 				} else {
 					contact = try await contactsManager.saveNewContact(
 						name: c_name,
-						photo: c_photo,
+						photoUri: nil,
 						offer: offer
 					)
 				}

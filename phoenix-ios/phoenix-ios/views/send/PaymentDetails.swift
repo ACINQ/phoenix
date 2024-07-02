@@ -129,8 +129,8 @@ struct PaymentDetails: View {
 				
 				HStack(alignment: VerticalAlignment.center, spacing: 4) {
 					Group {
-						if let photoData = contact.photo?.toSwiftData(),
-							let uiImage = UIImage(data: photoData)
+						if let photoUri = contact.photoUri,
+							let uiImage = UIImage(contentsOfFile: photoUri)
 						{
 							Image(uiImage: uiImage)
 								.resizable()
