@@ -605,17 +605,22 @@ fun WalletState.WalletWithConfirmations._spendExpiredSwapIn(
 }
 
 suspend fun Peer.altPayOffer(
+    paymentId: UUID,
     amount: MilliSatoshi,
     offer: OfferTypes.Offer,
     payerKey: PrivateKey,
     fetchInvoiceTimeoutInSeconds: Int
 ): SendPaymentResult {
-    return this.payOffer(
-        amount = amount,
-        offer = offer,
-        payerKey = payerKey,
-        fetchInvoiceTimeout = fetchInvoiceTimeoutInSeconds.seconds
-    )
+    val res = CompletableDeferred<SendPaymentResult>()
+    this.launch {
+        res.complete(eventsFlow
+            .filterIsInstance<SendPaymentResult>()
+            .filter { it.request.paymentId == paymentId }
+            .first()
+        )
+    }
+    send(PayOffer(paymentId, payerKey, amount, offer, fetchInvoiceTimeoutInSeconds.seconds))
+    return res.await()
 }
 
 suspend fun Peer.betterPayOffer(

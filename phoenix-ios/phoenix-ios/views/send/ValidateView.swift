@@ -488,6 +488,11 @@ struct ValidateView: View {
 				}
 				.padding(.top, 4)
 				
+			} else if let payOfferProblem {
+				
+				Text(payOfferProblem.localizedDescription())
+					.foregroundColor(.appNegative)
+				
 			} else if let spliceOutProblem {
 				
 				Text(spliceOutProblem.localizedDescription())
@@ -1555,54 +1560,6 @@ struct ValidateView: View {
 		))
 	}
 	
-	func sendPayment_bolt12Offer_A(
-		_ model: Scan.Model_OfferFlow,
-		_ msat: Int64
-	) {
-		log.trace("sendPayment_bolt12Offer_A()")
-		
-		guard
-			let peer = Biz.business.peerManager.peerStateValue(),
-			paymentInProgress == false
-		else {
-			return
-		}
-		
-		paymentInProgress = true
-		payOfferProblem = nil
-		
-		saveTipPercentInPrefs()
-		Task { @MainActor in
-			do {
-				let result: Lightning_kmpSendPaymentResult = try await peer.payOffer(
-					amount: Lightning_kmpMilliSatoshi(msat: msat),
-					offer: model.offer,
-					payerKey: Lightning_randomKey(),
-					fetchInvoiceTimeout: Int64(30 * 1_000_000_000) // Int64 =?= nanoseconds ? Doesn't work !!!
-				)
-				
-				self.paymentInProgress = false
-				
-				switch onEnum(of: result) {
-				case .offerNotPaid(let offerNotPaid):
-					let problem = PayOfferProblem.fromResponse(offerNotPaid)
-					self.payOfferProblem = problem
-					
-				case .paymentNotSent(_): fallthrough
-				case .paymentSent(_):
-					self.payOfferProblem = nil
-					self.presentationMode.wrappedValue.dismiss()
-				}
-				
-			} catch {
-				log.error("peer.payOffer(): error: \(error)")
-				
-				self.paymentInProgress = false
-				self.payOfferProblem = .other
-			}
-		} // </Task>
-	}
-	
 	func sendPayment_bolt12Offer_B(
 		_ model: Scan.Model_OfferFlow,
 		_ msat: Int64
@@ -1622,7 +1579,11 @@ struct ValidateView: View {
 		saveTipPercentInPrefs()
 		Task { @MainActor in
 			do {
+				let paymentId = Lightning_kmpUUID.companion.randomUUID()
+				Biz.beginLongLivedTask(id: paymentId.description())
+				
 				let result: Lightning_kmpSendPaymentResult = try await peer.altPayOffer(
+					paymentId: paymentId,
 					amount: Lightning_kmpMilliSatoshi(msat: msat),
 					offer: model.offer,
 					payerKey: Lightning_randomKey(),
@@ -1635,6 +1596,7 @@ struct ValidateView: View {
 				case .offerNotPaid(let offerNotPaid):
 					let problem = PayOfferProblem.fromResponse(offerNotPaid)
 					self.payOfferProblem = problem
+					Biz.endLongLivedTask(id: paymentId.description())
 					
 				case .paymentNotSent(_): fallthrough
 				case .paymentSent(_):
@@ -1671,6 +1633,8 @@ struct ValidateView: View {
 		Task { @MainActor in
 			do {
 				let paymentId = Lightning_kmpUUID.companion.randomUUID()
+				Biz.beginLongLivedTask(id: paymentId.description())
+				
 				let response: Lightning_kmpOfferNotPaid? = try await peer.betterPayOffer(
 					paymentId: paymentId,
 					amount: Lightning_kmpMilliSatoshi(msat: msat),
@@ -1683,6 +1647,7 @@ struct ValidateView: View {
 				
 				if let problem = PayOfferProblem.fromResponse(response) {
 					self.payOfferProblem = problem
+					Biz.endLongLivedTask(id: paymentId.description())
 					
 				} else {
 					self.payOfferProblem = nil
