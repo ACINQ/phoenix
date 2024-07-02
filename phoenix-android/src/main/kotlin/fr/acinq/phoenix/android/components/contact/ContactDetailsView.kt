@@ -19,9 +19,11 @@ package fr.acinq.phoenix.android.components.contact
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -204,6 +206,7 @@ private fun OfferAttachedToContactRow(offer: OfferTypes.Offer, onDelete: () -> U
     val encoded = remember(offer) { offer.encode() }
     Clickable(onClick = { onOfferClick(offer) }) {
         Row(
+            modifier = Modifier.height(IntrinsicSize.Min),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -217,14 +220,16 @@ private fun OfferAttachedToContactRow(offer: OfferTypes.Offer, onDelete: () -> U
             Button(
                 icon = R.drawable.ic_copy,
                 onClick = { copyToClipboard(context, encoded, "Copy offer") },
-                padding = PaddingValues(horizontal = 12.dp, vertical = 12.dp)
+                padding = PaddingValues(horizontal = 12.dp),
+                modifier = Modifier.fillMaxHeight()
             )
-            Button(
-                icon = R.drawable.ic_trash,
-                onClick = onDelete,
-                padding = PaddingValues(horizontal = 12.dp, vertical = 12.dp),
-                iconTint = negativeColor,
-            )
+            // FIXME: detaching an offer should refresh the contact view
+//            Button(
+//                icon = R.drawable.ic_trash,
+//                onClick = onDelete,
+//                padding = PaddingValues(horizontal = 12.dp, vertical = 12.dp),
+//                iconTint = negativeColor,
+//            )
         }
     }
 }

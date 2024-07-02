@@ -22,6 +22,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.Settings
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.launch
@@ -97,6 +98,8 @@ fun ContactPhotoView(
             Modifier.clickable(
                 role = Role.Button,
                 onClick = {
+                    Toast.makeText(context, "\uD83D\uDEA7 Coming soon!", Toast.LENGTH_SHORT).show()
+                    return@clickable
                     if (cameraPermissionState.status.isGranted) {
                         cameraLauncher.launch(tempPhotoUri)
                     } else {

@@ -476,7 +476,7 @@
     <string name="contact_save_button">Save</string>
     <string name="contact_delete_button">Delete</string>
 
-    <string name="contact_add_title">Attach a contact to an invoice</string>
+    <string name="contact_add_title">Attach a contact to an BOLT12 offer</string>
     <string name="contact_name_label">Name</string>
     <string name="contact_photo_label">Photo</string>
     <string name="contact_offer_label">Offer</string>
