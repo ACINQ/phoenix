@@ -40,7 +40,7 @@ import fr.acinq.phoenix.android.components.SplashClickableContent
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.data.ContactInfo
 
-private sealed class OfferContactState {
+sealed class OfferContactState {
     data object Init: OfferContactState()
     data class Found(val contact: ContactInfo): OfferContactState()
     data object NotFound: OfferContactState()

@@ -24,7 +24,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
@@ -63,11 +62,11 @@ import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.contact.ContactCompactView
 import fr.acinq.phoenix.android.components.contact.ContactOrOfferView
+import fr.acinq.phoenix.android.components.contact.OfferContactState
 import fr.acinq.phoenix.android.payments.cpfp.CpfpView
 import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
-import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.data.LnurlPayMetadata
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
@@ -129,7 +128,7 @@ fun PaymentDetailsSplashView(
                 OfferPayerNote(payerNote = it)
                 Spacer(modifier = Modifier.height(8.dp))
             }
-            OfferPayerContact(payerPubkey = meta.payerKey)
+            OfferSentBy(payerPubkey = meta.payerKey)
         }
 
         PaymentDescriptionView(data = data, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
@@ -450,29 +449,28 @@ private fun OfferPayerNote(payerNote: String) {
 }
 
 @Composable
-private fun OfferPayerContact(payerPubkey: PublicKey?) {
+private fun OfferSentBy(payerPubkey: PublicKey?) {
     val contactsManager = business.contactsManager
-    val contactForOffer = produceState<Either<Unit, ContactInfo>?>(initialValue = null, producer = {
-        value = payerPubkey?.let {
-            contactsManager.getContactForPayerPubkey(it)?.let {
-                Either.Right(it)
-            } ?: Either.Left(Unit)
-        } ?: Either.Left(Unit)
-    })
+    val contactState = remember { mutableStateOf<OfferContactState>(OfferContactState.Init) }
+    LaunchedEffect(Unit) {
+        contactState.value = payerPubkey?.let {
+            contactsManager.getContactForPayerPubkey(it)
+        }?.let { OfferContactState.Found(it) } ?: OfferContactState.NotFound
+    }
 
     SplashLabelRow(label = stringResource(id = R.string.paymentdetails_offer_sender_label)) {
-        when (val contact = contactForOffer.value) {
-            null -> Text(text = stringResource(id = R.string.utils_loading_data))
-            is Either.Left -> {
+        when (val res = contactState.value) {
+            is OfferContactState.Init -> Text(text = stringResource(id = R.string.utils_loading_data))
+            is OfferContactState.NotFound -> {
                 Text(text = stringResource(id = R.string.paymentdetails_offer_sender_unknown))
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(text = stringResource(id = R.string.paymentdetails_offer_sender_unknown_details), style = MaterialTheme.typography.subtitle2)
             }
-            is Either.Right -> {
+            is OfferContactState.Found -> {
                 ContactCompactView(
-                    contact = contact.value,
+                    contact = res.contact,
                     currentOffer = null,
-                    onContactChange = {},
+                    onContactChange = { contactState.value = if (it == null) OfferContactState.NotFound else OfferContactState.Found(it) },
                 )
             }
         }
