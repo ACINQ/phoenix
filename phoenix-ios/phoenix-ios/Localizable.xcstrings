@@ -9832,6 +9832,9 @@
         }
       }
     },
+    "Clear image" : {
+
+    },
     "Clear textfield" : {
       "localizations" : {
         "ar" : {
@@ -11396,6 +11399,9 @@
           }
         }
       }
+    },
+    "Contact Image" : {
+
     },
     "Contact support if needed." : {
       "localizations" : {
@@ -32122,6 +32128,9 @@
         }
       }
     },
+    "Select image" : {
+
+    },
     "select miner fee when sending on-chain" : {
       "localizations" : {
         "ar" : {
@@ -35910,6 +35919,9 @@
           }
         }
       }
+    },
+    "Take photo" : {
+
     },
     "Tap for more info" : {
       "localizations" : {
