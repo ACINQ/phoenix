@@ -160,8 +160,8 @@ struct SummaryView: View {
 		let payment = paymentInfo.payment
 		let paymentState = payment.state()
 		
-		if paymentState == WalletPaymentState.successonchain ||
-		   paymentState == WalletPaymentState.successoffchain
+		if paymentState == WalletPaymentState.successOnChain ||
+		   paymentState == WalletPaymentState.successOffChain
 		{
 			Image("ic_payment_sent")
 				.renderingMode(.template)
@@ -200,7 +200,7 @@ struct SummaryView: View {
 			}
 			.padding(.bottom, 30)
 			
-		} else if paymentState == WalletPaymentState.pendingonchain {
+		} else if paymentState == WalletPaymentState.pendingOnChain {
 			
 			Image(systemName: "hourglass.circle")
 				.renderingMode(.template)
@@ -224,7 +224,7 @@ struct SummaryView: View {
 			} // </VStack>
 			.padding(.bottom, 30)
 			
-		} else if paymentState == WalletPaymentState.pendingoffchain {
+		} else if paymentState == WalletPaymentState.pendingOffChain {
 			
 			Image("ic_payment_sending")
 				.renderingMode(.template)

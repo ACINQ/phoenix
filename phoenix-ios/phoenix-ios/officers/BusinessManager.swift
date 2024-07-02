@@ -238,7 +238,7 @@ class BusinessManager {
 			.sink { (event: Lightning_kmpNodeEvents) in
 				
 				if let rejected = event as? Lightning_kmpLiquidityEventsRejected,
-				   rejected.source == Lightning_kmpLiquidityEventsSource.onchainwallet
+				   rejected.source == Lightning_kmpLiquidityEventsSource.onChainWallet
 				{
 					log.debug("Received Lightning_kmpLiquidityEventsRejected: \(rejected)")
 					self.swapInRejectedPublisher.value = rejected

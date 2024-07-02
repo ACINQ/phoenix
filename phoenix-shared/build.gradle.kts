@@ -1,5 +1,8 @@
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import java.io.ByteArrayOutputStream
+import co.touchlab.skie.configuration.FlowInterop
+import co.touchlab.skie.configuration.SuspendInterop
+
 
 plugins {
     kotlin("multiplatform")
@@ -8,6 +11,7 @@ plugins {
     if (System.getProperty("includeAndroid")?.toBoolean() == true) {
         id("com.android.library")
     }
+    id("co.touchlab.skie") version "0.8.1"
 }
 
 val includeAndroid = System.getProperty("includeAndroid")?.toBoolean() ?: false
@@ -60,7 +64,6 @@ kotlin {
             framework {
                 optimized = false
                 baseName = "PhoenixShared"
-                embedBitcode(Framework.BitcodeEmbeddingMode.DISABLE)
             }
             configureEach {
                 it.compilations.all {
@@ -95,6 +98,8 @@ kotlin {
                 // sqldelight
                 implementation("app.cash.sqldelight:runtime:${Versions.sqlDelight}")
                 implementation("app.cash.sqldelight:coroutines-extensions:${Versions.sqlDelight}")
+                // SKEI
+                implementation("co.touchlab.skie:configuration-annotations:0.8.1")
             }
         }
 
@@ -196,5 +201,17 @@ if (includeAndroid) {
         }
 
         sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+    }
+}
+
+skie {
+    analytics {
+        disableUpload.set(true)
+    }
+    features {
+        group {
+            FlowInterop.Enabled(false)
+            SuspendInterop.Enabled(false)
+        }
     }
 }

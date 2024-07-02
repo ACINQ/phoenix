@@ -565,7 +565,7 @@ struct ValidateView: View {
 	func requestDescription() -> String? {
 		
 		if let paymentRequest = paymentRequest() {
-			return paymentRequest.desc()
+			return paymentRequest.desc_()
 			
 		} else if let lnurlPay = lnurlPay() {
 			return lnurlPay.metadata.plainText

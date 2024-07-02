@@ -680,7 +680,7 @@ struct LightningInvoiceView: View {
 		}
 		
 		let state = lastIncomingPayment.state()
-		if state == WalletPaymentState.successonchain || state == WalletPaymentState.successoffchain {
+		if state == WalletPaymentState.successOnChain || state == WalletPaymentState.successOffChain {
 			if lastIncomingPayment.paymentHash.toHex() == model.paymentHash {
 				presentationMode.wrappedValue.dismiss()
 			}
