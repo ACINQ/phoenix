@@ -1549,6 +1549,7 @@ struct ValidateView: View {
 		
 		paymentInProgress = true
 		payOfferProblem = nil
+		let payerNote = comment.isEmpty ? nil : comment
 		
 		saveTipPercentInPrefs()
 		Task { @MainActor in
@@ -1561,6 +1562,7 @@ struct ValidateView: View {
 					amount: Lightning_kmpMilliSatoshi(msat: msat),
 					offer: model.offer,
 					payerKey: Lightning_randomKey(),
+					payerNote: payerNote,
 					fetchInvoiceTimeoutInSeconds: 30
 				)
 				
@@ -1602,6 +1604,7 @@ struct ValidateView: View {
 		
 		paymentInProgress = true
 		payOfferProblem = nil
+		let payerNote = comment.isEmpty ? nil : comment
 		
 		saveTipPercentInPrefs()
 		Task { @MainActor in
@@ -1614,6 +1617,7 @@ struct ValidateView: View {
 					amount: Lightning_kmpMilliSatoshi(msat: msat),
 					offer: model.offer,
 					payerKey: Lightning_randomKey(),
+					payerNote: payerNote,
 					fetchInvoiceTimeoutInSeconds: 30
 				)
 				

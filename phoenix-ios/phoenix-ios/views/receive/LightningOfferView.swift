@@ -454,10 +454,9 @@ struct LightningOfferView: View {
 	func generateQrCode() async {
 		
 		do {
-			let offer: Lightning_kmpOfferTypesOffer =
-				try await Biz.business.nodeParamsManager.defaultOffer()
+			let offerData = try await Biz.business.nodeParamsManager.defaultOffer()
 			
-			let offerStr = offer.encode()
+			let offerStr = offerData.defaultOffer.encode()
 			qrCode.generate(value: offerStr)
 			
 		} catch {

@@ -609,6 +609,7 @@ suspend fun Peer.altPayOffer(
     amount: MilliSatoshi,
     offer: OfferTypes.Offer,
     payerKey: PrivateKey,
+    payerNote: String?,
     fetchInvoiceTimeoutInSeconds: Int
 ): SendPaymentResult {
     val res = CompletableDeferred<SendPaymentResult>()
@@ -619,7 +620,7 @@ suspend fun Peer.altPayOffer(
             .first()
         )
     }
-    send(PayOffer(paymentId, payerKey, amount, offer, fetchInvoiceTimeoutInSeconds.seconds))
+    send(PayOffer(paymentId, payerKey, payerNote, amount, offer, fetchInvoiceTimeoutInSeconds.seconds))
     return res.await()
 }
 
@@ -628,6 +629,7 @@ suspend fun Peer.betterPayOffer(
     amount: MilliSatoshi,
     offer: OfferTypes.Offer,
     payerKey: PrivateKey,
+    payerNote: String?,
     fetchInvoiceTimeoutInSeconds: Int
 ): OfferNotPaid? {
     val res = CompletableDeferred<OfferNotPaid?>()
@@ -642,6 +644,6 @@ suspend fun Peer.betterPayOffer(
             }
         }
     }
-    send(PayOffer(paymentId, payerKey, amount, offer, fetchInvoiceTimeoutInSeconds.seconds))
+    send(PayOffer(paymentId, payerKey, payerNote, amount, offer, fetchInvoiceTimeoutInSeconds.seconds))
     return res.await()
 }
