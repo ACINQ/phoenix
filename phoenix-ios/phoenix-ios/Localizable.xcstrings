@@ -13077,6 +13077,12 @@
         }
       }
     },
+    "Delete contact" : {
+
+    },
+    "Delete contact?" : {
+
+    },
     "Delete payment" : {
       "localizations" : {
         "ar" : {
