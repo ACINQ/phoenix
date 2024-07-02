@@ -276,7 +276,7 @@
     <string name="home__connection__electrum_late">Electrum mešká</string>
     <string name="home__connection__bad_cert">Electrum certifikát</string>
     <string name="home__connection__connecting">Pripájanie…</string>
-    <string name="home__connection__tor_active">Tor povolený</string>
+    <string name="home__connection__tor_active">Tor</string>
     <string name="home_request_liquidity">Vyžiadať likviditu</string>
     <string name="home_inflight_payments">Momentálne máte %1$d platieb nepotvrdených vo vašej peňaženke.\n\nNechajte aplikáciu otvorenú, aby ste sa uistili, že sa tieto platby správne a bez problémov vyrovnajú..</string>
 

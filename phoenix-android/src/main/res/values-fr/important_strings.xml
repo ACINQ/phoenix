@@ -134,6 +134,8 @@
 
     <!-- receive: offer labels -->
 
+    <string name="receive_toggle_offer_button">QR Code réutilisable</string>
+
     <string name="receive_offer_howto_intro_1">🎉 Voici votre QR réutilisable!</string>
     <string name="receive_offer_howto_intro_2">Cliquez pour voir comment ça s\'utilise</string>
     <string name="receive_offer_howto_details_1">Ce code Bolt12 est votre adresse statique sur Lightning. Il permet à d\'autres de vous envoyer des bitcoins très facilement.</string>
@@ -141,7 +143,7 @@
     <string name="receive_offer_howto_details_3">Partagez-le largement : il peut être servir pour des dons, des pourboires, ou pour vous faire payer par vos amis.</string>
     <string name="receive_offer_howto_details_4_title">🛟 Qui accepte Bolt12 aujourd\'hui?</string>
     <string name="receive_offer_howto_details_4">Pour l\'instant, peu de services supportent Bolt12. Si des services rejettent ce code, faites-leur savoir qu\'ils passent à côté de quelque chose de génial!</string>
-    <string name="receive_offer_howto_details_5_title">😴 Restrictions sur la batterie</string>
+    <string name="receive_offer_howto_details_5_title">🔋 Restrictions sur la batterie</string>
     <string name="receive_offer_howto_details_5">Assurez-vous qu\'Android n\'applique pas à Phoenix un mode d\'économie de batterie. Si c\'est le cas, vous ne pourrez pas recevoir de paiements quand l\'application est fermée ou en arrière-plan. Activer TOR sur Phoenix pourra également poser problème.</string>
     <string name="receive_offer_howto_details_faq_link">En savoir plus</string>
 
@@ -191,8 +193,6 @@
     <string name="inappnotif_swapin_timeout_message">Un dépôt va bientôt expirer.</string>
     <string name="inappnotif_swapin_timeout_action">Voir les détails</string>
 
-    <string name="inappnotif_powersaver">Le mode d\'économie d\'énergie est activé. Les paiements en arrière-plan vont probablement échouer.</string>
-
     <string name="inappnotif_watchtower_late_message">Phoenix vérifie périodiquement la blockchain lorsque l\'application est éteinte. Dernièrement, elle n\'a pas pu le faire.\n\nAssurez vous qu\'Android n\'applique pas de restrictions à Phoenix, et que l\'application puisse se connecter à Electrum.</string>
     <string name="inappnotif_watchtower_late_action">Fermer</string>
 
@@ -227,7 +227,7 @@
 
     <!-- settings: display seed -->
 
-    <string name="displayseed_instructions">La phrase de sauvegarde (aussi appelée clé, ou \"seed\"), est une liste de 12 mots en anglais. Elle permet de restaurer un accès complet aux fonds si besoin.\n\n<b>Vous seul avez possession de cette clé. Gardez la secrète.</b>\n\n<b>Ne la partagez avec personne</b>.\nFaîtes attention au hameçonnage et imposteurs. Les développeurs de Phoenix ne vous demanderont jamais de révéler cette clé.\n\n<b>Ne perdez pas cette clé</b>.\nSauvegardez-là en lieu sûr (pas sur ce téléphone). Si vous perdez cette clé et votre téléphone, vous perdez vos fonds.</string>
+    <string name="displayseed_instructions">La phrase de sauvegarde (aussi appelée clé, ou \"seed\"), est une liste de 12 mots en anglais. Elle permet de restaurer un accès complet aux fonds si besoin.\n\n<b>Vous seul avez possession de cette clé. Gardez la secrète.</b>\n\n<b>Ne la partagez avec personne</b>.\nFaîtes attention au hameçonnage et aux arnaques. Les développeurs de Phoenix ne vous demanderont jamais de révéler votre clé.\n\n<b>Ne perdez pas cette clé</b>.\nSauvegardez-là en lieu sûr (pas sur ce téléphone). Si vous perdez cette clé et votre téléphone, vous perdez vos fonds.</string>
     <string name="displayseed_authenticate_button">Voir ma clé</string>
     <string name="displayseed_dialog_header">GARDEZ CETTE CLÉ SECRÈTE.\nNE LA PARTAGEZ PAS.</string>
     <string name="displayseed_backup_notice_header">Vous n\'avez pas sauvegardé votre clé!</string>
@@ -256,7 +256,7 @@
 
     <!-- Tor -->
 
-    <string name="tor_settings_subtitle">Phoenix peut utiliser Tor pour cacher votre IP des autres noeuds du réseau Lightning et des serveurs Electrum.\n\nActiver Tor améliorera votre vie privée mais peut causer des difficultés de paiement si votre connexion est instable.</string>
+    <string name="tor_settings_subtitle">Phoenix peut utiliser Tor pour masquer votre IP des autres noeuds du réseau Lightning et des serveurs Electrum.</string>
 
     <string name="tor_confirm_dialog_title">Activer Tor ?</string>
     <string name="tor_confirm_dialog_details_1">Tor est lent et va impacter les performances de vos paiements.</string>

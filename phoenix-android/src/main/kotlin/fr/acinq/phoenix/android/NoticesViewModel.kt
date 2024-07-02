@@ -21,7 +21,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.PowerManager
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -43,7 +46,6 @@ sealed class Notice() {
     data class RemoteMessage(val notice: WalletNotice) : ShowInHome(1)
     data object CriticalUpdateAvailable : ShowInHome(2)
     data object SwapInCloseToTimeout : ShowInHome(3)
-    data object PowerSaverMode : ShowInHome(4)
     data object BackupSeedReminder : ShowInHome(5)
     data object MempoolFull : ShowInHome(10)
     data object UpdateAvailable : ShowInHome(20)
@@ -64,16 +66,13 @@ class NoticesViewModel(
     private val log = LoggerFactory.getLogger(this::class.java)
 
     val notices = mutableStateListOf<Notice>()
+    var isPowerSaverModeOn by mutableStateOf(false)
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent?) {
             val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
             log.info("power_saver=${powerManager.isPowerSaveMode}")
-            if (powerManager.isPowerSaveMode) {
-                addNotice(Notice.PowerSaverMode)
-            } else {
-                removeNotice<Notice.PowerSaverMode>()
-            }
+            isPowerSaverModeOn = powerManager.isPowerSaveMode
         }
     }
 
@@ -81,6 +80,8 @@ class NoticesViewModel(
         viewModelScope.launch { monitorWalletContext() }
         viewModelScope.launch { monitorSwapInCloseToTimeout() }
         viewModelScope.launch { monitorWalletNotice() }
+        val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+        isPowerSaverModeOn = powerManager.isPowerSaveMode
         context.registerReceiver(receiver, IntentFilter(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED))
     }
 

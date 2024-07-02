@@ -83,6 +83,8 @@ fun HomeView(
 
     val internalData = application.internalDataRepository
     val userPrefs = application.userPrefs
+    val isPowerSaverModeOn = noticesViewModel.isPowerSaverModeOn
+    val fcmToken by internalData.getFcmToken.collectAsState(initial = "")
     val torEnabledState = userPrefs.getIsTorEnabled.collectAsState(initial = null)
     val balanceDisplayMode by userPrefs.getHomeAmountDisplayMode.collectAsState(initial = HomeAmountDisplayMode.REDACTED)
 
@@ -223,6 +225,8 @@ fun HomeView(
                     inFlightPaymentsCount = inFlightPaymentsCount,
                     isTorEnabled = torEnabledState.value,
                     onTorClick = onTorClick,
+                    hasFcmToken = fcmToken != null,
+                    isPowerSaverMode = isPowerSaverModeOn,
                     showRequestLiquidity = channels.canRequestLiquidity(),
                     onRequestLiquidityClick = onRequestLiquidityClick,
                 )

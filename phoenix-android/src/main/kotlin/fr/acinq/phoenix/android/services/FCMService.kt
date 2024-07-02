@@ -16,6 +16,7 @@ class FCMService : FirebaseMessagingService() {
     private val serviceScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
+        log.info("received message from fcm [data=${remoteMessage.data} prio=${remoteMessage.priority}]")
         log.debug(
             "received fcm message" +
                     "\n    data=${remoteMessage.data}" +

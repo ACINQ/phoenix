@@ -125,7 +125,6 @@
     <string name="receive_lightning_share_subject">Lightning invoice</string>
     <string name="receive_lightning_share_title">Share this Lightning invoice with…</string>
     <string name="receive_lnurl_button">Use LNURL link</string>
-    <string name="receive_toggle_offer_button">Show reusable QR</string>
     <string name="receive_toggle_offer_new_overlay">NEW!</string>
 
     <string name="receive_offer_share_title">Static Lightning invoice</string>
@@ -306,7 +305,7 @@
     <string name="home__connection__electrum_late">Electrum late</string>
     <string name="home__connection__bad_cert">Electrum certificate</string>
     <string name="home__connection__connecting">Connecting…</string>
-    <string name="home__connection__tor_active">Tor enabled</string>
+    <string name="home__connection__tor_active">Tor</string>
     <string name="home_request_liquidity">Request liquidity</string>
     <string name="home_inflight_payments">You currently have %1$d payment(s) pending in your wallet.\n\nKeep the app open to make sure these payments settle properly without issues.</string>
 

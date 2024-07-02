@@ -274,7 +274,7 @@
     <string name="home__connection__electrum_late">Retraso de Electrum</string>
     <string name="home__connection__bad_cert">Certificado de Electrum</string>
     <string name="home__connection__connecting">Conectando…</string>
-    <string name="home__connection__tor_active">Tor activado</string>
+    <string name="home__connection__tor_active">Tor</string>
 
     <!-- in-app notifications -->
 

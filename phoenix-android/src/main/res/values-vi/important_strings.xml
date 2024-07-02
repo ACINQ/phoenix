@@ -147,7 +147,7 @@
     <string name="receive_offer_howto_details_3">Chia sẻ rộng rãi: nó có thể được sử dụng để quyên góp, tiền boa hoặc để được bạn bè của bạn trả tiền.</string>
     <string name="receive_offer_howto_details_4_title">🛟 Ai ủng hộ Bolt12?</string>
     <string name="receive_offer_howto_details_4">Hiện tại, rất ít dịch vụ hỗ trợ Bolt12. Nếu một dịch vụ từ chối hóa đơn này, hãy cho họ biết họ đang bỏ lỡ!</string>
-    <string name="receive_offer_howto_details_5_title">😴 Hạn chế về pin</string>
+    <string name="receive_offer_howto_details_5_title">🔋 Hạn chế về pin</string>
     <string name="receive_offer_howto_details_5">Kiểm tra xem Android có áp dụng chế độ tiết kiệm pin cho Phoenix hay không. Nếu không, bạn sẽ không thể nhận thanh toán nếu ứng dụng bị đóng hoặc chạy ở chế độ nền. Kích hoạt TOR ở Phoenix cũng sẽ gây ra sự cố.</string>
     <string name="receive_offer_howto_details_faq_link">Tìm hiểu thêm</string>
 
@@ -201,8 +201,6 @@
 
     <string name="inappnotif_swapin_timeout_message">Một khoản vốn sẽ sớm hết hạn.</string>
     <string name="inappnotif_swapin_timeout_action">Xem chi tiết</string>
-
-    <string name="inappnotif_powersaver">Chế độ tiết kiệm năng lượng được bật. Thanh toán nền có thể sẽ không thành công.</string>
 
     <string name="inappnotif_watchtower_late_message">Phoenix thường xuyên quản lý blockchain khi ở chế độ chạy trên nền, nhưng gần đây Phoenix không thể thực hiện việc này.\n\nHãy đảm bảo rằng Android không chặn Phoenix và Phoenix có thể kết nối với Electrum.</string>
     <string name="inappnotif_watchtower_late_action">Huỷ</string>
@@ -262,7 +260,7 @@
 
     <!-- Tor -->
 
-    <string name="tor_settings_subtitle">Phoenix có thể sử dụng Tor để bảo vệ IP của bạn khỏi các nút mạng khác trên mạng Lightning và máy chủ Electrum.\n\nBật Tor sẽ tăng quyền riêng tư của bạn nhưng lại có thể sẽ gây ra sự cố thanh toán nếu kết nối mạng của bạn không ổn định.</string>
+    <string name="tor_settings_subtitle">Phoenix có thể sử dụng Tor để bảo vệ IP của bạn khỏi các nút mạng khác trên mạng Lightning và máy chủ Electrum.</string>
 
     <string name="tor_confirm_dialog_title">Bật Tor ?</string>
     <string name="tor_confirm_dialog_details_1">Tor chạy chậm và sẽ ảnh hưởng đến hiệu suất thanh toán của bạn.</string>

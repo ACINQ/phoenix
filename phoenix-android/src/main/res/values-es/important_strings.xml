@@ -134,6 +134,8 @@
 
     <!-- receive: offer labels -->
 
+    <string name="receive_toggle_offer_button">Mostrar código QR reutilizable</string>
+
     <string name="receive_offer_howto_intro_1">🎉¡Aquí tienes tu código QR reutilizable!</string>
     <string name="receive_offer_howto_intro_2">Toca para aprender a usarlo</string>
     <string name="receive_offer_howto_details_1">Este código Bolt12 es tu dirección estática en Lightning. Permite que otros te envíen bitcoins de forma súper sencilla.</string>
@@ -141,7 +143,7 @@
     <string name="receive_offer_howto_details_3">Compártela ampliamente: se puede utilizar para donaciones, propinas o para que te paguen tus amigos.</string>
     <string name="receive_offer_howto_details_4_title">🛟 ¿Quién apoya a Bolt12?</string>
     <string name="receive_offer_howto_details_4">Por el momento, pocos servicios admiten Bolt12. Si un servicio rechaza esta factura, ¡hágale saber que se lo está perdiendo!</string>
-    <string name="receive_offer_howto_details_5_title">😴 Restricciones de la batería</string>
+    <string name="receive_offer_howto_details_5_title">🔋 Restricciones de la batería</string>
     <string name="receive_offer_howto_details_5">Comprueba que Android no aplica un modo de ahorro de batería a Phoenix. De lo contrario, no podrás recibir pagos si la aplicación está cerrada o en segundo plano. Activar TOR en Phoenix también causará problemas.</string>
     <string name="receive_offer_howto_details_faq_link">Más información</string>
 
@@ -195,8 +197,6 @@
 
     <string name="inappnotif_swapin_timeout_message">Un depósito expirará pronto.</string>
     <string name="inappnotif_swapin_timeout_action">Ver detalles</string>
-
-    <string name="inappnotif_powersaver">El modo de ahorro de energía está activado. Los pagos en segundo plano probablemente fallarán.</string>
 
     <string name="inappnotif_watchtower_late_message">Phoenix monitorea regularmente el blockchain cuando está en segundo plano, pero no pudo hacerlo los últimos días.\n\nAsegúrate de que Android no bloquee Phoenix, y que pueda conectarse a Electrum.</string>
     <string name="inappnotif_watchtower_late_action">Desestimar</string>
@@ -256,7 +256,7 @@
 
     <!-- Tor -->
 
-    <string name="tor_settings_subtitle">Phoenix puede utilizar Tor para proteger su IP de los otros nodos de la Red Lightning y de los servidores de Electrum.\n\nActivar Tor mejorará su privacidad, pero puede causar problemas de pago si su conexión es inestable.</string>
+    <string name="tor_settings_subtitle">Phoenix puede utilizar Tor para proteger su IP de los otros nodos de la Red Lightning y de los servidores de Electrum.</string>
 
     <string name="tor_confirm_dialog_title">¿Habilitar Tor?</string>
     <string name="tor_confirm_dialog_details_1">Tor es lento y afectará al rendimiento de tus pagos.</string>

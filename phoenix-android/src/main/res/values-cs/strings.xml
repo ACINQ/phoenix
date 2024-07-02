@@ -237,7 +237,7 @@
     <string name="home__connection__electrum_late">Electrum late</string>
     <string name="home__connection__bad_cert">Electrum certifikát</string>
     <string name="home__connection__connecting">Připojování…</string>
-    <string name="home__connection__tor_active">Tor povolen</string>
+    <string name="home__connection__tor_active">Tor</string>
 
     <!-- in-app notifications -->
 

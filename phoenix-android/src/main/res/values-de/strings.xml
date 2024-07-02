@@ -278,7 +278,7 @@
     <string name="home__connection__electrum_late">Electrum unsynchron</string>
     <string name="home__connection__bad_cert">Electrum-Zertifikat</string>
     <string name="home__connection__connecting">Verbinde…</string>
-    <string name="home__connection__tor_active">Tor aktiviert</string>
+    <string name="home__connection__tor_active">Tor</string>
     <string name="home_request_liquidity">Liquidität anfordern</string>
     <string name="home_inflight_payments">Du hast derzeit %1$d Zahlung(en) in deiner Brieftasche ausstehend.\n\nHalte die App geöffnet, um sicherzustellen, dass diese Zahlungen ohne Probleme abgerechnet werden.</string>
 

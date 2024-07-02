@@ -133,6 +133,8 @@
 
     <!-- receive: offer labels -->
 
+    <string name="receive_toggle_offer_button">Zobraziť opakovane použiteľný QR kód</string>
+
     <string name="receive_offer_howto_intro_1">🎉 Tu je váš opakovane použiteľný QR kód!</string>
     <string name="receive_offer_howto_intro_2">Klepnutím sa dozviete, ako ho používať</string>
     <string name="receive_offer_howto_details_1">Tento kód Bolt12 je vaša statická adresa v Lightning. Umožňuje ostatným posielať vám bitcoiny veľmi jednoducho.</string>
@@ -140,7 +142,7 @@
     <string name="receive_offer_howto_details_3">Zdieľajte ho široko: možno ho použiť na dary, tipy alebo na zaplatenie od priateľov.</string>
     <string name="receive_offer_howto_details_4_title">🛟 Kto podporuje Bolt12?</string>
     <string name="receive_offer_howto_details_4">V súčasnosti podporuje Bolt12 len málo služieb. Ak služba odmietne túto faktúru, dajte jej vedieť, že o ňu prichádza!</string>
-    <string name="receive_offer_howto_details_5_title">😴 Obmedzenia batérie</string>
+    <string name="receive_offer_howto_details_5_title">🔋 Obmedzenia batérie</string>
     <string name="receive_offer_howto_details_5">Skontrolujte, či systém Android neaplikuje na Phoenix režim šetrenia batérie. V opačnom prípade nebudete môcť prijímať platby, ak je aplikácia zatvorená alebo na pozadí. Problémy spôsobí aj povolenie TOR vo Phoenixe.</string>
     <string name="receive_offer_howto_details_faq_link">Viac informácií</string>
 
@@ -194,8 +196,6 @@
 
     <string name="inappnotif_swapin_timeout_message">Vklad čoskoro vyprší.</string>
     <string name="inappnotif_swapin_timeout_action">Zobraziť podrobnosti</string>
-
-    <string name="inappnotif_powersaver">Režim úspory energie je zapnutý. Platby na pozadí pravdepodobne zlyhajú.</string>
 
     <string name="inappnotif_watchtower_late_message">Phoenix pravidelne monitoruje blockchain na pozadí, ale v posledných dňoch sa mu to nedarilo.\n\nUistite sa, že systém Android neblokuje aplikáciu Phoenix a že sa môže pripojiť k službe Electrum.</string>
     <string name="inappnotif_watchtower_late_action">Zatvoriť</string>
@@ -255,7 +255,7 @@
 
     <!-- Tor -->
 
-    <string name="tor_settings_subtitle">Phoenix môže použiť Tor na skrytie vašej IP adresy pred ostatnými uzlami siete Lightning Network a servermi Electrum.\n\nPovolením Toru sa zlepší vaše súkromie, ale môže spôsobiť problémy s platbami, ak je vaše pripojenie nestabilné.</string>
+    <string name="tor_settings_subtitle">Phoenix môže použiť Tor na skrytie vašej IP adresy pred ostatnými uzlami siete Lightning Network a servermi Electrum.</string>
 
     <string name="tor_confirm_dialog_title">Povolenie Tor?</string>
     <string name="tor_confirm_dialog_details_1">Tor je pomalý a ovplyvní výkon vašich platieb.</string>

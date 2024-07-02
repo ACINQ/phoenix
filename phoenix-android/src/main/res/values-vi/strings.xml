@@ -280,7 +280,7 @@
     <string name="home__connection__electrum_late">Electrum muộn</string>
     <string name="home__connection__bad_cert">Chứng nhận Electrum</string>
     <string name="home__connection__connecting">Đang kết nối…</string>
-    <string name="home__connection__tor_active">Tor đã được bật</string>
+    <string name="home__connection__tor_active">Tor</string>
     <string name="home_request_liquidity">Yêu cầu thanh khoản</string>
 
     <!-- in-app notifications -->

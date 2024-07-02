@@ -244,13 +244,6 @@ private fun PermamentNotice(
                 },
             )
         }
-
-        is Notice.PowerSaverMode -> {
-            ImportantNotification(
-                icon = R.drawable.ic_alert_triangle,
-                message = stringResource(id = R.string.inappnotif_powersaver)
-            )
-        }
     }
 }
 

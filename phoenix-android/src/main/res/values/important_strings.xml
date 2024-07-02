@@ -86,6 +86,14 @@
     <string name="home_swapin_help_generic">On-chain funds have been deposited into your wallet.</string>
     <string name="home_swapin_help_button">Tap for details</string>
 
+    <string name="home_background_restriction_title">Background processing restricted</string>
+    <string name="home_background_restriction_body_1">Phoenix will not be able to receive payments when it is in the background, or when it is closed.</string>
+    <string name="home_background_restriction_body_2">This happens because:</string>
+    <string name="home_background_restriction_tor">Tor is enabled</string>
+    <string name="home_background_restriction_powersaver">The device is in power saving mode</string>
+    <string name="home_background_restriction_fcm">Cloud notifications unavailable</string>
+    <string name="home_background_restriction_fcm_details">If you\'re on GrapheneOS or CalyxOS, install Google Play Services to get FCM notifications. Check the FAQ for guidance.</string>
+
     <!-- home: bottom menu -->
 
     <string name="menu_settings">Settings</string>
@@ -136,6 +144,8 @@
 
     <!-- receive: offer labels -->
 
+    <string name="receive_toggle_offer_button">Show reusable QR code</string>
+
     <string name="receive_offer_howto_intro_1">🎉 Here is your reusable QR code!</string>
     <string name="receive_offer_howto_intro_2">Tap to learn how to use it</string>
     <string name="receive_offer_howto_details_1">This Bolt2 code is your static address on Lightning. It lets others send you bitcoins super easily.</string>
@@ -143,7 +153,7 @@
     <string name="receive_offer_howto_details_3">Share it widely : it can be used for donations, tips, or to get paid by your friends.</string>
     <string name="receive_offer_howto_details_4_title">🛟 Who supports Bolt12?</string>
     <string name="receive_offer_howto_details_4">For the moment, few services support Bolt12. If a service rejects this invoice, let them know they\'re missing out!</string>
-    <string name="receive_offer_howto_details_5_title">😴 Battery restrictions</string>
+    <string name="receive_offer_howto_details_5_title">🔋 Battery restrictions</string>
     <string name="receive_offer_howto_details_5">Check that Android does not apply a battery saving mode to Phoenix. Otherwise, you won\'t be able to receive payments if the app is closed or in the background. Enabling TOR in Phoenix will also cause issues.</string>
     <string name="receive_offer_howto_details_faq_link">Learn more</string>
 
@@ -197,8 +207,6 @@
 
     <string name="inappnotif_swapin_timeout_message">A deposit will expire soon.</string>
     <string name="inappnotif_swapin_timeout_action">View details</string>
-
-    <string name="inappnotif_powersaver">Power saver mode is enabled. Background payments will likely fail.</string>
 
     <string name="inappnotif_watchtower_late_message">Phoenix regularly monitors the blockchain when in the background, but was unable to do so the last few days.\n\nMake sure Android does not block Phoenix, and that it can connect to Electrum.</string>
     <string name="inappnotif_watchtower_late_action">Dismiss</string>

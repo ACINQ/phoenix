@@ -132,6 +132,8 @@
 
     <!-- receive: offer labels -->
 
+    <string name="receive_toggle_offer_button">Mostrar código QR reutilizável</string>
+
     <string name="receive_offer_howto_intro_1">🎉 Aqui está seu código QR reutilizável!</string>
     <string name="receive_offer_howto_intro_2">Toque para saber como usá-lo</string>
     <string name="receive_offer_howto_details_1">Este código Bolt12 é seu endereço estático no Lightning. Ele permite que outras pessoas enviem bitcoins para você de forma superfácil.</string>
@@ -139,7 +141,7 @@
     <string name="receive_offer_howto_details_3">Compartilhe-a amplamente: ela pode ser usada para doações, gorjetas ou para receber pagamentos de seus amigos.</string>
     <string name="receive_offer_howto_details_4_title">🛟 Quem apóia o Bolt12?</string>
     <string name="receive_offer_howto_details_4">No momento, poucos serviços oferecem suporte ao Bolt12. Se um serviço rejeitar essa fatura, informe-o de que está perdendo!</string>
-    <string name="receive_offer_howto_details_5_title">😴 Restrições de bateria</string>
+    <string name="receive_offer_howto_details_5_title">🔋 Restrições de bateria</string>
     <string name="receive_offer_howto_details_5">Verifique se o Android não aplica um modo de economia de bateria ao Phoenix. Caso contrário, você não poderá receber pagamentos se o aplicativo estiver fechado ou em segundo plano. A ativação do TOR no Phoenix também causará problemas.</string>
     <string name="receive_offer_howto_details_faq_link">Saiba mais</string>
 
@@ -193,8 +195,6 @@
 
     <string name="inappnotif_swapin_timeout_message">Um depósito expirará em breve.</string>
     <string name="inappnotif_swapin_timeout_action">Ver detalhes</string>
-
-    <string name="inappnotif_powersaver">O modo de economia de energia está ativado. Os pagamentos em segundo plano provavelmente falharão.</string>
 
     <string name="inappnotif_watchtower_late_message">O Phoenix monitora regularmente o blockchain quando está em segundo plano, mas não conseguiu fazer isso nos últimos dias.\n\nCertifique-se de que o Android não bloqueie o Phoenix e que ele possa se conectar à Electrum.</string>
     <string name="inappnotif_watchtower_late_action">Dispensar</string>
@@ -255,7 +255,7 @@
 
     <!-- Tor -->
 
-    <string name="tor_settings_subtitle">A Phoenix pode usar o Tor para proteger seu IP dos outros nós da Lightning Network e dos servidores da Electrum.\n\nA ativação do Tor melhorará sua privacidade, mas poderá causar problemas de pagamento se sua conexão for instável.</string>
+    <string name="tor_settings_subtitle">A Phoenix pode usar o Tor para proteger seu IP dos outros nós da Lightning Network e dos servidores da Electrum.</string>
 
     <!-- about -->
 
