@@ -155,6 +155,16 @@ struct ManageContactSheet: View {
 				Image(systemName: "person.circle")
 					.resizable()
 					.aspectRatio(contentMode: .fit)
+					.foregroundColor(.gray)
+//				if #available(iOS 17, *) {
+//					Image("user_round_symbol")
+//						.resizable()
+//						.aspectRatio(contentMode: .fit)
+//				} else {
+//					Image("user_round")
+//						.resizable()
+//						.aspectRatio(contentMode: .fit)
+//				}
 			}
 		}
 		.frame(width: 150, height: 150)
@@ -331,7 +341,7 @@ struct ManageContactSheet: View {
 				let existingContact = try await contactsManager.getContactForOffer(offer: offer)
 				if let existingContact {
 					contact = try await contactsManager.updateContact(
-						contactId: existingContact.id,
+						contactId: existingContact.uuid,
 						name: c_name,
 						photo: c_photo,
 						offers: existingContact.offers
@@ -359,7 +369,7 @@ struct ManageContactSheet: View {
 	func deleteContact() {
 		log.trace("deleteContact()")
 		
-		guard let cid = contact?.id else {
+		guard let cid = contact?.uuid else {
 			return
 		}
 		
