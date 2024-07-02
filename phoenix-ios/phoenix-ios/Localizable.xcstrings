@@ -7547,6 +7547,7 @@
     },
     "Base amount: (amountBitcoin), ≈(amountFiat)" : {
       "comment" : "VoiceOver label: PaymentSummaryView",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -17438,6 +17439,9 @@
           }
         }
       }
+    },
+    "Fetching invoice..." : {
+
     },
     "Fetching Lightning URL" : {
       "comment" : "Progress title",
@@ -27603,6 +27607,7 @@
       }
     },
     "payment description" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

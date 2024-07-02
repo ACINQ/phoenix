@@ -64,10 +64,11 @@
 		DC18C418256FE22300A2D083 /* Prefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC18C417256FE22300A2D083 /* Prefs.swift */; };
 		DC18C41D256FF91100A2D083 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC18C41C256FF91100A2D083 /* Utils.swift */; };
 		DC1916B029CB6C1D00917F06 /* Text_CurrencyName.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1916AF29CB6C1D00917F06 /* Text_CurrencyName.swift */; };
-		DC1B325029FC3D5900F7F45F /* OnChainDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1B324F29FC3D5900F7F45F /* OnChainDetails.swift */; };
 		DC1D2B4B2593EB860036AD38 /* Currency.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1D2B4A2593EB850036AD38 /* Currency.swift */; };
 		DC1D2B502594CE900036AD38 /* FormattedAmount.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1D2B4F2594CE900036AD38 /* FormattedAmount.swift */; };
 		DC1E75722B73DD500026F36E /* LogFileParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1E75712B73DD500026F36E /* LogFileParser.swift */; };
+		DC20BDF02C233F8200338AA2 /* PaymentDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC20BDEF2C233F8200338AA2 /* PaymentDetails.swift */; };
+		DC20BDF22C23403100338AA2 /* PaymentSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC20BDF12C23403100338AA2 /* PaymentSummary.swift */; };
 		DC20D77A2BC5982400C37255 /* ServerMessageMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC20D7792BC5982400C37255 /* ServerMessageMonitor.swift */; };
 		DC23F80F2B55923F00389A10 /* WalletCreationOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC23F80E2B55923F00389A10 /* WalletCreationOptions.swift */; };
 		DC26D0BB2A93BD0F006763B3 /* EffectsLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = DC26D0BA2A93BD0F006763B3 /* EffectsLibrary */; };
@@ -311,7 +312,6 @@
 		DCE77A5627C5240500F0FA24 /* TLSConnectionCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE77A5527C5240500F0FA24 /* TLSConnectionCheck.swift */; };
 		DCE77A5827C671D600F0FA24 /* ElectrumAddressSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE77A5727C671D600F0FA24 /* ElectrumAddressSheet.swift */; };
 		DCE81C172BC883BE0094B950 /* KotlinFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAEE26CACCF700E760A6 /* KotlinFlow.swift */; };
-		DCE9F95728412A9D005E03ED /* PaymentSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE9F95628412A9D005E03ED /* PaymentSummaryView.swift */; };
 		DCEAE5B72943CC7400320C46 /* RangeSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEAE5B62943CC7400320C46 /* RangeSheet.swift */; };
 		DCEAE5B92943D64B00320C46 /* MsatRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEAE5B82943D64B00320C46 /* MsatRange.swift */; };
 		DCEB2795282D7A9F0096B87E /* KotlinPublishers+Phoenix.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAEF26CACCF700E760A6 /* KotlinPublishers+Phoenix.swift */; };
@@ -467,10 +467,11 @@
 		DC18C417256FE22300A2D083 /* Prefs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Prefs.swift; sourceTree = "<group>"; };
 		DC18C41C256FF91100A2D083 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		DC1916AF29CB6C1D00917F06 /* Text_CurrencyName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Text_CurrencyName.swift; sourceTree = "<group>"; };
-		DC1B324F29FC3D5900F7F45F /* OnChainDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnChainDetails.swift; sourceTree = "<group>"; };
 		DC1D2B4A2593EB850036AD38 /* Currency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Currency.swift; sourceTree = "<group>"; };
 		DC1D2B4F2594CE900036AD38 /* FormattedAmount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormattedAmount.swift; sourceTree = "<group>"; };
 		DC1E75712B73DD500026F36E /* LogFileParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogFileParser.swift; sourceTree = "<group>"; };
+		DC20BDEF2C233F8200338AA2 /* PaymentDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentDetails.swift; sourceTree = "<group>"; };
+		DC20BDF12C23403100338AA2 /* PaymentSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentSummary.swift; sourceTree = "<group>"; };
 		DC20D7792BC5982400C37255 /* ServerMessageMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerMessageMonitor.swift; sourceTree = "<group>"; };
 		DC23F80E2B55923F00389A10 /* WalletCreationOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WalletCreationOptions.swift; sourceTree = "<group>"; };
 		DC27E4C32791C58C00C777CC /* PaymentsBackupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentsBackupView.swift; sourceTree = "<group>"; };
@@ -680,7 +681,6 @@
 		DCE7232F27B167240017CF56 /* SyncSeedManager_Actor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncSeedManager_Actor.swift; sourceTree = "<group>"; };
 		DCE77A5527C5240500F0FA24 /* TLSConnectionCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLSConnectionCheck.swift; sourceTree = "<group>"; };
 		DCE77A5727C671D600F0FA24 /* ElectrumAddressSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElectrumAddressSheet.swift; sourceTree = "<group>"; };
-		DCE9F95628412A9D005E03ED /* PaymentSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentSummaryView.swift; sourceTree = "<group>"; };
 		DCEAE5B62943CC7400320C46 /* RangeSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangeSheet.swift; sourceTree = "<group>"; };
 		DCEAE5B82943D64B00320C46 /* MsatRange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MsatRange.swift; sourceTree = "<group>"; };
 		DCEC6A1727A82A98002C20BA /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
@@ -937,8 +937,8 @@
 				DC118BFB27B4504B0080BBAC /* ScanView.swift */,
 				DC118C0527B4557D0080BBAC /* ValidateView.swift */,
 				DC39D4E6286BB2120030F18D /* PaymentLayerChoice.swift */,
-				DC1B324F29FC3D5900F7F45F /* OnChainDetails.swift */,
-				DCE9F95628412A9D005E03ED /* PaymentSummaryView.swift */,
+				DC20BDF12C23403100338AA2 /* PaymentSummary.swift */,
+				DC20BDEF2C233F8200338AA2 /* PaymentDetails.swift */,
 				DCEAE5B62943CC7400320C46 /* RangeSheet.swift */,
 				DC118BF927B44F840080BBAC /* TipSliderSheet.swift */,
 				DC118BFD27B451890080BBAC /* MetadataSheet.swift */,
@@ -1746,6 +1746,7 @@
 				DC63A3762B965D54008E040E /* InboundFeeSheet.swift in Sources */,
 				DC355E212A44D838008E8A8E /* NotificationsView.swift in Sources */,
 				DC7DA9F62AD84DF200F86B99 /* String+Substring.swift in Sources */,
+				DC20BDF22C23403100338AA2 /* PaymentSummary.swift in Sources */,
 				DC2ABAD52BEC092B00C11C9C /* InvalidPin.swift in Sources */,
 				DC4CF3C62BE59E4B003A957F /* TextTracking.swift in Sources */,
 				DC63BDF729AEB30C0067A361 /* BackgroundPaymentsConfig.swift in Sources */,
@@ -1778,7 +1779,6 @@
 				DC355E1D2A4398A8008E8A8E /* NoticeBox.swift in Sources */,
 				7555FF81242A565900829871 /* SceneDelegate.swift in Sources */,
 				DCC9D99A267BD28600EA36DD /* SyncTxManager.swift in Sources */,
-				DCE9F95728412A9D005E03ED /* PaymentSummaryView.swift in Sources */,
 				DCB876302735AA7300657570 /* UserDefaults+Serialization.swift in Sources */,
 				DC5F1C4C28DDF702007A55ED /* DrainWalletView_Action.swift in Sources */,
 				DCE1E5FA26418183005465B8 /* Toast.swift in Sources */,
@@ -1831,6 +1831,7 @@
 				DC18C41D256FF91100A2D083 /* Utils.swift in Sources */,
 				53BEFF4EDB40975C2123C63D /* ui.swift in Sources */,
 				DCACF6FD2566D0BA0009B01E /* SecurityFile.swift in Sources */,
+				DC20BDF02C233F8200338AA2 /* PaymentDetails.swift in Sources */,
 				DC118C0C27B561210080BBAC /* CurrencyAmount.swift in Sources */,
 				DC04C2632A9009890021F2E8 /* MergeChannelsView.swift in Sources */,
 				DC46BAF726CACCF700E760A6 /* KotlinExtensions+Conversion.swift in Sources */,
@@ -1850,7 +1851,6 @@
 				DCA02BA02BD1A5FC0080520F /* ChannelSizeImpactWarning.swift in Sources */,
 				DC355E232A45FAF2008E8A8E /* NestedObservableObject.swift in Sources */,
 				DC5F1C4A28DDAA49007A55ED /* ResetWalletView_Confirm.swift in Sources */,
-				DC1B325029FC3D5900F7F45F /* OnChainDetails.swift in Sources */,
 				DC39D4E7286BB2130030F18D /* PaymentLayerChoice.swift in Sources */,
 				DCAC9FC6296879770098D769 /* NavigationStackDestination.swift in Sources */,
 				DC46BAF626CACCF700E760A6 /* KotlinFutures.swift in Sources */,

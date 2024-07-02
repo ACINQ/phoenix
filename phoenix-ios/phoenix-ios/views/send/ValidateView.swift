@@ -8,17 +8,6 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-struct PaymentNumbers {
-	let baseMsat: Int64
-	let tipMsat: Int64
-	let lightningFeeMsat: Int64
-	let minerFeeMsat: Int64
-	let totalMsat: Int64
-	let tipPercent: Double
-	let lightningFeePercent: Double
-	let minerFeePercent: Double
-}
-
 enum Problem: Error {
 	case emptyInput
 	case invalidInput
@@ -184,27 +173,20 @@ struct ValidateView: View {
 		VStack {
 			header()
 			amountField()
+				.padding(.bottom, 4)
 			
 			Text(altAmount)
 				.font(.caption)
 				.foregroundColor(problem != nil ? Color.appNegative : .secondary)
-				.padding(.top, 4)
 				.padding(.bottom)
 			
 			optionalButtons()
 			
-			if mvi.model is Scan.Model_OnChainFlow {
-				onChainDetails()
-			} else {
-				paymentDescription()
-			}
+			paymentDetails()
+				.padding(.vertical)
 			
 			paymentButton()
 			otherWarning()
-			
-			paymentSummary()
-				.padding(.top)
-				.padding(.top)
 			
 		} // </VStack>
 	}
@@ -395,36 +377,17 @@ struct ValidateView: View {
 	}
 	
 	@ViewBuilder
-	func paymentDescription() -> some View {
+	func paymentDetails() -> some View {
 		
-		if let description = requestDescription() {
-			Text(description)
-				.padding()
-				.padding(.bottom)
-				.accessibilityHint("payment description")
-		} else {
-			Text("No description")
-				.foregroundColor(.secondary)
-				.padding()
-				.padding(.bottom)
-		}
-	}
-	
-	@ViewBuilder
-	func onChainDetails() -> some View {
-		
-		if let model = mvi.model as? Scan.Model_OnChainFlow {
-			OnChainDetails(model: model)
-				.padding(.horizontal, 60)
-				.padding(.vertical)
-				.padding(.bottom)
-		}
+		PaymentDetails(parent: self)
+			.padding(.horizontal, 10)
 	}
 	
 	@ViewBuilder
 	func paymentButton() -> some View {
 		
 		let needsPrepare = (mvi.model is Scan.Model_OnChainFlow) && (minerFeeInfo == nil)
+		let fetchingInvoice = (mvi.model is Scan.Model_OfferFlow) && paymentInProgress
 		
 		Button {
 			if needsPrepare {
@@ -438,6 +401,11 @@ struct ValidateView: View {
 					Image(systemName: "hammer")
 						.renderingMode(.template)
 					Text("Prepare Transaction")
+				} else if fetchingInvoice {
+					ProgressView()
+						.progressViewStyle(CircularProgressViewStyle())
+						.padding(.trailing, 2)
+					Text("Fetching invoice...")
 				} else if mvi.model is Scan.Model_LnurlWithdrawFlow {
 					Image("ic_receive")
 						.renderingMode(.template)
@@ -491,24 +459,18 @@ struct ValidateView: View {
 			} else if let payOfferProblem {
 				
 				Text(payOfferProblem.localizedDescription())
+					.multilineTextAlignment(.center)
 					.foregroundColor(.appNegative)
+					.padding(.horizontal)
 				
 			} else if let spliceOutProblem {
 				
 				Text(spliceOutProblem.localizedDescription())
+					.multilineTextAlignment(.center)
 					.foregroundColor(.appNegative)
+					.padding(.horizontal)
 			}
 		}
-	}
-	
-	@ViewBuilder
-	func paymentSummary() -> some View {
-		
-		PaymentSummaryView(
-			problem: $problem,
-			paymentNumbers: paymentNumbers(),
-			showMinerFeeSheet: showMinerFeeSheet
-		)
 	}
 	
 	@ViewBuilder
@@ -565,25 +527,6 @@ struct ValidateView: View {
 			
 		} else {
 			return false
-		}
-	}
-	
-	func requestDescription() -> String? {
-		
-		if let invoice = bolt11Invoice() {
-			return invoice.desc_()
-			
-		} else if let offer = bolt12Offer() {
-			return offer.description_
-			
-		} else if let lnurlPay = lnurlPay() {
-			return lnurlPay.metadata.plainText
-			
-		} else if let lnurlWithdraw = lnurlWithdraw() {
-			return lnurlWithdraw.defaultDescription
-			
-		} else {
-			return nil
 		}
 	}
 	
@@ -859,7 +802,7 @@ struct ValidateView: View {
 		return peer.walletParams.trampolineFees.first
 	}
 	
-	func paymentNumbers() -> PaymentNumbers? {
+	func paymentNumbers() -> PaymentSummary? {
 		
 		guard let recipientAmountMsat = parsedAmountMsat() else {
 			return nil
@@ -904,7 +847,7 @@ struct ValidateView: View {
 		let lightningFeePercent = Double(lightningFeeMsat) / Double(recipientAmountMsat)
 		let minerFeePercent = Double(minerFeeMsat) / Double(recipientAmountMsat)
 		
-		return PaymentNumbers(
+		return PaymentSummary(
 			baseMsat            : baseMsat,
 			tipMsat             : tipMsat,
 			lightningFeeMsat    : lightningFeeMsat,
@@ -913,6 +856,15 @@ struct ValidateView: View {
 			tipPercent          : tipPercent,
 			lightningFeePercent : lightningFeePercent,
 			minerFeePercent     : minerFeePercent
+		)
+	}
+	
+	func paymentStrings() -> PaymentSummaryStrings? {
+		
+		return PaymentSummaryStrings.create(
+			from: paymentNumbers(),
+			currencyPrefs: currencyPrefs,
+			problem: problem
 		)
 	}
 	
@@ -1558,6 +1510,19 @@ struct ValidateView: View {
 			amount: Lightning_kmpMilliSatoshi(msat: msat),
 			trampolineFees: trampolineFees
 		))
+	}
+	
+	func sendPayment_bolt12Offer_test(
+		_ model: Scan.Model_OfferFlow,
+		_ msat: Int64
+	) {
+		log.trace("sendPayment_bolt12Offer()_test")
+		
+		paymentInProgress = true
+		DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) {
+			paymentInProgress = false
+			payOfferProblem = .noResponse
+		}
 	}
 	
 	func sendPayment_bolt12Offer_B(
