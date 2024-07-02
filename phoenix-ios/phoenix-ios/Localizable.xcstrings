@@ -22688,6 +22688,7 @@
       }
     },
     "Lightning invoice" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -22728,6 +22729,7 @@
       }
     },
     "Lightning Invoice" : {
+      "comment" : "Secondary title",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -22807,11 +22809,8 @@
         }
       }
     },
-    "Lightning offer" : {
-
-    },
     "Lightning Offer" : {
-
+      "comment" : "Secondary title"
     },
     "Lightning Offers" : {
 
@@ -22896,6 +22895,9 @@
           }
         }
       }
+    },
+    "Lightning QR code" : {
+
     },
     "Link" : {
       "comment" : "lnurl-auth: login button title",
@@ -25244,6 +25246,9 @@
           }
         }
       }
+    },
+    "NEW" : {
+
     },
     "New Channel (auto-created)" : {
       "localizations" : {
@@ -34149,6 +34154,9 @@
         }
       }
     },
+    "Show one-time invoice" : {
+
+    },
     "Show only in-flight payments" : {
       "localizations" : {
         "ar" : {
@@ -34806,6 +34814,9 @@
           }
         }
       }
+    },
+    "Show reusable QR" : {
+
     },
     "Sign into iCloud to backup your payments" : {
       "localizations" : {
