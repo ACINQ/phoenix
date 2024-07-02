@@ -70,7 +70,6 @@ class KotlinLogger {
 			case Kermit_coreSeverity.warn    : logger.warning("\(msg)")
 			case Kermit_coreSeverity.error   : logger.error("\(msg)")
 			case Kermit_coreSeverity.assert  : logger.error("\(msg)")
-			default                          : logger.notice("\(msg)")
 		}
 	}
 }

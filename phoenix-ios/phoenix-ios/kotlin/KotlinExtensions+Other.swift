@@ -6,11 +6,11 @@ import Combine
 extension PeerManager {
 	
 	func peerStateValue() -> Lightning_kmpPeer? {
-		return peerState.value_ as? Lightning_kmpPeer
+		return peerState.value as? Lightning_kmpPeer
 	}
 	
 	func channelsFlowValue() -> [Bitcoin_kmpByteVector32: LocalChannelInfo] {
-		if let value = self.channelsFlow.value_ as? [Bitcoin_kmpByteVector32: LocalChannelInfo] {
+		if let value = self.channelsFlow.value as? [Bitcoin_kmpByteVector32: LocalChannelInfo] {
 			return value
 		} else {
 			return [:]
@@ -22,7 +22,7 @@ extension PeerManager {
 	}
 	
 	func finalWalletValue() -> Lightning_kmpWalletState.WalletWithConfirmations {
-		if let value = self.finalWallet.value_ as? Lightning_kmpWalletState.WalletWithConfirmations {
+		if let value = self.finalWallet.value as? Lightning_kmpWalletState.WalletWithConfirmations {
 			return value
 		} else {
 			return Lightning_kmpWalletState.WalletWithConfirmations.empty()
@@ -33,7 +33,7 @@ extension PeerManager {
 extension BalanceManager {
 	
 	func swapInWalletValue() -> Lightning_kmpWalletState.WalletWithConfirmations {
-		if let value = self.swapInWallet.value_ as? Lightning_kmpWalletState.WalletWithConfirmations {
+		if let value = self.swapInWallet.value as? Lightning_kmpWalletState.WalletWithConfirmations {
 			return value
 		} else {
 			return Lightning_kmpWalletState.WalletWithConfirmations.empty()
@@ -44,7 +44,7 @@ extension BalanceManager {
 extension WalletManager {
 	
 	func keyManagerValue() -> Lightning_kmpLocalKeyManager? {
-		if let value = keyManager.value_ as? Lightning_kmpLocalKeyManager {
+		if let value = keyManager.value as? Lightning_kmpLocalKeyManager {
 			return value
 		} else {
 			return nil
@@ -69,7 +69,7 @@ extension PhoenixShared.Notification {
 extension ConnectionsManager {
 	
 	var currentValue: Connections {
-		return connections.value_ as! Connections
+		return connections.value as! Connections
 	}
 	
 	func asyncStream() -> AsyncStream<Connections> {
@@ -148,11 +148,10 @@ extension LnurlAuth {
 	var actionPromptTitle: String {
 		if let action = self.action {
 			switch action {
-				case .register_ : return NSLocalizedString("Register",     comment: "lnurl-auth: login button title")
+				case .register  : return NSLocalizedString("Register",     comment: "lnurl-auth: login button title")
 				case .login     : return NSLocalizedString("Login",        comment: "lnurl-auth: login button title")
 				case .link      : return NSLocalizedString("Link",         comment: "lnurl-auth: login button title")
 				case .auth      : return NSLocalizedString("Authenticate", comment: "lnurl-auth: login button title")
-				default         : break
 			}
 		}
 		return LnurlAuth.defaultActionPromptTitle
@@ -165,11 +164,10 @@ extension LnurlAuth {
 	var actionSuccessTitle: String {
 		if let action = self.action {
 			switch action {
-				case .register_ : return NSLocalizedString("Registered",    comment: "lnurl-auth: success text")
+				case .register  : return NSLocalizedString("Registered",    comment: "lnurl-auth: success text")
 				case .login     : return NSLocalizedString("Logged In",     comment: "lnurl-auth: success text")
 				case .link      : return NSLocalizedString("Linked",        comment: "lnurl-auth: success text")
 				case .auth      : return NSLocalizedString("Authenticated", comment: "lnurl-auth: success text")
-				default         : break
 			}
 		}
 		return LnurlAuth.defaultActionSuccessTitle
@@ -205,7 +203,6 @@ extension MnemonicLanguage {
 		case .spanish : return "🇪🇸"
 		case .french  : return "🇫🇷"
 		case .czech   : return "🇨🇿"
-		default       : return "🏳️"
 	}}
 	
 	var displayName: String {
@@ -219,42 +216,14 @@ extension MnemonicLanguage {
 			case .spanish : return "Spanish"
 			case .french  : return "French"
 			case .czech   : return "Czech"
-			default       : return "Unknown"
 		}
 	}
 
 	static func fromLanguageCode(_ code: String) -> MnemonicLanguage? {
 		
-		let all: KotlinArray<MnemonicLanguage> = MnemonicLanguage.values()
-		
-		let iterator = all.iterator()
-		while iterator.hasNext() {
-			if let lang = iterator.next() as? MnemonicLanguage {
-				if lang.code.caseInsensitiveCompare(code) == .orderedSame {
-					return lang
-				}
-			}
-		}
-		
-		return nil
+		return MnemonicLanguage.allCases
+			.first(where: { $0.code.caseInsensitiveCompare(code) == .orderedSame })
 	}
-	
-	static var allCases: [MnemonicLanguage]  {
-		let all: KotlinArray<MnemonicLanguage> = MnemonicLanguage.values()
-		
-		var result = [MnemonicLanguage]()
-		result.reserveCapacity(Int(all.size))
-		
-		let iterator = all.iterator()
-		while iterator.hasNext() {
-			if let lang = iterator.next() as? MnemonicLanguage {
-				result.append(lang)
-			}
-		}
-		
-		return result
-	}
-
 
 	static var defaultCase: MnemonicLanguage {
 		

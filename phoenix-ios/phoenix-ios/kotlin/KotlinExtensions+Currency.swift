@@ -186,7 +186,7 @@ extension FiatCurrency {
 		case .tmt   : return "Turkmenistani Manat"
 		case .tnd   : return "Tunisian Dinar"
 		case .top   : return "Tongan Paʻanga"
-		case .try_  : return "Turkish Lira"
+		case .try   : return "Turkish Lira"
 		case .ttd   : return "Trinidad and Tobago Dollar"
 		case .twd   : return "Taiwan Dollar"
 		case .tzs   : return "Tanzanian Shilling"
@@ -205,7 +205,6 @@ extension FiatCurrency {
 		case .yer   : return "Yemeni Rial"
 		case .zar   : return "South African Rand"
 		case .zmw   : return "Zambian Kwacha"
-		default     : return self.shortName
 	}}
 	
 	private var longName_manualTranslation: String { switch self {
@@ -344,7 +343,7 @@ extension FiatCurrency {
 		case .tmt   : return NSLocalizedString("TMT", tableName: "Currencies", comment: "Turkmenistani Manat")
 		case .tnd   : return NSLocalizedString("TND", tableName: "Currencies", comment: "Tunisian Dinar")
 		case .top   : return NSLocalizedString("TOP", tableName: "Currencies", comment: "Tongan Paʻanga")
-		case .try_  : return NSLocalizedString("TRY", tableName: "Currencies", comment: "Turkish Lira")
+		case .try   : return NSLocalizedString("TRY", tableName: "Currencies", comment: "Turkish Lira")
 		case .ttd   : return NSLocalizedString("TTD", tableName: "Currencies", comment: "Trinidad and Tobago Dollar")
 		case .twd   : return NSLocalizedString("TWD", tableName: "Currencies", comment: "Taiwan Dollar")
 		case .tzs   : return NSLocalizedString("TZS", tableName: "Currencies", comment: "Tanzanian Shilling")
@@ -363,7 +362,6 @@ extension FiatCurrency {
 		case .yer   : return NSLocalizedString("YER", tableName: "Currencies", comment: "Yemeni Rial")
 		case .zar   : return NSLocalizedString("ZAR", tableName: "Currencies", comment: "South African Rand")
 		case .zmw   : return NSLocalizedString("ZMW", tableName: "Currencies", comment: "Zambian Kwacha")
-		default     : return ""
 	}}
 	
 	private var longName_marketTranslation: String { switch self {
@@ -421,8 +419,8 @@ extension FiatCurrency {
 		
 		let (selfCurrencyCode, _) = self.splitShortName
 		
-		return self.getSetAssociatedObject(storageKey: &_Key.matchingLocales) {
-			
+		return self._bridgeToObjectiveC().getSetAssociatedObject(storageKey: &_Key.matchingLocales) {
+
 			var matchingLocales = [Locale]()
 			for identifier in Locale.availableIdentifiers {
 			
@@ -444,7 +442,7 @@ extension FiatCurrency {
 			return true
 		}
 		
-		return self.getSetAssociatedObject(storageKey: &_Key.usesCents) {
+		return self._bridgeToObjectiveC().getSetAssociatedObject(storageKey: &_Key.usesCents) {
 			
 			let formatter = NumberFormatter()
 			formatter.numberStyle = .currency
@@ -477,10 +475,7 @@ extension BitcoinUnit {
 			case BitcoinUnit.bit  : return "1 bit = 0.00\(s)000\(s)100 btc"
 			case BitcoinUnit.mbtc : return "1 mbtc = 0.00\(s)100 btc"
 			case BitcoinUnit.btc  : return "1 btc"
-			default               : break
 		}
-		
-		return self.name
 	}
 }
 
