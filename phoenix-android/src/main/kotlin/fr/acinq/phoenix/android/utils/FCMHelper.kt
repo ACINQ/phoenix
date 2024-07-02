@@ -22,6 +22,6 @@ import com.google.android.gms.common.GoogleApiAvailability
 
 object FCMHelper {
     fun isFCMAvailable(context: Context): Boolean {
-        return GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context) != ConnectionResult.SUCCESS
+        return GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS
     }
 }

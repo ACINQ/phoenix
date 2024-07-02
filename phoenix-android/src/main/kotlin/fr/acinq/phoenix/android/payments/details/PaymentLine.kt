@@ -187,8 +187,15 @@ private fun PaymentDescription(paymentInfo: WalletPaymentInfo, modifier: Modifie
                     value = contactsManager.getContactForPayerPubkey(offerMetadata.payerKey)
                 })
 
-                contactForKey.value?.let {
-                    offerMetadata.payerNote ?: stringResource(id = R.string.paymentdetails_desc_from, it.name)
+                when (val contact = contactForKey.value) {
+                    null -> when (val note = offerMetadata.payerNote) {
+                        null -> stringResource(id = R.string.paymentdetails_desc_from_unknown)
+                        else -> stringResource(id = R.string.paymentdetails_desc_from_unknown_with_note, note)
+                    }
+                    else -> when (val note = offerMetadata.payerNote) {
+                        null -> stringResource(id = R.string.paymentdetails_desc_from, contact.name)
+                        else -> stringResource(id = R.string.paymentdetails_desc_from_with_note, contact.name, note)
+                    }
                 }
             }
             ?: payment.outgoingInvoiceRequest()?.let { request ->
@@ -198,7 +205,16 @@ private fun PaymentDescription(paymentInfo: WalletPaymentInfo, modifier: Modifie
                     value = contactsManager.getContactForOffer(offer)
                 })
 
-                request.payerNote ?: contactForOffer.value?.let { stringResource(id = R.string.paymentdetails_desc_to, it.name) }
+                when (val contact = contactForOffer.value) {
+                    null -> when (val note = request.payerNote) {
+                        null -> stringResource(id = R.string.paymentdetails_desc_to_unknown)
+                        else -> stringResource(id = R.string.paymentdetails_desc_to_unknown_with_note, note)
+                    }
+                    else -> when (val note = request.payerNote) {
+                        null -> stringResource(id = R.string.paymentdetails_desc_to, contact.name)
+                        else -> stringResource(id = R.string.paymentdetails_desc_to_with_note, contact.name, note)
+                    }
+                }
             }
             ?: payment.smartDescription(context)
     }

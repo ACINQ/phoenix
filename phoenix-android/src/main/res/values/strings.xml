@@ -384,9 +384,15 @@
     <string name="paymentdetails_desc_inbound_liquidity">+%1$s inbound liquidity</string>
     <string name="paymentdetails_desc_swapout">Swap-out to %1$s</string>
     <string name="paymentdetails_desc_swapin">On-chain deposit</string>
+
     <string name="paymentdetails_desc_to">To %1$s</string>
+    <string name="paymentdetails_desc_to_with_note">To %1$s: %2$s</string>
+    <string name="paymentdetails_desc_to_unknown">To unknown</string>
+    <string name="paymentdetails_desc_to_unknown_with_note">To unknown: %1$s</string>
     <string name="paymentdetails_desc_from">From %1$s</string>
-    <string name="paymentdetails_desc_offer_incoming">Offer</string>
+    <string name="paymentdetails_desc_from_with_note">From %1$s: %2$s</string>
+    <string name="paymentdetails_desc_from_unknown">From unknown</string>
+    <string name="paymentdetails_desc_from_unknown_with_note">From unknown: %1$s</string>
 
     <string name="paymentdetails_edit_dialog_title">Add a custom description to this payment</string>
     <string name="paymentdetails_edit_dialog_input_label">Description</string>
