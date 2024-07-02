@@ -61,7 +61,8 @@ struct PaymentDetails: View {
 				
 				Text("On-Chain Payment")
 					.font(valueFont)
-					.gridColumnAlignment(.leading)
+					.gridCellColumns(2)
+					.gridCellAnchor(.leading)
 				
 			} // </GridRow>
 		}
@@ -77,8 +78,7 @@ struct PaymentDetails: View {
 			}
 			.font(valueFont)
 			.gridCellColumns(2)
-			.gridColumnAlignment(.leading)
-			.gridCellAnchor(.leading) // bug workaround
+			.gridCellAnchor(.leading)
 			
 		} // </GridRow>
 		GridRow(alignment: VerticalAlignment.firstTextBaseline) {
@@ -90,7 +90,7 @@ struct PaymentDetails: View {
 				.truncationMode(.middle)
 				.font(valueFont)
 				.gridCellColumns(2)
-				.gridColumnAlignment(.leading)
+				.gridCellAnchor(.leading)
 				.contextMenu {
 					Button {
 						UIPasteboard.general.string = btcAddr
@@ -113,8 +113,7 @@ struct PaymentDetails: View {
 				.truncationMode(.tail)
 				.font(valueFont)
 				.gridCellColumns(2)
-				.gridColumnAlignment(.leading)
-				.gridCellAnchor(.leading) // bug workaround
+				.gridCellAnchor(.leading)
 			
 		} // </GridRow>
 	}
@@ -125,32 +124,62 @@ struct PaymentDetails: View {
 		
 		GridRow(alignment: VerticalAlignment.firstTextBaseline) {
 			titleColumn("Send To")
-			
-			let offer: String = model.offer.encode()
-			VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
-				Text(offer)
-					.lineLimit(2)
-					.truncationMode(.middle)
-					.gridCellColumns(2)
-					.gridColumnAlignment(.leading)
-					.contextMenu {
-						Button {
-							UIPasteboard.general.string = offer
-						} label: {
-							Text("Copy")
+				
+			if let contact = parent.contact {
+				
+				HStack(alignment: VerticalAlignment.center, spacing: 4) {
+					Group {
+						if let photoData = contact.photo?.toSwiftData(),
+							let uiImage = UIImage(data: photoData)
+						{
+							Image(uiImage: uiImage)
+								.resizable()
+								.aspectRatio(contentMode: .fill) // FILL !
+						} else {
+							Image(systemName: "person.circle")
+								.resizable()
+								.aspectRatio(contentMode: .fit)
 						}
 					}
-				Button {
-					parent.showAddContactSheet()
-				} label: {
-					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 2) {
-						Image(systemName: "person")
-						Text("Add contact")
-					}
+					.frame(width: 32, height: 32)
+					.clipShape(Circle())
+					
+					Text(contact.name)
 				}
-			} // </VStack>
-			.font(valueFont)
-			
+				.font(valueFont)
+				.onTapGesture {
+					parent.showManageContactSheet()
+				}
+				.gridCellColumns(2)
+				.gridCellAnchor(.leading)
+				
+			} else {
+				
+				let offer: String = model.offer.encode()
+				VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+					Text(offer)
+						.lineLimit(2)
+						.truncationMode(.middle)
+						.contextMenu {
+							Button {
+								UIPasteboard.general.string = offer
+							} label: {
+								Text("Copy")
+							}
+						}
+					Button {
+						parent.showManageContactSheet()
+					} label: {
+						HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 2) {
+							Image(systemName: "person")
+							Text("Add contact")
+						}
+					}
+				} // </VStack>
+				.font(valueFont)
+				.gridCellColumns(2)
+				.gridCellAnchor(.leading)
+			}
 		} // </GridRow>
 		
 		GridRow(alignment: VerticalAlignment.firstTextBaseline) {
@@ -179,7 +208,6 @@ struct PaymentDetails: View {
 			} // </Group>
 			.font(valueFont)
 			.gridCellColumns(2)
-			.gridColumnAlignment(.leading)
 			.gridCellAnchor(.leading)
 			
 		} // </GridRow>
@@ -205,12 +233,12 @@ struct PaymentDetails: View {
 						.foregroundColor(fiatColor)
 				}
 				.font(valueFont)
-				.gridColumnAlignment(.leading)
+				.gridCellAnchor(.leading)
 				
 				Text(verbatim: info.percent_tip)
 					.font(valueFont)
 					.foregroundColor(percentColor)
-					.gridColumnAlignment(.leading)
+					.gridCellAnchor(.leading)
 				
 			} // </GridRow>
 			.accessibilityLabel(accessibilityLabel_tipAmount(info))
@@ -228,12 +256,12 @@ struct PaymentDetails: View {
 						.foregroundColor(fiatColor)
 				}
 				.font(valueFont)
-				.gridColumnAlignment(.leading)
+				.gridCellAnchor(.leading)
 				
 				Text(verbatim: info.percent_lightningFee)
 					.font(valueFont)
 					.foregroundColor(percentColor)
-					.gridColumnAlignment(.leading)
+					.gridCellAnchor(.leading)
 				
 			} // </GridRow>
 			.accessibilityLabel(accessibilityLabel_lightningFeeAmount(info))
@@ -251,7 +279,7 @@ struct PaymentDetails: View {
 						.foregroundColor(fiatColor)
 				}
 				.font(valueFont)
-				.gridColumnAlignment(.leading)
+				.gridCellAnchor(.leading)
 				
 				VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
 					Text(verbatim: info.percent_minerFee)
@@ -264,7 +292,7 @@ struct PaymentDetails: View {
 						Image(systemName: "square.and.pencil").font(.body)
 					}
 				}
-				.gridColumnAlignment(.leading)
+				.gridCellAnchor(.leading)
 				
 			} // </GridRow>
 			.accessibilityLabel(accessibilityLabel_minerFeeAmount(info))
@@ -282,7 +310,7 @@ struct PaymentDetails: View {
 						.foregroundColor(fiatColor)
 				}
 				.font(valueFont)
-				.gridColumnAlignment(.leading)
+				.gridCellAnchor(.leading)
 				
 			} // </GridRow>
 			.accessibilityLabel(accessibilityLabel_totalAmount(info))
@@ -298,8 +326,8 @@ struct PaymentDetails: View {
 			.textCase(.uppercase)
 			.font(.subheadline)
 			.foregroundColor(color)
-			.gridColumnAlignment(.trailing)
-			.frame(minWidth: 125, alignment: .trailing) // Todo: Replace hard-coded value
+			.gridCellAnchor(.trailing)
+		//	.frame(minWidth: 125, alignment: .trailing) // Todo: Replace hard-coded value
 	}
 	
 	// --------------------------------------------------

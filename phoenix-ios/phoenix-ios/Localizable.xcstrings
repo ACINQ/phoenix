@@ -14982,6 +14982,9 @@
         }
       }
     },
+    "Edit contact" : {
+
+    },
     "Edit Info" : {
       "comment" : "Navigation bar title",
       "localizations" : {
