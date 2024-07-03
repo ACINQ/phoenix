@@ -387,7 +387,6 @@
 
     <string name="paymentdetails_desc_to">to %1$s</string>
     <string name="paymentdetails_desc_from">from %1$s</string>
-    <string name="paymentdetails_desc_unknown">Unknown</string>
 
     <string name="paymentdetails_edit_dialog_title">Add a custom description to this payment</string>
     <string name="paymentdetails_edit_dialog_input_label">Description</string>

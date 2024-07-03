@@ -358,7 +358,6 @@
 
     <string name="paymentdetails_desc_to">đến %1$s</string>
     <string name="paymentdetails_desc_from">từ %1$s</string>
-    <string name="paymentdetails_desc_unknown">Không xác định</string>
 
     <string name="paymentdetails_edit_dialog_title">Thêm mô tả tùy chọn cho khoản thanh toán này</string>
     <string name="paymentdetails_edit_dialog_input_label">Mô tả</string>

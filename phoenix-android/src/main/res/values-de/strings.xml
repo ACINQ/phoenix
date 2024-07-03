@@ -357,7 +357,6 @@
 
     <string name="paymentdetails_desc_to">an %1$s</string>
     <string name="paymentdetails_desc_from">von %1$s</string>
-    <string name="paymentdetails_desc_unknown">Unbekannt</string>
 
     <string name="paymentdetails_edit_dialog_title">Fügen Sie eine eigene Beschreibung zu dieser Zahlung hinzu</string>
     <string name="paymentdetails_edit_dialog_input_label">Beschreibung</string>

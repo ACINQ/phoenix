@@ -181,7 +181,17 @@ private fun PaymentDescription(paymentInfo: WalletPaymentInfo, modifier: Modifie
         true -> stringResource(id = R.string.paymentdetails_desc_legacy_migration)
         false -> metadata.userDescription
             ?: metadata.lnurl?.description
-            ?: payment.incomingOfferMetadata()?.payerNote
+            ?: payment.incomingOfferMetadata()?.let { offerMetadata ->
+                val contactsManager = business.contactsManager
+                val contactForKey = produceState<ContactInfo?>(initialValue = null, producer = {
+                    value = contactsManager.getContactForPayerPubkey(offerMetadata.payerKey)
+                })
+
+                when (contactForKey.value) {
+                    null -> null
+                    else -> offerMetadata.payerNote
+                }
+            }
             ?: payment.outgoingInvoiceRequest()?.payerNote
             ?: payment.smartDescription(context)
     }
@@ -290,7 +300,7 @@ private fun PaymentContactInfo(
         })
 
         when (val contact = contactForKey.value) {
-            null -> FromToNameView(isOutgoing = false, userName = stringResource(id = R.string.paymentdetails_desc_unknown))
+            null -> Unit
             else -> FromToNameView(isOutgoing = false, userName = contact.name)
         }
         return
