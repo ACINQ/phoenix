@@ -1,4 +1,5 @@
 import Combine
+import Foundation
 import PhoenixShared
 
 /**
@@ -70,7 +71,7 @@ class KotlinCurrentValueSubject<ObjCType: AnyObject>: Publisher {
 		// because the instance itself doesn't maintain any state.
 		// All state is encapsulated in the watch method.
 		
-		let initialValue = stateFlowWrapper.value_
+		let initialValue = stateFlowWrapper.value
 		wrapped = CurrentValueSubject(initialValue)
 		
 		watcher = stateFlowWrapper.watch {[weak self](value: ObjCType?) in

@@ -1081,6 +1081,9 @@
         }
       }
     },
+    "(Lightning offer)" : {
+      "comment" : "Type of text being copied"
+    },
     "(Phoenix can be running in the background.)" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1548,6 +1551,9 @@
           }
         }
       }
+    },
+    "**This Bolt12 payment request is the Lightning equivalent to a Bitcoin address.**\n\nUnlike traditional Lightning invoices, it does not expire and can be reused.\n\nShare it widely : for donations, tips, or to get paid by your friends.\n\n🛟 **Who supports Bolt12?**\n\nFor the moment, few services support Bolt12. If a service rejects this invoice, let them know they're missing out!\n\n🪫 **Restrictions**\n\nYour phone must be turned on and connected to the internet to receive a payment. Also enabling TOR in Phoenix may cause issues." : {
+
     },
     "#%lld: %@" : {
       "localizations" : {
@@ -4754,6 +4760,9 @@
         }
       }
     },
+    "Add contact" : {
+
+    },
     "add liquidity" : {
       "localizations" : {
         "ar" : {
@@ -5045,6 +5054,9 @@
           }
         }
       }
+    },
+    "Address Book" : {
+
     },
     "address type" : {
       "comment" : "Label in DetailsView_IncomingPayment",
@@ -6677,6 +6689,9 @@
         }
       }
     },
+    "Attach a message" : {
+
+    },
     "Attention: if the Bitcoin mempool feerate is high, incoming LN payments requiring an on-chain operation could be expensive." : {
       "localizations" : {
         "ar" : {
@@ -7544,6 +7559,7 @@
     },
     "Base amount: (amountBitcoin), ≈(amountFiat)" : {
       "comment" : "VoiceOver label: PaymentSummaryView",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -7582,6 +7598,9 @@
           }
         }
       }
+    },
+    "Be careful with messages from unknown sources" : {
+
     },
     "Below the expected fee. Some payments may be rejected." : {
       "localizations" : {
@@ -9822,6 +9841,9 @@
         }
       }
     },
+    "Clear image" : {
+
+    },
     "Clear textfield" : {
       "localizations" : {
         "ar" : {
@@ -11387,6 +11409,9 @@
         }
       }
     },
+    "Contact Image" : {
+
+    },
     "Contact support if needed." : {
       "localizations" : {
         "ar" : {
@@ -11426,6 +11451,9 @@
           }
         }
       }
+    },
+    "Contacts" : {
+
     },
     "continue to next step" : {
       "comment" : "VoiceOver hint",
@@ -12147,6 +12175,12 @@
           }
         }
       }
+    },
+    "Could not retrieve payment details within a reasonable time. The recipient may be offline or unreachable." : {
+
+    },
+    "Could not retrieve payment details. Received invalid response from node." : {
+
     },
     "Create new wallet" : {
       "localizations" : {
@@ -13054,6 +13088,12 @@
           }
         }
       }
+    },
+    "Delete contact" : {
+
+    },
+    "Delete contact?" : {
+
     },
     "Delete payment" : {
       "localizations" : {
@@ -14960,6 +15000,9 @@
         }
       }
     },
+    "Edit contact" : {
+
+    },
     "Edit Info" : {
       "comment" : "Navigation bar title",
       "localizations" : {
@@ -15352,6 +15395,9 @@
           }
         }
       }
+    },
+    "Enable if you don't want Bolt12 recipients to know that payments come from your wallet." : {
+
     },
     "Enable notifications in the Notification Center" : {
       "localizations" : {
@@ -17430,6 +17476,9 @@
         }
       }
     },
+    "Fetching invoice..." : {
+
+    },
     "Fetching Lightning URL" : {
       "comment" : "Progress title",
       "localizations" : {
@@ -19110,6 +19159,9 @@
           }
         }
       }
+    },
+    "How to use" : {
+
     },
     "I have saved my recovery phrase somewhere safe." : {
       "localizations" : {
@@ -22127,6 +22179,9 @@
         }
       }
     },
+    "Learn more" : {
+
+    },
     "Learn more from our [blog post](https://acinq.co/blog/phoenix-splicing-update)." : {
       "localizations" : {
         "ar" : {
@@ -22642,6 +22697,7 @@
       }
     },
     "Lightning invoice" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -22682,6 +22738,7 @@
       }
     },
     "Lightning Invoice" : {
+      "comment" : "Secondary title",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -22760,6 +22817,12 @@
           }
         }
       }
+    },
+    "Lightning Offer" : {
+      "comment" : "Secondary title"
+    },
+    "Lightning Offers" : {
+
     },
     "Lightning payments are fast and best suited for smaller payments." : {
       "localizations" : {
@@ -22841,6 +22904,9 @@
           }
         }
       }
+    },
+    "Lightning QR code" : {
+
     },
     "Link" : {
       "comment" : "lnurl-auth: login button title",
@@ -25190,6 +25256,9 @@
         }
       }
     },
+    "NEW" : {
+
+    },
     "New Channel (auto-created)" : {
       "localizations" : {
         "ar" : {
@@ -26063,6 +26132,9 @@
           }
         }
       }
+    },
+    "Offer:" : {
+
     },
     "Offline" : {
       "comment" : "Connection state\nConnection status",
@@ -27579,6 +27651,7 @@
       }
     },
     "payment description" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -30080,6 +30153,9 @@
         }
       }
     },
+    "Random payer key" : {
+
+    },
     "Random server" : {
       "comment" : "Connection info",
       "localizations" : {
@@ -31923,6 +31999,7 @@
       }
     },
     "Scan withdraw" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -32082,6 +32159,9 @@
           }
         }
       }
+    },
+    "Select image" : {
+
     },
     "select miner fee when sending on-chain" : {
       "localizations" : {
@@ -34086,6 +34166,9 @@
         }
       }
     },
+    "Show one-time invoice" : {
+
+    },
     "Show only in-flight payments" : {
       "localizations" : {
         "ar" : {
@@ -34743,6 +34826,9 @@
           }
         }
       }
+    },
+    "Show reusable QR" : {
+
     },
     "Sign into iCloud to backup your payments" : {
       "localizations" : {
@@ -35871,6 +35957,9 @@
           }
         }
       }
+    },
+    "Take photo" : {
+
     },
     "Tap for more info" : {
       "localizations" : {
@@ -40696,6 +40785,9 @@
           }
         }
       }
+    },
+    "Unknown offer error" : {
+
     },
     "Unknown reason" : {
       "localizations" : {

@@ -103,6 +103,25 @@ extension WalletPaymentInfo {
 	
 		return NSLocalizedString("No description", comment: "placeholder text")
 	}
+	
+	func attachedMessage() -> String? {
+		
+		var msg: String? = nil
+		
+		if let incomingOfferMetadata = payment.incomingOfferMetadata() {
+			msg = incomingOfferMetadata.payerNote
+			
+		} else if let outgoingInvoiceRequest = payment.outgoingInvoiceRequest() {
+			msg = outgoingInvoiceRequest.payerNote
+		}
+		
+		if var msg {
+			msg = msg.trimmingCharacters(in: .whitespacesAndNewlines)
+			return msg.isEmpty ? nil : msg
+		} else {
+			return nil
+		}
+	}
 }
 
 extension WalletPaymentMetadata {
@@ -120,7 +139,7 @@ extension WalletPaymentMetadata {
 
 extension Lightning_kmpWalletPayment {
 
-	func inIncoming() -> Bool {
+	func isIncoming() -> Bool {
 		return self is Lightning_kmpIncomingPayment
 	}
 

@@ -34,6 +34,7 @@ fileprivate struct PaymentOptionsList: View {
 	let invoiceExpirationDaysOptions = [7, 30, 60]
 
 	@State var allowOverpayment: Bool = Prefs.shared.allowOverpayment
+	@State var randomPayerKey: Bool = Prefs.shared.randomPayerKey
 	
 	@State var notificationSettings = NotificationsManager.shared.settings.value
 	
@@ -105,31 +106,73 @@ fileprivate struct PaymentOptionsList: View {
 	func section_outgoingPayments() -> some View {
 		
 		Section {
-			
-			Toggle(isOn: $allowOverpayment) {
-				Text("Enable overpayment")
-			}
-			.onChange(of: allowOverpayment) { newValue in
-				Prefs.shared.allowOverpayment = newValue
-			}
-
-			Text(
-				"""
-				You'll be able to overpay Lightning invoices up to 2 times the amount requested. \
-				Useful for manual tipping, or as a privacy measure.
-				"""
-			)
-			.font(.callout)
-			.fixedSize(horizontal: false, vertical: true) // SwiftUI truncation bugs
-			.foregroundColor(Color.secondary)
-			.padding(.top, 8)
-			.padding(.bottom, 4)
+			subsection_enableOverpayments()
+			subsection_randomPayerKey()
 			
 		} /* Section.*/header: {
 			Text("Outgoing payments")
 			
 		} // </Section>
 		.id(sectionID_outgoingPayments)
+	}
+	
+	@ViewBuilder
+	func section_backgroundPayments() -> some View {
+		
+		Section(header: Text("Background Payments")) {
+			
+			let config = BackgroundPaymentsConfig.fromSettings(notificationSettings)
+			let hideAmount = NSLocalizedString("(hide amount)", comment: "Background payments configuration")
+			
+			navLink(.BackgroundPaymentsSelector) {
+				
+				Group { // Compiler workaround: Type '()' cannot conform to 'View'
+					switch config {
+					case .receiveQuietly(let discreet):
+						HStack(alignment: VerticalAlignment.center, spacing: 4) {
+							Text("Receive quietly")
+							if discreet {
+								Text(verbatim: hideAmount)
+									.font(.subheadline)
+									.foregroundColor(.secondary)
+								}
+							}
+						
+					case .fullVisibility(let discreet):
+						HStack(alignment: VerticalAlignment.center, spacing: 4) {
+							Text("Visible")
+							if discreet {
+								Text(verbatim: hideAmount)
+									.font(.subheadline)
+									.foregroundColor(.secondary)
+								}
+							}
+						
+					case .customized(let discreet):
+						HStack(alignment: VerticalAlignment.center, spacing: 4) {
+							Text("Customized")
+							if discreet {
+								Text(verbatim: hideAmount)
+									.font(.subheadline)
+									.foregroundColor(.secondary)
+								}
+							}
+						
+					case .disabled:
+						HStack(alignment: VerticalAlignment.center, spacing: 0) {
+							Text("Disabled")
+							Spacer()
+							Image(systemName: "exclamationmark.triangle")
+								.renderingMode(.template)
+								.foregroundColor(Color.appWarn)
+							}
+						
+					} // </switch>
+				} // </Group>
+			} // </navLink>
+			
+		} // </Section>
+		.id(sectionID_backgroundPayments)
 	}
 	
 	@ViewBuilder
@@ -192,62 +235,79 @@ fileprivate struct PaymentOptionsList: View {
 	}
 	
 	@ViewBuilder
-	func section_backgroundPayments() -> some View {
+	func subsection_enableOverpayments() -> some View {
 		
-		Section(header: Text("Background Payments")) {
+		HStack(alignment: VerticalAlignment.centerTopLine) { // <- Custom VerticalAlignment
 			
-			let config = BackgroundPaymentsConfig.fromSettings(notificationSettings)
-			let hideAmount = NSLocalizedString("(hide amount)", comment: "Background payments configuration")
+			VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
+				Text("Enable overpayment")
+					.alignmentGuide(VerticalAlignment.centerTopLine) { (d: ViewDimensions) in
+						d[VerticalAlignment.center]
+					}
+					
+				Text(
+					"""
+					You'll be able to overpay Lightning invoices up to 2 times the amount requested. \
+					Useful for manual tipping, or as a privacy measure.
+					"""
+				)
+				.font(.callout)
+				.fixedSize(horizontal: false, vertical: true) // SwiftUI truncation bugs
+				.foregroundColor(Color.secondary)
+					
+			} // </VStack>
 			
-			navLink(.BackgroundPaymentsSelector) {
-				
-				Group { // Compiler workaround: Type '()' cannot conform to 'View'
-					switch config {
-					case .receiveQuietly(let discreet):
-						HStack(alignment: VerticalAlignment.center, spacing: 4) {
-							Text("Receive quietly")
-							if discreet {
-								Text(verbatim: hideAmount)
-									.font(.subheadline)
-									.foregroundColor(.secondary)
-								}
-							}
-						
-					case .fullVisibility(let discreet):
-						HStack(alignment: VerticalAlignment.center, spacing: 4) {
-							Text("Visible")
-							if discreet {
-								Text(verbatim: hideAmount)
-									.font(.subheadline)
-									.foregroundColor(.secondary)
-								}
-							}
-						
-					case .customized(let discreet):
-						HStack(alignment: VerticalAlignment.center, spacing: 4) {
-							Text("Customized")
-							if discreet {
-								Text(verbatim: hideAmount)
-									.font(.subheadline)
-									.foregroundColor(.secondary)
-								}
-							}
-						
-					case .disabled:
-						HStack(alignment: VerticalAlignment.center, spacing: 0) {
-							Text("Disabled")
-							Spacer()
-							Image(systemName: "exclamationmark.triangle")
-								.renderingMode(.template)
-								.foregroundColor(Color.appWarn)
-							}
-						
-					} // </switch>
-				} // </Group>
-			} // </navLink>
+			Spacer()
 			
-		} // </Section>
-		.id(sectionID_backgroundPayments)
+			Toggle("", isOn: $allowOverpayment)
+				.labelsHidden()
+				.padding(.trailing, 2)
+				.alignmentGuide(VerticalAlignment.centerTopLine) { (d: ViewDimensions) in
+					d[VerticalAlignment.center]
+				}
+				.onChange(of: allowOverpayment) { newValue in
+					Prefs.shared.allowOverpayment = newValue
+				}
+			
+		} // </HStack>
+	}
+	
+	@ViewBuilder
+	func subsection_randomPayerKey() -> some View {
+		
+		HStack(alignment: VerticalAlignment.centerTopLine) { // <- Custom VerticalAlignment
+			
+			VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
+				Text("Random payer key")
+					.alignmentGuide(VerticalAlignment.centerTopLine) { (d: ViewDimensions) in
+						d[VerticalAlignment.center]
+					}
+					
+				Text(
+					"""
+					Enable if you don't want Bolt12 recipients to know \
+					that payments come from your wallet.
+					"""
+				)
+				.font(.callout)
+				.fixedSize(horizontal: false, vertical: true) // SwiftUI truncation bugs
+				.foregroundColor(Color.secondary)
+					
+			} // </VStack>
+			
+			Spacer()
+			
+			Toggle("", isOn: $randomPayerKey)
+				.labelsHidden()
+				.padding(.trailing, 2)
+				.alignmentGuide(VerticalAlignment.centerTopLine) { (d: ViewDimensions) in
+					d[VerticalAlignment.center]
+				}
+				.onChange(of: randomPayerKey) { newValue in
+					Prefs.shared.randomPayerKey = newValue
+				}
+			
+		} // </HStack>
 	}
 	
 	@ViewBuilder

@@ -840,7 +840,7 @@ struct HomeView : MVIView {
 		bizNotifications_payment = list.filter({ item in
 			if let paymentRejected = item.notification as? PhoenixShared.Notification.PaymentRejected {
 				// Remove items where source == onChain
-				if paymentRejected.source == Lightning_kmpLiquidityEventsSource.offchainpayment {
+				if paymentRejected.source == Lightning_kmpLiquidityEventsSource.offChainPayment {
 					return paymentRejected.createdAt > cutOffDate
 				} else {
 					return false
