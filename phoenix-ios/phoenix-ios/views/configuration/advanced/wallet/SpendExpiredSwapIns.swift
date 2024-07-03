@@ -427,7 +427,6 @@ struct SpendExpiredSwapIns: View {
 		
 		guard
 			let minerFeeInfo,
-			let peer = Biz.business.peerManager.peerStateValue(),
 			let keyManager = Biz.business.walletManager.keyManagerValue()
 		else {
 			return
