@@ -119,7 +119,7 @@ struct PaymentRequestedView: View {
 		log.debug("lastIncomingPayment.paymentHash = \(lastIncomingPayment.paymentHash.toHex())")
 		
 		let paymentState = lastIncomingPayment.state()
-		if paymentState == WalletPaymentState.successonchain || paymentState == WalletPaymentState.successoffchain {
+		if paymentState == WalletPaymentState.successOnChain || paymentState == WalletPaymentState.successOffChain {
 			if lastIncomingPayment.paymentHash.toHex() == model.paymentHash {
 				presentationMode.wrappedValue.dismiss()
 			}

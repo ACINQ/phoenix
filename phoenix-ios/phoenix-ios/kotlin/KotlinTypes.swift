@@ -17,6 +17,8 @@ extension Scan {
 	typealias Model_Bolt11InvoiceFlow_InvoiceRequest = ModelBolt11InvoiceFlowBolt11InvoiceRequest
 	typealias Model_Bolt11InvoiceFlow_Sending = ModelBolt11InvoiceFlowSending
 
+	typealias Model_OfferFlow = ModelOfferFlow
+	
 	typealias Model_OnChainFlow = ModelOnchainFlow
 
 	typealias Model_LnurlServiceFetch = ModelLnurlServiceFetch

@@ -1,6 +1,7 @@
 package fr.acinq.phoenix.utils
 
 import fr.acinq.bitcoin.ByteVector
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.ByteVector64
 import fr.acinq.bitcoin.PrivateKey
 import fr.acinq.bitcoin.PublicKey
@@ -10,6 +11,7 @@ import fr.acinq.bitcoin.TxId
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.ChannelEvents
 import fr.acinq.lightning.DefaultSwapInParams
+import fr.acinq.lightning.Lightning
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.NodeEvents
@@ -31,18 +33,35 @@ import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.io.NativeSocketException
+import fr.acinq.lightning.io.OfferInvoiceReceived
+import fr.acinq.lightning.io.OfferNotPaid
 import fr.acinq.lightning.io.PaymentNotSent
 import fr.acinq.lightning.io.PaymentProgress
 import fr.acinq.lightning.io.PaymentSent
+import fr.acinq.lightning.io.PayOffer
 import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.io.PeerEvent
+import fr.acinq.lightning.io.SendPaymentResult
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.payment.OutgoingPaymentFailure
 import fr.acinq.lightning.utils.Connection
+import fr.acinq.lightning.utils.UUID
+import fr.acinq.lightning.utils.copyTo
+import fr.acinq.lightning.utils.toByteArray
+import fr.acinq.lightning.utils.toNSData
 import fr.acinq.lightning.wire.LiquidityAds
-import fr.acinq.phoenix.PhoenixBusiness
+import fr.acinq.lightning.wire.OfferTypes
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import platform.Foundation.NSData
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Class types from lightning-kmp & bitcoin-kmp are not exported to iOS unless we explicitly
@@ -451,6 +470,15 @@ fun LightningOutgoingPayment.Part.Status.Failure.asTooManyPendingPayments():
         LightningOutgoingPayment.Part.Status.Failure.TooManyPendingPayments? =
     (this as? LightningOutgoingPayment.Part.Status.Failure.TooManyPendingPayments)
 
+fun Lightning_randomBytes32(): ByteVector32 = Lightning.randomBytes32()
+fun Lightning_randomBytes64(): ByteVector64 = Lightning.randomBytes64()
+fun Lightning_randomKey(): PrivateKey = Lightning.randomKey()
+
+fun NSData_toByteArray(data: NSData): ByteArray = data.toByteArray()
+fun NSData_copyTo(data: NSData, buffer: ByteArray, offset: Int = 0) = data.copyTo(buffer, offset)
+fun ByteArray_toNSDataSlice(buffer: ByteArray, offset: Int, length: Int): NSData = buffer.toNSData(offset = offset, length = length)
+fun ByteArray_toNSData(buffer: ByteArray): NSData = buffer.toNSData()
+
 /**
  * The class LiquidityAds.LeaseRate is NOT exposed to iOS.
  * That is, it's exposed via Objective-C, but cannot be mapped to Swift.
@@ -583,4 +611,48 @@ fun WalletState.WalletWithConfirmations._spendExpiredSwapIn(
     feerate: FeeratePerKw
 ): Pair<Transaction, Satoshi>? {
     return this.spendExpiredSwapIn(swapInKeys, scriptPubKey, feerate)
+}
+
+suspend fun Peer.altPayOffer(
+    paymentId: UUID,
+    amount: MilliSatoshi,
+    offer: OfferTypes.Offer,
+    payerKey: PrivateKey,
+    payerNote: String?,
+    fetchInvoiceTimeoutInSeconds: Int
+): SendPaymentResult {
+    val res = CompletableDeferred<SendPaymentResult>()
+    this.launch {
+        res.complete(eventsFlow
+            .filterIsInstance<SendPaymentResult>()
+            .filter { it.request.paymentId == paymentId }
+            .first()
+        )
+    }
+    send(PayOffer(paymentId, payerKey, payerNote, amount, offer, fetchInvoiceTimeoutInSeconds.seconds))
+    return res.await()
+}
+
+suspend fun Peer.betterPayOffer(
+    paymentId: UUID,
+    amount: MilliSatoshi,
+    offer: OfferTypes.Offer,
+    payerKey: PrivateKey,
+    payerNote: String?,
+    fetchInvoiceTimeoutInSeconds: Int
+): OfferNotPaid? {
+    val res = CompletableDeferred<OfferNotPaid?>()
+    launch {
+        eventsFlow.collect {
+            if (it is OfferNotPaid && it.request.paymentId == paymentId) {
+                res.complete(it)
+                cancel()
+            } else if (it is OfferInvoiceReceived && it.request.paymentId == paymentId) {
+                res.complete(null)
+                cancel()
+            }
+        }
+    }
+    send(PayOffer(paymentId, payerKey, payerNote, amount, offer, fetchInvoiceTimeoutInSeconds.seconds))
+    return res.await()
 }

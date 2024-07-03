@@ -160,8 +160,8 @@ struct SummaryView: View {
 		let payment = paymentInfo.payment
 		let paymentState = payment.state()
 		
-		if paymentState == WalletPaymentState.successonchain ||
-		   paymentState == WalletPaymentState.successoffchain
+		if paymentState == WalletPaymentState.successOnChain ||
+		   paymentState == WalletPaymentState.successOffChain
 		{
 			Image("ic_payment_sent")
 				.renderingMode(.template)
@@ -200,7 +200,7 @@ struct SummaryView: View {
 			}
 			.padding(.bottom, 30)
 			
-		} else if paymentState == WalletPaymentState.pendingonchain {
+		} else if paymentState == WalletPaymentState.pendingOnChain {
 			
 			Image(systemName: "hourglass.circle")
 				.renderingMode(.template)
@@ -224,7 +224,7 @@ struct SummaryView: View {
 			} // </VStack>
 			.padding(.bottom, 30)
 			
-		} else if paymentState == WalletPaymentState.pendingoffchain {
+		} else if paymentState == WalletPaymentState.pendingOffChain {
 			
 			Image("ic_payment_sending")
 				.renderingMode(.template)
@@ -861,7 +861,8 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			paymentServiceRow()
 			paymentDescriptionRow()
 			paymentMessageRow()
-			paymentNotesRow()
+			customNotesRow()
+			attachedMessageRow()
 			paymentTypeRow()
 			channelClosingRow()
 			
@@ -1061,7 +1062,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func paymentNotesRow() -> some View {
+	func customNotesRow() -> some View {
 		let identifier: String = #function
 		
 		if let notes = paymentInfo.metadata.userNotes, notes.count > 0 {
@@ -1079,6 +1080,40 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			} valueColumn: {
 				
 				Text(notes)
+				
+			} // </InfoGridRow>
+		}
+	}
+	
+	@ViewBuilder
+	func attachedMessageRow() -> some View {
+		
+		let identifier: String = #function
+		
+		if let msg = paymentInfo.attachedMessage() {
+			
+			InfoGridRow(
+				identifier: identifier,
+				vAlignment: .firstTextBaseline,
+				hSpacing: horizontalSpacingBetweenColumns,
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
+			) {
+				
+				keyColumn("Message")
+				
+			} valueColumn: {
+				
+				VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+					Text(msg)
+					if paymentInfo.payment.isIncoming() {
+						Text("Be careful with messages from unknown sources")
+							.foregroundColor(.secondary)
+							.font(.subheadline)
+					}
+				}
+				
+				
 				
 			} // </InfoGridRow>
 		}

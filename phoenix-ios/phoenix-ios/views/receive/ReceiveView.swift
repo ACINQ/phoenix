@@ -15,18 +15,21 @@ struct ReceiveView: MVIView {
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
 	
-	enum Tab: Int, CaseIterable, Identifiable {
-		case lightning = 0
-		case blockchain = 1
+	// The order of items within this enum controls the order in the UI.
+	// If you change the order, you might also consider changing the initial value for `selectedTab`.
+	enum Tab: CaseIterable, Identifiable {
+		case lightning
+		case blockchain
 
 		var id: Self { self }
 	}
 	
 	@State var selectedTab: Tab = .lightning
 	
-	@State var receiveLightningView_didAppear = false
+	@State var lightningInvoiceView_didAppear = false
 	@State var showSendView = false
 	
+	@StateObject var inboundFeeState = InboundFeeState()
 	@StateObject var toast = Toast()
 	
 	@Environment(\.colorScheme) var colorScheme
@@ -81,6 +84,7 @@ struct ReceiveView: MVIView {
 						removal: .opacity
 					)
 				)
+				.navigationBarItems(trailing: scanButton())
 		}
 	}
 	
@@ -90,20 +94,27 @@ struct ReceiveView: MVIView {
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 		
 			TabView(selection: $selectedTab) {
-				
-				ReceiveLightningView(
-					mvi: mvi,
-					toast: toast,
-					didAppear: $receiveLightningView_didAppear,
-					showSendView: $showSendView
-				)
-				.tag(Tab.lightning)
-				
-				SwapInView(
-					toast: toast
-				)
-				.tag(Tab.blockchain)
-			}
+				ForEach(Tab.allCases) { tab in
+					
+					switch tab {
+					case .lightning:
+						LightningDualView(
+							mvi: mvi,
+							inboundFeeState: inboundFeeState,
+							toast: toast,
+							didAppear: $lightningInvoiceView_didAppear
+						)
+						.tag(Tab.lightning)
+						
+					case .blockchain:
+						SwapInView(
+							toast: toast
+						)
+						.tag(Tab.blockchain)
+						
+					} // </switch>
+				} // </ForEach>
+			} // </TabView>
 			.tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
 			
 			customTabViewStyle()
@@ -137,7 +148,7 @@ struct ReceiveView: MVIView {
 			} label: {
 				Image(systemName: "chevron.backward")
 			}
-			.disabled(selectedTab == Tab.lightning)
+			.disabled(selectedTab == Tab.allCases.first!)
 			
 			Spacer()
 			customTabViewStyle_Icons()
@@ -148,7 +159,7 @@ struct ReceiveView: MVIView {
 			} label: {
 				Image(systemName: "chevron.forward")
 			}
-			.disabled(selectedTab == Tab.blockchain)
+			.disabled(selectedTab == Tab.allCases.last!)
 			
 		} // </HStack>
 	}
@@ -193,6 +204,18 @@ struct ReceiveView: MVIView {
 		} // </HStack>
 	}
 	
+	@ViewBuilder
+	func scanButton() -> some View {
+		
+		Button {
+			withAnimation {
+				showSendView = true
+			}
+		} label: {
+			Image(systemName: "qrcode.viewfinder")
+		}
+	}
+	
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
@@ -228,7 +251,7 @@ struct ReceiveView: MVIView {
 	// --------------------------------------------------
 	
 	/// Shared logic. Used by:
-	/// - ReceiveLightningView
+	/// - LightningDualView
 	/// - SwapInView
 	///
 	static func qrCodeBorderColor(_ colorScheme: ColorScheme) -> Color {
