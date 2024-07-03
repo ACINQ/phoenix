@@ -68,8 +68,7 @@ class AppViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        service?.shutdown()
-        log.debug("AppViewModel has been cleared")
+        log.info("AppViewModel cleared")
     }
 
     companion object {
