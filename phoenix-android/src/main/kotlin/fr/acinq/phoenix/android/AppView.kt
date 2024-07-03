@@ -312,8 +312,10 @@ fun AppView(
                                     val previousNav = navController.previousBackStackEntry
                                     if (fromEvent && previousNav?.destination?.route == Screen.ScanData.route) {
                                         popToHome(navController)
-                                    } else {
+                                    } else if (navController.previousBackStackEntry != null){
                                         navController.popBackStack()
+                                    } else {
+                                        popToHome(navController)
                                     }
                                 },
                                 fromEvent = fromEvent

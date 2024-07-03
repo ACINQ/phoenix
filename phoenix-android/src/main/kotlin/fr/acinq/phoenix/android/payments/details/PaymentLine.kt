@@ -160,7 +160,10 @@ fun PaymentLine(
                 || (payment is SpliceCpfpOutgoingPayment && payment.confirmedAt == null)) {
                 Text(text = stringResource(id = R.string.paymentline_outgoing_unconfirmed), style = MaterialTheme.typography.caption.copy(fontSize = 12.sp))
             } else {
-                Text(text = payment.createdAt.toRelativeDateString(), style = MaterialTheme.typography.caption.copy(fontSize = 12.sp))
+                Row {
+                    Text(text = payment.createdAt.toRelativeDateString(), style = MaterialTheme.typography.caption.copy(fontSize = 12.sp), maxLines = 1)
+                    PaymentContactInfo(paymentInfo = paymentInfo)
+                }
             }
         }
     }
@@ -177,9 +180,6 @@ private fun PaymentDescription(paymentInfo: WalletPaymentInfo, modifier: Modifie
         null -> stringResource(id = R.string.paymentdetails_desc_closing_channel) // not sure yet, but we still know it's a closing
         true -> stringResource(id = R.string.paymentdetails_desc_legacy_migration)
         false -> metadata.userDescription
-            ?: metadata.lnurl?.pay?.metadata?.lnid?.takeIf { it.isNotBlank() }?.let {
-                stringResource(id = R.string.paymentdetails_desc_to, it)
-            }
             ?: metadata.lnurl?.description
             ?: payment.incomingOfferMetadata()?.let { offerMetadata ->
                 val contactsManager = business.contactsManager
@@ -187,35 +187,12 @@ private fun PaymentDescription(paymentInfo: WalletPaymentInfo, modifier: Modifie
                     value = contactsManager.getContactForPayerPubkey(offerMetadata.payerKey)
                 })
 
-                when (val contact = contactForKey.value) {
-                    null -> when (val note = offerMetadata.payerNote) {
-                        null -> null
-                        else -> stringResource(id = R.string.paymentdetails_desc_from_unknown_with_note, note)
-                    }
-                    else -> when (val note = offerMetadata.payerNote) {
-                        null -> stringResource(id = R.string.paymentdetails_desc_from, contact.name)
-                        else -> stringResource(id = R.string.paymentdetails_desc_from_with_note, contact.name, note)
-                    }
+                when (contactForKey.value) {
+                    null -> null
+                    else -> offerMetadata.payerNote
                 }
             }
-            ?: payment.outgoingInvoiceRequest()?.let { request ->
-                val offer = request.offer
-                val contactsManager = business.contactsManager
-                val contactForOffer = produceState<ContactInfo?>(initialValue = null, producer = {
-                    value = contactsManager.getContactForOffer(offer)
-                })
-
-                when (val contact = contactForOffer.value) {
-                    null -> when (val note = request.payerNote) {
-                        null -> null
-                        else -> stringResource(id = R.string.paymentdetails_desc_to_unknown_with_note, note)
-                    }
-                    else -> when (val note = request.payerNote) {
-                        null -> stringResource(id = R.string.paymentdetails_desc_to, contact.name)
-                        else -> stringResource(id = R.string.paymentdetails_desc_to_with_note, contact.name, note)
-                    }
-                }
-            }
+            ?: payment.outgoingInvoiceRequest()?.payerNote
             ?: payment.smartDescription(context)
     }
 
@@ -309,4 +286,56 @@ private fun PaymentIconComponent(
             )
         }
     }
+}
+
+@Composable
+private fun PaymentContactInfo(
+    paymentInfo: WalletPaymentInfo
+) {
+    val offerMetadata = paymentInfo.payment.incomingOfferMetadata()
+    if (offerMetadata != null) {
+        val contactsManager = business.contactsManager
+        val contactForKey = produceState<ContactInfo?>(initialValue = null, producer = {
+            value = contactsManager.getContactForPayerPubkey(offerMetadata.payerKey)
+        })
+
+        when (val contact = contactForKey.value) {
+            null -> Unit
+            else -> FromToNameView(isOutgoing = false, userName = contact.name)
+        }
+        return
+    }
+
+    val invoiceRequest = paymentInfo.payment.outgoingInvoiceRequest()
+    if (invoiceRequest != null) {
+        val offer = invoiceRequest.offer
+        val contactsManager = business.contactsManager
+        val contactForOffer = produceState<ContactInfo?>(initialValue = null, producer = {
+            value = contactsManager.getContactForOffer(offer)
+        })
+
+        when (val contact = contactForOffer.value) {
+            null -> Unit
+            else -> FromToNameView(isOutgoing = true, userName = contact.name)
+        }
+        return
+    }
+
+    val lnid = paymentInfo.metadata.lnurl?.pay?.metadata?.lnid?.takeIf { it.isNotBlank() }
+    if (!lnid.isNullOrBlank()) {
+        FromToNameView(isOutgoing = true, userName = lnid)
+    }
+}
+
+@Composable
+private fun FromToNameView(isOutgoing: Boolean, userName: String) {
+    Spacer(modifier = Modifier.width(4.dp))
+    Text(text = "•", style = MaterialTheme.typography.caption.copy(fontSize = 12.sp))
+    Spacer(modifier = Modifier.width(4.dp))
+    Text(
+        text = if (isOutgoing) stringResource(id = R.string.paymentdetails_desc_to, userName) else stringResource(id = R.string.paymentdetails_desc_from, userName),
+        style = MaterialTheme.typography.subtitle2.copy(fontSize = 12.sp),
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+    )
 }
