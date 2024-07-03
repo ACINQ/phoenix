@@ -29,6 +29,10 @@ struct SummaryView: View {
 	@State var didAppear = false
 	@State var popToDestination: PopToDestination? = nil
 	
+	@State var buttonListTruncationDetected_standard: Bool = false
+	@State var buttonListTruncationDetected_squeezed: Bool = false
+	@State var buttonListTruncationDetected_compact: Bool = false
+	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
@@ -472,65 +476,293 @@ struct SummaryView: View {
 	@ViewBuilder
 	func buttonList() -> some View {
 		
-		// Details | Edit | Delete
+		Group {
+			if buttonListTruncationDetected_compact {
+				buttonList_accessibility()
+			} else if buttonListTruncationDetected_squeezed {
+				buttonList_compact()
+			} else if buttonListTruncationDetected_standard {
+				buttonList_squeezed()
+			} else {
+				buttonList_standard()
+			}
+		} // </Group>
+		.confirmationDialog("Delete payment?",
+			isPresented: $showDeletePaymentConfirmationDialog,
+			titleVisibility: Visibility.hidden
+		) {
+			Button("Delete payment", role: ButtonRole.destructive) {
+				deletePayment()
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func buttonList_standard() -> some View {
+		
+		// We're making all the buttons the same size.
+		//
+		// ---------------------------
+		//  Details |  Edit  | Delete
+		// ---------------------------
+		//   ^          ^         ^    < same size
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 16) {
 			
-			NavigationLink(destination: detailsView()) {
-				Label {
-					Text("Details")
-				} icon: {
-					Image(systemName: "magnifyingglass").imageScale(.small)
+			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+				NavigationLink(destination: detailsView()) {
+					buttonLabel_details()
+						.lineLimit(1)
 				}
 				.frame(minWidth: buttonWidth, alignment: Alignment.trailing)
 				.read(buttonWidthReader)
 				.read(buttonHeightReader)
+			} wasTruncated: {
+				log.debug("buttonListTruncationDetected_standard = true (details)")
+				buttonListTruncationDetected_standard = true
 			}
 			
 			if let buttonHeight = buttonHeight {
 				Divider().frame(height: buttonHeight)
 			}
 			
-			NavigationLink(destination: editInfoView()) {
-				Label {
-					Text("Edit")
-				} icon: {
-					Image(systemName: "pencil.line").imageScale(.small)
+			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+				NavigationLink(destination: editInfoView()) {
+					buttonLabel_edit()
 				}
-				.frame(minWidth: buttonWidth, alignment: Alignment.center)
+				.frame(minWidth: buttonWidth, alignment: Alignment.trailing)
 				.read(buttonWidthReader)
 				.read(buttonHeightReader)
+			} wasTruncated: {
+				log.debug("buttonListTruncationDetected_standard = true (edit)")
+				buttonListTruncationDetected_standard = true
 			}
 			
 			if let buttonHeight = buttonHeight {
 				Divider().frame(height: buttonHeight)
 			}
 			
-			Button {
-				showDeletePaymentConfirmationDialog = true
-			} label: {
-				Label {
-					Text("Delete")
-				} icon: {
-					Image(systemName: "eraser.line.dashed").imageScale(.small)
+			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+				Button {
+					showDeletePaymentConfirmationDialog = true
+				} label: {
+					buttonLabel_delete()
 				}
-				.foregroundColor(.appNegative)
 				.frame(minWidth: buttonWidth, alignment: Alignment.leading)
 				.read(buttonWidthReader)
 				.read(buttonHeightReader)
-			}
-			.confirmationDialog("Delete payment?",
-				isPresented: $showDeletePaymentConfirmationDialog,
-				titleVisibility: Visibility.hidden
-			) {
-				Button("Delete payment", role: ButtonRole.destructive) {
-					deletePayment()
-				}
+			} wasTruncated: {
+				log.debug("buttonListTruncationDetected_standard = true (delete)")
+				buttonListTruncationDetected_standard = true
 			}
 		}
-		.padding([.top, .bottom])
+		.padding(.all)
 		.assignMaxPreference(for: buttonWidthReader.key, to: $buttonWidth)
 		.assignMaxPreference(for: buttonHeightReader.key, to: $buttonHeight)
+	}
+	
+	@ViewBuilder
+	func buttonList_squeezed() -> some View {
+		
+		// There's not enough space to make all the buttons the same size.
+		// So we're just making the left & right buttons the same size.
+		// This still ensures that the center button is perfectly centered on screen.
+		//
+		// ---------------------------
+		//  Details |  Edit  | Delete
+		// ---------------------------
+		//   ^                    ^    < same size
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 16) {
+			
+			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+				NavigationLink(destination: detailsView()) {
+					buttonLabel_details()
+						.lineLimit(1)
+				}
+				.frame(minWidth: buttonWidth, alignment: Alignment.trailing)
+				.read(buttonWidthReader)
+				.read(buttonHeightReader)
+			} wasTruncated: {
+				log.debug("buttonListTruncationDetected_squeezed = true (edit)")
+				buttonListTruncationDetected_squeezed = true
+			}
+			
+			if let buttonHeight = buttonHeight {
+				Divider().frame(height: buttonHeight)
+			}
+			
+			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+				NavigationLink(destination: editInfoView()) {
+					buttonLabel_edit()
+						.lineLimit(1)
+				}
+				.read(buttonHeightReader)
+			} wasTruncated: {
+				log.debug("buttonListTruncationDetected_squeezed = true (edit)")
+				buttonListTruncationDetected_squeezed = true
+			}
+			
+			if let buttonHeight = buttonHeight {
+				Divider().frame(height: buttonHeight)
+			}
+			
+			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+				Button {
+					showDeletePaymentConfirmationDialog = true
+				} label: {
+					buttonLabel_delete()
+						.lineLimit(1)
+				}
+				.frame(minWidth: buttonWidth, alignment: Alignment.leading)
+				.read(buttonWidthReader)
+				.read(buttonHeightReader)
+			} wasTruncated: {
+				log.debug("buttonListTruncationDetected_squeezed = true (delete)")
+				buttonListTruncationDetected_squeezed = true
+			}
+		}
+		.padding(.horizontal, 10) // allow content to be closer to edges
+		.padding(.vertical)
+		.assignMaxPreference(for: buttonWidthReader.key, to: $buttonWidth)
+		.assignMaxPreference(for: buttonHeightReader.key, to: $buttonHeight)
+	}
+	
+	@ViewBuilder
+	func buttonList_compact() -> some View {
+		
+		// There's a large font being used, and possibly a small screen too.
+		// Thus horizontal space is tight.
+		//
+		// So we're going to just try to squeeze all the buttons into a single line.
+		//
+		// -----------------------
+		// Details | Edit | Delete
+		// -----------------------
+		//             ^ might not be centered, but at least the buttons fit on 1 line
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 8) {
+			
+			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+				NavigationLink(destination: detailsView()) {
+					buttonLabel_details()
+						.lineLimit(1)
+				}
+				.read(buttonHeightReader)
+			} wasTruncated: {
+				log.debug("buttonListTruncationDetected_compact = true (details)")
+				buttonListTruncationDetected_compact = true
+			}
+			
+			if let buttonHeight = buttonHeight {
+				Divider().frame(height: buttonHeight)
+			}
+			
+			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+				NavigationLink(destination: editInfoView()) {
+					buttonLabel_edit()
+						.lineLimit(1)
+				}
+				.read(buttonHeightReader)
+			} wasTruncated: {
+				log.debug("buttonListTruncationDetected_compact = true (edit)")
+				buttonListTruncationDetected_compact = true
+			}
+			
+			if let buttonHeight = buttonHeight {
+				Divider().frame(height: buttonHeight)
+			}
+			
+			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+				Button {
+					showDeletePaymentConfirmationDialog = true
+				} label: {
+					buttonLabel_delete()
+						.lineLimit(1)
+				}
+				.read(buttonHeightReader)
+			} wasTruncated: {
+				log.debug("buttonListTruncationDetected_compact = true (delete)")
+				buttonListTruncationDetected_compact = true
+			}
+		}
+		.padding(.horizontal, 4) // allow content to be closer to edges
+		.padding(.vertical)
+		.assignMaxPreference(for: buttonHeightReader.key, to: $buttonHeight)
+	}
+	
+	@ViewBuilder
+	func buttonList_accessibility() -> some View {
+		
+		// There's a large font being used, and possibly a small screen too.
+		// Horizontal space is so tight that we can't get the 3 buttons on a single line.
+		//
+		// So we're going to put them on multiple lines.
+		//
+		// --------------
+		// Details | Edit
+		//     Delete
+		// --------------
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 16) {
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 8) {
+				
+				NavigationLink(destination: detailsView()) {
+					buttonLabel_details()
+						.read(buttonHeightReader)
+				}
+				
+				if let buttonHeight = buttonHeight {
+					Divider().frame(height: buttonHeight)
+				}
+				
+				NavigationLink(destination: editInfoView()) {
+					buttonLabel_edit()
+						.read(buttonHeightReader)
+				}
+			}
+				
+			Button {
+				showDeletePaymentConfirmationDialog = true
+			} label: {
+				buttonLabel_delete()
+			}
+		}
+		.padding(.horizontal, 4) // allow content to be closer to edges
+		.padding(.vertical)
+		.assignMaxPreference(for: buttonHeightReader.key, to: $buttonHeight)
+	}
+	
+	@ViewBuilder
+	func buttonLabel_details() -> some View {
+		
+		Label {
+			Text("Details")
+		} icon: {
+			Image(systemName: "magnifyingglass").imageScale(.small)
+		}
+	}
+	
+	@ViewBuilder
+	func buttonLabel_edit() -> some View {
+		
+		Label {
+			Text("Edit")
+		} icon: {
+			Image(systemName: "pencil.line").imageScale(.small)
+		}
+	}
+	
+	@ViewBuilder
+	func buttonLabel_delete() -> some View {
+		
+		Label {
+			Text("Delete")
+		} icon: {
+			Image(systemName: "eraser.line.dashed").imageScale(.small)
+		}
+		.foregroundColor(.appNegative)
 	}
 	
 	@ViewBuilder
