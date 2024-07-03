@@ -161,7 +161,7 @@ fun PaymentLine(
                 Text(text = stringResource(id = R.string.paymentline_outgoing_unconfirmed), style = MaterialTheme.typography.caption.copy(fontSize = 12.sp))
             } else {
                 Row {
-                    Text(text = payment.createdAt.toRelativeDateString(), style = MaterialTheme.typography.caption.copy(fontSize = 12.sp))
+                    Text(text = payment.createdAt.toRelativeDateString(), style = MaterialTheme.typography.caption.copy(fontSize = 12.sp), maxLines = 1)
                     PaymentContactInfo(paymentInfo = paymentInfo)
                 }
             }
@@ -334,6 +334,8 @@ private fun FromToNameView(isOutgoing: Boolean, userName: String) {
     Spacer(modifier = Modifier.width(4.dp))
     Text(
         text = if (isOutgoing) stringResource(id = R.string.paymentdetails_desc_to, userName) else stringResource(id = R.string.paymentdetails_desc_from, userName),
-        style = MaterialTheme.typography.subtitle2.copy(fontSize = 12.sp)
+        style = MaterialTheme.typography.subtitle2.copy(fontSize = 12.sp),
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
     )
 }
