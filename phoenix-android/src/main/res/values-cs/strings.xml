@@ -307,7 +307,10 @@
     <string name="paymentdetails_desc_cpfp">Postrčit transakci</string>
     <string name="paymentdetails_desc_swapout">Swap-out do %1$s</string>
     <string name="paymentdetails_desc_swapin">On-Chain vklad</string>
-    <string name="paymentdetails_desc_to">Platba pro %1$s</string>
+
+    <string name="paymentdetails_desc_to">pro %1$s</string>
+    <string name="paymentdetails_desc_from">od %1$s</string>
+    <string name="paymentdetails_desc_unknown">Neznámé</string>
 
     <string name="paymentdetails_edit_dialog_title">Přidat vlastní popis k této platbě</string>
     <string name="paymentdetails_edit_dialog_input_label">Popis</string>

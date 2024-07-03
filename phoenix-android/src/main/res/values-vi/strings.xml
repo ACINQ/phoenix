@@ -355,7 +355,10 @@
     <string name="paymentdetails_desc_inbound_liquidity">+%1$s thanh khoản đầu vào</string>
     <string name="paymentdetails_desc_swapout">Swap-out thành %1$s</string>
     <string name="paymentdetails_desc_swapin">Tiền cọc on-chain</string>
-    <string name="paymentdetails_desc_to">Khoản thanh toán cho %1$s</string>
+
+    <string name="paymentdetails_desc_to">đến %1$s</string>
+    <string name="paymentdetails_desc_from">từ %1$s</string>
+    <string name="paymentdetails_desc_unknown">Không xác định</string>
 
     <string name="paymentdetails_edit_dialog_title">Thêm mô tả tùy chọn cho khoản thanh toán này</string>
     <string name="paymentdetails_edit_dialog_input_label">Mô tả</string>
