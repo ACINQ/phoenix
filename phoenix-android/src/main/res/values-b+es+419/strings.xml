@@ -268,7 +268,7 @@
     <string name="home__balance_loading">Cargando…</string>
     <string name="home__onchain_incoming">+%1$s</string>
 
-    <string name="home__faq_button">Preguntas frecuentes</string>
+    <string name="home__faq_button">FAQ</string>
     <string name="home__payments_none">Usa los botones Recibir y Enviar en la parte inferior de esta pantalla para empezar.</string>
     <string name="home__payments_more_button">Mostrar todos los pagos…</string>
     <string name="home__connection__electrum_late">Retraso de Electrum</string>
