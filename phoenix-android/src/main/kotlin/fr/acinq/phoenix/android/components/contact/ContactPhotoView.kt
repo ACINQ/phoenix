@@ -18,14 +18,12 @@ package fr.acinq.phoenix.android.components.contact
 
 import android.Manifest
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.result.launch
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -55,10 +53,7 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.utils.BitmapHelper
-import fr.acinq.phoenix.android.utils.createContactPictureUri
-import fr.acinq.phoenix.android.utils.mutedBgColor
-import java.io.ByteArrayOutputStream
+import fr.acinq.phoenix.android.utils.borderColor
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -67,11 +62,10 @@ fun ContactPhotoView(
     name: String?,
     onChange: ((String?) -> Unit)?,
     imageSize: Dp = 96.dp,
-    borderSize: Dp = 4.dp
 ) {
     val context = LocalContext.current
 
-    val tempPhotoUri by remember { mutableStateOf(photoUri?.let { Uri.parse(it) } ?: context.createContactPictureUri()) }
+    val tempPhotoUri by remember { mutableStateOf(photoUri?.let { Uri.parse(it) }) }
     var realUri by remember { mutableStateOf<Uri?>(null) }
     val bitmap: ImageBitmap? = remember(tempPhotoUri) {
         realUri?.let { uri ->
@@ -92,8 +86,7 @@ fun ContactPhotoView(
     )
     Surface(
         shape = CircleShape,
-        border = BorderStroke(width = borderSize, color = MaterialTheme.colors.surface),
-        elevation = 1.dp,
+        border = bitmap?.let { BorderStroke(width = 1.dp, color = borderColor) },
         modifier = if (onChange != null) {
             Modifier.clickable(
                 role = Role.Button,
@@ -116,11 +109,10 @@ fun ContactPhotoView(
             )
         } else Modifier
     ) {
-
         if (bitmap == null) {
             Image(
                 painter = painterResource(id = R.drawable.ic_contact_placeholder),
-                colorFilter = ColorFilter.tint(mutedBgColor),
+                colorFilter = ColorFilter.tint(borderColor),
                 contentDescription = name,
                 modifier = Modifier.size(imageSize)
             )

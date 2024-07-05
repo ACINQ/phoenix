@@ -146,7 +146,7 @@ fun WalletPayment.smartDescription(context: Context): String? = when (this) {
     is LightningOutgoingPayment -> when (val details = this.details) {
         is LightningOutgoingPayment.Details.Normal -> details.paymentRequest.desc
         is LightningOutgoingPayment.Details.SwapOut -> context.getString(R.string.paymentdetails_desc_swapout, details.address)
-        is LightningOutgoingPayment.Details.Blinded -> details.paymentRequest.invoiceRequest.payerNote ?: details.paymentRequest.description
+        is LightningOutgoingPayment.Details.Blinded -> details.paymentRequest.description
     }
     is IncomingPayment -> when (val origin = this.origin) {
         is IncomingPayment.Origin.Invoice -> origin.paymentRequest.description

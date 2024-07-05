@@ -274,7 +274,7 @@
     <string name="home__balance_loading">Đang tải…</string>
     <string name="home__onchain_incoming">+%1$s</string>
 
-    <string name="home__faq_button">Câu hỏi thường gặp</string>
+    <string name="home__faq_button">FAQ</string>
     <string name="home__payments_none">Sử dụng các nút Nhận và Gửi ở cuối màn hình này để bắt đầu!</string>
     <string name="home__payments_more_button">Hiển thị tất cả các khoản thanh toán…</string>
     <string name="home__connection__electrum_late">Electrum muộn</string>

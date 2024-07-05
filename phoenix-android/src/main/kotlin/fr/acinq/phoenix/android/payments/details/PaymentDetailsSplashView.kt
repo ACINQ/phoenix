@@ -74,6 +74,7 @@ import fr.acinq.phoenix.data.lnurl.LnurlPay
 import fr.acinq.phoenix.utils.extensions.WalletPaymentState
 import fr.acinq.phoenix.utils.extensions.minDepthForFunding
 import fr.acinq.phoenix.utils.extensions.incomingOfferMetadata
+import fr.acinq.phoenix.utils.extensions.outgoingInvoiceRequest
 import fr.acinq.phoenix.utils.extensions.state
 import io.ktor.http.Url
 import kotlinx.coroutines.delay
@@ -124,11 +125,15 @@ fun PaymentDetailsSplashView(
         }
 
         payment.incomingOfferMetadata()?.let { meta ->
-            meta.payerNote?.let {
+            meta.payerNote?.takeIf { it.isNotBlank() }?.let {
                 OfferPayerNote(payerNote = it)
                 Spacer(modifier = Modifier.height(8.dp))
             }
-            OfferSentBy(payerPubkey = meta.payerKey)
+            OfferSentBy(payerPubkey = meta.payerKey, !meta.payerNote.isNullOrBlank())
+        }
+
+        payment.outgoingInvoiceRequest()?.payerNote?.takeIf { it.isNotBlank() }?.let {
+            OfferPayerNote(payerNote = it)
         }
 
         PaymentDescriptionView(data = data, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
@@ -449,7 +454,7 @@ private fun OfferPayerNote(payerNote: String) {
 }
 
 @Composable
-private fun OfferSentBy(payerPubkey: PublicKey?) {
+private fun OfferSentBy(payerPubkey: PublicKey?, hasPayerNote: Boolean) {
     val contactsManager = business.contactsManager
     val contactState = remember { mutableStateOf<OfferContactState>(OfferContactState.Init) }
     LaunchedEffect(Unit) {
@@ -463,8 +468,10 @@ private fun OfferSentBy(payerPubkey: PublicKey?) {
             is OfferContactState.Init -> Text(text = stringResource(id = R.string.utils_loading_data))
             is OfferContactState.NotFound -> {
                 Text(text = stringResource(id = R.string.paymentdetails_offer_sender_unknown))
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(text = stringResource(id = R.string.paymentdetails_offer_sender_unknown_details), style = MaterialTheme.typography.subtitle2)
+                if (hasPayerNote) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(text = stringResource(id = R.string.paymentdetails_offer_sender_unknown_details), style = MaterialTheme.typography.subtitle2)
+                }
             }
             is OfferContactState.Found -> {
                 ContactCompactView(
