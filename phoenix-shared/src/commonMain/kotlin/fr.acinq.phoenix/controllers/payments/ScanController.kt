@@ -19,10 +19,12 @@ package fr.acinq.phoenix.controllers.payments
 import fr.acinq.bitcoin.BitcoinError
 import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.utils.Either
+import fr.acinq.bitcoin.utils.Try
 import fr.acinq.lightning.*
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.io.PayInvoice
 import fr.acinq.lightning.logging.LoggerFactory
+import fr.acinq.lightning.logging.debug
 import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.controllers.AppController
@@ -31,19 +33,29 @@ import fr.acinq.phoenix.data.lnurl.*
 import fr.acinq.phoenix.db.payments.WalletPaymentMetadataRow
 import fr.acinq.phoenix.managers.*
 import fr.acinq.phoenix.utils.Parser
-import fr.acinq.phoenix.utils.extensions.chain
 import fr.acinq.lightning.logging.error
 import fr.acinq.lightning.logging.info
+import fr.acinq.lightning.logging.warning
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.wire.OfferTypes
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.Url
+import io.ktor.serialization.kotlinx.json.json
+import io.ktor.utils.io.charsets.Charsets
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonPrimitive
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.ExperimentalTime
 import kotlin.time.TimeSource
 
 class AppScanController(
@@ -110,6 +122,11 @@ class AppScanController(
             processBolt11Invoice(it)
         } ?: Parser.readOffer(input)?.let {
             processOffer(it)
+        } ?: readEmailLikeAddress(input)?.let {
+            when (it) {
+                is Either.Left -> processOffer(it.value)
+                is Either.Right -> processLnurl(it.value)
+            }
         } ?: readLnurl(input)?.let {
             processLnurl(it)
         } ?: readBitcoinAddress(input)?.let {
@@ -414,7 +431,6 @@ class AppScanController(
         )
     }
 
-    @OptIn(ExperimentalTime::class)
     private suspend fun processLnurlAuth(
         intent: Scan.Intent.LnurlAuthFlow.Login
     ) {
@@ -491,6 +507,95 @@ class AppScanController(
             Scan.BadRequestReason.AlreadyPaidInvoice
         } else {
             null
+        }
+    }
+
+    private suspend fun readEmailLikeAddress(input: String): Either<OfferTypes.Offer, Lnurl.Request>? {
+
+        if (!input.contains("@", ignoreCase = true)) return null
+
+        // Ignore excess input, including additional lines, and leading/trailing whitespace
+        val line = input.lines().firstOrNull { it.isNotBlank() }?.trim()
+        val token = line?.split("\\s+".toRegex())?.firstOrNull()
+
+        if (token.isNullOrBlank()) return null
+
+        val components = token.split("@")
+        if (components.size != 2) {
+            throw RuntimeException("identifier must contain one @ delimiter")
+        }
+
+        val username = components[0].lowercase()
+        val domain = components[1]
+
+        return resolveBip353Offer(username, domain)?.let {
+            Either.Left(it)
+        } ?: Either.Right(Lnurl.Request(Url("https://$domain/.well-known/lnurlp/$username"), tag = Lnurl.Tag.Pay))
+    }
+
+    val bip353HttpClient: HttpClient by lazy {
+        HttpClient {
+            install(ContentNegotiation) {
+                json(json = Json { ignoreUnknownKeys = true })
+                expectSuccess = true
+            }
+        }
+    }
+
+    /** Resolve dns-based offers. See https://github.com/bitcoin/bips/blob/master/bip-0353.mediawiki. */
+    private suspend fun resolveBip353Offer(
+        username: String,
+        domain: String,
+    ): OfferTypes.Offer? {
+        model(Scan.Model.ResolvingBip353)
+        val dnsPath = "$username.user._bitcoin-payment.$domain."
+
+        // list of resolvers: https://dnsprivacy.org/public_resolvers/
+        // curl https://dns.google/resolve?name=alice.acinq.co&type=TXT
+        // curl --http2 -H "accept: application/dns-json" "https://1.1.1.1/dns-query?name=bob.acinq.co&type=TXT"
+        // curl -H "accept: application/dns-json" "https://mozilla.cloudflare-dns.com/dns-query?name=alice.acinq.co&type=TXT"
+        val url = Url("https://dns.google/resolve?name=$dnsPath&type=TXT")
+
+        try {
+            val response = bip353HttpClient.get(url)
+            val json = Json.decodeFromString<JsonObject>(response.bodyAsText(Charsets.UTF_8))
+            logger.info { "dns resolved to ${json.toString().take(100)}" }
+
+            val status = json["Status"]?.jsonPrimitive?.intOrNull
+            if (status == null || status > 0) throw RuntimeException("invalid status=$status")
+
+            val ad = json["AD"]?.jsonPrimitive?.booleanOrNull
+            if (ad != true) {
+                logger.info { "AD false, abort dns lookup to $url" }
+                return null
+            }
+
+            val records = json["Answer"]?.jsonArray
+            if (records.isNullOrEmpty()) {
+                logger.debug { "no records for $url" }
+                return null
+            }
+
+            val matchingRecord = records.filterIsInstance<JsonObject>().firstOrNull {
+                logger.debug { "inspecting record=$it" }
+                it["name"]?.jsonPrimitive?.content == dnsPath
+            } ?: return null
+
+            val data = matchingRecord["data"]?.jsonPrimitive?.content ?: return null
+            if (!data.startsWith("bitcoin:")) return null
+            val offerString = data.substringAfter("lno=").substringBefore("?")
+            if (offerString.isBlank()) return null
+
+            return when (val offer = OfferTypes.Offer.decode(offerString)) {
+                is Try.Success -> { offer.result }
+                is Try.Failure -> {
+                    model(Scan.Model.BadRequest(request = url.toString(), reason = Scan.BadRequestReason.InvalidBip353(url)))
+                    null
+                }
+            }
+        } catch (e: Exception) {
+            logger.error(e) { "error when resolving offer on $dnsPath: ${e.message}" }
+            return null
         }
     }
 

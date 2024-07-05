@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.controllers.payments
 
+import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
@@ -41,6 +42,7 @@ object Scan {
         data class ChainMismatch(val expected: Chain) : BadRequestReason()
         data class ServiceError(val url: Url, val error: LnurlError.RemoteFailure) : BadRequestReason()
         data class InvalidLnurl(val url: Url) : BadRequestReason()
+        data class InvalidBip353(val url: Url) : BadRequestReason()
         data class UnsupportedLnurl(val url: Url) : BadRequestReason()
     }
 
@@ -82,6 +84,7 @@ object Scan {
         data class OnchainFlow(val uri: BitcoinUri): Model()
 
         object LnurlServiceFetch : Model()
+        object ResolvingBip353 : Model()
 
         sealed class LnurlPayFlow : Model() {
             abstract val paymentIntent: LnurlPay.Intent
