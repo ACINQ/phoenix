@@ -186,6 +186,8 @@
 		DC6D68272AC1DD5C0099929F /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = DC6D68262AC1DD5C0099929F /* Localizable.xcstrings */; };
 		DC6D68292AC1DD5C0099929F /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = DC6D68282AC1DD5C0099929F /* InfoPlist.xcstrings */; };
 		DC6F04232C35EB9900627B4F /* SummaryInfoGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F04222C35EB9900627B4F /* SummaryInfoGrid.swift */; };
+		DC6F04252C38807300627B4F /* PhotosManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F04242C38807300627B4F /* PhotosManager.swift */; };
+		DC6F04272C3895E300627B4F /* ContactPhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F04262C3895E300627B4F /* ContactPhoto.swift */; };
 		DC70A99C2BBB6093002DBFF8 /* InboundFeeWarning.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC70A99B2BBB6093002DBFF8 /* InboundFeeWarning.swift */; };
 		DC71E7302723240E0063613D /* KotlinObservables.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC71E72F2723240E0063613D /* KotlinObservables.swift */; };
 		DC71E7332728645B0063613D /* CurrencyConverterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC71E7322728645B0063613D /* CurrencyConverterView.swift */; };
@@ -576,6 +578,8 @@
 		DC6D68262AC1DD5C0099929F /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		DC6D68282AC1DD5C0099929F /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		DC6F04222C35EB9900627B4F /* SummaryInfoGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryInfoGrid.swift; sourceTree = "<group>"; };
+		DC6F04242C38807300627B4F /* PhotosManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotosManager.swift; sourceTree = "<group>"; };
+		DC6F04262C3895E300627B4F /* ContactPhoto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactPhoto.swift; sourceTree = "<group>"; };
 		DC70A99B2BBB6093002DBFF8 /* InboundFeeWarning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboundFeeWarning.swift; sourceTree = "<group>"; };
 		DC71E72F2723240E0063613D /* KotlinObservables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinObservables.swift; sourceTree = "<group>"; };
 		DC71E7322728645B0063613D /* CurrencyConverterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverterView.swift; sourceTree = "<group>"; };
@@ -775,6 +779,7 @@
 				DC6D26E229E76557006A7814 /* AnimatedClock.swift */,
 				DCB30E532A0AABAF00E7D7A2 /* InfoPopoverWindow.swift */,
 				DC3345D12C2C761800EDD2D4 /* CameraPicker.swift */,
+				DC6F04262C3895E300627B4F /* ContactPhoto.swift */,
 			);
 			path = widgets;
 			sourceTree = "<group>";
@@ -1115,6 +1120,7 @@
 				DC63BDF329AE44380067A361 /* NotificationsManager.swift */,
 				DCD7E0AE28EC3C0D009C30E5 /* WatchTower.swift */,
 				DC175C1B28F008AE0086B9A6 /* WalletReset.swift */,
+				DC6F04242C38807300627B4F /* PhotosManager.swift */,
 			);
 			path = officers;
 			sourceTree = "<group>";
@@ -1885,6 +1891,7 @@
 				DC63BDF429AE44380067A361 /* NotificationsManager.swift in Sources */,
 				DC118BFA27B44F840080BBAC /* TipSliderSheet.swift in Sources */,
 				DC2F431827B698E20006FCC4 /* ShareOptionsSheet.swift in Sources */,
+				DC6F04252C38807300627B4F /* PhotosManager.swift in Sources */,
 				DC72C33425A51AAC008A927A /* CurrencyPrefs.swift in Sources */,
 				DCE6FB8C28D0B5F200054511 /* ResetWalletView.swift in Sources */,
 				DC3345D02C2B4C1200EDD2D4 /* ManageContactSheet.swift in Sources */,
@@ -2005,6 +2012,7 @@
 				DCDAA7402971C29700B406A8 /* RecentPaymentsSelector.swift in Sources */,
 				DC2ABAD72BED081400C11C9C /* VibrationFeedback.swift in Sources */,
 				DCD5FF4326A0D34B009CC666 /* EqualSizes.swift in Sources */,
+				DC6F04272C3895E300627B4F /* ContactPhoto.swift in Sources */,
 				DCB62F472A5DF19D00912A71 /* KotlinPublishers+Lightning.swift in Sources */,
 				DC355E252A45FDD3008E8A8E /* NoticeMonitor.swift in Sources */,
 				F4AED298257A50CD009485C1 /* LogsConfigurationView.swift in Sources */,

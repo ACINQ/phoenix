@@ -17,7 +17,8 @@ struct ManageContactSheet: View {
 	@StateObject var toast = Toast()
 	
 	@State var name: String
-	@State var image: UIImage?
+	@State var updatedImage: UIImage?
+	@State var useUpdatedImage: Bool = false
 	
 	@State var showImageOptions: Bool = false
 	@State var isSaving: Bool = false
@@ -48,15 +49,8 @@ struct ManageContactSheet: View {
 		
 		if let existingContact = contact.wrappedValue {
 			self._name = State(initialValue: existingContact.name)
-			if let photoUri = existingContact.photoUri {
-				let uiimage = UIImage(contentsOfFile: photoUri)
-				self._image = State(initialValue: uiimage)
-			} else {
-				self._image = State(initialValue: nil)
-			}
 		} else {
 			self._name = State(initialValue: "")
-			self._image = State(initialValue: nil)
 		}
 	}
 	
@@ -78,10 +72,10 @@ struct ManageContactSheet: View {
 		.sheet(isPresented: activeSheetBinding()) { // SwiftUI only allows for 1 ".sheet"
 			switch activeSheet! {
 			case .camera:
-				CameraPicker(image: $image)
+				CameraPicker(image: $updatedImage)
 			
 			case .imagePicker:
-				ImagePicker(image: $image)
+				ImagePicker(image: $updatedImage)
 			
 			} // </switch>
 		}
@@ -148,7 +142,7 @@ struct ManageContactSheet: View {
 	func content_image() -> some View {
 		
 		Group {
-			if let uiimage = image {
+			if let uiimage = imageProxy {
 				Image(uiImage: uiimage)
 					.resizable()
 					.aspectRatio(contentMode: .fill) // FILL !
@@ -157,15 +151,6 @@ struct ManageContactSheet: View {
 					.resizable()
 					.aspectRatio(contentMode: .fit)
 					.foregroundColor(.gray)
-//				if #available(iOS 17, *) {
-//					Image("user_round_symbol")
-//						.resizable()
-//						.aspectRatio(contentMode: .fit)
-//				} else {
-//					Image("user_round")
-//						.resizable()
-//						.aspectRatio(contentMode: .fit)
-//				}
 			}
 		}
 		.frame(width: 150, height: 150)
@@ -190,9 +175,10 @@ struct ManageContactSheet: View {
 			} label: {
 				Text("Take photo")
 			}
-			if image != nil {
+			if hasImage {
 				Button("Clear image", role: ButtonRole.destructive) {
-					image = nil
+					updatedImage = nil
+					useUpdatedImage = true
 				}
 			}
 		} // </confirmationDialog>
@@ -299,6 +285,31 @@ struct ManageContactSheet: View {
 		return !trimmedName.isEmpty
 	}
 	
+	var imageProxy: UIImage? {
+		
+		if useUpdatedImage {
+			return updatedImage
+		} else if let img = updatedImage {
+			return img
+		} else if let fileName = contact?.photoUri {
+			let filePath = PhotosManager.shared.filePathForPhoto(fileName: fileName)
+			return UIImage(contentsOfFile: filePath)
+		} else {
+			return nil
+		}
+	}
+	
+	var hasImage: Bool {
+		
+		if useUpdatedImage {
+			return updatedImage != nil
+		} else if let _ = updatedImage {
+			return true
+		} else {
+			return contact?.photoUri != nil
+		}
+	}
+	
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
@@ -334,34 +345,52 @@ struct ManageContactSheet: View {
 		isSaving = true
 		Task { @MainActor in
 			
-			let c_name = trimmedName
-			let _ = image?.jpegData(compressionQuality: 1.0)
-			// Todo: save to disk
-			
-			let contactsManager = Biz.business.contactsManager
+			var success = false
 			do {
+				let updatedContactName = trimmedName
+				
+				let oldPhotoName: String? = contact?.photoUri
+				var newPhotoName: String? = nil
+				
+				if let newImg = updatedImage {
+					newPhotoName = try await PhotosManager.shared.writeToDisk(image: newImg)
+				} else if !useUpdatedImage {
+					newPhotoName = oldPhotoName
+				}
+				
+				log.debug("oldPhotoName: \(oldPhotoName ?? "<nil>")")
+				log.debug("newPhotoName: \(newPhotoName ?? "<nil>")")
+				
+				let contactsManager = Biz.business.contactsManager
 				let existingContact = try await contactsManager.getContactForOffer(offer: offer)
 				if let existingContact {
 					contact = try await contactsManager.updateContact(
 						contactId: existingContact.uuid,
-						name: c_name,
-						photoUri: nil,
+						name: updatedContactName,
+						photoUri: newPhotoName,
 						offers: existingContact.offers
 					)
 					
 				} else {
 					contact = try await contactsManager.saveNewContact(
-						name: c_name,
-						photoUri: nil,
+						name: updatedContactName,
+						photoUri: newPhotoName,
 						offer: offer
 					)
 				}
+				
+				if let oldPhotoName, oldPhotoName != newPhotoName {
+					log.debug("Deleting old photo from disk...")
+					try await PhotosManager.shared.deleteFromDisk(fileName: oldPhotoName)
+				}
+				
+				success = true
 			} catch {
 				log.error("contactsManager: error: \(error)")
 			}
 			
 			isSaving = false
-			if contact != nil {
+			if success {
 				smartModalState.close()
 			}
 			
