@@ -91,7 +91,11 @@
     <string name="receive_lightning_share_subject">Lightningová faktura</string>
     <string name="receive_lightning_share_title">Sdílet tuto Lightningovou fakturu s…</string>
     <string name="receive_lnurl_button">Použít LNURL odkaz</string>
+    <string name="receive_toggle_offer_new_overlay">NOVINKA!</string>
 
+    <string name="receive_offer_share_title">Statická Lightning faktura</string>
+    <string name="receive_offer_share_subject">Sdílet tuto statickou Lightning fakturu s…</string>
+    
     <string name="receive_lightning_edit_button">Upravit</string>
     <string name="receive_lightning_edit_title">Upravit fakturu</string>
     <string name="receive_lightning_edit_amount_label">Částka (volitelné)</string>
@@ -119,6 +123,16 @@
     <string name="send_trampoline_amountless_warning_details">Faktura pro tuto platbu nevyžaduje konkrétní částku. Toho mohou zneužít škodlivé uzly během platby. \n\nPro jistotu <b>požádejte příjemce, aby při generování faktury uvedl částku</b>.</string>
     <string name="send_connecting_button">Připojování…</string>
     <string name="send_pay_button">Zaplatit</string>
+    <string name="send_pay_retry_button">Zkusit znovu</string>
+
+    <string name="send_offer_payer_note_label">Zpráva</string>
+    <string name="send_offer_payer_note_placeholder">Klikněte pro přidání zprávy…</string>
+    <string name="send_offer_payer_note_dialog_title">Přidat vlastní zprávu</string>
+    <string name="send_offer_payer_note_dialog_subtitle">Příjemce uvidí tuto zprávu</string>
+    <string name="send_offer_payer_note_dialog_placeholder">Zadejte zprávu…</string>
+    <string name="send_offer_fetching">Získávání podrobností o platbě…</string>
+    <string name="send_offer_failure_title">Platba selhala</string>
+    <string name="send_offer_failure_timeout">Nepodařilo se získat údaje o platbě v přiměřené době.\n\nPříjemce může být offline nebo nedostupný.</string>
 
     <string name="send_paymentmode_onchain">Zaplatit On-Chain</string>
     <string name="send_paymentmode_onchain_desc">On-Chain transakce jsou obvykle pomalejší a nejvhodnější pro velké platby.</string>
@@ -286,6 +300,11 @@
     <string name="paymentdetails_status_unconfirmed_with_depth">%1$d/%2$d potvrzení</string>
     <string name="paymentdetails_status_confirmed">Potrvzeno On-Chain</string>
 
+    <string name="paymentdetails_offer_note_label">Zpráva</string>
+    <string name="paymentdetails_offer_sender_label">Poslal(a)</string>
+    <string name="paymentdetails_offer_sender_unknown">Neznámý</string>
+    <string name="paymentdetails_offer_sender_unknown_details">Se zprávy od neznámých zdrojů buďte opatrní</string>
+
     <string name="paymentdetails_lnurlpay_service">Obsluhováno</string>
     <string name="paymentdetails_lnurlpay_action_message_label">Zpráva</string>
     <string name="paymentdetails_lnurlpay_action_url_label">Odkaz</string>
@@ -330,8 +349,8 @@
     <string name="paymentdetails_swapin">Swap-in vklad Bitcoinu</string>
     <string name="paymentdetails_swapout">Swap-out na Bitcoinovou adresu</string>
 
-    <string name="paymentdetails_offer_outgoing">Odchozí platba Lightning (nabídky)</string>
-    <string name="paymentdetails_offer_incoming">Příchozí platba Lightning (nabídky)</string>
+    <string name="paymentdetails_offer_outgoing">Odchozí platba Lightning (nabídka)</string>
+    <string name="paymentdetails_offer_incoming">Příchozí platba Lightning (nabídka)</string>
 
     <string name="paymentdetails_swapin_address_label">Adresa vkladu</string>
     <string name="paymentdetails_bitcoin_address_label">Bitcoinová adresa</string>
@@ -353,6 +372,9 @@
     <string name="paymentdetails_payment_request_label">Faktura</string>
     <string name="paymentdetails_preimage_label">Předobraz</string>
     <string name="paymentdetails_payerkey_label">Plátcův klíč</string>
+    <string name="paymentdetails_offer_label">Nabídka</string>
+    <string name="paymentdetails_bolt12_label">Bolt12 faktura</string>
+    <string name="paymentdetails_offer_metadata_label">Metadata</string>
 
     <string name="paymentdetails_status_label">Stav platby</string>
     <string name="paymentdetails_status_success">Úspěšná</string>
@@ -381,6 +403,24 @@
     <string name="paymentdetails_amount_received_label">Přijatá částka</string>
     <string name="paymentdetails_amount_rate_now">≈ %1$s (nyní)</string>
     <string name="paymentdetails_amount_rate_then">≈ %1$s (předtím)</string>
+
+    <!-- offer contact -->
+
+    <string name="contact_add_contact_button">Přidat kontakt…</string>
+    <string name="contact_error_offer_invalid">Neplatná nabídka</string>
+    <string name="contact_error_offer_known">Faktura již byla přidělena k %1$s</string>
+    <string name="contact_save_button">Uložit</string>
+    <string name="contact_delete_button">Smazat</string>
+
+    <string name="contact_add_title">Přidělit kontakt k BOLT12 nabídce</string>
+    <string name="contact_name_label">Jméno</string>
+    <string name="contact_photo_label">Fotka</string>
+    <string name="contact_offer_label">Nabídka</string>
+    <string name="contact_offers_list_title">Známé nabídky tohoto kontaktu</string>
+
+
+    <string name="contact_search_name">Hledat podle jména</string>
+    <string name="contact_none">Nenalezeny žádné kontakty…</string>
 
     <!-- settings: access control -->
 
@@ -439,7 +479,7 @@
 
     <!-- lnurl: common remote error messages -->
 
-    <string name="lnurl_error_remote_details">Služba <b>%1$s</b> odpověděla s chybou. V případě potřeby kontaktujte jejich podporu.\n\nPodrobnosti o servisní zprávě: \"<i>%2$s</i>\"</string>
+    <string name="lnurl_error_remote_details">Služba <b>%1$s</b> vrátila chybu. V případě potřeby kontaktujte jejich podporu.\n\nPodrobnosti zprávy služby: \"<i>%2$s</i>\"</string>
     <string name="lnurl_error_remote_code">Služba <b>%1$s</b> vrátila HTTP chybu (%2$s).\n\nV případě potřeby kontaktujte jejich podporu.</string>
     <string name="lnurl_error_remote_unreadable">Služba <b>%1$s</b> vrátila chybnou zprávu.</string>
     <string name="lnurl_error_remote_connection">Nepodařilo se připojit ke službě <b>%1$s</b>.</string>
@@ -518,7 +558,7 @@
     <string name="tor_settings_enabled">Tor je zapnutý</string>
     <string name="tor_settings_disabled">Tor je vypnutý</string>
     <string name="tor_settings_state_unknown">Tor proxy server ještě nebyl spuštěn.</string>
-    <string name="tor_settings_state_closed">Tor proxy server je vypnutý.\nPočkejte prosím a zkontrolujte své internetové připojení.</string>
+    <string name="tor_settings_state_closed">Tor proxy server je vypnutý.</string>
     <string name="tor_settings_state_starting">Zapínání Tor proxy serveru…</string>
     <string name="tor_settings_state_started">Tor je připojen</string>
 
@@ -580,6 +620,9 @@
     <string name="paymentsettings_overpayment_title">Povolit přeplacení</string>
     <string name="paymentsettings_overpayment_enabled">Budete moci přeplatit Lightning fakturu dvakrát o požadovanou částku. Užitečné na nastavení dýška nebo pro ochranu soukromí.</string>
     <string name="paymentsettings_overpayment_disabled">Vypnuté (výchozí)</string>
+
+    <string name="paymentsettings_random_payer_key_title">Náhodný klíč plátce</string>
+    <string name="paymentsettings_random_payer_key_desc">Pokud toto povolíte, příjemce BOLT12 nabídky nebude vědět, kdo provedl platbu.</string>
 
     <!-- settings: currencies -->
 
@@ -701,7 +744,7 @@
     <string name="reset_wallet_confirm_button">Smazat peněženku</string>
     <string name="reset_wallet_shutting_down">Vypínání…</string>
     <string name="reset_wallet_deleting_prefs">Mazání předvoleb…</string>
-    <string name="reset_wallet_deleting_seed">Mázání seedu…</string>
+    <string name="reset_wallet_deleting_seed">Mazání seedu…</string>
     <string name="reset_wallet_deleting_db">Mazání databáze…</string>
     <string name="reset_wallet_success">Peněženka byla úspěšně resetována</string>
     <string name="reset_wallet_failure_title">Reset selhal</string>
@@ -717,5 +760,9 @@
     <string name="swapin_signer_invalid_tx_header">Neplatná nepodepsaná transakce</string>
     <string name="swapin_signer_invalid_tx_details">Zkontrolujte, že vstup je celý a nechybí žádný znak.</string>
     <string name="swapin_signer_error_header">Podepisování vstupu selhalo</string>
+
+    <!-- settings: contacts list -->
+
+    <string name="settings_contacts_help">Kontakty vám umožňují připojit ke jménu statickou fakturu. Jsou ukládány lokálně.</string>
 
 </resources>
