@@ -57,6 +57,8 @@ class InternalDataRepository(private val internalData: DataStore<Preferences>) {
         private val SHOW_SPLICEOUT_CAPACITY_DISCLAIMER = booleanPreferencesKey("SHOW_SPLICEOUT_CAPACITY_DISCLAIMER")
         private val REMOTE_WALLET_NOTICE_READ_INDEX = intPreferencesKey("REMOTE_WALLET_NOTICE_READ_INDEX")
         private val BIP_353_ADDRESS = stringPreferencesKey("BIP_353_ADDRESS")
+        private val BACKGROUND_SERVICE_MODE = booleanPreferencesKey("BACKGROUND_SERVICE_MODE")
+        private val BACKGROUND_SERVICE_MODE_WITH_WAKELOCK = booleanPreferencesKey("BACKGROUND_SERVICE_MODE_WITH_WAKELOCK")
     }
 
     val log = LoggerFactory.getLogger(this::class.java)
@@ -147,4 +149,22 @@ class InternalDataRepository(private val internalData: DataStore<Preferences>) {
 
     val getBip353Address: Flow<String> = safeData.map { it[BIP_353_ADDRESS] ?: "" }
     suspend fun saveBip353Address(address: String) = internalData.edit { it[BIP_353_ADDRESS] = address }
+
+    val getBackgroundServiceMode: Flow<Pair<Boolean, Boolean>?> = safeData.map {
+        val isEnabled = it[BACKGROUND_SERVICE_MODE]
+        val withWakeLock = it[BACKGROUND_SERVICE_MODE_WITH_WAKELOCK] ?: false
+        isEnabled?.let { it to withWakeLock }
+    }
+    suspend fun saveBackgroundServiceModeEnabled(withWakeLock: Boolean) {
+        internalData.edit {
+            it[BACKGROUND_SERVICE_MODE] = true
+            it[BACKGROUND_SERVICE_MODE_WITH_WAKELOCK] = withWakeLock
+        }
+    }
+    suspend fun saveBackgroundServiceModeDisabled() {
+        internalData.edit {
+            it[BACKGROUND_SERVICE_MODE] = false
+            it[BACKGROUND_SERVICE_MODE_WITH_WAKELOCK] = false
+        }
+    }
 }

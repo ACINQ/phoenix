@@ -44,6 +44,7 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.constraintlayout.compose.MotionLayout
 import androidx.constraintlayout.compose.MotionScene
 import androidx.constraintlayout.compose.layoutId
+import fr.acinq.phoenix.android.AppViewModel
 import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.NoticesViewModel
 import fr.acinq.phoenix.android.PaymentsViewModel
@@ -53,7 +54,6 @@ import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.Dialog
 import fr.acinq.phoenix.android.components.PrimarySeparator
 import fr.acinq.phoenix.android.components.mvi.MVIView
-import fr.acinq.phoenix.android.utils.FCMHelper
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
 import fr.acinq.phoenix.android.utils.findActivity
@@ -67,6 +67,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun HomeView(
+    appViewModel: AppViewModel,
     paymentsViewModel: PaymentsViewModel,
     noticesViewModel: NoticesViewModel,
     onPaymentClick: (WalletPaymentId) -> Unit,
@@ -85,8 +86,6 @@ fun HomeView(
     val internalData = application.internalDataRepository
     val userPrefs = application.userPrefs
     val isPowerSaverModeOn = noticesViewModel.isPowerSaverModeOn
-    val fcmToken by internalData.getFcmToken.collectAsState(initial = "")
-    val isFCMAvailable = remember { FCMHelper.isFCMAvailable(context) }
     val torEnabledState = userPrefs.getIsTorEnabled.collectAsState(initial = null)
     val balanceDisplayMode by userPrefs.getHomeAmountDisplayMode.collectAsState(initial = HomeAmountDisplayMode.REDACTED)
 
@@ -221,13 +220,13 @@ fun HomeView(
                 ) {}
                 TopBar(
                     modifier = Modifier.layoutId("topBar"),
+                    appViewModel = appViewModel,
                     onConnectionsStateButtonClick = { showConnectionsDialog = true },
                     connections = connections,
                     electrumBlockheight = electrumMessages?.blockHeight ?: 0,
                     inFlightPaymentsCount = inFlightPaymentsCount,
                     isTorEnabled = torEnabledState.value,
                     onTorClick = onTorClick,
-                    isFCMUnavailable = fcmToken == null || !isFCMAvailable,
                     isPowerSaverMode = isPowerSaverModeOn,
                     showRequestLiquidity = channels.canRequestLiquidity(),
                     onRequestLiquidityClick = onRequestLiquidityClick,

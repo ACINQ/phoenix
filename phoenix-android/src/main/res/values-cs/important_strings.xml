@@ -83,8 +83,7 @@
     <string name="home_swapin_help_button">Klikněte pro podrobnosti</string>
 
     <string name="home_background_restriction_title">Omezeno zpracovávání na pozadí</string>
-    <string name="home_background_restriction_body_1">Phoenix nebude moci přijímat platby, pokud je na pozadí nebo pokud je zavřený.</string>.
-    <string name="home_background_restriction_body_2">Děje se tak, protože:</string>
+    <string name="home_background_restriction_body_1">Phoenix možná nebude moci přijímat platby, pokud je na pozadí nebo pokud je zavřený.</string>.
     <string name="home_background_restriction_tor">Tor je povolen</string>
     <string name="home_background_restriction_powersaver">Zařízení je v úsporném režimu</string>
     <string name="home_background_restriction_fcm">Oznámení FCM nejsou k dispozici</string>

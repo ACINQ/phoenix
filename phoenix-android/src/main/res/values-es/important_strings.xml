@@ -75,8 +75,7 @@
     <string name="home_swapin_help_button">Ver detalles</string>
 
     <string name="home_background_restriction_title">Procesamiento en segundo plano restringido</string>.
-    <string name="home_background_restriction_body_1">Phoenix no podrá recibir pagos cuando esté en segundo plano, o cuando esté cerrado.</string>
-    <string name="home_background_restriction_body_2">Esto ocurre porque:</string>
+    <string name="home_background_restriction_body_1">Phoenix podría no recibir pagos cuando esté en segundo plano, o cuando esté cerrado.</string>
     <string name="home_background_restriction_tor">Tor está activado</string>
     <string name="home_background_restriction_powersaver">El dispositivo está en modo de ahorro de energía</string>
     <string name="home_background_restriction_fcm">FCM notificaciones no disponibles</string>

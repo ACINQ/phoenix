@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 ACINQ SAS
+ * Copyright 2020 ACINQ SAS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.utils
+package fr.acinq.phoenix.android
 
-import android.content.Context
-import com.google.android.gms.common.ConnectionResult
-import com.google.android.gms.common.GoogleApiAvailability
+import fr.acinq.phoenix.android.services.NodeService
+import fr.acinq.phoenix.android.services.NodeServiceGoogle
 
-object FCMHelper {
-    fun isFCMAvailable(context: Context): Boolean {
-        return GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS
-    }
+
+class PhoenixApplicationGoogle : PhoenixApplication() {
+
+    override val mainActivityClass: Class<out MainActivity> get() = MainActivityGoogle::class.java
+    override val nodeServiceClass: Class<out NodeService> get() = NodeServiceGoogle::class.java
 }

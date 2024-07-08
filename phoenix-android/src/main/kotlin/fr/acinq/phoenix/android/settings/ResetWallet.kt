@@ -49,6 +49,7 @@ import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.LocalFiatCurrency
 import fr.acinq.phoenix.android.MainActivity
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.BorderButton
 import fr.acinq.phoenix.android.components.Button
@@ -328,6 +329,7 @@ private fun WalletDeleted() {
         verticalArrangement = Arrangement.spacedBy(2.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        val application = application
         SuccessMessage(header = stringResource(id = R.string.reset_wallet_success))
         Spacer(modifier = Modifier.height(16.dp))
         BorderButton(
@@ -335,7 +337,7 @@ private fun WalletDeleted() {
             icon = R.drawable.ic_check,
             onClick = {
                 context.startActivity(
-                    Intent(context, MainActivity::class.java).apply {
+                    Intent(context, application.mainActivityClass).apply {
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     }
                 )

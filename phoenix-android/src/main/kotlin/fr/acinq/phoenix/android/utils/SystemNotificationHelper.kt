@@ -37,6 +37,7 @@ import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.MainActivity
+import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateString
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
@@ -72,6 +73,10 @@ object SystemNotificationHelper {
     /** If the remaining blocks count before a swap timeout is lower than this, we should mention it in the notification. */
     private const val SWAP_TIMEOUT_THRESHOLD_IN_BLOCKS = 144 * 30  * 2 // ~2 months
 
+    private fun getActivityClass(context: Context): Class<out MainActivity>? {
+        return (context as? PhoenixApplication)?.mainActivityClass
+    }
+
     fun registerNotificationChannels(context: Context) {
         // notification channels (android 8+)
         context.getSystemService(NotificationManager::class.java)?.createNotificationChannels(
@@ -98,15 +103,18 @@ object SystemNotificationHelper {
         )
     }
 
-    fun notifyRunningHeadless(context: Context): Notification {
+    fun getHeadlessNotification(context: Context): Notification {
         return NotificationCompat.Builder(context, HEADLESS_NOTIF_CHANNEL).apply {
             setContentTitle(context.getString(R.string.notif_headless_title_default))
             setSmallIcon(R.drawable.ic_phoenix_outline)
-        }.build().also {
-            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-                NotificationManagerCompat.from(context).notify(HEADLESS_NOTIF_ID, it)
-            }
-        }
+        }.build()
+    }
+
+    fun getHeadlessFailureNotification(context: Context): Notification {
+        return NotificationCompat.Builder(context, HEADLESS_NOTIF_CHANNEL).apply {
+            setContentTitle(context.getString(R.string.notif_headless_title_failure))
+            setSmallIcon(R.drawable.ic_phoenix_outline)
+        }.build()
     }
 
     private fun notifyPaymentFailed(context: Context, title: String, message: String, deepLink: String?): Notification {
@@ -116,8 +124,8 @@ object SystemNotificationHelper {
             setStyle(NotificationCompat.BigTextStyle().bigText(message))
             setSmallIcon(R.drawable.ic_phoenix_outline)
             val intent = deepLink?.let {
-                Intent(Intent.ACTION_VIEW, it.toUri(), context, MainActivity::class.java)
-            } ?: Intent(context, MainActivity::class.java)
+                Intent(Intent.ACTION_VIEW, it.toUri(), context, getActivityClass(context))
+            } ?: Intent(context,  getActivityClass(context))
             setContentIntent(
                 TaskStackBuilder.create(context).run {
                     addNextIntentWithParentStack(intent)
@@ -218,7 +226,7 @@ object SystemNotificationHelper {
             setContentText(context.getString(R.string.notif_pending_settlement_message))
             setStyle(NotificationCompat.BigTextStyle().bigText(context.getString(R.string.notif_pending_settlement_message)))
             setSmallIcon(R.drawable.ic_phoenix_outline)
-            setContentIntent(PendingIntent.getActivity(context, 0, Intent(context, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE))
+            setContentIntent(PendingIntent.getActivity(context, 0, Intent(context, getActivityClass(context)), PendingIntent.FLAG_IMMUTABLE))
             setAutoCancel(true)
         }.build().also {
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
@@ -233,7 +241,7 @@ object SystemNotificationHelper {
             setContentText(context.getString(R.string.notif_inflight_payment_message))
             setStyle(NotificationCompat.BigTextStyle().bigText(context.getString(R.string.notif_inflight_payment_message)))
             setSmallIcon(R.drawable.ic_phoenix_outline)
-            setContentIntent(PendingIntent.getActivity(context, 0, Intent(context, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE))
+            setContentIntent(PendingIntent.getActivity(context, 0, Intent(context, getActivityClass(context)), PendingIntent.FLAG_IMMUTABLE))
             setAutoCancel(true)
         }.build().also {
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
@@ -248,7 +256,7 @@ object SystemNotificationHelper {
         paymentHash: ByteVector32,
         amount: MilliSatoshi,
         rates: List<ExchangeRate>,
-        isHeadless: Boolean,
+        isFromBackground: Boolean,
     ): Notification {
         val isFiat = userPrefs.getIsAmountInFiat.first() && rates.isNotEmpty()
         val unit = if (isFiat) {
@@ -277,14 +285,14 @@ object SystemNotificationHelper {
         return NotificationCompat.Builder(context, PAYMENT_RECEIVED_NOTIF_CHANNEL).apply {
             setContentTitle(context.getString(R.string.notif_headless_received, amount.toPrettyString(unit, rate, withUnit = true)))
             setSmallIcon(R.drawable.ic_phoenix_outline)
-            val intent = Intent(Intent.ACTION_VIEW,"phoenix:payments/${WalletPaymentId.DbType.INCOMING.value}/${paymentHash.toHex()}".toUri(), context, MainActivity::class.java).apply {
+            val intent = Intent(Intent.ACTION_VIEW,"phoenix:payments/${WalletPaymentId.DbType.INCOMING.value}/${paymentHash.toHex()}".toUri(), context, getActivityClass(context)).apply {
                 Intent.FLAG_ACTIVITY_SINGLE_TOP
             }
             setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT))
             setAutoCancel(true)
         }.build().also {
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-                NotificationManagerCompat.from(context).notify(if (isHeadless) HEADLESS_NOTIF_ID else Random().nextInt(), it)
+                NotificationManagerCompat.from(context).notify(if (isFromBackground) HEADLESS_NOTIF_ID else Random().nextInt(), it)
             }
         }
     }
@@ -294,7 +302,7 @@ object SystemNotificationHelper {
             setContentTitle(context.getString(R.string.notif_watcher_revoked_commit_title))
             setContentText(context.getString(R.string.notif_watcher_revoked_commit_message))
             setSmallIcon(R.drawable.ic_phoenix_outline)
-            setContentIntent(PendingIntent.getActivity(context, 0, Intent(context, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE))
+            setContentIntent(PendingIntent.getActivity(context, 0, Intent(context, getActivityClass(context)), PendingIntent.FLAG_IMMUTABLE))
             setAutoCancel(true)
         }.let {
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {

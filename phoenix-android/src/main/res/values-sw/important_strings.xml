@@ -87,8 +87,7 @@
     <string name="home_swapin_help_button">Bonyeza kwa maelezo</string>
 
     <string name="home_background_restriction_title">Usindikaji wa nyuma umepunguzwa</string>
-    <string name="home_background_restriction_body_1">Phoenix haitaweza kupokea malipo wakati iko nyuma, au wakati imefungwa.</string>
-    <string name="home_background_restriction_body_2">Hii hutokea kwa sababu:</string>
+    <string name="home_background_restriction_body_1">Huenda Phoenix isiweze kupokea malipo ikiwa chinichini, au inapofungwa.</string>
     <string name="home_background_restriction_tor">Tor imewashwa</string>
     <string name="home_background_restriction_powersaver">Kifaa kipo kwenye hali ya kuokoa nguvu</string>
     <string name="home_background_restriction_fcm">Arifa za FCM hazipatikani</string>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2024 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_REMOTE_MESSAGING" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <application
+        android:name=".PhoenixApplicationFoss">
+
+        <activity
+            android:name=".MainActivityFoss"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.PhoenixAndroid.NoActionBar"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <!-- support for lightning/bitcoin/lnurl schemes -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <!-- bitcoin & lightning schemes -->
+                <data android:scheme="bitcoin" />
+                <data android:scheme="lightning" />
+                <!-- lnurl schemes -->
+                <data android:scheme="lnurl" />
+                <data android:scheme="lnurlw" />
+                <data android:scheme="lnurlp" />
+                <data android:scheme="keyauth" />
+                <!-- phoenix specific scheme, for apps who specifically want to open phoenix -->
+                <data android:scheme="phoenix" />
+            </intent-filter>
+        </activity>
+
+        <!-- node service -->
+        <service
+            android:name="fr.acinq.phoenix.android.services.NodeServiceFoss"
+            android:foregroundServiceType="shortService|remoteMessaging"
+            android:exported="false"
+            android:stopWithTask="false" />
+
+        <!-- broadcast receivers -->
+        <receiver
+            android:name="fr.acinq.phoenix.android.services.BootReceiverFoss"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+</manifest>

@@ -42,7 +42,7 @@ object SeedManager {
     }
 
     /** Extract the encrypted seed from app private dir. */
-    fun loadSeedFromDisk(context: Context): EncryptedSeed? = loadSeedFromDir(getDatadir(context), SEED_FILE)
+    fun loadSeedFromDisk(context: Context): EncryptedSeed.V2.NoAuth? = loadSeedFromDir(getDatadir(context), SEED_FILE)
 
     fun getSeedState(context: Context): SeedFileState = try {
         when (val seed = loadSeedFromDisk(context)) {
@@ -56,7 +56,7 @@ object SeedManager {
     }
 
     /** Extract an encrypted seed contained in a given file/folder. */
-    private fun loadSeedFromDir(dir: File, seedFileName: String): EncryptedSeed? {
+    private fun loadSeedFromDir(dir: File, seedFileName: String): EncryptedSeed.V2.NoAuth? {
         val seedFile = File(dir, seedFileName)
         return if (!seedFile.exists()) {
             null

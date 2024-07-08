@@ -16,9 +16,22 @@
 
 package fr.acinq.phoenix.android.home
 
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
@@ -40,12 +53,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.utils.Connection
+import fr.acinq.phoenix.android.AppViewModel
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.BorderButton
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Dialog
 import fr.acinq.phoenix.android.components.FilledButton
-import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.VSeparator
 import fr.acinq.phoenix.android.components.openLink
 import fr.acinq.phoenix.android.utils.isBadCertificate
@@ -57,12 +70,12 @@ import fr.acinq.phoenix.managers.Connections
 @Composable
 fun TopBar(
     modifier: Modifier = Modifier,
+    appViewModel: AppViewModel,
     onConnectionsStateButtonClick: () -> Unit,
     connections: Connections,
     electrumBlockheight: Int,
     onTorClick: () -> Unit,
     isTorEnabled: Boolean?,
-    isFCMUnavailable: Boolean,
     isPowerSaverMode: Boolean,
     inFlightPaymentsCount: Int,
     showRequestLiquidity: Boolean,
@@ -90,9 +103,9 @@ fun TopBar(
         }
 
         BackgroundRestrictionBadge(
-            isFCMUnavailable = isFCMUnavailable,
+            appViewModel = appViewModel,
+            isPowerSaverMode = isPowerSaverMode,
             isTorEnabled = isTorEnabled == true,
-            isPowerSaverMode = isPowerSaverMode
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -172,7 +185,7 @@ private fun ConnectionBadge(
 }
 
 @Composable
-private fun TopBadgeButton(
+fun TopBadgeButton(
     text: String?,
     icon: Int,
     onClick: () -> Unit,
@@ -191,58 +204,6 @@ private fun TopBadgeButton(
         modifier = modifier.widthIn(max = 120.dp),
         maxLines = 1
     )
-}
-
-@Composable
-private fun BackgroundRestrictionBadge(
-    isTorEnabled: Boolean,
-    isPowerSaverMode: Boolean,
-    isFCMUnavailable: Boolean,
-) {
-    if (isTorEnabled || isPowerSaverMode || isFCMUnavailable) {
-        var showDialog by remember { mutableStateOf(false) }
-
-        TopBadgeButton(
-            text = null,
-            icon = R.drawable.ic_alert_triangle,
-            iconTint = warningColor,
-            onClick = { showDialog = true },
-        )
-        Spacer(modifier = Modifier.width(4.dp))
-
-        if (showDialog) {
-            Dialog(
-                onDismiss = { showDialog = false },
-                title = stringResource(id = R.string.home_background_restriction_title)
-            ) {
-                Column(
-                    modifier = Modifier.padding(horizontal = 24.dp)
-                ) {
-                    Text(text = stringResource(id = R.string.home_background_restriction_body_1))
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(text = stringResource(id = R.string.home_background_restriction_body_2))
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        if (isTorEnabled) {
-                            TextWithIcon(text = stringResource(id = R.string.home_background_restriction_tor), icon = R.drawable.ic_tor_shield_ok)
-                        }
-                        if (isPowerSaverMode) {
-                            TextWithIcon(text = stringResource(id = R.string.home_background_restriction_powersaver), icon = R.drawable.ic_battery_charging)
-                        }
-                        if (isFCMUnavailable) {
-                            TextWithIcon(text = stringResource(id = R.string.home_background_restriction_fcm), icon = R.drawable.ic_cloud_off)
-                            Text(
-                                text = stringResource(id = R.string.home_background_restriction_fcm_details),
-                                style = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
-                                modifier = Modifier.padding(start = 26.dp)
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
 }
 
 @Composable

@@ -35,7 +35,7 @@ class FCMService : FirebaseMessagingService() {
 
         when {
             encryptedSeed !is EncryptedSeed.V2.NoAuth -> {
-                log.warn("ignored fcm message with unhandled seed=${encryptedSeed?.name()}")
+                log.warn("ignored fcm message with unhandled seed}")
             }
             remoteMessage.priority != RemoteMessage.PRIORITY_HIGH -> {
                 // cannot start foreground service from low/normal priority message
@@ -54,8 +54,11 @@ class FCMService : FirebaseMessagingService() {
     }
 
     private fun startPhoenixForegroundService(reason: String?) {
-        ContextCompat.startForegroundService(applicationContext, Intent(applicationContext, NodeService::class.java)
-            .apply { reason?.let { putExtra(NodeService.EXTRA_REASON, it) } })
+        ContextCompat.startForegroundService(applicationContext, Intent(applicationContext, NodeServiceGoogle::class.java)
+            .apply {
+                reason?.let { putExtra(NodeService.EXTRA_REASON, it) }
+                putExtra(NodeService.EXTRA_ORIGIN, NodeService.ORIGIN_FCM)
+            })
     }
 
     override fun onNewToken(token: String) {

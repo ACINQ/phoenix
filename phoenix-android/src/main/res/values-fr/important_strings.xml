@@ -83,8 +83,7 @@
     <string name="home_swapin_help_button">Voir les détails</string>
 
     <string name="home_background_restriction_title">Fonctionnement en arrière plan restreint</string>
-    <string name="home_background_restriction_body_1">Phoenix ne pourra pas recevoir de paiements quand l\'application est en arrière plan ou est fermée.</string>
-    <string name="home_background_restriction_body_2">Cela vient du fait que:</string>
+    <string name="home_background_restriction_body_1">Phoenix pourrait ne pas être en mesure de recevoir de paiements quand l\'application est en arrière plan ou est fermée.</string>
     <string name="home_background_restriction_tor">Tor est activé</string>
     <string name="home_background_restriction_powersaver">Le téléphone est en mode économie d\'énergie</string>
     <string name="home_background_restriction_fcm">Les notifications FCM sont indisponibles</string>
