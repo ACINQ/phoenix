@@ -254,16 +254,10 @@ struct PaymentDetails: View {
 		
 		if CONTACTS_ENABLED, let contact = parent.contact {
 			
-			VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
-				HStack(alignment: VerticalAlignment.center, spacing: 4) {
-					ContactPhoto(fileName: contact.photoUri, size: 32)
-					
-					Text(contact.name)
-				} // <HStack>
-				
-				Text(contact.photoUri ?? "<nil>")
-				
-			} // </VStack>
+			HStack(alignment: VerticalAlignment.center, spacing: 4) {
+				ContactPhoto(fileName: contact.photoUri, size: 32)
+				Text(contact.name)
+			} // <HStack>
 			.onTapGesture {
 				parent.showManageContactSheet()
 			}

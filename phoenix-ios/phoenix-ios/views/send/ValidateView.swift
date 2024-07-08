@@ -1476,8 +1476,18 @@ struct ValidateView: View {
 		
 		dismissKeyboardIfVisible()
 		smartModalState.display(dismissable: false) {
-			ManageContactSheet(offer: offer, contact: $contact)
+			ManageContactSheet(
+				offer: offer,
+				contact: contact,
+				contactUpdated: contactUpdated
+			)
 		}
+	}
+	
+	func contactUpdated(_ updatedContact: ContactInfo?) {
+		log.trace("contactUpdated()")
+		
+		contact = updatedContact
 	}
 	
 	func maybeShowCapacityImpactWarning() {

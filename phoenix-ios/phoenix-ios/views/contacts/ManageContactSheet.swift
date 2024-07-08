@@ -10,8 +10,10 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct ManageContactSheet: View {
 	
-	let offer: Lightning_kmpOfferTypesOffer
-	@Binding var contact: ContactInfo?
+	let offer: Lightning_kmpOfferTypesOffer?
+	
+	let contact: ContactInfo?
+	let contactUpdated: (ContactInfo?) -> Void
 	let isNewContact: Bool
 	
 	@StateObject var toast = Toast()
@@ -42,16 +44,18 @@ struct ManageContactSheet: View {
 	
 	@EnvironmentObject var smartModalState: SmartModalState
 	
-	init(offer: Lightning_kmpOfferTypesOffer, contact: Binding<ContactInfo?>) {
-		self.offer = offer
-		self._contact = contact
-		self.isNewContact = (contact.wrappedValue == nil)
+	init(
+		offer: Lightning_kmpOfferTypesOffer?,
+		contact: ContactInfo?,
+		contactUpdated: @escaping (ContactInfo?) -> Void
+	) {
 		
-		if let existingContact = contact.wrappedValue {
-			self._name = State(initialValue: existingContact.name)
-		} else {
-			self._name = State(initialValue: "")
-		}
+		self.offer = offer
+		self.contact = contact
+		self.contactUpdated = contactUpdated
+		self.isNewContact = (contact == nil)
+		
+		self._name = State(initialValue: contact?.name ?? "")
 	}
 	
 	// --------------------------------------------------
@@ -211,16 +215,18 @@ struct ManageContactSheet: View {
 	@ViewBuilder
 	func content_details() -> some View {
 		
-		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
-			Text("Offer:")
-			Text(offer.encode())
-				.lineLimit(2)
-				.multilineTextAlignment(.leading)
-				.truncationMode(.middle)
-				.font(.subheadline)
-				.padding(.leading, 20)
+		if let offer {
+			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+				Text("Offer:")
+				Text(offer.encode())
+					.lineLimit(2)
+					.multilineTextAlignment(.leading)
+					.truncationMode(.middle)
+					.font(.subheadline)
+					.padding(.leading, 20)
+			}
+			.frame(maxWidth: .infinity)
 		}
-		.frame(maxWidth: .infinity)
 	}
 	
 	@ViewBuilder
@@ -345,6 +351,7 @@ struct ManageContactSheet: View {
 		isSaving = true
 		Task { @MainActor in
 			
+			var updatedContact: ContactInfo? = nil
 			var success = false
 			do {
 				let updatedContactName = trimmedName
@@ -362,20 +369,29 @@ struct ManageContactSheet: View {
 				log.debug("newPhotoName: \(newPhotoName ?? "<nil>")")
 				
 				let contactsManager = Biz.business.contactsManager
-				let existingContact = try await contactsManager.getContactForOffer(offer: offer)
-				if let existingContact {
-					contact = try await contactsManager.updateContact(
+				if let offer {
+					let existingContact = try await contactsManager.getContactForOffer(offer: offer)
+					if let existingContact {
+						updatedContact = try await contactsManager.updateContact(
+							contactId: existingContact.uuid,
+							name: updatedContactName,
+							photoUri: newPhotoName,
+							offers: existingContact.offers
+						)
+						
+					} else {
+						updatedContact = try await contactsManager.saveNewContact(
+							name: updatedContactName,
+							photoUri: newPhotoName,
+							offer: offer
+						)
+					}
+				} else if let existingContact = contact {
+					updatedContact = try await contactsManager.updateContact(
 						contactId: existingContact.uuid,
 						name: updatedContactName,
 						photoUri: newPhotoName,
 						offers: existingContact.offers
-					)
-					
-				} else {
-					contact = try await contactsManager.saveNewContact(
-						name: updatedContactName,
-						photoUri: newPhotoName,
-						offer: offer
 					)
 				}
 				
@@ -392,6 +408,9 @@ struct ManageContactSheet: View {
 			isSaving = false
 			if success {
 				smartModalState.close()
+			}
+			if let updatedContact {
+				contactUpdated(updatedContact)
 			}
 			
 		} // </Task>
@@ -410,7 +429,6 @@ struct ManageContactSheet: View {
 			let contactsManager = Biz.business.contactsManager
 			do {
 				try await contactsManager.deleteContact(contactId: cid)
-				contact = nil
 				
 			} catch {
 				log.error("contactsManager: error: \(error)")
@@ -418,6 +436,7 @@ struct ManageContactSheet: View {
 			
 			isSaving = false
 			smartModalState.close()
+			contactUpdated(nil)
 			
 		} // </Task>
 	}
