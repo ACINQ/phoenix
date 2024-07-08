@@ -85,15 +85,22 @@ fun ReceiveView(
 
     DefaultScreenLayout(horizontalAlignment = Alignment.CenterHorizontally, isScrollable = true) {
         DefaultScreenHeader(
-            title = if (vm.isEditingLightningInvoice) {
-                stringResource(id = R.string.receive_lightning_edit_title)
-            } else null,
-            onBackClick = {
+            onBackClick = if (vm.isEditingLightningInvoice) {
+                { vm.isEditingLightningInvoice = false }
+            } else {
+                onBackClick
+            },
+            content = {
                 if (vm.isEditingLightningInvoice) {
-                    vm.isEditingLightningInvoice = false
-                } else {
-                    onBackClick()
+                    Text(text = stringResource(id = R.string.receive_lightning_edit_title))
                 }
+                Spacer(modifier = Modifier.weight(1f))
+                Button(
+                    text = stringResource(id = R.string.receive_lnurl_button),
+                    icon = R.drawable.ic_scan,
+                    onClick = onScanDataClick,
+                    shape = CircleShape,
+                )
             },
         )
         ReceiveViewPages(vm, onFeeManagementClick, onScanDataClick)

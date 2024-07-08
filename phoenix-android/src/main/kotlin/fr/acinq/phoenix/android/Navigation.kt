@@ -67,6 +67,7 @@ sealed class Screen(val route: String) {
     data object Notifications: Screen("notifications")
     data object Contacts: Screen("settings/contacts")
     data object ResetWallet: Screen("settings/resetwallet")
+    data object Experimental: Screen("settings/experimental")
 }
 
 fun NavController.navigate(screen: Screen, arg: List<Any> = emptyList(), builder: NavOptionsBuilder.() -> Unit = {}) {

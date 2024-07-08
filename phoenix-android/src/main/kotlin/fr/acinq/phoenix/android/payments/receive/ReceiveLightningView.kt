@@ -34,6 +34,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
@@ -81,11 +82,13 @@ import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.Clickable
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.HSeparator
+import fr.acinq.phoenix.android.components.IconPopup
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.TextInput
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.feedback.InfoMessage
 import fr.acinq.phoenix.android.components.feedback.WarningMessage
+import fr.acinq.phoenix.android.internalData
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.borderColor
@@ -198,17 +201,15 @@ fun LightningInvoiceView(
             )
             Text(
                 text = stringResource(id = R.string.receive_toggle_offer_new_overlay),
-                modifier = Modifier.rotate(-38f).offset((-9).dp, (-4).dp).background(red500).padding(horizontal = 4.dp, vertical = 2.dp),
+                modifier = Modifier
+                    .rotate(-38f)
+                    .offset((-9).dp, (-4).dp)
+                    .background(red500)
+                    .padding(horizontal = 4.dp, vertical = 2.dp),
                 color = MaterialTheme.colors.onPrimary,
                 fontSize = 12.sp
             )
         }
-        Spacer(modifier = Modifier.height(16.dp))
-        BorderButton(
-            text = stringResource(id = R.string.receive_lnurl_button),
-            icon = R.drawable.ic_scan,
-            onClick = onScanDataClick,
-        )
     }
 }
 

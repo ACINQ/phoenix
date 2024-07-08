@@ -56,6 +56,7 @@ class InternalDataRepository(private val internalData: DataStore<Preferences>) {
         private val INFLIGHT_PAYMENTS_COUNT = intPreferencesKey("INFLIGHT_PAYMENTS_COUNT")
         private val SHOW_SPLICEOUT_CAPACITY_DISCLAIMER = booleanPreferencesKey("SHOW_SPLICEOUT_CAPACITY_DISCLAIMER")
         private val REMOTE_WALLET_NOTICE_READ_INDEX = intPreferencesKey("REMOTE_WALLET_NOTICE_READ_INDEX")
+        private val BIP_353_ADDRESS = stringPreferencesKey("BIP_353_ADDRESS")
     }
 
     val log = LoggerFactory.getLogger(this::class.java)
@@ -143,4 +144,7 @@ class InternalDataRepository(private val internalData: DataStore<Preferences>) {
 
     val getLastReadWalletNoticeIndex: Flow<Int> = safeData.map { it[REMOTE_WALLET_NOTICE_READ_INDEX] ?: -1 }
     suspend fun saveLastReadWalletNoticeIndex(index: Int) = internalData.edit { it[REMOTE_WALLET_NOTICE_READ_INDEX] = index }
+
+    val getBip353Address: Flow<String> = safeData.map { it[BIP_353_ADDRESS] ?: "" }
+    suspend fun saveBip353Address(address: String) = internalData.edit { it[BIP_353_ADDRESS] = address }
 }

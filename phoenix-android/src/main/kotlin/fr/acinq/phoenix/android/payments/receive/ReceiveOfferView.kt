@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -33,6 +34,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,7 +50,7 @@ import fr.acinq.phoenix.android.components.BorderButton
 import fr.acinq.phoenix.android.components.Clickable
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.openLink
-import fr.acinq.phoenix.android.utils.annotatedStringResource
+import fr.acinq.phoenix.android.internalData
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.share
 
@@ -89,6 +91,7 @@ fun DisplayOfferDialog(
                     Box(modifier = Modifier.widthIn(max = 400.dp)) {
                         QRCodeImage(bitmap = offerState.bitmap, onLongClick = { copyToClipboard(context, offerState.encoded) })
                     }
+                    Bip353AddressDisplay()
                     Spacer(modifier = Modifier.height(16.dp))
                     CopyShareEditButtons(
                         onCopy = { copyToClipboard(context, data = offerState.encoded) },
@@ -100,6 +103,21 @@ fun DisplayOfferDialog(
                     TorWarning()
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun Bip353AddressDisplay() {
+    val bip353AddressState = internalData.getBip353Address.collectAsState(initial = null)
+    val address = bip353AddressState.value
+    when {
+        address.isNullOrBlank() -> {}
+        else -> {
+            SelectionContainer {
+                Text(text = address, style = MaterialTheme.typography.body2)
+            }
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
