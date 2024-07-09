@@ -137,85 +137,13 @@ struct PaymentDetails: View {
 		GridRowWrapper(gridWidth: gridWidth) {
 			titleColumn("Send To")
 		} valueColumn: {
-				
-			if CONTACTS_ENABLED, let contact = parent.contact {
-				
-				HStack(alignment: VerticalAlignment.center, spacing: 4) {
-					Group {
-						if let photoUri = contact.photoUri,
-							let uiImage = UIImage(contentsOfFile: photoUri)
-						{
-							Image(uiImage: uiImage)
-								.resizable()
-								.aspectRatio(contentMode: .fill) // FILL !
-						} else {
-							Image(systemName: "person.circle")
-								.resizable()
-								.aspectRatio(contentMode: .fit)
-								.foregroundColor(.gray)
-						}
-					}
-					.frame(width: 32, height: 32)
-					.clipShape(Circle())
-					
-					Text(contact.name)
-				} // <HStack>
-				.onTapGesture {
-					parent.showManageContactSheet()
-				}
-				
-			} else {
-				
-				let offer: String = model.offer.encode()
-				VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
-					Text(offer)
-						.lineLimit(2)
-						.truncationMode(.middle)
-						.contextMenu {
-							Button {
-								UIPasteboard.general.string = offer
-							} label: {
-								Text("Copy")
-							}
-						}
-					if CONTACTS_ENABLED {
-						Button {
-							parent.showManageContactSheet()
-						} label: {
-							HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 2) {
-								Image(systemName: "person")
-								Text("Add contact")
-							}
-						}
-					}
-				} // </VStack>
-			}
+			valueColumn_offer_sendTo(model)
 		} // </GridRowWrapper>
 		
 		GridRowWrapper(gridWidth: gridWidth) {
 			titleColumn("Message")
 		} valueColumn: {
-			Group {
-				let comment = parent.comment
-				if comment.isEmpty {
-					Button {
-						parent.showCommentSheet()
-					} label: {
-						Text("Attach a message")
-					}
-				} else {
-					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 4) {
-						Text(comment)
-							.lineLimit(3)
-							.truncationMode(.tail)
-						Button {
-							parent.showCommentSheet()
-						} label: {
-							Image(systemName: "square.and.pencil").font(.body)
-						}
-					}
-				}
-			} // </Group>
+			valueColumn_offer_message(model)
 		} // </GridRowWrapper>
 	}
 	
@@ -268,7 +196,7 @@ struct PaymentDetails: View {
 			GridRowWrapper(gridWidth: gridWidth) {
 				titleColumn("miner fee", titleColor)
 			} valueColumn: {
-				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 4) {
+				HStack(alignment: VerticalAlignment.center, spacing: 4) {
 					
 					VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
 						Text(verbatim: info.bitcoin_minerFee.string)
@@ -317,6 +245,93 @@ struct PaymentDetails: View {
 		Text(title)
 			.textCase(.uppercase)
 			.foregroundColor(color)
+	}
+	
+	@ViewBuilder
+	func valueColumn_offer_sendTo(
+		_ model: Scan.Model_OfferFlow
+	) -> some View {
+		
+		if CONTACTS_ENABLED, let contact = parent.contact {
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 4) {
+				Group {
+					if let photoUri = contact.photoUri,
+						let uiImage = UIImage(contentsOfFile: photoUri)
+					{
+						Image(uiImage: uiImage)
+							.resizable()
+							.aspectRatio(contentMode: .fill) // FILL !
+					} else {
+						Image(systemName: "person.circle")
+							.resizable()
+							.aspectRatio(contentMode: .fit)
+							.foregroundColor(.gray)
+					}
+				}
+				.frame(width: 32, height: 32)
+				.clipShape(Circle())
+				
+				Text(contact.name)
+			} // <HStack>
+			.onTapGesture {
+				parent.showManageContactSheet()
+			}
+			
+		} else {
+			
+			let offer: String = model.offer.encode()
+			VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+				Text(offer)
+					.lineLimit(2)
+					.truncationMode(.middle)
+					.contextMenu {
+						Button {
+							UIPasteboard.general.string = offer
+						} label: {
+							Text("Copy")
+						}
+					}
+				if CONTACTS_ENABLED {
+					Button {
+						parent.showManageContactSheet()
+					} label: {
+						HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 2) {
+							Image(systemName: "person")
+							Text("Add contact")
+						}
+					}
+				}
+			} // </VStack>
+		}
+	}
+	
+	@ViewBuilder
+	func valueColumn_offer_message(
+		_ model: Scan.Model_OfferFlow
+	) -> some View {
+		
+		Group {
+			let comment = parent.comment
+			if comment.isEmpty {
+				Button {
+					parent.showCommentSheet()
+				} label: {
+					Text("Attach a message")
+				}
+			} else {
+				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 4) {
+					Text(comment)
+						.lineLimit(3)
+						.truncationMode(.tail)
+					Button {
+						parent.showCommentSheet()
+					} label: {
+						Image(systemName: "square.and.pencil").font(.body)
+					}
+				}
+			}
+		} // </Group>
 	}
 	
 	// --------------------------------------------------
@@ -456,6 +471,8 @@ struct GridRowWrapper<KeyColumn: View, ValueColumn: View>: View {
 // MARK: -
 // --------------------------------------------------
 
+/// Workaround for iOS 15, where `Grid` isn't available.
+///
 fileprivate struct PaymentDetails_Grid: InfoGridView {
 	
 	let parent: PaymentDetails
@@ -488,12 +505,15 @@ fileprivate struct PaymentDetails_Grid: InfoGridView {
 	private let horizontalSpacingBetweenColumns: CGFloat = 8
 	
 	@ViewBuilder
-	func keyColumn(_ title: LocalizedStringKey) -> some View {
+	func keyColumn(
+		_ title: LocalizedStringKey,
+		_ color: Color = Color.secondary
+	) -> some View {
 		
 		Text(title)
 			.textCase(.uppercase)
 			.font(.subheadline)
-			.foregroundColor(.secondary)
+			.foregroundColor(color)
 	}
 	
 	@ViewBuilder
@@ -505,6 +525,14 @@ fileprivate struct PaymentDetails_Grid: InfoGridView {
 		) {
 			if let model = grandparent.mvi.model as? Scan.Model_OnChainFlow {
 				rows_onChain(model)
+			} else if parent.requestDescription() != nil {
+				row_description()
+			}
+			if let model = grandparent.mvi.model as? Scan.Model_OfferFlow {
+				rows_offer(model)
+			}
+			if let paymentSummary = grandparent.paymentStrings() {
+				rows_paymentSummary(paymentSummary)
 			}
 		}
 	}
@@ -513,14 +541,62 @@ fileprivate struct PaymentDetails_Grid: InfoGridView {
 	func rows_onChain(_ model: Scan.Model_OnChainFlow) -> some View {
 		
 		if parent.bitcoinUriMessage() != nil {
-			onChain_type()
+			row_onChain_type()
 		}
-		onChain_description()
-		onChain_sendTo(model)
+		row_onChain_description()
+		row_onChain_sendTo(model)
 	}
 	
 	@ViewBuilder
-	func onChain_type() -> some View {
+	func rows_offer(
+		_ model: Scan.Model_OfferFlow
+	) -> some View {
+		
+		row_offer_sendTo(model)
+		row_offer_message(model)
+	}
+	
+	@ViewBuilder
+	func rows_paymentSummary(
+		_ info: PaymentSummaryStrings
+	) -> some View {
+		
+		if info.hasTip {
+			row_paymentSummary_tip(info)
+		}
+		if info.hasLightningFee || info.isEmpty {
+			row_paymentSummary_lightningFee(info)
+		}
+		if info.hasMinerFee {
+			row_paymentSummary_minerFee(info)
+		}
+		if info.hasTip || info.hasLightningFee || info.hasMinerFee || info.isEmpty {
+			row_paymentSummary_total(info)
+		}
+	}
+	
+	@ViewBuilder
+	func row_description() -> some View {
+		let identifier: String = #function
+		
+		InfoGridRow(
+			identifier: identifier,
+			vAlignment: .firstTextBaseline,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier),
+			keyColumnAlignment: .trailing
+		) {
+			keyColumn("Desc")
+		} valueColumn: {
+			
+			Text(parent.requestDescription() ?? "")
+				.font(.subheadline)
+			
+		} // </InfoGridRow>
+	}
+	
+	@ViewBuilder
+	func row_onChain_type() -> some View {
 		let identifier: String = #function
 		
 		InfoGridRow(
@@ -540,7 +616,7 @@ fileprivate struct PaymentDetails_Grid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func onChain_description() -> some View {
+	func row_onChain_description() -> some View {
 		let identifier: String = #function
 		
 		InfoGridRow(
@@ -565,7 +641,7 @@ fileprivate struct PaymentDetails_Grid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func onChain_sendTo(_ model: Scan.Model_OnChainFlow) -> some View {
+	func row_onChain_sendTo(_ model: Scan.Model_OnChainFlow) -> some View {
 		let identifier: String = #function
 		
 		InfoGridRow(
@@ -590,5 +666,166 @@ fileprivate struct PaymentDetails_Grid: InfoGridView {
 				}
 			
 		} // </InfoGridRow>
+	}
+	
+	@ViewBuilder
+	func row_offer_sendTo(_ model: Scan.Model_OfferFlow) -> some View {
+		let identifier: String = #function
+		
+		InfoGridRow(
+			identifier: identifier,
+			vAlignment: .firstTextBaseline,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier),
+			keyColumnAlignment: .trailing
+		) {
+			keyColumn("Send To")
+		} valueColumn: {
+			parent.valueColumn_offer_sendTo(model)
+		} // </InfoGridRow>
+	}
+	
+	@ViewBuilder
+	func row_offer_message(_ model: Scan.Model_OfferFlow) -> some View {
+		let identifier: String = #function
+		
+		InfoGridRow(
+			identifier: identifier,
+			vAlignment: .firstTextBaseline,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier),
+			keyColumnAlignment: .trailing
+		) {
+			keyColumn("Message")
+		} valueColumn: {
+			parent.valueColumn_offer_message(model)
+		} // </InfoGridRow>
+	}
+	
+	@ViewBuilder
+	func row_paymentSummary_tip(_ info: PaymentSummaryStrings) -> some View {
+		let identifier: String = #function
+		
+		let titleColor   = info.isEmpty ? Color.clear : Color.secondary
+		let bitcoinColor = info.isEmpty ? Color.clear : Color.primary
+		let fiatColor    = info.isEmpty ? Color.clear : Color(UIColor.systemGray2)
+		let percentColor = info.isEmpty ? Color.clear : Color.secondary
+		
+		InfoGridRow(
+			identifier: identifier,
+			vAlignment: .firstTextBaseline,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier),
+			keyColumnAlignment: .trailing
+		) {
+			keyColumn("tip", titleColor)
+		} valueColumn: {
+			VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+				Text(verbatim: info.bitcoin_tip.string)
+					.foregroundColor(bitcoinColor)
+				Text(verbatim: " ≈\(info.fiat_tip.string)")
+					.foregroundColor(fiatColor)
+				Text(verbatim: info.percent_tip)
+					.foregroundColor(percentColor)
+			}
+		} // </InfoGridRow>
+		.accessibilityLabel(parent.accessibilityLabel_tipAmount(info))
+	}
+	
+	@ViewBuilder
+	func row_paymentSummary_lightningFee(_ info: PaymentSummaryStrings) -> some View {
+		let identifier: String = #function
+		
+		let titleColor   = info.isEmpty ? Color.clear : Color.secondary
+		let bitcoinColor = info.isEmpty ? Color.clear : Color.primary
+		let fiatColor    = info.isEmpty ? Color.clear : Color(UIColor.systemGray2)
+		let percentColor = info.isEmpty ? Color.clear : Color.secondary
+		
+		InfoGridRow(
+			identifier: identifier,
+			vAlignment: .firstTextBaseline,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier),
+			keyColumnAlignment: .trailing
+		) {
+			keyColumn("lightning fee", titleColor)
+		} valueColumn: {
+			VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+				Text(verbatim: info.bitcoin_lightningFee.string)
+					.foregroundColor(bitcoinColor)
+				Text(verbatim: " ≈\(info.fiat_lightningFee.string)")
+					.foregroundColor(fiatColor)
+				Text(verbatim: info.percent_lightningFee)
+					.foregroundColor(percentColor)
+			}
+		} // </InfoGridRow>
+		.accessibilityLabel(parent.accessibilityLabel_lightningFeeAmount(info))
+	}
+	
+	@ViewBuilder
+	func row_paymentSummary_minerFee(_ info: PaymentSummaryStrings) -> some View {
+		let identifier: String = #function
+		
+		let titleColor   = info.isEmpty ? Color.clear : Color.secondary
+		let bitcoinColor = info.isEmpty ? Color.clear : Color.primary
+		let fiatColor    = info.isEmpty ? Color.clear : Color(UIColor.systemGray2)
+		let percentColor = info.isEmpty ? Color.clear : Color.secondary
+		
+		InfoGridRow(
+			identifier: identifier,
+			vAlignment: .firstTextBaseline,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier),
+			keyColumnAlignment: .trailing
+		) {
+			keyColumn("miner fee", titleColor)
+		} valueColumn: {
+			HStack(alignment: VerticalAlignment.center, spacing: 4) {
+				
+				VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+					Text(verbatim: info.bitcoin_minerFee.string)
+						.foregroundColor(bitcoinColor)
+					Text(verbatim: " ≈\(info.fiat_minerFee.string)")
+						.foregroundColor(fiatColor)
+					Text(verbatim: info.percent_minerFee)
+						.foregroundColor(percentColor)
+				} // </VStack>
+				
+				Button {
+					grandparent.showMinerFeeSheet()
+				} label: {
+					Image(systemName: "square.and.pencil").font(.body)
+				}
+				
+			} // </HStack>
+		} // </InfoGridRow>
+		.accessibilityLabel(parent.accessibilityLabel_minerFeeAmount(info))
+	}
+	
+	@ViewBuilder
+	func row_paymentSummary_total(_ info: PaymentSummaryStrings) -> some View {
+		let identifier: String = #function
+		
+		let titleColor   = info.isEmpty ? Color.clear : Color.secondary
+		let bitcoinColor = info.isEmpty ? Color.clear : Color.primary
+		let fiatColor    = info.isEmpty ? Color.clear : Color(UIColor.systemGray2)
+		
+		InfoGridRow(
+			identifier: identifier,
+			vAlignment: .firstTextBaseline,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier),
+			keyColumnAlignment: .trailing
+		) {
+			keyColumn("total", titleColor)
+		} valueColumn: {
+			VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+				Text(verbatim: info.bitcoin_total.string)
+					.foregroundColor(bitcoinColor)
+				Text(verbatim: " ≈\(info.fiat_total.string)")
+					.foregroundColor(fiatColor)
+			}
+		} // </InfoGridRow>
+		.accessibilityLabel(parent.accessibilityLabel_totalAmount(info))
 	}
 }
