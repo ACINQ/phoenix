@@ -551,9 +551,6 @@ class AppScanController(
         val dnsPath = "$username.user._bitcoin-payment.$domain."
 
         // list of resolvers: https://dnsprivacy.org/public_resolvers/
-        // curl https://dns.google/resolve?name=alice.acinq.co&type=TXT
-        // curl --http2 -H "accept: application/dns-json" "https://1.1.1.1/dns-query?name=bob.acinq.co&type=TXT"
-        // curl -H "accept: application/dns-json" "https://mozilla.cloudflare-dns.com/dns-query?name=alice.acinq.co&type=TXT"
         val url = Url("https://dns.google/resolve?name=$dnsPath&type=TXT")
 
         try {
@@ -589,7 +586,7 @@ class AppScanController(
             return when (val offer = OfferTypes.Offer.decode(offerString)) {
                 is Try.Success -> { offer.result }
                 is Try.Failure -> {
-                    model(Scan.Model.BadRequest(request = url.toString(), reason = Scan.BadRequestReason.InvalidBip353(url)))
+                    model(Scan.Model.BadRequest(request = url.toString(), reason = Scan.BadRequestReason.InvalidBip353(dnsPath)))
                     null
                 }
             }

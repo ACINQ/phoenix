@@ -42,6 +42,7 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.mvi.MVIView
+import fr.acinq.phoenix.android.components.settings.Setting
 import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.controllers.config.ElectrumConfiguration
 import fr.acinq.phoenix.data.ElectrumConfig
@@ -88,7 +89,7 @@ fun ElectrumView() {
 
                 // -- connection detail
                 val connection = model.connection
-                SettingInteractive(
+                Setting(
                     title = when {
                         connection is Connection.ESTABLISHED -> {
                             stringResource(id = R.string.electrum_connection_connected, "${model.currentServer?.host}:${model.currentServer?.port}")
@@ -106,7 +107,7 @@ fun ElectrumView() {
                             stringResource(id = R.string.electrum_connection_closed_with_random)
                         }
                     },
-                    description = {
+                    subtitle = {
                         when (config) {
                             is ElectrumConfig.Custom -> {
                                 if (connection is Connection.CLOSED && connection.isBadCertificate()) {
@@ -121,11 +122,15 @@ fun ElectrumView() {
                             else -> Unit
                         }
                     },
-                    icon = R.drawable.ic_server,
-                    iconTint = when (connection) {
-                        is Connection.ESTABLISHED -> positiveColor
-                        is Connection.ESTABLISHING -> orange
-                        else -> negativeColor
+                    leadingIcon = {
+                        PhoenixIcon(
+                            resourceId = R.drawable.ic_server,
+                            tint = when (connection) {
+                                is Connection.ESTABLISHED -> positiveColor
+                                is Connection.ESTABLISHING -> orange
+                                else -> negativeColor
+                            }
+                        )
                     },
                     maxTitleLines = 1
                 ) { showCustomServerDialog = true }

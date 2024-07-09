@@ -225,6 +225,7 @@
     <string name="btn_back">Go back</string>
     <string name="btn_next">Next</string>
     <string name="btn_copy">Copy</string>
+    <string name="btn_share">Share</string>
     <string name="btn_ok">OK</string>
     <string name="btn_save">Save</string>
     <string name="btn_confirm">Confirm</string>
@@ -837,5 +838,15 @@
     <!-- settings: contacts list -->
 
     <string name="settings_contacts_help">Contacts allows you to link a name to a static offer. They are stored locally.</string>
+
+    <!-- experimental -->
+
+    <string name="experimental_title">Experimental features</string>
+
+    <string name="bip353_header">Bip353 DNS address</string>
+    <string name="bip353_empty">No address yet…</string>
+    <string name="bip353_claim_button">Claim my address</string>
+    <string name="bip353_claiming">Claiming address…</string>
+    <string name="bip353_error">Failed to claim address</string>
 
 </resources>

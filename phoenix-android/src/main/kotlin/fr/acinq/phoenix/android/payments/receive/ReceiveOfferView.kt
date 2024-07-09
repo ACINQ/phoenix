@@ -16,12 +16,17 @@
 
 package fr.acinq.phoenix.android.payments.receive
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -41,12 +46,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.BorderButton
+import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Clickable
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.openLink
@@ -63,6 +70,9 @@ fun DisplayOfferDialog(
 ) {
     val context = LocalContext.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    val bip353AddressState = internalData.getBip353Address.collectAsState(initial = null)
+    val address = bip353AddressState.value
 
     ModalBottomSheet(
         sheetState = sheetState,
@@ -91,14 +101,25 @@ fun DisplayOfferDialog(
                     Box(modifier = Modifier.widthIn(max = 400.dp)) {
                         QRCodeImage(bitmap = offerState.bitmap, onLongClick = { copyToClipboard(context, offerState.encoded) })
                     }
-                    Bip353AddressDisplay()
+                    Bip353AddressDisplay(address)
                     Spacer(modifier = Modifier.height(16.dp))
-                    CopyShareEditButtons(
-                        onCopy = { copyToClipboard(context, data = offerState.encoded) },
-                        onShare = { share(context, "lightning:${offerState.encoded}", context.getString(R.string.receive_offer_share_subject), context.getString(R.string.receive_offer_share_title)) },
-                        onEdit = null,
-                        maxWidth = 400.dp,
-                    )
+                    Row {
+                        var showCopyDialog by remember { mutableStateOf(false) }
+                        if (showCopyDialog && !address.isNullOrBlank()) {
+                            CopyAddressDialog(address = address, offer = offerState.encoded, onDismiss = { showCopyDialog = false })
+                        }
+                        BorderButton(
+                            text = stringResource(id = R.string.btn_copy),
+                            icon = R.drawable.ic_copy,
+                            onClick = { if (!address.isNullOrBlank()) showCopyDialog = true else copyToClipboard(context, data = offerState.encoded) },
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        BorderButton(
+                            text = stringResource(id = R.string.btn_share),
+                            icon = R.drawable.ic_share,
+                            onClick = { share(context, "lightning:${offerState.encoded}", context.getString(R.string.receive_offer_share_subject), context.getString(R.string.receive_offer_share_title)) },
+                        )
+                    }
                     Spacer(modifier = Modifier.height(16.dp))
                     TorWarning()
                 }
@@ -108,9 +129,7 @@ fun DisplayOfferDialog(
 }
 
 @Composable
-fun Bip353AddressDisplay() {
-    val bip353AddressState = internalData.getBip353Address.collectAsState(initial = null)
-    val address = bip353AddressState.value
+fun Bip353AddressDisplay(address: String?) {
     when {
         address.isNullOrBlank() -> {}
         else -> {
@@ -118,6 +137,45 @@ fun Bip353AddressDisplay() {
                 Text(text = address, style = MaterialTheme.typography.body2)
             }
             Spacer(modifier = Modifier.height(16.dp))
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CopyAddressDialog(
+    address: String,
+    offer: String,
+    onDismiss: () -> Unit
+) {
+    val context = LocalContext.current
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    ModalBottomSheet(
+        sheetState = sheetState,
+        onDismissRequest = {
+            // executed when user click outside the sheet, and after sheet has been hidden thru state.
+            onDismiss()
+        },
+        modifier = Modifier.heightIn(max = 700.dp),
+        containerColor = MaterialTheme.colors.surface,
+        contentColor = MaterialTheme.colors.onSurface,
+        scrimColor = MaterialTheme.colors.onBackground.copy(alpha = 0.2f),
+        //dragHandle = null
+    ) {
+        Column(Modifier.padding(bottom = 50.dp)) {
+            Button(
+                text = "Copy Bolt12 code",
+                icon = R.drawable.ic_copy,
+                onClick = { copyToClipboard(context, data = offer) },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Button(
+                text = "Copy address",
+                icon = R.drawable.ic_copy,
+                onClick = { copyToClipboard(context, data = address) },
+                modifier = Modifier.fillMaxWidth(),
+            )
         }
     }
 }

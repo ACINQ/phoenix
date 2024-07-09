@@ -35,6 +35,8 @@ import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.settings.Setting
+import fr.acinq.phoenix.android.components.settings.SettingSwitch
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.annotatedStringResource
@@ -87,14 +89,14 @@ fun TorConfigView() {
         if (isTorEnabled == true) {
             Card {
                 val torState = connState.value.tor
-                SettingWithDecoration(
+                Setting(
                     title = when (torState) {
                         is Connection.CLOSED -> stringResource(R.string.tor_settings_state_closed)
                         Connection.ESTABLISHING -> stringResource(R.string.tor_settings_state_starting)
                         Connection.ESTABLISHED -> stringResource(R.string.tor_settings_state_started)
                         else -> stringResource(R.string.tor_settings_state_unknown)
                     },
-                    decoration = {
+                    leadingIcon = {
                         Row(modifier = Modifier.width(width = ButtonDefaults.IconSize), horizontalArrangement = Arrangement.Center) {
                             Surface(
                                 shape = CircleShape,

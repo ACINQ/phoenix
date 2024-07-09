@@ -30,6 +30,9 @@ import fr.acinq.phoenix.android.LocalFiatCurrency
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.settings.ListPreferenceButton
+import fr.acinq.phoenix.android.components.settings.PreferenceItem
+import fr.acinq.phoenix.android.components.settings.Setting
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.UserTheme
@@ -143,7 +146,7 @@ private fun UserThemePreference(userPrefs: UserPrefsRepository, scope: Coroutine
 @Composable
 private fun AppLocaleSetting() {
     val context = LocalContext.current
-    SettingInteractive(
+    Setting(
         title = stringResource(id = R.string.prefs_locale_label),
         description = Locale.getDefault().displayLanguage.replaceFirstChar { it.uppercase() }, // context.getSystemService(LocaleManager::class.java).applicationLocales.get(0).language,
         onClick = {

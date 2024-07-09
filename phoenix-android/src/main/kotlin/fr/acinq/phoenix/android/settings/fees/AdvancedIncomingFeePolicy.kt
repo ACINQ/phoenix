@@ -46,7 +46,7 @@ import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.InlineNumberInput
 import fr.acinq.phoenix.android.components.ProgressView
-import fr.acinq.phoenix.android.components.SettingSwitch
+import fr.acinq.phoenix.android.components.settings.SettingSwitch
 import fr.acinq.phoenix.android.components.feedback.WarningMessage
 import fr.acinq.phoenix.android.components.enableOrFade
 import fr.acinq.phoenix.android.userPrefs

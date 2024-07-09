@@ -114,7 +114,7 @@
     <string name="receive_lightning_error">Không thể xuất hóa đơn</string>
     <string name="receive_lightning_share_subject">Hoá đơn Lightning</string>
     <string name="receive_lightning_share_title">Chia sẻ hóa đơn Lightning này với…</string>
-    <string name="receive_lnurl_button">Sử dụng liên kết LNURL</string>
+    <string name="receive_lnurl_button">Quét</string>
 
     <string name="receive_lightning_edit_button">Chỉnh sửa</string>
     <string name="receive_lightning_edit_title">Chỉnh sửa hoá đơn</string>

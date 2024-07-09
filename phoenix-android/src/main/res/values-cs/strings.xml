@@ -90,7 +90,7 @@
     <string name="receive_lightning_error">Nepodařilo se vygenerovat fakturu</string>
     <string name="receive_lightning_share_subject">Lightningová faktura</string>
     <string name="receive_lightning_share_title">Sdílet tuto Lightningovou fakturu s…</string>
-    <string name="receive_lnurl_button">Použít LNURL odkaz</string>
+    <string name="receive_lnurl_button">Skenování</string>
 
     <string name="receive_lightning_edit_button">Upravit</string>
     <string name="receive_lightning_edit_title">Upravit fakturu</string>

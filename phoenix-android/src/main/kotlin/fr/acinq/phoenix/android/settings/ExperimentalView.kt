@@ -16,32 +16,39 @@
 
 package fr.acinq.phoenix.android.settings
 
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.CardHeader
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
-import fr.acinq.phoenix.android.components.ProgressView
-import fr.acinq.phoenix.android.components.Setting
-import fr.acinq.phoenix.android.components.SettingInteractive
+import fr.acinq.phoenix.android.components.FilledButton
+import fr.acinq.phoenix.android.components.PhoenixIcon
+import fr.acinq.phoenix.android.components.settings.Setting
+import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
 import fr.acinq.phoenix.managers.PeerManager
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
@@ -77,12 +84,14 @@ class ExperimentalViewModel(val peerManager: PeerManager, val internalDataReposi
         if (claimAddressState == ClaimAddressState.Claiming || claimAddressState == ClaimAddressState.Init) return
         claimAddressState = ClaimAddressState.Claiming
         viewModelScope.launch {
-            log.info("claiming bip-353 address")
+            log.debug("claiming bip-353 address")
             try {
-                withTimeout(10_000) {
+
+                withTimeout(5_000) {
                     val address = peerManager.getPeer().requestAddress(languageSubtag = "en")
                     internalDataRepository.saveBip353Address(address)
-                    log.info("bip-353 address successfully claimed!")
+                    delay(500)
+                    log.info("successfully claimed bip-353 address=$address")
                     claimAddressState = ClaimAddressState.Done(address)
                 }
             } catch (e: Exception) {
@@ -113,12 +122,12 @@ fun ExperimentalView(
     DefaultScreenLayout {
         DefaultScreenHeader(
             onBackClick = onBackClick,
-            title = "Experimental features"
+            title = stringResource(id = R.string.experimental_title)
         )
 
-        CardHeader(text = "Bip-353 address")
+        CardHeader(text = stringResource(id = R.string.bip353_header))
         Card(modifier = Modifier.fillMaxWidth()) {
-            ClaimAddressButton(vm.claimAddressState, onClaim = { vm.claimAddress() })
+            ClaimAddressButton(state = vm.claimAddressState, onClaim = { vm.claimAddress() })
         }
     }
 }
@@ -131,33 +140,49 @@ private fun ClaimAddressButton(
     when (state) {
         is ClaimAddressState.Init -> {
             Setting(
-                title = "Checking address",
-                description = "Lets you share your Bolt12 code with a human-readable address, using a DNS look-up",
+                title = stringResource(id = R.string.utils_loading_data),
+                description = stringResource(id = R.string.bip353_subtitle),
+                icon = R.drawable.ic_arobase,
             )
         }
         is ClaimAddressState.None -> {
-            SettingInteractive(
-                title = "Claim my Bip-353 address",
-                description = "Lets you share your Bolt12 code with a human-readable address, using a DNS look-up",
-                onClick = onClaim,
+            Setting(
+                title = stringResource(id = R.string.bip353_empty),
+                leadingIcon = { PhoenixIcon(R.drawable.ic_arobase) },
+                subtitle = {
+                    Text(text = stringResource(id = R.string.bip353_subtitle))
+                    Spacer(modifier = Modifier.height(8.dp))
+                    FilledButton(text = stringResource(id = R.string.bip353_claim_button), onClick = onClaim, padding = PaddingValues(horizontal = 12.dp, vertical = 8.dp))
+                }
             )
         }
         is ClaimAddressState.Claiming -> {
             Setting(
-                title = "Claiming address...",
-                description = "Lets you share your Bolt12 code with a human-readable address, using a DNS look-up",
+                title = stringResource(id = R.string.bip353_claiming),
+                description = stringResource(id = R.string.bip353_subtitle),
+                icon = R.drawable.ic_arobase,
             )
         }
         is ClaimAddressState.Done -> {
+            val context = LocalContext.current
             Setting(
                 title = state.address,
-                description = "Lets you share your Bolt12 code with a human-readable address, using a DNS look-up",
+                leadingIcon = { PhoenixIcon(R.drawable.ic_arobase) },
+                trailingIcon = { Button(icon = R.drawable.ic_copy, onClick = { copyToClipboard(context, state.address) }) },
+                subtitle = {
+                    Text(text = stringResource(id = R.string.bip353_subtitle))
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(text = stringResource(id = R.string.bip353_subtitle2))
+                },
             )
         }
         is ClaimAddressState.Failure -> {
             Setting(
-                title = "Failure! ${state.e.localizedMessage}",
-                description = "Lets you share your Bolt12 code with a human-readable address, using a DNS look-up",
+                title = stringResource(id = R.string.bip353_error),
+                icon = R.drawable.ic_cross_circle,
+                subtitle = {
+                    Text(text = stringResource(id = R.string.bip353_subtitle))
+                }
             )
         }
     }

@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.settings.SettingButton
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 

@@ -360,7 +360,7 @@ private fun ScanErrorView(
         is Scan.BadRequestReason.InvalidLnurl -> stringResource(R.string.scan_error_lnurl_invalid)
         is Scan.BadRequestReason.UnsupportedLnurl -> stringResource(R.string.scan_error_lnurl_unsupported)
         is Scan.BadRequestReason.UnknownFormat -> stringResource(R.string.scan_error_invalid_generic)
-        is Scan.BadRequestReason.InvalidBip353 -> "invalid bip-353 response: ${reason.url}"
+        is Scan.BadRequestReason.InvalidBip353 -> "invalid bip-353 response: ${reason.path}"
     }
     Dialog(
         onDismiss = onErrorDialogDismiss,

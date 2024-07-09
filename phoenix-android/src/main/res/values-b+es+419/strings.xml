@@ -111,7 +111,7 @@
     <string name="receive_lightning_error">No se pudo generar la factura</string>
     <string name="receive_lightning_share_subject">Factura de Lightning</string>
     <string name="receive_lightning_share_title">Compartir esta dirección de Lightning con…</string>
-    <string name="receive_lnurl_button">Usar enlace LNURL</string>
+    <string name="receive_lnurl_button">Escanear</string>
 
     <string name="receive_lightning_edit_button">Editar</string>
     <string name="receive_lightning_edit_title">Editar factura</string>

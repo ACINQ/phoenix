@@ -41,6 +41,7 @@ import fr.acinq.phoenix.android.LocalFiatCurrency
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.settings.SettingSwitch
 import fr.acinq.phoenix.android.fiatRate
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
