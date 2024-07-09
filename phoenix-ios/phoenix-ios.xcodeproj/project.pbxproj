@@ -188,6 +188,8 @@
 		DC6F04232C35EB9900627B4F /* SummaryInfoGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F04222C35EB9900627B4F /* SummaryInfoGrid.swift */; };
 		DC6F04252C38807300627B4F /* PhotosManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F04242C38807300627B4F /* PhotosManager.swift */; };
 		DC6F04272C3895E300627B4F /* ContactPhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F04262C3895E300627B4F /* ContactPhoto.swift */; };
+		DC6F042B2C3DA7AD00627B4F /* ContactsListSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F042A2C3DA7AD00627B4F /* ContactsListSheet.swift */; };
+		DC6F042D2C3DC4CD00627B4F /* ManualInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F042C2C3DC4CD00627B4F /* ManualInput.swift */; };
 		DC70A99C2BBB6093002DBFF8 /* InboundFeeWarning.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC70A99B2BBB6093002DBFF8 /* InboundFeeWarning.swift */; };
 		DC71E7302723240E0063613D /* KotlinObservables.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC71E72F2723240E0063613D /* KotlinObservables.swift */; };
 		DC71E7332728645B0063613D /* CurrencyConverterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC71E7322728645B0063613D /* CurrencyConverterView.swift */; };
@@ -580,6 +582,8 @@
 		DC6F04222C35EB9900627B4F /* SummaryInfoGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryInfoGrid.swift; sourceTree = "<group>"; };
 		DC6F04242C38807300627B4F /* PhotosManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotosManager.swift; sourceTree = "<group>"; };
 		DC6F04262C3895E300627B4F /* ContactPhoto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactPhoto.swift; sourceTree = "<group>"; };
+		DC6F042A2C3DA7AD00627B4F /* ContactsListSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsListSheet.swift; sourceTree = "<group>"; };
+		DC6F042C2C3DC4CD00627B4F /* ManualInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualInput.swift; sourceTree = "<group>"; };
 		DC70A99B2BBB6093002DBFF8 /* InboundFeeWarning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboundFeeWarning.swift; sourceTree = "<group>"; };
 		DC71E72F2723240E0063613D /* KotlinObservables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinObservables.swift; sourceTree = "<group>"; };
 		DC71E7322728645B0063613D /* CurrencyConverterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverterView.swift; sourceTree = "<group>"; };
@@ -971,6 +975,7 @@
 				DCA02B9F2BD1A5FC0080520F /* ChannelSizeImpactWarning.swift */,
 				DCB62F482A5E09F900912A71 /* SpliceOutProblem.swift */,
 				DC1718A62C20BF8A000CCAF5 /* PayOfferProblem.swift */,
+				DC6F042C2C3DC4CD00627B4F /* ManualInput.swift */,
 			);
 			path = send;
 			sourceTree = "<group>";
@@ -1020,6 +1025,7 @@
 			children = (
 				DC3345CF2C2B4C1200EDD2D4 /* ManageContactSheet.swift */,
 				DC5567442C2F1A6900008E11 /* ContactsList.swift */,
+				DC6F042A2C3DA7AD00627B4F /* ContactsListSheet.swift */,
 			);
 			path = contacts;
 			sourceTree = "<group>";
@@ -1853,6 +1859,7 @@
 				DC98D3962AF170AC005BD177 /* PaymentWarningPopover.swift in Sources */,
 				DC48D2C42593DE30008D138C /* TextFieldCurrencyStyler.swift in Sources */,
 				DC18C41D256FF91100A2D083 /* Utils.swift in Sources */,
+				DC6F042D2C3DC4CD00627B4F /* ManualInput.swift in Sources */,
 				53BEFF4EDB40975C2123C63D /* ui.swift in Sources */,
 				DCACF6FD2566D0BA0009B01E /* SecurityFile.swift in Sources */,
 				DC20BDF02C233F8200338AA2 /* PaymentDetails.swift in Sources */,
@@ -1943,6 +1950,7 @@
 				DCB30E592A0C3F8200E7D7A2 /* LiquidityPolicyView.swift in Sources */,
 				DCEAE5B72943CC7400320C46 /* RangeSheet.swift in Sources */,
 				DCAC5B7027726FC80077BB98 /* DeepLink.swift in Sources */,
+				DC6F042B2C3DA7AD00627B4F /* ContactsListSheet.swift in Sources */,
 				DC9473FA261270B4008D7242 /* MVI+Mock.swift in Sources */,
 				DCDD9ECE28637474001800A3 /* Orientation.swift in Sources */,
 				DCCFE6B02B64326F002FFF11 /* OSLogHandler.swift in Sources */,
