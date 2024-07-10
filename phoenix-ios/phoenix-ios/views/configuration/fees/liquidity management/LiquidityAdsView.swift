@@ -918,9 +918,8 @@ struct LiquidityAdsView: View {
 // MARK: -
 // --------------------------------------------------
 
-/**
- * Workaround for iOS 15, where `Grid` isn't available.
- */
+/// Workaround for iOS 15, where `Grid` isn't available.
+///
 fileprivate struct FeeInfo_Grid: InfoGridView {
 	
 	let feeInfo: LiquidityFeeInfo
