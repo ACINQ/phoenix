@@ -458,6 +458,6 @@
     <!-- experimental features -->
 
     <string name="bip353_subtitle">Dies ist eine von Menschen lesbare Adresse für Ihre Bolt12-Zahlungsanfrage.</string>
-    <string name="bip353_subtitle2">Wollen Sie eine hübschere Adresse? Verwenden Sie Dienste von Drittanbietern wie twelve.cash, oder hosten Sie die Adresse selbst!</string>
+    <string name="bip353_subtitle2">Wollen Sie eine hübschere Adresse? Verwenden Sie Dienste von Drittanbietern, oder hosten Sie die Adresse selbst!</string>
 
 </resources>

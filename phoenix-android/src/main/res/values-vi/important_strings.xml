@@ -468,6 +468,6 @@
     <!-- experimental features -->
 
     <string name="bip353_subtitle">Đây là địa chỉ mà con người có thể đọc được cho yêu cầu thanh toán Bolt12 của bạn.</string>
-    <string name="bip353_subtitle2">Bạn muốn một địa chỉ đẹp hơn? Sử dụng các dịch vụ của bên thứ ba như Twelve.cash hoặc tự lưu trữ địa chỉ!</string>
+    <string name="bip353_subtitle2">Bạn muốn một địa chỉ đẹp hơn? Sử dụng dịch vụ của bên thứ ba hoặc tự lưu trữ địa chỉ!</string>
 
 </resources>

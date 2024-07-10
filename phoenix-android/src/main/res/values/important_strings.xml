@@ -463,6 +463,6 @@
     <!-- experimental features -->
 
     <string name="bip353_subtitle">This is a human-readable address for your Bolt12 payment request.</string>
-    <string name="bip353_subtitle2">Want a prettier address? Use third-party services like twelve.cash, or self-host the address!</string>
+    <string name="bip353_subtitle2">Want a prettier address? Use third-party services, or self-host the address!</string>
 
 </resources>

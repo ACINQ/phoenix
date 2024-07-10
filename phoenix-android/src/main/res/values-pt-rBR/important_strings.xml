@@ -456,6 +456,6 @@
     <!-- experimental features -->
 
     <string name="bip353_subtitle">Este é um endereço legível por humanos para sua solicitação de pagamento do Bolt12.</string>
-    <string name="bip353_subtitle2">Quer um endereço mais bonito? Use serviços de terceiros, como twelve.cash, ou hospede o endereço por conta própria!</string>
+    <string name="bip353_subtitle2">Quer um endereço mais bonito? Use serviços de terceiros, ou hospede o endereço por conta própria!</string>
 
 </resources>
