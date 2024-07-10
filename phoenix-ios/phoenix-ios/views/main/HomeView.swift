@@ -799,7 +799,7 @@ struct HomeView : MVIView {
 			lastCompletedPaymentId = paymentId
 		}
 		
-		// PaymentView will need `WalletPaymentFetchOptions.companion.All`,
+		// SummaryView will need `WalletPaymentFetchOptions.companion.All`,
 		// so as long as we're fetching from the database, we might as well fetch everything we need.
 		let options = WalletPaymentFetchOptions.companion.All
 		

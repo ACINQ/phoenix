@@ -156,6 +156,7 @@ class CloudKitDb(
                             rowMap[paymentId] = WalletPaymentInfo(
                                 payment = payment,
                                 metadata = metadataPlaceholder,
+                                contact = null,
                                 fetchOptions = emptyOptions
                             )
                         }
@@ -170,6 +171,7 @@ class CloudKitDb(
                             rowMap[paymentId] = WalletPaymentInfo(
                                 payment = payment,
                                 metadata = metadataPlaceholder,
+                                contact = null,
                                 fetchOptions = emptyOptions
                             )
                         }
@@ -184,6 +186,7 @@ class CloudKitDb(
                             rowMap[paymentId] = WalletPaymentInfo(
                                 payment = payment,
                                 metadata = metadataPlaceholder,
+                                contact = null,
                                 fetchOptions = emptyOptions
                             )
                         }
@@ -198,6 +201,7 @@ class CloudKitDb(
                             rowMap[paymentId] = WalletPaymentInfo(
                                 payment = payment,
                                 metadata = metadataPlaceholder,
+                                contact = null,
                                 fetchOptions = emptyOptions
                             )
                         }
@@ -212,6 +216,7 @@ class CloudKitDb(
                             rowMap[paymentId] = WalletPaymentInfo(
                                 payment = payment,
                                 metadata = metadataPlaceholder,
+                                contact = null,
                                 fetchOptions = emptyOptions
                             )
                         }
@@ -226,17 +231,19 @@ class CloudKitDb(
                             rowMap[paymentId] = WalletPaymentInfo(
                                 payment = payment,
                                 metadata = metadataPlaceholder,
+                                contact = null,
                                 fetchOptions = emptyOptions
                             )
                         }
                     } // <outgoing_liquidity_payments>
 
-                val fetchOptions = WalletPaymentFetchOptions.All
+                val fetchOptions = WalletPaymentFetchOptions.All - WalletPaymentFetchOptions.Contact
                 uniquePaymentIds.forEach { paymentId ->
                     metaQueries.getMetadata(paymentId, fetchOptions)?.let { metadata ->
                         rowMap[paymentId]?.let {
                             rowMap[paymentId] = it.copy(
                                 metadata = metadata,
+                                contact = null,
                                 fetchOptions = fetchOptions
                             )
                         }

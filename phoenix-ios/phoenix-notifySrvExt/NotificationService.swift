@@ -376,6 +376,7 @@ class NotificationService: UNNotificationServiceExtension {
 					let paymentInfo = WalletPaymentInfo(
 						payment: receivedPayments.first!,
 						metadata: WalletPaymentMetadata.empty(),
+						contact: nil,
 						fetchOptions: WalletPaymentFetchOptions.companion.None
 					)
 					if let desc = paymentInfo.paymentDescription(), desc.count > 0 {

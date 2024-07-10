@@ -37,8 +37,8 @@ struct EditInfoView: View {
 		
 		let pi = paymentInfo.wrappedValue
 		
-		defaultDescText = pi.paymentDescription(includingUserDescription: false) ?? ""
-		let realizedDesc = pi.paymentDescription(includingUserDescription: true) ?? ""
+		defaultDescText = pi.paymentDescription(options: .none) ?? ""
+		let realizedDesc = pi.paymentDescription(options: .userDescription) ?? ""
 		
 		if realizedDesc == defaultDescText {
 			originalDescText = nil

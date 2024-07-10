@@ -2611,6 +2611,7 @@
     },
     "+(amount.string) inbound liquidity" : {
       "comment" : "Payment description for inbound liquidity",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -2684,6 +2685,9 @@
           }
         }
       }
+    },
+    "+%@ inbound liquidity" : {
+      "comment" : "Payment description for inbound liquidity"
     },
     "<decryption error>" : {
       "localizations" : {
@@ -27769,6 +27773,9 @@
         }
       }
     },
+    "Payment from %@" : {
+
+    },
     "payment hash" : {
       "comment" : "Label in DetailsView_IncomingPayment",
       "localizations" : {
@@ -28495,6 +28502,9 @@
           }
         }
       }
+    },
+    "Payment to %@" : {
+
     },
     "Payment will fail" : {
       "localizations" : {
@@ -32726,6 +32736,12 @@
           }
         }
       }
+    },
+    "Sent By" : {
+
+    },
+    "Sent To" : {
+
     },
     "Server" : {
       "localizations" : {
