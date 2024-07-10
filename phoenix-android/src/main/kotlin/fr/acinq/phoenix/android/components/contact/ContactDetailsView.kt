@@ -105,9 +105,9 @@ fun ContactDetailsView(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 if (onContactChange != null) {
-                    ContactPhotoView(photoUri = photoUri, name = contact.name, onChange = { photoUri = it })
+                    ContactPhotoView(photoUri = photoUri, name = contact.name, onChange = { photoUri = it }, borderSize = 4.dp)
                 } else {
-                    ContactPhotoView(photoUri = photoUri, name = contact.name, onChange = null)
+                    ContactPhotoView(photoUri = photoUri, name = contact.name, onChange = null, borderSize = 4.dp)
                 }
                 Spacer(modifier = Modifier.height(24.dp))
                 TextInput(
