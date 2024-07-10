@@ -80,16 +80,6 @@ fun Context.findActivity(): MainActivity {
     throw IllegalStateException("not in the context of the main Phoenix activity")
 }
 
-fun Context.createContactPictureUri(
-    provider: String = "${BuildConfig.APPLICATION_ID}.provider",
-): Uri {
-    val contactDir = File(cacheDir, "contacts")
-    if (!contactDir.exists()) contactDir.mkdir()
-    val photoFile = File(contactDir, "contact_${currentTimestampMillis()}.jpg")
-    if (!photoFile.exists() || !photoFile.canWrite()) photoFile.createNewFile()
-    return FileProvider.getUriForFile(applicationContext, provider, photoFile)
-}
-
 @Composable
 fun BitcoinUnit.label(): String = when (this) {
     BitcoinUnit.Sat -> stringResource(id = R.string.prefs_display_coin_sat_label)
@@ -146,7 +136,7 @@ fun WalletPayment.smartDescription(context: Context): String? = when (this) {
     is LightningOutgoingPayment -> when (val details = this.details) {
         is LightningOutgoingPayment.Details.Normal -> details.paymentRequest.desc
         is LightningOutgoingPayment.Details.SwapOut -> context.getString(R.string.paymentdetails_desc_swapout, details.address)
-        is LightningOutgoingPayment.Details.Blinded -> details.paymentRequest.invoiceRequest.payerNote ?: details.paymentRequest.description
+        is LightningOutgoingPayment.Details.Blinded -> details.paymentRequest.description
     }
     is IncomingPayment -> when (val origin = this.origin) {
         is IncomingPayment.Origin.Invoice -> origin.paymentRequest.description

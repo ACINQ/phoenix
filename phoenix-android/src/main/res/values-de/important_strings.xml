@@ -455,4 +455,9 @@
     <string name="swapinrefund_success">Transaktion veröffentlicht.</string>
     <string name="swapinrefund_success_details">Sie können die Transaktion unten finden. Sie wird nicht in Ihrem Zahlungsverlauf erscheinen, also machen Sie bei Bedarf jetzt eine Kopie davon.</string>
 
+    <!-- experimental features -->
+
+    <string name="bip353_subtitle">Dies ist eine von Menschen lesbare Adresse für Ihre Bolt12-Zahlungsanfrage.</string>
+    <string name="bip353_subtitle2">Wollen Sie eine hübschere Adresse? Verwenden Sie Dienste von Drittanbietern wie twelve.cash, oder hosten Sie die Adresse selbst!</string>
+
 </resources>

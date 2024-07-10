@@ -81,7 +81,6 @@ object Parser {
         return when (val res = OfferTypes.Offer.decode(cleanInput)) {
             is Try.Success -> res.get()
             is Try.Failure -> {
-                println("invalid offer=$input")
                 null
             }
         }

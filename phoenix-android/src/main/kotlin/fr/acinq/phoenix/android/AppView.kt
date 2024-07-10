@@ -478,6 +478,9 @@ fun AppView(
                 composable(Screen.Contacts.route) {
                     SettingsContactsView(onBackClick = { navController.popBackStack() })
                 }
+                composable(Screen.Experimental.route) {
+                    ExperimentalView(onBackClick = { navController.popBackStack() })
+                }
             }
         }
     }

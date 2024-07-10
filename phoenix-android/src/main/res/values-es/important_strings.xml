@@ -458,4 +458,9 @@
     <string name="swapinrefund_success">Transacción publicada.</string>
     <string name="swapinrefund_success_details">Puede encontrar la transacción a continuación. No aparecerá en su historial de pagos, así que haga una copia ahora si lo necesita.</string>
 
+    <!-- experimental features -->
+
+    <string name="bip353_subtitle">Esta es una dirección humanamente legible para su solicitud de pago Bolt12.</string>
+    <string name="bip353_subtitle2">¿Quieres una dirección más bonita? Utilice servicios de terceros como twelve.cash o aloje usted mismo la dirección.</string>
+
 </resources>

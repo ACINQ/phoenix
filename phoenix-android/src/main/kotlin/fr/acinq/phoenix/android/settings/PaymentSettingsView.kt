@@ -33,13 +33,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.settings.ListPreferenceButton
+import fr.acinq.phoenix.android.components.settings.PreferenceItem
+import fr.acinq.phoenix.android.components.settings.Setting
+import fr.acinq.phoenix.android.components.settings.SettingSwitch
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.datastore.SwapAddressFormat
@@ -70,12 +72,12 @@ fun PaymentSettingsView(
 
         CardHeader(text = stringResource(id = R.string.paymentsettings_category_incoming))
         Card {
-            SettingInteractive(
+            Setting(
                 title = stringResource(id = R.string.paymentsettings_defaultdesc_title),
                 description = invoiceDefaultDesc.ifEmpty { stringResource(id = R.string.paymentsettings_defaultdesc_none) },
                 onClick = { showDescriptionDialog = true }
             )
-            SettingInteractive(
+            Setting(
                 title = stringResource(id = R.string.paymentsettings_expiry_title),
                 description = when (invoiceDefaultExpiry) {
                     null -> stringResource(id = R.string.utils_unknown)

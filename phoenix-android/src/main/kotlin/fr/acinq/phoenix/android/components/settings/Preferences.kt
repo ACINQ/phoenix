@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 ACINQ SAS
+ * Copyright 2024 ACINQ SAS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.components
+package fr.acinq.phoenix.android.components.settings
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,6 +28,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.components.Button
+import fr.acinq.phoenix.android.components.Clickable
+import fr.acinq.phoenix.android.components.Dialog
 
 
 internal data class PreferenceItem<T>(val item: T, val title: String, val description: String? = null)
@@ -35,7 +38,7 @@ internal data class PreferenceItem<T>(val item: T, val title: String, val descri
 @Composable
 internal fun <T> ListPreferenceButton(
     title: String,
-    subtitle: @Composable () -> Unit = {},
+    subtitle: @Composable ColumnScope.() -> Unit = {},
     enabled: Boolean,
     selectedItem: T,
     preferences: List<PreferenceItem<T>>,
@@ -46,9 +49,7 @@ internal fun <T> ListPreferenceButton(
 ) {
     var showPreferenceDialog by remember { mutableStateOf(initialShowDialog) }
 
-    SettingInteractive(title = title, description = subtitle, enabled = enabled) {
-        showPreferenceDialog = true
-    }
+    Setting(title = title, subtitle = subtitle, enabled = enabled, onClick = { showPreferenceDialog = true })
 
     if (showPreferenceDialog) {
         ListPreferenceDialog(

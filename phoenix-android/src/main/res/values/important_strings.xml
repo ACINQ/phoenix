@@ -460,4 +460,9 @@
     <string name="swapinrefund_success">Transaction published.</string>
     <string name="swapinrefund_success_details">You can find the transaction spending the funds below. It will not appear in your payments history, so make a copy of its ID now if needed.</string>
 
+    <!-- experimental features -->
+
+    <string name="bip353_subtitle">This is a human-readable address for your Bolt12 payment request.</string>
+    <string name="bip353_subtitle2">Want a prettier address? Use third-party services like twelve.cash, or self-host the address!</string>
+
 </resources>

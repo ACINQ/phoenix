@@ -83,8 +83,6 @@ sealed interface Lnurl {
                 try {
                     if (lud17Schemes.any { input.startsWith(it, ignoreCase = true) }) {
                         parseNonBech32Lud17(input, logger)
-                    } else if (input.contains('@')) {
-                        parseInternetIdentifier(input)
                     } else {
                         parseNonBech32Http(input)
                     }
@@ -165,33 +163,6 @@ sealed interface Lnurl {
                     URLProtocol.HTTPS
                 }
             }.build()
-        }
-
-        /** LUD-16 support: https://github.com/fiatjaf/lnurl-rfc/blob/luds/16.md */
-        private fun parseInternetIdentifier(source: String): Url {
-
-            // Ignore excess input, including additional lines, and leading/trailing whitespace
-            val line = source.lines().firstOrNull { it.isNotBlank() }?.trim() ?: throw RuntimeException("identifier has an empty leading line")
-            val token = line.split("\\s+".toRegex()).firstOrNull() ?: throw RuntimeException("identifier has invalid chars")
-
-            // The format is: <username>@<domain.tld>
-            //
-            // The username is technically limited to: a-z0-9-_.
-            // But we don't enforce it, as it's a bit restrictive for a global audience.
-            //
-            // Note that, in the real world, users will type with capital letters.
-            // So we need to auto-convert to lowercase.
-
-            val components = token.split("@")
-            if (components.size != 2) {
-                throw RuntimeException("identifier must contain one @ delimiter")
-            }
-
-            val username = components[0].lowercase()
-            val domain = components[1]
-
-            // May throw an exception if domain is invalid
-            return Url("https://$domain/.well-known/lnurlp/$username")
         }
 
         /**

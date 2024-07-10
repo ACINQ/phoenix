@@ -124,7 +124,7 @@
     <string name="receive_lightning_error">Could not generate invoice</string>
     <string name="receive_lightning_share_subject">Lightning invoice</string>
     <string name="receive_lightning_share_title">Share this Lightning invoice with…</string>
-    <string name="receive_lnurl_button">Use LNURL link</string>
+    <string name="receive_lnurl_button">Scan</string>
     <string name="receive_toggle_offer_new_overlay">NEW!</string>
 
     <string name="receive_offer_share_title">Static Lightning invoice</string>
@@ -195,6 +195,7 @@
     <string name="scan_request_camera_access_denied">Camera permission has been denied</string>
 
     <string name="scan_lnurl_fetching">Fetching data from service…</string>
+    <string name="scan_bip353_resolving">Resolving payment request over DNS…</string>
 
     <string name="scan_manual_input_title">Manual input</string>
     <string name="scan_manual_input_instructions">Enter a Lightning invoice, LNURL or Lightning address you want to send money to.</string>
@@ -224,6 +225,7 @@
     <string name="btn_back">Go back</string>
     <string name="btn_next">Next</string>
     <string name="btn_copy">Copy</string>
+    <string name="btn_share">Share</string>
     <string name="btn_ok">OK</string>
     <string name="btn_save">Save</string>
     <string name="btn_confirm">Confirm</string>
@@ -836,5 +838,15 @@
     <!-- settings: contacts list -->
 
     <string name="settings_contacts_help">Contacts allows you to link a name to a static offer. They are stored locally.</string>
+
+    <!-- experimental -->
+
+    <string name="experimental_title">Experimental features</string>
+
+    <string name="bip353_header">Bip353 DNS address</string>
+    <string name="bip353_empty">No address yet…</string>
+    <string name="bip353_claim_button">Claim my address</string>
+    <string name="bip353_claiming">Claiming address…</string>
+    <string name="bip353_error">Failed to claim address</string>
 
 </resources>

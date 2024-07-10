@@ -91,7 +91,7 @@
     <string name="receive_lightning_error">Échec de la création de la requête</string>
     <string name="receive_lightning_share_subject">Paiement Lightning</string>
     <string name="receive_lightning_share_title">Partagez cette requête de paiement Lightning avec…</string>
-    <string name="receive_lnurl_button">Utiliser un lien LNURL</string>
+    <string name="receive_lnurl_button">Scan</string>
 
     <string name="receive_lightning_edit_button">Éditer</string>
     <string name="receive_lightning_edit_title">Éditer une requête</string>

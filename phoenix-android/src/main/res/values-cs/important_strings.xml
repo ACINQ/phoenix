@@ -82,13 +82,13 @@
     <string name="home_swapin_help_generic">On-chain prostředky byly vloženy do vaší peněženky.</string>
     <string name="home_swapin_help_button">Klikněte pro podrobnosti</string>
 
-    <string name="home_background_restriction_title">Zpracování pozadí omezeno</string>
-    <string name="home_background_restriction_body_1">Fénix nebude moci přijímat platby, pokud je na pozadí nebo pokud je zavřený </string>.
+    <string name="home_background_restriction_title">Omezeno zpracovávání na pozadí</string>
+    <string name="home_background_restriction_body_1">Phoenix nebude moci přijímat platby, pokud je na pozadí nebo pokud je zavřený.</string>.
     <string name="home_background_restriction_body_2">Děje se tak, protože:</string>
     <string name="home_background_restriction_tor">Tor je povolen</string>
     <string name="home_background_restriction_powersaver">Zařízení je v úsporném režimu</string>
     <string name="home_background_restriction_fcm">Oznámení FCM nejsou k dispozici</string>
-    <string name="home_background_restriction_fcm_details">Pokud používáte GrapheneOS nebo CalyxOS, nainstalujte si služby Google Play, abyste mohli dostávat oznámení FCM. Nápovědu naleznete v často kladených dotazech.</string>
+    <string name="home_background_restriction_fcm_details">Pokud používáte GrapheneOS nebo CalyxOS, nainstalujte si služby Google Play, abyste mohli dostávat FCM oznámení. Nápovědu naleznete v často kladených dotazech.</string>
 
     <!-- home: bottom menu -->
 
@@ -141,17 +141,17 @@
 
     <!-- receive: offer labels -->
 
-    <string name="receive_toggle_offer_button">Zobrazit opakovaně použitelný QR kód</string>
+    <string name="receive_toggle_offer_button">Zobrazit znovupoužitelný QR kód</string>
 
-    <string name="receive_offer_howto_intro_1">🎉 Zde je vaše žádost o opakovanou platbu!</string>
-    <string name="receive_offer_howto_intro_2">Klepnutím se dozvíte, jak jej používat</string>
-    <string name="receive_offer_howto_details_1">Tento požadavek na platbu Bolt12 je ekvivalentem adresy Bitcoin v systému Lightning.</string>
-    <string name="receive_offer_howto_details_2">Na rozdíl od tradičních faktur Lightning nevyprší její platnost a lze ji použít opakovaně.</string>
-    <string name="receive_offer_howto_details_3">Sdílejte ji široce : za dary, spropitné nebo aby vám zaplatili vaši přátelé.</string>
+    <string name="receive_offer_howto_intro_1">🎉 Zde je vaše znovupoužitelná žádost o platbu!</string>
+    <string name="receive_offer_howto_intro_2">Klepnutím se dozvíte, jak ji používat</string>
+    <string name="receive_offer_howto_details_1">Tento Bolt12 požadavek na platbu je ekvivalentem Bitcoin adresy v Lightningu.</string>
+    <string name="receive_offer_howto_details_2">Na rozdíl od tradičních Lightning faktur nevyprší její platnost a lze ji používat opakovaně.</string>
+    <string name="receive_offer_howto_details_3">Sdílejte ji ve velkém : na dary, spropitné nebo aby vám zaplatili vaši přátelé.</string>
     <string name="receive_offer_howto_details_4_title">🛟 Kdo podporuje Bolt12?</string>
-    <string name="receive_offer_howto_details_4">V tuto chvíli podporuje Bolt12 jen několik služeb. Pokud služba odmítne tuto fakturu, dejte jí vědět, že o ni přichází!</string>
+    <string name="receive_offer_howto_details_4">V tuto chvíli podporuje Bolt12 jen několik služeb. Pokud služba tuto fakturu odmítne, dejte jí vědět o co přichází!</string>
     <string name="receive_offer_howto_details_5_title">🔋 Omezení baterie</string>
-    <string name="receive_offer_howto_details_5">Zkontrolujte, zda Android na Phoenix nepoužívá režim úspory baterie. V opačném případě nebudete moci přijímat platby, pokud je aplikace zavřená nebo na pozadí. Povolení TOR ve Phoenixu také způsobí problémy.</string>
+    <string name="receive_offer_howto_details_5">Zkontrolujte, zda Android na aplikaci Phoenix nepoužívá režim úspory baterie. V opačném případě nebudete moci přijímat platby, pokud je aplikace zavřená nebo na pozadí. Povolení TORu ve Phoenixu také způsobí problémy.</string>
     <string name="receive_offer_howto_details_faq_link">Další informace</string>
 
     <!-- scanning errors -->
@@ -166,8 +166,8 @@
     <!-- receive: Tor warning -->
 
     <string name="receive_tor_warning_title">Tor je povolen</string>
-    <string name="receive_tor_warning_dialog_content_1">Fénix nemůže přijímat platby na pozadí </string>.
-    <string name="receive_tor_warning_dialog_content_2">Chcete-li se vyhnout selhání plateb, použijte místo toho Orbot nebo se ujistěte, že Fénix zůstává viditelný v popředí, když jsou vám odesílány platby.</string>
+    <string name="receive_tor_warning_dialog_content_1">Phoenix nemůže přijímat platby na pozadí </string>.
+    <string name="receive_tor_warning_dialog_content_2">Chcete-li se vyhnout selhání plateb, použijte místo toho Orbot nebo se ujistěte, že Phoenix zůstává zobrazený v popředí, když jsou vám platby odesílány.</string>
 
     <!-- validation -->
 
@@ -263,10 +263,10 @@
 
     <!-- Tor -->
 
-    <string name="tor_settings_subtitle">Phoenix může použít Tor ke skrytí vaší IP adresy od ostatních uzlů sítě Lightning Network a serverů Electrum.</string>
+    <string name="tor_settings_subtitle">Phoenix může použít Tor ke skrytí vaší IP adresy před ostatními uzly v síti Lightning a servery Electrum.</string>
 
     <string name="tor_confirm_dialog_title">Povolit Tor?</string>
-    <string name="tor_confirm_dialog_details_1">Tor je pomalý a ovlivní výkon vašich plateb.</string>
+    <string name="tor_confirm_dialog_details_1">Tor je pomalý a ovlivní rychlost vašich plateb.</string>
     <string name="tor_confirm_dialog_details_2">Konkrétně <b>nebudete moci přijímat platby</b>, pokud je Phoenix na pozadí nebo pokud je zavřený.</string>
 
     <!-- about -->
@@ -456,5 +456,10 @@
     <string name="swapinrefund_failed_cannot_create">Nepodařilo se vytvořit refund transakci. Zkuste to prosím znovu.</string>
     <string name="swapinrefund_success">Transakce odeslána.</string>
     <string name="swapinrefund_success_details">Transakci naleznete níže. Nebude se zobrazovat v historii plateb, proto si nyní v případě potřeby zkopírujte její ID.</string>
+
+    <!-- experimental features -->
+
+    <string name="bip353_subtitle">Toto je lidsky čitelná adresa pro vaši žádost o platbu Bolt12.</string>
+    <string name="bip353_subtitle2">Chcete hezčí adresu? Použijte služby třetích stran, jako je twelve.cash, nebo si adresu hostujte sami!</string>
 
 </resources>

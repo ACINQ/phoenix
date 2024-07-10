@@ -114,7 +114,7 @@
     <string name="receive_lightning_error">Không thể xuất hóa đơn</string>
     <string name="receive_lightning_share_subject">Hoá đơn Lightning</string>
     <string name="receive_lightning_share_title">Chia sẻ hóa đơn Lightning này với…</string>
-    <string name="receive_lnurl_button">Sử dụng liên kết LNURL</string>
+    <string name="receive_lnurl_button">Quét</string>
 
     <string name="receive_lightning_edit_button">Chỉnh sửa</string>
     <string name="receive_lightning_edit_title">Chỉnh sửa hoá đơn</string>
@@ -274,7 +274,7 @@
     <string name="home__balance_loading">Đang tải…</string>
     <string name="home__onchain_incoming">+%1$s</string>
 
-    <string name="home__faq_button">Câu hỏi thường gặp</string>
+    <string name="home__faq_button">FAQ</string>
     <string name="home__payments_none">Sử dụng các nút Nhận và Gửi ở cuối màn hình này để bắt đầu!</string>
     <string name="home__payments_more_button">Hiển thị tất cả các khoản thanh toán…</string>
     <string name="home__connection__electrum_late">Electrum muộn</string>

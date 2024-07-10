@@ -45,6 +45,7 @@ import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.settings.SettingWithCopy
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.monoTypo
 import fr.acinq.phoenix.android.utils.mutedTextColor
@@ -175,7 +176,7 @@ private fun FinalWalletView(onFinalWalletClick: () -> Unit) {
             HSeparator(modifier = Modifier.padding(start = 16.dp), width = 50.dp)
             SettingWithCopy(
                 title = stringResource(id = R.string.walletinfo_xpub),
-                titleMuted = stringResource(id = R.string.walletinfo_path, it.finalOnChainWalletPath),
+                titleNote = stringResource(id = R.string.walletinfo_path, it.finalOnChainWalletPath),
                 value = it.finalOnChainWallet.xpub,
                 maxLines = 2,
             )

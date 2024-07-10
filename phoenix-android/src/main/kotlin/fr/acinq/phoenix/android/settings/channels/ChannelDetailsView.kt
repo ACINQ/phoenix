@@ -47,7 +47,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
@@ -56,7 +55,6 @@ import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.AmountWithFiatBelow
 import fr.acinq.phoenix.android.components.AmountWithFiatBeside
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Card
@@ -66,11 +64,10 @@ import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.Dialog
 import fr.acinq.phoenix.android.components.InlineButton
 import fr.acinq.phoenix.android.components.ItemCard
+import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.ProgressView
-import fr.acinq.phoenix.android.components.Setting
-import fr.acinq.phoenix.android.components.SettingInteractive
-import fr.acinq.phoenix.android.components.SettingWithCopy
-import fr.acinq.phoenix.android.components.SettingWithDecoration
+import fr.acinq.phoenix.android.components.settings.Setting
+import fr.acinq.phoenix.android.components.settings.SettingWithCopy
 import fr.acinq.phoenix.android.components.TransactionLinkButton
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.navigateToPaymentDetails
@@ -132,20 +129,19 @@ private fun ChannelSummaryView(
                 Setting(title = stringResource(id = R.string.channeldetails_state), description = channel.stateName)
                 Setting(
                     title = stringResource(id = R.string.channeldetails_spendable),
-                    content = {
+                    subtitle = {
                         channel.localBalance?.let { AmountWithFiatBeside(amount = it) } ?: Text(text = stringResource(id = R.string.utils_unknown))
                     }
                 )
                 Setting(
                     title = stringResource(id = R.string.channeldetails_receivable),
-                    content = {
+                    subtitle = {
                         channel.availableForReceive?.let { AmountWithFiatBeside(amount = it) } ?: Text(text = stringResource(id = R.string.utils_unknown))
                     }
                 )
-                SettingInteractive(
+                Setting(
                     title = stringResource(id = R.string.channeldetails_json),
-                    icon = R.drawable.ic_curly_braces,
-                    iconTint = MaterialTheme.colors.primary,
+                    leadingIcon = { PhoenixIcon(resourceId = R.drawable.ic_curly_braces, tint = MaterialTheme.colors.primary) },
                     onClick = { showJsonDialog = true }
                 )
             }
@@ -186,9 +182,9 @@ private fun CommitmentDetailsView(
         value = paymentsManager.listPaymentsForTxId(commitment.fundingTxId)
     }
 
-    SettingWithDecoration(
+    Setting(
         title = "Index ${commitment.fundingTxIndex}",
-        description = {
+        subtitle = {
             Row {
                 Text(text = stringResource(id = R.string.channeldetails_commitment_funding_tx_id), modifier = Modifier.alignByBaseline())
                 Spacer(modifier = Modifier.width(4.dp))
@@ -236,7 +232,6 @@ private fun CommitmentDetailsView(
                 }
             }
         },
-        decoration = null
     )
 }
 
