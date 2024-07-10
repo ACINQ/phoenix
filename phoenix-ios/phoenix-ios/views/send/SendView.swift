@@ -86,7 +86,8 @@ struct SendView: MVIView {
 		switch mvi.model {
 		case _ as Scan.Model_Ready,
 		     _ as Scan.Model_BadRequest,
-		     _ as Scan.Model_LnurlServiceFetch:
+		     _ as Scan.Model_LnurlServiceFetch,
+		     _ as Scan.Model_ResolvingBip353:
 
 			ScanView(location: location, mvi: mvi, toast: toast)
 				.zIndex(4)
@@ -215,7 +216,14 @@ struct SendView: MVIView {
 				"You've already paid this invoice. Paying it again could result in stolen funds.",
 				comment: "Error message - scanning lightning invoice"
 			)
+
+		case is Scan.BadRequestReason_InvalidBip353:
 			
+			msg = NSLocalizedString(
+				"Invalid BIP353 DNS address",
+				comment: "Error message - dns record contains an invalid offer"
+			)
+
 		case let serviceError as Scan.BadRequestReason_ServiceError:
 			
 			let remoteFailure: LnurlError.RemoteFailure = serviceError.error

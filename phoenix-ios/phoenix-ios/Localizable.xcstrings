@@ -21340,6 +21340,17 @@
         }
       }
     },
+    "Invalid BIP353 DNS address" : {
+      "comment" : "Error message - dns record contains an invalid offer",
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adresse DNS BIP353 invalide"
+          }
+        }
+      }
+    },
     "Invalid bitcoin address" : {
       "comment" : "Error message - parsing bitcoin address",
       "localizations" : {

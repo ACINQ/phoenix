@@ -185,6 +185,7 @@
 		DC6D68252AC1DD5C0099929F /* Currencies.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = DC6D68242AC1DD5C0099929F /* Currencies.xcstrings */; };
 		DC6D68272AC1DD5C0099929F /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = DC6D68262AC1DD5C0099929F /* Localizable.xcstrings */; };
 		DC6D68292AC1DD5C0099929F /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = DC6D68282AC1DD5C0099929F /* InfoPlist.xcstrings */; };
+		DC6F04232C35EB9900627B4F /* SummaryInfoGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F04222C35EB9900627B4F /* SummaryInfoGrid.swift */; };
 		DC70A99C2BBB6093002DBFF8 /* InboundFeeWarning.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC70A99B2BBB6093002DBFF8 /* InboundFeeWarning.swift */; };
 		DC71E7302723240E0063613D /* KotlinObservables.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC71E72F2723240E0063613D /* KotlinObservables.swift */; };
 		DC71E7332728645B0063613D /* CurrencyConverterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC71E7322728645B0063613D /* CurrencyConverterView.swift */; };
@@ -574,6 +575,7 @@
 		DC6D68242AC1DD5C0099929F /* Currencies.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Currencies.xcstrings; sourceTree = "<group>"; };
 		DC6D68262AC1DD5C0099929F /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		DC6D68282AC1DD5C0099929F /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
+		DC6F04222C35EB9900627B4F /* SummaryInfoGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryInfoGrid.swift; sourceTree = "<group>"; };
 		DC70A99B2BBB6093002DBFF8 /* InboundFeeWarning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboundFeeWarning.swift; sourceTree = "<group>"; };
 		DC71E72F2723240E0063613D /* KotlinObservables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinObservables.swift; sourceTree = "<group>"; };
 		DC71E7322728645B0063613D /* CurrencyConverterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverterView.swift; sourceTree = "<group>"; };
@@ -1375,6 +1377,7 @@
 			children = (
 				53BEF4DAE061532668494988 /* PaymentView.swift */,
 				DCCD045E27EE0301007D57A5 /* SummaryView.swift */,
+				DC6F04222C35EB9900627B4F /* SummaryInfoGrid.swift */,
 				DCCD046027EE045C007D57A5 /* DetailsView.swift */,
 				DCCD045C27EE0173007D57A5 /* EditInfoView.swift */,
 				DCCD046227EE04E1007D57A5 /* WalletPaymentExtensions.swift */,
@@ -1603,8 +1606,9 @@
 		7555FF73242A565900829871 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1330;
-				LastUpgradeCheck = 1400;
+				LastUpgradeCheck = 1540;
 				ORGANIZATIONNAME = Acinq;
 				TargetAttributes = {
 					7555FF7A242A565900829871 = {
@@ -1984,6 +1988,7 @@
 				DC65D86428E2F7D700686355 /* ResetWalletView_Action.swift in Sources */,
 				DC71E7332728645B0063613D /* CurrencyConverterView.swift in Sources */,
 				DCA3B41F2A5471C900E6B231 /* MinerFeeInfo.swift in Sources */,
+				DC6F04232C35EB9900627B4F /* SummaryInfoGrid.swift in Sources */,
 				DCACF6F02566D0A60009B01E /* Data+Hexadecimal.swift in Sources */,
 				DCE3C7AB2A6AD3CC00F4D385 /* MempoolMonitor.swift in Sources */,
 				DC3780392C04D60400937C8E /* KotlinEnums.swift in Sources */,
@@ -2277,7 +2282,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Green";
 				CODE_SIGN_ENTITLEMENTS = "phoenix-ios/Phoenix.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 77;
+				CURRENT_PROJECT_VERSION = 78;
 				DEVELOPMENT_ASSET_PATHS = "\"phoenix-ios/Preview Content\"";
 				DEVELOPMENT_TEAM = XD77LN4376;
 				ENABLE_PREVIEWS = YES;
@@ -2306,7 +2311,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Green";
 				CODE_SIGN_ENTITLEMENTS = "phoenix-ios/Phoenix.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 77;
+				CURRENT_PROJECT_VERSION = 78;
 				DEVELOPMENT_ASSET_PATHS = "\"phoenix-ios/Preview Content\"";
 				DEVELOPMENT_TEAM = XD77LN4376;
 				ENABLE_PREVIEWS = YES;
@@ -2410,8 +2415,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 77;
+				CURRENT_PROJECT_VERSION = 78;
 				DEVELOPMENT_TEAM = XD77LN4376;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -2439,8 +2445,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 77;
+				CURRENT_PROJECT_VERSION = 78;
 				DEVELOPMENT_TEAM = XD77LN4376;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -2470,7 +2477,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_ENTITLEMENTS = "phoenix-notifySrvExt/phoenix-notifySrvExt.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 77;
+				CURRENT_PROJECT_VERSION = 78;
 				DEVELOPMENT_TEAM = XD77LN4376;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "phoenix-notifySrvExt/Info.plist";
@@ -2497,7 +2504,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_ENTITLEMENTS = "phoenix-notifySrvExt/phoenix-notifySrvExt.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 77;
+				CURRENT_PROJECT_VERSION = 78;
 				DEVELOPMENT_TEAM = XD77LN4376;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "phoenix-notifySrvExt/Info.plist";

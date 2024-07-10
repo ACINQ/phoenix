@@ -449,6 +449,6 @@
     <!-- experimental features -->
 
     <string name="bip353_subtitle">Esta es una dirección humanamente legible para su solicitud de pago Bolt12.</string>
-    <string name="bip353_subtitle2">¿Quieres una dirección más bonita? Utilice servicios de terceros como twelve.cash o aloje usted mismo la dirección.</string>
+    <string name="bip353_subtitle2">¿Quieres una dirección más bonita? Utilice servicios de terceros o aloje usted mismo la dirección.</string>
 
 </resources>
