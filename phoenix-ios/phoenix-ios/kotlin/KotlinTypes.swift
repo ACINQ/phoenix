@@ -22,6 +22,7 @@ extension Scan {
 	typealias Model_OnChainFlow = ModelOnchainFlow
 
 	typealias Model_LnurlServiceFetch = ModelLnurlServiceFetch
+	typealias Model_ResolvingBip353 = ModelResolvingBip353
 
 	typealias Model_LnurlPayFlow = ModelLnurlPayFlow
 	typealias Model_LnurlPayFlow_LnurlPayRequest = ModelLnurlPayFlowLnurlPayRequest
@@ -68,6 +69,7 @@ extension Scan {
 	typealias BadRequestReason_ServiceError = BadRequestReasonServiceError
 	typealias BadRequestReason_UnknownFormat = BadRequestReasonUnknownFormat
 	typealias BadRequestReason_UnsupportedLnurl = BadRequestReasonUnsupportedLnurl
+	typealias BadRequestReason_InvalidBip353 = BadRequestReasonInvalidBip353
 
 	typealias ClipboardContent_Bolt11InvoiceRequest = ClipboardContentBolt11InvoiceRequest
 	typealias ClipboardContent_BitcoinRequest = ClipboardContentBitcoinRequest
