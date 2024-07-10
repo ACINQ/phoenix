@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -47,6 +48,7 @@ import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.settings.Setting
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
+import fr.acinq.phoenix.data.canRequestLiquidity
 import fr.acinq.phoenix.managers.PeerManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
@@ -137,6 +139,9 @@ private fun ClaimAddressButton(
     state: ClaimAddressState,
     onClaim: () -> Unit,
 ) {
+    val channels by business.peerManager.channelsFlow.collectAsState()
+    val canClaimAddress = channels.canRequestLiquidity()
+
     when (state) {
         is ClaimAddressState.Init -> {
             Setting(
@@ -152,7 +157,13 @@ private fun ClaimAddressButton(
                 subtitle = {
                     Text(text = stringResource(id = R.string.bip353_subtitle))
                     Spacer(modifier = Modifier.height(8.dp))
-                    FilledButton(text = stringResource(id = R.string.bip353_claim_button), onClick = onClaim, padding = PaddingValues(horizontal = 12.dp, vertical = 8.dp))
+                    FilledButton(
+                        text = stringResource(id = R.string.bip353_claim_button),
+                        onClick = onClaim,
+                        padding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+                        enabled = canClaimAddress,
+                        enabledEffect = true,
+                    )
                 }
             )
         }
