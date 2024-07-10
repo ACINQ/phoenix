@@ -425,6 +425,8 @@ private fun ManualInputDialog(
                 text = input,
                 onTextChange = { input = it },
                 modifier = Modifier.fillMaxWidth(),
+                minLines = 2,
+                maxLines = 3,
                 staticLabel = stringResource(id = R.string.scan_manual_input_label),
             )
         }
