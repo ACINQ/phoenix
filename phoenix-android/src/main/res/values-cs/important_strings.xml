@@ -457,4 +457,9 @@
     <string name="swapinrefund_success">Transakce odeslána.</string>
     <string name="swapinrefund_success_details">Transakci naleznete níže. Nebude se zobrazovat v historii plateb, proto si nyní v případě potřeby zkopírujte její ID.</string>
 
+    <!-- experimental features -->
+
+    <string name="bip353_subtitle">Toto je lidsky čitelná adresa pro vaši žádost o platbu Bolt12.</string>
+    <string name="bip353_subtitle2">Chcete hezčí adresu? Použijte služby třetích stran, jako je twelve.cash, nebo si adresu hostujte sami!</string>
+
 </resources>

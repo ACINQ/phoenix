@@ -32,7 +32,7 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
-import fr.acinq.phoenix.android.components.SettingButton
+import fr.acinq.phoenix.android.components.settings.SettingButton
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.Logging
 import fr.acinq.phoenix.android.utils.shareFile

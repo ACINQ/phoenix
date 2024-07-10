@@ -130,7 +130,7 @@ fun ScanDataView(
             }
         }
         when (model) {
-            Scan.Model.Ready, is Scan.Model.BadRequest, is Scan.Model.LnurlServiceFetch -> {
+            Scan.Model.Ready, is Scan.Model.BadRequest, is Scan.Model.LnurlServiceFetch, is Scan.Model.ResolvingBip353 -> {
                 ReadDataView(
                     initialInput = initialInput,
                     model = model,
@@ -294,6 +294,12 @@ fun ReadDataView(
             }
         }
 
+        if (model is Scan.Model.ResolvingBip353) {
+            Card(modifier = Modifier.align(Alignment.Center), internalPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)) {
+                ProgressView(text = stringResource(R.string.scan_bip353_resolving))
+            }
+        }
+
         if (showManualInputDialog) {
             ManualInputDialog(onInputConfirm = onScannedText, onDismiss = { showManualInputDialog = false })
         }
@@ -354,6 +360,7 @@ private fun ScanErrorView(
         is Scan.BadRequestReason.InvalidLnurl -> stringResource(R.string.scan_error_lnurl_invalid)
         is Scan.BadRequestReason.UnsupportedLnurl -> stringResource(R.string.scan_error_lnurl_unsupported)
         is Scan.BadRequestReason.UnknownFormat -> stringResource(R.string.scan_error_invalid_generic)
+        is Scan.BadRequestReason.InvalidBip353 -> "invalid bip-353 response: ${reason.path}"
     }
     Dialog(
         onDismiss = onErrorDialogDismiss,
@@ -418,6 +425,8 @@ private fun ManualInputDialog(
                 text = input,
                 onTextChange = { input = it },
                 modifier = Modifier.fillMaxWidth(),
+                minLines = 2,
+                maxLines = 3,
                 staticLabel = stringResource(id = R.string.scan_manual_input_label),
             )
         }

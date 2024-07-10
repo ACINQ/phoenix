@@ -458,4 +458,9 @@
     <string name="swapinrefund_success">Zverejnená transakcia.</string>
     <string name="swapinrefund_success_details">Transakciu nájdete nižšie. Nebude sa zobrazovať v histórii platieb, preto si teraz vytvorte jej kópiu, ak ju potrebujete.</string>
 
+    <!-- experimental features -->
+
+    <string name="bip353_subtitle">Toto je ľudsky čitateľná adresa pre vašu žiadosť o platbu Bolt12.</string>
+    <string name="bip353_subtitle2">Chcete krajšiu adresu? Použite služby tretích strán, ako je twelve.cash, alebo si adresu vytvorte sami!</string>
+
 </resources>

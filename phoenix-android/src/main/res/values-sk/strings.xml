@@ -113,7 +113,7 @@
     <string name="receive_lightning_error">Nepodarilo sa vygenerovať faktúru</string>
     <string name="receive_lightning_share_subject">Lightningová faktúra</string>
     <string name="receive_lightning_share_title">Zdieľať túto Lightningovú faktúru s…</string>
-    <string name="receive_lnurl_button">Použiť LNURL odkaz</string>
+    <string name="receive_lnurl_button">Skenovanie</string>
     <string name="receive_toggle_offer_new_overlay">NOVÉ!</string>
 
     <string name="receive_offer_share_title">Statická Lightningová faktúra</string>

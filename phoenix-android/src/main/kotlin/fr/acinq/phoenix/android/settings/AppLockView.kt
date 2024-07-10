@@ -29,6 +29,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.settings.Setting
+import fr.acinq.phoenix.android.components.settings.SettingSwitch
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.*
 import kotlinx.coroutines.launch
@@ -58,11 +60,10 @@ private fun CanNotAuthenticate(
     status: Int,
 ) {
     val context = LocalContext.current
-    SettingInteractive(
+    Setting(
         title = stringResource(id = R.string.accessctrl_auth_error_header),
-        icon = R.drawable.ic_alert_triangle,
-        iconTint = negativeColor,
-        description = { Text(text = BiometricsHelper.getAuthErrorMessage(context, code = status)) },
+        leadingIcon = { PhoenixIcon(resourceId = R.drawable.ic_alert_triangle, tint = negativeColor) },
+        subtitle = { Text(text = BiometricsHelper.getAuthErrorMessage(context, code = status)) },
         onClick = { context.startActivity(Intent(Settings.ACTION_SECURITY_SETTINGS)) }
     )
 }

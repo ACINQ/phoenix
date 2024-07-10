@@ -465,4 +465,9 @@
     <string name="swapinrefund_success">Giao dịch đã được công bố.</string>
     <string name="swapinrefund_success_details">Bạn có thể tìm thấy giao dịch chi tiêu số tiền bên dưới. Nó sẽ không xuất hiện trong lịch sử thanh toán của bạn, vì vậy hãy tạo bản sao ID của nó ngay bây giờ nếu cần.</string>
 
+    <!-- experimental features -->
+
+    <string name="bip353_subtitle">Đây là địa chỉ mà con người có thể đọc được cho yêu cầu thanh toán Bolt12 của bạn.</string>
+    <string name="bip353_subtitle2">Bạn muốn một địa chỉ đẹp hơn? Sử dụng các dịch vụ của bên thứ ba như Twelve.cash hoặc tự lưu trữ địa chỉ!</string>
+
 </resources>
