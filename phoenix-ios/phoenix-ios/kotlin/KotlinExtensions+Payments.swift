@@ -1,6 +1,34 @@
 import Foundation
 import PhoenixShared
 
+extension PaymentsPage {
+	
+	func forceRefresh() -> PaymentsPage {
+		
+		// What we want to do is ensure a fetch (via the PaymentsFetcher) will return
+		// a new version of the payment (+ metadata + contact).
+		// To accomplish this we simply tweak `metadataModifiedAt` for each item.
+		
+		let newRows: [WalletPaymentOrderRow] = self.rows.map { (row: WalletPaymentOrderRow) in
+			
+			let newMetadataModifiedAt: Int64
+			if let oldMetadataModifiedAt = row.metadataModifiedAt {
+				newMetadataModifiedAt = oldMetadataModifiedAt.int64Value + 1
+			} else {
+				newMetadataModifiedAt = 0
+			}
+			
+			return WalletPaymentOrderRow(
+				id: row.kotlinId(),
+				createdAt: row.createdAt,
+				completedAt: row.completedAt,
+				metadataModifiedAt: KotlinLong(value: newMetadataModifiedAt)
+			)
+		}
+		
+		return PaymentsPage(offset: self.offset, count: self.count, rows: newRows)
+	}
+}
 
 extension WalletPaymentOrderRow {
 	
