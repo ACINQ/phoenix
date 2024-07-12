@@ -177,9 +177,14 @@ private fun ClaimAddressButton(
         is ClaimAddressState.Done -> {
             val context = LocalContext.current
             Setting(
-                title = state.address,
+                title = stringResource(id = R.string.utils_bip353_with_prefix, state.address),
                 leadingIcon = { PhoenixIcon(R.drawable.ic_arobase) },
-                trailingIcon = { Button(icon = R.drawable.ic_copy, onClick = { copyToClipboard(context, state.address) }) },
+                trailingIcon = {
+                    Button(
+                        icon = R.drawable.ic_copy,
+                        onClick = { copyToClipboard(context, context.getString(R.string.utils_bip353_with_prefix, state.address)) }
+                    )
+                },
                 subtitle = {
                     Text(text = stringResource(id = R.string.bip353_subtitle))
                     Spacer(modifier = Modifier.height(4.dp))

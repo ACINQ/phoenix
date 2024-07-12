@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import fr.acinq.bitcoin.BitcoinError
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.Transaction
 import fr.acinq.bitcoin.utils.Either
@@ -83,18 +84,26 @@ class SwapInRefundViewModel(
                 is Either.Right -> {
                     val keyManager = walletManager.keyManager.filterNotNull().first()
                     val swapInWallet = peerManager.swapInWallet.filterNotNull().first()
-                    val res = swapInWallet.spendExpiredSwapIn(
-                        swapInKeys = keyManager.swapInOnChainWallet,
-                        scriptPubKey = parseAddress.value.script,
-                        feerate = FeeratePerKw(feerate)
-                    )
-                    state = if (res == null) {
-                        log.error("could not generate a swap-in refund transaction")
-                        SwapInRefundState.Done.Failed.CannotCreateTx
+                    val script = parseAddress.value.script
+                    if (script == null) {
+                        state = SwapInRefundState.Done.Failed.InvalidAddress(
+                            address = parseAddress.value.address,
+                            error = BitcoinUriError.InvalidScript(BitcoinError.InvalidScript)
+                        )
                     } else {
-                        val (tx, fee) = res
-                        log.info("estimated fee=$fee for swap-in refund")
-                        SwapInRefundState.ReviewFee(fees = fee, transaction = tx)
+                        val res = swapInWallet.spendExpiredSwapIn(
+                            swapInKeys = keyManager.swapInOnChainWallet,
+                            scriptPubKey = script,
+                            feerate = FeeratePerKw(feerate)
+                        )
+                        state = if (res == null) {
+                            log.error("could not generate a swap-in refund transaction")
+                            SwapInRefundState.Done.Failed.CannotCreateTx
+                        } else {
+                            val (tx, fee) = res
+                            log.info("estimated fee=$fee for swap-in refund")
+                            SwapInRefundState.ReviewFee(fees = fee, transaction = tx)
+                        }
                     }
                 }
             }

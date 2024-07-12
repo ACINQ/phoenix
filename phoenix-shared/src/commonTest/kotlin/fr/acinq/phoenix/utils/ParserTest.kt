@@ -75,6 +75,9 @@ class ParserTest {
         assertIs<Either.Right<BitcoinUri>>(
             Parser.readBitcoinAddress(Chain.Mainnet, "bitcoin://bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4")
         )
+        assertIs<Either.Right<BitcoinUri>>(
+            Parser.readBitcoinAddress(Chain.Testnet, "bitcoin:?lno=lno1qgsyxjtl6luzd9t3pr62xr7eemp6awnejusgf6gw45q75vcfqqqqqqqsespexwyy4tcadvgg89l9aljus6709kx235hhqrk6n8dey98uyuftzdqrt2gkjvf2rj2vnt7m7chnmazen8wpur2h65ttgftkqaugy6ql9dcsyq39xc2g084xfn0s50zlh2ex22vvaqxqz3vmudklz453nns4d0624sqr8ux4p5usm22qevld4ydfck7hwgcg9wc3f78y7jqhc6hwdq7e9dwkhty3svq5ju4dptxtldjumlxh5lw48jsz6pnagtwrmeus7uq9rc5g6uddwcwldpklxexvlezld8egntua4gsqqy8auz966nksacdac8yv3maq6elp")
+        )
     }
 
     @Test

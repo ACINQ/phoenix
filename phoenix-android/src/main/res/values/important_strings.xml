@@ -157,6 +157,10 @@
     <string name="receive_offer_howto_details_5">Check that Android does not apply a battery saving mode to Phoenix. Otherwise, you won\'t be able to receive payments if the app is closed or in the background. Enabling TOR in Phoenix will also cause issues.</string>
     <string name="receive_offer_howto_details_faq_link">Learn more</string>
 
+    <string name="receive_offer_copy_bip353">Copy human-readable address</string>
+    <string name="receive_offer_copy_bolt12">Copy payment code</string>
+    <string name="receive_offer_copy_bip21">Copy full URI</string>
+
     <!-- receive: Tor warning -->
 
     <string name="receive_tor_warning_title">Tor is enabled</string>

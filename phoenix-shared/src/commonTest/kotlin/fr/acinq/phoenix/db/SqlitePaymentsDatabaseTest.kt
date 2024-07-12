@@ -154,7 +154,7 @@ class SqlitePaymentsDatabaseTest {
     fun incoming__purge_expired() = runTest {
         val expiredPreimage = randomBytes32()
         val expiredInvoice = Bolt11Invoice.create(
-            chainHash = Block.TestnetGenesisBlock.hash,
+            chain = Chain.Testnet,
             amount = 150_000.msat,
             paymentHash = Crypto.sha256(expiredPreimage).toByteVector32(),
             privateKey = Lightning.randomKey(),
@@ -407,7 +407,7 @@ class SqlitePaymentsDatabaseTest {
             msat: MilliSatoshi = 150_000.msat
         ): Bolt11Invoice {
             return Bolt11Invoice.create(
-                chainHash = Block.LivenetGenesisBlock.hash,
+                chain = Chain.Mainnet,
                 amount = msat,
                 paymentHash = Crypto.sha256(preimage).toByteVector32(),
                 privateKey = Lightning.randomKey(),

@@ -134,7 +134,7 @@ fun Bip353AddressDisplay(address: String?) {
         address.isNullOrBlank() -> {}
         else -> {
             SelectionContainer {
-                Text(text = address, style = MaterialTheme.typography.body2)
+                Text(text = stringResource(id = R.string.utils_bip353_with_prefix, address), style = MaterialTheme.typography.body2)
             }
             Spacer(modifier = Modifier.height(16.dp))
         }
@@ -161,19 +161,24 @@ private fun CopyAddressDialog(
         containerColor = MaterialTheme.colors.surface,
         contentColor = MaterialTheme.colors.onSurface,
         scrimColor = MaterialTheme.colors.onBackground.copy(alpha = 0.2f),
-        //dragHandle = null
     ) {
         Column(Modifier.padding(bottom = 50.dp)) {
             Button(
-                text = "Copy Bolt12 code",
+                text = stringResource(id = R.string.receive_offer_copy_bip353),
+                icon = R.drawable.ic_copy,
+                onClick = { copyToClipboard(context, data = context.getString(R.string.utils_bip353_with_prefix, address)) },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Button(
+                text = stringResource(id = R.string.receive_offer_copy_bolt12),
                 icon = R.drawable.ic_copy,
                 onClick = { copyToClipboard(context, data = offer) },
                 modifier = Modifier.fillMaxWidth(),
             )
             Button(
-                text = "Copy address",
+                text = stringResource(id = R.string.receive_offer_copy_bip21),
                 icon = R.drawable.ic_copy,
-                onClick = { copyToClipboard(context, data = address) },
+                onClick = { copyToClipboard(context, data = "bitcoin:?lno=$offer") },
                 modifier = Modifier.fillMaxWidth(),
             )
         }

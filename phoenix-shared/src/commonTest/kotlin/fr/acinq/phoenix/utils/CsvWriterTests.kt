@@ -1,6 +1,7 @@
 package fr.acinq.phoenix.utils
 
 import fr.acinq.bitcoin.Block
+import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.OutPoint
 import fr.acinq.bitcoin.PrivateKey
 import fr.acinq.bitcoin.PublicKey
@@ -336,7 +337,7 @@ class CsvWriterTests {
      */
     private fun makePaymentRequest() =
         Bolt11Invoice.create(
-            chainHash = Block.TestnetGenesisBlock.hash,
+            chain = Chain.Testnet,
             amount = 10_000.msat,
             paymentHash = randomBytes32(),
             privateKey = PrivateKey(value = randomBytes32()),

@@ -198,8 +198,9 @@
     <string name="scan_bip353_resolving">Resolving payment request over DNS…</string>
 
     <string name="scan_manual_input_title">Manual input</string>
-    <string name="scan_manual_input_instructions">Enter a Lightning invoice, LNURL or Lightning address you want to send money to.</string>
-    <string name="scan_manual_input_label">Invoice or LN address</string>
+    <string name="scan_manual_input_instructions">Enter a Lightning invoice, an offer, a LNURL or a Lightning address you want to send money to.</string>
+    <string name="scan_manual_input_label">Invoice, LN address…</string>
+    <string name="scan_manual_input_hint" translatable="false">₿satoshi@domain.com</string>
 
     <!-- utils: misc strings -->
 
@@ -213,6 +214,8 @@
     <string name="utils_loading_data">Loading data…</string>
     <string name="utils_loading_prefs">Loading preferences…</string>
     <string name="utils_copied">Copied to clipboard!</string>
+
+    <string name="utils_bip353_with_prefix" translatable="false">₿%1$s</string>
 
     <string name="accessibility_link">Open link in a browser</string>
     <string name="accessibility_explorer_link">Open transaction in an explorer</string>

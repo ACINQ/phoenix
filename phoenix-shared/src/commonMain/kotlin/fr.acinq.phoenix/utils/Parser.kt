@@ -132,15 +132,29 @@ object Parser {
                 is Try.Failure -> null
             }
         }
+        val offer = url.parameters["lno"]?.let {
+            when (val res = OfferTypes.Offer.decode(it)) {
+                is Try.Success -> res.get()
+                is Try.Failure -> null
+            }
+        }
         val otherParams = ParametersBuilder().apply {
             appendAll(url.parameters.filter { entry, _ ->
-                !listOf("amount", "label", "message", "lightning").contains(entry)
+                !listOf("amount", "label", "message", "lightning", "lno").contains(entry)
             })
         }.build()
 
-        return when (val res = Bitcoin.addressToPublicKeyScript(chain.chainHash, address)) {
-            is Either.Left -> Either.Left(BitcoinUriError.InvalidScript(res.left))
-            is Either.Right -> Either.Right(BitcoinUri(chain, address, res.right.let { Script.write(it) }.byteVector(), label, message, amount, lightning, otherParams))
+        val scriptParse = address.takeIf { it.isNotBlank() }?.let {
+            Bitcoin.addressToPublicKeyScript(chain.chainHash, address)
+        }
+        return when (scriptParse) {
+            is Either.Left -> Either.Left(BitcoinUriError.InvalidScript(scriptParse.left))
+            else -> Either.Right(
+                BitcoinUri(
+                    chain = chain, address = address, script = scriptParse?.right?.let { Script.write(it) }?.byteVector(), label = label,
+                    message = message, amount = amount, paymentRequest = lightning, offer = offer, ignoredParams = otherParams,
+                )
+            )
         }
     }
 
