@@ -783,7 +783,6 @@
 				DC6D26E229E76557006A7814 /* AnimatedClock.swift */,
 				DCB30E532A0AABAF00E7D7A2 /* InfoPopoverWindow.swift */,
 				DC3345D12C2C761800EDD2D4 /* CameraPicker.swift */,
-				DC6F04262C3895E300627B4F /* ContactPhoto.swift */,
 			);
 			path = widgets;
 			sourceTree = "<group>";
@@ -1026,6 +1025,7 @@
 				DC3345CF2C2B4C1200EDD2D4 /* ManageContactSheet.swift */,
 				DC5567442C2F1A6900008E11 /* ContactsList.swift */,
 				DC6F042A2C3DA7AD00627B4F /* ContactsListSheet.swift */,
+				DC6F04262C3895E300627B4F /* ContactPhoto.swift */,
 			);
 			path = contacts;
 			sourceTree = "<group>";
