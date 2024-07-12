@@ -127,8 +127,12 @@
     <string name="receive_lnurl_button">Scan</string>
     <string name="receive_toggle_offer_new_overlay">NEW!</string>
 
-    <string name="receive_offer_share_title">Static Lightning invoice</string>
-    <string name="receive_offer_share_subject">Share this static Lightning invoice with…</string>
+    <string name="receive_offer_share_title">Bolt12 payment code</string>
+    <string name="receive_offer_share_subject">Share this Bolt12 payment code with…</string>
+
+    <string name="receive_offer_copy_bip353">Copy human-readable address</string>
+    <string name="receive_offer_copy_bolt12">Copy payment code</string>
+    <string name="receive_offer_copy_bip21">Copy full URI</string>
 
     <string name="receive_lightning_edit_button">Edit</string>
     <string name="receive_lightning_edit_title">Edit invoice</string>
@@ -688,8 +692,9 @@
     <string name="paymentsettings_overpayment_enabled">You\'ll be able to overpay Lightning invoices up to 2 times the amount requested. Useful for manual tipping, or as a privacy measure.</string>
     <string name="paymentsettings_overpayment_disabled">Disabled (default)</string>
 
-    <string name="paymentsettings_random_payer_key_title">Random payer key</string>
-    <string name="paymentsettings_random_payer_key_desc">If enabled, the recipient of a BOLT12 offer will not know who made the payment.</string>
+    <string name="paymentsettings_offer_key_contacts_title">Use my offer key for contacts</string>
+    <string name="paymentsettings_offer_key_contacts_enabled">If the recipient knows your offer, they will be able to tell the payment is coming from you.</string>
+    <string name="paymentsettings_offer_key_contacts_disabled">Use a throw-away id for every payment (default).</string>
 
     <!-- settings: currencies -->
 

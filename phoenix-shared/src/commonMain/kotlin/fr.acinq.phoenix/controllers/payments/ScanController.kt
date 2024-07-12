@@ -174,7 +174,13 @@ class AppScanController(
         result: Either<BitcoinUriError, BitcoinUri>
     ) {
         model(when (result) {
-            is Either.Right -> Scan.Model.OnchainFlow(uri = result.value)
+            is Either.Right -> {
+                if (result.value.address.isNotBlank()) {
+                    Scan.Model.OnchainFlow(uri = result.value)
+                } else {
+                    Scan.Model.BadRequest(request = input, reason = Scan.BadRequestReason.UnknownFormat)
+                }
+            }
             is Either.Left -> {
                 val error = result.value
                 if (error is BitcoinUriError.InvalidScript && error.error is BitcoinError.ChainHashMismatch) {

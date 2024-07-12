@@ -623,9 +623,6 @@
     <string name="paymentsettings_overpayment_enabled">Budete moci přeplatit Lightning fakturu dvakrát o požadovanou částku. Užitečné na nastavení dýška nebo pro ochranu soukromí.</string>
     <string name="paymentsettings_overpayment_disabled">Vypnuté (výchozí)</string>
 
-    <string name="paymentsettings_random_payer_key_title">Náhodný klíč plátce</string>
-    <string name="paymentsettings_random_payer_key_desc">Pokud toto povolíte, příjemce BOLT12 nabídky nebude vědět, kdo provedl platbu.</string>
-
     <!-- settings: currencies -->
 
     <string name="currency_ars_official">Argentinské Peso (oficiální kurz)</string>

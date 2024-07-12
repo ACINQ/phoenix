@@ -131,7 +131,7 @@ fun PaymentSettingsView(
         }
 
         val isOverpaymentEnabled by userPrefs.getIsOverpaymentEnabled.collectAsState(initial = false)
-        val isRandomPayerKey by userPrefs.getPayOfferWithRandomKey.collectAsState(initial = false)
+        val useOfferKeyForContacts by userPrefs.getUseOfferKeyForContacts.collectAsState(initial = false)
         CardHeader(text = stringResource(id = R.string.paymentsettings_category_outgoing))
         Card {
             SettingSwitch(
@@ -144,12 +144,16 @@ fun PaymentSettingsView(
                 }
             )
             SettingSwitch(
-                title = stringResource(id = R.string.paymentsettings_random_payer_key_title),
-                description = stringResource(id = R.string.paymentsettings_random_payer_key_desc),
+                title = stringResource(id = R.string.paymentsettings_offer_key_contacts_title),
+                description = if (useOfferKeyForContacts) {
+                    stringResource(id = R.string.paymentsettings_offer_key_contacts_enabled)
+                } else {
+                    stringResource(id = R.string.paymentsettings_offer_key_contacts_disabled)
+                },
                 enabled = true,
-                isChecked = isRandomPayerKey,
+                isChecked = useOfferKeyForContacts,
                 onCheckChangeAttempt = {
-                    scope.launch { userPrefs.savePayOfferWithRandomKey(it) }
+                    scope.launch { userPrefs.saveUseOfferKeyForContacts(it) }
                 }
             )
         }
