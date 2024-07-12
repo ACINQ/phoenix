@@ -166,6 +166,8 @@
     <string name="scan_error_lnurl_invalid">Error al procesar este enlace LNURL. Comprueba que sea válido.</string>
     <string name="scan_error_lnurl_unsupported">Este tipo de LNURL aún no es compatible.</string>
     <string name="scan_error_invalid_generic">Estos datos usan un formato desconocido por lo que no se pueden procesar.</string>
+    <string name="scan_error_bip353_invalid_offer">Esta dirección utiliza una oferta Bolt12 no válida.</string>
+    <string name="scan_error_bip353_dnssec">Esta dirección está alojada en un DNS no seguro. DNSSEC debe estar habilitado.</string>
 
     <!-- validation -->
 

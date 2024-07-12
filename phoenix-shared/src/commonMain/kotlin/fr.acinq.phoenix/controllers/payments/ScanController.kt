@@ -128,23 +128,31 @@ class AppScanController(
     ) {
         val input = Parser.removeExcessInput(intent.request)
 
-        Parser.readBolt11Invoice(input)?.let {
-            processBolt11Invoice(it)
-        } ?: Parser.readOffer(input)?.let {
-            processOffer(it)
-        } ?: readEmailLikeAddress(input)?.let {
-            when (it) {
-                is Either.Left -> processOffer(it.value)
-                is Either.Right -> processLnurl(it.value)
+        try {
+            Parser.readBolt11Invoice(input)?.let {
+                processBolt11Invoice(it)
+            } ?: Parser.readOffer(input)?.let {
+                processOffer(it)
+            } ?: readEmailLikeAddress(input)?.let {
+                when (it) {
+                    is Either.Left -> processOffer(it.value)
+                    is Either.Right -> processLnurl(it.value)
+                }
+            } ?: readLnurl(input)?.let {
+                processLnurl(it)
+            } ?: readBitcoinAddress(input)?.let {
+                processBitcoinAddress(input, it)
+            } ?: readLNURLFallback(input)?.let {
+                processLnurl(it)
+            } ?: run {
+                model(Scan.Model.BadRequest(request = intent.request, reason = Scan.BadRequestReason.UnknownFormat))
             }
-        } ?: readLnurl(input)?.let {
-            processLnurl(it)
-        } ?: readBitcoinAddress(input)?.let {
-            processBitcoinAddress(input, it)
-        } ?: readLNURLFallback(input)?.let {
-            processLnurl(it)
-        } ?: run {
-            model(Scan.Model.BadRequest(request = intent.request, reason = Scan.BadRequestReason.UnknownFormat))
+        } catch (e: Exception) {
+            if (e is Scan.BadRequestReason) {
+                model(Scan.Model.BadRequest(request = intent.request, reason = e))
+            } else {
+                model(Scan.Model.BadRequest(request = intent.request, reason = Scan.BadRequestReason.UnknownFormat))
+            }
         }
     }
 
@@ -564,45 +572,39 @@ class AppScanController(
         model(Scan.Model.ResolvingBip353)
         val dnsPath = "$username.user._bitcoin-payment.$domain."
 
-        try {
-            val json = DnsResolvers.getRandom().getTxtRecord(dnsPath)
-            logger.debug { "dns resolved to ${json.toString().take(100)}" }
+        val json = DnsResolvers.getRandom().getTxtRecord(dnsPath)
+        logger.debug { "dns resolved to ${json.toString().take(100)}" }
 
-            val status = json["Status"]?.jsonPrimitive?.intOrNull
-            if (status == null || status > 0) throw RuntimeException("invalid status=$status")
+        val status = json["Status"]?.jsonPrimitive?.intOrNull
+        if (status == null || status > 0) return null
 
-            val ad = json["AD"]?.jsonPrimitive?.booleanOrNull
-            if (ad != true) {
-                logger.info { "AD false, abort dns lookup" }
-                return null
-            }
-
-            val records = json["Answer"]?.jsonArray
-            if (records.isNullOrEmpty()) {
-                logger.debug { "no records for $dnsPath" }
-                return null
-            }
-
-            val matchingRecord = records.filterIsInstance<JsonObject>().firstOrNull {
-                logger.debug { "inspecting record=$it" }
-                it["name"]?.jsonPrimitive?.content == dnsPath
-            } ?: return null
-
-            val data = matchingRecord["data"]?.jsonPrimitive?.content ?: return null
-            if (!data.startsWith("bitcoin:")) return null
-            val offerString = data.substringAfter("lno=").substringBefore("?")
-            if (offerString.isBlank()) return null
-
-            return when (val offer = OfferTypes.Offer.decode(offerString)) {
-                is Try.Success -> { offer.result }
-                is Try.Failure -> {
-                    model(Scan.Model.BadRequest(request = dnsPath, reason = Scan.BadRequestReason.InvalidBip353(dnsPath)))
-                    null
-                }
-            }
-        } catch (e: Exception) {
-            logger.error(e) { "error when resolving offer on $dnsPath: ${e.message}" }
+        val records = json["Answer"]?.jsonArray
+        if (records.isNullOrEmpty()) {
+            logger.debug { "no records for $dnsPath" }
             return null
+        }
+
+        val matchingRecord = records.filterIsInstance<JsonObject>().firstOrNull {
+            logger.debug { "inspecting record=$it" }
+            it["name"]?.jsonPrimitive?.content == dnsPath
+        } ?: return null
+
+        val ad = json["AD"]?.jsonPrimitive?.booleanOrNull
+        if (ad != true) {
+            logger.debug { "AD false, abort dns lookup" }
+            throw Scan.BadRequestReason.Bip353NoDNSSEC(dnsPath)
+        }
+
+        val data = matchingRecord["data"]?.jsonPrimitive?.content ?: return null
+        if (!data.startsWith("bitcoin:")) throw Scan.BadRequestReason.Bip353InvalidOffer(dnsPath)
+        val offerString = data.substringAfter("lno=").substringBefore("?")
+        if (offerString.isBlank()) throw Scan.BadRequestReason.Bip353InvalidOffer(dnsPath)
+
+        return when (val offer = OfferTypes.Offer.decode(offerString)) {
+            is Try.Success -> { offer.result }
+            is Try.Failure -> {
+                throw Scan.BadRequestReason.Bip353InvalidOffer(dnsPath)
+            }
         }
     }
 
