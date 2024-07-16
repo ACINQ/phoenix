@@ -186,7 +186,7 @@ fun PaymentsHistoryView(
                             }
                             PaymentLineLoading(item.orderRow.id, onPaymentClick)
                         } else {
-                            PaymentLine(item.paymentInfo, onPaymentClick)
+                            PaymentLine(item.paymentInfo, item.contactInfo, onPaymentClick)
                         }
                     }
                 }

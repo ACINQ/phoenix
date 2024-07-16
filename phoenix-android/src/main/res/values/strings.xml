@@ -440,6 +440,7 @@
     <string name="paymentdetails_payment_request_label">Invoice</string>
     <string name="paymentdetails_preimage_label">Preimage</string>
     <string name="paymentdetails_payerkey_label">Payer key</string>
+    <string name="paymentdetails_payerkey_is_mine">Your offer key</string>
     <string name="paymentdetails_offer_label">Offer</string>
     <string name="paymentdetails_bolt12_label">Bolt12 invoice</string>
     <string name="paymentdetails_offer_metadata_label">Metadata</string>

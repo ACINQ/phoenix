@@ -109,7 +109,7 @@ private fun ColumnScope.LatestPaymentsList(
                 }
                 PaymentLineLoading(item.orderRow.id, onPaymentClick)
             } else {
-                PaymentLine(item.paymentInfo, onPaymentClick, isAmountRedacted)
+                PaymentLine(item.paymentInfo, item.contactInfo, onPaymentClick, isAmountRedacted)
             }
             if (payments.isNotEmpty() && allPaymentsCount > PaymentsViewModel.latestPaymentsCount && index == payments.size - 1) {
                 Spacer(Modifier.height(16.dp))

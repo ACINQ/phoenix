@@ -201,8 +201,7 @@ private fun ContactNameAndPhoto(
                 }
             }
         }
-        Spacer(modifier = Modifier.height(24.dp))
-        HSeparator()
+        Spacer(modifier = Modifier.height(48.dp))
         SwitchView(
             text = stringResource(id = R.string.contact_offer_key_title),
             description = if (useOfferKey) {

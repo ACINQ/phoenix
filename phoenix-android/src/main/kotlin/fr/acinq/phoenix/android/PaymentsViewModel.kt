@@ -19,12 +19,17 @@ package fr.acinq.phoenix.android
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.db.LightningOutgoingPayment
+import fr.acinq.lightning.payment.OfferPaymentMetadata
+import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.walletPaymentId
 import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import fr.acinq.phoenix.managers.Connections
+import fr.acinq.phoenix.managers.ContactsManager
 import fr.acinq.phoenix.managers.PaymentsManager
 import fr.acinq.phoenix.managers.PaymentsPageFetcher
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -36,13 +41,14 @@ import org.slf4j.LoggerFactory
 
 data class PaymentRowState(
     val orderRow: WalletPaymentOrderRow,
-    val paymentInfo: WalletPaymentInfo?
+    val paymentInfo: WalletPaymentInfo?,
+    val contactInfo: ContactInfo?,
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PaymentsViewModel(
-    val connectionsFlow: StateFlow<Connections>,
     private val paymentsManager: PaymentsManager,
+    private val contactsManager: ContactsManager,
 ) : ViewModel() {
 
     companion object {
@@ -97,7 +103,7 @@ class PaymentsViewModel(
 
         // collect changes on the payments page that we subscribed to
         viewModelScope.launch(CoroutineExceptionHandler { _, e ->
-            log.error("failed to collect all payments page items: ", e)
+            log.error("error when collecting payments-page items: ", e)
         }) {
             paymentsPageFetcher.paymentsPage.collect { page ->
                 viewModelScope.launch(Dispatchers.Default) {
@@ -108,7 +114,7 @@ class PaymentsViewModel(
                         val existingData = paymentsFlow.value[paymentId]
                         // We look at the row to check if the payment has changed (the row contains timestamps)
                         if (existingData?.orderRow != newRow) {
-                            paymentId to PaymentRowState(newRow, null)
+                            paymentId to PaymentRowState(newRow, paymentInfo = null, contactInfo = null)
                         } else {
                             paymentId to existingData
                         }
@@ -122,8 +128,26 @@ class PaymentsViewModel(
     fun fetchPaymentDetails(row: WalletPaymentOrderRow) {
         viewModelScope.launch(Dispatchers.Main) {
             val paymentInfo = paymentsManager.fetcher.getPayment(row, WalletPaymentFetchOptions.Descriptions)
+            val contactInfo = when (val payment = paymentInfo?.payment) {
+                is IncomingPayment -> {
+                    val origin = payment.origin
+                    if (origin is IncomingPayment.Origin.Offer) {
+                        val metadata = origin.metadata
+                        if (metadata is OfferPaymentMetadata.V1) {
+                            contactsManager.getContactForPayerPubkey(metadata.payerKey)
+                        } else null
+                    } else null
+                }
+                is LightningOutgoingPayment -> {
+                    val details = payment.details
+                    if (details is LightningOutgoingPayment.Details.Blinded) {
+                        contactsManager.getContactForOffer(details.paymentRequest.invoiceRequest.offer)
+                    } else null
+                }
+                else -> null
+            }
             if (paymentInfo != null) {
-                _paymentsFlow.value += (row.id.identifier to PaymentRowState(row, paymentInfo))
+                _paymentsFlow.value += (row.id.identifier to PaymentRowState(row, paymentInfo, contactInfo))
             }
         }
     }
@@ -134,12 +158,12 @@ class PaymentsViewModel(
     }
 
     class Factory(
-        private val connectionsFlow: StateFlow<Connections>,
         private val paymentsManager: PaymentsManager,
+        private val contactsManager: ContactsManager,
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return PaymentsViewModel(connectionsFlow, paymentsManager) as T
+            return PaymentsViewModel(paymentsManager, contactsManager) as T
         }
     }
 }
