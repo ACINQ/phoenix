@@ -78,7 +78,6 @@ class UserPrefsRepository(private val data: DataStore<Preferences>) {
         private val SWAP_ADDRESS_FORMAT = intPreferencesKey("SWAP_ADDRESS_FORMAT")
         private val LNURL_AUTH_SCHEME = intPreferencesKey("LNURL_AUTH_SCHEME")
         private val IS_OVERPAYMENT_ENABLED = booleanPreferencesKey("IS_OVERPAYMENT_ENABLED")
-        private val USE_OFFER_KEY_FOR_CONTACTS = booleanPreferencesKey("USE_OFFER_KEY_FOR_CONTACTS")
         // liquidity policy & channels management
         private val LIQUIDITY_POLICY = stringPreferencesKey("LIQUIDITY_POLICY")
         private val INCOMING_MAX_SAT_FEE_INTERNAL_TRACKER = longPreferencesKey("INCOMING_MAX_SAT_FEE_INTERNAL_TRACKER")
@@ -241,9 +240,6 @@ class UserPrefsRepository(private val data: DataStore<Preferences>) {
 
     val getIsOverpaymentEnabled: Flow<Boolean> = safeData.map { it[IS_OVERPAYMENT_ENABLED] ?: false }
     suspend fun saveIsOverpaymentEnabled(enabled: Boolean) = data.edit { it[IS_OVERPAYMENT_ENABLED] = enabled }
-
-    val getUseOfferKeyForContacts: Flow<Boolean> = safeData.map { it[USE_OFFER_KEY_FOR_CONTACTS] ?: false }
-    suspend fun saveUseOfferKeyForContacts(useOfferKey: Boolean) = data.edit { it[USE_OFFER_KEY_FOR_CONTACTS] = useOfferKey }
 
     val getIsTorEnabled: Flow<Boolean> = safeData.map { it[IS_TOR_ENABLED] ?: false }
     suspend fun saveIsTorEnabled(isEnabled: Boolean) = data.edit { it[IS_TOR_ENABLED] = isEnabled }

@@ -1,0 +1,7 @@
+-- Migration: v5 -> v6
+--
+-- Changes:
+-- * add use_offer_key flag to the contacts table. By default, a contact is trusted.
+
+ALTER TABLE contacts
+    ADD COLUMN use_offer_key INTEGER AS Boolean DEFAULT 1 NOT NULL;

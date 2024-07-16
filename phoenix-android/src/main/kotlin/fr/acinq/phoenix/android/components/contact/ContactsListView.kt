@@ -51,7 +51,6 @@ import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.TextInput
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.mutedTextFieldColors
-import fr.acinq.phoenix.android.utils.outlinedTextFieldColors
 import fr.acinq.phoenix.data.ContactInfo
 
 @Composable

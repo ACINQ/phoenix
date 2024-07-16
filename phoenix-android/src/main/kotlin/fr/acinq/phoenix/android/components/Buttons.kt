@@ -83,7 +83,7 @@ fun BorderButton(
         onClick = onClick,
         shape = shape,
         backgroundColor = backgroundColor,
-        border = BorderStroke(ButtonDefaults.OutlinedBorderSize, if (enabled) borderColor else borderColor.copy(alpha = 0.4f)),
+        border = BorderStroke(ButtonDefaults.OutlinedBorderSize, if (enabled) borderColor else borderColor.copy(alpha = 0.35f)),
         textStyle = textStyle,
         padding = padding,
         maxLines = maxLines,
@@ -309,7 +309,7 @@ fun Button(
                         .padding(padding)
                         .alpha(
                             if (!enabled && enabledEffect) {
-                                if (backgroundColor == Color.Unspecified) 0.3f else 0.8f
+                                if (backgroundColor == Color.Unspecified) 0.3f else 0.65f
                             } else {
                                 1f
                             }

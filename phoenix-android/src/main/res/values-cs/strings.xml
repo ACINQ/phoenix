@@ -408,7 +408,7 @@
 
     <!-- offer contact -->
 
-    <string name="contact_add_contact_button">Přidat kontakt…</string>
+    <string name="contact_add_contact_button">Přidat kontakt</string>
     <string name="contact_error_offer_invalid">Neplatná nabídka</string>
     <string name="contact_error_offer_known">Faktura již byla přidělena k %1$s</string>
     <string name="contact_save_button">Uložit</string>
@@ -418,8 +418,6 @@
     <string name="contact_name_label">Jméno</string>
     <string name="contact_photo_label">Fotka</string>
     <string name="contact_offer_label">Nabídka</string>
-    <string name="contact_offers_list_title">Známé nabídky tohoto kontaktu</string>
-
 
     <string name="contact_search_name">Hledat podle jména</string>
     <string name="contact_none">Nenalezeny žádné kontakty…</string>

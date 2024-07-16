@@ -455,7 +455,7 @@
 
     <!-- offer contact -->
 
-    <string name="contact_add_contact_button">Pridať kontakt...</string>
+    <string name="contact_add_contact_button">Pridať kontakt</string>
     <string name="contact_error_offer_invalid">Neplatná ponuka</string>
     <string name="contact_error_offer_known">Faktúra už je priradená k %1$s</string>
     <string name="contact_save_button">Uložiť</string>
@@ -465,7 +465,6 @@
     <string name="contact_name_label">Meno</string>
     <string name="contact_photo_label">Fotka</string>
     <string name="contact_offer_label">Ponuka</string>
-    <string name="contact_offers_list_title">Známe ponuky pre tento kontakt</string>
 
     <string name="contact_search_name">Hľadať podľa mena</string>
     <string name="contact_none">Nenašli sa žiadne kontakty...</string>

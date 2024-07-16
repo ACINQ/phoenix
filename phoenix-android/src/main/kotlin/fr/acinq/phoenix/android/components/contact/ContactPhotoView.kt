@@ -30,6 +30,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
@@ -59,8 +60,9 @@ import com.google.accompanist.permissions.shouldShowRationale
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.utils.borderColor
-import fr.acinq.phoenix.android.utils.mutedBgColor
+import fr.acinq.phoenix.android.isDarkTheme
+import fr.acinq.phoenix.android.utils.gray70
+import fr.acinq.phoenix.android.utils.gray800
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileOutputStream
@@ -72,7 +74,7 @@ fun ContactPhotoView(
     name: String?,
     onChange: ((String?) -> Unit)?,
     imageSize: Dp = 96.dp,
-    borderSize: Dp? = null
+    borderSize: Dp = 1.dp,
 ) {
     val context = LocalContext.current
 
@@ -101,59 +103,63 @@ fun ContactPhotoView(
         }
     )
 
-    Surface(
-        shape = CircleShape,
-        border = borderSize?.let { BorderStroke(width = it, color = MaterialTheme.colors.surface) },
-        elevation = borderSize?.let { 1.dp } ?: 0.dp,
-        modifier = if (onChange != null) {
-            Modifier.clickable(
-                role = Role.Button,
-                onClick = {
-                    Toast.makeText(context, "\uD83D\uDEA7 Coming soon!", Toast.LENGTH_SHORT).show()
-                    return@clickable
-                    if (isProcessing) return@clickable
-                    if (cameraPermissionState.status.isGranted) {
-                        isProcessing = true
-                        if (tempPhotoUri == null) {
-                            ContactPhotoHelper.createTempContactPictureUri(context)?.let {
-                                tempPhotoUri = it
+    val color = if (isDarkTheme) gray800 else gray70
+
+    Box {
+        Surface(
+            shape = CircleShape,
+            border = BorderStroke(width = borderSize, color = color),
+            elevation = 0.dp,
+            modifier = if (onChange != null) {
+                Modifier.clickable(
+                    role = Role.Button,
+                    onClick = {
+                        Toast.makeText(context, "\uD83D\uDEA7 Coming soon!", Toast.LENGTH_SHORT).show()
+                        return@clickable
+                        if (isProcessing) return@clickable
+                        if (cameraPermissionState.status.isGranted) {
+                            isProcessing = true
+                            if (tempPhotoUri == null) {
+                                ContactPhotoHelper.createTempContactPictureUri(context)?.let {
+                                    tempPhotoUri = it
+                                    cameraLauncher.launch(tempPhotoUri)
+                                }
+                            } else {
                                 cameraLauncher.launch(tempPhotoUri)
                             }
                         } else {
-                            cameraLauncher.launch(tempPhotoUri)
+                            cameraAccessDenied = cameraPermissionState.status.shouldShowRationale
+                            if (cameraAccessDenied) {
+                                context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                    data = Uri.fromParts("package", context.packageName, null)
+                                })
+                            } else {
+                                cameraPermissionState.launchPermissionRequest()
+                            }
                         }
-                    } else {
-                        cameraAccessDenied = cameraPermissionState.status.shouldShowRationale
-                        if (cameraAccessDenied) {
-                            context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                                data = Uri.fromParts("package", context.packageName, null)
-                            })
-                        } else {
-                            cameraPermissionState.launchPermissionRequest()
-                        }
-                    }
-                },
-                enabled = !isProcessing
-            )
-        } else Modifier
-    ) {
-        if (bitmap == null) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_contact_placeholder),
-                colorFilter = ColorFilter.tint(borderColor),
-                contentDescription = name,
-                modifier = Modifier.size(imageSize)
-            )
-            if (cameraAccessDenied) {
-                Text(text = stringResource(id = R.string.scan_request_camera_access_denied), style = MaterialTheme.typography.subtitle2)
+                    },
+                    enabled = !isProcessing
+                )
+            } else Modifier
+        ) {
+            if (bitmap == null) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_contact_placeholder),
+                    colorFilter = ColorFilter.tint(color),
+                    contentDescription = name,
+                    modifier = Modifier.size(imageSize)
+                )
+                if (cameraAccessDenied) {
+                    Text(text = stringResource(id = R.string.scan_request_camera_access_denied), style = MaterialTheme.typography.subtitle2)
+                }
+            } else {
+                Image(
+                    bitmap = bitmap,
+                    contentDescription = name,
+                    modifier = Modifier.size(imageSize),
+                    contentScale = ContentScale.Crop,
+                )
             }
-        } else {
-            Image(
-                bitmap = bitmap,
-                contentDescription = name,
-                modifier = Modifier.size(imageSize),
-                contentScale = ContentScale.Crop,
-            )
         }
     }
 }

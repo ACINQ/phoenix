@@ -131,7 +131,6 @@ fun PaymentSettingsView(
         }
 
         val isOverpaymentEnabled by userPrefs.getIsOverpaymentEnabled.collectAsState(initial = false)
-        val useOfferKeyForContacts by userPrefs.getUseOfferKeyForContacts.collectAsState(initial = false)
         CardHeader(text = stringResource(id = R.string.paymentsettings_category_outgoing))
         Card {
             SettingSwitch(
@@ -141,19 +140,6 @@ fun PaymentSettingsView(
                 isChecked = isOverpaymentEnabled,
                 onCheckChangeAttempt = {
                     scope.launch { userPrefs.saveIsOverpaymentEnabled(it) }
-                }
-            )
-            SettingSwitch(
-                title = stringResource(id = R.string.paymentsettings_offer_key_contacts_title),
-                description = if (useOfferKeyForContacts) {
-                    stringResource(id = R.string.paymentsettings_offer_key_contacts_enabled)
-                } else {
-                    stringResource(id = R.string.paymentsettings_offer_key_contacts_disabled)
-                },
-                enabled = true,
-                isChecked = useOfferKeyForContacts,
-                onCheckChangeAttempt = {
-                    scope.launch { userPrefs.saveUseOfferKeyForContacts(it) }
                 }
             )
         }

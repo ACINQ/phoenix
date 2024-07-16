@@ -63,25 +63,10 @@ class SendOfferViewModel(
     val peerManager: PeerManager,
     val nodeParamsManager: NodeParamsManager,
     val contactsManager: ContactsManager,
-    val userPrefs: UserPrefsRepository,
 ) : ViewModel() {
     private val log = LoggerFactory.getLogger(this::class.java)
 
     var state by mutableStateOf<OfferState>(OfferState.Init)
-    private var useRandomKey by mutableStateOf<Boolean?>(null)
-
-    init {
-        viewModelScope.launch {
-            // if the offer matches a contact and user has checked the offer-key-for-contact preference, then use the offer key. Otherwise, random key.
-            val useOfferKeyForContacts = userPrefs.getUseOfferKeyForContacts.first()
-            useRandomKey = if (!useOfferKeyForContacts) {
-                true
-            } else {
-                val contact = contactsManager.getContactForOffer(offer)
-                contact == null
-            }
-        }
-    }
 
     fun sendOffer(amount: MilliSatoshi, message: String, offer: OfferTypes.Offer) {
         if (state is OfferState.FetchingInvoice) return
@@ -90,8 +75,9 @@ class SendOfferViewModel(
         viewModelScope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, e ->
             log.error("error when paying offer payment: ", e)
         }) {
+            val contact = contactsManager.getContactForOffer(offer)
+            val useRandomKey = contact == null || !contact.useOfferKey
             val payerKey = when (useRandomKey) {
-                null -> return@launch
                 true -> Lightning.randomKey()
                 false -> nodeParamsManager.defaultOffer().payerKey
             }
@@ -120,10 +106,9 @@ class SendOfferViewModel(
         private val nodeParamsManager: NodeParamsManager,
         private val contactsManager: ContactsManager,
     ) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-            val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as? PhoenixApplication)
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return SendOfferViewModel(offer, peerManager, nodeParamsManager, contactsManager, application.userPrefs) as T
+            return SendOfferViewModel(offer, peerManager, nodeParamsManager, contactsManager) as T
         }
     }
 }
