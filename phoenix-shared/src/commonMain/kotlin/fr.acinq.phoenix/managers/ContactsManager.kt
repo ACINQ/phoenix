@@ -61,9 +61,10 @@ class ContactsManager(
     suspend fun saveNewContact(
         name: String,
         photoUri: String?,
+        useOfferKey: Boolean,
         offer: OfferTypes.Offer
     ): ContactInfo {
-        val contact = ContactInfo(id = UUID.randomUUID(), name = name, photoUri = photoUri, offers = listOf(offer))
+        val contact = ContactInfo(id = UUID.randomUUID(), name = name, photoUri = photoUri, useOfferKey = useOfferKey, offers = listOf(offer))
         appDb.saveContact(contact)
         return contact
     }
@@ -72,9 +73,10 @@ class ContactsManager(
         contactId: UUID,
         name: String,
         photoUri: String?,
+        useOfferKey: Boolean,
         offers: List<OfferTypes.Offer>
     ): ContactInfo {
-        val contact = ContactInfo(id = contactId, name = name, photoUri = photoUri, offers = offers)
+        val contact = ContactInfo(id = contactId, name = name, photoUri = photoUri, useOfferKey = useOfferKey, offers = offers)
         appDb.updateContact(contact)
         return contact
     }

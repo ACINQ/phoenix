@@ -398,7 +398,7 @@ class CloudDataTest {
 
         private fun createBolt11Invoice(preimage: ByteVector32, amount: MilliSatoshi): Bolt11Invoice {
             return Bolt11Invoice.create(
-                chainHash = Block.LivenetGenesisBlock.hash,
+                chain = Chain.Mainnet,
                 amount = amount,
                 paymentHash = Crypto.sha256(preimage).toByteVector32(),
                 privateKey = randomKey(),

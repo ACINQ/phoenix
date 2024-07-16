@@ -23,6 +23,8 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.platform.LocalContext
@@ -43,6 +45,7 @@ import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.LocalFiatCurrency
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountView
 import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.CardHeader
@@ -552,7 +555,22 @@ private fun Bolt12InvoiceSection(
         }
     }
 
-    TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payerkey_label), value = payerKey.toHex())
+    TechnicalRow(label = stringResource(id = R.string.paymentdetails_payerkey_label)) {
+        Text(text = payerKey.toHex())
+        val nodeParamsManager = business.nodeParamsManager
+        val offerPayerKey by produceState<PrivateKey?>(initialValue = null) {
+            value = nodeParamsManager.defaultOffer().payerKey
+        }
+        if (offerPayerKey != null && payerKey == offerPayerKey) {
+            Spacer(modifier = Modifier.heightIn(4.dp))
+            TextWithIcon(
+                text = stringResource(id = R.string.paymentdetails_payerkey_is_mine),
+                textStyle = MaterialTheme.typography.subtitle2,
+                icon = R.drawable.ic_info,
+                iconTint = MaterialTheme.typography.subtitle2.color,
+            )
+        }
+    }
     TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = invoice.paymentHash.toHex())
     TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_offer_label), value = invoice.invoiceRequest.offer.encode())
     TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_bolt12_label), value = invoice.write())

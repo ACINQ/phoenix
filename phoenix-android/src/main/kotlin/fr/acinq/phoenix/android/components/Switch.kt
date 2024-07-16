@@ -26,7 +26,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
@@ -59,12 +58,11 @@ fun SwitchView(
                 internalChecked = !internalChecked
                 onCheckedChange(internalChecked)
             }
-            .padding(vertical = 6.dp),
     ) {
         Column(
             modifier = Modifier
                 .weight(1f)
-                .padding(end = 16.dp)
+                .padding(top = 6.dp, bottom = 6.dp, end = 16.dp)
         ) {
             Text(text = text, style = textStyle)
             if (description != null) {
@@ -77,6 +75,7 @@ fun SwitchView(
             onCheckedChange = null,
             modifier = Modifier
                 .enableOrFade(enabled)
+                .offset(y = 4.dp)
                 .indication(
                     interactionSource = interactionSource,
                     indication = rememberRipple(bounded = false, color = if (isDarkTheme) gray300 else gray600, radius = 28.dp)

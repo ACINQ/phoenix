@@ -171,6 +171,8 @@
     <string name="scan_error_lnurl_invalid">Failed to process this LNURL link. Make sure it is valid.</string>
     <string name="scan_error_lnurl_unsupported">This type of LNURL is not supported yet.</string>
     <string name="scan_error_invalid_generic">This data uses an unknown format and cannot be processed.</string>
+    <string name="scan_error_bip353_invalid_offer">This address uses an invalid Bolt12 offer.</string>
+    <string name="scan_error_bip353_dnssec">This address is hosted on an unsecure DNS. DNSSEC must be enabled.</string>
 
     <!-- validation -->
 

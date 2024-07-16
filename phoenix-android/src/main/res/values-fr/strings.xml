@@ -101,6 +101,9 @@
     <string name="receive_lightning_edit_desc_placeholder">Entrez une description pour cette requête</string>
     <string name="receive_lightning_edit_generate_button">Créer une requête</string>
 
+    <string name="receive_offer_share_title">Code de paiement Bolt12</string>
+    <string name="receive_offer_share_subject">Partager ce code de paiement Bolt12</string>
+
     <!-- send -->
 
     <string name="send_balance_prefix">Solde:</string>
@@ -140,6 +143,16 @@
     <string name="send_spliceout_complete_recap_fee_details">Utilise un taux effective de %1$s sat/vbyte.</string>
     <string name="send_spliceout_complete_recap_total">Total</string>
 
+    <string name="send_pay_retry_button">Réessayer</string>
+    <string name="send_offer_payer_note_label">Message</string>
+    <string name="send_offer_payer_note_placeholder">Joindre un message…</string>
+    <string name="send_offer_payer_note_dialog_title">Joindre un message</string>
+    <string name="send_offer_payer_note_dialog_subtitle">Le destinataire recevra ce message</string>
+    <string name="send_offer_payer_note_dialog_placeholder">Saisir un message…</string>
+    <string name="send_offer_fetching">Récupération des détails du paiement…</string>
+    <string name="send_offer_failure_title">Le paiement a échoué</string>
+    <string name="send_offer_failure_timeout">Les détails pour ce paiement n\'ont pas pu être récupérés en un temps raisonnable.\n\nLe destinataire est possiblement hors-ligne, ou indisponible.</string>
+
     <!-- scan -->
 
     <string name="scan_manual_input_button">Saisie manuelle</string>
@@ -148,6 +161,7 @@
     <string name="scan_request_camera_access_denied">L\'accès à la caméra a été refusé</string>
 
     <string name="scan_lnurl_fetching">Récupération des données auprès du service…</string>
+    <string name="scan_bip353_resolving">Résolution de la requête de paiement via DNS…</string>
 
     <string name="scan_manual_input_title">Saisie manuelle</string>
     <string name="scan_manual_input_instructions">Saisissez une requête de paiement Lightning, un LNURL, ou une adresse Ligthning que vous souhaitez payer.</string>
@@ -176,6 +190,7 @@
     <string name="btn_next">Suivant</string>
     <string name="btn_copy">Copier</string>
     <string name="btn_ok">OK</string>
+    <string name="btn_share">Partager</string>
     <string name="btn_save">Sauver</string>
     <string name="btn_confirm">Confirmer</string>
     <string name="btn_cancel">Annuler</string>
@@ -256,6 +271,8 @@
 
     <!-- in-app notifications -->
 
+    <string name="home_request_liquidity">Demande de liquidité</string>
+    <string name="home_inflight_payments">Vous avez actuellement %1$d paiement(s) en cours dans le wallet. Gardez l\'application ouverte pour vous assurer que ces paiements se finalisent proprement.</string>
     <string name="inappnotif_title">Notifications</string>
     <string name="inappnotif_notices_title">Messages importants</string>
     <string name="inappnotif_payments_title">Activité récente</string>
@@ -318,6 +335,14 @@
     <string name="paymentdetails_error_label">Erreur</string>
     <string name="paymentdetails_no_description">Sans description</string>
     <string name="paymentdetails_info_uniclose">Ce paiement a eu lieu suite à un conflit dans un canal Lightning.</string>
+
+    <string name="paymentdetails_offer_note_label">Message</string>
+    <string name="paymentdetails_offer_sender_label">Envoyé par</string>
+    <string name="paymentdetails_offer_sender_unknown">Inconnu</string>
+    <string name="paymentdetails_offer_sender_unknown_details">Prenez garde aux message venant d\'inconnus</string>
+    <string name="paymentdetails_offer_outgoing">Paiement Lightning sortant (offre)</string>
+    <string name="paymentdetails_offer_incoming">Paiement Lightning entrant (offre)</string>
+    <string name="paymentdetails_payerkey_is_mine">Clé de votre code Bolt12</string>
 
     <string name="paymentdetails_desc_splice_out">Paiement on-chain</string>
     <string name="paymentdetails_desc_closing_channel">Fermeture de canal</string>
@@ -398,6 +423,25 @@
     <string name="paymentdetails_amount_received_label">Montant reçu</string>
     <string name="paymentdetails_amount_rate_now">≈ %1$s (actuel)</string>
     <string name="paymentdetails_amount_rate_then">≈ %1$s (à l\'époque)</string>
+
+    <!-- offer contact -->
+
+    <string name="contact_add_title">Associez un nom à un code de paiement</string>
+    <string name="contact_add_contact_button">Ajouter un contact</string>
+
+    <string name="contact_name_label">Nom</string>
+    <string name="contact_photo_label">Photo</string>
+    <string name="contact_offer_label">Offre</string>
+    <string name="contact_offer_key_title">Payer avec la clé de votre code Bolt12</string>
+    <string name="contact_offer_key_enabled">S\'il connaît votre code de paiement Bolt12, il pourra savoir quand des paiement viennent de votre part.</string>
+    <string name="contact_offer_key_disabled">Utiliser un identifiant jetable quand vous payez ce contact.</string>
+    <string name="contact_offers_list">Codes de paiement Bolt12</string>
+
+    <string name="contact_save_button">Sauver</string>
+    <string name="contact_delete_button">Supprimer</string>
+
+    <string name="contact_error_offer_invalid">Offre invalide</string>
+    <string name="contact_error_offer_known">Offre déjà associée au contact %1$s</string>
 
     <!-- settings: access control -->
 
@@ -498,13 +542,269 @@
     <string name="prefs_display_theme_system_label">Iso système</string>
     <string name="prefs_locale_label">Langue de l\'application</string>
 
+    <!-- settings: electrum server -->
+
+    <string name="electrum_title">Serveur Electrum server</string>
+    <string name="electrum_about">Pour sécuriser vos canaux de paiement, Phoenix surveille la chaîne Bitcoin via des serveurs Electrum.\n\nPar défaut, Phoenix se connecte à un serveur aléatoire, mais vous pouvez le configurer pour ne se connecter qu\'à votre propre serveur.</string>
+    <string name="electrum_block_height_label">Hauteur de blocs</string>
+    <string name="electrum_connection_dialog_tls_port">Utilisez le port TLS (par défaut 50002).</string>
+    <string name="electrum_connection_dialog_onion_port">Utilisez le port TCP ordinaire, pas TLS, car il s\'agit d\'une adresse onion.</string>
+
+    <string name="electrum_connection_closed_with_random">Déconnecté</string>
+    <string name="electrum_connection_closed_with_custom">Déconnecté de %1$s</string>
+    <string name="electrum_connection_connecting_to_random">Connexion à %1$s (aléatoire)</string>
+    <string name="electrum_connection_connecting_to_custom">Connexion à %1$s</string>
+    <string name="electrum_connection_connected">Connecté à %1$s</string>
+
+    <string name="electrum_description_custom">Vous utilisez un serveur spécifique</string>
+    <string name="electrum_description_bad_certificate">Ce serveur fournit un certificat inconnu. La connexion a été rejetée.</string>
+
+    <string name="electrum_dialog_checkbox">Utiliser un serveur spécifique</string>
+    <string name="electrum_dialog_input">Adresse du serveur (host:port)</string>
+    <string name="electrum_dialog_invalid_input">Cette adresse est invalide.</string>
+    <string name="electrum_dialog_cert_check_button">Se connecter</string>
+    <string name="electrum_dialog_cert_checking">Vérification du certificat…</string>
+    <string name="electrum_dialog_cert_failure">Échec de la connexion</string>
+    <string name="electrum_dialog_cert_unresolved">Cette adresse n\'a pu être résolue.</string>
+    <string name="electrum_dialog_cert_header">Certificat non reconnu</string>
+    <string name="electrum_dialog_cert_sha1">Empreinte SHA1</string>
+    <string name="electrum_dialog_cert_sha256">Empreinte SHA256</string>
+    <string name="electrum_dialog_cert_issuer">Émetteur</string>
+    <string name="electrum_dialog_cert_subject">Sujet</string>
+    <string name="electrum_dialog_cert_expiration">Valide jusqu\'à</string>
+    <string name="electrum_dialog_cert_copy">Copier le certificat</string>
+    <string name="electrum_dialog_cert_accept">Accepter le certificat</string>
+
+    <!-- settings: Tor -->
+
+    <string name="tor_settings_title">Tor</string>
+    <string name="tor_settings_unknown">Vérification des préférences…</string>
+    <string name="tor_settings_enabled">Tor est activé</string>
+    <string name="tor_settings_disabled">Tor est désactivé</string>
+    <string name="tor_settings_state_unknown">Le proxy Tor n\'est pas encore démarré.</string>
+    <string name="tor_settings_state_closed">Le proxy Tor est éteint.</string>
+    <string name="tor_settings_state_starting">Démarrage du proxy Tor…</string>
+    <string name="tor_settings_state_started">Tor est en fonctionnement</string>
+
+    <!-- home: connectivity dialog -->
+
+    <string name="conndialog_title">Statut des connexions</string>
+    <string name="conndialog_summary_not_ok">L\'application ne fonctionnera pas correctement tant que chaque connexion n\'est pas établie.</string>
+    <string name="conndialog_network">Votre appareil n\'a pas de connexion internet. L\'application ne fonctionnera pas correctement.\n\nVérifiez votre configuration réseau.</string>
+    <string name="conndialog_internet">Internet</string>
+    <string name="conndialog_electrum">Electrum</string>
+    <string name="conndialog_tor">Tor</string>
+    <string name="conndialog_lightning">Lightning</string>
+    <string name="conndialog_connecting">Connexion…</string>
+    <string name="conndialog_connected">Connecté</string>
+    <string name="conndialog_connected_electrum_behind">Serveur électrum en retard (bloc $1$d)</string>
+    <string name="conndialog_closed">Déconnecté</string>
+    <string name="conndialog_closed_bad_cert">Certificat invalide</string>
+
+    <!-- settings: about -->
+
+    <string name="about_title">À propos de Phoenix</string>
+    <string name="about_version">Version: <b>%1$s</b></string>
+    <string name="about_faq_link">Des questions ? Consultez la FAQ</string>
+    <string name="about_support_link">Support</string>
+    <string name="about_privacy_link">Vie privée</string>
+    <string name="about_terms_link">Termes d\'utilisation</string>
+
+    <!-- settings: options for payments -->
+
+    <string name="paymentsettings_title">Options de paiements</string>
+
+    <string name="paymentsettings_category_incoming">Paiements entrants</string>
+    <string name="paymentsettings_category_outgoing">Paiements sortants</string>
+    <string name="paymentsettings_category_lnurl">LNURL</string>
+
+    <string name="paymentsettings_defaultdesc_title">Description des requêtes</string>
+    <string name="paymentsettings_defaultdesc_none">Sans description…</string>
+    <string name="paymentsettings_defaultdesc_dialog_title">Description par défaut</string>
+    <string name="paymentsettings_defaultdesc_dialog_description">Vos requêtes de paiements utiliseront cette valeur par défaut. Cette description peut toujours être changée au cas par cas.</string>
+    <string name="paymentsettings_defaultdesc_dialog_label">Description des requêtes</string>
+
+    <string name="paymentsettings_expiry_title">Expiration des requêtes de paiement</string>
+    <string name="paymentsettings_expiry_dialog_title">Expiration des requêtes</string>
+    <string name="paymentsettings_expiry_dialog_description">Vos requêtes de paiements seront inactives une fois ce délai passé. Par défaut, 1 semaine.</string>
+    <string name="paymentsettings_expiry_one_week">1 week</string>
+    <string name="paymentsettings_expiry_two_weeks">2 weeks</string>
+    <string name="paymentsettings_expiry_three_weeks">3 weeks</string>
+    <string name="paymentsettings_expiry_value">%1$s seconds</string>
+
+    <string name="paymentsettings_lnurlauth_scheme_title">Schéma d\'authentification LNURL</string>
+
+    <string name="paymentsettings_swap_format_title">Format des adresses Bitcoin</string>
+    <string name="paymentsettings_swap_format_legacy_title">Legacy</string>
+    <string name="paymentsettings_swap_format_legacy_desc">Un format moins efficient et moins privé, sans rotation d\'adresse. Ce format est en revanche compatible avec presque tous les services/wallets.</string>
+    <string name="paymentsettings_swap_format_taproot_title">Taproot (recommandé)</string>
+    <string name="paymentsettings_swap_format_taproot_desc">Format par défaut, avec une meilleure confidentialité, des frais plus bas et la rotation d\'adresse. Certains services/wallets ne pourront cependant pas accepter ce format.</string>
+
+    <string name="paymentsettings_overpayment_title">Activer le surpaiement</string>
+    <string name="paymentsettings_overpayment_enabled">Vous pourrez surpayer des requêtes de paiement Lightning jusqu\'à deux fois le montant demandé. Utile pour des pourboires ou pour une meilleure confidentialité.</string>
+    <string name="paymentsettings_overpayment_disabled">Désactivé (défaut)</string>
+
+    <!-- settings: currencies -->
+
+    <string name="currency_ars_official">Peso argentin (cours officiel)</string>
+    <string name="currency_ars_bm">Peso argentin</string>
+    <string name="currency_cup_official">Peso cubain (cours officiel)</string>
+    <string name="currency_cup_fm">Cuban Peso</string>
+    <string name="currency_lbp_official">Livre libanaise (cours officiel)</string>
+    <string name="currency_lbp_bm">Livre libanaise</string>
+
+    <!-- payments history -->
+
+    <string name="payments_history_title">Paiements locaux (%1$d)</string>
+    <string name="payments_history_export_button">Exporter</string>
+    <string name="payments_history_today">Aujourd\'hui</string>
+    <string name="payments_history_yesterday">Hier</string>
+    <string name="payments_history_thisweek">Plus tôt dans la semaine</string>
+    <string name="payments_history_lastweek">Semaine dernière</string>
+    <string name="payments_export_title">Exporter les paiements</string>
+    <string name="payments_export_instructions">Exporte vos paiements réussis dans un format CSV.</string>
+    <string name="payments_export_start_label">Date de début</string>
+    <string name="payments_export_end_label">Date de fin</string>
+    <string name="payments_export_context_label">Inclure origine et destinataire</string>
+    <string name="payments_export_description_label">Inclure la description</string>
+    <string name="payments_export_generate_button">Exporter</string>
+    <string name="payments_export_no_payments">Aucun paiement réussis</string>
+    <string name="payments_export_invalid_timestamps">Veuillez choisir une date de début/fin valide</string>
+    <string name="payments_export_in_progress">Export du paiement #%1$d</string>
+    <string name="payments_export_success">%1$d paiement(s) exportés </string>
+    <string name="payments_export_share_subject">Phoenix - paiement du %1$s au %2$s</string>
+    <string name="payments_export_share_title">Partager les paiement Phoenix…</string>
+    <string name="payments_export_share_button">Partager le fichier</string>
+    <string name="payments_export_error">Échec de l\'export.</string>
+    <string name="payments_export_no_data">Aucun paiements trouvés.</string>
+
+    <!-- components -->
+
+    <string name="component_calendar_inclusive">(inclus)</string>
+
+    <!-- settings: wallet info -->
+
+    <string name="walletinfo_title">Information du wallet</string>
+    <string name="walletinfo_descriptor_legacy">Descripteur legacy</string>
+    <string name="walletinfo_descriptor">Descripteur</string>
+    <string name="walletinfo_swapin_user_pubkey">Clé publique utilisateur</string>
+    <string name="walletinfo_swapin_addresses">Adresses de swap</string>
+    <string name="walletinfo_xpub">Clé publique maître</string>
+    <string name="walletinfo_path">(Chemin: %1$s)</string>
+
+    <string name="walletinfo_swappable_title">Prêt au swap</string>
+    <string name="walletinfo_confirming_title">En attente de %1$d confirmations</string>
+    <string name="walletinfo_confirming_more">+%1$d de plus…</string>
+    <string name="walletinfo_confirmed_title">Solde confirmé</string>
+    <string name="walletinfo_unconfirmed_title">Solde non confirmé</string>
+    <string name="walletinfo_incoming_balance">+%1$s entrant</string>
+    <string name="walletinfo_loading_data">Chargement du wallet…</string>
+
+    <string name="swapinaddresses_title">Adresses de swap</string>
+    <string name="swapinaddresses_sync">Synchronisation…</string>
+    <string name="swapinaddresses_taproot">Taproot</string>
+    <string name="swapinaddresses_legacy">Legacy</string>
+
+    <string name="walletinfo_lightning">Lightning</string>
+    <string name="walletinfo_nodeid">Identifiant du noeud</string>
+    <string name="walletinfo_legacy_nodeid_toggle">Voir l\'identifiant legacy</string>
+    <string name="walletinfo_legacy_nodeid">Identifiant legacy</string>
+
+    <string name="walletinfo_onchain_final">Wallet final</string>
+
+    <!-- settings: liquidity policy for channels creation -->
+
+    <string name="liquiditypolicy_title">Gestion de canaux</string>
+    <string name="liquiditypolicy_fees_estimation_loading">Récupération du feerate…</string>
+    <string name="liquiditypolicy_fees_header">Ma configuration des frais</string>
+    <string name="liquiditypolicy_advanced_title">Gestion avancée</string>
+    <string name="liquiditypolicy_loading">Récupération de la configuration…</string>
+
+    <!-- CPFP splices -->
+
+    <string name="cpfp_feerate_label">Feerate</string>
+    <string name="cpfp_feerate_value">%1$s sat/vbyte</string>
+
+    <string name="cpfp_prepare_button">Préparation du paiement</string>
+    <string name="cpfp_estimating">Estimation des frais…</string>
+    <string name="cpfp_estimation">Vous allez payer <b>%1$s</b> aux mineurs Bitcoin</string>
+    <string name="cpfp_execute_button">Exécuter le paiement</string>
+    <string name="cpfp_executing">Execution du paiement…</string>
+    <string name="cpfp_success">Paiement effectué</string>
+    <string name="cpfp_failure_title">Payment échoué</string>
+    <string name="cpfp_error_title">Impossible de continuer</string>
+
     <!-- mempool -->
 
-    <string name="mempool_unknown_feerate_title">Frais mempool inconnus</string>
-    <string name="mempool_unknown_feerate_details">Phoenix n\'a pas pu vérifier l\'état actuel du mempool Bitcoin, et ne peut donc pas estimer la vélocité des transactions.\n\nVérifiez le mempool manuellement via un explorateur, et utilisez une valeur pertinente.</string>
+    <string name="mempool_unknown_feerate_title">Mempool indisponible</string>
+    <string name="mempool_unknown_feerate_details">Phoenix n\'a pas pu vérifier l\'état actuel du mempool Bitcoin, et ne peut donc pas estimer la vélocité des transactions.\n\nVérifiez les frais manuellement via un explorateur, et utilisez une valeur pertinente.</string>
     <string name="mempool_fastest">≈ 10 minutes</string>
     <string name="mempool_halfhour">≈ 30 minutes</string>`
     <string name="mempool_hour">≈ 1 heure</string>
     <string name="mempool_slow">Frais bas</string>
+
+    <!-- splice errors -->
+
+    <string name="splice_error_nochannels">Vous n\'avez pas de canaux</string>
+    <string name="splice_error_aborted_by_peer">Annulé par le pair : [%1$s]</string>
+    <string name="splice_error_cannot_create_commit">Impossible de créer un nouveau commitment</string>
+    <string name="splice_error_concurrent_remote">Il y a un autre splice en cours</string>
+    <string name="splice_error_channel_not_quiescent">Annulé suite à un erreur</string>
+    <string name="splice_error_disconnected">Canal déconnecté</string>
+    <string name="splice_error_funding_error">Échec de l\'apport de fonds [%1$s]</string>
+    <string name="splice_error_insufficient_funds">Fonds insuffisants</string>
+    <string name="splice_error_cannot_start_session">La session de transaction n\'a pas pu être initiée</string>
+    <string name="splice_error_interactive_session">La session de transaction a été interrompue [%1$s]</string>
+    <string name="splice_error_invalid_pubkey">Script de clé publique pour le splice-out invalide</string>
+    <string name="splice_error_splice_in_progress">Un paiement splice est déjà en cours</string>
+    <string name="splice_error_invalid_liquidity_ads">Demande de liquidité invalide : [%1$s]</string>
+
+    <!-- reset wallet -->
+
+    <string name="reset_wallet_title">Réinitialiser le wallet</string>
+    <string name="reset_wallet_instructions_header">Supprime toutes les données du wallet de cet appareil</string>
+    <string name="reset_wallet_instructions_details">L\'application sera réinitialisée, comme si vous veniez de l\'installer.</string>
+    <string name="reset_wallet_review_button">Valider</string>
+
+    <string name="reset_wallet_confirm_title">cConfirmer la réinitialisation</string>
+    <string name="reset_wallet_confirm_header">Le wallet sera complètement supprimé de <b>cet appareil</b>.</string>
+    <string name="reset_wallet_confirm_details">L\'application sera réinitialisée. Votre historique de paiements sera perdu. Vous serez redirigé vers l\'écran de création du wallet..</string>
+    <string name="reset_wallet_confirm_seed_balance">Ne perdez pas vos fonds :\n%1$s (≈ %2$s).</string>
+    <string name="reset_wallet_confirm_seed_responsibility">Vous êtes responsable de la conservation de votre clé de sauvegarde.</string>
+    <string name="reset_wallet_confirm_button">Supprimer le wallet</string>
+    <string name="reset_wallet_shutting_down">Extinction…</string>
+    <string name="reset_wallet_deleting_prefs">Suppression des préférences…</string>
+    <string name="reset_wallet_deleting_seed">Suppression de la seed…</string>
+    <string name="reset_wallet_deleting_db">Suppression des bases de données…</string>
+    <string name="reset_wallet_success">Le wallet a été correctement réinitialisé.</string>
+    <string name="reset_wallet_failure_title">Échec de la réinitialisation</string>
+
+    <!-- swap input signer tool -->
+
+    <string name="swapin_signer_title">Signature de swap-in</string>
+    <string name="swapin_signer_instructions">Cet outil de debug vous permet de signer des entrées de swap-in. N\'utilisez cet écran que si vous savez ce qu\'il fait.</string>
+    <string name="swapin_signer_tx">Transaction non-signée</string>
+    <string name="swapin_signer_sign">Signer</string>
+    <string name="swapin_signer_signing">Signature…</string>
+    <string name="swapin_signer_signed_sig">Signature utilisateur</string>
+    <string name="swapin_signer_invalid_tx_header">Transaction non-signée invalide</string>
+    <string name="swapin_signer_invalid_tx_details">Vérifiez que la valeur saisie n\'est pas tronquée.</string>
+    <string name="swapin_signer_error_header">Échec de la signature</string>
+
+    <!-- settings: contacts list -->
+
+    <string name="settings_contacts_help">Les contacts vous permettent d\'associer un nom à une requête de paiement Bolt12. Ces contacts sont stockés en local uniquement.</string>
+    <string name="contact_search_name">Chercher par nom…</string>
+    <string name="contact_none">Aucun contact trouvé…</string>
+
+    <!-- experimental -->
+
+    <string name="experimental_title">Fonctionnalités expérimentales</string>
+
+    <string name="bip353_header">Adresse Bip353</string>
+    <string name="bip353_empty">Vous n\'avez pas encore d\'adresse</string>
+    <string name="bip353_claim_button">Demander une adresse</string>
+    <string name="bip353_claiming">Récupération de l\'adresse…</string>
+    <string name="bip353_error">Échec de la création de l\'adresse</string>
 
 </resources>

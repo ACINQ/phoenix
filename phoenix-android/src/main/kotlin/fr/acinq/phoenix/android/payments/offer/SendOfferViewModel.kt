@@ -59,9 +59,10 @@ sealed class OfferState {
 }
 
 class SendOfferViewModel(
+    val offer: OfferTypes.Offer,
     val peerManager: PeerManager,
     val nodeParamsManager: NodeParamsManager,
-    val userPrefs: UserPrefsRepository
+    val contactsManager: ContactsManager,
 ) : ViewModel() {
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -74,10 +75,15 @@ class SendOfferViewModel(
         viewModelScope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, e ->
             log.error("error when paying offer payment: ", e)
         }) {
+            val contact = contactsManager.getContactForOffer(offer)
+            val useRandomKey = contact == null || !contact.useOfferKey
+            val payerKey = when (useRandomKey) {
+                true -> Lightning.randomKey()
+                false -> nodeParamsManager.defaultOffer().payerKey
+            }
             val peer = peerManager.getPeer()
             val payerNote = message.takeIf { it.isNotBlank() }
-            val payerKey = if (userPrefs.getPayOfferWithRandomKey.first()) Lightning.randomKey() else nodeParamsManager.defaultOffer().payerKey
-            log.info("sending amount=$amount message=$message for offer=$offer")
+            log.info("sending amount=$amount random=$useRandomKey message=$message for offer=$offer")
             val paymentResult = peer.payOffer(
                 amount = amount,
                 offer = offer,
@@ -95,13 +101,14 @@ class SendOfferViewModel(
     }
 
     class Factory(
+        private val offer: OfferTypes.Offer,
         private val peerManager: PeerManager,
         private val nodeParamsManager: NodeParamsManager,
+        private val contactsManager: ContactsManager,
     ) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-            val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as? PhoenixApplication)
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return SendOfferViewModel(peerManager, nodeParamsManager, application.userPrefs) as T
+            return SendOfferViewModel(offer, peerManager, nodeParamsManager, contactsManager) as T
         }
     }
 }

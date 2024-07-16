@@ -56,7 +56,6 @@ import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountHeroInput
 import fr.acinq.phoenix.android.components.AmountWithFiatRowView
 import fr.acinq.phoenix.android.components.BackButtonWithBalance
-import fr.acinq.phoenix.android.components.BasicSwitchWithText
 import fr.acinq.phoenix.android.components.Clickable
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.ProgressView
@@ -80,7 +79,7 @@ fun SendOfferView(
     val balance = business.balanceManager.balance.collectAsState(null).value
     val prefBitcoinUnit = LocalBitcoinUnit.current
 
-    val vm = viewModel<SendOfferViewModel>(factory = SendOfferViewModel.Factory(business.peerManager, business.nodeParamsManager))
+    val vm = viewModel<SendOfferViewModel>(factory = SendOfferViewModel.Factory(offer, business.peerManager, business.nodeParamsManager, business.contactsManager))
     val requestedAmount = offer.amount
     var amount by remember { mutableStateOf(requestedAmount) }
     val amountErrorMessage: String = remember(amount) {

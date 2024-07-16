@@ -43,7 +43,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -55,6 +54,7 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.FilledButton
+import fr.acinq.phoenix.android.components.SwitchView
 import fr.acinq.phoenix.android.components.TextInput
 import fr.acinq.phoenix.android.payments.CameraPermissionsView
 import fr.acinq.phoenix.android.payments.ScannerView
@@ -83,6 +83,7 @@ fun SaveNewContactDialog(
     var offerErrorMessage by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
     var photoUri by remember { mutableStateOf<String?>(null) }
+    var useOfferKey by remember { mutableStateOf(true) }
 
     val contactsManager = business.contactsManager
 
@@ -138,6 +139,17 @@ fun SaveNewContactDialog(
                     errorMessage = offerErrorMessage,
                     showResetButton = false
                 )
+                Spacer(modifier = Modifier.height(8.dp))
+                SwitchView(
+                    text = stringResource(id = R.string.contact_offer_key_title),
+                    description = if (useOfferKey) {
+                        stringResource(id = R.string.contact_offer_key_enabled)
+                    } else {
+                        stringResource(id = R.string.contact_offer_key_disabled)
+                    },
+                    checked = useOfferKey,
+                    onCheckedChange = { useOfferKey = it }
+                )
                 Spacer(modifier = Modifier.height(24.dp))
                 FilledButton(
                     text = stringResource(id = R.string.contact_add_contact_button),
@@ -153,7 +165,7 @@ fun SaveNewContactDialog(
                                         if (existingContact != null) {
                                             offerErrorMessage = context.getString(R.string.contact_error_offer_known, existingContact.name)
                                         } else {
-                                            val contact = contactsManager.saveNewContact(name, photoUri, res.result)
+                                            val contact = contactsManager.saveNewContact(name, photoUri, useOfferKey, res.result)
                                             onSaved(contact)
                                         }
                                     }
@@ -164,7 +176,7 @@ fun SaveNewContactDialog(
                                 if (existingContact != null) {
                                     offerErrorMessage = context.getString(R.string.contact_error_offer_known, existingContact.name)
                                 } else {
-                                    val contact = contactsManager.saveNewContact(name, photoUri, initialOffer)
+                                    val contact = contactsManager.saveNewContact(name, photoUri, useOfferKey, initialOffer)
                                     onSaved(contact)
                                 }
 

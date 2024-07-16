@@ -20,35 +20,45 @@ import fr.acinq.bitcoin.BitcoinError
 import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.bitcoin.utils.Try
-import fr.acinq.lightning.*
+import fr.acinq.lightning.Lightning
+import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.TrampolineFees
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.io.PayInvoice
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.logging.debug
-import fr.acinq.lightning.utils.*
-import fr.acinq.phoenix.PhoenixBusiness
-import fr.acinq.phoenix.controllers.AppController
-import fr.acinq.phoenix.data.*
-import fr.acinq.phoenix.data.lnurl.*
-import fr.acinq.phoenix.db.payments.WalletPaymentMetadataRow
-import fr.acinq.phoenix.managers.*
-import fr.acinq.phoenix.utils.Parser
 import fr.acinq.lightning.logging.error
 import fr.acinq.lightning.logging.info
-import fr.acinq.lightning.logging.warning
 import fr.acinq.lightning.payment.Bolt11Invoice
+import fr.acinq.lightning.utils.UUID
+import fr.acinq.lightning.utils.currentTimestampSeconds
 import fr.acinq.lightning.wire.OfferTypes
-import io.ktor.client.HttpClient
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.request.get
-import io.ktor.client.statement.bodyAsText
+import fr.acinq.phoenix.PhoenixBusiness
+import fr.acinq.phoenix.controllers.AppController
+import fr.acinq.phoenix.data.BitcoinUri
+import fr.acinq.phoenix.data.BitcoinUriError
+import fr.acinq.phoenix.data.LnurlPayMetadata
+import fr.acinq.phoenix.data.WalletPaymentId
+import fr.acinq.phoenix.data.WalletPaymentMetadata
+import fr.acinq.phoenix.data.lnurl.Lnurl
+import fr.acinq.phoenix.data.lnurl.LnurlAuth
+import fr.acinq.phoenix.data.lnurl.LnurlError
+import fr.acinq.phoenix.data.lnurl.LnurlPay
+import fr.acinq.phoenix.data.lnurl.LnurlWithdraw
+import fr.acinq.phoenix.db.payments.WalletPaymentMetadataRow
+import fr.acinq.phoenix.managers.DatabaseManager
+import fr.acinq.phoenix.managers.LnurlManager
+import fr.acinq.phoenix.managers.PeerManager
+import fr.acinq.phoenix.utils.DnsResolvers
+import fr.acinq.phoenix.utils.Parser
 import io.ktor.http.Url
-import io.ktor.serialization.kotlinx.json.json
-import io.ktor.utils.io.charsets.Charsets
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.serialization.json.Json
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.intOrNull
@@ -118,23 +128,31 @@ class AppScanController(
     ) {
         val input = Parser.removeExcessInput(intent.request)
 
-        Parser.readBolt11Invoice(input)?.let {
-            processBolt11Invoice(it)
-        } ?: Parser.readOffer(input)?.let {
-            processOffer(it)
-        } ?: readEmailLikeAddress(input)?.let {
-            when (it) {
-                is Either.Left -> processOffer(it.value)
-                is Either.Right -> processLnurl(it.value)
+        try {
+            Parser.readBolt11Invoice(input)?.let {
+                processBolt11Invoice(it)
+            } ?: Parser.readOffer(input)?.let {
+                processOffer(it)
+            } ?: readEmailLikeAddress(input)?.let {
+                when (it) {
+                    is Either.Left -> processOffer(it.value)
+                    is Either.Right -> processLnurl(it.value)
+                }
+            } ?: readLnurl(input)?.let {
+                processLnurl(it)
+            } ?: readBitcoinAddress(input)?.let {
+                processBitcoinAddress(input, it)
+            } ?: readLNURLFallback(input)?.let {
+                processLnurl(it)
+            } ?: run {
+                model(Scan.Model.BadRequest(request = intent.request, reason = Scan.BadRequestReason.UnknownFormat))
             }
-        } ?: readLnurl(input)?.let {
-            processLnurl(it)
-        } ?: readBitcoinAddress(input)?.let {
-            processBitcoinAddress(input, it)
-        } ?: readLNURLFallback(input)?.let {
-            processLnurl(it)
-        } ?: run {
-            model(Scan.Model.BadRequest(request = intent.request, reason = Scan.BadRequestReason.UnknownFormat))
+        } catch (e: Exception) {
+            if (e is Scan.BadRequestReason) {
+                model(Scan.Model.BadRequest(request = intent.request, reason = e))
+            } else {
+                model(Scan.Model.BadRequest(request = intent.request, reason = Scan.BadRequestReason.UnknownFormat))
+            }
         }
     }
 
@@ -164,7 +182,13 @@ class AppScanController(
         result: Either<BitcoinUriError, BitcoinUri>
     ) {
         model(when (result) {
-            is Either.Right -> Scan.Model.OnchainFlow(uri = result.value)
+            is Either.Right -> {
+                if (result.value.address.isNotBlank()) {
+                    Scan.Model.OnchainFlow(uri = result.value)
+                } else {
+                    Scan.Model.BadRequest(request = input, reason = Scan.BadRequestReason.UnknownFormat)
+                }
+            }
             is Either.Left -> {
                 val error = result.value
                 if (error is BitcoinUriError.InvalidScript && error.error is BitcoinError.ChainHashMismatch) {
@@ -528,17 +552,15 @@ class AppScanController(
         val username = components[0].lowercase()
         val domain = components[1]
 
-        return resolveBip353Offer(username, domain)?.let {
-            Either.Left(it)
-        } ?: Either.Right(Lnurl.Request(Url("https://$domain/.well-known/lnurlp/$username"), tag = Lnurl.Tag.Pay))
-    }
+        val signalBip353 = username.startsWith("₿")
+        val cleanUsername = username.dropWhile { it == '₿' }
 
-    val bip353HttpClient: HttpClient by lazy {
-        HttpClient {
-            install(ContentNegotiation) {
-                json(json = Json { ignoreUnknownKeys = true })
-                expectSuccess = true
-            }
+        val offer = resolveBip353Offer(cleanUsername, domain)
+        return if (signalBip353) {
+            offer?.let { Either.Left(it) } // skip lnurl resolution if it's a bip353 address
+        } else {
+            offer?.let { Either.Left(it) }
+                ?: Either.Right(Lnurl.Request(Url("https://$domain/.well-known/lnurlp/$username"), tag = Lnurl.Tag.Pay))
         }
     }
 
@@ -550,49 +572,39 @@ class AppScanController(
         model(Scan.Model.ResolvingBip353)
         val dnsPath = "$username.user._bitcoin-payment.$domain."
 
-        // list of resolvers: https://dnsprivacy.org/public_resolvers/
-        val url = Url("https://dns.google/resolve?name=$dnsPath&type=TXT")
+        val json = DnsResolvers.getRandom().getTxtRecord(dnsPath)
+        logger.debug { "dns resolved to ${json.toString().take(100)}" }
 
-        try {
-            val response = bip353HttpClient.get(url)
-            val json = Json.decodeFromString<JsonObject>(response.bodyAsText(Charsets.UTF_8))
-            logger.info { "dns resolved to ${json.toString().take(100)}" }
+        val status = json["Status"]?.jsonPrimitive?.intOrNull
+        if (status == null || status > 0) return null
 
-            val status = json["Status"]?.jsonPrimitive?.intOrNull
-            if (status == null || status > 0) throw RuntimeException("invalid status=$status")
-
-            val ad = json["AD"]?.jsonPrimitive?.booleanOrNull
-            if (ad != true) {
-                logger.info { "AD false, abort dns lookup to $url" }
-                return null
-            }
-
-            val records = json["Answer"]?.jsonArray
-            if (records.isNullOrEmpty()) {
-                logger.debug { "no records for $url" }
-                return null
-            }
-
-            val matchingRecord = records.filterIsInstance<JsonObject>().firstOrNull {
-                logger.debug { "inspecting record=$it" }
-                it["name"]?.jsonPrimitive?.content == dnsPath
-            } ?: return null
-
-            val data = matchingRecord["data"]?.jsonPrimitive?.content ?: return null
-            if (!data.startsWith("bitcoin:")) return null
-            val offerString = data.substringAfter("lno=").substringBefore("?")
-            if (offerString.isBlank()) return null
-
-            return when (val offer = OfferTypes.Offer.decode(offerString)) {
-                is Try.Success -> { offer.result }
-                is Try.Failure -> {
-                    model(Scan.Model.BadRequest(request = url.toString(), reason = Scan.BadRequestReason.InvalidBip353(dnsPath)))
-                    null
-                }
-            }
-        } catch (e: Exception) {
-            logger.error(e) { "error when resolving offer on $dnsPath: ${e.message}" }
+        val records = json["Answer"]?.jsonArray
+        if (records.isNullOrEmpty()) {
+            logger.debug { "no records for $dnsPath" }
             return null
+        }
+
+        val matchingRecord = records.filterIsInstance<JsonObject>().firstOrNull {
+            logger.debug { "inspecting record=$it" }
+            it["name"]?.jsonPrimitive?.content == dnsPath
+        } ?: return null
+
+        val ad = json["AD"]?.jsonPrimitive?.booleanOrNull
+        if (ad != true) {
+            logger.debug { "AD false, abort dns lookup" }
+            throw Scan.BadRequestReason.Bip353NoDNSSEC(dnsPath)
+        }
+
+        val data = matchingRecord["data"]?.jsonPrimitive?.content ?: return null
+        if (!data.startsWith("bitcoin:")) throw Scan.BadRequestReason.Bip353InvalidOffer(dnsPath)
+        val offerString = data.substringAfter("lno=").substringBefore("?")
+        if (offerString.isBlank()) throw Scan.BadRequestReason.Bip353InvalidOffer(dnsPath)
+
+        return when (val offer = OfferTypes.Offer.decode(offerString)) {
+            is Try.Success -> { offer.result }
+            is Try.Failure -> {
+                throw Scan.BadRequestReason.Bip353InvalidOffer(dnsPath)
+            }
         }
     }
 

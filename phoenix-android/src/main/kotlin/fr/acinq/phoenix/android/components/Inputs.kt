@@ -64,6 +64,7 @@ fun TextInput(
     onTextChange: (String) -> Unit,
     textFieldColors: TextFieldColors = outlinedTextFieldColors(),
     showResetButton: Boolean = true,
+    keyboardType: KeyboardType = KeyboardType.Text
 ) {
     val charsCount by remember(text) { mutableStateOf(text.length) }
     val focusManager = LocalFocusManager.current
@@ -81,7 +82,7 @@ fun TextInput(
             singleLine = singleLine,
             keyboardOptions = KeyboardOptions.Default.copy(
                 imeAction = ImeAction.Done,
-                keyboardType = KeyboardType.Text
+                keyboardType = keyboardType
             ),
             label = null,
             placeholder = placeholder,

@@ -168,6 +168,8 @@
     <string name="scan_error_lnurl_invalid">Tento LNURL odkaz sa nepodarilo spracovať. Uistite sa, že je platný.</string>
     <string name="scan_error_lnurl_unsupported">Tento typ LNURL zatiaľ nie je podporovaný.</string>
     <string name="scan_error_invalid_generic">Tieto údaje používajú neznámy formát a nemožno ich spracovať.</string>
+    <string name="scan_error_bip353_invalid_offer">Táto adresa používa neplatnú ponuku Bolt12.</string>
+    <string name="scan_error_bip353_dnssec">Táto adresa je umiestnená na nezabezpečenom DNS. DNSSEC musí byť povolený.</string>
 
     <!-- validation -->
 

@@ -90,7 +90,7 @@
     <string name="receive_lightning_error">Nepodařilo se vygenerovat fakturu</string>
     <string name="receive_lightning_share_subject">Lightningová faktura</string>
     <string name="receive_lightning_share_title">Sdílet tuto Lightningovou fakturu s…</string>
-    <string name="receive_lnurl_button">Skenování</string>
+    <string name="receive_lnurl_button">Skenovat</string>
     <string name="receive_toggle_offer_new_overlay">NOVINKA!</string>
 
     <string name="receive_offer_share_title">Statická Lightning faktura</string>
@@ -162,6 +162,7 @@
     <string name="scan_request_camera_access_denied">Povolení k použití fotoaparátu bylo zamítnuto</string>
 
     <string name="scan_lnurl_fetching">Získávání dat ze služby…</string>
+    <string name="scan_bip353_resolving">Zpracovávání žádosti o platbu přes DNS…</string>
 
     <string name="scan_manual_input_title">Ruční vstup</string>
     <string name="scan_manual_input_instructions">Zadejte Lightningovou fakturu, LNURL nebo Lightningovou adresu na kterou chcete poslat peníze.</string>
@@ -186,9 +187,10 @@
     <string name="validation_invalid_number">Zadejte prosím platné číslo</string>
     <string name="validation_no_decimal">V tomto poli musí být celé číslo</string>
 
-    <string name="btn_back">Zpátky</string>
+    <string name="btn_back">Zpět</string>
     <string name="btn_next">Další</string>
     <string name="btn_copy">Kopírovat</string>
+    <string name="btn_share">Sdílet</string>
     <string name="btn_ok">OK</string>
     <string name="btn_save">Uložit</string>
     <string name="btn_confirm">Potvrdit</string>
@@ -406,7 +408,7 @@
 
     <!-- offer contact -->
 
-    <string name="contact_add_contact_button">Přidat kontakt…</string>
+    <string name="contact_add_contact_button">Přidat kontakt</string>
     <string name="contact_error_offer_invalid">Neplatná nabídka</string>
     <string name="contact_error_offer_known">Faktura již byla přidělena k %1$s</string>
     <string name="contact_save_button">Uložit</string>
@@ -416,8 +418,6 @@
     <string name="contact_name_label">Jméno</string>
     <string name="contact_photo_label">Fotka</string>
     <string name="contact_offer_label">Nabídka</string>
-    <string name="contact_offers_list_title">Známé nabídky tohoto kontaktu</string>
-
 
     <string name="contact_search_name">Hledat podle jména</string>
     <string name="contact_none">Nenalezeny žádné kontakty…</string>
@@ -621,9 +621,6 @@
     <string name="paymentsettings_overpayment_enabled">Budete moci přeplatit Lightning fakturu dvakrát o požadovanou částku. Užitečné na nastavení dýška nebo pro ochranu soukromí.</string>
     <string name="paymentsettings_overpayment_disabled">Vypnuté (výchozí)</string>
 
-    <string name="paymentsettings_random_payer_key_title">Náhodný klíč plátce</string>
-    <string name="paymentsettings_random_payer_key_desc">Pokud toto povolíte, příjemce BOLT12 nabídky nebude vědět, kdo provedl platbu.</string>
-
     <!-- settings: currencies -->
 
     <string name="currency_ars_official">Argentinské Peso (oficiální kurz)</string>
@@ -764,5 +761,15 @@
     <!-- settings: contacts list -->
 
     <string name="settings_contacts_help">Kontakty vám umožňují připojit ke jménu statickou fakturu. Jsou ukládány lokálně.</string>
+
+    <!-- experimental -->
+
+    <string name="experimental_title">Experimentální funkce</string>
+
+    <string name="bip353_header">Bip353 DNS adresa</string>
+    <string name="bip353_empty">Zatím bez adresy…</string>
+    <string name="bip353_claim_button">Vyžádat si mou adresu</string>
+    <string name="bip353_claiming">Nárokování adresy…</string>
+    <string name="bip353_error">Vyžádání adresy selhalo</string>
 
 </resources>

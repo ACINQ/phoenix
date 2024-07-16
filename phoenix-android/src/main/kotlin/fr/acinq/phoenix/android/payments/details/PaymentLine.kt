@@ -124,6 +124,7 @@ fun PaymentLineLoading(
 @Composable
 fun PaymentLine(
     paymentInfo: WalletPaymentInfo,
+    contactInfo: ContactInfo?,
     onPaymentClick: (WalletPaymentId) -> Unit,
     isAmountRedacted: Boolean = false,
 ) {
@@ -139,7 +140,7 @@ fun PaymentLine(
         Spacer(modifier = Modifier.width(16.dp))
         Column {
             Row {
-                PaymentDescription(paymentInfo = paymentInfo, modifier = Modifier.weight(1.0f))
+                PaymentDescription(paymentInfo = paymentInfo, contactInfo = contactInfo, modifier = Modifier.weight(1.0f))
                 Spacer(modifier = Modifier.width(16.dp))
                 if (payment.state() != WalletPaymentState.Failure) {
                     val isOutgoing = payment is OutgoingPayment
@@ -162,7 +163,7 @@ fun PaymentLine(
             } else {
                 Row {
                     Text(text = payment.createdAt.toRelativeDateString(), style = MaterialTheme.typography.caption.copy(fontSize = 12.sp), maxLines = 1)
-                    PaymentContactInfo(paymentInfo = paymentInfo)
+                    PaymentContactInfo(paymentInfo = paymentInfo, contactInfo = contactInfo)
                 }
             }
         }
@@ -170,7 +171,11 @@ fun PaymentLine(
 }
 
 @Composable
-private fun PaymentDescription(paymentInfo: WalletPaymentInfo, modifier: Modifier = Modifier) {
+private fun PaymentDescription(
+    paymentInfo: WalletPaymentInfo,
+    contactInfo: ContactInfo?,
+    modifier: Modifier = Modifier
+) {
     val context = LocalContext.current
     val payment = paymentInfo.payment
     val metadata = paymentInfo.metadata
@@ -182,15 +187,7 @@ private fun PaymentDescription(paymentInfo: WalletPaymentInfo, modifier: Modifie
         false -> metadata.userDescription
             ?: metadata.lnurl?.description
             ?: payment.incomingOfferMetadata()?.let { offerMetadata ->
-                val contactsManager = business.contactsManager
-                val contactForKey = produceState<ContactInfo?>(initialValue = null, producer = {
-                    value = contactsManager.getContactForPayerPubkey(offerMetadata.payerKey)
-                })
-
-                when (contactForKey.value) {
-                    null -> null
-                    else -> offerMetadata.payerNote
-                }
+                if (contactInfo != null) offerMetadata.payerNote else null
             }
             ?: payment.outgoingInvoiceRequest()?.payerNote
             ?: payment.smartDescription(context)
@@ -290,40 +287,16 @@ private fun PaymentIconComponent(
 
 @Composable
 private fun PaymentContactInfo(
-    paymentInfo: WalletPaymentInfo
+    paymentInfo: WalletPaymentInfo,
+    contactInfo: ContactInfo?,
 ) {
-    val offerMetadata = paymentInfo.payment.incomingOfferMetadata()
-    if (offerMetadata != null) {
-        val contactsManager = business.contactsManager
-        val contactForKey = produceState<ContactInfo?>(initialValue = null, producer = {
-            value = contactsManager.getContactForPayerPubkey(offerMetadata.payerKey)
-        })
-
-        when (val contact = contactForKey.value) {
-            null -> Unit
-            else -> FromToNameView(isOutgoing = false, userName = contact.name)
+    if (contactInfo != null) {
+        FromToNameView(isOutgoing = paymentInfo.payment is OutgoingPayment, userName = contactInfo.name)
+    } else {
+        val lnid = paymentInfo.metadata.lnurl?.pay?.metadata?.lnid?.takeIf { it.isNotBlank() }
+        if (!lnid.isNullOrBlank()) {
+            FromToNameView(isOutgoing = true, userName = lnid)
         }
-        return
-    }
-
-    val invoiceRequest = paymentInfo.payment.outgoingInvoiceRequest()
-    if (invoiceRequest != null) {
-        val offer = invoiceRequest.offer
-        val contactsManager = business.contactsManager
-        val contactForOffer = produceState<ContactInfo?>(initialValue = null, producer = {
-            value = contactsManager.getContactForOffer(offer)
-        })
-
-        when (val contact = contactForOffer.value) {
-            null -> Unit
-            else -> FromToNameView(isOutgoing = true, userName = contact.name)
-        }
-        return
-    }
-
-    val lnid = paymentInfo.metadata.lnurl?.pay?.metadata?.lnid?.takeIf { it.isNotBlank() }
-    if (!lnid.isNullOrBlank()) {
-        FromToNameView(isOutgoing = true, userName = lnid)
     }
 }
 

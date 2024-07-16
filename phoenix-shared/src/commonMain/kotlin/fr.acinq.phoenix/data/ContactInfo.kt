@@ -16,10 +16,7 @@
 
 package fr.acinq.phoenix.data
 
-import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.PublicKey
-import fr.acinq.bitcoin.byteVector
-import fr.acinq.bitcoin.utils.Try
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.wire.OfferTypes
 
@@ -27,13 +24,15 @@ data class ContactInfo(
     val id: UUID,
     val name: String,
     val photoUri: String?,
+    val useOfferKey: Boolean,
     val offers: List<OfferTypes.Offer>,
     val publicKeys: List<PublicKey>,
 ) {
-    constructor(id: UUID, name: String, photoUri: String?, offers: List<OfferTypes.Offer>) : this(
+    constructor(id: UUID, name: String, photoUri: String?, useOfferKey: Boolean, offers: List<OfferTypes.Offer>) : this(
         id = id,
         name = name,
         photoUri = photoUri,
+        useOfferKey = useOfferKey,
         offers = offers,
         publicKeys = offers.map { it.contactNodeIds }.flatten()
     )

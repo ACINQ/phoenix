@@ -86,7 +86,7 @@ fun CreateWalletView(
                                 )
                             }
                             LaunchedEffect(true) {
-                                vm.writeSeed(context, model.mnemonics, true, onSeedWritten)
+                                vm.writeSeed(context, model.mnemonics, isNewWallet = true, onSeedWritten)
                                 LegacyPrefsDatastore.savePrefsMigrationExpected(context, false)
                                 LegacyPrefsDatastore.saveDataMigrationExpected(context, false)
                             }

@@ -21,20 +21,22 @@ import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.payment.Bolt11Invoice
+import fr.acinq.lightning.wire.OfferTypes
 import io.ktor.http.*
 
 data class BitcoinUri(
     val chain: Chain,
     /** Actual Bitcoin address; may be different than the source, e.g. if the source is an URI like "bitcoin:xyz?param=123". */
     val address: String,
-    val script: ByteVector,
+    val script: ByteVector?,
     // Bip-21 parameters
     val label: String? = null,
     val message: String? = null,
     /** Amount requested in the URI. */
     val amount: Satoshi? = null,
-    /** A Bitcoin URI may contain a Lightning payment request as an alternative way to make the payment. */
+    /** A Bitcoin URI may contain a Bolt11 invoice or an offer as an alternative way to make the payment. */
     val paymentRequest: Bolt11Invoice? = null,
+    val offer: OfferTypes.Offer? = null,
     /** Other bip-21 parameters in the URI that we do not handle. */
     val ignoredParams: Parameters = Parameters.Empty,
 ) {

@@ -52,6 +52,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidViewBinding
@@ -157,8 +158,8 @@ fun ScanDataView(
                 SendOfferView(offer = model.offer, trampolineFees = trampolineFees, onBackClick = onBackClick, onPaymentSent = onProcessingFinished)
             }
             is Scan.Model.OnchainFlow -> {
-                val paymentRequest = model.uri.paymentRequest
-                if (paymentRequest == null) {
+                val lightningRequest = model.uri.paymentRequest?.write() ?: model.uri.offer?.encode()
+                if (lightningRequest == null) {
                     SendSpliceOutView(
                         requestedAmount = model.uri.amount,
                         address = model.uri.address,
@@ -171,11 +172,11 @@ fun ScanDataView(
                         ChoosePaymentModeDialog(
                             onPayOffchainClick = {
                                 showPaymentModeDialog = true
-                                postIntent(Scan.Intent.Parse(request = paymentRequest.write()))
+                                postIntent(Scan.Intent.Parse(request = lightningRequest))
                             },
                             onPayOnchainClick = {
                                 showPaymentModeDialog = true
-                                postIntent(Scan.Intent.Parse(request = model.uri.copy(paymentRequest = null).write()))
+                                postIntent(Scan.Intent.Parse(request = model.uri.copy(paymentRequest = null, offer = null).write()))
                             },
                             onDismiss = {
                                 showPaymentModeDialog = false
@@ -360,7 +361,8 @@ private fun ScanErrorView(
         is Scan.BadRequestReason.InvalidLnurl -> stringResource(R.string.scan_error_lnurl_invalid)
         is Scan.BadRequestReason.UnsupportedLnurl -> stringResource(R.string.scan_error_lnurl_unsupported)
         is Scan.BadRequestReason.UnknownFormat -> stringResource(R.string.scan_error_invalid_generic)
-        is Scan.BadRequestReason.InvalidBip353 -> "invalid bip-353 response: ${reason.path}"
+        is Scan.BadRequestReason.Bip353InvalidOffer -> stringResource(id = R.string.scan_error_bip353_invalid_offer)
+        is Scan.BadRequestReason.Bip353NoDNSSEC -> stringResource(id = R.string.scan_error_bip353_dnssec)
     }
     Dialog(
         onDismiss = onErrorDialogDismiss,
@@ -428,6 +430,8 @@ private fun ManualInputDialog(
                 minLines = 2,
                 maxLines = 3,
                 staticLabel = stringResource(id = R.string.scan_manual_input_label),
+                placeholder = { Text(text = stringResource(id = R.string.scan_manual_input_hint)) },
+                keyboardType = KeyboardType.Email,
             )
         }
     }
