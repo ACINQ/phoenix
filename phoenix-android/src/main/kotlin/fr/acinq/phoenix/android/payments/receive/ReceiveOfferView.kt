@@ -16,7 +16,6 @@
 
 package fr.acinq.phoenix.android.payments.receive
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,6 +25,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
@@ -46,7 +46,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -55,6 +54,7 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.BorderButton
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Clickable
+import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.openLink
 import fr.acinq.phoenix.android.internalData
@@ -89,7 +89,7 @@ fun DisplayOfferDialog(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
-                .padding(top = 0.dp, start = 24.dp, end = 24.dp, bottom = 50.dp)
+                .padding(top = 0.dp, start = 12.dp, end = 12.dp, bottom = 50.dp)
         ) {
             when (offerState) {
                 OfferState.Init -> {
@@ -98,7 +98,7 @@ fun DisplayOfferDialog(
                 is OfferState.Show -> {
                     HowToOffer()
                     Spacer(modifier = Modifier.height(6.dp))
-                    Box(modifier = Modifier.widthIn(max = 400.dp)) {
+                    Box(modifier = Modifier.widthIn(max = 350.dp)) {
                         QRCodeImage(bitmap = offerState.bitmap, onLongClick = { copyToClipboard(context, offerState.encoded) })
                     }
                     Bip353AddressDisplay(address)
@@ -117,7 +117,7 @@ fun DisplayOfferDialog(
                         BorderButton(
                             text = stringResource(id = R.string.btn_share),
                             icon = R.drawable.ic_share,
-                            onClick = { share(context, "lightning:${offerState.encoded}", context.getString(R.string.receive_offer_share_subject), context.getString(R.string.receive_offer_share_title)) },
+                            onClick = { share(context, "bitcoin:?lno=${offerState.encoded}", context.getString(R.string.receive_offer_share_subject), context.getString(R.string.receive_offer_share_title)) },
                         )
                     }
                     Spacer(modifier = Modifier.height(16.dp))
@@ -133,8 +133,26 @@ fun Bip353AddressDisplay(address: String?) {
     when {
         address.isNullOrBlank() -> {}
         else -> {
-            SelectionContainer {
-                Text(text = stringResource(id = R.string.utils_bip353_with_prefix, address), style = MaterialTheme.typography.body2)
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .border(1.dp, MaterialTheme.colors.primary, CircleShape)
+                        .padding(3.dp)
+                ) {
+                    PhoenixIcon(
+                        resourceId = R.drawable.ic_bitcoin_wire,
+                        modifier = Modifier.size(18.dp),
+                        tint = MaterialTheme.colors.primary,
+                    )
+                }
+                Spacer(modifier = Modifier.width(5.dp))
+                SelectionContainer {
+                    Text(
+                        text = address,
+                        style = MaterialTheme.typography.body2,
+                    )
+                }
             }
             Spacer(modifier = Modifier.height(16.dp))
         }

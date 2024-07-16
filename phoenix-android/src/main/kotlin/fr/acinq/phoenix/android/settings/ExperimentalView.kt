@@ -177,7 +177,7 @@ private fun ClaimAddressButton(
         is ClaimAddressState.Done -> {
             val context = LocalContext.current
             Setting(
-                title = stringResource(id = R.string.utils_bip353_with_prefix, state.address),
+                title = state.address,
                 leadingIcon = { PhoenixIcon(R.drawable.ic_arobase) },
                 trailingIcon = {
                     Button(

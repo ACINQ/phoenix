@@ -204,7 +204,7 @@
     <string name="scan_manual_input_title">Manual input</string>
     <string name="scan_manual_input_instructions">Enter a Lightning invoice, an offer, a LNURL or a Lightning address you want to send money to.</string>
     <string name="scan_manual_input_label">Invoice, LN address…</string>
-    <string name="scan_manual_input_hint" translatable="false">₿satoshi@domain.com</string>
+    <string name="scan_manual_input_hint" translatable="false">satoshi@domain.com, bc1q..., lnbc...</string>
 
     <!-- utils: misc strings -->
 
