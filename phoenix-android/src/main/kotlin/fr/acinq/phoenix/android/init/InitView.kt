@@ -128,7 +128,11 @@ class InitViewModel(controller: InitializationController) : MVIControllerViewMod
                     SeedManager.writeSeedToDisk(context, encrypted)
                     writingState = WritingSeedState.WrittenToDisk(encrypted)
                     LegacyPrefsDatastore.saveStartLegacyApp(context, if (isNewWallet) LegacyAppStatus.NotRequired else LegacyAppStatus.Unknown)
-                    log.info("a new wallet has been generated and mnemonics have been written to disk")
+                    if (isNewWallet) {
+                        log.info("new seed successfully created and written to disk")
+                    } else {
+                        log.info("wallet successfully restored from mnemonics and written to disk")
+                    }
                 } else {
                     log.warn("cannot overwrite existing seed=${existing.name()}")
                     writingState = WritingSeedState.WrittenToDisk(existing)
