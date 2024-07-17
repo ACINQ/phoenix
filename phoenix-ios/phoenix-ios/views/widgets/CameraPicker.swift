@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct CameraPicker: UIViewControllerRepresentable {
-	@Binding var image: UIImage?
+	@Binding var result: PickerResult?
 	
 	func makeUIViewController(context: Context) -> UIImagePickerController {
 		let imagePicker = UIImagePickerController()
@@ -31,8 +31,10 @@ struct CameraPicker: UIViewControllerRepresentable {
 		) {
 			picker.dismiss(animated: true)
 			
-			guard let selectedImage = info[.originalImage] as? UIImage else { return }
-			self.parent.image = selectedImage
+			if let image = info[.originalImage] as? UIImage {
+				let result = PickerResult(image: image, file: nil)
+				self.parent.result = result
+			}
 		}
 	}
 }
