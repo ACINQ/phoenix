@@ -3,7 +3,6 @@ package fr.acinq.phoenix.managers
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
-import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
@@ -13,6 +12,8 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.SqlitePaymentsDb
 import fr.acinq.lightning.logging.debug
+import fr.acinq.phoenix.utils.extensions.incomingOfferMetadata
+import fr.acinq.phoenix.utils.extensions.outgoingInvoiceRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +26,7 @@ import kotlinx.coroutines.launch
 class PaymentsManager(
     private val loggerFactory: LoggerFactory,
     private val configurationManager: AppConfigurationManager,
-    private val peerManager: PeerManager,
+    private val contactsManager: ContactsManager,
     private val databaseManager: DatabaseManager,
     private val electrumClient: ElectrumClient,
 ) : CoroutineScope by MainScope() {
@@ -33,7 +34,7 @@ class PaymentsManager(
     constructor(business: PhoenixBusiness) : this(
         loggerFactory = business.loggerFactory,
         configurationManager = business.appConfigurationManager,
-        peerManager = business.peerManager,
+        contactsManager = business.contactsManager,
         databaseManager = business.databaseManager,
         electrumClient = business.electrumClient
     )
@@ -166,11 +167,37 @@ class PaymentsManager(
             is WalletPaymentId.SpliceCpfpOutgoingPaymentId -> paymentsDb().getSpliceCpfpOutgoingPayment(id.id, options)
             is WalletPaymentId.InboundLiquidityOutgoingPaymentId -> paymentsDb().getInboundLiquidityOutgoingPayment(id.id, options)
         }?.let {
+            val payment = it.first
+            val contact = if (options.contains(WalletPaymentFetchOptions.Contact)) {
+                contactForPayment(payment)
+            } else { null }
             WalletPaymentInfo(
-                payment = it.first,
+                payment = payment,
                 metadata = it.second ?: WalletPaymentMetadata(),
+                contact = contact,
                 fetchOptions = options
             )
         }
+    }
+
+    private fun contactForPayment(payment: WalletPayment): ContactInfo? {
+        // We could query the database here, but there's no reason to since
+        // the ContactsManager already has all the contacts stored in memory.
+
+        val offerMetadata = payment.incomingOfferMetadata()
+        if (offerMetadata != null) {
+            return contactsManager.contactsList.value.firstOrNull {
+                it.publicKeys.contains(offerMetadata.payerKey)
+            }
+        }
+
+        val invoiceRequest = payment.outgoingInvoiceRequest()
+        if (invoiceRequest != null) {
+            return contactsManager.contactsList.value.firstOrNull {
+                it.offers.contains(invoiceRequest.offer)
+            }
+        }
+
+        return null
     }
 }

@@ -12,6 +12,8 @@ struct PaymentCell : View {
 	
 	static let fetchOptions = WalletPaymentFetchOptions.companion.Descriptions.plus(
 		other: WalletPaymentFetchOptions.companion.OriginalFiat
+	).plus(
+		other: WalletPaymentFetchOptions.companion.Contact
 	)
 	
 	private let paymentsManager = Biz.business.paymentsManager
