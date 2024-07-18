@@ -16,6 +16,8 @@ struct ManageContactSheet: View {
 	let contactUpdated: (ContactInfo?) -> Void
 	let isNewContact: Bool
 	
+	let IMG_SIZE: CGFloat = 150
+	
 	@StateObject var toast = Toast()
 	
 	@State var name: String
@@ -146,7 +148,9 @@ struct ManageContactSheet: View {
 	func content_image() -> some View {
 		
 		Group {
-			if let uiimage = imageProxy {
+			if useDiskImage {
+				ContactPhoto(fileName: contact?.photoUri, size: IMG_SIZE, useCache: false)
+			} else if let uiimage = updatedImage {
 				Image(uiImage: uiimage)
 					.resizable()
 					.aspectRatio(contentMode: .fill) // FILL !
@@ -157,7 +161,7 @@ struct ManageContactSheet: View {
 					.foregroundColor(.gray)
 			}
 		}
-		.frame(width: 150, height: 150)
+		.frame(width: IMG_SIZE, height: IMG_SIZE)
 		.clipShape(Circle())
 		.onTapGesture {
 			if !isSaving {
@@ -291,17 +295,14 @@ struct ManageContactSheet: View {
 		return !trimmedName.isEmpty
 	}
 	
-	var imageProxy: UIImage? {
+	var useDiskImage: Bool {
 		
 		if useUpdatedImage {
-			return updatedImage
-		} else if let img = updatedImage {
-			return img
-		} else if let fileName = contact?.photoUri {
-			let filePath = PhotosManager.shared.filePathForPhoto(fileName: fileName)
-			return UIImage(contentsOfFile: filePath)
+			return false
+		} else if let _ = updatedImage {
+			return false
 		} else {
-			return nil
+			return true
 		}
 	}
 	

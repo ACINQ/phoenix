@@ -12,12 +12,41 @@ class PhotosManager {
 	/// Singleton instance
 	public static let shared = PhotosManager()
 	
+	private let queue = DispatchQueue.init(label: "PhotosManager")
+	private let cache = Cache<String, UIImage>(countLimit: 30)
+	
+	private let memoryPressure: DispatchSourceMemoryPressure
+	
 	private init() { // must use shared instance
-		// Nothing to do here yet
+		
+		memoryPressure = DispatchSource.makeMemoryPressureSource(
+			eventMask: [.warning, .critical],
+			queue: queue
+		)
+		memoryPressure.setEventHandler { [weak self] in
+			guard let self else {
+				return
+			}
+			let event = self.memoryPressure.data
+			switch event {
+				case .warning : self.respondToMemoryPressure(event)
+				case.critical : self.respondToMemoryPressure(event)
+				default       : break
+			}
+		}
+		memoryPressure.activate()
 	}
 	
-	enum PhotosManagerError: Error {
-		case conversionToJPEG
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
+	
+	func respondToMemoryPressure(_ event: DispatchSource.MemoryPressureEvent) {
+		log.trace("respondToMemoryPressure()")
+		
+		// Note: This function is invoked on our `queue`, so we can safely modify the `cache` variable.
+		
+		cache.removeAll()
 	}
 	
 	// --------------------------------------------------
@@ -60,32 +89,14 @@ class PhotosManager {
 	// MARK: Writing
 	// --------------------------------------------------
 	
-	func deleteFromDisk(
-		fileName: String,
-		qos: DispatchQoS.QoSClass = .userInitiated
-	) async throws {
-		
-		return try await withCheckedThrowingContinuation { continuation in
-			DispatchQueue.global(qos: qos).async {
-				
-				let fileUrl = self.urlForPhoto(fileName: fileName)
-				do {
-					try FileManager.default.removeItem(at: fileUrl)
-					continuation.resume(with: .success)
-				} catch {
-					continuation.resume(throwing: error)
-				}
-			}
-		}
+	enum PhotosManagerError: Error {
+		case conversionToJPEG
 	}
 	
-	func writeToDisk(
-		image: UIImage,
-		qos: DispatchQoS.QoSClass = .userInitiated
-	) async throws -> String {
+	func writeToDisk(image: UIImage) async throws -> String {
 		
 		return try await withCheckedThrowingContinuation { continuation in
-			DispatchQueue.global(qos: qos).async {
+			DispatchQueue.global(qos: .userInitiated).async {
 				
 				guard let imageData = image.jpegData(compressionQuality: 1.0) else {
 					continuation.resume(throwing: PhotosManagerError.conversionToJPEG)
@@ -100,6 +111,70 @@ class PhotosManager {
 					continuation.resume(returning: fileName)
 				} catch {
 					continuation.resume(throwing: error)
+				}
+			}
+		}
+	}
+
+	func deleteFromDisk(fileName: String) async throws {
+		
+		return try await withCheckedThrowingContinuation { continuation in
+			DispatchQueue.global(qos: .userInitiated).async {
+				
+				let fileUrl = self.urlForPhoto(fileName: fileName)
+				do {
+					try FileManager.default.removeItem(at: fileUrl)
+					continuation.resume(with: .success)
+				} catch {
+					continuation.resume(throwing: error)
+				}
+			}
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Reading
+	// --------------------------------------------------
+	
+	func readFromDisk(fileName: String, size: CGFloat, useCache: Bool = true) async -> UIImage? {
+		
+		let readTask = {() -> UIImage? in
+			do {
+				let fileUrl = self.urlForPhoto(fileName: fileName)
+				let data = try Data(contentsOf: fileUrl, options: [.mappedIfSafe, .uncached])
+				guard let fullSizePhoto = UIImage(data: data) else {
+					return nil
+				}
+				
+				let cgsize = CGSize(width: size, height: size)
+				let scaledPhoto = UIGraphicsImageRenderer(size: cgsize).image { _ in
+					fullSizePhoto.draw(in: CGRect(origin: .zero, size: cgsize))
+				}
+				
+				return scaledPhoto
+			} catch {
+				log.warning("readFromDisk: error: \(error)")
+				return nil
+			}
+		}
+		
+		return await withCheckedContinuation { continuation in
+			if useCache {
+				queue.async {
+					let key = "\(fileName)|\(size)"
+					if let cachedImg = self.cache[key] {
+						continuation.resume(returning: cachedImg)
+					} else if let img = readTask() {
+						self.cache[key] = img
+						continuation.resume(returning: img)
+					} else {
+						continuation.resume(returning: nil)
+					}
+				}
+			} else {
+				DispatchQueue.global(qos: .userInitiated).async {
+					let img = readTask()
+					continuation.resume(returning: img)
 				}
 			}
 		}

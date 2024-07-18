@@ -12,12 +12,21 @@ struct ContactPhoto: View {
 	
 	let fileName: String?
 	let size: CGFloat
+	let useCache: Bool
+	
+	init(fileName: String?, size: CGFloat, useCache: Bool = true) {
+		self.fileName = fileName
+		self.size = size
+		self.useCache = useCache
+		
+		log.trace("[public] init(): \(fileName ?? "<nil>")")
+	}
 	
 	@ViewBuilder
 	var body: some View {
 		
-		_ContactPhoto(fileName: fileName, size: size)
-			.id("\(fileName ?? "<nil>")@\(size)") // <- required
+		_ContactPhoto(fileName: fileName, size: size, useCache: useCache)
+			.id(uniqueId) // <- required
 		
 		// Due to "structural identity" in SwiftUI:
 		// - even when `fileName` or `size` changes, it's still considered to be the "same" view
@@ -31,18 +40,24 @@ struct ContactPhoto: View {
 		// To get around this, we use `.id` to force "explicit identity".
 		// So when `fileName` or `size` changes, it will be a new instance of `_ContactPhoto`.
 	}
+	
+	var uniqueId: String {
+		return "\(fileName ?? "<nil>")@\(size)|\(useCache)"
+	}
 }
 
 fileprivate struct _ContactPhoto: View {
 	
 	let fileName: String?
 	let size: CGFloat
+	let useCache: Bool
 	
 	@State private var bgLoadedImage: UIImage? = nil
 	
-	init(fileName: String?, size: CGFloat) {
+	init(fileName: String?, size: CGFloat, useCache: Bool) {
 		self.fileName = fileName
 		self.size = size
+		self.useCache = useCache
 		
 		log.trace("[private] init(): \(fileName ?? "<nil>")")
 	}
@@ -71,29 +86,18 @@ fileprivate struct _ContactPhoto: View {
 	
 	func loadImage() async {
 		log.trace("[private] loadImage(): \(fileName ?? "<nil>")")
-		
+
 		guard let fileName else {
 			return
 		}
 		
-		let fileUrl = PhotosManager.shared.urlForPhoto(fileName: fileName)
-		DispatchQueue.global(qos: .userInteractive).async {
-			do {
-				let data = try Data(contentsOf: fileUrl, options: [.mappedIfSafe, .uncached])
-				guard let fullSizePhoto = UIImage(data: data) else {
-					return
-				}
-				
-				let cgsize = CGSize(width: size, height: size)
-				let scaledPhoto = UIGraphicsImageRenderer(size: cgsize).image { _ in
-					fullSizePhoto.draw(in: CGRect(origin: .zero, size: cgsize))
-				}
-				
-				bgLoadedImage = scaledPhoto
-				
-			} catch {
-				log.warning("loadImage: error: \(error)")
-			}
-		}
+		let img = await PhotosManager.shared.readFromDisk(
+			fileName: fileName,
+			size: size,
+			useCache: useCache
+		)
+		
+		log.trace("[private] loadImage(): \(fileName) => done")
+		bgLoadedImage = img
 	}
 }
