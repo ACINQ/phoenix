@@ -12,8 +12,6 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.SqlitePaymentsDb
 import fr.acinq.lightning.logging.debug
-import fr.acinq.phoenix.utils.extensions.incomingOfferMetadata
-import fr.acinq.phoenix.utils.extensions.outgoingInvoiceRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -169,7 +167,7 @@ class PaymentsManager(
         }?.let {
             val payment = it.first
             val contact = if (options.contains(WalletPaymentFetchOptions.Contact)) {
-                contactForPayment(payment)
+                contactsManager.contactForPayment(payment)
             } else { null }
             WalletPaymentInfo(
                 payment = payment,
@@ -178,26 +176,5 @@ class PaymentsManager(
                 fetchOptions = options
             )
         }
-    }
-
-    private fun contactForPayment(payment: WalletPayment): ContactInfo? {
-        // We could query the database here, but there's no reason to since
-        // the ContactsManager already has all the contacts stored in memory.
-
-        val offerMetadata = payment.incomingOfferMetadata()
-        if (offerMetadata != null) {
-            return contactsManager.contactsList.value.firstOrNull {
-                it.publicKeys.contains(offerMetadata.payerKey)
-            }
-        }
-
-        val invoiceRequest = payment.outgoingInvoiceRequest()
-        if (invoiceRequest != null) {
-            return contactsManager.contactsList.value.firstOrNull {
-                it.offers.contains(invoiceRequest.offer)
-            }
-        }
-
-        return null
     }
 }
