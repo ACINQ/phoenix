@@ -2,6 +2,13 @@ import Foundation
 import UIKit
 import UniformTypeIdentifiers.UTType
 
+fileprivate let filename = "NSItemProvider"
+#if DEBUG && true
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
+#else
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
+#endif
+
 extension NSItemProvider {
 	
 	@available(iOS 16.0, *)
@@ -29,11 +36,29 @@ extension NSItemProvider {
 	) async throws -> URL {
 		
 		return try await withCheckedThrowingContinuation { continuation in
-			let _ = self.loadFileRepresentation(for: contentType, openInPlace: openInPlace) { url, _, error in
+			let _ = self.loadFileRepresentation(for: contentType, openInPlace: openInPlace) {
+				(url: URL?, openedInPlace: Bool, error: (any Error)?) in
+				
 				if let error {
 					continuation.resume(throwing: error)
 				} else if let url {
-					continuation.resume(returning: url)
+					if openedInPlace {
+						// Since file was successfully opened in place,
+						// we should (as far as I understand) have access to the URL outside this block.
+						continuation.resume(returning: url)
+					} else {
+						// We have to copy the file to a safe location
+						// because it will be deleted when we return from this block.
+						let tempDir = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+						let fileName = UUID().uuidString
+						let copyUrl = tempDir.appendingPathComponent(fileName, isDirectory: false)
+						do {
+							try FileManager.default.copyItem(at: url, to: copyUrl)
+							continuation.resume(returning: copyUrl)
+						} catch {
+							continuation.resume(throwing: error)
+						}
+					}
 				} else {
 					preconditionFailure("NSItemProvider.loadFileRepresentation: failed API contract")
 				}

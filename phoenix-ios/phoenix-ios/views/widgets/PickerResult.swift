@@ -40,18 +40,18 @@ class PickerResult: Equatable {
 		if let existingFile = file {
 			return PickerResult.compressWithHeic(
 				image: image,
-				compressionQualities: [0.9, 0.85, 0.8],
+				compressionQualities: [1.0, 0.98, 0.94, 0.9],
 				targetFileSize: existingFile.size
 			)
 			
 		} else {
-			return PickerResult.compressWithHeic(image: image, compressionQuality: 0.9)
+			return PickerResult.compressWithHeic(image: image, compressionQuality: 0.98)
 		}
 	}
 	
 	private static func compressWithHeic(
 		image: UIImage,
-		compressionQualities: [Float],
+		compressionQualities: [CGFloat],
 		targetFileSize: Int
 	) -> Data? {
 		log.trace("compressWithHeic(:::): \(compressionQualities)")
@@ -73,7 +73,7 @@ class PickerResult: Equatable {
 	
 	private static func compressWithHeic(
 		image: UIImage,
-		compressionQuality: Float
+		compressionQuality: CGFloat
 	) -> Data? {
 		log.trace("compressWithHeic(::) \(compressionQuality)")
 		
@@ -85,19 +85,26 @@ class PickerResult: Equatable {
 				log.error("PickerResult.compressWithHeic: heic not supported")
 				return nil
 		}
-
-		// 2
+		
 		guard let cgImage = image.cgImage else {
 			log.error("PickerResult.compressWithHeic: cgImage missing")
 			return nil
 		}
 
-		// 3
+		let orientation: CGImagePropertyOrientation = image.imageOrientation.cgImageOrientation
+		log.debug("uiImageOrientation = \(image.imageOrientation.rawValue)")
+		log.debug("cgImageOrientation = \(orientation)")
+		
+//		let tiffOptions: NSDictionary = [
+//			kCGImagePropertyTIFFOrientation as String: NSNumber(value: orientation.rawValue)
+//		]
 		let options: NSDictionary = [
-		  kCGImageDestinationLossyCompressionQuality: compressionQuality
+			kCGImageDestinationLossyCompressionQuality as String: NSNumber(value: compressionQuality),
+			kCGImageDestinationOrientation as String: NSNumber(value: orientation.rawValue) // doesn't work ?!?
+//			kCGImagePropertyTIFFDictionary as String: tiffOptions
 		]
-
-		// 4
+//		CGImageDestinationSetProperties(imageDestination, options)
+		
 		CGImageDestinationAddImage(imageDestination, cgImage, options)
 		guard CGImageDestinationFinalize(imageDestination) else {
 			log.error("PickerResult.compressWithHeic: could not finalize")
@@ -152,5 +159,25 @@ class FileCopyResult: Equatable {
 			return false
 		}
 		return true
+	}
+}
+
+extension UIImage.Orientation {
+	
+	// The rawValues for UIImageOrientation do NOT match CGImagePropertyOrientation :(
+	// https://developer.apple.com/documentation/imageio/cgimagepropertyorientation
+	//
+	var cgImageOrientation: CGImagePropertyOrientation {
+		switch self {
+			case .up            : return CGImagePropertyOrientation.up
+			case .upMirrored    : return CGImagePropertyOrientation.upMirrored
+			case .down          : return CGImagePropertyOrientation.down
+			case .downMirrored  : return CGImagePropertyOrientation.downMirrored
+			case .left          : return CGImagePropertyOrientation.left
+			case .leftMirrored  : return CGImagePropertyOrientation.leftMirrored
+			case .right         : return CGImagePropertyOrientation.right
+			case .rightMirrored : return CGImagePropertyOrientation.rightMirrored
+			@unknown default    : fatalError("Unknown UIImage.Orientation")
+		}
 	}
 }
