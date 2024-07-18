@@ -90,29 +90,43 @@ class PhotosManager {
 	// --------------------------------------------------
 	
 	enum PhotosManagerError: Error {
-		case conversionToJPEG
+		case writingToDisk
+		case copyingFile
+		case compressionFailed
 	}
 	
-	func writeToDisk(image: UIImage) async throws -> String {
+	func writeToDisk(_ original: PickerResult) async throws -> String {
 		
-		return try await withCheckedThrowingContinuation { continuation in
-			DispatchQueue.global(qos: .userInitiated).async {
+		let fileName = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+		let fileUrl = self.urlForPhoto(fileName: fileName)
 				
-				guard let imageData = image.jpegData(compressionQuality: 1.0) else {
-					continuation.resume(throwing: PhotosManagerError.conversionToJPEG)
-					return
-				}
+		let scaled = await original.downscale()
+		if let compressedImageData = await scaled.compress() {
+			
+			do {
+				try compressedImageData.write(to: fileUrl)
+				log.debug("compressedImage: \(fileUrl)")
 				
-				let fileName = UUID().uuidString.replacingOccurrences(of: "-", with: "")
-				let fileUrl = self.urlForPhoto(fileName: fileName)
-				
-				do {
-					try imageData.write(to: fileUrl)
-					continuation.resume(returning: fileName)
-				} catch {
-					continuation.resume(throwing: error)
-				}
+				return fileName
+			} catch {
+				throw PhotosManagerError.writingToDisk
 			}
+			
+		} else if let originalFileUrl = scaled.file?.url {
+			
+			do {
+				try FileManager.default.copyItem(at: originalFileUrl, to: fileUrl)
+				log.debug("originalImage: \(originalFileUrl)")
+						
+				return fileName
+			} catch {
+				throw PhotosManagerError.copyingFile
+			}
+					
+		} else {
+			
+			log.debug("compression failed")
+			throw PhotosManagerError.compressionFailed
 		}
 	}
 

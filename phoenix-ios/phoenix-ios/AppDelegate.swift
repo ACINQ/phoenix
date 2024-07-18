@@ -11,7 +11,7 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-let CONTACTS_ENABLED = false
+let CONTACTS_ENABLED = true
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {

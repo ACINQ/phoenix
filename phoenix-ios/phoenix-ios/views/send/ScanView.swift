@@ -21,7 +21,7 @@ struct ScanView: View {
 	@State var clipboardContent: Scan.ClipboardContent? = nil
 	
 	@State var showingImagePicker = false
-	@State var imagePickerSelection: UIImage? = nil
+	@State var imagePickerResult: PickerResult? = nil
 	
 	@State var ignoreScanner: Bool = false
 	
@@ -117,7 +117,7 @@ struct ScanView: View {
 		}
 		.ignoresSafeArea(.keyboard) // disable keyboard avoidance on this view
 		.sheet(isPresented: $showingImagePicker) {
-			 ImagePicker(image: $imagePickerSelection)
+			 ImagePicker(copyFile: false, result: $imagePickerResult)
 		}
 	}
 	
@@ -399,7 +399,7 @@ struct ScanView: View {
 			}
 		}
 		.font(.title3)
-		.onChange(of: imagePickerSelection) { _ in
+		.onChange(of: imagePickerResult) { _ in
 			imagePickerDidChooseImage()
 		}
 	}
@@ -583,8 +583,8 @@ struct ScanView: View {
 	func imagePickerDidChooseImage() {
 		log.trace("imagePickerDidChooseImage()")
 		
-		guard let uiImage = imagePickerSelection else { return }
-		imagePickerSelection = nil
+		guard let uiImage = imagePickerResult?.image else { return }
+		imagePickerResult = nil
 		
 		if let ciImage = CIImage(image: uiImage) {
 			var options: [String: Any]

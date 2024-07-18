@@ -21,8 +21,9 @@ struct ManageContactSheet: View {
 	@StateObject var toast = Toast()
 	
 	@State var name: String
-	@State var updatedImage: UIImage?
-	@State var useUpdatedImage: Bool = false
+	@State var pickerResult: PickerResult?
+	@State var pickerResultIsPrepped: Bool = false
+	@State var doNotUseDiskImage: Bool = false
 	
 	@State var showImageOptions: Bool = false
 	@State var isSaving: Bool = false
@@ -78,10 +79,10 @@ struct ManageContactSheet: View {
 		.sheet(isPresented: activeSheetBinding()) { // SwiftUI only allows for 1 ".sheet"
 			switch activeSheet! {
 			case .camera:
-				CameraPicker(image: $updatedImage)
+				CameraPicker(result: $pickerResult)
 			
 			case .imagePicker:
-				ImagePicker(image: $updatedImage)
+				ImagePicker(copyFile: true, result: $pickerResult)
 			
 			} // </switch>
 		}
@@ -150,7 +151,7 @@ struct ManageContactSheet: View {
 		Group {
 			if useDiskImage {
 				ContactPhoto(fileName: contact?.photoUri, size: IMG_SIZE, useCache: false)
-			} else if let uiimage = updatedImage {
+			} else if let uiimage = pickerResult?.image {
 				Image(uiImage: uiimage)
 					.resizable()
 					.aspectRatio(contentMode: .fill) // FILL !
@@ -185,8 +186,8 @@ struct ManageContactSheet: View {
 			}
 			if hasImage {
 				Button("Clear image", role: ButtonRole.destructive) {
-					updatedImage = nil
-					useUpdatedImage = true
+					pickerResult = nil
+					doNotUseDiskImage = true
 				}
 			}
 		} // </confirmationDialog>
@@ -297,9 +298,9 @@ struct ManageContactSheet: View {
 	
 	var useDiskImage: Bool {
 		
-		if useUpdatedImage {
+		if doNotUseDiskImage {
 			return false
-		} else if let _ = updatedImage {
+		} else if let _ = pickerResult {
 			return false
 		} else {
 			return true
@@ -308,9 +309,9 @@ struct ManageContactSheet: View {
 	
 	var hasImage: Bool {
 		
-		if useUpdatedImage {
-			return updatedImage != nil
-		} else if let _ = updatedImage {
+		if doNotUseDiskImage {
+			return pickerResult != nil
+		} else if let _ = pickerResult {
 			return true
 		} else {
 			return contact?.photoUri != nil
@@ -360,9 +361,9 @@ struct ManageContactSheet: View {
 				let oldPhotoName: String? = contact?.photoUri
 				var newPhotoName: String? = nil
 				
-				if let newImg = updatedImage {
-					newPhotoName = try await PhotosManager.shared.writeToDisk(image: newImg)
-				} else if !useUpdatedImage {
+				if let pickerResult {
+					newPhotoName = try await PhotosManager.shared.writeToDisk(pickerResult)
+				} else if !doNotUseDiskImage {
 					newPhotoName = oldPhotoName
 				}
 				

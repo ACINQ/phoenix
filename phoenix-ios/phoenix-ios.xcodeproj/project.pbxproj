@@ -190,6 +190,8 @@
 		DC6F04272C3895E300627B4F /* ContactPhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F04262C3895E300627B4F /* ContactPhoto.swift */; };
 		DC6F042B2C3DA7AD00627B4F /* ContactsListSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F042A2C3DA7AD00627B4F /* ContactsListSheet.swift */; };
 		DC6F042D2C3DC4CD00627B4F /* ManualInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F042C2C3DC4CD00627B4F /* ManualInput.swift */; };
+		DC6F19BF2C46FB0F004EC469 /* NSItemProvider+Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F19BE2C46FB0F004EC469 /* NSItemProvider+Async.swift */; };
+		DC6F19C12C470F70004EC469 /* PickerResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F19C02C470F70004EC469 /* PickerResult.swift */; };
 		DC70A99C2BBB6093002DBFF8 /* InboundFeeWarning.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC70A99B2BBB6093002DBFF8 /* InboundFeeWarning.swift */; };
 		DC71E7302723240E0063613D /* KotlinObservables.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC71E72F2723240E0063613D /* KotlinObservables.swift */; };
 		DC71E7332728645B0063613D /* CurrencyConverterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC71E7322728645B0063613D /* CurrencyConverterView.swift */; };
@@ -584,6 +586,8 @@
 		DC6F04262C3895E300627B4F /* ContactPhoto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactPhoto.swift; sourceTree = "<group>"; };
 		DC6F042A2C3DA7AD00627B4F /* ContactsListSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsListSheet.swift; sourceTree = "<group>"; };
 		DC6F042C2C3DC4CD00627B4F /* ManualInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualInput.swift; sourceTree = "<group>"; };
+		DC6F19BE2C46FB0F004EC469 /* NSItemProvider+Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSItemProvider+Async.swift"; sourceTree = "<group>"; };
+		DC6F19C02C470F70004EC469 /* PickerResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerResult.swift; sourceTree = "<group>"; };
 		DC70A99B2BBB6093002DBFF8 /* InboundFeeWarning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboundFeeWarning.swift; sourceTree = "<group>"; };
 		DC71E72F2723240E0063613D /* KotlinObservables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinObservables.swift; sourceTree = "<group>"; };
 		DC71E7322728645B0063613D /* CurrencyConverterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverterView.swift; sourceTree = "<group>"; };
@@ -783,6 +787,7 @@
 				DC6D26E229E76557006A7814 /* AnimatedClock.swift */,
 				DCB30E532A0AABAF00E7D7A2 /* InfoPopoverWindow.swift */,
 				DC3345D12C2C761800EDD2D4 /* CameraPicker.swift */,
+				DC6F19C02C470F70004EC469 /* PickerResult.swift */,
 			);
 			path = widgets;
 			sourceTree = "<group>";
@@ -1308,6 +1313,7 @@
 				DC2CE3AE29AFEB0500BA0B00 /* Bundle+Icon.swift */,
 				DCFB8DF62A94066100947698 /* Task+Sleep.swift */,
 				DCFB8DF82A94112A00947698 /* Dictionary+MapKeys.swift */,
+				DC6F19BE2C46FB0F004EC469 /* NSItemProvider+Async.swift */,
 			);
 			path = extensions;
 			sourceTree = "<group>";
@@ -1792,11 +1798,13 @@
 				DC82EED629789853007A5853 /* TxHistoryExporter.swift in Sources */,
 				DC98D3982AF2AE41005BD177 /* ReceiveView.swift in Sources */,
 				DC9E7EC32A12955300A5F1D0 /* LiquidityHTML.swift in Sources */,
+				DC6F19BF2C46FB0F004EC469 /* NSItemProvider+Async.swift in Sources */,
 				DCCFE6C22B7140FA002FFF11 /* LoggerFactory+Foreground.swift in Sources */,
 				7555FF7F242A565900829871 /* AppDelegate.swift in Sources */,
 				DC74174B270F332700F7E3E3 /* KotlinTypes.swift in Sources */,
 				DC142135261E72320075857A /* AboutHTML.swift in Sources */,
 				DC33C5632A7C15D40053D785 /* MainView_BigPrimary.swift in Sources */,
+				DC6F19C12C470F70004EC469 /* PickerResult.swift in Sources */,
 				DCEE8998288605FD00FE42DD /* PaymentCell.swift in Sources */,
 				DCDD9ED428637EBB001800A3 /* ToolsButton.swift in Sources */,
 				DCDD9ED0286377B7001800A3 /* MainView_Big.swift in Sources */,
