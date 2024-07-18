@@ -63,6 +63,7 @@ public class SmartModalState: ObservableObject {
 	func display<Content: View>(
 		dismissable: Bool,
 		@ViewBuilder builder: () -> Content,
+		onDidAppear: (() -> Void)? = nil,
 		onWillDisappear: (() -> Void)? = nil,
 		onDidDisappear: (() -> Void)? = nil
 	) {
@@ -70,6 +71,7 @@ public class SmartModalState: ObservableObject {
 			popoverState.display(
 				dismissable: dismissable,
 				builder: builder,
+				onDidAppear: onDidAppear,
 				onWillDisappear: onWillDisappear,
 				onDidDisappear: onDidDisappear
 			)
@@ -77,6 +79,7 @@ public class SmartModalState: ObservableObject {
 			shortSheetState.display(
 				dismissable: dismissable,
 				builder: builder,
+				onDidAppear: onDidAppear,
 				onWillDisappear: onWillDisappear,
 				onDidDisappear: onDidDisappear
 			)
@@ -96,6 +99,14 @@ public class SmartModalState: ObservableObject {
 			popoverState.close(animationCompletion: animationCompletion)
 		} else {
 			shortSheetState.close(animationCompletion: animationCompletion)
+		}
+	}
+	
+	func onNextDidAppear(_ action: @escaping () -> Void) {
+		if isIPad {
+			popoverState.onNextDidAppear(action)
+		} else {
+			shortSheetState.onNextDidAppear(action)
 		}
 	}
 	

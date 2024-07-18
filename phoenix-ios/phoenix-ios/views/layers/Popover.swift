@@ -24,16 +24,21 @@ public class PopoverState: ObservableObject {
 	/// - view will animate on screen (onWillAppear)
 	/// - view has animated off screen (onDidDisappear)
 	///
-	var itemPublisher = CurrentValueSubject<PopoverItem?, Never>(nil)
+	let itemPublisher = CurrentValueSubject<PopoverItem?, Never>(nil)
+	
+	/// Fires when:
+	/// - view has animated on screen (onDidAppear)
+	///
+	let didAppearPublisher = PassthroughSubject<Void, Never>()
 	
 	/// Fires when:
 	/// - view will animate off screen (onWillDisapper)
 	///
-	var closePublisher = PassthroughSubject<Void, Never>()
+	let willDisappearPublisher = PassthroughSubject<Void, Never>()
 	
 	/// Whether or not the popover is dismissable by tapping outside the popover.
 	///
-	var dismissablePublisher = CurrentValueSubject<Bool, Never>(true)
+	let dismissablePublisher = CurrentValueSubject<Bool, Never>(true)
 	
 	var currentItem: PopoverItem? {
 		return itemPublisher.value
@@ -47,6 +52,7 @@ public class PopoverState: ObservableObject {
 	func display<Content: View>(
 		dismissable: Bool,
 		@ViewBuilder builder: () -> Content,
+		onDidAppear: (() -> Void)? = nil,
 		onWillDisappear: (() -> Void)? = nil,
 		onDidDisappear: (() -> Void)? = nil
 	) {
@@ -54,6 +60,9 @@ public class PopoverState: ObservableObject {
 		itemPublisher.send(PopoverItem(
 			view: builder().anyView
 		))
+		if let didAppearLambda = onDidAppear {
+			onNextDidAppear(didAppearLambda)
+		}
 		if let willDisappearLambda = onWillDisappear {
 			onNextWillDisappear(willDisappearLambda)
 		}
@@ -63,30 +72,29 @@ public class PopoverState: ObservableObject {
 	}
 	
 	func close() {
-		closePublisher.send()
+		willDisappearPublisher.send()
 	}
 	
 	func close(animationCompletion: @escaping () -> Void) {
+		onNextDidDisappear(animationCompletion)
+		willDisappearPublisher.send()
+	}
+	
+	func onNextDidAppear(_ action: @escaping () -> Void) {
 		
 		var cancellables = Set<AnyCancellable>()
-		itemPublisher.sink { (item: PopoverItem?) in
+		didAppearPublisher.sink { _ in
 			
-			// NB: This fires right away because itemPublisher is CurrentValueSubject.
-			// It only means `onDidDisappear` if item is nil.
-			if item == nil {
-				animationCompletion()
-				cancellables.removeAll()
-			}
+			action()
+			cancellables.removeAll()
 			
 		}.store(in: &cancellables)
-		
-		closePublisher.send()
 	}
 	
 	func onNextWillDisappear(_ action: @escaping () -> Void) {
 		
 		var cancellables = Set<AnyCancellable>()
-		closePublisher.sink { _ in
+		willDisappearPublisher.sink { _ in
 			
 			action()
 			cancellables.removeAll()
@@ -181,7 +189,7 @@ struct PopoverWrapper<Content: View>: View {
 				animation = 1
 			}
 		}
-		.onReceive(popoverState.closePublisher) { _ in
+		.onReceive(popoverState.willDisappearPublisher) { _ in
 			withAnimation {
 				animation = 2
 			}
@@ -198,6 +206,7 @@ struct PopoverWrapper<Content: View>: View {
 		if animation == 1 {
 			// Popover is now visible
 			UIAccessibility.post(notification: .screenChanged, argument: nil)
+			popoverState.didAppearPublisher.send()
 		} else if animation == 2 {
 			// Popover is now hidden
 			UIAccessibility.post(notification: .screenChanged, argument: nil)

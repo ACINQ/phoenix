@@ -18,8 +18,6 @@ struct ManageContactSheet: View {
 	
 	let IMG_SIZE: CGFloat = 150
 	
-	@StateObject var toast = Toast()
-	
 	@State var name: String
 	@State var trustedContact: Bool
 	@State var pickerResult: PickerResult?
@@ -29,6 +27,8 @@ struct ManageContactSheet: View {
 	@State var showImageOptions: Bool = false
 	@State var isSaving: Bool = false
 	@State var showDeleteContactConfirmationDialog: Bool = false
+	
+	@State var didAppear: Bool = false
 	
 	enum ActiveSheet {
 		case camera
@@ -43,6 +43,8 @@ struct ManageContactSheet: View {
 		value: { [$0.size.width] }
 	)
 	@State var maxFooterButtonWidth: CGFloat? = nil
+	
+	@StateObject var toast = Toast()
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	
@@ -78,6 +80,9 @@ struct ManageContactSheet: View {
 			}
 			toast.view()
 		} // </ZStack>
+		.onAppear {
+			onAppear()
+		}
 		.sheet(isPresented: activeSheetBinding()) { // SwiftUI only allows for 1 ".sheet"
 			switch activeSheet! {
 			case .camera:
@@ -152,7 +157,7 @@ struct ManageContactSheet: View {
 	func content_image() -> some View {
 		
 		Group {
-			if useDiskImage {
+			if useDiskImage && didAppear {
 				ContactPhoto(fileName: contact?.photoUri, size: IMG_SIZE, useCache: false)
 			} else if let uiimage = pickerResult?.image {
 				Image(uiImage: uiimage)
@@ -230,14 +235,18 @@ struct ManageContactSheet: View {
 			.disabled(isSaving)
 			
 			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 2) {
-				Text(verbatim: "•").font(.title2)
+				Text(verbatim: "•")
+					.font(.title2)
 				Text("**enabled**: they will be able to tell when payments are from you")
+					.font(.subheadline)
 			}
 			.foregroundColor(.secondary)
 			
 			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 2) {
-				Text(verbatim: "•").font(.title2)
+				Text(verbatim: "•")
+					.font(.title2)
 				Text("**disabled**: sent payments will be anonymous")
+					.font(.subheadline)
 			}
 			.foregroundColor(.secondary)
 		}
@@ -341,6 +350,19 @@ struct ManageContactSheet: View {
 			return true
 		} else {
 			return contact?.photoUri != nil
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
+	
+	func onAppear() {
+		log.trace("onAppear()")
+		
+		smartModalState.onNextDidAppear {
+			log.trace("didAppear()")
+			didAppear = true
 		}
 	}
 	

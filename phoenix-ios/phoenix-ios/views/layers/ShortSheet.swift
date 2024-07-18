@@ -24,16 +24,21 @@ public class ShortSheetState: ObservableObject {
 	/// - sheet view will animate on screen (onWillAppear)
 	/// - sheet view has animated off screen (onDidDisappear)
 	///
-	var itemPublisher = CurrentValueSubject<ShortSheetItem?, Never>(nil)
+	let itemPublisher = CurrentValueSubject<ShortSheetItem?, Never>(nil)
+	
+	/// Fires when:
+	/// - view has animated on screen (onDidAppear)
+	///
+	let didAppearPublisher = PassthroughSubject<Void, Never>()
 	
 	/// Fires when:
 	/// - sheet view will animate off screen (onWillDisapper)
 	///
-	var closePublisher = PassthroughSubject<Void, Never>()
+	let willDisappearPublisher = PassthroughSubject<Void, Never>()
 	
 	/// Whether or not the sheet is dimissable by tapping outside the sheet.
 	///
-	var dismissablePublisher = CurrentValueSubject<Bool, Never>(true)
+	let dismissablePublisher = CurrentValueSubject<Bool, Never>(true)
 	
 	var currentItem: ShortSheetItem? {
 		return itemPublisher.value
@@ -47,6 +52,7 @@ public class ShortSheetState: ObservableObject {
 	func display<Content: View>(
 		dismissable: Bool,
 		@ViewBuilder builder: () -> Content,
+		onDidAppear: (() -> Void)? = nil,
 		onWillDisappear: (() -> Void)? = nil,
 		onDidDisappear: (() -> Void)? = nil
 	) {
@@ -54,6 +60,9 @@ public class ShortSheetState: ObservableObject {
 		itemPublisher.send(ShortSheetItem(
 			view: builder().anyView
 		))
+		if let didAppearLambda = onDidAppear {
+			onNextDidAppear(didAppearLambda)
+		}
 		if let willDisappearLambda = onWillDisappear {
 			onNextWillDisappear(willDisappearLambda)
 		}
@@ -63,30 +72,29 @@ public class ShortSheetState: ObservableObject {
 	}
 	
 	func close() {
-		closePublisher.send()
+		willDisappearPublisher.send()
 	}
 	
 	func close(animationCompletion: @escaping () -> Void) {
+		onNextDidDisappear(animationCompletion)
+		willDisappearPublisher.send()
+	}
+	
+	func onNextDidAppear(_ action: @escaping () -> Void) {
 		
 		var cancellables = Set<AnyCancellable>()
-		itemPublisher.sink { (item: ShortSheetItem?) in
+		didAppearPublisher.sink { _ in
 			
-			// NB: This fires right away because itemPublisher is CurrentValueSubject.
-			// It only means `onDidDisappear` if item is nil.
-			if item == nil {
-				animationCompletion()
-				cancellables.removeAll()
-			}
+			action()
+			cancellables.removeAll()
 			
 		}.store(in: &cancellables)
-		
-		closePublisher.send()
 	}
 	
 	func onNextWillDisappear(_ action: @escaping () -> Void) {
 		
 		var cancellables = Set<AnyCancellable>()
-		closePublisher.sink { _ in
+		willDisappearPublisher.sink { _ in
 			
 			action()
 			cancellables.removeAll()
@@ -173,7 +181,7 @@ struct ShortSheetWrapper<Content: View>: View {
 				animation = 1
 			}
 		}
-		.onReceive(shortSheetState.closePublisher) { _ in
+		.onReceive(shortSheetState.willDisappearPublisher) { _ in
 			withAnimation {
 				animation = 2
 			}
@@ -190,6 +198,7 @@ struct ShortSheetWrapper<Content: View>: View {
 		if animation == 1 {
 			// ShortSheet is now visible
 			UIAccessibility.post(notification: .screenChanged, argument: nil)
+			shortSheetState.didAppearPublisher.send()
 		}
 		else if animation == 2 {
 			// ShortSheet is now hidden
