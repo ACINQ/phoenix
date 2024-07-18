@@ -254,26 +254,16 @@ struct PaymentDetails: View {
 		
 		if CONTACTS_ENABLED, let contact = parent.contact {
 			
-			HStack(alignment: VerticalAlignment.center, spacing: 4) {
-				Group {
-					if let photoUri = contact.photoUri,
-						let uiImage = UIImage(contentsOfFile: photoUri)
-					{
-						Image(uiImage: uiImage)
-							.resizable()
-							.aspectRatio(contentMode: .fill) // FILL !
-					} else {
-						Image(systemName: "person.circle")
-							.resizable()
-							.aspectRatio(contentMode: .fit)
-							.foregroundColor(.gray)
-					}
-				}
-				.frame(width: 32, height: 32)
-				.clipShape(Circle())
+			VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+				HStack(alignment: VerticalAlignment.center, spacing: 4) {
+					ContactPhoto(fileName: contact.photoUri, size: 32)
+					
+					Text(contact.name)
+				} // <HStack>
 				
-				Text(contact.name)
-			} // <HStack>
+				Text(contact.photoUri ?? "<nil>")
+				
+			} // </VStack>
 			.onTapGesture {
 				parent.showManageContactSheet()
 			}
