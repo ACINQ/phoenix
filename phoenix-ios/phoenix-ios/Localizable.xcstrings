@@ -1681,6 +1681,26 @@
         }
       }
     },
+    "%@ - from %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ - from %2$@"
+          }
+        }
+      }
+    },
+    "%@ - to %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ - to %2$@"
+          }
+        }
+      }
+    },
     "%@ [more info](https://phoenix.acinq.co/faq#what-is-inbound-liquidity)" : {
       "localizations" : {
         "ar" : {
