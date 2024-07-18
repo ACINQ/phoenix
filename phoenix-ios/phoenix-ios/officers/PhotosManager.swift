@@ -147,8 +147,8 @@ class PhotosManager {
 				}
 				
 				let cgsize = CGSize(width: size, height: size)
-				let scaledPhoto = UIGraphicsImageRenderer(size: cgsize).image { _ in
-					fullSizePhoto.draw(in: CGRect(origin: .zero, size: cgsize))
+				guard let scaledPhoto = fullSizePhoto.preparingThumbnail(of: cgsize) else {
+					return nil
 				}
 				
 				return scaledPhoto

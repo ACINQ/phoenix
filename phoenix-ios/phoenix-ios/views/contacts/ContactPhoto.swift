@@ -54,6 +54,8 @@ fileprivate struct _ContactPhoto: View {
 	
 	@State private var bgLoadedImage: UIImage? = nil
 	
+	@Environment(\.displayScale) var displayScale: CGFloat
+	
 	init(fileName: String?, size: CGFloat, useCache: Bool) {
 		self.fileName = fileName
 		self.size = size
@@ -91,9 +93,10 @@ fileprivate struct _ContactPhoto: View {
 			return
 		}
 		
+		let targetSize = size * displayScale
 		let img = await PhotosManager.shared.readFromDisk(
 			fileName: fileName,
-			size: size,
+			size: targetSize,
 			useCache: useCache
 		)
 		
