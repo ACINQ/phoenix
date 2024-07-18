@@ -192,6 +192,7 @@
 		DC6F042D2C3DC4CD00627B4F /* ManualInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F042C2C3DC4CD00627B4F /* ManualInput.swift */; };
 		DC6F19BF2C46FB0F004EC469 /* NSItemProvider+Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F19BE2C46FB0F004EC469 /* NSItemProvider+Async.swift */; };
 		DC6F19C12C470F70004EC469 /* PickerResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F19C02C470F70004EC469 /* PickerResult.swift */; };
+		DC6F19C32C49B7E2004EC469 /* ScrollingDismissesKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F19C22C49B7E2004EC469 /* ScrollingDismissesKeyboard.swift */; };
 		DC70A99C2BBB6093002DBFF8 /* InboundFeeWarning.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC70A99B2BBB6093002DBFF8 /* InboundFeeWarning.swift */; };
 		DC71E7302723240E0063613D /* KotlinObservables.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC71E72F2723240E0063613D /* KotlinObservables.swift */; };
 		DC71E7332728645B0063613D /* CurrencyConverterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC71E7322728645B0063613D /* CurrencyConverterView.swift */; };
@@ -588,6 +589,7 @@
 		DC6F042C2C3DC4CD00627B4F /* ManualInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualInput.swift; sourceTree = "<group>"; };
 		DC6F19BE2C46FB0F004EC469 /* NSItemProvider+Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSItemProvider+Async.swift"; sourceTree = "<group>"; };
 		DC6F19C02C470F70004EC469 /* PickerResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerResult.swift; sourceTree = "<group>"; };
+		DC6F19C22C49B7E2004EC469 /* ScrollingDismissesKeyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollingDismissesKeyboard.swift; sourceTree = "<group>"; };
 		DC70A99B2BBB6093002DBFF8 /* InboundFeeWarning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboundFeeWarning.swift; sourceTree = "<group>"; };
 		DC71E72F2723240E0063613D /* KotlinObservables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinObservables.swift; sourceTree = "<group>"; };
 		DC71E7322728645B0063613D /* CurrencyConverterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverterView.swift; sourceTree = "<group>"; };
@@ -1257,6 +1259,7 @@
 				DCAC9FC5296879770098D769 /* NavigationStackDestination.swift */,
 				DC4CF3C52BE59E4B003A957F /* TextTracking.swift */,
 				DC2ABAD62BED081400C11C9C /* VibrationFeedback.swift */,
+				DC6F19C22C49B7E2004EC469 /* ScrollingDismissesKeyboard.swift */,
 			);
 			path = compatibility;
 			sourceTree = "<group>";
@@ -1849,6 +1852,7 @@
 				DC118C0627B4557D0080BBAC /* ValidateView.swift in Sources */,
 				DC118C0827B457520080BBAC /* FetchActivityNotice.swift in Sources */,
 				DCD7E0AC28EC32CB009C30E5 /* BusinessManager.swift in Sources */,
+				DC6F19C32C49B7E2004EC469 /* ScrollingDismissesKeyboard.swift in Sources */,
 				DC4864DA29D4E52C00ACD539 /* BgRefreshDisabledPopover.swift in Sources */,
 				DCE7233027B167240017CF56 /* SyncSeedManager_Actor.swift in Sources */,
 				DCBA371B2758076F00610EC8 /* SyncSeedManager.swift in Sources */,

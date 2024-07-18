@@ -48,6 +48,7 @@ struct ManageContactSheet: View {
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	
+	@EnvironmentObject var deviceInfo: DeviceInfo
 	@EnvironmentObject var smartModalState: SmartModalState
 	
 	init(
@@ -76,7 +77,7 @@ struct ManageContactSheet: View {
 			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 				header()
 				content()
-				footer()
+					.frame(maxHeight: (deviceInfo.windowSize.height / 2.0))
 			}
 			toast.view()
 		} // </ZStack>
@@ -143,14 +144,18 @@ struct ManageContactSheet: View {
 	@ViewBuilder
 	func content() -> some View {
 		
-		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-			
-			content_image().padding(.bottom)
-			content_name().padding(.bottom)
-			content_trusted().padding(.bottom)
-			content_details()
+		ScrollView {
+			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+				
+				content_image().padding(.bottom)
+				content_name().padding(.bottom)
+				content_trusted().padding(.bottom)
+				content_details().padding(.bottom)
+				content_buttons()
+			}
+			.padding()
 		}
-		.padding()
+		.scrollingDismissesKeyboard(.interactively)
 	}
 	
 	@ViewBuilder
@@ -270,7 +275,7 @@ struct ManageContactSheet: View {
 	}
 	
 	@ViewBuilder
-	func footer() -> some View {
+	func content_buttons() -> some View {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 0) {
 			
@@ -307,7 +312,6 @@ struct ManageContactSheet: View {
 			.disabled(isSaving || !hasName)
 			
 		} // </HStack>
-		.padding(.vertical)
 		.assignMaxPreference(for: maxFooterButtonWidthReader.key, to: $maxFooterButtonWidth)
 	}
 	
