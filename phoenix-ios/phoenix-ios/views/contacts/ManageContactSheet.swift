@@ -21,6 +21,7 @@ struct ManageContactSheet: View {
 	@StateObject var toast = Toast()
 	
 	@State var name: String
+	@State var trustedContact: Bool
 	@State var pickerResult: PickerResult?
 	@State var pickerResultIsPrepped: Bool = false
 	@State var doNotUseDiskImage: Bool = false
@@ -59,6 +60,7 @@ struct ManageContactSheet: View {
 		self.isNewContact = (contact == nil)
 		
 		self._name = State(initialValue: contact?.name ?? "")
+		self._trustedContact = State(initialValue: contact?.useOfferKey ?? true)
 	}
 	
 	// --------------------------------------------------
@@ -139,7 +141,8 @@ struct ManageContactSheet: View {
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
 			content_image().padding(.bottom)
-			content_textField().padding(.bottom)
+			content_name().padding(.bottom)
+			content_trusted().padding(.bottom)
 			content_details()
 		}
 		.padding()
@@ -194,7 +197,7 @@ struct ManageContactSheet: View {
 	}
 	
 	@ViewBuilder
-	func content_textField() -> some View {
+	func content_name() -> some View {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 0) {
 			TextField("Name", text: $name)
@@ -215,6 +218,29 @@ struct ManageContactSheet: View {
 			RoundedRectangle(cornerRadius: 8)
 				.stroke(Color.textFieldBorder, lineWidth: 1)
 		)
+	}
+	
+	@ViewBuilder
+	func content_trusted() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+			Toggle(isOn: $trustedContact) {
+				Text("Trusted contact")
+			}
+			.disabled(isSaving)
+			
+			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 2) {
+				Text(verbatim: "•").font(.title2)
+				Text("**enabled**: they will be able to tell when payments are from you")
+			}
+			.foregroundColor(.secondary)
+			
+			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 2) {
+				Text(verbatim: "•").font(.title2)
+				Text("**disabled**: sent payments will be anonymous")
+			}
+			.foregroundColor(.secondary)
+		}
 	}
 	
 	@ViewBuilder
@@ -357,6 +383,7 @@ struct ManageContactSheet: View {
 			var success = false
 			do {
 				let updatedContactName = trimmedName
+				let updatedUseOfferKey = trustedContact
 				
 				let oldPhotoName: String? = contact?.photoUri
 				var newPhotoName: String? = nil
@@ -378,7 +405,7 @@ struct ManageContactSheet: View {
 							contactId: existingContact.uuid,
 							name: updatedContactName,
 							photoUri: newPhotoName,
-							useOfferKey: true, // TODO: Fix me
+							useOfferKey: updatedUseOfferKey,
 							offers: existingContact.offers
 						)
 						
@@ -386,7 +413,7 @@ struct ManageContactSheet: View {
 						updatedContact = try await contactsManager.saveNewContact(
 							name: updatedContactName,
 							photoUri: newPhotoName,
-							useOfferKey: true, // TODO: Fix me
+							useOfferKey: updatedUseOfferKey,
 							offer: offer
 						)
 					}
@@ -395,7 +422,7 @@ struct ManageContactSheet: View {
 						contactId: existingContact.uuid,
 						name: updatedContactName,
 						photoUri: newPhotoName,
-						useOfferKey: true, // TODO: Fix me
+						useOfferKey: updatedUseOfferKey,
 						offers: existingContact.offers
 					)
 				}

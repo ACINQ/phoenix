@@ -1436,6 +1436,9 @@
         }
       }
     },
+    "**disabled**: sent payments will be anonymous" : {
+
+    },
     "**Do not lose this seed.** Save it somewhere safe (not on this phone). If you lose your seed and your phone, you've lost your funds." : {
       "comment" : "RecoverySeedView",
       "localizations" : {
@@ -1517,6 +1520,9 @@
           }
         }
       }
+    },
+    "**enabled**: they will be able to tell when payments are from you" : {
+
     },
     "**Imagine that your wallet is a bucket**, and your balance is the water in the bucket." : {
       "localizations" : {
@@ -15419,9 +15425,6 @@
           }
         }
       }
-    },
-    "Enable if you don't want Bolt12 recipients to know that payments come from your wallet." : {
-
     },
     "Enable notifications in the Notification Center" : {
       "localizations" : {
@@ -30198,9 +30201,6 @@
         }
       }
     },
-    "Random payer key" : {
-
-    },
     "Random server" : {
       "comment" : "Connection info",
       "localizations" : {
@@ -40316,6 +40316,9 @@
           }
         }
       }
+    },
+    "Trusted contact" : {
+
     },
     "Trustless swaps" : {
       "localizations" : {
