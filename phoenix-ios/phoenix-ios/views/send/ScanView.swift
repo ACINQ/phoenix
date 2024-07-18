@@ -21,7 +21,7 @@ struct ScanView: View {
 	@State var clipboardContent: Scan.ClipboardContent? = nil
 	
 	@State var showingImagePicker = false
-	@State var imagePickerSelection: UIImage? = nil
+	@State var imagePickerResult: PickerResult? = nil
 	
 	@State var ignoreScanner: Bool = false
 	
@@ -117,7 +117,7 @@ struct ScanView: View {
 		}
 		.ignoresSafeArea(.keyboard) // disable keyboard avoidance on this view
 		.sheet(isPresented: $showingImagePicker) {
-			 ImagePicker(image: $imagePickerSelection)
+			 ImagePicker(copyFile: false, result: $imagePickerResult)
 		}
 	}
 	
@@ -186,6 +186,13 @@ struct ScanView: View {
 			
 			if showingFullMenu || voiceOverEnabled {
 				VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+					
+					Divider()
+					
+					menuOption_contacts()
+						.padding(.horizontal, 20)
+						.padding(.vertical, 12)
+						.accessibilitySortPriority(2)
 					
 					Divider()
 					
@@ -365,6 +372,21 @@ struct ScanView: View {
 	}
 	
 	@ViewBuilder
+	func menuOption_contacts() -> some View {
+		
+		Button {
+			showContactsList()
+		} label: {
+			Label {
+				Text("Contacts")
+			} icon: {
+				Image(systemName: "person.2")
+			}
+		}
+		.font(.title3)
+	}
+	
+	@ViewBuilder
 	func menuOption_chooseImage() -> some View {
 		
 		Button {
@@ -377,7 +399,7 @@ struct ScanView: View {
 			}
 		}
 		.font(.title3)
-		.onChange(of: imagePickerSelection) { _ in
+		.onChange(of: imagePickerResult) { _ in
 			imagePickerDidChooseImage()
 		}
 	}
@@ -527,22 +549,42 @@ struct ScanView: View {
 			mvi.intent(Scan.Intent_Parse(request: request))
 		}
 	}
+	
+	func showContactsList() {
+		log.trace("showContactsList()")
+		
+		ignoreScanner = true
+		smartModalState.display(dismissable: true) {
+			ContactsListSheet(didSelectContact: didSelectContact)
+		} onDidDisappear: {
+			ignoreScanner = false
+		}
+	}
+	
+	func didSelectContact(_ contact: ContactInfo) {
+		log.trace("didSelectContact()")
+		
+		if let offer = contact.mostRelevantOffer {
+			mvi.intent(Scan.Intent_Parse(request: offer.encode()))
+		}
+	}
 
 	func manualInput() {
 		log.trace("manualInput()")
 		
 		ignoreScanner = true
 		smartModalState.display(dismissable: true) {
-			
-			ManualInput(mvi: mvi, ignoreScanner: $ignoreScanner)
+			ManualInput(mvi: mvi)
+		} onDidDisappear: {
+			ignoreScanner = false
 		}
 	}
 	
 	func imagePickerDidChooseImage() {
 		log.trace("imagePickerDidChooseImage()")
 		
-		guard let uiImage = imagePickerSelection else { return }
-		imagePickerSelection = nil
+		guard let uiImage = imagePickerResult?.image else { return }
+		imagePickerResult = nil
 		
 		if let ciImage = CIImage(image: uiImage) {
 			var options: [String: Any]
@@ -579,99 +621,5 @@ struct ScanView: View {
 				)
 			}
 		}
-	}
-}
-
-// --------------------------------------------------
-// MARK: -
-// --------------------------------------------------
-
-struct ManualInput: View, ViewName {
-	
-	@ObservedObject var mvi: MVIState<Scan.Model, Scan.Intent>
-	@Binding var ignoreScanner: Bool
-	
-	@State var input = ""
-	
-	@EnvironmentObject var smartModalState: SmartModalState
-	
-	@ViewBuilder
-	var body: some View {
-		
-		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
-			
-			Text("Manual Input")
-				.font(.title2)
-				.padding(.bottom)
-				.accessibilityAddTraits(.isHeader)
-			
-			Text(
-				"""
-				Enter a Lightning invoice, LNURL, or Lightning address \
-				you want to send money to.
-				"""
-			)
-			.padding(.bottom)
-			
-			HStack(alignment: VerticalAlignment.center, spacing: 0) {
-				TextField("", text: $input)
-				
-				// Clear button (appears when TextField's text is non-empty)
-				Button {
-					input = ""
-				} label: {
-					Image(systemName: "multiply.circle.fill")
-						.foregroundColor(.secondary)
-				}
-				.accessibilityLabel("Clear textfield")
-				.isHidden(input == "")
-			}
-			.padding(.all, 8)
-			.overlay(
-				RoundedRectangle(cornerRadius: 8)
-					.stroke(Color.textFieldBorder, lineWidth: 1)
-			)
-			.padding(.bottom)
-			.padding(.bottom)
-			
-			HStack(alignment: VerticalAlignment.center, spacing: 0) {
-				Spacer()
-				
-				Button("Cancel") {
-					didCancel()
-				}
-				.font(.title3)
-				
-				Divider()
-					.frame(maxHeight: 20, alignment: Alignment.center)
-					.padding([.leading, .trailing])
-				
-				Button("OK") {
-					didConfirm()
-				}
-				.font(.title3)
-			}
-			
-		} // </VStack>
-		.padding()
-	}
-	
-	func didCancel() -> Void {
-		log.trace("[\(viewName)] didCancel()")
-		
-		smartModalState.close {
-			ignoreScanner = false
-		}
-	}
-	
-	func didConfirm() -> Void {
-		log.trace("[\(viewName)] didConfirm()")
-		
-		let request = input.trimmingCharacters(in: .whitespacesAndNewlines)
-		if request.count > 0 {
-			mvi.intent(Scan.Intent_Parse(request: request))
-		}
-		
-		smartModalState.close()
 	}
 }

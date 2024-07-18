@@ -1436,6 +1436,9 @@
         }
       }
     },
+    "**disabled**: sent payments will be anonymous" : {
+
+    },
     "**Do not lose this seed.** Save it somewhere safe (not on this phone). If you lose your seed and your phone, you've lost your funds." : {
       "comment" : "RecoverySeedView",
       "localizations" : {
@@ -1517,6 +1520,9 @@
           }
         }
       }
+    },
+    "**enabled**: they will be able to tell when payments are from you" : {
+
     },
     "**Imagine that your wallet is a bucket**, and your balance is the water in the bucket." : {
       "localizations" : {
@@ -1677,6 +1683,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@"
+          }
+        }
+      }
+    },
+    "%@ - from %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ - from %2$@"
+          }
+        }
+      }
+    },
+    "%@ - to %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ - to %2$@"
           }
         }
       }
@@ -2611,6 +2637,7 @@
     },
     "+(amount.string) inbound liquidity" : {
       "comment" : "Payment description for inbound liquidity",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -2684,6 +2711,9 @@
           }
         }
       }
+    },
+    "+%@ inbound liquidity" : {
+      "comment" : "Payment description for inbound liquidity"
     },
     "<decryption error>" : {
       "localizations" : {
@@ -8392,6 +8422,12 @@
           }
         }
       }
+    },
+    "Bolt12 offer:" : {
+
+    },
+    "Bolt12 offers" : {
+
     },
     "broadcast" : {
       "localizations" : {
@@ -14135,6 +14171,9 @@
         }
       }
     },
+    "Discard changes" : {
+
+    },
     "Discard Changes" : {
       "localizations" : {
         "ar" : {
@@ -14174,6 +14213,9 @@
           }
         }
       }
+    },
+    "Discard changes?" : {
+
     },
     "Disconnected" : {
       "localizations" : {
@@ -15395,9 +15437,6 @@
           }
         }
       }
-    },
-    "Enable if you don't want Bolt12 recipients to know that payments come from your wallet." : {
-
     },
     "Enable notifications in the Notification Center" : {
       "localizations" : {
@@ -21342,6 +21381,7 @@
     },
     "Invalid BIP353 DNS address" : {
       "comment" : "Error message - dns record contains an invalid offer",
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -21507,6 +21547,9 @@
           }
         }
       }
+    },
+    "Invalid offer" : {
+
     },
     "Invalid port. Valid range: [1 - 65535]" : {
       "localizations" : {
@@ -25310,6 +25353,9 @@
         }
       }
     },
+    "New contact" : {
+
+    },
     "New inbound liquidity:" : {
       "localizations" : {
         "ar" : {
@@ -25620,6 +25666,9 @@
           }
         }
       }
+    },
+    "No matches for search" : {
+
     },
     "No notifications" : {
       "localizations" : {
@@ -26143,9 +26192,6 @@
           }
         }
       }
-    },
-    "Offer:" : {
-
     },
     "Offline" : {
       "comment" : "Connection state\nConnection status",
@@ -27777,6 +27823,9 @@
         }
       }
     },
+    "Payment from %@" : {
+
+    },
     "payment hash" : {
       "comment" : "Label in DetailsView_IncomingPayment",
       "localizations" : {
@@ -28503,6 +28552,9 @@
           }
         }
       }
+    },
+    "Payment to %@" : {
+
     },
     "Payment will fail" : {
       "localizations" : {
@@ -30163,9 +30215,6 @@
           }
         }
       }
-    },
-    "Random payer key" : {
-
     },
     "Random server" : {
       "comment" : "Connection info",
@@ -32050,6 +32099,9 @@
         }
       }
     },
+    "Search" : {
+
+    },
     "Security" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -32731,6 +32783,12 @@
           }
         }
       }
+    },
+    "Sent By" : {
+
+    },
+    "Sent To" : {
+
     },
     "Server" : {
       "localizations" : {
@@ -38093,6 +38151,12 @@
         }
       }
     },
+    "This address is hosted on an unsecure DNS. DNSSEC must be enabled." : {
+      "comment" : "Error message - dns issue"
+    },
+    "This address uses an invalid Bolt12 offer." : {
+      "comment" : "Error message - dns record contains an invalid offer"
+    },
     "This appears to be a website (not a lightning invoice):" : {
       "localizations" : {
         "ar" : {
@@ -40267,6 +40331,9 @@
           }
         }
       }
+    },
+    "Trusted contact" : {
+
     },
     "Trustless swaps" : {
       "localizations" : {

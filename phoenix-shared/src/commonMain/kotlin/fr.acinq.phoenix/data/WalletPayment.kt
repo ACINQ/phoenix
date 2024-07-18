@@ -130,6 +130,7 @@ fun WalletPayment.walletPaymentId(): WalletPaymentId = when (this) {
 data class WalletPaymentInfo(
     val payment: WalletPayment,
     val metadata: WalletPaymentMetadata,
+    val contact: ContactInfo?,
     val fetchOptions: WalletPaymentFetchOptions
 ) {
     fun id() = payment.walletPaymentId()
@@ -191,6 +192,13 @@ data class WalletPaymentFetchOptions(val flags: Int) { // <- bitmask
         return WalletPaymentFetchOptions(this.flags or other.flags)
     }
 
+    /* The `-` operator is implemented, so it can be used like so:
+     * `val options = WalletPaymentFetchOptions.All - WalletPaymentFetchOptions.UserNotes`
+     */
+    operator fun minus(other: WalletPaymentFetchOptions): WalletPaymentFetchOptions {
+        return WalletPaymentFetchOptions(this.flags and other.flags.inv())
+    }
+
     fun contains(options: WalletPaymentFetchOptions): Boolean {
         return (this.flags and options.flags) != 0
     }
@@ -201,7 +209,8 @@ data class WalletPaymentFetchOptions(val flags: Int) { // <- bitmask
         val Lnurl = WalletPaymentFetchOptions(1 shl 1)
         val UserNotes = WalletPaymentFetchOptions(1 shl 2)
         val OriginalFiat = WalletPaymentFetchOptions(1 shl 3)
+        val Contact = WalletPaymentFetchOptions(1 shl 4)
 
-        val All = Descriptions + Lnurl + UserNotes + OriginalFiat
+        val All = Descriptions + Lnurl + UserNotes + OriginalFiat + Contact
     }
 }

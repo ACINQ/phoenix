@@ -230,7 +230,14 @@ class Cache<Key: Hashable, Value: Any> {
 		}
 	}
 	
-	func removeValue(forKey key: Key) -> Void {
+	func removeAll() {
+		
+		mostRecentCacheItem = nil
+		leastRecentCacheItem = nil
+		_dict.removeAll(keepingCapacity: true)
+	}
+	
+	func removeValue(forKey key: Key) {
 		
 		if let item = _dict[key] {
 			

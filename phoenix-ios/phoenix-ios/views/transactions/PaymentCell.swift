@@ -12,6 +12,8 @@ struct PaymentCell : View {
 	
 	static let fetchOptions = WalletPaymentFetchOptions.companion.Descriptions.plus(
 		other: WalletPaymentFetchOptions.companion.OriginalFiat
+	).plus(
+		other: WalletPaymentFetchOptions.companion.Contact
 	)
 	
 	private let paymentsManager = Biz.business.paymentsManager
@@ -89,12 +91,12 @@ struct PaymentCell : View {
 			paymentImage()
 
 			VStack(alignment: HorizontalAlignment.leading) {
-				Text(paymentDescription())
+				Text(line1())
 					.lineLimit(1)
 					.truncationMode(.tail)
 					.foregroundColor(.primaryForeground)
 
-				Text(paymentTimestamp())
+				Text(line2())
 					.font(.caption)
 					.lineLimit(1)
 					.truncationMode(.tail)
@@ -118,12 +120,12 @@ struct PaymentCell : View {
 			
 			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 				
-				Text(paymentDescription())
+				Text(line1())
 					.lineLimit(1)
 					.truncationMode(.tail)
 					.foregroundColor(.primaryForeground)
 				
-				Text(paymentTimestamp())
+				Text(line2())
 					.font(.caption)
 					.lineLimit(1)
 					.truncationMode(.tail)
@@ -206,7 +208,7 @@ struct PaymentCell : View {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
-	func paymentDescription() -> String {
+	func line1() -> String {
 
 		if let fetched = fetched {
 			return fetched.paymentDescription() ?? fetched.defaultPaymentDescription()
@@ -215,7 +217,7 @@ struct PaymentCell : View {
 		}
 	}
 	
-	func paymentTimestamp() -> String {
+	func line2() -> String {
 
 		guard let payment = fetched?.payment else {
 			return ""
@@ -223,19 +225,60 @@ struct PaymentCell : View {
 		
 		guard let completedAtDate = payment.completedAtDate else {
 			if payment.isOnChain() {
-				return NSLocalizedString("waiting for confirmations", comment: "explanation for pending transaction")
+				return String(
+					localized: "waiting for confirmations",
+					comment: "explanation for pending transaction"
+				)
 			} else {
-				return NSLocalizedString("pending", comment: "timestamp string for pending transaction")
+				return String(
+					localized: "pending",
+					comment: "timestamp string for pending transaction"
+				)
 			}
 		}
 		
-		let formatter = DateFormatter()
-		if textScaling > 100 {
-			formatter.dateStyle = .short
+		let timestamp = stringForDate(completedAtDate)
+		
+		if let contact = fetched?.contact {
+			if let payment = fetched?.payment, payment.isIncoming() {
+				return String(localized: "\(timestamp) - from \(contact.name)")
+			} else {
+				return String(localized: "\(timestamp) - to \(contact.name)")
+			}
+			
 		} else {
-			formatter.dateStyle = .long
+			return timestamp
 		}
-		formatter.timeStyle = .short
+	}
+	
+	func stringForDate(_ completedAtDate: Date) -> String {
+		
+		let calendar = Calendar.current
+		let compsA = calendar.dateComponents([.year], from: completedAtDate)
+		let compsB = calendar.dateComponents([.year], from: Date.now)
+		
+		let yearA = compsA.year ?? 0
+		let yearB = compsB.year ?? 0
+		
+		let preferShortDate = (textScaling > 100) || (fetched?.contact != nil)
+		
+		let formatter = DateFormatter()
+		if yearA == yearB {
+
+			if preferShortDate {
+				formatter.setLocalizedDateFormatFromTemplate("MMMdjmma")  // ≈ dateStyle.medium - year
+			} else {
+				formatter.setLocalizedDateFormatFromTemplate("MMMMdjmma") // ≈ dateStyle.long - year
+			}
+		} else {
+			
+			if preferShortDate {
+				formatter.dateStyle = .short
+			} else {
+				formatter.dateStyle = .long
+			}
+			formatter.timeStyle = .short
+		}
 		
 		return formatter.string(from: completedAtDate)
 	}

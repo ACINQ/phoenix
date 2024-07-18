@@ -92,7 +92,7 @@
 		DC2F431A27B699800006FCC4 /* ModifyInvoiceSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2F431927B699800006FCC4 /* ModifyInvoiceSheet.swift */; };
 		DC32FB3529A3D3FE009912AC /* XpcManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC32FB3429A3D3FE009912AC /* XpcManager.swift */; };
 		DC33369826BAF721000E3F49 /* ShortSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC33369726BAF721000E3F49 /* ShortSheet.swift */; };
-		DC3345D02C2B4C1200EDD2D4 /* ManageContactSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3345CF2C2B4C1200EDD2D4 /* ManageContactSheet.swift */; };
+		DC3345D02C2B4C1200EDD2D4 /* ManageContact.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3345CF2C2B4C1200EDD2D4 /* ManageContact.swift */; };
 		DC3345D22C2C761800EDD2D4 /* CameraPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3345D12C2C761800EDD2D4 /* CameraPicker.swift */; };
 		DC33C5632A7C15D40053D785 /* MainView_BigPrimary.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC33C5622A7C15D40053D785 /* MainView_BigPrimary.swift */; };
 		DC34399F276CEFB600CAA73A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7555FF84242A565B00829871 /* Assets.xcassets */; };
@@ -186,6 +186,13 @@
 		DC6D68272AC1DD5C0099929F /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = DC6D68262AC1DD5C0099929F /* Localizable.xcstrings */; };
 		DC6D68292AC1DD5C0099929F /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = DC6D68282AC1DD5C0099929F /* InfoPlist.xcstrings */; };
 		DC6F04232C35EB9900627B4F /* SummaryInfoGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F04222C35EB9900627B4F /* SummaryInfoGrid.swift */; };
+		DC6F04252C38807300627B4F /* PhotosManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F04242C38807300627B4F /* PhotosManager.swift */; };
+		DC6F04272C3895E300627B4F /* ContactPhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F04262C3895E300627B4F /* ContactPhoto.swift */; };
+		DC6F042B2C3DA7AD00627B4F /* ContactsListSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F042A2C3DA7AD00627B4F /* ContactsListSheet.swift */; };
+		DC6F042D2C3DC4CD00627B4F /* ManualInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F042C2C3DC4CD00627B4F /* ManualInput.swift */; };
+		DC6F19BF2C46FB0F004EC469 /* NSItemProvider+Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F19BE2C46FB0F004EC469 /* NSItemProvider+Async.swift */; };
+		DC6F19C12C470F70004EC469 /* PickerResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F19C02C470F70004EC469 /* PickerResult.swift */; };
+		DC6F19C32C49B7E2004EC469 /* ScrollingDismissesKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F19C22C49B7E2004EC469 /* ScrollingDismissesKeyboard.swift */; };
 		DC70A99C2BBB6093002DBFF8 /* InboundFeeWarning.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC70A99B2BBB6093002DBFF8 /* InboundFeeWarning.swift */; };
 		DC71E7302723240E0063613D /* KotlinObservables.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC71E72F2723240E0063613D /* KotlinObservables.swift */; };
 		DC71E7332728645B0063613D /* CurrencyConverterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC71E7322728645B0063613D /* CurrencyConverterView.swift */; };
@@ -497,7 +504,7 @@
 		DC2F431927B699800006FCC4 /* ModifyInvoiceSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModifyInvoiceSheet.swift; sourceTree = "<group>"; };
 		DC32FB3429A3D3FE009912AC /* XpcManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XpcManager.swift; sourceTree = "<group>"; };
 		DC33369726BAF721000E3F49 /* ShortSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortSheet.swift; sourceTree = "<group>"; };
-		DC3345CF2C2B4C1200EDD2D4 /* ManageContactSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageContactSheet.swift; sourceTree = "<group>"; };
+		DC3345CF2C2B4C1200EDD2D4 /* ManageContact.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageContact.swift; sourceTree = "<group>"; };
 		DC3345D12C2C761800EDD2D4 /* CameraPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPicker.swift; sourceTree = "<group>"; };
 		DC33C5622A7C15D40053D785 /* MainView_BigPrimary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView_BigPrimary.swift; sourceTree = "<group>"; };
 		DC355E1C2A4398A8008E8A8E /* NoticeBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoticeBox.swift; sourceTree = "<group>"; };
@@ -576,6 +583,13 @@
 		DC6D68262AC1DD5C0099929F /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		DC6D68282AC1DD5C0099929F /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		DC6F04222C35EB9900627B4F /* SummaryInfoGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryInfoGrid.swift; sourceTree = "<group>"; };
+		DC6F04242C38807300627B4F /* PhotosManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotosManager.swift; sourceTree = "<group>"; };
+		DC6F04262C3895E300627B4F /* ContactPhoto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactPhoto.swift; sourceTree = "<group>"; };
+		DC6F042A2C3DA7AD00627B4F /* ContactsListSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsListSheet.swift; sourceTree = "<group>"; };
+		DC6F042C2C3DC4CD00627B4F /* ManualInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualInput.swift; sourceTree = "<group>"; };
+		DC6F19BE2C46FB0F004EC469 /* NSItemProvider+Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSItemProvider+Async.swift"; sourceTree = "<group>"; };
+		DC6F19C02C470F70004EC469 /* PickerResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerResult.swift; sourceTree = "<group>"; };
+		DC6F19C22C49B7E2004EC469 /* ScrollingDismissesKeyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollingDismissesKeyboard.swift; sourceTree = "<group>"; };
 		DC70A99B2BBB6093002DBFF8 /* InboundFeeWarning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboundFeeWarning.swift; sourceTree = "<group>"; };
 		DC71E72F2723240E0063613D /* KotlinObservables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinObservables.swift; sourceTree = "<group>"; };
 		DC71E7322728645B0063613D /* CurrencyConverterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverterView.swift; sourceTree = "<group>"; };
@@ -775,6 +789,7 @@
 				DC6D26E229E76557006A7814 /* AnimatedClock.swift */,
 				DCB30E532A0AABAF00E7D7A2 /* InfoPopoverWindow.swift */,
 				DC3345D12C2C761800EDD2D4 /* CameraPicker.swift */,
+				DC6F19C02C470F70004EC469 /* PickerResult.swift */,
 			);
 			path = widgets;
 			sourceTree = "<group>";
@@ -815,9 +830,9 @@
 				DCA3B41A2A5220A200E6B231 /* notifications */,
 				DC2F431227B696A40006FCC4 /* receive */,
 				DC118BF627B44E4C0080BBAC /* send */,
-				DC3345CE2C2B4BED00EDD2D4 /* contacts */,
 				DCCD045B27EE0101007D57A5 /* inspect */,
 				DCD1208528663F2D00EB39C5 /* transactions */,
+				DC3345CE2C2B4BED00EDD2D4 /* contacts */,
 				DC71E7312728643C0063613D /* tools */,
 				DCFA8757260E6DFF00AE8953 /* onboarding */,
 				C8D7A7335040D755924F8FFC /* configuration */,
@@ -966,6 +981,7 @@
 				DCA02B9F2BD1A5FC0080520F /* ChannelSizeImpactWarning.swift */,
 				DCB62F482A5E09F900912A71 /* SpliceOutProblem.swift */,
 				DC1718A62C20BF8A000CCAF5 /* PayOfferProblem.swift */,
+				DC6F042C2C3DC4CD00627B4F /* ManualInput.swift */,
 			);
 			path = send;
 			sourceTree = "<group>";
@@ -1013,8 +1029,10 @@
 		DC3345CE2C2B4BED00EDD2D4 /* contacts */ = {
 			isa = PBXGroup;
 			children = (
-				DC3345CF2C2B4C1200EDD2D4 /* ManageContactSheet.swift */,
+				DC3345CF2C2B4C1200EDD2D4 /* ManageContact.swift */,
 				DC5567442C2F1A6900008E11 /* ContactsList.swift */,
+				DC6F042A2C3DA7AD00627B4F /* ContactsListSheet.swift */,
+				DC6F04262C3895E300627B4F /* ContactPhoto.swift */,
 			);
 			path = contacts;
 			sourceTree = "<group>";
@@ -1115,6 +1133,7 @@
 				DC63BDF329AE44380067A361 /* NotificationsManager.swift */,
 				DCD7E0AE28EC3C0D009C30E5 /* WatchTower.swift */,
 				DC175C1B28F008AE0086B9A6 /* WalletReset.swift */,
+				DC6F04242C38807300627B4F /* PhotosManager.swift */,
 			);
 			path = officers;
 			sourceTree = "<group>";
@@ -1240,6 +1259,7 @@
 				DCAC9FC5296879770098D769 /* NavigationStackDestination.swift */,
 				DC4CF3C52BE59E4B003A957F /* TextTracking.swift */,
 				DC2ABAD62BED081400C11C9C /* VibrationFeedback.swift */,
+				DC6F19C22C49B7E2004EC469 /* ScrollingDismissesKeyboard.swift */,
 			);
 			path = compatibility;
 			sourceTree = "<group>";
@@ -1296,6 +1316,7 @@
 				DC2CE3AE29AFEB0500BA0B00 /* Bundle+Icon.swift */,
 				DCFB8DF62A94066100947698 /* Task+Sleep.swift */,
 				DCFB8DF82A94112A00947698 /* Dictionary+MapKeys.swift */,
+				DC6F19BE2C46FB0F004EC469 /* NSItemProvider+Async.swift */,
 			);
 			path = extensions;
 			sourceTree = "<group>";
@@ -1780,11 +1801,13 @@
 				DC82EED629789853007A5853 /* TxHistoryExporter.swift in Sources */,
 				DC98D3982AF2AE41005BD177 /* ReceiveView.swift in Sources */,
 				DC9E7EC32A12955300A5F1D0 /* LiquidityHTML.swift in Sources */,
+				DC6F19BF2C46FB0F004EC469 /* NSItemProvider+Async.swift in Sources */,
 				DCCFE6C22B7140FA002FFF11 /* LoggerFactory+Foreground.swift in Sources */,
 				7555FF7F242A565900829871 /* AppDelegate.swift in Sources */,
 				DC74174B270F332700F7E3E3 /* KotlinTypes.swift in Sources */,
 				DC142135261E72320075857A /* AboutHTML.swift in Sources */,
 				DC33C5632A7C15D40053D785 /* MainView_BigPrimary.swift in Sources */,
+				DC6F19C12C470F70004EC469 /* PickerResult.swift in Sources */,
 				DCEE8998288605FD00FE42DD /* PaymentCell.swift in Sources */,
 				DCDD9ED428637EBB001800A3 /* ToolsButton.swift in Sources */,
 				DCDD9ED0286377B7001800A3 /* MainView_Big.swift in Sources */,
@@ -1829,6 +1852,7 @@
 				DC118C0627B4557D0080BBAC /* ValidateView.swift in Sources */,
 				DC118C0827B457520080BBAC /* FetchActivityNotice.swift in Sources */,
 				DCD7E0AC28EC32CB009C30E5 /* BusinessManager.swift in Sources */,
+				DC6F19C32C49B7E2004EC469 /* ScrollingDismissesKeyboard.swift in Sources */,
 				DC4864DA29D4E52C00ACD539 /* BgRefreshDisabledPopover.swift in Sources */,
 				DCE7233027B167240017CF56 /* SyncSeedManager_Actor.swift in Sources */,
 				DCBA371B2758076F00610EC8 /* SyncSeedManager.swift in Sources */,
@@ -1847,6 +1871,7 @@
 				DC98D3962AF170AC005BD177 /* PaymentWarningPopover.swift in Sources */,
 				DC48D2C42593DE30008D138C /* TextFieldCurrencyStyler.swift in Sources */,
 				DC18C41D256FF91100A2D083 /* Utils.swift in Sources */,
+				DC6F042D2C3DC4CD00627B4F /* ManualInput.swift in Sources */,
 				53BEFF4EDB40975C2123C63D /* ui.swift in Sources */,
 				DCACF6FD2566D0BA0009B01E /* SecurityFile.swift in Sources */,
 				DC20BDF02C233F8200338AA2 /* PaymentDetails.swift in Sources */,
@@ -1885,9 +1910,10 @@
 				DC63BDF429AE44380067A361 /* NotificationsManager.swift in Sources */,
 				DC118BFA27B44F840080BBAC /* TipSliderSheet.swift in Sources */,
 				DC2F431827B698E20006FCC4 /* ShareOptionsSheet.swift in Sources */,
+				DC6F04252C38807300627B4F /* PhotosManager.swift in Sources */,
 				DC72C33425A51AAC008A927A /* CurrencyPrefs.swift in Sources */,
 				DCE6FB8C28D0B5F200054511 /* ResetWalletView.swift in Sources */,
-				DC3345D02C2B4C1200EDD2D4 /* ManageContactSheet.swift in Sources */,
+				DC3345D02C2B4C1200EDD2D4 /* ManageContact.swift in Sources */,
 				DCE7232E27AD68CD0017CF56 /* SyncTxManager_Actor.swift in Sources */,
 				DC16965F27FE0FAC003DE1DD /* KotlinExtensions+Currency.swift in Sources */,
 				DC65BBF22A58A40700EBA651 /* CpfpView.swift in Sources */,
@@ -1936,6 +1962,7 @@
 				DCB30E592A0C3F8200E7D7A2 /* LiquidityPolicyView.swift in Sources */,
 				DCEAE5B72943CC7400320C46 /* RangeSheet.swift in Sources */,
 				DCAC5B7027726FC80077BB98 /* DeepLink.swift in Sources */,
+				DC6F042B2C3DA7AD00627B4F /* ContactsListSheet.swift in Sources */,
 				DC9473FA261270B4008D7242 /* MVI+Mock.swift in Sources */,
 				DCDD9ECE28637474001800A3 /* Orientation.swift in Sources */,
 				DCCFE6B02B64326F002FFF11 /* OSLogHandler.swift in Sources */,
@@ -2005,6 +2032,7 @@
 				DCDAA7402971C29700B406A8 /* RecentPaymentsSelector.swift in Sources */,
 				DC2ABAD72BED081400C11C9C /* VibrationFeedback.swift in Sources */,
 				DCD5FF4326A0D34B009CC666 /* EqualSizes.swift in Sources */,
+				DC6F04272C3895E300627B4F /* ContactPhoto.swift in Sources */,
 				DCB62F472A5DF19D00912A71 /* KotlinPublishers+Lightning.swift in Sources */,
 				DC355E252A45FDD3008E8A8E /* NoticeMonitor.swift in Sources */,
 				F4AED298257A50CD009485C1 /* LogsConfigurationView.swift in Sources */,

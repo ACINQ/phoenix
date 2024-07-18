@@ -44,7 +44,7 @@ class MetadataQueries(val database: PaymentsDatabase) {
         // - descriptions + originalFiat
         // - descriptions
         // Other combinations are uncommon or never used, so remain unoptimized at this point.
-        return when (options) {
+        return when (options - WalletPaymentFetchOptions.Contact) {
             WalletPaymentFetchOptions.None -> {
                 null
             }

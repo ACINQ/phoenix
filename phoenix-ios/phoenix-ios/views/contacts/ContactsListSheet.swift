@@ -1,14 +1,16 @@
 import SwiftUI
 import PhoenixShared
 
-fileprivate let filename = "ContactsList"
+fileprivate let filename = "ContactsListSheet"
 #if DEBUG && true
 fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-struct ContactsList: View {
+struct ContactsListSheet: View {
+	
+	let didSelectContact: (ContactInfo) -> Void
 	
 	@State var sortedContacts: [ContactInfo] = []
 	@State var offers: [String: [String]] = [:]
@@ -16,10 +18,7 @@ struct ContactsList: View {
 	@State var searchText = ""
 	@State var filteredContacts: [ContactInfo]? = nil
 	
-	@State var addItem: Bool = false
-	@State var selectedItem: ContactInfo? = nil
-	@State var pendingDelete: ContactInfo? = nil
-	
+	@EnvironmentObject var deviceInfo: DeviceInfo
 	@EnvironmentObject var smartModalState: SmartModalState
 	
 	// --------------------------------------------------
@@ -29,26 +28,37 @@ struct ContactsList: View {
 	@ViewBuilder
 	var body: some View {
 		
-		ZStack {
-			
-			if #unavailable(iOS 16.0) {
-				NavigationLink(
-					destination: selectedItemView(),
-					isActive: selectedItemBinding()
-				) {
-					EmptyView()
-				}
-				.isDetailLink(false)
-			} // else: uses.navigationStackDestination()
-			
+		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+			header()
 			content()
+				.frame(maxHeight: (deviceInfo.windowSize.height / 2.0))
 		}
-		.navigationStackDestination(isPresented: selectedItemBinding()) { // For iOS 16+
-			selectedItemView()
+	}
+	
+	@ViewBuilder
+	func header() -> some View {
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+			Text("Contacts")
+				.font(.title3)
+				.accessibilityAddTraits(.isHeader)
+				.accessibilitySortPriority(100)
+			Spacer()
+			Button {
+				closeSheet()
+			} label: {
+				Image(systemName: "xmark").imageScale(.medium).font(.title2)
+			}
+			.accessibilityLabel("Close")
+			.accessibilityHidden(smartModalState.dismissable)
 		}
-		.navigationTitle("Address Book")
-		.navigationBarTitleDisplayMode(.inline)
-		.navigationBarItems(trailing: plusButton())
+		.padding(.horizontal)
+		.padding(.vertical, 8)
+		.background(
+			Color(UIColor.secondarySystemBackground)
+				.cornerRadius(15, corners: [.topLeft, .topRight])
+		)
+		.padding(.bottom, 4)
 	}
 	
 	@ViewBuilder
@@ -61,31 +71,18 @@ struct ContactsList: View {
 			.onChange(of: searchText) { _ in
 				searchTextChanged()
 			}
-		
 	}
 	
 	@ViewBuilder
 	func list() -> some View {
 		
 		List {
+			searchField()
 			ForEach(visibleContacts) { item in
 				Button {
-					selectedItem = item
+					selectItem(item)
 				} label: {
 					row(item)
-				}
-				.swipeActions(allowsFullSwipe: false) {
-					Button {
-						selectedItem = item
-					} label: {
-						Label("Edit", systemImage: "square.and.pencil")
-					}
-					Button {
-						pendingDelete = item // prompt for confirmation
-					} label: {
-						Label("Delete", systemImage: "trash.fill")
-					}
-					.tint(.red)
 				}
 			}
 			if hasZeroMatchesForSearch {
@@ -94,15 +91,35 @@ struct ContactsList: View {
 			}
 		} // </List>
 		.listStyle(.plain)
-		.searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .automatic))
-		.confirmationDialog("Delete contact?",
-			isPresented: confirmationDialogBinding(),
-			titleVisibility: Visibility.automatic
-		) {
-			Button("Delete contact", role: ButtonRole.destructive) {
-				deleteContact()
+	}
+	
+	@ViewBuilder
+	func searchField() -> some View {
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+			
+			Image(systemName: "magnifyingglass")
+				.foregroundColor(.gray)
+				.padding(.trailing, 4)
+			
+			TextField("Search", text: $searchText)
+			
+			// Clear button (appears when TextField's text is non-empty)
+			Button {
+				searchText = ""
+			} label: {
+				Image(systemName: "multiply.circle.fill")
+					.foregroundColor(.secondary)
 			}
+			.accessibilityLabel("Clear textfield")
+			.isHidden(searchText == "")
 		}
+		.padding(.all, 8)
+		.overlay(
+			RoundedRectangle(cornerRadius: 8)
+				.stroke(Color.textFieldBorder, lineWidth: 1)
+		)
+		.padding(.horizontal, 4)
 	}
 	
 	@ViewBuilder
@@ -128,38 +145,6 @@ struct ContactsList: View {
 		.padding(.all, 4)
 	}
 	
-	@ViewBuilder
-	func selectedItemView() -> some View {
-		
-		if let selectedItem {
-			ManageContact(
-				location: .embedded,
-				offer: nil,
-				contact: selectedItem,
-				contactUpdated: { _ in }
-			)
-		} else if addItem {
-			ManageContact(
-				location: .embedded,
-				offer: nil,
-				contact: nil,
-				contactUpdated: { _ in }
-			)
-		} else {
-			EmptyView()
-		}
-	}
-	
-	@ViewBuilder
-	func plusButton() -> some View {
-		
-		Button {
-			addItem = true
-		} label: {
-			Image(systemName: "plus")
-		}
-	}
-	
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
@@ -175,22 +160,6 @@ struct ContactsList: View {
 		}
 		
 		return filteredContacts.isEmpty && !sortedContacts.isEmpty
-	}
-	
-	func selectedItemBinding() -> Binding<Bool> {
-		
-		return Binding<Bool>(
-			get: { selectedItem != nil || addItem },
-			set: { if !$0 { selectedItem = nil; addItem = false }}
-		)
-	}
-	
-	func confirmationDialogBinding() -> Binding<Bool> {
-		
-		return Binding(
-			get: { pendingDelete != nil },
-			set: { if !$0 { pendingDelete = nil }}
-		)
 	}
 	
 	// --------------------------------------------------
@@ -241,22 +210,17 @@ struct ContactsList: View {
 	// MARK: Actions
 	// --------------------------------------------------
 	
-	func deleteContact() {
-		log.trace("deleteContact: \(pendingDelete?.name ?? "<nil>")")
+	func selectItem(_ item: ContactInfo) {
+		log.trace("selectItem: \(item.name)")
 		
-		guard let contact = pendingDelete else {
-			return
-		}
+		didSelectContact(item)
+		smartModalState.close()
+	}
+	
+	func closeSheet() {
+		log.trace("closeSheet()")
 		
-		Task { @MainActor in
-			
-			let contactsManager = Biz.business.contactsManager
-			do {
-				try await contactsManager.deleteContact(contactId: contact.uuid)
-			} catch {
-				log.error("contactsManager.deleteContact(): error: \(error)")
-			}
-		}
+		smartModalState.close()
 	}
 	
 	// --------------------------------------------------
@@ -275,3 +239,4 @@ struct ContactsList: View {
 		keyWindow?.endEditing(true)
 	}
 }
+

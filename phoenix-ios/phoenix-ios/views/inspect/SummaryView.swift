@@ -38,6 +38,14 @@ struct SummaryView: View {
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var smartModalState: SmartModalState
 	
+	enum NavLinkTag {
+		case DetailsView
+		case EditInfoView
+		case CpfpView(onChainPayment: Lightning_kmpOnChainOutgoingPayment)
+		case ContactView(contact: ContactInfo)
+	}
+	@State var navLinkTag: NavLinkTag? = nil
+	
 	enum ButtonWidth: Preference {}
 	let buttonWidthReader = GeometryPreferenceReader(
 		key: AppendValue<ButtonWidth>.self,
@@ -109,6 +117,16 @@ struct SummaryView: View {
 		
 		ZStack {
 
+			if #unavailable(iOS 16.0) {
+				NavigationLink(
+					destination: navLinkView(),
+					isActive: navLinkTagBinding()
+				) {
+					EmptyView()
+				}
+				.isDetailLink(false)
+			} // else: uses.navigationStackDestination()
+			
 			// This technique is used to center the content vertically
 			GeometryReader { geometry in
 				ScrollView(.vertical) {
@@ -137,6 +155,9 @@ struct SummaryView: View {
 			}
 		
 		} // </ZStack>
+		.navigationStackDestination(isPresented: navLinkTagBinding()) { // For iOS 16+
+			navLinkView()
+		}
 		.onAppear {
 			onAppear()
 		}
@@ -152,7 +173,7 @@ struct SummaryView: View {
 			Spacer(minLength: 25)
 			header_status()
 			header_amount()
-			SummaryInfoGrid(paymentInfo: $paymentInfo, showOriginalFiatValue: $showOriginalFiatValue)
+			summaryInfoGrid()
 			buttonList()
 			Spacer(minLength: 25)
 		}
@@ -330,7 +351,9 @@ struct SummaryView: View {
 				} // </confirmationDialog>
 				
 				if confirmations == 0 && supportsBumpFee(onChainPayment) {
-					NavigationLink(destination: cpfpView(onChainPayment)) {
+					Button {
+						navLinkTag = .CpfpView(onChainPayment: onChainPayment)
+					} label: {
 						Label {
 							Text("Accelerate transaction")
 						} icon: {
@@ -474,6 +497,16 @@ struct SummaryView: View {
 	}
 	
 	@ViewBuilder
+	func summaryInfoGrid() -> some View {
+		
+		SummaryInfoGrid(
+			paymentInfo: $paymentInfo,
+			showOriginalFiatValue: $showOriginalFiatValue,
+			showContactView: showContactView
+		)
+	}
+	
+	@ViewBuilder
 	func buttonList() -> some View {
 		
 		Group {
@@ -510,7 +543,9 @@ struct SummaryView: View {
 		HStack(alignment: VerticalAlignment.center, spacing: 16) {
 			
 			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
-				NavigationLink(destination: detailsView()) {
+				Button {
+					navLinkTag = .DetailsView
+				} label: {
 					buttonLabel_details()
 						.lineLimit(1)
 				}
@@ -527,7 +562,9 @@ struct SummaryView: View {
 			}
 			
 			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
-				NavigationLink(destination: editInfoView()) {
+				Button {
+					navLinkTag = .EditInfoView
+				} label: {
 					buttonLabel_edit()
 				}
 				.frame(minWidth: buttonWidth, alignment: Alignment.trailing)
@@ -576,7 +613,9 @@ struct SummaryView: View {
 		HStack(alignment: VerticalAlignment.center, spacing: 16) {
 			
 			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
-				NavigationLink(destination: detailsView()) {
+				Button {
+					navLinkTag = .DetailsView
+				} label: {
 					buttonLabel_details()
 						.lineLimit(1)
 				}
@@ -593,7 +632,9 @@ struct SummaryView: View {
 			}
 			
 			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
-				NavigationLink(destination: editInfoView()) {
+				Button {
+					navLinkTag = .EditInfoView
+				} label: {
 					buttonLabel_edit()
 						.lineLimit(1)
 				}
@@ -644,7 +685,9 @@ struct SummaryView: View {
 		HStack(alignment: VerticalAlignment.center, spacing: 8) {
 			
 			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
-				NavigationLink(destination: detailsView()) {
+				Button {
+					navLinkTag = .DetailsView
+				} label: {
 					buttonLabel_details()
 						.lineLimit(1)
 				}
@@ -659,7 +702,9 @@ struct SummaryView: View {
 			}
 			
 			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
-				NavigationLink(destination: editInfoView()) {
+				Button {
+					navLinkTag = .EditInfoView
+				} label: {
 					buttonLabel_edit()
 						.lineLimit(1)
 				}
@@ -708,7 +753,9 @@ struct SummaryView: View {
 			
 			HStack(alignment: VerticalAlignment.center, spacing: 8) {
 				
-				NavigationLink(destination: detailsView()) {
+				Button {
+					navLinkTag = .DetailsView
+				} label: {
 					buttonLabel_details()
 						.read(buttonHeightReader)
 				}
@@ -717,7 +764,9 @@ struct SummaryView: View {
 					Divider().frame(height: buttonHeight)
 				}
 				
-				NavigationLink(destination: editInfoView()) {
+				Button {
+					navLinkTag = .EditInfoView
+				} label: {
 					buttonLabel_edit()
 						.read(buttonHeightReader)
 				}
@@ -766,24 +815,6 @@ struct SummaryView: View {
 	}
 	
 	@ViewBuilder
-	func detailsView() -> some View {
-		DetailsView(
-			location: wrappedLocation(),
-			paymentInfo: $paymentInfo,
-			showOriginalFiatValue: $showOriginalFiatValue,
-			showFiatValueExplanation: $showFiatValueExplanation
-		)
-	}
-	
-	@ViewBuilder
-	func editInfoView() -> some View {
-		EditInfoView(
-			location: wrappedLocation(),
-			paymentInfo: $paymentInfo
-		)
-	}
-	
-	@ViewBuilder
 	func cpfpView(_ onChainPayment: Lightning_kmpOnChainOutgoingPayment) -> some View {
 		CpfpView(
 			location: wrappedLocation(),
@@ -791,9 +822,61 @@ struct SummaryView: View {
 		)
 	}
 	
+	@ViewBuilder
+	func navLinkView() -> some View {
+		
+		if let tag = self.navLinkTag {
+			navLinkView(tag)
+		} else {
+			EmptyView()
+		}
+	}
+	
+	@ViewBuilder
+	private func navLinkView(_ tag: NavLinkTag) -> some View {
+		
+		switch tag {
+		case .DetailsView:
+			DetailsView(
+				location: wrappedLocation(),
+				paymentInfo: $paymentInfo,
+				showOriginalFiatValue: $showOriginalFiatValue,
+				showFiatValueExplanation: $showFiatValueExplanation
+			)
+			
+		case .EditInfoView:
+			EditInfoView(
+				location: wrappedLocation(),
+				paymentInfo: $paymentInfo
+			)
+			
+		case .CpfpView(let onChainPayment):
+			CpfpView(
+				location: wrappedLocation(),
+				onChainPayment: onChainPayment
+			)
+			
+		case .ContactView(let contact):
+			ManageContact(
+				location: manageContactLocation(),
+				offer: nil,
+				contact: contact,
+				contactUpdated: { _ in }
+			)
+		}
+	}
+	
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
+	
+	func navLinkTagBinding() -> Binding<Bool> {
+		
+		return Binding<Bool>(
+			get: { navLinkTag != nil },
+			set: { if !$0 { navLinkTag = nil }}
+		)
+	}
 	
 	func formattedAmount() -> FormattedAmount {
 		
@@ -831,6 +914,16 @@ struct SummaryView: View {
 			return location
 		case .embedded(_):
 			return .embedded(popTo: popToWrapper)
+		}
+	}
+	
+	func manageContactLocation() -> ManageContact.Location {
+		
+		switch location {
+		case .sheet(_):
+			return ManageContact.Location.sheet
+		case .embedded(_):
+			return ManageContact.Location.embedded
 		}
 	}
 	
@@ -998,6 +1091,12 @@ struct SummaryView: View {
 		if case .embedded(let popTo) = location {
 			popTo(destination)
 		}
+	}
+	
+	func showContactView(_ contact: ContactInfo) {
+		log.trace("showContactView()")
+		
+		navLinkTag = .ContactView(contact: contact)
 	}
 	
 	func exploreTx(_ txId: Bitcoin_kmpTxId, website: BlockchainExplorer.Website) {

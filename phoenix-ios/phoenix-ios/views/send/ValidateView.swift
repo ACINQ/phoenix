@@ -1476,8 +1476,19 @@ struct ValidateView: View {
 		
 		dismissKeyboardIfVisible()
 		smartModalState.display(dismissable: false) {
-			ManageContactSheet(offer: offer, contact: $contact)
+			ManageContact(
+				location: .smartModal,
+				offer: offer,
+				contact: contact,
+				contactUpdated: contactUpdated
+			)
 		}
+	}
+	
+	func contactUpdated(_ updatedContact: ContactInfo?) {
+		log.trace("contactUpdated()")
+		
+		contact = updatedContact
 	}
 	
 	func maybeShowCapacityImpactWarning() {
@@ -1589,11 +1600,11 @@ struct ValidateView: View {
 				Biz.beginLongLivedTask(id: paymentId.description())
 				
 				let payerKey: Bitcoin_kmpPrivateKey
-				if Prefs.shared.randomPayerKey {
-					payerKey = Lightning_randomKey()
-				} else {
+				if contact?.useOfferKey ?? false {
 					let offerData = try await Biz.business.nodeParamsManager.defaultOffer()
 					payerKey = offerData.payerKey
+				} else {
+					payerKey = Lightning_randomKey()
 				}
 				
 				let result: Lightning_kmpSendPaymentResult = try await peer.altPayOffer(
@@ -1652,11 +1663,11 @@ struct ValidateView: View {
 				Biz.beginLongLivedTask(id: paymentId.description())
 				
 				let payerKey: Bitcoin_kmpPrivateKey
-				if Prefs.shared.randomPayerKey {
-					payerKey = Lightning_randomKey()
-				} else {
+				if contact?.useOfferKey ?? false {
 					let offerData = try await Biz.business.nodeParamsManager.defaultOffer()
 					payerKey = offerData.payerKey
+				} else {
+					payerKey = Lightning_randomKey()
 				}
 				
 				let response: Lightning_kmpOfferNotPaid? = try await peer.betterPayOffer(
