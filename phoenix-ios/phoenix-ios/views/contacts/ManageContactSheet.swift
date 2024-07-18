@@ -378,6 +378,7 @@ struct ManageContactSheet: View {
 							contactId: existingContact.uuid,
 							name: updatedContactName,
 							photoUri: newPhotoName,
+							useOfferKey: true, // TODO: Fix me
 							offers: existingContact.offers
 						)
 						
@@ -385,6 +386,7 @@ struct ManageContactSheet: View {
 						updatedContact = try await contactsManager.saveNewContact(
 							name: updatedContactName,
 							photoUri: newPhotoName,
+							useOfferKey: true, // TODO: Fix me
 							offer: offer
 						)
 					}
@@ -393,6 +395,7 @@ struct ManageContactSheet: View {
 						contactId: existingContact.uuid,
 						name: updatedContactName,
 						photoUri: newPhotoName,
+						useOfferKey: true, // TODO: Fix me
 						offers: existingContact.offers
 					)
 				}

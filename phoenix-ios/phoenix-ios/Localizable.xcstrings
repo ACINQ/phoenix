@@ -21366,6 +21366,7 @@
     },
     "Invalid BIP353 DNS address" : {
       "comment" : "Error message - dns record contains an invalid offer",
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -38134,6 +38135,12 @@
           }
         }
       }
+    },
+    "This address is hosted on an unsecure DNS. DNSSEC must be enabled." : {
+      "comment" : "Error message - dns issue"
+    },
+    "This address uses an invalid Bolt12 offer." : {
+      "comment" : "Error message - dns record contains an invalid offer"
     },
     "This appears to be a website (not a lightning invoice):" : {
       "localizations" : {
