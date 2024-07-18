@@ -47,7 +47,8 @@ public class PopoverState: ObservableObject {
 	func display<Content: View>(
 		dismissable: Bool,
 		@ViewBuilder builder: () -> Content,
-		onWillDisappear: (() -> Void)? = nil
+		onWillDisappear: (() -> Void)? = nil,
+		onDidDisappear: (() -> Void)? = nil
 	) {
 		dismissablePublisher.send(dismissable)
 		itemPublisher.send(PopoverItem(
@@ -55,6 +56,9 @@ public class PopoverState: ObservableObject {
 		))
 		if let willDisappearLambda = onWillDisappear {
 			onNextWillDisappear(willDisappearLambda)
+		}
+		if let didDisappearLambda = onDidDisappear {
+			onNextDidDisappear(didDisappearLambda)
 		}
 	}
 	
