@@ -117,8 +117,8 @@ class LnurlPayTest {
                 )
             }
             val client = fakeClient(engine)
-            val lnurl = Lnurl.extractLnurl("acinq@zbd.gg", logger)
-            assertIs<Lnurl.Request>(lnurl)
+            // TODO move to an email-like reader test with bip353
+            val lnurl = Lnurl.Request(Url("https://zbd.gg/.well-known/lnurlp/acinq"), tag = Lnurl.Tag.Pay)
             val response: HttpResponse = client.get(lnurl.initialUrl)
             val json = Lnurl.processLnurlResponse(response, logger)
             assertEquals("payRequest", json.get("tag")!!.jsonPrimitive.content)

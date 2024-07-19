@@ -107,7 +107,7 @@ class AppCloseChannelsConfigurationController(
     override fun process(intent: CloseChannelsConfiguration.Intent) {
         val scriptPubKey = if (intent is CloseChannelsConfiguration.Intent.MutualCloseAllChannels) {
             try {
-                Parser.readBitcoinAddress(chain, intent.address).right!!.script
+                Parser.parseBip21Uri(chain, intent.address).right!!.script
             } catch (e: Exception) {
                 throw IllegalArgumentException("Address is invalid. Caller MUST validate user input via readBitcoinAddress")
             }

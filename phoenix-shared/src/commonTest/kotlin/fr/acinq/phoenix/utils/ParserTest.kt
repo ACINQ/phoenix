@@ -17,14 +17,13 @@
 package fr.acinq.phoenix.utils
 
 
-import fr.acinq.bitcoin.Bitcoin
 import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.BitcoinError
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.payment.Bolt11Invoice
-import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.sat
+import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.data.BitcoinUriError
 import fr.acinq.phoenix.data.BitcoinUri
 import io.ktor.http.*
@@ -36,47 +35,47 @@ class ParserTest {
 
     @Test
     fun parse_bitcoin_uri_with_valid_addresses() {
-        assertIs<Either.Right<BitcoinUri>>(Parser.readBitcoinAddress(Chain.Mainnet, "17VZNX1SN5NtKa8UQFxwQbFeFc3iqRYhem"))
-        assertIs<Either.Right<BitcoinUri>>(Parser.readBitcoinAddress(Chain.Mainnet, "3EktnHQD7RiAE6uzMj2ZifT9YgRrkSgzQX"))
-        assertIs<Either.Right<BitcoinUri>>(Parser.readBitcoinAddress(Chain.Mainnet, "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4"))
-        assertIs<Either.Right<BitcoinUri>>(Parser.readBitcoinAddress(Chain.Mainnet, "bc1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3qccfmv3"))
+        assertIs<Either.Right<BitcoinUri>>(Parser.parseBip21Uri(Chain.Mainnet, "17VZNX1SN5NtKa8UQFxwQbFeFc3iqRYhem"))
+        assertIs<Either.Right<BitcoinUri>>(Parser.parseBip21Uri(Chain.Mainnet, "3EktnHQD7RiAE6uzMj2ZifT9YgRrkSgzQX"))
+        assertIs<Either.Right<BitcoinUri>>(Parser.parseBip21Uri(Chain.Mainnet, "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4"))
+        assertIs<Either.Right<BitcoinUri>>(Parser.parseBip21Uri(Chain.Mainnet, "bc1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3qccfmv3"))
 
-        assertIs<Either.Right<BitcoinUri>>(Parser.readBitcoinAddress(Chain.Testnet, "mipcBbFg9gMiCh81Kj8tqqdgoZub1ZJRfn"))
-        assertIs<Either.Right<BitcoinUri>>(Parser.readBitcoinAddress(Chain.Testnet, "2MzQwSSnBHWHqSAqtTVQ6v47XtaisrJa1Vc"))
-        assertIs<Either.Right<BitcoinUri>>(Parser.readBitcoinAddress(Chain.Testnet, "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx"))
-        assertIs<Either.Right<BitcoinUri>>(Parser.readBitcoinAddress(Chain.Testnet, "tb1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3q0sl5k7"))
-        assertIs<Either.Right<BitcoinUri>>(Parser.readBitcoinAddress(Chain.Testnet, "tb1p607g5ea77m370pey3y5rg58fz7542hnpg40rs2cqw6w69yt5lf2qlktj2a"))
+        assertIs<Either.Right<BitcoinUri>>(Parser.parseBip21Uri(Chain.Testnet, "mipcBbFg9gMiCh81Kj8tqqdgoZub1ZJRfn"))
+        assertIs<Either.Right<BitcoinUri>>(Parser.parseBip21Uri(Chain.Testnet, "2MzQwSSnBHWHqSAqtTVQ6v47XtaisrJa1Vc"))
+        assertIs<Either.Right<BitcoinUri>>(Parser.parseBip21Uri(Chain.Testnet, "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx"))
+        assertIs<Either.Right<BitcoinUri>>(Parser.parseBip21Uri(Chain.Testnet, "tb1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3q0sl5k7"))
+        assertIs<Either.Right<BitcoinUri>>(Parser.parseBip21Uri(Chain.Testnet, "tb1p607g5ea77m370pey3y5rg58fz7542hnpg40rs2cqw6w69yt5lf2qlktj2a"))
     }
 
     @Test
     fun parse_bitcoin_uri_chain_mismatch() {
         assertEquals(
             expected = Either.Left(BitcoinUriError.InvalidScript(error = BitcoinError.ChainHashMismatch)),
-            actual = Parser.readBitcoinAddress(Chain.Testnet, "bc1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3qccfmv3")
+            actual = Parser.parseBip21Uri(Chain.Testnet, "bc1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3qccfmv3")
         )
         assertEquals(
             expected = Either.Left(BitcoinUriError.InvalidScript(error = BitcoinError.ChainHashMismatch)),
-            actual = Parser.readBitcoinAddress(Chain.Mainnet, "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx")
+            actual = Parser.parseBip21Uri(Chain.Mainnet, "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx")
         )
     }
 
     @Test
     fun parse_bitcoin_uri_with_invalid_addresses() {
         assertIs<Either.Left<BitcoinUriError.InvalidScript>>(
-            Parser.readBitcoinAddress(Chain.Mainnet, "17VZNX1SN5NtKa8UQFxwQbFeFc3iqRYhe")
+            Parser.parseBip21Uri(Chain.Mainnet, "17VZNX1SN5NtKa8UQFxwQbFeFc3iqRYhe")
         )
     }
 
     @Test
     fun parse_bitcoin_uri_with_bitcoin_prefixes() {
         assertIs<Either.Right<BitcoinUri>>(
-            Parser.readBitcoinAddress(Chain.Mainnet, "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4")
+            Parser.parseBip21Uri(Chain.Mainnet, "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4")
         )
         assertIs<Either.Right<BitcoinUri>>(
-            Parser.readBitcoinAddress(Chain.Mainnet, "bitcoin://bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4")
+            Parser.parseBip21Uri(Chain.Mainnet, "bitcoin://bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4")
         )
         assertIs<Either.Right<BitcoinUri>>(
-            Parser.readBitcoinAddress(Chain.Testnet, "bitcoin:?lno=lno1qgsyxjtl6luzd9t3pr62xr7eemp6awnejusgf6gw45q75vcfqqqqqqqsespexwyy4tcadvgg89l9aljus6709kx235hhqrk6n8dey98uyuftzdqrt2gkjvf2rj2vnt7m7chnmazen8wpur2h65ttgftkqaugy6ql9dcsyq39xc2g084xfn0s50zlh2ex22vvaqxqz3vmudklz453nns4d0624sqr8ux4p5usm22qevld4ydfck7hwgcg9wc3f78y7jqhc6hwdq7e9dwkhty3svq5ju4dptxtldjumlxh5lw48jsz6pnagtwrmeus7uq9rc5g6uddwcwldpklxexvlezld8egntua4gsqqy8auz966nksacdac8yv3maq6elp")
+            Parser.parseBip21Uri(Chain.Testnet, "bitcoin:?lno=lno1qgsyxjtl6luzd9t3pr62xr7eemp6awnejusgf6gw45q75vcfqqqqqqqsespexwyy4tcadvgg89l9aljus6709kx235hhqrk6n8dey98uyuftzdqrt2gkjvf2rj2vnt7m7chnmazen8wpur2h65ttgftkqaugy6ql9dcsyq39xc2g084xfn0s50zlh2ex22vvaqxqz3vmudklz453nns4d0624sqr8ux4p5usm22qevld4ydfck7hwgcg9wc3f78y7jqhc6hwdq7e9dwkhty3svq5ju4dptxtldjumlxh5lw48jsz6pnagtwrmeus7uq9rc5g6uddwcwldpklxexvlezld8egntua4gsqqy8auz966nksacdac8yv3maq6elp")
         )
     }
 
@@ -84,13 +83,13 @@ class ParserTest {
     fun parse_bitcoin_uri_with_non_bitcoin_prefixes() {
         // non-bitcoin prefixes are not trimmed, so error is invalid script
         assertIs<Either.Left<BitcoinUriError.InvalidScript>>(
-            Parser.readBitcoinAddress(Chain.Mainnet, "btc:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4")
+            Parser.parseBip21Uri(Chain.Mainnet, "btc:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4")
         )
         assertIs<Either.Left<BitcoinUriError.InvalidScript>>(
-            Parser.readBitcoinAddress(Chain.Mainnet, "lightning:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4")
+            Parser.parseBip21Uri(Chain.Mainnet, "lightning:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4")
         )
         assertIs<Either.Left<BitcoinUriError.InvalidScript>>(
-            Parser.readBitcoinAddress(Chain.Mainnet, "lnurl://bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4")
+            Parser.parseBip21Uri(Chain.Mainnet, "lnurl://bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4")
         )
     }
 
@@ -120,7 +119,7 @@ class ParserTest {
                 BitcoinUriError.UnhandledRequiredParams(parameters = listOf("req-somethingyoudontunderstand" to "50", "req-somethingelseyoudontget" to "999"))
             ),
         ).forEach {
-            assertEquals(it.second, Parser.readBitcoinAddress(Chain.Mainnet, it.first))
+            assertEquals(it.second, Parser.parseBip21Uri(Chain.Mainnet, it.first))
         }
     }
 
@@ -146,7 +145,7 @@ class ParserTest {
                 BitcoinUri(chain = Chain.Mainnet, address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4", script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"))
             ),
         ).forEach { (address, expected) ->
-            val uri = Parser.readBitcoinAddress(Chain.Mainnet, address)
+            val uri = Parser.parseBip21Uri(Chain.Mainnet, address)
             assertEquals(expected, uri)
         }
     }
@@ -224,7 +223,7 @@ class ParserTest {
                 )
             )
         ).forEach {
-            assertEquals(it.second, Parser.readBitcoinAddress(Chain.Mainnet, it.first))
+            assertEquals(it.second, Parser.parseBip21Uri(Chain.Mainnet, it.first))
         }
     }
 
@@ -264,4 +263,61 @@ class ParserTest {
         }
     }
 
+    @Test
+    fun parse_bitcoin_uri_with_offer_parameter() {
+        val offer = OfferTypes.Offer
+            .decode("lno1qgsyxjtl6luzd9t3pr62xr7eemp6awnejusgf6gw45q75vcfqqqqqqqsespexwyy4tcadvgg89l9aljus6709kx235hhqrk6n8dey98uyuftzdqzrtkahuum7m56dxlnx8r6tffy54004l7kvs7pylmxx7xs4n54986qyqeeuhhunayntt50snmdkq4t7fzsgghpl69v9csgparek8kv7dlp5uqr8ymp5s4z9upmwr2s8xu020d45t5phqc8nljrq8gzsjmurzevawjz6j6rc95xwfvnhgfx6v4c3jha7jwynecrz3y092nn25ek4yl7xp9yu9ry9zqagt0ktn4wwvqg52v9ss9ls22sqyqqestzp2l6decpn87pq96udsvx")
+            .get()
+
+        val validUri = BitcoinUri(
+            chain = Chain.Mainnet,
+            address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+            script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+            offer = offer,
+        )
+        val validFoobarUri = validUri
+
+        listOf<Pair<String, Either<BitcoinUriError, BitcoinUri>>>(
+            // valid offer uris
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?lno=$offer" to Either.Right(validFoobarUri),
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?lno=$offer&foo=bar" to Either.Right(
+                validFoobarUri.copy(ignoredParams = ParametersBuilder().apply { set("foo", "bar") }.build())
+            ),
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?foo=bar&lno=$offer" to Either.Right(
+                validFoobarUri.copy(ignoredParams = ParametersBuilder().apply { set("foo", "bar") }.build())
+            ),
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?foo=bar&lno=$offer&bar=baz" to Either.Right(
+                validFoobarUri.copy(ignoredParams = ParametersBuilder().apply { set("foo", "bar") ; set("bar", "baz") }.build())
+            ),
+            // valid offer in a typical bip353 uri
+            "bitcoin:?sp=silentpayment&lno=$offer" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "",
+                    script = null,
+                    offer = offer,
+                    ignoredParams = ParametersBuilder().apply { set("sp", "silentpayment") }.build()
+                )
+            ),
+            // invalid offer parameter
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?lightning=lno1qgsyxjtl6luzd9t3pr62xr7eemp6awnejusgf6gw45q75vcfqqqqqqqsespexwyy4tcadvgg89l9a" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6")
+                )
+            ),
+            // empty offer invoice
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?lno=" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6")
+                )
+            ),
+        ).forEach { (address, expected) ->
+            val uri = Parser.parseBip21Uri(Chain.Mainnet, address)
+            assertEquals(expected, uri)
+        }
+    }
 }

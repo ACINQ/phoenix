@@ -19,7 +19,6 @@ package fr.acinq.phoenix.controllers.payments
 import fr.acinq.bitcoin.BitcoinError
 import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.utils.Either
-import fr.acinq.bitcoin.utils.Try
 import fr.acinq.lightning.Lightning
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.TrampolineFees
@@ -576,35 +575,32 @@ class AppScanController(
         logger.debug { "dns resolved to ${json.toString().take(100)}" }
 
         val status = json["Status"]?.jsonPrimitive?.intOrNull
+        // could be a [BadRequestReason.Bip353NameNotFound] it status == 3
         if (status == null || status > 0) return null
 
-        val records = json["Answer"]?.jsonArray
-        if (records.isNullOrEmpty()) {
-            logger.debug { "no records for $dnsPath" }
-            return null
-        }
-
-        val matchingRecord = records.filterIsInstance<JsonObject>().firstOrNull {
-            logger.debug { "inspecting record=$it" }
-            it["name"]?.jsonPrimitive?.content == dnsPath
-        } ?: return null
-
+        // check dnssec
         val ad = json["AD"]?.jsonPrimitive?.booleanOrNull
         if (ad != true) {
             logger.debug { "AD false, abort dns lookup" }
             throw Scan.BadRequestReason.Bip353NoDNSSEC(dnsPath)
         }
 
-        val data = matchingRecord["data"]?.jsonPrimitive?.content ?: return null
-        if (!data.startsWith("bitcoin:")) throw Scan.BadRequestReason.Bip353InvalidOffer(dnsPath)
-        val offerString = data.substringAfter("lno=").substringBefore("?")
-        if (offerString.isBlank()) throw Scan.BadRequestReason.Bip353InvalidOffer(dnsPath)
+        // check name matches records
+        val records = json["Answer"]?.jsonArray
+        if (records.isNullOrEmpty()) {
+            logger.debug { "no answer for $dnsPath" }
+            throw Scan.BadRequestReason.Bip353NameNotFound(username, domain)
+        }
 
-        return when (val offer = OfferTypes.Offer.decode(offerString)) {
-            is Try.Success -> { offer.result }
-            is Try.Failure -> {
-                throw Scan.BadRequestReason.Bip353InvalidOffer(dnsPath)
-            }
+        val matchingRecord = records.filterIsInstance<JsonObject>().firstOrNull {
+            logger.debug { "inspecting record=$it" }
+            it["name"]?.jsonPrimitive?.content == dnsPath
+        } ?: throw Scan.BadRequestReason.Bip353NameNotFound(username, domain)
+
+        val data = matchingRecord["data"]?.jsonPrimitive?.content ?: throw Scan.BadRequestReason.Bip353InvalidUri(dnsPath)
+        return when (val res = Parser.parseBip21Uri(chain, data)) {
+            is Either.Left -> throw Scan.BadRequestReason.Bip353InvalidUri(dnsPath)
+            is Either.Right -> res.value.offer ?: throw Scan.BadRequestReason.Bip353InvalidOffer(dnsPath)
         }
     }
 
@@ -617,7 +613,7 @@ class AppScanController(
 
     /** Invokes `Parser.readBitcoinAddress`, but maps [BitcoinUriError.InvalidUri] to a null result instead of a fatal error. */
     private fun readBitcoinAddress(input: String): Either<BitcoinUriError, BitcoinUri>? {
-        return when (val result = Parser.readBitcoinAddress(chain, input)) {
+        return when (val result = Parser.parseBip21Uri(chain, input)) {
             is Either.Left -> when (result.left) {
                 is BitcoinUriError.InvalidUri -> null
                 else -> result
