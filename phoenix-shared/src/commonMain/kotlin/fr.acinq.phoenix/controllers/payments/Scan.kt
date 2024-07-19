@@ -42,6 +42,8 @@ object Scan {
         data class ChainMismatch(val expected: Chain) : BadRequestReason()
         data class ServiceError(val url: Url, val error: LnurlError.RemoteFailure) : BadRequestReason()
         data class InvalidLnurl(val url: Url) : BadRequestReason()
+        data class Bip353NameNotFound(val username: String, val domain: String) : BadRequestReason()
+        data class Bip353InvalidUri(val path: String) : BadRequestReason()
         data class Bip353InvalidOffer(val path: String) : BadRequestReason()
         data class Bip353NoDNSSEC(val path: String) : BadRequestReason()
         data class UnsupportedLnurl(val url: Url) : BadRequestReason()

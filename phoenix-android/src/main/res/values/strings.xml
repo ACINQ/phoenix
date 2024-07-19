@@ -678,7 +678,9 @@
     <string name="paymentsettings_expiry_title">Invoice expiry</string>
     <string name="paymentsettings_expiry_dialog_title">Invoice expiry</string>
     <string name="paymentsettings_expiry_dialog_description">Invoices that you create are stale after this delay. Default value is 1 week.</string>
-    <string name="paymentsettings_expiry_one_week">1 week</string>
+    <string name="paymentsettings_expiry_one_hour">1 hour</string>
+    <string name="paymentsettings_expiry_one_day">1 day</string>
+    <string name="paymentsettings_expiry_one_week">1 week (default)</string>
     <string name="paymentsettings_expiry_two_weeks">2 weeks</string>
     <string name="paymentsettings_expiry_three_weeks">3 weeks</string>
     <string name="paymentsettings_expiry_value">%1$s seconds</string>

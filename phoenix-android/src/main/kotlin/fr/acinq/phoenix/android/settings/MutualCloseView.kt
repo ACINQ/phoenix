@@ -152,7 +152,7 @@ fun MutualCloseView(
                                 modifier = Modifier.fillMaxWidth(),
                                 enabled = address.isNotBlank() && model.channels.isNotEmpty(),
                                 onClick = {
-                                    when (val validation = Parser.readBitcoinAddress(chain, address)) {
+                                    when (val validation = Parser.parseBip21Uri(chain, address)) {
                                         is Either.Left -> {
                                             val error = validation.value
                                             addressErrorMessage = when (error) {

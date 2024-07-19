@@ -612,7 +612,9 @@
     <string name="paymentsettings_expiry_title">Verfallsfrist von Rechnungen</string>
     <string name="paymentsettings_expiry_dialog_title">Verfallsfrist von Rechnungen</string>
     <string name="paymentsettings_expiry_dialog_description">Rechnungen, die Sie erstellen, sind nach dieser Frist ungültig. Standardwert ist 1 Woche.</string>
-    <string name="paymentsettings_expiry_one_week">1 Woche</string>
+    <string name="paymentsettings_expiry_one_hour">1 Stunde</string>
+    <string name="paymentsettings_expiry_one_day">1 Tag</string>
+    <string name="paymentsettings_expiry_one_week">1 Woche (Standard)</string>
     <string name="paymentsettings_expiry_two_weeks">2 Wochen</string>
     <string name="paymentsettings_expiry_three_weeks">3 Wochen</string>
     <string name="paymentsettings_expiry_value">%1$s Sekunden</string>

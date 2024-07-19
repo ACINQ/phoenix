@@ -87,12 +87,12 @@ object Parser {
     }
 
     /**
-     * Parses an input and returns a [BitcoinUri] if it is valid, or a typed error otherwise.
+     * Parses an input and returns a bip-21 [BitcoinUri] if it is valid, or a typed error otherwise.
      *
      * @param chain the chain this parser expects the address to be valid on.
      * @param input can range from a basic bitcoin address to a sophisticated Bitcoin URI with a prefix and parameters.
      */
-    fun readBitcoinAddress(
+    fun parseBip21Uri(
         chain: Chain,
         input: String
     ): Either<BitcoinUriError, BitcoinUri> {
@@ -128,13 +128,13 @@ object Parser {
         val message = url.parameters["message"]
         val lightning = url.parameters["lightning"]?.let {
             when (val res = Bolt11Invoice.read(it)) {
-                is Try.Success -> res.get()
+                is Try.Success -> res.result
                 is Try.Failure -> null
             }
         }
         val offer = url.parameters["lno"]?.let {
             when (val res = OfferTypes.Offer.decode(it)) {
-                is Try.Success -> res.get()
+                is Try.Success -> res.result
                 is Try.Failure -> null
             }
         }
@@ -160,6 +160,6 @@ object Parser {
 
     /** Transforms a bitcoin address into a public key script if valid, otherwise returns null. */
     fun addressToPublicKeyScriptOrNull(chain: Chain, address: String): ByteVector? {
-        return readBitcoinAddress(chain, address).right?.script
+        return parseBip21Uri(chain, address).right?.script
     }
 }

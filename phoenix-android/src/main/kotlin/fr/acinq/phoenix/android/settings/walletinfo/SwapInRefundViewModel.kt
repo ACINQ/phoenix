@@ -75,7 +75,7 @@ class SwapInRefundViewModel(
             log.error("error when estimating swap-in refund fees: ", e)
             state = SwapInRefundState.Done.Failed.Error(e)
         }) {
-            when (val parseAddress = Parser.readBitcoinAddress(NodeParamsManager.chain, address)) {
+            when (val parseAddress = Parser.parseBip21Uri(NodeParamsManager.chain, address)) {
                 is Either.Left -> {
                     log.debug("invalid refund address=$address (${parseAddress.value}")
                     state = SwapInRefundState.Done.Failed.InvalidAddress(address, parseAddress.value)

@@ -165,6 +165,8 @@
     <string name="scan_error_lnurl_invalid">Dieser LNURL-Link konnte nicht verarbeitet werden. Stellen Sie sicher, dass er gültig ist.</string>
     <string name="scan_error_lnurl_unsupported">Dieser LNURL-Typ wird noch nicht unterstützt.</string>
     <string name="scan_error_invalid_generic">Diese Daten haben ein unbekanntes Format und können nicht verarbeitet werden.</string>
+    <string name="scan_error_bip353_name_not_found">Name \"%1$s\" wird auf \"%2$s\" nicht gefunden.</string>
+    <string name="scan_error_bip353_invalid_uri">Diese Adresse verwendet eine ungültige Bip21 Ressource.</string>
     <string name="scan_error_bip353_invalid_offer">Diese Adresse verwendet ein ungültiges Bolt12-Angebot.</string>
     <string name="scan_error_bip353_dnssec">Diese Adresse wird über einen unsicheren DNS gehostet. DNSSEC muss aktiviert sein.</string>
 

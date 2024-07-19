@@ -627,10 +627,12 @@
     <string name="paymentsettings_expiry_title">Expiration des requêtes de paiement</string>
     <string name="paymentsettings_expiry_dialog_title">Expiration des requêtes</string>
     <string name="paymentsettings_expiry_dialog_description">Vos requêtes de paiements seront inactives une fois ce délai passé. Par défaut, 1 semaine.</string>
-    <string name="paymentsettings_expiry_one_week">1 week</string>
-    <string name="paymentsettings_expiry_two_weeks">2 weeks</string>
-    <string name="paymentsettings_expiry_three_weeks">3 weeks</string>
-    <string name="paymentsettings_expiry_value">%1$s seconds</string>
+    <string name="paymentsettings_expiry_one_hour">1 heure</string>
+    <string name="paymentsettings_expiry_one_day">1 jour</string>
+    <string name="paymentsettings_expiry_one_week">1 semaine (défaut)</string>
+    <string name="paymentsettings_expiry_two_weeks">2 semaines</string>
+    <string name="paymentsettings_expiry_three_weeks">3 semaines</string>
+    <string name="paymentsettings_expiry_value">%1$s secondes</string>
 
     <string name="paymentsettings_lnurlauth_scheme_title">Schéma d\'authentification LNURL</string>
 
