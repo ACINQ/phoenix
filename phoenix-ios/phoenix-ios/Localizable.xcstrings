@@ -8423,6 +8423,9 @@
         }
       }
     },
+    "Bolt12 offers" : {
+
+    },
     "broadcast" : {
       "localizations" : {
         "ar" : {
@@ -26174,9 +26177,6 @@
           }
         }
       }
-    },
-    "Offer:" : {
-
     },
     "Offline" : {
       "comment" : "Connection state\nConnection status",

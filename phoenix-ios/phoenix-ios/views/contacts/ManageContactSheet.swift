@@ -8,6 +8,15 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
+struct OfferRow: Identifiable {
+	let offer: String
+	let isCurrentOffer: Bool
+	
+	var id: String {
+		return offer
+	}
+}
+
 struct ManageContactSheet: View {
 	
 	let offer: Lightning_kmpOfferTypesOffer?
@@ -27,6 +36,9 @@ struct ManageContactSheet: View {
 	@State var showImageOptions: Bool = false
 	@State var isSaving: Bool = false
 	@State var showDeleteContactConfirmationDialog: Bool = false
+	
+	@State var showingOffers: Bool = false
+	@State var chevronPosition: AnimatedChevron.Position = .pointingDown
 	
 	@State var didAppear: Bool = false
 	
@@ -77,7 +89,6 @@ struct ManageContactSheet: View {
 			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 				header()
 				content()
-					.frame(maxHeight: (deviceInfo.windowSize.height / 2.0))
 			}
 			toast.view()
 		} // </ZStack>
@@ -144,44 +155,58 @@ struct ManageContactSheet: View {
 	@ViewBuilder
 	func content() -> some View {
 		
-		ScrollView {
-			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-				
-				content_image().padding(.bottom)
-				content_name().padding(.bottom)
-				content_trusted().padding(.bottom)
-				content_details().padding(.bottom)
-				content_buttons()
-			}
-			.padding()
-		}
-		.scrollingDismissesKeyboard(.interactively)
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			ScrollView {
+				VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+					
+					content_image()
+					content_name()
+					content_trusted()
+					if showOffers {
+						content_offers()
+					}
+				} // </VStack>
+				.padding()
+			} // </ScrollView>
+			.frame(maxHeight: scrollViewMaxHeight)
+			.scrollingDismissesKeyboard(.interactively)
+			
+			content_buttons()
+				.padding()
+		} // </VStack>
 	}
 	
 	@ViewBuilder
 	func content_image() -> some View {
 		
-		Group {
-			if useDiskImage && didAppear {
-				ContactPhoto(fileName: contact?.photoUri, size: IMG_SIZE, useCache: false)
-			} else if let uiimage = pickerResult?.image {
-				Image(uiImage: uiimage)
-					.resizable()
-					.aspectRatio(contentMode: .fill) // FILL !
-			} else {
-				Image(systemName: "person.circle")
-					.resizable()
-					.aspectRatio(contentMode: .fit)
-					.foregroundColor(.gray)
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+			Spacer(minLength: 0)
+			Group {
+				if useDiskImage && didAppear {
+					ContactPhoto(fileName: contact?.photoUri, size: IMG_SIZE, useCache: false)
+				} else if let uiimage = pickerResult?.image {
+					Image(uiImage: uiimage)
+						.resizable()
+						.aspectRatio(contentMode: .fill) // FILL !
+				} else {
+					Image(systemName: "person.circle")
+						.resizable()
+						.aspectRatio(contentMode: .fit)
+						.foregroundColor(.gray)
+				}
 			}
-		}
-		.frame(width: IMG_SIZE, height: IMG_SIZE)
-		.clipShape(Circle())
-		.onTapGesture {
-			if !isSaving {
-				showImageOptions = true
+			.frame(width: IMG_SIZE, height: IMG_SIZE)
+			.clipShape(Circle())
+			.onTapGesture {
+				if !isSaving {
+					showImageOptions = true
+				}
 			}
+			Spacer(minLength: 0)
 		}
+		.padding(.bottom)
+		.background(Color(UIColor.systemBackground))
+		.zIndex(1)
 		.confirmationDialog("Contact Image",
 			isPresented: $showImageOptions,
 			titleVisibility: .automatic
@@ -228,6 +253,9 @@ struct ManageContactSheet: View {
 			RoundedRectangle(cornerRadius: 8)
 				.stroke(Color.textFieldBorder, lineWidth: 1)
 		)
+		.padding(.bottom)
+		.background(Color(UIColor.systemBackground))
+		.zIndex(1)
 	}
 	
 	@ViewBuilder
@@ -244,6 +272,7 @@ struct ManageContactSheet: View {
 					.font(.title2)
 				Text("**enabled**: they will be able to tell when payments are from you")
 					.font(.subheadline)
+					.fixedSize(horizontal: false, vertical: true)
 			}
 			.foregroundColor(.secondary)
 			
@@ -252,26 +281,72 @@ struct ManageContactSheet: View {
 					.font(.title2)
 				Text("**disabled**: sent payments will be anonymous")
 					.font(.subheadline)
+					.fixedSize(horizontal: false, vertical: true)
 			}
 			.foregroundColor(.secondary)
 		}
+		.padding(.bottom)
+		.background(Color(UIColor.systemBackground))
+		.zIndex(1)
 	}
 	
 	@ViewBuilder
-	func content_details() -> some View {
+	func content_offers() -> some View {
 		
-		if let offer {
-			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
-				Text("Offer:")
-				Text(offer.encode())
-					.lineLimit(2)
-					.multilineTextAlignment(.leading)
-					.truncationMode(.middle)
-					.font(.subheadline)
-					.padding(.leading, 20)
+		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Text("Bolt12 offers")
+				Spacer(minLength: 0)
+				AnimatedChevron(
+					position: $chevronPosition,
+					color: Color(UIColor.systemGray2),
+					lineWidth: 20,
+					lineThickness: 2,
+					verticalOffset: 8
+				)
+			} // </HStack>
+			.background(Color(UIColor.systemBackground))
+			.contentShape(Rectangle()) // make Spacer area tappable
+			.onTapGesture {
+				withAnimation {
+					if showingOffers {
+						showingOffers = false
+						chevronPosition = .pointingDown
+					} else {
+						showingOffers = true
+						chevronPosition = .pointingUp
+					}
+				}
 			}
-			.frame(maxWidth: .infinity)
-		}
+			.zIndex(1)
+			
+			if showingOffers {
+				VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
+					ForEach(offerRows()) { row in
+						HStack(alignment: VerticalAlignment.center, spacing: 0) {
+							Text(row.offer)
+								.lineLimit(1)
+								.truncationMode(.middle)
+								.foregroundColor(row.isCurrentOffer ? Color.appPositive : Color.primary)
+							Spacer(minLength: 8)
+							Button {
+								copyText(row.offer)
+							} label: {
+								Image(systemName: "square.on.square")
+							}
+						}
+						.font(.subheadline)
+						.padding(.vertical, 8)
+						.padding(.leading, 20)
+					} // </ForEach>
+				} // </VStack>
+				.zIndex(0)
+				.transition(.move(edge: .top).combined(with: .opacity))
+			}
+			
+		} // </VStack>
+		.padding(.bottom)
 	}
 	
 	@ViewBuilder
@@ -327,6 +402,14 @@ struct ManageContactSheet: View {
 		)
 	}
 	
+	var scrollViewMaxHeight: CGFloat {
+		if deviceInfo.isShortHeight {
+			return CGFloat.infinity
+		} else {
+			return deviceInfo.windowSize.height * 0.6
+		}
+	}
+	
 	var trimmedName: String {
 		return name.trimmingCharacters(in: .whitespacesAndNewlines)
 	}
@@ -355,6 +438,40 @@ struct ManageContactSheet: View {
 		} else {
 			return contact?.photoUri != nil
 		}
+	}
+	
+	var showOffers: Bool {
+		
+		if offer != nil {
+			return true
+		} else if let contact {
+			return !contact.offers.isEmpty
+		} else {
+			return false
+		}
+	}
+	
+	func offerRows() -> [OfferRow] {
+		
+		var offers = Set<String>()
+		var results = Array<OfferRow>()
+		
+		if let offer {
+			let offerStr = offer.encode()
+			offers.insert(offerStr)
+			results.append(OfferRow(offer: offerStr, isCurrentOffer: true))
+		}
+		if let contact {
+			for offer in contact.offers {
+				let offerStr = offer.encode()
+				if !offers.contains(offerStr) {
+					offers.insert(offerStr)
+					results.append(OfferRow(offer: offerStr, isCurrentOffer: false))
+				}
+			}
+		}
+		
+		return results
 	}
 	
 	// --------------------------------------------------
@@ -392,6 +509,17 @@ struct ManageContactSheet: View {
 	#else
 		activeSheet = .camera
 	#endif
+	}
+	
+	func copyText(_ text: String) {
+		log.trace("copyText()")
+		
+		UIPasteboard.general.string = text
+		toast.pop(
+			NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
+			colorScheme: colorScheme.opposite,
+			style: .chrome
+		)
 	}
 	
 	func cancel() {
