@@ -612,7 +612,9 @@
     <string name="paymentsettings_expiry_title">Hóa đơn hết hạn</string>
     <string name="paymentsettings_expiry_dialog_title">Hóa đơn hết hạn</string>
     <string name="paymentsettings_expiry_dialog_description">Hóa đơn bạn tạo đã hết hạn sau khoảng trì hoãn này. Thời hạn mặc định là 1 tuần.</string>
-    <string name="paymentsettings_expiry_one_week">1 tuần</string>
+    <string name="paymentsettings_expiry_one_hour">1 giờ</string>
+    <string name="paymentsettings_expiry_one_day">1 ngày</string>
+    <string name="paymentsettings_expiry_one_week">1 tuần (mặc định)</string>
     <string name="paymentsettings_expiry_two_weeks">2 tuần</string>
     <string name="paymentsettings_expiry_three_weeks">3 tuần</string>
     <string name="paymentsettings_expiry_value">%1$s giây</string>

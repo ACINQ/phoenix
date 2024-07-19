@@ -597,7 +597,9 @@
     <string name="paymentsettings_expiry_title">Vencimiento de la factura</string>
     <string name="paymentsettings_expiry_dialog_title">Vencimiento de la factura</string>
     <string name="paymentsettings_expiry_dialog_description">Las facturas que crees caducan después de este plazo. El valor predeterminado es 1 semana.</string>
-    <string name="paymentsettings_expiry_one_week">1 semana</string>
+    <string name="paymentsettings_expiry_one_hour">1 hora</string>
+    <string name="paymentsettings_expiry_one_day">1 día</string>
+    <string name="paymentsettings_expiry_one_week">1 semana (por defecto)</string>
     <string name="paymentsettings_expiry_two_weeks">2 semanas</string>
     <string name="paymentsettings_expiry_three_weeks">3 semanas</string>
     <string name="paymentsettings_expiry_value">%1$s segundos</string>

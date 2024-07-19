@@ -17,13 +17,10 @@
 package fr.acinq.phoenix.android.settings
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Slider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -34,7 +31,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
@@ -48,6 +44,8 @@ import fr.acinq.phoenix.android.utils.datastore.SwapAddressFormat
 import fr.acinq.phoenix.data.lnurl.LnurlAuth
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
 
 @Composable
 fun PaymentSettingsView(
@@ -58,7 +56,6 @@ fun PaymentSettingsView(
     val userPrefs = userPrefs
 
     var showDescriptionDialog by rememberSaveable { mutableStateOf(false) }
-    var showExpiryDialog by rememberSaveable { mutableStateOf(false) }
 
     val invoiceDefaultDesc by userPrefs.getInvoiceDefaultDesc.collectAsState(initial = "")
     val invoiceDefaultExpiry by userPrefs.getInvoiceDefaultExpiry.collectAsState(null)
@@ -77,18 +74,7 @@ fun PaymentSettingsView(
                 description = invoiceDefaultDesc.ifEmpty { stringResource(id = R.string.paymentsettings_defaultdesc_none) },
                 onClick = { showDescriptionDialog = true }
             )
-            Setting(
-                title = stringResource(id = R.string.paymentsettings_expiry_title),
-                description = when (invoiceDefaultExpiry) {
-                    null -> stringResource(id = R.string.utils_unknown)
-                    1 * 604800L -> stringResource(id = R.string.paymentsettings_expiry_one_week)
-                    2 * 604800L -> stringResource(id = R.string.paymentsettings_expiry_two_weeks)
-                    3 * 604800L -> stringResource(id = R.string.paymentsettings_expiry_three_weeks)
-                    else -> stringResource(id = R.string.paymentsettings_expiry_value, NumberFormat.getInstance().format(invoiceDefaultExpiry))
-                },
-                onClick = { showExpiryDialog = true }
-            )
-
+            Bolt11ExpiryPreference()
             val swapAddressFormat = swapAddressFormatState.value
             if (swapAddressFormat != null) {
                 val schemes = listOf(
@@ -192,70 +178,42 @@ fun PaymentSettingsView(
             }
         )
     }
-
-    if (showExpiryDialog) {
-        invoiceDefaultExpiry?.let {
-            DefaultExpiryInvoiceDialog(
-                expiry = it,
-                onDismiss = { showExpiryDialog = false },
-                onConfirm = {
-                    scope.launch { userPrefs.saveInvoiceDefaultExpiry(it.toLong()) }
-                    showExpiryDialog = false
-                }
-            )
-        }
-    }
 }
 
 @Composable
-private fun DefaultExpiryInvoiceDialog(
-    expiry: (Long),
-    onDismiss: () -> Unit,
-    onConfirm: (Float) -> Unit,
-) {
-    var paymentExpiry by rememberSaveable { mutableStateOf(expiry.toFloat()) }
-
-    Dialog(
-        onDismiss = onDismiss,
-        title = stringResource(id = R.string.paymentsettings_expiry_dialog_title),
-        buttons = {
-            Button(onClick = onDismiss, text = stringResource(id = R.string.btn_cancel))
-            Button(
-                onClick = { onConfirm(paymentExpiry) },
-                text = stringResource(id = R.string.btn_ok)
-            )
-        }
-    ) {
-        Column(Modifier.padding(horizontal = 24.dp)) {
-            Text(text = stringResource(id = R.string.paymentsettings_expiry_dialog_description))
-            Spacer(Modifier.height(16.dp))
-            Slider(
-                value = paymentExpiry,
-                onValueChange = { paymentExpiry = it },
-                valueRange = 604800f..1814400f,
-                steps = 1,
-            )
-            Row {
-                Text(
-                    text = stringResource(id = R.string.paymentsettings_expiry_one_week),
-                    style = MaterialTheme.typography.caption,
-                    textAlign = TextAlign.Start,
-                    modifier = Modifier.weight(1f)
-                )
-                Text(
-                    text = stringResource(id = R.string.paymentsettings_expiry_two_weeks),
-                    style = MaterialTheme.typography.caption,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.weight(1f)
-                )
-                Text(
-                    text = stringResource(id = R.string.paymentsettings_expiry_three_weeks),
-                    style = MaterialTheme.typography.caption,
-                    textAlign = TextAlign.End,
-                    modifier = Modifier.weight(1f)
-                )
+private fun Bolt11ExpiryPreference() {
+    val scope = rememberCoroutineScope()
+    val userPrefs = userPrefs
+    val preferences = listOf(
+        PreferenceItem(item = 1.hours.inWholeSeconds, title = stringResource(id = R.string.paymentsettings_expiry_one_hour)),
+        PreferenceItem(item = 1.days.inWholeSeconds, title = stringResource(id = R.string.paymentsettings_expiry_one_day)),
+        PreferenceItem(item = 7.days.inWholeSeconds, title = stringResource(id = R.string.paymentsettings_expiry_one_week)),
+        PreferenceItem(item = 14.days.inWholeSeconds, title = stringResource(id = R.string.paymentsettings_expiry_two_weeks)),
+        PreferenceItem(item = 21.days.inWholeSeconds, title = stringResource(id = R.string.paymentsettings_expiry_three_weeks)),
+    )
+    val expiry = userPrefs.getInvoiceDefaultExpiry.collectAsState(initial = null)
+    expiry.value?.let { expiry ->
+        ListPreferenceButton(
+            title = stringResource(id = R.string.paymentsettings_expiry_title),
+            subtitle = {
+                Text(text = when (expiry) {
+                    1.hours.inWholeSeconds -> stringResource(id = R.string.paymentsettings_expiry_one_hour)
+                    1.days.inWholeSeconds -> stringResource(id = R.string.paymentsettings_expiry_one_day)
+                    7.days.inWholeSeconds -> stringResource(id = R.string.paymentsettings_expiry_one_week)
+                    14.days.inWholeSeconds -> stringResource(id = R.string.paymentsettings_expiry_two_weeks)
+                    21.days.inWholeSeconds -> stringResource(id = R.string.paymentsettings_expiry_three_weeks)
+                    else -> stringResource(id = R.string.paymentsettings_expiry_value, NumberFormat.getInstance().format(expiry))
+                })
+            },
+            selectedItem = expiry,
+            preferences = preferences,
+            enabled = true,
+            onPreferenceSubmit = {
+                scope.launch {
+                    userPrefs.saveInvoiceDefaultExpiry(it.item)
+                }
             }
-        }
+        )
     }
 }
 

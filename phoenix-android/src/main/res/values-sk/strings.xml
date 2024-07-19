@@ -654,7 +654,9 @@
     <string name="paymentsettings_expiry_title">Platnosť faktúry</string>
     <string name="paymentsettings_expiry_dialog_title">Platnosť faktúry</string>
     <string name="paymentsettings_expiry_dialog_description">Vytvorené faktúry sú po tejto lehote neaktuálne. Predvolená hodnota je 1 týždeň.</string>
-    <string name="paymentsettings_expiry_one_week">1 týždeň</string>
+    <string name="paymentsettings_expiry_one_hour">1 hodina</string>
+    <string name="paymentsettings_expiry_one_day">1 deň</string>
+    <string name="paymentsettings_expiry_one_week">1 týždeň (predvolená)</string>
     <string name="paymentsettings_expiry_two_weeks">2 týždne</string>
     <string name="paymentsettings_expiry_three_weeks">3 týždne</string>
     <string name="paymentsettings_expiry_value">%1$s sekúnd</string>

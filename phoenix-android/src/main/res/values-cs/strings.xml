@@ -604,7 +604,9 @@
     <string name="paymentsettings_expiry_title">Platnost faktury</string>
     <string name="paymentsettings_expiry_dialog_title">Platnost faktury</string>
     <string name="paymentsettings_expiry_dialog_description">Vytvořené faktury jsou po této prodlevě neaktuální. Výchozí hodnota je 1 týden.</string>
-    <string name="paymentsettings_expiry_one_week">1 týden</string>
+    <string name="paymentsettings_expiry_one_hour">1 hodina</string>
+    <string name="paymentsettings_expiry_one_day">1 den</string>
+    <string name="paymentsettings_expiry_one_week">1 týden (výchozí)</string>
     <string name="paymentsettings_expiry_two_weeks">2 týdny</string>
     <string name="paymentsettings_expiry_three_weeks">3 týdny</string>
     <string name="paymentsettings_expiry_value">%1$s sekund</string>
