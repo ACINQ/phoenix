@@ -13,6 +13,8 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 	@Binding var paymentInfo: WalletPaymentInfo
 	@Binding var showOriginalFiatValue: Bool
 	
+	let showContactView: (_ contact: ContactInfo) -> Void
+	
 	// <InfoGridView Protocol>
 	let minKeyColumnWidth: CGFloat = 50
 	let maxKeyColumnWidth: CGFloat = 200
@@ -334,12 +336,15 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 						ContactPhoto(fileName: contact.photoUri, size: 32)
 						Text(contact.name)
 					} // <HStack>
+					.onTapGesture {
+						showContactView(contact)
+					}
 					
 				} else {
 					
 					VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
 						Text("Unknown")
-						if paymentInfo.payment.isIncoming() && paymentInfo.attachedMessage() != nil {
+						if paymentInfo.attachedMessage() != nil {
 							Text("Be careful with messages from unknown sources")
 								.foregroundColor(.secondary)
 								.font(.subheadline)
@@ -373,6 +378,9 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 					ContactPhoto(fileName: contact.photoUri, size: 32)
 					Text(contact.name)
 				} // <HStack>
+				.onTapGesture {
+					showContactView(contact)
+				}
 				
 			} // </InfoGridRow>
 		}

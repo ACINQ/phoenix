@@ -205,7 +205,12 @@ struct ContactsList: View {
 		
 		dismissKeyboardIfVisible()
 		smartModalState.display(dismissable: false) {
-			ManageContactSheet(offer: nil, contact: item, contactUpdated: { _ in })
+			ManageContact(
+				location: .smartModal,
+				offer: nil,
+				contact: item,
+				contactUpdated: { _ in }
+			)
 		}
 	}
 	

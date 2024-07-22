@@ -1,7 +1,7 @@
 import SwiftUI
 import PhoenixShared
 
-fileprivate let filename = "ManageContactSheet"
+fileprivate let filename = "ManageContact"
 #if DEBUG && true
 fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
@@ -17,20 +17,27 @@ struct OfferRow: Identifiable {
 	}
 }
 
-struct ManageContactSheet: View {
+fileprivate let IMG_SIZE: CGFloat = 150
+fileprivate let DEFAULT_TRUSTED: Bool = true
+
+struct ManageContact: View {
+	
+	enum Location {
+		case smartModal
+		case sheet
+		case embedded
+	}
+	
+	let location: Location
 	
 	let offer: Lightning_kmpOfferTypesOffer?
-	
 	let contact: ContactInfo?
 	let contactUpdated: (ContactInfo?) -> Void
 	let isNewContact: Bool
 	
-	let IMG_SIZE: CGFloat = 150
-	
 	@State var name: String
 	@State var trustedContact: Bool
 	@State var pickerResult: PickerResult?
-	@State var pickerResultIsPrepped: Bool = false
 	@State var doNotUseDiskImage: Bool = false
 	
 	@State var showImageOptions: Bool = false
@@ -59,23 +66,29 @@ struct ManageContactSheet: View {
 	@StateObject var toast = Toast()
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
+	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	@EnvironmentObject var deviceInfo: DeviceInfo
 	@EnvironmentObject var smartModalState: SmartModalState
 	
+	// --------------------------------------------------
+	// MARK: Init
+	// --------------------------------------------------
+	
 	init(
+		location: Location,
 		offer: Lightning_kmpOfferTypesOffer?,
 		contact: ContactInfo?,
 		contactUpdated: @escaping (ContactInfo?) -> Void
 	) {
-		
+		self.location = location
 		self.offer = offer
 		self.contact = contact
 		self.contactUpdated = contactUpdated
 		self.isNewContact = (contact == nil)
 		
 		self._name = State(initialValue: contact?.name ?? "")
-		self._trustedContact = State(initialValue: contact?.useOfferKey ?? true)
+		self._trustedContact = State(initialValue: contact?.useOfferKey ?? DEFAULT_TRUSTED)
 	}
 	
 	// --------------------------------------------------
@@ -85,10 +98,34 @@ struct ManageContactSheet: View {
 	@ViewBuilder
 	var body: some View {
 		
+		switch location {
+		case .smartModal:
+			main()
+			
+		case .sheet:
+			main()
+				.navigationBarHidden(true)
+			
+		case .embedded:
+			main()
+				.navigationTitle("Edit Contact")
+				.navigationBarTitleDisplayMode(.inline)
+				.navigationBarBackButtonHidden(true)
+				.navigationBarItems(leading: header_saveButton())
+				.background(
+					Color.primaryBackground.ignoresSafeArea(.all, edges: .bottom)
+				)
+		}
+	}
+	
+	@ViewBuilder
+	func main() -> some View {
+		
 		ZStack(alignment: Alignment.center) {
 			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 				header()
 				content()
+				footer()
 			}
 			toast.view()
 		} // </ZStack>
@@ -109,6 +146,31 @@ struct ManageContactSheet: View {
 	
 	@ViewBuilder
 	func header() -> some View {
+		
+		Group {
+			switch location {
+			case .smartModal:
+				header_smartModal()
+				
+			case .sheet:
+				header_sheet()
+				
+			case .embedded:
+				header_embedded()
+			}
+		}
+		.confirmationDialog("Delete contact?",
+			isPresented: $showDeleteContactConfirmationDialog,
+			titleVisibility: Visibility.hidden
+		) {
+			Button("Delete contact", role: ButtonRole.destructive) {
+				deleteContact()
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func header_smartModal() -> some View {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 0) {
 			Group {
@@ -132,6 +194,7 @@ struct ManageContactSheet: View {
 						.font(.title2)
 						.foregroundColor(.appNegative)
 				}
+				.disabled(isSaving)
 				.accessibilityLabel("Delete contact")
 			}
 		}
@@ -142,38 +205,73 @@ struct ManageContactSheet: View {
 				.cornerRadius(15, corners: [.topLeft, .topRight])
 		)
 		.padding(.bottom, 4)
-		.confirmationDialog("Delete contact?",
-			isPresented: $showDeleteContactConfirmationDialog,
-			titleVisibility: Visibility.hidden
-		) {
-			Button("Delete contact", role: ButtonRole.destructive) {
-				deleteContact()
+	}
+	
+	@ViewBuilder
+	func header_sheet() -> some View {
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+			header_saveButton()
+			Spacer()
+			if !isNewContact {
+				Button {
+					showDeleteContactConfirmationDialog = true
+				} label: {
+					Image(systemName: "trash.fill")
+						.imageScale(.medium)
+						.font(.title2)
+						.foregroundColor(.appNegative)
+				}
+				.disabled(isSaving)
+				.accessibilityLabel("Delete contact")
 			}
 		}
+		.padding()
+	}
+	
+	@ViewBuilder
+	func header_embedded() -> some View {
+		
+		Spacer()
+			.frame(height: 25)
+	}
+	
+	@ViewBuilder
+	func header_saveButton() -> some View {
+		
+		Button {
+			saveButtonTapped()
+		} label: {
+			HStack(alignment: .center, spacing: 4) {
+				Image(systemName: "chevron.backward")
+					.imageScale(.medium)
+					.font(.headline.weight(.semibold))
+				if hasChanges() {
+					Text("Save")
+						.font(.title3)
+				}
+			}
+		}
+		.disabled(isSaving)
 	}
 	
 	@ViewBuilder
 	func content() -> some View {
 		
-		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-			ScrollView {
-				VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-					
-					content_image()
-					content_name()
-					content_trusted()
-					if showOffers {
-						content_offers()
-					}
-				} // </VStack>
-				.padding()
-			} // </ScrollView>
-			.frame(maxHeight: scrollViewMaxHeight)
-			.scrollingDismissesKeyboard(.interactively)
-			
-			content_buttons()
-				.padding()
-		} // </VStack>
+		ScrollView {
+			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+				
+				content_image()
+				content_name()
+				content_trusted()
+				if showOffers {
+					content_offers()
+				}
+			} // </VStack>
+			.padding()
+		} // </ScrollView>
+		.frame(maxHeight: scrollViewMaxHeight)
+		.scrollingDismissesKeyboard(.interactively)
 	}
 	
 	@ViewBuilder
@@ -350,12 +448,22 @@ struct ManageContactSheet: View {
 	}
 	
 	@ViewBuilder
-	func content_buttons() -> some View {
+	func footer() -> some View {
+		
+		if case .smartModal = location {
+			footer_smartModal()
+		} else {
+			footer_navStack()
+		}
+	}
+	
+	@ViewBuilder
+	func footer_smartModal() -> some View {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 0) {
 			
 			Button {
-				cancel()
+				cancelButtonTapped()
 			} label: {
 				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 2) {
 					Image(systemName: "xmark")
@@ -372,7 +480,7 @@ struct ManageContactSheet: View {
 			Spacer().frame(maxWidth: 16)
 			
 			Button {
-				saveContact()
+				saveButtonTapped()
 			} label: {
 				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 2) {
 					Image(systemName: "checkmark")
@@ -387,7 +495,23 @@ struct ManageContactSheet: View {
 			.disabled(isSaving || !hasName)
 			
 		} // </HStack>
+		.padding()
 		.assignMaxPreference(for: maxFooterButtonWidthReader.key, to: $maxFooterButtonWidth)
+	}
+	
+	@ViewBuilder
+	func footer_navStack() -> some View {
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+			Spacer()
+			Button {
+				discardButtonTapped()
+			} label: {
+				Text("Discard Changes")
+			}
+			.disabled(!hasChanges())
+		}
+		.padding()
 	}
 	
 	// --------------------------------------------------
@@ -403,10 +527,15 @@ struct ManageContactSheet: View {
 	}
 	
 	var scrollViewMaxHeight: CGFloat {
-		if deviceInfo.isShortHeight {
-			return CGFloat.infinity
+		
+		if case .smartModal = location {
+			if deviceInfo.isShortHeight {
+				return CGFloat.infinity
+			} else {
+				return deviceInfo.windowSize.height * 0.6
+			}
 		} else {
-			return deviceInfo.windowSize.height * 0.6
+			return CGFloat.infinity
 		}
 	}
 	
@@ -474,6 +603,29 @@ struct ManageContactSheet: View {
 		return results
 	}
 	
+	func hasChanges() -> Bool {
+		
+		if let contact {
+			if name != contact.name {
+				return true
+			}
+			if pickerResult != nil {
+				return true
+			}
+			if doNotUseDiskImage {
+				return true
+			}
+			if trustedContact != contact.useOfferKey {
+				return true
+			}
+			
+			return false
+			
+		} else {
+			return true
+		}
+	}
+	
 	// --------------------------------------------------
 	// MARK: Notifications
 	// --------------------------------------------------
@@ -481,8 +633,17 @@ struct ManageContactSheet: View {
 	func onAppear() {
 		log.trace("onAppear()")
 		
-		smartModalState.onNextDidAppear {
-			log.trace("didAppear()")
+		switch location {
+		case .smartModal:
+			smartModalState.onNextDidAppear {
+				log.trace("didAppear()")
+				didAppear = true
+			}
+			
+		case .sheet:
+			didAppear = true
+			
+		case .embedded:
 			didAppear = true
 		}
 	}
@@ -522,9 +683,29 @@ struct ManageContactSheet: View {
 		)
 	}
 	
-	func cancel() {
-		log.trace("cancel")
-		smartModalState.close()
+	func discardButtonTapped() {
+		log.trace("discardButtonTapped()")
+		
+		name = contact?.name ?? ""
+		pickerResult = nil
+		doNotUseDiskImage = false
+		trustedContact = contact?.useOfferKey ?? DEFAULT_TRUSTED
+	}
+	
+	func cancelButtonTapped() {
+		log.trace("cancelButtonTapped")
+		
+		close()
+	}
+	
+	func saveButtonTapped() {
+		log.trace("saveButtonTapped()")
+		
+		if hasChanges() {
+			saveContact()
+		} else {
+			close()
+		}
 	}
 	
 	func saveContact() {
@@ -593,7 +774,7 @@ struct ManageContactSheet: View {
 			
 			isSaving = false
 			if success {
-				smartModalState.close()
+				close()
 			}
 			if let updatedContact {
 				contactUpdated(updatedContact)
@@ -621,9 +802,22 @@ struct ManageContactSheet: View {
 			}
 			
 			isSaving = false
-			smartModalState.close()
+			close()
 			contactUpdated(nil)
 			
 		} // </Task>
+	}
+	
+	func close() {
+		log.trace("close()")
+		
+		switch location {
+		case .smartModal:
+			smartModalState.close()
+		case .sheet:
+			presentationMode.wrappedValue.dismiss()
+		case .embedded:
+			presentationMode.wrappedValue.dismiss()
+		}
 	}
 }

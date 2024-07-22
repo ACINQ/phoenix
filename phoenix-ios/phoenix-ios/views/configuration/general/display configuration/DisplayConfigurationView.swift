@@ -232,21 +232,3 @@ fileprivate struct DisplayConfigurationList: View {
 		}
 	}
 }
-
-// MARK: -
-
-class DisplayConfigurationView_Previews: PreviewProvider {
-
-	static var previews: some View {
-		
-		DisplayConfigurationView()
-			.preferredColorScheme(.light)
-			.previewDevice("iPhone 11")
-			.environmentObject(CurrencyPrefs.mockEUR())
-		
-		DisplayConfigurationView()
-			.preferredColorScheme(.dark)
-			.previewDevice("iPhone 11")
-			.environmentObject(CurrencyPrefs.mockEUR())
-	}
-}

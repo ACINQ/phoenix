@@ -1476,7 +1476,8 @@ struct ValidateView: View {
 		
 		dismissKeyboardIfVisible()
 		smartModalState.display(dismissable: false) {
-			ManageContactSheet(
+			ManageContact(
+				location: .smartModal,
 				offer: offer,
 				contact: contact,
 				contactUpdated: contactUpdated
