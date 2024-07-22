@@ -37,45 +37,66 @@ class PickerResult: Equatable {
 	
 	func compress() async -> Data? {
 		
-		if let existingFile = file {
-			return PickerResult.compressWithHeic(
-				image: image,
-				compressionQualities: [1.0, 0.98, 0.94, 0.9],
-				targetFileSize: existingFile.size
-			)
-			
-		} else {
-			return PickerResult.compressWithHeic(image: image, compressionQuality: 0.98)
-		}
-	}
-	
-	private static func compressWithHeic(
-		image: UIImage,
-		compressionQualities: [CGFloat],
-		targetFileSize: Int
-	) -> Data? {
-		log.trace("compressWithHeic(:::): \(compressionQualities)")
-		
-		for compressionQuality in compressionQualities {
-			if let data = compressWithHeic(image: image, compressionQuality: compressionQuality) {
-				let compressedFileSize = data.count
-				if compressedFileSize < targetFileSize {
-					log.debug("compressedFileSize(\(compressedFileSize)) < targetFileSize(\(targetFileSize))")
-					return data
-				} else {
-					log.debug("compressedFileSize(\(compressedFileSize)) >= targetFileSize(\(targetFileSize))")
-				}
+		let isSmallerThanExistingFile = { (data: Data) -> Bool in
+			if let existingFile = self.file {
+				return data.count < existingFile.size
+			} else {
+				return true
 			}
+		}
+		
+		if let result = compressWithHeic_optionA(), isSmallerThanExistingFile(result) {
+			return result
+		}
+		if let result = compressWithHeic_optionB(), isSmallerThanExistingFile(result) {
+			return result
+		}
+		if let result = compressWithJpeg(), isSmallerThanExistingFile(result) {
+			return result
 		}
 		
 		return nil
 	}
 	
-	private static func compressWithHeic(
-		image: UIImage,
-		compressionQuality: CGFloat
-	) -> Data? {
-		log.trace("compressWithHeic(::) \(compressionQuality)")
+	private func compressWithHeic_optionA() -> Data? {
+		
+		// UIImage has a method `heicData` that just works.
+		// Unfortunately it's only available on iOS 17.
+		// And it doesn't take a compressionQuality parameter as you would expect.
+		//
+		// But it does actually work.
+		// Unlike Apple's buggy and/or undocumented low-level stuff.
+		
+		var compressedImageData: Data? = nil
+		if #available(iOS 17, *) {
+			compressedImageData = image.heicData()
+		}
+		
+		return compressedImageData
+	}
+	
+	private func compressWithHeic_optionB() -> Data? {
+		
+		// We can use CGImageDestination to create the HEIC file.
+		// But it only seems to work if the image isn't rotated.
+		//
+		// Details:
+		// When you take a photo on the iPhone, the raw data (rows & columns of color information)
+		// is always stored in the same orientation, according to the hardware of the camera.
+		// So how does rotation work ? Via metadata.
+		// A `rotation` flag is stored in the image's metadata. This is later read by software,
+		// which automatically rotates the image for display on the screen.
+		//
+		// The problem we have is that we're unable to properly set this orientation flag.
+		// You're supposed to be able to use the `kCGImageDestinationOrientation` option.
+		// But I've tried setting this flag a hundred different ways, and no matter what I do,
+		// the CGImageDestination code always writes a file with the orientation flag set to 1.
+		//
+		// So we're only going to use this option if the bug won't affect us.
+		
+		guard image.imageOrientation == .up else {
+			return nil
+		}
 		
 		let data = NSMutableData()
 		guard let imageDestination =
@@ -92,26 +113,23 @@ class PickerResult: Equatable {
 		}
 
 		let orientation: CGImagePropertyOrientation = image.imageOrientation.cgImageOrientation
-		log.debug("uiImageOrientation = \(image.imageOrientation.rawValue)")
-		log.debug("cgImageOrientation = \(orientation)")
-		
-//		let tiffOptions: NSDictionary = [
-//			kCGImagePropertyTIFFOrientation as String: NSNumber(value: orientation.rawValue)
-//		]
 		let options: NSDictionary = [
-			kCGImageDestinationLossyCompressionQuality as String: NSNumber(value: compressionQuality),
-			kCGImageDestinationOrientation as String: NSNumber(value: orientation.rawValue) // doesn't work ?!?
-//			kCGImagePropertyTIFFDictionary as String: tiffOptions
+			kCGImageDestinationLossyCompressionQuality as String: NSNumber(value: 0.98),
+			kCGImageDestinationOrientation as String: NSNumber(value: orientation.rawValue), // does NOT work
 		]
-//		CGImageDestinationSetProperties(imageDestination, options)
 		
-		CGImageDestinationAddImage(imageDestination, cgImage, options)
+		CGImageDestinationAddImageAndMetadata(imageDestination, cgImage, nil, options)
 		guard CGImageDestinationFinalize(imageDestination) else {
 			log.error("PickerResult.compressWithHeic: could not finalize")
 			return nil
 		}
 		
 		return data as Data
+	}
+	
+	private func compressWithJpeg() -> Data? {
+		
+		return image.jpegData(compressionQuality: 0.98)
 	}
 	
 	static func == (lhs: PickerResult, rhs: PickerResult) -> Bool {
