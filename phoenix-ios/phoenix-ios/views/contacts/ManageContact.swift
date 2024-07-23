@@ -42,6 +42,7 @@ struct ManageContact: View {
 	
 	@State var showImageOptions: Bool = false
 	@State var isSaving: Bool = false
+	@State var showDiscardChangesConfirmationDialog: Bool = false
 	@State var showDeleteContactConfirmationDialog: Bool = false
 	
 	@State var showingOffers: Bool = false
@@ -111,7 +112,7 @@ struct ManageContact: View {
 				.navigationTitle("Edit Contact")
 				.navigationBarTitleDisplayMode(.inline)
 				.navigationBarBackButtonHidden(true)
-				.navigationBarItems(leading: header_saveButton())
+				.navigationBarItems(leading: header_backButton(), trailing: header_trailingButtons())
 				.background(
 					Color.primaryBackground.ignoresSafeArea(.all, edges: .bottom)
 				)
@@ -157,6 +158,14 @@ struct ManageContact: View {
 				
 			case .embedded:
 				header_embedded()
+			}
+		}
+		.confirmationDialog("Discard changes?",
+			isPresented: $showDiscardChangesConfirmationDialog,
+			titleVisibility: Visibility.hidden
+		) {
+			Button("Discard changes", role: ButtonRole.destructive) {
+				discardChanges()
 			}
 		}
 		.confirmationDialog("Delete contact?",
@@ -211,20 +220,9 @@ struct ManageContact: View {
 	func header_sheet() -> some View {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 0) {
-			header_saveButton()
+			header_backButton()
 			Spacer()
-			if !isNewContact {
-				Button {
-					showDeleteContactConfirmationDialog = true
-				} label: {
-					Image(systemName: "trash.fill")
-						.imageScale(.medium)
-						.font(.title2)
-						.foregroundColor(.appNegative)
-				}
-				.disabled(isSaving)
-				.accessibilityLabel("Delete contact")
-			}
+			header_trailingButtons()
 		}
 		.padding()
 	}
@@ -237,22 +235,55 @@ struct ManageContact: View {
 	}
 	
 	@ViewBuilder
-	func header_saveButton() -> some View {
+	func header_backButton() -> some View {
 		
 		Button {
-			saveButtonTapped()
+			backButtonTapped()
 		} label: {
 			HStack(alignment: .center, spacing: 4) {
 				Image(systemName: "chevron.backward")
 					.imageScale(.medium)
 					.font(.headline.weight(.semibold))
 				if hasChanges() {
-					Text("Save")
-						.font(.title3)
+					if canSave() {
+						Text("Save").font(.title3)
+					} else {
+						Text("Cancel").font(.title3)
+					}
 				}
 			}
 		}
 		.disabled(isSaving)
+	}
+	
+	@ViewBuilder
+	func header_trailingButtons() -> some View {
+		
+		if !isNewContact {
+			HStack(alignment: VerticalAlignment.center, spacing: 10) {
+				Button {
+					showDiscardChangesConfirmationDialog = true
+				} label: {
+					Image(systemName: "eraser")
+						.imageScale(.medium)
+						.font(.title2)
+						.foregroundColor(.gray)
+				}
+				.disabled(!hasChanges())
+				.accessibilityLabel("Discard changes")
+				
+				Button {
+					showDeleteContactConfirmationDialog = true
+				} label: {
+					Image(systemName: "trash.fill")
+						.imageScale(.medium)
+						.font(.title2)
+						.foregroundColor(.appNegative)
+				}
+				.disabled(isSaving)
+				.accessibilityLabel("Delete contact")
+			}
+		}
 	}
 	
 	@ViewBuilder
@@ -303,7 +334,7 @@ struct ManageContact: View {
 			Spacer(minLength: 0)
 		}
 		.padding(.bottom)
-		.background(Color(UIColor.systemBackground))
+		.background(backgroundColor)
 		.zIndex(1)
 		.confirmationDialog("Contact Image",
 			isPresented: $showImageOptions,
@@ -347,12 +378,16 @@ struct ManageContact: View {
 			.isHidden(name == "")
 		}
 		.padding(.all, 8)
+		.background(
+			RoundedRectangle(cornerRadius: 8)
+				.fill(Color(UIColor.systemBackground))
+		)
 		.overlay(
 			RoundedRectangle(cornerRadius: 8)
 				.stroke(Color.textFieldBorder, lineWidth: 1)
 		)
-		.padding(.bottom)
-		.background(Color(UIColor.systemBackground))
+		.padding(.bottom, 30)
+		.background(backgroundColor)
 		.zIndex(1)
 	}
 	
@@ -383,8 +418,8 @@ struct ManageContact: View {
 			}
 			.foregroundColor(.secondary)
 		}
-		.padding(.bottom)
-		.background(Color(UIColor.systemBackground))
+		.padding(.bottom, 30)
+		.background(backgroundColor)
 		.zIndex(1)
 	}
 	
@@ -404,7 +439,7 @@ struct ManageContact: View {
 					verticalOffset: 8
 				)
 			} // </HStack>
-			.background(Color(UIColor.systemBackground))
+			.background(backgroundColor)
 			.contentShape(Rectangle()) // make Spacer area tappable
 			.onTapGesture {
 				withAnimation {
@@ -452,8 +487,6 @@ struct ManageContact: View {
 		
 		if case .smartModal = location {
 			footer_smartModal()
-		} else {
-			footer_navStack()
 		}
 	}
 	
@@ -492,26 +525,11 @@ struct ManageContact: View {
 			.buttonStyle(.bordered)
 			.buttonBorderShape(.capsule)
 			.foregroundColor(hasName ? Color.appPositive : Color.appPositive.opacity(0.6))
-			.disabled(isSaving || !hasName)
+			.disabled(isSaving || !canSave())
 			
 		} // </HStack>
 		.padding()
 		.assignMaxPreference(for: maxFooterButtonWidthReader.key, to: $maxFooterButtonWidth)
-	}
-	
-	@ViewBuilder
-	func footer_navStack() -> some View {
-		
-		HStack(alignment: VerticalAlignment.center, spacing: 0) {
-			Spacer()
-			Button {
-				discardButtonTapped()
-			} label: {
-				Text("Discard Changes")
-			}
-			.disabled(!hasChanges())
-		}
-		.padding()
 	}
 	
 	// --------------------------------------------------
@@ -536,6 +554,14 @@ struct ManageContact: View {
 			}
 		} else {
 			return CGFloat.infinity
+		}
+	}
+	
+	var backgroundColor: Color {
+		switch location {
+			case .smartModal : return Color(UIColor.systemBackground)
+			case .sheet      : return Color(UIColor.systemBackground)
+			case .embedded   : return Color.primaryBackground
 		}
 	}
 	
@@ -626,6 +652,16 @@ struct ManageContact: View {
 		}
 	}
 	
+	func canSave() -> Bool {
+		
+		if !hasName {
+			return false
+		}
+		// Todo: Check offer here
+		
+		return true
+	}
+	
 	// --------------------------------------------------
 	// MARK: Notifications
 	// --------------------------------------------------
@@ -683,15 +719,6 @@ struct ManageContact: View {
 		)
 	}
 	
-	func discardButtonTapped() {
-		log.trace("discardButtonTapped()")
-		
-		name = contact?.name ?? ""
-		pickerResult = nil
-		doNotUseDiskImage = false
-		trustedContact = contact?.useOfferKey ?? DEFAULT_TRUSTED
-	}
-	
 	func cancelButtonTapped() {
 		log.trace("cancelButtonTapped")
 		
@@ -706,6 +733,25 @@ struct ManageContact: View {
 		} else {
 			close()
 		}
+	}
+	
+	func backButtonTapped() {
+		log.trace("backButtonTapped()")
+		
+		if hasChanges() && canSave() {
+			saveContact()
+		} else {
+			close()
+		}
+	}
+	
+	func discardChanges() {
+		log.trace("discardChages()")
+		
+		name = contact?.name ?? ""
+		pickerResult = nil
+		doNotUseDiskImage = false
+		trustedContact = contact?.useOfferKey ?? DEFAULT_TRUSTED
 	}
 	
 	func saveContact() {

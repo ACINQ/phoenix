@@ -14168,6 +14168,9 @@
         }
       }
     },
+    "Discard changes" : {
+
+    },
     "Discard Changes" : {
       "localizations" : {
         "ar" : {
@@ -14207,6 +14210,9 @@
           }
         }
       }
+    },
+    "Discard changes?" : {
+
     },
     "Disconnected" : {
       "localizations" : {

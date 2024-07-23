@@ -16,6 +16,7 @@ struct ContactsList: View {
 	@State var searchText = ""
 	@State var filteredContacts: [ContactInfo]? = nil
 	
+	@State var selectedItem: ContactInfo? = nil
 	@State var pendingDelete: ContactInfo? = nil
 	
 	@EnvironmentObject var smartModalState: SmartModalState
@@ -27,9 +28,26 @@ struct ContactsList: View {
 	@ViewBuilder
 	var body: some View {
 		
-		content()
-			.navigationTitle("Address Book")
-			.navigationBarTitleDisplayMode(.inline)
+		ZStack {
+			
+			if #unavailable(iOS 16.0) {
+				NavigationLink(
+					destination: selectedItemView(),
+					isActive: selectedItemBinding()
+				) {
+					EmptyView()
+				}
+				.isDetailLink(false)
+			} // else: uses.navigationStackDestination()
+			
+			content()
+		}
+		.navigationStackDestination(isPresented: selectedItemBinding()) { // For iOS 16+
+			selectedItemView()
+		}
+		.navigationTitle("Address Book")
+		.navigationBarTitleDisplayMode(.inline)
+	//	.navigationBarItems(trailing: plusButton())
 	}
 	
 	@ViewBuilder
@@ -51,13 +69,13 @@ struct ContactsList: View {
 		List {
 			ForEach(visibleContacts) { item in
 				Button {
-					selectItem(item)
+					selectedItem = item
 				} label: {
 					row(item)
 				}
 				.swipeActions(allowsFullSwipe: false) {
 					Button {
-						selectItem(item)
+						selectedItem = item
 					} label: {
 						Label("Edit", systemImage: "square.and.pencil")
 					}
@@ -109,6 +127,25 @@ struct ContactsList: View {
 		.padding(.all, 4)
 	}
 	
+	@ViewBuilder
+	func selectedItemView() -> some View {
+		
+		if let selectedItem {
+			ManageContact(
+				location: .embedded,
+				offer: nil,
+				contact: selectedItem,
+				contactUpdated: { _ in }
+			)
+		} else {
+			EmptyView()
+		}
+	}
+	
+//	@ViewBuilder
+//	func plusButton() -> some View {
+//	}
+	
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
@@ -124,6 +161,14 @@ struct ContactsList: View {
 		}
 		
 		return filteredContacts.isEmpty && !sortedContacts.isEmpty
+	}
+	
+	func selectedItemBinding() -> Binding<Bool> {
+		
+		return Binding<Bool>(
+			get: { selectedItem != nil },
+			set: { if !$0 { selectedItem = nil }}
+		)
 	}
 	
 	func confirmationDialogBinding() -> Binding<Bool> {
@@ -197,20 +242,6 @@ struct ContactsList: View {
 			} catch {
 				log.error("contactsManager.deleteContact(): error: \(error)")
 			}
-		}
-	}
-	
-	func selectItem(_ item: ContactInfo) {
-		log.trace("selectItem: \(item.name)")
-		
-		dismissKeyboardIfVisible()
-		smartModalState.display(dismissable: false) {
-			ManageContact(
-				location: .smartModal,
-				offer: nil,
-				contact: item,
-				contactUpdated: { _ in }
-			)
 		}
 	}
 	
