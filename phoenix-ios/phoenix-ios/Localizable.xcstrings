@@ -8423,6 +8423,9 @@
         }
       }
     },
+    "Bolt12 offer:" : {
+
+    },
     "Bolt12 offers" : {
 
     },
@@ -15042,9 +15045,6 @@
     "Edit contact" : {
 
     },
-    "Edit Contact" : {
-
-    },
     "Edit Info" : {
       "comment" : "Navigation bar title",
       "localizations" : {
@@ -21548,6 +21548,9 @@
         }
       }
     },
+    "Invalid offer" : {
+
+    },
     "Invalid port. Valid range: [1 - 65535]" : {
       "localizations" : {
         "ar" : {
@@ -25349,6 +25352,9 @@
           }
         }
       }
+    },
+    "New contact" : {
+
     },
     "New inbound liquidity:" : {
       "localizations" : {

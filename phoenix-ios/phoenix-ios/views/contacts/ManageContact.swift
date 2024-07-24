@@ -37,16 +37,20 @@ struct ManageContact: View {
 	
 	@State var name: String
 	@State var trustedContact: Bool
+	@State var showImageOptions: Bool = false
 	@State var pickerResult: PickerResult?
 	@State var doNotUseDiskImage: Bool = false
 	
-	@State var showImageOptions: Bool = false
 	@State var isSaving: Bool = false
 	@State var showDiscardChangesConfirmationDialog: Bool = false
 	@State var showDeleteContactConfirmationDialog: Bool = false
 	
 	@State var showingOffers: Bool = false
 	@State var chevronPosition: AnimatedChevron.Position = .pointingDown
+	
+	@State var pastedOffer: String = ""
+	@State var pastedOfferIsInvalid: Bool = false
+	@State var parsedOffer: Lightning_kmpOfferTypesOffer? = nil
 	
 	@State var didAppear: Bool = false
 	
@@ -109,7 +113,7 @@ struct ManageContact: View {
 			
 		case .embedded:
 			main()
-				.navigationTitle("Edit Contact")
+				.navigationTitle(self.title)
 				.navigationBarTitleDisplayMode(.inline)
 				.navigationBarBackButtonHidden(true)
 				.navigationBarItems(leading: header_backButton(), trailing: header_trailingButtons())
@@ -182,15 +186,9 @@ struct ManageContact: View {
 	func header_smartModal() -> some View {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 0) {
-			Group {
-				if isNewContact {
-					Text("Add contact")
-				} else {
-					Text("Edit contact")
-				}
-			}
-			.font(.title3)
-			.accessibilityAddTraits(.isHeader)
+			Text(self.title)
+				.font(.title3)
+				.accessibilityAddTraits(.isHeader)
 			
 			Spacer(minLength: 0)
 			
@@ -238,7 +236,7 @@ struct ManageContact: View {
 	func header_backButton() -> some View {
 		
 		Button {
-			backButtonTapped()
+			saveButtonTapped()
 		} label: {
 			HStack(alignment: .center, spacing: 4) {
 				Image(systemName: "chevron.backward")
@@ -297,6 +295,9 @@ struct ManageContact: View {
 				content_trusted()
 				if showOffers {
 					content_offers()
+				}
+				if showPasteOffer {
+					content_pasteOffer()
 				}
 			} // </VStack>
 			.padding()
@@ -483,6 +484,43 @@ struct ManageContact: View {
 	}
 	
 	@ViewBuilder
+	func content_pasteOffer() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+			Text("Bolt12 offer:")
+				.padding(.bottom, 4)
+			
+			TextEditor(text: $pastedOffer)
+				.frame(minHeight: 80, maxHeight: 80)
+				.padding(.all, 8)
+				.background(
+					RoundedRectangle(cornerRadius: 8)
+						.fill(Color(UIColor.systemBackground))
+				)
+				.overlay(
+					RoundedRectangle(cornerRadius: 8)
+						.stroke(Color.textFieldBorder, lineWidth: 1)
+				)
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Spacer()
+				if pastedOfferIsInvalid {
+					Text("Invalid offer")
+						.font(.subheadline)
+						.foregroundColor(.appNegative)
+				} else {
+					Text(verbatim: " ")
+				}
+			}
+			
+		} // </VStack>
+		.padding(.bottom)
+		.onChange(of: pastedOffer) { _ in
+			pastedOfferChanged()
+		}
+	}
+	
+	@ViewBuilder
 	func footer() -> some View {
 		
 		if case .smartModal = location {
@@ -542,6 +580,15 @@ struct ManageContact: View {
 			get: { activeSheet != nil },
 			set: { if !$0 { activeSheet = nil }}
 		)
+	}
+	
+	var title: String {
+		
+		if isNewContact {
+			return String(localized: "New contact")
+		} else {
+			return String(localized: "Edit contact")
+		}
 	}
 	
 	var scrollViewMaxHeight: CGFloat {
@@ -606,6 +653,11 @@ struct ManageContact: View {
 		}
 	}
 	
+	var showPasteOffer: Bool {
+		
+		return (offer == nil) && (contact == nil)
+	}
+	
 	func offerRows() -> [OfferRow] {
 		
 		var offers = Set<String>()
@@ -657,7 +709,11 @@ struct ManageContact: View {
 		if !hasName {
 			return false
 		}
-		// Todo: Check offer here
+		if contact == nil {
+			if offer == nil && parsedOffer == nil {
+				return false
+			}
+		}
 		
 		return true
 	}
@@ -719,6 +775,25 @@ struct ManageContact: View {
 		)
 	}
 	
+	func pastedOfferChanged() {
+		log.trace("pastedOfferChanged()")
+		
+		let text = pastedOffer.trimmingCharacters(in: .whitespacesAndNewlines)
+		if text.isEmpty {
+			pastedOfferIsInvalid = true
+		} else {
+			let result: Bitcoin_kmpTry<Lightning_kmpOfferTypesOffer> =
+				Lightning_kmpOfferTypesOffer.companion.decode(s: text)
+			
+			if result.isFailure {
+				pastedOfferIsInvalid = true
+			} else {
+				pastedOfferIsInvalid = false
+				parsedOffer = result.get()
+			}
+		}
+	}
+	
 	func cancelButtonTapped() {
 		log.trace("cancelButtonTapped")
 		
@@ -727,16 +802,6 @@ struct ManageContact: View {
 	
 	func saveButtonTapped() {
 		log.trace("saveButtonTapped()")
-		
-		if hasChanges() {
-			saveContact()
-		} else {
-			close()
-		}
-	}
-	
-	func backButtonTapped() {
-		log.trace("backButtonTapped()")
 		
 		if hasChanges() && canSave() {
 			saveContact()
@@ -766,7 +831,7 @@ struct ManageContact: View {
 				let updatedContactName = trimmedName
 				let updatedUseOfferKey = trustedContact
 				
-				let oldPhotoName: String? = contact?.photoUri
+				var oldPhotoName: String? = contact?.photoUri
 				var newPhotoName: String? = nil
 				
 				if let pickerResult {
@@ -779,26 +844,22 @@ struct ManageContact: View {
 				log.debug("newPhotoName: \(newPhotoName ?? "<nil>")")
 				
 				let contactsManager = Biz.business.contactsManager
-				if let offer {
-					let existingContact = try await contactsManager.getContactForOffer(offer: offer)
-					if let existingContact {
-						updatedContact = try await contactsManager.updateContact(
-							contactId: existingContact.uuid,
-							name: updatedContactName,
-							photoUri: newPhotoName,
-							useOfferKey: updatedUseOfferKey,
-							offers: existingContact.offers
-						)
-						
-					} else {
-						updatedContact = try await contactsManager.saveNewContact(
-							name: updatedContactName,
-							photoUri: newPhotoName,
-							useOfferKey: updatedUseOfferKey,
-							offer: offer
-						)
-					}
-				} else if let existingContact = contact {
+				
+				// There are 3 ways the ManageContact view is initialized:
+				//
+				// 1. With a non-nil contact, and possibly a non-nil offer.
+				//    In this case we're updating the contact.
+				//    The given offer may be highlighted in the UI.
+				//
+				// 2. With a nil contact, and a non-nil offer.
+				//    In this case the user wishes to create a new contact
+				//    associated with the given offer.
+				//
+				// 3. With a nil contact, and a nil offer.
+				//    In this case, the user must paste a Bolt12 offer.
+				//    And we'll create the new contact with the pasted offer.
+				
+				if let existingContact = contact {
 					updatedContact = try await contactsManager.updateContact(
 						contactId: existingContact.uuid,
 						name: updatedContactName,
@@ -806,6 +867,30 @@ struct ManageContact: View {
 						useOfferKey: updatedUseOfferKey,
 						offers: existingContact.offers
 					)
+				} else if let newOffer = offer ?? parsedOffer {
+					let existingContact = try await contactsManager.getContactForOffer(offer: newOffer)
+					if let existingContact {
+						// The newOffer is actually NOT new.
+						// It already exists in the database and is attached to a contact.
+						// For now, we will update the details of that contact.
+						// In the future, it would be better to display some kind of error message,
+						// and then update the UI with this existing contact.
+						updatedContact = try await contactsManager.updateContact(
+							contactId: existingContact.uuid,
+							name: updatedContactName,
+							photoUri: newPhotoName,
+							useOfferKey: updatedUseOfferKey,
+							offers: existingContact.offers
+						)
+						oldPhotoName = existingContact.photoUri
+					} else {
+						updatedContact = try await contactsManager.saveNewContact(
+							name: updatedContactName,
+							photoUri: newPhotoName,
+							useOfferKey: updatedUseOfferKey,
+							offer: newOffer
+						)
+					}
 				}
 				
 				if let oldPhotoName, oldPhotoName != newPhotoName {

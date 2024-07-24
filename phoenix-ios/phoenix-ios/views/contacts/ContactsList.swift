@@ -16,6 +16,7 @@ struct ContactsList: View {
 	@State var searchText = ""
 	@State var filteredContacts: [ContactInfo]? = nil
 	
+	@State var addItem: Bool = false
 	@State var selectedItem: ContactInfo? = nil
 	@State var pendingDelete: ContactInfo? = nil
 	
@@ -47,7 +48,7 @@ struct ContactsList: View {
 		}
 		.navigationTitle("Address Book")
 		.navigationBarTitleDisplayMode(.inline)
-	//	.navigationBarItems(trailing: plusButton())
+		.navigationBarItems(trailing: plusButton())
 	}
 	
 	@ViewBuilder
@@ -137,14 +138,27 @@ struct ContactsList: View {
 				contact: selectedItem,
 				contactUpdated: { _ in }
 			)
+		} else if addItem {
+			ManageContact(
+				location: .embedded,
+				offer: nil,
+				contact: nil,
+				contactUpdated: { _ in }
+			)
 		} else {
 			EmptyView()
 		}
 	}
 	
-//	@ViewBuilder
-//	func plusButton() -> some View {
-//	}
+	@ViewBuilder
+	func plusButton() -> some View {
+		
+		Button {
+			addItem = true
+		} label: {
+			Image(systemName: "plus")
+		}
+	}
 	
 	// --------------------------------------------------
 	// MARK: View Helpers
@@ -166,8 +180,8 @@ struct ContactsList: View {
 	func selectedItemBinding() -> Binding<Bool> {
 		
 		return Binding<Bool>(
-			get: { selectedItem != nil },
-			set: { if !$0 { selectedItem = nil }}
+			get: { selectedItem != nil || addItem },
+			set: { if !$0 { selectedItem = nil; addItem = false }}
 		)
 	}
 	
