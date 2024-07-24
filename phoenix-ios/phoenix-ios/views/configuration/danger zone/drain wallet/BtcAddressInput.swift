@@ -116,7 +116,7 @@ struct BtcAddressInput: View {
 		let isScannedValue = textFieldValue == scannedValue
 		
 		let business = Biz.business
-		let parseResult = Parser.shared.readBitcoinAddress(chain: business.chain, input: textFieldValue)
+		let parseResult = Parser.shared.parseBip21Uri(chain: business.chain, input: textFieldValue)
 		
 		if let error = parseResult.left {
 			
