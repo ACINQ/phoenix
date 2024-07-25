@@ -160,7 +160,7 @@ struct PaymentDetails: View {
 		
 		if info.hasTip {
 			GridRowWrapper(gridWidth: gridWidth) {
-				titleColumn("tip", titleColor)
+				titleColumn("Tip", titleColor)
 			} valueColumn: {
 				VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
 					Text(verbatim: info.bitcoin_tip.string)
@@ -177,7 +177,7 @@ struct PaymentDetails: View {
 		
 		if info.hasLightningFee || info.isEmpty {
 			GridRowWrapper(gridWidth: gridWidth) {
-				titleColumn("lightning fee", titleColor)
+				titleColumn("Lightning fee", titleColor)
 			} valueColumn: {
 				VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
 					Text(verbatim: info.bitcoin_lightningFee.string)
@@ -194,7 +194,7 @@ struct PaymentDetails: View {
 		
 		if info.hasMinerFee {
 			GridRowWrapper(gridWidth: gridWidth) {
-				titleColumn("miner fee", titleColor)
+				titleColumn("Miner fee", titleColor)
 			} valueColumn: {
 				HStack(alignment: VerticalAlignment.center, spacing: 4) {
 					
@@ -221,7 +221,7 @@ struct PaymentDetails: View {
 		
 		if info.hasTip || info.hasLightningFee || info.hasMinerFee || info.isEmpty {
 			GridRowWrapper(gridWidth: gridWidth) {
-				titleColumn("total", titleColor)
+				titleColumn("Total", titleColor)
 			} valueColumn: {
 				VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
 					Text(verbatim: info.bitcoin_total.string)
@@ -243,7 +243,6 @@ struct PaymentDetails: View {
 	) -> some View {
 		
 		Text(title)
-			.textCase(.uppercase)
 			.foregroundColor(color)
 	}
 	
@@ -433,13 +432,13 @@ struct GridRowWrapper<KeyColumn: View, ValueColumn: View>: View {
 		GridRow(alignment: VerticalAlignment.firstTextBaseline) {
 			keyColumn
 				.font(.subheadline)
-				.frame(maxWidth: columnWidth, alignment: Alignment.topTrailing)
-				.gridCellAnchor(.topTrailing)
+				.frame(maxWidth: columnWidth, alignment: Alignment.trailing)
+				.gridColumnAlignment(HorizontalAlignment.trailing)
 			
 			valueColumn
 				.font(.subheadline)
 				.frame(minWidth: columnWidth, alignment: Alignment.leading)
-				.gridCellAnchor(.leading)
+				.gridColumnAlignment(HorizontalAlignment.leading)
 		}
 	}
 	

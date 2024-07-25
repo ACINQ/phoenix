@@ -22542,6 +22542,9 @@
         }
       }
     },
+    "Lightning fee" : {
+
+    },
     "Lightning fee amount: (percent), (amountBitcoin), ≈(amountFiat)" : {
       "comment" : "VoiceOver label: PaymentSummaryView",
       "localizations" : {
@@ -39180,6 +39183,9 @@
         }
       }
     },
+    "Tip" : {
+
+    },
     "Tip amount: (percent), (amountBitcoin), ≈(amountFiat)" : {
       "comment" : "VoiceOver label: PaymentSummaryView",
       "localizations" : {
@@ -39856,6 +39862,9 @@
           }
         }
       }
+    },
+    "Total" : {
+
     },
     "total amount" : {
       "comment" : "Label in DetailsView_IncomingPayment",
