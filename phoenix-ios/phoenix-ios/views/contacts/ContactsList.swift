@@ -46,7 +46,7 @@ struct ContactsList: View {
 		.navigationStackDestination(isPresented: selectedItemBinding()) { // For iOS 16+
 			selectedItemView()
 		}
-		.navigationTitle("Address Book")
+		.navigationTitle("Contacts")
 		.navigationBarTitleDisplayMode(.inline)
 		.navigationBarItems(trailing: plusButton())
 	}
