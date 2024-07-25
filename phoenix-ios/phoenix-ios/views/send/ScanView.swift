@@ -182,17 +182,17 @@ struct ScanView: View {
 				.padding(.horizontal, 20)
 				.padding(.top, 20)
 				.padding(.bottom, 12)
+				.accessibilitySortPriority(4)
+			
+			Divider()
+			
+			menuOption_contacts()
+				.padding(.horizontal, 20)
+				.padding(.vertical, 12)
 				.accessibilitySortPriority(3)
 			
 			if showingFullMenu || voiceOverEnabled {
 				VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-					
-					Divider()
-					
-					menuOption_contacts()
-						.padding(.horizontal, 20)
-						.padding(.vertical, 12)
-						.accessibilitySortPriority(2)
 					
 					Divider()
 					
