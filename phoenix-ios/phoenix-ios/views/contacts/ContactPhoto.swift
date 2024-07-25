@@ -76,7 +76,7 @@ fileprivate struct _ContactPhoto: View {
 				Image(systemName: "person.circle")
 					.resizable()
 					.aspectRatio(contentMode: .fit)
-					.foregroundColor(.gray)
+					.foregroundColor(Color(UIColor.systemGray3))
 			}
 		}
 		.frame(width: size, height: size)

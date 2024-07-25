@@ -5085,9 +5085,6 @@
         }
       }
     },
-    "Address Book" : {
-
-    },
     "address type" : {
       "comment" : "Label in DetailsView_IncomingPayment",
       "localizations" : {

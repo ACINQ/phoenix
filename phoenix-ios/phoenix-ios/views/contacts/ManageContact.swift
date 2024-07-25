@@ -322,7 +322,7 @@ struct ManageContact: View {
 					Image(systemName: "person.circle")
 						.resizable()
 						.aspectRatio(contentMode: .fit)
-						.foregroundColor(.gray)
+						.foregroundColor(Color(UIColor.systemGray3))
 				}
 			}
 			.frame(width: IMG_SIZE, height: IMG_SIZE)
