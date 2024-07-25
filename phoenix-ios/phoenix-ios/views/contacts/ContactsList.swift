@@ -94,7 +94,7 @@ struct ContactsList: View {
 			}
 		} // </List>
 		.listStyle(.plain)
-		.searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .automatic))
+		.searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
 		.confirmationDialog("Delete contact?",
 			isPresented: confirmationDialogBinding(),
 			titleVisibility: Visibility.automatic
