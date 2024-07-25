@@ -116,7 +116,7 @@ struct ManageContact: View {
 				.navigationTitle(self.title)
 				.navigationBarTitleDisplayMode(.inline)
 				.navigationBarBackButtonHidden(true)
-				.navigationBarItems(leading: header_backButton(), trailing: header_trailingButtons())
+				.navigationBarItems(leading: header_cancelButton(), trailing: header_doneButton())
 				.background(
 					Color.primaryBackground.ignoresSafeArea(.all, edges: .bottom)
 				)
@@ -169,7 +169,7 @@ struct ManageContact: View {
 			titleVisibility: Visibility.hidden
 		) {
 			Button("Discard changes", role: ButtonRole.destructive) {
-				discardChanges()
+				close()
 			}
 		}
 		.confirmationDialog("Delete contact?",
@@ -218,9 +218,9 @@ struct ManageContact: View {
 	func header_sheet() -> some View {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 0) {
-			header_backButton()
+			header_cancelButton()
 			Spacer()
-			header_trailingButtons()
+			header_doneButton()
 		}
 		.padding()
 	}
@@ -233,55 +233,27 @@ struct ManageContact: View {
 	}
 	
 	@ViewBuilder
-	func header_backButton() -> some View {
+	func header_cancelButton() -> some View {
+		
+		Button {
+			cancelButtonTapped()
+		} label: {
+			Text("Cancel").font(.headline)
+		}
+		.disabled(isSaving)
+		.accessibilityLabel("Discard changes")
+	}
+	
+	@ViewBuilder
+	func header_doneButton() -> some View {
 		
 		Button {
 			saveButtonTapped()
 		} label: {
-			HStack(alignment: .center, spacing: 4) {
-				Image(systemName: "chevron.backward")
-					.imageScale(.medium)
-					.font(.headline.weight(.semibold))
-				if hasChanges() {
-					if canSave() {
-						Text("Save").font(.title3)
-					} else {
-						Text("Cancel").font(.title3)
-					}
-				}
-			}
+			Text("Done").font(.headline)
 		}
-		.disabled(isSaving)
-	}
-	
-	@ViewBuilder
-	func header_trailingButtons() -> some View {
-		
-		if !isNewContact {
-			HStack(alignment: VerticalAlignment.center, spacing: 10) {
-				Button {
-					showDiscardChangesConfirmationDialog = true
-				} label: {
-					Image(systemName: "eraser")
-						.imageScale(.medium)
-						.font(.title2)
-						.foregroundColor(.gray)
-				}
-				.disabled(!hasChanges())
-				.accessibilityLabel("Discard changes")
-				
-				Button {
-					showDeleteContactConfirmationDialog = true
-				} label: {
-					Image(systemName: "trash.fill")
-						.imageScale(.medium)
-						.font(.title2)
-						.foregroundColor(.appNegative)
-				}
-				.disabled(isSaving)
-				.accessibilityLabel("Delete contact")
-			}
-		}
+		.disabled(!hasChanges || !canSave || isSaving)
+		.accessibilityLabel("Save changes")
 	}
 	
 	@ViewBuilder
@@ -480,7 +452,7 @@ struct ManageContact: View {
 			}
 			
 		} // </VStack>
-		.padding(.bottom)
+		.padding(.bottom, 30)
 	}
 	
 	@ViewBuilder
@@ -514,7 +486,7 @@ struct ManageContact: View {
 			}
 			
 		} // </VStack>
-		.padding(.bottom)
+		.padding(.bottom, 30)
 		.onChange(of: pastedOffer) { _ in
 			pastedOfferChanged()
 		}
@@ -525,6 +497,8 @@ struct ManageContact: View {
 		
 		if case .smartModal = location {
 			footer_smartModal()
+		} else {
+			footer_navStack()
 		}
 	}
 	
@@ -563,11 +537,33 @@ struct ManageContact: View {
 			.buttonStyle(.bordered)
 			.buttonBorderShape(.capsule)
 			.foregroundColor(hasName ? Color.appPositive : Color.appPositive.opacity(0.6))
-			.disabled(isSaving || !canSave())
+			.disabled(isSaving || !canSave)
 			
 		} // </HStack>
 		.padding()
 		.assignMaxPreference(for: maxFooterButtonWidthReader.key, to: $maxFooterButtonWidth)
+	}
+	
+	@ViewBuilder
+	func footer_navStack() -> some View {
+		
+		if !isNewContact {
+			HStack(alignment: VerticalAlignment.centerTopLine, spacing: 0) {
+				Spacer(minLength: 0)
+				
+				Button {
+					showDeleteContactConfirmationDialog = true
+				} label: {
+				//	Text("Delete contact")
+					Label("Delete contact", systemImage: "trash.fill")
+						.foregroundColor(.appNegative)
+				}
+				.disabled(isSaving)
+				
+				Spacer(minLength: 0)
+			} // </HStack>
+			.padding(.bottom)
+		}
 	}
 	
 	// --------------------------------------------------
@@ -658,30 +654,7 @@ struct ManageContact: View {
 		return (offer == nil) && (contact == nil)
 	}
 	
-	func offerRows() -> [OfferRow] {
-		
-		var offers = Set<String>()
-		var results = Array<OfferRow>()
-		
-		if let offer {
-			let offerStr = offer.encode()
-			offers.insert(offerStr)
-			results.append(OfferRow(offer: offerStr, isCurrentOffer: true))
-		}
-		if let contact {
-			for offer in contact.offers {
-				let offerStr = offer.encode()
-				if !offers.contains(offerStr) {
-					offers.insert(offerStr)
-					results.append(OfferRow(offer: offerStr, isCurrentOffer: false))
-				}
-			}
-		}
-		
-		return results
-	}
-	
-	func hasChanges() -> Bool {
+	var hasChanges: Bool {
 		
 		if let contact {
 			if name != contact.name {
@@ -704,7 +677,7 @@ struct ManageContact: View {
 		}
 	}
 	
-	func canSave() -> Bool {
+	var canSave: Bool {
 		
 		if !hasName {
 			return false
@@ -716,6 +689,29 @@ struct ManageContact: View {
 		}
 		
 		return true
+	}
+	
+	func offerRows() -> [OfferRow] {
+		
+		var offers = Set<String>()
+		var results = Array<OfferRow>()
+		
+		if let offer {
+			let offerStr = offer.encode()
+			offers.insert(offerStr)
+			results.append(OfferRow(offer: offerStr, isCurrentOffer: true))
+		}
+		if let contact {
+			for offer in contact.offers {
+				let offerStr = offer.encode()
+				if !offers.contains(offerStr) {
+					offers.insert(offerStr)
+					results.append(OfferRow(offer: offerStr, isCurrentOffer: false))
+				}
+			}
+		}
+		
+		return results
 	}
 	
 	// --------------------------------------------------
@@ -797,26 +793,21 @@ struct ManageContact: View {
 	func cancelButtonTapped() {
 		log.trace("cancelButtonTapped")
 		
-		close()
-	}
-	
-	func saveButtonTapped() {
-		log.trace("saveButtonTapped()")
-		
-		if hasChanges() && canSave() {
-			saveContact()
+		if hasChanges && canSave {
+			showDiscardChangesConfirmationDialog = true
 		} else {
 			close()
 		}
 	}
 	
-	func discardChanges() {
-		log.trace("discardChages()")
+	func saveButtonTapped() {
+		log.trace("saveButtonTapped()")
 		
-		name = contact?.name ?? ""
-		pickerResult = nil
-		doNotUseDiskImage = false
-		trustedContact = contact?.useOfferKey ?? DEFAULT_TRUSTED
+		if hasChanges && canSave {
+			saveContact()
+		} else {
+			close()
+		}
 	}
 	
 	func saveContact() {
