@@ -26,7 +26,7 @@ struct EditInfoView: View {
 	let maxNotesCount: Int = 280
 	@State var remainingNotesCount: Int
 	
-	@State var hasChanges = false
+	@State var showDiscardChangesConfirmationDialog: Bool = false
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
@@ -67,16 +67,16 @@ struct EditInfoView: View {
 		switch location {
 		case .sheet:
 			main()
-				.navigationTitle(NSLocalizedString("Edit Info", comment: "Navigation bar title"))
+				.navigationTitle(String(localized: "Edit Info", comment: "Navigation bar title"))
 				.navigationBarTitleDisplayMode(.inline)
 				.navigationBarHidden(true)
 			
 		case .embedded:
 			main()
-				.navigationTitle(NSLocalizedString("Edit Payment", comment: "Navigation bar title"))
+				.navigationTitle(String(localized: "Edit Info", comment: "Navigation bar title"))
 				.navigationBarTitleDisplayMode(.inline)
 				.navigationBarBackButtonHidden(true)
-				.navigationBarItems(leading: saveButton())
+				.navigationBarItems(leading: header_cancelButton(), trailing: header_doneButton())
 				.background(
 					Color.primaryBackground.ignoresSafeArea(.all, edges: .bottom)
 				)
@@ -87,23 +87,61 @@ struct EditInfoView: View {
 	func main() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			header()
+			ScrollView {
+				content()
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func header() -> some View {
 		
+		Group {
 			switch location {
 			case .sheet:
 				HStack(alignment: VerticalAlignment.center, spacing: 0) {
-					saveButton()
+					header_cancelButton()
 					Spacer()
+					header_doneButton()
 				}
 				.padding()
 				
 			case .embedded:
 				Spacer().frame(height: 25)
 			}
-			
-			ScrollView {
-				content()
+		}
+		.confirmationDialog("Discard changes?",
+			isPresented: $showDiscardChangesConfirmationDialog,
+			titleVisibility: Visibility.hidden
+		) {
+			Button("Discard changes", role: ButtonRole.destructive) {
+				close()
 			}
 		}
+	}
+	
+	@ViewBuilder
+	func header_cancelButton() -> some View {
+		
+		Button {
+			cancelButtonTapped()
+		} label: {
+			Text("Cancel").font(.headline)
+		}
+		.accessibilityLabel("Discard changes")
+	}
+	
+	@ViewBuilder
+	func header_doneButton() -> some View {
+		
+		Button {
+			saveButtonTapped()
+		} label: {
+			Text("Done").font(.headline)
+		}
+		.disabled(!hasChanges)
+		.accessibilityLabel("Save changes")
 	}
 	
 	@ViewBuilder
@@ -177,14 +215,6 @@ struct EditInfoView: View {
 			}
 			.padding([.leading, .trailing], 8)
 			.padding(.top, 4)
-			
-			Button {
-				discardButtonTapped()
-			} label: {
-				Text("Discard Changes")
-			}
-			.disabled(!hasChanges)
-			.padding(.top, 8)
 		}
 		.padding(.top)
 		.padding([.leading, .trailing])
@@ -196,31 +226,20 @@ struct EditInfoView: View {
 		}
 	}
 	
-	@ViewBuilder
-	func saveButton() -> some View {
-		
-		Button {
-			saveButtonTapped()
-		} label: {
-			HStack(alignment: .center, spacing: 4) {
-				Image(systemName: "chevron.backward")
-					.imageScale(.medium)
-					.font(.headline.weight(.semibold))
-				Text("Save")
-					.font(.title3)
-			}
-		}
-	}
-	
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
-	func updateHasChanges() {
+	var hasChanges: Bool {
 		
-		hasChanges =
-			descText != (originalDescText ?? "") ||
-			notesText != (originalNotesText ?? "")
+		if descText != (originalDescText ?? "") {
+			return true
+		}
+		if notesText != (originalNotesText ?? "") {
+			return true
+		}
+		
+		return false
 	}
 	
 	// --------------------------------------------------
@@ -231,35 +250,26 @@ struct EditInfoView: View {
 		log.trace("descTextDidChange()")
 		
 		remainingDescCount = maxDescCount - newText.count
-		updateHasChanges()
 	}
 	
 	func notesTextDidChange(_ newText: String) {
 		log.trace("notesTextDidChange()")
 		
 		remainingNotesCount = maxNotesCount - newText.count
-		updateHasChanges()
 	}
 	
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
 	
-	func discardButtonTapped() {
-		log.trace("discardButtonTapped()")
+	func cancelButtonTapped() {
+		log.trace("cancelButtonTapped()")
 		
-		let realizedDesc = originalDescText ?? ""
-		if realizedDesc == defaultDescText {
-			descText = ""
-			remainingDescCount = maxDescCount
+		if hasChanges {
+			showDiscardChangesConfirmationDialog = true
 		} else {
-			descText = realizedDesc
-			remainingDescCount = maxDescCount - realizedDesc.count
+			close()
 		}
-		
-		let realizedNotes = originalNotesText ?? ""
-		notesText = realizedNotes
-		remainingNotesCount = maxNotesCount - realizedNotes.count
 	}
 	
 	func saveButtonTapped() {
@@ -301,6 +311,12 @@ struct EditInfoView: View {
 		} else {
 			log.debug("no changes - nothing to save")
 		}
+		
+		close()
+	}
+	
+	func close() {
+		log.trace("close()")
 		
 		presentationMode.wrappedValue.dismiss()
 	}

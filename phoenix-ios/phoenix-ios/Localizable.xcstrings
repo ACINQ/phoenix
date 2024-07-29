@@ -14172,6 +14172,7 @@
 
     },
     "Discard Changes" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -15085,6 +15086,7 @@
     },
     "Edit Payment" : {
       "comment" : "Navigation bar title",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
