@@ -421,7 +421,7 @@ fileprivate struct ConfigurationList: View {
 			case .WalletCreationOptions : WalletCreationOptions()
 			case .DisplayConfiguration  : DisplayConfigurationView()
 			case .PaymentOptions        : PaymentOptionsView()
-			case .ContactsList          : ContactsList()
+			case .ContactsList          : ContactsList(popTo: popTo)
 			case .Notifications         : NotificationsView(location: .embedded)
 		// Fees
 			case .ChannelManagement     : LiquidityPolicyView()

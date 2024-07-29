@@ -24,11 +24,12 @@ struct ManageContact: View {
 	
 	enum Location {
 		case smartModal
-		case sheet
+		case sheet(closeAction: () -> Void)
 		case embedded
 	}
 	
 	let location: Location
+	let popTo: ((PopToDestination) -> Void)?
 	
 	let offer: Lightning_kmpOfferTypesOffer?
 	let contact: ContactInfo?
@@ -52,6 +53,15 @@ struct ManageContact: View {
 	@State var pastedOfferIsInvalid: Bool = false
 	@State var parsedOffer: Lightning_kmpOfferTypesOffer? = nil
 	
+	enum FooterType: Int {
+		case expanded_standard = 1
+		case expanded_squeezed = 2
+		case compact_standard = 3
+		case compact_squeezed = 4
+		case accessible = 5
+	}
+	@State var footerType: [DynamicTypeSize: FooterType] = [:]
+	
 	@State var didAppear: Bool = false
 	
 	enum ActiveSheet {
@@ -61,16 +71,24 @@ struct ManageContact: View {
 	@State var activeSheet: ActiveSheet? = nil
 	
 	// For the footer buttons: [cancel, save]
-	enum MaxFooterButtonWidth: Preference {}
-	let maxFooterButtonWidthReader = GeometryPreferenceReader(
-		key: AppendValue<MaxFooterButtonWidth>.self,
+	enum FooterButtonWidth: Preference {}
+	let footerButtonWidthReader = GeometryPreferenceReader(
+		key: AppendValue<FooterButtonWidth>.self,
 		value: { [$0.size.width] }
 	)
-	@State var maxFooterButtonWidth: CGFloat? = nil
+	@State var footerButtonWidth: CGFloat? = nil
+	
+	enum FooterButtonHeight: Preference {}
+	let footerButtonHeightReader = GeometryPreferenceReader(
+		key: AppendValue<FooterButtonHeight>.self,
+		value: { [$0.size.height] }
+	)
+	@State var footerButtonHeight: CGFloat? = nil
 	
 	@StateObject var toast = Toast()
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
+	@Environment(\.dynamicTypeSize) var dynamicTypeSize: DynamicTypeSize
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	@EnvironmentObject var deviceInfo: DeviceInfo
@@ -82,11 +100,13 @@ struct ManageContact: View {
 	
 	init(
 		location: Location,
+		popTo: ((PopToDestination) -> Void)?,
 		offer: Lightning_kmpOfferTypesOffer?,
 		contact: ContactInfo?,
 		contactUpdated: @escaping (ContactInfo?) -> Void
 	) {
 		self.location = location
+		self.popTo = popTo
 		self.offer = offer
 		self.contact = contact
 		self.contactUpdated = contactUpdated
@@ -514,8 +534,8 @@ struct ManageContact: View {
 					Image(systemName: "xmark")
 					Text("Cancel")
 				}
-				.frame(width: maxFooterButtonWidth)
-				.read(maxFooterButtonWidthReader)
+				.frame(width: footerButtonWidth)
+				.read(footerButtonWidthReader)
 			}
 			.buttonStyle(.bordered)
 			.buttonBorderShape(.capsule)
@@ -531,8 +551,8 @@ struct ManageContact: View {
 					Image(systemName: "checkmark")
 					Text("Save")
 				}
-				.frame(width: maxFooterButtonWidth)
-				.read(maxFooterButtonWidthReader)
+				.frame(width: footerButtonWidth)
+				.read(footerButtonWidthReader)
 			}
 			.buttonStyle(.bordered)
 			.buttonBorderShape(.capsule)
@@ -541,29 +561,154 @@ struct ManageContact: View {
 			
 		} // </HStack>
 		.padding()
-		.assignMaxPreference(for: maxFooterButtonWidthReader.key, to: $maxFooterButtonWidth)
+		.assignMaxPreference(for: footerButtonWidthReader.key, to: $footerButtonWidth)
 	}
 	
 	@ViewBuilder
 	func footer_navStack() -> some View {
 		
 		if !isNewContact {
-			HStack(alignment: VerticalAlignment.centerTopLine, spacing: 0) {
-				Spacer(minLength: 0)
-				
-				Button {
-					showDeleteContactConfirmationDialog = true
-				} label: {
-				//	Text("Delete contact")
-					Label("Delete contact", systemImage: "trash.fill")
-						.foregroundColor(.appNegative)
-				}
-				.disabled(isSaving)
-				
-				Spacer(minLength: 0)
-			} // </HStack>
-			.padding(.bottom)
+			let type = footerType[dynamicTypeSize] ?? FooterType.expanded_standard
+			switch type {
+			case .expanded_standard:
+				footer_navStack_standard(compact: false)
+			case .expanded_squeezed:
+				footer_navStack_squeezed(compact: false)
+			case .compact_standard:
+				footer_navStack_standard(compact: true)
+			case .compact_squeezed:
+				footer_navStack_squeezed(compact: true)
+			case .accessible:
+				footer_navStack_accessible()
+			}
 		}
+	}
+	
+	@ViewBuilder
+	func footer_navStack_standard(compact: Bool) -> some View {
+		
+		// We're making both buttons the same size.
+		//
+		// ---------------------------------
+		//  Delete Contact |  Send Payment
+		// ---------------------------------
+		//        ^                ^        < same size
+		
+		let type: FooterType = compact ? FooterType.compact_standard : FooterType.expanded_standard
+		
+		HStack(alignment: VerticalAlignment.centerTopLine, spacing: 10) {
+			
+			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+				footer_button_deleteContact(compact: compact, lineLimit: 1)
+			} wasTruncated: {
+				footerTruncationDetected(type, "delete")
+			}
+			.frame(minWidth: footerButtonWidth, alignment: Alignment.trailing)
+			.read(footerButtonWidthReader)
+			.read(footerButtonHeightReader)
+			
+			if let footerButtonHeight {
+				Divider().frame(height: footerButtonHeight)
+			}
+			
+			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+				footer_button_sendPayment(compact: compact, lineLimit: 1)
+			} wasTruncated: {
+				footerTruncationDetected(type, "pay")
+			}
+			.frame(minWidth: footerButtonWidth, alignment: Alignment.leading)
+			.read(footerButtonWidthReader)
+			.read(footerButtonHeightReader)
+			
+		} // </HStack>
+		.padding([.leading, .trailing, .bottom])
+		.assignMaxPreference(for: footerButtonWidthReader.key, to: $footerButtonWidth)
+		.assignMaxPreference(for: footerButtonHeightReader.key, to: $footerButtonHeight)
+	}
+	
+	@ViewBuilder
+	func footer_navStack_squeezed(compact: Bool) -> some View {
+		
+		// There's not enough space to make both buttons the same size.
+		// So we're just trying to put them on one line.
+		//
+		// -------------------------------
+		//  Delete Contact | Send Payment
+		// -------------------------------
+		//        ^                ^      < NOT the same size
+		
+		let type: FooterType = compact ? FooterType.compact_squeezed : FooterType.expanded_squeezed
+		
+		HStack(alignment: VerticalAlignment.centerTopLine, spacing: 10) {
+			
+			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+				footer_button_deleteContact(compact: compact, lineLimit: 1)
+			} wasTruncated: {
+				footerTruncationDetected(type, "delete")
+			}
+			.read(footerButtonHeightReader)
+			
+			if let footerButtonHeight {
+				Divider().frame(height: footerButtonHeight)
+			}
+			
+			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+				footer_button_sendPayment(compact: compact, lineLimit: 1)
+			} wasTruncated: {
+				footerTruncationDetected(type, "pay")
+			}
+			.read(footerButtonHeightReader)
+			
+		} // </HStack>
+		.padding([.leading, .trailing, .bottom])
+		.assignMaxPreference(for: footerButtonHeightReader.key, to: $footerButtonHeight)
+	}
+	
+	@ViewBuilder
+	func footer_navStack_accessible() -> some View {
+		
+		// There's a large font being used, and possibly a small screen too.
+		// Horizontal space is so tight that we can't get the 3 buttons on a single line.
+		//
+		// So we're going to put them on multiple lines.
+		//
+		// --------------
+		// Delete contact
+		//  Send payment
+		// --------------
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 16) {
+			footer_button_deleteContact(compact: true, lineLimit: nil)
+			footer_button_sendPayment(compact: true, lineLimit: nil)
+		}
+		.padding(.horizontal, 4) // allow content to be closer to edges
+		.padding(.bottom)
+	}
+	
+	@ViewBuilder
+	func footer_button_deleteContact(compact: Bool, lineLimit: Int?) -> some View {
+		
+		Button {
+			deleteButtonTapped()
+		} label: {
+			Label(compact ? "Delete" : "Delete contact", systemImage: "trash.fill")
+				.foregroundColor(.appNegative)
+				.lineLimit(lineLimit)
+		}
+		.disabled(isSaving)
+	}
+	
+	@ViewBuilder
+	func footer_button_sendPayment(compact: Bool, lineLimit: Int?) -> some View {
+		
+		Button {
+			payButtonTapped()
+		} label: {
+			Label(compact ? "Pay" : "Send payment", systemImage: "paperplane.fill")
+				.foregroundColor(.appPositive)
+				.lineLimit(lineLimit)
+		}
+		.disabled(hasChanges || isSaving)
 	}
 	
 	// --------------------------------------------------
@@ -740,6 +885,31 @@ struct ManageContact: View {
 	// MARK: Actions
 	// --------------------------------------------------
 	
+	func footerTruncationDetected(_ type: FooterType, _ identifier: String) {
+		
+		switch type {
+		case .expanded_standard:
+			log.debug("footerTruncationDetected: expanded_standard (\(identifier))")
+			footerType[dynamicTypeSize] = .expanded_squeezed
+		
+		case .expanded_squeezed:
+			log.debug("footerTruncationDetected: expanded_squeezed (\(identifier))")
+			footerType[dynamicTypeSize] = .compact_standard
+			
+		case .compact_standard:
+			log.debug("footerTruncationDetected: compact_standard (\(identifier))")
+			footerType[dynamicTypeSize] = .compact_squeezed
+			
+		case .compact_squeezed:
+			log.debug("footerTruncationDetected: compact_squeezed (\(identifier))")
+			footerType[dynamicTypeSize] = .accessible
+			
+		case .accessible:
+			log.debug("footerTruncationDetected: accessible (\(identifier))")
+			break
+		}
+	}
+	
 	func selectImageOptionSelected() {
 		log.trace("selectImageOptionSelected()")
 		
@@ -790,8 +960,33 @@ struct ManageContact: View {
 		}
 	}
 	
+	func deleteButtonTapped() {
+		log.trace("deleteButtonTapped()")
+		
+		showDeleteContactConfirmationDialog = true
+	}
+	
+	func payButtonTapped() {
+		log.trace("payButtonTapped()")
+		
+		if let contact, let offer = contact.mostRelevantOffer {
+			let offerString = offer.encode()
+			AppDelegate.get().externalLightningUrlPublisher.send(offerString)
+			
+			if let popTo {
+				popTo(.ConfigurationView(followedBy: nil))
+			}
+			
+			if case .sheet(let closeAction) = location {
+				closeAction()
+			} else {
+				close()
+			}
+		}
+	}
+	
 	func cancelButtonTapped() {
-		log.trace("cancelButtonTapped")
+		log.trace("cancelButtonTapped()")
 		
 		if hasChanges && canSave {
 			showDiscardChangesConfirmationDialog = true

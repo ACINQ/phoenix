@@ -859,6 +859,7 @@ struct SummaryView: View {
 		case .ContactView(let contact):
 			ManageContact(
 				location: manageContactLocation(),
+				popTo: nil,
 				offer: nil,
 				contact: contact,
 				contactUpdated: { _ in }
@@ -920,8 +921,8 @@ struct SummaryView: View {
 	func manageContactLocation() -> ManageContact.Location {
 		
 		switch location {
-		case .sheet(_):
-			return ManageContact.Location.sheet
+		case .sheet(let closeAction):
+			return ManageContact.Location.sheet(closeAction: closeAction)
 		case .embedded(_):
 			return ManageContact.Location.embedded
 		}

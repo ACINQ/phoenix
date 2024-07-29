@@ -10,6 +10,8 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct ContactsList: View {
 	
+	let popTo: (PopToDestination) -> Void
+	
 	@State var sortedContacts: [ContactInfo] = []
 	@State var offers: [String: [String]] = [:]
 	
@@ -19,6 +21,11 @@ struct ContactsList: View {
 	@State var addItem: Bool = false
 	@State var selectedItem: ContactInfo? = nil
 	@State var pendingDelete: ContactInfo? = nil
+	
+	@State var didAppear = false
+	@State var popToDestination: PopToDestination? = nil
+	
+	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	@EnvironmentObject var smartModalState: SmartModalState
 	
@@ -55,6 +62,9 @@ struct ContactsList: View {
 	func content() -> some View {
 		
 		list()
+			.onAppear() {
+				onAppear()
+			}
 			.onReceive(Biz.business.contactsManager.contactsListPublisher()) {
 				contactsListChanged($0)
 			}
@@ -134,6 +144,7 @@ struct ContactsList: View {
 		if let selectedItem {
 			ManageContact(
 				location: .embedded,
+				popTo: popToWrapper,
 				offer: nil,
 				contact: selectedItem,
 				contactUpdated: { _ in }
@@ -141,6 +152,7 @@ struct ContactsList: View {
 		} else if addItem {
 			ManageContact(
 				location: .embedded,
+				popTo: popToWrapper,
 				offer: nil,
 				contact: nil,
 				contactUpdated: { _ in }
@@ -194,6 +206,21 @@ struct ContactsList: View {
 	}
 	
 	// --------------------------------------------------
+	// MARK: View Lifecycle
+	// --------------------------------------------------
+	
+	func onAppear(){
+		log.trace("onAppear()")
+		
+		if let destination = popToDestination {
+			log.debug("popToDestination: \(destination)")
+			
+			popToDestination = nil
+			presentationMode.wrappedValue.dismiss()
+		}
+	}
+	
+	// --------------------------------------------------
 	// MARK: Notifications
 	// --------------------------------------------------
 	
@@ -240,6 +267,13 @@ struct ContactsList: View {
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
+	
+	func popToWrapper(_ destination: PopToDestination) {
+		log.trace("popToWrapper(\(destination))")
+		
+		popToDestination = destination
+		popTo(destination)
+	}
 	
 	func deleteContact() {
 		log.trace("deleteContact: \(pendingDelete?.name ?? "<nil>")")
