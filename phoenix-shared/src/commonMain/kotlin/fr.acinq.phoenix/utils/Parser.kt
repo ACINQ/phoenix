@@ -102,7 +102,6 @@ object Parser {
         } catch (e: Exception) {
             return Either.Left(BitcoinUriError.InvalidUri)
         }
-
         // -- get address
         // The input might look like: bitcoin:tb1qla78tll0eua3l5f4nvfq3tx58u35yc3m44flfu?time=1618931109&exp=604800
         // We want to parse the parameters and the address. However the Url api lacks a simple property to extract an address.
@@ -128,13 +127,34 @@ object Parser {
         val message = url.parameters["message"]
         val lightning = url.parameters["lightning"]?.let {
             when (val res = Bolt11Invoice.read(it)) {
-                is Try.Success -> res.result
+                is Try.Success -> {
+                    val invoiceChain = res.result.chain
+                    if (invoiceChain != chain) {
+                        if (address.isBlank()) {
+                            return Either.Left(BitcoinUriError.InvalidScript(BitcoinError.ChainHashMismatch))
+                        } else {
+                            null
+                        }
+                    } else {
+                        res.result
+                    }
+                }
                 is Try.Failure -> null
             }
         }
         val offer = url.parameters["lno"]?.let {
             when (val res = OfferTypes.Offer.decode(it)) {
-                is Try.Success -> res.result
+                is Try.Success -> {
+                    if (!res.result.chains.contains(chain.chainHash)) {
+                        if (address.isBlank()) {
+                            return Either.Left(BitcoinUriError.InvalidScript(BitcoinError.ChainHashMismatch))
+                        } else {
+                            null
+                        }
+                    } else {
+                        res.result
+                    }
+                }
                 is Try.Failure -> null
             }
         }
