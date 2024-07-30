@@ -182,10 +182,14 @@ class AppScanController(
     ) {
         model(when (result) {
             is Either.Right -> {
-                if (result.value.address.isNotBlank()) {
-                    Scan.Model.OnchainFlow(uri = result.value)
-                } else {
-                    Scan.Model.BadRequest(request = input, reason = Scan.BadRequestReason.UnknownFormat)
+                val address = result.value.address
+                val bolt11 = result.value.paymentRequest
+                val bolt12 = result.value.offer
+                when {
+                    address.isNotBlank() -> Scan.Model.OnchainFlow(uri = result.value)
+                    bolt11 != null -> Scan.Model.Bolt11InvoiceFlow.Bolt11InvoiceRequest(request = input, invoice = bolt11)
+                    bolt12 != null -> Scan.Model.OfferFlow(offer = bolt12)
+                    else -> Scan.Model.BadRequest(request = input, reason = Scan.BadRequestReason.UnknownFormat)
                 }
             }
             is Either.Left -> {
@@ -599,7 +603,14 @@ class AppScanController(
 
         val data = matchingRecord["data"]?.jsonPrimitive?.content ?: throw Scan.BadRequestReason.Bip353InvalidUri(dnsPath)
         return when (val res = Parser.parseBip21Uri(chain, data)) {
-            is Either.Left -> throw Scan.BadRequestReason.Bip353InvalidUri(dnsPath)
+            is Either.Left -> {
+                val error = res.value
+                if (error is BitcoinUriError.InvalidScript && error.error is BitcoinError.ChainHashMismatch) {
+                    throw Scan.BadRequestReason.ChainMismatch(expected = chain)
+                } else {
+                    throw Scan.BadRequestReason.Bip353InvalidUri(dnsPath)
+                }
+            }
             is Either.Right -> res.value.offer ?: throw Scan.BadRequestReason.Bip353InvalidOffer(dnsPath)
         }
     }

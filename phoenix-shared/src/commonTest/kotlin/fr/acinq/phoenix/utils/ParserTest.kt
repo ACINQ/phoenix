@@ -75,7 +75,10 @@ class ParserTest {
             Parser.parseBip21Uri(Chain.Mainnet, "bitcoin://bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4")
         )
         assertIs<Either.Right<BitcoinUri>>(
-            Parser.parseBip21Uri(Chain.Testnet, "bitcoin:?lno=lno1qgsyxjtl6luzd9t3pr62xr7eemp6awnejusgf6gw45q75vcfqqqqqqqsespexwyy4tcadvgg89l9aljus6709kx235hhqrk6n8dey98uyuftzdqrt2gkjvf2rj2vnt7m7chnmazen8wpur2h65ttgftkqaugy6ql9dcsyq39xc2g084xfn0s50zlh2ex22vvaqxqz3vmudklz453nns4d0624sqr8ux4p5usm22qevld4ydfck7hwgcg9wc3f78y7jqhc6hwdq7e9dwkhty3svq5ju4dptxtldjumlxh5lw48jsz6pnagtwrmeus7uq9rc5g6uddwcwldpklxexvlezld8egntua4gsqqy8auz966nksacdac8yv3maq6elp")
+            Parser.parseBip21Uri(
+                Chain.Testnet,
+                "bitcoin:?lno=lno1qgsyxjtl6luzd9t3pr62xr7eemp6awnejusgf6gw45q75vcfqqqqqqqsespexwyy4tcadvgg89l9aljus6709kx235hhqrk6n8dey98uyuftzdqrt2gkjvf2rj2vnt7m7chnmazen8wpur2h65ttgftkqaugy6ql9dcsyq39xc2g084xfn0s50zlh2ex22vvaqxqz3vmudklz453nns4d0624sqr8ux4p5usm22qevld4ydfck7hwgcg9wc3f78y7jqhc6hwdq7e9dwkhty3svq5ju4dptxtldjumlxh5lw48jsz6pnagtwrmeus7uq9rc5g6uddwcwldpklxexvlezld8egntua4gsqqy8auz966nksacdac8yv3maq6elp"
+            )
         )
     }
 
@@ -132,7 +135,8 @@ class ParserTest {
                     chain = Chain.Mainnet,
                     address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
                     script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
-                    paymentRequest = Bolt11Invoice.read("lntb15u1p05vazrpp5apz75ghtq3ynmc5qm98tsgucmsav44fyffpguhzdep2kcgkfme4sdq4xysyymr0vd4kzcmrd9hx7cqp2xqrrss9qy9qsqsp5v4hqr48qe0u7al6lxwdpmp3w6k7evjdavm0lh7arpv3qaf038s5st2d8k8vvmxyav2wkfym9jp4mk64srmswgh7l6sqtq7l4xl3nknf8snltamvpw5p3yl9nxg0ax9k0698rr94qx6unrv8yhccmh4z9ghcq77hxps").get(),
+                    paymentRequest = Bolt11Invoice.read("lntb15u1p05vazrpp5apz75ghtq3ynmc5qm98tsgucmsav44fyffpguhzdep2kcgkfme4sdq4xysyymr0vd4kzcmrd9hx7cqp2xqrrss9qy9qsqsp5v4hqr48qe0u7al6lxwdpmp3w6k7evjdavm0lh7arpv3qaf038s5st2d8k8vvmxyav2wkfym9jp4mk64srmswgh7l6sqtq7l4xl3nknf8snltamvpw5p3yl9nxg0ax9k0698rr94qx6unrv8yhccmh4z9ghcq77hxps")
+                        .get(),
                     ignoredParams = ParametersBuilder().apply { set("foo", "bar") }.build()
                 )
             ),
@@ -231,7 +235,8 @@ class ParserTest {
     fun test_prefixes() {
         val lnurlw = "LNURL1DP68GURN8GHJ7MRWW4EXCTNXD9SHG6NPVCHXXMMD9AKXUATJDSKHW6T5DPJ8YCTH8AEK2UMND9HKU0FKVESNZDFEX4SNXENZV4JNWWF3VENXVV3H8YUXYE3JXQMNJCF4VYMNSCEKXFSKGC3S8YENVCEJVDJXXVRXXSUKGCMY8QERSCFKXFJRZ0FPS8D"
         val address = "3EktnHQD7RiAE6uzMj2ZifT9YgRrkSgzQX"
-        val invoice = "lntb10u1pjfgej2pp5cr2l5v08ty6uymjhs4pgrpar2f4anwaefzjjam7u7zhnvjnr97nsdq5xysyymr0ddskxcmfdehsxqrrsscqp79qy9qsqsp58uwzthcgl8lmcp8s4f9du2pmxaf6rqxc2s80gtcm0u43e2qy3apqe9tj28qmhxdgzpd6ax2z344m6ct62f4updckhpww3jpuf08ldq4nejfvnqfem8vkw39r9jtndy3vqd63gwwfahfprk68n7xm4ypgmggq3v0sy8"
+        val invoice =
+            "lntb10u1pjfgej2pp5cr2l5v08ty6uymjhs4pgrpar2f4anwaefzjjam7u7zhnvjnr97nsdq5xysyymr0ddskxcmfdehsxqrrsscqp79qy9qsqsp58uwzthcgl8lmcp8s4f9du2pmxaf6rqxc2s80gtcm0u43e2qy3apqe9tj28qmhxdgzpd6ax2z344m6ct62f4updckhpww3jpuf08ldq4nejfvnqfem8vkw39r9jtndy3vqd63gwwfahfprk68n7xm4ypgmggq3v0sy8"
         listOf(
             address to "phoenix:bitcoin:$address",
             address to "phoenix:bitcoin://$address             ",
@@ -266,6 +271,9 @@ class ParserTest {
     @Test
     fun parse_bitcoin_uri_with_offer_parameter() {
         val offer = OfferTypes.Offer
+            .decode("lno1zrxq8pjw7qjlm68mtp7e3yvxee4y5xrgjhhyf2fxhlphpckrvevh50u0q0fpur5ezagkrszpfuyqvpw27kkyw9gnhl98c3w75hdadwz00jmqsqsr73zphy9alpauz89rs56m27cwyw3nwhhsdgj9nypa6ljxcnq5qf8sqve6fzk2nestscasjl5zct4a6kmeks9nxwjnchtllr8cv73z3c72gljcze9ejfz3856r0d3r0h29fr8rfwwmq2nfm9fjy2j380fnz65ulqhcdsgr8m2thr63ga44nnzj30e927gexqqs45znd4hfeha55kemx03zzr0gau")
+            .get()
+        val testnetOffer = OfferTypes.Offer
             .decode("lno1qgsyxjtl6luzd9t3pr62xr7eemp6awnejusgf6gw45q75vcfqqqqqqqsespexwyy4tcadvgg89l9aljus6709kx235hhqrk6n8dey98uyuftzdqzrtkahuum7m56dxlnx8r6tffy54004l7kvs7pylmxx7xs4n54986qyqeeuhhunayntt50snmdkq4t7fzsgghpl69v9csgparek8kv7dlp5uqr8ymp5s4z9upmwr2s8xu020d45t5phqc8nljrq8gzsjmurzevawjz6j6rc95xwfvnhgfx6v4c3jha7jwynecrz3y092nn25ek4yl7xp9yu9ry9zqagt0ktn4wwvqg52v9ss9ls22sqyqqestzp2l6decpn87pq96udsvx")
             .get()
 
@@ -275,49 +283,57 @@ class ParserTest {
             script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
             offer = offer,
         )
-        val validFoobarUri = validUri
 
-        listOf<Pair<String, Either<BitcoinUriError, BitcoinUri>>>(
+        listOf(
             // valid offer uris
-            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?lno=$offer" to Either.Right(validFoobarUri),
-            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?lno=$offer&foo=bar" to Either.Right(
-                validFoobarUri.copy(ignoredParams = ParametersBuilder().apply { set("foo", "bar") }.build())
-            ),
-            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?foo=bar&lno=$offer" to Either.Right(
-                validFoobarUri.copy(ignoredParams = ParametersBuilder().apply { set("foo", "bar") }.build())
-            ),
-            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?foo=bar&lno=$offer&bar=baz" to Either.Right(
-                validFoobarUri.copy(ignoredParams = ParametersBuilder().apply { set("foo", "bar") ; set("bar", "baz") }.build())
-            ),
+            "bitcoin:?lno=$offer" to validUri.copy(address = "", script = null),
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?lno=$offer" to validUri,
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?lno=$offer&foo=bar" to
+                    validUri.copy(
+                        ignoredParams = ParametersBuilder().apply { set("foo", "bar") }.build()
+                    ),
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?foo=bar&lno=$offer" to
+                    validUri.copy(ignoredParams = ParametersBuilder().apply { set("foo", "bar") }.build()),
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?foo=bar&lno=$offer&bar=baz" to
+                    validUri.copy(ignoredParams = ParametersBuilder().apply { set("foo", "bar"); set("bar", "baz") }.build()),
             // valid offer in a typical bip353 uri
-            "bitcoin:?sp=silentpayment&lno=$offer" to Either.Right(
-                BitcoinUri(
-                    chain = Chain.Mainnet,
-                    address = "",
-                    script = null,
-                    offer = offer,
-                    ignoredParams = ParametersBuilder().apply { set("sp", "silentpayment") }.build()
-                )
+            "bitcoin:?sp=silentpayment&lno=$offer" to BitcoinUri(
+                chain = Chain.Mainnet,
+                address = "",
+                script = null,
+                offer = offer,
+                ignoredParams = ParametersBuilder().apply { set("sp", "silentpayment") }.build()
             ),
             // invalid offer parameter
-            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?lightning=lno1qgsyxjtl6luzd9t3pr62xr7eemp6awnejusgf6gw45q75vcfqqqqqqqsespexwyy4tcadvgg89l9a" to Either.Right(
-                BitcoinUri(
-                    chain = Chain.Mainnet,
-                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
-                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6")
-                )
-            ),
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?lightning=lno1qgsyxjtl6luzd9t3pr62xr7eemp6awnejusgf6gw45q75vcfqqqqqqqsespexwyy4tcadvgg89l9a" to
+                    BitcoinUri(
+                        chain = Chain.Mainnet,
+                        address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                        script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6")
+                    ),
             // empty offer invoice
-            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?lno=" to Either.Right(
-                BitcoinUri(
-                    chain = Chain.Mainnet,
-                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
-                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6")
-                )
-            ),
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?lno=" to
+                    BitcoinUri(
+                        chain = Chain.Mainnet,
+                        address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                        script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6")
+                    ),
+            // offer chain mismatch with valid address fails silently
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?lno=$testnetOffer" to
+                    validUri.copy(offer = null)
         ).forEach { (address, expected) ->
-            val uri = Parser.parseBip21Uri(Chain.Mainnet, address)
-            assertEquals(expected, uri)
+            val uri = Parser.parseBip21Uri(expected.chain, address)
+            assertEquals(Either.Right(expected), uri)
         }
+
+        // chain mismatch errors
+        assertEquals(
+            expected = Either.Left(BitcoinUriError.InvalidScript(error = BitcoinError.ChainHashMismatch)),
+            actual = Parser.parseBip21Uri(Chain.Mainnet, "bitcoin:?lno=$testnetOffer")
+        )
+        assertEquals(
+            expected = Either.Left(BitcoinUriError.InvalidScript(error = BitcoinError.ChainHashMismatch)),
+            actual = Parser.parseBip21Uri(Chain.Mainnet, "bitcoin:tb1pan78kdkqnwe5ym7k8lnd77rrq5gfnxsyg7j7fay5rdhkwrzgkg0s6u8pvx?lno=$testnetOffer")
+        )
     }
 }
