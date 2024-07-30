@@ -582,6 +582,13 @@ class AppScanController(
         // could be a [BadRequestReason.Bip353NameNotFound] it status == 3
         if (status == null || status > 0) return null
 
+        val records = json["Answer"]?.jsonArray
+        if (records.isNullOrEmpty()) {
+            logger.debug { "no answer for $dnsPath" }
+            // TODO add test (see #599)
+            return null
+        }
+
         // check dnssec
         val ad = json["AD"]?.jsonPrimitive?.booleanOrNull
         if (ad != true) {
@@ -590,12 +597,6 @@ class AppScanController(
         }
 
         // check name matches records
-        val records = json["Answer"]?.jsonArray
-        if (records.isNullOrEmpty()) {
-            logger.debug { "no answer for $dnsPath" }
-            throw Scan.BadRequestReason.Bip353NameNotFound(username, domain)
-        }
-
         val matchingRecord = records.filterIsInstance<JsonObject>().firstOrNull {
             logger.debug { "inspecting record=$it" }
             it["name"]?.jsonPrimitive?.content == dnsPath
