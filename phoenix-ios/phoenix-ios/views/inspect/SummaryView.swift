@@ -1018,32 +1018,31 @@ struct SummaryView: View {
 	func onAppear() {
 		log.trace("onAppear()")
 		
-		let business = Biz.business
-		
 		if !didAppear {
 			didAppear = true
 			
 			// First time displaying the SummaryView (coming from HomeView)
 			
 			if paymentInfoIsStale {
-				
 				// We either don't have the full payment information (missing metadata info),
 				// or the payment information is possibly stale, and needs to be refreshed.
 				
 				if let row = paymentInfo.toOrderRow() {
 
-					business.paymentsManager.fetcher.getPayment(row: row, options: fetchOptions) { (result, _) in
-
-						if let result = result {
+					Biz.business.paymentsManager.fetcher.getPayment(row: row, options: fetchOptions) {
+						(result: WalletPaymentInfo?, _) in
+						
+						if let result {
 							paymentInfo = result
 						}
 					}
 
 				} else {
 				
-					business.paymentsManager.getPayment(id: paymentInfo.id(), options: fetchOptions) { (result, _) in
+					Biz.business.paymentsManager.getPayment(id: paymentInfo.id(), options: fetchOptions) {
+						(result: WalletPaymentInfo?, _) in
 						
-						if let result = result {
+						if let result {
 							paymentInfo = result
 						}
 					}
@@ -1056,9 +1055,10 @@ struct SummaryView: View {
 			// The payment metadata may have changed (e.g. description/notes modified).
 			// So we need to refresh the payment info.
 			
-			business.paymentsManager.getPayment(id: paymentInfo.id(), options: fetchOptions) { (result, _) in
+			Biz.business.paymentsManager.getPayment(id: paymentInfo.id(), options: fetchOptions) {
+				(result: WalletPaymentInfo?, _) in
 				
-				if let result = result {
+				if let result {
 					paymentInfo = result
 				}
 			}

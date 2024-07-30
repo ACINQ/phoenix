@@ -144,6 +144,8 @@
 		DC4CF3CE2BE96C36003A957F /* DisablePinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CF3CD2BE96C36003A957F /* DisablePinView.swift */; };
 		DC4CF3D02BEA8C13003A957F /* EditPinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CF3CF2BEA8C13003A957F /* EditPinView.swift */; };
 		DC5567452C2F1A6900008E11 /* ContactsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5567442C2F1A6900008E11 /* ContactsList.swift */; };
+		DC5631C72C5944CF00DCB5BF /* KotlinExtensions+Manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5631C62C5944CF00DCB5BF /* KotlinExtensions+Manager.swift */; };
+		DC5631C82C59466000DCB5BF /* KotlinExtensions+Manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5631C62C5944CF00DCB5BF /* KotlinExtensions+Manager.swift */; };
 		DC59377127516297003B4B53 /* Sequence+Sum.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC59377027516296003B4B53 /* Sequence+Sum.swift */; };
 		DC5A935329846044004F19FD /* FileHandle+Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5A935229846043004F19FD /* FileHandle+Async.swift */; };
 		DC5CA4ED28F83C3B0048A737 /* DrainWalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5CA4EC28F83C3B0048A737 /* DrainWalletView.swift */; };
@@ -551,6 +553,7 @@
 		DC4CF3CD2BE96C36003A957F /* DisablePinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisablePinView.swift; sourceTree = "<group>"; };
 		DC4CF3CF2BEA8C13003A957F /* EditPinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPinView.swift; sourceTree = "<group>"; };
 		DC5567442C2F1A6900008E11 /* ContactsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsList.swift; sourceTree = "<group>"; };
+		DC5631C62C5944CF00DCB5BF /* KotlinExtensions+Manager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KotlinExtensions+Manager.swift"; sourceTree = "<group>"; };
 		DC59377027516296003B4B53 /* Sequence+Sum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+Sum.swift"; sourceTree = "<group>"; };
 		DC5A935229846043004F19FD /* FileHandle+Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FileHandle+Async.swift"; sourceTree = "<group>"; };
 		DC5CA4EC28F83C3B0048A737 /* DrainWalletView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrainWalletView.swift; sourceTree = "<group>"; };
@@ -1045,6 +1048,7 @@
 				DC46BAF126CACCF700E760A6 /* KotlinExtensions+Conversion.swift */,
 				DC16965E27FE0FAC003DE1DD /* KotlinExtensions+Currency.swift */,
 				DC0D2EA62939273B00284608 /* KotlinExtensions+Payments.swift */,
+				DC5631C62C5944CF00DCB5BF /* KotlinExtensions+Manager.swift */,
 				DC46BAED26CACCF700E760A6 /* KotlinExtensions+Other.swift */,
 				DC49FE9A2AC49CB500D8D2E2 /* KotlinExtensions+Lightning.swift */,
 				DC49FE982AC49C6300D8D2E2 /* KotlinExtensions+Bitcoin.swift */,
@@ -1907,6 +1911,7 @@
 				DC18C418256FE22300A2D083 /* Prefs.swift in Sources */,
 				DCAEF8F5276131A600015993 /* CheckboxToggleStyle.swift in Sources */,
 				DC641C712820889C00862DCD /* GroupPrefs.swift in Sources */,
+				DC5631C72C5944CF00DCB5BF /* KotlinExtensions+Manager.swift in Sources */,
 				DC63BDF429AE44380067A361 /* NotificationsManager.swift in Sources */,
 				DC118BFA27B44F840080BBAC /* TipSliderSheet.swift in Sources */,
 				DC2F431827B698E20006FCC4 /* ShareOptionsSheet.swift in Sources */,
@@ -2107,6 +2112,7 @@
 				DCA6DEC92829C3180073C658 /* GenericPasswordConvertible.swift in Sources */,
 				DCCFE6A72B630836002FFF11 /* KotlinLogger.swift in Sources */,
 				DC641C78282171EA00862DCD /* KotlinAssociatedObject.swift in Sources */,
+				DC5631C82C59466000DCB5BF /* KotlinExtensions+Manager.swift in Sources */,
 				DCCFE6B32B680DF5002FFF11 /* LoggerFactory.swift in Sources */,
 				DCA6DECA2829C31B0073C658 /* KeyStoreError.swift in Sources */,
 				DC49FE9D2AC49E0800D8D2E2 /* KotlinExtensions+Bitcoin.swift in Sources */,

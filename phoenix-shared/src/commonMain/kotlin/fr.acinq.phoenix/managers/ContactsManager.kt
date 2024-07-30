@@ -56,32 +56,39 @@ class ContactsManager(
     private val _contactsList = MutableStateFlow<List<ContactInfo>>(emptyList())
     val contactsList = _contactsList.asStateFlow()
 
-    val contactsMap = _contactsList.map { list ->
-        list.associateBy { it.id }
-    }.stateIn(scope = this, started = SharingStarted.Eagerly, initialValue = emptyMap())
+    private val _contactsMap = MutableStateFlow<Map<UUID, ContactInfo>>(emptyMap())
+    val contactsMap = _contactsMap.asStateFlow()
 
-    val offerMap = _contactsList.map { list ->
-        list.flatMap { contact ->
-            contact.offers.map { offer ->
-                offer to contact.id
-            }
-        }.toMap()
-    }.stateIn(scope = this, started = SharingStarted.Eagerly, initialValue = emptyMap())
+    private val _offerMap = MutableStateFlow<Map<OfferTypes.Offer, UUID>>(emptyMap())
+    val offerMap = _offerMap.asStateFlow()
 
-    val publicKeyMap = _contactsList.map { list ->
-        list.flatMap { contact ->
-            contact.publicKeys.map { pubKey ->
-                pubKey to contact.id
-            }
-        }.toMap()
-    }.stateIn(scope = this, started = SharingStarted.Eagerly, initialValue = emptyMap())
+    private val _publicKeyMap = MutableStateFlow<Map<PublicKey, UUID>>(emptyMap())
+    val publicKeyMap = _publicKeyMap.asStateFlow()
 
     val contactsWithOfferList = _contactsList.map { contacts ->
         contacts.filter { it.offers.isNotEmpty()  }
     }
 
     init {
-        launch { appDb.monitorContacts().collect { _contactsList.value = it } }
+        launch {
+            appDb.monitorContacts().collect { list ->
+                val newMap = list.associateBy { it.id }
+                val newOfferMap = list.flatMap { contact ->
+                    contact.offers.map { offer ->
+                        offer to contact.id
+                    }
+                }.toMap()
+                val newPublicKeyMap = list.flatMap { contact ->
+                    contact.publicKeys.map { pubKey ->
+                        pubKey to contact.id
+                    }
+                }.toMap()
+                _contactsList.value = list
+                _contactsMap.value = newMap
+                _offerMap.value = newOfferMap
+                _publicKeyMap.value = newPublicKeyMap
+            }
+        }
     }
 
     suspend fun getContactForOffer(offer: OfferTypes.Offer): ContactInfo? {
