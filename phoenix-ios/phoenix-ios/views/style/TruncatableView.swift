@@ -4,6 +4,13 @@
 
 import SwiftUI
 
+fileprivate let filename = "TruncatableView"
+#if DEBUG && false
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
+#else
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
+#endif
+
 struct TruncatableView<Content: View>: View {
 	
 	let fixedHorizontal: Bool
@@ -52,6 +59,12 @@ struct TruncatableView<Content: View>: View {
 			return
 		}
 		if rSize.width < iSize.width || rSize.height < iSize.height {
+			log.debug(
+				"""
+				rSize.width(\(rSize.width)) < iSize.width(\(iSize.width)) || \
+				rSize.height(\(rSize.height)) < iSize.height(\(iSize.height))
+				"""
+			)
 			wasTruncated()
 		}
 	}

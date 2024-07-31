@@ -25,7 +25,6 @@ fileprivate enum Key: String {
 	case serverMessageReadIndex
 	case allowOverpayment
 	case doNotShowChannelImpactWarning
-	case randomPayerKey
 }
 
 fileprivate enum KeyDeprecated: String {
@@ -173,14 +172,9 @@ class Prefs {
 	}
 
 	var doNotShowChannelImpactWarning: Bool {
-		 get { defaults.doNotShowChannelImpactWarning }
-		 set { defaults.doNotShowChannelImpactWarning = newValue }
-	 }
-	
-	var randomPayerKey: Bool {
-		 get { defaults.randomPayerKey }
-		 set { defaults.randomPayerKey = newValue }
-	 }
+		get { defaults.doNotShowChannelImpactWarning }
+		set { defaults.doNotShowChannelImpactWarning = newValue }
+	}
 	
 	// --------------------------------------------------
 	// MARK: Wallet State
@@ -269,7 +263,6 @@ class Prefs {
 		defaults.removeObject(forKey: Key.serverMessageReadIndex.rawValue)
 		defaults.removeObject(forKey: Key.allowOverpayment.rawValue)
 		defaults.removeObject(forKey: Key.doNotShowChannelImpactWarning.rawValue)
-		defaults.removeObject(forKey: Key.randomPayerKey.rawValue)
 		
 		self.backupTransactions.resetWallet(encryptedNodeId: encryptedNodeId)
 		self.backupSeed.resetWallet(encryptedNodeId: encryptedNodeId)
@@ -388,10 +381,5 @@ extension UserDefaults {
 	@objc fileprivate var doNotShowChannelImpactWarning: Bool {
 		get { bool(forKey: Key.doNotShowChannelImpactWarning.rawValue) }
 		set { set(newValue, forKey: Key.doNotShowChannelImpactWarning.rawValue) }
-	}
-	
-	@objc fileprivate var randomPayerKey: Bool {
-		get { bool(forKey: Key.randomPayerKey.rawValue) }
-		set { set(newValue, forKey: Key.randomPayerKey.rawValue) }
 	}
 }

@@ -34,7 +34,6 @@ fileprivate struct PaymentOptionsList: View {
 	let invoiceExpirationDaysOptions = [7, 30, 60]
 
 	@State var allowOverpayment: Bool = Prefs.shared.allowOverpayment
-	@State var randomPayerKey: Bool = Prefs.shared.randomPayerKey
 	
 	@State var notificationSettings = NotificationsManager.shared.settings.value
 	
@@ -107,7 +106,6 @@ fileprivate struct PaymentOptionsList: View {
 		
 		Section {
 			subsection_enableOverpayments()
-			subsection_randomPayerKey()
 			
 		} /* Section.*/header: {
 			Text("Outgoing payments")
@@ -267,44 +265,6 @@ fileprivate struct PaymentOptionsList: View {
 				}
 				.onChange(of: allowOverpayment) { newValue in
 					Prefs.shared.allowOverpayment = newValue
-				}
-			
-		} // </HStack>
-	}
-	
-	@ViewBuilder
-	func subsection_randomPayerKey() -> some View {
-		
-		HStack(alignment: VerticalAlignment.centerTopLine) { // <- Custom VerticalAlignment
-			
-			VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
-				Text("Random payer key")
-					.alignmentGuide(VerticalAlignment.centerTopLine) { (d: ViewDimensions) in
-						d[VerticalAlignment.center]
-					}
-					
-				Text(
-					"""
-					Enable if you don't want Bolt12 recipients to know \
-					that payments come from your wallet.
-					"""
-				)
-				.font(.callout)
-				.fixedSize(horizontal: false, vertical: true) // SwiftUI truncation bugs
-				.foregroundColor(Color.secondary)
-					
-			} // </VStack>
-			
-			Spacer()
-			
-			Toggle("", isOn: $randomPayerKey)
-				.labelsHidden()
-				.padding(.trailing, 2)
-				.alignmentGuide(VerticalAlignment.centerTopLine) { (d: ViewDimensions) in
-					d[VerticalAlignment.center]
-				}
-				.onChange(of: randomPayerKey) { newValue in
-					Prefs.shared.randomPayerKey = newValue
 				}
 			
 		} // </HStack>

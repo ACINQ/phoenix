@@ -1436,6 +1436,9 @@
         }
       }
     },
+    "**disabled**: sent payments will be anonymous" : {
+
+    },
     "**Do not lose this seed.** Save it somewhere safe (not on this phone). If you lose your seed and your phone, you've lost your funds." : {
       "comment" : "RecoverySeedView",
       "localizations" : {
@@ -1517,6 +1520,9 @@
           }
         }
       }
+    },
+    "**enabled**: they will be able to tell when payments are from you" : {
+
     },
     "**Imagine that your wallet is a bucket**, and your balance is the water in the bucket." : {
       "localizations" : {
@@ -1677,6 +1683,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@"
+          }
+        }
+      }
+    },
+    "%@ - from %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ - from %2$@"
+          }
+        }
+      }
+    },
+    "%@ - to %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ - to %2$@"
           }
         }
       }
@@ -2611,6 +2637,7 @@
     },
     "+(amount.string) inbound liquidity" : {
       "comment" : "Payment description for inbound liquidity",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -2684,6 +2711,9 @@
           }
         }
       }
+    },
+    "+%@ inbound liquidity" : {
+      "comment" : "Payment description for inbound liquidity"
     },
     "<decryption error>" : {
       "localizations" : {
@@ -5054,9 +5084,6 @@
           }
         }
       }
-    },
-    "Address Book" : {
-
     },
     "address type" : {
       "comment" : "Label in DetailsView_IncomingPayment",
@@ -8392,6 +8419,12 @@
           }
         }
       }
+    },
+    "Bolt12 offer:" : {
+
+    },
+    "Bolt12 offers" : {
+
     },
     "broadcast" : {
       "localizations" : {
@@ -14135,7 +14168,11 @@
         }
       }
     },
+    "Discard changes" : {
+
+    },
     "Discard Changes" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -14174,6 +14211,9 @@
           }
         }
       }
+    },
+    "Discard changes?" : {
+
     },
     "Disconnected" : {
       "localizations" : {
@@ -14713,7 +14753,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Donar"
+            "value" : "Listo"
           }
         },
         "fr" : {
@@ -15046,6 +15086,7 @@
     },
     "Edit Payment" : {
       "comment" : "Navigation bar title",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -15395,9 +15436,6 @@
           }
         }
       }
-    },
-    "Enable if you don't want Bolt12 recipients to know that payments come from your wallet." : {
-
     },
     "Enable notifications in the Notification Center" : {
       "localizations" : {
@@ -21342,6 +21380,7 @@
     },
     "Invalid BIP353 DNS address" : {
       "comment" : "Error message - dns record contains an invalid offer",
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -21507,6 +21546,9 @@
           }
         }
       }
+    },
+    "Invalid offer" : {
+
     },
     "Invalid port. Valid range: [1 - 65535]" : {
       "localizations" : {
@@ -22501,6 +22543,9 @@
           }
         }
       }
+    },
+    "Lightning fee" : {
+
     },
     "Lightning fee amount: (percent), (amountBitcoin), ≈(amountFiat)" : {
       "comment" : "VoiceOver label: PaymentSummaryView",
@@ -25310,6 +25355,9 @@
         }
       }
     },
+    "New contact" : {
+
+    },
     "New inbound liquidity:" : {
       "localizations" : {
         "ar" : {
@@ -25620,6 +25668,9 @@
           }
         }
       }
+    },
+    "No matches for search" : {
+
     },
     "No notifications" : {
       "localizations" : {
@@ -26143,9 +26194,6 @@
           }
         }
       }
-    },
-    "Offer:" : {
-
     },
     "Offline" : {
       "comment" : "Connection state\nConnection status",
@@ -27777,6 +27825,9 @@
         }
       }
     },
+    "Payment from %@" : {
+
+    },
     "payment hash" : {
       "comment" : "Label in DetailsView_IncomingPayment",
       "localizations" : {
@@ -28503,6 +28554,9 @@
           }
         }
       }
+    },
+    "Payment to %@" : {
+
     },
     "Payment will fail" : {
       "localizations" : {
@@ -30163,9 +30217,6 @@
           }
         }
       }
-    },
-    "Random payer key" : {
-
     },
     "Random server" : {
       "comment" : "Connection info",
@@ -31887,6 +31938,9 @@
         }
       }
     },
+    "Save changes" : {
+
+    },
     "Save it somewhere safe (not on this phone). If you lose your seed and your phone, you've lost your funds." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -32049,6 +32103,9 @@
           }
         }
       }
+    },
+    "Search" : {
+
     },
     "Security" : {
       "extractionState" : "manual",
@@ -32731,6 +32788,12 @@
           }
         }
       }
+    },
+    "Sent By" : {
+
+    },
+    "Sent To" : {
+
     },
     "Server" : {
       "localizations" : {
@@ -38093,6 +38156,12 @@
         }
       }
     },
+    "This address is hosted on an unsecure DNS. DNSSEC must be enabled." : {
+      "comment" : "Error message - dns issue"
+    },
+    "This address uses an invalid Bolt12 offer." : {
+      "comment" : "Error message - dns record contains an invalid offer"
+    },
     "This appears to be a website (not a lightning invoice):" : {
       "localizations" : {
         "ar" : {
@@ -39119,6 +39188,9 @@
         }
       }
     },
+    "Tip" : {
+
+    },
     "Tip amount: (percent), (amountBitcoin), ≈(amountFiat)" : {
       "comment" : "VoiceOver label: PaymentSummaryView",
       "localizations" : {
@@ -39796,6 +39868,9 @@
         }
       }
     },
+    "Total" : {
+
+    },
     "total amount" : {
       "comment" : "Label in DetailsView_IncomingPayment",
       "extractionState" : "manual",
@@ -40267,6 +40342,9 @@
           }
         }
       }
+    },
+    "Trusted contact" : {
+
     },
     "Trustless swaps" : {
       "localizations" : {

@@ -3,7 +3,6 @@ package fr.acinq.phoenix.managers
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
-import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
@@ -25,7 +24,7 @@ import kotlinx.coroutines.launch
 class PaymentsManager(
     private val loggerFactory: LoggerFactory,
     private val configurationManager: AppConfigurationManager,
-    private val peerManager: PeerManager,
+    private val contactsManager: ContactsManager,
     private val databaseManager: DatabaseManager,
     private val electrumClient: ElectrumClient,
 ) : CoroutineScope by MainScope() {
@@ -33,7 +32,7 @@ class PaymentsManager(
     constructor(business: PhoenixBusiness) : this(
         loggerFactory = business.loggerFactory,
         configurationManager = business.appConfigurationManager,
-        peerManager = business.peerManager,
+        contactsManager = business.contactsManager,
         databaseManager = business.databaseManager,
         electrumClient = business.electrumClient
     )
@@ -166,9 +165,14 @@ class PaymentsManager(
             is WalletPaymentId.SpliceCpfpOutgoingPaymentId -> paymentsDb().getSpliceCpfpOutgoingPayment(id.id, options)
             is WalletPaymentId.InboundLiquidityOutgoingPaymentId -> paymentsDb().getInboundLiquidityOutgoingPayment(id.id, options)
         }?.let {
+            val payment = it.first
+            val contact = if (options.contains(WalletPaymentFetchOptions.Contact)) {
+                contactsManager.contactForPayment(payment)
+            } else { null }
             WalletPaymentInfo(
-                payment = it.first,
+                payment = payment,
                 metadata = it.second ?: WalletPaymentMetadata(),
+                contact = contact,
                 fetchOptions = options
             )
         }
