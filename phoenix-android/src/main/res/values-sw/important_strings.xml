@@ -1,0 +1,472 @@
+<!--
+  ~ Copyright 2023 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!--
+  ~ This file contains string resources related to important messages in the app, and should be translated as a priority.
+  ~ It should be kept as small as possible.
+  ~
+  ~ Most technical resource strings should stay in the default `strings.xml` file.
+-->
+<resources>
+
+    <!-- generic -->
+
+    <string name="utils_ack">I understand.</string>
+
+    <!-- system notifications -->
+
+    <string name="notif_headless_title_default">Phoenix inaendesha nyuma</string>
+    <string name="notif_headless_received">Imepokelewa +%1$s</string>
+
+    <string name="notif_pending_settlement_title">Tafadhali anzisha Phoenix</string>
+    <string name="notif_pending_settlement_message">Malipo yanayokuja yanangoja kukamilishwa.</string>
+
+    <string name="notif_inflight_payment_title">Malipo yanangoja</string>
+    <string name="notif_inflight_payment_message">Anzisha Phoenix ili malipo yakamilike kwa wakati unaofaa.</string>
+
+    <string name="notif_missed_title">Malipo yaliyokosekana</string>
+    <string name="notif_missed_unavailable">Phoenix haikuweza kuanzishwa nyuma.</string>
+
+    <string name="notif_rejected_deposit_title">Amana ya on-chain inangoja (+%1$s)</string>
+    <string name="notif_rejected_payment_title">Malipo yamekataliwa (+%1$s)</string>
+    <string name="notif_rejected_policy_disabled">Usimamizi wa kiotomatiki wa chaneli umesitishwa. Bonyeza kwa maelezo zaidi.</string>
+    <string name="notif_rejected_policy_disabled_timeout">Usimamizi wa kiotomatiki wa chaneli umesitishwa. Amana hii itaisha muda wake ifikapo %1$s.</string>
+    <string name="notif_rejected_over_absolute">Ada ilikuwa %1$s, lakini ada yako ya juu ilikuwa imewekwa kwa %2$s. Bonyeza kwa maelezo zaidi.</string>
+    <string name="notif_rejected_over_absolute_timeout">Ada ilikuwa %1$s, lakini ada yako ya juu ilikuwa imewekwa kwa %2$s. Amana hii itaisha muda wake ifikapo %3$s.</string>
+    <string name="notif_rejected_over_relative">Ada ilikuwa %1$s ambayo ni zaidi ya %2$s%% ya kiasi kilichopokelewa. Bonyeza kwa maelezo zaidi.</string>
+    <string name="notif_rejected_over_relative_timeout">Ada ilikuwa %1$s ambayo ni zaidi ya %2$s%% ya kiasi kilichopokelewa. Amana hii itaisha muda wake ifikapo %3$s.</string>
+    <string name="notif_rejected_channels_initializing">Chaneli zako zilikuwa zinaanzishwa na hazikuweza kukubali malipo hayo. Jaribu tena baadaye.</string>
+
+    <string name="notif_watcher_revoked_commit_title">Tafadhali anzisha Phoenix</string>
+    <string name="notif_watcher_revoked_commit_message">Baadhi ya chaneli zako zinaweza kuwa zimefungwa.</string>
+
+    <!-- settings list -->
+
+    <string name="settings_general_title">Mazingira</string>
+    <string name="settings_security_title">Faragha &amp; Usalama</string>
+    <string name="settings_advanced_title">Kisasa</string>
+    <string name="settings_danger_title">Eneo la hatari</string>
+
+    <string name="settings_display_prefs">Mwonekano</string>
+    <string name="settings_wallet_info">Taarifa za pochi</string>
+    <string name="settings_liquidity_policy">Usimamizi wa chaneli</string>
+    <string name="settings_display_seed">Maneno ya kurejesha</string>
+    <string name="settings_access_control">Udhibiti wa ufikiaji</string>
+    <string name="settings_list_channels">Chaneli za malipo</string>
+    <string name="settings_logs">Magogo</string>
+    <string name="settings_electrum">Seva ya Electrum</string>
+    <string name="settings_reset_wallet">Weka upya pochi</string>
+    <string name="settings_mutual_close">Funga chaneli</string>
+    <string name="settings_force_close">Funga chaneli kwa nguvu</string>
+    <string name="settings_tor">Tor</string>
+    <string name="settings_about">Kuhusu</string>
+    <string name="settings_payment_settings">Chaguzi za malipo</string>
+    <string name="settings_payment_history">Historia ya malipo</string>
+    <string name="settings_notifications">Arifa</string>
+    <string name="settings_contacts">Anuani zangu</string>
+
+    <!-- home: swap help -->
+
+    <string name="home_swapin_help_pending">Kusubiri uthibitisho 3.</string>
+    <string name="home_swapin_help_ready_fee">Amana zitawekwa kwenye Lightning wakati ada za uchimbaji zitakuwa chini ya %1$s.</string>
+    <string name="home_swapin_help_ready_disabled">Amana zitabaki kwenye-chain kwa sababu usimamizi wa chaneli kiotomatiki umesitishwa.</string>
+    <string name="home_swapin_help_generic">Fedha za kwenye-chain zimewekwa kwenye pochi yako.</string>
+    <string name="home_swapin_help_button">Bonyeza kwa maelezo</string>
+
+    <string name="home_background_restriction_title">Usindikaji wa nyuma umepunguzwa</string>
+    <string name="home_background_restriction_body_1">Phoenix haitaweza kupokea malipo wakati iko nyuma, au wakati imefungwa.</string>
+    <string name="home_background_restriction_body_2">Hii hutokea kwa sababu:</string>
+    <string name="home_background_restriction_tor">Tor imewashwa</string>
+    <string name="home_background_restriction_powersaver">Kifaa kipo kwenye hali ya kuokoa nguvu</string>
+    <string name="home_background_restriction_fcm">Arifa za FCM hazipatikani</string>
+    <string name="home_background_restriction_fcm_details">Kama uko kwenye GrapheneOS au CalyxOS, weka Huduma za Google Play kupata arifa za FCM. Angalia FAQ kwa mwongozo.</string>
+
+    <!-- home: bottom menu -->
+
+    <string name="menu_settings">Mazingira</string>
+    <string name="menu_send">Tuma</string>
+    <string name="menu_receive">Pokea</string>
+
+    <!-- init wallet / automated wallet creation -->
+
+    <string name="initwallet_create">Unda pochi mpya</string>
+    <string name="initwallet_restore">Rejesha pochi yangu</string>
+
+    <string name="restore_disclaimer_message">Phoenix inaweza tu kurejesha fedha za nje ya mtandao zilizokuwa zikisimamiwa na programu hii.\n\nKuleta mbegu ambayo haikuundwa na Phoenix haitarejesha fedha yoyote.\n\nPia hakikisha hauendeshi pochi nyingine ya Phoenix na mbegu hiyo hiyo.</string>
+
+    <string name="restore_instructions">Mbegu ya pochi yako ni orodha ya maneno 12 ya Kiingereza. Andika kila neno la orodha hii kwenye sanduku hapa chini.</string>
+    <string name="restore_input_label">Ingiza neno #%1$s</string>
+    <string name="restore_input_invalid">Hili sio neno halali.</string>
+    <string name="restore_seed_valid">Mbegu hii ni halali</string>
+    <string name="restore_seed_valid_details">Sasa unaweza kuendelea na kurejesha pochi yako</string>
+    <string name="restore_seed_invalid">Mbegu hii sio halali</string>
+    <string name="restore_seed_invalid_details">Hakikisha umeingiza maneno sahihi kwa mpangilio sahihi.</string>
+    <string name="restore_import_button">Rejesha</string>
+
+    <!-- upgrade required dialog -->
+
+    <string name="upgraderequired_title">Sasisho linahitajika</string>
+    <string name="upgraderequired_message">Toleo hili la Phoenix (v%1$s) halilingani na pochi yako. Tafadhali sasisha, au tumia toleo linalolingana.</string>
+    <string name="upgraderequired_button">Sasisha kwenye Google Play</string>
+
+    <!-- receive view: warning about fee/liquidity -->
+
+    <string name="receive_lightning_warning_title_surefail">Malipo yatashindwa</string>
+    <string name="receive_lightning_warning_title_fee_expected">Ada ya mtandaoni inatarajiwa</string>
+    <string name="receive_lightning_warning_hint_show_details">Gusa kujua zaidi</string>
+
+    <string name="receive_lightning_sheet_dismiss">Funga</string>
+    <string name="receive_lightning_sheet_button_enable">Wezesha usimamizi wa njia otomatiki</string>
+    <string name="receive_lightning_sheet_button_configure">Sanidi kikomo cha ada</string>
+
+    <string name="receive_lightning_warning_message_fee_expected">Operesheni ya mtandaoni itahitajika kupokea kiasi hiki.\n\nAda inakadiriwa kuwa karibu %1$s.</string>
+    <string name="receive_lightning_warning_message_fee_expected_unknown">Operesheni ya mtandaoni itahitajika kupokea kiasi hiki.</string>
+
+    <string name="receive_lightning_warning_message_above_limit">Ada ya %1$s inatarajiwa kupokea kiasi hiki, na ada hiyo iko juu ya kikomo chako cha %2$s.\n\nOngeza kikomo hiki katika mipangilio ya usimamizi wa njia.</string>
+    <string name="receive_lightning_warning_message_above_limit_or_liquidity">Ada ya %1$s inatarajiwa kupokea kiasi hiki, na ada hiyo iko juu ya kikomo chako cha %2$s.\n\nOngeza kikomo hiki katika mipangilio ya usimamizi wa njia, au omba ukwasi wa ziada.</string>
+    <string name="receive_lightning_warning_message_above_limit_percent">Ada ya %1$s inatarajiwa kupokea kiasi hiki, na ada hiyo ni zaidi ya %2$s%% ya kiasi kilichopokelewa.\n\nOngeza kikomo hiki katika mipangilio ya usimamizi wa njia.</string>
+    <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Ada ya %1$s inatarajiwa kupokea kiasi hiki, na ada hiyo ni zaidi ya %2$s%% ya kiasi kilichopokelewa.\n\nOngeza kikomo hiki katika mipangilio ya usimamizi wa njia, au omba ukwasi wa ziada.</string>
+
+    <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Ukwasi wa kupokea hautoshi kwa kiasi hiki, na umelemaza usimamizi wa njia otomatiki.</string>
+
+    <!-- receive: offer labels -->
+
+    <string name="receive_toggle_offer_button">Onyesha msimbo wa QR unaoweza kutumika tena</string>
+
+    <string name="receive_offer_howto_intro_1">🎉 Hapa ni ombi lako la malipo linaloweza kutumika tena!</string>
+    <string name="receive_offer_howto_intro_2">Gusa kujifunza jinsi ya kutumia</string>
+    <string name="receive_offer_howto_details_1">Ombi hili la malipo la Bolt12 ni sawa na anwani ya Bitcoin.</string>
+    <string name="receive_offer_howto_details_2">Tofauti na ankara za jadi za Lightning, hili haliishi muda wake na linaweza kutumika tena.</string>
+    <string name="receive_offer_howto_details_3">Shiriki kwa wingi: kwa michango, vidokezo, au kulipwa na marafiki zako.</string>
+    <string name="receive_offer_howto_details_4_title">🛟 Nani anaunga mkono Bolt12?</string>
+    <string name="receive_offer_howto_details_4">Kwa sasa, huduma chache zinaunga mkono Bolt12. Ikiwa huduma itakataa ankara hii, waambie wanakosa fursa!</string>
+    <string name="receive_offer_howto_details_5_title">🔋 Vizuizi vya betri</string>
+    <string name="receive_offer_howto_details_5">Hakikisha Android haitekelezi hali ya kuokoa betri kwa Phoenix. Vinginevyo, hutapokea malipo ikiwa programu imefungwa au iko kwenye usuli. Kuwezesha TOR kwenye Phoenix pia kutasababisha matatizo.</string>
+    <string name="receive_offer_howto_details_faq_link">Jifunze zaidi</string>
+
+    <!-- receive: Tor warning -->
+
+    <string name="receive_tor_warning_title">Tor imewezeshwa</string>
+    <string name="receive_tor_warning_dialog_content_1">Phoenix haiwezi kupokea malipo katika usuli.</string>
+    <string name="receive_tor_warning_dialog_content_2">Ili kuepuka kushindwa kwa malipo, tumia Orbot badala yake, au hakikisha Phoenix inaonekana mbele wakati malipo yanatumwa kwako.</string>
+
+    <!-- scanning errors -->
+
+    <string name="scan_error_expired">Ankara hii imeisha muda wake.</string>
+    <string name="scan_error_already_paid">Malipo haya tayari yamelipwa.</string>
+    <string name="scan_error_invalid_chain">Malipo haya hayatumii mnyororo sawa na pochi yako.</string>
+    <string name="scan_error_lnurl_invalid">Imeshindwa kuchakata kiungo hiki cha LNURL. Hakikisha ni halali.</string>
+    <string name="scan_error_lnurl_unsupported">Aina hii ya LNURL haijaungwa mkono bado.</string>
+    <string name="scan_error_invalid_generic">Data hii inatumia muundo usiojulikana na haiwezi kuchakatwa.</string>
+    <string name="scan_error_bip353_name_not_found">Jina \"%1$s\" halijapatikana kwenye \"%2$s\".</string>
+    <string name="scan_error_bip353_invalid_uri">Anwani hii inatumia rasilimali ya Bip21 isiyo halali.</string>
+    <string name="scan_error_bip353_invalid_offer">Anwani hii inatumia ombi batili la Bolt12.</string>
+    <string name="scan_error_bip353_dnssec">Anwani hii inashikiliwa kwenye DNS isiyo salama. DNSSEC lazima iwezeshwe.</string>
+
+    <!-- validation -->
+
+    <string name="validation_below_min">Lazima iwe angalau %1$s</string>
+    <string name="validation_above_max">Lazima isiwe zaidi ya %1$s</string>
+
+    <!-- closing channels -->
+
+    <string name="mutualclose_input_label">Anwani ya Bitcoin</string>
+    <string name="mutualclose_input_instructions">Tuma fedha zote kwa pochi ya Bitcoin. Njia zote za malipo zitafungwa.</string>
+    <string name="mutualclose_confirm_title">Thibitisha kufunga</string>
+    <string name="mutualclose_confirm_details">Fedha zote zitatumwa kwa:</string>
+
+    <string name="forceclose_title">Funga njia kwa nguvu</string>
+    <string name="forceclose_instructions">Skrini hii inakuwezesha kufunga njia zako moja kwa moja.\n\nHii sio kitufe cha "rekebisha-kila-kitu" cha uchawi: iko hapa kama kipimo cha usalama na <b>inapaswa kutumiwa tu katika hali za dharura</b>. Kwa mfano, ikiwa mshirika wako (ACINQ) atatoweka kabisa, kukuzuia kutumia pesa zako. Katika visa vingine vyote, <b>ikiwa unakutana na matatizo na Phoenix unapaswa kuwasiliana na msaada</b>.\n\nKufunga njia kwa nguvu kutakugharimu pesa (kulipia ada za mtandaoni) na kutasababisha fedha zako kufungwa kwa siku kadhaa.\n\n<b>Usiondoe programu hadi njia zako zifungwe kikamilifu, au utapoteza pesa.</b>\n\n<b>Usitumie kipengele hiki ikiwa hujui kabisa kinachofanya.</b></string>
+    <string name="forceclose_address_label">Fedha zitakazotumwa hatimaye kwa pochi ya mwisho:</string>
+
+    <string name="forceclose_confirm_title">Thibitisha kufunga kwa nguvu</string>
+    <string name="forceclose_confirm_details">Fedha zote zitatumwa kwa pochi yako ya mwisho, baada ya muda.</string>
+    <string name="forceclose_button">Funga njia zangu zote kwa nguvu</string>
+
+    <!-- in-app notifications -->
+
+    <string name="inappnotif_migration_from_legacy">Hongera! Pochi yako imesasishwa.</string>
+    <string name="inappnotif_migration_from_legacy_action">Angalia kilichobadilika</string>
+    <string name="inappnotif_migration_from_legacy_dialog_title">Anwani yako ya Bitcoin ya mtandaoni imebadilika</string>
+    <string name="inappnotif_migration_from_legacy_dialog_body">Usitumie anwani zako za zamani! Hazitafanya kazi tena.\n\nWasiliana na msaada ikiwa ulifanya hivyo kwa bahati mbaya.</string>
+
+    <string name="inappnotif_backup_seed_message">Hifadhi nakala ya pochi yako ili kuepuka kupoteza bitcoins zako.</string>
+    <string name="inappnotif_backup_seed_action">Hifadhi pochi yangu</string>
+
+    <string name="inappnotif_notification_permission_message">Arifa zimelemazwa katika mipangilio ya Android. Phoenix haitakuwa na uwezo wa kukutaarifu wakati malipo yanashughulikiwa.</string>
+    <string name="inappnotif_notification_permission_enable">Wezesha</string>
+
+    <string name="inappnotif_swapin_timeout_message">Amana itakwisha muda wake hivi karibuni.</string>
+    <string name="inappnotif_swapin_timeout_action">Angalia maelezo</string>
+
+    <string name="inappnotif_watchtower_late_message">Phoenix inafuatilia mara kwa mara blockchain ikiwa nyuma, lakini ilishindwa kufanya hivyo kwa siku chache zilizopita.\n\nHakikisha Android haiwezi kuzuia Phoenix, na inaweza kuunganisha na Electrum.</string>
+    <string name="inappnotif_watchtower_late_action">Funga</string>
+
+    <string name="inappnotif_upgrade_message">Sasisho linapatikana</string>
+    <string name="inappnotif_upgrade_critical_message">Sasisho muhimu linapatikana. Unapaswa kusasisha Phoenix haraka iwezekanavyo.</string>
+    <string name="inappnotif_upgrade_button">Sasisha kwenye Google Play</string>
+
+    <string name="inappnotif_mempool_full_message">Ada za mtandaoni ziko juu.</string>
+    <string name="inappnotif_mempool_full_action">Angalia jinsi Phoenix inavyoathirika</string>
+
+    <string name="inappnotif_payment_onchain_pending_title">Fedha za mtandaoni zinangosubiria (+%1$s)</string>
+    <string name="inappnotif_payments_rejection_overview_one">Malipo moja ya kuingia yamekataliwa hivi karibuni</string>
+    <string name="inappnotif_payments_rejection_overview_many">%1$d malipo ya kuingia yamekataliwa hivi karibuni</string>
+    <string name="inappnotif_payment_rejected_title">Malipo yamekataliwa (+%1$s)</string>
+    <string name="inappnotif_payment_rejected_disabled">Usimamizi wa njia otomatiki umelemazwa.</string>
+    <string name="inappnotif_payment_rejected_over_absolute">Ada ilikuwa %1$s, lakini ada yako ya juu ilikuwa imewekwa kwa %2$s.</string>
+    <string name="inappnotif_payment_rejected_over_relative">Ada ilikuwa %1$s ambayo ni zaidi ya %2$s%% ya kiasi hicho.</string>
+    <string name="inappnotif_payment_rejected_channel_initializing">Njia zako bado zinaanzishwa na haziwezi kupokea malipo hayo.</string>
+    <string name="inappnotif_payment_rejected_tweak_setting">Gusa kusanidi.</string>
+    <string name="inappnotif_payment_rejected_view_wallet">Angalia maelezo</string>
+
+    <string name="inappnotif_watchtower_nominal_title">Ripoti ya Watchtower</string>
+    <string name="inappnotif_watchtower_nominal_description_one">%1$d njia ilikaguliwa kwa mafanikio tarehe %2$s. Hakuna masuala yaliyopatikana.</string>
+    <string name="inappnotif_watchtower_nominal_description_many">%1$d njia zilizoangaliwa kwa mafanikio tarehe %2$s. Hakuna masuala yaliyopatikana.</string>
+    <string name="inappnotif_watchtower_revokedfound_title">Tahadhari ya Watchtower</string>
+    <string name="inappnotif_watchtower_revokedfound_description">Mikataba iliyovunjwa ilipatikana tarehe %1$s kwa njia: %2$s. Njia hii inaweza kufungwa.</string>
+
+    <!-- settings: display seed -->
+
+    <string name="displayseed_instructions">Maneno ya kurejesha (yanayojulikana pia kama mbegu), ni orodha ya maneno 12 ya Kiingereza. Inakuwezesha kurejesha ufikiaji kamili wa fedha zako ikiwa inahitajika.\n\n<b>Ni wewe pekee unayemiliki mbegu hii. Ifanye iwe ya siri.</b>\n\n<b>Usishiriki mbegu hii na mtu yeyote</b>.\nJihadharini na ulaghai. Waendelezaji wa Phoenix hawatawahi kuuliza mbegu yako.\n\n<b>Usipoteze mbegu hii</b>.\nIhifadhi mahali salama (si kwenye simu hii). Ukipoteza mbegu yako na simu yako, utapoteza fedha zako.</string>
+  <string name="displayseed_authenticate_button">Onyesha mbegu</string>
+  <string name="displayseed_dialog_header">IFADHI HII MBEGU KWA USALAMA.\nUSISHIRIKI.</string>
+  <string name="displayseed_backup_notice_header">Hujaweka nakala ya maneno yako ya kurejesha!</string>
+  <string name="displayseed_backup_notice_details">Ikiwa hutaweka nakala na ukapoteza ufikiaji wa Phoenix, utapoteza fedha zako!</string>
+  <string name="displayseed_backup_checkbox">Nimehifadhi maneno yangu ya kurejesha mahali salama.</string>
+  <string name="displayseed_loss_disclaimer_checkbox">Ninaelewa kwamba nikikosa simu yangu na maneno yangu ya kurejesha, basi nitapoteza fedha zilizo kwenye pochi yangu.</string>
+
+  <!-- payment details -->
+
+  <string name="paymentdetails_funding_fees_label">Ada za wachimba madini</string>
+  <string name="paymentdetails_funding_fees_desc">Ada zilizolipwa kwa wachimba madini wa mtandao wa Bitcoin kushughulikia muamala wa mtandaoni.</string>
+  <string name="paymentdetails_service_fees_label">Ada za huduma</string>
+  <string name="paymentdetails_service_fees_desc">Ada zilizolipwa kwa ajili ya kuunda njia mpya ya malipo. Hii sio lazima kila wakati.</string>
+  <string name="paymentdetails_liquidity_service_fee_label">Ada za huduma</string>
+  <string name="paymentdetails_liquidity_service_fee_help">Ada zilizolipwa kwa huduma ya ukwasi.</string>
+  <string name="paymentdetails_liquidity_miner_fee_label">Ada za wachimba madini</string>
+  <string name="paymentdetails_liquidity_miner_fee_help">Ada zilizolipwa kwa wachimba madini wa mtandao wa Bitcoin kushughulikia muamala wa mtandaoni.</string>
+  <string name="paymentdetails_liquidity_lease_duration_label">Muda</string>
+  <string name="paymentdetails_liquidity_lease_duration_value">1 mwaka</string>
+
+  <!-- lnurl -->
+
+  <string name="lnurl_auth_instructions">Unaweza kuingia kwa siri na kuidhinisha kitendo kwenye:</string>
+  <string name="lnurl_withdraw_header">Unaweza kutoa fedha kutoka\n<b>%1$s</b>.</string>
+  <string name="lnurl_withdraw_success">Ombi la kutoa fedha limepelekwa kwa <b>%1$s</b>.\n\nInaweza kuchukua muda kabla ya wao kutuma fedha. Tafadhali weka programu kwenye mtandao kwa wakati huu.</string>
+
+  <!-- Tor -->
+
+  <string name="tor_settings_subtitle">Phoenix inaweza kutumia Tor kuficha IP yako kutoka kwa nodi zingine kwenye Mtandao wa Lightning na seva za Electrum.</string>
+
+  <string name="tor_confirm_dialog_title">Wezesha Tor?</string>
+  <string name="tor_confirm_dialog_details_1">Tor ni polepole na itaathiri utendaji wa malipo yako.</string>
+  <string name="tor_confirm_dialog_details_2">Hasa, <b>hutoweza kupokea malipo</b> ikiwa Phoenix iko kwenye usuli, au ikiwa imefungwa.</string>
+
+  <!-- about -->
+
+  <string name="about_general_content">Phoenix ni pochi ya Bitcoin inayotumia mtandao wa Lightning kwa kutuma na kupokea malipo.\n\nNi programu huru ya chanzo wazi, iliyotengenezwa na <a href="https://phoenix.acinq.co">ACINQ</a> chini ya <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Leseni ya Apache 2.0</a>.</string>
+  <string name="about_seed_title">Kulinda ufunguo wako</string>
+  <string name="about_seed_content">Pochi hii ni ya kujisimamia: <b>wewe una mamlaka kamili ya mbegu ya maneno 12 ya pochi</b>.\n\nMbegu hii inatoa ufikiaji wa fedha zako. Usifunue kwa mtu yeyote, na jihadhari na ulaghai.</string>
+  <string name="about_rates_title">Viwango vya kubadilisha fedha</string>
+  <string name="about_rates_content">Viwango vya kubadilisha Bitcoin/fiat vinapatikana kutoka kwenye API za wahusika wengine mbalimbali:\n\n- Blockchain.info\n- powered by Coindesk.com\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nViwango hivyo vinaweza kuwa si sahihi. Daima hakikisha kiasi halisi cha Bitcoin kabla ya kutuma malipo.</string>
+
+  <!-- introduction screens -->
+
+  <string name="intro_welcome_title">Karibu!</string>
+  <string name="intro_welcome_sub1">Kwa Phoenix, kutuma na kupokea bitcoins ni rahisi na salama.</string>
+  <string name="intro_welcome_next_button">Ifuatayo</string>
+
+  <string name="intro_channels_title">Bitcoin yenye nguvu zaidi</string>
+  <string name="intro_channels_sub1">Phoenix hutumia njia za malipo kufanya Bitcoin kuwa ya haraka na ya siri.</string>
+  <string name="intro_channels_next_button">Ifuatayo</string>
+
+  <string name="intro_selfcustody_title">Ufunguo wako, bitcoins zako</string>
+  <string name="intro_selfcustody_sub1">Phoenix ni ya kujisimamia. Unachukua udhibiti.</string>
+  <string name="intro_selfcustody_sub2">Unaweza kurejesha pochi yako wakati wowote kwa kutumia ufunguo wako wa siri. Ifanye salama!</string>
+  <string name="intro_selfcustody_next_button">Anza</string>
+
+  <!-- wallet info -->
+
+  <string name="walletinfo_onchain_swapin">Pochi ya swap-in</string>
+  <string name="walletinfo_onchain_swapin_help">Pochi ya swap-in inasimamia fedha za mtandaoni zilizowekwa kwenye Phoenix.\n\nInazibadilisha moja kwa moja kuwa Lightning inapowezekana, kulingana na mipangilio yako ya usimamizi wa njia.</string>
+  <string name="walletinfo_onchain_swapin_help_faq_link">Angalia jinsi inavyofanya kazi</string>
+  <string name="walletinfo_onchain_swapin_policy_view">Gusa kusanidi</string>
+  <string name="walletinfo_onchain_swapin_empty">Hakuna swap zinazoendelea.</string>
+
+  <string name="walletinfo_onchain_swapin_policy_auto_details">Fedha za mtandaoni zinabadilishwa moja kwa moja kuwa Lightning ikiwa ada ya wachimba madini ni <b>chini ya %1$s</b> (inaweza kusanidiwa).</string>
+  <string name="walletinfo_onchain_swapin_policy_auto_details_timeout">Fedha ambazo hazijabadilishwa <b>baada ya miezi %1$d</b> zinapatikana kwa kurejeshwa mtandaoni.</string>
+  <string name="walletinfo_onchain_swapin_policy_disabled_details">Usimamizi wa njia otomatiki <b>umelemazwa</b>. Hakuna kubadilisha kutakakotokea, fedha zitabaki mtandaoni.</string>
+
+  <string name="walletinfo_onchain_swapin_last_attempt">Jaribio la kubadilisha lilishindikana %1$s</string>
+  <string name="walletinfo_onchain_swapin_last_attempt_disabled">Usimamizi wa njia ulikuwa umelemazwa.</string>
+  <string name="walletinfo_onchain_swapin_last_attempt_channels_init">Njia zilikuwa bado zinaanzishwa.</string>
+  <string name="walletinfo_onchain_swapin_timeout_1day">Swap hii itaisha muda wake ndani ya siku moja!</string>
+  <string name="walletinfo_onchain_swapin_timeout">Swap hii itaisha muda wake ndani ya siku %1$s.</string>
+
+  <string name="walletinfo_onchain_swapin_locked_title">Muda umekwisha</string>
+  <string name="walletinfo_onchain_swapin_locked_description">Fedha hizi zitapatikana kuanzia siku %1$s na kuendelea.</string>
+
+  <string name="walletinfo_onchain_swapin_refund_title">Fedha zilizobatilishwa</string>
+  <string name="walletinfo_onchain_swapin_refund_description">Fedha hizi hazikubadilishwa kwa wakati. Gusa kutumia.</string>
+
+  <string name="walletinfo_onchain_final_about">Pochi ya mwisho ni mahali ambapo fedha zinatumwa wakati njia zako za Lightning zimefungwa au kunapokuwa na tatizo. Kawaida inapaswa kuwa tupu.</string>
+
+  <!-- settings: liquidity policy for channels creation -->
+
+  <string name="liquiditypolicy_instructions">Malipo yanayoingia wakati mwingine yanahitaji muamala wa mtandaoni. Hii haitokei kila wakati, tu inapohitajika.</string>
+  <string name="liquiditypolicy_fees_estimation">Ada zinakadiriwa sasa hivi kuwa takribani <b>%1$s</b> (≈%2$s).</string>
+  <string name="liquiditypolicy_disable_label">Usimamizi wa njia otomatiki</string>
+  <string name="liquiditypolicy_disable_desc">Malipo yanayoingia yanayohitaji operesheni za mtandaoni yatakataliwa.</string>
+
+  <string name="liquiditypolicy_fees_base_label">Kiwango cha juu cha ada</string>
+  <string name="liquiditypolicy_fees_base_help">Malipo ambayo ada yake inazidi thamani hii yatakataliwa.</string>
+  <string name="liquiditypolicy_fees_base_too_low">Thamani hii ni ya chini sana.</string>
+  <string name="liquiditypolicy_fees_base_below_estimation">Chini ya ada inayotarajiwa. Malipo mengine yanaweza kukataliwa.</string>
+
+  <string name="liquiditypolicy_advanced_menu">Chaguzi za hali ya juu</string>
+  <string name="liquiditypolicy_advanced_disable">Usimamizi wa njia umelemazwa. Inaweza kuwezeshwa kwenye skrini ya mipangilio ya usimamizi wa njia.</string>
+  <string name="liquiditypolicy_advanced_disclaimer_header">Tahadhari!</string>
+  <string name="liquiditypolicy_advanced_disclaimer_message">Skrini hii ni kwa watumiaji wa hali ya juu. Usibadilishe mipangilio hii isipokuwa unaelewa madhumuni yake.</string>
+
+  <string name="liquiditypolicy_advanced_verifications_title">Uthibitisho wa ziada</string>
+  <string name="liquiditypolicy_advanced_fees_prop_label">Ukaguzi wa asilimia</string>
+  <string name="liquiditypolicy_advanced_fees_prop_help">Angalia ada kulingana na kiasi kilichopokelewa. Chaguo hili ni muhimu kama ukaguzi wa busara kwa malipo madogo.</string>
+  <string name="liquiditypolicy_advanced_overrides_title">Kuingilia sera</string>
+  <string name="liquiditypolicy_advanced_pay_to_open_label">Ruka ukaguzi wa ada kamili kwa Lightning</string>
+  <string name="liquiditypolicy_advanced_pay_to_open_help">Ikiwa imewezeshwa, malipo yanayoingia ya Lightning yatapuuza kiwango cha juu cha ada kamili. Ukaguzi wa asilimia tu ndio utatumika.\n\nTahadhari: ikiwa kiwango cha ada ya mempool ya Bitcoin kiko juu, malipo ya LN yanayoingia yanayohitaji operesheni ya mtandaoni yanaweza kuwa ghali.</string>
+  <string name="liquiditypolicy_save_button">Hifadhi sera</string>
+  <string name="liquiditypolicy_request_button">Omba ukwasi wa kuingia</string>
+
+  <string name="liquiditypolicy_help">
+    Phoenix inakuruhusu kupokea malipo kwenye blockchain ya Bitcoin (L1) na safu ya Lightning ya Bitcoin (L2).
+    \n\n
+    - safu ya blockchain (L1) ni polepole, na kwa ujumla ni ghali zaidi (inahitaji ada za wachimba madini)
+    \n
+    - safu ya Lightning (L2) ni ya haraka zaidi, na kwa ujumla ni ya bei nafuu zaidi (hasa kwa malipo madogo)
+    \n\n
+    Unapopokea malipo kwenye L1, Phoenix itahamisha moja kwa moja fedha hizo kwenda L2 <b>IKIWA</b> ada za wachimba madini zinazingatia sera yako ya ada iliyosanidiwa.
+    \n\n
+    Malipo unayopokea kwenye L2 yanaweza kupokelewa papo hapo na bila ada. Hata hivyo, mara kwa mara operesheni ya L1 pia inahitajika ili kusimamia njia ya malipo ya L2. Hii inaweza kufanywa kiotomatiki <b>IKIWA</b> ada za wachimba madini zinazingatia sera yako ya ada iliyosanidiwa.
+  </string>
+
+    <!-- settings: liquidity request -->
+
+    <string name="liquidityads_no_channels_header">Hakuna njia bado!</string>
+    <string name="liquidityads_no_channels_details">Unahitaji fedha kwenye pochi ili kutumia kipengele hiki.</string>
+    <string name="liquidityads_header">Panga mapema ukwasi wako</string>
+    <string name="liquidityads_instructions">Ukwasi wa kuingia unakuwezesha kuepuka ada za muamala wa kwenye mnyororo kwa malipo ya baadaye yanayopokelewa kupitia Lightning.\n\nKwa kuomba ukwasi zaidi sasa, unaweza kuokoa ada baadaye.</string>
+    <string name="liquidityads_faq_link">Maelezo zaidi</string>
+    <string name="liquidityads_current_liquidity">Ukwasi wa sasa</string>
+
+    <string name="liquidityads_amount_label">Omba ukwasi</string>
+    <string name="liquidityads_estimate_button">Kadiria gharama ya ukwasi</string>
+    <string name="liquidityads_estimating_spinner">Inakadiria gharama…</string>
+    <string name="liquidityads_estimate_details_miner_fees">Ada ya wachimbaji</string>
+    <string name="liquidityads_estimate_details_miner_fees_help">Mchango wa ada ya uchimbaji kwa muamala wa msingi wa kwenye mnyororo.</string>
+    <string name="liquidityads_estimate_details_service_fees">Ada ya huduma</string>
+    <string name="liquidityads_estimate_details_service_fees_help">Ada hii inaenda kwa huduma inayotoa ukwasi.</string>
+    <string name="liquidityads_estimate_details_duration">Muda</string>
+    <string name="liquidityads_estimate_details_duration_value">Mwaka 1</string>
+    <string name="liquidityads_estimate_details_duration_help">Unapopokea fedha, ukwasi utatumika na kuwa salio lako. Baada ya mwaka mmoja, ukwasi uliobaki ambao haujatumiwa utarejeshwa na huduma.</string>
+    <string name="liquidityads_estimate_above_25">Ada ya jumla ni zaidi ya 25% ya kiasi cha ukwasi kilichoombwa.</string>
+    <string name="liquidityads_over_balance">Ada za jumla ni zaidi ya salio lako.</string>
+
+    <string name="liquidityads_review_button">Kagua</string>
+    <string name="liquidityads_disclaimer_body1">Unaomba kiasi cha <b>awali</b> cha ukwasi. Ukwasi sio wa kudumu kwa muda: unapopokea fedha kupitia Lightning, ukwasi utatumika na kuwa salio lako.</string>
+    <string name="liquidityads_disclaimer_body2">Baada ya mwaka mmoja, ukwasi uliobaki ambao haujatumiwa utarejeshwa na huduma.</string>
+
+    <string name="liquidityads_request_button">Kubali</string>
+    <string name="liquidityads_requesting_spinner">Inasindika splice…</string>
+
+    <string name="liquidityads_success">Ukwasi umeongezwa kwa mafanikio!</string>
+    <string name="liquidityads_success_amount">Kiasi kilichoongezwa: %1$s</string>
+
+    <string name="liquidityads_error_header">Ombi la ukwasi limeshindwa</string>
+    <string name="liquidityads_error_channels_unavailable">Njia hazipatikani. Jaribu tena baadaye.</string>
+
+    <!-- payment line -->
+
+    <string name="paymentline_outgoing_unconfirmed">Haijathibitishwa - gonga kuongeza kasi</string>
+
+    <!-- CPFP -->
+
+    <string name="cpfp_title">Ongeza kasi ya miamala yangu.</string>
+    <string name="cpfp_instructions">Unaweza kufanya miamala yako yote isiyothibitishwa itumie kiwango cha ada cha juu zaidi ili kuwashawishi wachimbaji kupendelea malipo yako.</string>
+    <string name="cpfp_splice_error_actual_below_user">Kiwango hiki cha ada ni chini ya kile ambacho miamala yako isiyothibitishwa tayari inatumia. Tumia kiwango cha ada cha juu zaidi.</string>
+
+    <!-- Lightning payment errors -->
+
+    <string name="outgoing_failuremessage_channel_closing">Njia zinafungwa.</string>
+    <string name="outgoing_failuremessage_channel_splicing">Njia tayari zinachakata splice. Jaribu tena baadaye.</string>
+    <string name="outgoing_failuremessage_not_enough_fee">Ada haitoshi.</string>
+    <string name="outgoing_failuremessage_not_enough_balance">Malipo haya ni zaidi ya salio lako.</string>
+    <string name="outgoing_failuremessage_too_big">Kiasi cha malipo ni kikubwa sana - jaribu kukigawanya katika sehemu kadhaa.</string>
+    <string name="outgoing_failuremessage_too_small">Kiasi cha malipo ni kidogo sana.</string>
+    <string name="outgoing_failuremessage_expiry_too_big">Muda wa malipo haya ni mbali sana katika siku zijazo.</string>
+    <string name="outgoing_failuremessage_rejected_by_recipient">Malipo yalikataliwa na mpokeaji. Ankra hii inaweza kuwa tayari imelipwa.</string>
+    <string name="outgoing_failuremessage_recipient_offline">Mpokeaji yupo nje ya mtandao.</string>
+    <string name="outgoing_failuremessage_not_enough_liquidity">Malipo hayakuweza kupitishwa kwa mpokeaji (inawezekana ukwasi wa kuingia hautoshi).</string>
+    <string name="outgoing_failuremessage_temporary_failure">Hitilafu ilitokea kwenye nodi katika njia ya malipo. Malipo yanaweza kufanikiwa ikiwa utajaribu tena.</string>
+    <string name="outgoing_failuremessage_too_many_pending">Una malipo mengi yanayosubiri. Jaribu tena mara yanapokamilika.</string>
+
+    <string name="outgoing_failuremessage_invalid_id">Kitambulisho cha malipo sio sahihi. Jaribu tena.</string>
+    <string name="outgoing_failuremessage_alreadypaid">Ankra hii tayari imelipwa.</string>
+    <string name="outgoing_failuremessage_not_connected">Njia yako haijaunganishwa bado. Subiri muunganisho thabiti na jaribu tena.</string>
+    <string name="outgoing_failuremessage_channel_opening">Njia yako bado iko katika mchakato wa kufunguliwa. Subiri na jaribu tena.</string>
+    <string name="outgoing_failuremessage_unsupported_features">Ankra hii inatumia vipengele visivyosaidiwa. Hakikisha uko kwenye toleo la hivi karibuni la Phoenix.</string>
+    <string name="outgoing_failuremessage_invalid_amount">Kiasi cha malipo sio sahihi.</string>
+    <string name="outgoing_failuremessage_no_available_channels">Malipo hayakuweza kutumwa kupitia njia zako zilizopo.</string>
+    <string name="outgoing_failuremessage_noroutefound">Mpokeaji hapatikani, au hana ukwasi wa kutosha wa kuingia.</string>
+    <string name="outgoing_failuremessage_unknown">Hitilafu isiyojulikana imetokea na malipo yameshindwa.</string>
+    <string name="outgoing_failuremessage_restarted">Pochi ilianzishwa upya wakati malipo yalikuwa yanachakata.</string>
+
+    <!-- spliceout: low feerate disclaimer -->
+
+    <string name="spliceout_low_feerate_dialog_title">Kiwango cha ada cha chini!</string>
+    <string name="spliceout_low_feerate_dialog_body1">Miamala yenye kiwango cha ada kisichotosha inaweza kuchelewa kwa siku au wiki bila kuthibitishwa.</string>
+    <string name="spliceout_low_feerate_dialog_body2">Kuchagua kiwango cha ada ni jukumu lako. Mara ikitumwa, muamala huu hauwezi kufutwa, unaweza tu kuongeza kasi kwa ada za juu zaidi.</string>
+    <string name="spliceout_low_feerate_dialog_body3">Je, una uhakika unataka kuendelea?</string>
+
+    <!-- spliceout: capacity disclaimer -->
+
+    <string name="spliceout_capacity_disclaimer_title">Ukubwa wa njia umeathirika</string>
+    <string name="spliceout_capacity_disclaimer_body1">Fedha zilizotumwa kwenye mnyororo zinachukuliwa kutoka upande wako wa njia, kupunguza ukubwa wa njia kwa kiasi sawa. Ukwasi wako wa kuingia unabaki vile vile.</string>
+    <string name="spliceout_capacity_disclaimer_checkbox">Usionyeshe ujumbe huu tena.</string>
+
+    <!-- Spend swap-in refund -->
+
+    <string name="swapinrefund_title">Tumia swap-ins zilizofutwa</string>
+    <string name="swapinrefund_none_available_label">Hakuna swap-ins zilizofutwa bado.</string>
+    <string name="swapinrefund_available_label">Inapatikana: <b>%1$s</b> (%2$s)</string>
+    <string name="swapinrefund_instructions_1">Tumia skrini hii kutumia amana za kwenye mnyororo ambazo hazikubadilishwa kwa wakati. Hii haiathiri njia zako za Lightning.</string>
+    <string name="swapinrefund_instructions_2">Hakikisha anwani ya marudio ni sahihi na kiwango cha ada ni cha kuridhisha.</string>
+    <string name="swapinrefund_estimate_button">Kadiria ada</string>
+    <string name="swapinrefund_estimating">Inakadiria ada…</string>
+    <string name="swapinrefund_send_button">Tangaza</string>
+    <string name="swapinrefund_sending">Inatangaza…</string>
+    <string name="swapinrefund_failed">Hitilafu ya muamala.</string>
+    <string name="swapinrefund_failed_address">Anwani hii sio sahihi.</string>
+    <string name="swapinrefund_failed_cannot_create">Haiwezi kuunda muamala wa marejesho.</string>
+    <string name="swapinrefund_success">Muamala umetangazwa.</string>
+    <string name="swapinrefund_success_details">Unaweza kupata muamala unaotumia fedha hapa chini. Haitaonekana kwenye historia ya malipo yako, hivyo fanya nakala ya kitambulisho chake sasa ikiwa inahitajika.</string>
+
+    <!-- experimental features -->
+
+    <string name="bip353_subtitle">Hii ni anwani inayosomeka na binadamu kwa ombi lako la malipo la Bolt12.</string>
+    <string name="bip353_subtitle2">Unataka anwani nzuri zaidi? Tumia huduma za watu wengine, au kuwa mwenyeji wa anwani hiyo!</string>
+
+</resources>
