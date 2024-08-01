@@ -894,7 +894,7 @@ struct LightningDualView: View {
 		log.trace("copyTextToPasteboard()")
 		
 		if let qrCodeValue = qrCode.value {
-			UIPasteboard.general.string = qrCodeValue
+            UIPasteboard.general.string = qrCodeValue.lowercased()
 			toast.pop(
 				NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
 				colorScheme: colorScheme.opposite,
@@ -921,7 +921,7 @@ struct LightningDualView: View {
 		
 		if let qrCodeValue = qrCode.value {
 			withAnimation {
-				let url = "lightning:\(qrCodeValue)"
+                let url = "lightning:\(qrCodeValue.lowercased())"
 				activeSheet = ReceiveViewSheet.sharingUrl(url: url)
 			}
 		}
