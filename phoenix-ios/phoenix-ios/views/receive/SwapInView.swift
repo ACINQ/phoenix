@@ -273,8 +273,6 @@ struct SwapInView: View {
 	
 	@ViewBuilder
 	func copyButton() -> some View {
-		
-		let address = swapInAddress
 			
 		actionButton(
 			text: NSLocalizedString("copy", comment: "button label - try to make it short"),
@@ -282,26 +280,16 @@ struct SwapInView: View {
 			width: 20, height: 20,
 			xOffset: 0, yOffset: 0
 		) {
-			// using simultaneousGesture's below
+			showCopyOptionsSheet()
 		}
-		.disabled(address == nil)
-		.simultaneousGesture(LongPressGesture().onEnded { _ in
-			didLongPressCopyButton()
-		})
-		.simultaneousGesture(TapGesture().onEnded {
-			if let address {
-				copyTextToPasteboard(address)
-			}
-		})
+		.disabled(swapInAddress == nil)
 		.accessibilityAction(named: "Copy options") {
-			didLongPressCopyButton()
+			showCopyOptionsSheet()
 		}
 	}
 	
 	@ViewBuilder
 	func shareButton() -> some View {
-		
-		let address = swapInAddress
 		
 		actionButton(
 			text: NSLocalizedString("share", comment: "button label - try to make it short"),
@@ -309,19 +297,11 @@ struct SwapInView: View {
 			width: 21, height: 21,
 			xOffset: 0, yOffset: -1
 		) {
-			// using simultaneousGesture's below
+			showShareOptionsSheet()
 		}
-		.disabled(address == nil)
-		.simultaneousGesture(LongPressGesture().onEnded { _ in
-			didLongPressShareButton()
-		})
-		.simultaneousGesture(TapGesture().onEnded {
-			if let address {
-				shareTextToSystem(address)
-			}
-		})
+		.disabled(swapInAddress == nil)
 		.accessibilityAction(named: "Share options") {
-			didLongPressShareButton()
+			showShareOptionsSheet()
 		}
 	}
 	
@@ -435,14 +415,14 @@ struct SwapInView: View {
 	// MARK: Actions
 	// --------------------------------------------------
 	
-	func didLongPressCopyButton() -> Void {
-		log.trace("didLongPressCopyButton()")
+	func showCopyOptionsSheet() {
+		log.trace("showCopyOptionsSheet()")
 		
 		showCopyShareOptionsSheet(.copy)
 	}
 	
-	func didLongPressShareButton() {
-		log.trace("didLongPressShareButton()")
+	func showShareOptionsSheet() {
+		log.trace("showShareOptionsSheet()")
 		
 		showCopyShareOptionsSheet(.share)
 	}
@@ -467,6 +447,7 @@ struct SwapInView: View {
 		if let address = qrCode.value {
 			sources.append(SourceInfo(
 				type: .text,
+				isDefault: true,
 				title: String(localized: "Bitcoin address", comment: "Type of text being copied"),
 				subtitle: address,
 				callback: exportText(address)
@@ -475,6 +456,7 @@ struct SwapInView: View {
 		if let cgImage = qrCode.cgImage {
 			sources.append(SourceInfo(
 				type: .image,
+				isDefault: false,
 				title: String(localized: "QR code", comment: "Type of image being copied"),
 				subtitle: nil,
 				callback: exportImage(cgImage)

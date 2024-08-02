@@ -323,29 +323,27 @@ struct LightningDualView: View {
 					.font(.footnote)
 					.foregroundColor(.secondary)
 			
-				Text(invoiceDescription())
+				invoiceDescriptionView()
 					.lineLimit(1)
 					.font(.footnote)
 					.foregroundColor(.secondary)
 				
 			} else {
-				offerAddressView()
-					.font(.footnote)
-					.foregroundColor(.secondary)
 				
-				if let bip353Address {
-					Text(bip353Address)
+				if let address = bip353Address {
+					bip353AddressView(address)
 						.lineLimit(2)
 						.multilineTextAlignment(.center)
 						.font(.footnote)
 						.foregroundColor(.secondary)
-						.contextMenu {
-							Button {
-								copyTextToPasteboard(bip353Address)
-							} label: {
-								Text("Copy")
-							}
-						}
+					
+				} else {
+					
+					offerAddressView()
+						.lineLimit(1)
+						.truncationMode(.middle)
+						.font(.footnote)
+						.foregroundColor(.secondary)
 				}
 			}
 		}
@@ -377,12 +375,39 @@ struct LightningDualView: View {
 	}
 	
 	@ViewBuilder
+	func invoiceDescriptionView() -> some View {
+		
+		if let m = mvi.model as? Receive.Model_Generated {
+			if let desc = m.desc, desc.count > 0 {
+				Text(desc)
+			} else {
+				Text("no description", comment: "placeholder: invoice is description-less")
+			}
+		} else {
+			Text("...")
+		}
+	}
+	
+	@ViewBuilder
+	func bip353AddressView(_ address: String) -> some View {
+		
+		let bAddress = "₿\(address)"
+		
+		Text("\(Image(systemName: "bitcoinsign.circle")) \(address)")
+			.contextMenu {
+				Button {
+					copyTextToPasteboard(bAddress)
+				} label: {
+					Text("Copy")
+				}
+			}
+	}
+	
+	@ViewBuilder
 	func offerAddressView() -> some View {
 		
 		if let offerStr = qrCode.value {
 			Text(offerStr)
-				.lineLimit(1)
-				.truncationMode(.middle)
 				.contextMenu {
 					Button {
 						copyTextToPasteboard(offerStr)
@@ -455,34 +480,22 @@ struct LightningDualView: View {
 	@ViewBuilder
 	func copyButton() -> some View {
 		
-		let qrCodeValue = qrCode.value
-		
 		actionButton(
 			text: NSLocalizedString("copy", comment: "button label - try to make it short"),
 			image: Image(systemName: "square.on.square"),
 			width: 20, height: 20,
 			xOffset: 0, yOffset: 0
 		) {
-			// using simultaneousGesture's below
+			showCopyOptionsSheet()
 		}
-		.disabled(qrCodeValue == nil)
-		.simultaneousGesture(LongPressGesture().onEnded { _ in
-			didLongPressCopyButton()
-		})
-		.simultaneousGesture(TapGesture().onEnded {
-			if let qrCodeValue {
-				copyTextToPasteboard(qrCodeValue)
-			}
-		})
+		.disabled(qrCode.value == nil)
 		.accessibilityAction(named: "Copy options") {
-			didLongPressCopyButton()
+			showCopyOptionsSheet()
 		}
 	}
 	
 	@ViewBuilder
 	func shareButton() -> some View {
-		
-		let qrCodeValue = qrCode.value
 		
 		actionButton(
 			text: NSLocalizedString("share", comment: "button label - try to make it short"),
@@ -490,19 +503,11 @@ struct LightningDualView: View {
 			width: 21, height: 21,
 			xOffset: 0, yOffset: -1
 		) {
-			// using simultaneousGesture's below
+			showShareOptionsSheet()
 		}
-		.disabled(qrCodeValue == nil)
-		.simultaneousGesture(LongPressGesture().onEnded { _ in
-			didLongPressShareButton()
-		})
-		.simultaneousGesture(TapGesture().onEnded {
-			if let qrCodeValue {
-				shareTextToSystem(qrCodeValue)
-			}
-		})
+		.disabled(qrCode.value == nil)
 		.accessibilityAction(named: "Share options") {
-			didLongPressShareButton()
+			showShareOptionsSheet()
 		}
 	}
 	
@@ -794,14 +799,14 @@ struct LightningDualView: View {
 		}
 	}
 	
-	func didLongPressCopyButton() {
-		log.trace("didLongPressCopyButton()")
+	func showCopyOptionsSheet() {
+		log.trace("showCopyOptionsSheet()")
 		
 		showCopyShareOptionsSheet(.copy)
 	}
 	
-	func didLongPressShareButton() -> Void {
-		log.trace("didLongPressShareButton()")
+	func showShareOptionsSheet() {
+		log.trace("showShareOptionsSheet()")
 		
 		showCopyShareOptionsSheet(.share)
 	}
@@ -828,6 +833,7 @@ struct LightningDualView: View {
 			if let invoiceText = qrCode.value {
 				sources.append(SourceInfo(
 					type: .text,
+					isDefault: true,
 					title: String(localized: "Lightning invoice", comment: "Type of text being copied"),
 					subtitle: invoiceText,
 					callback: exportText(invoiceText)
@@ -836,6 +842,7 @@ struct LightningDualView: View {
 			if let invoiceImage = qrCode.cgImage {
 				sources.append(SourceInfo(
 					type: .image,
+					isDefault: false,
 					title: String(localized: "QR code", comment: "Type of image being copied"),
 					subtitle: nil,
 					callback: exportImage(invoiceImage)
@@ -844,16 +851,19 @@ struct LightningDualView: View {
 			
 		case .bolt12_offer:
 			if let address = bip353Address {
+				let bAddress = "₿\(address)" // this will probably confuse users, but it's in the spec
 				sources.append(SourceInfo(
 					type: .text,
+					isDefault: true,
 					title: String(localized: "Human-readable address", comment: "Type of text being copied"),
-					subtitle: address,
-					callback: exportText(address)
+					subtitle: bAddress,
+					callback: exportText(bAddress)
 				))
 			}
 			if let offerText = qrCode.value {
 				sources.append(SourceInfo(
 					type: .text,
+					isDefault: false,
 					title: String(localized: "Payment code", comment: "Type of text being copied"),
 					subtitle: offerText,
 					callback: exportText(offerText)
@@ -863,6 +873,7 @@ struct LightningDualView: View {
 				let uri = "bitcoin:?lno=\(offerText)"
 				sources.append(SourceInfo(
 					type: .text,
+					isDefault: false,
 					title: String(localized: "Full URI", comment: "Type of text being copied"),
 					subtitle: uri,
 					callback: exportText(uri)
@@ -871,6 +882,7 @@ struct LightningDualView: View {
 			if let offerImage = qrCode.cgImage {
 				sources.append(SourceInfo(
 					type: .image,
+					isDefault: false,
 					title: String(localized: "QR code", comment: "Type of image being copied"),
 					subtitle: nil,
 					callback: exportImage(offerImage)

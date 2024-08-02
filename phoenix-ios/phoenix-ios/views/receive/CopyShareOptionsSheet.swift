@@ -63,12 +63,14 @@ struct CopyShareOptionsSheet: View {
 						Image(systemName: "square.and.arrow.up")
 					}
 				}
-				.imageScale(.large)
+				.imageScale(.medium)
 				.font(.title3)
 				.padding(.trailing, 4)
 
 				VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
 					Text(source.title)
+						.font(source.isDefault ? Font.body.bold() : Font.body)
+					
 					if let subtitle = source.subtitle {
 						Text(subtitle)
 							.font(.footnote)
