@@ -8,10 +8,6 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-fileprivate enum NavLinkTag: String {
-	case SpendExpiredSwapIns
-}
-
 struct SwapInWalletDetails: View {
 	
 	enum Location {
@@ -22,7 +18,10 @@ struct SwapInWalletDetails: View {
 	let location: Location
 	let popTo: (PopToDestination) -> Void
 	
-	@State private var navLinkTag: NavLinkTag? = nil
+	enum NavLinkTag: String {
+		case SpendExpiredSwapIns
+	}
+	@State var navLinkTag: NavLinkTag? = nil
 	
 	@State var liquidityPolicy: LiquidityPolicy = GroupPrefs.shared.liquidityPolicy
 	
@@ -53,7 +52,12 @@ struct SwapInWalletDetails: View {
 		}
 		.navigationTitle(NSLocalizedString("Swap-in wallet", comment: "Navigation Bar Title"))
 		.navigationBarTitleDisplayMode(.inline)
-		.onAppear { onAppear() }
+		.navigationDestination(for: NavLinkTag.self) { tag in
+			navLinkView(tag)
+		}
+		.onAppear {
+			onAppear()
+		}
 	}
 	
 	@ViewBuilder
@@ -347,7 +351,7 @@ struct SwapInWalletDetails: View {
 		Section {
 			
 			let (btcAmt, fiatAmt) = cancelledBalance()
-			navLink(.SpendExpiredSwapIns) {
+			NavigationLink(value: NavLinkTag.SpendExpiredSwapIns) {
 				Text(verbatim: "\(btcAmt.string)") +
 				Text(verbatim: " ≈ \(fiatAmt.string)").foregroundColor(.secondary)
 			}
@@ -363,21 +367,7 @@ struct SwapInWalletDetails: View {
 	}
 	
 	@ViewBuilder
-	private func navLink<Content>(
-		_ tag: NavLinkTag,
-		label: () -> Content
-	) -> some View where Content: View {
-		
-		NavigationLink(
-			destination: navLinkView(tag),
-			tag: tag,
-			selection: $navLinkTag,
-			label: label
-		)
-	}
-	
-	@ViewBuilder
-	private func navLinkView(_ tag: NavLinkTag) -> some View {
+	func navLinkView(_ tag: NavLinkTag) -> some View {
 		
 		switch tag {
 			case .SpendExpiredSwapIns: SpendExpiredSwapIns()

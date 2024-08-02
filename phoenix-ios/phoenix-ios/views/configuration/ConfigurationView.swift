@@ -9,34 +9,6 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-fileprivate enum NavLinkTag: String {
-	// General
-	case About
-	case WalletCreationOptions
-	case DisplayConfiguration
-	case PaymentOptions
-	case ContactsList
-	case Notifications
-	// Fees
-	case ChannelManagement
-	case LiquidityManagement
-	// Privacy & Security
-	case AppAccess
-	case RecoveryPhrase
-	case ElectrumServer
-	case Tor
-	case PaymentsBackup
-	// Advanced
-	case WalletInfo
-	case ChannelsConfiguration
-	case LogsConfiguration
-	case Experimental
-	// Danger Zone
-	case DrainWallet
-	case ResetWallet
-	case ForceCloseChannels
-}
-
 struct ConfigurationView: View {
 	
 	@ViewBuilder
@@ -51,7 +23,64 @@ fileprivate struct ConfigurationList: View {
 	
 	let scrollViewProxy: ScrollViewProxy
 	
-	@State private var navLinkTag: NavLinkTag? = nil
+	enum NavLinkTag: String, Codable {
+		// General
+		case About
+		case WalletCreationOptions
+		case DisplayConfiguration
+		case PaymentOptions
+		case ContactsList
+		case Notifications
+		// Fees
+		case ChannelManagement
+		case LiquidityManagement
+		// Privacy & Security
+		case AppAccess
+		case RecoveryPhrase
+		case ElectrumServer
+		case Tor
+		case PaymentsBackup
+		// Advanced
+		case WalletInfo
+		case ChannelsConfiguration
+		case LogsConfiguration
+		case Experimental
+		// Danger Zone
+		case DrainWallet
+		case ResetWallet
+		case ForceCloseChannels
+		
+//		var description: String {
+//			switch self {
+//				// General
+//				case .About                 : return "About"
+//				case .WalletCreationOptions : return "WalletCreationOptions"
+//				case .DisplayConfiguration  : return "DisplayConfiguration"
+//				case .PaymentOptions        : return "PaymentOptions"
+//				case .ContactsList          : return "ContactsList"
+//				case .Notifications         : return "Notifications"
+//					// Fees
+//				case .ChannelManagement     : return "ChannelManagement"
+//				case .LiquidityManagement   : return "LiquidityManagement"
+//					// Privacy & Security
+//				case .AppAccess             : return "AppAccess"
+//				case .RecoveryPhrase        : return "RecoveryPhrase"
+//				case .ElectrumServer        : return "ElectrumServer"
+//				case .Tor                   : return "Tor"
+//				case .PaymentsBackup        : return "PaymentsBackup"
+//					// Advanced
+//				case .WalletInfo            : return "WalletInfo"
+//				case .ChannelsConfiguration : return "ChannelsConfiguration"
+//				case .LogsConfiguration     : return "LogsConfiguration"
+//				case .Experimental          : return "Experimental"
+//					// Danger Zone
+//				case .DrainWallet           : return "DrainWallet"
+//				case .ResetWallet           : return "ResetWallet"
+//				case .ForceCloseChannels    : return "ForceCloseChannels"
+//			}
+//		}
+	}
+	@State var navLinkTag: NavLinkTag? = nil
 	
 	@State private var notificationPermissions = NotificationsManager.shared.permissions.value
 	
@@ -111,6 +140,9 @@ fileprivate struct ConfigurationList: View {
 		content()
 			.navigationTitle(NSLocalizedString("Settings", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
+			.navigationDestination(for: NavLinkTag.self) { tag in
+				navLinkView(tag)
+			}
 	}
 	
 	@ViewBuilder
@@ -155,7 +187,7 @@ fileprivate struct ConfigurationList: View {
 			
 		#if DEBUG
 			if !hasWallet {
-				navLink(.WalletCreationOptions) {
+				NavigationLink(value: NavLinkTag.WalletCreationOptions) {
 					Label { Text("Wallet creation options") } icon: {
 						Image(systemName: "quote.bubble")
 					}
@@ -164,14 +196,14 @@ fileprivate struct ConfigurationList: View {
 			}
 		#endif
 			
-			navLink(.About) {
+			NavigationLink(value: NavLinkTag.About) {
 				Label { Text("About") } icon: {
 					Image(systemName: "info.circle")
 				}
 			}
 			.id(linkID_About)
 		
-			navLink(.DisplayConfiguration) {
+			NavigationLink(value: NavLinkTag.DisplayConfiguration) {
 				Label { Text("Display") } icon: {
 					Image(systemName: "paintbrush.pointed")
 				}
@@ -179,7 +211,7 @@ fileprivate struct ConfigurationList: View {
 			.id(linkID_DisplayConfiguration)
 	
 			if hasWallet {
-				navLink(.PaymentOptions) {
+				NavigationLink(value: NavLinkTag.PaymentOptions) {
 					Label {
 						HStack(alignment: VerticalAlignment.center, spacing: 0) {
 							Text("Payment options")
@@ -198,7 +230,7 @@ fileprivate struct ConfigurationList: View {
 			} // </if hasWallet>
 			
 			if hasWallet && CONTACTS_ENABLED {
-				navLink(.ContactsList) {
+				NavigationLink(value: NavLinkTag.ContactsList) {
 					Label { Text("Contacts") } icon: {
 						Image(systemName: "person.2")
 					}
@@ -207,7 +239,7 @@ fileprivate struct ConfigurationList: View {
 			}
 			
 			if hasWallet {
-				navLink(.Notifications) {
+				NavigationLink(value: NavLinkTag.Notifications) {
 					Label { Text("Notifications") } icon: {
 						Image(systemName: "tray")
 					}
@@ -223,7 +255,7 @@ fileprivate struct ConfigurationList: View {
 		
 		Section(header: Text("Fees")) {
 			if hasWallet {
-				navLink(.ChannelManagement) {
+				NavigationLink(value: NavLinkTag.ChannelManagement) {
 					Label { Text("Channel management") } icon: {
 						Image(systemName: "wand.and.stars")
 					}
@@ -232,7 +264,7 @@ fileprivate struct ConfigurationList: View {
 			}
 			
 			if hasWallet {
-				navLink(.LiquidityManagement) {
+				NavigationLink(value: NavLinkTag.LiquidityManagement) {
 					Label { Text("Add liquidity") } icon: {
 						if #available(iOS 17, *) {
 							Image("bucket_monochrome_symbol")
@@ -257,7 +289,7 @@ fileprivate struct ConfigurationList: View {
 		Section(header: Text("Privacy & Security")) {
 
 			if hasWallet {
-				navLink(.AppAccess) {
+				NavigationLink(value: NavLinkTag.AppAccess) {
 					Label { Text("App access") } icon: {
 						Image(systemName: isTouchID() ? "touchid" : "faceid")
 					}
@@ -266,7 +298,7 @@ fileprivate struct ConfigurationList: View {
 			} // </if hasWallet>
 			
 			if hasWallet {
-				navLink(.RecoveryPhrase) {
+				NavigationLink(value: NavLinkTag.RecoveryPhrase) {
 					Label {
 						switch backupSeedState {
 						case .notBackedUp:
@@ -293,14 +325,14 @@ fileprivate struct ConfigurationList: View {
 				.id(linkID_RecoveryPhrase)
 			} // </if hasWallet>
 			
-			navLink(.ElectrumServer) {
+			NavigationLink(value: NavLinkTag.ElectrumServer) {
 				Label { Text("Electrum server") } icon: {
 					Image(systemName: "link")
 				}
 			}
 			.id(linkID_ElectrumServer)
 			
-			navLink(.Tor) {
+			NavigationLink(value: NavLinkTag.Tor) {
 				Label { Text("Tor") } icon: {
 					Image(systemName: "shield.lefthalf.fill")
 				}
@@ -308,7 +340,7 @@ fileprivate struct ConfigurationList: View {
 			.id(linkID_Tor)
 			
 			if hasWallet {
-				navLink(.PaymentsBackup) {
+				NavigationLink(value: NavLinkTag.PaymentsBackup) {
 					Label { Text("Payments backup") } icon: {
 						Image(systemName: "icloud.and.arrow.up")
 					}
@@ -325,7 +357,7 @@ fileprivate struct ConfigurationList: View {
 		Section(header: Text("Advanced")) {
 
 			if hasWallet {
-				navLink(.WalletInfo) {
+				NavigationLink(value: NavLinkTag.WalletInfo) {
 					Label {
 						Text("Wallet info")
 					} icon: {
@@ -336,7 +368,7 @@ fileprivate struct ConfigurationList: View {
 			}
 			
 			if hasWallet {
-				navLink(.ChannelsConfiguration) {
+				NavigationLink(value: NavLinkTag.ChannelsConfiguration) {
 					Label { Text("Payment channels") } icon: {
 						Image(systemName: "bolt")
 					}
@@ -344,7 +376,7 @@ fileprivate struct ConfigurationList: View {
 				.id(linkID_ChannelManagement)
 			}
 			
-			navLink(.LogsConfiguration) {
+			NavigationLink(value: NavLinkTag.LogsConfiguration) {
 				Label { Text("Logs") } icon: {
 					Image(systemName: "doc.text")
 				}
@@ -352,7 +384,7 @@ fileprivate struct ConfigurationList: View {
 			.id(linkID_LogsConfiguration)
 			
 			if hasWallet {
-				navLink(.Experimental) {
+				NavigationLink(value: NavLinkTag.Experimental) {
 					Label { Text("Experimental") } icon: {
 						if #available(iOS 17, *) {
 							Image(systemName: "flask")
@@ -373,7 +405,7 @@ fileprivate struct ConfigurationList: View {
 		Section(header: Text("Danger Zone")) {
 			
 			if hasWallet {
-				navLink(.DrainWallet) {
+				NavigationLink(value: NavLinkTag.DrainWallet) {
 					Label { Text("Drain wallet") } icon: {
 						Image(systemName: "xmark.circle")
 					}
@@ -382,7 +414,7 @@ fileprivate struct ConfigurationList: View {
 			}
 			
 			if hasWallet {
-				navLink(.ResetWallet) {
+				NavigationLink(value: NavLinkTag.ResetWallet) {
 					Label { Text("Reset wallet") } icon: {
 						Image(systemName: "trash")
 					}
@@ -391,7 +423,7 @@ fileprivate struct ConfigurationList: View {
 			}
 			
 			if hasWallet {
-				navLink(.ForceCloseChannels) {
+				NavigationLink(value: NavLinkTag.ForceCloseChannels) {
 					Label { Text("Force-close channels") } icon: {
 						Image(systemName: "exclamationmark.triangle")
 					}
@@ -400,31 +432,6 @@ fileprivate struct ConfigurationList: View {
 				.id(linkID_ForceCloseChannels)
 			}
 		} // </Section: Danger Zone>
-	}
-
-	@ViewBuilder
-	private func navLink<Content>(
-		_ tag: NavLinkTag,
-		label: () -> Content
-	) -> some View where Content: View {
-		
-		NavigationLink(
-			destination: navLinkView(tag),
-			tag: tag,
-			selection: $navLinkTag,
-			label: label
-		)
-	//	.id(linkID(for: tag)) // doesn't compile - don't understand why
-	}
-	
-	@ViewBuilder
-	func navLinkView() -> some View {
-		
-		if let tag = self.navLinkTag {
-			navLinkView(tag)
-		} else {
-			EmptyView()
-		}
 	}
 	
 	@ViewBuilder

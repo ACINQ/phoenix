@@ -8,21 +8,20 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-fileprivate enum NavLinkTag: String {
-	case ConfigurationView
-	case TransactionsView
-	case ReceiveView
-	case SendView
-	case CurrencyConverter
-	case SwapInWalletDetails
-	case LiquidityAdsView
-}
-
 struct MainView_Small: View {
 	
 	private let phoenixBusiness = Biz.business
 	
-	@State private var navLinkTag: NavLinkTag? = nil
+	enum NavLinkTag: String, Codable {
+		case ConfigurationView
+		case TransactionsView
+		case ReceiveView
+		case SendView
+		case CurrencyConverter
+		case SwapInWalletDetails
+		case LiquidityAdsView
+	}
+	@State var navLinkTag: NavLinkTag? = nil
 	
 	@State var canMergeChannelsForSplicing = Biz.canMergeChannelsForSplicingPublisher.value
 	@State var showingMergeChannelsView = false
@@ -88,6 +87,9 @@ struct MainView_Small: View {
 				.navigationTitle("")
 				.navigationBarTitleDisplayMode(.inline)
 				.navigationBarHidden(true)
+				.navigationDestination(for: NavLinkTag.self) { tag in
+					navLinkView(tag)
+				}
 		}
 		.sheet(isPresented: $showingMergeChannelsView) {
 			MergeChannelsView(location: .sheet)
@@ -113,9 +115,6 @@ struct MainView_Small: View {
 
 		} // </ZStack>
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.navigationDestination(isPresented: navLinkTagBinding()) {
-			navLinkView()
-		}
 		.onChange(of: deepLinkManager.deepLink) {
 			deepLinkChanged($0)
 		}
@@ -183,9 +182,7 @@ struct MainView_Small: View {
 	@ViewBuilder
 	func header_settingsButton() -> some View {
 		
-		Button {
-			navLinkTag = .ConfigurationView
-		} label: {
+		NavigationLink(value: NavLinkTag.ConfigurationView) {
 			Image(systemName: "gearshape.fill")
 				.renderingMode(.template)
 				.imageScale(.large)
@@ -203,6 +200,27 @@ struct MainView_Small: View {
 				)
 		}
 		.accessibilityLabel("Settings")
+		
+//		Button {
+//			navLinkTag = .ConfigurationView
+//		} label: {
+//			Image(systemName: "gearshape.fill")
+//				.renderingMode(.template)
+//				.imageScale(.large)
+//				.font(.caption2)
+//				.foregroundColor(.primary)
+//				.padding(.all, 7)
+//				.read(headerButtonHeightReader)
+//				.frame(minHeight: headerButtonHeight)
+//				.squareFrame()
+//				.background(Color.buttonFill)
+//				.cornerRadius(30)
+//				.overlay(
+//					RoundedRectangle(cornerRadius: 30)
+//						.stroke(Color.borderColor, lineWidth: 1)
+//				)
+//		}
+//		.accessibilityLabel("Settings")
 	}
 	
 	@ViewBuilder
@@ -474,16 +492,6 @@ struct MainView_Small: View {
 	}
 	
 	@ViewBuilder
-	func navLinkView() -> some View {
-		
-		if let tag = self.navLinkTag {
-			navLinkView(tag)
-		} else {
-			EmptyView()
-		}
-	}
-	
-	@ViewBuilder
 	private func navLinkView(_ tag: NavLinkTag) -> some View {
 		
 		switch tag {
@@ -495,18 +503,6 @@ struct MainView_Small: View {
 			case .SwapInWalletDetails : SwapInWalletDetails(location: .embedded, popTo: popTo)
 			case .LiquidityAdsView    : LiquidityAdsView(location: .embedded)
 		}
-	}
-	
-	// --------------------------------------------------
-	// MARK: View Helpers
-	// --------------------------------------------------
-	
-	private func navLinkTagBinding() -> Binding<Bool> {
-		
-		return Binding<Bool>(
-			get: { navLinkTag != nil },
-			set: { if !$0 { navLinkTag = nil }}
-		)
 	}
 	
 	// --------------------------------------------------

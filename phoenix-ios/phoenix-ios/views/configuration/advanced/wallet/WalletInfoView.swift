@@ -9,18 +9,24 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-fileprivate enum NavLinkTag: String {
-	case SwapInWalletDetails
-	case SwapInAddresses
-	case FinalWalletDetails
-}
-
-
 struct WalletInfoView: View {
 	
 	let popTo: (PopToDestination) -> Void
 	
-	@State private var navLinkTag: NavLinkTag? = nil
+	enum NavLinkTag: CustomStringConvertible {
+		case SwapInWalletDetails
+		case SwapInAddresses
+		case FinalWalletDetails
+		
+		var description: String {
+			switch self {
+				case .SwapInWalletDetails : return "SwapInWalletDetails"
+				case .SwapInAddresses     : return "SwapInAddresses"
+				case .FinalWalletDetails  : return "FinalWalletDetails"
+			}
+		}
+	}
+	@State var navLinkTag: NavLinkTag? = nil
 	
 	@State var didAppear = false
 	@State var popToDestination: PopToDestination? = nil
@@ -60,6 +66,9 @@ struct WalletInfoView: View {
 		}
 		.navigationTitle(NSLocalizedString("Wallet info", comment: "Navigation Bar Title"))
 		.navigationBarTitleDisplayMode(.inline)
+		.navigationDestination(for: WalletInfoView.NavLinkTag.self) { tag in
+			navLinkView(tag)
+		}
 	}
 	
 	@ViewBuilder
@@ -130,13 +139,13 @@ struct WalletInfoView: View {
 		
 		Section {
 			
-			navLink(.SwapInWalletDetails) {
+			NavigationLink(value: NavLinkTag.SwapInWalletDetails) {
 				subsection_swapInWallet_balance()
 			}
 			subsection_swapInWallet_legacyDescriptor()
 			subsection_swapInWallet_descriptor()
 			subsection_swapInWallet_publicKey()
-			navLink(.SwapInAddresses) {
+			NavigationLink(value: NavLinkTag.SwapInAddresses) {
 				subsection_swapInWallet_swapAddresses()
 			}
 			
@@ -284,7 +293,7 @@ struct WalletInfoView: View {
 		
 		Section {
 			
-			navLink(.FinalWalletDetails) {
+			NavigationLink(value: NavLinkTag.FinalWalletDetails) {
 				subsection_finalWallet_balance()
 			}
 			subsection_finalWallet_masterPublicKey()
@@ -430,20 +439,6 @@ struct WalletInfoView: View {
 	}
 	
 	@ViewBuilder
-	private func navLink<Content>(
-		_ tag: NavLinkTag,
-		label: () -> Content
-	) -> some View where Content: View {
-		
-		NavigationLink(
-			destination: navLinkView(tag),
-			tag: tag,
-			selection: $navLinkTag,
-			label: label
-		)
-	}
-	
-	@ViewBuilder
 	private func navLinkView(_ tag: NavLinkTag) -> some View {
 		
 		switch tag {
@@ -577,7 +572,7 @@ struct WalletInfoView: View {
 	}
 	
 	fileprivate func navLinkTagChanged(_ tag: NavLinkTag?) {
-		log.trace("navLinkTagChanged() => \(tag?.rawValue ?? "nil")")
+		log.trace("navLinkTagChanged() => \(tag?.description ?? "nil")")
 		
 		if tag == nil, let forcedNavLinkTag = swiftUiBugWorkaround {
 				

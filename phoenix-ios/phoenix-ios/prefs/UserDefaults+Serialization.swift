@@ -28,7 +28,7 @@ extension FiatCurrency {
 	
 	static func localeDefault() -> FiatCurrency? {
 		
-        guard let currencyCode = NSLocale.current.currency?.identifier else {
+		guard let currencyId = NSLocale.current.currency?.identifier else {
 			return nil
 		}
 		// currencyCode examples:
@@ -39,7 +39,7 @@ extension FiatCurrency {
 			
 			let fiatCode = fiat.displayCode // e.g. "AUD", "BRL"
 			
-			if currencyCode.caseInsensitiveCompare(fiatCode) == .orderedSame {
+			if currencyId.caseInsensitiveCompare(fiatCode) == .orderedSame {
 				return fiat
 			}
 		}
