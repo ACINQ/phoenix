@@ -22549,6 +22549,7 @@
       }
     },
     "lightning fee" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -24725,6 +24726,7 @@
       }
     },
     "miner fee" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -36322,6 +36324,7 @@
       }
     },
     "The additional capacity will be preserved for that duration." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -39892,6 +39895,7 @@
       }
     },
     "total" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

@@ -304,15 +304,10 @@ struct LiquidityAdsView: View {
 	@ViewBuilder
 	func subsection_costDetails(_ feeInfo: LiquidityFeeInfo) -> some View {
 		
-		if #available(iOS 16.0, *) {
-			subsection_costDetails_ios16(feeInfo)
-		} else {
-			subsection_costDetails_ios15(feeInfo)
-		}
+		subsection_costDetails_ios16(feeInfo)
 	}
 	
 	@ViewBuilder
-	@available(iOS 16.0, *)
 	func subsection_costDetails_ios16(_ feeInfo: LiquidityFeeInfo) -> some View {
 		
 		Grid(horizontalSpacing: 8, verticalSpacing: 12) {
@@ -397,17 +392,6 @@ struct LiquidityAdsView: View {
 				.gridColumnAlignment(.leading)
 			} // </GridRow>
 		} // </Grid>
-	}
-	
-	@ViewBuilder
-	func subsection_costDetails_ios15(_ feeInfo: LiquidityFeeInfo) -> some View {
-		
-		FeeInfo_Grid(
-			feeInfo: feeInfo,
-			popoverPresent_minerFee: $popoverPresent_minerFee,
-			popoverPresent_serviceFee: $popoverPresent_serviceFee,
-			popoverPresent_duration: $popoverPresent_duration
-		)
 	}
 	
 	@ViewBuilder
@@ -911,203 +895,5 @@ struct LiquidityAdsView: View {
 		log.trace("closePopover")
 		
 		popoverState.close()
-	}
-}
-
-// --------------------------------------------------
-// MARK: -
-// --------------------------------------------------
-
-/// Workaround for iOS 15, where `Grid` isn't available.
-///
-fileprivate struct FeeInfo_Grid: InfoGridView {
-	
-	let feeInfo: LiquidityFeeInfo
-	
-	@Binding var popoverPresent_minerFee: Bool
-	@Binding var popoverPresent_serviceFee: Bool
-	@Binding var popoverPresent_duration: Bool
-	
-	// <InfoGridView Protocol>
-	let minKeyColumnWidth: CGFloat = 50
-	let maxKeyColumnWidth: CGFloat = 200
-	
-	@State var keyColumnSizes: [InfoGridRow_KeyColumn_Size] = []
-	func setKeyColumnSizes(_ value: [InfoGridRow_KeyColumn_Size]) {
-		keyColumnSizes = value
-	}
-	func getKeyColumnSizes() -> [InfoGridRow_KeyColumn_Size] {
-		return keyColumnSizes
-	}
-	
-	@State var rowSizes: [InfoGridRow_Size] = []
-	func setRowSizes(_ sizes: [InfoGridRow_Size]) {
-		rowSizes = sizes
-	}
-	func getRowSizes() -> [InfoGridRow_Size] {
-		return rowSizes
-	}
-	// </InfoGridView Protocol>
-	
-	private let verticalSpacingBetweenRows: CGFloat = 12
-	private let horizontalSpacingBetweenColumns: CGFloat = 8
-	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
-	
-	@ViewBuilder
-	var infoGridRows: some View {
-		
-		VStack(
-			alignment : HorizontalAlignment.leading,
-			spacing   : verticalSpacingBetweenRows
-		) {
-			minerFee()
-			serviceFee()
-			duration()
-		}
-	}
-	
-	@ViewBuilder
-	func keyColumn(_ title: LocalizedStringKey) -> some View {
-		
-		Text(title)
-			.textCase(.uppercase)
-			.font(.subheadline)
-			.foregroundColor(.secondary)
-	}
-	
-	@ViewBuilder
-	func minerFee() -> some View {
-		let identifier: String = #function
-		
-		InfoGridRow(
-			identifier: identifier,
-			vAlignment: .firstTextBaseline,
-			hSpacing: horizontalSpacingBetweenColumns,
-			keyColumnWidth: keyColumnWidth(identifier: identifier),
-			keyColumnAlignment: .trailing
-		) {
-			keyColumn("Miner Fee")
-		} valueColumn: {
-			
-			let (amtBtc, amtFiat) = formattedBalances(sats: feeInfo.estimate.minerFee)
-			HStack(alignment: VerticalAlignment.top, spacing: 8) {
-				VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
-					Text(amtBtc.string)
-					Text(verbatim: "≈ \(amtFiat.string)").foregroundColor(.secondary)
-				}
-				helpButton {
-					popoverPresent_minerFee = true
-				}
-				.popover(present: $popoverPresent_minerFee) {
-					InfoPopoverWindow {
-						Text("Mining fee contribution for the underlying on-chain transaction.")
-					}
-				}
-			} // </HStack>
-			.font(.subheadline)
-			
-		} // </InfoGridRow>
-	}
-	
-	@ViewBuilder
-	func serviceFee() -> some View {
-		let identifier: String = #function
-		
-		InfoGridRow(
-			identifier: identifier,
-			vAlignment: .firstTextBaseline,
-			hSpacing: horizontalSpacingBetweenColumns,
-			keyColumnWidth: keyColumnWidth(identifier: identifier),
-			keyColumnAlignment: .trailing
-		) {
-			keyColumn("Service Fee")
-		} valueColumn: {
-			
-			let (amtBtc, amtFiat) = formattedBalances(
-				sats: feeInfo.estimate.serviceFee
-			)
-			HStack(alignment: VerticalAlignment.top, spacing: 8) {
-				VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
-					Text(amtBtc.string)
-					Text(verbatim: "≈ \(amtFiat.string)").foregroundColor(.secondary)
-				}
-				helpButton {
-					popoverPresent_serviceFee = true
-				}
-				.popover(present: $popoverPresent_serviceFee) {
-					InfoPopoverWindow {
-						Text("This fee goes to the service providing the liquidity.")
-					}
-				}
-			} // </HStack>
-			.font(.subheadline)
-			
-		} // </InfoGridRow>
-	}
-	
-	@ViewBuilder
-	func duration() -> some View {
-		let identifier: String = #function
-		
-		InfoGridRow(
-			identifier: identifier,
-			vAlignment: .firstTextBaseline,
-			hSpacing: horizontalSpacingBetweenColumns,
-			keyColumnWidth: keyColumnWidth(identifier: identifier),
-			keyColumnAlignment: .trailing
-		) {
-			keyColumn("Duration")
-		} valueColumn: {
-			
-			HStack(alignment: VerticalAlignment.top, spacing: 8) {
-				Text("1 year")
-				helpButton {
-					popoverPresent_duration = true
-				}
-				.popover(present: $popoverPresent_duration) {
-					InfoPopoverWindow {
-						Text("The additional capacity will be preserved for that duration.")
-					}
-				}
-			} // </HStack>
-			.font(.subheadline)
-			
-		} // </InfoGridRow>
-	}
-	
-	@ViewBuilder
-	func helpButton(
-		action: @escaping () -> Void
-	) -> some View {
-		
-		Button(action: action) {
-			Image(systemName: "questionmark.circle")
-				.renderingMode(.template)
-				.foregroundColor(.secondary)
-				.font(.body)
-		}
-		.buttonStyle(.borderless) // prevents trigger when row tapped
-	}
-	
-	func formattedBalances(
-		sats: Bitcoin_kmpSatoshi
-	) -> (FormattedAmount, FormattedAmount) {
-		
-		let amtBitcoin = Utils.formatBitcoin(currencyPrefs, sat: sats)
-		let amtFiat = Utils.formatFiat(currencyPrefs, sat: sats)
-		
-		return (amtBitcoin, amtFiat)
-	}
-	
-	func formattedBalances(
-		msats: Lightning_kmpMilliSatoshi,
-		policy: MsatsPolicy
-	) -> (FormattedAmount, FormattedAmount) {
-		
-		let amtBitcoin = Utils.formatBitcoin(currencyPrefs, msat: msats, policy: policy)
-		let amtFiat = Utils.formatFiat(currencyPrefs, msat: msats)
-		
-		return (amtBitcoin, amtFiat)
 	}
 }

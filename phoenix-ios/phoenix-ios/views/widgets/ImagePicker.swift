@@ -43,7 +43,7 @@ struct ImagePicker: UIViewControllerRepresentable {
 			Task { @MainActor in
 				
 				var fileUrl: URL? = nil
-				if #available(iOS 16, *), parent.copyFile {
+				if parent.copyFile {
 					
 					if let type = provider.registeredContentTypes(conformingTo: UTType.heic).first {
 						log.debug("heic: available")

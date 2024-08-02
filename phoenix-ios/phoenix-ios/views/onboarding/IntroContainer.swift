@@ -14,7 +14,7 @@ struct IntroContainer: View {
 	@ViewBuilder
 	var body: some View {
 		
-		NavigationWrapper {
+		NavigationStack {
 			content()
 		}
 	}

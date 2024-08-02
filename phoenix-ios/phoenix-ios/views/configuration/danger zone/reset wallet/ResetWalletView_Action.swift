@@ -60,7 +60,7 @@ struct ResetWalletView_Action: View {
 	@ViewBuilder
 	func navWrappedContent() -> some View {
 		
-		NavigationWrapper {
+		NavigationStack {
 			content()
 				.navigationTitle(NSLocalizedString("Resetting Wallet", comment: "Navigation bar title"))
 				.navigationBarTitleDisplayMode(.inline)

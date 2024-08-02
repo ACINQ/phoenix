@@ -28,7 +28,7 @@ extension FiatCurrency {
 	
 	static func localeDefault() -> FiatCurrency? {
 		
-		guard let currencyCode = NSLocale.current.currencyCode else {
+        guard let currencyCode = NSLocale.current.currency?.identifier else {
 			return nil
 		}
 		// currencyCode examples:

@@ -92,17 +92,6 @@ struct CurrencyConverterView: View {
 	func layers() -> some View {
 		
 		ZStack {
-			if #unavailable(iOS 16.0) {
-				NavigationLink(
-					destination: currencySelectorView(),
-					isActive: $currencySelectorOpen
-				) {
-					EmptyView()
-				}
-				.accessibilityHidden(true)
-				
-			} // else: uses.navigationStackDestination()
-			
 			// We want to measure various items within the List.
 			// But we need to measure ALL of them.
 			// And we can't do that with a List because it's lazy.
@@ -147,7 +136,7 @@ struct CurrencyConverterView: View {
 		.onDisappear {
 			onDisappear()
 		}
-		.navigationStackDestination(isPresented: $currencySelectorOpen) { // For iOS 16+
+		.navigationDestination(isPresented: $currencySelectorOpen) {
 			currencySelectorView()
 		}
 		.onChange(of: currencies) { _ in
@@ -182,7 +171,7 @@ struct CurrencyConverterView: View {
 				EditButton()
 			}
 			.listStyle(.plain)
-			.listBackgroundColor(Color(.systemBackground)) // For iOS 16
+			.listBackgroundColor(Color(.systemBackground))
 			
 			footer()
 			

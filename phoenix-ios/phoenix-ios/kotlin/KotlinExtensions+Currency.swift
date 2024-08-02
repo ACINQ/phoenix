@@ -396,7 +396,7 @@ extension FiatCurrency {
 		var autoTranslation: String? = nil
 
 		let currentLocale = Locale.current
-		if currentLocale.languageCode != "en" {
+        if currentLocale.language.languageCode?.identifier != "en" {
 			let (code, mkt) = splitShortPreciseName
 			if mkt.isEmpty {
 				autoTranslation = currentLocale.localizedString(forCurrencyCode: code)
@@ -425,7 +425,7 @@ extension FiatCurrency {
 			for identifier in Locale.availableIdentifiers {
 			
 				let locale = Locale(identifier: identifier)
-				if let currencyCode = locale.currencyCode,
+                if let currencyCode = locale.currency?.identifier,
 					currencyCode.caseInsensitiveCompare(selfCurrencyCode) == .orderedSame
 				{
 					matchingLocales.append(locale)

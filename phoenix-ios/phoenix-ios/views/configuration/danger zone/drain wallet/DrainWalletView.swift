@@ -38,23 +38,12 @@ struct DrainWalletView: MVIView {
 	var view: some View {
 
 		ZStack {
-			if #unavailable(iOS 16.0) {
-				NavigationLink(
-					destination: reviewScreen(),
-					isActive: $reviewRequested
-				) {
-					EmptyView()
-				}
-				.accessibilityHidden(true)
-				
-			} // else: uses.navigationStackDestination()
-			
 			content()
 		}
 		.onAppear {
 			onAppear()
 		}
-		.navigationStackDestination(isPresented: $reviewRequested) { // For iOS 16+
+		.navigationDestination(isPresented: $reviewRequested) {
 			reviewScreen()
 		}
 		.navigationTitle(NSLocalizedString("Drain wallet", comment: "Navigation bar title"))

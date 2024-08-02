@@ -68,15 +68,10 @@ struct RangeSheet: View {
 	@ViewBuilder
 	func content() -> some View {
 		
-		if #available(iOS 16.0, *) {
-			content_ios16()
-		} else {
-			content_pre16()
-		}
+		content_ios16()
 	}
 
 	@ViewBuilder
-	@available(iOS 16.0, *)
 	func content_ios16() -> some View {
 		
 		Grid(
@@ -109,57 +104,6 @@ struct RangeSheet: View {
 				}
 			}
 		}
-		.padding()
-	}
-
-	@ViewBuilder
-	func content_pre16() -> some View {
-		
-		GeometryReader { geometry in
-			
-			let column0Width: CGFloat = geometry.size.width / 5.0 * 1.0
-			let column1Width: CGFloat = geometry.size.width / 5.0 * 2.0
-			let column2Width: CGFloat = geometry.size.width / 5.0 * 2.0
-			
-			let columns: [GridItem] = [
-				GridItem(.fixed(column0Width), spacing: 0, alignment: .trailing),
-				GridItem(.fixed(column1Width), spacing: 0, alignment: .trailing),
-				GridItem(.fixed(column2Width), spacing: 0, alignment: .trailing)
-			]
-			
-			LazyVGrid(columns: columns, spacing: 0) {
-				
-				Text("min:").bold()
-				Button {
-					minAmountTapped()
-				} label: {
-					Text(verbatim: minBitcoinAmount().string)
-				}
-				if let minFiatAmount = minFiatAmount() {
-					Text(verbatim: "≈\(minFiatAmount.string)")
-						.padding(.leading, 4)
-				} else {
-					Text(verbatim: " ")
-				}
-				
-				Text("max:").bold()
-				Button {
-					maxAmountTapped()
-				} label: {
-					Text(verbatim: maxBitcoinAmount().string)
-				}
-				if let maxFiatAmount = maxFiatAmount() {
-					Text(verbatim: "≈\(maxFiatAmount.string)")
-						.padding(.leading, 4)
-				} else {
-					Text(verbatim: " ")
-				}
-			}
-			.read(exampleHeightReader)
-			
-		} // </GeometryReader>
-		.assignMaxPreference(for: exampleHeightReader.key, to: $exampleHeight)
-		.frame(height: exampleHeight)
 		.padding()
 	}
 	

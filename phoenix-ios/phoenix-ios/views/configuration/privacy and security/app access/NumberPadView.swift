@@ -145,7 +145,7 @@ struct NumberPadView: View {
 							}
 						}
 						.font(.system(size: 12, weight: .regular))
-						.textTracking(1)
+						.tracking(1)
 					}
 				} // </VStack>
 				.opacity(disabled ? 0.5 : 1.0)
@@ -179,14 +179,8 @@ struct NumberPadView: View {
 	
 	var isLatinScript: Bool {
 		
-		if #available(iOS 16, *) {
-			if let script = Locale.current.language.script {
-				return script == Locale.Script.latin
-			}
-		} else { // iOS 15
-			if let scriptCode = Locale.current.scriptCode {
-				return scriptCode.caseInsensitiveCompare("Latin") == .orderedSame
-			}
+		if let script = Locale.current.language.script {
+			return script == Locale.Script.latin
 		}
 		
 		return false

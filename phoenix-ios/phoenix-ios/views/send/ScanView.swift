@@ -32,10 +32,6 @@ struct ScanView: View {
 	@EnvironmentObject var popoverState: PopoverState
 	@EnvironmentObject var smartModalState: SmartModalState
 	
-	let willEnterForegroundPublisher = NotificationCenter.default.publisher(for:
-		UIApplication.willEnterForegroundNotification
-	)
-	
 	@State var voiceOverEnabled = UIAccessibility.isVoiceOverRunning
 	let voiceOverStatusPublisher = NotificationCenter.default.publisher(for:
 		UIAccessibility.voiceOverStatusDidChangeNotification
@@ -88,12 +84,6 @@ struct ScanView: View {
 				removal: .move(edge: .bottom)
 			)
 		)
-		.onAppear {
-			onAppear()
-		}
-		.onReceive(willEnterForegroundPublisher) { _ in
-			willEnterForeground()
-		}
 		.onReceive(voiceOverStatusPublisher) { _ in
 			voiceOverStatusChanged()
 		}
@@ -230,16 +220,11 @@ struct ScanView: View {
 	@ViewBuilder
 	func menuOption_paste() -> some View {
 
-		if #available(iOS 16.0, *) {
-		//	menuOption_paste_ios16() // this looks horrible; thanks apple :(
-			menuOption_paste_pre16()
-		} else {
-			menuOption_paste_pre16()
-		}
+    //	menuOption_paste_ios16() // this looks horrible; thanks apple :(
+        menuOption_paste_pre16()
 	}
 
 	@ViewBuilder
-	@available(iOS 16.0, *)
 	func menuOption_paste_ios16() -> some View {
 
 		PasteButton(payloadType: String.self) { strings in
@@ -422,22 +407,6 @@ struct ScanView: View {
 	// --------------------------------------------------
 	// MARK: Notifications
 	// --------------------------------------------------
-
-	func onAppear() {
-		log.trace("onAppear()")
-		
-		if #unavailable(iOS 16.0) {
-			checkClipboard()
-		}
-	}
-
-	func willEnterForeground() {
-		log.trace("willEnterForeground()")
-		
-		if #unavailable(iOS 16.0) {
-			checkClipboard()
-		}
-	}
 	
 	func voiceOverStatusChanged() {
 		log.trace("voiceOverStatusChanged()")
@@ -506,30 +475,6 @@ struct ScanView: View {
 		log.trace("didCancelLnurlServiceFetch()")
 		
 		mvi.intent(Scan.Intent_CancelLnurlServiceFetch())
-	}
-	
-	// --------------------------------------------------
-	// MARK: Utilities
-	// --------------------------------------------------
-
-	func checkClipboard() {
-		if UIPasteboard.general.hasStrings {
-			clipboardHasString = true
-
-			guard let string = UIPasteboard.general.string else {
-				// iOS lied to us ?!?
-				clipboardHasString = false
-				clipboardContent = nil
-				return
-			}
-
-			let controller = mvi.controller as! AppScanController
-			self.clipboardContent = controller.inspectClipboard(data: string)
-
-		} else {
-			clipboardHasString = false
-			clipboardContent = nil
-		}
 	}
 
 	// --------------------------------------------------

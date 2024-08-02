@@ -55,7 +55,7 @@ fileprivate struct PaymentViewSheet: View {
 		
 		ZStack {
 			
-			NavigationWrapper {
+			NavigationStack {
 				SummaryView(location: location, paymentInfo: paymentInfo)
 			}
 			.edgesIgnoringSafeArea(.all)

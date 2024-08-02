@@ -73,24 +73,9 @@ struct AppAccessView : View {
 	func layers() -> some View {
 		
 		ZStack {
-			
-			if #unavailable(iOS 16.0) {
-				// iOS 14 & 15 have bugs when using NavigationLink.
-				// The suggested workarounds include using only a single NavigationLink.
-				NavigationLink(
-					destination: navLinkView(),
-					isActive: navLinkTagBinding()
-				) {
-					EmptyView()
-				}
-				.accessibilityHidden(true)
-				
-			} // else: uses.navigationStackDestination()
-			
 			content()
-			
-		} // </ZStack>
-		.navigationStackDestination(isPresented: navLinkTagBinding()) { // For iOS 16+
+		}
+		.navigationDestination(isPresented: navLinkTagBinding()) {
 			navLinkView()
 		}
 	}
