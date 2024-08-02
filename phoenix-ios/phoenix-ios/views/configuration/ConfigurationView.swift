@@ -30,6 +30,7 @@ fileprivate enum NavLinkTag: String {
 	case WalletInfo
 	case ChannelsConfiguration
 	case LogsConfiguration
+	case Experimental
 	// Danger Zone
 	case DrainWallet
 	case ResetWallet
@@ -81,6 +82,7 @@ fileprivate struct ConfigurationList: View {
 	@Namespace var linkID_WalletInfo
 	@Namespace var linkID_ChannelsConfiguration
 	@Namespace var linkID_LogsConfiguration
+	@Namespace var linkID_Experimental
 	@Namespace var linkID_DrainWallet
 	@Namespace var linkID_ResetWallet
 	@Namespace var linkID_ForceCloseChannels
@@ -348,6 +350,19 @@ fileprivate struct ConfigurationList: View {
 				}
 			}
 			.id(linkID_LogsConfiguration)
+			
+			if hasWallet {
+				navLink(.Experimental) {
+					Label { Text("Experimental") } icon: {
+						if #available(iOS 17, *) {
+							Image(systemName: "flask")
+						} else {
+							Image(systemName: "testtube.2")
+						}
+					}
+				}
+				.id(linkID_Experimental)
+			}
 
 		} // </Section: Advanced>
 	}
@@ -436,6 +451,7 @@ fileprivate struct ConfigurationList: View {
 			case .WalletInfo            : WalletInfoView(popTo: popTo)
 			case .ChannelsConfiguration : ChannelsConfigurationView()
 			case .LogsConfiguration     : LogsConfigurationView()
+			case .Experimental          : Experimental()
 		// Danger Zone
 			case .DrainWallet           : DrainWalletView(popTo: popTo)
 			case .ResetWallet           : ResetWalletView()
@@ -623,6 +639,7 @@ fileprivate struct ConfigurationList: View {
 			case .WalletInfo            : return linkID_WalletInfo
 			case .ChannelsConfiguration : return linkID_ChannelsConfiguration
 			case .LogsConfiguration     : return linkID_LogsConfiguration
+			case .Experimental          : return linkID_Experimental
 			
 			case .DrainWallet           : return linkID_DrainWallet
 			case .ResetWallet           : return linkID_ResetWallet

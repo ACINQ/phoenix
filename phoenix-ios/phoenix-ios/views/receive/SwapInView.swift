@@ -22,11 +22,6 @@ enum SwapInAddressType: CustomStringConvertible{
 
 struct SwapInView: View {
 	
-	enum ReceiveViewSheet {
-		case sharingUrl(url: String)
-		case sharingImg(img: UIImage)
-	}
-	
 	@ObservedObject var toast: Toast
 	
 	@State var swapInAddress: String? = nil
@@ -34,7 +29,11 @@ struct SwapInView: View {
 	
 	@StateObject var qrCode = QRCode()
 	
-	@State var activeSheet: ReceiveViewSheet? = nil
+	enum ActiveSheet {
+		case sharingText(text: String)
+		case sharingImage(image: UIImage)
+	}
+	@State var activeSheet: ActiveSheet? = nil
 	
 	let swapInWalletPublisher = Biz.business.balanceManager.swapInWalletPublisher()
 	@State var swapInWallet = Biz.business.balanceManager.swapInWalletValue()
@@ -116,14 +115,14 @@ struct SwapInView: View {
 			set: { if !$0 { activeSheet = nil }}
 		)) {
 			switch activeSheet! {
-			case .sharingUrl(let sharingUrl):
+			case .sharingText(let text):
 
-				let items: [Any] = [sharingUrl]
+				let items: [Any] = [text]
 				ActivityView(activityItems: items, applicationActivities: nil)
 			
-			case .sharingImg(let sharingImg):
+			case .sharingImage(let image):
 
-				let items: [Any] = [sharingImg]
+				let items: [Any] = [image]
 				ActivityView(activityItems: items, applicationActivities: nil)
 				
 			} // </switch>
@@ -162,22 +161,20 @@ struct SwapInView: View {
 	@ViewBuilder
 	func qrCodeView() -> some View {
 		
-		if let address = swapInAddress,
-		   let qrCodeValue = qrCode.value,
-		   qrCodeValue.caseInsensitiveCompare(address) == .orderedSame,
-			let qrCodeImage = qrCode.image
+		if let qrCodeCgImage = qrCode.cgImage,
+		   let qrCodeImage = qrCode.image
 		{
 			qrCodeImage
 				.resizable()
 				.aspectRatio(contentMode: .fit)
 				.contextMenu {
 					Button(action: {
-						copyImageToPasteboard()
+						copyImageToPasteboard(qrCodeCgImage)
 					}) {
 						Text("Copy")
 					}
 					Button(action: {
-						shareImageToSystem()
+						shareImageToSystem(qrCodeCgImage)
 					}) {
 						Text("Share")
 					}
@@ -187,10 +184,10 @@ struct SwapInView: View {
 				.accessibilityLabel("QR code")
 				.accessibilityHint("Bitcoin address")
 				.accessibilityAction(named: "Copy Image") {
-					copyImageToPasteboard()
+					copyImageToPasteboard(qrCodeCgImage)
 				}
 				.accessibilityAction(named: "Share Image") {
-					shareImageToSystem()
+					shareImageToSystem(qrCodeCgImage)
 				}
 			
 		} else {
@@ -219,7 +216,7 @@ struct SwapInView: View {
 				.multilineTextAlignment(.center)
 				.contextMenu {
 					Button {
-						didTapCopyButton()
+						copyTextToPasteboard(btcAddr)
 					} label: {
 						Text("Copy")
 					}
@@ -276,27 +273,18 @@ struct SwapInView: View {
 	
 	@ViewBuilder
 	func copyButton() -> some View {
-		
+			
 		actionButton(
 			text: NSLocalizedString("copy", comment: "button label - try to make it short"),
 			image: Image(systemName: "square.on.square"),
 			width: 20, height: 20,
 			xOffset: 0, yOffset: 0
 		) {
-			// using simultaneousGesture's below
+			showCopyOptionsSheet()
 		}
 		.disabled(swapInAddress == nil)
-		.simultaneousGesture(LongPressGesture().onEnded { _ in
-			didLongPressCopyButton()
-		})
-		.simultaneousGesture(TapGesture().onEnded {
-			didTapCopyButton()
-		})
-		.accessibilityAction(named: "Copy Text (bitcoin address)") {
-			copyTextToPasteboard()
-		}
-		.accessibilityAction(named: "Copy Image (QR code)") {
-			copyImageToPasteboard()
+		.accessibilityAction(named: "Copy options") {
+			showCopyOptionsSheet()
 		}
 	}
 	
@@ -309,20 +297,11 @@ struct SwapInView: View {
 			width: 21, height: 21,
 			xOffset: 0, yOffset: -1
 		) {
-			// using simultaneousGesture's below
+			showShareOptionsSheet()
 		}
 		.disabled(swapInAddress == nil)
-		.simultaneousGesture(LongPressGesture().onEnded { _ in
-			didLongPressShareButton()
-		})
-		.simultaneousGesture(TapGesture().onEnded {
-			didTapShareButton()
-		})
-		.accessibilityAction(named: "Share Text (bitcoin address)") {
-			shareTextToSystem()
-		}
-		.accessibilityAction(named: "Share Image (QR code)") {
-			shareImageToSystem()
+		.accessibilityAction(named: "Share options") {
+			showShareOptionsSheet()
 		}
 	}
 	
@@ -436,41 +415,58 @@ struct SwapInView: View {
 	// MARK: Actions
 	// --------------------------------------------------
 	
-	func didTapCopyButton() -> Void {
-		log.trace("didTapCopyButton()")
+	func showCopyOptionsSheet() {
+		log.trace("showCopyOptionsSheet()")
 		
-		copyTextToPasteboard()
+		showCopyShareOptionsSheet(.copy)
 	}
 	
-	func didLongPressCopyButton() -> Void {
-		log.trace("didLongPressCopyButton()")
+	func showShareOptionsSheet() {
+		log.trace("showShareOptionsSheet()")
 		
-		smartModalState.display(dismissable: true) {
-			
-			CopyOptionsSheet(
-				textType: String(localized: "(Bitcoin address)", comment: "Type of text being copied"),
-				copyText: {	copyTextToPasteboard() },
-				copyImage: { copyImageToPasteboard() }
-			)
+		showCopyShareOptionsSheet(.share)
+	}
+	
+	func showCopyShareOptionsSheet(_ type: CopyShareOptionsSheet.ActionType) {
+		log.trace("showCopyShareOptionsSheet(_)")
+		
+		let exportText = { (text: String) -> () -> Void in
+			switch type {
+				case .copy  : return { copyTextToPasteboard(text) }
+				case .share : return { shareTextToSystem(text) }
+			}
 		}
-	}
-	
-	func didTapShareButton() {
-		log.trace("didTapShareButton()")
+		let exportImage = { (img: CGImage) -> () -> Void in
+			switch type {
+				case .copy  : return { copyImageToPasteboard(img) }
+				case .share : return { shareImageToSystem(img) }
+			}
+		}
 		
-		shareTextToSystem()
-	}
-	
-	func didLongPressShareButton() {
-		log.trace("didLongPressShareButton()")
+		var sources: [SourceInfo] = []
+		if let address = qrCode.value {
+			sources.append(SourceInfo(
+				type: .text,
+				isDefault: true,
+				title: String(localized: "Bitcoin address", comment: "Type of text being copied"),
+				subtitle: address,
+				callback: exportText(address)
+			))
+		}
+		if let cgImage = qrCode.cgImage {
+			sources.append(SourceInfo(
+				type: .image,
+				isDefault: false,
+				title: String(localized: "QR code", comment: "Type of image being copied"),
+				subtitle: nil,
+				callback: exportImage(cgImage)
+			))
+		}
 		
-		smartModalState.display(dismissable: true) {
-					
-			ShareOptionsSheet(
-				textType: NSLocalizedString("(Bitcoin address)", comment: "Type of text being copied"),
-				shareText: { shareTextToSystem() },
-				shareImage: { shareImageToSystem() }
-			)
+		if !sources.isEmpty {
+			smartModalState.display(dismissable: true) {
+				CopyShareOptionsSheet(type: type, sources: sources)
+			}
 		}
 	}
 	
@@ -478,7 +474,6 @@ struct SwapInView: View {
 		log.trace("didTapEditButton()")
 		
 		smartModalState.display(dismissable: true) {
-					
 			BtcAddrOptionsSheet(swapInAddressType: $swapInAddressType)
 		}
 	}
@@ -487,54 +482,37 @@ struct SwapInView: View {
 	// MARK: Utilities
 	// --------------------------------------------------
 	
-	func copyTextToPasteboard() -> Void {
-		log.trace("copyTextToPasteboard()")
+	func copyTextToPasteboard(_ text: String) {
+		log.trace("copyTextToPasteboard(_)")
 		
-		if let address = swapInAddress {
-			UIPasteboard.general.string = address
-			toast.pop(
-				NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
-				colorScheme: colorScheme.opposite
-			)
-		}
+		UIPasteboard.general.string = text
+		toast.pop(
+			NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
+			colorScheme: colorScheme.opposite
+		)
 	}
 	
-	func copyImageToPasteboard() -> Void {
-		log.trace("copyImageToPasteboard()")
+	func copyImageToPasteboard(_ cgImage: CGImage) {
+		log.trace("copyImageToPasteboard(_)")
 		
-		if let address = swapInAddress,
-			let qrCodeValue = qrCode.value,
-			qrCodeValue.caseInsensitiveCompare(address) == .orderedSame,
-			let qrCodeCgImage = qrCode.cgImage
-		{
-			let uiImg = UIImage(cgImage: qrCodeCgImage)
-			UIPasteboard.general.image = uiImg
-			toast.pop(
-				NSLocalizedString("Copied QR code image to pasteboard!", comment: "Toast message"),
-				colorScheme: colorScheme.opposite
-			)
-		}
+		let uiImg = UIImage(cgImage: cgImage)
+		UIPasteboard.general.image = uiImg
+		toast.pop(
+			NSLocalizedString("Copied image to pasteboard!", comment: "Toast message"),
+			colorScheme: colorScheme.opposite
+		)
 	}
 	
-	func shareTextToSystem() {
-		log.trace("shareTextToSystem()")
+	func shareTextToSystem(_ text: String) {
+		log.trace("shareTextToSystem(_)")
 		
-		if let address = swapInAddress {
-			let url = "bitcoin:\(address)"
-			activeSheet = ReceiveViewSheet.sharingUrl(url: url)
-		}
+		activeSheet = ActiveSheet.sharingText(text: text)
 	}
 	
-	func shareImageToSystem() {
+	func shareImageToSystem(_ cgImage: CGImage) {
 		log.trace("shareImageToSystem()")
 		
-		if let address = swapInAddress,
-			let qrCodeValue = qrCode.value,
-			qrCodeValue.caseInsensitiveCompare(address) == .orderedSame,
-			let qrCodeCgImage = qrCode.cgImage
-		{
-			let uiImg = UIImage(cgImage: qrCodeCgImage)
-			activeSheet = ReceiveViewSheet.sharingImg(img: uiImg)
-		}
+		let uiImg = UIImage(cgImage: cgImage)
+		activeSheet = ActiveSheet.sharingImage(image: uiImg)
 	}
 }

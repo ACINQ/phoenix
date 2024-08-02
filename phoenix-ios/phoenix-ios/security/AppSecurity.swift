@@ -601,6 +601,10 @@ class AppSecurity {
 		return enabled
 	}
 	
+	// --------------------------------------------------------------------------------
+	// MARK: Custom PIN
+	// --------------------------------------------------------------------------------
+	
 	public func setCustomPin(
 		pin        : String?,
 		completion : @escaping (_ error: Error?) -> Void
@@ -794,6 +798,58 @@ class AppSecurity {
 		}
 		
 		return invalidPin
+	}
+	
+	// --------------------------------------------------------------------------------
+	// MARK: BIP353 Address
+	// --------------------------------------------------------------------------------
+	
+	public func setBip353Address(
+		_ address: String
+	) -> Result<Void, Error> {
+		
+		let keychain = GenericPasswordStore()
+		let account = keychain_accountName_bip353Address
+		let accessGroup = privateAccessGroup()
+		
+		do {
+			var mixins = [String: Any]()
+			mixins[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+			
+			try keychain.storeKey( address,
+							  account: account,
+						 accessGroup: accessGroup,
+								mixins: mixins)
+			
+			return .success
+		} catch {
+			log.error("keychain.storeKey(account: bip353Address): error: \(error)")
+			return .failure(error)
+		}
+	}
+		
+	public func getBip353Address() -> String? {
+		
+		let keychain = GenericPasswordStore()
+		let account = keychain_accountName_bip353Address
+		let accessGroup = privateAccessGroup()
+		
+		var addr: String? = nil
+		do {
+			let value: String? = try keychain.readKey(
+				account     : account,
+				accessGroup : accessGroup
+			)
+			
+			if let value {
+				addr = value
+			}
+			
+		} catch {
+			log.error("keychain.readKey(account: bip353Address): error: \(error)")
+		}
+		
+		return addr
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -1033,11 +1089,13 @@ class AppSecurity {
 		let fm = FileManager.default
 		let securityJsonUrl = SharedSecurity.shared.securityJsonUrl
 		
-		do {
-			try fm.removeItem(at: securityJsonUrl)
-			log.error("Deleted file security.json")
-		} catch {
-			log.error("Unable to delete security.json: \(error)")
+		if fm.fileExists(atPath: securityJsonUrl.path) {
+			do {
+				try fm.removeItem(at: securityJsonUrl)
+				log.info("Deleted file security.json")
+			} catch {
+				log.error("Unable to delete security.json: \(error)")
+			}
 		}
 			
 		let keychain = GenericPasswordStore()
@@ -1077,9 +1135,29 @@ class AppSecurity {
 				account: keychain_accountName_softBiometrics,
 				accessGroup: privateAccessGroup()
 			)
-			log.error("Deleted keychain item: act(softBiometrics) grp(private)")
+			log.info("Deleted keychain item: act(softBiometrics) grp(private)")
 		} catch {
 			log.error("Unable to delete keychain item: act(softBiometrics) grp(private): \(error)")
+		}
+		
+		do {
+			try keychain.deleteKey(
+				account: keychain_accountName_customPin,
+				accessGroup: privateAccessGroup()
+			)
+			log.info("Deleted keychain item: act(customPin) grp(private)")
+		} catch {
+			log.error("Unable to delete keychain item: act(customPin) grp(private): \(error)")
+		}
+		
+		do {
+			try keychain.deleteKey(
+				account: keychain_accountName_bip353Address,
+				accessGroup: privateAccessGroup()
+			)
+			log.info("Deleted keychain item: act(bip353Address) grp(private)")
+		} catch {
+			log.error("Unable to delete keychain item: act(bip353Address) grp(private): \(error)")
 		}
 		
 		publishEnabledSecurity(EnabledSecurity())

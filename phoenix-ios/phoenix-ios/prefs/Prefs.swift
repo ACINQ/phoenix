@@ -12,7 +12,6 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 fileprivate enum Key: String {
 	case theme
 	case defaultPaymentDescription
-	case showChannelsRemoteBalance
 	case recentTipPercents
 	case isNewWallet
 	case invoiceExpirationDays
@@ -28,6 +27,7 @@ fileprivate enum Key: String {
 }
 
 fileprivate enum KeyDeprecated: String {
+	case showChannelsRemoteBalance
 	case recentPaymentSeconds
 	case maxFees
 }
@@ -76,11 +76,6 @@ class Prefs {
 	var defaultPaymentDescription: String? {
 		get { defaults.defaultPaymentDescription }
 		set { defaults.defaultPaymentDescription = newValue }
-	}
-	
-	var showChannelsRemoteBalance: Bool {
-		get { defaults.showChannelsRemoteBalance }
-		set { defaults.showChannelsRemoteBalance = newValue }
 	}
 	
 	var invoiceExpirationDays: Int {
@@ -250,7 +245,6 @@ class Prefs {
 		// - Key.theme: App feels weird when this changes unexpectedly.
 
 		defaults.removeObject(forKey: Key.defaultPaymentDescription.rawValue)
-		defaults.removeObject(forKey: Key.showChannelsRemoteBalance.rawValue)
 		defaults.removeObject(forKey: Key.recentTipPercents.rawValue)
 		defaults.removeObject(forKey: Key.isNewWallet.rawValue)
 		defaults.removeObject(forKey: Key.invoiceExpirationDays.rawValue)
@@ -316,11 +310,6 @@ extension UserDefaults {
 	@objc fileprivate var defaultPaymentDescription: String? {
 		get { string(forKey: Key.defaultPaymentDescription.rawValue) }
 		set { setValue(newValue, forKey: Key.defaultPaymentDescription.rawValue) }
-	}
-
-	@objc fileprivate var showChannelsRemoteBalance: Bool {
-		get { bool(forKey: Key.showChannelsRemoteBalance.rawValue) }
-		set { set(newValue, forKey: Key.showChannelsRemoteBalance.rawValue) }
 	}
 
 	@objc fileprivate var invoiceExpirationDays: Int {

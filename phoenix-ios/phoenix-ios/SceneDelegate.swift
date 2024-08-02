@@ -275,8 +275,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 				
 				// Issue #282 - Face ID remains enabled between app installs.
 				// Items stored in the iOS keychain remain persisted between iOS installs.
-				// So we clear the flag here.
-				AppSecurity.shared.setSoftBiometrics(enabled: false) { _ in }
+				// So we need to clear the flag here.
+				//
+				// We have the same problem with the Custom PIN.
+				// And also the Bip353Address.
+				// So we perform a standard wallet reset (which clears all values).
+				AppSecurity.shared.resetWallet()
 				
 			} else {
 				// The user has a wallet. (UI may or may not be locked.)
