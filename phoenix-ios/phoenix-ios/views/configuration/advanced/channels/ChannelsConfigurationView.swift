@@ -15,8 +15,6 @@ struct ChannelsConfigurationView: View {
 	let channelsPublisher = Biz.business.peerManager.channelsPublisher()
 	@State var channels: [LocalChannelInfo] = []
 	
-	@State var importChannelsOpen = false
-	
 	enum CapacityHeight: Preference {}
 	let capacityHeightReader = GeometryPreferenceReader(
 		key: AppendValue<CapacityHeight>.self,
@@ -24,10 +22,15 @@ struct ChannelsConfigurationView: View {
 	)
 	@State var capacityHeight: CGFloat? = nil
 	
+	enum NavLinkTag: String, Codable {
+		case ImportChannels
+	}
+	
 	@StateObject var toast = Toast()
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var popoverState: PopoverState
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
@@ -39,40 +42,44 @@ struct ChannelsConfigurationView: View {
 	@ViewBuilder
 	var body: some View {
 		
-		content()
-			.sharing($sharing)
-			.frame(maxWidth: .infinity, maxHeight: .infinity)
-			.onReceive(channelsPublisher) {
-				channels = $0
-			}
+		layers()
 			.navigationTitle(NSLocalizedString("Payment channels", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
+			.navigationBarItems(trailing: menuButton())
+			.navigationDestination(for: NavLinkTag.self) { tag in
+				navLinkView(tag)
+			}
+	}
+	
+	@ViewBuilder
+	func layers() -> some View {
+		
+		ZStack {
+			content()
+			toast.view()
+		} // </ZStack>
+		.sharing($sharing)
+		.frame(maxWidth: .infinity, maxHeight: .infinity)
+		.onReceive(channelsPublisher) {
+			channels = $0
+		}
 	}
 	
 	@ViewBuilder
 	func content() -> some View {
 		
-		ZStack {
-			List {
-				if channels.isEmpty {
-					section_noChannels()
-				} else {
-					if hasUsableChannels() {
-						section_balance()
-					}
-					section_channels()
+		List {
+			if channels.isEmpty {
+				section_noChannels()
+			} else {
+				if hasUsableChannels() {
+					section_balance()
 				}
+				section_channels()
 			}
-			.listStyle(.insetGrouped)
-			.listBackgroundColor(.primaryBackground)
-			
-			toast.view()
-			
-		} // </ZStack>
-		.navigationBarItems(trailing: menuButton())
-		.navigationDestination(isPresented: $importChannelsOpen) {
-			importChannelsView()
 		}
+		.listStyle(.insetGrouped)
+		.listBackgroundColor(.primaryBackground)
 	}
 	
 	@ViewBuilder
@@ -233,8 +240,12 @@ struct ChannelsConfigurationView: View {
 	}
 	
 	@ViewBuilder
-	func importChannelsView() -> some View {
-		ImportChannelsView()
+	func navLinkView(_ tag: NavLinkTag) -> some View {
+		
+		switch tag {
+		case .ImportChannels:
+			ImportChannelsView()
+		}
 	}
 	
 	// --------------------------------------------------
@@ -313,7 +324,7 @@ struct ChannelsConfigurationView: View {
 	func importChannels() {
 		log.trace("importChannels()")
 		
-		importChannelsOpen = true
+		navCoordinator.path.append(NavLinkTag.ImportChannels)
 	}
 	
 	func closeAllChannels() {

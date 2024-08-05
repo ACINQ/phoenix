@@ -10,15 +10,7 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-fileprivate enum NavLinkTag: String {
-	case SetCustomPinView
-	case EditCustomPinView
-	case DisableCustomPinView
-}
-
-struct AppAccessView : View {
-	
-	@State private var navLinkTag: NavLinkTag? = nil
+struct AppAccessView: View {
 	
 	@State var biometricSupport = AppSecurity.shared.deviceBiometricSupport()
 	@State var biometricsEnabled: Bool = false
@@ -33,8 +25,15 @@ struct AppAccessView : View {
 	@State private var backupSeedState: BackupSeedState = .safelyBackedUp
 	let backupSeedStatePublisher: AnyPublisher<BackupSeedState, Never>
 	
+	enum NavLinkTag: String, Codable {
+		case SetCustomPinView
+		case EditCustomPinView
+		case DisableCustomPinView
+	}
+	
 	@Environment(\.colorScheme) var colorScheme
 	
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var smartModalState: SmartModalState
 	
 	let willEnterForegroundPublisher = NotificationCenter.default.publisher(for:
@@ -67,6 +66,9 @@ struct AppAccessView : View {
 		layers()
 			.navigationTitle(NSLocalizedString("App Access", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
+			.navigationDestination(for: NavLinkTag.self) { tag in
+				navLinkView(tag)
+			}
 	}
 	
 	@ViewBuilder
@@ -74,9 +76,6 @@ struct AppAccessView : View {
 		
 		ZStack {
 			content()
-		}
-		.navigationDestination(isPresented: navLinkTagBinding()) {
-			navLinkView()
 		}
 	}
 	
@@ -313,17 +312,7 @@ struct AppAccessView : View {
 	}
 	
 	@ViewBuilder
-	func navLinkView() -> some View {
-		
-		if let tag = self.navLinkTag {
-			navLinkView(tag)
-		} else {
-			EmptyView()
-		}
-	}
-	
-	@ViewBuilder
-	private func navLinkView(_ tag: NavLinkTag) -> some View {
+	func navLinkView(_ tag: NavLinkTag) -> some View {
 		
 		switch tag {
 			case .SetCustomPinView     : SetNewPinView(willClose: setNewPinView_willClose)
@@ -335,14 +324,6 @@ struct AppAccessView : View {
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
-	
-	private func navLinkTagBinding() -> Binding<Bool> {
-		
-		return Binding<Bool>(
-			get: { navLinkTag != nil },
-			set: { if !$0 { navLinkTag = nil }}
-		)
-	}
 	
 	func isTouchID() -> Bool {
 		
@@ -567,17 +548,17 @@ struct AppAccessView : View {
 			}
 			
 		} else if flag { // toggle => ON
-			navLinkTag = .SetCustomPinView
+			navCoordinator.path.append(NavLinkTag.SetCustomPinView)
 			
 		} else { // toggle => OFF
-			navLinkTag = .DisableCustomPinView
+			navCoordinator.path.append(NavLinkTag.DisableCustomPinView)
 		}
 	}
 	
 	func changePin() {
 		log.trace("changePin()")
 		
-		navLinkTag = .EditCustomPinView
+		navCoordinator.path.append(NavLinkTag.EditCustomPinView)
 	}
 }
 

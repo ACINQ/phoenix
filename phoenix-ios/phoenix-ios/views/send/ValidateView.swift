@@ -24,7 +24,6 @@ struct ValidateView: View {
 	@State var currencyList: [Currency] = [Currency.bitcoin(.sat)]
 	
 	@State var currencyPickerChoice: String = Currency.bitcoin(.sat).shortName
-	@State var currencyConverterOpen = false
 	
 	@State var amount: String = ""
 	@State var parsedAmount: Result<Double, TextFieldCurrencyStylerError> = Result.failure(.emptyInput)
@@ -71,8 +70,13 @@ struct ValidateView: View {
 	)
 	@State var maxButtonWidth: CGFloat? = nil
 	
+	enum NavLinkTag: String, Codable {
+		case CurrencyConverter
+	}
+	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var popoverState: PopoverState
 	@EnvironmentObject var smartModalState: SmartModalState
@@ -83,6 +87,21 @@ struct ValidateView: View {
 	
 	@ViewBuilder
 	var body: some View {
+		
+		layers()
+			.navigationTitle(
+				mvi.model is Scan.Model_LnurlWithdrawFlow
+					? NSLocalizedString("Confirm Withdraw", comment: "Navigation bar title")
+					: NSLocalizedString("Confirm Payment", comment: "Navigation bar title")
+			)
+			.navigationBarTitleDisplayMode(.inline)
+			.navigationDestination(for: NavLinkTag.self) { tag in
+				navLinkView(tag)
+			}
+	}
+	
+	@ViewBuilder
+	func layers() -> some View {
 		
 		ZStack {
 			Color.primaryBackground
@@ -120,12 +139,6 @@ struct ValidateView: View {
 			}
 			
 		}// </ZStack>
-		.navigationTitle(
-			mvi.model is Scan.Model_LnurlWithdrawFlow
-				? NSLocalizedString("Confirm Withdraw", comment: "Navigation bar title")
-				: NSLocalizedString("Confirm Payment", comment: "Navigation bar title")
-		)
-		.navigationBarTitleDisplayMode(.inline)
 		.transition(
 			.asymmetric(
 				insertion: .identity,
@@ -134,9 +147,6 @@ struct ValidateView: View {
 		)
 		.onAppear() {
 			onAppear()
-		}
-		.navigationDestination(isPresented: $currencyConverterOpen) {
-			currencyConverterView()
 		}
 		.onChange(of: mvi.model) { newModel in
 			modelDidChange(newModel)
@@ -468,13 +478,16 @@ struct ValidateView: View {
 	}
 	
 	@ViewBuilder
-	func currencyConverterView() -> some View {
+	func navLinkView(_ tag: NavLinkTag) -> some View {
 		
-		CurrencyConverterView(
-			initialAmount: currentAmount(),
-			didChange: currencyConverterAmountChanged,
-			didClose: {}
-		)
+		switch tag {
+		case .CurrencyConverter:
+			CurrencyConverterView(
+				initialAmount: currentAmount(),
+				didChange: currencyConverterAmountChanged,
+				didClose: {}
+			)
+		}
 	}
 	
 	// --------------------------------------------------
@@ -1034,7 +1047,7 @@ struct ValidateView: View {
 			
 		} else { // user selected "other"
 			
-			currencyConverterOpen = true
+			navCoordinator.path.append(NavLinkTag.CurrencyConverter)
 			currencyPickerChoice = currency.shortName // revert to last real currency
 		}
 		

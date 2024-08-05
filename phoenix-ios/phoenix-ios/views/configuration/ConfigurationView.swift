@@ -23,65 +23,6 @@ fileprivate struct ConfigurationList: View {
 	
 	let scrollViewProxy: ScrollViewProxy
 	
-	enum NavLinkTag: String, Codable {
-		// General
-		case About
-		case WalletCreationOptions
-		case DisplayConfiguration
-		case PaymentOptions
-		case ContactsList
-		case Notifications
-		// Fees
-		case ChannelManagement
-		case LiquidityManagement
-		// Privacy & Security
-		case AppAccess
-		case RecoveryPhrase
-		case ElectrumServer
-		case Tor
-		case PaymentsBackup
-		// Advanced
-		case WalletInfo
-		case ChannelsConfiguration
-		case LogsConfiguration
-		case Experimental
-		// Danger Zone
-		case DrainWallet
-		case ResetWallet
-		case ForceCloseChannels
-		
-//		var description: String {
-//			switch self {
-//				// General
-//				case .About                 : return "About"
-//				case .WalletCreationOptions : return "WalletCreationOptions"
-//				case .DisplayConfiguration  : return "DisplayConfiguration"
-//				case .PaymentOptions        : return "PaymentOptions"
-//				case .ContactsList          : return "ContactsList"
-//				case .Notifications         : return "Notifications"
-//					// Fees
-//				case .ChannelManagement     : return "ChannelManagement"
-//				case .LiquidityManagement   : return "LiquidityManagement"
-//					// Privacy & Security
-//				case .AppAccess             : return "AppAccess"
-//				case .RecoveryPhrase        : return "RecoveryPhrase"
-//				case .ElectrumServer        : return "ElectrumServer"
-//				case .Tor                   : return "Tor"
-//				case .PaymentsBackup        : return "PaymentsBackup"
-//					// Advanced
-//				case .WalletInfo            : return "WalletInfo"
-//				case .ChannelsConfiguration : return "ChannelsConfiguration"
-//				case .LogsConfiguration     : return "LogsConfiguration"
-//				case .Experimental          : return "Experimental"
-//					// Danger Zone
-//				case .DrainWallet           : return "DrainWallet"
-//				case .ResetWallet           : return "ResetWallet"
-//				case .ForceCloseChannels    : return "ForceCloseChannels"
-//			}
-//		}
-	}
-	@State var navLinkTag: NavLinkTag? = nil
-	
 	@State private var notificationPermissions = NotificationsManager.shared.permissions.value
 	
 	@State private var backupSeedState: BackupSeedState = .safelyBackedUp
@@ -116,8 +57,37 @@ fileprivate struct ConfigurationList: View {
 	@Namespace var linkID_ResetWallet
 	@Namespace var linkID_ForceCloseChannels
 	
+	enum NavLinkTag: String, Codable {
+		// General
+		case About
+		case WalletCreationOptions
+		case DisplayConfiguration
+		case PaymentOptions
+		case ContactsList
+		case Notifications
+		// Fees
+		case ChannelManagement
+		case LiquidityManagement
+		// Privacy & Security
+		case AppAccess
+		case RecoveryPhrase
+		case ElectrumServer
+		case Tor
+		case PaymentsBackup
+		// Advanced
+		case WalletInfo
+		case ChannelsConfiguration
+		case LogsConfiguration
+		case Experimental
+		// Danger Zone
+		case DrainWallet
+		case ResetWallet
+		case ForceCloseChannels
+	}
+	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	init(scrollViewProxy: ScrollViewProxy) {
@@ -168,9 +138,6 @@ fileprivate struct ConfigurationList: View {
 		}
 		.onChange(of: deepLinkManager.deepLink) {
 			deepLinkChanged($0)
-		}
-		.onChange(of: navLinkTag) {
-			navLinkTagChanged($0)
 		}
 		.onReceive(NotificationsManager.shared.permissions) {(permissions: NotificationPermissions) in
 			notificationPermissionsChanged(permissions)
@@ -435,7 +402,7 @@ fileprivate struct ConfigurationList: View {
 	}
 	
 	@ViewBuilder
-	private func navLinkView(_ tag: NavLinkTag) -> some View {
+	func navLinkView(_ tag: NavLinkTag) -> some View {
 		
 		switch tag {
 		// General
@@ -510,17 +477,6 @@ fileprivate struct ConfigurationList: View {
 	func deepLinkChanged(_ value: DeepLink?) {
 		log.trace("deepLinkChanged() => \(value?.rawValue ?? "nil")")
 		
-		// This is a hack, courtesy of bugs in Apple's NavigationLink:
-		// https://developer.apple.com/forums/thread/677333
-		//
-		// Summary:
-		// There's some quirky code in SwiftUI that is resetting our navLinkTag.
-		// Several bizarre workarounds have been proposed.
-		// I've tried every one of them, and none of them work (at least, without bad side-effects).
-		//
-		// The only clean solution I've found is to listen for SwiftUI's bad behaviour,
-		// and forcibly undo it.
-		
 		if let value = value {
 			
 			// Navigate towards deep link (if needed)
@@ -538,63 +494,7 @@ fileprivate struct ConfigurationList: View {
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {
-				
-				self.swiftUiBugWorkaround = newNavLinkTag
-				self.swiftUiBugWorkaroundIdx += 1
-				clearSwiftUiBugWorkaround(delay: delay)
-				
-				// Interesting bug in SwiftUI:
-				// If the navLinkTag you're targetting is scrolled off the screen,
-				// the you won't be able to navigate to it.
-				// My understanding is that List is lazy, and this somehow prevents triggering the navigation.
-				// The workaround is to manually scroll to the item to ensure it's onscreen,
-				// at which point we can activate the navLinkTag trigger.
-				//
-				scrollViewProxy.scrollTo(linkID(for: newNavLinkTag))
-				DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-					self.navLinkTag = newNavLinkTag // Trigger/push the view
-				}
-			}
-			
-		} else {
-			// We reached the final destination of the deep link
-			clearSwiftUiBugWorkaround(delay: 0.0)
-		}
-	}
-	
-	fileprivate func navLinkTagChanged(_ tag: NavLinkTag?) {
-		log.trace("navLinkTagChanged() => \(tag?.rawValue ?? "nil")")
-		
-		if tag == nil, let forcedNavLinkTag = swiftUiBugWorkaround {
-			
-			log.debug("Blocking SwiftUI's attempt to reset our navLinkTag")
-			self.navLinkTag = forcedNavLinkTag
-			
-		} else if tag == nil {
-			
-			// If there's a pending popToDestination, it's now safe to continue the flow.
-			//
-			// Note that performing this operation in `onAppear` doesn't work properly:
-			// - it appears to work fine on the simulator, but isn't reliable on the actual device
-			// - it seems that, IF using a `navLinkTag`, then we need to wait for the tag to be
-			//   unset before it can be set properly again.
-			//
-			if let destination = popToDestination {
-				log.debug("popToDestination: \(destination)")
-				
-				popToDestination = nil
-				switch destination {
-				case .RootView(_):
-					presentationMode.wrappedValue.dismiss()
-					
-				case .ConfigurationView(let deepLink):
-					if let deepLink {
-						deepLinkManager.broadcast(deepLink)
-					}
-				
-				case .TransactionsView:
-					log.warning("Invalid popToDestination")
-				}
+				navCoordinator.path.append(newNavLinkTag)
 			}
 		}
 	}
@@ -619,51 +519,5 @@ fileprivate struct ConfigurationList: View {
 		log.trace("popTo(\(destination))")
 		
 		popToDestination = destination
-	}
-	
-	// --------------------------------------------------
-	// MARK: Utilities
-	// --------------------------------------------------
-	
-	func linkID(for navLinkTag: NavLinkTag) -> any Hashable {
-		
-		switch navLinkTag {
-			case .About                 : return linkID_About
-			case .WalletCreationOptions : return linkID_WalletCreationOptions
-			case .DisplayConfiguration  : return linkID_DisplayConfiguration
-			case .PaymentOptions        : return linkID_PaymentOptions
-			case .ChannelManagement     : return linkID_ChannelManagement
-			case .LiquidityManagement   : return linkID_LiquidityManagement
-			case .ContactsList          : return linkID_ContactsList
-			case .Notifications         : return linkID_Notifications
-			
-			case .AppAccess             : return linkID_AppAccess
-			case .RecoveryPhrase        : return linkID_RecoveryPhrase
-			case .ElectrumServer        : return linkID_ElectrumServer
-			case .Tor                   : return linkID_Tor
-			case .PaymentsBackup        : return linkID_PaymentsBackup
-		
-			case .WalletInfo            : return linkID_WalletInfo
-			case .ChannelsConfiguration : return linkID_ChannelsConfiguration
-			case .LogsConfiguration     : return linkID_LogsConfiguration
-			case .Experimental          : return linkID_Experimental
-			
-			case .DrainWallet           : return linkID_DrainWallet
-			case .ResetWallet           : return linkID_ResetWallet
-			case .ForceCloseChannels    : return linkID_ForceCloseChannels
-		}
-	}
-	
-	func clearSwiftUiBugWorkaround(delay: TimeInterval) {
-		
-		let idx = self.swiftUiBugWorkaroundIdx
-		
-		DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-			
-			if self.swiftUiBugWorkaroundIdx == idx {
-				log.debug("swiftUiBugWorkaround = nil")
-				self.swiftUiBugWorkaround = nil
-			}
-		}
 	}
 }

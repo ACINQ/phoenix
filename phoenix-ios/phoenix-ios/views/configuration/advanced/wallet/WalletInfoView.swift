@@ -13,21 +13,6 @@ struct WalletInfoView: View {
 	
 	let popTo: (PopToDestination) -> Void
 	
-	enum NavLinkTag: CustomStringConvertible {
-		case SwapInWalletDetails
-		case SwapInAddresses
-		case FinalWalletDetails
-		
-		var description: String {
-			switch self {
-				case .SwapInWalletDetails : return "SwapInWalletDetails"
-				case .SwapInAddresses     : return "SwapInAddresses"
-				case .FinalWalletDetails  : return "FinalWalletDetails"
-			}
-		}
-	}
-	@State var navLinkTag: NavLinkTag? = nil
-	
 	@State var didAppear = false
 	@State var popToDestination: PopToDestination? = nil
 	
@@ -42,14 +27,18 @@ struct WalletInfoView: View {
 	@State var finalWallet = Biz.business.peerManager.finalWalletValue()
 	let finalWalletPublisher = Biz.business.peerManager.finalWalletPublisher()
 	
-	@State private var swiftUiBugWorkaround: NavLinkTag? = nil
-	@State private var swiftUiBugWorkaroundIdx = 0
+	enum NavLinkTag: String, Codable {
+		case SwapInWalletDetails
+		case SwapInAddresses
+		case FinalWalletDetails
+	}
 	
 	@StateObject var toast = Toast()
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
@@ -86,9 +75,6 @@ struct WalletInfoView: View {
 		}
 		.onChange(of: deepLinkManager.deepLink) {
 			deepLinkChanged($0)
-		}
-		.onChange(of: navLinkTag) {
-			navLinkTagChanged($0)
 		}
 		.onReceive(swapInWalletPublisher) {
 			swapInWalletChanged($0)
@@ -439,7 +425,7 @@ struct WalletInfoView: View {
 	}
 	
 	@ViewBuilder
-	private func navLinkView(_ tag: NavLinkTag) -> some View {
+	func navLinkView(_ tag: NavLinkTag) -> some View {
 		
 		switch tag {
 			case .SwapInWalletDetails : SwapInWalletDetails(location: .embedded, popTo: popToWrapper)
@@ -530,17 +516,6 @@ struct WalletInfoView: View {
 	func deepLinkChanged(_ value: DeepLink?) {
 		log.trace("deepLinkChanged() => \(value?.rawValue ?? "nil")")
 		
-		// This is a hack, courtesy of bugs in Apple's NavigationLink:
-		// https://developer.apple.com/forums/thread/677333
-		//
-		// Summary:
-		// There's some quirky code in SwiftUI that is resetting our navLinkTag.
-		// Several bizarre workarounds have been proposed.
-		// I've tried every one of them, and none of them work (at least, without bad side-effects).
-		//
-		// The only clean solution I've found is to listen for SwiftUI's bad behaviour,
-		// and forcibly undo it.
-		
 		if let value = value {
 			
 			// Navigate towards deep link (if needed)
@@ -557,27 +532,8 @@ struct WalletInfoView: View {
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {
-				
-				self.swiftUiBugWorkaround = newNavLinkTag
-				self.swiftUiBugWorkaroundIdx += 1
-				clearSwiftUiBugWorkaround(delay: 1.5)
-				
-				self.navLinkTag = newNavLinkTag // Trigger/push the view
+				navCoordinator.path.append(newNavLinkTag)
 			}
-			
-		} else {
-			// We reached the final destination of the deep link
-			clearSwiftUiBugWorkaround(delay: 0.0)
-		}
-	}
-	
-	fileprivate func navLinkTagChanged(_ tag: NavLinkTag?) {
-		log.trace("navLinkTagChanged() => \(tag?.description ?? "nil")")
-		
-		if tag == nil, let forcedNavLinkTag = swiftUiBugWorkaround {
-				
-			log.debug("Blocking SwiftUI's attempt to reset our navLinkTag")
-			self.navLinkTag = forcedNavLinkTag
 		}
 	}
 	
@@ -605,22 +561,5 @@ struct WalletInfoView: View {
 			NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
 			colorScheme: colorScheme.opposite
 		)
-	}
-	
-	// --------------------------------------------------
-	// MARK: Workarounds
-	// --------------------------------------------------
-	
-	func clearSwiftUiBugWorkaround(delay: TimeInterval) {
-		
-		let idx = self.swiftUiBugWorkaroundIdx
-		
-		DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-			
-			if self.swiftUiBugWorkaroundIdx == idx {
-				log.trace("swiftUiBugWorkaround = nil")
-				self.swiftUiBugWorkaround = nil
-			}
-		}
 	}
 }

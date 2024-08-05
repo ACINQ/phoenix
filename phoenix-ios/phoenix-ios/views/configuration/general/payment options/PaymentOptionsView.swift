@@ -8,25 +8,7 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-fileprivate enum NavLinkTag: String {
-	case BackgroundPaymentsSelector
-}
-
 struct PaymentOptionsView: View {
-	
-	@ViewBuilder
-	var body: some View {
-		ScrollViewReader { scrollViewProxy in
-			PaymentOptionsList(scrollViewProxy: scrollViewProxy)
-		}
-	}
-}
-
-fileprivate struct PaymentOptionsList: View {
-	
-	let scrollViewProxy: ScrollViewProxy
-	
-	@State private var navLinkTag: NavLinkTag? = nil
 	
 	@State var defaultPaymentDescription: String = Prefs.shared.defaultPaymentDescription ?? ""
 	
@@ -39,15 +21,13 @@ fileprivate struct PaymentOptionsList: View {
 	
 	@State var firstAppearance = true
 	
-	@State private var swiftUiBugWorkaround: NavLinkTag? = nil
-	@State private var swiftUiBugWorkaroundIdx = 0
-	
-	@Namespace var sectionID_incomingPayments
-	@Namespace var sectionID_outgoingPayments
-	@Namespace var sectionID_backgroundPayments
+	enum NavLinkTag: String, Codable {
+		case BackgroundPaymentsSelector
+	}
 	
 	@Environment(\.openURL) var openURL
 	
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	@EnvironmentObject var smartModalState: SmartModalState
 	
@@ -61,6 +41,11 @@ fileprivate struct PaymentOptionsList: View {
 		content()
 			.navigationTitle(NSLocalizedString("Payment Options", comment: "Navigation Bar Title"))
 			.navigationBarTitleDisplayMode(.inline)
+			.navigationDestination(for: NavLinkTag.self) { tag in
+				switch tag {
+					case .BackgroundPaymentsSelector : BackgroundPaymentsSelector()
+				}
+			}
 	}
 	
 	@ViewBuilder
@@ -75,9 +60,6 @@ fileprivate struct PaymentOptionsList: View {
 		.listBackgroundColor(.primaryBackground)
 		.onAppear {
 			onAppear()
-		}
-		.onChange(of: navLinkTag) {
-			navLinkTagChanged($0)
 		}
 		.onChange(of: deepLinkManager.deepLink) {
 			deepLinkChanged($0)
@@ -98,7 +80,6 @@ fileprivate struct PaymentOptionsList: View {
 			Text("Incoming payments")
 			
 		} // </Section>
-		.id(sectionID_incomingPayments)
 	}
 	
 	@ViewBuilder
@@ -111,7 +92,6 @@ fileprivate struct PaymentOptionsList: View {
 			Text("Outgoing payments")
 			
 		} // </Section>
-		.id(sectionID_outgoingPayments)
 	}
 	
 	@ViewBuilder
@@ -122,7 +102,7 @@ fileprivate struct PaymentOptionsList: View {
 			let config = BackgroundPaymentsConfig.fromSettings(notificationSettings)
 			let hideAmount = NSLocalizedString("(hide amount)", comment: "Background payments configuration")
 			
-			navLink(.BackgroundPaymentsSelector) {
+			NavigationLink(value: NavLinkTag.BackgroundPaymentsSelector) {
 				
 				Group { // Compiler workaround: Type '()' cannot conform to 'View'
 					switch config {
@@ -167,10 +147,9 @@ fileprivate struct PaymentOptionsList: View {
 						
 					} // </switch>
 				} // </Group>
-			} // </navLink>
+			} // </NavigationLink>
 			
 		} // </Section>
-		.id(sectionID_backgroundPayments)
 	}
 	
 	@ViewBuilder
@@ -270,28 +249,6 @@ fileprivate struct PaymentOptionsList: View {
 		} // </HStack>
 	}
 	
-	@ViewBuilder
-	private func navLink<Content>(
-		_ tag: NavLinkTag,
-		label: () -> Content
-	) -> some View where Content: View {
-		
-		NavigationLink(
-			destination: navLinkView(tag),
-			tag: tag,
-			selection: $navLinkTag,
-			label: label
-		)
-	}
-	
-	@ViewBuilder
-	private func navLinkView(_ tag: NavLinkTag) -> some View {
-		
-		switch tag {
-			case .BackgroundPaymentsSelector : BackgroundPaymentsSelector()
-		}
-	}
-	
 	// --------------------------------------------------
 	// MARK: Notifications
 	// --------------------------------------------------
@@ -313,17 +270,6 @@ fileprivate struct PaymentOptionsList: View {
 	func deepLinkChanged(_ value: DeepLink?) {
 		log.trace("deepLinkChanged() => \(value?.rawValue ?? "nil")")
 		
-		// This is a hack, courtesy of bugs in Apple's NavigationLink:
-		// https://developer.apple.com/forums/thread/677333
-		//
-		// Summary:
-		// There's some quirky code in SwiftUI that is resetting our navLinkTag.
-		// Several bizarre workarounds have been proposed.
-		// I've tried every one of them, and none of them work (at least, without bad side-effects).
-		//
-		// The only clean solution I've found is to listen for SwiftUI's bad behaviour,
-		// and forcibly undo it.
-		
 		if let value = value {
 			
 			// Navigate towards deep link (if needed)
@@ -340,37 +286,8 @@ fileprivate struct PaymentOptionsList: View {
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {
-				
-				self.swiftUiBugWorkaround = newNavLinkTag
-				self.swiftUiBugWorkaroundIdx += 1
-				clearSwiftUiBugWorkaround(delay: 1.5)
-				
-				// Interesting bug in SwiftUI:
-				// If the navLinkTag you're targetting is scrolled off the screen,
-				// the you won't be able to navigate to it.
-				// My understanding is that List is lazy, and this somehow prevents triggering the navigation.
-				// The workaround is to manually scroll to the item to ensure it's onscreen,
-				// at which point we can activate the navLinkTag trigger.
-				//
-				scrollViewProxy.scrollTo(sectionID_backgroundPayments)
-				DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-					self.navLinkTag = newNavLinkTag // Trigger/push the view
-				}
+				navCoordinator.path.append(newNavLinkTag)
 			}
-			
-		} else {
-			// We reached the final destination of the deep link
-			clearSwiftUiBugWorkaround(delay: 0.0)
-		}
-	}
-	
-	fileprivate func navLinkTagChanged(_ tag: NavLinkTag?) {
-		log.trace("navLinkTagChanged() => \(tag?.rawValue ?? "nil")")
-		
-		if tag == nil, let forcedNavLinkTag = swiftUiBugWorkaround {
-				
-			log.debug("Blocking SwiftUI's attempt to reset our navLinkTag")
-			self.navLinkTag = forcedNavLinkTag
 		}
 	}
 	
@@ -395,23 +312,6 @@ fileprivate struct PaymentOptionsList: View {
 		
 		if let url = URL(string: "https://phoenix.acinq.co/faq") {
 			openURL(url)
-		}
-	}
-	
-	// --------------------------------------------------
-	// MARK: Workarounds
-	// --------------------------------------------------
-	
-	func clearSwiftUiBugWorkaround(delay: TimeInterval) {
-		
-		let idx = self.swiftUiBugWorkaroundIdx
-		
-		DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-			
-			if self.swiftUiBugWorkaroundIdx == idx {
-				log.trace("swiftUiBugWorkaround = nil")
-				self.swiftUiBugWorkaround = nil
-			}
 		}
 	}
 }

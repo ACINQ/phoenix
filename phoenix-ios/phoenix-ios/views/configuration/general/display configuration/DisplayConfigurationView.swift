@@ -8,27 +8,7 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-fileprivate enum NavLinkTag: String {
-	case FiatCurrencySelector
-	case BitcoinUnitSelector
-	case RecentPaymentsSelector
-}
-
 struct DisplayConfigurationView: View {
-	
-	@ViewBuilder
-	var body: some View {
-		ScrollViewReader { scrollViewProxy in
-			DisplayConfigurationList(scrollViewProxy: scrollViewProxy)
-		}
-	}
-}
-
-fileprivate struct DisplayConfigurationList: View {
-	
-	let scrollViewProxy: ScrollViewProxy
-	
-	@State private var navLinkTag: NavLinkTag? = nil
 	
 	@State var fiatCurrency = GroupPrefs.shared.fiatCurrency
 	@State var bitcoinUnit = GroupPrefs.shared.bitcoinUnit
@@ -36,10 +16,11 @@ fileprivate struct DisplayConfigurationList: View {
 	@State var showOriginalFiatAmount = Prefs.shared.showOriginalFiatAmount
 	@State var recentPaymentsConfig = Prefs.shared.recentPaymentsConfig
 	
-	@Namespace var sectionID_currency
-	@Namespace var sectionID_theme
-	@Namespace var sectionID_paymentHistory
-	@Namespace var sectionID_home
+	enum NavLinkTag: String, Codable {
+		case FiatCurrencySelector
+		case BitcoinUnitSelector
+		case RecentPaymentsSelector
+	}
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -51,6 +32,9 @@ fileprivate struct DisplayConfigurationList: View {
 		content()
 			.navigationTitle(NSLocalizedString("Display options", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
+			.navigationDestination(for: NavLinkTag.self) { tag in
+				navLinkView(tag)
+			}
 	}
 	
 	@ViewBuilder
@@ -81,7 +65,7 @@ fileprivate struct DisplayConfigurationList: View {
 	func section_currency() -> some View {
 		
 		Section {
-			navLink(.FiatCurrencySelector) {
+			NavigationLink(value: NavLinkTag.FiatCurrencySelector) {
 				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 					Text("Fiat currency")
 					Spacer()
@@ -91,7 +75,7 @@ fileprivate struct DisplayConfigurationList: View {
 				}
 			}
 			
-			navLink(.BitcoinUnitSelector) {
+			NavigationLink(value: NavLinkTag.BitcoinUnitSelector) {
 				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 					Text("Bitcoin unit")
 					Spacer()
@@ -114,7 +98,6 @@ fileprivate struct DisplayConfigurationList: View {
 				.padding(.bottom, 4)
 			
 		} // </Section>
-		.id(sectionID_currency)
 	}
 	
 	@ViewBuilder
@@ -134,7 +117,6 @@ fileprivate struct DisplayConfigurationList: View {
 			.pickerStyle(SegmentedPickerStyle())
 			
 		} // </Section>
-		.id(sectionID_theme)
 	}
 	
 	@ViewBuilder
@@ -170,7 +152,6 @@ fileprivate struct DisplayConfigurationList: View {
 			.padding(.bottom, 4)
 			
 		} // </Section>
-		.id(sectionID_paymentHistory)
 	}
 	
 	@ViewBuilder
@@ -178,7 +159,7 @@ fileprivate struct DisplayConfigurationList: View {
 		
 		Section(header: Text("Home Screen")) {
 			
-			navLink(.RecentPaymentsSelector) {
+			NavigationLink(value: NavLinkTag.RecentPaymentsSelector) {
 				
 				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 					switch recentPaymentsConfig {
@@ -195,7 +176,7 @@ fileprivate struct DisplayConfigurationList: View {
 							.fixedSize(horizontal: false, vertical: true)
 					}
 				}
-			} // </navLink>
+			} // </NavigationLink>
 			
 			Text("Use the payments screen to view your full payment history.")
 				.font(.callout)
@@ -205,25 +186,10 @@ fileprivate struct DisplayConfigurationList: View {
 				.padding(.bottom, 4)
 			
 		} // </Section>
-		.id(sectionID_home)
 	}
 	
 	@ViewBuilder
-	private func navLink<Content>(
-		_ tag: NavLinkTag,
-		label: () -> Content
-	) -> some View where Content: View {
-		
-		NavigationLink(
-			destination: navLinkView(tag),
-			tag: tag,
-			selection: $navLinkTag,
-			label: label
-		)
-	}
-	
-	@ViewBuilder
-	private func navLinkView(_ tag: NavLinkTag) -> some View {
+	func navLinkView(_ tag: NavLinkTag) -> some View {
 		
 		switch tag {
 			case .FiatCurrencySelector   : FiatCurrencySelector(selectedFiatCurrency: fiatCurrency)

@@ -75,6 +75,9 @@ struct LightningDualView: View {
 		content()
 			.navigationTitle(NSLocalizedString("Receive", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
+			.navigationDestination(isPresented: $currencyConverterOpen) {
+				currencyConverterView()
+			}
 	}
 	
 	@ViewBuilder
@@ -85,9 +88,6 @@ struct LightningDualView: View {
 		}
 		.onAppear {
 			onAppear()
-		}
-		.navigationDestination(isPresented: $currencyConverterOpen) {
-			currencyConverterView()
 		}
 		.onChange(of: mvi.model) {
 			modelChanged($0)

@@ -18,11 +18,6 @@ struct SwapInWalletDetails: View {
 	let location: Location
 	let popTo: (PopToDestination) -> Void
 	
-	enum NavLinkTag: String {
-		case SpendExpiredSwapIns
-	}
-	@State var navLinkTag: NavLinkTag? = nil
-	
 	@State var liquidityPolicy: LiquidityPolicy = GroupPrefs.shared.liquidityPolicy
 	
 	@State var swapInWallet = Biz.business.balanceManager.swapInWalletValue()
@@ -32,6 +27,10 @@ struct SwapInWalletDetails: View {
 	@State var swapInRejected: Lightning_kmpLiquidityEventsRejected? = nil
 	
 	@State var blockchainExplorerTxid: Bitcoin_kmpTxId? = nil
+	
+	enum NavLinkTag: String, Codable {
+		case SpendExpiredSwapIns
+	}
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	

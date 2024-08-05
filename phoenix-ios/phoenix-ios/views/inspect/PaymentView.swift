@@ -21,6 +21,13 @@ struct PaymentView: View {
 		case sheet(closeAction: () -> Void)
 		
 		case embedded(popTo: (PopToDestination) -> Void)
+		
+		var isSheet: Bool {
+			switch self {
+				case .sheet(_)    : return true
+				case .embedded(_) : return false
+			}
+		}
 	}
 	
 	let location: Location
@@ -50,14 +57,17 @@ fileprivate struct PaymentViewSheet: View {
 	@EnvironmentObject var popoverState: PopoverState
 	@State var popoverItem: PopoverItem? = nil
 	
+	@StateObject var navCoordinator = NavigationCoordinator()
+	
 	@ViewBuilder
 	var body: some View {
 		
 		ZStack {
 			
-			NavigationStack {
+			NavigationStack(path: $navCoordinator.path) {
 				SummaryView(location: location, paymentInfo: paymentInfo)
 			}
+			.environmentObject(navCoordinator)
 			.edgesIgnoringSafeArea(.all)
 			.zIndex(0) // needed for proper animation
 			.accessibilityHidden(shortSheetItem != nil || popoverItem != nil)

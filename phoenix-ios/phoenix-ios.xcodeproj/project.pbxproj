@@ -337,6 +337,7 @@
 		DCFA8759260E6F2E00AE8953 /* IntroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA8758260E6F2E00AE8953 /* IntroView.swift */; };
 		DCFA876D260E91E600AE8953 /* IntroContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA876C260E91E600AE8953 /* IntroContainer.swift */; };
 		DCFAEFC92A72F48700330088 /* SwapInWalletDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFAEFC82A72F48700330088 /* SwapInWalletDetails.swift */; };
+		DCFB24812C6155D1005F5098 /* NavigationCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFB24802C6155D1005F5098 /* NavigationCoordinator.swift */; };
 		DCFB8DF72A94066100947698 /* Task+Sleep.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFB8DF62A94066100947698 /* Task+Sleep.swift */; };
 		DCFB8DF92A94112A00947698 /* Dictionary+MapKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFB8DF82A94112A00947698 /* Dictionary+MapKeys.swift */; };
 		DCFBC5592AE2CFEF00E3A418 /* BizNotificationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFBC5582AE2CFEF00E3A418 /* BizNotificationCell.swift */; };
@@ -710,6 +711,7 @@
 		DCFA8758260E6F2E00AE8953 /* IntroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroView.swift; sourceTree = "<group>"; };
 		DCFA876C260E91E600AE8953 /* IntroContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroContainer.swift; sourceTree = "<group>"; };
 		DCFAEFC82A72F48700330088 /* SwapInWalletDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwapInWalletDetails.swift; sourceTree = "<group>"; };
+		DCFB24802C6155D1005F5098 /* NavigationCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationCoordinator.swift; sourceTree = "<group>"; };
 		DCFB8DF62A94066100947698 /* Task+Sleep.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Task+Sleep.swift"; sourceTree = "<group>"; };
 		DCFB8DF82A94112A00947698 /* Dictionary+MapKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Dictionary+MapKeys.swift"; sourceTree = "<group>"; };
 		DCFBC5582AE2CFEF00E3A418 /* BizNotificationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BizNotificationCell.swift; sourceTree = "<group>"; };
@@ -1447,6 +1449,7 @@
 				DCDD9ED528637FD7001800A3 /* AppStatusButton.swift */,
 				DCDD9ED328637EBB001800A3 /* ToolsButton.swift */,
 				DC4864D929D4E52C00ACD539 /* BgRefreshDisabledPopover.swift */,
+				DCFB24802C6155D1005F5098 /* NavigationCoordinator.swift */,
 			);
 			path = main;
 			sourceTree = "<group>";
@@ -1903,6 +1906,7 @@
 				DC63BDF429AE44380067A361 /* NotificationsManager.swift in Sources */,
 				DC118BFA27B44F840080BBAC /* TipSliderSheet.swift in Sources */,
 				DC6F04252C38807300627B4F /* PhotosManager.swift in Sources */,
+				DCFB24812C6155D1005F5098 /* NavigationCoordinator.swift in Sources */,
 				DC72C33425A51AAC008A927A /* CurrencyPrefs.swift in Sources */,
 				DCE6FB8C28D0B5F200054511 /* ResetWalletView.swift in Sources */,
 				DC3345D02C2B4C1200EDD2D4 /* ManageContact.swift in Sources */,

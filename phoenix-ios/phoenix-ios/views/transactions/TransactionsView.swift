@@ -28,7 +28,6 @@ struct TransactionsView: View {
 	@State var visibleRows: Set<WalletPaymentOrderRow> = Set()
 	
 	@State var selectedItem: WalletPaymentInfo? = nil
-	@State var historyExporterOpen: Bool = false
 	
 	let syncStatePublisher = Biz.syncManager!.syncTxManager.statePublisher
 	@State var isDownloadingTxs: Bool = false
@@ -36,8 +35,14 @@ struct TransactionsView: View {
 	@State var didAppear = false
 	@State var popToDestination: PopToDestination? = nil
 	
+	enum NavLinkTag: String, Codable {
+		case PaymentView
+		case HistoryExporter
+	}
+	
 	@Environment(\.colorScheme) var colorScheme
 	
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var deviceInfo: DeviceInfo
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
@@ -62,8 +67,8 @@ struct TransactionsView: View {
 		.navigationTitle(NSLocalizedString("Payments", comment: "Navigation bar title"))
 		.navigationBarTitleDisplayMode(.inline)
 		.navigationBarItems(trailing: exportButton())
-		.navigationDestination(isPresented: navLinkBinding()) {
-			navLinkView()
+		.navigationDestination(for: NavLinkTag.self) { tag in
+			navLinkView(tag)
 		}
 	}
 	
@@ -175,40 +180,28 @@ struct TransactionsView: View {
 	@ViewBuilder
 	func exportButton() -> some View {
 		
-		Button {
-			historyExporterOpen = true
-		} label: {
+		NavigationLink(value: NavLinkTag.HistoryExporter) {
 			Image(systemName: "square.and.arrow.up")
 		}
 	}
 	
 	@ViewBuilder
-	func navLinkView() -> some View {
+	func navLinkView(_ tag: NavLinkTag) -> some View {
 		
-		if let selectedItem {
-			PaymentView(
-				location: .embedded(popTo: popTo),
-				paymentInfo: selectedItem
-			)
+		switch tag {
+		case .PaymentView:
+			if let selectedItem {
+				PaymentView(
+					location: .embedded(popTo: popTo),
+					paymentInfo: selectedItem
+				)
+			} else {
+				EmptyView()
+			}
 			
-		} else if historyExporterOpen {
+		case .HistoryExporter:
 			TxHistoryExporter()
-			
-		} else {
-			EmptyView()
 		}
-	}
-	
-	// --------------------------------------------------
-	// MARK: View Helpers
-	// --------------------------------------------------
-	
-	func navLinkBinding() -> Binding<Bool> {
-		
-		return Binding<Bool>(
-			get: { selectedItem != nil || historyExporterOpen },
-			set: { if !$0 { selectedItem = nil; historyExporterOpen = false }}
-		)
 	}
 	
 	// --------------------------------------------------
@@ -580,6 +573,7 @@ struct TransactionsView: View {
 			
 			if let result = result {
 				selectedItem = result
+				navCoordinator.path.append(NavLinkTag.PaymentView)
 			}
 		}
 	}

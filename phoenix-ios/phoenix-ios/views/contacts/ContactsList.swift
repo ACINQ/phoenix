@@ -18,15 +18,20 @@ struct ContactsList: View {
 	@State var searchText = ""
 	@State var filteredContacts: [ContactInfo]? = nil
 	
-	@State var addItem: Bool = false
 	@State var selectedItem: ContactInfo? = nil
 	@State var pendingDelete: ContactInfo? = nil
 	
 	@State var didAppear = false
 	@State var popToDestination: PopToDestination? = nil
 	
+	enum NavLinkTag: String, Codable {
+		case AddItem
+		case SelectedItem
+	}
+	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var smartModalState: SmartModalState
 	
 	// --------------------------------------------------
@@ -39,12 +44,12 @@ struct ContactsList: View {
 		ZStack {
 			content()
 		}
-		.navigationDestination(isPresented: selectedItemBinding()) {
-			selectedItemView()
-		}
 		.navigationTitle("Contacts")
 		.navigationBarTitleDisplayMode(.inline)
 		.navigationBarItems(trailing: plusButton())
+		.navigationDestination(for: NavLinkTag.self) { tag in
+			navLinkView(tag)
+		}
 	}
 	
 	@ViewBuilder
@@ -69,13 +74,13 @@ struct ContactsList: View {
 		List {
 			ForEach(visibleContacts) { item in
 				Button {
-					selectedItem = item
+					selectItem(item)
 				} label: {
 					row(item)
 				}
 				.swipeActions(allowsFullSwipe: false) {
 					Button {
-						selectedItem = item
+						selectItem(item)
 					} label: {
 						Label("Edit", systemImage: "square.and.pencil")
 					}
@@ -128,17 +133,18 @@ struct ContactsList: View {
 	}
 	
 	@ViewBuilder
-	func selectedItemView() -> some View {
+	func plusButton() -> some View {
 		
-		if let selectedItem {
-			ManageContact(
-				location: .embedded,
-				popTo: popToWrapper,
-				offer: nil,
-				contact: selectedItem,
-				contactUpdated: { _ in }
-			)
-		} else if addItem {
+		NavigationLink(value: NavLinkTag.AddItem) {
+			Image(systemName: "plus")
+		}
+	}
+	
+	@ViewBuilder
+	func navLinkView(_ tag: NavLinkTag) -> some View {
+		
+		switch tag {
+		case .AddItem:
 			ManageContact(
 				location: .embedded,
 				popTo: popToWrapper,
@@ -146,18 +152,19 @@ struct ContactsList: View {
 				contact: nil,
 				contactUpdated: { _ in }
 			)
-		} else {
-			EmptyView()
-		}
-	}
-	
-	@ViewBuilder
-	func plusButton() -> some View {
-		
-		Button {
-			addItem = true
-		} label: {
-			Image(systemName: "plus")
+			
+		case .SelectedItem:
+			if let selectedItem {
+				ManageContact(
+					location: .embedded,
+					popTo: popToWrapper,
+					offer: nil,
+					contact: selectedItem,
+					contactUpdated: { _ in }
+				)
+			} else {
+				EmptyView()
+			}
 		}
 	}
 	
@@ -176,14 +183,6 @@ struct ContactsList: View {
 		}
 		
 		return filteredContacts.isEmpty && !sortedContacts.isEmpty
-	}
-	
-	func selectedItemBinding() -> Binding<Bool> {
-		
-		return Binding<Bool>(
-			get: { selectedItem != nil || addItem },
-			set: { if !$0 { selectedItem = nil; addItem = false }}
-		)
 	}
 	
 	func confirmationDialogBinding() -> Binding<Bool> {
@@ -262,6 +261,12 @@ struct ContactsList: View {
 		
 		popToDestination = destination
 		popTo(destination)
+	}
+	
+	func selectItem(_ contact: ContactInfo) {
+		
+		selectedItem = contact
+		navCoordinator.path.append(NavLinkTag.SelectedItem)
 	}
 	
 	func deleteContact() {
