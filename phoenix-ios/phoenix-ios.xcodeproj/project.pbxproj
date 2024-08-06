@@ -150,6 +150,8 @@
 		DC5A935329846044004F19FD /* FileHandle+Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5A935229846043004F19FD /* FileHandle+Async.swift */; };
 		DC5CA4ED28F83C3B0048A737 /* DrainWalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5CA4EC28F83C3B0048A737 /* DrainWalletView.swift */; };
 		DC5CA4EF28F842F10048A737 /* MVI+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5CA4EE28F842F10048A737 /* MVI+Extensions.swift */; };
+		DC5E288E2C62C3DF0037B3D3 /* NavigationStackDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5E288D2C62C3DF0037B3D3 /* NavigationStackDestination.swift */; };
+		DC5E28CA2C62D37A0037B3D3 /* NavigationCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5E28C92C62D37A0037B3D3 /* NavigationCoordinator.swift */; };
 		DC5EE4C927679C6300A3035C /* RestoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5EE4C827679C6300A3035C /* RestoreView.swift */; };
 		DC5F1C4828DDA539007A55ED /* DrainWalletView_Confirm.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F1C4728DDA539007A55ED /* DrainWalletView_Confirm.swift */; };
 		DC5F1C4A28DDAA49007A55ED /* ResetWalletView_Confirm.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F1C4928DDAA49007A55ED /* ResetWalletView_Confirm.swift */; };
@@ -555,6 +557,8 @@
 		DC5A935229846043004F19FD /* FileHandle+Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FileHandle+Async.swift"; sourceTree = "<group>"; };
 		DC5CA4EC28F83C3B0048A737 /* DrainWalletView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrainWalletView.swift; sourceTree = "<group>"; };
 		DC5CA4EE28F842F10048A737 /* MVI+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MVI+Extensions.swift"; sourceTree = "<group>"; };
+		DC5E288D2C62C3DF0037B3D3 /* NavigationStackDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationStackDestination.swift; sourceTree = "<group>"; };
+		DC5E28C92C62D37A0037B3D3 /* NavigationCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationCoordinator.swift; sourceTree = "<group>"; };
 		DC5EE4C827679C6300A3035C /* RestoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestoreView.swift; sourceTree = "<group>"; };
 		DC5F1C4728DDA539007A55ED /* DrainWalletView_Confirm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrainWalletView_Confirm.swift; sourceTree = "<group>"; };
 		DC5F1C4928DDAA49007A55ED /* ResetWalletView_Confirm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetWalletView_Confirm.swift; sourceTree = "<group>"; };
@@ -1254,6 +1258,7 @@
 			children = (
 				DC6CF35A2938F32E001837EE /* ListBackgroundColor.swift */,
 				DC2ABAD62BED081400C11C9C /* VibrationFeedback.swift */,
+				DC5E288D2C62C3DF0037B3D3 /* NavigationStackDestination.swift */,
 			);
 			path = compatibility;
 			sourceTree = "<group>";
@@ -1447,6 +1452,7 @@
 				DCDD9ED528637FD7001800A3 /* AppStatusButton.swift */,
 				DCDD9ED328637EBB001800A3 /* ToolsButton.swift */,
 				DC4864D929D4E52C00ACD539 /* BgRefreshDisabledPopover.swift */,
+				DC5E28C92C62D37A0037B3D3 /* NavigationCoordinator.swift */,
 			);
 			path = main;
 			sourceTree = "<group>";
@@ -2001,6 +2007,7 @@
 				DC72C33925A663CA008A927A /* QRCode.swift in Sources */,
 				DC20D77A2BC5982400C37255 /* ServerMessageMonitor.swift in Sources */,
 				DC5CA4ED28F83C3B0048A737 /* DrainWalletView.swift in Sources */,
+				DC5E288E2C62C3DF0037B3D3 /* NavigationStackDestination.swift in Sources */,
 				DC784A112B31EA180018DC4A /* LiquidityAdsView.swift in Sources */,
 				DC6D26E329E76557006A7814 /* AnimatedClock.swift in Sources */,
 				DC5631C52C541E5C00DCB5BF /* Experimental.swift in Sources */,
@@ -2012,6 +2019,7 @@
 				DCACF6F02566D0A60009B01E /* Data+Hexadecimal.swift in Sources */,
 				DCE3C7AB2A6AD3CC00F4D385 /* MempoolMonitor.swift in Sources */,
 				DC3780392C04D60400937C8E /* KotlinEnums.swift in Sources */,
+				DC5E28CA2C62D37A0037B3D3 /* NavigationCoordinator.swift in Sources */,
 				DCACF7092566D0F00009B01E /* AppAccessView.swift in Sources */,
 				DC27E4D1279753EC00C777CC /* TextFieldNumberStyler.swift in Sources */,
 				DC46CB1628D9F30500C4EAC7 /* LoadingView.swift in Sources */,
