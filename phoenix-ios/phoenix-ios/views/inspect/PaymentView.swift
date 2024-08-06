@@ -18,14 +18,14 @@ struct PaymentView: View {
 		/// - the general API to pop a view from the nav stack is `presentationMode.wrappedValue.dismiss()`
 		/// - the general API to dismiss a sheet is `presentationMode.wrappedValue.dismiss()`
 		/// - thus we cannot use the general API
-		case sheet(closeAction: () -> Void)
+		case sheet(closeSheet: () -> Void)
 		
-		case embedded(popTo: (PopToDestination) -> Void)
+		case embedded
 		
 		var isSheet: Bool {
 			switch self {
-				case .sheet(_)    : return true
-				case .embedded(_) : return false
+				case .sheet(_) : return true
+				case .embedded : return false
 			}
 		}
 	}

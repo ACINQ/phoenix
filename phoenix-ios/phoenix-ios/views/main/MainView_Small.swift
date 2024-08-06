@@ -18,8 +18,6 @@ struct MainView_Small: View {
 	let externalLightningUrlPublisher = AppDelegate.get().externalLightningUrlPublisher
 	@State var externalLightningRequest: AppScanController? = nil
 	
-	@State var popToDestination: PopToDestination? = nil
-	
 	@ScaledMetric var sendImageSize: CGFloat = 17
 	@ScaledMetric var receiveImageSize: CGFloat = 18
 	
@@ -474,7 +472,7 @@ struct MainView_Small: View {
 			case .ReceiveView         : ReceiveView()
 			case .SendView            : SendView(location: .MainView, controller: externalLightningRequest)
 			case .CurrencyConverter   : CurrencyConverterView()
-			case .SwapInWalletDetails : SwapInWalletDetails(location: .embedded, popTo: popTo)
+			case .SwapInWalletDetails : SwapInWalletDetails(location: .embedded)
 			case .LiquidityAdsView    : LiquidityAdsView(location: .embedded)
 		}
 	}
@@ -517,7 +515,7 @@ struct MainView_Small: View {
 	private func didReceiveExternalLightningUrl(_ urlStr: String) {
 		log.trace("didReceiveExternalLightningUrl()")
 	
-		// How to do this with NavigationPath ??
+		// Todo: How to do this with NavigationPath ??
 //		if navLinkTag == .SendView {
 //			log.debug("Ignoring: handled by SendView")
 //			return
@@ -564,11 +562,5 @@ struct MainView_Small: View {
 		log.trace("showLiquidityAds()")
 		
 		navCoordinator.path.append(NavLinkTag.LiquidityAdsView)
-	}
-	
-	func popTo(_ destination: PopToDestination) {
-		log.trace("popTo(\(destination))")
-		
-		popToDestination = destination
 	}
 }

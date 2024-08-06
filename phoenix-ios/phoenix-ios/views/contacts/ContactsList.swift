@@ -10,8 +10,6 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct ContactsList: View {
 	
-	let popTo: (PopToDestination) -> Void
-	
 	@State var sortedContacts: [ContactInfo] = []
 	@State var offers: [String: [String]] = [:]
 	
@@ -22,7 +20,6 @@ struct ContactsList: View {
 	@State var pendingDelete: ContactInfo? = nil
 	
 	@State var didAppear = false
-	@State var popToDestination: PopToDestination? = nil
 	
 	enum NavLinkTag: String, Codable {
 		case AddItem
@@ -56,9 +53,6 @@ struct ContactsList: View {
 	func content() -> some View {
 		
 		list()
-			.onAppear() {
-				onAppear()
-			}
 			.onReceive(Biz.business.contactsManager.contactsListPublisher()) {
 				contactsListChanged($0)
 			}
@@ -147,7 +141,6 @@ struct ContactsList: View {
 		case .AddItem:
 			ManageContact(
 				location: .embedded,
-				popTo: popToWrapper,
 				offer: nil,
 				contact: nil,
 				contactUpdated: { _ in }
@@ -157,7 +150,6 @@ struct ContactsList: View {
 			if let selectedItem {
 				ManageContact(
 					location: .embedded,
-					popTo: popToWrapper,
 					offer: nil,
 					contact: selectedItem,
 					contactUpdated: { _ in }
@@ -191,21 +183,6 @@ struct ContactsList: View {
 			get: { pendingDelete != nil },
 			set: { if !$0 { pendingDelete = nil }}
 		)
-	}
-	
-	// --------------------------------------------------
-	// MARK: View Lifecycle
-	// --------------------------------------------------
-	
-	func onAppear(){
-		log.trace("onAppear()")
-		
-		if let destination = popToDestination {
-			log.debug("popToDestination: \(destination)")
-			
-			popToDestination = nil
-			presentationMode.wrappedValue.dismiss()
-		}
 	}
 	
 	// --------------------------------------------------
@@ -255,13 +232,6 @@ struct ContactsList: View {
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
-	
-	func popToWrapper(_ destination: PopToDestination) {
-		log.trace("popToWrapper(\(destination))")
-		
-		popToDestination = destination
-		popTo(destination)
-	}
 	
 	func selectItem(_ contact: ContactInfo) {
 		

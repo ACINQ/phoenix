@@ -20,10 +20,6 @@ struct ResetWalletView: MVIView {
 	@State var deleteSeedBackup: Bool = false
 	@State var deleteTransactionHistory: Bool = false
 	
-	@State var reviewRequested = false
-	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
-	
 	let backupTransactions_enabled_publisher = Prefs.shared.backupTransactions.isEnabledPublisher
 	@State var backupTransactions_enabled = Prefs.shared.backupTransactions.isEnabled
 	
@@ -35,6 +31,13 @@ struct ResetWalletView: MVIView {
 		encryptedNodeId: Biz.encryptedNodeId!
 	)
 	
+	enum NavLinkTag: String, Codable {
+		case ReviewScreen
+	}
+	
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
+	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	
 	// --------------------------------------------------
 	// MARK: View Builders
 	// --------------------------------------------------
@@ -42,24 +45,12 @@ struct ResetWalletView: MVIView {
 	@ViewBuilder
 	var view: some View {
 
-		ZStack {
-			content()
-		}
-		.navigationDestination(isPresented: $reviewRequested) {
-			reviewScreen()
-		}
-		.onReceive(backupTransactions_enabled_publisher) {
-			self.backupTransactions_enabled = $0
-		}
-		.onReceive(backupSeed_enabled_publisher) {
-			self.backupSeed_enabled = $0
-		}
-		.onReceive(manualBackup_taskDone_publisher) {
-			self.manualBackup_taskDone =
-				Prefs.shared.backupSeed.manualBackup_taskDone(encryptedNodeId: encryptedNodeId)
-		}
-		.navigationTitle(NSLocalizedString("Reset wallet", comment: "Navigation bar title"))
-		.navigationBarTitleDisplayMode(.inline)
+		content()
+			.navigationTitle(NSLocalizedString("Reset wallet", comment: "Navigation bar title"))
+			.navigationBarTitleDisplayMode(.inline)
+			.navigationDestination(for: NavLinkTag.self) { tag in
+				navLinkView(tag)
+			}
 	}
 	
 	@ViewBuilder
@@ -77,6 +68,16 @@ struct ResetWalletView: MVIView {
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
+		.onReceive(backupTransactions_enabled_publisher) {
+			self.backupTransactions_enabled = $0
+		}
+		.onReceive(backupSeed_enabled_publisher) {
+			self.backupSeed_enabled = $0
+		}
+		.onReceive(manualBackup_taskDone_publisher) {
+			self.manualBackup_taskDone =
+				Prefs.shared.backupSeed.manualBackup_taskDone(encryptedNodeId: encryptedNodeId)
+		}
 	}
 	
 	@ViewBuilder
@@ -315,13 +316,16 @@ struct ResetWalletView: MVIView {
 	}
 	
 	@ViewBuilder
-	func reviewScreen() -> some View {
+	func navLinkView(_ tag: NavLinkTag) -> some View {
 		
-		ResetWalletView_Confirm(
-			mvi: mvi,
-			deleteTransactionHistory: deleteTransactionHistory,
-			deleteSeedBackup: deleteSeedBackup
-		)
+		switch tag {
+		case .ReviewScreen:
+			ResetWalletView_Confirm(
+				mvi: mvi,
+				deleteTransactionHistory: deleteTransactionHistory,
+				deleteSeedBackup: deleteSeedBackup
+			)
+		}
 	}
 	
 	// --------------------------------------------------
@@ -348,6 +352,6 @@ struct ResetWalletView: MVIView {
 	func reviewButtonTapped() {
 		log.trace("reviewButtonTapped()")
 		
-		reviewRequested = true
+		navCoordinator.path.append(NavLinkTag.ReviewScreen)
 	}
 }

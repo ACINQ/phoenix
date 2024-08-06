@@ -11,10 +11,7 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct WalletInfoView: View {
 	
-	let popTo: (PopToDestination) -> Void
-	
 	@State var didAppear = false
-	@State var popToDestination: PopToDestination? = nil
 	
 	@State var popoverPresent_swapInWallet = false
 	@State var popoverPresent_finalWallet = false
@@ -428,7 +425,7 @@ struct WalletInfoView: View {
 	func navLinkView(_ tag: NavLinkTag) -> some View {
 		
 		switch tag {
-			case .SwapInWalletDetails : SwapInWalletDetails(location: .embedded, popTo: popToWrapper)
+			case .SwapInWalletDetails : SwapInWalletDetails(location: .embedded)
 			case .SwapInAddresses     : SwapInAddresses()
 			case .FinalWalletDetails  : FinalWalletDetails()
 		}
@@ -475,13 +472,6 @@ struct WalletInfoView: View {
 		return (btcAmt, fiatAmt)
 	}
 	
-	func popToWrapper(_ destination: PopToDestination) {
-		log.trace("popToWrapper(\(destination))")
-		
-		popToDestination = destination
-		popTo(destination)
-	}
-	
 	// --------------------------------------------------
 	// MARK: View Lifecycle
 	// --------------------------------------------------
@@ -496,15 +486,6 @@ struct WalletInfoView: View {
 				DispatchQueue.main.async { // iOS 14 issues workaround
 					deepLinkChanged(deepLink)
 				}
-			}
-			
-		} else {
-			
-			if let destination = popToDestination {
-				log.debug("popToDestination: \(destination)")
-				
-				popToDestination = nil
-				presentationMode.wrappedValue.dismiss()
 			}
 		}
 	}

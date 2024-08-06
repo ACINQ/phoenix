@@ -1480,7 +1480,6 @@ struct ValidateView: View {
 		smartModalState.display(dismissable: false) {
 			ManageContact(
 				location: .smartModal,
-				popTo: nil,
 				offer: offer,
 				contact: contact,
 				contactUpdated: contactUpdated

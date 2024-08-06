@@ -12,15 +12,16 @@ struct DrainWalletView_Confirm: MVISubView {
 	
 	@ObservedObject var mvi: MVIState<CloseChannelsConfiguration.Model, CloseChannelsConfiguration.Intent>
 	let bitcoinAddress: String
-	let popTo: (PopToDestination) -> Void
 	
-	@State var actionRequested: Bool = false
 	@State var expectedTxCount: Int = 0
 	
-	@State var popToDestination: PopToDestination? = nil
+	enum NavLinkTag: String, Codable {
+		case ActionView
+	}
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	// --------------------------------------------------
@@ -30,17 +31,12 @@ struct DrainWalletView_Confirm: MVISubView {
 	@ViewBuilder
 	var view: some View {
 		
-		ZStack {
-			content()
-		}
-		.onAppear {
-			onAppear()
-		}
-		.navigationDestination(isPresented: $actionRequested) {
-			actionScreen()
-		}
-		.navigationTitle(NSLocalizedString("Confirm Drain", comment: "Navigation bar title"))
-		.navigationBarTitleDisplayMode(.inline)
+		content()
+			.navigationTitle(NSLocalizedString("Confirm Drain", comment: "Navigation bar title"))
+			.navigationBarTitleDisplayMode(.inline)
+			.navigationDestination(for: NavLinkTag.self) { tag in
+				navLinkView(tag)
+			}
 	}
 	
 	@ViewBuilder
@@ -136,13 +132,15 @@ struct DrainWalletView_Confirm: MVISubView {
 	}
 	
 	@ViewBuilder
-	func actionScreen() -> some View {
+	func navLinkView(_ tag: NavLinkTag) -> some View {
 		
-		DrainWalletView_Action(
-			mvi: mvi,
-			expectedTxCount: expectedTxCount,
-			popTo: popToWrapper
-		)
+		switch tag {
+		case .ActionView:
+			DrainWalletView_Action(
+				mvi: mvi,
+				expectedTxCount: expectedTxCount
+			)
+		}
 	}
 	
 	// --------------------------------------------------
@@ -181,33 +179,15 @@ struct DrainWalletView_Confirm: MVISubView {
 		}
 	}
 	
-	func popToWrapper(_ destination: PopToDestination) {
-		log.trace("popToWrapper(\(destination))")
-		
-		popToDestination = destination
-		popTo(destination)
-	}
-	
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
 	
-	func onAppear() {
-		log.trace("onAppear()")
-		
-		if popToDestination != nil {
-			popToDestination = nil
-			presentationMode.wrappedValue.dismiss()
-		}
-	}
-	
 	func drainWallet() {
 		log.trace("drainWallet()")
 		
-		if !actionRequested {
-			actionRequested = true
-			expectedTxCount = nonZeroChannelCount()
-			mvi.intent(CloseChannelsConfiguration.IntentMutualCloseAllChannels(address: bitcoinAddress))
-		}
+		expectedTxCount = nonZeroChannelCount()
+		navCoordinator.path.append(NavLinkTag.ActionView)
+		mvi.intent(CloseChannelsConfiguration.IntentMutualCloseAllChannels(address: bitcoinAddress))
 	}
 }

@@ -24,12 +24,11 @@ struct ManageContact: View {
 	
 	enum Location {
 		case smartModal
-		case sheet(closeAction: () -> Void)
+		case sheet(closeSheet: () -> Void)
 		case embedded
 	}
 	
 	let location: Location
-	let popTo: ((PopToDestination) -> Void)?
 	
 	let offer: Lightning_kmpOfferTypesOffer?
 	let contact: ContactInfo?
@@ -91,6 +90,7 @@ struct ManageContact: View {
 	@Environment(\.dynamicTypeSize) var dynamicTypeSize: DynamicTypeSize
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var deviceInfo: DeviceInfo
 	@EnvironmentObject var smartModalState: SmartModalState
 	
@@ -100,13 +100,11 @@ struct ManageContact: View {
 	
 	init(
 		location: Location,
-		popTo: ((PopToDestination) -> Void)?,
 		offer: Lightning_kmpOfferTypesOffer?,
 		contact: ContactInfo?,
 		contactUpdated: @escaping (ContactInfo?) -> Void
 	) {
 		self.location = location
-		self.popTo = popTo
 		self.offer = offer
 		self.contact = contact
 		self.contactUpdated = contactUpdated
@@ -973,14 +971,13 @@ struct ManageContact: View {
 			let offerString = offer.encode()
 			AppDelegate.get().externalLightningUrlPublisher.send(offerString)
 			
-			if let popTo {
-				popTo(.ConfigurationView(followedBy: nil))
-			}
-			
-			if case .sheet(let closeAction) = location {
-				closeAction()
-			} else {
-				close()
+			switch location {
+			case .smartModal:
+				smartModalState.close()
+			case .sheet(let closeSheet):
+				closeSheet()
+			case .embedded:
+				navCoordinator.popToRootView()
 			}
 		}
 	}

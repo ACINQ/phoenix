@@ -15,18 +15,18 @@ struct DrainWalletView: MVIView {
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
 	
-	let popTo: (PopToDestination) -> Void
 	let encryptedNodeId = Biz.encryptedNodeId!
 	
 	@State var didAppear = false
-	@State var popToDestination: PopToDestination? = nil
-
 	@State var btcAddressInputResult: Result<BitcoinUri, BtcAddressInput.DetailedError> = .failure(.emptyInput)
 	
-	@State var reviewRequested = false
+	enum NavLinkTag: String, Codable {
+		case ConfirmView
+	}
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
@@ -37,17 +37,12 @@ struct DrainWalletView: MVIView {
 	@ViewBuilder
 	var view: some View {
 
-		ZStack {
-			content()
-		}
-		.onAppear {
-			onAppear()
-		}
-		.navigationDestination(isPresented: $reviewRequested) {
-			reviewScreen()
-		}
-		.navigationTitle(NSLocalizedString("Drain wallet", comment: "Navigation bar title"))
-		.navigationBarTitleDisplayMode(.inline)
+		content()
+			.navigationTitle(NSLocalizedString("Drain wallet", comment: "Navigation bar title"))
+			.navigationBarTitleDisplayMode(.inline)
+			.navigationDestination(for: NavLinkTag.self) { tag in
+				navLinkView(tag)
+			}
 	}
 	
 	@ViewBuilder
@@ -73,6 +68,9 @@ struct DrainWalletView: MVIView {
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
+		.onAppear {
+			onAppear()
+		}
 	}
 	
 	@ViewBuilder
@@ -172,14 +170,18 @@ struct DrainWalletView: MVIView {
 	}
 	
 	@ViewBuilder
-	func reviewScreen() -> some View {
+	func navLinkView(_ tag: NavLinkTag) -> some View {
 		
-		if case .success(let bitcoinUri) = btcAddressInputResult {
-			DrainWalletView_Confirm(
-				mvi: mvi,
-				bitcoinAddress: bitcoinUri.address,
-				popTo: popToWrapper
-			)
+		switch tag {
+		case .ConfirmView:
+			if case .success(let bitcoinUri) = btcAddressInputResult {
+				DrainWalletView_Confirm(
+					mvi: mvi,
+					bitcoinAddress: bitcoinUri.address
+				)
+			} else {
+				EmptyView()
+			}
 		}
 	}
 	
@@ -200,13 +202,6 @@ struct DrainWalletView: MVIView {
 		return (balance_bitcoin, balance_fiat)
 	}
 	
-	func popToWrapper(_ destination: PopToDestination) {
-		log.trace("popToWrapper(\(destination))")
-		
-		popToDestination = destination
-		popTo(destination)
-	}
-	
 	// --------------------------------------------------
 	// MARK: View Lifecycle
 	// --------------------------------------------------
@@ -223,13 +218,6 @@ struct DrainWalletView: MVIView {
 					deepLinkManager.unbroadcast(deepLink)
 				}
 			}
-			
-		} else {
-			
-			if popToDestination != nil {
-				popToDestination = nil
-				presentationMode.wrappedValue.dismiss()
-			}
 		}
 	}
 	
@@ -239,6 +227,7 @@ struct DrainWalletView: MVIView {
 	
 	func reviewButtonTapped() {
 		log.trace("reviewButtonTapped()")
-		reviewRequested = true
+		
+		navCoordinator.path.append(NavLinkTag.ConfirmView)
 	}
 }

@@ -272,7 +272,7 @@ struct MainView_BigPrimary: View {
 		log.trace("showSwapInWallet()")
 		
 		popoverState.display(dismissable: true) {
-			SwapInWalletDetails(location: .popover, popTo: popTo)
+			SwapInWalletDetails(location: .popover)
 				.frame(maxHeight: 600)
 		}
 	}
@@ -283,16 +283,6 @@ struct MainView_BigPrimary: View {
 		popoverState.display(dismissable: true) {
 			LiquidityAdsView(location: .popover)
 				.frame(maxHeight: 600)
-		}
-	}
-	
-	func popTo(_ destination: PopToDestination) {
-		log.trace("popTo(\(destination))")
-		
-		popoverState.close {
-			if let deepLink = destination.followedBy {
-				deepLinkManager.broadcast(deepLink)
-			}
 		}
 	}
 }

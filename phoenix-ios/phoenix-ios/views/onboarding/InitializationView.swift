@@ -24,8 +24,29 @@ struct InitializationView: MVIView {
 	)
 	@State var buttonWidth: CGFloat? = nil
 	
+	enum NavLinkTag: String, Codable {
+		case ConfigurationView
+		case RestoreView
+	}
+	
+	// --------------------------------------------------
+	// MARK: View Builders
+	// --------------------------------------------------
+	
 	@ViewBuilder
 	var view: some View {
+		
+		layers()
+			.navigationTitle("")
+			.navigationBarTitleDisplayMode(.inline)
+			.navigationBarHidden(true)
+			.navigationDestination(for: NavLinkTag.self) { tag in
+				navLinkView(tag)
+			}
+	}
+	
+	@ViewBuilder
+	func layers() -> some View {
 		
 		ZStack {
 			
@@ -44,9 +65,6 @@ struct InitializationView: MVIView {
 			
 		} // </ZStack>
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.navigationTitle("")
-		.navigationBarTitleDisplayMode(.inline)
-		.navigationBarHidden(true)
 		.onChange(of: mvi.model) { model in
 			onModelChange(model: model)
 		}
@@ -63,7 +81,7 @@ struct InitializationView: MVIView {
 		HStack{
 			Spacer()
 			VStack {
-				NavigationLink(destination: configurationView()) {
+				NavigationLink(value: NavLinkTag.ConfigurationView) {
 					Image(systemName: "gearshape")
 						.renderingMode(.template)
 						.imageScale(.large)
@@ -118,7 +136,7 @@ struct InitializationView: MVIView {
 			)
 			.padding(.bottom, 40)
 
-			NavigationLink(destination: RestoreView()) {
+			NavigationLink(value: NavLinkTag.RestoreView) {
 				HStack(alignment: VerticalAlignment.firstTextBaseline) {
 					Image(systemName: "arrow.down.circle")
 						.imageScale(.small)
@@ -149,14 +167,24 @@ struct InitializationView: MVIView {
 	}
 	
 	@ViewBuilder
-	func configurationView() -> some View {
+	func navLinkView(_ tag: NavLinkTag) -> some View {
 		
-		ConfigurationView()
-		//	.environment(\.mnemonicLanguageBinding, $mnemonicLanguage)
-		//
-		// ^ This doesn't work. Apparently you can't pass an environment variable thru a NavigationLink:
-		// https://stackoverflow.com/questions/59812640/environmentobject-doesnt-work-well-through-navigationlink
+		switch tag {
+		case .ConfigurationView:
+			ConfigurationView()
+			//	.environment(\.mnemonicLanguageBinding, $mnemonicLanguage)
+			//
+			// ^ This doesn't work. Apparently you can't pass an environment variable thru a NavigationLink:
+			// https://stackoverflow.com/questions/59812640/environmentobject-doesnt-work-well-through-navigationlink
+			
+		case .RestoreView:
+			RestoreView()
+		}
 	}
+	
+	// --------------------------------------------------
+	// MARK: View Helpers
+	// --------------------------------------------------
 	
 	var logoImageName: String {
 		if BusinessManager.isTestnet {
@@ -165,6 +193,22 @@ struct InitializationView: MVIView {
 			return "logo_green"
 		}
 	}
+	
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
+	
+	func onModelChange(model: Initialization.Model) -> Void {
+		log.trace("onModelChange()")
+	
+		if let model = model as? Initialization.ModelGeneratedWallet {
+			createWallet(model: model)
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
 	
 	func createMnemonics() -> Void {
 		log.trace("createMnemonics()")
@@ -177,14 +221,6 @@ struct InitializationView: MVIView {
 			language: mnemonicLanguage
 		)
 		mvi.intent(intent)
-	}
-	
-	func onModelChange(model: Initialization.Model) -> Void {
-		log.trace("onModelChange()")
-	
-		if let model = model as? Initialization.ModelGeneratedWallet {
-			createWallet(model: model)
-		}
 	}
 	
 	func createWallet(model: Initialization.ModelGeneratedWallet) -> Void {

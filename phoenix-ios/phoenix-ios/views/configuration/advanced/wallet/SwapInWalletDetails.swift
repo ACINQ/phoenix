@@ -16,7 +16,6 @@ struct SwapInWalletDetails: View {
 	}
 	
 	let location: Location
-	let popTo: (PopToDestination) -> Void
 	
 	@State var liquidityPolicy: LiquidityPolicy = GroupPrefs.shared.liquidityPolicy
 	
@@ -31,8 +30,6 @@ struct SwapInWalletDetails: View {
 	enum NavLinkTag: String, Codable {
 		case SpendExpiredSwapIns
 	}
-	
-	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	@EnvironmentObject var popoverState: PopoverState
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
@@ -554,8 +551,7 @@ struct SwapInWalletDetails: View {
 	func navigateToLiquiditySettings() {
 		log.trace("navigateToLiquiditySettings()")
 		
-		popTo(.ConfigurationView(followedBy: .liquiditySettings))
-		presentationMode.wrappedValue.dismiss()
+		deepLinkManager.broadcast(DeepLink.liquiditySettings)
 	}
 	
 	func closePopover() {

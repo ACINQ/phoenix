@@ -27,7 +27,6 @@ struct SummaryView: View {
 	@State var showDeletePaymentConfirmationDialog = false
 	
 	@State var didAppear = false
-	@State var popToDestination: PopToDestination? = nil
 	
 	@State var buttonListTruncationDetected_standard: Bool = false
 	@State var buttonListTruncationDetected_squeezed: Bool = false
@@ -909,17 +908,17 @@ struct SummaryView: View {
 		switch location {
 		case .sheet(_):
 			return location
-		case .embedded(_):
-			return .embedded(popTo: popToWrapper)
+		case .embedded:
+			return .embedded
 		}
 	}
 	
 	func manageContactLocation() -> ManageContact.Location {
 		
 		switch location {
-		case .sheet(let closeAction):
-			return ManageContact.Location.sheet(closeAction: closeAction)
-		case .embedded(_):
+		case .sheet(let closeSheet):
+			return ManageContact.Location.sheet(closeSheet: closeSheet)
+		case .embedded:
 			return ManageContact.Location.embedded
 		}
 	}
@@ -1058,22 +1057,6 @@ struct SummaryView: View {
 					paymentInfo = result
 				}
 			}
-			
-			if let destination = popToDestination {
-				log.debug("popToDestination: \(destination)")
-				
-				popToDestination = nil
-				switch destination {
-				case .RootView(_):
-					log.debug("Unhandled popToDestination")
-					
-				case .ConfigurationView(_):
-					log.debug("Unhandled popToDestination")
-					
-				case .TransactionsView:
-					presentationMode.wrappedValue.dismiss()
-				}
-			}
 		}
 	}
 	
@@ -1081,19 +1064,10 @@ struct SummaryView: View {
 	// MARK: Actions
 	// --------------------------------------------------
 	
-	func popToWrapper(_ destination: PopToDestination) {
-		log.trace("popToWrapper(\(destination))")
-		
-		popToDestination = destination
-		if case .embedded(let popTo) = location {
-			popTo(destination)
-		}
-	}
-	
 	func showContactView(_ contact: ContactInfo) {
 		log.trace("showContactView()")
 		
-		// Todo...
+		// Todo: How to fix this
 	//	navCoordinator.path.append(NavLinkTag.ContactView(contact: contact))
 	}
 	

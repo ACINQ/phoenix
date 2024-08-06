@@ -11,18 +11,6 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct ConfigurationView: View {
 	
-	@ViewBuilder
-	var body: some View {
-		ScrollViewReader { scrollViewProxy in
-			ConfigurationList(scrollViewProxy: scrollViewProxy)
-		}
-	}
-}
-
-fileprivate struct ConfigurationList: View {
-	
-	let scrollViewProxy: ScrollViewProxy
-	
 	@State private var notificationPermissions = NotificationsManager.shared.permissions.value
 	
 	@State private var backupSeedState: BackupSeedState = .safelyBackedUp
@@ -32,7 +20,6 @@ fileprivate struct ConfigurationList: View {
 	@State private var swiftUiBugWorkaroundIdx = 0
 	
 	@State var firstAppearance = false
-	@State var popToDestination: PopToDestination? = nil
 	
 	@State var biometricSupport = AppSecurity.shared.deviceBiometricSupport()
 	
@@ -90,9 +77,8 @@ fileprivate struct ConfigurationList: View {
 	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
-	init(scrollViewProxy: ScrollViewProxy) {
+	init() {
 		
-		self.scrollViewProxy = scrollViewProxy
 		if let encryptedNodeId = Biz.encryptedNodeId {
 			backupSeedStatePublisher = Prefs.shared.backupSeedStatePublisher(encryptedNodeId)
 		} else {
@@ -410,7 +396,7 @@ fileprivate struct ConfigurationList: View {
 			case .WalletCreationOptions : WalletCreationOptions()
 			case .DisplayConfiguration  : DisplayConfigurationView()
 			case .PaymentOptions        : PaymentOptionsView()
-			case .ContactsList          : ContactsList(popTo: popTo)
+			case .ContactsList          : ContactsList()
 			case .Notifications         : NotificationsView(location: .embedded)
 		// Fees
 			case .ChannelManagement     : LiquidityPolicyView()
@@ -422,12 +408,12 @@ fileprivate struct ConfigurationList: View {
 			case .Tor                   : TorConfigurationView()
 			case .PaymentsBackup        : PaymentsBackupView()
 		// Advanced
-			case .WalletInfo            : WalletInfoView(popTo: popTo)
+			case .WalletInfo            : WalletInfoView()
 			case .ChannelsConfiguration : ChannelsConfigurationView()
 			case .LogsConfiguration     : LogsConfigurationView()
 			case .Experimental          : Experimental()
 		// Danger Zone
-			case .DrainWallet           : DrainWalletView(popTo: popTo)
+			case .DrainWallet           : DrainWalletView()
 			case .ResetWallet           : ResetWalletView()
 			case .ForceCloseChannels    : ForceCloseChannelsView()
 		}
@@ -509,15 +495,5 @@ fileprivate struct ConfigurationList: View {
 		log.trace("backupSeedStateChanged()")
 		
 		backupSeedState = newState
-	}
-	
-	// --------------------------------------------------
-	// MARK: Actions
-	// --------------------------------------------------
-	
-	func popTo(_ destination: PopToDestination) {
-		log.trace("popTo(\(destination))")
-		
-		popToDestination = destination
 	}
 }

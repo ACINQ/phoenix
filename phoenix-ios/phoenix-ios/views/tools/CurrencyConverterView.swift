@@ -31,14 +31,12 @@ struct CurrencyConverterView: View {
 	
 	@State var parsedRow: ParsedRow? = nil
 	
-	@State var currencySelectorOpen = false
 	@State var replacingCurrency: Currency? = nil
 	
 	@State var didAppear = false
 	@State var isRefreshingExchangeRates = false
 	
-	let refreshingExchangeRatesPublisher =
-		Biz.business.currencyManager.refreshPublisher()
+	let refreshingExchangeRatesPublisher = Biz.business.currencyManager.refreshPublisher()
 	
 	let timer = Timer.publish(every: 15 /* seconds */, on: .current, in: .common).autoconnect()
 	@State var currentDate = Date()
@@ -57,7 +55,13 @@ struct CurrencyConverterView: View {
 	)
 	@State var flagWidth: CGFloat? = nil
 	
+	enum NavLinkTag: String, Codable {
+		case CurrencySelector
+	}
+	
 	@Environment(\.colorScheme) var colorScheme
+	
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	init() {
@@ -86,58 +90,23 @@ struct CurrencyConverterView: View {
 		layers()
 			.navigationTitle(NSLocalizedString("Currency Converter", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
+			.navigationDestination(for: NavLinkTag.self) { tag in
+				navLinkView(tag)
+			}
 	}
 	
 	@ViewBuilder
 	func layers() -> some View {
 		
 		ZStack {
-			// We want to measure various items within the List.
-			// But we need to measure ALL of them.
-			// And we can't do that with a List because it's lazy.
-			//
-			// So we have to use this hack,
-			// which force-renders all the Text items using a hidden VStack.
-			//
-			ScrollView {
-				VStack {
-					ForEach(currencies) { currency in
-						
-						switch currency {
-						case .bitcoin(let bitcoinUnit):
-							Text(bitcoinUnit.shortName)
-								.foregroundColor(Color.clear)
-								.read(currencyTextWidthReader)
-							//	.frame(width: currencyTextWidth, alignment: .leading) // required, or refreshes after display
-							
-						case .fiat(let fiatCurrency):
-							Text(fiatCurrency.shortName)
-								.foregroundColor(Color.clear)
-								.read(currencyTextWidthReader)
-							//	.frame(width: currencyTextWidth, alignment: .leading) // required, or refreshes after display
-							
-							Text(fiatCurrency.flag)
-								.foregroundColor(Color.clear)
-								.read(flagWidthReader)
-							//	.frame(width: flagWidth, alignment: .leading) // required, or refreshes after display
-						}
-					}
-				} // </VStack>
-				.assignMaxPreference(for: currencyTextWidthReader.key, to: $currencyTextWidth)
-				.assignMaxPreference(for: flagWidthReader.key, to: $flagWidth)
-			} // </ScrollView>
-			
+			hiddenContent()
 			content()
-			
-		} // </ZStack>
+		}
 		.onAppear {
 			onAppear()
 		}
 		.onDisappear {
 			onDisappear()
-		}
-		.navigationDestination(isPresented: $currencySelectorOpen) {
-			currencySelectorView()
 		}
 		.onChange(of: currencies) { _ in
 			currenciesDidChange()
@@ -151,6 +120,45 @@ struct CurrencyConverterView: View {
 		.onReceive(timer) { _ in
 			self.currentDate = Date()
 		}
+	}
+	
+	@ViewBuilder
+	func hiddenContent() -> some View {
+		
+		// We want to measure various items within the List.
+		// But we need to measure ALL of them.
+		// And we can't do that with a List because it's lazy.
+		//
+		// So we have to use this hack,
+		// which force-renders all the Text items using a hidden VStack.
+		//
+		ScrollView {
+			VStack {
+				ForEach(currencies) { currency in
+					
+					switch currency {
+					case .bitcoin(let bitcoinUnit):
+						Text(bitcoinUnit.shortName)
+							.foregroundColor(Color.clear)
+							.read(currencyTextWidthReader)
+						//	.frame(width: currencyTextWidth, alignment: .leading) // required, or refreshes after display
+						
+					case .fiat(let fiatCurrency):
+						Text(fiatCurrency.shortName)
+							.foregroundColor(Color.clear)
+							.read(currencyTextWidthReader)
+						//	.frame(width: currencyTextWidth, alignment: .leading) // required, or refreshes after display
+						
+						Text(fiatCurrency.flag)
+							.foregroundColor(Color.clear)
+							.read(flagWidthReader)
+						//	.frame(width: flagWidth, alignment: .leading) // required, or refreshes after display
+					}
+				}
+			} // </VStack>
+			.assignMaxPreference(for: currencyTextWidthReader.key, to: $currencyTextWidth)
+			.assignMaxPreference(for: flagWidthReader.key, to: $flagWidth)
+		} // </ScrollView>
 	}
 	
 	@ViewBuilder
@@ -277,13 +285,16 @@ struct CurrencyConverterView: View {
 	}
 	
 	@ViewBuilder
-	func currencySelectorView() -> some View {
+	func navLinkView(_ tag: NavLinkTag) -> some View {
 		
-		CurrencySelector(
-			selectedCurrencies: $currencies,
-			replacingCurrency: $replacingCurrency,
-			didSelectCurrency: didSelectCurrency
-		)
+		switch tag {
+		case .CurrencySelector:
+			CurrencySelector(
+				selectedCurrencies: $currencies,
+				replacingCurrency: $replacingCurrency,
+				didSelectCurrency: didSelectCurrency
+			)
+		}
 	}
 	
 	// --------------------------------------------------
@@ -356,9 +367,10 @@ struct CurrencyConverterView: View {
 	private func onDisappear() {
 		log.trace("onDisappear()")
 		
-		if !currencySelectorOpen, let didClose = didClose {
-			didClose()
-		}
+		// Todo: How to fix this ?
+	//	if !currencySelectorOpen, let didClose = didClose {
+	//		didClose()
+	//	}
 	}
 	
 	private func defaultCurrencies() -> [Currency] {
@@ -503,14 +515,14 @@ struct CurrencyConverterView: View {
 		log.trace("editRow()")
 		
 		replacingCurrency = currency
-		currencySelectorOpen = true
+		navCoordinator.path.append(NavLinkTag.CurrencySelector)
 	}
 	
 	private func addRow() {
 		log.trace("addRow()")
 		
 		replacingCurrency = nil
-		currencySelectorOpen = true
+		navCoordinator.path.append(NavLinkTag.CurrencySelector)
 	}
 	
 	private func refreshRates() {

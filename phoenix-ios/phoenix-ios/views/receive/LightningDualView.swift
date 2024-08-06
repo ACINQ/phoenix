@@ -38,18 +38,22 @@ struct LightningDualView: View {
 	@State var notificationPermissions = NotificationsManager.shared.permissions.value
 	
 	@State var modificationAmount: CurrencyAmount? = nil
-	@State var currencyConverterOpen = false
 	
 	// To workaround a bug in SwiftUI, we're using multiple namespaces for our animation.
 	// In particular, animating the border around the qrcode doesn't work well.
 	@Namespace private var qrCodeAnimation_inner
 	@Namespace private var qrCodeAnimation_outer
 	
+	enum NavLinkTag {
+		case CurrencyConverter
+	}
+	
 	@Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
 	@Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	@EnvironmentObject var popoverState: PopoverState
@@ -75,8 +79,8 @@ struct LightningDualView: View {
 		content()
 			.navigationTitle(NSLocalizedString("Receive", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
-			.navigationDestination(isPresented: $currencyConverterOpen) {
-				currencyConverterView()
+			.navigationDestination(for: NavLinkTag.self) { tag in
+				navLinkView(tag)
 			}
 	}
 	
@@ -610,13 +614,16 @@ struct LightningDualView: View {
 	}
 	
 	@ViewBuilder
-	func currencyConverterView() -> some View {
+	func navLinkView(_ tag: NavLinkTag) -> some View {
 		
-		CurrencyConverterView(
-			initialAmount: modificationAmount,
-			didChange: currencyConverterDidChange,
-			didClose: currencyConvertDidClose
-		)
+		switch tag {
+		case .CurrencyConverter:
+			CurrencyConverterView(
+				initialAmount: modificationAmount,
+				didChange: currencyConverterDidChange,
+				didClose: currencyConvertDidClose
+			)
+		}
 	}
 	
 	// --------------------------------------------------
@@ -744,6 +751,12 @@ struct LightningDualView: View {
 		notificationPermissions = newValue
 	}
 	
+	func openCurrencyConverter() {
+		log.trace("openCurrencyConverter()")
+		
+		navCoordinator.path.append(NavLinkTag.CurrencyConverter)
+	}
+	
 	func currencyConverterDidChange(_ amount: CurrencyAmount?) {
 		log.trace("currencyConverterDidChange()")
 		
@@ -767,7 +780,7 @@ struct LightningDualView: View {
 				savedAmount: $modificationAmount,
 				amount: amount,
 				desc: desc ?? "",
-				currencyConverterOpen: $currencyConverterOpen
+				openCurrencyConverter: openCurrencyConverter
 			)
 		}
 	}
@@ -900,7 +913,7 @@ struct LightningDualView: View {
 					savedAmount: $modificationAmount,
 					amount: model.amount,
 					desc: model.desc ?? "",
-					currencyConverterOpen: $currencyConverterOpen
+					openCurrencyConverter: openCurrencyConverter
 				)
 			}
 		}

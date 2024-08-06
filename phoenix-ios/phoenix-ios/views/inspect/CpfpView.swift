@@ -720,8 +720,9 @@ struct CpfpView: View {
 					switch location {
 					case .sheet(let closeAction):
 						closeAction()
-					case .embedded(let popTo):
-						popTo(.TransactionsView)
+					case .embedded:
+						// Todo: How to accomplish this ?
+					//	popTo(.TransactionsView)
 						self.presentationMode.wrappedValue.dismiss()
 					}
 				}

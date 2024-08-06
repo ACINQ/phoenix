@@ -11,9 +11,7 @@ class KotlinLogger {
 	private var loggers: [String: Logger] = [:]
 	private let lock = UnfairLock()
 	
-	private init() { // must use shared instance
-		// Todo...
-	}
+	private init() {} // must use shared instance
 	
 	private func splitTag(_ tag: String) -> (String, String) {
 		
