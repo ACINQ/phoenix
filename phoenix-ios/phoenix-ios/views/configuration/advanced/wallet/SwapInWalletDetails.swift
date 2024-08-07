@@ -8,11 +8,11 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-fileprivate enum NavLinkTag: String {
-	case SpendExpiredSwapIns
-}
-
 struct SwapInWalletDetails: View {
+	
+	enum NavLinkTag: String {
+		case SpendExpiredSwapIns
+	}
 	
 	enum Location {
 		case popover
@@ -21,8 +21,6 @@ struct SwapInWalletDetails: View {
 	
 	let location: Location
 	let popTo: (PopToDestination) -> Void
-	
-	@State private var navLinkTag: NavLinkTag? = nil
 	
 	@State var liquidityPolicy: LiquidityPolicy = GroupPrefs.shared.liquidityPolicy
 	
@@ -33,6 +31,10 @@ struct SwapInWalletDetails: View {
 	@State var swapInRejected: Lightning_kmpLiquidityEventsRejected? = nil
 	
 	@State var blockchainExplorerTxid: Bitcoin_kmpTxId? = nil
+	
+	// <iOS_16_workarounds>
+	@State var navLinkTag: NavLinkTag? = nil
+	// </iOS_16_workarounds>
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
@@ -47,13 +49,36 @@ struct SwapInWalletDetails: View {
 	@ViewBuilder
 	var body: some View {
 		
+		main()
+			.navigationTitle(NSLocalizedString("Swap-in wallet", comment: "Navigation Bar Title"))
+			.navigationBarTitleDisplayMode(.inline)
+//			.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
+//				navLinkView()
+//			}
+			.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17
+				navLinkView(tag)
+			}
+	}
+	
+	@ViewBuilder
+	func main() -> some View {
+		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			header()
 			content()
 		}
-		.navigationTitle(NSLocalizedString("Swap-in wallet", comment: "Navigation Bar Title"))
-		.navigationBarTitleDisplayMode(.inline)
-		.onAppear { onAppear() }
+		.onAppear {
+			onAppear()
+		}
+		.onReceive(GroupPrefs.shared.liquidityPolicyPublisher) {
+			liquidityPolicyChanged($0)
+		}
+		.onReceive(swapInWalletPublisher) {
+			swapInWalletChanged($0)
+		}
+		.onReceive(swapInRejectedPublisher) {
+			swapInRejectedStateChange($0)
+		}
 	}
 	
 	@ViewBuilder
@@ -100,21 +125,12 @@ struct SwapInWalletDetails: View {
 			if hasTimedOutUtxos() {
 				section_timedOut()
 			}
-			if hasCancelledUtxos() {
+		//	if hasCancelledUtxos() {
 				section_cancelled()
-			}
+		//	}
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
-		.onReceive(GroupPrefs.shared.liquidityPolicyPublisher) {
-			liquidityPolicyChanged($0)
-		}
-		.onReceive(swapInWalletPublisher) {
-			swapInWalletChanged($0)
-		}
-		.onReceive(swapInRejectedPublisher) {
-			swapInRejectedStateChange($0)
-		}
 	}
 	
 	@ViewBuilder
@@ -347,7 +363,7 @@ struct SwapInWalletDetails: View {
 		Section {
 			
 			let (btcAmt, fiatAmt) = cancelledBalance()
-			navLink(.SpendExpiredSwapIns) {
+			navLink_plain(.SpendExpiredSwapIns) {
 				Text(verbatim: "\(btcAmt.string)") +
 				Text(verbatim: " ≈ \(fiatAmt.string)").foregroundColor(.secondary)
 			}
@@ -363,21 +379,51 @@ struct SwapInWalletDetails: View {
 	}
 	
 	@ViewBuilder
-	private func navLink<Content>(
+	private func navLink_plain<Content>(
 		_ tag: NavLinkTag,
-		label: () -> Content
+		label: @escaping () -> Content
 	) -> some View where Content: View {
 		
-		NavigationLink(
-			destination: navLinkView(tag),
-			tag: tag,
-			selection: $navLinkTag,
-			label: label
-		)
+		if #available(iOS 17, *) {
+			NavigationLink(value: tag, label: label)
+		} else {
+			// Option #1 is what we were using before
+			//
+			// Note that if you use this option,
+			// then you must remove `.navigationStackDestination(isPresented::)`
+			// or there will be weird navigation bugs.
+			
+			NavigationLink_16(
+				destination: navLinkView(tag),
+				tag: tag,
+				selection: $navLinkTag,
+				label: label
+			)
+			
+			// Option #2 looks like a better option.
+			// That is, closer to what iOS 16 is pushing us towards.
+			
+//			Button {
+//				navLinkTag = tag
+//			} label: {
+//				label()
+//			}
+//			.buttonStyle(ButtonStyle_NavigationLink())
+		}
 	}
 	
 	@ViewBuilder
-	private func navLinkView(_ tag: NavLinkTag) -> some View {
+	func navLinkView() -> some View {
+		
+		if let tag = self.navLinkTag {
+			navLinkView(tag)
+		} else {
+			EmptyView()
+		}
+	}
+	
+	@ViewBuilder
+	func navLinkView(_ tag: NavLinkTag) -> some View {
 		
 		switch tag {
 			case .SpendExpiredSwapIns: SpendExpiredSwapIns()
@@ -387,6 +433,14 @@ struct SwapInWalletDetails: View {
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
+	
+	func navLinkTagBinding() -> Binding<Bool> {
+		
+		return Binding<Bool>(
+			get: { navLinkTag != nil },
+			set: { if !$0 { navLinkTag = nil }}
+		)
+	}
 	
 	func maxSwapInFeeDetails() -> (FormattedAmount, Bool) {
 		

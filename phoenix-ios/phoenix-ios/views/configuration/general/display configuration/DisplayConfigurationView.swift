@@ -8,12 +8,6 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-fileprivate enum NavLinkTag: String {
-	case FiatCurrencySelector
-	case BitcoinUnitSelector
-	case RecentPaymentsSelector
-}
-
 struct DisplayConfigurationView: View {
 	
 	@ViewBuilder
@@ -26,15 +20,23 @@ struct DisplayConfigurationView: View {
 
 fileprivate struct DisplayConfigurationList: View {
 	
-	let scrollViewProxy: ScrollViewProxy
+	enum NavLinkTag: String {
+		case FiatCurrencySelector
+		case BitcoinUnitSelector
+		case RecentPaymentsSelector
+	}
 	
-	@State private var navLinkTag: NavLinkTag? = nil
+	let scrollViewProxy: ScrollViewProxy
 	
 	@State var fiatCurrency = GroupPrefs.shared.fiatCurrency
 	@State var bitcoinUnit = GroupPrefs.shared.bitcoinUnit
 	@State var theme = Prefs.shared.theme
 	@State var showOriginalFiatAmount = Prefs.shared.showOriginalFiatAmount
 	@State var recentPaymentsConfig = Prefs.shared.recentPaymentsConfig
+	
+	// <iOS_16_workarounds>
+	@State var navLinkTag: NavLinkTag? = nil
+	// </iOS_16_workarounds>
 	
 	@Namespace var sectionID_currency
 	@Namespace var sectionID_theme
@@ -51,6 +53,12 @@ fileprivate struct DisplayConfigurationList: View {
 		content()
 			.navigationTitle(NSLocalizedString("Display options", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
+			.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
+				navLinkView()
+			}
+			.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17
+				navLinkView(tag)
+			}
 	}
 	
 	@ViewBuilder
@@ -81,7 +89,7 @@ fileprivate struct DisplayConfigurationList: View {
 	func section_currency() -> some View {
 		
 		Section {
-			navLink(.FiatCurrencySelector) {
+			navLink_plain(.FiatCurrencySelector) {
 				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 					Text("Fiat currency")
 					Spacer()
@@ -91,7 +99,7 @@ fileprivate struct DisplayConfigurationList: View {
 				}
 			}
 			
-			navLink(.BitcoinUnitSelector) {
+			navLink_plain(.BitcoinUnitSelector) {
 				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 					Text("Bitcoin unit")
 					Spacer()
@@ -178,7 +186,7 @@ fileprivate struct DisplayConfigurationList: View {
 		
 		Section(header: Text("Home Screen")) {
 			
-			navLink(.RecentPaymentsSelector) {
+			navLink_plain(.RecentPaymentsSelector) {
 				
 				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 					switch recentPaymentsConfig {
@@ -209,17 +217,31 @@ fileprivate struct DisplayConfigurationList: View {
 	}
 	
 	@ViewBuilder
-	private func navLink<Content>(
+	private func navLink_plain<Content>(
 		_ tag: NavLinkTag,
 		label: () -> Content
 	) -> some View where Content: View {
 		
-		NavigationLink(
-			destination: navLinkView(tag),
-			tag: tag,
-			selection: $navLinkTag,
-			label: label
-		)
+		if #available(iOS 17, *) {
+			NavigationLink(value: tag, label: label)
+		} else {
+			Button {
+				navLinkTag = tag
+			} label: {
+				label()
+			}
+			.buttonStyle(ButtonStyle_NavigationLink())
+		}
+	}
+	
+	@ViewBuilder
+	func navLinkView() -> some View {
+		
+		if let tag = self.navLinkTag {
+			navLinkView(tag)
+		} else {
+			EmptyView()
+		}
 	}
 	
 	@ViewBuilder
@@ -230,5 +252,17 @@ fileprivate struct DisplayConfigurationList: View {
 			case .BitcoinUnitSelector    : BitcoinUnitSelector(selectedBitcoinUnit: bitcoinUnit)
 			case .RecentPaymentsSelector : RecentPaymentsSelector(recentPaymentsConfig: recentPaymentsConfig)
 		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: View Helpers
+	// --------------------------------------------------
+	
+	func navLinkTagBinding() -> Binding<Bool> {
+		
+		return Binding<Bool>(
+			get: { navLinkTag != nil },
+			set: { if !$0 { navLinkTag = nil }}
+		)
 	}
 }

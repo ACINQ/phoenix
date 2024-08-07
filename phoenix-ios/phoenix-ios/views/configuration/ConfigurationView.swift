@@ -9,34 +9,6 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-fileprivate enum NavLinkTag: String {
-	// General
-	case About
-	case WalletCreationOptions
-	case DisplayConfiguration
-	case PaymentOptions
-	case ContactsList
-	case Notifications
-	// Fees
-	case ChannelManagement
-	case LiquidityManagement
-	// Privacy & Security
-	case AppAccess
-	case RecoveryPhrase
-	case ElectrumServer
-	case Tor
-	case PaymentsBackup
-	// Advanced
-	case WalletInfo
-	case ChannelsConfiguration
-	case LogsConfiguration
-	case Experimental
-	// Danger Zone
-	case DrainWallet
-	case ResetWallet
-	case ForceCloseChannels
-}
-
 struct ConfigurationView: View {
 	
 	@ViewBuilder
@@ -49,22 +21,51 @@ struct ConfigurationView: View {
 
 fileprivate struct ConfigurationList: View {
 	
-	let scrollViewProxy: ScrollViewProxy
+	enum NavLinkTag: String {
+		// General
+		case About
+		case WalletCreationOptions
+		case DisplayConfiguration
+		case PaymentOptions
+		case ContactsList
+		case Notifications
+		// Fees
+		case ChannelManagement
+		case LiquidityManagement
+		// Privacy & Security
+		case AppAccess
+		case RecoveryPhrase
+		case ElectrumServer
+		case Tor
+		case PaymentsBackup
+		// Advanced
+		case WalletInfo
+		case ChannelsConfiguration
+		case LogsConfiguration
+		case Experimental
+		// Danger Zone
+		case DrainWallet
+		case ResetWallet
+		case ForceCloseChannels
+	}
 	
-	@State private var navLinkTag: NavLinkTag? = nil
+	let scrollViewProxy: ScrollViewProxy
 	
 	@State private var notificationPermissions = NotificationsManager.shared.permissions.value
 	
 	@State private var backupSeedState: BackupSeedState = .safelyBackedUp
 	let backupSeedStatePublisher: AnyPublisher<BackupSeedState, Never>
 	
-	@State private var swiftUiBugWorkaround: NavLinkTag? = nil
-	@State private var swiftUiBugWorkaroundIdx = 0
-	
 	@State var firstAppearance = false
-	@State var popToDestination: PopToDestination? = nil
 	
 	@State var biometricSupport = AppSecurity.shared.deviceBiometricSupport()
+	
+	// <iOS_16_workarounds>
+	@State var navLinkTag: NavLinkTag? = nil
+	@State var popToDestination: PopToDestination? = nil
+	@State var swiftUiBugWorkaround: NavLinkTag? = nil
+	@State var swiftUiBugWorkaroundIdx = 0
+	// </iOS_16_workarounds>
 	
 	@Namespace var linkID_About
 	@Namespace var linkID_WalletCreationOptions
@@ -89,7 +90,12 @@ fileprivate struct ConfigurationList: View {
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
+	
+	// --------------------------------------------------
+	// MARK: Init
+	// --------------------------------------------------
 	
 	init(scrollViewProxy: ScrollViewProxy) {
 		
@@ -111,6 +117,13 @@ fileprivate struct ConfigurationList: View {
 		content()
 			.navigationTitle(NSLocalizedString("Settings", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
+			.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
+				// This must be removed if you switch to navLink1
+				navLinkView()
+			}
+			.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17
+				navLinkView(tag)
+			}
 	}
 	
 	@ViewBuilder
@@ -135,10 +148,14 @@ fileprivate struct ConfigurationList: View {
 			onAppear()
 		}
 		.onChange(of: deepLinkManager.deepLink) {
-			deepLinkChanged($0)
+			if #unavailable(iOS 17.0) {
+				deepLinkChanged($0)
+			}
 		}
 		.onChange(of: navLinkTag) {
-			navLinkTagChanged($0)
+			if #unavailable(iOS 17.0) {
+				navLinkTagChanged($0)
+			}
 		}
 		.onReceive(NotificationsManager.shared.permissions) {(permissions: NotificationPermissions) in
 			notificationPermissionsChanged(permissions)
@@ -155,7 +172,7 @@ fileprivate struct ConfigurationList: View {
 			
 		#if DEBUG
 			if !hasWallet {
-				navLink(.WalletCreationOptions) {
+				navLink_label(.WalletCreationOptions) {
 					Label { Text("Wallet creation options") } icon: {
 						Image(systemName: "quote.bubble")
 					}
@@ -164,14 +181,14 @@ fileprivate struct ConfigurationList: View {
 			}
 		#endif
 			
-			navLink(.About) {
+			navLink_label(.About) {
 				Label { Text("About") } icon: {
 					Image(systemName: "info.circle")
 				}
 			}
 			.id(linkID_About)
 		
-			navLink(.DisplayConfiguration) {
+			navLink_label(.DisplayConfiguration) {
 				Label { Text("Display") } icon: {
 					Image(systemName: "paintbrush.pointed")
 				}
@@ -179,17 +196,18 @@ fileprivate struct ConfigurationList: View {
 			.id(linkID_DisplayConfiguration)
 	
 			if hasWallet {
-				navLink(.PaymentOptions) {
+				navLink_label(.PaymentOptions) {
 					Label {
 						HStack(alignment: VerticalAlignment.center, spacing: 0) {
 							Text("Payment options")
-							if notificationPermissions == .disabled {
+						//	if notificationPermissions == .disabled {
 								Spacer()
 								Image(systemName: "exclamationmark.triangle")
 									.renderingMode(.template)
 									.foregroundColor(Color.appWarn)
-							}
+						//	}
 						} // </HStack>
+						.foregroundColor(.primary)
 					} icon: {
 						Image(systemName: "wrench")
 					} // </Label>
@@ -198,7 +216,7 @@ fileprivate struct ConfigurationList: View {
 			} // </if hasWallet>
 			
 			if hasWallet && CONTACTS_ENABLED {
-				navLink(.ContactsList) {
+				navLink_label(.ContactsList) {
 					Label { Text("Contacts") } icon: {
 						Image(systemName: "person.2")
 					}
@@ -207,7 +225,7 @@ fileprivate struct ConfigurationList: View {
 			}
 			
 			if hasWallet {
-				navLink(.Notifications) {
+				navLink_label(.Notifications) {
 					Label { Text("Notifications") } icon: {
 						Image(systemName: "tray")
 					}
@@ -223,7 +241,7 @@ fileprivate struct ConfigurationList: View {
 		
 		Section(header: Text("Fees")) {
 			if hasWallet {
-				navLink(.ChannelManagement) {
+				navLink_label(.ChannelManagement) {
 					Label { Text("Channel management") } icon: {
 						Image(systemName: "wand.and.stars")
 					}
@@ -232,7 +250,7 @@ fileprivate struct ConfigurationList: View {
 			}
 			
 			if hasWallet {
-				navLink(.LiquidityManagement) {
+				navLink_label(.LiquidityManagement) {
 					Label { Text("Add liquidity") } icon: {
 						if #available(iOS 17, *) {
 							Image("bucket_monochrome_symbol")
@@ -257,7 +275,7 @@ fileprivate struct ConfigurationList: View {
 		Section(header: Text("Privacy & Security")) {
 
 			if hasWallet {
-				navLink(.AppAccess) {
+				navLink_label(.AppAccess) {
 					Label { Text("App access") } icon: {
 						Image(systemName: isTouchID() ? "touchid" : "faceid")
 					}
@@ -266,7 +284,7 @@ fileprivate struct ConfigurationList: View {
 			} // </if hasWallet>
 			
 			if hasWallet {
-				navLink(.RecoveryPhrase) {
+				navLink_label(.RecoveryPhrase) {
 					Label {
 						switch backupSeedState {
 						case .notBackedUp:
@@ -293,14 +311,14 @@ fileprivate struct ConfigurationList: View {
 				.id(linkID_RecoveryPhrase)
 			} // </if hasWallet>
 			
-			navLink(.ElectrumServer) {
+			navLink_label(.ElectrumServer) {
 				Label { Text("Electrum server") } icon: {
 					Image(systemName: "link")
 				}
 			}
 			.id(linkID_ElectrumServer)
 			
-			navLink(.Tor) {
+			navLink_label(.Tor) {
 				Label { Text("Tor") } icon: {
 					Image(systemName: "shield.lefthalf.fill")
 				}
@@ -308,7 +326,7 @@ fileprivate struct ConfigurationList: View {
 			.id(linkID_Tor)
 			
 			if hasWallet {
-				navLink(.PaymentsBackup) {
+				navLink_label(.PaymentsBackup) {
 					Label { Text("Payments backup") } icon: {
 						Image(systemName: "icloud.and.arrow.up")
 					}
@@ -325,7 +343,7 @@ fileprivate struct ConfigurationList: View {
 		Section(header: Text("Advanced")) {
 
 			if hasWallet {
-				navLink(.WalletInfo) {
+				navLink_label(.WalletInfo) {
 					Label {
 						Text("Wallet info")
 					} icon: {
@@ -336,7 +354,7 @@ fileprivate struct ConfigurationList: View {
 			}
 			
 			if hasWallet {
-				navLink(.ChannelsConfiguration) {
+				navLink_label(.ChannelsConfiguration) {
 					Label { Text("Payment channels") } icon: {
 						Image(systemName: "bolt")
 					}
@@ -344,7 +362,7 @@ fileprivate struct ConfigurationList: View {
 				.id(linkID_ChannelManagement)
 			}
 			
-			navLink(.LogsConfiguration) {
+			navLink_label(.LogsConfiguration) {
 				Label { Text("Logs") } icon: {
 					Image(systemName: "doc.text")
 				}
@@ -352,7 +370,7 @@ fileprivate struct ConfigurationList: View {
 			.id(linkID_LogsConfiguration)
 			
 			if hasWallet {
-				navLink(.Experimental) {
+				navLink_label(.Experimental) {
 					Label { Text("Experimental") } icon: {
 						if #available(iOS 17, *) {
 							Image(systemName: "flask")
@@ -373,7 +391,7 @@ fileprivate struct ConfigurationList: View {
 		Section(header: Text("Danger Zone")) {
 			
 			if hasWallet {
-				navLink(.DrainWallet) {
+				navLink_label(.DrainWallet) {
 					Label { Text("Drain wallet") } icon: {
 						Image(systemName: "xmark.circle")
 					}
@@ -382,7 +400,7 @@ fileprivate struct ConfigurationList: View {
 			}
 			
 			if hasWallet {
-				navLink(.ResetWallet) {
+				navLink_label(.ResetWallet) {
 					Label { Text("Reset wallet") } icon: {
 						Image(systemName: "trash")
 					}
@@ -391,7 +409,7 @@ fileprivate struct ConfigurationList: View {
 			}
 			
 			if hasWallet {
-				navLink(.ForceCloseChannels) {
+				navLink_label(.ForceCloseChannels) {
 					Label { Text("Force-close channels") } icon: {
 						Image(systemName: "exclamationmark.triangle")
 					}
@@ -403,18 +421,36 @@ fileprivate struct ConfigurationList: View {
 	}
 
 	@ViewBuilder
-	private func navLink<Content>(
+	private func navLink_label<Content>(
 		_ tag: NavLinkTag,
-		label: () -> Content
+		label: @escaping () -> Content
 	) -> some View where Content: View {
 		
-		NavigationLink(
-			destination: navLinkView(tag),
-			tag: tag,
-			selection: $navLinkTag,
-			label: label
-		)
-	//	.id(linkID(for: tag)) // doesn't compile - don't understand why
+		if #available(iOS 17, *) {
+			NavigationLink(value: tag, label: label)
+		} else {
+			// Option #1 is what we were using before
+			//
+			// Note that if you use this option, then you must remove
+			// `.navigationStackDestination(isPresented::)` or there will be navigation bugs.
+			
+		//	NavigationLink_16(
+		//		destination: navLinkView(tag),
+		//		tag: tag,
+		//		selection: $navLinkTag,
+		//		label: label
+		//	)
+			
+			// Option #2 looks like a better option.
+			// That is, closer to what iOS 16 is pushing us towards.
+			
+			Button {
+				navLinkTag = tag
+			} label: {
+				label().labelStyle(LabelStyle_NavigationLink())
+			}
+			
+		} // </iOS_16>
 	}
 	
 	@ViewBuilder
@@ -463,6 +499,14 @@ fileprivate struct ConfigurationList: View {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
+	func navLinkTagBinding() -> Binding<Bool> {
+		
+		return Binding<Bool>(
+			get: { navLinkTag != nil },
+			set: { if !$0 { navLinkTag = nil }}
+		)
+	}
+	
 	func hasWallet() -> Bool {
 		
 		return Biz.business.walletManager.isLoaded()
@@ -500,98 +544,6 @@ fileprivate struct ConfigurationList: View {
 		}
 	}
 	
-	func deepLinkChanged(_ value: DeepLink?) {
-		log.trace("deepLinkChanged() => \(value?.rawValue ?? "nil")")
-		
-		// This is a hack, courtesy of bugs in Apple's NavigationLink:
-		// https://developer.apple.com/forums/thread/677333
-		//
-		// Summary:
-		// There's some quirky code in SwiftUI that is resetting our navLinkTag.
-		// Several bizarre workarounds have been proposed.
-		// I've tried every one of them, and none of them work (at least, without bad side-effects).
-		//
-		// The only clean solution I've found is to listen for SwiftUI's bad behaviour,
-		// and forcibly undo it.
-		
-		if let value = value {
-			
-			// Navigate towards deep link (if needed)
-			var newNavLinkTag: NavLinkTag? = nil
-			var delay: TimeInterval = 1.5 // seconds; multiply by number of screens we need to navigate
-			switch value {
-				case .paymentHistory     : break
-				case .backup             : newNavLinkTag = .RecoveryPhrase       ; delay *= 1
-				case .drainWallet        : newNavLinkTag = .DrainWallet          ; delay *= 1
-				case .electrum           : newNavLinkTag = .ElectrumServer       ; delay *= 1
-				case .backgroundPayments : newNavLinkTag = .PaymentOptions       ; delay *= 2
-				case .liquiditySettings  : newNavLinkTag = .ChannelManagement    ; delay *= 1
-				case .forceCloseChannels : newNavLinkTag = .ForceCloseChannels   ; delay *= 1
-				case .swapInWallet       : newNavLinkTag = .WalletInfo           ; delay *= 2
-			}
-			
-			if let newNavLinkTag = newNavLinkTag {
-				
-				self.swiftUiBugWorkaround = newNavLinkTag
-				self.swiftUiBugWorkaroundIdx += 1
-				clearSwiftUiBugWorkaround(delay: delay)
-				
-				// Interesting bug in SwiftUI:
-				// If the navLinkTag you're targetting is scrolled off the screen,
-				// the you won't be able to navigate to it.
-				// My understanding is that List is lazy, and this somehow prevents triggering the navigation.
-				// The workaround is to manually scroll to the item to ensure it's onscreen,
-				// at which point we can activate the navLinkTag trigger.
-				//
-				scrollViewProxy.scrollTo(linkID(for: newNavLinkTag))
-				DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-					self.navLinkTag = newNavLinkTag // Trigger/push the view
-				}
-			}
-			
-		} else {
-			// We reached the final destination of the deep link
-			clearSwiftUiBugWorkaround(delay: 0.0)
-		}
-	}
-	
-	fileprivate func navLinkTagChanged(_ tag: NavLinkTag?) {
-		log.trace("navLinkTagChanged() => \(tag?.rawValue ?? "nil")")
-		
-		if tag == nil, let forcedNavLinkTag = swiftUiBugWorkaround {
-			
-			log.debug("Blocking SwiftUI's attempt to reset our navLinkTag")
-			self.navLinkTag = forcedNavLinkTag
-			
-		} else if tag == nil {
-			
-			// If there's a pending popToDestination, it's now safe to continue the flow.
-			//
-			// Note that performing this operation in `onAppear` doesn't work properly:
-			// - it appears to work fine on the simulator, but isn't reliable on the actual device
-			// - it seems that, IF using a `navLinkTag`, then we need to wait for the tag to be
-			//   unset before it can be set properly again.
-			//
-			if let destination = popToDestination {
-				log.debug("popToDestination: \(destination)")
-				
-				popToDestination = nil
-				switch destination {
-				case .RootView(_):
-					presentationMode.wrappedValue.dismiss()
-					
-				case .ConfigurationView(let deepLink):
-					if let deepLink {
-						deepLinkManager.broadcast(deepLink)
-					}
-				
-				case .TransactionsView:
-					log.warning("Invalid popToDestination")
-				}
-			}
-		}
-	}
-	
 	func notificationPermissionsChanged(_ permissions: NotificationPermissions) {
 		log.trace("notificationPermissionsChanged()")
 		
@@ -605,18 +557,18 @@ fileprivate struct ConfigurationList: View {
 	}
 	
 	// --------------------------------------------------
-	// MARK: Actions
+	// MARK: Navigation
 	// --------------------------------------------------
 	
-	func popTo(_ destination: PopToDestination) {
-		log.trace("popTo(\(destination))")
+	func navigateTo(_ tag: NavLinkTag) {
+		log.trace("navigateTo(\(tag.rawValue))")
 		
-		popToDestination = destination
+		if #available(iOS 17, *) {
+			navCoordinator.path.append(tag)
+		} else {
+			navLinkTag = tag
+		}
 	}
-	
-	// --------------------------------------------------
-	// MARK: Utilities
-	// --------------------------------------------------
 	
 	func linkID(for navLinkTag: NavLinkTag) -> any Hashable {
 		
@@ -647,16 +599,131 @@ fileprivate struct ConfigurationList: View {
 		}
 	}
 	
+	func deepLinkChanged(_ value: DeepLink?) {
+		log.trace("deepLinkChanged() => \(value?.rawValue ?? "nil")")
+		
+		if #available(iOS 17, *) {
+			log.warning("This function is for iOS 16 only: deepLinkChanged()")
+		} else { // iOS 16
+			
+			// This is a hack, courtesy of bugs in Apple's NavigationLink:
+			// https://developer.apple.com/forums/thread/677333
+			//
+			// Summary:
+			// There's some quirky code in SwiftUI that is resetting our navLinkTag.
+			// Several bizarre workarounds have been proposed.
+			// I've tried every one of them, and none of them work (at least, without bad side-effects).
+			//
+			// The only clean solution I've found is to listen for SwiftUI's bad behaviour,
+			// and forcibly undo it.
+			
+			if let value = value {
+				
+				// Navigate towards deep link (if needed)
+				var newNavLinkTag: NavLinkTag? = nil
+				var delay: TimeInterval = 1.5 // seconds; multiply by number of screens we need to navigate
+				switch value {
+					case .paymentHistory     : break
+					case .backup             : newNavLinkTag = .RecoveryPhrase       ; delay *= 1
+					case .drainWallet        : newNavLinkTag = .DrainWallet          ; delay *= 1
+					case .electrum           : newNavLinkTag = .ElectrumServer       ; delay *= 1
+					case .backgroundPayments : newNavLinkTag = .PaymentOptions       ; delay *= 2
+					case .liquiditySettings  : newNavLinkTag = .ChannelManagement    ; delay *= 1
+					case .forceCloseChannels : newNavLinkTag = .ForceCloseChannels   ; delay *= 1
+					case .swapInWallet       : newNavLinkTag = .WalletInfo           ; delay *= 2
+				}
+				
+				if let newNavLinkTag = newNavLinkTag {
+					
+					self.swiftUiBugWorkaround = newNavLinkTag
+					self.swiftUiBugWorkaroundIdx += 1
+					clearSwiftUiBugWorkaround(delay: delay)
+					
+					// Interesting bug in SwiftUI:
+					// If the navLinkTag you're targetting is scrolled off the screen,
+					// the you won't be able to navigate to it.
+					// My understanding is that List is lazy, and this somehow prevents triggering the navigation.
+					// The workaround is to manually scroll to the item to ensure it's onscreen,
+					// at which point we can activate the navLinkTag trigger.
+					//
+					scrollViewProxy.scrollTo(linkID(for: newNavLinkTag))
+					DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+						self.navLinkTag = newNavLinkTag // Trigger/push the view
+					}
+				}
+				
+			} else {
+				// We reached the final destination of the deep link
+				clearSwiftUiBugWorkaround(delay: 0.0)
+			}
+		}
+	}
+	
+	fileprivate func navLinkTagChanged(_ tag: NavLinkTag?) {
+		log.trace("navLinkTagChanged() => \(tag?.rawValue ?? "nil")")
+		
+		if #available(iOS 17, *) {
+			log.warning("This function is for iOS 16 only: navLinkTagChanged()")
+		} else { // iOS 16
+			
+			if tag == nil, let forcedNavLinkTag = swiftUiBugWorkaround {
+				
+				log.debug("Blocking SwiftUI's attempt to reset our navLinkTag")
+				self.navLinkTag = forcedNavLinkTag
+				
+			} else if tag == nil {
+				
+				// If there's a pending popToDestination, it's now safe to continue the flow.
+				//
+				// Note that performing this operation in `onAppear` doesn't work properly:
+				// - it appears to work fine on the simulator, but isn't reliable on the actual device
+				// - it seems that, IF using a `navLinkTag`, then we need to wait for the tag to be
+				//   unset before it can be set properly again.
+				//
+				if let destination = popToDestination {
+					log.debug("popToDestination: \(destination)")
+					
+					popToDestination = nil
+					switch destination {
+					case .RootView(_):
+						presentationMode.wrappedValue.dismiss()
+						
+					case .ConfigurationView(let deepLink):
+						if let deepLink {
+							deepLinkManager.broadcast(deepLink)
+						}
+						
+					case .TransactionsView:
+						log.warning("Invalid popToDestination")
+					}
+				}
+			}
+		}
+	}
+	
 	func clearSwiftUiBugWorkaround(delay: TimeInterval) {
 		
-		let idx = self.swiftUiBugWorkaroundIdx
-		
-		DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+		if #available(iOS 17, *) {
+			log.warning("This function is for iOS 16 only: clearSwiftUiBugWorkaround()")
+		} else { // iOS 16
 			
-			if self.swiftUiBugWorkaroundIdx == idx {
-				log.debug("swiftUiBugWorkaround = nil")
-				self.swiftUiBugWorkaround = nil
+			let idx = self.swiftUiBugWorkaroundIdx
+			DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+				if self.swiftUiBugWorkaroundIdx == idx {
+					log.debug("swiftUiBugWorkaround = nil")
+					self.swiftUiBugWorkaround = nil
+				}
 			}
+		}
+	}
+	
+	func popTo(_ destination: PopToDestination) {
+		log.trace("popTo(\(destination))")
+		
+		if #available(iOS 17, *) {
+			log.warning("This function is for iOS 16 only: popTo()")
+		} else { // iOS 16
+			popToDestination = destination
 		}
 	}
 }
