@@ -52,10 +52,7 @@ struct SwapInWalletDetails: View {
 		main()
 			.navigationTitle(NSLocalizedString("Swap-in wallet", comment: "Navigation Bar Title"))
 			.navigationBarTitleDisplayMode(.inline)
-//			.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
-//				navLinkView()
-//			}
-			.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17
+			.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
 				navLinkView(tag)
 			}
 	}
@@ -125,9 +122,9 @@ struct SwapInWalletDetails: View {
 			if hasTimedOutUtxos() {
 				section_timedOut()
 			}
-		//	if hasCancelledUtxos() {
+			if hasCancelledUtxos() {
 				section_cancelled()
-		//	}
+			}
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
@@ -379,7 +376,7 @@ struct SwapInWalletDetails: View {
 	}
 	
 	@ViewBuilder
-	private func navLink_plain<Content>(
+	func navLink_plain<Content>(
 		_ tag: NavLinkTag,
 		label: @escaping () -> Content
 	) -> some View where Content: View {
@@ -387,38 +384,12 @@ struct SwapInWalletDetails: View {
 		if #available(iOS 17, *) {
 			NavigationLink(value: tag, label: label)
 		} else {
-			// Option #1 is what we were using before
-			//
-			// Note that if you use this option,
-			// then you must remove `.navigationStackDestination(isPresented::)`
-			// or there will be weird navigation bugs.
-			
 			NavigationLink_16(
 				destination: navLinkView(tag),
 				tag: tag,
 				selection: $navLinkTag,
 				label: label
 			)
-			
-			// Option #2 looks like a better option.
-			// That is, closer to what iOS 16 is pushing us towards.
-			
-//			Button {
-//				navLinkTag = tag
-//			} label: {
-//				label()
-//			}
-//			.buttonStyle(ButtonStyle_NavigationLink())
-		}
-	}
-	
-	@ViewBuilder
-	func navLinkView() -> some View {
-		
-		if let tag = self.navLinkTag {
-			navLinkView(tag)
-		} else {
-			EmptyView()
 		}
 	}
 	
@@ -433,14 +404,6 @@ struct SwapInWalletDetails: View {
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
-	
-	func navLinkTagBinding() -> Binding<Bool> {
-		
-		return Binding<Bool>(
-			get: { navLinkTag != nil },
-			set: { if !$0 { navLinkTag = nil }}
-		)
-	}
 	
 	func maxSwapInFeeDetails() -> (FormattedAmount, Bool) {
 		

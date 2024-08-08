@@ -117,11 +117,7 @@ fileprivate struct ConfigurationList: View {
 		content()
 			.navigationTitle(NSLocalizedString("Settings", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
-			.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
-				// This must be removed if you switch to navLink1
-				navLinkView()
-			}
-			.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17
+			.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
 				navLinkView(tag)
 			}
 	}
@@ -200,12 +196,12 @@ fileprivate struct ConfigurationList: View {
 					Label {
 						HStack(alignment: VerticalAlignment.center, spacing: 0) {
 							Text("Payment options")
-						//	if notificationPermissions == .disabled {
+							if notificationPermissions == .disabled {
 								Spacer()
 								Image(systemName: "exclamationmark.triangle")
 									.renderingMode(.template)
 									.foregroundColor(Color.appWarn)
-						//	}
+							}
 						} // </HStack>
 						.foregroundColor(.primary)
 					} icon: {
@@ -421,7 +417,7 @@ fileprivate struct ConfigurationList: View {
 	}
 
 	@ViewBuilder
-	private func navLink_label<Content>(
+	func navLink_label<Content>(
 		_ tag: NavLinkTag,
 		label: @escaping () -> Content
 	) -> some View where Content: View {
@@ -429,38 +425,13 @@ fileprivate struct ConfigurationList: View {
 		if #available(iOS 17, *) {
 			NavigationLink(value: tag, label: label)
 		} else {
-			// Option #1 is what we were using before
-			//
-			// Note that if you use this option, then you must remove
-			// `.navigationStackDestination(isPresented::)` or there will be navigation bugs.
-			
-		//	NavigationLink_16(
-		//		destination: navLinkView(tag),
-		//		tag: tag,
-		//		selection: $navLinkTag,
-		//		label: label
-		//	)
-			
-			// Option #2 looks like a better option.
-			// That is, closer to what iOS 16 is pushing us towards.
-			
-			Button {
-				navLinkTag = tag
-			} label: {
-				label().labelStyle(LabelStyle_NavigationLink())
-			}
-			
+			NavigationLink_16(
+				destination: navLinkView(tag),
+				tag: tag,
+				selection: $navLinkTag,
+				label: label
+			)
 		} // </iOS_16>
-	}
-	
-	@ViewBuilder
-	func navLinkView() -> some View {
-		
-		if let tag = self.navLinkTag {
-			navLinkView(tag)
-		} else {
-			EmptyView()
-		}
 	}
 	
 	@ViewBuilder
@@ -498,14 +469,6 @@ fileprivate struct ConfigurationList: View {
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
-	
-	func navLinkTagBinding() -> Binding<Bool> {
-		
-		return Binding<Bool>(
-			get: { navLinkTag != nil },
-			set: { if !$0 { navLinkTag = nil }}
-		)
-	}
 	
 	func hasWallet() -> Bool {
 		

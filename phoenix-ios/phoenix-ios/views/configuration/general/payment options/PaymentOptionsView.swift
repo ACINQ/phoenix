@@ -62,10 +62,7 @@ fileprivate struct PaymentOptionsList: View {
 		content()
 			.navigationTitle(NSLocalizedString("Payment Options", comment: "Navigation Bar Title"))
 			.navigationBarTitleDisplayMode(.inline)
-//			.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
-//				navLinkView()
-//			}
-			.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17
+			.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
 				// Don't know why, but this doesn't work here.
 			//	navLinkView(tag)
 				
@@ -287,7 +284,7 @@ fileprivate struct PaymentOptionsList: View {
 	}
 	
 	@ViewBuilder
-	private func navLink_plain<Content>(
+	func navLink_plain<Content>(
 		_ tag: NavLinkTag,
 		label: @escaping () -> Content
 	) -> some View where Content: View {
@@ -295,41 +292,13 @@ fileprivate struct PaymentOptionsList: View {
 		if #available(iOS 17, *) {
 			NavigationLink(value: tag, label: label)
 		} else {
-			// Option #1 is what we were using before
-			//
-			// Note that if you use this option, then you must remove
-			// `.navigationStackDestination(isPresented::)` or there will be navigation bugs.
-			
 			NavigationLink_16(
 				destination: navLinkView(tag),
 				tag: tag,
 				selection: $navLinkTag,
 				label: label
 			)
-			
-			// Option #2 looks like a better option.
-			// That is, closer to what iOS 16 is pushing us towards.
-			//
-			// However, this doesn't work well here for some reason.
-			
-//			Button {
-//				navLinkTag = tag
-//			} label: {
-//				label()
-//			}
-//			.buttonStyle(ButtonStyle_NavigationLink())
-			
 		} // </iOS_16>
-	}
-	
-	@ViewBuilder
-	func navLinkView() -> some View {
-		
-		if let tag = self.navLinkTag {
-			navLinkView(tag)
-		} else {
-			EmptyView()
-		}
 	}
 	
 	@ViewBuilder
@@ -338,18 +307,6 @@ fileprivate struct PaymentOptionsList: View {
 		switch tag {
 			case .BackgroundPaymentsSelector : BackgroundPaymentsSelector()
 		}
-	}
-	
-	// --------------------------------------------------
-	// MARK: View Helpers
-	// --------------------------------------------------
-	
-	func navLinkTagBinding() -> Binding<Bool> {
-		
-		return Binding<Bool>(
-			get: { navLinkTag != nil },
-			set: { if !$0 { navLinkTag = nil }}
-		)
 	}
 	
 	// --------------------------------------------------

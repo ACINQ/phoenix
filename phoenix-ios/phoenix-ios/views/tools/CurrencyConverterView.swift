@@ -21,6 +21,10 @@ enum LastUpdated {
 
 struct CurrencyConverterView: View {
 	
+	enum NavLinkTag: String, Codable {
+		case CurrencySelector
+	}
+
 	let initialAmount: CurrencyAmount?
 	let didChange: ((CurrencyAmount?) -> Void)?
 	let didClose: (() -> Void)?
@@ -31,14 +35,12 @@ struct CurrencyConverterView: View {
 	
 	@State var parsedRow: ParsedRow? = nil
 	
-	@State var currencySelectorOpen = false
 	@State var replacingCurrency: Currency? = nil
 	
 	@State var didAppear = false
 	@State var isRefreshingExchangeRates = false
 	
-	let refreshingExchangeRatesPublisher =
-		Biz.business.currencyManager.refreshPublisher()
+	let refreshingExchangeRatesPublisher = Biz.business.currencyManager.refreshPublisher()
 	
 	let timer = Timer.publish(every: 15 /* seconds */, on: .current, in: .common).autoconnect()
 	@State var currentDate = Date()
@@ -57,8 +59,18 @@ struct CurrencyConverterView: View {
 	)
 	@State var flagWidth: CGFloat? = nil
 	
+	// <iOS_16_workarounds>
+	@State var navLinkTag: NavLinkTag? = nil
+	// </iOS_16_workarounds>
+	
 	@Environment(\.colorScheme) var colorScheme
+	
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	
+	// --------------------------------------------------
+	// MARK: Init
+	// --------------------------------------------------
 	
 	init() {
 		self.initialAmount = nil
@@ -86,58 +98,26 @@ struct CurrencyConverterView: View {
 		layers()
 			.navigationTitle(NSLocalizedString("Currency Converter", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
+			.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
+				navLinkView()
+			}
+			.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
+				navLinkView(tag)
+			}
 	}
 	
 	@ViewBuilder
 	func layers() -> some View {
 		
 		ZStack {
-			// We want to measure various items within the List.
-			// But we need to measure ALL of them.
-			// And we can't do that with a List because it's lazy.
-			//
-			// So we have to use this hack,
-			// which force-renders all the Text items using a hidden VStack.
-			//
-			ScrollView {
-				VStack {
-					ForEach(currencies) { currency in
-						
-						switch currency {
-						case .bitcoin(let bitcoinUnit):
-							Text(bitcoinUnit.shortName)
-								.foregroundColor(Color.clear)
-								.read(currencyTextWidthReader)
-							//	.frame(width: currencyTextWidth, alignment: .leading) // required, or refreshes after display
-							
-						case .fiat(let fiatCurrency):
-							Text(fiatCurrency.shortName)
-								.foregroundColor(Color.clear)
-								.read(currencyTextWidthReader)
-							//	.frame(width: currencyTextWidth, alignment: .leading) // required, or refreshes after display
-							
-							Text(fiatCurrency.flag)
-								.foregroundColor(Color.clear)
-								.read(flagWidthReader)
-							//	.frame(width: flagWidth, alignment: .leading) // required, or refreshes after display
-						}
-					}
-				} // </VStack>
-				.assignMaxPreference(for: currencyTextWidthReader.key, to: $currencyTextWidth)
-				.assignMaxPreference(for: flagWidthReader.key, to: $flagWidth)
-			} // </ScrollView>
-			
+			hiddenContent()
 			content()
-			
-		} // </ZStack>
+		}
 		.onAppear {
 			onAppear()
 		}
 		.onDisappear {
 			onDisappear()
-		}
-		.navigationDestination(isPresented: $currencySelectorOpen) {
-			currencySelectorView()
 		}
 		.onChange(of: currencies) { _ in
 			currenciesDidChange()
@@ -151,6 +131,45 @@ struct CurrencyConverterView: View {
 		.onReceive(timer) { _ in
 			self.currentDate = Date()
 		}
+	}
+	
+	@ViewBuilder
+	func hiddenContent() -> some View {
+		
+		// We want to measure various items within the List.
+		// But we need to measure ALL of them.
+		// And we can't do that with a List because it's lazy.
+		//
+		// So we have to use this hack,
+		// which force-renders all the Text items using a hidden VStack.
+		//
+		ScrollView {
+			VStack {
+				ForEach(currencies) { currency in
+					
+					switch currency {
+					case .bitcoin(let bitcoinUnit):
+						Text(bitcoinUnit.shortName)
+							.foregroundColor(Color.clear)
+							.read(currencyTextWidthReader)
+						//	.frame(width: currencyTextWidth, alignment: .leading) // required, or refreshes after display
+						
+					case .fiat(let fiatCurrency):
+						Text(fiatCurrency.shortName)
+							.foregroundColor(Color.clear)
+							.read(currencyTextWidthReader)
+						//	.frame(width: currencyTextWidth, alignment: .leading) // required, or refreshes after display
+						
+						Text(fiatCurrency.flag)
+							.foregroundColor(Color.clear)
+							.read(flagWidthReader)
+						//	.frame(width: flagWidth, alignment: .leading) // required, or refreshes after display
+					}
+				}
+			} // </VStack>
+			.assignMaxPreference(for: currencyTextWidthReader.key, to: $currencyTextWidth)
+			.assignMaxPreference(for: flagWidthReader.key, to: $flagWidth)
+		} // </ScrollView>
 	}
 	
 	@ViewBuilder
@@ -277,18 +296,39 @@ struct CurrencyConverterView: View {
 	}
 	
 	@ViewBuilder
-	func currencySelectorView() -> some View {
+	func navLinkView() -> some View {
 		
-		CurrencySelector(
-			selectedCurrencies: $currencies,
-			replacingCurrency: $replacingCurrency,
-			didSelectCurrency: didSelectCurrency
-		)
+		if let tag = self.navLinkTag {
+			navLinkView(tag)
+		} else {
+			EmptyView()
+		}
+	}
+	
+	@ViewBuilder
+	func navLinkView(_ tag: NavLinkTag) -> some View {
+	
+		switch tag {
+		case .CurrencySelector:
+			CurrencySelector(
+				selectedCurrencies: $currencies,
+				replacingCurrency: $replacingCurrency,
+				didSelectCurrency: didSelectCurrency
+			)
+		}
 	}
 	
 	// --------------------------------------------------
-	// MARK: UI Content Helpers
+	// MARK: View Helpers
 	// --------------------------------------------------
+	
+	func navLinkTagBinding() -> Binding<Bool> {
+		
+		return Binding<Bool>(
+			get: { navLinkTag != nil },
+			set: { if !$0 { navLinkTag = nil }}
+		)
+	}
 	
 	func lastUpdatedText() -> String {
 		
@@ -310,7 +350,7 @@ struct CurrencyConverterView: View {
 	}
 	
 	// --------------------------------------------------
-	// MARK: Actions
+	// MARK: Notifications
 	// --------------------------------------------------
 	
 	private func onAppear() {
@@ -356,9 +396,10 @@ struct CurrencyConverterView: View {
 	private func onDisappear() {
 		log.trace("onDisappear()")
 		
-		if !currencySelectorOpen, let didClose = didClose {
-			didClose()
-		}
+		// Todo: How do we accomplish this with navCoordinator ?
+	//	if !currencySelectorOpen, let didClose = didClose {
+	//		didClose()
+	//	}
 	}
 	
 	private func defaultCurrencies() -> [Currency] {
@@ -477,6 +518,20 @@ struct CurrencyConverterView: View {
 		isRefreshingExchangeRates = value
 	}
 	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
+	
+	func navigateTo(_ tag: NavLinkTag) {
+		log.trace("navigateTo(\(tag.rawValue))")
+		
+		if #available(iOS 17, *) {
+			navCoordinator.path.append(tag)
+		} else {
+			navLinkTag = tag
+		}
+	}
+	
 	private func moveRow(_ indexSet: IndexSet, to index: Int) {
 		log.trace("moveRow()")
 		
@@ -503,14 +558,14 @@ struct CurrencyConverterView: View {
 		log.trace("editRow()")
 		
 		replacingCurrency = currency
-		currencySelectorOpen = true
+		navigateTo(.CurrencySelector)
 	}
 	
 	private func addRow() {
 		log.trace("addRow()")
 		
 		replacingCurrency = nil
-		currencySelectorOpen = true
+		navigateTo(.CurrencySelector)
 	}
 	
 	private func refreshRates() {

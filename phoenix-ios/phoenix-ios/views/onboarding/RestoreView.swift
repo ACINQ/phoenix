@@ -11,12 +11,38 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct RestoreView: View {
 	
+	enum NavLinkTag: String, Codable {
+		case ManualRestore
+	}
+	
+	// <iOS_16_workarounds>
+	@State var navLinkTag: NavLinkTag? = nil
+	// </iOS_16_workarounds>
+	
 	@StateObject var fetcher = FetchSeedsObserver()
 	
 	@EnvironmentObject var deviceInfo: DeviceInfo
 	
+	// --------------------------------------------------
+	// MARK: View Builders
+	// --------------------------------------------------
+	
 	@ViewBuilder
 	var body: some View {
+		
+		layers()
+			.navigationTitle(NSLocalizedString("Restore my wallet", comment: "Navigation bar title"))
+			.navigationBarTitleDisplayMode(.inline)
+			.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
+				navLinkView()
+			}
+			.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
+				navLinkView(tag)
+			}
+	}
+	
+	@ViewBuilder
+	func layers() -> some View {
 		
 		ZStack {
 			Color.primaryBackground
@@ -24,8 +50,6 @@ struct RestoreView: View {
 			
 			content()
 		}
-		.navigationTitle(NSLocalizedString("Restore my wallet", comment: "Navigation bar title"))
-		.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder
@@ -33,7 +57,7 @@ struct RestoreView: View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
-			NavigationLink(destination: ManualRestoreView()) {
+			navLink(.ManualRestore) {
 				Label {
 					Text("Type in recovery phrase")
 				} icon: {
@@ -136,6 +160,55 @@ struct RestoreView: View {
 		}
 	}
 	
+	@ViewBuilder
+	func navLink<Content>(
+		_ tag: NavLinkTag,
+		label: @escaping () -> Content
+	) -> some View where Content: View {
+		
+		if #available(iOS 17, *) {
+			NavigationLink(value: tag, label: label)
+		} else {
+			NavigationLink_16(
+				destination: navLinkView(tag),
+				tag: tag,
+				selection: $navLinkTag,
+				label: label
+			)
+		}
+	}
+	
+	@ViewBuilder
+	func navLinkView() -> some View {
+		
+		if let tag = self.navLinkTag {
+			navLinkView(tag)
+		} else {
+			EmptyView()
+		}
+	}
+	
+	@ViewBuilder
+	func navLinkView(_ tag: NavLinkTag) -> some View {
+		
+		switch tag {
+		case .ManualRestore:
+			ManualRestoreView()
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: View Helpers
+	// --------------------------------------------------
+	
+	func navLinkTagBinding() -> Binding<Bool> {
+		
+		return Binding<Bool>(
+			get: { navLinkTag != nil },
+			set: { if !$0 { navLinkTag = nil }}
+		)
+	}
+	
 	func errorInfo(_ error: FetchSeedsError) -> String {
 		
 		switch error {
@@ -184,6 +257,10 @@ struct RestoreView: View {
 		formatter.timeStyle = .short
 		return formatter.string(from: date)
 	}
+	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
 	
 	func didTapRow(_ seedBackup: SeedBackup) {
 		log.trace("didTapRow: \(seedBackup.name ?? "Wallet")")

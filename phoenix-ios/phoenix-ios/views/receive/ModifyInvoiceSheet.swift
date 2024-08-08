@@ -13,7 +13,7 @@ struct ModifyInvoiceSheet: View {
 	@ObservedObject var mvi: MVIState<Receive.Model, Receive.Intent>
 
 	@Binding var savedAmount: CurrencyAmount?
-	@Binding var currencyConverterOpen: Bool
+	let openCurrencyConverter: () -> Void
 	
 	let initialAmount: Lightning_kmpMilliSatoshi?
 	@State var desc: String
@@ -45,13 +45,13 @@ struct ModifyInvoiceSheet: View {
 		savedAmount: Binding<CurrencyAmount?>,
 		amount: Lightning_kmpMilliSatoshi?,
 		desc: String,
-		currencyConverterOpen: Binding<Bool>
+		openCurrencyConverter: @escaping () -> Void
 	) {
 		self.mvi = mvi
 		self._savedAmount = savedAmount
 		self.initialAmount = amount
 		self._desc = State<String>(initialValue: desc)
-		self._currencyConverterOpen = currencyConverterOpen
+		self.openCurrencyConverter = openCurrencyConverter
 	}
 	
 	// --------------------------------------------------
@@ -301,7 +301,7 @@ struct ModifyInvoiceSheet: View {
 				savedAmount = nil
 			}
 			
-			currencyConverterOpen = true
+			openCurrencyConverter()
 			smartModalState.close()
 		}
 	}

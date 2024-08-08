@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Used on iOS 16, where NavigationLink doesn't meet our purposes.
+/// Used on iOS 16, when NavigationLink doesn't meet our purposes.
 ///
 struct LabelStyle_NavigationLink: LabelStyle {
 	
@@ -18,7 +18,7 @@ struct LabelStyle_NavigationLink: LabelStyle {
 	}
 }
 
-/// Used on iOS 16, where NavigationLink doesn't meet our purposes.
+/// Used on iOS 16, when NavigationLink doesn't meet our purposes.
 ///
 struct ButtonStyle_NavigationLink: ButtonStyle {
 	

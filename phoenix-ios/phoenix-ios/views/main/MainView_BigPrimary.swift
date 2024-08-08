@@ -8,15 +8,12 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-fileprivate enum NavLinkTag: String {
-	case ReceiveView
-	case SendView
-}
-
-
 struct MainView_BigPrimary: View {
 	
-	@State private var navLinkTag: NavLinkTag? = nil
+	enum NavLinkTag: String {
+		case ReceiveView
+		case SendView
+	}
 	
 	@State var didAppear = false
 	
@@ -33,8 +30,14 @@ struct MainView_BigPrimary: View {
 	)
 	@State var footerButtonWidth: CGFloat? = nil
 	
+	// <iOS_16_workarounds>
+	@State var navLinkTag: NavLinkTag? = nil
+	// </iOS_16_workarounds>
+	
 	@ScaledMetric var sendImageSize: CGFloat = 22
 	@ScaledMetric var receiveImageSize: CGFloat = 22
+	
+	@StateObject var navCoordinator = NavigationCoordinator()
 	
 	@EnvironmentObject var popoverState: PopoverState
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
@@ -46,15 +49,19 @@ struct MainView_BigPrimary: View {
 	@ViewBuilder
 	var body: some View {
 		
-		NavigationStack {
+		NavigationStack(path: $navCoordinator.path) {
 			layers()
 				.navigationTitle("")
 				.navigationBarTitleDisplayMode(.inline)
 				.navigationBarHidden(true)
+				.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
+					navLinkView()
+				}
+				.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
+					navLinkView(tag)
+				}
 		}
-		.sheet(isPresented: $showingMergeChannelsView) {
-			MergeChannelsView(location: .sheet)
-		}
+		.environmentObject(navCoordinator)
 	}
 	
 	@ViewBuilder
@@ -71,17 +78,16 @@ struct MainView_BigPrimary: View {
 					.ignoresSafeArea()
 			}
 			
-			primary_body()
+			content()
 		
 		} // <ZStack>
-		.navigationDestination(isPresented: navLinkTagBinding()) {
-			primary_navLinkView()
-		}
 		.onAppear {
 			onAppear()
 		}
 		.onChange(of: navLinkTag) {
-			navLinkTagChanged($0)
+			if #unavailable(iOS 17.0) {
+				navLinkTagChanged($0)
+			}
 		}
 		.onReceive(Biz.canMergeChannelsForSplicingPublisher) {
 			canMergeChannelsForSplicingChanged($0)
@@ -89,10 +95,13 @@ struct MainView_BigPrimary: View {
 		.onReceive(externalLightningUrlPublisher) {
 			didReceiveExternalLightningUrl($0)
 		}
+		.sheet(isPresented: $showingMergeChannelsView) {
+			MergeChannelsView(location: .sheet)
+		}
 	}
 	
 	@ViewBuilder
-	func primary_body() -> some View {
+	func content() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			HomeView(
@@ -100,13 +109,13 @@ struct MainView_BigPrimary: View {
 				showLiquidityAds: showLiquidityAds
 			)
 			.padding(.bottom, 15)
-			primary_footer()
+			footer()
 		}
 		.padding(.bottom, 60)
 	}
 	
 	@ViewBuilder
-	func primary_footer() -> some View {
+	func footer() -> some View {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 20) {
 			
@@ -166,15 +175,21 @@ struct MainView_BigPrimary: View {
 	}
 	
 	@ViewBuilder
-	func primary_navLinkView() -> some View {
+	func navLinkView() -> some View {
 		
-		if let tag = navLinkTag {
-			switch tag {
-				case .ReceiveView : ReceiveView()
-				case .SendView    : SendView(location: .MainView, controller: externalLightningRequest)
-			}
+		if let tag = self.navLinkTag {
+			navLinkView(tag)
 		} else {
 			EmptyView()
+		}
+	}
+	
+	@ViewBuilder
+	func navLinkView(_ tag: NavLinkTag) -> some View {
+		
+		switch tag {
+			case .ReceiveView : ReceiveView()
+			case .SendView    : SendView(location: .MainView, controller: externalLightningRequest)
 		}
 	}
 	
@@ -209,25 +224,16 @@ struct MainView_BigPrimary: View {
 	// MARK: Notifications
 	// --------------------------------------------------
 	
-	private func navLinkTagChanged(_ tag: NavLinkTag?) {
-		log.trace("navLinkTagChanged() => \(tag?.rawValue ?? "nil")")
-		
-		if tag == nil {
-			// If we pushed the SendView, triggered by an external lightning url,
-			// then we can nil out the associated controller now (since we handed off to SendView).
-			self.externalLightningRequest = nil
-		}
-	}
-	
-	private func canMergeChannelsForSplicingChanged(_ value: Bool) {
+	func canMergeChannelsForSplicingChanged(_ value: Bool) {
 		log.trace("canMergeChannelsForSplicingChanged()")
 		
 		canMergeChannelsForSplicing = value
 	}
 	
-	private func didReceiveExternalLightningUrl(_ urlStr: String) -> Void {
+	func didReceiveExternalLightningUrl(_ urlStr: String) -> Void {
 		log.trace("didReceiveExternalLightningUrl()")
 		
+		// Todo: How do we handle this with the NavigationCoordinator ?
 		if navLinkTag == .SendView {
 			log.debug("Ignoring: handled by SendView")
 			return
@@ -235,14 +241,24 @@ struct MainView_BigPrimary: View {
 		
 		MainViewHelper.shared.processExternalLightningUrl(urlStr) { scanController in
 			
-			self.externalLightningRequest = scanController
-			self.navLinkTag = .SendView
+			externalLightningRequest = scanController
+			navigateTo(.SendView)
 		}
 	}
 	
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
+	
+	func navigateTo(_ tag: NavLinkTag) {
+		log.trace("navigateTo(\(tag.rawValue))")
+		
+		if #available(iOS 17, *) {
+			navCoordinator.path.append(tag)
+		} else {
+			navLinkTag = tag
+		}
+	}
 	
 	func didTapSendButton() {
 		log.trace("didTapSendButton()")
@@ -251,7 +267,7 @@ struct MainView_BigPrimary: View {
 			showingMergeChannelsView = true
 		} else {
 			withAnimation {
-				navLinkTag = .SendView
+				navigateTo(.SendView)
 			}
 		}
 	}
@@ -263,7 +279,7 @@ struct MainView_BigPrimary: View {
 			showingMergeChannelsView = true
 		} else {
 			withAnimation {
-				navLinkTag = .ReceiveView
+				navigateTo(.ReceiveView)
 			}
 		}
 	}
@@ -292,6 +308,24 @@ struct MainView_BigPrimary: View {
 		popoverState.close {
 			if let deepLink = destination.followedBy {
 				deepLinkManager.broadcast(deepLink)
+			}
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
+	
+	func navLinkTagChanged(_ tag: NavLinkTag?) {
+		log.trace("navLinkTagChanged() => \(tag?.rawValue ?? "nil")")
+		
+		if #available(iOS 17, *) {
+			log.warning("This function is for iOS 16 only: navLinkTagChanged()")
+		} else {
+			if tag == nil {
+				// If we pushed the SendView, triggered by an external lightning url,
+				// then we can nil out the associated controller now (since we handed off to SendView).
+				self.externalLightningRequest = nil
 			}
 		}
 	}

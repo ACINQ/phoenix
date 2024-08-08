@@ -53,10 +53,7 @@ fileprivate struct DisplayConfigurationList: View {
 		content()
 			.navigationTitle(NSLocalizedString("Display options", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
-			.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
-				navLinkView()
-			}
-			.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17
+			.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
 				navLinkView(tag)
 			}
 	}
@@ -217,30 +214,20 @@ fileprivate struct DisplayConfigurationList: View {
 	}
 	
 	@ViewBuilder
-	private func navLink_plain<Content>(
+	func navLink_plain<Content>(
 		_ tag: NavLinkTag,
-		label: () -> Content
+		label: @escaping () -> Content
 	) -> some View where Content: View {
 		
 		if #available(iOS 17, *) {
 			NavigationLink(value: tag, label: label)
 		} else {
-			Button {
-				navLinkTag = tag
-			} label: {
-				label()
-			}
-			.buttonStyle(ButtonStyle_NavigationLink())
-		}
-	}
-	
-	@ViewBuilder
-	func navLinkView() -> some View {
-		
-		if let tag = self.navLinkTag {
-			navLinkView(tag)
-		} else {
-			EmptyView()
+			NavigationLink_16(
+				destination: navLinkView(tag),
+				tag: tag,
+				selection: $navLinkTag,
+				label: label
+			)
 		}
 	}
 	
@@ -257,12 +244,4 @@ fileprivate struct DisplayConfigurationList: View {
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
-	
-	func navLinkTagBinding() -> Binding<Bool> {
-		
-		return Binding<Bool>(
-			get: { navLinkTag != nil },
-			set: { if !$0 { navLinkTag = nil }}
-		)
-	}
 }

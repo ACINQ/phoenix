@@ -91,7 +91,7 @@ struct MainView_Small: View {
 				.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
 					navLinkView()
 				}
-				.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17
+				.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
 					navLinkView(tag)
 				}
 		}
@@ -537,8 +537,8 @@ struct MainView_Small: View {
 		
 		MainViewHelper.shared.processExternalLightningUrl(urlStr) { scanController in
 			
-			self.externalLightningRequest = scanController
-			self.navLinkTag = .SendView
+			externalLightningRequest = scanController
+			navigateTo(.SendView)
 		}
 	}
 	
@@ -552,7 +552,7 @@ struct MainView_Small: View {
 		if canMergeChannelsForSplicing {
 			showingMergeChannelsView = true
 		} else {
-			navLinkTag = .SendView
+			navigateTo(.SendView)
 		}
 	}
 	
@@ -562,7 +562,7 @@ struct MainView_Small: View {
 		if canMergeChannelsForSplicing {
 			showingMergeChannelsView = true
 		} else {
-			navLinkTag = .ReceiveView
+			navigateTo(.ReceiveView)
 		}
 	}
 	

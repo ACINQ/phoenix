@@ -10,6 +10,11 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct InitializationView: MVIView {
 	
+	enum NavLinkTag: String, Codable {
+		case Configuration
+		case RestoreView
+	}
+	
 	@StateObject var mvi = MVIState({ $0.initialization() })
 	
 	@Environment(\.controllerFactory) var factoryEnv
@@ -24,8 +29,33 @@ struct InitializationView: MVIView {
 	)
 	@State var buttonWidth: CGFloat? = nil
 	
+	// <iOS_16_workarounds>
+	@State var navLinkTag: NavLinkTag? = nil
+	// </iOS_16_workarounds>
+	
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
+	
+	// --------------------------------------------------
+	// MARK: View Builders
+	// --------------------------------------------------
+	
 	@ViewBuilder
 	var view: some View {
+		
+		layers()
+			.navigationTitle("")
+			.navigationBarTitleDisplayMode(.inline)
+			.navigationBarHidden(true)
+			.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
+				navLinkView()
+			}
+			.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
+				navLinkView(tag)
+			}
+	}
+	
+	@ViewBuilder
+	func layers() -> some View {
 		
 		ZStack {
 			
@@ -44,9 +74,6 @@ struct InitializationView: MVIView {
 			
 		} // </ZStack>
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.navigationTitle("")
-		.navigationBarTitleDisplayMode(.inline)
-		.navigationBarHidden(true)
 		.onChange(of: mvi.model) { model in
 			onModelChange(model: model)
 		}
@@ -63,7 +90,7 @@ struct InitializationView: MVIView {
 		HStack{
 			Spacer()
 			VStack {
-				NavigationLink(destination: configurationView()) {
+				navLink(.Configuration) {
 					Image(systemName: "gearshape")
 						.renderingMode(.template)
 						.imageScale(.large)
@@ -118,7 +145,7 @@ struct InitializationView: MVIView {
 			)
 			.padding(.bottom, 40)
 
-			NavigationLink(destination: RestoreView()) {
+			navLink(.RestoreView) {
 				HStack(alignment: VerticalAlignment.firstTextBaseline) {
 					Image(systemName: "arrow.down.circle")
 						.imageScale(.small)
@@ -149,14 +176,52 @@ struct InitializationView: MVIView {
 	}
 	
 	@ViewBuilder
-	func configurationView() -> some View {
+	private func navLink<Content>(
+		_ tag: NavLinkTag,
+		label: @escaping () -> Content
+	) -> some View where Content: View {
 		
-		ConfigurationView()
-		//	.environment(\.mnemonicLanguageBinding, $mnemonicLanguage)
-		//
-		// ^ This doesn't work. Apparently you can't pass an environment variable thru a NavigationLink:
-		// https://stackoverflow.com/questions/59812640/environmentobject-doesnt-work-well-through-navigationlink
+		if #available(iOS 17, *) {
+			NavigationLink(value: tag, label: label)
+		} else {
+			NavigationLink_16(
+				destination: navLinkView(tag),
+				tag: tag,
+				selection: $navLinkTag,
+				label: label
+			)
+		}
 	}
+	
+	@ViewBuilder
+	func navLinkView() -> some View {
+		
+		if let tag = self.navLinkTag {
+			navLinkView(tag)
+		} else {
+			EmptyView()
+		}
+	}
+	
+	@ViewBuilder
+	func navLinkView(_ tag: NavLinkTag) -> some View {
+		
+		switch tag {
+		case .Configuration:
+			ConfigurationView()
+			//	.environment(\.mnemonicLanguageBinding, $mnemonicLanguage)
+			//
+			// ^ This doesn't work. Apparently you can't pass an environment variable thru a NavigationLink:
+			// https://stackoverflow.com/questions/59812640/environmentobject-doesnt-work-well-through-navigationlink
+			
+		case .RestoreView:
+			RestoreView()
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: View Helpers
+	// --------------------------------------------------
 	
 	var logoImageName: String {
 		if BusinessManager.isTestnet {
@@ -164,6 +229,14 @@ struct InitializationView: MVIView {
 		} else {
 			return "logo_green"
 		}
+	}
+	
+	func navLinkTagBinding() -> Binding<Bool> {
+		
+		return Binding<Bool>(
+			get: { navLinkTag != nil },
+			set: { if !$0 { navLinkTag = nil }}
+		)
 	}
 	
 	func createMnemonics() -> Void {
