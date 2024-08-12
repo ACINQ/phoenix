@@ -1013,6 +1013,12 @@
             "state" : "translated",
             "value" : "(image)"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(image)"
+          }
         }
       }
     },
@@ -1111,6 +1117,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "(Blesková nabídka)"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Blitzangebot)"
           }
         }
       }
@@ -1319,6 +1331,12 @@
             "state" : "translated",
             "value" : "(text)"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(text)"
+          }
         }
       }
     },
@@ -1497,6 +1515,12 @@
             "state" : "translated",
             "value" : "**vypnuto**: odeslané platby budou anonymní"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "**deaktiviert**: gesendete Zahlungen werden anonymisiert"
+          }
         }
       }
     },
@@ -1595,6 +1619,12 @@
             "state" : "translated",
             "value" : "**povoleno**: budou moci zjistit, kdy jsou platby od vás"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "**aktiviert**: Sie können erkennen, wenn die Zahlungen von Ihnen stammen"
+          }
         }
       }
     },
@@ -1644,6 +1674,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "**Tento požadavek na platbu Bolt12 je ekvivalentem adresy Bitcoinu v systému Lightning.**\n\nNa rozdíl od tradičních faktur Lightning nevyprší její platnost a lze ji použít opakovaně.\n\nMůžete ji široce sdílet : za dary, spropitné nebo za to, že vám zaplatí vaši přátelé.\n\n🛟 **Kdo podporuje Bolt12?\n\nV současné době podporuje Bolt12 jen několik služeb. Pokud některá služba tuto fakturu odmítá, dejte jí vědět, že o ni přichází!\n\n🪫 **Omezení**\n\nPro přijetí platby musí být telefon zapnutý a připojený k internetu. Problémy může způsobit také zapnutí TOR ve Phoenixu."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "**Diese Bolt12-Zahlungsanforderung ist das Lightning-Äquivalent zu einer Bitcoin-Adresse\n\nIm Gegensatz zu herkömmlichen Lightning-Rechnungen läuft sie nicht ab und kann wiederverwendet werden.\n\nGeben Sie sie weiter: für Spenden, Trinkgelder oder um von Ihren Freunden bezahlt zu werden.\n\n🛟 **Wer unterstützt Bolt12?**\n\nIm Moment unterstützen nur wenige Dienste Bolt12. Wenn ein Dienst diese Rechnung ablehnt, lassen Sie ihn wissen, dass er etwas verpasst!\n\n🪫 **Einschränkungen**\n\nIhr Telefon muss eingeschaltet und mit dem Internet verbunden sein, um eine Zahlung zu erhalten. Auch die Aktivierung von TOR in Phoenix kann zu Problemen führen."
           }
         }
       }
@@ -1788,6 +1824,12 @@
             "value" : "%1$@ - od %2$@"
           }
         },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ - von %2$@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -1808,6 +1850,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ - na %2$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ - bis %2$@"
           }
         },
         "en" : {
@@ -1861,6 +1909,12 @@
           }
         },
         "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ %2$@"
+          }
+        },
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ %2$@"
@@ -2858,6 +2912,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "+%@ příchozí likvidita"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+%@ eingehende Liquidität"
           }
         }
       }
@@ -4950,6 +5010,12 @@
             "state" : "translated",
             "value" : "Přidat kontakt"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontakt hinzufügen"
+          }
         }
       }
     },
@@ -6237,7 +6303,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bei einem Knoten in der Zahlungsroute ist ein Fehler aufgetreten. Die Zahlung kann erfolgreich sein, wenn Sie es erneut versuchen."
+            "value" : "Ein Fehler ist an einem Knoten in der Zahlungsroute aufgetreten. Die Zahlung kann erfolgreich sein, wenn Sie es erneut versuchen."
           }
         },
         "es" : {
@@ -6888,6 +6954,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Připojit zprávu"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nachricht hinzufügen"
           }
         }
       }
@@ -7812,6 +7884,12 @@
             "state" : "translated",
             "value" : "Se zprávy od neznámých zdrojů buďte opatrní"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seien Sie vorsichtig bei Nachrichten aus unbekannten Quellen"
+          }
         }
       }
     },
@@ -8021,6 +8099,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "BIP353 Adresa DNS"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "BIP353 DNS-Adresse"
           }
         }
       }
@@ -8635,6 +8719,12 @@
             "state" : "translated",
             "value" : "Nabídka Bolt12:"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Angebot von Bolt12:"
+          }
         }
       }
     },
@@ -8650,6 +8740,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bolt12 nabízí"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bolt12 bietet"
           }
         }
       }
@@ -9420,7 +9516,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Größe des Kanals beeinträchtigt"
+            "value" : "Kanalgröße beeinträchtigt"
           }
         },
         "es" : {
@@ -9454,7 +9550,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die Kanäle verarbeiten bereits einen Spleiß. Versuchen Sie es später noch einmal."
+            "value" : "Kanäle verarbeiten bereits einen Splice. Versuchen Sie es später noch einmal."
           }
         },
         "es" : {
@@ -9488,7 +9584,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die Kanäle schließen sich."
+            "value" : "Kanäle werden geschlossen."
           }
         },
         "es" : {
@@ -10033,6 +10129,12 @@
             "state" : "translated",
             "value" : "Vyžádat si mou adresu"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meine Adresse anfordern"
+          }
         }
       }
     },
@@ -10130,6 +10232,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Jasný obraz"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klares Bild"
           }
         }
       }
@@ -11712,6 +11820,12 @@
             "state" : "translated",
             "value" : "Kontaktní obrázek"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontakt Bild"
+          }
         }
       }
     },
@@ -11767,6 +11881,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kontakty"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontakte"
           }
         }
       }
@@ -11865,6 +11985,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zkopírovaný obrázek na nástěnku!"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bild in die Zwischenablage kopiert!"
           }
         }
       }
@@ -12207,6 +12333,12 @@
             "state" : "translated",
             "value" : "Možnosti kopírování"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Optionen kopieren"
+          }
         }
       }
     },
@@ -12543,6 +12675,12 @@
             "state" : "translated",
             "value" : "Nepodařilo se načíst platební údaje v přiměřené době. Příjemce může být offline nebo nedostupný."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Zahlungsdaten konnten nicht innerhalb einer angemessenen Zeit abgerufen werden. Der Empfänger ist möglicherweise offline oder unerreichbar."
+          }
         }
       }
     },
@@ -12558,6 +12696,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nepodařilo se načíst platební údaje. Obdržel neplatnou odpověď z uzlu."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konnte die Zahlungsdetails nicht abrufen. Ungültige Antwort vom Knoten erhalten."
           }
         }
       }
@@ -13482,6 +13626,12 @@
             "state" : "translated",
             "value" : "Odstranit kontakt"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontakt löschen"
+          }
         }
       }
     },
@@ -13497,6 +13647,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Smazat kontakt?"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontakt löschen?"
           }
         }
       }
@@ -14554,6 +14710,12 @@
             "state" : "translated",
             "value" : "Vyřazení změn"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Änderungen verwerfen"
+          }
         }
       }
     },
@@ -14610,6 +14772,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vyřazení změn?"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Änderungen verwerfen?"
           }
         }
       }
@@ -15451,6 +15619,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Upravit kontakt"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontakt bearbeiten"
           }
         }
       }
@@ -16713,6 +16887,12 @@
             "state" : "translated",
             "value" : "Experimentální"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Experimentelle"
+          }
         }
       }
     },
@@ -17405,7 +17585,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die Gebühr ist unzureichend."
+            "value" : "Gebühr ist nicht ausreichend."
           }
         },
         "es" : {
@@ -17954,6 +18134,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Získání faktury..."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechnung abholen..."
           }
         }
       }
@@ -18659,6 +18845,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Úplný URI"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vollständige URI"
           }
         }
       }
@@ -19669,6 +19861,12 @@
             "state" : "translated",
             "value" : "Jak používat"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wie zu verwenden"
+          }
         }
       }
     },
@@ -19685,6 +19883,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lidsky čitelná adresa"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Human-lesbare Adresse"
           }
         }
       }
@@ -21882,6 +22086,12 @@
             "value" : "Neplatná adresa DNS BIP353"
           }
         },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ungültige DNS-Adresse des BIP353"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -22059,6 +22269,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Neplatná nabídka"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ungültiges Angebot"
           }
         }
       }
@@ -22758,6 +22974,12 @@
             "state" : "translated",
             "value" : "Další informace"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erfahren Sie mehr"
+          }
         }
       }
     },
@@ -23082,6 +23304,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Poplatek za blesk"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blitzschutzgebühr"
           }
         }
       }
@@ -23427,6 +23655,12 @@
             "state" : "translated",
             "value" : "Blesková nabídka"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blitzangebot"
+          }
         }
       }
     },
@@ -23442,6 +23676,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bleskové nabídky"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blitzangebote"
           }
         }
       }
@@ -23539,6 +23779,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bleskový kód QR"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blitz-QR-Code"
           }
         }
       }
@@ -25904,6 +26150,12 @@
             "state" : "translated",
             "value" : "NOVINKA"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NEU"
+          }
         }
       }
     },
@@ -25959,6 +26211,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nový kontakt"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neuer Kontakt"
           }
         }
       }
@@ -26090,6 +26348,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zatím bez adresy..."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch keine Adresse..."
           }
         }
       }
@@ -26302,6 +26566,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Žádné shody pro vyhledávání"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Treffer für die Suche"
           }
         }
       }
@@ -28357,6 +28627,12 @@
             "state" : "translated",
             "value" : "Kód platby"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zahlungscode"
+          }
         }
       }
     },
@@ -28488,6 +28764,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Platba z %@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zahlung von %@"
           }
         }
       }
@@ -29231,6 +29513,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Platba na %@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zahlung an %@"
           }
         }
       }
@@ -31593,7 +31881,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Der Empfänger ist nicht erreichbar oder hat nicht genügend eingehende Liquidität."
+            "value" : "Der Empfänger ist nicht erreichbar oder hat nicht genügend Liquidität im Eingang."
           }
         },
         "es" : {
@@ -32391,7 +32679,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Überprüfen"
+            "value" : "Review"
           }
         },
         "es" : {
@@ -32628,6 +32916,12 @@
             "state" : "translated",
             "value" : "Uložení změn"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Änderungen speichern"
+          }
         }
       }
     },
@@ -32807,6 +33101,12 @@
             "state" : "translated",
             "value" : "Vyhledávání"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suche"
+          }
         }
       }
     },
@@ -32943,6 +33243,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vybrat obrázek"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bild auswählen"
           }
         }
       }
@@ -33518,6 +33824,12 @@
             "state" : "translated",
             "value" : "Odesláno"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesendet von"
+          }
         }
       }
     },
@@ -33533,6 +33845,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Odesláno do"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesendet an"
           }
         }
       }
@@ -34394,6 +34712,12 @@
             "state" : "translated",
             "value" : "Akciové opce"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktienoptionen"
+          }
         }
       }
     },
@@ -35014,6 +35338,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zobrazit jednorázovou fakturu"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einmalige Rechnung anzeigen"
           }
         }
       }
@@ -35688,6 +36018,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zobrazit opakovaně použitelné QR"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wiederverwendbare QR anzeigen"
           }
         }
       }
@@ -36833,6 +37169,12 @@
             "state" : "translated",
             "value" : "Vyfotografujte se"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto machen"
+          }
         }
       }
     },
@@ -37402,7 +37744,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Das Auslaufen dieser Zahlung liegt zu weit in der Zukunft."
+            "value" : "Der Verfall dieser Zahlung liegt zu weit in der Zukunft."
           }
         },
         "es" : {
@@ -38062,7 +38404,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Der Zahlungsbetrag ist zu hoch - versuchen Sie, ihn in mehrere Teile aufzuteilen."
+            "value" : "Der Zahlungsbetrag ist zu groß - versuchen Sie, ihn in mehrere Teile aufzuteilen."
           }
         },
         "es" : {
@@ -38096,7 +38438,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Der Zahlungsbetrag ist zu gering."
+            "value" : "Der Zahlungsbetrag ist zu klein."
           }
         },
         "es" : {
@@ -38130,7 +38472,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die Zahlung konnte nicht an den Empfänger weitergeleitet werden (wahrscheinlich unzureichende Liquidität im Eingang)."
+            "value" : "Die Zahlung konnte nicht an den Empfänger weitergeleitet werden (wahrscheinlich unzureichende eingehende Liquidität)."
           }
         },
         "es" : {
@@ -38164,7 +38506,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die Zahlung konnte nicht über Ihre bestehenden Kanäle übermittelt werden."
+            "value" : "Die Zahlung konnte nicht über Ihre vorhandenen Kanäle gesendet werden."
           }
         },
         "es" : {
@@ -38198,7 +38540,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die Zahlung wurde vom Empfänger abgelehnt. Die betreffende Rechnung wurde möglicherweise bereits bezahlt."
+            "value" : "Die Zahlung wurde vom Empfänger abgelehnt. Möglicherweise wurde diese Rechnung bereits bezahlt."
           }
         },
         "es" : {
@@ -38301,6 +38643,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Požadavek se vyčerpal. Zkontrolujte prosím své internetové připojení a zkuste to znovu."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Anfrage wurde abgebrochen. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut."
           }
         }
       }
@@ -38682,7 +39030,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die Brieftasche wurde neu gestartet, während die Zahlung verarbeitet wurde."
+            "value" : "Die Brieftasche wurde neu gestartet, während die Zahlung bearbeitet wurde."
           }
         },
         "es" : {
@@ -38836,7 +39184,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Diese Mittel wurden nicht rechtzeitig umgetauscht. Zum Ausgeben antippen."
+            "value" : "Diese Guthaben konnten nicht rechtzeitig getauscht werden. Tippen Sie auf, um diese Guthaben auszugeben."
           }
         },
         "es" : {
@@ -38987,6 +39335,12 @@
             "state" : "translated",
             "value" : "Tato adresa je hostována na nezabezpečeném DNS. DNSSEC musí být povolen."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Adresse wird über einen unsicheren DNS gehostet. DNSSEC muss aktiviert sein."
+          }
         }
       }
     },
@@ -39003,6 +39357,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tato adresa používá neplatnou nabídku Bolt12."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Adresse verwendet ein ungültiges Bolt12-Angebot."
           }
         }
       }
@@ -39343,7 +39703,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Diese Rechnung wurde bereits beglichen."
+            "value" : "Diese Zahlung wurde bereits getätigt."
           }
         },
         "es" : {
@@ -39406,6 +39766,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Toto je lidsky čitelná adresa pro vaši žádost o platbu Bolt12."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dies ist eine von Menschen lesbare Adresse für Ihre Bolt12-Zahlungsanfrage."
           }
         }
       }
@@ -39630,7 +39996,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Diese Zahlung übersteigt Ihren Saldo."
+            "value" : "Diese Zahlung übersteigt Ihr Guthaben."
           }
         },
         "es" : {
@@ -40061,6 +40427,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tip"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipp"
           }
         }
       }
@@ -40755,6 +41127,12 @@
             "state" : "translated",
             "value" : "Celkem"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Summe"
+          }
         }
       }
     },
@@ -41242,6 +41620,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Důvěryhodný kontakt"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vertrauensvoller Kontakt"
           }
         }
       }
@@ -41787,6 +42171,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Neznámá chyba nabídky"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unbekannter Angebotsfehler"
           }
         }
       }
@@ -43550,6 +43940,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Chcete hezčí adresu? Použijte služby třetích stran, nebo si adresu hostujte sami!"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wollen Sie eine hübschere Adresse? Verwenden Sie Dienste von Drittanbietern, oder hosten Sie die Adresse selbst!"
           }
         }
       }
@@ -45487,7 +45883,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sie haben zu viele ausstehende Zahlungen. Versuchen Sie es erneut, sobald diese beglichen sind."
+            "value" : "Sie haben zu viele ausstehende Zahlungen. Versuchen Sie es erneut, sobald sie abgewickelt sind."
           }
         },
         "es" : {
@@ -45590,6 +45986,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "K uplatnění nároku na adresu potřebujete alespoň jeden kanál. Zkuste přidat prostředky do peněženky a zkuste to znovu."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie benötigen mindestens einen Kanal, um Ihre Adresse zu beanspruchen. Versuchen Sie, Geld in Ihr Portemonnaie einzuzahlen und versuchen Sie es erneut."
           }
         }
       }
@@ -45928,7 +46330,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ihr Kanal wird noch nicht geöffnet. Warten Sie und versuchen Sie es erneut."
+            "value" : "Ihr Kanal wird noch geöffnet. Warten Sie und versuchen Sie es erneut."
           }
         },
         "es" : {
