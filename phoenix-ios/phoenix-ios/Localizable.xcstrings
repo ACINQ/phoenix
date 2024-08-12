@@ -1019,6 +1019,12 @@
             "state" : "translated",
             "value" : "(image)"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(image)"
+          }
         }
       }
     },
@@ -1123,6 +1129,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "(Blitzangebot)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Oferta relámpago)"
           }
         }
       }
@@ -1337,6 +1349,12 @@
             "state" : "translated",
             "value" : "(text)"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(text)"
+          }
         }
       }
     },
@@ -1521,6 +1539,12 @@
             "state" : "translated",
             "value" : "**deaktiviert**: gesendete Zahlungen werden anonymisiert"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "**desactivado**: los pagos enviados serán anónimos"
+          }
         }
       }
     },
@@ -1625,6 +1649,12 @@
             "state" : "translated",
             "value" : "**aktiviert**: Sie können erkennen, wenn die Zahlungen von Ihnen stammen"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "**habilitado**: podrán saber cuándo los pagos proceden de ti"
+          }
         }
       }
     },
@@ -1680,6 +1710,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "**Diese Bolt12-Zahlungsanforderung ist das Lightning-Äquivalent zu einer Bitcoin-Adresse\n\nIm Gegensatz zu herkömmlichen Lightning-Rechnungen läuft sie nicht ab und kann wiederverwendet werden.\n\nGeben Sie sie weiter: für Spenden, Trinkgelder oder um von Ihren Freunden bezahlt zu werden.\n\n🛟 **Wer unterstützt Bolt12?**\n\nIm Moment unterstützen nur wenige Dienste Bolt12. Wenn ein Dienst diese Rechnung ablehnt, lassen Sie ihn wissen, dass er etwas verpasst!\n\n🪫 **Einschränkungen**\n\nIhr Telefon muss eingeschaltet und mit dem Internet verbunden sein, um eine Zahlung zu erhalten. Auch die Aktivierung von TOR in Phoenix kann zu Problemen führen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "**Esta solicitud de pago Bolt12 es el equivalente Lightning a una dirección Bitcoin.**\n\nA diferencia de las facturas Lightning tradicionales, no caduca y puede reutilizarse.\n\nCompártela ampliamente: para donaciones, propinas o para que te paguen tus amigos.\n\n🛟 **¿Quién admite Bolt12?**\n\nPor el momento, pocos servicios admiten Bolt12. Si un servicio rechaza esta factura, ¡hazle saber que se lo está perdiendo!\n\n🪫 **Restricciones**\n\nTu teléfono debe estar encendido y conectado a Internet para recibir un pago. También activar TOR en Phoenix puede causar problemas."
           }
         }
       }
@@ -1835,6 +1871,12 @@
             "state" : "new",
             "value" : "%1$@ - from %2$@"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ - de %2$@"
+          }
         }
       }
     },
@@ -1862,6 +1904,12 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$@ - to %2$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ - a %2$@"
           }
         }
       }
@@ -1923,6 +1971,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
+            "value" : "%1$@ %2$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "%1$@ %2$@"
           }
         }
@@ -2918,6 +2972,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "+%@ eingehende Liquidität"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+%@ liquidez entrante"
           }
         }
       }
@@ -4785,7 +4845,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Acerca de"
+            "value" : "Sobre Phoenix"
           }
         },
         "es-419" : {
@@ -5015,6 +5075,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kontakt hinzufügen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir contacto"
           }
         }
       }
@@ -6891,7 +6957,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¿Está seguro que quiere proceder?"
+            "value" : "¿Está seguro de que desea continuar?"
           }
         },
         "es-419" : {
@@ -6960,6 +7026,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nachricht hinzufügen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adjuntar un mensaje"
           }
         }
       }
@@ -7890,6 +7962,12 @@
             "state" : "translated",
             "value" : "Seien Sie vorsichtig bei Nachrichten aus unbekannten Quellen"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ten cuidado con los mensajes de fuentes desconocidas"
+          }
         }
       }
     },
@@ -7916,7 +7994,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Por debajo de la tarifa esperada. Algunos pagos pueden ser rechazados."
+            "value" : "Por debajo de la tasa prevista. Algunos pagos pueden ser rechazados."
           }
         },
         "es-419" : {
@@ -8105,6 +8183,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "BIP353 DNS-Adresse"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "BIP353 Dirección DNS"
           }
         }
       }
@@ -8493,7 +8577,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bitcoin sobrealimentado"
+            "value" : "Bitcoin supercharged"
           }
         },
         "es-419" : {
@@ -8725,6 +8809,12 @@
             "state" : "translated",
             "value" : "Angebot von Bolt12:"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oferta Bolt12:"
+          }
         }
       }
     },
@@ -8746,6 +8836,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bolt12 bietet"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bolt12 ofrece"
           }
         }
       }
@@ -9556,7 +9652,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Los canales ya están procesando un empalme. Vuelve a intentarlo más tarde."
+            "value" : "Los canales ya están procesando un Splice. Inténtelo de nuevo más tarde."
           }
         },
         "fr" : {
@@ -9590,7 +9686,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Los canales se cierran."
+            "value" : "Los canales se están cerrando."
           }
         },
         "fr" : {
@@ -10135,6 +10231,12 @@
             "state" : "translated",
             "value" : "Meine Adresse anfordern"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reclamar mi dirección"
+          }
         }
       }
     },
@@ -10238,6 +10340,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Klares Bild"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imagen nítida"
           }
         }
       }
@@ -11826,6 +11934,12 @@
             "state" : "translated",
             "value" : "Kontakt Bild"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imagen de contacto"
+          }
         }
       }
     },
@@ -11887,6 +12001,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kontakte"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contactos"
           }
         }
       }
@@ -11991,6 +12111,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bild in die Zwischenablage kopiert!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imagen copiada en la mesa de trabajo"
           }
         }
       }
@@ -12339,6 +12465,12 @@
             "state" : "translated",
             "value" : "Optionen kopieren"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opciones de copia"
+          }
         }
       }
     },
@@ -12681,6 +12813,12 @@
             "state" : "translated",
             "value" : "Die Zahlungsdaten konnten nicht innerhalb einer angemessenen Zeit abgerufen werden. Der Empfänger ist möglicherweise offline oder unerreichbar."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se han podido recuperar los datos del pago en un tiempo razonable. El destinatario puede estar desconectado o ilocalizable."
+          }
         }
       }
     },
@@ -12702,6 +12840,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Konnte die Zahlungsdetails nicht abrufen. Ungültige Antwort vom Knoten erhalten."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se han podido recuperar los datos de pago. Se ha recibido una respuesta no válida del nodo."
           }
         }
       }
@@ -12729,7 +12873,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Crear nueva billetera"
+            "value" : "Crear una nueva cartera"
           }
         },
         "es-419" : {
@@ -13632,6 +13776,12 @@
             "state" : "translated",
             "value" : "Kontakt löschen"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borrar contacto"
+          }
         }
       }
     },
@@ -13653,6 +13803,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kontakt löschen?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Borrar contacto?"
           }
         }
       }
@@ -14716,6 +14872,12 @@
             "state" : "translated",
             "value" : "Änderungen verwerfen"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descartar cambios"
+          }
         }
       }
     },
@@ -14778,6 +14940,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Änderungen verwerfen?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Descartar cambios?"
           }
         }
       }
@@ -14959,7 +15127,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mostrar"
+            "value" : "Visualización"
           }
         },
         "es-419" : {
@@ -15040,7 +15208,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mostrar semilla"
+            "value" : "Mostrar semillas"
           }
         },
         "es-419" : {
@@ -15626,6 +15794,12 @@
             "state" : "translated",
             "value" : "Kontakt bearbeiten"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar contacto"
+          }
         }
       }
     },
@@ -15852,7 +16026,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Servidor Electrum"
+            "value" : "Electrum server"
           }
         },
         "es-419" : {
@@ -16893,6 +17067,12 @@
             "state" : "translated",
             "value" : "Experimentelle"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Experimental"
+          }
         }
       }
     },
@@ -17591,7 +17771,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La tasa es insuficiente."
+            "value" : "La tarifa es insuficiente."
           }
         },
         "fr" : {
@@ -18141,6 +18321,12 @@
             "state" : "translated",
             "value" : "Rechnung abholen..."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscando factura..."
+          }
         }
       }
     },
@@ -18573,7 +18759,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Forzar el cierre de canales"
+            "value" : "Forzar cierre de canales"
           }
         },
         "es-419" : {
@@ -18851,6 +19037,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vollständige URI"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URI completo"
           }
         }
       }
@@ -19187,7 +19379,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "General"
+            "value" : "Configuración general"
           }
         },
         "es-419" : {
@@ -19867,6 +20059,12 @@
             "state" : "translated",
             "value" : "Wie zu verwenden"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cómo utilizarlo"
+          }
         }
       }
     },
@@ -19889,6 +20087,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Human-lesbare Adresse"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dirección legible por humanos"
           }
         }
       }
@@ -19916,7 +20120,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Guardé mi frase de recuperación en un lugar seguro."
+            "value" : "He guardado mi frase de recuperación en algún lugar seguro."
           }
         },
         "es-419" : {
@@ -21743,7 +21947,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Los pagos entrantes a veces requieren transacciones en cadena. Esto no siempre sucede, sólo cuando es necesario."
+            "value" : "Los pagos entrantes a veces requieren transacciones en la cadena. Esto no ocurre siempre, solo cuando es necesario."
           }
         },
         "es-419" : {
@@ -21783,7 +21987,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Se rechazarán los pagos entrantes que requieran operaciones en cadena."
+            "value" : "Los pagos entrantes que requieran operaciones en la cadena serán rechazados."
           }
         },
         "es-419" : {
@@ -22092,6 +22296,12 @@
             "value" : "Ungültige DNS-Adresse des BIP353"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dirección DNS BIP353 no válida"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -22275,6 +22485,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ungültiges Angebot"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oferta no válida"
           }
         }
       }
@@ -22980,6 +23196,12 @@
             "state" : "translated",
             "value" : "Erfahren Sie mehr"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Más información"
+          }
         }
       }
     },
@@ -23310,6 +23532,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Blitzschutzgebühr"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tasa por rayos"
           }
         }
       }
@@ -23661,6 +23889,12 @@
             "state" : "translated",
             "value" : "Blitzangebot"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oferta relámpago"
+          }
         }
       }
     },
@@ -23682,6 +23916,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Blitzangebote"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ofertas relámpago"
           }
         }
       }
@@ -23785,6 +24025,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Blitz-QR-Code"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Código QR del rayo"
           }
         }
       }
@@ -24239,7 +24485,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Registros"
+            "value" : "Logs"
           }
         },
         "es-419" : {
@@ -24360,7 +24606,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¡Feerate bajo!"
+            "value" : "¡Baja tasa!"
           }
         },
         "fr" : {
@@ -24837,7 +25083,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importe máximo de la tarifa"
+            "value" : "Importe máximo de la tasa"
           }
         },
         "es-419" : {
@@ -25568,7 +25814,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tarifa de minero"
+            "value" : "Tasa del minero"
           }
         },
         "es-419" : {
@@ -26156,6 +26402,12 @@
             "state" : "translated",
             "value" : "NEU"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NUEVO"
+          }
         }
       }
     },
@@ -26217,6 +26469,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Neuer Kontakt"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuevo contacto"
           }
         }
       }
@@ -26354,6 +26612,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Noch keine Adresse..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aún no hay dirección..."
           }
         }
       }
@@ -26572,6 +26836,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Keine Treffer für die Suche"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay resultados para la búsqueda"
           }
         }
       }
@@ -28633,6 +28903,12 @@
             "state" : "translated",
             "value" : "Zahlungscode"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Código de pago"
+          }
         }
       }
     },
@@ -28770,6 +29046,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zahlung von %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pago de %@"
           }
         }
       }
@@ -29520,6 +29802,12 @@
             "state" : "translated",
             "value" : "Zahlung an %@"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pago a %@"
+          }
         }
       }
     },
@@ -30110,7 +30398,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Phoenix tiene custodia propia. Tú tomas el control."
+            "value" : "Phoenix es autocustodia. Tú tomas el control."
           }
         },
         "es-419" : {
@@ -31887,7 +32175,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El destinatario no está localizable, o no tiene suficiente liquidez entrante."
+            "value" : "El destinatario no está localizable o no tiene suficiente liquidez entrante."
           }
         },
         "fr" : {
@@ -32409,7 +32697,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Restablecer billetera"
+            "value" : "Reiniciar cartera"
           }
         },
         "es-419" : {
@@ -32531,7 +32819,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Restaurar mi billetera"
+            "value" : "Restaurar mi cartera"
           }
         },
         "es-419" : {
@@ -32685,7 +32973,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Revisar"
+            "value" : "Validar"
           }
         },
         "es-419" : {
@@ -32922,6 +33210,12 @@
             "state" : "translated",
             "value" : "Änderungen speichern"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar cambios"
+          }
         }
       }
     },
@@ -33107,6 +33401,12 @@
             "state" : "translated",
             "value" : "Suche"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Busca en"
+          }
         }
       }
     },
@@ -33249,6 +33549,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bild auswählen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleccionar imagen"
           }
         }
       }
@@ -33830,6 +34136,12 @@
             "state" : "translated",
             "value" : "Gesendet von"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviado por"
+          }
         }
       }
     },
@@ -33851,6 +34163,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gesendet an"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviado a"
           }
         }
       }
@@ -34440,7 +34758,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ajustes"
+            "value" : "Configuración"
           }
         },
         "es-419" : {
@@ -34717,6 +35035,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aktienoptionen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opciones sobre acciones"
           }
         }
       }
@@ -35344,6 +35668,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Einmalige Rechnung anzeigen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar factura única"
           }
         }
       }
@@ -36025,6 +36355,12 @@
             "state" : "translated",
             "value" : "Wiederverwendbare QR anzeigen"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar QR reutilizables"
+          }
         }
       }
     },
@@ -36131,7 +36467,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Omitir la verificación de tarifa absoluta para Lightning"
+            "value" : "Omitir la comprobación absoluta de tasas para Lightning"
           }
         },
         "es-419" : {
@@ -37057,7 +37393,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Billetera Swap-in"
+            "value" : "Cartera swap-in"
           }
         },
         "es-419" : {
@@ -37174,6 +37510,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Foto machen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haz una foto"
           }
         }
       }
@@ -37750,7 +38092,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El vencimiento de este pago está demasiado lejos en el futuro."
+            "value" : "El vencimiento de este pago es demasiado lejano."
           }
         },
         "fr" : {
@@ -38090,7 +38432,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El ID del pago no es válido. Inténtalo de nuevo."
+            "value" : "El ID del pago no es válido. Inténtelo de nuevo."
           }
         },
         "fr" : {
@@ -38410,7 +38752,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El importe del pago es demasiado grande - intenta dividirlo en varias partes."
+            "value" : "El importe del pago es demasiado grande - intente dividirlo en varias partes."
           }
         },
         "fr" : {
@@ -38478,7 +38820,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El pago no pudo ser retransmitido al destinatario (probablemente insuficiente liquidez de entrada)."
+            "value" : "El pago no se ha podido retransmitir al destinatario (probablemente liquidez entrante insuficiente)."
           }
         },
         "fr" : {
@@ -38512,7 +38854,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No se ha podido enviar el pago a través de tus canales existentes."
+            "value" : "El pago no se ha podido enviar a través de sus canales existentes."
           }
         },
         "fr" : {
@@ -38546,7 +38888,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El pago fue rechazado por el destinatario. Es posible que esta factura en concreto ya se haya pagado."
+            "value" : "El pago ha sido rechazado por el destinatario. Es posible que esta factura en concreto ya se haya pagado."
           }
         },
         "fr" : {
@@ -38580,7 +38922,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El destinatario está desconectado."
+            "value" : "El destinatario no está conectado."
           }
         },
         "fr" : {
@@ -38649,6 +38991,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Die Anfrage wurde abgebrochen. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La solicitud ha expirado. Comprueba tu conexión a Internet e inténtalo de nuevo."
           }
         }
       }
@@ -39036,7 +39384,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El monedero se reinició mientras se procesaba el pago."
+            "value" : "La cartera se ha reiniciado mientras se procesaba el pago."
           }
         },
         "fr" : {
@@ -39190,7 +39538,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Estos fondos no se intercambiaron a tiempo. Toca para gastar."
+            "value" : "Estos fondos no fueron canjeados a tiempo. Toque para gastar estos fondos."
           }
         },
         "fr" : {
@@ -39341,6 +39689,12 @@
             "state" : "translated",
             "value" : "Diese Adresse wird über einen unsicheren DNS gehostet. DNSSEC muss aktiviert sein."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta dirección está alojada en un DNS no seguro. DNSSEC debe estar habilitado."
+          }
         }
       }
     },
@@ -39363,6 +39717,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Diese Adresse verwendet ein ungültiges Bolt12-Angebot."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta dirección utiliza una oferta Bolt12 no válida."
           }
         }
       }
@@ -39773,6 +40133,12 @@
             "state" : "translated",
             "value" : "Dies ist eine von Menschen lesbare Adresse für Ihre Bolt12-Zahlungsanfrage."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta es una dirección humanamente legible para su solicitud de pago Bolt12."
+          }
         }
       }
     },
@@ -40002,7 +40368,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Este pago supera tu saldo."
+            "value" : "Este pago supera su saldo."
           }
         },
         "fr" : {
@@ -40433,6 +40799,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tipp"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consejo"
           }
         }
       }
@@ -41015,7 +41387,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tor está Habilitado"
+            "value" : "Tor está activado"
           }
         },
         "es-419" : {
@@ -41132,6 +41504,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Summe"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total"
           }
         }
       }
@@ -41626,6 +42004,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vertrauensvoller Kontakt"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contacto de confianza"
           }
         }
       }
@@ -42177,6 +42561,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Unbekannter Angebotsfehler"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error de oferta desconocida"
           }
         }
       }
@@ -43830,7 +44220,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Información de billetera"
+            "value" : "Información de la cartera"
           }
         },
         "es-419" : {
@@ -43946,6 +44336,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wollen Sie eine hübschere Adresse? Verwenden Sie Dienste von Drittanbietern, oder hosten Sie die Adresse selbst!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Quieres una dirección más bonita? Utilice servicios de terceros o aloje usted mismo la dirección."
           }
         }
       }
@@ -44093,7 +44489,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Alerta de torre de vigilancia"
+            "value" : "Alerta de la Watchtower"
           }
         },
         "es-419" : {
@@ -44213,7 +44609,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reporte de torre de vigilancia"
+            "value" : "Informe de la Watchtower"
           }
         },
         "es-419" : {
@@ -44333,7 +44729,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¡Bienvenido!"
+            "value" : "Bienvenido!"
           }
         },
         "es-419" : {
@@ -44730,7 +45126,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Con Phoenix enviar y recibir bitcoins es fácil y seguro."
+            "value" : "Con Phoenix, enviar y recibir bitcoins es fácil y seguro."
           }
         },
         "es-419" : {
@@ -45325,7 +45721,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Puede restaurar su billetera en cualquier momento usando su clave secreta. ¡Manténlo seguro!"
+            "value" : "Puedes restaurar tu cartera en cualquier momento utilizando tu clave secreta. ¡Manténgalo a salvo!"
           }
         },
         "es-419" : {
@@ -45849,7 +46245,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¡No has hecho una copia de seguridad de tu frase de recuperación!"
+            "value" : "No has hecho una copia de seguridad de tu frase de recuperación."
           }
         },
         "es-419" : {
@@ -45889,7 +46285,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tienes demasiados pagos pendientes. Vuelve a intentarlo cuando se hayan liquidado."
+            "value" : "Tienes demasiados pagos pendientes. Vuelva a intentarlo una vez que se hayan liquidado."
           }
         },
         "fr" : {
@@ -45992,6 +46388,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sie benötigen mindestens einen Kanal, um Ihre Adresse zu beanspruchen. Versuchen Sie, Geld in Ihr Portemonnaie einzuzahlen und versuchen Sie es erneut."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Necesitas al menos un canal para reclamar tu dirección. Intenta añadir fondos a tu monedero e inténtalo de nuevo."
           }
         }
       }
@@ -46336,7 +46738,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu canal aún está en proceso de apertura. Espera e inténtalo de nuevo."
+            "value" : "Tu canal aún está en proceso de apertura. Espere e inténtelo de nuevo."
           }
         },
         "fr" : {
@@ -46410,7 +46812,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu clave, tus bitcoins"
+            "value" : "Tu llave, tus bitcoins"
           }
         },
         "es-419" : {

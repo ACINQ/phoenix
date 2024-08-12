@@ -699,6 +699,9 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z"
       },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z"
+      },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
       }
@@ -768,6 +771,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "(Blesková nabídka)"
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "(Blitzangebot)"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -916,6 +923,9 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z"
       },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z"
+      },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
       }
@@ -1045,6 +1055,10 @@
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "**vypnuto**: odeslané platby budou anonymní"
       },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "**deaktiviert**: gesendete Zahlungen werden anonymisiert"
+      },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
       }
@@ -1116,6 +1130,10 @@
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "**povoleno**: budou moci zjistit, kdy jsou platby od vás"
       },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "**aktiviert**: Sie können erkennen, wenn die Zahlungen von Ihnen stammen"
+      },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
       }
@@ -1153,6 +1171,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "**Tento požadavek na platbu Bolt12 je ekvivalentem adresy Bitcoinu v systému Lightning.**\n\nNa rozdíl od tradičních faktur Lightning nevyprší její platnost a lze ji použít opakovaně.\n\nMůžete ji široce sdílet : za dary, spropitné nebo za to, že vám zaplatí vaši přátelé.\n\n🛟 **Kdo podporuje Bolt12?\n\nV současné době podporuje Bolt12 jen několik služeb. Pokud některá služba tuto fakturu odmítá, dejte jí vědět, že o ni přichází!\n\n🪫 **Omezení**\n\nPro přijetí platby musí být telefon zapnutý a připojený k internetu. Problémy může způsobit také zapnutí TOR ve Phoenixu."
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "**Diese Bolt12-Zahlungsanforderung ist das Lightning-Äquivalent zu einer Bitcoin-Adresse\n\nIm Gegensatz zu herkömmlichen Lightning-Rechnungen läuft sie nicht ab und kann wiederverwendet werden.\n\nGeben Sie sie weiter: für Spenden, Trinkgelder oder um von Ihren Freunden bezahlt zu werden.\n\n🛟 **Wer unterstützt Bolt12?**\n\nIm Moment unterstützen nur wenige Dienste Bolt12. Wenn ein Dienst diese Rechnung ablehnt, lassen Sie ihn wissen, dass er etwas verpasst!\n\n🪫 **Einschränkungen**\n\nIhr Telefon muss eingeschaltet und mit dem Internet verbunden sein, um eine Zahlung zu erhalten. Auch die Aktivierung von TOR in Phoenix kann zu Problemen führen."
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -1243,6 +1265,10 @@
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "%1$@ - od %2$@"
       },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "%1$@ - von %2$@"
+      },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z",
         "v" : "%1$@ - from %2$@"
@@ -1256,6 +1282,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "%1$@ - na %2$@"
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "%1$@ - bis %2$@"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -1294,6 +1324,10 @@
       },
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
+        "v" : "%1$@ %2$@"
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
         "v" : "%1$@ %2$@"
       },
       "en" : {
@@ -1970,6 +2004,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "+%@ příchozí likvidita"
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "+%@ eingehende Liquidität"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -3446,6 +3484,10 @@
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Přidat kontakt"
       },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Kontakt hinzufügen"
+      },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
       }
@@ -4368,8 +4410,8 @@
         "v" : "Na uzlu v platební trase došlo k chybě. Platba může být úspěšná, pokud se o ni pokusíte znovu."
       },
       "de" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Bei einem Knoten in der Zahlungsroute ist ein Fehler aufgetreten. Die Zahlung kann erfolgreich sein, wenn Sie es erneut versuchen."
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Ein Fehler ist an einem Knoten in der Zahlungsroute aufgetreten. Die Zahlung kann erfolgreich sein, wenn Sie es erneut versuchen."
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -4839,6 +4881,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Připojit zprávu"
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Nachricht hinzufügen"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -5503,6 +5549,10 @@
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Se zprávy od neznámých zdrojů buďte opatrní"
       },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Seien Sie vorsichtig bei Nachrichten aus unbekannten Quellen"
+      },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
       }
@@ -5655,6 +5705,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "BIP353 Adresa DNS"
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "BIP353 DNS-Adresse"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -6081,6 +6135,10 @@
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Nabídka Bolt12:"
       },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Angebot von Bolt12:"
+      },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
       }
@@ -6093,6 +6151,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Bolt12 nabízí"
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Bolt12 bietet"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -6646,8 +6708,8 @@
         "v" : "Ovlivněna velikost kanálu"
       },
       "de" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Größe des Kanals beeinträchtigt"
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Kanalgröße beeinträchtigt"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -6671,8 +6733,8 @@
         "v" : "Kanály již zpracovávají splicing. Zkuste to později."
       },
       "de" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Die Kanäle verarbeiten bereits einen Spleiß. Versuchen Sie es später noch einmal."
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Kanäle verarbeiten bereits einen Splice. Versuchen Sie es später noch einmal."
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -6696,8 +6758,8 @@
         "v" : "Kanály se uzavírají."
       },
       "de" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Die Kanäle schließen sich."
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Kanäle werden geschlossen."
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -7093,6 +7155,10 @@
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Vyžádat si mou adresu"
       },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Meine Adresse anfordern"
+      },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
       }
@@ -7163,6 +7229,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Jasný obraz"
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Klares Bild"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -8294,6 +8364,10 @@
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Kontaktní obrázek"
       },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Kontakt Bild"
+      },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
       }
@@ -8335,6 +8409,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Kontakty"
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Kontakte"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -8406,6 +8484,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Zkopírovaný obrázek na nástěnku!"
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Bild in die Zwischenablage kopiert!"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -8652,6 +8734,10 @@
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Možnosti kopírování"
       },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Optionen kopieren"
+      },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
       }
@@ -8892,6 +8978,10 @@
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Nepodařilo se načíst platební údaje v přiměřené době. Příjemce může být offline nebo nedostupný."
       },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Die Zahlungsdaten konnten nicht innerhalb einer angemessenen Zeit abgerufen werden. Der Empfänger ist möglicherweise offline oder unerreichbar."
+      },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
       }
@@ -8904,6 +8994,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Nepodařilo se načíst platební údaje. Obdržel neplatnou odpověď z uzlu."
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Konnte die Zahlungsdetails nicht abrufen. Ungültige Antwort vom Knoten erhalten."
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -9573,6 +9667,10 @@
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Odstranit kontakt"
       },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Kontakt löschen"
+      },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
       }
@@ -9585,6 +9683,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Smazat kontakt?"
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Kontakt löschen?"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -10342,6 +10444,10 @@
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Vyřazení změn"
       },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Änderungen verwerfen"
+      },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
       }
@@ -10383,6 +10489,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Vyřazení změn?"
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Änderungen verwerfen?"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -10993,6 +11103,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Upravit kontakt"
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Kontakt bearbeiten"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -11895,6 +12009,10 @@
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Experimentální"
       },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Experimentelle"
+      },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
       }
@@ -12387,8 +12505,8 @@
         "v" : "Poplatek je nedostatečný."
       },
       "de" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Die Gebühr ist unzureichend."
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Gebühr ist nicht ausreichend."
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -12780,6 +12898,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Získání faktury..."
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Rechnung abholen..."
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -13283,6 +13405,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Úplný URI"
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Vollständige URI"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -14011,6 +14137,10 @@
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Jak používat"
       },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Wie zu verwenden"
+      },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
       }
@@ -14023,6 +14153,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Lidsky čitelná adresa"
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Human-lesbare Adresse"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -15593,6 +15727,10 @@
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Neplatná adresa DNS BIP353"
       },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Ungültige DNS-Adresse des BIP353"
+      },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
       },
@@ -15721,6 +15859,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Neplatná nabídka"
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Ungültiges Angebot"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -16223,6 +16365,10 @@
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Další informace"
       },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Erfahren Sie mehr"
+      },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
       }
@@ -16451,6 +16597,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Poplatek za blesk"
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Blitzschutzgebühr"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -16695,6 +16845,10 @@
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Blesková nabídka"
       },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Blitzangebot"
+      },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
       }
@@ -16707,6 +16861,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Bleskové nabídky"
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Blitzangebote"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -16777,6 +16935,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Bleskový kód QR"
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Blitz-QR-Code"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -18442,6 +18604,10 @@
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "NOVINKA"
       },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "NEU"
+      },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
       }
@@ -18483,6 +18649,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Nový kontakt"
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Neuer Kontakt"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -18577,6 +18747,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Zatím bez adresy..."
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Noch keine Adresse..."
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -18731,6 +18905,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Žádné shody pro vyhledávání"
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Keine Treffer für die Suche"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -20200,6 +20378,10 @@
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Kód platby"
       },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Zahlungscode"
+      },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
       }
@@ -20295,6 +20477,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Platba z %@"
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Zahlung von %@"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -20829,6 +21015,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Platba na %@"
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Zahlung an %@"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -22514,8 +22704,8 @@
         "v" : "Příjemce není dosažitelný nebo nemá dostatečnou příchozí likviditu."
       },
       "de" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Der Empfänger ist nicht erreichbar oder hat nicht genügend eingehende Liquidität."
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Der Empfänger ist nicht erreichbar oder hat nicht genügend Liquidität im Eingang."
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -23082,8 +23272,7 @@
         "v" : "Zobrazit"
       },
       "de" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Überprüfen"
+        "ts" : "2024-08-12T21:21:28Z"
       },
       "en" : {
         "ts" : "2024-04-30T15:55:52Z"
@@ -23250,6 +23439,10 @@
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Uložení změn"
       },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Änderungen speichern"
+      },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
       }
@@ -23379,6 +23572,10 @@
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Vyhledávání"
       },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Suche"
+      },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
       }
@@ -23478,6 +23675,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Vybrat obrázek"
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Bild auswählen"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -23893,6 +24094,10 @@
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Odesláno"
       },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Gesendet von"
+      },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
       }
@@ -23905,6 +24110,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Odesláno do"
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Gesendet an"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -24514,6 +24723,10 @@
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Akciové opce"
       },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Aktienoptionen"
+      },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
       }
@@ -24957,6 +25170,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Zobrazit jednorázovou fakturu"
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Einmalige Rechnung anzeigen"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -25434,6 +25651,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Zobrazit opakovaně použitelné QR"
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Wiederverwendbare QR anzeigen"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -26249,6 +26470,10 @@
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Vyfotografujte se"
       },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Foto machen"
+      },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
       }
@@ -26653,8 +26878,8 @@
         "v" : "Konec platnosti této platby je příliš daleko v budoucnosti."
       },
       "de" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Das Auslaufen dieser Zahlung liegt zu weit in der Zukunft."
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Der Verfall dieser Zahlung liegt zu weit in der Zukunft."
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -27110,8 +27335,8 @@
         "v" : "Částka je příliš velká - zkuste ji rozdělit na více částí."
       },
       "de" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Der Zahlungsbetrag ist zu hoch - versuchen Sie, ihn in mehrere Teile aufzuteilen."
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Der Zahlungsbetrag ist zu groß - versuchen Sie, ihn in mehrere Teile aufzuteilen."
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -27135,8 +27360,8 @@
         "v" : "Částka je příliš malá."
       },
       "de" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Der Zahlungsbetrag ist zu gering."
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Der Zahlungsbetrag ist zu klein."
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -27160,8 +27385,8 @@
         "v" : "Platbu nebylo možné předat příjemci (pravděpodobně nedostatečná příchozí likvidita)."
       },
       "de" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Die Zahlung konnte nicht an den Empfänger weitergeleitet werden (wahrscheinlich unzureichende Liquidität im Eingang)."
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Die Zahlung konnte nicht an den Empfänger weitergeleitet werden (wahrscheinlich unzureichende eingehende Liquidität)."
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -27185,8 +27410,8 @@
         "v" : "Platba nemohla být odeslána prostřednictvím vašich stávajících kanálů."
       },
       "de" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Die Zahlung konnte nicht über Ihre bestehenden Kanäle übermittelt werden."
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Die Zahlung konnte nicht über Ihre vorhandenen Kanäle gesendet werden."
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -27210,8 +27435,8 @@
         "v" : "Příjemce platbu odmítl. Tato konkrétní faktura již mohla být uhrazena."
       },
       "de" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Die Zahlung wurde vom Empfänger abgelehnt. Die betreffende Rechnung wurde möglicherweise bereits bezahlt."
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Die Zahlung wurde vom Empfänger abgelehnt. Möglicherweise wurde diese Rechnung bereits bezahlt."
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -27287,6 +27512,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Požadavek se vyčerpal. Zkontrolujte prosím své internetové připojení a zkuste to znovu."
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Die Anfrage wurde abgebrochen. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut."
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -27559,8 +27788,8 @@
         "v" : "Peněženka byla restartována během zpracování platby."
       },
       "de" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Die Brieftasche wurde neu gestartet, während die Zahlung verarbeitet wurde."
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Die Brieftasche wurde neu gestartet, während die Zahlung bearbeitet wurde."
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -27671,8 +27900,8 @@
         "v" : "Tyto prostředky nebyly převedeny včas. Klepnutím na tlačítko tyto prostředky utratíte."
       },
       "de" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Diese Mittel wurden nicht rechtzeitig umgetauscht. Zum Ausgeben antippen."
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Diese Guthaben konnten nicht rechtzeitig getauscht werden. Tippen Sie auf, um diese Guthaben auszugeben."
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -27782,6 +28011,10 @@
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Tato adresa je hostována na nezabezpečeném DNS. DNSSEC musí být povolen."
       },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Diese Adresse wird über einen unsicheren DNS gehostet. DNSSEC muss aktiviert sein."
+      },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
       }
@@ -27794,6 +28027,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Tato adresa používá neplatnou nabídku Bolt12."
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Diese Adresse verwendet ein ungültiges Bolt12-Angebot."
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -28037,8 +28274,8 @@
         "v" : "Tato faktura již byla uhrazena."
       },
       "de" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Diese Rechnung wurde bereits beglichen."
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Diese Zahlung wurde bereits getätigt."
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -28085,6 +28322,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Toto je lidsky čitelná adresa pro vaši žádost o platbu Bolt12."
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Dies ist eine von Menschen lesbare Adresse für Ihre Bolt12-Zahlungsanfrage."
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -28245,8 +28486,8 @@
         "v" : "Tato platba přesahuje váš zůstatek."
       },
       "de" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Diese Zahlung übersteigt Ihren Saldo."
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Diese Zahlung übersteigt Ihr Guthaben."
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -28556,6 +28797,10 @@
       },
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z"
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Tipp"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -29046,6 +29291,10 @@
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Celkem"
       },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Summe"
+      },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
       }
@@ -29388,6 +29637,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Důvěryhodný kontakt"
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Vertrauensvoller Kontakt"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -29772,6 +30025,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Neznámá chyba nabídky"
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Unbekannter Angebotsfehler"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -31039,6 +31296,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "Chcete hezčí adresu? Použijte služby třetích stran, nebo si adresu hostujte sami!"
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Wollen Sie eine hübschere Adresse? Verwenden Sie Dienste von Drittanbietern, oder hosten Sie die Adresse selbst!"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -32434,8 +32695,8 @@
         "v" : "Máte příliš mnoho čekajících plateb. Zkuste to znovu, jakmile budou vypořádány."
       },
       "de" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Sie haben zu viele ausstehende Zahlungen. Versuchen Sie es erneut, sobald diese beglichen sind."
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Sie haben zu viele ausstehende Zahlungen. Versuchen Sie es erneut, sobald sie abgewickelt sind."
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -32511,6 +32772,10 @@
       "cs" : {
         "ts" : "2024-08-12T21:18:59Z",
         "v" : "K uplatnění nároku na adresu potřebujete alespoň jeden kanál. Zkuste přidat prostředky do peněženky a zkuste to znovu."
+      },
+      "de" : {
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Sie benötigen mindestens einen Kanal, um Ihre Adresse zu beanspruchen. Versuchen Sie, Geld in Ihr Portemonnaie einzuzahlen und versuchen Sie es erneut."
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -32751,8 +33016,8 @@
         "v" : "Váš kanál je stále v procesu otevírání. Počkejte a zkuste to znovu."
       },
       "de" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Ihr Kanal wird noch nicht geöffnet. Warten Sie und versuchen Sie es erneut."
+        "ts" : "2024-08-12T21:21:28Z",
+        "v" : "Ihr Kanal wird noch geöffnet. Warten Sie und versuchen Sie es erneut."
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
