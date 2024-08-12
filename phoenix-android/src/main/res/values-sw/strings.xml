@@ -566,7 +566,7 @@
     <string name="lnurl_pay_requesting_invoice">Ikidai ankara…</string>
 
     <string name="lnurl_pay_amount_below_min">Kiasi lazima kiwe angalau %1$s</string>
-    <string name="lnurl_pay_amount_above_max">Kiasi lazima kiwe angalau %1$s</string>
+    <string name="lnurl_pay_amount_above_max">Kiasi lazima kiwe zaidi %1$s</string>
 
     <string name="lnurl_pay_error_header">Malipo yameshindwa.</string>
     <string name="lnurl_pay_error_invalid_chain">Ankara iliyorudishwa na <b>%1$s</b> haiutumii mnyororo sawa na pochi yako.</string>
