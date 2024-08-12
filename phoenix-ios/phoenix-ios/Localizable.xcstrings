@@ -1001,7 +1001,14 @@
       }
     },
     "(image)" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(image)"
+          }
+        }
+      }
     },
     "(inclusive)" : {
       "comment" : "translate: inclusive",
@@ -1086,7 +1093,15 @@
       }
     },
     "(Lightning offer)" : {
-      "comment" : "Type of text being copied"
+      "comment" : "Type of text being copied",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(عرض البرق)"
+          }
+        }
+      }
     },
     "(Phoenix can be running in the background.)" : {
       "extractionState" : "manual",
@@ -1280,7 +1295,14 @@
       }
     },
     "(text)" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(text)"
+          }
+        }
+      }
     },
     "(This is your address - derived from your seed. You alone possess your seed.)" : {
       "localizations" : {
@@ -1445,7 +1467,14 @@
       }
     },
     "**disabled**: sent payments will be anonymous" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "**معطل**: المدفوعات المرسلة ستكون مجهولة المصدر"
+          }
+        }
+      }
     },
     "**Do not lose this seed.** Save it somewhere safe (not on this phone). If you lose your seed and your phone, you've lost your funds." : {
       "comment" : "RecoverySeedView",
@@ -1530,7 +1559,14 @@
       }
     },
     "**enabled**: they will be able to tell when payments are from you" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "**ممكّن**: سيتمكنون من معرفة متى تكون المدفوعات منك"
+          }
+        }
+      }
     },
     "**Imagine that your wallet is a bucket**, and your balance is the water in the bucket." : {
       "localizations" : {
@@ -1567,7 +1603,14 @@
       }
     },
     "**This Bolt12 payment request is the Lightning equivalent to a Bitcoin address.**\n\nUnlike traditional Lightning invoices, it does not expire and can be reused.\n\nShare it widely : for donations, tips, or to get paid by your friends.\n\n🛟 **Who supports Bolt12?**\n\nFor the moment, few services support Bolt12. If a service rejects this invoice, let them know they're missing out!\n\n🪫 **Restrictions**\n\nYour phone must be turned on and connected to the internet to receive a payment. Also enabling TOR in Phoenix may cause issues." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "** طلب الدفع هذا من Bolt12 هو المكافئ البرق لعنوان البيتكوين.**\n\nعلى عكس فواتير Lightning التقليدية، لا تنتهي صلاحيته ويمكن إعادة استخدامه.\n\nشاركها على نطاق واسع: للتبرعات أو الإكراميات أو للحصول على أموال من أصدقائك.\n\n🛟 **من يدعم Bolt12؟\n\nفي الوقت الحالي، هناك عدد قليل من الخدمات التي تدعم Bolt12. إذا رفضت إحدى الخدمات هذه الفاتورة، دعهم يعلمون أنه يفوتهم الكثير!\n\n🪫 **القيود**\n\nيجب أن يكون هاتفك قيد التشغيل ومتصلاً بالإنترنت لتلقي الدفع. كما قد يتسبب تمكين TOR في فينيكس في حدوث مشكلات."
+          }
+        }
+      }
     },
     "#%lld: %@" : {
       "localizations" : {
@@ -1697,6 +1740,12 @@
     },
     "%@ - from %@" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$$$@ - من %2$$$@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -1707,6 +1756,12 @@
     },
     "%@ - to %@" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$$$@ - إلى %2$$$@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -1751,6 +1806,12 @@
     },
     "%@ %@" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ %2$@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -2731,7 +2792,15 @@
       }
     },
     "+%@ inbound liquidity" : {
-      "comment" : "Payment description for inbound liquidity"
+      "comment" : "Payment description for inbound liquidity",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+%* السيولة الواردة"
+          }
+        }
+      }
     },
     "<decryption error>" : {
       "localizations" : {
@@ -4809,7 +4878,14 @@
       }
     },
     "Add contact" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إضافة جهة اتصال"
+          }
+        }
+      }
     },
     "add liquidity" : {
       "localizations" : {
@@ -6735,7 +6811,14 @@
       }
     },
     "Attach a message" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إرفاق رسالة"
+          }
+        }
+      }
     },
     "Attention: if the Bitcoin mempool feerate is high, incoming LN payments requiring an on-chain operation could be expensive." : {
       "localizations" : {
@@ -7645,7 +7728,14 @@
       }
     },
     "Be careful with messages from unknown sources" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "كن حذرًا مع الرسائل الواردة من مصادر مجهولة"
+          }
+        }
+      }
     },
     "Below the expected fee. Some payments may be rejected." : {
       "localizations" : {
@@ -7842,7 +7932,14 @@
       }
     },
     "BIP353 DNS Address" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عنوان DNS BIP353"
+          }
+        }
+      }
     },
     "Bitcoin" : {
       "localizations" : {
@@ -8442,10 +8539,24 @@
       }
     },
     "Bolt12 offer:" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عرض بولت12"
+          }
+        }
+      }
     },
     "Bolt12 offers" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عروض Bolt12"
+          }
+        }
+      }
     },
     "broadcast" : {
       "localizations" : {
@@ -9814,7 +9925,14 @@
       }
     },
     "Claim my address" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المطالبة بعنواني"
+          }
+        }
+      }
     },
     "claimed amount" : {
       "comment" : "Label in DetailsView_IncomingPayment",
@@ -9899,7 +10017,14 @@
       }
     },
     "Clear image" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "صورة واضحة"
+          }
+        }
+      }
     },
     "Clear textfield" : {
       "localizations" : {
@@ -11467,7 +11592,14 @@
       }
     },
     "Contact Image" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الاتصال بالصورة"
+          }
+        }
+      }
     },
     "Contact support if needed." : {
       "localizations" : {
@@ -11510,7 +11642,14 @@
       }
     },
     "Contacts" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جهات الاتصال"
+          }
+        }
+      }
     },
     "continue to next step" : {
       "comment" : "VoiceOver hint",
@@ -11594,7 +11733,15 @@
       }
     },
     "Copied image to pasteboard!" : {
-      "comment" : "Toast message"
+      "comment" : "Toast message",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "نسخ الصورة إلى لوحة اللصق!"
+          }
+        }
+      }
     },
     "Copied QR code image to pasteboard!" : {
       "comment" : "Toast message",
@@ -11922,7 +12069,14 @@
       }
     },
     "Copy options" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "خيارات النسخ"
+          }
+        }
+      }
     },
     "Copy Text" : {
       "extractionState" : "stale",
@@ -12245,10 +12399,24 @@
       }
     },
     "Could not retrieve payment details within a reasonable time. The recipient may be offline or unreachable." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعذر استرداد تفاصيل الدفع في غضون فترة زمنية معقولة. قد يكون المستلم غير متصل بالإنترنت أو لا يمكن الوصول إليه."
+          }
+        }
+      }
     },
     "Could not retrieve payment details. Received invalid response from node." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعذر استرداد تفاصيل الدفع. تم تلقي استجابة غير صالحة من العقدة."
+          }
+        }
+      }
     },
     "Create new wallet" : {
       "localizations" : {
@@ -13158,10 +13326,24 @@
       }
     },
     "Delete contact" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حذف جهة الاتصال"
+          }
+        }
+      }
     },
     "Delete contact?" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حذف جهة الاتصال؟"
+          }
+        }
+      }
     },
     "Delete payment" : {
       "localizations" : {
@@ -14204,7 +14386,14 @@
       }
     },
     "Discard changes" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تجاهل التغييرات"
+          }
+        }
+      }
     },
     "Discard Changes" : {
       "extractionState" : "stale",
@@ -14248,7 +14437,14 @@
       }
     },
     "Discard changes?" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تجاهل التغييرات؟"
+          }
+        }
+      }
     },
     "Disconnected" : {
       "localizations" : {
@@ -15076,7 +15272,14 @@
       }
     },
     "Edit contact" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحرير جهة الاتصال"
+          }
+        }
+      }
     },
     "Edit Info" : {
       "comment" : "Navigation bar title",
@@ -16324,7 +16527,14 @@
       }
     },
     "Experimental" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تجريبي"
+          }
+        }
+      }
     },
     "Expired" : {
       "localizations" : {
@@ -17553,7 +17763,14 @@
       }
     },
     "Fetching invoice..." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إحضار الفاتورة..."
+          }
+        }
+      }
     },
     "Fetching Lightning URL" : {
       "comment" : "Progress title",
@@ -18244,7 +18461,15 @@
       }
     },
     "Full URI" : {
-      "comment" : "Type of text being copied"
+      "comment" : "Type of text being copied",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URI كامل"
+          }
+        }
+      }
     },
     "Funding failure" : {
       "localizations" : {
@@ -19240,10 +19465,25 @@
       }
     },
     "How to use" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "كيفية الاستخدام"
+          }
+        }
+      }
     },
     "Human-readable address" : {
-      "comment" : "Type of text being copied"
+      "comment" : "Type of text being copied",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "العنوان المقروء بشرياً"
+          }
+        }
+      }
     },
     "I have saved my recovery phrase somewhere safe." : {
       "localizations" : {
@@ -21426,6 +21666,12 @@
       "comment" : "Error message - dns record contains an invalid offer",
       "extractionState" : "stale",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عنوان BIP353 DNS غير صالح"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -21592,7 +21838,14 @@
       }
     },
     "Invalid offer" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عرض غير صالح"
+          }
+        }
+      }
     },
     "Invalid port. Valid range: [1 - 65535]" : {
       "localizations" : {
@@ -22277,7 +22530,14 @@
       }
     },
     "Learn more" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اعرف المزيد"
+          }
+        }
+      }
     },
     "Learn more from our [blog post](https://acinq.co/blog/phoenix-splicing-update)." : {
       "localizations" : {
@@ -22589,7 +22849,14 @@
       }
     },
     "Lightning fee" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "رسوم البرق"
+          }
+        }
+      }
     },
     "Lightning fee amount: (percent), (amountBitcoin), ≈(amountFiat)" : {
       "comment" : "VoiceOver label: PaymentSummaryView",
@@ -22919,10 +23186,25 @@
       }
     },
     "Lightning Offer" : {
-      "comment" : "Secondary title"
+      "comment" : "Secondary title",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عرض البرق"
+          }
+        }
+      }
     },
     "Lightning Offers" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عروض البرق"
+          }
+        }
+      }
     },
     "Lightning payments are fast and best suited for smaller payments." : {
       "localizations" : {
@@ -23006,7 +23288,14 @@
       }
     },
     "Lightning QR code" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "رمز الاستجابة السريعة الباعث للضوء"
+          }
+        }
+      }
     },
     "Link" : {
       "comment" : "lnurl-auth: login button title",
@@ -25357,7 +25646,14 @@
       }
     },
     "NEW" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جديد"
+          }
+        }
+      }
     },
     "New Channel (auto-created)" : {
       "localizations" : {
@@ -25400,7 +25696,14 @@
       }
     },
     "New contact" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جهة اتصال جديدة"
+          }
+        }
+      }
     },
     "New inbound liquidity:" : {
       "localizations" : {
@@ -25518,7 +25821,14 @@
       }
     },
     "No address yet..." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا يوجد عنوان بعد..."
+          }
+        }
+      }
     },
     "No available channels. Please check your internet connection." : {
       "localizations" : {
@@ -25717,7 +26027,14 @@
       }
     },
     "No matches for search" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا يوجد تطابق للبحث"
+          }
+        }
+      }
     },
     "No notifications" : {
       "localizations" : {
@@ -27757,7 +28074,15 @@
       }
     },
     "Payment code" : {
-      "comment" : "Type of text being copied"
+      "comment" : "Type of text being copied",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "رمز الدفع"
+          }
+        }
+      }
     },
     "payment description" : {
       "extractionState" : "stale",
@@ -27876,7 +28201,14 @@
       }
     },
     "Payment from %@" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الدفع من %@"
+          }
+        }
+      }
     },
     "payment hash" : {
       "comment" : "Label in DetailsView_IncomingPayment",
@@ -28606,7 +28938,14 @@
       }
     },
     "Payment to %@" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الدفع إلى %@"
+          }
+        }
+      }
     },
     "Payment will fail" : {
       "localizations" : {
@@ -31989,7 +32328,14 @@
       }
     },
     "Save changes" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حفظ التغييرات"
+          }
+        }
+      }
     },
     "Save it somewhere safe (not on this phone). If you lose your seed and your phone, you've lost your funds." : {
       "extractionState" : "manual",
@@ -32155,7 +32501,14 @@
       }
     },
     "Search" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "بحث"
+          }
+        }
+      }
     },
     "Security" : {
       "extractionState" : "manual",
@@ -32279,7 +32632,14 @@
       }
     },
     "Select image" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حدد الصورة"
+          }
+        }
+      }
     },
     "select miner fee when sending on-chain" : {
       "localizations" : {
@@ -32840,10 +33200,24 @@
       }
     },
     "Sent By" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم الإرسال بواسطة"
+          }
+        }
+      }
     },
     "Sent To" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم الإرسال إلى"
+          }
+        }
+      }
     },
     "Server" : {
       "localizations" : {
@@ -33690,7 +34064,14 @@
       }
     },
     "Share options" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "خيارات المشاركة"
+          }
+        }
+      }
     },
     "Share Text" : {
       "extractionState" : "stale",
@@ -34298,7 +34679,14 @@
       }
     },
     "Show one-time invoice" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إظهار الفاتورة لمرة واحدة"
+          }
+        }
+      }
     },
     "Show only in-flight payments" : {
       "localizations" : {
@@ -34959,7 +35347,14 @@
       }
     },
     "Show reusable QR" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عرض QR القابل لإعادة الاستخدام"
+          }
+        }
+      }
     },
     "Sign into iCloud to backup your payments" : {
       "localizations" : {
@@ -36090,7 +36485,14 @@
       }
     },
     "Take photo" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التقط صورة"
+          }
+        }
+      }
     },
     "Tap for more info" : {
       "localizations" : {
@@ -37546,7 +37948,14 @@
       }
     },
     "The request timed out. Please check your internet connection and try again." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "انتهت مهلة الطلب. يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى."
+          }
+        }
+      }
     },
     "The scanned QR code is not a bitcoin address" : {
       "comment" : "Error message - parsing bitcoin address",
@@ -38217,10 +38626,26 @@
       }
     },
     "This address is hosted on an unsecure DNS. DNSSEC must be enabled." : {
-      "comment" : "Error message - dns issue"
+      "comment" : "Error message - dns issue",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هذا العنوان مستضاف على DNS غير آمن. يجب تمكين DNSSEC."
+          }
+        }
+      }
     },
     "This address uses an invalid Bolt12 offer." : {
-      "comment" : "Error message - dns record contains an invalid offer"
+      "comment" : "Error message - dns record contains an invalid offer",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يستخدم هذا العنوان عرض Bolt12 غير صالح."
+          }
+        }
+      }
     },
     "This appears to be a website (not a lightning invoice):" : {
       "localizations" : {
@@ -38610,7 +39035,14 @@
       }
     },
     "This is a human-readable address for your Bolt12 payment request." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هذا عنوان مقروء بشري لطلب الدفع الخاص بك Bolt12."
+          }
+        }
+      }
     },
     "This is a swap address. It is not controlled by your wallet. On-chain deposits sent to this address will be converted to Lightning channels." : {
       "extractionState" : "manual",
@@ -39252,7 +39684,14 @@
       }
     },
     "Tip" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "نصيحة"
+          }
+        }
+      }
     },
     "Tip amount: (percent), (amountBitcoin), ≈(amountFiat)" : {
       "comment" : "VoiceOver label: PaymentSummaryView",
@@ -39932,7 +40371,14 @@
       }
     },
     "Total" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الإجمالي"
+          }
+        }
+      }
     },
     "total amount" : {
       "comment" : "Label in DetailsView_IncomingPayment",
@@ -40407,7 +40853,14 @@
       }
     },
     "Trusted contact" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جهة اتصال موثوق بها"
+          }
+        }
+      }
     },
     "Trustless swaps" : {
       "localizations" : {
@@ -40939,7 +41392,14 @@
       }
     },
     "Unknown offer error" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "خطأ في العرض غير معروف"
+          }
+        }
+      }
     },
     "Unknown reason" : {
       "localizations" : {
@@ -42689,7 +43149,14 @@
       }
     },
     "Want a prettier address? Use third-party services, or self-host the address!" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هل تريد عنواناً أجمل؟ استخدم خدمات الطرف الثالث، أو استضف العنوان بنفسك!"
+          }
+        }
+      }
     },
     "Warning" : {
       "localizations" : {
@@ -44716,7 +45183,14 @@
       }
     },
     "You need at least one channel to claim your address. Try adding funds to your wallet and try again." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحتاج إلى قناة واحدة على الأقل للمطالبة بعنوانك. حاول إضافة أموال إلى محفظتك وحاول مرة أخرى."
+          }
+        }
+      }
     },
     "You scanned a bitcoin address. Phoenix currently only supports sending Lightning payments. You can use a third-party service to make the offchain->onchain swap." : {
       "comment" : "Error message - scanning lightning invoice",
