@@ -1007,6 +1007,12 @@
             "state" : "translated",
             "value" : "(image)"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(image)"
+          }
         }
       }
     },
@@ -1099,6 +1105,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "(عرض البرق)"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Blesková nabídka)"
           }
         }
       }
@@ -1301,6 +1313,12 @@
             "state" : "translated",
             "value" : "(text)"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(text)"
+          }
         }
       }
     },
@@ -1473,6 +1491,12 @@
             "state" : "translated",
             "value" : "**معطل**: المدفوعات المرسلة ستكون مجهولة المصدر"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "**vypnuto**: odeslané platby budou anonymní"
+          }
         }
       }
     },
@@ -1565,6 +1589,12 @@
             "state" : "translated",
             "value" : "**ممكّن**: سيتمكنون من معرفة متى تكون المدفوعات منك"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "**povoleno**: budou moci zjistit, kdy jsou platby od vás"
+          }
         }
       }
     },
@@ -1608,6 +1638,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "** طلب الدفع هذا من Bolt12 هو المكافئ البرق لعنوان البيتكوين.**\n\nعلى عكس فواتير Lightning التقليدية، لا تنتهي صلاحيته ويمكن إعادة استخدامه.\n\nشاركها على نطاق واسع: للتبرعات أو الإكراميات أو للحصول على أموال من أصدقائك.\n\n🛟 **من يدعم Bolt12؟\n\nفي الوقت الحالي، هناك عدد قليل من الخدمات التي تدعم Bolt12. إذا رفضت إحدى الخدمات هذه الفاتورة، دعهم يعلمون أنه يفوتهم الكثير!\n\n🪫 **القيود**\n\nيجب أن يكون هاتفك قيد التشغيل ومتصلاً بالإنترنت لتلقي الدفع. كما قد يتسبب تمكين TOR في فينيكس في حدوث مشكلات."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "**Tento požadavek na platbu Bolt12 je ekvivalentem adresy Bitcoinu v systému Lightning.**\n\nNa rozdíl od tradičních faktur Lightning nevyprší její platnost a lze ji použít opakovaně.\n\nMůžete ji široce sdílet : za dary, spropitné nebo za to, že vám zaplatí vaši přátelé.\n\n🛟 **Kdo podporuje Bolt12?\n\nV současné době podporuje Bolt12 jen několik služeb. Pokud některá služba tuto fakturu odmítá, dejte jí vědět, že o ni přichází!\n\n🪫 **Omezení**\n\nPro přijetí platby musí být telefon zapnutý a připojený k internetu. Problémy může způsobit také zapnutí TOR ve Phoenixu."
           }
         }
       }
@@ -1746,6 +1782,12 @@
             "value" : "%1$$$@ - من %2$$$@"
           }
         },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ - od %2$@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -1760,6 +1802,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$$$@ - إلى %2$$$@"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ - na %2$@"
           }
         },
         "en" : {
@@ -1807,6 +1855,12 @@
     "%@ %@" : {
       "localizations" : {
         "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ %2$@"
+          }
+        },
+        "cs" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ %2$@"
@@ -2798,6 +2852,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "+%* السيولة الواردة"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+%@ příchozí likvidita"
           }
         }
       }
@@ -4884,6 +4944,12 @@
             "state" : "translated",
             "value" : "إضافة جهة اتصال"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Přidat kontakt"
+          }
         }
       }
     },
@@ -6165,7 +6231,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "V uzlu na trase platby došlo k chybě. Platba může být úspěšná, pokud se o ni pokusíte znovu."
+            "value" : "Na uzlu v platební trase došlo k chybě. Platba může být úspěšná, pokud se o ni pokusíte znovu."
           }
         },
         "de" : {
@@ -6233,7 +6299,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pro získání této částky bude pravděpodobně nutná operace na řetězci."
+            "value" : "Pro příjem této částky bude pravděpodobně nutná on-chain transakce."
           }
         },
         "de" : {
@@ -6747,7 +6813,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Opravdu chcete pokračovat?"
+            "value" : "Jste si jisti, že chcete pokračovat?"
           }
         },
         "de" : {
@@ -6787,7 +6853,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Jakmile obdržíte finanční prostředky, likvidita se spotřebuje a stane se vaším zůstatkem. Po jednom roce bude zbývající nespotřebovaná likvidita službou vyžádána zpět."
+            "value" : "Jak budete přijímat prostředky, likvidita bude spotřebovávána a stane se součástí vašeho zůstatku. Po jednom roce bude zbývající nevyužitá likvidita vrácena poskytovateli."
           }
         },
         "de" : {
@@ -6816,6 +6882,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "إرفاق رسالة"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Připojit zprávu"
           }
         }
       }
@@ -7734,6 +7806,12 @@
             "state" : "translated",
             "value" : "كن حذرًا مع الرسائل الواردة من مصادر مجهولة"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se zprávy od neznámých zdrojů buďte opatrní"
+          }
         }
       }
     },
@@ -7902,7 +7980,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "BIP39 seed se standardní derivační cestou BIP84 "
+            "value" : "Seed BIP39 se standardní odvozovací cestou BIP84"
           }
         },
         "de" : {
@@ -7937,6 +8015,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "عنوان DNS BIP353"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "BIP353 Adresa DNS"
           }
         }
       }
@@ -8114,7 +8198,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Formát adresy bitcoinu"
+            "value" : "Formát Bitcoinové adresy"
           }
         },
         "de" : {
@@ -8388,7 +8472,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bitcoinová jednotka"
+            "value" : "Jednotka Bitcoinu"
           }
         },
         "de" : {
@@ -8428,7 +8512,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Velikost bloku"
+            "value" : "Výška bloku"
           }
         },
         "de" : {
@@ -8545,6 +8629,12 @@
             "state" : "translated",
             "value" : "عرض بولت12"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nabídka Bolt12:"
+          }
         }
       }
     },
@@ -8554,6 +8644,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "عروض Bolt12"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bolt12 nabízí"
           }
         }
       }
@@ -9318,7 +9414,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ovlivněná velikost kanálu"
+            "value" : "Ovlivněna velikost kanálu"
           }
         },
         "de" : {
@@ -9352,7 +9448,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kanály již zpracovávají spoje. Zkuste to později."
+            "value" : "Kanály již zpracovávají splicing. Zkuste to později."
           }
         },
         "de" : {
@@ -9931,6 +10027,12 @@
             "state" : "translated",
             "value" : "المطالبة بعنواني"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vyžádat si mou adresu"
+          }
         }
       }
     },
@@ -10022,6 +10124,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "صورة واضحة"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jasný obraz"
           }
         }
       }
@@ -10161,7 +10269,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zavřít kanály"
+            "value" : "Uzavření kanálů"
           }
         },
         "de" : {
@@ -10802,7 +10910,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Konfigurace limitu poplatků"
+            "value" : "Nastavit limit poplatků"
           }
         },
         "de" : {
@@ -11440,7 +11548,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Připojování …"
+            "value" : "Připojování…"
           }
         },
         "de" : {
@@ -11598,6 +11706,12 @@
             "state" : "translated",
             "value" : "الاتصال بالصورة"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontaktní obrázek"
+          }
         }
       }
     },
@@ -11647,6 +11761,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "جهات الاتصال"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontakty"
           }
         }
       }
@@ -11739,6 +11859,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "نسخ الصورة إلى لوحة اللصق!"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zkopírovaný obrázek na nástěnku!"
           }
         }
       }
@@ -12075,6 +12201,12 @@
             "state" : "translated",
             "value" : "خيارات النسخ"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Možnosti kopírování"
+          }
         }
       }
     },
@@ -12405,6 +12537,12 @@
             "state" : "translated",
             "value" : "تعذر استرداد تفاصيل الدفع في غضون فترة زمنية معقولة. قد يكون المستلم غير متصل بالإنترنت أو لا يمكن الوصول إليه."
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nepodařilo se načíst platební údaje v přiměřené době. Příjemce může být offline nebo nedostupný."
+          }
         }
       }
     },
@@ -12414,6 +12552,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تعذر استرداد تفاصيل الدفع. تم تلقي استجابة غير صالحة من العقدة."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nepodařilo se načíst platební údaje. Obdržel neplatnou odpověď z uzlu."
           }
         }
       }
@@ -12429,7 +12573,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vytvořit novou peněženku"
+            "value" : "Vytvoření nové peněženky"
           }
         },
         "de" : {
@@ -13256,7 +13400,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Odstranit"
+            "value" : "Smazat"
           }
         },
         "de" : {
@@ -13332,6 +13476,12 @@
             "state" : "translated",
             "value" : "حذف جهة الاتصال"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odstranit kontakt"
+          }
         }
       }
     },
@@ -13341,6 +13491,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "حذف جهة الاتصال؟"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Smazat kontakt?"
           }
         }
       }
@@ -14392,6 +14548,12 @@
             "state" : "translated",
             "value" : "تجاهل التغييرات"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vyřazení změn"
+          }
         }
       }
     },
@@ -14442,6 +14604,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تجاهل التغييرات؟"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vyřazení změn?"
           }
         }
       }
@@ -14611,7 +14779,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zobrazení"
+            "value" : "Zobrazit"
           }
         },
         "de" : {
@@ -14652,7 +14820,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Možnosti zobrazení"
+            "value" : "Zobrazit možnosti"
           }
         },
         "de" : {
@@ -14692,7 +14860,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zobrazit seed"
+            "value" : "Zobrazení Seedu"
           }
         },
         "de" : {
@@ -15278,6 +15446,12 @@
             "state" : "translated",
             "value" : "تحرير جهة الاتصال"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upravit kontakt"
+          }
         }
       }
     },
@@ -15726,7 +15900,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Povolení přeplatku"
+            "value" : "Povolit přeplacení"
           }
         },
         "de" : {
@@ -16100,7 +16274,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Error"
+            "value" : "Chyba"
           }
         },
         "de" : {
@@ -16532,6 +16706,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تجريبي"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Experimentální"
           }
         }
       }
@@ -17138,7 +17318,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Často kladené dotazy"
+            "value" : "FAQ"
           }
         },
         "de" : {
@@ -17253,7 +17433,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sazba poplatku"
+            "value" : "Výše poplatku"
           }
         },
         "de" : {
@@ -17408,7 +17588,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Poplatek"
+            "value" : "Poplatky"
           }
         },
         "de" : {
@@ -17768,6 +17948,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "إحضار الفاتورة..."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Získání faktury..."
           }
         }
       }
@@ -18467,6 +18653,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "URI كامل"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Úplný URI"
           }
         }
       }
@@ -19471,6 +19663,12 @@
             "state" : "translated",
             "value" : "كيفية الاستخدام"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jak používat"
+          }
         }
       }
     },
@@ -19481,6 +19679,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "العنوان المقروء بشرياً"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lidsky čitelná adresa"
           }
         }
       }
@@ -21672,6 +21876,12 @@
             "value" : "عنوان BIP353 DNS غير صالح"
           }
         },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neplatná adresa DNS BIP353"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -21843,6 +22053,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "عرض غير صالح"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neplatná nabídka"
           }
         }
       }
@@ -22536,6 +22752,12 @@
             "state" : "translated",
             "value" : "اعرف المزيد"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Další informace"
+          }
         }
       }
     },
@@ -22590,7 +22812,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Odkaz"
+            "value" : "Legacy"
           }
         },
         "de" : {
@@ -22854,6 +23076,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "رسوم البرق"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Poplatek za blesk"
           }
         }
       }
@@ -23193,6 +23421,12 @@
             "state" : "translated",
             "value" : "عرض البرق"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blesková nabídka"
+          }
         }
       }
     },
@@ -23202,6 +23436,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "عروض البرق"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bleskové nabídky"
           }
         }
       }
@@ -23293,6 +23533,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "رمز الاستجابة السريعة الباعث للضوء"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bleskový kód QR"
           }
         }
       }
@@ -23735,7 +23981,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Protokoly"
+            "value" : "Logs"
           }
         },
         "de" : {
@@ -23856,7 +24102,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nízký feerate!"
+            "value" : "Nízký poplatek!"
           }
         },
         "de" : {
@@ -25454,7 +25700,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Název"
+            "value" : "Jméno"
           }
         },
         "de" : {
@@ -25652,6 +25898,12 @@
             "state" : "translated",
             "value" : "جديد"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NOVINKA"
+          }
         }
       }
     },
@@ -25701,6 +25953,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "جهة اتصال جديدة"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nový kontakt"
           }
         }
       }
@@ -25827,6 +26085,12 @@
             "state" : "translated",
             "value" : "لا يوجد عنوان بعد..."
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zatím bez adresy..."
+          }
         }
       }
     },
@@ -25923,7 +26187,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bez popisu"
+            "value" : "Žádný popis"
           }
         },
         "de" : {
@@ -26032,6 +26296,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "لا يوجد تطابق للبحث"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Žádné shody pro vyhledávání"
           }
         }
       }
@@ -28081,6 +28351,12 @@
             "state" : "translated",
             "value" : "رمز الدفع"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kód platby"
+          }
         }
       }
     },
@@ -28206,6 +28482,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "الدفع من %@"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Platba z %@"
           }
         }
       }
@@ -28665,7 +28947,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Platba zamítnuta (+%@)"
+            "value" : "Zamítnutí platby (+%@)"
           }
         },
         "de" : {
@@ -28944,6 +29226,12 @@
             "state" : "translated",
             "value" : "الدفع إلى %@"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Platba na %@"
+          }
         }
       }
     },
@@ -28958,7 +29246,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Platba se nezdaří"
+            "value" : "Platba selže"
           }
         },
         "de" : {
@@ -31821,7 +32109,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Obnovení peněženky"
+            "value" : "Resetovat peněženku"
           }
         },
         "de" : {
@@ -32097,7 +32385,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Recenze"
+            "value" : "Zobrazit"
           }
         },
         "de" : {
@@ -32334,6 +32622,12 @@
             "state" : "translated",
             "value" : "حفظ التغييرات"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uložení změn"
+          }
         }
       }
     },
@@ -32507,6 +32801,12 @@
             "state" : "translated",
             "value" : "بحث"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vyhledávání"
+          }
         }
       }
     },
@@ -32637,6 +32937,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "حدد الصورة"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vybrat obrázek"
           }
         }
       }
@@ -33206,6 +33512,12 @@
             "state" : "translated",
             "value" : "تم الإرسال بواسطة"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odesláno"
+          }
         }
       }
     },
@@ -33215,6 +33527,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تم الإرسال إلى"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odesláno do"
           }
         }
       }
@@ -34070,6 +34388,12 @@
             "state" : "translated",
             "value" : "خيارات المشاركة"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Akciové opce"
+          }
         }
       }
     },
@@ -34684,6 +35008,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "إظهار الفاتورة لمرة واحدة"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zobrazit jednorázovou fakturu"
           }
         }
       }
@@ -35352,6 +35682,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "عرض QR القابل لإعادة الاستخدام"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zobrazit opakovaně použitelné QR"
           }
         }
       }
@@ -36181,7 +36517,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Výměna adres"
+            "value" : "Swap adresy"
           }
         },
         "de" : {
@@ -36491,6 +36827,12 @@
             "state" : "translated",
             "value" : "التقط صورة"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vyfotografujte se"
+          }
         }
       }
     },
@@ -36580,7 +36922,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Taproot (doporučeno)"
+            "value" : "Taproot (doporučený)"
           }
         },
         "de" : {
@@ -37054,7 +37396,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Platnost této platby je příliš vzdálená."
+            "value" : "Konec platnosti této platby je příliš daleko v budoucnosti."
           }
         },
         "de" : {
@@ -37394,7 +37736,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ID platby není platné. Zkuste to znovu."
+            "value" : "ID platby není platný. Zkuste to znovu."
           }
         },
         "de" : {
@@ -37714,7 +38056,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Částka platby je příliš vysoká - zkuste ji rozdělit na několik částí."
+            "value" : "Částka je příliš velká - zkuste ji rozdělit na více částí."
           }
         },
         "de" : {
@@ -37748,7 +38090,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Výše platby je příliš nízká."
+            "value" : "Částka je příliš malá."
           }
         },
         "de" : {
@@ -37782,7 +38124,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Platbu se nepodařilo předat příjemci (pravděpodobně nedostatečná příchozí likvidita)."
+            "value" : "Platbu nebylo možné předat příjemci (pravděpodobně nedostatečná příchozí likvidita)."
           }
         },
         "de" : {
@@ -37816,7 +38158,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Platbu nebylo možné odeslat prostřednictvím vašich stávajících kanálů."
+            "value" : "Platba nemohla být odeslána prostřednictvím vašich stávajících kanálů."
           }
         },
         "de" : {
@@ -37953,6 +38295,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "انتهت مهلة الطلب. يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Požadavek se vyčerpal. Zkontrolujte prosím své internetové připojení a zkuste to znovu."
           }
         }
       }
@@ -38328,7 +38676,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Během zpracování platby byla peněženka restartována."
+            "value" : "Peněženka byla restartována během zpracování platby."
           }
         },
         "de" : {
@@ -38482,7 +38830,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tyto prostředky nebyly včas vyměněny. Klepněte na tlačítko utratit."
+            "value" : "Tyto prostředky nebyly převedeny včas. Klepnutím na tlačítko tyto prostředky utratíte."
           }
         },
         "de" : {
@@ -38633,6 +38981,12 @@
             "state" : "translated",
             "value" : "هذا العنوان مستضاف على DNS غير آمن. يجب تمكين DNSSEC."
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tato adresa je hostována na nezabezpečeném DNS. DNSSEC musí být povolen."
+          }
         }
       }
     },
@@ -38643,6 +38997,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "يستخدم هذا العنوان عرض Bolt12 غير صالح."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tato adresa používá neplatnou nabídku Bolt12."
           }
         }
       }
@@ -39041,6 +39401,12 @@
             "state" : "translated",
             "value" : "هذا عنوان مقروء بشري لطلب الدفع الخاص بك Bolt12."
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toto je lidsky čitelná adresa pro vaši žádost o platbu Bolt12."
+          }
         }
       }
     },
@@ -39258,7 +39624,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tato platba převyšuje váš zůstatek."
+            "value" : "Tato platba přesahuje váš zůstatek."
           }
         },
         "de" : {
@@ -39689,6 +40055,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "نصيحة"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip"
           }
         }
       }
@@ -40219,7 +40591,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tor je deaktivován"
+            "value" : "Tor je vypnutý"
           }
         },
         "de" : {
@@ -40376,6 +40748,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "الإجمالي"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Celkem"
           }
         }
       }
@@ -40858,6 +41236,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "جهة اتصال موثوق بها"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Důvěryhodný kontakt"
           }
         }
       }
@@ -41397,6 +41781,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "خطأ في العرض غير معروف"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neznámá chyba nabídky"
           }
         }
       }
@@ -43154,6 +43544,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "هل تريد عنواناً أجمل؟ استخدم خدمات الطرف الثالث، أو استضف العنوان بنفسك!"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chcete hezčí adresu? Použijte služby třetích stran, nebo si adresu hostujte sami!"
           }
         }
       }
@@ -45085,7 +45481,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Máte příliš mnoho nevyřízených plateb. Zkuste to znovu, jakmile budou uhrazeny."
+            "value" : "Máte příliš mnoho čekajících plateb. Zkuste to znovu, jakmile budou vypořádány."
           }
         },
         "de" : {
@@ -45188,6 +45584,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تحتاج إلى قناة واحدة على الأقل للمطالبة بعنوانك. حاول إضافة أموال إلى محفظتك وحاول مرة أخرى."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "K uplatnění nároku na adresu potřebujete alespoň jeden kanál. Zkuste přidat prostředky do peněženky a zkuste to znovu."
           }
         }
       }
