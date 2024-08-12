@@ -27,6 +27,12 @@
             "value" : ""
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -59,6 +65,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : " "
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
           }
         },
         "fr" : {
@@ -373,6 +385,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(espacio adicional en el cubo)"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "(espacio adicional en el cubo)"
@@ -1025,6 +1043,12 @@
             "state" : "translated",
             "value" : "(image)"
           }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(image)"
+          }
         }
       }
     },
@@ -1058,7 +1082,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "(inclusive)"
+            "value" : "(incluso)"
           }
         },
         "fr" : {
@@ -1132,6 +1156,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Oferta relámpago)"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "(Oferta relámpago)"
@@ -1248,6 +1278,12 @@
             "value" : "(recomendado)"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(recomendado)"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1322,6 +1358,12 @@
             "value" : "(espacio en el cubo para recibir)"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(espacio en el cubo para recibir)"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1351,6 +1393,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(text)"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "(text)"
@@ -1545,6 +1593,12 @@
             "state" : "translated",
             "value" : "**desactivado**: los pagos enviados serán anónimos"
           }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "**desactivado**: los pagos enviados serán anónimos"
+          }
         }
       }
     },
@@ -1655,6 +1709,12 @@
             "state" : "translated",
             "value" : "**habilitado**: podrán saber cuándo los pagos proceden de ti"
           }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "**habilitado**: podrán saber cuándo los pagos proceden de ti"
+          }
         }
       }
     },
@@ -1679,6 +1739,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "**Imagina que tu cartera es un cubo**, y tu saldo es el agua del cubo."
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "**Imagina que tu cartera es un cubo**, y tu saldo es el agua del cubo."
@@ -1713,6 +1779,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "**Esta solicitud de pago Bolt12 es el equivalente Lightning a una dirección Bitcoin.**\n\nA diferencia de las facturas Lightning tradicionales, no caduca y puede reutilizarse.\n\nCompártela ampliamente: para donaciones, propinas o para que te paguen tus amigos.\n\n🛟 **¿Quién admite Bolt12?**\n\nPor el momento, pocos servicios admiten Bolt12. Si un servicio rechaza esta factura, ¡hazle saber que se lo está perdiendo!\n\n🪫 **Restricciones**\n\nTu teléfono debe estar encendido y conectado a Internet para recibir un pago. También activar TOR en Phoenix puede causar problemas."
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "**Esta solicitud de pago Bolt12 es el equivalente Lightning a una dirección Bitcoin.**\n\nA diferencia de las facturas Lightning tradicionales, no caduca y puede reutilizarse.\n\nCompártela ampliamente: para donaciones, propinas o para que te paguen tus amigos.\n\n🛟 **¿Quién admite Bolt12?**\n\nPor el momento, pocos servicios admiten Bolt12. Si un servicio rechaza esta factura, ¡hazle saber que se lo está perdiendo!\n\n🪫 **Restricciones**\n\nTu teléfono debe estar encendido y conectado a Internet para recibir un pago. También activar TOR en Phoenix puede causar problemas."
@@ -1877,6 +1949,12 @@
             "state" : "translated",
             "value" : "%1$@ - de %2$@"
           }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ - de %2$@"
+          }
         }
       }
     },
@@ -1911,6 +1989,12 @@
             "state" : "translated",
             "value" : "%1$@ - a %2$@"
           }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ - a %2$@"
+          }
         }
       }
     },
@@ -1935,6 +2019,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ [más información](https://phoenix.acinq.co/faq#what-is-inbound-liquidity)"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ [más información](https://phoenix.acinq.co/faq#what-is-inbound-liquidity)"
@@ -1975,6 +2065,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ %2$@"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ %2$@"
@@ -2904,6 +3000,12 @@
             "value" : "+(amount.string) liquidez entrante"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+(amount.string) liquidez entrante"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2975,6 +3077,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+%@ liquidez entrante"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "+%@ liquidez entrante"
@@ -3131,7 +3239,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "≈ 10 minutos"
+            "value" : "≈ Próximo bloque"
           }
         },
         "fr" : {
@@ -3203,6 +3311,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "≈%@"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "≈%@"
@@ -3809,6 +3923,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 año"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "1 año"
@@ -4465,6 +4585,12 @@
             "value" : "Se espera una comisión de %1$@ para recibir esta cantidad, y esa comisión está por encima de tu límite de %2$@.\n\nAumenta este límite en los ajustes de gestión del canal, o solicita liquidez adicional."
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se espera una comisión de %1$@ para recibir esta cantidad, y esa comisión está por encima de tu límite de %2$@.\n\nAumenta este límite en los ajustes de gestión del canal, o solicita liquidez adicional."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4500,6 +4626,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se espera una comisión de %1$@ para recibir esta cantidad, y esa comisión está por encima de tu límite de %2$@.\n\nAumenta este límite en los ajustes de gestión del canal."
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Se espera una comisión de %1$@ para recibir esta cantidad, y esa comisión está por encima de tu límite de %2$@.\n\nAumenta este límite en los ajustes de gestión del canal."
@@ -4545,6 +4677,12 @@
             "value" : "Se espera una comisión de %1$@ para recibir esta cantidad, y esa comisión es superior al %2$@ de la cantidad.\n\nAumenta este límite en los ajustes de gestión del canal, o solicita liquidez adicional."
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se espera una comisión de %1$@ para recibir esta cantidad, y esa comisión es superior al %2$@ de la cantidad.\n\nAumenta este límite en los ajustes de gestión del canal, o solicita liquidez adicional."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4585,6 +4723,12 @@
             "value" : "Se espera una comisión de %1$@ para recibir esta cantidad, y esa comisión es superior al %2$@ de la cantidad.\n\nAumenta este límite en los ajustes de gestión del canal."
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se espera una comisión de %1$@ para recibir esta cantidad, y esa comisión es superior al %2$@ de la cantidad.\n\nAumenta este límite en los ajustes de gestión del canal."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4614,6 +4758,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un formato menos eficaz y menos privado que no rota las direcciones. Sin embargo, es compatible con casi todos los servicios y monederos."
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Un formato menos eficaz y menos privado que no rota las direcciones. Sin embargo, es compatible con casi todos los servicios y monederos."
@@ -4813,6 +4963,12 @@
             "value" : "Abortado por un compañero"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abortado por un compañero"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4969,6 +5125,12 @@
             "value" : "Acepta"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aceptar"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5082,6 +5244,12 @@
             "state" : "translated",
             "value" : "Añadir contacto"
           }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir contacto"
+          }
         }
       }
     },
@@ -5106,6 +5274,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "añade liquidez"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "añade liquidez"
@@ -5145,6 +5319,12 @@
             "value" : "Añadir liquidez"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir liquidez"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5174,6 +5354,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir liquidez"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Añadir liquidez"
@@ -5213,6 +5399,12 @@
             "value" : "¡Añadir liquidez fallida!"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Añadir liquidez fallida!"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5242,6 +5434,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade liquidez:"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Añade liquidez:"
@@ -6054,7 +6252,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El importe debe ser como mínimo (minBitcoin.string)"
+            "value" : "El importe debe ser al menos (minBitcoin.string)."
           }
         },
         "fr" : {
@@ -6136,7 +6334,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El importe debe ser como máximo (maxBitcoin.string)"
+            "value" : "El importe debe ser como máximo (maxBitcoin.string)."
           }
         },
         "fr" : {
@@ -6378,6 +6576,12 @@
             "value" : "Se ha producido un error en un nodo de la ruta de pago. El pago puede tener éxito si lo intentas de nuevo."
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se ha producido un error en un nodo de la ruta de pago. El pago puede tener éxito si lo intentas de nuevo."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6407,6 +6611,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es probable que se requiera una operación en cadena para que recibas esta cantidad.\n\nSe estima que la comisión rondará el %@."
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Es probable que se requiera una operación en cadena para que recibas esta cantidad.\n\nSe estima que la comisión rondará el %@."
@@ -6444,6 +6654,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Es probable que se requiera una operación en cadena para que recibas esta cantidad."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Probablemente será necesaria una transacción en la cadena para recibir esta cantidad."
           }
         },
         "fr" : {
@@ -6555,6 +6771,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se ha producido un error desconocido y el pago ha fallado."
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Se ha producido un error desconocido y el pago ha fallado."
@@ -6963,7 +7185,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¿Seguro quieres continuar?"
+            "value" : "¿Está seguro de que desea continuar?"
           }
         },
         "fr" : {
@@ -7000,6 +7222,12 @@
             "value" : "A medida que recibas fondos, la liquidez se consumirá y se convertirá en tu saldo. Al cabo de un año, la liquidez restante no utilizada será reclamada por el servicio."
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La capacidad adicional se conservará durante esa duración."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7029,6 +7257,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adjuntar un mensaje"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Adjuntar un mensaje"
@@ -7180,6 +7414,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autentificar para desactivar el código de acceso."
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Autentificar para desactivar el código de acceso."
@@ -7381,6 +7621,12 @@
             "value" : "Disponible"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disponible"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7451,6 +7697,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volver"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Volver"
@@ -7893,6 +8145,12 @@
             "value" : "Saldo"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saldo"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7964,6 +8222,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ten cuidado con los mensajes de fuentes desconocidas"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ten cuidado con los mensajes de fuentes desconocidas"
@@ -8117,6 +8381,12 @@
             "value" : "Mnemotécnico BIP39"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mnemotécnico BIP39"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8186,6 +8456,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "BIP353 Dirección DNS"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "BIP353 Dirección DNS"
@@ -8376,6 +8652,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Formato de la dirección Bitcoin"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Formato de la dirección Bitcoin"
@@ -8620,6 +8902,12 @@
             "value" : "bitcoin txid"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "bitcoin txid"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8698,7 +8986,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Altura de bloque"
+            "value" : "Altura de bloques"
           }
         },
         "fr" : {
@@ -8815,6 +9103,12 @@
             "state" : "translated",
             "value" : "Oferta Bolt12:"
           }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oferta Bolt12:"
+          }
         }
       }
     },
@@ -8839,6 +9133,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bolt12 ofrece"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bolt12 ofrece"
@@ -9233,6 +9533,12 @@
             "value" : "No se puede crear commit tx"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se puede crear commit tx"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9262,6 +9568,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se puede iniciar la sesión"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "No se puede iniciar la sesión"
@@ -9377,6 +9689,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar PIN"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cambiar PIN"
@@ -9621,6 +9939,12 @@
             "value" : "Tamaño del canal afectado"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamaño del canal afectado"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9653,6 +9977,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Los canales ya están procesando un Splice. Inténtelo de nuevo más tarde."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los canales ya están procesando un splice. Inténtelo de nuevo más tarde."
           }
         },
         "fr" : {
@@ -9689,6 +10019,12 @@
             "value" : "Los canales se están cerrando."
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los canales se están cerrando."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9718,6 +10054,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los canales no están disponibles, inténtalo más tarde"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Los canales no están disponibles, inténtalo más tarde"
@@ -10237,6 +10579,12 @@
             "state" : "translated",
             "value" : "Reclamar mi dirección"
           }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reclamar mi dirección"
+          }
         }
       }
     },
@@ -10343,6 +10691,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imagen nítida"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Imagen nítida"
@@ -11067,6 +11421,12 @@
             "value" : "Empalme simultáneo en curso"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empalme simultáneo en curso"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -11139,6 +11499,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Configurar límite de cuota"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurar comisiones máximas"
           }
         },
         "fr" : {
@@ -11291,6 +11657,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirmar nuevo PIN"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Confirmar nuevo PIN"
@@ -11782,7 +12154,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Conectando..."
+            "value" : "Conectando…"
           }
         },
         "fr" : {
@@ -11940,6 +12312,12 @@
             "state" : "translated",
             "value" : "Imagen de contacto"
           }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imagen de contacto"
+          }
         }
       }
     },
@@ -12004,6 +12382,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contactos"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Contactos"
@@ -12114,6 +12498,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imagen copiada en la mesa de trabajo"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Imagen copiada en la mesa de trabajo"
@@ -12471,6 +12861,12 @@
             "state" : "translated",
             "value" : "Opciones de copia"
           }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opciones de copia"
+          }
         }
       }
     },
@@ -12663,6 +13059,12 @@
             "value" : "Correcto"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Correcto"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -12819,6 +13221,12 @@
             "state" : "translated",
             "value" : "No se han podido recuperar los datos del pago en un tiempo razonable. El destinatario puede estar desconectado o ilocalizable."
           }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se han podido recuperar los datos del pago en un tiempo razonable. El destinatario puede estar desconectado o ilocalizable."
+          }
         }
       }
     },
@@ -12843,6 +13251,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se han podido recuperar los datos de pago. Se ha recibido una respuesta no válida del nodo."
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "No se han podido recuperar los datos de pago. Se ha recibido una respuesta no válida del nodo."
@@ -13118,6 +13532,12 @@
             "value" : "Liquidez entrante actual:"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liquidez entrante actual:"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -13187,6 +13607,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN personalizado"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "PIN personalizado"
@@ -13629,6 +14055,12 @@
             "value" : "Formato por defecto, con mejor privacidad, tarifas más baratas y rotación de direcciones. Algunos servicios o monederos antiguos pueden no entender este formato de dirección moderno."
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Formato por defecto, con mejor privacidad, tarifas más baratas y rotación de direcciones. Algunos servicios o monederos antiguos pueden no entender este formato de dirección moderno."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -13782,6 +14214,12 @@
             "state" : "translated",
             "value" : "Borrar contacto"
           }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borrar contacto"
+          }
         }
       }
     },
@@ -13806,6 +14244,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Borrar contacto?"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "¿Borrar contacto?"
@@ -14765,6 +15209,12 @@
             "value" : "Desactivar PIN"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desactivar PIN"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -14878,6 +15328,12 @@
             "state" : "translated",
             "value" : "Descartar cambios"
           }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descartar cambios"
+          }
         }
       }
     },
@@ -14947,6 +15403,12 @@
             "state" : "translated",
             "value" : "¿Descartar cambios?"
           }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Descartar cambios?"
+          }
         }
       }
     },
@@ -14971,6 +15433,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desconectado"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Desconectado"
@@ -15411,6 +15879,12 @@
             "value" : "No vuelvas a mostrar este mensaje"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No vuelvas a mostrar este mensaje"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15686,6 +16160,12 @@
             "value" : "Duración"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duración"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15796,6 +16276,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar contacto"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Editar contacto"
@@ -15948,6 +16434,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar PIN"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Editar PIN"
@@ -16149,6 +16641,12 @@
             "value" : "Habilitar canales automatizados"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activar la gestión automátizada"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -16258,6 +16756,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activar el pago en exceso"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Activar el pago en exceso"
@@ -16500,6 +17004,12 @@
             "value" : "Introducir nuevo PIN"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Introducir nuevo PIN"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -16529,6 +17039,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Introduce el PIN de Phoenix"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Introduce el PIN de Phoenix"
@@ -16568,6 +17084,12 @@
             "value" : "Introduce el PIN para autentificarte"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Introduce el PIN para autentificarte"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -16597,6 +17119,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Introduce el PIN para confirmar"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Introduce el PIN para confirmar"
@@ -16837,6 +17365,12 @@
             "value" : "Estimación del coste de liquidez"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calcular el costo de liquidez"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -17073,6 +17607,12 @@
             "state" : "translated",
             "value" : "Experimental"
           }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Experimental"
+          }
         }
       }
     },
@@ -17097,6 +17637,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Caducado"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Caducado"
@@ -17418,6 +17964,12 @@
             "value" : "Face ID"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Face ID"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -17696,7 +18248,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Preguntas frecuentes"
+            "value" : "FAQ"
           }
         },
         "fr" : {
@@ -17769,6 +18321,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La tarifa es insuficiente."
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "La tarifa es insuficiente."
@@ -17883,6 +18441,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feerate por debajo del mínimo permitido por mempool: %@ sats/vByte"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Feerate por debajo del mínimo permitido por mempool: %@ sats/vByte"
@@ -18086,6 +18650,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comisiones pagadas por el servicio de liquidez."
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Comisiones pagadas por el servicio de liquidez."
@@ -18323,6 +18893,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscando factura..."
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Buscando factura..."
@@ -19044,6 +19620,12 @@
             "state" : "translated",
             "value" : "URI completo"
           }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URI completo"
+          }
         }
       }
     },
@@ -19068,6 +19650,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Falta de financiación"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Falta de financiación"
@@ -19303,6 +19891,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los fondos enviados en cadena se toman de tu lado del canal, reduciendo el tamaño del canal en la misma cantidad. Tu liquidez entrante sigue siendo la misma."
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Los fondos enviados en cadena se toman de tu lado del canal, reduciendo el tamaño del canal en la misma cantidad. Tu liquidez entrante sigue siendo la misma."
@@ -20065,6 +20659,12 @@
             "state" : "translated",
             "value" : "Cómo utilizarlo"
           }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cómo utilizarlo"
+          }
         }
       }
     },
@@ -20090,6 +20690,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dirección legible por humanos"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dirección legible por humanos"
@@ -20768,6 +21374,12 @@
             "value" : "Si hay que cambiar el tamaño del cubo para que quepa más agua, eso requerirá una operación en cadena con un canon minero."
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si hay que cambiar el tamaño del cubo para que quepa más agua, eso requerirá una operación en cadena con un canon minero."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -20919,6 +21531,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si activas la [Protección avanzada de datos](https://support.apple.com/en-us/108756) para iCloud, tu frase de recuperación se cifrará de extremo a extremo y Apple no podrá acceder a ella."
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Si activas la [Protección avanzada de datos](https://support.apple.com/en-us/108756) para iCloud, tu frase de recuperación se cifrará de extremo a extremo y Apple no podrá acceder a ella."
@@ -21403,7 +22021,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importando datos..."
+            "value" : "Importando datos…"
           }
         },
         "fr" : {
@@ -21561,6 +22179,12 @@
             "value" : "Liquidez entrante"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liquidez entrante"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -21593,6 +22217,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La liquidez entrante es insuficiente para esta cantidad, y has desactivado la gestión automatizada de canales."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La liquidez entrante es insuficiente y tienes desactivada la gestión automatizada de canales."
           }
         },
         "fr" : {
@@ -21953,7 +22583,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Los pagos entrantes a veces requieren transacciones en la cadena. Esto no ocurre siempre; solo cuando es necesario."
+            "value" : "Los pagos entrantes a veces requieren transacciones en la cadena. No siempre ocurre así; solo cuando es necesario."
           }
         },
         "fr" : {
@@ -22065,6 +22695,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Incorrecto"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Incorrecto"
@@ -22225,6 +22861,12 @@
             "value" : "Fallo en la sesión de transmisión interactiva"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fallo en la sesión de transmisión interactiva"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -22297,6 +22939,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dirección DNS BIP353 no válida"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dirección DNS BIP353 no válida"
@@ -22459,6 +23107,12 @@
             "value" : "Anuncios de liquidez no válidos"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anuncios de liquidez no válidos"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -22488,6 +23142,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oferta no válida"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Oferta no válida"
@@ -22637,6 +23297,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Splice-out pubKeyScript no válido"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Splice-out pubKeyScript no válido"
@@ -23202,6 +23868,12 @@
             "state" : "translated",
             "value" : "Más información"
           }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Más información"
+          }
         }
       }
     },
@@ -23271,6 +23943,12 @@
             "value" : "Legado"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Legado"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -23300,6 +23978,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descriptor heredado"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Descriptor heredado"
@@ -23535,6 +24219,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tasa por rayos"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tasa por rayos"
@@ -23895,6 +24585,12 @@
             "state" : "translated",
             "value" : "Oferta relámpago"
           }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oferta relámpago"
+          }
         }
       }
     },
@@ -23919,6 +24615,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ofertas relámpago"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ofertas relámpago"
@@ -24032,6 +24734,12 @@
             "state" : "translated",
             "value" : "Código QR del rayo"
           }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Código QR del rayo"
+          }
         }
       }
     },
@@ -24065,7 +24773,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vincular"
+            "value" : "Enlace"
           }
         },
         "fr" : {
@@ -24143,6 +24851,12 @@
             "value" : "Liquidez añadida"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liquidez añadida"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -24172,6 +24886,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "importe de liquidez"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "importe de liquidez"
@@ -24209,6 +24929,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "¡Liquidez añadida con éxito!"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La liquidez se agregó correctamente."
           }
         },
         "fr" : {
@@ -24368,7 +25094,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cargando..."
+            "value" : "Cargando…"
           }
         },
         "fr" : {
@@ -24607,6 +25333,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "¡Baja tasa!"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Baja comisión!"
           }
         },
         "fr" : {
@@ -24848,7 +25580,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Introducción manual"
+            "value" : "Ingreso manual"
           }
         },
         "fr" : {
@@ -25089,7 +25821,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importe máximo de comisión"
+            "value" : "Importe máximo de la comisión"
           }
         },
         "fr" : {
@@ -25857,6 +26589,12 @@
             "value" : "Tasa minera"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tasa minera"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -25927,6 +26665,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tasa de minero:"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tasa de minero:"
@@ -26091,6 +26835,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Contribución al canon minero por la transacción subyacente en la cadena."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contribución a las comisiones de minería para la transacción subyacente en la cadena."
           }
         },
         "fr" : {
@@ -26408,6 +27158,12 @@
             "state" : "translated",
             "value" : "NUEVO"
           }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NUEVO"
+          }
         }
       }
     },
@@ -26476,6 +27232,12 @@
             "state" : "translated",
             "value" : "Nuevo contacto"
           }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuevo contacto"
+          }
         }
       }
     },
@@ -26500,6 +27262,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nueva liquidez entrante:"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nueva liquidez entrante:"
@@ -26615,6 +27383,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aún no hay dirección..."
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aún no hay dirección..."
@@ -26810,6 +27584,12 @@
             "value" : "No se transfirieron fondos."
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se transfirieron fondos."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -26839,6 +27619,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay resultados para la búsqueda"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "No hay resultados para la búsqueda"
@@ -27557,6 +28343,12 @@
             "value" : "Tasa en cadena prevista"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comisión prevista"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -28040,6 +28832,12 @@
             "value" : "Opciones"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opciones"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -28150,6 +28948,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pagos salientes"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pagos salientes"
@@ -28752,6 +29556,12 @@
             "value" : "Canales de pago"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canales de pago"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -28909,6 +29719,12 @@
             "state" : "translated",
             "value" : "Código de pago"
           }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Código de pago"
+          }
         }
       }
     },
@@ -29020,6 +29836,12 @@
             "value" : "Pago fallido"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pago fallido"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -29049,6 +29871,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pago de %@"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pago de %@"
@@ -29804,6 +30632,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pago a %@"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pago a %@"
@@ -30602,6 +31436,12 @@
             "value" : "PIN"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -30636,6 +31476,12 @@
             "value" : "¡PIN incorrecto!"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡PIN incorrecto!"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -30665,6 +31511,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planifica con antelación para ahorrar dinero después"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Planifica con antelación para ahorrar dinero después"
@@ -30901,6 +31753,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Por favor, realiza una copia de seguridad antes de activar cualquier opción aquí. ¡Si te bloqueas en Phoenix sin una copia de seguridad de tu frase de recuperación, **perderás tus fondos**!"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Por favor, realiza una copia de seguridad antes de activar cualquier opción aquí. ¡Si te bloqueas en Phoenix sin una copia de seguridad de tu frase de recuperación, **perderás tus fondos**!"
@@ -31378,6 +32236,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clave pública"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Clave pública"
@@ -31942,6 +32806,12 @@
             "value" : "Recibe:"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recibe:"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -32173,6 +33043,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El destinatario no está localizable o no tiene suficiente liquidez entrante."
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "El destinatario no está localizable o no tiene suficiente liquidez entrante."
@@ -32942,6 +33818,12 @@
             "value" : "Reintento en %@"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reintento en %@"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -32979,7 +33861,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Revisar"
+            "value" : "Validar"
           }
         },
         "fr" : {
@@ -33216,6 +34098,12 @@
             "state" : "translated",
             "value" : "Guardar cambios"
           }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar cambios"
+          }
         }
       }
     },
@@ -33407,6 +34295,12 @@
             "state" : "translated",
             "value" : "Busca en"
           }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Busca en"
+          }
         }
       }
     },
@@ -33552,6 +34446,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleccionar imagen"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Seleccionar imagen"
@@ -34027,6 +34927,12 @@
             "value" : "Enviado"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviado"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -34142,6 +35048,12 @@
             "state" : "translated",
             "value" : "Enviado por"
           }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviado por"
+          }
         }
       }
     },
@@ -34166,6 +35078,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviado a"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enviado a"
@@ -34608,6 +35526,12 @@
             "value" : "Tasa de servicio"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tasa de servicio"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -34721,6 +35645,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Establecer PIN"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Establecer PIN"
@@ -35042,6 +35972,12 @@
             "state" : "translated",
             "value" : "Opciones sobre acciones"
           }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opciones sobre acciones"
+          }
         }
       }
     },
@@ -35108,6 +36044,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compartir texto (dirección bitcoin)"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Compartir texto (dirección bitcoin)"
@@ -35671,6 +36613,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar factura única"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mostrar factura única"
@@ -36361,6 +37309,12 @@
             "state" : "translated",
             "value" : "Mostrar QR reutilizables"
           }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar QR reutilizables"
+          }
         }
       }
     },
@@ -36473,7 +37427,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Omitir la comprobación de la comisión absoluta para Lightning"
+            "value" : "Omitir la comprobación de comisión absoluta para Lightning"
           }
         },
         "fr" : {
@@ -36591,6 +37545,12 @@
             "value" : "Gastar intercambios caducados"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gastar intercambios caducados"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -36620,6 +37580,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gastar = echar agua\nRecibir = añadir más agua"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gastar = echar agua\nRecibir = añadir más agua"
@@ -36694,6 +37660,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se ha abortado el empalme"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Se ha abortado el empalme"
@@ -36929,6 +37901,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volver a empezar"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Volver a empezar"
@@ -37170,6 +38148,12 @@
             "value" : "Ayuda"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asistencia"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -37199,6 +38183,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Intercambiar direcciones"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Intercambiar direcciones"
@@ -37361,6 +38351,12 @@
             "value" : "Direcciones de intercambio"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Direcciones de intercambio"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -37517,6 +38513,12 @@
             "state" : "translated",
             "value" : "Haz una foto"
           }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haz una foto"
+          }
         }
       }
     },
@@ -37586,6 +38588,12 @@
             "value" : "Taproot"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Taproot"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -37616,6 +38624,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Taproot (recomendado)"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Taproot (recomendado)"
@@ -37770,6 +38784,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La capacidad adicional se conservará durante ese tiempo."
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "La capacidad adicional se conservará durante ese tiempo."
@@ -38090,6 +39110,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El vencimiento de este pago es demasiado lejano."
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "El vencimiento de este pago es demasiado lejano."
@@ -38435,6 +39461,12 @@
             "value" : "El ID del pago no es válido. Inténtelo de nuevo."
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El ID del pago no es válido. Inténtelo de nuevo."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -38721,6 +39753,12 @@
             "value" : "El importe del pago no es válido."
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El importe del pago no es válido."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -38750,6 +39788,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El importe del pago es demasiado grande - intente dividirlo en varias partes."
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "El importe del pago es demasiado grande - intente dividirlo en varias partes."
@@ -38789,6 +39833,12 @@
             "value" : "El importe del pago es demasiado pequeño."
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El importe del pago es demasiado pequeño."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -38818,6 +39868,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El pago no se ha podido retransmitir al destinatario (probablemente liquidez entrante insuficiente)."
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "El pago no se ha podido retransmitir al destinatario (probablemente liquidez entrante insuficiente)."
@@ -38857,6 +39913,12 @@
             "value" : "El pago no se ha podido enviar a través de sus canales existentes."
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El pago no se ha podido enviar a través de sus canales existentes."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -38891,6 +39953,12 @@
             "value" : "El pago ha sido rechazado por el destinatario. Es posible que esta factura en concreto ya se haya pagado."
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El pago ha sido rechazado por el destinatario. Es posible que esta factura en concreto ya se haya pagado."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -38920,6 +39988,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El destinatario no está conectado."
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "El destinatario no está conectado."
@@ -38994,6 +40068,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La solicitud ha expirado. Comprueba tu conexión a Internet e inténtalo de nuevo."
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "La solicitud ha expirado. Comprueba tu conexión a Internet e inténtalo de nuevo."
@@ -39313,6 +40393,12 @@
             "value" : "El total de las tasas supera tu saldo"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El total de las tasas supera tu saldo"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -39382,6 +40468,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La cartera se ha reiniciado mientras se procesaba el pago."
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "La cartera se ha reiniciado mientras se procesaba el pago."
@@ -39541,6 +40633,12 @@
             "value" : "Estos fondos no fueron canjeados a tiempo. Toque para gastar estos fondos."
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estos fondos no se intercambiaron a tiempo. Toque para gastar estos fondos."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -39578,7 +40676,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Estos fondos estarán disponibles a partir de %lld días."
+            "value" : "Estos fondos estarán disponibles dentro de %lld días."
           }
         },
         "fr" : {
@@ -39695,6 +40793,12 @@
             "state" : "translated",
             "value" : "Esta dirección está alojada en un DNS no seguro. DNSSEC debe estar habilitado."
           }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta dirección está alojada en un DNS no seguro. DNSSEC debe estar habilitado."
+          }
         }
       }
     },
@@ -39720,6 +40824,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta dirección utiliza una oferta Bolt12 no válida."
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Esta dirección utiliza una oferta Bolt12 no válida."
@@ -39916,6 +41026,12 @@
             "value" : "Esta tasa se destina al servicio que proporciona la liquidez."
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta comisión se destina al servicio que proporciona la liquidez."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -40072,6 +41188,12 @@
             "value" : "Esta factura ya ha sido pagada."
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta factura ya ha sido pagada."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -40106,6 +41228,12 @@
             "value" : "Esta factura utiliza funciones no compatibles. Asegúrate de que estás en la última versión de Phoenix."
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta factura utiliza funciones no compatibles. Asegúrate de que estás en la última versión de Phoenix."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -40135,6 +41263,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta es una dirección humanamente legible para su solicitud de pago Bolt12."
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Esta es una dirección humanamente legible para su solicitud de pago Bolt12."
@@ -40366,6 +41500,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este pago supera su saldo."
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Este pago supera su saldo."
@@ -40806,6 +41946,12 @@
             "state" : "translated",
             "value" : "Consejo"
           }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consejo"
+          }
         }
       }
     },
@@ -40957,6 +42103,12 @@
             "value" : "Para activar un PIN personalizado, primero debes desactivar la opción \"Permitir código de acceso alternativo\"."
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para activar un PIN personalizado, primero debes desactivar la opción \"Permitir código de acceso alternativo\"."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -41026,6 +42178,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para activar la opción \"permitir código de acceso alternativo\", primero debes desactivar el PIN personalizado."
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Para activar la opción \"permitir código de acceso alternativo\", primero debes desactivar el PIN personalizado."
@@ -41393,7 +42551,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tor está activada"
+            "value" : "Tor está activado"
           }
         },
         "fr" : {
@@ -41507,6 +42665,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Total"
@@ -41829,6 +42993,12 @@
             "value" : "Touch ID"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touch ID"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -41858,6 +43028,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "transacción"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "transacción"
@@ -41938,6 +43114,12 @@
             "value" : "Las transacciones con feerate insuficiente pueden demorarse días o semanas sin confirmarse.\n\nLa elección del feerate es responsabilidad tuya. Una vez enviada, esta transacción no puede cancelarse, sólo acelerarse con tasas más elevadas.\n\n¿Estás seguro de que quieres proceder?"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las transacciones con feerate insuficiente pueden demorarse días o semanas sin confirmarse.\n\nLa elección del feerate es responsabilidad tuya. Una vez enviada, esta transacción no puede cancelarse, sólo acelerarse con comisiones más elevadas.\n\n¿Estás seguro de que quieres proceder?"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -42007,6 +43189,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contacto de confianza"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Contacto de confianza"
@@ -42568,6 +43756,12 @@
             "state" : "translated",
             "value" : "Error de oferta desconocida"
           }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error de oferta desconocida"
+          }
         }
       }
     },
@@ -42592,6 +43786,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Motivo desconocido"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Motivo desconocido"
@@ -43312,6 +44512,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utiliza esta pantalla para gastar tus fondos en la cadena que no fueron canjeados a tiempo. La solicitud de canje ha caducado. "
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Utiliza esta pantalla para gastar tus fondos en la cadena que no fueron canjeados a tiempo. La solicitud de canje ha caducado. "
@@ -44154,6 +45360,12 @@
             "value" : "Creación de carteras"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Creación de carteras"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -44183,6 +45395,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opciones de creación de carteras"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Opciones de creación de carteras"
@@ -44339,6 +45557,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Quieres una dirección más bonita? Utilice servicios de terceros o aloje usted mismo la dirección."
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "¿Quieres una dirección más bonita? Utilice servicios de terceros o aloje usted mismo la dirección."
@@ -44615,7 +45839,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Informe de torre de vigilancia"
+            "value" : "Reporte de torre de vigilancia"
           }
         },
         "fr" : {
@@ -44847,6 +46071,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Qué PIN?"
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "¿Qué PIN?"
@@ -45132,7 +46362,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Con Phoenix, enviar y recibir bitcoin es fácil y seguro."
+            "value" : "Con Phoenix, enviar y recibir Bitcoin es fácil y seguro."
           }
         },
         "fr" : {
@@ -45251,6 +46481,12 @@
             "value" : "Has añadido %@"
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Has añadido %@"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -45361,6 +46597,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estás solicitando una cantidad **inicial** de liquidez. La liquidez no es constante a lo largo del tiempo: a medida que recibas fondos durante el Rayo, la liquidez se consumirá y se convertirá en tu saldo.\n\nAl cabo de un año, la liquidez restante no utilizada será reclamada por el servicio."
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Estás solicitando una cantidad **inicial** de liquidez. La liquidez no es constante a lo largo del tiempo: a medida que recibas fondos durante el Rayo, la liquidez se consumirá y se convertirá en tu saldo.\n\nAl cabo de un año, la liquidez restante no utilizada será reclamada por el servicio."
@@ -45485,7 +46727,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Eres responsable de guardar la frase de recuperación."
+            "value" : "Eres responsable de guardar tu frase de recuperación."
           }
         },
         "fr" : {
@@ -46251,7 +47493,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¡No has hecho una copia de seguridad de tu frase de recuperación!"
+            "value" : "No has hecho una copia de seguridad de tu frase de recuperación."
           }
         },
         "fr" : {
@@ -46288,6 +47530,12 @@
             "value" : "Tienes demasiados pagos pendientes. Vuelva a intentarlo una vez que se hayan liquidado."
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tienes demasiados pagos pendientes. Vuelva a intentarlo una vez que se hayan liquidado."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -46317,6 +47565,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es posible que puedas reducir tus comisiones aumentando el tamaño de tu cubo antes de una serie de pagos entrantes."
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Es posible que puedas reducir tus comisiones aumentando el tamaño de tu cubo antes de una serie de pagos entrantes."
@@ -46391,6 +47645,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Necesitas al menos un canal para reclamar tu dirección. Intenta añadir fondos a tu monedero e inténtalo de nuevo."
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Necesitas al menos un canal para reclamar tu dirección. Intenta añadir fondos a tu monedero e inténtalo de nuevo."
@@ -46552,6 +47812,12 @@
             "value" : "Podrás sobrepagar facturas relámpago hasta 2 veces la cantidad solicitada. Útil para propinas manuales, o como medida de privacidad."
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Podrás sobrepagar facturas relámpago hasta 2 veces la cantidad solicitada. Útil para propinas manuales, o como medida de privacidad."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -46707,6 +47973,12 @@
             "value" : "Tu canal aún no está conectado. Espera a tener una conexión estable e inténtalo de nuevo."
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu canal aún no está conectado. Espera a tener una conexión estable e inténtalo de nuevo."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -46736,6 +48008,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu canal aún está en proceso de apertura. Espere e inténtelo de nuevo."
+          }
+        },
+        "es-419" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tu canal aún está en proceso de apertura. Espere e inténtelo de nuevo."
@@ -46976,6 +48254,12 @@
             "value" : "Su frase de recuperación es de 12 palabras, generada utilizando el estándar BIP39.\n\nSe recomienda inglés. Si prefiere otro idioma, le proporcionamos instrucciones de recuperación en nuestro sitio web.\n\nSu selección aquí **no** afecta su capacidad para enviar o recibir bitcoins dentro de Phoenix."
           }
         },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu frase de recuperación tiene 12 palabras, generadas utilizando la norma BIP39.\n\nSe recomienda el inglés. Si prefieres otro idioma, ofrecemos instrucciones de recuperación en nuestro sitio web.\n\nTu selección aquí **no** afecta a tu capacidad de enviar o recibir bitcoin dentro de Phoenix."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -47008,6 +48292,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Su frase de recuperación es una lista de 12 palabras en:"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu frase de recuperación es una lista de 12 palabras en:"
           }
         },
         "fr" : {

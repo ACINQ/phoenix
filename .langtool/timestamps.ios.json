@@ -704,6 +704,9 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z"
       }
     },
     "(inclusive)" : {
@@ -778,6 +781,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "(Oferta relámpago)"
       }
     },
     "(Phoenix can be running in the background.)" : {
@@ -928,6 +935,9 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z"
       }
     },
     "(This is your address - derived from your seed. You alone possess your seed.)" : {
@@ -1061,6 +1071,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "**desactivado**: los pagos enviados serán anónimos"
       }
     },
     "**Do not lose this seed.** Save it somewhere safe (not on this phone). If you lose your seed and your phone, you've lost your funds." : {
@@ -1136,6 +1150,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "**habilitado**: podrán saber cuándo los pagos proceden de ti"
       }
     },
     "**Imagine that your wallet is a bucket**, and your balance is the water in the bucket." : {
@@ -1178,6 +1196,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "**Esta solicitud de pago Bolt12 es el equivalente Lightning a una dirección Bitcoin.**\n\nA diferencia de las facturas Lightning tradicionales, no caduca y puede reutilizarse.\n\nCompártela ampliamente: para donaciones, propinas o para que te paguen tus amigos.\n\n🛟 **¿Quién admite Bolt12?**\n\nPor el momento, pocos servicios admiten Bolt12. Si un servicio rechaza esta factura, ¡hazle saber que se lo está perdiendo!\n\n🪫 **Restricciones**\n\nTu teléfono debe estar encendido y conectado a Internet para recibir un pago. También activar TOR en Phoenix puede causar problemas."
       }
     },
     "#%lld: %@" : {
@@ -1272,6 +1294,10 @@
       "en" : {
         "ts" : "2024-08-12T21:16:31Z",
         "v" : "%1$@ - from %2$@"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "%1$@ - de %2$@"
       }
     },
     "%@ - to %@" : {
@@ -1290,6 +1316,10 @@
       "en" : {
         "ts" : "2024-08-12T21:16:31Z",
         "v" : "%1$@ - to %2$@"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "%1$@ - a %2$@"
       }
     },
     "%@ [more info](https://phoenix.acinq.co/faq#what-is-inbound-liquidity)" : {
@@ -1332,6 +1362,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z",
+        "v" : "%1$@ %2$@"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
         "v" : "%1$@ %2$@"
       }
     },
@@ -2011,6 +2045,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "+%@ liquidez entrante"
       }
     },
     "<decryption error>" : {
@@ -3322,8 +3360,8 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Acerca de"
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Sobre Phoenix"
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -3490,6 +3528,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Añadir contacto"
       }
     },
     "add liquidity" : {
@@ -4836,8 +4878,8 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "¿Está seguro que quiere proceder?"
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "¿Está seguro de que desea continuar?"
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -4888,6 +4930,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Adjuntar un mensaje"
       }
     },
     "Attention: if the Bitcoin mempool feerate is high, incoming LN payments requiring an on-chain operation could be expensive." : {
@@ -5555,6 +5601,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Ten cuidado con los mensajes de fuentes desconocidas"
       }
     },
     "Below the expected fee. Some payments may be rejected." : {
@@ -5574,8 +5624,8 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Por debajo de la tarifa esperada. Algunos pagos pueden ser rechazados."
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Por debajo de la tasa prevista. Algunos pagos pueden ser rechazados."
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -5712,6 +5762,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "BIP353 Dirección DNS"
       }
     },
     "Bitcoin" : {
@@ -5981,8 +6035,7 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Bitcoin sobrealimentado"
+        "ts" : "2024-08-12T21:22:49Z"
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -6141,6 +6194,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Oferta Bolt12:"
       }
     },
     "Bolt12 offers" : {
@@ -6158,6 +6215,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Bolt12 ofrece"
       }
     },
     "broadcast" : {
@@ -6740,8 +6801,8 @@
         "ts" : "2024-08-12T21:16:31Z"
       },
       "es" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Los canales ya están procesando un empalme. Vuelve a intentarlo más tarde."
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Los canales ya están procesando un Splice. Inténtelo de nuevo más tarde."
       },
       "fr" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -6765,8 +6826,8 @@
         "ts" : "2024-08-12T21:16:31Z"
       },
       "es" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Los canales se cierran."
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Los canales se están cerrando."
       },
       "fr" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -7161,6 +7222,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Reclamar mi dirección"
       }
     },
     "claimed amount" : {
@@ -7236,6 +7301,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Imagen nítida"
       }
     },
     "Clear textfield" : {
@@ -8370,6 +8439,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Imagen de contacto"
       }
     },
     "Contact support if needed." : {
@@ -8416,6 +8489,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Contactos"
       }
     },
     "continue to next step" : {
@@ -8491,6 +8568,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Imagen copiada en la mesa de trabajo"
       }
     },
     "Copied QR code image to pasteboard!" : {
@@ -8740,6 +8821,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Opciones de copia"
       }
     },
     "Copy Text" : {
@@ -8984,6 +9069,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "No se han podido recuperar los datos del pago en un tiempo razonable. El destinatario puede estar desconectado o ilocalizable."
       }
     },
     "Could not retrieve payment details. Received invalid response from node." : {
@@ -9001,6 +9090,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "No se han podido recuperar los datos de pago. Se ha recibido una respuesta no válida del nodo."
       }
     },
     "Create new wallet" : {
@@ -9020,8 +9113,8 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Crear nueva billetera"
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Crear una nueva cartera"
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -9673,6 +9766,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Borrar contacto"
       }
     },
     "Delete contact?" : {
@@ -9690,6 +9787,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "¿Borrar contacto?"
       }
     },
     "Delete payment" : {
@@ -10450,6 +10551,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Descartar cambios"
       }
     },
     "Discard Changes" : {
@@ -10496,6 +10601,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "¿Descartar cambios?"
       }
     },
     "Disconnected" : {
@@ -10627,8 +10736,8 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Mostrar"
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Visualización"
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -10685,8 +10794,8 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Mostrar semilla"
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Mostrar semillas"
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -11110,6 +11219,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Editar contacto"
       }
     },
     "Edit Info" : {
@@ -11269,8 +11382,7 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Servidor Electrum"
+        "ts" : "2024-08-12T21:22:49Z"
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -12015,6 +12127,9 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z"
       }
     },
     "Expired" : {
@@ -12512,8 +12627,8 @@
         "ts" : "2024-08-12T21:16:31Z"
       },
       "es" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "La tasa es insuficiente."
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "La tarifa es insuficiente."
       },
       "fr" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -12905,6 +13020,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Buscando factura..."
       }
     },
     "Fetching Lightning URL" : {
@@ -13211,8 +13330,8 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Forzar el cierre de canales"
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Forzar cierre de canales"
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -13412,6 +13531,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "URI completo"
       }
     },
     "Funding failure" : {
@@ -13655,7 +13778,8 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z"
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Configuración general"
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z"
@@ -14143,6 +14267,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Cómo utilizarlo"
       }
     },
     "Human-readable address" : {
@@ -14160,6 +14288,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Dirección legible por humanos"
       }
     },
     "I have saved my recovery phrase somewhere safe." : {
@@ -14179,8 +14311,8 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Guardé mi frase de recuperación en un lugar seguro."
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "He guardado mi frase de recuperación en algún lugar seguro."
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -15490,8 +15622,8 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Los pagos entrantes a veces requieren transacciones en cadena. Esto no siempre sucede, sólo cuando es necesario."
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Los pagos entrantes a veces requieren transacciones en la cadena. Esto no ocurre siempre, solo cuando es necesario."
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -15519,8 +15651,8 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Se rechazarán los pagos entrantes que requieran operaciones en cadena."
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Los pagos entrantes que requieran operaciones en la cadena serán rechazados."
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -15734,6 +15866,10 @@
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
       },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Dirección DNS BIP353 no válida"
+      },
       "fr" : {
         "ts" : "2024-08-12T21:16:31Z",
         "v" : "Adresse DNS BIP353 invalide"
@@ -15866,6 +16002,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Oferta no válida"
       }
     },
     "Invalid port. Valid range: [1 - 65535]" : {
@@ -16371,6 +16511,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Más información"
       }
     },
     "Learn more from our [blog post](https://acinq.co/blog/phoenix-splicing-update)." : {
@@ -16604,6 +16748,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Tasa por rayos"
       }
     },
     "Lightning fee amount: (percent), (amountBitcoin), ≈(amountFiat)" : {
@@ -16851,6 +16999,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Oferta relámpago"
       }
     },
     "Lightning Offers" : {
@@ -16868,6 +17020,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Ofertas relámpago"
       }
     },
     "Lightning payments are fast and best suited for smaller payments." : {
@@ -16942,6 +17098,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Código QR del rayo"
       }
     },
     "Link" : {
@@ -17254,8 +17414,7 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Registros"
+        "ts" : "2024-08-12T21:22:49Z"
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -17340,8 +17499,8 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "¡Feerate bajo!"
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "¡Baja tasa!"
       },
       "fr" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -17682,8 +17841,8 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Importe máximo de la tarifa"
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Importe máximo de la tasa"
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -18189,8 +18348,8 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Tarifa de minero"
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Tasa del minero"
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -18610,6 +18769,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "NUEVO"
       }
     },
     "New Channel (auto-created)" : {
@@ -18656,6 +18819,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Nuevo contacto"
       }
     },
     "New inbound liquidity:" : {
@@ -18754,6 +18921,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Aún no hay dirección..."
       }
     },
     "No available channels. Please check your internet connection." : {
@@ -18912,6 +19083,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "No hay resultados para la búsqueda"
       }
     },
     "No notifications" : {
@@ -20384,6 +20559,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Código de pago"
       }
     },
     "payment description" : {
@@ -20484,6 +20663,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Pago de %@"
       }
     },
     "payment hash" : {
@@ -21022,6 +21205,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Pago a %@"
       }
     },
     "Payment will fail" : {
@@ -21440,8 +21627,8 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Phoenix tiene custodia propia. Tú tomas el control."
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Phoenix es autocustodia. Tú tomas el control."
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -22711,8 +22898,8 @@
         "ts" : "2024-08-12T21:16:31Z"
       },
       "es" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "El destinatario no está localizable, o no tiene suficiente liquidez entrante."
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "El destinatario no está localizable o no tiene suficiente liquidez entrante."
       },
       "fr" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -23080,8 +23267,8 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Restablecer billetera"
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Reiniciar cartera"
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -23167,8 +23354,8 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Restaurar mi billetera"
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Restaurar mi cartera"
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -23278,8 +23465,8 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Revisar"
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Validar"
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -23445,6 +23632,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Guardar cambios"
       }
     },
     "Save it somewhere safe (not on this phone). If you lose your seed and your phone, you've lost your funds." : {
@@ -23578,6 +23769,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Busca en"
       }
     },
     "Security" : {
@@ -23682,6 +23877,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Seleccionar imagen"
       }
     },
     "select miner fee when sending on-chain" : {
@@ -24100,6 +24299,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Enviado por"
       }
     },
     "Sent To" : {
@@ -24117,6 +24320,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Enviado a"
       }
     },
     "Server" : {
@@ -24528,8 +24735,8 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Ajustes"
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Configuración"
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -24729,6 +24936,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Opciones sobre acciones"
       }
     },
     "Share Text" : {
@@ -25177,6 +25388,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Mostrar factura única"
       }
     },
     "Show only in-flight payments" : {
@@ -25658,6 +25873,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Mostrar QR reutilizables"
       }
     },
     "Sign into iCloud to backup your payments" : {
@@ -25735,8 +25954,8 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Omitir la verificación de tarifa absoluta para Lightning"
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Omitir la comprobación absoluta de tasas para Lightning"
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -26392,8 +26611,8 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Billetera Swap-in"
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Cartera swap-in"
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -26476,6 +26695,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Haz una foto"
       }
     },
     "Tap for more info" : {
@@ -26885,8 +27108,8 @@
         "ts" : "2024-08-12T21:16:31Z"
       },
       "es" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "El vencimiento de este pago está demasiado lejos en el futuro."
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "El vencimiento de este pago es demasiado lejano."
       },
       "fr" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -27117,8 +27340,8 @@
         "ts" : "2024-08-12T21:16:31Z"
       },
       "es" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "El ID del pago no es válido. Inténtalo de nuevo."
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "El ID del pago no es válido. Inténtelo de nuevo."
       },
       "fr" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -27342,8 +27565,8 @@
         "ts" : "2024-08-12T21:16:31Z"
       },
       "es" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "El importe del pago es demasiado grande - intenta dividirlo en varias partes."
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "El importe del pago es demasiado grande - intente dividirlo en varias partes."
       },
       "fr" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -27392,8 +27615,8 @@
         "ts" : "2024-08-12T21:16:31Z"
       },
       "es" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "El pago no pudo ser retransmitido al destinatario (probablemente insuficiente liquidez de entrada)."
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "El pago no se ha podido retransmitir al destinatario (probablemente liquidez entrante insuficiente)."
       },
       "fr" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -27417,8 +27640,8 @@
         "ts" : "2024-08-12T21:16:31Z"
       },
       "es" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "No se ha podido enviar el pago a través de tus canales existentes."
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "El pago no se ha podido enviar a través de sus canales existentes."
       },
       "fr" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -27442,8 +27665,8 @@
         "ts" : "2024-08-12T21:16:31Z"
       },
       "es" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "El pago fue rechazado por el destinatario. Es posible que esta factura en concreto ya se haya pagado."
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "El pago ha sido rechazado por el destinatario. Es posible que esta factura en concreto ya se haya pagado."
       },
       "fr" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -27467,8 +27690,8 @@
         "ts" : "2024-08-12T21:16:31Z"
       },
       "es" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "El destinatario está desconectado."
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "El destinatario no está conectado."
       },
       "fr" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -27519,6 +27742,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "La solicitud ha expirado. Comprueba tu conexión a Internet e inténtalo de nuevo."
       }
     },
     "The scanned QR code is not a bitcoin address" : {
@@ -27795,8 +28022,8 @@
         "ts" : "2024-08-12T21:16:31Z"
       },
       "es" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "El monedero se reinició mientras se procesaba el pago."
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "La cartera se ha reiniciado mientras se procesaba el pago."
       },
       "fr" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -27907,8 +28134,8 @@
         "ts" : "2024-08-12T21:16:31Z"
       },
       "es" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Estos fondos no se intercambiaron a tiempo. Toca para gastar."
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Estos fondos no fueron canjeados a tiempo. Toque para gastar estos fondos."
       },
       "fr" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -28017,6 +28244,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Esta dirección está alojada en un DNS no seguro. DNSSEC debe estar habilitado."
       }
     },
     "This address uses an invalid Bolt12 offer." : {
@@ -28034,6 +28265,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Esta dirección utiliza una oferta Bolt12 no válida."
       }
     },
     "This appears to be a website (not a lightning invoice):" : {
@@ -28329,6 +28564,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Esta es una dirección humanamente legible para su solicitud de pago Bolt12."
       }
     },
     "This is a swap address. It is not controlled by your wallet. On-chain deposits sent to this address will be converted to Lightning channels." : {
@@ -28493,8 +28732,8 @@
         "ts" : "2024-08-12T21:16:31Z"
       },
       "es" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Este pago supera tu saldo."
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Este pago supera su saldo."
       },
       "fr" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -28804,6 +29043,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Consejo"
       }
     },
     "Tip amount: (percent), (amountBitcoin), ≈(amountFiat)" : {
@@ -29215,8 +29458,8 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Tor está Habilitado"
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Tor está activado"
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -29297,6 +29540,9 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z"
       }
     },
     "total amount" : {
@@ -29644,6 +29890,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Contacto de confianza"
       }
     },
     "Trustless swaps" : {
@@ -30032,6 +30282,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Error de oferta desconocida"
       }
     },
     "Unknown reason" : {
@@ -31218,8 +31472,8 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Información de billetera"
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Información de la cartera"
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -31303,6 +31557,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "¿Quieres una dirección más bonita? Utilice servicios de terceros o aloje usted mismo la dirección."
       }
     },
     "Warning" : {
@@ -31409,8 +31667,8 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Alerta de torre de vigilancia"
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Alerta de la Watchtower"
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -31496,8 +31754,8 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Reporte de torre de vigilancia"
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Informe de la Watchtower"
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -31583,8 +31841,8 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "¡Bienvenido!"
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Bienvenido!"
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -31869,8 +32127,8 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Con Phoenix enviar y recibir bitcoins es fácil y seguro."
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Con Phoenix, enviar y recibir bitcoins es fácil y seguro."
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -32296,8 +32554,8 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Puede restaurar su billetera en cualquier momento usando su clave secreta. ¡Manténlo seguro!"
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Puedes restaurar tu cartera en cualquier momento utilizando tu clave secreta. ¡Manténgalo a salvo!"
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -32673,8 +32931,8 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "¡No has hecho una copia de seguridad de tu frase de recuperación!"
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "No has hecho una copia de seguridad de tu frase de recuperación."
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -32702,8 +32960,8 @@
         "ts" : "2024-08-12T21:16:31Z"
       },
       "es" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Tienes demasiados pagos pendientes. Vuelve a intentarlo cuando se hayan liquidado."
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Tienes demasiados pagos pendientes. Vuelva a intentarlo una vez que se hayan liquidado."
       },
       "fr" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -32779,6 +33037,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Necesitas al menos un canal para reclamar tu dirección. Intenta añadir fondos a tu monedero e inténtalo de nuevo."
       }
     },
     "You scanned a bitcoin address. Phoenix currently only supports sending Lightning payments. You can use a third-party service to make the offchain->onchain swap." : {
@@ -33023,8 +33285,8 @@
         "ts" : "2024-08-12T21:16:31Z"
       },
       "es" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Tu canal aún está en proceso de apertura. Espera e inténtalo de nuevo."
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Tu canal aún está en proceso de apertura. Espere e inténtelo de nuevo."
       },
       "fr" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -33077,8 +33339,8 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Tu clave, tus bitcoins"
+        "ts" : "2024-08-12T21:22:49Z",
+        "v" : "Tu llave, tus bitcoins"
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
