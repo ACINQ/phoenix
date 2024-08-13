@@ -1176,7 +1176,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "(Offre éclair)"
+            "value" : "(Offre Lightning)"
           }
         }
       }
@@ -1823,7 +1823,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "**Cette demande de paiement Bolt12 est l'équivalent Lightning d'une adresse Bitcoin\n\nContrairement aux factures Lightning traditionnelles, elle n'expire pas et peut être réutilisée.\n\nPartagez-la largement : pour des dons, des pourboires, ou pour vous faire payer par vos amis.\n\n🛟 **Qui soutient Bolt12?**\n\nPour l'instant, peu de services soutiennent Bolt12. Si un service rejette cette facture, faites-lui savoir qu'il passe à côté !\n\n🪫 **Restrictions**\n\nVotre téléphone doit être allumé et connecté à internet pour recevoir un paiement. L'activation de TOR dans Phoenix peut également causer des problèmes."
+            "value" : "**Ce code de paiement Bolt12 est l'équivalent Lightning d'une adresse Bitcoin\n\nContrairement aux requêtes Lightning traditionnelles, elle n'expire pas et peut être réutilisée.\n\nPartagez-la largement : pour des dons, des pourboires, ou pour vous faire payer par vos amis.\n\n🛟 **Qui accepte Bolt12?**\n\nPour l'instant, peu de services supportent Bolt12. Si un service rejette ce code, faites-leur savoir qu'il passe à côté de quelque chose de génial !\n\n🪫 **Restrictions**\n\nVotre téléphone doit être allumé et connecté à internet pour recevoir un paiement. L'activation de TOR dans Phoenix peut également causer des problèmes."
           }
         }
       }
@@ -12632,7 +12632,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Copie de l'image dans le tableau !"
+            "value" : "Image copiée !"
           }
         }
       }
@@ -19087,7 +19087,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Facture d'achat..."
+            "value" : "Récupération de l\\'invoice..."
           }
         }
       }
