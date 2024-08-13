@@ -20902,7 +20902,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Adresse lisible par l'homme"
+            "value" : "Adresse Lightning"
           }
         }
       }
@@ -24449,7 +24449,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Frais de foudre"
+            "value" : "Frais Lightning"
           }
         }
       }
@@ -24817,7 +24817,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Offre éclair"
+            "value" : "Offre Lightning"
           }
         }
       }
@@ -24857,7 +24857,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Offres éclair"
+            "value" : "Offres Lightning"
           }
         }
       }
@@ -24978,7 +24978,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Code QR de la foudre"
+            "value" : "Code QR Lightning"
           }
         }
       }
@@ -47929,7 +47929,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vous avez trop de paiements en attente. Réessayez une fois qu\\'il sont terminés."
+            "value" : "Vous avez trop de paiements en attente. Réessayez une fois qu\\'ils sont terminés."
           }
         }
       }
