@@ -1,8 +1,13 @@
 import Foundation
 import SwiftUI
 
+struct QRCodeValue: Equatable {
+	let original: String
+	let rendered: String // possibly transformed using UPPERCASE
+}
+
 class QRCode : ObservableObject {
-	@Published var value: String? = nil
+	@Published var value: QRCodeValue? = nil
 	@Published var cgImage: CGImage? = nil
 	@Published var image: Image? = nil
 
@@ -12,14 +17,14 @@ class QRCode : ObservableObject {
 		self.image = nil
 	}
 	
-	func generate(value: String) {
+	func generate(value: QRCodeValue) {
 		if value == self.value { return }
 		self.value = value
 		self.cgImage = nil
 		self.image = nil
 
 		DispatchQueue.global(qos: .userInitiated).async {
-			let data = value.data(using: .ascii)
+			let data = value.rendered.data(using: .ascii)
 			guard let qrFilter = CIFilter(name: "CIQRCodeGenerator") else {
 				fatalError("No CIQRCodeGenerator")
 			}

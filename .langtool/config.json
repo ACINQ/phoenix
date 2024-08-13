@@ -5,7 +5,8 @@
       "formality" : "prefer_less"
     },
     "es-419" : {
-      "formality" : "prefer_less"
+      "formality" : "prefer_less",
+      "target" : "es"
     },
     "fr" : {
       "formality" : "prefer_more"

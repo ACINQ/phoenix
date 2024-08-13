@@ -406,7 +406,7 @@ struct LightningDualView: View {
 	@ViewBuilder
 	func offerAddressView() -> some View {
 		
-		if let offerStr = qrCode.value {
+		if let offerStr = qrCode.value?.original {
 			Text(offerStr)
 				.contextMenu {
 					Button {
@@ -711,7 +711,10 @@ struct LightningDualView: View {
 			
 			offerStr = offerString
 			if activeType == .bolt12_offer {
-				qrCode.generate(value: offerString)
+				qrCode.generate(value: QRCodeValue(
+					original: offerString,
+					rendered: offerString // is this supposed to be uppercase ?
+				))
 			}
 			
 		} catch {
@@ -730,7 +733,10 @@ struct LightningDualView: View {
 			log.debug("updating qr code...")
 			
 			// Issue #196: Use uppercase lettering for invoices and address QRs
-			qrCode.generate(value: m.request.uppercased())
+			qrCode.generate(value: QRCodeValue(
+				original: m.request,
+				rendered: m.request.uppercased()
+			))
 		}
 	}
 	
@@ -830,7 +836,7 @@ struct LightningDualView: View {
 		var sources: [SourceInfo] = []
 		switch activeType {
 		case .bolt11_invoice:
-			if let invoiceText = qrCode.value {
+			if let invoiceText = qrCode.value?.original {
 				sources.append(SourceInfo(
 					type: .text,
 					isDefault: true,
@@ -860,7 +866,7 @@ struct LightningDualView: View {
 					callback: exportText(bAddress)
 				))
 			}
-			if let offerText = qrCode.value {
+			if let offerText = qrCode.value?.original {
 				sources.append(SourceInfo(
 					type: .text,
 					isDefault: false,
@@ -926,7 +932,10 @@ struct LightningDualView: View {
 			activeType = .bolt12_offer
 			
 			if let offerStr {
-				qrCode.generate(value: offerStr)
+				qrCode.generate(value: QRCodeValue(
+					original: offerStr,
+					rendered: offerStr
+				))
 			} else {
 				qrCode.clear()
 			}
@@ -941,7 +950,10 @@ struct LightningDualView: View {
 			
 			if let m = mvi.model as? Receive.Model_Generated {
 				// Issue #196: Use uppercase lettering for invoices and address QRs
-				qrCode.generate(value: m.request.uppercased())
+				qrCode.generate(value: QRCodeValue(
+					original: m.request,
+					rendered: m.request.uppercased()
+				))
 			} else {
 				qrCode.clear()
 			}
