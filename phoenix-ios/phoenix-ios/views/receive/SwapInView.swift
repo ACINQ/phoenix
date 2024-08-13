@@ -367,7 +367,10 @@ struct SwapInView: View {
 			swapInAddress = address
 			
 			// Issue #196: Use uppercase lettering for invoices and address QRs
-			self.qrCode.generate(value: address.uppercased())
+			self.qrCode.generate(value: QRCodeValue(
+				original: address,
+				rendered: address.uppercased()
+			))
 		}
 	}
 	
@@ -444,7 +447,7 @@ struct SwapInView: View {
 		}
 		
 		var sources: [SourceInfo] = []
-		if let address = qrCode.value {
+		if let address = qrCode.value?.original {
 			sources.append(SourceInfo(
 				type: .text,
 				isDefault: true,
