@@ -140,11 +140,6 @@ private fun SwapInWalletView(
                 value = it.swapInOnChainWallet.publicDescriptor,
                 maxLines = 1
             )
-            SettingWithCopy(
-                title = stringResource(id = R.string.walletinfo_swapin_user_pubkey),
-                value = it.swapInOnChainWallet.userPublicKey.toHex(),
-                maxLines = 1
-            )
         }
         MenuButton(
             text = stringResource(id = R.string.walletinfo_swapin_addresses),
