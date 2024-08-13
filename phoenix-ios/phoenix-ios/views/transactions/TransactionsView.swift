@@ -286,8 +286,16 @@ struct TransactionsView: View {
 		let dateFormatter = DateFormatter()
 		dateFormatter.setLocalizedDateFormatFromTemplate("yyyyMMMM")
 		
-		var newSections = [PaymentsSection]()
+		var newSectionMap = [String: PaymentsSection]()
 		for row in allPayments {
+			
+			// Implementation note:
+			// In theory, `allPayments` is perfectly sorted according to `row.sortDate`.
+			// However, if theory != practice, then you could end up with duplicate sections.
+			// This was the case recently, when the DB query was changed, and the end result
+			// was a very messed up UI when attempting to scroll.
+			//
+			// So it's better to code more defensively, and don't assume perfect sort order.
 			
 			let date = row.sortDate
 			let comps = calendar.dateComponents([.year, .month], from: date)
@@ -295,19 +303,24 @@ struct TransactionsView: View {
 			let year = comps.year!
 			let month = comps.month!
 			
-			if var lastSection = newSections.last, lastSection.year == year, lastSection.month == month {
+			let sectionId = "\(year)-\(month)"
+			if var section = newSectionMap[sectionId] {
 				
-				lastSection.payments.append(row)
-				let _ = newSections.popLast()
-				newSections.append(lastSection)
+				section.payments.append(row)
+				newSectionMap[sectionId] = section
 				
 			} else {
 				let name = dateFormatter.string(from: date)
 				var section = PaymentsSection(year: year, month: month, name: name)
 				
 				section.payments.append(row)
-				newSections.append(section)
+				newSectionMap[sectionId] = section
 			}
+		}
+		
+		let newSections = newSectionMap.values.sorted { (a: PaymentsSection, b: PaymentsSection) in
+			// return true if `a` should be ordered before `b`; otherwise return false
+			return (a.year > b.year) || (a.year == b.year && a.month > b.month)
 		}
 		
 		paymentsPage = page

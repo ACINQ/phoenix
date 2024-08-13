@@ -1,6 +1,34 @@
 import Foundation
 import PhoenixShared
 
+extension PaymentsPage {
+	
+	func forceRefresh() -> PaymentsPage {
+		
+		// What we want to do is ensure a fetch (via the PaymentsFetcher) will return
+		// a new version of the payment (+ metadata + contact).
+		// To accomplish this we simply tweak `metadataModifiedAt` for each item.
+		
+		let newRows: [WalletPaymentOrderRow] = self.rows.map { (row: WalletPaymentOrderRow) in
+			
+			let newMetadataModifiedAt: Int64
+			if let oldMetadataModifiedAt = row.metadataModifiedAt {
+				newMetadataModifiedAt = oldMetadataModifiedAt.int64Value + 1
+			} else {
+				newMetadataModifiedAt = 0
+			}
+			
+			return WalletPaymentOrderRow(
+				id: row.kotlinId(),
+				createdAt: row.createdAt,
+				completedAt: row.completedAt,
+				metadataModifiedAt: KotlinLong(value: newMetadataModifiedAt)
+			)
+		}
+		
+		return PaymentsPage(offset: self.offset, count: self.count, rows: newRows)
+	}
+}
 
 extension WalletPaymentOrderRow {
 	
@@ -28,7 +56,34 @@ extension WalletPaymentOrderRow {
 
 extension WalletPaymentInfo {
 	
-	func paymentDescription(includingUserDescription: Bool = true) -> String? {
+	struct PaymentDescriptionOptions: OptionSet, CustomStringConvertible {
+		
+		let rawValue: Int
+
+		static let userDescription       = PaymentDescriptionOptions(rawValue: 1 << 0)
+		static let incomingBolt12Message = PaymentDescriptionOptions(rawValue: 1 << 1)
+		static let knownContact          = PaymentDescriptionOptions(rawValue: 1 << 2)
+
+		static let all: PaymentDescriptionOptions = [.userDescription, .incomingBolt12Message, .knownContact]
+		static let none: PaymentDescriptionOptions = []
+		
+		var description: String {
+			var items = [String]()
+			items.reserveCapacity(3)
+			if contains(.userDescription) {
+				items.append("userDescription")
+			}
+			if contains(.incomingBolt12Message) {
+				items.append("incomingBolt12Message")
+			}
+			if contains(.knownContact) {
+				items.append("knownContact")
+			}
+			return "[\(items.joined(separator: ","))]"
+		}
+	}
+	
+	func paymentDescription(options: PaymentDescriptionOptions = .all) -> String? {
 		
 		let sanitize = { (input: String?) -> String? in
 			
@@ -41,13 +96,27 @@ extension WalletPaymentInfo {
 			return nil
 		}
 		
-		if includingUserDescription {
-			if let description = sanitize(metadata.userDescription) {
-				return description
+		if options.contains(.userDescription) {
+			if let result = sanitize(metadata.userDescription) {
+				return result
 			}
 		}
-		if let description = sanitize(metadata.lnurl?.description_) {
-			return description
+		if let contact {
+			if options.contains(.incomingBolt12Message) {
+				if payment.isIncoming(), let msg = attachedMessage() {
+					return msg // only incoming messages from **known contacts**
+				}
+			}
+			if options.contains(.knownContact) {
+				if payment.isIncoming() {
+					return String(localized: "Payment from \(contact.name)")
+				} else {
+					return String(localized: "Payment to \(contact.name)")
+				}
+			}
+		}
+		if let result = sanitize(metadata.lnurl?.description_) {
+			return result
 		}
 		
 		if let incomingPayment = payment as? Lightning_kmpIncomingPayment {
@@ -58,10 +127,11 @@ extension WalletPaymentInfo {
 			
 		} else if let outgoingPayment = payment as? Lightning_kmpOutgoingPayment {
 			
-			if let lightningPayment = payment as? Lightning_kmpLightningOutgoingPayment {
+			if let lightningPayment = outgoingPayment as? Lightning_kmpLightningOutgoingPayment {
 			
 				if let normal = lightningPayment.details.asNormal() {
 					return sanitize(normal.paymentRequest.desc)
+					
 				} else if let swapOut = lightningPayment.details.asSwapOut() {
 					return sanitize(swapOut.address)
 				}
@@ -79,29 +149,29 @@ extension WalletPaymentInfo {
 		if let incomingPayment = payment as? Lightning_kmpIncomingPayment {
 			
 			if let _ = incomingPayment.origin.asSwapIn() {
-				return NSLocalizedString("On-chain deposit", comment: "Payment description for received deposit")
+				return String(localized: "On-chain deposit", comment: "Payment description for received deposit")
 			} else if let _ = incomingPayment.origin.asOnChain() {
-				return NSLocalizedString("On-chain deposit", comment: "Payment description for received deposit")
+				return String(localized: "On-chain deposit", comment: "Payment description for received deposit")
 			}
 			
 		} else if let outgoingPayment = payment as? Lightning_kmpOutgoingPayment {
 			
 			if let _ = outgoingPayment as? Lightning_kmpChannelCloseOutgoingPayment {
-				return NSLocalizedString("Channel closing", comment: "Payment description for channel closing")
+				return String(localized: "Channel closing", comment: "Payment description for channel closing")
 				
 			} else if let _ = outgoingPayment as? Lightning_kmpSpliceCpfpOutgoingPayment {
-				return NSLocalizedString("Bump fees", comment: "Payment description for splice CPFP")
+				return String(localized: "Bump fees", comment: "Payment description for splice CPFP")
 				
 			} else if let il = outgoingPayment as? Lightning_kmpInboundLiquidityOutgoingPayment {
 				let amount = Utils.formatBitcoin(sat: il._lease.amount, bitcoinUnit: .sat)
-				return NSLocalizedString(
-					"+\(amount.string) inbound liquidity",
+				return String(
+					localized: "+\(amount.string) inbound liquidity",
 					comment: "Payment description for inbound liquidity"
 				)
 			}
 		}
 	
-		return NSLocalizedString("No description", comment: "placeholder text")
+		return String(localized: "No description", comment: "placeholder text")
 	}
 	
 	func attachedMessage() -> String? {

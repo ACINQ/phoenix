@@ -11,7 +11,7 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-let CONTACTS_ENABLED = false
+let CONTACTS_ENABLED = true
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
@@ -193,7 +193,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
 	}
 
-	func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
+	func application(
+		_ application: UIApplication,
+		didDiscardSceneSessions sceneSessions: Set<UISceneSession>
+	) {
 		// Called when the user discards a scene session.
 		// If any sessions were discarded while the application was not running,
 		// this will be called shortly after application:didFinishLaunchingWithOptions.

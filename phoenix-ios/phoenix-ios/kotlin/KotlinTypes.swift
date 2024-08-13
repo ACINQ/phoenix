@@ -69,7 +69,8 @@ extension Scan {
 	typealias BadRequestReason_ServiceError = BadRequestReasonServiceError
 	typealias BadRequestReason_UnknownFormat = BadRequestReasonUnknownFormat
 	typealias BadRequestReason_UnsupportedLnurl = BadRequestReasonUnsupportedLnurl
-	typealias BadRequestReason_InvalidBip353 = BadRequestReasonInvalidBip353
+	typealias BadRequestReason_Bip353InvalidOffer = BadRequestReasonBip353InvalidOffer
+	typealias BadRequestReason_Bip353NoDNSSEC = BadRequestReasonBip353NoDNSSEC
 
 	typealias ClipboardContent_Bolt11InvoiceRequest = ClipboardContentBolt11InvoiceRequest
 	typealias ClipboardContent_BitcoinRequest = ClipboardContentBitcoinRequest

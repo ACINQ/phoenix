@@ -428,6 +428,7 @@
     },
     "(Bitcoin address)" : {
       "comment" : "Type of text being copied",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -999,6 +1000,9 @@
         }
       }
     },
+    "(image)" : {
+
+    },
     "(inclusive)" : {
       "comment" : "translate: inclusive",
       "localizations" : {
@@ -1126,6 +1130,7 @@
       }
     },
     "(QR code)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1273,6 +1278,9 @@
           }
         }
       }
+    },
+    "(text)" : {
+
     },
     "(This is your address - derived from your seed. You alone possess your seed.)" : {
       "localizations" : {
@@ -1436,6 +1444,9 @@
         }
       }
     },
+    "**disabled**: sent payments will be anonymous" : {
+
+    },
     "**Do not lose this seed.** Save it somewhere safe (not on this phone). If you lose your seed and your phone, you've lost your funds." : {
       "comment" : "RecoverySeedView",
       "localizations" : {
@@ -1517,6 +1528,9 @@
           }
         }
       }
+    },
+    "**enabled**: they will be able to tell when payments are from you" : {
+
     },
     "**Imagine that your wallet is a bucket**, and your balance is the water in the bucket." : {
       "localizations" : {
@@ -1681,6 +1695,26 @@
         }
       }
     },
+    "%@ - from %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ - from %2$@"
+          }
+        }
+      }
+    },
+    "%@ - to %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ - to %2$@"
+          }
+        }
+      }
+    },
     "%@ [more info](https://phoenix.acinq.co/faq#what-is-inbound-liquidity)" : {
       "localizations" : {
         "ar" : {
@@ -1711,6 +1745,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ [plus d'infos](https://phoenix.acinq.co/faq#what-is-inbound-liquidity)"
+          }
+        }
+      }
+    },
+    "%@ %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@"
           }
         }
       }
@@ -2611,6 +2655,7 @@
     },
     "+(amount.string) inbound liquidity" : {
       "comment" : "Payment description for inbound liquidity",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -2684,6 +2729,9 @@
           }
         }
       }
+    },
+    "+%@ inbound liquidity" : {
+      "comment" : "Payment description for inbound liquidity"
     },
     "<decryption error>" : {
       "localizations" : {
@@ -5054,9 +5102,6 @@
           }
         }
       }
-    },
-    "Address Book" : {
-
     },
     "address type" : {
       "comment" : "Label in DetailsView_IncomingPayment",
@@ -7796,6 +7841,9 @@
         }
       }
     },
+    "BIP353 DNS Address" : {
+
+    },
     "Bitcoin" : {
       "localizations" : {
         "ar" : {
@@ -8392,6 +8440,12 @@
           }
         }
       }
+    },
+    "Bolt12 offer:" : {
+
+    },
+    "Bolt12 offers" : {
+
     },
     "broadcast" : {
       "localizations" : {
@@ -9758,6 +9812,9 @@
           }
         }
       }
+    },
+    "Claim my address" : {
+
     },
     "claimed amount" : {
       "comment" : "Label in DetailsView_IncomingPayment",
@@ -11536,8 +11593,12 @@
         }
       }
     },
+    "Copied image to pasteboard!" : {
+      "comment" : "Toast message"
+    },
     "Copied QR code image to pasteboard!" : {
       "comment" : "Toast message",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -11780,6 +11841,7 @@
       }
     },
     "Copy Image (QR code)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -11859,7 +11921,11 @@
         }
       }
     },
+    "Copy options" : {
+
+    },
     "Copy Text" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -11900,6 +11966,7 @@
       }
     },
     "Copy Text (bitcoin address)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -11940,6 +12007,7 @@
       }
     },
     "Copy Text (lightning invoice)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -14135,7 +14203,11 @@
         }
       }
     },
+    "Discard changes" : {
+
+    },
     "Discard Changes" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -14174,6 +14246,9 @@
           }
         }
       }
+    },
+    "Discard changes?" : {
+
     },
     "Disconnected" : {
       "localizations" : {
@@ -14713,7 +14788,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Donar"
+            "value" : "Listo"
           }
         },
         "fr" : {
@@ -15046,6 +15121,7 @@
     },
     "Edit Payment" : {
       "comment" : "Navigation bar title",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -15395,9 +15471,6 @@
           }
         }
       }
-    },
-    "Enable if you don't want Bolt12 recipients to know that payments come from your wallet." : {
-
     },
     "Enable notifications in the Notification Center" : {
       "localizations" : {
@@ -16249,6 +16322,9 @@
           }
         }
       }
+    },
+    "Experimental" : {
+
     },
     "Expired" : {
       "localizations" : {
@@ -18167,6 +18243,9 @@
         }
       }
     },
+    "Full URI" : {
+      "comment" : "Type of text being copied"
+    },
     "Funding failure" : {
       "localizations" : {
         "ar" : {
@@ -19162,6 +19241,9 @@
     },
     "How to use" : {
 
+    },
+    "Human-readable address" : {
+      "comment" : "Type of text being copied"
     },
     "I have saved my recovery phrase somewhere safe." : {
       "localizations" : {
@@ -21342,6 +21424,7 @@
     },
     "Invalid BIP353 DNS address" : {
       "comment" : "Error message - dns record contains an invalid offer",
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -21507,6 +21590,9 @@
           }
         }
       }
+    },
+    "Invalid offer" : {
+
     },
     "Invalid port. Valid range: [1 - 65535]" : {
       "localizations" : {
@@ -22502,6 +22588,9 @@
         }
       }
     },
+    "Lightning fee" : {
+
+    },
     "Lightning fee amount: (percent), (amountBitcoin), ≈(amountFiat)" : {
       "comment" : "VoiceOver label: PaymentSummaryView",
       "localizations" : {
@@ -22708,7 +22797,7 @@
       }
     },
     "Lightning invoice" : {
-      "extractionState" : "stale",
+      "comment" : "Type of text being copied",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -25310,6 +25399,9 @@
         }
       }
     },
+    "New contact" : {
+
+    },
     "New inbound liquidity:" : {
       "localizations" : {
         "ar" : {
@@ -25424,6 +25516,9 @@
           }
         }
       }
+    },
+    "No address yet..." : {
+
     },
     "No available channels. Please check your internet connection." : {
       "localizations" : {
@@ -25620,6 +25715,9 @@
           }
         }
       }
+    },
+    "No matches for search" : {
+
     },
     "No notifications" : {
       "localizations" : {
@@ -26143,9 +26241,6 @@
           }
         }
       }
-    },
-    "Offer:" : {
-
     },
     "Offline" : {
       "comment" : "Connection state\nConnection status",
@@ -27661,6 +27756,9 @@
         }
       }
     },
+    "Payment code" : {
+      "comment" : "Type of text being copied"
+    },
     "payment description" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -27776,6 +27874,9 @@
           }
         }
       }
+    },
+    "Payment from %@" : {
+
     },
     "payment hash" : {
       "comment" : "Label in DetailsView_IncomingPayment",
@@ -28503,6 +28604,9 @@
           }
         }
       }
+    },
+    "Payment to %@" : {
+
     },
     "Payment will fail" : {
       "localizations" : {
@@ -30163,9 +30267,6 @@
           }
         }
       }
-    },
-    "Random payer key" : {
-
     },
     "Random server" : {
       "comment" : "Connection info",
@@ -31887,6 +31988,9 @@
         }
       }
     },
+    "Save changes" : {
+
+    },
     "Save it somewhere safe (not on this phone). If you lose your seed and your phone, you've lost your funds." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -32049,6 +32153,9 @@
           }
         }
       }
+    },
+    "Search" : {
+
     },
     "Security" : {
       "extractionState" : "manual",
@@ -32731,6 +32838,12 @@
           }
         }
       }
+    },
+    "Sent By" : {
+
+    },
+    "Sent To" : {
+
     },
     "Server" : {
       "localizations" : {
@@ -33536,6 +33649,7 @@
       }
     },
     "Share Image (QR code)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -33575,7 +33689,11 @@
         }
       }
     },
+    "Share options" : {
+
+    },
     "Share Text" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -33616,6 +33734,7 @@
       }
     },
     "Share Text (bitcoin address)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -33650,6 +33769,7 @@
       }
     },
     "Share Text (lightning invoice)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -37425,6 +37545,9 @@
         }
       }
     },
+    "The request timed out. Please check your internet connection and try again." : {
+
+    },
     "The scanned QR code is not a bitcoin address" : {
       "comment" : "Error message - parsing bitcoin address",
       "localizations" : {
@@ -38093,6 +38216,12 @@
         }
       }
     },
+    "This address is hosted on an unsecure DNS. DNSSEC must be enabled." : {
+      "comment" : "Error message - dns issue"
+    },
+    "This address uses an invalid Bolt12 offer." : {
+      "comment" : "Error message - dns record contains an invalid offer"
+    },
     "This appears to be a website (not a lightning invoice):" : {
       "localizations" : {
         "ar" : {
@@ -38479,6 +38608,9 @@
           }
         }
       }
+    },
+    "This is a human-readable address for your Bolt12 payment request." : {
+
     },
     "This is a swap address. It is not controlled by your wallet. On-chain deposits sent to this address will be converted to Lightning channels." : {
       "extractionState" : "manual",
@@ -39118,6 +39250,9 @@
           }
         }
       }
+    },
+    "Tip" : {
+
     },
     "Tip amount: (percent), (amountBitcoin), ≈(amountFiat)" : {
       "comment" : "VoiceOver label: PaymentSummaryView",
@@ -39796,6 +39931,9 @@
         }
       }
     },
+    "Total" : {
+
+    },
     "total amount" : {
       "comment" : "Label in DetailsView_IncomingPayment",
       "extractionState" : "manual",
@@ -40267,6 +40405,9 @@
           }
         }
       }
+    },
+    "Trusted contact" : {
+
     },
     "Trustless swaps" : {
       "localizations" : {
@@ -42547,6 +42688,9 @@
         }
       }
     },
+    "Want a prettier address? Use third-party services, or self-host the address!" : {
+
+    },
     "Warning" : {
       "localizations" : {
         "ar" : {
@@ -44570,6 +44714,9 @@
           }
         }
       }
+    },
+    "You need at least one channel to claim your address. Try adding funds to your wallet and try again." : {
+
     },
     "You scanned a bitcoin address. Phoenix currently only supports sending Lightning payments. You can use a third-party service to make the offchain->onchain swap." : {
       "comment" : "Error message - scanning lightning invoice",

@@ -217,11 +217,18 @@ struct SendView: MVIView {
 				comment: "Error message - scanning lightning invoice"
 			)
 
-		case is Scan.BadRequestReason_InvalidBip353:
+		case is Scan.BadRequestReason_Bip353InvalidOffer:
 			
 			msg = NSLocalizedString(
-				"Invalid BIP353 DNS address",
+				"This address uses an invalid Bolt12 offer.",
 				comment: "Error message - dns record contains an invalid offer"
+			)
+			
+		case is Scan.BadRequestReason_Bip353NoDNSSEC:
+			
+			msg = NSLocalizedString(
+				"This address is hosted on an unsecure DNS. DNSSEC must be enabled.",
+				comment: "Error message - dns issue"
 			)
 
 		case let serviceError as Scan.BadRequestReason_ServiceError:

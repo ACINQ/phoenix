@@ -13,6 +13,8 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 	@Binding var paymentInfo: WalletPaymentInfo
 	@Binding var showOriginalFiatValue: Bool
 	
+	let showContactView: (_ contact: ContactInfo) -> Void
+	
 	// <InfoGridView Protocol>
 	let minKeyColumnWidth: CGFloat = 50
 	let maxKeyColumnWidth: CGFloat = 200
@@ -60,6 +62,8 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 			paymentMessageRow()
 			customNotesRow()
 			attachedMessageRow()
+			sentByRow()
+			recipientRow()
 			paymentTypeRow()
 			channelClosingRow()
 			
@@ -126,7 +130,9 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 			
 		} valueColumn: {
 			
-			let description = paymentInfo.paymentDescription() ?? paymentInfo.defaultPaymentDescription()
+			let description =
+				paymentInfo.paymentDescription(options: [.userDescription]) ??
+				paymentInfo.defaultPaymentDescription()
 			Text(description)
 				.contextMenu {
 					Button(action: {
@@ -284,7 +290,6 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 	
 	@ViewBuilder
 	func attachedMessageRow() -> some View {
-		
 		let identifier: String = #function
 		
 		if let msg = paymentInfo.attachedMessage() {
@@ -301,16 +306,81 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 				
 			} valueColumn: {
 				
-				VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
-					Text(msg)
-					if paymentInfo.payment.isIncoming() {
-						Text("Be careful with messages from unknown sources")
-							.foregroundColor(.secondary)
-							.font(.subheadline)
+				Text(msg)
+				
+			} // </InfoGridRow>
+		}
+	}
+	
+	@ViewBuilder
+	func sentByRow() -> some View {
+		let identifier: String = #function
+		
+		if paymentInfo.payment.isIncoming() {
+			
+			InfoGridRow(
+				identifier: identifier,
+				vAlignment: .firstTextBaseline,
+				hSpacing: horizontalSpacingBetweenColumns,
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
+			) {
+				
+				keyColumn("Sent By")
+				
+			} valueColumn: {
+				
+				if let contact = paymentInfo.contact {
+					
+					HStack(alignment: VerticalAlignment.center, spacing: 4) {
+						ContactPhoto(fileName: contact.photoUri, size: 32)
+						Text(contact.name)
+					} // <HStack>
+					.onTapGesture {
+						showContactView(contact)
+					}
+					
+				} else {
+					
+					VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+						Text("Unknown")
+						if paymentInfo.attachedMessage() != nil {
+							Text("Be careful with messages from unknown sources")
+								.foregroundColor(.secondary)
+								.font(.subheadline)
+						}
 					}
 				}
 				
+			} // </InfoGridRow>
+		}
+	}
+	
+	@ViewBuilder
+	func recipientRow() -> some View {
+		let identifier: String = #function
+		
+		if paymentInfo.payment.isOutgoing(), let contact = paymentInfo.contact {
+			
+			InfoGridRow(
+				identifier: identifier,
+				vAlignment: .firstTextBaseline,
+				hSpacing: horizontalSpacingBetweenColumns,
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
+			) {
 				
+				keyColumn("Sent To")
+				
+			} valueColumn: {
+				
+				HStack(alignment: VerticalAlignment.center, spacing: 4) {
+					ContactPhoto(fileName: contact.photoUri, size: 32)
+					Text(contact.name)
+				} // <HStack>
+				.onTapGesture {
+					showContactView(contact)
+				}
 				
 			} // </InfoGridRow>
 		}
@@ -560,6 +630,10 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 		}
 	}
 	
+	// --------------------------------------------------
+	// MARK: Utilities
+	// --------------------------------------------------
+	
 	func formattedAmount(msat: Int64) -> FormattedAmount {
 		
 		if showOriginalFiatValue && currencyPrefs.currencyType == .fiat {
@@ -576,6 +650,7 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 		}
 	}
 
+	// Todo: Perform decryption in a background thread, and store in a State variable.
 	func decrypt(aes sa_aes: LnurlPay.Invoice_SuccessAction_Aes) -> LnurlPay.Invoice_SuccessAction_Aes_Decrypted? {
 		
 		guard

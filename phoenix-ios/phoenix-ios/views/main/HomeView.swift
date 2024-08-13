@@ -53,6 +53,8 @@ struct HomeView : MVIView {
 	@State var bizNotifications_payment: [PhoenixShared.NotificationsManager.NotificationItem] = []
 	@State var bizNotifications_watchtower: [PhoenixShared.NotificationsManager.NotificationItem] = []
 	
+	let contactsPublisher = Biz.business.contactsManager.contactsListPublisher()
+	
 	@State var didAppear = false
 	
 	enum NoticeBoxContentHeight: Preference {}
@@ -132,6 +134,9 @@ struct HomeView : MVIView {
 		}
 		.onReceive(bizNotificationsPublisher) {
 			bizNotificationsChanged($0)
+		}
+		.onReceive(contactsPublisher) {
+			contactsChanged($0)
 		}
 	}
 
@@ -799,7 +804,7 @@ struct HomeView : MVIView {
 			lastCompletedPaymentId = paymentId
 		}
 		
-		// PaymentView will need `WalletPaymentFetchOptions.companion.All`,
+		// SummaryView will need `WalletPaymentFetchOptions.companion.All`,
 		// so as long as we're fetching from the database, we might as well fetch everything we need.
 		let options = WalletPaymentFetchOptions.companion.All
 		
@@ -860,6 +865,12 @@ struct HomeView : MVIView {
 		})
 	}
 	
+	func contactsChanged(_ contacts: [ContactInfo]) {
+		log.trace("contactsChanged()")
+		
+		paymentsPage = paymentsPage.forceRefresh()
+	}
+	
 	fileprivate func footerCellDidAppear() {
 		log.trace("footerCellDidAppear()")
 		
@@ -885,7 +896,9 @@ struct HomeView : MVIView {
 		if maybeHasMoreRowsInDatabase {
 			log.debug("maybeHasMoreRowsInDatabase")
 			
-			if case let .withinTime(recentPaymentSeconds) = recentPaymentsConfig {
+			switch recentPaymentsConfig {
+			case .withinTime(let recentPaymentSeconds):
+				log.debug("recentPaymentsConfig.withinTime(seconds: \(recentPaymentSeconds))")
 				
 				// increase paymentsPage.count
 				
@@ -899,8 +912,27 @@ struct HomeView : MVIView {
 					count: newCount,
 					seconds: Int32(recentPaymentSeconds)
 				)
-			} else {
-				log.debug("!recentPayments.withinTime(X)")
+				
+			case .mostRecent(let count):
+				log.debug("recentPaymentsConfig.mostRecent(count: \(count))")
+				
+				// Nothing to do here.
+				// The original subscription was configured with the correct count.
+				
+			case .inFlightOnly:
+				log.debug("recentPaymentsConfig.inFlightOnly")
+				
+				// increase paymentsPage.count
+				
+				let prvOffset = paymentsPage.offset
+				let newCount = paymentsPage.count + Int32(PAGE_COUNT_INCREMENT)
+				
+				log.debug("increasing page.count: Page(offset=\(prvOffset), count=\(newCount)")
+				
+				paymentsPageFetcher.subscribeToInFlight(
+					offset: prvOffset,
+					count: newCount
+				)
 			}
 			
 		} else {

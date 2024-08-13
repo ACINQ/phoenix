@@ -12,7 +12,6 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 fileprivate enum Key: String {
 	case theme
 	case defaultPaymentDescription
-	case showChannelsRemoteBalance
 	case recentTipPercents
 	case isNewWallet
 	case invoiceExpirationDays
@@ -25,10 +24,10 @@ fileprivate enum Key: String {
 	case serverMessageReadIndex
 	case allowOverpayment
 	case doNotShowChannelImpactWarning
-	case randomPayerKey
 }
 
 fileprivate enum KeyDeprecated: String {
+	case showChannelsRemoteBalance
 	case recentPaymentSeconds
 	case maxFees
 }
@@ -77,11 +76,6 @@ class Prefs {
 	var defaultPaymentDescription: String? {
 		get { defaults.defaultPaymentDescription }
 		set { defaults.defaultPaymentDescription = newValue }
-	}
-	
-	var showChannelsRemoteBalance: Bool {
-		get { defaults.showChannelsRemoteBalance }
-		set { defaults.showChannelsRemoteBalance = newValue }
 	}
 	
 	var invoiceExpirationDays: Int {
@@ -173,14 +167,9 @@ class Prefs {
 	}
 
 	var doNotShowChannelImpactWarning: Bool {
-		 get { defaults.doNotShowChannelImpactWarning }
-		 set { defaults.doNotShowChannelImpactWarning = newValue }
-	 }
-	
-	var randomPayerKey: Bool {
-		 get { defaults.randomPayerKey }
-		 set { defaults.randomPayerKey = newValue }
-	 }
+		get { defaults.doNotShowChannelImpactWarning }
+		set { defaults.doNotShowChannelImpactWarning = newValue }
+	}
 	
 	// --------------------------------------------------
 	// MARK: Wallet State
@@ -256,7 +245,6 @@ class Prefs {
 		// - Key.theme: App feels weird when this changes unexpectedly.
 
 		defaults.removeObject(forKey: Key.defaultPaymentDescription.rawValue)
-		defaults.removeObject(forKey: Key.showChannelsRemoteBalance.rawValue)
 		defaults.removeObject(forKey: Key.recentTipPercents.rawValue)
 		defaults.removeObject(forKey: Key.isNewWallet.rawValue)
 		defaults.removeObject(forKey: Key.invoiceExpirationDays.rawValue)
@@ -269,7 +257,6 @@ class Prefs {
 		defaults.removeObject(forKey: Key.serverMessageReadIndex.rawValue)
 		defaults.removeObject(forKey: Key.allowOverpayment.rawValue)
 		defaults.removeObject(forKey: Key.doNotShowChannelImpactWarning.rawValue)
-		defaults.removeObject(forKey: Key.randomPayerKey.rawValue)
 		
 		self.backupTransactions.resetWallet(encryptedNodeId: encryptedNodeId)
 		self.backupSeed.resetWallet(encryptedNodeId: encryptedNodeId)
@@ -323,11 +310,6 @@ extension UserDefaults {
 	@objc fileprivate var defaultPaymentDescription: String? {
 		get { string(forKey: Key.defaultPaymentDescription.rawValue) }
 		set { setValue(newValue, forKey: Key.defaultPaymentDescription.rawValue) }
-	}
-
-	@objc fileprivate var showChannelsRemoteBalance: Bool {
-		get { bool(forKey: Key.showChannelsRemoteBalance.rawValue) }
-		set { set(newValue, forKey: Key.showChannelsRemoteBalance.rawValue) }
 	}
 
 	@objc fileprivate var invoiceExpirationDays: Int {
@@ -388,10 +370,5 @@ extension UserDefaults {
 	@objc fileprivate var doNotShowChannelImpactWarning: Bool {
 		get { bool(forKey: Key.doNotShowChannelImpactWarning.rawValue) }
 		set { set(newValue, forKey: Key.doNotShowChannelImpactWarning.rawValue) }
-	}
-	
-	@objc fileprivate var randomPayerKey: Bool {
-		get { bool(forKey: Key.randomPayerKey.rawValue) }
-		set { set(newValue, forKey: Key.randomPayerKey.rawValue) }
 	}
 }

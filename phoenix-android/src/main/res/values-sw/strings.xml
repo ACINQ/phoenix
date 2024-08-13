@@ -1,0 +1,861 @@
+<!--
+  ~ Copyright 2019 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <string name="app_name">Phoenix Testnet</string>
+
+    <!-- system notification channels -->
+
+    <string name="notification_channels_watcher_title">Mtazamaji wa Njia</string>
+    <string name="notification_channels_watcher_desc">Inajitokeza wakati unahitaji kuanza Phoenix.</string>
+
+    <string name="notification_pending_settlement_title">Uthibitisho wa Malipo</string>
+    <string name="notification_pending_settlement_desc">Inakuambia wakati Phoenix inahitaji kuanzishwa ili kumaliza malipo yanayosubiri.</string>
+
+    <string name="notification_missed_payment_title">Malipo yamekataliwa</string>
+    <string name="notification_missed_payment_desc">Inaonekana wakati Phoenix haiwezi kupokea malipo kutokana na tatizo la ukwasi.</string>
+
+    <string name="notification_received_payment_title">Malipo yamepokelewa</string>
+    <string name="notification_received_payment_desc">Inaonekana unapopokea malipo wakati programu iko katika hali ya nyuma.</string>
+
+    <string name="notification_headless_title">Inaendeshwa kwa nyuma</string>
+    <string name="notification_headless_desc">Inakuambia wakati Phoenix inaendeshwa kwa nyuma.</string>
+
+    <string name="notification_swap_timeout_title">Muda wa Kubadilisha Umeisha</string>
+    <string name="notification_swap_timeout_desc">Inakuambia wakati kubadilisha kutafikia muda wake wa mwisho.</string>
+
+    <!-- init wallet / automated wallet creation -->
+
+    <string name="autocreate_generating">Kuunda pochi yako…</string>
+    <string name="autocreate_error">Kuunda pochi kumeshindikana</string>
+
+    <string name="restore_title">Rejesha pochi yangu</string>
+    <string name="restore_disclaimer_next">Inayofuata</string>
+    <string name="restore_in_progress">Kurejesha pochi yako…</string>
+
+    <!-- Auth prompt (v2) -->
+
+    <string name="authprompt_title">Fungua ili kuendelea</string>
+
+    <!-- utils: placeholders -->
+
+    <string name="lipsum_short" translatable="false">Etiam porttitor egestas faucibus. Curabitur condimentum eros non ipsum elementum egestas.</string>
+    <string name="lipsum" translatable="false">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ut facilisis lectus. Integer massa tellus, suscipit sit amet felis vitae, blandit consectetur dolor. Fusce volutpat id magna id vestibulum. Integer a erat lacinia, placerat risus a, fermentum justo. Etiam euismod tincidunt dolor vel posuere. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur non euismod dui. Morbi enim dui, blandit sed erat sit amet, porta pulvinar odio. Cras metus felis, vestibulum eu consequat vitae, consectetur quis nulla. Fusce vulputate, elit et luctus sodales, metus metus elementum sem, eget commodo nunc nunc in ex. Sed aliquam eros nibh, ac volutpat turpis accumsan vitae. Cras suscipit ipsum accumsan aliquam interdum.</string>
+    <string name="lipsum_long" translatable="false">
+    Praesent ut nisi fringilla, pharetra dui sit amet, ornare urna. Donec at ultrices nunc. Fusce gravida metus vitae viverra egestas. In hac habitasse platea dictumst. Proin consequat fringilla felis, vehicula vehicula turpis ullamcorper nec. Pellentesque urna massa, blandit cursus metus et, ultrices consectetur neque. Suspendisse hendrerit venenatis mi ac tincidunt. Morbi hendrerit orci vitae erat luctus, at dignissim turpis accumsan. Integer elementum est eu tincidunt ullamcorper. Phasellus varius porttitor vestibulum. Maecenas faucibus ullamcorper diam, ac commodo dui fringilla sed. Aliquam arcu velit, porta eu sem vel, rhoncus bibendum dolor.
+    \nEtiam porttitor egestas faucibus. Curabitur condimentum eros non ipsum elementum egestas. Nam tempor euismod erat eget scelerisque. Integer sit amet laoreet erat. Duis enim turpis, vehicula eu justo vitae, dapibus auctor mauris. Aenean euismod eleifend dui a aliquet. Aliquam eleifend malesuada tortor ornare volutpat. In augue tortor, gravida et volutpat elementum, iaculis non sapien. Etiam dolor nisi, pulvinar a rhoncus ac, eleifend ac libero. In lobortis enim vitae ultricies viverra. Maecenas accumsan elementum sem, nec pharetra urna maximus maximus.
+    \nIn sit amet volutpat ligula, ac pretium dolor. Phasellus posuere rhoncus magna quis fermentum. Ut risus turpis, fermentum facilisis mollis in, porttitor eget erat. Donec luctus egestas ligula et interdum. Phasellus vitae hendrerit sem, at vehicula nulla. Curabitur mollis risus quis metus euismod ullamcorper. Nam eu aliquet mi. Duis id urna ac urna iaculis blandit. Morbi eros dui, congue a posuere efficitur, imperdiet a nisi. Morbi non orci non lorem aliquet tincidunt. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce pulvinar, mi vitae sollicitudin dignissim, nunc urna facilisis massa, ut scelerisque mi felis in sapien.
+    \nNam felis felix, tristique commodo odio eget, imperdiet viverra erat. Donec venenatis magna pulvinar, finibus leo id, gravida augue. Integer ante leo, bibendum ac nibh quis, auctor commodo quam. Sed luctus vitae quam vel condimentum. Mauris eu rhoncus mauris. Fusce enim diam, consequat a odio sit amet, accumsan cursus nisl. Etiam lectus nunc, lacinia id purus sit amet, pulvinar auctor odio. Maecenas vitae arcu sit amet est cursus maximus. Nullam ac sapien non nibh tempor rhoncus. Mauris dignissim cursus libero quis egestas.
+    </string>
+
+    <!-- Startup -->
+
+    <string name="startup_binding_service">Kuunganisha huduma…</string>
+    <string name="startup_wait">Kuandaa pochi…</string>
+    <string name="startup_wait_legacy_check">Kuangalia pochi ya zamani…</string>
+    <string name="startup_manual_unlock_button">Fungua</string>
+    <string name="startup_checking_seed">Kufungua…</string>
+    <string name="startup_unlocked">Ufikiaji umekubaliwa…</string>
+    <string name="startup_unlock_failure">Kufungua kumeshindikana</string>
+    <string name="startup_unlock_failure_keystore">Hitilafu ya kitunzaji cha Android</string>
+    <string name="startup_unlock_failure_unhandled_version">Toleo la mbegu halijashughulikiwa (%1$s)</string>
+    <string name="startup_unlock_failure_fallback">Fungua kwa mbegu</string>
+
+    <string name="startup_fallback_instructions">Ingiza maneno yako 12 ya urejesho ili kufungua pochi.\n\nManeno lazima yaingizwe kwa mpangilio sahihi, na kutenganishwa na nafasi moja.</string>
+    <string name="startup_fallback_input_label">Ingiza neno #%1$d</string>
+    <string name="startup_fallback_input_label_error">Maneno yasizidi 12!</string>
+    <string name="startup_fallback_incomplete">Ingiza mbegu kamili ili kuendelea zaidi.</string>
+    <string name="startup_fallback_invalid">Mbegu hii si sahihi. Hakikisha maneno yako ni sahihi na yamepangwa kwa mpangilio.</string>
+    <string name="startup_fallback_unlock_button">Fungua pochi</string>
+    <string name="startup_fallback_checking">Kuangalia mbegu…</string>
+    <string name="startup_fallback_error_default">Hitilafu imetokea. Tafadhali jaribu tena.</string>
+    <string name="startup_fallback_error_incorrect_seed">Mbegu hii haifanani na pochi yako.</string>
+    <string name="startup_fallback_success_match">Mbegu inafanana.\nInaandika kwa diski…</string>
+    <string name="startup_fallback_success_starting">Inaanzisha Phoenix…</string>
+
+    <string name="startup_starting">Inaanzisha…</string>
+    <string name="startup_error_generic">Programu haikuweza kuanza.</string>
+
+    <!-- Switch between legacy/modern apps -->
+
+    <string name="legacyswitch_title">Programu ya zamani</string>
+    <string name="legacyswitch_restart">Anzisha upya programu ya zamani</string>
+
+    <!-- Payment line -->
+
+    <string name="paymentline_prefix_sent">-</string>
+    <string name="paymentline_prefix_received">+</string>
+    <string name="paymentline_desc_pending_onchain">Inasubiri uthibitisho</string>
+    <string name="paymentline_desc_pending_offchain">Malipo yanayosubiri</string>
+    <string name="paymentline_desc_success_onchain">Malipo yamethibitishwa</string>
+    <string name="paymentline_desc_success_offchain">Malipo yamekamilika</string>
+    <string name="paymentline_desc_failed">Malipo yameshindwa</string>
+
+    <!-- Receive screen -->
+
+    <string name="receive_help_qr">QR Code ya ankara/anwani</string>
+
+    <string name="receive_bitcoin_title">Bitcoin</string>
+    <string name="receive_bitcoin_help">QR Code hii ni anwani ya kawaida ya Bitcoin.\n\nInaweza kusomwa na karibu huduma yoyote ya Bitcoin, lakini malipo yatachelewa kufika.</string>
+    <string name="receive_bitcoin_address_label">Anwani</string>
+    <string name="receive_bitcoin_generating">Inasawazisha anwani…</string>
+    <string name="receive_bitcoin_error">Haikuweza kuzalisha anwani ya bitcoin</string>
+    <string name="receive_bitcoin_share_title">Anwani ya Bitcoin</string>
+    <string name="receive_bitcoin_share_subject">Shiriki anwani hii ya Bitcoin na…</string>
+
+    <string name="receive_lightning_title">Umeme</string>
+    <string name="receive_lightning_help">Hii ni QR code ya hati ya Lightning.\n\nMalipo ya Lightning ni ya haraka sana na kawaida huwa na gharama ndogo, lakini baadhi ya pochi na huduma zinaweza kutosa kuziunga mkono bado.\n\nKatika hali hiyo, piga kushoto kupata anwani ya kawaida ya Bitcoin.</string>
+    <string name="receive_lightning_generating">Inatengeneza…</string>
+    <string name="receive_lightning_amount_label">Kiasi</string>
+    <string name="receive_lightning_desc_label">Maelezo</string>
+    <string name="receive_lightning_error">Haiwezi kutengeneza hati</string>
+    <string name="receive_lightning_share_subject">Hati ya Lightning</string>
+    <string name="receive_lightning_share_title">Shiriki hati ya Lightning na…</string>
+    <string name="receive_lnurl_button">Piga picha</string>
+    <string name="receive_toggle_offer_new_overlay">MPYA!</string>
+
+    <string name="receive_offer_share_title">Mkodishaji wa Bolt12</string>
+    <string name="receive_offer_share_subject">Shiriki msimbo huu wa Bolt12 na…</string>
+
+    <string name="receive_offer_copy_bip353">Nakili anwani inayosomwa kwa mtu</string>
+    <string name="receive_offer_copy_bolt12">Nakili msimbo wa malipo</string>
+    <string name="receive_offer_copy_bip21">Nakili URI kamili</string>
+
+    <string name="receive_lightning_edit_button">Hariri</string>
+    <string name="receive_lightning_edit_title">Hariri hati</string>
+    <string name="receive_lightning_edit_amount_label">Kiasi (hiari)</string>
+    <string name="receive_lightning_edit_amount_placeholder">Kiasi cha kupokea</string>
+    <string name="receive_lightning_edit_desc_label">Maelezo (hiari)</string>
+    <string name="receive_lightning_edit_desc_placeholder">Ingiza maelezo kwa hati hii</string>
+    <string name="receive_lightning_edit_generate_button">Tengeneza hati</string>
+
+    <!-- send -->
+
+    <string name="send_balance_prefix">Salio:</string>
+    <string name="send_error_amount_too_large">Kiasi ni kubwa kupita kiasi.</string>
+    <string name="send_error_amount_negative">Kiasi hakiwezi kuwa hasi.</string>
+    <string name="send_error_amount_invalid">Hii si kiasi halali.</string>
+    <string name="send_error_amount_over_balance">Kiasi hiki kinapita salio lako.</string>
+    <string name="send_error_amount_overpaying">Haiwezi kulipa zaidi ya %1$s.</string>
+    <string name="send_error_amount_below_requested">Kiasi hiki kiko chini ya kiasi kilichoombwa cha %1$s.</string>
+    <string name="send_destination_label">Tuma kwa</string>
+    <string name="send_description_label">Maelezo</string>
+    <string name="send_trampoline_fee_label">Gharama</string>
+    <string name="send_trampoline_fee_no_amount">N/A</string>
+    <string name="send_trampoline_fee_loading">Inapakia gharama…</string>
+    <string name="send_trampoline_amountless_warning_label">Hati bila kiasi</string>
+    <string name="send_trampoline_amountless_warning_details">Hati ya malipo kwa malipo haya haitaji kiasi maalum. Hii inaweza kutumiwa vibaya na nodi hatari wakati wa malipo.\n\nIli kuwa salama, <b>uliza mpokeaji aweke kiasi</b> wakati wa kutengeneza hati.</string>
+    <string name="send_connecting_button">Inasubiri njia za malipo…</string>
+    <string name="send_pay_button">Lipa</string>
+    <string name="send_pay_retry_button">Jaribu tena</string>
+
+    <string name="send_offer_payer_note_label">Ujumbe</string>
+    <string name="send_offer_payer_note_placeholder">Gonga ili kuambatisha ujumbe…</string>
+    <string name="send_offer_payer_note_dialog_title">Ambatisha ujumbe wa kibinafsi</string>
+    <string name="send_offer_payer_note_dialog_subtitle">Mpokeaji ataona ujumbe huu</string>
+    <string name="send_offer_payer_note_dialog_placeholder">Ingiza ujumbe…</string>
+    <string name="send_offer_fetching">Inapata maelezo ya malipo…</string>
+    <string name="send_offer_failure_title">Malipo yamekosa</string>
+    <string name="send_offer_failure_timeout">Haiwezi kupata maelezo ya malipo ndani ya muda unaokubalika.\n\nMpokeaji anaweza kuwa mbali au hauwezi kupatikana.</string>
+
+    <string name="send_paymentmode_onchain">Lipa kwa on-chain</string>
+    <string name="send_paymentmode_onchain_desc">Muamala wa on-chain kawaida huwa polepole na unafaa zaidi kwa malipo makubwa.</string>
+    <string name="send_paymentmode_lightning">Lipa kwa Lightning</string>
+    <string name="send_paymentmode_lightning_desc">Malipo ya Lightning ni ya haraka na yanastahili zaidi kwa malipo madogo.</string>
+
+    <string name="send_spliceout_address_label">Anwani</string>
+    <string name="send_spliceout_feerate_label">Kiwango cha gharama</string>
+    <string name="send_spliceout_feerate_waiting_for_value">Inapata kiwango cha gharama cha sasa…</string>
+
+    <string name="send_spliceout_error_invalid_feerate">Tafadhali ingiza kiwango sahihi cha gharama.</string>
+    <string name="send_spliceout_error_cannot_afford_fees">Jumla inazidi salio lako</string>
+    <string name="send_spliceout_error_failure">Malipo yamekosa</string>
+
+    <string name="send_spliceout_prepare_button">Andaa muamala</string>
+    <string name="send_spliceout_prepare_in_progress">Inatayarisha muamala…</string>
+    <string name="send_spliceout_execute_in_progress">Inatekeleza splice…</string>
+    <string name="send_spliceout_complete_recap_fee">Gharama ya wachimba madini</string>
+    <string name="send_spliceout_complete_recap_fee_details">Inatumia kiwango cha gharama cha %1$s sat/vbyte.</string>
+    <string name="send_spliceout_complete_recap_total">Jumla</string>
+
+    <!-- scan -->
+
+    <string name="scan_manual_input_button">Ingiza kwa mkono</string>
+    <string name="scan_paste_button">Pasta data kutoka clipboard</string>
+    <string name="scan_request_camera_access">Gonga ili kutoa ruhusa ya kamera</string>
+    <string name="scan_request_camera_access_denied">Ruhusa ya kamera imekana</string>
+
+    <string name="scan_lnurl_fetching">Inapata data kutoka huduma…</string>
+    <string name="scan_bip353_resolving">Inapata ombi la malipo kupitia DNS…</string>
+
+    <string name="scan_manual_input_title">Ingiza kwa mkono</string>
+    <string name="scan_manual_input_instructions">Ingiza hati ya Lightning, ofa, LNURL au anwani ya Lightning unayotaka kutuma pesa kwake.</string>
+    <string name="scan_manual_input_label">Hati, anwani ya LN…</string>
+    <string name="scan_manual_input_hint" translatable="false">satoshi@domain.com, bc1q..., lnbc...</string>
+
+    <!-- utils: misc strings -->
+
+    <string name="utils_rounded">≈</string>
+    <string name="utils_converted_amount">≈ %1$s</string>
+    <string name="utils_unknown_amount" translatable="false">!?</string>
+    <string name="utils_no_conversion">Kiwango cha kubadilisha BTC hakipatikani</string>
+
+    <string name="utils_date_just_now">sasa hivi</string>
+    <string name="utils_unknown">N/A</string>
+    <string name="utils_loading_data">Inapakia data…</string>
+    <string name="utils_loading_prefs">Inapakia mapendeleo…</string>
+    <string name="utils_copied">Imekopywa kwenye clipboard!</string>
+
+    <string name="utils_bip353_with_prefix" translatable="false">₿%1$s</string>
+
+    <string name="accessibility_link">Fungua kiungo kwenye kivinjari</string>
+    <string name="accessibility_explorer_link">Fungua muamala kwenye kivinjari cha utafutaji</string>
+    <string name="accessibility_address_explorer_link">Fungua anwani kwenye kivinjari cha utafutaji</string>
+    <string name="validation_empty">Hii uwanja haiwezi kuwa tupu</string>
+    <string name="validation_invalid_amount">Tafadhali ingiza kiasi halali</string>
+    <string name="validation_invalid_number">Tafadhali ingiza nambari halali</string>
+    <string name="validation_no_decimal">Hii uwanja lazima iwe idadi kamili</string>
+
+    <string name="btn_back">Rudi nyuma</string>
+    <string name="btn_next">Hadi</string>
+    <string name="btn_copy">Nakili</string>
+    <string name="btn_share">Shiriki</string>
+    <string name="btn_ok">Sawa</string>
+    <string name="btn_save">Hifadhi</string>
+    <string name="btn_confirm">Thibitisha</string>
+    <string name="btn_cancel">Ghairi</string>
+    <string name="btn_close">Funga</string>
+
+    <!-- mutual close -->
+
+    <string name="mutualclose_title">Mwaga pochi yangu</string>
+    <string name="mutualclose_loading">Inapakia…</string>
+    <string name="mutualclose_checking_balance">Inakagua salio…</string>
+    <string name="mutualclose_balance">Salio: <b>%1$s</b> (≈ %2$s)</string>
+    <string name="mutualclose_no_channels">Pochi haina kanali zinazostahiki kufungwa.</string>
+    <string name="mutualclose_button">Mwaga pochi yangu</string>
+    <string name="mutualclose_error_chain_mismatch">Anwani hii inatumia blockchain tofauti</string>
+    <string name="mutualclose_error_chain_reqparams">Anwani hii inatumia vipengele visivyosaidiwa</string>
+    <string name="mutualclose_error_chain_generic">Anwani hii haisaidiwi</string>
+    <string name="mutualclose_done">%1$d kanali zimefungwa. Unaweza kuona maelezo kwenye skrini ya nyumbani.</string>
+
+    <string name="forceclose_no_channels">Hakuna kanali zinazostahiki kufungwa.</string>
+
+    <!-- channels view -->
+
+    <string name="channelsview_title">Kanali za malipo</string>
+    <string name="channelsview_menu_import_channels">Ingiza kanali</string>
+    <string name="channelsview_header">Muonekano</string>
+    <string name="channelsview_balance">Salio</string>
+    <string name="channelsview_balance_about"><b>Salio</b> ni jumla ya salio la kanali zako za kazi. Hii ndiyo unaweza kutumia kwa Lightning.</string>
+    <string name="channelsview_inbound">Maji ya ndani</string>
+    <string name="channelsview_inbound_about"><b>Maji ya ndani</b> ni kile kinachoweza kupokelewa na kanali zako kupitia Lightning bila kulazimika kwenda kwenye blockchain na kulipa ada.</string>
+    <string name="channelsview_loading_channels">Inapakia data za kanali…</string>
+    <string name="channelsview_no_channels">Huna kanali bado.\n\nKanali mpya ya malipo itaundwa moja kwa moja inavyohitajika.</string>
+
+    <!-- channels details -->
+
+    <string name="channeldetails_title">Maelezo ya kanali</string>
+    <string name="channeldetails_not_found">Hakuna kanali ya kazi inayopatikana kwa kitambulisho hicho.</string>
+    <string name="channeldetails_channel_id">Kitambulisho cha kanali</string>
+    <string name="channeldetails_state">Hali</string>
+    <string name="channeldetails_spendable">Salio</string>
+    <string name="channeldetails_receivable">Maji ya ndani</string>
+
+    <string name="channeldetails_commitments">Ahadi zinazofanya kazi</string>
+    <string name="channeldetails_inactive_commitments">Ahadi zisizofanya kazi</string>
+    <string name="channeldetails_commitment_funding_tx_id">Tx ya ufadhili:</string>
+    <string name="channeldetails_commitment_balance">Salio:</string>
+    <string name="channeldetails_commitment_funding_capacity">Uwezo:</string>
+    <string name="channeldetails_commitment_linked_payments">Imesababishwa na:</string>
+
+    <string name="channeldetails_json">Onyesha data za raw</string>
+    <string name="channeldetails_share">Shiriki</string>
+    <string name="channeldetails_share_subject">Data za kanali</string>
+    <string name="channeldetails_share_title">Shiriki data za kanali</string>
+
+    <!-- manual channels data import -->
+
+    <string name="channelimport_title">Ingiza data za kanali za raw</string>
+    <string name="channelimport_instructions">Skrini hii ni zana ya uundaji inayoweza kutumika kwa kuingiza data za kanali zilizowekwa siri kwa mkono.\n\nTumia kwa tahadhari.</string>
+    <string name="channelimport_input_label">Data blob</string>
+    <string name="channelimport_import_button">Ingiza</string>
+    <string name="channelimport_importing">Inaingiza data…</string>
+    <string name="channelimport_success">Ingizo limefanikiwa</string>
+    <string name="channelimport_success_restart">Sasa lazima upige upya Phoenix.</string>
+    <string name="channelimport_error_title">Ingizo limekosa</string>
+    <string name="channelimport_error_malformed">Data zimeharibika. Blob ya hex yenye usalama inatarajiwa.</string>
+    <string name="channelimport_error_decryption">Data haiwezi kufunguliwa na pochi hii.</string>
+    <string name="channelimport_error_unknown_version">Toleo %1$d halisaidiwi</string>
+
+    <!-- home: balance section & misc -->
+
+    <string name="home__balance_loading">Inapakia…</string>
+    <string name="home__onchain_incoming">+%1$s</string>
+
+    <string name="home__faq_button">Maswali Yanayoulizwa Mara Kwa Mara (FAQ)</string>
+    <string name="home__payments_none">Tumia vitufe vya Kupokea na Kutuma vilivyo chini ya skrini hii ili kuanza!</string>
+    <string name="home__payments_more_button">Onyesha malipo yote…</string>
+    <string name="home__connection__electrum_late">Electrum imechelewa</string>
+    <string name="home__connection__bad_cert">Cheti cha Electrum</string>
+    <string name="home__connection__connecting">Inajiunganisha…</string>
+    <string name="home__connection__tor_active">Tor</string>
+    <string name="home_request_liquidity">Omba fedha</string>
+    <string name="home_inflight_payments">Kwa sasa una malipo %1$d yanayosubiri kwenye pochi yako.\n\nHifadhi programu wazi ili kuhakikisha malipo haya yanaweza kutekelezwa vizuri bila matatizo.</string>
+
+    <!-- in-app notifications -->
+
+    <string name="inappnotif_title">Taarifa</string>
+    <string name="inappnotif_notices_title">Ujumbe Muhimu</string>
+    <string name="inappnotif_payments_title">Shughuli za Karibuni</string>
+    <string name="inappnotif_empty">Hakuna taarifa bado</string>
+
+    <!-- settings: display seed -->
+
+    <string name="displayseed_title">Kipande cha kuokoa</string>
+    <string name="displayseed_loading">Ikifungua kipande…</string>
+    <string name="displayseed_error_details">Haiwezi kufungua kipande</string>
+    <string name="displayseed_derivation_path">Kipande cha BIP39 chenye njia ya uokoaji ya BIP84</string>
+    <string name="displayseed_loading_prefs">Inapakia mapendeleo…</string>
+    <string name="displayseed_backup_title">Thibitisho la Hifadhi</string>
+
+    <!-- settings: logs -->
+
+    <string name="logs_title">Makala za Programu</string>
+    <string name="logs_exporting">Inaongeza makala…</string>
+    <string name="logs_failed">Hitilafu: makala haya hayawezi kupakiwa</string>
+    <string name="logs_view_button">Tazama makala…</string>
+    <string name="logs_view_with">Tazama makala na…</string>
+    <string name="logs_share_button">Shiriki makala…</string>
+    <string name="logs_share_subject">Makala za Phoenix App</string>
+    <string name="logs_share_title">Shiriki makala za Phoenix…</string>
+
+    <!-- payment details -->
+
+    <string name="paymentdetails_loading">Inapakia maelezo ya malipo…</string>
+    <string name="paymentdetails_error">Haiwezi kupata maelezo ya malipo</string>
+
+    <string name="paymentdetails_status_inbound_liquidity_success"><b>FEDHA ZIMEONGEZWA</b> %1$s</string>
+    <string name="paymentdetails_status_channelclose_confirmed"><b>IMEKAMILIKA</b> %1$s</string>
+    <string name="paymentdetails_status_sent_successful"><b>IMETUMWA</b> %1$s</string>
+    <string name="paymentdetails_status_sent_pending">Inasubiri…</string>
+    <string name="paymentdetails_status_sent_failed"><b>IMESHINDWA</b>\nHakuna pesa iliyotumwa.</string>
+
+    <string name="paymentdetails_status_received_pending">Hajapokea bado.</string>
+    <string name="paymentdetails_status_received_paytoopen_pending">Inasubiri channel kufunguliwa</string>
+    <string name="paymentdetails_status_received_successful"><b>IMEPOKELEWA</b> %1$s</string>
+
+    <string name="paymentdetails_status_unconfirmed">Inasubiri uthibitisho</string>
+    <string name="paymentdetails_status_unconfirmed_fetching">Inapata hali…</string>
+    <string name="paymentdetails_status_unconfirmed_zero">0 uthibitisho</string>
+    <string name="paymentdetails_status_unconfirmed_zero_bump">Gonga ili kuharakisha</string>
+    <string name="paymentdetails_status_unconfirmed_default">%1$d uthibitisho(s)</string>
+    <string name="paymentdetails_status_unconfirmed_with_depth">%1$d/%2$d uthibitisho(s)</string>
+    <string name="paymentdetails_status_confirmed">Imethibitishwa kwenye blockchain</string>
+
+    <string name="paymentdetails_offer_note_label">Ujumbe</string>
+    <string name="paymentdetails_offer_sender_label">Imetumwa na</string>
+    <string name="paymentdetails_offer_sender_unknown">Haijulikani</string>
+    <string name="paymentdetails_offer_sender_unknown_details">Kuwa mwangalifu na ujumbe kutoka vyanzo visivyojulikana</string>
+
+    <string name="paymentdetails_lnurlpay_service">Huduma inatolewa na</string>
+    <string name="paymentdetails_lnurlpay_action_message_label">Ujumbe</string>
+    <string name="paymentdetails_lnurlpay_action_url_label">Kiungo</string>
+    <string name="paymentdetails_lnurlpay_action_url_button">Fungua kiungo</string>
+    <string name="paymentdetails_lnurlpay_action_aes_label">Ujumbe</string>
+    <string name="paymentdetails_lnurlpay_action_aes_decrypting">Inafungua ujumbe…</string>
+
+    <string name="paymentdetails_desc_label">Maelezo</string>
+    <string name="paymentdetails_destination_label">Imetumwa kwa</string>
+    <string name="paymentdetails_destination_cpfp_value">Wachimba madini wa Bitcoin</string>
+    <string name="paymentdetails_fees_label">Gharama</string>
+    <string name="paymentdetails_error_label">Hitilafu</string>
+    <string name="paymentdetails_no_description">Hakuna maelezo</string>
+    <string name="paymentdetails_info_uniclose">Malipo haya yalitokea baada ya mgogoro kwenye channel.</string>
+
+    <string name="paymentdetails_desc_splice_out">Malipo ya on-chain</string>
+    <string name="paymentdetails_desc_closing_channel">Kufunga channel</string>
+    <string name="paymentdetails_desc_legacy_migration">Uhamaji kutoka programu ya zamani</string>
+    <string name="paymentdetails_desc_cpfp">Kuweka vipaumbele vya muamala</string>
+    <string name="paymentdetails_desc_inbound_liquidity">+%1$s fedha za ndani</string>
+    <string name="paymentdetails_desc_swapout">Kubadilisha kwa %1$s</string>
+    <string name="paymentdetails_desc_swapin">Depo ya on-chain</string>
+
+    <string name="paymentdetails_desc_to">kwa %1$s</string>
+    <string name="paymentdetails_desc_from">kutoka %1$s</string>
+
+    <string name="paymentdetails_edit_dialog_title">Ongeza maelezo maalum kwa malipo haya</string>
+    <string name="paymentdetails_edit_dialog_input_label">Maelezo</string>
+    <string name="paymentdetails_attach_desc_button">Ambatisha kumbukumbu</string>
+    <string name="paymentdetails_edit_desc_button">Hariri kumbukumbu</string>
+    <string name="paymentdetails_details_button">Maelezo ya kiufundi</string>
+
+    <!-- payment details: technicals data -->
+
+    <string name="paymentdetails_technical_title">Maelezo ya kiufundi</string>
+    <string name="paymentdetails_payment_type_label">Aina ya malipo</string>
+    <string name="paymentdetails_closing">Malipo ya kufunga channel</string>
+    <string name="paymentdetails_splice_outgoing">Malipo ya splice ya kutuma</string>
+    <string name="paymentdetails_splice_cpfp_outgoing">Harakisha muamala wa on-chain</string>
+    <string name="paymentdetails_inbound_liquidity">Omba fedha za ndani</string>
+    <string name="paymentdetails_normal_outgoing">Malipo ya Lightning ya kutuma (kawaida)</string>
+    <string name="paymentdetails_normal_incoming">Malipo ya Lightning ya kupokea (kawaida)</string>
+    <string name="paymentdetails_swapin">Depo ya Bitcoin ya swap-in</string>
+    <string name="paymentdetails_swapout">Kubadilisha kwa anwani ya Bitcoin</string>
+    <string name="paymentdetails_offer_outgoing">Malipo ya Lightning ya kutuma (offer)</string>
+    <string name="paymentdetails_offer_incoming">Malipo ya Lightning ya kupokea (offer)</string>
+    <string name="paymentdetails_swapin_address_label">Anwani ya depo</string>
+    <string name="paymentdetails_bitcoin_address_label">Anwani ya Bitcoin</string>
+
+    <string name="paymentdetails_splice_out_channel_label">Channel ya splice</string>
+    <string name="paymentdetails_dualswapin_tx_label">Muamala</string>
+    <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
+
+    <string name="paymentdetails_liquidity_amount_label">Kiasi kilichoombwa</string>
+    <string name="paymentdetails_liquidity_signature_label">Sahihi</string>
+
+    <string name="paymentdetails_closing_type_label">Aina ya kufunga</string>
+    <string name="paymentdetails_closing_type_mutual">Kushirikiana</string>
+    <string name="paymentdetails_closing_type_local">Mitaa</string>
+    <string name="paymentdetails_closing_type_remote">Mbali</string>
+    <string name="paymentdetails_closing_type_revoked">Imekataliwa</string>
+    <string name="paymentdetails_closing_type_other">Mengine</string>
+
+    <string name="paymentdetails_pubkey_label">Funguo ya umma wa lengwa</string>
+    <string name="paymentdetails_payment_request_description_label">Maelezo ya ankara</string>
+    <string name="paymentdetails_payment_hash_label">Hash ya Malipo</string>
+    <string name="paymentdetails_payment_request_label">Ankara</string>
+    <string name="paymentdetails_preimage_label">Picha ya awali</string>
+    <string name="paymentdetails_payerkey_label">Funguo ya Mlipaji</string>
+    <string name="paymentdetails_payerkey_is_mine">Funguo yako ya offer</string>
+    <string name="paymentdetails_offer_label">Offer</string>
+    <string name="paymentdetails_bolt12_label">Ankara ya Bolt12</string>
+    <string name="paymentdetails_offer_metadata_label">Metadata</string>
+
+    <string name="paymentdetails_status_label">Hali ya malipo</string>
+    <string name="paymentdetails_status_success">Imefanikiwa</string>
+    <string name="paymentdetails_status_confirming">Inathibitishwa</string>
+    <string name="paymentdetails_status_pending">Inasubiri</string>
+    <string name="paymentdetails_status_failed">Imeshindwa</string>
+
+    <string name="paymentdetails_parts_label">Sehemu za malipo (%1$d)</string>
+    <string name="paymentdetails_part_label">Sehemu</string>
+    <string name="paymentdetails_part_hops_label">Hops</string>
+
+    <string name="paymentdetails_received_with_label">Imepokelewa kupitia</string>
+    <string name="paymentdetails_received_with_splicein">Splice-in (kuongeza kwenye channel iliyopo)</string>
+    <string name="paymentdetails_received_with_channel">Channel mpya (iliyoundwa kiotomatiki)</string>
+    <string name="paymentdetails_received_with_lightning">Malipo ya Lightning</string>
+    <string name="paymentdetails_channel_id_label">Kitambulisho cha channel</string>
+    <string name="paymentdetails_tx_id_label">Muamala</string>
+
+    <string name="paymentdetails_created_at_label">Ilibuniwa saa</string>
+    <string name="paymentdetails_completed_at_label">Ilikamilishwa saa</string>
+    <string name="paymentdetails_elapsed_label">Muda uliopita</string>
+    <string name="paymentdetails_elapsed">%1$s ms</string>
+
+    <string name="paymentdetails_invoice_requested_label">Kiasi kilichoombwa</string>
+    <string name="paymentdetails_amount_sent_label">Kiasi kilichotumwa (gharama zimejumuishwa)</string>
+    <string name="paymentdetails_amount_received_label">Kiasi kilichopokelewa</string>
+    <string name="paymentdetails_amount_rate_now">≈ %1$s (sasa)</string>
+    <string name="paymentdetails_amount_rate_then">≈ %1$s (wakati huo)</string>
+
+    <!-- offer contact -->
+
+    <string name="contact_add_contact_button">Ongeza mawasiliano</string>
+    <string name="contact_error_offer_invalid">Offer haifai</string>
+    <string name="contact_error_offer_known">Ankara tayari imeunganishwa na %1$s</string>
+    <string name="contact_save_button">Hifadhi</string>
+    <string name="contact_delete_button">Futa</string>
+
+    <string name="contact_add_title">Unganisha jina na nambari ya malipo</string>
+    <string name="contact_name_label">Jina</string>
+    <string name="contact_photo_label">Picha</string>
+    <string name="contact_offer_label">Ofa</string>
+    <string name="contact_offer_key_title">Lipa kwa funguo yako ya ofa</string>
+    <string name="contact_offer_key_enabled">Ikiwa wanajua nambari yako ya Bolt12, wataweza kujua wakati malipo yanafanywa na wewe.</string>
+    <string name="contact_offer_key_disabled">Tumia kitambulisho cha muda wakati unalipa mawasiliano haya.</string>
+    <string name="contact_offers_list">Nambari za malipo za Bolt12</string>
+
+    <string name="contact_search_name">Tafuta kwa jina</string>
+    <string name="contact_none">Hakuna mawasiliano yaliyo pata…</string>
+
+    <!-- settings: access control -->
+
+    <string name="accessctrl_title">Upatikanaji wa programu</string>
+    <string name="accessctrl_loading">Inapata data…</string>
+
+    <string name="accessctrl_auth_error_header">Kufunga skrini haiwezi kuwezeshwa</string>
+    <string name="accessctrl_auth_error_no_hw">Hakuna vifaa vya uthibitishaji vinavyofaa kwenye kifaa hiki.</string>
+    <string name="accessctrl_auth_error_hw_unavailable">Vifaa vya biometriki havipatikani. Jaribu tena baadaye.</string>
+    <string name="accessctrl_auth_error_none_enrolled">Tafadhali sajili PIN/Schema/Alama ya vidole kwenye Android kwanza.</string>
+    <string name="accessctrl_auth_error_update_required">Vifaa sio salama. Sasisho la usalama wa Android linahitajika.</string>
+    <string name="accessctrl_auth_error_unsupported">Haliwezi kuungwa mkono na toleo hili la Android.</string>
+    <string name="accessctrl_auth_error_lockout">Jaribio mengi sana, jaribu tena baadaye.</string>
+    <string name="accessctrl_auth_error_vendor">Hitilafu isiyoshughulikiwa ya muuzaji wa vifaa</string>
+    <string name="accessctrl_auth_error_timeout">Jaribio la uthibitishaji limeisha muda</string>
+    <string name="accessctrl_auth_error_cancelled">Uthibitishaji umesitishwa</string>
+    <string name="accessctrl_auth_error_too_old">Toleo hili la Android halifai.</string>
+    <string name="accessctrl_auth_error_unhandled">Kificho kisichoshughulikiwa: %1$d</string>
+
+    <string name="accessctrl_screen_lock_switch">Kufunga skrini</string>
+    <string name="accessctrl_screen_lock_switch_desc">Funga upatikanaji wa programu kwa kutumia kufunga skrini/alama ya vidole ya Android</string>
+
+    <!-- lnurl-auth -->
+
+    <string name="lnurl_auth_legacy_notice">Hali ya zamani</string>
+    <string name="lnurl_auth_help">Gonga hapa kwa maelezo zaidi</string>
+    <string name="lnurl_auth_help_dialog_title">Inavyofanya kazi</string>
+    <string name="lnurl_auth_help_dialog_general_details">Phoenix inathibitisha kwa funguo ya kipekee kwa <b>%1$s</b>. Funguo hii ya kipekee inakuwa nenosiri lako kwa akaunti yako huko.</string>
+    <string name="lnurl_auth_help_dialog_privacy_title">Faragha</string>
+    <string name="lnurl_auth_help_dialog_privacy_details">Huduma haitakuwa na ufikiaji wa pochi yako kwa vyovyote vile. Hawawezi kuona salio lako, malipo, au funguo zako.</string>
+    <string name="lnurl_auth_help_dialog_compat_title">Hali ya zamani</string>
+    <string name="lnurl_auth_help_dialog_compat_details">Phoenix inatumia mpango usio wa kawaida kwenye huduma hii ili kuendana na toleo la zamani la programu. Akaunti inayohusishwa haiwezi kuhamishwa kwa pochi nyingine.</string>
+    <string name="lnurl_auth_help_dialog_compat_button">Badilisha mpango</string>
+    <string name="lnurl_auth_button">Ingiza</string>
+    <string name="lnurl_auth_try_again_button">Jaribu tena</string>
+    <string name="lnurl_auth_in_progress">Inaingia kwenye\n<b>%1$s</b></string>
+    <string name="lnurl_auth_success">Uthibitishaji umeshinda.</string>
+    <string name="lnurl_auth_failure">Uthibitishaji umeshindwa:</string>
+    <string name="lnurl_auth_error_network">Hitilafu ya mtandao. Angalia muunganisho wako wa intaneti na jaribu tena.</string>
+    <string name="lnurl_auth_error_other">Hitilafu isiyojulikana ilitokea. Jaribu tena.</string>
+
+    <!-- lnurl-auth settings: scheme types -->
+
+    <string name="lnurl_auth_scheme_default">Kawaida</string>
+    <string name="lnurl_auth_scheme_default_desc">Tumia mpango wa kawaida unaokubaliana na spesifikas za LNURL. Hii ndiyo chaguo inayopendekezwa kwa pochi mpya, na kile kinachotumiwa na programu ya Phoenix iOS.</string>
+    <string name="lnurl_auth_scheme_legacy">Android Legacy</string>
+    <string name="lnurl_auth_scheme_legacy_desc">Tumia mpango wa zamani kuungana na akaunti zilizoundwa na programu ya zamani ya Phoenix Android.</string>
+
+    <!-- lnurl-withdraw -->
+
+    <string name="lnurl_withdraw_confirm_button">Fungua</string>
+    <string name="lnurl_withdraw_wait">Ikidai fedha…</string>
+    <string name="lnurl_withdraw_amount_below_min">Kiasi lazima kiwe angalau %1$s.</string>
+    <string name="lnurl_withdraw_amount_above_max">Kiasi hakiwezi kupita %1$s.</string>
+    <string name="lnurl_withdraw_error_header">Uondoaji umeshindwa:</string>
+
+    <!-- lnurl: common remote error messages -->
+
+    <string name="lnurl_error_remote_details">Huduma <b>%1$s</b> imerudisha hitilafu. Wasiliana na dawati la msaada la huduma hii ikiwa tatizo litaendelea.\n\nMaelezo ya ujumbe wa huduma: \"<i>%2$s</i>\"</string>
+    <string name="lnurl_error_remote_code">Huduma <b>%1$s</b> imerudisha hitilafu ya HTTP (%2$s). Wasiliana na dawati lao la msaada ikiwa inahitajika.</string>
+    <string name="lnurl_error_remote_unreadable">Huduma <b>%1$s</b> imerudisha ujumbe usioweza kusomwa.</string>
+    <string name="lnurl_error_remote_connection">Haiwezi kuungana na huduma <b>%1$s</b>.</string>
+
+    <!-- lnurl-pay -->
+
+    <string name="lnurl_pay_domain">Huduma inatolewa na</string>
+    <string name="lnurl_pay_meta_description">Maelezo</string>
+    <string name="lnurl_pay_comment_add_button">Ambatisha ujumbe</string>
+    <string name="lnurl_pay_comment_label">Ujumbe wangu</string>
+    <string name="lnurl_pay_comment_instructions">Unaweza ambatisha ujumbe kwa malipo. Ujumbe huu utatumwa kwa mpokeaji.</string>
+    <string name="lnurl_pay_pay_button">Lipa</string>
+    <string name="lnurl_pay_requesting_invoice">Ikidai ankara…</string>
+
+    <string name="lnurl_pay_amount_below_min">Kiasi lazima kiwe angalau %1$s</string>
+    <string name="lnurl_pay_amount_above_max">Kiasi lazima kiwe zaidi %1$s</string>
+
+    <string name="lnurl_pay_error_header">Malipo yameshindwa.</string>
+    <string name="lnurl_pay_error_invalid_chain">Ankara iliyorudishwa na <b>%1$s</b> haiutumii mnyororo sawa na pochi yako.</string>
+    <string name="lnurl_pay_error_already_paid">Ankara iliyorudishwa na <b>%1$s</b> tayari imelipwa.</string>
+    <string name="lnurl_pay_error_invalid_amount">Ankara iliyorudishwa na <b>%1$s</b> ina kiasi kisicho sahihi.</string>
+    <string name="lnurl_pay_error_invalid_malformed">Ankara iliyorudishwa na <b>%1$s</b> imevunjika.</string>
+
+    <!-- settings: display preferences -->
+
+    <string name="prefs_display_title">Chaguzi za kuonyesha</string>
+    <string name="prefs_display_coin_label">Kitengo cha Bitcoin</string>
+    <string name="prefs_display_coin_sat_label">Satoshi (sat)</string>
+    <string name="prefs_display_coin_sat_desc">1 sat ni 0.00000001 btc</string>
+    <string name="prefs_display_coin_bit_label">Bit (bit)</string>
+    <string name="prefs_display_coin_bit_desc">1 bit ni 0.000001 btc</string>
+    <string name="prefs_display_coin_mbtc_label">Milli-Bitcoin (mbtc)</string>
+    <string name="prefs_display_coin_mbtc_desc">1 mbtc ni 0.001 btc</string>
+    <string name="prefs_display_coin_btc_label">Bitcoin (btc)</string>
+    <string name="prefs_display_fiat_label">Sarafu za fiat</string>
+    <string name="prefs_display_theme_label">Mandhari ya programu</string>
+    <string name="prefs_display_theme_dark_label">Mandhari ya giza</string>
+    <string name="prefs_display_theme_light_label">Mandhari ya mwangaza</string>
+    <string name="prefs_display_theme_system_label">Fuata mfumo</string>
+    <string name="prefs_locale_label">Lugha ya programu</string>
+
+    <!-- settings: electrum server -->
+
+    <string name="electrum_title">Seva ya Electrum</string>
+    <string name="electrum_about">Ili kulinda mifumo yako ya malipo, Phoenix inatazama blockchain ya Bitcoin kupitia seva za Electrum.\n\nKwa kawaida, seva za nasibu hutumika. Unaweza pia kuunda Phoenix iungane tu na seva yako mwenyewe.</string>
+    <string name="electrum_block_height_label">Kimo cha block</string>
+    <string name="electrum_connection_dialog_tls_port">Tumia bandari ya TLS (kawaida 50002).</string>
+    <string name="electrum_connection_dialog_onion_port">Tumia bandari ya TCP ya kawaida, si TLS, kwani hii ni huduma ya vitunguu.</string>
+
+    <string name="electrum_connection_closed_with_random">Imetenganishwa na Electrum</string>
+    <string name="electrum_connection_closed_with_custom">Imetenganishwa na %1$s</string>
+    <string name="electrum_connection_connecting_to_random">Kuungana na (nasibu) %1$s</string>
+    <string name="electrum_connection_connecting_to_custom">Kuungana na %1$s</string>
+    <string name="electrum_connection_connected">Imerudi kuungana na %1$s</string>
+
+    <string name="electrum_description_custom">Unatumia seva maalum</string>
+    <string name="electrum_description_bad_certificate">Seva hii ilitoa cheti kisichojulikana. Muunganisho umejibiwa.</string>
+
+    <string name="electrum_dialog_checkbox">Tumia seva maalum</string>
+    <string name="electrum_dialog_input">Anwani ya seva (mwenyeji:bandari)</string>
+    <string name="electrum_dialog_invalid_input">Anwani hii sio sahihi.</string>
+    <string name="electrum_dialog_cert_check_button">Unganisha</string>
+    <string name="electrum_dialog_cert_checking">Ikikagua cheti…</string>
+    <string name="electrum_dialog_cert_failure">Imeshindwa kuunganisha</string>
+    <string name="electrum_dialog_cert_unresolved">Anwani hii haiwezi kutatuliwa.</string>
+    <string name="electrum_dialog_cert_header">Cheti kisichojulikana</string>
+    <string name="electrum_dialog_cert_sha1">Funguo ya SHA1</string>
+    <string name="electrum_dialog_cert_sha256">Funguo ya SHA256</string>
+    <string name="electrum_dialog_cert_issuer">Mtoaji</string>
+    <string name="electrum_dialog_cert_subject">Mada</string>
+    <string name="electrum_dialog_cert_expiration">Inakuwa na nguvu hadi</string>
+    <string name="electrum_dialog_cert_copy">Nakili cheti</string>
+    <string name="electrum_dialog_cert_accept">Amua cheti</string>
+
+    <!-- settings: Tor -->
+
+    <string name="tor_settings_title">Tor</string>
+    <string name="tor_settings_unknown">Inakagua mapendeleo…</string>
+    <string name="tor_settings_enabled">Tor imewezeshwa</string>
+    <string name="tor_settings_disabled">Tor haijawezeshwa</string>
+    <string name="tor_settings_state_unknown">Kipande cha Tor hakijaanza bado.</string>
+    <string name="tor_settings_state_closed">Kipande cha Tor kimefungwa.</string>
+    <string name="tor_settings_state_starting">Kuanza kwa kipande cha Tor…</string>
+    <string name="tor_settings_state_started">Tor iko mtandaoni</string>
+
+    <!-- home: connectivity dialog -->
+
+    <string name="conndialog_title">Hali ya Muunganisho</string>
+    <string name="conndialog_summary_not_ok">Programu haitafanya kazi ipasavyo hadi muunganisho wote utakapowekwa.</string>
+    <string name="conndialog_network">Kifaa chako hakina muunganisho wa Intaneti. Programu haitafanya kazi vizuri.\n\nTafadhali angalia mipangilio ya kifaa chako.</string>
+    <string name="conndialog_internet">Intaneti</string>
+    <string name="conndialog_electrum">Electrum</string>
+    <string name="conndialog_tor">Tor</string>
+    <string name="conndialog_lightning">Mwenzi</string>
+    <string name="conndialog_accessibility_desc">Simamia muunganisho kwa %1$s</string>
+    <string name="conndialog_connecting">Kuunganisha…</string>
+    <string name="conndialog_connected">Imepangwa</string>
+    <string name="conndialog_connected_electrum_behind">Seva ya Electrum inachelewa (block $1$d)</string>
+    <string name="conndialog_closed">Imetenganishwa</string>
+    <string name="conndialog_closed_bad_cert">Cheti kibaya</string>
+
+    <!-- Settings: About -->
+
+    <string name="about_title">Kuhusu Phoenix</string>
+    <string name="about_version">Matoleo ya Phoenix: <b>%1$s</b></string>
+    <string name="about_faq_link">Maswali yoyote? Angalia FAQ</string>
+    <string name="about_support_link">Msaada</string>
+    <string name="about_privacy_link">Faragha</string>
+    <string name="about_terms_link">Masharti</string>
+
+    <!-- Settings: Payment options -->
+
+    <string name="paymentsettings_title">Mikakati ya Malipo</string>
+
+    <string name="paymentsettings_category_incoming">Malipo yanayopokelewa</string>
+    <string name="paymentsettings_category_outgoing">Malipo yanayotumwa</string>
+    <string name="paymentsettings_category_lnurl">LNURL</string>
+
+    <string name="paymentsettings_defaultdesc_title">Maelezo ya risiti</string>
+    <string name="paymentsettings_defaultdesc_none">Hakuna maelezo yaliyowekwa…</string>
+    <string name="paymentsettings_defaultdesc_dialog_title">Maelezo ya kawaida</string>
+    <string name="paymentsettings_defaultdesc_dialog_description">Risiti zako zitatumia maelezo haya kwa msingi. Unaweza kubadilisha kwa kila kesi.</string>
+    <string name="paymentsettings_defaultdesc_dialog_label">Maelezo ya risiti</string>
+
+    <string name="paymentsettings_expiry_title">Muda wa kuisha kwa risiti</string>
+    <string name="paymentsettings_expiry_dialog_title">Muda wa kuisha kwa risiti</string>
+    <string name="paymentsettings_expiry_dialog_description">Risiti unazozitengeneza zitakuwa zimetoweka baada ya kuchelewa kwa muda huu. Thamani ya msingi ni wiki 1.</string>
+    <string name="paymentsettings_expiry_one_hour">Saa 1</string>
+    <string name="paymentsettings_expiry_one_day">Siku 1</string>
+    <string name="paymentsettings_expiry_one_week">Wiki 1 (kawaida)</string>
+    <string name="paymentsettings_expiry_two_weeks">Wiki 2</string>
+    <string name="paymentsettings_expiry_three_weeks">Wiki 3</string>
+    <string name="paymentsettings_expiry_value">%1$s sekunde</string>
+
+    <string name="paymentsettings_lnurlauth_scheme_title">Mpango wa uthibitishaji wa LNURL</string>
+
+    <string name="paymentsettings_swap_format_title">Muundo wa anwani ya Bitcoin</string>
+    <string name="paymentsettings_swap_format_legacy_title">Legacy</string>
+    <string name="paymentsettings_swap_format_legacy_desc">Muundo usio bora na usio wa faragha sana ambao haugeuzi anwani. Hata hivyo, unapatana na huduma na pochi nyingi.</string>
+    <string name="paymentsettings_swap_format_taproot_title">Taproot (inapendekezwa)</string>
+    <string name="paymentsettings_swap_format_taproot_desc">Muundo wa msingi, wenye faragha bora, ada nafuu na ugeuzi wa anwani. Huduma au pochi zingine zinaweza kutoweza kuelewa anwani.</string>
+
+    <string name="paymentsettings_overpayment_title">wezesha kulipa zaidi</string>
+    <string name="paymentsettings_overpayment_enabled">Utakuwa na uwezo wa kulipa zaidi kwa risiti za Lightning hadi mara 2 ya kiasi kilichombolewa. Inafaa kwa kupiga kura kwa mikono, au kama kipimo cha faragha.</string>
+    <string name="paymentsettings_overpayment_disabled">Imezimwa (kawaida)</string>
+
+    <!-- Settings: Currencies -->
+
+    <string name="currency_ars_official">Peso la Argentina (kiwango rasmi)</string>
+    <string name="currency_ars_bm">Peso la Argentina</string>
+    <string name="currency_cup_official">Peso la Cuba (kiwango rasmi)</string>
+    <string name="currency_cup_fm">Peso la Cuba</string>
+    <string name="currency_lbp_official">Paundi ya Lebanon (kiwango rasmi)</string>
+    <string name="currency_lbp_bm">Paundi ya Lebanon</string>
+
+    <!-- Payments history -->
+
+    <string name="payments_history_title">Malipo ya ndani (%1$d)</string>
+    <string name="payments_history_export_button">Hamisha</string>
+    <string name="payments_history_today">Leo</string>
+    <string name="payments_history_yesterday">Jana</string>
+    <string name="payments_history_thisweek">Mapema wiki hii</string>
+    <string name="payments_history_lastweek">Wiki iliyopita</string>
+    <string name="payments_export_title">Hamisha malipo</string>
+    <string name="payments_export_instructions">Hamisha malipo yako ya ndani yaliyofanikiwa kwa format ya CSV (maadili yaliyoonyeshwa kwa koma).</string>
+    <string name="payments_export_start_label">Tarehe ya mwanzo</string>
+    <string name="payments_export_end_label">Tarehe ya mwisho</string>
+    <string name="payments_export_context_label">Jumuisha asili/malengo</string>
+    <string name="payments_export_description_label">Jumuisha maelezo</string>
+    <string name="payments_export_generate_button">Hamisha</string>
+    <string name="payments_export_no_payments">Hakuna malipo yaliyofanikiwa bado</string>
+    <string name="payments_export_invalid_timestamps">Tafadhali chagua tarehe sahihi ya mwanzo/mwisho</string>
+    <string name="payments_export_in_progress">Ikihamisha malipo #%1$d</string>
+    <string name="payments_export_success">%1$d malipo yametiwa alama kwa mafanikio</string>
+    <string name="payments_export_share_subject">Phoenix - malipo kutoka %1$s hadi %2$s</string>
+    <string name="payments_export_share_title">Shiriki malipo ya Phoenix…</string>
+    <string name="payments_export_share_button">Shiriki faili</string>
+    <string name="payments_export_error">Uhamisho umeshindwa.</string>
+    <string name="payments_export_no_data">Hakuna malipo yaliyoonekana.</string>
+
+    <!-- Components -->
+
+    <string name="component_calendar_inclusive">(ikiwemo)</string>
+
+    <!-- Settings: Wallet info -->
+
+    <string name="walletinfo_title">Taarifa za Pochi</string>
+    <string name="walletinfo_descriptor_legacy">Maelezo ya Legacy</string>
+    <string name="walletinfo_descriptor">Maelezo</string>
+    <string name="walletinfo_swapin_user_pubkey">Funguo ya umma ya mtumiaji</string>
+    <string name="walletinfo_swapin_addresses">Anwani za kubadilishana</string>
+    <string name="walletinfo_xpub">Funguo kuu ya umma</string>
+    <string name="walletinfo_path">(Njia: %1$s)</string>
+
+    <string name="walletinfo_swappable_title">Inapatikana kwa kubadilishana</string>
+    <string name="walletinfo_confirming_title">Inasubiri %1$d uthibitisho</string>
+    <string name="walletinfo_confirming_more">+%1$d zaidi…</string>
+    <string name="walletinfo_confirmed_title">Salio lililo thibitishwa</string>
+    <string name="walletinfo_unconfirmed_title">Salio lisilo thibitishwa</string>
+    <string name="walletinfo_incoming_balance">+%1$s inayoingia</string>
+    <string name="walletinfo_loading_data">Ikipakia data za pochi…</string>
+
+    <string name="swapinaddresses_title">Anwani za kubadilishana</string>
+    <string name="swapinaddresses_sync">Ikisawazisha…</string>
+    <string name="swapinaddresses_taproot">Taproot</string>
+    <string name="swapinaddresses_legacy">Legacy</string>
+
+    <string name="walletinfo_lightning">Lightning</string>
+    <string name="walletinfo_nodeid">Kitambulisho cha Node</string>
+    <string name="walletinfo_legacy_nodeid_toggle">Onyesha kitambulisho cha node cha Legacy</string>
+    <string name="walletinfo_legacy_nodeid">Kitambulisho cha node cha Legacy</string>
+
+    <string name="walletinfo_onchain_final">Pochi ya Mwisho</string>
+
+    <!-- Settings: Liquidity policy for channels creation -->
+
+    <string name="liquiditypolicy_title">Usimamizi wa Channel</string>
+    <string name="liquiditypolicy_fees_estimation_loading">Ikipata kiwango cha ada…</string>
+    <string name="liquiditypolicy_fees_header">Mipangilio ya ada zangu</string>
+    <string name="liquiditypolicy_advanced_title">Usimamizi wa Channels wa Kipekee</string>
+    <string name="liquiditypolicy_loading">Ikipata sera…</string>
+
+    <!-- CPFP Splices -->
+
+    <string name="cpfp_feerate_label">Kiwango cha ada</string>
+    <string name="cpfp_feerate_value">%1$s sat/vbyte</string>
+
+    <string name="cpfp_prepare_button">Andaa malipo</string>
+    <string name="cpfp_estimating">Ikikadiria ada…</string>
+    <string name="cpfp_estimation">Utatoa <b>%1$s</b> kwa wachimba madini wa Bitcoin</string>
+    <string name="cpfp_execute_button">Tekeleza malipo</string>
+    <string name="cpfp_executing">Ikitekeleza malipo…</string>
+    <string name="cpfp_success">Malipo kamili</string>
+    <string name="cpfp_failure_title">Malipo yameshindwa</string>
+    <string name="cpfp_error_title">Haiwezi kuendelea</string>
+
+    <!-- Mempool -->
+
+    <string name="mempool_unknown_feerate_title">Hali isiyojulikana ya mempool</string>
+    <string name="mempool_unknown_feerate_details">Phoenix ilishindwa kupata hali ya sasa ya mempool na haiwezi kutathmini kasi ya miamala yako.\n\nAngalia mempool kwa mkaguzi, na tumia thamani inayofaa!</string>
+    <string name="mempool_fastest">≈ Dakika 10</string>
+    <string name="mempool_halfhour">≈ Dakika 30</string>
+    <string name="mempool_hour">≈ Saa 1</string>
+    <string name="mempool_slow">Kiwango cha ada cha chini</string>
+
+    <!-- Splice errors -->
+
+    <string name="splice_error_nochannels">Huna channels yoyote</string>
+    <string name="splice_error_aborted_by_peer">Imeahirishwa na mwenzi [%1$s]</string>
+    <string name="splice_error_cannot_create_commit">Haiwezi kuunda ahadi mpya</string>
+    <string name="splice_error_concurrent_remote">Kuna splice nyingine inayendelea</string>
+    <string name="splice_error_channel_not_quiescent">Imeahirishwa kutokana na kosa</string>
+    <string name="splice_error_disconnected">Channel imetenganishwa</string>
+    <string name="splice_error_funding_error">Ufadhili umeshindwa [%1$s]</string>
+    <string name="splice_error_insufficient_funds">Hana fedha za kutosha</string>
+    <string name="splice_error_cannot_start_session">Haiwezi kuanzisha kikao cha muamala na mwenzi</string>
+    <string name="splice_error_interactive_session">Kikao cha tx cha mwingiliano kimeshindwa [%1$s]</string>
+    <string name="splice_error_invalid_pubkey">Furushi la pubkey la splice-out si halali</string>
+    <string name="splice_error_splice_in_progress">Malipo ya splice tayari yanaendelea</string>
+    <string name="splice_error_invalid_liquidity_ads">Omba maelezo ya uhamisho wa kiwanda yasiyo halali: [%1$s]</string>
+
+    <!-- Reset wallet -->
+
+    <string name="reset_wallet_title">Futa pochi</string>
+    <string name="reset_wallet_instructions_header">Futa data zote za pochi kutoka kifaa hiki</string>
+    <string name="reset_wallet_instructions_details">Hii itafanya programu irejee kama vile umeisakinisha tu.</string>
+    <string name="reset_wallet_review_button">Tathmini</string>
+
+    <string name="reset_wallet_confirm_title">Thibitisha kufuta</string>
+    <string name="reset_wallet_confirm_header">Pochi itafutwa kabisa kutoka <b>kifaa hiki</b>.</string>
+    <string name="reset_wallet_confirm_details">Hii itafanya programu irejee. Historia yako ya malipo itapotea. Utapelekwa kwenye skrini ya Utangulizi, na utaombwa kuunda au kurejesha pochi.</string>
+    <string name="reset_wallet_confirm_seed_balance">Usipoteze fedha zako:\n%1$s (≈ %2$s).</string>
+    <string name="reset_wallet_confirm_seed_responsibility">Wewe ndiye mwenye jukumu la kuhifadhi sentensi yako ya urejeleaji.</string>
+    <string name="reset_wallet_confirm_button">Futa pochi</string>
+    <string name="reset_wallet_shutting_down">Inazima…</string>
+    <string name="reset_wallet_deleting_prefs">Ikifuta mapendeleo…</string>
+    <string name="reset_wallet_deleting_seed">Ikifuta mbegu…</string>
+    <string name="reset_wallet_deleting_db">Ikifuta hifadhidata…</string>
+    <string name="reset_wallet_success">Pochi imefutwa kwa mafanikio.</string>
+    <string name="reset_wallet_failure_title">Kufuta kumeshindwa</string>
+
+    <!-- Swap input signer tool -->
+
+    <string name="swapin_signer_title">Signer wa kubadilishana</string>
+    <string name="swapin_signer_instructions">Zana hii ya upimaji inakuwezesha kusaini vipande vya kubadilishana. Tumia tu ikiwa unaelewa inavyofanya kazi.</string>
+    <string name="swapin_signer_tx">Tx isiyo sahihi</string>
+    <string name="swapin_signer_sign">Saini</string>
+    <string name="swapin_signer_signing">Ikisaini…</string>
+    <string name="swapin_signer_signed_sig">Saini ya mtumiaji</string>
+    <string name="swapin_signer_invalid_tx_header">Tx isiyo sahihi</string>
+    <string name="swapin_signer_invalid_tx_details">Angalia kwamba ingizo limekamilika na halikupungua tabia yoyote.</string>
+    <string name="swapin_signer_error_header">Imeshindwa kusaini ingizo</string>
+
+    <!-- Settings: Contacts list -->
+
+    <string name="settings_contacts_help">Mawasiliano yanakuwezesha kuunganisha jina na ofa ya kudumu. Yanahifadhiwa kwa ndani.</string>
+
+    <!-- Experimental -->
+
+    <string name="experimental_title">Sifa za majaribio</string>
+
+    <string name="bip353_header">Anwani ya DNS ya Bip353</string>
+    <string name="bip353_empty">Hakuna anwani bado…</string>
+    <string name="bip353_claim_button">Dai anwani yangu</string>
+    <string name="bip353_claiming">Ikidai anwani…</string>
+    <string name="bip353_error">Imeshindwa kudai anwani</string>
+
+</resources>

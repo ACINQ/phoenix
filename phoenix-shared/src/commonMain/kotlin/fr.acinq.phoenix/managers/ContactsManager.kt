@@ -18,17 +18,26 @@ package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.PublicKey
+import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.db.SqliteAppDb
+import fr.acinq.phoenix.utils.extensions.incomingOfferMetadata
+import fr.acinq.phoenix.utils.extensions.outgoingInvoiceRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMap
+import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 
@@ -46,12 +55,40 @@ class ContactsManager(
 
     private val _contactsList = MutableStateFlow<List<ContactInfo>>(emptyList())
     val contactsList = _contactsList.asStateFlow()
+
+    private val _contactsMap = MutableStateFlow<Map<UUID, ContactInfo>>(emptyMap())
+    val contactsMap = _contactsMap.asStateFlow()
+
+    private val _offerMap = MutableStateFlow<Map<OfferTypes.Offer, UUID>>(emptyMap())
+    val offerMap = _offerMap.asStateFlow()
+
+    private val _publicKeyMap = MutableStateFlow<Map<PublicKey, UUID>>(emptyMap())
+    val publicKeyMap = _publicKeyMap.asStateFlow()
+
     val contactsWithOfferList = _contactsList.map { contacts ->
         contacts.filter { it.offers.isNotEmpty()  }
     }
 
     init {
-        launch { appDb.monitorContacts().collect { _contactsList.value = it } }
+        launch {
+            appDb.monitorContacts().collect { list ->
+                val newMap = list.associateBy { it.id }
+                val newOfferMap = list.flatMap { contact ->
+                    contact.offers.map { offer ->
+                        offer to contact.id
+                    }
+                }.toMap()
+                val newPublicKeyMap = list.flatMap { contact ->
+                    contact.publicKeys.map { pubKey ->
+                        pubKey to contact.id
+                    }
+                }.toMap()
+                _contactsList.value = list
+                _contactsMap.value = newMap
+                _offerMap.value = newOfferMap
+                _publicKeyMap.value = newPublicKeyMap
+            }
+        }
     }
 
     suspend fun getContactForOffer(offer: OfferTypes.Offer): ContactInfo? {
@@ -91,5 +128,31 @@ class ContactsManager(
 
     suspend fun detachOfferFromContact(offerId: ByteVector32) {
         appDb.deleteOfferContactLink(offerId)
+    }
+
+    /**
+     * In many cases there's no need to query the database since we have everything in memory.
+     */
+
+    fun contactForId(contactId: UUID): ContactInfo? {
+        return contactsMap.value[contactId]
+    }
+
+    fun contactIdForPayment(payment: WalletPayment): UUID? {
+        return if (payment is IncomingPayment) {
+            payment.incomingOfferMetadata()?.let { offerMetadata ->
+                publicKeyMap.value[offerMetadata.payerKey]
+            }
+        } else {
+            payment.outgoingInvoiceRequest()?.let {invoiceRequest ->
+                offerMap.value[invoiceRequest.offer]
+            }
+        }
+    }
+
+    fun contactForPayment(payment: WalletPayment): ContactInfo? {
+        return contactIdForPayment(payment)?.let { contactId ->
+            contactForId(contactId)
+        }
     }
 }
