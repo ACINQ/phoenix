@@ -64,7 +64,7 @@ sealed class EncryptedPin {
 
         companion object {
             /** Version byte written at the start of the encrypted pin file. */
-            val version: Byte = 1
+            const val version: Byte = 1
 
             fun encrypt(pin: ByteArray): V1 = tryWith(GeneralSecurityException()) {
                 val cipher = KeystoreHelper.getEncryptionCipher(KeystoreHelper.KEY_FOR_PINCODE_V1)
@@ -80,9 +80,9 @@ sealed class EncryptedPin {
         private const val FILE_NAME = "pin.dat"
 
         /** Reads an array of byte and de-serializes it as an [EncryptedPin] object. */
-        fun deserialize(serialized: ByteArray): EncryptedPin {
+        private fun deserialize(serialized: ByteArray): EncryptedPin {
             val stream = ByteArrayInputStream(serialized)
-            return when (stream.read()) {
+            return when (val version = stream.read()) {
                 V1.version.toInt() -> {
                     val iv = ByteArray(IV_LENGTH)
                     stream.read(iv, 0, IV_LENGTH)
@@ -91,7 +91,7 @@ sealed class EncryptedPin {
                     V1(iv, cipherText)
                 }
 
-                else -> TODO()
+                else -> throw UnsupportedOperationException("unhandled version=$version")
             }
         }
 

@@ -39,10 +39,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-/**
- * Tracks the state of the PIN dialog UI. For the state of the
- * PIN lock, see [UserPrefsRepository.PREFS_CUSTOM_PIN_STATE].
- */
+/** View model tracking the state of the PIN dialog UI. */
 sealed class CheckPinFlowState {
 
     data object Init : CheckPinFlowState()
