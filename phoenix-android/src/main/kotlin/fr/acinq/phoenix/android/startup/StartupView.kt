@@ -68,6 +68,7 @@ import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
+import fr.acinq.phoenix.android.components.screenlock.LockPrompt
 import fr.acinq.phoenix.android.internalData
 import fr.acinq.phoenix.android.security.SeedFileState
 import fr.acinq.phoenix.android.security.SeedManager
@@ -94,8 +95,9 @@ fun StartupView(
 ) {
     val context = LocalContext.current
     val serviceState by appVM.serviceState.observeAsState()
-    val showIntro by internalData.getShowIntro.collectAsState(initial = null)
-    val isLockActiveState by userPrefs.getIsScreenLockActive.collectAsState(initial = null)
+
+    val showIntroState = internalData.getShowIntro.collectAsState(initial = null)
+    val showIntro = showIntroState.value
 
     Column(
         modifier = Modifier
@@ -109,55 +111,33 @@ fun StartupView(
             painter = painterResource(id = R.drawable.ic_phoenix),
             contentDescription = "phoenix-icon",
         )
-        val isScreenLockEnabled = isLockActiveState
-        val isScreenLocked by appVM.isScreenLocked
-        if (isScreenLockEnabled == null || showIntro == null) {
-            // wait for preferences to load
-        } else if (showIntro!!) {
-            LaunchedEffect(key1 = Unit) { onShowIntro() }
-        } else if (isScreenLockEnabled && isScreenLocked) {
-            val promptScreenLock = {
-                val promptInfo = BiometricPrompt.PromptInfo.Builder().apply {
-                    setTitle(context.getString(R.string.authprompt_title))
-                    setAllowedAuthenticators(BiometricsHelper.authCreds)
-                }.build()
-                BiometricsHelper.getPrompt(
-                    activity = context.findActivity(),
-                    onSuccess = { appVM.saveIsScreenLocked(false) },
-                    onFailure = { appVM.saveIsScreenLocked(true) },
-                    onCancel = { }
-                ).authenticate(promptInfo)
-            }
-            LaunchedEffect(key1 = true) {
-                promptScreenLock()
-            }
-            BorderButton(
-                text = stringResource(id = R.string.startup_manual_unlock_button),
-                icon = R.drawable.ic_shield,
-                onClick = promptScreenLock
-            )
-        } else {
-            when (val currentState = serviceState) {
-                null, is NodeServiceState.Disconnected -> Text(stringResource(id = R.string.startup_binding_service))
-                is NodeServiceState.Off -> DecryptSeedAndStartBusiness(appVM = appVM, onKeyAbsent = onKeyAbsent)
-                is NodeServiceState.Init -> Text(stringResource(id = R.string.startup_starting))
-                is NodeServiceState.Error -> {
-                    ErrorMessage(
-                        header = stringResource(id = R.string.startup_error_generic),
-                        details = currentState.cause.message
-                    )
-                }
-                is NodeServiceState.Running -> {
-                    val legacyAppStatus by LegacyPrefsDatastore.getLegacyAppStatus(context).collectAsState(null)
-                    when (legacyAppStatus) {
-                        LegacyAppStatus.Unknown -> {
-                            Text(stringResource(id = R.string.startup_wait_legacy_check))
-                        }
-                        LegacyAppStatus.NotRequired -> {
-                            LaunchedEffect(true) { onBusinessStarted() }
-                        }
-                        else -> {
-                            Text(stringResource(id = R.string.startup_starting))
+
+        when (showIntro) {
+            null -> Unit // wait for preference to load
+            true -> LaunchedEffect(key1 = Unit) { onShowIntro() }
+            false -> {
+                when (val currentState = serviceState) {
+                    null, is NodeServiceState.Disconnected -> Text(stringResource(id = R.string.startup_binding_service))
+                    is NodeServiceState.Off -> DecryptSeedAndStartBusiness(appVM = appVM, onKeyAbsent = onKeyAbsent)
+                    is NodeServiceState.Init -> Text(stringResource(id = R.string.startup_starting))
+                    is NodeServiceState.Error -> {
+                        ErrorMessage(
+                            header = stringResource(id = R.string.startup_error_generic),
+                            details = currentState.cause.message
+                        )
+                    }
+                    is NodeServiceState.Running -> {
+                        val legacyAppStatus by LegacyPrefsDatastore.getLegacyAppStatus(context).collectAsState(null)
+                        when (legacyAppStatus) {
+                            LegacyAppStatus.Unknown -> {
+                                Text(stringResource(id = R.string.startup_wait_legacy_check))
+                            }
+                            LegacyAppStatus.NotRequired -> {
+                                LaunchedEffect(true) { onBusinessStarted() }
+                            }
+                            else -> {
+                                Text(stringResource(id = R.string.startup_starting))
+                            }
                         }
                     }
                 }
@@ -246,12 +226,10 @@ private fun DecryptionFailure(
     val context = LocalContext.current
     ErrorMessage(
         header = when (state) {
-            is StartupDecryptionState.DecryptionError.UnhandledVersion -> stringResource(id = R.string.startup_unlock_failure_unhandled_version, state.name)
             is StartupDecryptionState.DecryptionError.Other -> stringResource(id = R.string.startup_unlock_failure)
             is StartupDecryptionState.DecryptionError.KeystoreFailure -> stringResource(id = R.string.startup_unlock_failure_keystore)
         },
         details = when (state) {
-            is StartupDecryptionState.DecryptionError.UnhandledVersion -> stringResource(id = R.string.startup_unlock_failure_unhandled_version)
             is StartupDecryptionState.DecryptionError.Other -> "[${state.cause::class.java.simpleName}] ${state.cause.localizedMessage ?: ""}"
             is StartupDecryptionState.DecryptionError.KeystoreFailure -> "[${state.cause::class.java.simpleName}] ${state.cause.localizedMessage ?: ""}" +
                     (state.cause.cause?.localizedMessage?.take(80) ?: "")

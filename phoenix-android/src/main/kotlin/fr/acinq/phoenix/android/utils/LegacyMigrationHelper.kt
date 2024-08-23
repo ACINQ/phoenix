@@ -111,7 +111,7 @@ object LegacyMigrationHelper {
 
         // -- security & tor
 
-        userPrefs.saveIsScreenLockActive(Prefs.isScreenLocked(context))
+        userPrefs.saveIsBiometricLockEnabled(Prefs.isScreenLocked(context))
         Prefs.isTorEnabled(context).let {
             userPrefs.saveIsTorEnabled(it)
             appConfigurationManager.updateTorUsage(it)

@@ -49,19 +49,17 @@
 
     <!-- Auth prompt (v2) -->
 
-    <string name="authprompt_title">Mở khóa để tiếp tục</string>
+    <string name="lockprompt_title">Mở khóa để tiếp tục</string>
 
     <!-- Startup -->
 
     <string name="startup_binding_service">Binding dịch vụ…</string>
     <string name="startup_wait">Đang chuẩn bị ví…</string>
     <string name="startup_wait_legacy_check">Đang kiểm tra ví cũ…</string>
-    <string name="startup_manual_unlock_button">Mở khoá</string>
     <string name="startup_checking_seed">Đang mở khoá…</string>
     <string name="startup_unlocked">Quyền truy cập được chấp nhận…</string>
     <string name="startup_unlock_failure">Mở khóa không thành công</string>
     <string name="startup_unlock_failure_keystore">Lỗi kho khóa Android</string>
-    <string name="startup_unlock_failure_unhandled_version">Phiên bản hạt giống chưa được xử lý (%1$s)</string>
     <string name="startup_unlock_failure_fallback">Mở khóa bằng hạt giống</string>
 
     <string name="startup_fallback_instructions">Nhập 12 từ khôi phục để mở khóa ví của bạn.\n\nCác từ phải được nhập theo đúng thứ tự và cách nhau bằng một dấu cách.</string>
@@ -431,7 +429,6 @@
     <!-- settings: access control -->
 
     <string name="accessctrl_title">Quyền truy cập ứng dụng</string>
-    <string name="accessctrl_loading">Đang tải dữ liệu…</string>
 
     <string name="accessctrl_auth_error_header">Không thể bật chế độ khóa màn hình</string>
     <string name="accessctrl_auth_error_no_hw">Thiết bị này không có phần cứng xác thực nào phù hợp.</string>
@@ -446,8 +443,8 @@
     <string name="accessctrl_auth_error_too_old">Phiên bản Android này không tương thích.</string>
     <string name="accessctrl_auth_error_unhandled">Lỗi mã chưa được xử lý: %1$d</string>
 
-    <string name="accessctrl_screen_lock_switch">Khóa màn hình</string>
-    <string name="accessctrl_screen_lock_switch_desc">Khóa quyền truy cập vào ứng dụng bằng khóa màn hình/khoá vân tay của Android</string>
+    <string name="accessctrl_biometric_lock_switch_label">Khóa màn hình</string>
+    <string name="accessctrl_biometric_lock_switch_desc">Khóa quyền truy cập vào ứng dụng bằng khóa màn hình/khoá vân tay của Android</string>
 
     <!-- lnurl-auth -->
 

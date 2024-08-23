@@ -44,7 +44,6 @@ sealed class StartupDecryptionState {
     sealed class DecryptionError : StartupDecryptionState() {
         data class Other(val cause: Throwable): DecryptionError()
         data class KeystoreFailure(val cause: Throwable): DecryptionError()
-        data class UnhandledVersion(val name: String): DecryptionError()
     }
     sealed class SeedInputFallback : StartupDecryptionState() {
         object Init: SeedInputFallback()
@@ -83,10 +82,6 @@ class StartupViewModel : ViewModel() {
                     log.debug("seed decrypted!")
                     decryptionState.value = StartupDecryptionState.DecryptionSuccess
                     service.startBusiness(seed, checkLegacyChannels)
-                }
-                is EncryptedSeed.V2.WithAuth -> {
-                    log.error("decryption failed, unsupported type=${encryptedSeed.name()}")
-                    decryptionState.value = StartupDecryptionState.DecryptionError.UnhandledVersion(encryptedSeed.name())
                 }
             }
         }

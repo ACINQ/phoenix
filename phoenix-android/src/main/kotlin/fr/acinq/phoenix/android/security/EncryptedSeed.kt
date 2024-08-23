@@ -50,17 +50,6 @@ sealed class EncryptedSeed {
       }
     }
 
-    /** This seed is encrypted with a key that requires user authentication. */
-    class WithAuth(override val iv: ByteArray, override val ciphertext: ByteArray) : V2(KeystoreHelper.KEY_WITH_AUTH) {
-      fun decrypt(cipher: Cipher?): ByteArray = tryWith(GeneralSecurityException()) { cipher!!.doFinal(ciphertext) }
-
-      companion object {
-        fun encrypt(seed: ByteArray, cipher: Cipher): WithAuth = tryWith(GeneralSecurityException()) {
-          WithAuth(cipher.iv, cipher.doFinal(seed))
-        }
-      }
-    }
-
     fun getDecryptionCipher() = KeystoreHelper.getDecryptionCipher(keyAlias, iv)
 
     /** Serialize to a V2 ByteArray. */
@@ -72,7 +61,6 @@ sealed class EncryptedSeed {
       array.write(SEED_FILE_VERSION_2.toInt())
       array.write(when (keyAlias) {
         KeystoreHelper.KEY_NO_AUTH -> NO_AUTH_KEY_VERSION
-        KeystoreHelper.KEY_WITH_AUTH -> REQUIRED_AUTH_KEY_VERSION
         else -> throw UnhandledEncryptionKeyAlias(keyAlias)
       }.toInt())
       array.write(iv)
@@ -83,7 +71,7 @@ sealed class EncryptedSeed {
     companion object {
       private const val IV_LENGTH = 16
       private const val NO_AUTH_KEY_VERSION = 1
-      private const val REQUIRED_AUTH_KEY_VERSION = 2
+      private const val REMOVED_DO_NOT_USE = 2
 
       fun deserialize(stream: ByteArrayInputStream): V2 {
         val keyVersion = stream.read()
@@ -93,7 +81,6 @@ sealed class EncryptedSeed {
         stream.read(cipherText, 0, stream.available())
         return when (keyVersion) {
           NO_AUTH_KEY_VERSION -> NoAuth(iv, cipherText)
-          REQUIRED_AUTH_KEY_VERSION -> WithAuth(iv, cipherText)
           else -> throw UnhandledEncryptionKeyVersion(keyVersion)
         }
       }

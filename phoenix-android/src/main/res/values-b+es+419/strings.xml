@@ -47,19 +47,17 @@
 
     <!-- Auth prompt (v2) -->
 
-    <string name="authprompt_title">Desbloquear para continuar</string>
+    <string name="lockprompt_title">Desbloquear para continuar</string>
 
     <!-- Startup -->
 
     <string name="startup_binding_service">Vinculando el servicio…</string>
     <string name="startup_wait">Preparando la billetera…</string>
     <string name="startup_wait_legacy_check">Comprobando la billetera heredada…</string>
-    <string name="startup_manual_unlock_button">Desbloquear</string>
     <string name="startup_checking_seed">Desbloqueando…</string>
     <string name="startup_unlocked">Acceso concedido…</string>
     <string name="startup_unlock_failure">Error al desbloquear</string>
     <string name="startup_unlock_failure_keystore">Error de Android Keystore</string>
-    <string name="startup_unlock_failure_unhandled_version">Versión de semilla no controlada (%1$s)</string>
     <string name="startup_unlock_failure_fallback">Desbloquear con semilla</string>
 
     <string name="startup_fallback_instructions">Ingresa tus 12 palabras de recuperación para desbloquear la billetera.\n\nLas palabras deben ingresarse en el orden correcto y estar separadas por un solo espacio.</string>
@@ -418,7 +416,6 @@
     <!-- settings: access control -->
 
     <string name="accessctrl_title">Acceso a la aplicación</string>
-    <string name="accessctrl_loading">Obteniendo datos…</string>
 
     <string name="accessctrl_auth_error_header">No se puede activar el bloqueo de pantalla</string>
     <string name="accessctrl_auth_error_no_hw">No hay hardware de autenticación adecuado en este dispositivo.</string>
@@ -433,8 +430,8 @@
     <string name="accessctrl_auth_error_too_old">Esta versión de Android no es compatible.</string>
     <string name="accessctrl_auth_error_unhandled">Código de error no controlado: %1$d</string>
 
-    <string name="accessctrl_screen_lock_switch">Bloqueo de pantalla</string>
-    <string name="accessctrl_screen_lock_switch_desc">Bloquea el acceso a la aplicación con el bloqueo de pantalla o la huella dactilar de Android.</string>
+    <string name="accessctrl_biometric_lock_switch_label">Bloqueo de pantalla del sistema</string>
+    <string name="accessctrl_biometric_lock_switch_desc">Bloquea el acceso a la aplicación con el bloqueo de pantalla o la huella dactilar de Android.</string>
 
     <!-- lnurl-auth -->
 
