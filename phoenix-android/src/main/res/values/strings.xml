@@ -512,8 +512,8 @@
 
     <string name="accessctrl_biometric_lock_switch_label">System Screen Lock</string>
     <string name="accessctrl_biometric_lock_switch_desc">Access to the app is controlled with the Android\'s system Screen Lock/Fingerprint</string>
-    <string name="accessctrl_pin_lock_switch_label">Custom PIN code</string>
-    <string name="accessctrl_pin_lock_switch_desc">Access to the app is controlled with a 6-digits PIN code</string>
+    <string name="accessctrl_pin_lock_switch_label">Custom PIN</string>
+    <string name="accessctrl_pin_lock_switch_desc">Access to the app is controlled with a 6-digits PIN code specific to Phoenix</string>
 
     <!-- lnurl-auth -->
 
