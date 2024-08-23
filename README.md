@@ -20,18 +20,20 @@ Head to our website for more information:
 ## Download
 
 Phoenix is available for Android and iOS:
-- for iOS: [on the App Store](https://apps.apple.com/us/app/phoenix-wallet/id1544097028) - requires iOS 14+.
+- for iOS: [on the App Store](https://apps.apple.com/us/app/phoenix-wallet/id1544097028) - requires iOS 15+.
 - for Android: [on Google Play](https://play.google.com/store/apps/details?id=fr.acinq.phoenix.mainnet), or [get the APK from the releases](https://github.com/ACINQ/phoenix/releases) - requires Android 8+.
 
 ## Build and test Phoenix
 
 Phoenix is separated in 3 modules:
 - `phoenix-shared`: business logic written in Kotlin, shared between the iOS and the Android applications. Uses [lightning-kmp](https://github.com/ACINQ/lightning-kmp) for everything Lightning/Bitcoin related.
-- `phoenix-android`: the UI for the new Android application, written in Kotlin and Jetpack Compose. Instructions to build this app are provided [here](https://github.com/ACINQ/phoenix/blob/master/phoenix-android/BUILD.md).
-- `phoenix-ios`: the UI for the iOS application, written in Swift. Instructions to build this app are provided [here](https://github.com/ACINQ/phoenix/blob/master/BUILD.md).
+- `phoenix-android`: the UI for the new Android application, written in Kotlin and Jetpack Compose.
+- `phoenix-ios`: the UI for the iOS application, written in Swift.
 
-About about the legacy Android app:
-`phoenix-legacy` contains the old, legacy Android application (version 1.x), using [eclair-core](https://github.com/ACINQ/eclair) for Lightning. This application has been replaced by `phoenix-android`. However, this legacy app is still embedded in the new production application for migration purposes. It will be removed eventually.
+Instructions to build the iOS and the Android apps are provided [here](https://github.com/ACINQ/phoenix/blob/master/BUILD.md).
+
+Deprecated module:
+- `phoenix-legacy`: contains the old, legacy Android application (version 1.x), using [eclair-core](https://github.com/ACINQ/eclair) for Lightning, which has been replaced by `phoenix-android`. However, this legacy app is still embedded in the new production application for migration purposes so the code remains. It will be removed eventually.
 
 ## Contribute
 

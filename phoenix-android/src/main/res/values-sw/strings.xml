@@ -48,7 +48,7 @@
 
     <!-- Auth prompt (v2) -->
 
-    <string name="authprompt_title">Fungua ili kuendelea</string>
+    <string name="lockprompt_title">Fungua ili kuendelea</string>
 
     <!-- utils: placeholders -->
 
