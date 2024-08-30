@@ -21,7 +21,7 @@ import kotlinx.coroutines.withContext
 
 class SqliteAppDb(private val driver: SqlDriver) {
 
-    private val database = AppDatabase(
+    internal val database = AppDatabase(
         driver = driver,
         exchange_ratesAdapter = Exchange_rates.Adapter(
             typeAdapter = EnumColumnAdapter()
@@ -34,7 +34,7 @@ class SqliteAppDb(private val driver: SqlDriver) {
     private val priceQueries = database.exchangeRatesQueries
     private val keyValueStoreQueries = database.keyValueStoreQueries
     private val notificationsQueries = NotificationsQueries(database)
-    private val contactQueries = ContactQueries(database)
+    internal val contactQueries = ContactQueries(database)
 
     /**
      * Save a list of [ExchangeRate] items to the database.
@@ -170,6 +170,10 @@ class SqliteAppDb(private val driver: SqlDriver) {
 
     suspend fun listUnreadNotification(): Flow<List<Pair<Set<UUID>, Notification>>> = withContext(Dispatchers.Default) {
         notificationsQueries.listUnread()
+    }
+
+    suspend fun getContact(contactId: UUID): ContactInfo? = withContext(Dispatchers.Default) {
+        contactQueries.getContact(contactId)
     }
 
     suspend fun getContactForOffer(offerId: ByteVector32): ContactInfo? = withContext(Dispatchers.Default) {

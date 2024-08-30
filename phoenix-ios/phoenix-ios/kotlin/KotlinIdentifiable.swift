@@ -1,6 +1,12 @@
 import Foundation
 import PhoenixShared
 
+extension Lightning_kmpUUID: Identifiable {
+	
+	public var id: String {
+		return self.description
+	}
+}
 
 extension WalletPaymentId: Identifiable {
 	

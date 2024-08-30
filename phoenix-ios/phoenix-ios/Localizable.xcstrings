@@ -21794,7 +21794,11 @@
         }
       }
     },
+    "If you switch to a new device (or reinstall the app) then you'll lose this information." : {
+
+    },
     "If you switch to a new device (or reinstall the app) then you'll lose your payment history." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -31050,6 +31054,7 @@
       }
     },
     "Payments backup" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -48544,7 +48549,14 @@
         }
       }
     },
+    "Your payment history and contacts are only stored on this device." : {
+
+    },
+    "Your payment history and contacts will be stored in iCloud." : {
+
+    },
     "Your payment history is only stored on this device." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -48585,6 +48597,7 @@
       }
     },
     "Your payment history will be stored in iCloud." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

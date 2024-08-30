@@ -75,7 +75,7 @@ struct PaymentsBackupView: View {
 			
 			Label {
 				VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
-					Text("Your payment history will be stored in iCloud.")
+					Text("Your payment history and contacts will be stored in iCloud.")
 					
 					Text(
 						"""
@@ -98,12 +98,12 @@ struct PaymentsBackupView: View {
 			
 			Label {
 				VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
-					Text("Your payment history is only stored on this device.")
+					Text("Your payment history and contacts are only stored on this device.")
 					
 					Text(
 						"""
 						If you switch to a new device (or reinstall the app) \
-						then you'll lose your payment history.
+						then you'll lose this information.
 						"""
 					)
 					.foregroundColor(Color.gray)

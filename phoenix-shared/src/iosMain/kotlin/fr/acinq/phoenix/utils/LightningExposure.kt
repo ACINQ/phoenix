@@ -3,11 +3,13 @@ package fr.acinq.phoenix.utils
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.ByteVector64
+import fr.acinq.bitcoin.Crypto
 import fr.acinq.bitcoin.PrivateKey
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.Transaction
 import fr.acinq.bitcoin.TxId
+import fr.acinq.bitcoin.byteVector
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.ChannelEvents
 import fr.acinq.lightning.DefaultSwapInParams
@@ -29,6 +31,7 @@ import fr.acinq.lightning.channel.states.Closed
 import fr.acinq.lightning.channel.states.Closing
 import fr.acinq.lightning.channel.states.Offline
 import fr.acinq.lightning.crypto.KeyManager
+import fr.acinq.lightning.crypto.LocalKeyManager
 import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
@@ -48,11 +51,14 @@ import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.payment.OutgoingPaymentFailure
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.lightning.utils.concat
 import fr.acinq.lightning.utils.copyTo
 import fr.acinq.lightning.utils.toByteArray
 import fr.acinq.lightning.utils.toNSData
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.lightning.wire.OfferTypes
+import fr.acinq.phoenix.managers.cloudKey
+import io.ktor.utils.io.core.toByteArray
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.filter
@@ -655,4 +661,13 @@ suspend fun Peer.betterPayOffer(
     }
     send(PayOffer(paymentId, payerKey, payerNote, amount, offer, fetchInvoiceTimeoutInSeconds.seconds))
     return res.await()
+}
+
+fun LocalKeyManager.cloudHash(name: String): String {
+    val nid: ByteArray = this.nodeKeys.nodeKey.publicKey.value.toByteArray()
+    val ck: ByteArray = this.cloudKey().toByteArray()
+    val nm: ByteArray = name.toByteArray()
+
+    val input = nid.concat(ck).concat(nm)
+    return Crypto.hash160(input).byteVector().toHex()
 }

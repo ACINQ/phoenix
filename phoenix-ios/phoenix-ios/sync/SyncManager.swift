@@ -13,12 +13,12 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 /// Common code utilized by both:
 /// - SyncSeedManager
-/// - SyncTxManager
+/// - SyncBackupManager
 ///
 class SyncManager {
 	
 	let syncSeedManager: SyncSeedManager
-	let syncTxManager: SyncTxManager
+	let syncBackupManager: SyncBackupManager
 	
 	private let networkMonitor = NWPathMonitor()
 	
@@ -36,13 +36,13 @@ class SyncManager {
 			recoveryPhrase: recoveryPhrase,
 			encryptedNodeId: encryptedNodeId
 		)
-		syncTxManager = SyncTxManager(
+		syncBackupManager = SyncBackupManager(
 			cloudKey: cloudKey,
 			encryptedNodeId: encryptedNodeId
 		)
 		
 		syncSeedManager.parent = self
-		syncTxManager.parent = self
+		syncBackupManager.parent = self
 		
 		startNetworkMonitor()
 		startCloudStatusMonitor()
@@ -79,7 +79,7 @@ class SyncManager {
 			}
 			
 			self.syncSeedManager.networkStatusChanged(hasInternet: hasInternet)
-			self.syncTxManager.networkStatusChanged(hasInternet: hasInternet)
+			self.syncBackupManager.networkStatusChanged(hasInternet: hasInternet)
 		}
 		
 		networkMonitor.start(queue: DispatchQueue.main)
@@ -100,7 +100,7 @@ class SyncManager {
 		}.store(in: &cancellables)
 	}
 	
-	/// May also be called by `SyncTxManager` or `SyncSeedManager` if they encounter
+	/// May also be called by `SyncBackupManager` or `SyncSeedManager` if they encounter
 	/// errors related to iCloud credential problems.
 	///
 	func checkForCloudCredentials() {
@@ -144,7 +144,7 @@ class SyncManager {
 			}
 			
 			self.syncSeedManager.cloudCredentialsChanged(hasCloudCredentials: hasCloudCredentials)
-			self.syncTxManager.cloudCredentialsChanged(hasCloudCredentials: hasCloudCredentials)
+			self.syncBackupManager.cloudCredentialsChanged(hasCloudCredentials: hasCloudCredentials)
 		}
 	}
 	
@@ -155,7 +155,7 @@ class SyncManager {
 		cancellables.removeAll()
 		
 		syncSeedManager.shutdown()
-		syncTxManager.shutdown()
+		syncBackupManager.shutdown()
 	}
 }
 

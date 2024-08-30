@@ -1,42 +1,24 @@
 import Foundation
-import Combine
 import CloudKit
 import CryptoKit
-import Network
 import PhoenixShared
 
-fileprivate let filename = "SyncTxManager"
+fileprivate let filename = "SyncBackupManager+Payments"
 #if DEBUG && true
 fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-/**
- * CloudKit hard limits (from the docs):
- *
- * Maximum number of operations in a request        :   200
- * Maximum number of records in a response          :   200
- * Maximum number of tokens in a request            :   200
- * Maximum record size (not including Asset fields) :  1 MB
- * Maximum file size of an Asset field              : 50 MB
- * Maximum number of source references to a single  :
- *         target where the action is delete self   :   750
-*/
-
-fileprivate let record_table_name = "payments"
-fileprivate let record_column_data = "encryptedData"
-fileprivate let record_column_meta = "encryptedMeta"
-
-fileprivate struct DownloadedItem {
+fileprivate struct DownloadedPayment {
 	let record: CKRecord
 	let unpaddedSize: Int
 	let payment: Lightning_kmpWalletPayment
 	let metadata: WalletPaymentMetadataRow?
 }
 
-fileprivate struct UploadOperationInfo {
-	let batch: FetchQueueBatchResult
+fileprivate struct UploadPaymentsOperationInfo {
+	let batch: FetchPaymentsQueueBatchResult
 	
 	let recordsToSave: [CKRecord]
 	let recordIDsToDelete: [CKRecord.ID]
@@ -52,451 +34,9 @@ fileprivate struct UploadOperationInfo {
 	var deletedRecordIds: [CKRecord.ID] = []
 }
 
-fileprivate struct ConsecutivePartialFailure {
-	var count: Int
-	var error: CKError?
-}
-
-// --------------------------------------------------------------------------------
-// MARK: -
-// --------------------------------------------------------------------------------
-
-/// Encompasses the logic for syncing transactions with Apple's CloudKit database.
-///
-class SyncTxManager {
+extension SyncBackupManager {
 	
-	/// Access to parent for shared logic.
-	///
-	weak var parent: SyncManager? = nil
-	
-	/// The cloudKey is derived from the user's seed.
-	/// It's used to encrypt data before uploading to the cloud.
-	/// The data stored in the cloud is an encrypted blob, and requires the cloudKey for decryption.
-	///
-	private let cloudKey: SymmetricKey
-	
-	/// The encryptedNodeId is created via: Hash(cloudKey + nodeID)
-	///
-	/// All data from a user's wallet is stored in the user's CKContainer.default().privateCloudDatabase.
-	/// Within the privateCloudDatabase, we create a dedicated CKRecordZone for each wallet,
-	/// where recordZone.name == encryptedNodeId
-	///
-	private let encryptedNodeId: String
-	
-	/// Informs the user interface regarding the activities of the SyncTxManager.
-	/// This includes various errors & active upload progress.
-	///
-	/// Changes to this publisher will always occur on the main thread.
-	///
-	public let statePublisher: CurrentValueSubject<SyncTxManager_State, Never>
-	
-	/// Informs the user interface about a pending change to the SyncTxManager's global settings.
-	///
-	/// Changes to this publisher will always occur on the main thread.
-	/// 
-	public let pendingSettingsPublisher = CurrentValueSubject<SyncTxManager_PendingSettings?, Never>(nil)
-	
-	/// Implements the state machine in a thread-safe actor.
-	/// 
-	private let actor: SyncTxManager_Actor
-	
-	private var consecutiveErrorCount = 0
-	private var consecutivePartialFailures: [WalletPaymentId: ConsecutivePartialFailure] = [:]
-	
-	private var _paymentsDb: SqlitePaymentsDb? = nil // see getter method
-	private var _cloudKitDb: CloudKitDb? = nil       // see getter method
-	
-	private var cancellables = Set<AnyCancellable>()
-	
-	init(cloudKey: Bitcoin_kmpByteVector32, encryptedNodeId: String) {
-		log.trace("init()")
-		
-		self.cloudKey = SymmetricKey(data: cloudKey.toByteArray().toSwiftData())
-		self.encryptedNodeId = encryptedNodeId
-		
-		self.actor = SyncTxManager_Actor(
-			isEnabled: Prefs.shared.backupTransactions.isEnabled,
-			recordZoneCreated: Prefs.shared.backupTransactions.recordZoneCreated(encryptedNodeId: encryptedNodeId),
-			hasDownloadedRecords: Prefs.shared.backupTransactions.hasDownloadedRecords(encryptedNodeId: encryptedNodeId)
-		)
-		statePublisher = CurrentValueSubject<SyncTxManager_State, Never>(.initializing)
-		
-		waitForDatabases()
-	}
-	
-	private var paymentsDb: SqlitePaymentsDb {
-		get { return _paymentsDb! }
-	}
-	private var cloudKitDb: CloudKitDb {
-		get { return _cloudKitDb! }
-	}
-	
-	// ----------------------------------------
-	// MARK: Monitors
-	// ----------------------------------------
-	
-	private func startQueueCountMonitor() {
-		log.trace("startQueueCountMonitor()")
-		
-		// Kotlin suspend functions are currently only supported on the main thread
-		assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
-		
-		self.cloudKitDb.fetchQueueCountPublisher().sink {[weak self] (queueCount: Int64) in
-			log.debug("fetchQueueCountPublisher().sink(): count = \(queueCount)")
-			
-			guard let self = self else {
-				return
-			}
-			
-			let count = Int(clamping: queueCount)
-			
-			let wait: SyncTxManager_State_Waiting?
-			if Prefs.shared.backupTransactions.useUploadDelay {
-				let delay = TimeInterval.random(in: 10 ..< 900)
-				wait = SyncTxManager_State_Waiting(kind: .randomizedUploadDelay, parent: self, delay: delay)
-			} else {
-				wait = nil
-			}
-			
-			Task {
-				if let newState = await self.actor.queueCountChanged(count, wait: wait) {
-					self.handleNewState(newState)
-				}
-			}
-
-		}.store(in: &cancellables)
-	}
-	
-	private func startPreferencesMonitor() {
-		log.trace("startPreferencesMonitor()")
-		
-		var isFirstFire = true
-		Prefs.shared.backupTransactions.isEnabledPublisher.sink {[weak self](shouldEnable: Bool) in
-			
-			if isFirstFire {
-				isFirstFire = false
-				return
-			}
-			guard let self = self else {
-				return
-			}
-			
-			log.debug("Prefs.shared.backupTransactions_isEnabled = \(shouldEnable ? "true" : "false")")
-			
-			let delay = 30.seconds()
-			let pendingSettings = shouldEnable ?
-				SyncTxManager_PendingSettings(self, enableSyncing: delay)
-			:	SyncTxManager_PendingSettings(self, disableSyncing: delay)
-			
-			Task {
-				if await self.actor.enqueuePendingSettings(pendingSettings) {
-					self.publishPendingSettings(pendingSettings)
-				}
-			}
-			
-		}.store(in: &cancellables)
-	}
-	
-	// ----------------------------------------
-	// MARK: Publishers
-	// ----------------------------------------
-	
-	private func publishNewState(_ state: SyncTxManager_State) {
-		log.trace("publishNewState()")
-		
-		// Contract: Changes to this publisher will always occur on the main thread.
-		let block = {
-			self.statePublisher.value = state
-		}
-		if Thread.isMainThread {
-			block()
-		} else {
-			DispatchQueue.main.async { block() }
-		}
-	}
-	
-	private func publishPendingSettings(_ pending: SyncTxManager_PendingSettings?) {
-		log.trace("publishPendingSettings()")
-		
-		// Contract: Changes to this publisher will always occur on the main thread.
-		let block = {
-			self.pendingSettingsPublisher.value = pending
-		}
-		if Thread.isMainThread {
-			block()
-		} else {
-			DispatchQueue.main.async { block() }
-		}
-	}
-	
-	// ----------------------------------------
-	// MARK: External Control
-	// ----------------------------------------
-	
-	/// Called from SyncManager; part of SyncManagerProtocol
-	///
-	func networkStatusChanged(hasInternet: Bool) {
-		log.trace("networkStatusChanged(hasInternet: \(hasInternet))")
-		
-		Task {
-			if let newState = await self.actor.networkStatusChanged(hasInternet: hasInternet) {
-				self.handleNewState(newState)
-			}
-		}
-	}
-	
-	/// Called from SyncManager; part of SyncManagerProtocol
-	///
-	func cloudCredentialsChanged(hasCloudCredentials: Bool) {
-		log.trace("cloudCredentialsChanged(hasCloudCredentials: \(hasCloudCredentials))")
-		
-		Task {
-			if let newState = await self.actor.cloudCredentialsChanged(hasCloudCredentials: hasCloudCredentials) {
-				self.handleNewState(newState)
-			}
-		}
-	}
-	
-	/// Called from `SyncTxManager_PendingSettings`
-	///
-	func dequeuePendingSettings(_ pending: SyncTxManager_PendingSettings, approved: Bool) {
-		log.trace("dequeuePendingSettings(_, approved: \(approved ? "true" : "false"))")
-		
-		Task {
-			let (accepted, newState) = await self.actor.dequeuePendingSettings(pending, approved: approved)
-			if accepted {
-				self.publishPendingSettings(nil)
-				if !approved {
-					if pending.paymentSyncing == .willEnable {
-						// We were going to enable cloud syncing.
-						// But the user just changed their mind, and cancelled it.
-						// So now we need to disable it again.
-						Prefs.shared.backupTransactions.isEnabled = false
-					} else {
-						// We were going to disable cloud syncing.
-						// But the user just changed their mind, and cancelled it.
-						// So now we need to enable it again.
-						Prefs.shared.backupTransactions.isEnabled = true
-					}
-				}
-			}
-			if let newState = newState {
-				self.handleNewState(newState)
-			}
-		}
-	}
-	
-	/// Called from `SyncTxManager_State_Waiting`
-	///
-	func finishWaiting(_ waiting: SyncTxManager_State_Waiting) {
-		log.trace("finishWaiting()")
-		
-		Task {
-			if let newState = await self.actor.finishWaiting(waiting) {
-				self.handleNewState(newState)
-			}
-		}
-	}
-	
-	/// Used when closing the corresponding wallet.
-	/// We transition to a terminal state.
-	///
-	func shutdown() {
-		log.trace("shutdown()")
-		
-		Task {
-			if let newState = await self.actor.shutdown() {
-				self.handleNewState(newState)
-			}
-		}
-		
-		cancellables.removeAll()
-	}
-	
-	// ----------------------------------------
-	// MARK: Flow
-	// ----------------------------------------
-	
-	private func handleNewState(_ newState: SyncTxManager_State) {
-		
-		log.trace("state = \(newState)")
-		switch newState {
-			case .updatingCloud(let details):
-				switch details.kind {
-					case .creatingRecordZone:
-						createRecordZone(details)
-					case .deletingRecordZone:
-						deleteRecordZone(details)
-				}
-			case .downloading(let progress):
-				downloadPayments(progress)
-			case .uploading(let progress):
-				uploadPayments(progress)
-			default:
-				break
-		}
-		
-		publishNewState(newState)
-	}
-	
-	/// We have to wait until the databases are setup and ready.
-	/// This may take a moment if a migration is triggered.
-	///
-	private func waitForDatabases() {
-		log.trace("waitForDatabases()")
-		
-		Task { @MainActor in
-			
-			let databaseManager = Biz.business.databaseManager
-			do {
-				let paymentsDb = try await databaseManager.paymentsDb()
-				let cloudKitDb = paymentsDb.getCloudKitDb() as! CloudKitDb
-				
-				self._paymentsDb = paymentsDb
-				self._cloudKitDb = cloudKitDb
-				
-				if let newState = await self.actor.markDatabasesReady() {
-					self.handleNewState(newState)
-				}
-				
-				DispatchQueue.main.async {
-					self.startQueueCountMonitor()
-					self.startPreferencesMonitor()
-				}
-				
-			} catch {
-				
-				assertionFailure("Unable to extract paymentsDb or cloudKitDb")
-			}
-			
-		} // </Task>
-	}
-	
-	/// We create a dedicated CKRecordZone for each wallet.
-	/// This allows us to properly segregate transactions between multiple wallets.
-	/// Before we can interact with the RecordZone we have to explicitly create it.
-	///
-	private func createRecordZone(_ state: SyncTxManager_State_UpdatingCloud) {
-		log.trace("createRecordZone()")
-		
-		state.task = Task {
-			log.trace("createRecordZone(): starting task")
-			
-			let container = CKContainer.default()
-			
-			let configuration = CKOperation.Configuration()
-			configuration.allowsCellularAccess = true
-			
-			do {
-				try await container.privateCloudDatabase.configuredWith(configuration: configuration) { database in
-				
-					log.trace("createRecordZone(): configured")
-					
-					if state.isCancelled {
-						throw CKError(.operationCancelled)
-					}
-					
-					let recordZone = CKRecordZone(zoneName: encryptedNodeId)
-					
-					let (saveResults, _) = try await database.modifyRecordZones(
-						saving: [recordZone],
-						deleting: []
-					)
-					
-					// saveResults: [CKRecordZone.ID : Result<CKRecordZone, Error>]
-					
-					let result = saveResults[recordZone.zoneID]!
-					
-					if case let .failure(error) = result {
-						log.trace("createRecordZone(): perZoneResult: failure")
-						throw error
-					}
-					
-					log.trace("createRecordZone(): perZoneResult: success")
-					
-					Prefs.shared.backupTransactions.setRecordZoneCreated(true, encryptedNodeId: self.encryptedNodeId)
-					self.consecutiveErrorCount = 0
-						
-					if let newState = await self.actor.didCreateRecordZone() {
-						self.handleNewState(newState)
-					}
-					
-				} // </configuredWith>
-				
-			} catch {
-				
-				log.error("createRecordZone(): error = \(error)")
-				self.handleError(error)
-			}
-		} // </Task>
-	}
-	
-	private func deleteRecordZone(_ state: SyncTxManager_State_UpdatingCloud) {
-		log.trace("deleteRecordZone()")
-		
-		state.task = Task {
-			log.trace("deleteRecordZone(): starting task")
-			
-			let container = CKContainer.default()
-			
-			let configuration = CKOperation.Configuration()
-			configuration.allowsCellularAccess = true
-			
-			do {
-				try await container.privateCloudDatabase.configuredWith(configuration: configuration) { database in
-				
-					log.trace("deleteRecordZone(): configured")
-					
-					if state.isCancelled {
-						throw CKError(.operationCancelled)
-					}
-					
-					// Step 1 of 2:
-					
-					let recordZoneID = CKRecordZone(zoneName: self.encryptedNodeId).zoneID
-					
-					let (_, deleteResults) = try await database.modifyRecordZones(
-						saving: [],
-						deleting: [recordZoneID]
-					)
-					
-					// deleteResults: [CKRecordZone.ID : Result<Void, Error>]
-					
-					let result = deleteResults[recordZoneID]!
-					
-					if case let .failure(error) = result {
-						log.trace("deleteRecordZone(): perZoneResult: failure")
-						throw error
-					}
-					
-					log.trace("deleteRecordZone(): perZoneResult: success")
-					
-					// Step 2 of 2:
-					
-					try await Task { @MainActor in
-						try await self.cloudKitDb.clearDatabaseTables()
-					}.value
-					
-					// Done !
-					
-					Prefs.shared.backupTransactions.setRecordZoneCreated(false, encryptedNodeId: self.encryptedNodeId)
-					self.consecutiveErrorCount = 0
-					
-					if let newState = await self.actor.didDeleteRecordZone() {
-						self.handleNewState(newState)
-					}
-					
-				} // </configuredWith>
-				
-			} catch {
-				
-				log.error("deleteRecordZone(): error = \(error)")
-				self.handleError(error)
-			}
-		} // </Task>
-	}
-	
-	private func downloadPayments(_ downloadProgress: SyncTxManager_State_Downloading) {
+	func downloadPayments(_ downloadProgress: SyncBackupManager_State_Downloading) {
 		log.trace("downloadPayments()")
 		
 		Task {
@@ -507,15 +47,15 @@ class SyncTxManager {
 			// So first we fetch the oldest payment date in the table (if there is one)
 			
 			let millis: KotlinLong? = try await Task { @MainActor in
-				return try await self.cloudKitDb.fetchOldestCreation()
+				return try await self.cloudKitDb.payments.fetchOldestCreation()
 			}.value
 			
 			let oldestCreationDate = millis?.int64Value.toDate(from: .milliseconds)
-			downloadProgress.setOldestCompletedDownload(oldestCreationDate)
+			downloadProgress.setPayments_oldestCompletedDownload(oldestCreationDate)
 			
 			/**
 			 * NOTE:
-			 * If we want to report proper progress (via `SyncTxManager_State_Downloading`),
+			 * If we want to report proper progress (via `SyncBackupManager_State_Downloading`),
 			 * then we need to know the total number of records to be downloaded from the cloud.
 			 *
 			 * However, there's a minor problem here:
@@ -538,14 +78,14 @@ class SyncTxManager {
 			 * our current choice is to sacrifice the progress details.
 			 */
 			
-			let container = CKContainer.default()
-			let zoneID = self.recordZoneID()
+			let privateCloudDatabase = CKContainer.default().privateCloudDatabase
+			let zoneID = self.paymentsRecordZoneID()
 			
 			let configuration = CKOperation.Configuration()
 			configuration.allowsCellularAccess = true
 			
 			do {
-				try await container.privateCloudDatabase.configuredWith(configuration: configuration) { database in
+				try await privateCloudDatabase.configuredWith(configuration: configuration) { database in
 					
 					// Step 2 of 4:
 					//
@@ -560,7 +100,7 @@ class SyncTxManager {
 					}
 					
 					let query = CKQuery(
-						recordType: record_table_name,
+						recordType: payments_record_table_name,
 						predicate: predicate
 					)
 					query.sortDescriptors = [
@@ -605,12 +145,12 @@ class SyncTxManager {
 							)
 						}
 						
-						var items: [DownloadedItem] = []
+						var items: [DownloadedPayment] = []
 						for (_, result) in results {
 							if case .success(let record) = result {
 								let (payment, metadata, unpaddedSize) = self.decryptAndDeserializePayment(record)
 								if let payment {
-									items.append(DownloadedItem(
+									items.append(DownloadedPayment(
 										record: record,
 										unpaddedSize: unpaddedSize,
 										payment: payment,
@@ -632,7 +172,7 @@ class SyncTxManager {
 							
 							var paymentRows: [Lightning_kmpWalletPayment] = []
 							var paymentMetadataRows: [WalletPaymentId: WalletPaymentMetadataRow] = [:]
-							var metadataMap: [WalletPaymentId: CloudKitDb.MetadataRow] = [:]
+							var metadataMap: [WalletPaymentId: CloudKitPaymentsDb.MetadataRow] = [:]
 							
 							for item in items {
 								
@@ -646,7 +186,7 @@ class SyncTxManager {
 								let creation = self.dateToMillis(creationDate)
 								let metadata = self.metadataForRecord(item.record)
 								
-								metadataMap[paymentId] = CloudKitDb.MetadataRow(
+								metadataMap[paymentId] = CloudKitPaymentsDb.MetadataRow(
 									unpaddedSize: Int64(item.unpaddedSize),
 									recordCreation: creation,
 									recordBlob: metadata.toKotlinByteArray()
@@ -663,13 +203,13 @@ class SyncTxManager {
 							
 							log.trace("downloadPayments(): cloudKitDb.updateRows()...")
 							
-							try await self.cloudKitDb.updateRows(
+							try await self.cloudKitDb.payments.updateRows(
 								downloadedPayments: paymentRows,
 								downloadedPaymentsMetadata: paymentMetadataRows,
 								updateMetadata: metadataMap
 							)
 							
-							downloadProgress.finishBatch(completed: items.count, oldest: oldest)
+							downloadProgress.payments_finishBatch(completed: items.count, oldest: oldest)
 							
 						}.value
 						// </Task @MainActor>
@@ -683,7 +223,6 @@ class SyncTxManager {
 						}
 						
 					} // </while !done>
-					
 				} // </configuredWith>
 				
 				log.trace("downloadPayments(): enqueueMissingItems()...")
@@ -694,12 +233,12 @@ class SyncTxManager {
 				// So we enqueue these for upload now.
 				
 				try await Task { @MainActor in
-					try await self.cloudKitDb.enqueueMissingItems()
+					try await self.cloudKitDb.payments.enqueueMissingItems()
 				}.value
 				
 				log.trace("downloadPayments(): finish: success")
 				
-				Prefs.shared.backupTransactions.setHasDownloadedRecords(true, encryptedNodeId: self.encryptedNodeId)
+				Prefs.shared.backupTransactions.markHasDownloadedPayments(self.encryptedNodeId)
 				self.consecutiveErrorCount = 0
 				
 				if let newState = await self.actor.didDownloadPayments() {
@@ -721,12 +260,12 @@ class SyncTxManager {
 	/// - remove the uploaded items from the queue
 	/// - repeat as needed
 	///
-	private func uploadPayments(_ uploadProgress: SyncTxManager_State_Uploading) {
+	func uploadPayments(_ uploadProgress: SyncBackupManager_State_Uploading) {
 		log.trace("uploadPayments()")
 		
 		let prepareUpload = {(
-			batch: FetchQueueBatchResult
-		) -> UploadOperationInfo in
+			batch: FetchPaymentsQueueBatchResult
+		) -> UploadPaymentsOperationInfo in
 			
 			log.trace("uploadPayments(): prepareUpload()")
 			
@@ -754,14 +293,14 @@ class SyncTxManager {
 					if let (ciphertext, unpaddedSize) = self.serializeAndEncryptPayment(row.payment, batch) {
 						
 						let record = existingRecord ?? CKRecord(
-							recordType: record_table_name,
-							recordID: self.recordID(for: paymentId)
+							recordType: payments_record_table_name,
+							recordID: self.recordID(paymentId: paymentId)
 						)
 						
-						record[record_column_data] = ciphertext
+						record[payments_record_column_data] = ciphertext
 						
 						if let fileUrl = self.serializeAndEncryptMetadata(row.metadata) {
-							record[record_column_meta] = CKAsset(fileURL: fileUrl)
+							record[payments_record_column_meta] = CKAsset(fileURL: fileUrl)
 						}
 						
 						recordsToSave.append(record)
@@ -774,14 +313,14 @@ class SyncTxManager {
 					// The payment has been deleted from the local database.
 					// So we're going to delete it from the cloud database (if it exists there).
 					
-					let recordID = existingRecord?.recordID ?? self.recordID(for: paymentId)
+					let recordID = existingRecord?.recordID ?? self.recordID(paymentId: paymentId)
 					
 					recordIDsToDelete.append(recordID)
 					reverseMap[recordID] = paymentId
 				}
 			}
 			
-			var opInfo = UploadOperationInfo(
+			var opInfo = UploadPaymentsOperationInfo(
 				batch: batch,
 				recordsToSave: recordsToSave,
 				recordIDsToDelete: recordIDsToDelete,
@@ -813,8 +352,8 @@ class SyncTxManager {
 		} // </prepareUpload()>
 		
 		let performUpload = {(
-			opInfo: UploadOperationInfo
-		) async throws -> UploadOperationInfo in
+			opInfo: UploadPaymentsOperationInfo
+		) async throws -> UploadPaymentsOperationInfo in
 			
 			log.trace("uploadPayments(): performUpload()")
 			log.trace("opInfo.recordsToSave.count = \(opInfo.recordsToSave.count)")
@@ -944,14 +483,14 @@ class SyncTxManager {
 		} // </performUpload()>
 		
 		let updateDatabase = {(
-			opInfo: UploadOperationInfo
+			opInfo: UploadPaymentsOperationInfo
 		) async throws -> Void in
 			
 			log.trace("uploadPayments(): updateDatabase()")
 			
 			var deleteFromQueue = [KotlinLong]()
 			var deleteFromMetadata = [WalletPaymentId]()
-			var updateMetadata = [WalletPaymentId: CloudKitDb.MetadataRow]()
+			var updateMetadata = [WalletPaymentId: CloudKitPaymentsDb.MetadataRow]()
 			
 			for (rowid) in opInfo.completedRowids {
 				deleteFromQueue.append(KotlinLong(longLong: rowid))
@@ -968,7 +507,7 @@ class SyncTxManager {
 					let creation = self.dateToMillis(record.creationDate ?? Date())
 					let metadata = self.metadataForRecord(record)
 					
-					updateMetadata[paymentRowId] = CloudKitDb.MetadataRow(
+					updateMetadata[paymentRowId] = CloudKitPaymentsDb.MetadataRow(
 						unpaddedSize: Int64(unpaddedSize),
 						recordCreation: creation,
 						recordBlob:  metadata.toKotlinByteArray()
@@ -977,8 +516,10 @@ class SyncTxManager {
 			}
 			
 			// Handle partial failures
-			for paymentRowId in self.updateConsecutivePartialFailures(opInfo.partialFailures) {
-				for rowid in opInfo.batch.rowidsMatching(paymentRowId) {
+			let partialFailures: [String: CKError?] = opInfo.partialFailures.mapKeys { $0.id }
+			
+			for paymentRowIdStr in self.updateConsecutivePartialFailures(partialFailures) {
+				for rowid in opInfo.batch.rowidsMatching(paymentRowIdStr) {
 					deleteFromQueue.append(KotlinLong(longLong: rowid))
 				}
 			}
@@ -988,7 +529,7 @@ class SyncTxManager {
 			log.debug("updateMetadata.count = \(updateMetadata.count)")
 		
 			try await Task { @MainActor [deleteFromQueue, deleteFromMetadata, updateMetadata] in
-				try await self.cloudKitDb.updateRows(
+				try await self.cloudKitDb.payments.updateRows(
 					deleteFromQueue: deleteFromQueue,
 					deleteFromMetadata: deleteFromMetadata,
 					updateMetadata: updateMetadata
@@ -1006,7 +547,7 @@ class SyncTxManager {
 				log.trace("uploadPayments(): finish(): success")
 				
 				self.consecutiveErrorCount = 0
-				if let newState = await self.actor.didUploadPayments() {
+				if let newState = await self.actor.didUploadItems() {
 					self.handleNewState(newState)
 				}
 				
@@ -1028,8 +569,8 @@ class SyncTxManager {
 				// - the corresponding payment information that needs to be uploaded
 				// - the corresponding CKRecord metadata from previous upload for the payment (if present)
 				
-				let result: CloudKitDb.FetchQueueBatchResult = try await Task { @MainActor in
-					return try await self.cloudKitDb.fetchQueueBatch(limit: 20)
+				let result: CloudKitPaymentsDb.FetchQueueBatchResult = try await Task { @MainActor in
+					return try await self.cloudKitDb.payments.fetchQueueBatch(limit: 20)
 				}.value
 				
 				let batch = result.convertToSwift()
@@ -1056,7 +597,7 @@ class SyncTxManager {
 					// - the uploadTask is triggered again
 					// - ...
 					//
-					if let newState = await self.actor.queueCountChanged(0, wait: nil) {
+					if let newState = await self.actor.paymentsQueueCountChanged(0, wait: nil) {
 						self.handleNewState(newState)
 					}
 					return await finish(.success)
@@ -1079,7 +620,6 @@ class SyncTxManager {
 					// Edge case: there are no cloud tasks to perform.
 					// We have to skip the upload, because it will fail if given an empty set of tasks.
 				} else {
-				//	uploadProgress.setInFlight(count: inFlightCount, progress: parentProgress)
 					opInfo = try await performUpload(opInfo)
 				}
 				
@@ -1091,7 +631,7 @@ class SyncTxManager {
 				
 				// Done !
 				
-				uploadProgress.completeInFlight(completed: inFlightCount)
+				uploadProgress.completePayments_inFlight(inFlightCount)
 				return await finish(.success)
 				
 			} catch {
@@ -1101,72 +641,37 @@ class SyncTxManager {
 	}
 	
 	// ----------------------------------------
-	// MARK: Debugging
+	// MARK: Record Zones
 	// ----------------------------------------
-	#if DEBUG
 	
-	private func listAllItems() -> Void {
-		log.trace("listAllItems()")
+	func paymentsRecordZoneName() -> String {
+		return self.encryptedNodeId
+	}
+	
+	func paymentsRecordZoneID() -> CKRecordZone.ID {
 		
-		let query = CKQuery(
-			recordType: record_table_name,
-			predicate: NSPredicate(format: "TRUEPREDICATE")
+		return CKRecordZone.ID(
+			zoneName: paymentsRecordZoneName(),
+			ownerName: CKCurrentUserDefaultName
 		)
-		query.sortDescriptors = [
-			NSSortDescriptor(key: "creationDate", ascending: false)
-		]
-		
-		let operation = CKQueryOperation(query: query)
-		operation.zoneID = recordZoneID()
-		
-		recursiveListBatch(operation: operation)
 	}
 	
-	private func recursiveListBatch(operation: CKQueryOperation) -> Void {
-		log.trace("recursiveListBatch()")
+	private func recordID(paymentId: WalletPaymentId) -> CKRecord.ID {
 		
-		operation.recordMatchedBlock = {(recordID: CKRecord.ID, result: Result<CKRecord, Error>) in
-			
-			if let record = try? result.get() {
-				
-				log.debug("Received record:")
-				log.debug(" - recordID: \(record.recordID)")
-				log.debug(" - creationDate: \(record.creationDate ?? Date.distantPast)")
-				
-				if let data = record[record_column_data] as? Data {
-					log.debug(" - data.count: \(data.count)")
-				} else {
-					log.debug(" - data: ?")
-				}
-			}
-		}
+		// The recordID is:
+		// - deterministic => by hashing the paymentId
+		// - secure => by mixing in the secret cloudKey (derived from seed)
 		
-		operation.queryResultBlock = {(result: Result<CKQueryOperation.Cursor?, Error>) in
-			
-			switch result {
-			case .success(let cursor):
-				if let cursor = cursor {
-					log.debug("Fetch batch complete. Continuing with cursor...")
-					self.recursiveListBatch(operation: CKQueryOperation(cursor: cursor))
-					
-				} else {
-					log.debug("Fetch batch complete.")
-				}
-				
-			case .failure(let error):
-				log.debug("Error fetching batch: \(String(describing: error))")
-			}
-		}
+		let prefix = SHA256.hash(data: cloudKey.rawRepresentation)
+		let suffix = paymentId.dbId.data(using: .utf8)!
 		
-		let configuration = CKOperation.Configuration()
-		configuration.allowsCellularAccess = true
+		let hashMe = prefix + suffix
+		let digest = SHA256.hash(data: hashMe)
+		let hash = digest.map { String(format: "%02hhx", $0) }.joined()
 		
-		operation.configuration = configuration
-		
-		CKContainer.default().privateCloudDatabase.add(operation)
+		return CKRecord.ID(recordName: hash, zoneID: paymentsRecordZoneID())
 	}
 	
-	#endif
 	// ----------------------------------------
 	// MARK: Utilities
 	// ----------------------------------------
@@ -1178,7 +683,7 @@ class SyncTxManager {
 	///
 	private func serializeAndEncryptPayment(
 		_ row: Lightning_kmpWalletPayment,
-		_ batch: FetchQueueBatchResult
+		_ batch: FetchPaymentsQueueBatchResult
 	) -> (Data, Int)? {
 		
 		var wrapper: CloudData? = nil
@@ -1219,9 +724,9 @@ class SyncTxManager {
 			//
 			// This allows us to generate the {mean, standardDeviation} for each payment type.
 			// Using this information, we generate a target range for the size of the encrypted blob.
-			// And then we and a random amount of padding the reach our target range.
+			// And then we and a random amount of padding to reach our target range.
 			
-			let makeRange = { (stats: CloudKitDb.MetadataStats) -> (Int, Int) in
+			let makeRange = { (stats: CloudKitPaymentsDb.MetadataStats) -> (Int, Int) in
 				
 				var rangeMin: Int = 0
 				var rangeMax: Int = 0
@@ -1349,7 +854,7 @@ class SyncTxManager {
 		var payment: Lightning_kmpWalletPayment? = nil
 		var metadata: WalletPaymentMetadataRow? = nil
 		
-		if let ciphertext = record[record_column_data] as? Data {
+		if let ciphertext = record[payments_record_column_data] as? Data {
 		//	log.debug(" - data.count: \(ciphertext.count)")
 			
 			var cleartext: Data? = nil
@@ -1393,7 +898,7 @@ class SyncTxManager {
 			}
 		}
 		
-		if let asset = record[record_column_meta] as? CKAsset {
+		if let asset = record[payments_record_column_meta] as? CKAsset {
 			
 			var ciphertext: Data? = nil
 			if let fileURL = asset.fileURL {
@@ -1440,262 +945,71 @@ class SyncTxManager {
 		return (payment, metadata, unpaddedSize)
 	}
 	
-	private func genRandomBytes(_ count: Int) -> Data {
-
-		var data = Data(count: count)
-		let _ = data.withUnsafeMutableBytes { (ptr: UnsafeMutableRawBufferPointer) in
-			SecRandomCopyBytes(kSecRandomDefault, count, ptr.baseAddress!)
-		}
-		return data
-	}
+	// ----------------------------------------
+	// MARK: Debugging
+	// ----------------------------------------
+	#if DEBUG
 	
-	/// Incorporates failures from the last CKModifyRecordsOperation,
-	/// and returns a list of permanently failed items.
-	///
-	private func updateConsecutivePartialFailures(
-		_ partialFailures: [WalletPaymentId: CKError?]
-	) -> [WalletPaymentId] {
+	private func listAllPayments() {
+		log.trace("listAllPayments()")
 		
-		// Handle partial failures.
-		// The rules are:
-		// - if an operation fails 2 times in a row with the same error, then we drop the operation
-		// - unless the failure was serverChangeError,
-		//   which must fail 3 times in a row before being dropped
-		
-		var permanentFailures: [WalletPaymentId] = []
-		
-		for (paymentId, ckerror) in partialFailures {
-			
-			guard var cpf = consecutivePartialFailures[paymentId] else {
-				consecutivePartialFailures[paymentId] = ConsecutivePartialFailure(
-					count: 1,
-					error: ckerror
-				)
-				continue
-			}
-			
-			let isSameError: Bool
-			if let lastError = cpf.error {
-				if let thisError = ckerror {
-					isSameError = lastError.errorCode == thisError.errorCode
-				} else {
-					isSameError = false
-				}
-			} else {
-				isSameError = (ckerror == nil)
-			}
-			
-			if isSameError {
-				cpf.count += 1
-				
-				var isPermanentFailure: Bool
-				if let ckerror = ckerror,
-				   ckerror.errorCode == CKError.serverRecordChanged.rawValue {
-					isPermanentFailure = cpf.count >= 3
-				} else {
-					isPermanentFailure = cpf.count >= 2
-				}
-				
-				if isPermanentFailure {
-					log.debug(
-						"""
-						Permanent failure: \(paymentId), count=\(cpf.count): \
-						\( ckerror == nil ? "<nil>" : String(describing: ckerror!) )
-						"""
-					)
-					
-					permanentFailures.append(paymentId)
-					self.consecutivePartialFailures[paymentId] = nil
-				} else {
-					self.consecutivePartialFailures[paymentId] = cpf
-				}
-				
-			} else {
-				self.consecutivePartialFailures[paymentId] = ConsecutivePartialFailure(
-					count: 1,
-					error: ckerror
-				)
-			}
-		}
-		
-		return permanentFailures
-	}
-	
-	private func recordZoneID() -> CKRecordZone.ID {
-		
-		return CKRecordZone.ID(
-			zoneName: self.encryptedNodeId,
-			ownerName: CKCurrentUserDefaultName
+		let query = CKQuery(
+			recordType: payments_record_table_name,
+			predicate: NSPredicate(format: "TRUEPREDICATE")
 		)
+		query.sortDescriptors = [
+			NSSortDescriptor(key: "creationDate", ascending: false)
+		]
+		
+		let operation = CKQueryOperation(query: query)
+		operation.zoneID = self.paymentsRecordZoneID()
+		
+		recursiveListPaymentsBatch(operation: operation)
 	}
 	
-	private func recordID(for paymentId: WalletPaymentId) -> CKRecord.ID {
+	private func recursiveListPaymentsBatch(operation: CKQueryOperation) -> Void {
+		log.trace("recursiveListPaymentsBatch()")
 		
-		// The recordID is:
-		// - deterministic => by hashing the paymentId
-		// - secure => by mixing in the secret cloudKey (derived from seed)
-		
-		let prefix = SHA256.hash(data: cloudKey.rawRepresentation)
-		let suffix = paymentId.dbId.data(using: .utf8)!
-		
-		let hashMe = prefix + suffix
-		let digest = SHA256.hash(data: hashMe)
-		let hash = digest.map { String(format: "%02hhx", $0) }.joined()
-		
-		return CKRecord.ID(recordName: hash, zoneID: recordZoneID())
-	}
-	
-	private func metadataForRecord(_ record: CKRecord) -> Data {
-		
-		// Source: CloudKit Tips and Tricks - WWDC 2015
-		
-		let archiver = NSKeyedArchiver(requiringSecureCoding: true)
-		record.encodeSystemFields(with: archiver)
-		
-		return archiver.encodedData
-	}
-	
-	private func recordFromMetadata(_ data: Data) -> CKRecord? {
-		
-		var record: CKRecord? = nil
-		do {
-			let unarchiver = try NSKeyedUnarchiver(forReadingFrom: data)
-			unarchiver.requiresSecureCoding = true
-			record = CKRecord(coder: unarchiver)
+		operation.recordMatchedBlock = {(recordID: CKRecord.ID, result: Result<CKRecord, Error>) in
 			
-		} catch {
-			log.error("Error decoding CKRecord: \(String(describing: error))")
-		}
-		
-		return record
-	}
-	
-	private func dateToMillis(_ date: Date) -> Int64 {
-		
-		return Int64(date.timeIntervalSince1970 * 1_000)
-	}
-	
-	// ----------------------------------------
-	// MARK: Errors
-	// ----------------------------------------
-	
-	/// Standardized error handling routine for various async operations.
-	///
-	private func handleError(_ error: Error) {
-		log.trace("handleError()")
-		
-		var isOperationCancelled = false
-		var isNotAuthenticated = false
-		var isZoneNotFound = false
-		var minDelay: Double? = nil
-		
-		if let ckerror = error as? CKError {
-			
-			switch ckerror.errorCode {
-				case CKError.operationCancelled.rawValue:
-					isOperationCancelled = true
+			if let record = try? result.get() {
 				
-				case CKError.notAuthenticated.rawValue:
-					isNotAuthenticated = true
-			
-				case CKError.accountTemporarilyUnavailable.rawValue:
-					isNotAuthenticated = true
+				log.debug("Received record:")
+				log.debug(" - recordID: \(record.recordID)")
+				log.debug(" - creationDate: \(record.creationDate ?? Date.distantPast)")
 				
-				case CKError.userDeletedZone.rawValue: fallthrough
-				case CKError.zoneNotFound.rawValue:
-					isZoneNotFound = true
-				
-				default: break
-			}
-			
-			// Sometimes a `notAuthenticated` error is hidden in a partial error.
-			if let partialErrorsByZone = ckerror.partialErrorsByItemID {
-				
-				for (_, perZoneError) in partialErrorsByZone {
-					let errCode = (perZoneError as NSError).code
-					
-					if errCode == CKError.notAuthenticated.rawValue {
-						isNotAuthenticated = true
-					} else if errCode == CKError.accountTemporarilyUnavailable.rawValue {
-						isNotAuthenticated = true
-					}
+				if let data = record[payments_record_column_data] as? Data {
+					log.debug(" - data.count: \(data.count)")
+				} else {
+					log.debug(" - data: ?")
 				}
 			}
+		}
+		
+		operation.queryResultBlock = {(result: Result<CKQueryOperation.Cursor?, Error>) in
 			
-			// If the error was `requestRateLimited`, then `retryAfterSeconds` may be non-nil.
-			// The value may also be set for other errors, such as `zoneBusy`.
-			//
-			minDelay = ckerror.retryAfterSeconds
-		}
-		
-		let useExponentialBackoff: Bool
-		if isOperationCancelled || isNotAuthenticated || isZoneNotFound {
-			// There are edge cases to consider.
-			// I've witnessed the following:
-			// - CKAccountStatus is consistently reported as `.available`
-			// - Attempt to create zone consistently fails with "Not Authenticated"
-			//
-			// This seems to be the case when, for example,
-			// the account needs to accept a new "terms of service".
-			//
-			// After several consecutive failures, the server starts sending us a minDelay value.
-			// We should interpret this as a signal to start using exponential backoff.
-			//
-			if let delay = minDelay, delay > 0.0 {
-				useExponentialBackoff = true
-			} else {
-				useExponentialBackoff = false
-			}
-		} else {
-			useExponentialBackoff = true
-		}
-		
-		let wait: SyncTxManager_State_Waiting?
-		if useExponentialBackoff {
-			self.consecutiveErrorCount += 1
-			var delay = self.exponentialBackoff()
-			if let minDelay = minDelay, delay < minDelay {
-				delay = minDelay
-			}
-			wait = SyncTxManager_State_Waiting(kind: .exponentialBackoff(error), parent: self, delay: delay)
-		} else {
-			wait = nil
-		}
-		
-		Task { [isNotAuthenticated, isZoneNotFound] in
-			if let newState = await self.actor.handleError(
-				isNotAuthenticated: isNotAuthenticated,
-				isZoneNotFound: isZoneNotFound,
-				wait: wait
-			) {
-				self.handleNewState(newState)
+			switch result {
+			case .success(let cursor):
+				if let cursor = cursor {
+					log.debug("Fetch batch complete. Continuing with cursor...")
+					self.recursiveListPaymentsBatch(operation: CKQueryOperation(cursor: cursor))
+					
+				} else {
+					log.debug("Fetch batch complete.")
+				}
+				
+			case .failure(let error):
+				log.debug("Error fetching batch: \(String(describing: error))")
 			}
 		}
 		
-		if isNotAuthenticated {
-			DispatchQueue.main.async {
-				self.parent?.checkForCloudCredentials()
-			}
-		}
+		let configuration = CKOperation.Configuration()
+		configuration.allowsCellularAccess = true
+		
+		operation.configuration = configuration
+		
+		CKContainer.default().privateCloudDatabase.add(operation)
 	}
 	
-	private func exponentialBackoff() -> TimeInterval {
-		
-		assert(consecutiveErrorCount > 0, "Invalid state")
-		
-		switch consecutiveErrorCount {
-			case  1 : return 250.milliseconds()
-			case  2 : return 500.milliseconds()
-			case  3 : return 1.seconds()
-			case  4 : return 2.seconds()
-			case  5 : return 4.seconds()
-			case  6 : return 8.seconds()
-			case  7 : return 16.seconds()
-			case  8 : return 32.seconds()
-			case  9 : return 64.seconds()
-			case 10 : return 128.seconds()
-			case 11 : return 256.seconds()
-			default : return 512.seconds()
-		}
-	}
+	#endif
 }

@@ -25,7 +25,7 @@ import fr.acinq.lightning.serialization.Serialization
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-internal class SqliteChannelsDb(private val driver: SqlDriver) : ChannelsDb {
+class SqliteChannelsDb(private val driver: SqlDriver) : ChannelsDb {
 
     private val database = ChannelsDatabase(driver)
     private val queries = database.channelsDatabaseQueries
