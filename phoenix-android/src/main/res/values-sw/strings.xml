@@ -15,7 +15,7 @@
   -->
 
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <string name="app_name">Phoenix Testnet</string>
+    <string name="app_name">Phoenix</string>
 
     <!-- system notification channels -->
 
@@ -48,7 +48,7 @@
 
     <!-- Auth prompt (v2) -->
 
-    <string name="authprompt_title">Fungua ili kuendelea</string>
+    <string name="lockprompt_title">Fungua ili kuendelea</string>
 
     <!-- utils: placeholders -->
 
@@ -66,12 +66,10 @@
     <string name="startup_binding_service">Kuunganisha huduma…</string>
     <string name="startup_wait">Kuandaa pochi…</string>
     <string name="startup_wait_legacy_check">Kuangalia pochi ya zamani…</string>
-    <string name="startup_manual_unlock_button">Fungua</string>
     <string name="startup_checking_seed">Kufungua…</string>
     <string name="startup_unlocked">Ufikiaji umekubaliwa…</string>
     <string name="startup_unlock_failure">Kufungua kumeshindikana</string>
     <string name="startup_unlock_failure_keystore">Hitilafu ya kitunzaji cha Android</string>
-    <string name="startup_unlock_failure_unhandled_version">Toleo la mbegu halijashughulikiwa (%1$s)</string>
     <string name="startup_unlock_failure_fallback">Fungua kwa mbegu</string>
 
     <string name="startup_fallback_instructions">Ingiza maneno yako 12 ya urejesho ili kufungua pochi.\n\nManeno lazima yaingizwe kwa mpangilio sahihi, na kutenganishwa na nafasi moja.</string>
@@ -496,7 +494,6 @@
     <!-- settings: access control -->
 
     <string name="accessctrl_title">Upatikanaji wa programu</string>
-    <string name="accessctrl_loading">Inapata data…</string>
 
     <string name="accessctrl_auth_error_header">Kufunga skrini haiwezi kuwezeshwa</string>
     <string name="accessctrl_auth_error_no_hw">Hakuna vifaa vya uthibitishaji vinavyofaa kwenye kifaa hiki.</string>
@@ -511,8 +508,8 @@
     <string name="accessctrl_auth_error_too_old">Toleo hili la Android halifai.</string>
     <string name="accessctrl_auth_error_unhandled">Kificho kisichoshughulikiwa: %1$d</string>
 
-    <string name="accessctrl_screen_lock_switch">Kufunga skrini</string>
-    <string name="accessctrl_screen_lock_switch_desc">Funga upatikanaji wa programu kwa kutumia kufunga skrini/alama ya vidole ya Android</string>
+    <string name="accessctrl_biometric_lock_switch_label">Kufunga skrini</string>
+    <string name="accessctrl_biometric_lock_switch_desc">Funga upatikanaji wa programu kwa kutumia kufunga skrini/alama ya vidole ya Android</string>
 
     <!-- lnurl-auth -->
 

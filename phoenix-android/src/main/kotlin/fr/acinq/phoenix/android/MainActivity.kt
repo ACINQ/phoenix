@@ -16,8 +16,10 @@
 
 package fr.acinq.phoenix.android
 
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -51,6 +53,15 @@ class MainActivity : AppCompatActivity() {
     private val appViewModel: AppViewModel by viewModels { AppViewModel.Factory }
 
     private var navController: NavHostController? = null
+
+    private val screenStateReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            when (intent?.action) {
+                Intent.ACTION_SCREEN_OFF -> appViewModel.lockScreen()
+                else -> Unit
+            }
+        }
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -97,6 +108,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        // lock screen when screen is off
+        val intentFilter = IntentFilter(Intent.ACTION_SCREEN_ON)
+        intentFilter.addAction(Intent.ACTION_SCREEN_OFF)
+        registerReceiver(screenStateReceiver, intentFilter)
+
         setContent {
             navController = rememberNavController()
             val businessState = (application as PhoenixApplication).business.collectAsState()
@@ -112,6 +128,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onUserInteraction() {
+        super.onUserInteraction()
+        appViewModel.scheduleAutoLock()
+    }
+
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         // force the intent flag to single top, in order to avoid [handleDeepLink] finish the current activity.
@@ -121,7 +142,11 @@ class MainActivity : AppCompatActivity() {
         intent?.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
 
         intent?.fixUri()
-        this.navController?.handleDeepLink(intent)
+        try {
+            this.navController?.handleDeepLink(intent)
+        } catch (e: Exception) {
+            log.warn("could not handle deeplink: {}", e.localizedMessage)
+        }
     }
 
     override fun onStart() {
@@ -169,6 +194,7 @@ class MainActivity : AppCompatActivity() {
         } catch (e: Exception) {
             log.error("failed to unbind activity from node service: {}", e.localizedMessage)
         }
+        unregisterReceiver(screenStateReceiver)
         log.debug("destroyed main activity")
     }
 
@@ -186,7 +212,7 @@ class MainActivity : AppCompatActivity() {
         val ssp = initialUri?.schemeSpecificPart
         if (scheme == "phoenix" && ssp != null && (ssp.startsWith("lnbc") || ssp.startsWith("lntb"))) {
             this.data = "lightning:$ssp".toUri()
-            log.debug("rewritten intent uri from $initialUri to ${intent.data}")
+            log.debug("rewritten intent uri from {} to {}", initialUri, intent.data)
         }
     }
 

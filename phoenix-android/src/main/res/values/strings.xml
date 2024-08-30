@@ -46,10 +46,6 @@
     <string name="restore_disclaimer_next">Next</string>
     <string name="restore_in_progress">Restoring your wallet…</string>
 
-    <!-- Auth prompt (v2) -->
-
-    <string name="authprompt_title">Unlock to continue</string>
-
     <!-- utils: placeholders -->
 
     <string name="lipsum_short" translatable="false">Etiam porttitor egestas faucibus. Curabitur condimentum eros non ipsum elementum egestas.</string>
@@ -61,17 +57,21 @@
     \nNam felis felix, tristique commodo odio eget, imperdiet viverra erat. Donec venenatis magna pulvinar, finibus leo id, gravida augue. Integer ante leo, bibendum ac nibh quis, auctor commodo quam. Sed luctus vitae quam vel condimentum. Mauris eu rhoncus mauris. Fusce enim diam, consequat a odio sit amet, accumsan cursus nisl. Etiam lectus nunc, lacinia id purus sit amet, pulvinar auctor odio. Maecenas vitae arcu sit amet est cursus maximus. Nullam ac sapien non nibh tempor rhoncus. Mauris dignissim cursus libero quis egestas.
     </string>
 
+    <!-- Lock prompt -->
+
+    <string name="lockprompt_title">Unlock to continue</string>
+    <string name="lockprompt_pin_button">PIN code</string>
+    <string name="lockprompt_biometrics_button">System lock</string>
+
     <!-- Startup -->
 
     <string name="startup_binding_service">Binding service…</string>
     <string name="startup_wait">Preparing wallet…</string>
     <string name="startup_wait_legacy_check">Checking legacy wallet…</string>
-    <string name="startup_manual_unlock_button">Unlock</string>
     <string name="startup_checking_seed">Unlocking…</string>
     <string name="startup_unlocked">Access granted…</string>
     <string name="startup_unlock_failure">Unlock failed</string>
     <string name="startup_unlock_failure_keystore">Android keystore error</string>
-    <string name="startup_unlock_failure_unhandled_version">Unhandled seed version (%1$s)</string>
     <string name="startup_unlock_failure_fallback">Unlock with seed</string>
 
     <string name="startup_fallback_instructions">Enter your 12-words recovery to unlock the wallet.\n\nWords must be entered in the correct order, and separated with a single space.</string>
@@ -496,7 +496,6 @@
     <!-- settings: access control -->
 
     <string name="accessctrl_title">Application access</string>
-    <string name="accessctrl_loading">Retrieving data…</string>
 
     <string name="accessctrl_auth_error_header">Screen lock cannot be enabled</string>
     <string name="accessctrl_auth_error_no_hw">No suitable authentication hardware on this device.</string>
@@ -511,8 +510,14 @@
     <string name="accessctrl_auth_error_too_old">This version of Android is not compatible.</string>
     <string name="accessctrl_auth_error_unhandled">Unhandled error code: %1$d</string>
 
-    <string name="accessctrl_screen_lock_switch">Screen lock</string>
-    <string name="accessctrl_screen_lock_switch_desc">Lock access to the app with Android\'s screen lock/fingerprint</string>
+    <string name="accessctrl_biometric_lock_switch_label">System Screen Lock</string>
+    <string name="accessctrl_biometric_lock_switch_desc">Access to the app is controlled with the Android\'s system Screen Lock/Fingerprint</string>
+    <string name="accessctrl_pin_lock_switch_label">Custom PIN</string>
+    <string name="accessctrl_pin_lock_switch_desc">Access to the app is controlled with a 6-digits PIN code specific to Phoenix</string>
+
+    <string name="accessctrl_autolock_title">Lock timeout</string>
+    <string name="accessctrl_autolock_desc">After %1$s minute(s) of inactivity</string>
+    <string name="accessctrl_autolock_desc_never">Never</string>
 
     <!-- lnurl-auth -->
 
@@ -858,5 +863,21 @@
     <string name="bip353_claim_button">Claim my address</string>
     <string name="bip353_claiming">Claiming address…</string>
     <string name="bip353_error">Failed to claim address</string>
+
+    <!-- PIN code dialog -->
+
+    <string name="pincode_check_title">Enter PIN</string>
+    <string name="pincode_new_title">Enter new PIN</string>
+    <string name="pincode_confirm_title">Confirm new PIN</string>
+
+    <string name="pincode_checking_label">Checking PIN…</string>
+    <string name="pincode_success_label">Authenticated</string>
+    <string name="pincode_failure_label">Incorrect</string>
+    <string name="pincode_locked_label">Locked for %1$s</string>
+
+    <string name="pincode_error_generic">An error occurred</string>
+    <string name="pincode_error_malformed">Malformed PIN</string>
+    <string name="pincode_error_confirm_do_not_match">PIN mismatch!</string>
+    <string name="pincode_error_write">Error when saving PIN</string>
 
 </resources>

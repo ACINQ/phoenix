@@ -39,6 +39,10 @@ import kotlinx.serialization.*
 import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 import java.io.IOException
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 class UserPrefsRepository(private val data: DataStore<Preferences>) {
 
@@ -69,7 +73,10 @@ class UserPrefsRepository(private val data: DataStore<Preferences>) {
         val PREFS_ELECTRUM_ADDRESS_PORT = intPreferencesKey("PREFS_ELECTRUM_ADDRESS_PORT")
         val PREFS_ELECTRUM_ADDRESS_PINNED_KEY = stringPreferencesKey("PREFS_ELECTRUM_ADDRESS_PINNED_KEY")
         // access control
-        val PREFS_SCREEN_LOCK = booleanPreferencesKey("PREFS_SCREEN_LOCK")
+        val PREFS_SCREEN_LOCK_BIOMETRICS = booleanPreferencesKey("PREFS_SCREEN_LOCK")
+        val PREFS_SCREEN_LOCK_CUSTOM_PIN_ENABLED = booleanPreferencesKey("PREFS_SCREEN_LOCK_CUSTOM_PIN_ENABLED")
+        val PREFS_CUSTOM_PIN_ATTEMPT_COUNT = intPreferencesKey("PREFS_CUSTOM_PIN_ATTEMPT_COUNT")
+        val PREFS_AUTO_LOCK_DELAY = longPreferencesKey("PREFS_AUTO_LOCK_DELAY")
         // payments options
         private val INVOICE_DEFAULT_DESC = stringPreferencesKey("INVOICE_DEFAULT_DESC")
         private val INVOICE_DEFAULT_EXPIRY = longPreferencesKey("INVOICE_DEFAULT_EXPIRY")
@@ -148,8 +155,28 @@ class UserPrefsRepository(private val data: DataStore<Preferences>) {
 
     // -- security
 
-    val getIsScreenLockActive: Flow<Boolean> = safeData.map { it[PREFS_SCREEN_LOCK] ?: false }
-    suspend fun saveIsScreenLockActive(isScreenLockActive: Boolean) = data.edit { it[PREFS_SCREEN_LOCK] = isScreenLockActive }
+    val getIsBiometricLockEnabled: Flow<Boolean> = safeData.map { it[PREFS_SCREEN_LOCK_BIOMETRICS] ?: false }
+    suspend fun saveIsBiometricLockEnabled(isEnabled: Boolean) = data.edit { it[PREFS_SCREEN_LOCK_BIOMETRICS] = isEnabled }
+
+    val getIsCustomPinLockEnabled: Flow<Boolean> = safeData.map { it[PREFS_SCREEN_LOCK_CUSTOM_PIN_ENABLED] ?: false }
+    suspend fun saveIsCustomPinLockEnabled(isEnabled: Boolean) = data.edit { it[PREFS_SCREEN_LOCK_CUSTOM_PIN_ENABLED] = isEnabled }
+
+    val getPinCodeAttempt: Flow<Int> = safeData.map {
+        it[PREFS_CUSTOM_PIN_ATTEMPT_COUNT] ?: 0
+    }
+    suspend fun savePinCodeFailure() = data.edit {
+        it[PREFS_CUSTOM_PIN_ATTEMPT_COUNT] = (it[PREFS_CUSTOM_PIN_ATTEMPT_COUNT] ?: 0) + 1
+    }
+    suspend fun savePinCodeSuccess() = data.edit {
+        it[PREFS_CUSTOM_PIN_ATTEMPT_COUNT] = 0
+    }
+
+    val getAutoLockDelay: Flow<Duration> = safeData.map {
+        it[PREFS_AUTO_LOCK_DELAY]?.toDuration(DurationUnit.MILLISECONDS) ?: 10.minutes
+    }
+    suspend fun saveAutoLockDelay(delay: Duration) = data.edit {
+        it[PREFS_AUTO_LOCK_DELAY] = delay.inWholeMilliseconds
+    }
 
     val getInvoiceDefaultDesc: Flow<String> = safeData.map { it[INVOICE_DEFAULT_DESC]?.takeIf { it.isNotBlank() } ?: "" }
     suspend fun saveInvoiceDefaultDesc(description: String) = data.edit { it[INVOICE_DEFAULT_DESC] = description }

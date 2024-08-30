@@ -63,25 +63,39 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Dialog
 import fr.acinq.phoenix.android.components.openLink
+import fr.acinq.phoenix.android.components.screenlock.LockPrompt
 import fr.acinq.phoenix.android.home.HomeView
 import fr.acinq.phoenix.android.init.CreateWalletView
 import fr.acinq.phoenix.android.init.InitWallet
 import fr.acinq.phoenix.android.init.RestoreWalletView
 import fr.acinq.phoenix.android.intro.IntroView
-import fr.acinq.phoenix.android.payments.receive.ReceiveView
 import fr.acinq.phoenix.android.payments.ScanDataView
 import fr.acinq.phoenix.android.payments.details.PaymentDetailsView
 import fr.acinq.phoenix.android.payments.history.CsvExportView
 import fr.acinq.phoenix.android.payments.history.PaymentsHistoryView
+import fr.acinq.phoenix.android.payments.liquidity.RequestLiquidityView
+import fr.acinq.phoenix.android.payments.receive.ReceiveView
 import fr.acinq.phoenix.android.services.NodeServiceState
-import fr.acinq.phoenix.android.settings.*
+import fr.acinq.phoenix.android.settings.AboutView
+import fr.acinq.phoenix.android.settings.AppAccessSettings
+import fr.acinq.phoenix.android.settings.DisplayPrefsView
+import fr.acinq.phoenix.android.settings.ElectrumView
+import fr.acinq.phoenix.android.settings.ExperimentalView
+import fr.acinq.phoenix.android.settings.ForceCloseView
+import fr.acinq.phoenix.android.settings.LogsView
+import fr.acinq.phoenix.android.settings.MutualCloseView
+import fr.acinq.phoenix.android.settings.NotificationsView
+import fr.acinq.phoenix.android.settings.PaymentSettingsView
+import fr.acinq.phoenix.android.settings.ResetWallet
+import fr.acinq.phoenix.android.settings.SettingsContactsView
+import fr.acinq.phoenix.android.settings.SettingsView
+import fr.acinq.phoenix.android.settings.TorConfigView
 import fr.acinq.phoenix.android.settings.channels.ChannelDetailsView
 import fr.acinq.phoenix.android.settings.channels.ChannelsView
 import fr.acinq.phoenix.android.settings.channels.ImportChannelsData
 import fr.acinq.phoenix.android.settings.displayseed.DisplaySeedView
 import fr.acinq.phoenix.android.settings.fees.AdvancedIncomingFeePolicy
 import fr.acinq.phoenix.android.settings.fees.LiquidityPolicyView
-import fr.acinq.phoenix.android.payments.liquidity.RequestLiquidityView
 import fr.acinq.phoenix.android.settings.walletinfo.FinalWalletInfo
 import fr.acinq.phoenix.android.settings.walletinfo.SendSwapInRefundView
 import fr.acinq.phoenix.android.settings.walletinfo.SwapInAddresses
@@ -168,318 +182,329 @@ fun AppView(
                 .fillMaxWidth()
                 .fillMaxHeight()
         ) {
+            val isScreenLocked by appVM.isScreenLocked
+            val isBiometricLockEnabledState = userPrefs.getIsBiometricLockEnabled.collectAsState(initial = null)
+            val isBiometricLockEnabled = isBiometricLockEnabledState.value
+            val isCustomPinLockEnabledState = userPrefs.getIsCustomPinLockEnabled.collectAsState(initial = null)
+            val isCustomPinLockEnabled = isCustomPinLockEnabledState.value
 
-            NavHost(
-                navController = navController,
-                startDestination = "${Screen.Startup.route}?next={next}",
-            ) {
-                composable(
-                    route = "${Screen.Startup.route}?next={next}",
-                    arguments = listOf(
-                        navArgument("next") { type = NavType.StringType; nullable = true }
-                    ),
+            if (isBiometricLockEnabled == null || isCustomPinLockEnabled == null) {
+                // wait for preferences to load
+            } else if (isScreenLocked && (isBiometricLockEnabled || isCustomPinLockEnabled)) {
+                LockPrompt(onLock = { appVM.lockScreen() }, onUnlock = { appVM.unlockScreen() })
+            } else {
+                NavHost(
+                    navController = navController,
+                    startDestination = "${Screen.Startup.route}?next={next}",
                 ) {
-                    val intent = try {
-                        it.arguments?.getParcelable<Intent>(NavController.KEY_DEEP_LINK_INTENT)
-                    } catch (e: Exception) {
-                        null
-                    }
-                    val nextScreenLink = try {
-                        intent?.data?.getQueryParameter("next")?.decodeURLPart()
-                    } catch (e: Exception) {
-                        null
-                    }
-                    StartupView(
-                        appVM = appVM,
-                        onShowIntro = { navController.navigate(Screen.Intro.route) },
-                        onKeyAbsent = { navController.navigate(Screen.InitWallet.route) },
-                        onBusinessStarted = {
-                            val next = nextScreenLink?.takeUnless { it.isBlank() }?.let { Uri.parse(it) }
-                            if (next == null || !navController.graph.hasDeepLink(next)) {
-                                log.debug("redirecting from startup to home")
-                                popToHome(navController)
-                            } else {
-                                log.debug("redirecting from startup to $next")
-                                navController.navigate(next, navOptions = navOptions {
-                                    popUpTo(navController.graph.id) { inclusive = true }
-                                })
+                    composable(
+                        route = "${Screen.Startup.route}?next={next}",
+                        arguments = listOf(
+                            navArgument("next") { type = NavType.StringType; nullable = true }
+                        ),
+                    ) {
+                        val intent = try {
+                            it.arguments?.getParcelable<Intent>(NavController.KEY_DEEP_LINK_INTENT)
+                        } catch (e: Exception) {
+                            null
+                        }
+                        val nextScreenLink = try {
+                            intent?.data?.getQueryParameter("next")?.decodeURLPart()
+                        } catch (e: Exception) {
+                            null
+                        }
+                        StartupView(
+                            appVM = appVM,
+                            onShowIntro = { navController.navigate(Screen.Intro.route) },
+                            onKeyAbsent = { navController.navigate(Screen.InitWallet.route) },
+                            onBusinessStarted = {
+                                val next = nextScreenLink?.takeUnless { it.isBlank() }?.let { Uri.parse(it) }
+                                if (next == null || !navController.graph.hasDeepLink(next)) {
+                                    log.debug("redirecting from startup to home")
+                                    popToHome(navController)
+                                } else {
+                                    log.debug("redirecting from startup to {}", next)
+                                    navController.navigate(next, navOptions = navOptions {
+                                        popUpTo(navController.graph.id) { inclusive = true }
+                                    })
+                                }
                             }
-                        }
-                    )
-                }
-                composable(Screen.Intro.route) {
-                    IntroView(onFinishClick = { navController.navigate(Screen.Startup.route) })
-                }
-                composable(Screen.InitWallet.route) {
-                    InitWallet(
-                        onCreateWalletClick = { navController.navigate(Screen.CreateWallet.route) },
-                        onRestoreWalletClick = { navController.navigate(Screen.RestoreWallet.route) },
-                    )
-                }
-                composable(Screen.CreateWallet.route) {
-                    CreateWalletView(onSeedWritten = { navController.navigate(Screen.Startup.route) })
-                }
-                composable(Screen.RestoreWallet.route) {
-                    RestoreWalletView(onSeedWritten = { navController.navigate(Screen.Startup.route) })
-                }
-                composable(Screen.Home.route) {
-                    RequireStarted(walletState) {
-                        HomeView(
-                            paymentsViewModel = paymentsViewModel,
-                            noticesViewModel = noticesViewModel,
-                            onPaymentClick = { navigateToPaymentDetails(navController, id = it, isFromEvent = false) },
-                            onSettingsClick = { navController.navigate(Screen.Settings.route) },
-                            onReceiveClick = { navController.navigate(Screen.Receive.route) },
-                            onSendClick = { navController.navigate(Screen.ScanData.route) { launchSingleTop = true } },
-                            onPaymentsHistoryClick = { navController.navigate(Screen.PaymentsHistory.route) },
-                            onTorClick = { navController.navigate(Screen.TorConfig) },
-                            onElectrumClick = { navController.navigate(Screen.ElectrumServer) },
-                            onShowSwapInWallet = { navController.navigate(Screen.WalletInfo.SwapInWallet) },
-                            onShowNotifications = { navController.navigate(Screen.Notifications) },
-                            onRequestLiquidityClick = { navController.navigate(Screen.LiquidityRequest.route) },
                         )
                     }
-                }
-                composable(Screen.Receive.route) {
-                    ReceiveView(
-                        onSwapInReceived = { popToHome(navController) },
-                        onBackClick = { navController.popBackStack() },
-                        onScanDataClick = { navController.navigate(Screen.ScanData.route) },
-                        onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) },
-                    )
-                }
-                composable(
-                    route = "${Screen.ScanData.route}?input={input}",
-                    arguments = listOf(
-                        navArgument("input") { type = NavType.StringType ; nullable = true },
-                    ),
-                    deepLinks = listOf(
-                        navDeepLink { uriPattern = "lightning:{data}" },
-                        navDeepLink { uriPattern = "bitcoin:{data}" },
-                        navDeepLink { uriPattern = "lnurl:{data}" },
-                        navDeepLink { uriPattern = "lnurlp:{data}" },
-                        navDeepLink { uriPattern = "lnurlw:{data}" },
-                        navDeepLink { uriPattern = "keyauth:{data}" },
-                        navDeepLink { uriPattern = "phoenix:lightning:{data}" },
-                        navDeepLink { uriPattern = "phoenix:bitcoin:{data}" },
-                        navDeepLink { uriPattern = "scanview:{data}" },
-                    )
-                ) {
-                    log.info("input arg=${it.arguments?.getString("input")}")
-                    val intent = try {
-                        it.arguments?.getParcelable<Intent>(NavController.KEY_DEEP_LINK_INTENT)
-                    } catch (e: Exception) {
-                        null
+                    composable(Screen.Intro.route) {
+                        IntroView(onFinishClick = { navController.navigate(Screen.Startup.route) })
                     }
-                    RequireStarted(walletState, nextUri = "scanview:${intent?.data?.toString()}") {
-                        val input = intent?.data?.toString()?.substringAfter("scanview:")?.takeIf {
-                            // prevents forwarding an internal deeplink intent coming from androidx-navigation framework.
-                            // TODO properly parse deeplinks following f0ae90444a23cc17d6d7407dfe43c0c8d20e62fc
-                            !it.contains("androidx.navigation")
-                        } ?: it.arguments?.getString("input")
-                        ScanDataView(
-                            input = input,
-                            onBackClick = { navController.popBackStack() },
-                            onAuthSchemeInfoClick = { navController.navigate("${Screen.PaymentSettings.route}/true") },
-                            onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) },
-                            onProcessingFinished = { popToHome(navController) },
+                    composable(Screen.InitWallet.route) {
+                        InitWallet(
+                            onCreateWalletClick = { navController.navigate(Screen.CreateWallet.route) },
+                            onRestoreWalletClick = { navController.navigate(Screen.RestoreWallet.route) },
                         )
                     }
-                }
-                composable(
-                    route = "${Screen.PaymentDetails.route}?direction={direction}&id={id}&fromEvent={fromEvent}",
-                    arguments = listOf(
-                        navArgument("direction") { type = NavType.LongType },
-                        navArgument("id") { type = NavType.StringType },
-                        navArgument("fromEvent") {
-                            type = NavType.BoolType
-                            defaultValue = false
-                        }
-                    ),
-                    deepLinks = listOf(navDeepLink { uriPattern = "phoenix:payments/{direction}/{id}" })
-                ) {
-                    val direction = it.arguments?.getLong("direction")
-                    val id = it.arguments?.getString("id")
-
-                    val paymentId = if (id != null && direction != null) WalletPaymentId.create(direction, id) else null
-                    if (paymentId != null) {
-                        RequireStarted(walletState, nextUri = "phoenix:payments/${direction}/${id}") {
-                            log.debug("navigating to payment-details id=$id")
-                            val fromEvent = it.arguments?.getBoolean("fromEvent") ?: false
-                            PaymentDetailsView(
-                                paymentId = paymentId,
-                                onBackClick = {
-                                    val previousNav = navController.previousBackStackEntry
-                                    if (fromEvent && previousNav?.destination?.route == Screen.ScanData.route) {
-                                        popToHome(navController)
-                                    } else if (navController.previousBackStackEntry != null){
-                                        navController.popBackStack()
-                                    } else {
-                                        popToHome(navController)
-                                    }
-                                },
-                                fromEvent = fromEvent
+                    composable(Screen.CreateWallet.route) {
+                        CreateWalletView(onSeedWritten = { navController.navigate(Screen.Startup.route) })
+                    }
+                    composable(Screen.RestoreWallet.route) {
+                        RestoreWalletView(onSeedWritten = { navController.navigate(Screen.Startup.route) })
+                    }
+                    composable(Screen.Home.route) {
+                        RequireStarted(walletState) {
+                            HomeView(
+                                paymentsViewModel = paymentsViewModel,
+                                noticesViewModel = noticesViewModel,
+                                onPaymentClick = { navigateToPaymentDetails(navController, id = it, isFromEvent = false) },
+                                onSettingsClick = { navController.navigate(Screen.Settings.route) },
+                                onReceiveClick = { navController.navigate(Screen.Receive.route) },
+                                onSendClick = { navController.navigate(Screen.ScanData.route) { launchSingleTop = true } },
+                                onPaymentsHistoryClick = { navController.navigate(Screen.PaymentsHistory.route) },
+                                onTorClick = { navController.navigate(Screen.TorConfig) },
+                                onElectrumClick = { navController.navigate(Screen.ElectrumServer) },
+                                onShowSwapInWallet = { navController.navigate(Screen.WalletInfo.SwapInWallet) },
+                                onShowNotifications = { navController.navigate(Screen.Notifications) },
+                                onRequestLiquidityClick = { navController.navigate(Screen.LiquidityRequest.route) },
                             )
                         }
                     }
-                }
-                composable(Screen.PaymentsHistory.route) {
-                    PaymentsHistoryView(
-                        onBackClick = { navController.popBackStack() },
-                        paymentsViewModel = paymentsViewModel,
-                        onPaymentClick = { navigateToPaymentDetails(navController, id = it, isFromEvent = false) },
-                        onCsvExportClick = { navController.navigate(Screen.PaymentsCsvExport) },
-                    )
-                }
-                composable(Screen.PaymentsCsvExport.route) {
-                    CsvExportView(onBackClick = {
-                        navController.navigate(Screen.PaymentsHistory.route) {
-                            popUpTo(Screen.PaymentsHistory.route) { inclusive = true }
-                        }
-                    })
-                }
-                composable(Screen.Settings.route) {
-                    SettingsView(noticesViewModel)
-                }
-                composable(Screen.DisplaySeed.route) {
-                    DisplaySeedView()
-                }
-                composable(Screen.ElectrumServer.route) {
-                    ElectrumView()
-                }
-                composable(Screen.TorConfig.route) {
-                    TorConfigView()
-                }
-                composable(Screen.Channels.route) {
-                    ChannelsView(
-                        onBackClick = {
-                            navController.navigate(Screen.Settings) {
-                                popUpTo(Screen.Settings.route) { inclusive = true }
-                            }
-                        },
-                        onChannelClick = { navController.navigate("${Screen.ChannelDetails.route}?id=$it") },
-                        onImportChannelsDataClick = { navController.navigate(Screen.ImportChannelsData)},
-                    )
-                }
-                composable(
-                    route = "${Screen.ChannelDetails.route}?id={id}",
-                    arguments = listOf(navArgument("id") { type = NavType.StringType })
-                ) {
-                    val channelId = it.arguments?.getString("id")
-                    ChannelDetailsView(onBackClick = { navController.popBackStack() }, channelId = channelId)
-                }
-                composable(Screen.ImportChannelsData.route) {
-                    ImportChannelsData(onBackClick = { navController.popBackStack() })
-                }
-                composable(Screen.MutualClose.route) {
-                    MutualCloseView(onBackClick = { navController.popBackStack() })
-                }
-                composable(Screen.ForceClose.route) {
-                    ForceCloseView(onBackClick = { navController.popBackStack() })
-                }
-                composable(Screen.Preferences.route) {
-                    DisplayPrefsView()
-                }
-                composable(Screen.About.route) {
-                    AboutView()
-                }
-                composable(Screen.PaymentSettings.route) {
-                    PaymentSettingsView(
-                        initialShowLnurlAuthSchemeDialog = false,
-                    )
-                }
-                composable("${Screen.PaymentSettings.route}/{showAuthSchemeDialog}", arguments = listOf(
-                    navArgument("showAuthSchemeDialog") { type = NavType.BoolType }
-                )) {
-                    val showAuthSchemeDialog = it.arguments?.getBoolean("showAuthSchemeDialog") ?: false
-                    PaymentSettingsView(
-                        initialShowLnurlAuthSchemeDialog = showAuthSchemeDialog,
-                    )
-                }
-                composable(Screen.AppLock.route) {
-                    AppLockView(onBackClick = { navController.popBackStack() })
-                }
-                composable(Screen.Logs.route) {
-                    LogsView()
-                }
-                composable(Screen.SwitchToLegacy.route) {
-                    LegacySwitcherView(onProceedNormally = { navController.navigate(Screen.Startup.route) })
-                }
-                composable(Screen.WalletInfo.route) {
-                    WalletInfoView(
-                        onBackClick = { navController.popBackStack() },
-                        onLightningWalletClick = { navController.navigate(Screen.Channels.route) },
-                        onSwapInWalletClick = { navController.navigate(Screen.WalletInfo.SwapInWallet.route) },
-                        onSwapInWalletInfoClick = { navController.navigate(Screen.WalletInfo.SwapInAddresses.route) },
-                        onFinalWalletClick = { navController.navigate(Screen.WalletInfo.FinalWallet.route) },
-                    )
-                }
-                composable(
-                    Screen.WalletInfo.SwapInWallet.route,
-                    deepLinks = listOf(
-                        navDeepLink { uriPattern = "phoenix:swapinwallet" }
-                    )
-                ) {
-                    SwapInWallet(
-                        onBackClick = { navController.popBackStack() },
-                        onViewChannelPolicyClick = { navController.navigate(Screen.LiquidityPolicy.route) },
-                        onAdvancedClick = { navController.navigate(Screen.WalletInfo.SwapInSigner.route) },
-                        onSpendRefundable = { navController.navigate(Screen.WalletInfo.SwapInRefund.route) },
-                    )
-                }
-                composable(Screen.WalletInfo.SwapInAddresses.route) {
-                    SwapInAddresses(onBackClick = { navController.popBackStack() })
-                }
-                composable(Screen.WalletInfo.SwapInSigner.route) {
-                    SwapInSignerView(onBackClick = { navController.popBackStack() })
-                }
-                composable(Screen.WalletInfo.SwapInRefund.route) {
-                    SendSwapInRefundView(onBackClick = { navController.popBackStack() })
-                }
-                composable(Screen.WalletInfo.FinalWallet.route) {
-                    FinalWalletInfo(onBackClick = { navController.popBackStack() })
-                }
-                composable(Screen.LiquidityPolicy.route, deepLinks = listOf(navDeepLink { uriPattern ="phoenix:liquiditypolicy" })) {
-                    LiquidityPolicyView(
-                        onBackClick = { navController.popBackStack() },
-                        onAdvancedClick = { navController.navigate(Screen.AdvancedLiquidityPolicy.route) },
-                        onRequestLiquidityClick = { navController.navigate(Screen.LiquidityRequest.route) },
-                    )
-                }
-                composable(Screen.LiquidityRequest.route, deepLinks = listOf(navDeepLink { uriPattern ="phoenix:requestliquidity" })) {
-                    RequestLiquidityView(onBackClick = { navController.popBackStack() },)
-                }
-                composable(Screen.AdvancedLiquidityPolicy.route) {
-                    AdvancedIncomingFeePolicy(onBackClick = { navController.popBackStack() })
-                }
-                composable(Screen.Notifications.route) {
-                    NotificationsView(
-                        noticesViewModel = noticesViewModel,
-                        onBackClick = { navController.popBackStack() },
-                    )
-                }
-                composable(Screen.ResetWallet.route) {
-                    appVM.service?.let { nodeService ->
-                        val application = application
-                        ResetWallet(
-                            onShutdownBusiness = application::shutdownBusiness,
-                            onShutdownService = nodeService::shutdown,
-                            onPrefsClear = application::clearPreferences,
-                            onBusinessReset = {
-                                application.resetBusiness()
-                                FirebaseMessaging.getInstance().deleteToken().addOnCompleteListener { task ->
-                                    if (task.isSuccessful) nodeService.refreshFcmToken()
-                                }
-                            },
-                            onBackClick = { navController.popBackStack() }
+                    composable(Screen.Receive.route) {
+                        ReceiveView(
+                            onSwapInReceived = { popToHome(navController) },
+                            onBackClick = { navController.popBackStack() },
+                            onScanDataClick = { navController.navigate(Screen.ScanData.route) },
+                            onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) },
                         )
                     }
-                }
-                composable(Screen.Contacts.route) {
-                    SettingsContactsView(onBackClick = { navController.popBackStack() })
-                }
-                composable(Screen.Experimental.route) {
-                    ExperimentalView(onBackClick = { navController.popBackStack() })
+                    composable(
+                        route = "${Screen.ScanData.route}?input={input}",
+                        arguments = listOf(
+                            navArgument("input") { type = NavType.StringType ; nullable = true },
+                        ),
+                        deepLinks = listOf(
+                            navDeepLink { uriPattern = "lightning:{data}" },
+                            navDeepLink { uriPattern = "bitcoin:{data}" },
+                            navDeepLink { uriPattern = "lnurl:{data}" },
+                            navDeepLink { uriPattern = "lnurlp:{data}" },
+                            navDeepLink { uriPattern = "lnurlw:{data}" },
+                            navDeepLink { uriPattern = "keyauth:{data}" },
+                            navDeepLink { uriPattern = "phoenix:lightning:{data}" },
+                            navDeepLink { uriPattern = "phoenix:bitcoin:{data}" },
+                            navDeepLink { uriPattern = "scanview:{data}" },
+                        )
+                    ) {
+                        log.info("input arg=${it.arguments?.getString("input")}")
+                        val intent = try {
+                            it.arguments?.getParcelable<Intent>(NavController.KEY_DEEP_LINK_INTENT)
+                        } catch (e: Exception) {
+                            null
+                        }
+                        RequireStarted(walletState, nextUri = "scanview:${intent?.data?.toString()}") {
+                            val input = intent?.data?.toString()?.substringAfter("scanview:")?.takeIf {
+                                // prevents forwarding an internal deeplink intent coming from androidx-navigation framework.
+                                // TODO properly parse deeplinks following f0ae90444a23cc17d6d7407dfe43c0c8d20e62fc
+                                !it.contains("androidx.navigation")
+                            } ?: it.arguments?.getString("input")
+                            ScanDataView(
+                                input = input,
+                                onBackClick = { navController.popBackStack() },
+                                onAuthSchemeInfoClick = { navController.navigate("${Screen.PaymentSettings.route}/true") },
+                                onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) },
+                                onProcessingFinished = { popToHome(navController) },
+                            )
+                        }
+                    }
+                    composable(
+                        route = "${Screen.PaymentDetails.route}?direction={direction}&id={id}&fromEvent={fromEvent}",
+                        arguments = listOf(
+                            navArgument("direction") { type = NavType.LongType },
+                            navArgument("id") { type = NavType.StringType },
+                            navArgument("fromEvent") {
+                                type = NavType.BoolType
+                                defaultValue = false
+                            }
+                        ),
+                        deepLinks = listOf(navDeepLink { uriPattern = "phoenix:payments/{direction}/{id}" })
+                    ) {
+                        val direction = it.arguments?.getLong("direction")
+                        val id = it.arguments?.getString("id")
+
+                        val paymentId = if (id != null && direction != null) WalletPaymentId.create(direction, id) else null
+                        if (paymentId != null) {
+                            RequireStarted(walletState, nextUri = "phoenix:payments/${direction}/${id}") {
+                                log.debug("navigating to payment-details id=$id")
+                                val fromEvent = it.arguments?.getBoolean("fromEvent") ?: false
+                                PaymentDetailsView(
+                                    paymentId = paymentId,
+                                    onBackClick = {
+                                        val previousNav = navController.previousBackStackEntry
+                                        if (fromEvent && previousNav?.destination?.route == Screen.ScanData.route) {
+                                            popToHome(navController)
+                                        } else if (navController.previousBackStackEntry != null){
+                                            navController.popBackStack()
+                                        } else {
+                                            popToHome(navController)
+                                        }
+                                    },
+                                    fromEvent = fromEvent
+                                )
+                            }
+                        }
+                    }
+                    composable(Screen.PaymentsHistory.route) {
+                        PaymentsHistoryView(
+                            onBackClick = { navController.popBackStack() },
+                            paymentsViewModel = paymentsViewModel,
+                            onPaymentClick = { navigateToPaymentDetails(navController, id = it, isFromEvent = false) },
+                            onCsvExportClick = { navController.navigate(Screen.PaymentsCsvExport) },
+                        )
+                    }
+                    composable(Screen.PaymentsCsvExport.route) {
+                        CsvExportView(onBackClick = {
+                            navController.navigate(Screen.PaymentsHistory.route) {
+                                popUpTo(Screen.PaymentsHistory.route) { inclusive = true }
+                            }
+                        })
+                    }
+                    composable(Screen.Settings.route) {
+                        SettingsView(noticesViewModel)
+                    }
+                    composable(Screen.DisplaySeed.route) {
+                        DisplaySeedView()
+                    }
+                    composable(Screen.ElectrumServer.route) {
+                        ElectrumView()
+                    }
+                    composable(Screen.TorConfig.route) {
+                        TorConfigView()
+                    }
+                    composable(Screen.Channels.route) {
+                        ChannelsView(
+                            onBackClick = {
+                                navController.navigate(Screen.Settings) {
+                                    popUpTo(Screen.Settings.route) { inclusive = true }
+                                }
+                            },
+                            onChannelClick = { navController.navigate("${Screen.ChannelDetails.route}?id=$it") },
+                            onImportChannelsDataClick = { navController.navigate(Screen.ImportChannelsData)},
+                        )
+                    }
+                    composable(
+                        route = "${Screen.ChannelDetails.route}?id={id}",
+                        arguments = listOf(navArgument("id") { type = NavType.StringType })
+                    ) {
+                        val channelId = it.arguments?.getString("id")
+                        ChannelDetailsView(onBackClick = { navController.popBackStack() }, channelId = channelId)
+                    }
+                    composable(Screen.ImportChannelsData.route) {
+                        ImportChannelsData(onBackClick = { navController.popBackStack() })
+                    }
+                    composable(Screen.MutualClose.route) {
+                        MutualCloseView(onBackClick = { navController.popBackStack() })
+                    }
+                    composable(Screen.ForceClose.route) {
+                        ForceCloseView(onBackClick = { navController.popBackStack() })
+                    }
+                    composable(Screen.Preferences.route) {
+                        DisplayPrefsView()
+                    }
+                    composable(Screen.About.route) {
+                        AboutView()
+                    }
+                    composable(Screen.PaymentSettings.route) {
+                        PaymentSettingsView(
+                            initialShowLnurlAuthSchemeDialog = false,
+                        )
+                    }
+                    composable("${Screen.PaymentSettings.route}/{showAuthSchemeDialog}", arguments = listOf(
+                        navArgument("showAuthSchemeDialog") { type = NavType.BoolType }
+                    )) {
+                        val showAuthSchemeDialog = it.arguments?.getBoolean("showAuthSchemeDialog") ?: false
+                        PaymentSettingsView(
+                            initialShowLnurlAuthSchemeDialog = showAuthSchemeDialog,
+                        )
+                    }
+                    composable(Screen.AppLock.route) {
+                        AppAccessSettings(onBackClick = { navController.popBackStack() }, appViewModel = appVM)
+                    }
+                    composable(Screen.Logs.route) {
+                        LogsView()
+                    }
+                    composable(Screen.SwitchToLegacy.route) {
+                        LegacySwitcherView(onProceedNormally = { navController.navigate(Screen.Startup.route) })
+                    }
+                    composable(Screen.WalletInfo.route) {
+                        WalletInfoView(
+                            onBackClick = { navController.popBackStack() },
+                            onLightningWalletClick = { navController.navigate(Screen.Channels.route) },
+                            onSwapInWalletClick = { navController.navigate(Screen.WalletInfo.SwapInWallet.route) },
+                            onSwapInWalletInfoClick = { navController.navigate(Screen.WalletInfo.SwapInAddresses.route) },
+                            onFinalWalletClick = { navController.navigate(Screen.WalletInfo.FinalWallet.route) },
+                        )
+                    }
+                    composable(
+                        Screen.WalletInfo.SwapInWallet.route,
+                        deepLinks = listOf(
+                            navDeepLink { uriPattern = "phoenix:swapinwallet" }
+                        )
+                    ) {
+                        SwapInWallet(
+                            onBackClick = { navController.popBackStack() },
+                            onViewChannelPolicyClick = { navController.navigate(Screen.LiquidityPolicy.route) },
+                            onAdvancedClick = { navController.navigate(Screen.WalletInfo.SwapInSigner.route) },
+                            onSpendRefundable = { navController.navigate(Screen.WalletInfo.SwapInRefund.route) },
+                        )
+                    }
+                    composable(Screen.WalletInfo.SwapInAddresses.route) {
+                        SwapInAddresses(onBackClick = { navController.popBackStack() })
+                    }
+                    composable(Screen.WalletInfo.SwapInSigner.route) {
+                        SwapInSignerView(onBackClick = { navController.popBackStack() })
+                    }
+                    composable(Screen.WalletInfo.SwapInRefund.route) {
+                        SendSwapInRefundView(onBackClick = { navController.popBackStack() })
+                    }
+                    composable(Screen.WalletInfo.FinalWallet.route) {
+                        FinalWalletInfo(onBackClick = { navController.popBackStack() })
+                    }
+                    composable(Screen.LiquidityPolicy.route, deepLinks = listOf(navDeepLink { uriPattern ="phoenix:liquiditypolicy" })) {
+                        LiquidityPolicyView(
+                            onBackClick = { navController.popBackStack() },
+                            onAdvancedClick = { navController.navigate(Screen.AdvancedLiquidityPolicy.route) },
+                            onRequestLiquidityClick = { navController.navigate(Screen.LiquidityRequest.route) },
+                        )
+                    }
+                    composable(Screen.LiquidityRequest.route, deepLinks = listOf(navDeepLink { uriPattern ="phoenix:requestliquidity" })) {
+                        RequestLiquidityView(onBackClick = { navController.popBackStack() },)
+                    }
+                    composable(Screen.AdvancedLiquidityPolicy.route) {
+                        AdvancedIncomingFeePolicy(onBackClick = { navController.popBackStack() })
+                    }
+                    composable(Screen.Notifications.route) {
+                        NotificationsView(
+                            noticesViewModel = noticesViewModel,
+                            onBackClick = { navController.popBackStack() },
+                        )
+                    }
+                    composable(Screen.ResetWallet.route) {
+                        appVM.service?.let { nodeService ->
+                            val application = application
+                            ResetWallet(
+                                onShutdownBusiness = application::shutdownBusiness,
+                                onShutdownService = nodeService::shutdown,
+                                onPrefsClear = application::clearPreferences,
+                                onBusinessReset = {
+                                    application.resetBusiness()
+                                    FirebaseMessaging.getInstance().deleteToken().addOnCompleteListener { task ->
+                                        if (task.isSuccessful) nodeService.refreshFcmToken()
+                                    }
+                                },
+                                onBackClick = { navController.popBackStack() }
+                            )
+                        }
+                    }
+                    composable(Screen.Contacts.route) {
+                        SettingsContactsView(onBackClick = { navController.popBackStack() })
+                    }
+                    composable(Screen.Experimental.route) {
+                        ExperimentalView(onBackClick = { navController.popBackStack() })
+                    }
                 }
             }
         }
