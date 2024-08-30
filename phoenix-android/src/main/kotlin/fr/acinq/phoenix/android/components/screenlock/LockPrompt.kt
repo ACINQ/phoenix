@@ -109,7 +109,9 @@ fun ColumnScope.LockPrompt(
             contentDescription = "phoenix-icon",
             modifier = Modifier.align(Alignment.CenterHorizontally),
         )
-        Text(text = stringResource(id = R.string.lockprompt_title), textAlign = TextAlign.Center, modifier = Modifier.align(Alignment.CenterHorizontally).padding(horizontal = 32.dp))
+        Text(text = stringResource(id = R.string.lockprompt_title), textAlign = TextAlign.Center, modifier = Modifier
+            .align(Alignment.CenterHorizontally)
+            .padding(horizontal = 32.dp))
         Spacer(modifier = Modifier.weight(1f))
         Column(modifier = Modifier.padding(horizontal = 16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             if (isBiometricLockEnabled) {
@@ -138,5 +140,12 @@ fun ColumnScope.LockPrompt(
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
-    } ?: ProgressView(text = stringResource(id = R.string.utils_loading_prefs))
+    } ?: run {
+        Spacer(modifier = Modifier.weight(1f))
+        ProgressView(
+            text = stringResource(id = R.string.utils_loading_prefs),
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+        )
+        Spacer(modifier = Modifier.weight(1f))
+    }
 }
