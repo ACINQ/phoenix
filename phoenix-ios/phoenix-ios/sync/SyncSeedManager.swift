@@ -49,15 +49,9 @@ class SyncSeedManager: SyncManagerProtcol {
 	///
 	private let recoveryPhrase: RecoveryPhrase
 	
-	/// The encryptedNodeId is created via: Hash(cloudKey + nodeID)
+	/// The wallet info, such as nodeID, cloudKey, etc.
 	///
-	/// All data from a user's wallet are stored in the user's CKContainer.default().privateCloudDatabase.
-	/// And within the privateCloudDatabase, we create a dedicated CKRecordZone for each wallet,
-	/// where recordZone.name == encryptedNodeId. All trasactions for the wallet are stored in this recordZone.
-	///
-	/// For simplicity, the name of the uploaded Seed shared the encryptedNodeId name.
-	///
-	private let encryptedNodeId: String
+	private let walletInfo: WalletManager.WalletInfo
 	
 	/// Informs the user interface regarding the activities of the SyncSeedManager.
 	/// This includes various errors & active upload progress.
@@ -75,16 +69,22 @@ class SyncSeedManager: SyncManagerProtcol {
 	private var cancellables = Set<AnyCancellable>()
 	private var upgradeTask: Task<Void, Error>? = nil
 	
-	init(chain: Bitcoin_kmpChain, recoveryPhrase: RecoveryPhrase, encryptedNodeId: String) {
+	init(
+		chain: Bitcoin_kmpChain,
+		recoveryPhrase: RecoveryPhrase,
+		walletInfo: WalletManager.WalletInfo
+	) {
 		log.trace("init()")
 		
 		self.chain = chain
 		self.recoveryPhrase = recoveryPhrase
-		self.encryptedNodeId = encryptedNodeId
+		self.walletInfo = walletInfo
 		
 		actor = SyncSeedManager_Actor(
 			isEnabled: Prefs.shared.backupSeed.isEnabled,
-			hasUploadedSeed: Prefs.shared.backupSeed.hasUploadedSeed(encryptedNodeId: encryptedNodeId)
+			hasUploadedSeed: Prefs.shared.backupSeed.hasUploadedSeed(
+				encryptedNodeId: walletInfo.encryptedNodeId
+			)
 		)
 		statePublisher = CurrentValueSubject<SyncSeedManager_State, Never>(actor.initialState)
 		
@@ -92,6 +92,10 @@ class SyncSeedManager: SyncManagerProtcol {
 		startNameMonitor()
 		
 		startUpgradeTask()
+	}
+	
+	var encryptedNodeId: String {
+		walletInfo.encryptedNodeId
 	}
 	
 	// ----------------------------------------

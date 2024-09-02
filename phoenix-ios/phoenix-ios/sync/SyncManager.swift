@@ -27,18 +27,16 @@ class SyncManager {
 	init(
 		chain: Bitcoin_kmpChain,
 		recoveryPhrase: RecoveryPhrase,
-		cloudKey: Bitcoin_kmpByteVector32,
-		encryptedNodeId: String
+		walletInfo: WalletManager.WalletInfo
 	) {
 		
 		syncSeedManager = SyncSeedManager(
 			chain: chain,
 			recoveryPhrase: recoveryPhrase,
-			encryptedNodeId: encryptedNodeId
+			walletInfo: walletInfo
 		)
 		syncBackupManager = SyncBackupManager(
-			cloudKey: cloudKey,
-			encryptedNodeId: encryptedNodeId
+			walletInfo: walletInfo
 		)
 		
 		syncSeedManager.parent = self

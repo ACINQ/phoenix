@@ -14697,7 +14697,11 @@
         }
       }
     },
+    "Deleting **payment history** and **contacts** from iCloud" : {
+
+    },
     "Deleting **payment history** from iCloud" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -39032,7 +39036,11 @@
         }
       }
     },
+    "The **payment history** and **contacts** for this wallet will be deleted from your iCloud account." : {
+
+    },
     "The **payment history** for this wallet will be deleted from your iCloud account." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

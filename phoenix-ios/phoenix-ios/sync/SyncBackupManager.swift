@@ -49,19 +49,9 @@ class SyncBackupManager {
 	///
 	weak var parent: SyncManager? = nil
 	
-	/// The cloudKey is derived from the user's seed.
-	/// It's used to encrypt data before uploading to the cloud.
-	/// The data stored in the cloud is an encrypted blob, and requires the cloudKey for decryption.
+	/// The wallet info, such as nodeID, cloudKey, etc.
 	///
-	let cloudKey: SymmetricKey
-	
-	/// The encryptedNodeId is created via: Hash(cloudKey + nodeID)
-	///
-	/// All data from a user's wallet is stored in the user's CKContainer.default().privateCloudDatabase.
-	/// Within the privateCloudDatabase, we create a dedicated CKRecordZone for each wallet,
-	/// where recordZone.name == encryptedNodeId
-	///
-	let encryptedNodeId: String
+	let walletInfo: WalletManager.WalletInfo
 	
 	/// Informs the user interface regarding the activities of the SyncBackupManager.
 	/// This includes various errors & active upload progress.
@@ -87,12 +77,12 @@ class SyncBackupManager {
 	
 	private var cancellables = Set<AnyCancellable>()
 	
-	init(cloudKey: Bitcoin_kmpByteVector32, encryptedNodeId: String) {
+	init(walletInfo: WalletManager.WalletInfo) {
 		log.trace("init()")
 		
-		self.cloudKey = SymmetricKey(data: cloudKey.toByteArray().toSwiftData())
-		self.encryptedNodeId = encryptedNodeId
+		self.walletInfo = walletInfo
 		
+		let encryptedNodeId = walletInfo.encryptedNodeId
 		self.actor = SyncBackupManager_Actor(
 			isEnabled: Prefs.shared.backupTransactions.isEnabled,
 			recordZoneCreated: Prefs.shared.backupTransactions.recordZoneCreated(encryptedNodeId),
@@ -105,6 +95,15 @@ class SyncBackupManager {
 	
 	var cloudKitDb: CloudKitDb {
 		get { return _cloudKitDb! }
+	}
+	
+	var cloudKey: SymmetricKey {
+		let cloudKeyData = walletInfo.cloudKey.toByteArray().toSwiftData()
+		return SymmetricKey(data: cloudKeyData)
+	}
+	
+	var encryptedNodeId: String {
+		return walletInfo.encryptedNodeId
 	}
 	
 	// ----------------------------------------
@@ -329,9 +328,9 @@ class SyncBackupManager {
 			case .updatingCloud(let details):
 				switch details.kind {
 					case .creatingRecordZone:
-						createRecordZones(details)
+						createRecordZone(details)
 					case .deletingRecordZone:
-						deleteRecordZones(details)
+						deleteRecordZone(details)
 				}
 			case .downloading(let details):
 				if details.needsDownloadPayments {
@@ -388,11 +387,11 @@ class SyncBackupManager {
 	/// This allows us to properly segregate transactions between multiple wallets.
 	/// Before we can interact with the RecordZone we have to explicitly create it.
 	///
-	private func createRecordZones(_ state: SyncBackupManager_State_UpdatingCloud) {
-		log.trace("createRecordZones()")
+	private func createRecordZone(_ state: SyncBackupManager_State_UpdatingCloud) {
+		log.trace("createRecordZone()")
 		
 		state.task = Task {
-			log.trace("createRecordZones(): starting task")
+			log.trace("createRecordZone(): starting task")
 			
 			let privateCloudDatabase = CKContainer.default().privateCloudDatabase
 			
@@ -402,46 +401,33 @@ class SyncBackupManager {
 			do {
 				try await privateCloudDatabase.configuredWith(configuration: configuration) { database in
 				
-					log.trace("createRecordZones(): configured")
+					log.trace("createRecordZone(): configured")
 					
 					if state.isCancelled {
 						throw CKError(.operationCancelled)
 					}
 					
-					let paymentsRzId = paymentsRecordZoneID()
-					let contactsRzId = contactsRecordZoneID()
-					
-					let paymentsRecordZone = CKRecordZone(zoneID: paymentsRzId)
-					let contactsRecordZone = CKRecordZone(zoneID: contactsRzId)
+					let rzId = self.recordZoneID()
+					let recordZone = CKRecordZone(zoneID: rzId)
 					
 					let (saveResults, _) = try await database.modifyRecordZones(
-						saving: [paymentsRecordZone, contactsRecordZone],
+						saving: [recordZone],
 						deleting: []
 					)
 					
 					// saveResults: [CKRecordZone.ID : Result<CKRecordZone, Error>]
 					
-					if let paymentsResult = saveResults[paymentsRzId] {
-						if case let .failure(error) = paymentsResult {
-							log.warning("createRecordZones(): perZoneResult: paymentsRecordZone: failure")
+					if let result = saveResults[rzId] {
+						if case let .failure(error) = result {
+							log.warning("createRecordZone(): perZoneResult: failure")
 							throw error
 						}
 					} else {
-						log.error("createRecordZones(): result missing: paymentsRecordZone")
-						throw CKError(CKError.zoneNotFound)
-					}
-				
-					if let contactsResult = saveResults[contactsRzId] {
-						if case let .failure(error) = contactsResult {
-							log.warning("createRecordZones(): perZoneResult: contactsRecordZone: failure")
-							throw error
-						}
-					} else {
-						log.error("createRecordZones(): result missing: contactsRecordZone")
+						log.error("createRecordZone(): result missing: recordZone")
 						throw CKError(CKError.zoneNotFound)
 					}
 					
-					log.trace("createRecordZones(): perZoneResult: success")
+					log.trace("createRecordZone(): perZoneResult: success")
 					
 					Prefs.shared.backupTransactions.setRecordZoneCreated(true, self.encryptedNodeId)
 					self.consecutiveErrorCount = 0
@@ -454,17 +440,17 @@ class SyncBackupManager {
 				
 			} catch {
 				
-				log.error("createRecordZones(): error = \(error)")
+				log.error("createRecordZone(): error = \(error)")
 				self.handleError(error)
 			}
 		} // </Task>
 	}
 	
-	private func deleteRecordZones(_ state: SyncBackupManager_State_UpdatingCloud) {
-		log.trace("deleteRecordZones()")
+	private func deleteRecordZone(_ state: SyncBackupManager_State_UpdatingCloud) {
+		log.trace("deleteRecordZone()")
 		
 		state.task = Task {
-			log.trace("deleteRecordZones(): starting task")
+			log.trace("deleteRecordZone(): starting task")
 			
 			let privateCloudDatabase = CKContainer.default().privateCloudDatabase
 			
@@ -474,7 +460,7 @@ class SyncBackupManager {
 			do {
 				try await privateCloudDatabase.configuredWith(configuration: configuration) { database in
 				
-					log.trace("deleteRecordZones(): configured")
+					log.trace("deleteRecordZone(): configured")
 					
 					if state.isCancelled {
 						throw CKError(.operationCancelled)
@@ -482,37 +468,26 @@ class SyncBackupManager {
 					
 					// Step 1 of 2:
 					
-					let paymentsRzId = paymentsRecordZoneID()
-					let contactsRzId = contactsRecordZoneID()
+					let rzId = recordZoneID()
 					
 					let (_, deleteResults) = try await database.modifyRecordZones(
 						saving: [],
-						deleting: [paymentsRzId, contactsRzId]
+						deleting: [rzId]
 					)
 					
 					// deleteResults: [CKRecordZone.ID : Result<Void, Error>]
 					
-					if let paymentsResult = deleteResults[paymentsRzId] {
-						if case let .failure(error) = paymentsResult {
-							log.warning("deleteRecordZones(): perZoneResult: paymentsRecordZone: failure")
+					if let result = deleteResults[rzId] {
+						if case let .failure(error) = result {
+							log.warning("deleteRecordZone(): perZoneResult: failure")
 							throw error
 						}
 					} else {
-						log.error("deleteRecordZones(): result missing: paymentsRecordZone")
+						log.error("deleteRecordZone(): result missing: recordZone")
 						throw CKError(CKError.zoneNotFound)
 					}
 					
-					if let contactsResult = deleteResults[contactsRzId] {
-						if case let .failure(error) = contactsResult {
-							log.warning("deleteRecordZones(): perZoneResult: contactsRecordZone: failure")
-							throw error
-						}
-					} else {
-						log.error("deleteRecordZones(): result missing: contactsRecordZone")
-						throw CKError(CKError.zoneNotFound)
-					}
-					
-					log.trace("deleteRecordZones(): perZoneResult: success")
+					log.trace("deleteRecordZone(): perZoneResult: success")
 					
 					// Step 2 of 2:
 					
@@ -534,10 +509,26 @@ class SyncBackupManager {
 				
 			} catch {
 				
-				log.error("deleteRecordZones(): error = \(error)")
+				log.error("deleteRecordZone(): error = \(error)")
 				self.handleError(error)
 			}
 		} // </Task>
+	}
+	
+	// ----------------------------------------
+	// MARK: Record Zones
+	// ----------------------------------------
+	
+	func recordZoneName() -> String {
+		return self.encryptedNodeId
+	}
+	
+	func recordZoneID() -> CKRecordZone.ID {
+		
+		return CKRecordZone.ID(
+			zoneName: recordZoneName(),
+			ownerName: CKCurrentUserDefaultName
+		)
 	}
 	
 	// ----------------------------------------

@@ -79,7 +79,7 @@ extension SyncBackupManager {
 			 */
 			
 			let privateCloudDatabase = CKContainer.default().privateCloudDatabase
-			let zoneID = self.paymentsRecordZoneID()
+			let zoneID = self.recordZoneID()
 			
 			let configuration = CKOperation.Configuration()
 			configuration.allowsCellularAccess = true
@@ -641,20 +641,8 @@ extension SyncBackupManager {
 	}
 	
 	// ----------------------------------------
-	// MARK: Record Zones
+	// MARK: Record ID
 	// ----------------------------------------
-	
-	func paymentsRecordZoneName() -> String {
-		return self.encryptedNodeId
-	}
-	
-	func paymentsRecordZoneID() -> CKRecordZone.ID {
-		
-		return CKRecordZone.ID(
-			zoneName: paymentsRecordZoneName(),
-			ownerName: CKCurrentUserDefaultName
-		)
-	}
 	
 	private func recordID(paymentId: WalletPaymentId) -> CKRecord.ID {
 		
@@ -669,7 +657,7 @@ extension SyncBackupManager {
 		let digest = SHA256.hash(data: hashMe)
 		let hash = digest.map { String(format: "%02hhx", $0) }.joined()
 		
-		return CKRecord.ID(recordName: hash, zoneID: paymentsRecordZoneID())
+		return CKRecord.ID(recordName: hash, zoneID: recordZoneID())
 	}
 	
 	// ----------------------------------------
@@ -962,7 +950,7 @@ extension SyncBackupManager {
 		]
 		
 		let operation = CKQueryOperation(query: query)
-		operation.zoneID = self.paymentsRecordZoneID()
+		operation.zoneID = self.recordZoneID()
 		
 		recursiveListPaymentsBatch(operation: operation)
 	}

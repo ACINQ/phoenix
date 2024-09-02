@@ -76,7 +76,7 @@ extension SyncBackupManager {
 			 */
 			
 			let privateCloudDatabase = CKContainer.default().privateCloudDatabase
-			let zoneID = self.contactsRecordZoneID()
+			let zoneID = self.recordZoneID()
 			
 			let configuration = CKOperation.Configuration()
 			configuration.allowsCellularAccess = true
@@ -227,7 +227,7 @@ extension SyncBackupManager {
 				
 				log.trace("downloadContacts(): finish: success")
 				
-				Prefs.shared.backupTransactions.markHasDownloadedContacts(self.encryptedNodeId)
+				Prefs.shared.backupTransactions.markHasDownloadedContacts(self.walletInfo.encryptedNodeId)
 				self.consecutiveErrorCount = 0
 				
 				if let newState = await self.actor.didDownloadContacts() {
@@ -621,23 +621,8 @@ extension SyncBackupManager {
 	}
 	
 	// ----------------------------------------
-	// MARK: Record Zones
+	// MARK: Record ID
 	// ----------------------------------------
-	
-	func contactsRecordZoneName() -> String {
-		let localKeyManager = Biz.business.walletManager.keyManagerValue()!
-		let zoneName: String = localKeyManager.cloudHash(name: "contacts")
-		
-		return zoneName
-	}
-	
-	func contactsRecordZoneID() -> CKRecordZone.ID {
-		
-		return CKRecordZone.ID(
-			zoneName: contactsRecordZoneName(),
-			ownerName: CKCurrentUserDefaultName
-		)
-	}
 	
 	private func recordID(contactId: Lightning_kmpUUID) -> CKRecord.ID {
 		
@@ -652,7 +637,7 @@ extension SyncBackupManager {
 		let digest = SHA256.hash(data: hashMe)
 		let hash = digest.map { String(format: "%02hhx", $0) }.joined()
 		
-		return CKRecord.ID(recordName: hash, zoneID: contactsRecordZoneID())
+		return CKRecord.ID(recordName: hash, zoneID: recordZoneID())
 	}
 	
 	// ----------------------------------------
@@ -776,7 +761,7 @@ extension SyncBackupManager {
 		]
 		
 		let operation = CKQueryOperation(query: query)
-		operation.zoneID = contactsRecordZoneID()
+		operation.zoneID = recordZoneID()
 		
 		recursiveListContactsBatch(operation: operation)
 	}
@@ -843,7 +828,7 @@ extension SyncBackupManager {
 		]
 		
 		let operation = CKQueryOperation(query: query)
-		operation.zoneID = contactsRecordZoneID()
+		operation.zoneID = recordZoneID()
 		
 		findContactsBatch(operation: operation)
 	}
