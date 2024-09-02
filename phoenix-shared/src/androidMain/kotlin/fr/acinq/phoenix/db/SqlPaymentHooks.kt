@@ -1,5 +1,6 @@
 package fr.acinq.phoenix.db
 
+import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.db.payments.CloudKitInterface
 
