@@ -14453,7 +14453,11 @@
         }
       }
     },
+    "Delete payment history and contacts from my iCloud account." : {
+
+    },
     "Delete payment history from my iCloud account." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -30285,7 +30289,11 @@
         }
       }
     },
+    "Payment history and contacts not stored in iCloud." : {
+
+    },
     "Payment history not stored in iCloud." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

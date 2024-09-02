@@ -129,7 +129,7 @@ struct ResetWalletView_Action: View {
 		Section {
 			
 			Label {
-				Text("Deleting **payment history** from iCloud")
+				Text("Deleting **payment history** and **contacts** from iCloud")
 			} icon: {
 				Image(systemName: "icloud.fill")
 			}
