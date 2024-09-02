@@ -628,9 +628,9 @@ extension SyncBackupManager {
 		
 		// The recordID is:
 		// - deterministic => by hashing the contactId
-		// - secure => by mixing in the secret cloudKey (derived from seed)
+		// - secure => by mixing in the nodeIdHash (nodeKey.publicKey.hash160)
 		
-		let prefix = SHA256.hash(data: cloudKey.rawRepresentation)
+		let prefix = walletInfo.nodeIdHash.data(using: .utf8)!
 		let suffix = contactId.description().data(using: .utf8)!
 		
 		let hashMe = prefix + suffix
