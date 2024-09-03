@@ -70,6 +70,7 @@ class AppViewModel(
     val serviceState = ServiceStateLiveData(_service)
 
     val isScreenLocked = mutableStateOf(true)
+    val promptScreenLockImmediately = mutableStateOf(true)
 
     private val autoLockHandler = Handler(Looper.getMainLooper())
     private val autoLockRunnable: Runnable = Runnable { lockScreen() }
@@ -124,11 +125,6 @@ class AppViewModel(
             }
         }
     }
-}
-
-sealed class LockState {
-    data object SettingUp: LockState()
-
 }
 
 class ServiceStateLiveData(service: MutableLiveData<NodeService?>) : MediatorLiveData<NodeServiceState>() {
