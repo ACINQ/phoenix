@@ -169,11 +169,6 @@ fun AppView(
         )
         MonitorNotices(vm = noticesViewModel)
 
-        val legacyAppStatus = LegacyPrefsDatastore.getLegacyAppStatus(context).collectAsState(null)
-        if (legacyAppStatus.value is LegacyAppStatus.Required && navController.currentDestination?.route != Screen.SwitchToLegacy.route) {
-            navController.navigate(Screen.SwitchToLegacy.route)
-        }
-
         val walletState by appVM.serviceState.observeAsState(null)
 
         Column(
@@ -506,6 +501,11 @@ fun AppView(
                         ExperimentalView(onBackClick = { navController.popBackStack() })
                     }
                 }
+
+                val legacyAppStatus = LegacyPrefsDatastore.getLegacyAppStatus(context).collectAsState(null)
+                if (legacyAppStatus.value is LegacyAppStatus.Required && navController.currentDestination?.route != Screen.SwitchToLegacy.route) {
+                    navController.navigate(Screen.SwitchToLegacy.route)
+                }
             }
         }
     }
@@ -542,7 +542,9 @@ private fun popToHome(navController: NavHostController) {
 }
 
 fun navigateToPaymentDetails(navController: NavController, id: WalletPaymentId, isFromEvent: Boolean) {
-    navController.navigate("${Screen.PaymentDetails.route}?direction=${id.dbType.value}&id=${id.dbId}&fromEvent=${isFromEvent}")
+    try {
+        navController.navigate("${Screen.PaymentDetails.route}?direction=${id.dbType.value}&id=${id.dbId}&fromEvent=${isFromEvent}")
+    } catch (_: Exception) { }
 }
 
 
