@@ -25,8 +25,8 @@ android {
         applicationId = "fr.acinq.phoenix.mainnet"
         minSdk = 26
         targetSdk = 34
-        versionCode = 88
-        versionName = "2.3.7"
+        versionCode = 89
+        versionName = gitCommitHash()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         resourceConfigurations.addAll(listOf("en", "fr", "de", "es", "b+es+419", "cs", "pt-rBR", "sk", "vi", "sw"))
     }

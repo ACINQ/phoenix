@@ -21,8 +21,10 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.text.format.DateUtils
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -107,6 +109,7 @@ import fr.acinq.phoenix.android.startup.StartupView
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
 import fr.acinq.phoenix.android.utils.appBackground
 import fr.acinq.phoenix.android.utils.logger
+import fr.acinq.phoenix.android.utils.safeFindActivity
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.WalletPaymentId
@@ -169,30 +172,15 @@ fun AppView(
         )
         MonitorNotices(vm = noticesViewModel)
 
-        val legacyAppStatus = LegacyPrefsDatastore.getLegacyAppStatus(context).collectAsState(null)
-        if (legacyAppStatus.value is LegacyAppStatus.Required && navController.currentDestination?.route != Screen.SwitchToLegacy.route) {
-            navController.navigate(Screen.SwitchToLegacy.route)
-        }
-
         val walletState by appVM.serviceState.observeAsState(null)
 
-        Column(
-            Modifier
-                .background(appBackground())
-                .fillMaxWidth()
-                .fillMaxHeight()
-        ) {
-            val isScreenLocked by appVM.isScreenLocked
-            val isBiometricLockEnabledState = userPrefs.getIsBiometricLockEnabled.collectAsState(initial = null)
-            val isBiometricLockEnabled = isBiometricLockEnabledState.value
-            val isCustomPinLockEnabledState = userPrefs.getIsCustomPinLockEnabled.collectAsState(initial = null)
-            val isCustomPinLockEnabled = isCustomPinLockEnabledState.value
-
-            if (isBiometricLockEnabled == null || isCustomPinLockEnabled == null) {
-                // wait for preferences to load
-            } else if (isScreenLocked && (isBiometricLockEnabled || isCustomPinLockEnabled)) {
-                LockPrompt(onLock = { appVM.lockScreen() }, onUnlock = { appVM.unlockScreen() })
-            } else {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                Modifier
+                    .background(appBackground())
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+            ) {
                 NavHost(
                     navController = navController,
                     startDestination = "${Screen.Startup.route}?next={next}",
@@ -303,7 +291,13 @@ fun AppView(
                             } ?: it.arguments?.getString("input")
                             ScanDataView(
                                 input = input,
-                                onBackClick = { navController.popBackStack() },
+                                onBackClick = {
+                                    if (navController.previousBackStackEntry != null) {
+                                        navController.popBackStack()
+                                    } else {
+                                        popToHome(navController)
+                                    }
+                                },
                                 onAuthSchemeInfoClick = { navController.navigate("${Screen.PaymentSettings.route}/true") },
                                 onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) },
                                 onProcessingFinished = { popToHome(navController) },
@@ -336,7 +330,7 @@ fun AppView(
                                         val previousNav = navController.previousBackStackEntry
                                         if (fromEvent && previousNav?.destination?.route == Screen.ScanData.route) {
                                             popToHome(navController)
-                                        } else if (navController.previousBackStackEntry != null){
+                                        } else if (navController.previousBackStackEntry != null) {
                                             navController.popBackStack()
                                         } else {
                                             popToHome(navController)
@@ -506,6 +500,32 @@ fun AppView(
                         ExperimentalView(onBackClick = { navController.popBackStack() })
                     }
                 }
+
+                val legacyAppStatus = LegacyPrefsDatastore.getLegacyAppStatus(context).collectAsState(null)
+                if (legacyAppStatus.value is LegacyAppStatus.Required && navController.currentDestination?.route != Screen.SwitchToLegacy.route) {
+                    navController.navigate(Screen.SwitchToLegacy.route)
+                }
+            }
+
+            val isScreenLocked by appVM.isScreenLocked
+            val isBiometricLockEnabledState = userPrefs.getIsBiometricLockEnabled.collectAsState(initial = null)
+            val isBiometricLockEnabled = isBiometricLockEnabledState.value
+            val isCustomPinLockEnabledState = userPrefs.getIsCustomPinLockEnabled.collectAsState(initial = null)
+            val isCustomPinLockEnabled = isCustomPinLockEnabledState.value
+
+            if ((isBiometricLockEnabled == true || isCustomPinLockEnabled == true) && isScreenLocked) {
+                BackHandler {
+                    // back button minimises the app
+                    context.safeFindActivity()?.moveTaskToBack(false)
+                }
+                LockPrompt(
+                    promptScreenLockImmediately = appVM.promptScreenLockImmediately.value,
+                    onLock = { appVM.lockScreen() },
+                    onUnlock = {
+                        appVM.unlockScreen()
+                        appVM.promptScreenLockImmediately.value = false
+                    },
+                )
             }
         }
     }
@@ -542,7 +562,9 @@ private fun popToHome(navController: NavHostController) {
 }
 
 fun navigateToPaymentDetails(navController: NavController, id: WalletPaymentId, isFromEvent: Boolean) {
-    navController.navigate("${Screen.PaymentDetails.route}?direction=${id.dbType.value}&id=${id.dbId}&fromEvent=${isFromEvent}")
+    try {
+        navController.navigate("${Screen.PaymentDetails.route}?direction=${id.dbType.value}&id=${id.dbId}&fromEvent=${isFromEvent}")
+    } catch (_: Exception) { }
 }
 
 
