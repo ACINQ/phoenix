@@ -30,7 +30,7 @@ android {
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
   buildTypes {
-    val libCode = 88
+    val libCode = 89
     getByName("debug") {
       resValue("string", "CHAIN", chain)
       buildConfigField("String", "CHAIN", chain)
