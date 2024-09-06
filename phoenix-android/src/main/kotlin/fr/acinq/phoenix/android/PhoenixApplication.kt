@@ -18,6 +18,7 @@ package fr.acinq.phoenix.android
 
 import android.content.Intent
 import fr.acinq.phoenix.PhoenixBusiness
+import fr.acinq.phoenix.android.services.NodeService
 import fr.acinq.phoenix.android.utils.Logging
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
 import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
@@ -31,13 +32,16 @@ import fr.acinq.phoenix.utils.PlatformContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class PhoenixApplication : AppContext() {
+abstract class PhoenixApplication : AppContext() {
 
     private val _business = MutableStateFlow<PhoenixBusiness?>(null)
     val business = _business.asStateFlow()
 
     lateinit var internalDataRepository: InternalDataRepository
     lateinit var userPrefs: UserPrefsRepository
+
+    abstract val mainActivityClass: Class<out MainActivity>
+    abstract val nodeServiceClass: Class<out NodeService>
 
     override fun onCreate() {
         super.onCreate()
@@ -49,7 +53,7 @@ class PhoenixApplication : AppContext() {
     }
 
     override fun onLegacyFinish() {
-        applicationContext.startActivity(Intent(applicationContext, MainActivity::class.java).apply {
+        applicationContext.startActivity(Intent(applicationContext, mainActivityClass).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         })
     }
@@ -59,6 +63,7 @@ class PhoenixApplication : AppContext() {
         business.value?.appConnectionsDaemon?.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.All)
         business.value?.stop()
     }
+
     fun resetBusiness() {
         _business.value = PhoenixBusiness(PlatformContext(this))
         log.info("business=$business")

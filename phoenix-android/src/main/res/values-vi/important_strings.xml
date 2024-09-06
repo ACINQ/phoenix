@@ -90,8 +90,7 @@
     <string name="home_swapin_help_button">Nhấn để biết thêm chi tiết</string>
 
     <string name="home_background_restriction_title">Hạn chế xử lý nền</string>
-    <string name="home_background_restriction_body_1">Phoenix sẽ không thể nhận thanh toán khi nó ở chế độ nền hoặc khi nó bị đóng.</string>
-    <string name="home_background_restriction_body_2">Điều này xảy ra vì:</string>
+    <string name="home_background_restriction_body_1">Phoenix có thể không nhận được thanh toán khi đang ở chế độ nền hoặc khi đóng cửa.</string>
     <string name="home_background_restriction_tor">Tor đã được bật</string>
     <string name="home_background_restriction_powersaver">Thiết bị đang ở chế độ tiết kiệm năng lượng</string>
     <string name="home_background_restriction_fcm">Thông báo FCM không khả dụng</string>

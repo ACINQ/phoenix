@@ -128,7 +128,8 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
                         service.value = null
                     }
                 }
-                Intent(applicationContext, NodeService::class.java).let { intent ->
+
+                Intent(applicationContext, application.nodeServiceClass).let { intent ->
                     applicationContext.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
                 }
 

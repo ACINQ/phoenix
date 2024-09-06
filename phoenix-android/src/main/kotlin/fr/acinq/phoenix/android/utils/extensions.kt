@@ -17,22 +17,18 @@
 package fr.acinq.phoenix.android.utils
 
 import android.content.*
-import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.core.content.FileProvider
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.utils.Connection
-import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.utils.extensions.desc
-import java.io.File
 import java.security.cert.CertificateException
 import java.util.*
 import kotlin.contracts.ExperimentalContracts

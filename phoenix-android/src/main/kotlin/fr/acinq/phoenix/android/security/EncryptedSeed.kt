@@ -73,7 +73,7 @@ sealed class EncryptedSeed {
       private const val NO_AUTH_KEY_VERSION = 1
       private const val REMOVED_DO_NOT_USE = 2
 
-      fun deserialize(stream: ByteArrayInputStream): V2 {
+      fun deserialize(stream: ByteArrayInputStream): V2.NoAuth {
         val keyVersion = stream.read()
         val iv = ByteArray(IV_LENGTH)
         stream.read(iv, 0, IV_LENGTH)
@@ -93,7 +93,7 @@ sealed class EncryptedSeed {
     const val SEED_FILE_VERSION_2: Byte = 2
 
     /** Reads an array of byte and de-serializes it as an [EncryptedSeed] object. */
-    fun deserialize(serialized: ByteArray): EncryptedSeed {
+    fun deserialize(serialized: ByteArray): EncryptedSeed.V2.NoAuth {
       val stream = ByteArrayInputStream(serialized)
       val version = stream.read()
       return when (version) {

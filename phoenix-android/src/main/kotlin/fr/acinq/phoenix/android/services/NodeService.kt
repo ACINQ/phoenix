@@ -2,33 +2,30 @@ package fr.acinq.phoenix.android.services
 
 import android.app.Notification
 import android.app.Service
+import android.content.Context
 import android.content.Intent
-import android.content.pm.ServiceInfo
 import android.os.Binder
 import android.os.Build
-import android.os.Handler
 import android.os.IBinder
-import android.os.Looper
 import android.text.format.DateUtils
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.ServiceCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.work.WorkManager
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.messaging.FirebaseMessaging
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.io.PaymentReceived
-import fr.acinq.lightning.utils.Connection
+import fr.acinq.lightning.PaymentEvents
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.security.EncryptedSeed
-import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.LegacyMigrationHelper
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
 import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
@@ -44,30 +41,30 @@ import fr.acinq.phoenix.utils.MnemonicLanguage
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.time.Duration.Companion.hours
 
-class NodeService : Service() {
+abstract class NodeService : Service() {
 
-    private val log = LoggerFactory.getLogger(this::class.java)
-    private val serviceScope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
+    internal val log = LoggerFactory.getLogger(this::class.java)
+
+    internal val serviceScope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
     lateinit var internalData: InternalDataRepository
     private val binder = NodeBinder()
 
-    /** True if the service is running headless (that is without a GUI). In that case we should show a notification */
-    @Volatile
-    private var isHeadless = true
+    var isHeadless by mutableStateOf(false)
 
-    // Notifications
-    private lateinit var notificationManager: NotificationManagerCompat
+    lateinit var notificationManager: NotificationManagerCompat
 
     /** State of the wallet, provides access to the business when started. Private so that it's not mutated from the outside. */
     private val _state = MutableLiveData<NodeServiceState>(NodeServiceState.Off)
@@ -77,7 +74,7 @@ class NodeService : Service() {
     private val stateLock = ReentrantLock()
 
     /** List of payments received while the app is in the background */
-    private val receivedInBackground = mutableStateListOf<MilliSatoshi>()
+    val receivedInBackground = mutableStateListOf<MilliSatoshi>()
 
     // jobs monitoring events/payments after business start
     private var monitorPaymentsJob: Job? = null
@@ -87,112 +84,70 @@ class NodeService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        log.debug("creating node service...")
+        log.info("creating node service...")
         internalData = (applicationContext as PhoenixApplication).internalDataRepository
         notificationManager = NotificationManagerCompat.from(this)
         refreshFcmToken()
         log.debug("service created")
     }
 
-    internal fun refreshFcmToken() {
-        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                log.warn("fetching FCM registration token failed: ${task.exception?.localizedMessage}")
-                return@OnCompleteListener
-            }
-            task.result?.let { serviceScope.launch { internalData.saveFcmToken(it) } }
-        })
-    }
+    abstract fun refreshFcmToken()
+    abstract fun deleteFcmToken()
+
+    abstract fun isFcmAvailable(context: Context): Boolean
+
+    abstract suspend fun monitorFcmToken(business: PhoenixBusiness)
 
     // =========================================================== //
     //                      SERVICE LIFECYCLE                      //
     // =========================================================== //
 
     override fun onBind(intent: Intent?): IBinder {
-        log.debug("binding node service from intent=$intent")
-        // UI is binding to the service. The service is not headless anymore and we can remove the notification.
-        isHeadless = false
+        log.debug("binding node service from intent={}", intent)
         receivedInBackground.clear()
-        stopForeground(STOP_FOREGROUND_REMOVE)
-        notificationManager.cancel(SystemNotificationHelper.HEADLESS_NOTIF_ID)
         return binder
     }
 
     /** When unbound, the service is running headless. */
     override fun onUnbind(intent: Intent?): Boolean {
-        isHeadless = true
         return false
     }
 
-    private val shutdownHandler = Handler(Looper.getMainLooper())
-    private val shutdownRunnable: Runnable = Runnable {
-        if (isHeadless) {
-            log.debug("reached scheduled shutdown...")
-            if (receivedInBackground.isEmpty()) {
-                stopForeground(STOP_FOREGROUND_REMOVE)
-            } else {
-                stopForeground(STOP_FOREGROUND_DETACH)
-            }
-            shutdown()
-        }
+    override fun onTimeout(startId: Int) {
+        super.onTimeout(startId)
+        stopForeground(STOP_FOREGROUND_REMOVE)
+        notificationManager.cancel(SystemNotificationHelper.HEADLESS_NOTIF_ID)
+        shutdown()
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        log.info("service destroyed")
+    }
+
+    // =========================================================== //
+    //                          UTILITY                            //
+    // =========================================================== //
 
     /** Shutdown the node, close connections and stop the service */
     fun shutdown() {
         log.info("shutting down service in state=${_state.value?.name}")
-        monitorNodeEventsJob?.cancel()
-        stopSelf()
-        _state.postValue(NodeServiceState.Off)
+        serviceScope.launch {
+            (application as? PhoenixApplication)?.business?.first()?.stop()
+            monitorNodeEventsJob?.cancel()
+            stopSelf()
+            _state.postValue(NodeServiceState.Off)
+            log.info("shutdown complete")
+        }
     }
 
-    // =========================================================== //
-    //                    START COMMAND HANDLER                    //
-    // =========================================================== //
-
-    /** Called when an intent is called for this service. */
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        super.onStartCommand(intent, flags, startId)
-        log.info("start service from intent [ intent=$intent, flag=$flags, startId=$startId ]")
-        val reason = intent?.getStringExtra(EXTRA_REASON)
-
-        fun startForeground(notif: Notification) {
-            if (Build.VERSION.SDK_INT >= 34) {
-                ServiceCompat.startForeground(this, SystemNotificationHelper.HEADLESS_NOTIF_ID, notif, ServiceInfo.FOREGROUND_SERVICE_TYPE_SHORT_SERVICE)
-            } else {
-                startForeground(SystemNotificationHelper.HEADLESS_NOTIF_ID, notif)
-            }
+    internal fun startForeground(notif: Notification, foregroundServiceType: Int) {
+        log.info("--- starting service in foreground with type=$foregroundServiceType ---")
+        if (Build.VERSION.SDK_INT >= 34) {
+            ServiceCompat.startForeground(this, SystemNotificationHelper.HEADLESS_NOTIF_ID, notif, foregroundServiceType)
+        } else {
+            startForeground(SystemNotificationHelper.HEADLESS_NOTIF_ID, notif)
         }
-
-        val encryptedSeed = SeedManager.loadSeedFromDisk(applicationContext)
-        when {
-            _state.value is NodeServiceState.Running -> {
-                // NOTE: the notification will NOT be shown if the app is already running
-                val notif = SystemNotificationHelper.notifyRunningHeadless(applicationContext)
-                startForeground(notif)
-            }
-            encryptedSeed is EncryptedSeed.V2.NoAuth -> {
-                val seed = encryptedSeed.decrypt()
-                log.debug("successfully decrypted seed in the background, starting wallet...")
-                val notif = SystemNotificationHelper.notifyRunningHeadless(applicationContext)
-                startBusiness(seed, requestCheckLegacyChannels = false)
-                startForeground(notif)
-            }
-            else -> {
-                log.warn("unhandled incoming payment with seed=${encryptedSeed?.name()} reason=$reason")
-                val notif = when (reason) {
-                    "IncomingPayment" -> SystemNotificationHelper.notifyPaymentMissedAppUnavailable(applicationContext)
-                    "PendingSettlement" -> SystemNotificationHelper.notifyPendingSettlement(applicationContext)
-                    else -> SystemNotificationHelper.notifyRunningHeadless(applicationContext)
-                }
-                startForeground(notif)
-            }
-        }
-        shutdownHandler.removeCallbacksAndMessages(null)
-        shutdownHandler.postDelayed(shutdownRunnable, 2 * 60 * 1000L) // service will shutdown in 2 minutes
-        if (!isHeadless) {
-            stopForeground(STOP_FOREGROUND_REMOVE)
-        }
-        return START_NOT_STICKY
     }
 
     // =========================================================== //
@@ -216,10 +171,6 @@ class NodeService : Service() {
         serviceScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
             log.error("error when starting node: ", e)
             _state.postValue(NodeServiceState.Error(e))
-            if (isHeadless) {
-                shutdown()
-                stopForeground(STOP_FOREGROUND_REMOVE)
-            }
         }) {
             log.info("cancel competing workers")
             val wm = WorkManager.getInstance(applicationContext)
@@ -257,7 +208,7 @@ class NodeService : Service() {
         val trustedSwapInTxs = LegacyPrefsDatastore.getMigrationTrustedSwapInTxs(applicationContext).first()
         val preferredFiatCurrency = userPrefs.getFiatCurrency.first()
 
-        monitorPaymentsJob = serviceScope.launch { monitorPaymentsWhenHeadless(business.peerManager, business.currencyManager, userPrefs) }
+        monitorPaymentsJob = serviceScope.launch { monitorPaymentsWhenHeadless(business.nodeParamsManager, business.currencyManager, userPrefs) }
         monitorNodeEventsJob = serviceScope.launch { monitorNodeEvents(business.peerManager, business.nodeParamsManager) }
         monitorFcmTokenJob = serviceScope.launch { monitorFcmToken(business) }
         monitorInFlightPaymentsJob = serviceScope.launch { monitorInFlightPayments(business.peerManager) }
@@ -286,21 +237,14 @@ class NodeService : Service() {
         }
     }
 
-    private suspend fun monitorFcmToken(business: PhoenixBusiness) {
-        val token = internalData.getFcmToken.filterNotNull().first()
-        business.connectionsManager.connections.first { it.peer == Connection.ESTABLISHED }
-        business.registerFcmToken(token)
-    }
-
     private suspend fun monitorNodeEvents(peerManager: PeerManager, nodeParamsManager: NodeParamsManager) {
         val monitoringStartedAt = currentTimestampMillis()
         combine(peerManager.swapInNextTimeout, nodeParamsManager.nodeParams.filterNotNull().first().nodeEvents) { nextTimeout, nodeEvent ->
             nextTimeout to nodeEvent
         }.collect { (nextTimeout, event) ->
-            // TODO: click on notif must deeplink to the notification screen
             when (event) {
                 is LiquidityEvents.Rejected -> {
-                    log.debug("processing liquidity_event=$event")
+                    log.debug("processing liquidity_event={}", event)
                     if (event.source == LiquidityEvents.Source.OnChainWallet) {
                         // Check the last time a rejected on-chain swap notification has been shown. If recent, we do not want to trigger a notification every time.
                         val lastRejectedSwap = internalData.getLastRejectedOnchainSwap.first().takeIf {
@@ -337,19 +281,20 @@ class NodeService : Service() {
         }
     }
 
-    private suspend fun monitorPaymentsWhenHeadless(peerManager: PeerManager, currencyManager: CurrencyManager, userPrefs: UserPrefsRepository) {
-        peerManager.getPeer().eventsFlow.collect { event ->
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private suspend fun monitorPaymentsWhenHeadless(nodeParamsManager: NodeParamsManager, currencyManager: CurrencyManager, userPrefs: UserPrefsRepository) {
+        nodeParamsManager.nodeParams.filterNotNull().flatMapLatest { it.nodeEvents }.collect { event ->
             when (event) {
-                is PaymentReceived -> {
+                is PaymentEvents.PaymentReceived -> {
                     if (isHeadless) {
-                        receivedInBackground.add(event.received.amount)
+                        receivedInBackground.add(event.amount)
                         SystemNotificationHelper.notifyPaymentsReceived(
                             context = applicationContext,
                             userPrefs = userPrefs,
-                            paymentHash = event.incomingPayment.paymentHash,
-                            amount = event.received.amount,
+                            paymentHash = event.paymentHash,
+                            amount = event.amount,
                             rates = currencyManager.ratesFlow.value,
-                            isHeadless = isHeadless && receivedInBackground.size == 1
+                            isFromBackground = isHeadless
                         )
                     }
                 }
@@ -376,5 +321,8 @@ class NodeService : Service() {
 
     companion object {
         const val EXTRA_REASON = "${BuildConfig.APPLICATION_ID}.SERVICE_SPAWN_REASON"
+        const val EXTRA_ORIGIN = "${BuildConfig.APPLICATION_ID}.SERVICE_SPAWN_ORIGIN"
+        const val ORIGIN_FCM = "fcm"
+        const val ORIGIN_HEADLESS = "fcm"
     }
 }

@@ -31,7 +31,6 @@ import androidx.navigation.*
 import androidx.navigation.compose.rememberNavController
 import fr.acinq.lightning.io.PhoenixAndroidLegacyInfoEvent
 import fr.acinq.lightning.utils.Connection
-import fr.acinq.phoenix.android.services.NodeService
 import fr.acinq.phoenix.android.utils.LegacyMigrationHelper
 import fr.acinq.phoenix.android.utils.PhoenixAndroidTheme
 import fr.acinq.phoenix.legacy.utils.*
@@ -47,10 +46,10 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 
-class MainActivity : AppCompatActivity() {
+abstract class MainActivity : AppCompatActivity() {
 
     val log: Logger = LoggerFactory.getLogger(MainActivity::class.java)
-    private val appViewModel: AppViewModel by viewModels { AppViewModel.Factory }
+    internal val appViewModel: AppViewModel by viewModels { AppViewModel.Factory }
 
     private var navController: NavHostController? = null
 
@@ -151,15 +150,15 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        Intent(this, NodeService::class.java).let { intent ->
-            applicationContext.bindService(intent, appViewModel.serviceConnection, Context.BIND_AUTO_CREATE or Context.BIND_ADJUST_WITH_ACTIVITY)
-        }
+        bindService()
     }
 
     override fun onResume() {
         super.onResume()
         tryReconnect()
     }
+
+    abstract fun bindService()
 
     private fun tryReconnect() {
         lifecycleScope.launch {

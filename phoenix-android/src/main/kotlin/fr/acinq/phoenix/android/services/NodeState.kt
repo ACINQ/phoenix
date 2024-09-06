@@ -29,11 +29,11 @@ sealed class NodeServiceState {
     val name: String by lazy { this.javaClass.simpleName }
 
     /** Default state, the node is not started. */
-    object Off : NodeServiceState()
+    data object Off : NodeServiceState()
 
     /** This is an utility state that is used when the binding between the service holding the state and the consumers of that state is disconnected. */
-    object Disconnected : NodeServiceState()
-    object Init : NodeServiceState()
-    object Running : NodeServiceState()
+    data object Disconnected : NodeServiceState()
+    data object Init : NodeServiceState()
+    data object Running : NodeServiceState()
     data class Error(val cause: Throwable) : NodeServiceState()
 }

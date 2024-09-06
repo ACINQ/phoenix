@@ -1,0 +1,36 @@
+<!--
+  ~ Copyright 2024 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <string name="home_background_restriction_headless">Background service mode is disabled</string>
+    <string name="home_background_restriction_headless_desc">Tap for details.</string>
+
+    <string name="background_header">Background processing</string>
+    <string name="background_mode_title">Background service mode</string>
+    <string name="background_mode_off">Not running. Enable to improve payments reliability</string>
+    <string name="background_mode_on_wakelock">Service is running (wakelock enabled)</string>
+    <string name="background_mode_on_no_wakelock">Service is running</string>
+
+    <string name="background_mode_dialog_title">Always-on service</string>
+    <string name="background_mode_dialog_desc">When enabled, Phoenix will keep running as a background service even if the app is closed, allowing you to receive payments more reliably.</string>
+    <string name="background_mode_dialog_perfs_title">Performance cost</string>
+    <string name="background_mode_dialog_perfs_desc">Phoenix battery usage will increase significantly.</string>
+    <string name="background_mode_dialog_wakelock_title">Keep wake-lock</string>
+    <string name="background_mode_dialog_wakelock_desc">Makes the service more reliable, but uses much more battery.</string>
+    <string name="background_mode_dialog_alternative_title">Alternatives</string>
+    <string name="background_mode_dialog_alternative_desc">If you prefer optimised, just-in-time notifications for background processing, install the Google Play version of Phoenix instead.</string>
+
+</resources>

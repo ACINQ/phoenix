@@ -58,7 +58,6 @@ import androidx.navigation.navOptions
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import com.google.firebase.messaging.FirebaseMessaging
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.PhoenixBusiness
@@ -136,7 +135,7 @@ fun LoadingAppView() {
 @Composable
 fun AppView(
     business: PhoenixBusiness,
-    appVM: AppViewModel,
+    appViewModel: AppViewModel,
     navController: NavHostController,
 ) {
     val log = logger("Navigation")
@@ -172,7 +171,7 @@ fun AppView(
         )
         MonitorNotices(vm = noticesViewModel)
 
-        val walletState by appVM.serviceState.observeAsState(null)
+        val walletState by appViewModel.serviceState.observeAsState(null)
 
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -202,7 +201,7 @@ fun AppView(
                             null
                         }
                         StartupView(
-                            appVM = appVM,
+                            appVM = appViewModel,
                             onShowIntro = { navController.navigate(Screen.Intro.route) },
                             onKeyAbsent = { navController.navigate(Screen.InitWallet.route) },
                             onBusinessStarted = {
@@ -237,6 +236,7 @@ fun AppView(
                     composable(Screen.Home.route) {
                         RequireStarted(walletState) {
                             HomeView(
+                                appViewModel = appViewModel,
                                 paymentsViewModel = paymentsViewModel,
                                 noticesViewModel = noticesViewModel,
                                 onPaymentClick = { navigateToPaymentDetails(navController, id = it, isFromEvent = false) },
@@ -415,7 +415,7 @@ fun AppView(
                         )
                     }
                     composable(Screen.AppLock.route) {
-                        AppAccessSettings(onBackClick = { navController.popBackStack() }, appViewModel = appVM)
+                        AppAccessSettings(onBackClick = { navController.popBackStack() }, appViewModel = appViewModel)
                     }
                     composable(Screen.Logs.route) {
                         LogsView()
@@ -477,7 +477,7 @@ fun AppView(
                         )
                     }
                     composable(Screen.ResetWallet.route) {
-                        appVM.service?.let { nodeService ->
+                        appViewModel.service?.let { nodeService ->
                             val application = application
                             ResetWallet(
                                 onShutdownBusiness = application::shutdownBusiness,
@@ -485,9 +485,7 @@ fun AppView(
                                 onPrefsClear = application::clearPreferences,
                                 onBusinessReset = {
                                     application.resetBusiness()
-                                    FirebaseMessaging.getInstance().deleteToken().addOnCompleteListener { task ->
-                                        if (task.isSuccessful) nodeService.refreshFcmToken()
-                                    }
+                                    nodeService.deleteFcmToken()
                                 },
                                 onBackClick = { navController.popBackStack() }
                             )
@@ -497,7 +495,7 @@ fun AppView(
                         SettingsContactsView(onBackClick = { navController.popBackStack() })
                     }
                     composable(Screen.Experimental.route) {
-                        ExperimentalView(onBackClick = { navController.popBackStack() })
+                        ExperimentalView(onBackClick = { navController.popBackStack() }, appViewModel = appViewModel)
                     }
                 }
 
@@ -507,7 +505,7 @@ fun AppView(
                 }
             }
 
-            val isScreenLocked by appVM.isScreenLocked
+            val isScreenLocked by appViewModel.isScreenLocked
             val isBiometricLockEnabledState = userPrefs.getIsBiometricLockEnabled.collectAsState(initial = null)
             val isBiometricLockEnabled = isBiometricLockEnabledState.value
             val isCustomPinLockEnabledState = userPrefs.getIsCustomPinLockEnabled.collectAsState(initial = null)
@@ -519,11 +517,11 @@ fun AppView(
                     context.safeFindActivity()?.moveTaskToBack(false)
                 }
                 LockPrompt(
-                    promptScreenLockImmediately = appVM.promptScreenLockImmediately.value,
-                    onLock = { appVM.lockScreen() },
+                    promptScreenLockImmediately = appViewModel.promptScreenLockImmediately.value,
+                    onLock = { appViewModel.lockScreen() },
                     onUnlock = {
-                        appVM.unlockScreen()
-                        appVM.promptScreenLockImmediately.value = false
+                        appViewModel.unlockScreen()
+                        appViewModel.promptScreenLockImmediately.value = false
                     },
                 )
             }
@@ -539,7 +537,7 @@ fun AppView(
             if (isDataMigrationExpected == false) {
                 if (payment is IncomingPayment && payment.origin is IncomingPayment.Origin.Offer) {
                     SystemNotificationHelper.notifyPaymentsReceived(
-                        context, userPrefs, paymentHash = payment.paymentHash, amount = payment.amount, rates = exchangeRates, isHeadless = false
+                        context, userPrefs, paymentHash = payment.paymentHash, amount = payment.amount, rates = exchangeRates, isFromBackground = false
                     )
                 } else {
                     navigateToPaymentDetails(navController, id = payment.walletPaymentId(), isFromEvent = true)

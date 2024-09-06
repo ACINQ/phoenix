@@ -83,8 +83,7 @@
     <string name="home_swapin_help_button">Toque para obter detalhes</string>
 
     <string name="home_background_restriction_title">Processamento em segundo plano restrito</string>
-    <string name="home_background_restriction_body_1">O Phoenix não poderá receber pagamentos quando estiver em segundo plano ou quando estiver fechado.</string>
-    <string name="home_background_restriction_body_2">Isso acontece porque:</string>
+    <string name="home_background_restriction_body_1">A Phoenix pode não conseguir receber pagamentos quando estiver em segundo plano ou quando estiver fechado.</string>
     <string name="home_background_restriction_tor">Tor está ativado</string>
     <string name="home_background_restriction_powersaver">O dispositivo está no modo de economia de energia</string>
     <string name="home_background_restriction_fcm">FCM notificações indisponíveis</string>

@@ -19,6 +19,7 @@ package fr.acinq.phoenix.android.components.settings
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -47,6 +48,32 @@ fun SettingSwitch(
     isChecked: Boolean,
     onCheckChangeAttempt: ((Boolean) -> Unit)
 ) {
+    SettingSwitch(
+        modifier = modifier,
+        title = {
+            Text(text = title, style = if (enabled) MaterialTheme.typography.body2 else MaterialTheme.typography.caption, modifier = Modifier.weight(1f))
+        },
+        subtitle = description?.let {
+            { Text(text = description, style = MaterialTheme.typography.subtitle2, modifier = Modifier.weight(1f)) }
+        },
+        icon = icon,
+        enabled = enabled,
+        isChecked = isChecked,
+        onCheckChangeAttempt = onCheckChangeAttempt
+    )
+}
+
+
+@Composable
+fun SettingSwitch(
+    modifier: Modifier = Modifier,
+    title: @Composable RowScope.() -> Unit,
+    subtitle: (@Composable RowScope.() -> Unit)? = null,
+    icon: Int? = null,
+    enabled: Boolean,
+    isChecked: Boolean,
+    onCheckChangeAttempt: ((Boolean) -> Unit)
+) {
     Column(
         modifier
             .fillMaxWidth()
@@ -58,17 +85,17 @@ fun SettingSwitch(
                 PhoenixIcon(it, Modifier.size(ButtonDefaults.IconSize))
                 Spacer(Modifier.width(12.dp))
             }
-            Text(text = title, style = if (enabled) MaterialTheme.typography.body2 else MaterialTheme.typography.caption, modifier = Modifier.weight(1f))
+            title()
             Spacer(Modifier.width(16.dp))
             Switch(checked = isChecked, onCheckedChange = null, enabled = enabled, modifier = Modifier.enableOrFade(enabled))
         }
-        if (description != null) {
+        if (subtitle != null) {
             Spacer(modifier = Modifier.height(2.dp))
             Row(Modifier.fillMaxWidth()) {
                 icon?.let {
                     Spacer(modifier = Modifier.width(30.dp))
                 }
-                Text(text = description, style = MaterialTheme.typography.subtitle2, modifier = Modifier.weight(1f))
+                subtitle()
                 Spacer(Modifier.width(48.dp))
             }
         }

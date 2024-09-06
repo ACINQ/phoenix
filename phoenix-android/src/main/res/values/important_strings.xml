@@ -29,6 +29,7 @@
     <!-- system notifications -->
 
     <string name="notif_headless_title_default">Phoenix is running in the background</string>
+    <string name="notif_headless_title_failure">Background start failed</string>
     <string name="notif_headless_received">Received +%1$s</string>
 
     <string name="notif_pending_settlement_title">Please start Phoenix</string>
@@ -87,8 +88,7 @@
     <string name="home_swapin_help_button">Tap for details</string>
 
     <string name="home_background_restriction_title">Background processing restricted</string>
-    <string name="home_background_restriction_body_1">Phoenix will not be able to receive payments when it is in the background, or when it is closed.</string>
-    <string name="home_background_restriction_body_2">This happens because:</string>
+    <string name="home_background_restriction_body_1">Phoenix may not be able to receive payments when it is in the background, or when it is closed.</string>
     <string name="home_background_restriction_tor">Tor is enabled</string>
     <string name="home_background_restriction_powersaver">The device is in power saving mode</string>
     <string name="home_background_restriction_fcm">FCM notifications unavailable</string>

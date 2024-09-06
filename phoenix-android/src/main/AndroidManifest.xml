@@ -11,7 +11,6 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
-        android:name=".PhoenixApplication"
         android:allowBackup="false"
         android:fullBackupContent="false"
         android:icon="@mipmap/ic_launcher"
@@ -34,35 +33,6 @@
             android:name="com.google.firebase.messaging.default_notification_color"
             android:value="#ff0000" />
 
-        <activity
-            android:name=".MainActivity"
-            android:exported="true"
-            android:launchMode="singleTask"
-            android:theme="@style/Theme.PhoenixAndroid.NoActionBar"
-            android:windowSoftInputMode="adjustResize">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-            <!-- support for lightning/bitcoin/lnurl schemes -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <!-- bitcoin & lightning schemes -->
-                <data android:scheme="bitcoin" />
-                <data android:scheme="lightning" />
-                <!-- lnurl schemes -->
-                <data android:scheme="lnurl" />
-                <data android:scheme="lnurlw" />
-                <data android:scheme="lnurlp" />
-                <data android:scheme="keyauth" />
-                <!-- phoenix specific scheme, for apps who specifically want to open phoenix -->
-                <data android:scheme="phoenix" />
-            </intent-filter>
-        </activity>
-
         <!-- providers -->
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -74,31 +44,7 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
-        <!-- firebase cloud messaging -->
-        <service
-            android:name="fr.acinq.phoenix.android.services.FCMService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
-
-        <!-- node service -->
-        <service
-            android:name="fr.acinq.phoenix.android.services.NodeService"
-            android:foregroundServiceType="shortService"
-            android:exported="false"
-            android:stopWithTask="false" />
-
-        <!-- broadcast receivers -->
-        <receiver
-            android:name="fr.acinq.phoenix.android.services.BootReceiver"
-            android:enabled="true"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
+        <!-- Services are defined in the variant folders (node service, fcm service, boot service) -->
 
     </application>
 </manifest>

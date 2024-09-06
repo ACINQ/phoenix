@@ -55,6 +55,16 @@ android {
         }
     }
 
+    flavorDimensions += "main"
+    productFlavors {
+        create("google") {
+            versionNameSuffix = "-google"
+        }
+        create("foss") {
+            versionNameSuffix = "-foss"
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -134,9 +144,9 @@ dependencies {
     implementation("org.slf4j:slf4j-api:${Versions.slf4j}")
     implementation("com.github.tony19:logback-android:${Versions.Android.logback}")
 
-    // firebase cloud messaging
-    implementation("com.google.firebase:firebase-messaging:${Versions.Android.fcm}")
-    implementation("com.google.android.gms:play-services-base:18.5.0")
+    // firebase cloud messaging -- only for the google flavor
+    "googleImplementation"("com.google.firebase:firebase-messaging:${Versions.Android.fcm}")
+    "googleImplementation"("com.google.android.gms:play-services-base:18.5.0")
 
     implementation("com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava")
 

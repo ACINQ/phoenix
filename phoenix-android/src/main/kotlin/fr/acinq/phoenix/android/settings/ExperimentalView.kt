@@ -35,6 +35,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.acinq.phoenix.android.AppViewModel
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
@@ -118,6 +119,7 @@ class ExperimentalViewModel(val peerManager: PeerManager, val internalDataReposi
 @Composable
 fun ExperimentalView(
     onBackClick: () -> Unit,
+    appViewModel: AppViewModel,
 ) {
     val vm = viewModel<ExperimentalViewModel>(factory = ExperimentalViewModel.Factory(business.peerManager))
 
@@ -131,6 +133,9 @@ fun ExperimentalView(
         Card(modifier = Modifier.fillMaxWidth()) {
             ClaimAddressButton(state = vm.claimAddressState, onClaim = { vm.claimAddress() })
         }
+
+        // flavored component
+        ManageHeadlessView(appViewModel = appViewModel)
     }
 }
 
@@ -156,7 +161,7 @@ private fun ClaimAddressButton(
                 leadingIcon = { PhoenixIcon(R.drawable.ic_arobase) },
                 subtitle = {
                     Text(text = stringResource(id = R.string.bip353_subtitle))
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
                     FilledButton(
                         text = stringResource(id = R.string.bip353_claim_button),
                         onClick = onClaim,
