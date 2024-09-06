@@ -112,7 +112,7 @@ jobs:
       # 5 - upload apk
 
     - name: Upload apk as artifact for this action
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: phoenix-testnet
         path: upload/phoenix-testnet-latest.apk
