@@ -69,6 +69,7 @@ struct CpfpView: View {
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -721,8 +722,12 @@ struct CpfpView: View {
 					case .sheet(let closeAction):
 						closeAction()
 					case .embedded(let popTo):
-						popTo(.TransactionsView)
-						self.presentationMode.wrappedValue.dismiss()
+						if #available(iOS 17, *) {
+							deepLinkManager.broadcast(.paymentHistory)
+						} else {
+							popTo(.TransactionsView)
+							self.presentationMode.wrappedValue.dismiss()
+						}
 					}
 				}
 				

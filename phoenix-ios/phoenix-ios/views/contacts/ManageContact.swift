@@ -91,6 +91,7 @@ struct ManageContact: View {
 	@Environment(\.dynamicTypeSize) var dynamicTypeSize: DynamicTypeSize
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var deviceInfo: DeviceInfo
 	@EnvironmentObject var smartModalState: SmartModalState
 	
@@ -973,14 +974,20 @@ struct ManageContact: View {
 			let offerString = offer.encode()
 			AppDelegate.get().externalLightningUrlPublisher.send(offerString)
 			
-			if let popTo {
-				popTo(.ConfigurationView(followedBy: nil))
-			}
-			
-			if case .sheet(let closeAction) = location {
-				closeAction()
-			} else {
-				close()
+			if #available(iOS 17, *) {
+				navCoordinator.path.removeAll()
+				
+			} else { // iOS 16
+				
+				if let popTo {
+					popTo(.ConfigurationView(followedBy: nil))
+				}
+				
+				if case .sheet(let closeAction) = location {
+					closeAction()
+				} else {
+					close()
+				}
 			}
 		}
 	}

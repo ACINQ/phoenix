@@ -10,15 +10,13 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-fileprivate enum NavLinkTag: String {
-	case SetCustomPinView
-	case EditCustomPinView
-	case DisableCustomPinView
-}
-
 struct AppAccessView : View {
 	
-	@State private var navLinkTag: NavLinkTag? = nil
+	enum NavLinkTag: String, Codable {
+		case SetCustomPinView
+		case EditCustomPinView
+		case DisableCustomPinView
+	}
 	
 	@State var biometricSupport = AppSecurity.shared.deviceBiometricSupport()
 	@State var biometricsEnabled: Bool = false
@@ -33,13 +31,22 @@ struct AppAccessView : View {
 	@State private var backupSeedState: BackupSeedState = .safelyBackedUp
 	let backupSeedStatePublisher: AnyPublisher<BackupSeedState, Never>
 	
-	@Environment(\.colorScheme) var colorScheme
-	
-	@EnvironmentObject var smartModalState: SmartModalState
-	
 	let willEnterForegroundPublisher = NotificationCenter.default.publisher(for:
 		UIApplication.willEnterForegroundNotification
 	)
+	
+	// <iOS_16_workarounds>
+	@State var navLinkTag: NavLinkTag? = nil
+	// </iOS_16_workarounds>
+	
+	@Environment(\.colorScheme) var colorScheme
+	
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
+	@EnvironmentObject var smartModalState: SmartModalState
+	
+	// --------------------------------------------------
+	// MARK: Init
+	// --------------------------------------------------
 	
 	init() {
 		let enabledSecurity: EnabledSecurity = AppSecurity.shared.enabledSecurityPublisher.value
@@ -67,6 +74,12 @@ struct AppAccessView : View {
 		layers()
 			.navigationTitle(NSLocalizedString("App Access", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
+			.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
+				navLinkView()
+			}
+			.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
+				navLinkView(tag)
+			}
 	}
 	
 	@ViewBuilder
@@ -75,8 +88,14 @@ struct AppAccessView : View {
 		ZStack {
 			content()
 		}
-		.navigationDestination(isPresented: navLinkTagBinding()) {
-			navLinkView()
+		.onAppear {
+			onAppear()
+		}
+		.onReceive(willEnterForegroundPublisher) { _ in
+			onWillEnterForeground()
+		}
+		.onReceive(backupSeedStatePublisher) {(state: BackupSeedState) in
+			backupSeedStateChanged(state)
 		}
 	}
 	
@@ -92,15 +111,6 @@ struct AppAccessView : View {
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
-		.onAppear {
-			onAppear()
-		}
-		.onReceive(willEnterForegroundPublisher) { _ in
-			onWillEnterForeground()
-		}
-		.onReceive(backupSeedStatePublisher) {(state: BackupSeedState) in
-			backupSeedStateChanged(state)
-		}
 	}
 	
 	@ViewBuilder
@@ -426,6 +436,16 @@ struct AppAccessView : View {
 	// MARK: Actions
 	// --------------------------------------------------
 	
+	func navigateTo(_ tag: NavLinkTag) {
+		log.trace("navigateTo(\(tag.rawValue))")
+		
+		if #available(iOS 17, *) {
+			navCoordinator.path.append(tag)
+		} else {
+			navLinkTag = tag
+		}
+	}
+	
 	func toggleBiometrics(_ flag: Bool) {
 		log.trace("toggleBiometrics()")
 		
@@ -567,17 +587,17 @@ struct AppAccessView : View {
 			}
 			
 		} else if flag { // toggle => ON
-			navLinkTag = .SetCustomPinView
+			navigateTo(.SetCustomPinView)
 			
 		} else { // toggle => OFF
-			navLinkTag = .DisableCustomPinView
+			navigateTo(.DisableCustomPinView)
 		}
 	}
 	
 	func changePin() {
 		log.trace("changePin()")
 		
-		navLinkTag = .EditCustomPinView
+		navigateTo(.EditCustomPinView)
 	}
 }
 

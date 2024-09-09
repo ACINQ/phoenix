@@ -16,6 +16,8 @@ struct DrainWalletView_Action: MVISubView {
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
+	
 	// --------------------------------------------------
 	// MARK: View Builders
 	// --------------------------------------------------
@@ -162,7 +164,11 @@ struct DrainWalletView_Action: MVISubView {
 	func doneButtonTapped() {
 		log.trace("doneButtonTapped()")
 		
-		popTo(.RootView(followedBy: nil))
-		presentationMode.wrappedValue.dismiss()
+		if #available(iOS 17, *) {
+			navCoordinator.path.removeAll()
+		} else {
+			popTo(.RootView(followedBy: nil))
+			presentationMode.wrappedValue.dismiss()
+		}
 	}
 }

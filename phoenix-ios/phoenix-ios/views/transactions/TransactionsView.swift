@@ -16,6 +16,11 @@ fileprivate let PAGE_COUNT_MAX = PAGE_COUNT_START + (PAGE_COUNT_INCREMENT * 2) /
 
 struct TransactionsView: View {
 	
+	enum NavLinkTag: String, Codable {
+		case PaymentView
+		case HistoryExporter
+	}
+
 	private let paymentsPageFetcher = Biz.getPaymentsPageFetcher(name: "TransactionsView")
 	
 	let paymentsCountPublisher = Biz.business.paymentsManager.paymentsCountPublisher()
@@ -28,16 +33,20 @@ struct TransactionsView: View {
 	@State var visibleRows: Set<WalletPaymentOrderRow> = Set()
 	
 	@State var selectedItem: WalletPaymentInfo? = nil
-	@State var historyExporterOpen: Bool = false
 	
 	let syncStatePublisher = Biz.syncManager!.syncBackupManager.statePublisher
 	@State var isDownloadingTxs: Bool = false
 	
 	@State var didAppear = false
+	
+	// <iOS_16_workarounds>
+	@State var navLinkTag: NavLinkTag? = nil
 	@State var popToDestination: PopToDestination? = nil
+	// </iOS_16_workarounds>
 	
 	@Environment(\.colorScheme) var colorScheme
 	
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var deviceInfo: DeviceInfo
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
@@ -56,77 +65,24 @@ struct TransactionsView: View {
 	@ViewBuilder
 	var body: some View {
 		
-		ZStack {
-			content()
-		}
-		.navigationTitle(NSLocalizedString("Payments", comment: "Navigation bar title"))
-		.navigationBarTitleDisplayMode(.inline)
-		.navigationBarItems(trailing: exportButton())
-		.navigationDestination(isPresented: navLinkBinding()) {
-			navLinkView()
-		}
+		layers()
+			.navigationTitle(NSLocalizedString("Payments", comment: "Navigation bar title"))
+			.navigationBarTitleDisplayMode(.inline)
+			.navigationBarItems(trailing: exportButton())
+			.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
+				navLinkView()
+			}
+			.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
+				navLinkView(tag)
+			}
 	}
 	
 	@ViewBuilder
-	func content() -> some View {
+	func layers() -> some View {
 		
-		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-			
-			Color.primaryBackground.frame(height: 25)
-			
-			ScrollView {
-				LazyVStack(pinnedViews: [.sectionHeaders]) {
-					// Reminder:
-					// - ForEach uses the given type (which conforms to Swift's Identifiable protocol)
-					//   to determine whether or not the row is new/modified or the same as before.
-					// - If the row is new/modified, then it it initialized with fresh state,
-					//   and the row's `onAppear` will fire.
-					// - If the row is unmodified, then it is initialized with existing state,
-					//   and the row's `onAppear` with NOT fire.
-					//
-					// Since we ultimately use WalletPaymentOrderRow.identifier, our unique identifier
-					// contains the row's completedAt date, which is modified when the row changes.
-					// Thus our row is automatically refreshed after it fails/succeeds.
-					//
-					ForEach(sections) { section in
-						Section {
-							ForEach(section.payments) { row in
-								Button {
-									didSelectPayment(row: row)
-								} label: {
-									PaymentCell(
-										row: row,
-										didAppearCallback: paymentCellDidAppear,
-										didDisappearCallback: paymentCellDidDisappear
-									)
-								}
-							}
-							
-						} header: {
-							Text(verbatim: section.name)
-								.padding([.top, .bottom], 10)
-								.frame(maxWidth: .infinity)
-								.background(
-									colorScheme == ColorScheme.light
-									? Color(UIColor.secondarySystemBackground)
-									: Color.mutedBackground // Color(UIColor.secondarySystemGroupedBackground)
-								)
-						}
-					}
-				
-					if isDownloadingTxs {
-						cell_syncing()
-					} else if sections.isEmpty {
-						cell_zeroPayments()
-					}
-					
-				} // </LazyVStack>
-			} // </ScrollView>
-			.background(
-				Color.primaryBackground.ignoresSafeArea()
-			)
-			
-		} // </VStack>
+		ZStack {
+			content()
+		}
 		.onAppear {
 			onAppear()
 		}
@@ -139,6 +95,71 @@ struct TransactionsView: View {
 		.onReceive(syncStatePublisher) {
 			syncStateChanged($0)
 		}
+	}
+	
+	@ViewBuilder
+	func content() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			Color.primaryBackground.frame(height: 25)
+			list()
+		}
+	}
+	
+	@ViewBuilder
+	func list() -> some View {
+		
+		ScrollView {
+			LazyVStack(pinnedViews: [.sectionHeaders]) {
+				// Reminder:
+				// - ForEach uses the given type (which conforms to Swift's Identifiable protocol)
+				//   to determine whether or not the row is new/modified or the same as before.
+				// - If the row is new/modified, then it it initialized with fresh state,
+				//   and the row's `onAppear` will fire.
+				// - If the row is unmodified, then it is initialized with existing state,
+				//   and the row's `onAppear` with NOT fire.
+				//
+				// Since we ultimately use WalletPaymentOrderRow.identifier, our unique identifier
+				// contains the row's completedAt date, which is modified when the row changes.
+				// Thus our row is automatically refreshed after it fails/succeeds.
+				//
+				ForEach(sections) { section in
+					Section {
+						ForEach(section.payments) { row in
+							Button {
+								didSelectPayment(row: row)
+							} label: {
+								PaymentCell(
+									row: row,
+									didAppearCallback: paymentCellDidAppear,
+									didDisappearCallback: paymentCellDidDisappear
+								)
+							}
+						}
+						
+					} header: {
+						Text(verbatim: section.name)
+							.padding([.top, .bottom], 10)
+							.frame(maxWidth: .infinity)
+							.background(
+								colorScheme == ColorScheme.light
+								? Color(UIColor.secondarySystemBackground)
+								: Color.mutedBackground // Color(UIColor.secondarySystemGroupedBackground)
+							)
+					}
+				}
+			
+				if isDownloadingTxs {
+					cell_syncing()
+				} else if sections.isEmpty {
+					cell_zeroPayments()
+				}
+				
+			} // </LazyVStack>
+		} // </ScrollView>
+		.background(
+			Color.primaryBackground.ignoresSafeArea()
+		)
 	}
 	
 	@ViewBuilder
@@ -176,7 +197,7 @@ struct TransactionsView: View {
 	func exportButton() -> some View {
 		
 		Button {
-			historyExporterOpen = true
+			navigateTo(.HistoryExporter)
 		} label: {
 			Image(systemName: "square.and.arrow.up")
 		}
@@ -185,17 +206,29 @@ struct TransactionsView: View {
 	@ViewBuilder
 	func navLinkView() -> some View {
 		
-		if let selectedItem {
-			PaymentView(
-				location: .embedded(popTo: popTo),
-				paymentInfo: selectedItem
-			)
-			
-		} else if historyExporterOpen {
-			TxHistoryExporter()
-			
+		if let tag = self.navLinkTag {
+			navLinkView(tag)
 		} else {
 			EmptyView()
+		}
+	}
+	
+	@ViewBuilder
+	func navLinkView(_ tag: NavLinkTag) -> some View {
+			
+		switch tag {
+		case .PaymentView:
+			if let selectedItem {
+				PaymentView(
+					location: .embedded(popTo: popTo),
+					paymentInfo: selectedItem
+				)
+			} else {
+				EmptyView()
+			}
+			
+		case .HistoryExporter:
+			TxHistoryExporter()
 		}
 	}
 	
@@ -203,11 +236,11 @@ struct TransactionsView: View {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
-	func navLinkBinding() -> Binding<Bool> {
+	func navLinkTagBinding() -> Binding<Bool> {
 		
 		return Binding<Bool>(
-			get: { selectedItem != nil || historyExporterOpen },
-			set: { if !$0 { selectedItem = nil; historyExporterOpen = false }}
+			get: { navLinkTag != nil },
+			set: { if !$0 { navLinkTag = nil }}
 		)
 	}
 	
@@ -564,10 +597,24 @@ struct TransactionsView: View {
 	// MARK: Actions
 	// --------------------------------------------------
 	
+	func navigateTo(_ tag: NavLinkTag) {
+		log.trace("navigateTo(\(tag.rawValue))")
+		
+		if #available(iOS 17, *) {
+			navCoordinator.path.append(tag)
+		} else {
+			navLinkTag = tag
+		}
+	}
+	
 	func popTo(_ destination: PopToDestination) {
 		log.trace("popTo(\(destination))")
 		
-		popToDestination = destination
+		if #available(iOS 17, *) {
+			log.warning("popTo(): This function is for iOS 16 only !")
+		} else {
+			popToDestination = destination
+		}
 	}
 	
 	func didSelectPayment(row: WalletPaymentOrderRow) -> Void {
@@ -580,6 +627,7 @@ struct TransactionsView: View {
 			
 			if let result = result {
 				selectedItem = result
+				navigateTo(.PaymentView)
 			}
 		}
 	}
