@@ -130,14 +130,6 @@ class ReceiveFragment : BaseFragment() {
       }
     })
 
-    context?.let { ctx ->
-      val payToOpenSettings = appContext(ctx).payToOpenSettings.value
-      val swapInSettings = appContext(ctx).swapInSettings.value
-      if (payToOpenSettings != null && swapInSettings != null) {
-        updateChannelServiceNotices(ctx, payToOpenSettings, swapInSettings)
-      }
-    }
-
     context?.let { mBinding.descValue.setText(Prefs.getDefaultPaymentDescription(it)) }
   }
 
@@ -199,10 +191,6 @@ class ReceiveFragment : BaseFragment() {
       model.state.value = PaymentGenerationState.EDITING_REQUEST
     }
 
-    mBinding.swapInButton.setOnClickListener {
-      context?.let { ctx -> generateSwapIn(ctx) }
-    }
-
     mBinding.withdrawButton.setOnClickListener {
       findNavController().navigate(R.id.global_action_any_to_read_input)
     }
@@ -238,25 +226,6 @@ class ReceiveFragment : BaseFragment() {
       val source = model.invoice.value!!.second ?: PaymentRequest.write(model.invoice.value!!.first)
       clipboard.setPrimaryClip(ClipData.newPlainText("Payment request", source))
       Toast.makeText(this, R.string.legacy_utils_copied, Toast.LENGTH_SHORT).show()
-    }
-  }
-
-  private fun updateChannelServiceNotices(context: Context, payToOpenSettings: PayToOpenSettings, swapInSettings: SwapInSettings) {
-    lifecycleScope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, exception ->
-      log.error("could not update pay-to-open and swap-in notices: ", exception)
-    }) {
-      val channels = app.requireService.getChannels().filter { it.state() is `NORMAL$` || it.state() is `WAIT_FOR_FUNDING_CONFIRMED$` || it.state() is `OFFLINE$` }
-      model.showMinFundingPayToOpen.postValue(channels.isEmpty() && swapInSettings.minFunding.`$greater`(Satoshi(0)))
-
-      launch(Dispatchers.Main) {
-        val prettyPayToOpenMinFunding = Converter.printAmountPretty(payToOpenSettings.minFunding, context, withUnit = true)
-        val prettySwapInMinFunding = Converter.printAmountPretty(swapInSettings.minFunding, context, withUnit = true)
-        val prettySwapInPercentFee = String.format("%.2f", 100 * (swapInSettings.feePercent))
-        val prettySwapInMinFee = Converter.printAmountPretty(swapInSettings.minFee, context, withUnit = true)
-
-        mBinding.swapInInfo.text = Converter.html(getString(R.string.legacy_receive_swap_in_info, prettySwapInMinFunding, prettySwapInPercentFee, prettySwapInMinFee))
-        mBinding.minFundingPayToOpen.text = Converter.html(getString(R.string.legacy_receive_min_amount_pay_to_open, prettyPayToOpenMinFunding))
-      }
     }
   }
 

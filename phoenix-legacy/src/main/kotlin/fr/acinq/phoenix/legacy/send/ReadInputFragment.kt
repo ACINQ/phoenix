@@ -107,6 +107,7 @@ class ReadInputFragment : BaseFragment() {
             }
             is ReadInputState.Error.UnhandledLNURL -> getString(R.string.legacy_scan_error_lnurl_unsupported)
             is ReadInputState.Error.UnhandledInput -> getString(R.string.legacy_scan_error_invalid_scan)
+            is ReadInputState.Error.OnChain -> getString(R.string.legacy_scan_error_onchain)
           }
           mBinding.scanView.pause()
         }
@@ -131,29 +132,6 @@ class ReadInputFragment : BaseFragment() {
               .show()
           } else {
             findNavController().navigate(SendFragmentDirections.globalActionAnyToSend(payload = PaymentRequest.write(it.pr)))
-          }
-        }
-        is ReadInputState.Done.Onchain -> {
-          val uri = it.bitcoinUri
-          if (it.bitcoinUri.lightning != null) {
-            val view = layoutInflater.inflate(R.layout.dialog_payment_mode, null)
-            val payOnChain = view.findViewById<ButtonView>(R.id.paymode_onchain_button)
-            val payOnLightning = view.findViewById<ButtonView>(R.id.paymode_lightning_button)
-            val dialog = AlertDialog.Builder(context, R.style.default_dialogTheme)
-              .setView(view)
-              .setCancelable(false)
-              .create()
-            payOnChain.setOnClickListener {
-              findNavController().navigate(SendFragmentDirections.globalActionAnyToSend(payload = uri.raw))
-              dialog.dismiss()
-            }
-            payOnLightning.setOnClickListener {
-              findNavController().navigate(SendFragmentDirections.globalActionAnyToSend(payload = PaymentRequest.write(uri.lightning)))
-              dialog.dismiss()
-            }
-            dialog.show()
-          } else {
-            findNavController().navigate(SendFragmentDirections.globalActionAnyToSend(payload = it.bitcoinUri.raw))
           }
         }
         is ReadInputState.Done.Url -> {
