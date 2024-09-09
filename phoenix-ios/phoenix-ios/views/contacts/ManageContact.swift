@@ -975,7 +975,11 @@ struct ManageContact: View {
 			AppDelegate.get().externalLightningUrlPublisher.send(offerString)
 			
 			if #available(iOS 17, *) {
-				navCoordinator.path.removeAll()
+			// Do not do this here. It interferes with navigation.
+			// navCoordinator.path.removeAll()
+			// Instead we allow the MainView_X to perform both
+			// `path.removeAll()` & `path.append(x)` at the same time.
+			// Doing it at the same time allows navigation to work properly.
 				
 			} else { // iOS 16
 				

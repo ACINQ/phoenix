@@ -80,13 +80,13 @@ struct ContactsList: View {
 		List {
 			ForEach(visibleContacts) { item in
 				Button {
-					selectedItem = item
+					selectContact(item)
 				} label: {
 					row(item)
 				}
 				.swipeActions(allowsFullSwipe: false) {
 					Button {
-						selectedItem = item
+						selectContact(item)
 					} label: {
 						Label("Edit", systemImage: "square.and.pencil")
 					}
@@ -301,6 +301,13 @@ struct ContactsList: View {
 			popToDestination = destination
 			popTo(destination)
 		}
+	}
+	
+	func selectContact(_ contact: ContactInfo) {
+		log.trace("selectContact: \(contact.id)")
+		
+		selectedItem = contact
+		navigateTo(.SelectedItem)
 	}
 	
 	func deleteContact() {

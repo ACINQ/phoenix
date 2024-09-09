@@ -3,6 +3,8 @@ import SwiftUI
 extension NavigationPath {
 	
 	mutating func removeAll() {
-		self.removeLast(self.count)
+		if self.count > 0 {
+			self.removeLast(self.count)
+		}
 	}
 }
