@@ -1,6 +1,6 @@
 import Foundation
 
-fileprivate let filename = "SyncTxActor"
+fileprivate let filename = "SyncBackupActor"
 #if DEBUG && true
 fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
@@ -8,9 +8,9 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
 /// This class implements the state machine in a thread-safe actor.
-/// See `SyncTxManager_State.swift` for state machine diagrams
+/// See `SyncBackupManager_State.swift` for state machine diagrams
 ///
-actor SyncTxManager_Actor {
+actor SyncBackupManager_Actor {
 	
 	private var waitingForDatabases = true
 	
@@ -20,26 +20,35 @@ actor SyncTxManager_Actor {
 	private var isEnabled: Bool
 	private var needsCreateRecordZone: Bool
 	private var needsDeleteRecordZone: Bool
-	private var needsDownloadExisting = false
+	private var needsDownloadPayments = false
+	private var needsDownloadContacts = false
 	
 	private var paymentsQueueCount: Int = 0
+	private var contactsQueueCount: Int = 0
 	
-	private var state: SyncTxManager_State
-	private var pendingSettings: SyncTxManager_PendingSettings? = nil
+	private var state: SyncBackupManager_State
+	private var pendingSettings: SyncBackupManager_PendingSettings? = nil
 	
-	var activeState: SyncTxManager_State {
+	var activeState: SyncBackupManager_State {
 		return state
 	}
 	
-	init(isEnabled: Bool, recordZoneCreated: Bool, hasDownloadedRecords: Bool) {
+	init(
+		isEnabled: Bool,
+		recordZoneCreated: Bool,
+		hasDownloadedPayments: Bool,
+		hasDownloadedContacts: Bool
+	) {
 		self.isEnabled = isEnabled
 		if isEnabled {
 			needsCreateRecordZone = !recordZoneCreated
-			needsDownloadExisting = !hasDownloadedRecords
+			needsDownloadPayments = !hasDownloadedPayments
+			needsDownloadContacts = !hasDownloadedContacts
 			needsDeleteRecordZone = false
 		} else {
 			needsCreateRecordZone = false
-			needsDownloadExisting = false
+			needsDownloadPayments = false
+			needsDownloadContacts = false
 			needsDeleteRecordZone = recordZoneCreated
 		}
 		
@@ -50,7 +59,7 @@ actor SyncTxManager_Actor {
 	// MARK: Transition Logic
 	// --------------------------------------------------
 	
-	func markDatabasesReady() -> SyncTxManager_State? {
+	func markDatabasesReady() -> SyncBackupManager_State? {
 		
 		waitingForDatabases = false
 		switch state {
@@ -61,7 +70,7 @@ actor SyncTxManager_Actor {
 		}
 	}
 	
-	func networkStatusChanged(hasInternet: Bool) -> SyncTxManager_State? {
+	func networkStatusChanged(hasInternet: Bool) -> SyncBackupManager_State? {
 		log.trace("networkStatusChanged(hasInternet: \(hasInternet))")
 		
 		if hasInternet {
@@ -91,7 +100,7 @@ actor SyncTxManager_Actor {
 		}
 	}
 	
-	func cloudCredentialsChanged(hasCloudCredentials: Bool) -> SyncTxManager_State? {
+	func cloudCredentialsChanged(hasCloudCredentials: Bool) -> SyncBackupManager_State? {
 		log.trace("cloudCredentialsChanged(hasCloudCredentials: \(hasCloudCredentials))")
 			
 		if hasCloudCredentials {
@@ -121,7 +130,12 @@ actor SyncTxManager_Actor {
 		}
 	}
 	
-	func queueCountChanged(_ count: Int, wait: SyncTxManager_State_Waiting?) -> SyncTxManager_State? {
+	func paymentsQueueCountChanged(
+		_ count: Int,
+		wait: SyncBackupManager_State_Waiting?
+	) -> SyncBackupManager_State? {
+		
+		log.trace("paymentsQueueCountChanged(\(count))")
 		
 		paymentsQueueCount = count
 		guard count > 0 else {
@@ -129,7 +143,7 @@ actor SyncTxManager_Actor {
 		}
 		switch state {
 			case .uploading(let details):
-				details.setTotalCount(count)
+				details.setPayments_totalCount(count)
 				return nil
 			case .synced:
 				if let wait = wait {
@@ -144,7 +158,35 @@ actor SyncTxManager_Actor {
 		}
 	}
 	
-	func didCreateRecordZone() -> SyncTxManager_State? {
+	func contactsQueueCountChanged(
+		_ count: Int,
+		wait: SyncBackupManager_State_Waiting?
+	) -> SyncBackupManager_State? {
+		
+		log.trace("contactsQueueCountChanged(\(count))")
+		
+		contactsQueueCount = count
+		guard count > 0 else {
+			return nil
+		}
+		switch state {
+			case .uploading(let details):
+				details.setContacts_totalCount(count)
+				return nil
+			case .synced:
+				if let wait = wait {
+					log.debug("state = waiting(randomizedUploadDelay)")
+					state = .waiting(details: wait)
+					return state
+				} else {
+					return simplifiedStateFlow()
+				}
+			default:
+				return nil
+		}
+	}
+	
+	func didCreateRecordZone() -> SyncBackupManager_State? {
 		log.trace("didCreateRecordZone()")
 		
 		needsCreateRecordZone = false
@@ -161,7 +203,7 @@ actor SyncTxManager_Actor {
 		}
 	}
 	
-	func didDeleteRecordZone() -> SyncTxManager_State? {
+	func didDeleteRecordZone() -> SyncBackupManager_State? {
 		log.trace("didDeleteRecordZone()")
 		
 		needsDeleteRecordZone = false
@@ -178,20 +220,40 @@ actor SyncTxManager_Actor {
 		}
 	}
 	
-	func didDownloadPayments() -> SyncTxManager_State? {
+	func didDownloadPayments() -> SyncBackupManager_State? {
 		log.trace("didDownloadPayments()")
 		
-		needsDownloadExisting = false
-		switch state {
-			case .downloading:
-				return simplifiedStateFlow()
-			default:
-				return nil
+		needsDownloadPayments = false
+		if needsDownloadContacts {
+			return nil
+		} else {
+			switch state {
+				case .downloading:
+					return simplifiedStateFlow()
+				default:
+					return nil
+			}
 		}
 	}
 	
-	func didUploadPayments() -> SyncTxManager_State? {
-		log.trace("didUploadPayments()")
+	func didDownloadContacts() -> SyncBackupManager_State? {
+		log.trace("didDownloadContacts()")
+		
+		needsDownloadContacts = false
+		if needsDownloadPayments {
+			return nil
+		} else {
+			switch state {
+				case .downloading:
+					return simplifiedStateFlow()
+				default:
+					return nil
+			}
+		}
+	}
+	
+	func didUploadItems() -> SyncBackupManager_State? {
+		log.trace("didUploadItems()")
 		
 		switch state {
 			case .uploading:
@@ -204,8 +266,8 @@ actor SyncTxManager_Actor {
 	func handleError(
 		isNotAuthenticated: Bool,
 		isZoneNotFound: Bool,
-		wait: SyncTxManager_State_Waiting?
-	) -> SyncTxManager_State? {
+		wait: SyncBackupManager_State_Waiting?
+	) -> SyncBackupManager_State? {
 		
 		if isNotAuthenticated {
 			waitingForCloudCredentials = true
@@ -231,7 +293,7 @@ actor SyncTxManager_Actor {
 		}
 	}
 	
-	func finishWaiting(_ sender: SyncTxManager_State_Waiting) -> SyncTxManager_State? {
+	func finishWaiting(_ sender: SyncBackupManager_State_Waiting) -> SyncBackupManager_State? {
 		log.trace("finishWaiting()")
 		
 		guard case .waiting(let details) = state, details == sender else {
@@ -250,7 +312,7 @@ actor SyncTxManager_Actor {
 		}
 	}
 	
-	func enqueuePendingSettings(_ pending: SyncTxManager_PendingSettings) -> Bool {
+	func enqueuePendingSettings(_ pending: SyncBackupManager_PendingSettings) -> Bool {
 		
 		let willEnable = pending.paymentSyncing == .willEnable
 		if willEnable {
@@ -278,9 +340,9 @@ actor SyncTxManager_Actor {
 	}
 	
 	func dequeuePendingSettings(
-		_ pending: SyncTxManager_PendingSettings,
+		_ pending: SyncBackupManager_PendingSettings,
 		approved: Bool
-	) -> (Bool, SyncTxManager_State?) {
+	) -> (Bool, SyncBackupManager_State?) {
 		
 		if pendingSettings != pending {
 			// Current state doesn't match parameter.
@@ -303,7 +365,8 @@ actor SyncTxManager_Actor {
 				
 				isEnabled = true
 				needsCreateRecordZone = true
-				needsDownloadExisting = true
+				needsDownloadPayments = true
+				needsDownloadContacts = true
 				needsDeleteRecordZone = false
 				
 				switch state {
@@ -337,7 +400,8 @@ actor SyncTxManager_Actor {
 				
 				isEnabled = false
 				needsCreateRecordZone = false
-				needsDownloadExisting = false
+				needsDownloadPayments = false
+				needsDownloadContacts = false
 				needsDeleteRecordZone = true
 				
 				switch state {
@@ -374,7 +438,7 @@ actor SyncTxManager_Actor {
 		}
 	}
 	
-	func shutdown() -> SyncTxManager_State? {
+	func shutdown() -> SyncBackupManager_State? {
 		
 		switch state {
 			case .shutdown: return nil       // already shutdown
@@ -386,7 +450,7 @@ actor SyncTxManager_Actor {
 	// MARK: Internal
 	// --------------------------------------------------
 	
-	private func simplifiedStateFlow() -> SyncTxManager_State? {
+	private func simplifiedStateFlow() -> SyncBackupManager_State? {
 		
 		let prvState = state
 		
@@ -397,11 +461,15 @@ actor SyncTxManager_Actor {
 		} else if isEnabled {
 			if needsCreateRecordZone {
 				state = .updatingCloud_creatingRecordZone()
-			} else if needsDownloadExisting {
-				state = .downloading(details: SyncTxManager_State_Downloading())
-			} else if paymentsQueueCount > 0 {
-				state = .uploading(details: SyncTxManager_State_Uploading(
-					totalCount: paymentsQueueCount
+			} else if needsDownloadPayments || needsDownloadContacts {
+				state = .downloading(details: SyncBackupManager_State_Downloading(
+					needsDownloadPayments: needsDownloadPayments,
+					needsDownloadContacts: needsDownloadContacts
+				))
+			} else if paymentsQueueCount > 0 || contactsQueueCount > 0 {
+				state = .uploading(details: SyncBackupManager_State_Uploading(
+					payments_totalCount: paymentsQueueCount,
+					contacts_totalCount: contactsQueueCount
 				))
 			} else {
 				state = .synced

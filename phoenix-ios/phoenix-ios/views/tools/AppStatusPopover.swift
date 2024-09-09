@@ -16,12 +16,12 @@ struct AppStatusPopover: View {
 	
 	@State var srvExtConnectedToPeer = Biz.srvExtConnectedToPeer.value
 	
-	@State var syncState: SyncTxManager_State = .initializing
-	@State var pendingSettings: SyncTxManager_PendingSettings? = nil
+	@State var syncState: SyncBackupManager_State = .initializing
+	@State var pendingSettings: SyncBackupManager_PendingSettings? = nil
 	
 	@EnvironmentObject var popoverState: PopoverState
 	
-	let syncManager = Biz.syncManager!.syncTxManager
+	let syncManager = Biz.syncManager!.syncBackupManager
 	
 	enum TitleIconWidth: Preference {}
 	let titleIconWidthReader = GeometryPreferenceReader(
@@ -154,7 +154,7 @@ struct AppStatusPopover: View {
 	}
 	
 	@ViewBuilder
-	func syncStatusSection_pending(_ value: SyncTxManager_PendingSettings) -> some View {
+	func syncStatusSection_pending(_ value: SyncBackupManager_PendingSettings) -> some View {
 		
 		VStack(alignment: .leading) {
 			
@@ -360,13 +360,13 @@ struct AppStatusPopover: View {
 		srvExtConnectedToPeer = newValue
 	}
 	
-	func syncStateChanged(_ newSyncState: SyncTxManager_State) {
+	func syncStateChanged(_ newSyncState: SyncBackupManager_State) {
 		log.trace("syncStateChanged()")
 		
 		syncState = newSyncState
 	}
 	
-	func pendingSettingsChanged(_ newPendingSettings: SyncTxManager_PendingSettings?) {
+	func pendingSettingsChanged(_ newPendingSettings: SyncBackupManager_PendingSettings?) {
 		log.trace("pendingSettingsChanged()")
 		
 		pendingSettings = newPendingSettings
@@ -441,7 +441,7 @@ fileprivate struct ConnectionCell: View {
 
 fileprivate struct DownloadProgressDetails: View {
 	
-	@StateObject var details: SyncTxManager_State_Downloading
+	@StateObject var details: SyncBackupManager_State_Downloading
 	
 	@ViewBuilder
 	var body: some View {
@@ -462,7 +462,7 @@ fileprivate struct DownloadProgressDetails: View {
 
 fileprivate struct UploadProgressDetails: View {
 	
-	@StateObject var details: SyncTxManager_State_Uploading
+	@StateObject var details: SyncBackupManager_State_Uploading
 	
 	@ViewBuilder
 	var body: some View {
@@ -514,7 +514,7 @@ fileprivate struct UploadProgressDetails: View {
 
 fileprivate struct SyncWaitingDetails: View, ViewName {
 	
-	let waiting: SyncTxManager_State_Waiting
+	let waiting: SyncBackupManager_State_Waiting
 	
 	let timer = Timer.publish(every: 0.5, on: .current, in: .common).autoconnect()
 	@State var currentDate = Date()
@@ -640,7 +640,7 @@ fileprivate struct SyncWaitingDetails: View, ViewName {
 
 fileprivate struct PendingSettingsDetails: View, ViewName {
 	
-	let pendingSettings: SyncTxManager_PendingSettings
+	let pendingSettings: SyncBackupManager_PendingSettings
 	
 	@ViewBuilder
 	var body: some View {

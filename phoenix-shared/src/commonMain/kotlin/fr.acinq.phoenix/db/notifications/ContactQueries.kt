@@ -25,6 +25,8 @@ import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.db.AppDatabase
+import fr.acinq.phoenix.db.didDeleteContact
+import fr.acinq.phoenix.db.didSaveContact
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
@@ -34,7 +36,7 @@ class ContactQueries(val database: AppDatabase) {
 
     val queries = database.contactsQueries
 
-    fun saveContact(contact: ContactInfo) {
+    fun saveContact(contact: ContactInfo, notify: Boolean = true) {
         database.transaction {
             queries.insertContact(
                 id = contact.id.toString(),
@@ -52,17 +54,36 @@ class ContactQueries(val database: AppDatabase) {
                     createdAt = currentTimestampMillis(),
                 )
             }
+            if (notify) {
+                didSaveContact(contact.id, database)
+            }
         }
     }
 
     fun updateContact(contact: ContactInfo) {
-        queries.updateContact(
-            name = contact.name,
-            photoUri = contact.photoUri,
-            useOfferKey = contact.useOfferKey,
-            updatedAt = currentTimestampMillis(),
-            contactId = contact.id.toString()
-        )
+        database.transaction {
+            queries.updateContact(
+                name = contact.name,
+                photoUri = contact.photoUri,
+                useOfferKey = contact.useOfferKey,
+                updatedAt = currentTimestampMillis(),
+                contactId = contact.id.toString()
+            )
+            didSaveContact(contact.id, database)
+        }
+    }
+
+    fun getContact(contactId: UUID): ContactInfo? {
+        return database.transactionWithResult {
+            queries.getContact(contactId = contactId.toString()).executeAsOneOrNull()?.let {
+                val offers = it.offers.split(",").map {
+                    OfferTypes.Offer.decode(it)
+                }.filterIsInstance<Try.Success<OfferTypes.Offer>>().map {
+                    it.get()
+                }
+                ContactInfo(contactId, it.name, it.photo_uri, it.use_offer_key, offers)
+            }
+        }
     }
 
     /** Retrieve a contact from a transaction ID - should be done in a transaction. */
@@ -114,6 +135,7 @@ class ContactQueries(val database: AppDatabase) {
         database.transaction {
             queries.deleteContactOfferForContactId(contactId = contactId.toString())
             queries.deleteContact(contactId = contactId.toString())
+            didDeleteContact(contactId, database)
         }
     }
 

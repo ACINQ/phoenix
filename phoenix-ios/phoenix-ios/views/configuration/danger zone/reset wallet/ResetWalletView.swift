@@ -197,14 +197,12 @@ struct ResetWalletView: MVIView {
 							.foregroundColor(.secondary)
 					}
 					
-					if !backupSeed_enabled {
-						Label {
-							Text("Seed backup not stored in iCloud.")
-								.font(.footnote)
-								.foregroundColor(.primary) // Stands out to provide explanation
-						} icon: {
-							invisibleImage()
-						}
+					Label {
+						Text("Seed backup not stored in iCloud.")
+							.font(.footnote)
+							.foregroundColor(.primary) // Stands out to provide explanation
+					} icon: {
+						invisibleImage()
 					}
 					
 				} else {
@@ -226,7 +224,7 @@ struct ResetWalletView: MVIView {
 				if !backupTransactions_enabled {
 					
 					Label {
-						Text("Delete payment history from my iCloud account.")
+						Text("Delete payment history and contacts from my iCloud account.")
 							.foregroundColor(.secondary)
 							.fixedSize(horizontal: false, vertical: true)
 					} icon: {
@@ -234,20 +232,18 @@ struct ResetWalletView: MVIView {
 							.foregroundColor(.secondary)
 					}
 					
-					if !backupTransactions_enabled {
-						Label {
-							Text("Payment history not stored in iCloud.")
-								.font(.footnote)
-								.foregroundColor(.primary) // Stands out to provide explanation
-						} icon: {
-							invisibleImage()
-						}
+					Label {
+						Text("Payment history and contacts not stored in iCloud.")
+							.font(.footnote)
+							.foregroundColor(.primary) // Stands out to provide explanation
+					} icon: {
+						invisibleImage()
 					}
 					
 				} else {
 					
 					Toggle(isOn: $deleteTransactionHistory) {
-						Text("Delete payment history from my iCloud account.")
+						Text("Delete payment history and contacts from my iCloud account.")
 							.foregroundColor(.primary)
 					}
 					.toggleStyle(CheckboxToggleStyle(

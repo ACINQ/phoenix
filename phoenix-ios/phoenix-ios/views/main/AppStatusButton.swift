@@ -15,8 +15,8 @@ struct AppStatusButton: View {
 	
 	@State var dimStatus = false
 	
-	@State var syncState: SyncTxManager_State = .initializing
-	@State var pendingSettings: SyncTxManager_PendingSettings? = nil
+	@State var syncState: SyncBackupManager_State = .initializing
+	@State var pendingSettings: SyncBackupManager_PendingSettings? = nil
 	
 	@State var timer: Timer? = nil
 	@State var showText: Bool = false
@@ -27,7 +27,7 @@ struct AppStatusButton: View {
 	@EnvironmentObject var popoverState: PopoverState
 	@EnvironmentObject var deviceInfo: DeviceInfo
 	
-	let syncTxManager = Biz.syncManager!.syncTxManager
+	let syncBackupManager = Biz.syncManager!.syncBackupManager
 
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -55,11 +55,11 @@ struct AppStatusButton: View {
 		.onChange(of: connectionsMonitor.connectingAt) { _ in
 			updateTimer()
 		}
-		.onReceive(syncTxManager.statePublisher) {
-			syncTxManagerStateChanged($0)
+		.onReceive(syncBackupManager.statePublisher) {
+			syncBackupManagerStateChanged($0)
 		}
-		.onReceive(syncTxManager.pendingSettingsPublisher) {
-			syncTxManagerPendingSettingsChanged($0)
+		.onReceive(syncBackupManager.pendingSettingsPublisher) {
+			syncBackupManagerPendingSettingsChanged($0)
 		}
 	}
 	
@@ -194,14 +194,14 @@ struct AppStatusButton: View {
 		updateTimer()
 	}
 	
-	func syncTxManagerStateChanged(_ newState: SyncTxManager_State) {
-		log.trace("syncTxManagerStateChanged()")
+	func syncBackupManagerStateChanged(_ newState: SyncBackupManager_State) {
+		log.trace("syncBackupManagerStateChanged()")
 		
 		syncState = newState
 	}
 	
-	func syncTxManagerPendingSettingsChanged(_ newPendingSettings: SyncTxManager_PendingSettings?) {
-		log.trace("syncTxManagerPendingSettingsChanged()")
+	func syncBackupManagerPendingSettingsChanged(_ newPendingSettings: SyncBackupManager_PendingSettings?) {
+		log.trace("syncBackupManagerPendingSettingsChanged()")
 		
 		pendingSettings = newPendingSettings
 	}

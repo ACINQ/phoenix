@@ -1,7 +1,7 @@
 import Foundation
 import CloudKit
 
-/* SyncTxManager State Machine:
+/* SyncBackupManager State Machine:
  *
  * The state is always one of the following:
  *
@@ -66,13 +66,13 @@ import CloudKit
  * as implemented by the actor's `simplifiedStateFlow` function.
  */
 
-enum SyncTxManager_State: Equatable, CustomStringConvertible {
+enum SyncBackupManager_State: Equatable, CustomStringConvertible {
 	
 	case initializing
-	case updatingCloud(details: SyncTxManager_State_UpdatingCloud)
-	case downloading(details: SyncTxManager_State_Downloading)
-	case uploading(details: SyncTxManager_State_Uploading)
-	case waiting(details: SyncTxManager_State_Waiting)
+	case updatingCloud(details: SyncBackupManager_State_UpdatingCloud)
+	case downloading(details: SyncBackupManager_State_Downloading)
+	case uploading(details: SyncBackupManager_State_Uploading)
+	case waiting(details: SyncBackupManager_State_Waiting)
 	case synced
 	case disabled
 	case shutdown
@@ -114,28 +114,28 @@ enum SyncTxManager_State: Equatable, CustomStringConvertible {
 	
 	// Simplified initializers:
 	
-	static func updatingCloud_creatingRecordZone() -> SyncTxManager_State {
-		return .updatingCloud(details: SyncTxManager_State_UpdatingCloud(kind: .creatingRecordZone))
+	static func updatingCloud_creatingRecordZone() -> SyncBackupManager_State {
+		return .updatingCloud(details: SyncBackupManager_State_UpdatingCloud(kind: .creatingRecordZone))
 	}
 	
-	static func updatingCloud_deletingRecordZone() -> SyncTxManager_State {
-		return .updatingCloud(details: SyncTxManager_State_UpdatingCloud(kind: .deletingRecordZone))
+	static func updatingCloud_deletingRecordZone() -> SyncBackupManager_State {
+		return .updatingCloud(details: SyncBackupManager_State_UpdatingCloud(kind: .deletingRecordZone))
 	}
 	
-	static func waiting_forInternet() -> SyncTxManager_State {
-		return .waiting(details: SyncTxManager_State_Waiting(kind: .forInternet))
+	static func waiting_forInternet() -> SyncBackupManager_State {
+		return .waiting(details: SyncBackupManager_State_Waiting(kind: .forInternet))
 	}
 	
-	static func waiting_forCloudCredentials() -> SyncTxManager_State {
-		return .waiting(details: SyncTxManager_State_Waiting(kind: .forCloudCredentials))
+	static func waiting_forCloudCredentials() -> SyncBackupManager_State {
+		return .waiting(details: SyncBackupManager_State_Waiting(kind: .forCloudCredentials))
 	}
 	
 	static func waiting_exponentialBackoff(
-		_ parent: SyncTxManager,
+		_ parent: SyncBackupManager,
 		delay: TimeInterval,
 		error: Error
-	) -> SyncTxManager_State {
-		return .waiting(details: SyncTxManager_State_Waiting(
+	) -> SyncBackupManager_State {
+		return .waiting(details: SyncBackupManager_State_Waiting(
 			kind: .exponentialBackoff(error),
 			parent: parent,
 			delay: delay
@@ -143,10 +143,10 @@ enum SyncTxManager_State: Equatable, CustomStringConvertible {
 	}
 	
 	static func waiting_randomizedUploadDelay(
-		_ parent: SyncTxManager,
+		_ parent: SyncBackupManager,
 		delay: TimeInterval
-	) -> SyncTxManager_State {
-		return .waiting(details: SyncTxManager_State_Waiting(
+	) -> SyncBackupManager_State {
+		return .waiting(details: SyncBackupManager_State_Waiting(
 			kind: .randomizedUploadDelay,
 			parent: parent,
 			delay: delay
@@ -156,7 +156,7 @@ enum SyncTxManager_State: Equatable, CustomStringConvertible {
 
 /// Details concerning the type of changes being made to the CloudKit container(s).
 ///
-class SyncTxManager_State_UpdatingCloud: Equatable {
+class SyncBackupManager_State_UpdatingCloud: Equatable {
 	
 	enum Kind {
 		case creatingRecordZone
@@ -177,7 +177,9 @@ class SyncTxManager_State_UpdatingCloud: Equatable {
 		task?.cancel()
 	}
 	
-	static func == (lhs: SyncTxManager_State_UpdatingCloud, rhs: SyncTxManager_State_UpdatingCloud) -> Bool {
+	static func == (lhs: SyncBackupManager_State_UpdatingCloud,
+	                rhs: SyncBackupManager_State_UpdatingCloud
+	) -> Bool {
 		return lhs.kind == rhs.kind
 	}
 }
@@ -185,10 +187,25 @@ class SyncTxManager_State_UpdatingCloud: Equatable {
 /// Exposes an ObservableObject that can be used by the UI for various purposes.
 /// All changes to `@Published` properties will be made on the UI thread.
 ///
-class SyncTxManager_State_Downloading: ObservableObject, Equatable {
+class SyncBackupManager_State_Downloading: ObservableObject, Equatable {
 	
-	@Published private(set) var completedCount: Int = 0
-	@Published private(set) var oldestCompletedDownload: Date? = nil
+	let needsDownloadPayments: Bool
+	let needsDownloadContacts: Bool
+	
+	@Published private(set) var payments_completedCount: Int = 0
+	@Published private(set) var payments_oldestCompletedDownload: Date? = nil
+	
+	@Published private(set) var contacts_completedCount: Int = 0
+	@Published private(set) var contacts_oldestCompletedDownload: Date? = nil
+	
+	init(needsDownloadPayments: Bool, needsDownloadContacts: Bool) {
+		self.needsDownloadPayments = needsDownloadPayments
+		self.needsDownloadContacts = needsDownloadContacts
+	}
+	
+	var completedCount: Int {
+		return payments_completedCount + contacts_completedCount
+	}
 	
 	private func updateOnMainThread(_ block: @escaping () -> Void) {
 		if Thread.isMainThread {
@@ -198,29 +215,53 @@ class SyncTxManager_State_Downloading: ObservableObject, Equatable {
 		}
 	}
 	
-	func setOldestCompletedDownload(_ date: Date?) {
+	func setPayments_oldestCompletedDownload(_ date: Date?) {
 		updateOnMainThread {
-			self.oldestCompletedDownload = date
+			self.payments_oldestCompletedDownload = date
 		}
 	}
 	
-	func finishBatch(completed: Int, oldest: Date?) {
+	func setContacts_oldestCompletedDownload(_ date: Date?) {
 		updateOnMainThread {
-			self.completedCount += completed
+			self.contacts_oldestCompletedDownload = date
+		}
+	}
+	
+	func payments_finishBatch(completed: Int, oldest: Date?) {
+		updateOnMainThread {
+			self.payments_completedCount += completed
 			
 			if let oldest = oldest {
-				if let prv = self.oldestCompletedDownload {
+				if let prv = self.payments_oldestCompletedDownload {
 					if oldest < prv {
-						self.oldestCompletedDownload = oldest
+						self.payments_oldestCompletedDownload = oldest
 					}
 				} else {
-					self.oldestCompletedDownload = oldest
+					self.payments_oldestCompletedDownload = oldest
 				}
 			}
 		}
 	}
 	
-	static func == (lhs: SyncTxManager_State_Downloading, rhs: SyncTxManager_State_Downloading) -> Bool {
+	func contacts_finishBatch(completed: Int, oldest: Date?) {
+		updateOnMainThread {
+			self.contacts_completedCount += completed
+			
+			if let oldest = oldest {
+				if let prv = self.contacts_oldestCompletedDownload {
+					if oldest < prv {
+						self.contacts_oldestCompletedDownload = oldest
+					}
+				} else {
+					self.contacts_oldestCompletedDownload = oldest
+				}
+			}
+		}
+	}
+	
+	static func == (lhs: SyncBackupManager_State_Downloading,
+	                rhs: SyncBackupManager_State_Downloading
+	) -> Bool {
 		// Equality for this class is is based on pointers
 		return lhs === rhs
 	}
@@ -229,18 +270,49 @@ class SyncTxManager_State_Downloading: ObservableObject, Equatable {
 /// Exposes an ObservableObject that can be used by the UI to display progress information.
 /// All changes to `@Published` properties will be made on the UI thread.
 ///
-class SyncTxManager_State_Uploading: ObservableObject, Equatable {
+class SyncBackupManager_State_Uploading: ObservableObject, Equatable {
 	
-	@Published private(set) var totalCount: Int
-	@Published private(set) var completedCount: Int = 0
-	@Published private(set) var inFlightCount: Int = 0
-	@Published private(set) var inFlightProgress: Progress? = nil
+	@Published private(set) var payments_totalCount: Int
+	@Published private(set) var payments_completedCount: Int = 0
+	@Published private(set) var payments_inFlightCount: Int = 0
+	@Published private(set) var payments_inFlightProgress: Progress? = nil
+	
+	@Published private(set) var contacts_totalCount: Int
+	@Published private(set) var contacts_completedCount: Int = 0
+	@Published private(set) var contacts_inFlightCount: Int = 0
+	@Published private(set) var contacts_inFlightProgress: Progress? = nil
 	
 	private(set) var isCancelled = false
 	private(set) var operation: CKOperation? = nil
 	
-	init(totalCount: Int) {
-		self.totalCount = totalCount
+	var totalCount: Int {
+		return payments_totalCount + contacts_totalCount
+	}
+	
+	var completedCount: Int {
+		return payments_completedCount + contacts_completedCount
+	}
+	
+	var inFlightCount: Int {
+		return payments_inFlightCount + contacts_inFlightCount
+	}
+	
+	var inFlightProgress: Progress? {
+		// Note: we only perform one upload at a time (either payments or contacts)
+		return payments_inFlightProgress ?? contacts_inFlightProgress
+	}
+	
+	var payments_pendingCount: Int {
+		return payments_totalCount - payments_completedCount
+	}
+	
+	var contacts_pendingCount: Int {
+		return contacts_totalCount - contacts_completedCount
+	}
+	
+	init(payments_totalCount: Int, contacts_totalCount: Int) {
+		self.payments_totalCount = payments_totalCount
+		self.contacts_totalCount = contacts_totalCount
 	}
 	
 	private func updateOnMainThread(_ block: @escaping () -> Void) {
@@ -251,24 +323,38 @@ class SyncTxManager_State_Uploading: ObservableObject, Equatable {
 		}
 	}
 	
-	func setTotalCount(_ value: Int) {
+	func setPayments_totalCount(_ value: Int) {
 		updateOnMainThread {
-			self.totalCount = value
+			self.payments_totalCount = value
 		}
 	}
 	
-	func setInFlight(count: Int, progress: Progress) {
+	func setContacts_totalCount(_ value: Int) {
 		updateOnMainThread {
-			self.inFlightCount = count
-			self.inFlightProgress = progress
+			self.contacts_totalCount = value
 		}
 	}
 	
-	func completeInFlight(completed: Int) {
+	func setPayments_inFlight(count: Int, progress: Progress) {
 		updateOnMainThread {
-			self.completedCount += completed
-			self.inFlightCount = 0
-			self.inFlightProgress = nil
+			self.payments_inFlightCount = count
+			self.payments_inFlightProgress = progress
+		}
+	}
+	
+	func completePayments_inFlight(_ completed: Int) {
+		updateOnMainThread {
+			self.payments_completedCount += completed
+			self.payments_inFlightCount = 0
+			self.payments_inFlightProgress = nil
+		}
+	}
+	
+	func completeContacts_inFlight(_ completed: Int) {
+		updateOnMainThread {
+			self.contacts_completedCount += completed
+			self.contacts_inFlightCount = 0
+			self.contacts_inFlightProgress = nil
 		}
 	}
 	
@@ -286,16 +372,18 @@ class SyncTxManager_State_Uploading: ObservableObject, Equatable {
 		}
 	}
 	
-	static func == (lhs: SyncTxManager_State_Uploading, rhs: SyncTxManager_State_Uploading) -> Bool {
+	static func == (lhs: SyncBackupManager_State_Uploading,
+	                rhs: SyncBackupManager_State_Uploading
+	) -> Bool {
 		// Equality for this class is is based on pointers
 		return lhs === rhs
 	}
 }
 
-/// Details concerning what/why the SyncTxManager is temporarily paused.
+/// Details concerning what/why the SyncBackupManager is temporarily paused.
 /// Sometimes these delays can be manually cancelled by the user.
 ///
-class SyncTxManager_State_Waiting: Equatable {
+class SyncBackupManager_State_Waiting: Equatable {
 	
 	enum Kind: Equatable {
 		case forInternet
@@ -303,7 +391,9 @@ class SyncTxManager_State_Waiting: Equatable {
 		case exponentialBackoff(Error)
 		case randomizedUploadDelay
 		
-		static func == (lhs: SyncTxManager_State_Waiting.Kind, rhs: SyncTxManager_State_Waiting.Kind) -> Bool {
+		static func == (lhs: SyncBackupManager_State_Waiting.Kind,
+		                rhs: SyncBackupManager_State_Waiting.Kind
+		) -> Bool {
 			switch (lhs, rhs) {
 				case (.forInternet, .forInternet): return true
 				case (.forCloudCredentials, .forCloudCredentials): return true
@@ -319,13 +409,13 @@ class SyncTxManager_State_Waiting: Equatable {
 	let kind: Kind
 	
 	struct WaitingUntil: Equatable {
-		weak var parent: SyncTxManager?
+		weak var parent: SyncBackupManager?
 		let delay: TimeInterval
 		let startDate: Date
 		let fireDate: Date
 		
-		static func == (lhs: SyncTxManager_State_Waiting.WaitingUntil,
-		                rhs: SyncTxManager_State_Waiting.WaitingUntil
+		static func == (lhs: SyncBackupManager_State_Waiting.WaitingUntil,
+		                rhs: SyncBackupManager_State_Waiting.WaitingUntil
 		) -> Bool {
 			return (lhs.parent === rhs.parent) &&
 			       (lhs.delay == rhs.delay) &&
@@ -341,7 +431,7 @@ class SyncTxManager_State_Waiting: Equatable {
 		self.until = nil
 	}
 	
-	init(kind: Kind, parent: SyncTxManager, delay: TimeInterval) {
+	init(kind: Kind, parent: SyncBackupManager, delay: TimeInterval) {
 		self.kind = kind
 		
 		let now = Date()
@@ -368,8 +458,9 @@ class SyncTxManager_State_Waiting: Equatable {
 		timerFire()
 	}
 	
-	static func == (lhs: SyncTxManager_State_Waiting, rhs: SyncTxManager_State_Waiting) -> Bool {
-		
+	static func == (lhs: SyncBackupManager_State_Waiting,
+						 rhs: SyncBackupManager_State_Waiting
+	) -> Bool {
 		return (lhs.kind == rhs.kind) && (lhs.until == rhs.until)
 	}
 }

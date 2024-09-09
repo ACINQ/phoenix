@@ -51,7 +51,7 @@ class SqlitePaymentsDb(
 
     private val log = loggerFactory.newLogger(this::class)
 
-    private val database = PaymentsDatabase(
+    internal val database = PaymentsDatabase(
         driver = driver,
         outgoing_payment_partsAdapter = Outgoing_payment_parts.Adapter(
             part_routeAdapter = OutgoingQueries.hopDescAdapter,
@@ -83,21 +83,15 @@ class SqlitePaymentsDb(
 
     internal val inQueries = IncomingQueries(database)
     internal val outQueries = OutgoingQueries(database)
-    private val spliceOutQueries = SpliceOutgoingQueries(database)
-    private val channelCloseQueries = ChannelCloseOutgoingQueries(database)
-    private val cpfpQueries = SpliceCpfpOutgoingQueries(database)
+    internal val spliceOutQueries = SpliceOutgoingQueries(database)
+    internal val channelCloseQueries = ChannelCloseOutgoingQueries(database)
+    internal val cpfpQueries = SpliceCpfpOutgoingQueries(database)
     private val aggrQueries = database.aggregatedQueriesQueries
-    private val metaQueries = MetadataQueries(database)
+    internal val metaQueries = MetadataQueries(database)
     private val linkTxToPaymentQueries = LinkTxToPaymentQueries(database)
-    private val inboundLiquidityQueries = InboundLiquidityQueries(database)
-
-    private val cloudKitDb = makeCloudKitDb(database)
+    internal val inboundLiquidityQueries = InboundLiquidityQueries(database)
 
     private var metadataQueue = MutableStateFlow(mapOf<WalletPaymentId, WalletPaymentMetadataRow>())
-
-    fun getCloudKitDb(): CloudKitInterface? {
-        return cloudKitDb
-    }
 
     override suspend fun addOutgoingLightningParts(
         parentId: UUID,
@@ -715,34 +709,3 @@ data class WalletPaymentOrderRow(
             return "${id.identifier}|${createdAt}|"
         }
 }
-
-/**
- * Implement this function to execute platform specific code when a payment is saved to the database.
- * For example, on iOS this is used to enqueue the (encrypted) payment for upload to CloudKit.
- *
- * This function is invoked inside the same transaction used to add/modify the row.
- * This means any database operations performed in this function are atomic,
- * with respect to the referenced row.
- */
-expect fun didSaveWalletPayment(id: WalletPaymentId, database: PaymentsDatabase)
-
-/**
- * Implement this function to execute platform specific code when a payment is deleted.
- * For example, on iOS this is used to enqueue an operation to delete the payment from CloudKit.
- */
-expect fun didDeleteWalletPayment(id: WalletPaymentId, database: PaymentsDatabase)
-
-/**
- * Implement this function to execute platform specific code when a payment's metadata is updated.
- * For example: the user modifies the payment description.
- *
- * This function is invoked inside the same transaction used to add/modify the row.
- * This means any database operations performed in this function are atomic,
- * with respect to the referenced row.
- */
-expect fun didUpdateWalletPaymentMetadata(id: WalletPaymentId, database: PaymentsDatabase)
-
-/**
- * Implemented on Apple platforms with support for CloudKit.
- */
-expect fun makeCloudKitDb(database: PaymentsDatabase): CloudKitInterface?
