@@ -71,8 +71,6 @@ fun ConnectionDialog(
                 }
                 Spacer(modifier = Modifier.height(24.dp))
                 HSeparator()
-                ConnectionDialogLine(label = stringResource(id = R.string.conndialog_internet), connection = connections.internet)
-                HSeparator()
 
                 val isTorEnabled = userPrefs.getIsTorEnabled.collectAsState(initial = null).value
                 if (isTorEnabled != null && isTorEnabled) {
@@ -130,7 +128,7 @@ private fun ConnectionDialogLine(
             text = when (connection) {
                 Connection.ESTABLISHING -> stringResource(R.string.conndialog_connecting)
                 Connection.ESTABLISHED -> stringResource(R.string.conndialog_connected)
-                else -> stringResource(R.string.conndialog_closed)
+                is Connection.CLOSED, null -> stringResource(R.string.conndialog_closed)
             },
             style = monoTypo
         )
