@@ -116,16 +116,6 @@ struct SummaryView: View {
 	func main() -> some View {
 		
 		ZStack {
-
-			if #unavailable(iOS 16.0) {
-				NavigationLink(
-					destination: navLinkView(),
-					isActive: navLinkTagBinding()
-				) {
-					EmptyView()
-				}
-				.isDetailLink(false)
-			} // else: uses.navigationStackDestination()
 			
 			// This technique is used to center the content vertically
 			GeometryReader { geometry in
@@ -155,7 +145,7 @@ struct SummaryView: View {
 			}
 		
 		} // </ZStack>
-		.navigationStackDestination(isPresented: navLinkTagBinding()) { // For iOS 16+
+		.navigationDestination(isPresented: navLinkTagBinding()) {
 			navLinkView()
 		}
 		.onAppear {

@@ -53,17 +53,6 @@ struct ChannelsConfigurationView: View {
 	func content() -> some View {
 		
 		ZStack {
-			if #unavailable(iOS 16.0) {
-				NavigationLink(
-					destination: importChannelsView(),
-					isActive: $importChannelsOpen
-				) {
-					EmptyView()
-				}
-				.accessibilityHidden(true)
-				
-			} // else: uses.navigationStackDestination()
-			
 			List {
 				if channels.isEmpty {
 					section_noChannels()
@@ -81,7 +70,7 @@ struct ChannelsConfigurationView: View {
 			
 		} // </ZStack>
 		.navigationBarItems(trailing: menuButton())
-		.navigationStackDestination(isPresented: $importChannelsOpen) { // For iOS 16+
+		.navigationDestination(isPresented: $importChannelsOpen) {
 			importChannelsView()
 		}
 	}

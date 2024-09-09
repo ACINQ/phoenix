@@ -48,12 +48,7 @@ class LoggerFactory {
 			forSecurityApplicationGroupIdentifier: "group.co.acinq.phoenix"
 		)!
 		
-		let logsDir: URL
-		if #available(iOS 16.0, *) {
-			logsDir = sharedDir.appending(path: "logs", directoryHint: .isDirectory)
-		} else {
-			logsDir = sharedDir.appendingPathComponent("logs", isDirectory: true)
-		}
+		let logsDir: URL = sharedDir.appending(path: "logs", directoryHint: .isDirectory)
 		
 		try FileManager.default.createDirectory(at: logsDir, withIntermediateDirectories: true)
 		return logsDir

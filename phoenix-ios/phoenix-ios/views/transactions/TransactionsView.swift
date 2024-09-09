@@ -57,23 +57,12 @@ struct TransactionsView: View {
 	var body: some View {
 		
 		ZStack {
-			if #unavailable(iOS 16.0) {
-				NavigationLink(
-					destination: navLinkView(),
-					isActive: navLinkBinding()
-				) {
-					EmptyView()
-				}
-				.isDetailLink(false)
-				
-			} // else: uses.navigationStackDestination()
-			
 			content()
 		}
 		.navigationTitle(NSLocalizedString("Payments", comment: "Navigation bar title"))
 		.navigationBarTitleDisplayMode(.inline)
 		.navigationBarItems(trailing: exportButton())
-		.navigationStackDestination(isPresented: navLinkBinding()) { // For iOS 16+
+		.navigationDestination(isPresented: navLinkBinding()) {
 			navLinkView()
 		}
 	}

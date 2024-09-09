@@ -399,13 +399,7 @@ class LogFileManager {
 				fileName = "\(baseFileName) \(attempt).log"
 			}
 			
-			let fileUrl: URL
-			if #available(iOS 16.0, *) {
-				fileUrl = logsDirectory.appending(path: fileName, directoryHint: .notDirectory)
-			} else {
-				fileUrl = logsDirectory.appendingPathComponent(fileName, isDirectory: false)
-			}
-			
+			let fileUrl: URL = logsDirectory.appending(path: fileName, directoryHint: .notDirectory)
 			do {
 				let options: Data.WritingOptions = .withoutOverwriting
 				try Data().write(to: fileUrl, options: options)

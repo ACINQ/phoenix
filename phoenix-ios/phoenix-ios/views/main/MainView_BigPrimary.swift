@@ -46,7 +46,7 @@ struct MainView_BigPrimary: View {
 	@ViewBuilder
 	var body: some View {
 		
-		NavigationWrapper {
+		NavigationStack {
 			layers()
 				.navigationTitle("")
 				.navigationBarTitleDisplayMode(.inline)
@@ -61,19 +61,6 @@ struct MainView_BigPrimary: View {
 	func layers() -> some View {
 		
 		ZStack {
-			if #unavailable(iOS 16.0) {
-				// iOS 14 & 15 have bugs when using NavigationLink.
-				// The suggested workarounds include using only a single NavigationLink.
-				//
-				NavigationLink(
-					destination: primary_navLinkView(),
-					isActive: navLinkTagBinding()
-				) {
-					EmptyView()
-				}
-				.isDetailLink(false)
-				
-			} // else: uses.navigationStackDestination()
 			
 			Color.primaryBackground
 				.ignoresSafeArea()
@@ -87,7 +74,7 @@ struct MainView_BigPrimary: View {
 			primary_body()
 		
 		} // <ZStack>
-		.navigationStackDestination(isPresented: navLinkTagBinding()) { // For iOS 16+
+		.navigationDestination(isPresented: navLinkTagBinding()) {
 			primary_navLinkView()
 		}
 		.onAppear {

@@ -292,7 +292,7 @@ struct MainView_Big: View {
 	@ViewBuilder
 	func leadingSidebar_settings() -> some View {
 		
-		NavigationWrapper {
+		NavigationStack {
 			ConfigurationView()
 		}
 		.padding(.top, navigationViewPaddingTop)
@@ -301,7 +301,7 @@ struct MainView_Big: View {
 	@ViewBuilder
 	func leadingSidebar_transactions() -> some View {
 		
-		NavigationWrapper {
+		NavigationStack {
 			TransactionsView()
 		}
 		.padding(.top, navigationViewPaddingTop)
@@ -342,7 +342,7 @@ struct MainView_Big: View {
 	@ViewBuilder
 	func trailingSidebar_currencyConverter() -> some View {
 		
-		NavigationWrapper {
+		NavigationStack {
 			CurrencyConverterView()
 		}
 		.padding(.top, navigationViewPaddingTop)

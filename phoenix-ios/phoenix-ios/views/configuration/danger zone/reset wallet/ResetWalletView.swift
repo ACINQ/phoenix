@@ -43,20 +43,9 @@ struct ResetWalletView: MVIView {
 	var view: some View {
 
 		ZStack {
-			if #unavailable(iOS 16.0) {
-				NavigationLink(
-					destination: reviewScreen(),
-					isActive: $reviewRequested
-				) {
-					EmptyView()
-				}
-				.accessibilityHidden(true)
-				
-			} // else: uses.navigationStackDestination()
-			
 			content()
 		}
-		.navigationStackDestination(isPresented: $reviewRequested) { // For iOS 16+
+		.navigationDestination(isPresented: $reviewRequested) {
 			reviewScreen()
 		}
 		.onReceive(backupTransactions_enabled_publisher) {

@@ -37,20 +37,9 @@ struct ContactsList: View {
 	var body: some View {
 		
 		ZStack {
-			
-			if #unavailable(iOS 16.0) {
-				NavigationLink(
-					destination: selectedItemView(),
-					isActive: selectedItemBinding()
-				) {
-					EmptyView()
-				}
-				.isDetailLink(false)
-			} // else: uses.navigationStackDestination()
-			
 			content()
 		}
-		.navigationStackDestination(isPresented: selectedItemBinding()) { // For iOS 16+
+		.navigationDestination(isPresented: selectedItemBinding()) {
 			selectedItemView()
 		}
 		.navigationTitle("Contacts")

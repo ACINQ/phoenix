@@ -62,26 +62,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		UINavigationBar.appearance().scrollEdgeAppearance = navBarAppearance
 		UINavigationBar.appearance().compactAppearance = navBarAppearance
 		UINavigationBar.appearance().standardAppearance = navBarAppearance
-		
-		if #available(iOS 16, *) {
-			// In iOS 16, List uses UICollectionView instead of UITableView.
-			// So this does have an effect:
-			// UICollectionView.appearance().backgroundColor = .primaryBackground
-			//
-			// However, in iOS 16 there's a better option:
-			// .listBackgroundColor(.someColor)
-			//
-			// Furthermore, if you set the global appearance option as above,
-			// then it will *override* the per-list settings via .listBackgroundColor().
-			// And we prefer to have more fine-grained control.
-			// For example, in the CurrencyConverterView we're instead using
-			// .listBackgroundColor(Color(.systemBackground))
-			
-		} else {
-			// iOS 15
-			UITableView.appearance().backgroundColor = .primaryBackground
-			UICollectionView.appearance().backgroundColor = .primaryBackground
-		}
 
 		#if !targetEnvironment(simulator) // push notifications don't work on iOS simulator
 			UIApplication.shared.registerForRemoteNotifications()

@@ -11,7 +11,6 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 extension NSItemProvider {
 	
-	@available(iOS 16.0, *)
 	func asyncLoadDataRepresentation(
 		 for contentType: UTType
 	) async throws -> Data {
@@ -29,7 +28,6 @@ extension NSItemProvider {
 		}
 	}
 	
-	@available(iOS 16.0, *)
 	func asyncLoadFileRepresentation(
 		 for contentType: UTType,
 		 openInPlace: Bool = false

@@ -295,7 +295,7 @@ struct ManageContact: View {
 			.padding()
 		} // </ScrollView>
 		.frame(maxHeight: scrollViewMaxHeight)
-		.scrollingDismissesKeyboard(.interactively)
+		.scrollDismissesKeyboard(.interactively)
 	}
 	
 	@ViewBuilder

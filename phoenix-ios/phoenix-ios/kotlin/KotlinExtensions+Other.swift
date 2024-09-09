@@ -177,7 +177,7 @@ extension MnemonicLanguage {
 		for identifier in Locale.preferredLanguages {
 			
 			let locale = Locale(identifier: identifier)
-			if let code = locale.languageCode {
+            if let code = locale.language.languageCode?.identifier {
 				
 				for lang in available {
 					if lang.code.caseInsensitiveCompare(code) == .orderedSame {

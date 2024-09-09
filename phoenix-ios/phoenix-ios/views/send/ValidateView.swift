@@ -85,17 +85,6 @@ struct ValidateView: View {
 	var body: some View {
 		
 		ZStack {
-			if #unavailable(iOS 16.0) {
-				NavigationLink(
-					destination: currencyConverterView(),
-					isActive: $currencyConverterOpen
-				) {
-					EmptyView()
-				}
-				.accessibilityHidden(true)
-				
-			} // else: uses.navigationStackDestination()
-			
 			Color.primaryBackground
 				.ignoresSafeArea(.all, edges: .all)
 			
@@ -146,7 +135,7 @@ struct ValidateView: View {
 		.onAppear() {
 			onAppear()
 		}
-		.navigationStackDestination(isPresented: $currencyConverterOpen) { // For iOS 16+
+		.navigationDestination(isPresented: $currencyConverterOpen) {
 			currencyConverterView()
 		}
 		.onChange(of: mvi.model) { newModel in
