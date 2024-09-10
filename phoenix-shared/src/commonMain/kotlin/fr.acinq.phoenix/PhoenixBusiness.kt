@@ -38,7 +38,6 @@ import fr.acinq.phoenix.db.createAppDbDriver
 import fr.acinq.phoenix.managers.*
 import fr.acinq.phoenix.utils.*
 import fr.acinq.phoenix.utils.logger.PhoenixLoggerConfig
-import fr.acinq.tor.Tor
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
@@ -59,12 +58,7 @@ class PhoenixBusiness(
 
     private val tcpSocketBuilder = TcpSocket.Builder()
     internal val tcpSocketBuilderFactory = suspend {
-        val isTorEnabled = appConfigurationManager.isTorEnabled.filterNotNull().first()
-        if (isTorEnabled) {
-            tcpSocketBuilder.torProxy(loggerFactory)
-        } else {
-            tcpSocketBuilder
-        }
+        tcpSocketBuilder
     }
 
     internal val httpClient by lazy {
@@ -97,7 +91,6 @@ class PhoenixBusiness(
     val notificationsManager by lazy { NotificationsManager(this) }
     val contactsManager by lazy { ContactsManager(this) }
     val blockchainExplorer by lazy { BlockchainExplorer(chain) }
-    val tor by lazy { Tor(getApplicationCacheDirectoryPath(ctx), TorHelper.torLogger(loggerFactory)) }
 
     fun start(startupParams: StartupParams) {
         logger.debug { "starting with params=$startupParams" }
