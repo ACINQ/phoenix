@@ -30,26 +30,33 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import fr.acinq.phoenix.android.AppViewModel
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.screenlock.CheckPinFlow
 import fr.acinq.phoenix.android.components.screenlock.NewPinFlow
+import fr.acinq.phoenix.android.components.settings.ListPreferenceButton
+import fr.acinq.phoenix.android.components.settings.PreferenceItem
 import fr.acinq.phoenix.android.components.settings.Setting
 import fr.acinq.phoenix.android.components.settings.SettingSwitch
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.*
 import kotlinx.coroutines.launch
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 
 @Composable
 fun AppAccessSettings(
     onBackClick: () -> Unit,
+    appViewModel: AppViewModel,
 ) {
     val context = LocalContext.current
     val biometricAuthStatus = BiometricsHelper.authStatus(context)
     val userPrefs = userPrefs
     val isBiometricLockEnabled by userPrefs.getIsBiometricLockEnabled.collectAsState(null)
     val isCustomPinLockEnabled by userPrefs.getIsCustomPinLockEnabled.collectAsState(null)
+    val autoLockDelay by userPrefs.getAutoLockDelay.collectAsState(null)
 
     DefaultScreenLayout {
         DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.accessctrl_title))
@@ -73,6 +80,20 @@ fun AppAccessSettings(
                     isCustomPinLockEnabled = pinEnabled,
                 )
             } ?: ProgressView(text = stringResource(id = R.string.utils_loading_prefs))
+        }
+
+        if (isBiometricLockEnabled == true || isCustomPinLockEnabled == true) {
+            autoLockDelay?.let {
+                val scope = rememberCoroutineScope()
+                Card {
+                    AutoLockDelayPicker(it, onUpdateDelay = { newDelay ->
+                        scope.launch {
+                            userPrefs.saveAutoLockDelay(newDelay)
+                            appViewModel.scheduleAutoLock()
+                        }
+                    })
+                }
+            }
         }
     }
 }
@@ -205,4 +226,33 @@ private fun CustomPinLockView(
             color = negativeColor,
         )
     }
+}
+
+@Composable
+private fun AutoLockDelayPicker(
+    currentDelay: Duration,
+    onUpdateDelay: (Duration) -> Unit,
+) {
+    val preferences = listOf(
+        PreferenceItem(item = 1.minutes, title = "1 minute"),
+        PreferenceItem(item = 10.minutes, title = "10 minutes"),
+        PreferenceItem(item = Duration.INFINITE, title = "Never"),
+    )
+    ListPreferenceButton(
+        title = stringResource(id = R.string.accessctrl_autolock_title),
+        subtitle = {
+            if (currentDelay == Duration.INFINITE) {
+                Text(text = stringResource(id = R.string.accessctrl_autolock_desc_never))
+            } else {
+                Text(text = stringResource(id = R.string.accessctrl_autolock_desc, currentDelay.inWholeMinutes))
+            }
+        },
+        leadingIcon = { PhoenixIcon(resourceId = R.drawable.ic_lock)},
+        selectedItem = currentDelay,
+        preferences = preferences,
+        onPreferenceSubmit = {
+            if (it.item != currentDelay) onUpdateDelay(it.item)
+        },
+        enabled = true,
+    )
 }

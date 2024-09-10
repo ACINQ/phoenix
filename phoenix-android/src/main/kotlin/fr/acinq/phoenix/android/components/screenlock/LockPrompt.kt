@@ -18,10 +18,12 @@ package fr.acinq.phoenix.android.components.screenlock
 
 import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -56,7 +58,8 @@ import kotlinx.coroutines.launch
  * Screen shown when authentication through biometrics or PIN is required, depending on the user's settings.
  */
 @Composable
-fun ColumnScope.LockPrompt(
+fun LockPrompt(
+    promptScreenLockImmediately: Boolean,
     onLock: () -> Unit,
     onUnlock: () -> Unit,
 ) {
@@ -68,75 +71,88 @@ fun ColumnScope.LockPrompt(
     val isCustomPinLockEnabledState by userPrefs.getIsCustomPinLockEnabled.collectAsState(initial = null)
     var showPinLockDialog by rememberSaveable { mutableStateOf(false) }
 
-    safeLet(isBiometricLockEnabledState, isCustomPinLockEnabledState) { isBiometricLockEnabled, isCustomPinEnabled ->
+    Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colors.background)) {
+        safeLet(isBiometricLockEnabledState, isCustomPinLockEnabledState) { isBiometricLockEnabled, isCustomPinEnabled ->
 
-        val promptBiometricLock = {
-            val promptInfo = BiometricPrompt.PromptInfo.Builder().apply {
-                setTitle(context.getString(R.string.lockprompt_title))
-                setAllowedAuthenticators(BiometricsHelper.authCreds)
-            }.build()
-            BiometricsHelper.getPrompt(
-                activity = context.findActivity(),
-                onSuccess = {
-                    scope.launch { userPrefs.savePinCodeSuccess() }
-                    onUnlock()
-                },
-                onFailure = { onLock() },
-                onCancel = { }
-            ).authenticate(promptInfo)
-        }
-
-        LaunchedEffect(key1 = true) {
-            if (isBiometricLockEnabled) {
-                promptBiometricLock()
-            } else if (isCustomPinEnabled) {
-                showPinLockDialog = true
-            } else {
-                onUnlock()
+            val promptBiometricLock = {
+                val promptInfo = BiometricPrompt.PromptInfo.Builder().apply {
+                    setTitle(context.getString(R.string.lockprompt_title))
+                    setAllowedAuthenticators(BiometricsHelper.authCreds)
+                }.build()
+                BiometricsHelper.getPrompt(
+                    activity = context.findActivity(),
+                    onSuccess = {
+                        scope.launch { userPrefs.savePinCodeSuccess() }
+                        onUnlock()
+                    },
+                    onFailure = { onLock() },
+                    onCancel = { }
+                ).authenticate(promptInfo)
             }
-        }
 
-        if (showPinLockDialog) {
-            CheckPinFlow(
-                onCancel = { showPinLockDialog = false },
-                onPinValid = { onUnlock() }
+            if (promptScreenLockImmediately) {
+                LaunchedEffect(key1 = true) {
+                    if (isBiometricLockEnabled) {
+                        promptBiometricLock()
+                    } else if (isCustomPinEnabled) {
+                        showPinLockDialog = true
+                    } else {
+                        onUnlock()
+                    }
+                }
+            }
+
+            if (showPinLockDialog) {
+                CheckPinFlow(
+                    onCancel = { showPinLockDialog = false },
+                    onPinValid = { onUnlock() }
+                )
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+            Image(
+                painter = painterResource(id = R.drawable.ic_phoenix),
+                contentDescription = "phoenix-icon",
+                modifier = Modifier.align(Alignment.CenterHorizontally),
             )
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
-        Image(
-            painter = painterResource(id = R.drawable.ic_phoenix),
-            contentDescription = "phoenix-icon",
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-        )
-        Text(text = stringResource(id = R.string.lockprompt_title), textAlign = TextAlign.Center, modifier = Modifier.align(Alignment.CenterHorizontally).padding(horizontal = 32.dp))
-        Spacer(modifier = Modifier.weight(1f))
-        Column(modifier = Modifier.padding(horizontal = 16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            if (isBiometricLockEnabled) {
-                Spacer(modifier = Modifier.height(16.dp))
-                Button(
-                    text = stringResource(id = R.string.lockprompt_biometrics_button),
-                    icon = R.drawable.ic_fingerprint,
-                    onClick = promptBiometricLock,
-                    modifier = Modifier.fillMaxWidth(),
-                    backgroundColor = MaterialTheme.colors.surface,
-                    shape = CircleShape,
-                    padding = PaddingValues(16.dp),
-                )
+            Text(text = stringResource(id = R.string.lockprompt_title), textAlign = TextAlign.Center, modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(horizontal = 32.dp))
+            Spacer(modifier = Modifier.weight(1f))
+            Column(modifier = Modifier.padding(horizontal = 16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                if (isBiometricLockEnabled) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(
+                        text = stringResource(id = R.string.lockprompt_biometrics_button),
+                        icon = R.drawable.ic_fingerprint,
+                        onClick = promptBiometricLock,
+                        modifier = Modifier.fillMaxWidth(),
+                        backgroundColor = MaterialTheme.colors.surface,
+                        shape = CircleShape,
+                        padding = PaddingValues(16.dp),
+                    )
+                }
+                if (isCustomPinEnabled) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(
+                        text = stringResource(id = R.string.lockprompt_pin_button),
+                        icon = R.drawable.ic_pin,
+                        onClick = { showPinLockDialog = true },
+                        modifier = Modifier.fillMaxWidth(),
+                        backgroundColor = MaterialTheme.colors.surface,
+                        shape = CircleShape,
+                        padding = PaddingValues(16.dp),
+                    )
+                }
             }
-            if (isCustomPinEnabled) {
-                Spacer(modifier = Modifier.height(16.dp))
-                Button(
-                    text = stringResource(id = R.string.lockprompt_pin_button),
-                    icon = R.drawable.ic_pin,
-                    onClick = { showPinLockDialog = true },
-                    modifier = Modifier.fillMaxWidth(),
-                    backgroundColor = MaterialTheme.colors.surface,
-                    shape = CircleShape,
-                    padding = PaddingValues(16.dp),
-                )
-            }
+            Spacer(modifier = Modifier.height(16.dp))
+        } ?: run {
+            Spacer(modifier = Modifier.weight(1f))
+            ProgressView(
+                text = stringResource(id = R.string.utils_loading_prefs),
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+            )
+            Spacer(modifier = Modifier.weight(1f))
         }
-        Spacer(modifier = Modifier.height(16.dp))
-    } ?: ProgressView(text = stringResource(id = R.string.utils_loading_prefs))
+    }
 }

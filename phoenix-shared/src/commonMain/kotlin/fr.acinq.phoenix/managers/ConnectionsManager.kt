@@ -1,6 +1,7 @@
 package fr.acinq.phoenix.managers
 
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.utils.TorHelper.connectionState
@@ -23,7 +24,9 @@ data class Connections(
     }
 }
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ConnectionsManager(
+    loggerFactory: LoggerFactory,
     peerManager: PeerManager,
     electrumClient: ElectrumClient,
     networkMonitor: NetworkMonitor,
@@ -32,6 +35,7 @@ class ConnectionsManager(
 ): CoroutineScope {
 
     constructor(business: PhoenixBusiness): this(
+        loggerFactory = business.loggerFactory,
         peerManager = business.peerManager,
         electrumClient = business.electrumClient,
         networkMonitor = business.networkMonitor,
@@ -39,34 +43,33 @@ class ConnectionsManager(
         tor = business.tor
     )
 
+    val log = loggerFactory.newLogger(this::class)
     private val job = Job()
     override val coroutineContext = MainScope().coroutineContext + job
 
-    private val _connections = MutableStateFlow(Connections())
-    public val connections: StateFlow<Connections> get() = _connections
-
-    init {
-        launch {
-            combine(
-                peerManager.getPeer().connectionState,
-                electrumClient.connectionStatus,
-                networkMonitor.networkState,
-                appConfigurationManager.isTorEnabled.filterNotNull(),
-                tor.state.connectionState(this)
-            ) { peerState, electrumStatus, internetState, torEnabled, torState ->
-                Connections(
-                    peer = peerState,
-                    electrum = electrumStatus.toConnectionState(),
-                    internet = when (internetState) {
-                        NetworkState.Available -> Connection.ESTABLISHED
-                        NetworkState.NotAvailable -> Connection.CLOSED(reason = null)
-                    },
-                    tor = if (torEnabled) torState else Connection.CLOSED(reason = null),
-                    torEnabled = torEnabled
-                )
-            }.collect {
-                _connections.value = it
-            }
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val connections = peerManager.peerState.filterNotNull().flatMapLatest { peer ->
+        combine(
+            peer.connectionState,
+            electrumClient.connectionStatus,
+            networkMonitor.networkState,
+            appConfigurationManager.isTorEnabled.filterNotNull(),
+            tor.state.connectionState(this)
+        ) { peerState, electrumStatus, internetState, torEnabled, torState ->
+            Connections(
+                peer = peerState,
+                electrum = electrumStatus.toConnectionState(),
+                internet = when (internetState) {
+                    NetworkState.Available -> Connection.ESTABLISHED
+                    NetworkState.NotAvailable -> Connection.CLOSED(reason = null)
+                },
+                tor = if (torEnabled) torState else Connection.CLOSED(reason = null),
+                torEnabled = torEnabled
+            )
         }
-    }
+    }.stateIn(
+        scope = this,
+        started = SharingStarted.Eagerly,
+        initialValue = Connections(), // default value is everything = closed
+    )
 }

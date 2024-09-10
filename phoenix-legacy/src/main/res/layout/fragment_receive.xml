@@ -271,16 +271,16 @@
           app:layout_goneMarginTop="@dimen/space_md" />
 
         <TextView
-          android:id="@+id/min_funding_pay_to_open"
+          android:id="@+id/upgrade_disclaimer"
           android:layout_width="0dp"
           android:layout_height="wrap_content"
           android:layout_marginStart="@dimen/space_lg"
           android:layout_marginTop="@dimen/space_md_p"
           android:layout_marginEnd="@dimen/space_lg"
-          android:text="@string/legacy_receive_min_amount_pay_to_open"
+          android:text="@string/legacy_receive_upgrade"
           android:textAlignment="center"
           android:textSize="@dimen/text_md"
-          android:visibility="@{model.state == PaymentGenerationState.DONE &amp;&amp; model.showMinFundingPayToOpen}"
+          android:visibility="@{model.state == PaymentGenerationState.DONE}"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/raw_invoice"
@@ -297,7 +297,7 @@
           app:layout_constraintEnd_toStartOf="@id/enlarge_button"
           app:layout_constraintHorizontal_chainStyle="packed"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/min_funding_pay_to_open" />
+          app:layout_constraintTop_toBottomOf="@id/upgrade_disclaimer" />
 
         <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/enlarge_button"
@@ -333,73 +333,6 @@
           app:layout_constraintStart_toEndOf="@id/share_button"
           app:layout_constraintTop_toTopOf="@id/copy_button" />
 
-        <View
-          android:id="@+id/swap_in_sep"
-          android:layout_width="80dp"
-          android:layout_height="1dp"
-          android:layout_marginTop="@dimen/space_lg"
-          android:background="@drawable/line_dots"
-          android:layerType="software"
-          android:visibility="@{model.state == PaymentGenerationState.DONE || model.state == SwapInState.DONE}"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/copy_button" />
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_marginStart="@dimen/space_lg"
-          android:layout_marginTop="@dimen/space_md_p"
-          android:layout_marginEnd="@dimen/space_lg"
-          android:background="@drawable/rounded"
-          android:padding="@dimen/space_md"
-          android:visibility="@{model.state == SwapInState.DONE}"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/swap_in_sep"
-          app:layout_constraintWidth_max="@dimen/max_width_sm"
-          app:layout_goneMarginTop="@dimen/space_md">
-
-          <ImageView
-            android:id="@+id/swap_in_icon"
-            android:layout_width="@dimen/button_height"
-            android:layout_height="@dimen/button_height"
-            android:contentDescription="@null"
-            android:layout_marginTop="@dimen/space_xxs"
-            app:layout_constraintEnd_toStartOf="@id/swap_in_info"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            android:src="@drawable/ic_info"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-          <TextView
-            android:id="@+id/swap_in_info"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/legacy_receive_swap_in_info"
-            android:layout_marginStart="@dimen/space_sm"
-            android:textSize="@dimen/text_md"
-            app:layout_constrainedWidth="true"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/swap_in_icon"
-            app:layout_constraintTop_toTopOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
-          android:id="@+id/swap_in_button"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_marginTop="@dimen/space_md_p"
-          android:visibility="@{model.state == PaymentGenerationState.DONE}"
-          app:icon="@drawable/ic_swap"
-          app:icon_tint="?attr/colorPrimary"
-          app:is_paused="@{!appModel.networkInfo.lightningConnected}"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/swap_in_sep"
-          app:paused_text="@string/legacy_btn_pause_connecting"
-          app:text="@string/legacy_receive_swap_in_button" />
-
         <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/withdraw_button"
           android:layout_width="wrap_content"
@@ -410,7 +343,7 @@
           app:icon_tint="?attr/colorPrimary"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/swap_in_button"
+          app:layout_constraintTop_toBottomOf="@id/copy_button"
           app:text="@string/legacy_receive_withdraw_button" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>

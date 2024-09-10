@@ -93,7 +93,7 @@ fun Setting(
                     }
                 }
                 if (subtitle != null) {
-                    Spacer(modifier = Modifier.height(2.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                     CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.subtitle2) {
                         subtitle()
                     }

@@ -116,7 +116,7 @@ class CheckPinFlowViewModel(private val userPrefsRepository: UserPrefsRepository
                 val expected = EncryptedPin.getPinFromDisk(context)
                 if (pin == expected) {
                     log.debug("valid pin")
-                    delay(100)
+                    delay(20)
                     userPrefsRepository.savePinCodeSuccess()
                     pinInput = ""
                     state = CheckPinFlowState.CanType
@@ -125,7 +125,7 @@ class CheckPinFlowViewModel(private val userPrefsRepository: UserPrefsRepository
                     }
                 } else {
                     log.debug("incorrect pin")
-                    delay(200)
+                    delay(80)
                     userPrefsRepository.savePinCodeFailure()
                     state = CheckPinFlowState.IncorrectPin
                     delay(1300)

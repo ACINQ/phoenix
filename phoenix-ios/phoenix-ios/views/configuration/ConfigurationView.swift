@@ -309,8 +309,8 @@ fileprivate struct ConfigurationList: View {
 			
 			if hasWallet {
 				navLink(.PaymentsBackup) {
-					Label { Text("Payments backup") } icon: {
-						Image(systemName: "icloud.and.arrow.up")
+					Label { Text("Cloud backup") } icon: {
+						Image(systemName: "icloud")
 					}
 				}
 				.id(linkID_PaymentsBackup)

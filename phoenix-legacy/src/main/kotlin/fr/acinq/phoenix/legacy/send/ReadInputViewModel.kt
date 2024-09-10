@@ -35,13 +35,13 @@ sealed class ReadInputState {
   data class Reading(val input: String) : ReadInputState()
   sealed class Done : ReadInputState() {
     data class Lightning(val pr: PaymentRequest) : Done()
-    data class Onchain(val bitcoinUri: BitcoinURI) : Done()
     data class Url(val url: LNUrl) : Done()
   }
 
   sealed class Error : ReadInputState() {
     object PayToSelf : Error()
     object PaymentExpired : Error()
+    object OnChain : Error()
     object InvalidChain : Error()
     data class ErrorInLNURLResponse(val error: LNUrlError) : Error()
     object UnhandledLNURL : Error()
@@ -73,7 +73,7 @@ class ReadInputViewModel : ViewModel() {
             val res = Wallet.parseLNObject(input)
             inputState.postValue(when (res) {
               is PaymentRequest -> ReadInputState.Done.Lightning(res)
-              is BitcoinURI -> ReadInputState.Done.Onchain(res)
+              is BitcoinURI -> ReadInputState.Error.OnChain
               is LNUrl -> ReadInputState.Done.Url(res)
               else -> ReadInputState.Error.UnhandledInput
             })

@@ -96,7 +96,6 @@
   <string name="legacy_receive_share_title">Partager cette requête de paiement avec…</string>
   <string name="legacy_receive_share_button">Partager…</string>
 
-  <string name="legacy_receive_min_amount_pay_to_open"><![CDATA[Votre portefeuille est vide. Votre premier versement doit être d\'au moins <b>%1$s</b>.]]></string>
   <string name="legacy_receive_address_label">Adresse</string>
   <string name="legacy_receive_withdraw_button">Utiliser un lien LNURL</string>
 
@@ -346,8 +345,8 @@
   <string name="legacy_inappnotif_background_worker_cannot_run">Phoenix surveille vos fonds même quand vous ne l\'utilisez pas. Assurez vous qu\'Android n\'empêche pas l\'application de fonctionner en arrière plan sous prétexte d\'optimisation de batterie.</string>
   <string name="legacy_inappnotif_upgrade">Une mise à jour pour cette application est disponible.</string>
   <string name="legacy_inappnotif_upgrade_critical">Une mise à jour critique est disponible. L\'application ne fonctionnera pas correctement si elle n\'est pas mise à jour.</string>
-  <string name="legacy_inappnotif_prepare_migration">L\'ancien Phoenix va bientôt tirer sa révérence. Il est temps de le mettre à niveau !</string>
-  <string name="legacy_inappnotif_prepare_migration_action">Passer à la nouvelle version</string>
+  <string name="legacy_inappnotif_prepare_migration">Cette version est obsolète. Mettez à jour dès que possible pour éviter les fermetures de canaux.</string>
+  <string name="legacy_inappnotif_prepare_migration_action">Mettre à jour</string>
 
   <!-- //////////////// display seed //////////////// -->
 
@@ -693,7 +692,7 @@
   <!-- //////////////// Migration to KMP //////////////// -->
 
   <string name="legacy_migration_title">Mise à niveau de Phoenix</string>
-  <string name="legacy_migration_ready_message">À partir du 1er novembre, les anciens services (échanges et canaux à la volée) seront désactivés.\n\nPassez à la nouvelle version de Phoenix, utilisant un moteur Lightning de dernière génération et de nouvelles fonctionnalités.\n\nLes canaux existants seront fusionnés. Ce processus de migration est automatisé.\n\nUne fois la migration faite, ne réutilisez pas vos anciennes adresses de swap.</string>
+  <string name="legacy_migration_ready_message">Ce wallet utilise un format de canaux obsolète. La majorité des fonctionnalités sont inactives.\n\nPassez à Phoenix v2 et profitez de swaps sans tiers de confiance, de splicing, des adresses statiques, et bien plus encore.\n\nÀ partir d\'octobre 2024, les canaux qui n\'ont pas été migrés seront fermés.</string>
   <string name="legacy_migration_prepare_button">Mettre à jour</string>
   <string name="legacy_migration_prepare_button_disconnected">Connexion…</string>
   <string name="legacy_migration_dismiss_button">Plus tard</string>

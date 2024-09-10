@@ -38,7 +38,7 @@ class NotificationsAdapter(private var notifications: MutableList<InAppNotificat
     return this.notifications.size
   }
 
-  fun update(notifs: HashSet<InAppNotifications>) {
+  fun update(notifs: Set<InAppNotifications>) {
     if (this.notifications != notifs) {
       this.notifications.clear()
       this.notifications.addAll(notifs.sortedBy { it.priority })

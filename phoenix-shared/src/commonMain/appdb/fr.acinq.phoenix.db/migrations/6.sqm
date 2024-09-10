@@ -1,0 +1,23 @@
+-- Migration: v6 -> v7
+--
+-- Changes:
+-- * Added table cloudkit_contacts_metadata
+-- * Added index on table cloudkit_contacts_metadata
+-- * Added table cloudkit_contacts_queue
+--
+-- See CloudKitContacts.sq for more details.
+
+CREATE TABLE IF NOT EXISTS cloudkit_contacts_metadata (
+    id TEXT NOT NULL PRIMARY KEY,
+    record_creation INTEGER NOT NULL,
+    record_blob BLOB NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS record_creation_idx
+ON cloudkit_contacts_metadata(record_creation);
+
+CREATE TABLE IF NOT EXISTS cloudkit_contacts_queue (
+    rowid INTEGER PRIMARY KEY,
+    id TEXT NOT NULL,
+    date_added INTEGER NOT NULL
+);

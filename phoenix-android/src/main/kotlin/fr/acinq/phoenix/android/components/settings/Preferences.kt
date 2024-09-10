@@ -39,6 +39,7 @@ internal data class PreferenceItem<T>(val item: T, val title: String, val descri
 internal fun <T> ListPreferenceButton(
     title: String,
     subtitle: @Composable ColumnScope.() -> Unit = {},
+    leadingIcon: @Composable (() -> Unit)? = null,
     enabled: Boolean,
     selectedItem: T,
     preferences: List<PreferenceItem<T>>,
@@ -49,7 +50,7 @@ internal fun <T> ListPreferenceButton(
 ) {
     var showPreferenceDialog by remember { mutableStateOf(initialShowDialog) }
 
-    Setting(title = title, subtitle = subtitle, enabled = enabled, onClick = { showPreferenceDialog = true })
+    Setting(title = title, subtitle = subtitle, leadingIcon = leadingIcon, enabled = enabled, onClick = { showPreferenceDialog = true })
 
     if (showPreferenceDialog) {
         ListPreferenceDialog(
@@ -119,6 +120,7 @@ private fun <T> PreferenceDialogItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             RadioButton(selected = selected, onClick = { onClick(item) })
             Column(modifier = Modifier.padding(vertical = 12.dp)) {

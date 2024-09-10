@@ -25,5 +25,5 @@ enum class InAppNotifications(val priority: Int, val messageResId: Int, val imag
   MNEMONICS_NEVER_SEEN(2, R.string.legacy_inappnotif_mnemonics_never_seen, R.drawable.ic_alert_triangle, R.string.legacy_inappnotif_mnemonics_never_seen_action),
   BACKGROUND_WORKER_CANNOT_RUN(3, R.string.legacy_inappnotif_background_worker_cannot_run, R.drawable.ic_battery_charging, null),
   UPGRADE_WALLET(3, R.string.legacy_inappnotif_upgrade, R.drawable.ic_refresh, null),
-  PREPARE_WALLET_MIGRATION(1, R.string.legacy_inappnotif_prepare_migration, R.drawable.ic_fire, R.string.legacy_inappnotif_prepare_migration_action),
+  PREPARE_WALLET_MIGRATION(1, R.string.legacy_inappnotif_prepare_migration, R.drawable.ic_alert_triangle, R.string.legacy_inappnotif_prepare_migration_action),
 }

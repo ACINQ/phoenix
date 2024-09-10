@@ -116,7 +116,7 @@ abstract class AppContext : Application() {
   val trampolineFeeSettings = MutableLiveData(Constants.DEFAULT_TRAMPOLINE_SETTINGS)
 
   /** List of in-app notifications. */
-  val notifications = MutableLiveData(HashSet<InAppNotifications>())
+  val notifications = MutableLiveData(mutableSetOf(InAppNotifications.PREPARE_WALLET_MIGRATION))
 
   /** Settings for swap-out (LN -> on-chain). */
   val swapOutSettings = MutableLiveData(Constants.DEFAULT_SWAP_OUT_SETTINGS)
@@ -198,20 +198,6 @@ abstract class AppContext : Application() {
 
   private fun handleWalletContext(json: JSONObject) {
     val inAppNotifs = notifications.value
-
-    // -- check if migration is ON
-    CoroutineScope(Dispatchers.Default).launch {
-      val isMigrationEnabled = if (json.has("migration")) {
-        json.getJSONObject("migration").getBoolean("kmp_enabled")
-      } else {
-        true
-      }
-      if (isMigrationEnabled) {
-        inAppNotifs?.add(InAppNotifications.PREPARE_WALLET_MIGRATION)
-      } else {
-        inAppNotifs?.remove(InAppNotifications.PREPARE_WALLET_MIGRATION)
-      }
-    }
 
     // -- check warning for high mempool usage (no free channels)
     json.getJSONObject("mempool").getJSONObject("v1").run {

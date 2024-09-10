@@ -39,6 +39,10 @@ import kotlinx.serialization.*
 import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 import java.io.IOException
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 class UserPrefsRepository(private val data: DataStore<Preferences>) {
 
@@ -72,6 +76,7 @@ class UserPrefsRepository(private val data: DataStore<Preferences>) {
         val PREFS_SCREEN_LOCK_BIOMETRICS = booleanPreferencesKey("PREFS_SCREEN_LOCK")
         val PREFS_SCREEN_LOCK_CUSTOM_PIN_ENABLED = booleanPreferencesKey("PREFS_SCREEN_LOCK_CUSTOM_PIN_ENABLED")
         val PREFS_CUSTOM_PIN_ATTEMPT_COUNT = intPreferencesKey("PREFS_CUSTOM_PIN_ATTEMPT_COUNT")
+        val PREFS_AUTO_LOCK_DELAY = longPreferencesKey("PREFS_AUTO_LOCK_DELAY")
         // payments options
         private val INVOICE_DEFAULT_DESC = stringPreferencesKey("INVOICE_DEFAULT_DESC")
         private val INVOICE_DEFAULT_EXPIRY = longPreferencesKey("INVOICE_DEFAULT_EXPIRY")
@@ -164,6 +169,13 @@ class UserPrefsRepository(private val data: DataStore<Preferences>) {
     }
     suspend fun savePinCodeSuccess() = data.edit {
         it[PREFS_CUSTOM_PIN_ATTEMPT_COUNT] = 0
+    }
+
+    val getAutoLockDelay: Flow<Duration> = safeData.map {
+        it[PREFS_AUTO_LOCK_DELAY]?.toDuration(DurationUnit.MILLISECONDS) ?: 10.minutes
+    }
+    suspend fun saveAutoLockDelay(delay: Duration) = data.edit {
+        it[PREFS_AUTO_LOCK_DELAY] = delay.inWholeMilliseconds
     }
 
     val getInvoiceDefaultDesc: Flow<String> = safeData.map { it[INVOICE_DEFAULT_DESC]?.takeIf { it.isNotBlank() } ?: "" }

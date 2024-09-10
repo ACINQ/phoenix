@@ -36,8 +36,10 @@ import fr.acinq.phoenix.android.services.NodeServiceState
 import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
 import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
+import kotlin.time.Duration
 
 class AppViewModel(
     private val internalData: InternalDataRepository,
@@ -68,6 +70,7 @@ class AppViewModel(
     val serviceState = ServiceStateLiveData(_service)
 
     val isScreenLocked = mutableStateOf(true)
+    val promptScreenLockImmediately = mutableStateOf(true)
 
     private val autoLockHandler = Handler(Looper.getMainLooper())
     private val autoLockRunnable: Runnable = Runnable { lockScreen() }
@@ -78,8 +81,13 @@ class AppViewModel(
     }
 
     fun scheduleAutoLock() {
-        autoLockHandler.removeCallbacksAndMessages(null)
-        autoLockHandler.postDelayed(autoLockRunnable, 10 * 60 * 1000L)
+        viewModelScope.launch {
+            val autoLockDelay = userPrefs.getAutoLockDelay.first()
+            autoLockHandler.removeCallbacksAndMessages(null)
+            if (autoLockDelay != Duration.INFINITE) {
+                autoLockHandler.postDelayed(autoLockRunnable, autoLockDelay.inWholeMilliseconds)
+            }
+        }
     }
 
     private fun monitorUserLockPrefs() {
@@ -117,11 +125,6 @@ class AppViewModel(
             }
         }
     }
-}
-
-sealed class LockState {
-    data object SettingUp: LockState()
-
 }
 
 class ServiceStateLiveData(service: MutableLiveData<NodeService?>) : MediatorLiveData<NodeServiceState>() {

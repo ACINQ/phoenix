@@ -14,8 +14,9 @@ fileprivate enum Key: String {
 	case backupTransactions_enabled
 	case backupTransactions_useCellularData
 	case backupTransactions_useUploadDelay
-	case hasCKRecordZone
-	case hasDownloadedCKRecords
+	case hasCKRecordZone_v2
+	case hasDownloadedPayments = "hasDownloadedCKRecords"
+	case hasDownloadedContacts
 }
 
 /// Preferences pertaining to backing up payment history in the user's own iCloud account.
@@ -77,16 +78,14 @@ class Prefs_BackupTransactions {
 	}
 	
 	private func recordZoneCreatedKey(_ encryptedNodeId: String) -> String {
-		return "\(Key.hasCKRecordZone.rawValue)-\(encryptedNodeId)"
+		return "\(Key.hasCKRecordZone_v2.rawValue)-\(encryptedNodeId)"
 	}
 	
-	func recordZoneCreated(encryptedNodeId: String) -> Bool {
-		
+	func recordZoneCreated(_ encryptedNodeId: String) -> Bool {
 		return defaults.bool(forKey: recordZoneCreatedKey(encryptedNodeId))
 	}
 	
-	func setRecordZoneCreated(_ value: Bool, encryptedNodeId: String) {
-		
+	func setRecordZoneCreated(_ value: Bool, _ encryptedNodeId: String) {
 		let key = recordZoneCreatedKey(encryptedNodeId)
 		if value == true {
 			defaults.setValue(value, forKey: key)
@@ -95,30 +94,35 @@ class Prefs_BackupTransactions {
 		}
 	}
 	
-	private func hasDownloadedRecordsKey(_ encryptedNodeId: String) -> String {
-		return "\(Key.hasDownloadedCKRecords.rawValue)-\(encryptedNodeId)"
+	private func hasDownloadedPaymentsKey(_ encryptedNodeId: String) -> String {
+		return "\(Key.hasDownloadedPayments.rawValue)-\(encryptedNodeId)"
 	}
 	
-	func hasDownloadedRecords(encryptedNodeId: String) -> Bool {
-		
-		return defaults.bool(forKey: hasDownloadedRecordsKey(encryptedNodeId))
+	func hasDownloadedPayments(_ encryptedNodeId: String) -> Bool {
+		return defaults.bool(forKey: hasDownloadedPaymentsKey(encryptedNodeId))
 	}
 	
-	func setHasDownloadedRecords(_ value: Bool, encryptedNodeId: String) {
-		
-		let key = hasDownloadedRecordsKey(encryptedNodeId)
-		if value == true {
-			defaults.setValue(value, forKey: key)
-		} else {
-			// Remove trace of account on disk
-			defaults.removeObject(forKey: key)
-		}
+	func markHasDownloadedPayments(_ encryptedNodeId: String) {
+		defaults.setValue(true, forKey: hasDownloadedPaymentsKey(encryptedNodeId))
+	}
+	
+	private func hasDownloadedContactsKey(_ encryptedNodeId: String) -> String {
+		return "\(Key.hasDownloadedContacts.rawValue)-\(encryptedNodeId)"
+	}
+	
+	func hasDownloadedContacts(_ encryptedNodeId: String) -> Bool {
+		return defaults.bool(forKey: hasDownloadedContactsKey(encryptedNodeId))
+	}
+	
+	func markHasDownloadedContacts(_ encryptedNodeId: String) {
+		defaults.setValue(true, forKey: hasDownloadedContactsKey(encryptedNodeId))
 	}
 	
 	func resetWallet(encryptedNodeId: String) {
 		
 		defaults.removeObject(forKey: recordZoneCreatedKey(encryptedNodeId))
-		defaults.removeObject(forKey: hasDownloadedRecordsKey(encryptedNodeId))
+		defaults.removeObject(forKey: hasDownloadedPaymentsKey(encryptedNodeId))
+		defaults.removeObject(forKey: hasDownloadedContactsKey(encryptedNodeId))
 		defaults.removeObject(forKey: Key.backupTransactions_enabled.rawValue)
 		defaults.removeObject(forKey: Key.backupTransactions_useCellularData.rawValue)
 		defaults.removeObject(forKey: Key.backupTransactions_useUploadDelay.rawValue)

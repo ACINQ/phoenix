@@ -30,7 +30,7 @@ struct TransactionsView: View {
 	@State var selectedItem: WalletPaymentInfo? = nil
 	@State var historyExporterOpen: Bool = false
 	
-	let syncStatePublisher = Biz.syncManager!.syncTxManager.statePublisher
+	let syncStatePublisher = Biz.syncManager!.syncBackupManager.statePublisher
 	@State var isDownloadingTxs: Bool = false
 	
 	@State var didAppear = false
@@ -523,7 +523,7 @@ struct TransactionsView: View {
 		visibleRows.remove(visibleRow)
 	}
 	
-	func syncStateChanged(_ state: SyncTxManager_State) {
+	func syncStateChanged(_ state: SyncBackupManager_State) {
 		log.trace("syncStateChanged()")
 		
 		if case .downloading(_) = state {

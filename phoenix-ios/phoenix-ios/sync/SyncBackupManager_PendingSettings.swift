@@ -1,27 +1,27 @@
 import Foundation
 
-fileprivate let filename = "SyncTxManager_PendingSettings"
+fileprivate let filename = "SyncBackupManager_PendingSettings"
 #if DEBUG && true
 fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-class SyncTxManager_PendingSettings: Equatable, CustomStringConvertible {
+class SyncBackupManager_PendingSettings: Equatable, CustomStringConvertible {
 	
 	enum EnableDisable{
 	  case willEnable
 	  case willDisable
 	}
 	
-	private weak var parent: SyncTxManager?
+	private weak var parent: SyncBackupManager?
 	
 	let paymentSyncing: EnableDisable
 	let delay: TimeInterval
 	let startDate: Date
 	let fireDate: Date
 	
-	init(_ parent: SyncTxManager, enableSyncing delay: TimeInterval) {
+	init(_ parent: SyncBackupManager, enableSyncing delay: TimeInterval) {
 		let now = Date()
 		self.parent = parent
 		self.paymentSyncing = .willEnable
@@ -32,7 +32,7 @@ class SyncTxManager_PendingSettings: Equatable, CustomStringConvertible {
 		startTimer()
 	}
 	
-	init(_ parent: SyncTxManager, disableSyncing delay: TimeInterval) {
+	init(_ parent: SyncBackupManager, disableSyncing delay: TimeInterval) {
 		let now = Date()
 		self.parent = parent
 		self.paymentSyncing = .willDisable
@@ -80,14 +80,15 @@ class SyncTxManager_PendingSettings: Equatable, CustomStringConvertible {
 		let dateStr = fireDate.description(with: Locale.current)
 		switch paymentSyncing {
 		case .willEnable:
-			return "<SyncTxManager_PendingSettings: willEnable @ \(dateStr)>"
+			return "<SyncBackupManager_PendingSettings: willEnable @ \(dateStr)>"
 		case .willDisable:
-			return "<SyncTxManager_PendingSettings: willDisable @ \(dateStr)>"
+			return "<SyncBackupManager_PendingSettings: willDisable @ \(dateStr)>"
 		}
 	}
 	
-	static func == (lhs: SyncTxManager_PendingSettings, rhs: SyncTxManager_PendingSettings) -> Bool {
-		
+	static func == (lhs: SyncBackupManager_PendingSettings,
+	                rhs: SyncBackupManager_PendingSettings
+	) -> Bool {
 		return (lhs.paymentSyncing == rhs.paymentSyncing) && (lhs.fireDate == rhs.fireDate)
 	}
 }

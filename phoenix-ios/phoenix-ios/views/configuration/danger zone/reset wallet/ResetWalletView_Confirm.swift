@@ -98,7 +98,7 @@ struct ResetWalletView_Confirm: MVISubView {
 	func section_transactionHistory(_ idx: Int) -> some View {
 		
 		Section {
-			Text("The **payment history** for this wallet will be deleted from your iCloud account.")
+			Text("The **payment history** and **contacts** for this wallet will be deleted from your iCloud account.")
 			
 		} header: {
 			Text("Step #\(idx)")

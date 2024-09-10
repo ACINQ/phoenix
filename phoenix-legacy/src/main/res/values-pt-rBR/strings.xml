@@ -118,8 +118,6 @@
   <string name="legacy_receive_share_title">Compartilhe esta fatura com…</string>
   <string name="legacy_receive_share_button">Compartilhar…</string>
 
-  <string name="legacy_receive_min_amount_pay_to_open"><![CDATA[Carteira vazia. O primeiro pagamento que você receber precisa ser de no mínimo <b>%1$s</b>.]]></string>
-
   <string name="legacy_receive_address_label">Endereço</string>
   <string name="legacy_receive_withdraw_button">Usar link LNURL</string>
 
@@ -370,8 +368,8 @@
   <string name="legacy_inappnotif_upgrade_critical">Uma atualização crítica está disponível. A carteira pode apresentar mau funcionamento se não for atualizada.</string>
   <string name="legacy_inappnotif_mempool_high_usage">O mempool da rede Bitcoin está cheio e com taxas altas.</string>
   <string name="legacy_inappnotif_mempool_high_usage_action">Veja como a Phoenix é afetada</string>
-  <string name="legacy_inappnotif_prepare_migration">A antiga Phoenix não existirá mais em breve. É hora de fazer um upgrade!</string>
-  <string name="legacy_inappnotif_prepare_migration_action">Atualizar para o novo Phoenix</string>
+  <string name="legacy_inappnotif_prepare_migration">Esta versão está obsoleta. Atualize o mais rápido possível para evitar o fechamento de canais.</string>
+  <string name="legacy_inappnotif_prepare_migration_action">Atualizar agora</string>
 
   <!-- //////////////// display seed //////////////// -->
 
@@ -754,7 +752,7 @@
   <!-- //////////////// Migration to KMP //////////////// -->
 
   <string name="legacy_migration_title">Atualização do Phoenix</string>
-  <string name="legacy_migration_ready_message">A partir de 1º de novembro, os serviços legados (swaps e canais on-the-fly) serão desativados.\n\nAtualize para a versão mais recente do Phoenix, com um mecanismo Lightning de ponta e novos recursos.\n\nSeus canais serão mesclados. Esse processo é automatizado.\n\nApós a conclusão da migração, não reutilize seus endereços de troca antigos.</string>
+  <string name="legacy_migration_ready_message">Esta carteira está usando um formato de canais obsoleto. A maioria dos recursos está desativada.\n\nAtualize para a Phoenix v2 e obtenha swaps sem confiança, splicing, endereços estáticos e muito mais.\n\nA partir de outubro de 2024, os canais que não tiverem sido migrados serão fechados.</string>
   <string name="legacy_migration_prepare_button">Upgrade</string>
   <string name="legacy_migration_prepare_button_disconnected">Conectando…</string>
   <string name="legacy_migration_dismiss_button">Não agora</string>

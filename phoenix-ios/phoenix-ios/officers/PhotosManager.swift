@@ -75,13 +75,15 @@ class PhotosManager {
 		return photosDir
 	}()
 	
+	func genFileName() -> String {
+		return UUID().uuidString.replacingOccurrences(of: "-", with: "")
+	}
+	
 	func urlForPhoto(fileName: String) -> URL {
-		
 		return photosDirectory.appendingPathComponent(fileName, isDirectory: false)
 	}
 	
 	func filePathForPhoto(fileName: String) -> String {
-		
 		return urlForPhoto(fileName: fileName).path
 	}
 	
@@ -97,7 +99,7 @@ class PhotosManager {
 	
 	func writeToDisk(_ original: PickerResult) async throws -> String {
 		
-		let fileName = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+		let fileName = genFileName()
 		let fileUrl = self.urlForPhoto(fileName: fileName)
 				
 		let scaled = await original.downscale()

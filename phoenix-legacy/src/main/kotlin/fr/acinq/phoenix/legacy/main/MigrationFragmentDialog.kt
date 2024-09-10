@@ -281,7 +281,7 @@ class MigrationDialogViewModel : ViewModel() {
               }
             }
             log.info("(migration) ${channelsPublicationStatusMap.filter { it.value }.size}/${channelsPublicationStatusMap.keys.size} closing published")
-            delay(3000)
+            delay(2000)
           }
 
           // migration is successful, update state
