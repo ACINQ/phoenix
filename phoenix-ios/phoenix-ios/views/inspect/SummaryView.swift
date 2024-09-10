@@ -11,6 +11,22 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct SummaryView: View {
 	
+	enum NavLinkTag: Hashable, CustomStringConvertible {
+		case DetailsView
+		case EditInfoView
+		case CpfpView(onChainPayment: Lightning_kmpOnChainOutgoingPayment)
+		case ContactView(contact: ContactInfo)
+		
+		var description: String {
+			switch self {
+			case .DetailsView    : return "DetailsView"
+			case .EditInfoView   : return "EditInfoView"
+			case .CpfpView(_)    : return "CpfpView"
+			case .ContactView(_) : return "ContactView"
+			}
+		}
+	}
+	
 	let location: PaymentView.Location
 	
 	@State var paymentInfo: WalletPaymentInfo
@@ -27,24 +43,15 @@ struct SummaryView: View {
 	@State var showDeletePaymentConfirmationDialog = false
 	
 	@State var didAppear = false
-	@State var popToDestination: PopToDestination? = nil
 	
 	@State var buttonListTruncationDetected_standard: Bool = false
 	@State var buttonListTruncationDetected_squeezed: Bool = false
 	@State var buttonListTruncationDetected_compact: Bool = false
 	
-	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
-	@EnvironmentObject var smartModalState: SmartModalState
-	
-	enum NavLinkTag {
-		case DetailsView
-		case EditInfoView
-		case CpfpView(onChainPayment: Lightning_kmpOnChainOutgoingPayment)
-		case ContactView(contact: ContactInfo)
-	}
+	// <iOS_16_workarounds>
 	@State var navLinkTag: NavLinkTag? = nil
+	@State var popToDestination: PopToDestination? = nil
+	// </iOS_16_workarounds>
 	
 	enum ButtonWidth: Preference {}
 	let buttonWidthReader = GeometryPreferenceReader(
@@ -59,6 +66,16 @@ struct SummaryView: View {
 		value: { [$0.size.height] }
 	)
 	@State var buttonHeight: CGFloat? = nil
+	
+	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+	
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
+	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@EnvironmentObject var smartModalState: SmartModalState
+	
+	// --------------------------------------------------
+	// MARK: View Builders
+	// --------------------------------------------------
 	
 	init(location: PaymentView.Location, paymentInfo: WalletPaymentInfo) {
 		
@@ -94,38 +111,27 @@ struct SummaryView: View {
 	@ViewBuilder
 	var body: some View {
 		
-		switch location {
-		case .sheet:
-			main()
-				.navigationTitle("")
-				.navigationBarTitleDisplayMode(.inline)
-				.navigationBarHidden(true)
-			
-		case .embedded:
-			
-			main()
-				.navigationTitle("Payment")
-				.navigationBarTitleDisplayMode(.inline)
-				.background(
+		layers()
+			.navigationTitle("Payment")
+			.navigationBarTitleDisplayMode(.inline)
+			.navigationBarHidden(location.isSheet ? true : false)
+			.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
+				navLinkView()
+			}
+			.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
+				navLinkView(tag)
+			}
+			.background(
+				location.isSheet ?
+					Color.clear.ignoresSafeArea(.all, edges: .bottom) :
 					Color.primaryBackground.ignoresSafeArea(.all, edges: .bottom)
-				)
-		}
+			)
 	}
 	
 	@ViewBuilder
-	func main() -> some View {
+	func layers() -> some View {
 		
 		ZStack {
-
-			if #unavailable(iOS 16.0) {
-				NavigationLink(
-					destination: navLinkView(),
-					isActive: navLinkTagBinding()
-				) {
-					EmptyView()
-				}
-				.isDetailLink(false)
-			} // else: uses.navigationStackDestination()
 			
 			// This technique is used to center the content vertically
 			GeometryReader { geometry in
@@ -155,9 +161,6 @@ struct SummaryView: View {
 			}
 		
 		} // </ZStack>
-		.navigationStackDestination(isPresented: navLinkTagBinding()) { // For iOS 16+
-			navLinkView()
-		}
 		.onAppear {
 			onAppear()
 		}
@@ -352,7 +355,7 @@ struct SummaryView: View {
 				
 				if confirmations == 0 && supportsBumpFee(onChainPayment) {
 					Button {
-						navLinkTag = .CpfpView(onChainPayment: onChainPayment)
+						navigateTo(.CpfpView(onChainPayment: onChainPayment))
 					} label: {
 						Label {
 							Text("Accelerate transaction")
@@ -544,7 +547,7 @@ struct SummaryView: View {
 			
 			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
 				Button {
-					navLinkTag = .DetailsView
+					navigateTo(.DetailsView)
 				} label: {
 					buttonLabel_details()
 						.lineLimit(1)
@@ -563,7 +566,7 @@ struct SummaryView: View {
 			
 			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
 				Button {
-					navLinkTag = .EditInfoView
+					navigateTo(.EditInfoView)
 				} label: {
 					buttonLabel_edit()
 				}
@@ -614,7 +617,7 @@ struct SummaryView: View {
 			
 			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
 				Button {
-					navLinkTag = .DetailsView
+					navigateTo(.DetailsView)
 				} label: {
 					buttonLabel_details()
 						.lineLimit(1)
@@ -633,7 +636,7 @@ struct SummaryView: View {
 			
 			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
 				Button {
-					navLinkTag = .EditInfoView
+					navigateTo(.EditInfoView)
 				} label: {
 					buttonLabel_edit()
 						.lineLimit(1)
@@ -686,7 +689,7 @@ struct SummaryView: View {
 			
 			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
 				Button {
-					navLinkTag = .DetailsView
+					navigateTo(.DetailsView)
 				} label: {
 					buttonLabel_details()
 						.lineLimit(1)
@@ -703,7 +706,7 @@ struct SummaryView: View {
 			
 			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
 				Button {
-					navLinkTag = .EditInfoView
+					navigateTo(.EditInfoView)
 				} label: {
 					buttonLabel_edit()
 						.lineLimit(1)
@@ -754,7 +757,7 @@ struct SummaryView: View {
 			HStack(alignment: VerticalAlignment.center, spacing: 8) {
 				
 				Button {
-					navLinkTag = .DetailsView
+					navigateTo(.DetailsView)
 				} label: {
 					buttonLabel_details()
 						.read(buttonHeightReader)
@@ -765,7 +768,7 @@ struct SummaryView: View {
 				}
 				
 				Button {
-					navLinkTag = .EditInfoView
+					navigateTo(.EditInfoView)
 				} label: {
 					buttonLabel_edit()
 						.read(buttonHeightReader)
@@ -812,14 +815,6 @@ struct SummaryView: View {
 			Image(systemName: "eraser.line.dashed").imageScale(.small)
 		}
 		.foregroundColor(.appNegative)
-	}
-	
-	@ViewBuilder
-	func cpfpView(_ onChainPayment: Lightning_kmpOnChainOutgoingPayment) -> some View {
-		CpfpView(
-			location: wrappedLocation(),
-			onChainPayment: onChainPayment
-		)
 	}
 	
 	@ViewBuilder
@@ -1085,19 +1080,33 @@ struct SummaryView: View {
 	// MARK: Actions
 	// --------------------------------------------------
 	
+	func navigateTo(_ tag: NavLinkTag) {
+		log.trace("navigateTo(\(tag.description))")
+		
+		if #available(iOS 17, *) {
+			navCoordinator.path.append(tag)
+		} else {
+			navLinkTag = tag
+		}
+	}
+	
 	func popToWrapper(_ destination: PopToDestination) {
 		log.trace("popToWrapper(\(destination))")
 		
-		popToDestination = destination
-		if case .embedded(let popTo) = location {
-			popTo(destination)
+		if #available(iOS 17, *) {
+			log.warning("popToWrapper(): This function is for iOS 16 only !")
+		} else {
+			popToDestination = destination
+			if case .embedded(let popTo) = location {
+				popTo(destination)
+			}
 		}
 	}
 	
 	func showContactView(_ contact: ContactInfo) {
 		log.trace("showContactView()")
 		
-		navLinkTag = .ContactView(contact: contact)
+		navigateTo(.ContactView(contact: contact))
 	}
 	
 	func exploreTx(_ txId: Bitcoin_kmpTxId, website: BlockchainExplorer.Website) {
@@ -1133,8 +1142,8 @@ struct SummaryView: View {
 		}
 		
 		switch location {
-		case .sheet(let closeAction):
-			closeAction()
+		case .sheet(let closeSheet):
+			closeSheet()
 		case .embedded:
 			presentationMode.wrappedValue.dismiss()
 		}

@@ -8,32 +8,23 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-fileprivate enum NavLinkTag: String {
-	case ConfigurationView
-	case TransactionsView
-	case ReceiveView
-	case SendView
-	case CurrencyConverter
-	case SwapInWalletDetails
-	case LiquidityAdsView
-}
-
 struct MainView_Small: View {
 	
-	private let phoenixBusiness = Biz.business
-	
-	@State private var navLinkTag: NavLinkTag? = nil
+	enum NavLinkTag: String, Codable {
+		case ConfigurationView
+		case TransactionsView
+		case ReceiveView
+		case SendView
+		case CurrencyConverter
+		case SwapInWalletDetails
+		case LiquidityAdsView
+	}
 	
 	@State var canMergeChannelsForSplicing = Biz.canMergeChannelsForSplicingPublisher.value
 	@State var showingMergeChannelsView = false
 	
 	let externalLightningUrlPublisher = AppDelegate.get().externalLightningUrlPublisher
 	@State var externalLightningRequest: AppScanController? = nil
-	
-	@State var popToDestination: PopToDestination? = nil
-	
-	@State private var swiftUiBugWorkaround: NavLinkTag? = nil
-	@State private var swiftUiBugWorkaroundIdx = 0
 	
 	@ScaledMetric var sendImageSize: CGFloat = 17
 	@ScaledMetric var receiveImageSize: CGFloat = 18
@@ -61,6 +52,15 @@ struct MainView_Small: View {
 	@State var footerTruncationDetection_standard: [DynamicTypeSize: Bool] = [:]
 	@State var footerTruncationDetection_condensed: [DynamicTypeSize: Bool] = [:]
 	
+	// <iOS_16_workarounds>
+	@State var navLinkTag: NavLinkTag? = nil
+	@State var popToDestination: PopToDestination? = nil
+	@State var swiftUiBugWorkaround: NavLinkTag? = nil
+	@State var swiftUiBugWorkaroundIdx = 0
+	// </iOS_16_workarounds>
+	
+	@StateObject var navCoordinator = NavigationCoordinator()
+	
 	@Environment(\.dynamicTypeSize) var dynamicTypeSize: DynamicTypeSize
 	
 	@EnvironmentObject var deviceInfo: DeviceInfo
@@ -83,34 +83,25 @@ struct MainView_Small: View {
 	@ViewBuilder
 	var body: some View {
 		
-		NavigationWrapper {
+		NavigationStack(path: $navCoordinator.path) {
 			layers()
 				.navigationTitle("")
 				.navigationBarTitleDisplayMode(.inline)
 				.navigationBarHidden(true)
+				.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
+					navLinkView()
+				}
+				.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
+					navLinkView(tag)
+				}
 		}
-		.sheet(isPresented: $showingMergeChannelsView) {
-			MergeChannelsView(location: .sheet)
-		}
+		.environmentObject(navCoordinator)
 	}
 	
 	@ViewBuilder
 	func layers() -> some View {
 		
 		ZStack {
-
-			if #unavailable(iOS 16.0) {
-				// iOS 14 & 15 have bugs when using NavigationLink.
-				// The suggested workarounds include using only a single NavigationLink.
-				NavigationLink(
-					destination: navLinkView(),
-					isActive: navLinkTagBinding()
-				) {
-					EmptyView()
-				}
-				.accessibilityHidden(true)
-				
-			} // else: uses.navigationStackDestination()
 			
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
@@ -126,9 +117,6 @@ struct MainView_Small: View {
 
 		} // </ZStack>
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.navigationStackDestination(isPresented: navLinkTagBinding()) { // For iOS 16+
-			navLinkView()
-		}
 		.onChange(of: deepLinkManager.deepLink) {
 			deepLinkChanged($0)
 		}
@@ -140,6 +128,9 @@ struct MainView_Small: View {
 		}
 		.onReceive(externalLightningUrlPublisher) {
 			didReceiveExternalLightningUrl($0)
+		}
+		.sheet(isPresented: $showingMergeChannelsView) {
+			MergeChannelsView(location: .sheet)
 		}
 	}
 	
@@ -184,7 +175,7 @@ struct MainView_Small: View {
 			ToolsMenu(
 				buttonHeightReader: headerButtonHeightReader,
 				buttonHeight: $headerButtonHeight,
-				openCurrencyConverter: { navLinkTag = .CurrencyConverter }
+				openCurrencyConverter: { navigateTo(.CurrencyConverter) }
 			)
 			.accessibilitySortPriority(20)
 		}
@@ -197,7 +188,7 @@ struct MainView_Small: View {
 	func header_settingsButton() -> some View {
 		
 		Button {
-			navLinkTag = .ConfigurationView
+			navigateTo(.ConfigurationView)
 		} label: {
 			Image(systemName: "gearshape.fill")
 				.renderingMode(.template)
@@ -222,7 +213,7 @@ struct MainView_Small: View {
 	func header_transactionsButton() -> some View {
 		
 		Button {
-			navLinkTag = .TransactionsView
+			navigateTo(.TransactionsView)
 		} label: {
 			Image(systemName: "list.bullet")
 				.renderingMode(.template)
@@ -497,7 +488,7 @@ struct MainView_Small: View {
 	}
 	
 	@ViewBuilder
-	private func navLinkView(_ tag: NavLinkTag) -> some View {
+	func navLinkView(_ tag: NavLinkTag) -> some View {
 		
 		switch tag {
 			case .ConfigurationView   : ConfigurationView()
@@ -526,72 +517,6 @@ struct MainView_Small: View {
 	// MARK: Notifications
 	// --------------------------------------------------
 	
-	private func deepLinkChanged(_ value: DeepLink?) {
-		log.trace("deepLinkChanged() => \(value?.rawValue ?? "nil")")
-		
-		if let value = value {
-			
-			// Navigate towards deep link (if needed)
-			var newNavLinkTag: NavLinkTag? = nil
-			var delay: TimeInterval = 1.5 // seconds; multiply by number of screens we need to navigate
-			switch value {
-				case .paymentHistory     : newNavLinkTag = .TransactionsView  ; delay *= 1
-				case .backup             : newNavLinkTag = .ConfigurationView ; delay *= 2
-				case .drainWallet        : newNavLinkTag = .ConfigurationView ; delay *= 2
-				case .electrum           : newNavLinkTag = .ConfigurationView ; delay *= 2
-				case .backgroundPayments : newNavLinkTag = .ConfigurationView ; delay *= 3
-				case .liquiditySettings  : newNavLinkTag = .ConfigurationView ; delay *= 3
-				case .forceCloseChannels : newNavLinkTag = .ConfigurationView ; delay *= 2
-				case .swapInWallet       : newNavLinkTag = .ConfigurationView ; delay *= 2
-			}
-			
-			if let newNavLinkTag = newNavLinkTag {
-				
-				self.swiftUiBugWorkaround = newNavLinkTag
-				self.swiftUiBugWorkaroundIdx += 1
-				clearSwiftUiBugWorkaround(delay: delay)
-				
-				self.navLinkTag = newNavLinkTag // Trigger/push the view
-			}
-			
-		} else {
-			// We reached the final destination of the deep link
-			clearSwiftUiBugWorkaround(delay: 0.0)
-		}
-	}
-	
-	private func navLinkTagChanged(_ tag: NavLinkTag?) {
-		log.trace("navLinkTagChanged() => \(tag?.rawValue ?? "nil")")
-		
-		if tag == nil, let forcedNavLinkTag = swiftUiBugWorkaround {
-			
-			log.debug("Blocking SwiftUI's attempt to reset our navLinkTag")
-			self.navLinkTag = forcedNavLinkTag
-			
-		} else if tag == nil {
-			
-			// If we pushed the SendView, triggered by an external lightning url,
-			// then we can nil out the associated controller now (since we handed off to SendView).
-			self.externalLightningRequest = nil
-			
-			// If there's a pending popToDestination, it's now safe to continue the flow.
-			//
-			// Note that performing this operation in `onAppear` doesn't work properly:
-			// - it appears to work fine on the simulator, but isn't reliable on the actual device
-			// - it seems that, IF using a `navLinkTag`, then we need to wait for the tag to be
-			//   unset before it can be set properly again.
-			// 
-			if let destination = popToDestination {
-				log.debug("popToDestination: \(destination)")
-				
-				popToDestination = nil
-				if let deepLink = destination.followedBy {
-					deepLinkManager.broadcast(deepLink)
-				}
-			}
-		}
-	}
-	
 	private func canMergeChannelsForSplicingChanged(_ value: Bool) {
 		log.trace("canMergeChannelsForSplicingChanged()")
 		
@@ -600,16 +525,23 @@ struct MainView_Small: View {
 	
 	private func didReceiveExternalLightningUrl(_ urlStr: String) {
 		log.trace("didReceiveExternalLightningUrl()")
-	
-		if navLinkTag == .SendView {
-			log.debug("Ignoring: handled by SendView")
-			return
+		
+		if #available(iOS 17.0, *) {
+			// If the SendView is visible, it will simply be replaced
+		} else { // iOS 16
+			if navLinkTag == .SendView {
+				log.debug("Ignoring: handled by SendView")
+				return
+			}
 		}
 		
 		MainViewHelper.shared.processExternalLightningUrl(urlStr) { scanController in
 			
-			self.externalLightningRequest = scanController
-			self.navLinkTag = .SendView
+			externalLightningRequest = scanController
+			if #available(iOS 17.0, *) {
+				navCoordinator.path.removeAll()
+			}
+			navigateTo(.SendView)
 		}
 	}
 	
@@ -623,7 +555,7 @@ struct MainView_Small: View {
 		if canMergeChannelsForSplicing {
 			showingMergeChannelsView = true
 		} else {
-			navLinkTag = .SendView
+			navigateTo(.SendView)
 		}
 	}
 	
@@ -633,42 +565,178 @@ struct MainView_Small: View {
 		if canMergeChannelsForSplicing {
 			showingMergeChannelsView = true
 		} else {
-			navLinkTag = .ReceiveView
+			navigateTo(.ReceiveView)
 		}
 	}
 	
 	func showSwapInWallet() {
 		log.trace("showSwapInWallet()")
 		
-		navLinkTag = .SwapInWalletDetails
+		navigateTo(.SwapInWalletDetails)
 	}
 	
 	func showLiquidityAds() {
 		log.trace("showLiquidityAds()")
 		
-		navLinkTag = .LiquidityAdsView
+		navigateTo(.LiquidityAdsView)
+	}
+	
+	// --------------------------------------------------
+	// MARK: Navigation
+	// --------------------------------------------------
+	
+	func navigateTo(_ tag: NavLinkTag) {
+		log.trace("navigateTo(\(tag.rawValue))")
+		
+		if #available(iOS 17, *) {
+			navCoordinator.path.append(tag)
+		} else {
+			navLinkTag = tag
+		}
+	}
+	
+	func deepLinkChanged(_ value: DeepLink?) {
+		log.trace("deepLinkChanged() => \(value?.rawValue ?? "nil")")
+		
+		if #available(iOS 17, *) {
+			
+			if let value {
+				navCoordinator.path.removeAll()
+				
+				switch value {
+				case .paymentHistory:
+					navCoordinator.path.append(NavLinkTag.TransactionsView)
+					
+				case .backup:
+					navCoordinator.path.append(NavLinkTag.ConfigurationView)
+					navCoordinator.path.append(ConfigurationList.NavLinkTag.RecoveryPhrase)
+						
+				case .drainWallet:
+					navCoordinator.path.append(NavLinkTag.ConfigurationView)
+					navCoordinator.path.append(ConfigurationList.NavLinkTag.DrainWallet)
+					
+				case .electrum:
+					navCoordinator.path.append(NavLinkTag.ConfigurationView)
+					navCoordinator.path.append(ConfigurationList.NavLinkTag.ElectrumServer)
+					
+				case .backgroundPayments:
+					navCoordinator.path.append(NavLinkTag.ConfigurationView)
+					navCoordinator.path.append(ConfigurationList.NavLinkTag.PaymentOptions)
+					navCoordinator.path.append(PaymentOptionsList.NavLinkTag.BackgroundPaymentsSelector)
+					
+				case .liquiditySettings:
+					navCoordinator.path.append(NavLinkTag.ConfigurationView)
+					navCoordinator.path.append(ConfigurationList.NavLinkTag.ChannelManagement)
+					
+				case .forceCloseChannels:
+					navCoordinator.path.append(NavLinkTag.ConfigurationView)
+					navCoordinator.path.append(ConfigurationList.NavLinkTag.ForceCloseChannels)
+					
+				case .swapInWallet:
+					navCoordinator.path.append(NavLinkTag.ConfigurationView)
+					navCoordinator.path.append(ConfigurationList.NavLinkTag.WalletInfo)
+					navCoordinator.path.append(WalletInfoView.NavLinkTag.SwapInWalletDetails)
+				}
+			}
+			
+		} else { // iOS 16
+			
+			if let value {
+				// Navigate towards deep link (if needed)
+				var newNavLinkTag: NavLinkTag? = nil
+				var delay: TimeInterval = 1.5 // seconds; multiply by number of screens we need to navigate
+				switch value {
+					case .paymentHistory     : newNavLinkTag = .TransactionsView  ; delay *= 1
+					case .backup             : newNavLinkTag = .ConfigurationView ; delay *= 2
+					case .drainWallet        : newNavLinkTag = .ConfigurationView ; delay *= 2
+					case .electrum           : newNavLinkTag = .ConfigurationView ; delay *= 2
+					case .backgroundPayments : newNavLinkTag = .ConfigurationView ; delay *= 3
+					case .liquiditySettings  : newNavLinkTag = .ConfigurationView ; delay *= 3
+					case .forceCloseChannels : newNavLinkTag = .ConfigurationView ; delay *= 2
+					case .swapInWallet       : newNavLinkTag = .ConfigurationView ; delay *= 2
+				}
+				
+				if let newNavLinkTag = newNavLinkTag {
+					
+					self.swiftUiBugWorkaround = newNavLinkTag
+					self.swiftUiBugWorkaroundIdx += 1
+					clearSwiftUiBugWorkaround(delay: delay)
+					
+					self.navLinkTag = newNavLinkTag // Trigger/push the view
+				}
+				
+			} else {
+				// We reached the final destination of the deep link
+				clearSwiftUiBugWorkaround(delay: 0.0)
+			}
+		}
+	}
+	
+	private func navLinkTagChanged(_ tag: NavLinkTag?) {
+		log.trace("navLinkTagChanged() => \(tag?.rawValue ?? "nil")")
+		
+		if #available(iOS 17, *) {
+			log.warning(
+				"""
+				navLinkTagChanged(): This function is for iOS 16 only ! This means there's a bug.
+				The navLinkTag is being set somewhere, when the navCoordinator should be used instead.
+				"""
+			)
+			
+		} else { // iOS 16
+			
+			if tag == nil, let forcedNavLinkTag = swiftUiBugWorkaround {
+				
+				log.debug("Blocking SwiftUI's attempt to reset our navLinkTag")
+				self.navLinkTag = forcedNavLinkTag
+				
+			} else if tag == nil {
+				
+				// If we pushed the SendView, triggered by an external lightning url,
+				// then we can nil out the associated controller now (since we handed off to SendView).
+				self.externalLightningRequest = nil
+				
+				// If there's a pending popToDestination, it's now safe to continue the flow.
+				//
+				// Note that performing this operation in `onAppear` doesn't work properly:
+				// - it appears to work fine on the simulator, but isn't reliable on the actual device
+				// - it seems that, IF using a `navLinkTag`, then we need to wait for the tag to be
+				//   unset before it can be set properly again.
+				//
+				if let destination = popToDestination {
+					log.debug("popToDestination: \(destination)")
+					
+					popToDestination = nil
+					if let deepLink = destination.followedBy {
+						deepLinkManager.broadcast(deepLink)
+					}
+				}
+			}
+		}
+	}
+	
+	func clearSwiftUiBugWorkaround(delay: TimeInterval) {
+		
+		if #available(iOS 17, *) {
+			log.warning("clearSwiftUiBugWorkaround(): This function is for iOS 16 only !")
+		} else {
+			let idx = self.swiftUiBugWorkaroundIdx
+			DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+				if self.swiftUiBugWorkaroundIdx == idx {
+					log.debug("swiftUiBugWorkaround = nil")
+					self.swiftUiBugWorkaround = nil
+				}
+			}
+		}
 	}
 	
 	func popTo(_ destination: PopToDestination) {
 		log.trace("popTo(\(destination))")
 		
-		popToDestination = destination
-	}
-	
-	// --------------------------------------------------
-	// MARK: Utilities
-	// --------------------------------------------------
-	
-	func clearSwiftUiBugWorkaround(delay: TimeInterval) {
-		
-		let idx = self.swiftUiBugWorkaroundIdx
-		
-		DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-			
-			if self.swiftUiBugWorkaroundIdx == idx {
-				log.debug("swiftUiBugWorkaround = nil")
-				self.swiftUiBugWorkaround = nil
-			}
+		if #available(iOS 17, *) {
+			log.warning("popTo(): This function is for iOS 16 only !")
+		} else {
+			popToDestination = destination
 		}
 	}
 }

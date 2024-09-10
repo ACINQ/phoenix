@@ -10,6 +10,10 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct LightningDualView: View {
 	
+	enum NavLinkTag: String, Codable {
+		case CurrencyConverter
+	}
+
 	@ObservedObject var mvi: MVIState<Receive.Model, Receive.Intent>
 	@ObservedObject var inboundFeeState: InboundFeeState
 	@ObservedObject var toast: Toast
@@ -38,22 +42,6 @@ struct LightningDualView: View {
 	@State var notificationPermissions = NotificationsManager.shared.permissions.value
 	
 	@State var modificationAmount: CurrencyAmount? = nil
-	@State var currencyConverterOpen = false
-	
-	// To workaround a bug in SwiftUI, we're using multiple namespaces for our animation.
-	// In particular, animating the border around the qrcode doesn't work well.
-	@Namespace private var qrCodeAnimation_inner
-	@Namespace private var qrCodeAnimation_outer
-	
-	@Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
-	@Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
-	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-	@Environment(\.colorScheme) var colorScheme: ColorScheme
-	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
-	@EnvironmentObject var deepLinkManager: DeepLinkManager
-	@EnvironmentObject var popoverState: PopoverState
-	@EnvironmentObject var smartModalState: SmartModalState
 	
 	let lastIncomingPaymentPublisher = Biz.business.paymentsManager.lastIncomingPaymentPublisher()
 	
@@ -65,6 +53,26 @@ struct LightningDualView: View {
 	)
 	@State var maxButtonWidth: CGFloat? = nil
 	
+	// <iOS_16_workarounds>
+	@State var navLinkTag: NavLinkTag? = nil
+	// </iOS_16_workarounds>
+	
+	// To workaround a bug in SwiftUI, we're using multiple namespaces for our animation.
+	// In particular, animating the border around the qrcode doesn't work well.
+	@Namespace private var qrCodeAnimation_inner
+	@Namespace private var qrCodeAnimation_outer
+	
+	@Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
+	@Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
+	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+	@Environment(\.colorScheme) var colorScheme: ColorScheme
+	
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
+	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@EnvironmentObject var deepLinkManager: DeepLinkManager
+	@EnvironmentObject var popoverState: PopoverState
+	@EnvironmentObject var smartModalState: SmartModalState
+	
 	// --------------------------------------------------
 	// MARK: View Builders
 	// --------------------------------------------------
@@ -75,30 +83,22 @@ struct LightningDualView: View {
 		content()
 			.navigationTitle(NSLocalizedString("Receive", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
+			.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
+				navLinkView()
+			}
+			.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
+				navLinkView(tag)
+			}
 	}
 	
 	@ViewBuilder
 	func content() -> some View {
 		
 		ZStack {
-			if #unavailable(iOS 16.0) {
-				NavigationLink(
-					destination: currencyConverterView(),
-					isActive: $currencyConverterOpen
-				) {
-					EmptyView()
-				}
-				.accessibilityHidden(true)
-				
-			} // else: uses.navigationStackDestination()
-			
 			mainWrapper()
 		}
 		.onAppear {
 			onAppear()
-		}
-		.navigationStackDestination(isPresented: $currencyConverterOpen) { // For iOS 16+
-			currencyConverterView()
 		}
 		.onChange(of: mvi.model) {
 			modelChanged($0)
@@ -621,18 +621,39 @@ struct LightningDualView: View {
 	}
 	
 	@ViewBuilder
-	func currencyConverterView() -> some View {
+	func navLinkView() -> some View {
 		
-		CurrencyConverterView(
-			initialAmount: modificationAmount,
-			didChange: currencyConverterDidChange,
-			didClose: currencyConvertDidClose
-		)
+		if let tag = self.navLinkTag {
+			navLinkView(tag)
+		} else {
+			EmptyView()
+		}
+	}
+	
+	@ViewBuilder
+	func navLinkView(_ tag: NavLinkTag) -> some View {
+		
+		switch tag {
+		case .CurrencyConverter:
+			CurrencyConverterView(
+				initialAmount: modificationAmount,
+				didChange: currencyConverterDidChange,
+				didClose: currencyConvertDidClose
+			)
+		}
 	}
 	
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
+	
+	func navLinkTagBinding() -> Binding<Bool> {
+		
+		return Binding<Bool>(
+			get: { navLinkTag != nil },
+			set: { if !$0 { navLinkTag = nil }}
+		)
+	}
 	
 	func title() -> String {
 		
@@ -761,6 +782,12 @@ struct LightningDualView: View {
 		notificationPermissions = newValue
 	}
 	
+	func openCurrencyConverter() {
+		log.trace("openCurrencyConverter()")
+		
+		navigateTo(.CurrencyConverter)
+	}
+	
 	func currencyConverterDidChange(_ amount: CurrencyAmount?) {
 		log.trace("currencyConverterDidChange()")
 		
@@ -784,7 +811,7 @@ struct LightningDualView: View {
 				savedAmount: $modificationAmount,
 				amount: amount,
 				desc: desc ?? "",
-				currencyConverterOpen: $currencyConverterOpen
+				openCurrencyConverter: openCurrencyConverter
 			)
 		}
 	}
@@ -792,6 +819,16 @@ struct LightningDualView: View {
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
+	
+	func navigateTo(_ tag: NavLinkTag) {
+		log.trace("navigateTo(\(tag.rawValue))")
+		
+		if #available(iOS 17, *) {
+			navCoordinator.path.append(tag)
+		} else {
+			navLinkTag = tag
+		}
+	}
 	
 	func showFullScreenQRCode() {
 		log.trace("showFullScreenQRCode()")
@@ -917,7 +954,7 @@ struct LightningDualView: View {
 					savedAmount: $modificationAmount,
 					amount: model.amount,
 					desc: model.desc ?? "",
-					currencyConverterOpen: $currencyConverterOpen
+					openCurrencyConverter: openCurrencyConverter
 				)
 			}
 		}

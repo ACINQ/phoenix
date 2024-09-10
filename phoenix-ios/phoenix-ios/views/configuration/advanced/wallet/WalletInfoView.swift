@@ -9,21 +9,17 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-fileprivate enum NavLinkTag: String {
-	case SwapInWalletDetails
-	case SwapInAddresses
-	case FinalWalletDetails
-}
-
-
 struct WalletInfoView: View {
+	
+	enum NavLinkTag: String {
+		case SwapInWalletDetails
+		case SwapInAddresses
+		case FinalWalletDetails
+	}
 	
 	let popTo: (PopToDestination) -> Void
 	
-	@State private var navLinkTag: NavLinkTag? = nil
-	
 	@State var didAppear = false
-	@State var popToDestination: PopToDestination? = nil
 	
 	@State var popoverPresent_swapInWallet = false
 	@State var popoverPresent_finalWallet = false
@@ -36,8 +32,12 @@ struct WalletInfoView: View {
 	@State var finalWallet = Biz.business.peerManager.finalWalletValue()
 	let finalWalletPublisher = Biz.business.peerManager.finalWalletPublisher()
 	
-	@State private var swiftUiBugWorkaround: NavLinkTag? = nil
-	@State private var swiftUiBugWorkaroundIdx = 0
+	// <iOS_16_workarounds>
+	@State var navLinkTag: NavLinkTag? = nil
+	@State var popToDestination: PopToDestination? = nil
+	@State var swiftUiBugWorkaround: NavLinkTag? = nil
+	@State var swiftUiBugWorkaroundIdx = 0
+	// </iOS_16_workarounds>
 	
 	@StateObject var toast = Toast()
 	
@@ -54,24 +54,21 @@ struct WalletInfoView: View {
 	@ViewBuilder
 	var body: some View {
 		
+		layers()
+			.navigationTitle(NSLocalizedString("Wallet info", comment: "Navigation Bar Title"))
+			.navigationBarTitleDisplayMode(.inline)
+			.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
+				navLinkView(tag)
+			}
+	}
+	
+	@ViewBuilder
+	func layers() -> some View {
+		
 		ZStack {
 			content()
 			toast.view()
 		}
-		.navigationTitle(NSLocalizedString("Wallet info", comment: "Navigation Bar Title"))
-		.navigationBarTitleDisplayMode(.inline)
-	}
-	
-	@ViewBuilder
-	func content() -> some View {
-		
-		List {
-			section_lightning()
-			section_swapInWallet()
-			section_finalWallet()
-		}
-		.listStyle(.insetGrouped)
-		.listBackgroundColor(.primaryBackground)
 		.onAppear() {
 			onAppear()
 		}
@@ -87,6 +84,18 @@ struct WalletInfoView: View {
 		.onReceive(finalWalletPublisher) {
 			finalWalletChanged($0)
 		}
+	}
+	
+	@ViewBuilder
+	func content() -> some View {
+		
+		List {
+			section_lightning()
+			section_swapInWallet()
+			section_finalWallet()
+		}
+		.listStyle(.insetGrouped)
+		.listBackgroundColor(.primaryBackground)
 	}
 	
 	@ViewBuilder
@@ -130,13 +139,13 @@ struct WalletInfoView: View {
 		
 		Section {
 			
-			navLink(.SwapInWalletDetails) {
+			navLink_plain(.SwapInWalletDetails) {
 				subsection_swapInWallet_balance()
 			}
 			subsection_swapInWallet_legacyDescriptor()
 			subsection_swapInWallet_descriptor()
 			subsection_swapInWallet_publicKey()
-			navLink(.SwapInAddresses) {
+			navLink_plain(.SwapInAddresses) {
 				subsection_swapInWallet_swapAddresses()
 			}
 			
@@ -284,7 +293,7 @@ struct WalletInfoView: View {
 		
 		Section {
 			
-			navLink(.FinalWalletDetails) {
+			navLink_plain(.FinalWalletDetails) {
 				subsection_finalWallet_balance()
 			}
 			subsection_finalWallet_masterPublicKey()
@@ -430,21 +439,25 @@ struct WalletInfoView: View {
 	}
 	
 	@ViewBuilder
-	private func navLink<Content>(
+	func navLink_plain<Content>(
 		_ tag: NavLinkTag,
-		label: () -> Content
+		label: @escaping () -> Content
 	) -> some View where Content: View {
 		
-		NavigationLink(
-			destination: navLinkView(tag),
-			tag: tag,
-			selection: $navLinkTag,
-			label: label
-		)
+		if #available(iOS 17, *) {
+			NavigationLink(value: tag, label: label)
+		} else {
+			NavigationLink_16(
+				destination: navLinkView(tag),
+				tag: tag,
+				selection: $navLinkTag,
+				label: label
+			)
+		}
 	}
 	
 	@ViewBuilder
-	private func navLinkView(_ tag: NavLinkTag) -> some View {
+	func navLinkView(_ tag: NavLinkTag) -> some View {
 		
 		switch tag {
 			case .SwapInWalletDetails : SwapInWalletDetails(location: .embedded, popTo: popToWrapper)
@@ -497,8 +510,12 @@ struct WalletInfoView: View {
 	func popToWrapper(_ destination: PopToDestination) {
 		log.trace("popToWrapper(\(destination))")
 		
-		popToDestination = destination
-		popTo(destination)
+		if #available(iOS 17, *) {
+			log.warning("popToWrapper(): This function is for iOS 16 only !")
+		} else {
+			popToDestination = destination
+			popTo(destination)
+		}
 	}
 	
 	// --------------------------------------------------
@@ -532,60 +549,6 @@ struct WalletInfoView: View {
 	// MARK: Notifications
 	// --------------------------------------------------
 	
-	func deepLinkChanged(_ value: DeepLink?) {
-		log.trace("deepLinkChanged() => \(value?.rawValue ?? "nil")")
-		
-		// This is a hack, courtesy of bugs in Apple's NavigationLink:
-		// https://developer.apple.com/forums/thread/677333
-		//
-		// Summary:
-		// There's some quirky code in SwiftUI that is resetting our navLinkTag.
-		// Several bizarre workarounds have been proposed.
-		// I've tried every one of them, and none of them work (at least, without bad side-effects).
-		//
-		// The only clean solution I've found is to listen for SwiftUI's bad behaviour,
-		// and forcibly undo it.
-		
-		if let value = value {
-			
-			// Navigate towards deep link (if needed)
-			var newNavLinkTag: NavLinkTag? = nil
-			switch value {
-				case .paymentHistory     : break
-				case .backup             : break
-				case .drainWallet        : break
-				case .electrum           : break
-				case .backgroundPayments : break
-				case .liquiditySettings  : break
-				case .forceCloseChannels : break
-				case .swapInWallet       : newNavLinkTag = NavLinkTag.SwapInWalletDetails
-			}
-			
-			if let newNavLinkTag = newNavLinkTag {
-				
-				self.swiftUiBugWorkaround = newNavLinkTag
-				self.swiftUiBugWorkaroundIdx += 1
-				clearSwiftUiBugWorkaround(delay: 1.5)
-				
-				self.navLinkTag = newNavLinkTag // Trigger/push the view
-			}
-			
-		} else {
-			// We reached the final destination of the deep link
-			clearSwiftUiBugWorkaround(delay: 0.0)
-		}
-	}
-	
-	fileprivate func navLinkTagChanged(_ tag: NavLinkTag?) {
-		log.trace("navLinkTagChanged() => \(tag?.rawValue ?? "nil")")
-		
-		if tag == nil, let forcedNavLinkTag = swiftUiBugWorkaround {
-				
-			log.debug("Blocking SwiftUI's attempt to reset our navLinkTag")
-			self.navLinkTag = forcedNavLinkTag
-		}
-	}
-	
 	func swapInWalletChanged(_ newValue: Lightning_kmpWalletState.WalletWithConfirmations) {
 		log.trace("swapInWalletChanged()")
 		
@@ -613,18 +576,93 @@ struct WalletInfoView: View {
 	}
 	
 	// --------------------------------------------------
-	// MARK: Workarounds
+	// MARK: Navigation
 	// --------------------------------------------------
+	
+	func deepLinkChanged(_ value: DeepLink?) {
+		log.trace("deepLinkChanged() => \(value?.rawValue ?? "nil")")
+		
+		if #available(iOS 17, *) {
+			// Nothing to do here.
+			// Everything is handled in `MainView_Small` & `MainView_Big`.
+			
+		} else { // iOS 16
+			
+			// This is a hack, courtesy of bugs in Apple's NavigationLink:
+			// https://developer.apple.com/forums/thread/677333
+			//
+			// Summary:
+			// There's some quirky code in SwiftUI that is resetting our navLinkTag.
+			// Several bizarre workarounds have been proposed.
+			// I've tried every one of them, and none of them work (at least, without bad side-effects).
+			//
+			// The only clean solution I've found is to listen for SwiftUI's bad behaviour,
+			// and forcibly undo it.
+			
+			if let value {
+				
+				// Navigate towards deep link (if needed)
+				var newNavLinkTag: NavLinkTag? = nil
+				switch value {
+					case .paymentHistory     : break
+					case .backup             : break
+					case .drainWallet        : break
+					case .electrum           : break
+					case .backgroundPayments : break
+					case .liquiditySettings  : break
+					case .forceCloseChannels : break
+					case .swapInWallet       : newNavLinkTag = NavLinkTag.SwapInWalletDetails
+				}
+				
+				if let newNavLinkTag {
+					
+					self.swiftUiBugWorkaround = newNavLinkTag
+					self.swiftUiBugWorkaroundIdx += 1
+					clearSwiftUiBugWorkaround(delay: 1.5)
+					
+					self.navLinkTag = newNavLinkTag // Trigger/push the view
+				}
+				
+			} else {
+				// We reached the final destination of the deep link
+				clearSwiftUiBugWorkaround(delay: 0.0)
+			}
+		}
+	}
+	
+	func navLinkTagChanged(_ tag: NavLinkTag?) {
+		log.trace("navLinkTagChanged() => \(tag?.rawValue ?? "nil")")
+		
+		if #available(iOS 17, *) {
+			log.warning(
+				"""
+				navLinkTagChanged(): This function is for iOS 16 only ! This means there's a bug.
+				The navLinkTag is being set somewhere, when the navCoordinator should be used instead.
+				"""
+			)
+			
+		} else { // iOS 16
+			
+			if tag == nil, let forcedNavLinkTag = swiftUiBugWorkaround {
+				
+				log.debug("Blocking SwiftUI's attempt to reset our navLinkTag")
+				self.navLinkTag = forcedNavLinkTag
+			}
+		}
+	}
 	
 	func clearSwiftUiBugWorkaround(delay: TimeInterval) {
 		
-		let idx = self.swiftUiBugWorkaroundIdx
-		
-		DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+		if #available(iOS 17, *) {
+			log.warning("clearSwiftUiBugWorkaround(): This function is for iOS 16 only !")
+		} else { // iOS 16
 			
-			if self.swiftUiBugWorkaroundIdx == idx {
-				log.trace("swiftUiBugWorkaround = nil")
-				self.swiftUiBugWorkaround = nil
+			let idx = self.swiftUiBugWorkaroundIdx
+			DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+				if self.swiftUiBugWorkaroundIdx == idx {
+					log.trace("swiftUiBugWorkaround = nil")
+					self.swiftUiBugWorkaround = nil
+				}
 			}
 		}
 	}

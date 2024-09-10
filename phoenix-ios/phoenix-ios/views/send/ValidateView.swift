@@ -18,13 +18,16 @@ enum Problem: Error {
 
 struct ValidateView: View {
 	
+	enum NavLinkTag: String, Codable {
+		case CurrencyConverter
+	}
+
 	@ObservedObject var mvi: MVIState<Scan.Model, Scan.Intent>
 	
 	@State var currency = Currency.bitcoin(.sat)
 	@State var currencyList: [Currency] = [Currency.bitcoin(.sat)]
 	
 	@State var currencyPickerChoice: String = Currency.bitcoin(.sat).shortName
-	@State var currencyConverterOpen = false
 	
 	@State var amount: String = ""
 	@State var parsedAmount: Result<Double, TextFieldCurrencyStylerError> = Result.failure(.emptyInput)
@@ -71,8 +74,13 @@ struct ValidateView: View {
 	)
 	@State var maxButtonWidth: CGFloat? = nil
 	
+	// <iOS_16_workarounds>
+	@State var navLinkTag: NavLinkTag? = nil
+	// </iOS_16_workarounds>
+	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var popoverState: PopoverState
 	@EnvironmentObject var smartModalState: SmartModalState
@@ -84,18 +92,25 @@ struct ValidateView: View {
 	@ViewBuilder
 	var body: some View {
 		
+		layers()
+		.navigationTitle(
+			mvi.model is Scan.Model_LnurlWithdrawFlow
+				? NSLocalizedString("Confirm Withdraw", comment: "Navigation bar title")
+				: NSLocalizedString("Confirm Payment", comment: "Navigation bar title")
+		)
+		.navigationBarTitleDisplayMode(.inline)
+		.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
+			navLinkView()
+		}
+		.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
+			navLinkView(tag)
+		}
+	}
+	
+	@ViewBuilder
+	func layers() -> some View {
+		
 		ZStack {
-			if #unavailable(iOS 16.0) {
-				NavigationLink(
-					destination: currencyConverterView(),
-					isActive: $currencyConverterOpen
-				) {
-					EmptyView()
-				}
-				.accessibilityHidden(true)
-				
-			} // else: uses.navigationStackDestination()
-			
 			Color.primaryBackground
 				.ignoresSafeArea(.all, edges: .all)
 			
@@ -131,12 +146,6 @@ struct ValidateView: View {
 			}
 			
 		}// </ZStack>
-		.navigationTitle(
-			mvi.model is Scan.Model_LnurlWithdrawFlow
-				? NSLocalizedString("Confirm Withdraw", comment: "Navigation bar title")
-				: NSLocalizedString("Confirm Payment", comment: "Navigation bar title")
-		)
-		.navigationBarTitleDisplayMode(.inline)
 		.transition(
 			.asymmetric(
 				insertion: .identity,
@@ -145,9 +154,6 @@ struct ValidateView: View {
 		)
 		.onAppear() {
 			onAppear()
-		}
-		.navigationStackDestination(isPresented: $currencyConverterOpen) { // For iOS 16+
-			currencyConverterView()
 		}
 		.onChange(of: mvi.model) { newModel in
 			modelDidChange(newModel)
@@ -479,19 +485,40 @@ struct ValidateView: View {
 	}
 	
 	@ViewBuilder
-	func currencyConverterView() -> some View {
+	func navLinkView() -> some View {
 		
-		CurrencyConverterView(
-			initialAmount: currentAmount(),
-			didChange: currencyConverterAmountChanged,
-			didClose: {}
-		)
+		if let tag = self.navLinkTag {
+			navLinkView(tag)
+		} else {
+			EmptyView()
+		}
+	}
+	
+	@ViewBuilder
+	func navLinkView(_ tag: NavLinkTag) -> some View {
+		
+		switch tag {
+		case .CurrencyConverter:
+			CurrencyConverterView(
+				initialAmount: currentAmount(),
+				didChange: currencyConverterAmountChanged,
+				didClose: {}
+			)
+		}
 	}
 	
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
-
+	
+	func navLinkTagBinding() -> Binding<Bool> {
+		
+		return Binding<Bool>(
+			get: { navLinkTag != nil },
+			set: { if !$0 { navLinkTag = nil }}
+		)
+	}
+	
 	var isDisconnected: Bool {
 		return !connectionsMonitor.connections.global.isEstablished()
 	}
@@ -1045,8 +1072,8 @@ struct ValidateView: View {
 			
 		} else { // user selected "other"
 			
-			currencyConverterOpen = true
 			currencyPickerChoice = currency.shortName // revert to last real currency
+			navigateTo(.CurrencyConverter)
 		}
 		
 		if !tipSliderSheetVisible {
@@ -1058,6 +1085,16 @@ struct ValidateView: View {
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
+	
+	func navigateTo(_ tag: NavLinkTag) {
+		log.trace("navigateTo(\(tag.rawValue))")
+		
+		if #available(iOS 17, *) {
+			navCoordinator.path.append(tag)
+		} else {
+			navLinkTag = tag
+		}
+	}
 	
 	func dismissKeyboardIfVisible() -> Void {
 		log.trace("dismissKeyboardIfVisible()")

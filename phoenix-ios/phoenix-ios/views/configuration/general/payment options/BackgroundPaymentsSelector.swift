@@ -301,21 +301,10 @@ struct BackgroundPaymentsSelector: View {
 	func customizeInIosSettings() {
 		log.trace("customizeInIosSettings()")
 		
-		if #available(iOS 16.0, *) {
-			// We can jump directly to the notification settings
-			if let url = URL(string: UIApplication.openNotificationSettingsURLString) {
-				if UIApplication.shared.canOpenURL(url) {
-					UIApplication.shared.open(url)
-				}
-			}
-		} else {
-			// The best we can do is jump to the app settings
-			if let bundleIdentifier = Bundle.main.bundleIdentifier,
-			   let url = URL(string: UIApplication.openSettingsURLString + bundleIdentifier)
-			{
-				if UIApplication.shared.canOpenURL(url) {
-					UIApplication.shared.open(url)
-				}
+		// We can jump directly to the notification settings
+		if let url = URL(string: UIApplication.openNotificationSettingsURLString) {
+			if UIApplication.shared.canOpenURL(url) {
+				UIApplication.shared.open(url)
 			}
 		}
 	}

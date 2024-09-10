@@ -91,6 +91,7 @@ struct ManageContact: View {
 	@Environment(\.dynamicTypeSize) var dynamicTypeSize: DynamicTypeSize
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var deviceInfo: DeviceInfo
 	@EnvironmentObject var smartModalState: SmartModalState
 	
@@ -295,7 +296,7 @@ struct ManageContact: View {
 			.padding()
 		} // </ScrollView>
 		.frame(maxHeight: scrollViewMaxHeight)
-		.scrollingDismissesKeyboard(.interactively)
+		.scrollDismissesKeyboard(.interactively)
 	}
 	
 	@ViewBuilder
@@ -973,14 +974,24 @@ struct ManageContact: View {
 			let offerString = offer.encode()
 			AppDelegate.get().externalLightningUrlPublisher.send(offerString)
 			
-			if let popTo {
-				popTo(.ConfigurationView(followedBy: nil))
-			}
-			
-			if case .sheet(let closeAction) = location {
-				closeAction()
-			} else {
-				close()
+			if #available(iOS 17, *) {
+			// Do not do this here. It interferes with navigation.
+			// navCoordinator.path.removeAll()
+			// Instead we allow the MainView_X to perform both
+			// `path.removeAll()` & `path.append(x)` at the same time.
+			// Doing it at the same time allows navigation to work properly.
+				
+			} else { // iOS 16
+				
+				if let popTo {
+					popTo(.ConfigurationView(followedBy: nil))
+				}
+				
+				if case .sheet(let closeAction) = location {
+					closeAction()
+				} else {
+					close()
+				}
 			}
 		}
 	}
