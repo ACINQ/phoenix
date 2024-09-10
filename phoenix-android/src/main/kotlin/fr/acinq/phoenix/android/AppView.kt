@@ -537,7 +537,9 @@ fun AppView(
     val userPrefs = userPrefs
     val exchangeRates = fiatRates
     lastCompletedPayment?.let { payment ->
-        LocalBackupWorker.scheduleOnce(context)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            LocalBackupWorker.scheduleOnce(context)
+        }
         LaunchedEffect(key1 = payment.walletPaymentId()) {
             try {
                 if (isDataMigrationExpected == false) {

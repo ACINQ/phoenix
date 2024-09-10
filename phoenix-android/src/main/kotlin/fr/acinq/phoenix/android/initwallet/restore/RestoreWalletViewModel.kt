@@ -166,7 +166,7 @@ class RestoreWalletViewModel: InitWalletViewModel() {
                             restoreBackupState = RestoreBackupState.Done.BackupRestored
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                                 LocalBackupHelper.cleanUpOldBackupFile(context, keyManager, encryptedBackup, uri)
-                                log.debug("old backup file cleaned up")
+                                log.info("old backup files cleaned up")
                             }
                             delay(1000)
                             viewModelScope.launch(Dispatchers.Main) {

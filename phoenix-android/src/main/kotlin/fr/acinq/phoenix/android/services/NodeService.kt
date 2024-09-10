@@ -233,7 +233,9 @@ class NodeService : Service() {
             doStartBusiness(decryptedMnemonics, requestCheckLegacyChannels)
             ChannelsWatcher.schedule(applicationContext)
             DailyConnect.schedule(applicationContext)
-            LocalBackupWorker.schedulePeriodic(applicationContext)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                LocalBackupWorker.schedulePeriodic(applicationContext)
+            }
             _state.postValue(NodeServiceState.Running)
         }
     }

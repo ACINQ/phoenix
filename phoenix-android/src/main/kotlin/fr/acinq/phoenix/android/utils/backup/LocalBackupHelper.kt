@@ -42,7 +42,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.util.zip.ZipEntry
@@ -55,10 +54,13 @@ import javax.crypto.spec.SecretKeySpec
 
 
 /**
- * This utility class provides helps backing up the channels/payments database
- * in an encrypted zip file, stored on disk in a public folder of the device.
+ * This utility class provides helpers to back up the channels/payments databases
+ * in an encrypted zip file and store them on disk, in a public folder of the device.
  *
  * The backup file is NOT removed when the app is uninstalled.
+ *
+ * Requires API 29+ (Q) because of the MediaStore API. Thanks to this API, no additional
+ * permissions are required to access the file system.
  */
 object LocalBackupHelper {
 
@@ -66,6 +68,9 @@ object LocalBackupHelper {
 
     /** The backup file is stored in the Documents directory of Android. */
     private val backupDir = "${Environment.DIRECTORY_DOCUMENTS}/phoenix-backup"
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private val volumeUri = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
 
     private suspend fun prepareBackupContent(context: Context): ByteArray {
         return withContext(Dispatchers.IO) {
@@ -100,29 +105,25 @@ object LocalBackupHelper {
             put(MediaStore.MediaColumns.MIME_TYPE, "application/octet-stream")
             put(MediaStore.MediaColumns.RELATIVE_PATH, backupDir)
         }
-        return context.contentResolver.insert(MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY), values)
+        return context.contentResolver.insert(volumeUri, values)
             ?: throw RuntimeException("failed to insert uri record for backup file")
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun getBackupFileUri(context: Context, fileName: String): Pair<Long, Uri>? {
-        val contentUri = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-        // columns to return -- we want the name & modified timestamp
-        val projection = arrayOf(
+        val columnsToGet = arrayOf(
             MediaStore.Files.FileColumns._ID,
             MediaStore.Files.FileColumns.DISPLAY_NAME,
             MediaStore.Files.FileColumns.DATE_MODIFIED,
         )
-        // filter on the file's name
-        val selection = "${MediaStore.Files.FileColumns.DISPLAY_NAME} = ?"
-        val selectionArgs = arrayOf(fileName)
-        val resolver = context.contentResolver
+        val filter = "${MediaStore.Files.FileColumns.DISPLAY_NAME} = ?"
+        val filterArgs = arrayOf(fileName)
 
-        return resolver.query(
-            contentUri,
-            projection,
-            selection,
-            selectionArgs,
+        return context.contentResolver.query(
+            volumeUri,
+            columnsToGet,
+            filter,
+            filterArgs,
             null, null
         )?.use { cursor ->
             val idColumn = cursor.getColumnIndex(MediaStore.Files.FileColumns._ID)
@@ -133,7 +134,7 @@ object LocalBackupHelper {
                 val actualFileName = cursor.getString(nameColumn)
                 val modifiedAt = cursor.getLong(modifiedAtColumn) * 1000
                 log.debug("found backup file with name=$actualFileName modified_at=${modifiedAt.toAbsoluteDateTimeString()}")
-                modifiedAt to ContentUris.withAppendedId(contentUri, fileId)
+                modifiedAt to ContentUris.withAppendedId(volumeUri, fileId)
             } else {
                 log.info("no backup file found for name=$fileName")
                 null
@@ -145,10 +146,7 @@ object LocalBackupHelper {
         return "phoenix-${keyManager.chain.name.lowercase()}-${keyManager.nodeIdHash().take(7)}.bak"
     }
 
-    /**
-     * Write an encrypted zip file of the payments/channels database, and store it in a public folder of the device.
-     * Since we're using the media store API for that, no permission is required.
-     */
+    @RequiresApi(Build.VERSION_CODES.Q)
     suspend fun saveBackupToDisk(context: Context, keyManager: LocalKeyManager) {
         val encryptedBackup = try {
             val data = prepareBackupContent(context)
@@ -162,10 +160,7 @@ object LocalBackupHelper {
         }
 
         val fileName = getBackupFileName(keyManager)
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            saveBackupThroughMediastore(context, encryptedBackup, fileName)
-        }
+        saveBackupThroughMediastore(context, encryptedBackup, fileName)
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -173,11 +168,17 @@ object LocalBackupHelper {
         log.debug("saving encrypted backup to public dir through mediastore api...")
         val resolver = context.contentResolver
 
-        val uri = getBackupFileUri(context, fileName)?.second ?: createBackupFileUri(context, fileName)
+        val uri = getBackupFileUri(context, fileName)?.second?.let {
+            log.debug("found existing backup file")
+            it
+        } ?: run {
+            log.debug("creating new backup file")
+            createBackupFileUri(context, fileName)
+        }
         resolver.openOutputStream(uri, "w")?.use { outputStream ->
             val array = encryptedBackup.write()
             outputStream.write(array)
-            log.debug("encrypted backup successfully saved to public dir ($uri)")
+            log.debug("encrypted backup successfully saved to public dir ({})", uri)
         } ?: run {
             log.error("public backup failed: cannot open output stream for uri=$uri")
         }

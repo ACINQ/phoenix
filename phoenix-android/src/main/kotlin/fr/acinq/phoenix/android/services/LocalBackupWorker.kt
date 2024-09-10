@@ -17,6 +17,8 @@
 package fr.acinq.phoenix.android.services
 
 import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
@@ -34,12 +36,17 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
 
+/**
+ * Writes a backup of the channels & payments database to disk, using [LocalBackupHelper].
+ * Requires API 29+ (Q) because we use the MediaStore API to access the file system.
+ */
 class LocalBackupWorker(val context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
 
     val log: Logger = LoggerFactory.getLogger(this::class.java)
 
     override suspend fun doWork(): Result {
-        log.info("starting local-backup-worker")
+        // should never happen, since the [schedule] and [scheduleOnce] methods are annotated.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return Result.failure()
 
         return try {
             val application = context as PhoenixApplication
@@ -50,26 +57,29 @@ class LocalBackupWorker(val context: Context, workerParams: WorkerParameters) : 
 
             Result.success()
         } catch (e: Exception) {
-            log.error("error when processing local-backup job: ", e)
+            log.error("error when processing $name: ", e)
             Result.failure()
         }
     }
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java)
+        val name = "local-backup-worker"
         const val TAG = BuildConfig.APPLICATION_ID + ".LocalBackupWorker"
         const val PERIODIC_TAG = BuildConfig.APPLICATION_ID + ".LocalBackupWorkerPeriodic"
 
         /** Schedule a local-backup-worker job every day. */
+        @RequiresApi(Build.VERSION_CODES.Q)
         fun schedulePeriodic(context: Context) {
-            log.info("scheduling periodic local-backup-worker")
+            log.info("scheduling periodic $name")
             val work = PeriodicWorkRequest.Builder(LocalBackupWorker::class.java, 24, TimeUnit.HOURS, 12, TimeUnit.HOURS).addTag(PERIODIC_TAG)
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(PERIODIC_TAG, ExistingPeriodicWorkPolicy.UPDATE, work.build())
         }
 
         /** Schedule a local-backup-worker job to run once. Existing schedules are replaced. */
+        @RequiresApi(Build.VERSION_CODES.Q)
         fun scheduleOnce(context: Context) {
-            log.info("scheduling local-backup once")
+            log.info("scheduling $name once")
             val work = OneTimeWorkRequestBuilder<LocalBackupWorker>().build()
             WorkManager.getInstance(context).enqueueUniqueWork(TAG, ExistingWorkPolicy.REPLACE, work)
         }
