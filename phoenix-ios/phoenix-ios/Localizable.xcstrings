@@ -10570,6 +10570,9 @@
         }
       }
     },
+    "choose image" : {
+      "comment" : "button label - try to make it short"
+    },
     "Choose image" : {
       "localizations" : {
         "ar" : {
@@ -27225,6 +27228,9 @@
         }
       }
     },
+    "name, lightning address, offer..." : {
+
+    },
     "Naming your wallet makes it easier to manage multiple wallets." : {
       "localizations" : {
         "ar" : {
@@ -29285,6 +29291,9 @@
           }
         }
       }
+    },
+    "paste" : {
+      "comment" : "button label - try to make it short"
     },
     "Paste encrypted data blob here" : {
       "localizations" : {
@@ -34535,6 +34544,12 @@
           }
         }
       }
+    },
+    "scan qr code" : {
+      "comment" : "button label - try to make it short"
+    },
+    "Scan QR Code" : {
+
     },
     "Scan withdraw" : {
       "extractionState" : "stale",
