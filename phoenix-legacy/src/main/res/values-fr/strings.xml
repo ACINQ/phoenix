@@ -345,7 +345,7 @@
   <string name="legacy_inappnotif_background_worker_cannot_run">Phoenix surveille vos fonds même quand vous ne l\'utilisez pas. Assurez vous qu\'Android n\'empêche pas l\'application de fonctionner en arrière plan sous prétexte d\'optimisation de batterie.</string>
   <string name="legacy_inappnotif_upgrade">Une mise à jour pour cette application est disponible.</string>
   <string name="legacy_inappnotif_upgrade_critical">Une mise à jour critique est disponible. L\'application ne fonctionnera pas correctement si elle n\'est pas mise à jour.</string>
-  <string name="legacy_inappnotif_prepare_migration">Cette version est obsolète. Mettez à jour dès que possible pour éviter les fermetures de canaux.</string>
+  <string name="legacy_inappnotif_prepare_migration">Cette version est obsolète. Les canaux vont bientôt être fermés.</string>
   <string name="legacy_inappnotif_prepare_migration_action">Mettre à jour</string>
 
   <!-- //////////////// display seed //////////////// -->

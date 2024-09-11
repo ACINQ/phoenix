@@ -273,7 +273,7 @@
   <string name="legacy_inappnotif_background_worker_cannot_run">Phoenix potřebuje běžet na pozadí čas od času. Ujistěte se, že vaše zařízení neukončuje agresivně tuto aplikaci kvůli šetření baterie.</string>
   <string name="legacy_inappnotif_upgrade">Je dostupná nová aktualizace.</string>
   <string name="legacy_inappnotif_upgrade_critical">Je dostupná kritická aktualizace. Peněženka nemusí fungovat správně pokud nebude aktualizována.</string>
-  <string name="legacy_inappnotif_prepare_migration">Tato verze je zastaralá. Aktualizujte ji co nejdříve, abyste se vyhnuli uzavření kanálu.</string>
+  <string name="legacy_inappnotif_prepare_migration">Tato verze je zastaralá. Kanály budou brzy uzavřeny.</string>
   <string name="legacy_inappnotif_prepare_migration_action">Aktualizujte nyní</string>
 
   <!-- //////////////// display seed //////////////// -->

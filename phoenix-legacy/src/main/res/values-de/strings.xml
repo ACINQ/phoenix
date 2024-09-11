@@ -394,7 +394,7 @@
   <string name="legacy_inappnotif_upgrade_critical">Ein kritisches Update ist verfügbar. Die Wallet könnte fehlerhaft funktionieren, wenn sie nicht aktualisiert wird.</string>
   <string name="legacy_inappnotif_mempool_high_usage">Bitcoin-Mempool ist voll und die Gebühren sind hoch.</string>
   <string name="legacy_inappnotif_mempool_high_usage_action">Sehen Sie, wie Phoenix betroffen ist</string>
-  <string name="legacy_inappnotif_prepare_migration">Diese Version ist veraltet. Führen Sie die Aktualisierung so bald wie möglich durch, um Kanalschließungen zu vermeiden.</string>
+  <string name="legacy_inappnotif_prepare_migration">Diese Version ist veraltet. Die Kanäle werden bald geschlossen.</string>
   <string name="legacy_inappnotif_prepare_migration_action">Jetzt aktualisieren</string>
 
   <!-- //////////////// display seed //////////////// -->
