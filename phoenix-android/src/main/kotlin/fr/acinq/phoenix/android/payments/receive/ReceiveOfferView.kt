@@ -46,13 +46,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.BorderButton
-import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Clickable
 import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.TextWithIcon
@@ -88,6 +90,7 @@ fun DisplayOfferDialog(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
+                .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
                 .padding(top = 0.dp, start = 12.dp, end = 12.dp, bottom = 50.dp)
         ) {
@@ -98,11 +101,12 @@ fun DisplayOfferDialog(
                 is OfferState.Show -> {
                     HowToOffer()
                     Spacer(modifier = Modifier.height(6.dp))
-                    Box(modifier = Modifier.widthIn(max = 350.dp)) {
+                    Box(modifier = Modifier
+                        .widthIn(max = 350.dp)
+                        .clip(shape = RoundedCornerShape(16.dp))) {
                         QRCodeImage(bitmap = offerState.bitmap, onLongClick = { copyToClipboard(context, offerState.encoded) })
                     }
                     Bip353AddressDisplay(address)
-                    Spacer(modifier = Modifier.height(16.dp))
                     Row {
                         var showCopyDialog by remember { mutableStateOf(false) }
                         if (showCopyDialog && !address.isNullOrBlank()) {
@@ -130,10 +134,10 @@ fun DisplayOfferDialog(
 
 @Composable
 fun Bip353AddressDisplay(address: String?) {
+    Spacer(modifier = Modifier.height(12.dp))
     when {
         address.isNullOrBlank() -> {}
         else -> {
-            Spacer(modifier = Modifier.height(8.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier
@@ -181,24 +185,26 @@ private fun CopyAddressDialog(
         scrimColor = MaterialTheme.colors.onBackground.copy(alpha = 0.2f),
     ) {
         Column(Modifier.padding(bottom = 50.dp)) {
-            Button(
-                text = stringResource(id = R.string.receive_offer_copy_bip353),
-                icon = R.drawable.ic_copy,
-                onClick = { copyToClipboard(context, data = context.getString(R.string.utils_bip353_with_prefix, address)) },
-                modifier = Modifier.fillMaxWidth(),
-            )
-            Button(
-                text = stringResource(id = R.string.receive_offer_copy_bolt12),
-                icon = R.drawable.ic_copy,
-                onClick = { copyToClipboard(context, data = offer) },
-                modifier = Modifier.fillMaxWidth(),
-            )
-            Button(
-                text = stringResource(id = R.string.receive_offer_copy_bip21),
-                icon = R.drawable.ic_copy,
-                onClick = { copyToClipboard(context, data = "bitcoin:?lno=$offer") },
-                modifier = Modifier.fillMaxWidth(),
-            )
+            CopyButtonDialog(label = stringResource(id = R.string.receive_offer_copy_bip353), valueToCopy = stringResource(id = R.string.utils_bip353_with_prefix, address))
+            CopyButtonDialog(label = stringResource(id = R.string.receive_offer_copy_bolt12), valueToCopy = offer)
+            CopyButtonDialog(label = stringResource(id = R.string.receive_offer_copy_bip21), valueToCopy = "bitcoin:?lno=$offer")
+        }
+    }
+}
+
+@Composable
+private fun CopyButtonDialog(label: String, valueToCopy: String) {
+    val context = LocalContext.current
+    Clickable(onClick = { copyToClipboard(context, data = valueToCopy) }, modifier = Modifier.padding(horizontal = 16.dp), shape = RoundedCornerShape(16.dp)) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp, vertical = 12.dp)
+        ) {
+            TextWithIcon(text = label, textStyle = MaterialTheme.typography.body2, icon = R.drawable.ic_copy)
+            Spacer(modifier = Modifier.height(1.dp))
+            Text(text = valueToCopy, style = MaterialTheme.typography.caption.copy(fontSize = 14.sp), maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.widthIn(max = 280.dp))
         }
     }
 }
