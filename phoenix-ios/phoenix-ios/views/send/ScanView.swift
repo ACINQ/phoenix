@@ -98,7 +98,7 @@ struct ScanView: View {
 		ZStack(alignment: Alignment.bottom) {
 			
 			QrCodeScannerView { (request: String) in
-				didScanQRCode(request)
+				didScanQrCode(request)
 			} ready: {
 				didEnableCamera()
 			}
@@ -453,7 +453,7 @@ struct ScanView: View {
 		}
 	}
 	
-	func didScanQRCode(_ request: String) {
+	func didScanQrCode(_ request: String) {
 		
 		var isFetchingLnurl = false
 		if let _ = mvi.model as? Scan.Model_LnurlServiceFetch {

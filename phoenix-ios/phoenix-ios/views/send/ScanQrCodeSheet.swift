@@ -58,9 +58,20 @@ struct ScanQrCodeSheet: View {
 	@ViewBuilder
 	func content() -> some View {
 		
-		QrCodeScannerView {(request: String) in
+		QrCodeScannerView { (request: String) in
 			didScanQrCode(request)
+		} ready: {
+			didEnableCamera()
 		}
+	}
+	
+	func didEnableCamera() {
+		log.trace("didEnableCamera()")
+		
+		UIAccessibility.post(
+			notification: .announcement,
+			argument: "Your camera is open to scan a QR code"
+		)
 	}
 	
 	func closeButtonTapped() {

@@ -89,7 +89,7 @@ struct SendView: MVIView {
 		     _ as Scan.Model_LnurlServiceFetch,
 		     _ as Scan.Model_ResolvingBip353:
 
-			ScanView(location: location, mvi: mvi, toast: toast)
+			NewScanView(location: location, mvi: mvi, toast: toast)
 				.zIndex(4)
 
 		case _ as Scan.Model_Bolt11InvoiceFlow_InvoiceRequest,

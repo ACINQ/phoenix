@@ -283,6 +283,7 @@
 		DCBA371B2758076F00610EC8 /* SyncSeedManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA371A2758076F00610EC8 /* SyncSeedManager.swift */; };
 		DCBA60CD2C909C7600878895 /* NewSendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA60CC2C909C7600878895 /* NewSendView.swift */; };
 		DCBA60CF2C90E41000878895 /* ScanQrCodeSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA60CE2C90E41000878895 /* ScanQrCodeSheet.swift */; };
+		DCBA60D12C922CCC00878895 /* NewScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA60D02C922CCC00878895 /* NewScanView.swift */; };
 		DCC46F1625C3521C005D32D9 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = DC72C31825A3CF87008A927A /* FirebaseMessaging */; };
 		DCC9D99A267BD28600EA36DD /* SyncBackupManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC9D999267BD28600EA36DD /* SyncBackupManager.swift */; };
 		DCC9D99C267BEB3D00EA36DD /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCC9D99B267BEB3D00EA36DD /* CloudKit.framework */; };
@@ -680,6 +681,7 @@
 		DCBA371A2758076F00610EC8 /* SyncSeedManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncSeedManager.swift; sourceTree = "<group>"; };
 		DCBA60CC2C909C7600878895 /* NewSendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSendView.swift; sourceTree = "<group>"; };
 		DCBA60CE2C90E41000878895 /* ScanQrCodeSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanQrCodeSheet.swift; sourceTree = "<group>"; };
+		DCBA60D02C922CCC00878895 /* NewScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewScanView.swift; sourceTree = "<group>"; };
 		DCBDB8812BE154840097F940 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = de; path = de.lproj/about.html; sourceTree = "<group>"; };
 		DCBDB8822BE154840097F940 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = de; path = de.lproj/liquidity.html; sourceTree = "<group>"; };
 		DCC9D999267BD28600EA36DD /* SyncBackupManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncBackupManager.swift; sourceTree = "<group>"; };
@@ -1004,6 +1006,7 @@
 				DC6F042C2C3DC4CD00627B4F /* ManualInput.swift */,
 				DCBA60CC2C909C7600878895 /* NewSendView.swift */,
 				DCBA60CE2C90E41000878895 /* ScanQrCodeSheet.swift */,
+				DCBA60D02C922CCC00878895 /* NewScanView.swift */,
 			);
 			path = send;
 			sourceTree = "<group>";
@@ -2086,6 +2089,7 @@
 				DC118BF827B44E6E0080BBAC /* LoginView.swift in Sources */,
 				DC43096E2A7953F400E28995 /* FinalWalletDetails.swift in Sources */,
 				DC74174D270F455D00F7E3E3 /* AES256.swift in Sources */,
+				DCBA60D12C922CCC00878895 /* NewScanView.swift in Sources */,
 				C8D7AB09E80CE2B6AE270A97 /* TorConfigurationView.swift in Sources */,
 				DC27E4C42791C58C00C777CC /* PaymentsBackupView.swift in Sources */,
 				DC59377127516297003B4B53 /* Sequence+Sum.swift in Sources */,
