@@ -381,7 +381,7 @@
   <string name="legacy_inappnotif_upgrade_critical">A critical update is available. The wallet may malfunction if not updated.</string>
   <string name="legacy_inappnotif_mempool_high_usage">Bitcoin mempool is full and fees are high.</string>
   <string name="legacy_inappnotif_mempool_high_usage_action">See how Phoenix is affected</string>
-  <string name="legacy_inappnotif_prepare_migration">This wallet is obsolete. Upgrade as soon as possible to avoid channel closures.</string>
+  <string name="legacy_inappnotif_prepare_migration">This wallet is obsolete. Channels will be closed soon.</string>
   <string name="legacy_inappnotif_prepare_migration_action">Upgrade now</string>
 
   <!-- //////////////// display seed //////////////// -->

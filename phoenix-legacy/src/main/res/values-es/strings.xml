@@ -282,7 +282,7 @@
   <string name="legacy_inappnotif_background_worker_cannot_run">Phoenix necesita poder ejecutarse en segundo plano de vez en cuando. Asegúrate de que tu dispositivo no fuerce el cierre de esta aplicación para ahorrar batería.</string>
   <string name="legacy_inappnotif_upgrade">Hay una actualización disponible para esta aplicación.</string>
   <string name="legacy_inappnotif_upgrade_critical">Una actualización crítica está disponible. La aplicación puede funcionar mal si no se actualiza.</string>
-  <string name="legacy_inappnotif_prepare_migration">Esta versión está obsoleta. Actualícela lo antes posible para evitar el cierre de canales.</string>
+  <string name="legacy_inappnotif_prepare_migration">Esta versión está obsoleta. Los canales se cerrarán pronto.</string>
   <string name="legacy_inappnotif_prepare_migration_action">Actualizar ahora</string>
 
   <!-- //////////////// display seed //////////////// -->

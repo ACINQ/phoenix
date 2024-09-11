@@ -224,7 +224,7 @@ class NodeService : Service() {
             log.info("cancel competing workers")
             val wm = WorkManager.getInstance(applicationContext)
             withContext(Dispatchers.IO) {
-                wm.getWorkInfosByTag(InflightPaymentsWatcher.TAG).get() + wm.getWorkInfosByTag(ChannelsWatcher.TAG).get()
+                wm.getWorkInfosByTag(InflightPaymentsWatcher.TAG).get() + wm.getWorkInfosByTag(ChannelsWatcher.TAG).get() + wm.getWorkInfosByTag(DailyConnect.TAG).get()
             }.forEach {
                 wm.cancelWorkById(it.id).result.get()
             }

@@ -368,7 +368,7 @@
   <string name="legacy_inappnotif_upgrade_critical">Uma atualização crítica está disponível. A carteira pode apresentar mau funcionamento se não for atualizada.</string>
   <string name="legacy_inappnotif_mempool_high_usage">O mempool da rede Bitcoin está cheio e com taxas altas.</string>
   <string name="legacy_inappnotif_mempool_high_usage_action">Veja como a Phoenix é afetada</string>
-  <string name="legacy_inappnotif_prepare_migration">Esta versão está obsoleta. Atualize o mais rápido possível para evitar o fechamento de canais.</string>
+  <string name="legacy_inappnotif_prepare_migration">Esta versão está obsoleta. Os canais serão fechados em breve.</string>
   <string name="legacy_inappnotif_prepare_migration_action">Atualizar agora</string>
 
   <!-- //////////////// display seed //////////////// -->
