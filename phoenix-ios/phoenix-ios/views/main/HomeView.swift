@@ -166,7 +166,7 @@ struct HomeView : MVIView {
 			case .paymentView(let selectedPayment):
 				
 				PaymentView(
-					location: .sheet(closeAction: { self.activeSheet = nil }),
+					location: .sheet(closeSheet: { self.activeSheet = nil }),
 					paymentInfo: selectedPayment
 				)
 				.modifier(GlobalEnvironment.sheetInstance())
@@ -1248,15 +1248,15 @@ class DownloadMonitor: ObservableObject {
 	
 	init() {
 		let syncManager = Biz.syncManager!
-		let syncStatePublisher = syncManager.syncTxManager.statePublisher
+		let syncStatePublisher = syncManager.syncBackupManager.statePublisher
 		
-		syncStatePublisher.sink {[weak self](state: SyncTxManager_State) in
+		syncStatePublisher.sink {[weak self](state: SyncBackupManager_State) in
 			self?.update(state)
 		}
 		.store(in: &cancellables)
 	}
 	
-	private func update(_ state: SyncTxManager_State) {
+	private func update(_ state: SyncBackupManager_State) {
 		log.trace("[DownloadMonitor] update()")
 		
 		if case .downloading(let details) = state {
@@ -1270,10 +1270,10 @@ class DownloadMonitor: ObservableObject {
 		}
 	}
 	
-	private func subscribe(_ details: SyncTxManager_State_Downloading) {
+	private func subscribe(_ details: SyncBackupManager_State_Downloading) {
 		log.trace("[DownloadMonitor] subscribe()")
 		
-		details.$oldestCompletedDownload.sink {[weak self](date: Date?) in
+		details.$payments_oldestCompletedDownload.sink {[weak self](date: Date?) in
 			log.trace("[DownloadMonitor] oldestCompletedDownload = \(date?.description ?? "nil")")
 			self?.oldestCompletedDownload = date
 		}

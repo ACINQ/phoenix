@@ -27,6 +27,13 @@ LEFT OUTER JOIN contact_offers AS contact_offers ON contact_id = id
 GROUP BY id
 ORDER BY contacts.name ASC;
 
+scanContacts:
+SELECT id, created_at FROM contacts;
+
+existsContact:
+SELECT COUNT(*) FROM contacts
+WHERE id = ?;
+
 getContact:
 SELECT id, name, photo_uri, use_offer_key, contacts.created_at, updated_at, group_concat(offer, ',') AS offers
 FROM contacts AS contacts

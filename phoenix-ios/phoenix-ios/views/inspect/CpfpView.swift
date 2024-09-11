@@ -69,6 +69,7 @@ struct CpfpView: View {
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -186,15 +187,10 @@ struct CpfpView: View {
 	@ViewBuilder
 	func priorityBoxes() -> some View {
 		
-		if #available(iOS 16.0, *) {
-			priorityBoxes_ios16()
-		} else {
-			priorityBoxes_ios15()
-		}
+		priorityBoxes_ios16()
 	}
 	
 	@ViewBuilder
-	@available(iOS 16.0, *)
 	func priorityBoxes_ios16() -> some View {
 		
 		ViewThatFits {
@@ -217,22 +213,6 @@ struct CpfpView: View {
 					priorityBox_high()
 				}
 			} // </Grid>
-		}
-		.assignMaxPreference(for: priorityBoxWidthReader.key, to: $priorityBoxWidth)
-	}
-	
-	@ViewBuilder
-	func priorityBoxes_ios15() -> some View {
-		
-		VStack(alignment: HorizontalAlignment.center, spacing: 8) {
-			HStack(alignment: VerticalAlignment.center, spacing: 8) {
-				priorityBox_economy()
-				priorityBox_low()
-			}
-			HStack(alignment: VerticalAlignment.center, spacing: 8) {
-				priorityBox_medium()
-				priorityBox_high()
-			}
 		}
 		.assignMaxPreference(for: priorityBoxWidthReader.key, to: $priorityBoxWidth)
 	}
@@ -742,8 +722,12 @@ struct CpfpView: View {
 					case .sheet(let closeAction):
 						closeAction()
 					case .embedded(let popTo):
-						popTo(.TransactionsView)
-						self.presentationMode.wrappedValue.dismiss()
+						if #available(iOS 17, *) {
+							deepLinkManager.broadcast(.paymentHistory)
+						} else {
+							popTo(.TransactionsView)
+							self.presentationMode.wrappedValue.dismiss()
+						}
 					}
 				}
 				

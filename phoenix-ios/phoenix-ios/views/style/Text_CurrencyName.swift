@@ -47,19 +47,14 @@ struct Text_CurrencyName: View {
 	@ViewBuilder
 	var body: some View {
 		
-		if #available(iOS 16, *) {
-			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
-				let (currencyName1, currencyName2) = currency.splitShortName
-				Text(currencyName1)
-				if !currencyName2.isEmpty {
-					Text(currencyName2).fontWidth(.condensed).padding(.leading, leadingPadding)
-				}
-			}
-			.environment(\.layoutDirection, .leftToRight) // issue #237
-			.font(.system(fontTextStyle))
-		} else {
-			Text(currency.shortName)
-				.font(.system(fontTextStyle))
-		}
+        HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+            let (currencyName1, currencyName2) = currency.splitShortName
+            Text(currencyName1)
+            if !currencyName2.isEmpty {
+                Text(currencyName2).fontWidth(.condensed).padding(.leading, leadingPadding)
+            }
+        }
+        .environment(\.layoutDirection, .leftToRight) // issue #237
+        .font(.system(fontTextStyle))
 	}
 }

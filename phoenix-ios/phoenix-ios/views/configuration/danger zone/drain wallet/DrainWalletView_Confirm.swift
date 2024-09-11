@@ -10,17 +10,25 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct DrainWalletView_Confirm: MVISubView {
 	
+	enum NavLinkTag: String, Codable {
+		case ActionView
+	}
+
 	@ObservedObject var mvi: MVIState<CloseChannelsConfiguration.Model, CloseChannelsConfiguration.Intent>
 	let bitcoinAddress: String
 	let popTo: (PopToDestination) -> Void
 	
-	@State var actionRequested: Bool = false
+	@State var actionFired: Bool = false
 	@State var expectedTxCount: Int = 0
 	
+	// <iOS_16_workarounds>
+	@State var navLinkTag: NavLinkTag? = nil
 	@State var popToDestination: PopToDestination? = nil
+	// </iOS_16_workarounds>
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	// --------------------------------------------------
@@ -30,28 +38,26 @@ struct DrainWalletView_Confirm: MVISubView {
 	@ViewBuilder
 	var view: some View {
 		
+		layers()
+			.navigationTitle(NSLocalizedString("Confirm Drain", comment: "Navigation bar title"))
+			.navigationBarTitleDisplayMode(.inline)
+			.navigationStackDestination(isPresented: navLinkTagBinding()) {
+				navLinkView()
+			}
+			.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
+				navLinkView(tag)
+			}
+	}
+	
+	@ViewBuilder
+	func layers() -> some View {
+		
 		ZStack {
-			if #unavailable(iOS 16.0) {
-				NavigationLink(
-					destination: actionScreen(),
-					isActive: $actionRequested
-				) {
-					EmptyView()
-				}
-				.accessibilityHidden(true)
-				
-			} // else: uses.navigationStackDestination()
-			
 			content()
 		}
 		.onAppear {
 			onAppear()
 		}
-		.navigationStackDestination(isPresented: $actionRequested) { // For iOS 16+
-			actionScreen()
-		}
-		.navigationTitle(NSLocalizedString("Confirm Drain", comment: "Navigation bar title"))
-		.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder
@@ -147,18 +153,39 @@ struct DrainWalletView_Confirm: MVISubView {
 	}
 	
 	@ViewBuilder
-	func actionScreen() -> some View {
+	func navLinkView() -> some View {
 		
-		DrainWalletView_Action(
-			mvi: mvi,
-			expectedTxCount: expectedTxCount,
-			popTo: popToWrapper
-		)
+		if let tag = self.navLinkTag {
+			navLinkView(tag)
+		} else {
+			EmptyView()
+		}
+	}
+	
+	@ViewBuilder
+	func navLinkView(_ tag: NavLinkTag) -> some View {
+		
+		switch tag {
+		case .ActionView:
+			DrainWalletView_Action(
+				mvi: mvi,
+				expectedTxCount: expectedTxCount,
+				popTo: popToWrapper
+			)
+		}
 	}
 	
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
+	
+	func navLinkTagBinding() -> Binding<Bool> {
+		
+		return Binding<Bool>(
+			get: { navLinkTag != nil },
+			set: { if !$0 { navLinkTag = nil }}
+		)
+	}
 	
 	func formattedBalances() -> (FormattedAmount, FormattedAmount?) {
 		
@@ -195,12 +222,16 @@ struct DrainWalletView_Confirm: MVISubView {
 	func popToWrapper(_ destination: PopToDestination) {
 		log.trace("popToWrapper(\(destination))")
 		
-		popToDestination = destination
-		popTo(destination)
+		if #available(iOS 17, *) {
+			log.warning("popToWrapper(): This function is for iOS 16 only !")
+		} else {
+			popToDestination = destination
+			popTo(destination)
+		}
 	}
 	
 	// --------------------------------------------------
-	// MARK: Actions
+	// MARK: Notifications
 	// --------------------------------------------------
 	
 	func onAppear() {
@@ -212,12 +243,27 @@ struct DrainWalletView_Confirm: MVISubView {
 		}
 	}
 	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
+	
+	func navigateTo(_ tag: NavLinkTag) {
+		log.trace("navigateTo(\(tag.rawValue))")
+		
+		if #available(iOS 17, *) {
+			navCoordinator.path.append(tag)
+		} else {
+			navLinkTag = tag
+		}
+	}
+	
 	func drainWallet() {
 		log.trace("drainWallet()")
 		
-		if !actionRequested {
-			actionRequested = true
+		if !actionFired {
+			actionFired = true
 			expectedTxCount = nonZeroChannelCount()
+			navigateTo(.ActionView)
 			mvi.intent(CloseChannelsConfiguration.IntentMutualCloseAllChannels(address: bitcoinAddress))
 		}
 	}

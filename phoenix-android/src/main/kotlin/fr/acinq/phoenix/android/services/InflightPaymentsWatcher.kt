@@ -94,24 +94,24 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
             val inFlightPaymentsCount = internalData.getInFlightPaymentsCount.first()
 
             if (inFlightPaymentsCount == 0) {
-                log.info("expecting NO in-flight payments, terminating job...")
+                log.info("aborting $name: expecting NO in-flight payments")
                 return Result.success()
             } else {
 
                 // check various preferences -- this job may abort early
                 val legacyAppStatus = LegacyPrefsDatastore.getLegacyAppStatus(applicationContext).filterNotNull().first()
                 if (legacyAppStatus !is LegacyAppStatus.NotRequired) {
-                    log.warn("aborting in-flight-payments check job, legacy_status=${legacyAppStatus.name()}")
+                    log.warn("aborting $name: legacy_status=${legacyAppStatus.name()}")
                     return Result.success()
                 }
 
                 if (LegacyPrefsDatastore.getPrefsMigrationExpected(applicationContext).first() == true) {
-                    log.warn("legacy data migration is required, aborting in-flight payment worker")
+                    log.warn("aborting $name: legacy data migration is required")
                     return Result.failure()
                 }
 
                 val encryptedSeed = SeedManager.loadSeedFromDisk(applicationContext) as? EncryptedSeed.V2.NoAuth ?: run {
-                    log.error("unhandled seed type, aborting in-flight payment worker")
+                    log.error("aborting $name: unhandled seed type")
                     return Result.failure()
                 }
 
@@ -141,7 +141,7 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
                         service.filterNotNull().flatMapLatest { it.state.asFlow() }.collect { state ->
                             when (state) {
                                 is NodeServiceState.Init, is NodeServiceState.Running, is NodeServiceState.Error, NodeServiceState.Disconnected -> {
-                                    log.info("node service in state=${state.name}, interrupting in-flight payments process")
+                                    log.info("interrupting $name: node service in state=${state.name}")
                                     stopJobs.value = true
                                     scheduleOnce(applicationContext)
                                 }
@@ -152,11 +152,10 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
                                     log.info("node service in state=${state.name}, starting an isolated business")
 
                                     jobChannelsWatcher = launch {
-                                        val mnemonics = encryptedSeed.decrypt()
-                                        business = startBusiness(mnemonics, userPrefs)
+                                        business = WorkerHelper.startIsolatedBusiness(application, encryptedSeed, userPrefs)
 
                                         business?.connectionsManager?.connections?.first { it.global is Connection.ESTABLISHED }
-                                        log.info("connections established, watching channels for in-flight payments...")
+                                        log.debug("connections established, watching channels for in-flight payments...")
 
                                         business?.peerManager?.channelsFlow?.filterNotNull()?.collectIndexed { index, channels ->
                                             val paymentsCount = channels.inFlightPaymentsCount()
@@ -168,24 +167,24 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
                                                 }
 
                                                 channels.any { it.value.state is Syncing } -> {
-                                                    log.info("channels syncing, pausing 10s before next check (#$index)")
+                                                    log.debug("channels syncing, pausing 10s before next check (#$index)")
                                                     delay(10_000)
                                                 }
 
                                                 paymentsCount > 0 -> {
-                                                    log.info("$paymentsCount payments in-flight, pausing 5s before next check (#$index)...")
+                                                    log.debug("$paymentsCount payments in-flight, pausing 5s before next check (#$index)...")
                                                     delay(5_000)
                                                 }
 
                                                 else -> {
-                                                    log.info("$paymentsCount payments in-flight, successfully terminating worker (#$index)...")
+                                                    log.info("$paymentsCount payments in-flight, successfully completing worker (#$index)...")
                                                     stopJobs.value = true
                                                 }
                                             }
                                         }
                                     }.also {
                                         it.invokeOnCompletion {
-                                            log.info("channels-watcher-job has been terminated (${it?.localizedMessage})")
+                                            log.debug("terminated job watching channels (${it?.localizedMessage})")
                                         }
                                     }
                                 }
@@ -195,7 +194,7 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
 
                     val jobTimer = launch {
                         delay(120_000)
-                        log.info("stopping channel-monitor job after 2 minutes without resolution, and show notification")
+                        log.info("stopping $name after 2 minutes without resolution - show notification")
                         scheduleOnce(applicationContext)
                         SystemNotificationHelper.notifyInFlightHtlc(applicationContext)
                         stopJobs.value = true
@@ -210,61 +209,30 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
                 return Result.success()
             }
         } catch (e: Exception) {
-            log.error("error when processing in-flight-payments: ", e)
+            log.error("error in $name: ", e)
             return Result.failure()
         } finally {
             business?.appConnectionsDaemon?.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.All)
             business?.stop()
-            log.info("terminated in-flight-payments watcher process...")
+            log.info("terminated $name...")
         }
-    }
-
-    private suspend fun startBusiness(mnemonics: ByteArray, userPrefs: UserPrefsRepository): PhoenixBusiness {
-        // retrieve preferences before starting business
-        val business = PhoenixBusiness(PlatformContext(applicationContext))
-        val electrumServer = userPrefs.getElectrumServer.first()
-        val isTorEnabled = userPrefs.getIsTorEnabled.first()
-        val liquidityPolicy = userPrefs.getLiquidityPolicy.first()
-        val trustedSwapInTxs = LegacyPrefsDatastore.getMigrationTrustedSwapInTxs(applicationContext).first()
-        val preferredFiatCurrency = userPrefs.getFiatCurrency.first()
-
-        // preparing business
-        val seed = business.walletManager.mnemonicsToSeed(EncryptedSeed.toMnemonics(mnemonics), wordList = MnemonicLanguage.English.wordlist())
-        business.walletManager.loadWallet(seed)
-        business.appConfigurationManager.updateElectrumConfig(electrumServer)
-        business.appConfigurationManager.updatePreferredFiatCurrencies(
-            AppConfigurationManager.PreferredFiatCurrencies(primary = preferredFiatCurrency, others = emptySet())
-        )
-
-        // start business
-        business.start(
-            StartupParams(
-                requestCheckLegacyChannels = false,
-                isTorEnabled = isTorEnabled,
-                liquidityPolicy = liquidityPolicy,
-                trustedSwapInTxs = trustedSwapInTxs.map { TxId(it) }.toSet()
-            )
-        )
-
-        // start the swap-in wallet watcher
-        business.peerManager.getPeer().startWatchSwapInWallet()
-        return business
     }
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java)
+        val name = "inflight-payments-watcher"
         const val TAG = BuildConfig.APPLICATION_ID + ".InflightPaymentsWatcher"
 
         /** Schedule a in-flight payments watcher job to start every few hours. */
         fun schedulePeriodic(context: Context) {
-            log.info("scheduling periodic in-flight-payments watcher")
+            log.info("scheduling periodic $name")
             val work = PeriodicWorkRequest.Builder(InflightPaymentsWatcher::class.java, 2, TimeUnit.HOURS, 3, TimeUnit.HOURS).addTag(TAG)
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(TAG, ExistingPeriodicWorkPolicy.UPDATE, work.build())
         }
 
         /** Schedule an in-flight payments job to run once in [delay] from now (by default, 2 hours). Existing schedules are replaced. */
         fun scheduleOnce(context: Context, delay: Duration = 2.hours) {
-            log.info("scheduling ${this::class.java.name} in $delay from now")
+            log.info("scheduling $name in $delay from now")
             val work = OneTimeWorkRequestBuilder<InflightPaymentsWatcher>().setInitialDelay(delay.toJavaDuration()).build()
             WorkManager.getInstance(context).enqueueUniqueWork(TAG, ExistingWorkPolicy.REPLACE, work)
         }

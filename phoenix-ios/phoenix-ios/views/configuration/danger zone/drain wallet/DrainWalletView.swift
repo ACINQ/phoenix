@@ -10,6 +10,10 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct DrainWalletView: MVIView {
 	
+	enum NavLinkTag: String, Codable {
+		case ConfirmView
+	}
+	
 	@StateObject var mvi = MVIState({ $0.closeChannelsConfiguration() })
 	
 	@Environment(\.controllerFactory) var factoryEnv
@@ -19,14 +23,17 @@ struct DrainWalletView: MVIView {
 	let encryptedNodeId = Biz.encryptedNodeId!
 	
 	@State var didAppear = false
-	@State var popToDestination: PopToDestination? = nil
 
 	@State var btcAddressInputResult: Result<BitcoinUri, BtcAddressInput.DetailedError> = .failure(.emptyInput)
 	
-	@State var reviewRequested = false
+	// <iOS_16_workarounds>
+	@State var navLinkTag: NavLinkTag? = nil
+	@State var popToDestination: PopToDestination? = nil
+	// </iOS_16_workarounds>
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
@@ -37,28 +44,26 @@ struct DrainWalletView: MVIView {
 	@ViewBuilder
 	var view: some View {
 
+		layers()
+			.navigationTitle(NSLocalizedString("Drain wallet", comment: "Navigation bar title"))
+			.navigationBarTitleDisplayMode(.inline)
+			.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
+				navLinkView()
+			}
+			.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
+				navLinkView(tag)
+			}
+	}
+	
+	@ViewBuilder
+	func layers() -> some View {
+		
 		ZStack {
-			if #unavailable(iOS 16.0) {
-				NavigationLink(
-					destination: reviewScreen(),
-					isActive: $reviewRequested
-				) {
-					EmptyView()
-				}
-				.accessibilityHidden(true)
-				
-			} // else: uses.navigationStackDestination()
-			
 			content()
 		}
 		.onAppear {
 			onAppear()
 		}
-		.navigationStackDestination(isPresented: $reviewRequested) { // For iOS 16+
-			reviewScreen()
-		}
-		.navigationTitle(NSLocalizedString("Drain wallet", comment: "Navigation bar title"))
-		.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder
@@ -183,20 +188,43 @@ struct DrainWalletView: MVIView {
 	}
 	
 	@ViewBuilder
-	func reviewScreen() -> some View {
+	func navLinkView() -> some View {
 		
-		if case .success(let bitcoinUri) = btcAddressInputResult {
-			DrainWalletView_Confirm(
-				mvi: mvi,
-				bitcoinAddress: bitcoinUri.address,
-				popTo: popToWrapper
-			)
+		if let tag = self.navLinkTag {
+			navLinkView(tag)
+		} else {
+			EmptyView()
+		}
+	}
+	
+	@ViewBuilder
+	func navLinkView(_ tag: NavLinkTag) -> some View {
+		
+		switch tag {
+		case .ConfirmView:
+			if case .success(let bitcoinUri) = btcAddressInputResult {
+				DrainWalletView_Confirm(
+					mvi: mvi,
+					bitcoinAddress: bitcoinUri.address,
+					popTo: popToWrapper
+				)
+			} else {
+				EmptyView()
+			}
 		}
 	}
 	
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
+	
+	func navLinkTagBinding() -> Binding<Bool> {
+		
+		return Binding<Bool>(
+			get: { navLinkTag != nil },
+			set: { if !$0 { navLinkTag = nil }}
+		)
+	}
 	
 	func formattedBalances() -> (FormattedAmount, FormattedAmount?) {
 		
@@ -214,8 +242,12 @@ struct DrainWalletView: MVIView {
 	func popToWrapper(_ destination: PopToDestination) {
 		log.trace("popToWrapper(\(destination))")
 		
-		popToDestination = destination
-		popTo(destination)
+		if #available(iOS 17, *) {
+			log.warning("popToWrapper(): This function is for iOS 16 only !")
+		} else {
+			popToDestination = destination
+			popTo(destination)
+		}
 	}
 	
 	// --------------------------------------------------
@@ -248,8 +280,19 @@ struct DrainWalletView: MVIView {
 	// MARK: Actions
 	// --------------------------------------------------
 	
+	func navigateTo(_ tag: NavLinkTag) {
+		log.trace("navigateTo(\(tag.rawValue))")
+		
+		if #available(iOS 17, *) {
+			navCoordinator.path.append(tag)
+		} else {
+			navLinkTag = tag
+		}
+	}
+	
 	func reviewButtonTapped() {
 		log.trace("reviewButtonTapped()")
-		reviewRequested = true
+		
+		navigateTo(.ConfirmView)
 	}
 }

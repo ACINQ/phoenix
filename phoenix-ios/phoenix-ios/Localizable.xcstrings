@@ -14453,7 +14453,11 @@
         }
       }
     },
+    "Delete payment history and contacts from my iCloud account." : {
+
+    },
     "Delete payment history from my iCloud account." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -14693,7 +14697,11 @@
         }
       }
     },
+    "Deleting **payment history** and **contacts** from iCloud" : {
+
+    },
     "Deleting **payment history** from iCloud" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -21794,7 +21802,11 @@
         }
       }
     },
+    "If you switch to a new device (or reinstall the app) then you'll lose this information." : {
+
+    },
     "If you switch to a new device (or reinstall the app) then you'll lose your payment history." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -24375,6 +24387,7 @@
       }
     },
     "lightning fee" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -26724,6 +26737,7 @@
       }
     },
     "miner fee" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -30281,7 +30295,11 @@
         }
       }
     },
+    "Payment history and contacts not stored in iCloud." : {
+
+    },
     "Payment history not stored in iCloud." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -31050,6 +31068,7 @@
       }
     },
     "Payments backup" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -39019,7 +39038,11 @@
         }
       }
     },
+    "The **payment history** and **contacts** for this wallet will be deleted from your iCloud account." : {
+
+    },
     "The **payment history** for this wallet will be deleted from your iCloud account." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -39100,6 +39123,7 @@
       }
     },
     "The additional capacity will be preserved for that duration." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -42971,6 +42995,7 @@
       }
     },
     "total" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -48544,7 +48569,14 @@
         }
       }
     },
+    "Your payment history and contacts are only stored on this device." : {
+
+    },
+    "Your payment history and contacts will be stored in iCloud." : {
+
+    },
     "Your payment history is only stored on this device." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -48585,6 +48617,7 @@
       }
     },
     "Your payment history will be stored in iCloud." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

@@ -2,9 +2,12 @@ package fr.acinq.phoenix.db.cloud
 
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.utils.Try
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.lightning.wire.OfferTypes
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
@@ -124,5 +127,22 @@ object UUIDSerializer : KSerializer<UUID> {
 
     override fun deserialize(decoder: Decoder): UUID {
         return UUID.fromString(decoder.decodeString())
+    }
+}
+
+object OfferSerializer : KSerializer<OfferTypes.Offer> {
+    override val descriptor: SerialDescriptor =
+        PrimitiveSerialDescriptor("Offer", PrimitiveKind.STRING)
+
+    override fun serialize(encoder: Encoder, value: OfferTypes.Offer) {
+        return encoder.encodeString(value.encode())
+    }
+
+    override fun deserialize(decoder: Decoder): OfferTypes.Offer {
+        val offerStr = decoder.decodeString()
+        return when (val result = OfferTypes.Offer.decode(offerStr)) {
+            is Try.Success -> result.result
+            is Try.Failure -> throw SerializationException(message = "invalid offer")
+        }
     }
 }

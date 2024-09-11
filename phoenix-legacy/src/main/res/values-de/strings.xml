@@ -108,9 +108,6 @@
   <string name="legacy_receive_share_title">Teilen Sie diese Zahlungsanforderung mit…</string>
   <string name="legacy_receive_share_button">Teilen…</string>
 
-  <string name="legacy_receive_min_amount_pay_to_open">
-    <![CDATA[Ihre Wallet ist leer. Die erste Zahlung, die Sie erhalten, muss mindestens <b>%1$s</b> betragen.]]>
-  </string>
   <string name="legacy_receive_address_label">Adresse</string>
   <string name="legacy_receive_withdraw_button">Benutze LNURL Link</string>
 
@@ -397,8 +394,8 @@
   <string name="legacy_inappnotif_upgrade_critical">Ein kritisches Update ist verfügbar. Die Wallet könnte fehlerhaft funktionieren, wenn sie nicht aktualisiert wird.</string>
   <string name="legacy_inappnotif_mempool_high_usage">Bitcoin-Mempool ist voll und die Gebühren sind hoch.</string>
   <string name="legacy_inappnotif_mempool_high_usage_action">Sehen Sie, wie Phoenix betroffen ist</string>
-  <string name="legacy_inappnotif_prepare_migration">Der alte Phoenix wird bald verschwinden. Zeit für ein Upgrade!</string>
-  <string name="legacy_inappnotif_prepare_migration_action">Upgrade auf die neue Phoenix</string>
+  <string name="legacy_inappnotif_prepare_migration">Diese Version ist veraltet. Führen Sie die Aktualisierung so bald wie möglich durch, um Kanalschließungen zu vermeiden.</string>
+  <string name="legacy_inappnotif_prepare_migration_action">Jetzt aktualisieren</string>
 
   <!-- //////////////// display seed //////////////// -->
 
@@ -818,7 +815,7 @@
   <!-- //////////////// Migration to KMP //////////////// -->
 
   <string name="legacy_migration_title">Phoenix Upgrade</string>
-  <string name="legacy_migration_ready_message">Ab dem 1. November werden die alten Dienste (Swaps und On-the-fly-Kanäle) deaktiviert.\n\nUpgrade auf die neueste Version von Phoenix, mit einer hochmodernen Lightning-Engine und neuen Funktionen.\n\nIhre Kanäle werden zusammengeführt. Dieser Prozess ist automatisiert.\n\nWenn die Migration abgeschlossen ist, sollten Sie Ihre alten Swap-Adressen nicht wieder verwenden.</string>
+  <string name="legacy_migration_ready_message">Diese Wallet verwendet ein veraltetes Channel-Format. Die meisten Funktionen sind deaktiviert.\n\nWerden Sie auf Phoenix v2 upgraden und erhalten Sie vertrauenslose Swaps, Splicing, statische Adressen und vieles mehr.\n\nAb Oktober 2024 werden die Kanäle, die nicht migriert wurden, geschlossen.</string>
   <string name="legacy_migration_prepare_button">Upgrade</string>
   <string name="legacy_migration_prepare_button_disconnected">Verbindung herstellen…</string>
   <string name="legacy_migration_dismiss_button">Nicht jetzt</string>

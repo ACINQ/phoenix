@@ -536,14 +536,18 @@ fun AppView(
     val exchangeRates = fiatRates
     lastCompletedPayment?.let { payment ->
         LaunchedEffect(key1 = payment.walletPaymentId()) {
-            if (isDataMigrationExpected == false) {
-                if (payment is IncomingPayment && payment.origin is IncomingPayment.Origin.Offer) {
-                    SystemNotificationHelper.notifyPaymentsReceived(
-                        context, userPrefs, paymentHash = payment.paymentHash, amount = payment.amount, rates = exchangeRates, isHeadless = false
-                    )
-                } else {
-                    navigateToPaymentDetails(navController, id = payment.walletPaymentId(), isFromEvent = true)
+            try {
+                if (isDataMigrationExpected == false) {
+                    if (payment is IncomingPayment && payment.origin is IncomingPayment.Origin.Offer) {
+                        SystemNotificationHelper.notifyPaymentsReceived(
+                            context, userPrefs, paymentHash = payment.paymentHash, amount = payment.amount, rates = exchangeRates, isHeadless = false
+                        )
+                    } else {
+                        navigateToPaymentDetails(navController, id = payment.walletPaymentId(), isFromEvent = true)
+                    }
                 }
+            } catch (e: Exception) {
+                log.warn("failed to notify UI of completed payment: {}", e.localizedMessage)
             }
         }
     }

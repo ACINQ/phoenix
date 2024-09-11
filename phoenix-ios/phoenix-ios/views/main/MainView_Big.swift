@@ -45,6 +45,10 @@ struct MainView_Big: View {
 	)
 	@State var headerButtonHeight: CGFloat? = nil
 	
+	@StateObject var navCoordinator_settings = NavigationCoordinator()
+	@StateObject var navCoordinator_transactions = NavigationCoordinator()
+	@StateObject var navCoordinator_currencyConverter = NavigationCoordinator()
+	
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	// --------------------------------------------------
@@ -292,18 +296,20 @@ struct MainView_Big: View {
 	@ViewBuilder
 	func leadingSidebar_settings() -> some View {
 		
-		NavigationWrapper {
+		NavigationStack(path: $navCoordinator_settings.path) {
 			ConfigurationView()
 		}
+		.environmentObject(navCoordinator_settings)
 		.padding(.top, navigationViewPaddingTop)
 	}
 	
 	@ViewBuilder
 	func leadingSidebar_transactions() -> some View {
 		
-		NavigationWrapper {
+		NavigationStack(path: $navCoordinator_transactions.path) {
 			TransactionsView()
 		}
+		.environmentObject(navCoordinator_transactions)
 		.padding(.top, navigationViewPaddingTop)
 	}
 	
@@ -342,9 +348,10 @@ struct MainView_Big: View {
 	@ViewBuilder
 	func trailingSidebar_currencyConverter() -> some View {
 		
-		NavigationWrapper {
+		NavigationStack(path: $navCoordinator_currencyConverter.path) {
 			CurrencyConverterView()
 		}
+		.environmentObject(navCoordinator_currencyConverter)
 		.padding(.top, navigationViewPaddingTop)
 	}
 	
@@ -614,6 +621,44 @@ struct MainView_Big: View {
 				case .liquiditySettings  : showSettings()
 				case .forceCloseChannels : showSettings()
 				case .swapInWallet       : showSettings()
+			}
+			
+			if #available(iOS 17, *) {
+				
+				switch value {
+				case .paymentHistory:
+					break
+					
+				case .backup:
+					navCoordinator_settings.path.removeAll()
+					navCoordinator_settings.path.append(ConfigurationList.NavLinkTag.RecoveryPhrase)
+						
+				case .drainWallet:
+					navCoordinator_settings.path.removeAll()
+					navCoordinator_settings.path.append(ConfigurationList.NavLinkTag.DrainWallet)
+					
+				case .electrum:
+					navCoordinator_settings.path.removeAll()
+					navCoordinator_settings.path.append(ConfigurationList.NavLinkTag.ElectrumServer)
+					
+				case .backgroundPayments:
+					navCoordinator_settings.path.removeAll()
+					navCoordinator_settings.path.append(ConfigurationList.NavLinkTag.PaymentOptions)
+					navCoordinator_settings.path.append(PaymentOptionsList.NavLinkTag.BackgroundPaymentsSelector)
+					
+				case .liquiditySettings:
+					navCoordinator_settings.path.removeAll()
+					navCoordinator_settings.path.append(ConfigurationList.NavLinkTag.ChannelManagement)
+					
+				case .forceCloseChannels:
+					navCoordinator_settings.path.removeAll()
+					navCoordinator_settings.path.append(ConfigurationList.NavLinkTag.ForceCloseChannels)
+					
+				case .swapInWallet:
+					navCoordinator_settings.path.removeAll()
+					navCoordinator_settings.path.append(ConfigurationList.NavLinkTag.WalletInfo)
+					navCoordinator_settings.path.append(WalletInfoView.NavLinkTag.SwapInWalletDetails)
+				}
 			}
 		}
 	}

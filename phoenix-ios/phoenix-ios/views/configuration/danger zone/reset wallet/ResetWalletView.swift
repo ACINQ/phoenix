@@ -10,6 +10,10 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct ResetWalletView: MVIView {
 	
+	enum NavLinkTag: String, Codable {
+		case ReviewScreen
+	}
+
 	@StateObject var mvi = MVIState({ $0.closeChannelsConfiguration() })
 	
 	@Environment(\.controllerFactory) var factoryEnv
@@ -22,8 +26,6 @@ struct ResetWalletView: MVIView {
 	
 	@State var reviewRequested = false
 	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
-	
 	let backupTransactions_enabled_publisher = Prefs.shared.backupTransactions.isEnabledPublisher
 	@State var backupTransactions_enabled = Prefs.shared.backupTransactions.isEnabled
 	
@@ -35,6 +37,13 @@ struct ResetWalletView: MVIView {
 		encryptedNodeId: Biz.encryptedNodeId!
 	)
 	
+	// <iOS_16_workarounds>
+	@State var navLinkTag: NavLinkTag? = nil
+	// </iOS_16_workarounds>
+	
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
+	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	
 	// --------------------------------------------------
 	// MARK: View Builders
 	// --------------------------------------------------
@@ -42,22 +51,22 @@ struct ResetWalletView: MVIView {
 	@ViewBuilder
 	var view: some View {
 
+		layers()
+			.navigationTitle(NSLocalizedString("Reset wallet", comment: "Navigation bar title"))
+			.navigationBarTitleDisplayMode(.inline)
+			.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
+				navLinkView()
+			}
+			.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
+				navLinkView(tag)
+			}
+	}
+	
+	@ViewBuilder
+	func layers() -> some View {
+		
 		ZStack {
-			if #unavailable(iOS 16.0) {
-				NavigationLink(
-					destination: reviewScreen(),
-					isActive: $reviewRequested
-				) {
-					EmptyView()
-				}
-				.accessibilityHidden(true)
-				
-			} // else: uses.navigationStackDestination()
-			
 			content()
-		}
-		.navigationStackDestination(isPresented: $reviewRequested) { // For iOS 16+
-			reviewScreen()
 		}
 		.onReceive(backupTransactions_enabled_publisher) {
 			self.backupTransactions_enabled = $0
@@ -69,8 +78,6 @@ struct ResetWalletView: MVIView {
 			self.manualBackup_taskDone =
 				Prefs.shared.backupSeed.manualBackup_taskDone(encryptedNodeId: encryptedNodeId)
 		}
-		.navigationTitle(NSLocalizedString("Reset wallet", comment: "Navigation bar title"))
-		.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder
@@ -197,14 +204,12 @@ struct ResetWalletView: MVIView {
 							.foregroundColor(.secondary)
 					}
 					
-					if !backupSeed_enabled {
-						Label {
-							Text("Seed backup not stored in iCloud.")
-								.font(.footnote)
-								.foregroundColor(.primary) // Stands out to provide explanation
-						} icon: {
-							invisibleImage()
-						}
+					Label {
+						Text("Seed backup not stored in iCloud.")
+							.font(.footnote)
+							.foregroundColor(.primary) // Stands out to provide explanation
+					} icon: {
+						invisibleImage()
 					}
 					
 				} else {
@@ -226,7 +231,7 @@ struct ResetWalletView: MVIView {
 				if !backupTransactions_enabled {
 					
 					Label {
-						Text("Delete payment history from my iCloud account.")
+						Text("Delete payment history and contacts from my iCloud account.")
 							.foregroundColor(.secondary)
 							.fixedSize(horizontal: false, vertical: true)
 					} icon: {
@@ -234,20 +239,18 @@ struct ResetWalletView: MVIView {
 							.foregroundColor(.secondary)
 					}
 					
-					if !backupTransactions_enabled {
-						Label {
-							Text("Payment history not stored in iCloud.")
-								.font(.footnote)
-								.foregroundColor(.primary) // Stands out to provide explanation
-						} icon: {
-							invisibleImage()
-						}
+					Label {
+						Text("Payment history and contacts not stored in iCloud.")
+							.font(.footnote)
+							.foregroundColor(.primary) // Stands out to provide explanation
+					} icon: {
+						invisibleImage()
 					}
 					
 				} else {
 					
 					Toggle(isOn: $deleteTransactionHistory) {
-						Text("Delete payment history from my iCloud account.")
+						Text("Delete payment history and contacts from my iCloud account.")
 							.foregroundColor(.primary)
 					}
 					.toggleStyle(CheckboxToggleStyle(
@@ -326,18 +329,39 @@ struct ResetWalletView: MVIView {
 	}
 	
 	@ViewBuilder
-	func reviewScreen() -> some View {
+	func navLinkView() -> some View {
 		
-		ResetWalletView_Confirm(
-			mvi: mvi,
-			deleteTransactionHistory: deleteTransactionHistory,
-			deleteSeedBackup: deleteSeedBackup
-		)
+		if let tag = self.navLinkTag {
+			navLinkView(tag)
+		} else {
+			EmptyView()
+		}
+	}
+	
+	@ViewBuilder
+	func navLinkView(_ tag: NavLinkTag) -> some View {
+		
+		switch tag {
+		case .ReviewScreen:
+			ResetWalletView_Confirm(
+				mvi: mvi,
+				deleteTransactionHistory: deleteTransactionHistory,
+				deleteSeedBackup: deleteSeedBackup
+			)
+		}
 	}
 	
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
+	
+	func navLinkTagBinding() -> Binding<Bool> {
+		
+		return Binding<Bool>(
+			get: { navLinkTag != nil },
+			set: { if !$0 { navLinkTag = nil }}
+		)
+	}
 	
 	func formattedBalances() -> (FormattedAmount, FormattedAmount?) {
 		
@@ -356,9 +380,19 @@ struct ResetWalletView: MVIView {
 	// MARK: Actions
 	// --------------------------------------------------
 	
+	func navigateTo(_ tag: NavLinkTag) {
+		log.trace("navigateTo(\(tag.rawValue))")
+		
+		if #available(iOS 17, *) {
+			navCoordinator.path.append(tag)
+		} else {
+			navLinkTag = tag
+		}
+	}
+	
 	func reviewButtonTapped() {
 		log.trace("reviewButtonTapped()")
 		
-		reviewRequested = true
+		navigateTo(.ReviewScreen)
 	}
 }

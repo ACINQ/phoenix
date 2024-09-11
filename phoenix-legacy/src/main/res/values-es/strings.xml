@@ -282,8 +282,8 @@
   <string name="legacy_inappnotif_background_worker_cannot_run">Phoenix necesita poder ejecutarse en segundo plano de vez en cuando. Asegúrate de que tu dispositivo no fuerce el cierre de esta aplicación para ahorrar batería.</string>
   <string name="legacy_inappnotif_upgrade">Hay una actualización disponible para esta aplicación.</string>
   <string name="legacy_inappnotif_upgrade_critical">Una actualización crítica está disponible. La aplicación puede funcionar mal si no se actualiza.</string>
-  <string name="legacy_inappnotif_prepare_migration">El viejo Phoenix desaparecerá pronto. Es hora de actualizarlo.</string>
-  <string name="legacy_inappnotif_prepare_migration_action">Actualizar al nuevo Phoenix</string>
+  <string name="legacy_inappnotif_prepare_migration">Esta versión está obsoleta. Actualícela lo antes posible para evitar el cierre de canales.</string>
+  <string name="legacy_inappnotif_prepare_migration_action">Actualizar ahora</string>
 
   <!-- //////////////// display seed //////////////// -->
 
@@ -466,7 +466,7 @@
   <!-- //////////////// Migration to KMP //////////////// -->
 
   <string name="legacy_migration_title">Actualización de Phoenix</string>
-  <string name="legacy_migration_ready_message">A partir del 1 de noviembre, se desactivarán los servicios heredados (intercambios y canales on-the-fly).\n\nActualízate a la última versión de Phoenix, con un motor Lightning de última generación y nuevas funciones.\n\nSus canales se fusionarán. Este proceso está automatizado.\n\nUna vez finalizada la migración, no vuelva a utilizar sus antiguas direcciones de intercambio.</string>
+  <string name="legacy_migration_ready_message">Este monedero utiliza un formato de canales obsoleto. La mayoría de las características están deshabilitadas.\n\nActualízate a Phoenix v2 y obtén swaps sin confianza, splicing, direcciones estáticas y mucho más.\n\nA partir de octubre de 2024, los canales que no hayan sido migrados serán cerrados.</string>
   <string name="legacy_migration_prepare_button">Actualizar</string>
   <string name="legacy_migration_prepare_button_disconnected">Connecting…</string>
   <string name="legacy_migration_dismiss_button">Ahora no</string>

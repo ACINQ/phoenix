@@ -10,12 +10,14 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct ChannelsConfigurationView: View {
 	
+	enum NavLinkTag: String, Codable {
+		case ImportChannels
+	}
+	
 	@State var sharing: String? = nil
 	
 	let channelsPublisher = Biz.business.peerManager.channelsPublisher()
 	@State var channels: [LocalChannelInfo] = []
-	
-	@State var importChannelsOpen = false
 	
 	enum CapacityHeight: Preference {}
 	let capacityHeightReader = GeometryPreferenceReader(
@@ -24,10 +26,15 @@ struct ChannelsConfigurationView: View {
 	)
 	@State var capacityHeight: CGFloat? = nil
 	
+	// <iOS_16_workarounds>
+	@State var navLinkTag: NavLinkTag? = nil
+	// </iOS_16_workarounds>
+	
 	@StateObject var toast = Toast()
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var popoverState: PopoverState
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
@@ -39,51 +46,47 @@ struct ChannelsConfigurationView: View {
 	@ViewBuilder
 	var body: some View {
 		
-		content()
-			.sharing($sharing)
-			.frame(maxWidth: .infinity, maxHeight: .infinity)
-			.onReceive(channelsPublisher) {
-				channels = $0
-			}
+		layers()
 			.navigationTitle(NSLocalizedString("Payment channels", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
+			.navigationBarItems(trailing: menuButton())
+			.navigationStackDestination(isPresented: navLinkTagBinding()) {
+				navLinkView()
+			}
+			.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
+				navLinkView(tag)
+			}
+	}
+	
+	@ViewBuilder
+	func layers() -> some View {
+		
+		ZStack {
+			content()
+			toast.view()
+		}
+		.frame(maxWidth: .infinity, maxHeight: .infinity)
+		.sharing($sharing)
+		.onReceive(channelsPublisher) {
+			channels = $0
+		}
 	}
 	
 	@ViewBuilder
 	func content() -> some View {
 		
-		ZStack {
-			if #unavailable(iOS 16.0) {
-				NavigationLink(
-					destination: importChannelsView(),
-					isActive: $importChannelsOpen
-				) {
-					EmptyView()
+		List {
+			if channels.isEmpty {
+				section_noChannels()
+			} else {
+				if hasUsableChannels() {
+					section_balance()
 				}
-				.accessibilityHidden(true)
-				
-			} // else: uses.navigationStackDestination()
-			
-			List {
-				if channels.isEmpty {
-					section_noChannels()
-				} else {
-					if hasUsableChannels() {
-						section_balance()
-					}
-					section_channels()
-				}
+				section_channels()
 			}
-			.listStyle(.insetGrouped)
-			.listBackgroundColor(.primaryBackground)
-			
-			toast.view()
-			
-		} // </ZStack>
-		.navigationBarItems(trailing: menuButton())
-		.navigationStackDestination(isPresented: $importChannelsOpen) { // For iOS 16+
-			importChannelsView()
 		}
+		.listStyle(.insetGrouped)
+		.listBackgroundColor(.primaryBackground)
 	}
 	
 	@ViewBuilder
@@ -244,13 +247,35 @@ struct ChannelsConfigurationView: View {
 	}
 	
 	@ViewBuilder
-	func importChannelsView() -> some View {
-		ImportChannelsView()
+	func navLinkView() -> some View {
+		
+		if let tag = self.navLinkTag {
+			navLinkView(tag)
+		} else {
+			EmptyView()
+		}
+	}
+	
+	@ViewBuilder
+	func navLinkView(_ tag: NavLinkTag) -> some View {
+		
+		switch tag {
+		case .ImportChannels:
+			ImportChannelsView()
+		}
 	}
 	
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
+	
+	func navLinkTagBinding() -> Binding<Bool> {
+		
+		return Binding<Bool>(
+			get: { navLinkTag != nil },
+			set: { if !$0 { navLinkTag = nil }}
+		)
+	}
 	
 	func hasUsableChannels() -> Bool {
 		
@@ -309,6 +334,16 @@ struct ChannelsConfigurationView: View {
 	// MARK: Actions
 	// --------------------------------------------------
 	
+	func navigateTo(_ tag: NavLinkTag) {
+		log.trace("navigateTo(\(tag.rawValue))")
+		
+		if #available(iOS 17, *) {
+			navCoordinator.path.append(tag)
+		} else {
+			navLinkTag = tag
+		}
+	}
+	
 	func showChannelInfoPopover(_ channel: LocalChannelInfo) {
 		log.trace("showChannelInfoPopover()")
 		
@@ -324,7 +359,7 @@ struct ChannelsConfigurationView: View {
 	func importChannels() {
 		log.trace("importChannels()")
 		
-		importChannelsOpen = true
+		navigateTo(.ImportChannels)
 	}
 	
 	func closeAllChannels() {

@@ -31,7 +31,7 @@ struct ResetWalletView_Action: View {
 	@State var didAppear = false
 	
 	@State var syncSeedManager = Biz.syncManager!.syncSeedManager
-	@State var syncTxManager = Biz.syncManager!.syncTxManager
+	@State var syncBackupManager = Biz.syncManager!.syncBackupManager
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -60,7 +60,7 @@ struct ResetWalletView_Action: View {
 	@ViewBuilder
 	func navWrappedContent() -> some View {
 		
-		NavigationWrapper {
+		NavigationStack {
 			content()
 				.navigationTitle(NSLocalizedString("Resetting Wallet", comment: "Navigation bar title"))
 				.navigationBarTitleDisplayMode(.inline)
@@ -78,11 +78,11 @@ struct ResetWalletView_Action: View {
 			list()
 				.frame(maxWidth: DeviceInfo.textColumnMaxWidth)
 		}
-		.onReceive(syncTxManager.pendingSettingsPublisher) {
-			syncTx_pendingSettingsChanged($0)
+		.onReceive(syncBackupManager.pendingSettingsPublisher) {
+			syncBackup_pendingSettingsChanged($0)
 		}
-		.onReceive(syncTxManager.statePublisher) {
-			syncTx_stateChanged($0)
+		.onReceive(syncBackupManager.statePublisher) {
+			syncBackup_stateChanged($0)
 		}
 		.onReceive(syncSeedManager.statePublisher) {
 			syncSeed_stateChanged($0)
@@ -129,7 +129,7 @@ struct ResetWalletView_Action: View {
 		Section {
 			
 			Label {
-				Text("Deleting **payment history** from iCloud")
+				Text("Deleting **payment history** and **contacts** from iCloud")
 			} icon: {
 				Image(systemName: "icloud.fill")
 			}
@@ -358,9 +358,9 @@ struct ResetWalletView_Action: View {
 		}
 	}
 	
-	func syncTx_pendingSettingsChanged(_ pendingSettings: SyncTxManager_PendingSettings?) {
-		log.trace("syncTx_pendingSettingsChanged()")
-		assertMainThread() // SyncTxManager promises to always publish on the main thread
+	func syncBackup_pendingSettingsChanged(_ pendingSettings: SyncBackupManager_PendingSettings?) {
+		log.trace("syncBackup_pendingSettingsChanged()")
+		assertMainThread() // SyncBackupManager promises to always publish on the main thread
 		
 		guard let pendingSettings = pendingSettings else {
 			return
@@ -372,9 +372,9 @@ struct ResetWalletView_Action: View {
 		}
 	}
 	
-	func syncTx_stateChanged(_ state: SyncTxManager_State) {
-		log.trace("syncTx_stateChanged(\(state.description))")
-		assertMainThread() // SyncTxManager promises to always publish on the main thread
+	func syncBackup_stateChanged(_ state: SyncBackupManager_State) {
+		log.trace("syncBackup_stateChanged(\(state.description))")
+		assertMainThread() // SyncBackupManager promises to always publish on the main thread
 		
 		guard deleteTransactionHistory else {
 			log.debug("ignoring => !deleteTransactionHistory")
@@ -401,7 +401,7 @@ struct ResetWalletView_Action: View {
 	}
 	
 	func syncSeed_stateChanged(_ state: SyncSeedManager_State) {
-		log.trace("syncTx_stateChanged(\(state.description)")
+		log.trace("syncSeed_stateChanged(\(state.description)")
 		assertMainThread() // SyncSeedManager promises to always publish on the main thread
 		
 		guard deleteSeedBackup else {

@@ -9,6 +9,20 @@ extension WalletBalance {
 	}
 }
 
+extension WalletManager.WalletInfo {
+	
+	/// All data from a user's wallet are stored in the user's privateCloudDatabase.
+	/// And within the privateCloudDatabase, we create a dedicated CKRecordZone for each wallet,
+	/// where recordZone.name == encryptedNodeId.
+	/// 
+	var encryptedNodeId: String {
+		
+		// For historical reasons, this is the cloudKeyHash, and NOT the nodeIdHash.
+		// The cloudKeyHash is created via: Hash160(cloudKey)
+		return self.cloudKeyHash
+	}
+}
+
 extension PhoenixShared.Notification {
 	
 	var createdAtDate: Date {
@@ -163,7 +177,7 @@ extension MnemonicLanguage {
 		for identifier in Locale.preferredLanguages {
 			
 			let locale = Locale(identifier: identifier)
-			if let code = locale.languageCode {
+            if let code = locale.language.languageCode?.identifier {
 				
 				for lang in available {
 					if lang.code.caseInsensitiveCompare(code) == .orderedSame {

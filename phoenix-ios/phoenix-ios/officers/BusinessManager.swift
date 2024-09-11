@@ -448,7 +448,6 @@ class BusinessManager {
 		self.walletInfo = _walletInfo
 		maybeRegisterFcmToken()
 		
-		let cloudKey = _walletInfo.cloudKey
 		let encryptedNodeId = _walletInfo.cloudKeyHash as String
 		
 		if let walletRestoreType = walletRestoreType {
@@ -484,8 +483,7 @@ class BusinessManager {
 		self.syncManager = SyncManager(
 			chain: business.chain,
 			recoveryPhrase: recoveryPhrase,
-			cloudKey: cloudKey,
-			encryptedNodeId: encryptedNodeId
+			walletInfo: _walletInfo
 		)
 
 		if LockState.shared.walletExistence == .doesNotExist {

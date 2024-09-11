@@ -18,9 +18,16 @@ struct PaymentView: View {
 		/// - the general API to pop a view from the nav stack is `presentationMode.wrappedValue.dismiss()`
 		/// - the general API to dismiss a sheet is `presentationMode.wrappedValue.dismiss()`
 		/// - thus we cannot use the general API
-		case sheet(closeAction: () -> Void)
+		case sheet(closeSheet: () -> Void)
 		
 		case embedded(popTo: (PopToDestination) -> Void)
+				
+		var isSheet: Bool {
+			switch self {
+				case .sheet(_)    : return true
+				case .embedded(_) : return false
+			}
+		}
 	}
 	
 	let location: Location
@@ -50,14 +57,17 @@ fileprivate struct PaymentViewSheet: View {
 	@EnvironmentObject var popoverState: PopoverState
 	@State var popoverItem: PopoverItem? = nil
 	
+	@StateObject var navCoordinator = NavigationCoordinator()
+	
 	@ViewBuilder
 	var body: some View {
 		
 		ZStack {
 			
-			NavigationWrapper {
+			NavigationStack(path: $navCoordinator.path) {
 				SummaryView(location: location, paymentInfo: paymentInfo)
 			}
+			.environmentObject(navCoordinator)
 			.edgesIgnoringSafeArea(.all)
 			.zIndex(0) // needed for proper animation
 			.accessibilityHidden(shortSheetItem != nil || popoverItem != nil)

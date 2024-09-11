@@ -11,12 +11,15 @@ struct IntroContainer: View {
 	
 	@State var introFinished = false
 	
+	@StateObject var navCoordinator = NavigationCoordinator()
+	
 	@ViewBuilder
 	var body: some View {
 		
-		NavigationWrapper {
+		NavigationStack(path: $navCoordinator.path) {
 			content()
 		}
+		.environmentObject(navCoordinator)
 	}
 	
 	@ViewBuilder

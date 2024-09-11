@@ -10,6 +10,11 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct ContactsList: View {
 	
+	enum NavLinkTag: String, Codable {
+		case AddItem
+		case SelectedItem
+	}
+	
 	let popTo: (PopToDestination) -> Void
 	
 	@State var sortedContacts: [ContactInfo] = []
@@ -18,15 +23,19 @@ struct ContactsList: View {
 	@State var searchText = ""
 	@State var filteredContacts: [ContactInfo]? = nil
 	
-	@State var addItem: Bool = false
 	@State var selectedItem: ContactInfo? = nil
 	@State var pendingDelete: ContactInfo? = nil
 	
 	@State var didAppear = false
+	
+	// <iOS_16_workarounds>
+	@State var navLinkTag: NavLinkTag? = nil
 	@State var popToDestination: PopToDestination? = nil
+	// </iOS_16_workarounds>
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var smartModalState: SmartModalState
 	
 	// --------------------------------------------------
@@ -36,57 +45,48 @@ struct ContactsList: View {
 	@ViewBuilder
 	var body: some View {
 		
+		layers()
+			.navigationTitle("Contacts")
+			.navigationBarTitleDisplayMode(.inline)
+			.navigationBarItems(trailing: plusButton())
+			.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
+				navLinkView()
+			}
+			.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
+				navLinkView(tag)
+			}
+	}
+	
+	@ViewBuilder
+	func layers() -> some View {
+		
 		ZStack {
-			
-			if #unavailable(iOS 16.0) {
-				NavigationLink(
-					destination: selectedItemView(),
-					isActive: selectedItemBinding()
-				) {
-					EmptyView()
-				}
-				.isDetailLink(false)
-			} // else: uses.navigationStackDestination()
-			
 			content()
 		}
-		.navigationStackDestination(isPresented: selectedItemBinding()) { // For iOS 16+
-			selectedItemView()
+		.onAppear() {
+			onAppear()
 		}
-		.navigationTitle("Contacts")
-		.navigationBarTitleDisplayMode(.inline)
-		.navigationBarItems(trailing: plusButton())
+		.onReceive(Biz.business.contactsManager.contactsListPublisher()) {
+			contactsListChanged($0)
+		}
+		.onChange(of: searchText) { _ in
+			searchTextChanged()
+		}
 	}
 	
 	@ViewBuilder
 	func content() -> some View {
 		
-		list()
-			.onAppear() {
-				onAppear()
-			}
-			.onReceive(Biz.business.contactsManager.contactsListPublisher()) {
-				contactsListChanged($0)
-			}
-			.onChange(of: searchText) { _ in
-				searchTextChanged()
-			}
-		
-	}
-	
-	@ViewBuilder
-	func list() -> some View {
-		
 		List {
 			ForEach(visibleContacts) { item in
 				Button {
-					selectedItem = item
+					selectContact(item)
 				} label: {
 					row(item)
 				}
 				.swipeActions(allowsFullSwipe: false) {
 					Button {
-						selectedItem = item
+						selectContact(item)
 					} label: {
 						Label("Edit", systemImage: "square.and.pencil")
 					}
@@ -139,17 +139,30 @@ struct ContactsList: View {
 	}
 	
 	@ViewBuilder
-	func selectedItemView() -> some View {
+	func plusButton() -> some View {
 		
-		if let selectedItem {
-			ManageContact(
-				location: .embedded,
-				popTo: popToWrapper,
-				offer: nil,
-				contact: selectedItem,
-				contactUpdated: { _ in }
-			)
-		} else if addItem {
+		Button {
+			navigateTo(.AddItem)
+		} label: {
+			Image(systemName: "plus")
+		}
+	}
+	
+	@ViewBuilder
+	func navLinkView() -> some View {
+		
+		if let tag = self.navLinkTag {
+			navLinkView(tag)
+		} else {
+			EmptyView()
+		}
+	}
+	
+	@ViewBuilder
+	func navLinkView(_ tag: NavLinkTag) -> some View {
+		
+		switch tag {
+		case .AddItem:
 			ManageContact(
 				location: .embedded,
 				popTo: popToWrapper,
@@ -157,18 +170,19 @@ struct ContactsList: View {
 				contact: nil,
 				contactUpdated: { _ in }
 			)
-		} else {
-			EmptyView()
-		}
-	}
-	
-	@ViewBuilder
-	func plusButton() -> some View {
-		
-		Button {
-			addItem = true
-		} label: {
-			Image(systemName: "plus")
+			
+		case .SelectedItem:
+			if let selectedItem {
+				ManageContact(
+					location: .embedded,
+					popTo: popToWrapper,
+					offer: nil,
+					contact: selectedItem,
+					contactUpdated: { _ in }
+				)
+			} else {
+				EmptyView()
+			}
 		}
 	}
 	
@@ -189,11 +203,11 @@ struct ContactsList: View {
 		return filteredContacts.isEmpty && !sortedContacts.isEmpty
 	}
 	
-	func selectedItemBinding() -> Binding<Bool> {
+	func navLinkTagBinding() -> Binding<Bool> {
 		
 		return Binding<Bool>(
-			get: { selectedItem != nil || addItem },
-			set: { if !$0 { selectedItem = nil; addItem = false }}
+			get: { navLinkTag != nil },
+			set: { if !$0 { navLinkTag = nil }}
 		)
 	}
 	
@@ -268,11 +282,32 @@ struct ContactsList: View {
 	// MARK: Actions
 	// --------------------------------------------------
 	
+	func navigateTo(_ tag: NavLinkTag) {
+		log.trace("navigateTo(\(tag.rawValue))")
+		
+		if #available(iOS 17, *) {
+			navCoordinator.path.append(tag)
+		} else {
+			navLinkTag = tag
+		}
+	}
+	
 	func popToWrapper(_ destination: PopToDestination) {
 		log.trace("popToWrapper(\(destination))")
 		
-		popToDestination = destination
-		popTo(destination)
+		if #available(iOS 17, *) {
+			log.warning("popToWrapper(): This function is for iOS 16 only !")
+		} else {
+			popToDestination = destination
+			popTo(destination)
+		}
+	}
+	
+	func selectContact(_ contact: ContactInfo) {
+		log.trace("selectContact: \(contact.id)")
+		
+		selectedItem = contact
+		navigateTo(.SelectedItem)
 	}
 	
 	func deleteContact() {

@@ -22,6 +22,10 @@ struct RecoveryPhraseView: View {
 
 struct RecoveryPhraseList: View {
 	
+	enum NavLinkTag: String, Codable {
+		case CloudBackup
+	}
+	
 	let scrollViewProxy: ScrollViewProxy
 	let encryptedNodeId: String
 	
@@ -42,6 +46,10 @@ struct RecoveryPhraseList: View {
 	
 	@State var didAppear = false
 	
+	// <iOS_16_workarounds>
+	@State var navLinkTag: NavLinkTag? = nil
+	// </iOS_16_workarounds>
+	
 	@Namespace var sectionID_warning
 	@Namespace var sectionID_info
 	@Namespace var sectionID_button
@@ -52,6 +60,10 @@ struct RecoveryPhraseList: View {
 	@EnvironmentObject var smartModalState: SmartModalState
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+	
+	// --------------------------------------------------
+	// MARK: Init
+	// --------------------------------------------------
 	
 	init(scrollViewProxy: ScrollViewProxy) {
 		self.scrollViewProxy = scrollViewProxy
@@ -70,12 +82,22 @@ struct RecoveryPhraseList: View {
 		self._legal_lossRisk = State<Bool>(initialValue: manualBackup_taskDone)
 	}
 	
+	// --------------------------------------------------
+	// MARK: View Builders
+	// --------------------------------------------------
+	
 	@ViewBuilder
 	var body: some View {
 		
 		content()
 			.navigationTitle(NSLocalizedString("Recovery Phrase", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
+			.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
+				navLinkView()
+			}
+			.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
+				navLinkView(tag)
+			}
 	}
 	
 	@ViewBuilder
@@ -84,22 +106,13 @@ struct RecoveryPhraseList: View {
 		List {
 			if !backupSeed_enabled && !(legal_taskDone && legal_lossRisk) {
 				section_warning()
-					.id(sectionID_warning)
 			}
 			section_info()
-				.id(sectionID_info)
 			section_button()
-				.id(sectionID_button)
 			if !backupSeed_enabled {
 				section_legal()
-					.id(sectionID_legal)
 			}
-			CloudBackupSection(
-				backupSeed_enabled: $backupSeed_enabled,
-				syncState: $syncState,
-				syncStateWasEnabled: $syncStateWasEnabled
-			)
-			.id(sectionID_cloudBackup)
+			section_cloudBackup()
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
@@ -162,6 +175,7 @@ struct RecoveryPhraseList: View {
 			.listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
 		
 		} // </Section>
+		.id(sectionID_warning)
 	}
 	
 	@ViewBuilder
@@ -201,6 +215,7 @@ struct RecoveryPhraseList: View {
 			.padding(.vertical, 15)
 			
 		} // </Section>
+		.id(sectionID_info)
 	}
 	
 	@ViewBuilder
@@ -235,6 +250,7 @@ struct RecoveryPhraseList: View {
 			.frame(maxWidth: .infinity)
 			
 		} // </Section>
+		.id(sectionID_button)
 	}
 	
 	@ViewBuilder
@@ -284,146 +300,15 @@ struct RecoveryPhraseList: View {
 			}
 			
 		} // </Section>
+		.id(sectionID_legal)
 	}
 	
 	@ViewBuilder
-	func onImage() -> some View {
-		Image(systemName: "checkmark.square.fill")
-			.imageScale(.large)
-	}
-	
-	@ViewBuilder
-	func offImage() -> some View {
-		Image(systemName: "square")
-			.renderingMode(.template)
-			.imageScale(.large)
-			.foregroundColor(animatingLegalToggleColor ? Color.red : Color.primary)
-	}
-	
-	func onAppear(){
-		log.trace("onAppear()")
-		
-		if !didAppear {
-			didAppear = true
-			
-			if let deepLink = deepLinkManager.deepLink, deepLink == .backup {
-				// Reached our destination
-				DispatchQueue.main.async { // iOS 14 issues workaround
-					deepLinkManager.unbroadcast(deepLink)
-				}
-			}
-			
-			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-				withAnimation(Animation.linear(duration: 1.0).repeatForever(autoreverses: true)) {
-					animatingLegalToggleColor = true
-				}
-			}
-		}
-	}
-	
-	func syncStateChanged(_ newSyncState: SyncSeedManager_State) {
-		log.trace("syncStateChanged()")
-		
-		syncState = newSyncState
-		if newSyncState != .disabled {
-			syncStateWasEnabled = true
-		}
-		if newSyncState == .deleting {
-			log.debug("newSyncState == .deleting")
-			DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-				scrollViewProxy.scrollTo(sectionID_cloudBackup, anchor: .top)
-			}
-		}
-	}
-	
-	func decrypt() {
-		log.trace("decrypt()")
-		
-		isDecrypting = true
-		
-		let Succeed = {(result: RecoveryPhrase) in
-			recoveryPhrase = result
-			revealSeed = true
-			isDecrypting = false
-		}
-		
-		let Fail = {
-			isDecrypting = false
-		}
-		
-		let AuthWithPin = {
-			smartModalState.display(dismissable: false) {
-				AuthenticateWithPinSheet { result in
-					switch result {
-					case .Authenticated(let recoveryPhrase):
-						Succeed(recoveryPhrase)
-					case .UserCancelled:
-						Fail()
-					case .Failed:
-						Fail()
-					}
-				}
-			}
-		}
-		
-		let enabledSecurity = AppSecurity.shared.enabledSecurityPublisher.value
-		if enabledSecurity == .none {
-			AppSecurity.shared.tryUnlockWithKeychain { (recoveryPhrase, _, _) in
-				
-				if let recoveryPhrase {
-					Succeed(recoveryPhrase)
-				} else {
-					Fail()
-				}
-			}
-		} else if enabledSecurity.contains(.biometrics) {
-			let prompt = NSLocalizedString("Unlock your seed.", comment: "Biometrics prompt")
-			
-			AppSecurity.shared.tryUnlockWithBiometrics(prompt: prompt) { result in
-				
-				if case .success(let recoveryPhrase) = result {
-					Succeed(recoveryPhrase)
-				} else if enabledSecurity.contains(.customPin) { // custom pin fallback
-					AuthWithPin()
-				} else {
-					Fail()
-				}
-			}
-		} else if enabledSecurity.contains(.customPin) {
-			AuthWithPin()
-			
-		} else {
-			log.error("Unhandled security configuration")
-			Fail()
-		}
-	}
-	
-	func legalToggleChanged() {
-		log.trace("legalToggleChanged()")
-		
-		let taskDone = legal_taskDone && legal_lossRisk
-		log.debug("taskDone = \(taskDone ? "true" : "false")")
-		
-		if taskDone != manualBackup_taskDone {
-			
-			manualBackup_taskDone = taskDone
-			Prefs.shared.backupSeed.manualBackup_setTaskDone(taskDone, encryptedNodeId: encryptedNodeId)
-		}
-	}
-}
-
-fileprivate struct CloudBackupSection: View {
-	
-	@Binding var backupSeed_enabled: Bool
-	@Binding var syncState: SyncSeedManager_State
-	@Binding var syncStateWasEnabled: Bool
-	
-	@ViewBuilder
-	var body: some View {
+	func section_cloudBackup() -> some View {
 		
 		Section {
 			
-			NavigationLink(destination: CloudBackupView(backupSeed_enabled: $backupSeed_enabled)) {
+			navLink(.CloudBackup) {
 				HStack(alignment: VerticalAlignment.center, spacing: 0) {
 					Label("iCloud backup", systemImage: "icloud")
 					Spacer()
@@ -446,20 +331,21 @@ fileprivate struct CloudBackupSection: View {
 			if backupSeed_enabled || syncState != .disabled || syncStateWasEnabled {
 				Group {
 					if syncState == .synced {
-						status_uploaded()
+						cloudBackup_status_uploaded()
 					} else if syncState != .disabled {
-						status_syncState()
+						cloudBackup_status_syncState()
 					} else {
-						status_deleted()
+						cloudBackup_status_deleted()
 					}
 				}
 				.padding(.vertical, 10)
 			}
-		}
+		} // </Section>
+		.id(sectionID_cloudBackup)
 	}
 	
 	@ViewBuilder
-	func status_uploaded() -> some View {
+	func cloudBackup_status_uploaded() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 			
@@ -483,7 +369,7 @@ fileprivate struct CloudBackupSection: View {
 	}
 	
 	@ViewBuilder
-	func status_deleted() -> some View {
+	func cloudBackup_status_deleted() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 			
@@ -500,7 +386,7 @@ fileprivate struct CloudBackupSection: View {
 	}
 	
 	@ViewBuilder
-	func status_syncState() -> some View {
+	func cloudBackup_status_syncState() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 20) {
 			
@@ -564,6 +450,188 @@ fileprivate struct CloudBackupSection: View {
 				} // </switch>
 			} // </case .waiting>
 		} // </VStack>
+	}
+	
+	@ViewBuilder
+	func onImage() -> some View {
+		Image(systemName: "checkmark.square.fill")
+			.imageScale(.large)
+	}
+	
+	@ViewBuilder
+	func offImage() -> some View {
+		Image(systemName: "square")
+			.renderingMode(.template)
+			.imageScale(.large)
+			.foregroundColor(animatingLegalToggleColor ? Color.red : Color.primary)
+	}
+	
+	@ViewBuilder
+	func navLink<Content>(
+		_ tag: NavLinkTag,
+		label: @escaping () -> Content
+	) -> some View where Content: View {
+		
+		if #available(iOS 17, *) {
+			NavigationLink(value: tag, label: label)
+		} else {
+			NavigationLink_16(
+				destination: navLinkView(tag),
+				tag: tag,
+				selection: $navLinkTag,
+				label: label
+			)
+		}
+	}
+	
+	@ViewBuilder
+	func navLinkView() -> some View {
+		
+		if let tag = self.navLinkTag {
+			navLinkView(tag)
+		} else {
+			EmptyView()
+		}
+	}
+	
+	@ViewBuilder
+	func navLinkView(_ tag: NavLinkTag) -> some View {
+		
+		switch tag {
+		case .CloudBackup:
+			CloudBackupView(backupSeed_enabled: $backupSeed_enabled)
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: View Helpers
+	// --------------------------------------------------
+	
+	func navLinkTagBinding() -> Binding<Bool> {
+		
+		return Binding<Bool>(
+			get: { navLinkTag != nil },
+			set: { if !$0 { navLinkTag = nil }}
+		)
+	}
+	
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
+	
+	func onAppear(){
+		log.trace("onAppear()")
+		
+		if !didAppear {
+			didAppear = true
+			
+			if let deepLink = deepLinkManager.deepLink, deepLink == .backup {
+				// Reached our destination
+				DispatchQueue.main.async { // iOS 14 issues workaround
+					deepLinkManager.unbroadcast(deepLink)
+				}
+			}
+			
+			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+				withAnimation(Animation.linear(duration: 1.0).repeatForever(autoreverses: true)) {
+					animatingLegalToggleColor = true
+				}
+			}
+		}
+	}
+	
+	func syncStateChanged(_ newSyncState: SyncSeedManager_State) {
+		log.trace("syncStateChanged()")
+		
+		syncState = newSyncState
+		if newSyncState != .disabled {
+			syncStateWasEnabled = true
+		}
+		if newSyncState == .deleting {
+			log.debug("newSyncState == .deleting")
+			DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+				scrollViewProxy.scrollTo(sectionID_cloudBackup, anchor: .top)
+			}
+		}
+	}
+	
+	func legalToggleChanged() {
+		log.trace("legalToggleChanged()")
+		
+		let taskDone = legal_taskDone && legal_lossRisk
+		log.debug("taskDone = \(taskDone ? "true" : "false")")
+		
+		if taskDone != manualBackup_taskDone {
+			
+			manualBackup_taskDone = taskDone
+			Prefs.shared.backupSeed.manualBackup_setTaskDone(taskDone, encryptedNodeId: encryptedNodeId)
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
+	
+	func decrypt() {
+		log.trace("decrypt()")
+		
+		isDecrypting = true
+		
+		let Succeed = {(result: RecoveryPhrase) in
+			recoveryPhrase = result
+			revealSeed = true
+			isDecrypting = false
+		}
+		
+		let Fail = {
+			isDecrypting = false
+		}
+		
+		let AuthWithPin = {
+			smartModalState.display(dismissable: false) {
+				AuthenticateWithPinSheet { result in
+					switch result {
+					case .Authenticated(let recoveryPhrase):
+						Succeed(recoveryPhrase)
+					case .UserCancelled:
+						Fail()
+					case .Failed:
+						Fail()
+					}
+				}
+			}
+		}
+		
+		let enabledSecurity = AppSecurity.shared.enabledSecurityPublisher.value
+		if enabledSecurity == .none {
+			AppSecurity.shared.tryUnlockWithKeychain { (recoveryPhrase, _, _) in
+				
+				if let recoveryPhrase {
+					Succeed(recoveryPhrase)
+				} else {
+					Fail()
+				}
+			}
+		} else if enabledSecurity.contains(.biometrics) {
+			let prompt = NSLocalizedString("Unlock your seed.", comment: "Biometrics prompt")
+			
+			AppSecurity.shared.tryUnlockWithBiometrics(prompt: prompt) { result in
+				
+				if case .success(let recoveryPhrase) = result {
+					Succeed(recoveryPhrase)
+				} else if enabledSecurity.contains(.customPin) { // custom pin fallback
+					AuthWithPin()
+				} else {
+					Fail()
+				}
+			}
+		} else if enabledSecurity.contains(.customPin) {
+			AuthWithPin()
+			
+		} else {
+			log.error("Unhandled security configuration")
+			Fail()
+		}
 	}
 }
 

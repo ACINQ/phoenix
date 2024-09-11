@@ -1,9 +1,9 @@
 package fr.acinq.phoenix.db
 
+import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.db.payments.CloudKitInterface
-import fracinqphoenixdb.Cloudkit_payments_queue
 
 
 actual fun didSaveWalletPayment(id: WalletPaymentId, database: PaymentsDatabase) {
@@ -30,6 +30,20 @@ actual fun didUpdateWalletPaymentMetadata(id: WalletPaymentId, database: Payment
     )
 }
 
-actual fun makeCloudKitDb(database: PaymentsDatabase): CloudKitInterface? {
-    return CloudKitDb(database)
+actual fun didSaveContact(contactId: UUID, database: AppDatabase) {
+    database.cloudKitContactsQueries.addToQueue(
+        id = contactId.toString(),
+        date_added = currentTimestampMillis()
+    )
+}
+
+actual fun didDeleteContact(contactId: UUID, database: AppDatabase) {
+    database.cloudKitContactsQueries.addToQueue(
+        id = contactId.toString(),
+        date_added = currentTimestampMillis()
+    )
+}
+
+actual fun makeCloudKitDb(appDb: SqliteAppDb, paymentsDb: SqlitePaymentsDb): CloudKitInterface? {
+    return CloudKitDb(appDb, paymentsDb)
 }
