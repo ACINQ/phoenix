@@ -23,6 +23,7 @@ import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.data.*
+import fr.acinq.phoenix.data.lnurl.Lnurl
 import io.ktor.http.*
 import io.ktor.util.*
 
@@ -83,6 +84,33 @@ object Parser {
             is Try.Failure -> {
                 null
             }
+        }
+    }
+
+    fun parseEmailLikeAddress(input: String): EmailLikeAddress? {
+        if (!input.contains("@", ignoreCase = true)) return null
+
+        // Ignore excess input, including additional lines, and leading/trailing whitespace
+        val line = input.lines().firstOrNull { it.isNotBlank() }?.trim()
+        val token = line?.split("\\s+".toRegex())?.firstOrNull()?.let {
+            trimMatchingPrefix(it, Parser.lightningPrefixes + Parser.lnurlPrefixes)
+        }
+
+        if (token.isNullOrBlank()) return null
+
+        val components = token.split("@")
+        if (components.size != 2) return null
+
+        val username = components[0].lowercase()
+            .replace("%E2%82%BF", "₿", ignoreCase = true) // the Bitcoin char may be url-encoded
+        val domain = components[1]
+
+        if (username.isBlank() || domain.isBlank()) return null
+
+        return if (username.startsWith("₿")) {
+            EmailLikeAddress.Bip353(token, username.dropWhile { it == '₿' }, domain)
+        } else {
+            EmailLikeAddress.UnknownType(token, username, domain)
         }
     }
 
@@ -182,4 +210,15 @@ object Parser {
     fun addressToPublicKeyScriptOrNull(chain: Chain, address: String): ByteVector? {
         return parseBip21Uri(chain, address).right?.script
     }
+}
+
+sealed class EmailLikeAddress {
+    abstract val source: String
+    abstract val username: String
+    abstract val domain: String
+    data class UnknownType(override val source: String, override val username: String, override val domain: String) : EmailLikeAddress()
+    data class LnurlBased(override val source: String, override val username: String, override val domain: String) : EmailLikeAddress() {
+        val url = Lnurl.Request(Url("https://$domain/.well-known/lnurlp/$username"), tag = Lnurl.Tag.Pay)
+    }
+    data class Bip353(override val source: String, override val username: String, override val domain: String) : EmailLikeAddress()
 }

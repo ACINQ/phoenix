@@ -30,6 +30,7 @@ import io.ktor.http.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlin.test.assertNull
 
 class ParserTest {
 
@@ -335,5 +336,40 @@ class ParserTest {
             expected = Either.Left(BitcoinUriError.InvalidScript(error = BitcoinError.ChainHashMismatch)),
             actual = Parser.parseBip21Uri(Chain.Mainnet, "bitcoin:tb1pan78kdkqnwe5ym7k8lnd77rrq5gfnxsyg7j7fay5rdhkwrzgkg0s6u8pvx?lno=$testnetOffer")
         )
+    }
+
+    @Test
+    fun parse_email_like() {
+
+        // addresses without a prefix are of an unknown type -- maybe bip353 or lnurl-based
+        assertIs<EmailLikeAddress.UnknownType>(Parser.parseEmailLikeAddress("foobar@acinq.co"))
+
+        // addresses with a ₿ prefix are bip353
+        assertIs<EmailLikeAddress.Bip353>(Parser.parseEmailLikeAddress("₿foobar@acinq.co"))
+        assertIs<EmailLikeAddress.Bip353>(Parser.parseEmailLikeAddress("%E2%82%BFfoobar@acinq.co"))
+
+        // check domains & username
+        assertEquals("foobar", Parser.parseEmailLikeAddress("foobar@acinq.co")!!.username)
+        assertEquals("foobar", Parser.parseEmailLikeAddress("₿foobar@acinq.co")!!.username)
+        assertEquals("foobar", Parser.parseEmailLikeAddress("%E2%82%BFfoobar@acinq.co")!!.username)
+        assertEquals("acinq.co", Parser.parseEmailLikeAddress("foobar@acinq.co")!!.domain)
+        assertEquals("acinq.co.fr", Parser.parseEmailLikeAddress("foobar@acinq.co.fr")!!.domain)
+
+        // should accept URI scheme (see #616)
+        assertIs<EmailLikeAddress>(Parser.parseEmailLikeAddress("lightning:₿foobar@acinq.co"))
+        assertIs<EmailLikeAddress>(Parser.parseEmailLikeAddress("lightning:foobar@acinq.co"))
+        assertIs<EmailLikeAddress>(Parser.parseEmailLikeAddress("lnurlp:foobar@acinq.co"))
+        assertIs<EmailLikeAddress>(Parser.parseEmailLikeAddress("bitcoin:foobar@acinq.co"))
+        assertIs<EmailLikeAddress>(Parser.parseEmailLikeAddress("phoenix:bitcoin:foobar@acinq.co"))
+
+        // invalid
+        assertNull(Parser.parseEmailLikeAddress(""))
+        assertNull(Parser.parseEmailLikeAddress("foobar"))
+        assertNull(Parser.parseEmailLikeAddress("foobar@@acinq.co"))
+        assertNull(Parser.parseEmailLikeAddress("foobar@foobar@acinq.co"))
+        assertNull(Parser.parseEmailLikeAddress("@acinq.co"))
+        assertNull(Parser.parseEmailLikeAddress("foobar@"))
+        assertNull(Parser.parseEmailLikeAddress("lntb10n1pnwrxrapp5x9plpwr7gn3vgvgxqve9s60e7lmcecej60xjzgyepjzmazm3jdnscqpjsp5jd29flqxjffcl8ul9e2m7de7j8jmz4mu0nyxtcltknxtmapf4v2s9q7sqqqqqqqqqqqqqqqqqqqsqqqqqysgqdq4xysyymr0vd4kzcmrd9hx7mqz9grzjqwfn3p9278ttzzpe0e00uhyxhned3j5d9acqak5emwfpflp8z2cnfl6h8msfh3505gqqqqlgqqqqqeqqjqtznlghccn9yspm3mt7kqp8wxkmadvs0r7t3tujnqg7qj0qrc2jvjn25zpv0dhdqq0nmvsx2rwtsc35wcmyjl49qmt9lmvk7hckm4wvcqftm4c5"))
+        assertNull(Parser.parseEmailLikeAddress("lno1qgsyxjtl6luzd9t3pr62xr7eemp6awnejusgf6gw45q75vcfqqqqqqqsespexwyy4tcadvgg89l9aljus6709kx235hhqrk6n8dey98uyuftzdqzrtkahuum7m56dxlnx8r6tffy54004l7kvs7pylmxx7xs4n54986qyqeeuhhunayntt50snmdkq4t7fzsgghpl69v9csgparek8kv7dlp5uqr8ymp5s4z9upmwr2s8xu020d45t5phqc8nljrq8gzsjmurzevawjz6j6rc95xwfvnhgfx6v4c3jha7jwynecrz3y092nn25ek4yl7xp9yu9ry9zqagt0ktn4wwvqg52v9ss9ls22sqyqqestzp2l6decpn87pq96udsvx"))
     }
 }

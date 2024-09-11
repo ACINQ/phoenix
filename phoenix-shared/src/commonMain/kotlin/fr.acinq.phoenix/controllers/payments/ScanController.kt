@@ -49,6 +49,7 @@ import fr.acinq.phoenix.managers.DatabaseManager
 import fr.acinq.phoenix.managers.LnurlManager
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.utils.DnsResolvers
+import fr.acinq.phoenix.utils.EmailLikeAddress
 import fr.acinq.phoenix.utils.Parser
 import io.ktor.http.Url
 import kotlinx.coroutines.Deferred
@@ -539,31 +540,15 @@ class AppScanController(
 
     private suspend fun readEmailLikeAddress(input: String): Either<OfferTypes.Offer, Lnurl.Request>? {
 
-        if (!input.contains("@", ignoreCase = true)) return null
+        val address = Parser.parseEmailLikeAddress(input) ?: return null
 
-        // Ignore excess input, including additional lines, and leading/trailing whitespace
-        val line = input.lines().firstOrNull { it.isNotBlank() }?.trim()
-        val token = line?.split("\\s+".toRegex())?.firstOrNull()
-
-        if (token.isNullOrBlank()) return null
-
-        val components = token.split("@")
-        if (components.size != 2) {
-            throw RuntimeException("identifier must contain one @ delimiter")
-        }
-
-        val username = components[0].lowercase()
-        val domain = components[1]
-
-        val signalBip353 = username.startsWith("₿")
-        val cleanUsername = username.dropWhile { it == '₿' }
-
-        val offer = resolveBip353Offer(cleanUsername, domain)
-        return if (signalBip353) {
-            offer?.let { Either.Left(it) } // skip lnurl resolution if it's a bip353 address
-        } else {
-            offer?.let { Either.Left(it) }
-                ?: Either.Right(Lnurl.Request(Url("https://$domain/.well-known/lnurlp/$username"), tag = Lnurl.Tag.Pay))
+        return when (address) {
+            is EmailLikeAddress.Bip353 -> resolveBip353Offer(address.username, address.domain)?.let { Either.Left(it) }
+            is EmailLikeAddress.LnurlBased -> Either.Right(address.url)
+            is EmailLikeAddress.UnknownType -> {
+                resolveBip353Offer(address.username.dropWhile { it == '₿' }, address.domain)?.let { Either.Left(it) }
+                    ?: Either.Right(EmailLikeAddress.LnurlBased(address.source, address.username, address.domain).url)
+            }
         }
     }
 
