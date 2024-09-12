@@ -29,6 +29,10 @@ struct NewSendView: View {
 	@State var search_lnid: [String: [String]] = [:]
 	@State var search_domains: [String] = []
 	
+	@State var isParsing: Bool = false
+	@State var parseIndex: Int = 0
+	@State var parseProgress: SendManager.ParseProgress? = nil
+	
 	enum ActiveSheet {
 		case imagePicker
 		case qrCodeScanner
@@ -45,7 +49,10 @@ struct NewSendView: View {
 	
 	@StateObject var toast = Toast()
 	
+	@Environment(\.openURL) var openURL: OpenURLAction
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
+	
+	@EnvironmentObject var popoverState: PopoverState
 	
 	// --------------------------------------------------
 	// MARK: ViewBuilders
@@ -55,8 +62,19 @@ struct NewSendView: View {
 	var body: some View {
 		
 		ZStack {
-			Color.primaryBackground.ignoresSafeArea(.all, edges: .all)
+			Color.primaryBackground
+				.ignoresSafeArea(.all, edges: .all)
+			
 			content()
+			
+			if parseProgress != nil {
+				FetchActivityNotice(
+					title: self.fetchActivityTitle,
+					onCancel: { self.cancelParseRequest() }
+				)
+				.ignoresSafeArea(.keyboard) // disable keyboard avoidance on this view
+			}
+			
 			toast.view()
 		}
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -123,9 +141,13 @@ struct NewSendView: View {
 	func smartInputField() -> some View {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 0) {
-			TextField("name, lightning address, offer...", text: $inputFieldText)
-				.disableAutocorrection(true)
-				.textInputAutocapitalization(.never)
+			TextField(
+				"name, lightning address, offer...",
+				text: $inputFieldText,
+				onCommit: { commitInputField() }
+			)
+			.disableAutocorrection(true)
+			.textInputAutocapitalization(.never)
 			
 			// Clear button (appears when TextField's text is non-empty)
 			Button {
@@ -252,7 +274,11 @@ struct NewSendView: View {
 		if !autocompleteSuggestions.isEmpty {
 			Section {
 				ForEach(autocompleteSuggestions, id: \.self) { suggestion in
-					Text(suggestion)
+					Button {
+						selectSuggestion(suggestion)
+					} label: {
+						Text(suggestion)
+					}
 				}
 			} // </Section>
 		}
@@ -296,16 +322,22 @@ struct NewSendView: View {
 	}
 	
 	var hasZeroMatchesForSearch: Bool {
-		
 		guard let filteredContacts else {
 			return false
 		}
-		
 		return filteredContacts.isEmpty && !sortedContacts.isEmpty
 	}
 	
-	func activeSheetBinding() -> Binding<Bool> {
+	var fetchActivityTitle: String {
 		
+		if parseProgress is SendManager.ParseProgress_LnurlServiceFetch {
+			return String(localized: "Fetching Lightning URL", comment: "Progress title")
+		} else {
+			return String(localized: "Resolving lightning address", comment: "Progress title")
+		}
+	}
+	
+	func activeSheetBinding() -> Binding<Bool> {
 		return Binding<Bool>(
 			get: { activeSheet != nil },
 			set: { if !$0 { activeSheet = nil }}
@@ -420,34 +452,6 @@ struct NewSendView: View {
 		autocompleteSuggestions = suggestions
 	}
 	
-	// --------------------------------------------------
-	// MARK: Actions
-	// --------------------------------------------------
-	
-	func clearInputField() {
-		log.trace("clearInputField()")
-		
-		inputFieldText = ""
-	}
-	
-	func pasteFromClipboard() {
-		log.trace("pasteFromClipboard()")
-		
-		if let _ = UIPasteboard.general.string {
-			// Todo...
-		}
-	}
-	
-	func chooseImage() {
-		log.trace("chooseImage()")
-		activeSheet = .imagePicker
-	}
-	
-	func scanQrCode() {
-		log.trace("scanQrCode()")
-		activeSheet = .qrCodeScanner
-	}
-	
 	func imagePickerDidChooseImage() {
 		log.trace("imagePickerDidChooseImage()")
 		
@@ -476,9 +480,8 @@ struct NewSendView: View {
 			}
 		}
 		
-		if let _ = qrCodeString {
-			// Todo...
-		//	mvi.intent(Scan.Intent_Parse(request: qrCodeString))
+		if let qrCodeString {
+			parseUserInput(qrCodeString)
 		} else {
 			toast.pop(
 				NSLocalizedString("Image doesn't contain a readable QR code.", comment: "Toast message"),
@@ -491,30 +494,274 @@ struct NewSendView: View {
 		}
 	}
 	
-	func didScanQrCode(result: String) {
+	func didScanQrCode(_ request: String) {
 		log.trace("didScanQrCode()")
 		
 		activeSheet = nil
-		// Todo...
+		if !isParsing {
+			parseUserInput(request)
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
+	
+	func clearInputField() {
+		log.trace("clearInputField()")
+		
+		inputFieldText = ""
+	}
+	
+	func commitInputField() {
+		log.trace("clearInputField()")
+		
+		if !inputFieldText.isEmpty {
+			parseUserInput(inputFieldText)
+		}
+	}
+	
+	func pasteFromClipboard() {
+		log.trace("pasteFromClipboard()")
+		
+		if let request = UIPasteboard.general.string {
+			parseUserInput(request)
+		}
+	}
+	
+	func chooseImage() {
+		log.trace("chooseImage()")
+		activeSheet = .imagePicker
+	}
+	
+	func scanQrCode() {
+		log.trace("scanQrCode()")
+		activeSheet = .qrCodeScanner
+	}
+	
+	func selectSuggestion(_ suggestion: String) {
+		log.trace("selectSuggestion()")
+		
+		inputFieldText = suggestion
+		parseUserInput(suggestion)
 	}
 	
 	func selectContact(_ contact: ContactInfo) {
 		log.trace("selectContact: \(contact.id)")
 		
-		// Todo...
-	}
-}
-
-struct InsetGroupBoxStyle: GroupBoxStyle {
-	
-	func makeBody(configuration: GroupBoxStyleConfiguration) -> some View {
-		VStack(alignment: .leading) {
-			configuration.label
-			configuration.content
+		if let offer = contact.mostRelevantOffer {
+			parseUserInput(offer.encode())
 		}
-		.padding()
-		.background(Color(.secondarySystemGroupedBackground))
-		.cornerRadius(10)
-		.padding(.horizontal)
+	}
+	
+	func cancelParseRequest() {
+		log.trace("cancelParseRequest()")
+		
+		isParsing = false
+		parseIndex += 1
+		parseProgress = nil
+	}
+	
+	func copyLink(_ url: URL) {
+		log.trace("copyLink()")
+		
+		UIPasteboard.general.string = url.absoluteString
+		toast.pop(
+			NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
+			colorScheme: colorScheme.opposite
+		)
+	}
+	
+	func openLink(_ url: URL) {
+		log.trace("openLink()")
+		
+		openURL(url)
+	}
+	
+	// --------------------------------------------------
+	// MARK: SendManger
+	// --------------------------------------------------
+	
+	func parseUserInput(_ input: String) {
+		log.trace("parseUserInput()")
+		
+		guard !isParsing else {
+			log.warning("parseUserInput: ignoring: isParsing == true")
+			return
+		}
+		
+		parseIndex += 1
+		let index = parseIndex
+		
+		Task { @MainActor in
+			do {
+				let progressHandler = {(progress: SendManager.ParseProgress) -> Void in
+					if index == parseIndex {
+						self.parseProgress = progress
+					} else {
+						log.warning("parseUserInput: progressHandler: ignoring: cancelled")
+					}
+				}
+				
+				let result: SendManager.ParseResult = try await Biz.business.sendManager.parse(
+					request: input,
+					progress: progressHandler
+				)
+				
+				if index == parseIndex {
+					isParsing = false
+					parseProgress = nil
+					
+					if let badRequest = result as? SendManager.ParseResult_BadRequest {
+						showErrorToast(badRequest)
+					} else {
+						// Todo...
+					}
+				} else {
+					log.warning("parseUserInput: result: ignoring: cancelled")
+				}
+				
+			} catch {
+				log.error("parseUserInput: error: \(error)")
+				
+				if index == parseIndex {
+					isParsing = false
+					parseProgress = nil
+				}
+			}
+		}
+	}
+	
+	func showErrorToast(_ result: SendManager.ParseResult_BadRequest) {
+		log.trace("showErrorToast()")
+		
+		let msg: String
+		var websiteLink: URL? = nil
+		
+		switch result.reason {
+		case is SendManager.BadRequestReason_Expired:
+			
+			msg = NSLocalizedString(
+				"Invoice is expired",
+				comment: "Error message - scanning lightning invoice"
+			)
+			
+		case let chainMismatch as SendManager.BadRequestReason_ChainMismatch:
+			
+			msg = NSLocalizedString(
+				"The invoice is not for \(chainMismatch.expected.name)",
+				comment: "Error message - scanning lightning invoice"
+			)
+			
+		case is SendManager.BadRequestReason_UnsupportedLnurl:
+			
+			msg = NSLocalizedString(
+				"Phoenix does not support this type of LNURL yet",
+				comment: "Error message - scanning lightning invoice"
+			)
+			
+		case is SendManager.BadRequestReason_AlreadyPaidInvoice:
+			
+			msg = NSLocalizedString(
+				"You've already paid this invoice. Paying it again could result in stolen funds.",
+				comment: "Error message - scanning lightning invoice"
+			)
+
+		case is SendManager.BadRequestReason_Bip353InvalidOffer:
+			
+			msg = NSLocalizedString(
+				"This address uses an invalid Bolt12 offer.",
+				comment: "Error message - dns record contains an invalid offer"
+			)
+			
+		case is SendManager.BadRequestReason_Bip353NoDNSSEC:
+			
+			msg = NSLocalizedString(
+				"This address is hosted on an unsecure DNS. DNSSEC must be enabled.",
+				comment: "Error message - dns issue"
+			)
+
+		case let serviceError as SendManager.BadRequestReason_ServiceError:
+			
+			let remoteFailure: LnurlError.RemoteFailure = serviceError.error
+			let origin = remoteFailure.origin
+			
+			let isLightningAddress = serviceError.url.description.contains("/.well-known/lnurlp/")
+			let lightningAddressErrorMessage = NSLocalizedString(
+				"The service (\(origin)) doesn't support Lightning addresses, or doesn't know this user",
+				comment: "Error message - scanning lightning invoice"
+			)
+			
+			switch remoteFailure {
+			case is LnurlError.RemoteFailure_CouldNotConnect:
+				msg = NSLocalizedString(
+					"Could not connect to service: \(origin)",
+					comment: "Error message - scanning lightning invoice"
+				)
+				
+			case is LnurlError.RemoteFailure_Unreadable:
+				let scheme = serviceError.url.protocol.name.lowercased()
+				if scheme == "https" || scheme == "http" {
+					websiteLink = URL(string: serviceError.url.description())
+				}
+				msg = NSLocalizedString(
+					"Unreadable response from service: \(origin)",
+					comment: "Error message - scanning lightning invoice"
+				)
+				
+			case let rfDetailed as LnurlError.RemoteFailure_Detailed:
+				if isLightningAddress {
+					msg = lightningAddressErrorMessage
+				} else {
+					msg = NSLocalizedString(
+						"The service (\(origin)) returned error message: \(rfDetailed.reason)",
+						comment: "Error message - scanning lightning invoice"
+					)
+				}
+				
+			case let rfCode as LnurlError.RemoteFailure_Code:
+				if isLightningAddress {
+					msg = lightningAddressErrorMessage
+				} else {
+					msg = NSLocalizedString(
+						"The service (\(origin)) returned error code: \(rfCode.code.value)",
+						comment: "Error message - scanning lightning invoice"
+					)
+				}
+				
+			default:
+				msg = NSLocalizedString(
+					"The service (\(origin)) appears to be offline, or they have a down server",
+					comment: "Error message - scanning lightning invoice"
+				)
+			}
+			
+		default:
+			
+			msg = NSLocalizedString(
+				"This doesn't appear to be a Lightning invoice",
+				comment: "Error message - scanning lightning invoice"
+			)
+		}
+		
+		if let websiteLink {
+			popoverState.display(dismissable: true) {
+				WebsiteLinkPopover(
+					link: websiteLink,
+					copyAction: copyLink,
+					openAction: openLink
+				)
+			}
+			
+		} else {
+			toast.pop(
+				msg,
+				colorScheme: colorScheme.opposite,
+				style: .chrome,
+				duration: 30.0,
+				alignment: .middle,
+				showCloseButton: true
+			)
+		}
 	}
 }

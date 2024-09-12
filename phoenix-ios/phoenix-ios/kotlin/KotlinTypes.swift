@@ -9,6 +9,26 @@ extension Receive {
 	typealias Model_Generated = ModelGenerated
 }
 
+extension SendManager {
+	
+	typealias ParseProgress_LnurlServiceFetch = ParseProgressLnurlServiceFetch
+	typealias ParseProgress_ResolvingBip353 = ParseProgressResolvingBip353
+	
+	typealias ParseResult_BadRequest = ParseResultBadRequest
+	
+	typealias BadRequestReason_AlreadyPaidInvoice = BadRequestReasonAlreadyPaidInvoice
+	typealias BadRequestReason_Bip353InvalidOffer = BadRequestReasonBip353InvalidOffer
+	typealias BadRequestReason_Bip353InvalidUri = BadRequestReasonBip353InvalidUri
+	typealias BadRequestReason_Bip353NameNotFound = BadRequestReasonBip353NameNotFound
+	typealias BadRequestReason_Bip353NoDNSSEC = BadRequestReasonBip353NoDNSSEC
+	typealias BadRequestReason_ChainMismatch = BadRequestReasonChainMismatch
+	typealias BadRequestReason_Expired = BadRequestReasonExpired
+	typealias BadRequestReason_InvalidLnurl = BadRequestReasonInvalidLnurl
+	typealias BadRequestReason_ServiceError = BadRequestReasonServiceError
+	typealias BadRequestReason_UnknownFormat = BadRequestReasonUnknownFormat
+	typealias BadRequestReason_UnsupportedLnurl = BadRequestReasonUnsupportedLnurl
+}
+
 extension Scan {
 	typealias Model_Ready = ModelReady
 	typealias Model_BadRequest = ModelBadRequest

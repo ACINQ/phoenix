@@ -33981,6 +33981,9 @@
         }
       }
     },
+    "Resolving lightning address" : {
+      "comment" : "Progress title"
+    },
     "Restore my wallet" : {
       "comment" : "Navigation bar title",
       "localizations" : {

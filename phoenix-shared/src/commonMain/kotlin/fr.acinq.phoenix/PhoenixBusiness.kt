@@ -91,6 +91,7 @@ class PhoenixBusiness(
     val notificationsManager by lazy { NotificationsManager(this) }
     val contactsManager by lazy { ContactsManager(this) }
     val blockchainExplorer by lazy { BlockchainExplorer(chain) }
+    val sendManager by lazy { SendManager(this) }
 
     fun start(startupParams: StartupParams) {
         logger.debug { "starting with params=$startupParams" }
