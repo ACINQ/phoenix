@@ -71,12 +71,13 @@ import fr.acinq.phoenix.android.init.CreateWalletView
 import fr.acinq.phoenix.android.init.InitWallet
 import fr.acinq.phoenix.android.init.RestoreWalletView
 import fr.acinq.phoenix.android.intro.IntroView
-import fr.acinq.phoenix.android.payments.ScanDataView
+import fr.acinq.phoenix.android.payments.send.ScanAndSendView
 import fr.acinq.phoenix.android.payments.details.PaymentDetailsView
 import fr.acinq.phoenix.android.payments.history.CsvExportView
 import fr.acinq.phoenix.android.payments.history.PaymentsHistoryView
 import fr.acinq.phoenix.android.payments.liquidity.RequestLiquidityView
 import fr.acinq.phoenix.android.payments.receive.ReceiveView
+import fr.acinq.phoenix.android.payments.send.PrepareSendView
 import fr.acinq.phoenix.android.services.NodeServiceState
 import fr.acinq.phoenix.android.settings.AboutView
 import fr.acinq.phoenix.android.settings.AppAccessSettings
@@ -244,6 +245,7 @@ fun AppView(
                                 onSettingsClick = { navController.navigate(Screen.Settings.route) },
                                 onReceiveClick = { navController.navigate(Screen.Receive.route) },
                                 onSendClick = { navController.navigate(Screen.ScanData.route) { launchSingleTop = true } },
+//                                onSendClick = { navController.navigate(Screen.PrepareSend) },
                                 onPaymentsHistoryClick = { navController.navigate(Screen.PaymentsHistory.route) },
                                 onTorClick = { navController.navigate(Screen.TorConfig) },
                                 onElectrumClick = { navController.navigate(Screen.ElectrumServer) },
@@ -261,6 +263,9 @@ fun AppView(
                             onScanDataClick = { navController.navigate(Screen.ScanData.route) },
                             onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) },
                         )
+                    }
+                    composable(route = "${Screen.PrepareSend}") {
+                        ///PrepareSendView(onBackClick = { navController.popBackStack() })
                     }
                     composable(
                         route = "${Screen.ScanData.route}?input={input}",
@@ -291,7 +296,7 @@ fun AppView(
                                 // TODO properly parse deeplinks following f0ae90444a23cc17d6d7407dfe43c0c8d20e62fc
                                 !it.contains("androidx.navigation")
                             } ?: it.arguments?.getString("input")
-                            ScanDataView(
+                            ScanAndSendView(
                                 input = input,
                                 onBackClick = {
                                     if (navController.previousBackStackEntry != null) {

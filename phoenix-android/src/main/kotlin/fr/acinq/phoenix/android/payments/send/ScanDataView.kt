@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 ACINQ SAS
+ * Copyright 2024 ACINQ SAS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 
 
-package fr.acinq.phoenix.android.payments
+package fr.acinq.phoenix.android.payments.send
 
 import android.Manifest
 import android.content.Intent
@@ -50,6 +50,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -86,6 +87,10 @@ import fr.acinq.phoenix.android.components.mvi.MVIControllerViewModel
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.controllerFactory
 import fr.acinq.phoenix.android.databinding.ScanViewBinding
+import fr.acinq.phoenix.android.payments.LnurlAuthView
+import fr.acinq.phoenix.android.payments.LnurlPayView
+import fr.acinq.phoenix.android.payments.LnurlWithdrawView
+import fr.acinq.phoenix.android.payments.SendBolt11PaymentView
 import fr.acinq.phoenix.android.payments.offer.SendOfferView
 import fr.acinq.phoenix.android.payments.spliceout.SendSpliceOutView
 import fr.acinq.phoenix.android.utils.readClipboard
@@ -112,7 +117,7 @@ class ScanDataViewModel(controller: ScanController) : MVIControllerViewModel<Sca
  *              When not null, the camera should not be initialized at first as we already have a data input.
  */
 @Composable
-fun ScanDataView(
+fun ScanAndSendView(
     input: String? = null,
     onBackClick: () -> Unit,
     onProcessingFinished: () -> Unit,
@@ -132,14 +137,14 @@ fun ScanDataView(
         }
         when (model) {
             Scan.Model.Ready, is Scan.Model.BadRequest, is Scan.Model.LnurlServiceFetch, is Scan.Model.ResolvingBip353 -> {
-                ReadDataView(
+                PrepareSendView(
                     initialInput = initialInput,
                     model = model,
-                    onFeedbackDismiss = {
+                    onReset = {
                         initialInput = ""
                         postIntent(Scan.Intent.Reset)
                     },
-                    onScannedText = { postIntent(Scan.Intent.Parse(request = it)) },
+                    onInputSubmit = { postIntent(Scan.Intent.Parse(request = it)) },
                     onBackClick = onBackClick,
                 )
             }
@@ -318,7 +323,7 @@ fun BoxScope.ScannerView(
 ) {
     // scanner view using a legacy binding
     AndroidViewBinding(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxSize().background(Color.Red),
         factory = { inflater, viewGroup, attach ->
             val binding = ScanViewBinding.inflate(inflater, viewGroup, attach)
             binding.scanView.let { scanView ->
@@ -344,7 +349,7 @@ fun BoxScope.ScannerView(
 }
 
 @Composable
-private fun ScanErrorView(
+fun ScanErrorView(
     model: Scan.Model.BadRequest,
     onErrorDialogDismiss: () -> Unit,
 ) {

@@ -30,6 +30,7 @@ sealed class Screen(val route: String) {
     data object Startup : Screen("startup")
     data object Home : Screen("home")
     data object Receive : Screen("receive")
+    data object PrepareSend : Screen("preparesend")
     /**
      * This route also manages the payment flow.
      * TODO: Separate scanning the data from processing the data (aka send payment, process lnurl...). Split to be done at the controller level.
