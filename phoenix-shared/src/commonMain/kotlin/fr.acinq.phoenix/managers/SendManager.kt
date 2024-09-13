@@ -3,21 +3,31 @@ package fr.acinq.phoenix.managers
 import fr.acinq.bitcoin.BitcoinError
 import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.utils.Either
+import fr.acinq.lightning.Lightning
+import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.TrampolineFees
 import fr.acinq.lightning.db.LightningOutgoingPayment
+import fr.acinq.lightning.io.PayInvoice
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.logging.debug
 import fr.acinq.lightning.logging.error
 import fr.acinq.lightning.payment.Bolt11Invoice
+import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampSeconds
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.PhoenixBusiness
+import fr.acinq.phoenix.controllers.payments.Scan
 import fr.acinq.phoenix.data.BitcoinUri
 import fr.acinq.phoenix.data.BitcoinUriError
+import fr.acinq.phoenix.data.LnurlPayMetadata
+import fr.acinq.phoenix.data.WalletPaymentId
+import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.data.lnurl.Lnurl
 import fr.acinq.phoenix.data.lnurl.LnurlAuth
 import fr.acinq.phoenix.data.lnurl.LnurlError
 import fr.acinq.phoenix.data.lnurl.LnurlPay
 import fr.acinq.phoenix.data.lnurl.LnurlWithdraw
+import fr.acinq.phoenix.db.payments.WalletPaymentMetadataRow
 import fr.acinq.phoenix.utils.DnsResolvers
 import fr.acinq.phoenix.utils.Parser
 import io.ktor.http.Url
@@ -60,6 +70,17 @@ class SendManager(
         data class Bip353InvalidOffer(val path: String) : BadRequestReason()
         data class Bip353NoDNSSEC(val path: String) : BadRequestReason()
         data class UnsupportedLnurl(val url: Url) : BadRequestReason()
+    }
+
+    sealed class LnurlPayError {
+        data class RemoteError(val err: LnurlError.RemoteFailure) : LnurlPayError()
+        data class BadResponseError(val err: LnurlError.Pay.Invoice) : LnurlPayError()
+        data class ChainMismatch(val expected: Chain) : LnurlPayError()
+        data object AlreadyPaidInvoice : LnurlPayError()
+    }
+
+    sealed class LnurlWithdrawError {
+        data class RemoteError(val err: LnurlError.RemoteFailure) : LnurlWithdrawError()
     }
 
     sealed class ParseProgress {
@@ -394,5 +415,161 @@ class SendManager(
         }
     } catch (t: Throwable) {
         null
+    }
+
+    /** Extract invoice and send it to the Peer to make the payment, attaching custom trampoline fees if needed. */
+    suspend fun payBolt11Invoice(
+        amountToSend: MilliSatoshi,
+        trampolineFees: TrampolineFees,
+        invoice: Bolt11Invoice,
+        metadata: WalletPaymentMetadata?,
+    ) {
+        val paymentId = UUID.randomUUID()
+        val peer = peerManager.getPeer()
+
+        // save lnurl metadata if any
+        metadata?.let { WalletPaymentMetadataRow.serialize(it) }?.let { row ->
+            databaseManager.paymentsDb().enqueueMetadata(
+                row = row,
+                id = WalletPaymentId.LightningOutgoingPaymentId(paymentId)
+            )
+        }
+
+        peer.send(
+            PayInvoice(
+                paymentId = paymentId,
+                amount = amountToSend,
+                paymentDetails = LightningOutgoingPayment.Details.Normal(paymentRequest = invoice),
+                trampolineFeesOverride = listOf(trampolineFees)
+            )
+        )
+    }
+
+    /**
+     * Step 1 of 2:
+     * First call this function to convert the LnurlPay.Intent into a LnurlPay.Invoice.
+     *
+     * Note: This step is cancellable. The UI can simply ignore the result.
+     */
+    suspend fun lnurlPay_requestInvoice(
+        paymentIntent: LnurlPay.Intent,
+        amount: MilliSatoshi,
+        comment: String?
+    ): Either<LnurlPayError, LnurlPay.Invoice> {
+        val task = lnurlManager.requestPayInvoice(
+            intent = paymentIntent,
+            amount = amount,
+            comment = comment
+        )
+        return try {
+            val invoice = task.await()
+            when (checkForBadBolt11Invoice(invoice.invoice)) {
+                is BadRequestReason.ChainMismatch -> Either.Left(
+                    LnurlPayError.ChainMismatch(expected = chain)
+                )
+                is BadRequestReason.AlreadyPaidInvoice -> Either.Left(
+                    LnurlPayError.AlreadyPaidInvoice
+                )
+                else -> Either.Right(invoice)
+            }
+        } catch (err: Throwable) {
+            when (err) {
+                is LnurlError.RemoteFailure -> Either.Left(
+                    LnurlPayError.RemoteError(err)
+                )
+                is LnurlError.Pay.Invoice -> Either.Left(
+                    LnurlPayError.BadResponseError(err)
+                )
+                else -> Either.Left(
+                    LnurlPayError.RemoteError(
+                        LnurlError.RemoteFailure.Unreadable(
+                            origin = paymentIntent.callback.host
+                        )
+                    )
+                )
+            }
+        }
+    }
+
+    /**
+     * Step 2 of 2:
+     * After fetching the LnurlPay.Invoice, use this function to send the payment.
+     *
+     * Note: This step is non-cancellable.
+     */
+    suspend fun lnurlPay_payInvoice(
+        paymentIntent: LnurlPay.Intent,
+        amount: MilliSatoshi,
+        comment: String?,
+        invoice: LnurlPay.Invoice,
+        trampolineFees: TrampolineFees
+    ) {
+        payBolt11Invoice(
+            amountToSend = amount,
+            trampolineFees = trampolineFees,
+            invoice = invoice.invoice,
+            metadata = WalletPaymentMetadata(
+                lnurl = LnurlPayMetadata(
+                    pay = paymentIntent,
+                    description = paymentIntent.metadata.plainText,
+                    successAction = invoice.successAction
+                ),
+                userNotes = comment
+            )
+        )
+    }
+
+    /**
+     * Step 1 of 2:
+     * First call this function to convert the LnurlWithdraw into a Bolt11Invoice.
+     *
+     * Note: This step is cancellable. The UI can simply ignore the result.
+     */
+    suspend fun lnurlWithdraw_createInvoice(
+        lnurlWithdraw: LnurlWithdraw,
+        amount: MilliSatoshi,
+        description: String?
+    ): Bolt11Invoice {
+        val paymentRequest = peerManager.getPeer().createInvoice(
+            paymentPreimage = Lightning.randomBytes32(),
+            amount = amount,
+            description = Either.Left(description ?: lnurlWithdraw.defaultDescription),
+            expirySeconds = (3600 * 24 * 7).toLong(), // one week
+        )
+        return paymentRequest
+    }
+
+    /**
+     * Step 2 of 2:
+     * Sends the Bolt11Invoice to the corresponding host.
+     *
+     * Todo: We probably want to return a Deferred<LnurlWithdrawError?> here instead.
+     *       That would make it cancellable (to a certain degree).
+     */
+    suspend fun lnurlWithdraw_sendInvoice(
+        lnurlWithdraw: LnurlWithdraw,
+        invoice: Bolt11Invoice
+    ): LnurlWithdrawError? {
+        val task = lnurlManager.sendWithdrawInvoice(
+            lnurlWithdraw = lnurlWithdraw,
+            paymentRequest = invoice
+        )
+        return try {
+            task.await()
+            null
+        } catch (err: Throwable) {
+            when (err) {
+                is LnurlError.RemoteFailure -> {
+                    LnurlWithdrawError.RemoteError(err)
+                }
+                else -> { // unexpected exception: map to generic error
+                    LnurlWithdrawError.RemoteError(
+                        LnurlError.RemoteFailure.Unreadable(
+                            origin = lnurlWithdraw.callback.host
+                        )
+                    )
+                }
+            }
+        }
     }
 }

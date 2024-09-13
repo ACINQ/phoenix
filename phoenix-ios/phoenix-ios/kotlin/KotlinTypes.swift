@@ -15,6 +15,13 @@ extension SendManager {
 	typealias ParseProgress_ResolvingBip353 = ParseProgressResolvingBip353
 	
 	typealias ParseResult_BadRequest = ParseResultBadRequest
+	typealias ParseResult_Bolt11Invoice = ParseResultBolt11Invoice
+	typealias ParseResult_Bolt12Offer = ParseResultBolt12Offer
+	typealias ParseResult_Uri = ParseResultUri
+	typealias ParseResult_Lnurl = ParseResultLnurl
+	typealias ParseResult_Lnurl_Pay = ParseResultLnurlPay
+	typealias ParseResult_Lnurl_Withdraw = ParseResultLnurlWithdraw
+	typealias ParseResult_Lnurl_Auth = ParseResultLnurlAuth
 	
 	typealias BadRequestReason_AlreadyPaidInvoice = BadRequestReasonAlreadyPaidInvoice
 	typealias BadRequestReason_Bip353InvalidOffer = BadRequestReasonBip353InvalidOffer

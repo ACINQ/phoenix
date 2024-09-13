@@ -326,6 +326,7 @@
 		DCDD9ED428637EBB001800A3 /* ToolsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDD9ED328637EBB001800A3 /* ToolsButton.swift */; };
 		DCDD9ED628637FD7001800A3 /* AppStatusButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDD9ED528637FD7001800A3 /* AppStatusButton.swift */; };
 		DCE1E5FA26418183005465B8 /* Toast.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE1E5F926418183005465B8 /* Toast.swift */; };
+		DCE2B9B52C939631000430B8 /* NewValidateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE2B9B42C939631000430B8 /* NewValidateView.swift */; };
 		DCE3C7AB2A6AD3CC00F4D385 /* MempoolMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE3C7AA2A6AD3CC00F4D385 /* MempoolMonitor.swift */; };
 		DCE443AC2B3482C800CABA96 /* LiquidityFeeInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE443AB2B3482C800CABA96 /* LiquidityFeeInfo.swift */; };
 		DCE6FB8C28D0B5F200054511 /* ResetWalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE6FB8B28D0B5F200054511 /* ResetWalletView.swift */; };
@@ -717,6 +718,7 @@
 		DCDD9ED328637EBB001800A3 /* ToolsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolsButton.swift; sourceTree = "<group>"; };
 		DCDD9ED528637FD7001800A3 /* AppStatusButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStatusButton.swift; sourceTree = "<group>"; };
 		DCE1E5F926418183005465B8 /* Toast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Toast.swift; sourceTree = "<group>"; };
+		DCE2B9B42C939631000430B8 /* NewValidateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewValidateView.swift; sourceTree = "<group>"; };
 		DCE3C7AA2A6AD3CC00F4D385 /* MempoolMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MempoolMonitor.swift; sourceTree = "<group>"; };
 		DCE443AB2B3482C800CABA96 /* LiquidityFeeInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidityFeeInfo.swift; sourceTree = "<group>"; };
 		DCE6FB8B28D0B5F200054511 /* ResetWalletView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetWalletView.swift; sourceTree = "<group>"; };
@@ -1421,6 +1423,7 @@
 			isa = PBXGroup;
 			children = (
 				DCBA60CC2C909C7600878895 /* NewSendView.swift */,
+				DCE2B9B42C939631000430B8 /* NewValidateView.swift */,
 			);
 			path = send2;
 			sourceTree = "<group>";
@@ -1835,6 +1838,7 @@
 				DC63A3762B965D54008E040E /* InboundFeeSheet.swift in Sources */,
 				DC355E212A44D838008E8A8E /* NotificationsView.swift in Sources */,
 				DC7DA9F62AD84DF200F86B99 /* String+Substring.swift in Sources */,
+				DCE2B9B52C939631000430B8 /* NewValidateView.swift in Sources */,
 				DC20BDF22C23403100338AA2 /* PaymentSummary.swift in Sources */,
 				DC2ABAD52BEC092B00C11C9C /* InvalidPin.swift in Sources */,
 				DC63BDF729AEB30C0067A361 /* BackgroundPaymentsConfig.swift in Sources */,
