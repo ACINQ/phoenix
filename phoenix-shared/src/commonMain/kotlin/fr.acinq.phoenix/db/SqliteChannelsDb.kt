@@ -23,6 +23,7 @@ import fr.acinq.lightning.channel.states.PersistedChannelState
 import fr.acinq.lightning.db.ChannelsDb
 import fr.acinq.lightning.serialization.Serialization
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 
 class SqliteChannelsDb(private val driver: SqlDriver) : ChannelsDb {

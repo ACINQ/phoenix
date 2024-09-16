@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.init
+package fr.acinq.phoenix.android.initwallet.create
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,7 +35,7 @@ import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.mvi.MVIView
-import fr.acinq.phoenix.android.controllerFactory
+import fr.acinq.phoenix.android.initwallet.WritingSeedState
 import fr.acinq.phoenix.android.security.SeedFileState
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.logger
@@ -46,12 +46,12 @@ import fr.acinq.phoenix.utils.MnemonicLanguage
 
 @Composable
 fun CreateWalletView(
-    onSeedWritten: () -> Unit
+    onWalletCreated: () -> Unit
 ) {
     val log = logger("CreateWallet")
     val context = LocalContext.current
 
-    val vm: InitViewModel = viewModel(factory = InitViewModel.Factory(controllerFactory, CF::initialization))
+    val vm = viewModel<CreateWalletViewModel>()
 
     val seedFileState = produceState<SeedFileState>(initialValue = SeedFileState.Unknown, true) {
         value = SeedManager.getSeedState(context)
@@ -64,7 +64,7 @@ fun CreateWalletView(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        when (seedFileState.value) {
+        when (val state = seedFileState.value) {
             is SeedFileState.Absent -> {
                 Text(stringResource(id = R.string.autocreate_generating))
                 MVIView(CF::initialization) { model, postIntent ->
@@ -86,7 +86,7 @@ fun CreateWalletView(
                                 )
                             }
                             LaunchedEffect(true) {
-                                vm.writeSeed(context, model.mnemonics, isNewWallet = true, onSeedWritten)
+                                vm.writeSeed(context, model.mnemonics, isNewWallet = true, onWalletCreated)
                                 LegacyPrefsDatastore.savePrefsMigrationExpected(context, false)
                                 LegacyPrefsDatastore.saveDataMigrationExpected(context, false)
                             }
@@ -101,7 +101,7 @@ fun CreateWalletView(
                 // we should not be here
                 Text(stringResource(id = R.string.startup_wait))
                 LaunchedEffect(true) {
-                    onSeedWritten()
+                    onWalletCreated()
                 }
             }
         }

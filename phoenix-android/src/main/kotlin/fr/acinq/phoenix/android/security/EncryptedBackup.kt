@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 ACINQ SAS
+ * Copyright 2024 ACINQ SAS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.db
+package fr.acinq.phoenix.android.security
 
-import app.cash.sqldelight.db.SqlDriver
-import fr.acinq.bitcoin.Chain
-import fr.acinq.phoenix.utils.PlatformContext
+import fr.acinq.bitcoin.ByteVector
 
-expect fun createChannelsDbDriver(ctx: PlatformContext, fileName: String): SqlDriver
+data class EncryptedBackup(val version: Int, val salt: ByteVector,) {
 
-expect fun createPaymentsDbDriver(ctx: PlatformContext,fileName: String): SqlDriver
-
-expect fun createAppDbDriver(ctx: PlatformContext): SqlDriver
+}

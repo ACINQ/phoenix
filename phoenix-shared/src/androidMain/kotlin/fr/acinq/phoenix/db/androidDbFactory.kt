@@ -21,13 +21,12 @@ import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import fr.acinq.bitcoin.Chain
 import fr.acinq.phoenix.utils.PlatformContext
 
-actual fun createChannelsDbDriver(ctx: PlatformContext, chain: Chain, nodeIdHash: String): SqlDriver {
-
-    return AndroidSqliteDriver(ChannelsDatabase.Schema, ctx.applicationContext, "channels-${chain.name.lowercase()}-$nodeIdHash.sqlite")
+actual fun createChannelsDbDriver(ctx: PlatformContext, fileName: String): SqlDriver {
+    return AndroidSqliteDriver(ChannelsDatabase.Schema, ctx.applicationContext, fileName)
 }
 
-actual fun createPaymentsDbDriver(ctx: PlatformContext, chain: Chain, nodeIdHash: String): SqlDriver {
-    return AndroidSqliteDriver(PaymentsDatabase.Schema, ctx.applicationContext, "payments-${chain.name.lowercase()}-$nodeIdHash.sqlite")
+actual fun createPaymentsDbDriver(ctx: PlatformContext, fileName: String): SqlDriver {
+    return AndroidSqliteDriver(PaymentsDatabase.Schema, ctx.applicationContext, fileName)
 }
 
 actual fun createAppDbDriver(ctx: PlatformContext): SqlDriver {

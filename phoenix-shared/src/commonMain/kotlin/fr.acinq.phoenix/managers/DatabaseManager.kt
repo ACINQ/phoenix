@@ -1,6 +1,7 @@
 package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.Chain
+import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.db.Databases
 import fr.acinq.lightning.logging.LoggerFactory
@@ -47,14 +48,12 @@ class DatabaseManager(
             nodeParamsManager.nodeParams.collect { nodeParams ->
                 if (nodeParams == null) return@collect
                 log.debug { "nodeParams available: building databases..." }
-
-                val nodeIdHash = nodeParams.nodeId.hash160().byteVector().toHex()
                 val channelsDb = SqliteChannelsDb(
-                    driver = createChannelsDbDriver(ctx, chain, nodeIdHash)
+                    driver = createChannelsDbDriver(ctx, channelsDbName(chain, nodeParams.nodeId))
                 )
                 val paymentsDb = SqlitePaymentsDb(
                     loggerFactory = loggerFactory,
-                    driver = createPaymentsDbDriver(ctx, chain, nodeIdHash),
+                    driver = createPaymentsDbDriver(ctx, paymentsDbName(chain, nodeParams.nodeId)),
                     currencyManager = currencyManager
                 )
                 val cloudKitDb = makeCloudKitDb(appDb, paymentsDb)
@@ -81,9 +80,24 @@ class DatabaseManager(
         return db.payments
     }
 
+    suspend fun channelsDb(): SqliteChannelsDb {
+        val db = databases.filterNotNull().first()
+        return db.channels as SqliteChannelsDb
+    }
+
     suspend fun cloudKitDb(): CloudKitInterface? {
         val db = databases.filterNotNull().first()
         return db.cloudKit
+    }
+
+    companion object {
+        fun channelsDbName(chain: Chain, nodeId: PublicKey): String {
+            return "channels-${chain.name.lowercase()}-${nodeId.hash160().byteVector().toHex()}.sqlite"
+        }
+
+        fun paymentsDbName(chain: Chain, nodeId: PublicKey): String {
+            return "payments-${chain.name.lowercase()}-${nodeId.hash160().byteVector().toHex()}.sqlite"
+        }
     }
 }
 

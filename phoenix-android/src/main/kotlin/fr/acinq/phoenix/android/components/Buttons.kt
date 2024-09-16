@@ -107,6 +107,7 @@ fun FilledButton(
     textStyle: TextStyle = MaterialTheme.typography.button.copy(color = MaterialTheme.colors.onPrimary),
     padding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
     backgroundColor: Color = MaterialTheme.colors.primary,
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.Center,
     onClick: () -> Unit,
 ) {
     Button(
@@ -120,6 +121,7 @@ fun FilledButton(
         onClick = onClick,
         shape = shape,
         backgroundColor = backgroundColor,
+        horizontalArrangement = horizontalArrangement,
         textStyle = textStyle,
         padding = padding,
         modifier = modifier

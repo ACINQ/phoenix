@@ -67,9 +67,9 @@ import fr.acinq.phoenix.android.components.Dialog
 import fr.acinq.phoenix.android.components.openLink
 import fr.acinq.phoenix.android.components.screenlock.LockPrompt
 import fr.acinq.phoenix.android.home.HomeView
-import fr.acinq.phoenix.android.init.CreateWalletView
-import fr.acinq.phoenix.android.init.InitWallet
-import fr.acinq.phoenix.android.init.RestoreWalletView
+import fr.acinq.phoenix.android.initwallet.create.CreateWalletView
+import fr.acinq.phoenix.android.initwallet.InitWallet
+import fr.acinq.phoenix.android.initwallet.restore.RestoreWalletView
 import fr.acinq.phoenix.android.intro.IntroView
 import fr.acinq.phoenix.android.payments.ScanDataView
 import fr.acinq.phoenix.android.payments.details.PaymentDetailsView
@@ -98,6 +98,8 @@ import fr.acinq.phoenix.android.settings.channels.ImportChannelsData
 import fr.acinq.phoenix.android.settings.displayseed.DisplaySeedView
 import fr.acinq.phoenix.android.settings.fees.AdvancedIncomingFeePolicy
 import fr.acinq.phoenix.android.settings.fees.LiquidityPolicyView
+import fr.acinq.phoenix.android.payments.liquidity.RequestLiquidityView
+import fr.acinq.phoenix.android.services.LocalBackupWorker
 import fr.acinq.phoenix.android.settings.walletinfo.FinalWalletInfo
 import fr.acinq.phoenix.android.settings.walletinfo.SendSwapInRefundView
 import fr.acinq.phoenix.android.settings.walletinfo.SwapInAddresses
@@ -229,10 +231,10 @@ fun AppView(
                         )
                     }
                     composable(Screen.CreateWallet.route) {
-                        CreateWalletView(onSeedWritten = { navController.navigate(Screen.Startup.route) })
+                        CreateWalletView(onWalletCreated = { navController.navigate(Screen.Startup.route) })
                     }
                     composable(Screen.RestoreWallet.route) {
-                        RestoreWalletView(onSeedWritten = { navController.navigate(Screen.Startup.route) })
+                        RestoreWalletView(onRestoreDone = { navController.navigate(Screen.Startup.route) })
                     }
                     composable(Screen.Home.route) {
                         RequireStarted(walletState) {
@@ -535,6 +537,9 @@ fun AppView(
     val userPrefs = userPrefs
     val exchangeRates = fiatRates
     lastCompletedPayment?.let { payment ->
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            LocalBackupWorker.scheduleOnce(context)
+        }
         LaunchedEffect(key1 = payment.walletPaymentId()) {
             try {
                 if (isDataMigrationExpected == false) {
