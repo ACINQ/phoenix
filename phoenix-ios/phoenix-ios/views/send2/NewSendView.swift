@@ -10,6 +10,10 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct NewSendView: View {
 	
+	enum NavLinkTag: String, Codable {
+		case NextView
+	}
+	
 	enum Location {
 		case MainView
 		case ReceiveView
@@ -32,6 +36,7 @@ struct NewSendView: View {
 	@State var isParsing: Bool = false
 	@State var parseIndex: Int = 0
 	@State var parseProgress: SendManager.ParseProgress? = nil
+	@State var parseResult: SendManager.ParseResult? = nil
 	
 	enum ActiveSheet {
 		case imagePicker
@@ -47,11 +52,15 @@ struct NewSendView: View {
 	)
 	@State var maxButtonWidth: CGFloat? = nil
 	
+	// <iOS_16_workarounds>
+	@State var navLinkTag: NavLinkTag? = nil
+	// </iOS_16_workarounds>
+	
 	@StateObject var toast = Toast()
 	
-	@Environment(\.openURL) var openURL: OpenURLAction
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var popoverState: PopoverState
 	
 	// --------------------------------------------------
@@ -80,6 +89,12 @@ struct NewSendView: View {
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.navigationTitle("Send")
 		.navigationBarTitleDisplayMode(.inline)
+		.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
+			navLinkView()
+		}
+		.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
+			navLinkView(tag)
+		}
 	}
 	
 	@ViewBuilder
@@ -313,6 +328,32 @@ struct NewSendView: View {
 		.padding(.all, 4)
 	}
 	
+	@ViewBuilder
+	func navLinkView() -> some View {
+		
+		if let tag = self.navLinkTag {
+			navLinkView(tag)
+		} else {
+			EmptyView()
+		}
+	}
+	
+	@ViewBuilder
+	func navLinkView(_ tag: NavLinkTag) -> some View {
+		
+		switch tag {
+		case .NextView:
+			
+			if let flow = parseResult as? SendManager.ParseResult_Lnurl_Auth {
+				NewLoginView(flow: flow)
+			} else if let flow = parseResult {
+				NewValidateView(flow: flow)
+			} else {
+				EmptyView()
+			}
+		}
+	}
+	
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
@@ -335,6 +376,13 @@ struct NewSendView: View {
 		} else {
 			return String(localized: "Resolving lightning address", comment: "Progress title")
 		}
+	}
+	
+	func navLinkTagBinding() -> Binding<Bool> {
+		return Binding<Bool>(
+			get: { navLinkTag != nil },
+			set: { if !$0 { navLinkTag = nil }}
+		)
 	}
 	
 	func activeSheetBinding() -> Binding<Bool> {
@@ -507,6 +555,16 @@ struct NewSendView: View {
 	// MARK: Actions
 	// --------------------------------------------------
 	
+	func navigateTo(_ tag: NavLinkTag) {
+		log.trace("navigateTo(\(tag.rawValue))")
+		
+		if #available(iOS 17, *) {
+			navCoordinator.path.append(tag)
+		} else {
+			navLinkTag = tag
+		}
+	}
+	
 	func clearInputField() {
 		log.trace("clearInputField()")
 		
@@ -575,7 +633,22 @@ struct NewSendView: View {
 	func openLink(_ url: URL) {
 		log.trace("openLink()")
 		
+		// Strange SwiftUI bug:
+		// https://forums.developer.apple.com/forums/thread/750514
+		//
+		// Simply declaring the following environment variable:
+		// @Environment(\.openURL) var openURL: OpenURLAction
+		//
+		// Somehow causes an infinite loop in SwiftUI !
+		// I encountered this multiple times while testing,
+		// and the suggested workaround is to use plain UIApplication calls.
+		/*
 		openURL(url)
+		*/
+		
+		if UIApplication.shared.canOpenURL(url) {
+			UIApplication.shared.open(url)
+		}
 	}
 	
 	// --------------------------------------------------
@@ -590,6 +663,7 @@ struct NewSendView: View {
 			return
 		}
 		
+		isParsing = true
 		parseIndex += 1
 		let index = parseIndex
 		
@@ -615,7 +689,8 @@ struct NewSendView: View {
 					if let badRequest = result as? SendManager.ParseResult_BadRequest {
 						showErrorToast(badRequest)
 					} else {
-						// Todo...
+						parseResult = result
+						navigateTo(.NextView)
 					}
 				} else {
 					log.warning("parseUserInput: result: ignoring: cancelled")

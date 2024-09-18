@@ -34,6 +34,20 @@ extension SendManager {
 	typealias BadRequestReason_ServiceError = BadRequestReasonServiceError
 	typealias BadRequestReason_UnknownFormat = BadRequestReasonUnknownFormat
 	typealias BadRequestReason_UnsupportedLnurl = BadRequestReasonUnsupportedLnurl
+	
+	typealias LnurlPay_Error = LnurlPayError
+	typealias LnurlPay_Error_RemoteError = LnurlPayErrorRemoteError
+	typealias LnurlPay_Error_BadResponseError = LnurlPayErrorBadResponseError
+	typealias LnurlPay_Error_ChainMismatch = LnurlPayErrorChainMismatch
+	typealias LnurlPay_Error_AlreadyPaidInvoice = LnurlPayErrorAlreadyPaidInvoice
+	
+	typealias LnurlWithdraw_Error = LnurlWithdrawError
+	typealias LnurlWithdraw_Error_RemoteError = LnurlWithdrawErrorRemoteError
+	
+	typealias LnurlAuth_Error = LnurlAuthError
+	typealias LnurlAuth_Error_ServerError = LnurlAuthErrorServerError
+	typealias LnurlAuth_Error_NetworkError = LnurlAuthErrorNetworkError
+	typealias LnurlAuth_Error_OtherError = LnurlAuthErrorOtherError
 }
 
 extension Scan {

@@ -19346,9 +19346,6 @@
         }
       }
     },
-    "FIXME" : {
-
-    },
     "For more information, see the FAQ" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -32567,6 +32564,9 @@
           }
         }
       }
+    },
+    "push next view" : {
+
     },
     "QR code" : {
       "localizations" : {
@@ -46849,6 +46849,9 @@
           }
         }
       }
+    },
+    "wtf" : {
+
     },
     "Yes" : {
       "extractionState" : "manual",

@@ -16,7 +16,6 @@ import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampSeconds
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.PhoenixBusiness
-import fr.acinq.phoenix.controllers.payments.Scan
 import fr.acinq.phoenix.data.BitcoinUri
 import fr.acinq.phoenix.data.BitcoinUriError
 import fr.acinq.phoenix.data.LnurlPayMetadata
@@ -31,14 +30,22 @@ import fr.acinq.phoenix.db.payments.WalletPaymentMetadataRow
 import fr.acinq.phoenix.utils.DnsResolvers
 import fr.acinq.phoenix.utils.Parser
 import io.ktor.http.Url
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.TimeSource
 
 class SendManager(
     loggerFactory: LoggerFactory,
@@ -46,7 +53,7 @@ class SendManager(
     private val lnurlManager: LnurlManager,
     private val databaseManager: DatabaseManager,
     private val chain: Chain,
-) {
+) : CoroutineScope by MainScope() {
 
     constructor(business: PhoenixBusiness): this(
         loggerFactory = business.loggerFactory,
@@ -81,6 +88,12 @@ class SendManager(
 
     sealed class LnurlWithdrawError {
         data class RemoteError(val err: LnurlError.RemoteFailure) : LnurlWithdrawError()
+    }
+
+    sealed class LnurlAuthError {
+        data class ServerError(val details: LnurlError.RemoteFailure) : LnurlAuthError()
+        data class NetworkError(val details: Throwable) : LnurlAuthError()
+        data class OtherError(val details: Throwable) : LnurlAuthError()
     }
 
     sealed class ParseProgress {
@@ -530,13 +543,12 @@ class SendManager(
         amount: MilliSatoshi,
         description: String?
     ): Bolt11Invoice {
-        val paymentRequest = peerManager.getPeer().createInvoice(
+        return peerManager.getPeer().createInvoice(
             paymentPreimage = Lightning.randomBytes32(),
             amount = amount,
             description = Either.Left(description ?: lnurlWithdraw.defaultDescription),
             expirySeconds = (3600 * 24 * 7).toLong(), // one week
         )
-        return paymentRequest
     }
 
     /**
@@ -569,6 +581,38 @@ class SendManager(
                         )
                     )
                 }
+            }
+        }
+    }
+
+    suspend fun lnurlAuth_signAndSend(
+        auth: LnurlAuth,
+        minSuccessDelaySeconds: Double = 0.0,
+        scheme: LnurlAuth.Scheme
+    ): LnurlAuthError? {
+        return withContext(Dispatchers.Default) {
+            val start = TimeSource.Monotonic.markNow()
+            val error = try {
+                lnurlManager.signAndSendAuthRequest(
+                    auth = auth,
+                    scheme = scheme
+                )
+                null
+            } catch (e: LnurlError.RemoteFailure.CouldNotConnect) {
+                LnurlAuthError.NetworkError(details = e)
+            } catch (e: LnurlError.RemoteFailure) {
+                LnurlAuthError.ServerError(details = e)
+            } catch (e: Throwable) {
+                LnurlAuthError.OtherError(details = e)
+            }
+            if (error != null) {
+                return@withContext error
+            } else {
+                val pending = minSuccessDelaySeconds.seconds - start.elapsedNow()
+                if (pending > Duration.ZERO) {
+                    delay(pending)
+                }
+                return@withContext null
             }
         }
     }

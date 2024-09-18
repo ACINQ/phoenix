@@ -496,6 +496,7 @@ struct MainView_Small: View {
 			case .ReceiveView         : ReceiveView()
 		//	case .SendView            : SendView(location: .MainView, controller: externalLightningRequest)
 			case .SendView            : NewSendView(location: .MainView)
+		//	case .SendView            : WtfSendView(location: .MainView)
 			case .CurrencyConverter   : CurrencyConverterView()
 			case .SwapInWalletDetails : SwapInWalletDetails(location: .embedded, popTo: popTo)
 			case .LiquidityAdsView    : LiquidityAdsView(location: .embedded)

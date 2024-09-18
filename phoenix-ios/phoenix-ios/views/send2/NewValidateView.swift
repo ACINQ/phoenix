@@ -20,14 +20,21 @@ enum Problem: Error {
 
 struct NewValidateView: View {
 	
-	enum NavLinkTag: String, Codable {
+	enum NavLinkTag: Hashable, CustomStringConvertible {
 		case CurrencyConverter
+		case PaymentRequestedView(invoice: Lightning_kmpBolt11Invoice)
+		
+		var description: String {
+			switch self {
+			case .CurrencyConverter       : return "CurrencyConverter"
+			case .PaymentRequestedView(_) : return "PaymentRequestedView"
+			}
+		}
 	}
 
-	let flow: SendManager.ParseResult
+	@State var flow: SendManager.ParseResult
 	
-	@State var isLnurlPayFetch: Bool = false
-	@State var isLnurlWithdrawFetch: Bool = false
+	@State var isLnurlFetch: Bool = false
 	
 	@State var currency = Currency.bitcoin(.sat)
 	@State var currencyList: [Currency] = [Currency.bitcoin(.sat)]
@@ -66,12 +73,14 @@ struct NewValidateView: View {
 	
 	@State var didAppear = false
 	
+	@State var isParsing: Bool = false
+	@State var parseIndex: Int = 0
+	@State var parseProgress: SendManager.ParseProgress? = nil
+	
 	@State var payIndex: Int = 0
 	
 	let balancePublisher = Biz.business.balanceManager.balancePublisher()
 	@State var balanceMsat: Int64 = 0
-	
-	@StateObject var connectionsMonitor = ObservableConnectionsMonitor()
 	
 	// For the cicular buttons: [metadata, tip, comment]
 	enum MaxButtonWidth: Preference {}
@@ -85,12 +94,24 @@ struct NewValidateView: View {
 	@State var navLinkTag: NavLinkTag? = nil
 	// </iOS_16_workarounds>
 	
+	@StateObject var toast = Toast()
+	@StateObject var connectionsMonitor = ObservableConnectionsMonitor()
+	
+	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var popoverState: PopoverState
 	@EnvironmentObject var smartModalState: SmartModalState
+	
+	// --------------------------------------------------
+	// MARK: Init
+	// --------------------------------------------------
+	
+	init(flow: SendManager.ParseResult) {
+		self._flow = State(initialValue: flow)
+	}
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -100,18 +121,18 @@ struct NewValidateView: View {
 	var body: some View {
 		
 		layers()
-		.navigationTitle(
-			isLnurlWithdrawFlow
-				? NSLocalizedString("Confirm Withdraw", comment: "Navigation bar title")
-				: NSLocalizedString("Confirm Payment", comment: "Navigation bar title")
-		)
-		.navigationBarTitleDisplayMode(.inline)
-		.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
-			navLinkView()
-		}
-		.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
-			navLinkView(tag)
-		}
+			.navigationTitle(
+				isLnurlWithdrawFlow
+					? NSLocalizedString("Confirm Withdraw", comment: "Navigation bar title")
+					: NSLocalizedString("Confirm Payment", comment: "Navigation bar title")
+			)
+			.navigationBarTitleDisplayMode(.inline)
+			.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
+				navLinkView()
+			}
+			.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
+				navLinkView(tag)
+			}
 	}
 	
 	@ViewBuilder
@@ -139,26 +160,23 @@ struct NewValidateView: View {
 				}
 			}
 			
-			if isLnurlPayFetch {
+			if parseProgress != nil {
 				FetchActivityNotice(
-					title: NSLocalizedString("Fetching Invoice", comment: "Progress title"),
-					onCancel: { didCancelLnurlPayFetch() }
-				)
-			}
-			else if isLnurlWithdrawFetch {
-				FetchActivityNotice(
-					title: NSLocalizedString("Forwarding Invoice", comment: "Progress title"),
-					onCancel: { didCancelLnurlWithdrawFetch() }
+					title: fetchActivityTitle_parsing(),
+					onCancel: { cancelParseRequest() }
 				)
 			}
 			
+			if isLnurlFetch {
+				FetchActivityNotice(
+					title: fetchActivityTitle_lnurlFetch(),
+					onCancel: { cancelLnurlFetch() }
+				)
+			}
+			
+			toast.view()
+			
 		}// </ZStack>
-		.transition(
-			.asymmetric(
-				insertion: .identity,
-				removal: .opacity
-			)
-		)
 		.onAppear() {
 			onAppear()
 		}
@@ -394,10 +412,8 @@ struct NewValidateView: View {
 	@ViewBuilder
 	func paymentDetails() -> some View {
 		
-		Text("FIXME")
-		// FIXME
-	//	PaymentDetails(parent: self)
-	//		.padding(.horizontal, 10)
+		NewPaymentDetails(parent: self)
+			.padding(.horizontal, 10)
 	}
 	
 	@ViewBuilder
@@ -510,6 +526,13 @@ struct NewValidateView: View {
 				didChange: currencyConverterAmountChanged,
 				didClose: {}
 			)
+			
+		case .PaymentRequestedView(let invoice):
+			if let withdrawFlow = flow as? SendManager.ParseResult_Lnurl_Withdraw {
+				NewPaymentRequestedView(flow: withdrawFlow, invoice: invoice)
+			} else {
+				EmptyView()
+			}
 		}
 	}
 	
@@ -565,6 +588,24 @@ struct NewValidateView: View {
 			hideMsats: false,
 			userDidEdit: { userDidEditTextField() }
 		)
+	}
+	
+	func fetchActivityTitle_parsing() -> String {
+		
+		if parseProgress is SendManager.ParseProgress_LnurlServiceFetch {
+			return String(localized: "Fetching Lightning URL", comment: "Progress title")
+		} else {
+			return String(localized: "Resolving lightning address", comment: "Progress title")
+		}
+	}
+	
+	func fetchActivityTitle_lnurlFetch() -> String {
+		
+		if isLnurlPayFlow {
+			return String(localized: "Fetching Invoice", comment: "Progress title")
+		} else {
+			return String(localized: "Forwarding Invoice", comment: "Progress title")
+		}
 	}
 	
 	func paymentHost() -> String? {
@@ -1028,50 +1069,20 @@ struct NewValidateView: View {
 		{
 			log.debug("triggering popover w/PaymentLayerChoice")
 	
-			// FIXME
-		//	popoverState.display(dismissable: false) {
-		//		PaymentLayerChoice(mvi: mvi)
-		//	} onWillDisappear: {
-		//		hasPickedSwapOutMode = true
-		//	}
+			popoverState.display(dismissable: false) {
+				PaymentLayerChoice(
+					didChooseL1: self.paymentLayerChoice_didChooseL1,
+					didChooseL2: self.paymentLayerChoice_didChooseL2
+				)
+			} onWillDisappear: {
+				hasPickedSwapOutMode = true
+			}
 		}
 	}
 	
 	// --------------------------------------------------
 	// MARK: Notifications
 	// --------------------------------------------------
-	
-	func modelDidChange(_ newModel: Scan.Model) {
-		log.trace("modelDidChange()")
-		
-		// There are several transitions that require re-calculating the altAmout:
-		//
-		// * SwapOutFlow_Requesting -> SwapOutFlow_Ready => amount + minerFee >? balance
-		// * SwapOutFlow_Ready -> SwapOutFlow_Init       => remove minerFee from calculations
-		// * OnChainFlow -> InvoiceFlow_X                => range changed (e.g. minAmount)
-		//
-		if newModel is Scan.Model_Bolt11InvoiceFlow {
-			
-			refreshAltAmount()
-		}
-		
-		if let model = newModel as? Scan.Model_LnurlPayFlow_LnurlPayRequest {
-			if let payError = model.error {
-				
-				popoverState.display(dismissable: true) {
-					LnurlFlowErrorNotice(error: LnurlFlowError.pay(error: payError))
-				}
-			}
-			
-		} else if let model = newModel as? Scan.Model_LnurlWithdrawFlow_LnurlWithdrawRequest {
-			if let withdrawError = model.error {
-				
-				popoverState.display(dismissable: true) {
-					LnurlFlowErrorNotice(error: LnurlFlowError.withdraw(error: withdrawError))
-				}
-			}
-		}
-	}
 	
 	func balanceDidChange(_ balance: Lightning_kmpMilliSatoshi?) {
 		log.trace("balanceDidChange()")
@@ -1111,12 +1122,35 @@ struct NewValidateView: View {
 		}
 	}
 	
+	func paymentLayerChoice_didChooseL1() {
+		log.trace("paymentLayerChoice_didChooseL1()")
+		
+		// Nothing to do here except close the popover.
+		// We're already setup to process the payment on L1.
+		
+		popoverState.close()
+	}
+	
+	func paymentLayerChoice_didChooseL2() {
+		log.trace("paymentLayerChoice_didChooseL2()")
+		
+		guard
+			let model = flow as? SendManager.ParseResult_Uri,
+			let paymentRequest = model.uri.paymentRequest
+		else {
+			return
+		}
+		
+		parseUserInput(paymentRequest.write())
+		popoverState.close()
+	}
+	
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
 	
 	func navigateTo(_ tag: NavLinkTag) {
-		log.trace("navigateTo(\(tag.rawValue))")
+		log.trace("navigateTo(\(tag.description))")
 		
 		if #available(iOS 17, *) {
 			navCoordinator.path.append(tag)
@@ -1636,7 +1670,7 @@ struct NewValidateView: View {
 					invoice: model.invoice,
 					metadata: nil
 				)
-				didSendPayment()
+				popToHomeView()
 				
 			} catch {
 				log.error("payBolt11Invoice(): error: \(error)")
@@ -1705,25 +1739,25 @@ struct NewValidateView: View {
 					fetchInvoiceTimeoutInSeconds: 30
 				)
 				
-				self.paymentInProgress = false
+				paymentInProgress = false
 				
 				switch onEnum(of: result) {
 				case .offerNotPaid(let offerNotPaid):
 					let problem = PayOfferProblem.fromResponse(offerNotPaid)
-					self.payOfferProblem = problem
+					payOfferProblem = problem
 					Biz.endLongLivedTask(id: paymentId.description())
 					
 				case .paymentNotSent(_): fallthrough
 				case .paymentSent(_):
-					self.payOfferProblem = nil
-					self.didSendPayment()
+					payOfferProblem = nil
+					popToHomeView()
 				}
 				
 			} catch {
 				log.error("peer.payOffer(): error: \(error)")
 				
-				self.paymentInProgress = false
-				self.payOfferProblem = .other
+				paymentInProgress = false
+				payOfferProblem = .other
 			}
 		} // </Task>
 	}
@@ -1770,22 +1804,22 @@ struct NewValidateView: View {
 					fetchInvoiceTimeoutInSeconds: 30
 				)
 				
-				self.paymentInProgress = false
+				paymentInProgress = false
 				
 				if let problem = PayOfferProblem.fromResponse(response) {
-					self.payOfferProblem = problem
+					payOfferProblem = problem
 					Biz.endLongLivedTask(id: paymentId.description())
 					
 				} else {
-					self.payOfferProblem = nil
-					self.didSendPayment()
+					payOfferProblem = nil
+					popToHomeView()
 				}
 			
 			} catch {
 				log.error("peer.payOffer(): error: \(error)")
 				
-				self.paymentInProgress = false
-				self.payOfferProblem = .other
+				paymentInProgress = false
+				payOfferProblem = .other
 			}
 		} // </Task>
 	}
@@ -1824,18 +1858,18 @@ struct NewValidateView: View {
 				self.paymentInProgress = false
 				
 				if let problem = SpliceOutProblem.fromResponse(response) {
-					self.spliceOutProblem = problem
+					spliceOutProblem = problem
 					
 				} else {
-					self.spliceOutProblem = nil
-					self.didSendPayment()
+					spliceOutProblem = nil
+					popToHomeView()
 				}
 				
 			} catch {
 				log.error("peer.spliceOut(): error: \(error)")
 				
-				self.paymentInProgress = false
-				self.spliceOutProblem = .other
+				paymentInProgress = false
+				spliceOutProblem = .other
 			}
 		} // </Task>
 	}
@@ -1910,39 +1944,50 @@ struct NewValidateView: View {
 			}
 			
 			paymentInProgress = true
-			isLnurlPayFetch = true
+			isLnurlFetch = true
 			let index = payIndex
 			let commentSnapshot = comment
 			
 			Task { @MainActor in
 				do {
-					let invoice = try await Biz.business.sendManager.lnurlPay_requestInvoice(
-						paymentIntent: model.paymentIntent,
-						amount: updatedMsat,
-						comment: commentSnapshot
-					)
+					let result1: Bitcoin_kmpEither<SendManager.LnurlPayError, LnurlPay.Invoice> =
+						try await Biz.business.sendManager.lnurlPay_requestInvoice(
+							paymentIntent: model.paymentIntent,
+							amount: updatedMsat,
+							comment: commentSnapshot
+						)
 					
-					if index != payIndex {
+					guard index == payIndex else {
 						log.info("sendPayment_lnurlPay: ignoring fetch: cancelled")
 						return
-					} else {
-						isLnurlPayFetch = false
 					}
+					isLnurlFetch = false
 					
-					// FIXME
-				//	try await Biz.business.sendManager.lnurlPay_payInvoice(
-				//		paymentIntent: model.paymentIntent,
-				//		amount: updatedMsat,
-				//		comment: commentSnapshot,
-				//		invoice: invoice, // <- Either<LnurlPayError, LnurlPay.Invoice>
-				//		trampolineFees: trampolineFees
-				//	)
-					
-					didSendPayment()
+					if result1.isLeft {
+						let payError: SendManager.LnurlPayError = result1.left!
+						
+						popoverState.display(dismissable: true) {
+							NewLnurlFlowErrorNotice(error: NewLnurlFlowError.pay(error: payError))
+						}
+						
+					} else {
+						let invoice: LnurlPay.Invoice = result1.right!
+						
+						try await Biz.business.sendManager.lnurlPay_payInvoice(
+							paymentIntent: model.paymentIntent,
+							amount: updatedMsat,
+							comment: commentSnapshot,
+							invoice: invoice,
+							trampolineFees: trampolineFees
+						)
+						
+						popToHomeView()
+					}
 					
 				} catch {
 					log.error("sendPayment_lnurlPay: error: \(error)")
 					paymentInProgress = false
+					isLnurlFetch = false
 				}
 			} // </Task>
 		}
@@ -1954,32 +1999,69 @@ struct NewValidateView: View {
 	) {
 		log.trace("sendPayment_lnurlWithdraw()")
 		
+		paymentInProgress = true
+		isLnurlFetch = true
+		let index = payIndex
+		
 		saveTipPercentInPrefs()
-		// FIXME
-	//	mvi.intent(Scan.Intent_LnurlWithdrawFlow_SendLnurlWithdraw(
-	//		lnurlWithdraw: model.lnurlWithdraw,
-	//		amount: Lightning_kmpMilliSatoshi(msat: msat),
-	//		description: nil
-	//	))
+		Task { @MainActor in
+			do {
+				let invoice: Lightning_kmpBolt11Invoice =
+					try await Biz.business.sendManager.lnurlWithdraw_createInvoice(
+						lnurlWithdraw: model.lnurlWithdraw,
+						amount: Lightning_kmpMilliSatoshi(msat: msat),
+						description: nil
+					)
+				
+				guard index == payIndex else {
+					log.info("sendPayment_lnurlWithdraw: ignoring fetch: cancelled")
+					return
+				}
+				isLnurlFetch = false
+				
+				let withdrawError: SendManager.LnurlWithdrawError? =
+					try await Biz.business.sendManager.lnurlWithdraw_sendInvoice(
+						lnurlWithdraw: model.lnurlWithdraw,
+						invoice: invoice
+					)
+				
+				if let withdrawError {
+					popoverState.display(dismissable: true) {
+						NewLnurlFlowErrorNotice(error: NewLnurlFlowError.withdraw(error: withdrawError))
+					}
+				} else {
+					navigateTo(.PaymentRequestedView(invoice: invoice))
+				}
+				
+			} catch {
+				log.error("sendPayment_lnurlPay: error: \(error)")
+				paymentInProgress = false
+				isLnurlFetch = false
+			}
+		} // </Task>
 	}
 	
-	func didCancelLnurlPayFetch() {
-		log.trace("didCancelLnurlPayFetch()")
+	func cancelParseRequest() {
+		log.trace("cancelParseRequest()")
+		
+		isParsing = false
+		parseIndex += 1
+		parseProgress = nil
+	}
+	
+	func cancelLnurlFetch() {
+		log.trace("cancelLnurlFetch()")
 		
 		payIndex += 1
-		isLnurlPayFetch = false
+		
+		paymentInProgress = false
+		isLnurlFetch = false
 	}
 	
-	func didCancelLnurlWithdrawFetch() {
-		log.trace("didCancelLnurlWithdrawFetch()")
+	func popToHomeView() {
+		log.trace("popToHomeView()")
 		
-		payIndex += 1
-		isLnurlWithdrawFetch = false
-	}
-	
-	func didSendPayment() {
-		log.trace("didSendPayment()")
-		
+		// Todo: Need a solution for iOS 16
 		navCoordinator.path.removeAll()
 	}
 	
@@ -2027,6 +2109,226 @@ struct NewValidateView: View {
 		
 		popoverState.display(dismissable: true) {
 			AppStatusPopover()
+		}
+	}
+	
+	func copyLink(_ url: URL) {
+		log.trace("copyLink()")
+		
+		UIPasteboard.general.string = url.absoluteString
+		toast.pop(
+			NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
+			colorScheme: colorScheme.opposite
+		)
+	}
+	
+	func openLink(_ url: URL) {
+		log.trace("openLink()")
+		
+		// Strange SwiftUI bug:
+		// https://forums.developer.apple.com/forums/thread/750514
+		//
+		// Simply declaring the following environment variable:
+		// @Environment(\.openURL) var openURL: OpenURLAction
+		//
+		// Somehow causes an infinite loop in SwiftUI !
+		// I encountered this multiple times while testing,
+		// and the suggested workaround is to use plain UIApplication calls.
+		/*
+		openURL(url)
+		*/
+		
+		if UIApplication.shared.canOpenURL(url) {
+			UIApplication.shared.open(url)
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: SendManger
+	// --------------------------------------------------
+	
+	func parseUserInput(_ input: String) {
+		log.trace("parseUserInput()")
+		
+		guard !isParsing else {
+			log.warning("parseUserInput: ignoring: isParsing == true")
+			return
+		}
+		
+		isParsing = true
+		parseIndex += 1
+		let index = parseIndex
+		
+		Task { @MainActor in
+			do {
+				let progressHandler = {(progress: SendManager.ParseProgress) -> Void in
+					if index == parseIndex {
+						self.parseProgress = progress
+					} else {
+						log.warning("parseUserInput: progressHandler: ignoring: cancelled")
+					}
+				}
+				
+				let result: SendManager.ParseResult = try await Biz.business.sendManager.parse(
+					request: input,
+					progress: progressHandler
+				)
+				
+				if index == parseIndex {
+					isParsing = false
+					parseProgress = nil
+					
+					if let badRequest = result as? SendManager.ParseResult_BadRequest {
+						showErrorToast(badRequest)
+					} else {
+						flow = result
+					}
+					
+				} else {
+					log.warning("parseUserInput: result: ignoring: cancelled")
+				}
+				
+			} catch {
+				log.error("parseUserInput: error: \(error)")
+				
+				if index == parseIndex {
+					isParsing = false
+					parseProgress = nil
+				}
+			}
+		} // </Task>
+	}
+	
+	func showErrorToast(_ result: SendManager.ParseResult_BadRequest) {
+		log.trace("showErrorToast()")
+		
+		let msg: String
+		var websiteLink: URL? = nil
+		
+		switch result.reason {
+		case is SendManager.BadRequestReason_Expired:
+			
+			msg = NSLocalizedString(
+				"Invoice is expired",
+				comment: "Error message - scanning lightning invoice"
+			)
+			
+		case let chainMismatch as SendManager.BadRequestReason_ChainMismatch:
+			
+			msg = NSLocalizedString(
+				"The invoice is not for \(chainMismatch.expected.name)",
+				comment: "Error message - scanning lightning invoice"
+			)
+			
+		case is SendManager.BadRequestReason_UnsupportedLnurl:
+			
+			msg = NSLocalizedString(
+				"Phoenix does not support this type of LNURL yet",
+				comment: "Error message - scanning lightning invoice"
+			)
+			
+		case is SendManager.BadRequestReason_AlreadyPaidInvoice:
+			
+			msg = NSLocalizedString(
+				"You've already paid this invoice. Paying it again could result in stolen funds.",
+				comment: "Error message - scanning lightning invoice"
+			)
+
+		case is SendManager.BadRequestReason_Bip353InvalidOffer:
+			
+			msg = NSLocalizedString(
+				"This address uses an invalid Bolt12 offer.",
+				comment: "Error message - dns record contains an invalid offer"
+			)
+			
+		case is SendManager.BadRequestReason_Bip353NoDNSSEC:
+			
+			msg = NSLocalizedString(
+				"This address is hosted on an unsecure DNS. DNSSEC must be enabled.",
+				comment: "Error message - dns issue"
+			)
+
+		case let serviceError as SendManager.BadRequestReason_ServiceError:
+			
+			let remoteFailure: LnurlError.RemoteFailure = serviceError.error
+			let origin = remoteFailure.origin
+			
+			let isLightningAddress = serviceError.url.description.contains("/.well-known/lnurlp/")
+			let lightningAddressErrorMessage = NSLocalizedString(
+				"The service (\(origin)) doesn't support Lightning addresses, or doesn't know this user",
+				comment: "Error message - scanning lightning invoice"
+			)
+			
+			switch remoteFailure {
+			case is LnurlError.RemoteFailure_CouldNotConnect:
+				msg = NSLocalizedString(
+					"Could not connect to service: \(origin)",
+					comment: "Error message - scanning lightning invoice"
+				)
+				
+			case is LnurlError.RemoteFailure_Unreadable:
+				let scheme = serviceError.url.protocol.name.lowercased()
+				if scheme == "https" || scheme == "http" {
+					websiteLink = URL(string: serviceError.url.description())
+				}
+				msg = NSLocalizedString(
+					"Unreadable response from service: \(origin)",
+					comment: "Error message - scanning lightning invoice"
+				)
+				
+			case let rfDetailed as LnurlError.RemoteFailure_Detailed:
+				if isLightningAddress {
+					msg = lightningAddressErrorMessage
+				} else {
+					msg = NSLocalizedString(
+						"The service (\(origin)) returned error message: \(rfDetailed.reason)",
+						comment: "Error message - scanning lightning invoice"
+					)
+				}
+				
+			case let rfCode as LnurlError.RemoteFailure_Code:
+				if isLightningAddress {
+					msg = lightningAddressErrorMessage
+				} else {
+					msg = NSLocalizedString(
+						"The service (\(origin)) returned error code: \(rfCode.code.value)",
+						comment: "Error message - scanning lightning invoice"
+					)
+				}
+				
+			default:
+				msg = NSLocalizedString(
+					"The service (\(origin)) appears to be offline, or they have a down server",
+					comment: "Error message - scanning lightning invoice"
+				)
+			}
+			
+		default:
+			
+			msg = NSLocalizedString(
+				"This doesn't appear to be a Lightning invoice",
+				comment: "Error message - scanning lightning invoice"
+			)
+		}
+		
+		if let websiteLink {
+			popoverState.display(dismissable: true) {
+				WebsiteLinkPopover(
+					link: websiteLink,
+					copyAction: copyLink,
+					openAction: openLink
+				)
+			}
+			
+		} else {
+			toast.pop(
+				msg,
+				colorScheme: colorScheme.opposite,
+				style: .chrome,
+				duration: 30.0,
+				alignment: .middle,
+				showCloseButton: true
+			)
 		}
 	}
 }

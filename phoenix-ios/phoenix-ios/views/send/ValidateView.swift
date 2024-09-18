@@ -1001,7 +1001,10 @@ struct ValidateView: View {
 			log.debug("triggering popover w/PaymentLayerChoice")
 	
 			popoverState.display(dismissable: false) {
-				PaymentLayerChoice(mvi: mvi)
+				PaymentLayerChoice(
+					didChooseL1: self.paymentLayerChoice_didChooseL1,
+					didChooseL2: self.paymentLayerChoice_didChooseL2
+				)
 			} onWillDisappear: {
 				hasPickedSwapOutMode = true
 			}
@@ -1080,6 +1083,28 @@ struct ValidateView: View {
 			preTipAmountMsat = nil
 			postTipAmountMsat = nil
 		}
+	}
+	
+	func paymentLayerChoice_didChooseL1() {
+		log.trace("paymentLayerChoice_didChooseL1()")
+		
+		// Nothing to do here except close the popover.
+		// We're already setup to process the payment on L1.
+		
+		popoverState.close()
+	}
+	
+	func paymentLayerChoice_didChooseL2() {
+		log.trace("paymentLayerChoice_didChooseL2()")
+		
+		// Switch to L2
+		if let model = mvi.model as? Scan.Model_OnChainFlow,
+			let paymentRequest = model.uri.paymentRequest
+		{
+			mvi.intent(Scan.Intent_Parse(request: paymentRequest.write()))
+		}
+		
+		popoverState.close()
 	}
 	
 	// --------------------------------------------------

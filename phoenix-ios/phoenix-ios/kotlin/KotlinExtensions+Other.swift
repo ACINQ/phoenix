@@ -77,35 +77,37 @@ extension Connections {
 extension LnurlAuth {
 	
 	static var defaultActionPromptTitle: String {
-		return NSLocalizedString("Authenticate", comment: "lnurl-auth: login button title")
+		return String(localized: "Authenticate", comment: "lnurl-auth: login button title")
 	}
 	
 	var actionPromptTitle: String {
-		if let action = self.action {
-			switch action {
-				case .register  : return NSLocalizedString("Register",     comment: "lnurl-auth: login button title")
-				case .login     : return NSLocalizedString("Login",        comment: "lnurl-auth: login button title")
-				case .link      : return NSLocalizedString("Link",         comment: "lnurl-auth: login button title")
-				case .auth      : return NSLocalizedString("Authenticate", comment: "lnurl-auth: login button title")
-			}
+		guard let action else {
+			return LnurlAuth.defaultActionPromptTitle
 		}
-		return LnurlAuth.defaultActionPromptTitle
+		
+		switch action {
+		case .register : return String(localized: "Register",     comment: "lnurl-auth: login button title")
+		case .login    : return String(localized: "Login",        comment: "lnurl-auth: login button title")
+		case .link     : return String(localized: "Link",         comment: "lnurl-auth: login button title")
+		case .auth     : return String(localized: "Authenticate", comment: "lnurl-auth: login button title")
+		}
 	}
 	
 	static var defaultActionSuccessTitle: String {
-		return NSLocalizedString("Authenticated", comment: "lnurl-auth: success text")
+		return String(localized: "Authenticated", comment: "lnurl-auth: success text")
 	}
 	
 	var actionSuccessTitle: String {
-		if let action = self.action {
-			switch action {
-				case .register  : return NSLocalizedString("Registered",    comment: "lnurl-auth: success text")
-				case .login     : return NSLocalizedString("Logged In",     comment: "lnurl-auth: success text")
-				case .link      : return NSLocalizedString("Linked",        comment: "lnurl-auth: success text")
-				case .auth      : return NSLocalizedString("Authenticated", comment: "lnurl-auth: success text")
-			}
+		guard let action else {
+			return LnurlAuth.defaultActionSuccessTitle
 		}
-		return LnurlAuth.defaultActionSuccessTitle
+		
+		switch action {
+		case .register  : return String(localized: "Registered",    comment: "lnurl-auth: success text")
+		case .login     : return String(localized: "Logged In",     comment: "lnurl-auth: success text")
+		case .link      : return String(localized: "Linked",        comment: "lnurl-auth: success text")
+		case .auth      : return String(localized: "Authenticated", comment: "lnurl-auth: success text")
+		}
 	}
 }
 
