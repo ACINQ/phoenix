@@ -218,7 +218,8 @@ class AppConfigurationManager(
 
     fun randomElectrumServer() = when (chain) {
         Chain.Mainnet -> mainnetElectrumServers.random()
-        Chain.Testnet -> testnetElectrumServers.random()
+        Chain.Testnet3 -> testnetElectrumServers.random()
+        Chain.Testnet4 -> TODO()
         Chain.Signet -> TODO()
         Chain.Regtest -> platformElectrumRegtestConf()
     }

@@ -16,7 +16,8 @@ class BlockchainExplorer(private val chain: Chain) {
             Website.MempoolSpace -> {
                 when (chain) {
                     Chain.Mainnet -> "${website.base}/tx/$txId"
-                    Chain.Testnet -> "${website.base}/testnet/tx/$txId"
+                    Chain.Testnet3 -> "${website.base}/testnet/tx/$txId"
+                    Chain.Testnet4 -> "${website.base}/testnet4/tx/$txId"
                     Chain.Signet -> "${website.base}/signet/tx/$txId"
                     Chain.Regtest -> "${website.base}/_REGTEST_/tx/$txId"
                 }
@@ -24,7 +25,8 @@ class BlockchainExplorer(private val chain: Chain) {
             Website.BlockstreamInfo -> {
                 when (chain) {
                     Chain.Mainnet -> "${website.base}/tx/$txId"
-                    Chain.Testnet -> "${website.base}/testnet/tx/$txId"
+                    Chain.Testnet3 -> "${website.base}/testnet/tx/$txId"
+                    Chain.Testnet4 -> "${website.base}/testnet4/tx/$txId"
                     Chain.Signet -> "${website.base}/signet/tx/$txId"
                     Chain.Regtest -> "${website.base}/_REGTEST_/tx/$txId"
                 }
@@ -37,7 +39,8 @@ class BlockchainExplorer(private val chain: Chain) {
             Website.MempoolSpace -> {
                 when (chain) {
                     Chain.Mainnet -> "${website.base}/address/$addr"
-                    Chain.Testnet -> "${website.base}/testnet/address/$addr"
+                    Chain.Testnet3 -> "${website.base}/testnet/address/$addr"
+                    Chain.Testnet4 -> "${website.base}/testnet4/address/$addr"
                     Chain.Signet -> "${website.base}/signet/address/$addr"
                     Chain.Regtest -> "${website.base}/_REGTEST_/address/$addr"
                 }
@@ -45,7 +48,8 @@ class BlockchainExplorer(private val chain: Chain) {
             Website.BlockstreamInfo -> {
                 when (chain) {
                     Chain.Mainnet -> "${website.base}/address/$addr"
-                    Chain.Testnet -> "${website.base}/testnet/address/$addr"
+                    Chain.Testnet3 -> "${website.base}/testnet/address/$addr"
+                    Chain.Testnet4 -> "${website.base}/testnet4/address/$addr"
                     Chain.Signet -> "${website.base}/signet/address/$addr"
                     Chain.Regtest -> "${website.base}/_REGTEST_/address/$addr"
                 }

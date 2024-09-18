@@ -1,5 +1,7 @@
 # Build
 build/
+.cxx
+.kotlin
 
 # Idea
 .idea
@@ -24,8 +26,6 @@ sdk-dependencies
 apk
 phoenix-legacy/release
 phoenix-legacy/debug
-.cxx
 
 # LangTool
 .langtool/deepl.authtoken
-
