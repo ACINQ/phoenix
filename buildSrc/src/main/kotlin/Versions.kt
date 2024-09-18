@@ -3,10 +3,10 @@ object Versions {
     const val secp256k1 = "0.14.0"
     const val torMobile = "0.2.0"
 
-    const val kotlin = "1.9.22"
+    const val kotlin = "2.0.10"
 
-    const val ktor = "2.3.7"
-    const val sqlDelight = "2.0.1"
+    const val ktor = "2.3.12"
+    const val sqlDelight = "2.0.2"
 
     const val slf4j = "1.7.30"
     const val junit = "4.13"
