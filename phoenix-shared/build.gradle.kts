@@ -71,7 +71,7 @@ kotlin {
                     // The notification-service-extension is limited to 24 MB of memory.
                     // With mimalloc we can easily hit the 24 MB limit, and the OS kills the process.
                     // But with standard allocation, we're using less then half the limit.
-                    kotlinOptions.freeCompilerArgs += "-Xallocator=std"
+                    //kotlinOptions.freeCompilerArgs += "-Xallocator=std"
                     kotlinOptions.freeCompilerArgs += listOf("-linker-options", "-application_extension")
                     // workaround for xcode 15 and kotlin < 1.9.10: 
                     // https://youtrack.jetbrains.com/issue/KT-60230/Native-unknown-options-iossimulatorversionmin-sdkversion-with-Xcode-15-beta-3
