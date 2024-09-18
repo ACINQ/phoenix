@@ -93,7 +93,7 @@ class BusinessManager {
 	private init() { // must use shared instance
 		
 		business = PhoenixBusiness(ctx: PlatformContext.default)
-		BusinessManager._isTestnet = business.chain.isTestnet()
+		BusinessManager._isTestnet = business.chain.isTestnet3()
 		
 		let nc = NotificationCenter.default
 		
