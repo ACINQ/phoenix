@@ -40,7 +40,6 @@ struct MainView_Small: View {
 	@State var showingMergeChannelsView = false
 	
 	let externalLightningUrlPublisher = AppDelegate.get().externalLightningUrlPublisher
-	@State var externalLightningRequest: AppScanController? = nil
 	
 	@ScaledMetric var sendImageSize: CGFloat = 17
 	@ScaledMetric var receiveImageSize: CGFloat = 18
@@ -534,8 +533,7 @@ struct MainView_Small: View {
 			ReceiveView()
 			
 		case .SendView:
-		//	SendView(location: .MainView, controller: externalLightningRequest)
-			NewSendView(location: .MainView)
+			SendView(location: .MainView)
 			
 		case .CurrencyConverter:
 			CurrencyConverterView()
@@ -547,10 +545,10 @@ struct MainView_Small: View {
 			LiquidityAdsView(location: .embedded)
 			
 		case .LoginView(let flow):
-			NewLoginView(flow: flow)
+			LoginView(flow: flow)
 			
 		case .ValidateView(let flow):
-			NewValidateView(flow: flow)
+			ValidateView(flow: flow)
 		}
 	}
 	
@@ -737,10 +735,6 @@ struct MainView_Small: View {
 				self.navLinkTag = forcedNavLinkTag
 				
 			} else if tag == nil {
-				
-				// If we pushed the SendView, triggered by an external lightning url,
-				// then we can nil out the associated controller now (since we handed off to SendView).
-				self.externalLightningRequest = nil
 				
 				// If there's a pending popToDestination, it's now safe to continue the flow.
 				//

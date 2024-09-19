@@ -187,7 +187,7 @@ struct MainView_BigPrimary: View {
 		
 		switch tag {
 			case .ReceiveView : ReceiveView()
-			case .SendView    : SendView(location: .MainView, controller: externalLightningRequest)
+			case .SendView    : SendView(location: .MainView)
 		}
 	}
 	

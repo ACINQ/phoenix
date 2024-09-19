@@ -18,11 +18,21 @@ enum Problem: Error {
 
 struct ValidateView: View {
 	
-	enum NavLinkTag: String, Codable {
+	enum NavLinkTag: Hashable, CustomStringConvertible {
 		case CurrencyConverter
+		case PaymentRequestedView(invoice: Lightning_kmpBolt11Invoice)
+		
+		var description: String {
+			switch self {
+			case .CurrencyConverter       : return "CurrencyConverter"
+			case .PaymentRequestedView(_) : return "PaymentRequestedView"
+			}
+		}
 	}
 
-	@ObservedObject var mvi: MVIState<Scan.Model, Scan.Intent>
+	@State var flow: SendManager.ParseResult
+	
+	@State var isLnurlFetch: Bool = false
 	
 	@State var currency = Currency.bitcoin(.sat)
 	@State var currencyList: [Currency] = [Currency.bitcoin(.sat)]
@@ -61,10 +71,14 @@ struct ValidateView: View {
 	
 	@State var didAppear = false
 	
+	@State var isParsing: Bool = false
+	@State var parseIndex: Int = 0
+	@State var parseProgress: SendManager.ParseProgress? = nil
+	
+	@State var payIndex: Int = 0
+	
 	let balancePublisher = Biz.business.balanceManager.balancePublisher()
 	@State var balanceMsat: Int64 = 0
-	
-	@StateObject var connectionsMonitor = ObservableConnectionsMonitor()
 	
 	// For the cicular buttons: [metadata, tip, comment]
 	enum MaxButtonWidth: Preference {}
@@ -78,12 +92,24 @@ struct ValidateView: View {
 	@State var navLinkTag: NavLinkTag? = nil
 	// </iOS_16_workarounds>
 	
+	@StateObject var toast = Toast()
+	@StateObject var connectionsMonitor = ObservableConnectionsMonitor()
+	
+	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var popoverState: PopoverState
 	@EnvironmentObject var smartModalState: SmartModalState
+	
+	// --------------------------------------------------
+	// MARK: Init
+	// --------------------------------------------------
+	
+	init(flow: SendManager.ParseResult) {
+		self._flow = State(initialValue: flow)
+	}
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -93,18 +119,18 @@ struct ValidateView: View {
 	var body: some View {
 		
 		layers()
-		.navigationTitle(
-			mvi.model is Scan.Model_LnurlWithdrawFlow
-				? NSLocalizedString("Confirm Withdraw", comment: "Navigation bar title")
-				: NSLocalizedString("Confirm Payment", comment: "Navigation bar title")
-		)
-		.navigationBarTitleDisplayMode(.inline)
-		.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
-			navLinkView()
-		}
-		.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
-			navLinkView(tag)
-		}
+			.navigationTitle(
+				isLnurlWithdrawFlow
+					? NSLocalizedString("Confirm Withdraw", comment: "Navigation bar title")
+					: NSLocalizedString("Confirm Payment", comment: "Navigation bar title")
+			)
+			.navigationBarTitleDisplayMode(.inline)
+			.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
+				navLinkView()
+			}
+			.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
+				navLinkView(tag)
+			}
 	}
 	
 	@ViewBuilder
@@ -132,31 +158,25 @@ struct ValidateView: View {
 				}
 			}
 			
-			if mvi.model is Scan.Model_LnurlPayFlow_LnurlPayFetch {
+			if parseProgress != nil {
 				FetchActivityNotice(
-					title: NSLocalizedString("Fetching Invoice", comment: "Progress title"),
-					onCancel: { didCancelLnurlPayFetch() }
-				)
-			}
-			else if mvi.model is Scan.Model_LnurlWithdrawFlow_LnurlWithdrawFetch {
-				FetchActivityNotice(
-					title: NSLocalizedString("Forwarding Invoice", comment: "Progress title"),
-					onCancel: { didCancelLnurlWithdrawFetch() }
+					title: fetchActivityTitle_parsing(),
+					onCancel: { cancelParseRequest() }
 				)
 			}
 			
+			if isLnurlFetch {
+				FetchActivityNotice(
+					title: fetchActivityTitle_lnurlFetch(),
+					onCancel: { cancelLnurlFetch() }
+				)
+			}
+			
+			toast.view()
+			
 		}// </ZStack>
-		.transition(
-			.asymmetric(
-				insertion: .identity,
-				removal: .opacity
-			)
-		)
 		.onAppear() {
 			onAppear()
-		}
-		.onChange(of: mvi.model) { newModel in
-			modelDidChange(newModel)
 		}
 		.onChange(of: amount) { _ in
 			amountDidChange()
@@ -209,7 +229,7 @@ struct ValidateView: View {
 
 		if let host = paymentHost() {
 			VStack(alignment: HorizontalAlignment.center, spacing: 10) {
-				if mvi.model is Scan.Model_LnurlWithdrawFlow {
+				if isLnurlWithdrawFlow {
 					Text("You are redeeming funds from")
 				} else {
 					Text("Payment requested by")
@@ -221,7 +241,7 @@ struct ValidateView: View {
 			.accessibilityElement(children: .combine)
 		}
 		
-		if mvi.model is Scan.Model_LnurlWithdrawFlow {
+		if isLnurlWithdrawFlow {
 			Text("amount to receive")
 				.textCase(.uppercase)
 				.padding(.bottom, 4)
@@ -397,8 +417,8 @@ struct ValidateView: View {
 	@ViewBuilder
 	func paymentButton() -> some View {
 		
-		let needsPrepare = (mvi.model is Scan.Model_OnChainFlow) && (minerFeeInfo == nil)
-		let fetchingInvoice = (mvi.model is Scan.Model_OfferFlow) && paymentInProgress
+		let needsPrepare = isOnChainFlow && (minerFeeInfo == nil)
+		let fetchingInvoice = isBolt12OfferFlow && paymentInProgress
 		
 		Button {
 			if needsPrepare {
@@ -417,7 +437,7 @@ struct ValidateView: View {
 						.progressViewStyle(CircularProgressViewStyle())
 						.padding(.trailing, 2)
 					Text("Fetching invoice...")
-				} else if mvi.model is Scan.Model_LnurlWithdrawFlow {
+				} else if isLnurlWithdrawFlow {
 					Image("ic_receive")
 						.renderingMode(.template)
 						.resizable()
@@ -504,6 +524,13 @@ struct ValidateView: View {
 				didChange: currencyConverterAmountChanged,
 				didClose: {}
 			)
+			
+		case .PaymentRequestedView(let invoice):
+			if let withdrawFlow = flow as? SendManager.ParseResult_Lnurl_Withdraw {
+				PaymentRequestedView(flow: withdrawFlow, invoice: invoice)
+			} else {
+				EmptyView()
+			}
 		}
 	}
 	
@@ -523,6 +550,34 @@ struct ValidateView: View {
 		return !connectionsMonitor.connections.global.isEstablished()
 	}
 	
+	var isBolt11InvoiceFlow: Bool {
+		return flow is SendManager.ParseResult_Bolt11Invoice
+	}
+	
+	var isBolt12OfferFlow: Bool {
+		return flow is SendManager.ParseResult_Bolt12Offer
+	}
+	
+	var isLnurlPayFlow: Bool {
+		return flow is SendManager.ParseResult_Lnurl_Pay
+	}
+	
+	var isLnurlWithdrawFlow: Bool {
+		return flow is SendManager.ParseResult_Lnurl_Withdraw
+	}
+	
+	var isLnurlAuthFlow: Bool {
+		return flow is SendManager.ParseResult_Lnurl_Auth
+	}
+	
+	var isOnChainFlow: Bool {
+		// This is a bit confusing, because a Uri might contain (for example) both L1 & L2 instructions.
+		// But when this is the case, we prompt the user to choose which layer.
+		// And if they choose L2, then we call `parse` again, and update our `flow` variable.
+		//
+		return flow is SendManager.ParseResult_Uri
+	}
+	
 	func currencyStyler() -> TextFieldCurrencyStyler {
 		return TextFieldCurrencyStyler(
 			currency: currency,
@@ -531,6 +586,24 @@ struct ValidateView: View {
 			hideMsats: false,
 			userDidEdit: { userDidEditTextField() }
 		)
+	}
+	
+	func fetchActivityTitle_parsing() -> String {
+		
+		if parseProgress is SendManager.ParseProgress_LnurlServiceFetch {
+			return String(localized: "Fetching Lightning URL", comment: "Progress title")
+		} else {
+			return String(localized: "Resolving lightning address", comment: "Progress title")
+		}
+	}
+	
+	func fetchActivityTitle_lnurlFetch() -> String {
+		
+		if isLnurlPayFlow {
+			return String(localized: "Fetching Invoice", comment: "Progress title")
+		} else {
+			return String(localized: "Forwarding Invoice", comment: "Progress title")
+		}
 	}
 	
 	func paymentHost() -> String? {
@@ -608,7 +681,7 @@ struct ValidateView: View {
 	
 	func showTipButton() -> Bool {
 		
-		if mvi.model is Scan.Model_OnChainFlow {
+		if isOnChainFlow {
 			return true
 			
 		} else if let _ = bolt11Invoice() {
@@ -660,7 +733,7 @@ struct ValidateView: View {
 	
 	func paymentButtonHint() -> String {
 		
-		if mvi.model is Scan.Model_OnChainFlow {
+		if isOnChainFlow {
 			
 			return NSLocalizedString("continue to next step", comment: "VoiceOver hint")
 			
@@ -734,7 +807,7 @@ struct ValidateView: View {
 		} else if let lnurlWithdraw = lnurlWithdraw() {
 			return lnurlWithdraw.maxWithdrawable
 			
-		} else if let model = mvi.model as? Scan.Model_OnChainFlow {
+		} else if let model = flow as? SendManager.ParseResult_Uri {
 			
 			if let amount_sat = model.uri.amount {
 				return Lightning_kmpMilliSatoshi(sat: amount_sat)
@@ -748,7 +821,7 @@ struct ValidateView: View {
 	
 	func bolt11Invoice() -> Lightning_kmpBolt11Invoice? {
 		
-		if let model = mvi.model as? Scan.Model_Bolt11InvoiceFlow_InvoiceRequest {
+		if let model = flow as? SendManager.ParseResult_Bolt11Invoice {
 			return model.invoice
 		} else {
 			return nil
@@ -757,7 +830,7 @@ struct ValidateView: View {
 	
 	func bolt12Offer() -> Lightning_kmpOfferTypesOffer? {
 		
-		if let model = mvi.model as? Scan.Model_OfferFlow {
+		if let model = flow as? SendManager.ParseResult_Bolt12Offer {
 			return model.offer
 		} else {
 			return nil
@@ -766,11 +839,7 @@ struct ValidateView: View {
 	
 	func lnurlPay() -> LnurlPay.Intent? {
 		
-		if let model = mvi.model as? Scan.Model_LnurlPayFlow {
-			return model.paymentIntent
-		} else if let model = mvi.model as? Scan.Model_LnurlPayFlow_LnurlPayFetch {
-			return model.paymentIntent
-		} else if let model = mvi.model as? Scan.Model_LnurlPayFlow_LnurlPayRequest {
+		if let model = flow as? SendManager.ParseResult_Lnurl_Pay {
 			return model.paymentIntent
 		} else {
 			return nil
@@ -779,9 +848,7 @@ struct ValidateView: View {
 	
 	func lnurlWithdraw() -> LnurlWithdraw? {
 		
-		if let model = mvi.model as? Scan.Model_LnurlWithdrawFlow_LnurlWithdrawRequest {
-			return model.lnurlWithdraw
-		} else if let model = mvi.model as? Scan.Model_LnurlWithdrawFlow_LnurlWithdrawFetch {
+		if let model = flow as? SendManager.ParseResult_Lnurl_Withdraw {
 			return model.lnurlWithdraw
 		} else {
 			return nil
@@ -795,7 +862,7 @@ struct ValidateView: View {
 	///
 	func isAmountlessInvoice() -> Bool {
 		
-		if mvi.model is Scan.Model_OnChainFlow {
+		if isOnChainFlow {
 			return true
 		} else if let invoice = bolt11Invoice() {
 			return invoice.amount == nil
@@ -865,7 +932,7 @@ struct ValidateView: View {
 		let tipMsat = recipientAmountMsat - baseMsat
 		
 		let lightningFeeMsat: Int64
-		if mvi.model is Scan.Model_OnChainFlow {
+		if isOnChainFlow {
 			lightningFeeMsat = 0
 		} else if let _ = lnurlWithdraw() {
 			lightningFeeMsat = 0
@@ -994,9 +1061,9 @@ struct ValidateView: View {
 			problem = nil // display in gray at very beginning
 		}
 		
-		if let model = mvi.model as? Scan.Model_OnChainFlow,
-		   model.uri.paymentRequest != nil,
-		   !hasPickedSwapOutMode
+		if let model = flow as? SendManager.ParseResult_Uri,
+			model.uri.paymentRequest != nil,
+			!hasPickedSwapOutMode
 		{
 			log.debug("triggering popover w/PaymentLayerChoice")
 	
@@ -1014,38 +1081,6 @@ struct ValidateView: View {
 	// --------------------------------------------------
 	// MARK: Notifications
 	// --------------------------------------------------
-	
-	func modelDidChange(_ newModel: Scan.Model) {
-		log.trace("modelDidChange()")
-		
-		// There are several transitions that require re-calculating the altAmout:
-		//
-		// * SwapOutFlow_Requesting -> SwapOutFlow_Ready => amount + minerFee >? balance
-		// * SwapOutFlow_Ready -> SwapOutFlow_Init       => remove minerFee from calculations
-		// * OnChainFlow -> InvoiceFlow_X                => range changed (e.g. minAmount)
-		//
-		if newModel is Scan.Model_Bolt11InvoiceFlow {
-			
-			refreshAltAmount()
-		}
-		
-		if let model = newModel as? Scan.Model_LnurlPayFlow_LnurlPayRequest {
-			if let payError = model.error {
-				
-				popoverState.display(dismissable: true) {
-					LnurlFlowErrorNotice(error: LnurlFlowError.pay(error: payError))
-				}
-			}
-			
-		} else if let model = newModel as? Scan.Model_LnurlWithdrawFlow_LnurlWithdrawRequest {
-			if let withdrawError = model.error {
-				
-				popoverState.display(dismissable: true) {
-					LnurlFlowErrorNotice(error: LnurlFlowError.withdraw(error: withdrawError))
-				}
-			}
-		}
-	}
 	
 	func balanceDidChange(_ balance: Lightning_kmpMilliSatoshi?) {
 		log.trace("balanceDidChange()")
@@ -1097,13 +1132,14 @@ struct ValidateView: View {
 	func paymentLayerChoice_didChooseL2() {
 		log.trace("paymentLayerChoice_didChooseL2()")
 		
-		// Switch to L2
-		if let model = mvi.model as? Scan.Model_OnChainFlow,
+		guard
+			let model = flow as? SendManager.ParseResult_Uri,
 			let paymentRequest = model.uri.paymentRequest
-		{
-			mvi.intent(Scan.Intent_Parse(request: paymentRequest.write()))
+		else {
+			return
 		}
 		
+		parseUserInput(paymentRequest.write())
 		popoverState.close()
 	}
 	
@@ -1112,7 +1148,7 @@ struct ValidateView: View {
 	// --------------------------------------------------
 	
 	func navigateTo(_ tag: NavLinkTag) {
-		log.trace("navigateTo(\(tag.rawValue))")
+		log.trace("navigateTo(\(tag.description))")
 		
 		if #available(iOS 17, *) {
 			navCoordinator.path.append(tag)
@@ -1182,7 +1218,7 @@ struct ValidateView: View {
 				}
 			}
 			
-			if let msat = msat, !(mvi.model is Scan.Model_LnurlWithdrawFlow) {
+			if let msat = msat, !isLnurlWithdrawFlow {
 				
 				// There are 2 scenarios that we handle slightly differently:
 				// - amount user selected (amount + tip) exceeds balance
@@ -1198,8 +1234,8 @@ struct ValidateView: View {
 			}
 			
 			if problem == nil,
-			   let msat = msat,
-			   let range = priceRange()
+				let msat = msat,
+				let range = priceRange()
 			{
 				let minMsat = range.min.msat
 				let maxMsat = range.max.msat
@@ -1504,7 +1540,7 @@ struct ValidateView: View {
 		
 		guard
 			let msat = parsedAmountMsat(),
-			let model = mvi.model as? Scan.Model_OnChainFlow
+			let model = flow as? SendManager.ParseResult_Uri
 		else {
 			return
 		}
@@ -1590,47 +1626,67 @@ struct ValidateView: View {
 			return
 		}
 		
-		if let model = mvi.model as? Scan.Model_Bolt11InvoiceFlow_InvoiceRequest {
+		if let model = flow as? SendManager.ParseResult_Bolt11Invoice {
 			sendPayment_bolt11Invoice(model, msat)
 			
-		} else if let model = mvi.model as? Scan.Model_OfferFlow {
+		} else if let model = flow as? SendManager.ParseResult_Bolt12Offer {
 			sendPayment_bolt12Offer_C(model, msat)
 			
-		} else if let model = mvi.model as? Scan.Model_OnChainFlow {
+		} else if let model = flow as? SendManager.ParseResult_Uri {
 			sendPayment_onChain(model, msat)
 			
-		} else if let model = mvi.model as? Scan.Model_LnurlPayFlow_LnurlPayRequest {
+		} else if let model = flow as? SendManager.ParseResult_Lnurl_Pay {
 			sendPayment_lnurlPay(model, msat)
 			
-		} else if let model = mvi.model as? Scan.Model_LnurlWithdrawFlow_LnurlWithdrawRequest {
+		} else if let model = flow as? SendManager.ParseResult_Lnurl_Withdraw {
 			sendPayment_lnurlWithdraw(model, msat)
 		}
 	}
 	
 	func sendPayment_bolt11Invoice(
-		_ model: Scan.Model_Bolt11InvoiceFlow_InvoiceRequest,
+		_ model: SendManager.ParseResult_Bolt11Invoice,
 		_ msat: Int64
 	) {
 		log.trace("sendPayment_bolt11Invoice")
 		
+		guard !paymentInProgress else {
+			log.warning("ignore: payment already in progress")
+			return
+		}
 		guard let trampolineFees = defaultTrampolineFees() else {
 			log.warning("ignore: trapolineFees == nil")
 			return
 		}
 		
+		paymentInProgress = true
 		saveTipPercentInPrefs()
-		mvi.intent(Scan.Intent_Bolt11InvoiceFlow_SendInvoicePayment(
-			invoice: model.invoice,
-			amount: Lightning_kmpMilliSatoshi(msat: msat),
-			trampolineFees: trampolineFees
-		))
+		Task { @MainActor in
+			do {
+				try await Biz.business.sendManager.payBolt11Invoice(
+					amountToSend: Lightning_kmpMilliSatoshi(msat: msat),
+					trampolineFees: trampolineFees,
+					invoice: model.invoice,
+					metadata: nil
+				)
+				popToHomeView()
+				
+			} catch {
+				log.error("payBolt11Invoice(): error: \(error)")
+				paymentInProgress = false
+			}
+		} // </Task>
 	}
 	
 	func sendPayment_bolt12Offer_test(
-		_ model: Scan.Model_OfferFlow,
+		_ model: SendManager.ParseResult_Bolt12Offer,
 		_ msat: Int64
 	) {
 		log.trace("sendPayment_bolt12Offer()_test")
+		
+		guard !paymentInProgress else {
+			log.warning("ignore: payment already in progress")
+			return
+		}
 		
 		paymentInProgress = true
 		DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) {
@@ -1640,15 +1696,17 @@ struct ValidateView: View {
 	}
 	
 	func sendPayment_bolt12Offer_B(
-		_ model: Scan.Model_OfferFlow,
+		_ model: SendManager.ParseResult_Bolt12Offer,
 		_ msat: Int64
 	) {
 		log.trace("sendPayment_bolt12Offer_B()")
 		
-		guard
-			let peer = Biz.business.peerManager.peerStateValue(),
-			paymentInProgress == false
-		else {
+		guard !paymentInProgress else {
+			log.warning("ignore: payment already in progress")
+			return
+		}
+		guard let peer = Biz.business.peerManager.peerStateValue() else {
+			log.warning("ignore: peer == nil")
 			return
 		}
 		
@@ -1679,39 +1737,41 @@ struct ValidateView: View {
 					fetchInvoiceTimeoutInSeconds: 30
 				)
 				
-				self.paymentInProgress = false
+				paymentInProgress = false
 				
 				switch onEnum(of: result) {
 				case .offerNotPaid(let offerNotPaid):
 					let problem = PayOfferProblem.fromResponse(offerNotPaid)
-					self.payOfferProblem = problem
+					payOfferProblem = problem
 					Biz.endLongLivedTask(id: paymentId.description())
 					
 				case .paymentNotSent(_): fallthrough
 				case .paymentSent(_):
-					self.payOfferProblem = nil
-					self.presentationMode.wrappedValue.dismiss()
+					payOfferProblem = nil
+					popToHomeView()
 				}
 				
 			} catch {
 				log.error("peer.payOffer(): error: \(error)")
 				
-				self.paymentInProgress = false
-				self.payOfferProblem = .other
+				paymentInProgress = false
+				payOfferProblem = .other
 			}
 		} // </Task>
 	}
 	
 	func sendPayment_bolt12Offer_C(
-		_ model: Scan.Model_OfferFlow,
+		_ model: SendManager.ParseResult_Bolt12Offer,
 		_ msat: Int64
 	) {
 		log.trace("sendPayment_bolt12Offer_C()")
 		
-		guard
-			let peer = Biz.business.peerManager.peerStateValue(),
-			paymentInProgress == false
-		else {
+		guard !paymentInProgress else {
+			log.warning("ignore: payment already in progress")
+			return
+		}
+		guard let peer = Biz.business.peerManager.peerStateValue() else {
+			log.warning("ignore: peer == nil")
 			return
 		}
 		
@@ -1742,37 +1802,42 @@ struct ValidateView: View {
 					fetchInvoiceTimeoutInSeconds: 30
 				)
 				
-				self.paymentInProgress = false
+				paymentInProgress = false
 				
 				if let problem = PayOfferProblem.fromResponse(response) {
-					self.payOfferProblem = problem
+					payOfferProblem = problem
 					Biz.endLongLivedTask(id: paymentId.description())
 					
 				} else {
-					self.payOfferProblem = nil
-					self.presentationMode.wrappedValue.dismiss()
+					payOfferProblem = nil
+					popToHomeView()
 				}
 			
 			} catch {
 				log.error("peer.payOffer(): error: \(error)")
 				
-				self.paymentInProgress = false
-				self.payOfferProblem = .other
+				paymentInProgress = false
+				payOfferProblem = .other
 			}
 		} // </Task>
 	}
 	
 	func sendPayment_onChain(
-		_ model: Scan.Model_OnChainFlow,
+		_ model: SendManager.ParseResult_Uri,
 		_ msat: Int64
 	) {
 		log.trace("sendPayment_onChain()")
 		
-		guard
-			let minerFeeInfo = minerFeeInfo,
-			let peer = Biz.business.peerManager.peerStateValue(),
-			paymentInProgress == false
-		else {
+		guard !paymentInProgress else {
+			log.warning("ignore: payment already in progress")
+			return
+		}
+		guard let peer = Biz.business.peerManager.peerStateValue() else {
+			log.warning("ignore: peer == nil")
+			return
+		}
+		guard let minerFeeInfo else {
+			log.warning("ignore: minerFeeInfo == nil")
 			return
 		}
 		
@@ -1791,28 +1856,32 @@ struct ValidateView: View {
 				self.paymentInProgress = false
 				
 				if let problem = SpliceOutProblem.fromResponse(response) {
-					self.spliceOutProblem = problem
+					spliceOutProblem = problem
 					
 				} else {
-					self.spliceOutProblem = nil
-					self.presentationMode.wrappedValue.dismiss()
+					spliceOutProblem = nil
+					popToHomeView()
 				}
 				
 			} catch {
 				log.error("peer.spliceOut(): error: \(error)")
 				
-				self.paymentInProgress = false
-				self.spliceOutProblem = .other
+				paymentInProgress = false
+				spliceOutProblem = .other
 			}
 		} // </Task>
 	}
 	
 	func sendPayment_lnurlPay(
-		_ model: Scan.Model_LnurlPayFlow_LnurlPayRequest,
+		_ model: SendManager.ParseResult_Lnurl_Pay,
 		_ msat: Int64
 	) {
 		log.trace("sendPayment_lnurlPay()")
 		
+		guard !paymentInProgress else {
+			log.warning("ignore: payment already in progress")
+			return
+		}
 		guard let trampolineFees = defaultTrampolineFees() else {
 			log.warning("ignore: trapolineFees == nil")
 			return
@@ -1841,9 +1910,9 @@ struct ValidateView: View {
 			
 			saveTipPercentInPrefs()
 			
-			let updateMsat: Lightning_kmpMilliSatoshi
+			let updatedMsat: Lightning_kmpMilliSatoshi
 			if currency.type == .bitcoin {
-				updateMsat = Lightning_kmpMilliSatoshi(msat: msat)
+				updatedMsat = Lightning_kmpMilliSatoshi(msat: msat)
 			} else {
 				// Workaround for WalletOfSatoshi bug:
 				//
@@ -1869,54 +1938,129 @@ struct ValidateView: View {
 				// https://github.com/ACINQ/phoenix/issues/388
 				//
 				let truncatedToSat = Lightning_kmpMilliSatoshi(msat: msat).truncateToSatoshi()
-				updateMsat = Lightning_kmpMilliSatoshi(sat: truncatedToSat)
+				updatedMsat = Lightning_kmpMilliSatoshi(sat: truncatedToSat)
 			}
 			
-			mvi.intent(Scan.Intent_LnurlPayFlow_RequestInvoice(
-				paymentIntent: model.paymentIntent,
-				amount: updateMsat,
-				trampolineFees: trampolineFees,
-				comment: comment
-			))
+			paymentInProgress = true
+			isLnurlFetch = true
+			let index = payIndex
+			let commentSnapshot = comment
+			
+			Task { @MainActor in
+				do {
+					let result1: Bitcoin_kmpEither<SendManager.LnurlPayError, LnurlPay.Invoice> =
+						try await Biz.business.sendManager.lnurlPay_requestInvoice(
+							paymentIntent: model.paymentIntent,
+							amount: updatedMsat,
+							comment: commentSnapshot
+						)
+					
+					guard index == payIndex else {
+						log.info("sendPayment_lnurlPay: ignoring fetch: cancelled")
+						return
+					}
+					isLnurlFetch = false
+					
+					if result1.isLeft {
+						let payError: SendManager.LnurlPayError = result1.left!
+						
+						popoverState.display(dismissable: true) {
+							LnurlFlowErrorNotice(error: LnurlFlowError.pay(error: payError))
+						}
+						
+					} else {
+						let invoice: LnurlPay.Invoice = result1.right!
+						
+						try await Biz.business.sendManager.lnurlPay_payInvoice(
+							paymentIntent: model.paymentIntent,
+							amount: updatedMsat,
+							comment: commentSnapshot,
+							invoice: invoice,
+							trampolineFees: trampolineFees
+						)
+						
+						popToHomeView()
+					}
+					
+				} catch {
+					log.error("sendPayment_lnurlPay: error: \(error)")
+					paymentInProgress = false
+					isLnurlFetch = false
+				}
+			} // </Task>
 		}
 	}
 	
 	func sendPayment_lnurlWithdraw(
-		_ model: Scan.Model_LnurlWithdrawFlow_LnurlWithdrawRequest,
+		_ model: SendManager.ParseResult_Lnurl_Withdraw,
 		_ msat: Int64
 	) {
 		log.trace("sendPayment_lnurlWithdraw()")
 		
+		paymentInProgress = true
+		isLnurlFetch = true
+		let index = payIndex
+		
 		saveTipPercentInPrefs()
-		mvi.intent(Scan.Intent_LnurlWithdrawFlow_SendLnurlWithdraw(
-			lnurlWithdraw: model.lnurlWithdraw,
-			amount: Lightning_kmpMilliSatoshi(msat: msat),
-			description: nil
-		))
+		Task { @MainActor in
+			do {
+				let invoice: Lightning_kmpBolt11Invoice =
+					try await Biz.business.sendManager.lnurlWithdraw_createInvoice(
+						lnurlWithdraw: model.lnurlWithdraw,
+						amount: Lightning_kmpMilliSatoshi(msat: msat),
+						description: nil
+					)
+				
+				guard index == payIndex else {
+					log.info("sendPayment_lnurlWithdraw: ignoring fetch: cancelled")
+					return
+				}
+				isLnurlFetch = false
+				
+				let withdrawError: SendManager.LnurlWithdrawError? =
+					try await Biz.business.sendManager.lnurlWithdraw_sendInvoice(
+						lnurlWithdraw: model.lnurlWithdraw,
+						invoice: invoice
+					)
+				
+				if let withdrawError {
+					popoverState.display(dismissable: true) {
+						LnurlFlowErrorNotice(error: LnurlFlowError.withdraw(error: withdrawError))
+					}
+				} else {
+					navigateTo(.PaymentRequestedView(invoice: invoice))
+				}
+				
+			} catch {
+				log.error("sendPayment_lnurlPay: error: \(error)")
+				paymentInProgress = false
+				isLnurlFetch = false
+			}
+		} // </Task>
 	}
 	
-	func didCancelLnurlPayFetch() {
-		log.trace("didCancelLnurlPayFetch()")
+	func cancelParseRequest() {
+		log.trace("cancelParseRequest()")
 		
-		guard let lnurlPay = lnurlPay() else {
-			return
-		}
-		
-		mvi.intent(Scan.Intent_LnurlPayFlow_CancelLnurlPayment(
-			lnurlPay: lnurlPay
-		))
+		isParsing = false
+		parseIndex += 1
+		parseProgress = nil
 	}
 	
-	func didCancelLnurlWithdrawFetch() {
-		log.trace("didCancelLnurlWithdrawFetch()")
+	func cancelLnurlFetch() {
+		log.trace("cancelLnurlFetch()")
 		
-		guard let lnurlWithdraw = lnurlWithdraw() else {
-			return
-		}
+		payIndex += 1
 		
-		mvi.intent(Scan.Intent_LnurlWithdrawFlow_CancelLnurlWithdraw(
-			lnurlWithdraw: lnurlWithdraw
-		))
+		paymentInProgress = false
+		isLnurlFetch = false
+	}
+	
+	func popToHomeView() {
+		log.trace("popToHomeView()")
+		
+		// Todo: Need a solution for iOS 16
+		navCoordinator.path.removeAll()
 	}
 	
 	func currencyConverterAmountChanged(_ result: CurrencyAmount?) {
@@ -1965,4 +2109,96 @@ struct ValidateView: View {
 			AppStatusPopover()
 		}
 	}
+	
+	func didCopyLink() {
+		log.trace("didCopyLink()")
+		
+		toast.pop(
+			NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
+			colorScheme: colorScheme.opposite
+		)
+	}
+	
+	// --------------------------------------------------
+	// MARK: SendManger
+	// --------------------------------------------------
+	
+	func parseUserInput(_ input: String) {
+		log.trace("parseUserInput()")
+		
+		guard !isParsing else {
+			log.warning("parseUserInput: ignoring: isParsing == true")
+			return
+		}
+		
+		isParsing = true
+		parseIndex += 1
+		let index = parseIndex
+		
+		Task { @MainActor in
+			do {
+				let progressHandler = {(progress: SendManager.ParseProgress) -> Void in
+					if index == parseIndex {
+						self.parseProgress = progress
+					} else {
+						log.warning("parseUserInput: progressHandler: ignoring: cancelled")
+					}
+				}
+				
+				let result: SendManager.ParseResult = try await Biz.business.sendManager.parse(
+					request: input,
+					progress: progressHandler
+				)
+				
+				if index == parseIndex {
+					isParsing = false
+					parseProgress = nil
+					
+					if let badRequest = result as? SendManager.ParseResult_BadRequest {
+						showErrorMessage(badRequest)
+					} else {
+						flow = result
+					}
+					
+				} else {
+					log.warning("parseUserInput: result: ignoring: cancelled")
+				}
+				
+			} catch {
+				log.error("parseUserInput: error: \(error)")
+				
+				if index == parseIndex {
+					isParsing = false
+					parseProgress = nil
+				}
+			}
+		} // </Task>
+	}
+	
+	func showErrorMessage(_ result: SendManager.ParseResult_BadRequest) {
+		log.trace("showErrorMessage()")
+		
+		let either = ParseResultHelper.processBadRequest(result)
+		switch either {
+		case .Left(let msg):
+			toast.pop(
+				msg,
+				colorScheme: colorScheme.opposite,
+				style: .chrome,
+				duration: 30.0,
+				alignment: .middle,
+				showCloseButton: true
+			)
+			
+		case .Right(let websiteLink):
+			popoverState.display(dismissable: true) {
+				WebsiteLinkPopover(
+					link: websiteLink,
+					didCopyLink: didCopyLink,
+					didOpenLink: nil
+				)
+			}
+		}
+	}
 }
+

@@ -10574,6 +10574,7 @@
       "comment" : "button label - try to make it short"
     },
     "Choose image" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -13292,6 +13293,7 @@
     },
     "Could not connect to service: (origin)" : {
       "comment" : "Error message - scanning lightning invoice",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -24272,6 +24274,7 @@
       }
     },
     "Less options" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -25811,6 +25814,7 @@
       }
     },
     "Manual input" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -27152,6 +27156,7 @@
       }
     },
     "More options" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -29339,6 +29344,7 @@
       }
     },
     "Paste from clipboard" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -29500,6 +29506,7 @@
       }
     },
     "Pay " : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -29540,6 +29547,7 @@
       }
     },
     "Pay %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -29580,6 +29588,7 @@
       }
     },
     "Pay %@ " : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -29620,6 +29629,7 @@
       }
     },
     "Pay Invoice" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -32568,9 +32578,6 @@
         }
       }
     },
-    "push next view" : {
-
-    },
     "QR code" : {
       "localizations" : {
         "ar" : {
@@ -34475,6 +34482,7 @@
     },
     "Scan a QR code" : {
       "comment" : "Navigation bar title",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -35125,6 +35133,7 @@
     },
     "Sending payment" : {
       "comment" : "Navigation bar title",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -35165,6 +35174,7 @@
       }
     },
     "Sending Payment..." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -39986,6 +39996,7 @@
     },
     "The invoice is not for (chainMismatch.expected.name)" : {
       "comment" : "Error message - scanning lightning invoice",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -40515,6 +40526,7 @@
     },
     "The service ((origin)) appears to be offline, or they have a down server" : {
       "comment" : "Error message - scanning lightning invoice",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -40556,6 +40568,7 @@
     },
     "The service ((origin)) doesn't support Lightning addresses, or doesn't know this user" : {
       "comment" : "Error message - scanning lightning invoice",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -40597,6 +40610,7 @@
     },
     "The service ((origin)) returned error code: (rfCode.code.value)" : {
       "comment" : "Error message - scanning lightning invoice",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -40638,6 +40652,7 @@
     },
     "The service ((origin)) returned error message: (rfDetailed.reason)" : {
       "comment" : "Error message - scanning lightning invoice",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -44390,6 +44405,7 @@
     },
     "Unreadable response from service: (origin)" : {
       "comment" : "Error message - scanning lightning invoice",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -46884,9 +46900,6 @@
           }
         }
       }
-    },
-    "wtf" : {
-
     },
     "Yes" : {
       "extractionState" : "manual",
