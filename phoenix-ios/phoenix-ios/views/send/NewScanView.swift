@@ -108,7 +108,7 @@ struct NewScanView: View {
 				ImagePicker(copyFile: false, result: $imagePickerResult)
 			
 			case .qrCodeScanner:
-				ScanQrCodeSheet(didScanQrCode: didScanQrCode)
+				ScanQrCodeView(location: .sheet, didScanQrCode: didScanQrCode)
 			
 			} // </switch>
 		}

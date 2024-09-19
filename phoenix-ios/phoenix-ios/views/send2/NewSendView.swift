@@ -10,8 +10,16 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct NewSendView: View {
 	
-	enum NavLinkTag: String, Codable {
-		case NextView
+	enum NavLinkTag: Hashable, CustomStringConvertible {
+		case LoginView(flow: SendManager.ParseResult_Lnurl_Auth)
+		case ValidateView(flow: SendManager.ParseResult)
+		
+		var description: String {
+			switch self {
+			case .LoginView(_)    : return "LoginView"
+			case .ValidateView(_) : return "ValidateView"
+			}
+		}
 	}
 	
 	enum Location {
@@ -36,7 +44,8 @@ struct NewSendView: View {
 	@State var isParsing: Bool = false
 	@State var parseIndex: Int = 0
 	@State var parseProgress: SendManager.ParseProgress? = nil
-	@State var parseResult: SendManager.ParseResult? = nil
+	
+	@State var needsAcceptWarning = true
 	
 	enum ActiveSheet {
 		case imagePicker
@@ -59,6 +68,7 @@ struct NewSendView: View {
 	@StateObject var toast = Toast()
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
+	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var popoverState: PopoverState
@@ -69,6 +79,48 @@ struct NewSendView: View {
 	
 	@ViewBuilder
 	var body: some View {
+		
+		Group {
+			switch location {
+			case .MainView:
+				body_mainView()
+				
+			case .ReceiveView:
+				body_receiveView()
+			}
+		}
+		.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
+			navLinkView()
+		}
+		.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
+			navLinkView(tag)
+		}
+	}
+	
+	@ViewBuilder
+	func body_mainView() -> some View {
+		
+		layers()
+			.navigationTitle("Send")
+			.navigationBarTitleDisplayMode(.inline)
+	}
+	
+	@ViewBuilder
+	func body_receiveView() -> some View {
+		
+		// Flow:
+		// - user tapped "Receive" button (expects to receive a payment)
+		// - user tapped "scan qr code" button (expecting to scan a lnurl-withdraw)
+		//
+		// So we should only show the QR code scanner here.
+		// And if they scan anything that will send money,
+		// then we should display a warning to the user.
+		
+		ScanQrCodeView(location: .embedded, didScanQrCode: didScanQrCode)
+	}
+	
+	@ViewBuilder
+	func layers() -> some View {
 		
 		ZStack {
 			Color.primaryBackground
@@ -87,14 +139,6 @@ struct NewSendView: View {
 			toast.view()
 		}
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.navigationTitle("Send")
-		.navigationBarTitleDisplayMode(.inline)
-		.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
-			navLinkView()
-		}
-		.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
-			navLinkView(tag)
-		}
 	}
 	
 	@ViewBuilder
@@ -122,7 +166,7 @@ struct NewSendView: View {
 				ImagePicker(copyFile: false, result: $imagePickerResult)
 			
 			case .qrCodeScanner:
-				ScanQrCodeSheet(didScanQrCode: didScanQrCode)
+				ScanQrCodeView(location: .sheet, didScanQrCode: didScanQrCode)
 			
 			} // </switch>
 		}
@@ -342,15 +386,11 @@ struct NewSendView: View {
 	func navLinkView(_ tag: NavLinkTag) -> some View {
 		
 		switch tag {
-		case .NextView:
+		case .LoginView(let flow):
+			NewLoginView(flow: flow)
 			
-			if let flow = parseResult as? SendManager.ParseResult_Lnurl_Auth {
-				NewLoginView(flow: flow)
-			} else if let flow = parseResult {
-				NewValidateView(flow: flow)
-			} else {
-				EmptyView()
-			}
+		case .ValidateView(let flow):
+			NewValidateView(flow: flow)
 		}
 	}
 	
@@ -556,7 +596,7 @@ struct NewSendView: View {
 	// --------------------------------------------------
 	
 	func navigateTo(_ tag: NavLinkTag) {
-		log.trace("navigateTo(\(tag.rawValue))")
+		log.trace("navigateTo(\(tag.description))")
 		
 		if #available(iOS 17, *) {
 			navCoordinator.path.append(tag)
@@ -620,39 +660,33 @@ struct NewSendView: View {
 		parseProgress = nil
 	}
 	
-	func copyLink(_ url: URL) {
-		log.trace("copyLink()")
+	func showSendPaymentWarning(_ result: SendManager.ParseResult) {
+		log.trace("showSendPaymentWarning()")
 		
-		UIPasteboard.general.string = url.absoluteString
+		popoverState.display(dismissable: false) {
+			PaymentWarningPopover(
+				cancelAction: {
+					presentationMode.wrappedValue.dismiss()
+				},
+				continueAction: {
+					needsAcceptWarning = false
+					handleParseResult(result)
+				}
+			)
+		}
+	}
+	
+	func didCopyLink() {
+		log.trace("didCopyLink()")
+		
 		toast.pop(
 			NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
 			colorScheme: colorScheme.opposite
 		)
 	}
 	
-	func openLink(_ url: URL) {
-		log.trace("openLink()")
-		
-		// Strange SwiftUI bug:
-		// https://forums.developer.apple.com/forums/thread/750514
-		//
-		// Simply declaring the following environment variable:
-		// @Environment(\.openURL) var openURL: OpenURLAction
-		//
-		// Somehow causes an infinite loop in SwiftUI !
-		// I encountered this multiple times while testing,
-		// and the suggested workaround is to use plain UIApplication calls.
-		/*
-		openURL(url)
-		*/
-		
-		if UIApplication.shared.canOpenURL(url) {
-			UIApplication.shared.open(url)
-		}
-	}
-	
 	// --------------------------------------------------
-	// MARK: SendManger
+	// MARK: Parsing
 	// --------------------------------------------------
 	
 	func parseUserInput(_ input: String) {
@@ -685,13 +719,7 @@ struct NewSendView: View {
 				if index == parseIndex {
 					isParsing = false
 					parseProgress = nil
-					
-					if let badRequest = result as? SendManager.ParseResult_BadRequest {
-						showErrorToast(badRequest)
-					} else {
-						parseResult = result
-						navigateTo(.NextView)
-					}
+					handleParseResult(result)
 				} else {
 					log.warning("parseUserInput: result: ignoring: cancelled")
 				}
@@ -707,128 +735,43 @@ struct NewSendView: View {
 		}
 	}
 	
-	func showErrorToast(_ result: SendManager.ParseResult_BadRequest) {
-		log.trace("showErrorToast()")
+	func handleParseResult(_ result: SendManager.ParseResult) {
 		
-		let msg: String
-		var websiteLink: URL? = nil
-		
-		switch result.reason {
-		case is SendManager.BadRequestReason_Expired:
-			
-			msg = NSLocalizedString(
-				"Invoice is expired",
-				comment: "Error message - scanning lightning invoice"
-			)
-			
-		case let chainMismatch as SendManager.BadRequestReason_ChainMismatch:
-			
-			msg = NSLocalizedString(
-				"The invoice is not for \(chainMismatch.expected.name)",
-				comment: "Error message - scanning lightning invoice"
-			)
-			
-		case is SendManager.BadRequestReason_UnsupportedLnurl:
-			
-			msg = NSLocalizedString(
-				"Phoenix does not support this type of LNURL yet",
-				comment: "Error message - scanning lightning invoice"
-			)
-			
-		case is SendManager.BadRequestReason_AlreadyPaidInvoice:
-			
-			msg = NSLocalizedString(
-				"You've already paid this invoice. Paying it again could result in stolen funds.",
-				comment: "Error message - scanning lightning invoice"
-			)
-
-		case is SendManager.BadRequestReason_Bip353InvalidOffer:
-			
-			msg = NSLocalizedString(
-				"This address uses an invalid Bolt12 offer.",
-				comment: "Error message - dns record contains an invalid offer"
-			)
-			
-		case is SendManager.BadRequestReason_Bip353NoDNSSEC:
-			
-			msg = NSLocalizedString(
-				"This address is hosted on an unsecure DNS. DNSSEC must be enabled.",
-				comment: "Error message - dns issue"
-			)
-
-		case let serviceError as SendManager.BadRequestReason_ServiceError:
-			
-			let remoteFailure: LnurlError.RemoteFailure = serviceError.error
-			let origin = remoteFailure.origin
-			
-			let isLightningAddress = serviceError.url.description.contains("/.well-known/lnurlp/")
-			let lightningAddressErrorMessage = NSLocalizedString(
-				"The service (\(origin)) doesn't support Lightning addresses, or doesn't know this user",
-				comment: "Error message - scanning lightning invoice"
-			)
-			
-			switch remoteFailure {
-			case is LnurlError.RemoteFailure_CouldNotConnect:
-				msg = NSLocalizedString(
-					"Could not connect to service: \(origin)",
-					comment: "Error message - scanning lightning invoice"
-				)
-				
-			case is LnurlError.RemoteFailure_Unreadable:
-				let scheme = serviceError.url.protocol.name.lowercased()
-				if scheme == "https" || scheme == "http" {
-					websiteLink = URL(string: serviceError.url.description())
-				}
-				msg = NSLocalizedString(
-					"Unreadable response from service: \(origin)",
-					comment: "Error message - scanning lightning invoice"
-				)
-				
-			case let rfDetailed as LnurlError.RemoteFailure_Detailed:
-				if isLightningAddress {
-					msg = lightningAddressErrorMessage
-				} else {
-					msg = NSLocalizedString(
-						"The service (\(origin)) returned error message: \(rfDetailed.reason)",
-						comment: "Error message - scanning lightning invoice"
-					)
-				}
-				
-			case let rfCode as LnurlError.RemoteFailure_Code:
-				if isLightningAddress {
-					msg = lightningAddressErrorMessage
-				} else {
-					msg = NSLocalizedString(
-						"The service (\(origin)) returned error code: \(rfCode.code.value)",
-						comment: "Error message - scanning lightning invoice"
-					)
-				}
-				
-			default:
-				msg = NSLocalizedString(
-					"The service (\(origin)) appears to be offline, or they have a down server",
-					comment: "Error message - scanning lightning invoice"
-				)
-			}
-			
-		default:
-			
-			msg = NSLocalizedString(
-				"This doesn't appear to be a Lightning invoice",
-				comment: "Error message - scanning lightning invoice"
-			)
-		}
-		
-		if let websiteLink {
-			popoverState.display(dismissable: true) {
-				WebsiteLinkPopover(
-					link: websiteLink,
-					copyAction: copyLink,
-					openAction: openLink
-				)
-			}
-			
+		if let badRequest = result as? SendManager.ParseResult_BadRequest {
+			showErrorMessage(badRequest)
 		} else {
+			
+			if location == .ReceiveView && needsAcceptWarning {
+				
+				var willSendMoney = false
+				switch result {
+					case is SendManager.ParseResult_Bolt11Invoice : fallthrough
+					case is SendManager.ParseResult_Bolt12Offer   : fallthrough
+					case is SendManager.ParseResult_Uri           : fallthrough
+					case is SendManager.ParseResult_Lnurl_Pay     : willSendMoney = true
+					default                                       : break
+				}
+				
+				guard !willSendMoney else {
+					showSendPaymentWarning(result)
+					return
+				}
+			}
+			
+			if let auth = result as? SendManager.ParseResult_Lnurl_Auth {
+				navigateTo(.LoginView(flow: auth))
+			} else {
+				navigateTo(.ValidateView(flow: result))
+			}
+		}
+	}
+	
+	func showErrorMessage(_ result: SendManager.ParseResult_BadRequest) {
+		log.trace("showErrorMessage()")
+		
+		let either = ParseResultHelper.processBadRequest(result)
+		switch either {
+		case .Left(let msg):
 			toast.pop(
 				msg,
 				colorScheme: colorScheme.opposite,
@@ -837,6 +780,15 @@ struct NewSendView: View {
 				alignment: .middle,
 				showCloseButton: true
 			)
+			
+		case .Right(let websiteLink):
+			popoverState.display(dismissable: true) {
+				WebsiteLinkPopover(
+					link: websiteLink,
+					didCopyLink: didCopyLink,
+					didOpenLink: nil
+				)
+			}
 		}
 	}
 }

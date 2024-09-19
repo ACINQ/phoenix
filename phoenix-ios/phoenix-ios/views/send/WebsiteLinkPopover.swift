@@ -10,8 +10,8 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 struct WebsiteLinkPopover: View {
 	
 	let link: URL
-	let copyAction: (URL)->Void
-	let openAction: (URL)->Void
+	let didCopyLink: (() -> Void)?
+	let didOpenLink: (() -> Void)?
 	
 	enum ButtonHeight: Preference {}
 	let buttonHeightReader = GeometryPreferenceReader(
@@ -57,25 +57,51 @@ struct WebsiteLinkPopover: View {
 					Label { Text("Open") } icon: { Image(systemName: "network") }
 				}
 				.read(buttonHeightReader)
+				.disabled(!canOpenLink)
 			}
 			.assignMaxPreference(for: buttonHeightReader.key, to: $buttonHeight)
 		}
 		.padding(20)
 	}
 	
+	var canOpenLink: Bool {
+		return UIApplication.shared.canOpenURL(link)
+	}
+	
 	func copyLink() {
 		log.trace("copyLink()")
 		
 		popoverState.close(animationCompletion: {
-			copyAction(self.link)
+			UIPasteboard.general.string = link.absoluteString
+			if let didCopyLink {
+				didCopyLink()
+			}
 		})
 	}
 	
 	func openLink() {
 		log.trace("openLink()")
 		
+		// Strange SwiftUI bug:
+		// https://forums.developer.apple.com/forums/thread/750514
+		//
+		// Simply declaring the following environment variable:
+		// @Environment(\.openURL) var openURL: OpenURLAction
+		//
+		// Somehow causes an infinite loop in SwiftUI !
+		// I encountered this multiple times while testing,
+		// and the suggested workaround is to use plain UIApplication calls.
+		/*
+		openURL(url)
+		*/
+		
 		popoverState.close(animationCompletion: {
-			openAction(self.link)
+			if UIApplication.shared.canOpenURL(link) {
+				UIApplication.shared.open(link)
+			}
+			if let didOpenLink {
+				didOpenLink()
+			}
 		})
 	}
 }

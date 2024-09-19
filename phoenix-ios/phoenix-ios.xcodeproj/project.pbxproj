@@ -227,6 +227,7 @@
 		DC99E94D25BA258C00FB20F7 /* about.html in Resources */ = {isa = PBXBuildFile; fileRef = DC99E94825BA258C00FB20F7 /* about.html */; };
 		DC99E95825BA2BA800FB20F7 /* common.css in Resources */ = {isa = PBXBuildFile; fileRef = DC99E95625BA2BA800FB20F7 /* common.css */; };
 		DC9AD1F12C9B81450019BEE9 /* NewPaymentRequestedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9AD1F02C9B81450019BEE9 /* NewPaymentRequestedView.swift */; };
+		DC9AD20D2C9C90A20019BEE9 /* ParseResultHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9AD20C2C9C90A20019BEE9 /* ParseResultHelper.swift */; };
 		DC9B15442B7D0DCB0023743B /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = DC9B15432B7D0DCB0023743B /* AsyncAlgorithms */; };
 		DC9B8EE225D72CC200E13818 /* ForceCloseChannelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9B8EE125D72CC200E13818 /* ForceCloseChannelsView.swift */; };
 		DC9E7EC32A12955300A5F1D0 /* LiquidityHTML.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9E7EC22A12955300A5F1D0 /* LiquidityHTML.swift */; };
@@ -288,7 +289,7 @@
 		DCB876322735AAB500657570 /* UserDefaults+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB876312735AAB500657570 /* UserDefaults+Codable.swift */; };
 		DCBA371B2758076F00610EC8 /* SyncSeedManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA371A2758076F00610EC8 /* SyncSeedManager.swift */; };
 		DCBA60CD2C909C7600878895 /* NewSendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA60CC2C909C7600878895 /* NewSendView.swift */; };
-		DCBA60CF2C90E41000878895 /* ScanQrCodeSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA60CE2C90E41000878895 /* ScanQrCodeSheet.swift */; };
+		DCBA60CF2C90E41000878895 /* ScanQrCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA60CE2C90E41000878895 /* ScanQrCodeView.swift */; };
 		DCBA60D12C922CCC00878895 /* NewScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA60D02C922CCC00878895 /* NewScanView.swift */; };
 		DCBA60D42C93544C00878895 /* InsetGroupBoxStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA60D32C93544C00878895 /* InsetGroupBoxStyle.swift */; };
 		DCC46F1625C3521C005D32D9 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = DC72C31825A3CF87008A927A /* FirebaseMessaging */; };
@@ -642,6 +643,7 @@
 		DC99E94925BA258C00FB20F7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/about.html; sourceTree = "<group>"; };
 		DC99E95625BA2BA800FB20F7 /* common.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = common.css; sourceTree = "<group>"; };
 		DC9AD1F02C9B81450019BEE9 /* NewPaymentRequestedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPaymentRequestedView.swift; sourceTree = "<group>"; };
+		DC9AD20C2C9C90A20019BEE9 /* ParseResultHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParseResultHelper.swift; sourceTree = "<group>"; };
 		DC9B8EE125D72CC200E13818 /* ForceCloseChannelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForceCloseChannelsView.swift; sourceTree = "<group>"; };
 		DC9E7EC22A12955300A5F1D0 /* LiquidityHTML.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidityHTML.swift; sourceTree = "<group>"; };
 		DC9E7EC72A1295B100A5F1D0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/liquidity.html; sourceTree = "<group>"; };
@@ -694,7 +696,7 @@
 		DCB876312735AAB500657570 /* UserDefaults+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Codable.swift"; sourceTree = "<group>"; };
 		DCBA371A2758076F00610EC8 /* SyncSeedManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncSeedManager.swift; sourceTree = "<group>"; };
 		DCBA60CC2C909C7600878895 /* NewSendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSendView.swift; sourceTree = "<group>"; };
-		DCBA60CE2C90E41000878895 /* ScanQrCodeSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanQrCodeSheet.swift; sourceTree = "<group>"; };
+		DCBA60CE2C90E41000878895 /* ScanQrCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanQrCodeView.swift; sourceTree = "<group>"; };
 		DCBA60D02C922CCC00878895 /* NewScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewScanView.swift; sourceTree = "<group>"; };
 		DCBA60D32C93544C00878895 /* InsetGroupBoxStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsetGroupBoxStyle.swift; sourceTree = "<group>"; };
 		DCBDB8812BE154840097F940 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = de; path = de.lproj/about.html; sourceTree = "<group>"; };
@@ -1021,8 +1023,9 @@
 				DCB62F482A5E09F900912A71 /* SpliceOutProblem.swift */,
 				DC1718A62C20BF8A000CCAF5 /* PayOfferProblem.swift */,
 				DC6F042C2C3DC4CD00627B4F /* ManualInput.swift */,
-				DCBA60CE2C90E41000878895 /* ScanQrCodeSheet.swift */,
+				DCBA60CE2C90E41000878895 /* ScanQrCodeView.swift */,
 				DCBA60D02C922CCC00878895 /* NewScanView.swift */,
+				DC9AD20C2C9C90A20019BEE9 /* ParseResultHelper.swift */,
 			);
 			path = send;
 			sourceTree = "<group>";
@@ -1855,6 +1858,7 @@
 				DC09085825B5E43900A46136 /* String+VersionComparison.swift in Sources */,
 				DC63A3762B965D54008E040E /* InboundFeeSheet.swift in Sources */,
 				DC355E212A44D838008E8A8E /* NotificationsView.swift in Sources */,
+				DC9AD20D2C9C90A20019BEE9 /* ParseResultHelper.swift in Sources */,
 				DC7DA9F62AD84DF200F86B99 /* String+Substring.swift in Sources */,
 				DCE2B9B52C939631000430B8 /* NewValidateView.swift in Sources */,
 				DC20BDF22C23403100338AA2 /* PaymentSummary.swift in Sources */,
@@ -2138,7 +2142,7 @@
 				DC46CB1228D9AAB000C4EAC7 /* LockState.swift in Sources */,
 				DC2F431427B6972C0006FCC4 /* SwapInView.swift in Sources */,
 				DC71E7352728A5720063613D /* KotlinIdentifiable.swift in Sources */,
-				DCBA60CF2C90E41000878895 /* ScanQrCodeSheet.swift in Sources */,
+				DCBA60CF2C90E41000878895 /* ScanQrCodeView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

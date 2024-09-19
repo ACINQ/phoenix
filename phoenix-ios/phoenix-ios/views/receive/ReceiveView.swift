@@ -67,7 +67,7 @@ struct ReceiveView: MVIView {
 	func content() -> some View {
 		
 		if showSendView {
-			SendView(location: .ReceiveView)
+			NewSendView(location: .ReceiveView)
 				.zIndex(5) // needed for proper animation
 				.transition(
 					.asymmetric(
@@ -75,6 +75,15 @@ struct ReceiveView: MVIView {
 						removal: .move(edge: .bottom)
 					)
 				)
+			
+//			SendView(location: .ReceiveView)
+//				.zIndex(5) // needed for proper animation
+//				.transition(
+//					.asymmetric(
+//						insertion: .move(edge: .bottom),
+//						removal: .move(edge: .bottom)
+//					)
+//				)
 		} else {
 			customTabView()
 				.zIndex(4) // needed for proper animation

@@ -31,7 +31,6 @@ struct SendView: MVIView {
 	
 	@EnvironmentObject var popoverState: PopoverState
 	
-	@Environment(\.openURL) var openURL
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
@@ -298,8 +297,8 @@ struct SendView: MVIView {
 			popoverState.display(dismissable: true) {
 				WebsiteLinkPopover(
 					link: websiteLink,
-					copyAction: copyLink,
-					openAction: openLink
+					didCopyLink: didCopyLink,
+					didOpenLink: nil
 				)
 			}
 			
@@ -330,19 +329,12 @@ struct SendView: MVIView {
 		}
 	}
 	
-	func copyLink(_ url: URL) {
-		log.trace("copyLink()")
+	func didCopyLink() {
+		log.trace("didCopyLink()")
 		
-		UIPasteboard.general.string = url.absoluteString
 		toast.pop(
 			NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
 			colorScheme: colorScheme.opposite
 		)
-	}
-	
-	func openLink(_ url: URL) {
-		log.trace("openLink()")
-		
-		openURL(url)
 	}
 }

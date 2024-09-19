@@ -13331,6 +13331,9 @@
         }
       }
     },
+    "Could not connect to service: %@" : {
+      "comment" : "Error message - scanning lightning invoice"
+    },
     "Could not retrieve payment details within a reasonable time. The recipient may be offline or unreachable." : {
       "localizations" : {
         "ar" : {
@@ -40023,6 +40026,7 @@
       }
     },
     "The invoice is not for %@" : {
+      "comment" : "Error message - scanning lightning invoice",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -40669,6 +40673,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le service ((origin)) a renvoyé un message d'erreur : (rfDetailed.reason)"
+          }
+        }
+      }
+    },
+    "The service (%@) appears to be offline, or they have a down server" : {
+      "comment" : "Error message - scanning lightning invoice"
+    },
+    "The service (%@) doesn't support Lightning addresses, or doesn't know this user" : {
+      "comment" : "Error message - scanning lightning invoice"
+    },
+    "The service (%@) returned error code: %d" : {
+      "comment" : "Error message - scanning lightning invoice",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The service (%1$@) returned error code: %2$d"
+          }
+        }
+      }
+    },
+    "The service (%@) returned error message: %@" : {
+      "comment" : "Error message - scanning lightning invoice",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The service (%1$@) returned error message: %2$@"
           }
         }
       }
@@ -44396,6 +44428,9 @@
           }
         }
       }
+    },
+    "Unreadable response from service: %@" : {
+      "comment" : "Error message - scanning lightning invoice"
     },
     "Updating cloud" : {
       "localizations" : {

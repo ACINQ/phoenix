@@ -1,13 +1,19 @@
 import SwiftUI
 
-fileprivate let filename = "ScanQrCodeSheet"
+fileprivate let filename = "ScanQrCodeView"
 #if DEBUG && true
 fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-struct ScanQrCodeSheet: View {
+struct ScanQrCodeView: View {
+	
+	enum Location {
+		case sheet
+		case embedded
+	}
+	let location: Location
 	
 	let didScanQrCode: (String) -> Void
 	
@@ -16,14 +22,38 @@ struct ScanQrCodeSheet: View {
 	@ViewBuilder
 	var body: some View {
 		
+		switch location {
+		case .sheet:
+			body_sheet()
+			
+		case .embedded:
+			body_embedded()
+		}
+	}
+	
+	@ViewBuilder
+	func body_sheet() -> some View {
+		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-			header()
+			sheetHeader()
 			content()
 		}
 	}
 	
 	@ViewBuilder
-	func header() -> some View {
+	func body_embedded() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			Color.primaryBackground.frame(height: 15)
+			content()
+		}
+		.navigationTitle("Scan QR Code")
+		.navigationBarTitleDisplayMode(.inline)
+		
+	}
+	
+	@ViewBuilder
+	func sheetHeader() -> some View {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 0) {
 			
