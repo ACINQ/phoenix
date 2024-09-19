@@ -72,6 +72,7 @@ struct SendView: View {
 	
 	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var popoverState: PopoverState
+	@EnvironmentObject var deviceInfo: DeviceInfo
 	
 	// --------------------------------------------------
 	// MARK: ViewBuilders
@@ -148,6 +149,7 @@ struct SendView: View {
 			header()
 			list()
 		}
+		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
 		.onAppear() {
 			onAppear()
 		}

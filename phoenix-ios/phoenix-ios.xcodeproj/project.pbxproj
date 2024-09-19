@@ -845,7 +845,6 @@
 				DCA3B41A2A5220A200E6B231 /* notifications */,
 				DC2F431227B696A40006FCC4 /* receive */,
 				DC118BF627B44E4C0080BBAC /* send */,
-				DCBA60D22C934E4B00878895 /* send2 */,
 				DCCD045B27EE0101007D57A5 /* inspect */,
 				DCD1208528663F2D00EB39C5 /* transactions */,
 				DC3345CE2C2B4BED00EDD2D4 /* contacts */,
@@ -1404,13 +1403,6 @@
 				DCB5D2DE280879460020B8F5 /* DeviceInfo.swift */,
 			);
 			path = environment;
-			sourceTree = "<group>";
-		};
-		DCBA60D22C934E4B00878895 /* send2 */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = send2;
 			sourceTree = "<group>";
 		};
 		DCC9D998267BD26D00EA36DD /* sync */ = {

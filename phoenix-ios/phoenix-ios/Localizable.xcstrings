@@ -17006,6 +17006,7 @@
       }
     },
     "Enter a Lightning invoice, LNURL, or Lightning address you want to send money to." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -25855,6 +25856,7 @@
       }
     },
     "Manual Input" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
