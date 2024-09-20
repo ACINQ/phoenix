@@ -545,10 +545,10 @@ struct MainView_Small: View {
 			LiquidityAdsView(location: .embedded)
 			
 		case .LoginView(let flow):
-			LoginView(flow: flow)
+			LoginView(flow: flow, popTo: self.popTo)
 			
 		case .ValidateView(let flow):
-			ValidateView(flow: flow)
+			ValidateView(flow: flow, popTo: self.popTo)
 		}
 	}
 	

@@ -63,6 +63,7 @@ struct SendView: View {
 	
 	// <iOS_16_workarounds>
 	@State var navLinkTag: NavLinkTag? = nil
+	@State var popToDestination: PopToDestination? = nil
 	// </iOS_16_workarounds>
 	
 	@StateObject var toast = Toast()
@@ -391,10 +392,10 @@ struct SendView: View {
 		
 		switch tag {
 		case .LoginView(let flow):
-			LoginView(flow: flow)
+			LoginView(flow: flow, popTo: self.popTo)
 			
 		case .ValidateView(let flow):
-			ValidateView(flow: flow)
+			ValidateView(flow: flow, popTo: self.popTo)
 		}
 	}
 	
@@ -442,6 +443,13 @@ struct SendView: View {
 	
 	func onAppear(){
 		log.trace("onAppear()")
+		
+		if let destination = popToDestination {
+			log.debug("popToDestination: \(destination)")
+			
+			popToDestination = nil
+			presentationMode.wrappedValue.dismiss()
+		}
 	}
 	
 	// --------------------------------------------------
@@ -609,6 +617,16 @@ struct SendView: View {
 		}
 	}
 	
+	func popTo(_ destination: PopToDestination) {
+		log.trace("popTo(\(destination))")
+		
+		if #available(iOS 17, *) {
+			log.warning("popTo(): This function is for iOS 16 only !")
+		} else { // iOS 16
+			popToDestination = destination
+		}
+	}
+	
 	func clearInputField() {
 		log.trace("clearInputField()")
 		
@@ -627,6 +645,7 @@ struct SendView: View {
 		log.trace("pasteFromClipboard()")
 		
 		if let request = UIPasteboard.general.string {
+			inputFieldText = request
 			parseUserInput(request)
 		}
 	}

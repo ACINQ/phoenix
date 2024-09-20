@@ -12,6 +12,8 @@ struct LoginView: View {
 	
 	let flow: SendManager.ParseResult_Lnurl_Auth
 	
+	let popTo: (PopToDestination) -> Void // For iOS 16
+	
 	@State var isLoggingIn = false
 	@State var didLogIn = false
 	@State var loginError: SendManager.LnurlAuth_Error? = nil
@@ -22,6 +24,8 @@ struct LoginView: View {
 		value: { [$0.size.height] }
 	)
 	@State var maxImageHeight: CGFloat? = nil
+	
+	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	
@@ -327,8 +331,18 @@ struct LoginView: View {
 	func doneButtonTapped() {
 		log.trace("doneButtonTapped()")
 		
-		// Todo: This needs to be fixed on iOS 16
-		navCoordinator.path.removeAll()
+		popToRootView()
+	}
+	
+	func popToRootView() {
+		log.trace("popToRootView()")
+		
+		if #available(iOS 17, *) {
+			navCoordinator.path.removeAll()
+		} else { // iOS 16
+			popTo(.RootView(followedBy: nil))
+			presentationMode.wrappedValue.dismiss()
+		}
 	}
 }
 

@@ -29,6 +29,8 @@ struct ValidateView: View {
 			}
 		}
 	}
+	
+	let popTo: (PopToDestination) -> Void // For iOS 16
 
 	@State var flow: SendManager.ParseResult
 	
@@ -90,6 +92,7 @@ struct ValidateView: View {
 	
 	// <iOS_16_workarounds>
 	@State var navLinkTag: NavLinkTag? = nil
+	@State var popToDestination: PopToDestination? = nil
 	// </iOS_16_workarounds>
 	
 	@StateObject var toast = Toast()
@@ -107,8 +110,9 @@ struct ValidateView: View {
 	// MARK: Init
 	// --------------------------------------------------
 	
-	init(flow: SendManager.ParseResult) {
+	init(flow: SendManager.ParseResult, popTo: @escaping (PopToDestination) -> Void) {
 		self._flow = State(initialValue: flow)
+		self.popTo = popTo
 	}
 	
 	// --------------------------------------------------
@@ -527,7 +531,7 @@ struct ValidateView: View {
 			
 		case .PaymentRequestedView(let invoice):
 			if let withdrawFlow = flow as? SendManager.ParseResult_Lnurl_Withdraw {
-				PaymentRequestedView(flow: withdrawFlow, invoice: invoice)
+				PaymentRequestedView(flow: withdrawFlow, invoice: invoice, popTo: self.popToWrapper)
 			} else {
 				EmptyView()
 			}
@@ -1035,45 +1039,57 @@ struct ValidateView: View {
 	func onAppear() -> Void {
 		log.trace("onAppear()")
 		
-		if didAppear {
-			return
-		}
-		didAppear = true
+		if !didAppear {
+			didAppear = true
 			
-		currencyList = Currency.displayable(currencyPrefs: currencyPrefs)
-		
-		let bitcoinUnit = currencyPrefs.bitcoinUnit
-		currency = Currency.bitcoin(bitcoinUnit)
-		currencyPickerChoice = currency.shortName
-		
-		if let amount_msat = initialAmount() {
+			// First time displaying this ValidateView
 			
-			let formattedAmt = Utils.formatBitcoin(
-				msat: amount_msat,
-				bitcoinUnit: bitcoinUnit,
-				policy: .showMsatsIfNonZero
-			)
+			currencyList = Currency.displayable(currencyPrefs: currencyPrefs)
 			
-			parsedAmount = Result.success(formattedAmt.amount) // do this first !
-			amount = formattedAmt.digits
-		} else {
-			altAmount = NSLocalizedString("Enter an amount", comment: "error message")
-			problem = nil // display in gray at very beginning
-		}
-		
-		if let model = flow as? SendManager.ParseResult_Uri,
-			model.uri.paymentRequest != nil,
-			!hasPickedSwapOutMode
-		{
-			log.debug("triggering popover w/PaymentLayerChoice")
-	
-			popoverState.display(dismissable: false) {
-				PaymentLayerChoice(
-					didChooseL1: self.paymentLayerChoice_didChooseL1,
-					didChooseL2: self.paymentLayerChoice_didChooseL2
+			let bitcoinUnit = currencyPrefs.bitcoinUnit
+			currency = Currency.bitcoin(bitcoinUnit)
+			currencyPickerChoice = currency.shortName
+			
+			if let amount_msat = initialAmount() {
+				
+				let formattedAmt = Utils.formatBitcoin(
+					msat: amount_msat,
+					bitcoinUnit: bitcoinUnit,
+					policy: .showMsatsIfNonZero
 				)
-			} onWillDisappear: {
-				hasPickedSwapOutMode = true
+				
+				parsedAmount = Result.success(formattedAmt.amount) // do this first !
+				amount = formattedAmt.digits
+			} else {
+				altAmount = NSLocalizedString("Enter an amount", comment: "error message")
+				problem = nil // display in gray at very beginning
+			}
+			
+			if let model = flow as? SendManager.ParseResult_Uri,
+				model.uri.paymentRequest != nil,
+				!hasPickedSwapOutMode
+			{
+				log.debug("triggering popover w/PaymentLayerChoice")
+		
+				popoverState.display(dismissable: false) {
+					PaymentLayerChoice(
+						didChooseL1: self.paymentLayerChoice_didChooseL1,
+						didChooseL2: self.paymentLayerChoice_didChooseL2
+					)
+				} onWillDisappear: {
+					hasPickedSwapOutMode = true
+				}
+			}
+			
+		} else {
+			
+			// We are returning to this ValidateView from a child view (e.g. PaymentRequestedView).
+			
+			if let destination = popToDestination {
+				log.debug("popToDestination: \(destination)")
+				
+				popToDestination = nil
+				presentationMode.wrappedValue.dismiss()
 			}
 		}
 	}
@@ -1154,6 +1170,17 @@ struct ValidateView: View {
 			navCoordinator.path.append(tag)
 		} else {
 			navLinkTag = tag
+		}
+	}
+	
+	func popToWrapper(_ destination: PopToDestination) {
+		log.trace("popToWrapper(\(destination))")
+		
+		if #available(iOS 17, *) {
+			log.warning("popToWrapper(): This function is for iOS 16 only !")
+		} else {
+			popToDestination = destination
+			popTo(destination)
 		}
 	}
 	
@@ -1668,7 +1695,7 @@ struct ValidateView: View {
 					invoice: model.invoice,
 					metadata: nil
 				)
-				popToHomeView()
+				popToRootView()
 				
 			} catch {
 				log.error("payBolt11Invoice(): error: \(error)")
@@ -1748,7 +1775,7 @@ struct ValidateView: View {
 				case .paymentNotSent(_): fallthrough
 				case .paymentSent(_):
 					payOfferProblem = nil
-					popToHomeView()
+					popToRootView()
 				}
 				
 			} catch {
@@ -1810,7 +1837,7 @@ struct ValidateView: View {
 					
 				} else {
 					payOfferProblem = nil
-					popToHomeView()
+					popToRootView()
 				}
 			
 			} catch {
@@ -1860,7 +1887,7 @@ struct ValidateView: View {
 					
 				} else {
 					spliceOutProblem = nil
-					popToHomeView()
+					popToRootView()
 				}
 				
 			} catch {
@@ -1979,7 +2006,7 @@ struct ValidateView: View {
 							trampolineFees: trampolineFees
 						)
 						
-						popToHomeView()
+						popToRootView()
 					}
 					
 				} catch {
@@ -2056,11 +2083,15 @@ struct ValidateView: View {
 		isLnurlFetch = false
 	}
 	
-	func popToHomeView() {
-		log.trace("popToHomeView()")
+	func popToRootView() {
+		log.trace("popToRootView()")
 		
-		// Todo: Need a solution for iOS 16
-		navCoordinator.path.removeAll()
+		if #available(iOS 17, *) {
+			navCoordinator.path.removeAll()
+		} else { // iOS 16
+			popTo(.RootView(followedBy: nil))
+			presentationMode.wrappedValue.dismiss()
+		}
 	}
 	
 	func currencyConverterAmountChanged(_ result: CurrencyAmount?) {

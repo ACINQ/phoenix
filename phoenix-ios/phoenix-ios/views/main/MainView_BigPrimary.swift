@@ -217,10 +217,10 @@ struct MainView_BigPrimary: View {
 			SendView(location: .MainView)
 			
 		case .LoginView(let flow):
-			LoginView(flow: flow)
+			LoginView(flow: flow, popTo: self.popTo)
 			
 		case .ValidateView(let flow):
-			ValidateView(flow: flow)
+			ValidateView(flow: flow, popTo: self.popTo)
 		}
 	}
 	
@@ -342,9 +342,11 @@ struct MainView_BigPrimary: View {
 		if #available(iOS 17, *) {
 			log.warning("popTo(): This function is for iOS 16 only !")
 		} else {
-			popoverState.close {
-				if let deepLink = destination.followedBy {
-					deepLinkManager.broadcast(deepLink)
+			if popoverState.hasCurrentItem {
+				popoverState.close {
+					if let deepLink = destination.followedBy {
+						deepLinkManager.broadcast(deepLink)
+					}
 				}
 			}
 		}

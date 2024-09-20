@@ -15,7 +15,9 @@ struct PaymentRequestedView: View {
 	let flow: SendManager.ParseResult_Lnurl_Withdraw
 	let invoice: Lightning_kmpBolt11Invoice
 	
-	//@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+	let popTo: (PopToDestination) -> Void // For iOS 16
+	
+	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var navCoordinator: NavigationCoordinator
@@ -128,7 +130,7 @@ struct PaymentRequestedView: View {
 		   paymentState == WalletPaymentState.successOffChain
 		{
 			if lastIncomingPayment.paymentHash.toHex() == invoice.paymentHash.toHex() {
-				popToHomeView()
+				popToRootView()
 			}
 		}
 	}
@@ -140,14 +142,18 @@ struct PaymentRequestedView: View {
 	func doneButtonTapped() {
 		log.trace("doneButtonTapped()")
 		
-		popToHomeView()
+		popToRootView()
 	}
 	
-	func popToHomeView() {
-		log.trace("popToHomeView()")
+	func popToRootView() {
+		log.trace("popToRootView()")
 		
-		// Todo: need a solution for iOS 16
-		navCoordinator.path.removeAll()
+		if #available(iOS 17, *) {
+			navCoordinator.path.removeAll()
+		} else { // iOS 16
+			popTo(.RootView(followedBy: nil))
+			presentationMode.wrappedValue.dismiss()
+		}
 	}
 }
 
