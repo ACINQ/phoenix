@@ -5319,6 +5319,9 @@
         }
       }
     },
+    "Add contacts for easy & quick payments" : {
+
+    },
     "add liquidity" : {
       "localizations" : {
         "ar" : {
@@ -27724,6 +27727,9 @@
         }
       }
     },
+    "No Contacts" : {
+
+    },
     "no description" : {
       "comment" : "placeholder: invoice is description-less",
       "localizations" : {
@@ -38464,6 +38470,9 @@
           }
         }
       }
+    },
+    "Suggestions" : {
+
     },
     "Summary" : {
       "comment" : "ChannelsConfigurationView/ChannelInfoPopup/TabBar",

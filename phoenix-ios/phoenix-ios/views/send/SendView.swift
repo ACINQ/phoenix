@@ -344,6 +344,8 @@ struct SendView: View {
 						Text(suggestion)
 					}
 				}
+			} header: {
+				Text("Suggestions")
 			} // </Section>
 		}
 	}
@@ -351,17 +353,22 @@ struct SendView: View {
 	@ViewBuilder
 	func section_contacts() -> some View {
 		
-		if !visibleContacts.isEmpty {
-			Section {
-				ForEach(visibleContacts) { item in
-					Button {
-						selectContact(item)
-					} label: {
-						contactRow(item)
-					}
+		Section {
+			ForEach(visibleContacts) { item in
+				Button {
+					selectContact(item)
+				} label: {
+					contactRow(item)
 				}
-			} // </Section>
-		}
+			}
+			if hasZeroMatchesForSearch {
+				zeroMatchesRow()
+			} else if hasZeroContacts {
+				zeroContactsRow()
+			}
+		} header: {
+			Text("Contacts")
+		} // </Section>
 	}
 	
 	@ViewBuilder
@@ -374,6 +381,36 @@ struct SendView: View {
 				.foregroundColor(.primary)
 			Spacer()
 		}
+		.padding(.all, 4)
+	}
+	
+	@ViewBuilder
+	func zeroMatchesRow() -> some View {
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 8) {
+			Image(systemName: "person.crop.circle.badge.questionmark")
+				.resizable()
+				.frame(width: 32, height: 32)
+			Text("No matches for search")
+			Spacer()
+		}
+		.foregroundStyle(.secondary)
+		.padding(.all, 4)
+	}
+	
+	@ViewBuilder
+	func zeroContactsRow() -> some View {
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 8) {
+			Image(systemName: "person.crop.circle.fill")
+				.resizable()
+				.scaledToFit()
+				.frame(width: 32, height: 32)
+			Text("No Contacts")
+				.font(.title3)
+			Spacer()
+		}
+		.foregroundStyle(.secondary)
 		.padding(.all, 4)
 	}
 	
@@ -408,10 +445,20 @@ struct SendView: View {
 	}
 	
 	var hasZeroMatchesForSearch: Bool {
-		guard let filteredContacts else {
+		if sortedContacts.isEmpty {
+			// User has zero contacts.
+			// This is different from zero search results.
+			return false
+		} else if let filteredContacts {
+			return filteredContacts.isEmpty
+		} else {
+			// Not searching
 			return false
 		}
-		return filteredContacts.isEmpty && !sortedContacts.isEmpty
+	}
+	
+	var hasZeroContacts: Bool {
+		return sortedContacts.isEmpty
 	}
 	
 	var fetchActivityTitle: String {

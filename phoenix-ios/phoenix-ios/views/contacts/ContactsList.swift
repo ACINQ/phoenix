@@ -99,7 +99,11 @@ struct ContactsList: View {
 				}
 			}
 			if hasZeroMatchesForSearch {
-				zeroMatches()
+				zeroMatchesRow()
+					.deleteDisabled(true)
+				
+			} else if hasZeroContacts {
+				zeroContactsRow()
 					.deleteDisabled(true)
 			}
 		} // </List>
@@ -129,10 +133,34 @@ struct ContactsList: View {
 	}
 	
 	@ViewBuilder
-	func zeroMatches() -> some View {
+	func zeroMatchesRow() -> some View {
 		
-		HStack(alignment: VerticalAlignment.center, spacing: 0) {
-			Text("No matches for search").foregroundStyle(.secondary)
+		HStack(alignment: VerticalAlignment.center, spacing: 8) {
+			Image(systemName: "person.crop.circle.badge.questionmark")
+				.resizable()
+				.frame(width: 32, height: 32)
+			Text("No matches for search")
+			Spacer()
+		}
+		.foregroundStyle(.secondary)
+		.padding(.all, 4)
+	}
+	
+	@ViewBuilder
+	func zeroContactsRow() -> some View {
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 8) {
+			Image(systemName: "person.crop.circle.fill")
+				.resizable()
+				.frame(width: 32, height: 32)
+			VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+				Text("No Contacts")
+					.font(.title3)
+					.foregroundColor(.primary)
+				Text("Add contacts for easy & quick payments")
+					.font(.subheadline)
+					.foregroundColor(.secondary)
+			}
 			Spacer()
 		}
 		.padding(.all, 4)
@@ -195,12 +223,20 @@ struct ContactsList: View {
 	}
 	
 	var hasZeroMatchesForSearch: Bool {
-		
-		guard let filteredContacts else {
+		if sortedContacts.isEmpty {
+			// User has zero contacts.
+			// This is different from zero search results.
+			return false
+		} else if let filteredContacts {
+			return filteredContacts.isEmpty
+		} else {
+			// Not searching
 			return false
 		}
-		
-		return filteredContacts.isEmpty && !sortedContacts.isEmpty
+	}
+	
+	var hasZeroContacts: Bool {
+		return sortedContacts.isEmpty
 	}
 	
 	func navLinkTagBinding() -> Binding<Bool> {
