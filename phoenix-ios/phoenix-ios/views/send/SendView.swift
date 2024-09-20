@@ -148,6 +148,7 @@ struct SendView: View {
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			header()
 			list()
+			footer()
 		}
 		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
 		.onAppear() {
@@ -178,10 +179,7 @@ struct SendView: View {
 	func header() -> some View {
 		
 		GroupBox {
-			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-				smartInputField()
-				actionButtons()
-			}
+			smartInputField()
 		}
 		.groupBoxStyle(InsetGroupBoxStyle())
 		.padding(.top)
@@ -196,6 +194,29 @@ struct SendView: View {
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
+	}
+	
+	@ViewBuilder
+	func footer() -> some View {
+		
+		HStack(alignment: VerticalAlignment.top, spacing: 0) {
+			Spacer()
+			actionButton_paste()
+			Spacer()
+			actionButton_chooseImage()
+			Spacer()
+			actionButton_scanQrCode()
+			Spacer()
+		}
+		.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
+		.padding(.horizontal)
+		.padding(.top, 20)
+		.padding(.bottom, deviceInfo.isFaceID ? 10 : 20)
+		.background(
+			Color.mutedBackground
+				.cornerRadius(15, corners: [.topLeft, .topRight])
+				.edgesIgnoringSafeArea([.horizontal, .bottom])
+		)
 	}
 	
 	@ViewBuilder
@@ -219,30 +240,11 @@ struct SendView: View {
 			}
 			.isHidden(inputFieldText.isEmpty)
 		}
-		.padding([.top, .bottom], 8)
-		.padding(.leading, 16)
-		.padding(.trailing, 8)
+		.padding(.vertical, 8)
+		.padding(.horizontal, 16)
 		.background(
 			Capsule().strokeBorder(Color.textFieldBorder)
 		)
-		.padding(.horizontal, 0)
-		.padding(.bottom, 16)
-	}
-	
-	@ViewBuilder
-	func actionButtons() -> some View {
-		
-		HStack(alignment: VerticalAlignment.top, spacing: 0) {
-			Spacer()
-			actionButton_paste()
-			Spacer()
-			actionButton_chooseImage()
-			Spacer()
-			actionButton_scanQrCode()
-			Spacer()
-		}
-		.padding(.horizontal)
-		.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
 	}
 	
 	@ViewBuilder
