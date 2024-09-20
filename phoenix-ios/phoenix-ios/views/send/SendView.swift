@@ -151,7 +151,6 @@ struct SendView: View {
 			list()
 			footer()
 		}
-		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
 		.onAppear() {
 			onAppear()
 		}
@@ -184,6 +183,7 @@ struct SendView: View {
 		}
 		.groupBoxStyle(InsetGroupBoxStyle())
 		.padding(.top)
+		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
 	}
 	
 	@ViewBuilder
@@ -195,6 +195,7 @@ struct SendView: View {
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
+		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
 	}
 	
 	@ViewBuilder
