@@ -170,8 +170,8 @@ class WalletReset {
 		
 		let dbDir = groupDir.appendingPathComponent("databases", isDirectory: true)
 		
-		let chainName = Biz.business.chain.name.lowercased()
-		let nodeIdHash = Biz.nodeIdHash ?? "nil"
+		let chainName: String = Biz.business.chain.phoenixName
+		let nodeIdHash: String = Biz.nodeIdHash ?? "nil"
 		
 		log.debug("dbDir: \(dbDir.path)")
 		log.debug("chainName: \(chainName)")
