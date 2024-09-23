@@ -11,7 +11,7 @@ plugins {
     if (System.getProperty("includeAndroid")?.toBoolean() == true) {
         id("com.android.library")
     }
-    id("co.touchlab.skie") version "0.8.1"
+    id("co.touchlab.skie") version "0.8.4"
 }
 
 val includeAndroid = System.getProperty("includeAndroid")?.toBoolean() ?: false
@@ -67,15 +67,12 @@ kotlin {
             }
             configureEach {
                 it.compilations.all {
-                    kotlinOptions.freeCompilerArgs += "-Xoverride-konan-properties=osVersionMin.ios_x64=15.0;osVersionMin.ios_arm64=15.0"
+                    kotlinOptions.freeCompilerArgs += "-Xoverride-konan-properties=osVersionMin.ios_x64=16.0;osVersionMin.ios_arm64=16.0"
                     // The notification-service-extension is limited to 24 MB of memory.
                     // With mimalloc we can easily hit the 24 MB limit, and the OS kills the process.
                     // But with standard allocation, we're using less then half the limit.
                     kotlinOptions.freeCompilerArgs += "-Xallocator=std"
                     kotlinOptions.freeCompilerArgs += listOf("-linker-options", "-application_extension")
-                    // workaround for xcode 15 and kotlin < 1.9.10: 
-                    // https://youtrack.jetbrains.com/issue/KT-60230/Native-unknown-options-iossimulatorversionmin-sdkversion-with-Xcode-15-beta-3
-                    linkerOpts += "-ld64"
                 }
             }
         }
@@ -99,7 +96,7 @@ kotlin {
                 implementation("app.cash.sqldelight:runtime:${Versions.sqlDelight}")
                 implementation("app.cash.sqldelight:coroutines-extensions:${Versions.sqlDelight}")
                 // SKEI
-                implementation("co.touchlab.skie:configuration-annotations:0.8.1")
+                implementation("co.touchlab.skie:configuration-annotations:0.8.4")
             }
         }
 

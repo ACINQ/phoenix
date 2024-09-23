@@ -1,12 +1,12 @@
 object Versions {
-    const val lightningKmp = "1.7.3"
+    const val lightningKmp = "1.7.4-SNAPSHOT"
     const val secp256k1 = "0.14.0"
     const val torMobile = "0.2.0"
 
-    const val kotlin = "1.9.22"
+    const val kotlin = "2.0.10"
 
-    const val ktor = "2.3.7"
-    const val sqlDelight = "2.0.1"
+    const val ktor = "2.3.12"
+    const val sqlDelight = "2.0.2"
 
     const val slf4j = "1.7.30"
     const val junit = "4.13"
@@ -19,7 +19,6 @@ object Versions {
         const val prefs = "1.2.0"
         const val datastore = "1.0.0"
         const val compose = "1.6.2"
-        const val composeCompiler = "1.5.8"
         const val navCompose = "2.6.0"
         const val accompanist = "0.30.1"
         const val composeConstraintLayout = "1.1.0-alpha09"

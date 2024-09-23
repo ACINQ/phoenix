@@ -154,7 +154,7 @@ class SqlitePaymentsDatabaseTest {
     fun incoming__purge_expired() = runTest {
         val expiredPreimage = randomBytes32()
         val expiredInvoice = Bolt11Invoice.create(
-            chain = Chain.Testnet,
+            chain = Chain.Testnet3,
             amount = 150_000.msat,
             paymentHash = Crypto.sha256(expiredPreimage).toByteVector32(),
             privateKey = Lightning.randomKey(),

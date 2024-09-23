@@ -337,7 +337,7 @@ class CsvWriterTests {
      */
     private fun makePaymentRequest() =
         Bolt11Invoice.create(
-            chain = Chain.Testnet,
+            chain = Chain.Testnet3,
             amount = 10_000.msat,
             paymentHash = randomBytes32(),
             privateKey = PrivateKey(value = randomBytes32()),

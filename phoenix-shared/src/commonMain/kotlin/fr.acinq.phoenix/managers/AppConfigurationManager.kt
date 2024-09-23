@@ -12,6 +12,7 @@ import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.SqliteAppDb
+import fr.acinq.phoenix.utils.extensions.phoenixName
 import fr.acinq.lightning.logging.debug
 import fr.acinq.lightning.logging.error
 import io.ktor.client.*
@@ -115,7 +116,7 @@ class AppConfigurationManager(
         }?.let { json ->
             logger.debug { "fetched wallet-context=$json" }
             try {
-                val base = json[chain.name.lowercase()]!!
+                val base = json[chain.phoenixName]!!
                 val isMempoolFull = base.jsonObject["mempool"]?.jsonObject?.get("v1")?.jsonObject?.get("high_usage")?.jsonPrimitive?.booleanOrNull
                 val androidLatestVersion = base.jsonObject["version"]?.jsonPrimitive?.intOrNull
                 val androidLatestCriticalVersion = base.jsonObject["latest_critical_version"]?.jsonPrimitive?.intOrNull
@@ -218,7 +219,8 @@ class AppConfigurationManager(
 
     fun randomElectrumServer() = when (chain) {
         Chain.Mainnet -> mainnetElectrumServers.random()
-        Chain.Testnet -> testnetElectrumServers.random()
+        Chain.Testnet3 -> testnetElectrumServers.random()
+        Chain.Testnet4 -> TODO()
         Chain.Signet -> TODO()
         Chain.Regtest -> platformElectrumRegtestConf()
     }

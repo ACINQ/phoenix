@@ -64,6 +64,7 @@ import fr.acinq.phoenix.android.fiatRate
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.negativeColor
+import fr.acinq.phoenix.utils.extensions.phoenixName
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -115,8 +116,8 @@ class ResetWalletViewModel : ViewModel() {
 
             state.value = ResetWalletStep.Deleting.Databases
             context.deleteDatabase("appdb.sqlite")
-            context.deleteDatabase("payments-${chain.name.lowercase()}-$nodeIdHash.sqlite")
-            context.deleteDatabase("channels-${chain.name.lowercase()}-$nodeIdHash.sqlite")
+            context.deleteDatabase("payments-${chain.phoenixName}-$nodeIdHash.sqlite")
+            context.deleteDatabase("channels-${chain.phoenixName}-$nodeIdHash.sqlite")
             delay(500)
 
             state.value = ResetWalletStep.Deleting.Prefs

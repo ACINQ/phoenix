@@ -41,18 +41,18 @@ class ParserTest {
         assertIs<Either.Right<BitcoinUri>>(Parser.parseBip21Uri(Chain.Mainnet, "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4"))
         assertIs<Either.Right<BitcoinUri>>(Parser.parseBip21Uri(Chain.Mainnet, "bc1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3qccfmv3"))
 
-        assertIs<Either.Right<BitcoinUri>>(Parser.parseBip21Uri(Chain.Testnet, "mipcBbFg9gMiCh81Kj8tqqdgoZub1ZJRfn"))
-        assertIs<Either.Right<BitcoinUri>>(Parser.parseBip21Uri(Chain.Testnet, "2MzQwSSnBHWHqSAqtTVQ6v47XtaisrJa1Vc"))
-        assertIs<Either.Right<BitcoinUri>>(Parser.parseBip21Uri(Chain.Testnet, "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx"))
-        assertIs<Either.Right<BitcoinUri>>(Parser.parseBip21Uri(Chain.Testnet, "tb1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3q0sl5k7"))
-        assertIs<Either.Right<BitcoinUri>>(Parser.parseBip21Uri(Chain.Testnet, "tb1p607g5ea77m370pey3y5rg58fz7542hnpg40rs2cqw6w69yt5lf2qlktj2a"))
+        assertIs<Either.Right<BitcoinUri>>(Parser.parseBip21Uri(Chain.Testnet3, "mipcBbFg9gMiCh81Kj8tqqdgoZub1ZJRfn"))
+        assertIs<Either.Right<BitcoinUri>>(Parser.parseBip21Uri(Chain.Testnet3, "2MzQwSSnBHWHqSAqtTVQ6v47XtaisrJa1Vc"))
+        assertIs<Either.Right<BitcoinUri>>(Parser.parseBip21Uri(Chain.Testnet3, "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx"))
+        assertIs<Either.Right<BitcoinUri>>(Parser.parseBip21Uri(Chain.Testnet3, "tb1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3q0sl5k7"))
+        assertIs<Either.Right<BitcoinUri>>(Parser.parseBip21Uri(Chain.Testnet3, "tb1p607g5ea77m370pey3y5rg58fz7542hnpg40rs2cqw6w69yt5lf2qlktj2a"))
     }
 
     @Test
     fun parse_bitcoin_uri_chain_mismatch() {
         assertEquals(
             expected = Either.Left(BitcoinUriError.InvalidScript(error = BitcoinError.ChainHashMismatch)),
-            actual = Parser.parseBip21Uri(Chain.Testnet, "bc1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3qccfmv3")
+            actual = Parser.parseBip21Uri(Chain.Testnet3, "bc1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3qccfmv3")
         )
         assertEquals(
             expected = Either.Left(BitcoinUriError.InvalidScript(error = BitcoinError.ChainHashMismatch)),
@@ -77,7 +77,7 @@ class ParserTest {
         )
         assertIs<Either.Right<BitcoinUri>>(
             Parser.parseBip21Uri(
-                Chain.Testnet,
+                Chain.Testnet3,
                 "bitcoin:?lno=lno1qgsyxjtl6luzd9t3pr62xr7eemp6awnejusgf6gw45q75vcfqqqqqqqsespexwyy4tcadvgg89l9aljus6709kx235hhqrk6n8dey98uyuftzdqrt2gkjvf2rj2vnt7m7chnmazen8wpur2h65ttgftkqaugy6ql9dcsyq39xc2g084xfn0s50zlh2ex22vvaqxqz3vmudklz453nns4d0624sqr8ux4p5usm22qevld4ydfck7hwgcg9wc3f78y7jqhc6hwdq7e9dwkhty3svq5ju4dptxtldjumlxh5lw48jsz6pnagtwrmeus7uq9rc5g6uddwcwldpklxexvlezld8egntua4gsqqy8auz966nksacdac8yv3maq6elp"
             )
         )
