@@ -404,7 +404,6 @@
     <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
 
     <string name="paymentdetails_liquidity_amount_label">Požadovaná suma</string>
-    <string name="paymentdetails_liquidity_signature_label">Podpis</string>
 
     <string name="paymentdetails_closing_type_label">Typ uzavretia</string>
     <string name="paymentdetails_closing_type_mutual">Vzájomné</string>

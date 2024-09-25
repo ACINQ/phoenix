@@ -41,7 +41,6 @@
     <string name="notif_rejected_over_absolute_timeout">La comisión fue %1$s, pero el límite máximo se fijó en %2$s. Este depósito vencerá el %3$s.</string>
     <string name="notif_rejected_over_relative">La comisión fue %1$s, que es más del %2$s%% del importe recibido. Toca para obtener más información.</string>
     <string name="notif_rejected_over_relative_timeout">La comisión fue %1$s, que es más del %2$s%% del importe recibido. Este depósito vencerá el %3$s.</string>
-    <string name="notif_rejected_channels_initializing">Los canales se estaban inicializando, por lo que no se pudo aceptar el pago. Intenta de nuevo más tarde.</string>
 
     <string name="notif_watcher_revoked_commit_title">Inicia Phoenix</string>
     <string name="notif_watcher_revoked_commit_message">Es posible que algunos de los canales se hayan cerrado.</string>

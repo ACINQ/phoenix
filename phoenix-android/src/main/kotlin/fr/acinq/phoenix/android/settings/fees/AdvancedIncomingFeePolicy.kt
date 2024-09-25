@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.payment.LiquidityPolicy
+import fr.acinq.lightning.utils.msat
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.Button
@@ -111,7 +112,15 @@ fun AdvancedIncomingFeePolicy(
                 }
 
                 Card {
-                    val newPolicy = maxRelativeFeeBasisPoints?.let { LiquidityPolicy.Auto(maxRelativeFeeBasisPoints = it, maxAbsoluteFee = maxAbsoluteFee, skipAbsoluteFeeCheck = skipAbsoluteFeeCheck) }
+                    val newPolicy = maxRelativeFeeBasisPoints?.let {
+                        LiquidityPolicy.Auto(
+                            inboundLiquidityTarget = null,
+                            maxRelativeFeeBasisPoints = it,
+                            maxAbsoluteFee = maxAbsoluteFee,
+                            skipAbsoluteFeeCheck = skipAbsoluteFeeCheck,
+                            maxAllowedFeeCredit = 0.msat,
+                        )
+                    }
                     val isEnabled = newPolicy != null && liquidityPolicyPrefs != newPolicy
                     Button(
                         text = stringResource(id = R.string.liquiditypolicy_save_button),

@@ -36,6 +36,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.payment.LiquidityPolicy
+import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.LocalFiatCurrency
 import fr.acinq.phoenix.android.R
@@ -132,7 +133,15 @@ fun LiquidityPolicyView(
                 val skipAbsoluteFeeCheck = if (liquidityPolicyPrefs is LiquidityPolicy.Auto) liquidityPolicyPrefs.skipAbsoluteFeeCheck else false
                 val newPolicy = when {
                     isPolicyDisabled -> LiquidityPolicy.Disable
-                    else -> maxAbsoluteFee?.let { LiquidityPolicy.Auto(maxRelativeFeeBasisPoints = maxPropFeePrefs, maxAbsoluteFee = it, skipAbsoluteFeeCheck = skipAbsoluteFeeCheck) }
+                    else -> maxAbsoluteFee?.let {
+                        LiquidityPolicy.Auto(
+                            inboundLiquidityTarget = null,
+                            maxRelativeFeeBasisPoints = maxPropFeePrefs,
+                            maxAbsoluteFee = it,
+                            skipAbsoluteFeeCheck = skipAbsoluteFeeCheck,
+                            maxAllowedFeeCredit = 0.msat,
+                        )
+                    }
                 }
                 val isEnabled = newPolicy != null && liquidityPolicyPrefs != newPolicy
                 Button(

@@ -51,7 +51,6 @@
     <string name="notif_rejected_over_absolute_timeout">Khoản phí là %1$s, nhưng phí tối đa của bạn được đặt là %2$s. Khoản tiền cọc này sẽ hết hạn vào %3$s.</string>
     <string name="notif_rejected_over_relative">Khoản phí là %1$s và cao hơn %2$s%% so với khoản nhận được. Nhấn để biết thêm chi tiết.</string>
     <string name="notif_rejected_over_relative_timeout">Khoản phí là %1$s và cao hơn %2$s%% so với khoản tiền sẽ nhận được. Khoản tiền này sẽ hết hạn vào %3$s.</string>
-    <string name="notif_rejected_channels_initializing">Kênh của bạn đang được khởi tạo và không thể nhận khoản thanh toán này. Vui lòng thử lại sau.</string>
 
     <string name="notif_watcher_revoked_commit_title">Xin hãy khởi động Phoenix.</string>
     <string name="notif_watcher_revoked_commit_message">Một vài kênh của bạn có thể đã đóng.</string>

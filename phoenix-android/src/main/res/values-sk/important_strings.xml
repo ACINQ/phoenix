@@ -44,7 +44,6 @@
     <string name="notif_rejected_over_absolute_timeout">Poplatok bol %1$s, ale váš maximálny poplatok bol nastavený na %2$s. Platnosť tohto vkladu vyprší %3$s.</string>
     <string name="notif_rejected_over_relative">Poplatok bol %1$s, čo je viac než %2$s%% z prijatej sumy. Kliknite pre podrobnosti.</string>
     <string name="notif_rejected_over_relative_timeout">Poplatok bol %1$s, čo je viac než %2$s%% z prijatej sumy. Platnosť tohto vkladu vyprší %3$s.</string>
-    <string name="notif_rejected_channels_initializing">Vaše kanály sa inicializovali a nemohli prijať túto platbu. Skúste to neskôr.</string>
 
     <string name="notif_watcher_revoked_commit_title">Spustite prosím Phoenix</string>
     <string name="notif_watcher_revoked_commit_message">Niektorý z vašich kanálov mohol byť uzavretý.</string>

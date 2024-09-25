@@ -423,7 +423,6 @@
     <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
 
     <string name="paymentdetails_liquidity_amount_label">Kiasi kilichoombwa</string>
-    <string name="paymentdetails_liquidity_signature_label">Sahihi</string>
 
     <string name="paymentdetails_closing_type_label">Aina ya kufunga</string>
     <string name="paymentdetails_closing_type_mutual">Kushirikiana</string>
