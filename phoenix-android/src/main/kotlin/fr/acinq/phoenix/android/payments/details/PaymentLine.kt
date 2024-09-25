@@ -181,7 +181,7 @@ private fun PaymentDescription(
     val metadata = paymentInfo.metadata
     val peer by business.peerManager.peerState.collectAsState()
 
-    val desc = when (paymentInfo.isLegacyMigration(peer)) {
+    val desc = when (payment.isLegacyMigration(metadata, peer)) {
         null -> stringResource(id = R.string.paymentdetails_desc_closing_channel) // not sure yet, but we still know it's a closing
         true -> stringResource(id = R.string.paymentdetails_desc_legacy_migration)
         false -> metadata.userDescription

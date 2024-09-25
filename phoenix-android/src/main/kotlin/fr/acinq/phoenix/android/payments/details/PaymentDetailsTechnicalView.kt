@@ -42,6 +42,7 @@ import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sum
 import fr.acinq.lightning.utils.toMilliSatoshi
+import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.LocalFiatCurrency
 import fr.acinq.phoenix.android.R
@@ -50,16 +51,22 @@ import fr.acinq.phoenix.android.components.AmountView
 import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.CardHeader
 import fr.acinq.phoenix.android.components.Clickable
+import fr.acinq.phoenix.android.components.InlineButton
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.TransactionLinkButton
 import fr.acinq.phoenix.android.fiatRate
+import fr.acinq.phoenix.android.navController
+import fr.acinq.phoenix.android.navigateToPaymentDetails
 import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
 import fr.acinq.phoenix.android.utils.Converter.toFiat
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.data.ExchangeRate
+import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
+import fr.acinq.phoenix.data.walletPaymentId
+import fr.acinq.phoenix.utils.extensions.amountFeeCredit
 
 
 @Composable
@@ -92,6 +99,7 @@ fun PaymentDetailsTechnicalView(
                             is IncomingPayment.ReceivedWith.LightningPayment -> ReceivedWithLightning(it, rateThen)
                             is IncomingPayment.ReceivedWith.NewChannel -> ReceivedWithNewChannel(it, rateThen)
                             is IncomingPayment.ReceivedWith.SpliceIn -> ReceivedWithSpliceIn(it, rateThen)
+                            is IncomingPayment.ReceivedWith.AddedToFeeCredit -> ReceivedWithFeeCredit(it, rateThen)
                         }
                     }
                 }
@@ -180,7 +188,7 @@ private fun HeaderForIncoming(
     // -- payment type
     TechnicalRow(label = stringResource(id = R.string.paymentdetails_payment_type_label)) {
         Text(
-            when (payment.origin) {
+            text = when (payment.origin) {
                 is IncomingPayment.Origin.Invoice -> stringResource(R.string.paymentdetails_normal_incoming)
                 is IncomingPayment.Origin.SwapIn -> stringResource(R.string.paymentdetails_swapin)
                 is IncomingPayment.Origin.OnChain -> stringResource(R.string.paymentdetails_swapin)
@@ -233,7 +241,7 @@ private fun AmountSection(
         is InboundLiquidityOutgoingPayment -> {
             TechnicalRowAmount(
                 label = stringResource(id = R.string.paymentdetails_liquidity_amount_label),
-                amount = payment.lease.amount.toMilliSatoshi(),
+                amount = payment.purchase.amount.toMilliSatoshi(),
                 rateThen = rateThen,
                 mSatDisplayPolicy = MSatDisplayPolicy.SHOW
             )
@@ -245,13 +253,9 @@ private fun AmountSection(
             )
             TechnicalRowAmount(
                 label = stringResource(id = R.string.paymentdetails_liquidity_service_fee_label),
-                amount = payment.lease.fees.serviceFee.toMilliSatoshi(),
+                amount = payment.serviceFees.toMilliSatoshi(),
                 rateThen = rateThen,
                 mSatDisplayPolicy = MSatDisplayPolicy.SHOW
-            )
-            TechnicalRowSelectable(
-                label = stringResource(id = R.string.paymentdetails_liquidity_signature_label),
-                value = payment.lease.sellerSig.toHex(),
             )
         }
         is OutgoingPayment -> {
@@ -275,6 +279,14 @@ private fun AmountSection(
                 rateThen = rateThen,
                 mSatDisplayPolicy = MSatDisplayPolicy.SHOW
             )
+            payment.amountFeeCredit?.let {
+                TechnicalRowAmount(
+                    label = stringResource(R.string.paymentdetails_amount_fee_credit_label),
+                    amount = it,
+                    rateThen = rateThen,
+                    mSatDisplayPolicy = MSatDisplayPolicy.SHOW
+                )
+            }
             val receivedWithNewChannel = payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>() ?: emptyList()
             val receivedWithSpliceIn = payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.SpliceIn>() ?: emptyList()
             if ((receivedWithNewChannel + receivedWithSpliceIn).isNotEmpty()) {
@@ -383,6 +395,37 @@ private fun DetailsForInboundLiquidity(
         label = stringResource(id = R.string.paymentdetails_channel_id_label),
         value = payment.channelId.toHex(),
     )
+    TechnicalRow(label = "Purchase Type") {
+        Text(text = when (payment.purchase) {
+            is LiquidityAds.Purchase.Standard -> "Standard"
+            is LiquidityAds.Purchase.WithFeeCredit -> "Fee credit"
+        })
+    }
+    val details = payment.purchase.paymentDetails
+    TechnicalRow(label = "Purchase details") {
+        Text(text = details.paymentType.toString())
+    }
+    when (details) {
+        is LiquidityAds.PaymentDetails.FromFutureHtlc -> ListLinksOfPaymentHashes(details.paymentHashes)
+        is LiquidityAds.PaymentDetails.FromChannelBalanceForFutureHtlc -> ListLinksOfPaymentHashes(details.paymentHashes)
+        else -> Unit
+    }
+}
+
+@Composable
+private fun ListLinksOfPaymentHashes(paymentHashes: List<ByteVector32>) {
+    val navController = navController
+    TechnicalRow(label = "Triggered by payments") {
+        Column {
+            paymentHashes.forEach {
+                InlineButton(
+                    text = "- ${it.toHex()}",
+                    onClick = { navigateToPaymentDetails(navController, WalletPaymentId.IncomingPaymentId(it), isFromEvent = false) },
+                    maxLines = 1,
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -449,7 +492,7 @@ private fun ReceivedWithLightning(
             Text(text = receivedWith.channelId.toHex())
         }
     }
-    TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_received_label), amount = receivedWith.amount, rateThen = rateThen)
+    TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_received_label), amount = receivedWith.amountReceived, rateThen = rateThen)
 }
 
 @Composable
@@ -470,7 +513,7 @@ private fun ReceivedWithNewChannel(
         label = stringResource(id = R.string.paymentdetails_tx_id_label),
         content = { TransactionLinkButton(txId = receivedWith.txId) }
     )
-    TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_received_label), amount = receivedWith.amount, rateThen = rateThen)
+    TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_received_label), amount = receivedWith.amountReceived, rateThen = rateThen)
 }
 
 @Composable
@@ -491,7 +534,18 @@ private fun ReceivedWithSpliceIn(
         label = stringResource(id = R.string.paymentdetails_tx_id_label),
         content = { TransactionLinkButton(txId = receivedWith.txId) }
     )
-    TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_received_label), amount = receivedWith.amount, rateThen = rateThen)
+    TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_received_label), amount = receivedWith.amountReceived, rateThen = rateThen)
+}
+
+@Composable
+private fun ReceivedWithFeeCredit(
+    receivedWith: IncomingPayment.ReceivedWith.AddedToFeeCredit,
+    rateThen: ExchangeRate.BitcoinPriceRate?
+) {
+    TechnicalRow(label = stringResource(id = R.string.paymentdetails_received_with_label)) {
+        Text(text = stringResource(id = R.string.paymentdetails_received_with_fee_credit))
+    }
+    TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_added_to_fee_credit_label), amount = receivedWith.amountReceived, rateThen = rateThen)
 }
 
 @Composable

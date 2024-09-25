@@ -237,7 +237,7 @@ private fun RequestLiquidityBottomSection(
                 ErrorMessage(header = stringResource(id = R.string.validation_invalid_amount))
             } else {
                 ReviewLiquidityRequest(
-                    onConfirm = { vm.requestInboundLiquidity(amount = state.amount, feerate = state.actualFeerate) }
+                    onConfirm = { vm.requestInboundLiquidity(amount = state.amount, feerate = state.actualFeerate, fundingRate = state.fundingRate) }
                 )
             }
         }
@@ -245,12 +245,18 @@ private fun RequestLiquidityBottomSection(
             ProgressView(text = stringResource(id = R.string.liquidityads_requesting_spinner))
         }
         is RequestLiquidityState.Complete.Success -> {
-            LeaseSuccessDetails(liquidityDetails = state.response)
+            LiquiditySuccessDetails(liquidityDetails = state.response)
         }
         is RequestLiquidityState.Error.NoChannelsAvailable -> {
             ErrorMessage(
                 header = stringResource(id = R.string.liquidityads_error_header),
                 details = stringResource(id = R.string.liquidityads_error_channels_unavailable)
+            )
+        }
+        is RequestLiquidityState.Error.InvalidFundingAmount -> {
+            ErrorMessage(
+                header =  stringResource(id = R.string.liquidityads_error_header),
+                details = "Invalid amount requested. Please try again."
             )
         }
         is RequestLiquidityState.Error.Thrown -> {
@@ -375,10 +381,10 @@ private fun ReviewLiquidityRequest(
 }
 
 @Composable
-private fun LeaseSuccessDetails(liquidityDetails: ChannelCommand.Commitment.Splice.Response.Created) {
+private fun LiquiditySuccessDetails(liquidityDetails: ChannelCommand.Commitment.Splice.Response.Created) {
     SuccessMessage(
         header = stringResource(id = R.string.liquidityads_success),
-        details = liquidityDetails.liquidityLease?.amount?.let {
+        details = liquidityDetails.liquidityPurchase?.amount?.let {
             stringResource(id = R.string.liquidityads_success_amount, it.toPrettyString(unit = LocalBitcoinUnit.current, withUnit = true))
         },
         alignment = Alignment.CenterHorizontally,

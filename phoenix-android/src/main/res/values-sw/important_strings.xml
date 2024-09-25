@@ -48,7 +48,6 @@
     <string name="notif_rejected_over_absolute_timeout">Ada ilikuwa %1$s, lakini ada yako ya juu ilikuwa imewekwa kwa %2$s. Amana hii itaisha muda wake ifikapo %3$s.</string>
     <string name="notif_rejected_over_relative">Ada ilikuwa %1$s ambayo ni zaidi ya %2$s%% ya kiasi kilichopokelewa. Bonyeza kwa maelezo zaidi.</string>
     <string name="notif_rejected_over_relative_timeout">Ada ilikuwa %1$s ambayo ni zaidi ya %2$s%% ya kiasi kilichopokelewa. Amana hii itaisha muda wake ifikapo %3$s.</string>
-    <string name="notif_rejected_channels_initializing">Chaneli zako zilikuwa zinaanzishwa na hazikuweza kukubali malipo hayo. Jaribu tena baadaye.</string>
 
     <string name="notif_watcher_revoked_commit_title">Tafadhali anzisha Phoenix</string>
     <string name="notif_watcher_revoked_commit_message">Baadhi ya chaneli zako zinaweza kuwa zimefungwa.</string>

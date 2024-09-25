@@ -48,7 +48,7 @@
     <string name="notif_rejected_over_absolute_timeout">The fee was %1$s, but your max fee was set to %2$s. This deposit will expire by %3$s.</string>
     <string name="notif_rejected_over_relative">The fee was %1$s which is more than %2$s%% of the amount received. Tap for details.</string>
     <string name="notif_rejected_over_relative_timeout">The fee was %1$s which is more than %2$s%% of the amount received. This deposit will expire by %3$s.</string>
-    <string name="notif_rejected_channels_initializing">Your channels were initializing and could not accept that payment. Try again later.</string>
+    <string name="notif_rejected_generic_error">An error occurred during the funding. Please try again later.</string>
 
     <string name="notif_watcher_revoked_commit_title">Please start Phoenix</string>
     <string name="notif_watcher_revoked_commit_message">Some of your channels may have closed.</string>
@@ -313,7 +313,9 @@
 
     <string name="walletinfo_onchain_swapin_last_attempt">A swap attempt failed %1$s</string>
     <string name="walletinfo_onchain_swapin_last_attempt_disabled">Channels management was disabled.</string>
-    <string name="walletinfo_onchain_swapin_last_attempt_channels_init">Channels were still initializing.</string>
+    <string name="walletinfo_onchain_swapin_last_attempt_funding_in_progress">A funding is in progress.</string>
+    <string name="walletinfo_onchain_swapin_last_attempt_amount_too_low">The amount was too low.</string>
+    <string name="walletinfo_onchain_swapin_last_attempt_generic">An error has occurred. Try again later.</string>
     <string name="walletinfo_onchain_swapin_timeout_1day">This swap will expire in a day!</string>
     <string name="walletinfo_onchain_swapin_timeout">This swap will expire in %1$s days.</string>
 

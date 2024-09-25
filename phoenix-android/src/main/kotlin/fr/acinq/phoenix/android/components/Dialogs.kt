@@ -179,7 +179,7 @@ fun RowScope.IconPopup(
     popupLink: Pair<String, String>? = null,
     spaceLeft: Dp? = 8.dp,
     spaceRight: Dp? = null,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     var showPopup by remember { mutableStateOf(false) }
     spaceLeft?.let { Spacer(Modifier.requiredWidth(it)) }
@@ -191,7 +191,7 @@ fun RowScope.IconPopup(
         padding = PaddingValues(iconPadding),
         modifier = modifier.requiredSize(iconSize),
         interactionSource = interactionSource,
-        onClick = { showPopup = true }
+        onClick = { showPopup = true },
     )
     if (showPopup) {
         PopupDialog(onDismiss = { showPopup = false }, message = popupMessage, button = popupLink?.let { (text, link) ->

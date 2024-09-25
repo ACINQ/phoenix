@@ -64,7 +64,7 @@ import fr.acinq.phoenix.android.components.SplashLayout
 import fr.acinq.phoenix.android.components.TextInput
 import fr.acinq.phoenix.android.components.contact.ContactOrOfferView
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
-import fr.acinq.phoenix.android.payments.details.translatePaymentError
+import fr.acinq.phoenix.android.payments.details.splash.translatePaymentError
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 

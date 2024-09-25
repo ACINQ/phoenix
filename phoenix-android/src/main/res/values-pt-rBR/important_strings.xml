@@ -44,7 +44,6 @@
     <string name="notif_rejected_over_absolute_timeout">A taxa foi de %1$s, mas sua taxa máxima foi definida como %2$s. Esse depósito expirará em %3$s.</string>
     <string name="notif_rejected_over_relative">A taxa foi de %1$s, que é mais do que %2$s%% do valor recebido. Você pode ajustar isso nas configurações.</string>
     <string name="notif_rejected_over_relative_timeout">A taxa foi de %1$s, que é mais do que %2$s%% do valor recebido. Esse depósito expirará em %3$s.</string>
-    <string name="notif_rejected_channels_initializing">Seus canais estavam sendo inicializados e não puderam aceitar esse pagamento. Tente novamente mais tarde.</string>
 
     <string name="notif_watcher_revoked_commit_title">Por favor, inicie o Phoenix</string>
     <string name="notif_watcher_revoked_commit_message">Alguns de seus canais podem ter sido fechados.</string>

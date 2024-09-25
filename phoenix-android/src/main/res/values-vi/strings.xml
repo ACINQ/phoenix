@@ -383,7 +383,6 @@
     <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
 
     <string name="paymentdetails_liquidity_amount_label">Số tiền yêu cầu</string>
-    <string name="paymentdetails_liquidity_signature_label">Chữ ký</string>
 
     <string name="paymentdetails_closing_type_label">Hình thức đóng</string>
     <string name="paymentdetails_closing_type_mutual">Đồng thuận</string>

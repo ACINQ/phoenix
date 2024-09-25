@@ -151,12 +151,12 @@ object SystemNotificationHelper {
         )
     }
 
-    fun notifyPaymentRejectedChannelsInitializing(context: Context, source: LiquidityEvents.Source, amountIncoming: MilliSatoshi, nextTimeoutRemainingBlocks: Int?): Notification {
+    fun notifyPaymentRejectedFundingError(context: Context, source: LiquidityEvents.Source, amountIncoming: MilliSatoshi): Notification {
         return notifyPaymentFailed(
             context = context,
             title = context.getString(if (source == LiquidityEvents.Source.OnChainWallet) R.string.notif_rejected_deposit_title else R.string.notif_rejected_payment_title,
                 amountIncoming.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
-            message = context.getString(R.string.notif_rejected_channels_initializing),
+            message = context.getString(R.string.notif_rejected_generic_error),
             deepLink = if (source == LiquidityEvents.Source.OnChainWallet) "phoenix:swapinwallet" else "phoenix:liquiditypolicy",
         )
     }

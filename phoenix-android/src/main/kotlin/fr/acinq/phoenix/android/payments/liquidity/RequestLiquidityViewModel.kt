@@ -24,8 +24,8 @@ import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.ChannelCommand
 import fr.acinq.lightning.channel.ChannelManagementFees
+import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.managers.AppConfigurationManager
-import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.managers.PeerManager
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory
 sealed class RequestLiquidityState {
     object Init: RequestLiquidityState()
     object Estimating: RequestLiquidityState()
-    data class Estimation(val amount: Satoshi, val fees: ChannelManagementFees, val actualFeerate: FeeratePerKw): RequestLiquidityState()
+    data class Estimation(val amount: Satoshi, val fees: ChannelManagementFees, val actualFeerate: FeeratePerKw, val fundingRate: LiquidityAds.FundingRate): RequestLiquidityState()
     object Requesting: RequestLiquidityState()
     sealed class Complete: RequestLiquidityState() {
         abstract val response: ChannelCommand.Commitment.Splice.Response
@@ -47,7 +47,8 @@ sealed class RequestLiquidityState {
     }
     sealed class Error: RequestLiquidityState() {
         data class Thrown(val cause: Throwable): Error()
-        object NoChannelsAvailable: Error()
+        data object NoChannelsAvailable: Error()
+        data object InvalidFundingAmount: Error()
     }
 }
 
@@ -65,23 +66,29 @@ class RequestLiquidityViewModel(val peerManager: PeerManager, val appConfigManag
         }) {
             val peer = peerManager.getPeer()
             val feerate = appConfigManager.mempoolFeerate.filterNotNull().first().hour
+            val fundingRate = peer.remoteFundingRates.filterNotNull().first().findRate(amount)
+            if (fundingRate == null) {
+                state.value = RequestLiquidityState.Error.InvalidFundingAmount
+                return@launch
+            }
+
             peer.estimateFeeForInboundLiquidity(
                 amount = amount,
                 targetFeerate = FeeratePerKw(feerate),
-                leaseRate = NodeParamsManager.liquidityLeaseRate(amount),
+                fundingRate = fundingRate,
             ).let { response ->
                 state.value = when (response) {
                     null -> RequestLiquidityState.Error.NoChannelsAvailable
                     else -> {
                         val (actualFeerate, fees) = response
-                        RequestLiquidityState.Estimation(amount, fees, actualFeerate)
+                        RequestLiquidityState.Estimation(amount, fees, actualFeerate, fundingRate)
                     }
                 }
             }
         }
     }
 
-    fun requestInboundLiquidity(amount: Satoshi, feerate: FeeratePerKw) {
+    fun requestInboundLiquidity(amount: Satoshi, feerate: FeeratePerKw, fundingRate: LiquidityAds.FundingRate) {
         if (state.value is RequestLiquidityState.Requesting) return
         state.value = RequestLiquidityState.Requesting
         viewModelScope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, e ->
@@ -92,7 +99,7 @@ class RequestLiquidityViewModel(val peerManager: PeerManager, val appConfigManag
             peer.requestInboundLiquidity(
                 amount = amount,
                 feerate = feerate,
-                leaseRate = NodeParamsManager.liquidityLeaseRate(amount),
+                fundingRate = fundingRate,
             ).let { response ->
                 state.value = when (response) {
                     null -> RequestLiquidityState.Error.NoChannelsAvailable

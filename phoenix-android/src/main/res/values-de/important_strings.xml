@@ -41,7 +41,6 @@
     <string name="notif_rejected_over_absolute_timeout">Die Gebühr wäre %1$s, aber Ihr Gebührenlimit beträgt %2$s. Diese Einzahlung verfällt am %3$s.</string>
     <string name="notif_rejected_over_relative">Die Gebühr wäre %1$s, was mehr als %2$s%% des zu empfangenden Betrags ist. Sie können dies in den Einstellungen anpassen.</string>
     <string name="notif_rejected_over_relative_timeout">Die Gebühr wäre %1$s, was mehr als %2$s%% des zu empfangenden Betrags ist. Diese Einzahlung verfällt am %3$s.</string>
-    <string name="notif_rejected_channels_initializing">Ihre Kanäle werden gerade initialisiert und konnten die Zahlung nicht empfangen. Versuchen Sie es später noch mal.</string>
 
     <string name="notif_watcher_revoked_commit_title">Bitte öffnen Sie Phoenix</string>
     <string name="notif_watcher_revoked_commit_message">Einige Ihrer Kanäle wurden möglicherweise geschlossen.</string>

@@ -17,22 +17,18 @@
 package fr.acinq.phoenix.android.utils
 
 import android.content.*
-import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.core.content.FileProvider
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.utils.Connection
-import fr.acinq.lightning.utils.currentTimestampMillis
+import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.utils.extensions.desc
-import java.io.File
 import java.security.cert.CertificateException
 import java.util.*
 import kotlin.contracts.ExperimentalContracts
@@ -126,6 +122,27 @@ fun UserTheme.label(): String {
 
 fun Connection.CLOSED.isBadCertificate() = this.reason?.cause is CertificateException
 
+fun LightningOutgoingPayment.smartDescription(context: Context): String? = when (val details = this.details) {
+    is LightningOutgoingPayment.Details.Normal -> details.paymentRequest.desc
+    is LightningOutgoingPayment.Details.SwapOut -> context.getString(R.string.paymentdetails_desc_swapout, details.address)
+    is LightningOutgoingPayment.Details.Blinded -> details.paymentRequest.description
+}?.takeIf { it.isNotBlank() }
+fun SpliceOutgoingPayment.smartDescription(context: Context): String = context.getString(R.string.paymentdetails_desc_splice_out)
+fun SpliceCpfpOutgoingPayment.smartDescription(context: Context): String = context.getString(R.string.paymentdetails_desc_cpfp)
+fun ChannelCloseOutgoingPayment.smartDescription(context: Context): String = context.getString(R.string.paymentdetails_desc_closing_channel)
+fun InboundLiquidityOutgoingPayment.smartDescription(context: Context): String = when (purchase.paymentDetails) {
+    // manual inbound liquidity
+    LiquidityAds.PaymentDetails.FromChannelBalance -> "Manual liquidity" // context.getString(R.string.paymentdetails_desc_inbound_liquidity, purchase.amount.toPrettyString(BitcoinUnit.Sat, withUnit = true))
+    // pay-to-open/pay-to-splice
+    else -> "Automated liquidity"
+}
+
+fun IncomingPayment.smartDescription(context: Context) : String? = when (val origin = this.origin) {
+    is IncomingPayment.Origin.Invoice -> origin.paymentRequest.description
+    is IncomingPayment.Origin.SwapIn, is IncomingPayment.Origin.OnChain -> context.getString(R.string.paymentdetails_desc_swapin)
+    is IncomingPayment.Origin.Offer -> null
+}?.takeIf { it.isNotBlank() }
+
 /**
  * Returns a trimmed, localized description of the payment, based on the type and information available. May be null!
  *
@@ -133,18 +150,10 @@ fun Connection.CLOSED.isBadCertificate() = this.reason?.cause is CertificateExce
  * payment with an invoice do have a description baked in, and that's what is returned.
  */
 fun WalletPayment.smartDescription(context: Context): String? = when (this) {
-    is LightningOutgoingPayment -> when (val details = this.details) {
-        is LightningOutgoingPayment.Details.Normal -> details.paymentRequest.desc
-        is LightningOutgoingPayment.Details.SwapOut -> context.getString(R.string.paymentdetails_desc_swapout, details.address)
-        is LightningOutgoingPayment.Details.Blinded -> details.paymentRequest.description
-    }
-    is IncomingPayment -> when (val origin = this.origin) {
-        is IncomingPayment.Origin.Invoice -> origin.paymentRequest.description
-        is IncomingPayment.Origin.SwapIn, is IncomingPayment.Origin.OnChain -> context.getString(R.string.paymentdetails_desc_swapin)
-        is IncomingPayment.Origin.Offer -> null
-    }
-    is SpliceOutgoingPayment -> context.getString(R.string.paymentdetails_desc_splice_out)
-    is ChannelCloseOutgoingPayment -> context.getString(R.string.paymentdetails_desc_closing_channel)
-    is SpliceCpfpOutgoingPayment -> context.getString(R.string.paymentdetails_desc_cpfp)
-    is InboundLiquidityOutgoingPayment -> context.getString(R.string.paymentdetails_desc_inbound_liquidity, lease.amount.toPrettyString(BitcoinUnit.Sat, withUnit = true))
-}?.takeIf { it.isNotBlank() }
+    is LightningOutgoingPayment -> smartDescription(context)
+    is IncomingPayment -> smartDescription(context)
+    is SpliceOutgoingPayment -> smartDescription(context)
+    is ChannelCloseOutgoingPayment -> smartDescription(context)
+    is SpliceCpfpOutgoingPayment -> smartDescription(context)
+    is InboundLiquidityOutgoingPayment -> smartDescription(context)
+}

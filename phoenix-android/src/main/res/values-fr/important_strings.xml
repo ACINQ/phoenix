@@ -44,7 +44,6 @@
     <string name="notif_rejected_over_absolute_timeout">Les frais étaient de %1$s, mais votre max est de %2$s. Le dépôt expirera le %3$s.</string>
     <string name="notif_rejected_over_relative">Les frais étaient de %1$s et dépassent %2$s%% du montant. Cette configuration peut être changée.</string>
     <string name="notif_rejected_over_relative_timeout">Les frais étaient de %1$s et dépassent %2$s%% du montant. Le dépôt expirera le %3$s.</string>
-    <string name="notif_rejected_channels_initializing">Vos canaux de paiement étaient en initialisation, et n\'ont pu accepter ce paiement.</string>
 
     <string name="notif_watcher_revoked_commit_title">Veuillez démarrer Phoenix</string>
     <string name="notif_watcher_revoked_commit_message">Certains de vos canaux pourraient avoir fermé.</string>
