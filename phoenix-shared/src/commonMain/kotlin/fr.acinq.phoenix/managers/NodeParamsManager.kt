@@ -92,30 +92,14 @@ class NodeParamsManager(
         val trampolineNodeId = PublicKey.fromHex("03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134")
         val trampolineNodeUri = NodeUri(id = trampolineNodeId, "13.248.222.197", 9735)
         const val remoteSwapInXpub = "tpubDAmCFB21J9ExKBRPDcVxSvGs9jtcf8U1wWWbS1xTYmnUsuUHPCoFdCnEGxLE3THSWcQE48GHJnyz8XPbYUivBMbLSMBifFd3G9KmafkM9og"
-        val defaultLiquidityPolicy = LiquidityPolicy.Auto(maxAbsoluteFee = 5_000.sat, maxRelativeFeeBasisPoints = 50_00 /* 50% */, skipAbsoluteFeeCheck = false)
-        val payToOpenFeeBase = 100
+        val defaultLiquidityPolicy = LiquidityPolicy.Auto(
+            inboundLiquidityTarget = null, // auto inbound liquidity is disabled (it must be purchased manually)
+            maxAbsoluteFee = 5_000.sat,
+            maxRelativeFeeBasisPoints = 50_00 /* 50% */,
+            skipAbsoluteFeeCheck = false,
+            maxAllowedFeeCredit = 0.msat, // no fee credit
+        )
 
-        fun liquidityLeaseRate(amount: Satoshi): LiquidityAds.LeaseRate {
-            // WARNING : THIS MUST BE KEPT IN SYNC WITH LSP OTHERWISE FUNDING REQUEST WILL BE REJECTED BY PHOENIX
-            val fundingWeight = if (amount <= 100_000.sat) {
-                271 * 2 // 2-inputs (wpkh) / 0-change
-            } else if (amount <= 250_000.sat) {
-                271 * 2 // 2-inputs (wpkh) / 0-change
-            } else if (amount <= 500_000.sat) {
-                271 * 4 // 4-inputs (wpkh) / 0-change
-            } else if (amount <= 1_000_000.sat) {
-                271 * 4 // 4-inputs (wpkh) / 0-change
-            } else {
-                271 * 6 // 6-inputs (wpkh) / 0-change
-            }
-            return LiquidityAds.LeaseRate(
-                leaseDuration = 0,
-                fundingWeight = fundingWeight,
-                leaseFeeProportional = 100, // 1%
-                leaseFeeBase = 0.sat,
-                maxRelayFeeProportional = 100,
-                maxRelayFeeBase = 1_000.msat
-            )
-        }
+        val payToOpenFeeBase = 100
     }
 }

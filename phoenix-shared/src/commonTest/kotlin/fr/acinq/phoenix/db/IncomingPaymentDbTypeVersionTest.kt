@@ -62,7 +62,7 @@ class IncomingPaymentDbTypeVersionTest {
     @Test
     @Suppress("DEPRECATION")
     fun incoming_receivedwith_multipart_v0_lightning() {
-        val receivedWith = listOf(IncomingPayment.ReceivedWith.LightningPayment(100_000.msat, ByteVector32.One, 2L))
+        val receivedWith = listOf(IncomingPayment.ReceivedWith.LightningPayment(100_000.msat, ByteVector32.One, 2L, null))
         val deserialized = IncomingReceivedWithData.deserialize(
             IncomingReceivedWithTypeVersion.MULTIPARTS_V0,
             receivedWith.mapToDb()!!.second,
@@ -74,7 +74,7 @@ class IncomingPaymentDbTypeVersionTest {
 
     @Test
     fun incoming_receivedwith_multipart_v1_lightning() {
-        val receivedWith = listOf(IncomingPayment.ReceivedWith.LightningPayment(100_000.msat, ByteVector32.One, 2L))
+        val receivedWith = listOf(IncomingPayment.ReceivedWith.LightningPayment(100_000.msat, ByteVector32.One, 2L, null))
         val deserialized = IncomingReceivedWithData.deserialize(
             IncomingReceivedWithTypeVersion.MULTIPARTS_V1,
             receivedWith.mapToDb()!!.second,
@@ -146,7 +146,7 @@ class IncomingPaymentDbTypeVersionTest {
             IncomingOriginTypeVersion.INVOICE_V0
         ).first() as IncomingPayment.ReceivedWith.LightningPayment
 
-        assertEquals(999_999.msat, deserialized.amount)
+        assertEquals(999_999.msat, deserialized.amountReceived)
         assertEquals(0.msat, deserialized.fees)
         assertEquals(ByteVector32.Zeroes, deserialized.channelId)
         assertEquals(0L, deserialized.htlcId)
@@ -162,7 +162,7 @@ class IncomingPaymentDbTypeVersionTest {
             IncomingOriginTypeVersion.SWAPIN_V0
         )
             .first() as IncomingPayment.ReceivedWith.NewChannel
-        assertEquals(123_456.msat, deserialized.amount)
+        assertEquals(123_456.msat, deserialized.amountReceived)
         assertEquals(15_000.msat, deserialized.fees)
         assertEquals(channelId1, deserialized.channelId)
     }

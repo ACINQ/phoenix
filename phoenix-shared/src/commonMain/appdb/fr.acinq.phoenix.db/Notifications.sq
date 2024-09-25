@@ -1,5 +1,3 @@
-import fr.acinq.phoenix.db.notifications.NotificationTypeVersion;
-
 -- This table stores notifications of all kinds.
 -- * id             => UUID of a notification
 -- * type_version   => string tracking the type/version of a notification
@@ -8,7 +6,7 @@ import fr.acinq.phoenix.db.notifications.NotificationTypeVersion;
 -- * read_at        => when the notification was read, in millis. Read notifications are typically not shown anymore.
 CREATE TABLE IF NOT EXISTS notifications (
     id TEXT NOT NULL PRIMARY KEY,
-    type_version TEXT AS NotificationTypeVersion NOT NULL,
+    type_version TEXT NOT NULL,
     data_json BLOB NOT NULL,
     created_at INTEGER NOT NULL,
     read_at INTEGER DEFAULT NULL

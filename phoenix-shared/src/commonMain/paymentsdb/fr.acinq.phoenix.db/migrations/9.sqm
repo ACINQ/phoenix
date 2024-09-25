@@ -1,0 +1,8 @@
+import fr.acinq.phoenix.db.payments.InboundLiquidityLeaseTypeVersion;
+
+-- Migration: v9 -> v10
+--
+-- Changes:
+-- * Added a new column [payment_details_type] in table [inbound_liquidity_outgoing_payments]
+
+ALTER TABLE inbound_liquidity_outgoing_payments ADD COLUMN payment_details_type TEXT DEFAULT NULL;

@@ -129,30 +129,33 @@ class ParserTest {
 
     @Test
     fun parse_bitcoin_uri_with_lightning_invoice() {
-        listOf<Pair<String, Either<BitcoinUriError, BitcoinUri>>>(
-            // valid lightning invoice
-            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?foo=bar&lightning=lntb15u1p05vazrpp5apz75ghtq3ynmc5qm98tsgucmsav44fyffpguhzdep2kcgkfme4sdq4xysyymr0vd4kzcmrd9hx7cqp2xqrrss9qy9qsqsp5v4hqr48qe0u7al6lxwdpmp3w6k7evjdavm0lh7arpv3qaf038s5st2d8k8vvmxyav2wkfym9jp4mk64srmswgh7l6sqtq7l4xl3nknf8snltamvpw5p3yl9nxg0ax9k0698rr94qx6unrv8yhccmh4z9ghcq77hxps" to Either.Right(
-                BitcoinUri(
-                    chain = Chain.Mainnet,
-                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
-                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
-                    paymentRequest = Bolt11Invoice.read("lntb15u1p05vazrpp5apz75ghtq3ynmc5qm98tsgucmsav44fyffpguhzdep2kcgkfme4sdq4xysyymr0vd4kzcmrd9hx7cqp2xqrrss9qy9qsqsp5v4hqr48qe0u7al6lxwdpmp3w6k7evjdavm0lh7arpv3qaf038s5st2d8k8vvmxyav2wkfym9jp4mk64srmswgh7l6sqtq7l4xl3nknf8snltamvpw5p3yl9nxg0ax9k0698rr94qx6unrv8yhccmh4z9ghcq77hxps")
-                        .get(),
-                    ignoredParams = ParametersBuilder().apply { set("foo", "bar") }.build()
-                )
+        assertEquals(
+            expected = BitcoinUri(
+                chain = Chain.Mainnet,
+                address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                paymentRequest = Bolt11Invoice.read("lnbc10u1pn08ld4pp5x7vvjs56tsj65c5xxe43xtxc22n6umuc89hwjndkwkazduzqhsesdpcge6kuerfdenjqspsxvcxxd33vseryefqdahzqum5v93kketj9ehx2amncqzzsxqrrs0sp5g2gjnwnsmy7xfprvjsuppymeqvr0zm3tksmqtg2sqdyqmxaxasxq9qxpqysgq3rj5d9vx7vsmfe8pxzqx7jzes77sta32yp9rqx78dkh4fn8lg8mk9kzh29255qgamcdddf30pp6hptk0u432sg39h3rjxru0ec5edycpxpqmg3").get(),
+                ignoredParams = ParametersBuilder().apply { set("foo", "bar") }.build()
             ),
-            // invalid lightning invoice
-            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?lightning=lntb15u1p05vazrpp" to Either.Right(
-                BitcoinUri(chain = Chain.Mainnet, address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4", script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"))
-            ),
-            // empty lightning invoice
-            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?lightning=" to Either.Right(
-                BitcoinUri(chain = Chain.Mainnet, address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4", script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"))
-            ),
-        ).forEach { (address, expected) ->
-            val uri = Parser.parseBip21Uri(Chain.Mainnet, address)
-            assertEquals(expected, uri)
-        }
+            actual = Parser.parseBip21Uri(
+                chain = Chain.Mainnet,
+                input = "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?foo=bar&lightning=lnbc10u1pn08ld4pp5x7vvjs56tsj65c5xxe43xtxc22n6umuc89hwjndkwkazduzqhsesdpcge6kuerfdenjqspsxvcxxd33vseryefqdahzqum5v93kketj9ehx2amncqzzsxqrrs0sp5g2gjnwnsmy7xfprvjsuppymeqvr0zm3tksmqtg2sqdyqmxaxasxq9qxpqysgq3rj5d9vx7vsmfe8pxzqx7jzes77sta32yp9rqx78dkh4fn8lg8mk9kzh29255qgamcdddf30pp6hptk0u432sg39h3rjxru0ec5edycpxpqmg3"
+            ).right
+        )
+        assertEquals(
+            expected = BitcoinUri(chain = Chain.Mainnet, address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4", script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"), paymentRequest = null),
+            actual = Parser.parseBip21Uri(
+                chain = Chain.Mainnet,
+                input = "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?lightning=lntb15u1p05vazrpp"
+            ).right
+        )
+        assertEquals(
+            expected = BitcoinUri(chain = Chain.Mainnet, address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4", script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"), paymentRequest = null),
+            actual = Parser.parseBip21Uri(
+                chain = Chain.Mainnet,
+                input = "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?lightning="
+            ).right
+        )
     }
 
     @Test

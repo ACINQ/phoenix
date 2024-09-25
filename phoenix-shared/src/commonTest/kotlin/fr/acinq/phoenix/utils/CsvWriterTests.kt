@@ -20,6 +20,7 @@ import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampSeconds
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
+import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.TestConstants
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency
@@ -42,7 +43,7 @@ class CsvWriterTests {
             received = IncomingPayment.Received(
                 receivedWith = listOf(
                     IncomingPayment.ReceivedWith.NewChannel(
-                        amount = 12_000_000.msat,
+                        amountReceived = 12_000_000.msat,
                         serviceFee = 3_000_000.msat,
                         miningFee = 0.sat,
                         channelId = randomBytes32(),
@@ -78,9 +79,10 @@ class CsvWriterTests {
             received = IncomingPayment.Received(
                 receivedWith = listOf(
                     IncomingPayment.ReceivedWith.LightningPayment(
-                        amount = 2_173_929.msat,
+                        amountReceived = 2_173_929.msat,
                         channelId = randomBytes32(),
-                        htlcId = 0
+                        htlcId = 0,
+                        fundingFee = LiquidityAds.FundingFee(2_000.msat, TxId(randomBytes32()))
                     )
                 ),
                 receivedAt = 1675270484965
@@ -92,7 +94,7 @@ class CsvWriterTests {
             userNotes = null
         )
 
-        val expected = "2023-02-01T16:54:44.965Z,2173929,0,0.4999 USD,0.0000 USD,Incoming LN payment,Cafécito,\r\n"
+        val expected = "2023-02-01T16:54:44.965Z,2173929,-2000,0.4999 USD,-0.0004 USD,Incoming LN payment,Cafécito,\r\n"
         val actual = CsvWriter.makeRow(
             info = WalletPaymentInfo(payment, metadata, null, WalletPaymentFetchOptions.All),
             localizedDescription = "Cafécito",
@@ -238,7 +240,7 @@ class CsvWriterTests {
             received = IncomingPayment.Received(
                 receivedWith = listOf(
                     IncomingPayment.ReceivedWith.NewChannel(
-                        amount = 12_000_000.msat,
+                        amountReceived = 12_000_000.msat,
                         serviceFee = 2_931_000.msat,
                         miningFee = 69.sat,
                         channelId = randomBytes32(),

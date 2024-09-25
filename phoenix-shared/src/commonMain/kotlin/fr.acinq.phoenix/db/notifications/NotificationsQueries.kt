@@ -22,7 +22,9 @@ import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.data.Notification
+import fr.acinq.phoenix.data.WatchTowerOutcome
 import fr.acinq.phoenix.db.AppDatabase
+import fr.acinq.phoenix.db.notifications.NotificationData.Companion.encodeAsDb
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
@@ -33,16 +35,25 @@ internal class NotificationsQueries(val database: AppDatabase) {
 
     fun get(id: UUID): Notification? {
         return queries.get(id.toString()).executeAsOneOrNull()?.let { row ->
-            mapToNotification(row.id, row.type_version, row.data_json, row.created_at, row.read_at)
+            mapToNotification(row.id, row.data_json, row.created_at, row.read_at)
         }
     }
 
     fun save(notification: Notification) {
-        val (typeVersion, blob) = notification.mapToDb()
         queries.insert(
             id = notification.id.toString(),
-            type_version = typeVersion,
-            data_json = blob,
+            type_version = when (notification) {
+                is Notification.OverAbsoluteFee -> "PAYMENT_REJECTED_OVER_ABSOLUTE_FEE"
+                is Notification.OverRelativeFee -> "PAYMENT_REJECTED_OVER_RELATIVE_FEE"
+                is Notification.FeePolicyDisabled -> "PAYMENT_REJECTED_POLICY_DISABLED"
+                is Notification.ChannelFundingInProgress -> "PAYMENT_REJECTED_CHANNEL_FUNDING_IN_PROGRESS"
+                is Notification.MissingOffChainAmountTooLow -> "PAYMENT_REJECTED_OFFCHAIN_AMOUNT_TOO_LOW"
+                is Notification.GenericError -> "PAYMENT_REJECTED_GENERIC_ERROR"
+                is WatchTowerOutcome.Nominal -> "WATCH_TOWER_NOMINAL"
+                is WatchTowerOutcome.RevokedFound -> "WATCH_TOWER_REVOKED"
+                is WatchTowerOutcome.Unknown -> "WATCH_TOWER_UNKNOWN"
+            },
+            data_json = notification.encodeAsDb(),
             created_at = currentTimestampMillis()
         )
     }
@@ -68,7 +79,7 @@ internal class NotificationsQueries(val database: AppDatabase) {
         return queries.listUnread().asFlow().mapToList(Dispatchers.IO).map {
             val notifs = it.mapNotNull { row ->
                 val ids = row.grouped_ids.split(";").map { UUID.fromString(it) }.toSet()
-                val notif = mapToNotification(row.id, row.type_version, row.data_json, row.max ?: 0, null)
+                val notif = mapToNotification(row.id, row.data_json, row.max ?: 0, null)
                 if (notif != null) {
                     ids to notif
                 } else {
@@ -101,53 +112,58 @@ internal class NotificationsQueries(val database: AppDatabase) {
         /** Map columns to a [Notification] object. If the [data_json] column is unreadable, return null. */
         internal fun mapToNotification(
             id: String,
-            type_version: NotificationTypeVersion,
             data_json: ByteArray,
             created_at: Long,
             read_at: Long?,
         ): Notification? {
-            return when (val data = NotificationData.deserialize(type_version, data_json)) {
-                is NotificationData.PaymentRejected.OverAbsoluteFee.V0 -> {
-                    Notification.OverAbsoluteFee(
-                        id = UUID.fromString(id),
-                        createdAt = created_at,
-                        readAt = read_at,
-                        amount = data.amount,
-                        source = data.source,
-                        fee = data.fee,
-                        maxAbsoluteFee = data.maxAbsoluteFee
-                    )
-                }
-                is NotificationData.PaymentRejected.OverRelativeFee.V0 -> {
-                    Notification.OverRelativeFee(
-                        id = UUID.fromString(id),
-                        createdAt = created_at,
-                        readAt = read_at,
-                        amount = data.amount,
-                        source = data.source,
-                        fee = data.fee,
-                        maxRelativeFeeBasisPoints = data.maxRelativeFeeBasisPoints
-                    )
-                }
-                is NotificationData.PaymentRejected.Disabled.V0 -> {
-                    Notification.FeePolicyDisabled(
-                        id = UUID.fromString(id),
-                        createdAt = created_at,
-                        readAt = read_at,
-                        amount = data.amount,
-                        source = data.source,
-                    )
-                }
-                is NotificationData.PaymentRejected.ChannelsInitializing.V0 -> {
-                    Notification.ChannelsInitializing(
-                        id = UUID.fromString(id),
-                        createdAt = created_at,
-                        readAt = read_at,
-                        amount = data.amount,
-                        source = data.source,
-                    )
-                }
-                is NotificationData.WatchTowerOutcome -> null
+            return when (val data = NotificationData.decode(data_json)) {
+                is NotificationData.PaymentRejected.OverAbsoluteFee.V0 -> Notification.OverAbsoluteFee(
+                    id = UUID.fromString(id),
+                    createdAt = created_at,
+                    readAt = read_at,
+                    amount = data.amount,
+                    source = data.source,
+                    fee = data.fee,
+                    maxAbsoluteFee = data.maxAbsoluteFee
+                )
+                is NotificationData.PaymentRejected.OverRelativeFee.V0 -> Notification.OverRelativeFee(
+                    id = UUID.fromString(id),
+                    createdAt = created_at,
+                    readAt = read_at,
+                    amount = data.amount,
+                    source = data.source,
+                    fee = data.fee,
+                    maxRelativeFeeBasisPoints = data.maxRelativeFeeBasisPoints
+                )
+                is NotificationData.PaymentRejected.Disabled.V0 -> Notification.FeePolicyDisabled(
+                    id = UUID.fromString(id),
+                    createdAt = created_at,
+                    readAt = read_at,
+                    amount = data.amount,
+                    source = data.source,
+                )
+                is NotificationData.PaymentRejected.ChannelFundingInProgress.V0 -> Notification.ChannelFundingInProgress(
+                    id = UUID.fromString(id),
+                    createdAt = created_at,
+                    readAt = read_at,
+                    amount = data.amount,
+                    source = data.source,
+                )
+                is NotificationData.PaymentRejected.MissingOffchainAmountTooLow.V0 -> Notification.MissingOffChainAmountTooLow(
+                    id = UUID.fromString(id),
+                    createdAt = created_at,
+                    readAt = read_at,
+                    amount = data.amount,
+                    source = data.source,
+                )
+                is NotificationData.PaymentRejected.GenericError.V0 -> Notification.GenericError(
+                    id = UUID.fromString(id),
+                    createdAt = created_at,
+                    readAt = read_at,
+                    amount = data.amount,
+                    source = data.source,
+                )
+                is NotificationData.WatchTowerOutcome -> null // ignored
                 null -> null
             }
         }

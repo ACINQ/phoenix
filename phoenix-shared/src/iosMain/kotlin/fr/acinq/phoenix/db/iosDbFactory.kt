@@ -30,7 +30,11 @@ actual fun createChannelsDbDriver(
     nodeIdHash: String
 ): SqlDriver {
     val schema = ChannelsDatabase.Schema
-    val name = "channels-${chain.name.lowercase()}-$nodeIdHash.sqlite"
+    val chainName = when (chain) {
+        is Chain.Testnet3 -> "testnet"
+        else -> chain.name.lowercase()
+    }
+    val name = "channels-$chainName-$nodeIdHash.sqlite"
 
     // The foreign_keys constraint needs to be set via the DatabaseConfiguration:
     // https://github.com/cashapp/sqldelight/issues/1356
@@ -59,7 +63,11 @@ actual fun createPaymentsDbDriver(
     nodeIdHash: String
 ): SqlDriver {
     val schema = PaymentsDatabase.Schema
-    val name = "payments-${chain.name.lowercase()}-$nodeIdHash.sqlite"
+    val chainName = when (chain) {
+        is Chain.Testnet3 -> "testnet"
+        else -> chain.name.lowercase()
+    }
+    val name = "payments-$chainName-$nodeIdHash.sqlite"
 
     val dbDir = getDatabaseFilesDirectoryPath(ctx)
     val configuration = DatabaseConfiguration(
