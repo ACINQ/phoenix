@@ -99,7 +99,22 @@ class NotificationsManager(
                         amount = event.amount,
                         source = event.source,
                     )
-                    is LiquidityEvents.Rejected.Reason.ChannelInitializing -> Notification.ChannelsInitializing(
+                    is LiquidityEvents.Rejected.Reason.ChannelFundingInProgress -> Notification.ChannelFundingInProgress(
+                        id = UUID.randomUUID(),
+                        createdAt = currentTimestampMillis(),
+                        readAt = null,
+                        amount = event.amount,
+                        source = event.source,
+                    )
+                    is LiquidityEvents.Rejected.Reason.MissingOffChainAmountTooLow -> Notification.MissingOffChainAmountTooLow(
+                        id = UUID.randomUUID(),
+                        createdAt = currentTimestampMillis(),
+                        readAt = null,
+                        amount = event.amount,
+                        source = event.source,
+                    )
+                    is LiquidityEvents.Rejected.Reason.NoMatchingFundingRate,
+                    is LiquidityEvents.Rejected.Reason.TooManyParts -> Notification.GenericError(
                         id = UUID.randomUUID(),
                         createdAt = currentTimestampMillis(),
                         readAt = null,

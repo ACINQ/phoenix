@@ -34,6 +34,9 @@ import fr.acinq.phoenix.db.serializers.v1.ByteVector32Serializer
 import fr.acinq.phoenix.db.serializers.v1.MilliSatoshiSerializer
 import fr.acinq.phoenix.db.serializers.v1.UUIDSerializer
 import fr.acinq.lightning.utils.sat
+import fr.acinq.phoenix.db.payments.liquidityads.FundingFeeData
+import fr.acinq.phoenix.db.payments.liquidityads.FundingFeeData.Companion.asCanonical
+import fr.acinq.phoenix.db.payments.liquidityads.FundingFeeData.Companion.asDb
 import fr.acinq.phoenix.db.serializers.v1.SatoshiSerializer
 import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*
@@ -80,11 +83,20 @@ sealed class IncomingReceivedWithData {
     @Serializable
     sealed class Part : IncomingReceivedWithData() {
         sealed class Htlc : Part() {
+            @Deprecated("Replaced by [Htlc.V1], which supports the liquidity ads funding fee")
             @Serializable
             data class V0(
                 @Serializable val amount: MilliSatoshi,
                 @Serializable val channelId: ByteVector32,
                 val htlcId: Long
+            ) : Htlc()
+
+            @Serializable
+            data class V1(
+                val amountReceived: MilliSatoshi,
+                val channelId: ByteVector32,
+                val htlcId: Long,
+                val fundingFee: FundingFeeData?,
             ) : Htlc()
         }
 
@@ -131,6 +143,13 @@ sealed class IncomingReceivedWithData {
                 @Serializable val lockedAt: Long?,
             ) : SpliceIn()
         }
+
+        sealed class FeeCredit : Part() {
+            @Serializable
+            data class V0(
+                val amount: MilliSatoshi
+            ) : FeeCredit()
+        }
     }
 
     companion object {
@@ -152,11 +171,11 @@ sealed class IncomingReceivedWithData {
             @Suppress("DEPRECATION")
             when (typeVersion) {
                 IncomingReceivedWithTypeVersion.LIGHTNING_PAYMENT_V0 -> listOf(
-                    IncomingPayment.ReceivedWith.LightningPayment(amount ?: 0.msat, ByteVector32.Zeroes, 0L)
+                    IncomingPayment.ReceivedWith.LightningPayment(amount ?: 0.msat, ByteVector32.Zeroes, 0L, null)
                 )
                 IncomingReceivedWithTypeVersion.NEW_CHANNEL_V0 -> listOf(format.decodeFromString<NewChannel.V0>(json).let {
                     IncomingPayment.ReceivedWith.NewChannel(
-                        amount = amount ?: 0.msat,
+                        amountReceived = amount ?: 0.msat,
                         serviceFee = it.fees,
                         miningFee = 0.sat,
                         channelId = it.channelId ?: ByteVector32.Zeroes,
@@ -165,12 +184,13 @@ sealed class IncomingReceivedWithData {
                         lockedAt = 0,
                     )
                 })
-                IncomingReceivedWithTypeVersion.MULTIPARTS_V0 -> DbTypesHelper.polymorphicFormat.decodeFromString(SetSerializer(PolymorphicSerializer(Part::class)), json).map {
+                IncomingReceivedWithTypeVersion.MULTIPARTS_V0 -> DbTypesHelper.polymorphicFormat.decodeFromString(SetSerializer(PolymorphicSerializer(Part::class)), json).mapNotNull {
                     when (it) {
-                        is Part.Htlc.V0 -> IncomingPayment.ReceivedWith.LightningPayment(it.amount, it.channelId, it.htlcId)
+                        is Part.Htlc.V0 -> IncomingPayment.ReceivedWith.LightningPayment(it.amount, it.channelId, it.htlcId, null)
+                        is Part.Htlc.V1 -> IncomingPayment.ReceivedWith.LightningPayment(it.amountReceived, it.channelId, it.htlcId, it.fundingFee?.asCanonical())
                         is Part.NewChannel.V0 -> if (originTypeVersion == IncomingOriginTypeVersion.SWAPIN_V0) {
                             IncomingPayment.ReceivedWith.NewChannel(
-                                amount = it.amount,
+                                amountReceived = it.amount,
                                 serviceFee = it.fees,
                                 miningFee = 0.sat,
                                 channelId = it.channelId ?: ByteVector32.Zeroes,
@@ -180,7 +200,7 @@ sealed class IncomingReceivedWithData {
                             )
                         } else {
                             IncomingPayment.ReceivedWith.NewChannel(
-                                amount = it.amount - it.fees,
+                                amountReceived = it.amount - it.fees,
                                 serviceFee = it.fees,
                                 miningFee = 0.sat,
                                 channelId = it.channelId ?: ByteVector32.Zeroes,
@@ -191,12 +211,23 @@ sealed class IncomingReceivedWithData {
                         }
                         else -> null // does not apply, MULTIPARTS_V0 only uses V0 parts
                     }
-                }.filterNotNull() // null elements are discarded!
+                }
                 IncomingReceivedWithTypeVersion.MULTIPARTS_V1 -> DbTypesHelper.polymorphicFormat.decodeFromString(SetSerializer(PolymorphicSerializer(Part::class)), json).map {
                     when (it) {
-                        is Part.Htlc.V0 -> IncomingPayment.ReceivedWith.LightningPayment(it.amount, it.channelId, it.htlcId)
+                        is Part.Htlc.V0 -> IncomingPayment.ReceivedWith.LightningPayment(
+                            amountReceived = it.amount,
+                            channelId = it.channelId,
+                            htlcId = it.htlcId,
+                            fundingFee = null
+                        )
+                        is Part.Htlc.V1 -> IncomingPayment.ReceivedWith.LightningPayment(
+                            amountReceived = it.amountReceived,
+                            channelId = it.channelId,
+                            htlcId = it.htlcId,
+                            fundingFee = it.fundingFee?.asCanonical()
+                        )
                         is Part.NewChannel.V0 -> IncomingPayment.ReceivedWith.NewChannel(
-                            amount = it.amount,
+                            amountReceived = it.amount,
                             serviceFee = it.fees,
                             miningFee = 0.sat,
                             channelId = it.channelId ?: ByteVector32.Zeroes,
@@ -205,7 +236,7 @@ sealed class IncomingReceivedWithData {
                             lockedAt = 0,
                         )
                         is Part.NewChannel.V1 -> IncomingPayment.ReceivedWith.NewChannel(
-                            amount = it.amount,
+                            amountReceived = it.amount,
                             serviceFee = it.fees,
                             miningFee = 0.sat,
                             channelId = it.channelId ?: ByteVector32.Zeroes,
@@ -214,7 +245,7 @@ sealed class IncomingReceivedWithData {
                             lockedAt = 0,
                         )
                         is Part.NewChannel.V2 -> IncomingPayment.ReceivedWith.NewChannel(
-                            amount = it.amount,
+                            amountReceived = it.amount,
                             serviceFee = it.serviceFee,
                             miningFee = it.miningFee,
                             channelId = it.channelId,
@@ -223,7 +254,7 @@ sealed class IncomingReceivedWithData {
                             lockedAt = it.lockedAt,
                         )
                         is Part.SpliceIn.V0 -> IncomingPayment.ReceivedWith.SpliceIn(
-                            amount = it.amount,
+                            amountReceived = it.amount,
                             serviceFee = it.serviceFee,
                             miningFee = it.miningFee,
                             channelId = it.channelId,
@@ -231,8 +262,11 @@ sealed class IncomingReceivedWithData {
                             confirmedAt = it.confirmedAt,
                             lockedAt = it.lockedAt,
                         )
+                        is Part.FeeCredit.V0 -> IncomingPayment.ReceivedWith.AddedToFeeCredit(
+                            amountReceived = it.amount
+                        )
                     }
-                }.filterNotNull() // null elements are discarded!
+                }
             }
         }
     }
@@ -241,9 +275,14 @@ sealed class IncomingReceivedWithData {
 /** Only serialize received_with into the [IncomingReceivedWithTypeVersion.MULTIPARTS_V1] type. */
 fun List<IncomingPayment.ReceivedWith>.mapToDb(): Pair<IncomingReceivedWithTypeVersion, ByteArray>? = map {
     when (it) {
-        is IncomingPayment.ReceivedWith.LightningPayment -> IncomingReceivedWithData.Part.Htlc.V0(it.amount, it.channelId, it.htlcId)
+        is IncomingPayment.ReceivedWith.LightningPayment -> IncomingReceivedWithData.Part.Htlc.V1(
+            amountReceived = it.amountReceived,
+            channelId = it.channelId,
+            htlcId = it.htlcId,
+            fundingFee = it.fundingFee?.asDb()
+        )
         is IncomingPayment.ReceivedWith.NewChannel -> IncomingReceivedWithData.Part.NewChannel.V2(
-            amount = it.amount,
+            amount = it.amountReceived,
             serviceFee = it.serviceFee,
             miningFee = it.miningFee,
             channelId = it.channelId,
@@ -252,13 +291,16 @@ fun List<IncomingPayment.ReceivedWith>.mapToDb(): Pair<IncomingReceivedWithTypeV
             lockedAt = it.lockedAt,
         )
         is IncomingPayment.ReceivedWith.SpliceIn -> IncomingReceivedWithData.Part.SpliceIn.V0(
-            amount = it.amount,
+            amount = it.amountReceived,
             serviceFee = it.serviceFee,
             miningFee = it.miningFee,
             channelId = it.channelId,
             txId = it.txId.value,
             confirmedAt = it.confirmedAt,
             lockedAt = it.lockedAt,
+        )
+        is IncomingPayment.ReceivedWith.AddedToFeeCredit -> IncomingReceivedWithData.Part.FeeCredit.V0(
+            amount = it.amountReceived
         )
     }
 }.takeIf { it.isNotEmpty() }?.toSet()?.let {

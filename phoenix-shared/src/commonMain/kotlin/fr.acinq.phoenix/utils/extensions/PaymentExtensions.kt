@@ -17,6 +17,7 @@
 package fr.acinq.phoenix.utils.extensions
 
 import fr.acinq.bitcoin.PrivateKey
+import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
@@ -25,6 +26,9 @@ import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.payment.Bolt12Invoice
 import fr.acinq.lightning.payment.OfferPaymentMetadata
+import fr.acinq.lightning.utils.getValue
+import fr.acinq.lightning.utils.msat
+import fr.acinq.lightning.utils.sum
 import fr.acinq.lightning.wire.OfferTypes
 
 /** Standardized location for extending types from: fr.acinq.lightning. */
@@ -64,6 +68,19 @@ fun WalletPayment.state(): WalletPaymentState = when (this) {
         }
     }
 }
+
+/**
+ * Incoming payments may be received (in part or entirely) as a fee credit. This happens when an on-chain operation
+ * would be necessary to complete the payment, but the amount received is too low to pay for this operation just yet.
+ * The payment is then accepted, but the amount is accrued to a fee credit.
+ *
+ * This fee credit in the wallet is not part of the wallet's balance. It and can only be spent to pay future mining
+ * or service fees. It serves as a buffer that allows the user to keep accepting incoming payments seamlessly.
+ *
+ * Most of the time, this value is null (i.e., the amount received goes to the balance).
+ */
+val IncomingPayment.amountFeeCredit : MilliSatoshi?
+    get() = this.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.AddedToFeeCredit>()?.map { it.amountReceived }?.sum()
 
 fun WalletPayment.paymentHashString(): String = when (this) {
     is OnChainOutgoingPayment -> throw NotImplementedError("no payment hash for on-chain outgoing")

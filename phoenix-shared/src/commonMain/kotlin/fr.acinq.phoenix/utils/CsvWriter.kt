@@ -1,6 +1,7 @@
 package fr.acinq.phoenix.utils
 
 import fr.acinq.lightning.db.*
+import fr.acinq.lightning.payment.OfferPaymentMetadata
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import kotlinx.datetime.Instant
 
@@ -124,8 +125,8 @@ class CsvWriter {
                         is IncomingPayment.Origin.OnChain -> {
                             "Swap-in with inputs: ${origin.localInputs.map { it.txid.toString() } }"
                         }
-                        is IncomingPayment.Origin.Offer -> {
-                            "Incoming offer ${origin.metadata.offerId}"
+                        is IncomingPayment.Origin.Offer -> when (origin.metadata) {
+                            is OfferPaymentMetadata.V1 -> "Incoming payment to your offer"
                         }
                     }
                     is LightningOutgoingPayment -> when (val details = payment.details) {
@@ -136,7 +137,7 @@ class CsvWriter {
                     is SpliceOutgoingPayment -> "Outgoing splice to ${payment.address}"
                     is ChannelCloseOutgoingPayment -> "Channel closing to ${payment.address}"
                     is SpliceCpfpOutgoingPayment -> "Accelerate transactions with CPFP"
-                    is InboundLiquidityOutgoingPayment -> "+${payment.lease.amount.sat} sat inbound liquidity"
+                    is InboundLiquidityOutgoingPayment -> "+${payment.purchase.amount.sat} sat inbound liquidity"
                 }
                 row += ",${processField(details)}"
             }

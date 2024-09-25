@@ -76,9 +76,6 @@ class SqlitePaymentsDb(
         channel_close_outgoing_paymentsAdapter = Channel_close_outgoing_payments.Adapter(
             closing_info_typeAdapter = EnumColumnAdapter()
         ),
-        inbound_liquidity_outgoing_paymentsAdapter = Inbound_liquidity_outgoing_payments.Adapter(
-            lease_typeAdapter = EnumColumnAdapter()
-        )
     )
 
     internal val inQueries = IncomingQueries(database)
@@ -152,6 +149,12 @@ class SqlitePaymentsDb(
     ) {
         withContext(Dispatchers.Default) {
             outQueries.completePayment(id, LightningOutgoingPayment.Status.Completed.Succeeded.OffChain(preimage, completedAt))
+        }
+    }
+
+    override suspend fun getInboundLiquidityPurchase(fundingTxId: TxId): InboundLiquidityOutgoingPayment? {
+        return withContext(Dispatchers.Default) {
+            inboundLiquidityQueries.getByTxId(fundingTxId)
         }
     }
 

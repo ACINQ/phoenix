@@ -21,14 +21,11 @@ import fr.acinq.bitcoin.*
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.*
 import fr.acinq.lightning.Lightning.randomBytes32
-import fr.acinq.lightning.channel.TooManyAcceptedHtlcs
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.FinalFailure
-import fr.acinq.lightning.payment.OutgoingPaymentFailure
-import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.*
-import fr.acinq.lightning.wire.TemporaryNodeFailure
+import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.runTest
 import fr.acinq.phoenix.utils.migrations.LegacyChannelCloseHelper
@@ -43,12 +40,12 @@ class SqlitePaymentsDatabaseTest {
     private val paymentHash1 = Crypto.sha256(preimage1).toByteVector32()
     private val origin1 = IncomingPayment.Origin.Invoice(createInvoice(preimage1))
     private val channelId1 = randomBytes32()
-    private val receivedWith1 = listOf(IncomingPayment.ReceivedWith.LightningPayment(100_000.msat, channelId1, 1L))
-    private val receivedWith3 = listOf(IncomingPayment.ReceivedWith.LightningPayment(150_000.msat, channelId1, 1L))
+    private val receivedWith1 = listOf(IncomingPayment.ReceivedWith.LightningPayment(100_000.msat, channelId1, 1L, null))
+    private val receivedWith3 = listOf(IncomingPayment.ReceivedWith.LightningPayment(150_000.msat, channelId1, 1L, fundingFee = LiquidityAds.FundingFee(2_000.msat, TxId(randomBytes32()))))
 
     private val preimage2 = randomBytes32()
     private val receivedWith2 = listOf(
-        IncomingPayment.ReceivedWith.NewChannel(amount = 1_995_000.msat, serviceFee = 5_000.msat, channelId = randomBytes32(), txId = TxId(randomBytes32()), miningFee = 100.sat, confirmedAt = 100, lockedAt = 200)
+        IncomingPayment.ReceivedWith.NewChannel(amountReceived = 1_995_000.msat, serviceFee = 5_000.msat, channelId = randomBytes32(), txId = TxId(randomBytes32()), miningFee = 100.sat, confirmedAt = 100, lockedAt = 200)
     )
 
     val origin3 = IncomingPayment.Origin.SwapIn(address = "1PwLgmRdDjy5GAKWyp8eyAC4SFzWuboLLb")
@@ -90,8 +87,8 @@ class SqlitePaymentsDatabaseTest {
         val origin = IncomingPayment.Origin.Invoice(createInvoice(preimage, 1_000_000_000.msat))
         val channelId = randomBytes32()
         val txId = TxId(randomBytes32())
-        val mppPart1 = IncomingPayment.ReceivedWith.NewChannel(amount = 600_000_000.msat, serviceFee = 5_000.msat, miningFee = 100.sat, channelId = channelId, txId = txId, confirmedAt = 100, lockedAt = 50)
-        val mppPart2 = IncomingPayment.ReceivedWith.NewChannel(amount = 400_000_000.msat, serviceFee = 5_000.msat, miningFee = 200.sat, channelId = channelId, txId = txId, confirmedAt = 115, lockedAt = 75)
+        val mppPart1 = IncomingPayment.ReceivedWith.NewChannel(amountReceived = 600_000_000.msat, serviceFee = 5_000.msat, miningFee = 100.sat, channelId = channelId, txId = txId, confirmedAt = 100, lockedAt = 50)
+        val mppPart2 = IncomingPayment.ReceivedWith.NewChannel(amountReceived = 400_000_000.msat, serviceFee = 5_000.msat, miningFee = 200.sat, channelId = channelId, txId = txId, confirmedAt = 115, lockedAt = 75)
         val receivedWith = listOf(mppPart1, mppPart2)
 
         db.addIncomingPayment(preimage, origin, 0)
@@ -106,8 +103,8 @@ class SqlitePaymentsDatabaseTest {
         val origin = IncomingPayment.Origin.Invoice(createInvoice(preimage, 1_000_000_000.msat))
         val channelId = randomBytes32()
         val txId = TxId(randomBytes32())
-        val mppPart1 = IncomingPayment.ReceivedWith.NewChannel(amount = 500_000_000.msat, serviceFee = 5_000.msat, miningFee = 200.sat, channelId = channelId, txId = txId, confirmedAt = 100, lockedAt = 50)
-        val mppPart2 = IncomingPayment.ReceivedWith.NewChannel(amount = 500_000_000.msat, serviceFee = 5_000.msat, miningFee = 150.sat, channelId = channelId, txId = txId, confirmedAt = 115, lockedAt = 75)
+        val mppPart1 = IncomingPayment.ReceivedWith.NewChannel(amountReceived = 500_000_000.msat, serviceFee = 5_000.msat, miningFee = 200.sat, channelId = channelId, txId = txId, confirmedAt = 100, lockedAt = 50)
+        val mppPart2 = IncomingPayment.ReceivedWith.NewChannel(amountReceived = 500_000_000.msat, serviceFee = 5_000.msat, miningFee = 150.sat, channelId = channelId, txId = txId, confirmedAt = 115, lockedAt = 75)
         val receivedWith = listOf(mppPart1, mppPart2)
 
         db.addIncomingPayment(preimage, origin, 0)
