@@ -36,7 +36,7 @@ val PaymentRequest.chain: Chain
         is Bolt11Invoice -> {
             when (prefix) {
                 "lnbc" -> Chain.Mainnet
-                "lntb" -> Chain.Testnet
+                "lntb" -> Chain.Testnet3
                 "lnbcrt" -> Chain.Regtest
                 else -> throw IllegalArgumentException("unhandled invoice prefix=$prefix")
             }

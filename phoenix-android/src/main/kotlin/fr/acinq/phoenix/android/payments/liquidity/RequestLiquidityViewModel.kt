@@ -23,6 +23,7 @@ import androidx.lifecycle.viewModelScope
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.ChannelCommand
+import fr.acinq.lightning.channel.ChannelFundingResponse
 import fr.acinq.lightning.channel.ChannelManagementFees
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.managers.AppConfigurationManager
@@ -41,9 +42,9 @@ sealed class RequestLiquidityState {
     data class Estimation(val amount: Satoshi, val fees: ChannelManagementFees, val actualFeerate: FeeratePerKw, val fundingRate: LiquidityAds.FundingRate): RequestLiquidityState()
     object Requesting: RequestLiquidityState()
     sealed class Complete: RequestLiquidityState() {
-        abstract val response: ChannelCommand.Commitment.Splice.Response
-        data class Success(override val response: ChannelCommand.Commitment.Splice.Response.Created): Complete()
-        data class Failed(override val response: ChannelCommand.Commitment.Splice.Response.Failure): Complete()
+        abstract val response: ChannelFundingResponse
+        data class Success(override val response: ChannelFundingResponse.Success): Complete()
+        data class Failed(override val response: ChannelFundingResponse.Failure): Complete()
     }
     sealed class Error: RequestLiquidityState() {
         data class Thrown(val cause: Throwable): Error()
@@ -103,8 +104,8 @@ class RequestLiquidityViewModel(val peerManager: PeerManager, val appConfigManag
             ).let { response ->
                 state.value = when (response) {
                     null -> RequestLiquidityState.Error.NoChannelsAvailable
-                    is ChannelCommand.Commitment.Splice.Response.Failure -> RequestLiquidityState.Complete.Failed(response)
-                    is ChannelCommand.Commitment.Splice.Response.Created -> RequestLiquidityState.Complete.Success(response)
+                    is ChannelFundingResponse.Failure -> RequestLiquidityState.Complete.Failed(response)
+                    is ChannelFundingResponse.Success -> RequestLiquidityState.Complete.Success(response)
                 }
             }
         }

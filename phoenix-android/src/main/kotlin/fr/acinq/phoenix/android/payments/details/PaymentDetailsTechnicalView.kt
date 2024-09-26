@@ -253,7 +253,7 @@ private fun AmountSection(
             )
             TechnicalRowAmount(
                 label = stringResource(id = R.string.paymentdetails_liquidity_service_fee_label),
-                amount = payment.serviceFees.toMilliSatoshi(),
+                amount = payment.purchase.fees.serviceFee.toMilliSatoshi(),
                 rateThen = rateThen,
                 mSatDisplayPolicy = MSatDisplayPolicy.SHOW
             )

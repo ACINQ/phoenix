@@ -134,7 +134,7 @@ private fun SplashFee(
         label = stringResource(id = R.string.paymentdetails_liquidity_service_fee_label),
         helpMessage = stringResource(id = R.string.paymentdetails_liquidity_service_fee_help)
     ) {
-        Text(text = payment.serviceFees.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW_IF_ZERO_SATS))
+        Text(text = payment.purchase.fees.serviceFee.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW_IF_ZERO_SATS))
         if (payment.purchase is LiquidityAds.Purchase.WithFeeCredit) {
             Text(text = "Paid with fee credit")
         }

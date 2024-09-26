@@ -43,6 +43,7 @@ import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.ChannelCommand
+import fr.acinq.lightning.channel.ChannelFundingResponse
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnit
@@ -417,17 +418,19 @@ private fun ReviewSpliceOutAndConfirm(
 }
 
 @Composable
-fun spliceFailureDetails(spliceFailure: ChannelCommand.Commitment.Splice.Response.Failure): String = when (spliceFailure) {
-    is ChannelCommand.Commitment.Splice.Response.Failure.AbortedByPeer -> stringResource(id = R.string.splice_error_aborted_by_peer, spliceFailure.reason)
-    is ChannelCommand.Commitment.Splice.Response.Failure.CannotCreateCommitTx -> stringResource(id = R.string.splice_error_cannot_create_commit)
-    is ChannelCommand.Commitment.Splice.Response.Failure.ConcurrentRemoteSplice -> stringResource(id = R.string.splice_error_concurrent_remote)
-    is ChannelCommand.Commitment.Splice.Response.Failure.ChannelNotQuiescent -> stringResource(id = R.string.splice_error_channel_not_quiescent)
-    is ChannelCommand.Commitment.Splice.Response.Failure.Disconnected -> stringResource(id = R.string.splice_error_disconnected)
-    is ChannelCommand.Commitment.Splice.Response.Failure.FundingFailure -> stringResource(id = R.string.splice_error_funding_error, spliceFailure.reason.javaClass.simpleName)
-    is ChannelCommand.Commitment.Splice.Response.Failure.InsufficientFunds -> stringResource(id = R.string.splice_error_insufficient_funds)
-    is ChannelCommand.Commitment.Splice.Response.Failure.CannotStartSession -> stringResource(id = R.string.splice_error_cannot_start_session)
-    is ChannelCommand.Commitment.Splice.Response.Failure.InteractiveTxSessionFailed -> stringResource(id = R.string.splice_error_interactive_session, spliceFailure.reason.javaClass.simpleName)
-    is ChannelCommand.Commitment.Splice.Response.Failure.InvalidSpliceOutPubKeyScript -> stringResource(id = R.string.splice_error_invalid_pubkey)
-    is ChannelCommand.Commitment.Splice.Response.Failure.SpliceAlreadyInProgress -> stringResource(id = R.string.splice_error_splice_in_progress)
-    is ChannelCommand.Commitment.Splice.Response.Failure.InvalidLiquidityAds -> stringResource(id = R.string.splice_error_invalid_liquidity_ads, spliceFailure.reason.details())
+fun spliceFailureDetails(spliceFailure: ChannelFundingResponse.Failure): String = when (spliceFailure) {
+    is ChannelFundingResponse.Failure.AbortedByPeer -> stringResource(id = R.string.splice_error_aborted_by_peer, spliceFailure.reason)
+    is ChannelFundingResponse.Failure.CannotCreateCommitTx -> stringResource(id = R.string.splice_error_cannot_create_commit)
+    is ChannelFundingResponse.Failure.ConcurrentRemoteSplice -> stringResource(id = R.string.splice_error_concurrent_remote)
+    is ChannelFundingResponse.Failure.ChannelNotQuiescent -> stringResource(id = R.string.splice_error_channel_not_quiescent)
+    is ChannelFundingResponse.Failure.Disconnected -> stringResource(id = R.string.splice_error_disconnected)
+    is ChannelFundingResponse.Failure.FundingFailure -> stringResource(id = R.string.splice_error_funding_error, spliceFailure.reason.javaClass.simpleName)
+    is ChannelFundingResponse.Failure.InsufficientFunds -> stringResource(id = R.string.splice_error_insufficient_funds)
+    is ChannelFundingResponse.Failure.CannotStartSession -> stringResource(id = R.string.splice_error_cannot_start_session)
+    is ChannelFundingResponse.Failure.InteractiveTxSessionFailed -> stringResource(id = R.string.splice_error_interactive_session, spliceFailure.reason.javaClass.simpleName)
+    is ChannelFundingResponse.Failure.InvalidSpliceOutPubKeyScript -> stringResource(id = R.string.splice_error_invalid_pubkey)
+    is ChannelFundingResponse.Failure.SpliceAlreadyInProgress -> stringResource(id = R.string.splice_error_splice_in_progress)
+    is ChannelFundingResponse.Failure.InvalidLiquidityAds -> stringResource(id = R.string.splice_error_invalid_liquidity_ads, spliceFailure.reason.details())
+    is ChannelFundingResponse.Failure.InvalidChannelParameters -> TODO()
+    is ChannelFundingResponse.Failure.UnexpectedMessage -> TODO()
 }

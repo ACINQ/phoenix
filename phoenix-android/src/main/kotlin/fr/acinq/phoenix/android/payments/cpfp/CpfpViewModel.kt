@@ -27,6 +27,7 @@ import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.ChannelCommand
+import fr.acinq.lightning.channel.ChannelFundingResponse
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.managers.PeerManager
@@ -42,7 +43,7 @@ sealed class CpfpState {
     data class Executing(val actualFeerate: FeeratePerKw) : CpfpState()
     sealed class Complete : CpfpState() {
         object Success: Complete()
-        data class Failed(val failure: ChannelCommand.Commitment.Splice.Response.Failure): Complete()
+        data class Failed(val failure: ChannelFundingResponse.Failure): Complete()
     }
     sealed class Error: CpfpState() {
         data class Thrown(val e: Throwable): Error()
@@ -102,11 +103,11 @@ class CpfpViewModel(val peerManager: PeerManager) : ViewModel() {
                         log.info("failed to execute cpfp splice: assuming no channels")
                         state = CpfpState.Error.NoChannels
                     }
-                    is ChannelCommand.Commitment.Splice.Response.Created -> {
+                    is ChannelFundingResponse.Success -> {
                         log.info("successfully executed cpfp splice: $res")
                         state = CpfpState.Complete.Success
                     }
-                    is ChannelCommand.Commitment.Splice.Response.Failure -> {
+                    is ChannelFundingResponse.Failure -> {
                         log.info("failed to execute cpfp splice: $res")
                         state = CpfpState.Complete.Failed(res)
                     }
