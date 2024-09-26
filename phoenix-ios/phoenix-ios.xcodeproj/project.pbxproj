@@ -262,8 +262,6 @@
 		DCAEF8F5276131A600015993 /* CheckboxToggleStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCAEF8F4276131A600015993 /* CheckboxToggleStyle.swift */; };
 		DCAEF8F727628BEB00015993 /* Either.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCAEF8F627628BEB00015993 /* Either.swift */; };
 		DCB04685260D162C007FDA37 /* ViewName.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB04684260D162C007FDA37 /* ViewName.swift */; };
-		DCB0DB8A255AE42F005B29C8 /* PhoenixShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCB0DB83255AE42F005B29C8 /* PhoenixShared.framework */; };
-		DCB0DBB1255AEE22005B29C8 /* PhoenixShared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DCB0DB83255AE42F005B29C8 /* PhoenixShared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DCB30E522A0A948000E7D7A2 /* WalletInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB30E512A0A948000E7D7A2 /* WalletInfoView.swift */; };
 		DCB30E542A0AABAF00E7D7A2 /* InfoPopoverWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB30E532A0AABAF00E7D7A2 /* InfoPopoverWindow.swift */; };
 		DCB30E592A0C3F8200E7D7A2 /* LiquidityPolicyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB30E582A0C3F8200E7D7A2 /* LiquidityPolicyView.swift */; };
@@ -370,20 +368,6 @@
 			remoteGlobalIDString = 7555FF7A242A565900829871;
 			remoteInfo = "phoenix-ios";
 		};
-		DC641C682820786600862DCD /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 7555FF73242A565900829871 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = DCB0DB82255AE42F005B29C8;
-			remoteInfo = "phoenix-ios-framework";
-		};
-		DCB0DBAF255AEE0E005B29C8 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 7555FF73242A565900829871 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = DCB0DB82255AE42F005B29C8;
-			remoteInfo = "phoenix-ios-framework";
-		};
 		DCB511CC281AED58001BC525 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 7555FF73242A565900829871 /* Project object */;
@@ -411,7 +395,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				DCB0DBB1255AEE22005B29C8 /* PhoenixShared.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -657,7 +640,6 @@
 		DCAEF8F4276131A600015993 /* CheckboxToggleStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckboxToggleStyle.swift; sourceTree = "<group>"; };
 		DCAEF8F627628BEB00015993 /* Either.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Either.swift; sourceTree = "<group>"; };
 		DCB04684260D162C007FDA37 /* ViewName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewName.swift; sourceTree = "<group>"; };
-		DCB0DB83255AE42F005B29C8 /* PhoenixShared.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PhoenixShared.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DCB30E512A0A948000E7D7A2 /* WalletInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletInfoView.swift; sourceTree = "<group>"; };
 		DCB30E532A0AABAF00E7D7A2 /* InfoPopoverWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoPopoverWindow.swift; sourceTree = "<group>"; };
 		DCB30E582A0C3F8200E7D7A2 /* LiquidityPolicyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidityPolicyView.swift; sourceTree = "<group>"; };
@@ -750,7 +732,6 @@
 				DC39D4E5286B4A7E0030F18D /* Popovers in Frameworks */,
 				DCC46F1625C3521C005D32D9 /* FirebaseMessaging in Frameworks */,
 				DCCFE6AB2B6430AB002FFF11 /* Logging in Frameworks */,
-				DCB0DB8A255AE42F005B29C8 /* PhoenixShared.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -891,7 +872,6 @@
 				7555FF7B242A565900829871 /* Phoenix.app */,
 				7555FF91242A565B00829871 /* phoenix-iosTests.xctest */,
 				7555FF9C242A565B00829871 /* phoenix-iosUITests.xctest */,
-				DCB0DB83255AE42F005B29C8 /* PhoenixShared.framework */,
 				DCB511C7281AED58001BC525 /* phoenix-notifySrvExt.appex */,
 			);
 			name = Products;
@@ -1548,6 +1528,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 7555FFA5242A565B00829871 /* Build configuration list for PBXNativeTarget "phoenix-ios" */;
 			buildPhases = (
+				DCA538EB2CA5AE7700B17C8B /* ShellScript */,
 				7555FF77242A565900829871 /* Sources */,
 				7555FF78242A565900829871 /* Frameworks */,
 				7555FF79242A565900829871 /* Resources */,
@@ -1557,7 +1538,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				DCB0DBB0255AEE0E005B29C8 /* PBXTargetDependency */,
 				DCB511CD281AED58001BC525 /* PBXTargetDependency */,
 			);
 			name = "phoenix-ios";
@@ -1610,30 +1590,11 @@
 			productReference = 7555FF9C242A565B00829871 /* phoenix-iosUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
-		DCB0DB82255AE42F005B29C8 /* phoenix-ios-framework */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = DCB0DB8C255AE42F005B29C8 /* Build configuration list for PBXNativeTarget "phoenix-ios-framework" */;
-			buildPhases = (
-				DCB0DB95255AE43E005B29C8 /* ShellScript */,
-				DCB0DB9F255AE6F1005B29C8 /* ShellScript */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "phoenix-ios-framework";
-			packageProductDependencies = (
-				DCA5391829F1DAA3001BD3D5 /* SegmentedPicker */,
-				DC26D0B92A93BA8C006763B3 /* EffectsLibrary */,
-			);
-			productName = "phoenix-ios-framework";
-			productReference = DCB0DB83255AE42F005B29C8 /* PhoenixShared.framework */;
-			productType = "com.apple.product-type.framework";
-		};
 		DCB511C6281AED58001BC525 /* phoenix-notifySrvExt */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = DCB511CF281AED58001BC525 /* Build configuration list for PBXNativeTarget "phoenix-notifySrvExt" */;
 			buildPhases = (
+				DCA538EC2CA5AF2A00B17C8B /* ShellScript */,
 				DCB511C3281AED58001BC525 /* Sources */,
 				DCB511C4281AED58001BC525 /* Frameworks */,
 				DCB511C5281AED58001BC525 /* Resources */,
@@ -1641,7 +1602,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				DC641C692820786600862DCD /* PBXTargetDependency */,
 			);
 			name = "phoenix-notifySrvExt";
 			packageProductDependencies = (
@@ -1672,9 +1632,6 @@
 					7555FF9B242A565B00829871 = {
 						CreatedOnToolsVersion = 11.3.1;
 						TestTargetID = 7555FF7A242A565900829871;
-					};
-					DCB0DB82255AE42F005B29C8 = {
-						CreatedOnToolsVersion = 12.1;
 					};
 					DCB511C6281AED58001BC525 = {
 						CreatedOnToolsVersion = 13.3;
@@ -1708,7 +1665,6 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				DCB0DB82255AE42F005B29C8 /* phoenix-ios-framework */,
 				7555FF7A242A565900829871 /* phoenix-ios */,
 				7555FF90242A565B00829871 /* phoenix-iosTests */,
 				7555FF9B242A565B00829871 /* phoenix-iosUITests */,
@@ -1762,9 +1718,8 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		DCB0DB95255AE43E005B29C8 /* ShellScript */ = {
+		DCA538EB2CA5AE7700B17C8B /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -1775,14 +1730,12 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$SRCROOT/../phoenix-shared/build/xcode-frameworks/$CONFIGURATION/$SDK_NAME/PhoenixShared.framework",
-				"$SRCROOT/../phoenix-shared/build/xcode-frameworks/$CONFIGURATION/$SDK_NAME/PhoenixShared.framework.dSYM",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "cd \"$SRCROOT/..\"\necho ./gradlew embedAndSignAppleFrameworkForXcode\n./gradlew embedAndSignAppleFrameworkForXcode\n";
 		};
-		DCB0DB9F255AE6F1005B29C8 /* ShellScript */ = {
+		DCA538EC2CA5AF2A00B17C8B /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1790,7 +1743,6 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
-				"$SRCROOT/../phoenix-shared/build/xcode-frameworks/$CONFIGURATION/$SDK_NAME/PhoenixShared.framework",
 			);
 			outputFileListPaths = (
 			);
@@ -1798,7 +1750,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "FrmkDuplicate=\"$SRCROOT/../phoenix-shared/build/xcode-frameworks/$CONFIGURATION/$SDK_NAME/PhoenixShared.framework/Frameworks/PhoenixShared.framework\"\n\nif [ -e \"$FrmkDuplicate\" ]; then\n  echo \"Deleting duplicate framework: $FrmkDuplicate\"\n  rm -R \"$FrmkDuplicate\"\nfi\n";
+			shellScript = "cd \"$SRCROOT/..\"\necho ./gradlew embedAndSignAppleFrameworkForXcode\n./gradlew embedAndSignAppleFrameworkForXcode\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -2165,16 +2117,6 @@
 			target = 7555FF7A242A565900829871 /* phoenix-ios */;
 			targetProxy = 7555FF9D242A565B00829871 /* PBXContainerItemProxy */;
 		};
-		DC641C692820786600862DCD /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = DCB0DB82255AE42F005B29C8 /* phoenix-ios-framework */;
-			targetProxy = DC641C682820786600862DCD /* PBXContainerItemProxy */;
-		};
-		DCB0DBB0255AEE0E005B29C8 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = DCB0DB82255AE42F005B29C8 /* phoenix-ios-framework */;
-			targetProxy = DCB0DBAF255AEE0E005B29C8 /* PBXContainerItemProxy */;
-		};
 		DCB511CD281AED58001BC525 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = DCB511C6281AED58001BC525 /* phoenix-notifySrvExt */;
@@ -2466,64 +2408,6 @@
 			};
 			name = Release;
 		};
-		DCB0DB8D255AE42F005B29C8 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CODE_SIGN_IDENTITY = "";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 81;
-				DEVELOPMENT_TEAM = XD77LN4376;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = "phoenix-ios-framework/Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = "fr.acinq.phoenix-ios-framework";
-				PRODUCT_NAME = PhoenixShared;
-				SKIP_INSTALL = YES;
-				SUPPORTS_MACCATALYST = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
-		};
-		DCB0DB8E255AE42F005B29C8 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CODE_SIGN_IDENTITY = "";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 81;
-				DEVELOPMENT_TEAM = XD77LN4376;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = "phoenix-ios-framework/Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = "fr.acinq.phoenix-ios-framework";
-				PRODUCT_NAME = PhoenixShared;
-				SKIP_INSTALL = YES;
-				SUPPORTS_MACCATALYST = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Release;
-		};
 		DCB511D0281AED58001BC525 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2617,15 +2501,6 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		DCB0DB8C255AE42F005B29C8 /* Build configuration list for PBXNativeTarget "phoenix-ios-framework" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				DCB0DB8D255AE42F005B29C8 /* Debug */,
-				DCB0DB8E255AE42F005B29C8 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		DCB511CF281AED58001BC525 /* Build configuration list for PBXNativeTarget "phoenix-notifySrvExt" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -2697,11 +2572,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		DC26D0B92A93BA8C006763B3 /* EffectsLibrary */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = DC26D0B82A93BA8C006763B3 /* XCRemoteSwiftPackageReference "effects-library" */;
-			productName = EffectsLibrary;
-		};
 		DC26D0BA2A93BD0F006763B3 /* EffectsLibrary */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = DC26D0B82A93BA8C006763B3 /* XCRemoteSwiftPackageReference "effects-library" */;
@@ -2726,11 +2596,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DC9B15422B7D0DCB0023743B /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
 			productName = AsyncAlgorithms;
-		};
-		DCA5391829F1DAA3001BD3D5 /* SegmentedPicker */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = DCA5391729F1DAA3001BD3D5 /* XCRemoteSwiftPackageReference "SwiftySegmentedPicker" */;
-			productName = SegmentedPicker;
 		};
 		DCA5391929F1DDE7001BD3D5 /* SegmentedPicker */ = {
 			isa = XCSwiftPackageProductDependency;
