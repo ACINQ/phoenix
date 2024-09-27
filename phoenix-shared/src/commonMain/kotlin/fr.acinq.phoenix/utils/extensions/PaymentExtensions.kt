@@ -29,7 +29,9 @@ import fr.acinq.lightning.payment.OfferPaymentMetadata
 import fr.acinq.lightning.utils.getValue
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sum
+import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.lightning.wire.OfferTypes
+import fr.acinq.phoenix.data.WalletPaymentId
 
 /** Standardized location for extending types from: fr.acinq.lightning. */
 enum class WalletPaymentState { SuccessOnChain, SuccessOffChain, PendingOnChain, PendingOffChain, Failure }
@@ -99,3 +101,10 @@ fun WalletPayment.errorMessage(): String? = when (this) {
 
 fun WalletPayment.incomingOfferMetadata(): OfferPaymentMetadata.V1? = ((this as? IncomingPayment)?.origin as? IncomingPayment.Origin.Offer)?.metadata as? OfferPaymentMetadata.V1
 fun WalletPayment.outgoingInvoiceRequest(): OfferTypes.InvoiceRequest? = ((this as? LightningOutgoingPayment)?.details as? LightningOutgoingPayment.Details.Blinded)?.paymentRequest?.invoiceRequest
+
+/** Returns a list of the ids of the payments that triggered this liquidity purchase. May be empty, for example if this is a manual purchase. */
+fun InboundLiquidityOutgoingPayment.relatedPaymentIds() : List<WalletPaymentId> = when (val details = purchase.paymentDetails) {
+    is LiquidityAds.PaymentDetails.FromFutureHtlc -> details.paymentHashes
+    is LiquidityAds.PaymentDetails.FromChannelBalanceForFutureHtlc -> details.paymentHashes
+    else -> emptyList()
+}.map { WalletPaymentId.IncomingPaymentId(it) }

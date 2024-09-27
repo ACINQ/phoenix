@@ -122,22 +122,20 @@ class CsvWriter {
                     is IncomingPayment -> when (val origin = payment.origin) {
                         is IncomingPayment.Origin.Invoice -> "Incoming LN payment"
                         is IncomingPayment.Origin.SwapIn -> "Swap-in to ${origin.address ?: "N/A"}"
-                        is IncomingPayment.Origin.OnChain -> {
-                            "Swap-in with inputs: ${origin.localInputs.map { it.txid.toString() } }"
-                        }
+                        is IncomingPayment.Origin.OnChain -> "On-chain deposit"
                         is IncomingPayment.Origin.Offer -> when (origin.metadata) {
                             is OfferPaymentMetadata.V1 -> "Incoming payment to your offer"
                         }
                     }
                     is LightningOutgoingPayment -> when (val details = payment.details) {
                         is LightningOutgoingPayment.Details.Normal -> "Outgoing LN payment to ${details.paymentRequest.nodeId.toHex()}"
-                        is LightningOutgoingPayment.Details.SwapOut -> "Swap-out to ${details.address}"
-                        is LightningOutgoingPayment.Details.Blinded -> "Offer to ${details.payerKey.publicKey()}"
+                        is LightningOutgoingPayment.Details.SwapOut -> "Outgoing Swap to ${details.address}"
+                        is LightningOutgoingPayment.Details.Blinded -> "Outgoing LN payment to ${details.paymentRequest.invoiceRequest.offer.encode()}"
                     }
                     is SpliceOutgoingPayment -> "Outgoing splice to ${payment.address}"
                     is ChannelCloseOutgoingPayment -> "Channel closing to ${payment.address}"
                     is SpliceCpfpOutgoingPayment -> "Accelerate transactions with CPFP"
-                    is InboundLiquidityOutgoingPayment -> "+${payment.purchase.amount.sat} sat inbound liquidity"
+                    is InboundLiquidityOutgoingPayment -> "Inbound liquidity purchase (+${payment.purchase.amount.sat} sat)"
                 }
                 row += ",${processField(details)}"
             }
