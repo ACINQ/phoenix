@@ -26,6 +26,7 @@ import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.utils.extensions.desc
@@ -141,7 +142,7 @@ fun ChannelCloseOutgoingPayment.smartDescription(): String = stringResource(id =
 @Composable
 fun InboundLiquidityOutgoingPayment.smartDescription(): String = when (purchase.paymentDetails) {
     // manual inbound liquidity
-    LiquidityAds.PaymentDetails.FromChannelBalance -> "Manual liquidity" // context.getString(R.string.paymentdetails_desc_inbound_liquidity, purchase.amount.toPrettyString(BitcoinUnit.Sat, withUnit = true))
+    LiquidityAds.PaymentDetails.FromChannelBalance -> "Manual liquidity +${purchase.amount.toPrettyString(BitcoinUnit.Sat, withUnit = true)}" // context.getString(R.string.paymentdetails_desc_inbound_liquidity, purchase.amount.toPrettyString(BitcoinUnit.Sat, withUnit = true))
     // pay-to-open/pay-to-splice
     else -> "Automated liquidity"
 }

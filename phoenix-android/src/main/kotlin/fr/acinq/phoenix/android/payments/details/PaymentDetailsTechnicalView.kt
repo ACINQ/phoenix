@@ -472,6 +472,9 @@ private fun ReceivedWithLightning(
     if (receivedWith.channelId != ByteVector32.Zeroes) {
         ChannelIdRow(receivedWith.channelId)
     }
+    receivedWith.fundingFee?.let {
+        TransactionRow(it.fundingTxId)
+    }
     TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_received_label), amount = receivedWith.amountReceived, rateThen = rateThen)
 }
 
