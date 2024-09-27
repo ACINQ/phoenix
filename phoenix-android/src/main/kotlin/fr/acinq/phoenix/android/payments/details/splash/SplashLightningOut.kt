@@ -61,8 +61,6 @@ fun SplashLightningOutgoing(
     metadata: WalletPaymentMetadata,
     onMetadataDescriptionUpdate: (WalletPaymentId, String?) -> Unit,
 ) {
-    val context = LocalContext.current
-
     metadata.lnurl?.let { lnurlMeta ->
         LnurlPayInfoView(payment, lnurlMeta)
     }
@@ -72,7 +70,7 @@ fun SplashLightningOutgoing(
     }
 
     SplashDescription(
-        description = payment.smartDescription(context),
+        description = payment.smartDescription(),
         userDescription = metadata.userDescription,
         paymentId = payment.walletPaymentId(),
         onMetadataDescriptionUpdate = onMetadataDescriptionUpdate

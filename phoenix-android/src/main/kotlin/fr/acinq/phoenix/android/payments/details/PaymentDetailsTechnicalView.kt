@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.PrivateKey
+import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.payment.Bolt11Invoice
@@ -46,6 +47,7 @@ import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.LocalFiatCurrency
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountView
 import fr.acinq.phoenix.android.components.Card
@@ -53,7 +55,9 @@ import fr.acinq.phoenix.android.components.CardHeader
 import fr.acinq.phoenix.android.components.Clickable
 import fr.acinq.phoenix.android.components.InlineButton
 import fr.acinq.phoenix.android.components.TextWithIcon
-import fr.acinq.phoenix.android.components.TransactionLinkButton
+import fr.acinq.phoenix.android.components.InlineTransactionLink
+import fr.acinq.phoenix.android.components.openLink
+import fr.acinq.phoenix.android.components.txUrl
 import fr.acinq.phoenix.android.fiatRate
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.navigateToPaymentDetails
@@ -62,10 +66,10 @@ import fr.acinq.phoenix.android.utils.Converter.toFiat
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
 import fr.acinq.phoenix.android.utils.copyToClipboard
+import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
-import fr.acinq.phoenix.data.walletPaymentId
 import fr.acinq.phoenix.utils.extensions.amountFeeCredit
 
 
@@ -349,18 +353,12 @@ private fun DetailsForLightningOutgoingPayment(
 private fun DetailsForChannelClose(
     payment: ChannelCloseOutgoingPayment
 ) {
-    TechnicalRowSelectable(
-        label = stringResource(id = R.string.paymentdetails_channel_id_label),
-        value = payment.channelId.toHex()
-    )
+    ChannelIdRow(payment.channelId)
     TechnicalRowSelectable(
         label = stringResource(id = R.string.paymentdetails_bitcoin_address_label),
         value = payment.address
     )
-    TechnicalRow(
-        label = stringResource(id = R.string.paymentdetails_tx_id_label),
-        content = { TransactionLinkButton(txId = payment.txId) }
-    )
+    TransactionRow(payment.txId)
     TechnicalRowSelectable(
         label = stringResource(id = R.string.paymentdetails_closing_type_label),
         value = when (payment.closingType) {
@@ -377,24 +375,15 @@ private fun DetailsForChannelClose(
 private fun DetailsForCpfp(
     payment: SpliceCpfpOutgoingPayment
 ) {
-    TechnicalRow(
-        label = stringResource(id = R.string.paymentdetails_tx_id_label),
-        content = { TransactionLinkButton(txId = payment.txId) }
-    )
+    TransactionRow(payment.txId)
 }
 
 @Composable
 private fun DetailsForInboundLiquidity(
     payment: InboundLiquidityOutgoingPayment
 ) {
-    TechnicalRow(
-        label = stringResource(id = R.string.paymentdetails_tx_id_label),
-        content = { TransactionLinkButton(txId = payment.txId) }
-    )
-    TechnicalRowSelectable(
-        label = stringResource(id = R.string.paymentdetails_channel_id_label),
-        value = payment.channelId.toHex(),
-    )
+    TransactionRow(payment.txId)
+    ChannelIdRow(channelId = payment.channelId)
     TechnicalRow(label = "Purchase Type") {
         Text(text = when (payment.purchase) {
             is LiquidityAds.Purchase.Standard -> "Standard"
@@ -432,19 +421,12 @@ private fun ListLinksOfPaymentHashes(paymentHashes: List<ByteVector32>) {
 private fun DetailsForSpliceOut(
     payment: SpliceOutgoingPayment
 ) {
-    TechnicalRowSelectable(
-        label = stringResource(id = R.string.paymentdetails_splice_out_channel_label),
-        value = payment.channelId.toHex()
-    )
+    ChannelIdRow(channelId = payment.channelId, label = stringResource(id = R.string.paymentdetails_splice_out_channel_label))
     TechnicalRowSelectable(
         label = stringResource(id = R.string.paymentdetails_bitcoin_address_label),
         value = payment.address
     )
-    TechnicalRow(
-        label = stringResource(id = R.string.paymentdetails_tx_id_label),
-        content = { TransactionLinkButton(txId = payment.txId) }
-    )
-
+    TransactionRow(payment.txId)
 }
 
 @Composable
@@ -468,7 +450,7 @@ private fun DetailsForIncoming(
                     Row {
                         Text(text = stringResource(id = R.string.paymentdetails_dualswapin_tx_value, index + 1))
                         Spacer(modifier = Modifier.width(4.dp))
-                        TransactionLinkButton(txId = outpoint.txid)
+                        InlineTransactionLink(txId = outpoint.txid)
                     }
                 }
             }
@@ -488,9 +470,7 @@ private fun ReceivedWithLightning(
         Text(text = stringResource(id = R.string.paymentdetails_received_with_lightning))
     }
     if (receivedWith.channelId != ByteVector32.Zeroes) {
-        TechnicalRow(label = stringResource(id = R.string.paymentdetails_channel_id_label)) {
-            Text(text = receivedWith.channelId.toHex())
-        }
+        ChannelIdRow(receivedWith.channelId)
     }
     TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_received_label), amount = receivedWith.amountReceived, rateThen = rateThen)
 }
@@ -505,14 +485,9 @@ private fun ReceivedWithNewChannel(
     }
     val channelId = receivedWith.channelId
     if (channelId != ByteVector32.Zeroes) { // backward compat
-        TechnicalRow(label = stringResource(id = R.string.paymentdetails_channel_id_label)) {
-            Text(text = channelId.toHex())
-        }
+        ChannelIdRow(channelId)
     }
-    TechnicalRow(
-        label = stringResource(id = R.string.paymentdetails_tx_id_label),
-        content = { TransactionLinkButton(txId = receivedWith.txId) }
-    )
+    TransactionRow(receivedWith.txId)
     TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_received_label), amount = receivedWith.amountReceived, rateThen = rateThen)
 }
 
@@ -526,14 +501,9 @@ private fun ReceivedWithSpliceIn(
     }
     val channelId = receivedWith.channelId
     if (channelId != ByteVector32.Zeroes) { // backward compat
-        TechnicalRow(label = stringResource(id = R.string.paymentdetails_channel_id_label)) {
-            Text(text = channelId.toHex())
-        }
+        ChannelIdRow(channelId)
     }
-    TechnicalRow(
-        label = stringResource(id = R.string.paymentdetails_tx_id_label),
-        content = { TransactionLinkButton(txId = receivedWith.txId) }
-    )
+    TransactionRow(receivedWith.txId)
     TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_received_label), amount = receivedWith.amountReceived, rateThen = rateThen)
 }
 
@@ -736,5 +706,53 @@ private fun TechnicalRowWithCopy(label: String, value: String) {
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun TechnicalRowClickable(
+    label: String,
+    onClick: () -> Unit,
+    onLongClick: (() -> Unit)? = null,
+    content: @Composable () -> Unit,
+) {
+    TechnicalRow(label = label) {
+        Clickable(
+            onClick = onClick,
+            onLongClick = onLongClick,
+            modifier = Modifier.fillMaxWidth().offset(x = (-8).dp),
+            shape = RoundedCornerShape(12.dp),
+            backgroundColor = mutedBgColor,
+        ) {
+            Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)) {
+                content()
+            }
+        }
+    }
+}
+
+@Composable
+private fun TransactionRow(txId: TxId) {
+    val context = LocalContext.current
+    val link = txUrl(txId = txId)
+    TechnicalRowClickable(
+        label = stringResource(id = R.string.paymentdetails_tx_id_label),
+        onClick = { openLink(context, link) },
+        onLongClick = { copyToClipboard(context, txId.toString()) }
+    ) {
+        TextWithIcon(text = txId.toString(), icon = R.drawable.ic_external_link, maxLines = 1, textOverflow = TextOverflow.Ellipsis, space = 4.dp)
+    }
+}
+
+@Composable
+private fun ChannelIdRow(channelId: ByteVector32, label: String = stringResource(id = R.string.paymentdetails_channel_id_label)) {
+    val context = LocalContext.current
+    val navController = navController
+    TechnicalRowClickable(
+        label = label,
+        onClick = { navController.navigate("${Screen.ChannelDetails.route}?id=${channelId.toHex()}") },
+        onLongClick = { copyToClipboard(context, channelId.toHex()) }
+    ) {
+        TextWithIcon(text = channelId.toHex(), icon = R.drawable.ic_zap, maxLines = 1, textOverflow = TextOverflow.Ellipsis, space = 4.dp)
     }
 }

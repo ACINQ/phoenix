@@ -29,9 +29,8 @@ import androidx.lifecycle.viewModelScope
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
-import fr.acinq.phoenix.android.utils.smartDescription
+import fr.acinq.phoenix.android.utils.basicDescription
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
-import fr.acinq.phoenix.db.SqlitePaymentsDb
 import fr.acinq.phoenix.managers.DatabaseManager
 import fr.acinq.phoenix.managers.PaymentsFetcher
 import fr.acinq.phoenix.managers.PeerManager
@@ -109,7 +108,7 @@ class CsvExportViewModel(
                 ).map { paymentRow ->
                     paymentsFetcher.getPayment(paymentRow, WalletPaymentFetchOptions.All)?.let { info ->
                         val descriptions = listOf(
-                            info.payment.smartDescription(context),
+                            info.payment.basicDescription(),
                             info.metadata.userDescription,
                             info.metadata.lnurl?.pay?.metadata?.longDesc
                         ).mapNotNull { it.takeIf { !it.isNullOrBlank() } }

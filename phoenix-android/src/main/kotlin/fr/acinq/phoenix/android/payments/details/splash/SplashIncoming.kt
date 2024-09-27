@@ -22,16 +22,19 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.utils.msat
+import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.sum
+import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
@@ -52,8 +55,6 @@ fun SplashIncoming(
     metadata: WalletPaymentMetadata,
     onMetadataDescriptionUpdate: (WalletPaymentId, String?) -> Unit,
 ) {
-    val context = LocalContext.current
-
     payment.incomingOfferMetadata()?.let { meta ->
         meta.payerNote?.takeIf { it.isNotBlank() }?.let {
             OfferPayerNote(payerNote = it)
@@ -63,7 +64,7 @@ fun SplashIncoming(
     }
 
     SplashDescription(
-        description = payment.smartDescription(context = context),
+        description = payment.smartDescription(),
         userDescription = metadata.userDescription,
         paymentId = payment.walletPaymentId(),
         onMetadataDescriptionUpdate = onMetadataDescriptionUpdate,
@@ -115,11 +116,24 @@ private fun SplashFee(
     payment: IncomingPayment
 ) {
     val btcUnit = LocalBitcoinUnit.current
-    val receivedWithNewChannel = payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>() ?: emptyList()
-    val receivedWithSpliceIn = payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.SpliceIn>() ?: emptyList()
-    if ((receivedWithNewChannel + receivedWithSpliceIn).isNotEmpty()) {
-        val serviceFee = receivedWithNewChannel.map { it.serviceFee }.sum() + receivedWithSpliceIn.map { it.serviceFee }.sum()
-        val fundingFee = receivedWithNewChannel.map { it.miningFee }.sum() + receivedWithSpliceIn.map { it.miningFee }.sum()
+    val receivedWithOnChain = remember(payment) { payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.OnChainIncomingPayment>() ?: emptyList() }
+    val receivedWithLightning = remember(payment) { payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.LightningPayment>() ?: emptyList() }
+
+    if (receivedWithOnChain.isNotEmpty() || receivedWithLightning.isNotEmpty()) {
+
+        val paymentsManager = business.paymentsManager
+        val txIds = remember(receivedWithLightning) { receivedWithLightning.mapNotNull { it.fundingFee?.fundingTxId } }
+        val relatedLiquidityPayments by produceState(initialValue = emptyList()) {
+            value = txIds.mapNotNull { paymentsManager.getLiquidityPurchaseForTxId(it) }
+        }
+
+        val serviceFee = remember(receivedWithOnChain, relatedLiquidityPayments) {
+            receivedWithOnChain.map { it.serviceFee }.sum() + relatedLiquidityPayments.map { it.feePaidFromFutureHtlc.serviceFee.toMilliSatoshi() }.sum()
+        }
+        val miningFee = remember(receivedWithOnChain, relatedLiquidityPayments) {
+            receivedWithOnChain.map { it.miningFee }.sum() + relatedLiquidityPayments.map { it.feePaidFromFutureHtlc.miningFee }.sum()
+        }
+
         Spacer(modifier = Modifier.height(8.dp))
         if (serviceFee > 0.msat) {
             SplashLabelRow(
@@ -131,11 +145,13 @@ private fun SplashFee(
             Spacer(modifier = Modifier.height(8.dp))
         }
 
-        SplashLabelRow(
-            label = stringResource(id = R.string.paymentdetails_funding_fees_label),
-            helpMessage = stringResource(R.string.paymentdetails_funding_fees_desc)
-        ) {
-            Text(text = fundingFee.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.HIDE))
+        if (miningFee > 0.sat) {
+            SplashLabelRow(
+                label = stringResource(id = R.string.paymentdetails_funding_fees_label),
+                helpMessage = stringResource(R.string.paymentdetails_funding_fees_desc)
+            ) {
+                Text(text = miningFee.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.HIDE))
+            }
         }
     }
 }

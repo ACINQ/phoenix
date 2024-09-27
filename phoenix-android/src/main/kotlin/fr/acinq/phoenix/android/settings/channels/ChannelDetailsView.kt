@@ -68,7 +68,7 @@ import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.settings.Setting
 import fr.acinq.phoenix.android.components.settings.SettingWithCopy
-import fr.acinq.phoenix.android.components.TransactionLinkButton
+import fr.acinq.phoenix.android.components.InlineTransactionLink
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.navigateToPaymentDetails
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
@@ -188,7 +188,7 @@ private fun CommitmentDetailsView(
             Row {
                 Text(text = stringResource(id = R.string.channeldetails_commitment_funding_tx_id), modifier = Modifier.alignByBaseline())
                 Spacer(modifier = Modifier.width(4.dp))
-                TransactionLinkButton(txId = commitment.fundingTxId, modifier = Modifier.alignByBaseline())
+                InlineTransactionLink(txId = commitment.fundingTxId, modifier = Modifier.alignByBaseline())
             }
             Row {
                 Text(text = stringResource(id = R.string.channeldetails_commitment_balance))

@@ -24,7 +24,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
@@ -46,14 +45,13 @@ fun SplashChannelClose(
     metadata: WalletPaymentMetadata,
     onMetadataDescriptionUpdate: (WalletPaymentId, String?) -> Unit,
 ) {
-    val context = LocalContext.current
     val peer by business.peerManager.peerState.collectAsState()
 
     val isLegacyMigration = payment.isLegacyMigration(metadata, peer)
     val description = when (isLegacyMigration) {
         null -> stringResource(id = R.string.paymentdetails_desc_closing_channel) // not sure yet, but we still know it's a closing
         true -> stringResource(id = R.string.paymentdetails_desc_legacy_migration)
-        false -> payment.smartDescription(context)
+        false -> payment.smartDescription()
     }
 
     SplashDescription(

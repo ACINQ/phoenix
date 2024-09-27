@@ -42,9 +42,8 @@ fun SplashSpliceOutCpfp(
     metadata: WalletPaymentMetadata,
     onMetadataDescriptionUpdate: (WalletPaymentId, String?) -> Unit,
 ) {
-    val context = LocalContext.current
     SplashDescription(
-        description = payment.smartDescription(context),
+        description = payment.smartDescription(),
         userDescription = metadata.userDescription,
         paymentId = payment.walletPaymentId(),
         onMetadataDescriptionUpdate = onMetadataDescriptionUpdate

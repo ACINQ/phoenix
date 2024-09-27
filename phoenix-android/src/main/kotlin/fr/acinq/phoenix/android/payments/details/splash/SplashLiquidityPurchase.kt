@@ -36,15 +36,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
+import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
@@ -53,6 +52,7 @@ import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.BorderButton
 import fr.acinq.phoenix.android.components.BottomSheetDialog
 import fr.acinq.phoenix.android.components.Clickable
+import fr.acinq.phoenix.android.components.SplashClickableContent
 import fr.acinq.phoenix.android.components.SplashLabelRow
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.navController
@@ -69,6 +69,8 @@ import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.WalletPaymentMetadata
+import fr.acinq.phoenix.utils.extensions.relatedPaymentIds
+import kotlinx.coroutines.launch
 
 @Composable
 fun SplashLiquidityPurchase(
@@ -85,7 +87,7 @@ fun SplashLiquidityPurchase(
     //    However, swap-ins do not **yet** request additional liquidity, so **for now** we can make a safe approximation.
     //    Eventually, once swap-ins are upgraded to request liquidity, this will have to be fixed, .
     if (payment.purchase.paymentDetails !is LiquidityAds.PaymentDetails.FromChannelBalance) {
-        AutoLiquidityDetails(purchase = payment.purchase)
+        AutoLiquidityDetails(payment)
     }
 }
 
@@ -123,20 +125,37 @@ private fun SplashFee(
     payment: InboundLiquidityOutgoingPayment
 ) {
     val btcUnit = LocalBitcoinUnit.current
-    SplashLabelRow(
-        label = stringResource(id = R.string.paymentdetails_liquidity_miner_fee_label),
-        helpMessage = stringResource(id = R.string.paymentdetails_liquidity_miner_fee_help)
-    ) {
-        Text(text = payment.miningFees.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW_IF_ZERO_SATS))
-    }
-    Spacer(modifier = Modifier.height(8.dp))
-    SplashLabelRow(
-        label = stringResource(id = R.string.paymentdetails_liquidity_service_fee_label),
-        helpMessage = stringResource(id = R.string.paymentdetails_liquidity_service_fee_help)
-    ) {
-        Text(text = payment.purchase.fees.serviceFee.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW_IF_ZERO_SATS))
-        if (payment.purchase is LiquidityAds.Purchase.WithFeeCredit) {
-            Text(text = "Paid with fee credit")
+
+    // if the fee paid from channel balance is 0, it means this is a liquidity purchase for a new channel whose fee are paid
+    // by a future htlc. In this case, for UX reasons, we don't show the fees here but instead link to the payment whose htlcs
+    // paid the fees.
+    if (payment.feePaidFromChannelBalance.total == 0.sat) {
+        SplashLabelRow(label = "Fees") {
+            val navController = navController
+            payment.relatedPaymentIds().forEach {
+                SplashClickableContent(onClick = { navigateToPaymentDetails(navController, it, isFromEvent = false) }) {
+                    TextWithIcon(text = "See related payment", icon = R.drawable.ic_arrow_next)
+                }
+            }
+        }
+    } else {
+        val miningFee = payment.feePaidFromChannelBalance.miningFee
+        val serviceFee = payment.feePaidFromChannelBalance.serviceFee
+        SplashLabelRow(
+            label = stringResource(id = R.string.paymentdetails_liquidity_miner_fee_label),
+            helpMessage = stringResource(id = R.string.paymentdetails_liquidity_miner_fee_help)
+        ) {
+            Text(text = miningFee.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW_IF_ZERO_SATS))
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        SplashLabelRow(
+            label = stringResource(id = R.string.paymentdetails_liquidity_service_fee_label),
+            helpMessage = stringResource(id = R.string.paymentdetails_liquidity_service_fee_help)
+        ) {
+            Text(text = serviceFee.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW_IF_ZERO_SATS))
+            if (payment.purchase is LiquidityAds.Purchase.WithFeeCredit) {
+                Text(text = "Paid with fee credit")
+            }
         }
     }
 }
@@ -155,7 +174,7 @@ private fun SplashPurchase(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun AutoLiquidityDetails(
-    purchase: LiquidityAds.Purchase
+    payment: InboundLiquidityOutgoingPayment
 ) {
     val navController = navController
     var showPaymentsDialog by remember { mutableStateOf(false) }
@@ -192,11 +211,23 @@ private fun AutoLiquidityDetails(
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(text = "This operation was necessary to accommodate new incoming payments.", modifier = Modifier.padding(horizontal = 24.dp))
                             Spacer(modifier = Modifier.height(12.dp))
-                            Text(
-                                text = "Swipe right to see these payments.",
-                                style = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
-                                modifier = Modifier.padding(horizontal = 24.dp)
-                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            val scope = rememberCoroutineScope()
+                            Clickable(onClick = { scope.launch { pagerState.animateScrollToPage(1) } }, modifier = Modifier
+                                .padding(horizontal = 12.dp)
+                                .align(Alignment.CenterHorizontally), shape = RoundedCornerShape(10.dp)) {
+                                Column(modifier = Modifier.padding(12.dp)) {
+                                    TextWithIcon(
+                                        text = "See related payments",
+                                        icon = R.drawable.ic_arrow_next,
+                                    )
+                                }
+                            }
+//                            Text(
+//                                text = "Swipe right to see these payments.",
+//                                style = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
+//                                modifier = Modifier.padding(horizontal = 24.dp)
+//                            )
 
                             Spacer(modifier = Modifier.height(32.dp))
                             Text(
@@ -235,12 +266,7 @@ private fun AutoLiquidityDetails(
                         Column(modifier = Modifier.fillMaxSize()) {
                             Text(text = "Operation triggered by...", style = MaterialTheme.typography.h4, modifier = Modifier.padding(horizontal = 16.dp))
                             Spacer(modifier = Modifier.height(8.dp))
-                            val paymentHashes = when (val details = purchase.paymentDetails) {
-                                is LiquidityAds.PaymentDetails.FromFutureHtlc -> details.paymentHashes
-                                is LiquidityAds.PaymentDetails.FromChannelBalanceForFutureHtlc -> details.paymentHashes
-                                else -> emptyList()
-                            }
-                            TriggeredBy(paymentHashes = paymentHashes)
+                            TriggeredBy(ids = payment.relatedPaymentIds())
                         }
                     }
                 }
@@ -250,12 +276,10 @@ private fun AutoLiquidityDetails(
 }
 
 @Composable
-private fun TriggeredBy(paymentHashes: List<ByteVector32>) {
-    val context = LocalContext.current
+private fun TriggeredBy(ids: List<WalletPaymentId>) {
     val navController = navController
     val paymentsManager = business.paymentsManager
-    paymentHashes.forEach { paymentHash ->
-        val id = remember(paymentHash) { WalletPaymentId.IncomingPaymentId(paymentHash) }
+    ids.forEach { id ->
         val paymentInfo by produceState<WalletPaymentInfo?>(initialValue = null) {
             value = paymentsManager.getPayment(id = id, options = WalletPaymentFetchOptions.None)
         }

@@ -49,6 +49,7 @@ import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
 import fr.acinq.lightning.db.SpliceOutgoingPayment
+import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.AmountView
 import fr.acinq.phoenix.android.components.BorderButton
@@ -82,30 +83,32 @@ fun PaymentDetailsSplashView(
         header = { DefaultScreenHeader(onBackClick = onBackClick) },
         topContent = { PaymentStatus(data.payment, fromEvent, onCpfpSuccess = onBackClick) }
     ) {
-        AmountView(
-            amount = when (payment) {
-                is InboundLiquidityOutgoingPayment -> payment.amount
-                is OutgoingPayment -> payment.amount - payment.fees
-                is IncomingPayment -> payment.amount
-            },
-            amountTextStyle = MaterialTheme.typography.body1.copy(fontSize = 30.sp),
-            separatorSpace = 4.dp,
-            prefix = stringResource(id = if (payment is OutgoingPayment) R.string.paymentline_prefix_sent else R.string.paymentline_prefix_received)
-
-        )
-
+        if (payment is InboundLiquidityOutgoingPayment && payment.purchase.paymentDetails is LiquidityAds.PaymentDetails.FromFutureHtlc) {
+            Unit
+        } else {
+            AmountView(
+                amount = when (payment) {
+                    is InboundLiquidityOutgoingPayment -> payment.amount
+                    is OutgoingPayment -> payment.amount - payment.fees
+                    is IncomingPayment -> payment.amount
+                },
+                amountTextStyle = MaterialTheme.typography.body1.copy(fontSize = 30.sp),
+                separatorSpace = 4.dp,
+                prefix = stringResource(id = if (payment is OutgoingPayment) R.string.paymentline_prefix_sent else R.string.paymentline_prefix_received)
+            )
+            Spacer(modifier = Modifier.height(36.dp))
+            PrimarySeparator(
+                height = 6.dp,
+                color = when (payment.state()) {
+                    WalletPaymentState.Failure -> negativeColor
+                    WalletPaymentState.SuccessOffChain, WalletPaymentState.SuccessOnChain -> positiveColor
+                    else -> mutedBgColor
+                }
+            )
+        }
         Spacer(modifier = Modifier.height(36.dp))
-        PrimarySeparator(
-            height = 6.dp,
-            color = when (payment.state()) {
-                WalletPaymentState.Failure -> negativeColor
-                WalletPaymentState.SuccessOffChain, WalletPaymentState.SuccessOnChain -> positiveColor
-                else -> mutedBgColor
-            }
-        )
-        Spacer(modifier = Modifier.height(36.dp))
 
-        when (val payment = data.payment) {
+        when (payment) {
             is IncomingPayment -> SplashIncoming(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
             is LightningOutgoingPayment -> SplashLightningOutgoing(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
             is ChannelCloseOutgoingPayment -> SplashChannelClose(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
@@ -136,7 +139,6 @@ fun SplashDescription(
     var showEditDescriptionDialog by remember { mutableStateOf(false) }
 
     Spacer(modifier = Modifier.height(8.dp))
-
     if (!(description.isNullOrBlank() && !userDescription.isNullOrBlank())) {
         SplashLabelRow(label = stringResource(id = R.string.paymentdetails_desc_label)) {
             if (description.isNullOrBlank()) {
@@ -149,7 +151,7 @@ fun SplashDescription(
             }
         }
     }
-
+    Spacer(modifier = Modifier.height(5.dp))
     SplashLabelRow(label = if (userDescription.isNullOrBlank()) "" else "Note") {
         SplashClickableContent(onClick = { showEditDescriptionDialog = true }) {
             if (!userDescription.isNullOrBlank()) {
