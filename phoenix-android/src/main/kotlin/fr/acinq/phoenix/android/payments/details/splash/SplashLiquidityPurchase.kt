@@ -90,11 +90,7 @@ private fun SplashPurchase(
     payment: InboundLiquidityOutgoingPayment,
 ) {
     val btcUnit = LocalBitcoinUnit.current
-    SplashLabelRow(
-        label = "Liquidity",
-        helpMessage = if (payment.isManualPurchase()) null else "This liquidity was required to receive a payment.",
-        helpLink = "See how to optimise" to "https://acinq.co/faq"
-    ) {
+    SplashLabelRow(label = "Liquidity") {
         Text(text = payment.purchase.amount.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW_IF_ZERO_SATS))
     }
 }
@@ -133,6 +129,8 @@ private fun SplashRelatedPayments(payment: InboundLiquidityOutgoingPayment) {
         Spacer(modifier = Modifier.height(4.dp))
         SplashLabelRow(
             label = "Caused by",
+            helpMessage = if (payment.isManualPurchase()) null else "This liquidity was required to receive a payment.",
+            helpLink = "See how to optimise" to "https://acinq.co/faq",
         ) {
             Button(
                 text = paymentId.dbId,
@@ -146,125 +144,5 @@ private fun SplashRelatedPayments(payment: InboundLiquidityOutgoingPayment) {
                 modifier = Modifier.widthIn(max = 170.dp)
             )
         }
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-private fun AutoLiquidityDetails(
-    payment: InboundLiquidityOutgoingPayment
-) {
-    val navController = navController
-    var showPaymentsDialog by remember { mutableStateOf(false) }
-
-    Spacer(modifier = Modifier.height(32.dp))
-    BorderButton(
-        text = "What is this?",
-        icon = R.drawable.ic_help_circle,
-        onClick = { showPaymentsDialog = true },
-        maxLines = 1,
-    )
-
-    if (showPaymentsDialog) {
-        BottomSheetDialog(onDismiss = { showPaymentsDialog = false }, modifier = Modifier.fillMaxHeight(.6f), internalPadding = PaddingValues(bottom = 32.dp)) {
-            val pagerState = rememberPagerState(pageCount = { 2 })
-            HorizontalPager(
-                modifier = Modifier
-                    .wrapContentHeight()
-                    .fillMaxWidth(),
-                state = pagerState,
-                verticalAlignment = Alignment.Top,
-                beyondBoundsPageCount = 1
-            ) { index ->
-                when (index) {
-                    0 -> {
-                        Column {
-                            Text(
-                                text = "Why did this payment happen?",
-                                style = MaterialTheme.typography.h4,
-                                modifier = Modifier.padding(horizontal = 24.dp)
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(text = "Your Lightning channel had to be resized, which is an on-chain operation incurring fees.", modifier = Modifier.padding(horizontal = 24.dp))
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(text = "This operation was necessary to accommodate new incoming payments.", modifier = Modifier.padding(horizontal = 24.dp))
-                            Spacer(modifier = Modifier.height(12.dp))
-                            Spacer(modifier = Modifier.height(4.dp))
-                            val scope = rememberCoroutineScope()
-                            Clickable(onClick = { scope.launch { pagerState.animateScrollToPage(1) } }, modifier = Modifier
-                                .padding(horizontal = 12.dp)
-                                .align(Alignment.CenterHorizontally), shape = RoundedCornerShape(10.dp)) {
-                                Column(modifier = Modifier.padding(12.dp)) {
-                                    TextWithIcon(
-                                        text = "See related payments",
-                                        icon = R.drawable.ic_arrow_next,
-                                    )
-                                }
-                            }
-
-//                            Text(
-//                                text = "Swipe right to see these payments.",
-//                                style = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
-//                                modifier = Modifier.padding(horizontal = 24.dp)
-//                            )
-
-                            Spacer(modifier = Modifier.height(32.dp))
-                            Text(
-                                text = "How to optimise channels resizing?",
-                                style = MaterialTheme.typography.h4,
-                                modifier = Modifier.padding(horizontal = 24.dp),
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Clickable(onClick = { navController.navigate(Screen.LiquidityPolicy.route) }, modifier = Modifier.padding(horizontal = 12.dp), shape = RoundedCornerShape(10.dp)) {
-                                Column(modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                                    TextWithIcon(
-                                        text = "Configure automated management",
-                                        icon = R.drawable.ic_settings,
-                                    )
-                                    Spacer(modifier = Modifier.height(2.dp))
-                                    Text(text = "Cap fees, or disable them altogether", style = MaterialTheme.typography.subtitle2)
-                                }
-                            }
-                            Clickable(onClick = { navController.navigate(Screen.LiquidityRequest.route) }, modifier = Modifier.padding(horizontal = 12.dp), shape = RoundedCornerShape(10.dp)) {
-                                Column(modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                                    TextWithIcon(
-                                        text = "Purchase liquidity in advance",
-                                        icon = R.drawable.ic_idea,
-                                    )
-                                    Spacer(modifier = Modifier.height(2.dp))
-                                    Text(text = "Requires some planning, but is most optimal", style = MaterialTheme.typography.subtitle2)
-                                }
-                            }
-                        }
-                    }
-                    1 -> {
-                        Column(modifier = Modifier.fillMaxSize()) {
-                            Text(text = "Operation triggered by...", style = MaterialTheme.typography.h4, modifier = Modifier.padding(horizontal = 16.dp))
-                            Spacer(modifier = Modifier.height(8.dp))
-                            TriggeredBy(ids = payment.relatedPaymentIds())
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun TriggeredBy(ids: List<WalletPaymentId>) {
-    val navController = navController
-    val paymentsManager = business.paymentsManager
-    ids.forEach { id ->
-        val paymentInfo by produceState<WalletPaymentInfo?>(initialValue = null) {
-            value = paymentsManager.getPayment(id = id, options = WalletPaymentFetchOptions.None)
-        }
-
-        paymentInfo?.let {
-            PaymentLine(paymentInfo = it, contactInfo = null, onPaymentClick = { navigateToPaymentDetails(navController, id, isFromEvent = false) })
-        } ?: PaymentLineLoading(paymentId = id, onPaymentClick = { navigateToPaymentDetails(navController, id, isFromEvent = false) })
     }
 }
