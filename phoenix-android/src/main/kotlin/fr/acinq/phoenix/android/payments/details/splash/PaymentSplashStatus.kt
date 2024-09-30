@@ -58,6 +58,7 @@ import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
 import fr.acinq.lightning.db.SpliceOutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
+import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.Card
@@ -384,5 +385,33 @@ private fun BumpTransactionDialog(
         buttons = null,
     ) {
         CpfpView(channelId = channelId, onSuccess = onSuccess)
+    }
+}
+
+@Composable
+fun SplashLiquidityStatus(payment: InboundLiquidityOutgoingPayment, fromEvent: Boolean) {
+    when (val lockedAt = payment.lockedAt) {
+        null -> {
+            PaymentStatusIcon(
+                message = null,
+                imageResId = R.drawable.ic_payment_details_pending_onchain_static,
+                isAnimated = false,
+                color = mutedTextColor,
+            )
+        }
+        else -> {
+            PaymentStatusIcon(
+                message = {
+                    if (payment.purchase.paymentDetails is LiquidityAds.PaymentDetails.FromChannelBalance) {
+                        Text(text = annotatedStringResource(id = R.string.paymentdetails_status_inbound_liquidity_success, lockedAt.toRelativeDateString()))
+                    } else {
+                        Text(text = annotatedStringResource(id = R.string.paymentdetails_status_inbound_liquidity_auto_success, lockedAt.toRelativeDateString()))
+                    }
+                },
+                imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
+                isAnimated = fromEvent,
+                color = positiveColor,
+            )
+        }
     }
 }

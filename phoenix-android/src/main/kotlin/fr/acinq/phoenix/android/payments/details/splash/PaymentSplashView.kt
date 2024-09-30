@@ -114,7 +114,7 @@ fun PaymentDetailsSplashView(
             is ChannelCloseOutgoingPayment -> SplashChannelClose(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
             is SpliceCpfpOutgoingPayment -> SplashSpliceOutCpfp(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
             is SpliceOutgoingPayment -> SplashSpliceOut(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
-            is InboundLiquidityOutgoingPayment -> SplashLiquidityPurchase(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
+            is InboundLiquidityOutgoingPayment -> SplashLiquidityPurchase(payment = payment)
         }
 
         Spacer(modifier = Modifier.height(48.dp))

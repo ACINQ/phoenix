@@ -51,7 +51,6 @@ import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
 import fr.acinq.lightning.db.SpliceOutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
-import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountView
@@ -68,6 +67,7 @@ import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.walletPaymentId
 import fr.acinq.phoenix.utils.extensions.WalletPaymentState
 import fr.acinq.phoenix.utils.extensions.incomingOfferMetadata
+import fr.acinq.phoenix.utils.extensions.isPaidInTheFuture
 import fr.acinq.phoenix.utils.extensions.outgoingInvoiceRequest
 import fr.acinq.phoenix.utils.extensions.state
 
@@ -142,9 +142,8 @@ fun PaymentLine(
             Row {
                 PaymentDescription(paymentInfo = paymentInfo, contactInfo = contactInfo, modifier = Modifier.weight(1.0f))
                 Spacer(modifier = Modifier.width(16.dp))
-                val showPayment = payment.state() != WalletPaymentState.Failure
-                        && !(payment is InboundLiquidityOutgoingPayment && payment.feePaidFromChannelBalance.total == 0.sat)
-                if (showPayment) {
+                val hideAmount = payment.state() == WalletPaymentState.Failure || (payment is InboundLiquidityOutgoingPayment && payment.isPaidInTheFuture())
+                if (!hideAmount) {
                     val isOutgoing = payment is OutgoingPayment
                     if (isAmountRedacted) {
                         Text(text = "****")

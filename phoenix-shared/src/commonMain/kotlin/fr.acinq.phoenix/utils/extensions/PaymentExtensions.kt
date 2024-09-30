@@ -28,6 +28,7 @@ import fr.acinq.lightning.payment.Bolt12Invoice
 import fr.acinq.lightning.payment.OfferPaymentMetadata
 import fr.acinq.lightning.utils.getValue
 import fr.acinq.lightning.utils.msat
+import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.sum
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.lightning.wire.OfferTypes
@@ -108,3 +109,20 @@ fun InboundLiquidityOutgoingPayment.relatedPaymentIds() : List<WalletPaymentId> 
     is LiquidityAds.PaymentDetails.FromChannelBalanceForFutureHtlc -> details.paymentHashes
     else -> emptyList()
 }.map { WalletPaymentId.IncomingPaymentId(it) }
+
+/**
+ * Returns true if this liquidity was initiated manually by the user, false otherwise.
+ *
+ * FIXME: Dangerous!!
+ * In general, FromChannelBalance only happens for manual purchases OR automated swap-ins with additional liquidity.
+ * However, swap-ins do not **yet** request additional liquidity, so **for now** we can make a safe approximation.
+ * Eventually, once swap-ins are upgraded to request liquidity, this will have to be fixed.
+ */
+fun InboundLiquidityOutgoingPayment.isManualPurchase(): Boolean = purchase.paymentDetails is LiquidityAds.PaymentDetails.FromChannelBalance
+
+/**
+ * Returns true if the liquidity fee was paid by an htlc in a future incoming payment. When that's the case, we should
+ * not display the fees in the liquidity details screen to avoid confusion. Instead we should link to the payment whose
+ * HTLCs paid the fees.
+ */
+fun InboundLiquidityOutgoingPayment.isPaidInTheFuture(): Boolean = feePaidFromChannelBalance.total == 0.sat

@@ -53,7 +53,6 @@ import fr.acinq.phoenix.android.components.AmountView
 import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.CardHeader
 import fr.acinq.phoenix.android.components.Clickable
-import fr.acinq.phoenix.android.components.InlineButton
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.InlineTransactionLink
 import fr.acinq.phoenix.android.components.openLink
@@ -68,7 +67,6 @@ import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.data.ExchangeRate
-import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.utils.extensions.amountFeeCredit
 import fr.acinq.phoenix.utils.extensions.relatedPaymentIds
@@ -397,7 +395,7 @@ private fun DetailsForInboundLiquidity(
     val navController = navController
     paymentIds.forEach {
         TechnicalRowClickable(
-            label = "Triggered by",
+            label = "Caused by",
             onClick = { navigateToPaymentDetails(navController, it, isFromEvent = false) },
         ) {
             TextWithIcon(
