@@ -71,6 +71,7 @@ import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.utils.extensions.amountFeeCredit
+import fr.acinq.phoenix.utils.extensions.relatedPaymentIds
 
 
 @Composable
@@ -385,34 +386,26 @@ private fun DetailsForInboundLiquidity(
     TransactionRow(payment.txId)
     ChannelIdRow(channelId = payment.channelId)
     TechnicalRow(label = "Purchase Type") {
-        Text(text = when (payment.purchase) {
-            is LiquidityAds.Purchase.Standard -> "Standard"
-            is LiquidityAds.Purchase.WithFeeCredit -> "Fee credit"
-        })
-    }
-    val details = payment.purchase.paymentDetails
-    TechnicalRow(label = "Purchase details") {
-        Text(text = details.paymentType.toString())
-    }
-    when (details) {
-        is LiquidityAds.PaymentDetails.FromFutureHtlc -> ListLinksOfPaymentHashes(details.paymentHashes)
-        is LiquidityAds.PaymentDetails.FromChannelBalanceForFutureHtlc -> ListLinksOfPaymentHashes(details.paymentHashes)
-        else -> Unit
-    }
-}
-
-@Composable
-private fun ListLinksOfPaymentHashes(paymentHashes: List<ByteVector32>) {
-    val navController = navController
-    TechnicalRow(label = "Triggered by payments") {
-        Column {
-            paymentHashes.forEach {
-                InlineButton(
-                    text = "- ${it.toHex()}",
-                    onClick = { navigateToPaymentDetails(navController, WalletPaymentId.IncomingPaymentId(it), isFromEvent = false) },
-                    maxLines = 1,
-                )
+        Text(text = "${
+            when (payment.purchase) {
+                is LiquidityAds.Purchase.Standard -> "Standard"
+                is LiquidityAds.Purchase.WithFeeCredit -> "Fee credit"
             }
+        } [${payment.purchase.paymentDetails.paymentType}]")
+    }
+    val paymentIds = payment.relatedPaymentIds()
+    val navController = navController
+    paymentIds.forEach {
+        TechnicalRowClickable(
+            label = "Triggered by",
+            onClick = { navigateToPaymentDetails(navController, it, isFromEvent = false) },
+        ) {
+            TextWithIcon(
+                text = "(incoming) ${it.dbId}",
+                icon = R.drawable.ic_arrow_down_circle,
+                maxLines = 1, textOverflow = TextOverflow.Ellipsis,
+                space = 4.dp
+            )
         }
     }
 }

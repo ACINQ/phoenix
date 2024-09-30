@@ -18,7 +18,7 @@ object Versions {
         const val lifecycle = "2.6.0"
         const val prefs = "1.2.0"
         const val datastore = "1.0.0"
-        const val compose = "1.6.2"
+        const val compose = "1.6.8"
         const val composeCompiler = "1.5.8"
         const val navCompose = "2.6.0"
         const val accompanist = "0.30.1"

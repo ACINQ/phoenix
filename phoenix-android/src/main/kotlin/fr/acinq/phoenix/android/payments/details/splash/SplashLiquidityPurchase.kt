@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -41,6 +42,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
 import fr.acinq.lightning.utils.sat
@@ -51,6 +56,7 @@ import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.BorderButton
 import fr.acinq.phoenix.android.components.BottomSheetDialog
+import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Clickable
 import fr.acinq.phoenix.android.components.SplashClickableContent
 import fr.acinq.phoenix.android.components.SplashLabelRow
@@ -78,7 +84,7 @@ fun SplashLiquidityPurchase(
     metadata: WalletPaymentMetadata,
     onMetadataDescriptionUpdate: (WalletPaymentId, String?) -> Unit,
 ) {
-    SplashPurchase(purchase = payment.purchase)
+    SplashPurchase(payment = payment)
     Spacer(modifier = Modifier.height(12.dp))
     SplashFee(payment = payment)
 
@@ -87,7 +93,7 @@ fun SplashLiquidityPurchase(
     //    However, swap-ins do not **yet** request additional liquidity, so **for now** we can make a safe approximation.
     //    Eventually, once swap-ins are upgraded to request liquidity, this will have to be fixed, .
     if (payment.purchase.paymentDetails !is LiquidityAds.PaymentDetails.FromChannelBalance) {
-        AutoLiquidityDetails(payment)
+        // AutoLiquidityDetails(payment)
     }
 }
 
@@ -162,12 +168,39 @@ private fun SplashFee(
 
 @Composable
 private fun SplashPurchase(
-    purchase: LiquidityAds.Purchase
+    payment: InboundLiquidityOutgoingPayment
 ) {
     val btcUnit = LocalBitcoinUnit.current
     Spacer(modifier = Modifier.height(8.dp))
-    SplashLabelRow(label = "Liquidity") {
-        Text(text = purchase.amount.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW_IF_ZERO_SATS))
+    SplashLabelRow(label = "Liquidity added") {
+        Text(text = payment.purchase.amount.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW_IF_ZERO_SATS))
+        if (payment.purchase.paymentDetails !is LiquidityAds.PaymentDetails.FromChannelBalance) {
+            Spacer(modifier = Modifier.height(4.dp))
+            val relatedPaymentId = payment.relatedPaymentIds().firstOrNull()
+            if (payment.feePaidFromChannelBalance.total == 0.sat || relatedPaymentId == null) {
+                Text(text = "This liquidity was needed to receive new payments", style = MaterialTheme.typography.subtitle2)
+            } else {
+                // this is an automated liquidity paid from balance => show a clickable link for nice UX
+                val navController = navController
+                val text = buildAnnotatedString {
+                    append("This liquidity was needed to receive ")
+                    pushStringAnnotation("payments", annotation = "click")
+                    withStyle(SpanStyle(textDecoration = TextDecoration.Underline, color = MaterialTheme.colors.primary)) {
+                        append("new payments.")
+                    }
+                    pop()
+                }
+                ClickableText(
+                    text = text,
+                    onClick = { offset ->
+                        text.getStringAnnotations(tag = "payments", start = offset, end = offset).firstOrNull()?.let {
+                            navigateToPaymentDetails(navController, relatedPaymentId, isFromEvent = false)
+                        }
+                    },
+                    style = MaterialTheme.typography.subtitle2
+                )
+            }
+        }
     }
 }
 
@@ -223,6 +256,7 @@ private fun AutoLiquidityDetails(
                                     )
                                 }
                             }
+
 //                            Text(
 //                                text = "Swipe right to see these payments.",
 //                                style = MaterialTheme.typography.caption.copy(fontSize = 14.sp),

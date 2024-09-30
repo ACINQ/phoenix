@@ -103,8 +103,8 @@ fun SplashLayout(
             }
             Column(
                 modifier = Modifier
-                    .widthIn(max = 500.dp)
-                    .padding(horizontal = 24.dp),
+                    .widthIn(max = 700.dp)
+                    .padding(horizontal = 6.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 bottomContent()

@@ -61,6 +61,7 @@ fun SplashIncoming(
             Spacer(modifier = Modifier.height(8.dp))
         }
         OfferSentBy(payerPubkey = meta.payerKey, !meta.payerNote.isNullOrBlank())
+        Spacer(modifier = Modifier.height(4.dp))
     }
 
     SplashDescription(

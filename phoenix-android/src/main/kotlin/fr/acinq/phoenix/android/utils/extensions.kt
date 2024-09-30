@@ -142,7 +142,7 @@ fun ChannelCloseOutgoingPayment.smartDescription(): String = stringResource(id =
 @Composable
 fun InboundLiquidityOutgoingPayment.smartDescription(): String = when (purchase.paymentDetails) {
     // manual inbound liquidity
-    LiquidityAds.PaymentDetails.FromChannelBalance -> "Manual liquidity +${purchase.amount.toPrettyString(BitcoinUnit.Sat, withUnit = true)}" // context.getString(R.string.paymentdetails_desc_inbound_liquidity, purchase.amount.toPrettyString(BitcoinUnit.Sat, withUnit = true))
+    LiquidityAds.PaymentDetails.FromChannelBalance -> "Manual liquidity +${purchase.amount.toPrettyString(BitcoinUnit.Sat, withUnit = true)}"
     // pay-to-open/pay-to-splice
     else -> "Automated liquidity"
 }
