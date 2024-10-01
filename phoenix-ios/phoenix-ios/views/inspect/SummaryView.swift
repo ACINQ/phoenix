@@ -33,6 +33,8 @@ struct SummaryView: View {
 	@State var paymentInfo: WalletPaymentInfo
 	@State var paymentInfoIsStale: Bool
 	
+	@State var liquidityPayment: Lightning_kmpInboundLiquidityOutgoingPayment? = nil
+	
 	let fetchOptions = WalletPaymentFetchOptions.companion.All
 	
 	@State var blockchainConfirmations: Int? = nil
@@ -168,8 +170,8 @@ struct SummaryView: View {
 		.onAppear {
 			onAppear()
 		}
-		.onChange(of: paymentInfo) {
-			blockchainMonitorState.paymentInfoPublisher.send($0)
+		.onChange(of: paymentInfo) { _ in
+			paymentInfoChanged()
 		}
 		.task {
 			await monitorBlockchain()
@@ -512,6 +514,7 @@ struct SummaryView: View {
 		SummaryInfoGrid(
 			paymentInfo: $paymentInfo,
 			showOriginalFiatValue: $showOriginalFiatValue,
+			liquidityPayment: $liquidityPayment,
 			showContactView: showContactView,
 			switchToPayment: switchToPayment
 		)
@@ -956,17 +959,11 @@ struct SummaryView: View {
 		// This means our Task to monitor the blockchain needs to properly respond whenever
 		// the `paymentInfo` property is changed.
 		
-		// This is needed when re-displaying the View.
-		// We have code to ignore duplicates below so that extra fires don't interrupt our work.
-		blockchainMonitorState.paymentInfoPublisher.send(self.paymentInfo)
-		
 		var lastPaymentId: WalletPaymentId? = nil
+		
+		// Note: When the task is cancelled, the `values` stream returns nil, and we exit the loop
+		
 		for await paymentInfo in blockchainMonitorState.paymentInfoPublisher.values {
-				
-			guard !Task.isCancelled else {
-				log.debug("monitorBlockchain(): Task.isCancelled")
-				return
-			}
 			
 			if let paymentInfo, paymentInfo.id() == lastPaymentId {
 				log.debug("monitorBlockchain: ignoring duplicate paymentInfo")
@@ -992,7 +989,12 @@ struct SummaryView: View {
 				blockchainMonitorState.currentTaskPublisher.send(nil)
 			}
 		}
-			
+		
+		if let currentTask = blockchainMonitorState.currentTaskPublisher.value {
+			log.debug("monitorBlockchain: currentTask.cancel()")
+			currentTask.cancel()
+		}
+		
 		log.debug("monitorBlockchain: terminated")
 	}
 	
@@ -1023,12 +1025,9 @@ struct SummaryView: View {
 			return
 		}
 		
+		// Note: When the task is cancelled, the `values` stream returns nil, and we exit the loop
+		
 		for await notification in Biz.business.electrumClient.notificationsPublisher().values {
-			
-			guard !Task.isCancelled else {
-				log.debug("monitorBlockchain(\(pid)): Task.isCancelled")
-				return
-			}
 			
 			if !(notification is Lightning_kmpHeaderSubscriptionResponse) {
 				log.debug("monitorBlockchain(\(pid)): notification isNot HeaderSubscriptionResponse")
@@ -1129,9 +1128,13 @@ struct SummaryView: View {
 						}
 					}
 				}
+			} else {
+				// Not triggered in this particular case, so we need to trigger it manually.
+				paymentInfoChanged()
 			}
 			
 		} else {
+			log.trace("subsequent appearance")
 			
 			// We are returning from the DetailsView/EditInfoView (via the NavigationController)
 			// The payment metadata may have changed (e.g. description/notes modified).
@@ -1159,6 +1162,33 @@ struct SummaryView: View {
 				case .TransactionsView:
 					presentationMode.wrappedValue.dismiss()
 				}
+			}
+		}
+	}
+	
+	func paymentInfoChanged() {
+		log.trace("paymentInfoChanged()")
+		
+		blockchainMonitorState.paymentInfoPublisher.send(paymentInfo)
+		
+		if let incomingPayment = paymentInfo.payment as? Lightning_kmpIncomingPayment,
+			let fundingTxId = incomingPayment.lightningPaymentFundingTxId
+		{
+			Task { @MainActor in
+				do {
+					let paymentsManager = Biz.business.paymentsManager
+					let payment = try await paymentsManager.getLiquidityPurchaseForTxId(txId: fundingTxId)
+					if let payment {
+						log.debug("liquidityPayment = \(payment.walletPaymentId().dbId)")
+						liquidityPayment = payment
+					} else {
+						log.debug("liquidityPayment = nil")
+					}
+					
+				} catch {
+					log.error("getLiquidityPurchaseForTxId(): error: \(error)")
+				}
+				
 			}
 		}
 	}
@@ -1204,6 +1234,7 @@ struct SummaryView: View {
 			
 			if let result {
 				paymentInfo = result
+				liquidityPayment = nil
 				blockchainConfirmations = nil
 			}
 		}

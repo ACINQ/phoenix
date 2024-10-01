@@ -35935,7 +35935,6 @@
     },
     "Service Fees" : {
       "comment" : "Label in SummaryInfoGrid",
-      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -35974,12 +35973,6 @@
           }
         }
       }
-    },
-    "Service Fees (1)" : {
-      "comment" : "Label in SummaryInfoGrid"
-    },
-    "Service Fees (2)" : {
-      "comment" : "Label in SummaryInfoGrid"
     },
     "Service returned unreadable response" : {
       "comment" : "Error message - scanning lightning invoice",

@@ -90,24 +90,6 @@ extension Lightning_kmpWalletPayment {
 			// An incomingPayment may have service fees if a new channel was automatically opened
 			if let received = incomingPayment.received {
 				
-//				received.receivedWith.forEach { rw in
-//					if let _ = rw as? Lightning_kmpIncomingPayment.ReceivedWith_LightningPayment {
-//						log.debug("ReceivedWith_LightningPayment")
-//						
-//					} else if let _ = rw as? Lightning_kmpIncomingPayment.ReceivedWith_AddedToFeeCredit {
-//						log.debug("ReceivedWith_AddedToFeeCredit")
-//						
-//					} else if let _ = rw as? Lightning_kmpIncomingPayment.ReceivedWith_SpliceIn {
-//						log.debug("ReceivedWith_SpliceIn")
-//						
-//					} else if let _ = rw as? Lightning_kmpIncomingPayment.ReceivedWith_NewChannel {
-//						log.debug("ReceivedWith_NewChannel")
-//						
-//					} else {
-//						log.debug("ReceivedWith_???")
-//					}
-//				}
-				
 				let msat = received.receivedWith.map {
 					if let lightning = $0 as? Lightning_kmpIncomingPayment.ReceivedWith_LightningPayment {
 						if lightning.fundingFee?.fundingTxId != nil {
@@ -129,7 +111,7 @@ extension Lightning_kmpWalletPayment {
 				
 				if msat > 0 {
 					
-					let title = String(localized: "Service Fees (1)", comment: "Label in SummaryInfoGrid")
+					let title = String(localized: "Service Fees", comment: "Label in SummaryInfoGrid")
 					let exp = String(localized:
 						"""
 						In order to receive this payment, a new payment channel was opened. \
@@ -265,7 +247,7 @@ extension Lightning_kmpWalletPayment {
 			let sat = il.purchase.fees.serviceFee
 			let msat = Utils.toMsat(sat: sat)
 			
-			let title = String(localized: "Service Fees (2)", comment: "Label in SummaryInfoGrid")
+			let title = String(localized: "Service Fees", comment: "Label in SummaryInfoGrid")
 			let exp = String(
 				localized: "Fees paid for the liquidity service.",
 				comment: "Fees explanation"

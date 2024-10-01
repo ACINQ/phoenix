@@ -13,6 +13,8 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 	@Binding var paymentInfo: WalletPaymentInfo
 	@Binding var showOriginalFiatValue: Bool	
 	
+	@Binding var liquidityPayment: Lightning_kmpInboundLiquidityOutgoingPayment?
+	
 	let showContactView: (_ contact: ContactInfo) -> Void
 	let switchToPayment: (_ paymentId: WalletPaymentId) -> Void
 	
@@ -48,6 +50,10 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 	@Environment(\.openURL) var openURL
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
+	// --------------------------------------------------
+	// MARK: View Builders
+	// --------------------------------------------------
+	
 	@ViewBuilder
 	var infoGridRows: some View {
 		
@@ -73,9 +79,7 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 			paymentFeesRow_MinerFees()
 			paymentFeesRow_ServiceFees()
 			
-			if isLiquidityPaidInTheFuture() {
-				causedByRow()
-			}
+			causedByRow()
 			
 			// How do we detect leased liquidity now ?
 		//	paymentDurationRow()
@@ -83,6 +87,9 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 			paymentErrorRow()
 		}
 		.padding([.leading, .trailing])
+		.onAppear {
+			onAppear()
+		}
 	}
 	
 	@ViewBuilder
@@ -478,7 +485,7 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 	@ViewBuilder
 	func paymentFeesRow_StandardFees() -> some View {
 		
-		if let standardFees = paymentInfo.payment.standardFees() {
+		if let standardFees = standardFees() {
 			paymentFeesRow(
 				msat: standardFees.0,
 				title: standardFees.1,
@@ -491,7 +498,7 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 	@ViewBuilder
 	func paymentFeesRow_MinerFees() -> some View {
 		
-		if let minerFees = paymentInfo.payment.minerFees(), !isLiquidityPaidInTheFuture() {
+		if let minerFees = minerFees() {
 			paymentFeesRow(
 				msat: minerFees.0,
 				title: minerFees.1,
@@ -504,7 +511,7 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 	@ViewBuilder
 	func paymentFeesRow_ServiceFees() -> some View {
 		
-		if let serviceFees = paymentInfo.payment.serviceFees(), !isLiquidityPaidInTheFuture() {
+		if let serviceFees = serviceFees() {
 			paymentFeesRow(
 				msat: serviceFees.0,
 				title: serviceFees.1,
@@ -687,8 +694,68 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 	}
 	
 	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
+	
+	func onAppear() {
+		log.trace("onAppear()")
+		
+		if let liquidity = paymentInfo.payment as? Lightning_kmpInboundLiquidityOutgoingPayment {
+			log.debug("is: Lightning_kmpInboundLiquidityOutgoingPayment")
+			
+			if let paymentId = liquidity.relatedPaymentIds().first {
+				log.debug("paymentId = \(paymentId.dbId)")
+			} else {
+				log.debug("paymentId = nil")
+			}
+			
+		} else {
+			log.debug("is NOT: Lightning_kmpInboundLiquidityOutgoingPayment")
+		}
+	}
+	
+	// --------------------------------------------------
 	// MARK: Utilities
 	// --------------------------------------------------
+	
+	func standardFees() -> (Int64, String, String)? {
+		
+		return paymentInfo.payment.standardFees()
+	}
+	
+	func minerFees() -> (Int64, String, String)? {
+		
+		if let liquidity = paymentInfo.payment as? Lightning_kmpInboundLiquidityOutgoingPayment,
+			liquidity.isPaidInTheFuture() {
+			// We don't display the fees here.
+			// Instead we're displaying the fees on the corresponding IncomingPayment.
+			return nil
+		} else if let result = paymentInfo.payment.minerFees() {
+			return result
+		} else if let liquidityPayment, liquidityPayment.isPaidInTheFuture() {
+			// This is the corresponding IncomingPayment, and we have the linked liquidityPayment.
+			return liquidityPayment.minerFees()
+		} else {
+			return nil
+		}
+	}
+	
+	func serviceFees() -> (Int64, String, String)? {
+		
+		if let liquidity = paymentInfo.payment as? Lightning_kmpInboundLiquidityOutgoingPayment,
+			liquidity.isPaidInTheFuture() {
+			// We don't display the fees here.
+			// Instead we're displaying the fees on the corresponding IncomingPayment.
+			return nil
+		} else if let result = paymentInfo.payment.serviceFees() {
+			return result
+		} else if let liquidityPayment, liquidityPayment.isPaidInTheFuture() {
+			// This is the corresponding IncomingPayment, and we have the linked liquidityPayment.
+			return liquidityPayment.serviceFees()
+		} else {
+			return nil
+		}
+	}
 	
 	func formattedAmount(msat: Int64) -> FormattedAmount {
 		
@@ -736,15 +803,6 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 		}
 		
 		return nil
-	}
-	
-	func isLiquidityPaidInTheFuture() -> Bool {
-		
-		if let liquidity = paymentInfo.payment as? Lightning_kmpInboundLiquidityOutgoingPayment {
-			return liquidity.isPaidInTheFuture()
-		} else {
-			return false
-		}
 	}
 
 	func toggleCurrencyType() -> Void {

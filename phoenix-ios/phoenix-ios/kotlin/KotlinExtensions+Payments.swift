@@ -283,19 +283,25 @@ extension Lightning_kmpIncomingPayment {
 		}
 	}
 	
-	var isLightningPaymentWithFundingTxId: Bool {
+	var lightningPaymentFundingTxId: Bitcoin_kmpTxId? {
 		
 		guard let received else {
-			return false
+			return nil
 		}
 		
-		return received.receivedWith.contains { rw in
-			if let lp = rw as? Lightning_kmpIncomingPayment.ReceivedWith_LightningPayment {
-				return lp.fundingFee?.fundingTxId != nil
-			} else {
-				return false
+		for rw in received.receivedWith {
+			if let lp = rw as? Lightning_kmpIncomingPayment.ReceivedWith_LightningPayment,
+			   let txId = lp.fundingFee?.fundingTxId
+			{
+				return txId
 			}
 		}
+		
+		return nil
+	}
+	
+	var isLightningPaymentWithFundingTxId: Bool {
+		return lightningPaymentFundingTxId != nil
 	}
 }
 
