@@ -127,6 +127,7 @@ fun SplashLabelRow(
         Row(
             modifier = Modifier
                 .weight(1f)
+                .heightIn(min = 22.dp)
                 .alignByBaseline(),
             horizontalArrangement = Arrangement.End
         ) {

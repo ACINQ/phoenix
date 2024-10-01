@@ -67,7 +67,6 @@ fun SplashLightningOutgoing(
 
     payment.outgoingInvoiceRequest()?.payerNote?.takeIf { it.isNotBlank() }?.let {
         OfferPayerNote(payerNote = it)
-        Spacer(modifier = Modifier.height(4.dp))
     }
 
     SplashDescription(

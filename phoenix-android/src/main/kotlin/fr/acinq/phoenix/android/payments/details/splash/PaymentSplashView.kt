@@ -151,7 +151,6 @@ fun SplashDescription(
             }
         }
     }
-    Spacer(modifier = Modifier.height(5.dp))
     SplashLabelRow(label = if (userDescription.isNullOrBlank()) "" else "Note") {
         SplashClickableContent(onClick = { showEditDescriptionDialog = true }) {
             if (!userDescription.isNullOrBlank()) {

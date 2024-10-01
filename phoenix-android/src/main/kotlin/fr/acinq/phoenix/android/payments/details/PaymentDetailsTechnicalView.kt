@@ -381,8 +381,6 @@ private fun DetailsForCpfp(
 private fun DetailsForInboundLiquidity(
     payment: InboundLiquidityOutgoingPayment
 ) {
-    TransactionRow(payment.txId)
-    ChannelIdRow(channelId = payment.channelId)
     TechnicalRow(label = "Purchase Type") {
         Text(text = "${
             when (payment.purchase) {
@@ -391,6 +389,8 @@ private fun DetailsForInboundLiquidity(
             }
         } [${payment.purchase.paymentDetails.paymentType}]")
     }
+    TransactionRow(payment.txId)
+    ChannelIdRow(channelId = payment.channelId)
     val paymentIds = payment.relatedPaymentIds()
     val navController = navController
     paymentIds.forEach {

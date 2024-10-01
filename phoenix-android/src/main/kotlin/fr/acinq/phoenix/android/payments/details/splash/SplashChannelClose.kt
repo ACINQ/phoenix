@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
+import fr.acinq.lightning.utils.msat
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
@@ -77,8 +78,10 @@ private fun SplashDestination(payment: ChannelCloseOutgoingPayment, metadata: Wa
 @Composable
 private fun SplashFee(payment: ChannelCloseOutgoingPayment) {
     val btcUnit = LocalBitcoinUnit.current
-    Spacer(modifier = Modifier.height(8.dp))
-    SplashLabelRow(label = stringResource(id = R.string.paymentdetails_fees_label)) {
-        Text(text = payment.fees.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW_IF_ZERO_SATS))
+    if (payment.fees > 0.msat) {
+        Spacer(modifier = Modifier.height(8.dp))
+        SplashLabelRow(label = stringResource(id = R.string.paymentdetails_fees_label)) {
+            Text(text = payment.fees.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW_IF_ZERO_SATS))
+        }
     }
 }

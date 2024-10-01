@@ -58,10 +58,8 @@ fun SplashIncoming(
     payment.incomingOfferMetadata()?.let { meta ->
         meta.payerNote?.takeIf { it.isNotBlank() }?.let {
             OfferPayerNote(payerNote = it)
-            Spacer(modifier = Modifier.height(8.dp))
         }
         OfferSentBy(payerPubkey = meta.payerKey, !meta.payerNote.isNullOrBlank())
-        Spacer(modifier = Modifier.height(4.dp))
     }
 
     SplashDescription(

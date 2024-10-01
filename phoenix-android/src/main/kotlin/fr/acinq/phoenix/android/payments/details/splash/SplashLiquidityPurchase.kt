@@ -79,10 +79,6 @@ fun SplashLiquidityPurchase(
     SplashPurchase(payment = payment)
     SplashFee(payment = payment)
     SplashRelatedPayments(payment)
-
-//    if (payment.purchase.paymentDetails !is LiquidityAds.PaymentDetails.FromChannelBalance) {
-//         AutoLiquidityDetails(payment)
-//    }
 }
 
 @Composable
