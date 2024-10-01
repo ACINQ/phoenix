@@ -11,9 +11,10 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture discussion
 	
 	@Binding var paymentInfo: WalletPaymentInfo
-	@Binding var showOriginalFiatValue: Bool
+	@Binding var showOriginalFiatValue: Bool	
 	
 	let showContactView: (_ contact: ContactInfo) -> Void
+	let switchToPayment: (_ paymentId: WalletPaymentId) -> Void
 	
 	// <InfoGridView Protocol>
 	let minKeyColumnWidth: CGFloat = 50
@@ -42,6 +43,7 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 	@State var popoverPresent_standardFees = false
 	@State var popoverPresent_minerFees = false
 	@State var popoverPresent_serviceFees = false
+	@State var popoverPresent_liquidityCause = false
 	
 	@Environment(\.openURL) var openURL
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
@@ -70,7 +72,13 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 			paymentFeesRow_StandardFees()
 			paymentFeesRow_MinerFees()
 			paymentFeesRow_ServiceFees()
-			paymentDurationRow()
+			
+			if isLiquidityPaidInTheFuture() {
+				causedByRow()
+			}
+			
+			// How do we detect leased liquidity now ?
+		//	paymentDurationRow()
 			
 			paymentErrorRow()
 		}
@@ -483,7 +491,7 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 	@ViewBuilder
 	func paymentFeesRow_MinerFees() -> some View {
 		
-		if let minerFees = paymentInfo.payment.minerFees() {
+		if let minerFees = paymentInfo.payment.minerFees(), !isLiquidityPaidInTheFuture() {
 			paymentFeesRow(
 				msat: minerFees.0,
 				title: minerFees.1,
@@ -496,7 +504,7 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 	@ViewBuilder
 	func paymentFeesRow_ServiceFees() -> some View {
 		
-		if let serviceFees = paymentInfo.payment.serviceFees() {
+		if let serviceFees = paymentInfo.payment.serviceFees(), !isLiquidityPaidInTheFuture() {
 			paymentFeesRow(
 				msat: serviceFees.0,
 				title: serviceFees.1,
@@ -607,6 +615,54 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 	}
 	
 	@ViewBuilder
+	func causedByRow() -> some View {
+		let identifier: String = #function
+		
+		if let liquidity = paymentInfo.payment as? Lightning_kmpInboundLiquidityOutgoingPayment,
+			let paymentId = liquidity.relatedPaymentIds().first
+		{
+			InfoGridRow(
+				identifier: identifier,
+				vAlignment: .firstTextBaseline,
+				hSpacing: horizontalSpacingBetweenColumns,
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
+			) {
+				
+				keyColumn("Caused by")
+				
+			} valueColumn: {
+				
+				HStack(alignment: VerticalAlignment.center, spacing: 6) {
+					
+					Button {
+						switchToPayment(paymentId)
+					} label: {
+						Text(paymentId.dbId)
+							.lineLimit(1)
+							.truncationMode(.middle)
+					}
+					
+					Button {
+						popoverPresent_liquidityCause.toggle()
+					} label: {
+						Image(systemName: "questionmark.circle")
+							.renderingMode(.template)
+							.foregroundColor(.secondary)
+							.font(.body)
+					}
+					.popover(present: $popoverPresent_liquidityCause) {
+						InfoPopoverWindow {
+							Text("This liquidity was required to receive a payment")
+						}
+					}
+				}
+				
+			} // </InfoGridRow>
+		}
+	}
+	
+	@ViewBuilder
 	func paymentErrorRow() -> some View {
 		let identifier: String = #function
 		
@@ -680,6 +736,15 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 		}
 		
 		return nil
+	}
+	
+	func isLiquidityPaidInTheFuture() -> Bool {
+		
+		if let liquidity = paymentInfo.payment as? Lightning_kmpInboundLiquidityOutgoingPayment {
+			return liquidity.isPaidInTheFuture()
+		} else {
+			return false
+		}
 	}
 
 	func toggleCurrencyType() -> Void {

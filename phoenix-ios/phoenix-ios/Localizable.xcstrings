@@ -1955,6 +1955,7 @@
       }
     },
     "%@ - from %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -2001,6 +2002,7 @@
       }
     },
     "%@ - to %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -2128,6 +2130,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ %2$@"
+          }
+        }
+      }
+    },
+    "%@ ∙ from %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ ∙ from %2$@"
+          }
+        }
+      }
+    },
+    "%@ ∙ to %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ ∙ to %2$@"
           }
         }
       }
@@ -3111,6 +3133,7 @@
     },
     "+%@ inbound liquidity" : {
       "comment" : "Payment description for inbound liquidity",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -7626,6 +7649,9 @@
         }
       }
     },
+    "Automated liquidity" : {
+      "comment" : "Payment description for inbound liquidity"
+    },
     "Automatic Channel Creation" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -9723,6 +9749,9 @@
         }
       }
     },
+    "Caused by" : {
+
+    },
     "Chain mismatch" : {
       "comment" : "Error title",
       "localizations" : {
@@ -10011,6 +10040,9 @@
           }
         }
       }
+    },
+    "Channel Resized" : {
+
     },
     "Channel size impacted" : {
       "localizations" : {
@@ -24558,6 +24590,7 @@
     },
     "Lightning fees for routing the payment. Payment required %d hops." : {
       "comment" : "Fees explanation",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -24596,6 +24629,9 @@
           }
         }
       }
+    },
+    "Lightning fees for routing the payment. Payment required %lld hops." : {
+      "comment" : "Fees explanation"
     },
     "Lightning fees for routing the payment. Payment required 1 hop." : {
       "comment" : "Fees explanation",
@@ -24640,6 +24676,7 @@
     },
     "Lightning fees for routing the payment. Payment was divided into %d parts, using %d hops." : {
       "comment" : "Fees explanation",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -24675,6 +24712,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Frais de routage Lightning. Le paiement a été divisé en %1$d parties et fait %2$d sauts."
+          }
+        }
+      }
+    },
+    "Lightning fees for routing the payment. Payment was divided into %lld parts, using %lld hops." : {
+      "comment" : "Fees explanation",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Lightning fees for routing the payment. Payment was divided into %1$lld parts, using %2$lld hops."
           }
         }
       }
@@ -25086,6 +25134,7 @@
       }
     },
     "Liquidity Added" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -25890,6 +25939,9 @@
           }
         }
       }
+    },
+    "Manual liquidity" : {
+      "comment" : "Payment description for inbound liquidity"
     },
     "Manual restore" : {
       "comment" : "Navigation bar title",
@@ -35883,6 +35935,7 @@
     },
     "Service Fees" : {
       "comment" : "Label in SummaryInfoGrid",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -35921,6 +35974,12 @@
           }
         }
       }
+    },
+    "Service Fees (1)" : {
+      "comment" : "Label in SummaryInfoGrid"
+    },
+    "Service Fees (2)" : {
+      "comment" : "Label in SummaryInfoGrid"
     },
     "Service returned unreadable response" : {
       "comment" : "Error message - scanning lightning invoice",
@@ -41790,6 +41849,9 @@
           }
         }
       }
+    },
+    "This liquidity was required to receive a payment" : {
+
     },
     "This means you will not be able to receive payments when Phoenix is in the background. To receive payments, Phoenix must be open and in the foreground." : {
       "extractionState" : "manual",
