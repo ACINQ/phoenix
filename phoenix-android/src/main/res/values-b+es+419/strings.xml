@@ -448,7 +448,7 @@
     <string name="lnurl_auth_help_dialog_compat_button">Cambiar esquema</string>
     <string name="lnurl_auth_button">Iniciar sesión</string>
     <string name="lnurl_auth_try_again_button">Intentar de nuevo</string>
-    <string name="lnurl_auth_in_progress">Iniciando sesión en<b>%1$s</b>.</string>
+    <string name="lnurl_auth_in_progress">Iniciando sesión en\n<b>%1$s</b>.</string>
     <string name="lnurl_auth_success">Autenticación correcta.</string>
     <string name="lnurl_auth_failure">Error de autenticación:</string>
     <string name="lnurl_auth_error_network">Error de red. Comprueba tu conexión a Internet y vuelve a intentarlo.</string>
