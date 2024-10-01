@@ -140,13 +140,14 @@ struct BizNotificationCell: View {
 			} // </HStack>
 			
 			Group {
-				if reason is PhoenixShared.Notification.PaymentRejected.FeePolicyDisabled {
+				switch onEnum(of: reason) {
+				case .feePolicyDisabled(_):
 					Text("Automated incoming liquidity is disabled in your incoming fee settings.")
-					
-				} else if reason is PhoenixShared.Notification.PaymentRejected.ChannelsInitializing {
-					Text("Channels initializing...")
-					
-				} else {
+				case .missingOffChainAmountTooLow(_):
+					Text("Missing off-chain amount too low.")
+				case .channelFundingInProgress(_):
+					Text("Channel funding in progress.")
+				default:
 					Text("Unknown reason.")
 				}
 			}

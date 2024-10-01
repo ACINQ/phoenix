@@ -1,10 +1,10 @@
 import Foundation
 import PhoenixShared
 
-enum SpliceOutProblem: Error {
+enum ChannelFundingProblem: Error {
 	case insufficientFunds
 	case spliceAlreadyInProgress
-	case channelNotQuiescent
+	case spliceAborted
 	case sessionError
 	case disconnected
 	case other
@@ -16,7 +16,7 @@ enum SpliceOutProblem: Error {
 			return String(localized: "Insufficient funds")
 		case .spliceAlreadyInProgress:
 			return String(localized: "Splice already in progress")
-		case .channelNotQuiescent:
+		case .spliceAborted:
 			return String(localized: "Splice has been aborted")
 		case .sessionError:
 			return String(localized: "Splice-out session error")
@@ -28,8 +28,8 @@ enum SpliceOutProblem: Error {
 	}
 	
 	static func fromResponse(
-		_ response: Lightning_kmpChannelCommand.CommitmentSpliceResponse?
-	) -> SpliceOutProblem? {
+		_ response: Lightning_kmpChannelFundingResponse?
+	) -> ChannelFundingProblem? {
 		
 		guard let response else {
 			return .other
@@ -42,11 +42,23 @@ enum SpliceOutProblem: Error {
 		if let _ = failure.asInsufficientFunds() {
 			return .insufficientFunds
 		}
+		if let _ = failure.asInvalidSpliceOutPubKeyScript() {
+			return .sessionError
+		}
 		if let _ = failure.asSpliceAlreadyInProgress() {
 			return .spliceAlreadyInProgress
 		}
+		if let _ = failure.asConcurrentRemoteSplice() {
+			return .spliceAborted
+		}
 		if let _ = failure.asChannelNotQuiescent() {
-			return .channelNotQuiescent
+			return .spliceAborted
+		}
+		if let _ = failure.asInvalidChannelParameters() {
+			return .sessionError
+		}
+		if let _ = failure.asInvalidLiquidityAds() {
+			return .sessionError
 		}
 		if let _ = failure.asFundingFailure() {
 			return .sessionError
@@ -61,6 +73,9 @@ enum SpliceOutProblem: Error {
 			return .sessionError
 		}
 		if let _ = failure.asAbortedByPeer() {
+			return .sessionError
+		}
+		if let _ = failure.asUnexpectedMessage() {
 			return .sessionError
 		}
 		if let _ = failure.asDisconnected() {

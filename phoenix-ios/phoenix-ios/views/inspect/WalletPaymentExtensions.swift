@@ -228,7 +228,7 @@ extension Lightning_kmpWalletPayment {
 		
 		if let il = self as? Lightning_kmpInboundLiquidityOutgoingPayment {
 			
-			let sat = il._lease.fees.serviceFee
+			let sat = il.purchase.fees.serviceFee
 			let msat = Utils.toMsat(sat: sat)
 			
 			let title = NSLocalizedString("Service Fees", comment: "Label in SummaryInfoGrid")

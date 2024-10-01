@@ -4,7 +4,7 @@ import PhoenixShared
 struct LiquidityFeeParams {
 	let amount: Bitcoin_kmpSatoshi
 	let feerate: Lightning_kmpFeeratePerKw
-	let leaseRate: LiquidityAds_LeaseRate
+	let fundingRate: Lightning_kmpLiquidityAdsFundingRate
 }
 
 struct LiquidityFeeEstimate {

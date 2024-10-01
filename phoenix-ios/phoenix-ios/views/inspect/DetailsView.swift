@@ -1090,7 +1090,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			commonValue_amounts(
 				identifier: identifier,
 				displayAmounts: displayAmounts(
-					sat: payment._lease.amount,
+					sat: payment.purchase.amount,
 					originalFiat: paymentInfo.metadata.originalFiat
 				)
 			)

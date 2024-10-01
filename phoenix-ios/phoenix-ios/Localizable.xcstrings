@@ -9927,6 +9927,9 @@
         }
       }
     },
+    "Channel funding in progress." : {
+
+    },
     "channel id" : {
       "comment" : "Label in DetailsView_IncomingPayment",
       "localizations" : {
@@ -10210,6 +10213,7 @@
       }
     },
     "Channels initializing..." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -23215,6 +23219,9 @@
         }
       }
     },
+    "Invalid channel parameters" : {
+
+    },
     "Invalid date range" : {
       "localizations" : {
         "ar" : {
@@ -27104,6 +27111,9 @@
           }
         }
       }
+    },
+    "Missing off-chain amount too low." : {
+
     },
     "Modify" : {
       "localizations" : {
@@ -43968,6 +43978,9 @@
           }
         }
       }
+    },
+    "Unexpected message" : {
+
     },
     "Unknown" : {
       "comment" : "Connection state",

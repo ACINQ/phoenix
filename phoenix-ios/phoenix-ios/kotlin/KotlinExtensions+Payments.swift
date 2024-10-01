@@ -163,7 +163,7 @@ extension WalletPaymentInfo {
 				return String(localized: "Bump fees", comment: "Payment description for splice CPFP")
 				
 			} else if let il = outgoingPayment as? Lightning_kmpInboundLiquidityOutgoingPayment {
-				let amount = Utils.formatBitcoin(sat: il._lease.amount, bitcoinUnit: .sat)
+				let amount = Utils.formatBitcoin(sat: il.purchase.amount, bitcoinUnit: .sat)
 				return String(
 					localized: "+\(amount.string) inbound liquidity",
 					comment: "Payment description for inbound liquidity"
