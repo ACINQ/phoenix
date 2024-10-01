@@ -71,14 +71,6 @@ sealed class Notification {
         override val source: LiquidityEvents.Source,
     ) : PaymentRejected()
 
-    data class ChannelFundingInProgress(
-        override val id: UUID,
-        override val createdAt: Long,
-        override val readAt: Long?,
-        override val amount: MilliSatoshi,
-        override val source: LiquidityEvents.Source,
-    ) : PaymentRejected()
-
     data class GenericError(
         override val id: UUID,
         override val createdAt: Long,

@@ -342,6 +342,8 @@
     <string name="paymentdetails_desc_closing_channel">Canal de cierre</string>
     <string name="paymentdetails_desc_legacy_migration">Migración desde aplicación heredada</string>
     <string name="paymentdetails_desc_cpfp">Impulsar transacciones</string>
+    <string name="paymentdetails_desc_liquidity_manual">Liquidez manual (+%1$s)</string>
+    <string name="paymentdetails_desc_liquidity_automated">Liquidez automatizada</string>
     <string name="paymentdetails_desc_swapout">Intercambiar a %1$s</string>
     <string name="paymentdetails_desc_swapin">Depósito en la cadena</string>
 

@@ -67,11 +67,6 @@ internal sealed class NotificationData {
             data class V0(@Serializable val amount: MilliSatoshi, val source: LiquidityEvents.Source) : Disabled()
         }
 
-        sealed class ChannelFundingInProgress : PaymentRejected() {
-            @Serializable
-            data class V0(@Serializable val amount: MilliSatoshi, val source: LiquidityEvents.Source) : ChannelFundingInProgress()
-        }
-
         sealed class MissingOffchainAmountTooLow : PaymentRejected() {
             @Serializable
             data class V0(@Serializable val amount: MilliSatoshi, val source: LiquidityEvents.Source) : MissingOffchainAmountTooLow()
@@ -113,7 +108,6 @@ internal sealed class NotificationData {
             is Notification.OverAbsoluteFee -> PaymentRejected.OverAbsoluteFee.V0(amount, source, fee, maxAbsoluteFee)
             is Notification.OverRelativeFee -> PaymentRejected.OverRelativeFee.V0(amount, source, fee, maxRelativeFeeBasisPoints)
             is Notification.FeePolicyDisabled -> PaymentRejected.Disabled.V0(amount, source)
-            is Notification.ChannelFundingInProgress -> PaymentRejected.ChannelFundingInProgress.V0(amount, source)
             is Notification.MissingOffChainAmountTooLow -> PaymentRejected.MissingOffchainAmountTooLow.V0(amount, source)
             is Notification.GenericError -> PaymentRejected.GenericError.V0(amount, source)
             is fr.acinq.phoenix.data.WatchTowerOutcome.Nominal -> WatchTowerOutcome.Nominal.V0(channelsWatchedCount)

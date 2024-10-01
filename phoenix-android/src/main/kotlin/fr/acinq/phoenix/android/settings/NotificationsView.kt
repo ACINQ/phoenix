@@ -273,9 +273,8 @@ private fun PaymentNotification(
                         notification.fee.toPrettyString(btcUnit, withUnit = true),
                         DecimalFormat("0.##").format(notification.maxRelativeFeeBasisPoints.toDouble() / 100),
                     )
-                    is Notification.GenericError -> "An error has occurred. Please try again."
-                    is Notification.ChannelFundingInProgress -> "A funding is in progress. Try again later."
-                    is Notification.MissingOffChainAmountTooLow -> "The amount is too low."
+                    is Notification.MissingOffChainAmountTooLow -> stringResource(id = R.string.notif_rejected_amount_too_low)
+                    is Notification.GenericError -> stringResource(id = R.string.notif_rejected_generic_error)
                 },
                 bottomText = when (notification) {
                     is Notification.OverAbsoluteFee, is Notification.OverRelativeFee, is Notification.FeePolicyDisabled -> {

@@ -44,6 +44,8 @@
     <string name="notif_rejected_over_absolute_timeout">Les frais étaient de %1$s, mais votre max est de %2$s. Le dépôt expirera le %3$s.</string>
     <string name="notif_rejected_over_relative">Les frais étaient de %1$s et dépassent %2$s%% du montant. Cette configuration peut être changée.</string>
     <string name="notif_rejected_over_relative_timeout">Les frais étaient de %1$s et dépassent %2$s%% du montant. Le dépôt expirera le %3$s.</string>
+    <string name="notif_rejected_amount_too_low">Le montant du paiement est trop faible.</string>
+    <string name="notif_rejected_generic_error">Une erreur s\'est produite lors du financement. Veuillez réessayer plus tard.</string>
 
     <string name="notif_watcher_revoked_commit_title">Veuillez démarrer Phoenix</string>
     <string name="notif_watcher_revoked_commit_message">Certains de vos canaux pourraient avoir fermé.</string>
@@ -226,7 +228,6 @@
     <string name="inappnotif_payment_rejected_disabled">La gestion des canaux automatisée est désactivée.</string>
     <string name="inappnotif_payment_rejected_over_absolute">Les frais étaient de %1$s, mais votre max est de %2$s.</string>
     <string name="inappnotif_payment_rejected_over_relative">Les frais de %1$s représentaient plus de %2$s%% du montant.</string>
-    <string name="inappnotif_payment_rejected_channel_initializing">Vous canaux étaient en initialisation et n\'ont pu recevoir ce paiement.</string>
     <string name="inappnotif_payment_rejected_tweak_setting">Cliquez pour configurer.</string>
     <string name="inappnotif_payment_rejected_view_wallet">Voir les détails</string>
 
@@ -256,8 +257,9 @@
     <string name="paymentdetails_liquidity_service_fee_help">Frais payés pour le service de liquidité.</string>
     <string name="paymentdetails_liquidity_miner_fee_label">Frais de\nminage</string>
     <string name="paymentdetails_liquidity_miner_fee_help">Frais payés aux mineurs du réseau Bitcoin pour traiter la transaction sur la chaîne.</string>
-    <string name="paymentdetails_liquidity_lease_duration_label">Durée</string>
-    <string name="paymentdetails_liquidity_lease_duration_value">1 an</string>
+    <string name="paymentdetails_liquidity_caused_by_label">Causé par</string>
+    <string name="paymentdetails_liquidity_caused_by_help">Cette liquidité était nécessaire pour recevoir un paiement.</string>
+    <string name="paymentdetails_liquidity_caused_by_help_link">Voir comment optimiser</string>
 
     <!-- lnurl -->
 
@@ -307,7 +309,6 @@
     <string name="walletinfo_onchain_swapin_policy_disabled_details">La gestion des canaux automatisée <b>est désactivée</b>. Les fonds ne seront pas basculés sur Lightning et vont rester sur ce wallet.</string>
     <string name="walletinfo_onchain_swapin_last_attempt">Dernière tentative (%1$s).</string>
     <string name="walletinfo_onchain_swapin_last_attempt_disabled">La gestion des canaux automatisée était désactivée.</string>
-    <string name="walletinfo_onchain_swapin_last_attempt_channels_init">Les canaux étaient encore en cours d\'initialisation.</string>
     <string name="walletinfo_onchain_swapin_empty">Il n\'y a pas de fonds en attente de swap.</string>
 
     <string name="walletinfo_onchain_swapin_timeout_1day">Ce swap va expirer dans moins d\'une journée!</string>

@@ -124,9 +124,9 @@ private fun SplashRelatedPayments(payment: InboundLiquidityOutgoingPayment) {
         val paymentId = relatedPaymentIds.first()
         Spacer(modifier = Modifier.height(4.dp))
         SplashLabelRow(
-            label = "Caused by",
-            helpMessage = if (payment.isManualPurchase()) null else "This liquidity was required to receive a payment.",
-            helpLink = "See how to optimise" to "https://acinq.co/faq",
+            label = stringResource(id = R.string.paymentdetails_liquidity_caused_by_label),
+            helpMessage = if (payment.isManualPurchase()) null else stringResource(id = R.string.paymentdetails_liquidity_caused_by_help),
+            helpLink = stringResource(id = R.string.paymentdetails_liquidity_caused_by_help_link) to "https://acinq.co/faq",
         ) {
             Button(
                 text = paymentId.dbId,

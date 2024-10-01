@@ -23,13 +23,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.utils.Connection
-import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.utils.extensions.desc
+import fr.acinq.phoenix.utils.extensions.isManualPurchase
 import java.security.cert.CertificateException
 import java.util.*
 import kotlin.contracts.ExperimentalContracts
@@ -140,11 +140,9 @@ fun SpliceCpfpOutgoingPayment.smartDescription(): String = stringResource(id = R
 fun ChannelCloseOutgoingPayment.smartDescription(): String = stringResource(id = R.string.paymentdetails_desc_closing_channel)
 
 @Composable
-fun InboundLiquidityOutgoingPayment.smartDescription(): String = when (purchase.paymentDetails) {
-    // manual inbound liquidity
-    LiquidityAds.PaymentDetails.FromChannelBalance -> "Manual liquidity +${purchase.amount.toPrettyString(BitcoinUnit.Sat, withUnit = true)}"
-    // pay-to-open/pay-to-splice
-    else -> "Automated liquidity"
+fun InboundLiquidityOutgoingPayment.smartDescription(): String = when {
+    isManualPurchase() -> stringResource(id = R.string.paymentdetails_desc_liquidity_manual, purchase.amount.toPrettyString(BitcoinUnit.Sat, withUnit = true))
+    else -> stringResource(id = R.string.paymentdetails_desc_liquidity_automated)
 }
 
 @Composable

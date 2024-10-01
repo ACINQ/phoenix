@@ -381,7 +381,7 @@ private fun DetailsForCpfp(
 private fun DetailsForInboundLiquidity(
     payment: InboundLiquidityOutgoingPayment
 ) {
-    TechnicalRow(label = "Purchase Type") {
+    TechnicalRow(label = stringResource(id = R.string.paymentdetails_liquidity_purchase_type)) {
         Text(text = "${
             when (payment.purchase) {
                 is LiquidityAds.Purchase.Standard -> "Standard"
@@ -395,7 +395,7 @@ private fun DetailsForInboundLiquidity(
     val navController = navController
     paymentIds.forEach {
         TechnicalRowClickable(
-            label = "Caused by",
+            label = stringResource(id = R.string.paymentdetails_liquidity_caused_by_label),
             onClick = { navigateToPaymentDetails(navController, it, isFromEvent = false) },
         ) {
             TextWithIcon(
@@ -714,7 +714,9 @@ private fun TechnicalRowClickable(
         Clickable(
             onClick = onClick,
             onLongClick = onLongClick,
-            modifier = Modifier.fillMaxWidth().offset(x = (-8).dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .offset(x = (-8).dp),
             shape = RoundedCornerShape(12.dp),
             backgroundColor = mutedBgColor,
         ) {

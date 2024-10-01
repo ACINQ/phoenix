@@ -300,7 +300,7 @@ class NodeService : Service() {
             // TODO: click on notif must deeplink to the notification screen
             when (event) {
                 is LiquidityEvents.Rejected -> {
-                    log.debug("processing liquidity_event=$event")
+                    log.debug("processing liquidity_event={}", event)
                     if (event.source == LiquidityEvents.Source.OnChainWallet) {
                         // Check the last time a rejected on-chain swap notification has been shown. If recent, we do not want to trigger a notification every time.
                         val lastRejectedSwap = internalData.getLastRejectedOnchainSwap.first().takeIf {
@@ -327,9 +327,11 @@ class NodeService : Service() {
                         is LiquidityEvents.Rejected.Reason.TooExpensive.OverRelativeFee -> {
                             SystemNotificationHelper.notifyPaymentRejectedOverRelative(applicationContext, event.source, event.amount, event.fee, reason.maxRelativeFeeBasisPoints, nextTimeout?.second)
                         }
+                        is LiquidityEvents.Rejected.Reason.MissingOffChainAmountTooLow -> {
+                            SystemNotificationHelper.notifyPaymentRejectedAmountTooLow(applicationContext, event.source, event.amount)
+                        }
                         // Temporary errors
                         is LiquidityEvents.Rejected.Reason.ChannelFundingInProgress,
-                        is LiquidityEvents.Rejected.Reason.MissingOffChainAmountTooLow,
                         is LiquidityEvents.Rejected.Reason.NoMatchingFundingRate,
                         is LiquidityEvents.Rejected.Reason.TooManyParts -> {
                             SystemNotificationHelper.notifyPaymentRejectedFundingError(applicationContext, event.source, event.amount)

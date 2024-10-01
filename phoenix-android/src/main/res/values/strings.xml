@@ -391,7 +391,8 @@
     <string name="paymentdetails_desc_closing_channel">Closing channel</string>
     <string name="paymentdetails_desc_legacy_migration">Migration from legacy app</string>
     <string name="paymentdetails_desc_cpfp">Bump transactions</string>
-    <string name="paymentdetails_desc_inbound_liquidity">+%1$s inbound liquidity</string>
+    <string name="paymentdetails_desc_liquidity_manual">Manual liquidity (+%1$s)</string>
+    <string name="paymentdetails_desc_liquidity_automated">Automated liquidity</string>
     <string name="paymentdetails_desc_swapout">Swap-out to %1$s</string>
     <string name="paymentdetails_desc_swapin">On-chain deposit</string>
 
@@ -444,6 +445,7 @@
     <string name="paymentdetails_offer_label">Offer</string>
     <string name="paymentdetails_bolt12_label">Bolt12 invoice</string>
     <string name="paymentdetails_offer_metadata_label">Metadata</string>
+    <string name="paymentdetails_liquidity_purchase_type">Purchase type</string>
 
     <string name="paymentdetails_status_label">Payment status</string>
     <string name="paymentdetails_status_success">Successful</string>

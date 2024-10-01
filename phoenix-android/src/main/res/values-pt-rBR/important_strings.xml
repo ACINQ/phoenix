@@ -44,6 +44,8 @@
     <string name="notif_rejected_over_absolute_timeout">A taxa foi de %1$s, mas sua taxa máxima foi definida como %2$s. Esse depósito expirará em %3$s.</string>
     <string name="notif_rejected_over_relative">A taxa foi de %1$s, que é mais do que %2$s%% do valor recebido. Você pode ajustar isso nas configurações.</string>
     <string name="notif_rejected_over_relative_timeout">A taxa foi de %1$s, que é mais do que %2$s%% do valor recebido. Esse depósito expirará em %3$s.</string>
+    <string name="notif_rejected_amount_too_low">O valor do pagamento é muito baixo.</string>
+    <string name="notif_rejected_generic_error">Ocorreu um erro durante o financiamento. Tente novamente mais tarde.</string>
 
     <string name="notif_watcher_revoked_commit_title">Por favor, inicie o Phoenix</string>
     <string name="notif_watcher_revoked_commit_message">Alguns de seus canais podem ter sido fechados.</string>
@@ -225,7 +227,6 @@
     <string name="inappnotif_payment_rejected_disabled">O gerenciamento automatizado de canais está desativado.</string>
     <string name="inappnotif_payment_rejected_over_absolute">A taxa foi de %1$s, mas sua taxa máxima foi definida como %2$s.</string>
     <string name="inappnotif_payment_rejected_over_relative">A taxa foi de %1$s, que é mais do que %2$s%% do valor.</string>
-    <string name="inappnotif_payment_rejected_channel_initializing">Seus canais ainda estão sendo inicializados e não puderam receber esse pagamento.</string>
     <string name="inappnotif_payment_rejected_tweak_setting">Toque para configurar.</string>
     <string name="inappnotif_payment_rejected_view_wallet">Ver detalhes</string>
 
@@ -255,8 +256,9 @@
     <string name="paymentdetails_liquidity_service_fee_help">Taxas pagas pelo serviço de liquidez.</string>
     <string name="paymentdetails_liquidity_miner_fee_label">Taxas do minerador</string>
     <string name="paymentdetails_liquidity_miner_fee_help">Taxas pagas aos mineradores da rede Bitcoin para processar a transação na cadeia.</string>
-    <string name="paymentdetails_liquidity_lease_duration_label">Duração</string>
-    <string name="paymentdetails_liquidity_lease_duration_value">1 ano</string>
+    <string name="paymentdetails_liquidity_caused_by_label">Causado por</string>
+    <string name="paymentdetails_liquidity_caused_by_help">Essa liquidez era necessária para receber um pagamento.</string>
+    <string name="paymentdetails_liquidity_caused_by_help_link">Veja como otimizar</string>
 
     <!-- lnurl -->
 
@@ -302,7 +304,6 @@
     <string name="walletinfo_onchain_swapin_policy_disabled_details">A política de taxas automatizadas <b>está desativada</b>. Os fundos não serão trocados. Eles permanecerão nessa carteira.</string>
     <string name="walletinfo_onchain_swapin_last_attempt">Última tentativa (%1$s).</string>
     <string name="walletinfo_onchain_swapin_last_attempt_disabled">A política de taxas automatizadas está desativada.</string>
-    <string name="walletinfo_onchain_swapin_last_attempt_channels_init">Seus canais ainda estavam sendo inicializados.</string>
     <string name="walletinfo_onchain_swapin_empty">Não há swaps em andamento.</string>
 
     <string name="walletinfo_onchain_swapin_timeout_1day">Essa troca expirará em um dia!</string>

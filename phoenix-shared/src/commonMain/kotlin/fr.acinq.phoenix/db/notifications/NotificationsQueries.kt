@@ -46,7 +46,6 @@ internal class NotificationsQueries(val database: AppDatabase) {
                 is Notification.OverAbsoluteFee -> "PAYMENT_REJECTED_OVER_ABSOLUTE_FEE"
                 is Notification.OverRelativeFee -> "PAYMENT_REJECTED_OVER_RELATIVE_FEE"
                 is Notification.FeePolicyDisabled -> "PAYMENT_REJECTED_POLICY_DISABLED"
-                is Notification.ChannelFundingInProgress -> "PAYMENT_REJECTED_CHANNEL_FUNDING_IN_PROGRESS"
                 is Notification.MissingOffChainAmountTooLow -> "PAYMENT_REJECTED_OFFCHAIN_AMOUNT_TOO_LOW"
                 is Notification.GenericError -> "PAYMENT_REJECTED_GENERIC_ERROR"
                 is WatchTowerOutcome.Nominal -> "WATCH_TOWER_NOMINAL"
@@ -136,13 +135,6 @@ internal class NotificationsQueries(val database: AppDatabase) {
                     maxRelativeFeeBasisPoints = data.maxRelativeFeeBasisPoints
                 )
                 is NotificationData.PaymentRejected.Disabled.V0 -> Notification.FeePolicyDisabled(
-                    id = UUID.fromString(id),
-                    createdAt = created_at,
-                    readAt = read_at,
-                    amount = data.amount,
-                    source = data.source,
-                )
-                is NotificationData.PaymentRejected.ChannelFundingInProgress.V0 -> Notification.ChannelFundingInProgress(
                     id = UUID.fromString(id),
                     createdAt = created_at,
                     readAt = read_at,

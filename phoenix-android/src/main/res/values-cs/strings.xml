@@ -326,6 +326,8 @@
     <string name="paymentdetails_desc_closing_channel">Zavírání kanálu</string>
     <string name="paymentdetails_desc_legacy_migration">Migrace ze staré aplikace</string>
     <string name="paymentdetails_desc_cpfp">Postrčit transakci</string>
+    <string name="paymentdetails_desc_liquidity_manual">Manuální likvidita (+%1$s)</string>
+    <string name="paymentdetails_desc_liquidity_automated">Automatizovaná likvidita</string>
     <string name="paymentdetails_desc_swapout">Swap-out do %1$s</string>
     <string name="paymentdetails_desc_swapin">On-Chain vklad</string>
 

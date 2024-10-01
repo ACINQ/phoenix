@@ -349,7 +349,8 @@
     <string name="paymentdetails_desc_closing_channel">Kanal-Schließung</string>
     <string name="paymentdetails_desc_legacy_migration">Migration von Legacy-App</string>
     <string name="paymentdetails_desc_cpfp">Beschleunigte Transaktion</string>
-    <string name="paymentdetails_desc_inbound_liquidity">+%1$s eingehende Liquidität</string>
+    <string name="paymentdetails_desc_liquidity_manual">Manuelle Liquidität (+%1$s)</string>
+    <string name="paymentdetails_desc_liquidity_automated">Automatisierte Liquidität</string>
     <string name="paymentdetails_desc_swapout">Swap-out an %1$s</string>
     <string name="paymentdetails_desc_swapin">On-Chain Einzahlung</string>
 
