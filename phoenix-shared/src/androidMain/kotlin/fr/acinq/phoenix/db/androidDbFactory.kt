@@ -20,21 +20,14 @@ import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import fr.acinq.bitcoin.Chain
 import fr.acinq.phoenix.utils.PlatformContext
+import fr.acinq.phoenix.utils.extensions.phoenixName
 
 actual fun createChannelsDbDriver(ctx: PlatformContext, chain: Chain, nodeIdHash: String): SqlDriver {
-    val chainName = when (chain) {
-        is Chain.Testnet3 -> "testnet"
-        else -> chain.name.lowercase()
-    }
-    return AndroidSqliteDriver(ChannelsDatabase.Schema, ctx.applicationContext, "channels-$chainName-$nodeIdHash.sqlite")
+    return AndroidSqliteDriver(ChannelsDatabase.Schema, ctx.applicationContext, "channels-${chain.phoenixName}-$nodeIdHash.sqlite")
 }
 
 actual fun createPaymentsDbDriver(ctx: PlatformContext, chain: Chain, nodeIdHash: String): SqlDriver {
-    val chainName = when (chain) {
-        is Chain.Testnet3 -> "testnet"
-        else -> chain.name.lowercase()
-    }
-    return AndroidSqliteDriver(PaymentsDatabase.Schema, ctx.applicationContext, "payments-$chainName-$nodeIdHash.sqlite")
+    return AndroidSqliteDriver(PaymentsDatabase.Schema, ctx.applicationContext, "payments-${chain.phoenixName}-$nodeIdHash.sqlite")
 }
 
 actual fun createAppDbDriver(ctx: PlatformContext): SqlDriver {
