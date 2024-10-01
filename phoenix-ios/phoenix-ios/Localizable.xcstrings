@@ -7652,6 +7652,12 @@
     "Automated liquidity" : {
       "comment" : "Payment description for inbound liquidity"
     },
+    "Automatic [FromChannelBalance]" : {
+
+    },
+    "Automatic [FromFutureHtlc]" : {
+
+    },
     "Automatic Channel Creation" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -9147,6 +9153,9 @@
         }
       }
     },
+    "Blockchain Info" : {
+
+    },
     "blockchain tx" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -9748,6 +9757,9 @@
           }
         }
       }
+    },
+    "caused by" : {
+
     },
     "Caused by" : {
 
@@ -25815,6 +25827,9 @@
         }
       }
     },
+    "Manual" : {
+
+    },
     "Manual Backup" : {
       "comment" : "Navigation bar title",
       "extractionState" : "manual",
@@ -26995,6 +27010,7 @@
       }
     },
     "miner fees" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -32614,6 +32630,9 @@
           }
         }
       }
+    },
+    "purchase type" : {
+
     },
     "QR code" : {
       "localizations" : {

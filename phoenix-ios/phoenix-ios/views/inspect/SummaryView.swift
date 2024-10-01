@@ -851,8 +851,10 @@ struct SummaryView: View {
 			DetailsView(
 				location: wrappedLocation(),
 				paymentInfo: $paymentInfo,
+				liquidityPayment: $liquidityPayment,
 				showOriginalFiatValue: $showOriginalFiatValue,
-				showFiatValueExplanation: $showFiatValueExplanation
+				showFiatValueExplanation: $showFiatValueExplanation,
+				switchToPayment: switchToPayment
 			)
 			
 		case .EditInfoView:
