@@ -9956,9 +9956,6 @@
         }
       }
     },
-    "Channel funding in progress." : {
-
-    },
     "channel id" : {
       "comment" : "Label in DetailsView_IncomingPayment",
       "localizations" : {

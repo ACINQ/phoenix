@@ -145,8 +145,6 @@ struct BizNotificationCell: View {
 					Text("Automated incoming liquidity is disabled in your incoming fee settings.")
 				case .missingOffChainAmountTooLow(_):
 					Text("Missing off-chain amount too low.")
-				case .channelFundingInProgress(_):
-					Text("Channel funding in progress.")
 				default:
 					Text("Unknown reason.")
 				}
