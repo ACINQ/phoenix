@@ -273,75 +273,75 @@ fun LiquidityPolicy.asAuto(): LiquidityPolicy.Auto? = when (this) {
     else -> null
 }
 
-fun ChannelCommand.Commitment.Splice.Response.asCreated(): ChannelCommand.Commitment.Splice.Response.Created? = when (this) {
-    is ChannelCommand.Commitment.Splice.Response.Created -> this
-    else -> null
-}
-
-fun ChannelCommand.Commitment.Splice.Response.asFailure(): ChannelCommand.Commitment.Splice.Response.Failure? = when (this) {
-    is ChannelCommand.Commitment.Splice.Response.Failure -> this
-    else -> null
-}
-
-fun ChannelCommand.Commitment.Splice.Response.Failure.asInsufficientFunds(): ChannelCommand.Commitment.Splice.Response.Failure.InsufficientFunds? = when (this) {
-    is ChannelCommand.Commitment.Splice.Response.Failure.InsufficientFunds -> this
-    else -> null
-}
-
-fun ChannelCommand.Commitment.Splice.Response.Failure.asInvalidSpliceOutPubKeyScript(): ChannelCommand.Commitment.Splice.Response.Failure.InvalidSpliceOutPubKeyScript? = when (this) {
-    is ChannelCommand.Commitment.Splice.Response.Failure.InvalidSpliceOutPubKeyScript -> this
-    else -> null
-}
-
-fun ChannelCommand.Commitment.Splice.Response.Failure.asSpliceAlreadyInProgress(): ChannelCommand.Commitment.Splice.Response.Failure.SpliceAlreadyInProgress? = when (this) {
-    is ChannelCommand.Commitment.Splice.Response.Failure.SpliceAlreadyInProgress -> this
-    else -> null
-}
-
-fun ChannelCommand.Commitment.Splice.Response.Failure.asChannelNotQuiescent(): ChannelCommand.Commitment.Splice.Response.Failure.ChannelNotQuiescent? = when (this) {
-    is ChannelCommand.Commitment.Splice.Response.Failure.ChannelNotQuiescent -> this
-    else -> null
-}
-
-fun ChannelCommand.Commitment.Splice.Response.Failure.asConcurrentRemoteSplice(): ChannelCommand.Commitment.Splice.Response.Failure.ConcurrentRemoteSplice? = when (this) {
-    is ChannelCommand.Commitment.Splice.Response.Failure.ConcurrentRemoteSplice -> this
-    else -> null
-}
-
-fun ChannelCommand.Commitment.Splice.Response.Failure.asInvalidLiquidityAds(): ChannelCommand.Commitment.Splice.Response.Failure.InvalidLiquidityAds? = when (this) {
-    is ChannelCommand.Commitment.Splice.Response.Failure.InvalidLiquidityAds -> this
-    else -> null
-}
-
-fun ChannelCommand.Commitment.Splice.Response.Failure.asFundingFailure(): ChannelCommand.Commitment.Splice.Response.Failure.FundingFailure? = when (this) {
-    is ChannelCommand.Commitment.Splice.Response.Failure.FundingFailure -> this
-    else -> null
-}
-
-fun ChannelCommand.Commitment.Splice.Response.Failure.asCannotStartSession(): ChannelCommand.Commitment.Splice.Response.Failure.CannotStartSession? = when (this) {
-    is ChannelCommand.Commitment.Splice.Response.Failure.CannotStartSession -> this
-    else -> null
-}
-
-fun ChannelCommand.Commitment.Splice.Response.Failure.asInteractiveTxSessionFailed(): ChannelCommand.Commitment.Splice.Response.Failure.InteractiveTxSessionFailed? = when (this) {
-    is ChannelCommand.Commitment.Splice.Response.Failure.InteractiveTxSessionFailed -> this
-    else -> null
-}
-
-fun ChannelCommand.Commitment.Splice.Response.Failure.asCannotCreateCommitTx(): ChannelCommand.Commitment.Splice.Response.Failure.CannotCreateCommitTx? = when (this) {
-    is ChannelCommand.Commitment.Splice.Response.Failure.CannotCreateCommitTx -> this
-    else -> null
-}
-
-fun ChannelCommand.Commitment.Splice.Response.Failure.asAbortedByPeer(): ChannelCommand.Commitment.Splice.Response.Failure.AbortedByPeer? = when (this) {
-    is ChannelCommand.Commitment.Splice.Response.Failure.AbortedByPeer -> this
-    else -> null
-}
-
-fun ChannelCommand.Commitment.Splice.Response.Failure.asDisconnected(): ChannelCommand.Commitment.Splice.Response.Failure.Disconnected? = when (this) {
-    is ChannelCommand.Commitment.Splice.Response.Failure.Disconnected -> this
-    else -> null
-}
+//fun ChannelCommand.Commitment.Splice.Response.asCreated(): ChannelCommand.Commitment.Splice.Response.Created? = when (this) {
+//    is ChannelCommand.Commitment.Splice.Response.Created -> this
+//    else -> null
+//}
+//
+//fun ChannelCommand.Commitment.Splice.Response.asFailure(): ChannelCommand.Commitment.Splice.Response.Failure? = when (this) {
+//    is ChannelCommand.Commitment.Splice.Response.Failure -> this
+//    else -> null
+//}
+//
+//fun ChannelCommand.Commitment.Splice.Response.Failure.asInsufficientFunds(): ChannelCommand.Commitment.Splice.Response.Failure.InsufficientFunds? = when (this) {
+//    is ChannelCommand.Commitment.Splice.Response.Failure.InsufficientFunds -> this
+//    else -> null
+//}
+//
+//fun ChannelCommand.Commitment.Splice.Response.Failure.asInvalidSpliceOutPubKeyScript(): ChannelCommand.Commitment.Splice.Response.Failure.InvalidSpliceOutPubKeyScript? = when (this) {
+//    is ChannelCommand.Commitment.Splice.Response.Failure.InvalidSpliceOutPubKeyScript -> this
+//    else -> null
+//}
+//
+//fun ChannelCommand.Commitment.Splice.Response.Failure.asSpliceAlreadyInProgress(): ChannelCommand.Commitment.Splice.Response.Failure.SpliceAlreadyInProgress? = when (this) {
+//    is ChannelCommand.Commitment.Splice.Response.Failure.SpliceAlreadyInProgress -> this
+//    else -> null
+//}
+//
+//fun ChannelCommand.Commitment.Splice.Response.Failure.asChannelNotQuiescent(): ChannelCommand.Commitment.Splice.Response.Failure.ChannelNotQuiescent? = when (this) {
+//    is ChannelCommand.Commitment.Splice.Response.Failure.ChannelNotQuiescent -> this
+//    else -> null
+//}
+//
+//fun ChannelCommand.Commitment.Splice.Response.Failure.asConcurrentRemoteSplice(): ChannelCommand.Commitment.Splice.Response.Failure.ConcurrentRemoteSplice? = when (this) {
+//    is ChannelCommand.Commitment.Splice.Response.Failure.ConcurrentRemoteSplice -> this
+//    else -> null
+//}
+//
+//fun ChannelCommand.Commitment.Splice.Response.Failure.asInvalidLiquidityAds(): ChannelCommand.Commitment.Splice.Response.Failure.InvalidLiquidityAds? = when (this) {
+//    is ChannelCommand.Commitment.Splice.Response.Failure.InvalidLiquidityAds -> this
+//    else -> null
+//}
+//
+//fun ChannelCommand.Commitment.Splice.Response.Failure.asFundingFailure(): ChannelCommand.Commitment.Splice.Response.Failure.FundingFailure? = when (this) {
+//    is ChannelCommand.Commitment.Splice.Response.Failure.FundingFailure -> this
+//    else -> null
+//}
+//
+//fun ChannelCommand.Commitment.Splice.Response.Failure.asCannotStartSession(): ChannelCommand.Commitment.Splice.Response.Failure.CannotStartSession? = when (this) {
+//    is ChannelCommand.Commitment.Splice.Response.Failure.CannotStartSession -> this
+//    else -> null
+//}
+//
+//fun ChannelCommand.Commitment.Splice.Response.Failure.asInteractiveTxSessionFailed(): ChannelCommand.Commitment.Splice.Response.Failure.InteractiveTxSessionFailed? = when (this) {
+//    is ChannelCommand.Commitment.Splice.Response.Failure.InteractiveTxSessionFailed -> this
+//    else -> null
+//}
+//
+//fun ChannelCommand.Commitment.Splice.Response.Failure.asCannotCreateCommitTx(): ChannelCommand.Commitment.Splice.Response.Failure.CannotCreateCommitTx? = when (this) {
+//    is ChannelCommand.Commitment.Splice.Response.Failure.CannotCreateCommitTx -> this
+//    else -> null
+//}
+//
+//fun ChannelCommand.Commitment.Splice.Response.Failure.asAbortedByPeer(): ChannelCommand.Commitment.Splice.Response.Failure.AbortedByPeer? = when (this) {
+//    is ChannelCommand.Commitment.Splice.Response.Failure.AbortedByPeer -> this
+//    else -> null
+//}
+//
+//fun ChannelCommand.Commitment.Splice.Response.Failure.asDisconnected(): ChannelCommand.Commitment.Splice.Response.Failure.Disconnected? = when (this) {
+//    is ChannelCommand.Commitment.Splice.Response.Failure.Disconnected -> this
+//    else -> null
+//}
 
 suspend fun ElectrumClient.kotlin_getConfirmations(txid: TxId): Int? {
     return this.getConfirmations(txid)
@@ -500,116 +500,116 @@ fun ByteArray_toNSData(buffer: ByteArray): NSData = buffer.toNSData()
  * which (in my experience) fixes all these problems.
  * But in the meantime, we're working around it by exposing our own class & wrapper functions.
  */
-data class LiquidityAds_LeaseRate(
-    val leaseDuration: Int,
-    val fundingWeight: Int,
-    val leaseFeeProportional: Int,
-    val leaseFeeBase: Satoshi,
-    val maxRelayFeeProportional: Int,
-    val maxRelayFeeBase: MilliSatoshi
-) {
-    constructor(src: LiquidityAds.LeaseRate) : this(
-        leaseDuration = src.leaseDuration,
-        fundingWeight = src.fundingWeight,
-        leaseFeeProportional = src.leaseFeeProportional,
-        leaseFeeBase = src.leaseFeeBase,
-        maxRelayFeeProportional = src.maxRelayFeeProportional,
-        maxRelayFeeBase = src.maxRelayFeeBase
-    )
-    fun unwrap() = LiquidityAds.LeaseRate(
-        leaseDuration = this.leaseDuration,
-        fundingWeight = this.fundingWeight,
-        leaseFeeProportional = this.leaseFeeProportional,
-        leaseFeeBase = this.leaseFeeBase,
-        maxRelayFeeProportional = this.maxRelayFeeProportional,
-        maxRelayFeeBase = this.maxRelayFeeBase
-    )
-}
+//data class LiquidityAds_LeaseRate(
+//    val leaseDuration: Int,
+//    val fundingWeight: Int,
+//    val leaseFeeProportional: Int,
+//    val leaseFeeBase: Satoshi,
+//    val maxRelayFeeProportional: Int,
+//    val maxRelayFeeBase: MilliSatoshi
+//) {
+//    constructor(src: LiquidityAds.LeaseRate) : this(
+//        leaseDuration = src.leaseDuration,
+//        fundingWeight = src.fundingWeight,
+//        leaseFeeProportional = src.leaseFeeProportional,
+//        leaseFeeBase = src.leaseFeeBase,
+//        maxRelayFeeProportional = src.maxRelayFeeProportional,
+//        maxRelayFeeBase = src.maxRelayFeeBase
+//    )
+//    fun unwrap() = LiquidityAds.LeaseRate(
+//        leaseDuration = this.leaseDuration,
+//        fundingWeight = this.fundingWeight,
+//        leaseFeeProportional = this.leaseFeeProportional,
+//        leaseFeeBase = this.leaseFeeBase,
+//        maxRelayFeeProportional = this.maxRelayFeeProportional,
+//        maxRelayFeeBase = this.maxRelayFeeBase
+//    )
+//}
 
-data class LiquidityAds_LeaseFees(
-    val miningFee: Satoshi,
-    val serviceFee: Satoshi
-) {
-    constructor(src: LiquidityAds.LeaseFees) : this(
-        miningFee = src.miningFee,
-        serviceFee = src.serviceFee
-    )
-    fun unwrap() = LiquidityAds.LeaseFees(
-        miningFee = this.miningFee,
-        serviceFee = this.serviceFee
-    )
+//data class LiquidityAds_LeaseFees(
+//    val miningFee: Satoshi,
+//    val serviceFee: Satoshi
+//) {
+//    constructor(src: LiquidityAds.LeaseFees) : this(
+//        miningFee = src.miningFee,
+//        serviceFee = src.serviceFee
+//    )
+//    fun unwrap() = LiquidityAds.LeaseFees(
+//        miningFee = this.miningFee,
+//        serviceFee = this.serviceFee
+//    )
+//
+//    val total: Satoshi = unwrap().total
+//}
 
-    val total: Satoshi = unwrap().total
-}
+//data class LiquidityAds_LeaseWitness(
+//    val fundingScript: ByteVector,
+//    val leaseDuration: Int,
+//    val leaseEnd: Int,
+//    val maxRelayFeeProportional: Int,
+//    val maxRelayFeeBase: MilliSatoshi
+//) {
+//    constructor(src: LiquidityAds.LeaseWitness) : this(
+//        fundingScript = src.fundingScript,
+//        leaseDuration = src.leaseDuration,
+//        leaseEnd = src.leaseEnd,
+//        maxRelayFeeProportional = src.maxRelayFeeProportional,
+//        maxRelayFeeBase = src.maxRelayFeeBase
+//    )
+//    fun unwrap() = LiquidityAds.LeaseWitness(
+//        fundingScript = this.fundingScript,
+//        leaseDuration = this.leaseDuration,
+//        leaseEnd = this.leaseEnd,
+//        maxRelayFeeProportional = this.maxRelayFeeProportional,
+//        maxRelayFeeBase = this.maxRelayFeeBase
+//    )
+//
+//    fun sign(nodeKey: PrivateKey): ByteVector64 = unwrap().sign(nodeKey)
+//    fun verify(nodeId: PublicKey, sig: ByteVector64): Boolean = unwrap().verify(nodeId, sig)
+//    fun encode(): ByteArray = unwrap().encode()
+//}
 
-data class LiquidityAds_LeaseWitness(
-    val fundingScript: ByteVector,
-    val leaseDuration: Int,
-    val leaseEnd: Int,
-    val maxRelayFeeProportional: Int,
-    val maxRelayFeeBase: MilliSatoshi
-) {
-    constructor(src: LiquidityAds.LeaseWitness) : this(
-        fundingScript = src.fundingScript,
-        leaseDuration = src.leaseDuration,
-        leaseEnd = src.leaseEnd,
-        maxRelayFeeProportional = src.maxRelayFeeProportional,
-        maxRelayFeeBase = src.maxRelayFeeBase
-    )
-    fun unwrap() = LiquidityAds.LeaseWitness(
-        fundingScript = this.fundingScript,
-        leaseDuration = this.leaseDuration,
-        leaseEnd = this.leaseEnd,
-        maxRelayFeeProportional = this.maxRelayFeeProportional,
-        maxRelayFeeBase = this.maxRelayFeeBase
-    )
+//data class LiquidityAds_Lease(
+//    val amount: Satoshi,
+//    val fees: LiquidityAds_LeaseFees,
+//    val sellerSig: ByteVector64,
+//    val witness: LiquidityAds_LeaseWitness
+//) {
+//    constructor(src: LiquidityAds.Lease) : this(
+//        amount = src.amount,
+//        fees = LiquidityAds_LeaseFees(src.fees),
+//        sellerSig = src.sellerSig,
+//        witness = LiquidityAds_LeaseWitness(src.witness)
+//    )
+//    fun unwrap() = LiquidityAds.Lease(
+//        amount = this.amount,
+//        fees = this.fees.unwrap(),
+//        sellerSig = this.sellerSig,
+//        witness = this.witness.unwrap()
+//    )
+//
+//    val start: Int = unwrap().start
+//    val expiry: Int = unwrap().expiry
+//}
 
-    fun sign(nodeKey: PrivateKey): ByteVector64 = unwrap().sign(nodeKey)
-    fun verify(nodeId: PublicKey, sig: ByteVector64): Boolean = unwrap().verify(nodeId, sig)
-    fun encode(): ByteArray = unwrap().encode()
-}
+//suspend fun Peer._estimateFeeForInboundLiquidity(
+//    amount: Satoshi,
+//    targetFeerate: FeeratePerKw,
+//    leaseRate: LiquidityAds_LeaseRate
+//): Pair<FeeratePerKw, ChannelManagementFees>? {
+//    return this.estimateFeeForInboundLiquidity(amount, targetFeerate, leaseRate.unwrap())
+//}
+//
+//suspend fun Peer._requestInboundLiquidity(
+//    amount: Satoshi,
+//    feerate: FeeratePerKw,
+//    leaseRate: LiquidityAds_LeaseRate
+//): ChannelCommand.Commitment.Splice.Response? {
+//    return this.requestInboundLiquidity(amount, feerate, leaseRate.unwrap())
+//}
 
-data class LiquidityAds_Lease(
-    val amount: Satoshi,
-    val fees: LiquidityAds_LeaseFees,
-    val sellerSig: ByteVector64,
-    val witness: LiquidityAds_LeaseWitness
-) {
-    constructor(src: LiquidityAds.Lease) : this(
-        amount = src.amount,
-        fees = LiquidityAds_LeaseFees(src.fees),
-        sellerSig = src.sellerSig,
-        witness = LiquidityAds_LeaseWitness(src.witness)
-    )
-    fun unwrap() = LiquidityAds.Lease(
-        amount = this.amount,
-        fees = this.fees.unwrap(),
-        sellerSig = this.sellerSig,
-        witness = this.witness.unwrap()
-    )
-
-    val start: Int = unwrap().start
-    val expiry: Int = unwrap().expiry
-}
-
-suspend fun Peer._estimateFeeForInboundLiquidity(
-    amount: Satoshi,
-    targetFeerate: FeeratePerKw,
-    leaseRate: LiquidityAds_LeaseRate
-): Pair<FeeratePerKw, ChannelManagementFees>? {
-    return this.estimateFeeForInboundLiquidity(amount, targetFeerate, leaseRate.unwrap())
-}
-
-suspend fun Peer._requestInboundLiquidity(
-    amount: Satoshi,
-    feerate: FeeratePerKw,
-    leaseRate: LiquidityAds_LeaseRate
-): ChannelCommand.Commitment.Splice.Response? {
-    return this.requestInboundLiquidity(amount, feerate, leaseRate.unwrap())
-}
-
-val InboundLiquidityOutgoingPayment._lease: LiquidityAds_Lease
-    get() = LiquidityAds_Lease(this.lease)
+//val InboundLiquidityOutgoingPayment._lease: LiquidityAds_Lease
+//    get() = LiquidityAds_Lease(this.lease)
 
 fun WalletState.WalletWithConfirmations._spendExpiredSwapIn(
     swapInKeys: KeyManager.SwapInOnChainKeys,
