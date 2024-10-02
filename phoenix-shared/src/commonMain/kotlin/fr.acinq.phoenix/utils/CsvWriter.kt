@@ -2,6 +2,8 @@ package fr.acinq.phoenix.utils
 
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.payment.OfferPaymentMetadata
+import fr.acinq.lightning.utils.msat
+import fr.acinq.lightning.utils.sum
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.utils.extensions.isManualPurchase
 import kotlinx.datetime.Instant
@@ -62,12 +64,28 @@ class CsvWriter {
             config: Configuration
         ): String {
 
-            val date = info.payment.completedAt ?: info.payment.createdAt
+            val payment = info.payment
+
+            val date = payment.completedAt ?: info.payment.createdAt
             val dateStr = Instant.fromEpochMilliseconds(date).toString() // ISO-8601 format
             var row = processField(dateStr)
 
-            val amtMsat = info.payment.amount.msat
-            val feesMsat = info.payment.fees.msat
+            val amtMsat = payment.amount.msat
+            // for the fee, we should ignore the fee returned by lightning parts, because it may contain a funding fee which is already accounted for in the liquidity payments
+            val feesMsat = when (payment) {
+                is IncomingPayment -> when (payment.origin) {
+                    is IncomingPayment.Origin.Invoice, is IncomingPayment.Origin.Offer -> {
+                        payment.received?.receivedWith.orEmpty().map { part ->
+                            when (part) {
+                                is IncomingPayment.ReceivedWith.LightningPayment, is IncomingPayment.ReceivedWith.AddedToFeeCredit -> 0.msat
+                                else -> part.fees
+                            }
+                        }.sum().msat
+                    }
+                    else -> payment.fees.msat
+                }
+                else -> payment.fees.msat
+            }
             val isOutgoing = info.payment is OutgoingPayment
 
             val amtMsatStr = if (isOutgoing) "-$amtMsat" else "$amtMsat"
@@ -124,14 +142,15 @@ class CsvWriter {
                         is IncomingPayment.Origin.Invoice -> "Incoming LN payment"
                         is IncomingPayment.Origin.SwapIn -> "Swap-in to ${origin.address ?: "N/A"}"
                         is IncomingPayment.Origin.OnChain -> "On-chain deposit"
-                        is IncomingPayment.Origin.Offer -> when (origin.metadata) {
-                            is OfferPaymentMetadata.V1 -> "Incoming payment to your offer"
-                        }
+                        is IncomingPayment.Origin.Offer -> "Incoming LN payment (offer)"
                     }
                     is LightningOutgoingPayment -> when (val details = payment.details) {
                         is LightningOutgoingPayment.Details.Normal -> "Outgoing LN payment to ${details.paymentRequest.nodeId.toHex()}"
                         is LightningOutgoingPayment.Details.SwapOut -> "Outgoing Swap to ${details.address}"
-                        is LightningOutgoingPayment.Details.Blinded -> "Outgoing LN payment to ${details.paymentRequest.invoiceRequest.offer.encode()}"
+                        is LightningOutgoingPayment.Details.Blinded -> {
+                            details.paymentRequest.invoiceRequest.offer.contactNodeIds.firstOrNull()?.let { "Outgoing LN payment (offer) to ${it.toHex()}" }
+                                ?: "Outgoing LN payment (offer)"
+                        }
                     }
                     is SpliceOutgoingPayment -> "Outgoing splice to ${payment.address}"
                     is ChannelCloseOutgoingPayment -> "Channel closing to ${payment.address}"
