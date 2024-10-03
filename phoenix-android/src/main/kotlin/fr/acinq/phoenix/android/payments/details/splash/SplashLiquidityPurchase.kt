@@ -137,7 +137,7 @@ private fun SplashRelatedPayments(payment: InboundLiquidityOutgoingPayment) {
                 space = 4.dp,
                 shape = RoundedCornerShape(12.dp),
                 backgroundColor = mutedBgColor,
-                modifier = Modifier.widthIn(max = 170.dp)
+                modifier = Modifier.widthIn(max = 130.dp)
             )
         }
     }
