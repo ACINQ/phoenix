@@ -134,6 +134,7 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
 
                 // Start the monitoring process. If the main app starts, we interrupt this job to prevent concurrent access.
                 withContext(Dispatchers.Default) {
+                    business = PhoenixBusiness(PlatformContext(applicationContext))
                     val stopJobs = MutableStateFlow(false)
                     var jobChannelsWatcher: Job? = null
 
@@ -152,7 +153,7 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
                                     log.info("node service in state=${state.name}, starting an isolated business")
 
                                     jobChannelsWatcher = launch {
-                                        business = WorkerHelper.startIsolatedBusiness(application, encryptedSeed, userPrefs)
+                                        WorkerHelper.startIsolatedBusiness(application, business!!, encryptedSeed, userPrefs)
 
                                         business?.connectionsManager?.connections?.first { it.global is Connection.ESTABLISHED }
                                         log.debug("connections established, watching channels for in-flight payments...")
