@@ -25,15 +25,13 @@ import fr.acinq.phoenix.data.StartupParams
 import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import fr.acinq.phoenix.managers.AppConfigurationManager
 import fr.acinq.phoenix.utils.MnemonicLanguage
-import fr.acinq.phoenix.utils.PlatformContext
 import kotlinx.coroutines.flow.first
 
 object WorkerHelper {
-    suspend fun startIsolatedBusiness(context: Context, encryptedSeed: EncryptedSeed.V2.NoAuth, userPrefs: UserPrefsRepository): PhoenixBusiness {
+    suspend fun startIsolatedBusiness(context: Context, business: PhoenixBusiness, encryptedSeed: EncryptedSeed.V2.NoAuth, userPrefs: UserPrefsRepository) {
         val mnemonics = encryptedSeed.decrypt()
 
         // retrieve preferences before starting business
-        val business = PhoenixBusiness(PlatformContext(context))
         val electrumServer = userPrefs.getElectrumServer.first()
         val isTorEnabled = userPrefs.getIsTorEnabled.first()
         val liquidityPolicy = userPrefs.getLiquidityPolicy.first()
@@ -60,6 +58,5 @@ object WorkerHelper {
 
         // start the swap-in wallet watcher
         business.peerManager.getPeer().startWatchSwapInWallet()
-        return business
     }
 }

@@ -39,6 +39,7 @@ import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
+import fr.acinq.phoenix.utils.PlatformContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -53,14 +54,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.toJavaDuration
 
 /**
  * This worker is scheduled to run roughly every day. It simply connects to the LSP, wait for 1 minute,
  * then shuts down. The purpose is to settle pending payments that may have been missed by the
  * [InflightPaymentsWatcher], to complete closings properly, etc...
- *
  */
 class DailyConnect(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
 
@@ -113,6 +111,7 @@ class DailyConnect(context: Context, workerParams: WorkerParameters) : Coroutine
                 var jobWatchingChannels: Job? = null
 
                 val jobMain = launch {
+                    business = PhoenixBusiness(PlatformContext(applicationContext))
                     service.filterNotNull().flatMapLatest { it.state.asFlow() }.collect { state ->
                         when (state) {
                             is NodeServiceState.Init, is NodeServiceState.Running, is NodeServiceState.Error, NodeServiceState.Disconnected -> {
@@ -126,7 +125,7 @@ class DailyConnect(context: Context, workerParams: WorkerParameters) : Coroutine
                                 log.info("node service in state=${state.name}, starting an isolated business")
 
                                 jobWatchingChannels = launch {
-                                    business = WorkerHelper.startIsolatedBusiness(application, encryptedSeed, userPrefs)
+                                    WorkerHelper.startIsolatedBusiness(application, business!!, encryptedSeed, userPrefs)
 
                                     business?.connectionsManager?.connections?.first { it.global is Connection.ESTABLISHED }
                                     log.debug("connections established")
@@ -184,8 +183,8 @@ class DailyConnect(context: Context, workerParams: WorkerParameters) : Coroutine
         }
 
         fun scheduleASAP(context: Context) {
-            log.info("scheduling $name")
-            val work = OneTimeWorkRequest.Builder(DailyConnect::class.java).setInitialDelay(1.minutes.toJavaDuration()).addTag(TAG).build()
+            log.info("scheduling $name once")
+            val work = OneTimeWorkRequest.Builder(DailyConnect::class.java).addTag(TAG).build()
             WorkManager.getInstance(context).enqueueUniqueWork(TAG, ExistingWorkPolicy.REPLACE, work)
         }
 
