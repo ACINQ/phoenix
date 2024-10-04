@@ -316,97 +316,105 @@ struct SummaryView: View {
 	@ViewBuilder
 	func header_blockchainStatus(_ onChainPayment: Lightning_kmpOnChainOutgoingPayment) -> some View {
 		
-		switch blockchainConfirmations {
-		case .none:
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
-			HStack(alignment: VerticalAlignment.center, spacing: 4) {
-				ProgressView()
-					.progressViewStyle(CircularProgressViewStyle(tint: Color.secondary))
+			let confirmations = blockchainConfirmations
+			
+			ZStack(alignment: Alignment(horizontal: .center, vertical: .top)) {
 				
-				Text("Checking blockchain…")
-					.font(.callout)
-					.foregroundColor(.secondary)
-			}
-			.padding(.top, 10)
-			
-		case .some(let confirmations):
-			
-			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+				HStack(alignment: VerticalAlignment.center, spacing: 4) {
+					ProgressView()
+						.progressViewStyle(CircularProgressViewStyle(tint: Color.secondary))
+					
+					Text("Checking blockchain…")
+						.font(.callout)
+						.foregroundColor(.secondary)
+					
+				} // </HStack>
+				.isHidden(confirmations != nil)
 				
 				Button {
 					showBlockchainExplorerOptions = true
 				} label: {
-					if confirmations == 1 {
-						Text("1 confirmation")
-							.font(.subheadline)
-					} else if confirmations < 7 {
-						Text("\(confirmations) confirmations")
-							.font(.subheadline)
-					} else {
-						Text("6+ confirmations")
-							.font(.subheadline)
-					}
-				}
-				.confirmationDialog("Blockchain Explorer",
-					isPresented: $showBlockchainExplorerOptions,
-					titleVisibility: .automatic
-				) {
-					Button {
-						exploreTx(onChainPayment.txId, website: BlockchainExplorer.WebsiteMempoolSpace())
-					} label: {
-						Text(verbatim: "Mempool.space") // no localization needed
-					}
-					Button {
-						exploreTx(onChainPayment.txId, website: BlockchainExplorer.WebsiteBlockstreamInfo())
-					} label: {
-						Text(verbatim: "Blockstream.info") // no localization needed
-					}
-					Button("Copy transaction id") {
-						copyTxId(onChainPayment.txId)
-					}
-				} // </confirmationDialog>
-				
-				if confirmations == 0 && supportsBumpFee(onChainPayment) {
-					Button {
-						navigateTo(.CpfpView(onChainPayment: onChainPayment))
-					} label: {
-						Label {
-							Text("Accelerate transaction")
-						} icon: {
-							Image(systemName: "paperplane").imageScale(.small)
+					Group {
+						if let confirmations {
+							if confirmations == 1 {
+								Text("1 confirmation")
+							} else if confirmations <= 6 {
+								Text("\(confirmations) confirmations")
+							} else {
+								Text("6+ confirmations")
+							}
+						} else {
+							Text("? confirmations")
 						}
-						.font(.subheadline)
+					} // </Group>
+					.font(.subheadline)
+					
+				} // </Button>
+				.isHidden(confirmations == nil)
+				
+			} // </ZStack>
+			
+			if confirmations == 0 && supportsBumpFee(onChainPayment) {
+				Button {
+					navigateTo(.CpfpView(onChainPayment: onChainPayment))
+				} label: {
+					Label {
+						Text("Accelerate transaction")
+					} icon: {
+						Image(systemName: "paperplane").imageScale(.small)
 					}
-					.padding(.top, 3)
+					.font(.subheadline)
 				}
-				
-				if let confirmedAt = onChainPayment.confirmedAt?.int64Value.toDate(from: .milliseconds) {
-				
-					Text("confirmed")
-						.font(.subheadline)
-						.foregroundColor(.secondary)
-						.padding(.top, 20)
-					
-					Text(confirmedAt.format())
-						.font(.subheadline)
-						.foregroundColor(.secondary)
-						.padding(.top, 3)
-					
-				} else {
-					
-					Text("broadcast")
-						.font(.subheadline)
-						.foregroundColor(.secondary)
-						.padding(.top, 20)
-					
-					Text(onChainPayment.createdAt.toDate(from: .milliseconds).format())
-						.font(.subheadline)
-						.foregroundColor(.secondary)
-						.padding(.top, 3)
-				}
+				.padding(.top, 3)
 			}
-			.padding(.top, 10)
-		}
+			
+			if let confirmedAt = onChainPayment.confirmedAt?.int64Value.toDate(from: .milliseconds) {
+			
+				Text("confirmed")
+					.font(.subheadline)
+					.foregroundColor(.secondary)
+					.padding(.top, 20)
+				
+				Text(confirmedAt.format())
+					.font(.subheadline)
+					.foregroundColor(.secondary)
+					.padding(.top, 3)
+				
+			} else {
+				
+				Text("broadcast")
+					.font(.subheadline)
+					.foregroundColor(.secondary)
+					.padding(.top, 20)
+				
+				Text(onChainPayment.createdAt.toDate(from: .milliseconds).format())
+					.font(.subheadline)
+					.foregroundColor(.secondary)
+					.padding(.top, 3)
+			}
+			
+		} // </VStack>
+		.padding(.top, 10)
+		.confirmationDialog("Blockchain Explorer",
+			isPresented: $showBlockchainExplorerOptions,
+			titleVisibility: .automatic
+		) {
+			Button {
+				exploreTx(onChainPayment.txId, website: BlockchainExplorer.WebsiteMempoolSpace())
+			} label: {
+				Text(verbatim: "Mempool.space") // no localization needed
+			}
+			Button {
+				exploreTx(onChainPayment.txId, website: BlockchainExplorer.WebsiteBlockstreamInfo())
+			} label: {
+				Text(verbatim: "Blockstream.info") // no localization needed
+			}
+			Button("Copy transaction id") {
+				copyTxId(onChainPayment.txId)
+			}
+		} // </confirmationDialog>
 	}
 	
 	@ViewBuilder
@@ -1086,7 +1094,7 @@ struct SummaryView: View {
 		
 		do {
 			let result = try await Biz.business.electrumClient.kotlin_getConfirmations(txid: onChainPayment.txId)
-
+			
 			let confirmations = result?.intValue ?? 0
 			log.debug("fetchConfirmations(\(pid)): => \(confirmations)")
 			return confirmations
