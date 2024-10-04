@@ -1116,12 +1116,26 @@ struct SummaryView: View {
 			
 			// First time displaying the SummaryView (coming from HomeView)
 			
+			// Not triggered in this particular case, so we need to trigger it manually.
+			//
+			// Note:
+			// The flow below won't automatically trigger `paymentInfoChanged` if:
+			// - !paymentInfoIsState
+			// - or the fetched payment is equal to the existing payment
+			//
+			// The latter happens when:
+			// - lastCompletedPaymentPublisher fires
+			// - HomeView fetches the payment with FetchOptions.All
+			// - HomeView displays the PaymentView with fetched `paymentInfo`
+			// - If we fetch the payment again here, it's equal to the existing payment
+			//
+			paymentInfoChanged()
+			
 			if paymentInfoIsStale {
 				// We either don't have the full payment information (missing metadata info),
 				// or the payment information is possibly stale, and needs to be refreshed.
 				
 				if let row = paymentInfo.toOrderRow() {
-
 					Biz.business.paymentsManager.fetcher.getPayment(row: row, options: fetchOptions) {
 						(result: WalletPaymentInfo?, _) in
 						
@@ -1129,9 +1143,7 @@ struct SummaryView: View {
 							paymentInfo = result
 						}
 					}
-
 				} else {
-				
 					Biz.business.paymentsManager.getPayment(id: paymentInfo.id(), options: fetchOptions) {
 						(result: WalletPaymentInfo?, _) in
 						
@@ -1140,9 +1152,6 @@ struct SummaryView: View {
 						}
 					}
 				}
-			} else {
-				// Not triggered in this particular case, so we need to trigger it manually.
-				paymentInfoChanged()
 			}
 			
 		} else {
