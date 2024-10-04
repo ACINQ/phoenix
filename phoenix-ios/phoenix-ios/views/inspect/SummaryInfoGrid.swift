@@ -645,7 +645,7 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 					Button {
 						switchToPayment(paymentId)
 					} label: {
-						Text(paymentId.dbId)
+						Text(verbatim: "\(paymentId.dbId.prefix(maxLength: 8))…")
 							.lineLimit(1)
 							.truncationMode(.middle)
 					}

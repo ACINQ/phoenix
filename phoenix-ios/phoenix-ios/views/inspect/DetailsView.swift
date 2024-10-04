@@ -1113,7 +1113,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				Button {
 					requestSwitchToPayment(paymentId)
 				} label: {
-					Text(paymentId.dbId)
+					Text(verbatim: "\(paymentId.dbId.prefix(maxLength: 8))…")
 						.lineLimit(1)
 						.truncationMode(.middle)
 				}
