@@ -327,7 +327,8 @@
     <string name="paymentdetails_lnurlpay_action_aes_label">Message</string>
     <string name="paymentdetails_lnurlpay_action_aes_decrypting">Déchiffrement du message…</string>
 
-    <string name="paymentdetails_desc_label">Desc.</string>
+    <string name="paymentdetails_desc_label">Description</string>
+    <string name="paymentdetails_note_label">Note</string>
     <string name="paymentdetails_destination_label">Envoyé à</string>
     <string name="paymentdetails_destination_cpfp_value">Mineurs Bitcoin</string>
     <string name="paymentdetails_fees_label">Frais</string>
@@ -347,7 +348,8 @@
     <string name="paymentdetails_desc_closing_channel">Fermeture de canal</string>
     <string name="paymentdetails_desc_legacy_migration">Migration depuis l\'ancienne appli</string>
     <string name="paymentdetails_desc_cpfp">Accélération de transactions</string>
-    <string name="paymentdetails_desc_inbound_liquidity">+%1$s de liquidité entrante</string>
+    <string name="paymentdetails_desc_liquidity_manual">Liquidité manuelle (+%1$s)</string>
+    <string name="paymentdetails_desc_liquidity_automated">Liquidité automatique</string>
     <string name="paymentdetails_desc_swapout">Swap-out vers %1$s</string>
     <string name="paymentdetails_desc_swapin">Dépôt on-chain</string>
 
@@ -380,7 +382,6 @@
     <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
 
     <string name="paymentdetails_liquidity_amount_label">Liquidité demandée</string>
-    <string name="paymentdetails_liquidity_signature_label">Signature</string>
 
     <string name="paymentdetails_closing_type_label">Type de clôture</string>
     <string name="paymentdetails_closing_type_mutual">Mutuelle</string>

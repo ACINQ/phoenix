@@ -27,6 +27,17 @@ class Prefs_BackupTransactions {
 		return Prefs.shared.defaults
 	}
 	
+	/// Updating publishers should always be done on the main thread.
+	/// Otherwise we risk updating UI components on a background thread, which is dangerous.
+	///
+	private func runOnMainThread(_ block: @escaping () -> Void) {
+		if Thread.isMainThread {
+			block()
+		} else {
+			DispatchQueue.main.async { block() }
+		}
+	}
+	
 	lazy private(set) var isEnabledPublisher: CurrentValueSubject<Bool, Never> = {
 		return CurrentValueSubject<Bool, Never>(self.isEnabled)
 	}()
@@ -43,7 +54,9 @@ class Prefs_BackupTransactions {
 		set {
 			let key = Key.backupTransactions_enabled.rawValue
 			defaults.set(newValue, forKey: key)
-			isEnabledPublisher.send(newValue)
+			runOnMainThread {
+				self.isEnabledPublisher.send(newValue)
+			}
 		}
 	}
 	
@@ -128,6 +141,8 @@ class Prefs_BackupTransactions {
 		defaults.removeObject(forKey: Key.backupTransactions_useUploadDelay.rawValue)
 		
 		// Reset any publishers with stored state
-		isEnabledPublisher.send(self.isEnabled)
+		runOnMainThread {
+			self.isEnabledPublisher.send(self.isEnabled)
+		}
 	}
 }

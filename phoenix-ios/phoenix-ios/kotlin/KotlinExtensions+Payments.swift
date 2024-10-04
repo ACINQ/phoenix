@@ -163,11 +163,17 @@ extension WalletPaymentInfo {
 				return String(localized: "Bump fees", comment: "Payment description for splice CPFP")
 				
 			} else if let il = outgoingPayment as? Lightning_kmpInboundLiquidityOutgoingPayment {
-				let amount = Utils.formatBitcoin(sat: il._lease.amount, bitcoinUnit: .sat)
-				return String(
-					localized: "+\(amount.string) inbound liquidity",
-					comment: "Payment description for inbound liquidity"
-				)
+				if il.isManualPurchase() {
+					return String(
+						localized: "Manual liquidity",
+						comment: "Payment description for inbound liquidity"
+					)
+				} else {
+					return String(
+						localized: "Automated liquidity",
+						comment: "Payment description for inbound liquidity"
+					)
+				}
 			}
 		}
 	
@@ -275,6 +281,27 @@ extension Lightning_kmpIncomingPayment {
 				return false
 			}
 		}
+	}
+	
+	var lightningPaymentFundingTxId: Bitcoin_kmpTxId? {
+		
+		guard let received else {
+			return nil
+		}
+		
+		for rw in received.receivedWith {
+			if let lp = rw as? Lightning_kmpIncomingPayment.ReceivedWith_LightningPayment,
+			   let txId = lp.fundingFee?.fundingTxId
+			{
+				return txId
+			}
+		}
+		
+		return nil
+	}
+	
+	var isLightningPaymentWithFundingTxId: Bool {
+		return lightningPaymentFundingTxId != nil
 	}
 }
 

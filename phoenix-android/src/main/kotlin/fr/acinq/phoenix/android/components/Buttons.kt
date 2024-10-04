@@ -336,11 +336,13 @@ fun Button(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Clickable(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    onLongClick: (() -> Unit)? = null,
     textStyle: TextStyle = MaterialTheme.typography.button,
     backgroundColor: Color = Color.Unspecified, // transparent by default!
     shape: Shape = RectangleShape,
@@ -360,8 +362,11 @@ fun Clickable(
         elevation = 0.dp,
         modifier = modifier
             .clip(shape)
-            .clickable(
+            .combinedClickable(
                 onClick = onClick,
+                onLongClick = onLongClick,
+                onLongClickLabel = null,
+                onDoubleClick = null,
                 enabled = enabled,
                 role = Role.Button,
                 onClickLabel = clickDescription,
@@ -422,7 +427,7 @@ fun AddressLinkButton(
 }
 
 @Composable
-fun TransactionLinkButton(
+fun InlineTransactionLink(
     modifier: Modifier = Modifier,
     txId: TxId,
 ) {

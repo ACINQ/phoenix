@@ -111,7 +111,7 @@ private fun LightningBalanceView(
         if (balance != null && inboundLiquidity != null) {
             val balanceVsInbound = remember(balance, inboundLiquidity) {
                 (balance.msat.toFloat() / (balance.msat + inboundLiquidity.msat))
-                    .coerceIn(0.1f, 0.9f)// unreadable otherwise
+                    .coerceIn(0.1f, if (inboundLiquidity.msat > 0) 0.9f else 1f) // unreadable otherwise
                     .takeUnless { it.isNaN() }
             }
             Row(verticalAlignment = Alignment.CenterVertically) {

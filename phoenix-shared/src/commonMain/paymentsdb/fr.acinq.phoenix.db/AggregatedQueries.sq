@@ -14,42 +14,48 @@ FROM (
         2            AS type,
         id           AS id,
         created_at   AS created_at,
-        completed_at AS completed_at
+        completed_at AS completed_at,
+        created_at   AS order_ts
     FROM outgoing_payments
 UNION ALL
     SELECT
         3            AS type,
         id           AS id,
         created_at   AS created_at,
-        confirmed_at AS completed_at
+        confirmed_at AS completed_at,
+        created_at   AS order_ts
     FROM splice_outgoing_payments
 UNION ALL
     SELECT
         4            AS type,
         id           AS id,
         created_at   AS created_at,
-        confirmed_at AS completed_at
+        confirmed_at AS completed_at,
+        created_at   AS order_ts
     FROM channel_close_outgoing_payments
 UNION ALL
     SELECT
         5            AS type,
         id           AS id,
         created_at   AS created_at,
-        confirmed_at AS completed_at
+        confirmed_at AS completed_at,
+        created_at   AS order_ts
     FROM splice_cpfp_outgoing_payments
 UNION ALL
     SELECT
         6            AS type,
         id           AS id,
         created_at   AS created_at,
-        locked_at    AS completed_at
+        locked_at    AS completed_at,
+        created_at   AS order_ts
     FROM inbound_liquidity_outgoing_payments
 UNION ALL
     SELECT
         1                        AS type,
         lower(hex(payment_hash)) AS id,
         created_at               AS created_at,
-        received_at              AS completed_at
+        received_at              AS completed_at,
+        received_at              AS order_ts
     FROM incoming_payments
     WHERE incoming_payments.received_at IS NOT NULL
     AND   incoming_payments.received_with_blob IS NOT NULL
@@ -57,7 +63,7 @@ UNION ALL
 LEFT OUTER JOIN payments_metadata ON
     payments_metadata.type = combined_payments.type AND
     payments_metadata.id = combined_payments.id
-ORDER BY combined_payments.created_at DESC
+ORDER BY COALESCE(combined_payments.order_ts, combined_payments.created_at) DESC
 LIMIT :limit OFFSET :offset;
 
 listAllPaymentsCount:

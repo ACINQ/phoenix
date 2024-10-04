@@ -16,6 +16,17 @@ class Prefs_BackupSeed {
 		return Prefs.shared.defaults
 	}
 	
+	/// Updating publishers should always be done on the main thread.
+	/// Otherwise we risk updating UI components on a background thread, which is dangerous.
+	/// 
+	private func runOnMainThread(_ block: @escaping () -> Void) {
+		if Thread.isMainThread {
+			block()
+		} else {
+			DispatchQueue.main.async { block() }
+		}
+	}
+	
 	lazy private(set) var isEnabled_publisher: CurrentValueSubject<Bool, Never> = {
 		return CurrentValueSubject<Bool, Never>(self.isEnabled)
 	}()
@@ -32,7 +43,9 @@ class Prefs_BackupSeed {
 		set {
 			let key = Key.backupSeed_enabled.rawValue
 			defaults.set(newValue, forKey: key)
-			isEnabled_publisher.send(newValue)
+			runOnMainThread {
+				self.isEnabled_publisher.send(newValue)
+			}
 		}
 	}
 	
@@ -57,7 +70,9 @@ class Prefs_BackupSeed {
 		} else {
 			defaults.removeObject(forKey: key)
 		}
-		hasUploadedSeed_publisher.send()
+		runOnMainThread {
+			self.hasUploadedSeed_publisher.send()
+		}
 	}
 	
 	lazy private(set) var name_publisher: PassthroughSubject<Void, Never> = {
@@ -86,7 +101,10 @@ class Prefs_BackupSeed {
 				defaults.setValue(newValue, forKey: key)
 			}
 			setHasUploadedSeed(false, encryptedNodeId: encryptedNodeId)
-			name_publisher.send()
+			runOnMainThread {
+				self.name_publisher.send()
+			}
+			
 		}
 	}
 	
@@ -111,7 +129,9 @@ class Prefs_BackupSeed {
 		} else {
 			defaults.removeObject(forKey: key)
 		}
-		manualBackup_taskDone_publisher.send()
+		runOnMainThread {
+			self.manualBackup_taskDone_publisher.send()
+		}
 	}
 	
 	func resetWallet(encryptedNodeId: String) {
@@ -122,7 +142,9 @@ class Prefs_BackupSeed {
 		defaults.removeObject(forKey: manualBackup_taskDone_key(encryptedNodeId))
 		
 		// Reset any publishers with stored state
-		isEnabled_publisher.send(self.isEnabled)
+		runOnMainThread {
+			self.isEnabled_publisher.send(self.isEnabled)
+		}
 	}
 }
 

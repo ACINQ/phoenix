@@ -268,14 +268,13 @@ private fun PaymentNotification(
                         notification.fee.toPrettyString(btcUnit, withUnit = true),
                         notification.maxAbsoluteFee.toPrettyString(btcUnit, withUnit = true),
                     )
-
                     is Notification.OverRelativeFee -> stringResource(
                         id = R.string.inappnotif_payment_rejected_over_relative,
                         notification.fee.toPrettyString(btcUnit, withUnit = true),
                         DecimalFormat("0.##").format(notification.maxRelativeFeeBasisPoints.toDouble() / 100),
                     )
-
-                    is Notification.ChannelsInitializing -> stringResource(id = R.string.inappnotif_payment_rejected_channel_initializing)
+                    is Notification.MissingOffChainAmountTooLow -> stringResource(id = R.string.notif_rejected_amount_too_low)
+                    is Notification.GenericError -> stringResource(id = R.string.notif_rejected_generic_error)
                 },
                 bottomText = when (notification) {
                     is Notification.OverAbsoluteFee, is Notification.OverRelativeFee, is Notification.FeePolicyDisabled -> {

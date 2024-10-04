@@ -23,6 +23,7 @@ import app.cash.sqldelight.driver.native.wrapConnection
 import fr.acinq.bitcoin.Chain
 import fr.acinq.phoenix.utils.PlatformContext
 import fr.acinq.phoenix.utils.getDatabaseFilesDirectoryPath
+import fr.acinq.phoenix.utils.extensions.phoenixName
 
 actual fun createChannelsDbDriver(
     ctx: PlatformContext,
@@ -30,7 +31,7 @@ actual fun createChannelsDbDriver(
     nodeIdHash: String
 ): SqlDriver {
     val schema = ChannelsDatabase.Schema
-    val name = "channels-${chain.name.lowercase()}-$nodeIdHash.sqlite"
+    val name = "channels-${chain.phoenixName}-$nodeIdHash.sqlite"
 
     // The foreign_keys constraint needs to be set via the DatabaseConfiguration:
     // https://github.com/cashapp/sqldelight/issues/1356
@@ -59,7 +60,7 @@ actual fun createPaymentsDbDriver(
     nodeIdHash: String
 ): SqlDriver {
     val schema = PaymentsDatabase.Schema
-    val name = "payments-${chain.name.lowercase()}-$nodeIdHash.sqlite"
+    val name = "payments-${chain.phoenixName}-$nodeIdHash.sqlite"
 
     val dbDir = getDatabaseFilesDirectoryPath(ctx)
     val configuration = DatabaseConfiguration(

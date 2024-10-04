@@ -1,6 +1,12 @@
 import Foundation
 import PhoenixShared
 
+fileprivate let filename = "WalletPaymentExtensions"
+#if DEBUG && true
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
+#else
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
+#endif
 
 extension Lightning_kmpWalletPayment {
 	
@@ -85,10 +91,19 @@ extension Lightning_kmpWalletPayment {
 			if let received = incomingPayment.received {
 				
 				let msat = received.receivedWith.map {
-					if let newChannel = $0 as? Lightning_kmpIncomingPayment.ReceivedWithNewChannel {
+					if let lightning = $0 as? Lightning_kmpIncomingPayment.ReceivedWith_LightningPayment {
+						if lightning.fundingFee?.fundingTxId != nil {
+							return 0 // should be separated into miner & service fees
+						} else {
+							return lightning.fees.msat
+						}
+						
+					} else if let newChannel = $0 as? Lightning_kmpIncomingPayment.ReceivedWithNewChannel {
 						return newChannel.serviceFee.msat
+						
 					} else if let spliceIn = $0 as? Lightning_kmpIncomingPayment.ReceivedWithSpliceIn {
 						return spliceIn.serviceFee.msat
+						
 					} else {
 						return $0.fees.msat
 					}
@@ -96,8 +111,8 @@ extension Lightning_kmpWalletPayment {
 				
 				if msat > 0 {
 					
-					let title = NSLocalizedString("Service Fees", comment: "Label in SummaryInfoGrid")
-					let exp = NSLocalizedString(
+					let title = String(localized: "Service Fees", comment: "Label in SummaryInfoGrid")
+					let exp = String(localized:
 						"""
 						In order to receive this payment, a new payment channel was opened. \
 						This is not always required.
@@ -106,13 +121,13 @@ extension Lightning_kmpWalletPayment {
 					)
 					
 					return (msat, title, exp)
-				}
-				else if !incomingPayment.isSpliceIn {
+					
+				} else if !incomingPayment.isSpliceIn && !incomingPayment.isLightningPaymentWithFundingTxId {
 					
 					// I think it's nice to see "Fees: 0 sat" :)
 					
 					let msat = Int64(0)
-					let title = NSLocalizedString("Fees", comment: "Label in SummaryInfoGrid")
+					let title = String(localized: "Fees", comment: "Label in SummaryInfoGrid")
 					let exp = ""
 					
 					return (msat, title, exp)
@@ -135,27 +150,28 @@ extension Lightning_kmpWalletPayment {
 					hops += part.route.count
 				}
 				
-				let title = NSLocalizedString("Lightning Fees", comment: "Label in SummaryInfoGrid")
+				let title = String(localized: "Lightning Fees", comment: "Label in SummaryInfoGrid")
 				let exp: String
 				if parts == 1 {
 					if hops == 1 {
-						exp = NSLocalizedString(
-							"Lightning fees for routing the payment. Payment required 1 hop.",
+						exp = String(
+							localized: "Lightning fees for routing the payment. Payment required 1 hop.",
 							comment: "Fees explanation"
 						)
 					} else {
-						exp = String(format: NSLocalizedString(
-							"Lightning fees for routing the payment. Payment required %d hops.",
-							comment: "Fees explanation"),
-							hops
+						exp = String(
+							localized: "Lightning fees for routing the payment. Payment required \(hops) hops.",
+							comment: "Fees explanation"
 						)
 					}
 					
 				} else {
-					exp = String(format: NSLocalizedString(
-						"Lightning fees for routing the payment. Payment was divided into %d parts, using %d hops.",
-						comment: "Fees explanation"),
-						parts, hops
+					exp = String(localized:
+						"""
+						Lightning fees for routing the payment. \
+						Payment was divided into \(parts) parts, using \(hops) hops.
+						""",
+						comment: "Fees explanation"
 					)
 				}
 				
@@ -175,9 +191,9 @@ extension Lightning_kmpWalletPayment {
 				// An incomingPayment may have minerFees if a new channel was opened using dual-funding
 				
 				let sat = received.receivedWith.map {
-					if let newChannel = $0 as? Lightning_kmpIncomingPayment.ReceivedWithNewChannel {
+					if let newChannel = $0 as? Lightning_kmpIncomingPayment.ReceivedWith_NewChannel {
 						return newChannel.miningFee.sat
-					} else if let spliceIn = $0 as? Lightning_kmpIncomingPayment.ReceivedWithSpliceIn {
+					} else if let spliceIn = $0 as? Lightning_kmpIncomingPayment.ReceivedWith_SpliceIn {
 						return spliceIn.miningFee.sat
 					} else {
 						return Int64(0)
@@ -187,9 +203,9 @@ extension Lightning_kmpWalletPayment {
 				if sat > 0 {
 					
 					let msat = Utils.toMsat(sat: sat)
-					let title = NSLocalizedString("Miner Fees", comment: "Label in SummaryInfoGrid")
-					let exp = NSLocalizedString(
-						"Bitcoin network fees paid for on-chain transaction.",
+					let title = String(localized: "Miner Fees", comment: "Label in SummaryInfoGrid")
+					let exp = String(
+						localized: "Bitcoin network fees paid for on-chain transaction.",
 						comment: "Fees explanation"
 					)
 					
@@ -212,9 +228,9 @@ extension Lightning_kmpWalletPayment {
 			let sat = onChainOutgoingPayment.miningFees.sat
 			let msat = Utils.toMsat(sat: sat)
 			
-			let title = NSLocalizedString("Miner Fees", comment: "Label in SummaryInfoGrid")
-			let exp = NSLocalizedString(
-				"Bitcoin network fees paid for on-chain transaction.",
+			let title = String(localized: "Miner Fees", comment: "Label in SummaryInfoGrid")
+			let exp = String(
+				localized: "Bitcoin network fees paid for on-chain transaction.",
 				comment: "Fees explanation"
 			)
 			
@@ -228,12 +244,12 @@ extension Lightning_kmpWalletPayment {
 		
 		if let il = self as? Lightning_kmpInboundLiquidityOutgoingPayment {
 			
-			let sat = il._lease.fees.serviceFee
+			let sat = il.purchase.fees.serviceFee
 			let msat = Utils.toMsat(sat: sat)
 			
-			let title = NSLocalizedString("Service Fees", comment: "Label in SummaryInfoGrid")
-			let exp = NSLocalizedString(
-				"Fees paid for the liquidity service.",
+			let title = String(localized: "Service Fees", comment: "Label in SummaryInfoGrid")
+			let exp = String(
+				localized: "Fees paid for the liquidity service.",
 				comment: "Fees explanation"
 			)
 			
@@ -244,9 +260,9 @@ extension Lightning_kmpWalletPayment {
 		{
 			let msat = outgoingPayment.fees.msat - outgoingPayment.routingFee.msat
 			
-			let title = NSLocalizedString("Swap Fees", comment: "Label in SummaryInfoGrid")
-			let exp = NSLocalizedString(
-				"Includes Bitcoin network miner fees, and the fee for the Swap-Out service.",
+			let title = String(localized: "Swap Fees", comment: "Label in SummaryInfoGrid")
+			let exp = String(
+				localized: "Includes Bitcoin network miner fees, and the fee for the Swap-Out service.",
 				comment: "Fees explanation"
 			)
 			

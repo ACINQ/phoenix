@@ -44,7 +44,8 @@
     <string name="notif_rejected_over_absolute_timeout">Poplatek činil %1$s, ale váš maximální poplatek byl nastaven na %2$s. Platnost této zálohy vyprší %3$s.</string>
     <string name="notif_rejected_over_relative">Poplatek činil %1$s, což je více než %2$s%% z přijaté částky. Můžete to upravit v nastavení.</string>
     <string name="notif_rejected_over_relative_timeout">Poplatek činil %1$s, což je více než %2$s%% z přijaté částky. Platnost této zálohy vyprší %3$s.</string>
-    <string name="notif_rejected_channels_initializing">Vaše kanály se inicializovaly a nemohly tuto platbu přijmout. Zkuste to později.</string>
+    <string name="notif_rejected_amount_too_low">Výše platby je příliš nízká.</string>
+    <string name="notif_rejected_generic_error">Při financování došlo k chybě. Zkuste to prosím později.</string>
 
     <string name="notif_watcher_revoked_commit_title">Spusťte prosím Phoenix</string>
     <string name="notif_watcher_revoked_commit_message">Některý z vašich kanálů mohl být uzavřen.</string>
@@ -226,7 +227,6 @@
     <string name="inappnotif_payment_rejected_disabled">Automatická správa kanálů je zakázána.</string>
     <string name="inappnotif_payment_rejected_over_absolute">Poplatek byl %1$s, ale váš maximální poplatek byl nastaven na %2$s.</string>
     <string name="inappnotif_payment_rejected_over_relative">Poplatek byl %1$s, což je více než %2$s%% částky.</string>
-    <string name="inappnotif_payment_rejected_channel_initializing">Vaše kanály se stále inicializují a nemohly tuto platbu přijmout.</string>
     <string name="inappnotif_payment_rejected_tweak_setting">Klepnutím na položku provedete konfiguraci.</string>
     <string name="inappnotif_payment_rejected_view_wallet">Zobrazit podrobnosti</string>
 
@@ -248,6 +248,7 @@
 
     <!-- payment details -->
 
+    <string name="paymentdetails_liquidity_purchase_label">Likvidity</string>
     <string name="paymentdetails_funding_fees_label">Poplatky těžařům</string>
     <string name="paymentdetails_funding_fees_desc">Poplatky placené těžařům Bitcoinové sítě za zpracování On-Chain transakce.</string>
     <string name="paymentdetails_service_fees_label">Poplatky za službu</string>
@@ -256,8 +257,9 @@
     <string name="paymentdetails_liquidity_service_fee_help">Poplatky za službu likvidity.</string>
     <string name="paymentdetails_liquidity_miner_fee_label">Poplatky těžařům</string>
     <string name="paymentdetails_liquidity_miner_fee_help">Poplatky placené těžařům Bitcoinové sítě za zpracování on-chain transakce.</string>
-    <string name="paymentdetails_liquidity_lease_duration_label">Doba trvání</string>
-    <string name="paymentdetails_liquidity_lease_duration_value">1 rok</string>
+    <string name="paymentdetails_liquidity_caused_by_label">Způsobeno</string>
+    <string name="paymentdetails_liquidity_caused_by_help">Tato likvidita byla vyžadována pro získání platby.</string>
+    <string name="paymentdetails_liquidity_caused_by_help_link">Podívejte se, jak optimalizovat</string>
 
     <!-- lnurl -->
 
@@ -307,7 +309,6 @@
     <string name="walletinfo_onchain_swapin_policy_disabled_details">Automatizovaná poplatková politika <b>je vypnutá</b>. Prostředky nebudou vyměňovány. Zůstanou na této peněžence.</string>
     <string name="walletinfo_onchain_swapin_last_attempt">Poslední pokus (%1$s).</string>
     <string name="walletinfo_onchain_swapin_last_attempt_disabled">Automatizovaná poplatková politika je vypnutá.</string>
-    <string name="walletinfo_onchain_swapin_last_attempt_channels_init">Vaše kanály byly inicializovány.</string>
     <string name="walletinfo_onchain_swapin_empty">Neprobíhají žádné výměny.</string>
 
     <string name="walletinfo_onchain_swapin_timeout_1day">Platnost této výměny vyprší za den!</string>
@@ -393,6 +394,7 @@
 
     <string name="liquidityads_error_header">Žádost o likviditu se nezdařila</string>
     <string name="liquidityads_error_channels_unavailable">Kanály nejsou k dispozici. Zkuste to později.</string>
+    <string name="liquidityads_error_invalid_funding_amount">Požadovaná částka je neplatná.</string>
 
     <!-- payment line -->
 

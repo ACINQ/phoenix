@@ -42,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -64,7 +65,7 @@ import fr.acinq.phoenix.android.components.SplashLayout
 import fr.acinq.phoenix.android.components.TextInput
 import fr.acinq.phoenix.android.components.contact.ContactOrOfferView
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
-import fr.acinq.phoenix.android.payments.details.translatePaymentError
+import fr.acinq.phoenix.android.payments.details.splash.translatePaymentError
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 
@@ -78,6 +79,7 @@ fun SendOfferView(
     val context = LocalContext.current
     val balance = business.balanceManager.balance.collectAsState(null).value
     val prefBitcoinUnit = LocalBitcoinUnit.current
+    val keyboardManager = LocalSoftwareKeyboardController.current
 
     val vm = viewModel<SendOfferViewModel>(factory = SendOfferViewModel.Factory(offer, business.peerManager, business.nodeParamsManager, business.contactsManager))
     val requestedAmount = offer.amount
@@ -171,7 +173,7 @@ fun SendOfferView(
     }
 
     if (showMessageDialog) {
-        PayerNoteInput(initialMessage = message, onMessageChange = { message = it }, onDismiss = { showMessageDialog = false })
+        PayerNoteInput(initialMessage = message, onMessageChange = { message = it }, onDismiss = { showMessageDialog = false ; keyboardManager?.hide() })
     }
 }
 

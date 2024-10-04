@@ -358,6 +358,7 @@
     <string name="paymentdetails_lnurlpay_action_aes_decrypting">Dešifrovanie správy…</string>
 
     <string name="paymentdetails_desc_label">Popis</string>
+    <string name="paymentdetails_note_label">Poznámka</string>
     <string name="paymentdetails_destination_label">Poslané</string>
     <string name="paymentdetails_destination_cpfp_value">Bitcoinoví ťažiari</string>
     <string name="paymentdetails_fees_label">Poplatky</string>
@@ -369,7 +370,8 @@
     <string name="paymentdetails_desc_closing_channel">Zatváranie kanála</string>
     <string name="paymentdetails_desc_legacy_migration">Migrácia zo staršej aplikácie</string>
     <string name="paymentdetails_desc_cpfp">Urýchliť transakciu</string>
-    <string name="paymentdetails_desc_inbound_liquidity">+%1$s prichádzajúca likvidita</string>
+    <string name="paymentdetails_desc_liquidity_manual">Manuálna likvidita (+%1$s)</string>
+    <string name="paymentdetails_desc_liquidity_automated">Automatizovaná likvidita</string>
     <string name="paymentdetails_desc_swapout">Swap-out na %1$s</string>
     <string name="paymentdetails_desc_swapin">On-chain vklad</string>
 
@@ -404,7 +406,6 @@
     <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
 
     <string name="paymentdetails_liquidity_amount_label">Požadovaná suma</string>
-    <string name="paymentdetails_liquidity_signature_label">Podpis</string>
 
     <string name="paymentdetails_closing_type_label">Typ uzavretia</string>
     <string name="paymentdetails_closing_type_mutual">Vzájomné</string>

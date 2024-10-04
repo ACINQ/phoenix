@@ -102,3 +102,13 @@ extension LnurlAuth {
 	typealias Scheme_DEFAULT = LnurlAuth.SchemeDEFAULT_SCHEME
 	typealias Scheme_ANDROID_LEGACY = LnurlAuth.SchemeANDROID_LEGACY_SCHEME
 }
+
+extension Lightning_kmpIncomingPayment {
+	
+	typealias ReceivedWith_LightningPayment = ReceivedWithLightningPayment
+	typealias ReceivedWith_AddedToFeeCredit = ReceivedWithAddedToFeeCredit
+	typealias ReceivedWith_OnChainIncomingPayment = ReceivedWithOnChainIncomingPayment
+	
+	typealias ReceivedWith_SpliceIn = ReceivedWithSpliceIn
+	typealias ReceivedWith_NewChannel = ReceivedWithNewChannel
+}

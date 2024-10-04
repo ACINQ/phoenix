@@ -1,6 +1,8 @@
 package fr.acinq.phoenix.db.cloud
 
 import fr.acinq.lightning.db.*
+import fr.acinq.phoenix.db.cloud.payments.InboundLiquidityLegacyWrapper
+import fr.acinq.phoenix.db.cloud.payments.InboundLiquidityPaymentWrapper
 import kotlinx.serialization.*
 import kotlinx.serialization.cbor.ByteString
 import kotlinx.serialization.cbor.Cbor
@@ -68,7 +70,9 @@ data class CloudData(
     @SerialName("sc")
     val spliceCpfp: SpliceCpfpPaymentWrapper? = null,
     @SerialName("il")
-    val inboundLiquidity: InboundLiquidityPaymentWrapper? = null,
+    val inboundLegacyLiquidity: InboundLiquidityLegacyWrapper? = null,
+    @SerialName("ip")
+    val inboundPurchaseLiquidity: InboundLiquidityPaymentWrapper? = null,
     @SerialName("v")
     val version: Int,
     @ByteString
@@ -81,7 +85,8 @@ data class CloudData(
         spliceOutgoing = null,
         channelClose = null,
         spliceCpfp = null,
-        inboundLiquidity = null,
+        inboundLegacyLiquidity = null,
+        inboundPurchaseLiquidity = null,
         version = CloudDataVersion.V0.value,
         padding = ByteArray(size = 0)
     )
@@ -92,7 +97,8 @@ data class CloudData(
         spliceOutgoing = if (outgoing is SpliceOutgoingPayment) SpliceOutgoingPaymentWrapper(outgoing) else null,
         channelClose = if (outgoing is ChannelCloseOutgoingPayment) ChannelClosePaymentWrapper(outgoing) else null,
         spliceCpfp = if (outgoing is SpliceCpfpOutgoingPayment) SpliceCpfpPaymentWrapper(outgoing) else null,
-        inboundLiquidity = if (outgoing is InboundLiquidityOutgoingPayment) InboundLiquidityPaymentWrapper(outgoing) else null,
+        inboundLegacyLiquidity = null,
+        inboundPurchaseLiquidity = if (outgoing is InboundLiquidityOutgoingPayment) InboundLiquidityPaymentWrapper(outgoing) else null,
         version = CloudDataVersion.V0.value,
         padding = ByteArray(size = 0)
     )
@@ -112,7 +118,8 @@ data class CloudData(
         spliceOutgoing != null -> spliceOutgoing.unwrap()
         channelClose != null -> channelClose.unwrap()
         spliceCpfp != null -> spliceCpfp.unwrap()
-        inboundLiquidity != null -> inboundLiquidity.unwrap()
+        inboundLegacyLiquidity != null -> inboundLegacyLiquidity.unwrap()
+        inboundPurchaseLiquidity != null -> inboundPurchaseLiquidity.unwrap()
         else -> null
     }
 

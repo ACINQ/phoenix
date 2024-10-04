@@ -12,4 +12,8 @@ extension String {
 		let to = index(startIndex, offsetBy: start + limitedLength)
 		return String(self[from..<to])
 	}
+	
+	func prefix(maxLength length: Int) -> String {
+		return substring(location: 0, length: length)
+	}
 }

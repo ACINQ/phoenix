@@ -9,6 +9,7 @@ import fr.acinq.lightning.db.*
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.utils.*
+import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.runTest
 import fr.acinq.secp256k1.Hex
 import kotlin.test.*
@@ -86,10 +87,10 @@ class CloudDataTest {
     fun incoming__receivedWith_lightning() = runTest {
         val invoice = createBolt11Invoice(preimage, 250_000.msat)
         val receivedWith1 = IncomingPayment.ReceivedWith.LightningPayment(
-            amount = 100_000.msat, channelId = channelId, htlcId = 1L
+            amountReceived = 100_000.msat, channelId = channelId, htlcId = 1L, fundingFee = null
         )
         val receivedWith2 = IncomingPayment.ReceivedWith.LightningPayment(
-            amount = 150_000.msat, channelId = channelId, htlcId = 1L
+            amountReceived = 150_000.msat, channelId = channelId, htlcId = 1L, fundingFee = LiquidityAds.FundingFee(amount = 1_000.msat, TxId(ByteVector32.Zeroes))
         )
         testRoundtrip(
             IncomingPayment(
@@ -104,7 +105,7 @@ class CloudDataTest {
     fun incoming__receivedWith_newChannel() = runTest {
         val invoice = createBolt11Invoice(preimage, 10_000_000.msat)
         val receivedWith = IncomingPayment.ReceivedWith.NewChannel(
-            amount = 7_000_000.msat, miningFee = 2_000.sat, serviceFee = 1_000_000.msat, channelId = channelId, txId = TxId(randomBytes32()), confirmedAt = 500, lockedAt = 800
+            amountReceived = 7_000_000.msat, miningFee = 2_000.sat, serviceFee = 1_000_000.msat, channelId = channelId, txId = TxId(randomBytes32()), confirmedAt = 500, lockedAt = 800
         )
         testRoundtrip(
             IncomingPayment(
@@ -127,8 +128,8 @@ class CloudDataTest {
         val expectedChannelId = Hex.decode("e8a0e7ba91a485ed6857415cc0c60f77eda6cb1ebe1da841d42d7b4388cc2bcc").byteVector32()
         val expectedReceived = IncomingPayment.Received(
             receivedWith = listOf(
-                IncomingPayment.ReceivedWith.NewChannel(amount = 7_000_000.msat, miningFee = 0.sat, serviceFee = 3_000_000.msat, channelId = expectedChannelId, txId = TxId(ByteVector32.Zeroes), confirmedAt = 0, lockedAt = 0),
-                IncomingPayment.ReceivedWith.NewChannel(amount = 9_000_000.msat, miningFee = 0.sat, serviceFee = 6_000_000.msat, channelId = expectedChannelId, txId = TxId(ByteVector32.Zeroes), confirmedAt = 0, lockedAt = 0)
+                IncomingPayment.ReceivedWith.NewChannel(amountReceived = 7_000_000.msat, miningFee = 0.sat, serviceFee = 3_000_000.msat, channelId = expectedChannelId, txId = TxId(ByteVector32.Zeroes), confirmedAt = 0, lockedAt = 0),
+                IncomingPayment.ReceivedWith.NewChannel(amountReceived = 9_000_000.msat, miningFee = 0.sat, serviceFee = 6_000_000.msat, channelId = expectedChannelId, txId = TxId(ByteVector32.Zeroes), confirmedAt = 0, lockedAt = 0)
             ),
             receivedAt = 1658246347319
         )

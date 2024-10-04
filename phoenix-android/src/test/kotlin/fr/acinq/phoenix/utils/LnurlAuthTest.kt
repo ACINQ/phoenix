@@ -26,7 +26,7 @@ class LnurlAuthTest {
         val legacyKeyManager = fr.acinq.eclair.crypto.LocalKeyManager(seed, Block.TestnetGenesisBlock().hash())
         val kmpKeyManager = LocalKeyManager(
             seed = seed.toArray().byteVector64(),
-            chain = Chain.Testnet,
+            chain = Chain.Testnet3,
             remoteSwapInExtendedPublicKey = "tpubDDt5vQap1awkyDXx1z1cP7QFKSZHDCCpbU8nSq9jy7X2grTjUVZDePexf6gc6AHtRRzkgfPW87K6EKUVV6t3Hu2hg7YkHkmMeLSfrP85x41"
         )
 
@@ -65,7 +65,7 @@ class LnurlAuthTest {
         val legacyKeyManager = fr.acinq.eclair.crypto.LocalKeyManager(seed, Block.LivenetGenesisBlock().hash())
         val kmpKeyManager = LocalKeyManager(
             seed = seed.toArray().byteVector64(),
-            chain = Chain.Testnet,
+            chain = Chain.Testnet3,
             remoteSwapInExtendedPublicKey = "tpubDDt5vQap1awkyDXx1z1cP7QFKSZHDCCpbU8nSq9jy7X2grTjUVZDePexf6gc6AHtRRzkgfPW87K6EKUVV6t3Hu2hg7YkHkmMeLSfrP85x41"
         )
 

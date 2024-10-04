@@ -41,7 +41,8 @@
     <string name="notif_rejected_over_absolute_timeout">Die Gebühr wäre %1$s, aber Ihr Gebührenlimit beträgt %2$s. Diese Einzahlung verfällt am %3$s.</string>
     <string name="notif_rejected_over_relative">Die Gebühr wäre %1$s, was mehr als %2$s%% des zu empfangenden Betrags ist. Sie können dies in den Einstellungen anpassen.</string>
     <string name="notif_rejected_over_relative_timeout">Die Gebühr wäre %1$s, was mehr als %2$s%% des zu empfangenden Betrags ist. Diese Einzahlung verfällt am %3$s.</string>
-    <string name="notif_rejected_channels_initializing">Ihre Kanäle werden gerade initialisiert und konnten die Zahlung nicht empfangen. Versuchen Sie es später noch mal.</string>
+    <string name="notif_rejected_amount_too_low">Der Zahlungsbetrag ist zu niedrig.</string>
+    <string name="notif_rejected_generic_error">Bei der Überweisung ist ein Fehler aufgetreten. Bitte versuchen Sie es später noch einmal.</string>
 
     <string name="notif_watcher_revoked_commit_title">Bitte öffnen Sie Phoenix</string>
     <string name="notif_watcher_revoked_commit_message">Einige Ihrer Kanäle wurden möglicherweise geschlossen.</string>
@@ -223,7 +224,6 @@
     <string name="inappnotif_payment_rejected_disabled">Automatisches Kanal-Management ist deaktiviert.</string>
     <string name="inappnotif_payment_rejected_over_absolute">Die Gebühr wäre %1$s, aber Ihr Gebührenlimit beträgt %2$s.</string>
     <string name="inappnotif_payment_rejected_over_relative">Die Gebühr wäre %1$s, was mehr als %2$s%% des zu empfangenden Betrags ist.</string>
-    <string name="inappnotif_payment_rejected_channel_initializing">Ihre Kanäle werden gerade initialisiert und konnten die Zahlung nicht empfangen.</string>
     <string name="inappnotif_payment_rejected_tweak_setting">Tippen, um zu bestätigen.</string>
     <string name="inappnotif_payment_rejected_view_wallet">Details ansehen</string>
 
@@ -245,6 +245,7 @@
 
     <!-- payment details -->
 
+    <string name="paymentdetails_liquidity_purchase_label">Liquidität</string>
     <string name="paymentdetails_funding_fees_label">Miner-Gebühren</string>
     <string name="paymentdetails_funding_fees_desc">Gebühren, die an die Miner des Bitcoin-Netzwerks für die Verarbeitung der On-Chain-Transaktion gezahlt werden.</string>
     <string name="paymentdetails_service_fees_label">Service-Gebühr</string>
@@ -253,8 +254,9 @@
     <string name="paymentdetails_liquidity_service_fee_help">Gebühren für die Liquiditätsdienstleistung.</string>
     <string name="paymentdetails_liquidity_miner_fee_label">Miner-Gebühren</string>
     <string name="paymentdetails_liquidity_miner_fee_help">Gebühren, die an die Miner des Bitcoin-Netzwerks für die Verarbeitung der On-Chain-Transaktion gezahlt werden.</string>
-    <string name="paymentdetails_liquidity_lease_duration_label">Dauer</string>
-    <string name="paymentdetails_liquidity_lease_duration_value">1 Jahr</string>
+    <string name="paymentdetails_liquidity_caused_by_label">Verursacht durch</string>
+    <string name="paymentdetails_liquidity_caused_by_help">Diese Liquidität war erforderlich, um eine Zahlung zu erhalten.</string>
+    <string name="paymentdetails_liquidity_caused_by_help_link">Sehen Sie, wie Sie optimieren können</string>
 
     <!-- lnurl -->
 
@@ -307,7 +309,6 @@
 
     <string name="walletinfo_onchain_swapin_last_attempt">Letzter Versuch (%1$s).</string>
     <string name="walletinfo_onchain_swapin_last_attempt_disabled">Die automatische Gebührenregelung ist deaktiviert.</string>
-    <string name="walletinfo_onchain_swapin_last_attempt_channels_init">Channels were still initializing.</string>
     <string name="walletinfo_onchain_swapin_timeout_1day">Dieser Swap wird in einem Tag auslaufen!</string>
     <string name="walletinfo_onchain_swapin_timeout">Dieser Swap wird in %1$s Tagen auslaufen.</string>
 
@@ -391,6 +392,7 @@
 
     <string name="liquidityads_error_header">Liquiditätsanfrage ist fehlgeschlagen</string>
     <string name="liquidityads_error_channels_unavailable">Kanäle sind nicht verfügbar. Versuchen Sie es später erneut.</string>
+    <string name="liquidityads_error_invalid_funding_amount">Der angeforderte Betrag ist ungültig.</string>
 
     <!-- payment line -->
 

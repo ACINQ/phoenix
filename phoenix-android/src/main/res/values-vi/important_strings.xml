@@ -51,7 +51,8 @@
     <string name="notif_rejected_over_absolute_timeout">Khoản phí là %1$s, nhưng phí tối đa của bạn được đặt là %2$s. Khoản tiền cọc này sẽ hết hạn vào %3$s.</string>
     <string name="notif_rejected_over_relative">Khoản phí là %1$s và cao hơn %2$s%% so với khoản nhận được. Nhấn để biết thêm chi tiết.</string>
     <string name="notif_rejected_over_relative_timeout">Khoản phí là %1$s và cao hơn %2$s%% so với khoản tiền sẽ nhận được. Khoản tiền này sẽ hết hạn vào %3$s.</string>
-    <string name="notif_rejected_channels_initializing">Kênh của bạn đang được khởi tạo và không thể nhận khoản thanh toán này. Vui lòng thử lại sau.</string>
+    <string name="notif_rejected_amount_too_low">Số tiền thanh toán quá thấp.</string>
+    <string name="notif_rejected_generic_error">Đã xảy ra lỗi trong quá trình cấp vốn. Vui lòng thử lại sau.</string>
 
     <string name="notif_watcher_revoked_commit_title">Xin hãy khởi động Phoenix.</string>
     <string name="notif_watcher_revoked_commit_message">Một vài kênh của bạn có thể đã đóng.</string>
@@ -233,7 +234,6 @@
     <string name="inappnotif_payment_rejected_disabled">Chức năng quản lý kênh tự động bị tắt.</string>
     <string name="inappnotif_payment_rejected_over_absolute">Phí là %1$s, tuy nhiên mức phí tối đa của bạn được đặt là %2$s.</string>
     <string name="inappnotif_payment_rejected_over_relative">Phí là %1$s và cao hơn %2$s%% so với số tiền.</string>
-    <string name="inappnotif_payment_rejected_channel_initializing">Các kênh của bạn vẫn đang được khởi tạo và không thể nhận khoản thanh toán này.</string>
     <string name="inappnotif_payment_rejected_tweak_setting">Nhấn để định cấu hình.</string>
     <string name="inappnotif_payment_rejected_view_wallet">Xem chi tiết</string>
 
@@ -255,6 +255,7 @@
 
     <!-- payment details -->
 
+    <string name="paymentdetails_liquidity_purchase_label">Thanh khoản</string>
     <string name="paymentdetails_funding_fees_label">Các khoản phí đào</string>
     <string name="paymentdetails_funding_fees_desc">Phí thanh toán cho mạng lưới thợ đào Bitcoin để xử lý giao dịch on-chain.</string>
     <string name="paymentdetails_service_fees_label">Phí dịch vụ</string>
@@ -263,8 +264,9 @@
     <string name="paymentdetails_liquidity_service_fee_help">Phí dịch vụ thanh khoản.</string>
     <string name="paymentdetails_liquidity_miner_fee_label">Phí đào</string>
     <string name="paymentdetails_liquidity_miner_fee_help">Phí thanh toán cho mạng lưới thợ đào Bitcoin để xử lý giao dịch on-chain.</string>
-    <string name="paymentdetails_liquidity_lease_duration_label">Thời hạn</string>
-    <string name="paymentdetails_liquidity_lease_duration_value">1 năm</string>
+    <string name="paymentdetails_liquidity_caused_by_label">Do</string>
+    <string name="paymentdetails_liquidity_caused_by_help">Cần có thanh khoản này để nhận được khoản thanh toán.</string>
+    <string name="paymentdetails_liquidity_caused_by_help_link">Xem cách tối ưu hóa</string>
 
     <!-- lnurl -->
 
@@ -317,7 +319,6 @@
 
     <string name="walletinfo_onchain_swapin_last_attempt">Một giao dịch swap không thành công %1$s</string>
     <string name="walletinfo_onchain_swapin_last_attempt_disabled">Chức năng quản lý kênh tự động đã bị tắt.</string>
-    <string name="walletinfo_onchain_swapin_last_attempt_channels_init">Các kênh vẫn đang được khởi tạo.</string>
     <string name="walletinfo_onchain_swapin_timeout_1day">Giao dịch swap này sẽ hết hạn sau 1 ngày nữa!</string>
     <string name="walletinfo_onchain_swapin_timeout">Giao dịch swap này sẽ hết hạn sau %1$s ngày nữa.</string>
 
@@ -401,6 +402,7 @@
 
     <string name="liquidityads_error_header">Yêu cầu thanh khoản không thành công</string>
     <string name="liquidityads_error_channels_unavailable">Các kênh đang bận. Vui lòng thử lại sau.</string>
+    <string name="liquidityads_error_invalid_funding_amount">Số tiền được yêu cầu không hợp lệ.</string>
 
     <!-- payment line -->
 

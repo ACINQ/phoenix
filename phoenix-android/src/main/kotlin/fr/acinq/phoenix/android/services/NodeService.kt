@@ -21,7 +21,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.io.PaymentReceived
+import fr.acinq.lightning.PaymentEvents
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.PhoenixBusiness
@@ -257,7 +257,7 @@ class NodeService : Service() {
         val trustedSwapInTxs = LegacyPrefsDatastore.getMigrationTrustedSwapInTxs(applicationContext).first()
         val preferredFiatCurrency = userPrefs.getFiatCurrency.first()
 
-        monitorPaymentsJob = serviceScope.launch { monitorPaymentsWhenHeadless(business.peerManager, business.currencyManager, userPrefs) }
+        monitorPaymentsJob = serviceScope.launch { monitorPaymentsWhenHeadless(business.nodeParamsManager, business.currencyManager, userPrefs) }
         monitorNodeEventsJob = serviceScope.launch { monitorNodeEvents(business.peerManager, business.nodeParamsManager) }
         monitorFcmTokenJob = serviceScope.launch { monitorFcmToken(business) }
         monitorInFlightPaymentsJob = serviceScope.launch { monitorInFlightPayments(business.peerManager) }
@@ -300,7 +300,7 @@ class NodeService : Service() {
             // TODO: click on notif must deeplink to the notification screen
             when (event) {
                 is LiquidityEvents.Rejected -> {
-                    log.debug("processing liquidity_event=$event")
+                    log.debug("processing liquidity_event={}", event)
                     if (event.source == LiquidityEvents.Source.OnChainWallet) {
                         // Check the last time a rejected on-chain swap notification has been shown. If recent, we do not want to trigger a notification every time.
                         val lastRejectedSwap = internalData.getLastRejectedOnchainSwap.first().takeIf {
@@ -327,8 +327,14 @@ class NodeService : Service() {
                         is LiquidityEvents.Rejected.Reason.TooExpensive.OverRelativeFee -> {
                             SystemNotificationHelper.notifyPaymentRejectedOverRelative(applicationContext, event.source, event.amount, event.fee, reason.maxRelativeFeeBasisPoints, nextTimeout?.second)
                         }
-                        LiquidityEvents.Rejected.Reason.ChannelInitializing -> {
-                            SystemNotificationHelper.notifyPaymentRejectedChannelsInitializing(applicationContext, event.source, event.amount, nextTimeout?.second)
+                        is LiquidityEvents.Rejected.Reason.MissingOffChainAmountTooLow -> {
+                            SystemNotificationHelper.notifyPaymentRejectedAmountTooLow(applicationContext, event.source, event.amount)
+                        }
+                        // Temporary errors
+                        is LiquidityEvents.Rejected.Reason.ChannelFundingInProgress,
+                        is LiquidityEvents.Rejected.Reason.NoMatchingFundingRate,
+                        is LiquidityEvents.Rejected.Reason.TooManyParts -> {
+                            SystemNotificationHelper.notifyPaymentRejectedFundingError(applicationContext, event.source, event.amount)
                         }
                     }
                 }
@@ -337,17 +343,18 @@ class NodeService : Service() {
         }
     }
 
-    private suspend fun monitorPaymentsWhenHeadless(peerManager: PeerManager, currencyManager: CurrencyManager, userPrefs: UserPrefsRepository) {
-        peerManager.getPeer().eventsFlow.collect { event ->
+    private suspend fun monitorPaymentsWhenHeadless(nodeParamsManager: NodeParamsManager, currencyManager: CurrencyManager, userPrefs: UserPrefsRepository) {
+
+        nodeParamsManager.nodeParams.filterNotNull().first().nodeEvents.collect { event ->
             when (event) {
-                is PaymentReceived -> {
+                is PaymentEvents.PaymentReceived -> {
                     if (isHeadless) {
-                        receivedInBackground.add(event.received.amount)
+                        receivedInBackground.add(event.amount)
                         SystemNotificationHelper.notifyPaymentsReceived(
                             context = applicationContext,
                             userPrefs = userPrefs,
-                            paymentHash = event.incomingPayment.paymentHash,
-                            amount = event.received.amount,
+                            paymentHash = event.paymentHash,
+                            amount = event.amount,
                             rates = currencyManager.ratesFlow.value,
                             isHeadless = isHeadless && receivedInBackground.size == 1
                         )

@@ -756,20 +756,10 @@ class SyncSeedManager: SyncManagerProtcol {
 	
 	private class func record_table_name(chain: Bitcoin_kmpChain) -> String {
 		
-		// From Apple's docs:
-		// > A record type must consist of one or more alphanumeric characters
-		// > and must start with a letter. CloudKit permits the use of underscores,
-		// > but not spaces.
-		//
-		var allowed = CharacterSet.alphanumerics
-		allowed.insert("_")
-		
-		let suffix = chain.name.lowercased().components(separatedBy: allowed.inverted).joined(separator: "")
-		
 		// E.g.:
 		// - seeds_bitcoin_testnet
 		// - seeds_bitcoin_mainnet
-		return "seeds_bitcoin_\(suffix)"
+		return "seeds_bitcoin_\(chain.phoenixName)"
 	}
 	
 	private func recordID() -> CKRecord.ID {

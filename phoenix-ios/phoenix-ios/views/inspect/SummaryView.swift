@@ -1,6 +1,7 @@
 import SwiftUI
 import PhoenixShared
 import Popovers
+import Combine
 
 fileprivate let filename = "SummaryView"
 #if DEBUG && true
@@ -32,6 +33,8 @@ struct SummaryView: View {
 	@State var paymentInfo: WalletPaymentInfo
 	@State var paymentInfoIsStale: Bool
 	
+	@State var liquidityPayment: Lightning_kmpInboundLiquidityOutgoingPayment? = nil
+	
 	let fetchOptions = WalletPaymentFetchOptions.companion.All
 	
 	@State var blockchainConfirmations: Int? = nil
@@ -44,9 +47,9 @@ struct SummaryView: View {
 	
 	@State var didAppear = false
 	
-	@State var buttonListTruncationDetected_standard: Bool = false
-	@State var buttonListTruncationDetected_squeezed: Bool = false
-	@State var buttonListTruncationDetected_compact: Bool = false
+	@State var buttonListTruncationDetection_standard: [DynamicTypeSize: Bool] = [:]
+	@State var buttonListTruncationDetection_squeezed: [DynamicTypeSize: Bool] = [:]
+	@State var buttonListTruncationDetection_compact: [DynamicTypeSize: Bool] = [:]
 	
 	// <iOS_16_workarounds>
 	@State var navLinkTag: NavLinkTag? = nil
@@ -67,6 +70,9 @@ struct SummaryView: View {
 	)
 	@State var buttonHeight: CGFloat? = nil
 	
+	@StateObject var blockchainMonitorState = BlockchainMonitorState()
+	
+	@Environment(\.dynamicTypeSize) var dynamicTypeSize: DynamicTypeSize
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	@EnvironmentObject var navCoordinator: NavigationCoordinator
@@ -164,6 +170,9 @@ struct SummaryView: View {
 		.onAppear {
 			onAppear()
 		}
+		.onChange(of: paymentInfo) { _ in
+			paymentInfoChanged()
+		}
 		.task {
 			await monitorBlockchain()
 		}
@@ -202,7 +211,7 @@ struct SummaryView: View {
 			VStack {
 				Group {
 					if payment is Lightning_kmpInboundLiquidityOutgoingPayment {
-						Text("Liquidity Added")
+						Text("Channel Resized")
 					}
 					else if payment is Lightning_kmpOutgoingPayment {
 						Text("SENT")
@@ -505,22 +514,29 @@ struct SummaryView: View {
 		SummaryInfoGrid(
 			paymentInfo: $paymentInfo,
 			showOriginalFiatValue: $showOriginalFiatValue,
-			showContactView: showContactView
+			liquidityPayment: $liquidityPayment,
+			showContactView: showContactView,
+			switchToPayment: switchToPayment
 		)
 	}
 	
 	@ViewBuilder
 	func buttonList() -> some View {
 		
+		let dts = dynamicTypeSize
+		let buttonListTruncationDetected_compact = buttonListTruncationDetection_compact[dts] ?? false
+		let buttonListTruncationDetected_squeezed = buttonListTruncationDetection_squeezed[dts] ?? false
+		let buttonListTruncationDetected_standard = buttonListTruncationDetection_standard[dts] ?? false
+		
 		Group {
 			if buttonListTruncationDetected_compact {
 				buttonList_accessibility()
 			} else if buttonListTruncationDetected_squeezed {
-				buttonList_compact()
+				buttonList_compact(dts)
 			} else if buttonListTruncationDetected_standard {
-				buttonList_squeezed()
+				buttonList_squeezed(dts)
 			} else {
-				buttonList_standard()
+				buttonList_standard(dts)
 			}
 		} // </Group>
 		.confirmationDialog("Delete payment?",
@@ -534,7 +550,7 @@ struct SummaryView: View {
 	}
 	
 	@ViewBuilder
-	func buttonList_standard() -> some View {
+	func buttonList_standard(_ dts: DynamicTypeSize) -> some View {
 		
 		// We're making all the buttons the same size.
 		//
@@ -556,8 +572,8 @@ struct SummaryView: View {
 				.read(buttonWidthReader)
 				.read(buttonHeightReader)
 			} wasTruncated: {
-				log.debug("buttonListTruncationDetected_standard = true (details)")
-				buttonListTruncationDetected_standard = true
+				log.debug("buttonListTruncationDetection_standard[\(dts)] = true (details)")
+				buttonListTruncationDetection_standard[dts] = true
 			}
 			
 			if let buttonHeight = buttonHeight {
@@ -574,8 +590,8 @@ struct SummaryView: View {
 				.read(buttonWidthReader)
 				.read(buttonHeightReader)
 			} wasTruncated: {
-				log.debug("buttonListTruncationDetected_standard = true (edit)")
-				buttonListTruncationDetected_standard = true
+				log.debug("buttonListTruncationDetection_standard[\(dts)] = true (edit)")
+				buttonListTruncationDetection_standard[dts] = true
 			}
 			
 			if let buttonHeight = buttonHeight {
@@ -592,8 +608,8 @@ struct SummaryView: View {
 				.read(buttonWidthReader)
 				.read(buttonHeightReader)
 			} wasTruncated: {
-				log.debug("buttonListTruncationDetected_standard = true (delete)")
-				buttonListTruncationDetected_standard = true
+				log.debug("buttonListTruncationDetection_standard[\(dts)] = true (delete)")
+				buttonListTruncationDetection_standard[dts] = true
 			}
 		}
 		.padding(.all)
@@ -602,7 +618,7 @@ struct SummaryView: View {
 	}
 	
 	@ViewBuilder
-	func buttonList_squeezed() -> some View {
+	func buttonList_squeezed(_ dts: DynamicTypeSize) -> some View {
 		
 		// There's not enough space to make all the buttons the same size.
 		// So we're just making the left & right buttons the same size.
@@ -626,8 +642,8 @@ struct SummaryView: View {
 				.read(buttonWidthReader)
 				.read(buttonHeightReader)
 			} wasTruncated: {
-				log.debug("buttonListTruncationDetected_squeezed = true (edit)")
-				buttonListTruncationDetected_squeezed = true
+				log.debug("buttonListTruncationDetection_squeezed[\(dts)] = true (edit)")
+				buttonListTruncationDetection_squeezed[dts] = true
 			}
 			
 			if let buttonHeight = buttonHeight {
@@ -643,8 +659,8 @@ struct SummaryView: View {
 				}
 				.read(buttonHeightReader)
 			} wasTruncated: {
-				log.debug("buttonListTruncationDetected_squeezed = true (edit)")
-				buttonListTruncationDetected_squeezed = true
+				log.debug("buttonListTruncationDetection_squeezed[\(dts)] = true (edit)")
+				buttonListTruncationDetection_squeezed[dts] = true
 			}
 			
 			if let buttonHeight = buttonHeight {
@@ -662,8 +678,8 @@ struct SummaryView: View {
 				.read(buttonWidthReader)
 				.read(buttonHeightReader)
 			} wasTruncated: {
-				log.debug("buttonListTruncationDetected_squeezed = true (delete)")
-				buttonListTruncationDetected_squeezed = true
+				log.debug("buttonListTruncationDetection_squeezed[\(dts)] = true (delete)")
+				buttonListTruncationDetection_squeezed[dts] = true
 			}
 		}
 		.padding(.horizontal, 10) // allow content to be closer to edges
@@ -673,7 +689,7 @@ struct SummaryView: View {
 	}
 	
 	@ViewBuilder
-	func buttonList_compact() -> some View {
+	func buttonList_compact(_ dts: DynamicTypeSize) -> some View {
 		
 		// There's a large font being used, and possibly a small screen too.
 		// Thus horizontal space is tight.
@@ -696,8 +712,8 @@ struct SummaryView: View {
 				}
 				.read(buttonHeightReader)
 			} wasTruncated: {
-				log.debug("buttonListTruncationDetected_compact = true (details)")
-				buttonListTruncationDetected_compact = true
+				log.debug("buttonListTruncationDetection_compact[\(dts)] = true (details)")
+				buttonListTruncationDetection_compact[dts] = true
 			}
 			
 			if let buttonHeight = buttonHeight {
@@ -713,8 +729,8 @@ struct SummaryView: View {
 				}
 				.read(buttonHeightReader)
 			} wasTruncated: {
-				log.debug("buttonListTruncationDetected_compact = true (edit)")
-				buttonListTruncationDetected_compact = true
+				log.debug("buttonListTruncationDetection_compact[\(dts)] = true (edit)")
+				buttonListTruncationDetection_compact[dts] = true
 			}
 			
 			if let buttonHeight = buttonHeight {
@@ -730,8 +746,8 @@ struct SummaryView: View {
 				}
 				.read(buttonHeightReader)
 			} wasTruncated: {
-				log.debug("buttonListTruncationDetected_compact = true (delete)")
-				buttonListTruncationDetected_compact = true
+				log.debug("buttonListTruncationDetection_compact[\(dts)] = true (delete)")
+				buttonListTruncationDetection_compact[dts] = true
 			}
 		}
 		.padding(.horizontal, 4) // allow content to be closer to edges
@@ -835,8 +851,10 @@ struct SummaryView: View {
 			DetailsView(
 				location: wrappedLocation(),
 				paymentInfo: $paymentInfo,
+				liquidityPayment: $liquidityPayment,
 				showOriginalFiatValue: $showOriginalFiatValue,
-				showFiatValueExplanation: $showFiatValueExplanation
+				showFiatValueExplanation: $showFiatValueExplanation,
+				switchToPayment: switchToPayment
 			)
 			
 		case .EditInfoView:
@@ -936,28 +954,59 @@ struct SummaryView: View {
 	// MARK: Tasks
 	// --------------------------------------------------
 	
-	func updateConfirmations(_ onChainPayment: Lightning_kmpOnChainOutgoingPayment) async -> Int {
-		log.trace("checkConfirmations()")
+	func monitorBlockchain() async {
 		
-		do {
-			let result = try await Biz.business.electrumClient.kotlin_getConfirmations(txid: onChainPayment.txId)
-
-			let confirmations = result?.intValue ?? 0
-			log.debug("checkConfirmations(): => \(confirmations)")
-
-			self.blockchainConfirmations = confirmations
-			return confirmations
-		} catch {
-			log.error("checkConfirmations(): error: \(error)")
-			return 0
+		// Architecture note:
+		// We need the ability to reset the View to display a completely different payment.
+		// This means our Task to monitor the blockchain needs to properly respond whenever
+		// the `paymentInfo` property is changed.
+		
+		var lastPaymentId: WalletPaymentId? = nil
+		
+		// Note: When the task is cancelled, the `values` stream returns nil, and we exit the loop
+		
+		for await paymentInfo in blockchainMonitorState.paymentInfoPublisher.values {
+			
+			if let paymentInfo, paymentInfo.id() == lastPaymentId {
+				log.debug("monitorBlockchain: ignoring duplicate paymentInfo")
+				continue
+			}
+			lastPaymentId = paymentInfo?.id()
+			
+			if let currentTask = blockchainMonitorState.currentTaskPublisher.value {
+				log.debug("monitorBlockchain: currentTask.cancel()")
+				currentTask.cancel()
+			}
+			
+			if let paymentInfo {
+				log.debug("monitorBlockchain: processing new paymentInfo")
+				
+				let newTask = Task { @MainActor in
+					await monitorBlockchain(paymentInfo)
+				}
+				blockchainMonitorState.currentTaskPublisher.send(newTask)
+				
+			} else {
+				log.debug("monitorBlockchain: paymentInfo is nil")
+				blockchainMonitorState.currentTaskPublisher.send(nil)
+			}
 		}
+		
+		if let currentTask = blockchainMonitorState.currentTaskPublisher.value {
+			log.debug("monitorBlockchain: currentTask.cancel()")
+			currentTask.cancel()
+		}
+		
+		log.debug("monitorBlockchain: terminated")
 	}
 	
-	func monitorBlockchain() async {
-		log.trace("monitorBlockchain()")
+	func monitorBlockchain(_ paymentInfo: WalletPaymentInfo) async {
+		
+		let pid: String = paymentInfo.id().dbId.prefix(maxLength: 8)
+		log.trace("monitorBlockchain(\(pid))")
 		
 		guard let onChainPayment = paymentInfo.payment as? Lightning_kmpOnChainOutgoingPayment else {
-			log.debug("monitorBlockchain(): not an on-chain payment")
+			log.debug("monitorBlockchain(\(pid)): not an on-chain payment")
 			return
 		}
 		
@@ -966,43 +1015,82 @@ struct SummaryView: View {
 			if elapsed > 24.hours() {
 				// It was marked as mined more than 24 hours ago.
 				// So there's really no need to check the exact confirmation count anymore.
-				log.debug("monitorBlockchain(): confirmedAt > 24.hours.ago")
+				log.debug("monitorBlockchain(\(pid)): confirmedAt > 24.hours.ago")
 				self.blockchainConfirmations = 7
 				return
 			}
 		}
 		
-		let confirmations = await updateConfirmations(onChainPayment)
-		if confirmations > 6 {
-			// No need to continue checking confirmation count,
-			// because the UI displays "6+" from this point forward.
-			log.debug("monitorBlockchain(): confirmations > 6")
+		let isDone = await updateConfirmations(onChainPayment, pid)
+		guard !isDone else {
+			log.debug("monitorBlockchain(\(pid)): done")
 			return
 		}
 		
+		// Note: When the task is cancelled, the `values` stream returns nil, and we exit the loop
+		
 		for await notification in Biz.business.electrumClient.notificationsPublisher().values {
 			
-			if notification is Lightning_kmpHeaderSubscriptionResponse {
-				// A new block was mined !
-				// Update confirmation count if needed.
-				let confirmations = await updateConfirmations(onChainPayment)
-				if confirmations > 6 {
-					// No need to continue checking confirmation count,
-					// because the UI displays "6+" from this point forward.
-					log.debug("monitorBlockchain(): confirmations > 6")
-					break
-				}
-				
-			} else {
-				log.debug("monitorBlockchain(): notification isNot HeaderSubscriptionResponse")
+			if !(notification is Lightning_kmpHeaderSubscriptionResponse) {
+				log.debug("monitorBlockchain(\(pid)): notification isNot HeaderSubscriptionResponse")
+				continue
 			}
 			
-			if Task.isCancelled {
-				log.debug("monitorBlockchain(): Task.isCancelled")
-				break
-			} else {
-				log.debug("monitorBlockchain(): Waiting for next electrum notification...")
+			// A new block was mined !
+			// Update confirmation count if needed.
+			
+			let isDone = await updateConfirmations(onChainPayment, pid)
+			guard !isDone else {
+				log.debug("monitorBlockchain(\(pid)): done")
+				return
 			}
+			
+			log.debug("monitorBlockchain(\(pid)): Waiting for next electrum notification...")
+		}
+		
+		log.debug("monitorBlockchain(\(pid)): terminated")
+	}
+	
+	func updateConfirmations(
+		_ onChainPayment: Lightning_kmpOnChainOutgoingPayment,
+		_ pid: String
+	) async -> Bool {
+		
+		log.trace("updateConfirmations(\(pid))")
+		
+		let confirmations = await fetchConfirmations(onChainPayment, pid)
+		guard !Task.isCancelled else {
+			log.debug("updateConfirmations(\(pid)): Task.isCancelled")
+			return true
+		}
+		self.blockchainConfirmations = confirmations
+		
+		if confirmations > 6 {
+			// No need to continue checking confirmation count,
+			// because the UI displays "6+" from this point forward.
+			log.debug("updateConfirmations(\(pid)): confirmations > 6")
+			return true
+		} else {
+			return false
+		}
+	}
+	
+	func fetchConfirmations(
+		_ onChainPayment: Lightning_kmpOnChainOutgoingPayment,
+		_ pid: String
+	) async -> Int {
+		
+		log.trace("fetchConfirmations(\(pid))")
+		
+		do {
+			let result = try await Biz.business.electrumClient.kotlin_getConfirmations(txid: onChainPayment.txId)
+
+			let confirmations = result?.intValue ?? 0
+			log.debug("fetchConfirmations(\(pid)): => \(confirmations)")
+			return confirmations
+		} catch {
+			log.error("checkConfirmations(\(pid)): error: \(error)")
+			return 0
 		}
 	}
 	
@@ -1042,9 +1130,13 @@ struct SummaryView: View {
 						}
 					}
 				}
+			} else {
+				// Not triggered in this particular case, so we need to trigger it manually.
+				paymentInfoChanged()
 			}
 			
 		} else {
+			log.trace("subsequent appearance")
 			
 			// We are returning from the DetailsView/EditInfoView (via the NavigationController)
 			// The payment metadata may have changed (e.g. description/notes modified).
@@ -1072,6 +1164,33 @@ struct SummaryView: View {
 				case .TransactionsView:
 					presentationMode.wrappedValue.dismiss()
 				}
+			}
+		}
+	}
+	
+	func paymentInfoChanged() {
+		log.trace("paymentInfoChanged()")
+		
+		blockchainMonitorState.paymentInfoPublisher.send(paymentInfo)
+		
+		if let incomingPayment = paymentInfo.payment as? Lightning_kmpIncomingPayment,
+			let fundingTxId = incomingPayment.lightningPaymentFundingTxId
+		{
+			Task { @MainActor in
+				do {
+					let paymentsManager = Biz.business.paymentsManager
+					let payment = try await paymentsManager.getLiquidityPurchaseForTxId(txId: fundingTxId)
+					if let payment {
+						log.debug("liquidityPayment = \(payment.walletPaymentId().dbId)")
+						liquidityPayment = payment
+					} else {
+						log.debug("liquidityPayment = nil")
+					}
+					
+				} catch {
+					log.error("getLiquidityPurchaseForTxId(): error: \(error)")
+				}
+				
 			}
 		}
 	}
@@ -1107,6 +1226,20 @@ struct SummaryView: View {
 		log.trace("showContactView()")
 		
 		navigateTo(.ContactView(contact: contact))
+	}
+	
+	func switchToPayment(_ paymentId: WalletPaymentId) {
+		log.trace("switchToPayment: \(paymentId.dbId)")
+		
+		Biz.business.paymentsManager.getPayment(id: paymentId, options: fetchOptions) {
+			(result: WalletPaymentInfo?, _) in
+			
+			if let result {
+				paymentInfo = result
+				liquidityPayment = nil
+				blockchainConfirmations = nil
+			}
+		}
 	}
 	
 	func exploreTx(_ txId: Bitcoin_kmpTxId, website: BlockchainExplorer.Website) {
@@ -1148,4 +1281,13 @@ struct SummaryView: View {
 			presentationMode.wrappedValue.dismiss()
 		}
 	}
+}
+
+// --------------------------------------------------
+// MARK: -
+// --------------------------------------------------
+
+class BlockchainMonitorState: ObservableObject {
+	let paymentInfoPublisher = CurrentValueSubject<WalletPaymentInfo?, Never>(nil)
+	let currentTaskPublisher = CurrentValueSubject<Task<(), Never>?, Never>(nil)
 }

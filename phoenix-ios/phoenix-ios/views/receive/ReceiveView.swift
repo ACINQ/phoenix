@@ -33,7 +33,6 @@ struct ReceiveView: MVIView {
 	@StateObject var toast = Toast()
 	
 	@Environment(\.colorScheme) var colorScheme
-	@Environment(\.dynamicTypeSize) var dynamicTypeSize: DynamicTypeSize
 	
 	@EnvironmentObject var deviceInfo: DeviceInfo
 	@EnvironmentObject var popoverState: PopoverState

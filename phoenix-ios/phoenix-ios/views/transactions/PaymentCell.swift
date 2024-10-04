@@ -166,7 +166,12 @@ struct PaymentCell : View {
 	func paymentAmount() -> some View {
 		
 		let (amount, isFailure, isOutgoing) = paymentAmountInfo()
-		if currencyPrefs.hideAmounts {
+		if isLiquidityPaidInTheFuture() {
+			
+			Text(verbatim: "")
+				.accessibilityHidden(true)
+			
+		} else if currencyPrefs.hideAmounts {
 			
 			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 				
@@ -241,14 +246,36 @@ struct PaymentCell : View {
 		
 		if let contact = fetched?.contact {
 			if let payment = fetched?.payment, payment.isIncoming() {
-				return String(localized: "\(timestamp) - from \(contact.name)")
+				return String(localized: "\(timestamp) ∙ from \(contact.name)")
 			} else {
-				return String(localized: "\(timestamp) - to \(contact.name)")
+				return String(localized: "\(timestamp) ∙ to \(contact.name)")
 			}
+			
+		} else if
+			let payment = fetched?.payment,
+			let liquidity = payment as? Lightning_kmpInboundLiquidityOutgoingPayment
+		{
+			let amount = Utils.formatBitcoin(sat: liquidity.purchase.amount, bitcoinUnit: .sat)
+			return "\(timestamp)  ∙  +\(amount.string)"
 			
 		} else {
 			return timestamp
 		}
+	}
+	
+	func line2HasExtraInfo() -> Bool {
+		
+		if fetched?.contact != nil {
+			// Also going to display contact name
+			return true
+		}
+		
+		if fetched?.payment is Lightning_kmpInboundLiquidityOutgoingPayment {
+			// Also going to display liquidity amount
+			return true
+		}
+		
+		return false
 	}
 	
 	func stringForDate(_ completedAtDate: Date) -> String {
@@ -260,7 +287,7 @@ struct PaymentCell : View {
 		let yearA = compsA.year ?? 0
 		let yearB = compsB.year ?? 0
 		
-		let preferShortDate = (textScaling > 100) || (fetched?.contact != nil)
+		let preferShortDate = (textScaling > 100) || line2HasExtraInfo()
 		
 		let formatter = DateFormatter()
 		if yearA == yearB {
@@ -317,6 +344,17 @@ struct PaymentCell : View {
 			let isOutgoing = true
 
 			return (amount, isFailure, isOutgoing)
+		}
+	}
+	
+	func isLiquidityPaidInTheFuture() -> Bool {
+		
+		if let payment = fetched?.payment,
+		   let liquidity = payment as? Lightning_kmpInboundLiquidityOutgoingPayment
+		{
+			return liquidity.isPaidInTheFuture()
+		} else {
+			return false
 		}
 	}
 	

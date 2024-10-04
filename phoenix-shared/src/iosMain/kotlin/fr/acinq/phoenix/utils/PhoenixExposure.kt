@@ -27,10 +27,10 @@ fun WalletPaymentOrderRow.kotlinId(): WalletPaymentId {
     return this.id
 }
 
-fun NodeParamsManager.Companion._liquidityLeaseRate(amount: Satoshi): LiquidityAds_LeaseRate {
-    val result = this.liquidityLeaseRate(amount)
-    return LiquidityAds_LeaseRate(result)
-}
+//fun NodeParamsManager.Companion._liquidityLeaseRate(amount: Satoshi): LiquidityAds_LeaseRate {
+//    val result = this.liquidityLeaseRate(amount)
+//    return LiquidityAds_LeaseRate(result)
+//}
 
 fun LocalChannelInfo.Companion.availableForReceive(
     channels: List<LocalChannelInfo>
