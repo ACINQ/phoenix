@@ -13,9 +13,7 @@ class NoticeMonitor: ObservableObject {
 	
 	@Published private var isNewWallet = Prefs.shared.isNewWallet
 	@Published private var backupSeed_enabled = Prefs.shared.backupSeed.isEnabled
-	@Published private var manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(
-		encryptedNodeId: Biz.encryptedNodeId!
-	)
+	@Published private var manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(Biz.walletId!)
 	
 	@Published private var walletContext: WalletContext? = nil
 	
@@ -44,9 +42,7 @@ class NoticeMonitor: ObservableObject {
 		
 		Prefs.shared.backupSeed.manualBackup_taskDone_publisher
 			.sink {[weak self] _ in
-				self?.manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(
-					encryptedNodeId: Biz.encryptedNodeId!
-				)
+				self?.manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(Biz.walletId!)
 			}
 			.store(in: &cancellables)
 		

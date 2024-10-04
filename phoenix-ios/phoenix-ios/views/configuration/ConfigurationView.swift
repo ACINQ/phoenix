@@ -100,8 +100,8 @@ struct ConfigurationList: View {
 	init(scrollViewProxy: ScrollViewProxy) {
 		
 		self.scrollViewProxy = scrollViewProxy
-		if let encryptedNodeId = Biz.encryptedNodeId {
-			backupSeedStatePublisher = Prefs.shared.backupSeedStatePublisher(encryptedNodeId)
+		if let walletId = Biz.walletId {
+			backupSeedStatePublisher = Prefs.shared.backupSeedStatePublisher(walletId)
 		} else {
 			backupSeedStatePublisher = PassthroughSubject<BackupSeedState, Never>().eraseToAnyPublisher()
 		}

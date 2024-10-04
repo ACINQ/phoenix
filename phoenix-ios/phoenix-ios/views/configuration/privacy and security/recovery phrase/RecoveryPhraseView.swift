@@ -27,7 +27,7 @@ struct RecoveryPhraseList: View {
 	}
 	
 	let scrollViewProxy: ScrollViewProxy
-	let encryptedNodeId: String
+	let walletId: WalletIdentifier
 	
 	@State var manualBackup_taskDone: Bool
 	@State var backupSeed_enabled: Bool
@@ -68,11 +68,11 @@ struct RecoveryPhraseList: View {
 	init(scrollViewProxy: ScrollViewProxy) {
 		self.scrollViewProxy = scrollViewProxy
 		
-		let encryptedNodeId = Biz.encryptedNodeId!
-		self.encryptedNodeId = encryptedNodeId
+		let walletId = Biz.walletId!
+		self.walletId = walletId
 		self.syncSeedManager = Biz.syncManager!.syncSeedManager
 		
-		let manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(encryptedNodeId: encryptedNodeId)
+		let manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(walletId)
 		self._manualBackup_taskDone = State<Bool>(initialValue: manualBackup_taskDone)
 		
 		let backupSeed_enabled = Prefs.shared.backupSeed.isEnabled
@@ -564,7 +564,7 @@ struct RecoveryPhraseList: View {
 		if taskDone != manualBackup_taskDone {
 			
 			manualBackup_taskDone = taskDone
-			Prefs.shared.backupSeed.manualBackup_setTaskDone(taskDone, encryptedNodeId: encryptedNodeId)
+			Prefs.shared.backupSeed.manualBackup_setTaskDone(taskDone, walletId)
 		}
 	}
 	

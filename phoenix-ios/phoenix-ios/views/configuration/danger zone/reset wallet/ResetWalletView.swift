@@ -19,7 +19,7 @@ struct ResetWalletView: MVIView {
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
 	
-	let encryptedNodeId = Biz.encryptedNodeId!
+	let walletId = Biz.walletId!
 	
 	@State var deleteSeedBackup: Bool = false
 	@State var deleteTransactionHistory: Bool = false
@@ -33,9 +33,7 @@ struct ResetWalletView: MVIView {
 	@State var backupSeed_enabled = Prefs.shared.backupSeed.isEnabled
 	
 	let manualBackup_taskDone_publisher = Prefs.shared.backupSeed.manualBackup_taskDone_publisher
-	@State var manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(
-		encryptedNodeId: Biz.encryptedNodeId!
-	)
+	@State var manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(Biz.walletId!)
 	
 	// <iOS_16_workarounds>
 	@State var navLinkTag: NavLinkTag? = nil
@@ -75,8 +73,7 @@ struct ResetWalletView: MVIView {
 			self.backupSeed_enabled = $0
 		}
 		.onReceive(manualBackup_taskDone_publisher) {
-			self.manualBackup_taskDone =
-				Prefs.shared.backupSeed.manualBackup_taskDone(encryptedNodeId: encryptedNodeId)
+			self.manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(walletId)
 		}
 	}
 	

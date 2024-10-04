@@ -208,6 +208,7 @@
 		DC74174B270F332700F7E3E3 /* KotlinTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC74174A270F332700F7E3E3 /* KotlinTypes.swift */; };
 		DC74174D270F455D00F7E3E3 /* AES256.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC74174C270F455D00F7E3E3 /* AES256.swift */; };
 		DC784A112B31EA180018DC4A /* LiquidityAdsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC784A102B31EA180018DC4A /* LiquidityAdsView.swift */; };
+		DC7BAA002CADAAE70074B568 /* WalletIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC7BA9FF2CADAAE70074B568 /* WalletIdentifier.swift */; };
 		DC7DA9F62AD84DF200F86B99 /* String+Substring.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC7DA9F52AD84DF200F86B99 /* String+Substring.swift */; };
 		DC81B79F25BF2AA200F5A52C /* MVI.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC81B79E25BF2AA200F5A52C /* MVI.swift */; };
 		DC82EED629789853007A5853 /* TxHistoryExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC82EED529789853007A5853 /* TxHistoryExporter.swift */; };
@@ -613,6 +614,7 @@
 		DC74174A270F332700F7E3E3 /* KotlinTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinTypes.swift; sourceTree = "<group>"; };
 		DC74174C270F455D00F7E3E3 /* AES256.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AES256.swift; sourceTree = "<group>"; };
 		DC784A102B31EA180018DC4A /* LiquidityAdsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidityAdsView.swift; sourceTree = "<group>"; };
+		DC7BA9FF2CADAAE70074B568 /* WalletIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletIdentifier.swift; sourceTree = "<group>"; };
 		DC7DA9F52AD84DF200F86B99 /* String+Substring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Substring.swift"; sourceTree = "<group>"; };
 		DC81B79E25BF2AA200F5A52C /* MVI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVI.swift; sourceTree = "<group>"; };
 		DC82EED529789853007A5853 /* TxHistoryExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TxHistoryExporter.swift; sourceTree = "<group>"; };
@@ -833,6 +835,7 @@
 				DCDD9ECD28637474001800A3 /* Orientation.swift */,
 				DC355E222A45FAF2008E8A8E /* NestedObservableObject.swift */,
 				DCCFE6A52B63028A002FFF11 /* UnfairLock.swift */,
+				DC7BA9FF2CADAAE70074B568 /* WalletIdentifier.swift */,
 			);
 			path = utils;
 			sourceTree = "<group>";
@@ -1925,6 +1928,7 @@
 				DCA02BA02BD1A5FC0080520F /* ChannelSizeImpactWarning.swift in Sources */,
 				DC355E232A45FAF2008E8A8E /* NestedObservableObject.swift in Sources */,
 				DC5F1C4A28DDAA49007A55ED /* ResetWalletView_Confirm.swift in Sources */,
+				DC7BAA002CADAAE70074B568 /* WalletIdentifier.swift in Sources */,
 				DC39D4E7286BB2130030F18D /* PaymentLayerChoice.swift in Sources */,
 				DC46BAF626CACCF700E760A6 /* KotlinFutures.swift in Sources */,
 				DC641C7E2821744000862DCD /* Currency+CurrencyPrefs.swift in Sources */,

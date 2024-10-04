@@ -448,7 +448,7 @@ class BusinessManager {
 		self.walletInfo = _walletInfo
 		maybeRegisterFcmToken()
 		
-		let encryptedNodeId = _walletInfo.cloudKeyHash as String
+		let walletId = WalletIdentifier(chain: business.chain, walletInfo: _walletInfo)
 		
 		if let walletRestoreType = walletRestoreType {
 			switch walletRestoreType {
@@ -457,13 +457,13 @@ class BusinessManager {
 				// User is restoring wallet after manually typing in the recovery phrase.
 				// So we can mark the manual_backup task as completed.
 				//
-				Prefs.shared.backupSeed.manualBackup_setTaskDone(true, encryptedNodeId: encryptedNodeId)
+				Prefs.shared.backupSeed.manualBackup_setTaskDone(true, walletId)
 				//
 				// And ensure cloud backup is disabled for the wallet.
 				//
 				Prefs.shared.backupSeed.isEnabled = false
-				Prefs.shared.backupSeed.setName(nil, encryptedNodeId: encryptedNodeId)
-				Prefs.shared.backupSeed.setHasUploadedSeed(false, encryptedNodeId: encryptedNodeId)
+				Prefs.shared.backupSeed.setName(nil, walletId)
+				Prefs.shared.backupSeed.setHasUploadedSeed(false, walletId)
 				
 			case .fromCloudBackup(let name):
 				//
@@ -471,12 +471,12 @@ class BusinessManager {
 				// So we can mark the iCloud backpu as completed.
 				//
 				Prefs.shared.backupSeed.isEnabled = true
-				Prefs.shared.backupSeed.setName(name, encryptedNodeId: encryptedNodeId)
-				Prefs.shared.backupSeed.setHasUploadedSeed(true, encryptedNodeId: encryptedNodeId)
+				Prefs.shared.backupSeed.setName(name, walletId)
+				Prefs.shared.backupSeed.setHasUploadedSeed(true, walletId)
 				//
 				// And ensure manual backup is diabled for the wallet.
 				//
-				Prefs.shared.backupSeed.manualBackup_setTaskDone(false, encryptedNodeId: encryptedNodeId)
+				Prefs.shared.backupSeed.manualBackup_setTaskDone(false, walletId)
 			}
 		}
 
@@ -492,15 +492,17 @@ class BusinessManager {
 		return true
 	}
 	
-	/// The current encryptedNodeId (from the current unlocked wallet).
+	/// The current walletIdentifier (from the current unlocked wallet).
 	///
 	/// Always fetch this on demand - don't cache it.
 	/// Because it might change if the user closes his/her wallet.
 	///
-	public var encryptedNodeId: String? {
-
-		// For historical reasons, this is the cloudKeyHash, and NOT the nodeIdHash.
-		return walletInfo?.cloudKeyHash
+	public var walletId: WalletIdentifier? {
+		if let walletInfo {
+			return WalletIdentifier(chain: business.chain, walletInfo: walletInfo)
+		} else {
+			return nil
+		}
 	}
 
 	/// The current nodeIdHash (from the current unlocked wallet).

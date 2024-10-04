@@ -227,7 +227,7 @@ extension SyncBackupManager {
 				
 				log.trace("downloadContacts(): finish: success")
 				
-				Prefs.shared.backupTransactions.markHasDownloadedContacts(self.walletInfo.encryptedNodeId)
+				Prefs.shared.backupTransactions.markHasDownloadedContacts(walletId)
 				self.consecutiveErrorCount = 0
 				
 				if let newState = await self.actor.didDownloadContacts() {

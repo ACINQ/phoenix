@@ -49,9 +49,18 @@ class SyncBackupManager {
 	///
 	weak var parent: SyncManager? = nil
 	
+	/// The chain in use by PhoenixBusiness (e.g. Testnet)
+	///
+	private let chain: Bitcoin_kmpChain
+	
 	/// The wallet info, such as nodeID, cloudKey, etc.
 	///
-	let walletInfo: WalletManager.WalletInfo
+	public let walletInfo: WalletManager.WalletInfo
+	
+	/// The wallet's unique identification in the cloud.
+	/// Also used in Prefs.
+	///
+	public let walletId: WalletIdentifier
 	
 	/// Informs the user interface regarding the activities of the SyncBackupManager.
 	/// This includes various errors & active upload progress.
@@ -77,17 +86,23 @@ class SyncBackupManager {
 	
 	private var cancellables = Set<AnyCancellable>()
 	
-	init(walletInfo: WalletManager.WalletInfo) {
+	init(
+		chain: Bitcoin_kmpChain,
+		walletInfo: WalletManager.WalletInfo
+	) {
 		log.trace("init()")
 		
+		self.chain = chain
 		self.walletInfo = walletInfo
 		
-		let encryptedNodeId = walletInfo.encryptedNodeId
+		let _walletId = WalletIdentifier(chain: chain, walletInfo: walletInfo)
+		self.walletId = _walletId
+		
 		self.actor = SyncBackupManager_Actor(
 			isEnabled: Prefs.shared.backupTransactions.isEnabled,
-			recordZoneCreated: Prefs.shared.backupTransactions.recordZoneCreated(encryptedNodeId),
-			hasDownloadedPayments: Prefs.shared.backupTransactions.hasDownloadedPayments(encryptedNodeId),
-			hasDownloadedContacts: Prefs.shared.backupTransactions.hasDownloadedContacts(encryptedNodeId)
+			recordZoneCreated: Prefs.shared.backupTransactions.recordZoneCreated(_walletId),
+			hasDownloadedPayments: Prefs.shared.backupTransactions.hasDownloadedPayments(_walletId),
+			hasDownloadedContacts: Prefs.shared.backupTransactions.hasDownloadedContacts(_walletId)
 		)
 		
 		waitForDatabases()
@@ -100,10 +115,6 @@ class SyncBackupManager {
 	var cloudKey: SymmetricKey {
 		let cloudKeyData = walletInfo.cloudKey.toByteArray().toSwiftData()
 		return SymmetricKey(data: cloudKeyData)
-	}
-	
-	var encryptedNodeId: String {
-		return walletInfo.encryptedNodeId
 	}
 	
 	// ----------------------------------------
@@ -429,7 +440,7 @@ class SyncBackupManager {
 					
 					log.trace("createRecordZone(): perZoneResult: success")
 					
-					Prefs.shared.backupTransactions.setRecordZoneCreated(true, self.encryptedNodeId)
+					Prefs.shared.backupTransactions.setRecordZoneCreated(true, walletId)
 					self.consecutiveErrorCount = 0
 						
 					if let newState = await self.actor.didCreateRecordZone() {
@@ -498,7 +509,7 @@ class SyncBackupManager {
 					
 					// Done !
 					
-					Prefs.shared.backupTransactions.setRecordZoneCreated(false, self.encryptedNodeId)
+					Prefs.shared.backupTransactions.setRecordZoneCreated(false, walletId)
 					self.consecutiveErrorCount = 0
 					
 					if let newState = await self.actor.didDeleteRecordZone() {
@@ -520,7 +531,7 @@ class SyncBackupManager {
 	// ----------------------------------------
 	
 	func recordZoneName() -> String {
-		return self.encryptedNodeId
+		return walletId.encryptedNodeId
 	}
 	
 	func recordZoneID() -> CKRecordZone.ID {
