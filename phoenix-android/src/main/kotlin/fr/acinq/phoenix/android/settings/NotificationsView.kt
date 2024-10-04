@@ -244,6 +244,15 @@ private fun PermamentNotice(
                 },
             )
         }
+
+        is Notice.FundsInFinalWallet -> {
+            ImportantNotification(
+                icon = R.drawable.ic_chain,
+                message = "Funds available in the final wallet.",
+                actionText = "View funds",
+                onActionClick = { nc?.navigate(Screen.WalletInfo.FinalWallet.route) },
+            )
+        }
     }
 }
 
