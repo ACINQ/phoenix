@@ -56,7 +56,7 @@ struct ConfigurationList: View {
 	@State private var backupSeedState: BackupSeedState = .safelyBackedUp
 	let backupSeedStatePublisher: AnyPublisher<BackupSeedState, Never>
 	
-	@State var firstAppearance = false
+	@State var didAppear = false
 	
 	@State var biometricSupport = AppSecurity.shared.deviceBiometricSupport()
 	
@@ -488,8 +488,8 @@ struct ConfigurationList: View {
 	func onAppear() {
 		log.trace("onAppear()")
 		
-		if firstAppearance {
-			firstAppearance = false
+		if !didAppear {
+			didAppear = true
 			
 			if let deepLink = deepLinkManager.deepLink {
 				DispatchQueue.main.async {

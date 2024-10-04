@@ -35,7 +35,7 @@ struct PaymentOptionsList: View {
 	
 	@State var notificationSettings = NotificationsManager.shared.settings.value
 	
-	@State var firstAppearance = true
+	@State var didAppear = false
 	
 	// <iOS_16_workarounds>
 	@State var navLinkTag: NavLinkTag? = nil
@@ -312,8 +312,8 @@ struct PaymentOptionsList: View {
 	func onAppear() {
 		log.trace("onAppear()")
 		
-		if firstAppearance {
-			firstAppearance = false
+		if !didAppear {
+			didAppear = true
 			
 			if let deepLink = deepLinkManager.deepLink {
 				DispatchQueue.main.async { // iOS 14 issues workaround
