@@ -248,6 +248,7 @@
 
     <!-- payment details -->
 
+    <string name="paymentdetails_liquidity_purchase_label">Likvidity</string>
     <string name="paymentdetails_funding_fees_label">Poplatky ťažiarom</string>
     <string name="paymentdetails_funding_fees_desc">Poplatky platené ťažiarom Bitcoinovej siete za spracovanie on-chain transakcie.</string>
     <string name="paymentdetails_service_fees_label">Poplatky za službu</string>
@@ -394,6 +395,7 @@
 
     <string name="liquidityads_error_header">Žiadosť o likviditu zlyhala</string>
     <string name="liquidityads_error_channels_unavailable">Kanály nie sú k dispozícii. Skúste to neskôr.</string>
+    <string name="liquidityads_error_invalid_funding_amount">Požadovaná suma je neplatná.</string>
 
     <!-- payment line -->
 

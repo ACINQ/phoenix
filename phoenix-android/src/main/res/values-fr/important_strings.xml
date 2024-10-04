@@ -45,7 +45,7 @@
     <string name="notif_rejected_over_relative">Les frais étaient de %1$s et dépassent %2$s%% du montant. Cette configuration peut être changée.</string>
     <string name="notif_rejected_over_relative_timeout">Les frais étaient de %1$s et dépassent %2$s%% du montant. Le dépôt expirera le %3$s.</string>
     <string name="notif_rejected_amount_too_low">Le montant du paiement est trop faible.</string>
-    <string name="notif_rejected_generic_error">Une erreur s\'est produite lors du financement. Veuillez réessayer plus tard.</string>
+    <string name="notif_rejected_generic_error">Une erreur est survenue lors de l\'ajout de fonds. Veuillez réessayer plus tard.</string>
 
     <string name="notif_watcher_revoked_commit_title">Veuillez démarrer Phoenix</string>
     <string name="notif_watcher_revoked_commit_message">Certains de vos canaux pourraient avoir fermé.</string>
@@ -249,9 +249,10 @@
 
     <!-- payment details -->
 
-    <string name="paymentdetails_funding_fees_label">Frais de\nminage</string>
+    <string name="paymentdetails_liquidity_purchase_label">Liquidité</string>
+    <string name="paymentdetails_funding_fees_label">Frais de minage</string>
     <string name="paymentdetails_funding_fees_desc">Frais payés aux mineurs du réseau Bitcoin pour traiter la transaction on-chain.</string>
-    <string name="paymentdetails_service_fees_label">Frais de\nservice</string>
+    <string name="paymentdetails_service_fees_label">Frais de service</string>
     <string name="paymentdetails_service_fees_desc">Frais payés pour la création d\'un nouveau canal de paiement. Cette action n\'est pas toujours nécessaire.</string>
     <string name="paymentdetails_liquidity_service_fee_label">Frais de\nservice</string>
     <string name="paymentdetails_liquidity_service_fee_help">Frais payés pour le service de liquidité.</string>
@@ -394,6 +395,7 @@
 
     <string name="liquidityads_error_header">La demande de liquidité a échoué</string>
     <string name="liquidityads_error_channels_unavailable">Vos canaux ne sont pas disponibles. Réessayez plus tard.</string>
+    <string name="liquidityads_error_invalid_funding_amount">Le montant demandé n\'est pas valide.</string>
 
     <!-- payment line -->
 

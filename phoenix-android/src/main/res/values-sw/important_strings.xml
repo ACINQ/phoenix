@@ -251,6 +251,7 @@
 
   <!-- payment details -->
 
+  <string name="paymentdetails_liquidity_purchase_label">Ukwasi</string>
   <string name="paymentdetails_funding_fees_label">Ada za wachimba madini</string>
   <string name="paymentdetails_funding_fees_desc">Ada zilizolipwa kwa wachimba madini wa mtandao wa Bitcoin kushughulikia muamala wa mtandaoni.</string>
   <string name="paymentdetails_service_fees_label">Ada za huduma</string>
@@ -397,6 +398,7 @@
 
     <string name="liquidityads_error_header">Ombi la ukwasi limeshindwa</string>
     <string name="liquidityads_error_channels_unavailable">Njia hazipatikani. Jaribu tena baadaye.</string>
+    <string name="liquidityads_error_invalid_funding_amount">Kiasi kilichoombwa ni batili.</string>
 
     <!-- payment line -->
 

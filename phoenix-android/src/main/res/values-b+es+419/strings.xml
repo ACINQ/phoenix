@@ -331,6 +331,7 @@
     <string name="paymentdetails_lnurlpay_action_aes_decrypting">Desencriptando mensaje…</string>
 
     <string name="paymentdetails_desc_label">Descripción</string>
+    <string name="paymentdetails_note_label">Nota</string>
     <string name="paymentdetails_destination_label">Enviado a</string>
     <string name="paymentdetails_destination_cpfp_value">Mineros de Bitcoin</string>
     <string name="paymentdetails_fees_label">Comisiones</string>

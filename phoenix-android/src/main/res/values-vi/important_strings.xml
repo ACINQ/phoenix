@@ -255,6 +255,7 @@
 
     <!-- payment details -->
 
+    <string name="paymentdetails_liquidity_purchase_label">Thanh khoản</string>
     <string name="paymentdetails_funding_fees_label">Các khoản phí đào</string>
     <string name="paymentdetails_funding_fees_desc">Phí thanh toán cho mạng lưới thợ đào Bitcoin để xử lý giao dịch on-chain.</string>
     <string name="paymentdetails_service_fees_label">Phí dịch vụ</string>
@@ -401,6 +402,7 @@
 
     <string name="liquidityads_error_header">Yêu cầu thanh khoản không thành công</string>
     <string name="liquidityads_error_channels_unavailable">Các kênh đang bận. Vui lòng thử lại sau.</string>
+    <string name="liquidityads_error_invalid_funding_amount">Số tiền được yêu cầu không hợp lệ.</string>
 
     <!-- payment line -->
 

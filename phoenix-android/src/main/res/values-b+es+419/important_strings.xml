@@ -246,6 +246,7 @@
 
     <!-- payment details -->
 
+    <string name="paymentdetails_liquidity_purchase_label">Liquidez</string>
     <string name="paymentdetails_funding_fees_label">Comisiones de minería</string>
     <string name="paymentdetails_funding_fees_desc">Comisiones pagadas a los mineros de la red Bitcoin para procesar la transacción en la cadena.</string>
     <string name="paymentdetails_service_fees_label">Comisiones de servicio</string>
@@ -382,6 +383,7 @@
 
     <string name="liquidityads_error_header">Error al solicitar liquidez</string>
     <string name="liquidityads_error_channels_unavailable">Los canales no están disponibles. Vuelve a intentarlo más tarde.</string>
+    <string name="liquidityads_error_invalid_funding_amount">El importe solicitado no es válido.</string>
 
     <!-- payment line -->
 

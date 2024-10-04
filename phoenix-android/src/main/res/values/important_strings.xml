@@ -256,6 +256,7 @@
     <string name="paymentdetails_service_fees_label">Service fees</string>
     <string name="paymentdetails_service_fees_desc">Fees paid for the creation of a new payment channel. This is not always required.</string>
 
+    <string name="paymentdetails_liquidity_purchase_label">Liquidity</string>
     <string name="paymentdetails_liquidity_service_fee_label">Service fees</string>
     <string name="paymentdetails_liquidity_service_fee_help">Fees paid for the liquidity service.</string>
     <string name="paymentdetails_liquidity_miner_fee_label">Miner fees</string>
@@ -398,6 +399,7 @@
 
     <string name="liquidityads_error_header">Liquidity request has failed</string>
     <string name="liquidityads_error_channels_unavailable">Channels are not available. Try again later.</string>
+    <string name="liquidityads_error_invalid_funding_amount">The requested amount is invalid.</string>
 
     <!-- payment line -->
 

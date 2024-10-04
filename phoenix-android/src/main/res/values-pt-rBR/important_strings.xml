@@ -248,6 +248,7 @@
 
     <!-- payment details -->
 
+    <string name="paymentdetails_liquidity_purchase_label">Liquidez</string>
     <string name="paymentdetails_funding_fees_label">Taxas do minerador</string>
     <string name="paymentdetails_funding_fees_desc">Taxas pagas aos mineradores da rede Bitcoin para processar a transação na cadeia.</string>
     <string name="paymentdetails_service_fees_label">Taxas de serviço</string>
@@ -389,6 +390,7 @@
 
     <string name="liquidityads_error_header">A solicitação de liquidez falhou</string>
     <string name="liquidityads_error_channels_unavailable">Os canais não estão disponíveis. Tente novamente mais tarde.</string>
+    <string name="liquidityads_error_invalid_funding_amount">O valor solicitado é inválido.</string>
 
     <!-- payment line -->
 

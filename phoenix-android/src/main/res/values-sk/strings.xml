@@ -358,6 +358,7 @@
     <string name="paymentdetails_lnurlpay_action_aes_decrypting">Dešifrovanie správy…</string>
 
     <string name="paymentdetails_desc_label">Popis</string>
+    <string name="paymentdetails_note_label">Poznámka</string>
     <string name="paymentdetails_destination_label">Poslané</string>
     <string name="paymentdetails_destination_cpfp_value">Bitcoinoví ťažiari</string>
     <string name="paymentdetails_fees_label">Poplatky</string>

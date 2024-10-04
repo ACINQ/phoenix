@@ -155,7 +155,7 @@ fun PaymentsHistoryView(
                     val hasMorePaymentsToFetch = payments.size < allPaymentsCount
                     if (hasMorePaymentsToFetch) {
                         // Subscribe to a bit more payments. Ideally would be the screen height / height of each payment.
-                        paymentsViewModel.subscribeToPayments(offset = 0, count = index + 16)
+                        paymentsViewModel.subscribeToPayments(offset = 0, count = index + 14)
                     }
                 }
         }

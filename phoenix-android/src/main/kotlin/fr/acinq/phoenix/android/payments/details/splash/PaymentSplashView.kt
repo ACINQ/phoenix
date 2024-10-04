@@ -151,7 +151,7 @@ fun SplashDescription(
             }
         }
     }
-    SplashLabelRow(label = if (userDescription.isNullOrBlank()) "" else "Note") {
+    SplashLabelRow(label = if (userDescription.isNullOrBlank()) "" else stringResource(id = R.string.paymentdetails_note_label)) {
         SplashClickableContent(onClick = { showEditDescriptionDialog = true }) {
             if (!userDescription.isNullOrBlank()) {
                 Text(text = userDescription)

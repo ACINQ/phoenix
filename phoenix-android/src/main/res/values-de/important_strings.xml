@@ -245,6 +245,7 @@
 
     <!-- payment details -->
 
+    <string name="paymentdetails_liquidity_purchase_label">Liquidität</string>
     <string name="paymentdetails_funding_fees_label">Miner-Gebühren</string>
     <string name="paymentdetails_funding_fees_desc">Gebühren, die an die Miner des Bitcoin-Netzwerks für die Verarbeitung der On-Chain-Transaktion gezahlt werden.</string>
     <string name="paymentdetails_service_fees_label">Service-Gebühr</string>
@@ -391,6 +392,7 @@
 
     <string name="liquidityads_error_header">Liquiditätsanfrage ist fehlgeschlagen</string>
     <string name="liquidityads_error_channels_unavailable">Kanäle sind nicht verfügbar. Versuchen Sie es später erneut.</string>
+    <string name="liquidityads_error_invalid_funding_amount">Der angeforderte Betrag ist ungültig.</string>
 
     <!-- payment line -->
 

@@ -257,7 +257,7 @@ private fun RequestLiquidityBottomSection(
         is RequestLiquidityState.Error.InvalidFundingAmount -> {
             ErrorMessage(
                 header =  stringResource(id = R.string.liquidityads_error_header),
-                details = "Invalid amount requested. Please try again."
+                details = stringResource(id = R.string.liquidityads_error_invalid_funding_amount)
             )
         }
         is RequestLiquidityState.Error.Thrown -> {

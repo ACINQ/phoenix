@@ -380,6 +380,7 @@
     <string name="paymentdetails_lnurlpay_action_aes_decrypting">Decrypting message…</string>
 
     <string name="paymentdetails_desc_label">Description</string>
+    <string name="paymentdetails_note_label">Note</string>
     <string name="paymentdetails_destination_label">Sent to</string>
     <string name="paymentdetails_destination_cpfp_value">Bitcoin miners</string>
     <string name="paymentdetails_fees_label">Fees</string>
@@ -821,6 +822,8 @@
     <string name="splice_error_invalid_pubkey">Invalid splice-out pubkey script</string>
     <string name="splice_error_splice_in_progress">A splice payment is already in progress</string>
     <string name="splice_error_invalid_liquidity_ads">Invalid liquidity-ads request: [%1$s]</string>
+    <string name="splice_error_invalid_channel_params">Invalid channel parameters: [%1$s]</string>
+    <string name="splice_error_unexpected">Unexpected error: [%1$s]</string>
 
     <!-- reset wallet -->
 

@@ -338,6 +338,7 @@
     <string name="paymentdetails_lnurlpay_action_aes_decrypting">Nachricht entschlüsseln..</string>
 
     <string name="paymentdetails_desc_label">Beschreibung</string>
+    <string name="paymentdetails_note_label">Hinweis</string>
     <string name="paymentdetails_destination_label">Gesendet an</string>
     <string name="paymentdetails_destination_cpfp_value">Bitcoin-Miner</string>
     <string name="paymentdetails_fees_label">Gebühren</string>

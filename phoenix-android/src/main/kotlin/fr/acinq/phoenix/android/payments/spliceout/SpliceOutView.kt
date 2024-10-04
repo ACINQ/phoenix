@@ -431,6 +431,6 @@ fun spliceFailureDetails(spliceFailure: ChannelFundingResponse.Failure): String 
     is ChannelFundingResponse.Failure.InvalidSpliceOutPubKeyScript -> stringResource(id = R.string.splice_error_invalid_pubkey)
     is ChannelFundingResponse.Failure.SpliceAlreadyInProgress -> stringResource(id = R.string.splice_error_splice_in_progress)
     is ChannelFundingResponse.Failure.InvalidLiquidityAds -> stringResource(id = R.string.splice_error_invalid_liquidity_ads, spliceFailure.reason.details())
-    is ChannelFundingResponse.Failure.InvalidChannelParameters -> TODO()
-    is ChannelFundingResponse.Failure.UnexpectedMessage -> TODO()
+    is ChannelFundingResponse.Failure.InvalidChannelParameters -> stringResource(id = R.string.splice_error_invalid_channel_params, spliceFailure.reason.details())
+    is ChannelFundingResponse.Failure.UnexpectedMessage -> stringResource(id = R.string.splice_error_unexpected, spliceFailure.msg.type.toString())
 }
