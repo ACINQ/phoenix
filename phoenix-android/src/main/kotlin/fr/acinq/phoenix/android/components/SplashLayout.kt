@@ -27,6 +27,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -135,11 +136,15 @@ fun SplashLabelRow(
             if (helpMessage != null) {
                 IconPopup(modifier = Modifier.offset(y = (-3).dp), popupMessage = helpMessage, popupLink = helpLink, spaceLeft = 0.dp, spaceRight = 5.dp)
             }
+            // workaround for issuetracker.google.com/issues/206039942
+            // to avoid a wrapped label with lots of empty space on the right, use IntrinsicSize.Min -- but only if the label is already long enough
+            val tryToWrap = remember(label) { label.length > 13 }
             Text(
                 text = label.uppercase(),
                 style = MaterialTheme.typography.subtitle1.copy(fontSize = 12.sp),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
+                modifier = if (tryToWrap) Modifier.width(IntrinsicSize.Min) else Modifier
             )
             if (icon != null) {
                 Spacer(modifier = Modifier.width(3.dp))
