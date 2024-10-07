@@ -167,6 +167,20 @@ class PaymentsManager(
         return paymentsDb().getInboundLiquidityPurchase(txId)
     }
 
+    /**
+     * Returns the inbound liquidity purchase relevant to a given transaction id.
+     *
+     * It is used to track the fees that may have been incurred by an incoming payment because of low liquidity. To do
+     * that, we use the transaction id attached to the incoming payment, and find any purchase that matches.
+     *
+     * This allows us to display the fees of a liquidity purchase inside an incoming payment details screen.
+     */
+    suspend fun listIncomingPaymentsForTxId(
+        txId: TxId
+    ): List<WalletPaymentId.IncomingPaymentId> {
+        return paymentsDb().getWalletPaymentIdForTxId(txId).filterIsInstance<WalletPaymentId.IncomingPaymentId>()
+    }
+
     suspend fun getPayment(
         id: WalletPaymentId,
         options: WalletPaymentFetchOptions

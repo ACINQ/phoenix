@@ -22,13 +22,10 @@ import app.cash.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
 import fr.acinq.bitcoin.TxId
-import fr.acinq.bitcoin.utils.Either
-import fr.acinq.lightning.channel.ChannelException
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.utils.*
-import fr.acinq.lightning.wire.FailureMessage
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentMetadata
@@ -384,6 +381,12 @@ class SqlitePaymentsDb(
 
     suspend fun listUnconfirmedTransactions(): Flow<List<ByteArray>> = withContext(Dispatchers.Default) {
         linkTxToPaymentQueries.listUnconfirmedTxs()
+    }
+
+    suspend fun getWalletPaymentIdForTxId(
+        txId: TxId
+    ): List<WalletPaymentId> = withContext(Dispatchers.Default) {
+        linkTxToPaymentQueries.listWalletPaymentIdsForTx(txId)
     }
 
     suspend fun listPaymentsForTxId(
