@@ -85,6 +85,7 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
     override suspend fun doWork(): Result {
         log.info("starting in-flight-payments watcher")
         var business: PhoenixBusiness? = null
+        var closeDatabases = true
 
         try {
 
@@ -143,6 +144,7 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
                             when (state) {
                                 is NodeServiceState.Init, is NodeServiceState.Running, is NodeServiceState.Error, NodeServiceState.Disconnected -> {
                                     log.info("interrupting $name: node service in state=${state.name}")
+                                    closeDatabases = false
                                     stopJobs.value = true
                                     scheduleOnce(applicationContext)
                                 }
@@ -214,7 +216,7 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
             return Result.failure()
         } finally {
             business?.appConnectionsDaemon?.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.All)
-            business?.stop()
+            business?.stop(closeDatabases = closeDatabases)
             log.info("terminated $name...")
         }
     }
