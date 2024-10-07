@@ -68,6 +68,7 @@ class DailyConnect(context: Context, workerParams: WorkerParameters) : Coroutine
     override suspend fun doWork(): Result {
         log.info("starting daily-connect job")
         var business: PhoenixBusiness? = null
+        var closeDatabases = true
 
         try {
             val application = (applicationContext as PhoenixApplication)
@@ -101,6 +102,7 @@ class DailyConnect(context: Context, workerParams: WorkerParameters) : Coroutine
                     service.value = null
                 }
             }
+
             Intent(applicationContext, NodeService::class.java).let { intent ->
                 applicationContext.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
             }
@@ -116,6 +118,7 @@ class DailyConnect(context: Context, workerParams: WorkerParameters) : Coroutine
                         when (state) {
                             is NodeServiceState.Init, is NodeServiceState.Running, is NodeServiceState.Error, NodeServiceState.Disconnected -> {
                                 log.info("aborting $name: node service in state=${state.name}")
+                                closeDatabases = false
                                 stopJobSignal.value = true
                             }
 
@@ -165,7 +168,7 @@ class DailyConnect(context: Context, workerParams: WorkerParameters) : Coroutine
             return Result.failure()
         } finally {
             business?.appConnectionsDaemon?.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.All)
-            business?.stop()
+            business?.stop(closeDatabases = closeDatabases)
             log.info("terminated $name")
         }
     }

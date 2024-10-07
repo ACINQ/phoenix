@@ -113,27 +113,29 @@ class PhoenixBusiness(
      * It's recommended that you close the network connections (electrum + peer)
      * BEFORE invoking this function, to ensure a clean disconnect from the server.
      */
-    fun stop() {
-        logger.info { "stopping business" }
+    fun stop(closeDatabases: Boolean = true) {
+        logger.info { "stopping business (close_db=$closeDatabases)" }
         electrumClient.stop()
         electrumWatcher.stop()
         electrumWatcher.cancel()
         appConnectionsDaemon?.cancel()
-        appDb.close()
         networkMonitor.stop()
-        walletManager.cancel()
-        nodeParamsManager.cancel()
-        databaseManager.close()
-        databaseManager.cancel()
-        databaseManager.cancel()
-        peerManager.peerState.value?.cancel()
-        peerManager.cancel()
-        paymentsManager.cancel()
-        appConfigurationManager.cancel()
-        currencyManager.cancel()
-        lnurlManager.cancel()
         notificationsManager.cancel()
         contactsManager.cancel()
+        currencyManager.cancel()
+        paymentsManager.cancel()
+        walletManager.cancel()
+        nodeParamsManager.cancel()
+        peerManager.peerState.value?.cancel()
+        peerManager.cancel()
+        appConfigurationManager.cancel()
+        if (closeDatabases) {
+            appDb.close()
+            databaseManager.close()
+        }
+        databaseManager.cancel()
+        lnurlManager.cancel()
+        logger.info { "stopped business" }
     }
 
     // The (node_id, fcm_token) tuple only needs to be registered once.
