@@ -135,8 +135,8 @@
 
     <string name="receive_lightning_warning_message_above_limit">Pre obdržanie tejto sumy sa očakáva poplatok vo výške %1$s a tento poplatok je vyšší než váš limit %2$s.\n\nZvýšte tento limit v nastavení správy kanálov.</string>
     <string name="receive_lightning_warning_message_above_limit_or_liquidity">Pre obdržanie tejto sumy sa očakáva poplatok vo výške %1$s a tento poplatok je vyšší než váš limit %2$s.\n\nZvýšte tento limit v nastavení správy kanálov alebo požiadajte o dodatočnú likviditu.</string>
-    <string name="receive_lightning_warning_message_above_limit_percent">Očakáva sa, že tento poplatok bude vo výške %1$s, a tento poplatok je vyšší než %2$s% sumy.\n\nZvýšte tento limit v nastavení správy kanálov.</string>
-    <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Očakáva sa, že tento poplatok bude vo výške %1$s, a tento poplatok je vyšší než %2$s% sumy.\n\nZvýšte tento limit v nastavení správy kanálov alebo požiadajte o dodatočnú likviditu.</string>
+    <string name="receive_lightning_warning_message_above_limit_percent">Očakáva sa, že tento poplatok bude vo výške %1$s, a tento poplatok je vyšší než %2$s%% sumy.\n\nZvýšte tento limit v nastavení správy kanálov.</string>
+    <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Očakáva sa, že tento poplatok bude vo výške %1$s, a tento poplatok je vyšší než %2$s%% sumy.\n\nZvýšte tento limit v nastavení správy kanálov alebo požiadajte o dodatočnú likviditu.</string>
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Prichádzajúca likvidita nie je dostatočná a máte zakázanú automatickú správu kanálov.</string>
 
