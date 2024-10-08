@@ -129,7 +129,3 @@ fun InboundLiquidityOutgoingPayment.isManualPurchase(): Boolean =
  */
 fun InboundLiquidityOutgoingPayment.isPaidInTheFuture(): Boolean =
     feePaidFromChannelBalance.total == 0.sat
-
-fun InboundLiquidityOutgoingPayment.isChannelCreationFromSwapIn(): Boolean =
-    purchase.paymentDetails is LiquidityAds.PaymentDetails.FromChannelBalance &&
-    purchase.amount == 1.sat
