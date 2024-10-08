@@ -1,5 +1,3 @@
-import fr.acinq.phoenix.db.payments.InboundLiquidityLeaseTypeVersion;
-
 -- Migration: v9 -> v10
 --
 -- Changes:
