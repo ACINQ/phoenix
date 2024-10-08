@@ -1,0 +1,8 @@
+import fr.acinq.phoenix.db.payments.InboundLiquidityLeaseTypeVersion;
+
+-- Migration: v10 -> v11
+--
+-- Changes:
+-- * Added a new column [liquidity_amount_sat] in table [inbound_liquidity_outgoing_payments]
+
+ALTER TABLE inbound_liquidity_outgoing_payments ADD COLUMN liquidity_amount_sat INTEGER DEFAULT NULL;

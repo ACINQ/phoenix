@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS inbound_liquidity_outgoing_payments (
     tx_id BLOB NOT NULL,
     lease_type TEXT NOT NULL,
     lease_blob BLOB NOT NULL,
+    liquidity_amount_sat INTEGER DEFAULT NULL,
     payment_details_type TEXT DEFAULT NULL,
     created_at INTEGER NOT NULL,
     confirmed_at INTEGER DEFAULT NULL,
@@ -15,8 +16,8 @@ CREATE TABLE IF NOT EXISTS inbound_liquidity_outgoing_payments (
 
 insert:
 INSERT INTO inbound_liquidity_outgoing_payments (
-    id, mining_fees_sat, channel_id, tx_id, lease_type, lease_blob, payment_details_type, created_at, confirmed_at, locked_at
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    id, mining_fees_sat, channel_id, tx_id, lease_type, lease_blob, liquidity_amount_sat, payment_details_type, created_at, confirmed_at, locked_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 setConfirmed:
 UPDATE inbound_liquidity_outgoing_payments SET confirmed_at=? WHERE id=?;

@@ -43,6 +43,7 @@ class InboundLiquidityQueries(val database: PaymentsDatabase) {
                    is LiquidityAds.Purchase.WithFeeCredit -> "WITH_FEE_CREDIT"
                },
                lease_blob = payment.purchase.encodeAsDb(),
+               liquidity_amount_sat = payment.purchase.amount.sat,
                payment_details_type = when (payment.purchase.paymentDetails) {
                    is LiquidityAds.PaymentDetails.FromChannelBalance -> "FROM_CHANNEL_BALANCE"
                    is LiquidityAds.PaymentDetails.FromFutureHtlc -> "FROM_FUTURE_HTLC"

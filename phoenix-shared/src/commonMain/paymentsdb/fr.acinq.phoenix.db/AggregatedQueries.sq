@@ -49,6 +49,8 @@ UNION ALL
         locked_at    AS completed_at,
         created_at   AS order_ts
     FROM inbound_liquidity_outgoing_payments
+    -- only retrieve liquidity purchases that are legacy (amount null) or that are not linked to new-otf-swap-ins (which only add 1 sat liquidity)
+    WHERE liquidity_amount_sat IS NULL OR liquidity_amount_sat > 1
 UNION ALL
     SELECT
         1                        AS type,
@@ -77,6 +79,7 @@ SELECT SUM(result) AS result FROM (
     SELECT COUNT(*) AS result FROM splice_cpfp_outgoing_payments
     UNION ALL
     SELECT COUNT(*) AS result FROM inbound_liquidity_outgoing_payments
+    WHERE liquidity_amount_sat IS NULL OR liquidity_amount_sat > 1
     UNION ALL
     SELECT COUNT(*) AS result FROM incoming_payments WHERE received_at IS NOT NULL AND received_with_blob IS NOT NULL
 );
@@ -136,6 +139,7 @@ UNION ALL
         locked_at    AS completed_at
     FROM inbound_liquidity_outgoing_payments
     WHERE locked_at >= :date
+    AND (liquidity_amount_sat IS NULL OR liquidity_amount_sat > 1)
 UNION ALL
     SELECT
         1                        AS type,
@@ -226,6 +230,7 @@ UNION ALL
     FROM inbound_liquidity_outgoing_payments
     WHERE inbound_liquidity_outgoing_payments.locked_at IS NOT NULL
     AND   inbound_liquidity_outgoing_payments.locked_at BETWEEN :startDate AND :endDate
+    AND   (inbound_liquidity_outgoing_payments.liquidity_amount_sat IS NULL OR inbound_liquidity_outgoing_payments.liquidity_amount_sat > 1)
 UNION ALL
     SELECT
         1                        AS type,
@@ -268,6 +273,7 @@ UNION ALL
     FROM inbound_liquidity_outgoing_payments
     WHERE inbound_liquidity_outgoing_payments.locked_at IS NOT NULL
     AND   inbound_liquidity_outgoing_payments.locked_at BETWEEN :startDate AND :endDate
+    AND   (inbound_liquidity_outgoing_payments.liquidity_amount_sat IS NULL OR inbound_liquidity_outgoing_payments.liquidity_amount_sat > 1)
 UNION ALL
     SELECT COUNT(*) AS result FROM incoming_payments
     WHERE incoming_payments.received_at BETWEEN :startDate AND :endDate
