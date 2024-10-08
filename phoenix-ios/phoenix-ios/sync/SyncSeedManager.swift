@@ -49,9 +49,10 @@ class SyncSeedManager: SyncManagerProtcol {
 	///
 	private let recoveryPhrase: RecoveryPhrase
 	
-	/// The wallet info, such as nodeID, cloudKey, etc.
+	/// The wallet's unique identification in the cloud.
+	/// Also used in Prefs.
 	///
-	private let walletInfo: WalletManager.WalletInfo
+	private let walletId: WalletIdentifier
 	
 	/// Informs the user interface regarding the activities of the SyncSeedManager.
 	/// This includes various errors & active upload progress.
@@ -78,13 +79,13 @@ class SyncSeedManager: SyncManagerProtcol {
 		
 		self.chain = chain
 		self.recoveryPhrase = recoveryPhrase
-		self.walletInfo = walletInfo
+		
+		let _walletId = WalletIdentifier(chain: chain, walletInfo: walletInfo)
+		self.walletId = _walletId
 		
 		actor = SyncSeedManager_Actor(
 			isEnabled: Prefs.shared.backupSeed.isEnabled,
-			hasUploadedSeed: Prefs.shared.backupSeed.hasUploadedSeed(
-				encryptedNodeId: walletInfo.encryptedNodeId
-			)
+			hasUploadedSeed: Prefs.shared.backupSeed.hasUploadedSeed(_walletId)
 		)
 		statePublisher = CurrentValueSubject<SyncSeedManager_State, Never>(actor.initialState)
 		
@@ -92,10 +93,6 @@ class SyncSeedManager: SyncManagerProtcol {
 		startNameMonitor()
 		
 		startUpgradeTask()
-	}
-	
-	var encryptedNodeId: String {
-		walletInfo.encryptedNodeId
 	}
 	
 	// ----------------------------------------
@@ -558,7 +555,7 @@ class SyncSeedManager: SyncManagerProtcol {
 	private func uploadSeed() {
 		log.trace("uploadSeed()")
 		
-		let uploadedName = Prefs.shared.backupSeed.name(encryptedNodeId: encryptedNodeId) ?? ""
+		let uploadedName = Prefs.shared.backupSeed.name(walletId) ?? ""
 		Task {
 			log.trace("uploadSeed(): starting task")
 			
@@ -632,14 +629,14 @@ class SyncSeedManager: SyncManagerProtcol {
 					// Since this is an async process, the user may have changed the seed name again
 					// while we were uploading the original name. So we need to check for that.
 					
-					let currentName = Prefs.shared.backupSeed.name(encryptedNodeId: self.encryptedNodeId) ?? ""
+					let currentName = Prefs.shared.backupSeed.name(walletId) ?? ""
 					let needsReUpload = currentName != uploadedName
 					
 					if needsReUpload {
 						log.debug("uploadSeed(): finished: needsReUpload")
 					} else {
 						log.trace("uploadSeed(): finished: success")
-						Prefs.shared.backupSeed.setHasUploadedSeed(true, encryptedNodeId: self.encryptedNodeId)
+						Prefs.shared.backupSeed.setHasUploadedSeed(true, walletId)
 					}
 					self.consecutiveErrorCount = 0
 					
@@ -730,7 +727,7 @@ class SyncSeedManager: SyncManagerProtcol {
 					
 					log.trace("deleteSeed(): finish: success")
 					
-					Prefs.shared.backupSeed.setHasUploadedSeed(false, encryptedNodeId: self.encryptedNodeId)
+					Prefs.shared.backupSeed.setHasUploadedSeed(false, walletId)
 					self.consecutiveErrorCount = 0
 					
 					Task {
@@ -765,7 +762,7 @@ class SyncSeedManager: SyncManagerProtcol {
 	private func recordID() -> CKRecord.ID {
 		
 		return CKRecord.ID(
-			recordName: encryptedNodeId,
+			recordName: walletId.encryptedNodeId,
 			zoneID: CKRecordZone.default().zoneID
 		)
 	}

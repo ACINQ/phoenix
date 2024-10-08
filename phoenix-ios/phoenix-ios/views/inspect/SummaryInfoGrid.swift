@@ -87,9 +87,6 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 			paymentErrorRow()
 		}
 		.padding([.leading, .trailing])
-		.onAppear {
-			onAppear()
-		}
 	}
 	
 	@ViewBuilder
@@ -645,7 +642,7 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 					Button {
 						switchToPayment(paymentId)
 					} label: {
-						Text(paymentId.dbId)
+						Text(verbatim: "\(paymentId.dbId.prefix(maxLength: 8))…")
 							.lineLimit(1)
 							.truncationMode(.middle)
 					}
@@ -690,27 +687,6 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 				Text(pError)
 				
 			} // </InfoGridRow>
-		}
-	}
-	
-	// --------------------------------------------------
-	// MARK: Notifications
-	// --------------------------------------------------
-	
-	func onAppear() {
-		log.trace("onAppear()")
-		
-		if let liquidity = paymentInfo.payment as? Lightning_kmpInboundLiquidityOutgoingPayment {
-			log.debug("is: Lightning_kmpInboundLiquidityOutgoingPayment")
-			
-			if let paymentId = liquidity.relatedPaymentIds().first {
-				log.debug("paymentId = \(paymentId.dbId)")
-			} else {
-				log.debug("paymentId = nil")
-			}
-			
-		} else {
-			log.debug("is NOT: Lightning_kmpInboundLiquidityOutgoingPayment")
 		}
 	}
 	

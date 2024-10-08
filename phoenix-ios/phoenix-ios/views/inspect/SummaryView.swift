@@ -47,9 +47,13 @@ struct SummaryView: View {
 	
 	@State var didAppear = false
 	
-	@State var buttonListTruncationDetection_standard: [DynamicTypeSize: Bool] = [:]
-	@State var buttonListTruncationDetection_squeezed: [DynamicTypeSize: Bool] = [:]
-	@State var buttonListTruncationDetection_compact: [DynamicTypeSize: Bool] = [:]
+	enum ButtonListType: Int {
+		case standard = 1
+		case squeezed = 2
+		case compact = 3
+		case accessible = 4
+	}
+	@State var buttonListType: [DynamicTypeSize: ButtonListType] = [:]
 	
 	// <iOS_16_workarounds>
 	@State var navLinkTag: NavLinkTag? = nil
@@ -312,97 +316,105 @@ struct SummaryView: View {
 	@ViewBuilder
 	func header_blockchainStatus(_ onChainPayment: Lightning_kmpOnChainOutgoingPayment) -> some View {
 		
-		switch blockchainConfirmations {
-		case .none:
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
-			HStack(alignment: VerticalAlignment.center, spacing: 4) {
-				ProgressView()
-					.progressViewStyle(CircularProgressViewStyle(tint: Color.secondary))
+			let confirmations = blockchainConfirmations
+			
+			ZStack(alignment: Alignment(horizontal: .center, vertical: .top)) {
 				
-				Text("Checking blockchain…")
-					.font(.callout)
-					.foregroundColor(.secondary)
-			}
-			.padding(.top, 10)
-			
-		case .some(let confirmations):
-			
-			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+				HStack(alignment: VerticalAlignment.center, spacing: 4) {
+					ProgressView()
+						.progressViewStyle(CircularProgressViewStyle(tint: Color.secondary))
+					
+					Text("Checking blockchain…")
+						.font(.callout)
+						.foregroundColor(.secondary)
+					
+				} // </HStack>
+				.isHidden(confirmations != nil)
 				
 				Button {
 					showBlockchainExplorerOptions = true
 				} label: {
-					if confirmations == 1 {
-						Text("1 confirmation")
-							.font(.subheadline)
-					} else if confirmations < 7 {
-						Text("\(confirmations) confirmations")
-							.font(.subheadline)
-					} else {
-						Text("6+ confirmations")
-							.font(.subheadline)
-					}
-				}
-				.confirmationDialog("Blockchain Explorer",
-					isPresented: $showBlockchainExplorerOptions,
-					titleVisibility: .automatic
-				) {
-					Button {
-						exploreTx(onChainPayment.txId, website: BlockchainExplorer.WebsiteMempoolSpace())
-					} label: {
-						Text(verbatim: "Mempool.space") // no localization needed
-					}
-					Button {
-						exploreTx(onChainPayment.txId, website: BlockchainExplorer.WebsiteBlockstreamInfo())
-					} label: {
-						Text(verbatim: "Blockstream.info") // no localization needed
-					}
-					Button("Copy transaction id") {
-						copyTxId(onChainPayment.txId)
-					}
-				} // </confirmationDialog>
-				
-				if confirmations == 0 && supportsBumpFee(onChainPayment) {
-					Button {
-						navigateTo(.CpfpView(onChainPayment: onChainPayment))
-					} label: {
-						Label {
-							Text("Accelerate transaction")
-						} icon: {
-							Image(systemName: "paperplane").imageScale(.small)
+					Group {
+						if let confirmations {
+							if confirmations == 1 {
+								Text("1 confirmation")
+							} else if confirmations <= 6 {
+								Text("\(confirmations) confirmations")
+							} else {
+								Text("6+ confirmations")
+							}
+						} else {
+							Text("? confirmations")
 						}
-						.font(.subheadline)
+					} // </Group>
+					.font(.subheadline)
+					
+				} // </Button>
+				.isHidden(confirmations == nil)
+				
+			} // </ZStack>
+			
+			if confirmations == 0 && supportsBumpFee(onChainPayment) {
+				Button {
+					navigateTo(.CpfpView(onChainPayment: onChainPayment))
+				} label: {
+					Label {
+						Text("Accelerate transaction")
+					} icon: {
+						Image(systemName: "paperplane").imageScale(.small)
 					}
-					.padding(.top, 3)
+					.font(.subheadline)
 				}
-				
-				if let confirmedAt = onChainPayment.confirmedAt?.int64Value.toDate(from: .milliseconds) {
-				
-					Text("confirmed")
-						.font(.subheadline)
-						.foregroundColor(.secondary)
-						.padding(.top, 20)
-					
-					Text(confirmedAt.format())
-						.font(.subheadline)
-						.foregroundColor(.secondary)
-						.padding(.top, 3)
-					
-				} else {
-					
-					Text("broadcast")
-						.font(.subheadline)
-						.foregroundColor(.secondary)
-						.padding(.top, 20)
-					
-					Text(onChainPayment.createdAt.toDate(from: .milliseconds).format())
-						.font(.subheadline)
-						.foregroundColor(.secondary)
-						.padding(.top, 3)
-				}
+				.padding(.top, 3)
 			}
-			.padding(.top, 10)
-		}
+			
+			if let confirmedAt = onChainPayment.confirmedAt?.int64Value.toDate(from: .milliseconds) {
+			
+				Text("confirmed")
+					.font(.subheadline)
+					.foregroundColor(.secondary)
+					.padding(.top, 20)
+				
+				Text(confirmedAt.format())
+					.font(.subheadline)
+					.foregroundColor(.secondary)
+					.padding(.top, 3)
+				
+			} else {
+				
+				Text("broadcast")
+					.font(.subheadline)
+					.foregroundColor(.secondary)
+					.padding(.top, 20)
+				
+				Text(onChainPayment.createdAt.toDate(from: .milliseconds).format())
+					.font(.subheadline)
+					.foregroundColor(.secondary)
+					.padding(.top, 3)
+			}
+			
+		} // </VStack>
+		.padding(.top, 10)
+		.confirmationDialog("Blockchain Explorer",
+			isPresented: $showBlockchainExplorerOptions,
+			titleVisibility: .automatic
+		) {
+			Button {
+				exploreTx(onChainPayment.txId, website: BlockchainExplorer.WebsiteMempoolSpace())
+			} label: {
+				Text(verbatim: "Mempool.space") // no localization needed
+			}
+			Button {
+				exploreTx(onChainPayment.txId, website: BlockchainExplorer.WebsiteBlockstreamInfo())
+			} label: {
+				Text(verbatim: "Blockstream.info") // no localization needed
+			}
+			Button("Copy transaction id") {
+				copyTxId(onChainPayment.txId)
+			}
+		} // </confirmationDialog>
 	}
 	
 	@ViewBuilder
@@ -523,20 +535,13 @@ struct SummaryView: View {
 	@ViewBuilder
 	func buttonList() -> some View {
 		
-		let dts = dynamicTypeSize
-		let buttonListTruncationDetected_compact = buttonListTruncationDetection_compact[dts] ?? false
-		let buttonListTruncationDetected_squeezed = buttonListTruncationDetection_squeezed[dts] ?? false
-		let buttonListTruncationDetected_standard = buttonListTruncationDetection_standard[dts] ?? false
-		
 		Group {
-			if buttonListTruncationDetected_compact {
-				buttonList_accessibility()
-			} else if buttonListTruncationDetected_squeezed {
-				buttonList_compact(dts)
-			} else if buttonListTruncationDetected_standard {
-				buttonList_squeezed(dts)
-			} else {
-				buttonList_standard(dts)
+			let type = buttonListType[dynamicTypeSize] ?? ButtonListType.standard
+			switch type {
+				case .standard   : buttonList_standard()
+				case .squeezed   : buttonList_squeezed()
+				case .compact    : buttonList_compact()
+				case .accessible : buttonList_accessibility()
 			}
 		} // </Group>
 		.confirmationDialog("Delete payment?",
@@ -550,7 +555,7 @@ struct SummaryView: View {
 	}
 	
 	@ViewBuilder
-	func buttonList_standard(_ dts: DynamicTypeSize) -> some View {
+	func buttonList_standard() -> some View {
 		
 		// We're making all the buttons the same size.
 		//
@@ -559,9 +564,11 @@ struct SummaryView: View {
 		// ---------------------------
 		//   ^          ^         ^    < same size
 		
+		let type = ButtonListType.standard
+		
 		HStack(alignment: VerticalAlignment.center, spacing: 16) {
 			
-			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+			TruncatableView(identifier: "standard-details", fixedHorizontal: true, fixedVertical: true) {
 				Button {
 					navigateTo(.DetailsView)
 				} label: {
@@ -572,33 +579,31 @@ struct SummaryView: View {
 				.read(buttonWidthReader)
 				.read(buttonHeightReader)
 			} wasTruncated: {
-				log.debug("buttonListTruncationDetection_standard[\(dts)] = true (details)")
-				buttonListTruncationDetection_standard[dts] = true
+				buttonListTruncationDetected(type, "details")
 			}
 			
-			if let buttonHeight = buttonHeight {
+			if let buttonHeight {
 				Divider().frame(height: buttonHeight)
 			}
 			
-			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+			TruncatableView(identifier: "standard-edit", fixedHorizontal: true, fixedVertical: true) {
 				Button {
 					navigateTo(.EditInfoView)
 				} label: {
 					buttonLabel_edit()
 				}
-				.frame(minWidth: buttonWidth, alignment: Alignment.trailing)
+				.frame(minWidth: buttonWidth, alignment: Alignment.center)
 				.read(buttonWidthReader)
 				.read(buttonHeightReader)
 			} wasTruncated: {
-				log.debug("buttonListTruncationDetection_standard[\(dts)] = true (edit)")
-				buttonListTruncationDetection_standard[dts] = true
+				buttonListTruncationDetected(type, "edit")
 			}
 			
-			if let buttonHeight = buttonHeight {
+			if let buttonHeight {
 				Divider().frame(height: buttonHeight)
 			}
 			
-			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+			TruncatableView(identifier: "standard-delete", fixedHorizontal: true, fixedVertical: true) {
 				Button {
 					showDeletePaymentConfirmationDialog = true
 				} label: {
@@ -608,8 +613,7 @@ struct SummaryView: View {
 				.read(buttonWidthReader)
 				.read(buttonHeightReader)
 			} wasTruncated: {
-				log.debug("buttonListTruncationDetection_standard[\(dts)] = true (delete)")
-				buttonListTruncationDetection_standard[dts] = true
+				buttonListTruncationDetected(type, "delete")
 			}
 		}
 		.padding(.all)
@@ -618,7 +622,7 @@ struct SummaryView: View {
 	}
 	
 	@ViewBuilder
-	func buttonList_squeezed(_ dts: DynamicTypeSize) -> some View {
+	func buttonList_squeezed() -> some View {
 		
 		// There's not enough space to make all the buttons the same size.
 		// So we're just making the left & right buttons the same size.
@@ -629,9 +633,11 @@ struct SummaryView: View {
 		// ---------------------------
 		//   ^                    ^    < same size
 		
+		let type = ButtonListType.squeezed
+		
 		HStack(alignment: VerticalAlignment.center, spacing: 16) {
 			
-			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+			TruncatableView(identifier: "squeezed-details", fixedHorizontal: true, fixedVertical: true) {
 				Button {
 					navigateTo(.DetailsView)
 				} label: {
@@ -642,15 +648,14 @@ struct SummaryView: View {
 				.read(buttonWidthReader)
 				.read(buttonHeightReader)
 			} wasTruncated: {
-				log.debug("buttonListTruncationDetection_squeezed[\(dts)] = true (edit)")
-				buttonListTruncationDetection_squeezed[dts] = true
+				buttonListTruncationDetected(type, "edit")
 			}
 			
-			if let buttonHeight = buttonHeight {
+			if let buttonHeight {
 				Divider().frame(height: buttonHeight)
 			}
 			
-			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+			TruncatableView(identifier: "squeezed-edit", fixedHorizontal: true, fixedVertical: true) {
 				Button {
 					navigateTo(.EditInfoView)
 				} label: {
@@ -659,15 +664,14 @@ struct SummaryView: View {
 				}
 				.read(buttonHeightReader)
 			} wasTruncated: {
-				log.debug("buttonListTruncationDetection_squeezed[\(dts)] = true (edit)")
-				buttonListTruncationDetection_squeezed[dts] = true
+				buttonListTruncationDetected(type, "edit")
 			}
 			
-			if let buttonHeight = buttonHeight {
+			if let buttonHeight {
 				Divider().frame(height: buttonHeight)
 			}
 			
-			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+			TruncatableView(identifier: "squeezed-delete", fixedHorizontal: true, fixedVertical: true) {
 				Button {
 					showDeletePaymentConfirmationDialog = true
 				} label: {
@@ -678,8 +682,7 @@ struct SummaryView: View {
 				.read(buttonWidthReader)
 				.read(buttonHeightReader)
 			} wasTruncated: {
-				log.debug("buttonListTruncationDetection_squeezed[\(dts)] = true (delete)")
-				buttonListTruncationDetection_squeezed[dts] = true
+				buttonListTruncationDetected(type, "delete")
 			}
 		}
 		.padding(.horizontal, 10) // allow content to be closer to edges
@@ -689,7 +692,7 @@ struct SummaryView: View {
 	}
 	
 	@ViewBuilder
-	func buttonList_compact(_ dts: DynamicTypeSize) -> some View {
+	func buttonList_compact() -> some View {
 		
 		// There's a large font being used, and possibly a small screen too.
 		// Thus horizontal space is tight.
@@ -701,9 +704,11 @@ struct SummaryView: View {
 		// -----------------------
 		//             ^ might not be centered, but at least the buttons fit on 1 line
 		
+		let type = ButtonListType.compact
+		
 		HStack(alignment: VerticalAlignment.center, spacing: 8) {
 			
-			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+			TruncatableView(identifier: "compatct-details", fixedHorizontal: true, fixedVertical: true) {
 				Button {
 					navigateTo(.DetailsView)
 				} label: {
@@ -712,15 +717,14 @@ struct SummaryView: View {
 				}
 				.read(buttonHeightReader)
 			} wasTruncated: {
-				log.debug("buttonListTruncationDetection_compact[\(dts)] = true (details)")
-				buttonListTruncationDetection_compact[dts] = true
+				buttonListTruncationDetected(type, "details")
 			}
 			
-			if let buttonHeight = buttonHeight {
+			if let buttonHeight {
 				Divider().frame(height: buttonHeight)
 			}
 			
-			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+			TruncatableView(identifier: "compact-edit", fixedHorizontal: true, fixedVertical: true) {
 				Button {
 					navigateTo(.EditInfoView)
 				} label: {
@@ -729,15 +733,14 @@ struct SummaryView: View {
 				}
 				.read(buttonHeightReader)
 			} wasTruncated: {
-				log.debug("buttonListTruncationDetection_compact[\(dts)] = true (edit)")
-				buttonListTruncationDetection_compact[dts] = true
+				buttonListTruncationDetected(type, "edit")
 			}
 			
-			if let buttonHeight = buttonHeight {
+			if let buttonHeight {
 				Divider().frame(height: buttonHeight)
 			}
 			
-			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+			TruncatableView(identifier: "compact-delete", fixedHorizontal: true, fixedVertical: true) {
 				Button {
 					showDeletePaymentConfirmationDialog = true
 				} label: {
@@ -746,8 +749,7 @@ struct SummaryView: View {
 				}
 				.read(buttonHeightReader)
 			} wasTruncated: {
-				log.debug("buttonListTruncationDetection_compact[\(dts)] = true (delete)")
-				buttonListTruncationDetection_compact[dts] = true
+				buttonListTruncationDetected(type, "delete")
 			}
 		}
 		.padding(.horizontal, 4) // allow content to be closer to edges
@@ -776,10 +778,11 @@ struct SummaryView: View {
 					navigateTo(.DetailsView)
 				} label: {
 					buttonLabel_details()
-						.read(buttonHeightReader)
+						.lineLimit(1) // see note below
 				}
+				.read(buttonHeightReader)
 				
-				if let buttonHeight = buttonHeight {
+				if let buttonHeight {
 					Divider().frame(height: buttonHeight)
 				}
 				
@@ -787,19 +790,26 @@ struct SummaryView: View {
 					navigateTo(.EditInfoView)
 				} label: {
 					buttonLabel_edit()
-						.read(buttonHeightReader)
+						.lineLimit(1) // see note below
 				}
+				.read(buttonHeightReader)
 			}
-				
+			.assignMaxPreference(for: buttonHeightReader.key, to: $buttonHeight)
+			
 			Button {
 				showDeletePaymentConfirmationDialog = true
 			} label: {
 				buttonLabel_delete()
 			}
+			.layoutPriority(1)
+			// ^^^^^^^^^^^^^^^ On iOS 16, the layout system seems to give as much
+			// height as is available to these buttons. With the end result being that
+			// the calculated buttonHeight is way too big, and the Divider looks really odd.
+			// So we tell the UI to give priority to this button,
+			// and we restrict the other buttons to 1 line.
 		}
 		.padding(.horizontal, 4) // allow content to be closer to edges
 		.padding(.vertical)
-		.assignMaxPreference(for: buttonHeightReader.key, to: $buttonHeight)
 	}
 	
 	@ViewBuilder
@@ -1084,7 +1094,7 @@ struct SummaryView: View {
 		
 		do {
 			let result = try await Biz.business.electrumClient.kotlin_getConfirmations(txid: onChainPayment.txId)
-
+			
 			let confirmations = result?.intValue ?? 0
 			log.debug("fetchConfirmations(\(pid)): => \(confirmations)")
 			return confirmations
@@ -1106,12 +1116,26 @@ struct SummaryView: View {
 			
 			// First time displaying the SummaryView (coming from HomeView)
 			
+			// Not triggered in this particular case, so we need to trigger it manually.
+			//
+			// Note:
+			// The flow below won't automatically trigger `paymentInfoChanged` if:
+			// - !paymentInfoIsState
+			// - or the fetched payment is equal to the existing payment
+			//
+			// The latter happens when:
+			// - lastCompletedPaymentPublisher fires
+			// - HomeView fetches the payment with FetchOptions.All
+			// - HomeView displays the PaymentView with fetched `paymentInfo`
+			// - If we fetch the payment again here, it's equal to the existing payment
+			//
+			paymentInfoChanged()
+			
 			if paymentInfoIsStale {
 				// We either don't have the full payment information (missing metadata info),
 				// or the payment information is possibly stale, and needs to be refreshed.
 				
 				if let row = paymentInfo.toOrderRow() {
-
 					Biz.business.paymentsManager.fetcher.getPayment(row: row, options: fetchOptions) {
 						(result: WalletPaymentInfo?, _) in
 						
@@ -1119,9 +1143,7 @@ struct SummaryView: View {
 							paymentInfo = result
 						}
 					}
-
 				} else {
-				
 					Biz.business.paymentsManager.getPayment(id: paymentInfo.id(), options: fetchOptions) {
 						(result: WalletPaymentInfo?, _) in
 						
@@ -1130,9 +1152,6 @@ struct SummaryView: View {
 						}
 					}
 				}
-			} else {
-				// Not triggered in this particular case, so we need to trigger it manually.
-				paymentInfoChanged()
 			}
 			
 		} else {
@@ -1219,6 +1238,27 @@ struct SummaryView: View {
 			if case .embedded(let popTo) = location {
 				popTo(destination)
 			}
+		}
+	}
+	
+	func buttonListTruncationDetected(_ type: ButtonListType, _ identifier: String) {
+		
+		switch type {
+		case .standard:
+			log.debug("buttonListTruncationDetected: standard (\(identifier))")
+			buttonListType[dynamicTypeSize] = .squeezed
+		
+		case .squeezed:
+			log.debug("buttonListTruncationDetected: squeezed (\(identifier))")
+			buttonListType[dynamicTypeSize] = .compact
+			
+		case .compact:
+			log.debug("buttonListTruncationDetected: compact (\(identifier))")
+			buttonListType[dynamicTypeSize] = .accessible
+			
+		case .accessible:
+			log.debug("buttonListTruncationDetected: accessible (\(identifier))")
+			break
 		}
 	}
 	

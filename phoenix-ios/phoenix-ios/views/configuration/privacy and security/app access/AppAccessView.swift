@@ -57,8 +57,8 @@ struct AppAccessView : View {
 		
 		_customPinSet = State(initialValue: AppSecurity.shared.hasCustomPin())
 		
-		if let encryptedNodeId = Biz.encryptedNodeId {
-			backupSeedStatePublisher = Prefs.shared.backupSeedStatePublisher(encryptedNodeId)
+		if let walletId = Biz.walletId {
+			backupSeedStatePublisher = Prefs.shared.backupSeedStatePublisher(walletId)
 		} else {
 			backupSeedStatePublisher = PassthroughSubject<BackupSeedState, Never>().eraseToAnyPublisher()
 		}

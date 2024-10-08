@@ -239,7 +239,7 @@ class Prefs {
 	// MARK: Reset Wallet
 	// --------------------------------------------------
 
-	func resetWallet(encryptedNodeId: String) {
+	func resetWallet(_ walletId: WalletIdentifier) {
 
 		// Purposefully not resetting:
 		// - Key.theme: App feels weird when this changes unexpectedly.
@@ -258,8 +258,8 @@ class Prefs {
 		defaults.removeObject(forKey: Key.allowOverpayment.rawValue)
 		defaults.removeObject(forKey: Key.doNotShowChannelImpactWarning.rawValue)
 		
-		self.backupTransactions.resetWallet(encryptedNodeId: encryptedNodeId)
-		self.backupSeed.resetWallet(encryptedNodeId: encryptedNodeId)
+		self.backupTransactions.resetWallet(walletId)
+		self.backupSeed.resetWallet(walletId)
 	}
 
 	// --------------------------------------------------

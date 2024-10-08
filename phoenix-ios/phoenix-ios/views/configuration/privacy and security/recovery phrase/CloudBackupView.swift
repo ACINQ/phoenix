@@ -21,7 +21,7 @@ struct CloudBackupView: View {
 	
 	@State var animatingLegalToggleColor = false
 	
-	let encryptedNodeId: String
+	let walletId: WalletIdentifier
 	@State var originalName: String = ""
 	@State var name: String = ""
 	
@@ -31,7 +31,7 @@ struct CloudBackupView: View {
 	init(backupSeed_enabled: Binding<Bool>) {
 		
 		self._backupSeed_enabled = backupSeed_enabled
-		self.encryptedNodeId = Biz.encryptedNodeId!
+		self.walletId = Biz.walletId!
 	}
 	
 	// --------------------------------------------------
@@ -308,7 +308,7 @@ struct CloudBackupView: View {
 		legal_appleRisk = original_appleRisk
 		legal_governmentRisk = original_governmentRisk
 		
-		originalName = Prefs.shared.backupSeed.name(encryptedNodeId: encryptedNodeId) ?? ""
+		originalName = Prefs.shared.backupSeed.name(walletId) ?? ""
 		name = originalName
 	}
 	
@@ -372,11 +372,11 @@ struct CloudBackupView: View {
 			// But it might result in 2 uploads.
 			//
 			if toggle_enabled {
-				Prefs.shared.backupSeed.setName(name, encryptedNodeId: encryptedNodeId)
+				Prefs.shared.backupSeed.setName(name, walletId)
 				Prefs.shared.backupSeed.isEnabled = toggle_enabled
 			} else {
 				Prefs.shared.backupSeed.isEnabled = toggle_enabled
-				Prefs.shared.backupSeed.setName(name, encryptedNodeId: encryptedNodeId)
+				Prefs.shared.backupSeed.setName(name, walletId)
 			}
 		} else {
 			log.trace("!hasChanges || !canSave")
