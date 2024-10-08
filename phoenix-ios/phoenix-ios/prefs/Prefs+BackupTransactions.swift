@@ -16,7 +16,11 @@ fileprivate enum Key: String {
 	case backupTransactions_useUploadDelay
 	case hasCKRecordZone_v2
 	case hasDownloadedPayments = "hasDownloadedCKRecords"
-	case hasDownloadedContacts
+	case hasDownloadedContacts_v2
+}
+
+fileprivate enum KeyDeprecated: String {
+	case hasDownloadedContacts_v1 = "hasDownloadedContacts"
 }
 
 /// Preferences pertaining to backing up payment history in the user's own iCloud account.
@@ -120,7 +124,7 @@ class Prefs_BackupTransactions {
 	}
 	
 	private func hasDownloadedContactsKey(_ walletId: WalletIdentifier) -> String {
-		return "\(Key.hasDownloadedContacts.rawValue)-\(walletId.prefsKeySuffix)"
+		return "\(Key.hasDownloadedContacts_v2.rawValue)-\(walletId.prefsKeySuffix)"
 	}
 	
 	func hasDownloadedContacts(_ walletId: WalletIdentifier) -> Bool {
@@ -139,6 +143,8 @@ class Prefs_BackupTransactions {
 		defaults.removeObject(forKey: Key.backupTransactions_enabled.rawValue)
 		defaults.removeObject(forKey: Key.backupTransactions_useCellularData.rawValue)
 		defaults.removeObject(forKey: Key.backupTransactions_useUploadDelay.rawValue)
+		
+		defaults.removeObject(forKey: "\(KeyDeprecated.hasDownloadedContacts_v1.rawValue)-\(walletId.encryptedNodeId)")
 		
 		// Reset any publishers with stored state
 		runOnMainThread {
