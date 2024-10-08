@@ -94,7 +94,6 @@ class InboundLiquidityQueries(val database: PaymentsDatabase) {
         ): InboundLiquidityOutgoingPayment {
             return InboundLiquidityOutgoingPayment(
                 id = UUID.fromString(id),
-                miningFees = mining_fees_sat.sat,
                 channelId = channel_id.toByteVector32(),
                 txId = TxId(tx_id),
                 purchase = PurchaseData.decodeAsCanonical(lease_type, lease_blob),
