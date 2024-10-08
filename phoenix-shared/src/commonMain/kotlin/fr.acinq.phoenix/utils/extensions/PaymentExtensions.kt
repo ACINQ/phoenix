@@ -127,4 +127,9 @@ fun InboundLiquidityOutgoingPayment.isManualPurchase(): Boolean =
  * not display the fees in the liquidity details screen to avoid confusion. Instead we should link to the payment whose
  * HTLCs paid the fees.
  */
-fun InboundLiquidityOutgoingPayment.isPaidInTheFuture(): Boolean = feePaidFromChannelBalance.total == 0.sat
+fun InboundLiquidityOutgoingPayment.isPaidInTheFuture(): Boolean =
+    feePaidFromChannelBalance.total == 0.sat
+
+fun InboundLiquidityOutgoingPayment.isChannelCreationFromSwapIn(): Boolean =
+    purchase.paymentDetails is LiquidityAds.PaymentDetails.FromChannelBalance &&
+    purchase.amount == 1.sat

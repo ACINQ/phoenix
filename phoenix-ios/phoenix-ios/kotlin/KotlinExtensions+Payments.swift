@@ -364,3 +364,10 @@ extension Lightning_kmpBolt11Invoice {
 		return timestampSeconds.toDate(from: .seconds)
 	}
 }
+
+extension Lightning_kmpInboundLiquidityOutgoingPayment {
+	
+	var hidesFees: Bool {
+		return self.isPaidInTheFuture() || self.isChannelCreationFromSwapIn()
+	}
+}

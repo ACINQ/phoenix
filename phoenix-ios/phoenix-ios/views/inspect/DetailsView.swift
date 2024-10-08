@@ -1086,7 +1086,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			
 			if payment.isManualPurchase() {
 				Text("Manual")
-			} else if payment.isPaidInTheFuture() {
+			} else if payment.purchase.paymentDetails is Lightning_kmpLiquidityAdsPaymentDetailsFromFutureHtlc {
 				Text("Automatic [FromFutureHtlc]")
 			} else {
 				Text("Automatic [FromChannelBalance]")
@@ -1493,13 +1493,13 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	func minerFees() -> (Int64, String, String)? {
 		
 		if let liquidity = paymentInfo.payment as? Lightning_kmpInboundLiquidityOutgoingPayment,
-			liquidity.isPaidInTheFuture() {
+			liquidity.hidesFees {
 			// We don't display the fees here.
 			// Instead we're displaying the fees on the corresponding IncomingPayment.
 			return nil
 		} else if let result = paymentInfo.payment.minerFees() {
 			return result
-		} else if let liquidityPayment, liquidityPayment.isPaidInTheFuture() {
+		} else if let liquidityPayment, liquidityPayment.hidesFees {
 			// This is the corresponding IncomingPayment, and we have the linked liquidityPayment.
 			return liquidityPayment.minerFees()
 		} else {
@@ -1510,13 +1510,13 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	func serviceFees() -> (Int64, String, String)? {
 		
 		if let liquidity = paymentInfo.payment as? Lightning_kmpInboundLiquidityOutgoingPayment,
-			liquidity.isPaidInTheFuture() {
+			liquidity.hidesFees {
 			// We don't display the fees here.
 			// Instead we're displaying the fees on the corresponding IncomingPayment.
 			return nil
 		} else if let result = paymentInfo.payment.serviceFees() {
 			return result
-		} else if let liquidityPayment, liquidityPayment.isPaidInTheFuture() {
+		} else if let liquidityPayment, liquidityPayment.hidesFees {
 			// This is the corresponding IncomingPayment, and we have the linked liquidityPayment.
 			return liquidityPayment.serviceFees()
 		} else {
