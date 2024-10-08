@@ -49,7 +49,7 @@ UNION ALL
         locked_at    AS completed_at,
         created_at   AS order_ts
     FROM inbound_liquidity_outgoing_payments
-    -- only retrieve liquidity purchases that are legacy (amount null) or that are not linked to new-otf-swap-ins (which only add 1 sat liquidity)
+    -- only retrieve liquidity purchases that are legacy (amount=null) or that do not request liquidity (i.e. amount=1 sat, which is a workaround for liquidity ads)
     WHERE liquidity_amount_sat IS NULL OR liquidity_amount_sat > 1
 UNION ALL
     SELECT
