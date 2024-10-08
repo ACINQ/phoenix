@@ -33,6 +33,7 @@ struct SummaryView: View {
 	@State var paymentInfo: WalletPaymentInfo
 	@State var paymentInfoIsStale: Bool
 	
+	@State var relatedPaymentIds: [WalletPaymentId] = []
 	@State var liquidityPayment: Lightning_kmpInboundLiquidityOutgoingPayment? = nil
 	
 	let fetchOptions = WalletPaymentFetchOptions.companion.All
@@ -513,8 +514,9 @@ struct SummaryView: View {
 		
 		SummaryInfoGrid(
 			paymentInfo: $paymentInfo,
-			showOriginalFiatValue: $showOriginalFiatValue,
+			relatedPaymentIds: $relatedPaymentIds,
 			liquidityPayment: $liquidityPayment,
+			showOriginalFiatValue: $showOriginalFiatValue,
 			showContactView: showContactView,
 			switchToPayment: switchToPayment
 		)
@@ -851,6 +853,7 @@ struct SummaryView: View {
 			DetailsView(
 				location: wrappedLocation(),
 				paymentInfo: $paymentInfo,
+				relatedPaymentIds: $relatedPaymentIds,
 				liquidityPayment: $liquidityPayment,
 				showOriginalFiatValue: $showOriginalFiatValue,
 				showFiatValueExplanation: $showFiatValueExplanation,
@@ -1173,16 +1176,38 @@ struct SummaryView: View {
 		
 		blockchainMonitorState.paymentInfoPublisher.send(paymentInfo)
 		
+		if let liquidity = paymentInfo.payment as? Lightning_kmpInboundLiquidityOutgoingPayment {
+			if liquidity.purchase.paymentDetails is Lightning_kmpLiquidityAdsPaymentDetailsFromChannelBalance {
+				Task { @MainActor in
+					do {
+						let paymentsManager = Biz.business.paymentsManager
+						let rpids = try await paymentsManager.listIncomingPaymentsForTxId(txId: liquidity.txId)
+						log.debug("relatedPaymentIds.count = \(rpids.count) (via listIncomingPaymentsForTxId)")
+						relatedPaymentIds = rpids
+					} catch {
+						log.error("listIncomingPaymentsForTxId(): error: \(error)")
+					}
+				}
+			} else {
+				let rpids = liquidity.relatedPaymentIds()
+				log.debug("relatedPaymentIds.count = \(rpids.count) (direct)")
+				relatedPaymentIds = rpids
+			}
+		} else {
+			log.debug("relatedPaymentIds.count = 0 (payment !is InboundLiquidityOutgoingPayment)")
+			relatedPaymentIds = []
+		}
+		
 		if let incomingPayment = paymentInfo.payment as? Lightning_kmpIncomingPayment,
 			let fundingTxId = incomingPayment.lightningPaymentFundingTxId
 		{
 			Task { @MainActor in
 				do {
 					let paymentsManager = Biz.business.paymentsManager
-					let payment = try await paymentsManager.getLiquidityPurchaseForTxId(txId: fundingTxId)
-					if let payment {
-						log.debug("liquidityPayment = \(payment.walletPaymentId().dbId)")
-						liquidityPayment = payment
+					let lp = try await paymentsManager.getLiquidityPurchaseForTxId(txId: fundingTxId)
+					if let lp {
+						log.debug("liquidityPayment = \(lp.walletPaymentId().dbId)")
+						liquidityPayment = lp
 					} else {
 						log.debug("liquidityPayment = nil")
 					}
@@ -1236,6 +1261,7 @@ struct SummaryView: View {
 			
 			if let result {
 				paymentInfo = result
+				relatedPaymentIds = []
 				liquidityPayment = nil
 				blockchainConfirmations = nil
 			}

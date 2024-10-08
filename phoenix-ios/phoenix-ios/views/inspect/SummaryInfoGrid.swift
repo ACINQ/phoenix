@@ -11,9 +11,9 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture discussion
 	
 	@Binding var paymentInfo: WalletPaymentInfo
-	@Binding var showOriginalFiatValue: Bool	
-	
+	@Binding var relatedPaymentIds: [WalletPaymentId]
 	@Binding var liquidityPayment: Lightning_kmpInboundLiquidityOutgoingPayment?
+	@Binding var showOriginalFiatValue: Bool
 	
 	let showContactView: (_ contact: ContactInfo) -> Void
 	let switchToPayment: (_ paymentId: WalletPaymentId) -> Void
@@ -625,9 +625,8 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 	func causedByRow() -> some View {
 		let identifier: String = #function
 		
-		if let liquidity = paymentInfo.payment as? Lightning_kmpInboundLiquidityOutgoingPayment,
-			let paymentId = liquidity.relatedPaymentIds().first
-		{
+		if let paymentId = relatedPaymentIds.first {
+			
 			InfoGridRow(
 				identifier: identifier,
 				vAlignment: .firstTextBaseline,

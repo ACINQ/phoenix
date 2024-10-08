@@ -11,7 +11,9 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 struct DetailsView: View {
 	
 	let location: PaymentView.Location
+	
 	@Binding var paymentInfo: WalletPaymentInfo
+	@Binding var relatedPaymentIds: [WalletPaymentId]
 	@Binding var liquidityPayment: Lightning_kmpInboundLiquidityOutgoingPayment?
 	
 	@Binding var showOriginalFiatValue: Bool
