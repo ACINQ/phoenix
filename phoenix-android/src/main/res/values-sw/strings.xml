@@ -389,7 +389,7 @@
     <string name="paymentdetails_desc_legacy_migration">Uhamaji kutoka programu ya zamani</string>
     <string name="paymentdetails_desc_cpfp">Kuweka vipaumbele vya muamala</string>
     <string name="paymentdetails_desc_liquidity_manual">Ukwasi wa mwongozo (+%1$s)</string>
-    <string name="paymentdetails_desc_liquidity_automated">Ukwasi wa kiotomatiki</string>
+    <string name="paymentdetails_desc_liquidity_automated">Usimamizi wa Channel</string>
     <string name="paymentdetails_desc_swapout">Kubadilisha kwa %1$s</string>
     <string name="paymentdetails_desc_swapin">Depo ya on-chain</string>
 

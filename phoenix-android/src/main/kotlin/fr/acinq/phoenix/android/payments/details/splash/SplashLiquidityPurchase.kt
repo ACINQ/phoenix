@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
+import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
@@ -57,9 +58,11 @@ fun SplashLiquidityPurchase(
 private fun SplashPurchase(
     payment: InboundLiquidityOutgoingPayment,
 ) {
-    val btcUnit = LocalBitcoinUnit.current
-    SplashLabelRow(label = stringResource(id = R.string.paymentdetails_liquidity_purchase_label)) {
-        Text(text = payment.purchase.amount.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW_IF_ZERO_SATS))
+    if (payment.purchase.amount > 1.sat) {
+        val btcUnit = LocalBitcoinUnit.current
+        SplashLabelRow(label = stringResource(id = R.string.paymentdetails_liquidity_purchase_label)) {
+            Text(text = payment.purchase.amount.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW_IF_ZERO_SATS))
+        }
     }
 }
 
@@ -108,7 +111,6 @@ private fun SplashRelatedPayments(payment: InboundLiquidityOutgoingPayment) {
         ) {
             Button(
                 text = paymentId.dbId,
-                icon = R.drawable.ic_zap,
                 onClick = { navigateToPaymentDetails(navController, paymentId, isFromEvent = false) },
                 maxLines = 1,
                 padding = PaddingValues(horizontal = 7.dp, vertical = 5.dp),

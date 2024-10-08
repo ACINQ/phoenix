@@ -351,7 +351,7 @@
     <string name="paymentdetails_desc_legacy_migration">Migration von Legacy-App</string>
     <string name="paymentdetails_desc_cpfp">Beschleunigte Transaktion</string>
     <string name="paymentdetails_desc_liquidity_manual">Manuelle Liquidität (+%1$s)</string>
-    <string name="paymentdetails_desc_liquidity_automated">Automatisierte Liquidität</string>
+    <string name="paymentdetails_desc_liquidity_automated">Kanal-Verwaltung</string>
     <string name="paymentdetails_desc_swapout">Swap-out an %1$s</string>
     <string name="paymentdetails_desc_swapin">On-Chain Einzahlung</string>
 
