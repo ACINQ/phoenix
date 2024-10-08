@@ -82,7 +82,7 @@ class SqlitePaymentsDb(
     internal val cpfpQueries = SpliceCpfpOutgoingQueries(database)
     private val aggrQueries = database.aggregatedQueriesQueries
     internal val metaQueries = MetadataQueries(database)
-    private val linkTxToPaymentQueries = LinkTxToPaymentQueries(database)
+    internal val linkTxToPaymentQueries = LinkTxToPaymentQueries(database)
     internal val inboundLiquidityQueries = InboundLiquidityQueries(database)
 
     private var metadataQueue = MutableStateFlow(mapOf<WalletPaymentId, WalletPaymentMetadataRow>())
@@ -112,23 +112,29 @@ class SqlitePaymentsDb(
                         spliceOutQueries.addSpliceOutgoingPayment(outgoingPayment)
                         linkTxToPaymentQueries.linkTxToPayment(
                             txId = outgoingPayment.txId,
-                            walletPaymentId = outgoingPayment.walletPaymentId()
+                            walletPaymentId = paymentId
                         )
                     }
                     is ChannelCloseOutgoingPayment -> {
                         channelCloseQueries.addChannelCloseOutgoingPayment(outgoingPayment)
                         linkTxToPaymentQueries.linkTxToPayment(
                             txId = outgoingPayment.txId,
-                            walletPaymentId = outgoingPayment.walletPaymentId()
+                            walletPaymentId = paymentId
                         )
                     }
                     is SpliceCpfpOutgoingPayment -> {
                         cpfpQueries.addCpfpPayment(outgoingPayment)
-                        linkTxToPaymentQueries.linkTxToPayment(outgoingPayment.txId, outgoingPayment.walletPaymentId())
+                        linkTxToPaymentQueries.linkTxToPayment(
+                            txId = outgoingPayment.txId,
+                            walletPaymentId = paymentId
+                        )
                     }
                     is InboundLiquidityOutgoingPayment -> {
                         inboundLiquidityQueries.add(outgoingPayment)
-                        linkTxToPaymentQueries.linkTxToPayment(outgoingPayment.txId, outgoingPayment.walletPaymentId())
+                        linkTxToPaymentQueries.linkTxToPayment(
+                            txId = outgoingPayment.txId,
+                            walletPaymentId = paymentId
+                        )
                     }
                 }
                 // Add associated metadata within the same atomic database transaction.
