@@ -324,6 +324,9 @@
         }
       }
     },
+    ": %@" : {
+
+    },
     "? confirmations" : {
 
     },
@@ -9201,6 +9204,7 @@
       }
     },
     "Bolt12 offer:" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -23993,6 +23997,9 @@
           }
         }
       }
+    },
+    "label (optional)" : {
+
     },
     "Last attempt failed" : {
       "localizations" : {

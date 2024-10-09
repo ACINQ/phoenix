@@ -9,11 +9,20 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
 struct OfferRow: Identifiable {
-	let offer: String
-	let isCurrentOffer: Bool
+	let raw: ContactOffer
+	let label: String
+	let text: String
+	let isReadonly: Bool
+	
+	init(raw: ContactOffer, isReadonly: Bool) {
+		self.raw = raw
+		self.label = raw.label?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+		self.text = raw.offer.encode()
+		self.isReadonly = isReadonly
+	}
 	
 	var id: String {
-		return offer
+		return text
 	}
 }
 
@@ -31,10 +40,8 @@ struct ManageContact: View {
 	let location: Location
 	let popTo: ((PopToDestination) -> Void)?
 	
-	let offer: Lightning_kmpOfferTypesOffer?
 	let contact: ContactInfo?
 	let contactUpdated: (ContactInfo?) -> Void
-	let isNewContact: Bool
 	
 	@State var name: String
 	@State var trustedContact: Bool
@@ -46,12 +53,13 @@ struct ManageContact: View {
 	@State var showDiscardChangesConfirmationDialog: Bool = false
 	@State var showDeleteContactConfirmationDialog: Bool = false
 	
-	@State var showingOffers: Bool = false
-	@State var chevronPosition: AnimatedChevron.Position = .pointingDown
+	@State var offers: [OfferRow]
+	@State var offers_hasChanges: Bool = false
 	
-	@State var pastedOffer: String = ""
-	@State var pastedOfferIsInvalid: Bool = false
-	@State var parsedOffer: Lightning_kmpOfferTypesOffer? = nil
+	@State var editOffer_index: Int? = nil
+	@State var editOffer_label: String = ""
+	@State var editOffer_text: String = ""
+	@State var editOffer_isInvalid: Bool = false
 	
 	enum FooterType: Int {
 		case expanded_standard = 1
@@ -108,13 +116,37 @@ struct ManageContact: View {
 	) {
 		self.location = location
 		self.popTo = popTo
-		self.offer = offer
 		self.contact = contact
 		self.contactUpdated = contactUpdated
-		self.isNewContact = (contact == nil)
 		
 		self._name = State(initialValue: contact?.name ?? "")
 		self._trustedContact = State(initialValue: contact?.useOfferKey ?? DEFAULT_TRUSTED)
+		
+		do {
+			var set = Set<String>()
+			var rows = Array<OfferRow>()
+			
+			if let offer {
+				let offerStr = offer.encode()
+				set.insert(offerStr)
+				let raw = ContactOffer(offer: offer, label: "", createdAt: Date.now.toInstant())
+				rows.append(OfferRow(raw: raw, isReadonly: true))
+			}
+			if let contact {
+				for offer in contact.offers {
+					let offerStr = offer.offer.encode()
+					if !set.contains(offerStr) {
+						set.insert(offerStr)
+						rows.append(OfferRow(raw: offer, isReadonly: false))
+					}
+				}
+			}
+			
+			self._offers = State(initialValue: rows)
+		}
+		do {
+			// Todo: duplicate of above for lightning address
+		}
 	}
 	
 	// --------------------------------------------------
@@ -282,16 +314,10 @@ struct ManageContact: View {
 		
 		ScrollView {
 			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-				
 				content_image()
 				content_name()
 				content_trusted()
-				if showOffers {
-					content_offers()
-				}
-				if showPasteOffer {
-					content_pasteOffer()
-				}
+				content_offers()
 			} // </VStack>
 			.padding()
 		} // </ScrollView>
@@ -425,51 +451,25 @@ struct ManageContact: View {
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 				Text("Bolt12 offers")
 				Spacer(minLength: 0)
-				AnimatedChevron(
-					position: $chevronPosition,
-					color: Color(UIColor.systemGray2),
-					lineWidth: 20,
-					lineThickness: 2,
-					verticalOffset: 8
-				)
-			} // </HStack>
-			.background(backgroundColor)
-			.contentShape(Rectangle()) // make Spacer area tappable
-			.onTapGesture {
-				withAnimation {
-					if showingOffers {
-						showingOffers = false
-						chevronPosition = .pointingDown
-					} else {
-						showingOffers = true
-						chevronPosition = .pointingUp
-					}
+				Button {
+					createNewOffer()
+				} label: {
+					Image(systemName: "plus")
 				}
-			}
-			.zIndex(1)
+			} // </HStack>
 			
-			if showingOffers {
-				VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
-					ForEach(offerRows()) { row in
-						HStack(alignment: VerticalAlignment.center, spacing: 0) {
-							Text(row.offer)
-								.lineLimit(1)
-								.truncationMode(.middle)
-								.foregroundColor(row.isCurrentOffer ? Color.appPositive : Color.primary)
-							Spacer(minLength: 8)
-							Button {
-								copyText(row.offer)
-							} label: {
-								Image(systemName: "square.on.square")
-							}
-						}
-						.font(.subheadline)
-						.padding(.vertical, 8)
-						.padding(.leading, 20)
-					} // </ForEach>
-				} // </VStack>
-				.zIndex(0)
-				.transition(.move(edge: .top).combined(with: .opacity))
+			VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
+				ForEach(0 ..< offers.count, id: \.self) { idx in
+					if let index = editOffer_index, index == idx {
+						content_offer_editRow()
+					} else {
+						content_offer_row(offers[idx])
+					}
+				} // </ForEach>
+			} // </VStack>
+			
+			if let index = editOffer_index, index == offers.count {
+				content_offer_editRow()
 			}
 			
 		} // </VStack>
@@ -477,13 +477,68 @@ struct ManageContact: View {
 	}
 	
 	@ViewBuilder
-	func content_pasteOffer() -> some View {
+	func content_offer_row(_ row: OfferRow) -> some View {
 		
-		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
-			Text("Bolt12 offer:")
-				.padding(.bottom, 4)
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
 			
-			TextEditor(text: $pastedOffer)
+			if row.label.isEmpty {
+				Text(row.text)
+					.lineLimit(1)
+					.truncationMode(.middle)
+					.foregroundStyle(row.isReadonly ? Color.appPositive : Color.primary)
+			} else {
+				Text(row.label)
+					.lineLimit(1)
+					.truncationMode(.tail)
+					.foregroundStyle(row.isReadonly ? Color.appPositive : Color.primary)
+				Text(": \(row.text)")
+					.lineLimit(1)
+					.truncationMode(.middle)
+					.foregroundStyle(Color.secondary)
+					.layoutPriority(-1)
+			}
+			
+			Spacer(minLength: 8)
+			Button {
+				copyText(row.text)
+			} label: {
+				Image(systemName: "square.on.square")
+			}
+		}
+		.font(.callout)
+		.padding(.vertical, 8)
+		.padding(.leading, 20)
+	}
+	
+	@ViewBuilder
+	func content_offer_editRow() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				TextField("label (optional)", text: $editOffer_label)
+					.textInputAutocapitalization(.never)
+				
+				// Clear button (appears when TextField's text is non-empty)
+				Button {
+					editOffer_label = ""
+				} label: {
+					Image(systemName: "multiply.circle.fill")
+						.foregroundColor(.secondary)
+				}
+				.isHidden(editOffer_label.isEmpty)
+			}
+			.padding(.all, 8)
+			.background(
+				RoundedRectangle(cornerRadius: 8)
+					.fill(Color(UIColor.systemBackground))
+			)
+			.overlay(
+				RoundedRectangle(cornerRadius: 8)
+					.stroke(Color.textFieldBorder, lineWidth: 1)
+			)
+			
+			TextEditor(text: $editOffer_text)
 				.frame(minHeight: 80, maxHeight: 80)
 				.padding(.all, 8)
 				.background(
@@ -496,21 +551,22 @@ struct ManageContact: View {
 				)
 			
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
-				Spacer()
-				if pastedOfferIsInvalid {
+				if editOffer_isInvalid {
 					Text("Invalid offer")
 						.font(.subheadline)
 						.foregroundColor(.appNegative)
-				} else {
-					Text(verbatim: " ")
+				}
+				Spacer()
+				Button {
+					processOffer()
+				} label: {
+					Text("Done")
 				}
 			}
 			
 		} // </VStack>
-		.padding(.bottom, 30)
-		.onChange(of: pastedOffer) { _ in
-			pastedOfferChanged()
-		}
+		.padding(.vertical, 8)
+		.padding(.leading, 20)
 	}
 	
 	@ViewBuilder
@@ -724,6 +780,10 @@ struct ManageContact: View {
 		)
 	}
 	
+	var isNewContact: Bool {
+		return contact == nil
+	}
+	
 	var title: String {
 		
 		if isNewContact {
@@ -784,43 +844,35 @@ struct ManageContact: View {
 		}
 	}
 	
-	var showOffers: Bool {
-		
-		if offer != nil {
-			return true
-		} else if let contact {
-			return !contact.offers.isEmpty
-		} else {
-			return false
-		}
-	}
-	
-	var showPasteOffer: Bool {
-		
-		return (offer == nil) && (contact == nil)
-	}
-	
 	var hasChanges: Bool {
 		
 		if let contact {
 			if name != contact.name {
 				return true
 			}
-			if pickerResult != nil {
-				return true
-			}
-			if doNotUseDiskImage {
-				return true
-			}
 			if trustedContact != contact.useOfferKey {
 				return true
 			}
-			
-			return false
-			
 		} else {
+			if name != "" {
+				return true
+			}
+			if trustedContact != DEFAULT_TRUSTED {
+				return true
+			}
+		}
+		
+		if pickerResult != nil {
 			return true
 		}
+		if doNotUseDiskImage {
+			return true
+		}
+		if offers_hasChanges {
+			return true
+		}
+		
+		return false
 	}
 	
 	var canSave: Bool {
@@ -828,36 +880,11 @@ struct ManageContact: View {
 		if !hasName {
 			return false
 		}
-		if contact == nil {
-			if offer == nil && parsedOffer == nil {
-				return false
-			}
+		if offers.isEmpty {
+			return false
 		}
 		
 		return true
-	}
-	
-	func offerRows() -> [OfferRow] {
-		
-		var offers = Set<String>()
-		var results = Array<OfferRow>()
-		
-		if let offer {
-			let offerStr = offer.encode()
-			offers.insert(offerStr)
-			results.append(OfferRow(offer: offerStr, isCurrentOffer: true))
-		}
-		if let contact {
-			for offer in contact.offers {
-				let offerStr = offer.encode()
-				if !offers.contains(offerStr) {
-					offers.insert(offerStr)
-					results.append(OfferRow(offer: offerStr, isCurrentOffer: false))
-				}
-			}
-		}
-		
-		return results
 	}
 	
 	// --------------------------------------------------
@@ -931,6 +958,71 @@ struct ManageContact: View {
 	#endif
 	}
 	
+	func createNewOffer() {
+		log.trace("createNewOffer()")
+		
+		// If the user is currently editing an offer
+		if let currentIndex = editOffer_index {
+			// Then we try to auto-save the changes
+			guard processOffer() else {
+				// Auto-save failed so we're aborting
+				return
+			}
+		}
+		
+		editOffer_index = offers.count
+		editOffer_label = ""
+		editOffer_text = ""
+	}
+	
+	func editOffer(index: Int) {
+		log.trace("editOffer(index: \(index))")
+		
+		// If the user is currently editing an offer
+		if let currentIndex = editOffer_index {
+			// Then we try to auto-save the changes
+			guard processOffer() else {
+				// Auto-save failed so we're aborting
+				return
+			}
+		}
+		
+		editOffer_index = index
+		let offer = offers[index]
+		editOffer_label = offer.label
+		editOffer_text = offer.text
+	}
+	
+	@discardableResult
+	func processOffer() -> Bool {
+		log.trace("processOffer()")
+		
+		let label = editOffer_label.trimmingCharacters(in: .whitespacesAndNewlines)
+		let text = editOffer_text.trimmingCharacters(in: .whitespacesAndNewlines)
+		
+		if text.isEmpty {
+			editOffer_isInvalid = true
+			return false
+		} else {
+			let result: Bitcoin_kmpTry<Lightning_kmpOfferTypesOffer> =
+				Lightning_kmpOfferTypesOffer.companion.decode(s: text)
+
+			if result.isFailure {
+				editOffer_isInvalid = true
+				return false
+			} else {
+				editOffer_isInvalid = false
+				editOffer_index = nil
+				
+				let offer: Lightning_kmpOfferTypesOffer = result.get()!
+				let raw = ContactOffer(offer: offer, label: label, createdAt: Date.now.toInstant())
+				let row = OfferRow(raw: raw, isReadonly: false)
+				offers.append(row)
+				return true
+			}
+		}
+	}
+	
 	func copyText(_ text: String) {
 		log.trace("copyText()")
 		
@@ -940,25 +1032,6 @@ struct ManageContact: View {
 			colorScheme: colorScheme.opposite,
 			style: .chrome
 		)
-	}
-	
-	func pastedOfferChanged() {
-		log.trace("pastedOfferChanged()")
-		
-		let text = pastedOffer.trimmingCharacters(in: .whitespacesAndNewlines)
-		if text.isEmpty {
-			pastedOfferIsInvalid = true
-		} else {
-			let result: Bitcoin_kmpTry<Lightning_kmpOfferTypesOffer> =
-				Lightning_kmpOfferTypesOffer.companion.decode(s: text)
-			
-			if result.isFailure {
-				pastedOfferIsInvalid = true
-			} else {
-				pastedOfferIsInvalid = false
-				parsedOffer = result.get()
-			}
-		}
 	}
 	
 	func deleteButtonTapped() {

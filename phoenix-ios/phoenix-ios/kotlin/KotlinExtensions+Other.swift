@@ -205,3 +205,11 @@ extension Array where Element == LocalChannelInfo {
 		return LocalChannelInfo.companion.inFlightPaymentsCount(channels: self)
 	}
 }
+
+extension Date {
+	
+	func toInstant() -> Kotlinx_datetimeInstant {
+		let millis = self.toMilliseconds()
+		return Kotlinx_datetimeInstant.companion.fromEpochMilliseconds(epochMilliseconds: millis)
+	}
+}
