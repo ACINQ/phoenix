@@ -189,7 +189,9 @@ struct SummaryView: View {
 		VStack {
 			Spacer(minLength: 25)
 			header_status()
-			header_amount()
+			if !isLiquidityWithFeesDisplayedElsewhere() {
+				header_amount()
+			}
 			summaryInfoGrid()
 			buttonList()
 			Spacer(minLength: 25)
@@ -903,6 +905,15 @@ struct SummaryView: View {
 			get: { navLinkTag != nil },
 			set: { if !$0 { navLinkTag = nil }}
 		)
+	}
+	
+	func isLiquidityWithFeesDisplayedElsewhere() -> Bool {
+		
+		if let liquidity = paymentInfo.payment as? Lightning_kmpInboundLiquidityOutgoingPayment {
+			return liquidity.hidesFees
+		} else {
+			return false
+		}
 	}
 	
 	func formattedAmount() -> FormattedAmount {
