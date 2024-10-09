@@ -174,7 +174,7 @@ struct ContactsListSheet: View {
 		var updatedOffers: [String: [String]] = [:]
 		for contact in sortedContacts {
 			let key: String = contact.id
-			let values: [String] = contact.offers.map { $0.encode().lowercased() }
+			let values: [String] = contact.offers.map { $0.offer.encode().lowercased() }
 			
 			updatedOffers[key] = values
 		}

@@ -1056,46 +1056,48 @@ struct ManageContact: View {
 				//    In this case, the user must paste a Bolt12 offer.
 				//    And we'll create the new contact with the pasted offer.
 				
-				if let existingContact = contact {
-					updatedContact = try await contactsManager.updateContact(
-						contactId: existingContact.uuid,
-						name: updatedContactName,
-						photoUri: newPhotoName,
-						useOfferKey: updatedUseOfferKey,
-						offers: existingContact.offers
-					)
-				} else if let newOffer = offer ?? parsedOffer {
-					let existingContact = try await contactsManager.getContactForOffer(offer: newOffer)
-					if let existingContact {
-						// The newOffer is actually NOT new.
-						// It already exists in the database and is attached to a contact.
-						// For now, we will update the details of that contact.
-						// In the future, it would be better to display some kind of error message,
-						// and then update the UI with this existing contact.
-						updatedContact = try await contactsManager.updateContact(
-							contactId: existingContact.uuid,
-							name: updatedContactName,
-							photoUri: newPhotoName,
-							useOfferKey: updatedUseOfferKey,
-							offers: existingContact.offers
-						)
-						oldPhotoName = existingContact.photoUri
-					} else {
-						updatedContact = try await contactsManager.saveNewContact(
-							name: updatedContactName,
-							photoUri: newPhotoName,
-							useOfferKey: updatedUseOfferKey,
-							offer: newOffer
-						)
-					}
-				}
+				// Todo: Fixme
 				
-				if let oldPhotoName, oldPhotoName != newPhotoName {
-					log.debug("Deleting old photo from disk...")
-					try await PhotosManager.shared.deleteFromDisk(fileName: oldPhotoName)
-				}
-				
-				success = true
+//				if let existingContact = contact {
+//					updatedContact = try await contactsManager.updateContact(
+//						contactId: existingContact.uuid,
+//						name: updatedContactName,
+//						photoUri: newPhotoName,
+//						useOfferKey: updatedUseOfferKey,
+//						offers: existingContact.offers
+//					)
+//				} else if let newOffer = offer ?? parsedOffer {
+//					let existingContact = try await contactsManager.getContactForOffer(offer: newOffer)
+//					if let existingContact {
+//						// The newOffer is actually NOT new.
+//						// It already exists in the database and is attached to a contact.
+//						// For now, we will update the details of that contact.
+//						// In the future, it would be better to display some kind of error message,
+//						// and then update the UI with this existing contact.
+//						updatedContact = try await contactsManager.updateContact(
+//							contactId: existingContact.uuid,
+//							name: updatedContactName,
+//							photoUri: newPhotoName,
+//							useOfferKey: updatedUseOfferKey,
+//							offers: existingContact.offers
+//						)
+//						oldPhotoName = existingContact.photoUri
+//					} else {
+//						updatedContact = try await contactsManager.saveNewContact(
+//							name: updatedContactName,
+//							photoUri: newPhotoName,
+//							useOfferKey: updatedUseOfferKey,
+//							offer: newOffer
+//						)
+//					}
+//				}
+//				
+//				if let oldPhotoName, oldPhotoName != newPhotoName {
+//					log.debug("Deleting old photo from disk...")
+//					try await PhotosManager.shared.deleteFromDisk(fileName: oldPhotoName)
+//				}
+//				
+//				success = true
 			} catch {
 				log.error("contactsManager: error: \(error)")
 			}
