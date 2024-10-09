@@ -2363,10 +2363,6 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 2.3.3;
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"\"-Xlinker -interposable\"",
-				);
 				PRODUCT_BUNDLE_IDENTIFIER = co.acinq.phoenix;
 				PRODUCT_NAME = Phoenix;
 				SWIFT_VERSION = 5.0;
@@ -2392,10 +2388,6 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 2.3.3;
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"\"-Xlinker -interposable\"",
-				);
 				PRODUCT_BUNDLE_IDENTIFIER = co.acinq.phoenix;
 				PRODUCT_NAME = Phoenix;
 				SWIFT_VERSION = 5.0;
