@@ -211,44 +211,42 @@ private fun ColumnScope.AvailableForRefund(
     Card(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         when (state) {
             is FinalWalletRefundState.Init, is FinalWalletRefundState.Failed -> {
-                if (availableForRefund > 0.sat) {
-                    var showLowFeerateDialog by remember(feerate, mempoolFeerate) { mutableStateOf(false) }
+                var showLowFeerateDialog by remember(feerate, mempoolFeerate) { mutableStateOf(false) }
 
-                    if (showLowFeerateDialog) {
-                        ConfirmLowFeerate(
-                            onConfirm = {
-                                feerate?.let {
-                                    onEstimateRefundFee(address, FeeratePerByte(it))
-                                    showLowFeerateDialog = false
-                                }
-                            },
-                            onCancel = { showLowFeerateDialog = false }
-                        )
-                    }
-
-                    Button(
-                        text = stringResource(id = R.string.swapinrefund_estimate_button),
-                        icon = R.drawable.ic_inspect,
-                        enabled = feerate != null && address.isNotBlank(),
-                        onClick = {
-                            keyboardManager?.hide()
-                            val finalFeerate = feerate
-                            if (finalFeerate != null) {
-                                val recommendedFeerate = mempoolFeerate?.hour
-                                if (recommendedFeerate != null && finalFeerate < recommendedFeerate.feerate) {
-                                    showLowFeerateDialog = true
-                                } else {
-                                    onEstimateRefundFee(address, FeeratePerByte(finalFeerate))
-                                }
+                if (showLowFeerateDialog) {
+                    ConfirmLowFeerate(
+                        onConfirm = {
+                            feerate?.let {
+                                onEstimateRefundFee(address, FeeratePerByte(it))
+                                showLowFeerateDialog = false
                             }
                         },
-                        backgroundColor = MaterialTheme.colors.primary,
-                        textStyle = MaterialTheme.typography.button.copy(color = MaterialTheme.colors.onPrimary),
-                        iconTint = MaterialTheme.colors.onPrimary,
-                        padding = PaddingValues(16.dp),
-                        modifier = Modifier.fillMaxWidth(),
+                        onCancel = { showLowFeerateDialog = false }
                     )
                 }
+
+                Button(
+                    text = stringResource(id = R.string.swapinrefund_estimate_button),
+                    icon = R.drawable.ic_inspect,
+                    enabled = feerate != null && address.isNotBlank(),
+                    onClick = {
+                        keyboardManager?.hide()
+                        val finalFeerate = feerate
+                        if (finalFeerate != null) {
+                            val recommendedFeerate = mempoolFeerate?.hour
+                            if (recommendedFeerate != null && finalFeerate < recommendedFeerate.feerate) {
+                                showLowFeerateDialog = true
+                            } else {
+                                onEstimateRefundFee(address, FeeratePerByte(finalFeerate))
+                            }
+                        }
+                    },
+                    backgroundColor = MaterialTheme.colors.primary,
+                    textStyle = MaterialTheme.typography.button.copy(color = MaterialTheme.colors.onPrimary),
+                    iconTint = MaterialTheme.colors.onPrimary,
+                    padding = PaddingValues(16.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                )
             }
 
             is FinalWalletRefundState.GettingFee -> {

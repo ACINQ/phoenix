@@ -81,7 +81,7 @@ class FinalWalletRefundViewModel(val peerManager: PeerManager, val electrumClien
                         )
                     } else {
                         val finalWallet = peerManager.getPeer().finalWallet!!
-                        log.debug("sending to address=${parseResult.value.address} feerate=$feerate")
+                        log.debug("sending to address={} feerate={}", parseResult.value.address, feerate)
                         val res = finalWallet.buildSendAllTransaction(bitcoinAddress = parseResult.value.address, feerate = FeeratePerKw(feerate))
                         delay(300)
                         state.value = if (res == null) {
@@ -89,8 +89,9 @@ class FinalWalletRefundViewModel(val peerManager: PeerManager, val electrumClien
                             FinalWalletRefundState.Failed.CannotCreateTx
                         } else {
                             val (tx, fee) = res
-                            log.debug("estimated fee=$fee for final-wallet refund")
-                            FinalWalletRefundState.ReviewFee(fees = fee, transaction = finalWallet.signTransaction(tx)!!)
+                            val signedTx = finalWallet.signTransaction(tx)!!
+                            log.debug("estimated fee={} for final-wallet refund", fee)
+                            FinalWalletRefundState.ReviewFee(fees = fee, transaction = signedTx)
                         }
                     }
                 }
