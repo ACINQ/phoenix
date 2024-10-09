@@ -94,6 +94,7 @@ struct DrainWalletView_Confirm: MVISubView {
 					.font(.system(.callout, design: .monospaced).weight(.semibold))
 				
 			} // </VStack>
+			.frame(maxWidth: .infinity)
 			.multilineTextAlignment(.center)
 			.padding(.vertical, 5)
 			

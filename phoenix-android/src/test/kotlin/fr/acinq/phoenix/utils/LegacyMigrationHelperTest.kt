@@ -91,7 +91,7 @@ class LegacyMigrationHelperTest {
         // transform legacy payments to modern OutgoingPayment objects
         val newOutgoingPayments = legacyOutgoingPayments.map {
             LegacyMigrationHelper.modernizeLegacyOutgoingPayment(
-                chain = Chain.Testnet,
+                chain = Chain.Testnet3,
                 parentId = it.key,
                 listOfParts = it.value,
                 paymentMeta = paymentMetaRepository.get(it.key.toString())

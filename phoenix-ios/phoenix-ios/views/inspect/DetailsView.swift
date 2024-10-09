@@ -11,10 +11,15 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 struct DetailsView: View {
 	
 	let location: PaymentView.Location
+	
 	@Binding var paymentInfo: WalletPaymentInfo
+	@Binding var relatedPaymentIds: [WalletPaymentId]
+	@Binding var liquidityPayment: Lightning_kmpInboundLiquidityOutgoingPayment?
 	
 	@Binding var showOriginalFiatValue: Bool
 	@Binding var showFiatValueExplanation: Bool
+	
+	let switchToPayment: (_ paymentId: WalletPaymentId) -> Void
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
@@ -48,8 +53,10 @@ struct DetailsView: View {
 				
 			DetailsInfoGrid(
 				paymentInfo: $paymentInfo,
+				liquidityPayment: $liquidityPayment,
 				showOriginalFiatValue: $showOriginalFiatValue,
-				showFiatValueExplanation: $showFiatValueExplanation
+				showFiatValueExplanation: $showFiatValueExplanation,
+				switchToPayment: switchToPayment
 			)
 		}
 		.background(Color.primaryBackground)
@@ -91,8 +98,12 @@ struct DetailsView: View {
 fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	@Binding var paymentInfo: WalletPaymentInfo
+	@Binding var liquidityPayment: Lightning_kmpInboundLiquidityOutgoingPayment?
+	
 	@Binding var showOriginalFiatValue: Bool
 	@Binding var showFiatValueExplanation: Bool
+	
+	let switchToPayment: (_ paymentId: WalletPaymentId) -> Void
 	
 	@State var showBlockchainExplorerOptions = false
 	
@@ -118,6 +129,8 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		return rowSizes
 	}
 	// </InfoGridView Protocol>
+	
+	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
@@ -177,6 +190,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				common_amountReceived(msat: received.amount)
 				payment_standardFees(incomingPayment)
 				payment_minerFees(incomingPayment)
+				payment_serviceFees(incomingPayment)
 			}
 
 			let receivedWithArray = received.receivedWith.sorted { $0.hash < $1.hash }
@@ -268,7 +282,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				onChain_broadcastAt(spliceOut)
 				onChain_confirmedAt(spliceOut)
 				common_amountSent(msat: outgoingPayment.amount)
-				onChain_minerFees(spliceOut)
+				payment_minerFees(spliceOut)
 				common_amountReceived(sat: spliceOut.recipientAmount)
 				onChain_btcTxid(spliceOut)
 			}
@@ -301,7 +315,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			} content: {
 				onChain_broadcastAt(spliceCpfp)
 				onChain_confirmedAt(spliceCpfp)
-				onChain_minerFees(spliceCpfp)
+				payment_minerFees(spliceCpfp)
 				onChain_btcTxid(spliceCpfp)
 			}
 			
@@ -310,11 +324,20 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			InlineSection {
 				header("Inbound Liquidity")
 			} content: {
+				liquidityPayment_purchaseType(liquidityPayment)
+				liquidityPayment_causedBy(liquidityPayment)
 				liquidityPayment_liqudityAmount(liquidityPayment)
 				payment_minerFees(outgoingPayment)
 				payment_serviceFees(outgoingPayment)
-				liquidityPayment_spliceTxid(liquidityPayment)
 				liquidityPayment_channelId(liquidityPayment)
+			}
+			
+			InlineSection {
+				header("Blockchain Info")
+			} content: {
+				onChain_broadcastAt(liquidityPayment)
+				onChain_confirmedAt(liquidityPayment)
+				liquidityPayment_spliceTxid(liquidityPayment)
 			}
 		}
 	}
@@ -357,7 +380,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	// --------------------------------------------------
-	// MARK: View Builders: Rows
+	// MARK: View Builders: Detailed Rows
 	// --------------------------------------------------
 	
 	@ViewBuilder
@@ -689,7 +712,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	) -> some View {
 		let identifier: String = #function
 		
-		if let standardFees = payment.standardFees(), standardFees.0 > 0 {
+		if let standardFees = standardFees(), standardFees.0 > 0 {
 			
 			InfoGridRowWrapper(
 				identifier: identifier,
@@ -717,7 +740,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	) -> some View {
 		let identifier: String = #function
 		
-		if let minerFees = payment.minerFees(), minerFees.0 > 0 {
+		if let minerFees = minerFees(), minerFees.0 > 0 {
 			
 			InfoGridRowWrapper(
 				identifier: identifier,
@@ -745,7 +768,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	) -> some View {
 		let identifier: String = #function
 		
-		if let serviceFees = payment.serviceFees(), serviceFees.0 > 0 {
+		if let serviceFees = serviceFees(), serviceFees.0 > 0 {
 			
 			InfoGridRowWrapper(
 				identifier: identifier,
@@ -984,30 +1007,6 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func onChain_minerFees(
-		_ onChain: Lightning_kmpOnChainOutgoingPayment
-	) -> some View {
-		let identifier: String = #function
-		
-		InfoGridRowWrapper(
-			identifier: identifier,
-			keyColumnWidth: keyColumnWidth(identifier: identifier)
-		) {
-			keyColumn("miner fees")
-			
-		} valueColumn: {
-			
-			commonValue_amounts(
-				identifier: identifier,
-				displayAmounts: displayAmounts(
-					sat: onChain.miningFees,
-					originalFiat: paymentInfo.metadata.originalFiat
-				)
-			)
-		}
-	}
-	
-	@ViewBuilder
 	func onChain_btcTxid(
 		_ onChain: Lightning_kmpOnChainOutgoingPayment
 	) -> some View {
@@ -1074,6 +1073,57 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
+	func liquidityPayment_purchaseType(
+		_ payment: Lightning_kmpInboundLiquidityOutgoingPayment
+	) -> some View {
+		let identifier: String = #function
+		
+		InfoGridRowWrapper(
+			identifier: identifier,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
+			keyColumn("purchase type")
+			
+		} valueColumn: {
+			
+			if payment.isManualPurchase() {
+				Text("Manual")
+			} else if payment.purchase.paymentDetails is Lightning_kmpLiquidityAdsPaymentDetailsFromFutureHtlc {
+				Text("Automatic [FromFutureHtlc]")
+			} else {
+				Text("Automatic [FromChannelBalance]")
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func liquidityPayment_causedBy(
+		_ payment: Lightning_kmpInboundLiquidityOutgoingPayment
+	) -> some View {
+		let identifier: String = #function
+		
+		if let paymentId = payment.relatedPaymentIds().first {
+			
+			InfoGridRowWrapper(
+				identifier: identifier,
+				keyColumnWidth: keyColumnWidth(identifier: identifier)
+			) {
+				keyColumn("caused by")
+				
+			} valueColumn: {
+				
+				Button {
+					requestSwitchToPayment(paymentId)
+				} label: {
+					Text(verbatim: "\(paymentId.dbId.prefix(maxLength: 8))…")
+						.lineLimit(1)
+						.truncationMode(.middle)
+				}
+			}
+		}
+	}
+	
+	@ViewBuilder
 	func liquidityPayment_liqudityAmount(
 		_ payment: Lightning_kmpInboundLiquidityOutgoingPayment
 	) -> some View {
@@ -1090,7 +1140,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			commonValue_amounts(
 				identifier: identifier,
 				displayAmounts: displayAmounts(
-					sat: payment._lease.amount,
+					sat: payment.purchase.amount,
 					originalFiat: paymentInfo.metadata.originalFiat
 				)
 			)
@@ -1112,6 +1162,10 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		
 		common_channelId(payment.channelId)
 	}
+	
+	// --------------------------------------------------
+	// MARK: View Builders: Common Rows
+	// --------------------------------------------------
 	
 	@ViewBuilder
 	func common_amountSent(
@@ -1260,7 +1314,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	// --------------------------------------------------
-	// MARK: View Builders: Values
+	// MARK: View Builders: Common Values
 	// --------------------------------------------------
 	
 	@ViewBuilder
@@ -1433,6 +1487,45 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
+	func standardFees() -> (Int64, String, String)? {
+		
+		return paymentInfo.payment.standardFees()
+	}
+	
+	func minerFees() -> (Int64, String, String)? {
+		
+		if let liquidity = paymentInfo.payment as? Lightning_kmpInboundLiquidityOutgoingPayment,
+			liquidity.hidesFees {
+			// We don't display the fees here.
+			// Instead we're displaying the fees on the corresponding IncomingPayment.
+			return nil
+		} else if let result = paymentInfo.payment.minerFees() {
+			return result
+		} else if let liquidityPayment, liquidityPayment.hidesFees {
+			// This is the corresponding IncomingPayment, and we have the linked liquidityPayment.
+			return liquidityPayment.minerFees()
+		} else {
+			return nil
+		}
+	}
+	
+	func serviceFees() -> (Int64, String, String)? {
+		
+		if let liquidity = paymentInfo.payment as? Lightning_kmpInboundLiquidityOutgoingPayment,
+			liquidity.hidesFees {
+			// We don't display the fees here.
+			// Instead we're displaying the fees on the corresponding IncomingPayment.
+			return nil
+		} else if let result = paymentInfo.payment.serviceFees() {
+			return result
+		} else if let liquidityPayment, liquidityPayment.hidesFees {
+			// This is the corresponding IncomingPayment, and we have the linked liquidityPayment.
+			return liquidityPayment.serviceFees()
+		} else {
+			return nil
+		}
+	}
+	
 	func displayTimes(date: Date) -> (String, String) {
 		
 		let df = DateFormatter()
@@ -1598,6 +1691,13 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
+	
+	func requestSwitchToPayment(_ paymentId: WalletPaymentId) {
+		log.trace("requestSwitchToPayment()")
+		
+		presentationMode.wrappedValue.dismiss()
+		switchToPayment(paymentId)
+	}
 	
 	func exploreTx(_ txId: Bitcoin_kmpTxId, website: BlockchainExplorer.Website) {
 		log.trace("exploreTX()")

@@ -17,22 +17,19 @@
 package fr.acinq.phoenix.android.utils
 
 import android.content.*
-import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.core.content.FileProvider
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.utils.Connection
-import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.utils.extensions.desc
-import java.io.File
+import fr.acinq.phoenix.utils.extensions.isManualPurchase
 import java.security.cert.CertificateException
 import java.util.*
 import kotlin.contracts.ExperimentalContracts
@@ -126,25 +123,64 @@ fun UserTheme.label(): String {
 
 fun Connection.CLOSED.isBadCertificate() = this.reason?.cause is CertificateException
 
+@Composable
+fun LightningOutgoingPayment.smartDescription(): String? = when (val details = this.details) {
+    is LightningOutgoingPayment.Details.Normal -> details.paymentRequest.desc
+    is LightningOutgoingPayment.Details.SwapOut -> stringResource(id = R.string.paymentdetails_desc_swapout, details.address)
+    is LightningOutgoingPayment.Details.Blinded -> details.paymentRequest.description
+}?.takeIf { it.isNotBlank() }
+
+@Composable
+fun SpliceOutgoingPayment.smartDescription(): String = stringResource(id = R.string.paymentdetails_desc_splice_out)
+
+@Composable
+fun SpliceCpfpOutgoingPayment.smartDescription(): String = stringResource(id = R.string.paymentdetails_desc_cpfp)
+
+@Composable
+fun ChannelCloseOutgoingPayment.smartDescription(): String = stringResource(id = R.string.paymentdetails_desc_closing_channel)
+
+@Composable
+fun InboundLiquidityOutgoingPayment.smartDescription(): String = when {
+    isManualPurchase() -> stringResource(id = R.string.paymentdetails_desc_liquidity_manual, purchase.amount.toPrettyString(BitcoinUnit.Sat, withUnit = true))
+    else -> stringResource(id = R.string.paymentdetails_desc_liquidity_automated)
+}
+
+@Composable
+fun IncomingPayment.smartDescription() : String? = when (val origin = this.origin) {
+    is IncomingPayment.Origin.Invoice -> origin.paymentRequest.description
+    is IncomingPayment.Origin.SwapIn, is IncomingPayment.Origin.OnChain -> stringResource(id = R.string.paymentdetails_desc_swapin)
+    is IncomingPayment.Origin.Offer -> null
+}?.takeIf { it.isNotBlank() }
+
 /**
  * Returns a trimmed, localized description of the payment, based on the type and information available. May be null!
  *
  * For example, a payment closing a channel has no description, and it's up to us to create one. Others like a LN
  * payment with an invoice do have a description baked in, and that's what is returned.
  */
-fun WalletPayment.smartDescription(context: Context): String? = when (this) {
+@Composable
+fun WalletPayment.smartDescription(): String? = when (this) {
+    is LightningOutgoingPayment -> smartDescription()
+    is IncomingPayment -> smartDescription()
+    is ChannelCloseOutgoingPayment -> smartDescription()
+    is SpliceOutgoingPayment -> smartDescription()
+    is SpliceCpfpOutgoingPayment -> smartDescription()
+    is InboundLiquidityOutgoingPayment -> smartDescription()
+}
+
+fun WalletPayment.basicDescription(): String? = when (this) {
     is LightningOutgoingPayment -> when (val details = this.details) {
         is LightningOutgoingPayment.Details.Normal -> details.paymentRequest.desc
-        is LightningOutgoingPayment.Details.SwapOut -> context.getString(R.string.paymentdetails_desc_swapout, details.address)
+        is LightningOutgoingPayment.Details.SwapOut -> null
         is LightningOutgoingPayment.Details.Blinded -> details.paymentRequest.description
     }
     is IncomingPayment -> when (val origin = this.origin) {
         is IncomingPayment.Origin.Invoice -> origin.paymentRequest.description
-        is IncomingPayment.Origin.SwapIn, is IncomingPayment.Origin.OnChain -> context.getString(R.string.paymentdetails_desc_swapin)
+        is IncomingPayment.Origin.SwapIn, is IncomingPayment.Origin.OnChain -> null
         is IncomingPayment.Origin.Offer -> null
-    }
-    is SpliceOutgoingPayment -> context.getString(R.string.paymentdetails_desc_splice_out)
-    is ChannelCloseOutgoingPayment -> context.getString(R.string.paymentdetails_desc_closing_channel)
-    is SpliceCpfpOutgoingPayment -> context.getString(R.string.paymentdetails_desc_cpfp)
-    is InboundLiquidityOutgoingPayment -> context.getString(R.string.paymentdetails_desc_inbound_liquidity, lease.amount.toPrettyString(BitcoinUnit.Sat, withUnit = true))
+    }?.takeIf { it.isNotBlank() }
+    is ChannelCloseOutgoingPayment -> null
+    is SpliceOutgoingPayment -> null
+    is SpliceCpfpOutgoingPayment -> null
+    is InboundLiquidityOutgoingPayment -> null
 }?.takeIf { it.isNotBlank() }

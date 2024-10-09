@@ -25,6 +25,7 @@ import fr.acinq.lightning.TrampolineFees
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.ServerAddress
+import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.utils.UserTheme
 import fr.acinq.phoenix.data.BitcoinUnit
@@ -214,7 +215,13 @@ class UserPrefsRepository(private val data: DataStore<Preferences>) {
         try {
             it[LIQUIDITY_POLICY]?.let { policy ->
                 when (val res = json.decodeFromString<InternalLiquidityPolicy>(policy)) {
-                    is InternalLiquidityPolicy.Auto -> LiquidityPolicy.Auto(res.maxAbsoluteFee, res.maxRelativeFeeBasisPoints, res.skipAbsoluteFeeCheck)
+                    is InternalLiquidityPolicy.Auto -> LiquidityPolicy.Auto(
+                        inboundLiquidityTarget = null,
+                        maxAbsoluteFee = res.maxAbsoluteFee,
+                        maxRelativeFeeBasisPoints = res.maxRelativeFeeBasisPoints,
+                        skipAbsoluteFeeCheck = res.skipAbsoluteFeeCheck,
+                        maxAllowedFeeCredit = 0.msat,
+                    )
                     is InternalLiquidityPolicy.Disable -> LiquidityPolicy.Disable
                 }
             }

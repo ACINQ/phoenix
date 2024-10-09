@@ -20,7 +20,6 @@ struct DrainWalletView: MVIView {
 	var factory: ControllerFactory { return factoryEnv }
 	
 	let popTo: (PopToDestination) -> Void
-	let encryptedNodeId = Biz.encryptedNodeId!
 	
 	@State var didAppear = false
 

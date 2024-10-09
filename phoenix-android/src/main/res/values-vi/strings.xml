@@ -350,7 +350,8 @@
     <string name="paymentdetails_desc_closing_channel">Đang đóng kênh</string>
     <string name="paymentdetails_desc_legacy_migration">Di chuyển từ ứng dụng cũ</string>
     <string name="paymentdetails_desc_cpfp">Các giao dịch tăng đột biến</string>
-    <string name="paymentdetails_desc_inbound_liquidity">+%1$s thanh khoản đầu vào</string>
+    <string name="paymentdetails_desc_liquidity_manual">Thanh khoản thủ công (+%1$s)</string>
+    <string name="paymentdetails_desc_liquidity_automated">Quản lý kênh</string>
     <string name="paymentdetails_desc_swapout">Swap-out thành %1$s</string>
     <string name="paymentdetails_desc_swapin">Tiền cọc on-chain</string>
 
@@ -383,7 +384,6 @@
     <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
 
     <string name="paymentdetails_liquidity_amount_label">Số tiền yêu cầu</string>
-    <string name="paymentdetails_liquidity_signature_label">Chữ ký</string>
 
     <string name="paymentdetails_closing_type_label">Hình thức đóng</string>
     <string name="paymentdetails_closing_type_mutual">Đồng thuận</string>

@@ -388,7 +388,8 @@
     <string name="paymentdetails_desc_closing_channel">Kufunga channel</string>
     <string name="paymentdetails_desc_legacy_migration">Uhamaji kutoka programu ya zamani</string>
     <string name="paymentdetails_desc_cpfp">Kuweka vipaumbele vya muamala</string>
-    <string name="paymentdetails_desc_inbound_liquidity">+%1$s fedha za ndani</string>
+    <string name="paymentdetails_desc_liquidity_manual">Ukwasi wa mwongozo (+%1$s)</string>
+    <string name="paymentdetails_desc_liquidity_automated">Usimamizi wa Channel</string>
     <string name="paymentdetails_desc_swapout">Kubadilisha kwa %1$s</string>
     <string name="paymentdetails_desc_swapin">Depo ya on-chain</string>
 
@@ -423,7 +424,6 @@
     <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
 
     <string name="paymentdetails_liquidity_amount_label">Kiasi kilichoombwa</string>
-    <string name="paymentdetails_liquidity_signature_label">Sahihi</string>
 
     <string name="paymentdetails_closing_type_label">Aina ya kufunga</string>
     <string name="paymentdetails_closing_type_mutual">Kushirikiana</string>

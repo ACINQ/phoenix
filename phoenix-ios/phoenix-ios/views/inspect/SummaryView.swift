@@ -1,6 +1,7 @@
 import SwiftUI
 import PhoenixShared
 import Popovers
+import Combine
 
 fileprivate let filename = "SummaryView"
 #if DEBUG && true
@@ -32,6 +33,9 @@ struct SummaryView: View {
 	@State var paymentInfo: WalletPaymentInfo
 	@State var paymentInfoIsStale: Bool
 	
+	@State var relatedPaymentIds: [WalletPaymentId] = []
+	@State var liquidityPayment: Lightning_kmpInboundLiquidityOutgoingPayment? = nil
+	
 	let fetchOptions = WalletPaymentFetchOptions.companion.All
 	
 	@State var blockchainConfirmations: Int? = nil
@@ -44,9 +48,13 @@ struct SummaryView: View {
 	
 	@State var didAppear = false
 	
-	@State var buttonListTruncationDetected_standard: Bool = false
-	@State var buttonListTruncationDetected_squeezed: Bool = false
-	@State var buttonListTruncationDetected_compact: Bool = false
+	enum ButtonListType: Int {
+		case standard = 1
+		case squeezed = 2
+		case compact = 3
+		case accessible = 4
+	}
+	@State var buttonListType: [DynamicTypeSize: ButtonListType] = [:]
 	
 	// <iOS_16_workarounds>
 	@State var navLinkTag: NavLinkTag? = nil
@@ -67,6 +75,9 @@ struct SummaryView: View {
 	)
 	@State var buttonHeight: CGFloat? = nil
 	
+	@StateObject var blockchainMonitorState = BlockchainMonitorState()
+	
+	@Environment(\.dynamicTypeSize) var dynamicTypeSize: DynamicTypeSize
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	@EnvironmentObject var navCoordinator: NavigationCoordinator
@@ -164,6 +175,9 @@ struct SummaryView: View {
 		.onAppear {
 			onAppear()
 		}
+		.onChange(of: paymentInfo) { _ in
+			paymentInfoChanged()
+		}
 		.task {
 			await monitorBlockchain()
 		}
@@ -175,7 +189,9 @@ struct SummaryView: View {
 		VStack {
 			Spacer(minLength: 25)
 			header_status()
-			header_amount()
+			if !isLiquidityWithFeesDisplayedElsewhere() {
+				header_amount()
+			}
 			summaryInfoGrid()
 			buttonList()
 			Spacer(minLength: 25)
@@ -202,7 +218,7 @@ struct SummaryView: View {
 			VStack {
 				Group {
 					if payment is Lightning_kmpInboundLiquidityOutgoingPayment {
-						Text("Liquidity Added")
+						Text("Channel Resized")
 					}
 					else if payment is Lightning_kmpOutgoingPayment {
 						Text("SENT")
@@ -303,97 +319,105 @@ struct SummaryView: View {
 	@ViewBuilder
 	func header_blockchainStatus(_ onChainPayment: Lightning_kmpOnChainOutgoingPayment) -> some View {
 		
-		switch blockchainConfirmations {
-		case .none:
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
-			HStack(alignment: VerticalAlignment.center, spacing: 4) {
-				ProgressView()
-					.progressViewStyle(CircularProgressViewStyle(tint: Color.secondary))
+			let confirmations = blockchainConfirmations
+			
+			ZStack(alignment: Alignment(horizontal: .center, vertical: .top)) {
 				
-				Text("Checking blockchain…")
-					.font(.callout)
-					.foregroundColor(.secondary)
-			}
-			.padding(.top, 10)
-			
-		case .some(let confirmations):
-			
-			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+				HStack(alignment: VerticalAlignment.center, spacing: 4) {
+					ProgressView()
+						.progressViewStyle(CircularProgressViewStyle(tint: Color.secondary))
+					
+					Text("Checking blockchain…")
+						.font(.callout)
+						.foregroundColor(.secondary)
+					
+				} // </HStack>
+				.isHidden(confirmations != nil)
 				
 				Button {
 					showBlockchainExplorerOptions = true
 				} label: {
-					if confirmations == 1 {
-						Text("1 confirmation")
-							.font(.subheadline)
-					} else if confirmations < 7 {
-						Text("\(confirmations) confirmations")
-							.font(.subheadline)
-					} else {
-						Text("6+ confirmations")
-							.font(.subheadline)
-					}
-				}
-				.confirmationDialog("Blockchain Explorer",
-					isPresented: $showBlockchainExplorerOptions,
-					titleVisibility: .automatic
-				) {
-					Button {
-						exploreTx(onChainPayment.txId, website: BlockchainExplorer.WebsiteMempoolSpace())
-					} label: {
-						Text(verbatim: "Mempool.space") // no localization needed
-					}
-					Button {
-						exploreTx(onChainPayment.txId, website: BlockchainExplorer.WebsiteBlockstreamInfo())
-					} label: {
-						Text(verbatim: "Blockstream.info") // no localization needed
-					}
-					Button("Copy transaction id") {
-						copyTxId(onChainPayment.txId)
-					}
-				} // </confirmationDialog>
-				
-				if confirmations == 0 && supportsBumpFee(onChainPayment) {
-					Button {
-						navigateTo(.CpfpView(onChainPayment: onChainPayment))
-					} label: {
-						Label {
-							Text("Accelerate transaction")
-						} icon: {
-							Image(systemName: "paperplane").imageScale(.small)
+					Group {
+						if let confirmations {
+							if confirmations == 1 {
+								Text("1 confirmation")
+							} else if confirmations <= 6 {
+								Text("\(confirmations) confirmations")
+							} else {
+								Text("6+ confirmations")
+							}
+						} else {
+							Text("? confirmations")
 						}
-						.font(.subheadline)
+					} // </Group>
+					.font(.subheadline)
+					
+				} // </Button>
+				.isHidden(confirmations == nil)
+				
+			} // </ZStack>
+			
+			if confirmations == 0 && supportsBumpFee(onChainPayment) {
+				Button {
+					navigateTo(.CpfpView(onChainPayment: onChainPayment))
+				} label: {
+					Label {
+						Text("Accelerate transaction")
+					} icon: {
+						Image(systemName: "paperplane").imageScale(.small)
 					}
-					.padding(.top, 3)
+					.font(.subheadline)
 				}
-				
-				if let confirmedAt = onChainPayment.confirmedAt?.int64Value.toDate(from: .milliseconds) {
-				
-					Text("confirmed")
-						.font(.subheadline)
-						.foregroundColor(.secondary)
-						.padding(.top, 20)
-					
-					Text(confirmedAt.format())
-						.font(.subheadline)
-						.foregroundColor(.secondary)
-						.padding(.top, 3)
-					
-				} else {
-					
-					Text("broadcast")
-						.font(.subheadline)
-						.foregroundColor(.secondary)
-						.padding(.top, 20)
-					
-					Text(onChainPayment.createdAt.toDate(from: .milliseconds).format())
-						.font(.subheadline)
-						.foregroundColor(.secondary)
-						.padding(.top, 3)
-				}
+				.padding(.top, 3)
 			}
-			.padding(.top, 10)
-		}
+			
+			if let confirmedAt = onChainPayment.confirmedAt?.int64Value.toDate(from: .milliseconds) {
+			
+				Text("confirmed")
+					.font(.subheadline)
+					.foregroundColor(.secondary)
+					.padding(.top, 20)
+				
+				Text(confirmedAt.format())
+					.font(.subheadline)
+					.foregroundColor(.secondary)
+					.padding(.top, 3)
+				
+			} else {
+				
+				Text("broadcast")
+					.font(.subheadline)
+					.foregroundColor(.secondary)
+					.padding(.top, 20)
+				
+				Text(onChainPayment.createdAt.toDate(from: .milliseconds).format())
+					.font(.subheadline)
+					.foregroundColor(.secondary)
+					.padding(.top, 3)
+			}
+			
+		} // </VStack>
+		.padding(.top, 10)
+		.confirmationDialog("Blockchain Explorer",
+			isPresented: $showBlockchainExplorerOptions,
+			titleVisibility: .automatic
+		) {
+			Button {
+				exploreTx(onChainPayment.txId, website: BlockchainExplorer.WebsiteMempoolSpace())
+			} label: {
+				Text(verbatim: "Mempool.space") // no localization needed
+			}
+			Button {
+				exploreTx(onChainPayment.txId, website: BlockchainExplorer.WebsiteBlockstreamInfo())
+			} label: {
+				Text(verbatim: "Blockstream.info") // no localization needed
+			}
+			Button("Copy transaction id") {
+				copyTxId(onChainPayment.txId)
+			}
+		} // </confirmationDialog>
 	}
 	
 	@ViewBuilder
@@ -504,8 +528,11 @@ struct SummaryView: View {
 		
 		SummaryInfoGrid(
 			paymentInfo: $paymentInfo,
+			relatedPaymentIds: $relatedPaymentIds,
+			liquidityPayment: $liquidityPayment,
 			showOriginalFiatValue: $showOriginalFiatValue,
-			showContactView: showContactView
+			showContactView: showContactView,
+			switchToPayment: switchToPayment
 		)
 	}
 	
@@ -513,14 +540,12 @@ struct SummaryView: View {
 	func buttonList() -> some View {
 		
 		Group {
-			if buttonListTruncationDetected_compact {
-				buttonList_accessibility()
-			} else if buttonListTruncationDetected_squeezed {
-				buttonList_compact()
-			} else if buttonListTruncationDetected_standard {
-				buttonList_squeezed()
-			} else {
-				buttonList_standard()
+			let type = buttonListType[dynamicTypeSize] ?? ButtonListType.standard
+			switch type {
+				case .standard   : buttonList_standard()
+				case .squeezed   : buttonList_squeezed()
+				case .compact    : buttonList_compact()
+				case .accessible : buttonList_accessibility()
 			}
 		} // </Group>
 		.confirmationDialog("Delete payment?",
@@ -543,9 +568,11 @@ struct SummaryView: View {
 		// ---------------------------
 		//   ^          ^         ^    < same size
 		
+		let type = ButtonListType.standard
+		
 		HStack(alignment: VerticalAlignment.center, spacing: 16) {
 			
-			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+			TruncatableView(identifier: "standard-details", fixedHorizontal: true, fixedVertical: true) {
 				Button {
 					navigateTo(.DetailsView)
 				} label: {
@@ -556,33 +583,31 @@ struct SummaryView: View {
 				.read(buttonWidthReader)
 				.read(buttonHeightReader)
 			} wasTruncated: {
-				log.debug("buttonListTruncationDetected_standard = true (details)")
-				buttonListTruncationDetected_standard = true
+				buttonListTruncationDetected(type, "details")
 			}
 			
-			if let buttonHeight = buttonHeight {
+			if let buttonHeight {
 				Divider().frame(height: buttonHeight)
 			}
 			
-			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+			TruncatableView(identifier: "standard-edit", fixedHorizontal: true, fixedVertical: true) {
 				Button {
 					navigateTo(.EditInfoView)
 				} label: {
 					buttonLabel_edit()
 				}
-				.frame(minWidth: buttonWidth, alignment: Alignment.trailing)
+				.frame(minWidth: buttonWidth, alignment: Alignment.center)
 				.read(buttonWidthReader)
 				.read(buttonHeightReader)
 			} wasTruncated: {
-				log.debug("buttonListTruncationDetected_standard = true (edit)")
-				buttonListTruncationDetected_standard = true
+				buttonListTruncationDetected(type, "edit")
 			}
 			
-			if let buttonHeight = buttonHeight {
+			if let buttonHeight {
 				Divider().frame(height: buttonHeight)
 			}
 			
-			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+			TruncatableView(identifier: "standard-delete", fixedHorizontal: true, fixedVertical: true) {
 				Button {
 					showDeletePaymentConfirmationDialog = true
 				} label: {
@@ -592,8 +617,7 @@ struct SummaryView: View {
 				.read(buttonWidthReader)
 				.read(buttonHeightReader)
 			} wasTruncated: {
-				log.debug("buttonListTruncationDetected_standard = true (delete)")
-				buttonListTruncationDetected_standard = true
+				buttonListTruncationDetected(type, "delete")
 			}
 		}
 		.padding(.all)
@@ -613,9 +637,11 @@ struct SummaryView: View {
 		// ---------------------------
 		//   ^                    ^    < same size
 		
+		let type = ButtonListType.squeezed
+		
 		HStack(alignment: VerticalAlignment.center, spacing: 16) {
 			
-			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+			TruncatableView(identifier: "squeezed-details", fixedHorizontal: true, fixedVertical: true) {
 				Button {
 					navigateTo(.DetailsView)
 				} label: {
@@ -626,15 +652,14 @@ struct SummaryView: View {
 				.read(buttonWidthReader)
 				.read(buttonHeightReader)
 			} wasTruncated: {
-				log.debug("buttonListTruncationDetected_squeezed = true (edit)")
-				buttonListTruncationDetected_squeezed = true
+				buttonListTruncationDetected(type, "edit")
 			}
 			
-			if let buttonHeight = buttonHeight {
+			if let buttonHeight {
 				Divider().frame(height: buttonHeight)
 			}
 			
-			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+			TruncatableView(identifier: "squeezed-edit", fixedHorizontal: true, fixedVertical: true) {
 				Button {
 					navigateTo(.EditInfoView)
 				} label: {
@@ -643,15 +668,14 @@ struct SummaryView: View {
 				}
 				.read(buttonHeightReader)
 			} wasTruncated: {
-				log.debug("buttonListTruncationDetected_squeezed = true (edit)")
-				buttonListTruncationDetected_squeezed = true
+				buttonListTruncationDetected(type, "edit")
 			}
 			
-			if let buttonHeight = buttonHeight {
+			if let buttonHeight {
 				Divider().frame(height: buttonHeight)
 			}
 			
-			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+			TruncatableView(identifier: "squeezed-delete", fixedHorizontal: true, fixedVertical: true) {
 				Button {
 					showDeletePaymentConfirmationDialog = true
 				} label: {
@@ -662,8 +686,7 @@ struct SummaryView: View {
 				.read(buttonWidthReader)
 				.read(buttonHeightReader)
 			} wasTruncated: {
-				log.debug("buttonListTruncationDetected_squeezed = true (delete)")
-				buttonListTruncationDetected_squeezed = true
+				buttonListTruncationDetected(type, "delete")
 			}
 		}
 		.padding(.horizontal, 10) // allow content to be closer to edges
@@ -685,9 +708,11 @@ struct SummaryView: View {
 		// -----------------------
 		//             ^ might not be centered, but at least the buttons fit on 1 line
 		
+		let type = ButtonListType.compact
+		
 		HStack(alignment: VerticalAlignment.center, spacing: 8) {
 			
-			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+			TruncatableView(identifier: "compatct-details", fixedHorizontal: true, fixedVertical: true) {
 				Button {
 					navigateTo(.DetailsView)
 				} label: {
@@ -696,15 +721,14 @@ struct SummaryView: View {
 				}
 				.read(buttonHeightReader)
 			} wasTruncated: {
-				log.debug("buttonListTruncationDetected_compact = true (details)")
-				buttonListTruncationDetected_compact = true
+				buttonListTruncationDetected(type, "details")
 			}
 			
-			if let buttonHeight = buttonHeight {
+			if let buttonHeight {
 				Divider().frame(height: buttonHeight)
 			}
 			
-			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+			TruncatableView(identifier: "compact-edit", fixedHorizontal: true, fixedVertical: true) {
 				Button {
 					navigateTo(.EditInfoView)
 				} label: {
@@ -713,15 +737,14 @@ struct SummaryView: View {
 				}
 				.read(buttonHeightReader)
 			} wasTruncated: {
-				log.debug("buttonListTruncationDetected_compact = true (edit)")
-				buttonListTruncationDetected_compact = true
+				buttonListTruncationDetected(type, "edit")
 			}
 			
-			if let buttonHeight = buttonHeight {
+			if let buttonHeight {
 				Divider().frame(height: buttonHeight)
 			}
 			
-			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+			TruncatableView(identifier: "compact-delete", fixedHorizontal: true, fixedVertical: true) {
 				Button {
 					showDeletePaymentConfirmationDialog = true
 				} label: {
@@ -730,8 +753,7 @@ struct SummaryView: View {
 				}
 				.read(buttonHeightReader)
 			} wasTruncated: {
-				log.debug("buttonListTruncationDetected_compact = true (delete)")
-				buttonListTruncationDetected_compact = true
+				buttonListTruncationDetected(type, "delete")
 			}
 		}
 		.padding(.horizontal, 4) // allow content to be closer to edges
@@ -760,10 +782,11 @@ struct SummaryView: View {
 					navigateTo(.DetailsView)
 				} label: {
 					buttonLabel_details()
-						.read(buttonHeightReader)
+						.lineLimit(1) // see note below
 				}
+				.read(buttonHeightReader)
 				
-				if let buttonHeight = buttonHeight {
+				if let buttonHeight {
 					Divider().frame(height: buttonHeight)
 				}
 				
@@ -771,19 +794,26 @@ struct SummaryView: View {
 					navigateTo(.EditInfoView)
 				} label: {
 					buttonLabel_edit()
-						.read(buttonHeightReader)
+						.lineLimit(1) // see note below
 				}
+				.read(buttonHeightReader)
 			}
-				
+			.assignMaxPreference(for: buttonHeightReader.key, to: $buttonHeight)
+			
 			Button {
 				showDeletePaymentConfirmationDialog = true
 			} label: {
 				buttonLabel_delete()
 			}
+			.layoutPriority(1)
+			// ^^^^^^^^^^^^^^^ On iOS 16, the layout system seems to give as much
+			// height as is available to these buttons. With the end result being that
+			// the calculated buttonHeight is way too big, and the Divider looks really odd.
+			// So we tell the UI to give priority to this button,
+			// and we restrict the other buttons to 1 line.
 		}
 		.padding(.horizontal, 4) // allow content to be closer to edges
 		.padding(.vertical)
-		.assignMaxPreference(for: buttonHeightReader.key, to: $buttonHeight)
 	}
 	
 	@ViewBuilder
@@ -835,8 +865,11 @@ struct SummaryView: View {
 			DetailsView(
 				location: wrappedLocation(),
 				paymentInfo: $paymentInfo,
+				relatedPaymentIds: $relatedPaymentIds,
+				liquidityPayment: $liquidityPayment,
 				showOriginalFiatValue: $showOriginalFiatValue,
-				showFiatValueExplanation: $showFiatValueExplanation
+				showFiatValueExplanation: $showFiatValueExplanation,
+				switchToPayment: switchToPayment
 			)
 			
 		case .EditInfoView:
@@ -872,6 +905,15 @@ struct SummaryView: View {
 			get: { navLinkTag != nil },
 			set: { if !$0 { navLinkTag = nil }}
 		)
+	}
+	
+	func isLiquidityWithFeesDisplayedElsewhere() -> Bool {
+		
+		if let liquidity = paymentInfo.payment as? Lightning_kmpInboundLiquidityOutgoingPayment {
+			return liquidity.hidesFees
+		} else {
+			return false
+		}
 	}
 	
 	func formattedAmount() -> FormattedAmount {
@@ -936,28 +978,59 @@ struct SummaryView: View {
 	// MARK: Tasks
 	// --------------------------------------------------
 	
-	func updateConfirmations(_ onChainPayment: Lightning_kmpOnChainOutgoingPayment) async -> Int {
-		log.trace("checkConfirmations()")
+	func monitorBlockchain() async {
 		
-		do {
-			let result = try await Biz.business.electrumClient.kotlin_getConfirmations(txid: onChainPayment.txId)
-
-			let confirmations = result?.intValue ?? 0
-			log.debug("checkConfirmations(): => \(confirmations)")
-
-			self.blockchainConfirmations = confirmations
-			return confirmations
-		} catch {
-			log.error("checkConfirmations(): error: \(error)")
-			return 0
+		// Architecture note:
+		// We need the ability to reset the View to display a completely different payment.
+		// This means our Task to monitor the blockchain needs to properly respond whenever
+		// the `paymentInfo` property is changed.
+		
+		var lastPaymentId: WalletPaymentId? = nil
+		
+		// Note: When the task is cancelled, the `values` stream returns nil, and we exit the loop
+		
+		for await paymentInfo in blockchainMonitorState.paymentInfoPublisher.values {
+			
+			if let paymentInfo, paymentInfo.id() == lastPaymentId {
+				log.debug("monitorBlockchain: ignoring duplicate paymentInfo")
+				continue
+			}
+			lastPaymentId = paymentInfo?.id()
+			
+			if let currentTask = blockchainMonitorState.currentTaskPublisher.value {
+				log.debug("monitorBlockchain: currentTask.cancel()")
+				currentTask.cancel()
+			}
+			
+			if let paymentInfo {
+				log.debug("monitorBlockchain: processing new paymentInfo")
+				
+				let newTask = Task { @MainActor in
+					await monitorBlockchain(paymentInfo)
+				}
+				blockchainMonitorState.currentTaskPublisher.send(newTask)
+				
+			} else {
+				log.debug("monitorBlockchain: paymentInfo is nil")
+				blockchainMonitorState.currentTaskPublisher.send(nil)
+			}
 		}
+		
+		if let currentTask = blockchainMonitorState.currentTaskPublisher.value {
+			log.debug("monitorBlockchain: currentTask.cancel()")
+			currentTask.cancel()
+		}
+		
+		log.debug("monitorBlockchain: terminated")
 	}
 	
-	func monitorBlockchain() async {
-		log.trace("monitorBlockchain()")
+	func monitorBlockchain(_ paymentInfo: WalletPaymentInfo) async {
+		
+		let pid: String = paymentInfo.id().dbId.prefix(maxLength: 8)
+		log.trace("monitorBlockchain(\(pid))")
 		
 		guard let onChainPayment = paymentInfo.payment as? Lightning_kmpOnChainOutgoingPayment else {
-			log.debug("monitorBlockchain(): not an on-chain payment")
+			log.debug("monitorBlockchain(\(pid)): not an on-chain payment")
 			return
 		}
 		
@@ -966,43 +1039,82 @@ struct SummaryView: View {
 			if elapsed > 24.hours() {
 				// It was marked as mined more than 24 hours ago.
 				// So there's really no need to check the exact confirmation count anymore.
-				log.debug("monitorBlockchain(): confirmedAt > 24.hours.ago")
+				log.debug("monitorBlockchain(\(pid)): confirmedAt > 24.hours.ago")
 				self.blockchainConfirmations = 7
 				return
 			}
 		}
 		
-		let confirmations = await updateConfirmations(onChainPayment)
-		if confirmations > 6 {
-			// No need to continue checking confirmation count,
-			// because the UI displays "6+" from this point forward.
-			log.debug("monitorBlockchain(): confirmations > 6")
+		let isDone = await updateConfirmations(onChainPayment, pid)
+		guard !isDone else {
+			log.debug("monitorBlockchain(\(pid)): done")
 			return
 		}
 		
+		// Note: When the task is cancelled, the `values` stream returns nil, and we exit the loop
+		
 		for await notification in Biz.business.electrumClient.notificationsPublisher().values {
 			
-			if notification is Lightning_kmpHeaderSubscriptionResponse {
-				// A new block was mined !
-				// Update confirmation count if needed.
-				let confirmations = await updateConfirmations(onChainPayment)
-				if confirmations > 6 {
-					// No need to continue checking confirmation count,
-					// because the UI displays "6+" from this point forward.
-					log.debug("monitorBlockchain(): confirmations > 6")
-					break
-				}
-				
-			} else {
-				log.debug("monitorBlockchain(): notification isNot HeaderSubscriptionResponse")
+			if !(notification is Lightning_kmpHeaderSubscriptionResponse) {
+				log.debug("monitorBlockchain(\(pid)): notification isNot HeaderSubscriptionResponse")
+				continue
 			}
 			
-			if Task.isCancelled {
-				log.debug("monitorBlockchain(): Task.isCancelled")
-				break
-			} else {
-				log.debug("monitorBlockchain(): Waiting for next electrum notification...")
+			// A new block was mined !
+			// Update confirmation count if needed.
+			
+			let isDone = await updateConfirmations(onChainPayment, pid)
+			guard !isDone else {
+				log.debug("monitorBlockchain(\(pid)): done")
+				return
 			}
+			
+			log.debug("monitorBlockchain(\(pid)): Waiting for next electrum notification...")
+		}
+		
+		log.debug("monitorBlockchain(\(pid)): terminated")
+	}
+	
+	func updateConfirmations(
+		_ onChainPayment: Lightning_kmpOnChainOutgoingPayment,
+		_ pid: String
+	) async -> Bool {
+		
+		log.trace("updateConfirmations(\(pid))")
+		
+		let confirmations = await fetchConfirmations(onChainPayment, pid)
+		guard !Task.isCancelled else {
+			log.debug("updateConfirmations(\(pid)): Task.isCancelled")
+			return true
+		}
+		self.blockchainConfirmations = confirmations
+		
+		if confirmations > 6 {
+			// No need to continue checking confirmation count,
+			// because the UI displays "6+" from this point forward.
+			log.debug("updateConfirmations(\(pid)): confirmations > 6")
+			return true
+		} else {
+			return false
+		}
+	}
+	
+	func fetchConfirmations(
+		_ onChainPayment: Lightning_kmpOnChainOutgoingPayment,
+		_ pid: String
+	) async -> Int {
+		
+		log.trace("fetchConfirmations(\(pid))")
+		
+		do {
+			let result = try await Biz.business.electrumClient.kotlin_getConfirmations(txid: onChainPayment.txId)
+			
+			let confirmations = result?.intValue ?? 0
+			log.debug("fetchConfirmations(\(pid)): => \(confirmations)")
+			return confirmations
+		} catch {
+			log.error("checkConfirmations(\(pid)): error: \(error)")
+			return 0
 		}
 	}
 	
@@ -1018,12 +1130,26 @@ struct SummaryView: View {
 			
 			// First time displaying the SummaryView (coming from HomeView)
 			
+			// Not triggered in this particular case, so we need to trigger it manually.
+			//
+			// Note:
+			// The flow below won't automatically trigger `paymentInfoChanged` if:
+			// - !paymentInfoIsState
+			// - or the fetched payment is equal to the existing payment
+			//
+			// The latter happens when:
+			// - lastCompletedPaymentPublisher fires
+			// - HomeView fetches the payment with FetchOptions.All
+			// - HomeView displays the PaymentView with fetched `paymentInfo`
+			// - If we fetch the payment again here, it's equal to the existing payment
+			//
+			paymentInfoChanged()
+			
 			if paymentInfoIsStale {
 				// We either don't have the full payment information (missing metadata info),
 				// or the payment information is possibly stale, and needs to be refreshed.
 				
 				if let row = paymentInfo.toOrderRow() {
-
 					Biz.business.paymentsManager.fetcher.getPayment(row: row, options: fetchOptions) {
 						(result: WalletPaymentInfo?, _) in
 						
@@ -1031,9 +1157,7 @@ struct SummaryView: View {
 							paymentInfo = result
 						}
 					}
-
 				} else {
-				
 					Biz.business.paymentsManager.getPayment(id: paymentInfo.id(), options: fetchOptions) {
 						(result: WalletPaymentInfo?, _) in
 						
@@ -1045,6 +1169,7 @@ struct SummaryView: View {
 			}
 			
 		} else {
+			log.trace("subsequent appearance")
 			
 			// We are returning from the DetailsView/EditInfoView (via the NavigationController)
 			// The payment metadata may have changed (e.g. description/notes modified).
@@ -1076,6 +1201,55 @@ struct SummaryView: View {
 		}
 	}
 	
+	func paymentInfoChanged() {
+		log.trace("paymentInfoChanged()")
+		
+		blockchainMonitorState.paymentInfoPublisher.send(paymentInfo)
+		
+		if let liquidity = paymentInfo.payment as? Lightning_kmpInboundLiquidityOutgoingPayment {
+			if liquidity.purchase.paymentDetails is Lightning_kmpLiquidityAdsPaymentDetailsFromChannelBalance {
+				Task { @MainActor in
+					do {
+						let paymentsManager = Biz.business.paymentsManager
+						let rpids = try await paymentsManager.listIncomingPaymentsForTxId(txId: liquidity.txId)
+						log.debug("relatedPaymentIds.count = \(rpids.count) (via listIncomingPaymentsForTxId)")
+						relatedPaymentIds = rpids
+					} catch {
+						log.error("listIncomingPaymentsForTxId(): error: \(error)")
+					}
+				}
+			} else {
+				let rpids = liquidity.relatedPaymentIds()
+				log.debug("relatedPaymentIds.count = \(rpids.count) (direct)")
+				relatedPaymentIds = rpids
+			}
+		} else {
+			log.debug("relatedPaymentIds.count = 0 (payment !is InboundLiquidityOutgoingPayment)")
+			relatedPaymentIds = []
+		}
+		
+		if let incomingPayment = paymentInfo.payment as? Lightning_kmpIncomingPayment,
+			let fundingTxId = incomingPayment.lightningPaymentFundingTxId
+		{
+			Task { @MainActor in
+				do {
+					let paymentsManager = Biz.business.paymentsManager
+					let lp = try await paymentsManager.getLiquidityPurchaseForTxId(txId: fundingTxId)
+					if let lp {
+						log.debug("liquidityPayment = \(lp.walletPaymentId().dbId)")
+						liquidityPayment = lp
+					} else {
+						log.debug("liquidityPayment = nil")
+					}
+					
+				} catch {
+					log.error("getLiquidityPurchaseForTxId(): error: \(error)")
+				}
+				
+			}
+		}
+	}
+	
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
@@ -1103,10 +1277,46 @@ struct SummaryView: View {
 		}
 	}
 	
+	func buttonListTruncationDetected(_ type: ButtonListType, _ identifier: String) {
+		
+		switch type {
+		case .standard:
+			log.debug("buttonListTruncationDetected: standard (\(identifier))")
+			buttonListType[dynamicTypeSize] = .squeezed
+		
+		case .squeezed:
+			log.debug("buttonListTruncationDetected: squeezed (\(identifier))")
+			buttonListType[dynamicTypeSize] = .compact
+			
+		case .compact:
+			log.debug("buttonListTruncationDetected: compact (\(identifier))")
+			buttonListType[dynamicTypeSize] = .accessible
+			
+		case .accessible:
+			log.debug("buttonListTruncationDetected: accessible (\(identifier))")
+			break
+		}
+	}
+	
 	func showContactView(_ contact: ContactInfo) {
 		log.trace("showContactView()")
 		
 		navigateTo(.ContactView(contact: contact))
+	}
+	
+	func switchToPayment(_ paymentId: WalletPaymentId) {
+		log.trace("switchToPayment: \(paymentId.dbId)")
+		
+		Biz.business.paymentsManager.getPayment(id: paymentId, options: fetchOptions) {
+			(result: WalletPaymentInfo?, _) in
+			
+			if let result {
+				paymentInfo = result
+				relatedPaymentIds = []
+				liquidityPayment = nil
+				blockchainConfirmations = nil
+			}
+		}
 	}
 	
 	func exploreTx(_ txId: Bitcoin_kmpTxId, website: BlockchainExplorer.Website) {
@@ -1148,4 +1358,13 @@ struct SummaryView: View {
 			presentationMode.wrappedValue.dismiss()
 		}
 	}
+}
+
+// --------------------------------------------------
+// MARK: -
+// --------------------------------------------------
+
+class BlockchainMonitorState: ObservableObject {
+	let paymentInfoPublisher = CurrentValueSubject<WalletPaymentInfo?, Never>(nil)
+	let currentTaskPublisher = CurrentValueSubject<Task<(), Never>?, Never>(nil)
 }

@@ -23,12 +23,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -49,7 +47,6 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import fr.acinq.bitcoin.Satoshi
@@ -71,7 +68,7 @@ import fr.acinq.phoenix.android.components.FeerateSlider
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.SplashLabelRow
 import fr.acinq.phoenix.android.components.TextInput
-import fr.acinq.phoenix.android.components.TransactionLinkButton
+import fr.acinq.phoenix.android.components.InlineTransactionLink
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.feedback.SuccessMessage
 import fr.acinq.phoenix.android.fiatRate
@@ -79,7 +76,6 @@ import fr.acinq.phoenix.android.payments.CameraPermissionsView
 import fr.acinq.phoenix.android.payments.ScannerView
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
-import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.utils.Parser
 
@@ -276,7 +272,7 @@ private fun AvailableForRefundView(
                         Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
                             Text(text = stringResource(id = R.string.swapinrefund_success_details))
                             Spacer(modifier = Modifier.height(12.dp))
-                            TransactionLinkButton(txId = currentState.tx.txid)
+                            InlineTransactionLink(txId = currentState.tx.txid)
                         }
                     }
                 }

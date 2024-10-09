@@ -16,7 +16,11 @@ fileprivate enum Key: String {
 	case backupTransactions_useUploadDelay
 	case hasCKRecordZone_v2
 	case hasDownloadedPayments = "hasDownloadedCKRecords"
-	case hasDownloadedContacts
+	case hasDownloadedContacts_v2
+}
+
+fileprivate enum KeyDeprecated: String {
+	case hasDownloadedContacts_v1 = "hasDownloadedContacts"
 }
 
 /// Preferences pertaining to backing up payment history in the user's own iCloud account.
@@ -25,6 +29,17 @@ class Prefs_BackupTransactions {
 	
 	private var defaults: UserDefaults {
 		return Prefs.shared.defaults
+	}
+	
+	/// Updating publishers should always be done on the main thread.
+	/// Otherwise we risk updating UI components on a background thread, which is dangerous.
+	///
+	private func runOnMainThread(_ block: @escaping () -> Void) {
+		if Thread.isMainThread {
+			block()
+		} else {
+			DispatchQueue.main.async { block() }
+		}
 	}
 	
 	lazy private(set) var isEnabledPublisher: CurrentValueSubject<Bool, Never> = {
@@ -43,7 +58,9 @@ class Prefs_BackupTransactions {
 		set {
 			let key = Key.backupTransactions_enabled.rawValue
 			defaults.set(newValue, forKey: key)
-			isEnabledPublisher.send(newValue)
+			runOnMainThread {
+				self.isEnabledPublisher.send(newValue)
+			}
 		}
 	}
 	
@@ -77,16 +94,16 @@ class Prefs_BackupTransactions {
 		}
 	}
 	
-	private func recordZoneCreatedKey(_ encryptedNodeId: String) -> String {
-		return "\(Key.hasCKRecordZone_v2.rawValue)-\(encryptedNodeId)"
+	private func recordZoneCreatedKey(_ walletId: WalletIdentifier) -> String {
+		return "\(Key.hasCKRecordZone_v2.rawValue)-\(walletId.prefsKeySuffix)"
 	}
 	
-	func recordZoneCreated(_ encryptedNodeId: String) -> Bool {
-		return defaults.bool(forKey: recordZoneCreatedKey(encryptedNodeId))
+	func recordZoneCreated(_ walletId: WalletIdentifier) -> Bool {
+		return defaults.bool(forKey: recordZoneCreatedKey(walletId))
 	}
 	
-	func setRecordZoneCreated(_ value: Bool, _ encryptedNodeId: String) {
-		let key = recordZoneCreatedKey(encryptedNodeId)
+	func setRecordZoneCreated(_ value: Bool, _ walletId: WalletIdentifier) {
+		let key = recordZoneCreatedKey(walletId)
 		if value == true {
 			defaults.setValue(value, forKey: key)
 		} else {
@@ -94,40 +111,44 @@ class Prefs_BackupTransactions {
 		}
 	}
 	
-	private func hasDownloadedPaymentsKey(_ encryptedNodeId: String) -> String {
-		return "\(Key.hasDownloadedPayments.rawValue)-\(encryptedNodeId)"
+	private func hasDownloadedPaymentsKey(_ walletId: WalletIdentifier) -> String {
+		return "\(Key.hasDownloadedPayments.rawValue)-\(walletId.prefsKeySuffix)"
 	}
 	
-	func hasDownloadedPayments(_ encryptedNodeId: String) -> Bool {
-		return defaults.bool(forKey: hasDownloadedPaymentsKey(encryptedNodeId))
+	func hasDownloadedPayments(_ walletId: WalletIdentifier) -> Bool {
+		return defaults.bool(forKey: hasDownloadedPaymentsKey(walletId))
 	}
 	
-	func markHasDownloadedPayments(_ encryptedNodeId: String) {
-		defaults.setValue(true, forKey: hasDownloadedPaymentsKey(encryptedNodeId))
+	func markHasDownloadedPayments(_ walletId: WalletIdentifier) {
+		defaults.setValue(true, forKey: hasDownloadedPaymentsKey(walletId))
 	}
 	
-	private func hasDownloadedContactsKey(_ encryptedNodeId: String) -> String {
-		return "\(Key.hasDownloadedContacts.rawValue)-\(encryptedNodeId)"
+	private func hasDownloadedContactsKey(_ walletId: WalletIdentifier) -> String {
+		return "\(Key.hasDownloadedContacts_v2.rawValue)-\(walletId.prefsKeySuffix)"
 	}
 	
-	func hasDownloadedContacts(_ encryptedNodeId: String) -> Bool {
-		return defaults.bool(forKey: hasDownloadedContactsKey(encryptedNodeId))
+	func hasDownloadedContacts(_ walletId: WalletIdentifier) -> Bool {
+		return defaults.bool(forKey: hasDownloadedContactsKey(walletId))
 	}
 	
-	func markHasDownloadedContacts(_ encryptedNodeId: String) {
-		defaults.setValue(true, forKey: hasDownloadedContactsKey(encryptedNodeId))
+	func markHasDownloadedContacts(_ walletId: WalletIdentifier) {
+		defaults.setValue(true, forKey: hasDownloadedContactsKey(walletId))
 	}
 	
-	func resetWallet(encryptedNodeId: String) {
+	func resetWallet(_ walletId: WalletIdentifier) {
 		
-		defaults.removeObject(forKey: recordZoneCreatedKey(encryptedNodeId))
-		defaults.removeObject(forKey: hasDownloadedPaymentsKey(encryptedNodeId))
-		defaults.removeObject(forKey: hasDownloadedContactsKey(encryptedNodeId))
+		defaults.removeObject(forKey: recordZoneCreatedKey(walletId))
+		defaults.removeObject(forKey: hasDownloadedPaymentsKey(walletId))
+		defaults.removeObject(forKey: hasDownloadedContactsKey(walletId))
 		defaults.removeObject(forKey: Key.backupTransactions_enabled.rawValue)
 		defaults.removeObject(forKey: Key.backupTransactions_useCellularData.rawValue)
 		defaults.removeObject(forKey: Key.backupTransactions_useUploadDelay.rawValue)
 		
+		defaults.removeObject(forKey: "\(KeyDeprecated.hasDownloadedContacts_v1.rawValue)-\(walletId.encryptedNodeId)")
+		
 		// Reset any publishers with stored state
-		isEnabledPublisher.send(self.isEnabled)
+		runOnMainThread {
+			self.isEnabledPublisher.send(self.isEnabled)
+		}
 	}
 }

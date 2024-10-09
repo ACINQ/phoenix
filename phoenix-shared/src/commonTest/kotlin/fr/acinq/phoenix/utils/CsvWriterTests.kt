@@ -20,6 +20,7 @@ import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampSeconds
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
+import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.TestConstants
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency
@@ -42,7 +43,7 @@ class CsvWriterTests {
             received = IncomingPayment.Received(
                 receivedWith = listOf(
                     IncomingPayment.ReceivedWith.NewChannel(
-                        amount = 12_000_000.msat,
+                        amountReceived = 12_000_000.msat,
                         serviceFee = 3_000_000.msat,
                         miningFee = 0.sat,
                         channelId = randomBytes32(),
@@ -78,9 +79,10 @@ class CsvWriterTests {
             received = IncomingPayment.Received(
                 receivedWith = listOf(
                     IncomingPayment.ReceivedWith.LightningPayment(
-                        amount = 2_173_929.msat,
+                        amountReceived = 2_173_929.msat,
                         channelId = randomBytes32(),
-                        htlcId = 0
+                        htlcId = 0,
+                        fundingFee = LiquidityAds.FundingFee(2_000.msat, TxId(randomBytes32()))
                     )
                 ),
                 receivedAt = 1675270484965
@@ -238,7 +240,7 @@ class CsvWriterTests {
             received = IncomingPayment.Received(
                 receivedWith = listOf(
                     IncomingPayment.ReceivedWith.NewChannel(
-                        amount = 12_000_000.msat,
+                        amountReceived = 12_000_000.msat,
                         serviceFee = 2_931_000.msat,
                         miningFee = 69.sat,
                         channelId = randomBytes32(),
@@ -256,7 +258,7 @@ class CsvWriterTests {
             userNotes = "Via dual-funding flow"
         )
 
-        val expected = "2023-02-01T17:14:43.668Z,12000000,-3000000,2.7599 USD,-0.6899 USD,Swap-in with inputs: [${input.txid}],L1 Top-up,Via dual-funding flow\r\n"
+        val expected = "2023-02-01T17:14:43.668Z,12000000,-3000000,2.7599 USD,-0.6899 USD,On-chain deposit,L1 Top-up,Via dual-funding flow\r\n"
         val actual = CsvWriter.makeRow(
             info = WalletPaymentInfo(payment, metadata, null, WalletPaymentFetchOptions.All),
             localizedDescription = "L1 Top-up",
@@ -291,7 +293,7 @@ class CsvWriterTests {
             userNotes = null
         )
 
-        val expected = "2023-02-01T22:16:54.498Z,-12820000,-2820000,-3.0366 USD,-0.6679 USD,Swap-out to tb1qlywh0dk40k87gqphpfs8kghd96hmnvus7r8hhf,Swap for cash,\r\n"
+        val expected = "2023-02-01T22:16:54.498Z,-12820000,-2820000,-3.0366 USD,-0.6679 USD,Outgoing Swap to tb1qlywh0dk40k87gqphpfs8kghd96hmnvus7r8hhf,Swap for cash,\r\n"
         val actual = CsvWriter.makeRow(
             info = WalletPaymentInfo(payment, metadata, null, WalletPaymentFetchOptions.All),
             localizedDescription = "Swap for cash",
@@ -337,7 +339,7 @@ class CsvWriterTests {
      */
     private fun makePaymentRequest() =
         Bolt11Invoice.create(
-            chain = Chain.Testnet,
+            chain = Chain.Testnet3,
             amount = 10_000.msat,
             paymentHash = randomBytes32(),
             privateKey = PrivateKey(value = randomBytes32()),

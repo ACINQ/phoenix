@@ -27,6 +27,7 @@ import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.ChannelCommand
+import fr.acinq.lightning.channel.ChannelFundingResponse
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.managers.PeerManager
@@ -45,9 +46,9 @@ sealed class SpliceOutState {
     sealed class Complete: SpliceOutState() {
         abstract val userAmount: Satoshi
         abstract val feerate: FeeratePerKw
-        abstract val result: ChannelCommand.Commitment.Splice.Response
-        data class Success(override val userAmount: Satoshi, override val feerate: FeeratePerKw, override val result: ChannelCommand.Commitment.Splice.Response.Created): Complete()
-        data class Failure(override val userAmount: Satoshi, override val feerate: FeeratePerKw, override val result: ChannelCommand.Commitment.Splice.Response.Failure): Complete()
+        abstract val result: ChannelFundingResponse
+        data class Success(override val userAmount: Satoshi, override val feerate: FeeratePerKw, override val result: ChannelFundingResponse.Success): Complete()
+        data class Failure(override val userAmount: Satoshi, override val feerate: FeeratePerKw, override val result: ChannelFundingResponse.Failure): Complete()
     }
     sealed class Error: SpliceOutState() {
         data class Thrown(val e: Throwable): Error()
@@ -70,7 +71,7 @@ class SpliceOutViewModel(private val peerManager: PeerManager, private val chain
             state = SpliceOutState.Error.Thrown(e)
         }) {
             state = SpliceOutState.Preparing(userAmount = amount, feeratePerByte = feeratePerByte)
-            log.debug("preparing splice-out for amount=$amount feerate=${feeratePerByte}sat/vb address=$address")
+            log.debug("preparing splice-out for amount={} feerate={}sat/vb address={}", amount, feeratePerByte, address)
             val userFeerate = FeeratePerKw(FeeratePerByte(feeratePerByte))
             val scriptPubKey = Parser.addressToPublicKeyScriptOrNull(chain, address)!!
             val res = peerManager.getPeer().estimateFeeForSpliceOut(
@@ -100,7 +101,7 @@ class SpliceOutViewModel(private val peerManager: PeerManager, private val chain
     ) {
         if (state is SpliceOutState.ReadyToSend) {
             state = SpliceOutState.Executing(amount, feerate)
-            log.debug("executing splice-out with for=$amount feerate=${feerate}sat/vb address=$address")
+            log.debug("executing splice-out with for={} feerate={}sat/vb address={}", amount, feerate, address)
             viewModelScope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, e ->
                 log.error("error when executing splice-out: ", e)
                 state = SpliceOutState.Error.Thrown(e)
@@ -111,11 +112,11 @@ class SpliceOutViewModel(private val peerManager: PeerManager, private val chain
                     feerate = feerate,
                 )
                 when (response) {
-                    is ChannelCommand.Commitment.Splice.Response.Created -> {
+                    is ChannelFundingResponse.Success -> {
                         log.info("successfully executed splice-out: $response")
                         state = SpliceOutState.Complete.Success(amount, feerate, response)
                     }
-                    is ChannelCommand.Commitment.Splice.Response.Failure -> {
+                    is ChannelFundingResponse.Failure -> {
                         log.info("failed to execute splice-out: $response")
                         state = SpliceOutState.Complete.Failure(amount, feerate, response)
                     }

@@ -36,6 +36,7 @@ class SyncManager {
 			walletInfo: walletInfo
 		)
 		syncBackupManager = SyncBackupManager(
+			chain: chain,
 			walletInfo: walletInfo
 		)
 		

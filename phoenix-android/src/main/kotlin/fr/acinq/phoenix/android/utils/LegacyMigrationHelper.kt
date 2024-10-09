@@ -46,6 +46,7 @@ import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
+import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.data.lnurl.LnurlAuth
 import fr.acinq.phoenix.legacy.db.*
 import fr.acinq.phoenix.legacy.utils.Prefs
@@ -305,7 +306,7 @@ object LegacyMigrationHelper {
             // use the PayToOpen metadata to know how the payment was received
             val receivedWith = if (payToOpenMeta != null || payment.paymentType() == PaymentType.SwapIn()) {
                 IncomingPayment.ReceivedWith.NewChannel(
-                    amount = status.amount().toLong().msat,
+                    amountReceived = status.amount().toLong().msat,
                     serviceFee = payToOpenMeta?.fee_sat?.sat?.toMilliSatoshi() ?: 0.msat,
                     miningFee = 0.sat,
                     channelId = ByteVector32.Zeroes,
@@ -315,9 +316,10 @@ object LegacyMigrationHelper {
                 )
             } else {
                 IncomingPayment.ReceivedWith.LightningPayment(
-                    amount = status.amount().toLong().msat,
+                    amountReceived = status.amount().toLong().msat,
                     channelId = ByteVector32.Zeroes,
-                    htlcId = 0L
+                    htlcId = 0L,
+                    fundingFee = null,
                 )
             }
 
@@ -494,12 +496,11 @@ object LegacyMigrationHelper {
 }
 
 /** Returns true if the payment is a channel-close made by the legacy app to the node's swap-in address. Uses the [LegacyMigrationHelper.migrationDescFlag] metadata flag. */
-fun WalletPaymentInfo.isLegacyMigration(peer: Peer?): Boolean? {
-    val p = payment
+fun WalletPayment.isLegacyMigration(metadata: WalletPaymentMetadata, peer: Peer?): Boolean? {
     return when {
-        p !is ChannelCloseOutgoingPayment -> false
+        this !is ChannelCloseOutgoingPayment -> false
         peer == null -> null
-        p.address == peer.phoenixSwapInWallet.legacySwapInAddress && metadata.userDescription == LegacyMigrationHelper.migrationDescFlag -> true
+        this.address == peer.phoenixSwapInWallet.legacySwapInAddress && metadata.userDescription == LegacyMigrationHelper.migrationDescFlag -> true
         else -> false
     }
 }

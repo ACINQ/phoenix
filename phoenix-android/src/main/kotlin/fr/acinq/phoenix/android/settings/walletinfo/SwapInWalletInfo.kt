@@ -237,7 +237,8 @@ private fun ReadyForSwapView(
                         DecimalFormat("0.##").format(lastSwapFailedNotification.maxRelativeFeeBasisPoints.toDouble() / 100),
                     )
                     is Notification.FeePolicyDisabled -> stringResource(id = R.string.walletinfo_onchain_swapin_last_attempt_disabled)
-                    is Notification.ChannelsInitializing -> stringResource(id = R.string.walletinfo_onchain_swapin_last_attempt_channels_init)
+                    is Notification.MissingOffChainAmountTooLow -> stringResource(id = R.string.notif_rejected_amount_too_low)
+                    is Notification.GenericError -> stringResource(id = R.string.notif_rejected_generic_error)
                 },
             )
         }

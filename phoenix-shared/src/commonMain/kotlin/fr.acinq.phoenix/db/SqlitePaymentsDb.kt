@@ -22,13 +22,10 @@ import app.cash.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
 import fr.acinq.bitcoin.TxId
-import fr.acinq.bitcoin.utils.Either
-import fr.acinq.lightning.channel.ChannelException
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.utils.*
-import fr.acinq.lightning.wire.FailureMessage
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentMetadata
@@ -76,9 +73,6 @@ class SqlitePaymentsDb(
         channel_close_outgoing_paymentsAdapter = Channel_close_outgoing_payments.Adapter(
             closing_info_typeAdapter = EnumColumnAdapter()
         ),
-        inbound_liquidity_outgoing_paymentsAdapter = Inbound_liquidity_outgoing_payments.Adapter(
-            lease_typeAdapter = EnumColumnAdapter()
-        )
     )
 
     internal val inQueries = IncomingQueries(database)
@@ -88,7 +82,7 @@ class SqlitePaymentsDb(
     internal val cpfpQueries = SpliceCpfpOutgoingQueries(database)
     private val aggrQueries = database.aggregatedQueriesQueries
     internal val metaQueries = MetadataQueries(database)
-    private val linkTxToPaymentQueries = LinkTxToPaymentQueries(database)
+    internal val linkTxToPaymentQueries = LinkTxToPaymentQueries(database)
     internal val inboundLiquidityQueries = InboundLiquidityQueries(database)
 
     private var metadataQueue = MutableStateFlow(mapOf<WalletPaymentId, WalletPaymentMetadataRow>())
@@ -118,23 +112,29 @@ class SqlitePaymentsDb(
                         spliceOutQueries.addSpliceOutgoingPayment(outgoingPayment)
                         linkTxToPaymentQueries.linkTxToPayment(
                             txId = outgoingPayment.txId,
-                            walletPaymentId = outgoingPayment.walletPaymentId()
+                            walletPaymentId = paymentId
                         )
                     }
                     is ChannelCloseOutgoingPayment -> {
                         channelCloseQueries.addChannelCloseOutgoingPayment(outgoingPayment)
                         linkTxToPaymentQueries.linkTxToPayment(
                             txId = outgoingPayment.txId,
-                            walletPaymentId = outgoingPayment.walletPaymentId()
+                            walletPaymentId = paymentId
                         )
                     }
                     is SpliceCpfpOutgoingPayment -> {
                         cpfpQueries.addCpfpPayment(outgoingPayment)
-                        linkTxToPaymentQueries.linkTxToPayment(outgoingPayment.txId, outgoingPayment.walletPaymentId())
+                        linkTxToPaymentQueries.linkTxToPayment(
+                            txId = outgoingPayment.txId,
+                            walletPaymentId = paymentId
+                        )
                     }
                     is InboundLiquidityOutgoingPayment -> {
                         inboundLiquidityQueries.add(outgoingPayment)
-                        linkTxToPaymentQueries.linkTxToPayment(outgoingPayment.txId, outgoingPayment.walletPaymentId())
+                        linkTxToPaymentQueries.linkTxToPayment(
+                            txId = outgoingPayment.txId,
+                            walletPaymentId = paymentId
+                        )
                     }
                 }
                 // Add associated metadata within the same atomic database transaction.
@@ -152,6 +152,12 @@ class SqlitePaymentsDb(
     ) {
         withContext(Dispatchers.Default) {
             outQueries.completePayment(id, LightningOutgoingPayment.Status.Completed.Succeeded.OffChain(preimage, completedAt))
+        }
+    }
+
+    override suspend fun getInboundLiquidityPurchase(fundingTxId: TxId): InboundLiquidityOutgoingPayment? {
+        return withContext(Dispatchers.Default) {
+            inboundLiquidityQueries.getByTxId(fundingTxId)
         }
     }
 
@@ -381,6 +387,12 @@ class SqlitePaymentsDb(
 
     suspend fun listUnconfirmedTransactions(): Flow<List<ByteArray>> = withContext(Dispatchers.Default) {
         linkTxToPaymentQueries.listUnconfirmedTxs()
+    }
+
+    suspend fun getWalletPaymentIdForTxId(
+        txId: TxId
+    ): List<WalletPaymentId> = withContext(Dispatchers.Default) {
+        linkTxToPaymentQueries.listWalletPaymentIdsForTx(txId)
     }
 
     suspend fun listPaymentsForTxId(

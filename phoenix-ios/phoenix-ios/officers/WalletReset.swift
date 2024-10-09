@@ -170,8 +170,8 @@ class WalletReset {
 		
 		let dbDir = groupDir.appendingPathComponent("databases", isDirectory: true)
 		
-		let chainName = Biz.business.chain.name.lowercased()
-		let nodeIdHash = Biz.nodeIdHash ?? "nil"
+		let chainName: String = Biz.business.chain.phoenixName
+		let nodeIdHash: String = Biz.nodeIdHash!
 		
 		log.debug("dbDir: \(dbDir.path)")
 		log.debug("chainName: \(chainName)")
@@ -214,9 +214,9 @@ class WalletReset {
 		log.trace("step4()")
 		progress.send(.resetingUserDefaults)
 		
-		let encrypedNodeId = Biz.encryptedNodeId ?? "nil"
+		let walletId = Biz.walletId!
 		
-		Prefs.shared.resetWallet(encryptedNodeId: encrypedNodeId)
+		Prefs.shared.resetWallet(walletId)
 		GroupPrefs.shared.resetWallet()
 		
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {

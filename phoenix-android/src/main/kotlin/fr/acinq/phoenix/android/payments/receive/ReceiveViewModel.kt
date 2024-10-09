@@ -131,11 +131,9 @@ class ReceiveViewModel(
                 val startAddress = keyManager.swapInOnChainWallet.getSwapInProtocol(startIndex).address(chain)
                 val image = BitmapHelper.generateBitmap(startAddress).asImageBitmap()
                 currentSwapAddress = BitcoinAddressState.Show(startIndex, startAddress, image)
-                log.info("starting with swap-in address $startAddress:$startIndex")
 
                 // monitor the actual address from the swap-in wallet -- might take some time since the wallet must check all previous addresses
                 peerManager.getPeer().phoenixSwapInWallet.swapInAddressFlow.filterNotNull().collect { (newAddress, newIndex) ->
-                    log.info("swap-in wallet current address update: $newAddress:$newIndex")
                     val newImage = BitmapHelper.generateBitmap(newAddress).asImageBitmap()
                     internalDataRepository.saveLastUsedSwapIndex(newIndex)
                     currentSwapAddress = BitcoinAddressState.Show(newIndex, newAddress, newImage)

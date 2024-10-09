@@ -238,7 +238,7 @@ extension SyncBackupManager {
 				
 				log.trace("downloadPayments(): finish: success")
 				
-				Prefs.shared.backupTransactions.markHasDownloadedPayments(self.encryptedNodeId)
+				Prefs.shared.backupTransactions.markHasDownloadedPayments(walletId)
 				self.consecutiveErrorCount = 0
 				
 				if let newState = await self.actor.didDownloadPayments() {

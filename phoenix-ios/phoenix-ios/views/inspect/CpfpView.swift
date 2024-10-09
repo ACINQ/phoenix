@@ -27,7 +27,7 @@ enum CpfpError: Error {
 	case feeNotIncreased
 	case noChannels
 	case errorThrown(message: String)
-	case executeError(problem: SpliceOutProblem)
+	case executeError(problem: ChannelFundingProblem)
 }
 
 
@@ -715,7 +715,7 @@ struct CpfpView: View {
 					feerate: feeratePerKw
 				)
 				
-				if let problem = SpliceOutProblem.fromResponse(response) {
+				if let problem = ChannelFundingProblem.fromResponse(response) {
 					self.cpfpError = .executeError(problem: problem)
 				} else {
 					switch location {

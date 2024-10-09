@@ -34,24 +34,24 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
 import fr.acinq.lightning.db.SpliceOutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
+import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountView
@@ -142,7 +142,8 @@ fun PaymentLine(
             Row {
                 PaymentDescription(paymentInfo = paymentInfo, contactInfo = contactInfo, modifier = Modifier.weight(1.0f))
                 Spacer(modifier = Modifier.width(16.dp))
-                if (payment.state() != WalletPaymentState.Failure) {
+                val hideAmount = payment.state() == WalletPaymentState.Failure || (payment is InboundLiquidityOutgoingPayment && payment.feePaidFromChannelBalance.total == 0.sat)
+                if (!hideAmount) {
                     val isOutgoing = payment is OutgoingPayment
                     if (isAmountRedacted) {
                         Text(text = "****")
@@ -176,12 +177,11 @@ private fun PaymentDescription(
     contactInfo: ContactInfo?,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
     val payment = paymentInfo.payment
     val metadata = paymentInfo.metadata
     val peer by business.peerManager.peerState.collectAsState()
 
-    val desc = when (paymentInfo.isLegacyMigration(peer)) {
+    val desc = when (payment.isLegacyMigration(metadata, peer)) {
         null -> stringResource(id = R.string.paymentdetails_desc_closing_channel) // not sure yet, but we still know it's a closing
         true -> stringResource(id = R.string.paymentdetails_desc_legacy_migration)
         false -> metadata.userDescription
@@ -190,7 +190,7 @@ private fun PaymentDescription(
                 if (contactInfo != null) offerMetadata.payerNote else null
             }
             ?: payment.outgoingInvoiceRequest()?.payerNote
-            ?: payment.smartDescription(context)
+            ?: payment.smartDescription()
     }
 
     Text(

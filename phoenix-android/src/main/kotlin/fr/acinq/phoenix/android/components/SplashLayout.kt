@@ -23,18 +23,17 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -105,8 +104,8 @@ fun SplashLayout(
             }
             Column(
                 modifier = Modifier
-                    .widthIn(max = 500.dp)
-                    .padding(horizontal = 24.dp),
+                    .widthIn(max = 700.dp)
+                    .padding(horizontal = 6.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 bottomContent()
@@ -127,27 +126,34 @@ fun SplashLabelRow(
 ) {
     Row {
         Row(
-            modifier = Modifier.weight(1f).alignByBaseline(),
+            modifier = Modifier
+                .weight(1f)
+                .heightIn(min = 22.dp)
+                .alignByBaseline(),
             horizontalArrangement = Arrangement.End
         ) {
+            Spacer(modifier = Modifier.weight(1f))
+            if (helpMessage != null) {
+                IconPopup(modifier = Modifier.offset(y = (-3).dp), popupMessage = helpMessage, popupLink = helpLink, spaceLeft = 0.dp, spaceRight = 5.dp)
+            }
+            // workaround for issuetracker.google.com/issues/206039942
+            // to avoid a wrapped label with lots of empty space on the right, use IntrinsicSize.Min -- but only if the label is already long enough
+            val tryToWrap = remember(label) { label.length > 13 }
             Text(
                 text = label.uppercase(),
-                style = MaterialTheme.typography.subtitle1.copy(fontSize = 12.sp, textAlign = TextAlign.End),
+                style = MaterialTheme.typography.subtitle1.copy(fontSize = 12.sp),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f)
+                modifier = if (tryToWrap) Modifier.width(IntrinsicSize.Min) else Modifier
             )
-            if (helpMessage != null) {
-                IconPopup(modifier = Modifier.offset(y = (-3).dp), popupMessage = helpMessage, popupLink = helpLink, spaceLeft = 4.dp, spaceRight = 0.dp)
-            }
             if (icon != null) {
-                Spacer(modifier = Modifier.width(4.dp))
+                Spacer(modifier = Modifier.width(3.dp))
                 Image(
                     painter = painterResource(id = icon),
                     colorFilter = ColorFilter.tint(iconTint),
                     contentDescription = null,
                     modifier = Modifier
-                        .size(ButtonDefaults.IconSize)
+                        .size(17.dp)
                         .offset(y = (-2).dp)
                 )
             }
@@ -175,7 +181,7 @@ fun SplashClickableContent(
             .offset(x = (-8).dp),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Column(modifier = Modifier.padding(8.dp)) {
+        Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)) {
             content()
         }
     }

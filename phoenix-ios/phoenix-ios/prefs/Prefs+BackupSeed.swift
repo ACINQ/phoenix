@@ -16,6 +16,17 @@ class Prefs_BackupSeed {
 		return Prefs.shared.defaults
 	}
 	
+	/// Updating publishers should always be done on the main thread.
+	/// Otherwise we risk updating UI components on a background thread, which is dangerous.
+	/// 
+	private func runOnMainThread(_ block: @escaping () -> Void) {
+		if Thread.isMainThread {
+			block()
+		} else {
+			DispatchQueue.main.async { block() }
+		}
+	}
+	
 	lazy private(set) var isEnabled_publisher: CurrentValueSubject<Bool, Never> = {
 		return CurrentValueSubject<Bool, Never>(self.isEnabled)
 	}()
@@ -32,7 +43,9 @@ class Prefs_BackupSeed {
 		set {
 			let key = Key.backupSeed_enabled.rawValue
 			defaults.set(newValue, forKey: key)
-			isEnabled_publisher.send(newValue)
+			runOnMainThread {
+				self.isEnabled_publisher.send(newValue)
+			}
 		}
 	}
 	
@@ -40,43 +53,45 @@ class Prefs_BackupSeed {
 		return PassthroughSubject<Void, Never>()
 	}()
 	
-	private func hasUploadedSeed_key(_ encryptedNodeId: String) -> String {
-		return "\(Key.backupSeed_hasUploadedSeed.rawValue)-\(encryptedNodeId)"
+	private func hasUploadedSeed_key(_ walletId: WalletIdentifier) -> String {
+		return "\(Key.backupSeed_hasUploadedSeed.rawValue)-\(walletId.prefsKeySuffix)"
 	}
 	
-	func hasUploadedSeed(encryptedNodeId: String) -> Bool {
+	func hasUploadedSeed(_ walletId: WalletIdentifier) -> Bool {
 		
-		return defaults.bool(forKey: hasUploadedSeed_key(encryptedNodeId))
+		return defaults.bool(forKey: hasUploadedSeed_key(walletId))
 	}
 	
-	func setHasUploadedSeed(_ value: Bool, encryptedNodeId: String) {
+	func setHasUploadedSeed(_ value: Bool, _ walletId: WalletIdentifier) {
 		
-		let key = hasUploadedSeed_key(encryptedNodeId)
+		let key = hasUploadedSeed_key(walletId)
 		if value == true {
 			defaults.setValue(value, forKey: key)
 		} else {
 			defaults.removeObject(forKey: key)
 		}
-		hasUploadedSeed_publisher.send()
+		runOnMainThread {
+			self.hasUploadedSeed_publisher.send()
+		}
 	}
 	
 	lazy private(set) var name_publisher: PassthroughSubject<Void, Never> = {
 		return PassthroughSubject<Void, Never>()
 	}()
 	
-	private func name_key(_ encryptedNodeId: String) -> String {
-		return "\(Key.backupSeed_name)-\(encryptedNodeId)"
+	private func name_key(_ walletId: WalletIdentifier) -> String {
+		return "\(Key.backupSeed_name)-\(walletId.prefsKeySuffix)"
 	}
 	
-	func name(encryptedNodeId: String) -> String? {
+	func name(_ walletId: WalletIdentifier) -> String? {
 		
-		return defaults.string(forKey: name_key(encryptedNodeId))
+		return defaults.string(forKey: name_key(walletId))
 	}
 	
-	func setName(_ value: String?, encryptedNodeId: String) {
+	func setName(_ value: String?, _ walletId: WalletIdentifier) {
 		
-		let key = name_key(encryptedNodeId)
-		let oldValue = name(encryptedNodeId: encryptedNodeId) ?? ""
+		let key = name_key(walletId)
+		let oldValue = name(walletId) ?? ""
 		let newValue = value ?? ""
 		
 		if oldValue != newValue {
@@ -85,8 +100,11 @@ class Prefs_BackupSeed {
 			} else {
 				defaults.setValue(newValue, forKey: key)
 			}
-			setHasUploadedSeed(false, encryptedNodeId: encryptedNodeId)
-			name_publisher.send()
+			setHasUploadedSeed(false, walletId)
+			runOnMainThread {
+				self.name_publisher.send()
+			}
+			
 		}
 	}
 	
@@ -94,41 +112,45 @@ class Prefs_BackupSeed {
 		return PassthroughSubject<Void, Never>()
 	}()
 	
-	private func manualBackup_taskDone_key(_ encryptedNodeId: String) -> String {
-		return "\(Key.manualBackup_taskDone)-\(encryptedNodeId)"
+	private func manualBackup_taskDone_key(_ walletId: WalletIdentifier) -> String {
+		return "\(Key.manualBackup_taskDone)-\(walletId.prefsKeySuffix)"
 	}
 	
-	func manualBackup_taskDone(encryptedNodeId: String) -> Bool {
+	func manualBackup_taskDone(_ walletId: WalletIdentifier) -> Bool {
 		
-		return defaults.bool(forKey: manualBackup_taskDone_key(encryptedNodeId))
+		return defaults.bool(forKey: manualBackup_taskDone_key(walletId))
 	}
 	
-	func manualBackup_setTaskDone(_ newValue: Bool, encryptedNodeId: String) {
+	func manualBackup_setTaskDone(_ newValue: Bool, _ walletId: WalletIdentifier) {
 		
-		let key = manualBackup_taskDone_key(encryptedNodeId)
+		let key = manualBackup_taskDone_key(walletId)
 		if newValue {
 			defaults.setValue(newValue, forKey: key)
 		} else {
 			defaults.removeObject(forKey: key)
 		}
-		manualBackup_taskDone_publisher.send()
+		runOnMainThread {
+			self.manualBackup_taskDone_publisher.send()
+		}
 	}
 	
-	func resetWallet(encryptedNodeId: String) {
+	func resetWallet(_ walletId: WalletIdentifier) {
 		
 		defaults.removeObject(forKey: Key.backupSeed_enabled.rawValue)
-		defaults.removeObject(forKey: hasUploadedSeed_key(encryptedNodeId))
-		defaults.removeObject(forKey: name_key(encryptedNodeId))
-		defaults.removeObject(forKey: manualBackup_taskDone_key(encryptedNodeId))
+		defaults.removeObject(forKey: hasUploadedSeed_key(walletId))
+		defaults.removeObject(forKey: name_key(walletId))
+		defaults.removeObject(forKey: manualBackup_taskDone_key(walletId))
 		
 		// Reset any publishers with stored state
-		isEnabled_publisher.send(self.isEnabled)
+		runOnMainThread {
+			self.isEnabled_publisher.send(self.isEnabled)
+		}
 	}
 }
 
 extension Prefs {
 	
-	func backupSeedStatePublisher(_ encryptedNodeId: String) -> AnyPublisher<BackupSeedState, Never> {
+	func backupSeedStatePublisher(_ walletId: WalletIdentifier) -> AnyPublisher<BackupSeedState, Never> {
 		
 		let publisher = Publishers.CombineLatest3(
 			backupSeed.isEnabled_publisher,            // CurrentValueSubject<Bool, Never>
@@ -138,8 +160,8 @@ extension Prefs {
 			
 			let prefs = Prefs.shared
 			
-			let backupSeed_hasUploadedSeed = prefs.backupSeed.hasUploadedSeed(encryptedNodeId: encryptedNodeId)
-			let manualBackup_taskDone = prefs.backupSeed.manualBackup_taskDone(encryptedNodeId: encryptedNodeId)
+			let backupSeed_hasUploadedSeed = prefs.backupSeed.hasUploadedSeed(walletId)
+			let manualBackup_taskDone = prefs.backupSeed.manualBackup_taskDone(walletId)
 			
 			if backupSeed_isEnabled {
 				if backupSeed_hasUploadedSeed {

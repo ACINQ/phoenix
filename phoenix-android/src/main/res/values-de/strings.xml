@@ -337,7 +337,8 @@
     <string name="paymentdetails_lnurlpay_action_aes_label">Nachricht</string>
     <string name="paymentdetails_lnurlpay_action_aes_decrypting">Nachricht entschlüsseln..</string>
 
-    <string name="paymentdetails_desc_label">Desc.</string>
+    <string name="paymentdetails_desc_label">Beschreibung</string>
+    <string name="paymentdetails_note_label">Hinweis</string>
     <string name="paymentdetails_destination_label">Gesendet an</string>
     <string name="paymentdetails_destination_cpfp_value">Bitcoin-Miner</string>
     <string name="paymentdetails_fees_label">Gebühren</string>
@@ -349,7 +350,8 @@
     <string name="paymentdetails_desc_closing_channel">Kanal-Schließung</string>
     <string name="paymentdetails_desc_legacy_migration">Migration von Legacy-App</string>
     <string name="paymentdetails_desc_cpfp">Beschleunigte Transaktion</string>
-    <string name="paymentdetails_desc_inbound_liquidity">+%1$s eingehende Liquidität</string>
+    <string name="paymentdetails_desc_liquidity_manual">Manuelle Liquidität (+%1$s)</string>
+    <string name="paymentdetails_desc_liquidity_automated">Kanal-Verwaltung</string>
     <string name="paymentdetails_desc_swapout">Swap-out an %1$s</string>
     <string name="paymentdetails_desc_swapin">On-Chain Einzahlung</string>
 
@@ -382,7 +384,6 @@
     <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
 
     <string name="paymentdetails_liquidity_amount_label">Geforderter Betrag</string>
-    <string name="paymentdetails_liquidity_signature_label">Unterschrift</string>
 
     <string name="paymentdetails_closing_type_label">Schließungs-Typ</string>
     <string name="paymentdetails_closing_type_mutual">Einvernehmlich</string>

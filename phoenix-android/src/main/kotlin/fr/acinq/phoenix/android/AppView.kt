@@ -99,6 +99,7 @@ import fr.acinq.phoenix.android.settings.displayseed.DisplaySeedView
 import fr.acinq.phoenix.android.settings.fees.AdvancedIncomingFeePolicy
 import fr.acinq.phoenix.android.settings.fees.LiquidityPolicyView
 import fr.acinq.phoenix.android.settings.walletinfo.FinalWalletInfo
+import fr.acinq.phoenix.android.settings.walletinfo.FinalWalletRefundView
 import fr.acinq.phoenix.android.settings.walletinfo.SendSwapInRefundView
 import fr.acinq.phoenix.android.settings.walletinfo.SwapInAddresses
 import fr.acinq.phoenix.android.settings.walletinfo.SwapInSignerView
@@ -246,7 +247,8 @@ fun AppView(
                                 onPaymentsHistoryClick = { navController.navigate(Screen.PaymentsHistory.route) },
                                 onTorClick = { navController.navigate(Screen.TorConfig) },
                                 onElectrumClick = { navController.navigate(Screen.ElectrumServer) },
-                                onShowSwapInWallet = { navController.navigate(Screen.WalletInfo.SwapInWallet) },
+                                onNavigateToSwapInWallet = { navController.navigate(Screen.WalletInfo.SwapInWallet) },
+                                onNavigateToFinalWallet = { navController.navigate(Screen.WalletInfo.FinalWallet) },
                                 onShowNotifications = { navController.navigate(Screen.Notifications) },
                                 onRequestLiquidityClick = { navController.navigate(Screen.LiquidityRequest.route) },
                             )
@@ -455,7 +457,10 @@ fun AppView(
                         SendSwapInRefundView(onBackClick = { navController.popBackStack() })
                     }
                     composable(Screen.WalletInfo.FinalWallet.route) {
-                        FinalWalletInfo(onBackClick = { navController.popBackStack() })
+                        FinalWalletInfo(onBackClick = { navController.popBackStack() }, onSpendClick = { navController.navigate(Screen.WalletInfo.FinalWalletRefund.route) })
+                    }
+                    composable(Screen.WalletInfo.FinalWalletRefund.route) {
+                        FinalWalletRefundView(onBackClick = { navController.popBackStack() })
                     }
                     composable(Screen.LiquidityPolicy.route, deepLinks = listOf(navDeepLink { uriPattern ="phoenix:liquiditypolicy" })) {
                         LiquidityPolicyView(

@@ -28,6 +28,7 @@ import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.services.NodeService
 import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.managers.nodeIdHash
+import fr.acinq.phoenix.utils.extensions.phoenixName
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -98,7 +99,7 @@ class StartupViewModel : ViewModel() {
             val seed = MnemonicCode.toSeed(mnemonics = words.joinToString(" "), passphrase = "").byteVector()
             val localKeyManager = LocalKeyManager(seed = seed, chain = NodeParamsManager.chain, remoteSwapInExtendedPublicKey = NodeParamsManager.remoteSwapInXpub)
             val nodeIdHash = localKeyManager.nodeIdHash()
-            val channelsDbFile = context.getDatabasePath("channels-${NodeParamsManager.chain.name.lowercase()}-$nodeIdHash.sqlite")
+            val channelsDbFile = context.getDatabasePath("channels-${NodeParamsManager.chain.phoenixName}-$nodeIdHash.sqlite")
             if (channelsDbFile.exists()) {
                 decryptionState.value = StartupDecryptionState.SeedInputFallback.Success.MatchingData
                 val encodedSeed = EncryptedSeed.fromMnemonics(words)

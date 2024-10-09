@@ -24,7 +24,7 @@ struct LiquidityAdsView: View {
 	
 	@State var sliderValue: Double = 0
 	@State var feeInfo: LiquidityFeeInfo? = nil
-	@State var finalResult: Lightning_kmpChannelCommand.CommitmentSpliceResponse? = nil
+	@State var finalResult: Lightning_kmpChannelFundingResponse? = nil
 	
 	@State var isEstimating: Bool = false
 	@State var isPurchasing: Bool = false
@@ -474,12 +474,12 @@ struct LiquidityAdsView: View {
 	
 	@ViewBuilder
 	func section_result(
-		_ finalResult: Lightning_kmpChannelCommand.CommitmentSpliceResponse
+		_ finalResult: Lightning_kmpChannelFundingResponse
 	) -> some View {
 		
 		Section {
-			if let _ = finalResult.asCreated() {
-				section_result_created()
+			if let _ = finalResult.asSuccess() {
+				section_result_success()
 			} else if let failure = finalResult.asFailure() {
 				section_result_failure(failure)
 			}
@@ -487,7 +487,7 @@ struct LiquidityAdsView: View {
 	}
 	
 	@ViewBuilder
-	func section_result_created() -> some View {
+	func section_result_success() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
@@ -535,7 +535,7 @@ struct LiquidityAdsView: View {
 	
 	@ViewBuilder
 	func section_result_failure(
-		_ failure: Lightning_kmpChannelCommand.CommitmentSpliceResponseFailure
+		_ failure: Lightning_kmpChannelFundingResponse.Failure
 	) -> some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
@@ -585,7 +585,7 @@ struct LiquidityAdsView: View {
 	
 	@ViewBuilder
 	func section_result_failure_details(
-		_ failure: Lightning_kmpChannelCommand.CommitmentSpliceResponseFailure
+		_ failure: Lightning_kmpChannelFundingResponse.Failure
 	) -> some View {
 		
 		Group {
@@ -595,10 +595,12 @@ struct LiquidityAdsView: View {
 				Text("Invalid splice-out pubKeyScript")
 			} else if let _ = failure.asSpliceAlreadyInProgress() {
 				Text("Splice already in progress")
-			} else if let _ = failure.asChannelNotQuiescent() {
-				Text("Splice has been aborted")
 			} else if let _ = failure.asConcurrentRemoteSplice() {
 				Text("Concurrent splice in progress")
+			} else if let _ = failure.asChannelNotQuiescent() {
+				Text("Splice has been aborted")
+			} else if let _ = failure.asInvalidChannelParameters() {
+				Text("Invalid channel parameters")
 			} else if let _ = failure.asInvalidLiquidityAds() {
 				Text("Invalid liquidity ads")
 			} else if let _ = failure.asFundingFailure() {
@@ -611,6 +613,8 @@ struct LiquidityAdsView: View {
 				Text("Cannot create commit tx")
 			} else if let _ = failure.asAbortedByPeer() {
 				Text("Aborted by peer")
+			} else if let _ = failure.asUnexpectedMessage() {
+				Text("Unexpected message")
 			} else if let _ = failure.asDisconnected() {
 				Text("Disconnected")
 			} else {
@@ -791,30 +795,38 @@ struct LiquidityAdsView: View {
 		let feePerByte = Lightning_kmpFeeratePerByte(feerate: satsPerByte)
 		let feePerKw = Lightning_kmpFeeratePerKw(feeratePerByte: feePerByte)
 		
-		let leaseRate = NodeParamsManager.companion._liquidityLeaseRate(amount: amount)
-		
 		isEstimating = true
 		Task { @MainActor in
+			
+			var fundingRate: Lightning_kmpLiquidityAdsFundingRate? = nil
+			do {
+				fundingRate = try await peer.fundingRate(amount: amount)
+			} catch {
+				log.error("peer.fundingRate(amount): error: \(error)")
+			}
 			
 			var pair: KotlinPair<
 				Lightning_kmpFeeratePerKw,
 				Lightning_kmpChannelManagementFees>? = nil
 			
 			var _channelsNotAvailable = false
-			do {
-				pair = try await peer._estimateFeeForInboundLiquidity(
-					amount: amount,
-					targetFeerate: feePerKw,
-					leaseRate: leaseRate
-				)
-				
-				if pair == nil {
-					log.error("peer.estimateFeeForInboundLiquidity() == nil")
-					_channelsNotAvailable = true
+			
+			if let fundingRate {
+				do {
+					pair = try await peer.estimateFeeForInboundLiquidity(
+						amount: amount,
+						targetFeerate: feePerKw,
+						fundingRate: fundingRate
+					)
+					
+					if pair == nil {
+						log.error("peer.estimateFeeForInboundLiquidity() == nil")
+						_channelsNotAvailable = true
+					}
+					
+				} catch {
+					log.error("peer.estimateFeeForInboundLiquidity(): error: \(error)")
 				}
-				
-			} catch {
-				log.error("peer.estimateFeeForInboundLiquidity(): error: \(error)")
 			}
 			
 			let currentAmount = self.selectedLiquidityAmount()
@@ -826,10 +838,11 @@ struct LiquidityAdsView: View {
 			
 			if let pair = pair,
 			   let feerate: Lightning_kmpFeeratePerKw = pair.first,
-			   let fees: Lightning_kmpChannelManagementFees = pair.second
+			   let fees: Lightning_kmpChannelManagementFees = pair.second,
+				let fundingRate = fundingRate
 			{
 				feeInfo = LiquidityFeeInfo(
-					params: LiquidityFeeParams(amount: amount, feerate: feerate, leaseRate: leaseRate),
+					params: LiquidityFeeParams(amount: amount, feerate: feerate, fundingRate: fundingRate),
 					estimate: LiquidityFeeEstimate(minerFee: fees.miningFee, serviceFee: fees.serviceFee)
 				)
 			}
@@ -853,13 +866,13 @@ struct LiquidityAdsView: View {
 		isPurchasing = true
 		Task { @MainActor in
 			
-			var result: Lightning_kmpChannelCommand.CommitmentSpliceResponse? = nil
+			var result: Lightning_kmpChannelFundingResponse? = nil
 			var _channelsNotAvailable = false
 			do {
-				result = try await peer._requestInboundLiquidity(
+				result = try await peer.requestInboundLiquidity(
 					amount: feeInfo.params.amount,
 					feerate: feeInfo.params.feerate,
-					leaseRate: feeInfo.params.leaseRate
+					fundingRate: feeInfo.params.fundingRate
 				)
 				
 				if result == nil {
@@ -874,12 +887,12 @@ struct LiquidityAdsView: View {
 			if let result {
 				finalResult = result
 			} else if !_channelsNotAvailable {
-				finalResult = Lightning_kmpChannelCommand.CommitmentSpliceResponseFailureDisconnected()
+				finalResult = Lightning_kmpChannelFundingResponse.FailureDisconnected()
 			}
 			
 			channelsNotAvailable = _channelsNotAvailable
 			isPurchasing = false
-			isPurchased = (result?.asCreated() != nil)
+			isPurchased = (result?.asSuccess() != nil)
 			
 		} // </Task>
 	}

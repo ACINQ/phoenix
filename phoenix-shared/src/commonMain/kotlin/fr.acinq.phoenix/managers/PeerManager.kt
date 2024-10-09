@@ -196,14 +196,12 @@ class PeerManager(
                 client = electrumClient,
                 watcher = electrumWatcher,
                 db = databaseManager.databases.filterNotNull().first(),
-                trustedSwapInTxs = startupParams.trustedSwapInTxs,
                 socketBuilder = null,
                 scope = MainScope()
             )
             _peer.value = peer
 
             launch { monitorNodeEvents(nodeParams) }
-            launch { updatePeerSwapInFeerate(peer) }
 
             // The local channels flow must use `bootFlow` first, as `channelsFlow` is empty when the wallet starts.
             // `bootFlow` data come from the local database and will be overridden by fresh data once the connection
@@ -248,14 +246,6 @@ class PeerManager(
     /** Override the liquidity policy setting used by the node. */
     suspend fun updatePeerLiquidityPolicy(newPolicy: LiquidityPolicy) {
         getPeer().nodeParams.liquidityPolicy.value = newPolicy
-    }
-
-    /** Update the peer's swap-in feerate with values from mempool.space estimator. */
-    private suspend fun updatePeerSwapInFeerate(peer: Peer) {
-        configurationManager.mempoolFeerate.filterNotNull().collect { feerate ->
-            logger.info { "using mempool.space feerate=$feerate" }
-            peer.swapInFeeratesFlow.value = FeeratePerKw(feerate.hour)
-        }
     }
 
     private suspend fun monitorNodeEvents(nodeParams: NodeParams) {

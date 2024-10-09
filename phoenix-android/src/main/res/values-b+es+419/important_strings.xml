@@ -41,7 +41,8 @@
     <string name="notif_rejected_over_absolute_timeout">La comisión fue %1$s, pero el límite máximo se fijó en %2$s. Este depósito vencerá el %3$s.</string>
     <string name="notif_rejected_over_relative">La comisión fue %1$s, que es más del %2$s%% del importe recibido. Toca para obtener más información.</string>
     <string name="notif_rejected_over_relative_timeout">La comisión fue %1$s, que es más del %2$s%% del importe recibido. Este depósito vencerá el %3$s.</string>
-    <string name="notif_rejected_channels_initializing">Los canales se estaban inicializando, por lo que no se pudo aceptar el pago. Intenta de nuevo más tarde.</string>
+    <string name="notif_rejected_amount_too_low">El importe del pago es demasiado bajo.</string>
+    <string name="notif_rejected_generic_error">Se ha producido un error durante la financiación. Vuelva a intentarlo más tarde.</string>
 
     <string name="notif_watcher_revoked_commit_title">Inicia Phoenix</string>
     <string name="notif_watcher_revoked_commit_message">Es posible que algunos de los canales se hayan cerrado.</string>
@@ -217,6 +218,9 @@
     <string name="inappnotif_mempool_full_message">Las comisiones en la cadena son elevadas.</string>
     <string name="inappnotif_mempool_full_action">Ver cómo afecta a Phoenix</string>
 
+    <string name="inappnotif_final_wallet_message">Fondos disponibles en la billetera final.</string>
+    <string name="inappnotif_final_wallet_action">Ver fondos</string>
+
     <string name="inappnotif_payment_onchain_pending_title">Fondos pendientes en la cadena (+%1$s)</string>
     <string name="inappnotif_payments_rejection_overview_one">Recientemente se rechazó un pago entrante</string>
     <string name="inappnotif_payments_rejection_overview_many">%1$d pagos entrantes rechazados recientemente</string>
@@ -224,7 +228,6 @@
     <string name="inappnotif_payment_rejected_disabled">La gestión automatizada de canales está desactivada.</string>
     <string name="inappnotif_payment_rejected_over_absolute">La comisión fue %1$s, pero el límite máximo se fijó en %2$s.</string>
     <string name="inappnotif_payment_rejected_over_relative">La comisión fue %1$s, que es más del %2$s%% del importe.</string>
-    <string name="inappnotif_payment_rejected_channel_initializing">Los canales todavía se están inicializando, por lo que no se pudo recibir ese pago.</string>
     <string name="inappnotif_payment_rejected_tweak_setting">Toca para configurar.</string>
     <string name="inappnotif_payment_rejected_view_wallet">Ver detalles</string>
 
@@ -246,6 +249,7 @@
 
     <!-- payment details -->
 
+    <string name="paymentdetails_liquidity_purchase_label">Liquidez</string>
     <string name="paymentdetails_funding_fees_label">Comisiones de minería</string>
     <string name="paymentdetails_funding_fees_desc">Comisiones pagadas a los mineros de la red Bitcoin para procesar la transacción en la cadena.</string>
     <string name="paymentdetails_service_fees_label">Comisiones de servicio</string>
@@ -254,8 +258,9 @@
     <string name="paymentdetails_liquidity_service_fee_help">Comisiones pagadas por el servicio de liquidez.</string>
     <string name="paymentdetails_liquidity_miner_fee_label">Comisiones de minería</string>
     <string name="paymentdetails_liquidity_miner_fee_help">Comisiones pagadas a los mineros de la red Bitcoin para procesar la transacción en la cadena.</string>
-    <string name="paymentdetails_liquidity_lease_duration_label">Duración</string>
-    <string name="paymentdetails_liquidity_lease_duration_value">1 año</string>
+    <string name="paymentdetails_liquidity_caused_by_label">Causado por</string>
+    <string name="paymentdetails_liquidity_caused_by_help">Esta liquidez era necesaria para recibir un pago.</string>
+    <string name="paymentdetails_liquidity_caused_by_help_link">Vea cómo optimizar</string>
 
     <!-- lnurl -->
 
@@ -308,7 +313,6 @@
 
     <string name="walletinfo_onchain_swapin_last_attempt">Error al intentar realizar el intercambio %1$s</string>
     <string name="walletinfo_onchain_swapin_last_attempt_disabled">La gestión de canales estaba desactivada.</string>
-    <string name="walletinfo_onchain_swapin_last_attempt_channels_init">Los canales aún se estaban inicializando.</string>
     <string name="walletinfo_onchain_swapin_timeout_1day">Este intercambio vencerá en un día.</string>
     <string name="walletinfo_onchain_swapin_timeout">Este intercambio vencerá en %1$s días.</string>
 
@@ -382,6 +386,7 @@
 
     <string name="liquidityads_error_header">Error al solicitar liquidez</string>
     <string name="liquidityads_error_channels_unavailable">Los canales no están disponibles. Vuelve a intentarlo más tarde.</string>
+    <string name="liquidityads_error_invalid_funding_amount">El importe solicitado no es válido.</string>
 
     <!-- payment line -->
 
@@ -449,6 +454,13 @@
     <string name="swapinrefund_failed_cannot_create">No se ha podido crear la transacción de cobro. Por favor, inténtelo de nuevo.</string>
     <string name="swapinrefund_success">Transacción publicada.</string>
     <string name="swapinrefund_success_details">Puede encontrar la transacción a continuación. No aparecerá en su historial de pagos, así que haga una copia ahora si lo necesita.</string>
+
+    <!-- Final wallet refund -->
+
+    <string name="finalwallet_refund_title">Gastar fondos del billetero final</string>
+    <string name="finalwallet_refund_available_none">No hay fondos disponibles</string>
+    <string name="finalwallet_refund_available">Importe disponible</string>
+    <string name="finalwallet_refund_instructions">Utilice esta pantalla para gastar fondos de su billetera final. Estos fondos proceden de canales que se han cerrado en el pasado. Esto no afecta a sus canales Lightning existentes.</string>
 
     <!-- experimental features -->
 

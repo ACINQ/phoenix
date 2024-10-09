@@ -106,8 +106,24 @@ struct LiquidityPolicy: Equatable, Codable {
 		)
 	}
 	
+	var effectiveInboundLiquidityTargetSats: Int64? {
+		return NodeParamsManager.companion.defaultLiquidityPolicy.inboundLiquidityTarget?.sat
+	}
+	
+	var effectiveInboundLiquidityTarget: Bitcoin_kmpSatoshi? {
+		if let sats = effectiveInboundLiquidityTargetSats {
+			return Bitcoin_kmpSatoshi(sat: sats)
+		} else {
+			return nil
+		}
+	}
+	
 	var effectiveMaxFeeSats: Int64 {
 		return maxFeeSats ?? NodeParamsManager.companion.defaultLiquidityPolicy.maxAbsoluteFee.sat
+	}
+	
+	var effectiveMaxFee: Bitcoin_kmpSatoshi {
+		return Bitcoin_kmpSatoshi(sat: effectiveMaxFeeSats)
 	}
 	
 	var effectiveMaxFeeBasisPoints: Int32 {
@@ -118,14 +134,20 @@ struct LiquidityPolicy: Equatable, Codable {
 		return skipAbsoluteFeeCheck ?? NodeParamsManager.companion.defaultLiquidityPolicy.skipAbsoluteFeeCheck
 	}
 	
+	var effectiveMaxAllowedFeeCredit: Lightning_kmpMilliSatoshi {
+		return NodeParamsManager.companion.defaultLiquidityPolicy.maxAllowedFeeCredit
+	}
+	
 	func toKotlin() -> Lightning_kmpLiquidityPolicy {
 		
 		if enabled {
 			
 			return Lightning_kmpLiquidityPolicy.Auto(
-				maxAbsoluteFee: Bitcoin_kmpSatoshi(sat: effectiveMaxFeeSats),
+				inboundLiquidityTarget: effectiveInboundLiquidityTarget,
+				maxAbsoluteFee: effectiveMaxFee,
 				maxRelativeFeeBasisPoints: effectiveMaxFeeBasisPoints,
-				skipAbsoluteFeeCheck: effectiveSkipAbsoluteFeeCheck
+				skipAbsoluteFeeCheck: effectiveSkipAbsoluteFeeCheck,
+				maxAllowedFeeCredit: effectiveMaxAllowedFeeCredit
 			)
 			
 		} else {

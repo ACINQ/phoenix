@@ -48,7 +48,8 @@
     <string name="notif_rejected_over_absolute_timeout">Ada ilikuwa %1$s, lakini ada yako ya juu ilikuwa imewekwa kwa %2$s. Amana hii itaisha muda wake ifikapo %3$s.</string>
     <string name="notif_rejected_over_relative">Ada ilikuwa %1$s ambayo ni zaidi ya %2$s%% ya kiasi kilichopokelewa. Bonyeza kwa maelezo zaidi.</string>
     <string name="notif_rejected_over_relative_timeout">Ada ilikuwa %1$s ambayo ni zaidi ya %2$s%% ya kiasi kilichopokelewa. Amana hii itaisha muda wake ifikapo %3$s.</string>
-    <string name="notif_rejected_channels_initializing">Chaneli zako zilikuwa zinaanzishwa na hazikuweza kukubali malipo hayo. Jaribu tena baadaye.</string>
+    <string name="notif_rejected_amount_too_low">Kiasi cha malipo ni kidogo sana.</string>
+    <string name="notif_rejected_generic_error">Hitilafu ilitokea wakati wa ufadhili. Tafadhali jaribu tena baadaye.</string>
 
     <string name="notif_watcher_revoked_commit_title">Tafadhali anzisha Phoenix</string>
     <string name="notif_watcher_revoked_commit_message">Baadhi ya chaneli zako zinaweza kuwa zimefungwa.</string>
@@ -222,6 +223,9 @@
     <string name="inappnotif_mempool_full_message">Ada za mtandaoni ziko juu.</string>
     <string name="inappnotif_mempool_full_action">Angalia jinsi Phoenix inavyoathirika</string>
 
+    <string name="inappnotif_final_wallet_message">Fedha zinapatikana katika pochi ya mwisho.</string>
+    <string name="inappnotif_final_wallet_action">Angalia fedha</string>
+
     <string name="inappnotif_payment_onchain_pending_title">Fedha za mtandaoni zinangosubiria (+%1$s)</string>
     <string name="inappnotif_payments_rejection_overview_one">Malipo moja ya kuingia yamekataliwa hivi karibuni</string>
     <string name="inappnotif_payments_rejection_overview_many">%1$d malipo ya kuingia yamekataliwa hivi karibuni</string>
@@ -229,7 +233,6 @@
     <string name="inappnotif_payment_rejected_disabled">Usimamizi wa njia otomatiki umelemazwa.</string>
     <string name="inappnotif_payment_rejected_over_absolute">Ada ilikuwa %1$s, lakini ada yako ya juu ilikuwa imewekwa kwa %2$s.</string>
     <string name="inappnotif_payment_rejected_over_relative">Ada ilikuwa %1$s ambayo ni zaidi ya %2$s%% ya kiasi hicho.</string>
-    <string name="inappnotif_payment_rejected_channel_initializing">Njia zako bado zinaanzishwa na haziwezi kupokea malipo hayo.</string>
     <string name="inappnotif_payment_rejected_tweak_setting">Gusa kusanidi.</string>
     <string name="inappnotif_payment_rejected_view_wallet">Angalia maelezo</string>
 
@@ -251,6 +254,7 @@
 
   <!-- payment details -->
 
+  <string name="paymentdetails_liquidity_purchase_label">Ukwasi</string>
   <string name="paymentdetails_funding_fees_label">Ada za wachimba madini</string>
   <string name="paymentdetails_funding_fees_desc">Ada zilizolipwa kwa wachimba madini wa mtandao wa Bitcoin kushughulikia muamala wa mtandaoni.</string>
   <string name="paymentdetails_service_fees_label">Ada za huduma</string>
@@ -259,8 +263,9 @@
   <string name="paymentdetails_liquidity_service_fee_help">Ada zilizolipwa kwa huduma ya ukwasi.</string>
   <string name="paymentdetails_liquidity_miner_fee_label">Ada za wachimba madini</string>
   <string name="paymentdetails_liquidity_miner_fee_help">Ada zilizolipwa kwa wachimba madini wa mtandao wa Bitcoin kushughulikia muamala wa mtandaoni.</string>
-  <string name="paymentdetails_liquidity_lease_duration_label">Muda</string>
-  <string name="paymentdetails_liquidity_lease_duration_value">1 mwaka</string>
+  <string name="paymentdetails_liquidity_caused_by_label">Imesababishwa na</string>
+  <string name="paymentdetails_liquidity_caused_by_help">Ukwasi huu ulihitajika ili kupokea malipo.</string>
+  <string name="paymentdetails_liquidity_caused_by_help_link">Tazama jinsi ya kuboresha</string>
 
   <!-- lnurl -->
 
@@ -313,7 +318,6 @@
 
   <string name="walletinfo_onchain_swapin_last_attempt">Jaribio la kubadilisha lilishindikana %1$s</string>
   <string name="walletinfo_onchain_swapin_last_attempt_disabled">Usimamizi wa njia ulikuwa umelemazwa.</string>
-  <string name="walletinfo_onchain_swapin_last_attempt_channels_init">Njia zilikuwa bado zinaanzishwa.</string>
   <string name="walletinfo_onchain_swapin_timeout_1day">Swap hii itaisha muda wake ndani ya siku moja!</string>
   <string name="walletinfo_onchain_swapin_timeout">Swap hii itaisha muda wake ndani ya siku %1$s.</string>
 
@@ -397,6 +401,7 @@
 
     <string name="liquidityads_error_header">Ombi la ukwasi limeshindwa</string>
     <string name="liquidityads_error_channels_unavailable">Njia hazipatikani. Jaribu tena baadaye.</string>
+    <string name="liquidityads_error_invalid_funding_amount">Kiasi kilichoombwa ni batili.</string>
 
     <!-- payment line -->
 
@@ -463,6 +468,13 @@
     <string name="swapinrefund_failed_cannot_create">Haiwezi kuunda muamala wa marejesho.</string>
     <string name="swapinrefund_success">Muamala umetangazwa.</string>
     <string name="swapinrefund_success_details">Unaweza kupata muamala unaotumia fedha hapa chini. Haitaonekana kwenye historia ya malipo yako, hivyo fanya nakala ya kitambulisho chake sasa ikiwa inahitajika.</string>
+
+    <!-- Final wallet refund -->
+
+    <string name="finalwallet_refund_title">Tumia pesa kutoka kwa mkoba wa mwisho</string>
+    <string name="finalwallet_refund_available_none">Hakuna fedha zinazopatikana</string>
+    <string name="finalwallet_refund_available">Kiasi kinachopatikana</string>
+    <string name="finalwallet_refund_instructions">Tumia skrini hii kutumia pesa kutoka kwa pochi yako ya mwisho. Fedha hizi hutoka kwa chaneli ambazo zilifungwa hapo awali. Hii haiathiri chaneli zako zilizopo za Lightning.</string>
 
     <!-- experimental features -->
 

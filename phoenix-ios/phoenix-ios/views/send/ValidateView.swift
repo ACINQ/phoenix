@@ -37,7 +37,7 @@ struct ValidateView: View {
 	
 	@State var paymentInProgress: Bool = false
 	@State var payOfferProblem: PayOfferProblem? = nil
-	@State var spliceOutProblem: SpliceOutProblem? = nil
+	@State var spliceOutProblem: ChannelFundingProblem? = nil
 	
 	@State var preTipAmountMsat: Int64? = nil
 	@State var postTipAmountMsat: Int64? = nil
@@ -1765,7 +1765,7 @@ struct ValidateView: View {
 				
 				self.paymentInProgress = false
 				
-				if let problem = SpliceOutProblem.fromResponse(response) {
+				if let problem = ChannelFundingProblem.fromResponse(response) {
 					self.spliceOutProblem = problem
 					
 				} else {

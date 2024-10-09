@@ -20,7 +20,7 @@ fileprivate enum Key: String {
 	case recentPaymentsConfig
 	case hasMergedChannelsForSplicing
 	case swapInAddressIndex
-	case hasUpgradedSeedCloudBackups
+	case hasUpgradedSeedCloudBackups_v2
 	case serverMessageReadIndex
 	case allowOverpayment
 	case doNotShowChannelImpactWarning
@@ -30,6 +30,7 @@ fileprivate enum KeyDeprecated: String {
 	case showChannelsRemoteBalance
 	case recentPaymentSeconds
 	case maxFees
+	case hasUpgradedSeedCloudBackups_v1 = "hasUpgradedSeedCloudBackups"
 }
 
 /// Standard app preferences, stored in the iOS UserDefaults system.
@@ -239,7 +240,7 @@ class Prefs {
 	// MARK: Reset Wallet
 	// --------------------------------------------------
 
-	func resetWallet(encryptedNodeId: String) {
+	func resetWallet(_ walletId: WalletIdentifier) {
 
 		// Purposefully not resetting:
 		// - Key.theme: App feels weird when this changes unexpectedly.
@@ -253,13 +254,18 @@ class Prefs {
 		defaults.removeObject(forKey: Key.recentPaymentsConfig.rawValue)
 		defaults.removeObject(forKey: Key.hasMergedChannelsForSplicing.rawValue)
 		defaults.removeObject(forKey: Key.swapInAddressIndex.rawValue)
-		defaults.removeObject(forKey: Key.hasUpgradedSeedCloudBackups.rawValue)
+		defaults.removeObject(forKey: Key.hasUpgradedSeedCloudBackups_v2.rawValue)
 		defaults.removeObject(forKey: Key.serverMessageReadIndex.rawValue)
 		defaults.removeObject(forKey: Key.allowOverpayment.rawValue)
 		defaults.removeObject(forKey: Key.doNotShowChannelImpactWarning.rawValue)
+
+		defaults.removeObject(forKey: KeyDeprecated.showChannelsRemoteBalance.rawValue)
+		defaults.removeObject(forKey: KeyDeprecated.recentPaymentSeconds.rawValue)
+		defaults.removeObject(forKey: KeyDeprecated.maxFees.rawValue)
+		defaults.removeObject(forKey: KeyDeprecated.hasUpgradedSeedCloudBackups_v1.rawValue)
 		
-		self.backupTransactions.resetWallet(encryptedNodeId: encryptedNodeId)
-		self.backupSeed.resetWallet(encryptedNodeId: encryptedNodeId)
+		self.backupTransactions.resetWallet(walletId)
+		self.backupSeed.resetWallet(walletId)
 	}
 
 	// --------------------------------------------------
@@ -353,8 +359,8 @@ extension UserDefaults {
 	}
   
 	@objc fileprivate var hasUpgradedSeedCloudBackups: Bool {
-		get { bool(forKey: Key.hasUpgradedSeedCloudBackups.rawValue) }
-		set { set(newValue, forKey: Key.hasUpgradedSeedCloudBackups.rawValue) }
+		get { bool(forKey: Key.hasUpgradedSeedCloudBackups_v2.rawValue) }
+		set { set(newValue, forKey: Key.hasUpgradedSeedCloudBackups_v2.rawValue) }
 	}
 	
 	@objc fileprivate var serverMessageReadIndex: NSNumber? {

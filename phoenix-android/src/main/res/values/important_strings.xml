@@ -48,7 +48,8 @@
     <string name="notif_rejected_over_absolute_timeout">The fee was %1$s, but your max fee was set to %2$s. This deposit will expire by %3$s.</string>
     <string name="notif_rejected_over_relative">The fee was %1$s which is more than %2$s%% of the amount received. Tap for details.</string>
     <string name="notif_rejected_over_relative_timeout">The fee was %1$s which is more than %2$s%% of the amount received. This deposit will expire by %3$s.</string>
-    <string name="notif_rejected_channels_initializing">Your channels were initializing and could not accept that payment. Try again later.</string>
+    <string name="notif_rejected_amount_too_low">Payment amount is too low.</string>
+    <string name="notif_rejected_generic_error">An error occurred during funding. Please try again later.</string>
 
     <string name="notif_watcher_revoked_commit_title">Please start Phoenix</string>
     <string name="notif_watcher_revoked_commit_message">Some of your channels may have closed.</string>
@@ -222,6 +223,9 @@
     <string name="inappnotif_mempool_full_message">On-chain fees are high.</string>
     <string name="inappnotif_mempool_full_action">See how Phoenix is affected</string>
 
+    <string name="inappnotif_final_wallet_message">Funds available in the final wallet.</string>
+    <string name="inappnotif_final_wallet_action">View funds.</string>
+
     <string name="inappnotif_payment_onchain_pending_title">On-chain funds pending (+%1$s)</string>
     <string name="inappnotif_payments_rejection_overview_one">An incoming payment has been recently rejected</string>
     <string name="inappnotif_payments_rejection_overview_many">%1$d incoming payments recently rejected</string>
@@ -229,7 +233,6 @@
     <string name="inappnotif_payment_rejected_disabled">Automated channel management is disabled.</string>
     <string name="inappnotif_payment_rejected_over_absolute">The fee was %1$s, but your max fee was set to %2$s.</string>
     <string name="inappnotif_payment_rejected_over_relative">The fee was %1$s which is more than %2$s%% of the amount.</string>
-    <string name="inappnotif_payment_rejected_channel_initializing">Your channels are still initializing and could not receive that payment.</string>
     <string name="inappnotif_payment_rejected_tweak_setting">Tap to configure.</string>
     <string name="inappnotif_payment_rejected_view_wallet">View details</string>
 
@@ -255,12 +258,15 @@
     <string name="paymentdetails_funding_fees_desc">Fees paid to the Bitcoin network miners to process the on-chain transaction.</string>
     <string name="paymentdetails_service_fees_label">Service fees</string>
     <string name="paymentdetails_service_fees_desc">Fees paid for the creation of a new payment channel. This is not always required.</string>
+
+    <string name="paymentdetails_liquidity_purchase_label">Liquidity</string>
     <string name="paymentdetails_liquidity_service_fee_label">Service fees</string>
     <string name="paymentdetails_liquidity_service_fee_help">Fees paid for the liquidity service.</string>
     <string name="paymentdetails_liquidity_miner_fee_label">Miner fees</string>
     <string name="paymentdetails_liquidity_miner_fee_help">Fees paid to the Bitcoin network miners to process the on-chain transaction.</string>
-    <string name="paymentdetails_liquidity_lease_duration_label">Duration</string>
-    <string name="paymentdetails_liquidity_lease_duration_value">1 year</string>
+    <string name="paymentdetails_liquidity_caused_by_label">Caused by</string>
+    <string name="paymentdetails_liquidity_caused_by_help">This liquidity was required to receive a payment.</string>
+    <string name="paymentdetails_liquidity_caused_by_help_link">See how to optimise</string>
 
     <!-- lnurl -->
 
@@ -313,7 +319,6 @@
 
     <string name="walletinfo_onchain_swapin_last_attempt">A swap attempt failed %1$s</string>
     <string name="walletinfo_onchain_swapin_last_attempt_disabled">Channels management was disabled.</string>
-    <string name="walletinfo_onchain_swapin_last_attempt_channels_init">Channels were still initializing.</string>
     <string name="walletinfo_onchain_swapin_timeout_1day">This swap will expire in a day!</string>
     <string name="walletinfo_onchain_swapin_timeout">This swap will expire in %1$s days.</string>
 
@@ -397,6 +402,7 @@
 
     <string name="liquidityads_error_header">Liquidity request has failed</string>
     <string name="liquidityads_error_channels_unavailable">Channels are not available. Try again later.</string>
+    <string name="liquidityads_error_invalid_funding_amount">The requested amount is invalid.</string>
 
     <!-- payment line -->
 
@@ -453,7 +459,7 @@
     <string name="swapinrefund_none_available_label">No cancelled swap-ins yet.</string>
     <string name="swapinrefund_available_label">Available: <b>%1$s</b> (%2$s)</string>
     <string name="swapinrefund_instructions_1">Use this screen to spend on-chain deposits that were not swapped in time. This does not affect your Lightning channels.</string>
-    <string name="swapinrefund_instructions_2">Make sure the destination address is valid and the feerate reasonable.</string>
+    <string name="swapinrefund_instructions_2">Make sure the destination address is valid, and use a reasonable feerate.</string>
     <string name="swapinrefund_estimate_button">Estimate fees</string>
     <string name="swapinrefund_estimating">Estimating fees…</string>
     <string name="swapinrefund_send_button">Broadcast</string>
@@ -462,7 +468,14 @@
     <string name="swapinrefund_failed_address">This address is not valid.</string>
     <string name="swapinrefund_failed_cannot_create">Cannot create the refund transaction.</string>
     <string name="swapinrefund_success">Transaction published.</string>
-    <string name="swapinrefund_success_details">You can find the transaction spending the funds below. It will not appear in your payments history, so make a copy of its ID now if needed.</string>
+    <string name="swapinrefund_success_details">You can find the transaction below. It will not appear in your payments history, so make a copy of its ID now if needed.</string>
+
+    <!-- Final wallet refund -->
+
+    <string name="finalwallet_refund_title">Spend funds from final wallet</string>
+    <string name="finalwallet_refund_available_none">No funds available</string>
+    <string name="finalwallet_refund_available">Amount available</string>
+    <string name="finalwallet_refund_instructions">Use this screen to spend funds from your final wallet. These funds come from channels that have been closed in the past. This does not affect your existing Lightning channels.</string>
 
     <!-- experimental features -->
 

@@ -44,7 +44,8 @@
     <string name="notif_rejected_over_absolute_timeout">Poplatok bol %1$s, ale váš maximálny poplatok bol nastavený na %2$s. Platnosť tohto vkladu vyprší %3$s.</string>
     <string name="notif_rejected_over_relative">Poplatok bol %1$s, čo je viac než %2$s%% z prijatej sumy. Kliknite pre podrobnosti.</string>
     <string name="notif_rejected_over_relative_timeout">Poplatok bol %1$s, čo je viac než %2$s%% z prijatej sumy. Platnosť tohto vkladu vyprší %3$s.</string>
-    <string name="notif_rejected_channels_initializing">Vaše kanály sa inicializovali a nemohli prijať túto platbu. Skúste to neskôr.</string>
+    <string name="notif_rejected_amount_too_low">Výška platby je príliš nízka.</string>
+    <string name="notif_rejected_generic_error">Počas financovania došlo k chybe. Skúste to prosím neskôr.</string>
 
     <string name="notif_watcher_revoked_commit_title">Spustite prosím Phoenix</string>
     <string name="notif_watcher_revoked_commit_message">Niektorý z vašich kanálov mohol byť uzavretý.</string>
@@ -134,8 +135,8 @@
 
     <string name="receive_lightning_warning_message_above_limit">Pre obdržanie tejto sumy sa očakáva poplatok vo výške %1$s a tento poplatok je vyšší než váš limit %2$s.\n\nZvýšte tento limit v nastavení správy kanálov.</string>
     <string name="receive_lightning_warning_message_above_limit_or_liquidity">Pre obdržanie tejto sumy sa očakáva poplatok vo výške %1$s a tento poplatok je vyšší než váš limit %2$s.\n\nZvýšte tento limit v nastavení správy kanálov alebo požiadajte o dodatočnú likviditu.</string>
-    <string name="receive_lightning_warning_message_above_limit_percent">Očakáva sa, že tento poplatok bude vo výške %1$s, a tento poplatok je vyšší než %2$s% sumy.\n\nZvýšte tento limit v nastavení správy kanálov.</string>
-    <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Očakáva sa, že tento poplatok bude vo výške %1$s, a tento poplatok je vyšší než %2$s% sumy.\n\nZvýšte tento limit v nastavení správy kanálov alebo požiadajte o dodatočnú likviditu.</string>
+    <string name="receive_lightning_warning_message_above_limit_percent">Očakáva sa, že tento poplatok bude vo výške %1$s, a tento poplatok je vyšší než %2$s%% sumy.\n\nZvýšte tento limit v nastavení správy kanálov.</string>
+    <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Očakáva sa, že tento poplatok bude vo výške %1$s, a tento poplatok je vyšší než %2$s%% sumy.\n\nZvýšte tento limit v nastavení správy kanálov alebo požiadajte o dodatočnú likviditu.</string>
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Prichádzajúca likvidita nie je dostatočná a máte zakázanú automatickú správu kanálov.</string>
 
@@ -219,6 +220,9 @@
     <string name="inappnotif_mempool_full_message">Bitcoin mempool je plný a on-chain poplatky sú vysoké.</string>
     <string name="inappnotif_mempool_full_action">Pozrite sa, ako je ovplyvnený Phoenix</string>
 
+    <string name="inappnotif_final_wallet_message">Prostriedky dostupné v konečnej peňaženke.</string>
+    <string name="inappnotif_final_wallet_action">Zobraziť prostriedky</string>
+
     <string name="inappnotif_payment_onchain_pending_title">On-chain finančné prostriedky čakajú na vybavenie (+%1$s)</string>
     <string name="inappnotif_payments_rejection_overview_one">Prichádzajúca platba bola nedávno zamietnutá</string>
     <string name="inappnotif_payments_rejection_overview_many">%1$d nedávno zamietnutých prichádzajúcich platieb</string>
@@ -226,7 +230,6 @@
     <string name="inappnotif_payment_rejected_disabled">Automatická správa kanálov je zakázaná.</string>
     <string name="inappnotif_payment_rejected_over_absolute">Poplatok bol %1$s, ale váš maximálny poplatok bol nastavený na %2$s.</string>
     <string name="inappnotif_payment_rejected_over_relative">Poplatok bol %1$s, čo je viac než %2$s%% sumy.</string>
-    <string name="inappnotif_payment_rejected_channel_initializing">Vaše kanály sa stále inicializujú a nemohli prijať túto platbu.</string>
     <string name="inappnotif_payment_rejected_tweak_setting">Kliknutím na položku vykonajte konfiguráciu.</string>
     <string name="inappnotif_payment_rejected_view_wallet">Zobraziť podrobnosti</string>
 
@@ -248,6 +251,7 @@
 
     <!-- payment details -->
 
+    <string name="paymentdetails_liquidity_purchase_label">Likvidity</string>
     <string name="paymentdetails_funding_fees_label">Poplatky ťažiarom</string>
     <string name="paymentdetails_funding_fees_desc">Poplatky platené ťažiarom Bitcoinovej siete za spracovanie on-chain transakcie.</string>
     <string name="paymentdetails_service_fees_label">Poplatky za službu</string>
@@ -256,8 +260,9 @@
     <string name="paymentdetails_liquidity_service_fee_help">Poplatky za službu likvidity.</string>
     <string name="paymentdetails_liquidity_miner_fee_label">Poplatky ťažiarom</string>
     <string name="paymentdetails_liquidity_miner_fee_help">Poplatky platené ťažiarom Bitcoinovej siete za spracovanie on-chain transakcie.</string>
-    <string name="paymentdetails_liquidity_lease_duration_label">Trvanie</string>
-    <string name="paymentdetails_liquidity_lease_duration_value">1 rok</string>
+    <string name="paymentdetails_liquidity_caused_by_label">Spôsobené</string>
+    <string name="paymentdetails_liquidity_caused_by_help">Táto likvidita bola potrebná na získanie platby.</string>
+    <string name="paymentdetails_liquidity_caused_by_help_link">Pozrite sa, ako optimalizovať</string>
 
     <!-- lnurl -->
 
@@ -307,7 +312,6 @@
     <string name="walletinfo_onchain_swapin_policy_disabled_details">Automatizovaná poplatková politika <b>je vypnutá</b>. Prostriedky nebudú vymieňané. Zostanú na tejto peňaženke.</string>
     <string name="walletinfo_onchain_swapin_last_attempt">Posledný pokus (%1$s).</string>
     <string name="walletinfo_onchain_swapin_last_attempt_disabled">Automatizovaná poplatková politika je vypnutá.</string>
-    <string name="walletinfo_onchain_swapin_last_attempt_channels_init">Vaše kanály boli inicializované.</string>
     <string name="walletinfo_onchain_swapin_empty">Neprebiehajú žiadne výmeny.</string>
 
     <string name="walletinfo_onchain_swapin_timeout_1day">Platnosť tejto výmeny vyprší za deň!</string>
@@ -394,6 +398,7 @@
 
     <string name="liquidityads_error_header">Žiadosť o likviditu zlyhala</string>
     <string name="liquidityads_error_channels_unavailable">Kanály nie sú k dispozícii. Skúste to neskôr.</string>
+    <string name="liquidityads_error_invalid_funding_amount">Požadovaná suma je neplatná.</string>
 
     <!-- payment line -->
 
@@ -461,6 +466,13 @@
     <string name="swapinrefund_failed_cannot_create">Nie je možné vytvoriť transakciu inkasa. Skúste to prosím znova.</string>
     <string name="swapinrefund_success">Zverejnená transakcia.</string>
     <string name="swapinrefund_success_details">Transakciu nájdete nižšie. Nebude sa zobrazovať v histórii platieb, preto si teraz vytvorte jej kópiu, ak ju potrebujete.</string>
+
+    <!-- Final wallet refund -->
+
+    <string name="finalwallet_refund_title">Míňať prostriedky z konečnej peňaženky</string>
+    <string name="finalwallet_refund_available_none">Nie sú k dispozícii žiadne prostriedky</string>
+    <string name="finalwallet_refund_available">Dostupná suma</string>
+    <string name="finalwallet_refund_instructions">Na tejto obrazovke môžete minúť prostriedky z konečnej peňaženky. Tieto prostriedky pochádzajú z kanálov, ktoré boli v minulosti uzavreté. Toto nemá vplyv na vaše existujúce kanály Lightning.</string>
 
     <!-- experimental features -->
 

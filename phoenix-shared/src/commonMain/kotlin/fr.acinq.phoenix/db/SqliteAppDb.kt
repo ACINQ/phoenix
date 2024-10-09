@@ -26,9 +26,6 @@ class SqliteAppDb(private val driver: SqlDriver) {
         exchange_ratesAdapter = Exchange_rates.Adapter(
             typeAdapter = EnumColumnAdapter()
         ),
-        notificationsAdapter = Notifications.Adapter(
-            type_versionAdapter = EnumColumnAdapter()
-        )
     )
 
     private val priceQueries = database.exchangeRatesQueries

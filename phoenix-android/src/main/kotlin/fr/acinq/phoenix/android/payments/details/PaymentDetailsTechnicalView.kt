@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.PrivateKey
+import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.payment.Bolt11Invoice
@@ -40,26 +41,36 @@ import fr.acinq.lightning.payment.Bolt12Invoice
 import fr.acinq.lightning.payment.OfferPaymentMetadata
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.utils.msat
+import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.sum
 import fr.acinq.lightning.utils.toMilliSatoshi
+import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.LocalFiatCurrency
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountView
 import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.CardHeader
 import fr.acinq.phoenix.android.components.Clickable
 import fr.acinq.phoenix.android.components.TextWithIcon
-import fr.acinq.phoenix.android.components.TransactionLinkButton
+import fr.acinq.phoenix.android.components.InlineTransactionLink
+import fr.acinq.phoenix.android.components.openLink
+import fr.acinq.phoenix.android.components.txUrl
 import fr.acinq.phoenix.android.fiatRate
+import fr.acinq.phoenix.android.navController
+import fr.acinq.phoenix.android.navigateToPaymentDetails
 import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
 import fr.acinq.phoenix.android.utils.Converter.toFiat
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
 import fr.acinq.phoenix.android.utils.copyToClipboard
+import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.WalletPaymentInfo
+import fr.acinq.phoenix.utils.extensions.amountFeeCredit
+import fr.acinq.phoenix.utils.extensions.relatedPaymentIds
 
 
 @Composable
@@ -92,6 +103,7 @@ fun PaymentDetailsTechnicalView(
                             is IncomingPayment.ReceivedWith.LightningPayment -> ReceivedWithLightning(it, rateThen)
                             is IncomingPayment.ReceivedWith.NewChannel -> ReceivedWithNewChannel(it, rateThen)
                             is IncomingPayment.ReceivedWith.SpliceIn -> ReceivedWithSpliceIn(it, rateThen)
+                            is IncomingPayment.ReceivedWith.AddedToFeeCredit -> ReceivedWithFeeCredit(it, rateThen)
                         }
                     }
                 }
@@ -180,7 +192,7 @@ private fun HeaderForIncoming(
     // -- payment type
     TechnicalRow(label = stringResource(id = R.string.paymentdetails_payment_type_label)) {
         Text(
-            when (payment.origin) {
+            text = when (payment.origin) {
                 is IncomingPayment.Origin.Invoice -> stringResource(R.string.paymentdetails_normal_incoming)
                 is IncomingPayment.Origin.SwapIn -> stringResource(R.string.paymentdetails_swapin)
                 is IncomingPayment.Origin.OnChain -> stringResource(R.string.paymentdetails_swapin)
@@ -233,26 +245,24 @@ private fun AmountSection(
         is InboundLiquidityOutgoingPayment -> {
             TechnicalRowAmount(
                 label = stringResource(id = R.string.paymentdetails_liquidity_amount_label),
-                amount = payment.lease.amount.toMilliSatoshi(),
+                amount = payment.purchase.amount.toMilliSatoshi(),
                 rateThen = rateThen,
                 mSatDisplayPolicy = MSatDisplayPolicy.SHOW
             )
-            TechnicalRowAmount(
-                label = stringResource(id = R.string.paymentdetails_liquidity_miner_fee_label),
-                amount = payment.miningFees.toMilliSatoshi(),
-                rateThen = rateThen,
-                mSatDisplayPolicy = MSatDisplayPolicy.SHOW
-            )
-            TechnicalRowAmount(
-                label = stringResource(id = R.string.paymentdetails_liquidity_service_fee_label),
-                amount = payment.lease.fees.serviceFee.toMilliSatoshi(),
-                rateThen = rateThen,
-                mSatDisplayPolicy = MSatDisplayPolicy.SHOW
-            )
-            TechnicalRowSelectable(
-                label = stringResource(id = R.string.paymentdetails_liquidity_signature_label),
-                value = payment.lease.sellerSig.toHex(),
-            )
+            if (payment.feePaidFromChannelBalance.total > 0.sat) {
+                TechnicalRowAmount(
+                    label = stringResource(id = R.string.paymentdetails_liquidity_miner_fee_label),
+                    amount = payment.feePaidFromChannelBalance.miningFee.toMilliSatoshi(),
+                    rateThen = rateThen,
+                    mSatDisplayPolicy = MSatDisplayPolicy.SHOW
+                )
+                TechnicalRowAmount(
+                    label = stringResource(id = R.string.paymentdetails_liquidity_service_fee_label),
+                    amount = payment.feePaidFromChannelBalance.serviceFee.toMilliSatoshi(),
+                    rateThen = rateThen,
+                    mSatDisplayPolicy = MSatDisplayPolicy.SHOW
+                )
+            }
         }
         is OutgoingPayment -> {
             TechnicalRowAmount(
@@ -337,18 +347,12 @@ private fun DetailsForLightningOutgoingPayment(
 private fun DetailsForChannelClose(
     payment: ChannelCloseOutgoingPayment
 ) {
-    TechnicalRowSelectable(
-        label = stringResource(id = R.string.paymentdetails_channel_id_label),
-        value = payment.channelId.toHex()
-    )
+    ChannelIdRow(payment.channelId)
     TechnicalRowSelectable(
         label = stringResource(id = R.string.paymentdetails_bitcoin_address_label),
         value = payment.address
     )
-    TechnicalRow(
-        label = stringResource(id = R.string.paymentdetails_tx_id_label),
-        content = { TransactionLinkButton(txId = payment.txId) }
-    )
+    TransactionRow(payment.txId)
     TechnicalRowSelectable(
         label = stringResource(id = R.string.paymentdetails_closing_type_label),
         value = when (payment.closingType) {
@@ -365,43 +369,45 @@ private fun DetailsForChannelClose(
 private fun DetailsForCpfp(
     payment: SpliceCpfpOutgoingPayment
 ) {
-    TechnicalRow(
-        label = stringResource(id = R.string.paymentdetails_tx_id_label),
-        content = { TransactionLinkButton(txId = payment.txId) }
-    )
+    TransactionRow(payment.txId)
 }
 
 @Composable
 private fun DetailsForInboundLiquidity(
     payment: InboundLiquidityOutgoingPayment
 ) {
-    TechnicalRow(
-        label = stringResource(id = R.string.paymentdetails_tx_id_label),
-        content = { TransactionLinkButton(txId = payment.txId) }
-    )
-    TechnicalRowSelectable(
-        label = stringResource(id = R.string.paymentdetails_channel_id_label),
-        value = payment.channelId.toHex(),
-    )
+    TechnicalRow(label = stringResource(id = R.string.paymentdetails_liquidity_purchase_type)) {
+        Text(text = "${
+            when (payment.purchase) {
+                is LiquidityAds.Purchase.Standard -> "Standard"
+                is LiquidityAds.Purchase.WithFeeCredit -> "Fee credit"
+            }
+        } [${payment.purchase.paymentDetails.paymentType}]")
+    }
+    TransactionRow(payment.txId)
+    ChannelIdRow(channelId = payment.channelId)
+    val paymentIds = payment.relatedPaymentIds()
+    val navController = navController
+    paymentIds.forEach {
+        TechnicalRowClickable(
+            label = stringResource(id = R.string.paymentdetails_liquidity_caused_by_label),
+            onClick = { navigateToPaymentDetails(navController, it, isFromEvent = false) },
+        ) {
+            Text(text = it.dbId, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
+    }
 }
 
 @Composable
 private fun DetailsForSpliceOut(
     payment: SpliceOutgoingPayment
 ) {
-    TechnicalRowSelectable(
-        label = stringResource(id = R.string.paymentdetails_splice_out_channel_label),
-        value = payment.channelId.toHex()
-    )
+    ChannelIdRow(channelId = payment.channelId, label = stringResource(id = R.string.paymentdetails_splice_out_channel_label))
     TechnicalRowSelectable(
         label = stringResource(id = R.string.paymentdetails_bitcoin_address_label),
         value = payment.address
     )
-    TechnicalRow(
-        label = stringResource(id = R.string.paymentdetails_tx_id_label),
-        content = { TransactionLinkButton(txId = payment.txId) }
-    )
-
+    TransactionRow(payment.txId)
 }
 
 @Composable
@@ -425,7 +431,7 @@ private fun DetailsForIncoming(
                     Row {
                         Text(text = stringResource(id = R.string.paymentdetails_dualswapin_tx_value, index + 1))
                         Spacer(modifier = Modifier.width(4.dp))
-                        TransactionLinkButton(txId = outpoint.txid)
+                        InlineTransactionLink(txId = outpoint.txid)
                     }
                 }
             }
@@ -445,11 +451,12 @@ private fun ReceivedWithLightning(
         Text(text = stringResource(id = R.string.paymentdetails_received_with_lightning))
     }
     if (receivedWith.channelId != ByteVector32.Zeroes) {
-        TechnicalRow(label = stringResource(id = R.string.paymentdetails_channel_id_label)) {
-            Text(text = receivedWith.channelId.toHex())
-        }
+        ChannelIdRow(receivedWith.channelId)
     }
-    TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_received_label), amount = receivedWith.amount, rateThen = rateThen)
+    receivedWith.fundingFee?.let {
+        TransactionRow(it.fundingTxId)
+    }
+    TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_received_label), amount = receivedWith.amountReceived, rateThen = rateThen)
 }
 
 @Composable
@@ -462,15 +469,10 @@ private fun ReceivedWithNewChannel(
     }
     val channelId = receivedWith.channelId
     if (channelId != ByteVector32.Zeroes) { // backward compat
-        TechnicalRow(label = stringResource(id = R.string.paymentdetails_channel_id_label)) {
-            Text(text = channelId.toHex())
-        }
+        ChannelIdRow(channelId)
     }
-    TechnicalRow(
-        label = stringResource(id = R.string.paymentdetails_tx_id_label),
-        content = { TransactionLinkButton(txId = receivedWith.txId) }
-    )
-    TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_received_label), amount = receivedWith.amount, rateThen = rateThen)
+    TransactionRow(receivedWith.txId)
+    TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_received_label), amount = receivedWith.amountReceived, rateThen = rateThen)
 }
 
 @Composable
@@ -483,15 +485,21 @@ private fun ReceivedWithSpliceIn(
     }
     val channelId = receivedWith.channelId
     if (channelId != ByteVector32.Zeroes) { // backward compat
-        TechnicalRow(label = stringResource(id = R.string.paymentdetails_channel_id_label)) {
-            Text(text = channelId.toHex())
-        }
+        ChannelIdRow(channelId)
     }
-    TechnicalRow(
-        label = stringResource(id = R.string.paymentdetails_tx_id_label),
-        content = { TransactionLinkButton(txId = receivedWith.txId) }
-    )
-    TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_received_label), amount = receivedWith.amount, rateThen = rateThen)
+    TransactionRow(receivedWith.txId)
+    TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_received_label), amount = receivedWith.amountReceived, rateThen = rateThen)
+}
+
+@Composable
+private fun ReceivedWithFeeCredit(
+    receivedWith: IncomingPayment.ReceivedWith.AddedToFeeCredit,
+    rateThen: ExchangeRate.BitcoinPriceRate?
+) {
+    TechnicalRow(label = stringResource(id = R.string.paymentdetails_received_with_label)) {
+        Text(text = stringResource(id = R.string.paymentdetails_received_with_fee_credit))
+    }
+    TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_added_to_fee_credit_label), amount = receivedWith.amountReceived, rateThen = rateThen)
 }
 
 @Composable
@@ -682,5 +690,55 @@ private fun TechnicalRowWithCopy(label: String, value: String) {
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun TechnicalRowClickable(
+    label: String,
+    onClick: () -> Unit,
+    onLongClick: (() -> Unit)? = null,
+    content: @Composable () -> Unit,
+) {
+    TechnicalRow(label = label) {
+        Clickable(
+            onClick = onClick,
+            onLongClick = onLongClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .offset(x = (-8).dp),
+            shape = RoundedCornerShape(12.dp),
+            backgroundColor = mutedBgColor,
+        ) {
+            Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)) {
+                content()
+            }
+        }
+    }
+}
+
+@Composable
+private fun TransactionRow(txId: TxId) {
+    val context = LocalContext.current
+    val link = txUrl(txId = txId)
+    TechnicalRowClickable(
+        label = stringResource(id = R.string.paymentdetails_tx_id_label),
+        onClick = { openLink(context, link) },
+        onLongClick = { copyToClipboard(context, txId.toString()) }
+    ) {
+        TextWithIcon(text = txId.toString(), icon = R.drawable.ic_external_link, maxLines = 1, textOverflow = TextOverflow.Ellipsis, space = 4.dp)
+    }
+}
+
+@Composable
+private fun ChannelIdRow(channelId: ByteVector32, label: String = stringResource(id = R.string.paymentdetails_channel_id_label)) {
+    val context = LocalContext.current
+    val navController = navController
+    TechnicalRowClickable(
+        label = label,
+        onClick = { navController.navigate("${Screen.ChannelDetails.route}?id=${channelId.toHex()}") },
+        onLongClick = { copyToClipboard(context, channelId.toHex()) }
+    ) {
+        TextWithIcon(text = channelId.toHex(), icon = R.drawable.ic_zap, maxLines = 1, textOverflow = TextOverflow.Ellipsis, space = 4.dp)
     }
 }

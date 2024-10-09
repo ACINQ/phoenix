@@ -330,7 +330,8 @@
     <string name="paymentdetails_lnurlpay_action_aes_label">Mensaje</string>
     <string name="paymentdetails_lnurlpay_action_aes_decrypting">Desencriptando mensaje…</string>
 
-    <string name="paymentdetails_desc_label">Desc.</string>
+    <string name="paymentdetails_desc_label">Descripción</string>
+    <string name="paymentdetails_note_label">Nota</string>
     <string name="paymentdetails_destination_label">Enviado a</string>
     <string name="paymentdetails_destination_cpfp_value">Mineros de Bitcoin</string>
     <string name="paymentdetails_fees_label">Comisiones</string>
@@ -342,6 +343,8 @@
     <string name="paymentdetails_desc_closing_channel">Canal de cierre</string>
     <string name="paymentdetails_desc_legacy_migration">Migración desde aplicación heredada</string>
     <string name="paymentdetails_desc_cpfp">Impulsar transacciones</string>
+    <string name="paymentdetails_desc_liquidity_manual">Liquidez manual (+%1$s)</string>
+    <string name="paymentdetails_desc_liquidity_automated">Gestión de canales</string>
     <string name="paymentdetails_desc_swapout">Intercambiar a %1$s</string>
     <string name="paymentdetails_desc_swapin">Depósito en la cadena</string>
 
@@ -446,7 +449,7 @@
     <string name="lnurl_auth_help_dialog_compat_button">Cambiar esquema</string>
     <string name="lnurl_auth_button">Iniciar sesión</string>
     <string name="lnurl_auth_try_again_button">Intentar de nuevo</string>
-    <string name="lnurl_auth_in_progress">Iniciando sesión en<b>%1$s</b>.</string>
+    <string name="lnurl_auth_in_progress">Iniciando sesión en\n<b>%1$s</b>.</string>
     <string name="lnurl_auth_success">Autenticación correcta.</string>
     <string name="lnurl_auth_failure">Error de autenticación:</string>
     <string name="lnurl_auth_error_network">Error de red. Comprueba tu conexión a Internet y vuelve a intentarlo.</string>

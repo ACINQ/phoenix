@@ -349,6 +349,7 @@
     <string name="paymentdetails_error">Could not find payment details</string>
 
     <string name="paymentdetails_status_inbound_liquidity_success"><b>LIQUIDITY ADDED</b> %1$s</string>
+    <string name="paymentdetails_status_inbound_liquidity_auto_success"><b>CHANNEL MANAGEMENT</b> %1$s</string>
     <string name="paymentdetails_status_channelclose_confirmed"><b>COMPLETE</b> %1$s</string>
     <string name="paymentdetails_status_sent_successful"><b>SENT</b> %1$s</string>
     <string name="paymentdetails_status_sent_pending">Pending…</string>
@@ -378,7 +379,8 @@
     <string name="paymentdetails_lnurlpay_action_aes_label">Message</string>
     <string name="paymentdetails_lnurlpay_action_aes_decrypting">Decrypting message…</string>
 
-    <string name="paymentdetails_desc_label">Desc.</string>
+    <string name="paymentdetails_desc_label">Description</string>
+    <string name="paymentdetails_note_label">Note</string>
     <string name="paymentdetails_destination_label">Sent to</string>
     <string name="paymentdetails_destination_cpfp_value">Bitcoin miners</string>
     <string name="paymentdetails_fees_label">Fees</string>
@@ -390,7 +392,8 @@
     <string name="paymentdetails_desc_closing_channel">Closing channel</string>
     <string name="paymentdetails_desc_legacy_migration">Migration from legacy app</string>
     <string name="paymentdetails_desc_cpfp">Bump transactions</string>
-    <string name="paymentdetails_desc_inbound_liquidity">+%1$s inbound liquidity</string>
+    <string name="paymentdetails_desc_liquidity_manual">Manual liquidity (+%1$s)</string>
+    <string name="paymentdetails_desc_liquidity_automated">Channel management</string>
     <string name="paymentdetails_desc_swapout">Swap-out to %1$s</string>
     <string name="paymentdetails_desc_swapin">On-chain deposit</string>
 
@@ -425,7 +428,6 @@
     <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
 
     <string name="paymentdetails_liquidity_amount_label">Amount requested</string>
-    <string name="paymentdetails_liquidity_signature_label">Signature</string>
 
     <string name="paymentdetails_closing_type_label">Closing type</string>
     <string name="paymentdetails_closing_type_mutual">Mutual</string>
@@ -444,6 +446,7 @@
     <string name="paymentdetails_offer_label">Offer</string>
     <string name="paymentdetails_bolt12_label">Bolt12 invoice</string>
     <string name="paymentdetails_offer_metadata_label">Metadata</string>
+    <string name="paymentdetails_liquidity_purchase_type">Purchase type</string>
 
     <string name="paymentdetails_status_label">Payment status</string>
     <string name="paymentdetails_status_success">Successful</string>
@@ -459,6 +462,7 @@
     <string name="paymentdetails_received_with_splicein">Splice-in (adding to existing channel)</string>
     <string name="paymentdetails_received_with_channel">New channel (automatically created)</string>
     <string name="paymentdetails_received_with_lightning">Lightning payment</string>
+    <string name="paymentdetails_received_with_fee_credit">Fee credit</string>
     <string name="paymentdetails_channel_id_label">Channel id</string>
     <string name="paymentdetails_tx_id_label">Transaction</string>
 
@@ -470,6 +474,8 @@
     <string name="paymentdetails_invoice_requested_label">Amount requested</string>
     <string name="paymentdetails_amount_sent_label">Amount sent (fees included)</string>
     <string name="paymentdetails_amount_received_label">Amount received</string>
+    <string name="paymentdetails_amount_fee_credit_label">Fee credit accrued</string>
+    <string name="paymentdetails_amount_added_to_fee_credit_label">Amount added to fee credit</string>
     <string name="paymentdetails_amount_rate_now">≈ %1$s (now)</string>
     <string name="paymentdetails_amount_rate_then">≈ %1$s (then)</string>
 
@@ -816,6 +822,8 @@
     <string name="splice_error_invalid_pubkey">Invalid splice-out pubkey script</string>
     <string name="splice_error_splice_in_progress">A splice payment is already in progress</string>
     <string name="splice_error_invalid_liquidity_ads">Invalid liquidity-ads request: [%1$s]</string>
+    <string name="splice_error_invalid_channel_params">Invalid channel parameters: [%1$s]</string>
+    <string name="splice_error_unexpected">Unexpected error: [%1$s]</string>
 
     <!-- reset wallet -->
 

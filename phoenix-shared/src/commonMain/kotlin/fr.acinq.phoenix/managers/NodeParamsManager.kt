@@ -35,6 +35,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.hours
 
 
 class NodeParamsManager(
@@ -69,6 +70,7 @@ class NodeParamsManager(
                 ).copy(
                     zeroConfPeers = setOf(trampolineNodeId),
                     liquidityPolicy = MutableStateFlow(startupParams.liquidityPolicy),
+                    bolt12invoiceExpiry = 24.hours,
                 )
             }.collect {
                 log.info { "hello!" }
@@ -92,30 +94,13 @@ class NodeParamsManager(
         val trampolineNodeId = PublicKey.fromHex("03864ef025fde8fb587d989186ce6a4a186895ee44a926bfc370e2c366597a3f8f")
         val trampolineNodeUri = NodeUri(id = trampolineNodeId, "3.33.236.230", 9735)
         const val remoteSwapInXpub = "xpub69q3sDXXsLuHVbmTrhqmEqYqTTsXJKahdfawXaYuUt6muf1PbZBnvqzFcwiT8Abpc13hY8BFafakwpPbVkatg9egwiMjed1cRrPM19b2Ma7"
-        val defaultLiquidityPolicy = LiquidityPolicy.Auto(maxAbsoluteFee = 5_000.sat, maxRelativeFeeBasisPoints = 50_00 /* 50% */, skipAbsoluteFeeCheck = false)
+        val defaultLiquidityPolicy = LiquidityPolicy.Auto(
+            inboundLiquidityTarget = null, // auto inbound liquidity is disabled (it must be purchased manually)
+            maxAbsoluteFee = 5_000.sat,
+            maxRelativeFeeBasisPoints = 50_00 /* 50% */,
+            skipAbsoluteFeeCheck = false,
+            maxAllowedFeeCredit = 0.msat, // no fee credit
+        )
         val payToOpenFeeBase = 100
-
-        fun liquidityLeaseRate(amount: Satoshi): LiquidityAds.LeaseRate {
-            // WARNING : THIS MUST BE KEPT IN SYNC WITH LSP OTHERWISE FUNDING REQUEST WILL BE REJECTED BY PHOENIX
-            val fundingWeight = if (amount <= 100_000.sat) {
-                271 * 2 // 2-inputs (wpkh) / 0-change
-            } else if (amount <= 250_000.sat) {
-                271 * 2 // 2-inputs (wpkh) / 0-change
-            } else if (amount <= 500_000.sat) {
-                271 * 4 // 4-inputs (wpkh) / 0-change
-            } else if (amount <= 1_000_000.sat) {
-                271 * 4 // 4-inputs (wpkh) / 0-change
-            } else {
-                271 * 6 // 6-inputs (wpkh) / 0-change
-            }
-            return LiquidityAds.LeaseRate(
-                leaseDuration = 0,
-                fundingWeight = fundingWeight,
-                leaseFeeProportional = 100, // 1%
-                leaseFeeBase = 0.sat,
-                maxRelayFeeProportional = 100,
-                maxRelayFeeBase = 1_000.msat
-            )
-        }
     }
 }
