@@ -375,6 +375,7 @@ class SyncSeedManager: SyncManagerProtcol {
 				
 				record[record_column_name] = seedBackup.name ?? ""
 				record[record_column_language] = seedBackup.language
+				record[record_column_mnemonics_deprecated] = nil // delete this key/value in the cloud
 				record.encryptedValues[record_column_mnemonics_encrypted] = seedBackup.mnemonics
 				
 				let (saveResults, _) = try await database.modifyRecords(
