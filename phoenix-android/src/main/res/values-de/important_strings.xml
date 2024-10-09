@@ -461,6 +461,13 @@
     <string name="swapinrefund_success">Transaktion veröffentlicht.</string>
     <string name="swapinrefund_success_details">Sie können die Transaktion unten finden. Sie wird nicht in Ihrem Zahlungsverlauf erscheinen, also machen Sie bei Bedarf jetzt eine Kopie davon.</string>
 
+    <!-- Final wallet refund -->
+
+    <string name="finalwallet_refund_title">Guthaben aus der Final Wallet ausgeben</string>
+    <string name="finalwallet_refund_available_none">Kein Guthaben verfügbar</string>
+    <string name="finalwallet_refund_available">Verfügbarer Betrag</string>
+    <string name="finalwallet_refund_instructions">Verwenden Sie diesen Screen, um Guthaben aus Ihrer finalen Wallet auszugeben. Diese Gelder stammen aus Kanälen, die in der Vergangenheit geschlossen wurden. Dies hat keine Auswirkungen auf Ihre bestehenden Lightning-Kanäle.</string>
+
     <!-- experimental features -->
 
     <string name="bip353_subtitle">Dies ist eine von Menschen lesbare Adresse für Ihre Bolt12-Zahlungsanfrage.</string>

@@ -464,6 +464,13 @@
     <string name="swapinrefund_success">Zverejnená transakcia.</string>
     <string name="swapinrefund_success_details">Transakciu nájdete nižšie. Nebude sa zobrazovať v histórii platieb, preto si teraz vytvorte jej kópiu, ak ju potrebujete.</string>
 
+    <!-- Final wallet refund -->
+
+    <string name="finalwallet_refund_title">Míňať prostriedky z konečnej peňaženky</string>
+    <string name="finalwallet_refund_available_none">Nie sú k dispozícii žiadne prostriedky</string>
+    <string name="finalwallet_refund_available">Dostupná suma</string>
+    <string name="finalwallet_refund_instructions">Na tejto obrazovke môžete minúť prostriedky z konečnej peňaženky. Tieto prostriedky pochádzajú z kanálov, ktoré boli v minulosti uzavreté. Toto nemá vplyv na vaše existujúce kanály Lightning.</string>
+
     <!-- experimental features -->
 
     <string name="bip353_subtitle">Toto je ľudsky čitateľná adresa pre vašu žiadosť o platbu Bolt12.</string>

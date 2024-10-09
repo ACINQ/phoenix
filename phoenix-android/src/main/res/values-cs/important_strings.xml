@@ -463,6 +463,13 @@
     <string name="swapinrefund_success">Transakce odeslána.</string>
     <string name="swapinrefund_success_details">Transakci naleznete níže. Nebude se zobrazovat v historii plateb, proto si nyní v případě potřeby zkopírujte její ID.</string>
 
+    <!-- Final wallet refund -->
+
+    <string name="finalwallet_refund_title">Utratit prostředky z konečné peněženky</string>
+    <string name="finalwallet_refund_available_none">Nejsou k dispozici žádné prostředky</string>
+    <string name="finalwallet_refund_available">Dostupná částka</string>
+    <string name="finalwallet_refund_instructions">Na této obrazovce můžete utratit prostředky z konečné peněženky. Tyto prostředky pocházejí z kanálů, které byly v minulosti uzavřeny. To nemá vliv na váš stávající kanál Lightning.</string>
+
     <!-- experimental features -->
 
     <string name="bip353_subtitle">Toto je lidsky čitelná adresa pro vaši žádost o platbu Bolt12.</string>

@@ -472,7 +472,7 @@
     <string name="finalwallet_refund_title">Spend funds from final wallet</string>
     <string name="finalwallet_refund_available_none">No funds available</string>
     <string name="finalwallet_refund_available">Amount available</string>
-    <string name="finalwallet_refund_instructions">Use this screen to spend funds from your final wallet. These funds typically come from channels that have been closed. This does not affect your Lightning channels.</string>
+    <string name="finalwallet_refund_instructions">Use this screen to spend funds from your final wallet. These funds come from channels that have been closed in the past. This does not affect your existing Lightning channels.</string>
 
     <!-- experimental features -->
 

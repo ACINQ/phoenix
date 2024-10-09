@@ -466,6 +466,13 @@
     <string name="swapinrefund_success">Muamala umetangazwa.</string>
     <string name="swapinrefund_success_details">Unaweza kupata muamala unaotumia fedha hapa chini. Haitaonekana kwenye historia ya malipo yako, hivyo fanya nakala ya kitambulisho chake sasa ikiwa inahitajika.</string>
 
+    <!-- Final wallet refund -->
+
+    <string name="finalwallet_refund_title">Tumia pesa kutoka kwa mkoba wa mwisho</string>
+    <string name="finalwallet_refund_available_none">Hakuna fedha zinazopatikana</string>
+    <string name="finalwallet_refund_available">Kiasi kinachopatikana</string>
+    <string name="finalwallet_refund_instructions">Tumia skrini hii kutumia pesa kutoka kwa pochi yako ya mwisho. Fedha hizi hutoka kwa chaneli ambazo zilifungwa hapo awali. Hii haiathiri chaneli zako zilizopo za Lightning.</string>
+
     <!-- experimental features -->
 
     <string name="bip353_subtitle">Hii ni anwani inayosomeka na binadamu kwa ombi lako la malipo la Bolt12.</string>

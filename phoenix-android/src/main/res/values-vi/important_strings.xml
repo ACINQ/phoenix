@@ -471,6 +471,13 @@
     <string name="swapinrefund_success">Giao dịch đã được công bố.</string>
     <string name="swapinrefund_success_details">Bạn có thể tìm thấy giao dịch chi tiêu số tiền bên dưới. Nó sẽ không xuất hiện trong lịch sử thanh toán của bạn, vì vậy hãy tạo bản sao ID của nó ngay bây giờ nếu cần.</string>
 
+    <!-- Final wallet refund -->
+
+    <string name="finalwallet_refund_title">Chi tiêu tiền từ ví cuối cùng</string>
+    <string name="finalwallet_refund_available_none">Không có sẵn tiền</string>
+    <string name="finalwallet_refund_available">Số tiền có sẵn</string>
+    <string name="finalwallet_refund_instructions">Sử dụng màn hình này để tiêu tiền từ ví cuối cùng của bạn. Những khoản tiền này đến từ các kênh đã bị đóng trong quá khứ. Điều này không ảnh hưởng đến các kênh Lightning hiện tại của bạn.</string>
+
     <!-- experimental features -->
 
     <string name="bip353_subtitle">Đây là địa chỉ mà con người có thể đọc được cho yêu cầu thanh toán Bolt12 của bạn.</string>

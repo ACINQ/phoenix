@@ -464,6 +464,13 @@
     <string name="swapinrefund_success">Transacción publicada.</string>
     <string name="swapinrefund_success_details">Puede encontrar la transacción a continuación. No aparecerá en su historial de pagos, así que haga una copia ahora si lo necesita.</string>
 
+    <!-- Final wallet refund -->
+
+    <string name="finalwallet_refund_title">Gastar fondos del billetero final</string>
+    <string name="finalwallet_refund_available_none">No hay fondos disponibles</string>
+    <string name="finalwallet_refund_available">Importe disponible</string>
+    <string name="finalwallet_refund_instructions">Utilice esta pantalla para gastar fondos de su billetera final. Estos fondos proceden de canales que se han cerrado en el pasado. Esto no afecta a sus canales Lightning existentes.</string>
+
     <!-- experimental features -->
 
     <string name="bip353_subtitle">Esta es una dirección humanamente legible para su solicitud de pago Bolt12.</string>
