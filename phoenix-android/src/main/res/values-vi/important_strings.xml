@@ -227,6 +227,9 @@
     <string name="inappnotif_mempool_full_message">Phí on-chain cao.</string>
     <string name="inappnotif_mempool_full_action">Xem những ảnh hưởng tới Phoenix.</string>
 
+    <string name="inappnotif_final_wallet_message">Tiền có sẵn trong ví cuối cùng.</string>
+    <string name="inappnotif_final_wallet_action">Xem tiền</string>
+
     <string name="inappnotif_payment_onchain_pending_title">Các khoản vốn on-chain đang chờ xử lý (+%1$s)</string>.
     <string name="inappnotif_payments_rejection_overview_one">Một khoản tiền đến đã bị từ chối gần đây.</string>
     <string name="inappnotif_payments_rejection_overview_many">Khoản thanh toán đến %1$d đã bị từ chối gần đây</string>

@@ -223,6 +223,9 @@
     <string name="inappnotif_mempool_full_message">Ada za mtandaoni ziko juu.</string>
     <string name="inappnotif_mempool_full_action">Angalia jinsi Phoenix inavyoathirika</string>
 
+    <string name="inappnotif_final_wallet_message">Fedha zinapatikana katika pochi ya mwisho.</string>
+    <string name="inappnotif_final_wallet_action">Angalia fedha</string>
+
     <string name="inappnotif_payment_onchain_pending_title">Fedha za mtandaoni zinangosubiria (+%1$s)</string>
     <string name="inappnotif_payments_rejection_overview_one">Malipo moja ya kuingia yamekataliwa hivi karibuni</string>
     <string name="inappnotif_payments_rejection_overview_many">%1$d malipo ya kuingia yamekataliwa hivi karibuni</string>

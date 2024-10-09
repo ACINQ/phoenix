@@ -217,6 +217,9 @@
     <string name="inappnotif_mempool_full_message">Der Bitcoin mempool ist voll und die on-chain Gebühren sind hoch.</string>
     <string name="inappnotif_mempool_full_action">Erfahren Sie inwiefern Phoenix davon betroffen ist</string>
 
+    <string name="inappnotif_final_wallet_message">Guthaben im Final Wallet verfügbar.</string>
+    <string name="inappnotif_final_wallet_action">Guthaben anzeigen</string>
+
     <string name="inappnotif_payment_onchain_pending_title">On-chain Guthaben ausstehend (+%1$s)</string>
     <string name="inappnotif_payments_rejection_overview_one">1 kürzlich abgelehnter Zahlungseingang</string>
     <string name="inappnotif_payments_rejection_overview_many">%1$d kürzlich abgelehnte Zahlungseingänge</string>

@@ -216,6 +216,9 @@
     <string name="inappnotif_mempool_full_message">Le mempool Bitcoin est plein, et les frais sur la chaîne sont élevés.</string>
     <string name="inappnotif_mempool_full_action">Voir en quoi Phoenix est affecté</string>
 
+    <string name="inappnotif_final_wallet_message">Des fonds sont disponibles dans le wallet final.</string>
+    <string name="inappnotif_final_wallet_action">Afficher les fonds</string>
+
     <string name="inappnotif_migration_from_legacy">Félicitations! Votre wallet a été mis à jour.</string>
     <string name="inappnotif_migration_from_legacy_action">Voir les nouveautés</string>
     <string name="inappnotif_migration_from_legacy_dialog_title">Votre adresse Bitcoin a changé</string>

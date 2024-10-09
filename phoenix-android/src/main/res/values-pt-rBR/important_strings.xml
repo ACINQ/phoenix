@@ -219,6 +219,9 @@
     <string name="inappnotif_mempool_full_message">O mempool do Bitcoin está cheio e as taxas na cadeia estão altas.</string>
     <string name="inappnotif_mempool_full_action">Veja como a Phoenix é afetada</string>
 
+    <string name="inappnotif_final_wallet_message">Fundos disponíveis na carteira final.</string>
+    <string name="inappnotif_final_wallet_action">Ver fundos.</string>
+
     <string name="inappnotif_payment_onchain_pending_title">Fundos pendentes na cadeia (+%1$s)</string>
 
     <string name="inappnotif_payments_rejection_overview_one">1 pagamento recebido recentemente rejeitado</string>

@@ -218,6 +218,9 @@
     <string name="inappnotif_mempool_full_message">Las comisiones en la cadena son elevadas.</string>
     <string name="inappnotif_mempool_full_action">Ver cómo afecta a Phoenix</string>
 
+    <string name="inappnotif_final_wallet_message">Fondos disponibles en la billetera final.</string>
+    <string name="inappnotif_final_wallet_action">Ver fondos</string>
+
     <string name="inappnotif_payment_onchain_pending_title">Fondos pendientes en la cadena (+%1$s)</string>
     <string name="inappnotif_payments_rejection_overview_one">Recientemente se rechazó un pago entrante</string>
     <string name="inappnotif_payments_rejection_overview_many">%1$d pagos entrantes rechazados recientemente</string>

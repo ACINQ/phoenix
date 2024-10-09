@@ -248,8 +248,8 @@ private fun PermamentNotice(
         is Notice.FundsInFinalWallet -> {
             ImportantNotification(
                 icon = R.drawable.ic_chain,
-                message = "Funds available in the final wallet.",
-                actionText = "View funds",
+                message = stringResource(id = R.string.inappnotif_final_wallet_message),
+                actionText = stringResource(id = R.string.inappnotif_final_wallet_action),
                 onActionClick = { nc?.navigate(Screen.WalletInfo.FinalWallet.route) },
             )
         }

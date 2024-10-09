@@ -192,7 +192,7 @@ private fun FirstNoticeView(
             }
 
             is Notice.FundsInFinalWallet -> {
-                NoticeTextView(text = "Funds available in the final wallet.", icon = R.drawable.ic_info)
+                NoticeTextView(text = stringResource(id = R.string.inappnotif_final_wallet_message), icon = R.drawable.ic_info)
             }
         }
 
