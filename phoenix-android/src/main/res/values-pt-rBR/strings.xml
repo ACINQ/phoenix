@@ -341,7 +341,7 @@
     <string name="paymentdetails_desc_legacy_migration">Migração de aplicativo legado</string>
     <string name="paymentdetails_desc_cpfp">Impulsionar transações</string>
     <string name="paymentdetails_desc_liquidity_manual">Liquidez manual (+%1$s)</string>
-    <string name="paymentdetails_desc_liquidity_automated">Liquidez automatizada</string>
+    <string name="paymentdetails_desc_liquidity_automated">Gerenciamento de canais</string>
     <string name="paymentdetails_desc_swapout">Trocar para %1$s</string>
     <string name="paymentdetails_desc_swapin">Depósito na rede</string>
 

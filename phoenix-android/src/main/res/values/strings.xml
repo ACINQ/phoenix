@@ -349,7 +349,7 @@
     <string name="paymentdetails_error">Could not find payment details</string>
 
     <string name="paymentdetails_status_inbound_liquidity_success"><b>LIQUIDITY ADDED</b> %1$s</string>
-    <string name="paymentdetails_status_inbound_liquidity_auto_success"><b>CHANNEL RESIZED</b> %1$s</string>
+    <string name="paymentdetails_status_inbound_liquidity_auto_success"><b>CHANNEL MANAGEMENT</b> %1$s</string>
     <string name="paymentdetails_status_channelclose_confirmed"><b>COMPLETE</b> %1$s</string>
     <string name="paymentdetails_status_sent_successful"><b>SENT</b> %1$s</string>
     <string name="paymentdetails_status_sent_pending">Pending…</string>
@@ -393,7 +393,7 @@
     <string name="paymentdetails_desc_legacy_migration">Migration from legacy app</string>
     <string name="paymentdetails_desc_cpfp">Bump transactions</string>
     <string name="paymentdetails_desc_liquidity_manual">Manual liquidity (+%1$s)</string>
-    <string name="paymentdetails_desc_liquidity_automated">Automated liquidity</string>
+    <string name="paymentdetails_desc_liquidity_automated">Channel management</string>
     <string name="paymentdetails_desc_swapout">Swap-out to %1$s</string>
     <string name="paymentdetails_desc_swapin">On-chain deposit</string>
 

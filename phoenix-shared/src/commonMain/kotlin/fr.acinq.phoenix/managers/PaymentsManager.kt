@@ -12,6 +12,7 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.SqlitePaymentsDb
 import fr.acinq.lightning.logging.debug
+import fr.acinq.phoenix.utils.extensions.relatedPaymentIds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -165,6 +166,18 @@ class PaymentsManager(
         txId: TxId
     ): InboundLiquidityOutgoingPayment? {
         return paymentsDb().getInboundLiquidityPurchase(txId)
+    }
+
+    /**
+     * Returns the incoming [WalletPaymentId] that match a given transaction Id.
+     *
+     * It is used to find the payments that could have triggered a liquidity event, using that event's txId.
+     * Similar to [InboundLiquidityOutgoingPayment.relatedPaymentIds].
+     */
+    suspend fun listIncomingPaymentsForTxId(
+        txId: TxId
+    ): List<WalletPaymentId.IncomingPaymentId> {
+        return paymentsDb().getWalletPaymentIdForTxId(txId).filterIsInstance<WalletPaymentId.IncomingPaymentId>()
     }
 
     suspend fun getPayment(

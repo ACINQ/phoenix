@@ -282,14 +282,6 @@ private fun AmountSection(
                 rateThen = rateThen,
                 mSatDisplayPolicy = MSatDisplayPolicy.SHOW
             )
-            payment.amountFeeCredit?.let {
-                TechnicalRowAmount(
-                    label = stringResource(R.string.paymentdetails_amount_fee_credit_label),
-                    amount = it,
-                    rateThen = rateThen,
-                    mSatDisplayPolicy = MSatDisplayPolicy.SHOW
-                )
-            }
             val receivedWithNewChannel = payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>() ?: emptyList()
             val receivedWithSpliceIn = payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.SpliceIn>() ?: emptyList()
             if ((receivedWithNewChannel + receivedWithSpliceIn).isNotEmpty()) {
@@ -398,12 +390,7 @@ private fun DetailsForInboundLiquidity(
             label = stringResource(id = R.string.paymentdetails_liquidity_caused_by_label),
             onClick = { navigateToPaymentDetails(navController, it, isFromEvent = false) },
         ) {
-            TextWithIcon(
-                text = "(incoming) ${it.dbId}",
-                icon = R.drawable.ic_arrow_down_circle,
-                maxLines = 1, textOverflow = TextOverflow.Ellipsis,
-                space = 4.dp
-            )
+            Text(text = it.dbId, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
     }
 }

@@ -166,7 +166,7 @@ struct PaymentCell : View {
 	func paymentAmount() -> some View {
 		
 		let (amount, isFailure, isOutgoing) = paymentAmountInfo()
-		if isLiquidityPaidInTheFuture() {
+		if isLiquidityWithFeesDisplayedElsewhere() {
 			
 			Text(verbatim: "")
 				.accessibilityHidden(true)
@@ -347,12 +347,12 @@ struct PaymentCell : View {
 		}
 	}
 	
-	func isLiquidityPaidInTheFuture() -> Bool {
+	func isLiquidityWithFeesDisplayedElsewhere() -> Bool {
 		
 		if let payment = fetched?.payment,
 		   let liquidity = payment as? Lightning_kmpInboundLiquidityOutgoingPayment
 		{
-			return liquidity.isPaidInTheFuture()
+			return liquidity.hidesFees
 		} else {
 			return false
 		}

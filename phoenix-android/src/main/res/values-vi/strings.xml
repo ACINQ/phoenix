@@ -351,7 +351,7 @@
     <string name="paymentdetails_desc_legacy_migration">Di chuyển từ ứng dụng cũ</string>
     <string name="paymentdetails_desc_cpfp">Các giao dịch tăng đột biến</string>
     <string name="paymentdetails_desc_liquidity_manual">Thanh khoản thủ công (+%1$s)</string>
-    <string name="paymentdetails_desc_liquidity_automated">Thanh khoản tự động</string>
+    <string name="paymentdetails_desc_liquidity_automated">Quản lý kênh</string>
     <string name="paymentdetails_desc_swapout">Swap-out thành %1$s</string>
     <string name="paymentdetails_desc_swapin">Tiền cọc on-chain</string>
 

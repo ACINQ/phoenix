@@ -1,7 +1,6 @@
 package fr.acinq.phoenix.utils
 
 import fr.acinq.lightning.db.*
-import fr.acinq.lightning.payment.OfferPaymentMetadata
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sum
 import fr.acinq.phoenix.data.WalletPaymentInfo
@@ -155,9 +154,10 @@ class CsvWriter {
                     is SpliceOutgoingPayment -> "Outgoing splice to ${payment.address}"
                     is ChannelCloseOutgoingPayment -> "Channel closing to ${payment.address}"
                     is SpliceCpfpOutgoingPayment -> "Accelerate transactions with CPFP"
-                    is InboundLiquidityOutgoingPayment ->
-                        if (payment.isManualPurchase()) "Manual liquidity (+${payment.purchase.amount.sat} sat)"
-                        else "Automated liquidity (+${payment.purchase.amount.sat} sat)"
+                    is InboundLiquidityOutgoingPayment -> when {
+                        payment.isManualPurchase() -> "Manual liquidity (+${payment.purchase.amount.sat} sat)"
+                        else -> "Channel management"
+                    }
                 }
                 row += ",${processField(details)}"
             }

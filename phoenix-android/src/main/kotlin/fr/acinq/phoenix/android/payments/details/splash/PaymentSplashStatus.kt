@@ -74,6 +74,7 @@ import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.positiveColor
+import fr.acinq.phoenix.utils.extensions.isManualPurchase
 import fr.acinq.phoenix.utils.extensions.minDepthForFunding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filterIsInstance
@@ -402,10 +403,9 @@ fun SplashLiquidityStatus(payment: InboundLiquidityOutgoingPayment, fromEvent: B
         else -> {
             PaymentStatusIcon(
                 message = {
-                    if (payment.purchase.paymentDetails is LiquidityAds.PaymentDetails.FromChannelBalance) {
-                        Text(text = annotatedStringResource(id = R.string.paymentdetails_status_inbound_liquidity_success, lockedAt.toRelativeDateString()))
-                    } else {
-                        Text(text = annotatedStringResource(id = R.string.paymentdetails_status_inbound_liquidity_auto_success, lockedAt.toRelativeDateString()))
+                    when {
+                        payment.isManualPurchase() -> Text(text = annotatedStringResource(id = R.string.paymentdetails_status_inbound_liquidity_success, lockedAt.toRelativeDateString()))
+                        else -> Text(text = annotatedStringResource(id = R.string.paymentdetails_status_inbound_liquidity_auto_success, lockedAt.toRelativeDateString()))
                     }
                 },
                 imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,

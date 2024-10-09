@@ -8,6 +8,7 @@ import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.WalletPaymentMetadata
+import fr.acinq.phoenix.data.walletPaymentId
 import fr.acinq.phoenix.db.payments.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -417,6 +418,7 @@ class CloudKitPaymentsDb(
             val spliceCpfpQueries = paymentsDb.cpfpQueries
             val inboundLiquidityQueries = paymentsDb.inboundLiquidityQueries
             val metaQueries = paymentsDb.database.paymentsMetadataQueries
+            val linkTxToPaymentQueries = paymentsDb.linkTxToPaymentQueries
 
             db.transaction {
 
@@ -520,6 +522,10 @@ class CloudKitPaymentsDb(
                     val existing = spliceOutQueries.getSpliceOutPayment(id = payment.id)
                     if (existing == null) {
                         spliceOutQueries.addSpliceOutgoingPayment(payment = payment)
+                        linkTxToPaymentQueries.linkTxToPayment(
+                            txId = payment.txId,
+                            walletPaymentId = payment.walletPaymentId()
+                        )
 
                     } else {
                         val confirmedAt = payment.confirmedAt
@@ -545,6 +551,10 @@ class CloudKitPaymentsDb(
                     val existing = channelCloseOutQueries.getChannelCloseOutgoingPayment(id = payment.id)
                     if (existing == null) {
                         channelCloseOutQueries.addChannelCloseOutgoingPayment(payment = payment)
+                        linkTxToPaymentQueries.linkTxToPayment(
+                            txId = payment.txId,
+                            walletPaymentId = payment.walletPaymentId()
+                        )
 
                     } else {
                         val confirmedAt = payment.confirmedAt
@@ -570,6 +580,10 @@ class CloudKitPaymentsDb(
                     val existing = spliceCpfpQueries.getCpfp(id = payment.id)
                     if (existing == null) {
                         spliceCpfpQueries.addCpfpPayment(payment = payment)
+                        linkTxToPaymentQueries.linkTxToPayment(
+                            txId = payment.txId,
+                            walletPaymentId = payment.walletPaymentId()
+                        )
 
                     } else {
                         val confirmedAt = payment.confirmedAt
@@ -595,6 +609,10 @@ class CloudKitPaymentsDb(
                     val existing = inboundLiquidityQueries.get(id = payment.id)
                     if (existing == null) {
                         inboundLiquidityQueries.add(payment = payment)
+                        linkTxToPaymentQueries.linkTxToPayment(
+                            txId = payment.txId,
+                            walletPaymentId = payment.walletPaymentId()
+                        )
 
                     } else {
                         val confirmedAt = payment.confirmedAt

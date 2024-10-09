@@ -118,11 +118,14 @@ fun InboundLiquidityOutgoingPayment.relatedPaymentIds() : List<WalletPaymentId> 
  * However, swap-ins do not **yet** request additional liquidity, so **for now** we can make a safe approximation.
  * Eventually, once swap-ins are upgraded to request liquidity, this will have to be fixed.
  */
-fun InboundLiquidityOutgoingPayment.isManualPurchase(): Boolean = purchase.paymentDetails is LiquidityAds.PaymentDetails.FromChannelBalance
+fun InboundLiquidityOutgoingPayment.isManualPurchase(): Boolean =
+    purchase.paymentDetails is LiquidityAds.PaymentDetails.FromChannelBalance &&
+    purchase.amount > 1.sat
 
 /**
  * Returns true if the liquidity fee was paid by an htlc in a future incoming payment. When that's the case, we should
  * not display the fees in the liquidity details screen to avoid confusion. Instead we should link to the payment whose
  * HTLCs paid the fees.
  */
-fun InboundLiquidityOutgoingPayment.isPaidInTheFuture(): Boolean = feePaidFromChannelBalance.total == 0.sat
+fun InboundLiquidityOutgoingPayment.isPaidInTheFuture(): Boolean =
+    feePaidFromChannelBalance.total == 0.sat
