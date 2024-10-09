@@ -42,7 +42,6 @@ import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
 import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.utils.extensions.isManualPurchase
-import fr.acinq.phoenix.utils.extensions.isPaidInTheFuture
 import fr.acinq.phoenix.utils.extensions.relatedPaymentIds
 
 @Composable
@@ -71,7 +70,7 @@ private fun SplashFee(
     payment: InboundLiquidityOutgoingPayment
 ) {
     val btcUnit = LocalBitcoinUnit.current
-    if (!payment.isPaidInTheFuture()) {
+    if (payment.feePaidFromChannelBalance.total > 0.sat) {
         val miningFee = payment.feePaidFromChannelBalance.miningFee
         val serviceFee = payment.feePaidFromChannelBalance.serviceFee
         Spacer(modifier = Modifier.height(8.dp))

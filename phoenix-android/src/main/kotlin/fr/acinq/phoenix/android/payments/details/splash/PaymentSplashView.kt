@@ -49,7 +49,8 @@ import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
 import fr.acinq.lightning.db.SpliceOutgoingPayment
-import fr.acinq.lightning.wire.LiquidityAds
+import fr.acinq.lightning.utils.sat
+import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.AmountView
 import fr.acinq.phoenix.android.components.BorderButton
@@ -83,12 +84,13 @@ fun PaymentDetailsSplashView(
         header = { DefaultScreenHeader(onBackClick = onBackClick) },
         topContent = { PaymentStatus(data.payment, fromEvent, onCpfpSuccess = onBackClick) }
     ) {
-        if (payment is InboundLiquidityOutgoingPayment && payment.purchase.paymentDetails is LiquidityAds.PaymentDetails.FromFutureHtlc) {
+        // hide the total if this is a liquidity purchase that's not paid from the balance
+        if (payment is InboundLiquidityOutgoingPayment && payment.feePaidFromChannelBalance.total == 0.sat) {
             Unit
         } else {
             AmountView(
                 amount = when (payment) {
-                    is InboundLiquidityOutgoingPayment -> payment.amount
+                    is InboundLiquidityOutgoingPayment -> payment.feePaidFromChannelBalance.total.toMilliSatoshi()
                     is OutgoingPayment -> payment.amount - payment.fees
                     is IncomingPayment -> payment.amount
                 },

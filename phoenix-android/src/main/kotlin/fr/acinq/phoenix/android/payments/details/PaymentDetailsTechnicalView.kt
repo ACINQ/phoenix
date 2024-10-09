@@ -41,6 +41,7 @@ import fr.acinq.lightning.payment.Bolt12Invoice
 import fr.acinq.lightning.payment.OfferPaymentMetadata
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.utils.msat
+import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.sum
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.lightning.wire.LiquidityAds
@@ -248,18 +249,20 @@ private fun AmountSection(
                 rateThen = rateThen,
                 mSatDisplayPolicy = MSatDisplayPolicy.SHOW
             )
-            TechnicalRowAmount(
-                label = stringResource(id = R.string.paymentdetails_liquidity_miner_fee_label),
-                amount = payment.miningFees.toMilliSatoshi(),
-                rateThen = rateThen,
-                mSatDisplayPolicy = MSatDisplayPolicy.SHOW
-            )
-            TechnicalRowAmount(
-                label = stringResource(id = R.string.paymentdetails_liquidity_service_fee_label),
-                amount = payment.purchase.fees.serviceFee.toMilliSatoshi(),
-                rateThen = rateThen,
-                mSatDisplayPolicy = MSatDisplayPolicy.SHOW
-            )
+            if (payment.feePaidFromChannelBalance.total > 0.sat) {
+                TechnicalRowAmount(
+                    label = stringResource(id = R.string.paymentdetails_liquidity_miner_fee_label),
+                    amount = payment.feePaidFromChannelBalance.miningFee.toMilliSatoshi(),
+                    rateThen = rateThen,
+                    mSatDisplayPolicy = MSatDisplayPolicy.SHOW
+                )
+                TechnicalRowAmount(
+                    label = stringResource(id = R.string.paymentdetails_liquidity_service_fee_label),
+                    amount = payment.feePaidFromChannelBalance.serviceFee.toMilliSatoshi(),
+                    rateThen = rateThen,
+                    mSatDisplayPolicy = MSatDisplayPolicy.SHOW
+                )
+            }
         }
         is OutgoingPayment -> {
             TechnicalRowAmount(
