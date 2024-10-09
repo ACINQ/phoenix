@@ -33,6 +33,8 @@ data class InboundLiquidityPaymentWrapper(
         id = src.id,
         channelId = src.channelId.toByteArray(),
         txId = src.txId.value.toByteArray(),
+        // see lightning-kmp#710 and comment in InboundLiquidityQueries mapper
+        // miningFeesSat contains the local fee + the purchase fee
         miningFeesSat = src.miningFees.sat,
         purchase = LiquidityAdsPurchaseWrapper(src.purchase),
         createdAt = src.createdAt,
@@ -41,15 +43,21 @@ data class InboundLiquidityPaymentWrapper(
     )
 
     @Throws(Exception::class)
-    fun unwrap() = InboundLiquidityOutgoingPayment(
-        id = this.id,
-        channelId = this.channelId.toByteVector32(),
-        txId = TxId(this.txId),
-        purchase = this.purchase.unwrap(),
-        createdAt = this.createdAt,
-        confirmedAt = this.confirmedAt,
-        lockedAt = this.lockedAt,
-    )
+    fun unwrap(): InboundLiquidityOutgoingPayment {
+        val purchase = this.purchase.unwrap()
+        return InboundLiquidityOutgoingPayment(
+            id = this.id,
+            channelId = this.channelId.toByteVector32(),
+            txId = TxId(this.txId),
+            // see lightning-kmp#710 and comment in InboundLiquidityQueries mapper
+            // miningFeesSat contains the local fee + the purchase fee
+            localMiningFees = this.miningFeesSat.sat - purchase.fees.miningFee,
+            purchase = purchase,
+            createdAt = this.createdAt,
+            confirmedAt = this.confirmedAt,
+            lockedAt = this.lockedAt,
+        )
+    }
 
     @Serializable
     data class LiquidityAdsPurchaseWrapper(@ByteString val blob: ByteArray) {
@@ -80,15 +88,21 @@ data class InboundLiquidityLegacyWrapper(
     val lockedAt: Long?,
 ) {
     @Throws(Exception::class)
-    fun unwrap() = InboundLiquidityOutgoingPayment(
-        id = this.id,
-        channelId = this.channelId.toByteVector32(),
-        txId = TxId(this.txId),
-        purchase = this.lease.unwrap(),
-        createdAt = this.createdAt,
-        confirmedAt = this.confirmedAt,
-        lockedAt = this.lockedAt,
-    )
+    fun unwrap(): InboundLiquidityOutgoingPayment {
+        val lease = this.lease.unwrap()
+        return InboundLiquidityOutgoingPayment(
+            id = this.id,
+            channelId = this.channelId.toByteVector32(),
+            txId = TxId(this.txId),
+            // see lightning-kmp#710 and comment in InboundLiquidityQueries mapper
+            // miningFeesSat contains the local fee + the purchase fee (even for legacy data)
+            localMiningFees = this.miningFeesSat.sat - lease.fees.miningFee,
+            purchase = lease,
+            createdAt = this.createdAt,
+            confirmedAt = this.confirmedAt,
+            lockedAt = this.lockedAt,
+        )
+    }
 
     @Serializable
     data class LiquidityAdsLeaseWrapper(
