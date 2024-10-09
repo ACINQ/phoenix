@@ -368,6 +368,6 @@ extension Lightning_kmpBolt11Invoice {
 extension Lightning_kmpInboundLiquidityOutgoingPayment {
 	
 	var hidesFees: Bool {
-		return self.isPaidInTheFuture()
+		return (self.feePaidFromChannelBalance.total.sat <= 0)
 	}
 }
