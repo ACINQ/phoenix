@@ -106,6 +106,14 @@ class BusinessManager {
 		}.store(in: &appCancellables)
 		
 		WatchTower.shared.prepare()
+		
+		// <print_database_location>
+		let fm = FileManager.default
+		if let groupDir = fm.containerURL(forSecurityApplicationGroupIdentifier: "group.co.acinq.phoenix") {
+			let dbDir = groupDir.appendingPathComponent("databases", isDirectory: true)
+			log.debug("dbDir: \(dbDir.path)")
+		}
+		// </print_database_location>
 	}
 	
 	// --------------------------------------------------

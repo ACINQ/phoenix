@@ -177,8 +177,8 @@ class SqliteAppDb(private val driver: SqlDriver) {
         contactQueries.getContactForOffer(offerId)
     }
 
-    suspend fun monitorContacts(): Flow<List<ContactInfo>> = withContext(Dispatchers.Default) {
-        contactQueries.monitorContactsFlow()
+    fun monitorContactsFlow(): Flow<List<ContactInfo>> {
+        return contactQueries.monitorContactsFlow(Dispatchers.Default)
     }
 
     suspend fun listContacts(): List<ContactInfo> = withContext(Dispatchers.Default) {
@@ -189,16 +189,8 @@ class SqliteAppDb(private val driver: SqlDriver) {
         contactQueries.saveContact(contact)
     }
 
-    suspend fun updateContact(contact: ContactInfo) = withContext(Dispatchers.Default) {
-        contactQueries.updateContact(contact)
-    }
-
     suspend fun deleteContact(contactId: UUID) = withContext(Dispatchers.Default) {
         contactQueries.deleteContact(contactId)
-    }
-
-    suspend fun deleteOfferContactLink(offerId: ByteVector32) = withContext(Dispatchers.Default) {
-        contactQueries.deleteOfferContactLink(offerId)
     }
 
     fun close() {

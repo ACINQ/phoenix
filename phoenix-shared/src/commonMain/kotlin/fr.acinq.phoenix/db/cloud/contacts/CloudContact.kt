@@ -41,18 +41,22 @@ data class CloudContact(
         id = contact.id,
         name = contact.name,
         useOfferKey = contact.useOfferKey,
-        offers = contact.offers
+        // FIXME
+    //  offers = contact.offers
+        offers = listOf()
     )
 
     @Throws(Exception::class)
     fun unwrap(photoUri: String?): ContactInfo? {
-        return ContactInfo(
-            id = this.id,
-            name = this.name,
-            photoUri = photoUri,
-            useOfferKey = this.useOfferKey,
-            offers = this.offers
-        )
+        // FIXME
+        return null
+//        return ContactInfo(
+//            id = this.id,
+//            name = this.name,
+//            photoUri = photoUri,
+//            useOfferKey = this.useOfferKey,
+//            offers = this.offers
+//        )
     }
 
     companion object

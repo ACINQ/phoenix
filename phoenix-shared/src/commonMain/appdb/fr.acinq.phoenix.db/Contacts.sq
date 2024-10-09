@@ -18,14 +18,62 @@ CREATE TABLE IF NOT EXISTS contact_offers (
     FOREIGN KEY(contact_id) REFERENCES contacts(id)
 );
 
+CREATE TABLE IF NOT EXISTS contact_addresses (
+    address_hash TEXT NOT NULL PRIMARY KEY,
+    contact_id TEXT NOT NULL,
+    address TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+
+    FOREIGN KEY(contact_id) REFERENCES contacts(id)
+);
+
+CREATE INDEX contact_name_index ON contacts(name ASC);
 CREATE INDEX contact_id_index ON contact_offers(contact_id);
+CREATE INDEX contact_id_index2 ON contact_addresses(contact_id);
+
+-- ########## aggregate queries ##########
 
 listContacts:
-SELECT id, name, photo_uri, use_offer_key, contacts.created_at, updated_at, group_concat(offer, ',') AS offers
-FROM contacts AS contacts
-LEFT OUTER JOIN contact_offers AS contact_offers ON contact_id = id
-GROUP BY id
-ORDER BY contacts.name ASC;
+SELECT
+  a.id,
+  a.name,
+  a.photo_uri,
+  a.use_offer_key,
+  a.created_at,
+  a.updated_at,
+  group_concat(b.offer, ',') AS offers,
+  group_concat(c.address, ',') AS addresses
+FROM contacts AS a
+LEFT OUTER JOIN contact_offers AS b ON b.contact_id = a.id
+LEFT OUTER JOIN contact_addresses AS c ON c.contact_id = a.id
+GROUP BY a.id
+ORDER BY a.name ASC;
+
+getContact:
+SELECT
+  a.id,
+  a.name,
+  a.photo_uri,
+  a.use_offer_key,
+  a.created_at,
+  a.updated_at,
+  group_concat(b.offer, ',') AS offers
+FROM contacts AS a
+JOIN contact_offers AS b ON b.contact_id = a.id
+WHERE id = :contactId
+ORDER BY b.created_at;
+
+-- ########## table: contacts ##########
+
+listContacts2:
+SELECT *
+FROM contacts
+ORDER BY name ASC;
+
+getContact2:
+SELECT *
+FROM contacts
+WHERE id = :contactId;
 
 scanContacts:
 SELECT id, created_at FROM contacts;
@@ -33,18 +81,6 @@ SELECT id, created_at FROM contacts;
 existsContact:
 SELECT COUNT(*) FROM contacts
 WHERE id = ?;
-
-getContact:
-SELECT id, name, photo_uri, use_offer_key, contacts.created_at, updated_at, group_concat(offer, ',') AS offers
-FROM contacts AS contacts
-JOIN contact_offers AS contact_offers ON contact_id = id
-WHERE id = :contactId
-ORDER BY contact_offers.created_at;
-
-getContactIdForOffer:
-SELECT offer_id, contact_id, offer, created_at
-FROM contact_offers
-WHERE offer_id=:offerId;
 
 insertContact:
 INSERT INTO contacts(id, name, photo_uri, use_offer_key, created_at, updated_at)
@@ -54,8 +90,31 @@ updateContact:
 UPDATE contacts SET name=:name, photo_uri=:photoUri, use_offer_key=:useOfferKey, updated_at=:updatedAt
 WHERE id=:contactId;
 
+-- `contact.updated_at` should be incremented when a corresponding change is made
+-- in `contact_offers` or `contact_addresses`
+markContactUpdated:
+UPDATE contacts
+SET updated_at=:updatedAt
+WHERE id=:contactId;
+
 deleteContact:
 DELETE FROM contacts WHERE id=:contactId;
+
+-- ########## table: contact_offers ##########
+
+listContactOffers:
+SELECT *
+FROM contact_offers;
+
+listOffersForContact:
+SELECT *
+FROM contact_offers
+WHERE contact_id=:contactId;
+
+getContactIdForOffer:
+SELECT offer_id, contact_id, offer, created_at
+FROM contact_offers
+WHERE offer_id=:offerId;
 
 insertOfferForContact:
 INSERT INTO contact_offers(offer_id, contact_id, offer, created_at)
@@ -64,5 +123,23 @@ VALUES (:offerId, :contactId, :offer, :createdAt);
 deleteContactOfferForOfferId:
 DELETE FROM contact_offers WHERE offer_id=:offerId;
 
-deleteContactOfferForContactId:
+deleteContactOffersForContactId:
 DELETE FROM contact_offers WHERE contact_id=:contactId;
+
+-- ########## table: contact_addresses ##########
+
+listContactAddresses:
+SELECT *
+FROM contact_addresses;
+
+listAddressesForContact:
+SELECT *
+FROM contact_addresses
+WHERE contact_id=:contactId;
+
+insertAddressForContact:
+INSERT INTO contact_addresses(address_hash, contact_id, address, created_at)
+VALUES (:addressHash, :contactId, :address, :createdAt);
+
+deleteContactAddressesForContactId:
+DELETE FROM contact_addresses WHERE contact_id=:contactId;
