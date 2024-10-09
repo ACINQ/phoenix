@@ -227,6 +227,9 @@
     <string name="inappnotif_mempool_full_message">Phí on-chain cao.</string>
     <string name="inappnotif_mempool_full_action">Xem những ảnh hưởng tới Phoenix.</string>
 
+    <string name="inappnotif_final_wallet_message">Tiền có sẵn trong ví cuối cùng.</string>
+    <string name="inappnotif_final_wallet_action">Xem tiền</string>
+
     <string name="inappnotif_payment_onchain_pending_title">Các khoản vốn on-chain đang chờ xử lý (+%1$s)</string>.
     <string name="inappnotif_payments_rejection_overview_one">Một khoản tiền đến đã bị từ chối gần đây.</string>
     <string name="inappnotif_payments_rejection_overview_many">Khoản thanh toán đến %1$d đã bị từ chối gần đây</string>
@@ -470,6 +473,13 @@
     <string name="swapinrefund_failed_cannot_create">Không thể tạo giao dịch hoàn tiền. Hãy thử lại.</string>
     <string name="swapinrefund_success">Giao dịch đã được công bố.</string>
     <string name="swapinrefund_success_details">Bạn có thể tìm thấy giao dịch chi tiêu số tiền bên dưới. Nó sẽ không xuất hiện trong lịch sử thanh toán của bạn, vì vậy hãy tạo bản sao ID của nó ngay bây giờ nếu cần.</string>
+
+    <!-- Final wallet refund -->
+
+    <string name="finalwallet_refund_title">Chi tiêu tiền từ ví cuối cùng</string>
+    <string name="finalwallet_refund_available_none">Không có sẵn tiền</string>
+    <string name="finalwallet_refund_available">Số tiền có sẵn</string>
+    <string name="finalwallet_refund_instructions">Sử dụng màn hình này để tiêu tiền từ ví cuối cùng của bạn. Những khoản tiền này đến từ các kênh đã bị đóng trong quá khứ. Điều này không ảnh hưởng đến các kênh Lightning hiện tại của bạn.</string>
 
     <!-- experimental features -->
 

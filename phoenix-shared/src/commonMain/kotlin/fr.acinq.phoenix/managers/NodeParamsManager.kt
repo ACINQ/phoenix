@@ -35,6 +35,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.hours
 
 
 class NodeParamsManager(
@@ -69,6 +70,7 @@ class NodeParamsManager(
                 ).copy(
                     zeroConfPeers = setOf(trampolineNodeId),
                     liquidityPolicy = MutableStateFlow(startupParams.liquidityPolicy),
+                    bolt12invoiceExpiry = 24.hours,
                 )
             }.collect {
                 log.info { "hello!" }

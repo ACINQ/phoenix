@@ -20,8 +20,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -31,28 +29,36 @@ import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.blockchain.electrum.WalletState
 import fr.acinq.lightning.blockchain.electrum.balance
+import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.Card
+import fr.acinq.phoenix.android.components.CardHeader
+import fr.acinq.phoenix.android.components.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.DefaultScreenLayout
+import fr.acinq.phoenix.android.components.FilledButton
+import fr.acinq.phoenix.utils.extensions.confirmed
 
 @Composable
 fun FinalWalletInfo(
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onSpendClick: () -> Unit,
 ) {
     val finalWallet by business.peerManager.finalWallet.collectAsState()
 
     DefaultScreenLayout(isScrollable = false) {
         DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.walletinfo_onchain_final), helpMessage = stringResource(id = R.string.walletinfo_onchain_final_about))
-        ConfirmedBalanceView(balance = finalWallet?.all?.balance?.toMilliSatoshi())
-        UnconfirmedWalletView(wallet = finalWallet)
+        ConfirmedBalanceView(balance = finalWallet?.confirmed?.balance?.toMilliSatoshi(), onSpendClick = onSpendClick)
+        UnconfirmedWalletView(utxos = finalWallet?.unconfirmed.orEmpty())
     }
 }
 
 @Composable
 private fun ConfirmedBalanceView(
-    balance: MilliSatoshi?
+    balance: MilliSatoshi?,
+    onSpendClick: () -> Unit,
 ) {
     CardHeader(text = stringResource(id = R.string.walletinfo_confirmed_title))
     Card(
@@ -60,17 +66,25 @@ private fun ConfirmedBalanceView(
         modifier = Modifier.fillMaxWidth()
     ) {
         BalanceRow(balance = balance)
+        if (balance != null && balance > 0.msat) {
+            Spacer(modifier = Modifier.height(12.dp))
+            FilledButton(
+                text = "Spend",
+                icon = R.drawable.ic_send,
+                onClick = onSpendClick,
+            )
+        }
     }
 }
 
 @Composable
 private fun UnconfirmedWalletView(
-    wallet: WalletState.WalletWithConfirmations?
+    utxos: List<WalletState.Utxo>
 ) {
-    if (wallet != null && wallet.unconfirmed.balance > 0.sat) {
+    if (utxos.balance > 0.sat) {
         CardHeader(text = stringResource(id = R.string.walletinfo_unconfirmed_title))
         Card {
-            wallet.unconfirmed.forEach {
+            utxos.forEach {
                 UtxoRow(it, null)
             }
         }

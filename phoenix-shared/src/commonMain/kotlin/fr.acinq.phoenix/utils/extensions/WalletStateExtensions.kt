@@ -17,7 +17,9 @@
 package fr.acinq.phoenix.utils.extensions
 
 import fr.acinq.lightning.SwapInParams
+import fr.acinq.lightning.blockchain.electrum.FinalWallet
 import fr.acinq.lightning.blockchain.electrum.WalletState
+import fr.acinq.lightning.utils.getValue
 import kotlin.math.ceil
 
 /** Number of confirmation during which a utxo is locked between the swap window closing and the refund delay. */
@@ -42,3 +44,7 @@ val WalletState.WalletWithConfirmations.deeplyConfirmedToExpiry: List<Pair<Walle
 /** A map of deeply confirmed utxos to their expiry, according to the wallet's swap params. */
 val WalletState.WalletWithConfirmations.nextTimeout: Pair<WalletState.Utxo, Int>?
     get() = deeplyConfirmedToExpiry.minByOrNull { it.second }
+
+/** List of all confirmed utxos. */
+val WalletState.WalletWithConfirmations.confirmed
+    get() = this.all.filter { it.blockHeight > 0L }

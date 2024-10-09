@@ -219,6 +219,9 @@
     <string name="inappnotif_mempool_full_message">O mempool do Bitcoin está cheio e as taxas na cadeia estão altas.</string>
     <string name="inappnotif_mempool_full_action">Veja como a Phoenix é afetada</string>
 
+    <string name="inappnotif_final_wallet_message">Fundos disponíveis na carteira final.</string>
+    <string name="inappnotif_final_wallet_action">Ver fundos.</string>
+
     <string name="inappnotif_payment_onchain_pending_title">Fundos pendentes na cadeia (+%1$s)</string>
 
     <string name="inappnotif_payments_rejection_overview_one">1 pagamento recebido recentemente rejeitado</string>
@@ -458,6 +461,13 @@
     <string name="swapinrefund_failed_cannot_create">Não foi possível criar a transação de cobrança. Por favor, tente novamente.</string>
     <string name="swapinrefund_success">Transação publicada.</string>
     <string name="swapinrefund_success_details">Você pode encontrar a transação abaixo. Ela não aparecerá em seu histórico de pagamentos, portanto, faça uma cópia agora, se necessário.</string>
+
+    <!-- Final wallet refund -->
+
+    <string name="finalwallet_refund_title">Gastar fundos da carteira final</string>
+    <string name="finalwallet_refund_available_none">Não há fundos disponíveis</string>
+    <string name="finalwallet_refund_available">Valor disponível</string>
+    <string name="finalwallet_refund_instructions">Use esta tela para gastar fundos de sua carteira final. Esses fundos vêm de canais que foram fechados no passado. Isso não afeta seus canais Lightning existentes.</string>
 
     <!-- experimental features -->
 

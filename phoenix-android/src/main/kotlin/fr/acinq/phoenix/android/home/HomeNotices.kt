@@ -29,6 +29,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -59,14 +60,16 @@ fun HomeNotices(
     notices: List<Notice>,
     notifications: List<Pair<Set<UUID>, Notification>>,
     onNavigateToSwapInWallet: () -> Unit,
+    onNavigateToFinalWallet: () -> Unit,
     onNavigateToNotificationsList: () -> Unit,
 ) {
-    val filteredNotices = notices.filterIsInstance<Notice.ShowInHome>().sortedBy { it.priority }
-    val now = currentTimestampMillis()
-    val recentRejectedOffchainCount = notifications.map { it.second }
-        .filterIsInstance<Notification.PaymentRejected>()
-        .filter { it.source == LiquidityEvents.Source.OffChainPayment && (now - it.createdAt) < 15 * DateUtils.HOUR_IN_MILLIS }
-        .size
+    val filteredNotices = remember(notices) { notices.filterIsInstance<Notice.ShowInHome>().sortedBy { it.priority } }
+    val recentRejectedOffchainCount = remember (notifications) {
+        notifications.map { it.second }
+            .filterIsInstance<Notification.PaymentRejected>()
+            .filter { it.source == LiquidityEvents.Source.OffChainPayment && (currentTimestampMillis() - it.createdAt) < 15 * DateUtils.HOUR_IN_MILLIS }
+            .size
+    }
 
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
         if (recentRejectedOffchainCount > 0) {
@@ -77,6 +80,7 @@ fun HomeNotices(
                 notice = it,
                 messagesCount = notices.size + notifications.size,
                 onNavigateToSwapInWallet = onNavigateToSwapInWallet,
+                onNavigateToFinalWallet = onNavigateToFinalWallet,
                 onNavigateToNotificationsList = onNavigateToNotificationsList
             )
         }
@@ -90,6 +94,7 @@ private fun FirstNoticeView(
     notice: Notice.ShowInHome,
     messagesCount: Int,
     onNavigateToSwapInWallet: () -> Unit,
+    onNavigateToFinalWallet: () -> Unit,
     onNavigateToNotificationsList: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -130,6 +135,8 @@ private fun FirstNoticeView(
             is Notice.MempoolFull -> onNavigateToNotificationsList
 
             is Notice.RemoteMessage -> onNavigateToNotificationsList
+
+            is Notice.FundsInFinalWallet -> onNavigateToFinalWallet
         }
     } else {
         onNavigateToNotificationsList
@@ -184,6 +191,9 @@ private fun FirstNoticeView(
                 NoticeTextView(text = notice.notice.message, icon = R.drawable.ic_info)
             }
 
+            is Notice.FundsInFinalWallet -> {
+                NoticeTextView(text = stringResource(id = R.string.inappnotif_final_wallet_message), icon = R.drawable.ic_info)
+            }
         }
 
         if (messagesCount > 1) {

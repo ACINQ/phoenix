@@ -223,6 +223,9 @@
     <string name="inappnotif_mempool_full_message">On-chain fees are high.</string>
     <string name="inappnotif_mempool_full_action">See how Phoenix is affected</string>
 
+    <string name="inappnotif_final_wallet_message">Funds available in the final wallet.</string>
+    <string name="inappnotif_final_wallet_action">View funds.</string>
+
     <string name="inappnotif_payment_onchain_pending_title">On-chain funds pending (+%1$s)</string>
     <string name="inappnotif_payments_rejection_overview_one">An incoming payment has been recently rejected</string>
     <string name="inappnotif_payments_rejection_overview_many">%1$d incoming payments recently rejected</string>
@@ -456,7 +459,7 @@
     <string name="swapinrefund_none_available_label">No cancelled swap-ins yet.</string>
     <string name="swapinrefund_available_label">Available: <b>%1$s</b> (%2$s)</string>
     <string name="swapinrefund_instructions_1">Use this screen to spend on-chain deposits that were not swapped in time. This does not affect your Lightning channels.</string>
-    <string name="swapinrefund_instructions_2">Make sure the destination address is valid and the feerate reasonable.</string>
+    <string name="swapinrefund_instructions_2">Make sure the destination address is valid, and use a reasonable feerate.</string>
     <string name="swapinrefund_estimate_button">Estimate fees</string>
     <string name="swapinrefund_estimating">Estimating fees…</string>
     <string name="swapinrefund_send_button">Broadcast</string>
@@ -465,7 +468,14 @@
     <string name="swapinrefund_failed_address">This address is not valid.</string>
     <string name="swapinrefund_failed_cannot_create">Cannot create the refund transaction.</string>
     <string name="swapinrefund_success">Transaction published.</string>
-    <string name="swapinrefund_success_details">You can find the transaction spending the funds below. It will not appear in your payments history, so make a copy of its ID now if needed.</string>
+    <string name="swapinrefund_success_details">You can find the transaction below. It will not appear in your payments history, so make a copy of its ID now if needed.</string>
+
+    <!-- Final wallet refund -->
+
+    <string name="finalwallet_refund_title">Spend funds from final wallet</string>
+    <string name="finalwallet_refund_available_none">No funds available</string>
+    <string name="finalwallet_refund_available">Amount available</string>
+    <string name="finalwallet_refund_instructions">Use this screen to spend funds from your final wallet. These funds come from channels that have been closed in the past. This does not affect your existing Lightning channels.</string>
 
     <!-- experimental features -->
 

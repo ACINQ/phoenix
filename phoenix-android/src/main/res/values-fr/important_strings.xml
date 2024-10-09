@@ -216,6 +216,9 @@
     <string name="inappnotif_mempool_full_message">Le mempool Bitcoin est plein, et les frais sur la chaîne sont élevés.</string>
     <string name="inappnotif_mempool_full_action">Voir en quoi Phoenix est affecté</string>
 
+    <string name="inappnotif_final_wallet_message">Des fonds sont disponibles dans le wallet final.</string>
+    <string name="inappnotif_final_wallet_action">Afficher les fonds</string>
+
     <string name="inappnotif_migration_from_legacy">Félicitations! Votre wallet a été mis à jour.</string>
     <string name="inappnotif_migration_from_legacy_action">Voir les nouveautés</string>
     <string name="inappnotif_migration_from_legacy_dialog_title">Votre adresse Bitcoin a changé</string>
@@ -463,6 +466,13 @@
     <string name="swapinrefund_failed_cannot_create">Impossible de créer la transaction de recouvrement. Veuillez réessayer.</string>
     <string name="swapinrefund_success">Transaction publiée.</string>
     <string name="swapinrefund_success_details">Vous pouvez trouver la transaction ci-dessous. Elle n\'apparaîtra pas dans votre historique de paiements, donc faites en copie maintenant si besoin.</string>
+
+    <!-- Final wallet refund -->
+
+    <string name="finalwallet_refund_title">Dépenser depuis le wallet final</string>
+    <string name="finalwallet_refund_available_none">Pas de fonds disponibles</string>
+    <string name="finalwallet_refund_available">Montant disponible</string>
+    <string name="finalwallet_refund_instructions">Utilisez cet écran pour dépenser les fonds de votre portefeuille final. Ces fonds proviennent de canaux qui ont été fermés par le passé. Cela n\'affecte pas les canaux Lightning existants.</string>
 
     <!-- experimental features -->
 

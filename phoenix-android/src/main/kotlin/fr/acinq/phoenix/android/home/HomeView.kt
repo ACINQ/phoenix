@@ -76,7 +76,8 @@ fun HomeView(
     onPaymentsHistoryClick: () -> Unit,
     onTorClick: () -> Unit,
     onElectrumClick: () -> Unit,
-    onShowSwapInWallet: () -> Unit,
+    onNavigateToSwapInWallet: () -> Unit,
+    onNavigateToFinalWallet: () -> Unit,
     onShowNotifications: () -> Unit,
     onRequestLiquidityClick: () -> Unit,
 ) {
@@ -238,14 +239,15 @@ fun HomeView(
                     balanceDisplayMode = balanceDisplayMode,
                     swapInBalance = swapInBalance.value,
                     unconfirmedChannelsBalance = pendingChannelsBalance.value,
-                    onShowSwapInWallet = onShowSwapInWallet,
+                    onShowSwapInWallet = onNavigateToSwapInWallet,
                 )
                 PrimarySeparator(modifier = Modifier.layoutId("separator"))
                 HomeNotices(
                     modifier = Modifier.layoutId("notices"),
-                    notices = notices,
+                    notices = notices.toList(),
                     notifications = notifications,
-                    onNavigateToSwapInWallet = onShowSwapInWallet,
+                    onNavigateToSwapInWallet = onNavigateToSwapInWallet,
+                    onNavigateToFinalWallet = onNavigateToFinalWallet,
                     onNavigateToNotificationsList = onShowNotifications,
                 )
             }

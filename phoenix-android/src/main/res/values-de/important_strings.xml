@@ -217,6 +217,9 @@
     <string name="inappnotif_mempool_full_message">Der Bitcoin mempool ist voll und die on-chain Gebühren sind hoch.</string>
     <string name="inappnotif_mempool_full_action">Erfahren Sie inwiefern Phoenix davon betroffen ist</string>
 
+    <string name="inappnotif_final_wallet_message">Guthaben im Final Wallet verfügbar.</string>
+    <string name="inappnotif_final_wallet_action">Guthaben anzeigen</string>
+
     <string name="inappnotif_payment_onchain_pending_title">On-chain Guthaben ausstehend (+%1$s)</string>
     <string name="inappnotif_payments_rejection_overview_one">1 kürzlich abgelehnter Zahlungseingang</string>
     <string name="inappnotif_payments_rejection_overview_many">%1$d kürzlich abgelehnte Zahlungseingänge</string>
@@ -460,6 +463,13 @@
     <string name="swapinrefund_failed_cannot_create">Die Einzugstransaktion konnte nicht erstellt werden. Bitte versuchen Sie es erneut.</string>
     <string name="swapinrefund_success">Transaktion veröffentlicht.</string>
     <string name="swapinrefund_success_details">Sie können die Transaktion unten finden. Sie wird nicht in Ihrem Zahlungsverlauf erscheinen, also machen Sie bei Bedarf jetzt eine Kopie davon.</string>
+
+    <!-- Final wallet refund -->
+
+    <string name="finalwallet_refund_title">Guthaben aus der Final Wallet ausgeben</string>
+    <string name="finalwallet_refund_available_none">Kein Guthaben verfügbar</string>
+    <string name="finalwallet_refund_available">Verfügbarer Betrag</string>
+    <string name="finalwallet_refund_instructions">Verwenden Sie diesen Screen, um Guthaben aus Ihrer finalen Wallet auszugeben. Diese Gelder stammen aus Kanälen, die in der Vergangenheit geschlossen wurden. Dies hat keine Auswirkungen auf Ihre bestehenden Lightning-Kanäle.</string>
 
     <!-- experimental features -->
 

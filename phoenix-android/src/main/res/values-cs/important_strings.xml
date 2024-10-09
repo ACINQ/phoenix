@@ -220,6 +220,9 @@
     <string name="inappnotif_mempool_full_message">Bitcoin mempool je plný a On-Chain poplatky jsou vysoké.</string>
     <string name="inappnotif_mempool_full_action">Podívejte se, jak je ovlivněn Phoenix</string>
 
+    <string name="inappnotif_final_wallet_message">Prostředky dostupné v konečné peněžence.</string>
+    <string name="inappnotif_final_wallet_action">Zobrazit prostředky</string>
+
     <string name="inappnotif_payment_onchain_pending_title">On-Chain finanční prostředky čekají na vyřízení (+%1$s)</string>
     <string name="inappnotif_payments_rejection_overview_one">Příchozí platba byla nedávno odmítnuta</string>
     <string name="inappnotif_payments_rejection_overview_many">%1$d nedávno odmítnutých příchozích plateb</string>
@@ -462,6 +465,13 @@
     <string name="swapinrefund_failed_cannot_create">Nepodařilo se vytvořit refund transakci. Zkuste to prosím znovu.</string>
     <string name="swapinrefund_success">Transakce odeslána.</string>
     <string name="swapinrefund_success_details">Transakci naleznete níže. Nebude se zobrazovat v historii plateb, proto si nyní v případě potřeby zkopírujte její ID.</string>
+
+    <!-- Final wallet refund -->
+
+    <string name="finalwallet_refund_title">Utratit prostředky z konečné peněženky</string>
+    <string name="finalwallet_refund_available_none">Nejsou k dispozici žádné prostředky</string>
+    <string name="finalwallet_refund_available">Dostupná částka</string>
+    <string name="finalwallet_refund_instructions">Na této obrazovce můžete utratit prostředky z konečné peněženky. Tyto prostředky pocházejí z kanálů, které byly v minulosti uzavřeny. To nemá vliv na váš stávající kanál Lightning.</string>
 
     <!-- experimental features -->
 

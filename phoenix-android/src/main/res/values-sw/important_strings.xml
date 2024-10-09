@@ -223,6 +223,9 @@
     <string name="inappnotif_mempool_full_message">Ada za mtandaoni ziko juu.</string>
     <string name="inappnotif_mempool_full_action">Angalia jinsi Phoenix inavyoathirika</string>
 
+    <string name="inappnotif_final_wallet_message">Fedha zinapatikana katika pochi ya mwisho.</string>
+    <string name="inappnotif_final_wallet_action">Angalia fedha</string>
+
     <string name="inappnotif_payment_onchain_pending_title">Fedha za mtandaoni zinangosubiria (+%1$s)</string>
     <string name="inappnotif_payments_rejection_overview_one">Malipo moja ya kuingia yamekataliwa hivi karibuni</string>
     <string name="inappnotif_payments_rejection_overview_many">%1$d malipo ya kuingia yamekataliwa hivi karibuni</string>
@@ -465,6 +468,13 @@
     <string name="swapinrefund_failed_cannot_create">Haiwezi kuunda muamala wa marejesho.</string>
     <string name="swapinrefund_success">Muamala umetangazwa.</string>
     <string name="swapinrefund_success_details">Unaweza kupata muamala unaotumia fedha hapa chini. Haitaonekana kwenye historia ya malipo yako, hivyo fanya nakala ya kitambulisho chake sasa ikiwa inahitajika.</string>
+
+    <!-- Final wallet refund -->
+
+    <string name="finalwallet_refund_title">Tumia pesa kutoka kwa mkoba wa mwisho</string>
+    <string name="finalwallet_refund_available_none">Hakuna fedha zinazopatikana</string>
+    <string name="finalwallet_refund_available">Kiasi kinachopatikana</string>
+    <string name="finalwallet_refund_instructions">Tumia skrini hii kutumia pesa kutoka kwa pochi yako ya mwisho. Fedha hizi hutoka kwa chaneli ambazo zilifungwa hapo awali. Hii haiathiri chaneli zako zilizopo za Lightning.</string>
 
     <!-- experimental features -->
 
