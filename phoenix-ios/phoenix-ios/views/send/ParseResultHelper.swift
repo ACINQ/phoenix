@@ -58,13 +58,20 @@ class ParseResultHelper {
 			let remoteFailure: LnurlError.RemoteFailure = serviceError.error
 			let origin = remoteFailure.origin
 			
-			let isLightningAddress = serviceError.url.description.contains("/.well-known/lnurlp/")
-			let lightningAddressErrorMessage = String(
-				localized: "The service (\(origin)) doesn't support Lightning addresses, or doesn't know this user",
-				comment: "Error message - scanning lightning invoice"
-			)
-			
 			switch remoteFailure {
+			case is LnurlError.RemoteFailure_IsWebsite:
+				websiteLink = URL(string: serviceError.url.description())
+				msg = String(
+					localized: "Unreadable response from service: \(origin)",
+					comment: "Error message - scanning lightning invoice"
+				)
+				
+			case is LnurlError.RemoteFailure_LightningAddressError:
+				msg = String(
+					localized: "The service (\(origin)) doesn't support Lightning addresses, or doesn't know this user",
+					comment: "Error message - scanning lightning invoice"
+				)
+				
 			case is LnurlError.RemoteFailure_CouldNotConnect:
 				msg = String(
 					localized: "Could not connect to service: \(origin)",
@@ -72,34 +79,22 @@ class ParseResultHelper {
 				)
 				
 			case is LnurlError.RemoteFailure_Unreadable:
-				let scheme = serviceError.url.protocol.name.lowercased()
-				if scheme == "https" || scheme == "http" {
-					websiteLink = URL(string: serviceError.url.description())
-				}
 				msg = String(
 					localized: "Unreadable response from service: \(origin)",
 					comment: "Error message - scanning lightning invoice"
 				)
 				
 			case let rfDetailed as LnurlError.RemoteFailure_Detailed:
-				if isLightningAddress {
-					msg = lightningAddressErrorMessage
-				} else {
-					msg = String(
-						localized: "The service (\(origin)) returned error message: \(rfDetailed.reason)",
-						comment: "Error message - scanning lightning invoice"
-					)
-				}
+				msg = String(
+					localized: "The service (\(origin)) returned error message: \(rfDetailed.reason)",
+					comment: "Error message - scanning lightning invoice"
+				)
 				
 			case let rfCode as LnurlError.RemoteFailure_Code:
-				if isLightningAddress {
-					msg = lightningAddressErrorMessage
-				} else {
-					msg = String(
-						localized: "The service (\(origin)) returned error code: \(rfCode.code.value)",
-						comment: "Error message - scanning lightning invoice"
-					)
-				}
+				msg = String(
+					localized: "The service (\(origin)) returned error code: \(rfCode.code.value)",
+					comment: "Error message - scanning lightning invoice"
+				)
 				
 			default:
 				msg = String(

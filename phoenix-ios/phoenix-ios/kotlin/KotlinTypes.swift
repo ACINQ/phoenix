@@ -128,11 +128,12 @@ extension LnurlPay {
 }
 
 extension LnurlError {
-	typealias RemoteFailure = LnurlError.RemoteFailure
-	typealias RemoteFailure_Code = LnurlError.RemoteFailureCode
-	typealias RemoteFailure_Detailed = LnurlError.RemoteFailureDetailed
-	typealias RemoteFailure_Unreadable = LnurlError.RemoteFailureUnreadable
-	typealias RemoteFailure_CouldNotConnect = LnurlError.RemoteFailureCouldNotConnect
+	typealias RemoteFailure_Code = RemoteFailureCode
+	typealias RemoteFailure_Detailed = RemoteFailureDetailed
+	typealias RemoteFailure_Unreadable = RemoteFailureUnreadable
+	typealias RemoteFailure_CouldNotConnect = RemoteFailureCouldNotConnect
+	typealias RemoteFailure_LightningAddressError = RemoteFailureLightningAddressError
+	typealias RemoteFailure_IsWebsite = RemoteFailureIsWebsite
 
 	typealias Pay_Invoice = LnurlError.PayInvoice
 	typealias Pay_Invoice_InvalidAmount = LnurlError.PayInvoiceInvalidAmount
