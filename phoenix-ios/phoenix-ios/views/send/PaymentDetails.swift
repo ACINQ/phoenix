@@ -25,7 +25,7 @@ struct PaymentDetails: View {
 	@ViewBuilder
 	var body: some View {
 		
-        details_ios16()
+		  details_ios16()
 	}
 	
 	@ViewBuilder
@@ -45,12 +45,12 @@ struct PaymentDetails: View {
 		
 		Grid(horizontalSpacing: grid_horizontalSpacing, verticalSpacing: grid_verticalSpacing) {
 			
-			if let model = parent.mvi.model as? Scan.Model_OnChainFlow {
+			if let model = parent.flow as? SendManager.ParseResult_Uri {
 				gridRows_onChain(model)
 			} else if requestDescription() != nil {
 				gridRows_description()
 			}
-			if let model = parent.mvi.model as? Scan.Model_OfferFlow {
+			if let model = parent.flow as? SendManager.ParseResult_Bolt12Offer {
 				gridRows_offer(model)
 			}
 			if let paymentSummary = parent.paymentStrings() {
@@ -61,7 +61,7 @@ struct PaymentDetails: View {
 	
 	@ViewBuilder
 	func gridRows_onChain(
-		_ model: Scan.Model_OnChainFlow
+		_ model: SendManager.ParseResult_Uri
 	) -> some View {
 		
 		let message = bitcoinUriMessage()
@@ -116,7 +116,7 @@ struct PaymentDetails: View {
 	
 	@ViewBuilder
 	func gridRows_offer(
-		_ model: Scan.Model_OfferFlow
+		_ model: SendManager.ParseResult_Bolt12Offer
 	) -> some View {
 		
 		GridRowWrapper(gridWidth: gridWidth) {
@@ -231,7 +231,7 @@ struct PaymentDetails: View {
 	
 	@ViewBuilder
 	func valueColumn_offer_sendTo(
-		_ model: Scan.Model_OfferFlow
+		_ model: SendManager.ParseResult_Bolt12Offer
 	) -> some View {
 		
 		if CONTACTS_ENABLED, let contact = parent.contact {
@@ -274,7 +274,7 @@ struct PaymentDetails: View {
 	
 	@ViewBuilder
 	func valueColumn_offer_message(
-		_ model: Scan.Model_OfferFlow
+		_ model: SendManager.ParseResult_Bolt12Offer
 	) -> some View {
 		
 		Group {
@@ -306,8 +306,9 @@ struct PaymentDetails: View {
 	
 	func bitcoinUriMessage() -> String? {
 		
-		guard let model = parent.mvi.model as? Scan.Model_OnChainFlow,
-		      let message = model.uri.message
+		guard
+			let model = parent.flow as? SendManager.ParseResult_Uri,
+			let message = model.uri.message
 		else {
 			return nil
 		}
@@ -392,7 +393,7 @@ struct PaymentDetails: View {
 	}
 }
 
-struct GridRowWrapper<KeyColumn: View, ValueColumn: View>: View {
+fileprivate struct GridRowWrapper<KeyColumn: View, ValueColumn: View>: View {
 	
 	let gridWidth: CGFloat?
 	let keyColumn: KeyColumn
@@ -431,3 +432,4 @@ struct GridRowWrapper<KeyColumn: View, ValueColumn: View>: View {
 		return (gridWidth / 2.0) - (grid_horizontalSpacing / 2.0)
 	}
 }
+

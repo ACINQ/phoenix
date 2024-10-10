@@ -10,9 +10,20 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct MainView_BigPrimary: View {
 	
-	enum NavLinkTag: String {
+	enum NavLinkTag: Hashable, CustomStringConvertible {
 		case ReceiveView
 		case SendView
+		case LoginView(flow: SendManager.ParseResult_Lnurl_Auth)
+		case ValidateView(flow: SendManager.ParseResult)
+		
+		var description: String {
+			switch self {
+				case .ReceiveView     : return "ReceiveView"
+				case .SendView        : return "SendView"
+				case .LoginView(_)    : return "LoginView"
+				case .ValidateView(_) : return "ValidateView"
+			}
+		}
 	}
 	
 	@State var didAppear = false
@@ -21,7 +32,6 @@ struct MainView_BigPrimary: View {
 	@State var showingMergeChannelsView = false
 	
 	let externalLightningUrlPublisher = AppDelegate.get().externalLightningUrlPublisher
-	@State var externalLightningRequest: AppScanController? = nil
 	
 	enum FooterButtonWidth: Preference {}
 	let footerButtonWidthReader = GeometryPreferenceReader(
@@ -30,6 +40,10 @@ struct MainView_BigPrimary: View {
 	)
 	@State var footerButtonWidth: CGFloat? = nil
 	
+	@State var isParsing: Bool = false
+	@State var parseIndex: Int = 0
+	@State var parseProgress: SendManager.ParseProgress? = nil
+	
 	// <iOS_16_workarounds>
 	@State var navLinkTag: NavLinkTag? = nil
 	// </iOS_16_workarounds>
@@ -37,7 +51,10 @@ struct MainView_BigPrimary: View {
 	@ScaledMetric var sendImageSize: CGFloat = 22
 	@ScaledMetric var receiveImageSize: CGFloat = 22
 	
+	@StateObject var toast = Toast()
 	@StateObject var navCoordinator = NavigationCoordinator()
+	
+	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	
 	@EnvironmentObject var popoverState: PopoverState
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
@@ -79,13 +96,20 @@ struct MainView_BigPrimary: View {
 			}
 			
 			content()
+			
+			if parseProgress != nil {
+				FetchActivityNotice(
+					title: self.fetchActivityTitle,
+					onCancel: { self.cancelParseRequest() }
+				)
+				.ignoresSafeArea(.keyboard) // disable keyboard avoidance on this view
+			}
+			
+			toast.view()
 		
 		} // <ZStack>
 		.onAppear {
 			onAppear()
-		}
-		.onChange(of: navLinkTag) {
-			navLinkTagChanged($0)
 		}
 		.onReceive(Biz.canMergeChannelsForSplicingPublisher) {
 			canMergeChannelsForSplicingChanged($0)
@@ -186,8 +210,17 @@ struct MainView_BigPrimary: View {
 	func navLinkView(_ tag: NavLinkTag) -> some View {
 		
 		switch tag {
-			case .ReceiveView : ReceiveView()
-			case .SendView    : SendView(location: .MainView, controller: externalLightningRequest)
+		case .ReceiveView:
+			ReceiveView()
+			
+		case .SendView:
+			SendView(location: .MainView)
+			
+		case .LoginView(let flow):
+			LoginView(flow: flow, popTo: self.popTo)
+			
+		case .ValidateView(let flow):
+			ValidateView(flow: flow, popTo: self.popTo)
 		}
 	}
 	
@@ -201,6 +234,15 @@ struct MainView_BigPrimary: View {
 			get: { navLinkTag != nil },
 			set: { if !$0 { navLinkTag = nil }}
 		)
+	}
+	
+	var fetchActivityTitle: String {
+		
+		if parseProgress is SendManager.ParseProgress_LnurlServiceFetch {
+			return String(localized: "Fetching Lightning URL", comment: "Progress title")
+		} else {
+			return String(localized: "Resolving lightning address", comment: "Progress title")
+		}
 	}
 	
 	// --------------------------------------------------
@@ -231,23 +273,7 @@ struct MainView_BigPrimary: View {
 	func didReceiveExternalLightningUrl(_ urlStr: String) -> Void {
 		log.trace("didReceiveExternalLightningUrl()")
 		
-		if #available(iOS 17.0, *) {
-			// If the SendView is visible, it will simply be replaced
-		} else { // iOS 16
-			if navLinkTag == .SendView {
-				log.debug("Ignoring: handled by SendView")
-				return
-			}
-		}
-		
-		MainViewHelper.shared.processExternalLightningUrl(urlStr) { scanController in
-			
-			externalLightningRequest = scanController
-			if #available(iOS 17, *) {
-				navCoordinator.path.removeAll()
-			}
-			navigateTo(.SendView)
-		}
+		parseExternalUrl(urlStr)
 	}
 	
 	// --------------------------------------------------
@@ -255,7 +281,7 @@ struct MainView_BigPrimary: View {
 	// --------------------------------------------------
 	
 	func navigateTo(_ tag: NavLinkTag) {
-		log.trace("navigateTo(\(tag.rawValue))")
+		log.trace("navigateTo(\(tag.description))")
 		
 		if #available(iOS 17, *) {
 			navCoordinator.path.append(tag)
@@ -310,38 +336,130 @@ struct MainView_BigPrimary: View {
 	// MARK: Navigation
 	// --------------------------------------------------
 	
-	func navLinkTagChanged(_ tag: NavLinkTag?) {
-		log.trace("navLinkTagChanged() => \(tag?.rawValue ?? "nil")")
-		
-		if #available(iOS 17, *) {
-			log.warning(
-				"""
-				navLinkTagChanged(): This function is for iOS 16 only ! This means there's a bug.
-				The navLinkTag is being set somewhere, when the navCoordinator should be used instead.
-				"""
-			)
-			
-		} else { // iOS 16
-			
-			if tag == nil {
-				// If we pushed the SendView, triggered by an external lightning url,
-				// then we can nil out the associated controller now (since we handed off to SendView).
-				self.externalLightningRequest = nil
-			}
-		}
-	}
-	
 	func popTo(_ destination: PopToDestination) {
 		log.trace("popTo(\(destination))")
 		
 		if #available(iOS 17, *) {
 			log.warning("popTo(): This function is for iOS 16 only !")
 		} else {
-			popoverState.close {
-				if let deepLink = destination.followedBy {
-					deepLinkManager.broadcast(deepLink)
+			if popoverState.hasCurrentItem {
+				popoverState.close {
+					if let deepLink = destination.followedBy {
+						deepLinkManager.broadcast(deepLink)
+					}
 				}
 			}
 		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: External URL
+	// --------------------------------------------------
+	
+	func parseExternalUrl(_ input: String) {
+		log.trace("parseExternalUrl()")
+		
+		guard !isParsing else {
+			log.warning("parseExternalUrl: ignoring: isParsing == true")
+			return
+		}
+		
+		isParsing = true
+		parseIndex += 1
+		let index = parseIndex
+		
+		Task { @MainActor in
+			do {
+				let progressHandler = {(progress: SendManager.ParseProgress) -> Void in
+					if index == parseIndex {
+						self.parseProgress = progress
+					} else {
+						log.warning("parseExternalUrl: progressHandler: ignoring: cancelled")
+					}
+				}
+				
+				let result: SendManager.ParseResult = try await Biz.business.sendManager.parse(
+					request: input,
+					progress: progressHandler
+				)
+				
+				if index == parseIndex {
+					isParsing = false
+					parseProgress = nil
+					handleParseResult(result)
+				} else {
+					log.warning("parseExternalUrl: result: ignoring: cancelled")
+				}
+				
+			} catch {
+				log.error("parseExternalUrl: error: \(error)")
+				
+				if index == parseIndex {
+					isParsing = false
+					parseProgress = nil
+				}
+			}
+		}
+	}
+	
+	func handleParseResult(_ result: SendManager.ParseResult) {
+		log.trace("handleParseResult()")
+		
+		if let badRequest = result as? SendManager.ParseResult_BadRequest {
+			showErrorMessage(badRequest)
+		} else {
+			
+			if #available(iOS 17.0, *) {
+				navCoordinator.path.removeAll()
+			}
+			if let auth = result as? SendManager.ParseResult_Lnurl_Auth {
+				navigateTo(.LoginView(flow: auth))
+			} else {
+				navigateTo(.ValidateView(flow: result))
+			}
+		}
+	}
+	
+	func showErrorMessage(_ result: SendManager.ParseResult_BadRequest) {
+		log.trace("showErrorMessage()")
+		
+		let either = ParseResultHelper.processBadRequest(result)
+		switch either {
+		case .Left(let msg):
+			toast.pop(
+				msg,
+				colorScheme: colorScheme.opposite,
+				style: .chrome,
+				duration: 30.0,
+				alignment: .middle,
+				showCloseButton: true
+			)
+			
+		case .Right(let websiteLink):
+			popoverState.display(dismissable: true) {
+				WebsiteLinkPopover(
+					link: websiteLink,
+					didCopyLink: didCopyLink,
+					didOpenLink: nil
+				)
+			}
+		}
+	}
+	
+	func cancelParseRequest() {
+		log.trace("cancelParseRequest()")
+		
+		isParsing = false
+		parseIndex += 1
+		parseProgress = nil
+	}
+	
+	func didCopyLink() {
+		log.trace("didCopyLink()")
+		
+		toast.pop(
+			NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
+			colorScheme: colorScheme.opposite
+		)
 	}
 }

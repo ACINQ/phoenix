@@ -99,7 +99,11 @@ struct ContactsList: View {
 				}
 			}
 			if hasZeroMatchesForSearch {
-				zeroMatches()
+				zeroMatchesRow()
+					.deleteDisabled(true)
+				
+			} else if hasZeroContacts {
+				zeroContactsRow()
 					.deleteDisabled(true)
 			}
 		} // </List>
@@ -129,10 +133,34 @@ struct ContactsList: View {
 	}
 	
 	@ViewBuilder
-	func zeroMatches() -> some View {
+	func zeroMatchesRow() -> some View {
 		
-		HStack(alignment: VerticalAlignment.center, spacing: 0) {
-			Text("No matches for search").foregroundStyle(.secondary)
+		HStack(alignment: VerticalAlignment.center, spacing: 8) {
+			Image(systemName: "person.crop.circle.badge.questionmark")
+				.resizable()
+				.frame(width: 32, height: 32)
+			Text("No matches for search")
+			Spacer()
+		}
+		.foregroundStyle(.secondary)
+		.padding(.all, 4)
+	}
+	
+	@ViewBuilder
+	func zeroContactsRow() -> some View {
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 8) {
+			Image(systemName: "person.crop.circle.fill")
+				.resizable()
+				.frame(width: 32, height: 32)
+			VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+				Text("No Contacts")
+					.font(.title3)
+					.foregroundColor(.primary)
+				Text("Add contacts for easy & quick payments")
+					.font(.subheadline)
+					.foregroundColor(.secondary)
+			}
 			Spacer()
 		}
 		.padding(.all, 4)
@@ -195,12 +223,20 @@ struct ContactsList: View {
 	}
 	
 	var hasZeroMatchesForSearch: Bool {
-		
-		guard let filteredContacts else {
+		if sortedContacts.isEmpty {
+			// User has zero contacts.
+			// This is different from zero search results.
+			return false
+		} else if let filteredContacts {
+			return filteredContacts.isEmpty
+		} else {
+			// Not searching
 			return false
 		}
-		
-		return filteredContacts.isEmpty && !sortedContacts.isEmpty
+	}
+	
+	var hasZeroContacts: Bool {
+		return sortedContacts.isEmpty
 	}
 	
 	func navLinkTagBinding() -> Binding<Bool> {
@@ -264,7 +300,17 @@ struct ContactsList: View {
 		
 		let searchtext = searchText.lowercased()
 		filteredContacts = sortedContacts.filter { (contact: ContactInfo) in
-			if contact.name.localizedCaseInsensitiveContains(searchtext) {
+			
+			// `localizedCaseInsensitiveContains` doesn't properly ignore diacritic marks.
+			// For example: search text of "belen" doesn't match name "Belén".
+			//
+			// `localizedStandardContains`:
+			// > This is the most appropriate method for doing user-level string searches,
+			// > similar to how searches are done generally in the system. The search is
+			// > locale-aware, case and diacritic insensitive. The exact list of search
+			// > options applied may change over time.
+			
+			if contact.name.localizedStandardContains(searchtext) {
 				return true
 			}
 			

@@ -9,6 +9,47 @@ extension Receive {
 	typealias Model_Generated = ModelGenerated
 }
 
+extension SendManager {
+	
+	typealias ParseProgress_LnurlServiceFetch = ParseProgressLnurlServiceFetch
+	typealias ParseProgress_ResolvingBip353 = ParseProgressResolvingBip353
+	
+	typealias ParseResult_BadRequest = ParseResultBadRequest
+	typealias ParseResult_Bolt11Invoice = ParseResultBolt11Invoice
+	typealias ParseResult_Bolt12Offer = ParseResultBolt12Offer
+	typealias ParseResult_Uri = ParseResultUri
+	typealias ParseResult_Lnurl = ParseResultLnurl
+	typealias ParseResult_Lnurl_Pay = ParseResultLnurlPay
+	typealias ParseResult_Lnurl_Withdraw = ParseResultLnurlWithdraw
+	typealias ParseResult_Lnurl_Auth = ParseResultLnurlAuth
+	
+	typealias BadRequestReason_AlreadyPaidInvoice = BadRequestReasonAlreadyPaidInvoice
+	typealias BadRequestReason_Bip353InvalidOffer = BadRequestReasonBip353InvalidOffer
+	typealias BadRequestReason_Bip353InvalidUri = BadRequestReasonBip353InvalidUri
+	typealias BadRequestReason_Bip353NameNotFound = BadRequestReasonBip353NameNotFound
+	typealias BadRequestReason_Bip353NoDNSSEC = BadRequestReasonBip353NoDNSSEC
+	typealias BadRequestReason_ChainMismatch = BadRequestReasonChainMismatch
+	typealias BadRequestReason_Expired = BadRequestReasonExpired
+	typealias BadRequestReason_InvalidLnurl = BadRequestReasonInvalidLnurl
+	typealias BadRequestReason_ServiceError = BadRequestReasonServiceError
+	typealias BadRequestReason_UnknownFormat = BadRequestReasonUnknownFormat
+	typealias BadRequestReason_UnsupportedLnurl = BadRequestReasonUnsupportedLnurl
+	
+	typealias LnurlPay_Error = LnurlPayError
+	typealias LnurlPay_Error_RemoteError = LnurlPayErrorRemoteError
+	typealias LnurlPay_Error_BadResponseError = LnurlPayErrorBadResponseError
+	typealias LnurlPay_Error_ChainMismatch = LnurlPayErrorChainMismatch
+	typealias LnurlPay_Error_AlreadyPaidInvoice = LnurlPayErrorAlreadyPaidInvoice
+	
+	typealias LnurlWithdraw_Error = LnurlWithdrawError
+	typealias LnurlWithdraw_Error_RemoteError = LnurlWithdrawErrorRemoteError
+	
+	typealias LnurlAuth_Error = LnurlAuthError
+	typealias LnurlAuth_Error_ServerError = LnurlAuthErrorServerError
+	typealias LnurlAuth_Error_NetworkError = LnurlAuthErrorNetworkError
+	typealias LnurlAuth_Error_OtherError = LnurlAuthErrorOtherError
+}
+
 extension Scan {
 	typealias Model_Ready = ModelReady
 	typealias Model_BadRequest = ModelBadRequest
