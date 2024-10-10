@@ -43,6 +43,14 @@ public class SmartModalState: ObservableObject {
 		}
 	}
 	
+	var hasCurrentItem: Bool {
+		if isIPad {
+			return popoverState.hasCurrentItem
+		} else {
+			return shortSheetState.hasCurrentItem
+		}
+	}
+	
 	var dismissable: Bool {
 		get {
 			if isIPad {

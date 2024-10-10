@@ -192,7 +192,17 @@ struct ContactsListSheet: View {
 		
 		let searchtext = searchText.lowercased()
 		filteredContacts = sortedContacts.filter { (contact: ContactInfo) in
-			if contact.name.localizedCaseInsensitiveContains(searchtext) {
+			
+			// `localizedCaseInsensitiveContains` doesn't properly ignore diacritic marks.
+			// For example: search text of "belen" doesn't match name "Belén".
+			//
+			// `localizedStandardContains`:
+			// > This is the most appropriate method for doing user-level string searches,
+			// > similar to how searches are done generally in the system. The search is
+			// > locale-aware, case and diacritic insensitive. The exact list of search
+			// > options applied may change over time.
+			
+			if contact.name.localizedStandardContains(searchtext) {
 				return true
 			}
 			

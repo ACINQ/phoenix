@@ -9,73 +9,45 @@ extension Receive {
 	typealias Model_Generated = ModelGenerated
 }
 
-extension Scan {
-	typealias Model_Ready = ModelReady
-	typealias Model_BadRequest = ModelBadRequest
-
-	typealias Model_Bolt11InvoiceFlow = ModelBolt11InvoiceFlow
-	typealias Model_Bolt11InvoiceFlow_InvoiceRequest = ModelBolt11InvoiceFlowBolt11InvoiceRequest
-	typealias Model_Bolt11InvoiceFlow_Sending = ModelBolt11InvoiceFlowSending
-
-	typealias Model_OfferFlow = ModelOfferFlow
+extension SendManager {
 	
-	typealias Model_OnChainFlow = ModelOnchainFlow
-
-	typealias Model_LnurlServiceFetch = ModelLnurlServiceFetch
-	typealias Model_ResolvingBip353 = ModelResolvingBip353
-
-	typealias Model_LnurlPayFlow = ModelLnurlPayFlow
-	typealias Model_LnurlPayFlow_LnurlPayRequest = ModelLnurlPayFlowLnurlPayRequest
-	typealias Model_LnurlPayFlow_LnurlPayFetch = ModelLnurlPayFlowLnurlPayFetch
-	typealias Model_LnurlPayFlow_Sending = ModelLnurlPayFlowSending
-
-	typealias Model_LnurlWithdrawFlow = ModelLnurlWithdrawFlow
-	typealias Model_LnurlWithdrawFlow_LnurlWithdrawRequest = ModelLnurlWithdrawFlowLnurlWithdrawRequest
-	typealias Model_LnurlWithdrawFlow_LnurlWithdrawFetch = ModelLnurlWithdrawFlowLnurlWithdrawFetch
-	typealias Model_LnurlWithdrawFlow_Receiving = ModelLnurlWithdrawFlowReceiving
-
-	typealias Model_LnurlAuthFlow = ModelLnurlAuthFlow
-	typealias Model_LnurlAuthFlow_LoginRequest = ModelLnurlAuthFlowLoginRequest
-	typealias Model_LnurlAuthFlow_LoggingIn = ModelLnurlAuthFlowLoggingIn
-	typealias Model_LnurlAuthFlow_LoginResult = ModelLnurlAuthFlowLoginResult
-
-	typealias Intent_Parse = IntentParse
-
-	typealias Intent_Bolt11InvoiceFlow_SendInvoicePayment = IntentBolt11InvoiceFlowSendBolt11Invoice
-
-	typealias Intent_CancelLnurlServiceFetch = IntentCancelLnurlServiceFetch
-
-	typealias Intent_LnurlPayFlow_RequestInvoice = IntentLnurlPayFlowRequestInvoice
-	typealias Intent_LnurlPayFlow_CancelLnurlPayment = IntentLnurlPayFlowCancelLnurlPayment
-
-	typealias Intent_LnurlWithdrawFlow_SendLnurlWithdraw = IntentLnurlWithdrawFlowSendLnurlWithdraw
-	typealias Intent_LnurlWithdrawFlow_CancelLnurlWithdraw = IntentLnurlWithdrawFlowCancelLnurlWithdraw
-
-	typealias Intent_LnurlAuthFlow_Login = IntentLnurlAuthFlowLogin
-
+	typealias ParseProgress_LnurlServiceFetch = ParseProgressLnurlServiceFetch
+	typealias ParseProgress_ResolvingBip353 = ParseProgressResolvingBip353
+	
+	typealias ParseResult_BadRequest = ParseResultBadRequest
+	typealias ParseResult_Bolt11Invoice = ParseResultBolt11Invoice
+	typealias ParseResult_Bolt12Offer = ParseResultBolt12Offer
+	typealias ParseResult_Uri = ParseResultUri
+	typealias ParseResult_Lnurl = ParseResultLnurl
+	typealias ParseResult_Lnurl_Pay = ParseResultLnurlPay
+	typealias ParseResult_Lnurl_Withdraw = ParseResultLnurlWithdraw
+	typealias ParseResult_Lnurl_Auth = ParseResultLnurlAuth
+	
+	typealias BadRequestReason_AlreadyPaidInvoice = BadRequestReasonAlreadyPaidInvoice
+	typealias BadRequestReason_Bip353InvalidOffer = BadRequestReasonBip353InvalidOffer
+	typealias BadRequestReason_Bip353InvalidUri = BadRequestReasonBip353InvalidUri
+	typealias BadRequestReason_Bip353NameNotFound = BadRequestReasonBip353NameNotFound
+	typealias BadRequestReason_Bip353NoDNSSEC = BadRequestReasonBip353NoDNSSEC
+	typealias BadRequestReason_ChainMismatch = BadRequestReasonChainMismatch
+	typealias BadRequestReason_Expired = BadRequestReasonExpired
+	typealias BadRequestReason_InvalidLnurl = BadRequestReasonInvalidLnurl
+	typealias BadRequestReason_ServiceError = BadRequestReasonServiceError
+	typealias BadRequestReason_UnknownFormat = BadRequestReasonUnknownFormat
+	typealias BadRequestReason_UnsupportedLnurl = BadRequestReasonUnsupportedLnurl
+	
 	typealias LnurlPay_Error = LnurlPayError
 	typealias LnurlPay_Error_RemoteError = LnurlPayErrorRemoteError
 	typealias LnurlPay_Error_BadResponseError = LnurlPayErrorBadResponseError
 	typealias LnurlPay_Error_ChainMismatch = LnurlPayErrorChainMismatch
 	typealias LnurlPay_Error_AlreadyPaidInvoice = LnurlPayErrorAlreadyPaidInvoice
-
+	
 	typealias LnurlWithdraw_Error = LnurlWithdrawError
 	typealias LnurlWithdraw_Error_RemoteError = LnurlWithdrawErrorRemoteError
-
-	typealias BadRequestReason_Expired = BadRequestReasonExpired
-	typealias BadRequestReason_AlreadyPaidInvoice = BadRequestReasonAlreadyPaidInvoice
-	typealias BadRequestReason_ChainMismatch = BadRequestReasonChainMismatch
-	typealias BadRequestReason_InvalidLnurl = BadRequestReasonInvalidLnurl
-	typealias BadRequestReason_ServiceError = BadRequestReasonServiceError
-	typealias BadRequestReason_UnknownFormat = BadRequestReasonUnknownFormat
-	typealias BadRequestReason_UnsupportedLnurl = BadRequestReasonUnsupportedLnurl
-	typealias BadRequestReason_Bip353InvalidOffer = BadRequestReasonBip353InvalidOffer
-	typealias BadRequestReason_Bip353NoDNSSEC = BadRequestReasonBip353NoDNSSEC
-
-	typealias ClipboardContent_Bolt11InvoiceRequest = ClipboardContentBolt11InvoiceRequest
-	typealias ClipboardContent_BitcoinRequest = ClipboardContentBitcoinRequest
-	typealias ClipboardContent_LoginRequest = ClipboardContentLoginRequest
-	typealias ClipboardContent_LnurlRequest = ClipboardContentLnurlRequest
+	
+	typealias LnurlAuth_Error = LnurlAuthError
+	typealias LnurlAuth_Error_ServerError = LnurlAuthErrorServerError
+	typealias LnurlAuth_Error_NetworkError = LnurlAuthErrorNetworkError
+	typealias LnurlAuth_Error_OtherError = LnurlAuthErrorOtherError
 }
 
 extension LnurlPay {
@@ -87,11 +59,12 @@ extension LnurlPay {
 }
 
 extension LnurlError {
-	typealias RemoteFailure = LnurlError.RemoteFailure
-	typealias RemoteFailure_Code = LnurlError.RemoteFailureCode
-	typealias RemoteFailure_Detailed = LnurlError.RemoteFailureDetailed
-	typealias RemoteFailure_Unreadable = LnurlError.RemoteFailureUnreadable
-	typealias RemoteFailure_CouldNotConnect = LnurlError.RemoteFailureCouldNotConnect
+	typealias RemoteFailure_Code = RemoteFailureCode
+	typealias RemoteFailure_Detailed = RemoteFailureDetailed
+	typealias RemoteFailure_Unreadable = RemoteFailureUnreadable
+	typealias RemoteFailure_CouldNotConnect = RemoteFailureCouldNotConnect
+	typealias RemoteFailure_LightningAddressError = RemoteFailureLightningAddressError
+	typealias RemoteFailure_IsWebsite = RemoteFailureIsWebsite
 
 	typealias Pay_Invoice = LnurlError.PayInvoice
 	typealias Pay_Invoice_InvalidAmount = LnurlError.PayInvoiceInvalidAmount

@@ -1,5 +1,6 @@
 # Build
 build/
+.kotlin/
 
 # Idea
 .idea

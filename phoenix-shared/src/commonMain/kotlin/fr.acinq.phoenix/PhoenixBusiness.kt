@@ -98,6 +98,7 @@ class PhoenixBusiness(
     val contactsManager by lazy { ContactsManager(this) }
     val blockchainExplorer by lazy { BlockchainExplorer(chain) }
     val tor by lazy { Tor(getApplicationCacheDirectoryPath(ctx), TorHelper.torLogger(loggerFactory)) }
+    val sendManager by lazy { SendManager(this) }
 
     fun start(startupParams: StartupParams) {
         logger.debug { "starting with params=$startupParams" }

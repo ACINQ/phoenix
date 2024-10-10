@@ -74,6 +74,7 @@ struct ReceiveView: MVIView {
 						removal: .move(edge: .bottom)
 					)
 				)
+			
 		} else {
 			customTabView()
 				.zIndex(4) // needed for proper animation

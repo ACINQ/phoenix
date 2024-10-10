@@ -5345,6 +5345,9 @@
         }
       }
     },
+    "Add contacts for easy & quick payments" : {
+
+    },
     "add liquidity" : {
       "localizations" : {
         "ar" : {
@@ -10618,7 +10621,11 @@
         }
       }
     },
+    "choose image" : {
+      "comment" : "button label - try to make it short"
+    },
     "Choose image" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -13337,6 +13344,7 @@
     },
     "Could not connect to service: (origin)" : {
       "comment" : "Error message - scanning lightning invoice",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -13375,6 +13383,9 @@
           }
         }
       }
+    },
+    "Could not connect to service: %@" : {
+      "comment" : "Error message - scanning lightning invoice"
     },
     "Could not retrieve payment details within a reasonable time. The recipient may be offline or unreachable." : {
       "localizations" : {
@@ -17046,6 +17057,7 @@
       }
     },
     "Enter a Lightning invoice, LNURL, or Lightning address you want to send money to." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -24317,6 +24329,7 @@
       }
     },
     "Less options" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -25876,6 +25889,7 @@
       }
     },
     "Manual input" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -25916,6 +25930,7 @@
       }
     },
     "Manual Input" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -27224,6 +27239,7 @@
       }
     },
     "More options" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -27302,6 +27318,9 @@
           }
         }
       }
+    },
+    "name, lightning address, offer..." : {
+
     },
     "Naming your wallet makes it easier to manage multiple wallets." : {
       "localizations" : {
@@ -27785,6 +27804,9 @@
           }
         }
       }
+    },
+    "No Contacts" : {
+
     },
     "no description" : {
       "comment" : "placeholder: invoice is description-less",
@@ -29364,6 +29386,9 @@
         }
       }
     },
+    "paste" : {
+      "comment" : "button label - try to make it short"
+    },
     "Paste encrypted data blob here" : {
       "localizations" : {
         "ar" : {
@@ -29405,6 +29430,7 @@
       }
     },
     "Paste from clipboard" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -29566,6 +29592,7 @@
       }
     },
     "Pay " : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -29606,6 +29633,7 @@
       }
     },
     "Pay %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -29646,6 +29674,7 @@
       }
     },
     "Pay %@ " : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -29686,6 +29715,7 @@
       }
     },
     "Pay Invoice" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -34053,6 +34083,9 @@
         }
       }
     },
+    "Resolving lightning address" : {
+      "comment" : "Progress title"
+    },
     "Restore my wallet" : {
       "comment" : "Navigation bar title",
       "localizations" : {
@@ -34538,6 +34571,7 @@
     },
     "Scan a QR code" : {
       "comment" : "Navigation bar title",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -34616,6 +34650,12 @@
           }
         }
       }
+    },
+    "scan qr code" : {
+      "comment" : "button label - try to make it short"
+    },
+    "Scan QR Code" : {
+
     },
     "Scan withdraw" : {
       "extractionState" : "stale",
@@ -35182,6 +35222,7 @@
     },
     "Sending payment" : {
       "comment" : "Navigation bar title",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -35222,6 +35263,7 @@
       }
     },
     "Sending Payment..." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -38510,6 +38552,9 @@
         }
       }
     },
+    "Suggestions" : {
+
+    },
     "Summary" : {
       "comment" : "ChannelsConfigurationView/ChannelInfoPopup/TabBar",
       "localizations" : {
@@ -40043,6 +40088,7 @@
     },
     "The invoice is not for (chainMismatch.expected.name)" : {
       "comment" : "Error message - scanning lightning invoice",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -40083,6 +40129,7 @@
       }
     },
     "The invoice is not for %@" : {
+      "comment" : "Error message - scanning lightning invoice",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -40571,6 +40618,7 @@
     },
     "The service ((origin)) appears to be offline, or they have a down server" : {
       "comment" : "Error message - scanning lightning invoice",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -40612,6 +40660,7 @@
     },
     "The service ((origin)) doesn't support Lightning addresses, or doesn't know this user" : {
       "comment" : "Error message - scanning lightning invoice",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -40653,6 +40702,7 @@
     },
     "The service ((origin)) returned error code: (rfCode.code.value)" : {
       "comment" : "Error message - scanning lightning invoice",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -40694,6 +40744,7 @@
     },
     "The service ((origin)) returned error message: (rfDetailed.reason)" : {
       "comment" : "Error message - scanning lightning invoice",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -40729,6 +40780,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le service ((origin)) a renvoyé un message d'erreur : (rfDetailed.reason)"
+          }
+        }
+      }
+    },
+    "The service (%@) appears to be offline, or they have a down server" : {
+      "comment" : "Error message - scanning lightning invoice"
+    },
+    "The service (%@) doesn't support Lightning addresses, or doesn't know this user" : {
+      "comment" : "Error message - scanning lightning invoice"
+    },
+    "The service (%@) returned error code: %d" : {
+      "comment" : "Error message - scanning lightning invoice",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The service (%1$@) returned error code: %2$d"
+          }
+        }
+      }
+    },
+    "The service (%@) returned error message: %@" : {
+      "comment" : "Error message - scanning lightning invoice",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The service (%1$@) returned error message: %2$@"
           }
         }
       }
@@ -44424,6 +44503,7 @@
     },
     "Unreadable response from service: (origin)" : {
       "comment" : "Error message - scanning lightning invoice",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -44462,6 +44542,9 @@
           }
         }
       }
+    },
+    "Unreadable response from service: %@" : {
+      "comment" : "Error message - scanning lightning invoice"
     },
     "Updating cloud" : {
       "localizations" : {
