@@ -391,6 +391,7 @@ struct SendView: View {
 		HStack(alignment: VerticalAlignment.center, spacing: 8) {
 			Image(systemName: "person.crop.circle.badge.questionmark")
 				.resizable()
+				.scaledToFit()
 				.frame(width: 32, height: 32)
 			Text("No matches for search")
 			Spacer()

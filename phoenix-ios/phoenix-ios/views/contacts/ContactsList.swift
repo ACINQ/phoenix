@@ -138,6 +138,7 @@ struct ContactsList: View {
 		HStack(alignment: VerticalAlignment.center, spacing: 8) {
 			Image(systemName: "person.crop.circle.badge.questionmark")
 				.resizable()
+				.scaledToFit()
 				.frame(width: 32, height: 32)
 			Text("No matches for search")
 			Spacer()
@@ -152,6 +153,7 @@ struct ContactsList: View {
 		HStack(alignment: VerticalAlignment.center, spacing: 8) {
 			Image(systemName: "person.crop.circle.fill")
 				.resizable()
+				.scaledToFit()
 				.frame(width: 32, height: 32)
 			VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
 				Text("No Contacts")
