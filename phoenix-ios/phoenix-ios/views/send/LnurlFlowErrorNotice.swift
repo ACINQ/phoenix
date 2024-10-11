@@ -9,8 +9,8 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
 enum LnurlFlowError {
-	case pay(error: Scan.LnurlPay_Error)
-	case withdraw(error: Scan.LnurlWithdraw_Error)
+	case pay(error: SendManager.LnurlPay_Error)
+	case withdraw(error: SendManager.LnurlWithdraw_Error)
 }
 
 struct LnurlFlowErrorNotice: View {
@@ -78,15 +78,15 @@ struct LnurlFlowErrorNotice: View {
 	}
 	
 	@ViewBuilder
-	func errorMessage(_ payError: Scan.LnurlPay_Error) -> some View {
+	func errorMessage(_ payError: SendManager.LnurlPay_Error) -> some View {
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
 			
-			if let remoteError = payError as? Scan.LnurlPay_Error_RemoteError {
+			if let remoteError = payError as? SendManager.LnurlPay_Error_RemoteError {
 				
 				errorMessage(remoteError.err)
 				
-			} else if let err = payError as? Scan.LnurlPay_Error_BadResponseError {
+			} else if let err = payError as? SendManager.LnurlPay_Error_BadResponseError {
 				
 				if let details = err.err as? LnurlError.Pay_Invoice_Malformed {
 					
@@ -106,26 +106,26 @@ struct LnurlFlowErrorNotice: View {
 					genericErrorMessage()
 				}
 			 
-			} else if let err = payError as? Scan.LnurlPay_Error_ChainMismatch {
+			} else if let err = payError as? SendManager.LnurlPay_Error_ChainMismatch {
 				
 				Text("The invoice is not for \(err.expected.name)")
 				
-			} else if let _ = payError as? Scan.LnurlPay_Error_AlreadyPaidInvoice {
+			} else if let _ = payError as? SendManager.LnurlPay_Error_AlreadyPaidInvoice {
 				
 				Text("You have already paid this invoice.")
 				
-		 	} else {
+			} else {
 				genericErrorMessage()
 			}
 		}
 	}
 	
 	@ViewBuilder
-	func errorMessage(_ withdrawError: Scan.LnurlWithdraw_Error) -> some View {
+	func errorMessage(_ withdrawError: SendManager.LnurlWithdraw_Error) -> some View {
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
 			
-			if let remoteError = withdrawError as? Scan.LnurlWithdraw_Error_RemoteError {
+			if let remoteError = withdrawError as? SendManager.LnurlWithdraw_Error_RemoteError {
 				
 				errorMessage(remoteError.err)
 				
@@ -185,41 +185,41 @@ struct LnurlFlowErrorNotice: View {
 		}
 	}
 	
-	private func title(_ payError: Scan.LnurlPay_Error) -> String {
+	private func title(_ payError: SendManager.LnurlPay_Error) -> String {
 		
-		if let remoteErr = payError as? Scan.LnurlPay_Error_RemoteError {
+		if let remoteErr = payError as? SendManager.LnurlPay_Error_RemoteError {
 			return title(remoteErr.err)
 			
-		} else if let _ = payError as? Scan.LnurlPay_Error_BadResponseError {
-			return NSLocalizedString("Invalid response", comment: "Error title")
+		} else if let _ = payError as? SendManager.LnurlPay_Error_BadResponseError {
+			return String(localized: "Invalid response", comment: "Error title")
 			
-		} else if let _ = payError as? Scan.LnurlPay_Error_ChainMismatch {
-			return NSLocalizedString("Chain mismatch", comment: "Error title")
+		} else if let _ = payError as? SendManager.LnurlPay_Error_ChainMismatch {
+			return String(localized: "Chain mismatch", comment: "Error title")
 			
-		} else if let _ = payError as? Scan.LnurlPay_Error_AlreadyPaidInvoice {
-			return NSLocalizedString("Already paid", comment: "Error title")
+		} else if let _ = payError as? SendManager.LnurlPay_Error_AlreadyPaidInvoice {
+			return String(localized: "Already paid", comment: "Error title")
 			
 		} else {
-			return NSLocalizedString("Unknown error", comment: "Error title")
+			return String(localized: "Unknown error", comment: "Error title")
 		}
 	}
 	
-	private func title(_ withdrawError: Scan.LnurlWithdraw_Error) -> String {
+	private func title(_ withdrawError: SendManager.LnurlWithdraw_Error) -> String {
 		
-		if let remoteErr = withdrawError as? Scan.LnurlWithdraw_Error_RemoteError {
+		if let remoteErr = withdrawError as? SendManager.LnurlWithdraw_Error_RemoteError {
 			return title(remoteErr.err)
 			
 		} else {
-			return NSLocalizedString("Unknown error", comment: "Error title")
+			return String(localized: "Unknown error", comment: "Error title")
 		}
 	}
 	
 	private func title(_ remoteFailure: LnurlError.RemoteFailure) -> String {
 		
 		if remoteFailure is LnurlError.RemoteFailure_CouldNotConnect {
-			return NSLocalizedString("Connection failure", comment: "Error title")
+			return String(localized: "Connection failure", comment: "Error title")
 		} else {
-			return NSLocalizedString("Invalid response", comment: "Error title")
+			return String(localized: "Invalid response", comment: "Error title")
 		}
 	}
 	
@@ -229,3 +229,4 @@ struct LnurlFlowErrorNotice: View {
 		popoverState.close()
 	}
 }
+

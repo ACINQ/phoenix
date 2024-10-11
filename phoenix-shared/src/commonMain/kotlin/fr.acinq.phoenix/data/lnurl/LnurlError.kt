@@ -58,6 +58,8 @@ sealed class LnurlError(override val message: String? = null) : RuntimeException
     sealed class RemoteFailure(override val message: String) : LnurlError(message) {
         abstract val origin: String
 
+        data class IsWebsite(override val origin: String) : RemoteFailure("this appears to just be a website")
+        data class LightningAddressError(override val origin: String) : RemoteFailure("service $origin doesn't support lightning addresses, or doesn't know this user")
         data class CouldNotConnect(override val origin: String) : RemoteFailure("could not connect to $origin")
         data class Unreadable(override val origin: String) : RemoteFailure("unreadable response from $origin")
         data class Detailed(override val origin: String, val reason: String) : RemoteFailure("error=$reason from $origin")

@@ -44,6 +44,10 @@ public class ShortSheetState: ObservableObject {
 		return itemPublisher.value
 	}
 	
+	var hasCurrentItem: Bool {
+		return currentItem != nil
+	}
+	
 	var dismissable: Bool {
 		get { dismissablePublisher.value }
 		set { dismissablePublisher.send(newValue) }
