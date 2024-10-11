@@ -82,7 +82,7 @@ fun SendSmartInput(
     isProcessing: Boolean,
     isError: Boolean,
 ) {
-    var textFieldValue by remember(value) { mutableStateOf(TextFieldValue(text = value, selection = TextRange(value.length))) }
+    var textFieldValue by remember { mutableStateOf(TextFieldValue(text = value)) }
     Row(
         modifier = Modifier.padding(horizontal = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -93,7 +93,6 @@ fun SendSmartInput(
             onExpandedChange = { showCompletionBox = it },
             modifier = Modifier.weight(1f)
         ) {
-
             val interactionSource = remember { MutableInteractionSource() }
             val shape = RoundedCornerShape(24.dp)
             val colors = if (isError) {
@@ -152,7 +151,10 @@ fun SendSmartInput(
                         trailingIcon = {
                             if (value.isNotEmpty()) {
                                 FilledButton(
-                                    onClick = { onValueChange("") },
+                                    onClick = {
+                                        textFieldValue = TextFieldValue("")
+                                        onValueChange("")
+                                    },
                                     icon = R.drawable.ic_cross,
                                     enabled = true,
                                     enabledEffect = false,
@@ -194,13 +196,16 @@ fun SendSmartInput(
                     showCompletionBox = true
                     Box(modifier = Modifier.padding(top = 48.dp, start = 16.dp, end = 0.dp)) {
                         ExposedDropdownMenu(
-                            expanded = showCompletionBox, onDismissRequest = { showCompletionBox = false },
+                            expanded = showCompletionBox,
+                            onDismissRequest = { showCompletionBox = false },
                             modifier = Modifier.exposedDropdownSize(false)
                         ) {
                             filterResult.domainsMatching.forEach { option ->
                                 Clickable(
                                     onClick = {
-                                        onValueChange("${filterResult.affix}@$option")
+                                        val newInput = "${filterResult.affix}@$option"
+                                        textFieldValue = TextFieldValue(text = newInput, selection = TextRange(newInput.length))
+                                        onValueChange(newInput)
                                         showCompletionBox = false
                                     },
                                     modifier = Modifier.fillMaxWidth()
