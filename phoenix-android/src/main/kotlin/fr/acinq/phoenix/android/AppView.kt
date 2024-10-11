@@ -77,7 +77,6 @@ import fr.acinq.phoenix.android.payments.history.CsvExportView
 import fr.acinq.phoenix.android.payments.history.PaymentsHistoryView
 import fr.acinq.phoenix.android.payments.liquidity.RequestLiquidityView
 import fr.acinq.phoenix.android.payments.receive.ReceiveView
-import fr.acinq.phoenix.android.payments.send.PrepareSendView
 import fr.acinq.phoenix.android.services.NodeServiceState
 import fr.acinq.phoenix.android.settings.AboutView
 import fr.acinq.phoenix.android.settings.AppAccessSettings
@@ -111,7 +110,7 @@ import fr.acinq.phoenix.android.startup.StartupView
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
 import fr.acinq.phoenix.android.utils.appBackground
 import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.android.utils.safeFindActivity
+import fr.acinq.phoenix.android.utils.extensions.findActivitySafe
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.WalletPaymentId
@@ -526,7 +525,7 @@ fun AppView(
             if ((isBiometricLockEnabled == true || isCustomPinLockEnabled == true) && isScreenLocked) {
                 BackHandler {
                     // back button minimises the app
-                    context.safeFindActivity()?.moveTaskToBack(false)
+                    context.findActivitySafe()?.moveTaskToBack(false)
                 }
                 LockPrompt(
                     promptScreenLockImmediately = appVM.promptScreenLockImmediately.value,

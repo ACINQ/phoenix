@@ -24,7 +24,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,8 +37,8 @@ import fr.acinq.phoenix.android.payments.receive.EvaluateLiquidityIssuesForPayme
 import fr.acinq.phoenix.android.preferredAmountUnit
 import fr.acinq.phoenix.android.utils.Converter.toPrettyStringWithFallback
 import fr.acinq.phoenix.android.utils.annotatedStringResource
+import fr.acinq.phoenix.android.utils.extensions.toLocalisedMessage
 import fr.acinq.phoenix.controllers.payments.Scan
-import fr.acinq.phoenix.data.lnurl.LnurlError
 
 @Composable
 fun LnurlWithdrawView(
@@ -93,7 +92,7 @@ fun LnurlWithdrawView(
                 if (error != null && error is Scan.LnurlWithdrawError.RemoteError) {
                     ErrorMessage(
                         header = stringResource(id = R.string.lnurl_withdraw_error_header),
-                        details = getRemoteErrorMessage(error = error.err),
+                        details = error.err.toLocalisedMessage(),
                         alignment = Alignment.CenterHorizontally,
                     )
                 }
@@ -134,17 +133,5 @@ fun LnurlWithdrawView(
                 BorderButton(text = stringResource(id = R.string.btn_ok), icon = R.drawable.ic_check_circle, onClick = onWithdrawDone)
             }
         }
-    }
-}
-
-@Composable
-fun getRemoteErrorMessage(
-    error: LnurlError.RemoteFailure
-): AnnotatedString {
-    return when (error) {
-        is LnurlError.RemoteFailure.Code -> annotatedStringResource(id = R.string.lnurl_error_remote_code, error.origin, error.code.value.toString())
-        is LnurlError.RemoteFailure.CouldNotConnect -> annotatedStringResource(id = R.string.lnurl_error_remote_connection, error.origin)
-        is LnurlError.RemoteFailure.Detailed -> annotatedStringResource(id = R.string.lnurl_error_remote_details, error.origin, error.reason)
-        is LnurlError.RemoteFailure.Unreadable -> annotatedStringResource(id = R.string.lnurl_error_remote_unreadable, error.origin)
     }
 }

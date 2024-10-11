@@ -35,7 +35,7 @@ import fr.acinq.phoenix.android.components.SplashLabelRow
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
 import fr.acinq.phoenix.android.utils.isLegacyMigration
-import fr.acinq.phoenix.android.utils.smartDescription
+import fr.acinq.phoenix.android.utils.extensions.smartDescription
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.data.walletPaymentId

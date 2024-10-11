@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 ACINQ SAS
+ * Copyright 2024 ACINQ SAS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,114 +14,22 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.utils
+package fr.acinq.phoenix.android.utils.extensions
 
-import android.content.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import fr.acinq.lightning.db.*
-import fr.acinq.lightning.utils.Connection
-import fr.acinq.phoenix.android.*
+import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
+import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
+import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.db.LightningOutgoingPayment
+import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
+import fr.acinq.lightning.db.SpliceOutgoingPayment
+import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.data.BitcoinUnit
-import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.utils.extensions.desc
 import fr.acinq.phoenix.utils.extensions.isManualPurchase
-import java.security.cert.CertificateException
-import java.util.*
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
-
-/**
- * Utility method rebinding any exceptions thrown by a method into another exception, using the origin exception as the root cause.
- * Helps with pattern matching.
- */
-inline fun <T> tryWith(exception: Exception, action: () -> T): T = try {
-    action.invoke()
-} catch (t: Exception) {
-    exception.initCause(t)
-    throw exception
-}
-
-inline fun <T1 : Any, T2 : Any, R : Any> safeLet(p1: T1?, p2: T2?, block: (T1, T2) -> R?): R? {
-    return if (p1 != null && p2 != null) block(p1, p2) else null
-}
-
-@OptIn(ExperimentalContracts::class)
-inline fun <T, R> T.ifLet(block: (T) -> R): R {
-    contract {
-        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
-    }
-    return block(this)
-}
-
-fun Context.safeFindActivity(): MainActivity? {
-    var context = this
-    while (context is ContextWrapper) {
-        if (context is MainActivity) return context
-        context = context.baseContext
-    }
-    return null
-}
-
-fun Context.findActivity(): MainActivity {
-    var context = this
-    while (context is ContextWrapper) {
-        if (context is MainActivity) return context
-        context = context.baseContext
-    }
-    throw IllegalStateException("not in the context of the main Phoenix activity")
-}
-
-@Composable
-fun BitcoinUnit.label(): String = when (this) {
-    BitcoinUnit.Sat -> stringResource(id = R.string.prefs_display_coin_sat_label)
-    BitcoinUnit.Bit -> stringResource(id = R.string.prefs_display_coin_bit_label)
-    BitcoinUnit.MBtc -> stringResource(id = R.string.prefs_display_coin_mbtc_label)
-    BitcoinUnit.Btc -> stringResource(id = R.string.prefs_display_coin_btc_label)
-}
-
-@Composable
-fun FiatCurrency.labels(): Pair<String, String> {
-    val context = LocalContext.current
-    return remember(key1 = displayCode) {
-        val fullName = when {
-            // use the free market rates as default. Name for official rates gets a special tag, as those rates are usually inaccurate.
-            this == FiatCurrency.ARS -> context.getString(R.string.currency_ars_official)
-            this == FiatCurrency.ARS_BM -> context.getString(R.string.currency_ars_bm)
-            this == FiatCurrency.CUP -> context.getString(R.string.currency_cup_official)
-            this == FiatCurrency.CUP_FM -> context.getString(R.string.currency_cup_fm)
-            this == FiatCurrency.LBP -> context.getString(R.string.currency_lbp_official)
-            this == FiatCurrency.LBP_BM -> context.getString(R.string.currency_lbp_bm)
-            // use the JVM API otherwise to get the name
-            displayCode.length == 3 -> try {
-                Currency.getInstance(displayCode).displayName
-            } catch (e: Exception) {
-                "N/A"
-            }
-            else -> "N/A"
-        }
-        "$flag $displayCode" to fullName
-    }
-}
-
-@Composable
-fun UserTheme.label(): String {
-    val context = LocalContext.current
-    return remember(key1 = this.name) {
-        when (this) {
-            UserTheme.DARK -> context.getString(R.string.prefs_display_theme_dark_label)
-            UserTheme.LIGHT -> context.getString(R.string.prefs_display_theme_light_label)
-            UserTheme.SYSTEM -> context.getString(R.string.prefs_display_theme_system_label)
-        }
-    }
-}
-
-fun Connection.CLOSED.isBadCertificate() = this.reason?.cause is CertificateException
 
 @Composable
 fun LightningOutgoingPayment.smartDescription(): String? = when (val details = this.details) {

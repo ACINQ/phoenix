@@ -93,6 +93,7 @@ import fr.acinq.phoenix.android.payments.LnurlWithdrawView
 import fr.acinq.phoenix.android.payments.SendBolt11PaymentView
 import fr.acinq.phoenix.android.payments.offer.SendOfferView
 import fr.acinq.phoenix.android.payments.spliceout.SendSpliceOutView
+import fr.acinq.phoenix.android.utils.extensions.toLocalisedMessage
 import fr.acinq.phoenix.android.utils.readClipboard
 import fr.acinq.phoenix.controllers.ControllerFactory
 import fr.acinq.phoenix.controllers.ScanController
@@ -323,7 +324,9 @@ fun BoxScope.ScannerView(
 ) {
     // scanner view using a legacy binding
     AndroidViewBinding(
-        modifier = Modifier.fillMaxSize().background(Color.Red),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Red),
         factory = { inflater, viewGroup, attach ->
             val binding = ScanViewBinding.inflate(inflater, viewGroup, attach)
             binding.scanView.let { scanView ->
@@ -353,24 +356,7 @@ fun ScanErrorView(
     model: Scan.Model.BadRequest,
     onErrorDialogDismiss: () -> Unit,
 ) {
-    val message = when (val reason = model.reason) {
-        is Scan.BadRequestReason.Expired -> stringResource(R.string.scan_error_expired)
-        is Scan.BadRequestReason.ChainMismatch -> stringResource(R.string.scan_error_invalid_chain)
-        is Scan.BadRequestReason.AlreadyPaidInvoice -> stringResource(R.string.scan_error_already_paid)
-        is Scan.BadRequestReason.ServiceError -> when (val error = reason.error) {
-            is LnurlError.RemoteFailure.Code -> stringResource(R.string.lnurl_error_remote_code, reason.url.host, error.code.value.toString())
-            is LnurlError.RemoteFailure.CouldNotConnect -> stringResource(R.string.lnurl_error_remote_connection, reason.url.host)
-            is LnurlError.RemoteFailure.Detailed -> stringResource(R.string.lnurl_error_remote_details, reason.url.host, error.reason)
-            is LnurlError.RemoteFailure.Unreadable -> stringResource(R.string.lnurl_error_remote_unreadable, reason.url.host)
-        }
-        is Scan.BadRequestReason.InvalidLnurl -> stringResource(R.string.scan_error_lnurl_invalid)
-        is Scan.BadRequestReason.UnsupportedLnurl -> stringResource(R.string.scan_error_lnurl_unsupported)
-        is Scan.BadRequestReason.UnknownFormat -> stringResource(R.string.scan_error_invalid_generic)
-        is Scan.BadRequestReason.Bip353NameNotFound -> stringResource(id = R.string.scan_error_bip353_name_not_found, reason.username, reason.domain)
-        is Scan.BadRequestReason.Bip353InvalidUri -> stringResource(id = R.string.scan_error_bip353_invalid_uri)
-        is Scan.BadRequestReason.Bip353InvalidOffer -> stringResource(id = R.string.scan_error_bip353_invalid_offer)
-        is Scan.BadRequestReason.Bip353NoDNSSEC -> stringResource(id = R.string.scan_error_bip353_dnssec)
-    }
+    val message = model.toLocalisedMessage()
     Dialog(
         onDismiss = onErrorDialogDismiss,
         content = { Text(text = message, modifier = Modifier.padding(top = 24.dp, start = 24.dp, end = 24.dp)) }

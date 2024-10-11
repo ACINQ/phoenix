@@ -46,7 +46,8 @@ import fr.acinq.phoenix.android.preferredAmountUnit
 import fr.acinq.phoenix.android.utils.BitmapHelper
 import fr.acinq.phoenix.android.utils.Converter.toPrettyStringWithFallback
 import fr.acinq.phoenix.android.utils.annotatedStringResource
-import fr.acinq.phoenix.android.utils.safeLet
+import fr.acinq.phoenix.android.utils.extensions.safeLet
+import fr.acinq.phoenix.android.utils.extensions.toLocalisedMessage
 import fr.acinq.phoenix.controllers.payments.Scan
 import fr.acinq.phoenix.data.lnurl.LnurlError
 
@@ -153,7 +154,7 @@ fun LnurlPayView(
                                 is LnurlError.Pay.Invoice.InvalidAmount -> annotatedStringResource(R.string.lnurl_pay_error_invalid_amount, errorDetail.origin)
                                 is LnurlError.Pay.Invoice.Malformed -> annotatedStringResource(R.string.lnurl_pay_error_invalid_malformed, errorDetail.origin)
                             }
-                            is Scan.LnurlPayError.RemoteError -> getRemoteErrorMessage(error = error.err)
+                            is Scan.LnurlPayError.RemoteError -> error.err.toLocalisedMessage()
                         },
                         alignment = Alignment.CenterHorizontally
                     )

@@ -75,13 +75,13 @@ import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.contact.ContactPhotoView
 import fr.acinq.phoenix.android.isDarkTheme
+import fr.acinq.phoenix.android.utils.extensions.toLocalisedMessage
 import fr.acinq.phoenix.android.utils.gray300
 import fr.acinq.phoenix.android.utils.gray800
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.readClipboard
 import fr.acinq.phoenix.controllers.payments.Scan
 import fr.acinq.phoenix.data.ContactInfo
-import fr.acinq.phoenix.data.lnurl.LnurlError
 import kotlinx.coroutines.flow.map
 
 
@@ -119,7 +119,7 @@ fun PrepareSendView(
         if (!showScanner) {
             if (model is Scan.Model.BadRequest) {
                 PaymentDataError(
-                    errorMessage = translatePaymentDataError(model),
+                    errorMessage = model.toLocalisedMessage(),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 28.dp, top = 0.dp, bottom = 8.dp, end = 16.dp),
@@ -221,7 +221,7 @@ private fun ScannerBox(
                     onReset()
                     scanView?.resume()
                 }) {
-                    PaymentDataError(errorMessage = translatePaymentDataError(model), modifier = Modifier.padding(16.dp))
+                    PaymentDataError(errorMessage = model.toLocalisedMessage(), modifier = Modifier.padding(16.dp))
                 }
                 Spacer(modifier = Modifier.height(16.dp))
             }
@@ -291,29 +291,5 @@ private fun ContactRow(
             Spacer(modifier = Modifier.width(8.dp))
             Text(text = contactInfo.name, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
-    }
-}
-
-@Composable
-fun translatePaymentDataError(
-    model: Scan.Model.BadRequest
-): String {
-    return when (val reason = model.reason) {
-        is Scan.BadRequestReason.Expired -> stringResource(R.string.scan_error_expired)
-        is Scan.BadRequestReason.ChainMismatch -> stringResource(R.string.scan_error_invalid_chain)
-        is Scan.BadRequestReason.AlreadyPaidInvoice -> stringResource(R.string.scan_error_already_paid)
-        is Scan.BadRequestReason.ServiceError -> when (val error = reason.error) {
-            is LnurlError.RemoteFailure.Code -> stringResource(R.string.lnurl_error_remote_code, reason.url.host, error.code.value.toString())
-            is LnurlError.RemoteFailure.CouldNotConnect -> stringResource(R.string.lnurl_error_remote_connection, reason.url.host)
-            is LnurlError.RemoteFailure.Detailed -> stringResource(R.string.lnurl_error_remote_details, reason.url.host, error.reason)
-            is LnurlError.RemoteFailure.Unreadable -> stringResource(R.string.lnurl_error_remote_unreadable, reason.url.host)
-        }
-        is Scan.BadRequestReason.InvalidLnurl -> stringResource(R.string.scan_error_lnurl_invalid)
-        is Scan.BadRequestReason.UnsupportedLnurl -> stringResource(R.string.scan_error_lnurl_unsupported)
-        is Scan.BadRequestReason.UnknownFormat -> stringResource(R.string.scan_error_invalid_generic)
-        is Scan.BadRequestReason.Bip353NameNotFound -> stringResource(id = R.string.scan_error_bip353_name_not_found, reason.username, reason.domain)
-        is Scan.BadRequestReason.Bip353InvalidUri -> stringResource(id = R.string.scan_error_bip353_invalid_uri)
-        is Scan.BadRequestReason.Bip353InvalidOffer -> stringResource(id = R.string.scan_error_bip353_invalid_offer)
-        is Scan.BadRequestReason.Bip353NoDNSSEC -> stringResource(id = R.string.scan_error_bip353_dnssec)
     }
 }

@@ -42,6 +42,7 @@ import fr.acinq.phoenix.android.LocalTheme
 import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.isDarkTheme
 import fr.acinq.phoenix.android.userPrefs
+import fr.acinq.phoenix.android.utils.extensions.findActivitySafe
 
 // primary for testnet
 val horizon = Color(0xff91b4d1)
@@ -338,7 +339,7 @@ fun getColor(context: Context, @AttrRes attrRes: Int): Int {
 }
 
 fun updateScreenBrightnesss(context: Context, toMax: Boolean) {
-    val activity = context.safeFindActivity() ?: return
+    val activity = context.findActivitySafe() ?: return
     activity.window.attributes.apply {
         screenBrightness = if (toMax) 1.0f else WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
     }.let {

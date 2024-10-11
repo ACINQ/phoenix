@@ -77,7 +77,7 @@ import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.BiometricsHelper
 import fr.acinq.phoenix.android.utils.Logging
 import fr.acinq.phoenix.android.utils.errorOutlinedTextFieldColors
-import fr.acinq.phoenix.android.utils.findActivity
+import fr.acinq.phoenix.android.utils.extensions.findActivity
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.outlinedTextFieldColors
 import fr.acinq.phoenix.android.utils.shareFile

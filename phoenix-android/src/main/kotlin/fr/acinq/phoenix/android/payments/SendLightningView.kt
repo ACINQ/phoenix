@@ -41,7 +41,7 @@ import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
-import fr.acinq.phoenix.android.utils.safeLet
+import fr.acinq.phoenix.android.utils.extensions.safeLet
 import fr.acinq.phoenix.controllers.payments.Scan
 import fr.acinq.phoenix.utils.extensions.isAmountlessTrampoline
 
