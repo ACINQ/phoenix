@@ -82,12 +82,14 @@ fun SendSmartInput(
     isProcessing: Boolean,
     isError: Boolean,
 ) {
-    var textFieldValue by remember { mutableStateOf(TextFieldValue(text = value)) }
+    var textFieldValue by remember(value) { mutableStateOf(TextFieldValue(text = value, selection = TextRange(value.length))) }
+
     Row(
         modifier = Modifier.padding(horizontal = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         var showCompletionBox by remember { mutableStateOf(false) }
+
         ExposedDropdownMenuBox(
             expanded = showCompletionBox,
             onExpandedChange = { showCompletionBox = it },
@@ -130,7 +132,7 @@ fun SendSmartInput(
                 ),
                 textStyle = MaterialTheme.typography.body1.copy(fontSize = 18.sp),
                 minLines = 1,
-                maxLines = 2,
+                maxLines = 3,
                 singleLine = false,
                 enabled = true,
                 visualTransformation = VisualTransformation.None,

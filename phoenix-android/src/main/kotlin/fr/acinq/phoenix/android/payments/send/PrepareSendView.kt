@@ -38,8 +38,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
@@ -65,14 +69,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.components.CardHeader
 import fr.acinq.phoenix.android.components.Clickable
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.Dialog
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.PhoenixIcon
+import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.contact.ContactPhotoView
 import fr.acinq.phoenix.android.isDarkTheme
 import fr.acinq.phoenix.android.utils.extensions.toLocalisedMessage
@@ -101,7 +104,7 @@ fun PrepareSendView(
 
     val vm = viewModel<PrepareSendViewModel>()
 
-    DefaultScreenLayout(backgroundColor = MaterialTheme.colors.background) {
+    DefaultScreenLayout(isScrollable = false) {
         DefaultScreenHeader(title = "Send", onBackClick = onBackClick)
 
         SendSmartInput(
@@ -114,70 +117,111 @@ fun PrepareSendView(
             isProcessing = model is Scan.Model.ResolvingBip353 || model is Scan.Model.LnurlServiceFetch,
             isError = model is Scan.Model.BadRequest,
         )
-        Spacer(modifier = Modifier.height(8.dp))
 
-        if (!showScanner) {
-            if (model is Scan.Model.BadRequest) {
-                PaymentDataError(
-                    errorMessage = model.toLocalisedMessage(),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 28.dp, top = 0.dp, bottom = 8.dp, end = 16.dp),
-                    textStyle = MaterialTheme.typography.body1.copy(fontSize = 15.sp, color = negativeColor)
-                )
-            } else {
-                when (vm.readImageState) {
-                    is ReadImageState.Error -> PaymentDataError(errorMessage = "This image could not be processed")
-                    is ReadImageState.NotFound -> PaymentDataError(errorMessage = "No QR code found")
-                    else -> {}
+        // dialogs for error messages
+        if (!showScanner && model is Scan.Model.BadRequest) {
+            Dialog(onDismiss = onReset) {
+                PaymentDataError(errorMessage = model.toLocalisedMessage(), modifier = Modifier.padding(16.dp))
+            }
+        }
+        when (vm.readImageState) {
+            is ReadImageState.Error -> {
+                Dialog(onDismiss = { vm.readImageState = ReadImageState.Ready }) {
+                    Text(text = "This image could not be processed.", modifier = Modifier.padding(16.dp))
                 }
+            }
+            is ReadImageState.NotFound -> {
+                Dialog(onDismiss = { vm.readImageState = ReadImageState.Ready }) {
+                    Text(text = "No QR code found in this image.", modifier = Modifier.padding(16.dp))
+                }
+            }
+            else -> {}
+        }
+
+
+        // contacts list
+        val contacts by business.contactsManager.contactsList.map { list ->
+            freeFormInput.takeIf { it.isNotBlank() && it.length >= 2 }?.let { filter ->
+                list.filter { it.name.contains(filter, ignoreCase = true) }
+            } ?: list
+        }.collectAsState(emptyList())
+        Column(modifier = Modifier.weight(1f).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+            if (contacts.isNotEmpty()) {
+                LazyColumn {
+                    item { Spacer(modifier = Modifier.height(12.dp)) }
+                    items(contacts) {
+                        ContactRow(contactInfo = it, onClick = { it.mostRelevantOffer?.let { onInputSubmit(it.encode()) } })
+                    }
+                    item { Spacer(modifier = Modifier.height(12.dp)) }
+                }
+            } else if (freeFormInput.isBlank()) {
+                Spacer(modifier = Modifier.height(16.dp))
+                TextWithIcon(text = "No contacts yet...", icon = R.drawable.ic_user, textStyle = MaterialTheme.typography.caption.copy(fontSize = 16.sp), iconTint = MaterialTheme.typography.caption.color, iconSize = 24.dp, space = 8.dp)
+            } else {
+                Spacer(modifier = Modifier.height(16.dp))
+                TextWithIcon(text = "No matches for search", icon = R.drawable.ic_user_search, textStyle = MaterialTheme.typography.caption.copy(fontSize = 16.sp), iconTint = MaterialTheme.typography.caption.color, iconSize = 24.dp, space = 8.dp)
             }
         }
 
-        Spacer(modifier = Modifier.height(4.dp))
+        // bottom buttons
+        SendButtonsRow(
+            onSubmit = {
+                freeFormInput = it
+                onInputSubmit(it)
+            },
+            readImageState = vm.readImageState,
+            onReadImage = {
+                onReset()
+                vm.readImage(context, it, onDataFound = {
+                    freeFormInput = it
+                    onInputSubmit(it)
+                })
+            },
+            onShowScanner = {
+                onReset()
+                keyboardManager?.hide()
+                showScanner = true
+            }
+        )
+    }
+
+    if (showScanner) {
+        ScannerBox(model = model, onDismiss = { onReset() ; showScanner = false }, onReset = onReset, onSubmit = {
+            freeFormInput = it
+            onInputSubmit(it)
+        })
+    }
+}
+
+@Composable
+private fun SendButtonsRow(
+    onSubmit: (String) -> Unit,
+    readImageState: ReadImageState,
+    onReadImage: (Uri) -> Unit,
+    onShowScanner: () -> Unit,
+) {
+    Surface(
+        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+        color = MaterialTheme.colors.surface,
+    ) {
+        val context = LocalContext.current
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(IntrinsicSize.Min)
+                .padding(horizontal = 24.dp, vertical = 8.dp)
         ) {
             var imageUri by remember { mutableStateOf<Uri?>(null) }
             val imagePickerLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) {
                 imageUri = it
             }
             LaunchedEffect(key1 = imageUri) {
-                imageUri?.let {
-                    onReset()
-                    vm.readImage(context, it, onDataFound = onInputSubmit)
-                }
+                imageUri?.let { onReadImage(it) ; imageUri = null }
             }
-            ReadDataButton(label = "Paste", icon = R.drawable.ic_paste, onClick = { readClipboard(context)?.let { onInputSubmit(it) } })
-            ReadDataButton(label = "Choose image", icon = R.drawable.ic_image, onClick = { imagePickerLauncher.launch("image/*") }, enabled = vm.readImageState.canProcess)
-            ReadDataButton(label = "Scan QR code", icon = R.drawable.ic_scan_qr, onClick = {
-                onReset()
-                keyboardManager?.hide()
-                showScanner = true
-            })
+            ReadDataButton(label = "Choose image", icon = R.drawable.ic_image, onClick = { imagePickerLauncher.launch("image/*") }, enabled = readImageState.canProcess)
+            ReadDataButton(label = "Paste", icon = R.drawable.ic_paste, onClick = { readClipboard(context)?.let { onSubmit(it) } })
+            ReadDataButton(label = "Scan QR code", icon = R.drawable.ic_scan_qr, onClick = onShowScanner)
         }
-
-        val contacts = business.contactsManager.contactsList.map { list ->
-            freeFormInput.takeIf { it.isNotBlank() && it.length >= 2 }?.let { filter ->
-                list.filter { it.name.contains(filter, ignoreCase = true) }
-            } ?: list
-        }.map { it.take(3) }.collectAsState(emptyList())
-
-        if (contacts.value.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(24.dp))
-            CardHeader(text = "Recently paid contacts")
-            Card(modifier = Modifier.fillMaxWidth()) {
-                contacts.value.map {
-                    ContactRow(contactInfo = it, onClick = { it.mostRelevantOffer?.let { onInputSubmit(it.encode()) } })
-                }
-            }
-        }
-    }
-
-    if (showScanner) {
-        ScannerBox(model = model, onDismiss = { onReset() ; showScanner = false }, onReset = onReset, onSubmit = onInputSubmit)
     }
 }
 
@@ -287,9 +331,9 @@ private fun ContactRow(
 ) {
     Clickable(modifier = Modifier.fillMaxWidth(), onClick = onClick) {
         Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-            ContactPhotoView(photoUri = contactInfo.photoUri, name = contactInfo.name, onChange = null, imageSize = 28.dp)
+            ContactPhotoView(photoUri = contactInfo.photoUri, name = contactInfo.name, onChange = null, imageSize = 32.dp)
             Spacer(modifier = Modifier.width(8.dp))
-            Text(text = contactInfo.name, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(text = contactInfo.name, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 18.sp)
         }
     }
 }
