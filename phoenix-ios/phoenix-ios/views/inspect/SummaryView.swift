@@ -889,6 +889,7 @@ struct SummaryView: View {
 				location: manageContactLocation(),
 				popTo: nil,
 				offer: nil,
+				address: nil,
 				contact: contact,
 				contactUpdated: { _ in }
 			)

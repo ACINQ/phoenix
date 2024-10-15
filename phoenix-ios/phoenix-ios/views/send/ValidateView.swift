@@ -195,9 +195,6 @@ struct ValidateView: View {
 			balanceDidChange($0)
 		}
 		.task {
-			await fetchContact()
-		}
-		.task {
 			await fetchMempoolRecommendedFees()
 		}
 	}
@@ -767,19 +764,6 @@ struct ValidateView: View {
 	// MARK: Tasks
 	// --------------------------------------------------
 	
-	func fetchContact() async {
-		
-		guard let offer = bolt12Offer() else {
-			return
-		}
-		let contactsManager = Biz.business.contactsManager
-		do {
-			contact = try await contactsManager.getContactForOffer(offer: offer)
-		} catch {
-			log.error("contactsManager: error: \(error)")
-		}
-	}
-	
 	func fetchMempoolRecommendedFees() async {
 		
 		for try await response in MempoolMonitor.shared.stream() {
@@ -1091,6 +1075,10 @@ struct ValidateView: View {
 				popToDestination = nil
 				presentationMode.wrappedValue.dismiss()
 			}
+		}
+		
+		if let offer = bolt12Offer() {
+			contact = Biz.business.contactsManager.contactForOffer(offer: offer)
 		}
 	}
 	
@@ -1605,6 +1593,7 @@ struct ValidateView: View {
 				location: .smartModal,
 				popTo: nil,
 				offer: offer,
+				address: nil,
 				contact: contact,
 				contactUpdated: contactUpdated
 			)

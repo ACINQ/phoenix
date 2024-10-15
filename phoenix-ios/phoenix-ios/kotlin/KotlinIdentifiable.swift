@@ -55,18 +55,19 @@ extension FiatCurrency: Identifiable {
 	}
 }
 
+extension ContactOffer: Identifiable {
+	// Already defined:
+//	var id: Bitcoin_kmpByteVector32 { get }
+}
+
+extension ContactAddress: Identifiable {
+	// Already defined:
+//	var id: Bitcoin_kmpByteVector32 { get }
+}
+
 extension ContactInfo: Identifiable {
-	
-	/// In kotlin the variable is called `id`, but that's a reserved property name in objective-c.
-	/// So it gets automatically overwritten, and is inaccessible to us.
-	/// Thus we'll provide an alternative property name that's easier to understand.
-	public var uuid: Lightning_kmpUUID {
-		return self.kotlinId() // defined in PhoenixExposure.kt
-	}
-	
-	public var id: String {
-		return self.uuid.description()
-	}
+	// Already defined:
+//	var id: Lightning_kmpUUID { get }
 }
 
 extension Lightning_kmpWalletState.Utxo: Identifiable {

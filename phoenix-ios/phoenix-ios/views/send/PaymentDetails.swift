@@ -234,7 +234,7 @@ struct PaymentDetails: View {
 		_ model: SendManager.ParseResult_Bolt12Offer
 	) -> some View {
 		
-		if CONTACTS_ENABLED, let contact = parent.contact {
+		if let contact = parent.contact {
 			
 			HStack(alignment: VerticalAlignment.center, spacing: 4) {
 				ContactPhoto(fileName: contact.photoUri, size: 32)
@@ -258,14 +258,12 @@ struct PaymentDetails: View {
 							Text("Copy")
 						}
 					}
-				if CONTACTS_ENABLED {
-					Button {
-						parent.showManageContactSheet()
-					} label: {
-						HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 2) {
-							Image(systemName: "person")
-							Text("Add contact")
-						}
+				Button {
+					parent.showManageContactSheet()
+				} label: {
+					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 2) {
+						Image(systemName: "person")
+						Text("Add contact")
 					}
 				}
 			} // </VStack>
