@@ -807,6 +807,18 @@ struct ValidateView: View {
 		return nil
 	}
 	
+	func lightningAddress() -> String? {
+		
+		var result: String? = nil
+		if let model = flow as? SendManager.ParseResult_Bolt12Offer {
+			result = model.lightningAddress
+		} else if let model = flow as? SendManager.ParseResult_Lnurl_Pay {
+			result = model.lightningAddress
+		}
+		
+		return result?.trimmingCharacters(in: .whitespacesAndNewlines)
+	}
+	
 	func bolt11Invoice() -> Lightning_kmpBolt11Invoice? {
 		
 		if let model = flow as? SendManager.ParseResult_Bolt11Invoice {
@@ -1077,7 +1089,10 @@ struct ValidateView: View {
 			}
 		}
 		
-		if let offer = bolt12Offer() {
+		if let address = lightningAddress() {
+			contact = Biz.business.contactsManager.contactForLightningAddress(address: address)
+		}
+		if contact == nil, let offer = bolt12Offer() {
 			contact = Biz.business.contactsManager.contactForOffer(offer: offer)
 		}
 	}
@@ -1583,7 +1598,14 @@ struct ValidateView: View {
 	func showManageContactSheet() {
 		log.trace("showManageContactSheet()")
 		
-		guard let offer = bolt12Offer() else {
+		let address = lightningAddress()
+		
+		var offer: Lightning_kmpOfferTypesOffer? = nil
+		if address == nil {
+			offer = bolt12Offer()
+		}
+		
+		guard (address != nil) || (offer != nil) else {
 			return
 		}
 		
@@ -1593,7 +1615,7 @@ struct ValidateView: View {
 				location: .smartModal,
 				popTo: nil,
 				offer: offer,
-				address: nil,
+				address: address,
 				contact: contact,
 				contactUpdated: contactUpdated
 			)
