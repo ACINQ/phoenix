@@ -651,9 +651,10 @@ struct ManageContact: View {
 						.textInputAutocapitalization(.never)
 						.autocorrectionDisabled()
 						.lineLimit(4)
+						.disabled(editOffer_isReadonly)
 					
 					// Clear button (appears when TextField's text is non-empty)
-					if !editOffer_text.isEmpty {
+					if !editOffer_text.isEmpty && !editOffer_isReadonly {
 						Button {
 							editOffer_text = ""
 						} label: {
@@ -860,9 +861,10 @@ struct ManageContact: View {
 					.textInputAutocapitalization(.never)
 					.autocorrectionDisabled()
 					.lineLimit(2)
+					.disabled(editAddress_isReadonly)
 					
 					// Clear button (appears when TextField's text is non-empty)
-					if !editAddress_text.isEmpty {
+					if !editAddress_text.isEmpty && !editAddress_isReadonly {
 						Button {
 							editAddress_text = ""
 						} label: {
@@ -1215,6 +1217,24 @@ struct ManageContact: View {
 			return true
 		} else {
 			return contact?.photoUri != nil
+		}
+	}
+	
+	var editOffer_isReadonly: Bool {
+		
+		if let index = editOffer_index, index < offers.count {
+			return offers[index].isReadonly
+		} else {
+			return false
+		}
+	}
+	
+	var editAddress_isReadonly: Bool {
+		
+		if let index = editAddress_index, index < addresses.count {
+			return addresses[index].isReadonly
+		} else {
+			return false
 		}
 	}
 	
