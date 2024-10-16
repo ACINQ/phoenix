@@ -5591,6 +5591,9 @@
         }
       }
     },
+    "Add to existing contact" : {
+
+    },
     "adding to existing channel" : {
       "comment" : "Transaction Info: Explanation",
       "localizations" : {
@@ -13474,6 +13477,9 @@
           }
         }
       }
+    },
+    "Create new contact" : {
+
     },
     "Create new wallet" : {
       "localizations" : {
@@ -34729,7 +34735,6 @@
       }
     },
     "Search" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

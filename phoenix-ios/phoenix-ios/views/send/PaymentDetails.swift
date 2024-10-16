@@ -268,7 +268,7 @@ struct PaymentDetails: View {
 			Text(contact.name)
 		} // <HStack>
 		.onTapGesture {
-			parent.showManageContactSheet()
+			parent.manageExistingContact()
 		}
 	}
 	
@@ -289,7 +289,7 @@ struct PaymentDetails: View {
 					}
 				}
 			Button {
-				parent.showManageContactSheet()
+				parent.addContact()
 			} label: {
 				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 2) {
 					Image(systemName: "person")

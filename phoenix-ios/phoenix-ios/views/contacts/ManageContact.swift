@@ -83,7 +83,7 @@ struct ManageContact: View {
 	@State var showDeleteContactConfirmationDialog: Bool = false
 	
 	@State var offers: [OfferRow]
-	@State var offers_hasChanges: Bool = false
+	@State var offers_hasChanges: Bool
 	
 	@State var editOffer_index: Int? = nil
 	@State var editOffer_label: String = ""
@@ -91,7 +91,7 @@ struct ManageContact: View {
 	@State var editOffer_invalidReason: InvalidReason? = nil
 	
 	@State var addresses: [AddressRow]
-	@State var addresses_hasChanges: Bool = false
+	@State var addresses_hasChanges: Bool
 	
 	@State var editAddress_index: Int? = nil
 	@State var editAddress_label: String = ""
@@ -181,6 +181,7 @@ struct ManageContact: View {
 			}
 			
 			self._offers = State(initialValue: rows)
+			self._offers_hasChanges = State(initialValue: (contact != nil && offer != nil))
 		}
 		do {
 			var set = Set<String>()
@@ -201,6 +202,7 @@ struct ManageContact: View {
 			}
 			
 			self._addresses = State(initialValue: rows)
+			self._addresses_hasChanges = State(initialValue: (contact != nil && address != nil))
 		}
 	}
 	
