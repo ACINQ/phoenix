@@ -13,6 +13,7 @@ struct MinerFeeSheet: View {
 	enum Target {
 		case spliceOut
 		case expiredSwapIn
+		case finalWallet
 	}
 	
 	let target: Target
@@ -483,6 +484,7 @@ struct MinerFeeSheet: View {
 			switch target {
 				case .spliceOut     : updateMinerFeeInfo_SpliceOut(satsPerByte_number)
 				case .expiredSwapIn : updateMinerFeeInfo_ExpiredSwapIn(satsPerByte_number)
+				case .finalWallet   : updateMinerFeeInfo_FinalWallet(satsPerByte_number)
 			}
 		}
 	}
@@ -553,6 +555,7 @@ struct MinerFeeSheet: View {
 					if self.satsPerByte == originalSatsPerByte {
 						self.minerFeeInfo = MinerFeeInfo(
 							pubKeyScript: scriptVector,
+							transaction: nil,
 							feerate: updatedFeePerKw,
 							minerFee: fees.miningFee
 						)
@@ -598,13 +601,53 @@ struct MinerFeeSheet: View {
 				feerate: feePerKw
 			)
 		
-		guard let minerFee = pair?.second else {
+		guard
+			let tx = pair?.first,
+			let minerFee = pair?.second
+		else {
 			log.debug("updateMinerFeeInfo_ExpiredSwapIn: swapInWallet.spendExpiredSwapIn() returned null")
 			return
 		}
 		
 		minerFeeInfo = MinerFeeInfo(
-			pubKeyScript: scriptVector,
+			pubKeyScript: nil,
+			transaction: tx,
+			feerate: feePerKw,
+			minerFee: minerFee
+		)
+	}
+	
+	func updateMinerFeeInfo_FinalWallet(_ satsPerByte_number: NSNumber) {
+		log.trace("updateMinerFeeInfo_FinalWallet()")
+		
+		guard
+			let peer = Biz.business.peerManager.peerStateValue(),
+			let finalWallet = peer.finalWallet
+		else {
+			return
+		}
+		
+		let satsPerByte_satoshi = Bitcoin_kmpSatoshi(sat: satsPerByte_number.int64Value)
+		let feePerByte = Lightning_kmpFeeratePerByte(feerate: satsPerByte_satoshi)
+		let feePerKw = Lightning_kmpFeeratePerKw(feeratePerByte: feePerByte)
+		
+		let pair: KotlinPair<Bitcoin_kmpTransaction, Bitcoin_kmpSatoshi>? =
+			finalWallet.buildSendAllTransaction(
+				bitcoinAddress: btcAddress,
+				feerate: feePerKw
+			)
+		
+		guard
+			let tx = pair?.first,
+			let minerFee = pair?.second
+		else {
+			log.debug("updateMinerFeeInfo_FinalWallet: finalWallet.buildSendAllTransaction() returned null")
+			return
+		}
+		
+		minerFeeInfo = MinerFeeInfo(
+			pubKeyScript: nil,
+			transaction: tx,
 			feerate: feePerKw,
 			minerFee: minerFee
 		)
