@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 ACINQ SAS
+ * Copyright 2024 ACINQ SAS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.payments
+package fr.acinq.phoenix.android.payments.send.bolt11
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -33,7 +33,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import fr.acinq.lightning.TrampolineFees
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
@@ -42,19 +41,22 @@ import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.extensions.safeLet
-import fr.acinq.phoenix.controllers.payments.Scan
 import fr.acinq.phoenix.utils.extensions.isAmountlessTrampoline
+import kotlinx.coroutines.launch
 
 @Composable
-fun SendBolt11PaymentView(
+fun SendToBolt11View(
     invoice: Bolt11Invoice,
-    trampolineFees: TrampolineFees?,
     onBackClick: () -> Unit,
-    onPayClick: (Scan.Intent.Bolt11InvoiceFlow.SendBolt11Invoice) -> Unit
+    onPaymentSent: () -> Unit,
 ) {
     val context = LocalContext.current
-    val balance = business.balanceManager.balance.collectAsState(null).value
     val prefBitcoinUnit = LocalBitcoinUnit.current
+
+    val balance = business.balanceManager.balance.collectAsState(null).value
+    val sendManager = business.sendManager
+    val peer by business.peerManager.peerState.collectAsState()
+    val trampolineFees = peer?.walletParams?.trampolineFees?.firstOrNull()
 
     val requestedAmount = invoice.amount
     var amount by remember { mutableStateOf(requestedAmount) }
@@ -157,6 +159,7 @@ fun SendBolt11PaymentView(
             }
         }
         Spacer(modifier = Modifier.height(36.dp))
+        val scope = rememberCoroutineScope()
         val mayDoPayments by business.peerManager.mayDoPayments.collectAsState()
         Row(verticalAlignment = Alignment.CenterVertically) {
             FilledButton(
@@ -165,7 +168,15 @@ fun SendBolt11PaymentView(
                 enabled = mayDoPayments && amount != null && amountErrorMessage.isBlank() && trampolineFees != null,
             ) {
                 safeLet(amount, trampolineFees) { amt, fees ->
-                    onPayClick(Scan.Intent.Bolt11InvoiceFlow.SendBolt11Invoice(invoice = invoice, amount = amt, trampolineFees = fees))
+                    scope.launch {
+                        sendManager.payBolt11Invoice(
+                            amountToSend = amt,
+                            trampolineFees = fees,
+                            invoice = invoice,
+                            metadata = null
+                        )
+                        onPaymentSent()
+                    }
                 }
             }
         }

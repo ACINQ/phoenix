@@ -22,26 +22,26 @@ import androidx.compose.ui.text.AnnotatedString
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.annotatedStringResource
-import fr.acinq.phoenix.controllers.payments.Scan
 import fr.acinq.phoenix.data.lnurl.LnurlError
+import fr.acinq.phoenix.managers.SendManager
 import java.security.cert.CertificateException
 
 fun Connection.CLOSED.isBadCertificate() = this.reason?.cause is CertificateException
 
 @Composable
-fun Scan.Model.BadRequest.toLocalisedMessage(): String {
+fun SendManager.ParseResult.BadRequest.toLocalisedMessage(): String {
     return when (val reason = this.reason) {
-        is Scan.BadRequestReason.Expired -> stringResource(R.string.scan_error_expired)
-        is Scan.BadRequestReason.ChainMismatch -> stringResource(R.string.scan_error_invalid_chain)
-        is Scan.BadRequestReason.AlreadyPaidInvoice -> stringResource(R.string.scan_error_already_paid)
-        is Scan.BadRequestReason.ServiceError -> reason.error.toLocalisedMessage().text
-        is Scan.BadRequestReason.InvalidLnurl -> stringResource(R.string.scan_error_lnurl_invalid)
-        is Scan.BadRequestReason.UnsupportedLnurl -> stringResource(R.string.scan_error_lnurl_unsupported)
-        is Scan.BadRequestReason.UnknownFormat -> stringResource(R.string.scan_error_invalid_generic)
-        is Scan.BadRequestReason.Bip353NameNotFound -> stringResource(id = R.string.scan_error_bip353_name_not_found, reason.username, reason.domain)
-        is Scan.BadRequestReason.Bip353InvalidUri -> stringResource(id = R.string.scan_error_bip353_invalid_uri)
-        is Scan.BadRequestReason.Bip353InvalidOffer -> stringResource(id = R.string.scan_error_bip353_invalid_offer)
-        is Scan.BadRequestReason.Bip353NoDNSSEC -> stringResource(id = R.string.scan_error_bip353_dnssec)
+        is SendManager.BadRequestReason.Expired -> stringResource(R.string.scan_error_expired)
+        is SendManager.BadRequestReason.ChainMismatch -> stringResource(R.string.scan_error_invalid_chain)
+        is SendManager.BadRequestReason.AlreadyPaidInvoice -> stringResource(R.string.scan_error_already_paid)
+        is SendManager.BadRequestReason.ServiceError -> reason.error.toLocalisedMessage().text
+        is SendManager.BadRequestReason.InvalidLnurl -> stringResource(R.string.scan_error_lnurl_invalid)
+        is SendManager.BadRequestReason.UnsupportedLnurl -> stringResource(R.string.scan_error_lnurl_unsupported)
+        is SendManager.BadRequestReason.UnknownFormat -> stringResource(R.string.scan_error_invalid_generic)
+        is SendManager.BadRequestReason.Bip353NameNotFound -> stringResource(id = R.string.scan_error_bip353_name_not_found, reason.username, reason.domain)
+        is SendManager.BadRequestReason.Bip353InvalidUri -> stringResource(id = R.string.scan_error_bip353_invalid_uri)
+        is SendManager.BadRequestReason.Bip353InvalidOffer -> stringResource(id = R.string.scan_error_bip353_invalid_offer)
+        is SendManager.BadRequestReason.Bip353NoDNSSEC -> stringResource(id = R.string.scan_error_bip353_dnssec)
     }
 }
 

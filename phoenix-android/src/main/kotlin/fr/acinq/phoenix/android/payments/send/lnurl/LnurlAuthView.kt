@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 ACINQ SAS
+ * Copyright 2024 ACINQ SAS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.payments
+package fr.acinq.phoenix.android.payments.send.lnurl
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -28,23 +28,26 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.userPrefs
-import fr.acinq.phoenix.controllers.payments.Scan
 import fr.acinq.phoenix.data.lnurl.LnurlAuth
+import fr.acinq.phoenix.managers.SendManager
 
 @Composable
 fun LnurlAuthView(
-    model: Scan.Model.LnurlAuthFlow,
+    auth: LnurlAuth,
     onBackClick: () -> Unit,
-    onLoginClick: (Scan.Intent.LnurlAuthFlow) -> Unit,
-    onAuthSchemeInfoClick: () -> Unit,
+    onChangeAuthSchemeSettingClick: () -> Unit,
     onAuthDone: () -> Unit,
 ) {
     var showHowItWorks by remember { mutableStateOf(false) }
     val prefAuthScheme by userPrefs.getLnurlAuthScheme.collectAsState(initial = null)
-    val isLegacyDomain = remember(model) { LnurlAuth.LegacyDomain.isEligible(model.auth.initialUrl) }
+    val isLegacyDomain = remember(auth) { LnurlAuth.LegacyDomain.isEligible(auth.initialUrl) }
+    val vm = viewModel<LnurlAuthViewModel>(factory = LnurlAuthViewModel.Factory(business.sendManager))
 
     Column(
         modifier = Modifier
@@ -54,14 +57,14 @@ fun LnurlAuthView(
     ) {
         DefaultScreenHeader(onBackClick = onBackClick)
         Spacer(Modifier.height(16.dp))
-        when (model) {
-            is Scan.Model.LnurlAuthFlow.LoginRequest -> {
+        when (val state = vm.state.value) {
+            is LnurlAuthViewState.Init -> {
                 val isLegacySchemeUsed = prefAuthScheme == LnurlAuth.Scheme.ANDROID_LEGACY_SCHEME && isLegacyDomain
                 if (showHowItWorks) {
                     HowItWorksDialog(
-                        domain = LnurlAuth.LegacyDomain.filterDomain(model.auth.initialUrl),
+                        domain = LnurlAuth.LegacyDomain.filterDomain(auth.initialUrl),
                         isLegacySchemeUsed = isLegacySchemeUsed,
-                        onAuthSchemeInfoClick = onAuthSchemeInfoClick,
+                        onChangeAuthSchemeSettingClick = onChangeAuthSchemeSettingClick,
                         onDismiss = { showHowItWorks = false }
                     )
                 }
@@ -72,7 +75,7 @@ fun LnurlAuthView(
                 ) {
                     Text(text = stringResource(R.string.lnurl_auth_instructions), textAlign = TextAlign.Center)
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text(text = model.auth.initialUrl.host, style = MaterialTheme.typography.body2, textAlign = TextAlign.Center)
+                    Text(text = auth.initialUrl.host, style = MaterialTheme.typography.body2, textAlign = TextAlign.Center)
                     if (isLegacySchemeUsed) {
                         Text(
                             text = stringResource(R.string.lnurl_auth_legacy_notice),
@@ -95,45 +98,50 @@ fun LnurlAuthView(
                 FilledButton(
                     text = stringResource(id = R.string.lnurl_auth_button),
                     icon = R.drawable.ic_key,
-                    onClick = {
-                        if (prefAuthScheme != null) {
-                            onLoginClick(Scan.Intent.LnurlAuthFlow.Login(model.auth, minSuccessDelaySeconds = 1.0, scheme = prefAuthScheme ?: LnurlAuth.Scheme.DEFAULT_SCHEME))
-                        }
-                    },
+                    onClick = { vm.authenticateToDomain(auth, prefAuthScheme ?: LnurlAuth.Scheme.DEFAULT_SCHEME) },
                     enabled = prefAuthScheme != null
                 )
             }
-            is Scan.Model.LnurlAuthFlow.LoggingIn -> {
+            is LnurlAuthViewState.LoggingIn -> {
                 Card(
                     externalPadding = PaddingValues(horizontal = 16.dp),
                     internalPadding = PaddingValues(32.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Text(text = stringResource(R.string.lnurl_auth_in_progress, model.auth.initialUrl.host), textAlign = TextAlign.Center)
+                    Text(text = stringResource(R.string.lnurl_auth_in_progress, auth.initialUrl.host), textAlign = TextAlign.Center)
                 }
             }
-            is Scan.Model.LnurlAuthFlow.LoginResult -> {
-                val error = model.error
-                if (error != null) {
-                    Card(
-                        externalPadding = PaddingValues(horizontal = 16.dp),
-                        internalPadding = PaddingValues(32.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        ErrorResponseView(error)
-                        BorderButton(text = stringResource(R.string.lnurl_auth_try_again_button), icon = R.drawable.ic_arrow_back, onClick = onBackClick)
-                    }
-                } else {
-                    Card(
-                        externalPadding = PaddingValues(horizontal = 16.dp),
-                        internalPadding = PaddingValues(32.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(text = stringResource(id = R.string.lnurl_auth_success, model.auth.initialUrl.host), textAlign = TextAlign.Center)
-                    }
-                    Spacer(Modifier.height(32.dp))
-                    FilledButton(text = stringResource(id = R.string.btn_ok), icon = R.drawable.ic_check, onClick = onAuthDone)
+            is LnurlAuthViewState.AuthFailure -> {
+                Card(
+                    externalPadding = PaddingValues(horizontal = 16.dp),
+                    internalPadding = PaddingValues(32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    ErrorResponseView(state.error)
+                    BorderButton(text = stringResource(R.string.lnurl_auth_try_again_button), icon = R.drawable.ic_arrow_back, onClick = onBackClick)
                 }
+            }
+            is LnurlAuthViewState.Error -> {
+                Card(
+                    externalPadding = PaddingValues(horizontal = 16.dp),
+                    internalPadding = PaddingValues(32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    ErrorMessage(header = stringResource(R.string.lnurl_auth_failure), details = state.cause.message)
+                    Spacer(Modifier.height(24.dp))
+                    BorderButton(text = stringResource(R.string.lnurl_auth_try_again_button), icon = R.drawable.ic_arrow_back, onClick = onBackClick)
+                }
+            }
+            is LnurlAuthViewState.AuthSuccess -> {
+                Card(
+                    externalPadding = PaddingValues(horizontal = 16.dp),
+                    internalPadding = PaddingValues(32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(text = stringResource(id = R.string.lnurl_auth_success, auth.initialUrl.host), textAlign = TextAlign.Center)
+                }
+                Spacer(Modifier.height(32.dp))
+                FilledButton(text = stringResource(id = R.string.btn_ok), icon = R.drawable.ic_check, onClick = onAuthDone)
             }
         }
     }
@@ -141,15 +149,15 @@ fun LnurlAuthView(
 
 @Composable
 private fun ErrorResponseView(
-    error: Scan.LoginError
+    error: SendManager.LnurlAuthError
 ) {
     Text(text = stringResource(R.string.lnurl_auth_failure), style = MaterialTheme.typography.body2)
     Spacer(Modifier.height(8.dp))
     Text(
         text = when (error) {
-            is Scan.LoginError.ServerError -> error.details.details
-            is Scan.LoginError.NetworkError -> stringResource(R.string.lnurl_auth_error_network)
-            is Scan.LoginError.OtherError -> stringResource(R.string.lnurl_auth_error_other)
+            is SendManager.LnurlAuthError.ServerError -> error.details.details
+            is SendManager.LnurlAuthError.NetworkError -> stringResource(R.string.lnurl_auth_error_network)
+            is SendManager.LnurlAuthError.OtherError -> stringResource(R.string.lnurl_auth_error_other)
         },
         style = MaterialTheme.typography.body1.copy(textAlign = TextAlign.Center),
         modifier = Modifier
@@ -163,7 +171,7 @@ private fun ErrorResponseView(
 private fun HowItWorksDialog(
     domain: String,
     isLegacySchemeUsed: Boolean,
-    onAuthSchemeInfoClick: () -> Unit,
+    onChangeAuthSchemeSettingClick: () -> Unit,
     onDismiss: () -> Unit
 ) {
     Dialog(title = stringResource(id = R.string.lnurl_auth_help_dialog_title), onDismiss = onDismiss) {
@@ -185,7 +193,7 @@ private fun HowItWorksDialog(
                     text = stringResource(id = R.string.lnurl_auth_help_dialog_compat_button),
                     icon = R.drawable.ic_settings,
                     space = 8.dp,
-                    onClick = onAuthSchemeInfoClick
+                    onClick = onChangeAuthSchemeSettingClick
                 )
             }
         }

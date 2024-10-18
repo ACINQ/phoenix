@@ -65,9 +65,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.Clickable
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
@@ -78,66 +80,149 @@ import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.contact.ContactPhotoView
 import fr.acinq.phoenix.android.isDarkTheme
+import fr.acinq.phoenix.android.navController
+import fr.acinq.phoenix.android.payments.send.bolt11.SendToBolt11View
+import fr.acinq.phoenix.android.payments.send.lnurl.LnurlAuthView
+import fr.acinq.phoenix.android.payments.send.lnurl.LnurlPayView
+import fr.acinq.phoenix.android.payments.send.lnurl.LnurlWithdrawView
+import fr.acinq.phoenix.android.payments.send.offer.SendToOfferView
+import fr.acinq.phoenix.android.payments.send.spliceout.SendSpliceOutView
+import fr.acinq.phoenix.android.popToHome
 import fr.acinq.phoenix.android.utils.extensions.toLocalisedMessage
 import fr.acinq.phoenix.android.utils.gray300
 import fr.acinq.phoenix.android.utils.gray800
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.readClipboard
-import fr.acinq.phoenix.controllers.payments.Scan
 import fr.acinq.phoenix.data.ContactInfo
+import fr.acinq.phoenix.managers.SendManager
 import kotlinx.coroutines.flow.map
 
-
 @Composable
-fun PrepareSendView(
+fun SendView(
     initialInput: String?,
-    model: Scan.Model,
-    onReset: () -> Unit,
-    onInputSubmit: (String) -> Unit,
+    immediatelyOpenScanner: Boolean,
+    fromDeepLink: Boolean,
     onBackClick: () -> Unit,
 ) {
-    val context = LocalContext.current
-
-    var freeFormInput by remember { mutableStateOf(initialInput ?: "") }
-    var showScanner by remember { mutableStateOf(false) }
+    val navController = navController
+    val vm = viewModel<PrepareSendViewModel>(factory = PrepareSendViewModel.Factory(sendManager = business.sendManager))
+    var showScanner by remember { mutableStateOf(immediatelyOpenScanner) }
     val keyboardManager = LocalSoftwareKeyboardController.current
 
-    val vm = viewModel<PrepareSendViewModel>()
+    val onPaymentBackClick: () -> Unit = {
+        if (fromDeepLink) {
+            navController.popToHome()
+        } else {
+            vm.resetParsing()
+        }
+    }
+
+    when (val parseState = vm.parsePaymentState) {
+        // if payment data has been successfully parsed, redirect to the relevant payment screen
+        is ParsePaymentState.Success -> when (val data = parseState.data) {
+            is SendManager.ParseResult.Bolt11Invoice -> {
+                SendToBolt11View(invoice = data.invoice, onBackClick = onPaymentBackClick, onPaymentSent = { navController.popToHome() })
+            }
+            is SendManager.ParseResult.Bolt12Offer -> {
+                SendToOfferView(offer = data.offer, onBackClick = onPaymentBackClick, onPaymentSent = { navController.popToHome() })
+            }
+            is SendManager.ParseResult.Uri -> {
+                SendSpliceOutView(requestedAmount = data.uri.amount, address = data.uri.address, onBackClick = onPaymentBackClick, onSpliceOutSuccess = {navController.popToHome() })
+            }
+            is SendManager.ParseResult.Lnurl.Pay -> {
+                LnurlPayView(payIntent = data.paymentIntent, onPaymentBackClick, onPaymentSent = { navController.popToHome() })
+            }
+            is SendManager.ParseResult.Lnurl.Withdraw -> {
+                LnurlWithdrawView(withdraw = data.lnurlWithdraw, onBackClick = onPaymentBackClick, onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) }, onWithdrawDone = { navController.popToHome()})
+            }
+            is SendManager.ParseResult.Lnurl.Auth -> {
+                LnurlAuthView(auth = data.auth, onBackClick = { navController.popBackStack() }, onChangeAuthSchemeSettingClick = { navController.navigate("${Screen.PaymentSettings.route}?showAuthSchemeDialog=true") },
+                    onAuthDone = { navController.popToHome() },)
+            }
+        }
+        is ParsePaymentState.Ready, is ParsePaymentState.Processing, is ParsePaymentState.Error, is ParsePaymentState.ChoosePaymentMode -> {
+            PrepareSendView(
+                onBackClick = onBackClick,
+                initialInput = initialInput,
+                vm = vm,
+                onShowScanner = {
+                    vm.resetParsing()
+                    keyboardManager?.hide()
+                    showScanner = true
+                }
+            )
+
+            // show dialogs when a parsing error occurs
+            if (parseState is ParsePaymentState.Error && !showScanner) {
+                Dialog(onDismiss = vm::resetParsing) {
+                    PaymentDataError(
+                        errorMessage = when (parseState) {
+                            is ParsePaymentState.GenericError -> parseState.errorMessage
+                            is ParsePaymentState.ParsingFailure -> parseState.error.toLocalisedMessage()
+                        },
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            }
+
+            if (parseState is ParsePaymentState.ChooseOnchainOrBolt11) {
+                ChoosePaymentModeDialog(
+                    onPayOnchainClick = { vm.parsePaymentState = ParsePaymentState.Success(SendManager.ParseResult.Uri(parseState.uri)) },
+                    onPayOffchainClick = { vm.parsePaymentState = ParsePaymentState.Success(SendManager.ParseResult.Bolt11Invoice(request = parseState.request, parseState.bolt11)) },
+                    onDismiss = { vm.resetParsing() }
+                )
+            }
+
+            if (parseState is ParsePaymentState.ChooseOnchainOrOffer) {
+                ChoosePaymentModeDialog(
+                    onPayOnchainClick = { vm.parsePaymentState = ParsePaymentState.Success(SendManager.ParseResult.Uri(parseState.uri)) },
+                    onPayOffchainClick = { vm.parsePaymentState = ParsePaymentState.Success(SendManager.ParseResult.Bolt12Offer(parseState.offer)) },
+                    onDismiss = { vm.resetParsing() }
+                )
+            }
+
+            if (showScanner) {
+                ScannerBox(state = vm.parsePaymentState, onDismiss = { vm.resetParsing() ; showScanner = false }, onReset = vm::resetParsing, onSubmit = vm::parsePaymentData)
+            }
+        }
+    }
+}
+
+@Composable
+private fun PrepareSendView(
+    onBackClick: () -> Unit,
+    initialInput: String?,
+    vm: PrepareSendViewModel,
+    onShowScanner: () -> Unit
+) {
+    val context = LocalContext.current
+    var freeFormInput by remember { mutableStateOf(initialInput ?: "") }
+    val parsePaymentState = vm.parsePaymentState
 
     DefaultScreenLayout(isScrollable = false) {
         DefaultScreenHeader(title = "Send", onBackClick = onBackClick)
 
+        // show error message when reading an image from disk fails
+        when (vm.readImageState) {
+            is ReadImageState.Error -> Dialog(onDismiss = { vm.readImageState = ReadImageState.Ready }) {
+                Text(text = "This image could not be processed.", modifier = Modifier.padding(16.dp))
+            }
+            is ReadImageState.NotFound -> Dialog(onDismiss = { vm.readImageState = ReadImageState.Ready }) {
+                Text(text = "No QR code found in this image.", modifier = Modifier.padding(16.dp))
+            }
+            ReadImageState.Reading, ReadImageState.Ready -> Unit
+        }
+
         SendSmartInput(
             value = freeFormInput,
             onValueChange = {
-                if (it.isBlank()) onReset()
+                if (it.isBlank()) { vm.resetParsing() }
                 freeFormInput = it
             },
-            onValueSubmit = { onInputSubmit(freeFormInput) },
-            isProcessing = model is Scan.Model.ResolvingBip353 || model is Scan.Model.LnurlServiceFetch,
-            isError = model is Scan.Model.BadRequest,
+            onValueSubmit = { vm.parsePaymentData(freeFormInput) },
+            isProcessing = parsePaymentState.isProcessing,
+            isError = parsePaymentState.hasFailed,
         )
-
-        // dialogs for error messages
-        if (!showScanner && model is Scan.Model.BadRequest) {
-            Dialog(onDismiss = onReset) {
-                PaymentDataError(errorMessage = model.toLocalisedMessage(), modifier = Modifier.padding(16.dp))
-            }
-        }
-        when (vm.readImageState) {
-            is ReadImageState.Error -> {
-                Dialog(onDismiss = { vm.readImageState = ReadImageState.Ready }) {
-                    Text(text = "This image could not be processed.", modifier = Modifier.padding(16.dp))
-                }
-            }
-            is ReadImageState.NotFound -> {
-                Dialog(onDismiss = { vm.readImageState = ReadImageState.Ready }) {
-                    Text(text = "No QR code found in this image.", modifier = Modifier.padding(16.dp))
-                }
-            }
-            else -> {}
-        }
-
 
         // contacts list
         val contacts by business.contactsManager.contactsList.map { list ->
@@ -145,12 +230,14 @@ fun PrepareSendView(
                 list.filter { it.name.contains(filter, ignoreCase = true) }
             } ?: list
         }.collectAsState(emptyList())
-        Column(modifier = Modifier.weight(1f).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(modifier = Modifier
+            .weight(1f)
+            .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             if (contacts.isNotEmpty()) {
                 LazyColumn {
                     item { Spacer(modifier = Modifier.height(12.dp)) }
                     items(contacts) {
-                        ContactRow(contactInfo = it, onClick = { it.mostRelevantOffer?.let { onInputSubmit(it.encode()) } })
+                        ContactRow(contactInfo = it, onClick = { it.mostRelevantOffer?.let { vm.parsePaymentData(it.encode()) } })
                     }
                     item { Spacer(modifier = Modifier.height(12.dp)) }
                 }
@@ -167,29 +254,15 @@ fun PrepareSendView(
         SendButtonsRow(
             onSubmit = {
                 freeFormInput = it
-                onInputSubmit(it)
+                vm.parsePaymentData(it)
             },
             readImageState = vm.readImageState,
             onReadImage = {
-                onReset()
-                vm.readImage(context, it, onDataFound = {
-                    freeFormInput = it
-                    onInputSubmit(it)
-                })
+                vm.resetParsing()
+                vm.readImage(context, it, onDataFound = vm::parsePaymentData)
             },
-            onShowScanner = {
-                onReset()
-                keyboardManager?.hide()
-                showScanner = true
-            }
+            onShowScanner = onShowScanner
         )
-    }
-
-    if (showScanner) {
-        ScannerBox(model = model, onDismiss = { onReset() ; showScanner = false }, onReset = onReset, onSubmit = {
-            freeFormInput = it
-            onInputSubmit(it)
-        })
     }
 }
 
@@ -236,7 +309,7 @@ private fun PaymentDataError(errorMessage: String, modifier: Modifier = Modifier
 
 @Composable
 private fun ScannerBox(
-    model: Scan.Model,
+    state: ParsePaymentState,
     onReset: () -> Unit,
     onDismiss: () -> Unit,
     onSubmit: (String) -> Unit,
@@ -260,12 +333,15 @@ private fun ScannerBox(
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
         ) {
-            if (model is Scan.Model.BadRequest) {
-                Dialog(onDismiss = {
-                    onReset()
-                    scanView?.resume()
-                }) {
-                    PaymentDataError(errorMessage = model.toLocalisedMessage(), modifier = Modifier.padding(16.dp))
+            if (state is ParsePaymentState.Error) {
+                Dialog(onDismiss = { onReset() ; scanView?.resume() }) {
+                    PaymentDataError(
+                        errorMessage = when (state) {
+                            is ParsePaymentState.GenericError -> state.errorMessage
+                            is ParsePaymentState.ParsingFailure -> state.error.toLocalisedMessage()
+                        },
+                        modifier = Modifier.padding(16.dp)
+                    )
                 }
                 Spacer(modifier = Modifier.height(16.dp))
             }
@@ -334,6 +410,38 @@ private fun ContactRow(
             ContactPhotoView(photoUri = contactInfo.photoUri, name = contactInfo.name, onChange = null, imageSize = 32.dp)
             Spacer(modifier = Modifier.width(8.dp))
             Text(text = contactInfo.name, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 18.sp)
+        }
+    }
+}
+
+@Composable
+private fun ChoosePaymentModeDialog(
+    onPayOnchainClick: () -> Unit,
+    onPayOffchainClick: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    Dialog(onDismiss = onDismiss, properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = true), isScrollable = true, buttons = null) {
+        Clickable(onClick = onPayOnchainClick) {
+            Row(modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+                PhoenixIcon(resourceId = R.drawable.ic_chain)
+                Spacer(Modifier.width(16.dp))
+                Column {
+                    Text(text = stringResource(id = R.string.send_paymentmode_onchain), style = MaterialTheme.typography.body2)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(text = stringResource(id = R.string.send_paymentmode_onchain_desc), style = MaterialTheme.typography.caption.copy(fontSize = 14.sp))
+                }
+            }
+        }
+        Clickable(onClick = onPayOffchainClick) {
+            Row(modifier = Modifier.padding(horizontal = 24.dp, vertical = 18.dp), verticalAlignment = Alignment.CenterVertically) {
+                PhoenixIcon(resourceId = R.drawable.ic_zap)
+                Spacer(Modifier.width(16.dp))
+                Column {
+                    Text(text = stringResource(id = R.string.send_paymentmode_lightning), style = MaterialTheme.typography.body2)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(text = stringResource(id = R.string.send_paymentmode_lightning_desc), style = MaterialTheme.typography.caption.copy(fontSize = 14.sp))
+                }
+            }
         }
     }
 }
