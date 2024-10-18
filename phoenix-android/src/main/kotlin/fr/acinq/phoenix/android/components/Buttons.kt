@@ -348,6 +348,8 @@ fun Clickable(
     shape: Shape = RectangleShape,
     clickDescription: String = "",
     internalPadding: PaddingValues = PaddingValues(0.dp),
+    indication: Indication? = LocalIndication.current,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable () -> Unit,
 ) {
     val colors = ButtonDefaults.buttonColors(
@@ -370,6 +372,8 @@ fun Clickable(
                 enabled = enabled,
                 role = Role.Button,
                 onClickLabel = clickDescription,
+                interactionSource = interactionSource,
+                indication = indication
             )
             .padding(internalPadding)
     ) {

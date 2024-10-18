@@ -243,7 +243,7 @@ private fun ContactOffers(
             offers.forEach { offer ->
                 OfferAttachedToContactRow(
                     offer = offer,
-                    onOfferClick = { navController.navigate("${Screen.ScanData.route}?input=${it.encode()}") },
+                    onOfferClick = { navController.navigate("${Screen.Send.route}?input=${it.encode()}") },
                 )
             }
         }

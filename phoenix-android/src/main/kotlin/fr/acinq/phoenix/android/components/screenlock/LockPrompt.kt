@@ -50,8 +50,8 @@ import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.BiometricsHelper
-import fr.acinq.phoenix.android.utils.findActivity
-import fr.acinq.phoenix.android.utils.safeLet
+import fr.acinq.phoenix.android.utils.extensions.findActivity
+import fr.acinq.phoenix.android.utils.extensions.safeLet
 import kotlinx.coroutines.launch
 
 /**

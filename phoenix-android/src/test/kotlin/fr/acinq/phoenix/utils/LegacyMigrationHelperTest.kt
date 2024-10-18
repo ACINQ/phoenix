@@ -271,7 +271,7 @@ class LegacyMigrationHelperTest {
                             amountReceived = 55_000.msat,
                             channelId = ByteVector32.Zeroes,
                             htlcId = 0,
-                            fundingFee = null
+                            fundingFee = null,
                         )
                     ),
                     receivedAt = 1656337800788
@@ -294,7 +294,7 @@ class LegacyMigrationHelperTest {
                             amountReceived = 350_000.msat,
                             channelId = ByteVector32.Zeroes,
                             htlcId = 0,
-                            fundingFee = null
+                            fundingFee = null,
                         )
                     ),
                     receivedAt = 1656338085497

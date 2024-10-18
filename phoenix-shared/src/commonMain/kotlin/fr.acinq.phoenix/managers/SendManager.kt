@@ -44,6 +44,7 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TimeSource
 
@@ -108,20 +109,21 @@ class SendManager(
             val reason: BadRequestReason
         ): ParseResult()
 
+        sealed class Success : ParseResult()
         data class Bolt11Invoice(
             val request: String,
             val invoice: fr.acinq.lightning.payment.Bolt11Invoice
-        ): ParseResult()
+        ): Success()
 
         data class Bolt12Offer(
             val offer: OfferTypes.Offer
-        ): ParseResult()
+        ): Success()
 
         data class Uri(
             val uri: BitcoinUri
-        ): ParseResult()
+        ): Success()
 
-        sealed class Lnurl: ParseResult() {
+        sealed class Lnurl: Success() {
             data class Pay(
                 val paymentIntent: LnurlPay.Intent
             ): Lnurl()
@@ -547,7 +549,7 @@ class SendManager(
             paymentPreimage = Lightning.randomBytes32(),
             amount = amount,
             description = Either.Left(description ?: lnurlWithdraw.defaultDescription),
-            expirySeconds = (3600 * 24 * 7).toLong(), // one week
+            expiry = 7.days,
         )
     }
 

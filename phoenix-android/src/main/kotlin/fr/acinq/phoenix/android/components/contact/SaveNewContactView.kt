@@ -56,8 +56,8 @@ import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.SwitchView
 import fr.acinq.phoenix.android.components.TextInput
-import fr.acinq.phoenix.android.payments.CameraPermissionsView
-import fr.acinq.phoenix.android.payments.ScannerView
+import fr.acinq.phoenix.android.payments.send.CameraPermissionsView
+import fr.acinq.phoenix.android.payments.send.ScannerView
 import fr.acinq.phoenix.data.ContactInfo
 import kotlinx.coroutines.launch
 

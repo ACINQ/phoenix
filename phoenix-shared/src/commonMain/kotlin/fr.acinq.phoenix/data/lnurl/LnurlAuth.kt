@@ -56,13 +56,13 @@ data class LnurlAuth(
          * The default scheme is spec compliant and that's what should be used on new service. The hashing key and
          * the linking key are computed by deriving the master key. The iOS app should always use that scheme.
          */
-        object DEFAULT_SCHEME : Scheme(0)
+        data object DEFAULT_SCHEME : Scheme(0)
 
         /**
          * This is the scheme used by the legacy android wallet. The hashing key is derived from the node key, and
          * the linking key derived from the hashing key. Only use this when needed.
          */
-        object ANDROID_LEGACY_SCHEME : Scheme(1)
+        data object ANDROID_LEGACY_SCHEME : Scheme(1)
     }
 
     companion object {
@@ -156,12 +156,12 @@ data class LnurlAuth(
         companion object {
             /** Return true if this host is eligible to use legacy keys, false otherwise. */
             fun isEligible(url: Url): Boolean {
-                return values().any { it.host == url.host }
+                return entries.any { it.host == url.host }
             }
 
             /** Get the legacy domain for the given [Url] if eligible, or the full domain name otherwise (i.e. specs compliant). */
             fun filterDomain(url: Url): String {
-                return values().firstOrNull() { it.host == url.host }?.legacyCompatDomain ?: url.host
+                return entries.firstOrNull() { it.host == url.host }?.legacyCompatDomain ?: url.host
             }
         }
     }

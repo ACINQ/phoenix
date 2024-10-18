@@ -17,9 +17,6 @@
 package fr.acinq.phoenix.android
 
 import androidx.navigation.NavController
-import androidx.navigation.NavOptionsBuilder
-import org.slf4j.LoggerFactory
-
 
 sealed class Screen(val route: String) {
     data object SwitchToLegacy : Screen("switchtolegacy")
@@ -30,11 +27,7 @@ sealed class Screen(val route: String) {
     data object Startup : Screen("startup")
     data object Home : Screen("home")
     data object Receive : Screen("receive")
-    /**
-     * This route also manages the payment flow.
-     * TODO: Separate scanning the data from processing the data (aka send payment, process lnurl...). Split to be done at the controller level.
-     */
-    data object ScanData : Screen("readdata")
+    data object Send : Screen("send")
     data object PaymentDetails : Screen("payments")
     data object PaymentsHistory : Screen("payments/all")
     data object PaymentsCsvExport : Screen("payments/export")
@@ -71,18 +64,10 @@ sealed class Screen(val route: String) {
     data object Experimental: Screen("settings/experimental")
 }
 
-fun NavController.navigate(screen: Screen, arg: List<Any> = emptyList(), builder: NavOptionsBuilder.() -> Unit = {}) {
-    val log = LoggerFactory.getLogger("NavController")
-    val path = arg.joinToString{ "/$it" }
-    val route = "${screen.route}$path"
-    log.debug("navigating from ${currentDestination?.route} to $route")
-    try {
-        if (route == currentDestination?.route) {
-            log.warn("cannot navigate to same route")
-        } else {
-            navigate(route, builder)
-        }
-    } catch (e: Exception) {
-        log.error("failed to navigate to $route: " , e)
+/** Navigates to Home and pops everything from the backstack up to Home. This effectively resets the nav stack. */
+fun NavController.popToHome() {
+    val navController = this
+    navigate(Screen.Home.route) {
+        popUpTo(navController.graph.id) { inclusive = true }
     }
 }

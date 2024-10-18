@@ -41,6 +41,7 @@ import fr.acinq.phoenix.android.components.settings.Setting
 import fr.acinq.phoenix.android.components.settings.SettingSwitch
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.*
+import fr.acinq.phoenix.android.utils.extensions.findActivity
 import kotlinx.coroutines.launch
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes

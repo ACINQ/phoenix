@@ -69,9 +69,8 @@ import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.SplashLabelRow
 import fr.acinq.phoenix.android.components.TextInput
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
-import fr.acinq.phoenix.android.components.feedback.SuccessMessage
-import fr.acinq.phoenix.android.payments.CameraPermissionsView
-import fr.acinq.phoenix.android.payments.ScannerView
+import fr.acinq.phoenix.android.payments.send.CameraPermissionsView
+import fr.acinq.phoenix.android.payments.send.ScannerView
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.data.MempoolFeerate
 import fr.acinq.phoenix.utils.Parser

@@ -17,15 +17,13 @@
 package fr.acinq.phoenix.android.security
 
 import android.content.Context
-import fr.acinq.phoenix.android.utils.tryWith
-import fr.acinq.secp256k1.Hex
+import fr.acinq.phoenix.android.utils.extensions.tryWith
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.security.GeneralSecurityException
-import javax.crypto.Cipher
 import javax.crypto.SecretKey
 
 

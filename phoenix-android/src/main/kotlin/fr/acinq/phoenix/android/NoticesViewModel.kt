@@ -73,7 +73,6 @@ class NoticesViewModel(
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent?) {
             val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-            log.info("power_saver=${powerManager.isPowerSaveMode}")
             isPowerSaverModeOn = powerManager.isPowerSaveMode
         }
     }

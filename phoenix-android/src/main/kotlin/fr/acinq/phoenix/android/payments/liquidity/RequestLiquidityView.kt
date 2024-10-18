@@ -78,7 +78,7 @@ import fr.acinq.phoenix.android.components.enableOrFade
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.feedback.InfoMessage
 import fr.acinq.phoenix.android.components.feedback.SuccessMessage
-import fr.acinq.phoenix.android.payments.spliceout.spliceFailureDetails
+import fr.acinq.phoenix.android.payments.send.spliceout.spliceFailureDetails
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.orange

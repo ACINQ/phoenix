@@ -49,7 +49,7 @@ import fr.acinq.phoenix.android.services.ChannelsWatcher
 import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
-import fr.acinq.phoenix.android.utils.safeLet
+import fr.acinq.phoenix.android.utils.extensions.safeLet
 import fr.acinq.phoenix.data.Notification
 import fr.acinq.phoenix.data.WatchTowerOutcome
 import kotlinx.coroutines.launch

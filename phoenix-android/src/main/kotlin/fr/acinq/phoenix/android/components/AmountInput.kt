@@ -251,12 +251,12 @@ fun AmountInput(
                 style = when {
                     errorMessage.isNotBlank() -> MaterialTheme.typography.body2.copy(color = negativeColor, fontSize = 14.sp)
                     isFocused -> MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.primary, fontSize = 14.sp)
-                    else -> MaterialTheme.typography.body1.copy(fontSize = 14.sp)
+                    else -> MaterialTheme.typography.body2.copy(fontSize = 14.sp)
                 },
                 modifier = Modifier
                     .align(Alignment.TopStart)
                     .padding(start = 8.dp)
-                    .clip(RoundedCornerShape(8.dp))
+                    .clip(RoundedCornerShape(2.dp))
                     .background(MaterialTheme.colors.surface)
                     .padding(horizontal = 8.dp, vertical = 2.dp)
             )
