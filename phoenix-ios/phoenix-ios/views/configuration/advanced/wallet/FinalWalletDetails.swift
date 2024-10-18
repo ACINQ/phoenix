@@ -191,11 +191,7 @@ struct FinalWalletDetails: View {
 	// --------------------------------------------------
 	
 	func hasConfirmedSats() -> Bool {
-	#if DEBUG
-		return true
-	#else
 		return finalWallet.anyConfirmedBalance.sat > 0
-	#endif
 	}
 	
 	func confirmedBalance() -> (FormattedAmount, FormattedAmount) {

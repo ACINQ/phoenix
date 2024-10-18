@@ -55,14 +55,7 @@ struct SpendOnChainFunds: View {
 			currentWallet = Biz.business.balanceManager.swapInWalletValue()
 			walletPublisher = Biz.business.balanceManager.swapInWalletPublisher()
 		case .finalWallet:
-		#if DEBUG
-			currentWallet = LightningExposureKt.fakeWallet(
-				amount: Bitcoin_kmpSatoshi(sat: 100_000),
-				swapInParams: LightningExposureKt.defaultSwapInParams()
-			)
-		#else
 			currentWallet = Biz.business.peerManager.finalWalletValue()
-		#endif
 			walletPublisher = Biz.business.peerManager.finalWalletPublisher()
 		}
 		
