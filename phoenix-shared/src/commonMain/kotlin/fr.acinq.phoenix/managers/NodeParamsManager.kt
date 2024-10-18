@@ -70,7 +70,6 @@ class NodeParamsManager(
                 ).copy(
                     zeroConfPeers = setOf(trampolineNodeId),
                     liquidityPolicy = MutableStateFlow(startupParams.liquidityPolicy),
-                    bolt12invoiceExpiry = 24.hours,
                 )
             }.collect {
                 log.info { "hello!" }

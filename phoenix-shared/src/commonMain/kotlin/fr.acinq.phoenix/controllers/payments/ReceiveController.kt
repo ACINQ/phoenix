@@ -23,6 +23,7 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.managers.PeerManager
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.seconds
 
 
 class AppReceiveController(
@@ -48,7 +49,7 @@ class AppReceiveController(
                         paymentPreimage = randomBytes32(),
                         amount = intent.amount,
                         description = Either.Left(intent.description),
-                        expirySeconds = intent.expirySeconds
+                        expiry = intent.expirySeconds.seconds
                     )
                     model(Receive.Model.Generated(paymentRequest.write(), paymentRequest.paymentHash.toHex(), paymentRequest.amount, paymentRequest.description))
                 }
