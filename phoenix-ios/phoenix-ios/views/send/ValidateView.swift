@@ -1863,8 +1863,11 @@ struct ValidateView: View {
 			log.warning("ignore: peer == nil")
 			return
 		}
-		guard let minerFeeInfo else {
-			log.warning("ignore: minerFeeInfo == nil")
+		guard
+			let minerFeeInfo,
+			let scriptPubKey = minerFeeInfo.pubKeyScript
+		else {
+			log.warning("ignore: minerFeeInfo info missing")
 			return
 		}
 		
@@ -1876,7 +1879,7 @@ struct ValidateView: View {
 			do {
 				let response = try await peer.spliceOut(
 					amount: amountSat,
-					scriptPubKey: minerFeeInfo.pubKeyScript,
+					scriptPubKey: scriptPubKey,
 					feerate: minerFeeInfo.feerate
 				)
 				
