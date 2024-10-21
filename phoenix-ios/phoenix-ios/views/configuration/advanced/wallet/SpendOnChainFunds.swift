@@ -435,8 +435,7 @@ struct SpendOnChainFunds: View {
 	//	wallet = newValue.fakeBlockHeight(plus: Int32(144 * 31 * 3)) // 3 months: test expirationWarning
 	//	wallet = newValue.fakeBlockHeight(plus: Int32(144 * 30 * 4)) // 4 months: test lockedUntilRefund
 	//	wallet = newValue.fakeBlockHeight(plus: Int32(144 * 30 * 6)) // 6 months: test readyForRefund
-	//	wallet = newValue
-		log.trace("walletChanged(): IGNORED - TESTING")
+		wallet = newValue
 	#else
 		wallet = newValue
 	#endif
