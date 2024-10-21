@@ -195,9 +195,6 @@ struct ValidateView: View {
 			balanceDidChange($0)
 		}
 		.task {
-			await fetchContact()
-		}
-		.task {
 			await fetchMempoolRecommendedFees()
 		}
 	}
@@ -767,19 +764,6 @@ struct ValidateView: View {
 	// MARK: Tasks
 	// --------------------------------------------------
 	
-	func fetchContact() async {
-		
-		guard let offer = bolt12Offer() else {
-			return
-		}
-		let contactsManager = Biz.business.contactsManager
-		do {
-			contact = try await contactsManager.getContactForOffer(offer: offer)
-		} catch {
-			log.error("contactsManager: error: \(error)")
-		}
-	}
-	
 	func fetchMempoolRecommendedFees() async {
 		
 		for try await response in MempoolMonitor.shared.stream() {
@@ -821,6 +805,18 @@ struct ValidateView: View {
 		}
 		
 		return nil
+	}
+	
+	func lightningAddress() -> String? {
+		
+		var result: String? = nil
+		if let model = flow as? SendManager.ParseResult_Bolt12Offer {
+			result = model.lightningAddress
+		} else if let model = flow as? SendManager.ParseResult_Lnurl_Pay {
+			result = model.lightningAddress
+		}
+		
+		return result?.trimmingCharacters(in: .whitespacesAndNewlines)
 	}
 	
 	func bolt11Invoice() -> Lightning_kmpBolt11Invoice? {
@@ -1091,6 +1087,13 @@ struct ValidateView: View {
 				popToDestination = nil
 				presentationMode.wrappedValue.dismiss()
 			}
+		}
+		
+		if let address = lightningAddress() {
+			contact = Biz.business.contactsManager.contactForLightningAddress(address: address)
+		}
+		if contact == nil, let offer = bolt12Offer() {
+			contact = Biz.business.contactsManager.contactForOffer(offer: offer)
 		}
 	}
 	
@@ -1592,10 +1595,11 @@ struct ValidateView: View {
 		}
 	}
 	
-	func showManageContactSheet() {
-		log.trace("showManageContactSheet()")
+	func manageExistingContact() {
+		log.trace("manageExistingContact()")
 		
-		guard let offer = bolt12Offer() else {
+		guard let contact else {
+			log.info("manageExistingContact(): ignoring: no existing contact")
 			return
 		}
 		
@@ -1604,8 +1608,103 @@ struct ValidateView: View {
 			ManageContact(
 				location: .smartModal,
 				popTo: nil,
-				offer: offer,
+				offer: nil,
+				address: nil,
 				contact: contact,
+				contactUpdated: contactUpdated
+			)
+		}
+	}
+	
+	func addContact() {
+		log.trace("addContact()")
+		
+		guard contact == nil else {
+			log.info("addContact(): ignoring: contact already exists")
+			return
+		}
+		
+		let address = lightningAddress()
+		
+		var offer: Lightning_kmpOfferTypesOffer? = nil
+		if address == nil {
+			offer = bolt12Offer()
+		}
+		
+		guard (address != nil) || (offer != nil) else {
+			log.info("addContact(): ignoring: missing address/offer")
+			return
+		}
+		
+		let count: Int = Biz.business.contactsManager.contactsListCurrentValue().count
+		if count == 0 {
+			// User doesn't have any contacts.
+			// No choice but to create a new contact.
+			addContact_createNew(address, offer)
+			
+		} else {
+			
+			dismissKeyboardIfVisible()
+			smartModalState.display(dismissable: true) {
+				AddContactOptionsSheet(
+					createNewContact: { addContact_createNew(address, offer) },
+					addToExistingContact: { addContact_selectExisting(address, offer) }
+				)
+			}
+		}
+	}
+	
+	private func addContact_createNew(
+		_ address: String?,
+		_ offer: Lightning_kmpOfferTypesOffer?
+	) {
+		log.trace("addContact_createNew()")
+		
+		dismissKeyboardIfVisible()
+		smartModalState.display(dismissable: false) {
+			ManageContact(
+				location: .smartModal,
+				popTo: nil,
+				offer: offer,
+				address: address,
+				contact: nil,
+				contactUpdated: contactUpdated
+			)
+		}
+	}
+	
+	private func addContact_selectExisting(
+		_ address: String?,
+		_ offer: Lightning_kmpOfferTypesOffer?
+	) {
+		log.trace("addContact_selectExisting()")
+		
+		dismissKeyboardIfVisible()
+		smartModalState.display(dismissable: true) {
+			ContactsListSheet(didSelectContact: { existingContact in
+				log.debug("didSelectContact")
+				smartModalState.onNextDidDisappear {
+					addContact_addToExisting(existingContact, address, offer)
+				}
+			})
+		}
+	}
+	
+	private func addContact_addToExisting(
+		_ existingContact: ContactInfo,
+		_ address: String?,
+		_ offer: Lightning_kmpOfferTypesOffer?
+	) {
+		log.trace("addContact_addToExisting()")
+		
+		dismissKeyboardIfVisible()
+		smartModalState.display(dismissable: false) {
+			ManageContact(
+				location: .smartModal,
+				popTo: nil,
+				offer: offer,
+				address: address,
+				contact: existingContact,
 				contactUpdated: contactUpdated
 			)
 		}
