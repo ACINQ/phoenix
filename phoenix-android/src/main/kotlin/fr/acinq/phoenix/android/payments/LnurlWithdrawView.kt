@@ -146,5 +146,7 @@ fun getRemoteErrorMessage(
         is LnurlError.RemoteFailure.CouldNotConnect -> annotatedStringResource(id = R.string.lnurl_error_remote_connection, error.origin)
         is LnurlError.RemoteFailure.Detailed -> annotatedStringResource(id = R.string.lnurl_error_remote_details, error.origin, error.reason)
         is LnurlError.RemoteFailure.Unreadable -> annotatedStringResource(id = R.string.lnurl_error_remote_unreadable, error.origin)
+        is LnurlError.RemoteFailure.IsWebsite -> TODO()
+        is LnurlError.RemoteFailure.LightningAddressError -> TODO()
     }
 }
