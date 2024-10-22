@@ -44,6 +44,7 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TimeSource
 
@@ -547,7 +548,7 @@ class SendManager(
             paymentPreimage = Lightning.randomBytes32(),
             amount = amount,
             description = Either.Left(description ?: lnurlWithdraw.defaultDescription),
-            expirySeconds = (3600 * 24 * 7).toLong(), // one week
+            expiry = 7.days,
         )
     }
 
