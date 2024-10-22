@@ -71,6 +71,12 @@ data class ContactAddress(
     }
 }
 
+data class ContactSecret(
+    val id: ByteVector32,
+    val incomingPaymentId: ByteVector32?,
+    val createdAt: Instant
+)
+
 data class ContactInfo(
     val id: UUID,
     val name: String,
@@ -78,22 +84,5 @@ data class ContactInfo(
     val useOfferKey: Boolean,
     val offers: List<ContactOffer>,
     val addresses: List<ContactAddress>,
-    val publicKeys: List<PublicKey>,
-) {
-    constructor(
-        id: UUID,
-        name: String,
-        photoUri: String?,
-        useOfferKey: Boolean,
-        offers: List<ContactOffer>,
-        addresses: List<ContactAddress>
-    ) : this(
-        id = id,
-        name = name,
-        photoUri = photoUri,
-        useOfferKey = useOfferKey,
-        offers = offers,
-        addresses = addresses,
-        publicKeys = offers.map { it.offer.contactNodeIds }.flatten()
-    )
-}
+    val secrets: List<ContactSecret>,
+)

@@ -180,12 +180,16 @@ extension WalletPaymentInfo {
 		return String(localized: "No description", comment: "placeholder text")
 	}
 	
+	func hasAttachedMessage() -> Bool {
+		return attachedMessage() != nil
+	}
+	
 	func attachedMessage() -> String? {
 		
 		var msg: String? = nil
 		
 		if let incomingOfferMetadata = payment.incomingOfferMetadata() {
-			msg = incomingOfferMetadata.payerNote
+			msg = incomingOfferMetadata.payerNote_
 			
 		} else if let outgoingInvoiceRequest = payment.outgoingInvoiceRequest() {
 			msg = outgoingInvoiceRequest.payerNote
@@ -197,6 +201,40 @@ extension WalletPaymentInfo {
 		} else {
 			return nil
 		}
+	}
+	
+	func canAddToContacts() -> Bool {
+		return addToContactsInfo() != nil
+	}
+	
+	func addToContactsInfo() -> AddToContactsInfo? {
+	
+		if let incoming = payment as? Lightning_kmpIncomingPayment {
+			if let metadata = payment.incomingOfferMetadataV2() {
+				if let rawSecret = metadata.contactSecret {
+					let offer = metadata.payerOffer
+					let address = metadata.payerAddress?.description()
+					if (offer != nil) || (address != nil) {
+						let secret = ContactSecret(
+							id: rawSecret,
+							incomingPaymentId: incoming.paymentHash,
+							createdAt: Date.now.toInstant()
+						)
+						return AddToContactsInfo(offer: offer, address: address, secret: secret)
+					}
+				}
+			}
+			
+		} else if payment is Lightning_kmpOutgoingPayment {
+			// Todo: check for lightning address (requires db change in metadata table)
+			
+			let invoiceRequest = payment.outgoingInvoiceRequest()
+			if let offer = invoiceRequest?.offer {
+				return AddToContactsInfo(offer: offer, address: nil, secret: nil)
+			}
+		}
+
+		return nil
 	}
 }
 

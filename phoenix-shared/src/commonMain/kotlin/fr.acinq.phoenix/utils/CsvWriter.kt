@@ -146,10 +146,7 @@ class CsvWriter {
                     is LightningOutgoingPayment -> when (val details = payment.details) {
                         is LightningOutgoingPayment.Details.Normal -> "Outgoing LN payment to ${details.paymentRequest.nodeId.toHex()}"
                         is LightningOutgoingPayment.Details.SwapOut -> "Outgoing Swap to ${details.address}"
-                        is LightningOutgoingPayment.Details.Blinded -> {
-                            details.paymentRequest.invoiceRequest.offer.contactNodeIds.firstOrNull()?.let { "Outgoing LN payment (offer) to ${it.toHex()}" }
-                                ?: "Outgoing LN payment (offer)"
-                        }
+                        is LightningOutgoingPayment.Details.Blinded -> "Outgoing LN payment (offer)"
                     }
                     is SpliceOutgoingPayment -> "Outgoing splice to ${payment.address}"
                     is ChannelCloseOutgoingPayment -> "Channel closing to ${payment.address}"

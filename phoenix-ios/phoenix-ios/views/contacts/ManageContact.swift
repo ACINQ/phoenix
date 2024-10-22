@@ -8,7 +8,7 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-struct OfferRow: Identifiable {
+fileprivate struct OfferRow: Identifiable {
 	let raw: ContactOffer
 	let identifier: String
 	let label: String
@@ -28,7 +28,7 @@ struct OfferRow: Identifiable {
 	}
 }
 
-struct AddressRow: Identifiable {
+fileprivate struct AddressRow: Identifiable {
 	let raw: ContactAddress
 	let identifier: String
 	let label: String
@@ -48,7 +48,7 @@ struct AddressRow: Identifiable {
 	}
 }
 
-enum InvalidReason {
+fileprivate enum InvalidReason {
 	case invalidFormat
 	case localDuplicate
 	case databaseDuplicate(contact: ContactInfo)
@@ -72,31 +72,34 @@ struct ManageContact: View {
 	let contact: ContactInfo?
 	let contactUpdated: (ContactInfo?) -> Void
 	
-	@State var name: String
-	@State var trustedContact: Bool
-	@State var showImageOptions: Bool = false
-	@State var pickerResult: PickerResult?
-	@State var doNotUseDiskImage: Bool = false
+	@State private var name: String
+	@State private var trustedContact: Bool
+	@State private var showImageOptions: Bool = false
+	@State private var pickerResult: PickerResult?
+	@State private var doNotUseDiskImage: Bool = false
 	
-	@State var isSaving: Bool = false
-	@State var showDiscardChangesConfirmationDialog: Bool = false
-	@State var showDeleteContactConfirmationDialog: Bool = false
+	@State private var isSaving: Bool = false
+	@State private var showDiscardChangesConfirmationDialog: Bool = false
+	@State private var showDeleteContactConfirmationDialog: Bool = false
 	
-	@State var offers: [OfferRow]
-	@State var offers_hasChanges: Bool
+	@State private var offers: [OfferRow]
+	@State private var offers_hasChanges: Bool
 	
-	@State var editOffer_index: Int? = nil
-	@State var editOffer_label: String = ""
-	@State var editOffer_text: String = ""
-	@State var editOffer_invalidReason: InvalidReason? = nil
+	@State private var editOffer_index: Int? = nil
+	@State private var editOffer_label: String = ""
+	@State private var editOffer_text: String = ""
+	@State private var editOffer_invalidReason: InvalidReason? = nil
 	
-	@State var addresses: [AddressRow]
-	@State var addresses_hasChanges: Bool
+	@State private var addresses: [AddressRow]
+	@State private var addresses_hasChanges: Bool
 	
-	@State var editAddress_index: Int? = nil
-	@State var editAddress_label: String = ""
-	@State var editAddress_text: String = ""
-	@State var editAddress_invalidReason: InvalidReason? = nil
+	@State private var editAddress_index: Int? = nil
+	@State private var editAddress_label: String = ""
+	@State private var editAddress_text: String = ""
+	@State private var editAddress_invalidReason: InvalidReason? = nil
+	
+	@State private var secrets: [ContactSecret]
+	@State private var secrets_hasChanges: Bool
 	
 	enum FooterType: Int {
 		case expanded_standard = 1
@@ -147,8 +150,7 @@ struct ManageContact: View {
 	init(
 		location: Location,
 		popTo: ((PopToDestination) -> Void)?,
-		offer: Lightning_kmpOfferTypesOffer?,
-		address: String?,
+		info: AddToContactsInfo?,
 		contact: ContactInfo?,
 		contactUpdated: @escaping (ContactInfo?) -> Void
 	) {
@@ -161,48 +163,78 @@ struct ManageContact: View {
 		self._trustedContact = State(initialValue: contact?.useOfferKey ?? DEFAULT_TRUSTED)
 		
 		do {
-			var set = Set<String>()
+			var set = Set<Bitcoin_kmpByteVector32>()
 			var rows = Array<OfferRow>()
 			
-			if let offer {
-				let offerStr = offer.encode()
-				set.insert(offerStr)
-				let raw = ContactOffer(offer: offer, label: "", createdAt: Date.now.toInstant())
-				rows.append(OfferRow(raw: raw, isReadonly: true))
-			}
 			if let contact {
 				for offer in contact.offers {
-					let offerStr = offer.offer.encode()
-					if !set.contains(offerStr) {
-						set.insert(offerStr)
+					if !set.contains(offer.id) {
+						set.insert(offer.id)
 						rows.append(OfferRow(raw: offer, isReadonly: false))
 					}
 				}
 			}
+			var hasNewOffer = false
+			if let newOffer = info?.offer {
+				let offer = ContactOffer(offer: newOffer, label: "", createdAt: Date.now.toInstant())
+				if !set.contains(offer.id) {
+					set.insert(offer.id)
+					rows.append(OfferRow(raw: offer, isReadonly: true))
+					hasNewOffer = true
+				}
+			}
 			
 			self._offers = State(initialValue: rows)
-			self._offers_hasChanges = State(initialValue: (contact != nil && offer != nil))
+			self._offers_hasChanges = State(initialValue: (contact != nil && hasNewOffer))
 		}
 		do {
-			var set = Set<String>()
+			var set = Set<Bitcoin_kmpByteVector32>()
 			var rows = Array<AddressRow>()
 			
-			if let address {
-				set.insert(address)
-				let raw = ContactAddress(address: address, label: "", createdAt: Date.now.toInstant())
-				rows.append(AddressRow(raw: raw, isReadonly: true))
-			}
 			if let contact {
 				for address in contact.addresses {
-					if !set.contains(address.address) {
-						set.insert(address.address)
+					if !set.contains(address.id) {
+						set.insert(address.id)
 						rows.append(AddressRow(raw: address, isReadonly: false))
 					}
 				}
 			}
+			var hasNewAddress = false
+			if let newAddress = info?.address {
+				let address = ContactAddress(address: newAddress, label: "", createdAt: Date.now.toInstant())
+				if !set.contains(address.id) {
+					set.insert(address.id)
+					rows.append(AddressRow(raw: address, isReadonly: true))
+					hasNewAddress = true
+				}
+			}
 			
 			self._addresses = State(initialValue: rows)
-			self._addresses_hasChanges = State(initialValue: (contact != nil && address != nil))
+			self._addresses_hasChanges = State(initialValue: (contact != nil && hasNewAddress))
+		}
+		do {
+			var set = Set<Bitcoin_kmpByteVector32>()
+			var secrets = Array<ContactSecret>()
+			
+			if let contact {
+				for secret in contact.secrets {
+					if !set.contains(secret.id) {
+						set.insert(secret.id)
+						secrets.append(secret)
+					}
+				}
+			}
+			var hasNewSecret = false
+			if let newSecret = info?.secret {
+				if !set.contains(newSecret.id) {
+					set.insert(newSecret.id)
+					secrets.append(newSecret)
+					hasNewSecret = true
+				}
+			}
+			
+			self._secrets = State(initialValue: secrets)
+			self._secrets_hasChanges = State(initialValue: (contact != nil && hasNewSecret))
 		}
 	}
 	
@@ -382,6 +414,9 @@ struct ManageContact: View {
 				content_trusted()
 				content_offers()
 				content_addresses()
+			#if DEBUG
+				content_secrets()
+			#endif
 			} // </VStack>
 			.padding()
 		} // </ScrollView>
@@ -410,10 +445,6 @@ struct ManageContact: View {
 			}
 			.frame(width: IMG_SIZE, height: IMG_SIZE)
 			.clipShape(Circle())
-		//	.padding(.all, 1)
-		//	.background(
-		//		Circle().fill(Color.textFieldBorder)
-		//	)
 			.onTapGesture {
 				if !isSaving {
 					showImageOptions = true
@@ -518,6 +549,7 @@ struct ManageContact: View {
 				} label: {
 					Image(systemName: "plus")
 				}
+				.disabled(isSaving)
 			} // </HStack>
 			
 			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
@@ -701,6 +733,7 @@ struct ManageContact: View {
 					} label: {
 						Text("Done")
 					}
+					.disabled(isSaving)
 				}
 				
 			} // </VStack>
@@ -723,6 +756,7 @@ struct ManageContact: View {
 				} label: {
 					Image(systemName: "plus")
 				}
+				.disabled(isSaving)
 			} // </HStack>
 			
 			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
@@ -911,12 +945,74 @@ struct ManageContact: View {
 					} label: {
 						Text("Done")
 					}
+					.disabled(isSaving)
 				}
 				
 			} // </VStack>
 			.font(.subheadline)
 			
 		} // </HStack>
+		.padding(.top, ROW_VERTICAL_SPACING)
+	}
+	
+	@ViewBuilder
+	func content_secrets() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Text("Secrets: (DEBUG build only)")
+				Spacer(minLength: 0)
+			} // </HStack>
+			
+			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+				ForEach(0 ..< secrets.count, id: \.self) { idx in
+					content_secret_row(idx)
+				} // </ForEach>
+			} // </VStack>
+			
+			if secrets.isEmpty {
+				content_secret_emptyRow()
+			}
+			
+		} // </VStack>
+		.padding(.bottom, 30)
+	}
+	
+	@ViewBuilder
+	func content_secret_row(_ index: Int) -> some View {
+		
+		let row: ContactSecret = secrets[index]
+		
+		HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+			
+			bullet()
+			
+			VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+				Text(row.id.toHex())
+					.foregroundStyle(Color.primary)
+				Text(verbatim: "incomingPaymentId: \( row.incomingPaymentId?.toHex() ?? "<nil>" )")
+					.foregroundStyle(Color.secondary)
+			}
+			.lineLimit(1)
+			.truncationMode(.middle)
+			.font(.callout)
+			
+		}
+		.padding(.top, ROW_VERTICAL_SPACING)
+	}
+	
+	@ViewBuilder
+	func content_secret_emptyRow() -> some View {
+		
+		HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+			bullet()
+			Text("none")
+				.lineLimit(1)
+				.foregroundStyle(Color.secondary)
+				.layoutPriority(-1)
+				.font(.callout)
+		}
 		.padding(.top, ROW_VERTICAL_SPACING)
 	}
 	
@@ -1276,10 +1372,7 @@ struct ManageContact: View {
 		if doNotUseDiskImage {
 			return true
 		}
-		if offers_hasChanges {
-			return true
-		}
-		if addresses_hasChanges {
+		if offers_hasChanges || addresses_hasChanges || secrets_hasChanges {
 			return true
 		}
 		
@@ -1431,6 +1524,23 @@ struct ManageContact: View {
 		}
 	}
 	
+	func close() {
+		log.trace("close()")
+		
+		switch location {
+		case .smartModal:
+			smartModalState.close()
+		case .sheet:
+			presentationMode.wrappedValue.dismiss()
+		case .embedded:
+			presentationMode.wrappedValue.dismiss()
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Actions: Database
+	// --------------------------------------------------
+	
 	func saveContact() {
 		log.trace("saveContact()")
 		
@@ -1459,8 +1569,11 @@ struct ManageContact: View {
 					photoUri: newPhotoName,
 					useOfferKey: updatedUseOfferKey,
 					offers: offers.map { $0.raw },
-					addresses: addresses.map { $0.raw }
+					addresses: addresses.map { $0.raw },
+					secrets: secrets
 				)
+				
+				log.debug("updatedContact.secrets.count: \(updatedContact.secrets.count)")
 				
 				try await Biz.business.contactsManager.saveContact(contact: updatedContact)
 				
@@ -1502,19 +1615,6 @@ struct ManageContact: View {
 			contactUpdated(nil)
 			
 		} // </Task>
-	}
-	
-	func close() {
-		log.trace("close()")
-		
-		switch location {
-		case .smartModal:
-			smartModalState.close()
-		case .sheet:
-			presentationMode.wrappedValue.dismiss()
-		case .embedded:
-			presentationMode.wrappedValue.dismiss()
-		}
 	}
 	
 	// --------------------------------------------------

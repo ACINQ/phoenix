@@ -1608,8 +1608,7 @@ struct ValidateView: View {
 			ManageContact(
 				location: .smartModal,
 				popTo: nil,
-				offer: nil,
-				address: nil,
+				info: nil,
 				contact: contact,
 				contactUpdated: contactUpdated
 			)
@@ -1636,27 +1635,28 @@ struct ValidateView: View {
 			return
 		}
 		
+		let info = AddToContactsInfo(offer: offer, address: address, secret: nil)
+		
 		let count: Int = Biz.business.contactsManager.contactsListCurrentValue().count
 		if count == 0 {
 			// User doesn't have any contacts.
 			// No choice but to create a new contact.
-			addContact_createNew(address, offer)
+			addContact_createNew(info)
 			
 		} else {
 			
 			dismissKeyboardIfVisible()
 			smartModalState.display(dismissable: true) {
 				AddContactOptionsSheet(
-					createNewContact: { addContact_createNew(address, offer) },
-					addToExistingContact: { addContact_selectExisting(address, offer) }
+					createNewContact: { addContact_createNew(info) },
+					addToExistingContact: { addContact_selectExisting(info) }
 				)
 			}
 		}
 	}
 	
 	private func addContact_createNew(
-		_ address: String?,
-		_ offer: Lightning_kmpOfferTypesOffer?
+		_ info: AddToContactsInfo
 	) {
 		log.trace("addContact_createNew()")
 		
@@ -1665,8 +1665,7 @@ struct ValidateView: View {
 			ManageContact(
 				location: .smartModal,
 				popTo: nil,
-				offer: offer,
-				address: address,
+				info: info,
 				contact: nil,
 				contactUpdated: contactUpdated
 			)
@@ -1674,8 +1673,7 @@ struct ValidateView: View {
 	}
 	
 	private func addContact_selectExisting(
-		_ address: String?,
-		_ offer: Lightning_kmpOfferTypesOffer?
+		_ info: AddToContactsInfo
 	) {
 		log.trace("addContact_selectExisting()")
 		
@@ -1684,7 +1682,7 @@ struct ValidateView: View {
 			ContactsListSheet(didSelectContact: { existingContact in
 				log.debug("didSelectContact")
 				smartModalState.onNextDidDisappear {
-					addContact_addToExisting(existingContact, address, offer)
+					addContact_addToExisting(existingContact, info)
 				}
 			})
 		}
@@ -1692,8 +1690,7 @@ struct ValidateView: View {
 	
 	private func addContact_addToExisting(
 		_ existingContact: ContactInfo,
-		_ address: String?,
-		_ offer: Lightning_kmpOfferTypesOffer?
+		_ info: AddToContactsInfo
 	) {
 		log.trace("addContact_addToExisting()")
 		
@@ -1702,8 +1699,7 @@ struct ValidateView: View {
 			ManageContact(
 				location: .smartModal,
 				popTo: nil,
-				offer: offer,
-				address: address,
+				info: info,
 				contact: existingContact,
 				contactUpdated: contactUpdated
 			)
@@ -1756,7 +1752,7 @@ struct ValidateView: View {
 			sendPayment_bolt11Invoice(model, msat)
 			
 		} else if let model = flow as? SendManager.ParseResult_Bolt12Offer {
-			sendPayment_bolt12Offer_C(model, msat)
+			sendPayment_bolt12Offer(model, msat)
 			
 		} else if let model = flow as? SendManager.ParseResult_Uri {
 			sendPayment_onChain(model, msat)
@@ -1803,29 +1799,11 @@ struct ValidateView: View {
 		} // </Task>
 	}
 	
-	func sendPayment_bolt12Offer_test(
+	func sendPayment_bolt12Offer(
 		_ model: SendManager.ParseResult_Bolt12Offer,
 		_ msat: Int64
 	) {
-		log.trace("sendPayment_bolt12Offer()_test")
-		
-		guard !paymentInProgress else {
-			log.warning("ignore: payment already in progress")
-			return
-		}
-		
-		paymentInProgress = true
-		DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) {
-			paymentInProgress = false
-			payOfferProblem = .noResponse
-		}
-	}
-	
-	func sendPayment_bolt12Offer_B(
-		_ model: SendManager.ParseResult_Bolt12Offer,
-		_ msat: Int64
-	) {
-		log.trace("sendPayment_bolt12Offer_B()")
+		log.trace("sendPayment_bolt12Offer()")
 		
 		guard !paymentInProgress else {
 			log.warning("ignore: payment already in progress")
@@ -1847,76 +1825,53 @@ struct ValidateView: View {
 				Biz.beginLongLivedTask(id: paymentId.description())
 				
 				let payerKey: Bitcoin_kmpPrivateKey
-				if contact?.useOfferKey ?? false {
-					let offerData = try await Biz.business.nodeParamsManager.defaultOffer()
-					payerKey = offerData.payerKey
-				} else {
-					payerKey = Lightning_randomKey()
-				}
+				let contactSecret: Bitcoin_kmpByteVector32?
 				
-				let result: Lightning_kmpSendPaymentResult = try await peer.altPayOffer(
-					paymentId: paymentId,
-					amount: Lightning_kmpMilliSatoshi(msat: msat),
-					offer: model.offer,
-					payerKey: payerKey,
-					payerNote: payerNote,
-					fetchInvoiceTimeoutInSeconds: 30
-				)
-				
-				paymentInProgress = false
-				
-				switch onEnum(of: result) {
-				case .offerNotPaid(let offerNotPaid):
-					let problem = PayOfferProblem.fromResponse(offerNotPaid)
-					payOfferProblem = problem
-					Biz.endLongLivedTask(id: paymentId.description())
+				if let contact, contact.useOfferKey {
+					let offerAndKey: Lightning_kmpOfferTypesOfferAndKey =
+						try await Biz.business.nodeParamsManager.defaultOffer()
+										
+					payerKey = offerAndKey.privateKey
 					
-				case .paymentNotSent(_): fallthrough
-				case .paymentSent(_):
-					payOfferProblem = nil
-					popToRootView()
-				}
-				
-			} catch {
-				log.error("peer.payOffer(): error: \(error)")
-				
-				paymentInProgress = false
-				payOfferProblem = .other
-			}
-		} // </Task>
-	}
-	
-	func sendPayment_bolt12Offer_C(
-		_ model: SendManager.ParseResult_Bolt12Offer,
-		_ msat: Int64
-	) {
-		log.trace("sendPayment_bolt12Offer_C()")
-		
-		guard !paymentInProgress else {
-			log.warning("ignore: payment already in progress")
-			return
-		}
-		guard let peer = Biz.business.peerManager.peerStateValue() else {
-			log.warning("ignore: peer == nil")
-			return
-		}
-		
-		paymentInProgress = true
-		payOfferProblem = nil
-		let payerNote = comment.isEmpty ? nil : comment
-		
-		saveTipPercentInPrefs()
-		Task { @MainActor in
-			do {
-				let paymentId = Lightning_kmpUUID.companion.randomUUID()
-				Biz.beginLongLivedTask(id: paymentId.description())
-				
-				let payerKey: Bitcoin_kmpPrivateKey
-				if contact?.useOfferKey ?? false {
-					let offerData = try await Biz.business.nodeParamsManager.defaultOffer()
-					payerKey = offerData.payerKey
+					if let existingSecret = contact.secrets.first {
+						// We already have a known secret with this contact.
+						// This could be because:
+						// A) we added the contact from an incoming payment which contained a secet
+						// B) we've already sent them a payment, and generated the secret in the past
+						contactSecret = existingSecret.id
+						
+					} else {
+						// Generate a new secret using the recommended derivation algorithm.
+						let rawSecret: Lightning_kmpContactSecrets =
+							LightningExposureKt.Contacts_computeContactSecret(
+								ourOffer: offerAndKey,
+								theirOffer: model.offer
+							)
+						
+						// Store the new secret to the database
+						let newSecret = ContactSecret(
+							id: rawSecret.primarySecret,
+							incomingPaymentId: nil,
+							createdAt: Date.now.toInstant()
+						)
+						let updatedContact = contact.doCopy(
+							id          : contact.id,
+							name        : contact.name,
+							photoUri    : contact.photoUri,
+							useOfferKey : contact.useOfferKey,
+							offers      : contact.offers,
+							addresses   : contact.addresses,
+							secrets     : contact.secrets + [newSecret]
+						)
+						try await Biz.business.contactsManager.saveContact(contact: updatedContact)
+						
+						// Use the newly generated secret for this payment
+						contactSecret = newSecret.id
+					}
+					
 				} else {
 					payerKey = Lightning_randomKey()
+					contactSecret = nil
 				}
 				
 				let response: Lightning_kmpOfferNotPaid? = try await peer.betterPayOffer(
@@ -1925,6 +1880,7 @@ struct ValidateView: View {
 					offer: model.offer,
 					payerKey: payerKey,
 					payerNote: payerNote,
+					contactSecret: contactSecret,
 					fetchInvoiceTimeoutInSeconds: 30
 				)
 				

@@ -317,6 +317,8 @@
 		DCD7E0AF28EC3C0D009C30E5 /* WatchTower.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD7E0AE28EC3C0D009C30E5 /* WatchTower.swift */; };
 		DCD7E0F128ED89A0009C30E5 /* GlobalEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD7E0F028ED89A0009C30E5 /* GlobalEnvironment.swift */; };
 		DCDAA7402971C29700B406A8 /* RecentPaymentsSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDAA73F2971C29700B406A8 /* RecentPaymentsSelector.swift */; };
+		DCDB97FA2CCA9DFC0097CBD9 /* AddToContactsInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDB97F92CCA9DF70097CBD9 /* AddToContactsInfo.swift */; };
+		DCDB97FB2CCA9EBD0097CBD9 /* AddToContactsInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDB97F92CCA9DF70097CBD9 /* AddToContactsInfo.swift */; };
 		DCDD9ECB28637242001800A3 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDD9ECA28637242001800A3 /* MainView.swift */; };
 		DCDD9ECE28637474001800A3 /* Orientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDD9ECD28637474001800A3 /* Orientation.swift */; };
 		DCDD9ED0286377B7001800A3 /* MainView_Big.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDD9ECF286377B7001800A3 /* MainView_Big.swift */; };
@@ -707,6 +709,7 @@
 		DCD7E0AE28EC3C0D009C30E5 /* WatchTower.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchTower.swift; sourceTree = "<group>"; };
 		DCD7E0F028ED89A0009C30E5 /* GlobalEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalEnvironment.swift; sourceTree = "<group>"; };
 		DCDAA73F2971C29700B406A8 /* RecentPaymentsSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentPaymentsSelector.swift; sourceTree = "<group>"; };
+		DCDB97F92CCA9DF70097CBD9 /* AddToContactsInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddToContactsInfo.swift; sourceTree = "<group>"; };
 		DCDD9ECA28637242001800A3 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		DCDD9ECD28637474001800A3 /* Orientation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Orientation.swift; sourceTree = "<group>"; };
 		DCDD9ECF286377B7001800A3 /* MainView_Big.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView_Big.swift; sourceTree = "<group>"; };
@@ -1051,6 +1054,7 @@
 		DC3345CE2C2B4BED00EDD2D4 /* contacts */ = {
 			isa = PBXGroup;
 			children = (
+				DCDB97F92CCA9DF70097CBD9 /* AddToContactsInfo.swift */,
 				DC3345CF2C2B4C1200EDD2D4 /* ManageContact.swift */,
 				DC5567442C2F1A6900008E11 /* ContactsList.swift */,
 				DC9933312CC03D7500EB3100 /* ContactsListSheet.swift */,
@@ -1834,6 +1838,7 @@
 				DCACF6FE2566D0BA0009B01E /* GenericPasswordConvertible.swift in Sources */,
 				DC949E6A2B45B1EC00E80BB5 /* LiquidityAdsHelp.swift in Sources */,
 				DC33369826BAF721000E3F49 /* ShortSheet.swift in Sources */,
+				DCDB97FA2CCA9DFC0097CBD9 /* AddToContactsInfo.swift in Sources */,
 				DC3780412C077E0300937C8E /* PriorityBoxStyle.swift in Sources */,
 				DC3FDCAF2C3306AB002C5931 /* LightningDualView.swift in Sources */,
 				DC99E90925B78FA800FB20F7 /* EnabledSecurity.swift in Sources */,
@@ -2158,6 +2163,7 @@
 				DC641C78282171EA00862DCD /* KotlinAssociatedObject.swift in Sources */,
 				DC5631C82C59466000DCB5BF /* KotlinExtensions+Manager.swift in Sources */,
 				DCCFE6B32B680DF5002FFF11 /* LoggerFactory.swift in Sources */,
+				DCDB97FB2CCA9EBD0097CBD9 /* AddToContactsInfo.swift in Sources */,
 				DCA6DECA2829C31B0073C658 /* KeyStoreError.swift in Sources */,
 				DC49FE9D2AC49E0800D8D2E2 /* KotlinExtensions+Bitcoin.swift in Sources */,
 				DC422F3629392C0000E72253 /* Int+ToDate.swift in Sources */,

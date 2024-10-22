@@ -198,8 +198,7 @@ struct ContactsList: View {
 			ManageContact(
 				location: .embedded,
 				popTo: popToWrapper,
-				offer: nil,
-				address: nil,
+				info: nil,
 				contact: nil,
 				contactUpdated: { _ in }
 			)
@@ -209,8 +208,7 @@ struct ContactsList: View {
 				ManageContact(
 					location: .embedded,
 					popTo: popToWrapper,
-					offer: nil,
-					address: nil,
+					info: nil,
 					contact: selectedItem,
 					contactUpdated: { _ in }
 				)

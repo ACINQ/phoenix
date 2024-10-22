@@ -1,0 +1,17 @@
+-- Migration: v8 -> v9
+--
+-- Changes:
+-- * Added table contact_secrets
+-- * Added index on table: contact_secrets
+--
+
+CREATE TABLE IF NOT EXISTS contact_secrets (
+    secret_id BLOB NOT NULL PRIMARY KEY,
+    contact_id TEXT NOT NULL,
+    incoming_payment_id BLOB,
+    created_at INTEGER NOT NULL,
+
+    FOREIGN KEY(contact_id) REFERENCES contacts(id)
+);
+
+CREATE INDEX contact_id_index3 ON contact_secrets(contact_id);
