@@ -147,7 +147,8 @@ struct LiquidityPolicy: Equatable, Codable {
 				maxAbsoluteFee: effectiveMaxFee,
 				maxRelativeFeeBasisPoints: effectiveMaxFeeBasisPoints,
 				skipAbsoluteFeeCheck: effectiveSkipAbsoluteFeeCheck,
-				maxAllowedFeeCredit: effectiveMaxAllowedFeeCredit
+				maxAllowedFeeCredit: effectiveMaxAllowedFeeCredit,
+				considerOnlyMiningFeeForAbsoluteFeeCheck: false // keep this in check with the default value in lightning-kmp
 			)
 			
 		} else {

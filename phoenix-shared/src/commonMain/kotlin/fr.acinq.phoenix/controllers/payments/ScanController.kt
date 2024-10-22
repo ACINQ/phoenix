@@ -65,6 +65,7 @@ import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TimeSource
 
@@ -393,7 +394,7 @@ class AppScanController(
             paymentPreimage = Lightning.randomBytes32(),
             amount = intent.amount,
             description = Either.Left(intent.description ?: intent.lnurlWithdraw.defaultDescription),
-            expirySeconds = (3600 * 24 * 7).toLong(), // one week
+            expiry = 7.days
         )
 
         if (requestId != lnurlRequestId) {

@@ -494,6 +494,7 @@
     },
     "(completed) of (total)" : {
       "comment" : "Upload progress information",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -535,6 +536,7 @@
     },
     "(completed) of (total), pushing batch of (inFlight)" : {
       "comment" : "Upload progress information",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -618,6 +620,7 @@
     },
     "(count) payments within the last 2 hours" : {
       "comment" : "Recent payments footer",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -659,6 +662,7 @@
     },
     "(count) payments within the last 3 days" : {
       "comment" : "Recent payments footer",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -700,6 +704,7 @@
     },
     "(count) payments within the last 7 days" : {
       "comment" : "Recent payments footer",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -741,6 +746,7 @@
     },
     "(count) payments within the last 10 minutes" : {
       "comment" : "Recent payments footer",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -782,6 +788,7 @@
     },
     "(count) payments within the last 24 hours" : {
       "comment" : "Recent payments footer",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -823,6 +830,7 @@
     },
     "(count) payments within the last minute" : {
       "comment" : "Recent payments footer",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1472,6 +1480,7 @@
     },
     "(totalPaymentCount) in-flight payments" : {
       "comment" : "Recent payments footer",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1513,6 +1522,7 @@
     },
     "(totalPaymentCount) recent payments" : {
       "comment" : "Recent payments footer",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -6243,6 +6253,7 @@
     },
     "Amount must be (exactBitcoin.string)" : {
       "comment" : "error message",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -6284,6 +6295,7 @@
     },
     "Amount must be (exactBitcoin.string) (≈ (approxFiat.string))" : {
       "comment" : "error message",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -6325,6 +6337,7 @@
     },
     "Amount must be at least (minBitcoin.string)" : {
       "comment" : "error message",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -6366,6 +6379,7 @@
     },
     "Amount must be at least (minBitcoin.string) (≈ (approxFiat.string))" : {
       "comment" : "error message",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -6407,6 +6421,7 @@
     },
     "Amount must be at most (maxBitcoin.string)" : {
       "comment" : "error message",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -6448,6 +6463,7 @@
     },
     "Amount must be at most (maxBitcoin.string) (≈ (approxFiat.string))" : {
       "comment" : "error message",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -8679,7 +8695,7 @@
       }
     },
     "Bitcoin address" : {
-      "comment" : "TextField placeholder",
+      "comment" : "TextField placeholder\nType of text being copied",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -24563,6 +24579,7 @@
     },
     "Lightning fee amount: (percent), (amountBitcoin), ≈(amountFiat)" : {
       "comment" : "VoiceOver label: PaymentSummaryView",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -26981,6 +26998,7 @@
     },
     "Miner fee amount: (percent), (amountBitcoin), ≈(amountFiat)" : {
       "comment" : "VoiceOver label: PaymentSummaryView",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -32704,6 +32722,7 @@
 
     },
     "QR code" : {
+      "comment" : "Type of image being copied",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -42546,6 +42565,7 @@
     },
     "Tip amount: (percent), (amountBitcoin), ≈(amountFiat)" : {
       "comment" : "VoiceOver label: PaymentSummaryView",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -42587,6 +42607,7 @@
     },
     "tip amount: (tipBtcn), ≈(tipFiat), total amount: (ttlBtcn), ≈(ttlFiat)" : {
       "comment" : "VoiceOver information: Customize tip sheet",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -43360,6 +43381,7 @@
     },
     "Total amount: (amountBitcoin), ≈(amountFiat)" : {
       "comment" : "VoiceOver label: PaymentSummaryView",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -43401,6 +43423,7 @@
     },
     "total amount: (btcnAmt.string), ≈(fiatAmt.string)" : {
       "comment" : "VoiceOver hint",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -43484,6 +43507,7 @@
     },
     "total amount: ≈(btcnAmt.string)" : {
       "comment" : "VoiceOver hint",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
