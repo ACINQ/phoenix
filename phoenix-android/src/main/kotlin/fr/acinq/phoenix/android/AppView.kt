@@ -280,23 +280,28 @@ fun AppView(
                             navDeepLink { uriPattern = "scanview:{data}" },
                         )
                     ) {
-                        log.info("preparing send-payment with input=${it.arguments?.getString("input")}")
                         val intent = try {
                             it.arguments?.getParcelable<Intent>(NavController.KEY_DEEP_LINK_INTENT)
                         } catch (e: Exception) {
                             null
                         }
-                        val input = intent?.data?.toString()?.substringAfter("scanview:")?.takeIf {
-                            // prevents forwarding an internal deeplink intent coming from androidx-navigation framework.
-                            // TODO properly parse deeplinks following f0ae90444a23cc17d6d7407dfe43c0c8d20e62fc
-                            !it.contains("androidx.navigation")
-                        } ?: it.arguments?.getString("input")
-                        SendView(
-                            initialInput = input,
-                            onBackClick = { navController.popBackStack() },
-                            fromDeepLink = intent != null,
-                            immediatelyOpenScanner = it.arguments?.getBoolean("openScanner") ?: false
-                        )
+                        // prevents forwarding an internal deeplink intent coming from androidx-navigation framework.
+                        // TODO properly parse deeplinks following f0ae90444a23cc17d6d7407dfe43c0c8d20e62fc
+                        val isIntentFromNavigation = intent?.dataString?.contains("androidx.navigation") ?: true
+                        log.info("isIntentFromNavigation=$isIntentFromNavigation")
+                        val input = if (isIntentFromNavigation) {
+                            it.arguments?.getString("input")
+                        } else {
+                            intent?.data?.toString()?.substringAfter("scanview:")
+                        }
+                        log.info("preparing send-payment with input=$input")
+                        RequireStarted(walletState, nextUri = "scanview:${intent?.data?.toString()}") {
+                            SendView(
+                                initialInput = input,
+                                fromDeepLink = !isIntentFromNavigation,
+                                immediatelyOpenScanner = it.arguments?.getBoolean("openScanner") ?: false
+                            )
+                        }
                     }
                     composable(
                         route = "${Screen.PaymentDetails.route}?direction={direction}&id={id}&fromEvent={fromEvent}",

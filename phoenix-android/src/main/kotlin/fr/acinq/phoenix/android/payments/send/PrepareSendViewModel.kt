@@ -30,7 +30,6 @@ import com.google.zxing.RGBLuminanceSource
 import com.google.zxing.common.HybridBinarizer
 import com.google.zxing.multi.qrcode.QRCodeMultiReader
 import fr.acinq.lightning.payment.Bolt11Invoice
-import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.data.BitcoinUri
 import fr.acinq.phoenix.managers.SendManager
@@ -143,7 +142,7 @@ class PrepareSendViewModel(val sendManager: SendManager) : ViewModel() {
             parsePaymentState = when (result) {
                 is SendManager.ParseResult.BadRequest -> ParsePaymentState.ParsingFailure(result)
                 is SendManager.ParseResult.Success -> {
-                    log.info("successfully parsed $result from input=$input")
+                    log.info("parsed ${result.javaClass.simpleName} from input=$input")
                     when (result) {
                         is SendManager.ParseResult.Uri -> {
                             val bolt11 = result.uri.paymentRequest

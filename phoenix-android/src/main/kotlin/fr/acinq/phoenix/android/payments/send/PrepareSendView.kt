@@ -102,18 +102,21 @@ fun SendView(
     initialInput: String?,
     immediatelyOpenScanner: Boolean,
     fromDeepLink: Boolean,
-    onBackClick: () -> Unit,
 ) {
     val navController = navController
     val vm = viewModel<PrepareSendViewModel>(factory = PrepareSendViewModel.Factory(sendManager = business.sendManager))
     var showScanner by remember { mutableStateOf(immediatelyOpenScanner) }
     val keyboardManager = LocalSoftwareKeyboardController.current
 
-    val onPaymentBackClick: () -> Unit = {
+    val onBackClick: () -> Unit = {
         if (fromDeepLink) {
             navController.popToHome()
         } else {
-            vm.resetParsing()
+            if (vm.parsePaymentState is ParsePaymentState.Ready) {
+                navController.popBackStack()
+            } else {
+                vm.resetParsing()
+            }
         }
     }
 
@@ -121,19 +124,19 @@ fun SendView(
         // if payment data has been successfully parsed, redirect to the relevant payment screen
         is ParsePaymentState.Success -> when (val data = parseState.data) {
             is SendManager.ParseResult.Bolt11Invoice -> {
-                SendToBolt11View(invoice = data.invoice, onBackClick = onPaymentBackClick, onPaymentSent = { navController.popToHome() })
+                SendToBolt11View(invoice = data.invoice, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() })
             }
             is SendManager.ParseResult.Bolt12Offer -> {
-                SendToOfferView(offer = data.offer, onBackClick = onPaymentBackClick, onPaymentSent = { navController.popToHome() })
+                SendToOfferView(offer = data.offer, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() })
             }
             is SendManager.ParseResult.Uri -> {
-                SendSpliceOutView(requestedAmount = data.uri.amount, address = data.uri.address, onBackClick = onPaymentBackClick, onSpliceOutSuccess = {navController.popToHome() })
+                SendSpliceOutView(requestedAmount = data.uri.amount, address = data.uri.address, onBackClick = onBackClick, onSpliceOutSuccess = {navController.popToHome() })
             }
             is SendManager.ParseResult.Lnurl.Pay -> {
-                LnurlPayView(payIntent = data.paymentIntent, onPaymentBackClick, onPaymentSent = { navController.popToHome() })
+                LnurlPayView(payIntent = data.paymentIntent, onBackClick, onPaymentSent = { navController.popToHome() })
             }
             is SendManager.ParseResult.Lnurl.Withdraw -> {
-                LnurlWithdrawView(withdraw = data.lnurlWithdraw, onBackClick = onPaymentBackClick, onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) }, onWithdrawDone = { navController.popToHome()})
+                LnurlWithdrawView(withdraw = data.lnurlWithdraw, onBackClick = onBackClick, onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) }, onWithdrawDone = { navController.popToHome()})
             }
             is SendManager.ParseResult.Lnurl.Auth -> {
                 LnurlAuthView(auth = data.auth, onBackClick = { navController.popBackStack() }, onChangeAuthSchemeSettingClick = { navController.navigate("${Screen.PaymentSettings.route}?showAuthSchemeDialog=true") },
@@ -190,14 +193,20 @@ fun SendView(
 
 @Composable
 private fun PrepareSendView(
-    onBackClick: () -> Unit,
     initialInput: String?,
     vm: PrepareSendViewModel,
+    onBackClick: () -> Unit,
     onShowScanner: () -> Unit
 ) {
     val context = LocalContext.current
     var freeFormInput by remember { mutableStateOf(initialInput ?: "") }
     val parsePaymentState = vm.parsePaymentState
+
+    LaunchedEffect(key1 = Unit) {
+        if (initialInput != null) {
+            vm.parsePaymentData(initialInput)
+        }
+    }
 
     DefaultScreenLayout(isScrollable = false) {
         DefaultScreenHeader(title = "Send", onBackClick = onBackClick)
@@ -214,7 +223,6 @@ private fun PrepareSendView(
         }
 
         SendSmartInput(
-            value = freeFormInput,
             onValueChange = {
                 if (it.isBlank()) { vm.resetParsing() }
                 freeFormInput = it
@@ -253,7 +261,7 @@ private fun PrepareSendView(
         // bottom buttons
         SendButtonsRow(
             onSubmit = {
-                freeFormInput = it
+                freeFormInput = ""
                 vm.parsePaymentData(it)
             },
             readImageState = vm.readImageState,

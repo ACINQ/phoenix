@@ -76,13 +76,12 @@ val domains = listOf(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SendSmartInput(
-    value: String,
     onValueChange: (String) -> Unit,
     onValueSubmit: () -> Unit,
     isProcessing: Boolean,
     isError: Boolean,
 ) {
-    var textFieldValue by remember(value) { mutableStateOf(TextFieldValue(text = value, selection = TextRange(value.length))) }
+    var textFieldValue by remember { mutableStateOf(TextFieldValue(text = "", selection = TextRange.Zero)) }
 
     Row(
         modifier = Modifier.padding(horizontal = 12.dp),
@@ -138,7 +137,7 @@ fun SendSmartInput(
                 visualTransformation = VisualTransformation.None,
                 decorationBox = @Composable { innerTextField ->
                     TextFieldDefaults.OutlinedTextFieldDecorationBox(
-                        value = value,
+                        value = textFieldValue.text,
                         visualTransformation = VisualTransformation.None,
                         innerTextField = innerTextField,
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
@@ -151,7 +150,7 @@ fun SendSmartInput(
                             )
                         },
                         trailingIcon = {
-                            if (value.isNotEmpty()) {
+                            if (textFieldValue.text.isNotEmpty()) {
                                 FilledButton(
                                     onClick = {
                                         textFieldValue = TextFieldValue("")
