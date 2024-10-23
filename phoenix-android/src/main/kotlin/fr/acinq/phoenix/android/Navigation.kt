@@ -47,6 +47,7 @@ sealed class Screen(val route: String) {
     data object Channels : Screen("settings/channels")
     data object ChannelDetails : Screen("settings/channeldetails")
     data object ImportChannelsData : Screen("settings/importchannels")
+    data object SpendChannelAddress : Screen("settings/spendchanneladdress")
     data object MutualClose : Screen("settings/mutualclose")
     data object ForceClose : Screen("settings/forceclose")
     data object Preferences : Screen("settings/preferences")
