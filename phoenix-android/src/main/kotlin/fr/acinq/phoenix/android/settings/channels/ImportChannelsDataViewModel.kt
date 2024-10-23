@@ -23,8 +23,8 @@ import androidx.lifecycle.viewModelScope
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.managers.PeerManager
-import fr.acinq.phoenix.utils.import.ChannelsImportHelper
-import fr.acinq.phoenix.utils.import.ChannelsImportResult
+import fr.acinq.phoenix.utils.channels.ChannelsImportHelper
+import fr.acinq.phoenix.utils.channels.ChannelsImportResult
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

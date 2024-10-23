@@ -63,6 +63,7 @@ fun ChannelsView(
     onBackClick: () -> Unit,
     onChannelClick: (String) -> Unit,
     onImportChannelsDataClick: () -> Unit,
+    onSpendFromChannelBalance: () -> Unit,
 ) {
     val channelsState by business.peerManager.channelsFlow.collectAsState()
     val balance by business.balanceManager.balance.collectAsState()
@@ -78,10 +79,10 @@ fun ChannelsView(
                 Box(contentAlignment = Alignment.TopEnd) {
                     DropdownMenu(expanded = showAdvancedMenuPopIn, onDismissRequest = { showAdvancedMenuPopIn = false }) {
                         DropdownMenuItem(onClick = onImportChannelsDataClick, contentPadding = PaddingValues(horizontal = 12.dp)) {
-                            Text(
-                                text = stringResource(R.string.channelsview_menu_import_channels),
-                                style = MaterialTheme.typography.body1,
-                            )
+                            Text(text = stringResource(R.string.channelsview_menu_import_channels), style = MaterialTheme.typography.body1)
+                        }
+                        DropdownMenuItem(onClick = onSpendFromChannelBalance, contentPadding = PaddingValues(horizontal = 12.dp)) {
+                            Text(text = stringResource(R.string.channelsview_menu_spend_channel_balance), style = MaterialTheme.typography.body1)
                         }
                     }
                     Button(

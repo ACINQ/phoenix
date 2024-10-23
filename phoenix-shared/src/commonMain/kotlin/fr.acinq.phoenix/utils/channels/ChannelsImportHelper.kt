@@ -1,4 +1,4 @@
-package fr.acinq.phoenix.utils.import
+package fr.acinq.phoenix.utils.channels
 
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.lightning.channel.states.PersistedChannelState

@@ -41,7 +41,7 @@ import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.utils.positiveColor
-import fr.acinq.phoenix.utils.import.ChannelsImportResult
+import fr.acinq.phoenix.utils.channels.ChannelsImportResult
 
 @Composable
 fun ImportChannelsData(
