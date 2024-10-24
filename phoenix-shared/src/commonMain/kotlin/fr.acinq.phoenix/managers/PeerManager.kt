@@ -263,7 +263,7 @@ class PeerManager(
             }
         }
     }
-
+}
 
 /** The peer's swap-in wallet for Phoenix is always not null, because the client is always an [IElectrumClient] (see how this Peer is built in `PeerManager.init`). */
 val Peer.phoenixSwapInWallet: SwapInWallet
