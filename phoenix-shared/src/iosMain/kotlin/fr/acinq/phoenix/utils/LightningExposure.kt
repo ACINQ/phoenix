@@ -3,14 +3,20 @@ package fr.acinq.phoenix.utils
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.ByteVector64
+import fr.acinq.bitcoin.OutPoint
 import fr.acinq.bitcoin.PrivateKey
 import fr.acinq.bitcoin.Satoshi
+import fr.acinq.bitcoin.Script
 import fr.acinq.bitcoin.Transaction
 import fr.acinq.bitcoin.TxId
+import fr.acinq.bitcoin.TxIn
+import fr.acinq.bitcoin.TxOut
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.ChannelEvents
 import fr.acinq.lightning.DefaultSwapInParams
 import fr.acinq.lightning.Lightning
+import fr.acinq.lightning.Lightning.randomBytes32
+import fr.acinq.lightning.Lightning.randomKey
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.NodeEvents
@@ -46,6 +52,7 @@ import fr.acinq.lightning.payment.OutgoingPaymentFailure
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.copyTo
+import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toByteArray
 import fr.acinq.lightning.utils.toNSData
 import fr.acinq.lightning.wire.LiquidityAds
@@ -416,4 +423,12 @@ suspend fun Peer.betterPayOffer(
     }
     send(PayOffer(paymentId, payerKey, payerNote, amount, offer, fetchInvoiceTimeoutInSeconds.seconds))
     return res.await()
+}
+
+fun fakeWallet(amount: Satoshi, swapInParams: SwapInParams): WalletState.WalletWithConfirmations {
+    val txIn = listOf(TxIn(OutPoint(TxId(randomBytes32()), 2), 0))
+    val txOut = listOf(TxOut(amount, Script.pay2wpkh(randomKey().publicKey())))
+    val parentTx = Transaction(2, txIn, txOut, 0)
+    val utxo = WalletState.Utxo(parentTx.txid, 0, 42, parentTx, WalletState.AddressMeta.Single)
+    return WalletState.WalletWithConfirmations(swapInParams, 100, listOf(utxo))
 }

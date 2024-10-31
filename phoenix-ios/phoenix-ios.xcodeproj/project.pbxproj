@@ -95,7 +95,7 @@
 		DC370A892B7FBD7C0093C56F /* BtcAddrOptionsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC370A882B7FBD7C0093C56F /* BtcAddrOptionsSheet.swift */; };
 		DC370A8B2B7FFFC70093C56F /* SwapInAddresses.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC370A8A2B7FFFC70093C56F /* SwapInAddresses.swift */; };
 		DC3780392C04D60400937C8E /* KotlinEnums.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3780382C04D60400937C8E /* KotlinEnums.swift */; };
-		DC37803B2C050F7000937C8E /* SpendExpiredSwapIns.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC37803A2C050F7000937C8E /* SpendExpiredSwapIns.swift */; };
+		DC37803B2C050F7000937C8E /* SpendOnChainFunds.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC37803A2C050F7000937C8E /* SpendOnChainFunds.swift */; };
 		DC37803D2C05215600937C8E /* ScanBitcoinAddressSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC37803C2C05215600937C8E /* ScanBitcoinAddressSheet.swift */; };
 		DC37803F2C06338000937C8E /* BtcAddressInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC37803E2C06338000937C8E /* BtcAddressInput.swift */; };
 		DC3780412C077E0300937C8E /* PriorityBoxStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3780402C077E0300937C8E /* PriorityBoxStyle.swift */; };
@@ -515,7 +515,7 @@
 		DC370A882B7FBD7C0093C56F /* BtcAddrOptionsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcAddrOptionsSheet.swift; sourceTree = "<group>"; };
 		DC370A8A2B7FFFC70093C56F /* SwapInAddresses.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwapInAddresses.swift; sourceTree = "<group>"; };
 		DC3780382C04D60400937C8E /* KotlinEnums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinEnums.swift; sourceTree = "<group>"; };
-		DC37803A2C050F7000937C8E /* SpendExpiredSwapIns.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendExpiredSwapIns.swift; sourceTree = "<group>"; };
+		DC37803A2C050F7000937C8E /* SpendOnChainFunds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendOnChainFunds.swift; sourceTree = "<group>"; };
 		DC37803C2C05215600937C8E /* ScanBitcoinAddressSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanBitcoinAddressSheet.swift; sourceTree = "<group>"; };
 		DC37803E2C06338000937C8E /* BtcAddressInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BtcAddressInput.swift; sourceTree = "<group>"; };
 		DC3780402C077E0300937C8E /* PriorityBoxStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriorityBoxStyle.swift; sourceTree = "<group>"; };
@@ -1529,7 +1529,7 @@
 				DC43096D2A7953F400E28995 /* FinalWalletDetails.swift */,
 				DC43096F2A795F9900E28995 /* UtxoWrapper.swift */,
 				DC370A8A2B7FFFC70093C56F /* SwapInAddresses.swift */,
-				DC37803A2C050F7000937C8E /* SpendExpiredSwapIns.swift */,
+				DC37803A2C050F7000937C8E /* SpendOnChainFunds.swift */,
 			);
 			path = wallet;
 			sourceTree = "<group>";
@@ -1861,7 +1861,7 @@
 				DCA7263D2C80BC0800600716 /* SyncBackupManager+Contacts.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
 				DCFB8DF92A94112A00947698 /* Dictionary+MapKeys.swift in Sources */,
-				DC37803B2C050F7000937C8E /* SpendExpiredSwapIns.swift in Sources */,
+				DC37803B2C050F7000937C8E /* SpendOnChainFunds.swift in Sources */,
 				DCB876322735AAB500657570 /* UserDefaults+Codable.swift in Sources */,
 				DCD777D226DE9FE800979A12 /* DelayedSave.swift in Sources */,
 				DCEE3E542931446A00EB4DFF /* Collections+AsInt.swift in Sources */,
@@ -1895,7 +1895,6 @@
 				DC0C52662BF3C31700143831 /* WhichPinSheet.swift in Sources */,
 				DCD1208728663F4A00EB39C5 /* TransactionsView.swift in Sources */,
 				DC70A99C2BBB6093002DBFF8 /* InboundFeeWarning.swift in Sources */,
-				DC118BFC27B4504B0080BBAC /* ScanView.swift in Sources */,
 				DC8D94142CA7015F00EE844E /* ChannelFundingProblem.swift in Sources */,
 				DC46BAF326CACCF700E760A6 /* KotlinExtensions+Other.swift in Sources */,
 				DCB5D2DF280879460020B8F5 /* DeviceInfo.swift in Sources */,
