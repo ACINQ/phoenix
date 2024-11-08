@@ -46,6 +46,8 @@
     <!-- Auth prompt (v2) -->
 
     <string name="lockprompt_title">Déverrouillez pour continuer</string>
+    <string name="lockprompt_pin_button">Code PIN</string>
+    <string name="lockprompt_biometrics_button">Verrouillage système</string>
 
     <!-- Startup -->
 
@@ -53,6 +55,21 @@
     <string name="startup_wait">Préparation du portefeuille…</string>
     <string name="startup_wait_legacy_check">Vérification de l\'ancien portefeuille…</string>
     <string name="startup_checking_seed">Déverrouillage…</string>
+    <string name="startup_unlocked">Accès accordé…</string>
+    <string name="startup_unlock_failure">Échec du déverrouillage</string>
+    <string name="startup_unlock_failure_fallback">Déverrouiller avec la seed</string>
+
+    <string name="startup_fallback_instructions">Saisissez vos 12 mots de récupération pour déverrouiller le wallet.\n\nLes mots doivent être saisis dans le bon ordre et séparés par un seul espace.</string>
+    <string name="startup_fallback_input_label">Saisir le mot #%1$d</string>
+    <string name="startup_fallback_input_label_error">Pas plus de 12 mots !</string>
+    <string name="startup_fallback_incomplete">Saisissez la seed entière pour continuer.</string>
+    <string name="startup_fallback_invalid">Cette seed n\'est pas valide. Assurez-vous que les mots sont corrects et dans l\'ordre.</string>
+    <string name="startup_fallback_checking">Vérification de la seed…</string>
+    <string name="startup_fallback_error_default">Une erreur est survenue. Merci de réessayer.</string>
+    <string name="startup_fallback_error_incorrect_seed">Cette seed ne correspond pas à votre wallet.</string>
+    <string name="startup_fallback_success_match">La seed correspond.\nÉcriture sur le disque…</string>
+    <string name="startup_fallback_success_starting">Démarrage de Phoenix…</string>
+
     <string name="startup_starting">Démarrage…</string>
     <string name="startup_error_generic">L\'application n\'a pas pu démarrer.</string>
 
@@ -462,6 +479,12 @@
 
     <string name="accessctrl_biometric_lock_switch_label">Verrouillage écran système</string>
     <string name="accessctrl_biometric_lock_switch_desc">Contrôle l\'accès à l\'application via le système de verrouillage système d\'Android.</string>
+    <string name="accessctrl_pin_lock_switch_label">PIN Personnalisé</string>
+    <string name="accessctrl_pin_lock_switch_desc">Contrôle l\'accès à l\'application via un code PIN à 6 chiffres spécifique à Phoenix.</string>
+
+    <string name="accessctrl_autolock_title">Délai de verrouillage</string>
+    <string name="accessctrl_autolock_desc">Après %1$s minute(s) d\'inactivité</string>
+    <string name="accessctrl_autolock_desc_never">Jamais</string>
 
     <!-- lnurl-auth -->
 
@@ -807,5 +830,20 @@
     <string name="bip353_claim_button">Demander une adresse</string>
     <string name="bip353_claiming">Récupération de l\'adresse…</string>
     <string name="bip353_error">Échec de la création de l\'adresse</string>
+
+    <!-- PIN code dialog -->
+
+    <string name="pincode_check_title">Saisir le PIN</string>
+    <string name="pincode_new_title">Saisir un nouveau PIN</string>
+    <string name="pincode_confirm_title">Confirmer le nouveau PIN</string>
+
+    <string name="pincode_checking_label">Vérification du PIN…</string>
+    <string name="pincode_success_label">Authentifié</string>
+    <string name="pincode_failure_label">Incorrect</string>
+    <string name="pincode_locked_label">Bloqué pendant %1$s</string>
+
+    <string name="pincode_error_generic">Une erreur est survenue</string>
+    <string name="pincode_error_confirm_do_not_match">PIN non correspondant !</string>
+    <string name="pincode_error_write">Erreur lors de l\'enregistrement du PIN</string>
 
 </resources>
