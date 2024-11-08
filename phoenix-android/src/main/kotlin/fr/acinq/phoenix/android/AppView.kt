@@ -95,6 +95,7 @@ import fr.acinq.phoenix.android.settings.TorConfigView
 import fr.acinq.phoenix.android.settings.channels.ChannelDetailsView
 import fr.acinq.phoenix.android.settings.channels.ChannelsView
 import fr.acinq.phoenix.android.settings.channels.ImportChannelsData
+import fr.acinq.phoenix.android.settings.channels.SpendFromChannelAddress
 import fr.acinq.phoenix.android.settings.displayseed.DisplaySeedView
 import fr.acinq.phoenix.android.settings.fees.AdvancedIncomingFeePolicy
 import fr.acinq.phoenix.android.settings.fees.LiquidityPolicyView
@@ -376,6 +377,7 @@ fun AppView(
                             },
                             onChannelClick = { navController.navigate("${Screen.ChannelDetails.route}?id=$it") },
                             onImportChannelsDataClick = { navController.navigate(Screen.ImportChannelsData.route)},
+                            onSpendFromChannelBalance = { navController.navigate(Screen.SpendChannelAddress.route)},
                         )
                     }
                     composable(
@@ -387,6 +389,9 @@ fun AppView(
                     }
                     composable(Screen.ImportChannelsData.route) {
                         ImportChannelsData(onBackClick = { navController.popBackStack() })
+                    }
+                    composable(Screen.SpendChannelAddress.route) {
+                        SpendFromChannelAddress(onBackClick = { navController.popBackStack() })
                     }
                     composable(Screen.MutualClose.route) {
                         MutualCloseView(onBackClick = { navController.popBackStack() })

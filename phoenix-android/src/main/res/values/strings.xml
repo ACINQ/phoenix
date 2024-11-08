@@ -265,6 +265,7 @@
 
     <string name="channelsview_title">Payment channels</string>
     <string name="channelsview_menu_import_channels">Import channels</string>
+    <string name="channelsview_menu_spend_channel_balance">Spend channel address</string>
     <string name="channelsview_header">Overview</string>
     <string name="channelsview_balance">Balance</string>
     <string name="channelsview_balance_about"><b>Balance</b> is the aggregated balance of your active channels. It\'s what you can spend over Lightning.</string>
@@ -307,6 +308,34 @@
     <string name="channelimport_error_malformed">Data are malformed. A encrypted hex blob is expected.</string>
     <string name="channelimport_error_decryption">Data could not be decrypted by this wallet.</string>
     <string name="channelimport_error_unknown_version">Version %1$d is not supported</string>
+
+    <!-- spend from channel address -->
+
+    <string name="spendchanneladdress_title">Spend channel address</string>
+    <string name="spendchanneladdress_instructions">This screen is a debugging tool that helps recover funds that have been accidentally sent to a channel\'s outpoint.</string>
+    <string name="spendchanneladdress_amount">Amount</string>
+    <string name="spendchanneladdress_tx_index">Tx index</string>
+    <string name="spendchanneladdress_channel_data">Raw channel data</string>
+    <string name="spendchanneladdress_remote_funding_pubkey">Remote funding pubkey</string>
+    <string name="spendchanneladdress_unsigned_tx">Unsigned tx</string>
+    <string name="spendchanneladdress_sign_button">Sign</string>
+    <string name="spendchanneladdress_signing">Signing…</string>
+
+    <string name="spendchanneladdress_success_header">Signature successfully generated.</string>
+    <string name="spendchanneladdress_success_pubkey">Public key</string>
+    <string name="spendchanneladdress_success_signature">Signature</string>
+
+    <string name="spendchanneladdress_error_generic">Failed to sign data</string>
+    <string name="spendchanneladdress_error_amount">Invalid amount</string>
+    <string name="spendchanneladdress_error_tx_index">Invalid tx index</string>
+    <string name="spendchanneladdress_error_channel_data">Malformed channel data</string>
+    <string name="spendchanneladdress_error_channel_data_decryption">Cannot decrypt channel data</string>
+    <string name="spendchanneladdress_error_channel_data_state">Unhandled channel state [%1$s]</string>
+    <string name="spendchanneladdress_error_channel_data_version">Malformed channel version [%1$s]</string>
+    <string name="spendchanneladdress_error_remote_pubkey">Malformed remote funding pubkey [%1$s]</string>
+    <string name="spendchanneladdress_error_unsigned_tx">Malformed unsigned tx [%1$s]</string>
+    <string name="spendchanneladdress_error_remote_funding_pubkey">Malformed remote funding pubkey [%1$s]</string>
+    <string name="spendchanneladdress_error_tx">Malformed transaction [%1$s]</string>
 
     <!-- home: balance section & misc -->
 
