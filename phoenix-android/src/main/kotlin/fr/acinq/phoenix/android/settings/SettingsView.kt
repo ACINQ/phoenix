@@ -108,7 +108,7 @@ fun SettingsView(
         Card {
             MenuButton(text = stringResource(R.string.settings_wallet_info), icon = R.drawable.ic_box, onClick = { nc.navigate(Screen.WalletInfo.route) })
             MenuButton(text = stringResource(R.string.settings_list_channels), icon = R.drawable.ic_zap, onClick = { nc.navigate(Screen.Channels.route) })
-            MenuButton(text = "Experimental features", icon = R.drawable.ic_experimental, onClick = { nc.navigate(Screen.Experimental.route) })
+            MenuButton(text = stringResource(R.string.experimental_title), icon = R.drawable.ic_experimental, onClick = { nc.navigate(Screen.Experimental.route) })
             MenuButton(text = stringResource(R.string.settings_logs), icon = R.drawable.ic_text, onClick = { nc.navigate(Screen.Logs.route) })
         }
         // -- advanced
