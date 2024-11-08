@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.payments.offer
+package fr.acinq.phoenix.android.payments.send.offer
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,7 +22,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
 import fr.acinq.lightning.Lightning
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.LightningOutgoingPayment
@@ -31,15 +30,11 @@ import fr.acinq.lightning.io.PaymentNotSent
 import fr.acinq.lightning.io.PaymentSent
 import fr.acinq.lightning.payment.OutgoingPaymentFailure
 import fr.acinq.lightning.wire.OfferTypes
-import fr.acinq.phoenix.android.PhoenixApplication
-import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
-import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.managers.ContactsManager
 import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.managers.PeerManager
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import kotlin.time.Duration.Companion.seconds

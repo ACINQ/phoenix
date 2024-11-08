@@ -56,7 +56,7 @@ import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.utils.FCMHelper
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
-import fr.acinq.phoenix.android.utils.findActivity
+import fr.acinq.phoenix.android.utils.extensions.findActivity
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.canRequestLiquidity
 import fr.acinq.phoenix.data.inFlightPaymentsCount

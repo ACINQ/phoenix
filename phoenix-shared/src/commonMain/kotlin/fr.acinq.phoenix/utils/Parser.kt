@@ -93,7 +93,7 @@ object Parser {
         // Ignore excess input, including additional lines, and leading/trailing whitespace
         val line = input.lines().firstOrNull { it.isNotBlank() }?.trim()
         val token = line?.split("\\s+".toRegex())?.firstOrNull()?.let {
-            trimMatchingPrefix(it, Parser.lightningPrefixes + Parser.lnurlPrefixes)
+            trimMatchingPrefix(it, bitcoinPrefixes + lightningPrefixes + lnurlPrefixes)
         }
 
         if (token.isNullOrBlank()) return null

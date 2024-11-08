@@ -27,9 +27,6 @@ extension View {
 	func mock(_ mock: RestoreWallet.Model) -> some View {
 		environment(\.controllerFactory, MockControllerFactory(mock))
 	}
-	func mock(_ mock: Scan.Model) -> some View {
-		environment(\.controllerFactory, MockControllerFactory(mock))
-	}
 }
 
 class MockControllerFactory : ControllerFactory {
@@ -139,16 +136,5 @@ class MockControllerFactory : ControllerFactory {
 			return base.restoreWallet()
 		}
 	}
-	
-	var mock_scan: Scan.Model? = nil
-	init(_ mock: Scan.Model) {
-		mock_scan = mock
-	}	
-	func scan(firstModel: Scan.Model) -> MVIController<Scan.Model, Scan.Intent> {
-		if let mock = mock_scan {
-			return MVIControllerMock(model: mock)
-		} else {
-			return base.scan(firstModel: firstModel)
-		}
-	}
+
 }

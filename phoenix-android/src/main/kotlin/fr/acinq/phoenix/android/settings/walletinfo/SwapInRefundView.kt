@@ -72,8 +72,8 @@ import fr.acinq.phoenix.android.components.InlineTransactionLink
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.feedback.SuccessMessage
 import fr.acinq.phoenix.android.fiatRate
-import fr.acinq.phoenix.android.payments.CameraPermissionsView
-import fr.acinq.phoenix.android.payments.ScannerView
+import fr.acinq.phoenix.android.payments.send.CameraPermissionsView
+import fr.acinq.phoenix.android.payments.send.ScannerView
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.managers.PeerManager

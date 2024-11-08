@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.payments.offer
+package fr.acinq.phoenix.android.payments.send.offer
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -49,7 +49,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.TrampolineFees
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
@@ -58,6 +57,7 @@ import fr.acinq.phoenix.android.components.AmountHeroInput
 import fr.acinq.phoenix.android.components.AmountWithFiatRowView
 import fr.acinq.phoenix.android.components.BackButtonWithBalance
 import fr.acinq.phoenix.android.components.Clickable
+import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.SplashLabelRow
@@ -70,16 +70,18 @@ import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 
 @Composable
-fun SendOfferView(
+fun SendToOfferView(
     offer: OfferTypes.Offer,
-    trampolineFees: TrampolineFees?,
     onBackClick: () -> Unit,
     onPaymentSent: () -> Unit,
 ) {
     val context = LocalContext.current
-    val balance = business.balanceManager.balance.collectAsState(null).value
     val prefBitcoinUnit = LocalBitcoinUnit.current
     val keyboardManager = LocalSoftwareKeyboardController.current
+
+    val balance = business.balanceManager.balance.collectAsState(null).value
+    val peer by business.peerManager.peerState.collectAsState()
+    val trampolineFees = peer?.walletParams?.trampolineFees?.firstOrNull()
 
     val vm = viewModel<SendOfferViewModel>(factory = SendOfferViewModel.Factory(offer, business.peerManager, business.nodeParamsManager, business.contactsManager))
     val requestedAmount = offer.amount

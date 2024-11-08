@@ -268,8 +268,4 @@ class FakeControllerFactory: ControllerFactory {
 			fatalError("Missing @Environment: ControllerFactory")
 		}
 
-	func scan(firstModel: Scan.Model) ->
-		MVIController<Scan.Model, Scan.Intent> {
-			fatalError("Missing @Environment: ControllerFactory")
-		}
 }

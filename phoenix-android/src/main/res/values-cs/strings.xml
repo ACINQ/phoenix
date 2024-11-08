@@ -161,8 +161,8 @@
     <string name="scan_request_camera_access">Klepnutím udělíte povolení k fotoaparátu</string>
     <string name="scan_request_camera_access_denied">Povolení k použití fotoaparátu bylo zamítnuto</string>
 
-    <string name="scan_lnurl_fetching">Získávání dat ze služby…</string>
-    <string name="scan_bip353_resolving">Zpracovávání žádosti o platbu přes DNS…</string>
+    <string name="preparesend_lnurl_fetching">Získávání dat ze služby…</string>
+    <string name="preparesend_bip353_resolving">Zpracovávání žádosti o platbu přes DNS…</string>
 
     <string name="scan_manual_input_title">Ruční vstup</string>
     <string name="scan_manual_input_instructions">Zadejte Lightningovou fakturu, LNURL nebo Lightningovou adresu na kterou chcete poslat peníze.</string>

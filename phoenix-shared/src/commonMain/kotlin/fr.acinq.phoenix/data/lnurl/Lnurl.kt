@@ -183,7 +183,7 @@ sealed interface Lnurl {
                 // > response body as JSON, then interpret it accordingly.
                 Json.decodeFromString(response.bodyAsText(Charsets.UTF_8))
             } catch (e: Exception) {
-                logger.error(e) { "unhandled response from url=$url: " }
+                logger.error { "unhandled response from url=$url: ${e.message}" }
                 throw LnurlError.RemoteFailure.Unreadable(url.host)
             }
 
