@@ -57,20 +57,24 @@ fun TextInput(
     staticLabel: String?,
     placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
-    trailingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (RowScope.() -> Unit)? = null,
+    isError: Boolean = false,
     errorMessage: String? = null,
     enabled: Boolean = true,
     enabledEffect: Boolean = true,
     onTextChange: (String) -> Unit,
     textFieldColors: TextFieldColors = outlinedTextFieldColors(),
     showResetButton: Boolean = true,
-    keyboardType: KeyboardType = KeyboardType.Text
+    keyboardType: KeyboardType = KeyboardType.Text,
+    shape: Shape = RoundedCornerShape(8.dp),
 ) {
     val charsCount by remember(text) { mutableStateOf(text.length) }
     val focusManager = LocalFocusManager.current
 
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
+
+    val displayError = isError || !errorMessage.isNullOrBlank()
 
     Box(modifier = modifier.enableOrFade(enabled || !enabledEffect)) {
         OutlinedTextField(
@@ -91,7 +95,7 @@ fun TextInput(
                 null
             } else {
                 {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxHeight()) {
                         if (text.isNotBlank()) {
                             FilledButton(
                                 onClick = { onTextChange("") },
@@ -109,12 +113,14 @@ fun TextInput(
             },
             enabled = enabled,
             keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-            colors = if (errorMessage.isNullOrBlank()) textFieldColors else errorOutlinedTextFieldColors(),
-            shape = RoundedCornerShape(8.dp),
+            colors = if (displayError) errorOutlinedTextFieldColors() else textFieldColors,
+            shape = shape,
             interactionSource = interactionSource,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 8.dp, top = if (staticLabel != null) 14.dp else 0.dp)
+                .height(IntrinsicSize.Min)
+                .padding(top = if (staticLabel != null) 14.dp else 0.dp, bottom = 8.dp)
+                .clip(shape)
         )
 
         staticLabel?.let {
@@ -124,12 +130,12 @@ fun TextInput(
                 style = when {
                     !errorMessage.isNullOrBlank() -> MaterialTheme.typography.body2.copy(color = negativeColor, fontSize = 14.sp)
                     isFocused -> MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.primary, fontSize = 14.sp)
-                    else -> MaterialTheme.typography.body1.copy(fontSize = 14.sp)
+                    else -> MaterialTheme.typography.body2.copy(fontSize = 14.sp)
                 },
                 modifier = Modifier
                     .align(Alignment.TopStart)
                     .padding(start = 8.dp)
-                    .clip(RoundedCornerShape(8.dp))
+                    .clip(RoundedCornerShape(2.dp))
                     .background(MaterialTheme.colors.surface)
                     .padding(horizontal = 8.dp, vertical = 2.dp)
             )

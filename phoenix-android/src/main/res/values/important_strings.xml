@@ -164,18 +164,18 @@
     <string name="receive_tor_warning_dialog_content_1">Phoenix cannot receive payments in the background.</string>
     <string name="receive_tor_warning_dialog_content_2">To avoid payment failures, use Orbot instead, or make sure Phoenix remain visible in the foreground when payments are sent to you.</string>
 
-    <!-- scanning errors -->
+    <!-- send errors -->
 
-    <string name="scan_error_expired">This invoice is expired.</string>
-    <string name="scan_error_already_paid">This payment has already been paid.</string>
-    <string name="scan_error_invalid_chain">This payment does not use the same blockchain as your wallet.</string>
-    <string name="scan_error_lnurl_invalid">Failed to process this LNURL link. Make sure it is valid.</string>
-    <string name="scan_error_lnurl_unsupported">This type of LNURL is not supported yet.</string>
-    <string name="scan_error_invalid_generic">This data uses an unknown format and cannot be processed.</string>
-    <string name="scan_error_bip353_name_not_found">Name \"%1$s\" is not found on \"%2$s\".</string>
-    <string name="scan_error_bip353_invalid_uri">This address uses an invalid Bip21 resource.</string>
-    <string name="scan_error_bip353_invalid_offer">This address uses an invalid Bolt12 offer.</string>
-    <string name="scan_error_bip353_dnssec">This address is hosted on an unsecure DNS. DNSSEC must be enabled.</string>
+    <string name="send_error_invoice_expired">This invoice is expired.</string>
+    <string name="send_error_already_paid">This payment has already been paid.</string>
+    <string name="send_error_invalid_chain">This payment does not use the same blockchain as your wallet.</string>
+    <string name="send_error_lnurl_invalid">Failed to process this LNURL link. Make sure it is valid.</string>
+    <string name="send_error_lnurl_unsupported">This type of LNURL is not supported yet.</string>
+    <string name="send_error_invalid_generic">This is not a supported payment request.</string>
+    <string name="send_error_bip353_name_not_found">Name \"%1$s\" is not found on \"%2$s\".</string>
+    <string name="send_error_bip353_invalid_uri">This address uses an invalid Bip21 resource.</string>
+    <string name="send_error_bip353_invalid_offer">This address uses an invalid Bolt12 offer.</string>
+    <string name="send_error_bip353_dnssec">This address is hosted on an unsecure DNS. DNSSEC must be enabled.</string>
 
     <!-- validation -->
 

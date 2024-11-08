@@ -193,18 +193,25 @@
 
     <!-- scan -->
 
-    <string name="scan_manual_input_button">Manual input</string>
-    <string name="scan_paste_button">Paste data from clipboard</string>
     <string name="scan_request_camera_access">Tap to grant camera permission</string>
     <string name="scan_request_camera_access_denied">Camera permission has been denied</string>
 
-    <string name="scan_lnurl_fetching">Fetching data from service…</string>
-    <string name="scan_bip353_resolving">Resolving payment request over DNS…</string>
+    <!-- prepare send payment -->
 
-    <string name="scan_manual_input_title">Manual input</string>
-    <string name="scan_manual_input_instructions">Enter a Lightning invoice, an offer, a LNURL or a Lightning address you want to send money to.</string>
-    <string name="scan_manual_input_label">Invoice, LN address…</string>
-    <string name="scan_manual_input_hint" translatable="false">satoshi@domain.com, bc1q..., lnbc...</string>
+
+    <string name="preparesend_title">Send</string>
+    <string name="preparesend_contacts_none">No contacts yet…</string>
+    <string name="preparesend_contacts_no_matches">No matches for search…</string>
+    <string name="preparesend_manual_input_hint" translatable="false">satoshi@domain, bc1q..., lnbc...</string>
+
+    <string name="preparesend_paste_button">Paste</string>
+    <string name="preparesend_scan_button">Scan QR code</string>
+    <string name="preparesend_imagepicker_button">Choose image</string>
+    <string name="preparesend_imagepicker_error">This image could not be processed.</string>
+    <string name="preparesend_imagepicker_not_found">No QR code found in this image.</string>
+    <string name="preparesend_parsing">Reading input…</string>
+    <string name="preparesend_lnurl_fetching">Fetching data from service…</string>
+    <string name="preparesend_bip353_resolving">Resolving payment request over DNS…</string>
 
     <!-- utils: misc strings -->
 
@@ -565,6 +572,8 @@
     <string name="lnurl_error_remote_code">The service <b>%1$s</b> returned an HTTP error (%2$s). Contact their helpdesk if needed.</string>
     <string name="lnurl_error_remote_unreadable">The service <b>%1$s</b> returned a malformed message.</string>
     <string name="lnurl_error_remote_connection">Could not connect to service <b>%1$s</b>.</string>
+    <string name="lnurl_error_remote_is_website">This appears to be a website (not a lightning invoice):\n\n<i>%1$s</i></string>
+    <string name="lnurl_error_remote_unknown_lnaddress">Service %1$s doesn\'t support lightning addresses, or doesn\'t know this user.</string>
 
     <!-- lnurl-pay -->
 
@@ -575,6 +584,7 @@
     <string name="lnurl_pay_comment_instructions">You can attach a message to the payment. This message will be sent to the recipient.</string>
     <string name="lnurl_pay_pay_button">Pay</string>
     <string name="lnurl_pay_requesting_invoice">Requesting invoice…</string>
+    <string name="lnurl_pay_paying_invoice">Paying invoice…</string>
 
     <string name="lnurl_pay_amount_below_min">Amount must be at least %1$s</string>
     <string name="lnurl_pay_amount_above_max">Amount must be at most %1$s</string>

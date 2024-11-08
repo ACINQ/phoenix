@@ -48,7 +48,7 @@ import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.VSeparator
 import fr.acinq.phoenix.android.components.openLink
-import fr.acinq.phoenix.android.utils.isBadCertificate
+import fr.acinq.phoenix.android.utils.extensions.isBadCertificate
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.android.utils.warningColor

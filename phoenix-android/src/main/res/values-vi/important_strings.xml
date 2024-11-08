@@ -170,16 +170,16 @@
 
     <!-- scanning errors -->
 
-    <string name="scan_error_expired">Hoá đơn này đã hết hạn.</string>
-    <string name="scan_error_already_paid">Khoản thanh toán này đã được trả.</string>
-    <string name="scan_error_invalid_chain">Khoản thanh toán này không sử dụng cùng blockchain với ví của bạn.</string>
-    <string name="scan_error_lnurl_invalid">Không thể xử lý liên kết LNURL này. Hãy đảm bảo liên kết này có hiệu lực.</string>
-    <string name="scan_error_lnurl_unsupported">Loại LNURL này chưa được hỗ trợ.</string>
-    <string name="scan_error_invalid_generic">Dữ liệu này sử dụng định dạng không xác định và không thể xử lý được.</string>
-    <string name="scan_error_bip353_name_not_found">Không tìm thấy tên \"%1$s\" trên \"%2$s\".</string>
-    <string name="scan_error_bip353_invalid_uri">Địa chỉ này sử dụng tài nguyên Bip21 không hợp lệ.</string>
-    <string name="scan_error_bip353_invalid_offer">Địa chỉ này sử dụng ưu đãi Bolt12 không hợp lệ.</string>
-    <string name="scan_error_bip353_dnssec">Địa chỉ này được lưu trữ trên một DNS không an toàn. DNSSEC phải được bật.</string>
+    <string name="send_error_invoice_expired">Hoá đơn này đã hết hạn.</string>
+    <string name="send_error_already_paid">Khoản thanh toán này đã được trả.</string>
+    <string name="send_error_invalid_chain">Khoản thanh toán này không sử dụng cùng blockchain với ví của bạn.</string>
+    <string name="send_error_lnurl_invalid">Không thể xử lý liên kết LNURL này. Hãy đảm bảo liên kết này có hiệu lực.</string>
+    <string name="send_error_lnurl_unsupported">Loại LNURL này chưa được hỗ trợ.</string>
+    <string name="send_error_invalid_generic">Dữ liệu này sử dụng định dạng không xác định và không thể xử lý được.</string>
+    <string name="send_error_bip353_name_not_found">Không tìm thấy tên \"%1$s\" trên \"%2$s\".</string>
+    <string name="send_error_bip353_invalid_uri">Địa chỉ này sử dụng tài nguyên Bip21 không hợp lệ.</string>
+    <string name="send_error_bip353_invalid_offer">Địa chỉ này sử dụng ưu đãi Bolt12 không hợp lệ.</string>
+    <string name="send_error_bip353_dnssec">Địa chỉ này được lưu trữ trên một DNS không an toàn. DNSSEC phải được bật.</string>
 
     <!-- validation -->
 

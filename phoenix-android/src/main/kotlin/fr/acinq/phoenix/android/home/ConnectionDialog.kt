@@ -42,7 +42,7 @@ import fr.acinq.phoenix.android.components.Dialog
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.userPrefs
-import fr.acinq.phoenix.android.utils.isBadCertificate
+import fr.acinq.phoenix.android.utils.extensions.isBadCertificate
 import fr.acinq.phoenix.android.utils.monoTypo
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.orange

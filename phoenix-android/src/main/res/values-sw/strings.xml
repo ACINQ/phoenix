@@ -196,8 +196,8 @@
     <string name="scan_request_camera_access">Gonga ili kutoa ruhusa ya kamera</string>
     <string name="scan_request_camera_access_denied">Ruhusa ya kamera imekana</string>
 
-    <string name="scan_lnurl_fetching">Inapata data kutoka huduma…</string>
-    <string name="scan_bip353_resolving">Inapata ombi la malipo kupitia DNS…</string>
+    <string name="preparesend_lnurl_fetching">Inapata data kutoka huduma…</string>
+    <string name="preparesend_bip353_resolving">Inapata ombi la malipo kupitia DNS…</string>
 
     <string name="scan_manual_input_title">Ingiza kwa mkono</string>
     <string name="scan_manual_input_instructions">Ingiza hati ya Lightning, ofa, LNURL au anwani ya Lightning unayotaka kutuma pesa kwake.</string>

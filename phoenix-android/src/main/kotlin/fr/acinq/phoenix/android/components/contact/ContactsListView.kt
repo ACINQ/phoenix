@@ -113,7 +113,7 @@ private fun ContactsList(
             itemsIndexed(contacts) { index, contact ->
                 val onClick = {
                     contact.mostRelevantOffer?.let {
-                        navController.navigate("${Screen.ScanData.route}?input=${it.encode()}")
+                        navController.navigate("${Screen.Send.route}?input=${it.encode()}")
                     } ?: run { if (canEditContact) { onEditContact(contact) } }
                 }
                 if (isOnSurface) {

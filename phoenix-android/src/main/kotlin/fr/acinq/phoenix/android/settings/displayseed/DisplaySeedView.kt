@@ -43,7 +43,7 @@ import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.mutedTextColor
-import fr.acinq.phoenix.android.utils.safeLet
+import fr.acinq.phoenix.android.utils.extensions.safeLet
 import kotlinx.coroutines.launch
 
 

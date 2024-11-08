@@ -39,8 +39,8 @@ import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIView
-import fr.acinq.phoenix.android.payments.CameraPermissionsView
-import fr.acinq.phoenix.android.payments.ScannerView
+import fr.acinq.phoenix.android.payments.send.CameraPermissionsView
+import fr.acinq.phoenix.android.payments.send.ScannerView
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.monoTypo

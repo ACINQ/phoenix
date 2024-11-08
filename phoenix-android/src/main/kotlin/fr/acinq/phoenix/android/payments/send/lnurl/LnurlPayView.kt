@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 ACINQ SAS
+ * Copyright 2024 ACINQ SAS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.payments
+package fr.acinq.phoenix.android.payments.send.lnurl
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
@@ -35,36 +38,51 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.TrampolineFees
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.AmountHeroInput
+import fr.acinq.phoenix.android.components.BackButtonWithBalance
+import fr.acinq.phoenix.android.components.Button
+import fr.acinq.phoenix.android.components.Dialog
+import fr.acinq.phoenix.android.components.FilledButton
+import fr.acinq.phoenix.android.components.ProgressView
+import fr.acinq.phoenix.android.components.SplashClickableContent
+import fr.acinq.phoenix.android.components.SplashLabelRow
+import fr.acinq.phoenix.android.components.SplashLayout
+import fr.acinq.phoenix.android.components.TextInput
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.fiatRate
 import fr.acinq.phoenix.android.preferredAmountUnit
 import fr.acinq.phoenix.android.utils.BitmapHelper
 import fr.acinq.phoenix.android.utils.Converter.toPrettyStringWithFallback
 import fr.acinq.phoenix.android.utils.annotatedStringResource
-import fr.acinq.phoenix.android.utils.safeLet
-import fr.acinq.phoenix.controllers.payments.Scan
+import fr.acinq.phoenix.android.utils.extensions.safeLet
+import fr.acinq.phoenix.android.utils.extensions.toLocalisedMessage
 import fr.acinq.phoenix.data.lnurl.LnurlError
+import fr.acinq.phoenix.data.lnurl.LnurlPay
+import fr.acinq.phoenix.managers.SendManager
 
 @Composable
 fun LnurlPayView(
-    model: Scan.Model.LnurlPayFlow,
-    trampolineFees: TrampolineFees?,
+    payIntent: LnurlPay.Intent,
     onBackClick: () -> Unit,
-    onSendLnurlPayClick: (Scan.Intent.LnurlPayFlow) -> Unit
+    onPaymentSent: () -> Unit,
 ) {
     val context = LocalContext.current
     val balance = business.balanceManager.balance.collectAsState(null).value
     val prefUnit = preferredAmountUnit
     val rate = fiatRate
 
-    val minRequestedAmount = model.paymentIntent.minSendable
+    val peer by business.peerManager.peerState.collectAsState()
+    val trampolineFees = peer?.walletParams?.trampolineFees?.firstOrNull()
+
+    val minRequestedAmount = payIntent.minSendable
     var amount by remember { mutableStateOf<MilliSatoshi?>(minRequestedAmount) }
     var amountErrorMessage by remember { mutableStateOf("") }
+
+    val vm = viewModel<LnurlPayViewModel>(factory = LnurlPayViewModel.Factory(business.sendManager))
 
     SplashLayout(
         header = { BackButtonWithBalance(onBackClick = onBackClick, balance = balance) },
@@ -78,44 +96,44 @@ fun LnurlPayView(
                         balance != null && newAmount.amount > balance -> {
                             amountErrorMessage = context.getString(R.string.send_error_amount_over_balance)
                         }
-                        newAmount.amount < model.paymentIntent.minSendable -> {
-                            amountErrorMessage = context.getString(R.string.lnurl_pay_amount_below_min, model.paymentIntent.minSendable.toPrettyStringWithFallback(prefUnit, rate, withUnit = true))
+                        newAmount.amount < payIntent.minSendable -> {
+                            amountErrorMessage = context.getString(R.string.lnurl_pay_amount_below_min, payIntent.minSendable.toPrettyStringWithFallback(prefUnit, rate, withUnit = true))
                         }
-                        newAmount.amount > model.paymentIntent.maxSendable -> {
-                            amountErrorMessage = context.getString(R.string.lnurl_pay_amount_above_max, model.paymentIntent.maxSendable.toPrettyStringWithFallback(prefUnit, rate, withUnit = true))
+                        newAmount.amount > payIntent.maxSendable -> {
+                            amountErrorMessage = context.getString(R.string.lnurl_pay_amount_above_max, payIntent.maxSendable.toPrettyStringWithFallback(prefUnit, rate, withUnit = true))
                         }
                     }
                     amount = newAmount?.amount
                 },
                 validationErrorMessage = amountErrorMessage,
                 inputTextSize = 42.sp,
-                enabled = model.paymentIntent.minSendable != model.paymentIntent.maxSendable
+                enabled = payIntent.minSendable != payIntent.maxSendable
             )
         }
     ) {
-        val image = remember(model.paymentIntent.metadata.imagePng + model.paymentIntent.metadata.imageJpg) {
-            listOfNotNull(model.paymentIntent.metadata.imagePng, model.paymentIntent.metadata.imageJpg).firstOrNull()?.let {
+        val image = remember(payIntent.metadata.imagePng + payIntent.metadata.imageJpg) {
+            listOfNotNull(payIntent.metadata.imagePng, payIntent.metadata.imageJpg).firstOrNull()?.let {
                 BitmapHelper.decodeBase64Image(it)?.asImageBitmap()
             }
         }
         image?.let {
-            Image(bitmap = it, contentDescription = model.paymentIntent.metadata.plainText, modifier = Modifier.size(90.dp))
+            Image(bitmap = it, contentDescription = payIntent.metadata.plainText, modifier = Modifier.size(90.dp))
             Spacer(modifier = Modifier.height(16.dp))
         }
         SplashLabelRow(label = stringResource(R.string.lnurl_pay_domain)) {
-            Text(text = model.paymentIntent.callback.host, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(text = payIntent.callback.host, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
         Spacer(modifier = Modifier.height(8.dp))
         SplashLabelRow(label = stringResource(R.string.lnurl_pay_meta_description)) {
             Text(
-                text = model.paymentIntent.metadata.longDesc ?: model.paymentIntent.metadata.plainText,
+                text = payIntent.metadata.longDesc ?: payIntent.metadata.plainText,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis
             )
         }
 
         var comment by remember { mutableStateOf<String?>(null) }
-        val commentLength = model.paymentIntent.maxCommentLength?.toInt()
+        val commentLength = payIntent.maxCommentLength?.toInt()
         if (commentLength != null && commentLength > 0) {
             var showCommentDialog by remember { mutableStateOf(false) }
             if (showCommentDialog) {
@@ -140,20 +158,22 @@ fun LnurlPayView(
         }
 
         Spacer(modifier = Modifier.height(32.dp))
-        when (model) {
-            is Scan.Model.LnurlPayFlow.LnurlPayRequest -> {
-                val error = model.error
-                if (error != null) {
+        when (val state = vm.state.value) {
+            is LnurlPayViewState.Init, is LnurlPayViewState.Error -> {
+                if (state is LnurlPayViewState.Error) {
                     ErrorMessage(
                         header = stringResource(id = R.string.lnurl_pay_error_header),
-                        details = when (error) {
-                            is Scan.LnurlPayError.AlreadyPaidInvoice -> annotatedStringResource(R.string.lnurl_pay_error_already_paid, model.paymentIntent.callback.host)
-                            is Scan.LnurlPayError.ChainMismatch -> annotatedStringResource(R.string.lnurl_pay_error_invalid_chain, model.paymentIntent.callback.host)
-                            is Scan.LnurlPayError.BadResponseError -> when (val errorDetail = error.err) {
-                                is LnurlError.Pay.Invoice.InvalidAmount -> annotatedStringResource(R.string.lnurl_pay_error_invalid_amount, errorDetail.origin)
-                                is LnurlError.Pay.Invoice.Malformed -> annotatedStringResource(R.string.lnurl_pay_error_invalid_malformed, errorDetail.origin)
+                        details = when (state) {
+                            is LnurlPayViewState.Error.Generic -> state.cause.localizedMessage
+                            is LnurlPayViewState.Error.PayError -> when (val error = state.error) {
+                                is SendManager.LnurlPayError.AlreadyPaidInvoice -> annotatedStringResource(R.string.lnurl_pay_error_already_paid, payIntent.callback.host)
+                                is SendManager.LnurlPayError.ChainMismatch -> annotatedStringResource(R.string.lnurl_pay_error_invalid_chain, payIntent.callback.host)
+                                is SendManager.LnurlPayError.BadResponseError -> when (val errorDetail = error.err) {
+                                    is LnurlError.Pay.Invoice.InvalidAmount -> annotatedStringResource(R.string.lnurl_pay_error_invalid_amount, errorDetail.origin)
+                                    is LnurlError.Pay.Invoice.Malformed -> annotatedStringResource(R.string.lnurl_pay_error_invalid_malformed, errorDetail.origin)
+                                }
+                                is SendManager.LnurlPayError.RemoteError -> error.err.toLocalisedMessage()
                             }
-                            is Scan.LnurlPayError.RemoteError -> getRemoteErrorMessage(error = error.err)
                         },
                         alignment = Alignment.CenterHorizontally
                     )
@@ -167,21 +187,16 @@ fun LnurlPayView(
                     enabled = mayDoPayments && amount != null && amountErrorMessage.isBlank() && trampolineFees != null,
                 ) {
                     safeLet(trampolineFees, amount) { fees, amt ->
-                        onSendLnurlPayClick(
-                            Scan.Intent.LnurlPayFlow.RequestInvoice(
-                                paymentIntent = model.paymentIntent,
-                                amount = amt,
-                                trampolineFees = fees,
-                                comment = comment?.takeIf { it.isNotBlank() },
-                            )
-                        )
+                        vm.requestAndPayInvoice(payIntent, amt, fees, comment?.takeIf { it.isNotBlank() }, onPaymentSent)
                     }
                 }
             }
-            is Scan.Model.LnurlPayFlow.LnurlPayFetch -> {
+            is LnurlPayViewState.RequestingInvoice -> {
                 ProgressView(text = stringResource(id = R.string.lnurl_pay_requesting_invoice))
             }
-            is Scan.Model.LnurlPayFlow.Sending -> LaunchedEffect(Unit) { onBackClick() }
+            is LnurlPayViewState.PayingInvoice -> {
+                ProgressView(text = stringResource(id = R.string.lnurl_pay_paying_invoice))
+            }
         }
     }
 }
