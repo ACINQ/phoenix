@@ -28,6 +28,7 @@ import fr.acinq.phoenix.data.lnurl.LnurlPay
 import fr.acinq.phoenix.data.lnurl.LnurlWithdraw
 import fr.acinq.phoenix.db.payments.WalletPaymentMetadataRow
 import fr.acinq.phoenix.utils.DnsResolvers
+import fr.acinq.phoenix.utils.EmailLikeAddress
 import fr.acinq.phoenix.utils.Parser
 import io.ktor.http.Url
 import kotlinx.coroutines.CoroutineScope
@@ -237,30 +238,21 @@ class SendManager(
 
         if (!input.contains("@", ignoreCase = true)) return null
 
-        // Ignore excess input, including additional lines, and leading/trailing whitespace
-        val line = input.lines().firstOrNull { it.isNotBlank() }?.trim()
-        val token = line?.split("\\s+".toRegex())?.firstOrNull()
+        val address = Parser.parseEmailLikeAddress(input) ?: return null
 
-        if (token.isNullOrBlank()) return null
-
-        val components = token.split("@")
-        if (components.size != 2) {
-            return null
-        }
-
-        val username = components[0].lowercase()
-        val domain = components[1]
-
-        val signalBip353 = username.startsWith("₿")
-        val cleanUsername = username.dropWhile { it == '₿' }
-
-        progress(ParseProgress.ResolvingBip353)
-        val offer = resolveBip353Offer(cleanUsername, domain)
-        return if (signalBip353) {
-            offer?.let { Either.Left(it) } // skip lnurl resolution if it's a bip353 address
-        } else {
-            offer?.let { Either.Left(it) }
-                ?: Either.Right(Lnurl.Request(Url("https://$domain/.well-known/lnurlp/$username"), tag = Lnurl.Tag.Pay))
+        return when (address) {
+            is EmailLikeAddress.Bip353 -> {
+                progress(ParseProgress.ResolvingBip353)
+                resolveBip353Offer(address.username, address.domain)?.let { Either.Left(it) }
+            }
+            is EmailLikeAddress.LnurlBased -> {
+                progress(ParseProgress.LnurlServiceFetch)
+                Either.Right(address.url)
+            }
+            is EmailLikeAddress.UnknownType -> {
+                resolveBip353Offer(address.username.dropWhile { it == '₿' }, address.domain)?.let { Either.Left(it) }
+                    ?: Either.Right(EmailLikeAddress.LnurlBased(address.source, address.username, address.domain).url)
+            }
         }
     }
 
