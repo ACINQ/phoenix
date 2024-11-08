@@ -159,8 +159,8 @@
     <string name="scan_request_camera_access">Autoriser l\'accès à la caméra</string>
     <string name="scan_request_camera_access_denied">L\'accès à la caméra a été refusé</string>
 
-    <string name="scan_lnurl_fetching">Récupération des données auprès du service…</string>
-    <string name="scan_bip353_resolving">Résolution de la requête de paiement via DNS…</string>
+    <string name="preparesend_lnurl_fetching">Récupération des données auprès du service…</string>
+    <string name="preparesend_bip353_resolving">Résolution de la requête de paiement via DNS…</string>
 
     <string name="scan_manual_input_title">Saisie manuelle</string>
     <string name="scan_manual_input_instructions">Saisissez une requête de paiement Lightning, un LNURL, ou une adresse Ligthning que vous souhaitez payer.</string>

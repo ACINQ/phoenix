@@ -169,7 +169,7 @@
     <string name="scan_request_camera_access">Nhấn để cho phép camera hoạt động</string>
     <string name="scan_request_camera_access_denied">Quyền hoạt động của camera đã bị từ chối</string>
 
-    <string name="scan_lnurl_fetching">Đang lấy dữ liệu từ bên dịch vụ…</string>
+    <string name="preparesend_lnurl_fetching">Đang lấy dữ liệu từ bên dịch vụ…</string>
 
     <string name="scan_manual_input_title">Nhập bằng tay</string>
     <string name="scan_manual_input_instructions">Nhập hóa đơn Lightning, LNURL hoặc địa chỉ Lightning bạn muốn gửi tiền tới.</string>

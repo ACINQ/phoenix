@@ -163,16 +163,16 @@
 
     <!-- scanning errors -->
 
-    <string name="scan_error_expired">Platnosť tejto faktúry vypršala.</string>
-    <string name="scan_error_already_paid">Táto platba už bola uhradená.</string>
-    <string name="scan_error_invalid_chain">Táto platba nepoužíva ten istý blockchain ako vaša peňaženka.</string>
-    <string name="scan_error_lnurl_invalid">Tento LNURL odkaz sa nepodarilo spracovať. Uistite sa, že je platný.</string>
-    <string name="scan_error_lnurl_unsupported">Tento typ LNURL zatiaľ nie je podporovaný.</string>
-    <string name="scan_error_invalid_generic">Tieto údaje používajú neznámy formát a nemožno ich spracovať.</string>
-    <string name="scan_error_bip353_name_not_found">Názov \"%1$s\" sa nenašiel na \"%2$s\".</string>
-    <string name="scan_error_bip353_invalid_uri">Táto adresa používa neplatný zdroj Bip21.</string>
-    <string name="scan_error_bip353_invalid_offer">Táto adresa používa neplatnú ponuku Bolt12.</string>
-    <string name="scan_error_bip353_dnssec">Táto adresa je umiestnená na nezabezpečenom DNS. DNSSEC musí byť povolený.</string>
+    <string name="send_error_invoice_expired">Platnosť tejto faktúry vypršala.</string>
+    <string name="send_error_already_paid">Táto platba už bola uhradená.</string>
+    <string name="send_error_invalid_chain">Táto platba nepoužíva ten istý blockchain ako vaša peňaženka.</string>
+    <string name="send_error_lnurl_invalid">Tento LNURL odkaz sa nepodarilo spracovať. Uistite sa, že je platný.</string>
+    <string name="send_error_lnurl_unsupported">Tento typ LNURL zatiaľ nie je podporovaný.</string>
+    <string name="send_error_invalid_generic">Tieto údaje používajú neznámy formát a nemožno ich spracovať.</string>
+    <string name="send_error_bip353_name_not_found">Názov \"%1$s\" sa nenašiel na \"%2$s\".</string>
+    <string name="send_error_bip353_invalid_uri">Táto adresa používa neplatný zdroj Bip21.</string>
+    <string name="send_error_bip353_invalid_offer">Táto adresa používa neplatnú ponuku Bolt12.</string>
+    <string name="send_error_bip353_dnssec">Táto adresa je umiestnená na nezabezpečenom DNS. DNSSEC musí byť povolený.</string>
 
     <!-- validation -->
 

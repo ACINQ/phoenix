@@ -182,7 +182,7 @@
     <string name="scan_request_camera_access">Kliknite a povoľte prístup ku kamere</string>
     <string name="scan_request_camera_access_denied">Povolenie používať kameru bolo zamietnuté</string>
 
-    <string name="scan_lnurl_fetching">Získavanie dát zo služby…</string>
+    <string name="preparesend_lnurl_fetching">Získavanie dát zo služby…</string>
 
     <string name="scan_manual_input_title">Manuálne zadanie</string>
     <string name="scan_manual_input_instructions">Zadajte Lightning faktúru, LNURL alebo Lightning adresu, na ktorú chcete poslať peniaze.</string>

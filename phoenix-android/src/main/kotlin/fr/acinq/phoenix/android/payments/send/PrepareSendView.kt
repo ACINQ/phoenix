@@ -24,6 +24,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -35,6 +36,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -52,6 +54,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -77,8 +80,10 @@ import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.Dialog
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.PhoenixIcon
+import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.contact.ContactPhotoView
+import fr.acinq.phoenix.android.components.enableOrFade
 import fr.acinq.phoenix.android.isDarkTheme
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.payments.send.bolt11.SendToBolt11View
@@ -95,7 +100,6 @@ import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.readClipboard
 import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.managers.SendManager
-import kotlinx.coroutines.flow.map
 
 @Composable
 fun SendView(
@@ -201,23 +205,24 @@ private fun PrepareSendView(
     val context = LocalContext.current
     var freeFormInput by remember { mutableStateOf(initialInput ?: "") }
     val parsePaymentState = vm.parsePaymentState
+    val isProcessingData = vm.parsePaymentState.isProcessing || vm.readImageState.isProcessing
 
     LaunchedEffect(key1 = Unit) {
-        if (initialInput != null) {
+        if (!initialInput.isNullOrBlank()) {
             vm.parsePaymentData(initialInput)
         }
     }
 
     DefaultScreenLayout(isScrollable = false) {
-        DefaultScreenHeader(title = "Send", onBackClick = onBackClick)
+        DefaultScreenHeader(title = stringResource(id = R.string.preparesend_title), onBackClick = onBackClick)
 
         // show error message when reading an image from disk fails
         when (vm.readImageState) {
             is ReadImageState.Error -> Dialog(onDismiss = { vm.readImageState = ReadImageState.Ready }) {
-                Text(text = "This image could not be processed.", modifier = Modifier.padding(16.dp))
+                Text(text = stringResource(id = R.string.preparesend_imagepicker_error), modifier = Modifier.padding(16.dp))
             }
             is ReadImageState.NotFound -> Dialog(onDismiss = { vm.readImageState = ReadImageState.Ready }) {
-                Text(text = "No QR code found in this image.", modifier = Modifier.padding(16.dp))
+                Text(text = stringResource(id = R.string.preparesend_imagepicker_not_found), modifier = Modifier.padding(16.dp))
             }
             ReadImageState.Reading, ReadImageState.Ready -> Unit
         }
@@ -228,82 +233,100 @@ private fun PrepareSendView(
                 freeFormInput = it
             },
             onValueSubmit = { vm.parsePaymentData(freeFormInput) },
-            isProcessing = parsePaymentState.isProcessing,
+            isProcessing = isProcessingData,
             isError = parsePaymentState.hasFailed,
         )
 
         // contacts list
-        val contacts by business.contactsManager.contactsList.map { list ->
-            freeFormInput.takeIf { it.isNotBlank() && it.length >= 2 }?.let { filter ->
-                list.filter { it.name.contains(filter, ignoreCase = true) }
-            } ?: list
-        }.collectAsState(emptyList())
+        val contacts by business.contactsManager.contactsList.collectAsState()
         Column(modifier = Modifier
             .weight(1f)
             .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-            if (contacts.isNotEmpty()) {
-                LazyColumn {
-                    item { Spacer(modifier = Modifier.height(12.dp)) }
-                    items(contacts) {
-                        ContactRow(contactInfo = it, onClick = { it.mostRelevantOffer?.let { vm.parsePaymentData(it.encode()) } })
-                    }
-                    item { Spacer(modifier = Modifier.height(12.dp)) }
-                }
-            } else if (freeFormInput.isBlank()) {
+            if (contacts.isEmpty()) {
                 Spacer(modifier = Modifier.height(16.dp))
-                TextWithIcon(text = "No contacts yet...", icon = R.drawable.ic_user, textStyle = MaterialTheme.typography.caption.copy(fontSize = 16.sp), iconTint = MaterialTheme.typography.caption.color, iconSize = 24.dp, space = 8.dp)
+                TextWithIcon(text = stringResource(id = R.string.preparesend_contacts_none), icon = R.drawable.ic_user, textStyle = MaterialTheme.typography.caption.copy(fontSize = 16.sp), iconTint = MaterialTheme.typography.caption.color, iconSize = 24.dp, space = 8.dp)
             } else {
-                Spacer(modifier = Modifier.height(16.dp))
-                TextWithIcon(text = "No matches for search", icon = R.drawable.ic_user_search, textStyle = MaterialTheme.typography.caption.copy(fontSize = 16.sp), iconTint = MaterialTheme.typography.caption.color, iconSize = 24.dp, space = 8.dp)
+                val filteredContacts by produceState(initialValue = emptyList(), key1 = contacts, key2 = freeFormInput) {
+                    value = if (freeFormInput.isBlank() || freeFormInput.length < 2) {
+                        contacts
+                    } else {
+                        contacts.filter { it.name.contains(freeFormInput, ignoreCase = true) }
+                    }
+                }
+                if (freeFormInput.isNotBlank() && filteredContacts.isEmpty()) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    TextWithIcon(text = stringResource(id = R.string.preparesend_contacts_no_matches), icon = R.drawable.ic_user_search, textStyle = MaterialTheme.typography.caption.copy(fontSize = 16.sp), iconTint = MaterialTheme.typography.caption.color, iconSize = 24.dp, space = 8.dp)
+                } else {
+                    LazyColumn {
+                        item { Spacer(modifier = Modifier.height(12.dp)) }
+                        items(filteredContacts) {
+                            ContactRow(
+                                contactInfo = it,
+                                onClick = { it.mostRelevantOffer?.let { vm.parsePaymentData(it.encode()) } },
+                                enabled = !isProcessingData
+                            )
+                        }
+                        item { Spacer(modifier = Modifier.height(12.dp)) }
+                    }
+                }
             }
         }
 
         // bottom buttons
-        SendButtonsRow(
-            onSubmit = {
-                freeFormInput = ""
-                vm.parsePaymentData(it)
-            },
-            readImageState = vm.readImageState,
-            onReadImage = {
-                vm.resetParsing()
-                vm.readImage(context, it, onDataFound = vm::parsePaymentData)
-            },
-            onShowScanner = onShowScanner
-        )
+        Surface(
+            shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+            color = MaterialTheme.colors.surface,
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(IntrinsicSize.Min)
+                    .padding(horizontal = 24.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                if (isProcessingData) {
+                    ProgressView(text = when {
+                        vm.parsePaymentState is ParsePaymentState.ResolvingBip353 -> stringResource(id = R.string.preparesend_bip353_resolving)
+                        vm.parsePaymentState is ParsePaymentState.ResolvingLnurl -> stringResource(id = R.string.preparesend_lnurl_fetching)
+                        else -> stringResource(id = R.string.preparesend_parsing)
+                    }, modifier = Modifier.heightIn(min = 80.dp), padding = PaddingValues(20.dp))
+                } else {
+                    SendButtonsRow(
+                        onSubmit = {
+                            freeFormInput = ""
+                            vm.parsePaymentData(it)
+                        },
+                        onReadImage = {
+                            vm.resetParsing()
+                            vm.readImage(context, it, onDataFound = vm::parsePaymentData)
+                        },
+                        onShowScanner = onShowScanner,
+                        enabled = !isProcessingData
+                    )
+                }
+            }
+        }
     }
 }
 
 @Composable
-private fun SendButtonsRow(
+private fun RowScope.SendButtonsRow(
     onSubmit: (String) -> Unit,
-    readImageState: ReadImageState,
     onReadImage: (Uri) -> Unit,
     onShowScanner: () -> Unit,
+    enabled: Boolean,
 ) {
-    Surface(
-        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
-        color = MaterialTheme.colors.surface,
-    ) {
-        val context = LocalContext.current
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(IntrinsicSize.Min)
-                .padding(horizontal = 24.dp, vertical = 8.dp)
-        ) {
-            var imageUri by remember { mutableStateOf<Uri?>(null) }
-            val imagePickerLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) {
-                imageUri = it
-            }
-            LaunchedEffect(key1 = imageUri) {
-                imageUri?.let { onReadImage(it) ; imageUri = null }
-            }
-            ReadDataButton(label = "Choose image", icon = R.drawable.ic_image, onClick = { imagePickerLauncher.launch("image/*") }, enabled = readImageState.canProcess)
-            ReadDataButton(label = "Paste", icon = R.drawable.ic_paste, onClick = { readClipboard(context)?.let { onSubmit(it) } })
-            ReadDataButton(label = "Scan QR code", icon = R.drawable.ic_scan_qr, onClick = onShowScanner)
-        }
+    val context = LocalContext.current
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+    val imagePickerLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) {
+        imageUri = it
     }
+    LaunchedEffect(key1 = imageUri) {
+        imageUri?.let { onReadImage(it) ; imageUri = null }
+    }
+    ReadDataButton(label = stringResource(id = R.string.preparesend_imagepicker_button), icon = R.drawable.ic_image, onClick = { imagePickerLauncher.launch("image/*") }, enabled = enabled)
+    ReadDataButton(label = stringResource(id = R.string.preparesend_paste_button), icon = R.drawable.ic_paste, onClick = { readClipboard(context)?.let { onSubmit(it) } }, enabled = enabled)
+    ReadDataButton(label = stringResource(id = R.string.preparesend_scan_button), icon = R.drawable.ic_scan_qr, onClick = onShowScanner, enabled = enabled)
 }
 
 @Composable
@@ -412,9 +435,12 @@ private fun RowScope.ReadDataButton(
 private fun ContactRow(
     contactInfo: ContactInfo,
     onClick: () -> Unit,
+    enabled: Boolean,
 ) {
-    Clickable(modifier = Modifier.fillMaxWidth(), onClick = onClick) {
-        Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+    Clickable(modifier = Modifier.fillMaxWidth(), onClick = onClick, enabled = enabled) {
+        Row(modifier = Modifier
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .enableOrFade(enabled), verticalAlignment = Alignment.CenterVertically) {
             ContactPhotoView(photoUri = contactInfo.photoUri, name = contactInfo.name, onChange = null, imageSize = 32.dp)
             Spacer(modifier = Modifier.width(8.dp))
             Text(text = contactInfo.name, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 18.sp)

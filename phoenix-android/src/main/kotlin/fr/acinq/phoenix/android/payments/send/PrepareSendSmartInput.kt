@@ -143,7 +143,7 @@ fun SendSmartInput(
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
                         placeholder = {
                             Text(
-                                text = stringResource(id = R.string.scan_manual_input_hint),
+                                text = stringResource(id = R.string.preparesend_manual_input_hint),
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                                 modifier = Modifier.padding(top = 2.dp)

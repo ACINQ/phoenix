@@ -288,14 +288,14 @@ fun AppView(
                         // prevents forwarding an internal deeplink intent coming from androidx-navigation framework.
                         // TODO properly parse deeplinks following f0ae90444a23cc17d6d7407dfe43c0c8d20e62fc
                         val isIntentFromNavigation = intent?.dataString?.contains("androidx.navigation") ?: true
-                        log.info("isIntentFromNavigation=$isIntentFromNavigation")
+                        log.debug("isIntentFromNavigation=$isIntentFromNavigation")
                         val input = if (isIntentFromNavigation) {
                             it.arguments?.getString("input")
                         } else {
                             intent?.data?.toString()?.substringAfter("scanview:")
                         }
-                        log.info("preparing send-payment with input=$input")
                         RequireStarted(walletState, nextUri = "scanview:${intent?.data?.toString()}") {
+                            log.info("navigating to send-payment with input=$input")
                             SendView(
                                 initialInput = input,
                                 fromDeepLink = !isIntentFromNavigation,

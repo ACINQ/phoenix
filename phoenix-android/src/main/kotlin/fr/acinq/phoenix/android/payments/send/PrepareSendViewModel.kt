@@ -36,6 +36,7 @@ import fr.acinq.phoenix.managers.SendManager
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 
@@ -46,7 +47,7 @@ sealed class ReadImageState {
     data object NotFound: ReadImageState()
     data object Error: ReadImageState()
 
-    val canProcess by lazy { this is Ready || this is Error }
+    val isProcessing by lazy { this is Reading || this is NotFound }
 }
 
 sealed class ParsePaymentState {
@@ -138,11 +139,10 @@ class PrepareSendViewModel(val sendManager: SendManager) : ViewModel() {
                     }
                 }
             )
-
             parsePaymentState = when (result) {
                 is SendManager.ParseResult.BadRequest -> ParsePaymentState.ParsingFailure(result)
                 is SendManager.ParseResult.Success -> {
-                    log.info("parsed ${result.javaClass.simpleName} from input=$input")
+                    log.info("parsed [${result.javaClass.canonicalName}] from input=$input")
                     when (result) {
                         is SendManager.ParseResult.Uri -> {
                             val bolt11 = result.uri.paymentRequest

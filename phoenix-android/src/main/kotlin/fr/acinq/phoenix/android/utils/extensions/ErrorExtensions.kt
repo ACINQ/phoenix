@@ -31,17 +31,17 @@ fun Connection.CLOSED.isBadCertificate() = this.reason?.cause is CertificateExce
 @Composable
 fun SendManager.ParseResult.BadRequest.toLocalisedMessage(): String {
     return when (val reason = this.reason) {
-        is SendManager.BadRequestReason.Expired -> stringResource(R.string.scan_error_expired)
-        is SendManager.BadRequestReason.ChainMismatch -> stringResource(R.string.scan_error_invalid_chain)
-        is SendManager.BadRequestReason.AlreadyPaidInvoice -> stringResource(R.string.scan_error_already_paid)
+        is SendManager.BadRequestReason.Expired -> stringResource(R.string.send_error_invoice_expired)
+        is SendManager.BadRequestReason.ChainMismatch -> stringResource(R.string.send_error_invalid_chain)
+        is SendManager.BadRequestReason.AlreadyPaidInvoice -> stringResource(R.string.send_error_already_paid)
         is SendManager.BadRequestReason.ServiceError -> reason.error.toLocalisedMessage().text
-        is SendManager.BadRequestReason.InvalidLnurl -> stringResource(R.string.scan_error_lnurl_invalid)
-        is SendManager.BadRequestReason.UnsupportedLnurl -> stringResource(R.string.scan_error_lnurl_unsupported)
-        is SendManager.BadRequestReason.UnknownFormat -> stringResource(R.string.scan_error_invalid_generic)
-        is SendManager.BadRequestReason.Bip353NameNotFound -> stringResource(id = R.string.scan_error_bip353_name_not_found, reason.username, reason.domain)
-        is SendManager.BadRequestReason.Bip353InvalidUri -> stringResource(id = R.string.scan_error_bip353_invalid_uri)
-        is SendManager.BadRequestReason.Bip353InvalidOffer -> stringResource(id = R.string.scan_error_bip353_invalid_offer)
-        is SendManager.BadRequestReason.Bip353NoDNSSEC -> stringResource(id = R.string.scan_error_bip353_dnssec)
+        is SendManager.BadRequestReason.InvalidLnurl -> stringResource(R.string.send_error_lnurl_invalid)
+        is SendManager.BadRequestReason.UnsupportedLnurl -> stringResource(R.string.send_error_lnurl_unsupported)
+        is SendManager.BadRequestReason.UnknownFormat -> stringResource(R.string.send_error_invalid_generic)
+        is SendManager.BadRequestReason.Bip353NameNotFound -> stringResource(id = R.string.send_error_bip353_name_not_found, reason.username, reason.domain)
+        is SendManager.BadRequestReason.Bip353InvalidUri -> stringResource(id = R.string.send_error_bip353_invalid_uri)
+        is SendManager.BadRequestReason.Bip353InvalidOffer -> stringResource(id = R.string.send_error_bip353_invalid_offer)
+        is SendManager.BadRequestReason.Bip353NoDNSSEC -> stringResource(id = R.string.send_error_bip353_dnssec)
     }
 }
 
