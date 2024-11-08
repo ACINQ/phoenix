@@ -572,7 +572,7 @@
     <string name="lnurl_error_remote_code">The service <b>%1$s</b> returned an HTTP error (%2$s). Contact their helpdesk if needed.</string>
     <string name="lnurl_error_remote_unreadable">The service <b>%1$s</b> returned a malformed message.</string>
     <string name="lnurl_error_remote_connection">Could not connect to service <b>%1$s</b>.</string>
-    <string name="lnurl_error_remote_is_website">This code is a website. Do you want to open the link?</string>
+    <string name="lnurl_error_remote_is_website">This appears to be a website (not a lightning invoice):\n\n<i>%1$s</i></string>
     <string name="lnurl_error_remote_unknown_lnaddress">Service %1$s doesn\'t support lightning addresses, or doesn\'t know this user.</string>
 
     <!-- lnurl-pay -->

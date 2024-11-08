@@ -52,7 +52,7 @@ fun LnurlError.RemoteFailure.toLocalisedMessage(): AnnotatedString {
         is LnurlError.RemoteFailure.CouldNotConnect -> annotatedStringResource(id = R.string.lnurl_error_remote_connection, origin)
         is LnurlError.RemoteFailure.Detailed -> annotatedStringResource(id = R.string.lnurl_error_remote_details, origin, reason)
         is LnurlError.RemoteFailure.Unreadable -> annotatedStringResource(id = R.string.lnurl_error_remote_unreadable, origin)
-        is LnurlError.RemoteFailure.IsWebsite -> annotatedStringResource(id = R.string.lnurl_error_remote_is_website)
+        is LnurlError.RemoteFailure.IsWebsite -> annotatedStringResource(id = R.string.lnurl_error_remote_is_website, origin)
         is LnurlError.RemoteFailure.LightningAddressError -> annotatedStringResource(id = R.string.lnurl_error_remote_unknown_lnaddress, origin)
     }
 }

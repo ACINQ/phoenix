@@ -171,7 +171,7 @@
     <string name="send_error_invalid_chain">This payment does not use the same blockchain as your wallet.</string>
     <string name="send_error_lnurl_invalid">Failed to process this LNURL link. Make sure it is valid.</string>
     <string name="send_error_lnurl_unsupported">This type of LNURL is not supported yet.</string>
-    <string name="send_error_invalid_generic">This data uses an unknown format and cannot be processed.</string>
+    <string name="send_error_invalid_generic">This is not a supported payment request.</string>
     <string name="send_error_bip353_name_not_found">Name \"%1$s\" is not found on \"%2$s\".</string>
     <string name="send_error_bip353_invalid_uri">This address uses an invalid Bip21 resource.</string>
     <string name="send_error_bip353_invalid_offer">This address uses an invalid Bolt12 offer.</string>

@@ -74,6 +74,7 @@ import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.business
+import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Clickable
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
@@ -84,6 +85,7 @@ import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.contact.ContactPhotoView
 import fr.acinq.phoenix.android.components.enableOrFade
+import fr.acinq.phoenix.android.components.openLink
 import fr.acinq.phoenix.android.isDarkTheme
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.payments.send.bolt11.SendToBolt11View
@@ -99,6 +101,7 @@ import fr.acinq.phoenix.android.utils.gray800
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.readClipboard
 import fr.acinq.phoenix.data.ContactInfo
+import fr.acinq.phoenix.data.lnurl.LnurlError
 import fr.acinq.phoenix.managers.SendManager
 
 @Composable
@@ -161,7 +164,7 @@ fun SendView(
 
             // show dialogs when a parsing error occurs
             if (parseState is ParsePaymentState.Error && !showScanner) {
-                Dialog(onDismiss = vm::resetParsing) {
+                Dialog(onDismiss = vm::resetParsing, buttons = null) {
                     PaymentDataError(
                         errorMessage = when (parseState) {
                             is ParsePaymentState.GenericError -> parseState.errorMessage
@@ -169,6 +172,17 @@ fun SendView(
                         },
                         modifier = Modifier.padding(16.dp)
                     )
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                        Spacer(modifier = Modifier.weight(1f))
+                        if (parseState is ParsePaymentState.ParsingFailure && parseState.error.reason is SendManager.BadRequestReason.ServiceError) {
+                            val error = (parseState.error.reason as SendManager.BadRequestReason.ServiceError).error
+                            if (error is LnurlError.RemoteFailure.IsWebsite) {
+                                val context = LocalContext.current
+                                Button(text = "Open link", icon = R.drawable.ic_external_link, onClick = { openLink(context, error.origin) })
+                            }
+                        }
+                        Button(text = stringResource(id = R.string.btn_ok), onClick = vm::resetParsing)
+                    }
                 }
             }
 

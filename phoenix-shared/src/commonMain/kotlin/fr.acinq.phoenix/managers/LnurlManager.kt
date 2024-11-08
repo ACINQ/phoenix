@@ -85,7 +85,7 @@ class LnurlManager(
                     val scheme = url.protocol.name.lowercase()
                     val isWebsite = scheme == "http" || scheme == "https"
                     when {
-                        isWebsite -> throw LnurlError.RemoteFailure.IsWebsite(url.host)
+                        isWebsite -> throw LnurlError.RemoteFailure.IsWebsite(url.toString())
                         else -> throw e
                     }
                 }

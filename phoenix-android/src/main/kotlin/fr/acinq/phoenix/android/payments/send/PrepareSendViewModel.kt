@@ -36,7 +36,6 @@ import fr.acinq.phoenix.managers.SendManager
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 
@@ -139,10 +138,10 @@ class PrepareSendViewModel(val sendManager: SendManager) : ViewModel() {
                     }
                 }
             )
+            log.info("parsed [${result.javaClass.canonicalName}] from input=$input")
             parsePaymentState = when (result) {
                 is SendManager.ParseResult.BadRequest -> ParsePaymentState.ParsingFailure(result)
                 is SendManager.ParseResult.Success -> {
-                    log.info("parsed [${result.javaClass.canonicalName}] from input=$input")
                     when (result) {
                         is SendManager.ParseResult.Uri -> {
                             val bolt11 = result.uri.paymentRequest
