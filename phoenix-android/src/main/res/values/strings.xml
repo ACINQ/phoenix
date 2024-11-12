@@ -82,7 +82,8 @@
     <string name="startup_fallback_unlock_button">Unlock wallet</string>
     <string name="startup_fallback_checking">Checking seed…</string>
     <string name="startup_fallback_error_default">An error occurred. Please try again.</string>
-    <string name="startup_fallback_error_incorrect_seed">This seed does not match your wallet.</string>
+    <string name="startup_fallback_error_incorrect_seed">This seed does not match your wallet data.</string>
+    <string name="startup_fallback_error_keystore_error">Failed to perform keystore operations.</string>
     <string name="startup_fallback_success_match">Seed matches.\nWriting to disk…</string>
     <string name="startup_fallback_success_starting">Starting Phoenix…</string>
 

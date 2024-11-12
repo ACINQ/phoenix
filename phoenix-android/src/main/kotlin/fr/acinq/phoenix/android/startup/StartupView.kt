@@ -370,6 +370,9 @@ private fun StartupSeedFallback(
                     icon = R.drawable.ic_check_circle
                 )
             }
+            is StartupDecryptionState.SeedInputFallback.Error.KeyStoreFailure -> {
+                Text(text = stringResource(id = R.string.startup_fallback_error_keystore_error))
+            }
         }
         Spacer(modifier = Modifier.height(100.dp))
     }
