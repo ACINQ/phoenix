@@ -198,7 +198,6 @@
 
     <!-- prepare send payment -->
 
-
     <string name="preparesend_title">Send</string>
     <string name="preparesend_contacts_none">No contacts yet…</string>
     <string name="preparesend_contacts_no_matches">No matches for search…</string>

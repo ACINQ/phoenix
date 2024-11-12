@@ -191,18 +191,11 @@
 
     <!-- scan -->
 
-    <string name="scan_manual_input_button">Ingiza kwa mkono</string>
-    <string name="scan_paste_button">Pasta data kutoka clipboard</string>
     <string name="scan_request_camera_access">Gonga ili kutoa ruhusa ya kamera</string>
     <string name="scan_request_camera_access_denied">Ruhusa ya kamera imekana</string>
 
     <string name="preparesend_lnurl_fetching">Inapata data kutoka huduma…</string>
     <string name="preparesend_bip353_resolving">Inapata ombi la malipo kupitia DNS…</string>
-
-    <string name="scan_manual_input_title">Ingiza kwa mkono</string>
-    <string name="scan_manual_input_instructions">Ingiza hati ya Lightning, ofa, LNURL au anwani ya Lightning unayotaka kutuma pesa kwake.</string>
-    <string name="scan_manual_input_label">Hati, anwani ya LN…</string>
-    <string name="scan_manual_input_hint" translatable="false">satoshi@domain.com, bc1q..., lnbc...</string>
 
     <!-- utils: misc strings -->
 
