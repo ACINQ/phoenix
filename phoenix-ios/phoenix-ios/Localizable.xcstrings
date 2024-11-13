@@ -38050,6 +38050,9 @@
         }
       }
     },
+    "Spend from final wallet" : {
+
+    },
     "Spending = pouring water out\nReceiving = adding more water" : {
       "localizations" : {
         "ar" : {
@@ -45094,7 +45097,14 @@
         }
       }
     },
+    "Use this screen to spend funds from your final wallet. These funds come from channels that have been closed in the past. This does not affect your existing Lightning channels." : {
+
+    },
+    "Use this screen to spend your on-chain funds that were not swapped in time. The swap-in request has now expired." : {
+
+    },
     "Use this screen to spend your on-chain funds that were not swapped in time. The swap-in request has now expired. " : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

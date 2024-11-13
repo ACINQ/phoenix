@@ -397,7 +397,7 @@ struct SwapInWalletDetails: View {
 	func navLinkView(_ tag: NavLinkTag) -> some View {
 		
 		switch tag {
-			case .SpendExpiredSwapIns: SpendExpiredSwapIns()
+		case .SpendExpiredSwapIns: SpendOnChainFunds(source: .expiredSwapIns)
 		}
 	}
 	
