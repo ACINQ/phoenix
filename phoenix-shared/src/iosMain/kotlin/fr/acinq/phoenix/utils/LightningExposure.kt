@@ -424,11 +424,3 @@ suspend fun Peer.betterPayOffer(
     send(PayOffer(paymentId, payerKey, payerNote, amount, offer, fetchInvoiceTimeoutInSeconds.seconds))
     return res.await()
 }
-
-fun fakeWallet(amount: Satoshi, swapInParams: SwapInParams): WalletState.WalletWithConfirmations {
-    val txIn = listOf(TxIn(OutPoint(TxId(randomBytes32()), 2), 0))
-    val txOut = listOf(TxOut(amount, Script.pay2wpkh(randomKey().publicKey())))
-    val parentTx = Transaction(2, txIn, txOut, 0)
-    val utxo = WalletState.Utxo(parentTx.txid, 0, 42, parentTx, WalletState.AddressMeta.Single)
-    return WalletState.WalletWithConfirmations(swapInParams, 100, listOf(utxo))
-}
