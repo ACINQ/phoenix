@@ -73,6 +73,14 @@ class ContactQueries(val database: AppDatabase) {
         }
     }
 
+    fun existsContact(contactId: UUID): Boolean {
+        return database.transactionWithResult {
+            queries.existsContact(
+                id = contactId.toString()
+            ).executeAsOne() > 0
+        }
+    }
+
     fun getContact(contactId: UUID): ContactInfo? {
         return database.transactionWithResult {
             queries.getContact(contactId = contactId.toString()).executeAsOneOrNull()?.let {

@@ -121,9 +121,14 @@ class CloudKitContactsDb(
                 // Fetch the corresponding contact info from the database.
 
                 uniqueContactIds.forEach { contactId ->
-                    appDb.contactQueries.getContact(contactId)?.let {
-                        rowMap[contactId] = it
+                    if (appDb.contactQueries.existsContact(contactId)) {
+                        // appDb.contactQueries.getContact() throws if the contact
+                        // doesn't exist in database.
+                        appDb.contactQueries.getContact(contactId)?.let {
+                            rowMap[contactId] = it
+                        }
                     }
+
                 }
 
                 // Step 4 of 5:
