@@ -164,6 +164,7 @@
     <!-- scanning errors -->
 
     <string name="send_error_invoice_expired">Platnosť tejto faktúry vypršala.</string>
+    <string name="send_error_payment_pending">Táto platba sa už spracováva. Počkajte, prosím, na jej dokončenie.</string>
     <string name="send_error_already_paid">Táto platba už bola uhradená.</string>
     <string name="send_error_invalid_chain">Táto platba nepoužíva ten istý blockchain ako vaša peňaženka.</string>
     <string name="send_error_lnurl_invalid">Tento LNURL odkaz sa nepodarilo spracovať. Uistite sa, že je platný.</string>

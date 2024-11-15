@@ -68,8 +68,9 @@ class SendManager(
     private val log = loggerFactory.newLogger(this::class)
 
     sealed class BadRequestReason : Exception() {
-        object UnknownFormat : BadRequestReason()
-        object AlreadyPaidInvoice : BadRequestReason()
+        data object UnknownFormat : BadRequestReason()
+        data object AlreadyPaidInvoice : BadRequestReason()
+        data object PaymentPending : BadRequestReason()
         data class Expired(val timestampSeconds: Long, val expirySeconds: Long) : BadRequestReason()
         data class ChainMismatch(val expected: Chain) : BadRequestReason()
         data class ServiceError(val url: Url, val error: LnurlError.RemoteFailure) : BadRequestReason()
@@ -86,6 +87,7 @@ class SendManager(
         data class BadResponseError(val err: LnurlError.Pay.Invoice) : LnurlPayError()
         data class ChainMismatch(val expected: Chain) : LnurlPayError()
         data object AlreadyPaidInvoice : LnurlPayError()
+        data object PaymentPending : LnurlPayError()
     }
 
     sealed class LnurlWithdrawError {
@@ -209,10 +211,16 @@ class SendManager(
         }
 
         val db = databaseManager.databases.filterNotNull().first()
-        return if (db.payments.listLightningOutgoingPayments(invoice.paymentHash).any { it.status is LightningOutgoingPayment.Status.Completed.Succeeded }) {
-            BadRequestReason.AlreadyPaidInvoice
-        } else {
-            null
+        val similarPayments = db.payments.listLightningOutgoingPayments(invoice.paymentHash)
+        // we MUST raise an error if this payment hash has already paid, or is being paid.
+        // parallel pending payments on the same payment hash can trigger force-closes
+        // FIXME: this check should be done in lightning-kmp, not in Phoenix
+        return when {
+            similarPayments.any { it.status is LightningOutgoingPayment.Status.Completed.Succeeded || it.parts.any { part -> part.status is LightningOutgoingPayment.Part.Status.Succeeded } } ->
+                BadRequestReason.AlreadyPaidInvoice
+            similarPayments.any { it.status is LightningOutgoingPayment.Status.Pending || it.parts.any { part -> part.status is LightningOutgoingPayment.Part.Status.Pending } } ->
+                BadRequestReason.PaymentPending
+            else -> null
         }
     }
 
@@ -471,22 +479,15 @@ class SendManager(
         return try {
             val invoice = task.await()
             when (checkForBadBolt11Invoice(invoice.invoice)) {
-                is BadRequestReason.ChainMismatch -> Either.Left(
-                    LnurlPayError.ChainMismatch(expected = chain)
-                )
-                is BadRequestReason.AlreadyPaidInvoice -> Either.Left(
-                    LnurlPayError.AlreadyPaidInvoice
-                )
+                is BadRequestReason.ChainMismatch -> Either.Left(LnurlPayError.ChainMismatch(expected = chain))
+                is BadRequestReason.AlreadyPaidInvoice -> Either.Left(LnurlPayError.AlreadyPaidInvoice)
+                is BadRequestReason.PaymentPending -> Either.Left(LnurlPayError.PaymentPending)
                 else -> Either.Right(invoice)
             }
         } catch (err: Throwable) {
             when (err) {
-                is LnurlError.RemoteFailure -> Either.Left(
-                    LnurlPayError.RemoteError(err)
-                )
-                is LnurlError.Pay.Invoice -> Either.Left(
-                    LnurlPayError.BadResponseError(err)
-                )
+                is LnurlError.RemoteFailure -> Either.Left(LnurlPayError.RemoteError(err))
+                is LnurlError.Pay.Invoice -> Either.Left(LnurlPayError.BadResponseError(err))
                 else -> Either.Left(
                     LnurlPayError.RemoteError(
                         LnurlError.RemoteFailure.Unreadable(

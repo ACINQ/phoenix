@@ -33,6 +33,7 @@ fun SendManager.ParseResult.BadRequest.toLocalisedMessage(): String {
     return when (val reason = this.reason) {
         is SendManager.BadRequestReason.Expired -> stringResource(R.string.send_error_invoice_expired)
         is SendManager.BadRequestReason.ChainMismatch -> stringResource(R.string.send_error_invalid_chain)
+        is SendManager.BadRequestReason.PaymentPending -> stringResource(R.string.send_error_payment_pending)
         is SendManager.BadRequestReason.AlreadyPaidInvoice -> stringResource(R.string.send_error_already_paid)
         is SendManager.BadRequestReason.ServiceError -> reason.error.toLocalisedMessage().text
         is SendManager.BadRequestReason.InvalidLnurl -> stringResource(R.string.send_error_lnurl_invalid)

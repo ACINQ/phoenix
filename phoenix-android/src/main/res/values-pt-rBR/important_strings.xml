@@ -163,6 +163,7 @@
     <!-- scanning errors -->
 
     <string name="send_error_invoice_expired">Esta fatura está expirada.</string>
+    <string name="send_error_payment_pending">Este pagamento já está sendo processado. Aguarde a conclusão.</string>
     <string name="send_error_already_paid">Este pagamento já foi pago.</string>
     <string name="send_error_invalid_chain">Este pagamento não usa o mesmo blockchain que sua carteira.</string>
     <string name="send_error_lnurl_invalid">Falha ao processar esse link LNURL. Verifique se ele é válido.</string>

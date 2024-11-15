@@ -166,6 +166,7 @@ fun LnurlPayView(
                         details = when (state) {
                             is LnurlPayViewState.Error.Generic -> state.cause.localizedMessage
                             is LnurlPayViewState.Error.PayError -> when (val error = state.error) {
+                                is SendManager.LnurlPayError.PaymentPending -> annotatedStringResource(R.string.lnurl_pay_error_payment_pending, payIntent.callback.host)
                                 is SendManager.LnurlPayError.AlreadyPaidInvoice -> annotatedStringResource(R.string.lnurl_pay_error_already_paid, payIntent.callback.host)
                                 is SendManager.LnurlPayError.ChainMismatch -> annotatedStringResource(R.string.lnurl_pay_error_invalid_chain, payIntent.callback.host)
                                 is SendManager.LnurlPayError.BadResponseError -> when (val errorDetail = error.err) {
