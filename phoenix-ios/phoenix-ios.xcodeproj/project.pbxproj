@@ -1618,6 +1618,7 @@
 			buildConfigurationList = DCB0DB8C255AE42F005B29C8 /* Build configuration list for PBXNativeTarget "phoenix-ios-framework" */;
 			buildPhases = (
 				DCB0DB95255AE43E005B29C8 /* ShellScript */,
+				DCB0DB9F255AE6F1005B29C8 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -1783,6 +1784,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "cd \"$SRCROOT/..\"\necho ./gradlew embedAndSignAppleFrameworkForXcode\n./gradlew embedAndSignAppleFrameworkForXcode\n";
+		};
+		DCB0DB9F255AE6F1005B29C8 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$SRCROOT/../phoenix-shared/build/xcode-frameworks/$CONFIGURATION/$SDK_NAME/PhoenixShared.framework",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "FrmkDuplicate=\"$SRCROOT/../phoenix-shared/build/xcode-frameworks/$CONFIGURATION/$SDK_NAME/PhoenixShared.framework/Frameworks/PhoenixShared.framework\"\n\nif [ -e \"$FrmkDuplicate\" ]; then\n  echo \"Deleting duplicate framework: $FrmkDuplicate\"\n  rm -R \"$FrmkDuplicate\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
