@@ -1659,7 +1659,6 @@
 			buildConfigurationList = DCB0DB8C255AE42F005B29C8 /* Build configuration list for PBXNativeTarget "phoenix-ios-framework" */;
 			buildPhases = (
 				DCB0DB95255AE43E005B29C8 /* ShellScript */,
-				DCB0DB9F255AE6F1005B29C8 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -1825,27 +1824,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "cd \"$SRCROOT/..\"\necho ./gradlew embedAndSignAppleFrameworkForXcode\n./gradlew embedAndSignAppleFrameworkForXcode\n";
-		};
-		DCB0DB9F255AE6F1005B29C8 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"$SRCROOT/../phoenix-shared/build/xcode-frameworks/$CONFIGURATION/$SDK_NAME/PhoenixShared.framework",
-				"$SRCROOT/../phoenix-shared/build/xcode-frameworks/$CONFIGURATION/$SDK_NAME/PhoenixShared.framework.dSYM",
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME/PhoenixShared.framework,
-				$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME/PhoenixShared.framework.dSYM,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "SrcFrmk=\"$SRCROOT/../phoenix-shared/build/xcode-frameworks/$CONFIGURATION/$SDK_NAME/PhoenixShared.framework\"\necho \"SrcFrmk = $SrcFrmk\"\n\nDstFrmk=\"$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME\"\necho \"DstFrmk = $DstFrmk\"\n\necho \"rm -R $DstFrmk/Frameworks\"\nrm -R \"$DstFrmk/Frameworks\"\n\necho \"cp -R $SrcFrmk/ $DstFrmk/\"\ncp -R \"$SrcFrmk/\" \"$DstFrmk/\"\n\necho \"cp -R $SrcFrmk.dSYM/ $DstFrmk.dSYM/\"\ncp -R \"$SrcFrmk.dSYM/\" \"$DstFrmk.dSYM/\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
