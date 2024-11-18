@@ -24,6 +24,7 @@ extension SendManager {
 	typealias ParseResult_Lnurl_Auth = ParseResultLnurlAuth
 	
 	typealias BadRequestReason_AlreadyPaidInvoice = BadRequestReasonAlreadyPaidInvoice
+	typealias BadRequestReason_PaymentPending = BadRequestReasonPaymentPending
 	typealias BadRequestReason_Bip353InvalidOffer = BadRequestReasonBip353InvalidOffer
 	typealias BadRequestReason_Bip353InvalidUri = BadRequestReasonBip353InvalidUri
 	typealias BadRequestReason_Bip353NameNotFound = BadRequestReasonBip353NameNotFound
@@ -40,6 +41,7 @@ extension SendManager {
 	typealias LnurlPay_Error_BadResponseError = LnurlPayErrorBadResponseError
 	typealias LnurlPay_Error_ChainMismatch = LnurlPayErrorChainMismatch
 	typealias LnurlPay_Error_AlreadyPaidInvoice = LnurlPayErrorAlreadyPaidInvoice
+	typealias LnurlPay_Error_PaymentPending = LnurlPayErrorPaymentPending
 	
 	typealias LnurlWithdraw_Error = LnurlWithdrawError
 	typealias LnurlWithdraw_Error_RemoteError = LnurlWithdrawErrorRemoteError

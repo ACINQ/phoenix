@@ -38,6 +38,13 @@ class ParseResultHelper {
 				localized: "You've already paid this invoice. Paying it again could result in stolen funds.",
 				comment: "Error message - scanning lightning invoice"
 			)
+			
+		case is SendManager.BadRequestReason_PaymentPending:
+			
+			msg = String(
+				localized: "This payment is already being processed. Please wait for it to complete.",
+				comment: "Error message - scanning lightning invoice"
+			)
 
 		case is SendManager.BadRequestReason_Bip353InvalidOffer:
 			
