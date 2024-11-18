@@ -2,7 +2,7 @@ object Versions {
     const val lightningKmp = "1.8.5-SNAPSHOT"
     const val secp256k1 = "0.14.0"
 
-    const val kotlin = "1.9.22"
+    const val kotlin = "2.0.21"
 
     const val ktor = "2.3.7"
     const val sqlDelight = "2.0.1"
