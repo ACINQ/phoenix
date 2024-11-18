@@ -7,12 +7,9 @@ import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.ElectrumConfig
-import fr.acinq.phoenix.utils.TorHelper.connectionState
 import fr.acinq.lightning.logging.debug
 import fr.acinq.lightning.logging.error
 import fr.acinq.lightning.logging.info
-import fr.acinq.tor.Tor
-import fr.acinq.tor.TorState
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -35,7 +32,6 @@ class AppConnectionsDaemon(
     private val currencyManager: CurrencyManager,
     private val networkMonitor: NetworkMonitor,
     private val tcpSocketBuilder: suspend () -> TcpSocket.Builder,
-    private val tor: Tor,
     private val electrumClient: ElectrumClient,
 ) : CoroutineScope by MainScope() {
 
@@ -47,7 +43,6 @@ class AppConnectionsDaemon(
         currencyManager = business.currencyManager,
         networkMonitor = business.networkMonitor,
         tcpSocketBuilder = business.tcpSocketBuilderFactory,
-        tor = business.tor,
         electrumClient = business.electrumClient
     )
 
@@ -55,7 +50,6 @@ class AppConnectionsDaemon(
 
     private var peerConnectionJob: Job? = null
     private var electrumConnectionJob: Job? = null
-    private var torConnectionJob: Job? = null
     private var httpControlFlowEnabled: Boolean = false
 
     private data class TrafficControl(
@@ -190,51 +184,6 @@ class AppConnectionsDaemon(
                 peerControlChanges.send { copy(torIsEnabled = newValue) }
                 electrumControlChanges.send { copy(torIsEnabled = newValue) }
                 httpApiControlChanges.send { copy(torIsEnabled = newValue) }
-            }
-        }
-
-        // Tor state monitor
-        launch {
-            tor.state.collect {
-                val newValue = it == TorState.RUNNING
-                logger.debug { "torIsAvailable = $newValue" }
-                torControlChanges.send { copy(torIsAvailable = newValue) }
-                peerControlChanges.send { copy(torIsAvailable = newValue) }
-                electrumControlChanges.send { copy(torIsAvailable = newValue) }
-                httpApiControlChanges.send { copy(torIsAvailable = newValue) }
-            }
-        }
-
-        // Tor
-        launch {
-            torControlFlow.collect {
-                when {
-                    it.internetIsAvailable && it.disconnectCount <= 0 && it.torIsEnabled -> {
-                        if (torConnectionJob == null) {
-                            logger.info { "starting tor" }
-                            torConnectionJob = connectionLoop(
-                                name = "Tor",
-                                statusStateFlow = tor.state.connectionState(this),
-                            ) {
-                                try {
-                                    tor.startInProperScope(this)
-                                } catch (t: Throwable) {
-                                    logger.error(t) { "tor cannot be started: ${t.message}" }
-                                }
-                            }
-                        }
-                    }
-                    else -> {
-                        torConnectionJob?.let {
-                            logger.info { "shutting down tor" }
-                            it.cancel()
-                            tor.stop()
-                            torConnectionJob = null
-                            // Tor runs it's own process, and needs time to shutdown before restarting.
-                            delay(500)
-                        }
-                    }
-                }
             }
         }
 
@@ -522,6 +471,3 @@ class AppConnectionsDaemon(
         }
     }
 }
-
-/** The start function must run on a different dispatcher depending on the platform. */
-expect suspend fun Tor.startInProperScope(scope: CoroutineScope)

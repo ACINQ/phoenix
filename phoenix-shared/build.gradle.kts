@@ -59,7 +59,7 @@ kotlin {
         }
     }
 
-    listOf(iosX64(), iosArm64()).forEach {
+    listOf(iosX64(), iosArm64(), iosSimulatorArm64()).forEach {
         it.binaries {
             framework {
                 optimized = false
@@ -89,7 +89,6 @@ kotlin {
             dependencies {
                 // lightning-kmp
                 api("fr.acinq.lightning:lightning-kmp:${Versions.lightningKmp}")
-                api("fr.acinq.tor:tor-mobile-kmp:${Versions.torMobile}")
                 // ktor
                 implementation("io.ktor:ktor-client-core:${Versions.ktor}")
                 implementation("io.ktor:ktor-client-json:${Versions.ktor}")
