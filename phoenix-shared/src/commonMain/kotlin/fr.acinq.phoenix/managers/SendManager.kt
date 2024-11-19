@@ -212,7 +212,7 @@ class SendManager(
 
         val db = databaseManager.databases.filterNotNull().first()
         val similarPayments = db.payments.listLightningOutgoingPayments(invoice.paymentHash)
-        // we MUST raise an error if this payment hash has already paid, or is being paid.
+        // we MUST raise an error if this payment hash has already been paid, or is being paid.
         // parallel pending payments on the same payment hash can trigger force-closes
         // FIXME: this check should be done in lightning-kmp, not in Phoenix
         return when {
