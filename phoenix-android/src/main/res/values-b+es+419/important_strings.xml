@@ -162,6 +162,7 @@
     <!-- scanning errors -->
 
     <string name="send_error_invoice_expired">Esta factura está vencida.</string>
+    <string name="send_error_payment_pending">Este pago ya se está procesando. Por favor, espere a que se complete.</string>
     <string name="send_error_already_paid">Este pago ya se realizó.</string>
     <string name="send_error_invalid_chain">Este pago no usa la misma cadena de bloques de la billetera.</string>
     <string name="send_error_lnurl_invalid">Error al procesar este enlace LNURL. Comprueba que sea válido.</string>

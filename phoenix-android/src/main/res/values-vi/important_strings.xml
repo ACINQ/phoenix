@@ -171,6 +171,7 @@
     <!-- scanning errors -->
 
     <string name="send_error_invoice_expired">Hoá đơn này đã hết hạn.</string>
+    <string name="send_error_payment_pending">Thanh toán này đang được xử lý. Vui lòng đợi để hoàn tất.</string>
     <string name="send_error_already_paid">Khoản thanh toán này đã được trả.</string>
     <string name="send_error_invalid_chain">Khoản thanh toán này không sử dụng cùng blockchain với ví của bạn.</string>
     <string name="send_error_lnurl_invalid">Không thể xử lý liên kết LNURL này. Hãy đảm bảo liên kết này có hiệu lực.</string>

@@ -40477,6 +40477,9 @@
         }
       }
     },
+    "The received invoice is already in progress." : {
+
+    },
     "The recipient is offline." : {
       "localizations" : {
         "ar" : {
@@ -42084,6 +42087,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ce paiement dépasse votre solde."
+          }
+        }
+      }
+    },
+    "This payment is already being processed. Please wait for it to complete." : {
+      "comment" : "Error message - scanning lightning invoice",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tato platba se již zpracovává. Počkejte prosím na její dokončení."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Zahlung wird bereits bearbeitet. Bitte warten Sie, bis sie abgeschlossen ist."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este pago ya se está procesando. Por favor, espere a que se complete."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este pago ya se está procesando. Por favor, espere a que se complete."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce paiement est déjà en cours de traitement. Veuillez attendre qu'il soit terminé."
           }
         }
       }

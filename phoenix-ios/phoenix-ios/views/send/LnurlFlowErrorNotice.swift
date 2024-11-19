@@ -114,6 +114,10 @@ struct LnurlFlowErrorNotice: View {
 				
 				Text("You have already paid this invoice.")
 				
+			} else if let _ = payError as? SendManager.LnurlPay_Error_PaymentPending {
+				
+				Text("The received invoice is already in progress.")
+				
 			} else {
 				genericErrorMessage()
 			}
