@@ -806,7 +806,7 @@ legacy_
   <string name="legacy_migration_swap_address">Getting migration address</string>
   <string name="legacy_migration_listing_channels">Reviewing channels</string>
   <string name="legacy_migration_closing_channels">Closing channels (%1$d/%2$d)</string>
-  <string name="legacy_migration_monitoring_channels_publish">Publishing transactions (%1$s/%2$d)</string>
+  <string name="legacy_migration_monitoring_channels_publish">Publishing transactions (%1$d/%2$d)</string>
 
   <string name="legacy_migration_complete_title">Upgrade complete</string>
   <string name="legacy_migration_complete_details">Switching to the new app…</string>
