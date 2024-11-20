@@ -55,6 +55,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.utils.getValue
+import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Clickable
@@ -62,15 +63,20 @@ import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.utils.negativeColor
 
 val domains = listOf(
-    "testnet.phoenixwallet.me",
+    "bipa.app",
     "bitrefill.me",
-    "strike.me",
+    "blink.sv",
     "coincorner.io",
-    "sparkwallet.me",
-    "ln.tips",
     "getalby.com",
-    "walletofsatoshi.com",
+    "ln.tips",
+    if (BuildConfig.CHAIN == "testnet") "testnet.phoenixwallet.me" else "phoenixwallet.me",
+    "sparkwallet.me",
     "stacker.news",
+    "strike.me",
+    "twelve.cash",
+    "walletofsatoshi.com",
+    "zbd.gg",
+    "8333.mobi",
 )
 
 @OptIn(ExperimentalMaterialApi::class)
