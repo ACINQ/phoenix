@@ -114,7 +114,7 @@ fun SaveNewContactDialog(
             ) {
                 Text(text = stringResource(id = R.string.contact_add_title), style = MaterialTheme.typography.h4, textAlign = TextAlign.Center)
                 Spacer(modifier = Modifier.height(24.dp))
-                ContactPhotoView(photoUri = photoUri, name = name, onChange = { photoUri = it }, borderSize = 4.dp)
+                ContactPhotoView(photoUri = photoUri, name = name, onChange = { photoUri = it }, imageSize = 120.dp, borderSize = 4.dp)
                 Spacer(modifier = Modifier.height(24.dp))
                 TextInput(
                     text = name,

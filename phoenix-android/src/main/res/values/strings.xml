@@ -535,6 +535,10 @@
     <string name="contact_search_name">Search by name</string>
     <string name="contact_none">No contacts found…</string>
 
+    <string name="contact_photo_open_camera">Take a photo</string>
+    <string name="contact_photo_open_gallery">Browse images</string>
+    <string name="contact_photo_remove">Delete picture</string>
+
     <!-- settings: access control -->
 
     <string name="accessctrl_title">Application access</string>

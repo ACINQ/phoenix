@@ -210,7 +210,7 @@ class MainActivity : AppCompatActivity() {
         val initialUri = this.data
         val scheme = initialUri?.scheme
         val ssp = initialUri?.schemeSpecificPart
-        if (scheme == "phoenix" && ssp != null && (ssp.startsWith("lnbc") || ssp.startsWith("lntb"))) {
+        if (scheme == "phoenix" && ssp != null && (ssp.startsWith("lnbc") || ssp.startsWith("lntb") || ssp.startsWith("lnurl") || ssp.startsWith("lno"))) {
             this.data = "lightning:$ssp".toUri()
             log.debug("rewritten intent uri from {} to {}", initialUri, intent.data)
         }

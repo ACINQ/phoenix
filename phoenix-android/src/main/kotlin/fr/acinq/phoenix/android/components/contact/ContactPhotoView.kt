@@ -22,20 +22,27 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
+import android.media.ExifInterface
 import android.net.Uri
 import android.provider.Settings
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -60,21 +67,23 @@ import com.google.accompanist.permissions.shouldShowRationale
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.isDarkTheme
 import fr.acinq.phoenix.android.utils.gray70
 import fr.acinq.phoenix.android.utils.gray800
+import fr.acinq.phoenix.android.utils.negativeColor
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileOutputStream
 
-@OptIn(ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ContactPhotoView(
     photoUri: String?,
     name: String?,
     onChange: ((String?) -> Unit)?,
-    imageSize: Dp = 96.dp,
-    borderSize: Dp = 1.dp,
+    imageSize: Dp,
+    borderSize: Dp,
 ) {
     val context = LocalContext.current
 
@@ -82,23 +91,38 @@ fun ContactPhotoView(
     var tempPhotoUri by remember { mutableStateOf<Uri?>(null) }
     var fileName by remember(photoUri) { mutableStateOf(photoUri) }
     val bitmap: ImageBitmap? = remember(fileName) {
-        fileName?.let { ContactPhotoHelper.getPhotoForFile(context, it) }
+        fileName?.let { ContactsPhotoHelper.getPhotoForFile(context, it) }
     }
 
     var cameraAccessDenied by remember { mutableStateOf(false) }
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
+
+    var showImageSourcePicker by remember { mutableStateOf(false) }
+
+    val photoGalleryLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.PickVisualMedia()) { imageUri ->
+        if (imageUri != null) {
+            val newFileName = ContactsPhotoHelper.createPermaContactPicture(context, imageUri)
+            fileName = newFileName
+            if (fileName != null) {
+                onChange?.invoke(fileName)
+            }
+        }
+        showImageSourcePicker = false
+        isProcessing = false
+    }
 
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture(),
         onResult = {
             val cacheUri = tempPhotoUri
             if (it && cacheUri != null) {
-                val newFileName = ContactPhotoHelper.createPermaContactPicture(context, cacheUri)
+                val newFileName = ContactsPhotoHelper.createPermaContactPicture(context, cacheUri)
                 fileName = newFileName
                 if (fileName != null) {
                     onChange?.invoke(fileName)
                 }
             }
+            showImageSourcePicker = false
             isProcessing = false
         }
     )
@@ -113,31 +137,7 @@ fun ContactPhotoView(
             modifier = if (onChange != null) {
                 Modifier.clickable(
                     role = Role.Button,
-                    onClick = {
-                        Toast.makeText(context, "\uD83D\uDEA7 Coming soon!", Toast.LENGTH_SHORT).show()
-                        return@clickable
-                        if (isProcessing) return@clickable
-                        if (cameraPermissionState.status.isGranted) {
-                            isProcessing = true
-                            if (tempPhotoUri == null) {
-                                ContactPhotoHelper.createTempContactPictureUri(context)?.let {
-                                    tempPhotoUri = it
-                                    cameraLauncher.launch(tempPhotoUri)
-                                }
-                            } else {
-                                cameraLauncher.launch(tempPhotoUri)
-                            }
-                        } else {
-                            cameraAccessDenied = cameraPermissionState.status.shouldShowRationale
-                            if (cameraAccessDenied) {
-                                context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                                    data = Uri.fromParts("package", context.packageName, null)
-                                })
-                            } else {
-                                cameraPermissionState.launchPermissionRequest()
-                            }
-                        }
-                    },
+                    onClick = { showImageSourcePicker = true },
                     enabled = !isProcessing
                 )
             } else Modifier
@@ -162,16 +162,78 @@ fun ContactPhotoView(
             }
         }
     }
+
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    if (showImageSourcePicker) {
+        ModalBottomSheet(
+            sheetState = sheetState,
+            onDismissRequest = { showImageSourcePicker = false },
+            containerColor = MaterialTheme.colors.surface,
+            contentColor = MaterialTheme.colors.onSurface,
+            scrimColor = MaterialTheme.colors.onBackground.copy(alpha = 0.2f),
+        ) {
+            Button(
+                text = stringResource(id = R.string.contact_photo_open_camera),
+                icon = R.drawable.ic_camera,
+                onClick = {
+                    if (isProcessing) return@Button
+                    if (cameraPermissionState.status.isGranted) {
+                        isProcessing = true
+                        if (tempPhotoUri == null) {
+                            ContactsPhotoHelper.createTempContactPictureUri(context)?.let {
+                                tempPhotoUri = it
+                                cameraLauncher.launch(tempPhotoUri)
+                            }
+                        } else {
+                            cameraLauncher.launch(tempPhotoUri)
+                        }
+                    } else {
+                        cameraAccessDenied = cameraPermissionState.status.shouldShowRationale
+                        if (cameraAccessDenied) {
+                            context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                data = Uri.fromParts("package", context.packageName, null)
+                            })
+                        } else {
+                            cameraPermissionState.launchPermissionRequest()
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Button(
+                text = stringResource(id = R.string.contact_photo_open_gallery),
+                icon = R.drawable.ic_image,
+                onClick = {
+                    if (isProcessing) return@Button
+                    photoGalleryLauncher.launch(PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly))
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Button(
+                text = stringResource(id = R.string.contact_photo_remove),
+                icon = R.drawable.ic_trash,
+                iconTint = negativeColor,
+                onClick = {
+                    onChange?.invoke(null)
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(32.dp))
+        }
+    }
 }
 
-object ContactPhotoHelper {
+object ContactsPhotoHelper {
 
-    val log = LoggerFactory.getLogger(this::class.java)
+    private val log = LoggerFactory.getLogger(this::class.java)
 
+    fun contactsDir(context: Context) = File(context.filesDir, "contacts")
+
+    /** Creates a temporary file where the camera activity will store the picture in. File is deleted on app exit. */
     fun createTempContactPictureUri(
         context: Context,
     ): Uri? {
-        val cacheContactsDir = File(context.cacheDir, "contacts")
+        val cacheContactsDir = File(context.cacheDir, "contacts") // using cacheDir !
         if (!cacheContactsDir.exists()) cacheContactsDir.mkdir()
         return try {
             val tempFile = File.createTempFile("contact_", ".png", cacheContactsDir)
@@ -183,23 +245,33 @@ object ContactPhotoHelper {
         }
     }
 
+    /** Creates the final picture from the temporary picture URI returned by the camera activity. The picture is resized and compressed. Returns the file name (in filesDir/contacts). */
     fun createPermaContactPicture(
         context: Context,
         tempFileUri: Uri,
     ): String? {
-        val contactsDir = File(context.filesDir, "contacts")
+        val contactsDir = contactsDir(context)
         if (!contactsDir.exists()) contactsDir.mkdir()
 
         return try {
+            val orientation = context.contentResolver.openInputStream(tempFileUri)?.use {
+                ExifInterface(it).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
+            } ?: ExifInterface.ORIENTATION_UNDEFINED
             val bitmap = context.contentResolver.openInputStream(tempFileUri)?.use {
                 BitmapFactory.decodeStream(it)
             } ?: return null
-            val scale = 480f / Math.max(bitmap.width, bitmap.height)
-            val matrix = Matrix().apply { postScale(scale, scale) }
+            val scale = (480f / bitmap.width.coerceAtLeast(bitmap.height)).coerceAtMost(1f)
+            val matrix = Matrix().apply {
+                postScale(scale, scale)
+                when (orientation) {
+                    ExifInterface.ORIENTATION_ROTATE_90 -> postRotate(90f)
+                    ExifInterface.ORIENTATION_ROTATE_180 -> postRotate(180f)
+                    ExifInterface.ORIENTATION_ROTATE_270 -> postRotate(270f)
+                }
+            }
             val scaledBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, false)
-
             val photoFile = File(contactsDir, "contact_${currentTimestampMillis()}.jpg")
-            FileOutputStream(photoFile).use { scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 80, it) }
+            FileOutputStream(photoFile).use { scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 50, it) }
             photoFile.name
         } catch (e: Exception) {
             log.error("failed to write contact photo to disk: {}", e.localizedMessage)
@@ -211,7 +283,7 @@ object ContactPhotoHelper {
         context: Context,
         fileName: String
     ): ImageBitmap? {
-        val contactsDir = File(context.filesDir, "contacts")
+        val contactsDir = contactsDir(context)
         if (!contactsDir.exists() || !contactsDir.canRead()) return null
 
         return try {

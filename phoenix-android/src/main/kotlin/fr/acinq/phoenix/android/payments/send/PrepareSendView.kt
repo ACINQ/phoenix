@@ -127,6 +127,12 @@ fun SendView(
         }
     }
 
+    LaunchedEffect(key1 = Unit) {
+        if (!initialInput.isNullOrBlank()) {
+            vm.parsePaymentData(initialInput)
+        }
+    }
+
     when (val parseState = vm.parsePaymentState) {
         // if payment data has been successfully parsed, redirect to the relevant payment screen
         is ParsePaymentState.Success -> when (val data = parseState.data) {
@@ -153,7 +159,6 @@ fun SendView(
         is ParsePaymentState.Ready, is ParsePaymentState.Processing, is ParsePaymentState.Error, is ParsePaymentState.ChoosePaymentMode -> {
             PrepareSendView(
                 onBackClick = onBackClick,
-                initialInput = initialInput,
                 vm = vm,
                 onShowScanner = {
                     vm.resetParsing()
@@ -211,21 +216,14 @@ fun SendView(
 
 @Composable
 private fun PrepareSendView(
-    initialInput: String?,
     vm: PrepareSendViewModel,
     onBackClick: () -> Unit,
     onShowScanner: () -> Unit
 ) {
     val context = LocalContext.current
-    var freeFormInput by remember { mutableStateOf(initialInput ?: "") }
+    var freeFormInput by remember { mutableStateOf("") }
     val parsePaymentState = vm.parsePaymentState
     val isProcessingData = vm.parsePaymentState.isProcessing || vm.readImageState.isProcessing
-
-    LaunchedEffect(key1 = Unit) {
-        if (!initialInput.isNullOrBlank()) {
-            vm.parsePaymentData(initialInput)
-        }
-    }
 
     DefaultScreenLayout(isScrollable = false) {
         DefaultScreenHeader(title = stringResource(id = R.string.preparesend_title), onBackClick = onBackClick)
@@ -315,7 +313,7 @@ private fun PrepareSendView(
                             vm.readImage(context, it, onDataFound = vm::parsePaymentData)
                         },
                         onShowScanner = onShowScanner,
-                        enabled = !isProcessingData
+                        enabled = true
                     )
                 }
             }
@@ -452,10 +450,13 @@ private fun ContactRow(
     enabled: Boolean,
 ) {
     Clickable(modifier = Modifier.fillMaxWidth(), onClick = onClick, enabled = enabled) {
-        Row(modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 12.dp)
-            .enableOrFade(enabled), verticalAlignment = Alignment.CenterVertically) {
-            ContactPhotoView(photoUri = contactInfo.photoUri, name = contactInfo.name, onChange = null, imageSize = 32.dp)
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 10.dp)
+                .enableOrFade(enabled),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            ContactPhotoView(photoUri = contactInfo.photoUri, name = contactInfo.name, onChange = null, imageSize = 38.dp, borderSize = 1.dp)
             Spacer(modifier = Modifier.width(8.dp))
             Text(text = contactInfo.name, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 18.sp)
         }
