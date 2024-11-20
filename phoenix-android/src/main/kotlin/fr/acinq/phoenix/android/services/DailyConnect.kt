@@ -54,6 +54,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * This worker is scheduled to run roughly every day. It simply connects to the LSP, wait for 1 minute,
@@ -66,9 +67,15 @@ class DailyConnect(context: Context, workerParams: WorkerParameters) : Coroutine
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun doWork(): Result {
-        log.info("starting daily-connect job")
+        log.info("starting $name")
         var business: PhoenixBusiness? = null
         var closeDatabases = true
+
+        // add a delay so this job does not start a node too quickly and collide with the UI startup logic
+        // (on some devices, background workers only run when the app is started by the user which causes a race to create
+        // a business node and can cause db locks)
+        // FIXME rework the node service/business logic to guarantee unicity
+        delay(20.seconds)
 
         try {
             val application = (applicationContext as PhoenixApplication)

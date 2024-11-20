@@ -83,7 +83,7 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun doWork(): Result {
-        log.info("starting in-flight-payments watcher")
+        log.info("starting $name")
         var business: PhoenixBusiness? = null
         var closeDatabases = true
 
