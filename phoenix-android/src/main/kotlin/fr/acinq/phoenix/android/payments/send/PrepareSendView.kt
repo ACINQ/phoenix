@@ -257,7 +257,7 @@ private fun PrepareSendView(
             .weight(1f)
             .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             if (contacts.isEmpty()) {
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(24.dp))
                 TextWithIcon(text = stringResource(id = R.string.preparesend_contacts_none), icon = R.drawable.ic_user, textStyle = MaterialTheme.typography.caption.copy(fontSize = 16.sp), iconTint = MaterialTheme.typography.caption.color, iconSize = 24.dp, space = 8.dp)
             } else {
                 val filteredContacts by produceState(initialValue = emptyList(), key1 = contacts, key2 = freeFormInput) {
@@ -268,7 +268,7 @@ private fun PrepareSendView(
                     }
                 }
                 if (freeFormInput.isNotBlank() && filteredContacts.isEmpty()) {
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
                     TextWithIcon(text = stringResource(id = R.string.preparesend_contacts_no_matches), icon = R.drawable.ic_user_search, textStyle = MaterialTheme.typography.caption.copy(fontSize = 16.sp), iconTint = MaterialTheme.typography.caption.color, iconSize = 24.dp, space = 8.dp)
                 } else {
                     LazyColumn {

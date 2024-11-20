@@ -493,8 +493,11 @@ fun AppView(
                             )
                         }
                     }
-                    composable(Screen.Contacts.route) {
-                        SettingsContactsView(onBackClick = { navController.popBackStack() })
+                    composable("${Screen.Contacts.route}?showAddContactDialog={showAddContactDialog}", arguments = listOf(
+                        navArgument("showAddContactDialog") { type = NavType.BoolType ; defaultValue = false }
+                    )) {
+                        val showAddContactDialog = it.arguments?.getBoolean("showAddContactDialog") ?: false
+                        SettingsContactsView(onBackClick = { navController.popBackStack() }, immediatelyShowAddContactDialog = showAddContactDialog)
                     }
                     composable(Screen.Experimental.route) {
                         ExperimentalView(onBackClick = { navController.popBackStack() })

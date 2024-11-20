@@ -39,9 +39,10 @@ import fr.acinq.phoenix.data.ContactInfo
 @Composable
 fun SettingsContactsView(
     onBackClick: () -> Unit,
+    immediatelyShowAddContactDialog: Boolean,
 ) {
     var selectedContact by remember { mutableStateOf<ContactInfo?>(null) }
-    var isAddingNewContact by remember { mutableStateOf(false) }
+    var isAddingNewContact by remember { mutableStateOf(immediatelyShowAddContactDialog) }
 
     DefaultScreenLayout(isScrollable = false) {
         DefaultScreenHeader(

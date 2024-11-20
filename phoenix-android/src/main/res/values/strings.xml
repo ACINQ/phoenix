@@ -518,16 +518,16 @@
     <!-- offer contact -->
 
     <string name="contact_add_contact_button">Add contact</string>
-    <string name="contact_error_offer_invalid">Invalid offer</string>
-    <string name="contact_error_offer_known">Invoice already attached to %1$s</string>
+    <string name="contact_error_offer_invalid">Invalid Bolt12 code</string>
+    <string name="contact_error_offer_known">This Bolt12 code already attached to contact %1$s</string>
     <string name="contact_save_button">Save</string>
     <string name="contact_delete_button">Delete</string>
 
-    <string name="contact_add_title">Attach a name to a payment code</string>
+    <string name="contact_add_title">Attach a name to a Bolt12 code</string>
     <string name="contact_name_label">Name</string>
     <string name="contact_photo_label">Photo</string>
-    <string name="contact_offer_label">Offer</string>
-    <string name="contact_offer_key_title">Pay with your offer key</string>
+    <string name="contact_offer_label">Bolt12 code</string>
+    <string name="contact_offer_key_title">Pay with your Bolt12 key</string>
     <string name="contact_offer_key_enabled">If they know your own Bolt12 payment code, they will be able to tell when payments are from you.</string>
     <string name="contact_offer_key_disabled">Use a throwaway id when you pay this contact.</string>
     <string name="contact_offers_list">Bolt12 payment codes</string>
@@ -900,7 +900,7 @@
 
     <!-- settings: contacts list -->
 
-    <string name="settings_contacts_help">Contacts allows you to link a name to a static offer. They are stored locally.</string>
+    <string name="settings_contacts_help">This screen allows you to link a BOLT12 code to a name.\n\nThe contacts data are stored locally.</string>
 
     <!-- experimental -->
 

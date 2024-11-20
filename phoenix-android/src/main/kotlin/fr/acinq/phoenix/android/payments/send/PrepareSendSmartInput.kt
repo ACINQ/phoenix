@@ -63,20 +63,21 @@ import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.utils.negativeColor
 
 val domains = listOf(
-    "bipa.app",
     "bitrefill.me",
     "blink.sv",
     "coincorner.io",
     "getalby.com",
-    "ln.tips",
     if (BuildConfig.CHAIN == "testnet") "testnet.phoenixwallet.me" else "phoenixwallet.me",
     "sparkwallet.me",
-    "stacker.news",
     "strike.me",
-    "twelve.cash",
     "walletofsatoshi.com",
+    "stacker.news",
+    "twelve.cash",
+    "lnmarkets.com",
     "zbd.gg",
     "8333.mobi",
+    "bipa.app",
+    "ln.tips",
 )
 
 @OptIn(ExperimentalMaterialApi::class)

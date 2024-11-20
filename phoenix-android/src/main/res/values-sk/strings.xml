@@ -449,7 +449,7 @@
     <!-- offer contact -->
 
     <string name="contact_add_contact_button">Pridať kontakt</string>
-    <string name="contact_error_offer_invalid">Neplatná ponuka</string>
+    <string name="contact_error_offer_invalid">Neplatný kód Bolt12</string>
     <string name="contact_error_offer_known">Faktúra už je priradená k %1$s</string>
     <string name="contact_save_button">Uložiť</string>
     <string name="contact_delete_button">Odstrániť</string>
@@ -457,7 +457,7 @@
     <string name="contact_add_title">Priradiť kontakt k ponuke BOLT12</string>
     <string name="contact_name_label">Meno</string>
     <string name="contact_photo_label">Fotka</string>
-    <string name="contact_offer_label">Ponuka</string>
+    <string name="contact_offer_label">Bolt12 kód</string>
 
     <string name="contact_search_name">Hľadať podľa mena</string>
     <string name="contact_none">Nenašli sa žiadne kontakty…</string>
@@ -813,6 +813,6 @@
     <string name="swapin_signer_error_header">Nepodarilo sa podpísať vstup</string>
 
   <!-- settings: contacts list -->
-  <string name="settings_contacts_help">Kontakty umožňujú prepojiť meno s jeho statickou ponukou. Ukladajú sa lokálne.</string>
+  <string name="settings_contacts_help">Táto obrazovka umožňuje prepojiť kód BOLT12 s názvom.\n\nDáta kontaktov sú uložené lokálne.</string>
 
 </resources>

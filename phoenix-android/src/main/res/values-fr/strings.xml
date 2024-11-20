@@ -442,7 +442,7 @@
 
     <string name="contact_name_label">Nom</string>
     <string name="contact_photo_label">Photo</string>
-    <string name="contact_offer_label">Offre</string>
+    <string name="contact_offer_label">Requête de paiement Bolt12</string>
     <string name="contact_offer_key_title">Payer avec la clé de votre code Bolt12</string>
     <string name="contact_offer_key_enabled">S\'il connaît votre code de paiement Bolt12, il pourra savoir quand des paiement viennent de votre part.</string>
     <string name="contact_offer_key_disabled">Utiliser un identifiant jetable quand vous payez ce contact.</string>
@@ -451,8 +451,8 @@
     <string name="contact_save_button">Sauver</string>
     <string name="contact_delete_button">Supprimer</string>
 
-    <string name="contact_error_offer_invalid">Offre invalide</string>
-    <string name="contact_error_offer_known">Offre déjà associée au contact %1$s</string>
+    <string name="contact_error_offer_invalid">Code Bolt12 invalide</string>
+    <string name="contact_error_offer_known">Ce code Bolt12 est déjà associée au contact %1$s</string>
 
     <!-- settings: access control -->
 
@@ -811,7 +811,7 @@
 
     <!-- settings: contacts list -->
 
-    <string name="settings_contacts_help">Les contacts vous permettent d\'associer un nom à une requête de paiement Bolt12. Ces contacts sont stockés en local uniquement.</string>
+    <string name="settings_contacts_help">Cet écran de contacts vous permet d\'associer une requête de paiement Bolt12 à un nom.\n\nLes données de contacts sont stockées localement.</string>
     <string name="contact_search_name">Chercher par nom…</string>
     <string name="contact_none">Aucun contact trouvé…</string>
 
