@@ -164,16 +164,17 @@
 
     <!-- scanning errors -->
 
-    <string name="scan_error_expired">Esta factura ha caducado.</string>
-    <string name="scan_error_already_paid">Este pago ya ha sido abonado.</string>
-    <string name="scan_error_invalid_chain">Este pago no utiliza la misma blockchain que su cartera.</string>
-    <string name="scan_error_lnurl_invalid">No se ha podido procesar este enlace LNURL. Asegúrese de que es válido.</string>
-    <string name="scan_error_lnurl_unsupported">Este tipo de LNURL aún no se admite.</string>
-    <string name="scan_error_invalid_generic">Estos datos utilizan un formato desconocido y no pueden ser procesados.</string>
-    <string name="scan_error_bip353_name_not_found">El nombre \"%1$s\" no se encuentra en \"%2$s\".</string>
-    <string name="scan_error_bip353_invalid_uri">Esta dirección utiliza un recurso Bip21 no válido.</string>
-    <string name="scan_error_bip353_invalid_offer">Esta dirección utiliza una oferta Bolt12 no válida.</string>
-    <string name="scan_error_bip353_dnssec">Esta dirección está alojada en un DNS no seguro. DNSSEC debe estar habilitado.</string>
+    <string name="send_error_invoice_expired">Esta factura ha caducado.</string>
+    <string name="send_error_payment_pending">Este pago ya se está procesando. Por favor, espere a que se complete.</string>
+    <string name="send_error_already_paid">Este pago ya ha sido abonado.</string>
+    <string name="send_error_invalid_chain">Este pago no utiliza la misma blockchain que su cartera.</string>
+    <string name="send_error_lnurl_invalid">No se ha podido procesar este enlace LNURL. Asegúrese de que es válido.</string>
+    <string name="send_error_lnurl_unsupported">Este tipo de LNURL aún no se admite.</string>
+    <string name="send_error_invalid_generic">Estos datos utilizan un formato desconocido y no pueden ser procesados.</string>
+    <string name="send_error_bip353_name_not_found">El nombre \"%1$s\" no se encuentra en \"%2$s\".</string>
+    <string name="send_error_bip353_invalid_uri">Esta dirección utiliza un recurso Bip21 no válido.</string>
+    <string name="send_error_bip353_invalid_offer">Esta dirección utiliza una oferta Bolt12 no válida.</string>
+    <string name="send_error_bip353_dnssec">Esta dirección está alojada en un DNS no seguro. DNSSEC debe estar habilitado.</string>
 
     <!-- validation -->
 

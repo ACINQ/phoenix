@@ -491,6 +491,7 @@
     },
     "(completed) of (total)" : {
       "comment" : "Upload progress information",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -532,6 +533,7 @@
     },
     "(completed) of (total), pushing batch of (inFlight)" : {
       "comment" : "Upload progress information",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -615,6 +617,7 @@
     },
     "(count) payments within the last 2 hours" : {
       "comment" : "Recent payments footer",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -656,6 +659,7 @@
     },
     "(count) payments within the last 3 days" : {
       "comment" : "Recent payments footer",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -697,6 +701,7 @@
     },
     "(count) payments within the last 7 days" : {
       "comment" : "Recent payments footer",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -738,6 +743,7 @@
     },
     "(count) payments within the last 10 minutes" : {
       "comment" : "Recent payments footer",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -779,6 +785,7 @@
     },
     "(count) payments within the last 24 hours" : {
       "comment" : "Recent payments footer",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -820,6 +827,7 @@
     },
     "(count) payments within the last minute" : {
       "comment" : "Recent payments footer",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1469,6 +1477,7 @@
     },
     "(totalPaymentCount) in-flight payments" : {
       "comment" : "Recent payments footer",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1510,6 +1519,7 @@
     },
     "(totalPaymentCount) recent payments" : {
       "comment" : "Recent payments footer",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -5345,6 +5355,9 @@
         }
       }
     },
+    "Add contacts for easy & quick payments" : {
+
+    },
     "add liquidity" : {
       "localizations" : {
         "ar" : {
@@ -6234,6 +6247,7 @@
     },
     "Amount must be (exactBitcoin.string)" : {
       "comment" : "error message",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -6275,6 +6289,7 @@
     },
     "Amount must be (exactBitcoin.string) (≈ (approxFiat.string))" : {
       "comment" : "error message",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -6316,6 +6331,7 @@
     },
     "Amount must be at least (minBitcoin.string)" : {
       "comment" : "error message",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -6357,6 +6373,7 @@
     },
     "Amount must be at least (minBitcoin.string) (≈ (approxFiat.string))" : {
       "comment" : "error message",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -6398,6 +6415,7 @@
     },
     "Amount must be at most (maxBitcoin.string)" : {
       "comment" : "error message",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -6439,6 +6457,7 @@
     },
     "Amount must be at most (maxBitcoin.string) (≈ (approxFiat.string))" : {
       "comment" : "error message",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -8670,7 +8689,7 @@
       }
     },
     "Bitcoin address" : {
-      "comment" : "TextField placeholder",
+      "comment" : "TextField placeholder\nType of text being copied",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -10618,7 +10637,11 @@
         }
       }
     },
+    "choose image" : {
+      "comment" : "button label - try to make it short"
+    },
     "Choose image" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -13337,6 +13360,7 @@
     },
     "Could not connect to service: (origin)" : {
       "comment" : "Error message - scanning lightning invoice",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -13375,6 +13399,9 @@
           }
         }
       }
+    },
+    "Could not connect to service: %@" : {
+      "comment" : "Error message - scanning lightning invoice"
     },
     "Could not retrieve payment details within a reasonable time. The recipient may be offline or unreachable." : {
       "localizations" : {
@@ -17046,6 +17073,7 @@
       }
     },
     "Enter a Lightning invoice, LNURL, or Lightning address you want to send money to." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -24317,6 +24345,7 @@
       }
     },
     "Less options" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -24520,6 +24549,7 @@
     },
     "Lightning fee amount: (percent), (amountBitcoin), ≈(amountFiat)" : {
       "comment" : "VoiceOver label: PaymentSummaryView",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -25876,6 +25906,7 @@
       }
     },
     "Manual input" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -25916,6 +25947,7 @@
       }
     },
     "Manual Input" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -26933,6 +26965,7 @@
     },
     "Miner fee amount: (percent), (amountBitcoin), ≈(amountFiat)" : {
       "comment" : "VoiceOver label: PaymentSummaryView",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -27224,6 +27257,7 @@
       }
     },
     "More options" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -27302,6 +27336,9 @@
           }
         }
       }
+    },
+    "name, lightning address, offer..." : {
+
     },
     "Naming your wallet makes it easier to manage multiple wallets." : {
       "localizations" : {
@@ -27785,6 +27822,9 @@
           }
         }
       }
+    },
+    "No Contacts" : {
+
     },
     "no description" : {
       "comment" : "placeholder: invoice is description-less",
@@ -29364,6 +29404,9 @@
         }
       }
     },
+    "paste" : {
+      "comment" : "button label - try to make it short"
+    },
     "Paste encrypted data blob here" : {
       "localizations" : {
         "ar" : {
@@ -29405,6 +29448,7 @@
       }
     },
     "Paste from clipboard" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -29566,6 +29610,7 @@
       }
     },
     "Pay " : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -29606,6 +29651,7 @@
       }
     },
     "Pay %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -29646,6 +29692,7 @@
       }
     },
     "Pay %@ " : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -29686,6 +29733,7 @@
       }
     },
     "Pay Invoice" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -32638,6 +32686,7 @@
 
     },
     "QR code" : {
+      "comment" : "Type of image being copied",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -34053,6 +34102,9 @@
         }
       }
     },
+    "Resolving lightning address" : {
+      "comment" : "Progress title"
+    },
     "Restore my wallet" : {
       "comment" : "Navigation bar title",
       "localizations" : {
@@ -34538,6 +34590,7 @@
     },
     "Scan a QR code" : {
       "comment" : "Navigation bar title",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -34616,6 +34669,12 @@
           }
         }
       }
+    },
+    "scan qr code" : {
+      "comment" : "button label - try to make it short"
+    },
+    "Scan QR Code" : {
+
     },
     "Scan withdraw" : {
       "extractionState" : "stale",
@@ -35182,6 +35241,7 @@
     },
     "Sending payment" : {
       "comment" : "Navigation bar title",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -35222,6 +35282,7 @@
       }
     },
     "Sending Payment..." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -37989,6 +38050,9 @@
         }
       }
     },
+    "Spend from final wallet" : {
+
+    },
     "Spending = pouring water out\nReceiving = adding more water" : {
       "localizations" : {
         "ar" : {
@@ -38509,6 +38573,9 @@
           }
         }
       }
+    },
+    "Suggestions" : {
+
     },
     "Summary" : {
       "comment" : "ChannelsConfigurationView/ChannelInfoPopup/TabBar",
@@ -40043,6 +40110,7 @@
     },
     "The invoice is not for (chainMismatch.expected.name)" : {
       "comment" : "Error message - scanning lightning invoice",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -40083,6 +40151,7 @@
       }
     },
     "The invoice is not for %@" : {
+      "comment" : "Error message - scanning lightning invoice",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -40408,6 +40477,9 @@
         }
       }
     },
+    "The received invoice is already in progress." : {
+
+    },
     "The recipient is offline." : {
       "localizations" : {
         "ar" : {
@@ -40571,6 +40643,7 @@
     },
     "The service ((origin)) appears to be offline, or they have a down server" : {
       "comment" : "Error message - scanning lightning invoice",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -40612,6 +40685,7 @@
     },
     "The service ((origin)) doesn't support Lightning addresses, or doesn't know this user" : {
       "comment" : "Error message - scanning lightning invoice",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -40653,6 +40727,7 @@
     },
     "The service ((origin)) returned error code: (rfCode.code.value)" : {
       "comment" : "Error message - scanning lightning invoice",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -40694,6 +40769,7 @@
     },
     "The service ((origin)) returned error message: (rfDetailed.reason)" : {
       "comment" : "Error message - scanning lightning invoice",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -40729,6 +40805,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le service ((origin)) a renvoyé un message d'erreur : (rfDetailed.reason)"
+          }
+        }
+      }
+    },
+    "The service (%@) appears to be offline, or they have a down server" : {
+      "comment" : "Error message - scanning lightning invoice"
+    },
+    "The service (%@) doesn't support Lightning addresses, or doesn't know this user" : {
+      "comment" : "Error message - scanning lightning invoice"
+    },
+    "The service (%@) returned error code: %d" : {
+      "comment" : "Error message - scanning lightning invoice",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The service (%1$@) returned error code: %2$d"
+          }
+        }
+      }
+    },
+    "The service (%@) returned error message: %@" : {
+      "comment" : "Error message - scanning lightning invoice",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The service (%1$@) returned error message: %2$@"
           }
         }
       }
@@ -41987,6 +42091,41 @@
         }
       }
     },
+    "This payment is already being processed. Please wait for it to complete." : {
+      "comment" : "Error message - scanning lightning invoice",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tato platba se již zpracovává. Počkejte prosím na její dokončení."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Zahlung wird bereits bearbeitet. Bitte warten Sie, bis sie abgeschlossen ist."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este pago ya se está procesando. Por favor, espere a que se complete."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este pago ya se está procesando. Por favor, espere a que se complete."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce paiement est déjà en cours de traitement. Veuillez attendre qu'il soit terminé."
+          }
+        }
+      }
+    },
     "This screen is a debugging tool that can be used to manually import encrypted channels data.\n\nUse with caution." : {
       "localizations" : {
         "ar" : {
@@ -42431,6 +42570,7 @@
     },
     "Tip amount: (percent), (amountBitcoin), ≈(amountFiat)" : {
       "comment" : "VoiceOver label: PaymentSummaryView",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -42472,6 +42612,7 @@
     },
     "tip amount: (tipBtcn), ≈(tipFiat), total amount: (ttlBtcn), ≈(ttlFiat)" : {
       "comment" : "VoiceOver information: Customize tip sheet",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -43245,6 +43386,7 @@
     },
     "Total amount: (amountBitcoin), ≈(amountFiat)" : {
       "comment" : "VoiceOver label: PaymentSummaryView",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -43286,6 +43428,7 @@
     },
     "total amount: (btcnAmt.string), ≈(fiatAmt.string)" : {
       "comment" : "VoiceOver hint",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -43369,6 +43512,7 @@
     },
     "total amount: ≈(btcnAmt.string)" : {
       "comment" : "VoiceOver hint",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -44424,6 +44568,7 @@
     },
     "Unreadable response from service: (origin)" : {
       "comment" : "Error message - scanning lightning invoice",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -44462,6 +44607,9 @@
           }
         }
       }
+    },
+    "Unreadable response from service: %@" : {
+      "comment" : "Error message - scanning lightning invoice"
     },
     "Updating cloud" : {
       "localizations" : {
@@ -44987,7 +45135,14 @@
         }
       }
     },
+    "Use this screen to spend funds from your final wallet. These funds come from channels that have been closed in the past. This does not affect your existing Lightning channels." : {
+
+    },
+    "Use this screen to spend your on-chain funds that were not swapped in time. The swap-in request has now expired." : {
+
+    },
     "Use this screen to spend your on-chain funds that were not swapped in time. The swap-in request has now expired. " : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

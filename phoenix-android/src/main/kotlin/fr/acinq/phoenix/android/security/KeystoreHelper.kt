@@ -85,6 +85,33 @@ object KeystoreHelper {
     else -> throw IllegalArgumentException("unhandled key=$keyName")
   }
 
+  /**
+   * Get the encryption cipher for the key. If it fails once, delete the key, and try again. This should only be used by the seed fallback to check if the
+   * keystore is accessible. This seems to (rarely) happen after an OS update that fails to upgrade the key (raising a `upgrade_keyblob_if_required_with`
+   * error), and might be related to the secure element option?
+   */
+  fun checkEncryptionCipherOrReset(keyName: String) = when (keyName) {
+    KEY_NO_AUTH -> {
+      try {
+        getEncryptionCipher(keyName)
+      } catch (e: Exception) {
+        log.error("could not get encryption cipher: ${e.localizedMessage}")
+        try {
+          log.error("deleting key=$keyName from keystore")
+          keyStore.deleteEntry(keyName)
+          getEncryptionCipher(keyName)
+        } catch (e: Exception) {
+          log.error("cannot delete $keyName entry from keystore: ${e.localizedMessage}")
+          throw e
+        }
+      }
+    }
+
+    else -> {
+      throw IllegalArgumentException("unhandled key_name=$keyName")
+    }
+  }
+
   /** Get encryption Cipher for given key. */
   internal fun getEncryptionCipher(keyName: String): Cipher = Cipher.getInstance("$ENC_ALGO/$ENC_BLOCK_MODE/$ENC_PADDING").apply {
     init(Cipher.ENCRYPT_MODE, getKeyForName(keyName), parameters)

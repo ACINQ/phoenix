@@ -70,7 +70,7 @@ import fr.acinq.phoenix.android.components.feedback.WarningMessage
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.BitmapHelper
 import fr.acinq.phoenix.android.utils.copyToClipboard
-import fr.acinq.phoenix.android.utils.safeLet
+import fr.acinq.phoenix.android.utils.extensions.safeLet
 import fr.acinq.phoenix.android.utils.updateScreenBrightnesss
 import kotlinx.coroutines.launch
 

@@ -77,7 +77,7 @@ import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.BiometricsHelper
 import fr.acinq.phoenix.android.utils.Logging
 import fr.acinq.phoenix.android.utils.errorOutlinedTextFieldColors
-import fr.acinq.phoenix.android.utils.findActivity
+import fr.acinq.phoenix.android.utils.extensions.findActivity
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.outlinedTextFieldColors
 import fr.acinq.phoenix.android.utils.shareFile
@@ -369,6 +369,9 @@ private fun StartupSeedFallback(
                     text = stringResource(id = R.string.startup_fallback_success_starting),
                     icon = R.drawable.ic_check_circle
                 )
+            }
+            is StartupDecryptionState.SeedInputFallback.Error.KeyStoreFailure -> {
+                Text(text = stringResource(id = R.string.startup_fallback_error_keystore_error))
             }
         }
         Spacer(modifier = Modifier.height(100.dp))

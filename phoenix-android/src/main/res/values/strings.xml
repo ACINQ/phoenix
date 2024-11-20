@@ -82,7 +82,8 @@
     <string name="startup_fallback_unlock_button">Unlock wallet</string>
     <string name="startup_fallback_checking">Checking seed…</string>
     <string name="startup_fallback_error_default">An error occurred. Please try again.</string>
-    <string name="startup_fallback_error_incorrect_seed">This seed does not match your wallet.</string>
+    <string name="startup_fallback_error_incorrect_seed">This seed does not match your wallet data.</string>
+    <string name="startup_fallback_error_keystore_error">Failed to perform keystore operations.</string>
     <string name="startup_fallback_success_match">Seed matches.\nWriting to disk…</string>
     <string name="startup_fallback_success_starting">Starting Phoenix…</string>
 
@@ -193,18 +194,24 @@
 
     <!-- scan -->
 
-    <string name="scan_manual_input_button">Manual input</string>
-    <string name="scan_paste_button">Paste data from clipboard</string>
     <string name="scan_request_camera_access">Tap to grant camera permission</string>
     <string name="scan_request_camera_access_denied">Camera permission has been denied</string>
 
-    <string name="scan_lnurl_fetching">Fetching data from service…</string>
-    <string name="scan_bip353_resolving">Resolving payment request over DNS…</string>
+    <!-- prepare send payment -->
 
-    <string name="scan_manual_input_title">Manual input</string>
-    <string name="scan_manual_input_instructions">Enter a Lightning invoice, an offer, a LNURL or a Lightning address you want to send money to.</string>
-    <string name="scan_manual_input_label">Invoice, LN address…</string>
-    <string name="scan_manual_input_hint" translatable="false">satoshi@domain.com, bc1q..., lnbc...</string>
+    <string name="preparesend_title">Send</string>
+    <string name="preparesend_contacts_none">No contacts yet…</string>
+    <string name="preparesend_contacts_no_matches">No matches for search…</string>
+    <string name="preparesend_manual_input_hint" translatable="false">satoshi@domain, bc1q..., lnbc...</string>
+
+    <string name="preparesend_paste_button">Paste</string>
+    <string name="preparesend_scan_button">Scan QR code</string>
+    <string name="preparesend_imagepicker_button">Choose image</string>
+    <string name="preparesend_imagepicker_error">This image could not be processed.</string>
+    <string name="preparesend_imagepicker_not_found">No QR code found in this image.</string>
+    <string name="preparesend_parsing">Reading input…</string>
+    <string name="preparesend_lnurl_fetching">Fetching data from service…</string>
+    <string name="preparesend_bip353_resolving">Resolving payment request over DNS…</string>
 
     <!-- utils: misc strings -->
 
@@ -258,6 +265,7 @@
 
     <string name="channelsview_title">Payment channels</string>
     <string name="channelsview_menu_import_channels">Import channels</string>
+    <string name="channelsview_menu_spend_channel_balance">Spend channel address</string>
     <string name="channelsview_header">Overview</string>
     <string name="channelsview_balance">Balance</string>
     <string name="channelsview_balance_about"><b>Balance</b> is the aggregated balance of your active channels. It\'s what you can spend over Lightning.</string>
@@ -300,6 +308,34 @@
     <string name="channelimport_error_malformed">Data are malformed. A encrypted hex blob is expected.</string>
     <string name="channelimport_error_decryption">Data could not be decrypted by this wallet.</string>
     <string name="channelimport_error_unknown_version">Version %1$d is not supported</string>
+
+    <!-- spend from channel address -->
+
+    <string name="spendchanneladdress_title">Spend channel address</string>
+    <string name="spendchanneladdress_instructions">This screen is a debugging tool that helps recover funds that have been accidentally sent to a channel\'s outpoint.</string>
+    <string name="spendchanneladdress_amount">Amount</string>
+    <string name="spendchanneladdress_tx_index">Tx index</string>
+    <string name="spendchanneladdress_channel_data">Raw channel data</string>
+    <string name="spendchanneladdress_remote_funding_pubkey">Remote funding pubkey</string>
+    <string name="spendchanneladdress_unsigned_tx">Unsigned tx</string>
+    <string name="spendchanneladdress_sign_button">Sign</string>
+    <string name="spendchanneladdress_signing">Signing…</string>
+
+    <string name="spendchanneladdress_success_header">Signature successfully generated.</string>
+    <string name="spendchanneladdress_success_pubkey">Public key</string>
+    <string name="spendchanneladdress_success_signature">Signature</string>
+
+    <string name="spendchanneladdress_error_generic">Failed to sign data</string>
+    <string name="spendchanneladdress_error_amount">Invalid amount</string>
+    <string name="spendchanneladdress_error_tx_index">Invalid tx index</string>
+    <string name="spendchanneladdress_error_channel_data">Malformed channel data</string>
+    <string name="spendchanneladdress_error_channel_data_decryption">Cannot decrypt channel data</string>
+    <string name="spendchanneladdress_error_channel_data_state">Unhandled channel state [%1$s]</string>
+    <string name="spendchanneladdress_error_channel_data_version">Malformed channel version [%1$s]</string>
+    <string name="spendchanneladdress_error_remote_pubkey">Malformed remote funding pubkey [%1$s]</string>
+    <string name="spendchanneladdress_error_unsigned_tx">Malformed unsigned tx [%1$s]</string>
+    <string name="spendchanneladdress_error_remote_funding_pubkey">Malformed remote funding pubkey [%1$s]</string>
+    <string name="spendchanneladdress_error_tx">Malformed transaction [%1$s]</string>
 
     <!-- home: balance section & misc -->
 
@@ -482,22 +518,26 @@
     <!-- offer contact -->
 
     <string name="contact_add_contact_button">Add contact</string>
-    <string name="contact_error_offer_invalid">Invalid offer</string>
-    <string name="contact_error_offer_known">Invoice already attached to %1$s</string>
+    <string name="contact_error_offer_invalid">Invalid Bolt12 code</string>
+    <string name="contact_error_offer_known">This Bolt12 code already attached to contact %1$s</string>
     <string name="contact_save_button">Save</string>
     <string name="contact_delete_button">Delete</string>
 
-    <string name="contact_add_title">Attach a name to a payment code</string>
+    <string name="contact_add_title">Attach a name to a Bolt12 code</string>
     <string name="contact_name_label">Name</string>
     <string name="contact_photo_label">Photo</string>
-    <string name="contact_offer_label">Offer</string>
-    <string name="contact_offer_key_title">Pay with your offer key</string>
+    <string name="contact_offer_label">Bolt12 code</string>
+    <string name="contact_offer_key_title">Pay with your Bolt12 key</string>
     <string name="contact_offer_key_enabled">If they know your own Bolt12 payment code, they will be able to tell when payments are from you.</string>
     <string name="contact_offer_key_disabled">Use a throwaway id when you pay this contact.</string>
     <string name="contact_offers_list">Bolt12 payment codes</string>
 
     <string name="contact_search_name">Search by name</string>
     <string name="contact_none">No contacts found…</string>
+
+    <string name="contact_photo_open_camera">Take a photo</string>
+    <string name="contact_photo_open_gallery">Browse images</string>
+    <string name="contact_photo_remove">Delete picture</string>
 
     <!-- settings: access control -->
 
@@ -565,6 +605,8 @@
     <string name="lnurl_error_remote_code">The service <b>%1$s</b> returned an HTTP error (%2$s). Contact their helpdesk if needed.</string>
     <string name="lnurl_error_remote_unreadable">The service <b>%1$s</b> returned a malformed message.</string>
     <string name="lnurl_error_remote_connection">Could not connect to service <b>%1$s</b>.</string>
+    <string name="lnurl_error_remote_is_website">This appears to be a website (not a lightning invoice):\n\n<i>%1$s</i></string>
+    <string name="lnurl_error_remote_unknown_lnaddress">Service %1$s doesn\'t support lightning addresses, or doesn\'t know this user.</string>
 
     <!-- lnurl-pay -->
 
@@ -575,12 +617,14 @@
     <string name="lnurl_pay_comment_instructions">You can attach a message to the payment. This message will be sent to the recipient.</string>
     <string name="lnurl_pay_pay_button">Pay</string>
     <string name="lnurl_pay_requesting_invoice">Requesting invoice…</string>
+    <string name="lnurl_pay_paying_invoice">Paying invoice…</string>
 
     <string name="lnurl_pay_amount_below_min">Amount must be at least %1$s</string>
     <string name="lnurl_pay_amount_above_max">Amount must be at most %1$s</string>
 
     <string name="lnurl_pay_error_header">Payment has failed.</string>
     <string name="lnurl_pay_error_invalid_chain">The invoice returned by <b>%1$s</b> does not use the same chain as your wallet.</string>
+    <string name="lnurl_pay_error_payment_pending">The invoice returned by <b>%1$s</b> is already in progress.</string>
     <string name="lnurl_pay_error_already_paid">The invoice returned by <b>%1$s</b> has already been paid.</string>
     <string name="lnurl_pay_error_invalid_amount">The invoice returned by <b>%1$s</b> has an incorrect amount.</string>
     <string name="lnurl_pay_error_invalid_malformed">The invoice returned by <b>%1$s</b> is malformed.</string>
@@ -860,7 +904,7 @@
 
     <!-- settings: contacts list -->
 
-    <string name="settings_contacts_help">Contacts allows you to link a name to a static offer. They are stored locally.</string>
+    <string name="settings_contacts_help">This screen allows you to link a BOLT12 code to a name.\n\nThe contacts data are stored locally.</string>
 
     <!-- experimental -->
 

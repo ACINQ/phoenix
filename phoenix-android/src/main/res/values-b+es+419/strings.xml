@@ -161,16 +161,10 @@
 
     <!-- scan -->
 
-    <string name="scan_manual_input_button">Ingreso manual</string>
-    <string name="scan_paste_button">Pegar datos desde el portapapeles</string>
     <string name="scan_request_camera_access">Tocar para conceder permiso a la cámara</string>
     <string name="scan_request_camera_access_denied">Se negó el permiso a la cámara</string>
 
-    <string name="scan_lnurl_fetching">Obteniendo datos del servicio…</string>
-
-    <string name="scan_manual_input_title">Ingreso manual</string>
-    <string name="scan_manual_input_instructions">Ingresa una factura de Lightning, LNURL o dirección de Lightning a la que quieras enviar dinero.</string>
-    <string name="scan_manual_input_label">Factura o dirección de Lightning</string>
+    <string name="preparesend_lnurl_fetching">Obteniendo datos del servicio…</string>
 
     <!-- utils: misc strings -->
 

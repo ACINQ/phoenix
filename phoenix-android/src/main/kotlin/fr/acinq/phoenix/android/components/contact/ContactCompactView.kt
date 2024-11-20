@@ -51,7 +51,7 @@ fun ContactCompactView(
 
     SplashClickableContent(onClick = { showSheet = true }) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            ContactPhotoView(photoUri = contact.photoUri, name = contact.name, onChange = null, imageSize = 28.dp)
+            ContactPhotoView(photoUri = contact.photoUri, name = contact.name, onChange = null, imageSize = 32.dp, borderSize = 1.dp)
             Spacer(modifier = Modifier.width(8.dp))
             Text(text = contact.name, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }

@@ -156,17 +156,11 @@
 
     <!-- scan -->
 
-    <string name="scan_manual_input_button">Ruční vstup</string>
-    <string name="scan_paste_button">Vložit data ze schránky</string>
     <string name="scan_request_camera_access">Klepnutím udělíte povolení k fotoaparátu</string>
     <string name="scan_request_camera_access_denied">Povolení k použití fotoaparátu bylo zamítnuto</string>
 
-    <string name="scan_lnurl_fetching">Získávání dat ze služby…</string>
-    <string name="scan_bip353_resolving">Zpracovávání žádosti o platbu přes DNS…</string>
-
-    <string name="scan_manual_input_title">Ruční vstup</string>
-    <string name="scan_manual_input_instructions">Zadejte Lightningovou fakturu, LNURL nebo Lightningovou adresu na kterou chcete poslat peníze.</string>
-    <string name="scan_manual_input_label">Faktura nebo LN adresa</string>
+    <string name="preparesend_lnurl_fetching">Získávání dat ze služby…</string>
+    <string name="preparesend_bip353_resolving">Zpracovávání žádosti o platbu přes DNS…</string>
 
     <!-- utils: misc strings -->
 
@@ -412,7 +406,7 @@
     <!-- offer contact -->
 
     <string name="contact_add_contact_button">Přidat kontakt</string>
-    <string name="contact_error_offer_invalid">Neplatná nabídka</string>
+    <string name="contact_error_offer_invalid">Neplatný kód Bolt12</string>
     <string name="contact_error_offer_known">Faktura již byla přidělena k %1$s</string>
     <string name="contact_save_button">Uložit</string>
     <string name="contact_delete_button">Smazat</string>
@@ -420,7 +414,7 @@
     <string name="contact_add_title">Přidělit kontakt k BOLT12 nabídce</string>
     <string name="contact_name_label">Jméno</string>
     <string name="contact_photo_label">Fotka</string>
-    <string name="contact_offer_label">Nabídka</string>
+    <string name="contact_offer_label">Kód Bolt12</string>
 
     <string name="contact_search_name">Hledat podle jména</string>
     <string name="contact_none">Nenalezeny žádné kontakty…</string>
@@ -764,7 +758,7 @@
 
     <!-- settings: contacts list -->
 
-    <string name="settings_contacts_help">Kontakty vám umožňují připojit ke jménu statickou fakturu. Jsou ukládány lokálně.</string>
+    <string name="settings_contacts_help">Tato obrazovka umožňuje propojit kód BOLT12 s názvem.\n\nData kontaktů jsou uložena lokálně.</string>
 
     <!-- experimental -->
 

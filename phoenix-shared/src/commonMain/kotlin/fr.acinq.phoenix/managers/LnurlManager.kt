@@ -71,7 +71,24 @@ class LnurlManager(
             val json = Lnurl.processLnurlResponse(response, log)
             return@async Lnurl.parseLnurlJson(url, json)
         } catch (e: Exception) {
+            val isLightningAddress = url.toString().contains("/.well-known/lnurlp/")
+
             when (e) {
+                is LnurlError.RemoteFailure.Detailed,
+                is LnurlError.RemoteFailure.Code -> {
+                    when {
+                        isLightningAddress -> throw LnurlError.RemoteFailure.LightningAddressError(url.host)
+                        else -> throw e
+                    }
+                }
+                is LnurlError.RemoteFailure.Unreadable -> {
+                    val scheme = url.protocol.name.lowercase()
+                    val isWebsite = scheme == "http" || scheme == "https"
+                    when {
+                        isWebsite -> throw LnurlError.RemoteFailure.IsWebsite(url.toString())
+                        else -> throw e
+                    }
+                }
                 is LnurlError -> throw e
                 else -> throw LnurlError.RemoteFailure.Unreadable(url.host)
             }

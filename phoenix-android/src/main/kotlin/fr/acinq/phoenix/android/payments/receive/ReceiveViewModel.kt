@@ -45,6 +45,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
+import kotlin.time.Duration.Companion.seconds
 
 sealed class LightningInvoiceState {
     data object Init : LightningInvoiceState()
@@ -108,7 +109,7 @@ class ReceiveViewModel(
                 paymentPreimage = Lightning.randomBytes32(),
                 amount = amount,
                 description = Either.Left(description),
-                expirySeconds = expirySeconds
+                expiry = expirySeconds.seconds
             )
             lightningQRBitmap = BitmapHelper.generateBitmap(pr.write()).asImageBitmap()
             log.debug("generated new invoice=${pr.write()}")

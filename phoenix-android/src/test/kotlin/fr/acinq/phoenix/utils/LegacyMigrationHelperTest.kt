@@ -242,7 +242,7 @@ class LegacyMigrationHelperTest {
                 received = IncomingPayment.Received(
                     receivedWith = listOf(
                         IncomingPayment.ReceivedWith.NewChannel(
-                            amount = 32_000_000.msat,
+                            amountReceived = 32_000_000.msat,
                             serviceFee = 0.msat,
                             miningFee = 0.sat,
                             channelId = ByteVector32.Zeroes,
@@ -268,9 +268,10 @@ class LegacyMigrationHelperTest {
                 received = IncomingPayment.Received(
                     receivedWith = listOf(
                         IncomingPayment.ReceivedWith.LightningPayment(
-                            amount = 55_000.msat,
+                            amountReceived = 55_000.msat,
                             channelId = ByteVector32.Zeroes,
-                            htlcId = 0
+                            htlcId = 0,
+                            fundingFee = null,
                         )
                     ),
                     receivedAt = 1656337800788
@@ -290,9 +291,10 @@ class LegacyMigrationHelperTest {
                 received = IncomingPayment.Received(
                     receivedWith = listOf(
                         IncomingPayment.ReceivedWith.LightningPayment(
-                            amount = 350_000.msat,
+                            amountReceived = 350_000.msat,
                             channelId = ByteVector32.Zeroes,
-                            htlcId = 0
+                            htlcId = 0,
+                            fundingFee = null,
                         )
                     ),
                     receivedAt = 1656338085497
@@ -314,7 +316,7 @@ class LegacyMigrationHelperTest {
                 received = IncomingPayment.Received(
                     receivedWith = listOf(
                         IncomingPayment.ReceivedWith.NewChannel(
-                            amount = 57_000_000.msat,
+                            amountReceived = 57_000_000.msat,
                             channelId = ByteVector32.Zeroes,
                             serviceFee = 3_000_000.msat,
                             miningFee = 0.sat,
@@ -341,10 +343,9 @@ class LegacyMigrationHelperTest {
                 received = IncomingPayment.Received(
                     receivedWith = listOf(
                         IncomingPayment.ReceivedWith.NewChannel(
-                            amount = 562_212_000.msat,
+                            amountReceived = 562_212_000.msat,
                             channelId = ByteVector32.Zeroes,
-                            txId = TxId(
-                                ByteVector32.Zeroes),
+                            txId = TxId(ByteVector32.Zeroes),
                             serviceFee = 5_678_000.msat,
                             miningFee = 0.sat,
                             confirmedAt = 1656403752448,

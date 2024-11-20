@@ -14,8 +14,7 @@ struct NotificationsView : View {
 		case sheet
 		case embedded
 	}
-	
-	let location: NotificationsView.Location
+	let location: Location
 	
 	@StateObject var noticeMonitor = NoticeMonitor()
 	

@@ -166,16 +166,17 @@
 
     <!-- scanning errors -->
 
-    <string name="scan_error_expired">Ankara hii imeisha muda wake.</string>
-    <string name="scan_error_already_paid">Malipo haya tayari yamelipwa.</string>
-    <string name="scan_error_invalid_chain">Malipo haya hayatumii mnyororo sawa na pochi yako.</string>
-    <string name="scan_error_lnurl_invalid">Imeshindwa kuchakata kiungo hiki cha LNURL. Hakikisha ni halali.</string>
-    <string name="scan_error_lnurl_unsupported">Aina hii ya LNURL haijaungwa mkono bado.</string>
-    <string name="scan_error_invalid_generic">Data hii inatumia muundo usiojulikana na haiwezi kuchakatwa.</string>
-    <string name="scan_error_bip353_name_not_found">Jina \"%1$s\" halijapatikana kwenye \"%2$s\".</string>
-    <string name="scan_error_bip353_invalid_uri">Anwani hii inatumia rasilimali ya Bip21 isiyo halali.</string>
-    <string name="scan_error_bip353_invalid_offer">Anwani hii inatumia ombi batili la Bolt12.</string>
-    <string name="scan_error_bip353_dnssec">Anwani hii inashikiliwa kwenye DNS isiyo salama. DNSSEC lazima iwezeshwe.</string>
+    <string name="send_error_invoice_expired">Ankara hii imeisha muda wake.</string>
+    <string name="send_error_payment_pending">Malipo haya tayari yanachakatwa. Tafadhali subiri ikamilike.</string>
+    <string name="send_error_already_paid">Malipo haya tayari yamelipwa.</string>
+    <string name="send_error_invalid_chain">Malipo haya hayatumii mnyororo sawa na pochi yako.</string>
+    <string name="send_error_lnurl_invalid">Imeshindwa kuchakata kiungo hiki cha LNURL. Hakikisha ni halali.</string>
+    <string name="send_error_lnurl_unsupported">Aina hii ya LNURL haijaungwa mkono bado.</string>
+    <string name="send_error_invalid_generic">Data hii inatumia muundo usiojulikana na haiwezi kuchakatwa.</string>
+    <string name="send_error_bip353_name_not_found">Jina \"%1$s\" halijapatikana kwenye \"%2$s\".</string>
+    <string name="send_error_bip353_invalid_uri">Anwani hii inatumia rasilimali ya Bip21 isiyo halali.</string>
+    <string name="send_error_bip353_invalid_offer">Anwani hii inatumia ombi batili la Bolt12.</string>
+    <string name="send_error_bip353_dnssec">Anwani hii inashikiliwa kwenye DNS isiyo salama. DNSSEC lazima iwezeshwe.</string>
 
     <!-- validation -->
 

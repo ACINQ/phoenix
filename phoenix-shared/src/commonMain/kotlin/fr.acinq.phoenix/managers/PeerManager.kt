@@ -18,7 +18,6 @@ import fr.acinq.lightning.blockchain.electrum.IElectrumClient
 import fr.acinq.lightning.blockchain.electrum.SwapInManager
 import fr.acinq.lightning.blockchain.electrum.SwapInWallet
 import fr.acinq.lightning.blockchain.electrum.WalletState
-import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.states.ChannelStateWithCommitments
 import fr.acinq.lightning.channel.states.Normal
 import fr.acinq.lightning.channel.states.Offline
@@ -265,7 +264,6 @@ class PeerManager(
         }
     }
 }
-
 
 /** The peer's swap-in wallet for Phoenix is always not null, because the client is always an [IElectrumClient] (see how this Peer is built in `PeerManager.init`). */
 val Peer.phoenixSwapInWallet: SwapInWallet

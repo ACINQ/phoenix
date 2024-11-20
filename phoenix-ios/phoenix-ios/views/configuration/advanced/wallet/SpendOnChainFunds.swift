@@ -1,17 +1,24 @@
 import SwiftUI
 import PhoenixShared
+import Combine
 
-fileprivate let filename = "SpendExpiredSwapIns"
+fileprivate let filename = "SpendOnChainFunds"
 #if DEBUG && true
 fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-struct SpendExpiredSwapIns: View {
+struct SpendOnChainFunds: View {
 	
-	@State var swapInWallet = Biz.business.balanceManager.swapInWalletValue()
-	let swapInWalletPublisher = Biz.business.balanceManager.swapInWalletPublisher()
+	enum Source {
+		case expiredSwapIns
+		case finalWallet
+	}
+	let source: Source
+	
+	@State var wallet: Lightning_kmpWalletState.WalletWithConfirmations
+	let walletPublisher: AnyPublisher<Lightning_kmpWalletState.WalletWithConfirmations, Never>
 	
 	@State var btcAddressInputResult: Result<BitcoinUri, BtcAddressInput.DetailedError> = .failure(.emptyInput)
 	
@@ -36,6 +43,26 @@ struct SpendExpiredSwapIns: View {
 	@EnvironmentObject var smartModalState: SmartModalState
 	
 	// --------------------------------------------------
+	// MARK: Init
+	// --------------------------------------------------
+	
+	init(source: Source) {
+		self.source = source
+		
+		let currentWallet: Lightning_kmpWalletState.WalletWithConfirmations
+		switch source {
+		case .expiredSwapIns:
+			currentWallet = Biz.business.balanceManager.swapInWalletValue()
+			walletPublisher = Biz.business.balanceManager.swapInWalletPublisher()
+		case .finalWallet:
+			currentWallet = Biz.business.peerManager.finalWalletValue()
+			walletPublisher = Biz.business.peerManager.finalWalletPublisher()
+		}
+		
+		self._wallet = State(initialValue: currentWallet)
+	}
+	
+	// --------------------------------------------------
 	// MARK: View Builders
 	// --------------------------------------------------
 	
@@ -43,7 +70,7 @@ struct SpendExpiredSwapIns: View {
 	var body: some View {
 		
 		content()
-			.navigationTitle("Spend expired swap-ins")
+			.navigationTitle(title)
 			.navigationBarTitleDisplayMode(.inline)
 	}
 	
@@ -58,8 +85,8 @@ struct SpendExpiredSwapIns: View {
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
-		.onReceive(swapInWalletPublisher) {
-			swapInWalletChanged($0)
+		.onReceive(walletPublisher) {
+			walletChanged($0)
 		}
 		.onChange(of: btcAddressInputResult) { _ in
 			btcAddressInputResultChanged()
@@ -72,11 +99,38 @@ struct SpendExpiredSwapIns: View {
 	@ViewBuilder
 	func section_info() -> some View {
 		
+		switch source {
+		case .expiredSwapIns:
+			section_info_expiredSwapIns()
+			
+		case .finalWallet:
+			section_info_finalWallet()
+		}
+	}
+	
+	@ViewBuilder
+	func section_info_expiredSwapIns() -> some View {
+		
 		Section {
 			Text(
 				"""
 				Use this screen to spend your on-chain funds that were not swapped \
-				in time. The swap-in request has now expired. 
+				in time. The swap-in request has now expired.
+				"""
+			)
+			.fixedSize(horizontal: false, vertical: true) // text truncation bugs
+		}
+	}
+	
+	@ViewBuilder
+	func section_info_finalWallet() -> some View {
+		
+		Section {
+			Text(
+				"""
+				Use this screen to spend funds from your final wallet. \
+				These funds come from channels that have been closed in the past. \
+				This does not affect your existing Lightning channels.
 				"""
 			)
 			.fixedSize(horizontal: false, vertical: true) // text truncation bugs
@@ -289,8 +343,27 @@ struct SpendExpiredSwapIns: View {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
+	var title: String {
+		
+		switch source {
+			case .expiredSwapIns : return String(localized: "Spend expired swap-ins")
+			case .finalWallet    : return String(localized: "Spend from final wallet")
+		}
+	}
+	
+	var spendableBalance: Bitcoin_kmpSatoshi {
+		
+		switch source {
+		case .expiredSwapIns:
+			return wallet.readyForRefundBalance
+			
+		case .finalWallet:
+			return wallet.anyConfirmedBalance
+		}
+	}
+	
 	func formattedBalances() -> (FormattedAmount, FormattedAmount) {
-		return formattedAmounts(swapInWallet.readyForRefundBalance.sat)
+		return formattedAmounts(spendableBalance.sat)
 	}
 	
 	func formattedMinerFees(_ minerFeeInfo: MinerFeeInfo) -> (FormattedAmount, FormattedAmount) {
@@ -298,7 +371,7 @@ struct SpendExpiredSwapIns: View {
 	}
 	
 	func formattedReceives(_ minerFeeInfo: MinerFeeInfo) -> (FormattedAmount, FormattedAmount) {
-		let balance = swapInWallet.readyForRefundBalance.sat
+		let balance = spendableBalance.sat
 		let minerFee = minerFeeInfo.minerFee.sat
 		let diff = (balance > minerFee) ? (balance - minerFee) : 0
 		return formattedAmounts(diff)
@@ -316,12 +389,12 @@ struct SpendExpiredSwapIns: View {
 			return false
 		}
 		
-		return minerFeeInfo.minerFee.sat > swapInWallet.readyForRefundBalance.sat
+		return minerFeeInfo.minerFee.sat > spendableBalance.sat
 	}
 	
 	func minerFeePercent(_ minerFeeInfo: MinerFeeInfo) -> String {
 		
-		let value = Double(minerFeeInfo.minerFee.sat) / Double(swapInWallet.readyForRefundBalance.sat)
+		let value = Double(minerFeeInfo.minerFee.sat) / Double(spendableBalance.sat)
 		
 		let formatter = NumberFormatter()
 		formatter.numberStyle = .percent
@@ -355,16 +428,16 @@ struct SpendExpiredSwapIns: View {
 	// MARK: Notifications
 	// --------------------------------------------------
 	
-	func swapInWalletChanged(_ newValue: Lightning_kmpWalletState.WalletWithConfirmations) {
-		log.trace("swapInWalletChanged()")
+	func walletChanged(_ newValue: Lightning_kmpWalletState.WalletWithConfirmations) {
+		log.trace("walletChanged()")
 		
 	#if DEBUG
-	//	swapInWallet = newValue.fakeBlockHeight(plus: Int32(144 * 31 * 3)) // 3 months: test expirationWarning
-	//	swapInWallet = newValue.fakeBlockHeight(plus: Int32(144 * 30 * 4)) // 4 months: test lockedUntilRefund
-	//	swapInWallet = newValue.fakeBlockHeight(plus: Int32(144 * 30 * 6)) // 6 months: test readyForRefund
-		swapInWallet = newValue
+	//	wallet = newValue.fakeBlockHeight(plus: Int32(144 * 31 * 3)) // 3 months: test expirationWarning
+	//	wallet = newValue.fakeBlockHeight(plus: Int32(144 * 30 * 4)) // 4 months: test lockedUntilRefund
+	//	wallet = newValue.fakeBlockHeight(plus: Int32(144 * 30 * 6)) // 6 months: test readyForRefund
+		wallet = newValue
 	#else
-		swapInWallet = newValue
+		wallet = newValue
 	#endif
 	}
 	
@@ -396,16 +469,22 @@ struct SpendExpiredSwapIns: View {
 	func showMinerFeeSheet() {
 		log.trace("showMinerFeeSheet()")
 		
-		let sats = swapInWallet.readyForRefundBalance
 		guard case let .success(bitcoinUri) = btcAddressInputResult else {
 			return
 		}
+		
+		let target: MinerFeeSheet.Target
+		switch source {
+			case .expiredSwapIns : target = .expiredSwapIn
+			case .finalWallet    : target = .finalWallet
+		}
+		let sats: Bitcoin_kmpSatoshi = spendableBalance
 		
 		dismissKeyboardIfVisible()
 		smartModalState.display(dismissable: true) {
 			
 			MinerFeeSheet(
-				target: .expiredSwapIn,
+				target: target,
 				amount: sats,
 				btcAddress: bitcoinUri.address,
 				minerFeeInfo: $minerFeeInfo,
@@ -425,37 +504,13 @@ struct SpendExpiredSwapIns: View {
 	func sendButtonTapped() {
 		log.trace("sendButtonTapped()")
 		
-		guard
-			let minerFeeInfo,
-			let keyManager = Biz.business.walletManager.keyManagerValue()
-		else {
-			return
-		}
-		
-		let pair: KotlinPair<Bitcoin_kmpTransaction, Bitcoin_kmpSatoshi>? =
-			swapInWallet._spendExpiredSwapIn(
-				swapInKeys: keyManager.swapInOnChainWallet,
-				scriptPubKey: minerFeeInfo.pubKeyScript,
-				feerate: minerFeeInfo.feerate
-			)
-		
-		guard let tx = pair?.first else {
-			log.debug("updateMinerFeeInfo_ExpiredSwapIn: swapInWallet.spendExpiredSwapIn() returned null")
-			return
-		}
-		
-		isSending = true
-		let electrumClient = Biz.business.electrumWatcher.client
-		Task { @MainActor in
-			do {
-				let txId = try await electrumClient.broadcastTransaction(tx: tx)
-				sentTxId = txId
-			} catch {
-				log.error("electrumClient.broadcastTransaction: error: \(error)")
-			}
+		switch source {
+		case .expiredSwapIns:
+			spendExpiredSwapInFunds()
 			
-			isSending = false
-		} // </Task>
+		case .finalWallet:
+			spendFinalWalletFunds()
+		}
 	}
 	
 	func exploreTx(_ txId: Bitcoin_kmpTxId, website: BlockchainExplorer.Website) {
@@ -465,5 +520,64 @@ struct SpendExpiredSwapIns: View {
 		if let txUrl = URL(string: txUrlStr) {
 			UIApplication.shared.open(txUrl)
 		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Sending Logic
+	// --------------------------------------------------
+	
+	func spendExpiredSwapInFunds() {
+		log.trace("spendExpiredSwapInFunds()")
+		
+		guard
+			let minerFeeInfo,
+			let signedTx = minerFeeInfo.transaction
+		else {
+			return
+		}
+		
+		isSending = true
+		let electrumClient = Biz.business.electrumWatcher.client
+		Task { @MainActor in
+			do {
+				let txId = try await electrumClient.broadcastTransaction(tx: signedTx)
+				sentTxId = txId
+			} catch {
+				log.error("electrumClient.broadcastTransaction: error: \(error)")
+			}
+			
+			isSending = false
+		} // </Task>
+	}
+	
+	func spendFinalWalletFunds() {
+		log.trace("spendFinalWalletFunds()")
+		
+		guard
+			let minerFeeInfo,
+			let unsignedTx = minerFeeInfo.transaction,
+			let peer = Biz.business.peerManager.peerStateValue(),
+			let finalWallet = peer.finalWallet
+		else {
+			return
+		}
+		
+		guard let signedTx = finalWallet.signTransaction(unsignedTx: unsignedTx) else {
+			log.error("finalWallet.signTransaction(): returned null")
+			return
+		}
+		
+		isSending = true
+		let electrumClient = Biz.business.electrumWatcher.client
+		Task { @MainActor in
+			do {
+				let txId = try await electrumClient.broadcastTransaction(tx: signedTx)
+				sentTxId = txId
+			} catch {
+				log.error("electrumClient.broadcastTransaction: error: \(error)")
+			}
+			
+			isSending = false
+		} // </Task>
 	}
 }

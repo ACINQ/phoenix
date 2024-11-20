@@ -10,7 +10,8 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct PaymentLayerChoice: View {
 	
-	@ObservedObject var mvi: MVIState<Scan.Model, Scan.Intent>
+	let didChooseL1: () -> Void
+	let didChooseL2: () -> Void
 	
 	@EnvironmentObject var popoverState: PopoverState
 	
@@ -50,7 +51,7 @@ struct PaymentLayerChoice: View {
 		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 			
 			Button {
-				payWithL2()
+				didChooseL2()
 			} label: {
 				Label {
 					Text("Pay with Lightning")
@@ -75,7 +76,7 @@ struct PaymentLayerChoice: View {
 			.padding(.bottom, 25)
 			
 			Button {
-				payWithL1()
+				didChooseL1()
 			} label: {
 				Label {
 					Text("Pay on-chain")
@@ -101,22 +102,5 @@ struct PaymentLayerChoice: View {
 		
 		} // </VStack>
 		.padding()
-	}
-	
-	func payWithL1() {
-		log.trace("payWithL1()")
-		
-		popoverState.close()
-	}
-	
-	func payWithL2() {
-		log.trace("payWithL2()")
-		
-		if let model = mvi.model as? Scan.Model_OnChainFlow,
-		   let paymentRequest = model.uri.paymentRequest
-		{
-			mvi.intent(Scan.Intent_Parse(request: paymentRequest.write()))
-		}
-		popoverState.close()
 	}
 }

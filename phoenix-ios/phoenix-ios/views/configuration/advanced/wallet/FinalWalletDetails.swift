@@ -10,10 +10,18 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct FinalWalletDetails: View {
 	
+	enum NavLinkTag: String {
+		case SpendFinalWalletFunds
+	}
+	
 	@State var finalWallet = Biz.business.peerManager.finalWalletValue()
 	let finalWalletPublisher = Biz.business.peerManager.finalWalletPublisher()
 	
 	@State var blockchainExplorerTxid: Bitcoin_kmpTxId? = nil
+	
+	// <iOS_16_workarounds>
+	@State var navLinkTag: NavLinkTag? = nil
+	// </iOS_16_workarounds>
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
@@ -27,6 +35,9 @@ struct FinalWalletDetails: View {
 		content()
 			.navigationTitle(NSLocalizedString("Final wallet", comment: "Navigation Bar Title"))
 			.navigationBarTitleDisplayMode(.inline)
+			.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
+				navLinkView(tag)
+			}
 	}
 	
 	@ViewBuilder
@@ -58,8 +69,16 @@ struct FinalWalletDetails: View {
 		Section {
 			
 			let confirmed = confirmedBalance()
-			Text(verbatim: "\(confirmed.0.string)") +
-			Text(verbatim: " ≈ \(confirmed.1.string)").foregroundColor(.secondary)
+
+			if hasConfirmedSats() {
+				navLink_plain(.SpendFinalWalletFunds) {
+					Text(verbatim: "\(confirmed.0.string)") +
+					Text(verbatim: " ≈ \(confirmed.1.string)").foregroundColor(.secondary)
+				}
+			} else {
+				Text(verbatim: "\(confirmed.0.string)") +
+				Text(verbatim: " ≈ \(confirmed.1.string)").foregroundColor(.secondary)
+			}
 			
 		} header: {
 			Text("Confirmed Balance")
@@ -141,9 +160,39 @@ struct FinalWalletDetails: View {
 		} // </confirmationDialog>
 	}
 	
+	@ViewBuilder
+	func navLink_plain<Content>(
+		_ tag: NavLinkTag,
+		label: @escaping () -> Content
+	) -> some View where Content: View {
+		
+		if #available(iOS 17, *) {
+			NavigationLink(value: tag, label: label)
+		} else {
+			NavigationLink_16(
+				destination: navLinkView(tag),
+				tag: tag,
+				selection: $navLinkTag,
+				label: label
+			)
+		}
+	}
+	
+	@ViewBuilder
+	func navLinkView(_ tag: NavLinkTag) -> some View {
+		
+		switch tag {
+		case .SpendFinalWalletFunds: SpendOnChainFunds(source: .finalWallet)
+		}
+	}
+	
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
+	
+	func hasConfirmedSats() -> Bool {
+		return finalWallet.anyConfirmedBalance.sat > 0
+	}
 	
 	func confirmedBalance() -> (FormattedAmount, FormattedAmount) {
 		

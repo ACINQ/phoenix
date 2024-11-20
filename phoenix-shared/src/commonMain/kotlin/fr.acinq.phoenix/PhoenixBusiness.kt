@@ -30,8 +30,6 @@ import fr.acinq.phoenix.controllers.init.AppRestoreWalletController
 import fr.acinq.phoenix.controllers.main.AppContentController
 import fr.acinq.phoenix.controllers.main.AppHomeController
 import fr.acinq.phoenix.controllers.payments.AppReceiveController
-import fr.acinq.phoenix.controllers.payments.AppScanController
-import fr.acinq.phoenix.controllers.payments.Scan
 import fr.acinq.phoenix.data.StartupParams
 import fr.acinq.phoenix.db.SqliteAppDb
 import fr.acinq.phoenix.db.createAppDbDriver
@@ -98,6 +96,7 @@ class PhoenixBusiness(
     val contactsManager by lazy { ContactsManager(this) }
     val blockchainExplorer by lazy { BlockchainExplorer(chain) }
     val tor by lazy { Tor(getApplicationCacheDirectoryPath(ctx), TorHelper.torLogger(loggerFactory)) }
+    val sendManager by lazy { SendManager(this) }
 
     fun start(startupParams: StartupParams) {
         logger.debug { "starting with params=$startupParams" }
@@ -158,9 +157,6 @@ class PhoenixBusiness(
 
         override fun receive(): ReceiveController =
             AppReceiveController(_this)
-
-        override fun scan(firstModel: Scan.Model): ScanController =
-            AppScanController(_this, firstModel)
 
         override fun restoreWallet(): RestoreWalletController =
             AppRestoreWalletController(_this)

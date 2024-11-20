@@ -56,8 +56,8 @@ import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.SwitchView
 import fr.acinq.phoenix.android.components.TextInput
-import fr.acinq.phoenix.android.payments.CameraPermissionsView
-import fr.acinq.phoenix.android.payments.ScannerView
+import fr.acinq.phoenix.android.payments.send.CameraPermissionsView
+import fr.acinq.phoenix.android.payments.send.ScannerView
 import fr.acinq.phoenix.data.ContactInfo
 import kotlinx.coroutines.launch
 
@@ -114,7 +114,7 @@ fun SaveNewContactDialog(
             ) {
                 Text(text = stringResource(id = R.string.contact_add_title), style = MaterialTheme.typography.h4, textAlign = TextAlign.Center)
                 Spacer(modifier = Modifier.height(24.dp))
-                ContactPhotoView(photoUri = photoUri, name = name, onChange = { photoUri = it }, borderSize = 4.dp)
+                ContactPhotoView(photoUri = photoUri, name = name, onChange = { photoUri = it }, imageSize = 120.dp, borderSize = 4.dp)
                 Spacer(modifier = Modifier.height(24.dp))
                 TextInput(
                     text = name,

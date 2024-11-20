@@ -163,16 +163,10 @@
 
     <!-- scan -->
 
-    <string name="scan_manual_input_button">Manuelle Eingabe</string>
-    <string name="scan_paste_button">Daten aus Zwischenablage einfügen</string>
     <string name="scan_request_camera_access">Tippen, um Kamerazugriff zu erlauben</string>
     <string name="scan_request_camera_access_denied">Kamerazugriff wurde abgelehnt</string>
 
-    <string name="scan_lnurl_fetching">Daten werden vom Service geholt…</string>
-
-    <string name="scan_manual_input_title">Manuelle Eingabe</string>
-    <string name="scan_manual_input_instructions">Geben Sie eine Lightning-Rechnung, LNURL oder Lightning-Adresse ein, an die Sie etwas senden möchten.</string>
-    <string name="scan_manual_input_label">Rechnung oder LN-Adresse</string>
+    <string name="preparesend_lnurl_fetching">Daten werden vom Service geholt…</string>
 
     <!-- utils: misc strings -->
 

@@ -115,7 +115,7 @@
     <string name="receive_toggle_offer_new_overlay">NOVÉ!</string>
 
     <string name="receive_offer_share_title">Statická Lightningová faktúra</string>
-    <string name="receive_offer_share_subject">Zdieľajte túto statickú Lightningovú faktúru s...</string>
+    <string name="receive_offer_share_subject">Zdieľajte túto statickú Lightningovú faktúru s…</string>
 
 
     <string name="receive_lightning_edit_button">Upraviť</string>
@@ -147,11 +147,11 @@
     <string name="send_pay_retry_button">Skúsiť znova</string>
 
     <string name="send_offer_payer_note_label">Správa</string>
-    <string name="send_offer_payer_note_placeholder">Kliknite pre pridanie správy...</string>
+    <string name="send_offer_payer_note_placeholder">Kliknite pre pridanie správy…</string>
     <string name="send_offer_payer_note_dialog_title">Pripojiť vlastnú správu</string>
     <string name="send_offer_payer_note_dialog_subtitle">Príjemca uvidí túto správu</string>
-    <string name="send_offer_payer_note_dialog_placeholder">Zadajte správu...</string>
-    <string name="send_offer_fetching">Načítavanie detailov platby...</string>
+    <string name="send_offer_payer_note_dialog_placeholder">Zadajte správu…</string>
+    <string name="send_offer_fetching">Načítavanie detailov platby…</string>
     <string name="send_offer_failure_title">Platba zlyhala</string>
     <string name="send_offer_failure_timeout">Nepodarilo sa načítať detaily platby v primeranom čase.\n\nPríjemca môže byť offline alebo nedostupný.</string>
 
@@ -177,16 +177,10 @@
 
     <!-- scan -->
 
-    <string name="scan_manual_input_button">Manuálne zadanie</string>
-    <string name="scan_paste_button">Vložiť zo schránky</string>
     <string name="scan_request_camera_access">Kliknite a povoľte prístup ku kamere</string>
     <string name="scan_request_camera_access_denied">Povolenie používať kameru bolo zamietnuté</string>
 
-    <string name="scan_lnurl_fetching">Získavanie dát zo služby…</string>
-
-    <string name="scan_manual_input_title">Manuálne zadanie</string>
-    <string name="scan_manual_input_instructions">Zadajte Lightning faktúru, LNURL alebo Lightning adresu, na ktorú chcete poslať peniaze.</string>
-    <string name="scan_manual_input_label">Faktúra alebo LN adresa</string>
+    <string name="preparesend_lnurl_fetching">Získavanie dát zo služby…</string>
 
     <!-- utils: misc strings -->
 
@@ -455,7 +449,7 @@
     <!-- offer contact -->
 
     <string name="contact_add_contact_button">Pridať kontakt</string>
-    <string name="contact_error_offer_invalid">Neplatná ponuka</string>
+    <string name="contact_error_offer_invalid">Neplatný kód Bolt12</string>
     <string name="contact_error_offer_known">Faktúra už je priradená k %1$s</string>
     <string name="contact_save_button">Uložiť</string>
     <string name="contact_delete_button">Odstrániť</string>
@@ -463,10 +457,10 @@
     <string name="contact_add_title">Priradiť kontakt k ponuke BOLT12</string>
     <string name="contact_name_label">Meno</string>
     <string name="contact_photo_label">Fotka</string>
-    <string name="contact_offer_label">Ponuka</string>
+    <string name="contact_offer_label">Bolt12 kód</string>
 
     <string name="contact_search_name">Hľadať podľa mena</string>
-    <string name="contact_none">Nenašli sa žiadne kontakty...</string>
+    <string name="contact_none">Nenašli sa žiadne kontakty…</string>
 
     <!-- settings: access control -->
 
@@ -819,6 +813,6 @@
     <string name="swapin_signer_error_header">Nepodarilo sa podpísať vstup</string>
 
   <!-- settings: contacts list -->
-  <string name="settings_contacts_help">Kontakty umožňujú prepojiť meno s jeho statickou ponukou. Ukladajú sa lokálne.</string>
+  <string name="settings_contacts_help">Táto obrazovka umožňuje prepojiť kód BOLT12 s názvom.\n\nDáta kontaktov sú uložené lokálne.</string>
 
 </resources>

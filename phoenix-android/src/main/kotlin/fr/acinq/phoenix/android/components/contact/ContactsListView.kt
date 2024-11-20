@@ -16,9 +16,11 @@
 
 package fr.acinq.phoenix.android.components.contact
 
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -27,6 +29,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -38,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.R
@@ -104,7 +108,9 @@ private fun ContactsList(
     if (contacts.isEmpty()) {
         Text(
             text = stringResource(id = R.string.contact_none),
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             style = MaterialTheme.typography.caption,
             textAlign = TextAlign.Center,
         )
@@ -113,7 +119,7 @@ private fun ContactsList(
             itemsIndexed(contacts) { index, contact ->
                 val onClick = {
                     contact.mostRelevantOffer?.let {
-                        navController.navigate("${Screen.ScanData.route}?input=${it.encode()}")
+                        navController.navigate("${Screen.Send.route}?input=${it.encode()}")
                     } ?: run { if (canEditContact) { onEditContact(contact) } }
                 }
                 if (isOnSurface) {
@@ -141,22 +147,27 @@ private fun ContactsList(
 private fun ContactRow(contact: ContactInfo, canEditContact: Boolean, onEditContact: (ContactInfo) -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.height(IntrinsicSize.Min),
     ) {
         Spacer(modifier = Modifier.width(12.dp))
-        ContactPhotoView(photoUri = contact.photoUri, name = contact.name, onChange = null, imageSize = 32.dp)
-        Spacer(modifier = Modifier.width(8.dp))
+        Surface(modifier = Modifier.padding(vertical = 5.dp)) {
+            ContactPhotoView(photoUri = contact.photoUri, name = contact.name, onChange = null, imageSize = 38.dp, borderSize = 1.dp)
+        }
+        Spacer(modifier = Modifier.width(12.dp))
         Text(
             text = contact.name,
             modifier = Modifier
                 .weight(1f)
                 .padding(vertical = 16.dp),
-            style = MaterialTheme.typography.body1.copy(fontSize = 18.sp)
+            style = MaterialTheme.typography.body1.copy(fontSize = 18.sp),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
         if (canEditContact) {
             Button(
                 icon = R.drawable.ic_edit,
                 onClick = { onEditContact(contact) },
-                padding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
+                modifier = Modifier.fillMaxHeight(),
             )
         }
     }

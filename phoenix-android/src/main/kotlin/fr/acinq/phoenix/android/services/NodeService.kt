@@ -233,6 +233,7 @@ class NodeService : Service() {
             doStartBusiness(decryptedMnemonics, requestCheckLegacyChannels)
             ChannelsWatcher.schedule(applicationContext)
             DailyConnect.schedule(applicationContext)
+            ContactsPhotoCleaner.scheduleASAP(applicationContext)
             _state.postValue(NodeServiceState.Running)
         }
     }

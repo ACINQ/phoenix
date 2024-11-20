@@ -10,7 +10,7 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct MainView_Small: View {
 	
-	enum NavLinkTag: String, Codable {
+	enum NavLinkTag: Hashable, CustomStringConvertible {
 		case ConfigurationView
 		case TransactionsView
 		case ReceiveView
@@ -18,13 +18,28 @@ struct MainView_Small: View {
 		case CurrencyConverter
 		case SwapInWalletDetails
 		case LiquidityAdsView
+		case LoginView(flow: SendManager.ParseResult_Lnurl_Auth)
+		case ValidateView(flow: SendManager.ParseResult)
+		
+		var description: String {
+			switch self {
+				case .ConfigurationView   : return "ConfigurationView"
+				case .TransactionsView    : return "TransactionsView"
+				case .ReceiveView         : return "ReceiveView"
+				case .SendView            : return "SendView"
+				case .CurrencyConverter   : return "CurrencyConverter"
+				case .SwapInWalletDetails : return "SwapInWalletDetails"
+				case .LiquidityAdsView    : return "LiquidityAdsView"
+				case .LoginView(_)        : return "LoginView"
+				case .ValidateView(_)     : return "ValidateView"
+			}
+		}
 	}
 	
 	@State var canMergeChannelsForSplicing = Biz.canMergeChannelsForSplicingPublisher.value
 	@State var showingMergeChannelsView = false
 	
 	let externalLightningUrlPublisher = AppDelegate.get().externalLightningUrlPublisher
-	@State var externalLightningRequest: AppScanController? = nil
 	
 	@ScaledMetric var sendImageSize: CGFloat = 17
 	@ScaledMetric var receiveImageSize: CGFloat = 18
@@ -52,6 +67,10 @@ struct MainView_Small: View {
 	@State var footerTruncationDetection_standard: [DynamicTypeSize: Bool] = [:]
 	@State var footerTruncationDetection_condensed: [DynamicTypeSize: Bool] = [:]
 	
+	@State var isParsing: Bool = false
+	@State var parseIndex: Int = 0
+	@State var parseProgress: SendManager.ParseProgress? = nil
+	
 	// <iOS_16_workarounds>
 	@State var navLinkTag: NavLinkTag? = nil
 	@State var popToDestination: PopToDestination? = nil
@@ -59,12 +78,15 @@ struct MainView_Small: View {
 	@State var swiftUiBugWorkaroundIdx = 0
 	// </iOS_16_workarounds>
 	
+	@StateObject var toast = Toast()
 	@StateObject var navCoordinator = NavigationCoordinator()
 	
+	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.dynamicTypeSize) var dynamicTypeSize: DynamicTypeSize
 	
 	@EnvironmentObject var deviceInfo: DeviceInfo
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
+	@EnvironmentObject var popoverState: PopoverState
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -114,6 +136,16 @@ struct MainView_Small: View {
 			}
 
 			content()
+			
+			if parseProgress != nil {
+				FetchActivityNotice(
+					title: self.fetchActivityTitle,
+					onCancel: { self.cancelParseRequest() }
+				)
+				.ignoresSafeArea(.keyboard) // disable keyboard avoidance on this view
+			}
+			
+			toast.view()
 
 		} // </ZStack>
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -491,13 +523,32 @@ struct MainView_Small: View {
 	func navLinkView(_ tag: NavLinkTag) -> some View {
 		
 		switch tag {
-			case .ConfigurationView   : ConfigurationView()
-			case .TransactionsView    : TransactionsView()
-			case .ReceiveView         : ReceiveView()
-			case .SendView            : SendView(location: .MainView, controller: externalLightningRequest)
-			case .CurrencyConverter   : CurrencyConverterView()
-			case .SwapInWalletDetails : SwapInWalletDetails(location: .embedded, popTo: popTo)
-			case .LiquidityAdsView    : LiquidityAdsView(location: .embedded)
+		case .ConfigurationView:
+			ConfigurationView()
+			
+		case .TransactionsView:
+			TransactionsView()
+		
+		case .ReceiveView:
+			ReceiveView()
+			
+		case .SendView:
+			SendView(location: .MainView)
+			
+		case .CurrencyConverter:
+			CurrencyConverterView()
+			
+		case .SwapInWalletDetails:
+			SwapInWalletDetails(location: .embedded, popTo: popTo)
+			
+		case .LiquidityAdsView:
+			LiquidityAdsView(location: .embedded)
+			
+		case .LoginView(let flow):
+			LoginView(flow: flow, popTo: self.popTo)
+			
+		case .ValidateView(let flow):
+			ValidateView(flow: flow, popTo: self.popTo)
 		}
 	}
 	
@@ -505,12 +556,21 @@ struct MainView_Small: View {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
-	private func navLinkTagBinding() -> Binding<Bool> {
+	func navLinkTagBinding() -> Binding<Bool> {
 		
 		return Binding<Bool>(
 			get: { navLinkTag != nil },
 			set: { if !$0 { navLinkTag = nil }}
 		)
+	}
+	
+	var fetchActivityTitle: String {
+		
+		if parseProgress is SendManager.ParseProgress_LnurlServiceFetch {
+			return String(localized: "Fetching Lightning URL", comment: "Progress title")
+		} else {
+			return String(localized: "Resolving lightning address", comment: "Progress title")
+		}
 	}
 	
 	// --------------------------------------------------
@@ -526,23 +586,7 @@ struct MainView_Small: View {
 	private func didReceiveExternalLightningUrl(_ urlStr: String) {
 		log.trace("didReceiveExternalLightningUrl()")
 		
-		if #available(iOS 17.0, *) {
-			// If the SendView is visible, it will simply be replaced
-		} else { // iOS 16
-			if navLinkTag == .SendView {
-				log.debug("Ignoring: handled by SendView")
-				return
-			}
-		}
-		
-		MainViewHelper.shared.processExternalLightningUrl(urlStr) { scanController in
-			
-			externalLightningRequest = scanController
-			if #available(iOS 17.0, *) {
-				navCoordinator.path.removeAll()
-			}
-			navigateTo(.SendView)
-		}
+		parseExternalUrl(urlStr)
 	}
 	
 	// --------------------------------------------------
@@ -586,7 +630,7 @@ struct MainView_Small: View {
 	// --------------------------------------------------
 	
 	func navigateTo(_ tag: NavLinkTag) {
-		log.trace("navigateTo(\(tag.rawValue))")
+		log.trace("navigateTo(\(tag.description))")
 		
 		if #available(iOS 17, *) {
 			navCoordinator.path.append(tag)
@@ -673,7 +717,7 @@ struct MainView_Small: View {
 	}
 	
 	private func navLinkTagChanged(_ tag: NavLinkTag?) {
-		log.trace("navLinkTagChanged() => \(tag?.rawValue ?? "nil")")
+		log.trace("navLinkTagChanged() => \(tag?.description ?? "nil")")
 		
 		if #available(iOS 17, *) {
 			log.warning(
@@ -691,10 +735,6 @@ struct MainView_Small: View {
 				self.navLinkTag = forcedNavLinkTag
 				
 			} else if tag == nil {
-				
-				// If we pushed the SendView, triggered by an external lightning url,
-				// then we can nil out the associated controller now (since we handed off to SendView).
-				self.externalLightningRequest = nil
 				
 				// If there's a pending popToDestination, it's now safe to continue the flow.
 				//
@@ -738,5 +778,116 @@ struct MainView_Small: View {
 		} else {
 			popToDestination = destination
 		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: External URL
+	// --------------------------------------------------
+	
+	func parseExternalUrl(_ input: String) {
+		log.trace("parseExternalUrl()")
+		
+		guard !isParsing else {
+			log.warning("parseExternalUrl: ignoring: isParsing == true")
+			return
+		}
+		
+		isParsing = true
+		parseIndex += 1
+		let index = parseIndex
+		
+		Task { @MainActor in
+			do {
+				let progressHandler = {(progress: SendManager.ParseProgress) -> Void in
+					if index == parseIndex {
+						self.parseProgress = progress
+					} else {
+						log.warning("parseExternalUrl: progressHandler: ignoring: cancelled")
+					}
+				}
+				
+				let result: SendManager.ParseResult = try await Biz.business.sendManager.parse(
+					request: input,
+					progress: progressHandler
+				)
+				
+				if index == parseIndex {
+					isParsing = false
+					parseProgress = nil
+					handleParseResult(result)
+				} else {
+					log.warning("parseExternalUrl: result: ignoring: cancelled")
+				}
+				
+			} catch {
+				log.error("parseExternalUrl: error: \(error)")
+				
+				if index == parseIndex {
+					isParsing = false
+					parseProgress = nil
+				}
+			}
+		}
+	}
+	
+	func handleParseResult(_ result: SendManager.ParseResult) {
+		log.trace("handleParseResult()")
+		
+		if let badRequest = result as? SendManager.ParseResult_BadRequest {
+			showErrorMessage(badRequest)
+		} else {
+			
+			if #available(iOS 17.0, *) {
+				navCoordinator.path.removeAll()
+			}
+			if let auth = result as? SendManager.ParseResult_Lnurl_Auth {
+				navigateTo(.LoginView(flow: auth))
+			} else {
+				navigateTo(.ValidateView(flow: result))
+			}
+		}
+	}
+	
+	func showErrorMessage(_ result: SendManager.ParseResult_BadRequest) {
+		log.trace("showErrorMessage()")
+		
+		let either = ParseResultHelper.processBadRequest(result)
+		switch either {
+		case .Left(let msg):
+			toast.pop(
+				msg,
+				colorScheme: colorScheme.opposite,
+				style: .chrome,
+				duration: 30.0,
+				alignment: .middle,
+				showCloseButton: true
+			)
+			
+		case .Right(let websiteLink):
+			popoverState.display(dismissable: true) {
+				WebsiteLinkPopover(
+					link: websiteLink,
+					didCopyLink: didCopyLink,
+					didOpenLink: nil
+				)
+			}
+		}
+	}
+	
+	func cancelParseRequest() {
+		log.trace("cancelParseRequest()")
+		
+		isParsing = false
+		parseIndex += 1
+		parseProgress = nil
+	}
+	
+	func didCopyLink() {
+		log.trace("didCopyLink()")
+		
+		toast.pop(
+			NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
+			colorScheme: colorScheme.opposite
+		)
 	}
 }

@@ -44,6 +44,7 @@ import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.components.settings.Setting
 import fr.acinq.phoenix.android.utils.*
+import fr.acinq.phoenix.android.utils.extensions.isBadCertificate
 import fr.acinq.phoenix.controllers.config.ElectrumConfiguration
 import fr.acinq.phoenix.data.ElectrumConfig
 import fr.acinq.secp256k1.Hex

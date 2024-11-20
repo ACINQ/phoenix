@@ -24,6 +24,7 @@ import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.crypto.LocalKeyManager
 import fr.acinq.phoenix.android.security.EncryptedSeed
+import fr.acinq.phoenix.android.security.KeystoreHelper
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.services.NodeService
 import fr.acinq.phoenix.managers.NodeParamsManager
@@ -39,23 +40,24 @@ import java.security.KeyStoreException
 
 
 sealed class StartupDecryptionState {
-    object Init : StartupDecryptionState()
-    object DecryptingSeed : StartupDecryptionState()
-    object DecryptionSuccess : StartupDecryptionState()
+    data object Init : StartupDecryptionState()
+    data object DecryptingSeed : StartupDecryptionState()
+    data object DecryptionSuccess : StartupDecryptionState()
     sealed class DecryptionError : StartupDecryptionState() {
         data class Other(val cause: Throwable): DecryptionError()
         data class KeystoreFailure(val cause: Throwable): DecryptionError()
     }
     sealed class SeedInputFallback : StartupDecryptionState() {
-        object Init: SeedInputFallback()
-        object CheckingSeed: SeedInputFallback()
+        data object Init: SeedInputFallback()
+        data object CheckingSeed: SeedInputFallback()
         sealed class Success: SeedInputFallback() {
             object MatchingData: Success()
             object WrittenToDisk: Success()
         }
         sealed class Error: SeedInputFallback() {
             data class Other(val cause: Throwable): Error()
-            object SeedDoesNotMatch: Error()
+            data object SeedDoesNotMatch: Error()
+            data class KeyStoreFailure(val cause: Throwable): Error()
         }
     }
 }
@@ -103,6 +105,12 @@ class StartupViewModel : ViewModel() {
             if (channelsDbFile.exists()) {
                 decryptionState.value = StartupDecryptionState.SeedInputFallback.Success.MatchingData
                 val encodedSeed = EncryptedSeed.fromMnemonics(words)
+                try {
+                    KeystoreHelper.checkEncryptionCipherOrReset(KeystoreHelper.KEY_NO_AUTH)
+                } catch (e: Exception) {
+                    decryptionState.value = StartupDecryptionState.SeedInputFallback.Error.SeedDoesNotMatch
+                    return@launch
+                }
                 val encrypted = EncryptedSeed.V2.NoAuth.encrypt(encodedSeed)
                 SeedManager.writeSeedToDisk(context, encrypted, overwrite = true)
                 delay(1000)

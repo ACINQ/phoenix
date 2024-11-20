@@ -22,14 +22,14 @@
     <path
         android:fillColor="#00000000"
         android:pathData="M11,9L20,9A2,2 0,0 1,22 11L22,20A2,2 0,0 1,20 22L11,22A2,2 0,0 1,9 20L9,11A2,2 0,0 1,11 9z"
-        android:strokeWidth="2"
+        android:strokeWidth="1.75"
         android:strokeColor="?attr/colorPrimary"
         android:strokeLineCap="round"
         android:strokeLineJoin="round" />
     <path
         android:fillColor="#00000000"
         android:pathData="M5,15H4a2,2 0,0 1,-2 -2V4a2,2 0,0 1,2 -2h9a2,2 0,0 1,2 2v1"
-        android:strokeWidth="2"
+        android:strokeWidth="1.75"
         android:strokeColor="?attr/colorPrimary"
         android:strokeLineCap="round"
         android:strokeLineJoin="round" />

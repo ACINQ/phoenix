@@ -37,8 +37,8 @@ import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.UserTheme
 import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
-import fr.acinq.phoenix.android.utils.label
-import fr.acinq.phoenix.android.utils.labels
+import fr.acinq.phoenix.android.utils.extensions.label
+import fr.acinq.phoenix.android.utils.extensions.labels
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.managers.AppConfigurationManager
@@ -155,4 +155,16 @@ private fun AppLocaleSetting() {
             })
         }
     )
+}
+
+@Composable
+private fun UserTheme.label(): String {
+    val context = LocalContext.current
+    return remember(key1 = this.name) {
+        when (this) {
+            UserTheme.DARK -> context.getString(R.string.prefs_display_theme_dark_label)
+            UserTheme.LIGHT -> context.getString(R.string.prefs_display_theme_light_label)
+            UserTheme.SYSTEM -> context.getString(R.string.prefs_display_theme_system_label)
+        }
+    }
 }
