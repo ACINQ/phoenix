@@ -81,11 +81,20 @@
 
     <!-- home: swap help -->
 
-    <string name="home_swapin_help_pending">Kusubiri uthibitisho 3.</string>
-    <string name="home_swapin_help_ready_fee">Amana zitawekwa kwenye Lightning wakati ada za uchimbaji zitakuwa chini ya %1$s.</string>
-    <string name="home_swapin_help_ready_disabled">Amana zitabaki kwenye-chain kwa sababu usimamizi wa chaneli kiotomatiki umesitishwa.</string>
-    <string name="home_swapin_help_generic">Fedha za kwenye-chain zimewekwa kwenye pochi yako.</string>
-    <string name="home_swapin_help_button">Bonyeza kwa maelezo</string>
+    <string name="home_swapin_confirming_title">Inathibitisha</string>
+    <string name="home_swapin_confirming_desc">Inangoja uthibitisho kwanza kabla ya kubadilishwa hadi Umeme."</string>
+
+    <string name="home_swapin_ready_title">"Inasubiri kubadilishana</string>
+    <string name="home_swapin_ready_desc_auto">Itatumia Umeme wakati ada za uchimbaji madini ziko chini ya %1$s.</string>
+    <string name="home_swapin_ready_desc_disabled">Hatasalia kwenye mnyororo kwa sababu udhibiti wa vituo otomatiki umezimwa.</string>
+    <string name="home_swapin_ready_desc_generic">Itatumia Umeme wakati masharti yatatumika.</string>
+    <string name="home_swapin_ready_expiring">Tahadhari! Baadhi ya pesa zitakwisha muda wa matumizi hivi karibuni na hazitatimiza masharti ya kubadilishwa hadi kwa Umeme.</string>
+
+    <string name="home_swapin_expired_title">Muda umekwisha</string>
+    <string name="home_swapin_expired_desc">"Hatuwezi kubadilishwa hadi kwa Umeme tena, baada ya miezi 4 kusubiri. Pesa hizi lazima zitumike wewe mwenyewe.</string >
+
+    <string name="home_final_title">Mkoba wa mwisho</string>
+    <string name="home_final_desc">Fedha hizi hutoka kwa vituo vya umeme vilivyofungwa. Ni lazima zitumike mwenyewe.</string>
 
     <string name="home_background_restriction_title">Usindikaji wa nyuma umepunguzwa</string>
     <string name="home_background_restriction_body_1">Phoenix haitaweza kupokea malipo wakati iko nyuma, au wakati imefungwa.</string>
@@ -223,9 +232,6 @@
 
     <string name="inappnotif_mempool_full_message">Ada za mtandaoni ziko juu.</string>
     <string name="inappnotif_mempool_full_action">Angalia jinsi Phoenix inavyoathirika</string>
-
-    <string name="inappnotif_final_wallet_message">Fedha zinapatikana katika pochi ya mwisho.</string>
-    <string name="inappnotif_final_wallet_action">Angalia fedha</string>
 
     <string name="inappnotif_payment_onchain_pending_title">Fedha za mtandaoni zinangosubiria (+%1$s)</string>
     <string name="inappnotif_payments_rejection_overview_one">Malipo moja ya kuingia yamekataliwa hivi karibuni</string>

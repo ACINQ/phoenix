@@ -77,11 +77,20 @@
 
     <!-- home: swap help -->
 
-    <string name="home_swapin_help_pending">Čekání na 3 potvrzení.</string>
-    <string name="home_swapin_help_ready_fee">Vklady se přidají do Lightningu, až budou poplatky za těžbu nižší než %1$s.</string>
-    <string name="home_swapin_help_ready_disabled">Vklady zůstanou on-chain, protože automatická správa kanálů je vypnutá.</string>
-    <string name="home_swapin_help_generic">On-chain prostředky byly vloženy do vaší peněženky.</string>
-    <string name="home_swapin_help_button">Klikněte pro podrobnosti</string>
+    <string name="home_swapin_confirming_title">Potvrzuji</string>
+    <string name="home_swapin_confirming_desc">Nejprve se čeká na potvrzení, než bude možné je vyměnit za Lightning.</string>
+
+    <string name="home_swapin_ready_title">Čekání na výměnu</string>
+    <string name="home_swapin_ready_desc_auto">Vklady se přidají do Lightningu, až budou poplatky za těžbu nižší než %1$s.</string>
+    <string name="home_swapin_ready_desc_disabled">Vklady zůstanou on-chain, protože automatická správa kanálů je vypnutá.</string>
+    <string name="home_swapin_ready_desc_generic">Nasadí se do Lightningu, až budou splněny podmínky.</string>
+    <string name="home_swapin_ready_expiring">Pozor! Některé prostředky brzy vyprší a již nebudou způsobilé pro výměnu za Lightning.</string>
+
+    <string name="home_swapin_expired_title">Platnost vypršela</string>
+    <string name="home_swapin_expired_desc">Po 4 měsících čekání již nelze vyměnit za Lightning. Tyto prostředky je nutné utratit ručně.</string>
+
+    <string name="home_final_title">Konečná peněženka</string>
+    <string name="home_final_desc">Tyto prostředky pocházejí z uzavřených kanálů Lightning. Musí být vynaloženy ručně.</string>
 
     <string name="home_background_restriction_title">Omezeno zpracovávání na pozadí</string>
     <string name="home_background_restriction_body_1">Phoenix nebude moci přijímat platby, pokud je na pozadí nebo pokud je zavřený.</string>.
@@ -220,9 +229,6 @@
 
     <string name="inappnotif_mempool_full_message">Bitcoin mempool je plný a On-Chain poplatky jsou vysoké.</string>
     <string name="inappnotif_mempool_full_action">Podívejte se, jak je ovlivněn Phoenix</string>
-
-    <string name="inappnotif_final_wallet_message">Prostředky dostupné v konečné peněžence.</string>
-    <string name="inappnotif_final_wallet_action">Zobrazit prostředky</string>
 
     <string name="inappnotif_payment_onchain_pending_title">On-Chain finanční prostředky čekají na vyřízení (+%1$s)</string>
     <string name="inappnotif_payments_rejection_overview_one">Příchozí platba byla nedávno odmítnuta</string>

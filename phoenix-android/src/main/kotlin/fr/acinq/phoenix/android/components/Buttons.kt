@@ -344,6 +344,7 @@ fun Clickable(
     enabled: Boolean = true,
     onLongClick: (() -> Unit)? = null,
     textStyle: TextStyle = MaterialTheme.typography.button,
+    border: BorderStroke? = null,
     backgroundColor: Color = Color.Unspecified, // transparent by default!
     shape: Shape = RectangleShape,
     clickDescription: String = "",
@@ -360,6 +361,7 @@ fun Clickable(
     Surface(
         shape = shape,
         color = backgroundColor,
+        border = border,
         contentColor = contentColor,
         elevation = 0.dp,
         modifier = modifier

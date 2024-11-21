@@ -74,11 +74,20 @@
 
     <!-- home: swap help -->
 
-    <string name="home_swapin_help_pending">Wartet auf 3 Bestätigungen.</string>
-    <string name="home_swapin_help_ready_fee">Einzahlungen werden auf Lightning übertragen, wenn die Mining-Gebühren unter %1$s liegen.</string>
-    <string name="home_swapin_help_ready_disabled">Einlagen bleiben auf der Chain, da die automatische Kanalverwaltung deaktiviert ist.</string>
-    <string name="home_swapin_help_generic">On-Chain Guthaben wurde auf Ihre Wallet eingezahlt.</string>
-    <string name="home_swapin_help_button">Tippen Sie für Details</string>
+    <string name="home_swapin_confirming_title">Bestätigung</string>
+    <string name="home_swapin_confirming_desc">Warten Sie zuerst auf die Bestätigung, bevor sie auf Lightning übertragen werden können.</string>
+
+    <string name="home_swapin_ready_title">Warten auf Tausch</string>
+    <string name="home_swapin_ready_desc_auto">Einzahlungen werden auf Lightning übertragen, wenn die Mining-Gebühren unter %1$s liegen.</string>
+    <string name="home_swapin_ready_desc_disabled">Einlagen bleiben auf der Chain, da die automatische Kanalverwaltung deaktiviert ist.</string>
+    <string name="home_swapin_ready_desc_generic">Wird auf Lightning bereitgestellt, wenn die Bedingungen zutreffen.</string>
+    <string name="home_swapin_ready_expiring">Achtung! Einige Guthaben laufen bald aus und können nicht mehr in Lightning umgetauscht werden.</string>
+
+    <string name="home_swapin_expired_title">Abgelaufen</string>
+    <string name="home_swapin_expired_desc">Kann nach 4 Monaten Wartezeit nicht mehr auf Lightning umgetauscht werden. Diese Gelder müssen manuell ausgegeben werden.</string>
+
+    <string name="home_final_title">Final wallet</string>
+    <string name="home_final_desc">Diese Gelder stammen aus geschlossenen Lightning-Kanäle. Sie müssen manuell ausgegeben werden.</string>
 
     <string name="home_background_restriction_title">Hintergrundverarbeitung eingeschränkt</string>
     <string name="home_background_restriction_body_1">Phoenix kann keine Zahlungen empfangen, wenn es im Hintergrund läuft oder geschlossen ist.</string>
@@ -217,9 +226,6 @@
 
     <string name="inappnotif_mempool_full_message">Der Bitcoin mempool ist voll und die on-chain Gebühren sind hoch.</string>
     <string name="inappnotif_mempool_full_action">Erfahren Sie inwiefern Phoenix davon betroffen ist</string>
-
-    <string name="inappnotif_final_wallet_message">Guthaben im Final Wallet verfügbar.</string>
-    <string name="inappnotif_final_wallet_action">Guthaben anzeigen</string>
 
     <string name="inappnotif_payment_onchain_pending_title">On-chain Guthaben ausstehend (+%1$s)</string>
     <string name="inappnotif_payments_rejection_overview_one">1 kürzlich abgelehnter Zahlungseingang</string>

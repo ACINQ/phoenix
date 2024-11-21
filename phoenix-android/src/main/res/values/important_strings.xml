@@ -81,11 +81,20 @@
 
     <!-- home: swap help -->
 
-    <string name="home_swapin_help_pending">Waiting for 3 confirmations.</string>
-    <string name="home_swapin_help_ready_fee">Deposits will deploy to Lightning when mining fees are below %1$s.</string>
-    <string name="home_swapin_help_ready_disabled">Deposits will remain on-chain because automated channels management is disabled.</string>
-    <string name="home_swapin_help_generic">On-chain funds have been deposited into your wallet.</string>
-    <string name="home_swapin_help_button">Tap for details</string>
+    <string name="home_swapin_confirming_title">Confirming</string>
+    <string name="home_swapin_confirming_desc">Waiting for confirmation first before they can be swapped to Lightning.</string>
+
+    <string name="home_swapin_ready_title">Waiting for swap</string>
+    <string name="home_swapin_ready_desc_auto">Will deploy to Lightning when mining fees are below %1$s.</string>
+    <string name="home_swapin_ready_desc_disabled">Will remain on-chain because automated channels management is disabled.</string>
+    <string name="home_swapin_ready_desc_generic">Will deploy to Lightning when conditions apply.</string>
+    <string name="home_swapin_ready_expiring">Attention! Some funds will expire soon and won\'t be eligible for a swap anymore.</string>
+
+    <string name="home_swapin_expired_title">Expired</string>
+    <string name="home_swapin_expired_desc">Cannot be swapped anymore, after 4 months waiting. These funds must be spent manually.</string>
+
+    <string name="home_final_title">Final wallet</string>
+    <string name="home_final_desc">These funds come from closed Lightning channels. They must be spent manually.</string>
 
     <string name="home_background_restriction_title">Background processing restricted</string>
     <string name="home_background_restriction_body_1">Phoenix will not be able to receive payments when it is in the background, or when it is closed.</string>
@@ -223,9 +232,6 @@
 
     <string name="inappnotif_mempool_full_message">On-chain fees are high.</string>
     <string name="inappnotif_mempool_full_action">See how Phoenix is affected</string>
-
-    <string name="inappnotif_final_wallet_message">Funds available in the final wallet.</string>
-    <string name="inappnotif_final_wallet_action">View funds.</string>
 
     <string name="inappnotif_payment_onchain_pending_title">On-chain funds pending (+%1$s)</string>
     <string name="inappnotif_payments_rejection_overview_one">An incoming payment has been recently rejected</string>

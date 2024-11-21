@@ -77,11 +77,20 @@
 
     <!-- home: swap help -->
 
-    <string name="home_swapin_help_pending">Aguardando 3 confirmações.</string>
-    <string name="home_swapin_help_ready_fee">Os depósitos serão implantados no Lightning quando as taxas de mineração estiverem abaixo de %1$s.</string>
-    <string name="home_swapin_help_ready_disabled">Os depósitos permanecerão na cadeia porque o gerenciamento automatizado de canais está desativado.</string>
-    <string name="home_swapin_help_generic">Os fundos on-chain foram depositados em sua carteira.</string>
-    <string name="home_swapin_help_button">Toque para obter detalhes</string>
+    <string name="home_swapin_confirming_title">Confirmando</string>
+    <string name="home_swapin_confirming_desc">Aguardando confirmação antes de poderem ser trocados para Lightning.</string>
+
+    <string name="home_swapin_ready_title">Aguardando troca</string>
+    <string name="home_swapin_ready_desc_auto">Será implantado no Lightning quando as taxas de mineração estiverem abaixo de %1$s.</string>
+    <string name="home_swapin_ready_desc_disabled">Permanecerá na cadeia porque o gerenciamento automatizado de canais está desabilitado.</string>
+    <string name="home_swapin_ready_desc_generic">Será implantado no Lightning quando as condições se aplicarem.</string>
+    <string name="home_swapin_ready_expiring">Atenção! Alguns fundos expirarão em breve e não serão mais elegíveis para troca para Lightning.</string>
+
+    <string name="home_swapin_expired_title">Expirado</string>
+    <string name="home_swapin_expired_desc">Não pode mais ser trocado para Lightning, após 4 meses de espera. Esses fundos devem ser gastos manualmente.</string>
+
+    <string name="home_final_title">Carteira final</string>
+    <string name="home_final_desc">Esses fundos vêm de canais Lightning fechados. Eles devem ser gastos manualmente.</string>
 
     <string name="home_background_restriction_title">Processamento em segundo plano restrito</string>
     <string name="home_background_restriction_body_1">O Phoenix não poderá receber pagamentos quando estiver em segundo plano ou quando estiver fechado.</string>
@@ -219,9 +228,6 @@
 
     <string name="inappnotif_mempool_full_message">O mempool do Bitcoin está cheio e as taxas na cadeia estão altas.</string>
     <string name="inappnotif_mempool_full_action">Veja como a Phoenix é afetada</string>
-
-    <string name="inappnotif_final_wallet_message">Fundos disponíveis na carteira final.</string>
-    <string name="inappnotif_final_wallet_action">Ver fundos.</string>
 
     <string name="inappnotif_payment_onchain_pending_title">Fundos pendentes na cadeia (+%1$s)</string>
 

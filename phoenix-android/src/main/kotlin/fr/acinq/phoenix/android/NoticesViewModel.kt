@@ -50,7 +50,6 @@ sealed class Notice() {
     data object BackupSeedReminder : ShowInHome(5)
     data object MempoolFull : ShowInHome(10)
     data object UpdateAvailable : ShowInHome(20)
-    data object FundsInFinalWallet : ShowInHome(21)
     data object NotificationPermission : ShowInHome(30)
 
     // less important notices
@@ -81,7 +80,6 @@ class NoticesViewModel(
         viewModelScope.launch { monitorWalletContext() }
         viewModelScope.launch { monitorSwapInCloseToTimeout() }
         viewModelScope.launch { monitorWalletNotice() }
-        viewModelScope.launch { monitorFinalWallet() }
         val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
         isPowerSaverModeOn = powerManager.isPowerSaveMode
         context.registerReceiver(receiver, IntentFilter(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED))
@@ -146,16 +144,6 @@ class NoticesViewModel(
             when {
                 nextTimeoutRemainingBlocks < 144 * 30 -> addNotice(Notice.SwapInCloseToTimeout)
                 else -> removeNotice<Notice.SwapInCloseToTimeout>()
-            }
-        }
-    }
-
-    private suspend fun monitorFinalWallet() {
-        peerManager.finalWallet.filterNotNull().collect {
-            if (it.all.isNotEmpty()) {
-                addNotice(Notice.FundsInFinalWallet)
-            } else {
-                removeNotice<Notice.FundsInFinalWallet>()
             }
         }
     }
