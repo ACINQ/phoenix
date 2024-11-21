@@ -84,11 +84,20 @@
 
     <!-- home: swap help -->
 
-    <string name="home_swapin_help_pending">Đang chờ 3 xác nhận.</string>
-    <string name="home_swapin_help_ready_fee">Các khoản đặt cọc sẽ được chuyển sang Lightning khi phí đào thấp hơn %1$s.</string>
-    <string name="home_swapin_help_ready_disabled">Các khoản đặt cọc sẽ vẫn duy trì ở on-chain do chức năng quản lý kênh tự động đã bị tắt.</string>
-    <string name="home_swapin_help_generic">Tiền vốn on-chain đã được ký gửi vào ví của bạn.</string>
-    <string name="home_swapin_help_button">Nhấn để biết thêm chi tiết</string>
+    <string name="home_swapin_confirming_title">Đang xác nhận</string>
+    <string name="home_swapin_confirming_desc">Đang chờ xác nhận trước khi có thể hoán đổi sang Lightning.</string>
+
+    <string name="home_swapin_ready_title">Đang chờ hoán đổi</string>
+    <string name="home_swapin_ready_desc_auto">Sẽ triển khai sang Lightning khi phí khai thác dưới %1$s.</string>
+    <string name="home_swapin_ready_desc_disabled">Sẽ vẫn ở trên chuỗi vì quản lý kênh tự động đã bị vô hiệu hóa.</string>
+    <string name="home_swapin_ready_desc_generic">Sẽ triển khai sang Lightning khi có điều kiện.</string>
+    <string name="home_swapin_ready_expiring">Lưu ý! Một số quỹ sẽ sớm hết hạn và sẽ không đủ điều kiện để hoán đổi sang Lightning nữa.</string>
+
+    <string name="home_swapin_expired_title">Đã hết hạn</string>
+    <string name="home_swapin_expired_desc">Không thể hoán đổi sang Lightning nữa, sau 4 tháng chờ đợi. Những quỹ này phải được chi tiêu thủ công.</string>
+
+    <string name="home_final_title">Ví cuối cùng</string>
+    <string name="home_final_desc">Những quỹ này đến từ các kênh Lightning đã đóng. Chúng phải được chi tiêu thủ công.</string>
 
     <string name="home_background_restriction_title">Hạn chế xử lý nền</string>
     <string name="home_background_restriction_body_1">Phoenix sẽ không thể nhận thanh toán khi nó ở chế độ nền hoặc khi nó bị đóng.</string>
@@ -227,9 +236,6 @@
 
     <string name="inappnotif_mempool_full_message">Phí on-chain cao.</string>
     <string name="inappnotif_mempool_full_action">Xem những ảnh hưởng tới Phoenix.</string>
-
-    <string name="inappnotif_final_wallet_message">Tiền có sẵn trong ví cuối cùng.</string>
-    <string name="inappnotif_final_wallet_action">Xem tiền</string>
 
     <string name="inappnotif_payment_onchain_pending_title">Các khoản vốn on-chain đang chờ xử lý (+%1$s)</string>.
     <string name="inappnotif_payments_rejection_overview_one">Một khoản tiền đến đã bị từ chối gần đây.</string>

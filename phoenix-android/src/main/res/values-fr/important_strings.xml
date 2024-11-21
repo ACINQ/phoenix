@@ -77,11 +77,20 @@
 
     <!-- home: swap help -->
 
-    <string name="home_swapin_help_pending">En attente de 3 confirmations.</string>
-    <string name="home_swapin_help_ready_fee">Les dépôts se déploieront sur Lightning quand les frais de minage seront sous %1$s.</string>
-    <string name="home_swapin_help_ready_disabled">Les dépôts resteront sur la chaîne car la gestion automatique des canaux est désactivée.</string>
-    <string name="home_swapin_help_generic">Des fonds on-chain on été déposés sur votre wallet.</string>
-    <string name="home_swapin_help_button">Voir les détails</string>
+    <string name="home_swapin_confirming_title">En confirmation</string>
+    <string name="home_swapin_confirming_desc">En attente de confirmation avant de pouvoir les échanger contre Lightning.</string>
+
+    <string name="home_swapin_ready_title">En attente de swap</string>
+    <string name="home_swapin_ready_desc_auto">Se déploieront sur Lightning lorsque les frais de minage seront inférieurs à %1$s.</string>
+    <string name="home_swapin_ready_desc_disabled">Vont rester on-chain car la gestion automatisée des canaux est désactivée.</string>
+    <string name="home_swapin_ready_desc_generic">Se déploieront sur Lightning lorsque les conditions s\'appliqueront.</string>
+    <string name="home_swapin_ready_expiring">Attention ! Certains fonds expireront bientôt et ne seront plus éligibles au swap sur Lightning.</string>
+
+    <string name="home_swapin_expired_title">Expiré</string>
+    <string name="home_swapin_expired_desc">Ne peuvent plus être swappés sur Lightning, après 4 mois d\'attente. Ces fonds doivent être dépensés manuellement.</string>
+
+    <string name="home_final_title">Wallet final</string>
+    <string name="home_final_desc">Ces fonds proviennent de canaux Lightning fermés. Ils doivent être dépensés manuellement.</string>
 
     <string name="home_background_restriction_title">Fonctionnement en arrière plan restreint</string>
     <string name="home_background_restriction_body_1">Phoenix ne pourra pas recevoir de paiements quand l\'application est en arrière plan ou est fermée.</string>
@@ -216,9 +225,6 @@
 
     <string name="inappnotif_mempool_full_message">Le mempool Bitcoin est plein, et les frais sur la chaîne sont élevés.</string>
     <string name="inappnotif_mempool_full_action">Voir en quoi Phoenix est affecté</string>
-
-    <string name="inappnotif_final_wallet_message">Des fonds sont disponibles dans le wallet final.</string>
-    <string name="inappnotif_final_wallet_action">Afficher les fonds</string>
 
     <string name="inappnotif_migration_from_legacy">Félicitations! Votre wallet a été mis à jour.</string>
     <string name="inappnotif_migration_from_legacy_action">Voir les nouveautés</string>

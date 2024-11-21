@@ -74,11 +74,20 @@
 
     <!-- home: swap help -->
 
-    <string name="home_swapin_help_pending">Esperando 3 confirmaciones.</string>
-    <string name="home_swapin_help_ready_fee">Los depósitos se transferirán a Lightning cuando las comisiones de minería sean inferiores a %1$s.</string>
-    <string name="home_swapin_help_ready_disabled">Los depósitos permanecerán en la cadena porque la gestión automatizada de canales está desactivada.</string>
-    <string name="home_swapin_help_generic">Los fondos en la cadena se depositaron en la billetera.</string>
-    <string name="home_swapin_help_button">Ver detalles</string>
+    <string name="home_swapin_confirming_title">Confirmando</string>
+    <string name="home_swapin_confirming_desc">Esperando confirmación primero antes de poder intercambiarlos a Lightning.</string>
+
+    <string name="home_swapin_ready_title">Esperando intercambio</string>
+    <string name="home_swapin_ready_desc_auto">Los depósitos se transferirán a Lightning cuando las comisiones de minería sean inferiores a %1$s.</string>
+    <string name="home_swapin_ready_desc_disabled">Los depósitos permanecerán en la cadena porque la gestión automatizada de canales está desactivada.</string>
+    <string name="home_swapin_ready_desc_generic">Se implementarán en Lightning cuando se cumplan las condiciones.</string>
+    <string name="home_swapin_ready_expiring">¡Atención! Algunos fondos vencerán pronto y ya no serán elegibles para un intercambio.</string>
+
+    <string name="home_swapin_expired_title">Vencido</string>
+    <string name="home_swapin_expired_desc">Ya no se pueden intercambiar, después de 4 meses de espera. Estos fondos deben gastarse manualmente.</string>
+
+    <string name="home_final_title">Billetera final</string>
+    <string name="home_final_desc">Estos fondos provienen de canales Lightning cerrados. Deben gastarse manualmente.</string>
 
     <string name="home_background_restriction_title">Procesamiento en segundo plano restringido</string>.
     <string name="home_background_restriction_body_1">Phoenix no podrá recibir pagos cuando esté en segundo plano, o cuando esté cerrado.</string>
@@ -218,9 +227,6 @@
 
     <string name="inappnotif_mempool_full_message">Las comisiones en la cadena son elevadas.</string>
     <string name="inappnotif_mempool_full_action">Ver cómo afecta a Phoenix</string>
-
-    <string name="inappnotif_final_wallet_message">Fondos disponibles en la billetera final.</string>
-    <string name="inappnotif_final_wallet_action">Ver fondos</string>
 
     <string name="inappnotif_payment_onchain_pending_title">Fondos pendientes en la cadena (+%1$s)</string>
     <string name="inappnotif_payments_rejection_overview_one">Recientemente se rechazó un pago entrante</string>
