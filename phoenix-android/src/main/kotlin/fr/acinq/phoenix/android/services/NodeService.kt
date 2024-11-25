@@ -232,7 +232,6 @@ class NodeService : Service() {
             log.info("starting node from service state=${_state.value?.name} with checkLegacyChannels=$requestCheckLegacyChannels")
             doStartBusiness(decryptedMnemonics, requestCheckLegacyChannels)
             ChannelsWatcher.schedule(applicationContext)
-            DailyConnect.schedule(applicationContext)
             ContactsPhotoCleaner.scheduleASAP(applicationContext)
             _state.postValue(NodeServiceState.Running)
         }

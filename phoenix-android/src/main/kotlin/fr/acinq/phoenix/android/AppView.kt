@@ -406,7 +406,7 @@ fun AppView(
                         AboutView()
                     }
                     composable("${Screen.PaymentSettings.route}?showAuthSchemeDialog={showAuthSchemeDialog}", arguments = listOf(
-                        navArgument("showAuthSchemeDialog") { type = NavType.BoolType }
+                        navArgument("showAuthSchemeDialog") { type = NavType.BoolType ; defaultValue = false }
                     )) {
                         val showAuthSchemeDialog = it.arguments?.getBoolean("showAuthSchemeDialog") ?: false
                         PaymentSettingsView(initialShowLnurlAuthSchemeDialog = showAuthSchemeDialog)

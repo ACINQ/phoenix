@@ -185,7 +185,7 @@ private fun OnChainBalance(
                                 OnChainBalanceEntry(
                                     label = stringResource(id = R.string.home_swapin_ready_title),
                                     icon = if (expiringSoon) R.drawable.ic_alert_triangle else R.drawable.ic_sleep,
-                                    amount = fundsBeingConfirmed,
+                                    amount = fundsConfirmedNotLocked.toMilliSatoshi(),
                                     description = {
                                         Column {
                                             Text(
