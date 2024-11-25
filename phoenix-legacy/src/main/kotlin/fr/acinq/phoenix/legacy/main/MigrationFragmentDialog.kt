@@ -289,7 +289,7 @@ class MigrationDialogViewModel : ViewModel() {
           state.value = MigrationScreenState.Complete(swapInAddress, channelsPublicationStatusMap.keys)
 
           // pause then update preferences to switch to the new app
-          delay(3_000)
+          delay(2_000)
           LegacyPrefsDatastore.savePrefsMigrationExpected(context, true)
           LegacyPrefsDatastore.saveDataMigrationExpected(context, true)
           LegacyPrefsDatastore.saveHasMigratedFromLegacy(context, true)
@@ -304,12 +304,12 @@ class MigrationDialogViewModel : ViewModel() {
     return channels.any {
       when (val data = it.data()) {
         is DATA_CLOSING -> {
-          data.remoteCommitPublished().isDefined
-            || !data.revokedCommitPublished().isEmpty
-            || !data.customRemoteCommitPublished().isEmpty
-            || data.futureRemoteCommitPublished().isDefined
-            || data.localCommitPublished().isDefined
-            || data.nextRemoteCommitPublished().isDefined
+            (data.remoteCommitPublished().nonEmpty() && data.remoteCommitPublished().get().irrevocablySpent().isEmpty) // potentially a remote close but remote commit is not confirmed
+              || data.revokedCommitPublished().nonEmpty()
+              || data.customRemoteCommitPublished().nonEmpty()
+              || data.futureRemoteCommitPublished().nonEmpty()
+              || data.localCommitPublished().nonEmpty()
+              || data.nextRemoteCommitPublished().nonEmpty()
         }
         else -> false
       }
