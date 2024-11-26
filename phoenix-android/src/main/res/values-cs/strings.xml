@@ -91,7 +91,6 @@
     <string name="receive_lightning_share_subject">Lightningová faktura</string>
     <string name="receive_lightning_share_title">Sdílet tuto Lightningovou fakturu s…</string>
     <string name="receive_lnurl_button">Skenovat</string>
-    <string name="receive_toggle_offer_new_overlay">NOVINKA!</string>
 
     <string name="receive_offer_share_title">Statická Lightning faktura</string>
     <string name="receive_offer_share_subject">Sdílet tuto statickou Lightning fakturu s…</string>
