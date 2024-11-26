@@ -143,13 +143,13 @@ fun SendView(
                 SendToOfferView(offer = data.offer, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() })
             }
             is SendManager.ParseResult.Uri -> {
-                SendSpliceOutView(requestedAmount = data.uri.amount, address = data.uri.address, onBackClick = onBackClick, onSpliceOutSuccess = {navController.popToHome() })
+                SendSpliceOutView(requestedAmount = data.uri.amount, address = data.uri.address, onBackClick = onBackClick, onSpliceOutSuccess = { navController.popToHome() })
             }
             is SendManager.ParseResult.Lnurl.Pay -> {
                 LnurlPayView(payIntent = data.paymentIntent, onBackClick, onPaymentSent = { navController.popToHome() })
             }
             is SendManager.ParseResult.Lnurl.Withdraw -> {
-                LnurlWithdrawView(withdraw = data.lnurlWithdraw, onBackClick = onBackClick, onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) }, onWithdrawDone = { navController.popToHome()})
+                LnurlWithdrawView(withdraw = data.lnurlWithdraw, onBackClick = onBackClick, onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) }, onWithdrawDone = { navController.popToHome() })
             }
             is SendManager.ParseResult.Lnurl.Auth -> {
                 LnurlAuthView(auth = data.auth, onBackClick = { navController.popBackStack() }, onChangeAuthSchemeSettingClick = { navController.navigate("${Screen.PaymentSettings.route}?showAuthSchemeDialog=true") },
