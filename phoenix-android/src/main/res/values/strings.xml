@@ -126,7 +126,6 @@
     <string name="receive_lightning_share_subject">Lightning invoice</string>
     <string name="receive_lightning_share_title">Share this Lightning invoice with…</string>
     <string name="receive_lnurl_button">Scan</string>
-    <string name="receive_toggle_offer_new_overlay">NEW!</string>
 
     <string name="receive_offer_share_title">Bolt12 payment code</string>
     <string name="receive_offer_share_subject">Share this Bolt12 payment code with…</string>
