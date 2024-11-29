@@ -45,42 +45,23 @@
         android:visibility="@{model.state instanceof MigrationScreenState.Ready}"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-          android:id="@+id/ready_title"
-          style="@style/dialog_title"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:text="@string/legacy_migration_title"
-          app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-          android:id="@+id/ready_message"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:layout_marginTop="@dimen/space_sm"
-          android:text="@string/legacy_migration_ready_message"
-          app:layout_constraintTop_toBottomOf="@id/ready_title" />
-
         <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/upgrade_button"
-          android:layout_width="wrap_content"
+          android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_marginTop="@dimen/space_lg"
           android:background="@drawable/button_bg_primary_border"
           app:icon="@drawable/ic_arrow_right_circle"
           app:is_paused="@{!model.isConnected}"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/ready_message"
+          app:layout_constraintTop_toTopOf="parent"
           app:paused_text="@string/legacy_migration_prepare_button_disconnected"
           app:text="@string/legacy_migration_prepare_button" />
 
         <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/dismiss_button"
-          android:layout_width="wrap_content"
+          android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:layout_marginTop="@dimen/space_md"
           android:background="@drawable/button_bg_no_border"
-          app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintTop_toBottomOf="@id/upgrade_button"
           app:text="@string/legacy_migration_dismiss_button" />
       </androidx.constraintlayout.widget.ConstraintLayout>

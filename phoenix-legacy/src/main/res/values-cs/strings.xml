@@ -421,8 +421,11 @@
 
   <!-- //////////////// Migration to KMP //////////////// -->
 
-  <string name="legacy_migration_title">Phoenix upgrade</string>
-  <string name="legacy_migration_ready_message">Tato peněženka používá zastaralý formát kanálů. Většina funkcí je vypnuta.\n\nPřejděte na Phoenix v2 a získejte swapy bez důvěry, splicing, statické adresy a mnoho dalšího.\n\nOd října 2024 budou kanály, které nebyly migrovány, uzavřeny.</string>
+  <string name="legacy_migration_body1">Starší peněženky jsou zastaralé. Kanály byly uzavřeny a finanční prostředky byly přesunuty zpět do řetězce.</string>
+  <string name="legacy_migration_body2">Pokud máte problémy nebo očekáváte více prostředků v konečné peněžence, kontaktujte podporu na adrese phoenix@acinq.co a poskytněte informace o ladění</string>
+  <string name="legacy_migration_available">Prostředky dostupné v konečné peněžence:</string>
+  <string name="legacy_migration_button">Upgradujte na Phoenix V2</string>
+  <string name="legacy_migration_copy_debug_button">Kopírování ladicích dat</string>
   <string name="legacy_migration_prepare_button">Upgrade</string>
   <string name="legacy_migration_prepare_button_disconnected">Připojení…</string>
   <string name="legacy_migration_dismiss_button">Teď ne</string>
