@@ -36,6 +36,7 @@ import fr.acinq.bitcoin.scala.Satoshi
 import fr.acinq.eclair.`JsonSerializers$`
 import fr.acinq.phoenix.legacy.AppViewModel
 import fr.acinq.phoenix.legacy.BaseFragment
+import fr.acinq.phoenix.legacy.BuildConfig
 import fr.acinq.phoenix.legacy.R
 import fr.acinq.phoenix.legacy.databinding.FragmentMainSunsetBinding
 import fr.acinq.phoenix.legacy.utils.Constants
@@ -88,13 +89,18 @@ class MainFragment : BaseFragment() {
         log.error("error when retrieving list of channels: ", exception)
         Toast.makeText(context, "Could not copy channel data", Toast.LENGTH_SHORT).show()
       }) {
-        val finalAddress = app.requireService.state.value?.kit()?.wallet()?.receiveAddress?.value()?.get()?.get()
+        val kit = app.requireService.state.value?.kit()
+        val finalAddress = kit?.wallet()?.receiveAddress?.value()?.get()?.get()
+        val blockCount = kit?.nodeParams()?.currentBlockHeight()
         val channels = app.requireService.getChannels(null).toMutableList()
-        val nodeId = app.state.value?.getNodeId()?.toString() ?: getString(R.string.legacy_utils_unknown)
+        val nodeId = kit?.nodeParams()?.nodeId()?.toString() ?: getString(R.string.legacy_utils_unknown)
         val data = channels.joinToString("\n\n", "", "", -1) { `default$`.`MODULE$`.write(it, 1, `JsonSerializers$`.`MODULE$`.cmdResGetinfoReadWriter()) }
         val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         clipboard.setPrimaryClip(ClipData.newPlainText("Legacy channels data", """
+          commit=${BuildConfig.LIB_COMMIT}
           legacy_node_id=$nodeId
+          block_count=$blockCount
+          final_balance=${model.finalWalletBalance.value}
           final_address=$finalAddress
           channels_data=${data.takeIf { it.isNotBlank() } ?: "none"}
         """.trimIndent()))
