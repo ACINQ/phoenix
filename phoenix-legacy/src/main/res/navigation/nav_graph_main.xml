@@ -121,6 +121,9 @@
       android:id="@+id/action_main_to_migration"
       app:destination="@id/migration_fragment" />
     <action
+      android:id="@+id/action_main_to_channel_import"
+      app:destination="@id/channels_import" />
+    <action
       android:id="@+id/action_main_payments_history"
       app:destination="@id/payments_history_fragment" />
   </fragment>

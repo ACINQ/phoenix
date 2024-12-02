@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.android.settings
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -26,8 +27,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -60,7 +63,7 @@ fun SettingsView(
     val nc = navController
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    var debugClickCount by remember { mutableStateOf(0) }
+    var debugClickCount by remember { mutableIntStateOf(0) }
     val notices = noticesViewModel.notices
     val notifications = business.notificationsManager.notifications.collectAsState()
 
@@ -76,6 +79,23 @@ fun SettingsView(
                         onClick = { debugClickCount += 1 }
                     )
             )
+        }
+
+        if (debugClickCount > 10) {
+            LaunchedEffect(key1 = Unit) {
+                Toast.makeText(context, "Debug mode enabled", Toast.LENGTH_SHORT).show()
+            }
+            // -- debug
+            CardHeader(text = "DEBUG")
+            Card {
+                MenuButton(
+                    text = "Switch to legacy app (DEBUG)",
+                    icon = R.drawable.ic_settings,
+                    onClick = {
+                        scope.launch { LegacyPrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.Expected) }
+                    },
+                )
+            }
         }
 
         // -- general
@@ -123,23 +143,6 @@ fun SettingsView(
                 iconTint = negativeColor,
                 onClick = { nc.navigate(Screen.ForceClose.route) },
             )
-        }
-
-        if (debugClickCount > 10) {
-            // -- debug
-            CardHeader(text = "DEBUG")
-            Card {
-                Button(
-                    text = "Switch to legacy app (DEBUG)",
-                    icon = R.drawable.ic_user,
-                    onClick = {
-                        scope.launch {
-                            LegacyPrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.Expected)
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start
-                )
-            }
         }
 
         Spacer(Modifier.height(32.dp))
