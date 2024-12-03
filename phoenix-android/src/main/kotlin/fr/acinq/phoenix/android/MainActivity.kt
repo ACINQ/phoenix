@@ -83,10 +83,11 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val doDataMigration = LegacyPrefsDatastore.getDataMigrationExpected(applicationContext).filterNotNull().first()
             if (doDataMigration) {
-                delay(7_000)
+                delay(3_000)
                 LegacyMigrationHelper.migrateLegacyPayments(applicationContext)
-                delay(5_000)
+                delay(1_000)
                 LegacyPrefsDatastore.saveDataMigrationExpected(applicationContext, false)
+                tryReconnect()
             }
         }
 
