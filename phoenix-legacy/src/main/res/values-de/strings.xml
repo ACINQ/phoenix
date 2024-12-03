@@ -814,8 +814,11 @@
 
   <!-- //////////////// Migration to KMP //////////////// -->
 
-  <string name="legacy_migration_title">Phoenix Upgrade</string>
-  <string name="legacy_migration_ready_message">Diese Wallet verwendet ein veraltetes Channel-Format. Die meisten Funktionen sind deaktiviert.\n\nWerden Sie auf Phoenix v2 upgraden und erhalten Sie vertrauenslose Swaps, Splicing, statische Adressen und vieles mehr.\n\nAb Oktober 2024 werden die Kanäle, die nicht migriert wurden, geschlossen.</string>
+  <string name="legacy_migration_body1">Legacy-Wallets werden nicht mehr unterstützt. Kanäle wurden geschlossen und Gelder zurück On-Chain verschoben.</string>
+  <string name="legacy_migration_body2">Wenn Sie Probleme haben oder mehr Gelder in der endgültigen Wallet erwarten, wenden Sie sich an den Support unter phoenix@acinq.co und stellen Sie die Debug-Daten bereit.</string>
+  <string name="legacy_migration_available">In der Final Wallet verfügbare Gelder:</string>
+  <string name="legacy_migration_button">Upgrade auf Phoenix V2</string>
+  <string name="legacy_migration_copy_debug_button">Debug-Daten kopieren</string>
   <string name="legacy_migration_prepare_button">Upgrade</string>
   <string name="legacy_migration_prepare_button_disconnected">Verbindung herstellen…</string>
   <string name="legacy_migration_dismiss_button">Nicht jetzt</string>

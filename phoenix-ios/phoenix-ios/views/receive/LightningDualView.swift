@@ -873,7 +873,7 @@ struct LightningDualView: View {
 		var sources: [SourceInfo] = []
 		switch activeType {
 		case .bolt11_invoice:
-			if let invoiceText = qrCode.value?.original {
+			if let invoiceText: String = qrCode.value?.original {
 				sources.append(SourceInfo(
 					type: .text,
 					isDefault: true,
@@ -882,7 +882,7 @@ struct LightningDualView: View {
 					callback: exportText(invoiceText)
 				))
 			}
-			if let invoiceImage = qrCode.cgImage {
+			if let invoiceImage: CGImage = qrCode.cgImage {
 				sources.append(SourceInfo(
 					type: .image,
 					isDefault: false,
@@ -893,7 +893,7 @@ struct LightningDualView: View {
 			}
 			
 		case .bolt12_offer:
-			if let address = bip353Address {
+			if let address: String = bip353Address {
 				let bAddress = "₿\(address)" // this will probably confuse users, but it's in the spec
 				sources.append(SourceInfo(
 					type: .text,
@@ -903,7 +903,7 @@ struct LightningDualView: View {
 					callback: exportText(bAddress)
 				))
 			}
-			if let offerText = qrCode.value?.original {
+			if let offerText: String = qrCode.value?.original {
 				sources.append(SourceInfo(
 					type: .text,
 					isDefault: false,
@@ -912,7 +912,7 @@ struct LightningDualView: View {
 					callback: exportText(offerText)
 				))
 			}
-			if let offerText = qrCode.value {
+			if let offerText: String = qrCode.value?.original {
 				let uri = "bitcoin:?lno=\(offerText)"
 				sources.append(SourceInfo(
 					type: .text,
@@ -922,7 +922,7 @@ struct LightningDualView: View {
 					callback: exportText(uri)
 				))
 			}
-			if let offerImage = qrCode.cgImage {
+			if let offerImage: CGImage = qrCode.cgImage {
 				sources.append(SourceInfo(
 					type: .image,
 					isDefault: false,

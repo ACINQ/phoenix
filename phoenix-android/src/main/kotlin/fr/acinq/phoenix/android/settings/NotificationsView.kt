@@ -346,8 +346,10 @@ private fun ImportantNotification(
                 safeLet(actionText, onActionClick) { text, onClick ->
                     Button(
                         text = text, textStyle = MaterialTheme.typography.body2.copy(fontSize = 16.sp),
+                        icon = R.drawable.ic_chevron_right,
                         modifier = Modifier.offset(x = (-16).dp),
                         padding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+                        space = 4.dp,
                         onClick = onClick,
                     )
                 } ?: Spacer(modifier = Modifier.height(12.dp))

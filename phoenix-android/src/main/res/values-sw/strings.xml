@@ -123,7 +123,6 @@
     <string name="receive_lightning_share_subject">Hati ya Lightning</string>
     <string name="receive_lightning_share_title">Shiriki hati ya Lightning na…</string>
     <string name="receive_lnurl_button">Piga picha</string>
-    <string name="receive_toggle_offer_new_overlay">MPYA!</string>
 
     <string name="receive_offer_share_title">Mkodishaji wa Bolt12</string>
     <string name="receive_offer_share_subject">Shiriki msimbo huu wa Bolt12 na…</string>

@@ -751,8 +751,11 @@
 
   <!-- //////////////// Migration to KMP //////////////// -->
 
-  <string name="legacy_migration_title">Atualização do Phoenix</string>
-  <string name="legacy_migration_ready_message">Esta carteira está usando um formato de canais obsoleto. A maioria dos recursos está desativada.\n\nAtualize para a Phoenix v2 e obtenha swaps sem confiança, splicing, endereços estáticos e muito mais.\n\nA partir de outubro de 2024, os canais que não tiverem sido migrados serão fechados.</string>
+  <string name="legacy_migration_body1">As carteiras legadas estão obsoletas. Os canais foram fechados e os fundos foram movidos de volta para a cadeia.</string>
+  <string name="legacy_migration_body2">Se você tiver problemas ou esperar mais fundos na carteira final, entre em contato com o suporte em phoenix@acinq.co e forneça os dados de depuração.</string>
+  <string name="legacy_migration_available">Fundos disponíveis na carteira final:</string>
+  <string name="legacy_migration_button">Atualizar para Phoenix V2</string>
+  <string name="legacy_migration_copy_debug_button">Copiar dados de depuração</string>
   <string name="legacy_migration_prepare_button">Upgrade</string>
   <string name="legacy_migration_prepare_button_disconnected">Conectando…</string>
   <string name="legacy_migration_dismiss_button">Não agora</string>

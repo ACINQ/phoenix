@@ -83,10 +83,11 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val doDataMigration = LegacyPrefsDatastore.getDataMigrationExpected(applicationContext).filterNotNull().first()
             if (doDataMigration) {
-                delay(7_000)
+                delay(3_000)
                 LegacyMigrationHelper.migrateLegacyPayments(applicationContext)
-                delay(5_000)
+                delay(1_000)
                 LegacyPrefsDatastore.saveDataMigrationExpected(applicationContext, false)
+                tryReconnect()
             }
         }
 
@@ -96,8 +97,11 @@ class MainActivity : AppCompatActivity() {
             application.business.filterNotNull().map { it.peerManager.getPeer().eventsFlow }.flattenMerge().collect {
                 if (it is PhoenixAndroidLegacyInfoEvent) {
                     if (it.info.hasChannels) {
-                        log.info("legacy channels have been found")
-                        LegacyPrefsDatastore.saveStartLegacyApp(applicationContext, LegacyAppStatus.Required.Expected)
+                        val legacyState = LegacyPrefsDatastore.getLegacyAppStatus(applicationContext).filterNotNull().first()
+                        log.info("legacy channels have been found, in legacy_state=$legacyState")
+                        if (legacyState is LegacyAppStatus.Required || legacyState is LegacyAppStatus.Unknown) {
+                            LegacyPrefsDatastore.saveStartLegacyApp(applicationContext, LegacyAppStatus.Required.Expected)
+                        }
                     } else {
                         log.info("no legacy channels were found")
                         LegacyPrefsDatastore.savePrefsMigrationExpected(applicationContext, false)

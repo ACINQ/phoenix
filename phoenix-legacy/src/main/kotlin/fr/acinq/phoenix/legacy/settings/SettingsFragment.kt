@@ -52,26 +52,18 @@ class SettingsFragment : BaseFragment(stayIfNotStarted = true) {
     mBinding.displaySeedButton.visibility = if (isStarted) View.VISIBLE else View.GONE
     mBinding.accessControlButton.visibility = if (isStarted) View.VISIBLE else View.GONE
     mBinding.listAllChannelsButton.visibility = if (isStarted) View.VISIBLE else View.GONE
-    mBinding.mutualCloseButton.visibility = if (isStarted) View.VISIBLE else View.GONE
-    mBinding.forceCloseButton.visibility = if (isStarted) View.VISIBLE else View.GONE
-    mBinding.paymentSettingsButton.visibility = if (isStarted) View.VISIBLE else View.GONE
   }
 
   override fun onStart() {
     super.onStart()
     mBinding.actionBar.setOnBackAction { findNavController().popBackStack() }
-    mBinding.prefsDisplayButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_prefs_display) }
     mBinding.electrumButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_electrum) }
-    mBinding.mutualCloseButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_mutual_close) }
-    mBinding.forceCloseButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_force_close) }
     mBinding.displaySeedButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_display_seed) }
     mBinding.accessControlButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_access_control) }
     mBinding.listAllChannelsButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_list_channels) }
     mBinding.logsButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_logs) }
-//    mBinding.feesButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_fees) }
     mBinding.torButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_tor) }
     mBinding.aboutButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_about) }
-    mBinding.paymentSettingsButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_payment_settings) }
   }
 
 }

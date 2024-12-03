@@ -465,8 +465,11 @@
 
   <!-- //////////////// Migration to KMP //////////////// -->
 
-  <string name="legacy_migration_title">Actualización de Phoenix</string>
-  <string name="legacy_migration_ready_message">Este monedero utiliza un formato de canales obsoleto. La mayoría de las características están deshabilitadas.\n\nActualízate a Phoenix v2 y obtén swaps sin confianza, splicing, direcciones estáticas y mucho más.\n\nA partir de octubre de 2024, los canales que no hayan sido migrados serán cerrados.</string>
+  <string name="legacy_migration_body1">Las billeteras antiguas están obsoletas. Los canales se cerraron y los fondos se volvieron a transferir a la cadena.</string>
+  <string name="legacy_migration_body2">Si tiene problemas o espera más fondos en la billetera final, comuníquese con el servicio de asistencia a phoenix@acinq.co y proporcione los datos de debug.</string>
+  <string name="legacy_migration_available">Fondos disponibles en la billetera final:</string>
+  <string name="legacy_migration_button">Actualizar a Phoenix V2</string>
+  <string name="legacy_migration_copy_debug_button">Copiar datos de debug</string>
   <string name="legacy_migration_prepare_button">Actualizar</string>
   <string name="legacy_migration_prepare_button_disconnected">Connecting…</string>
   <string name="legacy_migration_dismiss_button">Ahora no</string>

@@ -62,18 +62,6 @@
           app:text="@string/legacy_settings_about" />
 
         <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
-          android:id="@+id/prefs_display_button"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:background="@drawable/button_bg_square"
-          android:padding="@dimen/space_md"
-          app:hz_bias="0"
-          app:icon="@drawable/ic_brush"
-          app:layout_constraintTop_toBottomOf="@id/about_button"
-          app:spacer_size="@dimen/space_md"
-          app:text="@string/legacy_settings_display_prefs" />
-
-        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/electrum_button"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
@@ -81,7 +69,7 @@
           android:padding="@dimen/space_md"
           app:hz_bias="0"
           app:icon="@drawable/ic_chain"
-          app:layout_constraintTop_toBottomOf="@id/prefs_display_button"
+          app:layout_constraintTop_toBottomOf="@id/about_button"
           app:spacer_size="@dimen/space_md"
           app:text="@string/legacy_settings_electrum" />
 
@@ -97,24 +85,12 @@
           app:spacer_size="@dimen/space_md"
           app:text="@string/legacy_settings_tor" />
 
-        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
-          android:id="@+id/payment_settings_button"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:background="@drawable/button_bg_square"
-          android:padding="@dimen/space_md"
-          app:hz_bias="0"
-          app:icon="@drawable/ic_tool"
-          app:layout_constraintTop_toBottomOf="@id/tor_button"
-          app:spacer_size="@dimen/space_md"
-          app:text="@string/legacy_settings_payment_settings" />
-
         <TextView
           android:id="@+id/security_title"
           style="@style/SettingsCategory"
           android:text="@string/legacy_settings_security_title"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/payment_settings_button" />
+          app:layout_constraintTop_toBottomOf="@id/tor_button" />
 
         <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/access_control_button"
@@ -170,32 +146,6 @@
           app:layout_constraintTop_toBottomOf="@id/list_all_channels_button"
           app:spacer_size="@dimen/space_md"
           app:text="@string/legacy_settings_logs" />
-
-        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
-          android:id="@+id/mutual_close_button"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:background="@drawable/button_bg_square"
-          android:padding="@dimen/space_md"
-          app:hz_bias="0"
-          app:icon="@drawable/ic_cross_circle"
-          app:layout_constraintTop_toBottomOf="@id/logs_button"
-          app:spacer_size="@dimen/space_md"
-          app:text="@string/legacy_settings_mutual_close" />
-
-        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
-          android:id="@+id/force_close_button"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:background="@drawable/button_bg_square"
-          android:padding="@dimen/space_md"
-          app:hz_bias="0"
-          app:icon="@drawable/ic_alert_triangle"
-          app:icon_tint="?attr/negativeColor"
-          app:layout_constraintTop_toBottomOf="@id/mutual_close_button"
-          app:spacer_size="@dimen/space_md"
-          app:text="@string/legacy_settings_force_close"
-          app:text_color="?attr/negativeColor" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

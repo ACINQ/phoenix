@@ -785,11 +785,14 @@ legacy_
 
   <!-- //////////////// Migration to KMP //////////////// -->
 
-  <string name="legacy_migration_title">Upgrade to Phoenix v2</string>
-  <string name="legacy_migration_ready_message">This wallet is using an obsolete channels format. Most features are disabled.\n\nUpgrade to Phoenix v2 and get trustless swaps, splicing, static addresses, and much more.\n\nStarting in October 2024, channels that have not been migrated will be closed.</string>
+  <string name="legacy_migration_body1">Legacy wallets have reached end of life. Channels have been closed, and funds moved back on-chain.</string>
+  <string name="legacy_migration_body2">If you have issues or expect more funds in the final wallet, contact support at phoenix@acinq.co and provide the debug data.</string>
+  <string name="legacy_migration_available">Funds available in final wallet:</string>
+  <string name="legacy_migration_button">Upgrade to Phoenix V2</string>
+  <string name="legacy_migration_copy_debug_button">Copy debug data</string>
   <string name="legacy_migration_prepare_button">Upgrade now</string>
   <string name="legacy_migration_prepare_button_disconnected">Connecting…</string>
-  <string name="legacy_migration_dismiss_button">Not now</string>
+  <string name="legacy_migration_dismiss_button">Later</string>
 
   <string name="legacy_migration_paused_swap_in">You cannot upgrade now: an on-chain deposit is pending.\n\nTry again later when this deposit has confirmed.</string>
   <string name="legacy_migration_paused_opening">You cannot upgrade now: some channels are currently being opened.\n\nTry again later when these channels have been opened and are active.</string>

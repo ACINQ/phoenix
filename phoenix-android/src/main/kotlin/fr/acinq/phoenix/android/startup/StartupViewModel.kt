@@ -75,7 +75,6 @@ class StartupViewModel : ViewModel() {
                 is KeyStoreException, is GeneralSecurityException -> StartupDecryptionState.DecryptionError.KeystoreFailure(e)
                 else -> StartupDecryptionState.DecryptionError.Other(e)
             }
-
         }) {
             when (encryptedSeed) {
                 is EncryptedSeed.V2.NoAuth -> {

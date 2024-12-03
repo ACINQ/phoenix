@@ -193,23 +193,11 @@ fun LightningInvoiceView(
         TorWarning()
         HSeparator(width = 50.dp)
         Spacer(modifier = Modifier.height(24.dp))
-        Box {
-            FilledButton(
-                text = stringResource(id = R.string.receive_toggle_offer_button),
-                icon = R.drawable.ic_qrcode,
-                onClick = { showOfferDialog = true },
-            )
-            Text(
-                text = stringResource(id = R.string.receive_toggle_offer_new_overlay),
-                modifier = Modifier
-                    .rotate(-38f)
-                    .offset((-9).dp, (-4).dp)
-                    .background(red500)
-                    .padding(horizontal = 4.dp, vertical = 2.dp),
-                color = MaterialTheme.colors.onPrimary,
-                fontSize = 12.sp
-            )
-        }
+        FilledButton(
+            text = stringResource(id = R.string.receive_toggle_offer_button),
+            icon = R.drawable.ic_qrcode,
+            onClick = { showOfferDialog = true },
+        )
     }
 }
 

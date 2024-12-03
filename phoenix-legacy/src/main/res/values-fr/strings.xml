@@ -691,8 +691,11 @@
 
   <!-- //////////////// Migration to KMP //////////////// -->
 
-  <string name="legacy_migration_title">Mise à niveau de Phoenix</string>
-  <string name="legacy_migration_ready_message">Ce wallet utilise un format de canaux obsolète. La majorité des fonctionnalités sont inactives.\n\nPassez à Phoenix v2 et profitez de swaps sans tiers de confiance, de splicing, des adresses statiques, et bien plus encore.\n\nÀ partir d\'octobre 2024, les canaux qui n\'ont pas été migrés seront fermés.</string>
+  <string name="legacy_migration_body1">Les portefeuilles legacy sont dépréciés. Les canaux ont été fermés et les fonds ont été retournés sur la chaîne.</string>
+  <string name="legacy_migration_body2">Si vous rencontrez des problèmes ou si vous vous attendez à avoir davantage de fonds dans le portefeuille final, contactez le support à l\'adresse phoenix@acinq.co en fournissez les données de débogage.</string>
+  <string name="legacy_migration_available">Fonds disponibles dans le portefeuille final :</string>
+  <string name="legacy_migration_button">Passer à Phoenix V2</string>
+  <string name="legacy_migration_copy_debug_button">Copier les données de débogage</string>
   <string name="legacy_migration_prepare_button">Mettre à jour</string>
   <string name="legacy_migration_prepare_button_disconnected">Connexion…</string>
   <string name="legacy_migration_dismiss_button">Plus tard</string>

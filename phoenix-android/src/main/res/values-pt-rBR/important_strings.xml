@@ -111,7 +111,10 @@
     <string name="initwallet_create">Criar nova carteira</string>
     <string name="initwallet_restore">Restaurar minha carteira</string>
 
-    <string name="restore_disclaimer_message">O Phoenix só pode restaurar fundos fora da cadeia que foram gerenciados por este aplicativo.\n\nA importação de uma semente que NÃO foi criada pelo Phoenix não restaurará nenhum fundo.\n\nVerifique também se você já não está executando outra carteira Phoenix com a mesma semente.</string>
+    <string name="restore_disclaimer_message_1_title">O Phoenix está apenas no Lightning</string>
+    <string name="restore_disclaimer_message_1_body">O Phoenix exibirá apenas fundos que já tenham sido gerenciados pelo Phoenix. Os fundos vinculados a uma semente gerada por outro aplicativo não aparecerão aqui (isso inclui fundos na cadeia).</string>
+    <string name="restore_disclaimer_message_2_title">Uso da mesma semente em paralelo</string>
+    <string name="restore_disclaimer_message_2_body">Não use a mesma semente simultaneamente em dispositivos diferentes. Isso pode causar conflitos entre as duas instâncias do Phoenix e resultar no fechamento de canais Lightning.</string>
     <string name="utils_ack">Eu entendo.</string>
 
     <string name="restore_instructions">A semente de sua carteira é uma lista de 12 palavras em inglês. Digite cada palavra dessa lista na caixa abaixo.</string>

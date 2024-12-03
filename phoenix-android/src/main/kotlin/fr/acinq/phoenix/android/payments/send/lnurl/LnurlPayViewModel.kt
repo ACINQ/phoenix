@@ -60,7 +60,9 @@ class LnurlPayViewModel(private val sendManager: SendManager) : ViewModel() {
                     val invoice = result.value
                     state.value = LnurlPayViewState.PayingInvoice(invoice)
                     sendManager.lnurlPay_payInvoice(payIntent, amount, comment, invoice, fees)
-                    onPaymentSent()
+                    viewModelScope.launch(Dispatchers.Main) {
+                        onPaymentSent()
+                    }
                 }
             }
         }
