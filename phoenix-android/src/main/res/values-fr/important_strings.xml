@@ -111,7 +111,10 @@
     <string name="initwallet_create">Créer un nouveau wallet</string>
     <string name="initwallet_restore">Restaurer mon wallet</string>
 
-    <string name="restore_disclaimer_message">Phoenix ne restaure que les fonds off-chain qu\'il avait déjà gérés.\n\nImporter une seed qui n\'a pas été créée par Phoenix ne restaurera aucun fonds.\n\nVeuillez également vous assurer que cette seed n\'est pas déjà utilisée sur un autre wallet Phoenix.</string>
+    <string name="restore_disclaimer_message_1_title">Phoenix est uniquement sur Lightning</string>
+    <string name="restore_disclaimer_message_1_body">Phoenix ne pourra afficher que les fonds qui ont déjà gérés par Phoenix. Les fonds attachés à une clé générée par une autre application n\'apparaîtront pas ici (ceci inclut les fonds on-chain).</string>
+    <string name="restore_disclaimer_message_2_title">Utilisation de la même clé en parallèle</string>
+    <string name="restore_disclaimer_message_2_body">N\'utilisez pas la même clé simultanément sur différents appareils. Ceci peut causer des conflits entre les deux instances de Phoenix, et entraîner la fermeture des canaux Lightning.</string>
     <string name="utils_ack">Je comprends.</string>
 
     <string name="restore_instructions">La clé (ou seed) de votre wallet est une liste de 12 mots en anglais. Entrez chaque mot de cette liste dans la zone de saisie ci-dessous.</string>

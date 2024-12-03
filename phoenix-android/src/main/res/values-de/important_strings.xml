@@ -108,7 +108,10 @@
     <string name="initwallet_create">Neue Wallet erstellen</string>
     <string name="initwallet_restore">Meine Wallet wiederherstellen</string>
 
-    <string name="restore_disclaimer_message">Phoenix kann nur off-chain-Guthaben wiederherstellen, das von dieser App verwaltet wurde.\n\nEin Seed, der nicht von Phoenix generiert wurde, kann nicht importiert werden.\n\nStellen Sie außerdem sicher, dass Sie nicht bereits eine andere Phoenix-Wallet mit demselben Seed betreiben.</string>
+    <string name="restore_disclaimer_message_1_title">Phoenix ist nur auf Lightning</string>
+    <string name="restore_disclaimer_message_1_body">Phoenix wird nur Guthaben anzeigen, die bereits von Phoenix verwaltet wurden. Guthaben, die mit einem Seed verbunden sind, das von einer anderen Anwendung erzeugt wurde, werden nicht angezeigt (das gilt auch für On-Chain-Guthaben).</string>
+    <string name="restore_disclaimer_message_2_title">Parallele Verwendung desselben Seed</string>
+    <string name="restore_disclaimer_message_2_body">Verwenden Sie nicht denselben Seed gleichzeitig auf verschiedenen Geräten. Dies kann zu Konflikten zwischen den beiden Phoenix-Instanzen führen und dazu, dass die Lightning-Kanäle geschlossen werden.</string>
     <string name="utils_ack">Ich verstehe.</string>
 
     <string name="restore_instructions">Der Seed für deine Wallet ist eine Liste mit 12 englischen Wörtern. Schreiben Sie jedes Wort dieser Liste in die folgende Box.</string>

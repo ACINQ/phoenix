@@ -118,7 +118,10 @@
     <string name="initwallet_create">Tạo ví mới</string>
     <string name="initwallet_restore">Khôi phục ví của tôi</string>
 
-    <string name="restore_disclaimer_message">Phoenix chỉ có thể khôi phục các khoản vốn off-chain được quản lý bởi ứng dụng này. \n\nNhập hạt giống KHÔNG tạo ra bởi Phoenix sẽ không khôi phục được bất cứ khoản tiền nào. \n\nNgoài ra, xin vui lòng đảm bảo rằng bạn chưa dùng ví Phoenix nào khác có chung hạt giống này.</string>
+    <string name="restore_disclaimer_message_1_title">Phoenix chỉ có trên Lightning</string>
+    <string name="restore_disclaimer_message_1_body">Phoenix sẽ chỉ có thể hiển thị số tiền đã được Phoenix quản lý. Các khoản tiền gắn liền với hạt giống do ứng dụng khác tạo ra sẽ không xuất hiện ở đây (bao gồm cả các quỹ trên chuỗi).</string>
+    <string name="restore_disclaimer_message_2_title">Sử dụng song song cùng một hạt giống</string>
+    <string name="restore_disclaimer_message_2_body">Không sử dụng cùng một hạt giống trên các thiết bị khác nhau. Điều này có thể gây ra xung đột giữa hai phiên bản Phoenix và dẫn đến việc đóng các kênh Lightning.</string>
     <string name="utils_ack">Tôi đã hiểu.</string>
 
     <string name="restore_instructions">Hạt giống ví của bạn là một danh sách gồm 12 từ tiếng Anh. Nhập các từ này vào ô dưới đây.</string>

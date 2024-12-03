@@ -115,7 +115,10 @@
     <string name="initwallet_create">Unda pochi mpya</string>
     <string name="initwallet_restore">Rejesha pochi yangu</string>
 
-    <string name="restore_disclaimer_message">Phoenix inaweza tu kurejesha fedha za nje ya mtandao zilizokuwa zikisimamiwa na programu hii.\n\nKuleta mbegu ambayo haikuundwa na Phoenix haitarejesha fedha yoyote.\n\nPia hakikisha hauendeshi pochi nyingine ya Phoenix na mbegu hiyo hiyo.</string>
+    <string name="restore_disclaimer_message_1_title">Phoenix iko kwenye Umeme tu</string>
+    <string name="restore_disclaimer_message_1_body">Phoenix itaweza tu kuonyesha fedha ambazo tayari zimesimamiwa na Phoenix. Pesa zinazoambatanishwa na mbegu iliyozalishwa na programu nyingine hazitaonekana hapa (hii ni pamoja na fedha za mtandaoni).</string>
+    <string name="restore_disclaimer_message_2_title">Kwa kutumia mbegu sawa sambamba</string>
+    <string name="restore_disclaimer_message_2_body">Usitumie mbegu moja kwa wakati mmoja kwenye vifaa tofauti. Hii inaweza kusababisha migogoro kati ya matukio mawili ya Phoenix, na kusababisha njia za Umeme kufungwa.</string>
 
     <string name="restore_instructions">Mbegu ya pochi yako ni orodha ya maneno 12 ya Kiingereza. Andika kila neno la orodha hii kwenye sanduku hapa chini.</string>
     <string name="restore_input_label">Ingiza neno #%1$s</string>

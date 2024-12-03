@@ -111,7 +111,10 @@
     <string name="initwallet_create">Vytvoření nové peněženky</string>
     <string name="initwallet_restore">Obnovit moji peněženku</string>
 
-    <string name="restore_disclaimer_message">Phoenix může obnovit pouze Off-Chain prostředky, které byly spravovány touto aplikací.\n\nImportem Seedu, který NEBYL vytvořen aplikací Phoenix, se neobnoví žádné prostředky.\n\nUjistěte se také, že již není spuštěna jiná aplikace Phoenix se stejným Seedem.</string>
+    <string name="restore_disclaimer_message_1_title">Phoenix je pouze na Lightning</string>
+    <string name="restore_disclaimer_message_1_body">Phoenix zobrazí pouze fondy, které již byly spravovány Phoenixem. Prostředky připojené k seedu vygenerovanému jinou aplikací se zde nezobrazí (to se týká i prostředků na řetězci).</string>
+    <string name="restore_disclaimer_message_2_title">Souběžné použití stejného klíče</string>
+    <string name="restore_disclaimer_message_2_body">Nepoužívejte stejný seed současně na různých zařízeních. Může to způsobit konflikty mezi oběma instancemi Phoenixu a vést k uzavření kanálů Lightning.</string>
     <string name="utils_ack">Rozumím.</string>
 
     <string name="restore_instructions">Seed vaší peněženky je seznam 12 anglických slov. Každé slovo z tohoto seznamu napište do níže uvedeného pole.</string>

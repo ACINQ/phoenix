@@ -114,7 +114,13 @@ private fun DisclaimerView(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Card(internalPadding = PaddingValues(16.dp)) {
-            Text(stringResource(R.string.restore_disclaimer_message))
+            Text(stringResource(R.string.restore_disclaimer_message_1_title), style = MaterialTheme.typography.h5)
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(stringResource(R.string.restore_disclaimer_message_1_body))
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(stringResource(R.string.restore_disclaimer_message_2_title), style = MaterialTheme.typography.h5)
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(stringResource(R.string.restore_disclaimer_message_2_body))
         }
         Checkbox(
             text = stringResource(R.string.utils_ack),

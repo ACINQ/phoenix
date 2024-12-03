@@ -108,7 +108,10 @@
     <string name="initwallet_create">Crear una billetera nueva</string>
     <string name="initwallet_restore">Restaurar mi billetera</string>
 
-    <string name="restore_disclaimer_message">Phoenix solo puede restaurar los fondos fuera de la cadena que hayan sido gestionados por esta aplicación.\n\nSi importas una semilla que NO haya sido creada por Phoenix, no se restaurará ningún fondo.\n\nAsegúrate además de no estar usando otra billetera Phoenix con la misma semilla.</string>
+    <string name="restore_disclaimer_message_1_title">Phoenix sólo está en Lightning</string>
+    <string name="restore_disclaimer_message_1_body">Phoenix sólo mostrará los fondos que ya han sido gestionados por Phoenix. Los fondos adjuntos a una semilla generada por otra aplicación no aparecerán aquí (esto incluye los fondos on-chain).</string>
+    <string name="restore_disclaimer_message_2_title">Utilizar la misma semilla en paralelo</string>
+    <string name="restore_disclaimer_message_2_body">No utilices la misma semilla al mismo tiempo en diferentes dispositivos. Esto puede causar conflictos entre las dos instancias de Phoenix, y resultar en el cierre de los canales Lightning.</string>
     <string name="utils_ack">Entiendo.</string>
 
     <string name="restore_instructions">La semilla de la billetera es una lista de 12 palabras en inglés. Escribe cada palabra de esta lista en la siguiente casilla.</string>

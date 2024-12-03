@@ -111,7 +111,10 @@
     <string name="initwallet_create">Vytvorenie novej peňaženky</string>
     <string name="initwallet_restore">Obnoviť moju peňaženku</string>
 
-    <string name="restore_disclaimer_message">Phoenix môže obnoviť len off-chain prostriedky, ktoré boli spravované touto aplikáciou.\n\nImportom obnovovacej frázy, ktorá NEBOLA vytvorená aplikáciou Phoenix, sa neobnovia žiadne prostriedky.\n\nUistite sa tiež, že už nie je spustená iná aplikácia Phoenix s tou istou obnovovacou frázou.</string>
+    <string name="restore_disclaimer_message_1_title">Phoenix je len na Lightning</string>
+    <string name="restore_disclaimer_message_1_body">Phoenix zobrazí len fondy, ktoré už spravuje Phoenix. Finančné prostriedky pripojené k seedu vytvorenému inou aplikáciou sa tu nezobrazia (to zahŕňa aj finančné prostriedky na reťazci).</string>
+    <string name="restore_disclaimer_message_2_title">Paralelné použitie rovnakého osiva</string>
+    <string name="restore_disclaimer_message_2_body">Nepoužívajte rovnaký seed súčasne na rôznych zariadeniach. Môže to spôsobiť konflikty medzi dvoma inštanciami Phoenixu a viesť k uzavretiu kanálov Lightning.</string>
     <string name="utils_ack">Rozumiem.</string>
 
     <string name="restore_instructions">Obnovovacia fráza (seed) vašej peňaženky je zoznam 12 anglických slov. Každé slovo z tohto zoznamu napíšte do nižšie uvedeného poľa.</string>
