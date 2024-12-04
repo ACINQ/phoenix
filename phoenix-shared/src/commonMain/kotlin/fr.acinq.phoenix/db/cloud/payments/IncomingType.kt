@@ -2,7 +2,8 @@ package fr.acinq.phoenix.db.cloud
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.phoenix.db.payments.*
+import fr.acinq.phoenix.db.payments.types.IncomingOriginData
+import fr.acinq.phoenix.db.payments.types.IncomingOriginTypeVersion
 import fr.acinq.phoenix.db.payments.types.IncomingReceivedWithData
 import fr.acinq.phoenix.db.payments.types.IncomingReceivedWithTypeVersion
 import fr.acinq.phoenix.db.payments.types.mapToDb

@@ -34,7 +34,6 @@ import fr.acinq.phoenix.db.serializers.v1.ByteVector32Serializer
 import fr.acinq.phoenix.db.serializers.v1.MilliSatoshiSerializer
 import fr.acinq.phoenix.db.serializers.v1.UUIDSerializer
 import fr.acinq.lightning.utils.sat
-import fr.acinq.phoenix.db.payments.IncomingOriginTypeVersion
 import fr.acinq.phoenix.db.payments.liquidityads.FundingFeeData
 import fr.acinq.phoenix.db.payments.liquidityads.FundingFeeData.Companion.asCanonical
 import fr.acinq.phoenix.db.payments.liquidityads.FundingFeeData.Companion.asDb

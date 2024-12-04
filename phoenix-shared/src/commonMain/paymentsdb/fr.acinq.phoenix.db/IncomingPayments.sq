@@ -1,4 +1,4 @@
-import fr.acinq.phoenix.db.payments.IncomingOriginTypeVersion;
+import fr.acinq.phoenix.db.payments.types.IncomingOriginTypeVersion;
 import fr.acinq.phoenix.db.payments.types.IncomingReceivedWithTypeVersion;
 
 -- incoming payments

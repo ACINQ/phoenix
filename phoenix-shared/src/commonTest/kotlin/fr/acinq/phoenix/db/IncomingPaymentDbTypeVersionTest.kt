@@ -22,7 +22,8 @@ import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
-import fr.acinq.phoenix.db.payments.*
+import fr.acinq.phoenix.db.payments.types.IncomingOriginData
+import fr.acinq.phoenix.db.payments.types.IncomingOriginTypeVersion
 import fr.acinq.phoenix.db.payments.types.IncomingReceivedWithData
 import fr.acinq.phoenix.db.payments.types.IncomingReceivedWithTypeVersion
 import fr.acinq.phoenix.db.payments.types.mapToDb

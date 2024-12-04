@@ -24,6 +24,8 @@ import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.db.*
+import fr.acinq.phoenix.db.payments.types.IncomingOriginData
+import fr.acinq.phoenix.db.payments.types.IncomingOriginTypeVersion
 import fr.acinq.phoenix.db.payments.types.IncomingReceivedWithData
 import fr.acinq.phoenix.db.payments.types.IncomingReceivedWithTypeVersion
 import fr.acinq.phoenix.db.payments.types.mapToDb
