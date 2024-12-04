@@ -42,6 +42,7 @@ import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.*
 import kotlinx.serialization.builtins.SetSerializer
+import kotlinx.serialization.json.Json
 
 
 enum class IncomingReceivedWithTypeVersion {
@@ -82,6 +83,7 @@ sealed class IncomingReceivedWithData {
 
     @Serializable
     sealed class Part : IncomingReceivedWithData() {
+
         sealed class Htlc : Part() {
             @Deprecated("Replaced by [Htlc.V1], which supports the liquidity ads funding fee")
             @Serializable
@@ -167,15 +169,65 @@ sealed class IncomingReceivedWithData {
             blob: ByteArray,
             amount: MilliSatoshi?,
             originTypeVersion: IncomingOriginTypeVersion
-        ): List<IncomingPayment.ReceivedWith> = DbTypesHelper.decodeBlob(blob) { json, format ->
-            @Suppress("DEPRECATION")
-            when (typeVersion) {
-                IncomingReceivedWithTypeVersion.LIGHTNING_PAYMENT_V0 -> listOf(
-                    IncomingPayment.ReceivedWith.LightningPayment(amount ?: 0.msat, ByteVector32.Zeroes, 0L, null)
-                )
-                IncomingReceivedWithTypeVersion.NEW_CHANNEL_V0 -> listOf(format.decodeFromString<NewChannel.V0>(json).let {
-                    IncomingPayment.ReceivedWith.NewChannel(
-                        amountReceived = amount ?: 0.msat,
+        ): List<IncomingPayment.ReceivedWith> = @Suppress("DEPRECATION") when (typeVersion) {
+            IncomingReceivedWithTypeVersion.LIGHTNING_PAYMENT_V0 -> listOf(
+                IncomingPayment.ReceivedWith.LightningPayment(amount ?: 0.msat, ByteVector32.Zeroes, 0L, null)
+            )
+            IncomingReceivedWithTypeVersion.NEW_CHANNEL_V0 -> Json.decodeFromString(NewChannel.V0.serializer(), String(bytes = blob, charset = Charsets.UTF_8)).let {
+                listOf(IncomingPayment.ReceivedWith.NewChannel(
+                    amountReceived = amount ?: 0.msat,
+                    serviceFee = it.fees,
+                    miningFee = 0.sat,
+                    channelId = it.channelId ?: ByteVector32.Zeroes,
+                    txId = TxId(ByteVector32.Zeroes),
+                    confirmedAt = 0,
+                    lockedAt = 0,
+                ))
+            }
+            IncomingReceivedWithTypeVersion.MULTIPARTS_V0 -> Json.decodeFromString(SetSerializer(Part.serializer()), String(bytes = blob, charset = Charsets.UTF_8)).mapNotNull {
+                when (it) {
+                    is Part.Htlc.V0 -> IncomingPayment.ReceivedWith.LightningPayment(it.amount, it.channelId, it.htlcId, null)
+                    is Part.Htlc.V1 -> IncomingPayment.ReceivedWith.LightningPayment(it.amountReceived, it.channelId, it.htlcId, it.fundingFee?.asCanonical())
+                    is Part.NewChannel.V0 -> if (originTypeVersion == IncomingOriginTypeVersion.SWAPIN_V0) {
+                        IncomingPayment.ReceivedWith.NewChannel(
+                            amountReceived = it.amount,
+                            serviceFee = it.fees,
+                            miningFee = 0.sat,
+                            channelId = it.channelId ?: ByteVector32.Zeroes,
+                            txId = TxId(ByteVector32.Zeroes),
+                            confirmedAt = 0,
+                            lockedAt = 0,
+                        )
+                    } else {
+                        IncomingPayment.ReceivedWith.NewChannel(
+                            amountReceived = it.amount - it.fees,
+                            serviceFee = it.fees,
+                            miningFee = 0.sat,
+                            channelId = it.channelId ?: ByteVector32.Zeroes,
+                            txId = TxId(ByteVector32.Zeroes),
+                            confirmedAt = 0,
+                            lockedAt = 0,
+                        )
+                    }
+                    else -> null // does not apply, MULTIPARTS_V0 only uses V0 parts
+                }
+            }
+            IncomingReceivedWithTypeVersion.MULTIPARTS_V1 -> Json.decodeFromString(SetSerializer(Part.serializer()), String(bytes = blob, charset = Charsets.UTF_8)).map {
+                when (it) {
+                    is Part.Htlc.V0 -> IncomingPayment.ReceivedWith.LightningPayment(
+                        amountReceived = it.amount,
+                        channelId = it.channelId,
+                        htlcId = it.htlcId,
+                        fundingFee = null
+                    )
+                    is Part.Htlc.V1 -> IncomingPayment.ReceivedWith.LightningPayment(
+                        amountReceived = it.amountReceived,
+                        channelId = it.channelId,
+                        htlcId = it.htlcId,
+                        fundingFee = it.fundingFee?.asCanonical()
+                    )
+                    is Part.NewChannel.V0 -> IncomingPayment.ReceivedWith.NewChannel(
+                        amountReceived = it.amount,
                         serviceFee = it.fees,
                         miningFee = 0.sat,
                         channelId = it.channelId ?: ByteVector32.Zeroes,
@@ -183,89 +235,36 @@ sealed class IncomingReceivedWithData {
                         confirmedAt = 0,
                         lockedAt = 0,
                     )
-                })
-                IncomingReceivedWithTypeVersion.MULTIPARTS_V0 -> DbTypesHelper.polymorphicFormat.decodeFromString(SetSerializer(PolymorphicSerializer(Part::class)), json).mapNotNull {
-                    when (it) {
-                        is Part.Htlc.V0 -> IncomingPayment.ReceivedWith.LightningPayment(it.amount, it.channelId, it.htlcId, null)
-                        is Part.Htlc.V1 -> IncomingPayment.ReceivedWith.LightningPayment(it.amountReceived, it.channelId, it.htlcId, it.fundingFee?.asCanonical())
-                        is Part.NewChannel.V0 -> if (originTypeVersion == IncomingOriginTypeVersion.SWAPIN_V0) {
-                            IncomingPayment.ReceivedWith.NewChannel(
-                                amountReceived = it.amount,
-                                serviceFee = it.fees,
-                                miningFee = 0.sat,
-                                channelId = it.channelId ?: ByteVector32.Zeroes,
-                                txId = TxId(ByteVector32.Zeroes),
-                                confirmedAt = 0,
-                                lockedAt = 0,
-                            )
-                        } else {
-                            IncomingPayment.ReceivedWith.NewChannel(
-                                amountReceived = it.amount - it.fees,
-                                serviceFee = it.fees,
-                                miningFee = 0.sat,
-                                channelId = it.channelId ?: ByteVector32.Zeroes,
-                                txId = TxId(ByteVector32.Zeroes),
-                                confirmedAt = 0,
-                                lockedAt = 0,
-                            )
-                        }
-                        else -> null // does not apply, MULTIPARTS_V0 only uses V0 parts
-                    }
-                }
-                IncomingReceivedWithTypeVersion.MULTIPARTS_V1 -> DbTypesHelper.polymorphicFormat.decodeFromString(SetSerializer(PolymorphicSerializer(Part::class)), json).map {
-                    when (it) {
-                        is Part.Htlc.V0 -> IncomingPayment.ReceivedWith.LightningPayment(
-                            amountReceived = it.amount,
-                            channelId = it.channelId,
-                            htlcId = it.htlcId,
-                            fundingFee = null
-                        )
-                        is Part.Htlc.V1 -> IncomingPayment.ReceivedWith.LightningPayment(
-                            amountReceived = it.amountReceived,
-                            channelId = it.channelId,
-                            htlcId = it.htlcId,
-                            fundingFee = it.fundingFee?.asCanonical()
-                        )
-                        is Part.NewChannel.V0 -> IncomingPayment.ReceivedWith.NewChannel(
-                            amountReceived = it.amount,
-                            serviceFee = it.fees,
-                            miningFee = 0.sat,
-                            channelId = it.channelId ?: ByteVector32.Zeroes,
-                            txId = TxId(ByteVector32.Zeroes),
-                            confirmedAt = 0,
-                            lockedAt = 0,
-                        )
-                        is Part.NewChannel.V1 -> IncomingPayment.ReceivedWith.NewChannel(
-                            amountReceived = it.amount,
-                            serviceFee = it.fees,
-                            miningFee = 0.sat,
-                            channelId = it.channelId ?: ByteVector32.Zeroes,
-                            txId = TxId(ByteVector32.Zeroes),
-                            confirmedAt = 0,
-                            lockedAt = 0,
-                        )
-                        is Part.NewChannel.V2 -> IncomingPayment.ReceivedWith.NewChannel(
-                            amountReceived = it.amount,
-                            serviceFee = it.serviceFee,
-                            miningFee = it.miningFee,
-                            channelId = it.channelId,
-                            txId = TxId(it.txId),
-                            confirmedAt = it.confirmedAt,
-                            lockedAt = it.lockedAt,
-                        )
-                        is Part.SpliceIn.V0 -> IncomingPayment.ReceivedWith.SpliceIn(
-                            amountReceived = it.amount,
-                            serviceFee = it.serviceFee,
-                            miningFee = it.miningFee,
-                            channelId = it.channelId,
-                            txId = TxId(it.txId),
-                            confirmedAt = it.confirmedAt,
-                            lockedAt = it.lockedAt,
-                        )
-                        is Part.FeeCredit.V0 -> IncomingPayment.ReceivedWith.AddedToFeeCredit(
-                            amountReceived = it.amount
-                        )
-                    }
+                    is Part.NewChannel.V1 -> IncomingPayment.ReceivedWith.NewChannel(
+                        amountReceived = it.amount,
+                        serviceFee = it.fees,
+                        miningFee = 0.sat,
+                        channelId = it.channelId ?: ByteVector32.Zeroes,
+                        txId = TxId(ByteVector32.Zeroes),
+                        confirmedAt = 0,
+                        lockedAt = 0,
+                    )
+                    is Part.NewChannel.V2 -> IncomingPayment.ReceivedWith.NewChannel(
+                        amountReceived = it.amount,
+                        serviceFee = it.serviceFee,
+                        miningFee = it.miningFee,
+                        channelId = it.channelId,
+                        txId = TxId(it.txId),
+                        confirmedAt = it.confirmedAt,
+                        lockedAt = it.lockedAt,
+                    )
+                    is Part.SpliceIn.V0 -> IncomingPayment.ReceivedWith.SpliceIn(
+                        amountReceived = it.amount,
+                        serviceFee = it.serviceFee,
+                        miningFee = it.miningFee,
+                        channelId = it.channelId,
+                        txId = TxId(it.txId),
+                        confirmedAt = it.confirmedAt,
+                        lockedAt = it.lockedAt,
+                    )
+                    is Part.FeeCredit.V0 -> IncomingPayment.ReceivedWith.AddedToFeeCredit(
+                        amountReceived = it.amount
+                    )
                 }
             }
         }
@@ -304,7 +303,7 @@ fun List<IncomingPayment.ReceivedWith>.mapToDb(): Pair<IncomingReceivedWithTypeV
         )
     }
 }.takeIf { it.isNotEmpty() }?.toSet()?.let {
-    IncomingReceivedWithTypeVersion.MULTIPARTS_V1 to DbTypesHelper.polymorphicFormat.encodeToString(
-        SetSerializer(PolymorphicSerializer(IncomingReceivedWithData.Part::class)), it
+    IncomingReceivedWithTypeVersion.MULTIPARTS_V1 to Json.encodeToString(
+        SetSerializer(IncomingReceivedWithData.Part.serializer()), it
     ).toByteArray(Charsets.UTF_8)
 }

@@ -26,18 +26,4 @@ import kotlinx.serialization.modules.subclass
 object DbTypesHelper {
     /** Decode a byte array and apply a deserialization handler. */
     fun <T> decodeBlob(blob: ByteArray, handler: (String, Json) -> T) = handler(String(bytes = blob, charset = Charsets.UTF_8), Json)
-
-    val module = SerializersModule {
-        polymorphic(IncomingReceivedWithData.Part::class) {
-            subclass(IncomingReceivedWithData.Part.Htlc.V0::class)
-            subclass(IncomingReceivedWithData.Part.Htlc.V1::class)
-            @Suppress("DEPRECATION")
-            subclass(IncomingReceivedWithData.Part.NewChannel.V0::class)
-            subclass(IncomingReceivedWithData.Part.NewChannel.V1::class)
-            subclass(IncomingReceivedWithData.Part.NewChannel.V2::class)
-            subclass(IncomingReceivedWithData.Part.SpliceIn.V0::class)
-        }
-    }
-
-    val polymorphicFormat = Json { serializersModule = module }
 }
