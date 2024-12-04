@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 ACINQ SAS
+ * Copyright 2024 ACINQ SAS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
     UUIDSerializer::class,
 )
 
-package fr.acinq.phoenix.db.payments
+package fr.acinq.phoenix.db.payments.types
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Satoshi
@@ -34,6 +34,7 @@ import fr.acinq.phoenix.db.serializers.v1.ByteVector32Serializer
 import fr.acinq.phoenix.db.serializers.v1.MilliSatoshiSerializer
 import fr.acinq.phoenix.db.serializers.v1.UUIDSerializer
 import fr.acinq.lightning.utils.sat
+import fr.acinq.phoenix.db.payments.IncomingOriginTypeVersion
 import fr.acinq.phoenix.db.payments.liquidityads.FundingFeeData
 import fr.acinq.phoenix.db.payments.liquidityads.FundingFeeData.Companion.asCanonical
 import fr.acinq.phoenix.db.payments.liquidityads.FundingFeeData.Companion.asDb
@@ -66,6 +67,7 @@ sealed class IncomingReceivedWithData {
     @Deprecated("Not used anymore, received-with is now a list of payment parts")
     sealed class NewChannel : IncomingReceivedWithData() {
         @Serializable
+        @SerialName("fr.acinq.phoenix.db.payments.IncomingReceivedWithData.NewChannel.V0")
         @Suppress("DEPRECATION")
         data class V0(
             @Serializable val fees: MilliSatoshi,
@@ -87,6 +89,7 @@ sealed class IncomingReceivedWithData {
         sealed class Htlc : Part() {
             @Deprecated("Replaced by [Htlc.V1], which supports the liquidity ads funding fee")
             @Serializable
+            @SerialName("fr.acinq.phoenix.db.payments.IncomingReceivedWithData.Part.Htlc.V0")
             data class V0(
                 @Serializable val amount: MilliSatoshi,
                 @Serializable val channelId: ByteVector32,
@@ -94,6 +97,7 @@ sealed class IncomingReceivedWithData {
             ) : Htlc()
 
             @Serializable
+            @SerialName("fr.acinq.phoenix.db.payments.IncomingReceivedWithData.Part.Htlc.V1")
             data class V1(
                 val amountReceived: MilliSatoshi,
                 val channelId: ByteVector32,
@@ -105,6 +109,7 @@ sealed class IncomingReceivedWithData {
         sealed class NewChannel : Part() {
             @Deprecated("Legacy type. Use V1 instead for new parts, with the new `id` field.")
             @Serializable
+            @SerialName("fr.acinq.phoenix.db.payments.IncomingReceivedWithData.Part.NewChannel.V0")
             data class V0(
                 @Serializable val amount: MilliSatoshi,
                 @Serializable val fees: MilliSatoshi,
@@ -113,6 +118,7 @@ sealed class IncomingReceivedWithData {
 
             /** V1 contains a new `id` field that ensure that each [NewChannel] is unique. Old V0 data will use a random UUID to respect the [IncomingPayment.ReceivedWith.NewChannel] interface. */
             @Serializable
+            @SerialName("fr.acinq.phoenix.db.payments.IncomingReceivedWithData.Part.NewChannel.V1")
             data class V1(
                 @Serializable val id: UUID,
                 @Serializable val amount: MilliSatoshi,
@@ -122,6 +128,7 @@ sealed class IncomingReceivedWithData {
 
             /** V2 supports dual funding. New fields: service/miningFees, channel id, funding tx id, and the confirmation/lock timestamps. Id is removed. */
             @Serializable
+            @SerialName("fr.acinq.phoenix.db.payments.IncomingReceivedWithData.Part.NewChannel.V2")
             data class V2(
                 @Serializable val amount: MilliSatoshi,
                 @Serializable val serviceFee: MilliSatoshi,
@@ -135,6 +142,7 @@ sealed class IncomingReceivedWithData {
 
         sealed class SpliceIn : Part() {
             @Serializable
+            @SerialName("fr.acinq.phoenix.db.payments.IncomingReceivedWithData.Part.SpliceIn.V0")
             data class V0(
                 @Serializable val amount: MilliSatoshi,
                 @Serializable val serviceFee: MilliSatoshi,
@@ -148,6 +156,7 @@ sealed class IncomingReceivedWithData {
 
         sealed class FeeCredit : Part() {
             @Serializable
+            @SerialName("fr.acinq.phoenix.db.payments.IncomingReceivedWithData.Part.FeeCredit.V0")
             data class V0(
                 val amount: MilliSatoshi
             ) : FeeCredit()

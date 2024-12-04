@@ -2,8 +2,10 @@ package fr.acinq.phoenix.db.cloud
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.utils.msat
 import fr.acinq.phoenix.db.payments.*
+import fr.acinq.phoenix.db.payments.types.IncomingReceivedWithData
+import fr.acinq.phoenix.db.payments.types.IncomingReceivedWithTypeVersion
+import fr.acinq.phoenix.db.payments.types.mapToDb
 import kotlinx.serialization.*
 import kotlinx.serialization.cbor.ByteString
 import kotlinx.serialization.cbor.Cbor

@@ -10,6 +10,7 @@ import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.data.walletPaymentId
 import fr.acinq.phoenix.db.payments.*
+import fr.acinq.phoenix.db.payments.types.mapToDb
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlin.math.pow

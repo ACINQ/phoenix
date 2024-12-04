@@ -2,23 +2,9 @@ package fr.acinq.phoenix.db
 
 import app.cash.sqldelight.Transacter
 import app.cash.sqldelight.coroutines.asFlow
-import fr.acinq.bitcoin.utils.Try
-import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
-import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
-import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.db.LightningOutgoingPayment
-import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
-import fr.acinq.lightning.db.SpliceOutgoingPayment
-import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
-import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.data.ContactInfo
-import fr.acinq.phoenix.data.WalletPaymentId
-import fr.acinq.phoenix.db.CloudKitPaymentsDb.MetadataRow
-import fr.acinq.phoenix.db.payments.IncomingQueries
-import fr.acinq.phoenix.db.payments.WalletPaymentMetadataRow
-import fr.acinq.phoenix.db.payments.mapToDb
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
