@@ -34,7 +34,7 @@ data class ContactInfo(
         photoUri = photoUri,
         useOfferKey = useOfferKey,
         offers = offers,
-        publicKeys = offers.map { it.contactNodeIds }.flatten()
+        publicKeys = offers.map { it.contactInfos.map { it.nodeId } }.flatten()
     )
 
     // TODO: order the offers listed by the group_concat in the sql query, and take the most recently added one

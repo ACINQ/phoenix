@@ -1,8 +1,10 @@
 package fr.acinq.phoenix.db.cloud
 
 import fr.acinq.lightning.db.*
+import fr.acinq.lightning.db.adapters.IncomingPaymentCborAdapter
 import fr.acinq.phoenix.db.cloud.payments.InboundLiquidityLegacyWrapper
 import fr.acinq.phoenix.db.cloud.payments.InboundLiquidityPaymentWrapper
+import fr.acinq.phoenix.db.cloud.payments.IncomingPaymentWrapperV10Legacy
 import kotlinx.serialization.*
 import kotlinx.serialization.cbor.ByteString
 import kotlinx.serialization.cbor.Cbor
@@ -60,7 +62,10 @@ enum class CloudDataVersion(val value: Int) {
 @OptIn(ExperimentalSerializationApi::class)
 data class CloudData(
     @SerialName("i")
-    val incoming: IncomingPaymentWrapper?,
+    val incomingv10Legacy: IncomingPaymentWrapperV10Legacy?,
+    @ByteString
+    @SerialName("i2")
+    val incoming: ByteArray? = null,
     @SerialName("o")
     val outgoing: LightningOutgoingPaymentWrapper?,
     @SerialName("so")
@@ -80,7 +85,8 @@ data class CloudData(
     val padding: ByteArray?,
 ) {
     constructor(incoming: IncomingPayment) : this(
-        incoming = IncomingPaymentWrapper(incoming),
+        incomingv10Legacy = null,
+        incoming = IncomingPaymentCborAdapter.encode(incoming),
         outgoing = null,
         spliceOutgoing = null,
         channelClose = null,
@@ -92,6 +98,7 @@ data class CloudData(
     )
 
     constructor(outgoing: OutgoingPayment) : this(
+        incomingv10Legacy = null,
         incoming = null,
         outgoing = if (outgoing is LightningOutgoingPayment) LightningOutgoingPaymentWrapper(outgoing) else null,
         spliceOutgoing = if (outgoing is SpliceOutgoingPayment) SpliceOutgoingPaymentWrapper(outgoing) else null,
@@ -113,7 +120,8 @@ data class CloudData(
 
     @Throws(Exception::class)
     fun unwrap(): WalletPayment? = when {
-        incoming != null -> incoming.unwrap()
+        incomingv10Legacy != null -> incomingv10Legacy.unwrap()
+        incoming != null -> IncomingPaymentCborAdapter.decode(incoming)
         outgoing != null -> outgoing.unwrap()
         spliceOutgoing != null -> spliceOutgoing.unwrap()
         channelClose != null -> channelClose.unwrap()

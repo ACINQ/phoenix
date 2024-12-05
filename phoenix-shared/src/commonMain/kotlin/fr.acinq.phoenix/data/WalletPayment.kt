@@ -5,17 +5,19 @@ import fr.acinq.lightning.db.*
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.data.lnurl.LnurlPay
 import fr.acinq.phoenix.db.WalletPaymentOrderRow
+import fr.acinq.phoenix.utils.extensions.deriveUUID
 
 /**
- * Represents a unique WalletPayment row in the database, which exists in either the `incoming_payments` table,
- * the `outgoing_payments` table, the `splice_outgoing_payments` table, the `channel_close_outgoing_payments`, ...
+ * Helper class that helps to link an actual payment to a unique string. This is useful to store a reference
+ * to a payment in a single TEXT sql column.
+ *
+ * e.g.: incoming|2cd7edf6-de67-46a0-bbea-6f300741c9a4
+ * This is a unique identifier for an [IncomingPayment] with id=2cd7edf6-...1c9a4.
  *
  * It is common to reference these rows in other database tables via [dbType] or [dbId].
  *
- * The [WalletPaymentId] class assists in this conversion.
- *
- * @param dbType Long representing either incoming or outgoing/splice-outgoing
- * @param dbId String representing the appropriate id for either table (payment hash or UUID).
+ * @param dbType Long identifies the table in which the payment is stored (incoming/outgoing/splice-outgoing/...)
+ * @param dbId String identifier inside the table.
  */
 sealed class WalletPaymentId {
 
@@ -25,14 +27,15 @@ sealed class WalletPaymentId {
     /** Use this to get a single (hashable) identifier for the row, for example within a hashmap or Cache. */
     abstract val identifier: String
 
-    data class IncomingPaymentId(val paymentHash: ByteVector32) : WalletPaymentId() {
+    data class IncomingPaymentId(val id: UUID) : WalletPaymentId() {
         override val dbType: DbType = DbType.INCOMING
-        override val dbId: String = paymentHash.toHex()
+        override val dbId: String = id.toString()
         override val identifier: String = "incoming|$dbId"
 
         companion object {
-            fun fromString(id: String) = IncomingPaymentId(paymentHash = ByteVector32(id))
-            fun fromByteArray(id: ByteArray) = IncomingPaymentId(paymentHash = ByteVector32(id))
+            fun fromString(id: String) = IncomingPaymentId(id = UUID.fromString(id))
+            /** For backward compatibility purposes (we used to use the `paymentHash` as identifier for incoming payments) */
+            fun fromPaymentHash(paymentHash: ByteVector32) = IncomingPaymentId(id = paymentHash.deriveUUID())
         }
     }
 
@@ -111,7 +114,7 @@ sealed class WalletPaymentId {
 }
 
 fun WalletPayment.walletPaymentId(): WalletPaymentId = when (this) {
-    is IncomingPayment -> WalletPaymentId.IncomingPaymentId(paymentHash = this.paymentHash)
+    is IncomingPayment -> WalletPaymentId.IncomingPaymentId(id = this.id)
     is LightningOutgoingPayment -> WalletPaymentId.LightningOutgoingPaymentId(id = this.id)
     is SpliceOutgoingPayment -> WalletPaymentId.SpliceOutgoingPaymentId(id = this.id)
     is ChannelCloseOutgoingPayment -> WalletPaymentId.ChannelCloseOutgoingPaymentId(id = this.id)

@@ -1,22 +1,15 @@
-import fr.acinq.phoenix.db.payments.types.IncomingOriginTypeVersion;
-import fr.acinq.phoenix.db.payments.types.IncomingReceivedWithTypeVersion;
+import fr.acinq.lightning.db.IncomingPayment;
 
 -- incoming payments
 CREATE TABLE IF NOT EXISTS incoming_payments (
-    payment_hash BLOB NOT NULL PRIMARY KEY,
-    preimage BLOB NOT NULL,
+    id TEXT NOT NULL PRIMARY KEY,
+    payment_hash BLOB UNIQUE,
     created_at INTEGER NOT NULL,
-    -- origin
-    origin_type TEXT AS IncomingOriginTypeVersion NOT NULL,
-    origin_blob BLOB NOT NULL,
-    -- this field is legacy, the amount received is the sum of the received-with parts
-    received_amount_msat INTEGER DEFAULT NULL,
-    -- timestamp when the payment has been received
     received_at INTEGER DEFAULT NULL,
-    -- received-with parts
-    received_with_type TEXT AS IncomingReceivedWithTypeVersion DEFAULT NULL,
-    received_with_blob BLOB DEFAULT NULL
+    json TEXT AS IncomingPayment NOT NULL
 );
+
+CREATE INDEX incoming_payments_payment_hash_idx ON incoming_payments(payment_hash);
 
 -- Create indexes to optimize the queries in AggregatedQueries.
 -- Tip: Use "explain query plan" to ensure they're actually being used.
@@ -28,33 +21,26 @@ CREATE INDEX IF NOT EXISTS incoming_payments_filter_idx
 
 insert:
 INSERT INTO incoming_payments (
+            id,
             payment_hash,
-            preimage,
             created_at,
-            origin_type,
-            origin_blob)
+            received_at,
+            json)
 VALUES (?, ?, ?, ?, ?);
 
 updateReceived:
 UPDATE incoming_payments
 SET    received_at=?,
-       received_with_type=?,
-       received_with_blob=?
-WHERE  payment_hash = ?;
-
-insertAndReceive:
-INSERT INTO incoming_payments (
-            payment_hash,
-            preimage,
-            created_at,
-            origin_type, origin_blob,
-            received_at,
-            received_with_type,
-            received_with_blob)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+       json=?
+WHERE  id = ?;
 
 get:
-SELECT payment_hash, preimage, created_at, origin_type, origin_blob, received_amount_msat, received_at, received_with_type, received_with_blob
+SELECT *
+FROM   incoming_payments
+WHERE  id=?;
+
+getByPaymentHash:
+SELECT *
 FROM   incoming_payments
 WHERE  payment_hash=?;
 
@@ -66,7 +52,7 @@ ORDER BY r.received_at ASC
 LIMIT 1;
 
 listAllWithin:
-SELECT payment_hash, preimage, created_at, origin_type, origin_blob, received_amount_msat, received_at, received_with_type, received_with_blob
+SELECT json
 FROM   incoming_payments
 WHERE  created_at BETWEEN :from AND :to
 ORDER BY
@@ -74,14 +60,13 @@ ORDER BY
        payment_hash DESC;
 
 listAllNotConfirmed:
-SELECT incoming_payments.payment_hash, preimage, created_at, origin_type, origin_blob, received_amount_msat, received_at, received_with_type, received_with_blob
+SELECT json
 FROM   incoming_payments
 LEFT OUTER JOIN link_tx_to_payments
     ON link_tx_to_payments.type = 1
     AND link_tx_to_payments.confirmed_at IS NULL
     AND link_tx_to_payments.id = incoming_payments.payment_hash
-WHERE received_at IS NOT NULL
-;
+WHERE received_at IS NOT NULL;
 
 scanCompleted:
 SELECT payment_hash,
@@ -90,6 +75,10 @@ FROM   incoming_payments
 WHERE  received_at IS NOT NULL;
 
 delete:
+DELETE FROM incoming_payments
+WHERE id = ?;
+
+deleteByPaymentHash:
 DELETE FROM incoming_payments
 WHERE payment_hash = ?;
 

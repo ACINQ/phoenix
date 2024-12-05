@@ -1,14 +1,14 @@
 -- This table links an on-chain transaction to one/many incoming or outgoing payment
 -- * tx_id => hex identifier of an on-chain transaction
 -- * type  => tracks the type of a payment. The value is an int as defined in the DbType enum
--- * id    => the identifier of the payment, can be a payment hash (incoming) or a UUID (outgoing)
+-- * id    => uuid identifier of the payment
 CREATE TABLE IF NOT EXISTS link_tx_to_payments (
     tx_id BLOB NOT NULL,
     type INTEGER NOT NULL,
     id TEXT NOT NULL,
     confirmed_at INTEGER DEFAULT NULL,
     locked_at INTEGER DEFAULT NULL,
-    PRIMARY KEY (tx_id, type, id)
+    PRIMARY KEY (tx_id, type, id) -- NB: the primary key should be the id column
 );
 
 CREATE INDEX IF NOT EXISTS link_tx_to_payments_txid ON link_tx_to_payments(tx_id);

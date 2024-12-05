@@ -6,11 +6,13 @@ import fr.acinq.lightning.*
 import fr.acinq.lightning.Lightning.randomBytes32
 import fr.acinq.lightning.Lightning.randomKey
 import fr.acinq.lightning.db.*
+import fr.acinq.lightning.db.adapters.IncomingPaymentCborAdapter
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.utils.*
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.runTest
+import fr.acinq.phoenix.utils.extensions.deriveUUID
 import fr.acinq.secp256k1.Hex
 import kotlin.test.*
 
@@ -33,7 +35,7 @@ class CloudDataTest {
         // attempt to deserialize & extract payment
         val data = CloudData.cborDeserialize(blob)
         assertNotNull(data)
-        val decoded = data.incoming?.unwrap()
+        val decoded = IncomingPaymentCborAdapter.decode(data.incoming!!)
         assertNotNull(decoded)
 
         // test equality (no loss of information)
@@ -64,10 +66,11 @@ class CloudDataTest {
     fun incoming__invoice() = runTest {
         val invoice = createBolt11Invoice(preimage, 250_000.msat)
         testRoundtrip(
-            IncomingPayment(
+            Bolt11IncomingPayment(
                 preimage = preimage,
-                origin = IncomingPayment.Origin.Invoice(invoice),
-                received = null
+                paymentRequest = invoice,
+                received = null,
+                createdAt = 100
             )
         )
     }
@@ -75,43 +78,62 @@ class CloudDataTest {
     @Test
     fun incoming__swapIn() = runTest {
         testRoundtrip(
-            IncomingPayment(
-                preimage = preimage,
-                origin = IncomingPayment.Origin.SwapIn(bitcoinAddress),
-                received = null
+            NewChannelIncomingPayment(
+                id = UUID.randomUUID(),
+                amountReceived = 150_000_000.msat,
+                serviceFee = 5_000_000.msat,
+                miningFee = 10_000.sat,
+                channelId = randomBytes32(),
+                txId = TxId(randomBytes32()),
+                localInputs = setOf(OutPoint(TxId(randomBytes32()), 0)),
+                createdAt = 0,
+                lockedAt = 50,
+                confirmedAt = 100,
             )
         )
     }
 
     @Test
     fun incoming__receivedWith_lightning() = runTest {
-        val invoice = createBolt11Invoice(preimage, 250_000.msat)
-        val receivedWith1 = IncomingPayment.ReceivedWith.LightningPayment(
-            amountReceived = 100_000.msat, channelId = channelId, htlcId = 1L, fundingFee = null
-        )
-        val receivedWith2 = IncomingPayment.ReceivedWith.LightningPayment(
-            amountReceived = 150_000.msat, channelId = channelId, htlcId = 1L, fundingFee = LiquidityAds.FundingFee(amount = 1_000.msat, TxId(ByteVector32.Zeroes))
-        )
         testRoundtrip(
-            IncomingPayment(
+            Bolt11IncomingPayment(
                 preimage = preimage,
-                origin = IncomingPayment.Origin.Invoice(invoice),
-                received = IncomingPayment.Received(listOf(receivedWith1, receivedWith2))
+                paymentRequest = createBolt11Invoice(preimage, 250_000.msat),
+                received = LightningIncomingPayment.Received(
+                    parts = listOf(
+                        LightningIncomingPayment.Received.Part.Htlc(
+                            amountReceived = 100_000.msat,
+                            channelId = randomBytes32(),
+                            htlcId = 1L,
+                            fundingFee = null
+                        ),
+                        LightningIncomingPayment.Received.Part.Htlc(
+                            amountReceived = 150_000.msat,
+                            channelId = randomBytes32(),
+                            htlcId = 2L,
+                            fundingFee = LiquidityAds.FundingFee(amount = 1_000.msat, fundingTxId = TxId(randomBytes32()))
+                        )
+                    )
+                ),
+                createdAt = 100
             )
         )
     }
 
     @Test
     fun incoming__receivedWith_newChannel() = runTest {
-        val invoice = createBolt11Invoice(preimage, 10_000_000.msat)
-        val receivedWith = IncomingPayment.ReceivedWith.NewChannel(
-            amountReceived = 7_000_000.msat, miningFee = 2_000.sat, serviceFee = 1_000_000.msat, channelId = channelId, txId = TxId(randomBytes32()), confirmedAt = 500, lockedAt = 800
-        )
         testRoundtrip(
-            IncomingPayment(
-                preimage = preimage,
-                origin = IncomingPayment.Origin.Invoice(invoice),
-                received = IncomingPayment.Received(listOf(receivedWith))
+            NewChannelIncomingPayment(
+                id = UUID.randomUUID(),
+                amountReceived = 150_000_000.msat,
+                serviceFee = 5_000_000.msat,
+                miningFee = 10_000.sat,
+                channelId = randomBytes32(),
+                txId = TxId(randomBytes32()),
+                localInputs = setOf(OutPoint(TxId(randomBytes32()), 0)),
+                createdAt = 0,
+                lockedAt = 50,
+                confirmedAt = 100,
             )
         )
     }
@@ -121,21 +143,28 @@ class CloudDataTest {
         val blob = Hex.decode("bf6169bf68707265696d6167655820d77a5c6e17f70240c4a2aaf54fb1389188e482e85247f63c80417661e6a9b250666f726967696ebf64747970656a494e564f4943455f563064626c6f6259011b7b227061796d656e7452657175657374223a226c6e6263333530753170336464347874707035716c706868353476396e366737323439636435613463337a6735666b666b336a657377356370306b6a70393264366e377574777364717664396838766d6d6676646a73637170737370357a6a7275777a6c7677353732616e3934776b6b7630616370657077773068647a387134726466673679756b776466647032723571397179397173717738337771653868797130767061636a78336c7963777567657765787a307a3634796732343564377a717277653039676c7572716e34706466306d706539766336713065667739637533613773746575786c6a7730786e7970336d686a6565786664677a787163703564646d6b61227dff687265636569766564bf6274731b00000182172f3a3764747970656d4d554c544950415254535f563164626c6f625901ab5b7b2274797065223a2266722e6163696e712e70686f656e69782e64622e7061796d656e74732e496e636f6d696e67526563656976656457697468446174612e506172742e4e65774368616e6e656c2e5630222c22616d6f756e74223a7b226d736174223a373030303030307d2c2266656573223a7b226d736174223a333030303030307d2c226368616e6e656c4964223a2265386130653762613931613438356564363835373431356363306336306637376564613663623165626531646138343164343264376234333838636332626363227d2c7b2274797065223a2266722e6163696e712e70686f656e69782e64622e7061796d656e74732e496e636f6d696e67526563656976656457697468446174612e506172742e4e65774368616e6e656c2e5630222c22616d6f756e74223a7b226d736174223a393030303030307d2c2266656573223a7b226d736174223a363030303030307d2c226368616e6e656c4964223a2265386130653762613931613438356564363835373431356363306336306637376564613663623165626531646138343164343264376234333838636332626363227d5dff696372656174656441741b00000182172f3a37ff616ff6617600617040ff")
         val data = CloudData.cborDeserialize(blob)
         assertNotNull(data)
-        val decoded = data.incoming?.unwrap()
+        val decoded = data.incomingv10Legacy?.unwrap()
         assertNotNull(decoded)
 
         val expectedPreimage = Hex.decode("d77a5c6e17f70240c4a2aaf54fb1389188e482e85247f63c80417661e6a9b250")
         val expectedChannelId = Hex.decode("e8a0e7ba91a485ed6857415cc0c60f77eda6cb1ebe1da841d42d7b4388cc2bcc").byteVector32()
-        val expectedReceived = IncomingPayment.Received(
-            receivedWith = listOf(
-                IncomingPayment.ReceivedWith.NewChannel(amountReceived = 7_000_000.msat, miningFee = 0.sat, serviceFee = 3_000_000.msat, channelId = expectedChannelId, txId = TxId(ByteVector32.Zeroes), confirmedAt = 0, lockedAt = 0),
-                IncomingPayment.ReceivedWith.NewChannel(amountReceived = 9_000_000.msat, miningFee = 0.sat, serviceFee = 6_000_000.msat, channelId = expectedChannelId, txId = TxId(ByteVector32.Zeroes), confirmedAt = 0, lockedAt = 0)
-            ),
-            receivedAt = 1658246347319
-        )
+//        val expectedReceived = IncomingPayment.Received(
+//            receivedWith = listOf(
+//                IncomingPayment.ReceivedWith.NewChannel(amountReceived = 7_000_000.msat, miningFee = 0.sat, serviceFee = 3_000_000.msat, channelId = expectedChannelId, txId = TxId(ByteVector32.Zeroes), confirmedAt = 0, lockedAt = 0),
+//                IncomingPayment.ReceivedWith.NewChannel(amountReceived = 9_000_000.msat, miningFee = 0.sat, serviceFee = 6_000_000.msat, channelId = expectedChannelId, txId = TxId(ByteVector32.Zeroes), confirmedAt = 0, lockedAt = 0)
+//            ),
+//            receivedAt = 1658246347319
+//        )
 
-        assertEquals(expectedPreimage.byteVector32(), decoded.preimage)
-        assertEquals(expectedReceived, decoded.received)
+        assertIs<LegacyPayToOpenIncomingPayment>(decoded)
+        assertEquals(expectedPreimage.byteVector32(), decoded.paymentPreimage)
+
+        val firstPart = decoded.parts[0]
+        assertIs<LegacyPayToOpenIncomingPayment.Part.OnChain>(firstPart)
+        assertEquals(expectedChannelId, firstPart.channelId)
+        assertEquals(7_000_000.msat, firstPart.amountReceived)
+
+        assertEquals(1658246347319, decoded.completedAt)
     }
 
     @Test
