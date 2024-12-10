@@ -526,7 +526,7 @@ struct ValidateView: View {
 			CurrencyConverterView(
 				initialAmount: currentAmount(),
 				didChange: currencyConverterAmountChanged,
-				didClose: {}
+				didClose: nil
 			)
 			
 		case .PaymentRequestedView(let invoice):

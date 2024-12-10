@@ -74,16 +74,10 @@ struct CurrencyConverterView: View {
 	// MARK: Init
 	// --------------------------------------------------
 	
-	init() {
-		self.initialAmount = nil
-		self.didChange = nil
-		self.didClose = nil
-	}
-	
 	init(
-		initialAmount: CurrencyAmount?,
-		didChange: @escaping (CurrencyAmount?) -> Void,
-		didClose: @escaping () -> Void
+		initialAmount: CurrencyAmount? = nil,
+		didChange: ((CurrencyAmount?) -> Void)? = nil,
+		didClose: (() -> Void)? = nil
 	) {
 		self.initialAmount = initialAmount
 		self.didChange = didChange
