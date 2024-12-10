@@ -27,7 +27,7 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
  *
  * This means that the following instances are recycled (continue existing in memory):
  * - PhoenixManager.shared
- * - XpcManager.shared
+ * - XPC.shared
  */
 class NotificationService: UNNotificationServiceExtension {
 
@@ -175,9 +175,11 @@ class NotificationService: UNNotificationServiceExtension {
 		if !xpcStarted && !srvExtDone {
 			xpcStarted = true
 			
-			XpcManager.shared.register {[weak self] in
-				self?.didReceiveXpcMessage()
-			}
+			XPC.shared.receivedMessagePublisher.sink {[weak self](msg: XpcMessage) in
+				self?.didReceiveXpcMessage(msg)
+			}.store(in: &cancellables)
+			
+			XPC.shared.resume()
 		}
 	}
 	
@@ -188,33 +190,36 @@ class NotificationService: UNNotificationServiceExtension {
 		if xpcStarted {
 			xpcStarted = false
 			
-			XpcManager.shared.unregister()
+			XPC.shared.suspend()
 		}
 	}
 	
-	private func didReceiveXpcMessage() {
+	private func didReceiveXpcMessage(_ msg: XpcMessage) {
 		log.trace("didReceiveXpcMessage()")
 		assertMainThread()
 		
-		// This means the main phoenix app is running.
-		
-		if isConnectedToPeer {
-		
-			// But we're already connected to the peer, and processing the payment.
-			// So we're going to continue working on the payment,
-			// and the main app will have to wait for us to finish before connecting to the peer itself.
+		if msg == .available {
 			
-			log.debug("isConnectedToPeer is true => continue processing incoming payment")
+			// The main phoenix app is running.
 			
-		} else {
-			
-			// Since we're not connected yet, we'll just go ahead and allow the main app to handle the payment.
-			//
-			// And we don't have to wait for the main app to finish handling the payment.
-			// Because whatever we emit from this app extension won't be displayed to the user.
-			// That is, the modified push content we emit isn't actually shown to the user.
-			
-			displayPushNotification()
+			if isConnectedToPeer {
+				
+				// But we're already connected to the peer, and processing the payment.
+				// So we're going to continue working on the payment,
+				// and the main app will have to wait for us to finish before connecting to the peer itself.
+				
+				log.debug("isConnectedToPeer is true => continue processing incoming payment")
+				
+			} else {
+				
+				// Since we're not connected yet, we'll just go ahead and allow the main app to handle the payment.
+				//
+				// And we don't have to wait for the main app to finish handling the payment.
+				// Because whatever we emit from this app extension won't be displayed to the user.
+				// That is, the modified push content we emit isn't actually shown to the user.
+				
+				displayPushNotification()
+			}
 		}
 	}
 	

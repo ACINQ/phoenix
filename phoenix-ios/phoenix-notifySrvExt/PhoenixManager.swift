@@ -29,7 +29,7 @@ typealias PaymentListener = (Lightning_kmpIncomingPayment) -> Void
  *
  * This means that the following instances are recycled (continue existing in memory):
  * - PhoenixManager.shared
- * - XpcManager.shared
+ * - XPC.shared
  *
  * ---------------------
  * # Architecture notes:
