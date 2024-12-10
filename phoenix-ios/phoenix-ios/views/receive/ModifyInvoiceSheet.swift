@@ -10,12 +10,12 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct ModifyInvoiceSheet: View {
 
-	@ObservedObject var mvi: MVIState<Receive.Model, Receive.Intent>
-
 	@Binding var savedAmount: CurrencyAmount?
-	let openCurrencyConverter: () -> Void
-	
 	let initialAmount: Lightning_kmpMilliSatoshi?
+	
+	let openCurrencyConverter: () -> Void
+	let didSave: (Lightning_kmpMilliSatoshi?, String) -> Void
+	
 	@State var desc: String
 	
 	@State var currency: Currency = Currency.bitcoin(.sat)
@@ -26,8 +26,6 @@ struct ModifyInvoiceSheet: View {
 	@State var parsedAmount: Result<Double, TextFieldCurrencyStylerError> = Result.failure(.emptyInput)
 	
 	@State var altAmount: String = ""
-	@State var isInvalidAmount: Bool = false
-	@State var isEmptyAmount: Bool = false
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var smartModalState: SmartModalState
@@ -41,21 +39,21 @@ struct ModifyInvoiceSheet: View {
 	@State var textHeight: CGFloat? = nil
 
 	init(
-		mvi: MVIState<Receive.Model, Receive.Intent>,
 		savedAmount: Binding<CurrencyAmount?>,
 		amount: Lightning_kmpMilliSatoshi?,
 		desc: String,
-		openCurrencyConverter: @escaping () -> Void
+		openCurrencyConverter: @escaping () -> Void,
+		didSave: @escaping (Lightning_kmpMilliSatoshi?, String) -> Void
 	) {
-		self.mvi = mvi
 		self._savedAmount = savedAmount
 		self.initialAmount = amount
 		self._desc = State<String>(initialValue: desc)
 		self.openCurrencyConverter = openCurrencyConverter
+		self.didSave = didSave
 	}
 	
 	// --------------------------------------------------
-	// MARK: ViewBuilders
+	// MARK: View Builders
 	// --------------------------------------------------
 	
 	@ViewBuilder
@@ -74,7 +72,7 @@ struct ModifyInvoiceSheet: View {
 				)
 				.keyboardType(.decimalPad)
 				.disableAutocorrection(true)
-				.foregroundColor(isInvalidAmount ? Color.appNegative : Color.primaryForeground)
+				.foregroundColor(parsedAmount.isError ? Color.appNegative : Color.primaryForeground)
 				.read(textHeightReader)
 				.padding([.top, .bottom], 8)
 				.padding(.leading, 16)
@@ -98,7 +96,7 @@ struct ModifyInvoiceSheet: View {
 
 			Text(altAmount)
 				.font(.caption)
-				.foregroundColor(isInvalidAmount && !isEmptyAmount ? Color.appNegative : .secondary)
+				.foregroundColor(parsedAmount.isError && !isEmptyAmount ? Color.appNegative : .secondary)
 				.padding(.top, 0)
 				.padding(.leading, 16)
 				.padding(.bottom, 4)
@@ -132,7 +130,7 @@ struct ModifyInvoiceSheet: View {
 					didTapSaveButton()
 				}
 				.font(.title2)
-				.disabled(isInvalidAmount && !isEmptyAmount)
+				.disabled(parsedAmount.isError && !isEmptyAmount)
 			}
 			.padding(.bottom)
 
@@ -178,8 +176,24 @@ struct ModifyInvoiceSheet: View {
 	}
 	
 	// --------------------------------------------------
-	// MARK: UI Content Helpers
+	// MARK: View Helpers
 	// --------------------------------------------------
+	
+	var isEmptyAmount: Bool {
+		
+		switch parsedAmount {
+		case .success(let amt):
+			return false
+			
+		case .failure(let reason):
+			switch reason {
+			case .emptyInput:
+				return true
+			case .invalidInput:
+				return false
+			}
+		}
+	}
 	
 	func currencyStyler() -> TextFieldCurrencyStyler {
 		return TextFieldCurrencyStyler(
@@ -311,8 +325,6 @@ struct ModifyInvoiceSheet: View {
 		
 		switch parsedAmount {
 		case .failure(let error):
-			isInvalidAmount = true
-			isEmptyAmount = error == .emptyInput
 			
 			switch error {
 			case .emptyInput:
@@ -322,8 +334,6 @@ struct ModifyInvoiceSheet: View {
 			}
 			
 		case .success(let amt):
-			isInvalidAmount = false
-			isEmptyAmount = false
 			
 			var msat: Int64? = nil
 			switch currency {
@@ -406,15 +416,10 @@ struct ModifyInvoiceSheet: View {
 			savedAmount = nil
 		}
 		
-		smartModalState.close {
-			
-			mvi.intent(Receive.IntentAsk(
-				amount: msat,
-				desc: trimmedDesc,
-				expirySeconds: Prefs.shared.invoiceExpirationSeconds
-			))
-		}
-	}	
+		smartModalState.close(animationCompletion: {
+			didSave(msat, trimmedDesc)
+		})
+	}
 }
 
 enum CurrencyPickerOption: Hashable, Identifiable, CustomStringConvertible {

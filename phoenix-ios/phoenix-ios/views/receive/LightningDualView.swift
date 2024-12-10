@@ -750,6 +750,16 @@ struct LightningDualView: View {
 		)
 	}
 	
+	func modifyInvoiceSheetDidSave(_ msat: Lightning_kmpMilliSatoshi?, _ desc: String) {
+		log.trace("modifyInvoiceSheetDidSave()")
+		
+		mvi.intent(Receive.IntentAsk(
+			amount: msat,
+			desc: desc,
+			expirySeconds: Prefs.shared.invoiceExpirationSeconds
+		))
+	}
+	
 	func currencyConverterDidChange(_ amount: CurrencyAmount?) {
 		log.trace("currencyConverterDidChange()")
 		
@@ -769,11 +779,11 @@ struct LightningDualView: View {
 		smartModalState.display(dismissable: true) {
 			
 			ModifyInvoiceSheet(
-				mvi: mvi,
 				savedAmount: $modificationAmount,
 				amount: amount,
 				desc: desc ?? "",
-				openCurrencyConverter: openCurrencyConverter
+				openCurrencyConverter: openCurrencyConverter,
+				didSave: modifyInvoiceSheetDidSave
 			)
 		}
 	}
@@ -902,11 +912,11 @@ struct LightningDualView: View {
 			smartModalState.display(dismissable: true) {
 				
 				ModifyInvoiceSheet(
-					mvi: mvi,
 					savedAmount: $modificationAmount,
 					amount: model.amount,
 					desc: model.desc ?? "",
-					openCurrencyConverter: openCurrencyConverter
+					openCurrencyConverter: openCurrencyConverter,
+					didSave: modifyInvoiceSheetDidSave
 				)
 			}
 		}
