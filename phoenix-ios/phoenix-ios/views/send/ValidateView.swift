@@ -2111,21 +2111,7 @@ struct ValidateView: View {
 			currency = newAmt.currency
 			currencyPickerChoice = newAmt.currency.shortName
 
-			let formattedAmt: FormattedAmount
-			switch newAmt.currency {
-			case .bitcoin(let bitcoinUnit):
-				formattedAmt = Utils.formatBitcoin(
-					amount: newAmt.amount,
-					bitcoinUnit: bitcoinUnit,
-					policy: .showMsatsIfNonZero
-				)
-			case .fiat(let fiatCurrency):
-				formattedAmt = Utils.formatFiat(
-					amount: newAmt.amount,
-					fiatCurrency: fiatCurrency
-				)
-			}
-
+			let formattedAmt = Utils.format(currencyAmount: newAmt, policy: .showMsatsIfNonZero)
 			parsedAmount = Result.success(newAmt.amount)
 			amount = formattedAmt.digits
 

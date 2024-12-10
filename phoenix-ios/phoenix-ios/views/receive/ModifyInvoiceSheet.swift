@@ -232,33 +232,19 @@ struct ModifyInvoiceSheet: View {
 	func onAppear() -> Void {
 		log.trace("onAppear()")
 		
-		if let savedAmount = savedAmount {
+		if let savedAmount {
 			
 			// We have a saved amount from a previous modification.
 			// That is, from using the ModifyInvoiceSheet earlier, or from using the CurrencyConverter.
 			// So we display this amount as-is.
 			
-			let formattedAmt: FormattedAmount
-			switch savedAmount.currency {
-				case .bitcoin(let bitcoinUnit):
-					formattedAmt = Utils.formatBitcoin(
-						amount: savedAmount.amount,
-						bitcoinUnit: bitcoinUnit,
-						policy: .showMsatsIfNonZero
-					)
-				
-				case .fiat(let fiatCurrency):
-					formattedAmt = Utils.formatFiat(
-						amount: savedAmount.amount,
-						fiatCurrency: fiatCurrency
-					)
-			}
+			let formattedAmt = Utils.format(currencyAmount: savedAmount, policy: .showMsatsIfNonZero)
 			
 			parsedAmount = Result.success(formattedAmt.amount)
 			amount = formattedAmt.digits
 			currency = savedAmount.currency
 			
-		} else if let initialAmount = initialAmount {
+		} else if let initialAmount {
 			
 			// Since there's an amount in bitcoin, we use the user's preferred bitcoin unit.
 			// We try to use the user's preferred currency.
