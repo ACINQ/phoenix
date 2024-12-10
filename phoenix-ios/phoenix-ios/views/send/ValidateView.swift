@@ -8,14 +8,6 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-enum Problem: Error {
-	case emptyInput
-	case invalidInput
-	case amountExceedsBalance
-	case finalAmountExceedsBalance // including minerFee
-	case amountOutOfRange
-}
-
 struct ValidateView: View {
 	
 	enum NavLinkTag: Hashable, CustomStringConvertible {
@@ -45,6 +37,14 @@ struct ValidateView: View {
 	@State var parsedAmount: Result<Double, TextFieldCurrencyStylerError> = Result.failure(.emptyInput)
 	
 	@State var altAmount: String = ""
+	
+	enum Problem: Error {
+		case emptyInput
+		case invalidInput
+		case amountExceedsBalance
+		case finalAmountExceedsBalance // including minerFee
+		case amountOutOfRange
+	}
 	@State var problem: Problem? = nil
 	
 	@State var paymentInProgress: Bool = false
