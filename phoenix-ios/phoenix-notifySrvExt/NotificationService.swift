@@ -234,14 +234,30 @@ class NotificationService: UNNotificationServiceExtension {
 		if !phoenixStarted && !srvExtDone {
 			phoenixStarted = true
 			
-			PhoenixManager.shared.register(
-				connectionsListener: {[weak self](connections: Connections) in
-					self?.connectionsChanged(connections)
-				},
-				paymentListener: {[weak self](payment: Lightning_kmpIncomingPayment) in
-					self?.didReceivePayment(payment)
+			let newBusiness = PhoenixManager.shared.setupBusiness()
+			
+			newBusiness.connectionsManager.connectionsPublisher().sink {
+				[weak self](connections: Connections) in
+					
+				self?.connectionsChanged(connections)
+			}
+			.store(in: &cancellables)
+
+			let pushReceivedAt = Date()
+			newBusiness.paymentsManager.lastIncomingPaymentPublisher().sink {
+				[weak self](payment: Lightning_kmpIncomingPayment) in
+				
+				guard
+					let paymentReceivedAt = payment.received?.receivedAtDate,
+					paymentReceivedAt > pushReceivedAt
+				else {
+					// Ignoring - this is the most recently received incomingPayment, but not a new one
+					return
 				}
-			)
+		
+				self?.didReceivePayment(payment)
+			}
+			.store(in: &cancellables)
 		}
 	}
 	
@@ -252,7 +268,7 @@ class NotificationService: UNNotificationServiceExtension {
 		if phoenixStarted {
 			phoenixStarted = false
 			
-			PhoenixManager.shared.unregister()
+			PhoenixManager.shared.teardownBusiness()
 		}
 	}
 	
@@ -325,10 +341,7 @@ class NotificationService: UNNotificationServiceExtension {
 		}
 		srvExtDone = true
 		
-		guard
-			let contentHandler = contentHandler,
-			let bestAttemptContent = bestAttemptContent
-		else {
+		guard let contentHandler, let bestAttemptContent else {
 			return
 		}
 		
@@ -341,6 +354,18 @@ class NotificationService: UNNotificationServiceExtension {
 		stopXpc()
 		stopPhoenix()
 		
+		updateBestAttemptContent()
+		contentHandler(bestAttemptContent)
+	}
+	
+	private func updateBestAttemptContent() {
+		log.trace("updateBestAttemptContent()")
+		assertMainThread()
+		
+		guard let bestAttemptContent else {
+			return
+		}
+		
 		if receivedPayments.isEmpty {
 			
 			if pushNotificationReason() == .pendingSettlement {
@@ -352,30 +377,18 @@ class NotificationService: UNNotificationServiceExtension {
 			
 		} else { // received 1 or more payments
 			
-			let bitcoinUnit = GroupPrefs.shared.bitcoinUnit
-			let fiatCurrency = GroupPrefs.shared.fiatCurrency
-			let exchangeRate = PhoenixManager.shared.exchangeRate(fiatCurrency: fiatCurrency)
-			
 			var msat: Int64 = 0
 			for payment in receivedPayments {
 				msat += payment.amount.msat
 			}
 			
-			let bitcoinAmt = Utils.formatBitcoin(msat: msat, bitcoinUnit: bitcoinUnit)
-			
-			var fiatAmt: FormattedAmount? = nil
-			if let exchangeRate {
-				fiatAmt = Utils.formatFiat(msat: msat, exchangeRate: exchangeRate)
-			}
-			
-			var amountString = bitcoinAmt.string
-			if let fiatAmt {
-				amountString += " (≈\(fiatAmt.string))"
-			}
+			let amountString = formatAmount(msat: msat)
 			
 			if receivedPayments.count == 1 {
-				bestAttemptContent.title =
-					NSLocalizedString("Received payment", comment: "Push notification title")
+				bestAttemptContent.title = String(
+					localized: "Received payment",
+					comment: "Push notification title"
+				)
 				
 				if !GroupPrefs.shared.discreetNotifications {
 					let paymentInfo = WalletPaymentInfo(
@@ -392,8 +405,10 @@ class NotificationService: UNNotificationServiceExtension {
 				}
 				
 			} else {
-				bestAttemptContent.title =
-					NSLocalizedString("Received multiple payments", comment: "Push notification title")
+				bestAttemptContent.title = String(
+					localized: "Received multiple payments",
+					comment: "Push notification title"
+				)
 				
 				if !GroupPrefs.shared.discreetNotifications {
 					bestAttemptContent.body = amountString
@@ -408,7 +423,22 @@ class NotificationService: UNNotificationServiceExtension {
 			GroupPrefs.shared.badgeCount += receivedPayments.count
 			bestAttemptContent.badge = NSNumber(value: GroupPrefs.shared.badgeCount)
 		}
+	}
+	
+	private func formatAmount(msat: Int64) -> String {
 		
-		contentHandler(bestAttemptContent)
+		let bitcoinUnit = GroupPrefs.shared.bitcoinUnit
+		let fiatCurrency = GroupPrefs.shared.fiatCurrency
+		let exchangeRate = PhoenixManager.shared.exchangeRate(fiatCurrency: fiatCurrency)
+		
+		let bitcoinAmt = Utils.formatBitcoin(msat: msat, bitcoinUnit: bitcoinUnit)
+		var amountString = bitcoinAmt.string
+		
+		if let exchangeRate {
+			let fiatAmt = Utils.formatFiat(msat: msat, exchangeRate: exchangeRate)
+			amountString += " (≈\(fiatAmt.string))"
+		}
+		
+		return amountString
 	}
 }

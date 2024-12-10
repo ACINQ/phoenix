@@ -48,9 +48,6 @@ typealias PaymentListener = (Lightning_kmpIncomingPayment) -> Void
 class PhoenixManager {
 	
 	public static let shared = PhoenixManager()
-
-	private var connectionsListener: ConnectionsListener? = nil
-	private var paymentListener: PaymentListener? = nil
 	
 	private var business: PhoenixBusiness? = nil
 	private var oldBusiness: PhoenixBusiness? = nil
@@ -66,46 +63,13 @@ class PhoenixManager {
 	// MARK: Public Functions
 	// --------------------------------------------------
 	
-	public func register(
-		connectionsListener: @escaping ConnectionsListener,
-		paymentListener: @escaping PaymentListener
-	) {
-		log.trace("register(::)")
-		assertMainThread()
-
-		self.connectionsListener = connectionsListener
-		self.paymentListener = paymentListener
-		
-		setupBusiness()
-		unlock()
-	}
-	
-	public func unregister() {
-		log.trace("unregister()")
-		assertMainThread()
-
-		self.connectionsListener = nil
-		self.paymentListener = nil
-		
-		teardownBusiness()
-	}
-	
-	public func exchangeRate(fiatCurrency: FiatCurrency) -> ExchangeRate.BitcoinPriceRate? {
-		
-		return Utils.exchangeRate(for: fiatCurrency, fromRates: fiatExchangeRates)
-	}
-	
-	// --------------------------------------------------
-	// MARK: Business management
-	// --------------------------------------------------
-	
-	private func setupBusiness() {
+	public func setupBusiness() -> PhoenixBusiness {
 		log.trace("setupBusiness()")
 		assertMainThread()
-
-		guard business == nil else {
-			log.warning("ignoring: business != nil")
-			return
+		
+		if let currentBusiness = business {
+			log.warning("setupBusiness(): business already setup")
+			return currentBusiness
 		}
 
 		let newBusiness = PhoenixBusiness(ctx: PlatformContext.default)
@@ -135,29 +99,6 @@ class PhoenixManager {
 
 		newBusiness.currencyManager.refreshAll(targets: [primaryFiatCurrency], force: false)
 
-		newBusiness.connectionsManager.connectionsPublisher().sink {
-			[weak self](connections: Connections) in
-
-			self?.connectionsChanged(connections)
-		}
-		.store(in: &cancellables)
-
-		let pushReceivedAt = Date()
-		newBusiness.paymentsManager.lastIncomingPaymentPublisher().sink {
-			[weak self](payment: Lightning_kmpIncomingPayment) in
-
-			guard
-				let paymentReceivedAt = payment.received?.receivedAtDate,
-				paymentReceivedAt > pushReceivedAt
-			else {
-				// Ignoring - this is the most recently received incomingPayment, but not a new one
-				return
-			}
-
-			self?.didReceivePayment(payment)
-		}
-		.store(in: &cancellables)
-
 		newBusiness.currencyManager.ratesPubliser().sink {
 			[weak self](rates: [ExchangeRate]) in
 
@@ -168,14 +109,17 @@ class PhoenixManager {
 
 		// Setup complete
 		business = newBusiness
+		
+		startAsyncUnlock()
+		return newBusiness
 	}
 
-	private func teardownBusiness() {
+	public func teardownBusiness() {
 		log.trace("teardownBusiness()")
 		assertMainThread()
 
 		guard let currentBusiness = business else {
-			log.warning("ignoring: business == nil")
+			log.warning("teardownBusiness(): business already nil")
 			return
 		}
 
@@ -204,17 +148,22 @@ class PhoenixManager {
 		// and the oldBusiness doesn't get properly cleaned up.
 		oldConnectionsChanged(currentBusiness.connectionsManager.currentValue)
 	}
+	
+	public func exchangeRate(fiatCurrency: FiatCurrency) -> ExchangeRate.BitcoinPriceRate? {
+		
+		return Utils.exchangeRate(for: fiatCurrency, fromRates: fiatExchangeRates)
+	}
 
 	// --------------------------------------------------
 	// MARK: Flow
 	// --------------------------------------------------
 
-	private func unlock() {
-		log.trace("unlock()")
+	private func startAsyncUnlock() {
+		log.trace("startAsyncUnlock()")
 		
 		let connectWithRecoveryPhrase = {(recoveryPhrase: RecoveryPhrase?) in
 			DispatchQueue.main.async {
-				self.connect(recoveryPhrase: recoveryPhrase)
+				self.connect(recoveryPhrase)
 			}
 		}
 		
@@ -251,20 +200,20 @@ class PhoenixManager {
 		}
 	}
 	
-	private func connect(recoveryPhrase: RecoveryPhrase?) {
-		log.trace("connect(recoveryPhrase:)")
+	private func connect(_ recoveryPhrase: RecoveryPhrase?) {
+		log.trace("connect()")
 		assertMainThread()
 		
 		guard let recoveryPhrase = recoveryPhrase else {
-			log.warning("ignoring: recoveryPhrase == nil")
+			log.warning("connect(): ignoring: recoveryPhrase == nil")
 			return
 		}
 		guard let language = recoveryPhrase.language else {
-			log.warning("ignoring: recoveryPhrase.language == nil")
+			log.warning("connect(): ignoring: recoveryPhrase.language == nil")
 			return
 		}
 		guard let business = business else {
-			log.warning("ignoring: business == nil")
+			log.warning("connect(): ignoring: business == nil")
 			return
 		}
 
@@ -274,28 +223,6 @@ class PhoenixManager {
 			passphrase: ""
 		)
 		business.walletManager.loadWallet(seed: seed)
-	}
-
-	// --------------------------------------------------
-	// MARK: Notifications
-	// --------------------------------------------------
-
-	private func connectionsChanged(_ connections: Connections) {
-		log.trace("connectionsChanged(_)")
-		assertMainThread()
-
-		if let listener = self.connectionsListener {
-			listener(connections)
-		}
-	}
-	
-	private func didReceivePayment(_ payment: Lightning_kmpIncomingPayment) {
-		log.trace("didReceivePayment(_)")
-		assertMainThread()
-
-		if let listener = self.paymentListener {
-			listener(payment)
-		}
 	}
 
 	// --------------------------------------------------
