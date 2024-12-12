@@ -156,7 +156,7 @@ class PeerManager(
             val startupParams = configurationManager.startupParams.filterNotNull().first()
 
             val walletParams = WalletParams(
-                trampolineNode = NodeParamsManager.trampolineNodeUri,
+                trampolineNode = if (startupParams.isTorEnabled) NodeParamsManager.trampolineNodeOnionUri else NodeParamsManager.trampolineNodeUri,
                 trampolineFees = listOf(
                     TrampolineFees(
                         feeBase = 4.sat,

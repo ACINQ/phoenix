@@ -10,6 +10,7 @@ import fr.acinq.phoenix.data.ElectrumConfig
 import fr.acinq.lightning.logging.debug
 import fr.acinq.lightning.logging.error
 import fr.acinq.lightning.logging.info
+import fr.acinq.phoenix.utils.extensions.isOnion
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -56,7 +57,6 @@ class AppConnectionsDaemon(
         val walletIsAvailable: Boolean = false,
         val internetIsAvailable: Boolean = false,
         val torIsEnabled: Boolean = false,
-        val torIsAvailable: Boolean = false,
 
         /**
          * Under normal circumstances, the connections are automatically managed based on whether
@@ -92,11 +92,7 @@ class AppConnectionsDaemon(
         /** If a configuration value changes, this value can be incremented to force a disconnection. Only used for Electrum. */
         val configVersion: Int = 0
     ) {
-        val canConnect get() = if (walletIsAvailable && internetIsAvailable && disconnectCount <= 0) {
-            if (torIsEnabled) torIsAvailable else true
-        } else {
-            false
-        }
+        val canConnect get() = walletIsAvailable && internetIsAvailable && disconnectCount <= 0
 
         fun incrementDisconnectCount(): TrafficControl {
             val safeInc = disconnectCount.let { if (it == Int.MAX_VALUE) it else it + 1 }
@@ -109,11 +105,7 @@ class AppConnectionsDaemon(
         }
 
         override fun toString(): String {
-            val details = when {
-                torIsEnabled -> "should_connect=${if (disconnectCount <= 0) "YES" else "NO ($disconnectCount)" } internet=${if (internetIsAvailable) "OK" else "NOK"} tor=${if (torIsAvailable) "OK" else "NOK" }"
-                else -> "should_connect=${if (disconnectCount <= 0) "YES" else "NO ($disconnectCount)" } internet=${if (internetIsAvailable) "OK" else "NOK"}"
-            }
-            return "can_connect=${canConnect.toString().uppercase()} ($details)"
+            return "can_connect=${canConnect.toString().uppercase()} (should_connect=${if (disconnectCount <= 0) "YES" else "NO ($disconnectCount)" } internet=${if (internetIsAvailable) "OK" else "NOK"} tor=${if (torIsEnabled) "YES" else "NO"})"
         }
     }
 
@@ -218,26 +210,19 @@ class AppConnectionsDaemon(
                         ) { connectionAttempt ->
                             peer.socketBuilder = tcpSocketBuilder()
                             try {
-                                val connectTimeout = when {
-                                    it.torIsEnabled && connectionAttempt <= 6 -> 15.seconds
-                                    it.torIsEnabled -> 30.seconds
-                                    connectionAttempt <= 1 -> 1.seconds
-                                    connectionAttempt <= 3 -> 2.seconds
-                                    connectionAttempt <= 6 -> 4.seconds
-                                    connectionAttempt <= 10 -> 7.seconds
-                                    else -> 10.seconds
-                                }
-                                val handshakeTimeout = when {
-                                    it.torIsEnabled && connectionAttempt <= 6 -> 20.seconds
-                                    it.torIsEnabled -> 40.seconds
-                                    connectionAttempt <= 1 -> 2.seconds
-                                    connectionAttempt <= 3 -> 4.seconds
-                                    connectionAttempt <= 6 -> 7.seconds
-                                    connectionAttempt <= 10 -> 10.seconds
-                                    else -> 15.seconds
-                                }
+                                val (connectTimeout, handshakeTimeout) = when {
+                                    connectionAttempt <= 1 -> 1.seconds to 2.seconds
+                                    connectionAttempt <= 3 -> 2.seconds to 4.seconds
+                                    connectionAttempt <= 6 -> 4.seconds to 7.seconds
+                                    connectionAttempt <= 10 -> 7.seconds to 10.seconds
+                                    else -> 10.seconds to 15.seconds
+                                }.run { if (it.torIsEnabled) first.times(3) to second.times(3) else this }
                                 logger.info { "calling Peer.connect with connect_timeout=$connectTimeout handshake_timeout=$handshakeTimeout" }
-                                peer.connect(connectTimeout = connectTimeout, handshakeTimeout = handshakeTimeout)
+                                if (it.torIsEnabled && !peer.walletParams.trampolineNode.isOnion) {
+                                    logger.error { "PEER CONNECTION ABORTED: MUST USE AN ONION ADDRESS" }
+                                } else {
+                                    peer.connect(connectTimeout = connectTimeout, handshakeTimeout = handshakeTimeout)
+                                }
                             } catch (e: Exception) {
                                 logger.error { "error when connecting to peer: ${e.message ?: e::class.simpleName}" }
                             }
@@ -278,7 +263,7 @@ class AppConnectionsDaemon(
                             val electrumServerAddress: ServerAddress? = configurationManager.electrumConfig.value?.let { electrumConfig ->
                                 when (electrumConfig) {
                                     is ElectrumConfig.Custom -> electrumConfig.server
-                                    is ElectrumConfig.Random -> configurationManager.randomElectrumServer()
+                                    is ElectrumConfig.Random -> configurationManager.randomElectrumServer(it.torIsEnabled)
                                 }
                             }
                             if (electrumServerAddress == null) {
@@ -294,7 +279,11 @@ class AppConnectionsDaemon(
                                         else -> 20.seconds
                                     }
                                     logger.info { "calling ElectrumClient.connect to server=$electrumServerAddress with handshake_timeout=$handshakeTimeout" }
-                                    electrumClient.connect(electrumServerAddress, tcpSocketBuilder(), timeout = handshakeTimeout)
+                                    if (it.torIsEnabled && !electrumServerAddress.isOnion) {
+                                        logger.error { "ELECTRUM CONNECTION ABORTED: MUST USE AN ONION ADDRESS" }
+                                    } else {
+                                        electrumClient.connect(electrumServerAddress, tcpSocketBuilder(), timeout = handshakeTimeout)
+                                    }
                                 } catch (e: Exception) {
                                     logger.error { "error when connecting to electrum: ${e.message ?: e::class.simpleName}"}
                                 }
