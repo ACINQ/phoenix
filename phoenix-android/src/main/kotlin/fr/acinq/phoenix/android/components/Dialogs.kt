@@ -64,8 +64,8 @@ fun Dialog(
     title: String? = null,
     properties: DialogProperties = DialogProperties(usePlatformDefaultWidth = false),
     isScrollable: Boolean = true,
-    buttonsTopMargin: Dp = 24.dp,
-    buttons: (@Composable RowScope.() -> Unit)? = { Button(onClick = onDismiss, text = stringResource(id = R.string.btn_ok), padding = PaddingValues(16.dp)) },
+    buttonsTopMargin: Dp = 20.dp,
+    buttons: (@Composable RowScope.() -> Unit)? = { Button(onClick = onDismiss, text = stringResource(id = R.string.btn_ok), padding = PaddingValues(16.dp), shape = RoundedCornerShape(16.dp)) },
     content: @Composable ColumnScope.() -> Unit,
 ) {
     androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss, properties = properties) {
@@ -79,10 +79,7 @@ fun Dialog(
             // buttons
             if (buttons != null) {
                 Spacer(Modifier.height(buttonsTopMargin))
-                Row(
-                    modifier = Modifier
-                        .align(Alignment.End)
-                ) {
+                Row(modifier = Modifier.align(Alignment.End).padding(8.dp)) {
                     buttons()
                 }
             }

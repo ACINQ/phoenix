@@ -90,7 +90,6 @@ fun HomeView(
     val isPowerSaverModeOn = noticesViewModel.isPowerSaverModeOn
     val fcmToken by internalData.getFcmToken.collectAsState(initial = "")
     val isFCMAvailable = remember { FCMHelper.isFCMAvailable(context) }
-    val torEnabledState = userPrefs.getIsTorEnabled.collectAsState(initial = null)
     val balanceDisplayMode by userPrefs.getHomeAmountDisplayMode.collectAsState(initial = HomeAmountDisplayMode.REDACTED)
 
     val connections by business.connectionsManager.connections.collectAsState()
@@ -228,7 +227,6 @@ fun HomeView(
                     connections = connections,
                     electrumBlockheight = electrumMessages?.blockHeight ?: 0,
                     inFlightPaymentsCount = inFlightPaymentsCount,
-                    isTorEnabled = torEnabledState.value,
                     onTorClick = onTorClick,
                     isFCMUnavailable = fcmToken == null || !isFCMAvailable,
                     isPowerSaverMode = isPowerSaverModeOn,

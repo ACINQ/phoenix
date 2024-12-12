@@ -393,8 +393,6 @@ fun TorWarning() {
                     Text(text = stringResource(id = R.string.receive_tor_warning_title), style = MaterialTheme.typography.h4)
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(text = stringResource(id = R.string.receive_tor_warning_dialog_content_1))
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(text = stringResource(id = R.string.receive_tor_warning_dialog_content_2))
                 }
             }
         }

@@ -85,7 +85,7 @@ import fr.acinq.phoenix.android.services.NodeServiceState
 import fr.acinq.phoenix.android.settings.AboutView
 import fr.acinq.phoenix.android.settings.AppAccessSettings
 import fr.acinq.phoenix.android.settings.DisplayPrefsView
-import fr.acinq.phoenix.android.settings.ElectrumView
+import fr.acinq.phoenix.android.settings.electrum.ElectrumView
 import fr.acinq.phoenix.android.settings.ExperimentalView
 import fr.acinq.phoenix.android.settings.ForceCloseView
 import fr.acinq.phoenix.android.settings.LogsView
@@ -370,7 +370,7 @@ fun AppView(
                         ElectrumView()
                     }
                     composable(Screen.TorConfig.route) {
-                        TorConfigView()
+                        TorConfigView(appViewModel = appVM, onBackClick = { navController.popBackStack() }, onBusinessTeardown = { navController.popToHome() })
                     }
                     composable(Screen.Channels.route) {
                         ChannelsView(

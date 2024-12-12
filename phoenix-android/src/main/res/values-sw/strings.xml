@@ -293,16 +293,16 @@
 
     <!-- home: balance section & misc -->
 
-    <string name="home__balance_loading">Inapakia…</string>
-    <string name="home__onchain_incoming">+%1$s</string>
+    <string name="home_balance_loading">Inapakia…</string>
+    <string name="home_onchain_incoming">+%1$s</string>
 
-    <string name="home__faq_button">Maswali Yanayoulizwa Mara Kwa Mara (FAQ)</string>
-    <string name="home__payments_none">Tumia vitufe vya Kupokea na Kutuma vilivyo chini ya skrini hii ili kuanza!</string>
-    <string name="home__payments_more_button">Onyesha malipo yote…</string>
-    <string name="home__connection__electrum_late">Electrum imechelewa</string>
-    <string name="home__connection__bad_cert">Cheti cha Electrum</string>
-    <string name="home__connection__connecting">Inajiunganisha…</string>
-    <string name="home__connection__tor_active">Tor</string>
+    <string name="home_faq_button">Maswali Yanayoulizwa Mara Kwa Mara (FAQ)</string>
+    <string name="home_payments_none">Tumia vitufe vya Kupokea na Kutuma vilivyo chini ya skrini hii ili kuanza!</string>
+    <string name="home_payments_more_button">Onyesha malipo yote…</string>
+    <string name="home_connection_electrum_late">Electrum imechelewa</string>
+    <string name="home_connection_bad_cert">Cheti cha Electrum</string>
+    <string name="home_connection_connecting">Inajiunganisha…</string>
+    <string name="home_connection_tor_active">Tor</string>
     <string name="home_request_liquidity">Omba fedha</string>
     <string name="home_inflight_payments">Kwa sasa una malipo %1$d yanayosubiri kwenye pochi yako.\n\nHifadhi programu wazi ili kuhakikisha malipo haya yanaweza kutekelezwa vizuri bila matatizo.</string>
 
@@ -613,27 +613,17 @@
     <!-- settings: Tor -->
 
     <string name="tor_settings_title">Tor</string>
-    <string name="tor_settings_unknown">Inakagua mapendeleo…</string>
-    <string name="tor_settings_enabled">Tor imewezeshwa</string>
-    <string name="tor_settings_disabled">Tor haijawezeshwa</string>
-    <string name="tor_settings_state_unknown">Kipande cha Tor hakijaanza bado.</string>
-    <string name="tor_settings_state_closed">Kipande cha Tor kimefungwa.</string>
-    <string name="tor_settings_state_starting">Kuanza kwa kipande cha Tor…</string>
-    <string name="tor_settings_state_started">Tor iko mtandaoni</string>
 
     <!-- home: connectivity dialog -->
 
     <string name="conndialog_title">Hali ya Muunganisho</string>
     <string name="conndialog_summary_not_ok">Programu haitafanya kazi ipasavyo hadi muunganisho wote utakapowekwa.</string>
     <string name="conndialog_network">Kifaa chako hakina muunganisho wa Intaneti. Programu haitafanya kazi vizuri.\n\nTafadhali angalia mipangilio ya kifaa chako.</string>
-    <string name="conndialog_internet">Intaneti</string>
     <string name="conndialog_electrum">Electrum</string>
-    <string name="conndialog_tor">Tor</string>
     <string name="conndialog_lightning">Mwenzi</string>
     <string name="conndialog_accessibility_desc">Simamia muunganisho kwa %1$s</string>
     <string name="conndialog_connecting">Kuunganisha…</string>
     <string name="conndialog_connected">Imepangwa</string>
-    <string name="conndialog_connected_electrum_behind">Seva ya Electrum inachelewa (block $1$d)</string>
     <string name="conndialog_closed">Imetenganishwa</string>
     <string name="conndialog_closed_bad_cert">Cheti kibaya</string>
 

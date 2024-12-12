@@ -92,7 +92,6 @@
     <string name="home_background_restriction_title">Hintergrundverarbeitung eingeschränkt</string>
     <string name="home_background_restriction_body_1">Phoenix kann keine Zahlungen empfangen, wenn es im Hintergrund läuft oder geschlossen ist.</string>
     <string name="home_background_restriction_body_2">Dies geschieht, weil:</string>
-    <string name="home_background_restriction_tor">Tor ist aktiviert</string>
     <string name="home_background_restriction_powersaver">Das Gerät ist im Energiesparmodus</string>
     <string name="home_background_restriction_fcm">FCM-Benachrichtigungen nicht verfügbar</string>
     <string name="home_background_restriction_fcm_details">Wenn Sie GrapheneOS oder CalyxOS verwenden, installieren Sie Google Play Services, um FCM-Benachrichtigungen zu erhalten. Lesen Sie die FAQ für Hilfe.</string>
@@ -278,12 +277,6 @@
     <string name="lnurl_withdraw_success">Der Antrag auf Auszahlung wurde an <b>%1$s</b> übermittelt.\n\nEs kann einige Zeit dauern, bis das Guthaben überwiesen wird. Bitte lassen Sie die App in der Zwischenzeit geöffnet.</string>
 
     <!-- Tor -->
-
-    <string name="tor_settings_subtitle">Phoenix kann Tor verwenden, um Ihre IP vor den anderen Knoten im Lightning Netzwerk und den Electrum Servern zu schützen.</string>
-
-    <string name="tor_confirm_dialog_title">Tor aktivieren?</string>
-    <string name="tor_confirm_dialog_details_1">Tor ist langsam und wird die Leistung Ihrer Zahlungen beeinträchtigen.</string>
-    <string name="tor_confirm_dialog_details_2">Speziell werden Sie <b>keine Zahlungen empfangen können</b>, wenn Phoenix im Hintergrund läuft oder geschlossen ist.</string>
 
     <!-- about -->
 

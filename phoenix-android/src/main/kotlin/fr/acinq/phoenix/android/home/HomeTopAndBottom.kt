@@ -25,6 +25,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,11 +49,13 @@ import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.VSeparator
 import fr.acinq.phoenix.android.components.openLink
+import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.extensions.isBadCertificate
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.android.utils.warningColor
 import fr.acinq.phoenix.managers.Connections
+import fr.acinq.phoenix.utils.extensions.isOnion
 
 @Composable
 fun TopBar(
@@ -61,7 +64,6 @@ fun TopBar(
     connections: Connections,
     electrumBlockheight: Int,
     onTorClick: () -> Unit,
-    isTorEnabled: Boolean?,
     isFCMUnavailable: Boolean,
     isPowerSaverMode: Boolean,
     inFlightPaymentsCount: Int,
@@ -82,7 +84,6 @@ fun TopBar(
             connections = connections,
             electrumBlockheight = electrumBlockheight,
             onTorClick = onTorClick,
-            isTorEnabled = isTorEnabled,
         )
 
         if (inFlightPaymentsCount > 0) {
@@ -91,7 +92,6 @@ fun TopBar(
 
         BackgroundRestrictionBadge(
             isFCMUnavailable = isFCMUnavailable,
-            isTorEnabled = isTorEnabled == true,
             isPowerSaverMode = isPowerSaverMode
         )
 
@@ -111,7 +111,7 @@ fun TopBar(
         }
 
         TopBadgeButton(
-            text = stringResource(R.string.home__faq_button),
+            text = stringResource(R.string.home_faq_button),
             icon = R.drawable.ic_help_circle,
             iconTint = MaterialTheme.colors.onSurface,
             onClick = { openLink(context, "https://phoenix.acinq.co/faq") },
@@ -125,8 +125,8 @@ private fun ConnectionBadge(
     connections: Connections,
     electrumBlockheight: Int,
     onTorClick: () -> Unit,
-    isTorEnabled: Boolean?,
 ) {
+    val torEnabled = userPrefs.getIsTorEnabled.collectAsState(initial = null)
     val connectionsTransition = rememberInfiniteTransition(label = "animateConnectionsBadge")
     val connectionsButtonAlpha by connectionsTransition.animateFloat(
         label = "animateConnectionsBadge",
@@ -138,36 +138,62 @@ private fun ConnectionBadge(
         ),
     )
 
-    if (connections.electrum !is Connection.ESTABLISHED || connections.peer !is Connection.ESTABLISHED) {
-        val electrumConnection = connections.electrum
-        val isBadElectrumCert = electrumConnection is Connection.CLOSED && electrumConnection.isBadCertificate()
-        TopBadgeButton(
-            text = stringResource(id = if (isBadElectrumCert) R.string.home__connection__bad_cert else R.string.home__connection__connecting),
-            icon = if (isBadElectrumCert) R.drawable.ic_alert_triangle else R.drawable.ic_connection_lost,
-            iconTint = if (isBadElectrumCert) negativeColor else MaterialTheme.colors.onSurface,
-            onClick = onConnectionsStateButtonClick,
-            modifier = Modifier.alpha(connectionsButtonAlpha)
-        )
-    } else if (electrumBlockheight < 795_000) {
-        // FIXME use a dynamic blockheight ^
-        TopBadgeButton(
-            text = stringResource(id = R.string.home__connection__electrum_late),
-            icon = R.drawable.ic_alert_triangle,
-            iconTint = warningColor,
-            onClick = onConnectionsStateButtonClick,
-            modifier = Modifier.alpha(connectionsButtonAlpha)
-        )
-    } else if (isTorEnabled == true) {
-        if (connections.tor is Connection.ESTABLISHED) {
+    when {
+        connections.electrum !is Connection.ESTABLISHED -> {
+            val electrumConnection = connections.electrum
+            val isBadElectrumCert = electrumConnection is Connection.CLOSED && electrumConnection.isBadCertificate()
+            val customElectrumServer by userPrefs.getElectrumServer.collectAsState(initial = null)
+
+            when {
+                isBadElectrumCert -> TopBadgeButton(
+                    text = stringResource(id = R.string.home_connection_bad_cert),
+                    icon = R.drawable.ic_alert_triangle,
+                    iconTint = negativeColor,
+                    onClick = onConnectionsStateButtonClick,
+                    modifier = Modifier.alpha(connectionsButtonAlpha)
+                )
+                torEnabled.value == true && customElectrumServer?.isOnion == false -> TopBadgeButton(
+                    text = stringResource(id = R.string.home_connection_onion),
+                    icon = R.drawable.ic_tor_shield,
+                    iconTint = negativeColor,
+                    onClick = onConnectionsStateButtonClick,
+                    modifier = Modifier.alpha(connectionsButtonAlpha)
+                )
+                else -> TopBadgeButton(
+                    text = stringResource(id = R.string.home_connection_connecting),
+                    icon = R.drawable.ic_connection_lost,
+                    iconTint = MaterialTheme.colors.onSurface,
+                    onClick = onConnectionsStateButtonClick,
+                    modifier = Modifier.alpha(connectionsButtonAlpha)
+                )
+            }
+        }
+        connections.peer !is Connection.ESTABLISHED -> {
             TopBadgeButton(
-                text = stringResource(id = R.string.home__connection__tor_active),
+                text = stringResource(id = R.string.home_connection_connecting),
+                icon = R.drawable.ic_connection_lost,
+                iconTint = MaterialTheme.colors.onSurface,
+                onClick = onConnectionsStateButtonClick,
+                modifier = Modifier.alpha(connectionsButtonAlpha)
+            )
+        }
+//        TODO: display a warning for desynced Electrum servers
+//        electrumBlockheight < XXX -> TopBadgeButton(
+//            text = stringResource(id = R.string.home_connection_electrum_late),
+//            icon = R.drawable.ic_alert_triangle,
+//            iconTint = warningColor,
+//            onClick = onConnectionsStateButtonClick,
+//            modifier = Modifier.alpha(connectionsButtonAlpha)
+//        )
+        torEnabled.value == true -> {
+            TopBadgeButton(
+                text = stringResource(id = R.string.home_connection_tor_active),
                 icon = R.drawable.ic_tor_shield_ok,
                 iconTint = positiveColor,
                 onClick = onTorClick,
             )
         }
     }
-
     Spacer(modifier = Modifier.width(4.dp))
 }
 
@@ -195,13 +221,11 @@ private fun TopBadgeButton(
 
 @Composable
 private fun BackgroundRestrictionBadge(
-    isTorEnabled: Boolean,
     isPowerSaverMode: Boolean,
     isFCMUnavailable: Boolean,
 ) {
-    if (isTorEnabled || isPowerSaverMode || isFCMUnavailable) {
+    if (isPowerSaverMode || isFCMUnavailable) {
         var showDialog by remember { mutableStateOf(false) }
-
         TopBadgeButton(
             text = null,
             icon = R.drawable.ic_alert_triangle,
@@ -224,9 +248,6 @@ private fun BackgroundRestrictionBadge(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        if (isTorEnabled) {
-                            TextWithIcon(text = stringResource(id = R.string.home_background_restriction_tor), icon = R.drawable.ic_tor_shield_ok)
-                        }
                         if (isPowerSaverMode) {
                             TextWithIcon(text = stringResource(id = R.string.home_background_restriction_powersaver), icon = R.drawable.ic_battery_charging)
                         }
