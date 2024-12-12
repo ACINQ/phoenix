@@ -6,20 +6,14 @@ import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.PhoenixBusiness
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import plus
+import fr.acinq.phoenix.utils.extensions.plus
 
 data class Connections(
     val internet: Connection = Connection.CLOSED(reason = null),
-    val tor: Connection = Connection.CLOSED(reason = null),
     val peer: Connection = Connection.CLOSED(reason = null),
     val electrum: Connection = Connection.CLOSED(reason = null),
-    val torEnabled: Boolean = false
 ) {
-    val global : Connection get() = if (torEnabled) {
-        internet + tor + peer + electrum
-    } else {
-        internet + peer + electrum
-    }
+    val global : Connection get() = internet + peer + electrum
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -55,8 +49,6 @@ class ConnectionsManager(
                     NetworkState.Available -> Connection.ESTABLISHED
                     NetworkState.NotAvailable -> Connection.CLOSED(reason = null)
                 },
-                tor = Connection.CLOSED(reason = null),
-                torEnabled = false
             )
         }
     }.stateIn(

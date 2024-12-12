@@ -234,7 +234,7 @@ sealed class ElectrumConfig {
 data class StartupParams(
     /** When true, we use a [InitTlv] to ask our peer whether there are legacy channels to reestablish for the legacy node id. */
     val requestCheckLegacyChannels: Boolean = false,
-    /** Tor state must be defined before the node starts. */
+    /** If true, we'll use onion addresses when connecting to the peer and to Electrum servers. */
     val isTorEnabled: Boolean,
     /** The liquidity policy must be injected into the node params manager. */
     val liquidityPolicy: LiquidityPolicy,
