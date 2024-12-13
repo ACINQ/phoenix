@@ -35,7 +35,7 @@ struct PaymentSummaryStrings {
 	static func create(
 		from source: PaymentSummary?,
 		currencyPrefs: CurrencyPrefs,
-		problem: Problem?
+		problem: ValidateView.Problem?
 	) -> PaymentSummaryStrings {
 		
 		let bitcoinUnit = currencyPrefs.bitcoinUnit

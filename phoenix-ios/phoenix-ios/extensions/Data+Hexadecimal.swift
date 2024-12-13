@@ -1,14 +1,38 @@
 import Foundation
+import CoreTransferable
+import CryptoKit
+
+enum HexOptions {
+	case lowerCase
+	case upperCase
+	
+	var formatString: String {
+		switch self {
+			case .lowerCase: return "%02hhx" // <- lowercase 'x'
+			case .upperCase: return "%02hhX" // <- UPPERCASE 'X'
+		}
+	}
+}
+
+extension SHA256.Digest {
+	
+	func toHex(options: HexOptions = .lowerCase) -> String {
+		return self.map { String(format: options.formatString, $0) }.joined()
+	}
+}
+
+extension Array where Element == UInt8 {
+	
+	func toHex(options: HexOptions = .lowerCase) -> String {
+		return self.map { String(format: options.formatString, $0) }.joined()
+	}
+}
+
 
 extension Data {
-	enum HexOptions {
-		case lowerCase
-		case upperCase
-	}
 
 	func toHex(options: HexOptions = .lowerCase) -> String {
-		let format = options == .upperCase ? "%02hhX" : "%02hhx"
-		return map { String(format: format, $0) }.joined()
+		return self.map { String(format: options.formatString, $0) }.joined()
 	}
 	
 	init?(fromHex string: String) {

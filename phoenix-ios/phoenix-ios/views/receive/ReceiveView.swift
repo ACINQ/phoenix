@@ -10,24 +10,88 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct ReceiveView: MVIView {
 	
+	enum NavLinkTag: Hashable, CustomStringConvertible {
+		
+		case CurrencyConverter(
+			initialAmount: CurrencyAmount?,
+			didChange: ((CurrencyAmount?) -> Void)?,
+			didClose: (() -> Void)?
+		)
+		
+		private var internalValue: Int {
+			switch self {
+				case .CurrencyConverter(_, _, _): return 1
+			}
+		}
+		
+		static func == (lhs: NavLinkTag, rhs: NavLinkTag) -> Bool {
+			return lhs.internalValue == rhs.internalValue
+		}
+		
+		func hash(into hasher: inout Hasher) {
+			hasher.combine(self.internalValue)
+		}
+		
+		var description: String {
+			switch self {
+				case .CurrencyConverter: return "CurrencyConverter"
+			}
+		}
+	}
+
+	// The order of items within this enum controls the order in the UI.
+	// If you change the order, you might also consider changing the initial value for `selectedTab`.
+	enum Tab: CaseIterable, Identifiable, CustomStringConvertible {
+		case lightning
+		case blockchain
+ 
+		var id: Self { self }
+
+		var description: String {
+			switch self {
+				case .lightning  : return "lightning"
+				case .blockchain : return "blockchain"
+			}
+		}
+
+		func previous() -> Tab? {
+			var previous: Tab? = nil
+			for t in Tab.allCases {
+				if t == self {
+					return previous
+				} else {
+					previous = t
+				}
+			}
+			return nil
+		}
+
+		func next() -> Tab? {
+			var found = false
+			for t in Tab.allCases {
+				if t == self {
+					found = true
+				} else if found {
+					return t
+				}
+			}
+			return nil
+		}
+	}
+	
 	@StateObject var mvi = MVIState({ $0.receive() })
 	
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
 	
-	// The order of items within this enum controls the order in the UI.
-	// If you change the order, you might also consider changing the initial value for `selectedTab`.
-	enum Tab: CaseIterable, Identifiable {
-		case lightning
-		case blockchain
-
-		var id: Self { self }
-	}
-	
 	@State var selectedTab: Tab = .lightning
 	
 	@State var lightningInvoiceView_didAppear = false
 	@State var showSendView = false
+	
+	// <iOS_16_workarounds>
+	@State var navLinkTag: NavLinkTag? = nil
+	// </iOS_16_workarounds>
 	
 	@StateObject var inboundFeeState = InboundFeeState()
 	@StateObject var toast = Toast()
@@ -36,6 +100,7 @@ struct ReceiveView: MVIView {
 	
 	@EnvironmentObject var deviceInfo: DeviceInfo
 	@EnvironmentObject var popoverState: PopoverState
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	
 	// --------------------------------------------------
 	// MARK: ViewBuilders
@@ -43,6 +108,18 @@ struct ReceiveView: MVIView {
 	
 	@ViewBuilder
 	var view: some View {
+		
+		layers()
+			.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
+				navLinkView()
+			}
+			.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
+				navLinkView(tag)
+			}
+	}
+	
+	@ViewBuilder
+	func layers() -> some View {
 		
 		ZStack {
 			
@@ -102,7 +179,8 @@ struct ReceiveView: MVIView {
 							mvi: mvi,
 							inboundFeeState: inboundFeeState,
 							toast: toast,
-							didAppear: $lightningInvoiceView_didAppear
+							didAppear: $lightningInvoiceView_didAppear,
+							navigateTo: navigateTo
 						)
 						.tag(Tab.lightning)
 						
@@ -216,25 +294,68 @@ struct ReceiveView: MVIView {
 		}
 	}
 	
+	@ViewBuilder
+	func navLinkView() -> some View {
+		
+		if let tag = self.navLinkTag {
+			navLinkView(tag)
+		} else {
+			EmptyView()
+		}
+	}
+	
+	@ViewBuilder
+	func navLinkView(_ tag: NavLinkTag) -> some View {
+		
+		switch tag {
+		case .CurrencyConverter(let initialAmount, let didChange, let didClose):
+			CurrencyConverterView(
+				initialAmount: initialAmount,
+				didChange: didChange,
+				didClose: didClose
+			)
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: View Helpers
+	// --------------------------------------------------
+	
+	func navLinkTagBinding() -> Binding<Bool> {
+		
+		return Binding<Bool>(
+			get: { navLinkTag != nil },
+			set: { if !$0 { navLinkTag = nil }}
+		)
+	}
+	
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
 	
+	func navigateTo(_ tag: NavLinkTag) {
+		log.trace("navigateTo(\(tag.description))")
+		
+		if #available(iOS 17, *) {
+			navCoordinator.path.append(tag)
+		} else {
+			navLinkTag = tag
+		}
+	}
+	
 	func moveToPreviousTab() {
 		log.trace("moveToPreviousTab()")
 		
-		switch selectedTab {
-			case Tab.lightning  : break
-			case Tab.blockchain : selectTabWithAnimation(.lightning)
+		if let previousTag = selectedTab.previous() {
+			selectTabWithAnimation(previousTag)
 		}
 	}
 	
 	func moveToNextTab() {
 		log.trace("moveToNextTab()")
 		
-		switch selectedTab {
-			case Tab.lightning  : selectTabWithAnimation(.blockchain)
-			case Tab.blockchain : break
+		if let nextTab = selectedTab.next() {
+			selectTabWithAnimation(nextTab)
 		}
 	}
 	

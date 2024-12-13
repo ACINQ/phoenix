@@ -145,7 +145,7 @@ extension Utils {
 	}
 	
 	// --------------------------------------------------
-	// MARK: Alt Formatting
+	// MARK: Hidden Amounts
 	// --------------------------------------------------
 	
 	static let hiddenCharacter = "\u{2217}" // asterisk operator

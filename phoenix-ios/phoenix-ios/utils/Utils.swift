@@ -475,7 +475,35 @@ class Utils {
 	}
 	
 	// --------------------------------------------------
-	// MARK: Alt Formatting
+	// MARK: Switched Formatting
+	// --------------------------------------------------
+
+	static func format(
+		currencyAmount : CurrencyAmount,
+		policy         : MsatsPolicy = .hideMsats,
+		locale         : Locale? = nil
+	) -> FormattedAmount {
+		
+		switch currencyAmount.currency {
+		case .bitcoin(let bitcoinUnit):
+			return formatBitcoin(
+				amount      : currencyAmount.amount,
+				bitcoinUnit : bitcoinUnit,
+				policy      : policy,
+				locale      : locale
+			)
+			
+		case .fiat(let fiatCurrency):
+			return formatFiat(
+				amount       : currencyAmount.amount,
+				fiatCurrency : fiatCurrency,
+				locale       : locale
+			)
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Unknown Amount
 	// --------------------------------------------------
 	
 	static func unknownBitcoinAmount(

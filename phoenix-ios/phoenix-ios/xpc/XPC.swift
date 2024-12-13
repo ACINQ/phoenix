@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 import notify
 
 fileprivate let filename = "XPC"
@@ -8,14 +9,28 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-enum XpcActor {
+enum XpcActor: CustomStringConvertible {
 	case mainApp
 	case notifySrvExt
+	
+	var description: String {
+		switch self {
+			case .mainApp      : return "mainApp"
+			case .notifySrvExt : return "notifySrvExt"
+		}
+	}
 }
 
-enum XpcMessage {
+enum XpcMessage: CustomStringConvertible {
 	case available
 	case unavailable
+	
+	var description: String {
+		switch self {
+			case .available   : return "available"
+			case .unavailable : return "unavailable"
+		}
+	}
 }
 
 fileprivate let msgPing_mainApp: UInt64             = 0b0001
@@ -53,27 +68,24 @@ fileprivate let msgUnavailable_notifySrvExt: UInt64 = 0b1100
  *
  * Using these simple primitives, we're able to determine if the other process is active.
  */
-class CrossProcessCommunication {
+class XPC {
 	
 	private let actor: XpcActor
-	private let receivedMessage: ((XpcMessage) -> Void)
 	
-	private let queue = DispatchQueue(label: "CrossProcessCommunication")
+	private let queue = DispatchQueue(label: "XPC")
 	private let channelPrefix = "co.acinq.phoenix"
 	private let groupIdentifier = "group.co.acinq.phoenix"
 	
 	private var channel: String? = nil
 	private var notifyToken: Int32 = NOTIFY_TOKEN_INVALID
-	private var pendingSuspendCount: UInt32 = 0
+	private var suspendCount: UInt32 = 1 // You have to call resume() to start XPC
 	
-	init(
-		actor: XpcActor,
-		receivedMessage: @escaping (XpcMessage) -> Void
-	) {
-		log.trace("init()")
+	public let receivedMessagePublisher = PassthroughSubject<XpcMessage, Never>()
+
+	init(actor: XpcActor) {
+		log.trace("init(\(actor))")
 		
 		self.actor = actor
-		self.receivedMessage = receivedMessage
 		
 		DispatchQueue.global(qos: .utility).async {
 			self.readChannelID()
@@ -95,36 +107,44 @@ class CrossProcessCommunication {
 	
 	public func suspend() {
 		
-		queue.async {
+		queue.async { [self] in
+			log.trace("suspend()")
 			
-			if notify_is_valid_token(self.notifyToken) {
-				switch self.actor {
-					case .mainApp      : self.sendMessage(msgUnavailable_mainApp)
-					case .notifySrvExt : self.sendMessage(msgUnavailable_notifySrvExt)
-				}
+			guard suspendCount < UInt32.max else {
+				log.warning("suspend(): suspendCount is already at UInt32.max")
+				return
+			}
+			
+			suspendCount += 1
+			log.debug("suspendCount = \(suspendCount)")
+
+			if suspendCount == 1, notify_is_valid_token(notifyToken) {
+				sendUnavailableMessage()
+				
 				log.debug("notify_suspend()")
-				notify_suspend(self.notifyToken)
-			} else {
-				if (self.pendingSuspendCount < UInt32.max) {
-					log.debug("pendingSuspendCount += 1")
-					self.pendingSuspendCount += 1
-				}
+				notify_suspend(notifyToken)
 			}
 		}
 	}
 	
 	public func resume() {
 		
-		queue.async {
+		queue.async { [self] in
+			log.trace("resume()")
 			
-			if notify_is_valid_token(self.notifyToken) {
+			guard suspendCount > 0 else {
+				log.warning("resume(): suspendCount is already at 0")
+				return
+			}
+			
+			suspendCount -= 1
+			log.debug("suspendCount = \(suspendCount)")
+			
+			if suspendCount == 0, notify_is_valid_token(notifyToken) {
 				log.debug("notify_resume()")
-				notify_resume(self.notifyToken)
-			} else {
-				if (self.pendingSuspendCount > 0) {
-					log.debug("pendingSuspendCount -= 1")
-					self.pendingSuspendCount -= 1
-				}
+				notify_resume(notifyToken)
+				
+				sendPingMessage()
 			}
 		}
 	}
@@ -216,6 +236,10 @@ class CrossProcessCommunication {
 			guard let self = self else {
 				return
 			}
+			guard self.suspendCount == 0 else {
+				log.info("ignoring received message: suspended")
+				return
+			}
 			
 			var msg: UInt64 = 0
 			notify_get_state(token, &msg)
@@ -225,21 +249,12 @@ class CrossProcessCommunication {
 		
 		if notify_is_valid_token(notifyToken) {
 			
-			if pendingSuspendCount > 0 {
-				
-				for _ in 0 ..< pendingSuspendCount {
-					log.debug("notify_suspend()")
-					notify_suspend(notifyToken)
-				}
-				pendingSuspendCount = 0
+			if suspendCount > 0 {
+				log.debug("notify_suspend()")
+				notify_suspend(notifyToken)
 				
 			} else {
-				
-				if actor == .mainApp {
-					sendMessage(msgPing_mainApp)
-				} else {
-					sendMessage(msgPing_notifySrvExt)
-				}
+				sendPingMessage()
 			}
 		}
 	}
@@ -259,7 +274,7 @@ class CrossProcessCommunication {
 			case msgPing_notifySrvExt:
 				log.debug("received message: \(msgStr)")
 				notifyReceivedMessage(.available)
-				sendMessage(msgPong_mainApp)
+				sendPongMessage()
 				
 			case msgPong_notifySrvExt:
 				log.debug("received message: \(msgStr)")
@@ -285,7 +300,7 @@ class CrossProcessCommunication {
 			case msgPing_mainApp:
 				log.debug("received message: \(msgStr)")
 				notifyReceivedMessage(.available)
-				sendMessage(msgPong_notifySrvExt)
+				sendPongMessage()
 				
 			case msgPong_mainApp:
 				log.debug("received message: \(msgStr)")
@@ -302,10 +317,32 @@ class CrossProcessCommunication {
 		} // </switch actor>
 	}
 	
+	private func sendPingMessage() {
+		switch actor {
+			case .mainApp      : sendMessage(msgPing_mainApp)
+			case .notifySrvExt : sendMessage(msgPing_notifySrvExt)
+		}
+	}
+	
+	private func sendPongMessage() {
+		switch actor {
+			case .mainApp      : sendMessage(msgPong_mainApp)
+			case .notifySrvExt : sendMessage(msgPong_notifySrvExt)
+		}
+	}
+	
+	private func sendUnavailableMessage() {
+		switch actor {
+			case .mainApp      : sendMessage(msgUnavailable_mainApp)
+			case .notifySrvExt : sendMessage(msgUnavailable_notifySrvExt)
+		}
+	}
+	
 	private func sendMessage(_ msg: UInt64) {
-		log.trace("sendMessage(\(self.messageToString(msg)))")
+		log.trace("sendMessage(\(messageToString(msg)))")
 		
 		guard notify_is_valid_token(notifyToken), let channel = channel else {
+			log.debug("sendMessage(\(messageToString(msg))): ignoring: channel not setup yet")
 			return
 		}
 		
@@ -334,7 +371,7 @@ class CrossProcessCommunication {
 		log.trace("notifyReceivedMessage()")
 		
 		DispatchQueue.main.async {
-			self.receivedMessage(msg)
+			self.receivedMessagePublisher.send(msg)
 		}
 	}
 }

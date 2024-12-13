@@ -30,7 +30,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	private var groupPrefsCancellables = Set<AnyCancellable>()
 
 	private var isInBackground = false
-	private var xpc: CrossProcessCommunication? = nil
 	
 	public var externalLightningUrlPublisher = PassthroughSubject<String, Never>()
 
@@ -89,10 +88,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			self._applicationDidEnterBackground()
 		}.store(in: &appCancellables)
 		
-		xpc = CrossProcessCommunication(actor: .mainApp, receivedMessage: {(_: XpcMessage) in
+		XPC.shared.receivedMessagePublisher.sink { (msg: XpcMessage) in
 			self.didReceivePaymentViaAppExtension()
-		})
 		
+		}.store(in: &appCancellables)
+				
+		XPC.shared.resume()
 		NotificationsManager.shared.requestPermissionForProvisionalNotifications()
 		
 		return true
@@ -146,7 +147,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		
 		if isInBackground {
 			isInBackground = false
-			xpc?.resume()
+			XPC.shared.resume()
 		}
 	}
 	
@@ -155,7 +156,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		
 		if !isInBackground {
 			isInBackground = true
-			xpc?.suspend()
+			XPC.shared.suspend()
 		}
 	}
 	
@@ -243,7 +244,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	}
 
 	// --------------------------------------------------
-	// MARK: CrossProcessCommunication
+	// MARK: XPC
 	// --------------------------------------------------
 
 	private func didReceivePaymentViaAppExtension() {
