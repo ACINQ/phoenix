@@ -47,7 +47,7 @@ fun WalletPayment.state(): WalletPaymentState = when (this) {
     }
     is LightningOutgoingPayment -> when (status) {
         is LightningOutgoingPayment.Status.Pending -> WalletPaymentState.PendingOffChain
-        is LightningOutgoingPayment.Status.Completed.Succeeded.OffChain -> WalletPaymentState.SuccessOffChain
+        is LightningOutgoingPayment.Status.Completed.Succeeded -> WalletPaymentState.SuccessOffChain
         is LightningOutgoingPayment.Status.Completed.Failed -> WalletPaymentState.Failure
     }
     is LightningIncomingPayment, is LegacyPayToOpenIncomingPayment -> when (completedAt) {

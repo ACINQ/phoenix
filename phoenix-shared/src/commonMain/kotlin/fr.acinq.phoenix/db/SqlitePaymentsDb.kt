@@ -16,16 +16,16 @@
 
 package fr.acinq.phoenix.db
 
+import app.cash.sqldelight.ColumnAdapter
 import app.cash.sqldelight.EnumColumnAdapter
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.bitcoin.Crypto
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.db.*
-import fr.acinq.lightning.db.adapters.IncomingPaymentJsonAdapter
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.payment.FinalFailure
+import fr.acinq.lightning.serialization.payment.Serialization
 import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
@@ -59,9 +59,12 @@ class SqlitePaymentsDb(
             status_typeAdapter = EnumColumnAdapter(),
             details_typeAdapter = EnumColumnAdapter()
         ),
-        incoming_paymentsAdapter = Incoming_payments.Adapter(
-            jsonAdapter = IncomingPaymentJsonAdapter,
-        ),
+        incoming_paymentsAdapter = Incoming_payments.Adapter(object : ColumnAdapter<IncomingPayment, ByteArray> {
+            override fun decode(databaseValue: ByteArray): IncomingPayment = Serialization.deserialize(databaseValue).get() as IncomingPayment
+
+            override fun encode(value: IncomingPayment): ByteArray = Serialization.serialize(value)
+
+        }),
         payments_metadataAdapter = Payments_metadata.Adapter(
             lnurl_base_typeAdapter = EnumColumnAdapter(),
             lnurl_metadata_typeAdapter = EnumColumnAdapter(),
@@ -151,7 +154,7 @@ class SqlitePaymentsDb(
         completedAt: Long
     ) {
         withContext(Dispatchers.Default) {
-            outQueries.completePayment(id, LightningOutgoingPayment.Status.Completed.Succeeded.OffChain(preimage, completedAt))
+            outQueries.completePayment(id, LightningOutgoingPayment.Status.Completed.Succeeded(preimage, completedAt))
         }
     }
 
@@ -303,9 +306,9 @@ class SqlitePaymentsDb(
         }
     }
 
-    override suspend fun receiveLightningPayment(paymentHash: ByteVector32, parts: List<LightningIncomingPayment.Received.Part>, receivedAt: Long) {
+    override suspend fun receiveLightningPayment(paymentHash: ByteVector32, parts: List<LightningIncomingPayment.Part>) {
         withContext(Dispatchers.Default) {
-            inQueries.receivePayment(paymentHash, parts, receivedAt)
+            inQueries.receivePayment(paymentHash, parts)
         }
     }
 

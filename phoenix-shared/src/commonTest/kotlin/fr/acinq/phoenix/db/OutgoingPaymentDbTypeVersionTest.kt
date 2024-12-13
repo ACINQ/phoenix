@@ -17,12 +17,10 @@
 package fr.acinq.phoenix.db
 
 import fr.acinq.lightning.Lightning.randomBytes32
-import fr.acinq.lightning.channel.InvalidFinalScript
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.utils.sat
-import fr.acinq.lightning.wire.PermanentNodeFailure
 import fr.acinq.phoenix.db.payments.*
 import io.ktor.utils.io.charsets.Charsets
 import io.ktor.utils.io.core.toByteArray
@@ -53,7 +51,7 @@ class OutgoingPaymentDbTypeVersionTest {
 
     @Test
     fun outgoing_status_success_offchain() {
-        val status = LightningOutgoingPayment.Status.Completed.Succeeded.OffChain(preimage1, 456)
+        val status = LightningOutgoingPayment.Status.Completed.Succeeded(preimage1, 456)
         val deserialized = OutgoingStatusData.deserialize(OutgoingStatusTypeVersion.SUCCEEDED_OFFCHAIN_V0, status.mapToDb().second, completedAt = 456)
         assertEquals(status, deserialized)
     }

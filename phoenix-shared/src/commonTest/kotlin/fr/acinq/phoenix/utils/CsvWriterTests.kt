@@ -68,16 +68,14 @@ class CsvWriterTests {
         val payment = Bolt11IncomingPayment(
             preimage = randomBytes32(),
             paymentRequest = makePaymentRequest(),
-            received = LightningIncomingPayment.Received(
-                parts = listOf(
-                    LightningIncomingPayment.Received.Part.Htlc(
-                        amountReceived = 12_000_000.msat,
-                        channelId = randomBytes32(),
-                        htlcId = 1L,
-                        fundingFee = null
-                    )
-                ),
-                receivedAt = 1675270272445L,
+            parts = listOf(
+                LightningIncomingPayment.Part.Htlc(
+                    amountReceived = 12_000_000.msat,
+                    channelId = randomBytes32(),
+                    htlcId = 1L,
+                    fundingFee = null,
+                    receivedAt = 1675270272445L,
+                )
             ),
             createdAt = 1675270270000L
         )
@@ -107,7 +105,7 @@ class CsvWriterTests {
             parts = listOf(
                 makeLightningPart(4_354_435.msat)
             ),
-            status = LightningOutgoingPayment.Status.Completed.Succeeded.OffChain(
+            status = LightningOutgoingPayment.Status.Completed.Succeeded(
                 preimage = randomBytes32(),
                 completedAt = 1675270582248
             )
@@ -138,7 +136,7 @@ class CsvWriterTests {
             parts = listOf(
                 makeLightningPart(103_010.msat)
             ),
-            status = LightningOutgoingPayment.Status.Completed.Succeeded.OffChain(
+            status = LightningOutgoingPayment.Status.Completed.Succeeded(
                 preimage = randomBytes32(),
                 completedAt = 1675270681099
             )
@@ -169,7 +167,7 @@ class CsvWriterTests {
             parts = listOf(
                 makeLightningPart(103_010.msat)
             ),
-            status = LightningOutgoingPayment.Status.Completed.Succeeded.OffChain(
+            status = LightningOutgoingPayment.Status.Completed.Succeeded(
                 preimage = randomBytes32(),
                 completedAt = 1675270740742
             )
@@ -200,7 +198,7 @@ class CsvWriterTests {
             parts = listOf(
                 makeLightningPart(103_010.msat)
             ),
-            status = LightningOutgoingPayment.Status.Completed.Succeeded.OffChain(
+            status = LightningOutgoingPayment.Status.Completed.Succeeded(
                 preimage = randomBytes32(),
                 completedAt = 1675270826945
             )
@@ -267,7 +265,7 @@ class CsvWriterTests {
                 makeLightningPart(12_000_000.msat),
                 makeLightningPart(820_000.msat)
             ),
-            status = LightningOutgoingPayment.Status.Completed.Succeeded.OffChain(
+            status = LightningOutgoingPayment.Status.Completed.Succeeded(
                 preimage = randomBytes32(),
                 completedAt = 1675289814498
             )

@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS incoming_payments (
     payment_hash BLOB UNIQUE,
     created_at INTEGER NOT NULL,
     received_at INTEGER DEFAULT NULL,
-    json TEXT AS IncomingPayment NOT NULL
+    data BLOB AS IncomingPayment NOT NULL
 );
 
 CREATE INDEX incoming_payments_payment_hash_idx ON incoming_payments(payment_hash);
@@ -25,13 +25,13 @@ INSERT INTO incoming_payments (
             payment_hash,
             created_at,
             received_at,
-            json)
+            data)
 VALUES (?, ?, ?, ?, ?);
 
 updateReceived:
 UPDATE incoming_payments
 SET    received_at=?,
-       json=?
+       data=?
 WHERE  id = ?;
 
 get:
@@ -52,7 +52,7 @@ ORDER BY r.received_at ASC
 LIMIT 1;
 
 listAllWithin:
-SELECT json
+SELECT data
 FROM   incoming_payments
 WHERE  created_at BETWEEN :from AND :to
 ORDER BY
@@ -60,7 +60,7 @@ ORDER BY
        payment_hash DESC;
 
 listAllNotConfirmed:
-SELECT json
+SELECT data
 FROM   incoming_payments
 LEFT OUTER JOIN link_tx_to_payments
     ON link_tx_to_payments.type = 1

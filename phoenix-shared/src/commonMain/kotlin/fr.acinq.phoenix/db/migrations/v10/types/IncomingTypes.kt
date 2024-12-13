@@ -35,12 +35,16 @@ import fr.acinq.lightning.db.Bolt11IncomingPayment
 import fr.acinq.lightning.db.Bolt12IncomingPayment
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.LegacyPayToOpenIncomingPayment
+import fr.acinq.lightning.db.LegacySwapInIncomingPayment
 import fr.acinq.lightning.db.LightningIncomingPayment
+import fr.acinq.lightning.db.SpliceInIncomingPayment
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.OfferPaymentMetadata
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
+import fr.acinq.lightning.utils.sum
+import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.db.payments.DbTypesHelper
 import fr.acinq.phoenix.db.payments.liquidityads.FundingFeeData
 import fr.acinq.phoenix.db.serializers.v1.ByteVector32Serializer
@@ -181,7 +185,7 @@ private sealed class IncomingReceivedWithData {
             typeVersion: IncomingReceivedWithTypeVersion,
             blob: ByteArray,
         ): List<IncomingReceivedWithData> = @Suppress("DEPRECATION") when (typeVersion) {
-            IncomingReceivedWithTypeVersion.LIGHTNING_PAYMENT_V0 -> listOf(IncomingReceivedWithData.LightningPayment.V0)
+            IncomingReceivedWithTypeVersion.LIGHTNING_PAYMENT_V0 -> listOf(LightningPayment.V0)
             IncomingReceivedWithTypeVersion.NEW_CHANNEL_V0 -> listOf(Json.decodeFromString(NewChannel.V0.serializer(), String(bytes = blob, charset = Charsets.UTF_8)))
             IncomingReceivedWithTypeVersion.MULTIPARTS_V0 -> Json.decodeFromString(SetSerializer(Part.serializer()), String(bytes = blob, charset = Charsets.UTF_8)).toList()
             IncomingReceivedWithTypeVersion.MULTIPARTS_V1 -> Json.decodeFromString(SetSerializer(Part.serializer()), String(bytes = blob, charset = Charsets.UTF_8)).toList()
@@ -203,11 +207,13 @@ private sealed class IncomingOriginData {
         data class V0(val paymentRequest: String) : Invoice()
     }
 
+    /** used for the old trusted swap-in mechanism */
     sealed class SwapIn : IncomingOriginData() {
         @Serializable
         data class V0(val address: String?) : SwapIn()
     }
 
+    /** Used for trustless swap-ins */
     sealed class OnChain : IncomingOriginData() {
         @Serializable
         data class V0(val txId: ByteVector32, val outpoints: List<OutPoint>) : SwapIn()
@@ -229,6 +235,39 @@ private sealed class IncomingOriginData {
         }
     }
 }
+
+private fun mapLightningIncomingPaymentPart(part: IncomingReceivedWithData, receivedAt: Long, receivedAmountFallback: MilliSatoshi?): LightningIncomingPayment.Part = when (part) {
+    is IncomingReceivedWithData.LightningPayment.V0 -> LightningIncomingPayment.Part.Htlc(
+        amountReceived = receivedAmountFallback ?: 0.msat,
+        channelId = ByteVector32.Zeroes,
+        htlcId = 0L,
+        fundingFee = null,
+        receivedAt = receivedAt
+    )
+    is IncomingReceivedWithData.Part.Htlc.V0 -> LightningIncomingPayment.Part.Htlc(
+        amountReceived = part.amount,
+        channelId = part.channelId,
+        htlcId = part.htlcId,
+        fundingFee = null,
+        receivedAt = receivedAt
+    )
+    is IncomingReceivedWithData.Part.Htlc.V1 -> LightningIncomingPayment.Part.Htlc(
+        amountReceived = part.amountReceived,
+        channelId = part.channelId,
+        htlcId = part.htlcId,
+        fundingFee = when (part.fundingFee) {
+            is FundingFeeData.V0 -> LiquidityAds.FundingFee(part.fundingFee.amount, part.fundingFee.fundingTxId)
+            null -> null
+        },
+        receivedAt = receivedAt
+    )
+    is IncomingReceivedWithData.Part.FeeCredit.V0 -> LightningIncomingPayment.Part.FeeCredit(
+        amountReceived = part.amount,
+        receivedAt = receivedAt
+    )
+    else -> error("unexpected part=$part")
+}
+
 
 @Suppress("DEPRECATION")
 fun mapIncomingPaymentFromV10(
@@ -252,33 +291,33 @@ fun mapIncomingPaymentFromV10(
             Bolt11IncomingPayment(
                 preimage = ByteVector32(preimage),
                 paymentRequest = Bolt11Invoice.read(origin.paymentRequest).get(),
-                received = null,
+                parts = emptyList(),
                 createdAt = created_at
             )
         received_at == null && origin is IncomingOriginData.Offer.V0 ->
             Bolt12IncomingPayment(
                 preimage = ByteVector32(preimage),
                 metadata = OfferPaymentMetadata.decode(origin.encodedMetadata),
-                received = null,
+                parts = emptyList(),
                 createdAt = created_at
             )
-        received_at != null && origin is IncomingOriginData.Invoice.V0 && parts.all { it is IncomingReceivedWithData.Part.Htlc || it is IncomingReceivedWithData.Part.FeeCredit || it is IncomingReceivedWithData.LightningPayment } ->
+        received_at != null && origin is IncomingOriginData.Invoice.V0 && parts.all { it is IncomingReceivedWithData.LightningPayment } ->
             Bolt11IncomingPayment(
                 preimage = ByteVector32(preimage),
                 paymentRequest = Bolt11Invoice.read(origin.paymentRequest).get(),
-                received = LightningIncomingPayment.Received(
-                    parts = emptyList(),
-                    receivedAt = received_at
-                )
+                parts = parts.map { mapLightningIncomingPaymentPart(it, received_at, received_amount_msat?.msat) }
+            )
+        received_at != null && origin is IncomingOriginData.Invoice.V0 && parts.all { it is IncomingReceivedWithData.Part.Htlc || it is IncomingReceivedWithData.Part.FeeCredit } ->
+            Bolt11IncomingPayment(
+                preimage = ByteVector32(preimage),
+                paymentRequest = Bolt11Invoice.read(origin.paymentRequest).get(),
+                parts = parts.map { mapLightningIncomingPaymentPart(it, received_at, received_amount_msat?.msat) }
             )
         received_at != null && origin is IncomingOriginData.Offer.V0 && parts.all { it is IncomingReceivedWithData.Part.Htlc || it is IncomingReceivedWithData.Part.FeeCredit } ->
             Bolt12IncomingPayment(
                 preimage = ByteVector32(preimage),
                 metadata = OfferPaymentMetadata.decode(origin.encodedMetadata),
-                received = LightningIncomingPayment.Received(
-                    parts = emptyList(),
-                    receivedAt = received_at
-                )
+                parts = parts.map { mapLightningIncomingPaymentPart(it, received_at, received_amount_msat?.msat) }
             )
         received_at != null && (origin is IncomingOriginData.Invoice || origin is IncomingOriginData.Offer) && parts.any { it is IncomingReceivedWithData.Part.SpliceIn || it is IncomingReceivedWithData.Part.NewChannel || it is IncomingReceivedWithData.NewChannel } ->
             LegacyPayToOpenIncomingPayment(
@@ -355,6 +394,79 @@ fun mapIncomingPaymentFromV10(
                 createdAt = created_at,
                 completedAt = received_at
             )
-        else -> TODO("unsupported payment origin=$origin parts=$parts")
+        received_at != null && origin is IncomingOriginData.SwapIn.V0 && parts.any { it is IncomingReceivedWithData.NewChannel || it is IncomingReceivedWithData.Part.NewChannel.V0  } ->
+            LegacySwapInIncomingPayment(
+                id = UUID.randomUUID(),
+                amountReceived = parts.mapNotNull { part ->
+                    when (part) {
+                        is IncomingReceivedWithData.NewChannel.V0 -> received_amount_msat?.msat
+                        is IncomingReceivedWithData.Part.NewChannel.V0 -> part.amount
+                        else -> null
+                    }
+                }.sum(),
+                fees = parts.mapNotNull { part ->
+                    when (part) {
+                        is IncomingReceivedWithData.NewChannel.V0 -> part.fees
+                        is IncomingReceivedWithData.Part.NewChannel.V0 -> part.fees
+                        else -> null
+                    }
+                }.sum(),
+                address = origin.address,
+                createdAt = created_at,
+                completedAt = received_at,
+            )
+        received_at != null && origin is IncomingOriginData.OnChain.V0 && parts.any { it is IncomingReceivedWithData.Part.SpliceIn.V0 || it is IncomingReceivedWithData.Part.NewChannel.V1 || it is IncomingReceivedWithData.Part.NewChannel.V2 } ->
+            SpliceInIncomingPayment(
+                id = UUID.randomUUID(),
+                amountReceived = parts.mapNotNull { part ->
+                    when (part) {
+                        is IncomingReceivedWithData.Part.SpliceIn.V0 -> part.amount
+                        is IncomingReceivedWithData.Part.NewChannel.V1 -> part.amount
+                        is IncomingReceivedWithData.Part.NewChannel.V2 -> part.amount
+                        else -> null
+                    }
+                }.sum(),
+                miningFee = parts.mapNotNull { part ->
+                    when (part) {
+                        is IncomingReceivedWithData.Part.SpliceIn.V0 -> part.miningFee
+                        is IncomingReceivedWithData.Part.NewChannel.V1 -> 0.sat
+                        is IncomingReceivedWithData.Part.NewChannel.V2 -> part.miningFee
+                        else -> null
+                    }
+                }.sum(),
+                channelId = parts.firstOrNull().let {
+                    when (it) {
+                        is IncomingReceivedWithData.Part.SpliceIn.V0 -> it.channelId
+                        is IncomingReceivedWithData.Part.NewChannel.V1 -> it.channelId
+                        is IncomingReceivedWithData.Part.NewChannel.V2 -> it.channelId
+                        else -> null
+                    }
+                } ?: ByteVector32.Zeroes,
+                txId = parts.firstOrNull().let {
+                    when (it) {
+                        is IncomingReceivedWithData.Part.SpliceIn.V0 -> TxId(it.txId)
+                        is IncomingReceivedWithData.Part.NewChannel.V2 -> TxId(it.txId)
+                        else -> null
+                    }
+                } ?: TxId(ByteVector32.Zeroes),
+                localInputs = origin.outpoints.toSet(),
+                createdAt = created_at,
+                confirmedAt = parts.firstOrNull().let {
+                    when (it) {
+                        is IncomingReceivedWithData.Part.SpliceIn.V0 -> it.confirmedAt
+                        is IncomingReceivedWithData.Part.NewChannel.V2 -> it.confirmedAt
+                        else -> null
+                    }
+                } ?: received_at,
+                lockedAt = parts.firstOrNull().let {
+                    when (it) {
+                        is IncomingReceivedWithData.Part.SpliceIn.V0 -> it.lockedAt
+                        is IncomingReceivedWithData.Part.NewChannel.V2 -> it.lockedAt
+                        else -> null
+                    }
+                } ?: received_at,
+            )
+
+        else -> TODO("unsupported payment origin=($origin_type)$origin parts=($received_with_type)$parts")
     }
 }

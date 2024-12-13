@@ -25,7 +25,6 @@ import fr.acinq.lightning.db.*
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.utils.*
-import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.runTest
 import fr.acinq.phoenix.utils.migrations.LegacyChannelCloseHelper
@@ -39,21 +38,19 @@ class SqlitePaymentsDatabaseTest {
     private val preimage1 = randomBytes32()
     private val paymentHash1 = preimage1.sha256()
     private val invoice1 = createInvoice(preimage1)
-    private val incoming1Received = LightningIncomingPayment.Received(
-        parts = listOf(
-            LightningIncomingPayment.Received.Part.Htlc(
-                amountReceived = 100_000.msat,
-                channelId = randomBytes32(),
-                htlcId = 1L,
-                fundingFee = null
-            )
-        ),
-        receivedAt = 100
+    private val incoming1Parts = listOf(
+        LightningIncomingPayment.Part.Htlc(
+            amountReceived = 100_000.msat,
+            channelId = randomBytes32(),
+            htlcId = 1L,
+            fundingFee = null,
+            receivedAt = 100
+        )
     )
     private val incoming1 = Bolt11IncomingPayment(
         preimage = preimage1,
         paymentRequest = invoice1,
-        received = null,
+        parts = emptyList(),
         createdAt = 50,
     )
 
@@ -66,20 +63,20 @@ class SqlitePaymentsDatabaseTest {
         txId = TxId(randomBytes32()),
         localInputs = setOf(OutPoint(TxId(randomBytes32()), 0)),
         createdAt = 0,
-        lockedAt = 50,
-        confirmedAt = 100,
+        lockedAt = null,
+        confirmedAt = null,
     )
 
     @Test
     fun incoming__receive_lightning() = runTest {
         db.addIncomingPayment(incoming1)
-        db.receiveLightningPayment(paymentHash1, incoming1Received.parts, receivedAt = incoming1Received.receivedAt)
+        db.receiveLightningPayment(paymentHash1, incoming1Parts)
         db.getLightningIncomingPayment(paymentHash1)!!.let {
             assertEquals(paymentHash1, it.paymentHash)
             assertEquals(preimage1, it.paymentPreimage)
             assertEquals(100_000.msat, it.amount)
             assertEquals(0.msat, it.fees)
-            assertEquals(100, it.received?.receivedAt)
+            assertEquals(100, it.completedAt)
         }
     }
 
@@ -318,7 +315,7 @@ class SqlitePaymentsDatabaseTest {
         // Parts are successful BUT parent payment is not successful yet.
         assertTrue(db.getLightningOutgoingPayment(p.id)!!.status is LightningOutgoingPayment.Status.Pending)
 
-        val paymentStatus = LightningOutgoingPayment.Status.Completed.Succeeded.OffChain(preimage, 130)
+        val paymentStatus = LightningOutgoingPayment.Status.Completed.Succeeded(preimage, 130)
         val paymentSucceeded = partsSettled.copy(
             status = paymentStatus,
             parts = partsSettled.parts.drop(1)

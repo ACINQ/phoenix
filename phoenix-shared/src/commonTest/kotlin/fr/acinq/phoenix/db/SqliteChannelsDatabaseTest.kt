@@ -24,7 +24,7 @@ import fr.acinq.lightning.CltvExpiry
 import fr.acinq.lightning.channel.states.LegacyWaitForFundingConfirmed
 import fr.acinq.lightning.channel.states.Normal
 import fr.acinq.lightning.channel.states.PersistedChannelState
-import fr.acinq.lightning.serialization.Encryption.from
+import fr.acinq.lightning.serialization.channel.Encryption.from
 import fr.acinq.lightning.wire.EncryptedChannelData
 import fr.acinq.phoenix.TestConstants
 import fr.acinq.phoenix.runTest

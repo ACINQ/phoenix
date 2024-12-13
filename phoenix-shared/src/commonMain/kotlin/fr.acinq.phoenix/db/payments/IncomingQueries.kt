@@ -20,9 +20,9 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.db.Bolt11IncomingPayment
-import fr.acinq.lightning.db.Bolt12IncomingPayment
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.LightningIncomingPayment
+import fr.acinq.lightning.db.LightningIncomingPayment.Companion.addReceivedParts
 import fr.acinq.lightning.db.NewChannelIncomingPayment
 import fr.acinq.lightning.db.OnChainIncomingPayment
 import fr.acinq.lightning.db.SpliceInIncomingPayment
@@ -45,30 +45,22 @@ class IncomingQueries(private val database: PaymentsDatabase) {
             payment_hash = (incomingPayment as? LightningIncomingPayment)?.paymentHash?.toByteArray(),
             created_at = incomingPayment.createdAt,
             received_at = incomingPayment.completedAt,
-            json = incomingPayment
+            data_ = incomingPayment
         )
     }
 
     fun receivePayment(
         paymentHash: ByteVector32,
-        parts: List<LightningIncomingPayment.Received.Part>,
-        receivedAt: Long
+        parts: List<LightningIncomingPayment.Part>,
     ) {
         database.transaction {
             when (val paymentInDb = getIncomingPayment(paymentHash)) {
                 null -> throw IncomingPaymentNotFound(paymentHash)
                 is LightningIncomingPayment -> {
-                    val newReceived = when (val received = paymentInDb.received) {
-                        null -> LightningIncomingPayment.Received(parts, receivedAt)
-                        else -> received.copy(parts = received.parts + parts)
-                    }
-                    val paymentInDb1 = when (paymentInDb) {
-                        is Bolt11IncomingPayment -> paymentInDb.copy(received = newReceived)
-                        is Bolt12IncomingPayment -> paymentInDb.copy(received = newReceived)
-                    }
+                    val paymentInDb1 = paymentInDb.addReceivedParts(parts)
                     queries.updateReceived(
-                        received_at = receivedAt,
-                        json = paymentInDb1,
+                        received_at = paymentInDb1.completedAt,
+                        data_ = paymentInDb1,
                         id = paymentInDb1.id.toString()
                     )
                     didSaveWalletPayment(WalletPaymentId.IncomingPaymentId.fromPaymentHash(paymentHash), database)
@@ -89,7 +81,7 @@ class IncomingQueries(private val database: PaymentsDatabase) {
                     }
                     queries.updateReceived(
                         received_at = lockedAt,
-                        json = paymentInDb1,
+                        data_ = paymentInDb1,
                         id = paymentInDb1.id.toString()
                     )
                     didSaveWalletPayment(WalletPaymentId.IncomingPaymentId(id), database)
@@ -110,7 +102,7 @@ class IncomingQueries(private val database: PaymentsDatabase) {
                     }
                     queries.updateReceived(
                         received_at = paymentInDb1.lockedAt, // keep the existing value
-                        json = paymentInDb1,
+                        data_ = paymentInDb1,
                         id = paymentInDb1.id.toString()
                     )
                     didSaveWalletPayment(WalletPaymentId.IncomingPaymentId(id), database)
@@ -121,11 +113,11 @@ class IncomingQueries(private val database: PaymentsDatabase) {
     }
 
     fun getIncomingPayment(id: UUID): IncomingPayment? {
-        return queries.get(id = id.toString()).executeAsOneOrNull()?.json
+        return queries.get(id = id.toString()).executeAsOneOrNull()?.data_
     }
 
     fun getIncomingPayment(paymentHash: ByteVector32): IncomingPayment? {
-        return queries.getByPaymentHash(payment_hash = paymentHash.toByteArray()).executeAsOneOrNull()?.json
+        return queries.getByPaymentHash(payment_hash = paymentHash.toByteArray()).executeAsOneOrNull()?.data_
     }
 
     fun getOldestReceivedDate(): Long? {
@@ -139,7 +131,7 @@ class IncomingQueries(private val database: PaymentsDatabase) {
     fun listExpiredPayments(fromCreatedAt: Long, toCreatedAt: Long): List<LightningIncomingPayment> {
         return queries.listAllWithin(fromCreatedAt, toCreatedAt).executeAsList()
             .filterIsInstance<Bolt11IncomingPayment>()
-            .filter { it.received == null && it.paymentRequest.isExpired() }
+            .filter { it.parts.isEmpty() && it.paymentRequest.isExpired() }
     }
 
     /** Try to delete an incoming payment ; return true if an element was deleted, false otherwise. */

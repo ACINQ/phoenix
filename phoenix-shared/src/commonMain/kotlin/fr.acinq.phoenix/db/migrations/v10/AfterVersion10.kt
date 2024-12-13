@@ -21,9 +21,9 @@ import app.cash.sqldelight.db.AfterVersion
 import app.cash.sqldelight.db.QueryResult
 import fr.acinq.lightning.db.LegacyPayToOpenIncomingPayment
 import fr.acinq.lightning.db.LightningIncomingPayment
-import fr.acinq.lightning.db.adapters.IncomingPaymentJsonAdapter
 import fr.acinq.phoenix.db.migrations.v10.types.mapIncomingPaymentFromV10
 import fr.acinq.phoenix.utils.extensions.deriveUUID
+import fr.acinq.lightning.serialization.payment.Serialization
 
 val AfterVersion10 = AfterVersion(10) { driver ->
     val transacter = object : TransacterImpl(driver) {}
@@ -62,7 +62,7 @@ val AfterVersion10 = AfterVersion(10) { driver ->
                     payment_hash BLOB,
                     created_at INTEGER NOT NULL,
                     received_at INTEGER DEFAULT NULL,
-                    json TEXT NOT NULL
+                    data BLOB NOT NULL
                 )
             """.trimIndent(),
             "CREATE INDEX incoming_payments_payment_hash_idx ON incoming_payments(payment_hash)",
@@ -74,7 +74,7 @@ val AfterVersion10 = AfterVersion(10) { driver ->
             .forEach { payment ->
                 driver.execute(
                     identifier = null,
-                    sql = "INSERT INTO incoming_payments (id, payment_hash, created_at, received_at, json) VALUES (?, ?, ?, ?, ?)",
+                    sql = "INSERT INTO incoming_payments (id, payment_hash, created_at, received_at, data) VALUES (?, ?, ?, ?, ?)",
                     parameters = 5
                 ) {
                     when (payment) {
@@ -92,7 +92,7 @@ val AfterVersion10 = AfterVersion(10) { driver ->
                     }
                     bindLong(2, payment.createdAt)
                     bindLong(3, payment.completedAt)
-                    bindString(4, IncomingPaymentJsonAdapter.encode(payment))
+                    bindBytes(4, Serialization.serialize(payment))
                 }
             }
 

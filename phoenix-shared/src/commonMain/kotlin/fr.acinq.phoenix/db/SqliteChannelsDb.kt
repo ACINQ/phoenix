@@ -21,7 +21,7 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.CltvExpiry
 import fr.acinq.lightning.channel.states.PersistedChannelState
 import fr.acinq.lightning.db.ChannelsDb
-import fr.acinq.lightning.serialization.Serialization
+import fr.acinq.lightning.serialization.channel.Serialization
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

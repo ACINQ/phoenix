@@ -86,7 +86,7 @@ sealed class OutgoingStatusData {
             @Suppress("DEPRECATION")
             when (typeVersion) {
                 OutgoingStatusTypeVersion.SUCCEEDED_OFFCHAIN_V0 -> format.decodeFromString<SucceededOffChain.V0>(json).let {
-                    LightningOutgoingPayment.Status.Completed.Succeeded.OffChain(it.preimage, completedAt)
+                    LightningOutgoingPayment.Status.Completed.Succeeded(it.preimage, completedAt)
                 }
                 OutgoingStatusTypeVersion.SUCCEEDED_ONCHAIN_V0, OutgoingStatusTypeVersion.SUCCEEDED_ONCHAIN_V1 -> {
                     TODO("impossible scenario")
@@ -118,7 +118,7 @@ sealed class OutgoingStatusData {
 }
 
 fun LightningOutgoingPayment.Status.Completed.mapToDb(): Pair<OutgoingStatusTypeVersion, ByteArray> = when (this) {
-    is LightningOutgoingPayment.Status.Completed.Succeeded.OffChain -> OutgoingStatusTypeVersion.SUCCEEDED_OFFCHAIN_V0 to
+    is LightningOutgoingPayment.Status.Completed.Succeeded -> OutgoingStatusTypeVersion.SUCCEEDED_OFFCHAIN_V0 to
             Json.encodeToString(OutgoingStatusData.SucceededOffChain.V0(preimage)).toByteArray(Charsets.UTF_8)
     is LightningOutgoingPayment.Status.Completed.Failed -> OutgoingStatusTypeVersion.FAILED_V0 to
             Json.encodeToString(OutgoingStatusData.Failed.V0(OutgoingStatusData.serializeFinalFailure(reason))).toByteArray(Charsets.UTF_8)
