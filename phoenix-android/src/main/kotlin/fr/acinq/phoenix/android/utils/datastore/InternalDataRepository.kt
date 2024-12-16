@@ -57,6 +57,8 @@ class InternalDataRepository(private val internalData: DataStore<Preferences>) {
         private val SHOW_SPLICEOUT_CAPACITY_DISCLAIMER = booleanPreferencesKey("SHOW_SPLICEOUT_CAPACITY_DISCLAIMER")
         private val REMOTE_WALLET_NOTICE_READ_INDEX = intPreferencesKey("REMOTE_WALLET_NOTICE_READ_INDEX")
         private val BIP_353_ADDRESS = stringPreferencesKey("BIP_353_ADDRESS")
+
+        private val SHOW_RELEASE_NOTES_SINCE = intPreferencesKey("SHOW_RELEASE_NOTES_SINCE")
     }
 
     val log = LoggerFactory.getLogger(this::class.java)
@@ -84,6 +86,12 @@ class InternalDataRepository(private val internalData: DataStore<Preferences>) {
     /** Returns the build code of the last Phoenix instance that has been run on the device. Used for migration purposes. */
     val getLastUsedAppCode: Flow<Int?> = safeData.map { it[LAST_USED_APP_CODE] }
     suspend fun saveLastUsedAppCode(code: Int) = internalData.edit { it[LAST_USED_APP_CODE] = code }
+
+    /** For some versions, we want to show a release note when opening the Home screen. This preference tracks from which code notes should be shown. If null, show nothing. */
+    val showReleaseNoteSinceCode: Flow<Int?> = safeData.map { it[SHOW_RELEASE_NOTES_SINCE] }
+    suspend fun saveShowReleaseNoteSinceCode(code: Int?) = internalData.edit {
+        if (code == null) it.remove(SHOW_RELEASE_NOTES_SINCE) else it[SHOW_RELEASE_NOTES_SINCE] = code
+    }
 
     /** True when the user states that he made a manual backup of the seed. */
     val isManualSeedBackupDone: Flow<Boolean> = safeData.map { it[SEED_MANUAL_BACKUP_DONE] ?: false }
