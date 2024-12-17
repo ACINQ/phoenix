@@ -205,14 +205,8 @@ class AppConfigurationManager(
      * Use this method to set a server to connect to.
      * If null, will connect to a random server from the hard-coded list.
      */
-    fun updateElectrumConfig(server: ServerAddress?) {
-        _electrumConfig.value = server?.let {
-            if (it.host.endsWith(".onion")) {
-                ElectrumConfig.Custom(it.copy(tls = TcpSocket.TLS.DISABLED))
-            } else {
-                ElectrumConfig.Custom(it)
-            }
-        } ?: ElectrumConfig.Random
+    fun updateElectrumConfig(config: ElectrumConfig.Custom?) {
+        _electrumConfig.value = config ?: ElectrumConfig.Random
     }
 
     fun randomElectrumServer(isTorEnabled: Boolean) = when (chain) {

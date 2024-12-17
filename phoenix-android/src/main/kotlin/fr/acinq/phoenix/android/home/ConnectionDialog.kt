@@ -71,6 +71,7 @@ fun ConnectionDialog(
                     modifier = Modifier.padding(top = 16.dp, start = 24.dp, end = 24.dp)
                 )
             } else {
+                val isTorEnabled = userPrefs.getIsTorEnabled.collectAsState(initial = null).value
                 val hasConnectionIssues = connections.electrum != Connection.ESTABLISHED || connections.peer != Connection.ESTABLISHED
                 if (hasConnectionIssues) {
                     Text(text = stringResource(id = R.string.conndialog_summary_not_ok), Modifier.padding(horizontal = 24.dp))
@@ -87,7 +88,7 @@ fun ConnectionDialog(
                         }
                         else -> {
                             val customElectrumServer by userPrefs.getElectrumServer.collectAsState(initial = null)
-                            if (customElectrumServer?.isOnion == false) {
+                            if (isTorEnabled == true && customElectrumServer?.server?.isOnion == false && customElectrumServer?.requireOnionIfTorEnabled == true) {
                                 TextWithIcon(text = stringResource(R.string.conndialog_electrum_not_onion), textStyle = monoTypo, icon = R.drawable.ic_alert_triangle, iconTint = negativeColor)
                             } else if (connection is Connection.CLOSED && connection.isBadCertificate()) {
                                 TextWithIcon(text = stringResource(R.string.conndialog_closed_bad_cert), textStyle = monoTypo, icon = R.drawable.ic_alert_triangle, iconTint = negativeColor)
@@ -102,7 +103,7 @@ fun ConnectionDialog(
                 HSeparator()
                 Spacer(Modifier.height(16.dp))
 
-                val isTorEnabled = userPrefs.getIsTorEnabled.collectAsState(initial = null).value
+
                 if (hasConnectionIssues && isTorEnabled == true) {
                     Card(backgroundColor = mutedBgColor, modifier = Modifier.fillMaxWidth(), internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp), onClick = onTorClick) {
                         TextWithIcon(text = stringResource(id = R.string.conndialog_tor_disclaimer_title), icon = R.drawable.ic_tor_shield, textStyle = MaterialTheme.typography.body2)

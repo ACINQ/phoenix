@@ -58,16 +58,17 @@ import java.text.DateFormat
 import java.text.NumberFormat
 
 @Composable
-fun ElectrumView() {
-    val nc = navController
+fun ElectrumView(
+    onBackClick: () -> Unit
+) {
     val scope = rememberCoroutineScope()
     val userPrefs = userPrefs
-    val electrumServerInPrefs by userPrefs.getElectrumServer.collectAsState(initial = null)
+    val electrumConfigInPrefs by userPrefs.getElectrumServer.collectAsState(initial = null)
     var showCustomServerDialog by rememberSaveable { mutableStateOf(false) }
 
     DefaultScreenLayout {
         DefaultScreenHeader(
-            onBackClick = { nc.popBackStack() },
+            onBackClick = onBackClick,
             title = stringResource(id = R.string.electrum_title),
         )
         Card(internalPadding = PaddingValues(16.dp)) {
@@ -78,11 +79,11 @@ fun ElectrumView() {
                 val config = model.configuration
                 if (showCustomServerDialog) {
                     ElectrumServerDialog(
-                        initialAddress = electrumServerInPrefs,
-                        onConfirm = { address ->
+                        initialConfig = electrumConfigInPrefs,
+                        onConfirm = { newConfig ->
                             scope.launch {
-                                userPrefs.saveElectrumServer(address)
-                                postIntent(ElectrumConfiguration.Intent.UpdateElectrumServer(address))
+                                userPrefs.saveElectrumServer(newConfig)
+                                postIntent(ElectrumConfiguration.Intent.UpdateElectrumServer(newConfig))
                                 showCustomServerDialog = false
                             }
                         },
@@ -119,7 +120,7 @@ fun ElectrumView() {
                                         text = stringResource(id = R.string.electrum_description_bad_certificate),
                                         style = MaterialTheme.typography.subtitle2.copy(color = negativeColor)
                                     )
-                                } else if (torEnabled.value == true && !config.server.isOnion) {
+                                } else if (torEnabled.value == true && !config.server.isOnion && config.requireOnionIfTorEnabled) {
                                     Text(
                                         text = stringResource(id = R.string.electrum_description_not_onion),
                                         style = MaterialTheme.typography.subtitle2.copy(color = negativeColor),
@@ -158,23 +159,25 @@ fun ElectrumView() {
 
 @Composable
 private fun ElectrumServerDialog(
-    initialAddress: ServerAddress?,
-    onConfirm: (ServerAddress?) -> Unit,
+    initialConfig: ElectrumConfig.Custom?,
+    onConfirm: (ElectrumConfig.Custom?) -> Unit,
     onDismiss: () -> Unit
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val keyboardManager = LocalSoftwareKeyboardController.current
 
-    var useCustomServer by rememberSaveable { mutableStateOf(initialAddress != null) }
-    var address by rememberSaveable { mutableStateOf(initialAddress?.run { "$host:$port" } ?: "") }
+    var useCustomServer by rememberSaveable { mutableStateOf(initialConfig != null) }
+    var address by rememberSaveable { mutableStateOf(initialConfig?.run { "${server.host}:${server.port}" } ?: "") }
     val host = remember(address) { address.trim().substringBeforeLast(":").takeIf { it.isNotBlank() } }
     val port = remember(address) { address.trim().substringAfterLast(":").toIntOrNull() ?: 50002 }
     val isOnionHost = remember(address) { host?.endsWith(".onion") ?: false }
     val isTorEnabled by userPrefs.getIsTorEnabled.collectAsState(initial = null)
 
     var addressError by rememberSaveable { mutableStateOf(false) }
-    val showTorWithoutOnionError = remember(isOnionHost, isTorEnabled, useCustomServer) { useCustomServer && isTorEnabled == true && !isOnionHost }
+    val showOnionOnCustomServerWarning = remember(isOnionHost, isTorEnabled, useCustomServer) { useCustomServer && isTorEnabled == true && !isOnionHost }
+    var requireOnionIfTorEnabled by remember { mutableStateOf(initialConfig?.requireOnionIfTorEnabled ?: true) }
+    val isViolatingTorRule = remember(isOnionHost, isTorEnabled, useCustomServer, requireOnionIfTorEnabled) { useCustomServer && isTorEnabled == true && !isOnionHost && requireOnionIfTorEnabled }
 
     val vm = viewModel<ElectrumDialogViewModel>()
 
@@ -204,7 +207,7 @@ private fun ElectrumServerDialog(
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             TextInput(
                 modifier = Modifier.fillMaxWidth(),
                 text = address,
@@ -218,24 +221,35 @@ private fun ElectrumServerDialog(
                 maxLines = 4,
                 staticLabel = stringResource(id = R.string.electrum_dialog_input),
                 enabled = useCustomServer && vm.state !is ElectrumDialogViewModel.CertificateCheckState.Checking,
-                errorMessage = if (addressError) stringResource(id = R.string.electrum_dialog_invalid_input) else if (showTorWithoutOnionError) stringResource(R.string.electrum_connection_dialog_tor_enabled) else null
+                errorMessage = if (addressError) stringResource(id = R.string.electrum_dialog_invalid_input) else if (isViolatingTorRule) "Must use an onion address" else null
             )
-            if (isTorEnabled == true || isOnionHost) {
-                Spacer(modifier = Modifier.height(4.dp))
-                TextWithIcon(
-                    text = stringResource(id = R.string.electrum_connection_dialog_onion_port),
-                    textStyle = MaterialTheme.typography.subtitle2,
-                    icon = R.drawable.ic_info,
-                )
-            } else {
-                Spacer(modifier = Modifier.height(4.dp))
-                TextWithIcon(
-                    text = stringResource(id = R.string.electrum_connection_dialog_tls_port),
-                    textStyle = MaterialTheme.typography.subtitle2,
-                    icon = R.drawable.ic_info,
-                )
+
+            Spacer(modifier = Modifier.height(4.dp))
+            TextWithIcon(
+                text = stringResource(id = if (isOnionHost) R.string.electrum_connection_dialog_onion_port else R.string.electrum_connection_dialog_tls_port),
+                textStyle = MaterialTheme.typography.subtitle2,
+                icon = R.drawable.ic_info,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+
+            if (showOnionOnCustomServerWarning) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Surface(color = mutedBgColor, shape = RoundedCornerShape(16.dp)) {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Text(text = stringResource(id = R.string.electrum_connection_dialog_tor_enabled_warning), modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp))
+                        Checkbox(
+                            text = stringResource(id = R.string.electrum_connection_dialog_tor_enabled_ignore_box),
+                            checked = !requireOnionIfTorEnabled,
+                            onCheckedChange = { requireOnionIfTorEnabled = !it },
+                            padding = PaddingValues(16.dp),
+                            enabled = useCustomServer && vm.state !is ElectrumDialogViewModel.CertificateCheckState.Checking,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                }
             }
         }
+
         Spacer(modifier = Modifier.height(12.dp))
         when (val state = vm.state) {
             ElectrumDialogViewModel.CertificateCheckState.Init, is ElectrumDialogViewModel.CertificateCheckState.Failure -> {
@@ -268,9 +282,9 @@ private fun ElectrumServerDialog(
                                 if (address.matches("""(.*):*(\d*)""".toRegex()) && host != null) {
                                     scope.launch {
                                         if (isOnionHost) {
-                                            onConfirm(ServerAddress(host, port, TcpSocket.TLS.DISABLED))
+                                            onConfirm(ElectrumConfig.Custom.create(ServerAddress(host, port, TcpSocket.TLS.DISABLED), requireOnionIfTorEnabled = requireOnionIfTorEnabled))
                                         } else {
-                                            vm.checkCertificate(host, port, onCertificateValid = onConfirm)
+                                            vm.checkCertificate(host, port, onCertificateValid = { onConfirm(ElectrumConfig.Custom.create(it, requireOnionIfTorEnabled = requireOnionIfTorEnabled)) })
                                         }
                                     }
                                 } else {
@@ -280,7 +294,7 @@ private fun ElectrumServerDialog(
                                 onConfirm(null)
                             }
                         },
-                        enabled = !addressError && !showTorWithoutOnionError,
+                        enabled = !addressError && !isViolatingTorRule,
                         shape = RoundedCornerShape(16.dp),
                     )
                 }
@@ -348,7 +362,14 @@ private fun ElectrumServerDialog(
                     )
                     Button(
                         text = stringResource(id = R.string.electrum_dialog_cert_accept),
-                        onClick = { onConfirm(ServerAddress(state.host, state.port, TcpSocket.TLS.PINNED_PUBLIC_KEY(Base64.encodeToString(cert.publicKey.encoded, Base64.NO_WRAP)))) },
+                        onClick = {
+                            onConfirm(
+                                ElectrumConfig.Custom.create(
+                                    server = ServerAddress(state.host, state.port, TcpSocket.TLS.PINNED_PUBLIC_KEY(Base64.encodeToString(cert.publicKey.encoded, Base64.NO_WRAP))),
+                                    requireOnionIfTorEnabled = requireOnionIfTorEnabled
+                                )
+                            )
+                        },
                         icon = R.drawable.ic_check_circle,
                         iconTint = positiveColor,
                         space = 8.dp,

@@ -260,11 +260,11 @@ class AppConnectionsDaemon(
                             name = "Electrum",
                             statusStateFlow = electrumClient.connectionStatus.map { it.toConnectionState() }.stateIn(this)
                         ) { connectionAttempt ->
-                            val electrumServerAddress: ServerAddress? = configurationManager.electrumConfig.value?.let { electrumConfig ->
-                                when (electrumConfig) {
-                                    is ElectrumConfig.Custom -> electrumConfig.server
-                                    is ElectrumConfig.Random -> configurationManager.randomElectrumServer(it.torIsEnabled)
-                                }
+                            val electrumConfig = configurationManager.electrumConfig.value
+                            val electrumServerAddress = when (electrumConfig) {
+                                is ElectrumConfig.Custom -> electrumConfig.server
+                                is ElectrumConfig.Random -> configurationManager.randomElectrumServer(it.torIsEnabled)
+                                null -> null
                             }
                             if (electrumServerAddress == null) {
                                 logger.debug { "ignoring electrum connection opportunity because no server is configured yet" }
@@ -279,7 +279,8 @@ class AppConnectionsDaemon(
                                         else -> 20.seconds
                                     }
                                     logger.info { "calling ElectrumClient.connect to server=$electrumServerAddress with handshake_timeout=$handshakeTimeout" }
-                                    if (it.torIsEnabled && !electrumServerAddress.isOnion) {
+                                    val requireOnionIfTorEnabled = electrumConfig is ElectrumConfig.Custom && electrumConfig.requireOnionIfTorEnabled
+                                    if (it.torIsEnabled && !electrumServerAddress.isOnion && requireOnionIfTorEnabled) {
                                         logger.error { "ELECTRUM CONNECTION ABORTED: MUST USE AN ONION ADDRESS" }
                                     } else {
                                         electrumClient.connect(electrumServerAddress, tcpSocketBuilder(), timeout = handshakeTimeout)

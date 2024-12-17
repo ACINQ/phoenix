@@ -152,7 +152,7 @@ private fun ConnectionBadge(
                     onClick = onConnectionsStateButtonClick,
                     modifier = Modifier.alpha(connectionsButtonAlpha)
                 )
-                torEnabled.value == true && customElectrumServer?.isOnion == false -> TopBadgeButton(
+                torEnabled.value == true && customElectrumServer?.server?.isOnion == false && customElectrumServer?.requireOnionIfTorEnabled == true -> TopBadgeButton(
                     text = stringResource(id = R.string.home_connection_onion),
                     icon = R.drawable.ic_tor_shield,
                     iconTint = negativeColor,

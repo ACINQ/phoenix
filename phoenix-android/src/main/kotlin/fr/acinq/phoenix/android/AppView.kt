@@ -367,7 +367,7 @@ fun AppView(
                         DisplaySeedView()
                     }
                     composable(Screen.ElectrumServer.route) {
-                        ElectrumView()
+                        ElectrumView(onBackClick = { navController.popBackStack() })
                     }
                     composable(Screen.TorConfig.route) {
                         TorConfigView(appViewModel = appVM, onBackClick = { navController.popBackStack() }, onBusinessTeardown = { navController.popToHome() })

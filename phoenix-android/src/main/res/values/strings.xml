@@ -658,7 +658,8 @@
     <string name="electrum_block_height_label">Block height</string>
     <string name="electrum_connection_dialog_tls_port">Use the TLS port (default 50002).</string>
     <string name="electrum_connection_dialog_onion_port">For onion services, use the plain TCP port, not the TLS one.</string>
-    <string name="electrum_connection_dialog_tor_enabled">Must be an onion address</string>
+    <string name="electrum_connection_dialog_tor_enabled_warning">Since you\'ve enabled Tor, you should use an onion address for this server.</string>
+    <string name="electrum_connection_dialog_tor_enabled_ignore_box">No, I don\'t want to use an onion address</string>
 
     <string name="electrum_connection_closed_with_random">Disconnected from Electrum</string>
     <string name="electrum_connection_closed_with_custom">Disconnected from %1$s</string>
@@ -668,7 +669,7 @@
 
     <string name="electrum_description_custom">You are using a custom server</string>
     <string name="electrum_description_bad_certificate">This server provided an unknown certificate. Connection is rejected.</string>
-    <string name="electrum_description_not_onion">Tor is enabled. This server must use an onion address.</string>
+    <string name="electrum_description_not_onion">Tor is enabled. This server should use an onion address.</string>
 
     <string name="electrum_dialog_checkbox">Use a custom server</string>
     <string name="electrum_dialog_input">Server address (host:port)</string>
