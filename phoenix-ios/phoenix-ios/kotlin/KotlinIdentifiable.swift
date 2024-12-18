@@ -1,14 +1,14 @@
 import Foundation
 import PhoenixShared
 
-extension Lightning_kmpUUID: Identifiable {
+extension Lightning_kmpUUID: @retroactive Identifiable {
 	
 	public var id: String {
 		return self.description
 	}
 }
 
-extension WalletPaymentId: Identifiable {
+extension WalletPaymentId: @retroactive Identifiable {
 	
 	/// Returns a unique identifier, in the form of:
 	/// - "outgoing|id"
@@ -19,7 +19,7 @@ extension WalletPaymentId: Identifiable {
 	}
 }
 
-extension WalletPaymentOrderRow: Identifiable {
+extension WalletPaymentOrderRow: @retroactive Identifiable {
 	
 	/// In kotlin the variable is called `id`, but that's a reserved property name in objective-c.
 	/// So it gets automatically overwritten, and is inaccessible to us.
@@ -37,7 +37,7 @@ extension WalletPaymentOrderRow: Identifiable {
 	}
 }
 
-extension BitcoinUnit: Identifiable {
+extension BitcoinUnit: @retroactive Identifiable {
 	
 	public var id: String {
 		// BitcoinUnit is an enum in Kotlin.
@@ -46,7 +46,7 @@ extension BitcoinUnit: Identifiable {
 	}
 }
 
-extension FiatCurrency: Identifiable {
+extension FiatCurrency: @retroactive Identifiable {
 	
 	public var id: String {
 		// FiatCurrency is an enum in Kotlin.
@@ -55,7 +55,7 @@ extension FiatCurrency: Identifiable {
 	}
 }
 
-extension ContactInfo: Identifiable {
+extension ContactInfo: @retroactive Identifiable {
 	
 	/// In kotlin the variable is called `id`, but that's a reserved property name in objective-c.
 	/// So it gets automatically overwritten, and is inaccessible to us.
@@ -69,14 +69,14 @@ extension ContactInfo: Identifiable {
 	}
 }
 
-extension Lightning_kmpWalletState.Utxo: Identifiable {
+extension Lightning_kmpWalletState.Utxo: @retroactive Identifiable {
 	
 	public var id: String {
 		return "\(previousTx.txid.toHex()):\(outputIndex):\(blockHeight)"
 	}
 }
 
-extension Lightning_kmpSensitiveTaskEventsTaskIdentifier.InteractiveTx: Identifiable {
+extension Lightning_kmpSensitiveTaskEventsTaskIdentifier.InteractiveTx: @retroactive Identifiable {
 	
 	public var id: String {
 		return "\(self.channelId.toHex()):\(self.fundingTxIndex)"
