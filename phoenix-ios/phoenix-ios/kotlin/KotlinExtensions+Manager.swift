@@ -1,5 +1,5 @@
 import Foundation
-import PhoenixShared
+@preconcurrency import PhoenixShared
 import Combine
 
 extension BalanceManager {
