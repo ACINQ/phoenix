@@ -1,7 +1,7 @@
 import Foundation
-import PhoenixShared
+@preconcurrency import PhoenixShared
 import CloudKit
-import Combine
+@preconcurrency import Combine
 import Network
 
 fileprivate let filename = "SyncSeedManager"
@@ -35,7 +35,7 @@ enum FetchSeedsError: Error {
 
 /// Encompasses the logic for syncing seeds with Apple's CloudKit database.
 ///
-class SyncSeedManager: SyncManagerProtcol {
+class SyncSeedManager: SyncManagerProtcol, @unchecked Sendable {
 	
 	/// Access to parent for shared logic.
 	///

@@ -156,7 +156,7 @@ enum SyncBackupManager_State: Equatable, CustomStringConvertible {
 
 /// Details concerning the type of changes being made to the CloudKit container(s).
 ///
-class SyncBackupManager_State_UpdatingCloud: Equatable {
+final class SyncBackupManager_State_UpdatingCloud: Equatable, @unchecked Sendable {
 	
 	enum Kind {
 		case creatingRecordZone
@@ -187,7 +187,7 @@ class SyncBackupManager_State_UpdatingCloud: Equatable {
 /// Exposes an ObservableObject that can be used by the UI for various purposes.
 /// All changes to `@Published` properties will be made on the UI thread.
 ///
-class SyncBackupManager_State_Downloading: ObservableObject, Equatable {
+class SyncBackupManager_State_Downloading: ObservableObject, Equatable, @unchecked Sendable {
 	
 	let needsDownloadPayments: Bool
 	let needsDownloadContacts: Bool
@@ -383,7 +383,7 @@ class SyncBackupManager_State_Uploading: ObservableObject, Equatable {
 /// Details concerning what/why the SyncBackupManager is temporarily paused.
 /// Sometimes these delays can be manually cancelled by the user.
 ///
-class SyncBackupManager_State_Waiting: Equatable {
+final class SyncBackupManager_State_Waiting: Equatable, Sendable {
 	
 	enum Kind: Equatable {
 		case forInternet
@@ -406,8 +406,6 @@ class SyncBackupManager_State_Waiting: Equatable {
 		}
 	}
 	
-	let kind: Kind
-	
 	struct WaitingUntil: Equatable {
 		weak var parent: SyncBackupManager?
 		let delay: TimeInterval
@@ -424,6 +422,7 @@ class SyncBackupManager_State_Waiting: Equatable {
 		}
 	}
 	
+	let kind: Kind
 	let until: WaitingUntil?
 	
 	init(kind: Kind) {
