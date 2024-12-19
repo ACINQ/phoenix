@@ -28,10 +28,10 @@ import fr.acinq.lightning.db.OnChainOutgoingPayment
 import fr.acinq.lightning.db.SpliceInIncomingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.payment.OfferPaymentMetadata
+import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.lightning.wire.OfferTypes
-import fr.acinq.phoenix.data.WalletPaymentId
 
 enum class WalletPaymentState { SuccessOnChain, SuccessOffChain, PendingOnChain, PendingOffChain, Failure }
 
@@ -73,11 +73,11 @@ fun WalletPayment.incomingOfferMetadata(): OfferPaymentMetadata.V1? = (this as? 
 fun WalletPayment.outgoingInvoiceRequest(): OfferTypes.InvoiceRequest? = ((this as? LightningOutgoingPayment)?.details as? LightningOutgoingPayment.Details.Blinded)?.paymentRequest?.invoiceRequest
 
 /** Returns a list of the ids of the payments that triggered this liquidity purchase. May be empty, for example if this is a manual purchase. */
-fun InboundLiquidityOutgoingPayment.relatedPaymentIds() : List<WalletPaymentId> = when (val details = purchase.paymentDetails) {
+fun InboundLiquidityOutgoingPayment.relatedPaymentIds() : List<UUID> = when (val details = purchase.paymentDetails) {
     is LiquidityAds.PaymentDetails.FromFutureHtlc -> details.paymentHashes
     is LiquidityAds.PaymentDetails.FromChannelBalanceForFutureHtlc -> details.paymentHashes
     else -> emptyList()
-}.map { WalletPaymentId.IncomingPaymentId.fromPaymentHash(it) }
+}.map { it.deriveUUID() }
 
 /**
  * Returns true if this liquidity was initiated manually by the user, false otherwise.

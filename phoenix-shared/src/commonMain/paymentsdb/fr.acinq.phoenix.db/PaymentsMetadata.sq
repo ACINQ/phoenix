@@ -4,7 +4,7 @@ import fr.acinq.phoenix.db.payments.LnurlSuccessAction;
 import fr.acinq.lightning.utils.UUID;
 
 -- This table stores metadata corresponding to a payment.
--- * id => uuid of an incoming or an outgoing payments
+-- * payment_id => uuid of an incoming or an outgoing payments
 -- * lnurl_base => serialized lnurl object (e.g. LNUrl.Pay), excluding metadata content
 -- * lnurl_metadata => serialized lnurl metadata (e.g. LNUrl.Pay.Metadata)
 -- * lnurl_successAction => serialized LUD-09 (e.g. LNUrl.PayInvoice.SuccessAction.Message)
@@ -14,7 +14,7 @@ import fr.acinq.lightning.utils.UUID;
 -- * original_fiat => stores original fiat price (via conversion rate) at time of transaction
 --
 CREATE TABLE IF NOT EXISTS payments_metadata (
-    id BLOB AS UUID NOT NULL PRIMARY KEY,
+    payment_id BLOB AS UUID NOT NULL PRIMARY KEY,
     lnurl_base_type TEXT AS LnurlBase.TypeVersion,
     lnurl_base_blob BLOB,
     lnurl_description TEXT,
@@ -33,11 +33,11 @@ CREATE TABLE IF NOT EXISTS payments_metadata (
 
 hasMetadata:
 SELECT COUNT(*) FROM payments_metadata
-WHERE id = ?;
+WHERE payment_id = ?;
 
 addMetadata:
 INSERT INTO payments_metadata (
-            id,
+            payment_id,
             lnurl_base_type, lnurl_base_blob,
             lnurl_description,
             lnurl_metadata_type, lnurl_metadata_blob,
@@ -52,18 +52,18 @@ UPDATE payments_metadata
 SET    user_description = ?,
        user_notes = ?,
        modified_at = ?
-WHERE  id = ?;
+WHERE  payment_id = ?;
 
 get:
 SELECT * FROM payments_metadata
-WHERE id = ?;
+WHERE payment_id = ?;
 
 getDescriptions:
 SELECT lnurl_description,
        user_description,
        modified_at
 FROM   payments_metadata
-WHERE  id = ?;
+WHERE  payment_id = ?;
 
 getDescriptionsAndOriginalFiat:
 SELECT lnurl_description,
@@ -72,7 +72,7 @@ SELECT lnurl_description,
        original_fiat_type,
        original_fiat_rate
 FROM   payments_metadata
-WHERE  id = ?;
+WHERE  payment_id = ?;
 
 -- use this in a `transaction` block to know how many rows were changed after an UPDATE
 changes:

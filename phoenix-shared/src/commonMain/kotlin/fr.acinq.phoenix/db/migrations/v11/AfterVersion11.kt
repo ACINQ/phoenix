@@ -16,13 +16,18 @@
 
 package fr.acinq.phoenix.db.migrations.v11
 
+import app.cash.sqldelight.EnumColumnAdapter
 import app.cash.sqldelight.TransacterImpl
 import app.cash.sqldelight.db.AfterVersion
 import app.cash.sqldelight.db.QueryResult
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.db.OnChainOutgoingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.serialization.payment.Serialization
+import fr.acinq.lightning.utils.UUID
+import fr.acinq.phoenix.data.WalletPaymentMetadata
+import fr.acinq.phoenix.db.UUIDAdapter
 import fr.acinq.phoenix.db.migrations.v11.queries.ChannelCloseOutgoingQueries
 import fr.acinq.phoenix.db.migrations.v11.queries.InboundLiquidityQueries
 import fr.acinq.phoenix.db.migrations.v11.queries.LightningOutgoingQueries
@@ -32,7 +37,13 @@ import fr.acinq.phoenix.db.migrations.v11.types.OutgoingDetailsTypeVersion
 import fr.acinq.phoenix.db.migrations.v11.types.OutgoingPartClosingInfoTypeVersion
 import fr.acinq.phoenix.db.migrations.v11.types.OutgoingPartStatusTypeVersion
 import fr.acinq.phoenix.db.migrations.v11.types.OutgoingStatusTypeVersion
+import fr.acinq.phoenix.db.payments.LnurlBase
+import fr.acinq.phoenix.db.payments.LnurlMetadata
+import fr.acinq.phoenix.db.payments.LnurlSuccessAction
+import fr.acinq.phoenix.db.payments.WalletPaymentMetadataRow
+import fr.acinq.phoenix.utils.extensions.deriveUUID
 import fr.acinq.phoenix.utils.extensions.toByteArray
+import fracinqphoenixdb.Payments_metadata
 
 val AfterVersion11 = AfterVersion(11) { driver ->
 
@@ -84,7 +95,7 @@ val AfterVersion11 = AfterVersion(11) { driver ->
     |       lightning_parts.part_created_at AS lightning_part_created_at,
     |       lightning_parts.part_completed_at AS lightning_part_completed_at,
     |       lightning_parts.part_status_type AS lightning_part_status_type,
-    |       lightning_parts.part_status_blob AS lightning_part_status_blob
+    |       lightning_parts.part_status_blob AS lightning_part_status_blob,
     |       -- closing tx parts
     |       closing_parts.part_id AS closingtx_part_id,
     |       closing_parts.part_tx_id AS closingtx_tx_id,
@@ -143,7 +154,6 @@ val AfterVersion11 = AfterVersion(11) { driver ->
                         tx_id = cursor.getBytes(3)!!,
                         lease_type = cursor.getString(4)!!,
                         lease_blob = cursor.getBytes(5)!!,
-//                        payment_details_type = cursor.getString(6),
                         created_at = cursor.getLong(6)!!,
                         confirmed_at = cursor.getLong(7),
                         locked_at = cursor.getLong(8)
@@ -224,15 +234,163 @@ val AfterVersion11 = AfterVersion(11) { driver ->
             }
         )
 
-        TODO("migrate or drop/recreate table cloud_kit_payments")
+        val metadataLinks = driver.executeQuery(
+            identifier = null,
+            sql = """
+                SELECT type, id, lnurl_base_type, lnurl_base_blob, lnurl_description, lnurl_metadata_type, lnurl_metadata_blob, lnurl_successAction_type, lnurl_successAction_blob, user_description, user_notes, modified_at, original_fiat_type, original_fiat_rate
+                FROM payments_metadata_old
+            """.trimIndent(),
+            parameters = 0,
+            mapper = { cursor ->
+                val result = buildList {
+                    while (cursor.next().value) {
+                        val type = cursor.getLong(0)!!
+                        val id = cursor.getString(1)!!.let { if (type == 1L) ByteVector32(it).deriveUUID() else UUID.fromString(it) }
+                        val lnurlBase = cursor.getString(2)?.let { t -> cursor.getBytes(3)?.let { LnurlBase.TypeVersion.valueOf(t) to it } }
+                        val lnurlDesc = cursor.getString(4)
+                        val lnurlMetadata = cursor.getString(5)?.let { t -> cursor.getBytes(6)?.let { LnurlMetadata.TypeVersion.valueOf(t) to it } }
+                        val lnurlSuccessAction = cursor.getString(7)?.let { t -> cursor.getBytes(8)?.let { LnurlSuccessAction.TypeVersion.valueOf(t) to it } }
+                        val userDesc = cursor.getString(9)
+                        val userNotes = cursor.getString(10)
+                        val modifiedAt = cursor.getLong(11)
+                        val originalFiat = cursor.getString(12)?.let { t -> cursor.getDouble(13)?.let { t to it }}
+
+                        add(id to WalletPaymentMetadataRow(lnurl_base = lnurlBase, lnurl_metadata = lnurlMetadata, lnurl_successAction =  lnurlSuccessAction, lnurl_description = lnurlDesc,
+                            original_fiat = originalFiat, user_description = userDesc, user_notes = userNotes, modified_at = modifiedAt))
+                    }
+                }
+                QueryResult.Value(result)
+            }
+        ).value
+
+        metadataLinks
+            .forEach { (paymentId, metadata) ->
+                driver.execute(
+                    identifier = null,
+                    sql = """
+                        INSERT INTO payments_metadata (
+                                    payment_id,
+                                    lnurl_base_type, lnurl_base_blob,
+                                    lnurl_description,
+                                    lnurl_metadata_type, lnurl_metadata_blob,
+                                    lnurl_successAction_type, lnurl_successAction_blob,
+                                    user_description, user_notes,
+                                    modified_at,
+                                    original_fiat_type, original_fiat_rate)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """.trimIndent(),
+                    parameters = 13
+                ) {
+                    bindBytes(0, paymentId.toByteArray())
+                    bindString(1, metadata.lnurl_base?.first?.let { EnumColumnAdapter<LnurlBase.TypeVersion>().encode(it) })
+                    bindBytes(2, metadata.lnurl_base?.second)
+                    bindString(3, metadata.lnurl_description)
+                    bindString(4, metadata.lnurl_metadata?.first?.let { EnumColumnAdapter<LnurlMetadata.TypeVersion>().encode(it) })
+                    bindBytes(5, metadata.lnurl_metadata?.second)
+                    bindString(6, metadata.lnurl_successAction?.first?.let { EnumColumnAdapter<LnurlSuccessAction.TypeVersion>().encode(it) })
+                    bindBytes(7, metadata.lnurl_successAction?.second)
+                    bindString(8, metadata.user_description)
+                    bindString(9, metadata.user_notes)
+                    bindLong(10, metadata.modified_at)
+                    bindString(11, metadata.original_fiat?.first)
+                    bindDouble(12, metadata.original_fiat?.second)
+                }
+            }
+
+        data class OnChainLink(val txId: ByteArray, val paymentId: UUID, val confirmedAt: Long?, val lockedAt: Long?)
+
+        val onChainTxLinks = driver.executeQuery(
+            identifier = null,
+            sql = """
+                SELECT tx_id, type, id, confirmed_at, locked_at
+                FROM link_tx_to_payments
+            """.trimIndent(),
+            parameters = 0,
+            mapper = { cursor ->
+                val result = buildList {
+                    while (cursor.next().value) {
+                        val txId = cursor.getBytes(0)!!
+                        val type = cursor.getLong(1)!!
+                        val id = cursor.getString(2)!!.let { if (type == 1L) ByteVector32(it).deriveUUID() else UUID.fromString(it) }
+                        val confirmedAt = cursor.getLong(3)
+                        val lockedAt = cursor.getLong(4)
+                        add(OnChainLink(txId = txId, paymentId = id, confirmedAt = confirmedAt, lockedAt = lockedAt))
+                    }
+                }
+                QueryResult.Value(result)
+            }
+        ).value
+
+        onChainTxLinks
+            .forEach { onChainTxLink ->
+                driver.execute(
+                    identifier = null,
+                    sql = """
+                        INSERT INTO on_chain_txs (payment_id, tx_id, confirmed_at, locked_at) VALUES (?, ?, ?, ?)
+                    """.trimIndent(),
+                    parameters = 4
+                ) {
+                    bindBytes(0, onChainTxLink.paymentId.toByteArray())
+                    bindBytes(1, onChainTxLink.txId)
+                    bindLong(2, onChainTxLink.confirmedAt)
+                    bindLong(3, onChainTxLink.lockedAt)
+                }
+            }
+
+        data class MetadataRow(
+            val unpaddedSize: Long?,
+            val recordCreation: Long?,
+            val recordBlob: ByteArray?,
+        )
+
+        val cloudMetadata = driver.executeQuery(
+            identifier = null,
+            sql = """
+                SELECT type, id, unpadded_size, record_creation, record_blob
+                FROM cloudkit_payments_metadata_old
+            """.trimIndent(),
+            parameters = 0,
+            mapper = { cursor ->
+                val result = buildList {
+                    while (cursor.next().value) {
+                        val type = cursor.getLong(0)!!
+                        val id = cursor.getString(1)!!.let { if (type == 1L) ByteVector32(it).deriveUUID() else UUID.fromString(it) }
+                        val unpaddedSize = cursor.getLong(2)
+                        val recordCreation = cursor.getLong(3)
+                        val recordBlob = cursor.getBytes(4)
+
+                        add(id to MetadataRow(unpaddedSize, recordCreation, recordBlob))
+                    }
+                }
+                QueryResult.Value(result)
+            }
+        ).value
+
+        cloudMetadata
+            .forEach { (paymentId, metadata) ->
+                driver.execute(
+                    identifier = null,
+                    sql = "INSERT INTO cloudkit_payments_metadata (payment_id, unpadded_size, record_creation, record_blob VALUES (?, ?, ?, ?)",
+                    parameters = 4
+                ) {
+                    bindBytes(0, paymentId.toByteArray())
+                    bindLong(1, metadata.unpaddedSize)
+                    bindLong(2, metadata.recordCreation)
+                    bindBytes(3, metadata.recordBlob)
+                }
+            }
 
         listOf(
-            "DROP TABLE lightning_outgoing_payments",
-            "DROP TABLE lightning_outgoing_payment_parts",
+            "DROP TABLE outgoing_payments",
+            "DROP TABLE outgoing_payment_parts",
             "DROP TABLE inbound_liquidity_outgoing_payments",
             "DROP TABLE splice_outgoing_payments",
             "DROP TABLE splice_cpfp_outgoing_payments",
             "DROP TABLE channel_close_outgoing_payments",
+            "DROP TABLE payments_metadata_old",
+            "DROP TABLE cloudkit_payments_metadata_old",
+            "DROP TABLE cloudkit_payments_queue_old",
+            "DROP TABLE link_tx_to_payments"
         ).forEach { sql ->
             driver.execute(identifier = null, sql = sql, parameters = 0)
         }

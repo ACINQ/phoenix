@@ -16,9 +16,18 @@
 
 package fr.acinq.phoenix.db
 
+import app.cash.sqldelight.EnumColumnAdapter
 import app.cash.sqldelight.db.SqlDriver
+import fr.acinq.lightning.utils.currentTimestampMillis
+import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.runTest
-import fr.acinq.phoenix.utils.testLoggerFactory
+import fracinqphoenixdb.Cloudkit_payments_metadata
+import fracinqphoenixdb.Cloudkit_payments_queue
+import fracinqphoenixdb.Link_lightning_outgoing_payment_parts
+import fracinqphoenixdb.On_chain_txs
+import fracinqphoenixdb.Payments_incoming
+import fracinqphoenixdb.Payments_metadata
+import fracinqphoenixdb.Payments_outgoing
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -27,8 +36,20 @@ class PaymentsDbMigrationTest {
 
     @Test
     fun `read v10 db`() = runTest {
-        val paymentsDb = SqlitePaymentsDb(testLoggerFactory, testPaymentsDriverFromFile(), currencyManager = null)
-        val payments = paymentsDb.listRangeSuccessfulPaymentsOrder(0, Long.MAX_VALUE, 1000, 0)
+        val driver = testPaymentsDriverFromFile()
+        val paymentsDb = SqlitePaymentsDb(driver, PaymentsDatabase(
+                driver = driver,
+                payments_incomingAdapter = Payments_incoming.Adapter(UUIDAdapter, ByteVector32Adapter, TxIdAdapter, IncomingPaymentAdapter),
+                payments_outgoingAdapter = Payments_outgoing.Adapter(UUIDAdapter, ByteVector32Adapter, TxIdAdapter, OutgoingPaymentAdapter),
+                link_lightning_outgoing_payment_partsAdapter = Link_lightning_outgoing_payment_parts.Adapter(UUIDAdapter, UUIDAdapter),
+                on_chain_txsAdapter = On_chain_txs.Adapter(UUIDAdapter, TxIdAdapter),
+                payments_metadataAdapter = Payments_metadata.Adapter(UUIDAdapter, EnumColumnAdapter(), EnumColumnAdapter(), EnumColumnAdapter()),
+                cloudkit_payments_queueAdapter = Cloudkit_payments_queue.Adapter(UUIDAdapter),
+                cloudkit_payments_metadataAdapter = Cloudkit_payments_metadata.Adapter(UUIDAdapter),
+            ),
+            currencyManager = null)
+        val payments = paymentsDb.database.paymentsQueries.list(Long.MAX_VALUE, 0).executeAsList()
+
         assertEquals(648, payments.size)
     }
 }

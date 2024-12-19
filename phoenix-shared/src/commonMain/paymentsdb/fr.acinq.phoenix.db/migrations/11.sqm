@@ -29,6 +29,34 @@ CREATE TABLE link_lightning_outgoing_payment_parts (
     parent_id BLOB AS UUID NOT NULL
 );
 
+-- This table will be read then deleted in the code migration
+ALTER TABLE payments_metadata RENAME TO payments_metadata_old;
+
+CREATE TABLE IF NOT EXISTS payments_metadata (
+    payment_id BLOB AS UUID NOT NULL PRIMARY KEY,
+    lnurl_base_type TEXT AS LnurlBase.TypeVersion,
+    lnurl_base_blob BLOB,
+    lnurl_description TEXT,
+    lnurl_metadata_type TEXT AS LnurlMetadata.TypeVersion,
+    lnurl_metadata_blob BLOB,
+    lnurl_successAction_type TEXT AS LnurlSuccessAction.TypeVersion,
+    lnurl_successAction_blob BLOB,
+    user_description TEXT,
+    user_notes TEXT DEFAULT NULL,
+    modified_at INTEGER DEFAULT NULL,
+    original_fiat_type TEXT DEFAULT NULL,
+    original_fiat_rate REAL DEFAULT NULL
+);
+
+CREATE TABLE on_chain_txs (
+    payment_id BLOB AS UUID NOT NULL PRIMARY KEY,
+    tx_id BLOB AS TxId NOT NULL,
+    confirmed_at INTEGER DEFAULT NULL,
+    locked_at INTEGER DEFAULT NULL
+);
+
+CREATE INDEX on_chain_txs_tx_id ON on_chain_txs(tx_id);
+
 CREATE VIEW payments
 AS SELECT id, created_at, completed_at, data
 FROM (
@@ -38,3 +66,26 @@ UNION ALL
     SELECT id, created_at, sent_at AS completed_at, data
     FROM payments_outgoing
 );
+
+-- This table will be read then deleted in the code migration
+ALTER TABLE cloudkit_payments_metadata RENAME TO cloudkit_payments_metadata_old;
+DROP INDEX record_creation_idx;
+
+CREATE TABLE IF NOT EXISTS cloudkit_payments_metadata (
+    id BLOB AS UUID NOT NULL PRIMARY KEY,
+    unpadded_size INTEGER NOT NULL,
+    record_creation INTEGER NOT NULL,
+    record_blob BLOB NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS record_creation_idx
+    ON cloudkit_payments_metadata(record_creation);
+
+-- This table will be read then deleted in the code migration
+ALTER TABLE cloudkit_payments_queue RENAME TO cloudkit_payments_queue_old;
+CREATE TABLE IF NOT EXISTS cloudkit_payments_queue (
+    rowid INTEGER PRIMARY KEY,
+    id BLOB AS UUID NOT NULL,
+    date_added INTEGER NOT NULL
+);
+

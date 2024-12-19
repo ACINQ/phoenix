@@ -27,7 +27,6 @@ import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.Bolt12Invoice
-import fr.acinq.phoenix.db.payments.DbTypesHelper
 import fr.acinq.phoenix.db.migrations.v10.json.ByteVector32Serializer
 import fr.acinq.phoenix.db.migrations.v10.json.SatoshiSerializer
 import kotlinx.serialization.SerialName
@@ -94,8 +93,6 @@ sealed class OutgoingDetailsData {
             }
 
         /** Returns the channel closing details from a blob, for backward-compatibility purposes. */
-        fun deserializeLegacyClosingDetails(blob: ByteArray): Closing.V0 = DbTypesHelper.decodeBlob(blob) { json, format ->
-            format.decodeFromString(json)
-        }
+        fun deserializeLegacyClosingDetails(blob: ByteArray): Closing.V0 = Json.decodeFromString<Closing.V0>(blob.decodeToString())
     }
 }

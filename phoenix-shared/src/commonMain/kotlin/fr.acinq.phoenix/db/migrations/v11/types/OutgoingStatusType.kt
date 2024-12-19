@@ -25,7 +25,6 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.payment.FinalFailure
-import fr.acinq.phoenix.db.payments.DbTypesHelper.decodeBlob
 import fr.acinq.phoenix.db.migrations.v10.json.ByteVector32Serializer
 import fr.acinq.phoenix.db.migrations.v10.json.SatoshiSerializer
 import kotlinx.serialization.SerialName
@@ -73,10 +72,7 @@ sealed class OutgoingStatusData {
     companion object {
 
         /** Extract valuable data from old outgoing payments status that represent closing transactions. */
-        fun deserializeLegacyClosingStatus(blob: ByteArray): SucceededOnChain.V0 = decodeBlob(blob) { json, format ->
-            val data = format.decodeFromString<SucceededOnChain.V0>(json)
-            data
-        }
+        fun deserializeLegacyClosingStatus(blob: ByteArray): SucceededOnChain.V0 = Json.decodeFromString<SucceededOnChain.V0>(blob.decodeToString())
 
         fun deserialize(typeVersion: OutgoingStatusTypeVersion, blob: ByteArray, completedAt: Long): LightningOutgoingPayment.Status =
             @Suppress("DEPRECATION")

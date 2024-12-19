@@ -3,6 +3,7 @@ package fr.acinq.phoenix.managers
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
+import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.utils.*
@@ -74,12 +75,12 @@ class PaymentsManager(
     }
 
     private suspend fun monitorPaymentsCountInDb() {
-        TODO("do we need the payments count?")
+        // TODO("do we need the payments count?")
     }
 
     /** Monitors the payments database and push any new payments in the [_lastCompletedPayment] flow. */
     private suspend fun monitorLastCompletedPayment(appLaunchTimestamp: Long) {
-        TODO("why not use NodeEvents?")
+        // TODO("why not use NodeEvents?")
     }
 
     /** Watches transactions that are unconfirmed, checks their confirmation status at each block, and updates relevant payments. */
@@ -139,15 +140,15 @@ class PaymentsManager(
     }
 
     /**
-     * Returns the incoming [WalletPaymentId] that match a given transaction Id.
+     * Returns the incoming [WalletPayment] that match a given transaction Id.
      *
      * It is used to find the payments that could have triggered a liquidity event, using that event's txId.
      * Similar to [InboundLiquidityOutgoingPayment.relatedPaymentIds].
      */
     suspend fun listIncomingPaymentsForTxId(
         txId: TxId
-    ): List<WalletPaymentId.IncomingPaymentId> {
-        return paymentsDb().getWalletPaymentIdForTxId(txId).filterIsInstance<WalletPaymentId.IncomingPaymentId>()
+    ): List<IncomingPayment> {
+        return paymentsDb().getWalletPaymentForTxId(txId).filterIsInstance<IncomingPayment>()
     }
 
     suspend fun getPayment(

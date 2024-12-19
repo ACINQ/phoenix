@@ -136,7 +136,7 @@ data class WalletPaymentInfo(
     val contact: ContactInfo?,
     val fetchOptions: WalletPaymentFetchOptions
 ) {
-    fun id() = payment.walletPaymentId()
+    val id get() = payment.id
 
     /**
      * Converts the info to a `WalletPaymentOrderRow`, if possible.

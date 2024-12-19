@@ -105,7 +105,7 @@ class CsvWriterTests {
             parts = listOf(
                 makeLightningPart(4_354_435.msat)
             ),
-            status = LightningOutgoingPayment.Status.Completed.Succeeded(
+            status = LightningOutgoingPayment.Status.Succeeded(
                 preimage = randomBytes32(),
                 completedAt = 1675270582248
             )
@@ -136,7 +136,7 @@ class CsvWriterTests {
             parts = listOf(
                 makeLightningPart(103_010.msat)
             ),
-            status = LightningOutgoingPayment.Status.Completed.Succeeded(
+            status = LightningOutgoingPayment.Status.Succeeded(
                 preimage = randomBytes32(),
                 completedAt = 1675270681099
             )
@@ -167,7 +167,7 @@ class CsvWriterTests {
             parts = listOf(
                 makeLightningPart(103_010.msat)
             ),
-            status = LightningOutgoingPayment.Status.Completed.Succeeded(
+            status = LightningOutgoingPayment.Status.Succeeded(
                 preimage = randomBytes32(),
                 completedAt = 1675270740742
             )
@@ -198,7 +198,7 @@ class CsvWriterTests {
             parts = listOf(
                 makeLightningPart(103_010.msat)
             ),
-            status = LightningOutgoingPayment.Status.Completed.Succeeded(
+            status = LightningOutgoingPayment.Status.Succeeded(
                 preimage = randomBytes32(),
                 completedAt = 1675270826945
             )
@@ -265,7 +265,7 @@ class CsvWriterTests {
                 makeLightningPart(12_000_000.msat),
                 makeLightningPart(820_000.msat)
             ),
-            status = LightningOutgoingPayment.Status.Completed.Succeeded(
+            status = LightningOutgoingPayment.Status.Succeeded(
                 preimage = randomBytes32(),
                 completedAt = 1675289814498
             )

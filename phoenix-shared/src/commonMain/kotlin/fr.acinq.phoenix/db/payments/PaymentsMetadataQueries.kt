@@ -18,7 +18,7 @@ class PaymentsMetadataQueries(val database: PaymentsDatabase) {
         data: WalletPaymentMetadataRow
     ) {
         queries.addMetadata(
-            id = id,
+            payment_id = id,
             lnurl_base_type = data.lnurl_base?.first,
             lnurl_base_blob = data.lnurl_base?.second,
             lnurl_description = data.lnurl_description,
@@ -60,15 +60,15 @@ class PaymentsMetadataQueries(val database: PaymentsDatabase) {
     }
 
     private fun getDescriptions(id: UUID): WalletPaymentMetadata? {
-        return queries.getDescriptions(id = id, mapper = ::mapDescriptions).executeAsOneOrNull()
+        return queries.getDescriptions(payment_id = id, mapper = ::mapDescriptions).executeAsOneOrNull()
     }
 
     private fun getDescriptionsAndOriginalFiat(id: UUID): WalletPaymentMetadata? {
-        return queries.getDescriptionsAndOriginalFiat(id = id, mapper = ::mapDescriptionsAndOriginalFiat).executeAsOneOrNull()
+        return queries.getDescriptionsAndOriginalFiat(payment_id = id, mapper = ::mapDescriptionsAndOriginalFiat).executeAsOneOrNull()
     }
 
     private fun get(id: UUID): WalletPaymentMetadata? {
-        return queries.get(id = id, mapper = ::mapAll).executeAsOneOrNull()
+        return queries.get(payment_id = id, mapper = ::mapAll).executeAsOneOrNull()
     }
 
     fun updateUserInfo(
@@ -77,18 +77,18 @@ class PaymentsMetadataQueries(val database: PaymentsDatabase) {
         userNotes: String?
     ) {
         database.transaction {
-            val rowExists = queries.hasMetadata(id = id).executeAsOne() > 0
+            val rowExists = queries.hasMetadata(payment_id = id).executeAsOne() > 0
             val modifiedAt = currentTimestampMillis()
             if (rowExists) {
                 queries.updateUserInfo(
-                    id = id,
+                    payment_id = id,
                     user_description = userDescription,
                     user_notes = userNotes,
                     modified_at = modifiedAt
                 )
             } else {
                 queries.addMetadata(
-                    id = id,
+                    payment_id = id,
                     lnurl_base_type = null,
                     lnurl_base_blob = null,
                     lnurl_description = null,

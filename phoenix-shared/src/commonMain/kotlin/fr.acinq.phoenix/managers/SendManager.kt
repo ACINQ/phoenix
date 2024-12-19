@@ -19,7 +19,6 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.BitcoinUri
 import fr.acinq.phoenix.data.BitcoinUriError
 import fr.acinq.phoenix.data.LnurlPayMetadata
-import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.data.lnurl.Lnurl
 import fr.acinq.phoenix.data.lnurl.LnurlAuth
@@ -444,10 +443,7 @@ class SendManager(
 
         // save lnurl metadata if any
         metadata?.let { WalletPaymentMetadataRow.serialize(it) }?.let { row ->
-            databaseManager.paymentsDb().enqueueMetadata(
-                row = row,
-                id = WalletPaymentId.LightningOutgoingPaymentId(paymentId)
-            )
+            databaseManager.paymentsDb().enqueueMetadata(row = row, id = paymentId)
         }
 
         peer.send(
