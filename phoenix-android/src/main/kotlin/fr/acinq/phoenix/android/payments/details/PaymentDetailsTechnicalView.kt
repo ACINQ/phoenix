@@ -16,15 +16,12 @@
 
 package fr.acinq.phoenix.android.payments.details
 
-import android.text.format.DateUtils
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.platform.LocalContext
@@ -32,24 +29,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.bitcoin.PrivateKey
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.*
-import fr.acinq.lightning.payment.Bolt11Invoice
-import fr.acinq.lightning.payment.Bolt12Invoice
-import fr.acinq.lightning.payment.OfferPaymentMetadata
-import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.utils.msat
-import fr.acinq.lightning.utils.sat
-import fr.acinq.lightning.utils.sum
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.LocalFiatCurrency
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.Screen
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountView
 import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.CardHeader
@@ -61,6 +51,17 @@ import fr.acinq.phoenix.android.components.txUrl
 import fr.acinq.phoenix.android.fiatRate
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.navigateToPaymentDetails
+import fr.acinq.phoenix.android.payments.details.technical.TechnicalIncomingBolt11
+import fr.acinq.phoenix.android.payments.details.technical.TechnicalIncomingBolt12
+import fr.acinq.phoenix.android.payments.details.technical.TechnicalIncomingLegacyPayToOpen
+import fr.acinq.phoenix.android.payments.details.technical.TechnicalIncomingLegacySwapIn
+import fr.acinq.phoenix.android.payments.details.technical.TechnicalIncomingNewChannel
+import fr.acinq.phoenix.android.payments.details.technical.TechnicalIncomingSpliceIn
+import fr.acinq.phoenix.android.payments.details.technical.TechnicalOutgoingChannelClose
+import fr.acinq.phoenix.android.payments.details.technical.TechnicalOutgoingLightning
+import fr.acinq.phoenix.android.payments.details.technical.TechnicalOutgoingLiquidity
+import fr.acinq.phoenix.android.payments.details.technical.TechnicalOutgoingSplice
+import fr.acinq.phoenix.android.payments.details.technical.TechnicalOutgoingSpliceCpfp
 import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
 import fr.acinq.phoenix.android.utils.Converter.toFiat
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
@@ -69,152 +70,80 @@ import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.WalletPaymentInfo
-import fr.acinq.phoenix.utils.extensions.amountFeeCredit
 import fr.acinq.phoenix.utils.extensions.relatedPaymentIds
 
 
 @Composable
 fun PaymentDetailsTechnicalView(
-    data: WalletPaymentInfo
+    data: WalletPaymentInfo,
 ) {
     val payment = data.payment
-    // only use original fiat rate if the payment is older than 3 days
-    val rateThen = data.metadata.originalFiat?.takeIf { currentTimestampMillis() - data.payment.createdAt >= 3 * DateUtils.DAY_IN_MILLIS }
 
+    // use original fiat rate if the payment is older than 1 days
+    val originalFiatRate = data.metadata.originalFiat
+
+    @Suppress("DEPRECATION")
     when (payment) {
-        is IncomingPayment -> {
-            TechnicalCard {
-                HeaderForIncoming(payment)
-            }
-            TechnicalCard {
-                TimestampSection(payment)
-            }
-            TechnicalCard {
-                AmountSection(payment, rateThen)
-                DetailsForIncoming(payment)
-            }
+        is Bolt11IncomingPayment -> TechnicalIncomingBolt11(payment, originalFiatRate)
+        is Bolt12IncomingPayment -> TechnicalIncomingBolt12(payment, originalFiatRate)
+        is LegacyPayToOpenIncomingPayment -> TechnicalIncomingLegacyPayToOpen(payment, originalFiatRate)
+        is LegacySwapInIncomingPayment -> TechnicalIncomingLegacySwapIn(payment, originalFiatRate)
+        is NewChannelIncomingPayment -> TechnicalIncomingNewChannel(payment, originalFiatRate)
+        is SpliceInIncomingPayment -> TechnicalIncomingSpliceIn(payment, originalFiatRate)
 
-            val receivedWith = payment.received?.receivedWith
-            if (!receivedWith.isNullOrEmpty()) {
-                CardHeader(text = stringResource(id = R.string.paymentdetails_parts_label, receivedWith.size))
-                receivedWith.forEach {
-                    TechnicalCard {
-                        when (it) {
-                            is IncomingPayment.ReceivedWith.LightningPayment -> ReceivedWithLightning(it, rateThen)
-                            is IncomingPayment.ReceivedWith.NewChannel -> ReceivedWithNewChannel(it, rateThen)
-                            is IncomingPayment.ReceivedWith.SpliceIn -> ReceivedWithSpliceIn(it, rateThen)
-                            is IncomingPayment.ReceivedWith.AddedToFeeCredit -> ReceivedWithFeeCredit(it, rateThen)
-                        }
-                    }
-                }
-            }
-        }
-        is OutgoingPayment -> {
-            TechnicalCard {
-                HeaderForOutgoing(payment)
-            }
-            TechnicalCard {
-                TimestampSection(payment)
-            }
-            TechnicalCard {
-                AmountSection(payment, rateThen)
-                when (payment) {
-                    is LightningOutgoingPayment -> DetailsForLightningOutgoingPayment(payment)
-                    is SpliceOutgoingPayment -> DetailsForSpliceOut(payment)
-                    is ChannelCloseOutgoingPayment -> DetailsForChannelClose(payment)
-                    is SpliceCpfpOutgoingPayment -> DetailsForCpfp(payment)
-                    is InboundLiquidityOutgoingPayment -> DetailsForInboundLiquidity(payment)
-                }
-            }
-
-            if (payment is LightningOutgoingPayment) {
-                val successfulParts = payment.parts.filter { it.status is LightningOutgoingPayment.Part.Status.Succeeded }
-                if (successfulParts.isNotEmpty()) {
-                    CardHeader(text = stringResource(id = R.string.paymentdetails_parts_label, successfulParts.size))
-                }
-                successfulParts.forEachIndexed { index, part ->
-                    TechnicalCard {
-                        LightningPart(index, part, rateThen)
-                    }
-                }
-            }
-        }
+        is LightningOutgoingPayment -> TechnicalOutgoingLightning(payment, originalFiatRate)
+        is ChannelCloseOutgoingPayment -> TechnicalOutgoingChannelClose(payment, originalFiatRate)
+        is InboundLiquidityOutgoingPayment -> TechnicalOutgoingLiquidity(payment, originalFiatRate)
+        is SpliceCpfpOutgoingPayment -> TechnicalOutgoingSpliceCpfp(payment, originalFiatRate)
+        is SpliceOutgoingPayment -> TechnicalOutgoingSplice(payment, originalFiatRate)
     }
 }
 
-@Composable
-private fun HeaderForOutgoing(
-    payment: OutgoingPayment
-) {
-    // -- payment type
-    TechnicalRow(label = stringResource(id = R.string.paymentdetails_payment_type_label)) {
-        Text(
-            when (payment) {
-                is ChannelCloseOutgoingPayment -> stringResource(id = R.string.paymentdetails_closing)
-                is SpliceOutgoingPayment -> stringResource(id = R.string.paymentdetails_splice_outgoing)
-                is LightningOutgoingPayment -> when (payment.details) {
-                    is LightningOutgoingPayment.Details.Normal -> stringResource(R.string.paymentdetails_normal_outgoing)
-                    is LightningOutgoingPayment.Details.SwapOut -> stringResource(R.string.paymentdetails_swapout)
-                    is LightningOutgoingPayment.Details.Blinded -> stringResource(id = R.string.paymentdetails_offer_outgoing)
-                }
-                is SpliceCpfpOutgoingPayment -> stringResource(id = R.string.paymentdetails_splice_cpfp_outgoing)
-                is InboundLiquidityOutgoingPayment -> stringResource(id = R.string.paymentdetails_inbound_liquidity)
-            }
-        )
-    }
-
-    // -- status
-    TechnicalRow(label = stringResource(id = R.string.paymentdetails_status_label)) {
-        Text(
-            when (payment) {
-                is InboundLiquidityOutgoingPayment -> when (payment.lockedAt) {
-                    null -> stringResource(R.string.paymentdetails_status_pending)
-                    else -> stringResource(R.string.paymentdetails_status_success)
-                }
-                is OnChainOutgoingPayment -> when (payment.confirmedAt) {
-                    null -> stringResource(R.string.paymentdetails_status_pending)
-                    else -> stringResource(R.string.paymentdetails_status_success)
-                }
-                is LightningOutgoingPayment -> when (payment.status) {
-                    is LightningOutgoingPayment.Status.Pending -> stringResource(R.string.paymentdetails_status_pending)
-                    is LightningOutgoingPayment.Status.Completed.Succeeded -> stringResource(R.string.paymentdetails_status_success)
-                    is LightningOutgoingPayment.Status.Completed.Failed -> stringResource(R.string.paymentdetails_status_failed)
-                }
-            }
-        )
-    }
-}
-
-@Composable
-private fun HeaderForIncoming(
-    payment: IncomingPayment
-) {
-    // -- payment type
-    TechnicalRow(label = stringResource(id = R.string.paymentdetails_payment_type_label)) {
-        Text(
-            text = when (payment.origin) {
-                is IncomingPayment.Origin.Invoice -> stringResource(R.string.paymentdetails_normal_incoming)
-                is IncomingPayment.Origin.SwapIn -> stringResource(R.string.paymentdetails_swapin)
-                is IncomingPayment.Origin.OnChain -> stringResource(R.string.paymentdetails_swapin)
-                is IncomingPayment.Origin.Offer -> stringResource(id = R.string.paymentdetails_offer_incoming)
-            }
-        )
-    }
-
-    // -- status
-    TechnicalRow(label = stringResource(id = R.string.paymentdetails_status_label)) {
-        if (payment.received == null) {
-            Text(text = stringResource(id = R.string.paymentdetails_status_pending))
-        } else if (payment.completedAt == null) {
-            Text(text= stringResource(id = R.string.paymentdetails_status_confirming))
-        } else {
-            Text(text = stringResource(R.string.paymentdetails_status_success))
-        }
-    }
-}
+//@Composable
+//private fun HeaderForOutgoing(
+//    payment: OutgoingPayment
+//) {
+//    // -- payment type
+//    TechnicalRow(label = stringResource(id = R.string.paymentdetails_payment_type_label)) {
+//        Text(
+//            when (payment) {
+//                is ChannelCloseOutgoingPayment -> stringResource(id = R.string.paymentdetails_closing)
+//                is SpliceOutgoingPayment -> stringResource(id = R.string.paymentdetails_splice_outgoing)
+//                is LightningOutgoingPayment -> when (payment.details) {
+//                    is LightningOutgoingPayment.Details.Normal -> stringResource(R.string.paymentdetails_normal_outgoing)
+//                    is LightningOutgoingPayment.Details.SwapOut -> stringResource(R.string.paymentdetails_swapout)
+//                    is LightningOutgoingPayment.Details.Blinded -> stringResource(id = R.string.paymentdetails_offer_outgoing)
+//                }
+//                is SpliceCpfpOutgoingPayment -> stringResource(id = R.string.paymentdetails_splice_cpfp_outgoing)
+//                is InboundLiquidityOutgoingPayment -> stringResource(id = R.string.paymentdetails_inbound_liquidity)
+//            }
+//        )
+//    }
+//
+//    // -- status
+//    TechnicalRow(label = stringResource(id = R.string.paymentdetails_status_label)) {
+//        Text(
+//            when (payment) {
+//                is InboundLiquidityOutgoingPayment -> when (payment.lockedAt) {
+//                    null -> stringResource(R.string.paymentdetails_status_pending)
+//                    else -> stringResource(R.string.paymentdetails_status_success)
+//                }
+//                is OnChainOutgoingPayment -> when (payment.confirmedAt) {
+//                    null -> stringResource(R.string.paymentdetails_status_pending)
+//                    else -> stringResource(R.string.paymentdetails_status_success)
+//                }
+//                is LightningOutgoingPayment -> when (payment.status) {
+//                    is LightningOutgoingPayment.Status.Pending -> stringResource(R.string.paymentdetails_status_pending)
+//                    is LightningOutgoingPayment.Status.Completed.Succeeded -> stringResource(R.string.paymentdetails_status_success)
+//                    is LightningOutgoingPayment.Status.Completed.Failed -> stringResource(R.string.paymentdetails_status_failed)
+//                }
+//            }
+//        )
+//    }
+//}
 
 @Composable
-private fun TimestampSection(
+fun TimestampSection(
     payment: WalletPayment
 ) {
     TechnicalRow(label = stringResource(id = R.string.paymentdetails_created_at_label)) {
@@ -237,271 +166,54 @@ private fun TimestampSection(
 }
 
 @Composable
-private fun AmountSection(
-    payment: WalletPayment,
-    rateThen: ExchangeRate.BitcoinPriceRate?
+fun IncomingAmountSection(
+    amountReceived: MilliSatoshi,
+    minerFee: Satoshi?,
+    serviceFee: MilliSatoshi?,
+    originalFiatRate: ExchangeRate.BitcoinPriceRate?,
 ) {
-    when (payment) {
-        is InboundLiquidityOutgoingPayment -> {
-            TechnicalRowAmount(
-                label = stringResource(id = R.string.paymentdetails_liquidity_amount_label),
-                amount = payment.purchase.amount.toMilliSatoshi(),
-                rateThen = rateThen,
-                mSatDisplayPolicy = MSatDisplayPolicy.SHOW
-            )
-            if (payment.feePaidFromChannelBalance.total > 0.sat) {
-                TechnicalRowAmount(
-                    label = stringResource(id = R.string.paymentdetails_liquidity_miner_fee_label),
-                    amount = payment.feePaidFromChannelBalance.miningFee.toMilliSatoshi(),
-                    rateThen = rateThen,
-                    mSatDisplayPolicy = MSatDisplayPolicy.SHOW
-                )
-                TechnicalRowAmount(
-                    label = stringResource(id = R.string.paymentdetails_liquidity_service_fee_label),
-                    amount = payment.feePaidFromChannelBalance.serviceFee.toMilliSatoshi(),
-                    rateThen = rateThen,
-                    mSatDisplayPolicy = MSatDisplayPolicy.SHOW
-                )
-            }
-        }
-        is OutgoingPayment -> {
-            TechnicalRowAmount(
-                label = stringResource(id = R.string.paymentdetails_amount_sent_label),
-                amount = payment.amount,
-                rateThen = rateThen,
-                mSatDisplayPolicy = MSatDisplayPolicy.SHOW
-            )
-            TechnicalRowAmount(
-                label = stringResource(id = R.string.paymentdetails_fees_label),
-                amount = payment.fees,
-                rateThen = rateThen,
-                mSatDisplayPolicy = MSatDisplayPolicy.SHOW
-            )
-        }
-        is IncomingPayment -> {
-            TechnicalRowAmount(
-                label = stringResource(R.string.paymentdetails_amount_received_label),
-                amount = payment.amount,
-                rateThen = rateThen,
-                mSatDisplayPolicy = MSatDisplayPolicy.SHOW
-            )
-            val receivedWithNewChannel = payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>() ?: emptyList()
-            val receivedWithSpliceIn = payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.SpliceIn>() ?: emptyList()
-            if ((receivedWithNewChannel + receivedWithSpliceIn).isNotEmpty()) {
-                val serviceFee = receivedWithNewChannel.map { it.serviceFee }.sum() +  receivedWithSpliceIn.map { it.serviceFee }.sum()
-                val fundingFee = receivedWithNewChannel.map { it.miningFee }.sum() + receivedWithSpliceIn.map { it.miningFee }.sum()
-                TechnicalRowAmount(
-                    label = stringResource(id = R.string.paymentdetails_service_fees_label),
-                    amount = serviceFee,
-                    rateThen = rateThen,
-                    mSatDisplayPolicy = MSatDisplayPolicy.SHOW
-                )
-                TechnicalRowAmount(
-                    label = stringResource(id = R.string.paymentdetails_funding_fees_label),
-                    amount = fundingFee.toMilliSatoshi(),
-                    rateThen = rateThen,
-                    mSatDisplayPolicy = MSatDisplayPolicy.HIDE
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun DetailsForLightningOutgoingPayment(
-    payment: LightningOutgoingPayment
-) {
-    val details = payment.details
-    val status = payment.status
-
-    // -- details of the payment
-    when (details) {
-        is LightningOutgoingPayment.Details.Normal -> {
-            TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_pubkey_label), value = payment.recipient.toHex())
-            Bolt11InvoiceSection(invoice = details.paymentRequest)
-        }
-        is LightningOutgoingPayment.Details.SwapOut -> {
-            TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_bitcoin_address_label), value = details.address)
-            TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = details.paymentHash.toHex())
-        }
-        is LightningOutgoingPayment.Details.Blinded -> {
-            Bolt12InvoiceSection(invoice = details.paymentRequest, payerKey = details.payerKey)
-        }
-    }
-
-    // -- status details
-    when (status) {
-        is LightningOutgoingPayment.Status.Completed.Succeeded.OffChain -> {
-            TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_preimage_label), value = status.preimage.toHex())
-        }
-        is LightningOutgoingPayment.Status.Completed.Failed -> {
-            TechnicalRow(label = stringResource(id = R.string.paymentdetails_error_label)) {
-                Text(text = status.reason.toString())
-            }
-        }
-        else -> {}
-    }
-}
-
-@Composable
-private fun DetailsForChannelClose(
-    payment: ChannelCloseOutgoingPayment
-) {
-    ChannelIdRow(payment.channelId)
-    TechnicalRowSelectable(
-        label = stringResource(id = R.string.paymentdetails_bitcoin_address_label),
-        value = payment.address
+    TechnicalRowAmount(
+        label = stringResource(R.string.paymentdetails_amount_received_label),
+        amount = amountReceived,
+        rateThen = originalFiatRate,
+        mSatDisplayPolicy = MSatDisplayPolicy.SHOW
     )
-    TransactionRow(payment.txId)
-    TechnicalRowSelectable(
-        label = stringResource(id = R.string.paymentdetails_closing_type_label),
-        value = when (payment.closingType) {
-            ChannelClosingType.Mutual -> stringResource(id = R.string.paymentdetails_closing_type_mutual)
-            ChannelClosingType.Local -> stringResource(id = R.string.paymentdetails_closing_type_local)
-            ChannelClosingType.Remote -> stringResource(id = R.string.paymentdetails_closing_type_remote)
-            ChannelClosingType.Revoked -> stringResource(id = R.string.paymentdetails_closing_type_revoked)
-            ChannelClosingType.Other -> stringResource(id = R.string.paymentdetails_closing_type_other)
-        }
+    serviceFee?.let {
+        TechnicalRowAmount(
+            label = stringResource(id = R.string.paymentdetails_service_fees_label),
+            amount = serviceFee,
+            rateThen = originalFiatRate,
+            mSatDisplayPolicy = MSatDisplayPolicy.SHOW
+        )
+    }
+    minerFee?.let {
+        TechnicalRowAmount(
+            label = stringResource(id = R.string.paymentdetails_funding_fees_label),
+            amount = minerFee.toMilliSatoshi(),
+            rateThen = originalFiatRate,
+            mSatDisplayPolicy = MSatDisplayPolicy.HIDE
+        )
+    }
+}
+
+@Composable
+fun OutgoingAmountSection(
+    payment: OutgoingPayment,
+    originalFiatRate: ExchangeRate.BitcoinPriceRate?
+) {
+    TechnicalRowAmount(
+        label = stringResource(id = R.string.paymentdetails_amount_sent_label),
+        amount = payment.amount,
+        rateThen = originalFiatRate,
+        mSatDisplayPolicy = MSatDisplayPolicy.SHOW
+    )
+    TechnicalRowAmount(
+        label = stringResource(id = R.string.paymentdetails_fees_label),
+        amount = payment.fees,
+        rateThen = originalFiatRate,
+        mSatDisplayPolicy = MSatDisplayPolicy.SHOW
     )
 }
-
-@Composable
-private fun DetailsForCpfp(
-    payment: SpliceCpfpOutgoingPayment
-) {
-    TransactionRow(payment.txId)
-}
-
-@Composable
-private fun DetailsForInboundLiquidity(
-    payment: InboundLiquidityOutgoingPayment
-) {
-    TechnicalRow(label = stringResource(id = R.string.paymentdetails_liquidity_purchase_type)) {
-        Text(text = "${
-            when (payment.purchase) {
-                is LiquidityAds.Purchase.Standard -> "Standard"
-                is LiquidityAds.Purchase.WithFeeCredit -> "Fee credit"
-            }
-        } [${payment.purchase.paymentDetails.paymentType}]")
-    }
-    TransactionRow(payment.txId)
-    ChannelIdRow(channelId = payment.channelId)
-    val paymentIds = payment.relatedPaymentIds()
-    val navController = navController
-    paymentIds.forEach {
-        TechnicalRowClickable(
-            label = stringResource(id = R.string.paymentdetails_liquidity_caused_by_label),
-            onClick = { navigateToPaymentDetails(navController, it, isFromEvent = false) },
-        ) {
-            Text(text = it.dbId, maxLines = 1, overflow = TextOverflow.Ellipsis)
-        }
-    }
-}
-
-@Composable
-private fun DetailsForSpliceOut(
-    payment: SpliceOutgoingPayment
-) {
-    ChannelIdRow(channelId = payment.channelId, label = stringResource(id = R.string.paymentdetails_splice_out_channel_label))
-    TechnicalRowSelectable(
-        label = stringResource(id = R.string.paymentdetails_bitcoin_address_label),
-        value = payment.address
-    )
-    TransactionRow(payment.txId)
-}
-
-@Composable
-private fun DetailsForIncoming(
-    payment: IncomingPayment
-) {
-    // -- details about the origin of the payment
-    when (val origin = payment.origin) {
-        is IncomingPayment.Origin.Invoice -> {
-            Bolt11InvoiceSection(invoice = origin.paymentRequest)
-            TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_preimage_label), value = payment.preimage.toHex())
-        }
-        is IncomingPayment.Origin.SwapIn -> {
-            TechnicalRow(label = stringResource(id = R.string.paymentdetails_swapin_address_label)) {
-                Text(origin.address ?: stringResource(id = R.string.utils_unknown))
-            }
-        }
-        is IncomingPayment.Origin.OnChain -> {
-            TechnicalRow(label = stringResource(id = R.string.paymentdetails_dualswapin_tx_label)) {
-                origin.localInputs.mapIndexed { index, outpoint ->
-                    Row {
-                        Text(text = stringResource(id = R.string.paymentdetails_dualswapin_tx_value, index + 1))
-                        Spacer(modifier = Modifier.width(4.dp))
-                        InlineTransactionLink(txId = outpoint.txid)
-                    }
-                }
-            }
-        }
-        is IncomingPayment.Origin.Offer -> {
-            Bolt12MetadataSection(metadata = origin.metadata)
-        }
-    }
-}
-
-@Composable
-private fun ReceivedWithLightning(
-    receivedWith: IncomingPayment.ReceivedWith.LightningPayment,
-    rateThen: ExchangeRate.BitcoinPriceRate?
-) {
-    TechnicalRow(label = stringResource(id = R.string.paymentdetails_received_with_label)) {
-        Text(text = stringResource(id = R.string.paymentdetails_received_with_lightning))
-    }
-    if (receivedWith.channelId != ByteVector32.Zeroes) {
-        ChannelIdRow(receivedWith.channelId)
-    }
-    receivedWith.fundingFee?.let {
-        TransactionRow(it.fundingTxId)
-    }
-    TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_received_label), amount = receivedWith.amountReceived, rateThen = rateThen)
-}
-
-@Composable
-private fun ReceivedWithNewChannel(
-    receivedWith: IncomingPayment.ReceivedWith.NewChannel,
-    rateThen: ExchangeRate.BitcoinPriceRate?
-) {
-    TechnicalRow(label = stringResource(id = R.string.paymentdetails_received_with_label)) {
-        Text(text = stringResource(id = R.string.paymentdetails_received_with_channel))
-    }
-    val channelId = receivedWith.channelId
-    if (channelId != ByteVector32.Zeroes) { // backward compat
-        ChannelIdRow(channelId)
-    }
-    TransactionRow(receivedWith.txId)
-    TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_received_label), amount = receivedWith.amountReceived, rateThen = rateThen)
-}
-
-@Composable
-private fun ReceivedWithSpliceIn(
-    receivedWith: IncomingPayment.ReceivedWith.SpliceIn,
-    rateThen: ExchangeRate.BitcoinPriceRate?
-) {
-    TechnicalRow(label = stringResource(id = R.string.paymentdetails_received_with_label)) {
-        Text(text = stringResource(id = R.string.paymentdetails_received_with_splicein))
-    }
-    val channelId = receivedWith.channelId
-    if (channelId != ByteVector32.Zeroes) { // backward compat
-        ChannelIdRow(channelId)
-    }
-    TransactionRow(receivedWith.txId)
-    TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_received_label), amount = receivedWith.amountReceived, rateThen = rateThen)
-}
-
-@Composable
-private fun ReceivedWithFeeCredit(
-    receivedWith: IncomingPayment.ReceivedWith.AddedToFeeCredit,
-    rateThen: ExchangeRate.BitcoinPriceRate?
-) {
-    TechnicalRow(label = stringResource(id = R.string.paymentdetails_received_with_label)) {
-        Text(text = stringResource(id = R.string.paymentdetails_received_with_fee_credit))
-    }
-    TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_added_to_fee_credit_label), amount = receivedWith.amountReceived, rateThen = rateThen)
-}
-
 @Composable
 private fun LightningPart(
     index: Int,
@@ -519,92 +231,10 @@ private fun LightningPart(
     TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_sent_label), amount = part.amount, rateThen = rateThen)
 }
 
-@Composable
-private fun Bolt11InvoiceSection(
-    invoice: Bolt11Invoice
-) {
-    val requestedAmount = invoice.amount
-    if (requestedAmount != null) {
-        TechnicalRowAmount(
-            label = stringResource(id = R.string.paymentdetails_invoice_requested_label),
-            amount = requestedAmount,
-            rateThen = null
-        )
-    }
-
-    val description = (invoice.description ?: invoice.descriptionHash?.toHex())?.takeIf { it.isNotBlank() }
-    if (description != null) {
-        TechnicalRow(label = stringResource(id = R.string.paymentdetails_payment_request_description_label)) {
-            Text(text = description)
-        }
-    }
-    TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = invoice.paymentHash.toHex())
-    TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_request_label), value = invoice.write())
-}
-
-@Composable
-private fun Bolt12InvoiceSection(
-    invoice: Bolt12Invoice,
-    payerKey: PrivateKey,
-) {
-    val requestedAmount = invoice.amount
-    if (requestedAmount != null) {
-        TechnicalRowAmount(
-            label = stringResource(id = R.string.paymentdetails_invoice_requested_label),
-            amount = requestedAmount,
-            rateThen = null
-        )
-    }
-
-    val description = invoice.description?.takeIf { it.isNotBlank() }
-    if (description != null) {
-        TechnicalRow(label = stringResource(id = R.string.paymentdetails_payment_request_description_label)) {
-            Text(text = description)
-        }
-    }
-
-    TechnicalRow(label = stringResource(id = R.string.paymentdetails_payerkey_label)) {
-        Text(text = payerKey.toHex())
-        val nodeParamsManager = business.nodeParamsManager
-        val offerPayerKey by produceState<PrivateKey?>(initialValue = null) {
-            value = nodeParamsManager.defaultOffer().payerKey
-        }
-        if (offerPayerKey != null && payerKey == offerPayerKey) {
-            Spacer(modifier = Modifier.heightIn(4.dp))
-            TextWithIcon(
-                text = stringResource(id = R.string.paymentdetails_payerkey_is_mine),
-                textStyle = MaterialTheme.typography.subtitle2,
-                icon = R.drawable.ic_info,
-                iconTint = MaterialTheme.typography.subtitle2.color,
-            )
-        }
-    }
-    TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = invoice.paymentHash.toHex())
-    TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_offer_label), value = invoice.invoiceRequest.offer.encode())
-    TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_bolt12_label), value = invoice.write())
-}
-
-@Composable
-private fun Bolt12MetadataSection(
-    metadata: OfferPaymentMetadata
-) {
-    TechnicalRowAmount(
-        label = stringResource(id = R.string.paymentdetails_invoice_requested_label),
-        amount = metadata.amount,
-        rateThen = null
-    )
-    TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = metadata.paymentHash.toHex())
-    TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_preimage_label), value = metadata.preimage.toHex())
-    TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_offer_metadata_label), value = metadata.encode().toHex())
-    if (metadata is OfferPaymentMetadata.V1) {
-        TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payerkey_label), value = metadata.payerKey.toHex())
-    }
-}
-
 // ============== utility components for this view
 
 @Composable
-private fun TechnicalCard(
+fun TechnicalCard(
     content: @Composable () -> Unit
 ) {
     Card(internalPadding = PaddingValues(12.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -613,7 +243,7 @@ private fun TechnicalCard(
 }
 
 @Composable
-private fun TechnicalRow(
+fun TechnicalRow(
     label: String,
     content: @Composable () -> Unit
 ) {
@@ -637,7 +267,7 @@ private fun TechnicalRow(
 }
 
 @Composable
-private fun TechnicalRowSelectable(
+fun TechnicalRowSelectable(
     label: String,
     value: String,
 ) {
@@ -649,7 +279,7 @@ private fun TechnicalRowSelectable(
 }
 
 @Composable
-private fun TechnicalRowAmount(
+fun TechnicalRowAmount(
     label: String,
     amount: MilliSatoshi,
     rateThen: ExchangeRate.BitcoinPriceRate?,
@@ -675,7 +305,7 @@ private fun TechnicalRowAmount(
 }
 
 @Composable
-private fun TechnicalRowWithCopy(label: String, value: String) {
+fun TechnicalRowWithCopy(label: String, value: String) {
     TechnicalRow(label = label) {
         val context = LocalContext.current
         Clickable(onClick = { copyToClipboard(context = context, data = value) }, modifier = Modifier.offset((-6).dp), shape = RoundedCornerShape(12.dp)) {
@@ -694,7 +324,7 @@ private fun TechnicalRowWithCopy(label: String, value: String) {
 }
 
 @Composable
-private fun TechnicalRowClickable(
+fun TechnicalRowClickable(
     label: String,
     onClick: () -> Unit,
     onLongClick: (() -> Unit)? = null,
@@ -718,7 +348,7 @@ private fun TechnicalRowClickable(
 }
 
 @Composable
-private fun TransactionRow(txId: TxId) {
+fun TransactionRow(txId: TxId) {
     val context = LocalContext.current
     val link = txUrl(txId = txId)
     TechnicalRowClickable(
@@ -731,7 +361,7 @@ private fun TransactionRow(txId: TxId) {
 }
 
 @Composable
-private fun ChannelIdRow(channelId: ByteVector32, label: String = stringResource(id = R.string.paymentdetails_channel_id_label)) {
+fun ChannelIdRow(channelId: ByteVector32, label: String = stringResource(id = R.string.paymentdetails_channel_id_label)) {
     val context = LocalContext.current
     val navController = navController
     TechnicalRowClickable(

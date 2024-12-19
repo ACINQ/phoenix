@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
+import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.msat
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
@@ -36,15 +37,13 @@ import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
 import fr.acinq.phoenix.android.utils.isLegacyMigration
 import fr.acinq.phoenix.android.utils.extensions.smartDescription
-import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentMetadata
-import fr.acinq.phoenix.data.walletPaymentId
 
 @Composable
 fun SplashChannelClose(
     payment: ChannelCloseOutgoingPayment,
     metadata: WalletPaymentMetadata,
-    onMetadataDescriptionUpdate: (WalletPaymentId, String?) -> Unit,
+    onMetadataDescriptionUpdate: (UUID, String?) -> Unit,
 ) {
     val peer by business.peerManager.peerState.collectAsState()
 
@@ -58,7 +57,7 @@ fun SplashChannelClose(
     SplashDescription(
         description = description,
         userDescription = metadata.userDescription,
-        paymentId = payment.walletPaymentId(),
+        paymentId = payment.id,
         onMetadataDescriptionUpdate = onMetadataDescriptionUpdate
     )
     SplashDestination(payment, metadata)

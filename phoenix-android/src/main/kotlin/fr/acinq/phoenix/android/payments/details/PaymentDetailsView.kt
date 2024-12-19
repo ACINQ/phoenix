@@ -30,6 +30,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.Card
@@ -38,7 +39,6 @@ import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.payments.details.splash.PaymentDetailsSplashView
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
-import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.managers.PaymentsManager
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory
 
 
 sealed class PaymentDetailsState {
-    object Loading : PaymentDetailsState()
+    data object Loading : PaymentDetailsState()
     sealed class Success : PaymentDetailsState() {
         abstract val payment: WalletPaymentInfo
 
@@ -67,14 +67,14 @@ class PaymentDetailsViewModel(
 
     var state by mutableStateOf<PaymentDetailsState>(PaymentDetailsState.Loading)
 
-    suspend fun getPayment(id: WalletPaymentId) {
-        log.debug("getting payment details for id=$id")
+    suspend fun getPayment(id: UUID) {
+        log.debug("getting payment details for id={}", id)
         state = paymentsManager.getPayment(id, WalletPaymentFetchOptions.All)?.let {
             PaymentDetailsState.Success.Splash(it)
         } ?: PaymentDetailsState.Failure(NoSuchElementException("no payment found for id=$id"))
     }
 
-    fun updateMetadata(id: WalletPaymentId, userDescription: String?) {
+    fun updateMetadata(id: UUID, userDescription: String?) {
         viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
             log.error("failed to save user description to database: ", e)
         }) {
@@ -96,7 +96,7 @@ class PaymentDetailsViewModel(
 
 @Composable
 fun PaymentDetailsView(
-    paymentId: WalletPaymentId,
+    paymentId: UUID,
     onBackClick: () -> Unit,
     fromEvent: Boolean,
 ) {

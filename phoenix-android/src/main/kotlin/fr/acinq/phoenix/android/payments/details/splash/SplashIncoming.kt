@@ -31,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.sum
@@ -41,19 +42,15 @@ import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.SplashLabelRow
 import fr.acinq.phoenix.android.components.contact.ContactCompactView
 import fr.acinq.phoenix.android.components.contact.OfferContactState
-import fr.acinq.phoenix.android.utils.Converter.toPrettyString
-import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
 import fr.acinq.phoenix.android.utils.extensions.smartDescription
-import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentMetadata
-import fr.acinq.phoenix.data.walletPaymentId
 import fr.acinq.phoenix.utils.extensions.incomingOfferMetadata
 
 @Composable
 fun SplashIncoming(
     payment: IncomingPayment,
     metadata: WalletPaymentMetadata,
-    onMetadataDescriptionUpdate: (WalletPaymentId, String?) -> Unit,
+    onMetadataDescriptionUpdate: (UUID, String?) -> Unit,
 ) {
     payment.incomingOfferMetadata()?.let { meta ->
         meta.payerNote?.takeIf { it.isNotBlank() }?.let {
@@ -65,7 +62,7 @@ fun SplashIncoming(
     SplashDescription(
         description = payment.smartDescription(),
         userDescription = metadata.userDescription,
-        paymentId = payment.walletPaymentId(),
+        paymentId = payment.id,
         onMetadataDescriptionUpdate = onMetadataDescriptionUpdate,
     )
     SplashFee(payment)
@@ -114,43 +111,44 @@ private fun OfferSentBy(payerPubkey: PublicKey?, hasPayerNote: Boolean) {
 private fun SplashFee(
     payment: IncomingPayment
 ) {
-    val btcUnit = LocalBitcoinUnit.current
-    val receivedWithOnChain = remember(payment) { payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.OnChainIncomingPayment>() ?: emptyList() }
-    val receivedWithLightning = remember(payment) { payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.LightningPayment>() ?: emptyList() }
-
-    if (receivedWithOnChain.isNotEmpty() || receivedWithLightning.isNotEmpty()) {
-
-        val paymentsManager = business.paymentsManager
-        val txIds = remember(receivedWithLightning) { receivedWithLightning.mapNotNull { it.fundingFee?.fundingTxId } }
-        val relatedLiquidityPayments by produceState(initialValue = emptyList()) {
-            value = txIds.mapNotNull { paymentsManager.getLiquidityPurchaseForTxId(it) }
-        }
-
-        val serviceFee = remember(receivedWithOnChain, relatedLiquidityPayments) {
-            receivedWithOnChain.map { it.serviceFee }.sum() + relatedLiquidityPayments.map { it.feePaidFromFutureHtlc.serviceFee.toMilliSatoshi() }.sum()
-        }
-        val miningFee = remember(receivedWithOnChain, relatedLiquidityPayments) {
-            receivedWithOnChain.map { it.miningFee }.sum() + relatedLiquidityPayments.map { it.feePaidFromFutureHtlc.miningFee }.sum()
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-        if (serviceFee > 0.msat) {
-            SplashLabelRow(
-                label = stringResource(id = R.string.paymentdetails_service_fees_label),
-                helpMessage = stringResource(R.string.paymentdetails_service_fees_desc)
-            ) {
-                Text(text = serviceFee.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW))
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-
-        if (miningFee > 0.sat) {
-            SplashLabelRow(
-                label = stringResource(id = R.string.paymentdetails_funding_fees_label),
-                helpMessage = stringResource(R.string.paymentdetails_funding_fees_desc)
-            ) {
-                Text(text = miningFee.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.HIDE))
-            }
-        }
-    }
+    Text("TODO: separate SplashIncoming into different components")
+//    val btcUnit = LocalBitcoinUnit.current
+//    val receivedWithOnChain = remember(payment) { payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.OnChainIncomingPayment>() ?: emptyList() }
+//    val receivedWithLightning = remember(payment) { payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.LightningPayment>() ?: emptyList() }
+//
+//    if (receivedWithOnChain.isNotEmpty() || receivedWithLightning.isNotEmpty()) {
+//
+//        val paymentsManager = business.paymentsManager
+//        val txIds = remember(receivedWithLightning) { receivedWithLightning.mapNotNull { it.fundingFee?.fundingTxId } }
+//        val relatedLiquidityPayments by produceState(initialValue = emptyList()) {
+//            value = txIds.mapNotNull { paymentsManager.getLiquidityPurchaseForTxId(it) }
+//        }
+//
+//        val serviceFee = remember(receivedWithOnChain, relatedLiquidityPayments) {
+//            receivedWithOnChain.map { it.serviceFee }.sum() + relatedLiquidityPayments.map { it.feePaidFromFutureHtlc.serviceFee.toMilliSatoshi() }.sum()
+//        }
+//        val miningFee = remember(receivedWithOnChain, relatedLiquidityPayments) {
+//            receivedWithOnChain.map { it.miningFee }.sum() + relatedLiquidityPayments.map { it.feePaidFromFutureHtlc.miningFee }.sum()
+//        }
+//
+//        Spacer(modifier = Modifier.height(8.dp))
+//        if (serviceFee > 0.msat) {
+//            SplashLabelRow(
+//                label = stringResource(id = R.string.paymentdetails_service_fees_label),
+//                helpMessage = stringResource(R.string.paymentdetails_service_fees_desc)
+//            ) {
+//                Text(text = serviceFee.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW))
+//            }
+//            Spacer(modifier = Modifier.height(8.dp))
+//        }
+//
+//        if (miningFee > 0.sat) {
+//            SplashLabelRow(
+//                label = stringResource(id = R.string.paymentdetails_funding_fees_label),
+//                helpMessage = stringResource(R.string.paymentdetails_funding_fees_desc)
+//            ) {
+//                Text(text = miningFee.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.HIDE))
+//            }
+//        }
+//    }
 }

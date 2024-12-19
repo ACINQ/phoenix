@@ -54,7 +54,11 @@ import fr.acinq.lightning.blockchain.electrum.ElectrumConnectionStatus
 import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
 import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
 import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.db.LegacyPayToOpenIncomingPayment
+import fr.acinq.lightning.db.LegacySwapInIncomingPayment
+import fr.acinq.lightning.db.LightningIncomingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
+import fr.acinq.lightning.db.OnChainIncomingPayment
 import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
 import fr.acinq.lightning.db.SpliceOutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
@@ -75,7 +79,6 @@ import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.utils.extensions.isManualPurchase
-import fr.acinq.phoenix.utils.extensions.minDepthForFunding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
@@ -97,13 +100,13 @@ fun PaymentStatus(
                 isAnimated = false,
                 color = mutedTextColor
             )
-            is LightningOutgoingPayment.Status.Completed.Failed -> PaymentStatusIcon(
+            is LightningOutgoingPayment.Status.Failed -> PaymentStatusIcon(
                 message = { Text(text = annotatedStringResource(id = R.string.paymentdetails_status_sent_failed), textAlign = TextAlign.Center) },
                 imageResId = R.drawable.ic_payment_details_failure_static,
                 isAnimated = false,
                 color = negativeColor
             )
-            is LightningOutgoingPayment.Status.Completed.Succeeded -> PaymentStatusIcon(
+            is LightningOutgoingPayment.Status.Succeeded -> PaymentStatusIcon(
                 message = {
                     Text(text = annotatedStringResource(id = R.string.paymentdetails_status_sent_successful, payment.completedAt?.toRelativeDateString() ?: ""))
                 },
@@ -178,40 +181,14 @@ fun PaymentStatus(
                 ConfirmationView(payment.txId, payment.channelId, isConfirmed = true, canBeBumped = true, onCpfpSuccess = onCpfpSuccess)
             }
         }
+        is InboundLiquidityOutgoingPayment -> {
+            SplashLiquidityStatus(payment = payment, fromEvent = fromEvent)
+        }
         is IncomingPayment -> {
-            val received = payment.received
-            when {
-                received == null -> {
+            when (payment.completedAt) {
+                null -> {
                     PaymentStatusIcon(
                         message = { Text(text = stringResource(id = R.string.paymentdetails_status_received_pending)) },
-                        imageResId = R.drawable.ic_payment_details_pending_static,
-                        isAnimated = false,
-                        color = mutedTextColor
-                    )
-                }
-                received.receivedWith.isEmpty() -> {
-                    PaymentStatusIcon(
-                        message = { Text(text = stringResource(id = R.string.paymentdetails_status_received_paytoopen_pending)) },
-                        isAnimated = false,
-                        imageResId = R.drawable.ic_clock,
-                        color = mutedTextColor,
-                    )
-                }
-                received.receivedWith.any { it is IncomingPayment.ReceivedWith.OnChainIncomingPayment && it.lockedAt == null } -> {
-                    PaymentStatusIcon(
-                        message = {
-                            Text(text = stringResource(id = R.string.paymentdetails_status_unconfirmed))
-                        },
-                        isAnimated = false,
-                        imageResId = R.drawable.ic_clock,
-                        color = mutedTextColor,
-                    )
-                }
-                payment.completedAt == null -> {
-                    PaymentStatusIcon(
-                        message = {
-                            Text(text = stringResource(id = R.string.paymentdetails_status_received_pending))
-                        },
                         imageResId = R.drawable.ic_payment_details_pending_static,
                         isAnimated = false,
                         color = mutedTextColor
@@ -228,18 +205,7 @@ fun PaymentStatus(
                     )
                 }
             }
-            received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.OnChainIncomingPayment>()?.firstOrNull()?.let {
-                val nodeParams = business.nodeParamsManager.nodeParams.value
-                val channelMinDepth by produceState<Int?>(initialValue = null, key1 = Unit) {
-                    nodeParams?.let { params ->
-                        val channelId = payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.OnChainIncomingPayment>()?.firstOrNull()?.channelId
-                        value = channelId?.let { peerManager.getChannelWithCommitments(it)?.minDepthForFunding(params) }
-                    }
-                }
-                ConfirmationView(it.txId, it.channelId, isConfirmed = it.confirmedAt != null, canBeBumped = false, onCpfpSuccess = onCpfpSuccess, channelMinDepth)
-            }
         }
-        is InboundLiquidityOutgoingPayment -> SplashLiquidityStatus(payment = payment, fromEvent = fromEvent)
     }
 }
 

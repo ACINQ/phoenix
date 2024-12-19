@@ -57,9 +57,6 @@ class CsvExportViewModel(
 ) : ViewModel() {
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    /** Timestamp in millis of the oldest completed payment (incoming or outgoing) */
-    var oldestCompletedTimestamp by mutableStateOf<Long?>(null)
-        private set
     var startTimestampMillis by mutableStateOf<Long?>(null)
     var endTimestampMillis by mutableStateOf(currentTimestampMillis())
     var includesFiat by mutableStateOf(true)
@@ -72,7 +69,7 @@ class CsvExportViewModel(
     private val authority = "${BuildConfig.APPLICATION_ID}.provider"
 
     init {
-        refreshOldestCompletedTimestamp()
+//        refreshOldestCompletedTimestamp()
     }
 
     fun reset() {
@@ -100,13 +97,13 @@ class CsvExportViewModel(
             val rows = mutableListOf<String>()
             rows += CsvWriter.makeHeaderRow(csvConfig)
             while (fetching) {
-                dbManager.paymentsDb().listRangeSuccessfulPaymentsOrder(
+                dbManager.paymentsDb().listPayments(
                     startDate = startTimestampMillis!!,
                     endDate = endTimestampMillis,
-                    count = batchSize,
-                    skip = batchOffset
-                ).map { paymentRow ->
-                    paymentsFetcher.getPayment(paymentRow, WalletPaymentFetchOptions.All)?.let { info ->
+                    count = batchSize.toLong(),
+                    skip = batchOffset.toLong(),
+                    fetchOptions = WalletPaymentFetchOptions.All
+                ).map { info ->
                         val descriptions = listOf(
                             info.payment.basicDescription(),
                             info.metadata.userDescription,
@@ -119,7 +116,6 @@ class CsvExportViewModel(
                         )
                         state = CsvExportState.Generating(rows.size - 1)
                         rows += row
-                    }
                 }.let { result ->
                     if (result.isEmpty()) {
                         fetching = false
@@ -146,18 +142,6 @@ class CsvExportViewModel(
                 val content = rows.joinToString(separator = "")
                 log.info("processed $paymentsCount payments CSV export")
                 state = CsvExportState.Success(paymentsCount, uri, content)
-            }
-        }
-    }
-
-    private fun refreshOldestCompletedTimestamp() {
-        viewModelScope.launch(Dispatchers.Main + CoroutineExceptionHandler { _, e ->
-            log.error("failed to get oldest completed payment timestamp: ", e)
-            state = CsvExportState.Failed(e)
-        }) {
-            dbManager.paymentsDb().getOldestCompletedDate().let {
-                oldestCompletedTimestamp = it
-                if (startTimestampMillis == null) startTimestampMillis = it
             }
         }
     }

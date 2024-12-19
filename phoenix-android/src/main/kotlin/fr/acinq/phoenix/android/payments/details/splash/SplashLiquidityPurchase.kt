@@ -92,11 +92,10 @@ private fun SplashFee(
 
 @Composable
 private fun SplashRelatedPayments(payment: InboundLiquidityOutgoingPayment) {
-
     val paymentsManager = business.paymentsManager
     val relatedPaymentIds by produceState(initialValue = emptyList(), key1 = payment) {
         value = if (payment.purchase.paymentDetails is LiquidityAds.PaymentDetails.FromChannelBalance) {
-            paymentsManager.listIncomingPaymentsForTxId(payment.txId)
+            paymentsManager.listIncomingPaymentsForTxId(payment.txId).map { it.id }
         } else payment.relatedPaymentIds()
     }
     if (relatedPaymentIds.isNotEmpty()) {
@@ -109,7 +108,7 @@ private fun SplashRelatedPayments(payment: InboundLiquidityOutgoingPayment) {
             helpLink = stringResource(id = R.string.paymentdetails_liquidity_caused_by_help_link) to "https://acinq.co/faq",
         ) {
             Button(
-                text = paymentId.dbId,
+                text = paymentId.toString(),
                 onClick = { navigateToPaymentDetails(navController, paymentId, isFromEvent = false) },
                 maxLines = 1,
                 padding = PaddingValues(horizontal = 7.dp, vertical = 5.dp),

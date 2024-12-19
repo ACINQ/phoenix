@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -46,26 +45,24 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
-import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.db.LightningIncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
 import fr.acinq.lightning.db.SpliceOutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
+import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountView
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.isLegacyMigration
-import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.android.utils.extensions.smartDescription
 import fr.acinq.phoenix.data.ContactInfo
-import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
-import fr.acinq.phoenix.data.walletPaymentId
 import fr.acinq.phoenix.utils.extensions.WalletPaymentState
 import fr.acinq.phoenix.utils.extensions.incomingOfferMetadata
 import fr.acinq.phoenix.utils.extensions.outgoingInvoiceRequest
@@ -73,59 +70,10 @@ import fr.acinq.phoenix.utils.extensions.state
 
 
 @Composable
-fun PaymentLineLoading(
-    paymentId: WalletPaymentId,
-    onPaymentClick: (WalletPaymentId) -> Unit
-) {
-    val backgroundColor = mutedBgColor.copy(alpha = 0.9f)
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .clickable { onPaymentClick(paymentId) }
-            .padding(horizontal = 16.dp, vertical = 12.dp)
-    ) {
-        PaymentIconComponent(
-            icon = null,
-            backgroundColor = backgroundColor,
-            description = stringResource(id = R.string.paymentdetails_status_sent_pending)
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-        Column {
-            Row {
-                Text(
-                    text = "",
-                    modifier = Modifier
-                        .weight(1f)
-                        .clip(RoundedCornerShape(6.dp))
-                        .background(backgroundColor)
-                )
-                Spacer(modifier = Modifier.width(24.dp))
-                Text(
-                    text = "",
-                    modifier = Modifier
-                        .width(80.dp)
-                        .clip(RoundedCornerShape(6.dp))
-                        .background(backgroundColor)
-                )
-            }
-            Spacer(modifier = Modifier.height(2.dp))
-            Text(
-                text = "",
-                fontSize = 12.sp,
-                modifier = Modifier
-                    .width(80.dp)
-                    .clip(RoundedCornerShape(6.dp))
-                    .background(backgroundColor)
-            )
-        }
-    }
-}
-
-@Composable
 fun PaymentLine(
     paymentInfo: WalletPaymentInfo,
     contactInfo: ContactInfo?,
-    onPaymentClick: (WalletPaymentId) -> Unit,
+    onPaymentClick: (UUID) -> Unit,
     isAmountRedacted: Boolean = false,
 ) {
     val payment = paymentInfo.payment
@@ -133,7 +81,7 @@ fun PaymentLine(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .clickable { onPaymentClick(payment.walletPaymentId()) }
+            .clickable { onPaymentClick(payment.id) }
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         PaymentIcon(payment)
@@ -220,7 +168,7 @@ private fun PaymentIcon(payment: WalletPayment) {
             )
         }
         WalletPaymentState.SuccessOnChain -> {
-            if (payment is IncomingPayment && payment.origin is IncomingPayment.Origin.Invoice) {
+            if (payment is LightningIncomingPayment) {
                 PaymentIconComponent(
                     icon = R.drawable.ic_payment_success,
                     description = stringResource(id = R.string.paymentline_desc_success_offchain),

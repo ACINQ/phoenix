@@ -349,12 +349,12 @@ class NodeService : Service() {
             when (event) {
                 is PaymentEvents.PaymentReceived -> {
                     if (isHeadless) {
-                        receivedInBackground.add(event.amount)
+                        receivedInBackground.add(event.payment.amountReceived)
                         SystemNotificationHelper.notifyPaymentsReceived(
                             context = applicationContext,
                             userPrefs = userPrefs,
-                            paymentHash = event.paymentHash,
-                            amount = event.amount,
+                            id = event.payment.id,
+                            amount = event.payment.amountReceived,
                             rates = currencyManager.ratesFlow.value,
                             isHeadless = isHeadless && receivedInBackground.size == 1
                         )

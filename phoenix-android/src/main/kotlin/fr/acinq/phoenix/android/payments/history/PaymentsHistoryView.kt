@@ -37,6 +37,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.android.PaymentsViewModel
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
@@ -46,8 +47,6 @@ import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.ItemCard
 import fr.acinq.phoenix.android.payments.details.PaymentLine
-import fr.acinq.phoenix.android.payments.details.PaymentLineLoading
-import fr.acinq.phoenix.data.WalletPaymentId
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
@@ -60,7 +59,7 @@ import kotlinx.datetime.toInstant
 import kotlinx.datetime.toKotlinLocalDateTime
 import kotlinx.datetime.toLocalDateTime
 import java.time.format.TextStyle
-import java.util.*
+import java.util.Locale
 
 
 private sealed class PaymentsGroup {
@@ -99,7 +98,7 @@ private sealed class PaymentsGroup {
 fun PaymentsHistoryView(
     onBackClick: () -> Unit,
     paymentsViewModel: PaymentsViewModel,
-    onPaymentClick: (WalletPaymentId) -> Unit,
+    onPaymentClick: (UUID) -> Unit,
     onCsvExportClick: () -> Unit,
 ) {
     val listState = rememberLazyListState()
@@ -109,7 +108,7 @@ fun PaymentsHistoryView(
         val timezone = TimeZone.currentSystemDefault()
         val (todaysDayOfWeek, today) = java.time.LocalDate.now().atTime(23, 59, 59).toKotlinLocalDateTime().let { it.dayOfWeek to it.toInstant(timezone) }
         payments.values.groupBy {
-            val paymentInstant = Instant.fromEpochMilliseconds(it.orderRow.createdAt)
+            val paymentInstant = Instant.fromEpochMilliseconds(it.paymentInfo.payment.createdAt)
             val daysElapsed = paymentInstant.daysUntil(today, timezone)
             when {
                 daysElapsed == 0 -> PaymentsGroup.Today
@@ -180,14 +179,7 @@ fun PaymentsHistoryView(
                 }
                 itemsIndexed(items = payments) { index, item ->
                     ItemCard(index = index, maxItemsCount = payments.size) {
-                        if (item.paymentInfo == null) {
-                            LaunchedEffect(key1 = item.orderRow.id.identifier) {
-                                paymentsViewModel.fetchPaymentDetails(item.orderRow)
-                            }
-                            PaymentLineLoading(item.orderRow.id, onPaymentClick)
-                        } else {
-                            PaymentLine(item.paymentInfo, item.contactInfo, onPaymentClick)
-                        }
+                        PaymentLine(item.paymentInfo, item.contactInfo, onPaymentClick)
                     }
                 }
             }

@@ -49,6 +49,7 @@ import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
 import fr.acinq.lightning.db.SpliceOutgoingPayment
+import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.R
@@ -66,7 +67,6 @@ import fr.acinq.phoenix.android.utils.borderColor
 import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.positiveColor
-import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.utils.extensions.WalletPaymentState
 import fr.acinq.phoenix.utils.extensions.state
@@ -75,8 +75,8 @@ import fr.acinq.phoenix.utils.extensions.state
 fun PaymentDetailsSplashView(
     onBackClick: () -> Unit,
     data: WalletPaymentInfo,
-    onDetailsClick: (WalletPaymentId) -> Unit,
-    onMetadataDescriptionUpdate: (WalletPaymentId, String?) -> Unit,
+    onDetailsClick: (UUID) -> Unit,
+    onMetadataDescriptionUpdate: (UUID, String?) -> Unit,
     fromEvent: Boolean,
 ) {
     val payment = data.payment
@@ -126,7 +126,7 @@ fun PaymentDetailsSplashView(
             textStyle = MaterialTheme.typography.caption,
             icon = R.drawable.ic_tool,
             iconTint = MaterialTheme.typography.caption.color,
-            onClick = { onDetailsClick(data.id()) },
+            onClick = { onDetailsClick(data.id) },
         )
     }
 }
@@ -135,8 +135,8 @@ fun PaymentDetailsSplashView(
 fun SplashDescription(
     description: String?,
     userDescription: String?,
-    paymentId: WalletPaymentId,
-    onMetadataDescriptionUpdate: (WalletPaymentId, String?) -> Unit,
+    paymentId: UUID,
+    onMetadataDescriptionUpdate: (UUID, String?) -> Unit,
 ) {
     var showEditDescriptionDialog by remember { mutableStateOf(false) }
 

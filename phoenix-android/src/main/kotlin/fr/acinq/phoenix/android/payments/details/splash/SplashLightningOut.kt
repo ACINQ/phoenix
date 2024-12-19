@@ -33,6 +33,7 @@ import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.payment.OutgoingPaymentFailure
+import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.ProgressView
@@ -43,10 +44,8 @@ import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
 import fr.acinq.phoenix.android.utils.extensions.smartDescription
 import fr.acinq.phoenix.data.LnurlPayMetadata
-import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.data.lnurl.LnurlPay
-import fr.acinq.phoenix.data.walletPaymentId
 import fr.acinq.phoenix.utils.extensions.WalletPaymentState
 import fr.acinq.phoenix.utils.extensions.outgoingInvoiceRequest
 import fr.acinq.phoenix.utils.extensions.state
@@ -59,7 +58,7 @@ import javax.crypto.spec.SecretKeySpec
 fun SplashLightningOutgoing(
     payment: LightningOutgoingPayment,
     metadata: WalletPaymentMetadata,
-    onMetadataDescriptionUpdate: (WalletPaymentId, String?) -> Unit,
+    onMetadataDescriptionUpdate: (UUID, String?) -> Unit,
 ) {
     metadata.lnurl?.let { lnurlMeta ->
         LnurlPayInfoView(payment, lnurlMeta)
@@ -72,13 +71,13 @@ fun SplashLightningOutgoing(
     SplashDescription(
         description = payment.smartDescription(),
         userDescription = metadata.userDescription,
-        paymentId = payment.walletPaymentId(),
+        paymentId = payment.id,
         onMetadataDescriptionUpdate = onMetadataDescriptionUpdate
     )
     SplashDestination(payment, metadata)
     SplashFee(payment = payment)
 
-    (payment.status as? LightningOutgoingPayment.Status.Completed.Failed)?.let { status ->
+    (payment.status as? LightningOutgoingPayment.Status.Failed)?.let { status ->
         PaymentErrorView(status = status, failedParts = payment.parts.map { it.status }.filterIsInstance<LightningOutgoingPayment.Part.Status.Failed>())
     }
 }
@@ -147,7 +146,7 @@ private fun LnurlSuccessAction(payment: LightningOutgoingPayment, action: LnurlP
         is LnurlPay.Invoice.SuccessAction.Aes -> {
             SplashLabelRow(label = stringResource(id = R.string.paymentdetails_lnurlpay_action_aes_label)) {
                 val status = payment.status
-                if (status is LightningOutgoingPayment.Status.Completed.Succeeded.OffChain) {
+                if (status is LightningOutgoingPayment.Status.Succeeded) {
                     val deciphered by produceState<String?>(initialValue = null) {
                         val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
                         cipher.init(Cipher.DECRYPT_MODE, SecretKeySpec(status.preimage.toByteArray(), "AES"), IvParameterSpec(action.iv.toByteArray()))
@@ -180,7 +179,7 @@ private fun LnurlSuccessAction(payment: LightningOutgoingPayment, action: LnurlP
 }
 
 @Composable
-private fun PaymentErrorView(status: LightningOutgoingPayment.Status.Completed.Failed, failedParts: List<LightningOutgoingPayment.Part.Status.Failed>) {
+private fun PaymentErrorView(status: LightningOutgoingPayment.Status.Failed, failedParts: List<LightningOutgoingPayment.Part.Status.Failed>) {
     val failure = remember(status, failedParts) { OutgoingPaymentFailure(status.reason, failedParts) }
     translatePaymentError(failure).let {
         Spacer(modifier = Modifier.height(8.dp))
@@ -197,19 +196,19 @@ fun translatePaymentError(paymentFailure: OutgoingPaymentFailure): String {
         when (val result = paymentFailure.explain()) {
             is Either.Left -> {
                 when (val partFailure = result.value) {
-                    is LightningOutgoingPayment.Part.Status.Failure.Uninterpretable -> partFailure.message
-                    LightningOutgoingPayment.Part.Status.Failure.ChannelIsClosing -> context.getString(R.string.outgoing_failuremessage_channel_closing)
-                    LightningOutgoingPayment.Part.Status.Failure.ChannelIsSplicing -> context.getString(R.string.outgoing_failuremessage_channel_splicing)
-                    LightningOutgoingPayment.Part.Status.Failure.NotEnoughFees -> context.getString(R.string.outgoing_failuremessage_not_enough_fee)
-                    LightningOutgoingPayment.Part.Status.Failure.NotEnoughFunds -> context.getString(R.string.outgoing_failuremessage_not_enough_balance)
-                    LightningOutgoingPayment.Part.Status.Failure.PaymentAmountTooBig -> context.getString(R.string.outgoing_failuremessage_too_big)
-                    LightningOutgoingPayment.Part.Status.Failure.PaymentAmountTooSmall -> context.getString(R.string.outgoing_failuremessage_too_small)
-                    LightningOutgoingPayment.Part.Status.Failure.PaymentExpiryTooBig -> context.getString(R.string.outgoing_failuremessage_expiry_too_big)
-                    LightningOutgoingPayment.Part.Status.Failure.RecipientRejectedPayment -> context.getString(R.string.outgoing_failuremessage_rejected_by_recipient)
-                    LightningOutgoingPayment.Part.Status.Failure.RecipientIsOffline -> context.getString(R.string.outgoing_failuremessage_recipient_offline)
-                    LightningOutgoingPayment.Part.Status.Failure.RecipientLiquidityIssue -> context.getString(R.string.outgoing_failuremessage_not_enough_liquidity)
-                    LightningOutgoingPayment.Part.Status.Failure.TemporaryRemoteFailure -> context.getString(R.string.outgoing_failuremessage_temporary_failure)
-                    LightningOutgoingPayment.Part.Status.Failure.TooManyPendingPayments -> context.getString(R.string.outgoing_failuremessage_too_many_pending)
+                    is LightningOutgoingPayment.Part.Status.Failed.Failure.Uninterpretable -> partFailure.message
+                    LightningOutgoingPayment.Part.Status.Failed.Failure.ChannelIsClosing -> context.getString(R.string.outgoing_failuremessage_channel_closing)
+                    LightningOutgoingPayment.Part.Status.Failed.Failure.ChannelIsSplicing -> context.getString(R.string.outgoing_failuremessage_channel_splicing)
+                    LightningOutgoingPayment.Part.Status.Failed.Failure.NotEnoughFees -> context.getString(R.string.outgoing_failuremessage_not_enough_fee)
+                    LightningOutgoingPayment.Part.Status.Failed.Failure.NotEnoughFunds -> context.getString(R.string.outgoing_failuremessage_not_enough_balance)
+                    LightningOutgoingPayment.Part.Status.Failed.Failure.PaymentAmountTooBig -> context.getString(R.string.outgoing_failuremessage_too_big)
+                    LightningOutgoingPayment.Part.Status.Failed.Failure.PaymentAmountTooSmall -> context.getString(R.string.outgoing_failuremessage_too_small)
+                    LightningOutgoingPayment.Part.Status.Failed.Failure.PaymentExpiryTooBig -> context.getString(R.string.outgoing_failuremessage_expiry_too_big)
+                    LightningOutgoingPayment.Part.Status.Failed.Failure.RecipientRejectedPayment -> context.getString(R.string.outgoing_failuremessage_rejected_by_recipient)
+                    LightningOutgoingPayment.Part.Status.Failed.Failure.RecipientIsOffline -> context.getString(R.string.outgoing_failuremessage_recipient_offline)
+                    LightningOutgoingPayment.Part.Status.Failed.Failure.RecipientLiquidityIssue -> context.getString(R.string.outgoing_failuremessage_not_enough_liquidity)
+                    LightningOutgoingPayment.Part.Status.Failed.Failure.TemporaryRemoteFailure -> context.getString(R.string.outgoing_failuremessage_temporary_failure)
+                    LightningOutgoingPayment.Part.Status.Failed.Failure.TooManyPendingPayments -> context.getString(R.string.outgoing_failuremessage_too_many_pending)
                 }
             }
             is Either.Right -> {
