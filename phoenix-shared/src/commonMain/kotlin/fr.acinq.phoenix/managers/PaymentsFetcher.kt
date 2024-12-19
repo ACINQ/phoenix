@@ -27,6 +27,7 @@ import kotlin.coroutines.suspendCoroutine
 class PaymentsFetcher(
     val loggerFactory: LoggerFactory,
     private var paymentsManager: PaymentsManager,
+    private val contactsManager: ContactsManager,
     cacheSizeLimit: Int
 ): CoroutineScope by MainScope() {
 
@@ -69,6 +70,26 @@ class PaymentsFetcher(
         return "${options.flags}|${row.staleIdentifierPrefix}"
     }
 
+    private fun withUpdatedContact(
+        result: Result,
+        options: WalletPaymentFetchOptions
+    ): WalletPaymentInfo? {
+        return result.info?.let { paymentInfo ->
+            if (options.contains(WalletPaymentFetchOptions.Contact)) {
+                // `WalletPaymentInfo.contact` depends on the various contact database tables.
+                // And when these contact tables change,
+                // they don't update anything in the payments table.
+                // So we should refresh them everytime.
+                // Note that fetching this information doesn't require a trip to the database.
+                // Everything is already in memory, so the lookup is very fast.
+                val updatedContact = contactsManager.contactForPayment(paymentInfo.payment)
+                paymentInfo.copy(contact = updatedContact)
+            } else {
+                paymentInfo
+            }
+        }
+    }
+
     /**
      * Returns the payment if it exists in the cache.
      * A database fetch is not performed.
@@ -79,7 +100,7 @@ class PaymentsFetcher(
     ): WalletPaymentInfo? {
 
         val key = cacheKey(row, options)
-        return cache[key]?.info
+        return cache[key]?.let { withUpdatedContact(it, options) }
     }
 
     /**
@@ -121,9 +142,10 @@ class PaymentsFetcher(
 
         val key = cacheKey(row, options)
         log.debug { "fetching payment for key=$key" }
-        cache[key]?.let {
+        cache[key]?.let { cacheHit ->
             log.debug { "payment found in cache for key=$key" }
-            continuation.resumeWith(kotlin.Result.success(it.info))
+            val updatedPaymentInfo = withUpdatedContact(cacheHit, options)
+            continuation.resumeWith(kotlin.Result.success(updatedPaymentInfo))
             return@suspendCoroutine
         }
 
