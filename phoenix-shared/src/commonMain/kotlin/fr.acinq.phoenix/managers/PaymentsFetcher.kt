@@ -82,7 +82,7 @@ class PaymentsFetcher(
                 // So we should refresh them everytime.
                 // Note that fetching this information doesn't require a trip to the database.
                 // Everything is already in memory, so the lookup is very fast.
-                val updatedContact = contactsManager.contactForPayment(paymentInfo.payment)
+                val updatedContact = contactsManager.contactForPaymentInfo(paymentInfo)
                 paymentInfo.copy(contact = updatedContact)
             } else {
                 paymentInfo

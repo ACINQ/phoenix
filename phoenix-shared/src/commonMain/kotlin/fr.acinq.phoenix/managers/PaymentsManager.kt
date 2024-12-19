@@ -200,17 +200,20 @@ class PaymentsManager(
             is WalletPaymentId.ChannelCloseOutgoingPaymentId -> paymentsDb().getChannelCloseOutgoingPayment(id.id, options)
             is WalletPaymentId.SpliceCpfpOutgoingPaymentId -> paymentsDb().getSpliceCpfpOutgoingPayment(id.id, options)
             is WalletPaymentId.InboundLiquidityOutgoingPaymentId -> paymentsDb().getInboundLiquidityOutgoingPayment(id.id, options)
-        }?.let {
-            val payment = it.first
-            val contact = if (options.contains(WalletPaymentFetchOptions.Contact)) {
-                contactsManager.contactForPayment(payment)
-            } else { null }
-            WalletPaymentInfo(
-                payment = payment,
-                metadata = it.second ?: WalletPaymentMetadata(),
-                contact = contact,
+        }?.let { pair ->
+            val paymentInfo = WalletPaymentInfo(
+                payment = pair.first,
+                metadata = pair.second ?: WalletPaymentMetadata(),
+                contact = null,
                 fetchOptions = options
             )
+            if (options.contains(WalletPaymentFetchOptions.Contact)) {
+                contactsManager.contactForPaymentInfo(paymentInfo)?.let { contact ->
+                    paymentInfo.copy(contact = contact)
+                } ?: paymentInfo
+            } else {
+                paymentInfo
+            }
         }
     }
 }
