@@ -9104,6 +9104,9 @@
         }
       }
     },
+    "BLIP 42 (DEBUG build only)" : {
+
+    },
     "Block height" : {
       "localizations" : {
         "ar" : {
@@ -12519,6 +12522,9 @@
           }
         }
       }
+    },
+    "contact secret" : {
+
     },
     "Contact support if needed." : {
       "localizations" : {
@@ -29891,6 +29897,12 @@
           }
         }
       }
+    },
+    "payer address" : {
+
+    },
+    "payer offer" : {
+
     },
     "Payment" : {
       "localizations" : {
