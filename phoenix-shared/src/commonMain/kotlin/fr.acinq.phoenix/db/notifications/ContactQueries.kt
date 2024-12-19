@@ -22,15 +22,18 @@ import fr.acinq.bitcoin.byteVector32
 import fr.acinq.bitcoin.utils.Try
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
+import fr.acinq.lightning.utils.toByteVector32
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.data.ContactAddress
 import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.data.ContactOffer
+import fr.acinq.phoenix.data.ContactSecret
 import fr.acinq.phoenix.db.AppDatabase
 import fr.acinq.phoenix.db.didDeleteContact
 import fr.acinq.phoenix.db.didSaveContact
 import fracinqphoenixdb.Contact_addresses
 import fracinqphoenixdb.Contact_offers
+import fracinqphoenixdb.Contact_secrets
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -82,6 +85,14 @@ class ContactQueries(val database: AppDatabase) {
                     contactId = contact.id.toString(),
                     address = row.address,
                     label = row.label,
+                    createdAt = row.createdAt.toEpochMilliseconds()
+                )
+            }
+            contact.secrets.forEach { row ->
+                queries.insertSecretForContact(
+                    secretId = row.id.toByteArray(),
+                    contactId = contact.id.toString(),
+                    incomingPaymentId = row.incomingPaymentId?.toByteArray(),
                     createdAt = row.createdAt.toEpochMilliseconds()
                 )
             }
@@ -176,6 +187,45 @@ class ContactQueries(val database: AppDatabase) {
                     addressHash = key.toByteArray()
                 )
             }
+
+            val existingSecrets: MutableMap<ByteVector32, ContactSecret> =
+                queries.listSecretsForContact(
+                    contactId = contact.id.toString()
+                ).executeAsList().mapNotNull { secretRow ->
+                    parseSecretRow(secretRow)?.let { secret ->
+                        secret.id to secret
+                    }
+                }.toMap().toMutableMap()
+            contact.secrets.forEach { row ->
+                val result: ComparisonResult =
+                    existingSecrets.remove(row.id)?.let { existing ->
+                        compareSecrets(existing, row)
+                    } ?: ComparisonResult.IsNew
+                when (result) {
+                    ComparisonResult.IsNew -> {
+                        queries.insertSecretForContact(
+                            secretId = row.id.toByteArray(),
+                            contactId = contact.id.toString(),
+                            incomingPaymentId = row.incomingPaymentId?.toByteArray(),
+                            createdAt = row.createdAt.toEpochMilliseconds()
+                        )
+                    }
+                    ComparisonResult.IsUpdated -> {
+                        queries.updateContactSecret(
+                            incomingPaymentId = row.incomingPaymentId?.toByteArray(),
+                            secretId = row.id.toByteArray()
+                        )
+                    }
+                    ComparisonResult.NoChanges -> {}
+                }
+            }
+            // In the loop above we removed every matching secret.
+            // So any items leftover have been deleted from the contact.
+            existingSecrets.forEach { (key, _) ->
+                queries.deleteContactSecretForSecretId(
+                    secretId = key.toByteArray()
+                )
+            }
         }
     }
 
@@ -202,13 +252,19 @@ class ContactQueries(val database: AppDatabase) {
                 ).executeAsList().map { addressRow ->
                     parseAddressRow(addressRow)
                 }
+                val secrets: List<ContactSecret> = queries.listSecretsForContact(
+                    contactId = contactId.toString()
+                ).executeAsList().map { secretRow ->
+                    parseSecretRow(secretRow)
+                }
                 ContactInfo(
                     id = contactId,
                     name = contactRow.name,
                     photoUri = contactRow.photo_uri,
                     useOfferKey = contactRow.use_offer_key,
                     offers = offers,
-                    addresses = addresses
+                    addresses = addresses,
+                    secrets = secrets
                 )
             }
         }
@@ -237,6 +293,16 @@ class ContactQueries(val database: AppDatabase) {
                 }
             }
 
+            val secrets: MutableMap<UUID, MutableList<ContactSecret>> = mutableMapOf()
+            queries.listContactSecrets().executeAsList().forEach { secretRow ->
+                parseSecretRow(secretRow).let { secret ->
+                    val contactId = UUID.fromString(secretRow.contact_id)
+                    secrets[contactId]?.add(secret) ?: run {
+                        secrets[contactId] = mutableListOf(secret)
+                    }
+                }
+            }
+
             queries.listContacts2().executeAsList().map { contactRow ->
                 val contactId = UUID.fromString(contactRow.id)
                 ContactInfo(
@@ -245,7 +311,8 @@ class ContactQueries(val database: AppDatabase) {
                     photoUri = contactRow.photo_uri,
                     useOfferKey = contactRow.use_offer_key,
                     offers = offers[contactId]?.toList() ?: listOf(),
-                    addresses = addresses[contactId]?.toList() ?: listOf()
+                    addresses = addresses[contactId]?.toList() ?: listOf(),
+                    secrets = secrets[contactId]?.toList() ?: listOf()
                 )
             }
         }
@@ -263,6 +330,7 @@ class ContactQueries(val database: AppDatabase) {
         database.transaction {
             queries.deleteContactOffersForContactId(contactId = contactId.toString())
             queries.deleteContactAddressesForContactId(contactId = contactId.toString())
+            queries.deleteContactSecretsForContactId(contactId = contactId.toString())
             queries.deleteContact(contactId = contactId.toString())
             didDeleteContact(contactId, database)
         }
@@ -287,6 +355,15 @@ class ContactQueries(val database: AppDatabase) {
             label = row.label ?: "",
             createdAt = Instant.fromEpochMilliseconds(row.created_at)
         )
+    }
+
+    private fun parseSecretRow(row: Contact_secrets): ContactSecret {
+        return ContactSecret(
+            id = row.secret_id.toByteVector32(),
+            incomingPaymentId = row.incoming_payment_id?.toByteVector32(),
+            createdAt = Instant.fromEpochMilliseconds(row.created_at)
+        )
+
     }
 
     private enum class ComparisonResult {
@@ -315,6 +392,17 @@ class ContactQueries(val database: AppDatabase) {
         // Since the hash is case-insensitive it remains unchanged.
         // In other words, this is just a requested formatting change by the user.
         return if ((existing.label != current.label) || (existing.address != current.address)) {
+            ComparisonResult.IsUpdated
+        } else {
+            ComparisonResult.NoChanges
+        }
+    }
+
+    private fun compareSecrets(
+        existing: ContactSecret,
+        current: ContactSecret
+    ): ComparisonResult {
+        return if (existing.incomingPaymentId != current.incomingPaymentId) {
             ComparisonResult.IsUpdated
         } else {
             ComparisonResult.NoChanges

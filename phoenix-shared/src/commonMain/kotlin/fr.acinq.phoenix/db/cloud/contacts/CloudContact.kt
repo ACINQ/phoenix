@@ -4,11 +4,13 @@ import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat
+import fr.acinq.lightning.utils.toByteVector32
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.data.ContactAddress
 import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.data.ContactOffer
+import fr.acinq.phoenix.data.ContactSecret
 import fr.acinq.phoenix.db.cloud.CloudData
 import fr.acinq.phoenix.db.cloud.CloudDataVersion
 import fr.acinq.phoenix.db.cloud.IncomingPaymentWrapper
@@ -21,6 +23,7 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.cbor.ByteString
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.decodeFromByteArray
 import kotlinx.serialization.encodeToByteArray
@@ -62,7 +65,8 @@ data class CloudContact_V1(
             photoUri = photoUri,
             useOfferKey = this.useOfferKey,
             offers = mappedOffers,
-            addresses = listOf()
+            addresses = listOf(),
+            secrets = listOf()
         )
     }
 
@@ -78,7 +82,8 @@ data class CloudContact_V2(
     val name: String,
     val useOfferKey: Boolean,
     val offers: List<ContactOfferWrapper>,
-    val addresses: List<ContactAddressWrapper>
+    val addresses: List<ContactAddressWrapper>,
+    val secrets: List<ContactSecretWrapper>
 ) {
     constructor(contact: ContactInfo) : this(
         version = CloudContactVersion.V0.value,
@@ -86,7 +91,8 @@ data class CloudContact_V2(
         name = contact.name,
         useOfferKey = contact.useOfferKey,
         offers = contact.offers.map { ContactOfferWrapper(it) },
-        addresses = contact.addresses.map { ContactAddressWrapper(it) }
+        addresses = contact.addresses.map { ContactAddressWrapper(it) },
+        secrets = contact.secrets.map { ContactSecretWrapper(it) }
     )
 
     @Throws(Exception::class)
@@ -97,7 +103,8 @@ data class CloudContact_V2(
             photoUri = photoUri,
             useOfferKey = this.useOfferKey,
             offers = this.offers.map { it.unwrap() },
-            addresses = this.addresses.map { it.unwrap() }
+            addresses = this.addresses.map { it.unwrap() },
+            secrets = this.secrets.map { it.unwrap() }
         )
     }
 
@@ -143,6 +150,29 @@ data class CloudContact_V2(
             return ContactAddress(
                 address = this.address,
                 label = this.label,
+                createdAt = Instant.fromEpochMilliseconds(this.createdAt)
+            )
+        }
+    }
+
+    @Serializable
+    @OptIn(ExperimentalSerializationApi::class)
+    data class ContactSecretWrapper(
+        @ByteString val secretId: ByteArray,
+        @ByteString val incomingPaymentId: ByteArray?,
+        val createdAt: Long
+    ) {
+        constructor(secret: ContactSecret) : this(
+            secretId = secret.id.toByteArray(),
+            incomingPaymentId = secret.incomingPaymentId?.toByteArray(),
+            createdAt = secret.createdAt.toEpochMilliseconds()
+        )
+
+        @Throws(Exception::class)
+        fun unwrap(): ContactSecret {
+            return ContactSecret(
+                id = this.secretId.toByteVector32(),
+                incomingPaymentId = this.incomingPaymentId?.toByteVector32(),
                 createdAt = Instant.fromEpochMilliseconds(this.createdAt)
             )
         }

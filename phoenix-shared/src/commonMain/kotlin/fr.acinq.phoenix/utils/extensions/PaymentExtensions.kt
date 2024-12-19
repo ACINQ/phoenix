@@ -100,7 +100,9 @@ fun WalletPayment.errorMessage(): String? = when (this) {
     is IncomingPayment -> null
 }
 
-fun WalletPayment.incomingOfferMetadata(): OfferPaymentMetadata.V1? = ((this as? IncomingPayment)?.origin as? IncomingPayment.Origin.Offer)?.metadata as? OfferPaymentMetadata.V1
+fun WalletPayment.incomingOfferMetadata(): OfferPaymentMetadata? = ((this as? IncomingPayment)?.origin as? IncomingPayment.Origin.Offer)?.metadata
+fun WalletPayment.incomingOfferMetadataV2(): OfferPaymentMetadata.V2? = this.incomingOfferMetadata() as? OfferPaymentMetadata.V2
+
 fun WalletPayment.outgoingInvoiceRequest(): OfferTypes.InvoiceRequest? = ((this as? LightningOutgoingPayment)?.details as? LightningOutgoingPayment.Details.Blinded)?.paymentRequest?.invoiceRequest
 
 /** Returns a list of the ids of the payments that triggered this liquidity purchase. May be empty, for example if this is a manual purchase. */

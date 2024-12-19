@@ -683,8 +683,11 @@ struct LightningDualView: View {
 	func generateQrCode() async {
 		
 		do {
-			let offerData = try await Biz.business.nodeParamsManager.defaultOffer()
-			let offerString = offerData.defaultOffer.encode()
+			let offerAndKey: Lightning_kmpOfferTypesOfferAndKey =
+				try await Biz.business.nodeParamsManager.defaultOffer()
+			
+			let offer: Lightning_kmpOfferTypesOffer = offerAndKey.offer
+			let offerString: String = offer.encode()
 			
 			offerStr = offerString
 			if activeType == .bolt12_offer {

@@ -21,6 +21,7 @@ import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.logging.LoggerFactory
+import fr.acinq.lightning.payment.OfferPaymentMetadata
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.PhoenixBusiness
@@ -29,6 +30,7 @@ import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.db.SqliteAppDb
 import fr.acinq.phoenix.utils.extensions.incomingOfferMetadata
+import fr.acinq.phoenix.utils.extensions.incomingOfferMetadataV2
 import fr.acinq.phoenix.utils.extensions.outgoingInvoiceRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
@@ -58,13 +60,13 @@ class ContactsManager(
     private val _offerMap = MutableStateFlow<Map<ByteVector32, UUID>>(emptyMap())
     val offerMap = _offerMap.asStateFlow()
 
-    // Key(Offer.contactNodeId), Value(ContactId)
-    private val _publicKeyMap = MutableStateFlow<Map<PublicKey, UUID>>(emptyMap())
-    val publicKeyMap = _publicKeyMap.asStateFlow()
-
     // Key(lightningAddress.hash), Value(ContactId)
     private val _addressMap = MutableStateFlow<Map<ByteVector32, UUID>>(emptyMap())
     val addressMap = _addressMap.asStateFlow()
+
+    // Key(SecretId), Value(ContactId)
+    private val _secretMap = MutableStateFlow<Map<ByteVector32, UUID>>(emptyMap())
+    val secretMap = _secretMap.asStateFlow()
 
     init {
         launch {
@@ -75,21 +77,21 @@ class ContactsManager(
                         row.id to contact.id
                     }
                 }.toMap()
-                val newPublicKeyMap = list.flatMap { contact ->
-                    contact.publicKeys.map { pubKey ->
-                        pubKey to contact.id
-                    }
-                }.toMap()
                 val newAddressMap = list.flatMap { contact ->
                     contact.addresses.map { row ->
+                        row.id to contact.id
+                    }
+                }.toMap()
+                val newSecretMap = list.flatMap { contact ->
+                    contact.secrets.map { row ->
                         row.id to contact.id
                     }
                 }.toMap()
                 _contactsList.value = list
                 _contactsMap.value = newMap
                 _offerMap.value = newOfferMap
-                _publicKeyMap.value = newPublicKeyMap
                 _addressMap.value = newAddressMap
+                _secretMap.value = newSecretMap
             }
         }
     }
@@ -141,16 +143,6 @@ class ContactsManager(
         return contactForOfferId(offer.offerId)
     }
 
-    fun contactIdForPayerPubKey(payerPubKey: PublicKey): UUID? {
-        return publicKeyMap.value[payerPubKey]
-    }
-
-    fun contactForPayerPubKey(payerPubKey: PublicKey): ContactInfo? {
-        return contactIdForPayerPubKey(payerPubKey)?.let { contactId ->
-            contactForId(contactId)
-        }
-    }
-
     fun contactIdForLightningAddress(address: String): UUID? {
         return addressMap.value[ContactAddress.hash(address)]
     }
@@ -161,10 +153,20 @@ class ContactsManager(
         }
     }
 
+    fun contactIdForSecret(secret: ByteVector32): UUID? {
+        return secretMap.value[secret]
+    }
+
+    fun contactForSecret(secret: ByteVector32): ContactInfo? {
+        return contactIdForSecret(secret)?.let { contactId ->
+            contactForId(contactId)
+        }
+    }
+
     fun contactIdForPaymentInfo(paymentInfo: WalletPaymentInfo): UUID? {
         return if (paymentInfo.payment is IncomingPayment) {
-            paymentInfo.payment.incomingOfferMetadata()?.let { offerMetadata ->
-                contactIdForPayerPubKey(offerMetadata.payerKey)
+            paymentInfo.payment.incomingOfferMetadataV2()?.contactSecret?.let { secret ->
+                contactIdForSecret(secret)
             }
         } else {
             paymentInfo.metadata.lightningAddress?.let { address ->

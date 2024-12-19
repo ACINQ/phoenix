@@ -1,6 +1,7 @@
 package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.BitcoinError
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.PrivateKey
 import fr.acinq.bitcoin.utils.Either
@@ -479,6 +480,7 @@ class SendManager(
         lightningAddress: String?,
         payerKey: PrivateKey,
         payerNote: String?,
+        contactSecret: ByteVector32?,
         fetchInvoiceTimeout: Duration
     ): OfferNotPaid? {
         val peer = peerManager.getPeer()
@@ -511,6 +513,7 @@ class SendManager(
             payerNote = payerNote,
             amount = amount,
             offer = offer,
+            contactSecret = contactSecret,
             fetchInvoiceTimeout = fetchInvoiceTimeout
         ))
         return res.await()

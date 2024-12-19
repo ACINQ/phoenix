@@ -43,6 +43,8 @@ import fr.acinq.lightning.io.PaymentSent
 import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.io.PeerEvent
 import fr.acinq.lightning.io.TcpSocket
+import fr.acinq.lightning.payment.ContactSecrets
+import fr.acinq.lightning.payment.Contacts
 import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.payment.OutgoingPaymentFailure
@@ -357,6 +359,13 @@ fun Lightning_randomBytes32(): ByteVector32 = Lightning.randomBytes32()
 fun Lightning_randomBytes64(): ByteVector64 = Lightning.randomBytes64()
 fun Lightning_randomKey(): PrivateKey = Lightning.randomKey()
 
+fun Contacts_computeContactSecret(
+    ourOffer: OfferTypes.OfferAndKey,
+    theirOffer: OfferTypes.Offer
+): ContactSecrets {
+    return Contacts.computeContactSecret(ourOffer, theirOffer)
+}
+
 fun NSData_toByteArray(data: NSData): ByteArray = data.toByteArray()
 fun NSData_copyTo(data: NSData, buffer: ByteArray, offset: Int = 0) = data.copyTo(buffer, offset)
 fun ByteArray_toNSDataSlice(buffer: ByteArray, offset: Int, length: Int): NSData = buffer.toNSData(offset = offset, length = length)
@@ -383,6 +392,7 @@ suspend fun SendManager._payBolt12Offer(
     lightningAddress: String?,
     payerKey: PrivateKey,
     payerNote: String?,
+    contactSecret: ByteVector32?,
     fetchInvoiceTimeoutInSeconds: Int
 ): OfferNotPaid? {
     return payBolt12Offer(
@@ -392,6 +402,7 @@ suspend fun SendManager._payBolt12Offer(
         lightningAddress = lightningAddress,
         payerKey = payerKey,
         payerNote = payerNote,
+        contactSecret = contactSecret,
         fetchInvoiceTimeout = fetchInvoiceTimeoutInSeconds.seconds
     )
 }

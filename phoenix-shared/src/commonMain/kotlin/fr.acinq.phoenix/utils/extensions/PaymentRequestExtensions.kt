@@ -53,5 +53,6 @@ val PaymentRequest.desc: String?
 val OfferPaymentMetadata.payerNote: String?
     get() = when {
         this is OfferPaymentMetadata.V1 -> this.payerNote
+        this is OfferPaymentMetadata.V2 -> this.payerNote
         else -> null
     }
