@@ -2,17 +2,12 @@ package fr.acinq.phoenix.db.cloud.payments
 
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.serialization.payment.Serialization
-import fr.acinq.phoenix.db.cloud.ChannelClosePaymentWrapper
-import fr.acinq.phoenix.db.cloud.LightningOutgoingPaymentWrapper
-import fr.acinq.phoenix.db.cloud.SpliceCpfpPaymentWrapper
-import fr.acinq.phoenix.db.cloud.SpliceOutgoingPaymentWrapper
 import fr.acinq.phoenix.db.cloud.cborSerializer
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.ByteString
 import kotlinx.serialization.decodeFromByteArray
-import kotlinx.serialization.encodeToByteArray
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -109,10 +104,7 @@ sealed class CloudData {
             else -> null
         }
 
-        @OptIn(ExperimentalSerializationApi::class)
-        override fun serialize(): ByteArray {
-            return cborSerializer().encodeToByteArray(this)
-        }
+        override fun serialize(): ByteArray = throw NotImplementedError("cannot create V0 cloud data anymore")
 
         companion object {
             @OptIn(ExperimentalSerializationApi::class)

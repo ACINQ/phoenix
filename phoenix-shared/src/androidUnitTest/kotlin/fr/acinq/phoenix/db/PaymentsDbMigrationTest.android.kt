@@ -19,6 +19,7 @@ package fr.acinq.phoenix.db
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import fr.acinq.phoenix.db.migrations.v10.AfterVersion10
+import fr.acinq.phoenix.db.migrations.v11.AfterVersion11
 import kotlinx.datetime.Clock
 import java.io.File
 import java.io.FileOutputStream
@@ -43,7 +44,8 @@ actual fun testPaymentsDriverFromFile(): SqlDriver {
         properties = Properties(),
         schema = PaymentsDatabase.Schema,
         migrateEmptySchema = false,
-        AfterVersion10
+        AfterVersion10,
+        AfterVersion11,
     )
 
     return driver

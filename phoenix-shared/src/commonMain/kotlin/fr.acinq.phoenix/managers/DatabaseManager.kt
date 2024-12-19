@@ -1,5 +1,6 @@
 package fr.acinq.phoenix.managers
 
+import app.cash.sqldelight.EnumColumnAdapter
 import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.db.Databases
@@ -11,9 +12,22 @@ import fr.acinq.phoenix.db.createChannelsDbDriver
 import fr.acinq.phoenix.db.createPaymentsDbDriver
 import fr.acinq.phoenix.utils.PlatformContext
 import fr.acinq.lightning.logging.debug
+import fr.acinq.phoenix.db.ByteVector32Adapter
+import fr.acinq.phoenix.db.IncomingPaymentAdapter
+import fr.acinq.phoenix.db.OutgoingPaymentAdapter
+import fr.acinq.phoenix.db.PaymentsDatabase
 import fr.acinq.phoenix.db.SqliteAppDb
+import fr.acinq.phoenix.db.TxIdAdapter
+import fr.acinq.phoenix.db.UUIDAdapter
 import fr.acinq.phoenix.db.makeCloudKitDb
 import fr.acinq.phoenix.db.payments.CloudKitInterface
+import fracinqphoenixdb.Cloudkit_payments_metadata
+import fracinqphoenixdb.Cloudkit_payments_queue
+import fracinqphoenixdb.Link_lightning_outgoing_payment_parts
+import fracinqphoenixdb.On_chain_txs
+import fracinqphoenixdb.Payments_incoming
+import fracinqphoenixdb.Payments_metadata
+import fracinqphoenixdb.Payments_outgoing
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
@@ -52,17 +66,27 @@ class DatabaseManager(
                 val channelsDb = SqliteChannelsDb(
                     driver = createChannelsDbDriver(ctx, chain, nodeIdHash)
                 )
+                val paymentsDbDriver = createPaymentsDbDriver(ctx, chain, nodeIdHash)
                 val paymentsDb = SqlitePaymentsDb(
-                    loggerFactory = loggerFactory,
-                    driver = createPaymentsDbDriver(ctx, chain, nodeIdHash),
-                    currencyManager = currencyManager
+                    driver = paymentsDbDriver,
+                    database = PaymentsDatabase(
+                        driver = paymentsDbDriver,
+                        payments_incomingAdapter = Payments_incoming.Adapter(UUIDAdapter, ByteVector32Adapter, TxIdAdapter, IncomingPaymentAdapter),
+                        payments_outgoingAdapter = Payments_outgoing.Adapter(UUIDAdapter, ByteVector32Adapter, TxIdAdapter, OutgoingPaymentAdapter),
+                        link_lightning_outgoing_payment_partsAdapter = Link_lightning_outgoing_payment_parts.Adapter(UUIDAdapter, UUIDAdapter),
+                        on_chain_txsAdapter = On_chain_txs.Adapter(UUIDAdapter, TxIdAdapter),
+                        payments_metadataAdapter = Payments_metadata.Adapter(UUIDAdapter, EnumColumnAdapter(), EnumColumnAdapter(), EnumColumnAdapter()),
+                        cloudkit_payments_queueAdapter = Cloudkit_payments_queue.Adapter(UUIDAdapter),
+                        cloudkit_payments_metadataAdapter = Cloudkit_payments_metadata.Adapter(UUIDAdapter),
+                    ),
+                    currencyManager = currencyManager,
                 )
                 val cloudKitDb = makeCloudKitDb(appDb, paymentsDb)
                 log.debug { "databases object created" }
                 _databases.value = PhoenixDatabases(
                     channels = channelsDb,
                     payments = paymentsDb,
-                    cloudKit = cloudKitDb
+                    cloudKit = cloudKitDb,
                 )
             }
         }
@@ -90,5 +114,5 @@ class DatabaseManager(
 data class PhoenixDatabases(
     override val channels: SqliteChannelsDb,
     override val payments: SqlitePaymentsDb,
-    val cloudKit: CloudKitInterface?
+    val cloudKit: CloudKitInterface?,
 ): Databases

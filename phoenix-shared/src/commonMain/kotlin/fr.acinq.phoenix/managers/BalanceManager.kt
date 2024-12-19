@@ -68,11 +68,12 @@ class BalanceManager(
 
     /** Monitors the database for incoming payments that are received but whose funds are not yet usable (e.g., need confirmation). */
     private suspend fun monitorIncomingPaymentNotYetConfirmed() {
-        databaseManager.paymentsDb().listIncomingPaymentsNotYetConfirmed().collect { payments ->
-            val unconfirmedOnchain = payments.filter { it.completedAt == null }
-            log.debug { "monitoring ${unconfirmedOnchain.size} unconfirmed on-chain payments" }
-            _pendingChannelsBalance.value = unconfirmedOnchain.map { it.amount }.sum()
-        }
+        TODO("We should not need this anymore. Now with the new funding there is no scenario where a incoming payment may leave a channel pending")
+//        databaseManager.paymentsDb().listIncomingPaymentsNotYetConfirmed().collect { payments ->
+//            val unconfirmedOnchain = payments.filter { it.completedAt == null }
+//            log.debug { "monitoring ${unconfirmedOnchain.size} unconfirmed on-chain payments" }
+//            _pendingChannelsBalance.value = unconfirmedOnchain.map { it.amount }.sum()
+//        }
     }
 
     /**

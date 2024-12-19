@@ -31,7 +31,7 @@ import fr.acinq.phoenix.android.utils.UserTheme
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.lnurl.LnurlAuth
-import fr.acinq.phoenix.db.serializers.v1.SatoshiSerializer
+import fr.acinq.phoenix.db.migrations.v10.json.SatoshiSerializer
 import fr.acinq.phoenix.managers.NodeParamsManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch

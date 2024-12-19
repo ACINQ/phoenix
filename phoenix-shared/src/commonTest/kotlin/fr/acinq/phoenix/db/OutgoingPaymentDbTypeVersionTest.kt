@@ -21,7 +21,13 @@ import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.utils.sat
-import fr.acinq.phoenix.db.payments.*
+import fr.acinq.phoenix.db.migrations.v11.types.OutgoingDetailsData
+import fr.acinq.phoenix.db.migrations.v11.types.OutgoingDetailsTypeVersion
+import fr.acinq.phoenix.db.migrations.v11.types.OutgoingPartStatusData
+import fr.acinq.phoenix.db.migrations.v11.types.OutgoingPartStatusTypeVersion
+import fr.acinq.phoenix.db.migrations.v11.types.OutgoingStatusData
+import fr.acinq.phoenix.db.migrations.v11.types.OutgoingStatusTypeVersion
+import fr.acinq.phoenix.db.migrations.v11.types.mapToDb
 import io.ktor.utils.io.charsets.Charsets
 import io.ktor.utils.io.core.toByteArray
 import kotlin.test.Test

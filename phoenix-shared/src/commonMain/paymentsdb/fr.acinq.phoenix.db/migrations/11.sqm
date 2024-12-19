@@ -1,0 +1,40 @@
+-- Migration: v11 -> v12
+--
+-- Changes:
+-- * add table payments_outgoing, which stores all types of outgoing payments.
+-- * add table link_lightning_outgoing_payment_parts, which links lightning parts with the parent.
+--
+-- /!\ There is also a code migration, see AfterVersion11.kt.
+-- This code migration moves existing data to the new tables and drops the old tables.
+
+CREATE TABLE payments_outgoing (
+    id BLOB AS UUID NOT NULL PRIMARY KEY,
+    payment_hash BLOB AS ByteVector32,
+    tx_id BLOB AS TxId,
+    created_at INTEGER NOT NULL,
+    completed_at INTEGER DEFAULT NULL, -- a completed outgoing payment can be a success or a failure
+    sent_at INTEGER DEFAULT NULL, -- will only be set for a successful payment
+    data BLOB AS OutgoingPayment NOT NULL
+);
+
+CREATE INDEX payments_outgoing_payment_hash_idx ON payments_outgoing(payment_hash);
+CREATE INDEX payments_outgoing_tx_id_idx ON payments_outgoing(tx_id);
+
+-- Create indexes to optimize the queries in AggregatedQueries.
+-- Tip: Use "explain query plan" to ensure they're actually being used.
+CREATE INDEX payments_outgoing_filter_idx ON payments_outgoing(completed_at) WHERE completed_at IS NOT NULL;
+
+CREATE TABLE link_lightning_outgoing_payment_parts (
+    part_id BLOB AS UUID NOT NULL PRIMARY KEY,
+    parent_id BLOB AS UUID NOT NULL
+);
+
+CREATE VIEW payments
+AS SELECT id, created_at, completed_at, data
+FROM (
+    SELECT id, created_at, received_at AS completed_at, data
+    FROM payments_incoming
+UNION ALL
+    SELECT id, created_at, sent_at AS completed_at, data
+    FROM payments_outgoing
+);

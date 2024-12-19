@@ -151,7 +151,7 @@ data class WalletPaymentInfo(
             return null
         } else {
             WalletPaymentOrderRow(
-                id = payment.walletPaymentId(),
+                id = payment.id,
                 createdAt = payment.createdAt,
                 completedAt = payment.completedAt,
                 metadataModifiedAt = metadata.modifiedAt

@@ -216,7 +216,7 @@ class SendManager(
         // parallel pending payments on the same payment hash can trigger force-closes
         // FIXME: this check should be done in lightning-kmp, not in Phoenix
         return when {
-            similarPayments.any { it.status is LightningOutgoingPayment.Status.Completed.Succeeded || it.parts.any { part -> part.status is LightningOutgoingPayment.Part.Status.Succeeded } } ->
+            similarPayments.any { it.status is LightningOutgoingPayment.Status.Succeeded || it.parts.any { part -> part.status is LightningOutgoingPayment.Part.Status.Succeeded } } ->
                 BadRequestReason.AlreadyPaidInvoice
             similarPayments.any { it.status is LightningOutgoingPayment.Status.Pending || it.parts.any { part -> part.status is LightningOutgoingPayment.Part.Status.Pending } } ->
                 BadRequestReason.PaymentPending

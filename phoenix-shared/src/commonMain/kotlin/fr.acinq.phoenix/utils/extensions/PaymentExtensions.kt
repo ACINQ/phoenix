@@ -47,8 +47,8 @@ fun WalletPayment.state(): WalletPaymentState = when (this) {
     }
     is LightningOutgoingPayment -> when (status) {
         is LightningOutgoingPayment.Status.Pending -> WalletPaymentState.PendingOffChain
-        is LightningOutgoingPayment.Status.Completed.Succeeded -> WalletPaymentState.SuccessOffChain
-        is LightningOutgoingPayment.Status.Completed.Failed -> WalletPaymentState.Failure
+        is LightningOutgoingPayment.Status.Succeeded -> WalletPaymentState.SuccessOffChain
+        is LightningOutgoingPayment.Status.Failed -> WalletPaymentState.Failure
     }
     is LightningIncomingPayment, is LegacyPayToOpenIncomingPayment -> when (completedAt) {
         null -> WalletPaymentState.PendingOffChain
@@ -63,7 +63,7 @@ fun WalletPayment.state(): WalletPaymentState = when (this) {
 fun WalletPayment.errorMessage(): String? = when (this) {
     is OnChainOutgoingPayment -> null
     is LightningOutgoingPayment -> when (val s = status) {
-        is LightningOutgoingPayment.Status.Completed.Failed -> s.reason.toString()
+        is LightningOutgoingPayment.Status.Failed -> s.reason.toString()
         else -> null
     }
     is IncomingPayment -> null

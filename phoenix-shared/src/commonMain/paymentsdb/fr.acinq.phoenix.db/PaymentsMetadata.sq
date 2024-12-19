@@ -1,10 +1,10 @@
 import fr.acinq.phoenix.db.payments.LnurlBase;
 import fr.acinq.phoenix.db.payments.LnurlMetadata;
 import fr.acinq.phoenix.db.payments.LnurlSuccessAction;
+import fr.acinq.lightning.utils.UUID;
 
 -- This table stores metadata corresponding to a payment.
--- * type => enum indicating whether payment is incoming or outgoing
--- * id => stores the primary key of the payment row
+-- * id => uuid of an incoming or an outgoing payments
 -- * lnurl_base => serialized lnurl object (e.g. LNUrl.Pay), excluding metadata content
 -- * lnurl_metadata => serialized lnurl metadata (e.g. LNUrl.Pay.Metadata)
 -- * lnurl_successAction => serialized LUD-09 (e.g. LNUrl.PayInvoice.SuccessAction.Message)
@@ -14,8 +14,7 @@ import fr.acinq.phoenix.db.payments.LnurlSuccessAction;
 -- * original_fiat => stores original fiat price (via conversion rate) at time of transaction
 --
 CREATE TABLE IF NOT EXISTS payments_metadata (
-    type INTEGER NOT NULL,
-    id TEXT NOT NULL,
+    id BLOB AS UUID NOT NULL PRIMARY KEY,
     lnurl_base_type TEXT AS LnurlBase.TypeVersion,
     lnurl_base_blob BLOB,
     lnurl_description TEXT,
@@ -27,19 +26,17 @@ CREATE TABLE IF NOT EXISTS payments_metadata (
     user_notes TEXT DEFAULT NULL,
     modified_at INTEGER DEFAULT NULL,
     original_fiat_type TEXT DEFAULT NULL,
-    original_fiat_rate REAL DEFAULT NULL,
-    PRIMARY KEY (type, id)
+    original_fiat_rate REAL DEFAULT NULL
 );
 
 -- queries for payments_metadata table
 
 hasMetadata:
 SELECT COUNT(*) FROM payments_metadata
-WHERE type = ? AND id = ?;
+WHERE id = ?;
 
 addMetadata:
 INSERT INTO payments_metadata (
-            type,
             id,
             lnurl_base_type, lnurl_base_blob,
             lnurl_description,
@@ -48,34 +45,34 @@ INSERT INTO payments_metadata (
             user_description, user_notes,
             modified_at,
             original_fiat_type, original_fiat_rate)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 updateUserInfo:
 UPDATE payments_metadata
 SET    user_description = ?,
        user_notes = ?,
        modified_at = ?
-WHERE  type = ? AND id = ?;
+WHERE  id = ?;
 
-fetchDescriptions:
+get:
+SELECT * FROM payments_metadata
+WHERE id = ?;
+
+getDescriptions:
 SELECT lnurl_description,
        user_description,
        modified_at
 FROM   payments_metadata
-WHERE  type = ? AND id = ?;
+WHERE  id = ?;
 
-fetchDescriptionsAndOriginalFiat:
+getDescriptionsAndOriginalFiat:
 SELECT lnurl_description,
        user_description,
        modified_at,
        original_fiat_type,
        original_fiat_rate
 FROM   payments_metadata
-WHERE  type = ? AND id = ?;
-
-fetchMetadata:
-SELECT * FROM payments_metadata
-WHERE type = ? AND id = ?;
+WHERE  id = ?;
 
 -- use this in a `transaction` block to know how many rows were changed after an UPDATE
 changes:

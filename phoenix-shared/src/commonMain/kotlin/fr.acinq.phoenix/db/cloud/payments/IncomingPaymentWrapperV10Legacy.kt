@@ -43,6 +43,4 @@ data class IncomingPaymentWrapperV10Legacy(
         val type: String,
         @ByteString val blob: ByteArray
     )
-
-    companion object
 }

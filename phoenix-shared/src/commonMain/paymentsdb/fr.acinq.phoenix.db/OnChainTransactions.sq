@@ -1,0 +1,39 @@
+import fr.acinq.bitcoin.ByteVector32;
+import fr.acinq.bitcoin.TxId;
+import fr.acinq.lightning.utils.UUID;
+
+CREATE TABLE on_chain_txs (
+    payment_id BLOB AS UUID NOT NULL PRIMARY KEY,
+    tx_id BLOB AS TxId NOT NULL,
+    confirmed_at INTEGER DEFAULT NULL,
+    locked_at INTEGER DEFAULT NULL
+);
+
+CREATE INDEX on_chain_txs_tx_id ON on_chain_txs(tx_id);
+
+insert:
+INSERT INTO on_chain_txs(
+            payment_id,
+            tx_id)
+VALUES (?, ?);
+
+setConfirmed:
+UPDATE on_chain_txs
+SET confirmed_at=?
+WHERE tx_id=?;
+
+setLocked:
+UPDATE on_chain_txs
+SET locked_at=?
+WHERE tx_id=?;
+
+listUnconfirmed:
+SELECT tx_id
+FROM on_chain_txs
+WHERE confirmed_at IS NULL;
+
+listByTxId:
+SELECT data
+FROM on_chain_txs t
+JOIN payments p ON t.payment_id=p.id
+WHERE tx_id=:tx_id;

@@ -33,7 +33,9 @@ import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toByteVector32
 import fr.acinq.lightning.wire.LiquidityAds
+import fr.acinq.phoenix.db.cloud.payments.CloudAsset
 import fr.acinq.phoenix.db.cloud.payments.CloudData
+import fr.acinq.phoenix.db.cloud.payments.cborDeserialize
 import fr.acinq.phoenix.runTest
 import fr.acinq.secp256k1.Hex
 import kotlinx.serialization.cbor.Cbor

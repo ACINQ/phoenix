@@ -7,8 +7,7 @@ import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toByteVector32
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.db.cloud.UUIDSerializer
-import fr.acinq.phoenix.db.payments.liquidityads.PurchaseData
-import fr.acinq.phoenix.db.payments.liquidityads.PurchaseData.Companion.encodeAsDb
+import fr.acinq.phoenix.db.migrations.v11.types.liquidityads.PurchaseData
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.ByteString
@@ -29,19 +28,6 @@ data class InboundLiquidityPaymentWrapper(
     val confirmedAt: Long?,
     val lockedAt: Long?,
 ) {
-    constructor(src: InboundLiquidityOutgoingPayment) : this(
-        id = src.id,
-        channelId = src.channelId.toByteArray(),
-        txId = src.txId.value.toByteArray(),
-        // see lightning-kmp#710 and comment in InboundLiquidityQueries mapper
-        // miningFeesSat contains the local fee + the purchase fee
-        miningFeesSat = src.miningFees.sat,
-        purchase = LiquidityAdsPurchaseWrapper(src.purchase),
-        createdAt = src.createdAt,
-        confirmedAt = src.confirmedAt,
-        lockedAt = src.lockedAt
-    )
-
     @Throws(Exception::class)
     fun unwrap(): InboundLiquidityOutgoingPayment {
         val purchase = this.purchase.unwrap()
@@ -61,11 +47,6 @@ data class InboundLiquidityPaymentWrapper(
 
     @Serializable
     data class LiquidityAdsPurchaseWrapper(@ByteString val blob: ByteArray) {
-        companion object {
-            operator fun invoke(purchase: LiquidityAds.Purchase): LiquidityAdsPurchaseWrapper {
-                return LiquidityAdsPurchaseWrapper(purchase.encodeAsDb())
-            }
-        }
         fun unwrap(): LiquidityAds.Purchase {
             return PurchaseData.decodeAsCanonical("", blob)
         }

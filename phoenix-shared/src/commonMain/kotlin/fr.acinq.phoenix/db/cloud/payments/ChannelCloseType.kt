@@ -1,4 +1,4 @@
-package fr.acinq.phoenix.db.cloud
+package fr.acinq.phoenix.db.cloud.payments
 
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
@@ -6,12 +6,12 @@ import fr.acinq.lightning.db.ChannelClosingType
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toByteVector32
+import fr.acinq.phoenix.db.cloud.UUIDSerializer
+import fr.acinq.phoenix.db.cloud.cborSerializer
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.ByteString
-import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.decodeFromByteArray
-import kotlinx.serialization.encodeToByteArray
 
 @Serializable
 @OptIn(ExperimentalSerializationApi::class)
@@ -29,19 +29,6 @@ data class ChannelClosePaymentWrapper(
     @ByteString val channelId: ByteArray,
     val closingType: ChannelClosingType,
 ) {
-    constructor(payment: ChannelCloseOutgoingPayment) : this(
-        id = payment.id,
-        amountSat = payment.recipientAmount.sat,
-        address = payment.address,
-        isSentToDefaultAddress = payment.isSentToDefaultAddress,
-        miningFeeSat = payment.miningFees.sat,
-        txId = payment.txId.value.toByteArray(),
-        createdAt = payment.createdAt,
-        confirmedAt = payment.confirmedAt,
-        lockedAt = payment.lockedAt,
-        channelId = payment.channelId.toByteArray(),
-        closingType = payment.closingType,
-    )
 
     @Throws(Exception::class)
     fun unwrap() = ChannelCloseOutgoingPayment(
@@ -59,12 +46,6 @@ data class ChannelClosePaymentWrapper(
     )
 
     companion object
-}
-
-@OptIn(ExperimentalSerializationApi::class)
-fun ChannelCloseOutgoingPayment.cborSerialize(): ByteArray {
-    val wrapper = ChannelClosePaymentWrapper(payment = this)
-    return Cbor.encodeToByteArray(wrapper)
 }
 
 @OptIn(ExperimentalSerializationApi::class)

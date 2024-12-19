@@ -1,5 +1,5 @@
 object Versions {
-    const val lightningKmp = "1.8.5-BINPAYCODECS-SNAPSHOT"
+    const val lightningKmp = "1.8.5-SNAPSHOT"
     const val secp256k1 = "0.14.0"
     const val torMobile = "0.2.0"
 
