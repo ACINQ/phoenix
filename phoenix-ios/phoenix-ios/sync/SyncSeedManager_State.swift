@@ -101,7 +101,7 @@ enum SyncSeedManager_State: Equatable, CustomStringConvertible {
 /// Details concerning what/why the SyncSeedManager is temporarily paused.
 /// Sometimes these delays can be manually cancelled by the user.
 ///
-class SyncSeedManager_State_Waiting: Equatable {
+final class SyncSeedManager_State_Waiting: Equatable, Sendable {
 	
 	enum Kind: Equatable {
 		case forInternet

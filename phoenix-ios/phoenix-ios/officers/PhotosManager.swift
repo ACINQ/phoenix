@@ -53,7 +53,7 @@ class PhotosManager {
 	// MARK: Locations
 	// --------------------------------------------------
 	
-	lazy var photosDirectory: URL = {
+	static var photosDirectory: URL = {
 		
 		// lazy == thread-safe (uses dispatch_once primitives internally)
 		
@@ -75,15 +75,15 @@ class PhotosManager {
 		return photosDir
 	}()
 	
-	func genFileName() -> String {
+	static func genFileName() -> String {
 		return UUID().uuidString.replacingOccurrences(of: "-", with: "")
 	}
 	
-	func urlForPhoto(fileName: String) -> URL {
+	static func urlForPhoto(fileName: String) -> URL {
 		return photosDirectory.appendingPathComponent(fileName, isDirectory: false)
 	}
 	
-	func filePathForPhoto(fileName: String) -> String {
+	static func filePathForPhoto(fileName: String) -> String {
 		return urlForPhoto(fileName: fileName).path
 	}
 	
@@ -99,8 +99,8 @@ class PhotosManager {
 	
 	func writeToDisk(_ original: PickerResult) async throws -> String {
 		
-		let fileName = genFileName()
-		let fileUrl = self.urlForPhoto(fileName: fileName)
+		let fileName = Self.genFileName()
+		let fileUrl = Self.urlForPhoto(fileName: fileName)
 				
 		let scaled = await original.downscale()
 		if let compressedImageData = await scaled.compress() {
@@ -132,19 +132,13 @@ class PhotosManager {
 		}
 	}
 
-	func deleteFromDisk(fileName: String) async throws {
+	func deleteFromDisk(fileName: String) async {
 		
-		return try await withCheckedThrowingContinuation { continuation in
-			DispatchQueue.global(qos: .userInitiated).async {
-				
-				let fileUrl = self.urlForPhoto(fileName: fileName)
-				do {
-					try FileManager.default.removeItem(at: fileUrl)
-					continuation.resume(with: .success)
-				} catch {
-					continuation.resume(throwing: error)
-				}
-			}
+		let fileUrl = Self.urlForPhoto(fileName: fileName)
+		do {
+			try FileManager.default.removeItem(at: fileUrl)
+		} catch {
+			log.warning("FileManager.remoteItem(\(fileUrl.lastPathComponent)): error: \(error)")
 		}
 	}
 	
@@ -156,7 +150,7 @@ class PhotosManager {
 		
 		let readTask = {() -> UIImage? in
 			do {
-				let fileUrl = self.urlForPhoto(fileName: fileName)
+				let fileUrl = Self.urlForPhoto(fileName: fileName)
 				let data = try Data(contentsOf: fileUrl, options: [.mappedIfSafe, .uncached])
 				guard let fullSizePhoto = UIImage(data: data) else {
 					return nil
@@ -174,25 +168,20 @@ class PhotosManager {
 			}
 		}
 		
-		return await withCheckedContinuation { continuation in
-			if useCache {
-				queue.async {
-					let key = "\(fileName)|\(size)"
-					if let cachedImg = self.cache[key] {
-						continuation.resume(returning: cachedImg)
-					} else if let img = readTask() {
-						self.cache[key] = img
-						continuation.resume(returning: img)
-					} else {
-						continuation.resume(returning: nil)
-					}
-				}
-			} else {
-				DispatchQueue.global(qos: .userInitiated).async {
-					let img = readTask()
-					continuation.resume(returning: img)
+		if useCache {
+			var result: UIImage? = nil
+			queue.sync {
+				let key = "\(fileName)|\(size)"
+				if let cachedImg = self.cache[key] {
+					result = cachedImg
+				} else if let img = readTask() {
+					self.cache[key] = img
+					result = img
 				}
 			}
+			return result
+		} else {
+			return readTask()
 		}
 	}
 }

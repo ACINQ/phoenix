@@ -21,7 +21,7 @@ actor SyncSeedManager_Actor {
 	
 	private var state: SyncSeedManager_State
 	
-	let initialState: SyncSeedManager_State
+	nonisolated let initialState: SyncSeedManager_State
 	
 	var activeState: SyncSeedManager_State {
 		return state

@@ -43,7 +43,7 @@ struct ConsecutivePartialFailure {
 
 /// Encompasses the logic for syncing data with Apple's CloudKit database.
 ///
-class SyncBackupManager {
+class SyncBackupManager: @unchecked Sendable {
 	
 	/// Access to parent for shared logic.
 	///

@@ -182,7 +182,7 @@ struct ModifyInvoiceSheet: View {
 	var isEmptyAmount: Bool {
 		
 		switch parsedAmount {
-		case .success(let amt):
+		case .success(_):
 			return false
 			
 		case .failure(let reason):

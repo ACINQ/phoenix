@@ -289,7 +289,7 @@ extension SyncBackupManager {
 						record[contacts_record_column_data] = ciphertext
 						
 						if let fileName = contactInfo.photoUri {
-							let fileUrl = PhotosManager.shared.urlForPhoto(fileName: fileName)
+							let fileUrl = PhotosManager.urlForPhoto(fileName: fileName)
 							record[contacts_record_column_photo] = CKAsset(fileURL: fileUrl)
 						}
 						
@@ -720,8 +720,8 @@ extension SyncBackupManager {
 			
 			if let srcFileURL = asset.fileURL {
 				
-				let dstFileName = PhotosManager.shared.genFileName()
-				let dstFileURL = PhotosManager.shared.urlForPhoto(fileName: dstFileName)
+				let dstFileName = PhotosManager.genFileName()
+				let dstFileURL = PhotosManager.urlForPhoto(fileName: dstFileName)
 				
 				do {
 					try FileManager.default.copyItem(at: srcFileURL, to: dstFileURL)
