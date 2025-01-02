@@ -3,6 +3,7 @@ package fr.acinq.phoenix.db.payments
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.byteVector32
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.data.lnurl.LnurlPay
@@ -32,7 +33,8 @@ class MetadataQueries(val database: PaymentsDatabase) {
             user_notes = data.user_notes,
             modified_at = data.modified_at,
             original_fiat_type = data.original_fiat?.first,
-            original_fiat_rate = data.original_fiat?.second
+            original_fiat_rate = data.original_fiat?.second,
+            card_id = data.card_id
         )
     }
 
@@ -48,11 +50,8 @@ class MetadataQueries(val database: PaymentsDatabase) {
             WalletPaymentFetchOptions.None -> {
                 null
             }
-            WalletPaymentFetchOptions.Descriptions + WalletPaymentFetchOptions.OriginalFiat -> {
-                getMetadataDescriptionsAndOriginalFiat(id)
-            }
-            WalletPaymentFetchOptions.Descriptions -> {
-                getMetadataDescriptions(id)
+            WalletPaymentFetchOptions.Common -> {
+                getMetadataCommon(id)
             }
             else -> {
                 getMetadataAll(id)
@@ -60,21 +59,13 @@ class MetadataQueries(val database: PaymentsDatabase) {
         }
     }
 
-    private fun getMetadataDescriptions(id: WalletPaymentId): WalletPaymentMetadata? {
-        return queries.fetchDescriptions(
-            type = id.dbType.value,
-            id = id.dbId,
-            mapper = ::mapDescriptions
-        ).executeAsOneOrNull()
-    }
-
-    private fun getMetadataDescriptionsAndOriginalFiat(
+    private fun getMetadataCommon(
         id: WalletPaymentId
     ): WalletPaymentMetadata? {
-        return queries.fetchDescriptionsAndOriginalFiat(
+        return queries.fetchCommon(
             type = id.dbType.value,
             id = id.dbId,
-            mapper = ::mapDescriptionsAndOriginalFiat
+            mapper = ::mapCommon
         ).executeAsOneOrNull()
     }
 
@@ -120,7 +111,8 @@ class MetadataQueries(val database: PaymentsDatabase) {
                     user_notes = userNotes,
                     modified_at = modifiedAt,
                     original_fiat_type = null,
-                    original_fiat_rate = null
+                    original_fiat_rate = null,
+                    card_id = null
                 )
             }
             didUpdateWalletPaymentMetadata(id, database)
@@ -128,31 +120,18 @@ class MetadataQueries(val database: PaymentsDatabase) {
     }
 
     companion object {
-        fun mapDescriptions(
-            lnurl_description: String?,
-            user_description: String?,
-            modified_at: Long?
-        ): WalletPaymentMetadata {
-            val lnurl = if (lnurl_description != null) {
-                LnurlPayMetadata.placeholder(lnurl_description)
-            } else null
-            return WalletPaymentMetadata(
-                userDescription = user_description,
-                lnurl = lnurl,
-                modifiedAt = modified_at
-            )
-        }
 
-        fun mapDescriptionsAndOriginalFiat(
+        fun mapCommon(
             lnurl_description: String?,
             user_description: String?,
             modified_at: Long?,
             original_fiat_type: String?,
-            original_fiat_rate: Double?
+            original_fiat_rate: Double?,
+            card_id: String?
         ): WalletPaymentMetadata {
-            val lnurl = if (lnurl_description != null) {
-                LnurlPayMetadata.placeholder(lnurl_description)
-            } else null
+            val lnurl = lnurl_description?.let {
+                LnurlPayMetadata.placeholder(it)
+            }
 
             val originalFiat =
                 if (original_fiat_type != null && original_fiat_rate != null) {
@@ -166,10 +145,17 @@ class MetadataQueries(val database: PaymentsDatabase) {
                     }
                 } else null
 
+            val cardId = card_id?.let {
+                try {
+                    UUID.fromString(it)
+                } catch (e: Exception) { null }
+            }
+
             return WalletPaymentMetadata(
                 lnurl = lnurl,
                 originalFiat = originalFiat,
                 userDescription = user_description,
+                cardId = cardId,
                 modifiedAt = modified_at
             )
         }
@@ -189,7 +175,8 @@ class MetadataQueries(val database: PaymentsDatabase) {
             user_notes: String?,
             modified_at: Long?,
             original_fiat_type: String?,
-            original_fiat_rate: Double?
+            original_fiat_rate: Double?,
+            card_id: String?
         ): WalletPaymentMetadata {
             val lnurlBase =
                 if (lnurl_base_type != null && lnurl_base_blob != null) {
@@ -219,6 +206,7 @@ class MetadataQueries(val database: PaymentsDatabase) {
                 original_fiat = originalFiat,
                 user_description = user_description,
                 user_notes = user_notes,
+                card_id = card_id,
                 modified_at = modified_at
             ).deserialize()
         }

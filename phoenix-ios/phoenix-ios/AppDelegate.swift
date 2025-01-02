@@ -62,9 +62,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		UINavigationBar.appearance().compactAppearance = navBarAppearance
 		UINavigationBar.appearance().standardAppearance = navBarAppearance
 
-		#if !targetEnvironment(simulator) // push notifications don't work on iOS simulator
-			UIApplication.shared.registerForRemoteNotifications()
-		#endif
+		// Push notifictions now work on the iOS simulator.
+		// But only for:
+		// - Macs with Apple Silicon processor
+		// - Macs with Intel processor & the T2 security chip
+		//   https://support.apple.com/en-us/103265
+		//
+		UIApplication.shared.registerForRemoteNotifications()
 		
 		FirebaseApp.configure()
 		Messaging.messaging().delegate = self
@@ -218,15 +222,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		log.trace("application(_:didReceiveRemoteNotification:fetchCompletionHandler:)")
 		log.debug("remote notification: \(userInfo)")
 		
-		// If the app is in the foreground:
-		// - we can ignore this notification
-		//
-		// If the app is in the background:
-		// - this notification was delivered to the notifySrvExt, which is in charge of processing it
-		
-		DispatchQueue.main.async {
-			completionHandler(.noData)
-		}
+		PushManager.processRemoteNotification(userInfo, completionHandler)
 	}
 	
 	func messaging(
@@ -281,7 +277,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		business.databaseManager.paymentsDb { paymentsDb, _ in
 		
 			let fakePaymentId = WalletPaymentId.IncomingPaymentId(paymentHash: Bitcoin_kmpByteVector32.random())
-			paymentsDb?.deletePayment(paymentId: fakePaymentId) { _ in
+			paymentsDb?.deletePayment(paymentId: fakePaymentId, notify: false) { _ in
 				// Nothing is actually deleted
 			}
 		}

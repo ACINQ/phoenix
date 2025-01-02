@@ -26,6 +26,7 @@ import fr.acinq.lightning.db.*
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.utils.*
+import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentMetadata
@@ -448,7 +449,7 @@ class SqlitePaymentsDb(
     // ---- list ALL payments
 
     fun listPaymentsCountFlow(): Flow<Long> {
-        return aggrQueries.listAllPaymentsCount(::allPaymentsCountMapper)
+        return aggrQueries.listAllPaymentsCount(::countMapper)
             .asFlow()
             .map {
                 withContext(Dispatchers.Default) {
@@ -471,7 +472,7 @@ class SqlitePaymentsDb(
         return aggrQueries.listAllPaymentsOrder(
             limit = count.toLong(),
             offset = skip.toLong(),
-            mapper = ::allPaymentsOrderMapper
+            mapper = ::walletPaymentsOrderRowMapper
         )
         .asFlow()
         .map {
@@ -483,6 +484,19 @@ class SqlitePaymentsDb(
         }
     }
 
+    suspend fun listRecentPaymentsOrder(
+        date: Long,
+        count: Int,
+        skip: Int
+    ): List<WalletPaymentOrderRow> = withContext(Dispatchers.Default) {
+        aggrQueries.listRecentPaymentsOrder(
+            date = date,
+            limit = count.toLong(),
+            offset = skip.toLong(),
+            mapper = ::walletPaymentsOrderRowMapper
+        ).executeAsList()
+    }
+
     fun listRecentPaymentsOrderFlow(
         date: Long,
         count: Int,
@@ -492,7 +506,7 @@ class SqlitePaymentsDb(
             date = date,
             limit = count.toLong(),
             offset = skip.toLong(),
-            mapper = ::allPaymentsOrderMapper
+            mapper = ::walletPaymentsOrderRowMapper
         )
         .asFlow()
         .map {
@@ -511,7 +525,7 @@ class SqlitePaymentsDb(
         return aggrQueries.listOutgoingInFlightPaymentsOrder(
             limit = count.toLong(),
             offset = skip.toLong(),
-            mapper = ::allPaymentsOrderMapper
+            mapper = ::walletPaymentsOrderRowMapper
         )
         .asFlow()
         .map {
@@ -542,7 +556,7 @@ class SqlitePaymentsDb(
             endDate = endDate,
             limit = count.toLong(),
             offset = skip.toLong(),
-            mapper = ::allPaymentsOrderMapper
+            mapper = ::walletPaymentsOrderRowMapper
         ).executeAsList()
     }
 
@@ -559,8 +573,29 @@ class SqlitePaymentsDb(
         aggrQueries.listRangeSuccessfulPaymentsCount(
             startDate = startDate,
             endDate = endDate,
-            mapper = ::allPaymentsCountMapper
+            mapper = ::countMapper
         ).executeAsList().first()
+    }
+
+    suspend fun listRecentCardPaymentsOrder(
+        newerThanDate: Long,
+        count: Int,
+        skip: Int
+    ): List<CardPaymentOrderRow> = withContext(Dispatchers.Default) {
+        aggrQueries.listRecentCardPaymentsOrder(
+            date = newerThanDate,
+            limit = count.toLong(),
+            offset = skip.toLong()
+        ).executeAsList().mapNotNull {
+            cardPaymentsOrderRowMapper(
+                type = it.type,
+                id = it.id,
+                created_at = it.created_at,
+                completed_at = it.completed_at,
+                metadata_modified_at = it.metadata_modified_at,
+                card_id = it.card_id
+            )
+        }
     }
 
     suspend fun getOldestCompletedDate(): Long? = withContext(Dispatchers.Default) {
@@ -613,7 +648,7 @@ class SqlitePaymentsDb(
         )
     }
 
-    suspend fun deletePayment(paymentId: WalletPaymentId) = withContext(Dispatchers.Default) {
+    suspend fun deletePayment(paymentId: WalletPaymentId, notify: Boolean = true) = withContext(Dispatchers.Default) {
         database.transaction {
             when (paymentId) {
                 is WalletPaymentId.IncomingPaymentId -> {
@@ -648,20 +683,22 @@ class SqlitePaymentsDb(
                     database.inboundLiquidityOutgoingQueries.delete(id = paymentId.dbId)
                 }
             }
-            didDeleteWalletPayment(paymentId, database)
+            if (notify) {
+                didDeleteWalletPayment(paymentId, database)
+            }
         }
     }
 
     fun close() = driver.close()
 
     companion object {
-        private fun allPaymentsCountMapper(
+        private fun countMapper(
             result: Long?
         ): Long {
             return result ?: 0
         }
 
-        private fun allPaymentsOrderMapper(
+        private fun walletPaymentsOrderRowMapper(
             type: Long,
             id: String,
             created_at: Long,
@@ -683,6 +720,27 @@ class SqlitePaymentsDb(
                 completedAt = completed_at,
                 metadataModifiedAt = metadata_modified_at
             )
+        }
+
+        private fun cardPaymentsOrderRowMapper(
+            type: Long,
+            id: String,
+            created_at: Long,
+            completed_at: Long?,
+            metadata_modified_at: Long?,
+            card_id: String
+        ): CardPaymentOrderRow? {
+            val walletPaymentOrderRow = walletPaymentsOrderRowMapper(
+                type = type,
+                id = id,
+                created_at = created_at,
+                completed_at = completed_at,
+                metadata_modified_at = metadata_modified_at
+            )
+            return try {
+                val cardId = UUID.fromString(card_id)
+                CardPaymentOrderRow(walletPaymentOrderRow, cardId)
+            } catch (e: Exception) { null }
         }
     }
 }
@@ -721,3 +779,8 @@ data class WalletPaymentOrderRow(
             return "${id.identifier}|${createdAt}|"
         }
 }
+
+data class CardPaymentOrderRow(
+    val walletPaymentOrderRow: WalletPaymentOrderRow,
+    val cardId: UUID
+)

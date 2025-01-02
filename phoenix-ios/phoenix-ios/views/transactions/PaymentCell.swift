@@ -10,11 +10,8 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct PaymentCell : View {
 	
-	static let fetchOptions = WalletPaymentFetchOptions.companion.Descriptions.plus(
-		other: WalletPaymentFetchOptions.companion.OriginalFiat
-	).plus(
-		other: WalletPaymentFetchOptions.companion.Contact
-	)
+	// Common options = Descriptions + OriginalFiat + Contacts + Card
+	static let fetchOptions = WalletPaymentFetchOptions.companion.Common
 	
 	private let paymentsManager = Biz.business.paymentsManager
 	

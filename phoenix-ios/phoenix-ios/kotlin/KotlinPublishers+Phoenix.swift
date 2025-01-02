@@ -168,6 +168,30 @@ extension ConnectionsManager {
 	}
 }
 
+// MARK: -
+extension CardsManager {
+	
+	fileprivate struct _Key {
+		static var cardsListPublisher = 0
+	}
+	
+	func cardsListPublisher() -> AnyPublisher<[BoltCardInfo], Never> {
+		
+		self.getSetAssociatedObject(storageKey: &_Key.cardsListPublisher) {
+			
+			// Transforming from Kotlin:
+			// `cardsList: StateFlow<List<BoltCardInfo>>`
+			//
+			KotlinCurrentValueSubject<NSArray>(
+				self.cardsList
+			)
+			.compactMap { $0 as? [BoltCardInfo] }
+			.eraseToAnyPublisher()
+		}
+	}
+}
+
+// MARK: -
 extension ContactsManager {
 	
 	fileprivate struct _Key {

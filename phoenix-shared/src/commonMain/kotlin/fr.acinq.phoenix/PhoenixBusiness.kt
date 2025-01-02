@@ -74,7 +74,7 @@ class PhoenixBusiness(
 
     var appConnectionsDaemon: AppConnectionsDaemon? = null
 
-    val appDb by lazy { SqliteAppDb(createAppDbDriver(ctx)) }
+    val appDb by lazy { SqliteAppDb(loggerFactory, createAppDbDriver(ctx)) }
     val networkMonitor by lazy { NetworkMonitor(loggerFactory, ctx) }
     val walletManager by lazy { WalletManager(chain) }
     val nodeParamsManager by lazy { NodeParamsManager(this) }
@@ -88,6 +88,7 @@ class PhoenixBusiness(
     val lnurlManager by lazy { LnurlManager(this) }
     val notificationsManager by lazy { NotificationsManager(this) }
     val contactsManager by lazy { ContactsManager(this) }
+    val cardsManager by lazy { CardsManager(this) }
     val blockchainExplorer by lazy { BlockchainExplorer(chain) }
     val sendManager by lazy { SendManager(this) }
 
