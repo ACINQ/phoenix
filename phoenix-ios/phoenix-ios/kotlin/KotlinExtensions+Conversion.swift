@@ -70,6 +70,11 @@ extension Data {
 		return result
 	*/
 	}
+	
+	func toKotlinByteVector() -> Bitcoin_kmpByteVector {
+		
+		return Bitcoin_kmpByteVector(bytes: self.toKotlinByteArray())
+	}
 }
 
 extension Array {

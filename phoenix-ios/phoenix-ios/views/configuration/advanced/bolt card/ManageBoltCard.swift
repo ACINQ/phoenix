@@ -46,6 +46,9 @@ struct ManageBoltCard: View {
 		
 		let remaining: String
 		let remainingAmount: Double
+		
+		let total: String
+		let totalAmount: Double
 	}
 	
 	@State var cardInfo: BoltCardInfo
@@ -482,7 +485,7 @@ struct ManageBoltCard: View {
 					.foregroundColor(remainingBalanceColor)
 			}
 			
-			ProgressView(value: graphInfo.spentAmount, total: graphInfo.remainingAmount)
+			ProgressView(value: graphInfo.spentAmount, total: graphInfo.totalAmount)
 				.tint(spentBalanceColor)
 				.background(remainingBalanceColor)
 				.padding(.vertical, 4)
@@ -684,20 +687,28 @@ struct ManageBoltCard: View {
 			}
 		}
 		
+		var totalAmount: Double = 0.0
+		var total = ""
+		
 		var remainingAmount: Double = 0.0
 		var remaining = ""
 		
 		switch parsedAmount {
 		case .success(let limit):
+			totalAmount = limit
 			remainingAmount = max(0.0, limit - spentAmount)
 			switch currency {
 			case .bitcoin(let bitcoinUnit):
+				total = Utils.formatBitcoin(amount: totalAmount, bitcoinUnit: bitcoinUnit).digits
 				remaining = Utils.formatBitcoin(amount: remainingAmount, bitcoinUnit: bitcoinUnit).digits
 			case .fiat(let fiatCurrency):
+				total = Utils.formatFiat(amount: totalAmount, fiatCurrency: fiatCurrency).digits
 				remaining = Utils.formatFiat(amount: remainingAmount, fiatCurrency: fiatCurrency).digits
 			}
 			
 		case .failure(_):
+			totalAmount = Double.greatestFiniteMagnitude
+			total = "♾️"
 			remainingAmount = Double.greatestFiniteMagnitude
 			remaining = "♾️"
 		}
@@ -706,7 +717,9 @@ struct ManageBoltCard: View {
 			spent: spent,
 			spentAmount: spentAmount,
 			remaining: remaining,
-			remainingAmount: remainingAmount
+			remainingAmount: remainingAmount,
+			total: total,
+			totalAmount: totalAmount
 		)
 	}
 	

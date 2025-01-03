@@ -600,40 +600,71 @@ class NotificationService: UNNotificationServiceExtension {
 		
 		switch result {
 		case .failure(let error):
+			bestAttemptContent.title = String(localized: "Payment rejected")
+			
 			switch error {
 			case .unknownCard:
-				bestAttemptContent.title = String(localized: "Payment attempt rejected")
 				bestAttemptContent.body = String(localized: "Unknown bolt card")
 				
 			case .replayDetected(let card):
-				bestAttemptContent.title = String(localized: "Payment attempt rejected")
-				bestAttemptContent.subtitle = card.sanitizedName
-				bestAttemptContent.body = String(localized: "Replay attempt detected")
+				bestAttemptContent.body = String(localized:
+					"""
+					Replay attempt detected
+					Card: \(card.sanitizedName)
+					""")
 				
 			case .frozenCard(let card):
-				bestAttemptContent.title = String(localized: "Payment attempt failed")
-				bestAttemptContent.subtitle = card.sanitizedName
-				bestAttemptContent.body = String(localized: "Card is frozen.")
+				bestAttemptContent.body = String(localized:
+					"""
+					Card is frozen
+					Card: \(card.sanitizedName)
+					""")
+				
+			case .dailyLimitExceeded(let card, let amount):
+				let amtStr = Utils.format(currencyAmount: amount).string
+				bestAttemptContent.body = String(localized:
+					"""
+					Daily limit exceeded
+					Payment amount: \(amtStr)
+					Card: \(card.sanitizedName)
+					""")
+				
+			case .monthlyLimitExceeded(let card, let amount):
+				let amtStr = Utils.format(currencyAmount: amount).string
+				bestAttemptContent.body = String(localized:
+					"""
+					Monthly limit exceeded
+					Payment amount: \(amtStr)
+					Card: \(card.sanitizedName)
+					""")
 				
 			case .badInvoice(let card, let details):
-				bestAttemptContent.title = String(localized: "Payment attempt rejected")
-				bestAttemptContent.subtitle = card.sanitizedName
-				bestAttemptContent.body = String(localized: "Bad invoice: \(details)")
+				bestAttemptContent.body = String(localized:
+					"""
+					Bad invoice: \(details)
+					Card: \(card.sanitizedName)
+					""")
 				
 			case .alreadyPaidInvoice(let card):
-				bestAttemptContent.title = String(localized: "Duplicate payment attempt rejected")
-				bestAttemptContent.subtitle = card.sanitizedName
-				bestAttemptContent.body = String(localized: "You've already paid this invoice.")
+				bestAttemptContent.body = String(localized:
+					"""
+					You've already paid this invoice
+					Card: \(card.sanitizedName)
+					""")
 				
 			case .paymentPending(let card):
-				bestAttemptContent.title = String(localized: "Duplicate payment attempt rejected")
-				bestAttemptContent.subtitle = card.sanitizedName
-				bestAttemptContent.body = String(localized: "A payment for this invoice in in-flight.")
+				bestAttemptContent.body = String(localized:
+					"""
+					A payment for this invoice is in-flight
+					Card: \(card.sanitizedName)
+					""")
 				
 			case .internalError(let card, let details):
-				bestAttemptContent.title = String(localized: "Payment attempt rejected")
-				bestAttemptContent.subtitle = card.sanitizedName
-				bestAttemptContent.body = String(localized: "Internal error: \(details)")
+				bestAttemptContent.body = String(localized:
+					"""
+					Internal error: \(details)
+					Card: \(card.sanitizedName)
+					""")
 			}
 			
 		case .success(let status):
@@ -648,27 +679,44 @@ class NotificationService: UNNotificationServiceExtension {
 				if let sentPayment, let failedStatus = sentPayment.status.asFailed() {
 					
 					bestAttemptContent.title = String(localized: "Payment attempt failed")
-					bestAttemptContent.subtitle = card.sanitizedName
 					
 					let localizedReason = failedStatus.reason.localizedDescription()
 					
 					if failedStatus.reason is Lightning_kmpFinalFailure.InsufficientBalance {
 						let amountString = formatAmount(msat: amount.msat)
-						bestAttemptContent.body = "\(localizedReason) \(amountString)"
+						bestAttemptContent.body = String(localized:
+							"""
+							\(localizedReason)
+							Payment amount: \(amountString)
+							Card: \(card.sanitizedName)
+							""")
 						
 					} else {
-						bestAttemptContent.body = localizedReason
+						bestAttemptContent.body = String(localized:
+							"""
+							\(localizedReason)
+							Card: \(card.sanitizedName)
+							""")
 					}
 					
 				} else {
 					
+					bestAttemptContent.title = String(localized: "Payment successful 💳")
 					let amountString = formatAmount(msat: amount.msat)
 					
-					bestAttemptContent.title = String(localized: "Paid: \(amountString)")
-					bestAttemptContent.subtitle = card.sanitizedName
-					
 					if let desc = invoice.description_ {
-						bestAttemptContent.body = String(localized: "For: \(desc)")
+						bestAttemptContent.body = String(localized:
+							"""
+							\(amountString)
+							For: \(desc)
+							Card: \(card.sanitizedName) 
+							""")
+					} else {
+						bestAttemptContent.body = String(localized:
+							"""
+							\(amountString)
+							Card: \(card.sanitizedName) 
+							""")
 					}
 				}
 			}
