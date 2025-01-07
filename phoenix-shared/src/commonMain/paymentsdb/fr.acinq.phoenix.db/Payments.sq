@@ -1,31 +1,28 @@
 CREATE VIEW payments
-AS SELECT id, created_at, completed_at, data
+AS SELECT id, created_at, completed_at, order_ts, data
 FROM (
-    SELECT id, created_at, received_at AS completed_at, data
+    SELECT id, created_at, received_at AS completed_at, COALESCE(received_at, created_at) AS order_ts, data
     FROM payments_incoming
 UNION ALL
-    SELECT id, created_at, sent_at AS completed_at, data
+    SELECT id, created_at, sent_at AS completed_at, created_at AS order_ts, data
     FROM payments_outgoing
-);
+)
+ORDER BY order_ts DESC;
 
 get:
 SELECT data
 FROM payments
 WHERE id=:id;
 
-
 -- payments_metadata.user_description, pm.user_notes, pm.modified_at as metadata_modified_at
 -- ??? this method should be used to populate the home screen with a list of payments, incl. custom desc
 list:
 SELECT data
 FROM payments
-LIMIT :limit OFFSET :offset;
-
--- pm.user_description, pm.user_notes, pm.modified_at as metadata_modified_at
--- ??? this method should be used to populate the home screen with a list of payments, incl. custom desc
-listFromTo:
-SELECT data
-FROM payments
 WHERE
     completed_at BETWEEN :completed_at_from AND :completed_at_to
 LIMIT :limit OFFSET :offset;
+
+count:
+SELECT count(id)
+FROM payments;

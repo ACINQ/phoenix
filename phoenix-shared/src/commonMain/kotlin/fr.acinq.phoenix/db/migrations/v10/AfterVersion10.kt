@@ -26,6 +26,7 @@ import fr.acinq.lightning.db.OnChainIncomingPayment
 import fr.acinq.phoenix.db.migrations.v10.types.mapIncomingPaymentFromV10
 import fr.acinq.phoenix.utils.extensions.deriveUUID
 import fr.acinq.lightning.serialization.payment.Serialization
+import fr.acinq.phoenix.utils.extensions.toByteArray
 
 val AfterVersion10 = AfterVersion(10) { driver ->
     val transacter = object : TransacterImpl(driver) {}
@@ -68,22 +69,22 @@ val AfterVersion10 = AfterVersion(10) { driver ->
                     println("migrating incoming $payment")
                     when (payment) {
                         is LightningIncomingPayment -> {
-                            bindString(0, payment.paymentHash.deriveUUID().toString())
+                            bindBytes(0, payment.paymentHash.deriveUUID().toByteArray())
                             bindBytes(1, payment.paymentHash.toByteArray())
                             bindBytes(2, null)
                         }
                         is @Suppress("DEPRECATION") LegacyPayToOpenIncomingPayment -> {
-                            bindString(0, payment.paymentHash.deriveUUID().toString())
+                            bindBytes(0, payment.paymentHash.deriveUUID().toByteArray())
                             bindBytes(1, payment.paymentHash.toByteArray())
                             bindBytes(2, null)
                         }
                         is @Suppress("DEPRECATION") LegacySwapInIncomingPayment -> {
-                            bindString(0, payment.id.toString())
+                            bindBytes(0, payment.id.toByteArray())
                             bindBytes(1, null)
                             bindBytes(2, null)
                         }
                         is OnChainIncomingPayment -> {
-                            bindString(0, payment.id.toString())
+                            bindBytes(0, payment.id.toByteArray())
                             bindBytes(1, null)
                             bindBytes(2, payment.txId.value.toByteArray())
                         }

@@ -18,9 +18,14 @@ package fr.acinq.phoenix.db
 
 import app.cash.sqldelight.EnumColumnAdapter
 import app.cash.sqldelight.db.SqlDriver
+import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.db.LightningIncomingPayment
+import fr.acinq.lightning.serialization.payment.Serialization
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.runTest
+import fr.acinq.phoenix.utils.extensions.WalletPaymentState
+import fr.acinq.phoenix.utils.extensions.state
 import fracinqphoenixdb.Cloudkit_payments_metadata
 import fracinqphoenixdb.Cloudkit_payments_queue
 import fracinqphoenixdb.Link_lightning_outgoing_payment_parts
@@ -48,9 +53,16 @@ class PaymentsDbMigrationTest {
                 cloudkit_payments_metadataAdapter = Cloudkit_payments_metadata.Adapter(UUIDAdapter),
             ),
             currencyManager = null)
-        val payments = paymentsDb.database.paymentsQueries.list(Long.MAX_VALUE, 0).executeAsList()
 
-        assertEquals(648, payments.size)
+        val payments = paymentsDb.database.paymentsQueries.list(Long.MAX_VALUE, 0).executeAsList().map {
+            Serialization.deserialize(it).get()
+        }
+        assertEquals(970, payments.size)
+
+        val successful = payments.filter { payment ->
+            payment.state() == WalletPaymentState.SuccessOnChain || payment.state() == WalletPaymentState.SuccessOffChain
+        }
+        assertEquals(648, successful.size)
     }
 }
 

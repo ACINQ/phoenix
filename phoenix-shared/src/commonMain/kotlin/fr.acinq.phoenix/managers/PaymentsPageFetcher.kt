@@ -84,7 +84,7 @@ class PaymentsPageFetcher(
         val subscriptionIdxSnapshot = subscriptionIdx
         this.job = launch {
             val db = databaseManager.paymentsDb()
-            db.listPayments(
+            db.listPaymentsAsFlow(
                 count = countSnapshot.toLong(),
                 skip = offsetSnapshot.toLong()
             ).collect { payments ->

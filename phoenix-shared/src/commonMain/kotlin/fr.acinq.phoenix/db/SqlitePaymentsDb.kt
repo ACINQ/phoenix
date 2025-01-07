@@ -134,17 +134,17 @@ class SqlitePaymentsDb(
 
     // ---- list ALL payments
 
-    suspend fun listPayments(count: Long, skip: Long): Flow<List<WalletPayment>> = withContext(Dispatchers.Default) {
+    suspend fun listPaymentsAsFlow(count: Long, skip: Long): Flow<List<WalletPayment>> = withContext(Dispatchers.Default) {
         // TODO: optimise this method to only fetch the data we need to populate the home list
         // including contact, metadata, ...
-        database.paymentsQueries.list(count, skip)
+        database.paymentsQueries.list(completed_at_from = 0, completed_at_to = Long.MAX_VALUE, limit = count, offset = skip)
             .asFlow()
             .map { it.executeAsList().map { WalletPaymentAdapter.decode(it) } }
     }
 
     suspend fun listPayments(count: Long, skip: Long, startDate: Long, endDate: Long, fetchOptions: WalletPaymentFetchOptions): List<WalletPaymentInfo> = withContext(Dispatchers.Default) {
         // TODO: optimise this method to join all the data and populate the list in one query, including contact, metadata, ...
-        database.paymentsQueries.listFromTo(completed_at_from = startDate, completed_at_to = endDate, limit = count, offset = skip).executeAsList()
+        database.paymentsQueries.list(completed_at_from = startDate, completed_at_to = endDate, limit = count, offset = skip).executeAsList()
             .map {
                 WalletPaymentInfo(
                     payment = WalletPaymentAdapter.decode(it),
@@ -155,17 +155,17 @@ class SqlitePaymentsDb(
             }
     }
 
-//    fun listPaymentsCountFlow(): Flow<Long> {
-//        return aggrQueries.listAllPaymentsCount(::allPaymentsCountMapper)
-//            .asFlow()
-//            .map {
-//                withContext(Dispatchers.Default) {
-//                    database.transactionWithResult {
-//                        it.executeAsOne()
-//                    }
-//                }
-//            }
-//    }
+    fun listPaymentsCountFlow(): Flow<Long> {
+        return database.paymentsQueries.count()
+            .asFlow()
+            .map {
+                withContext(Dispatchers.Default) {
+                    database.transactionWithResult {
+                        it.executeAsOne()
+                    }
+                }
+            }
+    }
 
     /** Returns a flow of incoming payments within <count, skip>. This flow is updated when the data change in the database. */
 //    fun listPaymentsOrderFlow(

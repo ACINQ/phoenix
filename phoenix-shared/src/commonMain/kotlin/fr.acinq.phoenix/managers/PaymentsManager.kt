@@ -75,7 +75,8 @@ class PaymentsManager(
     }
 
     private suspend fun monitorPaymentsCountInDb() {
-        // TODO("do we need the payments count?")
+        // TODO: check if this could be removed
+        paymentsDb().listPaymentsCountFlow().collect { _paymentsCount.value = it }
     }
 
     /** Monitors the payments database and push any new payments in the [_lastCompletedPayment] flow. */
