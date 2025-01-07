@@ -331,7 +331,7 @@ fun mapIncomingPaymentFromV10(
                     is IncomingOriginData.Offer.V0 -> LegacyPayToOpenIncomingPayment.Origin.Offer(OfferPaymentMetadata.decode(origin.encodedMetadata))
                     else -> error("impossible")
                 },
-                parts = parts.map {
+                parts = parts.mapNotNull {
                     when (it) {
                         is IncomingReceivedWithData.Part.Htlc.V0 -> LegacyPayToOpenIncomingPayment.Part.Lightning(
                             amountReceived = it.amount,
@@ -392,7 +392,8 @@ fun mapIncomingPaymentFromV10(
                             confirmedAt = it.confirmedAt,
                             lockedAt = it.lockedAt,
                         )
-                        else -> error("unexpected part=$it")
+                        IncomingReceivedWithData.LightningPayment.V0 -> null // we have no detail info, and there is at least another on-chain part, so we can just ignore
+                        is IncomingReceivedWithData.Part.FeeCredit.V0 -> null // cannot have a mix of pay-to-open + fee-credit
                     }
                 },
                 createdAt = created_at,
