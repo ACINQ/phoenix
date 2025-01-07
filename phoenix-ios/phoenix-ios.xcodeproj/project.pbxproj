@@ -221,6 +221,7 @@
 		DC9B15442B7D0DCB0023743B /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = DC9B15432B7D0DCB0023743B /* AsyncAlgorithms */; };
 		DC9B8EE225D72CC200E13818 /* ForceCloseChannelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9B8EE125D72CC200E13818 /* ForceCloseChannelsView.swift */; };
 		DC9CF83D2D2C6D37003F3B0F /* ScrollView_18.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9CF83C2D2C6D31003F3B0F /* ScrollView_18.swift */; };
+		DC9CF83F2D2DC3F3003F3B0F /* GeometryGroup_17.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9CF83E2D2DC3ED003F3B0F /* GeometryGroup_17.swift */; };
 		DC9E7EC32A12955300A5F1D0 /* LiquidityHTML.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9E7EC22A12955300A5F1D0 /* LiquidityHTML.swift */; };
 		DC9E7EC62A1295B100A5F1D0 /* liquidity.html in Resources */ = {isa = PBXBuildFile; fileRef = DC9E7EC82A1295B100A5F1D0 /* liquidity.html */; };
 		DCA02B9D2BD065BF0080520F /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = DCA02B9C2BD065BF0080520F /* PrivacyInfo.xcprivacy */; };
@@ -628,6 +629,7 @@
 		DC9AD20C2C9C90A20019BEE9 /* ParseResultHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParseResultHelper.swift; sourceTree = "<group>"; };
 		DC9B8EE125D72CC200E13818 /* ForceCloseChannelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForceCloseChannelsView.swift; sourceTree = "<group>"; };
 		DC9CF83C2D2C6D31003F3B0F /* ScrollView_18.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollView_18.swift; sourceTree = "<group>"; };
+		DC9CF83E2D2DC3ED003F3B0F /* GeometryGroup_17.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeometryGroup_17.swift; sourceTree = "<group>"; };
 		DC9E7EC22A12955300A5F1D0 /* LiquidityHTML.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidityHTML.swift; sourceTree = "<group>"; };
 		DC9E7EC72A1295B100A5F1D0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/liquidity.html; sourceTree = "<group>"; };
 		DCA02B9C2BD065BF0080520F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
@@ -1291,6 +1293,7 @@
 		DCAC9FC42968793D0098D769 /* compatibility */ = {
 			isa = PBXGroup;
 			children = (
+				DC9CF83E2D2DC3ED003F3B0F /* GeometryGroup_17.swift */,
 				DC9CF83C2D2C6D31003F3B0F /* ScrollView_18.swift */,
 				DC6CF35A2938F32E001837EE /* ListBackgroundColor.swift */,
 				DC5E28CB2C63EF8E0037B3D3 /* NavigationLink_16.swift */,
@@ -1861,6 +1864,7 @@
 				DC4309702A795F9900E28995 /* UtxoWrapper.swift in Sources */,
 				DC355E1D2A4398A8008E8A8E /* NoticeBox.swift in Sources */,
 				7555FF81242A565900829871 /* SceneDelegate.swift in Sources */,
+				DC9CF83F2D2DC3F3003F3B0F /* GeometryGroup_17.swift in Sources */,
 				DCC9D99A267BD28600EA36DD /* SyncBackupManager.swift in Sources */,
 				DCB876302735AA7300657570 /* UserDefaults+Serialization.swift in Sources */,
 				DC5F1C4C28DDF702007A55ED /* DrainWalletView_Action.swift in Sources */,
