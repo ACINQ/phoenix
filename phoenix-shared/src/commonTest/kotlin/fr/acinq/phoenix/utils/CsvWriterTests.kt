@@ -18,6 +18,7 @@ import fr.acinq.lightning.db.NewChannelIncomingPayment
 import fr.acinq.lightning.db.SpliceInIncomingPayment
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.utils.currentTimestampSeconds
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
@@ -108,7 +109,8 @@ class CsvWriterTests {
             status = LightningOutgoingPayment.Status.Succeeded(
                 preimage = randomBytes32(),
                 completedAt = 1675270582248
-            )
+            ),
+            createdAt = currentTimestampMillis()
         )
         val metadata = makeMetadata(
             exchangeRate = 22999.83,
@@ -139,7 +141,8 @@ class CsvWriterTests {
             status = LightningOutgoingPayment.Status.Succeeded(
                 preimage = randomBytes32(),
                 completedAt = 1675270681099
-            )
+            ),
+            createdAt = currentTimestampMillis()
         )
         val metadata = makeMetadata(
             exchangeRate = 22999.83,
@@ -170,7 +173,8 @@ class CsvWriterTests {
             status = LightningOutgoingPayment.Status.Succeeded(
                 preimage = randomBytes32(),
                 completedAt = 1675270740742
-            )
+            ),
+            createdAt = currentTimestampMillis()
         )
         val metadata = makeMetadata(
             exchangeRate = 22999.83,
@@ -201,7 +205,8 @@ class CsvWriterTests {
             status = LightningOutgoingPayment.Status.Succeeded(
                 preimage = randomBytes32(),
                 completedAt = 1675270826945
-            )
+            ),
+            createdAt = currentTimestampMillis()
         )
         val metadata = makeMetadata(
             exchangeRate = 22999.83,
@@ -268,7 +273,8 @@ class CsvWriterTests {
             status = LightningOutgoingPayment.Status.Succeeded(
                 preimage = randomBytes32(),
                 completedAt = 1675289814498
-            )
+            ),
+            createdAt = currentTimestampMillis()
         )
         val metadata = makeMetadata(
             exchangeRate = 23686.60,

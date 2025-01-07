@@ -54,6 +54,7 @@ import fr.acinq.phoenix.db.migrations.v10.json.MilliSatoshiSerializer
 import fr.acinq.phoenix.db.migrations.v10.json.OutpointSerializer
 import fr.acinq.phoenix.db.migrations.v10.json.SatoshiSerializer
 import fr.acinq.phoenix.db.migrations.v10.json.UUIDSerializer
+import fr.acinq.phoenix.utils.extensions.deriveUUID
 import io.ktor.utils.io.charsets.Charsets
 import io.ktor.utils.io.core.String
 import kotlinx.serialization.SerialName
@@ -305,19 +306,22 @@ fun mapIncomingPaymentFromV10(
             Bolt11IncomingPayment(
                 preimage = ByteVector32(preimage),
                 paymentRequest = Bolt11Invoice.read(origin.paymentRequest).get(),
-                parts = parts.map { mapLightningIncomingPaymentPart(it, received_at, received_amount_msat?.msat) }
+                parts = parts.map { mapLightningIncomingPaymentPart(it, received_at, received_amount_msat?.msat) },
+                createdAt = created_at
             )
         received_at != null && origin is IncomingOriginData.Invoice.V0 && parts.all { it is IncomingReceivedWithData.Part.Htlc || it is IncomingReceivedWithData.Part.FeeCredit } ->
             Bolt11IncomingPayment(
                 preimage = ByteVector32(preimage),
                 paymentRequest = Bolt11Invoice.read(origin.paymentRequest).get(),
-                parts = parts.map { mapLightningIncomingPaymentPart(it, received_at, received_amount_msat?.msat) }
+                parts = parts.map { mapLightningIncomingPaymentPart(it, received_at, received_amount_msat?.msat) },
+                createdAt = created_at
             )
         received_at != null && origin is IncomingOriginData.Offer.V0 && parts.all { it is IncomingReceivedWithData.Part.Htlc || it is IncomingReceivedWithData.Part.FeeCredit } ->
             Bolt12IncomingPayment(
                 preimage = ByteVector32(preimage),
                 metadata = OfferPaymentMetadata.decode(origin.encodedMetadata),
-                parts = parts.map { mapLightningIncomingPaymentPart(it, received_at, received_amount_msat?.msat) }
+                parts = parts.map { mapLightningIncomingPaymentPart(it, received_at, received_amount_msat?.msat) },
+                createdAt = created_at
             )
         received_at != null && (origin is IncomingOriginData.Invoice || origin is IncomingOriginData.Offer) && parts.any { it is IncomingReceivedWithData.Part.SpliceIn || it is IncomingReceivedWithData.Part.NewChannel || it is IncomingReceivedWithData.NewChannel } ->
             LegacyPayToOpenIncomingPayment(
@@ -395,7 +399,7 @@ fun mapIncomingPaymentFromV10(
                 completedAt = received_at
             )
         received_at != null && origin is IncomingOriginData.OnChain.V0 && parts.all { it is IncomingReceivedWithData.Part.NewChannel } -> NewChannelIncomingPayment(
-            id = randomUUID(),
+            id = ByteVector32(payment_hash).deriveUUID() ,
             amountReceived = parts.filterIsInstance<IncomingReceivedWithData.Part.NewChannel>().map {
                 when (it) {
                     is IncomingReceivedWithData.Part.NewChannel.V0 -> it.amount
@@ -443,7 +447,7 @@ fun mapIncomingPaymentFromV10(
             }.first(),
         )
         received_at != null && origin is IncomingOriginData.OnChain.V0 && parts.all { it is IncomingReceivedWithData.Part.SpliceIn } -> SpliceInIncomingPayment(
-            id = randomUUID(),
+            id = ByteVector32(payment_hash).deriveUUID(),
             amountReceived = parts.filterIsInstance<IncomingReceivedWithData.Part.SpliceIn>().map {
                 when (it) {
                     is IncomingReceivedWithData.Part.SpliceIn.V0 -> it.amount
@@ -474,7 +478,7 @@ fun mapIncomingPaymentFromV10(
             }.first(),
             )
         received_at != null && origin is IncomingOriginData.SwapIn.V0 && parts.all { it is IncomingReceivedWithData.Part.NewChannel } -> LegacySwapInIncomingPayment(
-            id = randomUUID(),
+            id = ByteVector32(payment_hash).deriveUUID(),
             amountReceived = parts.filterIsInstance<IncomingReceivedWithData.Part.NewChannel>().map {
                 when (it) {
                     is IncomingReceivedWithData.Part.NewChannel.V0 -> it.amount
