@@ -60,13 +60,13 @@ CREATE INDEX on_chain_txs_tx_id ON on_chain_txs(tx_id);
 CREATE VIEW payments
 AS SELECT id, created_at, completed_at, order_ts, data
 FROM (
-    SELECT id, created_at, received_at AS completed_at, COALESCE(received_at, created_at) AS order_ts, data
+    SELECT id, created_at, received_at AS completed_at, received_at AS order_ts, data
     FROM payments_incoming
+    WHERE received_at IS NOT NULL -- we only consider completed incoming payments
 UNION ALL
     SELECT id, created_at, sent_at AS completed_at, created_at AS order_ts, data
     FROM payments_outgoing
-)
-ORDER BY order_ts DESC;
+);
 
 -- This table will be read then deleted in the code migration
 ALTER TABLE cloudkit_payments_metadata RENAME TO cloudkit_payments_metadata_old;
