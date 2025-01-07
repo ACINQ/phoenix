@@ -54,8 +54,8 @@ class PaymentsDbMigrationTest {
             ),
             currencyManager = null)
 
-        val payments = paymentsDb.database.paymentsQueries.list(Long.MAX_VALUE, 0).executeAsList().map {
-            Serialization.deserialize(it).get()
+        val payments = paymentsDb.database.paymentsQueries.list(completed_at_from = 0, completed_at_to = Long.MAX_VALUE, limit = Long.MAX_VALUE, offset = 0).executeAsList().map {
+            Serialization.deserialize(it).getOrThrow()
         }
         assertEquals(970, payments.size)
 

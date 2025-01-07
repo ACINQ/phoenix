@@ -47,19 +47,19 @@ object TxIdAdapter : ColumnAdapter<TxId, ByteArray> {
 }
 
 object IncomingPaymentAdapter : ColumnAdapter<IncomingPayment, ByteArray> {
-    override fun decode(databaseValue: ByteArray): IncomingPayment = Serialization.deserialize(databaseValue).get() as IncomingPayment
+    override fun decode(databaseValue: ByteArray): IncomingPayment = Serialization.deserialize(databaseValue).getOrThrow() as IncomingPayment
 
     override fun encode(value: IncomingPayment): ByteArray = Serialization.serialize(value)
 }
 
 object OutgoingPaymentAdapter : ColumnAdapter<OutgoingPayment, ByteArray> {
-    override fun decode(databaseValue: ByteArray): OutgoingPayment = Serialization.deserialize(databaseValue).get() as OutgoingPayment
+    override fun decode(databaseValue: ByteArray): OutgoingPayment = Serialization.deserialize(databaseValue).getOrThrow() as OutgoingPayment
 
     override fun encode(value: OutgoingPayment): ByteArray = Serialization.serialize(value)
 }
 
 object WalletPaymentAdapter : ColumnAdapter<WalletPayment, ByteArray> {
-    override fun decode(databaseValue: ByteArray): WalletPayment = Serialization.deserialize(databaseValue).get()
+    override fun decode(databaseValue: ByteArray): WalletPayment = Serialization.deserialize(databaseValue).getOrThrow()
 
     override fun encode(value: WalletPayment): ByteArray = Serialization.serialize(value)
 }

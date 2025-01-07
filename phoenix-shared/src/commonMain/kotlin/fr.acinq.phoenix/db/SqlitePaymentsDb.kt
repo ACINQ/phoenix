@@ -21,10 +21,6 @@ import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.db.*
-import fr.acinq.lightning.db.OnChainIncomingPayment.Companion.setConfirmed
-import fr.acinq.lightning.db.OnChainIncomingPayment.Companion.setLocked
-import fr.acinq.lightning.db.OnChainOutgoingPayment.Companion.setConfirmed
-import fr.acinq.lightning.db.OnChainOutgoingPayment.Companion.setLocked
 import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentInfo

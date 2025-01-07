@@ -126,7 +126,7 @@ sealed class CloudData {
         @OptIn(ExperimentalSerializationApi::class)
         fun deserialize(data: ByteArray): CloudData? {
             return kotlin.runCatching {
-                V1(Serialization.deserialize(data).get())
+                V1(Serialization.deserialize(data).getOrThrow())
             }.recoverCatching {
                 cborSerializer().decodeFromByteArray<V0>(data)
             }.getOrNull()

@@ -21,7 +21,6 @@ import fr.acinq.lightning.db.Bolt11IncomingPayment
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.IncomingPaymentsDb
 import fr.acinq.lightning.db.LightningIncomingPayment
-import fr.acinq.lightning.db.LightningIncomingPayment.Companion.addReceivedParts
 import fr.acinq.lightning.db.OnChainIncomingPayment
 import fr.acinq.phoenix.db.PaymentsDatabase
 import fr.acinq.phoenix.db.didDeleteWalletPayment
