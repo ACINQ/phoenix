@@ -133,14 +133,14 @@ class SqlitePaymentsDb(
     suspend fun listPaymentsAsFlow(count: Long, skip: Long): Flow<List<WalletPayment>> = withContext(Dispatchers.Default) {
         // TODO: optimise this method to only fetch the data we need to populate the home list
         // including contact, metadata, ...
-        database.paymentsQueries.list(completed_at_from = 0, completed_at_to = Long.MAX_VALUE, limit = count, offset = skip)
+        database.paymentsQueries.list(limit = count, offset = skip)
             .asFlow()
             .map { it.executeAsList().map { WalletPaymentAdapter.decode(it) } }
     }
 
-    suspend fun listPayments(count: Long, skip: Long, startDate: Long, endDate: Long, fetchOptions: WalletPaymentFetchOptions): List<WalletPaymentInfo> = withContext(Dispatchers.Default) {
+    suspend fun listCompletedPayments(count: Long, skip: Long, startDate: Long, endDate: Long, fetchOptions: WalletPaymentFetchOptions): List<WalletPaymentInfo> = withContext(Dispatchers.Default) {
         // TODO: optimise this method to join all the data and populate the list in one query, including contact, metadata, ...
-        database.paymentsQueries.list(completed_at_from = startDate, completed_at_to = endDate, limit = count, offset = skip).executeAsList()
+        database.paymentsQueries.listCompleted(completed_at_from = startDate, completed_at_to = endDate, limit = count, offset = skip).executeAsList()
             .map {
                 WalletPaymentInfo(
                     payment = WalletPaymentAdapter.decode(it),

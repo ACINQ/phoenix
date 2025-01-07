@@ -18,11 +18,7 @@ package fr.acinq.phoenix.db
 
 import app.cash.sqldelight.EnumColumnAdapter
 import app.cash.sqldelight.db.SqlDriver
-import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.db.LightningIncomingPayment
 import fr.acinq.lightning.serialization.payment.Serialization
-import fr.acinq.lightning.utils.currentTimestampMillis
-import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.runTest
 import fr.acinq.phoenix.utils.extensions.WalletPaymentState
 import fr.acinq.phoenix.utils.extensions.state
@@ -42,26 +38,46 @@ class PaymentsDbMigrationTest {
     @Test
     fun `read v10 db`() = runTest {
         val driver = testPaymentsDriverFromFile()
-        val paymentsDb = SqlitePaymentsDb(driver, PaymentsDatabase(
+        val paymentsDb = SqlitePaymentsDb(
+            driver, PaymentsDatabase(
                 driver = driver,
-                payments_incomingAdapter = Payments_incoming.Adapter(UUIDAdapter, ByteVector32Adapter, TxIdAdapter, IncomingPaymentAdapter),
-                payments_outgoingAdapter = Payments_outgoing.Adapter(UUIDAdapter, ByteVector32Adapter, TxIdAdapter, OutgoingPaymentAdapter),
-                link_lightning_outgoing_payment_partsAdapter = Link_lightning_outgoing_payment_parts.Adapter(UUIDAdapter, UUIDAdapter),
+                payments_incomingAdapter = Payments_incoming.Adapter(
+                    UUIDAdapter,
+                    ByteVector32Adapter,
+                    TxIdAdapter,
+                    IncomingPaymentAdapter
+                ),
+                payments_outgoingAdapter = Payments_outgoing.Adapter(
+                    UUIDAdapter,
+                    ByteVector32Adapter,
+                    TxIdAdapter,
+                    OutgoingPaymentAdapter
+                ),
+                link_lightning_outgoing_payment_partsAdapter = Link_lightning_outgoing_payment_parts.Adapter(
+                    UUIDAdapter,
+                    UUIDAdapter
+                ),
                 on_chain_txsAdapter = On_chain_txs.Adapter(UUIDAdapter, TxIdAdapter),
-                payments_metadataAdapter = Payments_metadata.Adapter(UUIDAdapter, EnumColumnAdapter(), EnumColumnAdapter(), EnumColumnAdapter()),
+                payments_metadataAdapter = Payments_metadata.Adapter(
+                    UUIDAdapter,
+                    EnumColumnAdapter(),
+                    EnumColumnAdapter(),
+                    EnumColumnAdapter()
+                ),
                 cloudkit_payments_queueAdapter = Cloudkit_payments_queue.Adapter(UUIDAdapter),
                 cloudkit_payments_metadataAdapter = Cloudkit_payments_metadata.Adapter(UUIDAdapter),
             ),
-            currencyManager = null)
+            currencyManager = null
+        )
 
-        val payments = paymentsDb.database.paymentsQueries.list(completed_at_from = 0, completed_at_to = Long.MAX_VALUE, limit = Long.MAX_VALUE, offset = 0).executeAsList().map {
-            Serialization.deserialize(it).getOrThrow()
-        }
+        val payments = paymentsDb.database.paymentsQueries.list(limit = Long.MAX_VALUE, offset = 0)
+            .executeAsList()
+            .map { Serialization.deserialize(it).getOrThrow() }
+
         assertEquals(970, payments.size)
 
-        val successful = payments.filter { payment ->
-            payment.state() == WalletPaymentState.SuccessOnChain || payment.state() == WalletPaymentState.SuccessOffChain
-        }
+        val successful =
+            payments.filter { it.state() == WalletPaymentState.SuccessOnChain || it.state() == WalletPaymentState.SuccessOffChain }
         assertEquals(648, successful.size)
     }
 }
