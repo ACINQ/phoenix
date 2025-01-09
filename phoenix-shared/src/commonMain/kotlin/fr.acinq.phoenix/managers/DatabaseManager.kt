@@ -19,6 +19,7 @@ import fr.acinq.phoenix.db.PaymentsDatabase
 import fr.acinq.phoenix.db.SqliteAppDb
 import fr.acinq.phoenix.db.TxIdAdapter
 import fr.acinq.phoenix.db.UUIDAdapter
+import fr.acinq.phoenix.db.createSqlitePaymentsDb
 import fr.acinq.phoenix.db.makeCloudKitDb
 import fr.acinq.phoenix.db.payments.CloudKitInterface
 import fracinqphoenixdb.Cloudkit_payments_metadata
@@ -67,20 +68,7 @@ class DatabaseManager(
                     driver = createChannelsDbDriver(ctx, chain, nodeIdHash)
                 )
                 val paymentsDbDriver = createPaymentsDbDriver(ctx, chain, nodeIdHash)
-                val paymentsDb = SqlitePaymentsDb(
-                    driver = paymentsDbDriver,
-                    database = PaymentsDatabase(
-                        driver = paymentsDbDriver,
-                        payments_incomingAdapter = Payments_incoming.Adapter(UUIDAdapter, ByteVector32Adapter, TxIdAdapter, IncomingPaymentAdapter),
-                        payments_outgoingAdapter = Payments_outgoing.Adapter(UUIDAdapter, ByteVector32Adapter, TxIdAdapter, OutgoingPaymentAdapter),
-                        link_lightning_outgoing_payment_partsAdapter = Link_lightning_outgoing_payment_parts.Adapter(UUIDAdapter, UUIDAdapter),
-                        on_chain_txsAdapter = On_chain_txs.Adapter(UUIDAdapter, TxIdAdapter),
-                        payments_metadataAdapter = Payments_metadata.Adapter(UUIDAdapter, EnumColumnAdapter(), EnumColumnAdapter(), EnumColumnAdapter()),
-                        cloudkit_payments_queueAdapter = Cloudkit_payments_queue.Adapter(UUIDAdapter),
-                        cloudkit_payments_metadataAdapter = Cloudkit_payments_metadata.Adapter(UUIDAdapter),
-                    ),
-                    currencyManager = currencyManager,
-                )
+                val paymentsDb = createSqlitePaymentsDb(paymentsDbDriver, currencyManager)
                 val cloudKitDb = makeCloudKitDb(appDb, paymentsDb)
                 log.debug { "databases object created" }
                 _databases.value = PhoenixDatabases(

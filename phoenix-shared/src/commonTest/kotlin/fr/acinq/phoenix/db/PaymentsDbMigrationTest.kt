@@ -16,7 +16,6 @@
 
 package fr.acinq.phoenix.db
 
-import app.cash.sqldelight.EnumColumnAdapter
 import app.cash.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.OutPoint
@@ -33,13 +32,6 @@ import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.runTest
 import fr.acinq.phoenix.utils.extensions.WalletPaymentState
 import fr.acinq.phoenix.utils.extensions.state
-import fracinqphoenixdb.Cloudkit_payments_metadata
-import fracinqphoenixdb.Cloudkit_payments_queue
-import fracinqphoenixdb.Link_lightning_outgoing_payment_parts
-import fracinqphoenixdb.On_chain_txs
-import fracinqphoenixdb.Payments_incoming
-import fracinqphoenixdb.Payments_metadata
-import fracinqphoenixdb.Payments_outgoing
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -50,37 +42,7 @@ class PaymentsDbMigrationTest {
     @Test
     fun `read v10 db`() = runTest {
         val driver = testPaymentsDriverFromResource("sampledbs/v10/payments-testnet-28903aff.sqlite")
-        val paymentsDb = SqlitePaymentsDb(
-            driver, PaymentsDatabase(
-                driver = driver,
-                payments_incomingAdapter = Payments_incoming.Adapter(
-                    UUIDAdapter,
-                    ByteVector32Adapter,
-                    TxIdAdapter,
-                    IncomingPaymentAdapter
-                ),
-                payments_outgoingAdapter = Payments_outgoing.Adapter(
-                    UUIDAdapter,
-                    ByteVector32Adapter,
-                    TxIdAdapter,
-                    OutgoingPaymentAdapter
-                ),
-                link_lightning_outgoing_payment_partsAdapter = Link_lightning_outgoing_payment_parts.Adapter(
-                    UUIDAdapter,
-                    UUIDAdapter
-                ),
-                on_chain_txsAdapter = On_chain_txs.Adapter(UUIDAdapter, TxIdAdapter),
-                payments_metadataAdapter = Payments_metadata.Adapter(
-                    UUIDAdapter,
-                    EnumColumnAdapter(),
-                    EnumColumnAdapter(),
-                    EnumColumnAdapter()
-                ),
-                cloudkit_payments_queueAdapter = Cloudkit_payments_queue.Adapter(UUIDAdapter),
-                cloudkit_payments_metadataAdapter = Cloudkit_payments_metadata.Adapter(UUIDAdapter),
-            ),
-            currencyManager = null
-        )
+        val paymentsDb = createSqlitePaymentsDb(driver, currencyManager = null)
 
         val payments = paymentsDb.database.paymentsQueries.list(limit = Long.MAX_VALUE, offset = 0)
             .executeAsList()
