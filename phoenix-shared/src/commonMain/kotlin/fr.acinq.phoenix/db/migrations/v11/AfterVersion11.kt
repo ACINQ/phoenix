@@ -21,6 +21,7 @@ import app.cash.sqldelight.TransacterImpl
 import app.cash.sqldelight.db.AfterVersion
 import app.cash.sqldelight.db.QueryResult
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.db.OnChainOutgoingPayment
 import fr.acinq.lightning.db.OutgoingPayment
@@ -75,7 +76,8 @@ val AfterVersion11 = AfterVersion(11) { driver ->
     }
 
     transacter.transaction {
-        driver.executeQuery(
+
+        val (lightningOutgoingPayments, channelCloseOutgoingPayments) = driver.executeQuery(
             identifier = null,
             sql = """
     |SELECT parent.id,
@@ -109,6 +111,8 @@ val AfterVersion11 = AfterVersion(11) { driver ->
     """.trimMargin(),
             parameters = 0,
             mapper = { cursor ->
+                val lightningOutgoingPayments = mutableListOf<LightningOutgoingPayment>()
+                val channelCloseOutgoingPayments = mutableListOf<ChannelCloseOutgoingPayment>()
                 while (cursor.next().value) {
                     val payment = LightningOutgoingQueries.mapLightningOutgoingPayment(
                         cursor.getString(0)!!,
@@ -123,7 +127,8 @@ val AfterVersion11 = AfterVersion(11) { driver ->
                         cursor.getBytes(9),
                         cursor.getString(10),
                         cursor.getLong(11),
-                        cursor.getString(12)?.let { LightningOutgoingQueries.hopDescAdapter.decode(it) },
+                        cursor.getString(12)
+                            ?.let { LightningOutgoingQueries.hopDescAdapter.decode(it) },
                         cursor.getLong(13),
                         cursor.getLong(14),
                         cursor.getString(15)?.let { OutgoingPartStatusTypeVersion.valueOf(it) },
@@ -131,15 +136,48 @@ val AfterVersion11 = AfterVersion(11) { driver ->
                         cursor.getString(17),
                         cursor.getBytes(18),
                         cursor.getLong(19),
-                        cursor.getString(20)?.let { OutgoingPartClosingInfoTypeVersion.valueOf(it) },
+                        cursor.getString(20)
+                            ?.let { OutgoingPartClosingInfoTypeVersion.valueOf(it) },
                         cursor.getBytes(21),
                         cursor.getLong(22),
                     )
-                    insertPayment(payment)
+
+                    when (payment) {
+                        is LightningOutgoingPayment -> lightningOutgoingPayments.add(payment)
+                        is ChannelCloseOutgoingPayment -> channelCloseOutgoingPayments.add(payment)
+                        else -> error("impossible")
+                    }
                 }
-                QueryResult.Unit
+                QueryResult.Value(lightningOutgoingPayments.toList() to channelCloseOutgoingPayments.toList())
             }
-        )
+        ).value
+
+        /** Group a list of lightning outgoing payments by parent id and parts. */
+        fun groupByRawLightningOutgoing(payments: List<LightningOutgoingPayment>) = payments
+            .takeIf { it.isNotEmpty() }
+            ?.groupBy { it.id }
+            ?.values
+            ?.map { group -> group.first().copy(parts = group.flatMap { it.parts }) }
+            ?: emptyList()
+
+        groupByRawLightningOutgoing(lightningOutgoingPayments)
+            .map { insertPayment(it) }
+
+        /** Group a list of channel close outgoing payments by parent id and parts. */
+        fun groupByRawChannelCloseOutgoing(payments: List<ChannelCloseOutgoingPayment>) = payments
+            .groupBy { it.id }
+            .values
+            .map {
+                it.reduce { close1, close2 ->
+                    close1.copy(
+                        recipientAmount = close1.recipientAmount + close2.recipientAmount,
+                        miningFees = close1.miningFees + close2.miningFees
+                    )
+                }
+            }
+
+        groupByRawChannelCloseOutgoing(channelCloseOutgoingPayments)
+            .map { insertPayment(it) }
 
         driver.executeQuery(
             identifier = null,

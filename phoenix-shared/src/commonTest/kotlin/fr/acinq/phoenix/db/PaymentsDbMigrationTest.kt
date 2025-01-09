@@ -21,9 +21,17 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.OutPoint
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.db.Bolt11IncomingPayment
+import fr.acinq.lightning.db.Bolt12IncomingPayment
+import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
+import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
 import fr.acinq.lightning.db.LegacyPayToOpenIncomingPayment
+import fr.acinq.lightning.db.LegacySwapInIncomingPayment
 import fr.acinq.lightning.db.LightningIncomingPayment
+import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.db.NewChannelIncomingPayment
+import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
+import fr.acinq.lightning.db.SpliceInIncomingPayment
+import fr.acinq.lightning.db.SpliceOutgoingPayment
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.serialization.payment.Serialization
 import fr.acinq.lightning.utils.UUID
@@ -38,6 +46,81 @@ import kotlin.test.assertEquals
 
 @Suppress("DEPRECATION")
 class PaymentsDbMigrationTest {
+
+    @Test
+    fun `read v1 db`() = runTest {
+        val driver = testPaymentsDriverFromResource("sampledbs/v1/old.payments-testnet-fedc36138a62ceadc8a93861d2c46f5ca5e8b418.sqlite")
+        val paymentsDb = createSqlitePaymentsDb(driver, currencyManager = null)
+
+        val payments = paymentsDb.database.paymentsQueries.list(limit = Long.MAX_VALUE, offset = 0)
+            .executeAsList()
+            .map { Serialization.deserialize(it).getOrThrow() }
+
+        assertEquals(2, payments.filterIsInstance<Bolt11IncomingPayment>().size)
+        assertEquals(1, payments.filterIsInstance<LegacyPayToOpenIncomingPayment>().size)
+        assertEquals(0, payments.filterIsInstance<LegacySwapInIncomingPayment>().size)
+        assertEquals(0, payments.filterIsInstance<SpliceOutgoingPayment>().size)
+        assertEquals(0, payments.filterIsInstance<SpliceCpfpOutgoingPayment>().size)
+        assertEquals(5, payments.filterIsInstance<LightningOutgoingPayment>().size)
+        assertEquals(0, payments.filterIsInstance<InboundLiquidityOutgoingPayment>().size)
+        assertEquals(0, payments.filterIsInstance<ChannelCloseOutgoingPayment>().size)
+
+        assertEquals(3 + 5, payments.size)
+
+        val successful =
+            payments.filter { it.state() == WalletPaymentState.SuccessOnChain || it.state() == WalletPaymentState.SuccessOffChain }
+        assertEquals(3 + 5, successful.size)
+    }
+
+    @Test
+    fun `read v1 db (additional)`() = runTest {
+        val driver = testPaymentsDriverFromResource("sampledbs/v1/old.payments-testnet-a224978853d2f4c94ac8e2dbb2acf8344e0146d0.sqlite")
+        val paymentsDb = createSqlitePaymentsDb(driver, currencyManager = null)
+
+        val payments = paymentsDb.database.paymentsQueries.list(limit = Long.MAX_VALUE, offset = 0)
+            .executeAsList()
+            .map { Serialization.deserialize(it).getOrThrow() }
+
+        assertEquals(4, payments.filterIsInstance<Bolt11IncomingPayment>().size)
+        assertEquals(1, payments.filterIsInstance<LegacyPayToOpenIncomingPayment>().size)
+        assertEquals(1, payments.filterIsInstance<LegacySwapInIncomingPayment>().size)
+        assertEquals(0, payments.filterIsInstance<SpliceOutgoingPayment>().size)
+        assertEquals(0, payments.filterIsInstance<SpliceCpfpOutgoingPayment>().size)
+        assertEquals(2, payments.filterIsInstance<LightningOutgoingPayment>().size)
+        assertEquals(0, payments.filterIsInstance<InboundLiquidityOutgoingPayment>().size)
+        assertEquals(0, payments.filterIsInstance<ChannelCloseOutgoingPayment>().size)
+
+        assertEquals(4 + 1 + 1 + 2, payments.size)
+
+        val successful =
+            payments.filter { it.state() == WalletPaymentState.SuccessOnChain || it.state() == WalletPaymentState.SuccessOffChain }
+        assertEquals(4 + 1 + 1 + 2, successful.size)
+    }
+
+    @Test
+    fun `read v6 db`() = runTest {
+        val driver = testPaymentsDriverFromResource("sampledbs/v6/old.payments-testnet-700486fc7a90d5922d6f993f2941ab9f9f1a9d85.sqlite")
+        val paymentsDb = createSqlitePaymentsDb(driver, currencyManager = null)
+
+        val payments = paymentsDb.database.paymentsQueries.list(limit = Long.MAX_VALUE, offset = 0)
+            .executeAsList()
+            .map { Serialization.deserialize(it).getOrThrow() }
+
+        assertEquals(1, payments.filterIsInstance<Bolt11IncomingPayment>().size)
+        assertEquals(0, payments.filterIsInstance<LegacyPayToOpenIncomingPayment>().size)
+        assertEquals(4, payments.filterIsInstance<LegacySwapInIncomingPayment>().size)
+        assertEquals(0, payments.filterIsInstance<SpliceOutgoingPayment>().size)
+        assertEquals(0, payments.filterIsInstance<SpliceCpfpOutgoingPayment>().size)
+        assertEquals(6, payments.filterIsInstance<LightningOutgoingPayment>().size)
+        assertEquals(0, payments.filterIsInstance<InboundLiquidityOutgoingPayment>().size)
+        assertEquals(4, payments.filterIsInstance<ChannelCloseOutgoingPayment>().size)
+
+        assertEquals(1 + 4 + 6 + 4, payments.size)
+
+        val successful =
+            payments.filter { it.state() == WalletPaymentState.SuccessOnChain || it.state() == WalletPaymentState.SuccessOffChain }
+        assertEquals(1 + 4 + 6 + 4, successful.size)
+    }
 
     @Test
     fun `read v10 db`() = runTest {
