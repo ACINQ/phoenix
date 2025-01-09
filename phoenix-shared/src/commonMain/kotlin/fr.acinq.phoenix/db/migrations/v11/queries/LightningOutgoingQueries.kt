@@ -37,60 +37,9 @@ import fr.acinq.secp256k1.Hex
 
 class LightningOutgoingQueries(val database: PaymentsDatabase) {
 
-//    /**
-//     * Returns a [LightningOutgoingPayment] for this id - if instead we find legacy converted to a new type (such as
-//     * [ChannelCloseOutgoingPayment], this payment is ignored and we return null instead.
-//     */
-//    fun getPaymentStrict(id: UUID): LightningOutgoingPayment? = queries.getPayment(
-//        id = id.toString(),
-//        mapper = Companion::mapLightningOutgoingPayment
-//    ).executeAsList().let { parts ->
-//        // only take regular LN payments parts, and group them
-//        parts.filterIsInstance<LightningOutgoingPayment>().let {
-//            groupByRawLightningOutgoing(it).firstOrNull()
-//        }?.let {
-//            filterUselessParts(it)
-//        }
-//    }
-
-//    /**
-//     * May return a [ChannelCloseOutgoingPayment] instead of the expected [LightningOutgoingPayment]. That's because
-//     * channel closing used to be stored as [LightningOutgoingPayment] with special closing parts. We convert those to
-//     * the propert object type.
-//     */
-//    fun getPaymentRelaxed(id: UUID): OutgoingPayment? = queries.getPayment(
-//        id = id.toString(),
-//        mapper = Companion::mapLightningOutgoingPayment
-//    ).executeAsList().let { parts ->
-//        // this payment may be a legacy channel closing - otherwise, only take regular LN payment parts, and group them
-//        parts.firstOrNull { it is ChannelCloseOutgoingPayment } ?: parts.filterIsInstance<LightningOutgoingPayment>().let {
-//            groupByRawLightningOutgoing(it).firstOrNull()
-//        }?.let {
-//            filterUselessParts(it)
-//        }
-//    }
-
-    /** Group a list of outgoing payments by parent id and parts. */
-//    private fun groupByRawLightningOutgoing(payments: List<LightningOutgoingPayment>) = payments
-//        .takeIf { it.isNotEmpty() }
-//        ?.groupBy { it.id }
-//        ?.values
-//        ?.map { group -> group.first().copy(parts = group.flatMap { it.parts }) }
-//        ?: emptyList()
-//
-//    /** Get a payment without its failed/pending parts. */
-//    private fun filterUselessParts(payment: LightningOutgoingPayment): LightningOutgoingPayment = when (payment.status) {
-//        is LightningOutgoingPayment.Status.Completed.Succeeded -> {
-//            payment.copy(parts = payment.parts.filter {
-//                it.status is LightningOutgoingPayment.Part.Status.Succeeded
-//            })
-//        }
-//        else -> payment
-//    }
-
     companion object {
         @Suppress("UNUSED_PARAMETER")
-        fun mapLightningOutgoingPaymentWithoutParts(
+        private fun mapLightningOutgoingPaymentWithoutParts(
             id: String,
             recipient_amount_msat: Long,
             recipient_node_id: String,

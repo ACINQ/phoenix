@@ -18,6 +18,8 @@ package fr.acinq.phoenix.db
 
 
 import app.cash.sqldelight.ColumnAdapter
+import app.cash.sqldelight.EnumColumnAdapter
+import app.cash.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.db.IncomingPayment
@@ -25,8 +27,33 @@ import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.serialization.payment.Serialization
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.phoenix.managers.CurrencyManager
 import fr.acinq.phoenix.utils.extensions.toByteArray
+import fracinqphoenixdb.Cloudkit_payments_metadata
+import fracinqphoenixdb.Cloudkit_payments_queue
+import fracinqphoenixdb.Link_lightning_outgoing_payment_parts
+import fracinqphoenixdb.On_chain_txs
+import fracinqphoenixdb.Payments_incoming
+import fracinqphoenixdb.Payments_metadata
+import fracinqphoenixdb.Payments_outgoing
 
+
+fun createSqlitePaymentsDb(driver: SqlDriver, currencyManager: CurrencyManager): SqlitePaymentsDb {
+    return SqlitePaymentsDb(
+        driver = driver,
+        database = PaymentsDatabase(
+            driver = driver,
+            payments_incomingAdapter = Payments_incoming.Adapter(UUIDAdapter, ByteVector32Adapter, TxIdAdapter, IncomingPaymentAdapter),
+            payments_outgoingAdapter = Payments_outgoing.Adapter(UUIDAdapter, ByteVector32Adapter, TxIdAdapter, OutgoingPaymentAdapter),
+            link_lightning_outgoing_payment_partsAdapter = Link_lightning_outgoing_payment_parts.Adapter(UUIDAdapter, UUIDAdapter),
+            on_chain_txsAdapter = On_chain_txs.Adapter(UUIDAdapter, TxIdAdapter),
+            payments_metadataAdapter = Payments_metadata.Adapter(UUIDAdapter, EnumColumnAdapter(), EnumColumnAdapter(), EnumColumnAdapter()),
+            cloudkit_payments_queueAdapter = Cloudkit_payments_queue.Adapter(UUIDAdapter),
+            cloudkit_payments_metadataAdapter = Cloudkit_payments_metadata.Adapter(UUIDAdapter),
+        ),
+        currencyManager = currencyManager,
+    )
+}
 
 object UUIDAdapter : ColumnAdapter<UUID, ByteArray> {
     override fun decode(databaseValue: ByteArray): UUID = UUID.fromBytes(databaseValue)

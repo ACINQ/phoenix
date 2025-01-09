@@ -116,7 +116,7 @@ sealed class CloudData {
 
     data class V1(val payment: WalletPayment) : CloudData() {
         override fun serialize(): ByteArray {
-            // TODO: prepend a version byte
+            // TODO: prepend a version byte to avoid the brutal try/catch in the deserialization ?
             return Serialization.serialize(payment)
         }
     }
@@ -133,8 +133,6 @@ sealed class CloudData {
         }
     }
 }
-
-
 
 /**
  * For DEBUGGING:

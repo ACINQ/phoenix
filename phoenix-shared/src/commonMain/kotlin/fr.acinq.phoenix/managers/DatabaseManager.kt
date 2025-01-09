@@ -1,37 +1,27 @@
 package fr.acinq.phoenix.managers
 
-import app.cash.sqldelight.EnumColumnAdapter
 import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.db.Databases
 import fr.acinq.lightning.logging.LoggerFactory
+import fr.acinq.lightning.logging.debug
 import fr.acinq.phoenix.PhoenixBusiness
+import fr.acinq.phoenix.db.SqliteAppDb
 import fr.acinq.phoenix.db.SqliteChannelsDb
 import fr.acinq.phoenix.db.SqlitePaymentsDb
 import fr.acinq.phoenix.db.createChannelsDbDriver
 import fr.acinq.phoenix.db.createPaymentsDbDriver
-import fr.acinq.phoenix.utils.PlatformContext
-import fr.acinq.lightning.logging.debug
-import fr.acinq.phoenix.db.ByteVector32Adapter
-import fr.acinq.phoenix.db.IncomingPaymentAdapter
-import fr.acinq.phoenix.db.OutgoingPaymentAdapter
-import fr.acinq.phoenix.db.PaymentsDatabase
-import fr.acinq.phoenix.db.SqliteAppDb
-import fr.acinq.phoenix.db.TxIdAdapter
-import fr.acinq.phoenix.db.UUIDAdapter
 import fr.acinq.phoenix.db.createSqlitePaymentsDb
 import fr.acinq.phoenix.db.makeCloudKitDb
 import fr.acinq.phoenix.db.payments.CloudKitInterface
-import fracinqphoenixdb.Cloudkit_payments_metadata
-import fracinqphoenixdb.Cloudkit_payments_queue
-import fracinqphoenixdb.Link_lightning_outgoing_payment_parts
-import fracinqphoenixdb.On_chain_txs
-import fracinqphoenixdb.Payments_incoming
-import fracinqphoenixdb.Payments_metadata
-import fracinqphoenixdb.Payments_outgoing
+import fr.acinq.phoenix.utils.PlatformContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class DatabaseManager(
@@ -64,9 +54,8 @@ class DatabaseManager(
                 log.debug { "nodeParams available: building databases..." }
 
                 val nodeIdHash = nodeParams.nodeId.hash160().byteVector().toHex()
-                val channelsDb = SqliteChannelsDb(
-                    driver = createChannelsDbDriver(ctx, chain, nodeIdHash)
-                )
+                val channelsDbDriver = createChannelsDbDriver(ctx, chain, nodeIdHash)
+                val channelsDb = SqliteChannelsDb(channelsDbDriver)
                 val paymentsDbDriver = createPaymentsDbDriver(ctx, chain, nodeIdHash)
                 val paymentsDb = createSqlitePaymentsDb(paymentsDbDriver, currencyManager)
                 val cloudKitDb = makeCloudKitDb(appDb, paymentsDb)

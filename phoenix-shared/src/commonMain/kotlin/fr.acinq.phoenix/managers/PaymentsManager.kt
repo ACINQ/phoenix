@@ -1,9 +1,11 @@
 package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.TxId
+import fr.acinq.lightning.PaymentEvents
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
 import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.db.LightningIncomingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.utils.*
@@ -11,12 +13,15 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.SqlitePaymentsDb
 import fr.acinq.lightning.logging.debug
+import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.utils.extensions.relatedPaymentIds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 
@@ -26,6 +31,7 @@ class PaymentsManager(
     private val contactsManager: ContactsManager,
     private val databaseManager: DatabaseManager,
     private val electrumClient: ElectrumClient,
+    private val nodeParamsManager: NodeParamsManager,
 ) : CoroutineScope by MainScope() {
 
     constructor(business: PhoenixBusiness) : this(
@@ -33,7 +39,8 @@ class PaymentsManager(
         configurationManager = business.appConfigurationManager,
         contactsManager = business.contactsManager,
         databaseManager = business.databaseManager,
-        electrumClient = business.electrumClient
+        electrumClient = business.electrumClient,
+        nodeParamsManager = business.nodeParamsManager,
     )
 
     private val log = loggerFactory.newLogger(this::class)
@@ -69,19 +76,25 @@ class PaymentsManager(
     init {
         launch { monitorPaymentsCountInDb() }
 
-        launch { monitorLastCompletedPayment(currentTimestampMillis()) }
+        launch { monitorLastCompletedPayment() }
 
         launch { monitorUnconfirmedTransactions() }
     }
 
     private suspend fun monitorPaymentsCountInDb() {
-        // TODO: check if this could be removed
         paymentsDb().listPaymentsCountFlow().collect { _paymentsCount.value = it }
     }
 
     /** Monitors the payments database and push any new payments in the [_lastCompletedPayment] flow. */
-    private suspend fun monitorLastCompletedPayment(appLaunchTimestamp: Long) {
-        // TODO("why not use NodeEvents?")
+    private suspend fun monitorLastCompletedPayment() {
+        val nodeParams = nodeParamsManager.nodeParams.filterNotNull().first()
+        nodeParams.nodeEvents.collect {
+            when (it) {
+                is PaymentEvents.PaymentReceived -> _lastCompletedPayment.value = it.payment
+                is PaymentEvents.PaymentSent -> _lastCompletedPayment.value = it.payment
+                else -> Unit
+            }
+        }
     }
 
     /** Watches transactions that are unconfirmed, checks their confirmation status at each block, and updates relevant payments. */
@@ -127,12 +140,12 @@ class PaymentsManager(
     }
 
     /**
-     * Returns the inbound liquidity purchase relevant to a given transaction id.
+     * Returns the liquidity purchase associated to a transaction id.
      *
-     * It is used to track the fees that may have been incurred by an incoming payment because of low liquidity. To do
-     * that, we use the transaction id attached to the incoming payment, and find any purchase that matches.
+     * When receiving payments over Lightning, a liquidity purchase may be needed because of low liquidity.. The link between the incoming payment
+     * and the liquidity purchase is done through the transaction ID field (see [LiquidityAds.FundingFee] in [LightningIncomingPayment.Part.Htlc]).
      *
-     * This allows us to display the fees of a liquidity purchase inside an incoming payment details screen.
+     * This allows us to display the service/mining fees of a liquidity purchase inside the incoming payment details screen.
      */
     suspend fun getLiquidityPurchaseForTxId(
         txId: TxId

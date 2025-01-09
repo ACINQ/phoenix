@@ -15,12 +15,11 @@ SELECT data
 FROM payments
 WHERE id=:id;
 
--- payments_metadata.user_description, pm.user_notes, pm.modified_at as metadata_modified_at
--- ??? this method should be used to populate the home screen with a list of payments, incl. custom desc
 list:
-SELECT data
-FROM payments
-ORDER BY order_ts
+SELECT p.data, pm.*
+FROM payments AS p
+LEFT OUTER JOIN payments_metadata AS pm ON pm.payment_id = p.id
+ORDER BY order_ts DESC
 LIMIT :limit OFFSET :offset;
 
 listCompleted:

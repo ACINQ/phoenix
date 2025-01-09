@@ -107,11 +107,3 @@ data class LightningOutgoingPaymentWrapper(
 
     } // </StatusWrapper>
 } // </OutgoingPaymentWrapper>
-
-@OptIn(ExperimentalSerializationApi::class)
-@Throws(Exception::class)
-fun LightningOutgoingPaymentWrapper.cborDeserialize(
-    blob: ByteArray
-): LightningOutgoingPaymentWrapper {
-    return cborSerializer().decodeFromByteArray(blob)
-}

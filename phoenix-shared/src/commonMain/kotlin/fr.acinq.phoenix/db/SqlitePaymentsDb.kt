@@ -28,7 +28,7 @@ import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.db.payments.*
 import fr.acinq.phoenix.db.payments.PaymentsMetadataQueries
 import fr.acinq.phoenix.managers.CurrencyManager
-import fracinqphoenixdb.*
+import kotlin.collections.List
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -116,7 +116,6 @@ class SqlitePaymentsDb(
     }
 
     suspend fun listUnconfirmedTransactions(): Flow<List<TxId>> = withContext(Dispatchers.Default) {
-        // TODO: should return a flow of tx ids instead of a list
         database.onChainTransactionsQueries.listUnconfirmed().asFlow().mapToList(Dispatchers.Default)
     }
 
@@ -130,12 +129,25 @@ class SqlitePaymentsDb(
 
     // ---- list ALL payments
 
-    suspend fun listPaymentsAsFlow(count: Long, skip: Long): Flow<List<WalletPayment>> = withContext(Dispatchers.Default) {
-        // TODO: optimise this method to only fetch the data we need to populate the home list
-        // including contact, metadata, ...
-        database.paymentsQueries.list(limit = count, offset = skip)
+    suspend fun listPaymentsAsFlow(count: Long, skip: Long): Flow<List<WalletPaymentInfo>> = withContext(Dispatchers.Default) {
+        database.paymentsQueries.list(limit = count, offset = skip, mapper = {
+                data_, _,
+                lnurl_base_type, lnurl_base_blob, lnurl_description, lnurl_metadata_type, lnurl_metadata_blob,
+                lnurl_successAction_type, lnurl_successAction_blob, user_description, user_notes, modified_at,
+                original_fiat_type, original_fiat_rate ->
+            val payment = WalletPaymentAdapter.decode(data_)
+            WalletPaymentInfo(
+                payment = payment,
+                metadata = PaymentsMetadataQueries.mapAll(payment.id,
+                    lnurl_base_type, lnurl_base_blob, lnurl_description, lnurl_metadata_type, lnurl_metadata_blob,
+                    lnurl_successAction_type, lnurl_successAction_blob, user_description, user_notes, modified_at,
+                    original_fiat_type, original_fiat_rate),
+                contact = null,
+                fetchOptions = WalletPaymentFetchOptions.Metadata
+            )
+        })
             .asFlow()
-            .map { it.executeAsList().map { WalletPaymentAdapter.decode(it) } }
+            .mapToList(Dispatchers.Default)
     }
 
     suspend fun listCompletedPayments(count: Long, skip: Long, startDate: Long, endDate: Long, fetchOptions: WalletPaymentFetchOptions): List<WalletPaymentInfo> = withContext(Dispatchers.Default) {
@@ -162,106 +174,6 @@ class SqlitePaymentsDb(
                 }
             }
     }
-
-    /** Returns a flow of incoming payments within <count, skip>. This flow is updated when the data change in the database. */
-//    fun listPaymentsOrderFlow(
-//        count: Int,
-//        skip: Int
-//    ): Flow<List<WalletPaymentOrderRow>>  {
-//        return aggrQueries.listAllPaymentsOrder(
-//            limit = count.toLong(),
-//            offset = skip.toLong(),
-//            mapper = ::allPaymentsOrderMapper
-//        )
-//        .asFlow()
-//        .map {
-//            withContext(Dispatchers.Default) {
-//                database.transactionWithResult {
-//                    it.executeAsList()
-//                }
-//            }
-//        }
-//    }
-
-//    fun listRecentPaymentsOrderFlow(
-//        date: Long,
-//        count: Int,
-//        skip: Int
-//    ): Flow<List<WalletPaymentOrderRow>> {
-//        return aggrQueries.listRecentPaymentsOrder(
-//            date = date,
-//            limit = count.toLong(),
-//            offset = skip.toLong(),
-//            mapper = ::allPaymentsOrderMapper
-//        )
-//        .asFlow()
-//        .map {
-//            withContext(Dispatchers.Default) {
-//                database.transactionWithResult {
-//                    it.executeAsList()
-//                }
-//            }
-//        }
-//    }
-
-//    fun listOutgoingInFlightPaymentsOrderFlow(
-//        count: Int,
-//        skip: Int
-//    ): Flow<List<WalletPaymentOrderRow>> {
-//        return aggrQueries.listOutgoingInFlightPaymentsOrder(
-//            limit = count.toLong(),
-//            offset = skip.toLong(),
-//            mapper = ::allPaymentsOrderMapper
-//        )
-//        .asFlow()
-//        .map {
-//            withContext(Dispatchers.Default) {
-//                database.transactionWithResult {
-//                    it.executeAsList()
-//                }
-//            }
-//        }
-//    }
-
-    /**
-     * List payments successfully received or sent between [startDate] and [endDate], for page ([skip]->[skip+count]).
-     *
-     * @param startDate timestamp in millis
-     * @param endDate timestamp in millis
-     * @param count limit number of rows
-     * @param skip rows offset for paging
-     */
-//    suspend fun listRangeSuccessfulPaymentsOrder(
-//        startDate: Long,
-//        endDate: Long,
-//        count: Int,
-//        skip: Int
-//    ): List<WalletPaymentOrderRow> = withContext(Dispatchers.Default) {
-//        aggrQueries.listRangeSuccessfulPaymentsOrder(
-//            startDate = startDate,
-//            endDate = endDate,
-//            limit = count.toLong(),
-//            offset = skip.toLong(),
-//            mapper = ::allPaymentsOrderMapper
-//        ).executeAsList()
-//    }
-
-//    /**
-//     * Count payments successfully received or sent between [startDate] and [endDate].
-//     *
-//     * @param startDate timestamp in millis
-//     * @param endDate timestamp in millis
-//     */
-//    suspend fun listRangeSuccessfulPaymentsCount(
-//        startDate: Long,
-//        endDate: Long
-//    ): Long = withContext(Dispatchers.Default) {
-//        aggrQueries.listRangeSuccessfulPaymentsCount(
-//            startDate = startDate,
-//            endDate = endDate,
-//            mapper = ::allPaymentsCountMapper
-//        ).executeAsList().first()
-//    }
 
     /**
      * The lightning-kmp layer triggers the addition of a payment to the database.
@@ -305,30 +217,17 @@ class SqlitePaymentsDb(
     }
 
     fun close() = driver.close()
-
-    companion object {
-        private fun allPaymentsCountMapper(
-            result: Long?
-        ): Long {
-            return result ?: 0
-        }
-
-        private fun allPaymentsOrderMapper(
-            id: UUID,
-            created_at: Long,
-            completed_at: Long?,
-            metadata_modified_at: Long?
-        ): WalletPaymentOrderRow {
-            return WalletPaymentOrderRow(
-                id = id,
-                createdAt = created_at,
-                completedAt = completed_at,
-                metadataModifiedAt = metadata_modified_at
-            )
-        }
-    }
 }
 
+// NOTE: this object should probably be removed.
+//
+// In the past we had to first list a subset of payments data (id and a few timestamp), then for each
+// result, fetch the detail of that payments.
+//
+// Now we are able to list payments in one go, including the actual payments data (and metadata).
+//
+// However, the `identifier` seems to be used in the payments cache so some part of this object could
+// still be useful and moved into `WalletPaymentInfo` ?
 data class WalletPaymentOrderRow(
     val id: UUID,
     val createdAt: Long,

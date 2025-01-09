@@ -6,11 +6,9 @@ import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toByteVector32
 import fr.acinq.phoenix.db.cloud.UUIDSerializer
-import fr.acinq.phoenix.db.cloud.cborSerializer
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.ByteString
-import kotlinx.serialization.decodeFromByteArray
 
 @Serializable
 @OptIn(ExperimentalSerializationApi::class)
@@ -38,12 +36,4 @@ data class SpliceOutgoingPaymentWrapper(
         confirmedAt = confirmedAt,
         lockedAt = lockedAt,
     )
-}
-
-@OptIn(ExperimentalSerializationApi::class)
-@Throws(Exception::class)
-fun SpliceOutgoingPaymentWrapper.cborDeserialize(
-    blob: ByteArray
-): SpliceOutgoingPaymentWrapper {
-    return cborSerializer().decodeFromByteArray(blob)
 }

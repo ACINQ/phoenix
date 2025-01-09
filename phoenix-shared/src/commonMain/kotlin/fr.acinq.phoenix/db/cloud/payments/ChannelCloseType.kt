@@ -47,11 +47,3 @@ data class ChannelClosePaymentWrapper(
 
     companion object
 }
-
-@OptIn(ExperimentalSerializationApi::class)
-@Throws(Exception::class)
-fun ChannelClosePaymentWrapper.cborDeserialize(
-    blob: ByteArray
-): ChannelClosePaymentWrapper {
-    return cborSerializer().decodeFromByteArray(blob)
-}
