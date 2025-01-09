@@ -56,7 +56,7 @@ struct HomeView : MVIView {
 	let contactsPublisher = Biz.business.contactsManager.contactsListPublisher()
 	
 	@State var didAppear = false
-	
+		
 	enum NoticeBoxContentHeight: Preference {}
 	let noticeBoxContentHeightReader = GeometryPreferenceReader(
 		key: AppendValue<NoticeBoxContentHeight>.self,
@@ -107,37 +107,37 @@ struct HomeView : MVIView {
 	@ViewBuilder
 	var view: some View {
 		
-		ZStack {
-			content()
-		}
-		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.onChange(of: mvi.model) { newModel in
-			onModelChange(model: newModel)
-		}
-		.onChange(of: currencyPrefs.hideAmounts) { _ in
-			hideAmountsChanged()
-		}
-		.onReceive(recentPaymentsConfigPublisher) {
-			recentPaymentsConfigChanged($0)
-		}
-		.onReceive(paymentsPagePublisher) {
-			paymentsPageChanged($0)
-		}
-		.onReceive(lastCompletedPaymentPublisher) {
-			lastCompletedPaymentChanged($0)
-		}
-		.onReceive(swapInWalletPublisher) {
-			swapInWalletChanged($0)
-		}
-		.onReceive(channelsPublisher) {
-			channelsChanged($0)
-		}
-		.onReceive(bizNotificationsPublisher) {
-			bizNotificationsChanged($0)
-		}
-		.onReceive(contactsPublisher) {
-			contactsChanged($0)
-		}
+		content()
+			.onAppear {
+				onAppear()
+			}
+			.onChange(of: mvi.model) { newModel in
+				onModelChange(model: newModel)
+			}
+			.onChange(of: currencyPrefs.hideAmounts) { _ in
+				hideAmountsChanged()
+			}
+			.onReceive(recentPaymentsConfigPublisher) {
+				recentPaymentsConfigChanged($0)
+			}
+			.onReceive(paymentsPagePublisher) {
+				paymentsPageChanged($0)
+			}
+			.onReceive(lastCompletedPaymentPublisher) {
+				lastCompletedPaymentChanged($0)
+			}
+			.onReceive(swapInWalletPublisher) {
+				swapInWalletChanged($0)
+			}
+			.onReceive(channelsPublisher) {
+				channelsChanged($0)
+			}
+			.onReceive(bizNotificationsPublisher) {
+				bizNotificationsChanged($0)
+			}
+			.onReceive(contactsPublisher) {
+				contactsChanged($0)
+			}
 	}
 
 	@ViewBuilder
@@ -155,9 +155,7 @@ struct HomeView : MVIView {
 			notices()
 			paymentsList()
 		}
-		.onAppear {
-			onAppear()
-		}
+		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.sheet(isPresented: Binding( // SwiftUI only allows for 1 ".sheet"
 			get: { activeSheet != nil },
 			set: { if !$0 { activeSheet = nil }}
@@ -559,8 +557,8 @@ struct HomeView : MVIView {
 	@ViewBuilder
 	func paymentsList() -> some View {
 		
-		ScrollView {
-			LazyVStack {
+		ScrollView(.vertical) {
+			VStack {
 				// paymentsPage.rows: [WalletPaymentOrderRow]
 				//
 				// Here's how this works:
@@ -592,8 +590,10 @@ struct HomeView : MVIView {
 					didAppearCallback: footerCellDidAppear
 				)
 				.accessibilitySortPriority(10)
-			}
-		}
+				
+			} // </VStack>
+			
+		} // </ScrollView>
 		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
 	}
 	
@@ -787,7 +787,7 @@ struct HomeView : MVIView {
 	}
 	
 	func paymentsPageChanged(_ page: PaymentsPage) {
-		log.trace("paymentsPageChanged()")
+		log.trace("paymentsPageChanged(count: \(page.count), offset: \(page.offset))")
 		
 		paymentsPage = page
 	}

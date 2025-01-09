@@ -89,7 +89,8 @@ struct AnimatedClock: View {
 							.foregroundColor(Color(UIColor.systemGray4))
 					)
 			}
-		}
+		} // </ZStack>
+		._geometryGroup()
 		.onTapGesture {
 			state.toggle()
 		}
