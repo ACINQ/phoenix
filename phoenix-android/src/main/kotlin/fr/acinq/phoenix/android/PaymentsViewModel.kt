@@ -19,20 +19,30 @@ package fr.acinq.phoenix.android
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import fr.acinq.lightning.db.Bolt12IncomingPayment
+import fr.acinq.lightning.db.LightningOutgoingPayment
+import fr.acinq.lightning.payment.OfferPaymentMetadata
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.data.WalletPaymentInfo
+import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import fr.acinq.phoenix.managers.ContactsManager
 import fr.acinq.phoenix.managers.PaymentsManager
 import fr.acinq.phoenix.managers.PaymentsPageFetcher
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 
 data class PaymentRowState(
     val paymentInfo: WalletPaymentInfo,
     val contactInfo: ContactInfo?,
-)
+) {
+    val orderRow : WalletPaymentOrderRow
+        get() = paymentInfo.toOrderRow()
+}
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PaymentsViewModel(
@@ -41,11 +51,8 @@ class PaymentsViewModel(
 ) : ViewModel() {
 
     companion object {
-        /** How many payments should be fetched by the initial subscription. */
-        private const val initialPaymentsCount = 15
-
-        /** How many payments should be visible in the home view. */
-        const val latestPaymentsCount = 15
+        const val pageSize = 40
+        const val paymentsCountInHome = 6
     }
 
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -60,86 +67,75 @@ class PaymentsViewModel(
      */
     val paymentsFlow: StateFlow<Map<UUID, PaymentRowState>> = _paymentsFlow.asStateFlow()
 
-    /** A subset of [paymentsFlow] used in the Home view. */
-    val latestPaymentsFlow: StateFlow<List<PaymentRowState>> = paymentsFlow.mapLatest {
-        it.values.take(latestPaymentsCount.coerceAtMost(initialPaymentsCount)).toList()
-    }.stateIn(
+    private val homePageFetcher: PaymentsPageFetcher = paymentsManager.makePageFetcher()
+    val homePaymentsFlow = homePageFetcher.paymentsPage.mapLatest { it.rows }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.Lazily,
-        initialValue = emptyList()
+        started = SharingStarted.Eagerly,
+        initialValue = emptyList(),
     )
 
     private val paymentsPageFetcher: PaymentsPageFetcher = paymentsManager.makePageFetcher()
+    val paymentsPage = paymentsPageFetcher.paymentsPage
+
 
     init {
-        paymentsPageFetcher.subscribeToAll(offset = 0, count = initialPaymentsCount)
-
-        // get details when a payment completes
-//        viewModelScope.launch(CoroutineExceptionHandler { _, e ->
-//            log.error("failed to collect last completed payment: ", e)
-//        }) {
-//            paymentsManager.lastCompletedPayment.filterNotNull().collect {
-//                // a new row object must be built to get a fresh cache key for the payment fetcher
-//                val row = WalletPaymentOrderRow(
-//                    id = it.id,
-//                    createdAt = it.createdAt,
-//                    completedAt = it.completedAt,
-//                    metadataModifiedAt = null
-//                )
-//                fetchPaymentDetails(row)
-//            }
-//        }
+        paymentsPageFetcher.subscribeToAll(offset = 0, count = pageSize)
+        homePageFetcher.subscribeToAll(offset = 0, count = paymentsCountInHome)
 
         // collect changes on the payments page that we subscribed to
-//        viewModelScope.launch(CoroutineExceptionHandler { _, e ->
-//            log.error("error when collecting payments-page items: ", e)
-//        }) {
-//            paymentsPageFetcher.paymentsPage.collect { page ->
-//                viewModelScope.launch(Dispatchers.Default) {
-//                    // We must rewrite the whole payments flow map to keep payments ordering.
-//                    // Adding the diff would only push new elements to the bottom of the map.
-//                    _paymentsFlow.value = page.rows.associate { newRow ->
-//                        val paymentId = newRow.payment.id
-//                        val existingData = paymentsFlow.value[paymentId]
-//                        // We look at the row to check if the payment has changed (the row contains timestamps)
-//                        if (existingData?.orderRow != newRow) {
-//                            paymentId to PaymentRowState(newRow, paymentInfo = null, contactInfo = null)
-//                        } else {
-//                            paymentId to existingData
-//                        }
-//                    }
-//                }
-//            }
-//        }
+        viewModelScope.launch(CoroutineExceptionHandler { _, e ->
+            log.error("error when collecting payments-page items: ", e)
+        }) {
+            paymentsPageFetcher.paymentsPage.collect { page ->
+                viewModelScope.launch(Dispatchers.Default) {
+                    val newElts = page.rows.associate { newRow ->
+                        val paymentId = newRow.payment.id
+                        val existingData = paymentsFlow.value[paymentId]
+
+                        // We look at the row to check if the payment has changed (the row contains timestamps)
+                        if (existingData?.orderRow != newRow.toOrderRow()) {
+                            fetchContactDetails(newRow)
+                            paymentId to PaymentRowState(paymentInfo = newRow, contactInfo = null)
+                        } else {
+                            paymentId to existingData
+                        }
+                    }
+                    if (page.offset == 0) {
+                        _paymentsFlow.value = newElts
+                    } else {
+                        _paymentsFlow.value += newElts
+                    }
+                }
+            }
+        }
     }
-//
-//    /** Fetches the details for a given payment and updates [paymentsFlow]. */
-//    fun fetchPaymentDetails(row: WalletPaymentOrderRow) {
-//        viewModelScope.launch(Dispatchers.Main) {
-//            val paymentInfo = paymentsManager.fetcher.getPayment(row, WalletPaymentFetchOptions.Descriptions)
-//            val contactInfo = when (val payment = paymentInfo?.payment) {
-//                is IncomingPayment -> {
-//                    val origin = payment.origin
-//                    if (origin is IncomingPayment.Origin.Offer) {
-//                        val metadata = origin.metadata
-//                        if (metadata is OfferPaymentMetadata.V1) {
-//                            contactsManager.getContactForPayerPubkey(metadata.payerKey)
-//                        } else null
-//                    } else null
-//                }
-//                is LightningOutgoingPayment -> {
-//                    val details = payment.details
-//                    if (details is LightningOutgoingPayment.Details.Blinded) {
-//                        contactsManager.getContactForOffer(details.paymentRequest.invoiceRequest.offer)
-//                    } else null
-//                }
-//                else -> null
-//            }
-//            if (paymentInfo != null) {
-//                _paymentsFlow.value += (row.id.identifier to PaymentRowState(row, paymentInfo, contactInfo))
-//            }
-//        }
-//    }
+
+    /** Fetches the contact details for a given payment and updates [paymentsFlow]. */
+    private fun fetchContactDetails(walletPaymentInfo: WalletPaymentInfo) {
+        when (val payment = walletPaymentInfo.payment) {
+            is Bolt12IncomingPayment -> {
+                val metadata = payment.metadata
+                if (metadata is OfferPaymentMetadata.V1) {
+                    viewModelScope.launch(Dispatchers.Main) {
+                        contactsManager.getContactForPayerPubkey(metadata.payerKey)?.let {
+                            _paymentsFlow.value += (payment.id to PaymentRowState(walletPaymentInfo, it))
+                        }
+                    }
+                }
+            }
+            is LightningOutgoingPayment -> {
+                val details = payment.details
+                if (details is LightningOutgoingPayment.Details.Blinded) {
+                    viewModelScope.launch(Dispatchers.Main) {
+                        contactsManager.getContactForOffer(details.paymentRequest.invoiceRequest.offer)?.let {
+                            _paymentsFlow.value += (payment.id to PaymentRowState(walletPaymentInfo, it))
+                        }
+                    }
+                }
+            }
+            else -> Unit
+        }
+    }
 
     /** Updates the payment fetcher to listen to changes within the given count and offset, indirectly updating the [paymentsFlow]. */
     fun subscribeToPayments(offset: Int, count: Int) {

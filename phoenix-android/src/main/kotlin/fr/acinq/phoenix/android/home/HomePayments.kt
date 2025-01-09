@@ -18,6 +18,7 @@ package fr.acinq.phoenix.android.home
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -38,7 +39,7 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.payments.details.PaymentLine
 import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
-import fr.acinq.phoenix.db.WalletPaymentOrderRow
+import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.managers.WalletBalance
 
 
@@ -49,7 +50,7 @@ fun ColumnScope.PaymentsList(
     balanceDisplayMode: HomeAmountDisplayMode,
     onPaymentClick: (UUID) -> Unit,
     onPaymentsHistoryClick: () -> Unit,
-    payments: List<PaymentRowState>,
+    payments: List<WalletPaymentInfo>,
     allPaymentsCount: Long,
 ) {
     Column(modifier = modifier.weight(1f, fill = true), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -76,7 +77,7 @@ fun ColumnScope.PaymentsList(
 @Composable
 private fun ColumnScope.LatestPaymentsList(
     allPaymentsCount: Long,
-    payments: List<PaymentRowState>,
+    payments: List<WalletPaymentInfo>,
     onPaymentClick: (UUID) -> Unit,
     onPaymentsHistoryClick: () -> Unit,
     isAmountRedacted: Boolean,
@@ -96,11 +97,11 @@ private fun ColumnScope.LatestPaymentsList(
         modifier = Modifier.weight(1f, fill = true),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        itemsIndexed(
-            items = payments,
-        ) { index, item ->
-            PaymentLine(item.paymentInfo, item.contactInfo, onPaymentClick, isAmountRedacted)
-            if (payments.isNotEmpty() && allPaymentsCount > PaymentsViewModel.latestPaymentsCount && index == payments.size - 1) {
+        items(payments) {
+            PaymentLine(it, null, onPaymentClick, isAmountRedacted)
+        }
+        if (payments.isNotEmpty() && allPaymentsCount > PaymentsViewModel.paymentsCountInHome) {
+            item {
                 Spacer(Modifier.height(16.dp))
                 morePaymentsButton()
                 Spacer(Modifier.height(80.dp))

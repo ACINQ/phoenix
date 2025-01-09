@@ -68,7 +68,6 @@ import fr.acinq.phoenix.utils.extensions.incomingOfferMetadata
 import fr.acinq.phoenix.utils.extensions.outgoingInvoiceRequest
 import fr.acinq.phoenix.utils.extensions.state
 
-
 @Composable
 fun PaymentLine(
     paymentInfo: WalletPaymentInfo,
@@ -204,7 +203,7 @@ private fun PaymentIcon(payment: WalletPayment) {
 @Composable
 private fun PaymentIconComponent(
     icon: Int?,
-    description: String,
+    description: String?,
     iconSize: Dp = 18.dp,
     iconColor: Color = MaterialTheme.colors.primary,
     backgroundColor: Color? = null

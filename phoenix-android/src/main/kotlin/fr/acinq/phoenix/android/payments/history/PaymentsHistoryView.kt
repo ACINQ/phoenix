@@ -16,7 +16,6 @@
 
 package fr.acinq.phoenix.android.payments.history
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -47,8 +46,8 @@ import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.ItemCard
 import fr.acinq.phoenix.android.payments.details.PaymentLine
+import fr.acinq.phoenix.android.utils.logger
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
@@ -93,7 +92,6 @@ private sealed class PaymentsGroup {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PaymentsHistoryView(
     onBackClick: () -> Unit,
@@ -103,7 +101,9 @@ fun PaymentsHistoryView(
 ) {
     val listState = rememberLazyListState()
     val allPaymentsCount by business.paymentsManager.paymentsCount.collectAsState()
+    val paymentsPage by paymentsViewModel.paymentsPage.collectAsState()
     val payments by paymentsViewModel.paymentsFlow.collectAsState()
+
     val groupedPayments = remember(payments) {
         val timezone = TimeZone.currentSystemDefault()
         val (todaysDayOfWeek, today) = java.time.LocalDate.now().atTime(23, 59, 59).toKotlinLocalDateTime().let { it.dayOfWeek to it.toInstant(timezone) }
@@ -119,6 +119,8 @@ fun PaymentsHistoryView(
             }
         }
     }
+
+    val log = logger("PaymentsHistory")
 
     DefaultScreenLayout(
         isScrollable = false,
@@ -138,24 +140,27 @@ fun PaymentsHistoryView(
             onBackClick = onBackClick,
         )
 
-        // fetch more payments when the end of the list has been reached
         LaunchedEffect(key1 = listState) {
-            snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull() }
+            snapshotFlow { listState.layoutInfo.visibleItemsInfo.takeIf { it.isNotEmpty() }?.run { first().index to last().index } }
                 .filterNotNull()
-                .map { it.index }
                 .distinctUntilChanged()
-                .filter { index ->
-                    val entriesInListCount = groupedPayments.entries.size + payments.size
-                    val isLastElementFetched = index >= entriesInListCount - 1
-                    isLastElementFetched
+                .map { (topIndex, bottomIndex) ->
+                    val listSize = groupedPayments.entries.size + payments.size // we must take group headers into account
+                    val isFirstVisible = topIndex == 0
+                    val isLastVisible = bottomIndex + 10 >= listSize - 1
+                    val hasMorePaymentsAbove = paymentsPage.offset > 0
+                    val hasMorePaymentsBelow = paymentsPage.offset + paymentsPage.count < allPaymentsCount
+                    log.debug("[$topIndex:$bottomIndex ($listSize) isFirstVisible=$isFirstVisible hasMoreAbove=$hasMorePaymentsAbove isLastVisible=$isLastVisible hasMoreBelow=$hasMorePaymentsBelow")
+                    if (hasMorePaymentsAbove && isFirstVisible) {
+                        paymentsPage.offset - PaymentsViewModel.pageSize / 2
+                    } else if (hasMorePaymentsBelow && isLastVisible) {
+                        paymentsPage.offset + PaymentsViewModel.pageSize / 2
+                    } else null
                 }
+                .filterNotNull()
                 .distinctUntilChanged()
-                .collect { index ->
-                    val hasMorePaymentsToFetch = payments.size < allPaymentsCount
-                    if (hasMorePaymentsToFetch) {
-                        // Subscribe to a bit more payments. Ideally would be the screen height / height of each payment.
-                        paymentsViewModel.subscribeToPayments(offset = 0, count = index + 14)
-                    }
+                .collect { offset ->
+                    paymentsViewModel.subscribeToPayments(offset, PaymentsViewModel.pageSize)
                 }
         }
 
@@ -163,8 +168,10 @@ fun PaymentsHistoryView(
             state = listState,
         ) {
             groupedPayments.forEach { (header, payments) ->
-                stickyHeader {
-                    Column(modifier = Modifier.fillMaxWidth().background(MaterialTheme.colors.background)) {
+                item {
+                    Column(modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colors.background)) {
                         CardHeader(
                             text = when (header) {
                                 PaymentsGroup.Today -> stringResource(id = R.string.payments_history_today)
@@ -179,12 +186,9 @@ fun PaymentsHistoryView(
                 }
                 itemsIndexed(items = payments) { index, item ->
                     ItemCard(index = index, maxItemsCount = payments.size) {
-                        PaymentLine(item.paymentInfo, item.contactInfo, onPaymentClick)
+                        PaymentLine(item.paymentInfo, null, onPaymentClick)
                     }
                 }
-            }
-            item {
-                Spacer(modifier = Modifier.height(40.dp))
             }
         }
     }

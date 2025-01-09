@@ -97,7 +97,7 @@ class CsvExportViewModel(
             val rows = mutableListOf<String>()
             rows += CsvWriter.makeHeaderRow(csvConfig)
             while (fetching) {
-                dbManager.paymentsDb().listPayments(
+                dbManager.paymentsDb().listCompletedPayments(
                     startDate = startTimestampMillis!!,
                     endDate = endTimestampMillis,
                     count = batchSize.toLong(),

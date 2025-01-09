@@ -110,7 +110,7 @@ fun HomeView(
     }
 
     val allPaymentsCount by business.paymentsManager.paymentsCount.collectAsState()
-    val payments by paymentsViewModel.latestPaymentsFlow.collectAsState()
+    val payments by paymentsViewModel.homePaymentsFlow.collectAsState()
     val swapInBalance = business.balanceManager.swapInWalletBalance.collectAsState()
     val finalWallet = business.peerManager.finalWallet.collectAsState()
     val pendingChannelsBalance = business.balanceManager.pendingChannelsBalance.collectAsState()
