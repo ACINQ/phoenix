@@ -18,6 +18,6 @@ package fr.acinq.phoenix.db
 
 import app.cash.sqldelight.db.SqlDriver
 
-actual fun testPaymentsDriverFromFile(): SqlDriver {
+actual fun testPaymentsDriverFromResource(path: String): SqlDriver {
     TODO("Not yet implemented")
 }

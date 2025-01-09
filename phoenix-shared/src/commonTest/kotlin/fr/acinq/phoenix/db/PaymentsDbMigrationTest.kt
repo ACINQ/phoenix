@@ -49,7 +49,7 @@ class PaymentsDbMigrationTest {
 
     @Test
     fun `read v10 db`() = runTest {
-        val driver = testPaymentsDriverFromFile()
+        val driver = testPaymentsDriverFromResource("sampledbs/v10/payments-testnet-28903aff.sqlite")
         val paymentsDb = SqlitePaymentsDb(
             driver, PaymentsDatabase(
                 driver = driver,
@@ -167,4 +167,4 @@ class PaymentsDbMigrationTest {
     }
 }
 
-expect fun testPaymentsDriverFromFile(): SqlDriver
+expect fun testPaymentsDriverFromResource(path: String): SqlDriver

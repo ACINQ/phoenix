@@ -26,11 +26,11 @@ import java.io.FileOutputStream
 import java.util.Properties
 
 
-actual fun testPaymentsDriverFromFile(): SqlDriver {
+actual fun testPaymentsDriverFromResource(path: String): SqlDriver {
 
     // loading original database file
     val loader = PaymentsDbMigrationTest::class.java.classLoader!!
-    val originalDb = loader.getResourceAsStream("sampledbs/v10/payments-testnet-28903aff.sqlite")!!
+    val originalDb = loader.getResourceAsStream(path)!!
 
     // make a copy in a temporary folder that we can safely edit later when testing the migration
     // TODO: fix temporary file creation
