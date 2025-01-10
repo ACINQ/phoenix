@@ -54,7 +54,7 @@ class PaymentsDbMigrationTest {
 
         val payments = paymentsDb.database.paymentsQueries.list(limit = Long.MAX_VALUE, offset = 0)
             .executeAsList()
-            .map { Serialization.deserialize(it).getOrThrow() }
+            .map { Serialization.deserialize(it.data_).getOrThrow() }
 
         assertEquals(2, payments.filterIsInstance<Bolt11IncomingPayment>().size)
         assertEquals(1, payments.filterIsInstance<LegacyPayToOpenIncomingPayment>().size)
@@ -79,7 +79,7 @@ class PaymentsDbMigrationTest {
 
         val payments = paymentsDb.database.paymentsQueries.list(limit = Long.MAX_VALUE, offset = 0)
             .executeAsList()
-            .map { Serialization.deserialize(it).getOrThrow() }
+            .map { Serialization.deserialize(it.data_).getOrThrow() }
 
         assertEquals(4, payments.filterIsInstance<Bolt11IncomingPayment>().size)
         assertEquals(1, payments.filterIsInstance<LegacyPayToOpenIncomingPayment>().size)
@@ -104,7 +104,7 @@ class PaymentsDbMigrationTest {
 
         val payments = paymentsDb.database.paymentsQueries.list(limit = Long.MAX_VALUE, offset = 0)
             .executeAsList()
-            .map { Serialization.deserialize(it).getOrThrow() }
+            .map { Serialization.deserialize(it.data_).getOrThrow() }
 
         assertEquals(1, payments.filterIsInstance<Bolt11IncomingPayment>().size)
         assertEquals(0, payments.filterIsInstance<LegacyPayToOpenIncomingPayment>().size)
@@ -129,7 +129,7 @@ class PaymentsDbMigrationTest {
 
         val payments = paymentsDb.database.paymentsQueries.list(limit = Long.MAX_VALUE, offset = 0)
             .executeAsList()
-            .map { Serialization.deserialize(it).getOrThrow() }
+            .map { Serialization.deserialize(it.data_).getOrThrow() }
 
         assertEquals(737, payments.size)
 

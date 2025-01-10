@@ -38,7 +38,7 @@ import fracinqphoenixdb.Payments_metadata
 import fracinqphoenixdb.Payments_outgoing
 
 
-fun createSqlitePaymentsDb(driver: SqlDriver, currencyManager: CurrencyManager): SqlitePaymentsDb {
+fun createSqlitePaymentsDb(driver: SqlDriver, currencyManager: CurrencyManager?): SqlitePaymentsDb {
     return SqlitePaymentsDb(
         driver = driver,
         database = PaymentsDatabase(
