@@ -1,13 +1,19 @@
 package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.BitcoinError
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Chain
+import fr.acinq.bitcoin.PrivateKey
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.Lightning
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.TrampolineFees
 import fr.acinq.lightning.db.LightningOutgoingPayment
+import fr.acinq.lightning.io.OfferInvoiceReceived
+import fr.acinq.lightning.io.OfferNotPaid
 import fr.acinq.lightning.io.PayInvoice
+import fr.acinq.lightning.io.PayOffer
+import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.logging.debug
 import fr.acinq.lightning.logging.error
@@ -31,12 +37,15 @@ import fr.acinq.phoenix.utils.DnsResolvers
 import fr.acinq.phoenix.utils.EmailLikeAddress
 import fr.acinq.phoenix.utils.Parser
 import io.ktor.http.Url
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.booleanOrNull
@@ -119,7 +128,8 @@ class SendManager(
         ): Success()
 
         data class Bolt12Offer(
-            val offer: OfferTypes.Offer
+            val offer: OfferTypes.Offer,
+            val lightningAddress: String?
         ): Success()
 
         data class Uri(
@@ -128,7 +138,8 @@ class SendManager(
 
         sealed class Lnurl: Success() {
             data class Pay(
-                val paymentIntent: LnurlPay.Intent
+                val paymentIntent: LnurlPay.Intent,
+                val lightningAddress: String?
             ): Lnurl()
 
             data class Withdraw(
@@ -151,18 +162,18 @@ class SendManager(
             Parser.readBolt11Invoice(input)?.let {
                 processBolt11Invoice(it)
             } ?: Parser.readOffer(input)?.let {
-                processOffer(it)
+                processOffer(it, null)
             } ?: readEmailLikeAddress(input, progress)?.let {
                 when (it) {
-                    is Either.Left -> processOffer(it.value)
-                    is Either.Right -> processLnurl(it.value, progress)
+                    is Either.Left -> processOffer(it.value, input)
+                    is Either.Right -> processLnurl(it.value, input, progress)
                 }
             } ?: readLnurl(input)?.let {
-                processLnurl(it, progress)
+                processLnurl(it, null, progress)
             } ?: readBitcoinAddress(input)?.let {
                 processBitcoinAddress(input, it)
             } ?: readLNURLFallback(input)?.let {
-                processLnurl(it, progress)
+                processLnurl(it, null, progress)
             } ?: run {
                 ParseResult.BadRequest(
                     request = request,
@@ -225,7 +236,8 @@ class SendManager(
     }
 
     private fun processOffer(
-        offer: OfferTypes.Offer
+        offer: OfferTypes.Offer,
+        lightningAddress: String?
     ): ParseResult {
 
         return if (!offer.chains.contains(chain.chainHash)) {
@@ -234,7 +246,7 @@ class SendManager(
                 reason = BadRequestReason.ChainMismatch(expected = chain)
             )
         } else {
-            ParseResult.Bolt12Offer(offer = offer)
+            ParseResult.Bolt12Offer(offer, lightningAddress)
         }
     }
 
@@ -324,6 +336,7 @@ class SendManager(
 
     private suspend fun processLnurl(
         lnurl: Lnurl,
+        lightningAddress: String?,
         progress: (p: ParseProgress) -> Unit
     ): ParseResult? {
         return when (lnurl) {
@@ -340,7 +353,7 @@ class SendManager(
                 try {
                     when (val result: Lnurl = task.await()) {
                         is LnurlPay.Intent -> {
-                            ParseResult.Lnurl.Pay(paymentIntent = result)
+                            ParseResult.Lnurl.Pay(paymentIntent = result, lightningAddress)
                         }
                         is LnurlWithdraw -> {
                             ParseResult.Lnurl.Withdraw(lnurlWithdraw = result)
@@ -403,7 +416,7 @@ class SendManager(
                 when {
                     address.isNotBlank() -> ParseResult.Uri(uri = result.value)
                     bolt11 != null -> ParseResult.Bolt11Invoice(request = input, invoice = bolt11)
-                    bolt12 != null -> ParseResult.Bolt12Offer(offer = bolt12)
+                    bolt12 != null -> ParseResult.Bolt12Offer(offer = bolt12, lightningAddress = null)
                     else -> ParseResult.BadRequest(request = input, reason = BadRequestReason.UnknownFormat)
                 }
             }
@@ -460,6 +473,52 @@ class SendManager(
         )
     }
 
+    suspend fun payBolt12Offer(
+        paymentId: UUID,
+        amount: MilliSatoshi,
+        offer: OfferTypes.Offer,
+        lightningAddress: String?,
+        payerKey: PrivateKey,
+        payerNote: String?,
+        contactSecret: ByteVector32?,
+        fetchInvoiceTimeout: Duration
+    ): OfferNotPaid? {
+        val peer = peerManager.getPeer()
+
+        lightningAddress?.let {
+            val metadata = WalletPaymentMetadata(lightningAddress = it)
+            WalletPaymentMetadataRow.serialize(metadata)?.let { row ->
+                databaseManager.paymentsDb().enqueueMetadata(
+                    row = row,
+                    id = WalletPaymentId.LightningOutgoingPaymentId(paymentId)
+                )
+            }
+        }
+
+        val res = CompletableDeferred<OfferNotPaid?>()
+        launch {
+            peer.eventsFlow.collect {
+                if (it is OfferNotPaid && it.request.paymentId == paymentId) {
+                    res.complete(it)
+                    cancel()
+                } else if (it is OfferInvoiceReceived && it.request.paymentId == paymentId) {
+                    res.complete(null)
+                    cancel()
+                }
+            }
+        }
+        peer.send(PayOffer(
+            paymentId = paymentId,
+            payerKey = payerKey,
+            payerNote = payerNote,
+            amount = amount,
+            offer = offer,
+            contactSecret = contactSecret,
+            fetchInvoiceTimeout = fetchInvoiceTimeout
+        ))
+        return res.await()
+    }
+
     /**
      * Step 1 of 2:
      * First call this function to convert the LnurlPay.Intent into a LnurlPay.Invoice.
@@ -467,12 +526,12 @@ class SendManager(
      * Note: This step is cancellable. The UI can simply ignore the result.
      */
     suspend fun lnurlPay_requestInvoice(
-        paymentIntent: LnurlPay.Intent,
+        pay: ParseResult.Lnurl.Pay,
         amount: MilliSatoshi,
         comment: String?
     ): Either<LnurlPayError, LnurlPay.Invoice> {
         val task = lnurlManager.requestPayInvoice(
-            intent = paymentIntent,
+            intent = pay.paymentIntent,
             amount = amount,
             comment = comment
         )
@@ -491,7 +550,7 @@ class SendManager(
                 else -> Either.Left(
                     LnurlPayError.RemoteError(
                         LnurlError.RemoteFailure.Unreadable(
-                            origin = paymentIntent.callback.host
+                            origin = pay.paymentIntent.callback.host
                         )
                     )
                 )
@@ -506,7 +565,7 @@ class SendManager(
      * Note: This step is non-cancellable.
      */
     suspend fun lnurlPay_payInvoice(
-        paymentIntent: LnurlPay.Intent,
+        pay: ParseResult.Lnurl.Pay,
         amount: MilliSatoshi,
         comment: String?,
         invoice: LnurlPay.Invoice,
@@ -518,11 +577,12 @@ class SendManager(
             invoice = invoice.invoice,
             metadata = WalletPaymentMetadata(
                 lnurl = LnurlPayMetadata(
-                    pay = paymentIntent,
-                    description = paymentIntent.metadata.plainText,
+                    pay = pay.paymentIntent,
+                    description = pay.paymentIntent.metadata.plainText,
                     successAction = invoice.successAction
                 ),
-                userNotes = comment
+                userNotes = comment,
+                lightningAddress = pay.lightningAddress
             )
         )
     }

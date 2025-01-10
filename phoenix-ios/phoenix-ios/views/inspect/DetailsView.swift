@@ -180,6 +180,19 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				paymentRequest_invoice(paymentRequest)
 			}
 		}
+		
+	#if DEBUG
+		if let metadata = incomingPayment.incomingOfferMetadataV2() {
+			
+			InlineSection {
+				header("BLIP 42 (DEBUG build only)")
+			} content: {
+				blip42_contactSecret(metadata.contactSecret)
+				blip42_offer(metadata.payerOffer)
+				blip42_address(metadata.payerAddress)
+			}
+		}
+	#endif
 
 		if let received = incomingPayment.received {
 
@@ -273,6 +286,19 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 					}
 				}
 			}
+			
+		#if DEBUG
+			if let request = outgoingPayment.outgoingInvoiceRequest() {
+				
+				InlineSection {
+					header("BLIP 42 (DEBUG build only)")
+				} content: {
+					blip42_contactSecret(request.contactSecret)
+					blip42_offer(request.payerOffer)
+					blip42_address(request.payerAddress)
+				}
+			}
+		#endif
 			
 		} else if let spliceOut = outgoingPayment as? Lightning_kmpSpliceOutgoingPayment {
 			
@@ -1161,6 +1187,81 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	) -> some View {
 		
 		common_channelId(payment.channelId)
+	}
+	
+	@ViewBuilder
+	func blip42_contactSecret(
+		_ secret: Bitcoin_kmpByteVector32?
+	) -> some View {
+		let identifier: String = #function
+		
+		InfoGridRowWrapper(
+			identifier: identifier,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
+			keyColumn("contact secret")
+			
+		} valueColumn: {
+			
+			if let str = secret?.toHex() {
+				Text(str)
+					.lineLimit(2)
+					.truncationMode(.middle)
+			} else {
+				Text(verbatim: "<null>")
+					.foregroundStyle(Color.secondary)
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func blip42_offer(
+		_ offer: Lightning_kmpOfferTypesOffer?
+	) -> some View {
+		let identifier: String = #function
+		
+		InfoGridRowWrapper(
+			identifier: identifier,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
+			keyColumn("payer offer")
+			
+		} valueColumn: {
+			
+			if let str = offer?.encode() {
+				Text(str)
+					.lineLimit(2)
+					.truncationMode(.middle)
+			} else {
+				Text(verbatim: "<null>")
+					.foregroundStyle(Color.secondary)
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func blip42_address(
+		_ address: Lightning_kmpContactAddress?
+	) -> some View {
+		let identifier: String = #function
+		
+		InfoGridRowWrapper(
+			identifier: identifier,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
+			keyColumn("payer address")
+			
+		} valueColumn: {
+			
+			if let str = address?.description() {
+				Text(str)
+					.lineLimit(2)
+					.truncationMode(.middle)
+			} else {
+				Text(verbatim: "<null>")
+					.foregroundStyle(Color.secondary)
+			}
+		}
 	}
 	
 	// --------------------------------------------------

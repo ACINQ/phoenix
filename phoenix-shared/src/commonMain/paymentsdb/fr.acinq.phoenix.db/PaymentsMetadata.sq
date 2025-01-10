@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS payments_metadata (
     modified_at INTEGER DEFAULT NULL,
     original_fiat_type TEXT DEFAULT NULL,
     original_fiat_rate REAL DEFAULT NULL,
+    lightning_address TEXT DEFAULT NULL,
     PRIMARY KEY (type, id)
 );
 
@@ -47,8 +48,9 @@ INSERT INTO payments_metadata (
             lnurl_successAction_type, lnurl_successAction_blob,
             user_description, user_notes,
             modified_at,
-            original_fiat_type, original_fiat_rate)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+            original_fiat_type, original_fiat_rate,
+            lightning_address)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 updateUserInfo:
 UPDATE payments_metadata
@@ -57,19 +59,13 @@ SET    user_description = ?,
        modified_at = ?
 WHERE  type = ? AND id = ?;
 
-fetchDescriptions:
-SELECT lnurl_description,
-       user_description,
-       modified_at
-FROM   payments_metadata
-WHERE  type = ? AND id = ?;
-
-fetchDescriptionsAndOriginalFiat:
+fetchCommon:
 SELECT lnurl_description,
        user_description,
        modified_at,
        original_fiat_type,
-       original_fiat_rate
+       original_fiat_rate,
+       lightning_address
 FROM   payments_metadata
 WHERE  type = ? AND id = ?;
 

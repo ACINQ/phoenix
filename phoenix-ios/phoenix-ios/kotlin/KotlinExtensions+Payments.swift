@@ -180,12 +180,16 @@ extension WalletPaymentInfo {
 		return String(localized: "No description", comment: "placeholder text")
 	}
 	
+	func hasAttachedMessage() -> Bool {
+		return attachedMessage() != nil
+	}
+	
 	func attachedMessage() -> String? {
 		
 		var msg: String? = nil
 		
 		if let incomingOfferMetadata = payment.incomingOfferMetadata() {
-			msg = incomingOfferMetadata.payerNote
+			msg = incomingOfferMetadata.payerNote_
 			
 		} else if let outgoingInvoiceRequest = payment.outgoingInvoiceRequest() {
 			msg = outgoingInvoiceRequest.payerNote
@@ -198,6 +202,52 @@ extension WalletPaymentInfo {
 			return nil
 		}
 	}
+	
+	func canAddToContacts() -> Bool {
+		return addToContactsInfo() != nil
+	}
+	
+	func addToContactsInfo() -> AddToContactsInfo? {
+	
+		if let incoming = payment as? Lightning_kmpIncomingPayment {
+
+			if let metadata = payment.incomingOfferMetadataV2() {
+				if let rawSecret = metadata.contactSecret {
+					let offer = metadata.payerOffer
+					let address = metadata.payerAddress?.description()
+					if (offer != nil) || (address != nil) {
+						let secret = ContactSecret(
+							id: rawSecret,
+							incomingPaymentId: incoming.paymentHash,
+							createdAt: Date.now.toInstant()
+						)
+						return AddToContactsInfo(offer: offer, address: address, secret: secret)
+					}
+				}
+			}
+
+		} else if payment is Lightning_kmpOutgoingPayment {
+			
+			// First check for a lightning address.
+			// Remember that an outgoing payment might have both an address & offer (i.e. BIP-353).
+			// But from the user's perspective, they sent a payment to the address.
+			// The fact that it used an offer under-the-hood is just a technicality.
+			// What they expect to save is the lightning address.
+			//
+			// Note: in the future we may support something like "offer pinning" for an LN address.
+			// But that's a different feature. The user's perspective remains the same.
+			//
+			if let address = self.metadata.lightningAddress {
+				return AddToContactsInfo(offer: nil, address: address, secret: nil)
+			}
+			
+			if let offer = payment.outgoingInvoiceRequest()?.offer {
+				return AddToContactsInfo(offer: offer, address: nil, secret: nil)
+			}
+		}
+
+		return nil
+	}
 }
 
 extension WalletPaymentMetadata {
@@ -208,6 +258,7 @@ extension WalletPaymentMetadata {
 			originalFiat: nil,
 			userDescription: nil,
 			userNotes: nil,
+			lightningAddress: nil,
 			modifiedAt: nil
 		)
 	}

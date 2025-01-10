@@ -36,16 +36,15 @@ import fr.acinq.lightning.crypto.KeyManager
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.io.NativeSocketException
-import fr.acinq.lightning.io.OfferInvoiceReceived
 import fr.acinq.lightning.io.OfferNotPaid
 import fr.acinq.lightning.io.PaymentNotSent
 import fr.acinq.lightning.io.PaymentProgress
 import fr.acinq.lightning.io.PaymentSent
-import fr.acinq.lightning.io.PayOffer
 import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.io.PeerEvent
-import fr.acinq.lightning.io.SendPaymentResult
 import fr.acinq.lightning.io.TcpSocket
+import fr.acinq.lightning.payment.ContactSecrets
+import fr.acinq.lightning.payment.Contacts
 import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.payment.OutgoingPaymentFailure
@@ -57,13 +56,9 @@ import fr.acinq.lightning.utils.toByteArray
 import fr.acinq.lightning.utils.toNSData
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.lightning.wire.OfferTypes
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterIsInstance
+import fr.acinq.phoenix.managers.SendManager
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import platform.Foundation.NSData
 import kotlin.time.Duration.Companion.seconds
 
@@ -364,6 +359,13 @@ fun Lightning_randomBytes32(): ByteVector32 = Lightning.randomBytes32()
 fun Lightning_randomBytes64(): ByteVector64 = Lightning.randomBytes64()
 fun Lightning_randomKey(): PrivateKey = Lightning.randomKey()
 
+fun Contacts_computeContactSecret(
+    ourOffer: OfferTypes.OfferAndKey,
+    theirOffer: OfferTypes.Offer
+): ContactSecrets {
+    return Contacts.computeContactSecret(ourOffer, theirOffer)
+}
+
 fun NSData_toByteArray(data: NSData): ByteArray = data.toByteArray()
 fun NSData_copyTo(data: NSData, buffer: ByteArray, offset: Int = 0) = data.copyTo(buffer, offset)
 fun ByteArray_toNSDataSlice(buffer: ByteArray, offset: Int, length: Int): NSData = buffer.toNSData(offset = offset, length = length)
@@ -381,46 +383,26 @@ suspend fun Peer.fundingRate(amount: Satoshi): LiquidityAds.FundingRate? {
     return this.remoteFundingRates.filterNotNull().first().findRate(amount)
 }
 
-suspend fun Peer.altPayOffer(
+// kotlinx.datetime.Duration isn't properly exposed to iOS.
+// So we need this little workaround until that issue is fixed.
+suspend fun SendManager._payBolt12Offer(
     paymentId: UUID,
     amount: MilliSatoshi,
     offer: OfferTypes.Offer,
+    lightningAddress: String?,
     payerKey: PrivateKey,
     payerNote: String?,
-    fetchInvoiceTimeoutInSeconds: Int
-): SendPaymentResult {
-    val res = CompletableDeferred<SendPaymentResult>()
-    this.launch {
-        res.complete(eventsFlow
-            .filterIsInstance<SendPaymentResult>()
-            .filter { it.request.paymentId == paymentId }
-            .first()
-        )
-    }
-    send(PayOffer(paymentId, payerKey, payerNote, amount, offer, fetchInvoiceTimeoutInSeconds.seconds))
-    return res.await()
-}
-
-suspend fun Peer.betterPayOffer(
-    paymentId: UUID,
-    amount: MilliSatoshi,
-    offer: OfferTypes.Offer,
-    payerKey: PrivateKey,
-    payerNote: String?,
+    contactSecret: ByteVector32?,
     fetchInvoiceTimeoutInSeconds: Int
 ): OfferNotPaid? {
-    val res = CompletableDeferred<OfferNotPaid?>()
-    launch {
-        eventsFlow.collect {
-            if (it is OfferNotPaid && it.request.paymentId == paymentId) {
-                res.complete(it)
-                cancel()
-            } else if (it is OfferInvoiceReceived && it.request.paymentId == paymentId) {
-                res.complete(null)
-                cancel()
-            }
-        }
-    }
-    send(PayOffer(paymentId, payerKey, payerNote, amount, offer, fetchInvoiceTimeoutInSeconds.seconds))
-    return res.await()
+    return payBolt12Offer(
+        paymentId = paymentId,
+        amount = amount,
+        offer = offer,
+        lightningAddress = lightningAddress,
+        payerKey = payerKey,
+        payerNote = payerNote,
+        contactSecret = contactSecret,
+        fetchInvoiceTimeout = fetchInvoiceTimeoutInSeconds.seconds
+    )
 }
