@@ -27,8 +27,6 @@ import fr.acinq.lightning.db.OnChainOutgoingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.serialization.payment.Serialization
 import fr.acinq.lightning.utils.UUID
-import fr.acinq.phoenix.data.WalletPaymentMetadata
-import fr.acinq.phoenix.db.UUIDAdapter
 import fr.acinq.phoenix.db.migrations.v11.queries.ChannelCloseOutgoingQueries
 import fr.acinq.phoenix.db.migrations.v11.queries.InboundLiquidityQueries
 import fr.acinq.phoenix.db.migrations.v11.queries.LightningOutgoingQueries
@@ -44,7 +42,6 @@ import fr.acinq.phoenix.db.payments.LnurlSuccessAction
 import fr.acinq.phoenix.db.payments.WalletPaymentMetadataRow
 import fr.acinq.phoenix.utils.extensions.deriveUUID
 import fr.acinq.phoenix.utils.extensions.toByteArray
-import fracinqphoenixdb.Payments_metadata
 
 val AfterVersion11 = AfterVersion(11) { driver ->
 
@@ -421,6 +418,7 @@ val AfterVersion11 = AfterVersion(11) { driver ->
         listOf(
             "DROP TABLE outgoing_payments",
             "DROP TABLE outgoing_payment_parts",
+            "DROP TABLE outgoing_payment_closing_tx_parts",
             "DROP TABLE inbound_liquidity_outgoing_payments",
             "DROP TABLE splice_outgoing_payments",
             "DROP TABLE splice_cpfp_outgoing_payments",
