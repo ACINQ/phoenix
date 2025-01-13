@@ -60,12 +60,14 @@ fun SplashLightningOutgoing(
     metadata: WalletPaymentMetadata,
     onMetadataDescriptionUpdate: (UUID, String?) -> Unit,
 ) {
+    SplashAmount(amount = payment.amount - payment.fees, state = payment.state(), isOutgoing = true)
+
     metadata.lnurl?.let { lnurlMeta ->
         LnurlPayInfoView(payment, lnurlMeta)
     }
 
     payment.outgoingInvoiceRequest()?.payerNote?.takeIf { it.isNotBlank() }?.let {
-        OfferPayerNote(payerNote = it)
+        SplashOfferPayerNote(payerNote = it)
     }
 
     SplashDescription(

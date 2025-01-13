@@ -22,12 +22,12 @@ import androidx.compose.ui.res.stringResource
 import fr.acinq.lightning.db.Bolt12IncomingPayment
 import fr.acinq.lightning.payment.OfferPaymentMetadata
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.payments.details.IncomingAmountSection
-import fr.acinq.phoenix.android.payments.details.TechnicalCard
+import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.payments.details.TechnicalRow
 import fr.acinq.phoenix.android.payments.details.TechnicalRowAmount
 import fr.acinq.phoenix.android.payments.details.TechnicalRowSelectable
 import fr.acinq.phoenix.android.payments.details.TimestampSection
+import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
 import fr.acinq.phoenix.data.ExchangeRate
 
 @Composable
@@ -35,9 +35,9 @@ fun TechnicalIncomingBolt12(
     payment: Bolt12IncomingPayment,
     originalFiatRate: ExchangeRate.BitcoinPriceRate?,
 ) {
-    TechnicalCard {
+    Card {
         TechnicalRow(label = stringResource(id = R.string.paymentdetails_payment_type_label)) {
-            Text(text = stringResource(R.string.paymentdetails_offer_incoming))
+            Text(text = stringResource(R.string.paymentdetails_type_incoming_bolt12))
         }
         TechnicalRow(label = stringResource(id = R.string.paymentdetails_status_label)) {
             Text(text = when (payment.completedAt) {
@@ -46,24 +46,33 @@ fun TechnicalIncomingBolt12(
             })
         }
     }
-    TechnicalCard {
+
+    Card {
         TimestampSection(payment)
     }
-    TechnicalCard {
-        IncomingAmountSection(payment.amountReceived, null, null, originalFiatRate)
-        Bolt12MetadataSection(metadata = payment.metadata)
+
+    Card {
+        TechnicalRowAmount(
+            label = stringResource(R.string.paymentdetails_amount_received_label),
+            amount = payment.amountReceived,
+            rateThen = originalFiatRate,
+            mSatDisplayPolicy = MSatDisplayPolicy.SHOW
+        )
+        IncomingBolt12Details(metadata = payment.metadata, originalFiatRate = originalFiatRate)
     }
+
     LightningPartsSection(payment = payment, originalFiatRate = originalFiatRate)
 }
 
 @Composable
-private fun Bolt12MetadataSection(
-    metadata: OfferPaymentMetadata
+fun IncomingBolt12Details(
+    metadata: OfferPaymentMetadata,
+    originalFiatRate: ExchangeRate.BitcoinPriceRate?,
 ) {
     TechnicalRowAmount(
         label = stringResource(id = R.string.paymentdetails_invoice_requested_label),
         amount = metadata.amount,
-        rateThen = null
+        rateThen = originalFiatRate
     )
     TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = metadata.paymentHash.toHex())
     TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_preimage_label), value = metadata.preimage.toHex())

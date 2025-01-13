@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 ACINQ SAS
+ * Copyright 2025 ACINQ SAS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,39 +22,40 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.bitcoin.PublicKey
-import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.db.Bolt12IncomingPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.msat
-import fr.acinq.lightning.utils.sat
-import fr.acinq.lightning.utils.sum
-import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.SplashLabelRow
 import fr.acinq.phoenix.android.components.contact.ContactCompactView
 import fr.acinq.phoenix.android.components.contact.OfferContactState
+import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
 import fr.acinq.phoenix.android.utils.extensions.smartDescription
 import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.utils.extensions.incomingOfferMetadata
+import fr.acinq.phoenix.utils.extensions.state
+
 
 @Composable
-fun SplashIncoming(
-    payment: IncomingPayment,
+fun SplashIncomingBolt12(
+    payment: Bolt12IncomingPayment,
     metadata: WalletPaymentMetadata,
     onMetadataDescriptionUpdate: (UUID, String?) -> Unit,
 ) {
+    SplashAmount(amount = payment.amount, state = payment.state(), isOutgoing = false)
+
     payment.incomingOfferMetadata()?.let { meta ->
         meta.payerNote?.takeIf { it.isNotBlank() }?.let {
-            OfferPayerNote(payerNote = it)
+            SplashOfferPayerNote(payerNote = it)
         }
         OfferSentBy(payerPubkey = meta.payerKey, !meta.payerNote.isNullOrBlank())
     }
@@ -65,11 +66,12 @@ fun SplashIncoming(
         paymentId = payment.id,
         onMetadataDescriptionUpdate = onMetadataDescriptionUpdate,
     )
-    SplashFee(payment)
+
+    SplashFeeLightningIncoming(payment)
 }
 
 @Composable
-fun OfferPayerNote(payerNote: String) {
+fun SplashOfferPayerNote(payerNote: String) {
     Spacer(modifier = Modifier.height(8.dp))
     SplashLabelRow(label = stringResource(id = R.string.paymentdetails_offer_note_label)) {
         Text(text = payerNote)
@@ -105,50 +107,4 @@ private fun OfferSentBy(payerPubkey: PublicKey?, hasPayerNote: Boolean) {
             }
         }
     }
-}
-
-@Composable
-private fun SplashFee(
-    payment: IncomingPayment
-) {
-    Text("TODO: separate SplashIncoming into different components")
-//    val btcUnit = LocalBitcoinUnit.current
-//    val receivedWithOnChain = remember(payment) { payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.OnChainIncomingPayment>() ?: emptyList() }
-//    val receivedWithLightning = remember(payment) { payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.LightningPayment>() ?: emptyList() }
-//
-//    if (receivedWithOnChain.isNotEmpty() || receivedWithLightning.isNotEmpty()) {
-//
-//        val paymentsManager = business.paymentsManager
-//        val txIds = remember(receivedWithLightning) { receivedWithLightning.mapNotNull { it.fundingFee?.fundingTxId } }
-//        val relatedLiquidityPayments by produceState(initialValue = emptyList()) {
-//            value = txIds.mapNotNull { paymentsManager.getLiquidityPurchaseForTxId(it) }
-//        }
-//
-//        val serviceFee = remember(receivedWithOnChain, relatedLiquidityPayments) {
-//            receivedWithOnChain.map { it.serviceFee }.sum() + relatedLiquidityPayments.map { it.feePaidFromFutureHtlc.serviceFee.toMilliSatoshi() }.sum()
-//        }
-//        val miningFee = remember(receivedWithOnChain, relatedLiquidityPayments) {
-//            receivedWithOnChain.map { it.miningFee }.sum() + relatedLiquidityPayments.map { it.feePaidFromFutureHtlc.miningFee }.sum()
-//        }
-//
-//        Spacer(modifier = Modifier.height(8.dp))
-//        if (serviceFee > 0.msat) {
-//            SplashLabelRow(
-//                label = stringResource(id = R.string.paymentdetails_service_fees_label),
-//                helpMessage = stringResource(R.string.paymentdetails_service_fees_desc)
-//            ) {
-//                Text(text = serviceFee.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW))
-//            }
-//            Spacer(modifier = Modifier.height(8.dp))
-//        }
-//
-//        if (miningFee > 0.sat) {
-//            SplashLabelRow(
-//                label = stringResource(id = R.string.paymentdetails_funding_fees_label),
-//                helpMessage = stringResource(R.string.paymentdetails_funding_fees_desc)
-//            ) {
-//                Text(text = miningFee.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.HIDE))
-//            }
-//        }
-//    }
 }

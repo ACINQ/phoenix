@@ -113,7 +113,6 @@ fun HomeView(
     val payments by paymentsViewModel.homePaymentsFlow.collectAsState()
     val swapInBalance = business.balanceManager.swapInWalletBalance.collectAsState()
     val finalWallet = business.peerManager.finalWallet.collectAsState()
-    val pendingChannelsBalance = business.balanceManager.pendingChannelsBalance.collectAsState()
 
     BackHandler {
         // force the back button to minimize the app
@@ -242,7 +241,6 @@ fun HomeView(
                     balanceDisplayMode = balanceDisplayMode,
                     swapInBalance = swapInBalance.value,
                     finalWalletBalance = finalWallet.value?.all?.balance ?: 0.sat,
-                    unconfirmedChannelsBalance = pendingChannelsBalance.value,
                     onNavigateToSwapInWallet = onNavigateToSwapInWallet,
                     onNavigateToFinalWallet = onNavigateToFinalWallet,
                 )

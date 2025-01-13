@@ -21,19 +21,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.db.Bolt11IncomingPayment
-import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.LightningIncomingPayment
+import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.CardHeader
-import fr.acinq.phoenix.android.payments.details.ChannelIdRow
-import fr.acinq.phoenix.android.payments.details.IncomingAmountSection
-import fr.acinq.phoenix.android.payments.details.TechnicalCard
+import fr.acinq.phoenix.android.payments.details.Bolt11InvoiceSection
 import fr.acinq.phoenix.android.payments.details.TechnicalRow
 import fr.acinq.phoenix.android.payments.details.TechnicalRowAmount
 import fr.acinq.phoenix.android.payments.details.TechnicalRowSelectable
 import fr.acinq.phoenix.android.payments.details.TimestampSection
-import fr.acinq.phoenix.android.payments.details.TransactionRow
 import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
+import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
 import fr.acinq.phoenix.data.ExchangeRate
 
 @Composable
@@ -41,9 +40,9 @@ fun TechnicalIncomingBolt11(
     payment: Bolt11IncomingPayment,
     originalFiatRate: ExchangeRate.BitcoinPriceRate?,
 ) {
-    TechnicalCard {
+    Card {
         TechnicalRow(label = stringResource(id = R.string.paymentdetails_payment_type_label)) {
-            Text(text = stringResource(R.string.paymentdetails_normal_incoming))
+            Text(text = stringResource(R.string.paymentdetails_type_incoming_bolt11))
         }
         TechnicalRow(label = stringResource(id = R.string.paymentdetails_status_label)) {
             Text(
@@ -54,12 +53,19 @@ fun TechnicalIncomingBolt11(
             )
         }
     }
-    TechnicalCard {
+
+    Card {
         TimestampSection(payment)
     }
-    TechnicalCard {
-        IncomingAmountSection(payment.amountReceived, null, null, originalFiatRate)
-        TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_preimage_label), value = payment.paymentPreimage.toHex())
+
+    Card {
+        TechnicalRowAmount(
+            label = stringResource(R.string.paymentdetails_amount_received_label),
+            amount = payment.amountReceived,
+            rateThen = originalFiatRate,
+            mSatDisplayPolicy = MSatDisplayPolicy.SHOW
+        )
+        Bolt11InvoiceSection(invoice = payment.paymentRequest, preimage = payment.paymentPreimage, originalFiatRate = originalFiatRate)
     }
 
     LightningPartsSection(payment = payment, originalFiatRate = originalFiatRate)
@@ -74,7 +80,7 @@ fun LightningPartsSection(
 
     CardHeader(text = stringResource(id = R.string.paymentdetails_parts_label, payment.parts.size))
     payment.parts.forEach { part ->
-        TechnicalCard {
+        Card {
             when (part) {
                 is LightningIncomingPayment.Part.Htlc -> {
                     TechnicalRow(label = stringResource(id = R.string.paymentdetails_received_with_label)) {

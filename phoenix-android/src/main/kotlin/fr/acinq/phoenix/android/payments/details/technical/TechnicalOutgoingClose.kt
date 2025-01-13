@@ -16,15 +16,18 @@
 
 package fr.acinq.phoenix.android.payments.details.technical
 
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
 import fr.acinq.lightning.db.ChannelClosingType
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.payments.details.ChannelIdRow
 import fr.acinq.phoenix.android.payments.details.OutgoingAmountSection
-import fr.acinq.phoenix.android.payments.details.TechnicalCard
+import fr.acinq.phoenix.android.payments.details.TechnicalRow
 import fr.acinq.phoenix.android.payments.details.TechnicalRowSelectable
+import fr.acinq.phoenix.android.payments.details.TimestampSection
 import fr.acinq.phoenix.android.payments.details.TransactionRow
 import fr.acinq.phoenix.data.ExchangeRate
 
@@ -33,8 +36,23 @@ fun TechnicalOutgoingChannelClose(
     payment: ChannelCloseOutgoingPayment,
     originalFiatRate: ExchangeRate.BitcoinPriceRate?,
 ) {
+    Card {
+        TechnicalRow(label = stringResource(id = R.string.paymentdetails_payment_type_label)) {
+            Text(text = stringResource(id = R.string.paymentdetails_type_outgoing_close))
+        }
+        TechnicalRow(label = stringResource(id = R.string.paymentdetails_status_label)) {
+            Text(text = when (payment.confirmedAt) {
+                null -> stringResource(R.string.paymentdetails_status_pending)
+                else -> stringResource(R.string.paymentdetails_status_success)
+            })
+        }
+    }
 
-    TechnicalCard {
+    Card {
+        TimestampSection(payment = payment)
+    }
+
+    Card {
         OutgoingAmountSection(payment = payment, originalFiatRate = originalFiatRate)
         ChannelIdRow(payment.channelId)
         TechnicalRowSelectable(

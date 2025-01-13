@@ -24,18 +24,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.NewChannelIncomingPayment
+import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.InlineTransactionLink
 import fr.acinq.phoenix.android.payments.details.ChannelIdRow
-import fr.acinq.phoenix.android.payments.details.IncomingAmountSection
-import fr.acinq.phoenix.android.payments.details.TechnicalCard
 import fr.acinq.phoenix.android.payments.details.TechnicalRow
 import fr.acinq.phoenix.android.payments.details.TechnicalRowAmount
 import fr.acinq.phoenix.android.payments.details.TimestampSection
 import fr.acinq.phoenix.android.payments.details.TransactionRow
+import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
 import fr.acinq.phoenix.data.ExchangeRate
 
 @Composable
@@ -43,9 +42,9 @@ fun TechnicalIncomingNewChannel(
     payment: NewChannelIncomingPayment,
     originalFiatRate: ExchangeRate.BitcoinPriceRate?,
 ) {
-    TechnicalCard {
+    Card {
         TechnicalRow(label = stringResource(id = R.string.paymentdetails_payment_type_label)) {
-            Text(text = "TODO type new-channel")
+            Text(text = stringResource(id = R.string.paymentdetails_type_incoming_onchain_newchannel))
         }
         TechnicalRow(label = stringResource(id = R.string.paymentdetails_status_label)) {
             Text(text = when {
@@ -56,17 +55,31 @@ fun TechnicalIncomingNewChannel(
         }
     }
 
-    TechnicalCard {
+    Card {
         TimestampSection(payment = payment)
     }
 
-    TechnicalCard {
-        IncomingAmountSection(
-            amountReceived = payment.amountReceived,
-            minerFee = payment.miningFee,
-            serviceFee = payment.serviceFee,
-            originalFiatRate = originalFiatRate
+    Card {
+        TechnicalRowAmount(
+            label = stringResource(R.string.paymentdetails_amount_received_label),
+            amount = payment.amountReceived,
+            rateThen = originalFiatRate,
+            mSatDisplayPolicy = MSatDisplayPolicy.SHOW
         )
+        TechnicalRowAmount(
+            label = stringResource(id = R.string.paymentdetails_service_fees_label),
+            amount = payment.serviceFee,
+            rateThen = originalFiatRate,
+            mSatDisplayPolicy = MSatDisplayPolicy.SHOW
+        )
+        TechnicalRowAmount(
+            label = stringResource(id = R.string.paymentdetails_funding_fees_label),
+            amount = payment.miningFee.toMilliSatoshi(),
+            rateThen = originalFiatRate,
+            mSatDisplayPolicy = MSatDisplayPolicy.HIDE
+        )
+        ChannelIdRow(channelId = payment.channelId)
+        TransactionRow(txId = payment.txId)
         TechnicalRow(label = stringResource(id = R.string.paymentdetails_dualswapin_tx_label)) {
             payment.localInputs.mapIndexed { index, outpoint ->
                 Row {

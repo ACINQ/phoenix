@@ -16,10 +16,15 @@
 
 package fr.acinq.phoenix.android.payments.details.technical
 
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
+import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.payments.details.OutgoingAmountSection
-import fr.acinq.phoenix.android.payments.details.TechnicalCard
+import fr.acinq.phoenix.android.payments.details.TechnicalRow
+import fr.acinq.phoenix.android.payments.details.TimestampSection
 import fr.acinq.phoenix.android.payments.details.TransactionRow
 import fr.acinq.phoenix.data.ExchangeRate
 
@@ -28,7 +33,23 @@ fun TechnicalOutgoingSpliceCpfp(
     payment: SpliceCpfpOutgoingPayment,
     originalFiatRate: ExchangeRate.BitcoinPriceRate?,
 ) {
-    TechnicalCard {
+    Card {
+        TechnicalRow(label = stringResource(id = R.string.paymentdetails_payment_type_label)) {
+            Text(text = stringResource(id = R.string.paymentdetails_type_outgoing_splice_cpfp))
+        }
+        TechnicalRow(label = stringResource(id = R.string.paymentdetails_status_label)) {
+            Text(text = when (payment.confirmedAt) {
+                null -> stringResource(R.string.paymentdetails_status_pending)
+                else -> stringResource(R.string.paymentdetails_status_success)
+            })
+        }
+    }
+
+    Card {
+        TimestampSection(payment = payment)
+    }
+
+    Card {
         OutgoingAmountSection(payment = payment, originalFiatRate = originalFiatRate)
         TransactionRow(payment.txId)
     }

@@ -445,16 +445,20 @@
 
     <string name="paymentdetails_technical_title">Technical details</string>
     <string name="paymentdetails_payment_type_label">Type of payment</string>
-    <string name="paymentdetails_closing">Channel closing payment</string>
-    <string name="paymentdetails_splice_outgoing">Outgoing splice payment</string>
-    <string name="paymentdetails_splice_cpfp_outgoing">Accelerate on-chain transactions</string>
-    <string name="paymentdetails_inbound_liquidity">Request inbound liquidity</string>
-    <string name="paymentdetails_normal_outgoing">Outgoing Lightning payment (standard)</string>
-    <string name="paymentdetails_normal_incoming">Incoming Lightning payment (standard)</string>
-    <string name="paymentdetails_swapin">Swap-in Bitcoin deposit</string>
-    <string name="paymentdetails_swapout">Swap-out to Bitcoin address</string>
-    <string name="paymentdetails_offer_outgoing">Outgoing Lightning payment (offer)</string>
-    <string name="paymentdetails_offer_incoming">Incoming Lightning payment (offer)</string>
+    <string name="paymentdetails_type_outgoing_close">Channel closing</string>
+    <string name="paymentdetails_type_incoming_onchain_splice">Incoming on-chain payment (splice)</string>
+    <string name="paymentdetails_type_incoming_onchain_newchannel">Incoming on-chain payment (new channel)</string>
+    <string name="paymentdetails_type_incoming_legacy_paytoopen">Incoming payment (legacy pay-to-open)</string>
+    <string name="paymentdetails_type_incoming_legacy_swapin">Incoming on-chain payment (legacy swap-in)</string>
+    <string name="paymentdetails_type_incoming_bolt11">Incoming Lightning payment (bolt11)</string>
+    <string name="paymentdetails_type_incoming_bolt12">Incoming Lightning payment (bolt12)</string>
+    <string name="paymentdetails_type_outgoing_bolt11">Outgoing Lightning payment (bolt11)</string>
+    <string name="paymentdetails_type_outgoing_bolt12">Outgoing Lightning payment (bolt12)</string>
+    <string name="paymentdetails_type_outgoing_splice">Outgoing on-chain payment</string>
+    <string name="paymentdetails_type_outgoing_swapout">Outgoing on-chain payment (legacy swap)</string>
+    <string name="paymentdetails_type_outgoing_splice_cpfp">Accelerate on-chain transactions</string>
+    <string name="paymentdetails_type_outgoing_liquidity">Inbound liquidity request</string>
+
     <string name="paymentdetails_swapin_address_label">Deposit address</string>
     <string name="paymentdetails_bitcoin_address_label">Bitcoin address</string>
 
@@ -472,15 +476,15 @@
     <string name="paymentdetails_closing_type_other">Other</string>
 
     <string name="paymentdetails_pubkey_label">Target public key</string>
-    <string name="paymentdetails_payment_request_description_label">Invoice description</string>
     <string name="paymentdetails_payment_hash_label">Payment Hash</string>
-    <string name="paymentdetails_payment_request_label">Invoice</string>
     <string name="paymentdetails_preimage_label">Preimage</string>
+    <string name="paymentdetails_bolt11_label">Bolt11 invoice</string>
+    <string name="paymentdetails_bolt11_description_label">Invoice description</string>
+    <string name="paymentdetails_bolt12_label">Bolt12 invoice</string>
+    <string name="paymentdetails_offer_label">Offer</string>
+    <string name="paymentdetails_offer_metadata_label">Metadata</string>
     <string name="paymentdetails_payerkey_label">Payer key</string>
     <string name="paymentdetails_payerkey_is_mine">Your offer key</string>
-    <string name="paymentdetails_offer_label">Offer</string>
-    <string name="paymentdetails_bolt12_label">Bolt12 invoice</string>
-    <string name="paymentdetails_offer_metadata_label">Metadata</string>
     <string name="paymentdetails_liquidity_purchase_type">Purchase type</string>
 
     <string name="paymentdetails_status_label">Payment status</string>
@@ -494,8 +498,7 @@
     <string name="paymentdetails_part_hops_label">Hops</string>
 
     <string name="paymentdetails_received_with_label">Received via</string>
-    <string name="paymentdetails_received_with_splicein">Splice-in (adding to existing channel)</string>
-    <string name="paymentdetails_received_with_channel">New channel (automatically created)</string>
+    <string name="paymentdetails_received_with_legacy_onchain">Channel operation (new or splice-in)</string>
     <string name="paymentdetails_received_with_lightning">Lightning payment</string>
     <string name="paymentdetails_received_with_fee_credit">Fee credit</string>
     <string name="paymentdetails_channel_id_label">Channel id</string>

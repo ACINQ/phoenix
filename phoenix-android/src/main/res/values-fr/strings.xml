@@ -350,9 +350,7 @@
     <string name="paymentdetails_offer_note_label">Message</string>
     <string name="paymentdetails_offer_sender_label">Envoyé par</string>
     <string name="paymentdetails_offer_sender_unknown">Inconnu</string>
-    <string name="paymentdetails_offer_sender_unknown_details">Prenez garde aux message venant d\'inconnus</string>
-    <string name="paymentdetails_offer_outgoing">Paiement Lightning sortant (offre)</string>
-    <string name="paymentdetails_offer_incoming">Paiement Lightning entrant (offre)</string>
+    <string name="paymentdetails_offer_sender_unknown_details">Prenez garde aux messages de source inconnue</string>
     <string name="paymentdetails_payerkey_is_mine">Clé de votre code Bolt12</string>
 
     <string name="paymentdetails_desc_splice_out">Paiement on-chain</string>
@@ -377,14 +375,14 @@
 
     <string name="paymentdetails_technical_title">Détails techniques</string>
     <string name="paymentdetails_payment_type_label">Type de paiement</string>
-    <string name="paymentdetails_closing">Clôture de canal de paiement</string>
-    <string name="paymentdetails_splice_outgoing">Splice sortant</string>
-    <string name="paymentdetails_splice_cpfp_outgoing">Accélération de transactions on-chain</string>
-    <string name="paymentdetails_inbound_liquidity">Requête de liquidité entrante</string>
-    <string name="paymentdetails_normal_outgoing">Paiement Lightning sortant (standard)</string>
-    <string name="paymentdetails_normal_incoming">Paiement Lightning entrant (standard)</string>
-    <string name="paymentdetails_swapin">Dépôt on-chain (swap-in)</string>
-    <string name="paymentdetails_swapout">Swap-out vers une adresse Bitcoin</string>
+    <string name="paymentdetails_type_outgoing_close">Clôture de canal de paiement</string>
+    <string name="paymentdetails_type_outgoing_splice">Splice sortant</string>
+    <string name="paymentdetails_type_outgoing_splice_cpfp">Accélération de transactions on-chain</string>
+    <string name="paymentdetails_type_outgoing_liquidity">Requête de liquidité entrante</string>
+    <string name="paymentdetails_type_outgoing_bolt11">Paiement Lightning sortant (bolt11)</string>
+    <string name="paymentdetails_type_outgoing_bolt12">Paiement Lightning sortant (bolt12)</string>
+    <string name="paymentdetails_type_incoming_bolt11">Paiement Lightning entrant (bolt11)</string>
+    <string name="paymentdetails_type_incoming_bolt12">Paiement Lightning entrant (bolt12)</string>
     <string name="paymentdetails_swapin_address_label">Adresse de dépôt on-chain</string>
     <string name="paymentdetails_bitcoin_address_label">Adresse Bitcoin</string>
 
@@ -402,9 +400,9 @@
     <string name="paymentdetails_closing_type_other">Autre</string>
 
     <string name="paymentdetails_pubkey_label">Clé publique du destinataire</string>
-    <string name="paymentdetails_payment_request_description_label">Description de la requête de paiement</string>
+    <string name="paymentdetails_bolt11_description_label">Description de la requête de paiement</string>
     <string name="paymentdetails_payment_hash_label">Hash du paiement</string>
-    <string name="paymentdetails_payment_request_label">Requête de paiement</string>
+    <string name="paymentdetails_bolt11_label">Requête de paiement</string>
     <string name="paymentdetails_preimage_label">Préimage</string>
 
     <string name="paymentdetails_status_label">Statut du paiement</string>
@@ -418,8 +416,6 @@
     <string name="paymentdetails_part_hops_label">Saut</string>
 
     <string name="paymentdetails_received_with_label">Reçu via</string>
-    <string name="paymentdetails_received_with_splicein">Splice-in (ajout vers un canal existant)</string>
-    <string name="paymentdetails_received_with_channel">Nouveau canal (créé automatiquement)</string>
     <string name="paymentdetails_received_with_lightning">Paiement lightning</string>
     <string name="paymentdetails_channel_id_label">Identifiant du canal</string>
     <string name="paymentdetails_tx_id_label">Transaction</string>

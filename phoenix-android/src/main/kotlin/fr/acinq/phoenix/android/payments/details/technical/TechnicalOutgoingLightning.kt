@@ -16,133 +16,90 @@
 
 package fr.acinq.phoenix.android.payments.details.technical
 
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import fr.acinq.bitcoin.PrivateKey
+import androidx.compose.ui.text.style.TextOverflow
 import fr.acinq.lightning.db.LightningOutgoingPayment
-import fr.acinq.lightning.payment.Bolt11Invoice
-import fr.acinq.lightning.payment.Bolt12Invoice
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.TextWithIcon
+import fr.acinq.phoenix.android.components.Card
+import fr.acinq.phoenix.android.components.CardHeader
+import fr.acinq.phoenix.android.payments.details.Bolt11InvoiceSection
+import fr.acinq.phoenix.android.payments.details.Bolt12InvoiceSection
 import fr.acinq.phoenix.android.payments.details.OutgoingAmountSection
-import fr.acinq.phoenix.android.payments.details.TechnicalCard
 import fr.acinq.phoenix.android.payments.details.TechnicalRow
 import fr.acinq.phoenix.android.payments.details.TechnicalRowAmount
 import fr.acinq.phoenix.android.payments.details.TechnicalRowSelectable
-import fr.acinq.phoenix.android.payments.details.TechnicalRowWithCopy
+import fr.acinq.phoenix.android.payments.details.TimestampSection
 import fr.acinq.phoenix.data.ExchangeRate
 
+@Suppress("DEPRECATION")
 @Composable
 fun TechnicalOutgoingLightning(
     payment: LightningOutgoingPayment,
     originalFiatRate: ExchangeRate.BitcoinPriceRate?,
 ) {
-    TechnicalCard {
+    Card {
+        TechnicalRow(label = stringResource(id = R.string.paymentdetails_payment_type_label)) {
+            Text(text = when (payment.details) {
+                is LightningOutgoingPayment.Details.Normal -> stringResource(R.string.paymentdetails_type_outgoing_bolt11)
+                is LightningOutgoingPayment.Details.SwapOut -> stringResource(R.string.paymentdetails_type_outgoing_swapout)
+                is LightningOutgoingPayment.Details.Blinded -> stringResource(id = R.string.paymentdetails_type_outgoing_bolt12)
+            })
+        }
+        TechnicalRow(label = stringResource(id = R.string.paymentdetails_status_label)) {
+            Text(text = when (payment.status) {
+                is LightningOutgoingPayment.Status.Pending -> stringResource(R.string.paymentdetails_status_pending)
+                is LightningOutgoingPayment.Status.Succeeded -> stringResource(R.string.paymentdetails_status_success)
+                is LightningOutgoingPayment.Status.Failed -> stringResource(R.string.paymentdetails_status_failed)
+            })
+        }
+    }
+
+    Card {
+        TimestampSection(payment = payment)
+    }
+
+    Card {
         OutgoingAmountSection(payment = payment, originalFiatRate = originalFiatRate)
 
-        val details = payment.details
-        val status = payment.status
-
-        // -- details of the payment
-        when (details) {
+        when (val details = payment.details) {
             is LightningOutgoingPayment.Details.Normal -> {
                 TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_pubkey_label), value = payment.recipient.toHex())
-                Bolt11InvoiceSection(invoice = details.paymentRequest)
+                Bolt11InvoiceSection(invoice = details.paymentRequest, preimage = (payment.status as? LightningOutgoingPayment.Status.Succeeded)?.preimage, originalFiatRate = originalFiatRate)
             }
             is LightningOutgoingPayment.Details.SwapOut -> {
                 TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_bitcoin_address_label), value = details.address)
                 TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = details.paymentHash.toHex())
-            }
-            is LightningOutgoingPayment.Details.Blinded -> {
-                Bolt12InvoiceSection(invoice = details.paymentRequest, payerKey = details.payerKey)
-            }
-        }
-
-        // -- status details
-        when (status) {
-            is LightningOutgoingPayment.Status.Succeeded -> {
-                TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_preimage_label), value = status.preimage.toHex())
-            }
-            is LightningOutgoingPayment.Status.Failed -> {
-                TechnicalRow(label = stringResource(id = R.string.paymentdetails_error_label)) {
-                    Text(text = status.reason.toString())
+                ((payment.status as? LightningOutgoingPayment.Status.Succeeded)?.preimage)?.let {
+                    TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_preimage_label), value = it.toHex())
                 }
             }
-            else -> {}
+            is LightningOutgoingPayment.Details.Blinded -> {
+                Bolt12InvoiceSection(invoice = details.paymentRequest, payerKey = details.payerKey, preimage = (payment.status as? LightningOutgoingPayment.Status.Succeeded)?.preimage, originalFiatRate = originalFiatRate)
+            }
         }
-    }
-}
 
-@Composable
-private fun Bolt11InvoiceSection(
-    invoice: Bolt11Invoice
-) {
-    val requestedAmount = invoice.amount
-    if (requestedAmount != null) {
-        TechnicalRowAmount(
-            label = stringResource(id = R.string.paymentdetails_invoice_requested_label),
-            amount = requestedAmount,
-            rateThen = null
-        )
-    }
-
-    val description = (invoice.description ?: invoice.descriptionHash?.toHex())?.takeIf { it.isNotBlank() }
-    if (description != null) {
-        TechnicalRow(label = stringResource(id = R.string.paymentdetails_payment_request_description_label)) {
-            Text(text = description)
-        }
-    }
-    TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = invoice.paymentHash.toHex())
-    TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_request_label), value = invoice.write())
-}
-
-@Composable
-private fun Bolt12InvoiceSection(
-    invoice: Bolt12Invoice,
-    payerKey: PrivateKey,
-) {
-    val requestedAmount = invoice.amount
-    if (requestedAmount != null) {
-        TechnicalRowAmount(
-            label = stringResource(id = R.string.paymentdetails_invoice_requested_label),
-            amount = requestedAmount,
-            rateThen = null
-        )
-    }
-
-    val description = invoice.description?.takeIf { it.isNotBlank() }
-    if (description != null) {
-        TechnicalRow(label = stringResource(id = R.string.paymentdetails_payment_request_description_label)) {
-            Text(text = description)
+        val status = payment.status
+        if (status is LightningOutgoingPayment.Status.Failed) {
+            TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_error_label), value = status.reason.toString())
         }
     }
 
-    TechnicalRow(label = stringResource(id = R.string.paymentdetails_payerkey_label)) {
-        Text(text = payerKey.toHex())
-        val nodeParamsManager = business.nodeParamsManager
-        val offerPayerKey by produceState<PrivateKey?>(initialValue = null) {
-            value = nodeParamsManager.defaultOffer().payerKey
-        }
-        if (offerPayerKey != null && payerKey == offerPayerKey) {
-            Spacer(modifier = Modifier.heightIn(4.dp))
-            TextWithIcon(
-                text = stringResource(id = R.string.paymentdetails_payerkey_is_mine),
-                textStyle = MaterialTheme.typography.subtitle2,
-                icon = R.drawable.ic_info,
-                iconTint = MaterialTheme.typography.subtitle2.color,
-            )
+    if (payment.parts.isNotEmpty()) {
+        CardHeader(text = stringResource(id = R.string.paymentdetails_parts_label, payment.parts.size))
+        payment.parts.forEachIndexed() { index, part ->
+            Card {
+                TechnicalRow(label = stringResource(id = R.string.paymentdetails_part_label)) {
+                    Text("#$index")
+                }
+                TechnicalRow(label = stringResource(id = R.string.paymentdetails_part_hops_label)) {
+                    part.route.forEach {
+                        Text("-> ${it.nextNodeId.toHex()}", maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
+                }
+                TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_sent_label), amount = part.amount, rateThen = originalFiatRate)
+            }
         }
     }
-    TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = invoice.paymentHash.toHex())
-    TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_offer_label), value = invoice.invoiceRequest.offer.encode())
-    TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_bolt12_label), value = invoice.write())
 }

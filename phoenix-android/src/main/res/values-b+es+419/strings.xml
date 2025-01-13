@@ -355,13 +355,13 @@
 
     <string name="paymentdetails_technical_title">Detalles técnicos</string>
     <string name="paymentdetails_payment_type_label">Tipo de pago</string>
-    <string name="paymentdetails_closing">Pago por cierre de canal</string>
-    <string name="paymentdetails_splice_outgoing">Pago por empalme saliente</string>
-    <string name="paymentdetails_splice_cpfp_outgoing">Acelerar transacciones en la cadena</string>
-    <string name="paymentdetails_normal_outgoing">Pago saliente de Lightning (estándar)</string>
-    <string name="paymentdetails_normal_incoming">Pago entrante de Lightning (estándar)</string>
-    <string name="paymentdetails_swapin">Depósito de Bitcoin para intercambio</string>
-    <string name="paymentdetails_swapout">Intercambio a dirección de Bitcoin</string>
+    <string name="paymentdetails_type_outgoing_close">Pago por cierre de canal</string>
+    <string name="paymentdetails_type_outgoing_splice">Pago por empalme saliente</string>
+    <string name="paymentdetails_type_outgoing_splice_cpfp">Acelerar transacciones en la cadena</string>
+    <string name="paymentdetails_type_outgoing_bolt11">Pago saliente de Lightning (bolt11)</string>
+    <string name="paymentdetails_type_outgoing_bolt12">Pago saliente de Lightning (bolt12)</string>
+    <string name="paymentdetails_type_incoming_bolt11">Pago entrante de Lightning (bolt11)</string>
+    <string name="paymentdetails_type_incoming_bolt12">Pago entrante de Lightning (bolt12)</string>
     <string name="paymentdetails_swapin_address_label">Dirección de depósito</string>
     <string name="paymentdetails_bitcoin_address_label">Dirección de Bitcoin</string>
 
@@ -377,9 +377,9 @@
     <string name="paymentdetails_closing_type_other">Otro</string>
 
     <string name="paymentdetails_pubkey_label">Clave pública de destino</string>
-    <string name="paymentdetails_payment_request_description_label">Descripción de la factura</string>
+    <string name="paymentdetails_bolt11_description_label">Descripción de la factura</string>
     <string name="paymentdetails_payment_hash_label">Hash de pago</string>
-    <string name="paymentdetails_payment_request_label">Factura</string>
+    <string name="paymentdetails_bolt11_label">Factura</string>
     <string name="paymentdetails_preimage_label">Imagen previa</string>
 
     <string name="paymentdetails_status_label">Estado del pago</string>
@@ -393,8 +393,6 @@
     <string name="paymentdetails_part_hops_label">Saltos</string>
 
     <string name="paymentdetails_received_with_label">Recibido a través de</string>
-    <string name="paymentdetails_received_with_splicein">Empalme (agregando al canal existente)</string>
-    <string name="paymentdetails_received_with_channel">Canal nuevo (creado automáticamente)</string>
     <string name="paymentdetails_received_with_lightning">Pago de Lightning</string>
     <string name="paymentdetails_channel_id_label">Identificador de canal</string>
     <string name="paymentdetails_tx_id_label">Transacción</string>

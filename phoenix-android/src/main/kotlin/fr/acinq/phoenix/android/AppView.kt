@@ -77,7 +77,7 @@ import fr.acinq.phoenix.android.intro.IntroView
 import fr.acinq.phoenix.android.payments.details.PaymentDetailsView
 import fr.acinq.phoenix.android.payments.history.CsvExportView
 import fr.acinq.phoenix.android.payments.history.PaymentsHistoryView
-import fr.acinq.phoenix.android.payments.liquidity.RequestLiquidityView
+import fr.acinq.phoenix.android.payments.send.liquidity.RequestLiquidityView
 import fr.acinq.phoenix.android.payments.receive.ReceiveView
 import fr.acinq.phoenix.android.payments.send.SendView
 import fr.acinq.phoenix.android.services.NodeServiceState

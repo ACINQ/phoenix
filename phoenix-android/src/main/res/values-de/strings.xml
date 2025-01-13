@@ -362,14 +362,14 @@
 
     <string name="paymentdetails_technical_title">Technische Details</string>
     <string name="paymentdetails_payment_type_label">Zahlungsart</string>
-    <string name="paymentdetails_closing">Kanal-Schließung</string>
-    <string name="paymentdetails_splice_outgoing">Ausgehender Splice</string>
-    <string name="paymentdetails_splice_cpfp_outgoing">Beschleunigte On-Chain Transaktion</string>
-    <string name="paymentdetails_inbound_liquidity">Inbound-Liquidität anfordern</string>
-    <string name="paymentdetails_normal_outgoing">Ausgehende Lightning-Zahlung (standard)</string>
-    <string name="paymentdetails_normal_incoming">Eingehende Lightning-Zahlung (standard)</string>
-    <string name="paymentdetails_swapin">Swap-in Bitcoin-Einzahlung</string>
-    <string name="paymentdetails_swapout">Swap-out an Bitcoin-Adresse</string>
+    <string name="paymentdetails_type_outgoing_close">Kanal-Schließung</string>
+    <string name="paymentdetails_type_outgoing_splice">Ausgehender Splice</string>
+    <string name="paymentdetails_type_outgoing_splice_cpfp">Beschleunigte On-Chain Transaktion</string>
+    <string name="paymentdetails_type_outgoing_liquidity">Inbound-Liquidität anfordern</string>
+    <string name="paymentdetails_type_outgoing_bolt11">Ausgehende Lightning-Zahlung (bolt11)</string>
+    <string name="paymentdetails_type_outgoing_bolt12">Ausgehende Lightning-Zahlung (bolt12)</string>
+    <string name="paymentdetails_type_incoming_bolt11">Eingehende Lightning-Zahlung (bolt11)</string>
+    <string name="paymentdetails_type_incoming_bolt12">Eingehende Lightning-Zahlung (bolt12)</string>
     <string name="paymentdetails_swapin_address_label">Einzahlungs-Adresse</string>
     <string name="paymentdetails_bitcoin_address_label">Bitcoin-Adresse</string>
 
@@ -387,9 +387,9 @@
     <string name="paymentdetails_closing_type_other">Andere</string>
 
     <string name="paymentdetails_pubkey_label">Öffentlicher Zielschlüssel</string>
-    <string name="paymentdetails_payment_request_description_label">Rechnungs-Beschreibung</string>
+    <string name="paymentdetails_bolt11_description_label">Rechnungs-Beschreibung</string>
     <string name="paymentdetails_payment_hash_label">Zahlungs-Hash</string>
-    <string name="paymentdetails_payment_request_label">Rechnung</string>
+    <string name="paymentdetails_bolt11_label">Rechnung</string>
     <string name="paymentdetails_preimage_label">Preimage</string>
 
     <string name="paymentdetails_status_label">Zahlungs-Status</string>
@@ -403,8 +403,6 @@
     <string name="paymentdetails_part_hops_label">Hops</string>
 
     <string name="paymentdetails_received_with_label">Empfangen über</string>
-    <string name="paymentdetails_received_with_splicein">Splice-in (bestehendem Kanal hinzugefügt)</string>
-    <string name="paymentdetails_received_with_channel">Neuer Kanal (automatisch geöffnet)</string>
     <string name="paymentdetails_received_with_lightning">Lightning-Zahlung</string>
     <string name="paymentdetails_channel_id_label">Kanal-ID</string>
     <string name="paymentdetails_tx_id_label">Transaktion</string>

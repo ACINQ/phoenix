@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 ACINQ SAS
+ * Copyright 2025 ACINQ SAS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,95 +41,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
-import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
-import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.db.LightningOutgoingPayment
-import fr.acinq.lightning.db.OutgoingPayment
-import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
-import fr.acinq.lightning.db.SpliceOutgoingPayment
 import fr.acinq.lightning.utils.UUID
-import fr.acinq.lightning.utils.sat
-import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.AmountView
-import fr.acinq.phoenix.android.components.BorderButton
 import fr.acinq.phoenix.android.components.Button
-import fr.acinq.phoenix.android.components.DefaultScreenHeader
-import fr.acinq.phoenix.android.components.PrimarySeparator
 import fr.acinq.phoenix.android.components.SplashClickableContent
 import fr.acinq.phoenix.android.components.SplashLabelRow
-import fr.acinq.phoenix.android.components.SplashLayout
 import fr.acinq.phoenix.android.components.TextInput
 import fr.acinq.phoenix.android.components.TextWithIcon
-import fr.acinq.phoenix.android.utils.borderColor
-import fr.acinq.phoenix.android.utils.mutedBgColor
-import fr.acinq.phoenix.android.utils.negativeColor
-import fr.acinq.phoenix.android.utils.positiveColor
-import fr.acinq.phoenix.data.WalletPaymentInfo
-import fr.acinq.phoenix.utils.extensions.WalletPaymentState
-import fr.acinq.phoenix.utils.extensions.state
-
-@Composable
-fun PaymentDetailsSplashView(
-    onBackClick: () -> Unit,
-    data: WalletPaymentInfo,
-    onDetailsClick: (UUID) -> Unit,
-    onMetadataDescriptionUpdate: (UUID, String?) -> Unit,
-    fromEvent: Boolean,
-) {
-    val payment = data.payment
-    SplashLayout(
-        header = { DefaultScreenHeader(onBackClick = onBackClick) },
-        topContent = { PaymentStatus(data.payment, fromEvent, onCpfpSuccess = onBackClick) }
-    ) {
-        // hide the total if this is a liquidity purchase that's not paid from the balance
-        if (payment is InboundLiquidityOutgoingPayment && payment.feePaidFromChannelBalance.total == 0.sat) {
-            Unit
-        } else {
-            AmountView(
-                amount = when (payment) {
-                    is InboundLiquidityOutgoingPayment -> payment.feePaidFromChannelBalance.total.toMilliSatoshi()
-                    is OutgoingPayment -> payment.amount - payment.fees
-                    is IncomingPayment -> payment.amount
-                },
-                amountTextStyle = MaterialTheme.typography.body1.copy(fontSize = 30.sp),
-                separatorSpace = 4.dp,
-                prefix = stringResource(id = if (payment is OutgoingPayment) R.string.paymentline_prefix_sent else R.string.paymentline_prefix_received)
-            )
-            Spacer(modifier = Modifier.height(36.dp))
-            PrimarySeparator(
-                height = 6.dp,
-                color = when (payment.state()) {
-                    WalletPaymentState.Failure -> negativeColor
-                    WalletPaymentState.SuccessOffChain, WalletPaymentState.SuccessOnChain -> positiveColor
-                    else -> mutedBgColor
-                }
-            )
-        }
-        Spacer(modifier = Modifier.height(36.dp))
-
-        when (payment) {
-            is IncomingPayment -> SplashIncoming(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
-            is LightningOutgoingPayment -> SplashLightningOutgoing(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
-            is ChannelCloseOutgoingPayment -> SplashChannelClose(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
-            is SpliceCpfpOutgoingPayment -> SplashSpliceOutCpfp(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
-            is SpliceOutgoingPayment -> SplashSpliceOut(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
-            is InboundLiquidityOutgoingPayment -> SplashLiquidityPurchase(payment = payment)
-        }
-
-        Spacer(modifier = Modifier.height(48.dp))
-        BorderButton(
-            text = stringResource(id = R.string.paymentdetails_details_button),
-            borderColor = borderColor,
-            textStyle = MaterialTheme.typography.caption,
-            icon = R.drawable.ic_tool,
-            iconTint = MaterialTheme.typography.caption.color,
-            onClick = { onDetailsClick(data.id) },
-        )
-    }
-}
 
 @Composable
 fun SplashDescription(

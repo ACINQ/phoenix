@@ -381,16 +381,14 @@
 
     <string name="paymentdetails_technical_title">Technické detaily</string>
     <string name="paymentdetails_payment_type_label">Typ platby</string>
-    <string name="paymentdetails_closing">Platba uzatvárajúca kanál</string>
-    <string name="paymentdetails_splice_outgoing">Odchádzajúca splice platba</string>
-    <string name="paymentdetails_splice_cpfp_outgoing">Urýchlenie on-chain transakcií</string>
-    <string name="paymentdetails_inbound_liquidity">Požiadavka na prichádzajúcu likviditu</string>
-    <string name="paymentdetails_normal_outgoing">Odchádzajúca Lightning platba (štandard)</string>
-    <string name="paymentdetails_normal_incoming">Prichádzajúca Lightning platba (štandard)</string>
-    <string name="paymentdetails_swapin">Swap-in vklad Bitcoinu</string>
-    <string name="paymentdetails_swapout">Swap-out na Bitcoinovú adresu</string>
-    <string name="paymentdetails_offer_outgoing">Odchádzajúca platba Lightning (ponuka)</string>
-    <string name="paymentdetails_offer_incoming">Prichádzajúca platba Lightning (ponuka)</string>
+    <string name="paymentdetails_type_outgoing_close">Platba uzatvárajúca kanál</string>
+    <string name="paymentdetails_type_outgoing_splice">Odchádzajúca splice platba</string>
+    <string name="paymentdetails_type_outgoing_splice_cpfp">Urýchlenie on-chain transakcií</string>
+    <string name="paymentdetails_type_outgoing_liquidity">Požiadavka na prichádzajúcu likviditu</string>
+    <string name="paymentdetails_type_outgoing_bolt11">Odchádzajúca Lightning platba (bolt11)</string>
+    <string name="paymentdetails_type_outgoing_bolt12">Odchádzajúca Lightning platba (bolt12)</string>
+    <string name="paymentdetails_type_incoming_bolt11">Prichádzajúca Lightning platba (bolt11)</string>
+    <string name="paymentdetails_type_incoming_bolt12">Prichádzajúca Lightning platba (bolt12)</string>
     <string name="paymentdetails_swapin_address_label">Adresa vkladu</string>
     <string name="paymentdetails_bitcoin_address_label">Bitcoinová adresa</string>
 
@@ -408,9 +406,9 @@
     <string name="paymentdetails_closing_type_other">Iné</string>
 
     <string name="paymentdetails_pubkey_label">Cieľový verejný kľúč</string>
-    <string name="paymentdetails_payment_request_description_label">Popis faktúry</string>
+    <string name="paymentdetails_bolt11_description_label">Popis faktúry</string>
     <string name="paymentdetails_payment_hash_label">Hash platby</string>
-    <string name="paymentdetails_payment_request_label">Faktúra</string>
+    <string name="paymentdetails_bolt11_label">Faktúra</string>
     <string name="paymentdetails_preimage_label">Preimage</string>
     <string name="paymentdetails_payerkey_label">Kľúč platiteľa</string>
     <string name="paymentdetails_offer_label">Ponuka</string>
@@ -428,8 +426,6 @@
     <string name="paymentdetails_part_hops_label">Skoky</string>
 
     <string name="paymentdetails_received_with_label">Prijaté cez</string>
-    <string name="paymentdetails_received_with_splicein">Splice-in (pridanie do existujúceho kanála)</string>
-    <string name="paymentdetails_received_with_channel">Nový kanál (automaticky vytvorený)</string>
     <string name="paymentdetails_received_with_lightning">Lightningová platba</string>
     <string name="paymentdetails_channel_id_label">ID kanála</string>
     <string name="paymentdetails_tx_id_label">Transakcia</string>

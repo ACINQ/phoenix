@@ -54,15 +54,10 @@ import fr.acinq.lightning.blockchain.electrum.ElectrumConnectionStatus
 import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
 import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
 import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.db.LegacyPayToOpenIncomingPayment
-import fr.acinq.lightning.db.LegacySwapInIncomingPayment
-import fr.acinq.lightning.db.LightningIncomingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
-import fr.acinq.lightning.db.OnChainIncomingPayment
 import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
 import fr.acinq.lightning.db.SpliceOutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
-import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.Card
@@ -72,7 +67,7 @@ import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.openLink
 import fr.acinq.phoenix.android.components.txUrl
-import fr.acinq.phoenix.android.payments.cpfp.CpfpView
+import fr.acinq.phoenix.android.payments.send.cpfp.CpfpView
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.mutedTextColor
@@ -86,12 +81,11 @@ import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
 @Composable
-fun PaymentStatus(
+fun SplashStatus(
     payment: WalletPayment,
     fromEvent: Boolean,
     onCpfpSuccess: () -> Unit,
 ) {
-    val peerManager = business.peerManager
     when (payment) {
         is LightningOutgoingPayment -> when (payment.status) {
             is LightningOutgoingPayment.Status.Pending -> PaymentStatusIcon(

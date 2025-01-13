@@ -19,31 +19,32 @@ package fr.acinq.phoenix.android.payments.details.technical
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
-import fr.acinq.lightning.db.SpliceOutgoingPayment
+import fr.acinq.lightning.db.LegacySwapInIncomingPayment
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.payments.details.ChannelIdRow
-import fr.acinq.phoenix.android.payments.details.OutgoingAmountSection
 import fr.acinq.phoenix.android.payments.details.TechnicalRow
-import fr.acinq.phoenix.android.payments.details.TechnicalRowSelectable
+import fr.acinq.phoenix.android.payments.details.TechnicalRowAmount
 import fr.acinq.phoenix.android.payments.details.TimestampSection
-import fr.acinq.phoenix.android.payments.details.TransactionRow
+import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
 import fr.acinq.phoenix.data.ExchangeRate
 
+@Suppress("DEPRECATION")
 @Composable
-fun TechnicalOutgoingSplice(
-    payment: SpliceOutgoingPayment,
+fun TechnicalIncomingLegacySwapIn(
+    payment: LegacySwapInIncomingPayment,
     originalFiatRate: ExchangeRate.BitcoinPriceRate?,
 ) {
     Card {
         TechnicalRow(label = stringResource(id = R.string.paymentdetails_payment_type_label)) {
-            Text(text = stringResource(id = R.string.paymentdetails_type_outgoing_splice))
+            Text(text = stringResource(R.string.paymentdetails_type_incoming_legacy_swapin))
         }
         TechnicalRow(label = stringResource(id = R.string.paymentdetails_status_label)) {
-            Text(text = when (payment.confirmedAt) {
-                null -> stringResource(R.string.paymentdetails_status_pending)
-                else -> stringResource(R.string.paymentdetails_status_success)
-            })
+            Text(
+                text = when (payment.completedAt) {
+                    null -> stringResource(id = R.string.paymentdetails_status_pending)
+                    else -> stringResource(R.string.paymentdetails_status_success)
+                }
+            )
         }
     }
 
@@ -52,12 +53,20 @@ fun TechnicalOutgoingSplice(
     }
 
     Card {
-        OutgoingAmountSection(payment = payment, originalFiatRate = originalFiatRate)
-        ChannelIdRow(channelId = payment.channelId, label = stringResource(id = R.string.paymentdetails_splice_out_channel_label))
-        TechnicalRowSelectable(
-            label = stringResource(id = R.string.paymentdetails_bitcoin_address_label),
-            value = payment.address
+        TechnicalRowAmount(
+            label = stringResource(R.string.paymentdetails_amount_received_label),
+            amount = payment.amountReceived,
+            rateThen = originalFiatRate,
+            mSatDisplayPolicy = MSatDisplayPolicy.SHOW
         )
-        TransactionRow(payment.txId)
+        TechnicalRowAmount(
+            label = stringResource(id = R.string.paymentdetails_funding_fees_label),
+            amount = payment.fees,
+            rateThen = originalFiatRate,
+            mSatDisplayPolicy = MSatDisplayPolicy.SHOW
+        )
+        TechnicalRow(label = stringResource(id = R.string.paymentdetails_swapin_address_label)) {
+            Text(payment.address ?: stringResource(id = R.string.utils_unknown))
+        }
     }
 }

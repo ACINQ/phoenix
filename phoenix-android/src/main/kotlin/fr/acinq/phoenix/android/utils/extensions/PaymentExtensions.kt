@@ -58,6 +58,7 @@ fun InboundLiquidityOutgoingPayment.smartDescription(): String = when {
     else -> stringResource(id = R.string.paymentdetails_desc_liquidity_automated)
 }
 
+@Suppress("DEPRECATION")
 @Composable
 fun IncomingPayment.smartDescription() : String? = when (this) {
     is Bolt11IncomingPayment -> paymentRequest.description
@@ -86,6 +87,7 @@ fun WalletPayment.smartDescription(): String? = when (this) {
     is InboundLiquidityOutgoingPayment -> smartDescription()
 }
 
+@Suppress("DEPRECATION")
 fun WalletPayment.basicDescription(): String? = when (this) {
     is Bolt11IncomingPayment -> paymentRequest.description?.takeIf { it.isNotBlank() }
     is LegacyPayToOpenIncomingPayment -> when (val origin = origin) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 ACINQ SAS
+ * Copyright 2025 ACINQ SAS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.payments.cpfp
+package fr.acinq.phoenix.android.payments.send.cpfp
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

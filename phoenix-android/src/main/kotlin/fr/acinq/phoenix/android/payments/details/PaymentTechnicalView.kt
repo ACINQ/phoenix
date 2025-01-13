@@ -16,41 +16,62 @@
 
 package fr.acinq.phoenix.android.payments.details
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.bitcoin.Satoshi
+import fr.acinq.bitcoin.PrivateKey
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.db.*
+import fr.acinq.lightning.db.Bolt11IncomingPayment
+import fr.acinq.lightning.db.Bolt12IncomingPayment
+import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
+import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
+import fr.acinq.lightning.db.LegacyPayToOpenIncomingPayment
+import fr.acinq.lightning.db.LegacySwapInIncomingPayment
+import fr.acinq.lightning.db.LightningOutgoingPayment
+import fr.acinq.lightning.db.NewChannelIncomingPayment
+import fr.acinq.lightning.db.OutgoingPayment
+import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
+import fr.acinq.lightning.db.SpliceInIncomingPayment
+import fr.acinq.lightning.db.SpliceOutgoingPayment
+import fr.acinq.lightning.db.WalletPayment
+import fr.acinq.lightning.payment.Bolt11Invoice
+import fr.acinq.lightning.payment.Bolt12Invoice
 import fr.acinq.lightning.utils.msat
-import fr.acinq.lightning.utils.toMilliSatoshi
-import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.LocalFiatCurrency
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.Screen
+import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountView
-import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.components.CardHeader
 import fr.acinq.phoenix.android.components.Clickable
 import fr.acinq.phoenix.android.components.TextWithIcon
-import fr.acinq.phoenix.android.components.InlineTransactionLink
 import fr.acinq.phoenix.android.components.openLink
 import fr.acinq.phoenix.android.components.txUrl
 import fr.acinq.phoenix.android.fiatRate
 import fr.acinq.phoenix.android.navController
-import fr.acinq.phoenix.android.navigateToPaymentDetails
 import fr.acinq.phoenix.android.payments.details.technical.TechnicalIncomingBolt11
 import fr.acinq.phoenix.android.payments.details.technical.TechnicalIncomingBolt12
 import fr.acinq.phoenix.android.payments.details.technical.TechnicalIncomingLegacyPayToOpen
@@ -70,7 +91,6 @@ import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.WalletPaymentInfo
-import fr.acinq.phoenix.utils.extensions.relatedPaymentIds
 
 
 @Composable
@@ -99,49 +119,6 @@ fun PaymentDetailsTechnicalView(
     }
 }
 
-//@Composable
-//private fun HeaderForOutgoing(
-//    payment: OutgoingPayment
-//) {
-//    // -- payment type
-//    TechnicalRow(label = stringResource(id = R.string.paymentdetails_payment_type_label)) {
-//        Text(
-//            when (payment) {
-//                is ChannelCloseOutgoingPayment -> stringResource(id = R.string.paymentdetails_closing)
-//                is SpliceOutgoingPayment -> stringResource(id = R.string.paymentdetails_splice_outgoing)
-//                is LightningOutgoingPayment -> when (payment.details) {
-//                    is LightningOutgoingPayment.Details.Normal -> stringResource(R.string.paymentdetails_normal_outgoing)
-//                    is LightningOutgoingPayment.Details.SwapOut -> stringResource(R.string.paymentdetails_swapout)
-//                    is LightningOutgoingPayment.Details.Blinded -> stringResource(id = R.string.paymentdetails_offer_outgoing)
-//                }
-//                is SpliceCpfpOutgoingPayment -> stringResource(id = R.string.paymentdetails_splice_cpfp_outgoing)
-//                is InboundLiquidityOutgoingPayment -> stringResource(id = R.string.paymentdetails_inbound_liquidity)
-//            }
-//        )
-//    }
-//
-//    // -- status
-//    TechnicalRow(label = stringResource(id = R.string.paymentdetails_status_label)) {
-//        Text(
-//            when (payment) {
-//                is InboundLiquidityOutgoingPayment -> when (payment.lockedAt) {
-//                    null -> stringResource(R.string.paymentdetails_status_pending)
-//                    else -> stringResource(R.string.paymentdetails_status_success)
-//                }
-//                is OnChainOutgoingPayment -> when (payment.confirmedAt) {
-//                    null -> stringResource(R.string.paymentdetails_status_pending)
-//                    else -> stringResource(R.string.paymentdetails_status_success)
-//                }
-//                is LightningOutgoingPayment -> when (payment.status) {
-//                    is LightningOutgoingPayment.Status.Pending -> stringResource(R.string.paymentdetails_status_pending)
-//                    is LightningOutgoingPayment.Status.Completed.Succeeded -> stringResource(R.string.paymentdetails_status_success)
-//                    is LightningOutgoingPayment.Status.Completed.Failed -> stringResource(R.string.paymentdetails_status_failed)
-//                }
-//            }
-//        )
-//    }
-//}
-
 @Composable
 fun TimestampSection(
     payment: WalletPayment
@@ -166,34 +143,56 @@ fun TimestampSection(
 }
 
 @Composable
-fun IncomingAmountSection(
-    amountReceived: MilliSatoshi,
-    minerFee: Satoshi?,
-    serviceFee: MilliSatoshi?,
+fun Bolt11InvoiceSection(
+    invoice: Bolt11Invoice,
+    preimage: ByteVector32?,
     originalFiatRate: ExchangeRate.BitcoinPriceRate?,
 ) {
-    TechnicalRowAmount(
-        label = stringResource(R.string.paymentdetails_amount_received_label),
-        amount = amountReceived,
-        rateThen = originalFiatRate,
-        mSatDisplayPolicy = MSatDisplayPolicy.SHOW
-    )
-    serviceFee?.let {
-        TechnicalRowAmount(
-            label = stringResource(id = R.string.paymentdetails_service_fees_label),
-            amount = serviceFee,
-            rateThen = originalFiatRate,
-            mSatDisplayPolicy = MSatDisplayPolicy.SHOW
-        )
+    invoice.amount?.let {
+        TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_invoice_requested_label), amount = it, rateThen = originalFiatRate)
     }
-    minerFee?.let {
-        TechnicalRowAmount(
-            label = stringResource(id = R.string.paymentdetails_funding_fees_label),
-            amount = minerFee.toMilliSatoshi(),
-            rateThen = originalFiatRate,
-            mSatDisplayPolicy = MSatDisplayPolicy.HIDE
-        )
+    (invoice.description ?: invoice.descriptionHash?.toHex())?.takeIf { it.isNotBlank() }?.let {
+        TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_bolt11_description_label), value = it)
     }
+    TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = invoice.paymentHash.toHex())
+    preimage?.let { TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_preimage_label), value = preimage.toHex()) }
+    TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_bolt11_label), value = invoice.write())
+}
+
+@Composable
+fun Bolt12InvoiceSection(
+    invoice: Bolt12Invoice,
+    payerKey: PrivateKey,
+    preimage: ByteVector32?,
+    originalFiatRate: ExchangeRate.BitcoinPriceRate?,
+) {
+    invoice.amount?.let {
+        TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_invoice_requested_label), amount = it, rateThen = originalFiatRate)
+    }
+    invoice.description?.takeIf { it.isNotBlank() }?.let {
+        TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_bolt11_description_label), value = it)
+    }
+    TechnicalRow(label = stringResource(id = R.string.paymentdetails_payerkey_label)) {
+        Text(text = payerKey.toHex())
+        val nodeParamsManager = business.nodeParamsManager
+        val offerPayerKey by produceState<PrivateKey?>(initialValue = null) {
+            value = nodeParamsManager.defaultOffer().payerKey
+        }
+        if (offerPayerKey != null && payerKey == offerPayerKey) {
+            Spacer(modifier = Modifier.heightIn(4.dp))
+            TextWithIcon(
+                text = stringResource(id = R.string.paymentdetails_payerkey_is_mine),
+                textStyle = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
+                icon = R.drawable.ic_info,
+                iconTint = MaterialTheme.typography.caption.color,
+                iconSize = 14.dp,
+            )
+        }
+    }
+    TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = invoice.paymentHash.toHex())
+    preimage?.let { TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_preimage_label), value = preimage.toHex()) }
+    TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_offer_label), value = invoice.invoiceRequest.offer.encode())
+    TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_bolt12_label), value = invoice.write())
 }
 
 @Composable
@@ -214,55 +213,36 @@ fun OutgoingAmountSection(
         mSatDisplayPolicy = MSatDisplayPolicy.SHOW
     )
 }
-@Composable
-private fun LightningPart(
-    index: Int,
-    part: LightningOutgoingPayment.Part,
-    rateThen: ExchangeRate.BitcoinPriceRate?
-) {
-    TechnicalRow(label = stringResource(id = R.string.paymentdetails_part_label)) {
-        Text("#$index")
-    }
-    TechnicalRow(label = stringResource(id = R.string.paymentdetails_part_hops_label)) {
-        part.route.forEach {
-            Text("-> ${it.nextNodeId.toHex()}", maxLines = 1, overflow = TextOverflow.Ellipsis)
-        }
-    }
-    TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_sent_label), amount = part.amount, rateThen = rateThen)
-}
 
 // ============== utility components for this view
 
 @Composable
-fun TechnicalCard(
-    content: @Composable () -> Unit
-) {
-    Card(internalPadding = PaddingValues(12.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        content()
-    }
-}
-
-@Composable
 fun TechnicalRow(
     label: String,
+    space: Dp = 12.dp,
+    contentPadding: PaddingValues = PaddingValues(vertical = 8.dp),
     content: @Composable () -> Unit
 ) {
     Row {
+        Spacer(modifier = Modifier.width(12.dp))
         Text(
             modifier = Modifier
                 .weight(1f)
-                .alignBy(FirstBaseline),
+                .alignBy(FirstBaseline)
+                .padding(vertical = 8.dp),
             text = label,
-            style = MaterialTheme.typography.subtitle2
+            style = MaterialTheme.typography.subtitle2,
         )
-        Spacer(modifier = Modifier.width(12.dp))
+        Spacer(modifier = Modifier.width(space))
         Column(
             modifier = Modifier
                 .weight(3f)
                 .alignBy(FirstBaseline)
+                .padding(contentPadding)
         ) {
             content()
         }
+        Spacer(modifier = Modifier.width(8.dp))
     }
 }
 
@@ -294,29 +274,32 @@ fun TechnicalRowAmount(
 
         if (rate != null && amount > 0.msat) {
             val fiatAmount = amount.toFiat(rate.price).toPrettyString(prefFiat, withUnit = true)
-            Text(text = stringResource(id = R.string.paymentdetails_amount_rate_now, fiatAmount))
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(text = stringResource(id = R.string.paymentdetails_amount_rate_now, fiatAmount), style = MaterialTheme.typography.subtitle2)
         }
 
         if (rateThen != null) {
             val fiatAmountThen = amount.toFiat(rateThen.price).toPrettyString(prefFiat, withUnit = true)
-            Text(text = stringResource(id = R.string.paymentdetails_amount_rate_then, fiatAmountThen))
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(text = stringResource(id = R.string.paymentdetails_amount_rate_then, fiatAmountThen), style = MaterialTheme.typography.subtitle2)
         }
     }
 }
 
 @Composable
 fun TechnicalRowWithCopy(label: String, value: String) {
-    TechnicalRow(label = label) {
+    TechnicalRow(label = label, space = 0.dp, contentPadding = PaddingValues(0.dp)) {
         val context = LocalContext.current
-        Clickable(onClick = { copyToClipboard(context = context, data = value) }, modifier = Modifier.offset((-6).dp), shape = RoundedCornerShape(12.dp)) {
-            Column(modifier = Modifier.padding(6.dp)) {
+        Clickable(onClick = { copyToClipboard(context = context, data = value) }, shape = RoundedCornerShape(12.dp)) {
+            Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)) {
                 Text(text = value, maxLines = 5, overflow = TextOverflow.Ellipsis)
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(4.dp))
                 TextWithIcon(
                     text = stringResource(id = R.string.btn_copy),
-                    textStyle = MaterialTheme.typography.subtitle2,
+                    textStyle = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
                     icon = R.drawable.ic_copy,
-                    iconTint = MaterialTheme.typography.subtitle2.color
+                    iconTint = MaterialTheme.typography.caption.color,
+                    iconSize = 14.dp
                 )
             }
         }
@@ -330,17 +313,15 @@ fun TechnicalRowClickable(
     onLongClick: (() -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
-    TechnicalRow(label = label) {
+    TechnicalRow(label = label, space = 12.dp, contentPadding = PaddingValues(vertical = 4.dp)) {
         Clickable(
             onClick = onClick,
             onLongClick = onLongClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .offset(x = (-8).dp),
+            modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             backgroundColor = mutedBgColor,
         ) {
-            Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)) {
+            Column(modifier = Modifier.padding(8.dp)) {
                 content()
             }
         }

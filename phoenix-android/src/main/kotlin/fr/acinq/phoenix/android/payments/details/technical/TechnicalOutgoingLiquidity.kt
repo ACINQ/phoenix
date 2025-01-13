@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.android.payments.details.technical
 
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
@@ -25,13 +26,14 @@ import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.navigateToPaymentDetails
 import fr.acinq.phoenix.android.payments.details.ChannelIdRow
-import fr.acinq.phoenix.android.payments.details.TechnicalCard
 import fr.acinq.phoenix.android.payments.details.TechnicalRow
 import fr.acinq.phoenix.android.payments.details.TechnicalRowAmount
 import fr.acinq.phoenix.android.payments.details.TechnicalRowClickable
+import fr.acinq.phoenix.android.payments.details.TimestampSection
 import fr.acinq.phoenix.android.payments.details.TransactionRow
 import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
 import fr.acinq.phoenix.data.ExchangeRate
@@ -42,10 +44,23 @@ fun TechnicalOutgoingLiquidity(
     payment: InboundLiquidityOutgoingPayment,
     originalFiatRate: ExchangeRate.BitcoinPriceRate?
 ) {
+    Card {
+        TechnicalRow(label = stringResource(id = R.string.paymentdetails_payment_type_label)) {
+            Text(text = stringResource(id = R.string.paymentdetails_type_outgoing_liquidity))
+        }
+        TechnicalRow(label = stringResource(id = R.string.paymentdetails_status_label)) {
+            Text(text = when (payment.confirmedAt) {
+                null -> stringResource(R.string.paymentdetails_status_pending)
+                else -> stringResource(R.string.paymentdetails_status_success)
+            })
+        }
+    }
 
+    Card {
+        TimestampSection(payment = payment)
+    }
 
-
-    TechnicalCard {
+    Card {
         TechnicalRowAmount(
             label = stringResource(id = R.string.paymentdetails_liquidity_amount_label),
             amount = payment.purchase.amount.toMilliSatoshi(),
@@ -66,20 +81,17 @@ fun TechnicalOutgoingLiquidity(
                 mSatDisplayPolicy = MSatDisplayPolicy.SHOW
             )
         }
-
         TechnicalRow(label = stringResource(id = R.string.paymentdetails_liquidity_purchase_type)) {
-            Text(text = "${
-                when (payment.purchase) {
-                    is LiquidityAds.Purchase.Standard -> "Standard"
-                    is LiquidityAds.Purchase.WithFeeCredit -> "Fee credit"
-                }
-            } [${payment.purchase.paymentDetails.paymentType}]")
+            Text(text = when (payment.purchase) {
+                is LiquidityAds.Purchase.Standard -> "Standard"
+                is LiquidityAds.Purchase.WithFeeCredit -> "Fee credit"
+            })
+            Text(text = "[${payment.purchase.paymentDetails.paymentType}]", style = MaterialTheme.typography.subtitle2)
         }
-        TransactionRow(payment.txId)
         ChannelIdRow(channelId = payment.channelId)
-        val paymentIds = payment.relatedPaymentIds()
+        TransactionRow(txId = payment.txId)
         val navController = navController
-        paymentIds.forEach {
+        payment.relatedPaymentIds().forEach {
             TechnicalRowClickable(
                 label = stringResource(id = R.string.paymentdetails_liquidity_caused_by_label),
                 onClick = { navigateToPaymentDetails(navController, it, isFromEvent = false) },

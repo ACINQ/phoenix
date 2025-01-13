@@ -43,11 +43,18 @@ import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
 import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.utils.extensions.isManualPurchase
 import fr.acinq.phoenix.utils.extensions.relatedPaymentIds
+import fr.acinq.phoenix.utils.extensions.state
 
 @Composable
 fun SplashLiquidityPurchase(
     payment: InboundLiquidityOutgoingPayment,
 ) {
+    // if this purchase is paid from the balance, show the amount
+    if (payment.feePaidFromChannelBalance.total > 0.sat) {
+        SplashAmount(amount = payment.amount - payment.fees, state = payment.state(), isOutgoing = true)
+    } else {
+        Spacer(modifier = Modifier.height(36.dp))
+    }
     SplashPurchase(payment = payment)
     SplashFee(payment = payment)
     SplashRelatedPayments(payment)
