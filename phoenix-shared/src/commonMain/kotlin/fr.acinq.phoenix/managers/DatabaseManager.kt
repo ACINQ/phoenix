@@ -11,6 +11,7 @@ import fr.acinq.phoenix.db.SqliteChannelsDb
 import fr.acinq.phoenix.db.SqlitePaymentsDb
 import fr.acinq.phoenix.db.createChannelsDbDriver
 import fr.acinq.phoenix.db.createPaymentsDbDriver
+import fr.acinq.phoenix.db.createSqliteChannelsDb
 import fr.acinq.phoenix.db.createSqlitePaymentsDb
 import fr.acinq.phoenix.db.makeCloudKitDb
 import fr.acinq.phoenix.db.payments.CloudKitInterface
@@ -55,7 +56,7 @@ class DatabaseManager(
 
                 val nodeIdHash = nodeParams.nodeId.hash160().byteVector().toHex()
                 val channelsDbDriver = createChannelsDbDriver(ctx, chain, nodeIdHash)
-                val channelsDb = SqliteChannelsDb(channelsDbDriver)
+                val channelsDb = createSqliteChannelsDb(channelsDbDriver)
                 val paymentsDbDriver = createPaymentsDbDriver(ctx, chain, nodeIdHash)
                 val paymentsDb = createSqlitePaymentsDb(paymentsDbDriver, currencyManager)
                 val cloudKitDb = makeCloudKitDb(appDb, paymentsDb)

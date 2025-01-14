@@ -33,7 +33,7 @@ import kotlin.test.*
 
 @Ignore
 class SqliteChannelsDatabaseTest {
-    private val db = SqliteChannelsDb(testChannelsDriver())
+    private val db = createSqliteChannelsDb(testChannelsDriver())
 
     @Test
     fun basic() = runTest {

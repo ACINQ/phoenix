@@ -21,24 +21,20 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.CltvExpiry
 import fr.acinq.lightning.channel.states.PersistedChannelState
 import fr.acinq.lightning.db.ChannelsDb
-import fr.acinq.lightning.serialization.channel.Serialization
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class SqliteChannelsDb(private val driver: SqlDriver) : ChannelsDb {
+class SqliteChannelsDb(val driver: SqlDriver, database: ChannelsDatabase) : ChannelsDb {
 
-    private val database = ChannelsDatabase(driver)
     private val queries = database.channelsDatabaseQueries
 
     override suspend fun addOrUpdateChannel(state: PersistedChannelState) {
-        val channelId = state.channelId.toByteArray()
-        val data = Serialization.serialize(state)
         withContext(Dispatchers.Default) {
             queries.transaction {
-                queries.getChannel(channelId).executeAsOneOrNull()?.run {
-                    queries.updateChannel(channel_id = this.channel_id, data_ = data)
+                queries.getChannel(state.channelId).executeAsOneOrNull()?.run {
+                    queries.updateChannel(channel_id = state.channelId, data_ = state)
                 } ?: run {
-                    queries.insertChannel(channel_id = channelId, data_ = data)
+                    queries.insertChannel(channel_id = state.channelId, data_ = state)
                 }
             }
         }
@@ -46,35 +42,30 @@ class SqliteChannelsDb(private val driver: SqlDriver) : ChannelsDb {
 
     override suspend fun removeChannel(channelId: ByteVector32) {
         withContext(Dispatchers.Default) {
-            queries.deleteHtlcInfo(channel_id = channelId.toByteArray())
-            queries.closeLocalChannel(channel_id = channelId.toByteArray())
+            queries.deleteHtlcInfo(channel_id = channelId)
+            queries.closeLocalChannel(channel_id = channelId)
         }
     }
 
     override suspend fun listLocalChannels(): List<PersistedChannelState> = withContext(Dispatchers.Default) {
-        val bytes = queries.listLocalChannels().executeAsList()
-        bytes.mapNotNull {
-            when (val res = Serialization.deserialize(it)) {
-                is Serialization.DeserializationResult.Success -> res.state
-                is Serialization.DeserializationResult.UnknownVersion -> null
-            }
-        }
+        queries.listLocalChannels().executeAsList()
     }
 
     override suspend fun addHtlcInfo(channelId: ByteVector32, commitmentNumber: Long, paymentHash: ByteVector32, cltvExpiry: CltvExpiry) {
         withContext(Dispatchers.Default) {
             queries.insertHtlcInfo(
-                channel_id = channelId.toByteArray(),
+                channel_id = channelId,
                 commitment_number = commitmentNumber,
-                payment_hash = paymentHash.toByteArray(),
-                cltv_expiry = cltvExpiry.toLong())
+                payment_hash = paymentHash,
+                cltv_expiry = cltvExpiry.toLong()
+            )
         }
     }
 
     override suspend fun listHtlcInfos(channelId: ByteVector32, commitmentNumber: Long): List<Pair<ByteVector32, CltvExpiry>> {
         return withContext(Dispatchers.Default) {
-            queries.listHtlcInfos(channel_id = channelId.toByteArray(), commitment_number = commitmentNumber, mapper = { payment_hash, cltv_expiry ->
-                ByteVector32(payment_hash) to CltvExpiry(cltv_expiry)
+            queries.listHtlcInfos(channel_id = channelId, commitment_number = commitmentNumber, mapper = { payment_hash, cltv_expiry ->
+                payment_hash to CltvExpiry(cltv_expiry)
             }).executeAsList()
         }
     }
