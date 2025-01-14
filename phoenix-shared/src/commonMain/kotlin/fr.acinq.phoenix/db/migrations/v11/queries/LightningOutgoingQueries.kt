@@ -20,8 +20,8 @@ import app.cash.sqldelight.ColumnAdapter
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.ShortChannelId
-import fr.acinq.lightning.db.HopDesc
 import fr.acinq.lightning.db.LightningOutgoingPayment
+import fr.acinq.lightning.db.LightningOutgoingPayment.Part.HopDesc
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.db.PaymentsDatabase
