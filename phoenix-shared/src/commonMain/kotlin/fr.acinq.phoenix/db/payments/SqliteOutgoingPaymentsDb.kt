@@ -40,7 +40,7 @@ class SqliteOutgoingPaymentsDb(private val database: PaymentsDatabase) : Outgoin
                     id = parentId,
                     data = payment1,
                     completed_at = null,
-                    sent_at = null
+                    succeeded_at = null
                 )
             }
             parts.forEach { part ->
@@ -61,8 +61,7 @@ class SqliteOutgoingPaymentsDb(private val database: PaymentsDatabase) : Outgoin
                             tx_id = null,
                             created_at = outgoingPayment.createdAt,
                             completed_at = outgoingPayment.completedAt,
-                            // outgoing lightning payments can fail, the sent_at timestamp is only set if the payment was success
-                            sent_at = if (outgoingPayment.status is LightningOutgoingPayment.Status.Succeeded) outgoingPayment.completedAt else null,
+                            succeeded_at = outgoingPayment.succeededAt,
                             data_ = outgoingPayment
                         )
                     }
@@ -73,7 +72,7 @@ class SqliteOutgoingPaymentsDb(private val database: PaymentsDatabase) : Outgoin
                             tx_id = outgoingPayment.txId,
                             created_at = outgoingPayment.createdAt,
                             completed_at = outgoingPayment.completedAt,
-                            sent_at = outgoingPayment.completedAt,
+                            succeeded_at = outgoingPayment.succeededAt,
                             data_ = outgoingPayment
                         )
                         database.onChainTransactionsQueries.insert(
@@ -95,8 +94,8 @@ class SqliteOutgoingPaymentsDb(private val database: PaymentsDatabase) : Outgoin
                 database.paymentsOutgoingQueries.update(
                     id = id,
                     data = payment1,
-                    completed_at = status.completedAt,
-                    sent_at = if (status is LightningOutgoingPayment.Status.Succeeded) status.completedAt else null,
+                    completed_at = payment1.completedAt,
+                    succeeded_at = payment1.succeededAt,
                 )
                 didSaveWalletPayment(id, database)
             }
@@ -117,7 +116,7 @@ class SqliteOutgoingPaymentsDb(private val database: PaymentsDatabase) : Outgoin
                     id = parentId,
                     data = payment1,
                     completed_at = null, // parts do not update parent timestamps
-                    sent_at = null
+                    succeeded_at = null
                 )
                 didSaveWalletPayment(parentId, database)
             }

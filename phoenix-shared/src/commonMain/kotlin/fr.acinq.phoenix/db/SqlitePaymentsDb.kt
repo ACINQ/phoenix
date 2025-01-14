@@ -69,7 +69,7 @@ class SqlitePaymentsDb(
                         is LightningIncomingPayment -> {}
                         is OnChainIncomingPayment -> {
                             val payment1 = payment.setLocked(lockedAt)
-                            database.paymentsIncomingQueries.update(id = payment1.id, data = payment1, receivedAt = lockedAt)
+                            database.paymentsIncomingQueries.update(id = payment1.id, data = payment1, receivedAt = payment1.lockedAt)
                             didSaveWalletPayment(payment1.id, database)
                         }
                         is LegacyPayToOpenIncomingPayment -> {}
@@ -77,7 +77,7 @@ class SqlitePaymentsDb(
                         is LightningOutgoingPayment -> {}
                         is OnChainOutgoingPayment -> {
                             val payment1 = payment.setLocked(lockedAt)
-                            database.paymentsOutgoingQueries.update(id = payment1.id, data = payment1, completed_at = lockedAt, sent_at = lockedAt)
+                            database.paymentsOutgoingQueries.update(id = payment1.id, data = payment1, completed_at = payment1.completedAt, succeeded_at = payment1.succeededAt)
                             didSaveWalletPayment(payment1.id, database)
                         }
                     }
@@ -99,7 +99,7 @@ class SqlitePaymentsDb(
                         is LightningIncomingPayment -> {}
                         is OnChainIncomingPayment -> {
                             val payment1 = payment.setConfirmed(confirmedAt)
-                            database.paymentsIncomingQueries.update(id = payment1.id, data = payment1, receivedAt = null)
+                            database.paymentsIncomingQueries.update(id = payment1.id, data = payment1, receivedAt = payment1.lockedAt)
                             didSaveWalletPayment(payment1.id, database)
                         }
                         is LegacyPayToOpenIncomingPayment -> {}
@@ -107,7 +107,7 @@ class SqlitePaymentsDb(
                         is LightningOutgoingPayment -> {}
                         is OnChainOutgoingPayment -> {
                             val payment1 = payment.setConfirmed(confirmedAt)
-                            database.paymentsOutgoingQueries.update(id = payment1.id, data = payment1, completed_at = null, sent_at = null)
+                            database.paymentsOutgoingQueries.update(id = payment1.id, data = payment1, completed_at = payment1.completedAt, succeeded_at = payment1.succeededAt)
                             didSaveWalletPayment(payment1.id, database)
                         }
                     }

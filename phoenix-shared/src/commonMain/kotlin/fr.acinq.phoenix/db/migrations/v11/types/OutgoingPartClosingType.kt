@@ -16,7 +16,7 @@
 
 package fr.acinq.phoenix.db.migrations.v11.types
 
-import fr.acinq.lightning.db.ChannelClosingType
+import fr.acinq.lightning.db.ChannelCloseOutgoingPayment.ChannelClosingType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json

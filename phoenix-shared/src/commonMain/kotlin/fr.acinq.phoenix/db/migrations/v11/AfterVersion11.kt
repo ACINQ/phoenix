@@ -50,7 +50,7 @@ val AfterVersion11 = AfterVersion(11) { driver ->
     fun insertPayment(payment: OutgoingPayment) {
         driver.execute(
             identifier = null,
-            sql = "INSERT INTO payments_outgoing (id, payment_hash, tx_id, created_at, completed_at, sent_at, data) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            sql = "INSERT INTO payments_outgoing (id, payment_hash, tx_id, created_at, completed_at, succeeded_at, data) VALUES (?, ?, ?, ?, ?, ?, ?)",
             parameters = 7
         ) {
             println("migrating outgoing $payment")
@@ -58,16 +58,12 @@ val AfterVersion11 = AfterVersion(11) { driver ->
                 is LightningOutgoingPayment -> payment.paymentHash to null
                 is OnChainOutgoingPayment -> null to payment.txId
             }
-            val sentAt = when (payment) {
-                is LightningOutgoingPayment -> if (payment.status is LightningOutgoingPayment.Status.Succeeded) payment.completedAt else null
-                is OnChainOutgoingPayment -> payment.completedAt
-            }
             bindBytes(0, payment.id.toByteArray())
             bindBytes(1, paymentHash?.toByteArray())
             bindBytes(2, txId?.value?.toByteArray())
             bindLong(3, payment.createdAt)
             bindLong(4, payment.completedAt)
-            bindLong(5, sentAt)
+            bindLong(5, payment.succeededAt)
             bindBytes(6, Serialization.serialize(payment))
         }
     }

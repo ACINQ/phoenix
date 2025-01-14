@@ -11,7 +11,7 @@ import fr.acinq.lightning.Lightning.randomBytes32
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.Bolt11IncomingPayment
 import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
-import fr.acinq.lightning.db.ChannelClosingType
+import fr.acinq.lightning.db.ChannelCloseOutgoingPayment.ChannelClosingType
 import fr.acinq.lightning.db.LightningIncomingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.db.NewChannelIncomingPayment

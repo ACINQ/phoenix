@@ -9,7 +9,7 @@ CREATE TABLE payments_outgoing (
     tx_id BLOB AS TxId,
     created_at INTEGER NOT NULL,
     completed_at INTEGER DEFAULT NULL, -- a completed outgoing payment can be a success or a failure
-    sent_at INTEGER DEFAULT NULL, -- will only be set for a successful payment
+    succeeded_at INTEGER DEFAULT NULL, -- will only be set for a successful payment
     data BLOB AS OutgoingPayment NOT NULL
 );
 
@@ -34,7 +34,7 @@ INSERT INTO payments_outgoing (
             tx_id,
             created_at,
             completed_at,
-            sent_at,
+            succeeded_at,
             data)
 VALUES (?, ?, ?, ?, ?, ?, ?);
 
@@ -45,11 +45,9 @@ INSERT INTO link_lightning_outgoing_payment_parts(
 VALUES (?, ?);
 
 update:
--- this method will update the completed_at/sent_at columns if a non-null value is provided,
--- otherwise it will keep the existing value
 UPDATE payments_outgoing
-SET    completed_at=COALESCE(:completed_at, completed_at),
-       sent_at=COALESCE(:sent_at, sent_at),
+SET    completed_at=?,
+       succeeded_at=?,
        data=:data
 WHERE  id = :id;
 
@@ -88,7 +86,7 @@ listSuccessful:
 SELECT data
 FROM  payments_outgoing
 WHERE
-    sent_at BETWEEN :sent_at_from AND :sent_at_to
+    succeeded_at BETWEEN :succeeded_at_from AND :succeeded_at_to
 LIMIT :limit OFFSET :offset;
 
 -- use this in a `transaction` block to know how many rows were changed after an UPDATE

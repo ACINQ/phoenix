@@ -21,7 +21,7 @@ import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
-import fr.acinq.lightning.db.ChannelClosingType
+import fr.acinq.lightning.db.ChannelCloseOutgoingPayment.ChannelClosingType
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.db.migrations.v11.types.OutgoingDetailsData
