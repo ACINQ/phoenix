@@ -130,37 +130,30 @@ class SqlitePaymentsDb(
     // ---- list ALL payments
 
     suspend fun listPaymentsAsFlow(count: Long, skip: Long): Flow<List<WalletPaymentInfo>> = withContext(Dispatchers.Default) {
-        database.paymentsQueries.list(limit = count, offset = skip, mapper = {
-                data_, _,
-                lnurl_base_type, lnurl_base_blob, lnurl_description, lnurl_metadata_type, lnurl_metadata_blob,
-                lnurl_successAction_type, lnurl_successAction_blob, user_description, user_notes, modified_at,
-                original_fiat_type, original_fiat_rate ->
-            val payment = WalletPaymentAdapter.decode(data_)
-            WalletPaymentInfo(
-                payment = payment,
-                metadata = PaymentsMetadataQueries.mapAll(payment.id,
-                    lnurl_base_type, lnurl_base_blob, lnurl_description, lnurl_metadata_type, lnurl_metadata_blob,
-                    lnurl_successAction_type, lnurl_successAction_blob, user_description, user_notes, modified_at,
-                    original_fiat_type, original_fiat_rate),
-                contact = null,
-                fetchOptions = WalletPaymentFetchOptions.Metadata
-            )
-        })
+        database.paymentsQueries.list(limit = count, offset = skip, mapper = ::mapPaymentsAndMetadata)
             .asFlow()
             .mapToList(Dispatchers.Default)
     }
 
-    suspend fun listCompletedPayments(count: Long, skip: Long, startDate: Long, endDate: Long, fetchOptions: WalletPaymentFetchOptions): List<WalletPaymentInfo> = withContext(Dispatchers.Default) {
-        // TODO: optimise this method to join all the data and populate the list in one query, including contact, metadata, ...
-        database.paymentsQueries.listCompleted(completed_at_from = startDate, completed_at_to = endDate, limit = count, offset = skip).executeAsList()
-            .map {
-                WalletPaymentInfo(
-                    payment = WalletPaymentAdapter.decode(it),
-                    metadata = WalletPaymentMetadata(),
-                    contact = null,
-                    fetchOptions = fetchOptions
-                )
-            }
+    suspend fun listCompletedPayments(count: Long, skip: Long, startDate: Long, endDate: Long): List<WalletPaymentInfo> = withContext(Dispatchers.Default) {
+        database.paymentsQueries.listSucceeded(completed_at_from = startDate, completed_at_to = endDate, limit = count, offset = skip, mapper = ::mapPaymentsAndMetadata).executeAsList()
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    private fun mapPaymentsAndMetadata(data_: ByteArray, payment_id: UUID?,
+                                       lnurl_base_type: LnurlBase.TypeVersion?, lnurl_base_blob: ByteArray?, lnurl_description: String?, lnurl_metadata_type: LnurlMetadata.TypeVersion?, lnurl_metadata_blob: ByteArray?,
+                                       lnurl_successAction_type: LnurlSuccessAction.TypeVersion?, lnurl_successAction_blob: ByteArray?,
+                                       user_description: String?, user_notes: String?, modified_at: Long?, original_fiat_type: String?, original_fiat_rate: Double?): WalletPaymentInfo {
+        val payment = WalletPaymentAdapter.decode(data_)
+        return WalletPaymentInfo(
+            payment = payment,
+            metadata = PaymentsMetadataQueries.mapAll(payment.id,
+                lnurl_base_type, lnurl_base_blob, lnurl_description, lnurl_metadata_type, lnurl_metadata_blob,
+                lnurl_successAction_type, lnurl_successAction_blob,
+                user_description, user_notes, modified_at, original_fiat_type, original_fiat_rate),
+            contact = null,
+            fetchOptions = WalletPaymentFetchOptions.Metadata
+        )
     }
 
     fun listPaymentsCountFlow(): Flow<Long> {
@@ -173,6 +166,11 @@ class SqlitePaymentsDb(
                     }
                 }
             }
+    }
+
+    /** Returns the timestamp of the oldest completed payment, if any. Lets us set up the export-csv UI with a nice start date. */
+    fun getOldestCompletedTimestamp(): Long? {
+        return database.paymentsQueries.getOldestCompletedTimestamp().executeAsOneOrNull()?.completed_at
     }
 
     /**

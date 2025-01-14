@@ -80,7 +80,7 @@ class LightningOutgoingQueries(val database: PaymentsDatabase) {
             // lightning parts data, may be null
             lightning_part_id: String?,
             lightning_part_amount_msat: Long?,
-            lightning_part_route: List<HopDesc>?,
+            lightning_part_route: List<LightningOutgoingPayment.Part.HopDesc>?,
             lightning_part_created_at: Long?,
             lightning_part_completed_at: Long?,
             lightning_part_status_type: OutgoingPartStatusTypeVersion?,
@@ -145,7 +145,7 @@ class LightningOutgoingQueries(val database: PaymentsDatabase) {
         private fun mapLightningPart(
             id: String,
             amountMsat: Long,
-            route: List<HopDesc>,
+            route: List<LightningOutgoingPayment.Part.HopDesc>,
             createdAt: Long,
             completedAt: Long?,
             statusType: OutgoingPartStatusTypeVersion?,
@@ -184,19 +184,19 @@ class LightningOutgoingQueries(val database: PaymentsDatabase) {
             else -> throw UnhandledOutgoingPartStatus(statusType, statusBlob, completedAt)
         }
 
-        val hopDescAdapter: ColumnAdapter<List<HopDesc>, String> = object : ColumnAdapter<List<HopDesc>, String> {
-            override fun decode(databaseValue: String): List<HopDesc> = when {
+        val hopDescAdapter: ColumnAdapter<List<LightningOutgoingPayment.Part.HopDesc>, String> = object : ColumnAdapter<List<LightningOutgoingPayment.Part.HopDesc>, String> {
+            override fun decode(databaseValue: String): List<LightningOutgoingPayment.Part.HopDesc> = when {
                 databaseValue.isEmpty() -> listOf()
                 else -> databaseValue.split(";").map { hop ->
                     val els = hop.split(":")
                     val n1 = PublicKey.parse(Hex.decode(els[0]))
                     val n2 = PublicKey.parse(Hex.decode(els[1]))
                     val cid = els[2].takeIf { it.isNotBlank() }?.run { ShortChannelId(this) }
-                    HopDesc(n1, n2, cid)
+                    LightningOutgoingPayment.Part.HopDesc(n1, n2, cid)
                 }
             }
 
-            override fun encode(value: List<HopDesc>): String = value.joinToString(";") {
+            override fun encode(value: List<LightningOutgoingPayment.Part.HopDesc>): String = value.joinToString(";") {
                 "${it.nodeId}:${it.nextNodeId}:${it.shortChannelId ?: ""}"
             }
         }

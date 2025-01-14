@@ -22,9 +22,10 @@ LEFT OUTER JOIN payments_metadata AS pm ON pm.payment_id = p.id
 ORDER BY order_ts DESC
 LIMIT :limit OFFSET :offset;
 
-listCompleted:
-SELECT data
-FROM payments
+listSucceeded:
+SELECT p.data, pm.*
+FROM payments AS p
+LEFT OUTER JOIN payments_metadata AS pm ON pm.payment_id = p.id
 WHERE
     completed_at BETWEEN :completed_at_from AND :completed_at_to
 ORDER BY order_ts
@@ -33,3 +34,10 @@ LIMIT :limit OFFSET :offset;
 count:
 SELECT count(id)
 FROM payments;
+
+getOldestCompletedTimestamp:
+SELECT completed_at
+FROM payments
+WHERE completed_at IS NOT NULL
+ORDER BY completed_at ASC
+LIMIT 1;
