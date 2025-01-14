@@ -54,6 +54,7 @@ import fr.acinq.phoenix.db.migrations.v10.json.MilliSatoshiSerializer
 import fr.acinq.phoenix.db.migrations.v10.json.OutpointSerializer
 import fr.acinq.phoenix.db.migrations.v10.json.SatoshiSerializer
 import fr.acinq.phoenix.db.migrations.v10.json.UUIDSerializer
+import fr.acinq.phoenix.db.migrations.v11.types.liquidityads.FundingFeeData.Companion.asCanonical
 import fr.acinq.phoenix.utils.extensions.deriveUUID
 import io.ktor.utils.io.charsets.Charsets
 import io.ktor.utils.io.core.String
@@ -109,8 +110,8 @@ private sealed class IncomingReceivedWithData {
             @Serializable
             @SerialName("fr.acinq.phoenix.db.payments.IncomingReceivedWithData.Part.Htlc.V0")
             data class V0(
-                @Serializable val amount: MilliSatoshi,
-                @Serializable val channelId: ByteVector32,
+                val amount: MilliSatoshi,
+                val channelId: ByteVector32,
                 val htlcId: Long
             ) : Htlc()
 
@@ -129,32 +130,32 @@ private sealed class IncomingReceivedWithData {
             @Serializable
             @SerialName("fr.acinq.phoenix.db.payments.IncomingReceivedWithData.Part.NewChannel.V0")
             data class V0(
-                @Serializable val amount: MilliSatoshi,
-                @Serializable val fees: MilliSatoshi,
-                @Serializable val channelId: ByteVector32?
+                val amount: MilliSatoshi,
+                val fees: MilliSatoshi,
+                val channelId: ByteVector32?
             ) : NewChannel()
 
             /** V1 contains a new `id` field that ensure that each [NewChannel] is unique. Old V0 data will use a random UUID to respect the [IncomingPayment.ReceivedWith.NewChannel] interface. */
             @Serializable
             @SerialName("fr.acinq.phoenix.db.payments.IncomingReceivedWithData.Part.NewChannel.V1")
             data class V1(
-                @Serializable val id: UUID,
-                @Serializable val amount: MilliSatoshi,
-                @Serializable val fees: MilliSatoshi,
-                @Serializable val channelId: ByteVector32?
+                val id: UUID,
+                val amount: MilliSatoshi,
+                val fees: MilliSatoshi,
+                val channelId: ByteVector32?
             ) : NewChannel()
 
             /** V2 supports dual funding. New fields: service/miningFees, channel id, funding tx id, and the confirmation/lock timestamps. Id is removed. */
             @Serializable
             @SerialName("fr.acinq.phoenix.db.payments.IncomingReceivedWithData.Part.NewChannel.V2")
             data class V2(
-                @Serializable val amount: MilliSatoshi,
-                @Serializable val serviceFee: MilliSatoshi,
-                @Serializable val miningFee: Satoshi,
-                @Serializable val channelId: ByteVector32,
-                @Serializable val txId: ByteVector32,
-                @Serializable val confirmedAt: Long?,
-                @Serializable val lockedAt: Long?,
+                val amount: MilliSatoshi,
+                val serviceFee: MilliSatoshi,
+                val miningFee: Satoshi,
+                val channelId: ByteVector32,
+                val txId: ByteVector32,
+                val confirmedAt: Long?,
+                val lockedAt: Long?,
             ) : NewChannel()
         }
 
@@ -162,13 +163,13 @@ private sealed class IncomingReceivedWithData {
             @Serializable
             @SerialName("fr.acinq.phoenix.db.payments.IncomingReceivedWithData.Part.SpliceIn.V0")
             data class V0(
-                @Serializable val amount: MilliSatoshi,
-                @Serializable val serviceFee: MilliSatoshi,
-                @Serializable val miningFee: Satoshi,
-                @Serializable val channelId: ByteVector32,
-                @Serializable val txId: ByteVector32,
-                @Serializable val confirmedAt: Long?,
-                @Serializable val lockedAt: Long?,
+                val amount: MilliSatoshi,
+                val serviceFee: MilliSatoshi,
+                val miningFee: Satoshi,
+                val channelId: ByteVector32,
+                val txId: ByteVector32,
+                val confirmedAt: Long?,
+                val lockedAt: Long?,
             ) : SpliceIn()
         }
 
@@ -256,10 +257,7 @@ private fun mapLightningIncomingPaymentPart(part: IncomingReceivedWithData, rece
         amountReceived = part.amountReceived,
         channelId = part.channelId,
         htlcId = part.htlcId,
-        fundingFee = when (part.fundingFee) {
-            is FundingFeeData.V0 -> LiquidityAds.FundingFee(part.fundingFee.amount, part.fundingFee.fundingTxId)
-            null -> null
-        },
+        fundingFee = part.fundingFee?.asCanonical(),
         receivedAt = receivedAt
     )
     is IncomingReceivedWithData.Part.FeeCredit.V0 -> LightningIncomingPayment.Part.FeeCredit(

@@ -36,4 +36,11 @@ sealed class FundingFeeData {
     @Serializable
     @SerialName("fr.acinq.phoenix.db.payments.liquidityads.FundingFeeData.V0")
     data class V0(val amount: MilliSatoshi, val fundingTxId: TxId) : FundingFeeData()
+
+    companion object {
+        fun FundingFeeData.asCanonical(): LiquidityAds.FundingFee = when (this) {
+            is V0 -> LiquidityAds.FundingFee(amount = amount, fundingTxId = fundingTxId)
+        }
+    }
+
 }
