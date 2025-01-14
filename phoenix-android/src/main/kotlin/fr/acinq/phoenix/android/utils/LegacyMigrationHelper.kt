@@ -45,7 +45,6 @@ import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
-import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.data.lnurl.LnurlAuth
 import fr.acinq.phoenix.legacy.db.*
@@ -345,10 +344,10 @@ object LegacyMigrationHelper {
                 lockedAt = closedAt,
                 channelId = paymentMeta?.closing_channel_id?.let { ByteVector32.fromValidHex(it) } ?: ByteVector32.Zeroes,
                 closingType = when (paymentMeta?.closing_type) {
-                    ClosingType.Mutual.code -> ChannelClosingType.Mutual
-                    ClosingType.Local.code -> ChannelClosingType.Local
-                    ClosingType.Remote.code -> ChannelClosingType.Remote
-                    else -> ChannelClosingType.Other
+                    ClosingType.Mutual.code -> ChannelCloseOutgoingPayment.ChannelClosingType.Mutual
+                    ClosingType.Local.code -> ChannelCloseOutgoingPayment.ChannelClosingType.Local
+                    ClosingType.Remote.code -> ChannelCloseOutgoingPayment.ChannelClosingType.Remote
+                    else -> ChannelCloseOutgoingPayment.ChannelClosingType.Other
                 },
             )
         }
@@ -385,7 +384,7 @@ object LegacyMigrationHelper {
                         id = UUID.fromString(part.id().toString()),
                         amount = part.amount().toLong().msat + partStatus.feesPaid().toLong().msat, // must include the fee!!!
                         route = JavaConverters.asJavaCollectionConverter(partStatus.route()).asJavaCollection().toList().map { hop ->
-                            HopDesc(
+                            LightningOutgoingPayment.Part.HopDesc(
                                 nodeId = PublicKey.fromHex(hop.nodeId().toString()),
                                 nextNodeId = PublicKey.fromHex(hop.nextNodeId().toString()),
                                 shortChannelId = if (hop.shortChannelId().isDefined) ShortChannelId(hop.shortChannelId().get().toLong()) else null

@@ -780,8 +780,8 @@
     <string name="payments_export_generate_button">Export</string>
     <string name="payments_export_no_payments">No successful payments yet</string>
     <string name="payments_export_invalid_timestamps">Please pick a valid start/end date</string>
-    <string name="payments_export_in_progress">Exporting payment #%1$d</string>
-    <string name="payments_export_success">%1$d payments successfully exported</string>
+    <string name="payments_export_in_progress">Exporting payments…</string>
+    <string name="payments_export_success">Payments successfully exported</string>
     <string name="payments_export_share_subject">Phoenix - payments from %1$s to %2$s</string>
     <string name="payments_export_share_title">Share Phoenix payments…</string>
     <string name="payments_export_share_button">Share file</string>

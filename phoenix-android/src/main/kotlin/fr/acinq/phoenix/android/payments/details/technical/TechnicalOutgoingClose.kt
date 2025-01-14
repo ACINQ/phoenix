@@ -20,7 +20,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
-import fr.acinq.lightning.db.ChannelClosingType
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.payments.details.ChannelIdRow
@@ -63,11 +62,11 @@ fun TechnicalOutgoingChannelClose(
         TechnicalRowSelectable(
             label = stringResource(id = R.string.paymentdetails_closing_type_label),
             value = when (payment.closingType) {
-                ChannelClosingType.Mutual -> stringResource(id = R.string.paymentdetails_closing_type_mutual)
-                ChannelClosingType.Local -> stringResource(id = R.string.paymentdetails_closing_type_local)
-                ChannelClosingType.Remote -> stringResource(id = R.string.paymentdetails_closing_type_remote)
-                ChannelClosingType.Revoked -> stringResource(id = R.string.paymentdetails_closing_type_revoked)
-                ChannelClosingType.Other -> stringResource(id = R.string.paymentdetails_closing_type_other)
+                ChannelCloseOutgoingPayment.ChannelClosingType.Mutual -> stringResource(id = R.string.paymentdetails_closing_type_mutual)
+                ChannelCloseOutgoingPayment.ChannelClosingType.Local -> stringResource(id = R.string.paymentdetails_closing_type_local)
+                ChannelCloseOutgoingPayment.ChannelClosingType.Remote -> stringResource(id = R.string.paymentdetails_closing_type_remote)
+                ChannelCloseOutgoingPayment.ChannelClosingType.Revoked -> stringResource(id = R.string.paymentdetails_closing_type_revoked)
+                ChannelCloseOutgoingPayment.ChannelClosingType.Other -> stringResource(id = R.string.paymentdetails_closing_type_other)
             }
         )
     }
