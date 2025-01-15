@@ -80,10 +80,10 @@ fun TechnicalIncomingNewChannel(
         )
         ChannelIdRow(channelId = payment.channelId)
         TransactionRow(txId = payment.txId)
-        TechnicalRow(label = stringResource(id = R.string.paymentdetails_dualswapin_tx_label)) {
+        TechnicalRow(label = stringResource(id = R.string.paymentdetails_inputs_label)) {
             payment.localInputs.mapIndexed { index, outpoint ->
                 Row {
-                    Text(text = stringResource(id = R.string.paymentdetails_dualswapin_tx_value, index + 1))
+                    Text(text = stringResource(id = R.string.paymentdetails_inputs_value, index + 1))
                     Spacer(modifier = Modifier.width(4.dp))
                     InlineTransactionLink(txId = outpoint.txid)
                 }

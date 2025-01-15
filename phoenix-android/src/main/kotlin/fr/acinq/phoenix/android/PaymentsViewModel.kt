@@ -52,7 +52,7 @@ class PaymentsViewModel(
 
     companion object {
         const val pageSize = 40
-        const val paymentsCountInHome = 6
+        const val paymentsCountInHome = 10
     }
 
     private val log = LoggerFactory.getLogger(this::class.java)

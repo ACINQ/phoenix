@@ -67,6 +67,7 @@ import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountView
 import fr.acinq.phoenix.android.components.Clickable
+import fr.acinq.phoenix.android.components.IconPopup
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.openLink
 import fr.acinq.phoenix.android.components.txUrl
@@ -117,6 +118,8 @@ fun PaymentDetailsTechnicalView(
         is SpliceCpfpOutgoingPayment -> TechnicalOutgoingSpliceCpfp(payment, originalFiatRate)
         is SpliceOutgoingPayment -> TechnicalOutgoingSplice(payment, originalFiatRate)
     }
+
+    Spacer(modifier = Modifier.height(60.dp))
 }
 
 @Composable
@@ -155,7 +158,7 @@ fun Bolt11InvoiceSection(
         TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_bolt11_description_label), value = it)
     }
     TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = invoice.paymentHash.toHex())
-    preimage?.let { TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_preimage_label), value = preimage.toHex()) }
+    preimage?.let { TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_preimage_label), value = preimage.toHex(), helpMessage = stringResource(id = R.string.paymentdetails_preimage_help)) }
     TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_bolt11_label), value = invoice.write())
 }
 
@@ -190,7 +193,7 @@ fun Bolt12InvoiceSection(
         }
     }
     TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = invoice.paymentHash.toHex())
-    preimage?.let { TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_preimage_label), value = preimage.toHex()) }
+    preimage?.let { TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_preimage_label), value = preimage.toHex(), helpMessage = stringResource(id = R.string.paymentdetails_preimage_help)) }
     TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_offer_label), value = invoice.invoiceRequest.offer.encode())
     TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_bolt12_label), value = invoice.write())
 }
@@ -219,20 +222,34 @@ fun OutgoingAmountSection(
 @Composable
 fun TechnicalRow(
     label: String,
+    helpMessage: String? = null,
     space: Dp = 12.dp,
     contentPadding: PaddingValues = PaddingValues(vertical = 8.dp),
     content: @Composable () -> Unit
 ) {
     Row {
         Spacer(modifier = Modifier.width(12.dp))
-        Text(
-            modifier = Modifier
-                .weight(1f)
-                .alignBy(FirstBaseline)
-                .padding(vertical = 8.dp),
-            text = label,
-            style = MaterialTheme.typography.subtitle2,
-        )
+        Row(modifier = Modifier
+            .weight(1f)
+            .alignBy(FirstBaseline)
+            .padding(vertical = 8.dp)
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.subtitle2,
+            )
+            if (helpMessage != null) {
+                IconPopup(
+                    icon = R.drawable.ic_help,
+                    iconSize = 16.dp,
+                    iconPadding = 3.dp,
+                    colorAtRest = MaterialTheme.typography.subtitle2.color,
+                    spaceRight = 0.dp,
+                    spaceLeft = 4.dp,
+                    popupMessage = helpMessage
+                )
+            }
+        }
         Spacer(modifier = Modifier.width(space))
         Column(
             modifier = Modifier
@@ -287,12 +304,12 @@ fun TechnicalRowAmount(
 }
 
 @Composable
-fun TechnicalRowWithCopy(label: String, value: String) {
-    TechnicalRow(label = label, space = 0.dp, contentPadding = PaddingValues(0.dp)) {
+fun TechnicalRowWithCopy(label: String, value: String, helpMessage: String? = null) {
+    TechnicalRow(label = label, space = 0.dp, contentPadding = PaddingValues(0.dp), helpMessage = helpMessage) {
         val context = LocalContext.current
         Clickable(onClick = { copyToClipboard(context = context, data = value) }, shape = RoundedCornerShape(12.dp)) {
             Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)) {
-                Text(text = value, maxLines = 5, overflow = TextOverflow.Ellipsis)
+                Text(text = value, maxLines = 4, overflow = TextOverflow.Ellipsis)
                 Spacer(modifier = Modifier.height(4.dp))
                 TextWithIcon(
                     text = stringResource(id = R.string.btn_copy),

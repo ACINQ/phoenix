@@ -30,6 +30,7 @@ import fr.acinq.phoenix.android.payments.details.OutgoingAmountSection
 import fr.acinq.phoenix.android.payments.details.TechnicalRow
 import fr.acinq.phoenix.android.payments.details.TechnicalRowAmount
 import fr.acinq.phoenix.android.payments.details.TechnicalRowSelectable
+import fr.acinq.phoenix.android.payments.details.TechnicalRowWithCopy
 import fr.acinq.phoenix.android.payments.details.TimestampSection
 import fr.acinq.phoenix.data.ExchangeRate
 
@@ -69,10 +70,10 @@ fun TechnicalOutgoingLightning(
                 Bolt11InvoiceSection(invoice = details.paymentRequest, preimage = (payment.status as? LightningOutgoingPayment.Status.Succeeded)?.preimage, originalFiatRate = originalFiatRate)
             }
             is LightningOutgoingPayment.Details.SwapOut -> {
-                TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_bitcoin_address_label), value = details.address)
-                TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = details.paymentHash.toHex())
+                TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_bitcoin_address_label), value = details.address)
+                TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = details.paymentHash.toHex())
                 ((payment.status as? LightningOutgoingPayment.Status.Succeeded)?.preimage)?.let {
-                    TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_preimage_label), value = it.toHex())
+                    TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_preimage_label), value = it.toHex())
                 }
             }
             is LightningOutgoingPayment.Details.Blinded -> {

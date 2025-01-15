@@ -69,14 +69,14 @@ fun TechnicalOutgoingLiquidity(
         )
         if (payment.feePaidFromChannelBalance.total > 0.sat) {
             TechnicalRowAmount(
-                label = stringResource(id = R.string.paymentdetails_liquidity_miner_fee_label),
-                amount = payment.feePaidFromChannelBalance.miningFee.toMilliSatoshi(),
+                label = stringResource(id = R.string.paymentdetails_liquidity_service_fee_label),
+                amount = payment.feePaidFromChannelBalance.serviceFee.toMilliSatoshi(),
                 rateThen = originalFiatRate,
                 mSatDisplayPolicy = MSatDisplayPolicy.SHOW
             )
             TechnicalRowAmount(
-                label = stringResource(id = R.string.paymentdetails_liquidity_service_fee_label),
-                amount = payment.feePaidFromChannelBalance.serviceFee.toMilliSatoshi(),
+                label = stringResource(id = R.string.paymentdetails_liquidity_miner_fee_label),
+                amount = payment.feePaidFromChannelBalance.miningFee.toMilliSatoshi(),
                 rateThen = originalFiatRate,
                 mSatDisplayPolicy = MSatDisplayPolicy.SHOW
             )

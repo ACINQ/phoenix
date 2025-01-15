@@ -463,8 +463,8 @@
     <string name="paymentdetails_bitcoin_address_label">Bitcoin address</string>
 
     <string name="paymentdetails_splice_out_channel_label">Spliced channel</string>
-    <string name="paymentdetails_dualswapin_tx_label">Transactions</string>
-    <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
+    <string name="paymentdetails_inputs_label">Local inputs</string>
+    <string name="paymentdetails_inputs_value">- #%1$s:</string>
 
     <string name="paymentdetails_liquidity_amount_label">Amount requested</string>
 
@@ -478,6 +478,7 @@
     <string name="paymentdetails_pubkey_label">Target public key</string>
     <string name="paymentdetails_payment_hash_label">Payment Hash</string>
     <string name="paymentdetails_preimage_label">Preimage</string>
+    <string name="paymentdetails_preimage_help">Cryptographic proof that the recipient successfully received the payment.</string>
     <string name="paymentdetails_bolt11_label">Bolt11 invoice</string>
     <string name="paymentdetails_bolt11_description_label">Invoice description</string>
     <string name="paymentdetails_bolt12_label">Bolt12 invoice</string>

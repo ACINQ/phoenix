@@ -387,8 +387,6 @@
     <string name="paymentdetails_bitcoin_address_label">Adresse Bitcoin</string>
 
     <string name="paymentdetails_splice_out_channel_label">Canal splicé</string>
-    <string name="paymentdetails_dualswapin_tx_label">Transactions</string>
-    <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
 
     <string name="paymentdetails_liquidity_amount_label">Liquidité demandée</string>
 

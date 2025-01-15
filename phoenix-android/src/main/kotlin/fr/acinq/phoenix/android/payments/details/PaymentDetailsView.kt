@@ -62,7 +62,7 @@ class PaymentDetailsViewModel(
     private val paymentsManager: PaymentsManager
 ) : ViewModel() {
 
-    val log = LoggerFactory.getLogger(this::class.java)
+    private val log = LoggerFactory.getLogger(this::class.java)
 
     var state by mutableStateOf<PaymentDetailsState>(PaymentDetailsState.Loading)
 

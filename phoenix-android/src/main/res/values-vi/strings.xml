@@ -374,8 +374,6 @@
     <string name="paymentdetails_bitcoin_address_label">Điạ chỉ Bitcoin</string>
 
     <string name="paymentdetails_splice_out_channel_label">Kênh đã splice </string>
-    <string name="paymentdetails_dualswapin_tx_label">Giao dịch</string>
-    <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
 
     <string name="paymentdetails_liquidity_amount_label">Số tiền yêu cầu</string>
 

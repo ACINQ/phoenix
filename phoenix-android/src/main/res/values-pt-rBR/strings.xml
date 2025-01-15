@@ -363,8 +363,6 @@
     <string name="paymentdetails_bitcoin_address_label">Endereço Bitcoin</string>
 
     <string name="paymentdetails_splice_out_channel_label">Canal emendado</string>
-    <string name="paymentdetails_dualswapin_tx_label">Transações</string>
-    <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
 
     <string name="paymentdetails_closing_type_label">Tipo de fechamento</string>
     <string name="paymentdetails_closing_type_mutual">Muto</string>

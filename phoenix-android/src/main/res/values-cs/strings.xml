@@ -351,8 +351,6 @@
     <string name="paymentdetails_bitcoin_address_label">Bitcoinová adresa</string>
 
     <string name="paymentdetails_splice_out_channel_label">Spliced kanál</string>
-    <string name="paymentdetails_dualswapin_tx_label">Transakce</string>
-    <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
 
     <string name="paymentdetails_closing_type_label">Typ uzavření</string>
     <string name="paymentdetails_closing_type_mutual">Vzájemný</string>
