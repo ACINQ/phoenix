@@ -27,7 +27,7 @@ SELECT p.data, pm.*
 FROM payments AS p
 LEFT OUTER JOIN payments_metadata AS pm ON pm.payment_id = p.id
 WHERE
-    completed_at BETWEEN :completed_at_from AND :completed_at_to
+    succeeded_at BETWEEN :succeeded_at_from AND :succeeded_at_to
 ORDER BY order_ts
 LIMIT :limit OFFSET :offset;
 
