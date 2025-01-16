@@ -81,124 +81,23 @@ import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
 @Composable
-fun SplashStatus(
-    payment: WalletPayment,
-    fromEvent: Boolean,
-    onCpfpSuccess: () -> Unit,
-) {
-    when (payment) {
-        is LightningOutgoingPayment -> when (payment.status) {
-            is LightningOutgoingPayment.Status.Pending -> PaymentStatusIcon(
-                message = { Text(text = stringResource(id = R.string.paymentdetails_status_sent_pending)) },
+fun SplashStatusIncoming(payment: IncomingPayment, fromEvent: Boolean) {
+    when (payment.completedAt) {
+        null -> {
+            PaymentStatusIcon(
+                message = { Text(text = stringResource(id = R.string.paymentdetails_status_received_pending)) },
                 imageResId = R.drawable.ic_payment_details_pending_static,
                 isAnimated = false,
                 color = mutedTextColor
             )
-            is LightningOutgoingPayment.Status.Failed -> PaymentStatusIcon(
-                message = { Text(text = annotatedStringResource(id = R.string.paymentdetails_status_sent_failed), textAlign = TextAlign.Center) },
-                imageResId = R.drawable.ic_payment_details_failure_static,
-                isAnimated = false,
-                color = negativeColor
-            )
-            is LightningOutgoingPayment.Status.Succeeded -> PaymentStatusIcon(
-                message = {
-                    Text(text = annotatedStringResource(id = R.string.paymentdetails_status_sent_successful, payment.completedAt?.toRelativeDateString() ?: ""))
-                },
+        }
+        else -> {
+            PaymentStatusIcon(
+                message = { Text(text = annotatedStringResource(id = R.string.paymentdetails_status_received_successful, payment.completedAt!!.toRelativeDateString())) },
                 imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
                 isAnimated = fromEvent,
                 color = positiveColor,
             )
-        }
-        is ChannelCloseOutgoingPayment -> when (payment.confirmedAt) {
-            null -> {
-                PaymentStatusIcon(
-                    message = null,
-                    imageResId = R.drawable.ic_payment_details_pending_onchain_static,
-                    isAnimated = false,
-                    color = mutedTextColor,
-                )
-                ConfirmationView(payment.txId, payment.channelId, isConfirmed = false, canBeBumped = false, onCpfpSuccess = onCpfpSuccess)
-            }
-            else -> {
-                PaymentStatusIcon(
-                    message = {
-                        Text(text = annotatedStringResource(id = R.string.paymentdetails_status_channelclose_confirmed, payment.completedAt?.toRelativeDateString() ?: ""))
-                    },
-                    imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
-                    isAnimated = fromEvent,
-                    color = positiveColor,
-                )
-                ConfirmationView(payment.txId, payment.channelId, isConfirmed = true, canBeBumped = false, onCpfpSuccess)
-            }
-        }
-        is SpliceOutgoingPayment -> when (payment.confirmedAt) {
-            null -> {
-                PaymentStatusIcon(
-                    message = null,
-                    imageResId = R.drawable.ic_payment_details_pending_onchain_static,
-                    isAnimated = false,
-                    color = mutedTextColor,
-                )
-                ConfirmationView(payment.txId, payment.channelId, isConfirmed = false, canBeBumped = true, onCpfpSuccess = onCpfpSuccess)
-            }
-            else -> {
-                PaymentStatusIcon(
-                    message = {
-                        Text(text = annotatedStringResource(id = R.string.paymentdetails_status_sent_successful, payment.completedAt!!.toRelativeDateString()))
-                    },
-                    imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
-                    isAnimated = fromEvent,
-                    color = positiveColor,
-                )
-                ConfirmationView(payment.txId, payment.channelId, isConfirmed = true, canBeBumped = true, onCpfpSuccess = onCpfpSuccess)
-            }
-        }
-        is SpliceCpfpOutgoingPayment -> when (payment.confirmedAt) {
-            null -> {
-                PaymentStatusIcon(
-                    message = null,
-                    imageResId = R.drawable.ic_payment_details_pending_onchain_static,
-                    isAnimated = false,
-                    color = mutedTextColor,
-                )
-                ConfirmationView(payment.txId, payment.channelId, isConfirmed = false, canBeBumped = true, onCpfpSuccess = onCpfpSuccess)
-            }
-            else -> {
-                PaymentStatusIcon(
-                    message = {
-                        Text(text = annotatedStringResource(id = R.string.paymentdetails_status_sent_successful, payment.completedAt!!.toRelativeDateString()))
-                    },
-                    imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
-                    isAnimated = fromEvent,
-                    color = positiveColor,
-                )
-                ConfirmationView(payment.txId, payment.channelId, isConfirmed = true, canBeBumped = true, onCpfpSuccess = onCpfpSuccess)
-            }
-        }
-        is InboundLiquidityOutgoingPayment -> {
-            SplashLiquidityStatus(payment = payment, fromEvent = fromEvent)
-        }
-        is IncomingPayment -> {
-            when (payment.completedAt) {
-                null -> {
-                    PaymentStatusIcon(
-                        message = { Text(text = stringResource(id = R.string.paymentdetails_status_received_pending)) },
-                        imageResId = R.drawable.ic_payment_details_pending_static,
-                        isAnimated = false,
-                        color = mutedTextColor
-                    )
-                }
-                else -> {
-                    PaymentStatusIcon(
-                        message = {
-                            Text(text = annotatedStringResource(id = R.string.paymentdetails_status_received_successful, payment.completedAt!!.toRelativeDateString()))
-                        },
-                        imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
-                        isAnimated = fromEvent,
-                        color = positiveColor,
-                    )
-                }
-            }
         }
     }
 }
@@ -243,13 +142,12 @@ fun PaymentStatusIcon(
 }
 
 @Composable
-private fun ConfirmationView(
+fun SplashConfirmationView(
     txId: TxId,
     channelId: ByteVector32,
     isConfirmed: Boolean,
     canBeBumped: Boolean,
     onCpfpSuccess: () -> Unit,
-    minDepth: Int? = null, // sometimes we know how many confirmations are needed
 ) {
     val txUrl = txUrl(txId = txId)
     val context = LocalContext.current
@@ -308,10 +206,7 @@ private fun ConfirmationView(
                 }
             } else {
                 FilledButton(
-                    text = when (minDepth) {
-                        null -> stringResource(R.string.paymentdetails_status_unconfirmed_default, conf)
-                        else -> stringResource(R.string.paymentdetails_status_unconfirmed_with_depth, conf, minDepth)
-                    },
+                    text = stringResource(R.string.paymentdetails_status_unconfirmed_default, conf),
                     icon = R.drawable.ic_chain,
                     onClick = { openLink(context, txUrl) },
                     backgroundColor = Color.Transparent,
@@ -346,32 +241,5 @@ private fun BumpTransactionDialog(
         buttons = null,
     ) {
         CpfpView(channelId = channelId, onSuccess = onSuccess)
-    }
-}
-
-@Composable
-fun SplashLiquidityStatus(payment: InboundLiquidityOutgoingPayment, fromEvent: Boolean) {
-    when (val lockedAt = payment.lockedAt) {
-        null -> {
-            PaymentStatusIcon(
-                message = null,
-                imageResId = R.drawable.ic_payment_details_pending_onchain_static,
-                isAnimated = false,
-                color = mutedTextColor,
-            )
-        }
-        else -> {
-            PaymentStatusIcon(
-                message = {
-                    when {
-                        payment.isManualPurchase() -> Text(text = annotatedStringResource(id = R.string.paymentdetails_status_inbound_liquidity_success, lockedAt.toRelativeDateString()))
-                        else -> Text(text = annotatedStringResource(id = R.string.paymentdetails_status_inbound_liquidity_auto_success, lockedAt.toRelativeDateString()))
-                    }
-                },
-                imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
-                isAnimated = fromEvent,
-                color = positiveColor,
-            )
-        }
     }
 }

@@ -25,8 +25,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
+import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.msat
 import fr.acinq.phoenix.android.LocalBitcoinUnit
@@ -34,9 +36,14 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.SplashLabelRow
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
+import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.isLegacyMigration
 import fr.acinq.phoenix.android.utils.extensions.smartDescription
+import fr.acinq.phoenix.android.utils.mutedTextColor
+import fr.acinq.phoenix.android.utils.negativeColor
+import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.data.WalletPaymentMetadata
 
 @Composable
@@ -62,6 +69,32 @@ fun SplashChannelClose(
     )
     SplashDestination(payment)
     SplashFee(payment = payment)
+}
+
+@Composable
+fun SplashStatusChannelClose(payment: ChannelCloseOutgoingPayment, fromEvent: Boolean, onCpfpSuccess: () -> Unit) {
+    when (payment.confirmedAt) {
+        null -> {
+            PaymentStatusIcon(
+                message = null,
+                imageResId = R.drawable.ic_payment_details_pending_onchain_static,
+                isAnimated = false,
+                color = mutedTextColor,
+            )
+            SplashConfirmationView(payment.txId, payment.channelId, isConfirmed = false, canBeBumped = false, onCpfpSuccess = onCpfpSuccess)
+        }
+        else -> {
+            PaymentStatusIcon(
+                message = {
+                    Text(text = annotatedStringResource(id = R.string.paymentdetails_status_channelclose_confirmed, payment.completedAt?.toRelativeDateString() ?: ""))
+                },
+                imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
+                isAnimated = fromEvent,
+                color = positiveColor,
+            )
+            SplashConfirmationView(payment.txId, payment.channelId, isConfirmed = true, canBeBumped = false, onCpfpSuccess)
+        }
+    }
 }
 
 @Composable

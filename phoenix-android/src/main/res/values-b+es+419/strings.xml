@@ -314,7 +314,6 @@
     <string name="paymentdetails_status_unconfirmed_zero">0 confirmaciones</string>
     <string name="paymentdetails_status_unconfirmed_zero_bump">Tocar para acelerar</string>
     <string name="paymentdetails_status_unconfirmed_default">%1$d confirmación(es)</string>
-    <string name="paymentdetails_status_unconfirmed_with_depth">%1$d/%2$d confirmación(es)</string>
     <string name="paymentdetails_status_confirmed">Confirmado en la cadena</string>
 
     <string name="paymentdetails_lnurlpay_service">Servicio por</string>

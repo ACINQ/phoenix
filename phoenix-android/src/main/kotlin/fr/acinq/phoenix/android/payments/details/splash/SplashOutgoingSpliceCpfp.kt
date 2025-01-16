@@ -30,8 +30,12 @@ import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.SplashLabelRow
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
+import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.extensions.smartDescription
+import fr.acinq.phoenix.android.utils.mutedTextColor
+import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.utils.extensions.state
 
@@ -49,6 +53,32 @@ fun SplashSpliceOutCpfp(
         onMetadataDescriptionUpdate = onMetadataDescriptionUpdate
     )
     SplashDestination()
+}
+
+@Composable
+fun SplashStatusSpliceOutCpfp(payment: SpliceCpfpOutgoingPayment, fromEvent: Boolean, onCpfpSuccess: () -> Unit) {
+    when (payment.confirmedAt) {
+        null -> {
+            PaymentStatusIcon(
+                message = null,
+                imageResId = R.drawable.ic_payment_details_pending_onchain_static,
+                isAnimated = false,
+                color = mutedTextColor,
+            )
+            SplashConfirmationView(payment.txId, payment.channelId, isConfirmed = false, canBeBumped = true, onCpfpSuccess = onCpfpSuccess)
+        }
+        else -> {
+            PaymentStatusIcon(
+                message = {
+                    Text(text = annotatedStringResource(id = R.string.paymentdetails_status_sent_successful, payment.completedAt!!.toRelativeDateString()))
+                },
+                imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
+                isAnimated = fromEvent,
+                color = positiveColor,
+            )
+            SplashConfirmationView(payment.txId, payment.channelId, isConfirmed = true, canBeBumped = true, onCpfpSuccess = onCpfpSuccess)
+        }
+    }
 }
 
 @Composable

@@ -27,6 +27,7 @@ import fr.acinq.lightning.db.Bolt11IncomingPayment
 import fr.acinq.lightning.db.Bolt12IncomingPayment
 import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
 import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
+import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.LegacyPayToOpenIncomingPayment
 import fr.acinq.lightning.db.LegacySwapInIncomingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
@@ -48,7 +49,12 @@ import fr.acinq.phoenix.android.payments.details.splash.SplashLightningOutgoing
 import fr.acinq.phoenix.android.payments.details.splash.SplashLiquidityPurchase
 import fr.acinq.phoenix.android.payments.details.splash.SplashSpliceOut
 import fr.acinq.phoenix.android.payments.details.splash.SplashSpliceOutCpfp
-import fr.acinq.phoenix.android.payments.details.splash.SplashStatus
+import fr.acinq.phoenix.android.payments.details.splash.SplashStatusChannelClose
+import fr.acinq.phoenix.android.payments.details.splash.SplashStatusIncoming
+import fr.acinq.phoenix.android.payments.details.splash.SplashStatusLightningOutgoing
+import fr.acinq.phoenix.android.payments.details.splash.SplashStatusLiquidityPurchase
+import fr.acinq.phoenix.android.payments.details.splash.SplashStatusSpliceOut
+import fr.acinq.phoenix.android.payments.details.splash.SplashStatusSpliceOutCpfp
 import fr.acinq.phoenix.android.utils.borderColor
 import fr.acinq.phoenix.data.WalletPaymentInfo
 
@@ -63,7 +69,16 @@ fun PaymentDetailsSplashView(
     val payment = data.payment
     SplashLayout(
         header = { DefaultScreenHeader(onBackClick = onBackClick) },
-        topContent = { SplashStatus(data.payment, fromEvent, onCpfpSuccess = onBackClick) }
+        topContent = {
+            when (payment) {
+                is LightningOutgoingPayment -> SplashStatusLightningOutgoing(payment = payment, fromEvent = fromEvent)
+                is ChannelCloseOutgoingPayment -> SplashStatusChannelClose(payment = payment, fromEvent = fromEvent, onCpfpSuccess = onBackClick)
+                is SpliceOutgoingPayment -> SplashStatusSpliceOut(payment = payment, fromEvent = fromEvent, onCpfpSuccess = onBackClick)
+                is SpliceCpfpOutgoingPayment -> SplashStatusSpliceOutCpfp(payment = payment, fromEvent = fromEvent, onCpfpSuccess = onBackClick)
+                is InboundLiquidityOutgoingPayment -> SplashStatusLiquidityPurchase(payment = payment, fromEvent = fromEvent)
+                is IncomingPayment -> SplashStatusIncoming(payment = payment, fromEvent = fromEvent)
+            }
+        }
     ) {
         @Suppress("DEPRECATION")
         when (payment) {

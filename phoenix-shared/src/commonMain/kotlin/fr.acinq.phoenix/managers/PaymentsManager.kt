@@ -13,6 +13,7 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.SqlitePaymentsDb
 import fr.acinq.lightning.logging.debug
+import fr.acinq.lightning.logging.info
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.utils.extensions.relatedPaymentIds
 import kotlinx.coroutines.CoroutineScope
@@ -113,8 +114,8 @@ class PaymentsManager(
                 log.debug { "checking confirmation status of ${unconfirmedTxs.size} txs at block=$blockHeight" }
                 unconfirmedTxs.forEach { txId ->
                     electrumClient.getConfirmations(txId)?.let { conf ->
+                        log.info { "transaction $txId has $conf confirmations" }
                         if (conf > 0) {
-                            log.debug { "transaction $txId has $conf confirmations, updating database" }
                             paymentsDb.setConfirmed(txId)
                         }
                     }

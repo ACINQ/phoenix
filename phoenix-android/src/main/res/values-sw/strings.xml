@@ -353,7 +353,6 @@
     <string name="paymentdetails_status_unconfirmed_zero">0 uthibitisho</string>
     <string name="paymentdetails_status_unconfirmed_zero_bump">Gonga ili kuharakisha</string>
     <string name="paymentdetails_status_unconfirmed_default">%1$d uthibitisho(s)</string>
-    <string name="paymentdetails_status_unconfirmed_with_depth">%1$d/%2$d uthibitisho(s)</string>
     <string name="paymentdetails_status_confirmed">Imethibitishwa kwenye blockchain</string>
 
     <string name="paymentdetails_offer_note_label">Ujumbe</string>

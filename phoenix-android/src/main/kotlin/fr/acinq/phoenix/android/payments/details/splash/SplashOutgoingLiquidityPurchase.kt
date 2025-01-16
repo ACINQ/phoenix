@@ -39,8 +39,12 @@ import fr.acinq.phoenix.android.components.SplashLabelRow
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.navigateToPaymentDetails
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
+import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.mutedBgColor
+import fr.acinq.phoenix.android.utils.mutedTextColor
+import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.utils.extensions.isManualPurchase
 import fr.acinq.phoenix.utils.extensions.relatedPaymentIds
 import fr.acinq.phoenix.utils.extensions.state
@@ -68,6 +72,33 @@ private fun SplashPurchase(
         val btcUnit = LocalBitcoinUnit.current
         SplashLabelRow(label = stringResource(id = R.string.paymentdetails_liquidity_purchase_label)) {
             Text(text = payment.purchase.amount.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW_IF_ZERO_SATS))
+        }
+    }
+}
+
+@Composable
+fun SplashStatusLiquidityPurchase(payment: InboundLiquidityOutgoingPayment, fromEvent: Boolean) {
+    when (val lockedAt = payment.lockedAt) {
+        null -> {
+            PaymentStatusIcon(
+                message = null,
+                imageResId = R.drawable.ic_payment_details_pending_onchain_static,
+                isAnimated = false,
+                color = mutedTextColor,
+            )
+        }
+        else -> {
+            PaymentStatusIcon(
+                message = {
+                    when {
+                        payment.isManualPurchase() -> Text(text = annotatedStringResource(id = R.string.paymentdetails_status_inbound_liquidity_success, lockedAt.toRelativeDateString()))
+                        else -> Text(text = annotatedStringResource(id = R.string.paymentdetails_status_inbound_liquidity_auto_success, lockedAt.toRelativeDateString()))
+                    }
+                },
+                imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
+                isAnimated = fromEvent,
+                color = positiveColor,
+            )
         }
     }
 }

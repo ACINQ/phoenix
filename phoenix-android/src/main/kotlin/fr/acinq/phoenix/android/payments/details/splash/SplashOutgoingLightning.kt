@@ -28,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.db.LightningOutgoingPayment
@@ -41,8 +42,13 @@ import fr.acinq.phoenix.android.components.SplashLabelRow
 import fr.acinq.phoenix.android.components.WebLink
 import fr.acinq.phoenix.android.components.contact.ContactOrOfferView
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
+import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.extensions.smartDescription
+import fr.acinq.phoenix.android.utils.mutedTextColor
+import fr.acinq.phoenix.android.utils.negativeColor
+import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.data.LnurlPayMetadata
 import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.data.lnurl.LnurlPay
@@ -81,6 +87,32 @@ fun SplashLightningOutgoing(
 
     (payment.status as? LightningOutgoingPayment.Status.Failed)?.let { status ->
         PaymentErrorView(status = status, failedParts = payment.parts.map { it.status }.filterIsInstance<LightningOutgoingPayment.Part.Status.Failed>())
+    }
+}
+
+@Composable
+fun SplashStatusLightningOutgoing(payment: LightningOutgoingPayment, fromEvent: Boolean) {
+    when (payment.status) {
+        is LightningOutgoingPayment.Status.Pending -> PaymentStatusIcon(
+            message = { Text(text = stringResource(id = R.string.paymentdetails_status_sent_pending)) },
+            imageResId = R.drawable.ic_payment_details_pending_static,
+            isAnimated = false,
+            color = mutedTextColor
+        )
+        is LightningOutgoingPayment.Status.Failed -> PaymentStatusIcon(
+            message = { Text(text = annotatedStringResource(id = R.string.paymentdetails_status_sent_failed), textAlign = TextAlign.Center) },
+            imageResId = R.drawable.ic_payment_details_failure_static,
+            isAnimated = false,
+            color = negativeColor
+        )
+        is LightningOutgoingPayment.Status.Succeeded -> PaymentStatusIcon(
+            message = {
+                Text(text = annotatedStringResource(id = R.string.paymentdetails_status_sent_successful, payment.completedAt?.toRelativeDateString() ?: ""))
+            },
+            imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
+            isAnimated = fromEvent,
+            color = positiveColor,
+        )
     }
 }
 
