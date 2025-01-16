@@ -61,6 +61,7 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.firebase.messaging.FirebaseMessaging
 import fr.acinq.lightning.db.Bolt12IncomingPayment
+import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
@@ -544,12 +545,10 @@ fun AppView(
         LaunchedEffect(key1 = payment.id) {
             try {
                 if (isDataMigrationExpected == false) {
-                    if (payment is Bolt12IncomingPayment) {
-                        SystemNotificationHelper.notifyPaymentsReceived(
-                            context, userPrefs, id = payment.id, amount = payment.amount, rates = exchangeRates, isHeadless = false
-                        )
-                    } else {
-                        navigateToPaymentDetails(navController, id = payment.id, isFromEvent = true)
+                    when (payment) {
+                        is ChannelCloseOutgoingPayment -> Unit
+                        is Bolt12IncomingPayment -> SystemNotificationHelper.notifyPaymentsReceived(context, userPrefs, id = payment.id, amount = payment.amount, rates = exchangeRates, isHeadless = false)
+                        else -> navigateToPaymentDetails(navController, id = payment.id, isFromEvent = true)
                     }
                 }
             } catch (e: Exception) {
