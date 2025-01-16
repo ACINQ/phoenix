@@ -41,7 +41,7 @@ fun SplashSpliceOutCpfp(
     metadata: WalletPaymentMetadata,
     onMetadataDescriptionUpdate: (UUID, String?) -> Unit,
 ) {
-    SplashAmount(amount = payment.amount - payment.fees, state = payment.state(), isOutgoing = true)
+    SplashAmount(amount = payment.amount, state = payment.state(), isOutgoing = true)
     SplashDescription(
         description = payment.smartDescription(),
         userDescription = metadata.userDescription,
@@ -49,7 +49,6 @@ fun SplashSpliceOutCpfp(
         onMetadataDescriptionUpdate = onMetadataDescriptionUpdate
     )
     SplashDestination()
-    SplashFee(payment = payment)
 }
 
 @Composable

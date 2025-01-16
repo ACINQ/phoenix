@@ -66,8 +66,8 @@ fun TechnicalOutgoingLightning(
 
         when (val details = payment.details) {
             is LightningOutgoingPayment.Details.Normal -> {
-                TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_pubkey_label), value = payment.recipient.toHex())
                 Bolt11InvoiceSection(invoice = details.paymentRequest, preimage = (payment.status as? LightningOutgoingPayment.Status.Succeeded)?.preimage, originalFiatRate = originalFiatRate)
+                TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_pubkey_label), value = payment.recipient.toHex())
             }
             is LightningOutgoingPayment.Details.SwapOut -> {
                 TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_bitcoin_address_label), value = details.address)
