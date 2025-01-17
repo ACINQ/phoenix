@@ -1,9 +1,8 @@
 object Versions {
     const val lightningKmp = "1.8.4"
     const val secp256k1 = "0.14.0"
-    const val torMobile = "0.2.0"
 
-    const val kotlin = "1.9.22"
+    const val kotlin = "2.0.21"
 
     const val ktor = "2.3.7"
     const val sqlDelight = "2.0.1"
@@ -19,7 +18,6 @@ object Versions {
         const val prefs = "1.2.0"
         const val datastore = "1.0.0"
         const val compose = "1.6.8"
-        const val composeCompiler = "1.5.8"
         const val navCompose = "2.6.0"
         const val accompanist = "0.30.1"
         const val composeConstraintLayout = "1.1.0-alpha09"
