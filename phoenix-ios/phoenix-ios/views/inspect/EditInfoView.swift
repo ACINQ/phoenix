@@ -275,7 +275,7 @@ struct EditInfoView: View {
 	func saveButtonTapped() {
 		log.trace("saveButtonTapped()")
 		
-		let paymentId = paymentInfo.id()
+		let paymentId: Lightning_kmpUUID = paymentInfo.payment.id
 		var desc = descText.trimmingCharacters(in: .whitespacesAndNewlines)
 		
 		if desc.count > maxDescCount {
@@ -301,7 +301,7 @@ struct EditInfoView: View {
 			let business = Biz.business
 			business.databaseManager.paymentsDb { (paymentsDb: SqlitePaymentsDb?, _) in
 				
-				paymentsDb?.updateMetadata(id: paymentId, userDescription: newDesc, userNotes: newNotes) { (err) in
+				paymentsDb?.updateUserInfo(id: paymentId, userDescription: newDesc, userNotes: newNotes) { (err) in
 					
 					if let err = err {
 						log.error("paymentsDb.updateMetadata: \(String(describing: err))")

@@ -248,7 +248,7 @@ class NotificationService: UNNotificationServiceExtension {
 				[weak self](payment: Lightning_kmpIncomingPayment) in
 				
 				guard
-					let paymentReceivedAt = payment.received?.receivedAtDate,
+					let paymentReceivedAt = payment.completedAtDate,
 					paymentReceivedAt > pushReceivedAt
 				else {
 					// Ignoring - this is the most recently received incomingPayment, but not a new one

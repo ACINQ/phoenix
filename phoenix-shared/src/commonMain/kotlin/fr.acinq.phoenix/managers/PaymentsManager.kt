@@ -71,7 +71,7 @@ class PaymentsManager(
     }
 
     fun makePageFetcher(): PaymentsPageFetcher {
-        return PaymentsPageFetcher(loggerFactory, databaseManager)
+        return PaymentsPageFetcher(loggerFactory, databaseManager, contactsManager)
     }
 
     init {

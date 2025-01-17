@@ -123,14 +123,15 @@ struct PaymentRequestedView: View {
 	
 	func lastIncomingPaymentChanged(_ lastIncomingPayment: Lightning_kmpIncomingPayment) {
 		log.trace("lastIncomingPaymentChanged()")
-		log.debug("lastIncomingPayment.paymentHash = \(lastIncomingPayment.paymentHash.toHex())")
+		log.debug("lastIncomingPayment.paymentHash = \(lastIncomingPayment.id.description())")
 		
 		let paymentState = lastIncomingPayment.state()
-		if paymentState == WalletPaymentState.successOnChain ||
-		   paymentState == WalletPaymentState.successOffChain
-		{
-			if lastIncomingPayment.paymentHash.toHex() == invoice.paymentHash.toHex() {
-				popToRootView()
+		if paymentState == WalletPaymentState.successOffChain {
+			
+			if let lightningPayment = lastIncomingPayment as? Lightning_kmpLightningIncomingPayment {
+				if lightningPayment.paymentHash.toHex() == invoice.paymentHash.toHex() {
+					popToRootView()
+				}
 			}
 		}
 	}

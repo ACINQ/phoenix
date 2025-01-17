@@ -8,32 +8,19 @@ extension Lightning_kmpUUID: @retroactive Identifiable {
 	}
 }
 
-extension WalletPaymentId: @retroactive Identifiable {
+extension WalletPaymentInfo: @retroactive Identifiable {
 	
 	/// Returns a unique identifier, in the form of:
-	/// - "outgoing|id"
-	/// - "incoming|paymentHash"
+	/// "paymentId|paymentHash|contactHash|metadataModifiedAt"
 	///
 	public var id: String {
-		return self.identifier // defined in WalletPayment.kt
-	}
-}
-
-extension WalletPaymentOrderRow: @retroactive Identifiable {
-	
-	/// In kotlin the variable is called `id`, but that's a reserved property name in objective-c.
-	/// So it gets automatically overwritten, and is inaccessible to us.
-	/// Thus we'll provide an alternative property name that's easier to understand.
-	public var walletPaymentId: WalletPaymentId {
-		return self.kotlinId() // defined in PhoenixExposure.kt
-	}
-	
-	/// Returns a unique identifier, in the form of:
-	/// - "outgoing|id|createdAt|completedAt|metadataModifiedAt"
-	/// - "incoming|paymentHash|createdAt|completedAt|metadataModifiedAt"
-	///
-	public var id: String {
-		return self.identifier // defined in SqlitePaymentsDb.kt
+		
+		let paymentId: String = payment.id.description()
+		let paymentHash: Int = payment.hash
+		let contactHash: Int = contact?.hash ?? 0
+		let metadataModifiedAt: Int64 = metadata.modifiedAt?.int64Value ?? 0
+		
+		return "\(paymentId)|\(paymentHash)|\(contactHash)|\(metadataModifiedAt)"
 	}
 }
 
@@ -60,7 +47,7 @@ extension ContactInfo: @retroactive Identifiable {
 	/// In kotlin the variable is called `id`, but that's a reserved property name in objective-c.
 	/// So it gets automatically overwritten, and is inaccessible to us.
 	/// Thus we'll provide an alternative property name that's easier to understand.
-	public var uuid: Lightning_kmpUUID {
+	var uuid: Lightning_kmpUUID {
 		return self.kotlinId() // defined in PhoenixExposure.kt
 	}
 	
