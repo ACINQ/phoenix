@@ -53,7 +53,7 @@ class CsvWriter {
          * Creates and returns the row for the given payment.
          * This includes the CRLF that terminates the row.
          *
-         * @param info Payment fetched via PaymentsFetcher
+         * @param info Payment info fetched from database
          * @param localizedDescription As displayed in app (might be a localized default value)
          * @param config The configuration for the CSV file
          */

@@ -20,8 +20,6 @@ data class PaymentsPage(
      * The rows fetched from the database.
      * If there are fewer items in the database than requested,
      * then PaymentsPage.rows.count will be less than PaymentsPage.count.
-     *
-     * Use PaymentsFetcher to fetch more information about the row.
      */
     val rows: List<WalletPaymentInfo>
 ) {

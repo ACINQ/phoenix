@@ -7,7 +7,6 @@ import fr.acinq.phoenix.data.LocalChannelInfo
 import fr.acinq.phoenix.data.availableForReceive
 import fr.acinq.phoenix.data.canRequestLiquidity
 import fr.acinq.phoenix.data.inFlightPaymentsCount
-import fr.acinq.phoenix.db.WalletPaymentOrderRow
 
 /**
  * Workarounds for various shortcomings between Kotlin and iOS.
@@ -18,9 +17,6 @@ import fr.acinq.phoenix.db.WalletPaymentOrderRow
  * so we can't properly access it from within iOS.
  */
 fun ContactInfo.kotlinId(): UUID {
-    return this.id
-}
-fun WalletPaymentOrderRow.kotlinId(): UUID {
     return this.id
 }
 

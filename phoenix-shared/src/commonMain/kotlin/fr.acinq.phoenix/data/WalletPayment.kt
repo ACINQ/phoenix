@@ -2,7 +2,6 @@ package fr.acinq.phoenix.data
 
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.phoenix.data.lnurl.LnurlPay
-import fr.acinq.phoenix.db.WalletPaymentOrderRow
 
 /**
  * Represents a payment & its associated metadata.
@@ -20,20 +19,6 @@ data class WalletPaymentInfo(
     val fetchOptions: WalletPaymentFetchOptions
 ) {
     val id get() = payment.id
-
-    /**
-     * Converts the info to a `WalletPaymentOrderRow`, if possible.
-     * This may be useful if you want to use the PaymentsFetcher
-     * to take advantage of the in-memory cache.
-     */
-    fun toOrderRow(): WalletPaymentOrderRow {
-        return WalletPaymentOrderRow(
-            id = payment.id,
-            createdAt = payment.createdAt,
-            completedAt = payment.completedAt,
-            metadataModifiedAt = metadata.modifiedAt
-        )
-    }
 }
 
 /**
