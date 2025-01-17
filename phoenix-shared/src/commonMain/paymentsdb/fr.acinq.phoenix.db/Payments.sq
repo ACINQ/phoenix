@@ -31,6 +31,14 @@ WHERE
 ORDER BY order_ts
 LIMIT :limit OFFSET :offset;
 
+listRecent:
+SELECT p.data, pm.*
+FROM payments AS p
+LEFT OUTER JOIN payments_metadata AS pm ON pm.payment_id = p.id
+WHERE order_ts >= :min_ts
+ORDER BY order_ts DESC
+LIMIT :limit OFFSET :offset;
+
 count:
 SELECT count(id)
 FROM payments;
