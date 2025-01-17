@@ -163,7 +163,7 @@ class PaymentsManager(
     suspend fun listIncomingPaymentsForTxId(
         txId: TxId
     ): List<IncomingPayment> {
-        return paymentsDb().getWalletPaymentForTxId(txId).filterIsInstance<IncomingPayment>()
+        return paymentsDb().listPaymentsForTxId(txId).filterIsInstance<IncomingPayment>()
     }
 
     suspend fun getPayment(

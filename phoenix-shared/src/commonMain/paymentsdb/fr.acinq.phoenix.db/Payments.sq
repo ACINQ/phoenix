@@ -36,8 +36,5 @@ SELECT count(id)
 FROM payments;
 
 getOldestCompletedTimestamp:
-SELECT completed_at
-FROM payments
-WHERE completed_at IS NOT NULL
-ORDER BY completed_at ASC
-LIMIT 1;
+SELECT min(completed_at) AS completed_at
+FROM payments;

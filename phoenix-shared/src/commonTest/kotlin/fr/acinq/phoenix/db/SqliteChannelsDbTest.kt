@@ -32,7 +32,7 @@ import fr.acinq.secp256k1.Hex
 import kotlin.test.*
 
 @Ignore
-class SqliteChannelsDatabaseTest {
+class SqliteChannelsDbTest {
     private val db = createSqliteChannelsDb(testChannelsDriver())
 
     @Test

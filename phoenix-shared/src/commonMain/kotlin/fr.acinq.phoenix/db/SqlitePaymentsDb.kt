@@ -119,10 +119,6 @@ class SqlitePaymentsDb(
         database.onChainTransactionsQueries.listUnconfirmed().asFlow().mapToList(Dispatchers.Default)
     }
 
-    suspend fun getWalletPaymentForTxId(txId: TxId): List<WalletPayment> = withContext(Dispatchers.Default) {
-        database.onChainTransactionsQueries.listByTxId(txId).executeAsList().map { WalletPaymentAdapter.decode(it) }
-    }
-
     suspend fun listPaymentsForTxId(txId: TxId): List<WalletPayment> = withContext(Dispatchers.Default) {
         database.onChainTransactionsQueries.listByTxId(txId).executeAsList().map { WalletPaymentAdapter.decode(it) }
     }

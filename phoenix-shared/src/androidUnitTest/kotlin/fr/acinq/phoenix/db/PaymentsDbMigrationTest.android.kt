@@ -18,6 +18,7 @@ package fr.acinq.phoenix.db
 
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
+import fr.acinq.phoenix.db.PaymentsDatabase
 import fr.acinq.phoenix.db.migrations.v10.AfterVersion10
 import fr.acinq.phoenix.db.migrations.v11.AfterVersion11
 import kotlinx.datetime.Clock
@@ -29,7 +30,7 @@ import java.util.Properties
 actual fun testPaymentsDriverFromResource(path: String): SqlDriver {
 
     // loading original database file
-    val loader = PaymentsDbMigrationTest::class.java.classLoader!!
+    val loader = PaymentsDatabase::class.java.classLoader!!
     val originalDb = loader.getResourceAsStream(path)!!
 
     // make a copy in a temporary folder that we can safely edit later when testing the migration

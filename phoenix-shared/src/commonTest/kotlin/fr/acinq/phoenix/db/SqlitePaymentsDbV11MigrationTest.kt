@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 ACINQ SAS
+ * Copyright 2025 ACINQ SAS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.OutPoint
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.db.Bolt11IncomingPayment
-import fr.acinq.lightning.db.Bolt12IncomingPayment
 import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
 import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
 import fr.acinq.lightning.db.LegacyPayToOpenIncomingPayment
@@ -30,7 +29,6 @@ import fr.acinq.lightning.db.LightningIncomingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.db.NewChannelIncomingPayment
 import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
-import fr.acinq.lightning.db.SpliceInIncomingPayment
 import fr.acinq.lightning.db.SpliceOutgoingPayment
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.serialization.payment.Serialization
@@ -44,8 +42,14 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 
+/**
+ * This class tests the (v1,v10) -> v12 migration. This migration happened after significant changes in the
+ * WalletPayment model in lightning-kmp, as well as a complete rework of the actual database structure in phoenix.
+ *
+ * See [AfterVersion10] and [AfterVersion11].
+ */
 @Suppress("DEPRECATION")
-class PaymentsDbMigrationTest {
+class SqlitePaymentsDbV11MigrationTest {
 
     @Test
     fun `read v1 db`() = runTest {
@@ -73,7 +77,7 @@ class PaymentsDbMigrationTest {
     }
 
     @Test
-    fun `read v1 db (additional)`() = runTest {
+    fun `read v1 db - additional`() = runTest {
         val driver = testPaymentsDriverFromResource("sampledbs/v1/old.payments-testnet-a224978853d2f4c94ac8e2dbb2acf8344e0146d0.sqlite")
         val paymentsDb = createSqlitePaymentsDb(driver, currencyManager = null)
 
