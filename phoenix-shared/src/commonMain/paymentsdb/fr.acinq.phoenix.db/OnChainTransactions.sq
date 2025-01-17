@@ -13,9 +13,8 @@ CREATE INDEX on_chain_txs_tx_id ON on_chain_txs(tx_id);
 
 insert:
 INSERT INTO on_chain_txs(
-            payment_id,
-            tx_id)
-VALUES (?, ?);
+    payment_id, tx_id, confirmed_at, locked_at
+) VALUES (?, ?, ?, ?);
 
 setConfirmed:
 UPDATE on_chain_txs
