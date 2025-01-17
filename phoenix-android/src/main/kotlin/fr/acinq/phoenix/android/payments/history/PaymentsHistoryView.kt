@@ -18,6 +18,7 @@ package fr.acinq.phoenix.android.payments.history
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -165,6 +166,7 @@ fun PaymentsHistoryView(
 
         LazyColumn(
             state = listState,
+            contentPadding = PaddingValues(bottom = 60.dp)
         ) {
             groupedPayments.forEach { (header, payments) ->
                 item {
