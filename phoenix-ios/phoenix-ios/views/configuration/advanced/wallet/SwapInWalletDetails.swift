@@ -475,7 +475,7 @@ struct SwapInWalletDetails: View {
 	
 	func confirmedBalance() -> (FormattedAmount, FormattedAmount) {
 		
-		let sats = swapInWallet.readyForSwapBalance
+		let sats = swapInWallet.deeplyConfirmedBalance
 		return formattedBalances(sats)
 	}
 	
