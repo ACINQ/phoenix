@@ -255,6 +255,7 @@ struct TransactionsView: View {
 			
 		} else {
 			
+			selectedItem = nil
 			if let destination = popToDestination {
 				log.debug("popToDestination: \(destination)")
 				
@@ -633,6 +634,8 @@ struct TransactionsView: View {
 		if selectedItem == nil {
 			selectedItem = row
 			navigateTo(.PaymentView)
+		} else {
+			log.warning("selectItem != nil")
 		}
 	}
 }
