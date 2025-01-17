@@ -58,6 +58,11 @@ WHERE
 ORDER BY payment.created_at DESC
 LIMIT :limit OFFSET :offset;
 
+scanCompleted:
+SELECT id, received_at
+FROM payments_incoming
+WHERE received_at IS NOT NULL;
+
 delete:
 DELETE FROM payments_incoming
 WHERE payment_hash = ?;
