@@ -1,12 +1,12 @@
-package fr.acinq.phoenix.db.cloud
+package fr.acinq.phoenix.db.cloud.payments
 
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.utils.UUID
-import fr.acinq.phoenix.db.payments.OutgoingPartStatusData
-import fr.acinq.phoenix.db.payments.OutgoingPartStatusTypeVersion
-import fr.acinq.phoenix.db.payments.OutgoingQueries
-import fr.acinq.phoenix.db.payments.mapToDb
+import fr.acinq.phoenix.db.cloud.UUIDSerializer
+import fr.acinq.phoenix.db.migrations.v11.queries.LightningOutgoingQueries
+import fr.acinq.phoenix.db.migrations.v11.types.OutgoingPartStatusData
+import fr.acinq.phoenix.db.migrations.v11.types.OutgoingPartStatusTypeVersion
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.ByteString
@@ -39,18 +39,11 @@ data class LightningOutgoingPartWrapper(
     val status: StatusWrapper?,
     val createdAt: Long
 ) {
-    constructor(part: LightningOutgoingPayment.Part) : this(
-        id = part.id,
-        msat = part.amount.msat,
-        route = OutgoingQueries.hopDescAdapter.encode(part.route),
-        status = StatusWrapper(part.status),
-        createdAt = part.createdAt
-    )
 
     fun unwrap() = LightningOutgoingPayment.Part(
         id = id,
         amount = MilliSatoshi(msat = msat),
-        route = OutgoingQueries.hopDescAdapter.decode(route),
+        route = LightningOutgoingQueries.hopDescAdapter.decode(route),
         status = status?.unwrap() ?: LightningOutgoingPayment.Part.Status.Pending,
         createdAt = createdAt
     )
@@ -63,31 +56,6 @@ data class LightningOutgoingPartWrapper(
         @ByteString
         val blob: ByteArray
     ) {
-        companion object {
-            // constructor
-            operator fun invoke(status: LightningOutgoingPayment.Part.Status): StatusWrapper? {
-                return when (status) {
-                    is LightningOutgoingPayment.Part.Status.Pending -> null
-                    is LightningOutgoingPayment.Part.Status.Failed -> {
-                        val (type, blob) = status.failure.mapToDb()
-                        StatusWrapper(
-                            ts = status.completedAt,
-                            type = type.name,
-                            blob = blob
-                        )
-                    }
-                    is LightningOutgoingPayment.Part.Status.Succeeded -> {
-                        val (type, blob) = status.mapToDb()
-                        StatusWrapper(
-                            ts = status.completedAt,
-                            type = type.name,
-                            blob = blob
-                        )
-                    }
-                }
-            }
-        } // </companion object>
-
         fun unwrap(): LightningOutgoingPayment.Part.Status {
             return OutgoingPartStatusData.deserialize(
                 typeVersion = OutgoingPartStatusTypeVersion.valueOf(type),

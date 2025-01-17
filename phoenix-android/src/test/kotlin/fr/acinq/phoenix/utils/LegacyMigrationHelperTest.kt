@@ -113,12 +113,12 @@ class LegacyMigrationHelperTest {
                         id = UUID.fromString("91018192-5eeb-4e23-a494-8579009a6117"),
                         amount = 2000.msat,
                         route = listOf(
-                            HopDesc(
+                            LightningOutgoingPayment.Part.HopDesc(
                                 nodeId = PublicKey.fromHex("0210d27a0a720c58ab656d9a793ee5bb2c9c1d7df9002f1a900715f4abe219b823"),
                                 nextNodeId = PublicKey.fromHex("03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134"),
                                 shortChannelId = ShortChannelId.invoke("0x1480x1")
                             ),
-                            HopDesc(
+                            LightningOutgoingPayment.Part.HopDesc(
                                 nodeId = PublicKey.fromHex("03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134"),
                                 nextNodeId = PublicKey.fromHex("020ec0c6a0c4fe5d8a79928ead294c36234a76f6e0dca896c35413612a3fd8dbf8"),
                             )

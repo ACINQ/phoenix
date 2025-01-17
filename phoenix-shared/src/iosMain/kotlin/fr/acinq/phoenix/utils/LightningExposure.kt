@@ -3,20 +3,14 @@ package fr.acinq.phoenix.utils
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.ByteVector64
-import fr.acinq.bitcoin.OutPoint
 import fr.acinq.bitcoin.PrivateKey
 import fr.acinq.bitcoin.Satoshi
-import fr.acinq.bitcoin.Script
 import fr.acinq.bitcoin.Transaction
 import fr.acinq.bitcoin.TxId
-import fr.acinq.bitcoin.TxIn
-import fr.acinq.bitcoin.TxOut
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.ChannelEvents
 import fr.acinq.lightning.DefaultSwapInParams
 import fr.acinq.lightning.Lightning
-import fr.acinq.lightning.Lightning.randomBytes32
-import fr.acinq.lightning.Lightning.randomKey
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.NodeEvents
@@ -52,7 +46,6 @@ import fr.acinq.lightning.payment.OutgoingPaymentFailure
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.copyTo
-import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toByteArray
 import fr.acinq.lightning.utils.toNSData
 import fr.acinq.lightning.wire.LiquidityAds
@@ -74,27 +67,8 @@ import kotlin.time.Duration.Companion.seconds
  * This problem is restricted to iOS, and does not affect Android.
  */
 
-fun IncomingPayment.Origin.asInvoice(): IncomingPayment.Origin.Invoice? =
-    (this as? IncomingPayment.Origin.Invoice)
-
-fun IncomingPayment.Origin.asSwapIn(): IncomingPayment.Origin.SwapIn? =
-    (this as? IncomingPayment.Origin.SwapIn)
-
-fun IncomingPayment.Origin.asOnChain(): IncomingPayment.Origin.OnChain? =
-    (this as? IncomingPayment.Origin.OnChain)
-
-fun IncomingPayment.ReceivedWith.asLightningPayment():
-        IncomingPayment.ReceivedWith.LightningPayment? =
-    (this as? IncomingPayment.ReceivedWith.LightningPayment)
-
-fun IncomingPayment.ReceivedWith.asNewChannel(): IncomingPayment.ReceivedWith.NewChannel? =
-    (this as? IncomingPayment.ReceivedWith.NewChannel)
-
-fun IncomingPayment.ReceivedWith.asSpliceIn(): IncomingPayment.ReceivedWith.SpliceIn? =
-    (this as? IncomingPayment.ReceivedWith.SpliceIn)
-
 fun LightningOutgoingPayment.outgoingPaymentFailure(): OutgoingPaymentFailure? {
-    return (status as? LightningOutgoingPayment.Status.Completed.Failed)?.let { status ->
+    return (status as? LightningOutgoingPayment.Status.Failed)?.let { status ->
         OutgoingPaymentFailure(
             reason = status.reason,
             failures = parts.map { it.status }
@@ -103,7 +77,7 @@ fun LightningOutgoingPayment.outgoingPaymentFailure(): OutgoingPaymentFailure? {
     }
 }
 
-fun LightningOutgoingPayment.explainAsPartFailure(): LightningOutgoingPayment.Part.Status.Failure? {
+fun LightningOutgoingPayment.explainAsPartFailed(): LightningOutgoingPayment.Part.Status.Failed.Failure? {
     return outgoingPaymentFailure()?.let { paymentFailure ->
         when (val result = paymentFailure.explain()) {
             is Either.Left -> result.value
@@ -130,16 +104,12 @@ fun LightningOutgoingPayment.Details.asSwapOut(): LightningOutgoingPayment.Detai
 fun LightningOutgoingPayment.Status.asPending(): LightningOutgoingPayment.Status.Pending? =
     (this as? LightningOutgoingPayment.Status.Pending)
 
-fun LightningOutgoingPayment.Status.asFailed(): LightningOutgoingPayment.Status.Completed.Failed? =
-    (this as? LightningOutgoingPayment.Status.Completed.Failed)
+fun LightningOutgoingPayment.Status.asFailed(): LightningOutgoingPayment.Status.Failed? =
+    (this as? LightningOutgoingPayment.Status.Failed)
 
 fun LightningOutgoingPayment.Status.asSucceeded():
-        LightningOutgoingPayment.Status.Completed.Succeeded? =
-    (this as? LightningOutgoingPayment.Status.Completed.Succeeded)
-
-fun LightningOutgoingPayment.Status.asOffChain():
-        LightningOutgoingPayment.Status.Completed.Succeeded.OffChain? =
-    (this as? LightningOutgoingPayment.Status.Completed.Succeeded.OffChain)
+        LightningOutgoingPayment.Status.Succeeded? =
+    (this as? LightningOutgoingPayment.Status.Succeeded)
 
 fun ChannelState.asOffline(): Offline? = (this as? Offline)
 fun ChannelState.asClosing(): Closing? = (this as? Closing)
@@ -308,57 +278,57 @@ fun FinalFailure.asWalletRestarted (): FinalFailure.WalletRestarted? =
 fun FinalFailure.asUnknownError (): FinalFailure.UnknownError? =
     (this as? FinalFailure.UnknownError)
 
-fun LightningOutgoingPayment.Part.Status.Failure.asUninterpretable():
-        LightningOutgoingPayment.Part.Status.Failure.Uninterpretable? =
-    (this as? LightningOutgoingPayment.Part.Status.Failure.Uninterpretable)
+fun LightningOutgoingPayment.Part.Status.Failed.Failure.asUninterpretable():
+        LightningOutgoingPayment.Part.Status.Failed.Failure.Uninterpretable? =
+    (this as? LightningOutgoingPayment.Part.Status.Failed.Failure.Uninterpretable)
 
-fun LightningOutgoingPayment.Part.Status.Failure.asChannelIsClosing():
-        LightningOutgoingPayment.Part.Status.Failure.ChannelIsClosing? =
-    (this as? LightningOutgoingPayment.Part.Status.Failure.ChannelIsClosing)
+fun LightningOutgoingPayment.Part.Status.Failed.Failure.asChannelIsClosing():
+        LightningOutgoingPayment.Part.Status.Failed.Failure.ChannelIsClosing? =
+    (this as? LightningOutgoingPayment.Part.Status.Failed.Failure.ChannelIsClosing)
 
-fun LightningOutgoingPayment.Part.Status.Failure.asChannelIsSplicing():
-        LightningOutgoingPayment.Part.Status.Failure.ChannelIsSplicing? =
-    (this as? LightningOutgoingPayment.Part.Status.Failure.ChannelIsSplicing)
+fun LightningOutgoingPayment.Part.Status.Failed.Failure.asChannelIsSplicing():
+        LightningOutgoingPayment.Part.Status.Failed.Failure.ChannelIsSplicing? =
+    (this as? LightningOutgoingPayment.Part.Status.Failed.Failure.ChannelIsSplicing)
 
-fun LightningOutgoingPayment.Part.Status.Failure.asNotEnoughFees():
-        LightningOutgoingPayment.Part.Status.Failure.NotEnoughFees? =
-    (this as? LightningOutgoingPayment.Part.Status.Failure.NotEnoughFees)
+fun LightningOutgoingPayment.Part.Status.Failed.Failure.asNotEnoughFees():
+        LightningOutgoingPayment.Part.Status.Failed.Failure.NotEnoughFees? =
+    (this as? LightningOutgoingPayment.Part.Status.Failed.Failure.NotEnoughFees)
 
-fun LightningOutgoingPayment.Part.Status.Failure.asNotEnoughFunds():
-        LightningOutgoingPayment.Part.Status.Failure.NotEnoughFunds? =
-    (this as? LightningOutgoingPayment.Part.Status.Failure.NotEnoughFunds)
+fun LightningOutgoingPayment.Part.Status.Failed.Failure.asNotEnoughFunds():
+        LightningOutgoingPayment.Part.Status.Failed.Failure.NotEnoughFunds? =
+    (this as? LightningOutgoingPayment.Part.Status.Failed.Failure.NotEnoughFunds)
 
-fun LightningOutgoingPayment.Part.Status.Failure.asPaymentAmountTooBig():
-        LightningOutgoingPayment.Part.Status.Failure.PaymentAmountTooBig? =
-    (this as? LightningOutgoingPayment.Part.Status.Failure.PaymentAmountTooBig)
+fun LightningOutgoingPayment.Part.Status.Failed.Failure.asPaymentAmountTooBig():
+        LightningOutgoingPayment.Part.Status.Failed.Failure.PaymentAmountTooBig? =
+    (this as? LightningOutgoingPayment.Part.Status.Failed.Failure.PaymentAmountTooBig)
 
-fun LightningOutgoingPayment.Part.Status.Failure.asPaymentAmountTooSmall():
-        LightningOutgoingPayment.Part.Status.Failure.PaymentAmountTooSmall? =
-    (this as? LightningOutgoingPayment.Part.Status.Failure.PaymentAmountTooSmall)
+fun LightningOutgoingPayment.Part.Status.Failed.Failure.asPaymentAmountTooSmall():
+        LightningOutgoingPayment.Part.Status.Failed.Failure.PaymentAmountTooSmall? =
+    (this as? LightningOutgoingPayment.Part.Status.Failed.Failure.PaymentAmountTooSmall)
 
-fun LightningOutgoingPayment.Part.Status.Failure.asPaymentExpiryTooBig():
-        LightningOutgoingPayment.Part.Status.Failure.PaymentExpiryTooBig? =
-    (this as? LightningOutgoingPayment.Part.Status.Failure.PaymentExpiryTooBig)
+fun LightningOutgoingPayment.Part.Status.Failed.Failure.asPaymentExpiryTooBig():
+        LightningOutgoingPayment.Part.Status.Failed.Failure.PaymentExpiryTooBig? =
+    (this as? LightningOutgoingPayment.Part.Status.Failed.Failure.PaymentExpiryTooBig)
 
-fun LightningOutgoingPayment.Part.Status.Failure.asRecipientRejectedPayment():
-        LightningOutgoingPayment.Part.Status.Failure.RecipientRejectedPayment? =
-    (this as? LightningOutgoingPayment.Part.Status.Failure.RecipientRejectedPayment)
+fun LightningOutgoingPayment.Part.Status.Failed.Failure.asRecipientRejectedPayment():
+        LightningOutgoingPayment.Part.Status.Failed.Failure.RecipientRejectedPayment? =
+    (this as? LightningOutgoingPayment.Part.Status.Failed.Failure.RecipientRejectedPayment)
 
-fun LightningOutgoingPayment.Part.Status.Failure.asRecipientIsOffline():
-        LightningOutgoingPayment.Part.Status.Failure.RecipientIsOffline? =
-    (this as? LightningOutgoingPayment.Part.Status.Failure.RecipientIsOffline)
+fun LightningOutgoingPayment.Part.Status.Failed.Failure.asRecipientIsOffline():
+        LightningOutgoingPayment.Part.Status.Failed.Failure.RecipientIsOffline? =
+    (this as? LightningOutgoingPayment.Part.Status.Failed.Failure.RecipientIsOffline)
 
-fun LightningOutgoingPayment.Part.Status.Failure.asRecipientLiquidityIssue():
-        LightningOutgoingPayment.Part.Status.Failure.RecipientLiquidityIssue? =
-    (this as? LightningOutgoingPayment.Part.Status.Failure.RecipientLiquidityIssue)
+fun LightningOutgoingPayment.Part.Status.Failed.Failure.asRecipientLiquidityIssue():
+        LightningOutgoingPayment.Part.Status.Failed.Failure.RecipientLiquidityIssue? =
+    (this as? LightningOutgoingPayment.Part.Status.Failed.Failure.RecipientLiquidityIssue)
 
-fun LightningOutgoingPayment.Part.Status.Failure.asTemporaryRemoteFailure():
-        LightningOutgoingPayment.Part.Status.Failure.TemporaryRemoteFailure? =
-    (this as? LightningOutgoingPayment.Part.Status.Failure.TemporaryRemoteFailure)
+fun LightningOutgoingPayment.Part.Status.Failed.Failure.asTemporaryRemoteFailure():
+        LightningOutgoingPayment.Part.Status.Failed.Failure.TemporaryRemoteFailure? =
+    (this as? LightningOutgoingPayment.Part.Status.Failed.Failure.TemporaryRemoteFailure)
 
-fun LightningOutgoingPayment.Part.Status.Failure.asTooManyPendingPayments():
-        LightningOutgoingPayment.Part.Status.Failure.TooManyPendingPayments? =
-    (this as? LightningOutgoingPayment.Part.Status.Failure.TooManyPendingPayments)
+fun LightningOutgoingPayment.Part.Status.Failed.Failure.asTooManyPendingPayments():
+        LightningOutgoingPayment.Part.Status.Failed.Failure.TooManyPendingPayments? =
+    (this as? LightningOutgoingPayment.Part.Status.Failed.Failure.TooManyPendingPayments)
 
 fun Lightning_randomBytes32(): ByteVector32 = Lightning.randomBytes32()
 fun Lightning_randomBytes64(): ByteVector64 = Lightning.randomBytes64()

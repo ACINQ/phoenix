@@ -23,12 +23,12 @@ fileprivate struct UploadPaymentsOperationInfo {
 	let recordsToSave: [CKRecord]
 	let recordIDsToDelete: [CKRecord.ID]
 	
-	let reverseMap: [CKRecord.ID: WalletPaymentId]
-	let unpaddedMap: [WalletPaymentId: Int]
+	let reverseMap: [CKRecord.ID: Lightning_kmpUUID]
+	let unpaddedMap: [Lightning_kmpUUID: Int]
 	
 	var completedRowids: [Int64] = []
 	
-	var partialFailures: [WalletPaymentId: CKError?] = [:]
+	var partialFailures: [Lightning_kmpUUID: CKError?] = [:]
 	
 	var savedRecords: [CKRecord] = []
 	var deletedRecordIds: [CKRecord.ID] = []
@@ -171,14 +171,14 @@ extension SyncBackupManager {
 							var oldest: Date? = nil
 							
 							var paymentRows: [Lightning_kmpWalletPayment] = []
-							var paymentMetadataRows: [WalletPaymentId: WalletPaymentMetadataRow] = [:]
-							var metadataMap: [WalletPaymentId: CloudKitPaymentsDb.MetadataRow] = [:]
+							var paymentMetadataRows: [Lightning_kmpUUID: WalletPaymentMetadataRow] = [:]
+							var metadataMap: [Lightning_kmpUUID: CloudKitPaymentsDb.MetadataRow] = [:]
 							
 							for item in items {
 								
 								paymentRows.append(item.payment)
 								
-								let paymentId = item.payment.walletPaymentId()
+								let paymentId = item.payment.id
 								paymentMetadataRows[paymentId] = item.metadata
 								
 								let creationDate = item.record.creationDate ?? Date()
@@ -272,8 +272,8 @@ extension SyncBackupManager {
 			var recordsToSave = [CKRecord]()
 			var recordIDsToDelete = [CKRecord.ID]()
 			
-			var reverseMap = [CKRecord.ID: WalletPaymentId]()
-			var unpaddedMap = [WalletPaymentId: Int]()
+			var reverseMap = [CKRecord.ID: Lightning_kmpUUID]()
+			var unpaddedMap = [Lightning_kmpUUID: Int]()
 			
 			// NB: batch.rowidMap may contain the same paymentRowId multiple times.
 			// And if we include the same record multiple times in the CKModifyRecordsOperation,
@@ -328,9 +328,9 @@ extension SyncBackupManager {
 				unpaddedMap: unpaddedMap
 			)
 			
-			// Edge-case: A rowid wasn't able to be converted to a WalletPaymentId.
-			// This may happen when we add a new type to the database,
-			// and we don't have code in place within `cloudKitDb.fetchQueueBatch()` to handle it.
+			// Edge-case: A rowid wasn't able to be converted to a UUID.
+			// This was possible in the past, when we added new types to the database.
+			// Very unlikely now that we've standardized on UUID for all paymentId's.
 			//
 			// So the rowid is not represented in either `rowidMap` or `uniquePaymentIds()`.
 			// Nor is it reprensented in `recordsToSave` or `recordIDsToDelete`.
@@ -489,8 +489,8 @@ extension SyncBackupManager {
 			log.trace("uploadPayments(): updateDatabase()")
 			
 			var deleteFromQueue = [KotlinLong]()
-			var deleteFromMetadata = [WalletPaymentId]()
-			var updateMetadata = [WalletPaymentId: CloudKitPaymentsDb.MetadataRow]()
+			var deleteFromMetadata = [Lightning_kmpUUID]()
+			var updateMetadata = [Lightning_kmpUUID: CloudKitPaymentsDb.MetadataRow]()
 			
 			for (rowid) in opInfo.completedRowids {
 				deleteFromQueue.append(KotlinLong(longLong: rowid))
@@ -644,14 +644,14 @@ extension SyncBackupManager {
 	// MARK: Record ID
 	// ----------------------------------------
 	
-	private func recordID(paymentId: WalletPaymentId) -> CKRecord.ID {
+	private func recordID(paymentId: Lightning_kmpUUID) -> CKRecord.ID {
 		
 		// The recordID is:
 		// - deterministic => by hashing the paymentId
 		// - secure => by mixing in the secret cloudKey (derived from seed)
 		
 		let prefix = SHA256.hash(data: cloudKey.rawRepresentation)
-		let suffix = paymentId.dbId.data(using: .utf8)!
+		let suffix = paymentId.description().data(using: .utf8)!
 		
 		let hashMe = prefix + suffix
 		let digest = SHA256.hash(data: hashMe)
@@ -674,119 +674,24 @@ extension SyncBackupManager {
 		_ batch: FetchPaymentsQueueBatchResult
 	) -> (Data, Int)? {
 		
-		var wrapper: CloudData? = nil
+		var wrapper = CloudData.V1(payment: row)
 		
-		if let incoming = row as? Lightning_kmpIncomingPayment {
-			wrapper = CloudData(incoming: incoming)
-			
-		} else if let outgoing = row as? Lightning_kmpOutgoingPayment {
-			wrapper = CloudData(outgoing: outgoing)
-		}
+		let cleartext: Data = wrapper.serialize().toSwiftData()
+		let unpaddedSize: Int = cleartext.count
 		
-		var cleartext: Data? = nil
-		var unpaddedSize: Int = 0
-		
-		if let wrapper = wrapper {
-			
-			let cbor = wrapper.cborSerialize().toSwiftData()
-			cleartext = cbor
-			unpaddedSize = cbor.count
-			
-			#if DEBUG
-		//	let jsonData = wrapper.jsonSerialize().toSwiftData()
-		//	let jsonStr = String(data: jsonData, encoding: .utf8)
-		//	log.debug("Uploading record (JSON representation):\n\(jsonStr ?? "<nil>")")
-			#endif
-			
-			// We want to add padding to obfuscate the payment type. That is,
-			// it should not be possible to determine the type of payment (incoming vs outgoing),
-			// simply by inspecting the size of the encrypted blob.
-			//
-			// Generally speaking, an IncomingPayment is smaller than an OutgoingPayment.
-			// But this depends on many factors, including the size of the PaymentRequest.
-			// And this may change over time, as the Phoenix codebase evolves.
-			//
-			// So our technique is dynamic and adaptive:
-			// For every payment stored in the cloud, we track (in the local database)
-			// the raw/unpadded size of the serialized payment.
-			//
-			// This allows us to generate the {mean, standardDeviation} for each payment type.
-			// Using this information, we generate a target range for the size of the encrypted blob.
-			// And then we and a random amount of padding to reach our target range.
-			
-			let makeRange = { (stats: CloudKitPaymentsDb.MetadataStats) -> (Int, Int) in
-				
-				var rangeMin: Int = 0
-				var rangeMax: Int = 0
-				
-				if stats.mean > 0 {
-					
-					let deviation = stats.standardDeviation * 1.5
-					
-					let minRange = stats.mean - deviation
-					let maxRange = stats.mean + deviation
-					
-					if minRange > 0 {
-						rangeMin = Int(minRange.rounded(.toNearestOrAwayFromZero))
-						rangeMax = Int(maxRange.rounded(.up))
-					}
-				}
-				
-				return (rangeMin, rangeMax)
-			}
-			
-			let (rangeMin_incoming, rangeMax_incoming) = makeRange(batch.incomingStats)
-			let (rangeMin_outgoing, rangeMax_outgoing) = makeRange(batch.outgoingStats)
-			
-			var rangeMin = 0
-			var rangeMax = 0
-			
-			if rangeMax_outgoing > rangeMax_incoming {
-				rangeMin = rangeMin_outgoing
-				rangeMax = rangeMax_outgoing
-				
-			} else if rangeMax_incoming > rangeMax_outgoing {
-				rangeMin = rangeMin_incoming
-				rangeMax = rangeMax_incoming
-			}
-			
-			var padSize = 0
-			if rangeMin > 0, rangeMax > 0, rangeMin < rangeMax, unpaddedSize < rangeMin {
-				
-				padSize = (rangeMin - unpaddedSize)
-				padSize += Int.random(in: 0 ..< (rangeMax - rangeMin))
-					
-			} else {
-				// Add a smaller amount of padding
-				padSize += Int.random(in: 0 ..< 256)
-			}
-			
-			let padding: Data
-			if padSize > 0 {
-				padding = genRandomBytes(padSize)
-			} else {
-				padding = Data()
-			}
-			
-			let padded = wrapper.doCopyWithPadding(padding: padding.toKotlinByteArray())
-			
-			let paddedCbor = padded.cborSerialize().toSwiftData()
-			cleartext = paddedCbor
-			
-			log.debug("unpadded=\(unpaddedSize), padded=\(cleartext!.count)")
-		}
+		#if DEBUG
+	//	let jsonData = wrapper.jsonSerialize().toSwiftData()
+	//	let jsonStr = String(data: jsonData, encoding: .utf8)
+	//	log.debug("Uploading record (JSON representation):\n\(jsonStr ?? "<nil>")")
+		#endif
 		
 		var ciphertext: Data? = nil
-		
-		if let cleartext = cleartext {
+		do {
+			let box = try ChaChaPoly.seal(cleartext, using: self.cloudKey)
+			ciphertext = box.combined
 			
-			do {
-				let box = try ChaChaPoly.seal(cleartext, using: self.cloudKey)
-				ciphertext = box.combined
-				
-			} catch {
-				log.error("Error encrypting row with ChaChaPoly: \(String(describing: error))")
-			}
+		} catch {
+			log.error("Error encrypting row with ChaChaPoly: \(String(describing: error))")
 		}
 		
 		if let ciphertext = ciphertext {
@@ -859,29 +764,32 @@ extension SyncBackupManager {
 			
 			var wrapper: CloudData? = nil
 			if let cleartext {
-				do {
-					let cleartext_kotlin = cleartext.toKotlinByteArray()
-					wrapper = try CloudData.companion.cborDeserialize(blob: cleartext_kotlin)
+				
+				let cleartext_kotlin = cleartext.toKotlinByteArray()
+				wrapper = CloudData.companion.deserialize(data: cleartext_kotlin)
 					
-				//	#if DEBUG
-				//	let jsonData = wrapper.jsonSerialize().toSwiftData()
-				//	let jsonStr = String(data: jsonData, encoding: .utf8)
-				//	log.debug(" - raw JSON:\n\(jsonStr ?? "<nil>")")
-				//	#endif
+			//	#if DEBUG
+			//	let jsonData = wrapper.jsonSerialize().toSwiftData()
+			//	let jsonStr = String(data: jsonData, encoding: .utf8)
+			//	log.debug(" - raw JSON:\n\(jsonStr ?? "<nil>")")
+			//	#endif
 
+				if let wrapper_v0 = wrapper as? CloudData.V0 {
+					do {
+						payment = try wrapper_v0.unwrap()
+					} catch {
+						log.error("Error unwrapping record.data: skipping \(record.recordID)")
+					}
+					
 					let paddedSize = cleartext.count
-					let paddingSize = Int(wrapper!.padding?.size ?? 0)
+					let paddingSize = Int(wrapper_v0.padding?.size ?? 0)
 					unpaddedSize = paddedSize - paddingSize
-				} catch {
+					
+				} else if let wrapper_v1 = wrapper as? CloudData.V1 {
+					payment = wrapper_v1.payment
+					unpaddedSize = cleartext.count
+				} else {
 					log.error("Error deserializing record.data: skipping \(record.recordID)")
-				}
-			}
-			
-			if let wrapper {
-				do {
-					payment = try wrapper.unwrap()
-				} catch {
-					log.error("Error unwrapping record.data: skipping \(record.recordID)")
 				}
 			}
 		}

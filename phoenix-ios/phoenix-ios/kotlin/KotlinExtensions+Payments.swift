@@ -1,59 +1,6 @@
 import Foundation
 import PhoenixShared
 
-extension PaymentsPage {
-	
-	func forceRefresh() -> PaymentsPage {
-		
-		// What we want to do is ensure a fetch (via the PaymentsFetcher) will return
-		// a new version of the payment (+ metadata + contact).
-		// To accomplish this we simply tweak `metadataModifiedAt` for each item.
-		
-		let newRows: [WalletPaymentOrderRow] = self.rows.map { (row: WalletPaymentOrderRow) in
-			
-			let newMetadataModifiedAt: Int64
-			if let oldMetadataModifiedAt = row.metadataModifiedAt {
-				newMetadataModifiedAt = oldMetadataModifiedAt.int64Value + 1
-			} else {
-				newMetadataModifiedAt = 0
-			}
-			
-			return WalletPaymentOrderRow(
-				id: row.kotlinId(),
-				createdAt: row.createdAt,
-				completedAt: row.completedAt,
-				metadataModifiedAt: KotlinLong(value: newMetadataModifiedAt)
-			)
-		}
-		
-		return PaymentsPage(offset: self.offset, count: self.count, rows: newRows)
-	}
-}
-
-extension WalletPaymentOrderRow {
-	
-	var createdAtDate: Date {
-		return createdAt.toDate(from: .milliseconds)
-	}
-	
-	var completedAtDate: Date? {
-		if let completedAt = self.completedAt?.int64Value {
-			return completedAt.toDate(from: .milliseconds)
-		} else {
-			return nil
-		}
-	}
-	
-	/// Models the sorting done in the raw Sqlite queries.
-	/// I.e.: `ORDER BY COALESCE(completed_at, created_at)`
-	///
-	/// See: AggregatedQueries.sq
-	///
-	var sortDate: Date {
-		return completedAtDate ?? createdAtDate
-	}
-}
-
 extension WalletPaymentInfo {
 	
 	struct PaymentDescriptionOptions: OptionSet, CustomStringConvertible {
@@ -121,8 +68,8 @@ extension WalletPaymentInfo {
 		
 		if let incomingPayment = payment as? Lightning_kmpIncomingPayment {
 			
-			if let invoice = incomingPayment.origin.asInvoice() {
-				return sanitize(invoice.paymentRequest.description_)
+			if let bolt11 = incomingPayment as? Lightning_kmpBolt11IncomingPayment {
+				return sanitize(bolt11.paymentRequest.description_)
 			}
 			
 		} else if let outgoingPayment = payment as? Lightning_kmpOutgoingPayment {
@@ -148,9 +95,7 @@ extension WalletPaymentInfo {
 	
 		if let incomingPayment = payment as? Lightning_kmpIncomingPayment {
 			
-			if let _ = incomingPayment.origin.asSwapIn() {
-				return String(localized: "On-chain deposit", comment: "Payment description for received deposit")
-			} else if let _ = incomingPayment.origin.asOnChain() {
+			if let _ = incomingPayment as? Lightning_kmpOnChainIncomingPayment {
 				return String(localized: "On-chain deposit", comment: "Payment description for received deposit")
 			}
 			
@@ -225,24 +170,10 @@ extension Lightning_kmpWalletPayment {
 	
 	func isOnChain() -> Bool {
 		
-		if let incomingPayment = self as? Lightning_kmpIncomingPayment {
-			
-			if let _ = incomingPayment.origin.asSwapIn() {
-				return true
-			} else if let _ = incomingPayment.origin.asOnChain() {
-				return true
-			}
-			
-		} else if let outgoingPayment = self as? Lightning_kmpLightningOutgoingPayment {
-			
-			if let _ = outgoingPayment.details.asSwapOut() {
-				return true
-			}
-			
-		} else if let _ = self as? Lightning_kmpChannelCloseOutgoingPayment {
+		if self is Lightning_kmpOnChainIncomingPayment {
 			return true
-			
-		} else if let _ = self as? Lightning_kmpSpliceOutgoingPayment {
+		}
+		if self is Lightning_kmpOnChainOutgoingPayment {
 			return true
 		}
 		
@@ -254,75 +185,35 @@ extension Lightning_kmpWalletPayment {
 	}
 	
 	var completedAtDate: Date? {
-		
-		if let millis = completedAt?.int64Value {
-			return millis.toDate(from: .milliseconds)
-		} else {
-			return nil
-		}
+		return completedAt?.int64Value.toDate(from: .milliseconds)
+	}
+	
+	var sortDate: Date {
+		return completedAtDate ?? createdAtDate
 	}
 }
 
 extension Lightning_kmpIncomingPayment {
 	
 	var isSpliceIn: Bool {
-		
-		guard
-			let _ = self.origin.asOnChain(),
-			let received = self.received
-		else {
-			return false
-		}
-		
-		return received.receivedWith.contains {
-			if let _ = $0.asSpliceIn() {
-				return true
-			} else {
-				return false
-			}
-		}
+		return (self is Lightning_kmp_coreSpliceInIncomingPayment)
 	}
 	
 	var lightningPaymentFundingTxId: Bitcoin_kmpTxId? {
-		
-		guard let received else {
-			return nil
-		}
-		
-		for rw in received.receivedWith {
-			if let lp = rw as? Lightning_kmpIncomingPayment.ReceivedWith_LightningPayment,
-			   let txId = lp.fundingFee?.fundingTxId
-			{
-				return txId
+		if let lp = self as? Lightning_kmpLightningIncomingPayment {
+			for part in lp.parts {
+				if let htlc = part as? Lightning_kmpLightningIncomingPayment.PartHtlc {
+					if let fundingFee = htlc.fundingFee {
+						return fundingFee.fundingTxId
+					}
+				}
 			}
 		}
-		
 		return nil
 	}
 	
 	var isLightningPaymentWithFundingTxId: Bool {
 		return lightningPaymentFundingTxId != nil
-	}
-}
-
-extension Lightning_kmpIncomingPayment.Received {
-	
-	var receivedAtDate: Date {
-		return receivedAt.toDate(from: .milliseconds)
-	}
-}
-
-extension Lightning_kmpLightningOutgoingPayment.StatusCompletedSucceededOffChain {
-	
-	var completedAtDate: Date {
-		return completedAt.toDate(from: .milliseconds)
-	}
-}
-
-extension Lightning_kmpLightningOutgoingPayment.StatusCompletedFailed {
-	
-	var completedAtDate: Date {
-		return completedAt.toDate(from: .milliseconds)
 	}
 }
 
@@ -346,6 +237,22 @@ extension Lightning_kmpLightningOutgoingPayment.PartStatusFailed {
 		return completedAt.toDate(from: .milliseconds)
 	}
 }
+
+extension Lightning_kmpLightningOutgoingPayment.StatusSucceeded {
+	
+	var completedAtDate: Date {
+		return completedAt.toDate(from: .milliseconds)
+	}
+}
+
+extension Lightning_kmpLightningOutgoingPayment.StatusFailed {
+	
+	var completedAtDate: Date {
+		return completedAt.toDate(from: .milliseconds)
+	}
+ }
+
+
 
 extension Lightning_kmpOnChainOutgoingPayment {
 	

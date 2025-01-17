@@ -25,8 +25,8 @@ import fr.acinq.bitcoin.Transaction
 import fr.acinq.lightning.channel.states.ChannelStateWithCommitments
 import fr.acinq.lightning.channel.states.PersistedChannelState
 import fr.acinq.lightning.logging.error
-import fr.acinq.lightning.serialization.Encryption.from
-import fr.acinq.lightning.serialization.Serialization
+import fr.acinq.lightning.serialization.channel.Encryption.from
+import fr.acinq.lightning.serialization.channel.Serialization
 import fr.acinq.lightning.transactions.Scripts
 import fr.acinq.lightning.transactions.Transactions
 import fr.acinq.lightning.wire.EncryptedChannelData

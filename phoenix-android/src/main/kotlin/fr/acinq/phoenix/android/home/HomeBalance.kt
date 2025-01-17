@@ -74,7 +74,6 @@ fun HomeBalance(
     balance: MilliSatoshi?,
     swapInBalance: WalletBalance,
     finalWalletBalance: Satoshi,
-    unconfirmedChannelsBalance: MilliSatoshi,
     onNavigateToSwapInWallet: () -> Unit,
     onNavigateToFinalWallet: () -> Unit,
     balanceDisplayMode: HomeAmountDisplayMode,
@@ -106,7 +105,7 @@ fun HomeBalance(
                     }
                 }
             )
-            OnChainBalance(swapInBalance, unconfirmedChannelsBalance, finalWalletBalance, onNavigateToSwapInWallet, onNavigateToFinalWallet, balanceDisplayMode)
+            OnChainBalance(swapInBalance, finalWalletBalance, onNavigateToSwapInWallet, onNavigateToFinalWallet, balanceDisplayMode)
         }
     }
 }
@@ -114,14 +113,13 @@ fun HomeBalance(
 @Composable
 private fun OnChainBalance(
     swapInBalance: WalletBalance,
-    pendingChannelsBalance: MilliSatoshi,
     finalWalletBalance: Satoshi,
     onNavigateToSwapInWallet: () -> Unit,
     onNavigateToFinalWallet: () -> Unit,
     balanceDisplayMode: HomeAmountDisplayMode,
 ) {
     var showOnchainDialog by remember { mutableStateOf(false) }
-    val availableOnchainBalance = swapInBalance.total.toMilliSatoshi() + pendingChannelsBalance + finalWalletBalance.toMilliSatoshi()
+    val availableOnchainBalance = swapInBalance.total.toMilliSatoshi() + finalWalletBalance.toMilliSatoshi()
 
     if (availableOnchainBalance > 0.msat) {
         val nextSwapTimeout by business.peerManager.swapInNextTimeout.collectAsState(initial = null)
@@ -167,7 +165,7 @@ private fun OnChainBalance(
                             verticalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
                             // 1) funds being confirmed (swap deposits or LN channels waiting for confirmation
-                            val fundsBeingConfirmed = (swapInBalance.unconfirmed + swapInBalance.weaklyConfirmed).toMilliSatoshi() + pendingChannelsBalance
+                            val fundsBeingConfirmed = (swapInBalance.unconfirmed + swapInBalance.weaklyConfirmed).toMilliSatoshi()
                             if (fundsBeingConfirmed > 0.msat) {
                                 OnChainBalanceEntry(
                                     label = stringResource(id = R.string.home_swapin_confirming_title),

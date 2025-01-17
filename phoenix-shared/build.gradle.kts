@@ -88,7 +88,7 @@ kotlin {
             kotlin.srcDir(buildVersionsTask.map { it.destinationDir })
             dependencies {
                 // lightning-kmp
-                api("fr.acinq.lightning:lightning-kmp:${Versions.lightningKmp}")
+                api("fr.acinq.lightning:lightning-kmp-core:${Versions.lightningKmp}")
                 api("fr.acinq.tor:tor-mobile-kmp:${Versions.torMobile}")
                 // ktor
                 implementation("io.ktor:ktor-client-core:${Versions.ktor}")

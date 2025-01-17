@@ -2,32 +2,19 @@ package fr.acinq.phoenix.db
 
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
-import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.db.payments.CloudKitInterface
 
 
-actual fun didSaveWalletPayment(id: WalletPaymentId, database: PaymentsDatabase) {
-    database.cloudKitPaymentsQueries.addToQueue(
-        type = id.dbType.value,
-        id = id.dbId,
-        date_added = currentTimestampMillis()
-    )
+actual fun didSaveWalletPayment(id: UUID, database: PaymentsDatabase) {
+    database.cloudKitPaymentsQueries.addToQueue(id = id, date_added = currentTimestampMillis())
 }
 
-actual fun didDeleteWalletPayment(id: WalletPaymentId, database: PaymentsDatabase) {
-    database.cloudKitPaymentsQueries.addToQueue(
-        type = id.dbType.value,
-        id = id.dbId,
-        date_added = currentTimestampMillis()
-    )
+actual fun didDeleteWalletPayment(id: UUID, database: PaymentsDatabase) {
+    database.cloudKitPaymentsQueries.addToQueue(id = id, date_added = currentTimestampMillis())
 }
 
-actual fun didUpdateWalletPaymentMetadata(id: WalletPaymentId, database: PaymentsDatabase) {
-    database.cloudKitPaymentsQueries.addToQueue(
-        type = id.dbType.value,
-        id = id.dbId,
-        date_added = currentTimestampMillis()
-    )
+actual fun didUpdateWalletPaymentMetadata(id: UUID, database: PaymentsDatabase) {
+    database.cloudKitPaymentsQueries.addToQueue(id = id, date_added = currentTimestampMillis())
 }
 
 actual fun didSaveContact(contactId: UUID, database: AppDatabase) {

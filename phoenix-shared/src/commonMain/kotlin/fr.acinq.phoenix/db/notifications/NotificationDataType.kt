@@ -27,11 +27,9 @@ import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.data.Notification
-import fr.acinq.phoenix.data.WatchTowerOutcome
-import fr.acinq.phoenix.db.payments.DbTypesHelper
-import fr.acinq.phoenix.db.serializers.v1.ByteVector32Serializer
-import fr.acinq.phoenix.db.serializers.v1.MilliSatoshiSerializer
-import fr.acinq.phoenix.db.serializers.v1.SatoshiSerializer
+import fr.acinq.phoenix.db.migrations.v10.json.ByteVector32Serializer
+import fr.acinq.phoenix.db.migrations.v10.json.MilliSatoshiSerializer
+import fr.acinq.phoenix.db.migrations.v10.json.SatoshiSerializer
 import io.ktor.utils.io.charsets.Charsets
 import io.ktor.utils.io.core.toByteArray
 import kotlinx.serialization.Serializable
@@ -96,7 +94,7 @@ internal sealed class NotificationData {
     companion object {
 
         fun decode(blob: ByteArray): NotificationData? = try {
-            DbTypesHelper.decodeBlob(blob) { json, format -> format.decodeFromString<NotificationData>(json) }
+            Json.decodeFromString<NotificationData>(blob.decodeToString())
         } catch (e: Exception) {
             // notifications are not critical data, can be ignored if malformed
             null

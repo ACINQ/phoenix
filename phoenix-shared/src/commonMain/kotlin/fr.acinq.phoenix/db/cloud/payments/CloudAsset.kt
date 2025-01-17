@@ -1,6 +1,7 @@
-package fr.acinq.phoenix.db.cloud
+package fr.acinq.phoenix.db.cloud.payments
 
 import fr.acinq.lightning.utils.currentTimestampMillis
+import fr.acinq.phoenix.db.cloud.cborSerializer
 import fr.acinq.phoenix.db.payments.LnurlBase
 import fr.acinq.phoenix.db.payments.LnurlMetadata
 import fr.acinq.phoenix.db.payments.LnurlSuccessAction

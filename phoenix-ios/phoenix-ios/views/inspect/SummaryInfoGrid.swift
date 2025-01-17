@@ -11,12 +11,12 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture discussion
 	
 	@Binding var paymentInfo: WalletPaymentInfo
-	@Binding var relatedPaymentIds: [WalletPaymentId]
+	@Binding var relatedPaymentIds: [Lightning_kmpUUID]
 	@Binding var liquidityPayment: Lightning_kmpInboundLiquidityOutgoingPayment?
 	@Binding var showOriginalFiatValue: Bool
 	
 	let showContactView: (_ contact: ContactInfo) -> Void
-	let switchToPayment: (_ paymentId: WalletPaymentId) -> Void
+	let switchToPayment: (_ paymentId: Lightning_kmpUUID) -> Void
 	
 	// <InfoGridView Protocol>
 	let minKeyColumnWidth: CGFloat = 50
@@ -641,7 +641,7 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 					Button {
 						switchToPayment(paymentId)
 					} label: {
-						Text(verbatim: "\(paymentId.dbId.prefix(maxLength: 8))…")
+						Text(verbatim: "\(paymentId.description().prefix(maxLength: 8))…")
 							.lineLimit(1)
 							.truncationMode(.middle)
 					}
@@ -753,14 +753,14 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 		
 		guard
 			let outgoingPayment = paymentInfo.payment as? Lightning_kmpLightningOutgoingPayment,
-			let offchainSuccess = outgoingPayment.status.asOffChain()
+			let successSuccess = outgoingPayment.status.asSucceeded()
 		else {
 			return nil
 		}
 		
 		do {
 			let aes = try AES256(
-				key: offchainSuccess.preimage.toSwiftData(),
+				key: successSuccess.preimage.toSwiftData(),
 				iv: sa_aes.iv.toSwiftData()
 			)
 			

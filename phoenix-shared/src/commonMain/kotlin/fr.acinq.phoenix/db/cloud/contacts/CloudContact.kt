@@ -1,13 +1,8 @@
 package fr.acinq.phoenix.db.cloud.contacts
 
-import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.data.ContactInfo
-import fr.acinq.phoenix.db.cloud.CloudData
-import fr.acinq.phoenix.db.cloud.CloudDataVersion
-import fr.acinq.phoenix.db.cloud.IncomingPaymentWrapper
 import fr.acinq.phoenix.db.cloud.OfferSerializer
 import fr.acinq.phoenix.db.cloud.UUIDSerializer
 import fr.acinq.phoenix.db.cloud.cborSerializer

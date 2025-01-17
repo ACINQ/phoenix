@@ -346,26 +346,22 @@ struct TxHistoryExporter: View {
 		let startMillis = sanitizeStartDate()
 		let endMillis = sanitizeEndDate()
 		
-		let databaseManager = Biz.business.databaseManager
-		databaseManager.paymentsDb { (result: SqlitePaymentsDb?, _) in
+		Task { @MainActor in
 			
-			assertMainThread()
-			guard let paymentsDb = result else {
-				return
-			}
+			let databaseManager = Biz.business.databaseManager
+			let paymentsDb = try await databaseManager.paymentsDb()
 			
-			paymentsDb.listRangeSuccessfulPaymentsCount(
+			let count = try await paymentsDb.countCompletedInRange(
 				startDate: startMillis,
 				endDate: endMillis
-			) { (result: KotlinLong?, _) in
-				
-				let count = result?.intValue ?? 0
-				if (startMillis == self.sanitizeStartDate()) && (endMillis == self.sanitizeEndDate()) {
-					paymentCount = count
-				} else {
-					// result no longer matches UI; user changed dates
-				}
+			)
+			
+			if (startMillis == self.sanitizeStartDate()) && (endMillis == self.sanitizeEndDate()) {
+				paymentCount = count.intValue
+			} else {
+				// result no longer matches UI; user changed dates
 			}
+			
 		}
 	}
 	
@@ -428,12 +424,11 @@ struct TxHistoryExporter: View {
 		exportedCount = 0
 		
 		let databaseManager = Biz.business.databaseManager
-		let fetcher = Biz.business.paymentsManager.fetcher
 		
 		do {
 			let paymentsDb = try await databaseManager.paymentsDb()
 			
-			let config = CsvWriter.Configuration(
+			let config = CsvWriter_.Configuration(
 				includesFiat: includeFiat,
 				includesDescription: includeDescription,
 				includesNotes: includeNotes,
@@ -443,32 +438,25 @@ struct TxHistoryExporter: View {
 			var done = false
 			var rowsOffset = 0
 			
-			let headerRowStr = CsvWriter.companion.makeHeaderRow(config: config)
+			let headerRowStr = CsvWriter_.companion.makeHeaderRow(config: config)
 			let headerRowData = Data(headerRowStr.utf8)
 			
 			try await fileHandle.asyncWrite(data: headerRowData)
 			
 			while !done {
 				
-				let rows: [WalletPaymentOrderRow] = try await paymentsDb.listRangeSuccessfulPaymentsOrder(
+				let rows: [WalletPaymentInfo] = try await paymentsDb.listCompletedPayments(
+					count: Int64(FETCH_ROWS_BATCH_COUNT),
+					skip: Int64(rowsOffset),
 					startDate: startMillis,
-					endDate: endMillis,
-					count: Int32(FETCH_ROWS_BATCH_COUNT),
-					skip: Int32(rowsOffset)
+					endDate: endMillis
 				)
 				
 				for row in rows {
 					
-					guard let info = try await fetcher.getPayment(
-						row: row,
-						options: WalletPaymentFetchOptions.companion.All
-					) else {
-						continue
-					}
-					
-					let localizedDescription = info.paymentDescription() ?? info.defaultPaymentDescription()
-					let rowStr = CsvWriter.companion.makeRow(
-						info: info,
+					let localizedDescription = row.paymentDescription() ?? row.defaultPaymentDescription()
+					let rowStr = CsvWriter_.companion.makeRow(
+						info: row,
 						localizedDescription: localizedDescription,
 						config: config
 					)

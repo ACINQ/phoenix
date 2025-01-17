@@ -44,17 +44,16 @@ struct FetchContactsQueueBatchResult {
 
 struct FetchPaymentsQueueBatchResult {
 	let rowids: [Int64]
-	let rowidMap: [Int64: WalletPaymentId]
-	let rowMap: [WalletPaymentId : WalletPaymentInfo]
-	let metadataMap: [WalletPaymentId : KotlinByteArray]
-	let incomingStats: CloudKitPaymentsDb.MetadataStats
-	let outgoingStats: CloudKitPaymentsDb.MetadataStats
+	let rowidMap: [Int64: Lightning_kmpUUID]
+	let rowMap: [Lightning_kmpUUID : WalletPaymentInfo]
+	let metadataMap: [Lightning_kmpUUID : KotlinByteArray]
+	let stats: CloudKitPaymentsDb.MetadataStats
 	
-	func uniquePaymentIds() -> Set<WalletPaymentId> {
-		return Set<WalletPaymentId>(rowidMap.values)
+	func uniquePaymentIds() -> Set<Lightning_kmpUUID> {
+		return Set<Lightning_kmpUUID>(rowidMap.values)
 	}
 	
-	func rowidsMatching(_ query: WalletPaymentId) -> [Int64] {
+	func rowidsMatching(_ query: Lightning_kmpUUID) -> [Int64] {
 		var results = [Int64]()
 		for (rowid, paymentRowId) in rowidMap {
 			if paymentRowId == query {
@@ -81,8 +80,7 @@ struct FetchPaymentsQueueBatchResult {
 			rowidMap: [:],
 			rowMap: [:],
 			metadataMap: [:],
-			incomingStats: CloudKitPaymentsDb.MetadataStats(),
-			outgoingStats: CloudKitPaymentsDb.MetadataStats()
+			stats: CloudKitPaymentsDb.MetadataStats()
 		)
 	}
 }
@@ -139,7 +137,7 @@ extension CloudKitPaymentsDb.FetchQueueBatchResult {
 		// And we need to do so without swift-style enumeration in order to avoid crashing.
 		
 		var _rowids = [Int64]()
-		var _rowidMap = [Int64: WalletPaymentId]()
+		var _rowidMap = [Int64: Lightning_kmpUUID]()
 		
 		for i in 0 ..< self.rowids.count { // cannot enumerate self.rowidMap
 			
@@ -157,8 +155,7 @@ extension CloudKitPaymentsDb.FetchQueueBatchResult {
 			rowidMap: _rowidMap,
 			rowMap: self.rowMap,
 			metadataMap: self.metadataMap,
-			incomingStats: self.incomingStats,
-			outgoingStats: self.outgoingStats
+			stats: self.stats
 		)
 	}
 }

@@ -1,16 +1,12 @@
 package fr.acinq.phoenix.utils
 
-import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.data.LocalChannelInfo
-import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.availableForReceive
 import fr.acinq.phoenix.data.canRequestLiquidity
 import fr.acinq.phoenix.data.inFlightPaymentsCount
-import fr.acinq.phoenix.db.WalletPaymentOrderRow
-import fr.acinq.phoenix.managers.NodeParamsManager
 
 /**
  * Workarounds for various shortcomings between Kotlin and iOS.
@@ -21,9 +17,6 @@ import fr.acinq.phoenix.managers.NodeParamsManager
  * so we can't properly access it from within iOS.
  */
 fun ContactInfo.kotlinId(): UUID {
-    return this.id
-}
-fun WalletPaymentOrderRow.kotlinId(): WalletPaymentId {
     return this.id
 }
 

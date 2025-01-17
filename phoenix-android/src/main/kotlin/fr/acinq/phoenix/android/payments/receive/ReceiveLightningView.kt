@@ -65,6 +65,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.db.Bolt11IncomingPayment
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.LiquidityPolicy
@@ -123,8 +124,8 @@ fun LightningInvoiceView(
     // refresh LN invoice when it has been paid
     val paymentsManager = business.paymentsManager
     LaunchedEffect(key1 = Unit) {
-        paymentsManager.lastCompletedPayment.collect {
-            if (state is LightningInvoiceState.Show && it is IncomingPayment && state.invoice.paymentHash == it.paymentHash) {
+        paymentsManager.lastCompletedPayment.collect { completedPayment ->
+            if (state is LightningInvoiceState.Show && completedPayment is Bolt11IncomingPayment && state.invoice.paymentHash == completedPayment.paymentHash) {
                 vm.generateInvoice(amount = customAmount, description = customDesc, expirySeconds = defaultExpiry)
                 feeWarningDialogShownTimestamp = 0 // reset the dialog tracker to show it asap for a new invoice
             }

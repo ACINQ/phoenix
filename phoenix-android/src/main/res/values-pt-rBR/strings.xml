@@ -311,7 +311,6 @@
     <string name="paymentdetails_status_unconfirmed_zero">0 confirmações</string>
     <string name="paymentdetails_status_unconfirmed_zero_bump">Toque para acelerar</string>
     <string name="paymentdetails_status_unconfirmed_default">%1$d confirmações</string>
-    <string name="paymentdetails_status_unconfirmed_with_depth">%1$d/%2$d confirmação(ões)</string>
     <string name="paymentdetails_status_confirmed">Confirmado em string</string>
 
     <string name="paymentdetails_lnurlpay_service">Serviço por</string>
@@ -352,19 +351,17 @@
 
     <string name="paymentdetails_technical_title">Detalhes técnicos</string>
     <string name="paymentdetails_payment_type_label">Tipo de pagamento</string>
-    <string name="paymentdetails_closing">Pagamento pelo encerramento do canal</string>
-    <string name="paymentdetails_splice_outgoing">Pagamento pela emenda de saída</string>
-    <string name="paymentdetails_splice_cpfp_outgoing">Acelere as transações na rede</string>
-    <string name="paymentdetails_normal_outgoing">Pagamento relâmpago (padrão)</string>
-    <string name="paymentdetails_normal_incoming">Recebimento de pagamento relâmpago (padrão)</string>
-    <string name="paymentdetails_swapin">Depósito de Bitcoin para troca</string>
-    <string name="paymentdetails_swapout">Trocar para endereço Bitcoin</string>
+    <string name="paymentdetails_type_outgoing_close">Pagamento pelo encerramento do canal</string>
+    <string name="paymentdetails_type_outgoing_splice">Pagamento pela emenda de saída</string>
+    <string name="paymentdetails_type_outgoing_splice_cpfp">Acelere as transações na rede</string>
+    <string name="paymentdetails_type_outgoing_bolt11">Pagamento relâmpago (bolt11)</string>
+    <string name="paymentdetails_type_outgoing_bolt12">Pagamento relâmpago (bolt12)</string>
+    <string name="paymentdetails_type_incoming_bolt11">Recebimento de pagamento relâmpago (bolt11)</string>
+    <string name="paymentdetails_type_incoming_bolt12">Recebimento de pagamento relâmpago (bolt12)</string>
     <string name="paymentdetails_swapin_address_label">Endereço de depósito</string>
     <string name="paymentdetails_bitcoin_address_label">Endereço Bitcoin</string>
 
     <string name="paymentdetails_splice_out_channel_label">Canal emendado</string>
-    <string name="paymentdetails_dualswapin_tx_label">Transações</string>
-    <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
 
     <string name="paymentdetails_closing_type_label">Tipo de fechamento</string>
     <string name="paymentdetails_closing_type_mutual">Muto</string>
@@ -374,9 +371,9 @@
     <string name="paymentdetails_closing_type_other">Outro</string>
 
     <string name="paymentdetails_pubkey_label">Chave pública de destino</string>
-    <string name="paymentdetails_payment_request_description_label">Descrição da fatura</string>
+    <string name="paymentdetails_bolt11_description_label">Descrição da fatura</string>
     <string name="paymentdetails_payment_hash_label">Hash de pagamento</string>
-    <string name="paymentdetails_payment_request_label">Fatura</string>
+    <string name="paymentdetails_bolt11_label">Fatura</string>
     <string name="paymentdetails_preimage_label">Pré-imagem</string>
 
     <string name="paymentdetails_status_label">Status do pagamento</string>
@@ -390,8 +387,6 @@
     <string name="paymentdetails_part_hops_label">Lúpulos</string>
 
     <string name="paymentdetails_received_with_label">Recebido via</string>
-    <string name="paymentdetails_received_with_splicein">Splice (adicionando ao canal existente)</string>
-    <string name="paymentdetails_received_with_channel">Novo canal (criado automaticamente)</string>
     <string name="paymentdetails_received_with_lightning">Pagamento relâmpago</string>
     <string name="paymentdetails_channel_id_label">Identificador do canal</string>
     <string name="paymentdetails_tx_id_label">Transação</string>

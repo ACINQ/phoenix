@@ -19,6 +19,8 @@ package fr.acinq.phoenix.db
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import fr.acinq.bitcoin.Chain
+import fr.acinq.phoenix.db.migrations.v10.AfterVersion10
+import fr.acinq.phoenix.db.migrations.v11.AfterVersion11
 import fr.acinq.phoenix.utils.PlatformContext
 import fr.acinq.phoenix.utils.extensions.phoenixName
 
@@ -27,7 +29,16 @@ actual fun createChannelsDbDriver(ctx: PlatformContext, chain: Chain, nodeIdHash
 }
 
 actual fun createPaymentsDbDriver(ctx: PlatformContext, chain: Chain, nodeIdHash: String): SqlDriver {
-    return AndroidSqliteDriver(PaymentsDatabase.Schema, ctx.applicationContext, "payments-${chain.phoenixName}-$nodeIdHash.sqlite")
+    return AndroidSqliteDriver(
+        schema = PaymentsDatabase.Schema,
+        context = ctx.applicationContext,
+        name = "payments-${chain.phoenixName}-$nodeIdHash.sqlite",
+        callback = AndroidSqliteDriver.Callback(
+            schema = PaymentsDatabase.Schema,
+            AfterVersion10,
+            AfterVersion11,
+        )
+    )
 }
 
 actual fun createAppDbDriver(ctx: PlatformContext): SqlDriver {

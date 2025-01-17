@@ -1,8 +1,8 @@
 package fr.acinq.phoenix.managers
 
 import fr.acinq.lightning.logging.LoggerFactory
-import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import fr.acinq.lightning.logging.debug
+import fr.acinq.phoenix.data.WalletPaymentInfo
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,17 +19,16 @@ data class PaymentsPage(
      * The rows fetched from the database.
      * If there are fewer items in the database than requested,
      * then PaymentsPage.rows.count will be less than PaymentsPage.count.
-     *
-     * Use PaymentsFetcher to fetch more information about the row.
      */
-    val rows: List<WalletPaymentOrderRow>
+    val rows: List<WalletPaymentInfo>
 ) {
     constructor(): this(0, 0, emptyList())
 }
 
 class PaymentsPageFetcher(
     loggerFactory: LoggerFactory,
-    private val databaseManager: DatabaseManager
+    private val databaseManager: DatabaseManager,
+    private val contactsManager: ContactsManager
 ): CoroutineScope by MainScope() {
 
     private val log = loggerFactory.newLogger(this::class)
@@ -81,15 +80,15 @@ class PaymentsPageFetcher(
         val subscriptionIdxSnapshot = subscriptionIdx
         this.job = launch {
             val db = databaseManager.paymentsDb()
-            db.listPaymentsOrderFlow(
-                count = countSnapshot,
-                skip = offsetSnapshot
-            ).collect {
+            db.listPaymentsAsFlow(
+                count = countSnapshot.toLong(),
+                skip = offsetSnapshot.toLong()
+            ).collect { rows ->
                 if (subscriptionIdxSnapshot == subscriptionIdx) {
                     _paymentsPage.value = PaymentsPage(
                         offset = offsetSnapshot,
                         count = countSnapshot,
-                        rows = it
+                        rows = rows
                     )
                 }
             }
@@ -120,9 +119,9 @@ class PaymentsPageFetcher(
         val subscriptionIdxSnapshot = subscriptionIdx
         this.job = launch {
             val db = databaseManager.paymentsDb()
-            db.listOutgoingInFlightPaymentsOrderFlow(
-                count = countSnapshot,
-                skip = offsetSnapshot
+            db.listOutgoingInFlightPaymentsAsFlow(
+                count = countSnapshot.toLong(),
+                skip = offsetSnapshot.toLong()
             ).collect { rows ->
                 if (subscriptionIdxSnapshot == subscriptionIdx) {
                     _paymentsPage.value = PaymentsPage(
@@ -176,10 +175,10 @@ class PaymentsPageFetcher(
         job = launch {
             val db = databaseManager.paymentsDb()
             val date = Clock.System.now() - secondsSnapshot.seconds
-            db.listRecentPaymentsOrderFlow(
-                date = date.toEpochMilliseconds(),
-                count = countSnapshot,
-                skip = offsetSnapshot
+            db.listRecentPaymentsAsFlow(
+                count = countSnapshot.toLong(),
+                skip = offsetSnapshot.toLong(),
+                sinceDate = date.toEpochMilliseconds()
             ).collect { rows ->
                 if (subscriptionIdxSnapshot == subscriptionIdx) {
                     _paymentsPage.value = PaymentsPage(
@@ -193,7 +192,7 @@ class PaymentsPageFetcher(
         }
     }
 
-    private fun resetRefreshJob(idx: Int, rows: List<WalletPaymentOrderRow>) {
+    private fun resetRefreshJob(idx: Int, rows: List<WalletPaymentInfo>) {
         log.debug { "resetRefreshJob(idx=$idx, rows=${rows.size})" }
 
         if (idx != subscriptionIdx) {
@@ -210,8 +209,8 @@ class PaymentsPageFetcher(
             return
         }
 
-        val oldestCompleted = rows.lastOrNull { it.completedAt != null } ?: return
-        val oldestTimestamp = Instant.fromEpochMilliseconds(oldestCompleted.completedAt!!)
+        val oldestCompleted = rows.mapNotNull { it.payment.completedAt }.lastOrNull() ?: return
+        val oldestTimestamp = Instant.fromEpochMilliseconds(oldestCompleted)
 
         val refreshTimestamp = oldestTimestamp + this.seconds.seconds
         val diff = refreshTimestamp - Clock.System.now()

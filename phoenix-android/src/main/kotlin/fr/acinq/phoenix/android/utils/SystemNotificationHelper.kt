@@ -34,6 +34,7 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.MainActivity
@@ -44,7 +45,6 @@ import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency
-import fr.acinq.phoenix.data.WalletPaymentId
 import kotlinx.coroutines.flow.first
 import org.slf4j.LoggerFactory
 import java.text.DecimalFormat
@@ -255,7 +255,7 @@ object SystemNotificationHelper {
     suspend fun notifyPaymentsReceived(
         context: Context,
         userPrefs: UserPrefsRepository,
-        paymentHash: ByteVector32,
+        id: UUID,
         amount: MilliSatoshi,
         rates: List<ExchangeRate>,
         isHeadless: Boolean,
@@ -287,7 +287,7 @@ object SystemNotificationHelper {
         return NotificationCompat.Builder(context, PAYMENT_RECEIVED_NOTIF_CHANNEL).apply {
             setContentTitle(context.getString(R.string.notif_headless_received, amount.toPrettyString(unit, rate, withUnit = true)))
             setSmallIcon(R.drawable.ic_phoenix_outline)
-            val intent = Intent(Intent.ACTION_VIEW,"phoenix:payments/${WalletPaymentId.DbType.INCOMING.value}/${paymentHash.toHex()}".toUri(), context, MainActivity::class.java).apply {
+            val intent = Intent(Intent.ACTION_VIEW,"phoenix:payments/$id".toUri(), context, MainActivity::class.java).apply {
                 Intent.FLAG_ACTIVITY_SINGLE_TOP
             }
             setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT))
