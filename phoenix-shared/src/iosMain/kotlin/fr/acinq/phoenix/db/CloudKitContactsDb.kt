@@ -275,12 +275,21 @@ class CloudKitContactsDb(
                 //
                 // But in what order do we want to upload them to the cloud ?
                 //
-                // We will choose to upload the newest item first.
+                // We will choose to upload the OLDEST item first.
+                // This matches how they normally would have been uploaded.
+                // Also, when a user restores their wallet (e.g. on a new phone),
+                // we always want to download the newest contacts first.
+                // And this assumes the newest items in the cloud are the newest contacts.
+                //
                 // Since items are uploaded in FIFO order,
-                // we just need to make the newest item have the
+                // we just need to make the oldest item have the
                 // smallest `date_added` value.
 
-                missing.sortBy { it.timestamp }
+                missing.sortByDescending { it.timestamp }
+
+                // The list is now sorted in descending order.
+                // Which means the newest item is at index 0,
+                // and the oldest item is at index <last>.
 
                 val now = currentTimestampMillis()
                 missing.forEachIndexed { idx, item ->
