@@ -31,6 +31,7 @@ class DatabaseManager(
     private val chain: Chain,
     private val appDb: SqliteAppDb,
     private val nodeParamsManager: NodeParamsManager,
+    private val contactsManager: ContactsManager,
     private val currencyManager: CurrencyManager
 ) : CoroutineScope by MainScope() {
 
@@ -40,6 +41,7 @@ class DatabaseManager(
         appDb = business.appDb,
         chain = business.chain,
         nodeParamsManager = business.nodeParamsManager,
+        contactsManager = business.contactsManager,
         currencyManager = business.currencyManager
     )
 
@@ -58,7 +60,7 @@ class DatabaseManager(
                 val channelsDbDriver = createChannelsDbDriver(ctx, chain, nodeIdHash)
                 val channelsDb = createSqliteChannelsDb(channelsDbDriver)
                 val paymentsDbDriver = createPaymentsDbDriver(ctx, chain, nodeIdHash)
-                val paymentsDb = createSqlitePaymentsDb(paymentsDbDriver, currencyManager)
+                val paymentsDb = createSqlitePaymentsDb(paymentsDbDriver, contactsManager, currencyManager)
                 val cloudKitDb = makeCloudKitDb(appDb, paymentsDb)
                 log.debug { "databases object created" }
                 _databases.value = PhoenixDatabases(

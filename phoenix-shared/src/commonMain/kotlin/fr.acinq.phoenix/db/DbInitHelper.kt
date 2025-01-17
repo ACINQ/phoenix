@@ -27,6 +27,7 @@ import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.phoenix.managers.ContactsManager
 import fr.acinq.phoenix.managers.CurrencyManager
 import fr.acinq.phoenix.utils.extensions.toByteArray
 import fracinqphoenixdb.Cloudkit_payments_metadata
@@ -50,7 +51,7 @@ fun createSqliteChannelsDb(driver: SqlDriver): SqliteChannelsDb {
     )
 }
 
-fun createSqlitePaymentsDb(driver: SqlDriver, currencyManager: CurrencyManager?): SqlitePaymentsDb {
+fun createSqlitePaymentsDb(driver: SqlDriver, contactsManager: ContactsManager?, currencyManager: CurrencyManager?): SqlitePaymentsDb {
     return SqlitePaymentsDb(
         driver = driver,
         database = PaymentsDatabase(
@@ -63,6 +64,7 @@ fun createSqlitePaymentsDb(driver: SqlDriver, currencyManager: CurrencyManager?)
             cloudkit_payments_queueAdapter = Cloudkit_payments_queue.Adapter(UUIDAdapter),
             cloudkit_payments_metadataAdapter = Cloudkit_payments_metadata.Adapter(UUIDAdapter),
         ),
+        contactsManager = contactsManager,
         currencyManager = currencyManager,
     )
 }
