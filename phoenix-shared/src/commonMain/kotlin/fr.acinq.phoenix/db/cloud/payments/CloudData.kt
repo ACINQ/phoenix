@@ -116,8 +116,9 @@ sealed class CloudData {
 
     data class V1(val payment: WalletPayment) : CloudData() {
         override fun serialize(): ByteArray {
-            // TODO: prepend a version byte to avoid the brutal try/catch in the deserialization ?
-            return Serialization.serialize(payment)
+            val version = byteArrayOf(1.toByte())
+            val serializedDate = Serialization.serialize(payment)
+            return version + serializedDate
         }
     }
 
@@ -126,7 +127,15 @@ sealed class CloudData {
         @OptIn(ExperimentalSerializationApi::class)
         fun deserialize(data: ByteArray): CloudData? {
             return kotlin.runCatching {
-                V1(Serialization.deserialize(data).getOrThrow())
+                when (val version = data.first()) {
+                    1.toByte() -> {
+                        val serializedData = data.sliceArray(1..<data.size)
+                        V1(Serialization.deserialize(serializedData).getOrThrow())
+                    }
+                    else -> {
+                        throw IllegalArgumentException("unknown version: $version")
+                    }
+                }
             }.recoverCatching {
                 cborSerializer().decodeFromByteArray<V0>(data)
             }.getOrNull()
