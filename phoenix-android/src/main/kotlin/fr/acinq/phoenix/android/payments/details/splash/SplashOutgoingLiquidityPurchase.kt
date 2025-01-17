@@ -53,9 +53,9 @@ import fr.acinq.phoenix.utils.extensions.state
 fun SplashLiquidityPurchase(
     payment: InboundLiquidityOutgoingPayment,
 ) {
-    // if this purchase is paid from the balance, show the amount
-    if (payment.feePaidFromChannelBalance.total > 0.sat) {
-        SplashAmount(amount = payment.amount - payment.fees, state = payment.state(), isOutgoing = true)
+    // if this purchase is paid from the balance and was not triggered by a on-chain new-channel, show the amount
+    if (payment.purchase.amount != 1.sat && payment.feePaidFromChannelBalance.total > 0.sat) {
+        SplashAmount(amount = payment.amount, state = payment.state(), isOutgoing = true)
     } else {
         Spacer(modifier = Modifier.height(36.dp))
     }
@@ -108,7 +108,7 @@ private fun SplashFee(
     payment: InboundLiquidityOutgoingPayment
 ) {
     val btcUnit = LocalBitcoinUnit.current
-    if (payment.feePaidFromChannelBalance.total > 0.sat) {
+    if (payment.purchase.amount != 1.sat && payment.feePaidFromChannelBalance.total > 0.sat) {
         val miningFee = payment.feePaidFromChannelBalance.miningFee
         val serviceFee = payment.feePaidFromChannelBalance.serviceFee
         Spacer(modifier = Modifier.height(8.dp))

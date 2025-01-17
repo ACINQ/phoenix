@@ -89,7 +89,11 @@ fun PaymentLine(
             Row {
                 PaymentDescription(paymentInfo = paymentInfo, contactInfo = contactInfo, modifier = Modifier.weight(1.0f))
                 Spacer(modifier = Modifier.width(16.dp))
-                val hideAmount = payment.state() == WalletPaymentState.Failure || (payment is InboundLiquidityOutgoingPayment && payment.feePaidFromChannelBalance.total == 0.sat)
+                val hideAmount = when {
+                    payment is InboundLiquidityOutgoingPayment && payment.purchase.amount == 1.sat -> true
+                    payment is InboundLiquidityOutgoingPayment && payment.feePaidFromChannelBalance.total == 0.sat -> true
+                    else -> payment.state() == WalletPaymentState.Failure
+                }
                 if (!hideAmount) {
                     val isOutgoing = payment is OutgoingPayment
                     if (isAmountRedacted) {

@@ -39,30 +39,20 @@ fun SplashAmount(
     state: WalletPaymentState,
     isOutgoing: Boolean,
 ) {
-    // hide the total if this is a liquidity purchase that's not paid from the balance
-//    if (payment is InboundLiquidityOutgoingPayment && payment.feePaidFromChannelBalance.total == 0.sat) {
-//        Unit
-//    } else {
-        AmountView(
-            amount = amount,
-//            amount = when (payment) {
-//                is InboundLiquidityOutgoingPayment -> payment.feePaidFromChannelBalance.total.toMilliSatoshi()
-//                is OutgoingPayment -> payment.amount - payment.fees
-//                is IncomingPayment -> payment.amount
-//            },
-            amountTextStyle = MaterialTheme.typography.body1.copy(fontSize = 30.sp),
-            separatorSpace = 4.dp,
-            prefix = stringResource(id = if (isOutgoing) R.string.paymentline_prefix_sent else R.string.paymentline_prefix_received)
-        )
-        Spacer(modifier = Modifier.height(36.dp))
-        PrimarySeparator(
-            height = 6.dp,
-            color = when (state) {
-                WalletPaymentState.Failure -> negativeColor
-                WalletPaymentState.SuccessOffChain, WalletPaymentState.SuccessOnChain -> positiveColor
-                else -> mutedBgColor
-            }
-        )
-//    }
+    AmountView(
+        amount = amount,
+        amountTextStyle = MaterialTheme.typography.body1.copy(fontSize = 30.sp),
+        separatorSpace = 4.dp,
+        prefix = stringResource(id = if (isOutgoing) R.string.paymentline_prefix_sent else R.string.paymentline_prefix_received)
+    )
+    Spacer(modifier = Modifier.height(36.dp))
+    PrimarySeparator(
+        height = 6.dp,
+        color = when (state) {
+            WalletPaymentState.Failure -> negativeColor
+            WalletPaymentState.SuccessOffChain, WalletPaymentState.SuccessOnChain -> positiveColor
+            else -> mutedBgColor
+        }
+    )
     Spacer(modifier = Modifier.height(36.dp))
 }

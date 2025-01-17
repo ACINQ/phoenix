@@ -31,8 +31,9 @@ import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.LegacyPayToOpenIncomingPayment
 import fr.acinq.lightning.db.LegacySwapInIncomingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
-import fr.acinq.lightning.db.OnChainIncomingPayment
+import fr.acinq.lightning.db.NewChannelIncomingPayment
 import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
+import fr.acinq.lightning.db.SpliceInIncomingPayment
 import fr.acinq.lightning.db.SpliceOutgoingPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.android.R
@@ -44,7 +45,8 @@ import fr.acinq.phoenix.android.payments.details.splash.SplashIncomingBolt11
 import fr.acinq.phoenix.android.payments.details.splash.SplashIncomingBolt12
 import fr.acinq.phoenix.android.payments.details.splash.SplashIncomingLegacyPayToOpen
 import fr.acinq.phoenix.android.payments.details.splash.SplashIncomingLegacySwapIn
-import fr.acinq.phoenix.android.payments.details.splash.SplashIncomingOnChain
+import fr.acinq.phoenix.android.payments.details.splash.SplashIncomingNewChannel
+import fr.acinq.phoenix.android.payments.details.splash.SplashIncomingSpliceIn
 import fr.acinq.phoenix.android.payments.details.splash.SplashLightningOutgoing
 import fr.acinq.phoenix.android.payments.details.splash.SplashLiquidityPurchase
 import fr.acinq.phoenix.android.payments.details.splash.SplashSpliceOut
@@ -84,7 +86,8 @@ fun PaymentDetailsSplashView(
         when (payment) {
             is Bolt11IncomingPayment -> SplashIncomingBolt11(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
             is Bolt12IncomingPayment -> SplashIncomingBolt12(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
-            is OnChainIncomingPayment -> SplashIncomingOnChain(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
+            is SpliceInIncomingPayment -> SplashIncomingSpliceIn(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
+            is NewChannelIncomingPayment -> SplashIncomingNewChannel(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
             is LegacySwapInIncomingPayment -> SplashIncomingLegacySwapIn(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
             is LegacyPayToOpenIncomingPayment -> SplashIncomingLegacyPayToOpen(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
 

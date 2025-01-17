@@ -140,7 +140,15 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
             is SpliceOutgoingPayment -> listOf(Details(Type.swap_out, amount = -payment.amount, feeCredit = 0.msat, miningFee = payment.miningFees, serviceFee = 0.msat, paymentHash = null, txId = payment.txId, destination = payment.address))
             is ChannelCloseOutgoingPayment -> listOf(Details(Type.channel_close, amount = -payment.amount, feeCredit = 0.msat, miningFee = payment.miningFees, serviceFee = 0.msat, paymentHash = null, txId = payment.txId, destination = payment.address))
             is SpliceCpfpOutgoingPayment -> listOf(Details(Type.fee_bumping, amount = -payment.amount, feeCredit = 0.msat, miningFee = payment.miningFees, serviceFee = 0.msat, paymentHash = null, txId = payment.txId))
-            is InboundLiquidityOutgoingPayment -> listOf(Details(Type.liquidity_purchase, amount = -payment.feePaidFromChannelBalance.total.toMilliSatoshi(), feeCredit = -payment.feeCreditUsed, miningFee = payment.miningFees, serviceFee = payment.serviceFees.toMilliSatoshi(), paymentHash = null, txId = payment.txId))
+            is InboundLiquidityOutgoingPayment -> listOf(
+                if (payment.purchase.amount == 1.sat) {
+                    // Special dummy liquidity operation for creating the channel. In that case the received amount for the corresponding NewChannelIncomingPayment
+                    // already takes liquidity fees into account.
+                    Details(Type.liquidity_purchase, amount = 0.msat, feeCredit = -payment.feeCreditUsed, miningFee = payment.miningFees, serviceFee = payment.serviceFees.toMilliSatoshi(), paymentHash = null, txId = payment.txId, description = "+${payment.purchase.amount.sat} sat liquidity")
+                } else {
+                    Details(Type.liquidity_purchase, amount = -payment.feePaidFromChannelBalance.total.toMilliSatoshi(), feeCredit = -payment.feeCreditUsed, miningFee = payment.miningFees, serviceFee = payment.serviceFees.toMilliSatoshi(), paymentHash = null, txId = payment.txId, description = "+${payment.purchase.amount.sat} sat liquidity")
+                }
+            )
         }
 
         details.forEach { addRow(timestamp, id, it, metadata) }
