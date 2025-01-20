@@ -351,26 +351,6 @@ suspend fun Peer.fundingRate(amount: Satoshi): LiquidityAds.FundingRate? {
     return this.remoteFundingRates.filterNotNull().first().findRate(amount)
 }
 
-suspend fun Peer.altPayOffer(
-    paymentId: UUID,
-    amount: MilliSatoshi,
-    offer: OfferTypes.Offer,
-    payerKey: PrivateKey,
-    payerNote: String?,
-    fetchInvoiceTimeoutInSeconds: Int
-): SendPaymentResult {
-    val res = CompletableDeferred<SendPaymentResult>()
-    this.launch {
-        res.complete(eventsFlow
-            .filterIsInstance<SendPaymentResult>()
-            .filter { it.request.paymentId == paymentId }
-            .first()
-        )
-    }
-    send(PayOffer(paymentId, payerKey, payerNote, amount, offer, fetchInvoiceTimeoutInSeconds.seconds))
-    return res.await()
-}
-
 suspend fun Peer.betterPayOffer(
     paymentId: UUID,
     amount: MilliSatoshi,
@@ -391,6 +371,13 @@ suspend fun Peer.betterPayOffer(
             }
         }
     }
-    send(PayOffer(paymentId, payerKey, payerNote, amount, offer, fetchInvoiceTimeoutInSeconds.seconds))
+    send(PayOffer(
+        paymentId = paymentId,
+        payerKey = payerKey,
+        payerNote = payerNote,
+        amount = amount,
+        offer = offer,
+        fetchInvoiceTimeout = fetchInvoiceTimeoutInSeconds.seconds
+    ))
     return res.await()
 }
