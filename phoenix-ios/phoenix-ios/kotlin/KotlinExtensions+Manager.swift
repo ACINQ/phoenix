@@ -13,6 +13,20 @@ extension BalanceManager {
 	}
 }
 
+extension CardsManager {
+	
+	var cardsListValue: [BoltCardInfo] {
+		return self.cardsList.value as? [BoltCardInfo] ?? []
+	}
+}
+
+extension CurrencyManager {
+	
+	var ratesFlowValue: [ExchangeRate] {
+		return self.ratesFlow.value as? [ExchangeRate] ?? []
+	}
+}
+
 extension ConnectionsManager {
 	
 	var currentValue: Connections {

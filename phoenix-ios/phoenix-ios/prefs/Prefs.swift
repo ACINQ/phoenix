@@ -24,6 +24,8 @@ fileprivate enum Key: String {
 	case serverMessageReadIndex
 	case allowOverpayment
 	case doNotShowChannelImpactWarning
+	case pushTokenRegistration
+	case lnurlWithdrawRegistration
 }
 
 fileprivate enum KeyDeprecated: String {
@@ -172,6 +174,16 @@ class Prefs {
 		set { defaults.doNotShowChannelImpactWarning = newValue }
 	}
 	
+	var pushTokenRegistration: PushTokenRegistration? {
+		get { defaults.pushTokenRegistration?.jsonDecode() }
+		set { defaults.pushTokenRegistration = newValue?.jsonEncode() }
+	}
+	
+	var lnurlWithdrawRegistration: LnurlWithdrawRegistration? {
+		get { defaults.lnurlWithdrawRegistration?.jsonDecode() }
+		set { defaults.lnurlWithdrawRegistration = newValue?.jsonEncode() }
+	}
+	
 	// --------------------------------------------------
 	// MARK: Wallet State
 	// --------------------------------------------------
@@ -258,6 +270,7 @@ class Prefs {
 		defaults.removeObject(forKey: Key.serverMessageReadIndex.rawValue)
 		defaults.removeObject(forKey: Key.allowOverpayment.rawValue)
 		defaults.removeObject(forKey: Key.doNotShowChannelImpactWarning.rawValue)
+		defaults.removeObject(forKey: Key.pushTokenRegistration.rawValue)
 
 		defaults.removeObject(forKey: KeyDeprecated.showChannelsRemoteBalance.rawValue)
 		defaults.removeObject(forKey: KeyDeprecated.recentPaymentSeconds.rawValue)
@@ -376,5 +389,15 @@ extension UserDefaults {
 	@objc fileprivate var doNotShowChannelImpactWarning: Bool {
 		get { bool(forKey: Key.doNotShowChannelImpactWarning.rawValue) }
 		set { set(newValue, forKey: Key.doNotShowChannelImpactWarning.rawValue) }
+	}
+	
+	@objc fileprivate var pushTokenRegistration: Data? {
+		get { data(forKey: Key.pushTokenRegistration.rawValue) }
+		set { set(newValue, forKey: Key.pushTokenRegistration.rawValue) }
+	}
+	
+	@objc fileprivate var lnurlWithdrawRegistration: Data? {
+		get { data(forKey: Key.lnurlWithdrawRegistration.rawValue) }
+		set { set(newValue, forKey: Key.lnurlWithdrawRegistration.rawValue) }
 	}
 }

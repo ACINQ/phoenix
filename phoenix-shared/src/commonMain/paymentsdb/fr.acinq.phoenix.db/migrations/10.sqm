@@ -1,0 +1,7 @@
+-- Migration: v10 -> v11
+--
+-- Changes:
+-- * Added a new column [card_id] in table [payments_metadata]
+
+ALTER TABLE payments_metadata
+ADD COLUMN card_id TEXT DEFAULT NULL;

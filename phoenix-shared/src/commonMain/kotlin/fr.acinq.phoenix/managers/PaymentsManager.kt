@@ -1,5 +1,6 @@
 package fr.acinq.phoenix.managers
 
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
@@ -12,6 +13,8 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.SqlitePaymentsDb
 import fr.acinq.lightning.logging.debug
+import fr.acinq.phoenix.db.CardPaymentOrderRow
+import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import fr.acinq.phoenix.utils.extensions.relatedPaymentIds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
@@ -20,6 +23,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import kotlinx.datetime.*
 
 
 class PaymentsManager(
