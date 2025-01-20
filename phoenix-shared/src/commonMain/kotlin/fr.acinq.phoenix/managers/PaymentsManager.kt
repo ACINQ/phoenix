@@ -163,16 +163,19 @@ class PaymentsManager(
         options: WalletPaymentFetchOptions
     ): WalletPaymentInfo? {
         return paymentsDb().getPayment(id, options)?.let {
-            val payment = it.first
-            val contact = if (options.contains(WalletPaymentFetchOptions.Contact)) {
-                contactsManager.contactForPayment(payment)
-            } else { null }
-            WalletPaymentInfo(
-                payment = payment,
+            val paymentInfo = WalletPaymentInfo(
+                payment = it.first,
                 metadata = it.second ?: WalletPaymentMetadata(),
-                contact = contact,
+                contact = null,
                 fetchOptions = options
             )
+            if (options.contains(WalletPaymentFetchOptions.Contact)) {
+                contactsManager.contactForPaymentInfo(paymentInfo)?.let { contact ->
+                    paymentInfo.copy(contact = contact)
+                } ?: paymentInfo
+            } else {
+                paymentInfo
+            }
         }
     }
 }

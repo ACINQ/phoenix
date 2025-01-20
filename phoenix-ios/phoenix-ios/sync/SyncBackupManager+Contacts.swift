@@ -732,7 +732,7 @@ extension SyncBackupManager {
 		if contact == nil, let photoUri {
 			// Edge case cleanup
 			Task {
-				try await PhotosManager.shared.deleteFromDisk(fileName: photoUri)
+				await PhotosManager.shared.deleteFromDisk(fileName: photoUri)
 			}
 		}
 		

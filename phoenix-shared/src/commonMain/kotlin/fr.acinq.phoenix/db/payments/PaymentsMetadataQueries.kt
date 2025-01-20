@@ -30,7 +30,8 @@ class PaymentsMetadataQueries(val database: PaymentsDatabase) {
             user_notes = data.user_notes,
             modified_at = data.modified_at,
             original_fiat_type = data.original_fiat?.first,
-            original_fiat_rate = data.original_fiat?.second
+            original_fiat_rate = data.original_fiat?.second,
+            lightning_address = data.lightning_address
         )
         didUpdateWalletPaymentMetadata(id, database)
     }
@@ -47,27 +48,20 @@ class PaymentsMetadataQueries(val database: PaymentsDatabase) {
             WalletPaymentFetchOptions.None -> {
                 null
             }
-            WalletPaymentFetchOptions.Descriptions + WalletPaymentFetchOptions.OriginalFiat -> {
-                getDescriptionsAndOriginalFiat(id)
-            }
-            WalletPaymentFetchOptions.Descriptions -> {
-                getDescriptions(id)
+            WalletPaymentFetchOptions.Common -> {
+                getCommon(id)
             }
             else -> {
-                get(id)
+                getAll(id)
             }
         }
     }
 
-    private fun getDescriptions(id: UUID): WalletPaymentMetadata? {
-        return queries.getDescriptions(payment_id = id, mapper = ::mapDescriptions).executeAsOneOrNull()
+    private fun getCommon(id: UUID): WalletPaymentMetadata? {
+        return queries.fetchCommon(payment_id = id, mapper = ::mapCommon).executeAsOneOrNull()
     }
 
-    private fun getDescriptionsAndOriginalFiat(id: UUID): WalletPaymentMetadata? {
-        return queries.getDescriptionsAndOriginalFiat(payment_id = id, mapper = ::mapDescriptionsAndOriginalFiat).executeAsOneOrNull()
-    }
-
-    private fun get(id: UUID): WalletPaymentMetadata? {
+    private fun getAll(id: UUID): WalletPaymentMetadata? {
         return queries.get(payment_id = id, mapper = ::mapAll).executeAsOneOrNull()
     }
 
@@ -100,7 +94,8 @@ class PaymentsMetadataQueries(val database: PaymentsDatabase) {
                     user_notes = userNotes,
                     modified_at = modifiedAt,
                     original_fiat_type = null,
-                    original_fiat_rate = null
+                    original_fiat_rate = null,
+                    lightning_address = null
                 )
             }
             didUpdateWalletPaymentMetadata(id, database)
@@ -108,24 +103,13 @@ class PaymentsMetadataQueries(val database: PaymentsDatabase) {
     }
 
     companion object {
-        fun mapDescriptions(
-            lnurl_description: String?,
-            user_description: String?,
-            modified_at: Long?
-        ): WalletPaymentMetadata {
-            return WalletPaymentMetadata(
-                userDescription = user_description,
-                lnurl = lnurl_description?.let { LnurlPayMetadata.placeholder(it) },
-                modifiedAt = modified_at
-            )
-        }
-
-        fun mapDescriptionsAndOriginalFiat(
+        fun mapCommon(
             lnurl_description: String?,
             user_description: String?,
             modified_at: Long?,
             original_fiat_type: String?,
-            original_fiat_rate: Double?
+            original_fiat_rate: Double?,
+            lightning_address: String?
         ): WalletPaymentMetadata {
             val originalFiat =
                 if (original_fiat_type != null && original_fiat_rate != null) {
@@ -143,6 +127,7 @@ class PaymentsMetadataQueries(val database: PaymentsDatabase) {
                 lnurl = lnurl_description?.let { LnurlPayMetadata.placeholder(it) },
                 originalFiat = originalFiat,
                 userDescription = user_description,
+                lightningAddress = lightning_address,
                 modifiedAt = modified_at
             )
         }
@@ -161,7 +146,8 @@ class PaymentsMetadataQueries(val database: PaymentsDatabase) {
             user_notes: String?,
             modified_at: Long?,
             original_fiat_type: String?,
-            original_fiat_rate: Double?
+            original_fiat_rate: Double?,
+            lightning_address: String?
         ): WalletPaymentMetadata {
             val lnurlBase =
                 if (lnurl_base_type != null && lnurl_base_blob != null) {
@@ -191,6 +177,7 @@ class PaymentsMetadataQueries(val database: PaymentsDatabase) {
                 original_fiat = originalFiat,
                 user_description = user_description,
                 user_notes = user_notes,
+                lightning_address = lightning_address,
                 modified_at = modified_at
             ).deserialize()
         }

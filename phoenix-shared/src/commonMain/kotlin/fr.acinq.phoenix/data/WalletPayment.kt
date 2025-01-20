@@ -29,6 +29,7 @@ data class WalletPaymentMetadata(
     val originalFiat: ExchangeRate.BitcoinPriceRate? = null,
     val userDescription: String? = null,
     val userNotes: String? = null,
+    val lightningAddress: String? = null,
     val modifiedAt: Long? = null
 )
 
@@ -79,6 +80,7 @@ data class WalletPaymentFetchOptions(val flags: Int) { // <- bitmask
         val Contact = WalletPaymentFetchOptions(1 shl 4)
 
         val Metadata = Descriptions + Lnurl + UserNotes + OriginalFiat
+        val Common = Descriptions + OriginalFiat + Contact
         val All = Descriptions + Lnurl + UserNotes + OriginalFiat + Contact
     }
 }
