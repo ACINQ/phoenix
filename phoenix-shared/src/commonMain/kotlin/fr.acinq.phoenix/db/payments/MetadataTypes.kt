@@ -223,6 +223,7 @@ data class WalletPaymentMetadataRow(
     val original_fiat: Pair<String, Double>? = null,
     val user_description: String? = null,
     val user_notes: String? = null,
+    val lightning_address: String? = null,
     val modified_at: Long? = null
 ) {
 
@@ -271,6 +272,7 @@ data class WalletPaymentMetadataRow(
             originalFiat = originalFiat,
             userDescription = user_description,
             userNotes = user_notes,
+            lightningAddress = lightning_address,
             modifiedAt = modified_at
         )
     }
@@ -286,6 +288,7 @@ data class WalletPaymentMetadataRow(
             && original_fiat == null
             && user_description == null
             && user_notes == null
+            && lightning_address == null
     }
 
     companion object {
@@ -319,6 +322,7 @@ data class WalletPaymentMetadataRow(
                 original_fiat = originalFiat,
                 user_description = metadata.userDescription,
                 user_notes = metadata.userNotes,
+                lightning_address = metadata.lightningAddress,
                 modified_at = metadata.modifiedAt
             )
 
