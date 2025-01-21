@@ -27,6 +27,7 @@ import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.db.payments.*
 import fr.acinq.phoenix.db.payments.PaymentsMetadataQueries
+import fr.acinq.phoenix.managers.ContactsManager
 import fr.acinq.phoenix.managers.CurrencyManager
 import kotlin.collections.List
 import kotlinx.coroutines.Dispatchers
@@ -38,7 +39,8 @@ import kotlinx.coroutines.withContext
 class SqlitePaymentsDb(
     val driver: SqlDriver,
     val database: PaymentsDatabase,
-    private val currencyManager: CurrencyManager? = null,
+    private val contactsManager: ContactsManager?,
+    private val currencyManager: CurrencyManager?
 ) : IncomingPaymentsDb by SqliteIncomingPaymentsDb(database),
     OutgoingPaymentsDb by SqliteOutgoingPaymentsDb(database),
     PaymentsDb {
@@ -107,12 +109,28 @@ class SqlitePaymentsDb(
         return database.paymentsQueries.list(limit = count, offset = skip, mapper = ::mapPaymentsAndMetadata)
             .asFlow()
             .mapToList(Dispatchers.Default)
+            .map { list ->
+                withContext(Dispatchers.Default) {
+                    list.map { info ->
+                        val contact = contactsManager?.contactForPayment(info.payment)
+                        info.copy(contact = contact, fetchOptions = WalletPaymentFetchOptions.All)
+                    }
+                }
+            }
     }
 
     fun listOutgoingInFlightPaymentsAsFlow(count: Long, skip: Long): Flow<List<WalletPaymentInfo>> {
         return database.paymentsOutgoingQueries.listInFlight(limit = count, offset = skip, mapper = ::mapInFlightPaymentsAndMetadata)
             .asFlow()
             .mapToList(Dispatchers.Default)
+            .map { list ->
+                withContext(Dispatchers.Default) {
+                    list.map { info ->
+                        val contact = contactsManager?.contactForPayment(info.payment)
+                        info.copy(contact = contact, fetchOptions = WalletPaymentFetchOptions.All)
+                    }
+                }
+            }
     }
 
     // Recent payments includes in-flight (not completed) payments.
@@ -120,6 +138,14 @@ class SqlitePaymentsDb(
         return database.paymentsQueries.listRecent(min_ts = sinceDate, limit = count, offset = skip, mapper = ::mapPaymentsAndMetadata)
             .asFlow()
             .mapToList(Dispatchers.Default)
+            .map { list ->
+                withContext(Dispatchers.Default) {
+                    list.map { info ->
+                        val contact = contactsManager?.contactForPayment(info.payment)
+                        info.copy(contact = contact, fetchOptions = WalletPaymentFetchOptions.All)
+                    }
+                }
+            }
     }
 
     suspend fun listCompletedPayments(count: Long, skip: Long, startDate: Long, endDate: Long): List<WalletPaymentInfo> = withContext(Dispatchers.Default) {
