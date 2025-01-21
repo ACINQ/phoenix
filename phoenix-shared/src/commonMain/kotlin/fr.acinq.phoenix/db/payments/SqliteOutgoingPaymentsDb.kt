@@ -52,38 +52,40 @@ class SqliteOutgoingPaymentsDb(private val database: PaymentsDatabase) : Outgoin
 
     override suspend fun addOutgoingPayment(outgoingPayment: OutgoingPayment) {
         withContext(Dispatchers.Default) {
-            database.transaction {
-                when (outgoingPayment) {
-                    is LightningOutgoingPayment -> {
-                        database.paymentsOutgoingQueries.insert(
-                            id = outgoingPayment.id,
-                            payment_hash = outgoingPayment.paymentHash,
-                            tx_id = null,
-                            created_at = outgoingPayment.createdAt,
-                            completed_at = outgoingPayment.completedAt,
-                            succeeded_at = outgoingPayment.succeededAt,
-                            data_ = outgoingPayment
-                        )
-                    }
-                    is OnChainOutgoingPayment -> {
-                        database.paymentsOutgoingQueries.insert(
-                            id = outgoingPayment.id,
-                            payment_hash = null,
-                            tx_id = outgoingPayment.txId,
-                            created_at = outgoingPayment.createdAt,
-                            completed_at = outgoingPayment.completedAt,
-                            succeeded_at = outgoingPayment.succeededAt,
-                            data_ = outgoingPayment
-                        )
-                        database.onChainTransactionsQueries.insert(
-                            payment_id = outgoingPayment.id,
-                            tx_id = outgoingPayment.txId
-                        )
-                    }
-                }
-                didSaveWalletPayment(outgoingPayment.id, database)
+            _addOutgoingPayment(outgoingPayment)
+        }
+    }
+
+    fun _addOutgoingPayment(outgoingPayment: OutgoingPayment) = database.transaction {
+        when (outgoingPayment) {
+            is LightningOutgoingPayment -> {
+                database.paymentsOutgoingQueries.insert(
+                    id = outgoingPayment.id,
+                    payment_hash = outgoingPayment.paymentHash,
+                    tx_id = null,
+                    created_at = outgoingPayment.createdAt,
+                    completed_at = outgoingPayment.completedAt,
+                    succeeded_at = outgoingPayment.succeededAt,
+                    data_ = outgoingPayment
+                )
+            }
+            is OnChainOutgoingPayment -> {
+                database.paymentsOutgoingQueries.insert(
+                    id = outgoingPayment.id,
+                    payment_hash = null,
+                    tx_id = outgoingPayment.txId,
+                    created_at = outgoingPayment.createdAt,
+                    completed_at = outgoingPayment.completedAt,
+                    succeeded_at = outgoingPayment.succeededAt,
+                    data_ = outgoingPayment
+                )
+                database.onChainTransactionsQueries.insert(
+                    payment_id = outgoingPayment.id,
+                    tx_id = outgoingPayment.txId
+                )
             }
         }
+        didSaveWalletPayment(outgoingPayment.id, database)
     }
 
     override suspend fun completeLightningOutgoingPayment(id: UUID, status: LightningOutgoingPayment.Status.Completed) {

@@ -47,11 +47,13 @@ class SqlitePaymentsDb(
     private var metadataQueue = MutableStateFlow(mapOf<UUID, WalletPaymentMetadataRow>())
 
     suspend fun getPayment(id: UUID, options: WalletPaymentFetchOptions): Pair<WalletPayment, WalletPaymentMetadata?>? = withContext(Dispatchers.Default) {
-        database.transactionWithResult {
-            database.paymentsQueries.get(id).executeAsOneOrNull()?.let { WalletPaymentAdapter.decode(it) }?.let { payment ->
-                val metadata = metadataQueries.get(id, options)
-                payment to metadata
-            }
+        _getPayment(id, options)
+    }
+
+    fun _getPayment(id: UUID, options: WalletPaymentFetchOptions): Pair<WalletPayment, WalletPaymentMetadata?>? = database.transactionWithResult {
+        database.paymentsQueries.get(id).executeAsOneOrNull()?.let { WalletPaymentAdapter.decode(it) }?.let { payment ->
+            val metadata = metadataQueries.get(id, options)
+            payment to metadata
         }
     }
 
