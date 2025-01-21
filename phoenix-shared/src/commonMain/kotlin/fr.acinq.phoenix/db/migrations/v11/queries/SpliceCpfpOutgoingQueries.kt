@@ -37,7 +37,7 @@ class SpliceCpfpOutgoingQueries(val database: PaymentsDatabase) {
         ): SpliceCpfpOutgoingPayment {
             return SpliceCpfpOutgoingPayment(
                 id = UUID.fromString(id),
-                miningFees = mining_fees_sat.sat,
+                miningFee = mining_fees_sat.sat,
                 channelId = channel_id.toByteVector32(),
                 txId = TxId(tx_id),
                 createdAt = created_at,

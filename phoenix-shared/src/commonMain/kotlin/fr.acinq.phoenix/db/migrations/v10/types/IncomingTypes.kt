@@ -407,18 +407,13 @@ fun mapIncomingPaymentFromV10(
                         is IncomingReceivedWithData.Part.NewChannel.V2 -> it.amount
                     }
                 }.sum(),
-            liquidityPurchase = LiquidityAds.Purchase.Standard(
-                amount = 0.sat,
-                fees = LiquidityAds.Fees(serviceFee = parts.filterIsInstance<IncomingReceivedWithData.Part.NewChannel>()
-                    .map {
-                        when (it) {
-                            is IncomingReceivedWithData.Part.NewChannel.V0 -> it.fees
-                            is IncomingReceivedWithData.Part.NewChannel.V1 -> it.fees
-                            is IncomingReceivedWithData.Part.NewChannel.V2 -> it.serviceFee
-                        }
-                    }.sum().truncateToSatoshi(), miningFee = 0.sat),
-                paymentDetails = LiquidityAds.PaymentDetails.FromChannelBalance
-            ),
+            serviceFee = parts.filterIsInstance<IncomingReceivedWithData.Part.NewChannel>().map {
+                when (it) {
+                    is IncomingReceivedWithData.Part.NewChannel.V0 -> it.fees
+                    is IncomingReceivedWithData.Part.NewChannel.V1 -> it.fees
+                    is IncomingReceivedWithData.Part.NewChannel.V2 -> it.serviceFee
+                }
+            }.sum(),
             miningFee = parts.filterIsInstance<IncomingReceivedWithData.Part.NewChannel>().map {
                 when (it) {
                     is IncomingReceivedWithData.Part.NewChannel.V0 -> 0.sat
@@ -426,6 +421,7 @@ fun mapIncomingPaymentFromV10(
                     is IncomingReceivedWithData.Part.NewChannel.V2 -> it.miningFee
                 }
             }.sum(),
+            liquidityPurchase = null, // will be populated in migration v11
             channelId = parts.filterIsInstance<IncomingReceivedWithData.Part.NewChannel>().map {
                 when (it) {
                     is IncomingReceivedWithData.Part.NewChannel.V0 -> it.channelId ?: ByteVector32.Zeroes

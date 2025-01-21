@@ -27,7 +27,7 @@ data class SpliceCpfpPaymentWrapper(
     @Throws(Exception::class)
     fun unwrap() = SpliceCpfpOutgoingPayment(
         id = id,
-        miningFees = miningFeeSat.sat,
+        miningFee = miningFeeSat.sat,
         channelId = channelId.toByteVector32(),
         txId = TxId(txId),
         createdAt = createdAt,

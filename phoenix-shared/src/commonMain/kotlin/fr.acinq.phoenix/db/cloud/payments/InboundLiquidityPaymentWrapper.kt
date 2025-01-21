@@ -35,9 +35,7 @@ data class InboundLiquidityPaymentWrapper(
             id = this.id,
             channelId = this.channelId.toByteVector32(),
             txId = TxId(this.txId),
-            // see lightning-kmp#710 and comment in InboundLiquidityQueries mapper
-            // miningFeesSat contains the local fee + the purchase fee
-            localMiningFees = this.miningFeesSat.sat - purchase.fees.miningFee,
+            miningFee = this.miningFeesSat.sat,
             purchase = purchase,
             createdAt = this.createdAt,
             confirmedAt = this.confirmedAt,
@@ -75,9 +73,7 @@ data class InboundLiquidityLegacyWrapper(
             id = this.id,
             channelId = this.channelId.toByteVector32(),
             txId = TxId(this.txId),
-            // see lightning-kmp#710 and comment in InboundLiquidityQueries mapper
-            // miningFeesSat contains the local fee + the purchase fee (even for legacy data)
-            localMiningFees = this.miningFeesSat.sat - lease.fees.miningFee,
+            miningFee = this.miningFeesSat.sat,
             purchase = lease,
             createdAt = this.createdAt,
             confirmedAt = this.confirmedAt,

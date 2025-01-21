@@ -199,8 +199,9 @@ class SqlitePaymentsDbTest {
                     NewChannelIncomingPayment(
                         id = UUID.fromString("6ab99b1d-2345-4ec5-bfc4-817f93fd8548"),
                         amountReceived = 878721000.msat,
-                        liquidityPurchase = LiquidityAds.Purchase.Standard(amount = 0.sat, fees = LiquidityAds.Fees(serviceFee = 1000.sat, miningFee = 0.sat), paymentDetails = LiquidityAds.PaymentDetails.FromChannelBalance),
                         miningFee = 1135.sat,
+                        serviceFee = 1000000.msat,
+                        liquidityPurchase = LiquidityAds.Purchase.Standard(amount = 1.sat, fees = LiquidityAds.Fees(serviceFee = 1000.sat, miningFee = 542.sat), paymentDetails = LiquidityAds.PaymentDetails.FromChannelBalance),
                         channelId = ByteVector32("7d508efbcd8070244db638062a7da90a2b68491f807dab2cdc2a4fe95afb235b"),
                         txId = TxId("2e1ed22ea8871365260c8bc413e765cc7435e97f67a8f363b1a74298f4c423ec"),
                         localInputs = setOf(
