@@ -58,6 +58,11 @@ WHERE
 ORDER BY payment.created_at DESC
 LIMIT :limit OFFSET :offset;
 
+listByTxId:
+SELECT data
+FROM   payments_incoming
+WHERE  tx_id=?;
+
 delete:
 DELETE FROM payments_incoming
 WHERE payment_hash = ?;

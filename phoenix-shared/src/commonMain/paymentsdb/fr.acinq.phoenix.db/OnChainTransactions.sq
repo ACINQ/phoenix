@@ -31,9 +31,3 @@ listUnconfirmed:
 SELECT tx_id
 FROM on_chain_txs
 WHERE confirmed_at IS NULL;
-
-listByTxId:
-SELECT data
-FROM on_chain_txs t
-JOIN payments p ON t.payment_id=p.id
-WHERE tx_id=:tx_id;

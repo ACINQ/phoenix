@@ -113,11 +113,10 @@ class PaymentsManager(
             if (blockHeight != null) {
                 log.debug { "checking confirmation status of ${unconfirmedTxs.size} txs at block=$blockHeight" }
                 unconfirmedTxs.forEach { txId ->
-                    electrumClient.getConfirmations(txId)?.let { conf ->
-                        log.info { "transaction $txId has $conf confirmations" }
-                        if (conf > 0) {
-                            paymentsDb.setConfirmed(txId)
-                        }
+                    val conf = electrumClient.getConfirmations(txId)
+                    log.info { "found confirmations=$conf for tx=$txId" }
+                    if (conf != null && conf > 0) {
+                        paymentsDb.setConfirmed(txId)
                     }
                 }
             }
@@ -163,7 +162,7 @@ class PaymentsManager(
     suspend fun listIncomingPaymentsForTxId(
         txId: TxId
     ): List<IncomingPayment> {
-        return paymentsDb().listPaymentsForTxId(txId).filterIsInstance<IncomingPayment>()
+        return paymentsDb().database.paymentsIncomingQueries.listByTxId(txId).executeAsList()
     }
 
     suspend fun getPayment(
