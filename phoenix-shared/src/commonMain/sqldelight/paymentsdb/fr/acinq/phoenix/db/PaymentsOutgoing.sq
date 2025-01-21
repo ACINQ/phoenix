@@ -89,6 +89,14 @@ WHERE
     succeeded_at BETWEEN :succeeded_at_from AND :succeeded_at_to
 LIMIT :limit OFFSET :offset;
 
+listInFlight:
+SELECT p.data, pm.*
+FROM payments_outgoing AS p
+LEFT OUTER JOIN payments_metadata AS pm ON pm.payment_id = p.id
+WHERE completed_at IS NULL
+ORDER BY created_at DESC
+LIMIT :limit OFFSET :offset;
+
 scanCompleted:
 SELECT id, completed_at
 FROM payments_outgoing

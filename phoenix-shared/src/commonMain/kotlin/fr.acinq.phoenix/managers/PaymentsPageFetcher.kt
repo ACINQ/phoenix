@@ -1,7 +1,6 @@
 package fr.acinq.phoenix.managers
 
 import fr.acinq.lightning.logging.LoggerFactory
-import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import fr.acinq.lightning.logging.debug
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentInfo
@@ -87,16 +86,16 @@ class PaymentsPageFetcher(
             db.listPaymentsAsFlow(
                 count = countSnapshot.toLong(),
                 skip = offsetSnapshot.toLong()
-            ).collect { payments ->
-                val updatedPayments = payments.map { info ->
-                    val contact = contactsManager.contactForPayment(info.payment)
-                    info.copy(contact = contact, fetchOptions = WalletPaymentFetchOptions.All)
-                }
+            ).collect { rows ->
                 if (subscriptionIdxSnapshot == subscriptionIdx) {
+                    val updatedRows = rows.map { info ->
+                        val contact = contactsManager.contactForPayment(info.payment)
+                        info.copy(contact = contact, fetchOptions = WalletPaymentFetchOptions.All)
+                    }
                     _paymentsPage.value = PaymentsPage(
                         offset = offsetSnapshot,
                         count = countSnapshot,
-                        rows = updatedPayments
+                        rows = updatedRows
                     )
                 }
             }
@@ -127,19 +126,22 @@ class PaymentsPageFetcher(
         val subscriptionIdxSnapshot = subscriptionIdx
         this.job = launch {
             val db = databaseManager.paymentsDb()
-            TODO("implement in-flight payments query, or simplify code and remove the option subscribe to in-flight")
-//            db.listOutgoingInFlightPaymentsOrderFlow(
-//                count = countSnapshot,
-//                skip = offsetSnapshot
-//            ).collect { rows ->
-//                if (subscriptionIdxSnapshot == subscriptionIdx) {
-//                    _paymentsPage.value = PaymentsPage(
-//                        offset = offsetSnapshot,
-//                        count = countSnapshot,
-//                        rows = rows
-//                    )
-//                }
-//            }
+            db.listOutgoingInFlightPaymentsAsFlow(
+                count = countSnapshot.toLong(),
+                skip = offsetSnapshot.toLong()
+            ).collect { rows ->
+                if (subscriptionIdxSnapshot == subscriptionIdx) {
+                    val updatedRows = rows.map { info ->
+                        val contact = contactsManager.contactForPayment(info.payment)
+                        info.copy(contact = contact, fetchOptions = WalletPaymentFetchOptions.All)
+                    }
+                    _paymentsPage.value = PaymentsPage(
+                        offset = offsetSnapshot,
+                        count = countSnapshot,
+                        rows = updatedRows
+                    )
+                }
+            }
         }
     }
 
@@ -184,25 +186,28 @@ class PaymentsPageFetcher(
         job = launch {
             val db = databaseManager.paymentsDb()
             val date = Clock.System.now() - secondsSnapshot.seconds
-            TODO("implement recent payments query, or simplify code and remove the option to subscribe to recent")
-//            db.listRecentPaymentsOrderFlow(
-//                date = date.toEpochMilliseconds(),
-//                count = countSnapshot,
-//                skip = offsetSnapshot
-//            ).collect { rows ->
-//                if (subscriptionIdxSnapshot == subscriptionIdx) {
-//                    _paymentsPage.value = PaymentsPage(
-//                        offset = offsetSnapshot,
-//                        count = countSnapshot,
-//                        rows = rows
-//                    )
-//                    resetRefreshJob(idx, rows)
-//                }
-//            }
+            db.listRecentPaymentsAsFlow(
+                count = countSnapshot.toLong(),
+                skip = offsetSnapshot.toLong(),
+                sinceDate = date.toEpochMilliseconds()
+            ).collect { rows ->
+                if (subscriptionIdxSnapshot == subscriptionIdx) {
+                    val updatedRows = rows.map { info ->
+                        val contact = contactsManager.contactForPayment(info.payment)
+                        info.copy(contact = contact, fetchOptions = WalletPaymentFetchOptions.All)
+                    }
+                    _paymentsPage.value = PaymentsPage(
+                        offset = offsetSnapshot,
+                        count = countSnapshot,
+                        rows = updatedRows
+                    )
+                    resetRefreshJob(idx, rows)
+                }
+            }
         }
     }
 
-    private fun resetRefreshJob(idx: Int, rows: List<WalletPaymentOrderRow>) {
+    private fun resetRefreshJob(idx: Int, rows: List<WalletPaymentInfo>) {
         log.debug { "resetRefreshJob(idx=$idx, rows=${rows.size})" }
 
         if (idx != subscriptionIdx) {
@@ -219,8 +224,8 @@ class PaymentsPageFetcher(
             return
         }
 
-        val oldestCompleted = rows.lastOrNull { it.completedAt != null } ?: return
-        val oldestTimestamp = Instant.fromEpochMilliseconds(oldestCompleted.completedAt!!)
+        val oldestCompleted = rows.mapNotNull { it.payment.completedAt }.lastOrNull() ?: return
+        val oldestTimestamp = Instant.fromEpochMilliseconds(oldestCompleted)
 
         val refreshTimestamp = oldestTimestamp + this.seconds.seconds
         val diff = refreshTimestamp - Clock.System.now()
@@ -231,7 +236,6 @@ class PaymentsPageFetcher(
 
         this.refreshJob = launch {
             delay(diff)
-            TODO("implement ")
             resetSubscribeToRecentJob(idx)
         }
     }
