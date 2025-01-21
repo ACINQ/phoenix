@@ -21,18 +21,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import fr.acinq.lightning.channel.ChannelManagementFees
-import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
 import fr.acinq.lightning.db.NewChannelIncomingPayment
-import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.InlineTransactionLink
 import fr.acinq.phoenix.android.payments.details.ChannelIdRow
@@ -72,22 +66,15 @@ fun TechnicalIncomingNewChannel(
             rateThen = originalFiatRate,
             mSatDisplayPolicy = MSatDisplayPolicy.SHOW
         )
-        val paymentsManager = business.paymentsManager
-        val channelManagementFees by produceState(initialValue = ChannelManagementFees(0.sat, 0.sat)) {
-            val liquidityPayments = paymentsManager.listPaymentsForTxId(payment.txId).filterIsInstance<InboundLiquidityOutgoingPayment>()
-            value = liquidityPayments.map { it.feePaidFromChannelBalance }.fold(ChannelManagementFees(0.sat, 0.sat)) { a, b ->
-                ChannelManagementFees(miningFee = a.miningFee + b.miningFee, serviceFee = a.serviceFee + b.serviceFee)
-            }
-        }
         TechnicalRowAmount(
             label = stringResource(id = R.string.paymentdetails_service_fees_label),
-            amount = payment.serviceFee + channelManagementFees.serviceFee.toMilliSatoshi(),
+            amount = payment.serviceFee,
             rateThen = originalFiatRate,
             mSatDisplayPolicy = MSatDisplayPolicy.SHOW
         )
         TechnicalRowAmount(
             label = stringResource(id = R.string.paymentdetails_funding_fees_label),
-            amount = payment.miningFee.toMilliSatoshi() + channelManagementFees.miningFee.toMilliSatoshi(),
+            amount = payment.miningFee.toMilliSatoshi(),
             rateThen = originalFiatRate,
             mSatDisplayPolicy = MSatDisplayPolicy.HIDE
         )

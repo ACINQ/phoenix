@@ -61,15 +61,13 @@ fun TechnicalOutgoingLiquidity(
     }
 
     Card {
-        if (payment.purchase.amount > 1.sat) {
-            TechnicalRowAmount(
-                label = stringResource(id = R.string.paymentdetails_liquidity_amount_label),
-                amount = payment.purchase.amount.toMilliSatoshi(),
-                rateThen = originalFiatRate,
-                mSatDisplayPolicy = MSatDisplayPolicy.SHOW
-            )
-        }
-        if (payment.purchase.amount != 1.sat && payment.feePaidFromChannelBalance.total > 0.sat) {
+        TechnicalRowAmount(
+            label = stringResource(id = R.string.paymentdetails_liquidity_amount_label),
+            amount = payment.purchase.amount.toMilliSatoshi(),
+            rateThen = originalFiatRate,
+            mSatDisplayPolicy = MSatDisplayPolicy.SHOW
+        )
+        if (payment.feePaidFromChannelBalance.total > 0.sat) {
             TechnicalRowAmount(
                 label = stringResource(id = R.string.paymentdetails_liquidity_service_fee_label),
                 amount = payment.feePaidFromChannelBalance.serviceFee.toMilliSatoshi(),
