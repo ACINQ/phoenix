@@ -18,9 +18,9 @@ extension WalletPaymentInfo: @retroactive Identifiable {
 		let paymentId: String = payment.id.description()
 		let paymentHash: Int = payment.hash
 		let contactHash: Int = contact?.hash ?? 0
-		let metadataModifiedAt: Int64 = metadata.modifiedAt?.int64Value ?? 0
+		let metadataHash: Int = metadata.hash
 		
-		return "\(paymentId)|\(paymentHash)|\(contactHash)|\(metadataModifiedAt)"
+		return "\(paymentId)|\(paymentHash)|\(contactHash)|\(metadataHash)"
 	}
 }
 

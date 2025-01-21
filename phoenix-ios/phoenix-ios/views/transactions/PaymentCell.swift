@@ -25,7 +25,7 @@ struct PaymentCell : View {
 
 	init(
 		info: WalletPaymentInfo,
-		didAppearCallback: ((WalletPaymentInfo) -> Void)?,
+		didAppearCallback: ((WalletPaymentInfo) -> Void)? = nil,
 		didDisappearCallback: ((WalletPaymentInfo) -> Void)? = nil
 	) {
 		self.info = info

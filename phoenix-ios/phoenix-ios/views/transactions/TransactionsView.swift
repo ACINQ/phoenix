@@ -30,9 +30,10 @@ struct TransactionsView: View {
 	@State var paymentsPage = PaymentsPage(offset: 0, count: 0, rows: [])
 	@State var cachedRows: [WalletPaymentInfo] = []
 	@State var sections: [PaymentsSection] = []
-	@State var visibleRows: Set<WalletPaymentInfo> = Set()
 	
 	@State var selectedItem: WalletPaymentInfo? = nil
+	
+	let contactsPublisher = Biz.business.contactsManager.contactsListPublisher()
 	
 	let syncStatePublisher = Biz.syncManager!.syncBackupManager.statePublisher
 	@State var isDownloadingTxs: Bool = false
@@ -92,6 +93,9 @@ struct TransactionsView: View {
 		.onReceive(paymentsPagePublisher) {
 			paymentsPageChanged($0)
 		}
+		.onReceive(contactsPublisher) {
+			contactsChanged($0)
+		}
 		.onReceive(syncStatePublisher) {
 			syncStateChanged($0)
 		}
@@ -121,7 +125,7 @@ struct TransactionsView: View {
 								PaymentCell(
 									info: row,
 									didAppearCallback: paymentCellDidAppear,
-									didDisappearCallback: paymentCellDidDisappear
+									didDisappearCallback: nil
 								)
 							}
 						}
@@ -336,22 +340,10 @@ struct TransactionsView: View {
 		
 		paymentsPage = page
 		sections = newSections
-		
-		let sortedVisibleRows = visibleRows.sorted { (a: WalletPaymentInfo, b: WalletPaymentInfo) in
-			// return true if `a` should be ordered before `b`; otherwise return false
-			return a.payment.sortDate > b.payment.sortDate
-		}
-		
-		if let topVisibleRow = sortedVisibleRows.first {
-			paymentCellDidAppear(topVisibleRow)
-			if let bottomVisibleRow = sortedVisibleRows.last {
-				paymentCellDidAppear(bottomVisibleRow)
-			}
-		}
 	}
 	
 	func paymentCellDidAppear(_ visibleRow: WalletPaymentInfo) -> Void {
-		log.trace("paymentCellDidAppear(): \(visibleRow.payment.id)")
+	//	log.trace("paymentCellDidAppear(): \(visibleRow.payment.id)")
 		
 		// Infinity Scrolling
 		//
@@ -465,7 +457,6 @@ struct TransactionsView: View {
 		// - in `paymentsPageChanged`, just invoke `paymentCellDidAppear` for first & last rows
 		// - this will perform the standard check (like during scrolling) to see if offset needs to change
 		
-		visibleRows.insert(visibleRow)
 		let allRows: [WalletPaymentInfo] = sections.flatMap { $0.payments }
 		
 		guard let rowIdx = allRows.firstIndexAsInt(of: visibleRow) else {
@@ -528,10 +519,38 @@ struct TransactionsView: View {
 		}
 	}
 	
-	func paymentCellDidDisappear(_ row: WalletPaymentInfo) -> Void {
-		log.trace("paymentCellDidDisappear(): \(row.payment.id)")
+	func contactsChanged(_ contacts: [ContactInfo]) {
+		log.trace("contactsChanged()")
 		
-		visibleRows.remove(row)
+		let contactsManager = Biz.business.contactsManager
+		
+		let updatedCachedRows = cachedRows.map { row in
+			let updatedContact = contactsManager.contactForPayment(payment: row.payment)
+			return WalletPaymentInfo(
+				payment      : row.payment,
+				metadata     : row.metadata,
+				contact      : updatedContact,
+				fetchOptions : row.fetchOptions
+			)
+		}
+		
+		let updatedPaymentsPageRows = paymentsPage.rows.map { row in
+			let updatedContact = contactsManager.contactForPayment(payment: row.payment)
+			return WalletPaymentInfo(
+				payment      : row.payment,
+				metadata     : row.metadata,
+				contact      : updatedContact,
+				fetchOptions : row.fetchOptions
+			)
+		}
+		let updatedPage = PaymentsPage(
+			offset : paymentsPage.offset,
+			count  : paymentsPage.count,
+			rows   : updatedPaymentsPageRows
+		)
+		
+		cachedRows = updatedCachedRows
+		paymentsPageChanged(updatedPage)
 	}
 	
 	func syncStateChanged(_ state: SyncBackupManager_State) {
