@@ -280,9 +280,9 @@ class CloudKitPaymentsDb(
 
                     if (existing == null) {
                         if (payment is IncomingPayment) {
-                            incomingPaymentsDb._addIncomingPayment(payment)
+                            incomingPaymentsDb._addIncomingPayment(payment, notify = false)
                         } else if (payment is OutgoingPayment) {
-                            outgoingPaymentsDb._addOutgoingPayment(payment)
+                            outgoingPaymentsDb._addOutgoingPayment(payment, notify = false)
                         }
                     } else {
                         // We don't support sync (yet) - just backup.

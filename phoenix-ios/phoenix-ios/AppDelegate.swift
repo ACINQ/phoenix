@@ -269,7 +269,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		//
 		// So there are 2 ways in which we can accomplish this:
 		// - Jump thru a bunch of hoops to subclass the SqlDriver,
-		//   and then add a custom transaction that calls invokes notifyQueries
+		//   and then add a custom transaction that invokes notifyQueries
 		//   with the appropriate parameters.
 		// - Just make some no-op calls, which automatically invoke notifyQueries for us.
 		//
@@ -278,15 +278,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		// that change the corresponding API, and aim to make it more accesible for us.
 
 		let business = Biz.business
-		business.databaseManager.paymentsDb { paymentsDb, _ in
-		
+		Task { @MainActor in
+			
+			let paymentsDb = try await business.databaseManager.paymentsDb()
+			
 			let fakePaymentId = Lightning_kmpUUID.companion.randomUUID()
-			paymentsDb?.deletePayment(paymentId: fakePaymentId) { _ in
-				// Nothing is actually deleted
-			}
-		}
-		business.appDb.deleteBitcoinRate(fiat: "FakeFiatCurrency") { _ in
-			// Nothing is actually deleted
+			try await paymentsDb.deletePayment(paymentId: fakePaymentId, notify: false)
+			
+			try await business.appDb.deleteBitcoinRate(fiat: "FakeFiatCurrency")
 		}
 	}
 }

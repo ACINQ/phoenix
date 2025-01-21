@@ -277,7 +277,10 @@ class SqlitePaymentsDb(
         metadataQueries.updateUserInfo(id = id, userDescription = userDescription, userNotes = userNotes)
     }
 
-    suspend fun deletePayment(paymentId: UUID): Unit = withContext(Dispatchers.Default) {
+    /**
+     * @param notify Set to false if `didDeleteWalletPayment` should not be invoked.
+     */
+    suspend fun deletePayment(paymentId: UUID, notify: Boolean = false): Unit = withContext(Dispatchers.Default) {
         database.transaction {
             database.paymentsIncomingQueries.deleteById(id = paymentId)
             if (database.paymentsIncomingQueries.changes().executeAsOne() == 0L) {
