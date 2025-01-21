@@ -42,14 +42,7 @@ class InboundLiquidityQueries(val database: PaymentsDatabase) {
             return InboundLiquidityOutgoingPayment(
                 id = UUID.fromString(id),
                 channelId = channel_id.toByteVector32(),
-                // Attention! With the new OTF and lightning-kmp#710, the liquidity mining fee is split between `localMiningFee` and `purchase.miningFee`.
-                // However, for compatibility reasons with legacy lease data, we do not split the data in the database. Instead, we store the full mining
-                // fee in the mining_fee_sat column.
-                //
-                // It means that to retrieve the split:
-                // - `purchase.miningFee` is directly retrieved from the serialised purchase data
-                // - `localMiningFee` can be retrieved by subtracting `purchase.miningFee` from the `mining_fee_sat` column
-                localMiningFees = mining_fees_sat.sat - purchase.fees.miningFee,
+                miningFee = mining_fees_sat.sat,
                 txId = TxId(tx_id),
                 purchase = purchase,
                 createdAt = created_at,

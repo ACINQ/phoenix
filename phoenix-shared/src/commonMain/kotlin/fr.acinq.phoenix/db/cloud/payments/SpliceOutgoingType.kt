@@ -29,7 +29,7 @@ data class SpliceOutgoingPaymentWrapper(
         id = id,
         recipientAmount = amountSat.sat,
         address = address,
-        miningFees = miningFeeSat.sat,
+        miningFee = miningFeeSat.sat,
         txId = TxId(txId),
         channelId = channelId.toByteVector32(),
         createdAt = createdAt,

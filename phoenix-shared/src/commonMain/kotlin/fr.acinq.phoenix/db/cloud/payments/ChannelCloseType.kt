@@ -34,7 +34,7 @@ data class ChannelClosePaymentWrapper(
         recipientAmount = amountSat.sat,
         address = address,
         isSentToDefaultAddress = isSentToDefaultAddress,
-        miningFees = miningFeeSat.sat,
+        miningFee = miningFeeSat.sat,
         txId = TxId(txId),
         createdAt = createdAt,
         confirmedAt = confirmedAt,

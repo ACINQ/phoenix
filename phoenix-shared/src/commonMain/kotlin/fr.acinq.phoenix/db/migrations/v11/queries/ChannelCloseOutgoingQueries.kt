@@ -47,7 +47,7 @@ class ChannelCloseOutgoingQueries(val database: PaymentsDatabase) {
                 recipientAmount = amount_sat.sat,
                 address = address,
                 isSentToDefaultAddress = is_default_address == 1L,
-                miningFees = mining_fees_sat.sat,
+                miningFee = mining_fees_sat.sat,
                 txId = TxId(tx_id),
                 createdAt = created_at,
                 confirmedAt = confirmed_at,

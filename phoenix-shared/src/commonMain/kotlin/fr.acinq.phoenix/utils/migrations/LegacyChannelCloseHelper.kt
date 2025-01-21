@@ -82,7 +82,7 @@ object LegacyChannelCloseHelper {
                         || closingType == ChannelClosingType.Revoked
                         || closingType == ChannelClosingType.Remote
                         || closingType == ChannelClosingType.Other),
-            miningFees = fees,
+            miningFee = fees,
             txId = TxId(closingTxId ?: ByteVector32.Zeroes),
             createdAt = createdAt,
             confirmedAt = confirmedAt ?: createdAt,
