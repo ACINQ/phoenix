@@ -107,7 +107,6 @@ class BusinessManager {
 		
 		WatchTower.shared.prepare()
 		
-		
 	#if DEBUG
 		if let path = PlatformIosKt.getDatabaseFilesDirectoryPath(ctx: PlatformContext.default) {
 			log.debug("DB path: \(path)")
