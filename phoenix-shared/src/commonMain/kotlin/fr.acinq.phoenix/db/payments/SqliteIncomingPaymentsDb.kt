@@ -94,7 +94,7 @@ class SqliteIncomingPaymentsDb(private val database: PaymentsDatabase) : Incomin
     override suspend fun removeLightningIncomingPayment(paymentHash: ByteVector32): Boolean =
         withContext(Dispatchers.Default) {
             database.transactionWithResult {
-                database.paymentsIncomingQueries.delete(payment_hash = paymentHash)
+                database.paymentsIncomingQueries.deleteByPaymentHash(payment_hash = paymentHash)
                 didDeleteWalletPayment(paymentHash.deriveUUID(), database)
                 database.paymentsIncomingQueries.changes().executeAsOne() != 0L
             }

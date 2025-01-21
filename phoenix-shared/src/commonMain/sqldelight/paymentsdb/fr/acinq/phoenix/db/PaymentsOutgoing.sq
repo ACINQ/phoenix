@@ -71,6 +71,10 @@ SELECT data
 FROM   payments_outgoing
 WHERE  tx_id=?;
 
+deleteById:
+DELETE FROM payments_outgoing
+WHERE id = ?;
+
 deleteByPaymentHash:
 DELETE FROM payments_outgoing
 WHERE payment_hash = ?;
