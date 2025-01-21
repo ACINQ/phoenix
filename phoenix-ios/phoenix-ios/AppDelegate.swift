@@ -280,7 +280,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		let business = Biz.business
 		business.databaseManager.paymentsDb { paymentsDb, _ in
 		
-			let fakePaymentId = WalletPaymentId.IncomingPaymentId(paymentHash: Bitcoin_kmpByteVector32.random())
+			let fakePaymentId = Lightning_kmpUUID.companion.randomUUID()
 			paymentsDb?.deletePayment(paymentId: fakePaymentId) { _ in
 				// Nothing is actually deleted
 			}

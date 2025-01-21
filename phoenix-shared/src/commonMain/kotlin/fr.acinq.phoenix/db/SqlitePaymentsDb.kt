@@ -91,8 +91,10 @@ class SqlitePaymentsDb(
         }
     }
 
-    suspend fun listUnconfirmedTransactions(): Flow<List<TxId>> = withContext(Dispatchers.Default) {
-        database.onChainTransactionsQueries.listUnconfirmed().asFlow().mapToList(Dispatchers.Default)
+    fun listUnconfirmedTransactions(): Flow<List<TxId>> {
+        return database.onChainTransactionsQueries.listUnconfirmed()
+            .asFlow()
+            .mapToList(Dispatchers.Default)
     }
 
     suspend fun listPaymentsForTxId(txId: TxId): List<WalletPayment> = withContext(Dispatchers.Default) {
@@ -101,8 +103,8 @@ class SqlitePaymentsDb(
 
     // ---- list ALL payments
 
-    suspend fun listPaymentsAsFlow(count: Long, skip: Long): Flow<List<WalletPaymentInfo>> = withContext(Dispatchers.Default) {
-        database.paymentsQueries.list(limit = count, offset = skip, mapper = ::mapPaymentsAndMetadata)
+    fun listPaymentsAsFlow(count: Long, skip: Long): Flow<List<WalletPaymentInfo>> {
+        return database.paymentsQueries.list(limit = count, offset = skip, mapper = ::mapPaymentsAndMetadata)
             .asFlow()
             .mapToList(Dispatchers.Default)
     }
@@ -143,6 +145,25 @@ class SqlitePaymentsDb(
     /** Returns the timestamp of the oldest completed payment, if any. Lets us set up the export-csv UI with a nice start date. */
     fun getOldestCompletedTimestamp(): Long? {
         return database.paymentsQueries.getOldestCompletedTimestamp().executeAsOneOrNull()?.completed_at
+    }
+
+    /** Test this technique: I wonder if it's faster. Because it definitely can use indexes, while the other one I'm not so sure. */
+    suspend fun altGetOldestCompletedDate(): Long? = withContext(Dispatchers.Default) {
+        database.transactionWithResult {
+            val oldestIncoming = database.paymentsIncomingQueries.getOldestReceivedDate().executeAsOneOrNull()
+            val oldestOutgoing = database.paymentsOutgoingQueries.getOldestCompletedDate().executeAsOneOrNull()
+            listOfNotNull(oldestIncoming, oldestOutgoing).minOrNull()
+        }
+    }
+
+    suspend fun countCompletedInRange(
+        startDate: Long,
+        endDate: Long
+    ): Long = withContext(Dispatchers.Default) {
+        database.paymentsQueries.countCompletedInRange(
+            completed_at_from = startDate,
+            completed_at_to = endDate
+        ).executeAsOne()
     }
 
     /**

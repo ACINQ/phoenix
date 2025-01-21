@@ -18523,6 +18523,9 @@
         }
       }
     },
+    "Fee Credit" : {
+
+    },
     "Fee for on-the-fly channel creation:" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -20949,6 +20952,9 @@
           }
         }
       }
+    },
+    "HTLC" : {
+
     },
     "Human-readable address" : {
       "comment" : "Type of text being copied",
@@ -24852,6 +24858,7 @@
       }
     },
     "Lightning network" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -27543,6 +27550,7 @@
       }
     },
     "New Channel (auto-created)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

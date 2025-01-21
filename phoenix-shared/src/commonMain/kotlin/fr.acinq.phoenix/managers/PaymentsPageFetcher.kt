@@ -3,6 +3,7 @@ package fr.acinq.phoenix.managers
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import fr.acinq.lightning.logging.debug
+import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,7 +31,8 @@ data class PaymentsPage(
 
 class PaymentsPageFetcher(
     loggerFactory: LoggerFactory,
-    private val databaseManager: DatabaseManager
+    private val databaseManager: DatabaseManager,
+    private val contactsManager: ContactsManager
 ): CoroutineScope by MainScope() {
 
     private val log = loggerFactory.newLogger(this::class)
@@ -86,11 +88,15 @@ class PaymentsPageFetcher(
                 count = countSnapshot.toLong(),
                 skip = offsetSnapshot.toLong()
             ).collect { payments ->
+                val updatedPayments = payments.map { info ->
+                    val contact = contactsManager.contactForPayment(info.payment)
+                    info.copy(contact = contact, fetchOptions = WalletPaymentFetchOptions.All)
+                }
                 if (subscriptionIdxSnapshot == subscriptionIdx) {
                     _paymentsPage.value = PaymentsPage(
                         offset = offsetSnapshot,
                         count = countSnapshot,
-                        rows = payments
+                        rows = updatedPayments
                     )
                 }
             }

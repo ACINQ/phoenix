@@ -38,3 +38,8 @@ FROM payments;
 getOldestCompletedTimestamp:
 SELECT min(completed_at) AS completed_at
 FROM payments;
+
+countCompletedInRange:
+SELECT   count(id)
+FROM     payments
+WHERE    completed_at BETWEEN :completed_at_from AND :completed_at_to;

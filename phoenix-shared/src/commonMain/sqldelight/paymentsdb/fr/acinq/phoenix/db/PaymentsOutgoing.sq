@@ -61,6 +61,13 @@ SELECT parent_id
 FROM   link_lightning_outgoing_payment_parts
 WHERE  part_id=?;
 
+getOldestCompletedDate:
+SELECT   completed_at
+FROM     payments_outgoing
+WHERE    completed_at IS NOT NULL
+ORDER BY completed_at ASC
+LIMIT    1;
+
 listByPaymentHash:
 SELECT data
 FROM   payments_outgoing

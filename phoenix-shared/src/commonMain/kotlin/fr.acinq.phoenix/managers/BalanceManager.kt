@@ -33,6 +33,10 @@ class BalanceManager(
     private val _balance = MutableStateFlow<MilliSatoshi?>(null)
     val balance: StateFlow<MilliSatoshi?> = _balance
 
+    /** The swap-in wallet. Reserved utxos are filtered out. */
+    private val _swapInWallet = MutableStateFlow<WalletState.WalletWithConfirmations?>(null)
+    val swapInWallet: StateFlow<WalletState.WalletWithConfirmations?> = _swapInWallet
+
     /** The swap-in wallet balance. Reserved utxos are filtered out. */
     private val _swapInWalletBalance = MutableStateFlow(WalletBalance.empty())
     val swapInWalletBalance: StateFlow<WalletBalance> = _swapInWalletBalance
@@ -60,6 +64,7 @@ class BalanceManager(
      */
     private suspend fun monitorSwapInBalance() {
         peerManager.swapInWallet.filterNotNull().collect { wallet ->
+            _swapInWallet.value = wallet
             _swapInWalletBalance.value = WalletBalance(
                 deeplyConfirmed = wallet.deeplyConfirmed.balance,
                 weaklyConfirmed = wallet.weaklyConfirmed.balance,
