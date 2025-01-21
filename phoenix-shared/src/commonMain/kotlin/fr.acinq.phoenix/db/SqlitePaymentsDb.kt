@@ -147,13 +147,9 @@ class SqlitePaymentsDb(
         return database.paymentsQueries.getOldestCompletedTimestamp().executeAsOneOrNull()?.completed_at
     }
 
-    /** Test this technique: I wonder if it's faster. Because it definitely can use indexes, while the other one I'm not so sure. */
-    suspend fun altGetOldestCompletedDate(): Long? = withContext(Dispatchers.Default) {
-        database.transactionWithResult {
-            val oldestIncoming = database.paymentsIncomingQueries.getOldestReceivedDate().executeAsOneOrNull()
-            val oldestOutgoing = database.paymentsOutgoingQueries.getOldestCompletedDate().executeAsOneOrNull()
-            listOfNotNull(oldestIncoming, oldestOutgoing).minOrNull()
-        }
+    /** Suspending version of `getOldestCompletedTimestamp`. */
+    suspend fun getOldestCompletedDate(): Long? = withContext(Dispatchers.Default) {
+        getOldestCompletedTimestamp()
     }
 
     suspend fun countCompletedInRange(
