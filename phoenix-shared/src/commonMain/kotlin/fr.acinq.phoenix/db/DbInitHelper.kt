@@ -29,15 +29,6 @@ import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.managers.CurrencyManager
 import fr.acinq.phoenix.utils.extensions.toByteArray
-import fracinqphoenixdb.Cloudkit_payments_metadata
-import fracinqphoenixdb.Cloudkit_payments_queue
-import fracinqphoenixdb.Htlc_infos
-import fracinqphoenixdb.Link_lightning_outgoing_payment_parts
-import fracinqphoenixdb.Local_channels
-import fracinqphoenixdb.On_chain_txs
-import fracinqphoenixdb.Payments_incoming
-import fracinqphoenixdb.Payments_metadata
-import fracinqphoenixdb.Payments_outgoing
 
 fun createSqliteChannelsDb(driver: SqlDriver): SqliteChannelsDb {
     return SqliteChannelsDb(

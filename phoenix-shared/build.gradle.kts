@@ -165,15 +165,15 @@ sqldelight {
     databases {
         create("ChannelsDatabase") {
             packageName.set("fr.acinq.phoenix.db")
-            srcDirs.from("src/commonMain/channelsdb")
+            srcDirs.from("src/commonMain/sqldelight/channelsdb")
         }
         create("PaymentsDatabase") {
             packageName.set("fr.acinq.phoenix.db")
-            srcDirs.from("src/commonMain/paymentsdb")
+            srcDirs.from("src/commonMain/sqldelight/paymentsdb")
         }
         create("AppDatabase") {
             packageName.set("fr.acinq.phoenix.db")
-            srcDirs.from("src/commonMain/appdb")
+            srcDirs.from("src/commonMain/sqldelight/appdb")
         }
     }
 }
