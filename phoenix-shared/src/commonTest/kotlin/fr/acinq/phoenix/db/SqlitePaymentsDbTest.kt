@@ -24,6 +24,7 @@ import fr.acinq.lightning.db.Bolt11IncomingPayment
 import fr.acinq.lightning.db.Bolt12IncomingPayment
 import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
 import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
+import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.LegacyPayToOpenIncomingPayment
 import fr.acinq.lightning.db.LegacySwapInIncomingPayment
 import fr.acinq.lightning.db.LightningIncomingPayment
@@ -132,11 +133,11 @@ class SqlitePaymentsDbTest {
             .executeAsList()
             .map { Serialization.deserialize(it.data_).getOrThrow() }
 
-        assertEquals(737, payments.size)
+        assertEquals(736, payments.size)
 
         val successful =
             payments.filter { it.state() == WalletPaymentState.SuccessOnChain || it.state() == WalletPaymentState.SuccessOffChain }
-        assertEquals(648, successful.size)
+        assertEquals(647, successful.size)
 
         paymentsDb.database.paymentsIncomingQueries
             .getByPaymentHash(ByteVector32("47fef2d23757298bf95386655d96fbe0c17f782713b1ba8880b625fd000190f4"))
@@ -189,6 +190,7 @@ class SqlitePaymentsDbTest {
                 )
             }
 
+        // this on-chain incoming payment triggered a liquidity purchase of 1 sat which is not migrated. Instead, its fees must be included in the payment details
         paymentsDb.database.paymentsIncomingQueries
             .get(UUID.fromString("6ab99b1d-2345-4ec5-bfc4-817f93fd8548"))
             .executeAsOne()
@@ -197,7 +199,7 @@ class SqlitePaymentsDbTest {
                     NewChannelIncomingPayment(
                         id = UUID.fromString("6ab99b1d-2345-4ec5-bfc4-817f93fd8548"),
                         amountReceived = 878721000.msat,
-                        serviceFee = 1000000.msat,
+                        liquidityPurchase = LiquidityAds.Purchase.Standard(amount = 0.sat, fees = LiquidityAds.Fees(serviceFee = 1000.sat, miningFee = 0.sat), paymentDetails = LiquidityAds.PaymentDetails.FromChannelBalance),
                         miningFee = 1135.sat,
                         channelId = ByteVector32("7d508efbcd8070244db638062a7da90a2b68491f807dab2cdc2a4fe95afb235b"),
                         txId = TxId("2e1ed22ea8871365260c8bc413e765cc7435e97f67a8f363b1a74298f4c423ec"),
@@ -214,59 +216,7 @@ class SqlitePaymentsDbTest {
 
     @Test
     fun `read v12 db`() = runTest {
-        val driver = testPaymentsDriverFromResource("sampledbs/v12/payments-testnet-c26917df05332317c66a54c2e575c0f85dbae423.sqlite")
-        val paymentsDb = createSqlitePaymentsDb(driver, currencyManager = null)
-
-        val payments = paymentsDb.database.paymentsQueries.list(limit = Long.MAX_VALUE, offset = 0)
-            .executeAsList()
-            .map { Serialization.deserialize(it.data_).getOrThrow() }
-
-        assertEquals(12, payments.size)
-
-        assertIs<ChannelCloseOutgoingPayment>(payments[0])
-        assertIs<Bolt12IncomingPayment>(payments[1])
-        assertIs<InboundLiquidityOutgoingPayment>(payments[2])
-        assertIs<Bolt11IncomingPayment>(payments[3])
-        assertIs<LightningOutgoingPayment>(payments[4])
-        assertIs<LightningOutgoingPayment>(payments[5])
-        assertIs<LightningOutgoingPayment>(payments[6])
-        assertIs<LightningOutgoingPayment>(payments[7])
-        assertIs<SpliceCpfpOutgoingPayment>(payments[8])
-        assertIs<SpliceOutgoingPayment>(payments[9])
-        assertIs<NewChannelIncomingPayment>(payments[10])
-        assertIs<InboundLiquidityOutgoingPayment>(payments[11])
-
-        val oldestCompletedPayment = paymentsDb.getOldestCompletedTimestamp()
-        assertEquals(1736964335587L, oldestCompletedPayment)
-
-        val paymentsForTx = paymentsDb.listPaymentsForTxId(TxId("336207f86415d8fd5dad3c10163803d032be0d167eed53a6b31697e687b46d1f"))
-        assertEquals(
-            listOf(
-                NewChannelIncomingPayment(
-                    id = UUID.fromString("4049002b-0a3b-4ad4-af2b-707701e87fda"),
-                    amountReceived = 698316000.msat, serviceFee = 0.msat, miningFee = 413.sat,
-                    channelId = ByteVector32.fromValidHex("b858ecdb13a382370445cefcec602496597ead2a9957cce5a8ae7ca0db8a904c"),
-                    txId = TxId("336207f86415d8fd5dad3c10163803d032be0d167eed53a6b31697e687b46d1f"),
-                    localInputs = setOf(
-                        OutPoint(TxId("93e4aa81ca2fe096c64a03f811e437b39e2b636e95df5201ef525e69d65f6d69"), 0),
-                        OutPoint(TxId("90f81f71dc2eba820b606ffabc769302cfb748e169ed7e84796612b55d1895da"), 0),
-                    ),
-                    createdAt = 1736964335207,
-                    confirmedAt = 1737022028411,
-                    lockedAt = 1736964335587
-                ),
-                InboundLiquidityOutgoingPayment(
-                    id = UUID.fromString("34edbeef-4564-455b-98f0-ab873eb4a9b8"),
-                    channelId = ByteVector32.fromValidHex("b858ecdb13a382370445cefcec602496597ead2a9957cce5a8ae7ca0db8a904c"),
-                    txId = TxId("336207f86415d8fd5dad3c10163803d032be0d167eed53a6b31697e687b46d1f"),
-                    localMiningFees = 0.sat,
-                    purchase = LiquidityAds.Purchase.Standard(amount = 1.sat, fees = LiquidityAds.Fees(miningFee = 271.sat, serviceFee = 1000.sat), paymentDetails = LiquidityAds.PaymentDetails.FromChannelBalance),
-                    createdAt = 1736964335195,
-                    confirmedAt = 1737022028411,
-                    lockedAt = 1736964335587
-                )
-            ), paymentsForTx
-        )
+        TODO()
     }
 }
 

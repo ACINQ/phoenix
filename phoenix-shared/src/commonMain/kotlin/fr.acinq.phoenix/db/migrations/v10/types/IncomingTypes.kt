@@ -399,32 +399,38 @@ fun mapIncomingPaymentFromV10(
             )
         received_at != null && origin is IncomingOriginData.OnChain.V0 && parts.all { it is IncomingReceivedWithData.Part.NewChannel } -> NewChannelIncomingPayment(
             id = ByteVector32(payment_hash).deriveUUID() ,
-            amountReceived = parts.filterIsInstance<IncomingReceivedWithData.Part.NewChannel>().map {
-                when (it) {
-                    is IncomingReceivedWithData.Part.NewChannel.V0 -> it.amount
-                    is IncomingReceivedWithData.Part.NewChannel.V1 -> it.amount
-                    is IncomingReceivedWithData.Part.NewChannel.V2 -> it.amount
+            amountReceived = parts.filterIsInstance<IncomingReceivedWithData.Part.NewChannel>()
+                .map {
+                    when (it) {
+                        is IncomingReceivedWithData.Part.NewChannel.V0 -> it.amount
+                        is IncomingReceivedWithData.Part.NewChannel.V1 -> it.amount
+                        is IncomingReceivedWithData.Part.NewChannel.V2 -> it.amount
                     }
                 }.sum(),
-            serviceFee = parts.filterIsInstance<IncomingReceivedWithData.Part.NewChannel>().map {
-                when (it) {
-                    is IncomingReceivedWithData.Part.NewChannel.V0 -> it.fees
-                    is IncomingReceivedWithData.Part.NewChannel.V1 -> it.fees
-                    is IncomingReceivedWithData.Part.NewChannel.V2 -> it.serviceFee
-                    }
-                }.sum(),
+            liquidityPurchase = LiquidityAds.Purchase.Standard(
+                amount = 0.sat,
+                fees = LiquidityAds.Fees(serviceFee = parts.filterIsInstance<IncomingReceivedWithData.Part.NewChannel>()
+                    .map {
+                        when (it) {
+                            is IncomingReceivedWithData.Part.NewChannel.V0 -> it.fees
+                            is IncomingReceivedWithData.Part.NewChannel.V1 -> it.fees
+                            is IncomingReceivedWithData.Part.NewChannel.V2 -> it.serviceFee
+                        }
+                    }.sum().truncateToSatoshi(), miningFee = 0.sat),
+                paymentDetails = LiquidityAds.PaymentDetails.FromChannelBalance
+            ),
             miningFee = parts.filterIsInstance<IncomingReceivedWithData.Part.NewChannel>().map {
                 when (it) {
                     is IncomingReceivedWithData.Part.NewChannel.V0 -> 0.sat
-                        is IncomingReceivedWithData.Part.NewChannel.V1 -> 0.sat
+                    is IncomingReceivedWithData.Part.NewChannel.V1 -> 0.sat
                     is IncomingReceivedWithData.Part.NewChannel.V2 -> it.miningFee
-                    }
-                }.sum(),
+                }
+            }.sum(),
             channelId = parts.filterIsInstance<IncomingReceivedWithData.Part.NewChannel>().map {
-                    when (it) {
+                when (it) {
                     is IncomingReceivedWithData.Part.NewChannel.V0 -> it.channelId ?: ByteVector32.Zeroes
                     is IncomingReceivedWithData.Part.NewChannel.V1 -> it.channelId ?: ByteVector32.Zeroes
-                        is IncomingReceivedWithData.Part.NewChannel.V2 -> it.channelId
+                    is IncomingReceivedWithData.Part.NewChannel.V2 -> it.channelId
                 }
             }.first(),
             txId = TxId(origin.txId),
@@ -450,32 +456,32 @@ fun mapIncomingPaymentFromV10(
             amountReceived = parts.filterIsInstance<IncomingReceivedWithData.Part.SpliceIn>().map {
                 when (it) {
                     is IncomingReceivedWithData.Part.SpliceIn.V0 -> it.amount
-                    }
+                }
             }.sum(),
             miningFee = parts.filterIsInstance<IncomingReceivedWithData.Part.SpliceIn>().map {
-                    when (it) {
+                when (it) {
                     is IncomingReceivedWithData.Part.SpliceIn.V0 -> it.miningFee
                 }
             }.sum(),
             channelId = parts.filterIsInstance<IncomingReceivedWithData.Part.SpliceIn>().map {
                 when (it) {
                     is IncomingReceivedWithData.Part.SpliceIn.V0 -> it.channelId
-                    }
+                }
             }.first(),
             txId = TxId(origin.txId),
                 localInputs = origin.outpoints.toSet(),
                 createdAt = created_at,
-            confirmedAt = parts.filterIsInstance<IncomingReceivedWithData.Part.SpliceIn>().map {
+                confirmedAt = parts.filterIsInstance<IncomingReceivedWithData.Part.SpliceIn>().map {
                     when (it) {
                         is IncomingReceivedWithData.Part.SpliceIn.V0 -> it.confirmedAt
                     }
             }.first(),
             lockedAt = parts.filterIsInstance<IncomingReceivedWithData.Part.SpliceIn>().map {
-                    when (it) {
-                        is IncomingReceivedWithData.Part.SpliceIn.V0 -> it.lockedAt
-                    }
+                when (it) {
+                    is IncomingReceivedWithData.Part.SpliceIn.V0 -> it.lockedAt
+                }
             }.first(),
-            )
+        )
         received_at != null && origin is IncomingOriginData.SwapIn.V0 && parts.all { it is IncomingReceivedWithData.Part.NewChannel } -> LegacySwapInIncomingPayment(
             id = ByteVector32(payment_hash).deriveUUID(),
             amountReceived = parts.filterIsInstance<IncomingReceivedWithData.Part.NewChannel>().map {

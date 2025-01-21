@@ -27,6 +27,7 @@ import fr.acinq.lightning.db.OnChainOutgoingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.serialization.payment.Serialization
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.db.migrations.v11.queries.ChannelCloseOutgoingQueries
 import fr.acinq.phoenix.db.migrations.v11.queries.InboundLiquidityQueries
 import fr.acinq.phoenix.db.migrations.v11.queries.LightningOutgoingQueries
@@ -189,7 +190,11 @@ val AfterVersion11 = AfterVersion(11) { driver ->
                         confirmed_at = cursor.getLong(7),
                         locked_at = cursor.getLong(8)
                     )
-                    insertPayment(payment)
+                    if (payment.purchase.amount == 1.sat) {
+                        // liquidity purchases of 1 sat are coming from on-chain deposits, and are already included in the incoming payment data. See V10.
+                    } else {
+                        insertPayment(payment)
+                    }
                 }
                 QueryResult.Unit
             }

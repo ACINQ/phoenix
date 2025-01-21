@@ -22,6 +22,7 @@ import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.utils.currentTimestampSeconds
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
+import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.TestConstants
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency
@@ -231,7 +232,7 @@ class CsvWriterTests {
         val payment = NewChannelIncomingPayment(
             id = UUID.randomUUID(),
             amountReceived = 100_000_000.msat,
-            serviceFee = 5_000_000.msat,
+            liquidityPurchase = LiquidityAds.Purchase.Standard(amount = 0.sat, fees = LiquidityAds.Fees(serviceFee = 5_000.sat, miningFee = 0.sat), paymentDetails = LiquidityAds.PaymentDetails.FromChannelBalance),
             miningFee = 2_000.sat,
             channelId = randomBytes32(),
             txId = TxId(randomBytes32()),
