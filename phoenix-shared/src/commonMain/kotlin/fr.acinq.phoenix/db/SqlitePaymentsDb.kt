@@ -176,9 +176,10 @@ class SqlitePaymentsDb(
         }
     }
 
-    suspend fun listRecentCardPayments(count: Long, skip: Long, sinceDate: Long): List<WalletPaymentInfo> {
+    suspend fun listRecentCardPayments(count: Long, skip: Long, cardId: UUID, sinceDate: Long): List<WalletPaymentInfo> {
         return withContext(Dispatchers.Default) {
             database.paymentsOutgoingQueries.listRecentCardPayments(
+                card_id = cardId.toString(),
                 min_ts = sinceDate,
                 limit = count,
                 offset = skip,

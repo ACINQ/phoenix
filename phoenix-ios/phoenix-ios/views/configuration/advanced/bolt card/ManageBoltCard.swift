@@ -1108,17 +1108,12 @@ struct ManageBoltCard: View {
 			return
 		}
 		
-		let cardPaymentsMap: [Lightning_kmpUUID : CardsManager.CardPayments]
+		let cardPayments: CardsManager.CardPayments
 		do {
-			cardPaymentsMap = try await Biz.business.cardsManager.fetchCardPayments()
+			cardPayments = try await Biz.business.cardsManager.fetchCardPayments(cardId: cardInfo.id)
 			
 		} catch {
 			log.error("CardsManager.fetchCardPayments(): error: \(error)")
-			return
-		}
-		
-		guard let cardPayments = cardPaymentsMap[cardInfo.id] else {
-			cardAmounts = CardsManager.CardAmounts(daily: [], monthly: [])
 			return
 		}
 		
