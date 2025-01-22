@@ -2102,8 +2102,7 @@ struct ValidateView: View {
 		
 		if let newAmt = result {
 
-			let newCurrencyList = Currency.displayable(currencyPrefs: currencyPrefs, plus: newAmt.currency)
-
+			let newCurrencyList = Currency.displayable(currencyPrefs: currencyPrefs, plus: [newAmt.currency])
 			if currencyList != newCurrencyList {
 				currencyList = newCurrencyList
 			}

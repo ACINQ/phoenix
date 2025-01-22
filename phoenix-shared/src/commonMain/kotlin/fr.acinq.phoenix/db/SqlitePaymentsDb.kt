@@ -20,7 +20,13 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.TxId
-import fr.acinq.lightning.db.*
+import fr.acinq.lightning.db.IncomingPaymentsDb
+import fr.acinq.lightning.db.OnChainIncomingPayment
+import fr.acinq.lightning.db.OnChainOutgoingPayment
+import fr.acinq.lightning.db.OutgoingPayment
+import fr.acinq.lightning.db.OutgoingPaymentsDb
+import fr.acinq.lightning.db.PaymentsDb
+import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.WalletPaymentMetadata
@@ -120,7 +126,7 @@ class SqlitePaymentsDb(
     }
 
     fun listOutgoingInFlightPaymentsAsFlow(count: Long, skip: Long): Flow<List<WalletPaymentInfo>> {
-        return database.paymentsOutgoingQueries.listInFlight(limit = count, offset = skip, mapper = ::mapInFlightPaymentsAndMetadata)
+        return database.paymentsOutgoingQueries.listInFlight(limit = count, offset = skip, mapper = ::mapOutgoingPaymentsAndMetadata)
             .asFlow()
             .mapToList(Dispatchers.Default)
             .map { list ->
@@ -135,7 +141,7 @@ class SqlitePaymentsDb(
     }
 
     // Recent payments includes in-flight (not completed) payments.
-    fun listRecentPaymentsAsFlow(count: Long, skip: Long, sinceDate: Long, ): Flow<List<WalletPaymentInfo>> {
+    fun listRecentPaymentsAsFlow(count: Long, skip: Long, sinceDate: Long): Flow<List<WalletPaymentInfo>> {
         return database.paymentsQueries.listRecent(min_ts = sinceDate, limit = count, offset = skip, mapper = ::mapPaymentsAndMetadata)
             .asFlow()
             .mapToList(Dispatchers.Default)
@@ -170,24 +176,60 @@ class SqlitePaymentsDb(
         }
     }
 
+    suspend fun listRecentCardPayments(count: Long, skip: Long, sinceDate: Long): List<WalletPaymentInfo> {
+        return withContext(Dispatchers.Default) {
+            database.paymentsOutgoingQueries.listRecentCardPayments(
+                min_ts = sinceDate,
+                limit = count,
+                offset = skip,
+                mapper = ::mapOutgoingPaymentsAndMetadata
+            ).executeAsList()
+        }
+    }
+
     @Suppress("UNUSED_PARAMETER")
-    private fun mapPaymentsAndMetadata(data_: ByteArray, payment_id: UUID?,
-                                       lnurl_base_type: LnurlBase.TypeVersion?, lnurl_base_blob: ByteArray?, lnurl_description: String?, lnurl_metadata_type: LnurlMetadata.TypeVersion?, lnurl_metadata_blob: ByteArray?,
-                                       lnurl_successAction_type: LnurlSuccessAction.TypeVersion?, lnurl_successAction_blob: ByteArray?,
-                                       user_description: String?, user_notes: String?, modified_at: Long?, original_fiat_type: String?, original_fiat_rate: Double?): WalletPaymentInfo {
+    private fun mapPaymentsAndMetadata(
+        data_: ByteArray,
+        payment_id: UUID?,
+        lnurl_base_type: LnurlBase.TypeVersion?,
+        lnurl_base_blob: ByteArray?,
+        lnurl_description: String?,
+        lnurl_metadata_type: LnurlMetadata.TypeVersion?,
+        lnurl_metadata_blob: ByteArray?,
+        lnurl_successAction_type: LnurlSuccessAction.TypeVersion?,
+        lnurl_successAction_blob: ByteArray?,
+        user_description: String?,
+        user_notes: String?,
+        modified_at: Long?,
+        original_fiat_type: String?,
+        original_fiat_rate: Double?,
+        card_id: String?
+    ): WalletPaymentInfo {
         val payment = WalletPaymentAdapter.decode(data_)
         return WalletPaymentInfo(
             payment = payment,
-            metadata = PaymentsMetadataQueries.mapAll(payment.id,
-                lnurl_base_type, lnurl_base_blob, lnurl_description, lnurl_metadata_type, lnurl_metadata_blob,
-                lnurl_successAction_type, lnurl_successAction_blob,
-                user_description, user_notes, modified_at, original_fiat_type, original_fiat_rate),
+            metadata = PaymentsMetadataQueries.mapAll(
+                id = payment.id,
+                lnurl_base_type = lnurl_base_type,
+                lnurl_base_blob = lnurl_base_blob,
+                lnurl_description = lnurl_description,
+                lnurl_metadata_type = lnurl_metadata_type,
+                lnurl_metadata_blob = lnurl_metadata_blob,
+                lnurl_successAction_type = lnurl_successAction_type,
+                lnurl_successAction_blob = lnurl_successAction_blob,
+                user_description = user_description,
+                user_notes = user_notes,
+                modified_at = modified_at,
+                original_fiat_type = original_fiat_type,
+                original_fiat_rate = original_fiat_rate,
+                card_id = card_id
+            ),
             contact = null
         )
     }
 
     @Suppress("UNUSED_PARAMETER")
-    private fun mapInFlightPaymentsAndMetadata(
+    private fun mapOutgoingPaymentsAndMetadata(
         payment: OutgoingPayment,
         payment_id: UUID?,
         lnurl_base_type: LnurlBase.TypeVersion?,
@@ -201,7 +243,8 @@ class SqlitePaymentsDb(
         user_notes: String?,
         modified_at: Long?,
         original_fiat_type: String?,
-        original_fiat_rate: Double?
+        original_fiat_rate: Double?,
+        card_id: String?
     ): WalletPaymentInfo {
         val metadata = PaymentsMetadataQueries.mapAll(
             id = payment.id,
@@ -216,7 +259,8 @@ class SqlitePaymentsDb(
             user_notes = user_notes,
             modified_at = modified_at,
             original_fiat_type = original_fiat_type,
-            original_fiat_rate = original_fiat_rate
+            original_fiat_rate = original_fiat_rate,
+            card_id = card_id
         )
         return WalletPaymentInfo(
             payment = payment,
@@ -296,13 +340,15 @@ class SqlitePaymentsDb(
     /**
      * @param notify Set to false if `didDeleteWalletPayment` should not be invoked.
      */
-    suspend fun deletePayment(paymentId: UUID, notify: Boolean = false): Unit = withContext(Dispatchers.Default) {
+    suspend fun deletePayment(paymentId: UUID, notify: Boolean = true): Unit = withContext(Dispatchers.Default) {
         database.transaction {
             database.paymentsIncomingQueries.deleteById(id = paymentId)
             if (database.paymentsIncomingQueries.changes().executeAsOne() == 0L) {
                 database.paymentsOutgoingQueries.deleteById(id = paymentId)
             }
-            didDeleteWalletPayment(paymentId, database)
+            if (notify) {
+                didDeleteWalletPayment(paymentId, database)
+            }
         }
     }
 

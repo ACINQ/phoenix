@@ -26,7 +26,8 @@ CREATE TABLE IF NOT EXISTS payments_metadata (
     user_notes TEXT DEFAULT NULL,
     modified_at INTEGER DEFAULT NULL,
     original_fiat_type TEXT DEFAULT NULL,
-    original_fiat_rate REAL DEFAULT NULL
+    original_fiat_rate REAL DEFAULT NULL,
+    card_id TEXT DEFAULT NULL
 );
 
 -- queries for payments_metadata table
@@ -44,8 +45,9 @@ INSERT INTO payments_metadata (
             lnurl_successAction_type, lnurl_successAction_blob,
             user_description, user_notes,
             modified_at,
-            original_fiat_type, original_fiat_rate)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+            original_fiat_type, original_fiat_rate,
+            card_id)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 updateUserInfo:
 UPDATE payments_metadata

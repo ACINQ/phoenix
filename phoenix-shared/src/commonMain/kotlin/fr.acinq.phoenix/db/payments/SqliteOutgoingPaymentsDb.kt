@@ -63,7 +63,7 @@ class SqliteOutgoingPaymentsDb(private val database: PaymentsDatabase) : Outgoin
      * @param notify Set to false if `didSaveWalletPayment` should not be invoked
      *               (e.g. when downloading payments from the cloud)
      */
-    fun _addOutgoingPayment(outgoingPayment: OutgoingPayment, notify: Boolean = false) = database.transaction {
+    fun _addOutgoingPayment(outgoingPayment: OutgoingPayment, notify: Boolean = true) = database.transaction {
         when (outgoingPayment) {
             is LightningOutgoingPayment -> {
                 database.paymentsOutgoingQueries.insert(

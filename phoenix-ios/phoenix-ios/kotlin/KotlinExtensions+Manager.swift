@@ -13,6 +13,13 @@ extension BalanceManager {
 	}
 }
 
+extension CardsManager {
+	
+	var cardsListValue: [BoltCardInfo] {
+		return self.cardsList.value as? [BoltCardInfo] ?? []
+	}
+}
+
 extension ConnectionsManager {
 	
 	var currentValue: Connections {

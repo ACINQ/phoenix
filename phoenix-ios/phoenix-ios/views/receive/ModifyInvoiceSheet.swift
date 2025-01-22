@@ -287,7 +287,7 @@ struct ModifyInvoiceSheet: View {
 			refreshAltAmount()
 		}
 		
-		currencyList = Currency.displayable(currencyPrefs: currencyPrefs, plus: currency)
+		currencyList = Currency.displayable(currencyPrefs: currencyPrefs, plus: [currency])
 		currencyPickerChoice = CurrencyPickerOption.currency(currency)
 		
 		smartModalState.onNextDidDisappear {

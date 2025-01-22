@@ -1,4 +1,5 @@
 {
+  "originHash" : "d649fbe2be50831fdb28cb2641e76bb148d3b4a074f1350225d4c038ab447877",
   "pins" : [
     {
       "identity" : "abseil-cpp-swiftpm",
@@ -127,6 +128,15 @@
       }
     },
     {
+      "identity" : "swcrypt",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/soyersoyer/SwCrypt",
+      "state" : {
+        "revision" : "d18cf90973a32dc0d28f94eec91faf14ae8b4443",
+        "version" : "5.1.4"
+      }
+    },
+    {
       "identity" : "swift-async-algorithms",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-async-algorithms.git",
@@ -172,5 +182,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }
