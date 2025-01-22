@@ -31,7 +31,6 @@ import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
 import fr.acinq.phoenix.android.utils.extensions.basicDescription
 import fr.acinq.phoenix.csv.WalletPaymentCsvWriter
-import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.managers.DatabaseManager
 import fr.acinq.phoenix.managers.PaymentsFetcher
 import fr.acinq.phoenix.managers.PeerManager

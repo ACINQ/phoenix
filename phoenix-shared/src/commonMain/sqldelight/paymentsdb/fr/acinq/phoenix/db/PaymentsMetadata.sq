@@ -58,22 +58,6 @@ get:
 SELECT * FROM payments_metadata
 WHERE payment_id = ?;
 
-getDescriptions:
-SELECT lnurl_description,
-       user_description,
-       modified_at
-FROM   payments_metadata
-WHERE  payment_id = ?;
-
-getDescriptionsAndOriginalFiat:
-SELECT lnurl_description,
-       user_description,
-       modified_at,
-       original_fiat_type,
-       original_fiat_rate
-FROM   payments_metadata
-WHERE  payment_id = ?;
-
 -- use this in a `transaction` block to know how many rows were changed after an UPDATE
 changes:
 SELECT changes();

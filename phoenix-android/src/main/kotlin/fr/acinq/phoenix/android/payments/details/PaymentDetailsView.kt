@@ -37,7 +37,6 @@ import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
-import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.managers.PaymentsManager
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -68,7 +67,7 @@ class PaymentDetailsViewModel(
 
     suspend fun getPayment(id: UUID) {
         log.debug("getting payment details for id={}", id)
-        state = paymentsManager.getPayment(id, WalletPaymentFetchOptions.All)?.let {
+        state = paymentsManager.getPayment(id)?.let {
             PaymentDetailsState.Success.Splash(it)
         } ?: PaymentDetailsState.Failure(NoSuchElementException("no payment found for id=$id"))
     }

@@ -26,7 +26,6 @@ import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.TestConstants
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency
-import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.WalletPaymentMetadata
 import kotlin.test.Test
@@ -57,7 +56,7 @@ class CsvWriterTests {
 
         val expected = "2023-02-01T16:51:12.445Z,100000000,-4000000,22.9998 USD,-0.9199 USD,Incoming on-chain payment,L2 Top-up,Via Lightning network\r\n"
         val actual = CsvWriter.makeRow(
-            info = WalletPaymentInfo(payment, metadata, null, WalletPaymentFetchOptions.All),
+            info = WalletPaymentInfo(payment, metadata, null),
             localizedDescription = "L2 Top-up",
             config = makeConfig()
         )
@@ -88,7 +87,7 @@ class CsvWriterTests {
 
         val expected = "2023-02-01T16:51:12.445Z,12000000,0,2.7599 USD,0.0000 USD,Incoming LN payment,Cafécito,Via Lightning network\r\n"
         val actual = CsvWriter.makeRow(
-            info = WalletPaymentInfo(payment, metadata, null, WalletPaymentFetchOptions.All),
+            info = WalletPaymentInfo(payment, metadata, null),
             localizedDescription = "Cafécito",
             config = makeConfig()
         )
@@ -120,7 +119,7 @@ class CsvWriterTests {
 
         val expected = "2023-02-01T16:56:22.248Z,-4354435,-3435,-1.0015 USD,-0.0007 USD,Outgoing LN payment to ${pr.nodeId.toHex()},Arepa de Choclo,Con quesito\r\n"
         val actual = CsvWriter.makeRow(
-            info = WalletPaymentInfo(payment, metadata, null, WalletPaymentFetchOptions.All),
+            info = WalletPaymentInfo(payment, metadata, null),
             localizedDescription = "Arepa de Choclo",
             config = makeConfig()
         )
@@ -152,7 +151,7 @@ class CsvWriterTests {
 
         val expected = "2023-02-01T16:58:01.099Z,-103010,-3010,-0.0236 USD,-0.0006 USD,Outgoing LN payment to ${pr.nodeId.toHex()},Test 1,\"This note, um, has a comma\"\r\n"
         val actual = CsvWriter.makeRow(
-            info = WalletPaymentInfo(payment, metadata, null, WalletPaymentFetchOptions.All),
+            info = WalletPaymentInfo(payment, metadata, null),
             localizedDescription = "Test 1",
             config = makeConfig()
         )
@@ -184,7 +183,7 @@ class CsvWriterTests {
 
         val expected = "2023-02-01T16:59:00.742Z,-103010,-3010,-0.0236 USD,-0.0006 USD,Outgoing LN payment to ${pr.nodeId.toHex()},Test 2,\"This \"\"note\"\" has quotes\"\r\n"
         val actual = CsvWriter.makeRow(
-            info = WalletPaymentInfo(payment, metadata, null, WalletPaymentFetchOptions.All),
+            info = WalletPaymentInfo(payment, metadata, null),
             localizedDescription = "Test 2",
             config = makeConfig()
         )
@@ -219,7 +218,7 @@ class CsvWriterTests {
                 "Cheddar\n" +
                 "Asiago\"\r\n"
         val actual = CsvWriter.makeRow(
-            info = WalletPaymentInfo(payment, metadata, null, WalletPaymentFetchOptions.All),
+            info = WalletPaymentInfo(payment, metadata, null),
             localizedDescription = "Test 3",
             config = makeConfig()
         )
@@ -248,7 +247,7 @@ class CsvWriterTests {
 
         val expected = "2023-02-01T16:51:12.445Z,100000000,-7000000,22.9998 USD,-1.6099 USD,Incoming on-chain payment,L1 Top-up,Via dual-funding flow\r\n"
         val actual = CsvWriter.makeRow(
-            info = WalletPaymentInfo(payment, metadata, null, WalletPaymentFetchOptions.All),
+            info = WalletPaymentInfo(payment, metadata, null),
             localizedDescription = "L1 Top-up",
             config = makeConfig()
         )
@@ -284,7 +283,7 @@ class CsvWriterTests {
 
         val expected = "2023-02-01T22:16:54.498Z,-12820000,-2820000,-3.0366 USD,-0.6679 USD,Outgoing Swap to tb1qlywh0dk40k87gqphpfs8kghd96hmnvus7r8hhf,Swap for cash,\r\n"
         val actual = CsvWriter.makeRow(
-            info = WalletPaymentInfo(payment, metadata, null, WalletPaymentFetchOptions.All),
+            info = WalletPaymentInfo(payment, metadata, null),
             localizedDescription = "Swap for cash",
             config = makeConfig()
         )
@@ -314,7 +313,7 @@ class CsvWriterTests {
 
         val expected = "2023-02-02T15:58:53.694Z,-10090000,-1400000,-2.3875 USD,-0.3312 USD,Channel closing to tb1qz5gxe2450uadavle8wwcc5ngquqfj5xp4dy0ja,Channel closing,\r\n"
         val actual = CsvWriter.makeRow(
-            info = WalletPaymentInfo(payment, metadata, null, WalletPaymentFetchOptions.All),
+            info = WalletPaymentInfo(payment, metadata, null),
             localizedDescription = "Channel closing",
             config = makeConfig()
         )

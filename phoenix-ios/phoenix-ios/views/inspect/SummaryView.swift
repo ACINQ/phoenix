@@ -35,8 +35,6 @@ struct SummaryView: View {
 	@State var relatedPaymentIds: [Lightning_kmpUUID] = []
 	@State var liquidityPayment: Lightning_kmpInboundLiquidityOutgoingPayment? = nil
 	
-	let fetchOptions = WalletPaymentFetchOptions.companion.All
-	
 	@State var blockchainConfirmations: Int? = nil
 	@State var showBlockchainExplorerOptions = false
 	
@@ -1117,7 +1115,7 @@ struct SummaryView: View {
 			// The payment metadata may have changed (e.g. description/notes modified).
 			// So we need to refresh the payment info.
 			
-			Biz.business.paymentsManager.getPayment(id: paymentInfo.payment.id, options: fetchOptions) {
+			Biz.business.paymentsManager.getPayment(id: paymentInfo.payment.id) {
 				(result: WalletPaymentInfo?, _) in
 				
 				if let result {
@@ -1250,7 +1248,7 @@ struct SummaryView: View {
 	func switchToPayment(_ paymentId: Lightning_kmpUUID) {
 		log.trace("switchToPayment: \(paymentId.description())")
 		
-		Biz.business.paymentsManager.getPayment(id: paymentId, options: fetchOptions) {
+		Biz.business.paymentsManager.getPayment(id: paymentId) {
 			(result: WalletPaymentInfo?, _) in
 			
 			if let result {
