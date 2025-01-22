@@ -24,14 +24,6 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
  *         target where the action is delete self   :   750
 */
 
-let payments_record_table_name = "payments"
-let payments_record_column_data = "encryptedData"
-let payments_record_column_meta = "encryptedMeta"
-
-let contacts_record_table_name = "contacts"
-let contacts_record_column_data = "encryptedData"
-let contacts_record_column_photo = "photo" // CKAsset: automatically encrypted by CloudKit
-
 struct ConsecutivePartialFailure {
 	var count: Int
 	var error: CKError?
@@ -79,12 +71,12 @@ class SyncBackupManager: @unchecked Sendable {
 	/// 
 	let actor: SyncBackupManager_Actor
 	
+	var cancellables = Set<AnyCancellable>()
+	
 	var consecutiveErrorCount = 0
 	var consecutivePartialFailures: [String: ConsecutivePartialFailure] = [:]
 	
 	private var _cloudKitDb: CloudKitDb? = nil // see getter method
-	
-	private var cancellables = Set<AnyCancellable>()
 	
 	init(
 		chain: Bitcoin_kmpChain,
@@ -102,7 +94,8 @@ class SyncBackupManager: @unchecked Sendable {
 			isEnabled: Prefs.shared.backupTransactions.isEnabled,
 			recordZoneCreated: Prefs.shared.backupTransactions.recordZoneCreated(_walletId),
 			hasDownloadedPayments: Prefs.shared.backupTransactions.hasDownloadedPayments(_walletId),
-			hasDownloadedContacts: Prefs.shared.backupTransactions.hasDownloadedContacts(_walletId)
+			hasDownloadedContacts: Prefs.shared.backupTransactions.hasDownloadedContacts(_walletId),
+			hasDownloadedCards: Prefs.shared.backupTransactions.hasDownloadedCards(_walletId)
 		)
 		
 		waitForDatabases()
@@ -120,67 +113,6 @@ class SyncBackupManager: @unchecked Sendable {
 	// ----------------------------------------
 	// MARK: Monitors
 	// ----------------------------------------
-	
-	private func startPaymentsQueueCountMonitor() {
-		log.trace("startPaymentsQueueCountMonitor()")
-		
-		// Kotlin suspend functions are currently only supported on the main thread
-		assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
-		
-		self.cloudKitDb.payments.queueCountPublisher().sink {[weak self] (queueCount: Int64) in
-			log.debug("payments.queueCountPublisher().sink(): count = \(queueCount)")
-			
-			guard let self = self else {
-				return
-			}
-			
-			let count = Int(clamping: queueCount)
-			
-			let wait: SyncBackupManager_State_Waiting?
-			if Prefs.shared.backupTransactions.useUploadDelay {
-				let delay = TimeInterval.random(in: 10 ..< 900)
-				wait = SyncBackupManager_State_Waiting(
-					kind: .randomizedUploadDelay,
-					parent: self,
-					delay: delay
-				)
-			} else {
-				wait = nil
-			}
-			
-			Task {
-				if let newState = await self.actor.paymentsQueueCountChanged(count, wait: wait) {
-					self.handleNewState(newState)
-				}
-			}
-
-		}.store(in: &cancellables)
-	}
-	
-	private func startContactsQueueCountMonitor() {
-		log.trace("startContactsQueueCountMonitor()")
-		
-		// Kotlin suspend functions are currently only supported on the main thread
-		assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
-		
-		self.cloudKitDb.contacts.queueCountPublisher().sink {[weak self] (queueCount: Int64) in
-			log.debug("contacts.queueCountPublisher().sink(): count = \(queueCount)")
-			
-			guard let self = self else {
-				return
-			}
-			
-			// Note: Upload delay doesn't apply to contacts.
-			
-			let count = Int(clamping: queueCount)
-			Task {
-				if let newState = await self.actor.contactsQueueCountChanged(count, wait: nil) {
-					self.handleNewState(newState)
-				}
-			}
-
-		}.store(in: &cancellables)
-	}
 	
 	private func startPreferencesMonitor() {
 		log.trace("startPreferencesMonitor()")
@@ -336,28 +268,36 @@ class SyncBackupManager: @unchecked Sendable {
 		
 		log.trace("state = \(newState)")
 		switch newState {
-			case .updatingCloud(let details):
-				switch details.kind {
-					case .creatingRecordZone:
-						createRecordZone(details)
-					case .deletingRecordZone:
-						deleteRecordZone(details)
-				}
-			case .downloading(let details):
-				if details.needsDownloadPayments {
-					downloadPayments(details)
-				}
-				if details.needsDownloadContacts {
-					downloadContacts(details)
-				}
-			case .uploading(let details):
-				if details.payments_pendingCount > 0 {
-					uploadPayments(details)
-				} else {
-					uploadContacts(details)
-				}
-			default:
-				break
+		case .updatingCloud(let details):
+			switch details.kind {
+			case .creatingRecordZone:
+				createRecordZone(details)
+			case .deletingRecordZone:
+				deleteRecordZone(details)
+			}
+		
+		case .downloading(let details):
+			if details.needsDownloadPayments {
+				downloadPayments(details)
+			}
+			if details.needsDownloadContacts {
+				downloadContacts(details)
+			}
+			if details.needsDownloadCards {
+				downloadCards(details)
+			}
+		
+		case .uploading(let details):
+			if details.payments_pendingCount > 0 {
+				uploadPayments(details)
+			} else if details.contacts_pendingCount > 0 {
+				uploadContacts(details)
+			} else {
+				uploadCards(details)
+			}
+		
+		default:
+			break
 		}
 		
 		publishNewState(newState)
@@ -383,6 +323,7 @@ class SyncBackupManager: @unchecked Sendable {
 				DispatchQueue.main.async {
 					self.startPaymentsQueueCountMonitor()
 					self.startContactsQueueCountMonitor()
+					self.startCardsQueueCountMonitor()
 					self.startPreferencesMonitor()
 				}
 				

@@ -17,6 +17,7 @@ fileprivate enum Key: String {
 	case hasCKRecordZone_v2
 	case hasDownloadedPayments = "hasDownloadedCKRecords"
 	case hasDownloadedContacts_v2
+	case hasDownloadedCards
 }
 
 fileprivate enum KeyDeprecated: String {
@@ -135,11 +136,24 @@ class Prefs_BackupTransactions {
 		defaults.setValue(true, forKey: hasDownloadedContactsKey(walletId))
 	}
 	
+	private func hasDownloadedCardsKey(_ walletId: WalletIdentifier) -> String {
+		return "\(Key.hasDownloadedCards.rawValue)-\(walletId.prefsKeySuffix)"
+	}
+	
+	func hasDownloadedCards(_ walletId: WalletIdentifier) -> Bool {
+		return defaults.bool(forKey: hasDownloadedCardsKey(walletId))
+	}
+	
+	func markHasDownloadedCards(_ walletId: WalletIdentifier) {
+		defaults.setValue(true, forKey: hasDownloadedCardsKey(walletId))
+	}
+	
 	func resetWallet(_ walletId: WalletIdentifier) {
 		
 		defaults.removeObject(forKey: recordZoneCreatedKey(walletId))
 		defaults.removeObject(forKey: hasDownloadedPaymentsKey(walletId))
 		defaults.removeObject(forKey: hasDownloadedContactsKey(walletId))
+		defaults.removeObject(forKey: hasDownloadedCardsKey(walletId))
 		defaults.removeObject(forKey: Key.backupTransactions_enabled.rawValue)
 		defaults.removeObject(forKey: Key.backupTransactions_useCellularData.rawValue)
 		defaults.removeObject(forKey: Key.backupTransactions_useUploadDelay.rawValue)

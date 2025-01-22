@@ -241,6 +241,7 @@
 		DC81B79F25BF2AA200F5A52C /* MVI.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC81B79E25BF2AA200F5A52C /* MVI.swift */; };
 		DC82EED629789853007A5853 /* TxHistoryExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC82EED529789853007A5853 /* TxHistoryExporter.swift */; };
 		DC89857F25914747007B253F /* UIApplicationState+Phoenix.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC89857E25914747007B253F /* UIApplicationState+Phoenix.swift */; };
+		DC8D6E812D41857C00F0A54A /* SyncBackupManager+Cards.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC8D6E802D41857500F0A54A /* SyncBackupManager+Cards.swift */; };
 		DC8D94142CA7015F00EE844E /* ChannelFundingProblem.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC8D94132CA7015F00EE844E /* ChannelFundingProblem.swift */; };
 		DC90A9572D02181C00E145CB /* Ntag424.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC75C11F2CFDE62700ABEF93 /* Ntag424.swift */; };
 		DC90A9582D02194200E145CB /* KotlinExtensions+Cards.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC71CB682CF75AAA00EBCBD6 /* KotlinExtensions+Cards.swift */; };
@@ -696,6 +697,7 @@
 		DC81B79E25BF2AA200F5A52C /* MVI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVI.swift; sourceTree = "<group>"; };
 		DC82EED529789853007A5853 /* TxHistoryExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TxHistoryExporter.swift; sourceTree = "<group>"; };
 		DC89857E25914747007B253F /* UIApplicationState+Phoenix.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplicationState+Phoenix.swift"; sourceTree = "<group>"; };
+		DC8D6E802D41857500F0A54A /* SyncBackupManager+Cards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SyncBackupManager+Cards.swift"; sourceTree = "<group>"; };
 		DC8D94132CA7015F00EE844E /* ChannelFundingProblem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelFundingProblem.swift; sourceTree = "<group>"; };
 		DC9473F9261270B4008D7242 /* MVI+Mock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MVI+Mock.swift"; sourceTree = "<group>"; };
 		DC949E692B45B1EC00E80BB5 /* LiquidityAdsHelp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidityAdsHelp.swift; sourceTree = "<group>"; };
@@ -1599,16 +1601,17 @@
 		DCC9D998267BD26D00EA36DD /* sync */ = {
 			isa = PBXGroup;
 			children = (
+				DCC9D999267BD28600EA36DD /* SyncBackupManager.swift */,
+				DCE7232D27AD68CD0017CF56 /* SyncBackupManager_Actor.swift */,
+				DCB493D0269F890D001B0F09 /* SyncBackupManager_PendingSettings.swift */,
+				DCB493CE269F859E001B0F09 /* SyncBackupManager_State.swift */,
+				DC8D6E802D41857500F0A54A /* SyncBackupManager+Cards.swift */,
+				DCA7263C2C80BC0800600716 /* SyncBackupManager+Contacts.swift */,
+				DCA7263A2C80BA0E00600716 /* SyncBackupManager+Payments.swift */,
 				DCEFD921276A796800001767 /* SyncManager.swift */,
 				DCBA371A2758076F00610EC8 /* SyncSeedManager.swift */,
 				DCE7232F27B167240017CF56 /* SyncSeedManager_Actor.swift */,
 				DCAEF8D8275E69B000015993 /* SyncSeedManager_State.swift */,
-				DCC9D999267BD28600EA36DD /* SyncBackupManager.swift */,
-				DCA7263C2C80BC0800600716 /* SyncBackupManager+Contacts.swift */,
-				DCA7263A2C80BA0E00600716 /* SyncBackupManager+Payments.swift */,
-				DCE7232D27AD68CD0017CF56 /* SyncBackupManager_Actor.swift */,
-				DCB493CE269F859E001B0F09 /* SyncBackupManager_State.swift */,
-				DCB493D0269F890D001B0F09 /* SyncBackupManager_PendingSettings.swift */,
 			);
 			path = sync;
 			sourceTree = "<group>";
@@ -2333,6 +2336,7 @@
 				DC46CB1228D9AAB000C4EAC7 /* LockState.swift in Sources */,
 				DC2F431427B6972C0006FCC4 /* SwapInView.swift in Sources */,
 				DC71E7352728A5720063613D /* KotlinIdentifiable.swift in Sources */,
+				DC8D6E812D41857C00F0A54A /* SyncBackupManager+Cards.swift in Sources */,
 				DCBA60CF2C90E41000878895 /* ScanQrCodeView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

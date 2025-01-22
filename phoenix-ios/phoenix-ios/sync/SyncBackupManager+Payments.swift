@@ -10,6 +10,10 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
+fileprivate let payments_record_table_name = "payments"
+fileprivate let payments_record_column_data = "encryptedData"
+fileprivate let payments_record_column_meta = "encryptedMeta"
+
 fileprivate struct DownloadedPayment {
 	let record: CKRecord
 	let unpaddedSize: Int
@@ -35,6 +39,46 @@ fileprivate struct UploadPaymentsOperationInfo {
 }
 
 extension SyncBackupManager {
+	
+	func startPaymentsQueueCountMonitor() {
+		log.trace("startPaymentsQueueCountMonitor()")
+		
+		// Kotlin suspend functions are currently only supported on the main thread
+		assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
+		
+		self.cloudKitDb.payments.queueCountPublisher().sink {[weak self] (queueCount: Int64) in
+			log.debug("payments.queueCountPublisher().sink(): count = \(queueCount)")
+			
+			guard let self = self else {
+				return
+			}
+			
+			let count = Int(clamping: queueCount)
+			
+			let wait: SyncBackupManager_State_Waiting?
+			if Prefs.shared.backupTransactions.useUploadDelay {
+				let delay = TimeInterval.random(in: 10 ..< 900)
+				wait = SyncBackupManager_State_Waiting(
+					kind: .randomizedUploadDelay,
+					parent: self,
+					delay: delay
+				)
+			} else {
+				wait = nil
+			}
+			
+			Task {
+				if let newState = await self.actor.paymentsQueueCountChanged(count, wait: wait) {
+					self.handleNewState(newState)
+				}
+			}
+
+		}.store(in: &cancellables)
+	}
+	
+	// ----------------------------------------
+	// MARK: IO
+	// ----------------------------------------
 	
 	func downloadPayments(_ downloadProgress: SyncBackupManager_State_Downloading) {
 		log.trace("downloadPayments()")
