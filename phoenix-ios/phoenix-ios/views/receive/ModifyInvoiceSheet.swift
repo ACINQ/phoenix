@@ -10,11 +10,18 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct ModifyInvoiceSheet: View {
 
+	enum TitleType {
+		case normal
+		case cardPaymentNeedsAmount
+	}
+	let titleType: TitleType
+	
 	@Binding var savedAmount: CurrencyAmount?
 	let initialAmount: Lightning_kmpMilliSatoshi?
 	
 	let openCurrencyConverter: () -> Void
 	let didSave: (Lightning_kmpMilliSatoshi?, String) -> Void
+	let didCancel: () -> Void
 	
 	@State var desc: String
 	
@@ -26,6 +33,8 @@ struct ModifyInvoiceSheet: View {
 	@State var parsedAmount: Result<Double, TextFieldCurrencyStylerError> = Result.failure(.emptyInput)
 	
 	@State var altAmount: String = ""
+	
+	@State var didTapSave: Bool = false
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var smartModalState: SmartModalState
@@ -39,17 +48,21 @@ struct ModifyInvoiceSheet: View {
 	@State var textHeight: CGFloat? = nil
 
 	init(
+		titleType: TitleType,
 		savedAmount: Binding<CurrencyAmount?>,
 		amount: Lightning_kmpMilliSatoshi?,
 		desc: String,
 		openCurrencyConverter: @escaping () -> Void,
-		didSave: @escaping (Lightning_kmpMilliSatoshi?, String) -> Void
+		didSave: @escaping (Lightning_kmpMilliSatoshi?, String) -> Void,
+		didCancel: @escaping () -> Void
 	) {
+		self.titleType = titleType
 		self._savedAmount = savedAmount
 		self.initialAmount = amount
 		self._desc = State<String>(initialValue: desc)
 		self.openCurrencyConverter = openCurrencyConverter
 		self.didSave = didSave
+		self.didCancel = didCancel
 	}
 	
 	// --------------------------------------------------
@@ -60,10 +73,18 @@ struct ModifyInvoiceSheet: View {
 	var body: some View {
 		
 		VStack(alignment: .leading) {
-			Text("Edit payment request")
-				.font(.title3)
-				.padding([.top, .bottom])
-				.accessibilityAddTraits(.isHeader)
+			
+			Group {
+				switch titleType {
+				case .normal:
+					Text("Edit payment request")
+				case .cardPaymentNeedsAmount:
+					Text("Amount required for card payment").foregroundStyle(Color.appNegative).bold()
+				}
+			}
+			.font(.title3)
+			.padding([.top, .bottom])
+			.accessibilityAddTraits(.isHeader)
 
 			HStack {
 				TextField(
@@ -268,6 +289,12 @@ struct ModifyInvoiceSheet: View {
 		
 		currencyList = Currency.displayable(currencyPrefs: currencyPrefs, plus: currency)
 		currencyPickerChoice = CurrencyPickerOption.currency(currency)
+		
+		smartModalState.onNextDidDisappear {
+			if !didTapSave {
+				didCancel()
+			}
+		}
 	}
 	
 	func amountDidChange() -> Void {
@@ -402,6 +429,7 @@ struct ModifyInvoiceSheet: View {
 			savedAmount = nil
 		}
 		
+		didTapSave = true
 		smartModalState.close(animationCompletion: {
 			didSave(msat, trimmedDesc)
 		})
