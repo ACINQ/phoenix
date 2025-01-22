@@ -30,7 +30,6 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class AppConfigurationManager(
-    private val appDb: SqliteAppDb,
     private val httpClient: HttpClient,
     private val electrumWatcher: ElectrumWatcher,
     private val chain: Chain,
@@ -40,7 +39,6 @@ class AppConfigurationManager(
     constructor(business: PhoenixBusiness) : this(
         loggerFactory = business.loggerFactory,
         chain = business.chain,
-        appDb = business.appDb,
         httpClient = business.httpClient,
         electrumWatcher = business.electrumWatcher,
     )
@@ -217,9 +215,9 @@ class AppConfigurationManager(
         } ?: ElectrumConfig.Random
     }
 
-    fun randomElectrumServer() = when (chain) {
-        Chain.Mainnet -> mainnetElectrumServers.random()
-        Chain.Testnet3 -> testnetElectrumServers.random()
+    fun randomElectrumServer(isTorEnabled: Boolean) = when (chain) {
+        Chain.Mainnet -> if (isTorEnabled) mainnetElectrumServersOnion.random() else mainnetElectrumServers.random()
+        Chain.Testnet3 -> if (isTorEnabled) testnetElectrumServersOnion.random() else testnetElectrumServers.random()
         Chain.Testnet4 -> TODO()
         Chain.Signet -> TODO()
         Chain.Regtest -> platformElectrumRegtestConf()

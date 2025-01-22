@@ -10,6 +10,9 @@ private fun electrumServer(host: String, port: Int = 50002): ServerAddress =
 private fun electrumServer(host: String, port: Int = 50002, publicKey: String): ServerAddress =
     ServerAddress(host = host, port = port, tls = TcpSocket.TLS.PINNED_PUBLIC_KEY(publicKey))
 
+private fun electrumServerOnion(host: String, port: Int = 50002): ServerAddress =
+    ServerAddress(host = host, port = port, tls = TcpSocket.TLS.DISABLED)
+
 val mainnetElectrumServers = listOf(
     electrumServer(host = "electrum.acinq.co"),
     electrumServer(
@@ -168,5 +171,13 @@ val testnetElectrumServers = listOf(
                 "TQIDAQAB"
     ),
 )
+
+val mainnetElectrumServersOnion: List<ServerAddress> by lazy { TODO() }
+
+val testnetElectrumServersOnion by lazy {
+    listOf(
+        electrumServerOnion(host = "explorerzydxu5ecjrkwceayqybizmpjjznk5izmitf2modhcusuqlid.onion", port = 143)
+    )
+}
 
 expect fun platformElectrumRegtestConf(): ServerAddress

@@ -95,7 +95,6 @@
     <string name="home_background_restriction_title">Omezeno zpracovávání na pozadí</string>
     <string name="home_background_restriction_body_1">Phoenix nebude moci přijímat platby, pokud je na pozadí nebo pokud je zavřený.</string>.
     <string name="home_background_restriction_body_2">Děje se tak, protože:</string>
-    <string name="home_background_restriction_tor">Tor je povolen</string>
     <string name="home_background_restriction_powersaver">Zařízení je v úsporném režimu</string>
     <string name="home_background_restriction_fcm">Oznámení FCM nejsou k dispozici</string>
     <string name="home_background_restriction_fcm_details">Pokud používáte GrapheneOS nebo CalyxOS, nainstalujte si služby Google Play, abyste mohli dostávat FCM oznámení. Nápovědu naleznete v často kladených dotazech.</string>
@@ -281,12 +280,6 @@
     <string name="lnurl_withdraw_success">Žádost o výběr byla odeslána službě <b>%1$s</b>.\n\nNež vám pošlou peníze, může to nějakou dobu trvat. Mezitím prosím nechte aplikaci online.</string>
 
     <!-- Tor -->
-
-    <string name="tor_settings_subtitle">Phoenix může použít Tor ke skrytí vaší IP adresy před ostatními uzly v síti Lightning a servery Electrum.</string>
-
-    <string name="tor_confirm_dialog_title">Povolit Tor?</string>
-    <string name="tor_confirm_dialog_details_1">Tor je pomalý a ovlivní rychlost vašich plateb.</string>
-    <string name="tor_confirm_dialog_details_2">Konkrétně <b>nebudete moci přijímat platby</b>, pokud je Phoenix na pozadí nebo pokud je zavřený.</string>
 
     <!-- about -->
 

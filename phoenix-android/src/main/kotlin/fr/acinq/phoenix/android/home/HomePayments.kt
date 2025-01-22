@@ -30,7 +30,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.PaymentRowState
 import fr.acinq.phoenix.android.PaymentsViewModel
 import fr.acinq.phoenix.android.R
@@ -57,7 +56,7 @@ fun ColumnScope.PaymentsList(
     Column(modifier = modifier.weight(1f, fill = true), horizontalAlignment = Alignment.CenterHorizontally) {
         if (payments.isEmpty()) {
             Text(
-                text = stringResource(id = R.string.home__payments_none),
+                text = stringResource(id = R.string.home_payments_none),
                 style = MaterialTheme.typography.caption.copy(textAlign = TextAlign.Center, fontSize = 14.sp),
                 modifier = Modifier
                     .padding(horizontal = 32.dp)
@@ -87,7 +86,7 @@ private fun ColumnScope.LatestPaymentsList(
 ) {
     val morePaymentsButton: @Composable () -> Unit = {
         FilledButton(
-            text = stringResource(id = R.string.home__payments_more_button),
+            text = stringResource(id = R.string.home_payments_more_button),
             icon = R.drawable.ic_chevron_down,
             iconTint = MaterialTheme.typography.caption.color,
             onClick = onPaymentsHistoryClick,

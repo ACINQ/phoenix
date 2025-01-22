@@ -90,7 +90,6 @@
     <string name="home_background_restriction_title">Procesamiento en segundo plano restringido</string>.
     <string name="home_background_restriction_body_1">Phoenix no podrá recibir pagos cuando esté en segundo plano, o cuando esté cerrado.</string>
     <string name="home_background_restriction_body_2">Esto ocurre porque:</string>
-    <string name="home_background_restriction_tor">Tor está activado</string>
     <string name="home_background_restriction_powersaver">El dispositivo está en modo de ahorro de energía</string>
     <string name="home_background_restriction_fcm">FCM notificaciones no disponibles</string>
     <string name="home_background_restriction_fcm_details">Si utilizas GrapheneOS o CalyxOS, instala Google Play Services para recibir notificaciones de FCM. Consulta las preguntas frecuentes para obtener más información.</string>
@@ -282,12 +281,6 @@
     <string name="lnurl_withdraw_success">La solicitud de retirada se ha enviado a <b>%1$s</b>.\n\nPuede que tarde un poco en enviar los fondos. Por favor, mantén la aplicación en línea mientras tanto.</string>
 
     <!-- Tor -->
-
-    <string name="tor_settings_subtitle">Phoenix puede utilizar Tor para proteger su IP de los otros nodos de la Red Lightning y de los servidores de Electrum.</string>
-
-    <string name="tor_confirm_dialog_title">¿Habilitar Tor?</string>
-    <string name="tor_confirm_dialog_details_1">Tor es lento y afectará al rendimiento de tus pagos.</string>
-    <string name="tor_confirm_dialog_details_2">Específicamente, <b>no podrá recibir pagos</b> si Phoenix está en segundo plano, o si está cerrado.</string>
 
     <!-- about -->
 
