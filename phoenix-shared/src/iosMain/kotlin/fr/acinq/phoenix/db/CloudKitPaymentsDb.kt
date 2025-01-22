@@ -5,7 +5,6 @@ import app.cash.sqldelight.coroutines.asFlow
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
-import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.db.payments.*
@@ -119,27 +118,23 @@ class CloudKitPaymentsDb(
                 // In order to optimize disk access, we fetch from 1 table at a time.
 
                 val metadataPlaceholder = WalletPaymentMetadata()
-                val emptyOptions = WalletPaymentFetchOptions.None
 
                 uniquePaymentIds.forEach { paymentId ->
-                    paymentsDb._getPayment(paymentId, emptyOptions)?.let { pair ->
+                    paymentsDb._getPayment(paymentId)?.let { pair ->
                         rowMap[paymentId] = WalletPaymentInfo(
                             payment = pair.first,
                             metadata = metadataPlaceholder,
-                            contact = null,
-                            fetchOptions = emptyOptions
+                            contact = null
                         )
                     }
                 }
 
-                val fetchOptions = WalletPaymentFetchOptions.All - WalletPaymentFetchOptions.Contact
                 uniquePaymentIds.forEach { paymentId ->
-                    paymentsDb.metadataQueries.get(paymentId, fetchOptions)?.let { metadata ->
+                    paymentsDb.metadataQueries.get(paymentId)?.let { metadata ->
                         rowMap[paymentId]?.let {
                             rowMap[paymentId] = it.copy(
                                 metadata = metadata,
-                                contact = null,
-                                fetchOptions = fetchOptions
+                                contact = null
                             )
                         }
                     }
@@ -274,8 +269,7 @@ class CloudKitPaymentsDb(
 
                     val paymentId: UUID = payment.id
                     val existing: WalletPayment? = paymentsDb._getPayment(
-                        id = paymentId,
-                        options = WalletPaymentFetchOptions.None
+                        id = paymentId
                     )?.first
 
                     if (existing == null) {

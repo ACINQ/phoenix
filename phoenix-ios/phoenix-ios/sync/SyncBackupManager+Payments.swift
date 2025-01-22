@@ -674,7 +674,7 @@ extension SyncBackupManager {
 		_ batch: FetchPaymentsQueueBatchResult
 	) -> (Data, Int)? {
 		
-		var wrapper = CloudData.V1(payment: row)
+		let wrapper = CloudData.V1(payment: row)
 		
 		let cleartext: Data = wrapper.serialize().toSwiftData()
 		let unpaddedSize: Int = cleartext.count

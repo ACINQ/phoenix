@@ -394,8 +394,7 @@ class NotificationService: UNNotificationServiceExtension {
 					let paymentInfo = WalletPaymentInfo(
 						payment: receivedPayments.first!,
 						metadata: WalletPaymentMetadata.empty(),
-						contact: nil,
-						fetchOptions: WalletPaymentFetchOptions.companion.None
+						contact: nil
 					)
 					if let desc = paymentInfo.paymentDescription(), desc.count > 0 {
 						bestAttemptContent.body = "\(amountString): \(desc)"

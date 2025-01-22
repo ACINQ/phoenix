@@ -22,7 +22,6 @@ import app.cash.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.utils.*
-import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.db.payments.*
@@ -48,13 +47,13 @@ class SqlitePaymentsDb(
     val metadataQueries = PaymentsMetadataQueries(database)
     private var metadataQueue = MutableStateFlow(mapOf<UUID, WalletPaymentMetadataRow>())
 
-    suspend fun getPayment(id: UUID, options: WalletPaymentFetchOptions): Pair<WalletPayment, WalletPaymentMetadata?>? = withContext(Dispatchers.Default) {
-        _getPayment(id, options)
+    suspend fun getPayment(id: UUID): Pair<WalletPayment, WalletPaymentMetadata?>? = withContext(Dispatchers.Default) {
+        _getPayment(id)
     }
 
-    fun _getPayment(id: UUID, options: WalletPaymentFetchOptions): Pair<WalletPayment, WalletPaymentMetadata?>? = database.transactionWithResult {
+    fun _getPayment(id: UUID): Pair<WalletPayment, WalletPaymentMetadata?>? = database.transactionWithResult {
         database.paymentsQueries.get(id).executeAsOneOrNull()?.let { WalletPaymentAdapter.decode(it) }?.let { payment ->
-            val metadata = metadataQueries.get(id, options)
+            val metadata = metadataQueries.get(id)
             payment to metadata
         }
     }
@@ -112,8 +111,9 @@ class SqlitePaymentsDb(
             .map { list ->
                 withContext(Dispatchers.Default) {
                     list.map { info ->
-                        val contact = contactsManager?.contactForPayment(info.payment)
-                        info.copy(contact = contact, fetchOptions = WalletPaymentFetchOptions.All)
+                        contactsManager?.contactForPayment(info.payment)?.let {
+                            info.copy(contact = it)
+                        } ?: info
                     }
                 }
             }
@@ -126,8 +126,9 @@ class SqlitePaymentsDb(
             .map { list ->
                 withContext(Dispatchers.Default) {
                     list.map { info ->
-                        val contact = contactsManager?.contactForPayment(info.payment)
-                        info.copy(contact = contact, fetchOptions = WalletPaymentFetchOptions.All)
+                        contactsManager?.contactForPayment(info.payment)?.let {
+                            info.copy(contact = it)
+                        } ?: info
                     }
                 }
             }
@@ -141,15 +142,32 @@ class SqlitePaymentsDb(
             .map { list ->
                 withContext(Dispatchers.Default) {
                     list.map { info ->
-                        val contact = contactsManager?.contactForPayment(info.payment)
-                        info.copy(contact = contact, fetchOptions = WalletPaymentFetchOptions.All)
+                        contactsManager?.contactForPayment(info.payment)?.let {
+                            info.copy(contact = it)
+                        } ?: info
                     }
                 }
             }
     }
 
-    suspend fun listCompletedPayments(count: Long, skip: Long, startDate: Long, endDate: Long): List<WalletPaymentInfo> = withContext(Dispatchers.Default) {
-        database.paymentsQueries.listSucceeded(succeeded_at_from = startDate, succeeded_at_to = endDate, limit = count, offset = skip, mapper = ::mapPaymentsAndMetadata).executeAsList()
+    suspend fun listCompletedPayments(count: Long, skip: Long, startDate: Long, endDate: Long): List<WalletPaymentInfo> {
+        return withContext(Dispatchers.Default) {
+            database.paymentsQueries.listSucceeded(
+                succeeded_at_from = startDate,
+                succeeded_at_to = endDate,
+                limit = count,
+                offset = skip,
+                mapper = ::mapPaymentsAndMetadata
+            ).executeAsList()
+        }.let { list ->
+            withContext(Dispatchers.Main) {
+                list.map { info ->
+                    contactsManager?.contactForPayment(info.payment)?.let {
+                        info.copy(contact = it)
+                    } ?: info
+                }
+            }
+        }
     }
 
     @Suppress("UNUSED_PARAMETER")
@@ -164,8 +182,7 @@ class SqlitePaymentsDb(
                 lnurl_base_type, lnurl_base_blob, lnurl_description, lnurl_metadata_type, lnurl_metadata_blob,
                 lnurl_successAction_type, lnurl_successAction_blob,
                 user_description, user_notes, modified_at, original_fiat_type, original_fiat_rate),
-            contact = null,
-            fetchOptions = WalletPaymentFetchOptions.Metadata
+            contact = null
         )
     }
 
@@ -204,8 +221,7 @@ class SqlitePaymentsDb(
         return WalletPaymentInfo(
             payment = payment,
             metadata = metadata,
-            contact = null,
-            fetchOptions = WalletPaymentFetchOptions.Metadata
+            contact = null
         )
     }
 
