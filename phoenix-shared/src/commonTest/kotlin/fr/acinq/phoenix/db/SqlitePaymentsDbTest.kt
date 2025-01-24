@@ -215,11 +215,6 @@ class SqlitePaymentsDbTest {
                 )
             }
     }
-
-    @Test
-    fun `read v12 db`() = runTest {
-        TODO()
-    }
 }
 
 expect fun testPaymentsDriverFromResource(path: String): SqlDriver

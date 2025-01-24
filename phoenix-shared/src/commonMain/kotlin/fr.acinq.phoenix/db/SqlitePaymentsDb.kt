@@ -56,19 +56,19 @@ class SqlitePaymentsDb(
         }
     }
 
-    override suspend fun getInboundLiquidityPurchase(txId: TxId): LiquidityAds.LiquidityTransactionDetails? = withContext(Dispatchers.Default) {
-        database.transactionWithResult {
-            val payments = database.paymentsIncomingQueries.listByTxId(txId).executeAsList() + database.paymentsOutgoingQueries.listByTxId(txId).executeAsList()
-            payments.map {
-                when (it) {
-                    is OnChainIncomingPayment -> it.liquidityPurchaseDetails
-                    is LightningIncomingPayment -> it.liquidityPurchaseDetails
-                    is OnChainOutgoingPayment -> it.liquidityPurchaseDetails
-                    is AutomaticLiquidityPurchasePayment -> it.liquidityPurchaseDetails
-                    is ManualLiquidityPurchasePayment -> it.liquidityPurchaseDetails
-                    else -> null
-                }
-            }.firstOrNull()
+    override suspend fun getInboundLiquidityPurchase(txId: TxId): LiquidityAds.LiquidityTransactionDetails? {
+        val payment = buildList {
+            addAll(database.paymentsIncomingQueries.listByTxId(txId).executeAsList())
+            addAll(database.paymentsOutgoingQueries.listByTxId(txId).executeAsList())
+        }.firstOrNull()
+        return when (payment) {
+            is LightningIncomingPayment -> payment.liquidityPurchaseDetails
+            is OnChainIncomingPayment -> payment.liquidityPurchaseDetails
+            is LegacyPayToOpenIncomingPayment -> null
+            is LegacySwapInIncomingPayment -> null
+            is LightningOutgoingPayment -> null
+            is OnChainOutgoingPayment -> payment.liquidityPurchaseDetails
+            null -> null
         }
     }
 
@@ -78,7 +78,7 @@ class SqlitePaymentsDb(
             database.onChainTransactionsQueries.setLocked(tx_id = txId, locked_at = lockedAt)
             database.paymentsIncomingQueries.listByTxId(txId).executeAsList().filterIsInstance<OnChainIncomingPayment>().forEach { payment ->
                 val payment1 = payment.setLocked(lockedAt)
-                database.paymentsIncomingQueries.update(id = payment1.id, data = payment1, receivedAt = payment1.lockedAt)
+                database.paymentsIncomingQueries.update(id = payment1.id, data = payment1, txId = payment1.txId, receivedAt = payment1.lockedAt)
                 didSaveWalletPayment(payment1.id, database)
             }
             database.paymentsOutgoingQueries.listByTxId(txId).executeAsList().filterIsInstance<OnChainOutgoingPayment>().forEach { payment ->
@@ -95,7 +95,7 @@ class SqlitePaymentsDb(
             database.onChainTransactionsQueries.setConfirmed(tx_id = txId, confirmed_at = confirmedAt)
             database.paymentsIncomingQueries.listByTxId(txId).executeAsList().filterIsInstance<OnChainIncomingPayment>().forEach { payment ->
                 val payment1 = payment.setConfirmed(confirmedAt)
-                database.paymentsIncomingQueries.update(id = payment1.id, data = payment1, receivedAt = payment1.lockedAt)
+                database.paymentsIncomingQueries.update(id = payment1.id, data = payment1, txId = payment1.txId, receivedAt = payment1.lockedAt)
                 didSaveWalletPayment(payment1.id, database)
             }
             database.paymentsOutgoingQueries.listByTxId(txId).executeAsList().filterIsInstance<OnChainOutgoingPayment>().forEach { payment ->

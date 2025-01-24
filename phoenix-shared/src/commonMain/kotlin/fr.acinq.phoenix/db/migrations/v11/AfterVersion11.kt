@@ -21,14 +21,17 @@ import app.cash.sqldelight.TransacterImpl
 import app.cash.sqldelight.db.AfterVersion
 import app.cash.sqldelight.db.QueryResult
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
+import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.db.LightningIncomingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.db.NewChannelIncomingPayment
 import fr.acinq.lightning.db.OnChainOutgoingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.serialization.payment.Serialization
 import fr.acinq.lightning.utils.UUID
-import fr.acinq.lightning.utils.sat
+import fr.acinq.lightning.utils.toByteVector32
 import fr.acinq.phoenix.db.migrations.v11.queries.ChannelCloseOutgoingQueries
 import fr.acinq.phoenix.db.migrations.v11.queries.InboundLiquidityQueries
 import fr.acinq.phoenix.db.migrations.v11.queries.LightningOutgoingQueries
@@ -174,13 +177,40 @@ val AfterVersion11 = AfterVersion(11) { driver ->
         groupByRawChannelCloseOutgoing(channelCloseOutgoingPayments)
             .map { insertPayment(it) }
 
+        val incomingPayments = driver.executeQuery(
+            identifier = null,
+            sql = "SELECT data FROM payments_incoming",
+            parameters = 0,
+            mapper = { cursor ->
+                val result = buildMap<TxId, IncomingPayment> {
+                    while (cursor.next().value) {
+                        val data = cursor.getBytes(0)!!
+                        when(val incomingPayment = Serialization.deserialize(data).getOrThrow()) {
+                            is LightningIncomingPayment ->
+                                when(val txId = incomingPayment.parts
+                                    .filterIsInstance<LightningIncomingPayment.Part.Htlc>()
+                                    .firstNotNullOfOrNull { it.fundingFee?.fundingTxId }) {
+                                is TxId -> put(txId, incomingPayment)
+                                else -> {}
+                            }
+                            is NewChannelIncomingPayment -> put(incomingPayment.txId, incomingPayment)
+                            else -> {}
+                        }
+                    }
+                }
+                QueryResult.Value(result)
+            }
+        ).value
+
         driver.executeQuery(
             identifier = null,
             sql = "SELECT id, mining_fees_sat, channel_id, tx_id, lease_type, lease_blob, created_at, confirmed_at, locked_at FROM inbound_liquidity_outgoing_payments",
             parameters = 0,
             mapper = { cursor ->
                 while (cursor.next().value) {
-                    val payment = InboundLiquidityQueries.mapPayment(
+
+                    val txId = TxId(cursor.getBytes(3)!!.toByteVector32())
+                    val (updatedIncomingPayment, liquidityPayment) = InboundLiquidityQueries.mapPayment(
                         id = cursor.getString(0)!!,
                         mining_fees_sat = cursor.getLong(1)!!,
                         channel_id = cursor.getBytes(2)!!,
@@ -189,48 +219,22 @@ val AfterVersion11 = AfterVersion(11) { driver ->
                         lease_blob = cursor.getBytes(5)!!,
                         created_at = cursor.getLong(6)!!,
                         confirmed_at = cursor.getLong(7),
-                        locked_at = cursor.getLong(8)
+                        locked_at = cursor.getLong(8),
+                        incomingPayment = incomingPayments[txId]
                     )
 
-                    if (payment.liquidityPurchase.amount == 1.sat) {
-                        // Liquidity purchases of 1 sat where just a way to represent liquidity fees associated to
-                        // the creation of a channel via a swap-in. They are now integrated into NewChannelIncomingPayment.
-                        TODO("also put the liquidity purchase data in the outgoing payments purchase parameter")
-                        val incomingPayment = driver.executeQuery(
+                    updatedIncomingPayment?.let {
+                        driver.execute(
                             identifier = null,
-                            sql = "SELECT data FROM payments_incoming WHERE tx_id=?",
-                            parameters = 1,
-                            binders = {
-                                bindBytes(0, payment.txId.value.toByteArray())
-                            },
-                            mapper = { cursor2 ->
-                                if (!cursor2.next().value) {
-                                    QueryResult.Value(null)
-                                } else {
-                                    val data = cursor2.getBytes(0)!!
-                                    val incomingPayment = Serialization.deserialize(data).getOrThrow()
-                                    QueryResult.Value(incomingPayment)
-                                }
-                            }
-                        ).value as? NewChannelIncomingPayment
-
-                        incomingPayment?.let {
-                            val incomingPayment1 = incomingPayment.copy(
-                                miningFee = payment.miningFee + incomingPayment.miningFee, // we must add the incoming payment local mining fee to the liquidity purchase's mining fee
-                                liquidityPurchase = payment.liquidityPurchase,
-                            )
-                            driver.execute(
-                                identifier = null,
-                                sql = "UPDATE payments_incoming SET data=? WHERE id=?".trimMargin(),
-                                parameters = 2
-                            ) {
-                                bindBytes(0, Serialization.serialize(incomingPayment1))
-                                bindBytes(1, incomingPayment1.id.toByteArray())
-                            }
+                            sql = "UPDATE payments_incoming SET data=? WHERE id=?".trimMargin(),
+                            parameters = 2
+                        ) {
+                            bindBytes(0, Serialization.serialize(updatedIncomingPayment))
+                            bindBytes(1, updatedIncomingPayment.id.toByteArray())
                         }
-                    } else {
-                        insertPayment(payment)
                     }
+
+                    liquidityPayment?.let { insertPayment(liquidityPayment) }
                 }
                 QueryResult.Unit
             }

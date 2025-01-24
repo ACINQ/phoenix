@@ -39,12 +39,17 @@ class SqliteIncomingPaymentsDb(private val database: PaymentsDatabase) : Incomin
                 database.paymentsIncomingQueries.insert(
                     id = incomingPayment.id,
                     payment_hash = (incomingPayment as? LightningIncomingPayment)?.paymentHash,
-                    tx_id = (incomingPayment as? OnChainIncomingPayment)?.txId,
+                    tx_id = when (incomingPayment) {
+                        is LightningIncomingPayment -> incomingPayment.liquidityPurchaseDetails?.txId
+                        is OnChainIncomingPayment -> incomingPayment.txId
+                        else -> null
+                    },
                     created_at = incomingPayment.createdAt,
                     received_at = incomingPayment.completedAt,
                     data_ = incomingPayment
                 )
                 // if the payment is on-chain, save the tx id link to the db
+                // NB: for LightningIncomingPayment, there will be a corresponding payment in the outgoing db
                 when (incomingPayment) {
                     is OnChainIncomingPayment -> {
                         database.onChainTransactionsQueries.insert(
@@ -77,8 +82,23 @@ class SqliteIncomingPaymentsDb(private val database: PaymentsDatabase) : Incomin
                         database.paymentsIncomingQueries.update(
                             id = paymentInDb1.id,
                             data = paymentInDb1,
-                            receivedAt = paymentInDb1.completedAt
+                            receivedAt = paymentInDb1.completedAt,
+                            txId = paymentInDb1.liquidityPurchaseDetails?.txId
                         )
+                        liquidityPurchase?.let {
+                            when (val autoLiquidityPayment = database.paymentsOutgoingQueries.listByTxId(liquidityPurchase.txId).executeAsOneOrNull()) {
+                                is AutomaticLiquidityPurchasePayment -> {
+                                    val autoLiquidityPayment1 = autoLiquidityPayment.copy(incomingPaymentReceivedAt = paymentInDb1.completedAt)
+                                    database.paymentsOutgoingQueries.update(
+                                        id = autoLiquidityPayment1.id,
+                                        completed_at = autoLiquidityPayment1.completedAt,
+                                        succeeded_at = autoLiquidityPayment1.succeededAt,
+                                        data = autoLiquidityPayment1
+                                    )
+                                }
+                                else -> {}
+                            }
+                        }
                         didSaveWalletPayment(paymentInDb1.id, database)
                     }
                     null -> error("missing payment for payment_hash=$paymentHash")

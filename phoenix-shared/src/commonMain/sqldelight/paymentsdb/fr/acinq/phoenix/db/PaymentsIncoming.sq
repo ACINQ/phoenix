@@ -37,6 +37,7 @@ VALUES (?, ?, ?, ?, ?, ?);
 update:
 UPDATE payments_incoming
 SET    received_at=:receivedAt,
+       tx_id=:txId,
        data=:data
 WHERE  id=:id;
 

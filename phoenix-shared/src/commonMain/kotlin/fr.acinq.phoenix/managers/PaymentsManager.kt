@@ -4,15 +4,14 @@ import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.PaymentEvents
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.db.LightningIncomingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.logging.LoggerFactory
+import fr.acinq.lightning.logging.debug
+import fr.acinq.lightning.logging.info
 import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.SqlitePaymentsDb
-import fr.acinq.lightning.logging.debug
-import fr.acinq.lightning.logging.info
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
