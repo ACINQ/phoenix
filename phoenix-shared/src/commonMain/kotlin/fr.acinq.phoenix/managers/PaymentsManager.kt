@@ -3,7 +3,6 @@ package fr.acinq.phoenix.managers
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.PaymentEvents
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
-import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.LightningIncomingPayment
 import fr.acinq.lightning.db.WalletPayment
@@ -14,8 +13,6 @@ import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.SqlitePaymentsDb
 import fr.acinq.lightning.logging.debug
 import fr.acinq.lightning.logging.info
-import fr.acinq.lightning.wire.LiquidityAds
-import fr.acinq.phoenix.utils.extensions.relatedPaymentIds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -137,20 +134,6 @@ class PaymentsManager(
      */
     suspend fun listPaymentsForTxId(txId: TxId): List<WalletPayment> {
         return paymentsDb().listPaymentsForTxId(txId)
-    }
-
-    /**
-     * Returns the liquidity purchase associated to a transaction id.
-     *
-     * When receiving payments over Lightning, a liquidity purchase may be needed because of low liquidity.. The link between the incoming payment
-     * and the liquidity purchase is done through the transaction ID field (see [LiquidityAds.FundingFee] in [LightningIncomingPayment.Part.Htlc]).
-     *
-     * This allows us to display the service/mining fees of a liquidity purchase inside the incoming payment details screen.
-     */
-    suspend fun getLiquidityPurchaseForTxId(
-        txId: TxId
-    ): InboundLiquidityOutgoingPayment? {
-        return paymentsDb().getInboundLiquidityPurchase(txId)
     }
 
     /**

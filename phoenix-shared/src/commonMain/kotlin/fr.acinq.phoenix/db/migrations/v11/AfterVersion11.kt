@@ -191,9 +191,11 @@ val AfterVersion11 = AfterVersion(11) { driver ->
                         confirmed_at = cursor.getLong(7),
                         locked_at = cursor.getLong(8)
                     )
-                    if (payment.purchase.amount == 1.sat) {
+
+                    if (payment.liquidityPurchase.amount == 1.sat) {
                         // Liquidity purchases of 1 sat where just a way to represent liquidity fees associated to
                         // the creation of a channel via a swap-in. They are now integrated into NewChannelIncomingPayment.
+                        TODO("also put the liquidity purchase data in the outgoing payments purchase parameter")
                         val incomingPayment = driver.executeQuery(
                             identifier = null,
                             sql = "SELECT data FROM payments_incoming WHERE tx_id=?",
@@ -206,15 +208,17 @@ val AfterVersion11 = AfterVersion(11) { driver ->
                                     QueryResult.Value(null)
                                 } else {
                                     val data = cursor2.getBytes(0)!!
-                                    val incomingPayment =
-                                        Serialization.deserialize(data).getOrThrow()
+                                    val incomingPayment = Serialization.deserialize(data).getOrThrow()
                                     QueryResult.Value(incomingPayment)
                                 }
                             }
                         ).value as? NewChannelIncomingPayment
 
                         incomingPayment?.let {
-                            val incomingPayment1 = incomingPayment.copy(liquidityPurchase = payment.purchase)
+                            val incomingPayment1 = incomingPayment.copy(
+                                miningFee = payment.miningFee + incomingPayment.miningFee, // we must add the incoming payment local mining fee to the liquidity purchase's mining fee
+                                liquidityPurchase = payment.liquidityPurchase,
+                            )
                             driver.execute(
                                 identifier = null,
                                 sql = "UPDATE payments_incoming SET data=? WHERE id=?".trimMargin(),

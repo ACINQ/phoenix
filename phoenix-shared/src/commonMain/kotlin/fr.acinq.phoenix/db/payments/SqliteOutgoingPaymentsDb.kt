@@ -17,8 +17,6 @@
 package fr.acinq.phoenix.db.payments
 
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.bitcoin.TxId
-import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.db.OnChainOutgoingPayment
 import fr.acinq.lightning.db.OutgoingPayment
@@ -120,14 +118,6 @@ class SqliteOutgoingPaymentsDb(private val database: PaymentsDatabase) : Outgoin
                 )
                 didSaveWalletPayment(parentId, database)
             }
-        }
-    }
-
-    override suspend fun getInboundLiquidityPurchase(fundingTxId: TxId): InboundLiquidityOutgoingPayment? {
-        return withContext(Dispatchers.Default) {
-            database.paymentsOutgoingQueries.listByTxId(fundingTxId).executeAsList()
-                .filterIsInstance<InboundLiquidityOutgoingPayment>()
-                .firstOrNull()
         }
     }
 

@@ -20,15 +20,14 @@ import app.cash.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.OutPoint
 import fr.acinq.bitcoin.TxId
+import fr.acinq.lightning.db.AutomaticLiquidityPurchasePayment
 import fr.acinq.lightning.db.Bolt11IncomingPayment
-import fr.acinq.lightning.db.Bolt12IncomingPayment
 import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
-import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
-import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.LegacyPayToOpenIncomingPayment
 import fr.acinq.lightning.db.LegacySwapInIncomingPayment
 import fr.acinq.lightning.db.LightningIncomingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
+import fr.acinq.lightning.db.ManualLiquidityPurchasePayment
 import fr.acinq.lightning.db.NewChannelIncomingPayment
 import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
 import fr.acinq.lightning.db.SpliceOutgoingPayment
@@ -43,7 +42,6 @@ import fr.acinq.phoenix.utils.extensions.WalletPaymentState
 import fr.acinq.phoenix.utils.extensions.state
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertIs
 
 
 @Suppress("DEPRECATION")
@@ -64,7 +62,8 @@ class SqlitePaymentsDbTest {
         assertEquals(0, payments.filterIsInstance<SpliceOutgoingPayment>().size)
         assertEquals(0, payments.filterIsInstance<SpliceCpfpOutgoingPayment>().size)
         assertEquals(5, payments.filterIsInstance<LightningOutgoingPayment>().size)
-        assertEquals(0, payments.filterIsInstance<InboundLiquidityOutgoingPayment>().size)
+        assertEquals(0, payments.filterIsInstance<ManualLiquidityPurchasePayment>().size)
+        assertEquals(0, payments.filterIsInstance<AutomaticLiquidityPurchasePayment>().size)
         assertEquals(0, payments.filterIsInstance<ChannelCloseOutgoingPayment>().size)
 
         assertEquals(3 + 5, payments.size)
@@ -89,7 +88,8 @@ class SqlitePaymentsDbTest {
         assertEquals(0, payments.filterIsInstance<SpliceOutgoingPayment>().size)
         assertEquals(0, payments.filterIsInstance<SpliceCpfpOutgoingPayment>().size)
         assertEquals(2, payments.filterIsInstance<LightningOutgoingPayment>().size)
-        assertEquals(0, payments.filterIsInstance<InboundLiquidityOutgoingPayment>().size)
+        assertEquals(0, payments.filterIsInstance<ManualLiquidityPurchasePayment>().size)
+        assertEquals(0, payments.filterIsInstance<AutomaticLiquidityPurchasePayment>().size)
         assertEquals(0, payments.filterIsInstance<ChannelCloseOutgoingPayment>().size)
 
         assertEquals(4 + 1 + 1 + 2, payments.size)
@@ -114,7 +114,8 @@ class SqlitePaymentsDbTest {
         assertEquals(0, payments.filterIsInstance<SpliceOutgoingPayment>().size)
         assertEquals(0, payments.filterIsInstance<SpliceCpfpOutgoingPayment>().size)
         assertEquals(6, payments.filterIsInstance<LightningOutgoingPayment>().size)
-        assertEquals(0, payments.filterIsInstance<InboundLiquidityOutgoingPayment>().size)
+        assertEquals(0, payments.filterIsInstance<ManualLiquidityPurchasePayment>().size)
+        assertEquals(0, payments.filterIsInstance<AutomaticLiquidityPurchasePayment>().size)
         assertEquals(4, payments.filterIsInstance<ChannelCloseOutgoingPayment>().size)
 
         assertEquals(1 + 4 + 6 + 4, payments.size)

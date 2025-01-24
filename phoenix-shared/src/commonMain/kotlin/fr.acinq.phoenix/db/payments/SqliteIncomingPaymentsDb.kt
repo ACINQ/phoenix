@@ -17,11 +17,13 @@
 package fr.acinq.phoenix.db.payments
 
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.lightning.db.AutomaticLiquidityPurchasePayment
 import fr.acinq.lightning.db.Bolt11IncomingPayment
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.IncomingPaymentsDb
 import fr.acinq.lightning.db.LightningIncomingPayment
 import fr.acinq.lightning.db.OnChainIncomingPayment
+import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.db.PaymentsDatabase
 import fr.acinq.phoenix.db.didDeleteWalletPayment
 import fr.acinq.phoenix.db.didSaveWalletPayment
@@ -44,11 +46,16 @@ class SqliteIncomingPaymentsDb(private val database: PaymentsDatabase) : Incomin
                 )
                 // if the payment is on-chain, save the tx id link to the db
                 when (incomingPayment) {
-                    is OnChainIncomingPayment ->
+                    is OnChainIncomingPayment -> {
                         database.onChainTransactionsQueries.insert(
                             payment_id = incomingPayment.id,
                             tx_id = incomingPayment.txId
                         )
+                        val autoLiquidityPurchases = database.paymentsOutgoingQueries.listByTxId(incomingPayment.txId).executeAsList().filterIsInstance<AutomaticLiquidityPurchasePayment>()
+                        autoLiquidityPurchases.forEach {
+                            TODO()
+                        }
+                    }
                     else -> {}
                 }
                 didSaveWalletPayment(incomingPayment.id, database)
@@ -61,12 +68,12 @@ class SqliteIncomingPaymentsDb(private val database: PaymentsDatabase) : Incomin
             database.paymentsIncomingQueries.getByPaymentHash(paymentHash).executeAsOneOrNull() as? LightningIncomingPayment
         }
 
-    override suspend fun receiveLightningPayment(paymentHash: ByteVector32, parts: List<LightningIncomingPayment.Part>) {
+    override suspend fun receiveLightningPayment(paymentHash: ByteVector32, parts: List<LightningIncomingPayment.Part>, liquidityPurchase: LiquidityAds.LiquidityTransactionDetails?) {
         withContext(Dispatchers.Default) {
             database.transaction {
                 when (val paymentInDb = database.paymentsIncomingQueries.getByPaymentHash(paymentHash).executeAsOneOrNull() as? LightningIncomingPayment) {
                     is LightningIncomingPayment -> {
-                        val paymentInDb1 = paymentInDb.addReceivedParts(parts)
+                        val paymentInDb1 = paymentInDb.addReceivedParts(parts, liquidityPurchase)
                         database.paymentsIncomingQueries.update(
                             id = paymentInDb1.id,
                             data = paymentInDb1,

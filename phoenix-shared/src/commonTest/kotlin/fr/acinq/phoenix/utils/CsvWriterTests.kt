@@ -43,6 +43,7 @@ class CsvWriterTests {
             id = UUID.randomUUID(),
             amountReceived = 100_000_000.msat,
             miningFee = 4_000.sat,
+            liquidityPurchase = null,
             channelId = randomBytes32(),
             txId = TxId(randomBytes32()),
             localInputs = setOf(),

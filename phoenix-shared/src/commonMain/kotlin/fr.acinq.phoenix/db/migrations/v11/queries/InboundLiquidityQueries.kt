@@ -17,7 +17,9 @@
 package fr.acinq.phoenix.db.migrations.v11.queries
 
 import fr.acinq.bitcoin.TxId
-import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
+import fr.acinq.lightning.db.AutomaticLiquidityPurchasePayment
+import fr.acinq.lightning.db.ManualLiquidityPurchasePayment
+import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toByteVector32
@@ -37,18 +39,19 @@ class InboundLiquidityQueries(val database: PaymentsDatabase) {
             created_at: Long,
             confirmed_at: Long?,
             locked_at: Long?
-        ): InboundLiquidityOutgoingPayment {
+        ): AutomaticLiquidityPurchasePayment {
             val purchase = PurchaseData.decodeAsCanonical(lease_type, lease_blob)
-            return InboundLiquidityOutgoingPayment(
-                id = UUID.fromString(id),
-                channelId = channel_id.toByteVector32(),
-                miningFee = mining_fees_sat.sat,
-                txId = TxId(tx_id),
-                purchase = purchase,
-                createdAt = created_at,
-                confirmedAt = confirmed_at,
-                lockedAt = locked_at
-            )
+//            return LiquidityPurchasePayment(
+//                id = UUID.fromString(id),
+//                miningFee = mining_fees_sat.sat,
+//                channelId = channel_id.toByteVector32(),
+//                txId = TxId(tx_id),
+//                liquidityPurchase = purchase,
+//                createdAt = created_at,
+//                confirmedAt = confirmed_at,
+//                lockedAt = locked_at
+//            )
+            TODO("map to manual or auto liquidity")
         }
     }
 }

@@ -407,18 +407,18 @@ fun mapIncomingPaymentFromV10(
                         is IncomingReceivedWithData.Part.NewChannel.V2 -> it.amount
                     }
                 }.sum(),
-            serviceFee = parts.filterIsInstance<IncomingReceivedWithData.Part.NewChannel>().map {
-                when (it) {
-                    is IncomingReceivedWithData.Part.NewChannel.V0 -> it.fees
-                    is IncomingReceivedWithData.Part.NewChannel.V1 -> it.fees
-                    is IncomingReceivedWithData.Part.NewChannel.V2 -> it.serviceFee
-                }
-            }.sum(),
             miningFee = parts.filterIsInstance<IncomingReceivedWithData.Part.NewChannel>().map {
                 when (it) {
                     is IncomingReceivedWithData.Part.NewChannel.V0 -> 0.sat
                     is IncomingReceivedWithData.Part.NewChannel.V1 -> 0.sat
                     is IncomingReceivedWithData.Part.NewChannel.V2 -> it.miningFee
+                }
+            }.sum(),
+            serviceFee = parts.filterIsInstance<IncomingReceivedWithData.Part.NewChannel>().map {
+                when (it) {
+                    is IncomingReceivedWithData.Part.NewChannel.V0 -> it.fees
+                    is IncomingReceivedWithData.Part.NewChannel.V1 -> it.fees
+                    is IncomingReceivedWithData.Part.NewChannel.V2 -> it.serviceFee
                 }
             }.sum(),
             liquidityPurchase = null, // will be populated in migration v11
@@ -459,6 +459,7 @@ fun mapIncomingPaymentFromV10(
                     is IncomingReceivedWithData.Part.SpliceIn.V0 -> it.miningFee
                 }
             }.sum(),
+            liquidityPurchase = null,
             channelId = parts.filterIsInstance<IncomingReceivedWithData.Part.SpliceIn>().map {
                 when (it) {
                     is IncomingReceivedWithData.Part.SpliceIn.V0 -> it.channelId

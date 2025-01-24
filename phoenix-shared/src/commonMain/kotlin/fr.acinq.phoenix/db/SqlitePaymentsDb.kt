@@ -22,6 +22,7 @@ import app.cash.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.utils.*
+import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.WalletPaymentMetadata
@@ -52,6 +53,22 @@ class SqlitePaymentsDb(
                 val metadata = metadataQueries.get(id, options)
                 payment to metadata
             }
+        }
+    }
+
+    override suspend fun getInboundLiquidityPurchase(txId: TxId): LiquidityAds.LiquidityTransactionDetails? = withContext(Dispatchers.Default) {
+        database.transactionWithResult {
+            val payments = database.paymentsIncomingQueries.listByTxId(txId).executeAsList() + database.paymentsOutgoingQueries.listByTxId(txId).executeAsList()
+            payments.map {
+                when (it) {
+                    is OnChainIncomingPayment -> it.liquidityPurchaseDetails
+                    is LightningIncomingPayment -> it.liquidityPurchaseDetails
+                    is OnChainOutgoingPayment -> it.liquidityPurchaseDetails
+                    is AutomaticLiquidityPurchasePayment -> it.liquidityPurchaseDetails
+                    is ManualLiquidityPurchasePayment -> it.liquidityPurchaseDetails
+                    else -> null
+                }
+            }.firstOrNull()
         }
     }
 

@@ -1,7 +1,9 @@
 package fr.acinq.phoenix.db.cloud.payments
 
 import fr.acinq.bitcoin.TxId
-import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
+import fr.acinq.lightning.db.AutomaticLiquidityPurchasePayment
+import fr.acinq.lightning.db.ManualLiquidityPurchasePayment
+import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toByteVector32
@@ -29,18 +31,33 @@ data class InboundLiquidityPaymentWrapper(
     val lockedAt: Long?,
 ) {
     @Throws(Exception::class)
-    fun unwrap(): InboundLiquidityOutgoingPayment {
+    fun unwrap(): WalletPayment {
         val purchase = this.purchase.unwrap()
-        return InboundLiquidityOutgoingPayment(
-            id = this.id,
-            channelId = this.channelId.toByteVector32(),
-            txId = TxId(this.txId),
-            miningFee = this.miningFeesSat.sat,
-            purchase = purchase,
-            createdAt = this.createdAt,
-            confirmedAt = this.confirmedAt,
-            lockedAt = this.lockedAt,
-        )
+//        return if (purchase.amount == 1.sat) {
+//            AutomaticLiquidityPurchasePayment(
+//                id = this.id,
+//                channelId = this.channelId.toByteVector32(),
+//                txId = TxId(this.txId),
+//                miningFee = this.miningFeesSat.sat,
+//                liquidityPurchase = purchase,
+//                createdAt = this.createdAt,
+//                confirmedAt = this.confirmedAt,
+//                lockedAt = this.lockedAt,
+//                incomingPaymentReceivedAt = this.confirmedAt
+//            )
+//        } else {
+//            ManualLiquidityPurchasePayment(
+//                id = this.id,
+//                channelId = this.channelId.toByteVector32(),
+//                txId = TxId(this.txId),
+//                miningFee = this.miningFeesSat.sat,
+//                liquidityPurchase = purchase,
+//                createdAt = this.createdAt,
+//                confirmedAt = this.confirmedAt,
+//                lockedAt = this.lockedAt,
+//            )
+//        }
+        TODO()
     }
 
     @Serializable
@@ -67,18 +84,33 @@ data class InboundLiquidityLegacyWrapper(
     val lockedAt: Long?,
 ) {
     @Throws(Exception::class)
-    fun unwrap(): InboundLiquidityOutgoingPayment {
-        val lease = this.lease.unwrap()
-        return InboundLiquidityOutgoingPayment(
-            id = this.id,
-            channelId = this.channelId.toByteVector32(),
-            txId = TxId(this.txId),
-            miningFee = this.miningFeesSat.sat,
-            purchase = lease,
-            createdAt = this.createdAt,
-            confirmedAt = this.confirmedAt,
-            lockedAt = this.lockedAt,
-        )
+    fun unwrap(): WalletPayment {
+        val purchase = this.lease.unwrap()
+//        return if (purchase.amount == 1.sat) {
+//            AutomaticLiquidityPurchasePayment(
+//                id = this.id,
+//                channelId = this.channelId.toByteVector32(),
+//                txId = TxId(this.txId),
+//                miningFee = this.miningFeesSat.sat,
+//                liquidityPurchase = purchase,
+//                createdAt = this.createdAt,
+//                confirmedAt = this.confirmedAt,
+//                lockedAt = this.lockedAt,
+//                incomingPaymentReceivedAt = this.confirmedAt
+//            )
+//        } else {
+//            ManualLiquidityPurchasePayment(
+//                id = this.id,
+//                channelId = this.channelId.toByteVector32(),
+//                txId = TxId(this.txId),
+//                miningFee = this.miningFeesSat.sat,
+//                liquidityPurchase = purchase,
+//                createdAt = this.createdAt,
+//                confirmedAt = this.confirmedAt,
+//                lockedAt = this.lockedAt,
+//            )
+//        }
+        TODO()
     }
 
     @Serializable

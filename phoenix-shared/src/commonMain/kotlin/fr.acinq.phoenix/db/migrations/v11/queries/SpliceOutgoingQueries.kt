@@ -42,8 +42,9 @@ class SpliceOutgoingQueries(val database: PaymentsDatabase) {
                 recipientAmount = recipient_amount_sat.sat,
                 address = address,
                 miningFee = mining_fees_sat.sat,
-                txId = TxId(tx_id),
                 channelId = channel_id.toByteVector32(),
+                txId = TxId(tx_id),
+                liquidityPurchase = null,
                 createdAt = created_at,
                 confirmedAt = confirmed_at,
                 lockedAt = locked_at

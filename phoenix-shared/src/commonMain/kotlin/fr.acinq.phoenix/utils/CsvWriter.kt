@@ -1,10 +1,7 @@
 package fr.acinq.phoenix.utils
 
 import fr.acinq.lightning.db.*
-import fr.acinq.lightning.utils.msat
-import fr.acinq.lightning.utils.sum
 import fr.acinq.phoenix.data.WalletPaymentInfo
-import fr.acinq.phoenix.utils.extensions.isManualPurchase
 import kotlinx.datetime.Instant
 
 class CsvWriter {
@@ -140,10 +137,8 @@ class CsvWriter {
                     is SpliceOutgoingPayment -> "Outgoing splice to ${payment.address}"
                     is ChannelCloseOutgoingPayment -> "Channel closing to ${payment.address}"
                     is SpliceCpfpOutgoingPayment -> "Accelerate transactions with CPFP"
-                    is InboundLiquidityOutgoingPayment -> when {
-                        payment.isManualPurchase() -> "Manual liquidity (+${payment.purchase.amount.sat} sat)"
-                        else -> "Channel management"
-                    }
+                    is AutomaticLiquidityPurchasePayment -> "Channel management"
+                    is ManualLiquidityPurchasePayment -> "Manual liquidity purchase"
                     else -> TODO()
                 }
                 row += ",${processField(details)}"

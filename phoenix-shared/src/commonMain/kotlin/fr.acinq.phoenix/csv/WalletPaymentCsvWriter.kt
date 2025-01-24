@@ -20,12 +20,13 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.db.AutomaticLiquidityPurchasePayment
 import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
-import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
 import fr.acinq.lightning.db.LegacyPayToOpenIncomingPayment
 import fr.acinq.lightning.db.LegacySwapInIncomingPayment
 import fr.acinq.lightning.db.LightningIncomingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
+import fr.acinq.lightning.db.ManualLiquidityPurchasePayment
 import fr.acinq.lightning.db.OnChainIncomingPayment
 import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
 import fr.acinq.lightning.db.SpliceOutgoingPayment
@@ -140,7 +141,13 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
             is SpliceOutgoingPayment -> listOf(Details(Type.swap_out, amount = -payment.amount, feeCredit = 0.msat, miningFee = payment.miningFee, serviceFee = 0.msat, paymentHash = null, txId = payment.txId, destination = payment.address))
             is ChannelCloseOutgoingPayment -> listOf(Details(Type.channel_close, amount = -payment.amount, feeCredit = 0.msat, miningFee = payment.miningFee, serviceFee = 0.msat, paymentHash = null, txId = payment.txId, destination = payment.address))
             is SpliceCpfpOutgoingPayment -> listOf(Details(Type.fee_bumping, amount = -payment.amount, feeCredit = 0.msat, miningFee = payment.miningFee, serviceFee = 0.msat, paymentHash = null, txId = payment.txId))
-            is InboundLiquidityOutgoingPayment -> listOf(Details(Type.liquidity_purchase, amount = -payment.feePaidFromChannelBalance.total.toMilliSatoshi(), feeCredit = -payment.feeCreditUsed, miningFee = payment.miningFee, serviceFee = payment.serviceFee.toMilliSatoshi(), paymentHash = null, txId = payment.txId, description = "+${payment.purchase.amount.sat} sat liquidity"))
+            is AutomaticLiquidityPurchasePayment -> if (payment.incomingPaymentReceivedAt != null) {
+                // ignore this purchase, the purchase data are stored in the object that triggered the purchase
+                emptyList()
+            } else {
+                listOf(Details(Type.liquidity_purchase, amount = -payment.amount, feeCredit = 0.msat, miningFee = payment.miningFee, serviceFee = payment.serviceFee, paymentHash = null, txId = payment.txId, description = "+${payment.amount.truncateToSatoshi().sat} sat liquidity (automatic)"))
+            }
+            is ManualLiquidityPurchasePayment -> listOf(Details(Type.liquidity_purchase, amount = -payment.amount, feeCredit = 0.msat, miningFee = payment.miningFee, serviceFee = payment.serviceFee, paymentHash = null, txId = payment.txId, description = "+${payment.amount.truncateToSatoshi().sat} sat liquidity (manual)"))
         }
 
         details.forEach { addRow(timestamp, id, it, metadata) }
