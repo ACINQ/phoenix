@@ -383,7 +383,8 @@
     <string name="paymentdetails_type_outgoing_close">Platba uzatvárajúca kanál</string>
     <string name="paymentdetails_type_outgoing_splice">Odchádzajúca splice platba</string>
     <string name="paymentdetails_type_outgoing_splice_cpfp">Urýchlenie on-chain transakcií</string>
-    <string name="paymentdetails_type_outgoing_liquidity">Požiadavka na prichádzajúcu likviditu</string>
+    <string name="paymentdetails_type_outgoing_liquidity_manual">Požiadavka na prichádzajúcu likviditu (manual)</string>
+    <string name="paymentdetails_type_outgoing_liquidity_auto">Požiadavka na prichádzajúcu likviditu (auto)</string>
     <string name="paymentdetails_type_outgoing_bolt11">Odchádzajúca Lightning platba (bolt11)</string>
     <string name="paymentdetails_type_outgoing_bolt12">Odchádzajúca Lightning platba (bolt12)</string>
     <string name="paymentdetails_type_incoming_bolt11">Prichádzajúca Lightning platba (bolt11)</string>

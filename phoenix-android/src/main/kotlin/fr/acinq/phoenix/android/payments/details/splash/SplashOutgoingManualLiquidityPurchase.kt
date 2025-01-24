@@ -36,7 +36,7 @@ import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.utils.extensions.state
 
 @Composable
-fun SplashLiquidityPurchase(
+fun SplashManualLiquidityPurchase(
     payment: ManualLiquidityPurchasePayment,
 ) {
     SplashAmount(amount = payment.amount, state = payment.state(), isOutgoing = true)
@@ -47,7 +47,7 @@ fun SplashLiquidityPurchase(
 }
 
 @Composable
-fun SplashStatusLiquidityPurchase(payment: ManualLiquidityPurchasePayment, fromEvent: Boolean) {
+fun SplashStatusManualLiquidityPurchase(payment: ManualLiquidityPurchasePayment, fromEvent: Boolean) {
     when (val lockedAt = payment.lockedAt) {
         null -> {
             PaymentStatusIcon(

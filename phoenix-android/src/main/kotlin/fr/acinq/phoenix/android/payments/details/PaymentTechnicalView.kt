@@ -80,6 +80,7 @@ import fr.acinq.phoenix.android.payments.details.technical.TechnicalIncomingLega
 import fr.acinq.phoenix.android.payments.details.technical.TechnicalIncomingLegacySwapIn
 import fr.acinq.phoenix.android.payments.details.technical.TechnicalIncomingNewChannel
 import fr.acinq.phoenix.android.payments.details.technical.TechnicalIncomingSpliceIn
+import fr.acinq.phoenix.android.payments.details.technical.TechnicalOutgoingAutoLiquidity
 import fr.acinq.phoenix.android.payments.details.technical.TechnicalOutgoingChannelClose
 import fr.acinq.phoenix.android.payments.details.technical.TechnicalOutgoingLightning
 import fr.acinq.phoenix.android.payments.details.technical.TechnicalOutgoingManualLiquidity
@@ -116,7 +117,7 @@ fun PaymentDetailsTechnicalView(
         is LightningOutgoingPayment -> TechnicalOutgoingLightning(payment, originalFiatRate)
         is ChannelCloseOutgoingPayment -> TechnicalOutgoingChannelClose(payment, originalFiatRate)
         is ManualLiquidityPurchasePayment -> TechnicalOutgoingManualLiquidity(payment, originalFiatRate)
-        is AutomaticLiquidityPurchasePayment -> TODO()
+        is AutomaticLiquidityPurchasePayment -> TechnicalOutgoingAutoLiquidity(payment, originalFiatRate)
         is SpliceCpfpOutgoingPayment -> TechnicalOutgoingSpliceCpfp(payment, originalFiatRate)
         is SpliceOutgoingPayment -> TechnicalOutgoingSplice(payment, originalFiatRate)
     }

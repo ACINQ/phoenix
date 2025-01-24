@@ -364,7 +364,8 @@
     <string name="paymentdetails_type_outgoing_close">Thanh toán đóng kênh</string>
     <string name="paymentdetails_type_outgoing_splice">Thanh toán splice đầu ra</string>
     <string name="paymentdetails_type_outgoing_splice_cpfp">Tăng tốc các giao dịch on-chain</string>
-    <string name="paymentdetails_type_outgoing_liquidity">Yêu cầu thanh khoản đầu vào</string>
+    <string name="paymentdetails_type_outgoing_liquidity_manual">Yêu cầu thanh khoản đầu vào (manual)</string>
+    <string name="paymentdetails_type_outgoing_liquidity_auto">Yêu cầu thanh khoản đầu vào (auto)</string>
     <string name="paymentdetails_type_outgoing_bolt11">Thanh toán đầu ra Lightning (bolt11)</string>
     <string name="paymentdetails_type_outgoing_bolt12">Thanh toán đầu ra Lightning (bolt12)</string>
     <string name="paymentdetails_type_incoming_bolt11">Thanh toán đầu vào Lightning (bolt11)</string>

@@ -377,7 +377,8 @@
     <string name="paymentdetails_type_outgoing_close">Clôture de canal de paiement</string>
     <string name="paymentdetails_type_outgoing_splice">Splice sortant</string>
     <string name="paymentdetails_type_outgoing_splice_cpfp">Accélération de transactions on-chain</string>
-    <string name="paymentdetails_type_outgoing_liquidity">Requête de liquidité entrante</string>
+    <string name="paymentdetails_type_outgoing_liquidity_manual">Requête de liquidité entrante (manuelle)</string>
+    <string name="paymentdetails_type_outgoing_liquidity_auto">Requête de liquidité entrante (auto)</string>
     <string name="paymentdetails_type_outgoing_bolt11">Paiement Lightning sortant (bolt11)</string>
     <string name="paymentdetails_type_outgoing_bolt12">Paiement Lightning sortant (bolt12)</string>
     <string name="paymentdetails_type_incoming_bolt11">Paiement Lightning entrant (bolt11)</string>

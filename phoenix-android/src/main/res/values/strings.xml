@@ -456,7 +456,8 @@
     <string name="paymentdetails_type_outgoing_splice">Outgoing on-chain payment</string>
     <string name="paymentdetails_type_outgoing_swapout">Outgoing on-chain payment (legacy swap)</string>
     <string name="paymentdetails_type_outgoing_splice_cpfp">Accelerate on-chain transactions</string>
-    <string name="paymentdetails_type_outgoing_liquidity">Inbound liquidity request</string>
+    <string name="paymentdetails_type_outgoing_liquidity_manual">Inbound liquidity request (manual)</string>
+    <string name="paymentdetails_type_outgoing_liquidity_auto">Inbound liquidity request (auto)</string>
 
     <string name="paymentdetails_swapin_address_label">Deposit address</string>
     <string name="paymentdetails_bitcoin_address_label">Bitcoin address</string>

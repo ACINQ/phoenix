@@ -20,6 +20,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
+import fr.acinq.lightning.db.AutomaticLiquidityPurchasePayment
 import fr.acinq.lightning.db.ManualLiquidityPurchasePayment
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.lightning.wire.LiquidityAds
@@ -34,13 +35,13 @@ import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
 import fr.acinq.phoenix.data.ExchangeRate
 
 @Composable
-fun TechnicalOutgoingManualLiquidity(
-    payment: ManualLiquidityPurchasePayment,
+fun TechnicalOutgoingAutoLiquidity(
+    payment: AutomaticLiquidityPurchasePayment,
     originalFiatRate: ExchangeRate.BitcoinPriceRate?
 ) {
     Card {
         TechnicalRow(label = stringResource(id = R.string.paymentdetails_payment_type_label)) {
-            Text(text = stringResource(id = R.string.paymentdetails_type_outgoing_liquidity))
+            Text(text = stringResource(id = R.string.paymentdetails_type_outgoing_liquidity_auto))
         }
         TechnicalRow(label = stringResource(id = R.string.paymentdetails_status_label)) {
             Text(text = when (payment.confirmedAt) {
@@ -54,13 +55,14 @@ fun TechnicalOutgoingManualLiquidity(
         TimestampSection(payment = payment)
     }
 
-    Card {
-        TechnicalRowAmount(
-            label = stringResource(id = R.string.paymentdetails_liquidity_amount_label),
-            amount = payment.liquidityPurchase.amount.toMilliSatoshi(),
-            rateThen = originalFiatRate,
-            mSatDisplayPolicy = MSatDisplayPolicy.SHOW
-        )
+    if (payment.incomingPaymentReceivedAt != null) {
+        Card {
+            TechnicalRowAmount(
+                label = stringResource(id = R.string.paymentdetails_liquidity_amount_label),
+                amount = payment.liquidityPurchase.amount.toMilliSatoshi(),
+                rateThen = originalFiatRate,
+                mSatDisplayPolicy = MSatDisplayPolicy.SHOW
+            )
             TechnicalRowAmount(
                 label = stringResource(id = R.string.paymentdetails_liquidity_service_fee_label),
                 amount = payment.serviceFee,
@@ -73,14 +75,15 @@ fun TechnicalOutgoingManualLiquidity(
                 rateThen = originalFiatRate,
                 mSatDisplayPolicy = MSatDisplayPolicy.SHOW
             )
-        TechnicalRow(label = stringResource(id = R.string.paymentdetails_liquidity_purchase_type)) {
-            Text(text = when (payment.liquidityPurchase) {
-                is LiquidityAds.Purchase.Standard -> "Standard"
-                is LiquidityAds.Purchase.WithFeeCredit -> "Fee credit"
-            })
-            Text(text = "[${payment.liquidityPurchase.paymentDetails.paymentType}]", style = MaterialTheme.typography.subtitle2)
+            TechnicalRow(label = stringResource(id = R.string.paymentdetails_liquidity_purchase_type)) {
+                Text(text = when (payment.liquidityPurchase) {
+                    is LiquidityAds.Purchase.Standard -> "Standard"
+                    is LiquidityAds.Purchase.WithFeeCredit -> "Fee credit"
+                })
+                Text(text = "[${payment.liquidityPurchase.paymentDetails.paymentType}]", style = MaterialTheme.typography.subtitle2)
+            }
+            ChannelIdRow(channelId = payment.channelId)
+            TransactionRow(txId = payment.txId)
         }
-        ChannelIdRow(channelId = payment.channelId)
-        TransactionRow(txId = payment.txId)
     }
 }

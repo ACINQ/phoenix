@@ -364,7 +364,8 @@
     <string name="paymentdetails_type_outgoing_close">Kanal-Schließung</string>
     <string name="paymentdetails_type_outgoing_splice">Ausgehender Splice</string>
     <string name="paymentdetails_type_outgoing_splice_cpfp">Beschleunigte On-Chain Transaktion</string>
-    <string name="paymentdetails_type_outgoing_liquidity">Inbound-Liquidität anfordern</string>
+    <string name="paymentdetails_type_outgoing_liquidity_manual">Inbound-Liquidität anfordern (manual)</string>
+    <string name="paymentdetails_type_outgoing_liquidity_auto">Inbound-Liquidität anfordern (auto)</string>
     <string name="paymentdetails_type_outgoing_bolt11">Ausgehende Lightning-Zahlung (bolt11)</string>
     <string name="paymentdetails_type_outgoing_bolt12">Ausgehende Lightning-Zahlung (bolt12)</string>
     <string name="paymentdetails_type_incoming_bolt11">Eingehende Lightning-Zahlung (bolt11)</string>

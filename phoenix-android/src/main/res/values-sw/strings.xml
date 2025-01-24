@@ -400,7 +400,8 @@
     <string name="paymentdetails_type_outgoing_close">Malipo ya kufunga channel</string>
     <string name="paymentdetails_type_outgoing_splice">Malipo ya splice ya kutuma</string>
     <string name="paymentdetails_type_outgoing_splice_cpfp">Harakisha muamala wa on-chain</string>
-    <string name="paymentdetails_type_outgoing_liquidity">Omba fedha za ndani</string>
+    <string name="paymentdetails_type_outgoing_liquidity_manual">Omba fedha za ndani (manual)</string>
+    <string name="paymentdetails_type_outgoing_liquidity_auto">Omba fedha za ndani (auto)</string>
     <string name="paymentdetails_type_outgoing_bolt11">Malipo ya Lightning ya kutuma (bolt11)</string>
     <string name="paymentdetails_type_outgoing_bolt12">Malipo ya Lightning ya kutuma (bolt12)</string>
     <string name="paymentdetails_type_incoming_bolt11">Malipo ya Lightning ya kupokea (bolt11)</string>

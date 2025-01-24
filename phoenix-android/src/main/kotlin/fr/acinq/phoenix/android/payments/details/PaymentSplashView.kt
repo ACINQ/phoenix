@@ -41,6 +41,7 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.BorderButton
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.SplashLayout
+import fr.acinq.phoenix.android.payments.details.splash.SplashAutoLiquidityPurchase
 import fr.acinq.phoenix.android.payments.details.splash.SplashChannelClose
 import fr.acinq.phoenix.android.payments.details.splash.SplashIncomingBolt11
 import fr.acinq.phoenix.android.payments.details.splash.SplashIncomingBolt12
@@ -49,13 +50,14 @@ import fr.acinq.phoenix.android.payments.details.splash.SplashIncomingLegacySwap
 import fr.acinq.phoenix.android.payments.details.splash.SplashIncomingNewChannel
 import fr.acinq.phoenix.android.payments.details.splash.SplashIncomingSpliceIn
 import fr.acinq.phoenix.android.payments.details.splash.SplashLightningOutgoing
-import fr.acinq.phoenix.android.payments.details.splash.SplashLiquidityPurchase
+import fr.acinq.phoenix.android.payments.details.splash.SplashManualLiquidityPurchase
 import fr.acinq.phoenix.android.payments.details.splash.SplashSpliceOut
 import fr.acinq.phoenix.android.payments.details.splash.SplashSpliceOutCpfp
+import fr.acinq.phoenix.android.payments.details.splash.SplashStatusAutoLiquidityPurchase
 import fr.acinq.phoenix.android.payments.details.splash.SplashStatusChannelClose
 import fr.acinq.phoenix.android.payments.details.splash.SplashStatusIncoming
 import fr.acinq.phoenix.android.payments.details.splash.SplashStatusLightningOutgoing
-import fr.acinq.phoenix.android.payments.details.splash.SplashStatusLiquidityPurchase
+import fr.acinq.phoenix.android.payments.details.splash.SplashStatusManualLiquidityPurchase
 import fr.acinq.phoenix.android.payments.details.splash.SplashStatusSpliceOut
 import fr.acinq.phoenix.android.payments.details.splash.SplashStatusSpliceOutCpfp
 import fr.acinq.phoenix.android.utils.borderColor
@@ -78,8 +80,8 @@ fun PaymentDetailsSplashView(
                 is ChannelCloseOutgoingPayment -> SplashStatusChannelClose(payment = payment, fromEvent = fromEvent, onCpfpSuccess = onBackClick)
                 is SpliceOutgoingPayment -> SplashStatusSpliceOut(payment = payment, fromEvent = fromEvent, onCpfpSuccess = onBackClick)
                 is SpliceCpfpOutgoingPayment -> SplashStatusSpliceOutCpfp(payment = payment, fromEvent = fromEvent, onCpfpSuccess = onBackClick)
-                is ManualLiquidityPurchasePayment -> SplashStatusLiquidityPurchase(payment = payment, fromEvent = fromEvent)
-                is AutomaticLiquidityPurchasePayment -> TODO()
+                is ManualLiquidityPurchasePayment -> SplashStatusManualLiquidityPurchase(payment = payment, fromEvent = fromEvent)
+                is AutomaticLiquidityPurchasePayment -> SplashStatusAutoLiquidityPurchase(payment = payment, fromEvent = fromEvent)
                 is IncomingPayment -> SplashStatusIncoming(payment = payment, fromEvent = fromEvent)
             }
         }
@@ -97,8 +99,8 @@ fun PaymentDetailsSplashView(
             is ChannelCloseOutgoingPayment -> SplashChannelClose(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
             is SpliceCpfpOutgoingPayment -> SplashSpliceOutCpfp(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
             is SpliceOutgoingPayment -> SplashSpliceOut(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
-            is ManualLiquidityPurchasePayment -> SplashLiquidityPurchase(payment = payment)
-            is AutomaticLiquidityPurchasePayment -> TODO()
+            is ManualLiquidityPurchasePayment -> SplashManualLiquidityPurchase(payment)
+            is AutomaticLiquidityPurchasePayment -> SplashAutoLiquidityPurchase(payment)
         }
 
         Spacer(modifier = Modifier.height(48.dp))
