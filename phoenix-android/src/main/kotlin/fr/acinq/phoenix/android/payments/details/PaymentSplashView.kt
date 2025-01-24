@@ -23,14 +23,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import fr.acinq.lightning.db.AutomaticLiquidityPurchasePayment
 import fr.acinq.lightning.db.Bolt11IncomingPayment
 import fr.acinq.lightning.db.Bolt12IncomingPayment
 import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
-import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.LegacyPayToOpenIncomingPayment
 import fr.acinq.lightning.db.LegacySwapInIncomingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
+import fr.acinq.lightning.db.ManualLiquidityPurchasePayment
 import fr.acinq.lightning.db.NewChannelIncomingPayment
 import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
 import fr.acinq.lightning.db.SpliceInIncomingPayment
@@ -77,7 +78,8 @@ fun PaymentDetailsSplashView(
                 is ChannelCloseOutgoingPayment -> SplashStatusChannelClose(payment = payment, fromEvent = fromEvent, onCpfpSuccess = onBackClick)
                 is SpliceOutgoingPayment -> SplashStatusSpliceOut(payment = payment, fromEvent = fromEvent, onCpfpSuccess = onBackClick)
                 is SpliceCpfpOutgoingPayment -> SplashStatusSpliceOutCpfp(payment = payment, fromEvent = fromEvent, onCpfpSuccess = onBackClick)
-                is InboundLiquidityOutgoingPayment -> SplashStatusLiquidityPurchase(payment = payment, fromEvent = fromEvent)
+                is ManualLiquidityPurchasePayment -> SplashStatusLiquidityPurchase(payment = payment, fromEvent = fromEvent)
+                is AutomaticLiquidityPurchasePayment -> TODO()
                 is IncomingPayment -> SplashStatusIncoming(payment = payment, fromEvent = fromEvent)
             }
         }
@@ -95,7 +97,8 @@ fun PaymentDetailsSplashView(
             is ChannelCloseOutgoingPayment -> SplashChannelClose(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
             is SpliceCpfpOutgoingPayment -> SplashSpliceOutCpfp(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
             is SpliceOutgoingPayment -> SplashSpliceOut(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
-            is InboundLiquidityOutgoingPayment -> SplashLiquidityPurchase(payment = payment)
+            is ManualLiquidityPurchasePayment -> SplashLiquidityPurchase(payment = payment)
+            is AutomaticLiquidityPurchasePayment -> TODO()
         }
 
         Spacer(modifier = Modifier.height(48.dp))

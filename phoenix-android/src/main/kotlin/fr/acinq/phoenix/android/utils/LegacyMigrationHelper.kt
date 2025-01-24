@@ -337,7 +337,7 @@ object LegacyMigrationHelper {
                 recipientAmount = head.amount().truncateToSatoshi().toLong().sat,
                 address = paymentMeta?.closing_main_output_script ?: "",
                 isSentToDefaultAddress = paymentMeta?.closing_type != ClosingType.Mutual.code,
-                miningFees = 0.sat,
+                miningFee = 0.sat,
                 txId = TxId(paymentMeta?.getSpendingTxs()?.firstOrNull()?.let { ByteVector32.fromValidHex(it) } ?: ByteVector32.Zeroes),
                 createdAt = head.createdAt(),
                 confirmedAt = closedAt,

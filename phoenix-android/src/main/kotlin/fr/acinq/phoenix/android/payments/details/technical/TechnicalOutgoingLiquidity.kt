@@ -20,28 +20,22 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
-import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
-import fr.acinq.lightning.utils.sat
+import fr.acinq.lightning.db.ManualLiquidityPurchasePayment
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.navController
-import fr.acinq.phoenix.android.navigateToPaymentDetails
 import fr.acinq.phoenix.android.payments.details.ChannelIdRow
 import fr.acinq.phoenix.android.payments.details.TechnicalRow
 import fr.acinq.phoenix.android.payments.details.TechnicalRowAmount
-import fr.acinq.phoenix.android.payments.details.TechnicalRowClickable
 import fr.acinq.phoenix.android.payments.details.TimestampSection
 import fr.acinq.phoenix.android.payments.details.TransactionRow
 import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
 import fr.acinq.phoenix.data.ExchangeRate
-import fr.acinq.phoenix.utils.extensions.relatedPaymentIds
 
 @Composable
-fun TechnicalOutgoingLiquidity(
-    payment: InboundLiquidityOutgoingPayment,
+fun TechnicalOutgoingManualLiquidity(
+    payment: ManualLiquidityPurchasePayment,
     originalFiatRate: ExchangeRate.BitcoinPriceRate?
 ) {
     Card {
@@ -63,41 +57,30 @@ fun TechnicalOutgoingLiquidity(
     Card {
         TechnicalRowAmount(
             label = stringResource(id = R.string.paymentdetails_liquidity_amount_label),
-            amount = payment.purchase.amount.toMilliSatoshi(),
+            amount = payment.liquidityPurchase.amount.toMilliSatoshi(),
             rateThen = originalFiatRate,
             mSatDisplayPolicy = MSatDisplayPolicy.SHOW
         )
-        if (payment.feePaidFromChannelBalance.total > 0.sat) {
             TechnicalRowAmount(
                 label = stringResource(id = R.string.paymentdetails_liquidity_service_fee_label),
-                amount = payment.feePaidFromChannelBalance.serviceFee.toMilliSatoshi(),
+                amount = payment.serviceFee,
                 rateThen = originalFiatRate,
                 mSatDisplayPolicy = MSatDisplayPolicy.SHOW
             )
             TechnicalRowAmount(
                 label = stringResource(id = R.string.paymentdetails_liquidity_miner_fee_label),
-                amount = payment.feePaidFromChannelBalance.miningFee.toMilliSatoshi(),
+                amount = payment.miningFee.toMilliSatoshi(),
                 rateThen = originalFiatRate,
                 mSatDisplayPolicy = MSatDisplayPolicy.SHOW
             )
-        }
         TechnicalRow(label = stringResource(id = R.string.paymentdetails_liquidity_purchase_type)) {
-            Text(text = when (payment.purchase) {
+            Text(text = when (payment.liquidityPurchase) {
                 is LiquidityAds.Purchase.Standard -> "Standard"
                 is LiquidityAds.Purchase.WithFeeCredit -> "Fee credit"
             })
-            Text(text = "[${payment.purchase.paymentDetails.paymentType}]", style = MaterialTheme.typography.subtitle2)
+            Text(text = "[${payment.liquidityPurchase.paymentDetails.paymentType}]", style = MaterialTheme.typography.subtitle2)
         }
         ChannelIdRow(channelId = payment.channelId)
         TransactionRow(txId = payment.txId)
-        val navController = navController
-        payment.relatedPaymentIds().forEach {
-            TechnicalRowClickable(
-                label = stringResource(id = R.string.paymentdetails_liquidity_caused_by_label),
-                onClick = { navigateToPaymentDetails(navController, it, isFromEvent = false) },
-            ) {
-                Text(text = it.toString(), maxLines = 1, overflow = TextOverflow.Ellipsis)
-            }
-        }
     }
 }

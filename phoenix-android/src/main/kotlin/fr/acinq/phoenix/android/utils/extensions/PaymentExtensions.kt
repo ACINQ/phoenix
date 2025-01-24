@@ -18,14 +18,15 @@ package fr.acinq.phoenix.android.utils.extensions
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
+import fr.acinq.lightning.db.AutomaticLiquidityPurchasePayment
 import fr.acinq.lightning.db.Bolt11IncomingPayment
 import fr.acinq.lightning.db.Bolt12IncomingPayment
 import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
-import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.LegacyPayToOpenIncomingPayment
 import fr.acinq.lightning.db.LegacySwapInIncomingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
+import fr.acinq.lightning.db.ManualLiquidityPurchasePayment
 import fr.acinq.lightning.db.OnChainIncomingPayment
 import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
 import fr.acinq.lightning.db.SpliceOutgoingPayment
@@ -34,7 +35,6 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.utils.extensions.desc
-import fr.acinq.phoenix.utils.extensions.isManualPurchase
 
 @Composable
 fun LightningOutgoingPayment.smartDescription(): String? = when (val details = this.details) {
@@ -53,10 +53,8 @@ fun SpliceCpfpOutgoingPayment.smartDescription(): String = stringResource(id = R
 fun ChannelCloseOutgoingPayment.smartDescription(): String = stringResource(id = R.string.paymentdetails_desc_closing_channel)
 
 @Composable
-fun InboundLiquidityOutgoingPayment.smartDescription(): String = when {
-    isManualPurchase() -> stringResource(id = R.string.paymentdetails_desc_liquidity_manual, purchase.amount.toPrettyString(BitcoinUnit.Sat, withUnit = true))
-    else -> stringResource(id = R.string.paymentdetails_desc_liquidity_automated)
-}
+fun ManualLiquidityPurchasePayment.smartDescription(): String =
+    stringResource(id = R.string.paymentdetails_desc_liquidity_manual, liquidityPurchase.amount.toPrettyString(BitcoinUnit.Sat, withUnit = true))
 
 @Suppress("DEPRECATION")
 @Composable
@@ -84,7 +82,8 @@ fun WalletPayment.smartDescription(): String? = when (this) {
     is ChannelCloseOutgoingPayment -> smartDescription()
     is SpliceOutgoingPayment -> smartDescription()
     is SpliceCpfpOutgoingPayment -> smartDescription()
-    is InboundLiquidityOutgoingPayment -> smartDescription()
+    is ManualLiquidityPurchasePayment -> smartDescription()
+    is AutomaticLiquidityPurchasePayment -> TODO()
 }
 
 @Suppress("DEPRECATION")
@@ -103,5 +102,6 @@ fun WalletPayment.basicDescription(): String? = when (this) {
     is ChannelCloseOutgoingPayment -> null
     is SpliceOutgoingPayment -> null
     is SpliceCpfpOutgoingPayment -> null
-    is InboundLiquidityOutgoingPayment -> null
+    is ManualLiquidityPurchasePayment -> null
+    is AutomaticLiquidityPurchasePayment -> null
 }?.takeIf { it.isNotBlank() }

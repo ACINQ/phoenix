@@ -44,14 +44,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
 import fr.acinq.lightning.db.LightningIncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
 import fr.acinq.lightning.db.SpliceOutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.utils.UUID
-import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountView
@@ -89,10 +87,7 @@ fun PaymentLine(
             Row {
                 PaymentDescription(paymentInfo = paymentInfo, contactInfo = contactInfo, modifier = Modifier.weight(1.0f))
                 Spacer(modifier = Modifier.width(16.dp))
-                val hideAmount = when {
-                    payment is InboundLiquidityOutgoingPayment && payment.feePaidFromChannelBalance.total == 0.sat -> true
-                    else -> payment.state() == WalletPaymentState.Failure
-                }
+                val hideAmount = payment.state() == WalletPaymentState.Failure
                 if (!hideAmount) {
                     val isOutgoing = payment is OutgoingPayment
                     if (isAmountRedacted) {
@@ -108,8 +103,7 @@ fun PaymentLine(
                 }
             }
             Spacer(modifier = Modifier.height(2.dp))
-            if ((payment is SpliceOutgoingPayment && payment.confirmedAt == null)
-                || (payment is SpliceCpfpOutgoingPayment && payment.confirmedAt == null)) {
+            if ((payment is SpliceOutgoingPayment && payment.confirmedAt == null) || (payment is SpliceCpfpOutgoingPayment && payment.confirmedAt == null)) {
                 Text(text = stringResource(id = R.string.paymentline_outgoing_unconfirmed), style = MaterialTheme.typography.caption.copy(fontSize = 12.sp))
             } else {
                 Row {

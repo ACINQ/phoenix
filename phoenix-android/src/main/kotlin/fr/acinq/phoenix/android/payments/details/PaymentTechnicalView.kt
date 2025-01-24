@@ -44,13 +44,14 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.PrivateKey
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.db.AutomaticLiquidityPurchasePayment
 import fr.acinq.lightning.db.Bolt11IncomingPayment
 import fr.acinq.lightning.db.Bolt12IncomingPayment
 import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
-import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
 import fr.acinq.lightning.db.LegacyPayToOpenIncomingPayment
 import fr.acinq.lightning.db.LegacySwapInIncomingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
+import fr.acinq.lightning.db.ManualLiquidityPurchasePayment
 import fr.acinq.lightning.db.NewChannelIncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
@@ -81,7 +82,7 @@ import fr.acinq.phoenix.android.payments.details.technical.TechnicalIncomingNewC
 import fr.acinq.phoenix.android.payments.details.technical.TechnicalIncomingSpliceIn
 import fr.acinq.phoenix.android.payments.details.technical.TechnicalOutgoingChannelClose
 import fr.acinq.phoenix.android.payments.details.technical.TechnicalOutgoingLightning
-import fr.acinq.phoenix.android.payments.details.technical.TechnicalOutgoingLiquidity
+import fr.acinq.phoenix.android.payments.details.technical.TechnicalOutgoingManualLiquidity
 import fr.acinq.phoenix.android.payments.details.technical.TechnicalOutgoingSplice
 import fr.acinq.phoenix.android.payments.details.technical.TechnicalOutgoingSpliceCpfp
 import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
@@ -114,7 +115,8 @@ fun PaymentDetailsTechnicalView(
 
         is LightningOutgoingPayment -> TechnicalOutgoingLightning(payment, originalFiatRate)
         is ChannelCloseOutgoingPayment -> TechnicalOutgoingChannelClose(payment, originalFiatRate)
-        is InboundLiquidityOutgoingPayment -> TechnicalOutgoingLiquidity(payment, originalFiatRate)
+        is ManualLiquidityPurchasePayment -> TechnicalOutgoingManualLiquidity(payment, originalFiatRate)
+        is AutomaticLiquidityPurchasePayment -> TODO()
         is SpliceCpfpOutgoingPayment -> TechnicalOutgoingSpliceCpfp(payment, originalFiatRate)
         is SpliceOutgoingPayment -> TechnicalOutgoingSplice(payment, originalFiatRate)
     }
