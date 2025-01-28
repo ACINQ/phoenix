@@ -219,7 +219,7 @@ class SqlitePaymentsDb(
                 .executeAsList()
                 .forEach {
                     when (val incomingPayment = it) {
-                        is NewChannelIncomingPayment -> {
+                        is NewChannelIncomingPayment -> if (incomingPayment.liquidityPurchase == null) {
                             val manualLiquidityPayment = database.paymentsOutgoingQueries.listByTxId(incomingPayment.txId)
                                 .executeAsOneOrNull() as? ManualLiquidityPurchasePayment
                             manualLiquidityPayment?.let {
@@ -235,7 +235,7 @@ class SqlitePaymentsDb(
                                 didDeleteWalletPayment(manualLiquidityPayment.id, database)
                             }
                         }
-                        is LightningIncomingPayment -> {
+                        is LightningIncomingPayment ->  if (incomingPayment.liquidityPurchaseDetails == null) {
                             val txId = incomingPayment.parts.filterIsInstance<LightningIncomingPayment.Part.Htlc>().firstNotNullOfOrNull { it.fundingFee?.fundingTxId }
                             txId?.let {
                                 val autoLiquidityPayment =
