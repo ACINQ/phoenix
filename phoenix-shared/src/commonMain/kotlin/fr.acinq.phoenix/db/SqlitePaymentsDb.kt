@@ -246,6 +246,12 @@ class SqlitePaymentsDb(
                                         is Bolt11IncomingPayment -> incomingPayment.copy(liquidityPurchaseDetails = autoLiquidityPayment.liquidityPurchaseDetails)
                                         is Bolt12IncomingPayment -> incomingPayment.copy(liquidityPurchaseDetails = autoLiquidityPayment.liquidityPurchaseDetails)
                                     }
+                                    database.paymentsIncomingQueries.update(
+                                        id = incomingPayment1.id,
+                                        data = incomingPayment1,
+                                        receivedAt = incomingPayment1.completedAt,
+                                        txId = incomingPayment1.liquidityPurchaseDetails?.txId
+                                    )
                                     val autoLiquidityPayment1 = autoLiquidityPayment.copy(incomingPaymentReceivedAt = incomingPayment1.completedAt)
                                     database.paymentsOutgoingQueries.update(
                                         id = autoLiquidityPayment.id,
