@@ -130,7 +130,7 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
             is LightningIncomingPayment -> extractLightningPaymentParts(payment)
             is LegacySwapInIncomingPayment -> listOf(Details(Type.legacy_swap_in, amount = payment.amount, feeCredit = 0.msat, miningFee = payment.fees.truncateToSatoshi(), serviceFee = 0.msat, paymentHash = null, txId = null, destination = payment.address))
             is LegacyPayToOpenIncomingPayment -> extractLegacyPayToOpenParts(payment)
-            is OnChainIncomingPayment -> listOf(Details(Type.swap_in, amount = payment.amount, feeCredit = 0.msat, miningFee = payment.fees.truncateToSatoshi(), serviceFee = 0.msat, paymentHash = null, txId = payment.txId))
+            is OnChainIncomingPayment -> listOf(Details(Type.swap_in, amount = payment.amount, feeCredit = 0.msat, miningFee = payment.miningFee, serviceFee = payment.serviceFee, paymentHash = null, txId = payment.txId))
 
             is LightningOutgoingPayment -> when (val details = payment.details) {
                 is LightningOutgoingPayment.Details.Normal -> listOf(Details(Type.lightning_sent, amount = -payment.amount, feeCredit = 0.msat, miningFee = 0.sat, serviceFee = payment.fees, paymentHash = payment.paymentHash, txId = null, destination = details.paymentRequest.nodeId.toHex(), description = details.paymentRequest.description))

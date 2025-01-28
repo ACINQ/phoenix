@@ -119,11 +119,18 @@ class SqlitePaymentsDb(
     suspend fun listPaymentsAsFlow(count: Long, skip: Long): Flow<List<WalletPaymentInfo>> = withContext(Dispatchers.Default) {
         database.paymentsQueries.list(limit = count, offset = skip, mapper = ::mapPaymentsAndMetadata)
             .asFlow()
-            .mapToList(Dispatchers.Default)
+            .map { it.executeAsList().discardReceivedAutomaticLiquidity() }
     }
 
     suspend fun listCompletedPayments(count: Long, skip: Long, startDate: Long, endDate: Long): List<WalletPaymentInfo> = withContext(Dispatchers.Default) {
         database.paymentsQueries.listSucceeded(succeeded_at_from = startDate, succeeded_at_to = endDate, limit = count, offset = skip, mapper = ::mapPaymentsAndMetadata).executeAsList()
+            .discardReceivedAutomaticLiquidity()
+    }
+
+    /** [AutomaticLiquidityPurchasePayment] should be ignored if the payment they are associated with has been received, because the liquidity data are already contained in that payment. */
+    private fun List<WalletPaymentInfo>.discardReceivedAutomaticLiquidity(): List<WalletPaymentInfo> = this.filterNot {
+        val payment = it.payment
+        payment is AutomaticLiquidityPurchasePayment && payment.incomingPaymentReceivedAt != null
     }
 
     @Suppress("UNUSED_PARAMETER")
