@@ -33,31 +33,33 @@ data class InboundLiquidityPaymentWrapper(
     @Throws(Exception::class)
     fun unwrap(): WalletPayment {
         val purchase = this.purchase.unwrap()
-//        return if (purchase.amount == 1.sat) {
-//            AutomaticLiquidityPurchasePayment(
-//                id = this.id,
-//                channelId = this.channelId.toByteVector32(),
-//                txId = TxId(this.txId),
-//                miningFee = this.miningFeesSat.sat,
-//                liquidityPurchase = purchase,
-//                createdAt = this.createdAt,
-//                confirmedAt = this.confirmedAt,
-//                lockedAt = this.lockedAt,
-//                incomingPaymentReceivedAt = this.confirmedAt
-//            )
-//        } else {
-//            ManualLiquidityPurchasePayment(
-//                id = this.id,
-//                channelId = this.channelId.toByteVector32(),
-//                txId = TxId(this.txId),
-//                miningFee = this.miningFeesSat.sat,
-//                liquidityPurchase = purchase,
-//                createdAt = this.createdAt,
-//                confirmedAt = this.confirmedAt,
-//                lockedAt = this.lockedAt,
-//            )
-//        }
-        TODO()
+        return when (purchase.paymentDetails) {
+            is LiquidityAds.PaymentDetails.FromFutureHtlc, is LiquidityAds.PaymentDetails.FromFutureHtlcWithPreimage, is LiquidityAds.PaymentDetails.FromChannelBalanceForFutureHtlc -> {
+                AutomaticLiquidityPurchasePayment(
+                    id = this.id,
+                    channelId = this.channelId.toByteVector32(),
+                    txId = TxId(this.txId),
+                    miningFee = this.miningFeesSat.sat,
+                    liquidityPurchase = purchase,
+                    createdAt = this.createdAt,
+                    confirmedAt = this.confirmedAt,
+                    lockedAt = this.lockedAt,
+                    incomingPaymentReceivedAt = this.confirmedAt
+                )
+            }
+            is LiquidityAds.PaymentDetails.FromChannelBalance -> {
+                ManualLiquidityPurchasePayment(
+                    id = this.id,
+                    channelId = this.channelId.toByteVector32(),
+                    txId = TxId(this.txId),
+                    miningFee = this.miningFeesSat.sat,
+                    liquidityPurchase = purchase,
+                    createdAt = this.createdAt,
+                    confirmedAt = this.confirmedAt,
+                    lockedAt = this.lockedAt,
+                )
+            }
+        }
     }
 
     @Serializable
@@ -86,31 +88,33 @@ data class InboundLiquidityLegacyWrapper(
     @Throws(Exception::class)
     fun unwrap(): WalletPayment {
         val purchase = this.lease.unwrap()
-//        return if (purchase.amount == 1.sat) {
-//            AutomaticLiquidityPurchasePayment(
-//                id = this.id,
-//                channelId = this.channelId.toByteVector32(),
-//                txId = TxId(this.txId),
-//                miningFee = this.miningFeesSat.sat,
-//                liquidityPurchase = purchase,
-//                createdAt = this.createdAt,
-//                confirmedAt = this.confirmedAt,
-//                lockedAt = this.lockedAt,
-//                incomingPaymentReceivedAt = this.confirmedAt
-//            )
-//        } else {
-//            ManualLiquidityPurchasePayment(
-//                id = this.id,
-//                channelId = this.channelId.toByteVector32(),
-//                txId = TxId(this.txId),
-//                miningFee = this.miningFeesSat.sat,
-//                liquidityPurchase = purchase,
-//                createdAt = this.createdAt,
-//                confirmedAt = this.confirmedAt,
-//                lockedAt = this.lockedAt,
-//            )
-//        }
-        TODO()
+        return when (purchase.paymentDetails) {
+            is LiquidityAds.PaymentDetails.FromFutureHtlc, is LiquidityAds.PaymentDetails.FromFutureHtlcWithPreimage, is LiquidityAds.PaymentDetails.FromChannelBalanceForFutureHtlc -> {
+                AutomaticLiquidityPurchasePayment(
+                    id = this.id,
+                    channelId = this.channelId.toByteVector32(),
+                    txId = TxId(this.txId),
+                    miningFee = this.miningFeesSat.sat,
+                    liquidityPurchase = purchase,
+                    createdAt = this.createdAt,
+                    confirmedAt = this.confirmedAt,
+                    lockedAt = this.lockedAt,
+                    incomingPaymentReceivedAt = this.confirmedAt
+                )
+            }
+            is LiquidityAds.PaymentDetails.FromChannelBalance -> {
+                ManualLiquidityPurchasePayment(
+                    id = this.id,
+                    channelId = this.channelId.toByteVector32(),
+                    txId = TxId(this.txId),
+                    miningFee = this.miningFeesSat.sat,
+                    liquidityPurchase = purchase,
+                    createdAt = this.createdAt,
+                    confirmedAt = this.confirmedAt,
+                    lockedAt = this.lockedAt,
+                )
+            }
+        }
     }
 
     @Serializable
