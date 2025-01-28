@@ -49,18 +49,13 @@ class SqliteIncomingPaymentsDb(private val database: PaymentsDatabase) : Incomin
                     data_ = incomingPayment
                 )
                 // if the payment is on-chain, save the tx id link to the db
-                // NB: for LightningIncomingPayment, there will be a corresponding payment in the outgoing db
                 when (incomingPayment) {
-                    is OnChainIncomingPayment -> {
+                    is OnChainIncomingPayment ->
                         database.onChainTransactionsQueries.insert(
                             payment_id = incomingPayment.id,
                             tx_id = incomingPayment.txId
                         )
-                        val autoLiquidityPurchases = database.paymentsOutgoingQueries.listByTxId(incomingPayment.txId).executeAsList().filterIsInstance<AutomaticLiquidityPurchasePayment>()
-                        autoLiquidityPurchases.forEach {
-                            TODO()
-                        }
-                    }
+
                     else -> {}
                 }
                 didSaveWalletPayment(incomingPayment.id, database)
