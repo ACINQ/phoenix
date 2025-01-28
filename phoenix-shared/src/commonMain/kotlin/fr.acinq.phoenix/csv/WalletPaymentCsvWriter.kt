@@ -141,13 +141,13 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
             is SpliceOutgoingPayment -> listOf(Details(Type.swap_out, amount = -payment.amount, feeCredit = 0.msat, miningFee = payment.miningFee, serviceFee = 0.msat, paymentHash = null, txId = payment.txId, destination = payment.address))
             is ChannelCloseOutgoingPayment -> listOf(Details(Type.channel_close, amount = -payment.amount, feeCredit = 0.msat, miningFee = payment.miningFee, serviceFee = 0.msat, paymentHash = null, txId = payment.txId, destination = payment.address))
             is SpliceCpfpOutgoingPayment -> listOf(Details(Type.fee_bumping, amount = -payment.amount, feeCredit = 0.msat, miningFee = payment.miningFee, serviceFee = 0.msat, paymentHash = null, txId = payment.txId))
-            is AutomaticLiquidityPurchasePayment -> if (payment.incomingPaymentReceivedAt != null) {
-                // ignore this purchase, the purchase data are stored in the object that triggered the purchase
-                emptyList()
+            is AutomaticLiquidityPurchasePayment -> if (payment.incomingPaymentReceivedAt == null) {
+                listOf(Details(Type.liquidity_purchase, amount = -payment.amount, feeCredit = -payment.liquidityPurchaseDetails.feeCreditUsed, miningFee = payment.miningFee, serviceFee = payment.serviceFee, paymentHash = null, txId = payment.txId))
             } else {
-                listOf(Details(Type.liquidity_purchase, amount = -payment.amount, feeCredit = 0.msat, miningFee = payment.miningFee, serviceFee = payment.serviceFee, paymentHash = null, txId = payment.txId, description = "+${payment.amount.truncateToSatoshi().sat} sat liquidity (automatic)"))
+                // If the corresponding Lightning payment was received, then liquidity fees will be included in the Lightning payment
+                emptyList()
             }
-            is ManualLiquidityPurchasePayment -> listOf(Details(Type.liquidity_purchase, amount = -payment.amount, feeCredit = 0.msat, miningFee = payment.miningFee, serviceFee = payment.serviceFee, paymentHash = null, txId = payment.txId, description = "+${payment.amount.truncateToSatoshi().sat} sat liquidity (manual)"))
+            is ManualLiquidityPurchasePayment -> listOf(Details(Type.liquidity_purchase, amount = -payment.amount, feeCredit = -payment.liquidityPurchaseDetails.feeCreditUsed, miningFee = payment.miningFee, serviceFee = payment.serviceFee, paymentHash = null, txId = payment.txId))
         }
 
         details.forEach { addRow(timestamp, id, it, metadata) }

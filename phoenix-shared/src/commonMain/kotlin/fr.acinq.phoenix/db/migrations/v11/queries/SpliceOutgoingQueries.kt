@@ -23,32 +23,30 @@ import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toByteVector32
 import fr.acinq.phoenix.db.PaymentsDatabase
 
-class SpliceOutgoingQueries(val database: PaymentsDatabase) {
+class SpliceOutgoingQueries {
 
-    companion object {
-        fun mapSpliceOutgoingPayment(
-            id: String,
-            recipient_amount_sat: Long,
-            address: String,
-            mining_fees_sat: Long,
-            tx_id: ByteArray,
-            channel_id: ByteArray,
-            created_at: Long,
-            confirmed_at: Long?,
-            locked_at: Long?
-        ): SpliceOutgoingPayment {
-            return SpliceOutgoingPayment(
-                id = UUID.fromString(id),
-                recipientAmount = recipient_amount_sat.sat,
-                address = address,
-                miningFee = mining_fees_sat.sat,
-                channelId = channel_id.toByteVector32(),
-                txId = TxId(tx_id),
-                liquidityPurchase = null,
-                createdAt = created_at,
-                confirmedAt = confirmed_at,
-                lockedAt = locked_at
-            )
-        }
+    fun mapSpliceOutgoingPayment(
+        id: String,
+        recipient_amount_sat: Long,
+        address: String,
+        mining_fees_sat: Long,
+        tx_id: ByteArray,
+        channel_id: ByteArray,
+        created_at: Long,
+        confirmed_at: Long?,
+        locked_at: Long?
+    ): SpliceOutgoingPayment {
+        return SpliceOutgoingPayment(
+            id = UUID.fromString(id),
+            recipientAmount = recipient_amount_sat.sat,
+            address = address,
+            miningFee = mining_fees_sat.sat,
+            channelId = channel_id.toByteVector32(),
+            txId = TxId(tx_id),
+            liquidityPurchase = null,
+            createdAt = created_at,
+            confirmedAt = confirmed_at,
+            lockedAt = locked_at
+        )
     }
 }

@@ -23,27 +23,25 @@ import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toByteVector32
 import fr.acinq.phoenix.db.PaymentsDatabase
 
-class SpliceCpfpOutgoingQueries(val database: PaymentsDatabase) {
+object SpliceCpfpOutgoingQueries {
 
-    companion object {
-        fun mapCpfp(
-            id: String,
-            mining_fees_sat: Long,
-            channel_id: ByteArray,
-            tx_id: ByteArray,
-            created_at: Long,
-            confirmed_at: Long?,
-            locked_at: Long?
-        ): SpliceCpfpOutgoingPayment {
-            return SpliceCpfpOutgoingPayment(
-                id = UUID.fromString(id),
-                miningFee = mining_fees_sat.sat,
-                channelId = channel_id.toByteVector32(),
-                txId = TxId(tx_id),
-                createdAt = created_at,
-                confirmedAt = confirmed_at,
-                lockedAt = locked_at
-            )
-        }
+    fun mapCpfp(
+        id: String,
+        mining_fees_sat: Long,
+        channel_id: ByteArray,
+        tx_id: ByteArray,
+        created_at: Long,
+        confirmed_at: Long?,
+        locked_at: Long?
+    ): SpliceCpfpOutgoingPayment {
+        return SpliceCpfpOutgoingPayment(
+            id = UUID.fromString(id),
+            miningFee = mining_fees_sat.sat,
+            channelId = channel_id.toByteVector32(),
+            txId = TxId(tx_id),
+            createdAt = created_at,
+            confirmedAt = confirmed_at,
+            lockedAt = locked_at
+        )
     }
 }
