@@ -47,15 +47,16 @@ class SqlitePaymentsDb(
     val metadataQueries = PaymentsMetadataQueries(database)
     private var metadataQueue = MutableStateFlow(mapOf<UUID, WalletPaymentMetadataRow>())
 
-    suspend fun getPayment(id: UUID, options: WalletPaymentFetchOptions): Pair<WalletPayment, WalletPaymentMetadata?>? = withContext(Dispatchers.Default) {
+    suspend fun getPayment(id: UUID): Pair<WalletPayment, WalletPaymentMetadata?>? = withContext(Dispatchers.Default) {
         database.transactionWithResult {
-            database.paymentsQueries.get(id).executeAsOneOrNull()?.let { WalletPaymentAdapter.decode(it) }?.let { payment ->
-                val metadata = metadataQueries.get(id, options)
+            (database.paymentsIncomingQueries.get(id).executeAsOneOrNull() ?: database.paymentsOutgoingQueries.get(id).executeAsOneOrNull())?.let { payment ->
+                val metadata = metadataQueries.get(id, WalletPaymentFetchOptions.All)
                 payment to metadata
             }
         }
     }
 
+    @Suppress("DEPRECATION")
     override suspend fun getInboundLiquidityPurchase(txId: TxId): LiquidityAds.LiquidityTransactionDetails? {
         val payment = buildList {
             addAll(database.paymentsIncomingQueries.listByTxId(txId).executeAsList())

@@ -153,7 +153,7 @@ class PaymentsFetcher(
         }
 
         launch {
-            paymentsManager.getPayment(row.id, options)?.let {
+            paymentsManager.getPayment(row.id)?.let {
                 completion(Result(it))
             } ?: run {
                 completion(Result(null))

@@ -149,18 +149,15 @@ class PaymentsManager(
 
     suspend fun getPayment(
         id: UUID,
-        options: WalletPaymentFetchOptions
     ): WalletPaymentInfo? {
-        return paymentsDb().getPayment(id, options)?.let {
+        return paymentsDb().getPayment(id)?.let {
             val payment = it.first
-            val contact = if (options.contains(WalletPaymentFetchOptions.Contact)) {
-                contactsManager.contactForPayment(payment)
-            } else { null }
+            val contact = contactsManager.contactForPayment(payment)
             WalletPaymentInfo(
                 payment = payment,
                 metadata = it.second ?: WalletPaymentMetadata(),
                 contact = contact,
-                fetchOptions = options
+                fetchOptions = WalletPaymentFetchOptions.All
             )
         }
     }
