@@ -201,6 +201,69 @@ class SqlitePaymentsDb(
         // didDeleteWalletPayment(paymentId, database)
     }
 
+    /**
+     * Cloudkit operates on a record-by-record basis. When a database migration involves merging
+     * records, it has to be done in a separate post-processing step.
+     *
+     * This particular function merges liquidity-related records, into other records.
+     */
+    suspend fun finishCloudkitRestore(): Unit = withContext(Dispatchers.Default) {
+        database.transaction {
+            database.paymentsIncomingQueries
+                .listSuccessful(
+                    received_at_from = 0,
+                    received_at_to = Long.MAX_VALUE,
+                    limit = Long.MAX_VALUE,
+                    offset = 0
+                )
+                .executeAsList()
+                .forEach {
+                    when (val incomingPayment = it) {
+                        is NewChannelIncomingPayment -> {
+                            val manualLiquidityPayment = database.paymentsOutgoingQueries.listByTxId(incomingPayment.txId)
+                                .executeAsOneOrNull() as? ManualLiquidityPurchasePayment
+                            manualLiquidityPayment?.let {
+                                val incomingPayment1 = incomingPayment.copy(liquidityPurchase = manualLiquidityPayment.liquidityPurchase)
+                                database.paymentsIncomingQueries.update(
+                                    receivedAt = incomingPayment1.completedAt,
+                                    txId = incomingPayment1.txId,
+                                    data = incomingPayment1,
+                                    id = incomingPayment1.id
+                                )
+                                database.paymentsOutgoingQueries.delete(manualLiquidityPayment.id)
+                                didSaveWalletPayment(incomingPayment.id, database)
+                                didDeleteWalletPayment(manualLiquidityPayment.id, database)
+                            }
+                        }
+                        is LightningIncomingPayment -> {
+                            val txId = incomingPayment.parts.filterIsInstance<LightningIncomingPayment.Part.Htlc>().firstNotNullOfOrNull { it.fundingFee?.fundingTxId }
+                            txId?.let {
+                                val autoLiquidityPayment =
+                                    database.paymentsOutgoingQueries.listByTxId(txId)
+                                        .executeAsOneOrNull() as? AutomaticLiquidityPurchasePayment
+                                autoLiquidityPayment?.let {
+                                    val incomingPayment1 = when(incomingPayment) {
+                                        is Bolt11IncomingPayment -> incomingPayment.copy(liquidityPurchaseDetails = autoLiquidityPayment.liquidityPurchaseDetails)
+                                        is Bolt12IncomingPayment -> incomingPayment.copy(liquidityPurchaseDetails = autoLiquidityPayment.liquidityPurchaseDetails)
+                                    }
+                                    val autoLiquidityPayment1 = autoLiquidityPayment.copy(incomingPaymentReceivedAt = incomingPayment1.completedAt)
+                                    database.paymentsOutgoingQueries.update(
+                                        id = autoLiquidityPayment.id,
+                                        completed_at = autoLiquidityPayment1.completedAt,
+                                        succeeded_at = autoLiquidityPayment1.succeededAt,
+                                        data = autoLiquidityPayment1
+                                    )
+                                    didSaveWalletPayment(incomingPayment.id, database)
+                                    didSaveWalletPayment(autoLiquidityPayment.id, database)
+                                }
+                            }
+                        }
+                        else -> Unit
+                    }
+                }
+        }
+    }
+
     fun close() = driver.close()
 }
 

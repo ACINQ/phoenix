@@ -59,6 +59,14 @@ WHERE
 ORDER BY payment.created_at DESC
 LIMIT :limit OFFSET :offset;
 
+listSuccessful:
+SELECT payment.data
+FROM   payments_incoming AS payment
+WHERE
+    payment.received_at BETWEEN :received_at_from AND :received_at_to
+ORDER BY payment.received_at DESC
+LIMIT :limit OFFSET :offset;
+
 listByTxId:
 SELECT data
 FROM   payments_incoming
