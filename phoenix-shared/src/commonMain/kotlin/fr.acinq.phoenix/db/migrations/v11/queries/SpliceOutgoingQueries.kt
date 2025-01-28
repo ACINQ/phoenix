@@ -23,7 +23,7 @@ import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toByteVector32
 import fr.acinq.phoenix.db.PaymentsDatabase
 
-class SpliceOutgoingQueries {
+object SpliceOutgoingQueries {
 
     fun mapSpliceOutgoingPayment(
         id: String,
