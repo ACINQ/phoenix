@@ -56,6 +56,10 @@ fun ChannelCloseOutgoingPayment.smartDescription(): String = stringResource(id =
 fun ManualLiquidityPurchasePayment.smartDescription(): String =
     stringResource(id = R.string.paymentdetails_desc_liquidity_manual, liquidityPurchase.amount.toPrettyString(BitcoinUnit.Sat, withUnit = true))
 
+@Composable
+fun AutomaticLiquidityPurchasePayment.smartDescription(): String =
+    stringResource(id = R.string.paymentdetails_desc_liquidity_automated, liquidityPurchase.amount.toPrettyString(BitcoinUnit.Sat, withUnit = true))
+
 @Suppress("DEPRECATION")
 @Composable
 fun IncomingPayment.smartDescription() : String? = when (this) {
@@ -83,7 +87,7 @@ fun WalletPayment.smartDescription(): String? = when (this) {
     is SpliceOutgoingPayment -> smartDescription()
     is SpliceCpfpOutgoingPayment -> smartDescription()
     is ManualLiquidityPurchasePayment -> smartDescription()
-    is AutomaticLiquidityPurchasePayment -> TODO()
+    is AutomaticLiquidityPurchasePayment -> smartDescription()
 }
 
 @Suppress("DEPRECATION")
