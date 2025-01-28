@@ -21,6 +21,7 @@ import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.AutomaticLiquidityPurchasePayment
+import fr.acinq.lightning.db.Bolt11IncomingPayment
 import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
 import fr.acinq.lightning.db.LegacyPayToOpenIncomingPayment
 import fr.acinq.lightning.db.LegacySwapInIncomingPayment
@@ -64,7 +65,22 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
     private val FIELD_DESCRIPTION = "description"
 
     init {
-        addRow(FIELD_DATE, FIELD_ID, FIELD_TYPE, FIELD_AMOUNT_MSAT, FIELD_AMOUNT_FIAT, FIELD_FEE_CREDIT_MSAT, FIELD_MINING_FEE_SAT, FIELD_MINING_FEE_FIAT, FIELD_SERVICE_FEE_MSAT, FIELD_SERVICE_FEE_FIAT, FIELD_PAYMENT_HASH, FIELD_TX_ID, FIELD_DESTINATION, FIELD_DESCRIPTION)
+        addRow(
+            FIELD_DATE,
+            FIELD_ID,
+            FIELD_TYPE,
+            FIELD_AMOUNT_MSAT,
+            FIELD_AMOUNT_FIAT,
+            FIELD_FEE_CREDIT_MSAT,
+            FIELD_MINING_FEE_SAT,
+            FIELD_MINING_FEE_FIAT,
+            FIELD_SERVICE_FEE_MSAT,
+            FIELD_SERVICE_FEE_FIAT,
+            FIELD_PAYMENT_HASH,
+            FIELD_TX_ID,
+            FIELD_DESTINATION,
+            FIELD_DESCRIPTION
+        )
     }
 
     @Suppress("EnumEntryName")
@@ -72,11 +88,9 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
         legacy_swap_in,
         legacy_swap_out,
         legacy_pay_to_open,
-        legacy_pay_to_splice,
         swap_in,
         swap_out,
         fee_bumping,
-        fee_credit,
         lightning_received,
         lightning_sent,
         liquidity_purchase,
@@ -126,71 +140,145 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
         val timestamp = payment.completedAt ?: payment.createdAt
         val id = payment.id
 
-        val details: List<Details> = when (payment) {
-            is LightningIncomingPayment -> extractLightningPaymentParts(payment)
-            is LegacySwapInIncomingPayment -> listOf(Details(Type.legacy_swap_in, amount = payment.amount, feeCredit = 0.msat, miningFee = payment.fees.truncateToSatoshi(), serviceFee = 0.msat, paymentHash = null, txId = null, destination = payment.address))
-            is LegacyPayToOpenIncomingPayment -> extractLegacyPayToOpenParts(payment)
-            is OnChainIncomingPayment -> listOf(Details(Type.swap_in, amount = payment.amount, feeCredit = 0.msat, miningFee = payment.miningFee, serviceFee = payment.serviceFee, paymentHash = null, txId = payment.txId))
-
-            is LightningOutgoingPayment -> when (val details = payment.details) {
-                is LightningOutgoingPayment.Details.Normal -> listOf(Details(Type.lightning_sent, amount = -payment.amount, feeCredit = 0.msat, miningFee = 0.sat, serviceFee = payment.fees, paymentHash = payment.paymentHash, txId = null, destination = details.paymentRequest.nodeId.toHex(), description = details.paymentRequest.description))
-                is LightningOutgoingPayment.Details.SwapOut -> listOf(Details(Type.legacy_swap_out, amount = -payment.amount, feeCredit = 0.msat, miningFee = details.swapOutFee, serviceFee = 0.msat, paymentHash = null, txId = null, destination = details.address))
-                is LightningOutgoingPayment.Details.Blinded -> listOf(Details(Type.lightning_sent, amount = -payment.amount, feeCredit = 0.msat, miningFee = 0.sat, serviceFee = payment.fees, paymentHash = payment.paymentHash, txId = null, description = details.paymentRequest.description))
-            }
-
-            is SpliceOutgoingPayment -> listOf(Details(Type.swap_out, amount = -payment.amount, feeCredit = 0.msat, miningFee = payment.miningFee, serviceFee = 0.msat, paymentHash = null, txId = payment.txId, destination = payment.address))
-            is ChannelCloseOutgoingPayment -> listOf(Details(Type.channel_close, amount = -payment.amount, feeCredit = 0.msat, miningFee = payment.miningFee, serviceFee = 0.msat, paymentHash = null, txId = payment.txId, destination = payment.address))
-            is SpliceCpfpOutgoingPayment -> listOf(Details(Type.fee_bumping, amount = -payment.amount, feeCredit = 0.msat, miningFee = payment.miningFee, serviceFee = 0.msat, paymentHash = null, txId = payment.txId))
-            is AutomaticLiquidityPurchasePayment -> if (payment.incomingPaymentReceivedAt == null) {
-                listOf(Details(Type.liquidity_purchase, amount = -payment.amount, feeCredit = -payment.liquidityPurchaseDetails.feeCreditUsed, miningFee = payment.miningFee, serviceFee = payment.serviceFee, paymentHash = null, txId = payment.txId))
-            } else {
-                // If the corresponding Lightning payment was received, then liquidity fees will be included in the Lightning payment
-                emptyList()
-            }
-            is ManualLiquidityPurchasePayment -> listOf(Details(Type.liquidity_purchase, amount = -payment.amount, feeCredit = -payment.liquidityPurchaseDetails.feeCreditUsed, miningFee = payment.miningFee, serviceFee = payment.serviceFee, paymentHash = null, txId = payment.txId))
-        }
-
-        details.forEach { addRow(timestamp, id, it, metadata) }
-    }
-
-    private fun extractLightningPaymentParts(payment: LightningIncomingPayment): List<Details> = payment.parts
-        .map {
-            when (it) {
-                is LightningIncomingPayment.Part.Htlc -> Details(Type.lightning_received, amount = it.amountReceived, feeCredit = 0.msat, miningFee = 0.sat, serviceFee = 0.msat, paymentHash = payment.paymentHash, txId = null)
-                is LightningIncomingPayment.Part.FeeCredit -> Details(Type.fee_credit, amount = 0.msat, feeCredit = it.amountReceived, miningFee = 0.sat, serviceFee = 0.msat, paymentHash = payment.paymentHash, txId = null)
-            }
-        }
-        .groupBy { it.type }
-        .values.map { parts ->
-            Details(
-                type = parts.first().type,
-                amount = parts.map { it.amount }.sum(),
-                feeCredit = parts.map { it.feeCredit }.sum(),
-                miningFee = parts.map { it.miningFee }.sum(),
-                serviceFee = parts.map { it.serviceFee }.sum(),
-                paymentHash = parts.first().paymentHash,
-                txId = parts.first().txId
+        val details: Details? = when (payment) {
+            is LightningIncomingPayment -> Details(
+                type = Type.lightning_received,
+                amount = payment.amount,
+                feeCredit = payment.parts.filterIsInstance<LightningIncomingPayment.Part.FeeCredit>().map { it.amountReceived }.sum() - (payment.liquidityPurchaseDetails?.feeCreditUsed ?: 0.msat),
+                miningFee = payment.liquidityPurchaseDetails?.miningFee ?: 0.sat,
+                serviceFee = payment.liquidityPurchaseDetails?.purchase?.fees?.serviceFee?.toMilliSatoshi() ?: 0.msat,
+                paymentHash = payment.paymentHash,
+                txId = payment.liquidityPurchaseDetails?.txId,
+                description = (payment as? Bolt11IncomingPayment)?.paymentRequest?.description
             )
-        }.toList()
 
-    private fun extractLegacyPayToOpenParts(payment: LegacyPayToOpenIncomingPayment): List<Details> = payment.parts
-        .map {
-            when (it) {
-                is LegacyPayToOpenIncomingPayment.Part.Lightning -> Details(Type.lightning_received, amount = it.amountReceived, feeCredit = 0.msat, miningFee = 0.sat, serviceFee = 0.msat, paymentHash = payment.paymentHash, txId = null)
-                is LegacyPayToOpenIncomingPayment.Part.OnChain -> Details(Type.legacy_pay_to_open, amount = it.amountReceived, feeCredit = 0.msat, miningFee = it.miningFee, serviceFee = it.serviceFee, paymentHash = payment.paymentHash, txId = it.txId)
-            }
-        }
-        .groupBy { it.type }
-        .values.map { parts ->
-            Details(
-                type = parts.first().type,
-                amount = parts.map { it.amount }.sum(),
-                feeCredit = parts.map { it.feeCredit }.sum(),
-                miningFee = parts.map { it.miningFee }.sum(),
-                serviceFee = parts.map { it.serviceFee }.sum(),
-                paymentHash = parts.first().paymentHash,
-                txId = parts.first().txId,
+            is LegacySwapInIncomingPayment -> Details(
+                Type.legacy_swap_in,
+                amount = payment.amount,
+                feeCredit = 0.msat,
+                miningFee = payment.fees.truncateToSatoshi(),
+                serviceFee = 0.msat,
+                paymentHash = null,
+                txId = null,
+                destination = payment.address
+            )
+
+            is LegacyPayToOpenIncomingPayment -> Details(
+                type = Type.legacy_pay_to_open,
+                amount = payment.amount,
+                feeCredit = 0.msat,
+                miningFee = payment.parts.filterIsInstance<LegacyPayToOpenIncomingPayment.Part.OnChain>().map { it.miningFee }.sum(),
+                serviceFee = payment.parts.filterIsInstance<LegacyPayToOpenIncomingPayment.Part.OnChain>().map { it.serviceFee }.sum(),
+                paymentHash = payment.paymentHash,
+                txId = payment.parts.filterIsInstance<LegacyPayToOpenIncomingPayment.Part.OnChain>().map { it.txId }.firstOrNull(),
                 description = (payment.origin as? LegacyPayToOpenIncomingPayment.Origin.Invoice)?.paymentRequest?.description
             )
-        }.toList()
+
+            is OnChainIncomingPayment -> Details(
+                Type.swap_in,
+                amount = payment.amount,
+                feeCredit = 0.msat,
+                miningFee = payment.miningFee,
+                serviceFee = payment.serviceFee,
+                paymentHash = null,
+                txId = payment.txId
+            )
+
+            is LightningOutgoingPayment -> when (val details = payment.details) {
+                is LightningOutgoingPayment.Details.Normal -> Details(
+                    Type.lightning_sent,
+                    amount = -payment.amount,
+                    feeCredit = 0.msat,
+                    miningFee = 0.sat,
+                    serviceFee = payment.fees,
+                    paymentHash = payment.paymentHash,
+                    txId = null,
+                    destination = details.paymentRequest.nodeId.toHex(),
+                    description = details.paymentRequest.description
+                )
+
+                is LightningOutgoingPayment.Details.SwapOut -> Details(
+                    Type.legacy_swap_out,
+                    amount = -payment.amount,
+                    feeCredit = 0.msat,
+                    miningFee = details.swapOutFee,
+                    serviceFee = 0.msat,
+                    paymentHash = null,
+                    txId = null,
+                    destination = details.address
+                )
+
+                is LightningOutgoingPayment.Details.Blinded -> Details(
+                    Type.lightning_sent,
+                    amount = -payment.amount,
+                    feeCredit = 0.msat,
+                    miningFee = 0.sat,
+                    serviceFee = payment.fees,
+                    paymentHash = payment.paymentHash,
+                    txId = null,
+                    description = details.paymentRequest.description
+                )
+            }
+
+            is SpliceOutgoingPayment -> Details(
+                Type.swap_out,
+                amount = -payment.amount,
+                feeCredit = 0.msat,
+                miningFee = payment.miningFee,
+                serviceFee = 0.msat,
+                paymentHash = null,
+                txId = payment.txId,
+                destination = payment.address
+            )
+
+            is ChannelCloseOutgoingPayment -> Details(
+                Type.channel_close,
+                amount = -payment.amount,
+                feeCredit = 0.msat,
+                miningFee = payment.miningFee,
+                serviceFee = 0.msat,
+                paymentHash = null,
+                txId = payment.txId,
+                destination = payment.address
+            )
+
+            is SpliceCpfpOutgoingPayment -> Details(
+                Type.fee_bumping,
+                amount = -payment.amount,
+                feeCredit = 0.msat,
+                miningFee = payment.miningFee,
+                serviceFee = 0.msat,
+                paymentHash = null,
+                txId = payment.txId
+            )
+
+            is AutomaticLiquidityPurchasePayment -> if (payment.incomingPaymentReceivedAt == null) {
+                Details(
+                    Type.liquidity_purchase,
+                    amount = -payment.amount,
+                    feeCredit = -payment.liquidityPurchaseDetails.feeCreditUsed,
+                    miningFee = payment.miningFee,
+                    serviceFee = payment.serviceFee,
+                    paymentHash = null,
+                    txId = payment.txId
+                )
+            } else {
+                // If the corresponding Lightning payment was received, then liquidity fees will be included in the Lightning payment
+                null
+            }
+
+            is ManualLiquidityPurchasePayment -> Details(
+                Type.liquidity_purchase,
+                amount = -payment.amount,
+                feeCredit = -payment.liquidityPurchaseDetails.feeCreditUsed,
+                miningFee = payment.miningFee,
+                serviceFee = payment.serviceFee,
+                paymentHash = null,
+                txId = payment.txId
+            )
+        }
+
+        details?.let { addRow(timestamp, id, it, metadata) }
+    }
+
 }
