@@ -51,13 +51,6 @@ SELECT data
 FROM   payments_incoming
 WHERE  payment_hash=?;
 
-getOldestReceivedDate:
-SELECT   received_at
-FROM     payments_incoming AS r
-WHERE    received_at IS NOT NULL
-ORDER BY r.received_at ASC
-LIMIT 1;
-
 list:
 SELECT payment.data
 FROM   payments_incoming AS payment
