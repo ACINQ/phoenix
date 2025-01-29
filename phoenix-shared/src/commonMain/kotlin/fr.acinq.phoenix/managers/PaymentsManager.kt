@@ -71,7 +71,7 @@ class PaymentsManager(
     }
 
     private suspend fun monitorPaymentsCountInDb() {
-        paymentsDb().listPaymentsCountFlow().collect { _paymentsCount.value = it }
+        paymentsDb().countPaymentsAsFlow().collect { _paymentsCount.value = it }
     }
 
     /** Monitors the payments database and push any new payments in the [_lastCompletedPayment] flow. */

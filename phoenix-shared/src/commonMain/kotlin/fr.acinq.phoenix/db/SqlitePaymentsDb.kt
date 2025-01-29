@@ -121,81 +121,51 @@ class SqlitePaymentsDb(
         database.paymentsIncomingQueries.listByTxId(txId).executeAsList() + database.paymentsOutgoingQueries.listByTxId(txId).executeAsList()
     }
 
-    // ---- list ALL payments
-
     fun listPaymentsAsFlow(count: Long, skip: Long): Flow<List<WalletPaymentInfo>> {
         return database.paymentsQueries.list(limit = count, offset = skip, mapper = ::mapPaymentsAndMetadata)
             .asFlow()
-            .mapToList(Dispatchers.Default)
-            .map { it.discardReceivedAutomaticLiquidity() }
-            .map { list ->
-                withContext(Dispatchers.Default) {
-                    list.map { info ->
-                        contactsManager?.contactForPayment(info.payment)?.let {
-                            info.copy(contact = it)
-                        } ?: info
-                    }
-                }
+            .map {
+                withContext(Dispatchers.Default) { it.executeAsList().postProcess() }
             }
     }
 
     fun listOutgoingInFlightPaymentsAsFlow(count: Long, skip: Long): Flow<List<WalletPaymentInfo>> {
-        return database.paymentsOutgoingQueries.listInFlight(limit = count, offset = skip, mapper = ::mapInFlightPaymentsAndMetadata)
+        return database.paymentsQueries.listInFlight(limit = count, offset = skip, mapper = ::mapPaymentsAndMetadata)
             .asFlow()
-            .mapToList(Dispatchers.Default)
-            .map { list ->
-                withContext(Dispatchers.Default) {
-                    list.map { info ->
-                        contactsManager?.contactForPayment(info.payment)?.let {
-                            info.copy(contact = it)
-                        } ?: info
-                    }
-                }
+            .map {
+                withContext(Dispatchers.Default) { it.executeAsList().postProcess() }
             }
     }
 
     // Recent payments includes in-flight (not completed) payments.
-    fun listRecentPaymentsAsFlow(count: Long, skip: Long, sinceDate: Long, ): Flow<List<WalletPaymentInfo>> {
+    fun listRecentPaymentsAsFlow(count: Long, skip: Long, sinceDate: Long): Flow<List<WalletPaymentInfo>> {
         return database.paymentsQueries.listRecent(min_ts = sinceDate, limit = count, offset = skip, mapper = ::mapPaymentsAndMetadata)
             .asFlow()
-            .mapToList(Dispatchers.Default)
-            .map { list ->
-                withContext(Dispatchers.Default) {
-                    list.map { info ->
-                        contactsManager?.contactForPayment(info.payment)?.let {
-                            info.copy(contact = it)
-                        } ?: info
-                    }
-                }
+            .map {
+                withContext(Dispatchers.Default) { it.executeAsList().postProcess() }
             }
     }
 
     suspend fun listCompletedPayments(count: Long, skip: Long, startDate: Long, endDate: Long): List<WalletPaymentInfo> {
         return withContext(Dispatchers.Default) {
-            database.paymentsQueries.listSucceeded(
-                succeeded_at_from = startDate,
-                succeeded_at_to = endDate,
-                limit = count,
-                offset = skip,
-                mapper = ::mapPaymentsAndMetadata
-            )
-            .executeAsList()
-            .discardReceivedAutomaticLiquidity()
-        }.let { list ->
-            withContext(Dispatchers.Main) {
-                list.map { info ->
-                    contactsManager?.contactForPayment(info.payment)?.let {
-                        info.copy(contact = it)
-                    } ?: info
-                }
-            }
+            database.paymentsQueries.listSucceeded(succeeded_at_from = startDate, succeeded_at_to = endDate, limit = count, offset = skip, mapper = ::mapPaymentsAndMetadata)
+                .executeAsList().postProcess()
         }
     }
 
-    /** [AutomaticLiquidityPurchasePayment] should be ignored if the payment they are associated with has been received, because the liquidity data are already contained in that payment. */
-    private fun List<WalletPaymentInfo>.discardReceivedAutomaticLiquidity(): List<WalletPaymentInfo> = this.filterNot {
-        val payment = it.payment
-        payment is AutomaticLiquidityPurchasePayment && payment.incomingPaymentReceivedAt != null
+    /**
+     * - [AutomaticLiquidityPurchasePayment] should be ignored if the payment they are associated with has been received, because the liquidity data are already contained in that payment.
+     * - fetch contact details for incoming/outgoing bolt12 payments.
+     */
+    private fun List<WalletPaymentInfo>.postProcess(): List<WalletPaymentInfo> = this.mapNotNull { paymentInfo ->
+        val payment = paymentInfo.payment
+        when {
+            payment is AutomaticLiquidityPurchasePayment && payment.incomingPaymentReceivedAt != null -> null
+            payment is Bolt12IncomingPayment || (payment is LightningOutgoingPayment && payment.details is LightningOutgoingPayment.Details.Blinded) -> {
+                paymentInfo.copy(contact = contactsManager?.contactForPayment(payment))
+            }
+            else -> paymentInfo
+        }
     }
 
     @Suppress("UNUSED_PARAMETER")
@@ -214,75 +184,22 @@ class SqlitePaymentsDb(
         )
     }
 
-    @Suppress("UNUSED_PARAMETER")
-    private fun mapInFlightPaymentsAndMetadata(
-        payment: OutgoingPayment,
-        payment_id: UUID?,
-        lnurl_base_type: LnurlBase.TypeVersion?,
-        lnurl_base_blob: ByteArray?,
-        lnurl_description: String?,
-        lnurl_metadata_type: LnurlMetadata.TypeVersion?,
-        lnurl_metadata_blob: ByteArray?,
-        lnurl_successAction_type: LnurlSuccessAction.TypeVersion?,
-        lnurl_successAction_blob: ByteArray?,
-        user_description: String?,
-        user_notes: String?,
-        modified_at: Long?,
-        original_fiat_type: String?,
-        original_fiat_rate: Double?
-    ): WalletPaymentInfo {
-        val metadata = PaymentsMetadataQueries.mapAll(
-            id = payment.id,
-            lnurl_base_type = lnurl_base_type,
-            lnurl_base_blob = lnurl_base_blob,
-            lnurl_description = lnurl_description,
-            lnurl_metadata_type = lnurl_metadata_type,
-            lnurl_metadata_blob = lnurl_metadata_blob,
-            lnurl_successAction_type = lnurl_successAction_type,
-            lnurl_successAction_blob = lnurl_successAction_blob,
-            user_description = user_description,
-            user_notes = user_notes,
-            modified_at = modified_at,
-            original_fiat_type = original_fiat_type,
-            original_fiat_rate = original_fiat_rate
-        )
-        return WalletPaymentInfo(
-            payment = payment,
-            metadata = metadata,
-            contact = null
-        )
+    suspend fun getOldestCompletedDate(): Long? = withContext(Dispatchers.Default) {
+        database.paymentsQueries.getOldestCompletedAt().executeAsOneOrNull()?.completed_at
     }
 
-    fun listPaymentsCountFlow(): Flow<Long> {
+    fun countPaymentsAsFlow(): Flow<Long> {
         return database.paymentsQueries.count()
             .asFlow()
             .map {
                 withContext(Dispatchers.Default) {
-                    database.transactionWithResult {
-                        it.executeAsOne()
-                    }
+                    database.transactionWithResult { it.executeAsOne() }
                 }
             }
     }
 
-    /** Returns the timestamp of the oldest completed payment, if any. Lets us set up the export-csv UI with a nice start date. */
-    fun getOldestCompletedTimestamp(): Long? {
-        return database.paymentsQueries.getOldestCompletedTimestamp().executeAsOneOrNull()?.completed_at
-    }
-
-    /** Suspending version of `getOldestCompletedTimestamp`. */
-    suspend fun getOldestCompletedDate(): Long? = withContext(Dispatchers.Default) {
-        getOldestCompletedTimestamp()
-    }
-
-    suspend fun countCompletedInRange(
-        startDate: Long,
-        endDate: Long
-    ): Long = withContext(Dispatchers.Default) {
-        database.paymentsQueries.countCompletedInRange(
-            completed_at_from = startDate,
-            completed_at_to = endDate
-        ).executeAsOne()
+    suspend fun countCompletedInRange(startDate: Long, endDate: Long): Long = withContext(Dispatchers.Default) {
+        database.paymentsQueries.countCompletedInRange(completed_at_from = startDate, completed_at_to = endDate).executeAsOne()
     }
 
     /**
