@@ -10,6 +10,10 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
+fileprivate let payments_record_table_name = "payments"
+fileprivate let payments_record_column_data = "encryptedData"
+fileprivate let payments_record_column_meta = "encryptedMeta"
+
 fileprivate struct DownloadedPayment {
 	let record: CKRecord
 	let payment: Lightning_kmpWalletPayment
@@ -24,7 +28,6 @@ fileprivate struct UploadPaymentsOperationInfo {
 	let recordIDsToDelete: [CKRecord.ID]
 	
 	let reverseMap: [CKRecord.ID: Lightning_kmpUUID]
-	let unpaddedMap: [Lightning_kmpUUID: Int]
 	
 	var completedRowids: [Int64] = []
 	
@@ -35,6 +38,67 @@ fileprivate struct UploadPaymentsOperationInfo {
 }
 
 extension SyncBackupManager {
+	
+	func startPaymentsQueueCountMonitor() {
+		log.trace("startPaymentsQueueCountMonitor()")
+		
+		// Kotlin suspend functions are currently only supported on the main thread
+		assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
+		
+		self.cloudKitDb.payments.queueCountPublisher().sink {[weak self] (queueCount: Int64) in
+			log.debug("payments.queueCountPublisher().sink(): count = \(queueCount)")
+			
+			guard let self = self else {
+				return
+			}
+			
+			let count = Int(clamping: queueCount)
+			
+			let wait: SyncBackupManager_State_Waiting?
+			if Prefs.shared.backupTransactions.useUploadDelay {
+				let delay = TimeInterval.random(in: 10 ..< 900)
+				wait = SyncBackupManager_State_Waiting(
+					kind: .randomizedUploadDelay,
+					parent: self,
+					delay: delay
+				)
+			} else {
+				wait = nil
+			}
+			
+			Task {
+				if let newState = await self.actor.paymentsQueueCountChanged(count, wait: wait) {
+					self.handleNewState(newState)
+				}
+			}
+
+		}.store(in: &cancellables)
+	}
+	
+	func startPaymentsMigrations() {
+		log.trace("startPaymentsMigrations()")
+		
+		let hasDownloadedPayments = Prefs.shared.backupTransactions.hasDownloadedPayments(walletId)
+		let hasReUploadedPayments = Prefs.shared.backupTransactions.hasReUploadedPayments(walletId)
+		
+		let needsMigration = hasDownloadedPayments && !hasReUploadedPayments
+		
+		guard needsMigration else {
+			log.debug("startPaymentsMigrations(): no migration needed")
+			return
+		}
+		
+		log.debug("startPaymentsMigrations(): starting...")
+		Task { @MainActor in
+		
+			try await self.cloudKitDb.payments.enqueueOutdatedItems()
+			Prefs.shared.backupTransactions.markHasReUploadedPayments(walletId)
+		}
+	}
+	
+	// ----------------------------------------
+	// MARK: IO
+	// ----------------------------------------
 	
 	func downloadPayments(_ downloadProgress: SyncBackupManager_State_Downloading) {
 		log.trace("downloadPayments()")
@@ -243,6 +307,7 @@ extension SyncBackupManager {
 				log.trace("downloadPayments(): finish: success")
 				
 				Prefs.shared.backupTransactions.markHasDownloadedPayments(walletId)
+				Prefs.shared.backupTransactions.markHasReUploadedPayments(walletId)
 				self.consecutiveErrorCount = 0
 				
 				if let newState = await self.actor.didDownloadPayments() {
@@ -277,7 +342,6 @@ extension SyncBackupManager {
 			var recordIDsToDelete = [CKRecord.ID]()
 			
 			var reverseMap = [CKRecord.ID: Lightning_kmpUUID]()
-			var unpaddedMap = [Lightning_kmpUUID: Int]()
 			
 			// NB: batch.rowidMap may contain the same paymentRowId multiple times.
 			// And if we include the same record multiple times in the CKModifyRecordsOperation,
@@ -294,7 +358,7 @@ extension SyncBackupManager {
 				
 				if let row = batch.rowMap[paymentId] {
 					
-					if let (ciphertext, unpaddedSize) = self.serializeAndEncryptPayment(row.payment, batch) {
+					if let ciphertext = self.serializeAndEncryptPayment(row.payment, batch) {
 						
 						let record = existingRecord ?? CKRecord(
 							recordType: payments_record_table_name,
@@ -309,7 +373,6 @@ extension SyncBackupManager {
 						
 						recordsToSave.append(record)
 						reverseMap[record.recordID] = paymentId
-						unpaddedMap[paymentId] = unpaddedSize
 					}
 					
 				} else {
@@ -328,8 +391,7 @@ extension SyncBackupManager {
 				batch: batch,
 				recordsToSave: recordsToSave,
 				recordIDsToDelete: recordIDsToDelete,
-				reverseMap: reverseMap,
-				unpaddedMap: unpaddedMap
+				reverseMap: reverseMap
 			)
 			
 			// Edge-case: A rowid wasn't able to be converted to a UUID.
@@ -507,12 +569,11 @@ extension SyncBackupManager {
 			for record in opInfo.savedRecords {
 				if let paymentRowId = opInfo.reverseMap[record.recordID] {
 					
-					let unpaddedSize = opInfo.unpaddedMap[paymentRowId] ?? 0
 					let creation = self.dateToMillis(record.creationDate ?? Date())
 					let metadata = self.metadataForRecord(record)
 					
 					updateMetadata[paymentRowId] = CloudKitPaymentsDb.MetadataRow(
-						unpaddedSize: Int64(unpaddedSize),
+						unpaddedSize: Int64(0),
 						recordCreation: creation,
 						recordBlob:  metadata.toKotlinByteArray()
 					)
@@ -676,12 +737,11 @@ extension SyncBackupManager {
 	private func serializeAndEncryptPayment(
 		_ row: Lightning_kmpWalletPayment,
 		_ batch: FetchPaymentsQueueBatchResult
-	) -> (Data, Int)? {
+	) -> Data? {
 		
 		let wrapper = CloudData.V1(payment: row)
 		
 		let cleartext: Data = wrapper.serialize().toSwiftData()
-		let unpaddedSize: Int = cleartext.count
 		
 		#if DEBUG
 	//	let jsonData = wrapper.jsonSerialize().toSwiftData()
@@ -698,11 +758,7 @@ extension SyncBackupManager {
 			log.error("Error encrypting row with ChaChaPoly: \(String(describing: error))")
 		}
 		
-		if let ciphertext = ciphertext {
-			return (ciphertext, unpaddedSize)
-		} else {
-			return nil
-		}
+		return ciphertext
 	}
 	
 	private func serializeAndEncryptMetadata(

@@ -10,6 +10,10 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
+fileprivate let contacts_record_table_name = "contacts"
+fileprivate let contacts_record_column_data = "encryptedData"
+fileprivate let contacts_record_column_photo = "photo" // CKAsset: automatically encrypted by CloudKit
+
 fileprivate struct DownloadedContact {
 	let record: CKRecord
 	let contact: ContactInfo
@@ -32,6 +36,35 @@ fileprivate struct UploadContactsOperationInfo {
 }
 
 extension SyncBackupManager {
+	
+	func startContactsQueueCountMonitor() {
+		log.trace("startContactsQueueCountMonitor()")
+		
+		// Kotlin suspend functions are currently only supported on the main thread
+		assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
+		
+		self.cloudKitDb.contacts.queueCountPublisher().sink {[weak self] (queueCount: Int64) in
+			log.debug("contacts.queueCountPublisher().sink(): count = \(queueCount)")
+			
+			guard let self = self else {
+				return
+			}
+			
+			// Note: Upload delay doesn't apply to contacts.
+			
+			let count = Int(clamping: queueCount)
+			Task {
+				if let newState = await self.actor.contactsQueueCountChanged(count, wait: nil) {
+					self.handleNewState(newState)
+				}
+			}
+
+		}.store(in: &cancellables)
+	}
+	
+	// ----------------------------------------
+	// MARK: IO
+	// ----------------------------------------
 	
 	func downloadContacts(_ downloadProgress: SyncBackupManager_State_Downloading) {
 		log.trace("downloadContacts()")
