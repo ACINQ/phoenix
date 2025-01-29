@@ -563,7 +563,7 @@ struct HomeView : MVIView {
 					Button {
 						didSelectPayment(row: row)
 					} label: {
-						PaymentCell(info: row, didAppearCallback: nil)
+						PaymentCell(info: row)
 					}
 				}
 				
@@ -854,7 +854,24 @@ struct HomeView : MVIView {
 	func contactsChanged(_ contacts: [ContactInfo]) {
 		log.trace("contactsChanged()")
 		
-		// Todo: Re-fetch the visible rows
+		// Update WalletPaymentInfo.contact for all rows
+		
+		let contactsManager = Biz.business.contactsManager
+		let updatedRows = paymentsPage.rows.map { info in
+			let updatedContact = contactsManager.contactForPayment(payment: info.payment)
+			return WalletPaymentInfo(
+				payment      : info.payment,
+				metadata     : info.metadata,
+				contact      : updatedContact,
+				fetchOptions : info.fetchOptions
+			)
+		}
+		let updatedPage = PaymentsPage(
+			offset : paymentsPage.offset,
+			count  : paymentsPage.count,
+			rows   : updatedRows
+		)
+		paymentsPage = updatedPage
 	}
 	
 	fileprivate func footerCellDidAppear() {
