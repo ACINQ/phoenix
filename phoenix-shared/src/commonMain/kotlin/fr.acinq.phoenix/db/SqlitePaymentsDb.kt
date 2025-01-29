@@ -128,6 +128,19 @@ class SqlitePaymentsDb(
             .map { it.executeAsList().discardReceivedAutomaticLiquidity() }
     }
 
+    fun listOutgoingInFlightPaymentsAsFlow(count: Long, skip: Long): Flow<List<WalletPaymentInfo>> {
+        return database.paymentsOutgoingQueries.listInFlight(limit = count, offset = skip, mapper = ::mapInFlightPaymentsAndMetadata)
+            .asFlow()
+            .mapToList(Dispatchers.Default)
+    }
+
+    // Recent payments includes in-flight (not completed) payments.
+    fun listRecentPaymentsAsFlow(count: Long, skip: Long, sinceDate: Long, ): Flow<List<WalletPaymentInfo>> {
+        return database.paymentsQueries.listRecent(min_ts = sinceDate, limit = count, offset = skip, mapper = ::mapPaymentsAndMetadata)
+            .asFlow()
+            .mapToList(Dispatchers.Default)
+    }
+
     suspend fun listCompletedPayments(count: Long, skip: Long, startDate: Long, endDate: Long): List<WalletPaymentInfo> = withContext(Dispatchers.Default) {
         database.paymentsQueries.listSucceeded(succeeded_at_from = startDate, succeeded_at_to = endDate, limit = count, offset = skip, mapper = ::mapPaymentsAndMetadata).executeAsList()
             .discardReceivedAutomaticLiquidity()
@@ -151,6 +164,46 @@ class SqlitePaymentsDb(
                 lnurl_base_type, lnurl_base_blob, lnurl_description, lnurl_metadata_type, lnurl_metadata_blob,
                 lnurl_successAction_type, lnurl_successAction_blob,
                 user_description, user_notes, modified_at, original_fiat_type, original_fiat_rate),
+            contact = null,
+            fetchOptions = WalletPaymentFetchOptions.Metadata
+        )
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    private fun mapInFlightPaymentsAndMetadata(
+        payment: OutgoingPayment,
+        payment_id: UUID?,
+        lnurl_base_type: LnurlBase.TypeVersion?,
+        lnurl_base_blob: ByteArray?,
+        lnurl_description: String?,
+        lnurl_metadata_type: LnurlMetadata.TypeVersion?,
+        lnurl_metadata_blob: ByteArray?,
+        lnurl_successAction_type: LnurlSuccessAction.TypeVersion?,
+        lnurl_successAction_blob: ByteArray?,
+        user_description: String?,
+        user_notes: String?,
+        modified_at: Long?,
+        original_fiat_type: String?,
+        original_fiat_rate: Double?
+    ): WalletPaymentInfo {
+        val metadata = PaymentsMetadataQueries.mapAll(
+            id = payment.id,
+            lnurl_base_type = lnurl_base_type,
+            lnurl_base_blob = lnurl_base_blob,
+            lnurl_description = lnurl_description,
+            lnurl_metadata_type = lnurl_metadata_type,
+            lnurl_metadata_blob = lnurl_metadata_blob,
+            lnurl_successAction_type = lnurl_successAction_type,
+            lnurl_successAction_blob = lnurl_successAction_blob,
+            user_description = user_description,
+            user_notes = user_notes,
+            modified_at = modified_at,
+            original_fiat_type = original_fiat_type,
+            original_fiat_rate = original_fiat_rate
+        )
+        return WalletPaymentInfo(
+            payment = payment,
+            metadata = metadata,
             contact = null,
             fetchOptions = WalletPaymentFetchOptions.Metadata
         )
