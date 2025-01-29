@@ -58,14 +58,6 @@ class PaymentsManager(
     private val _lastCompletedPayment = MutableStateFlow<WalletPayment?>(null)
     val lastCompletedPayment: StateFlow<WalletPayment?> = _lastCompletedPayment
 
-    /**
-     * Provides a default PaymentsFetcher for use by the app.
-     * (You can also create your own instances if needed.)
-     */
-    val fetcher: PaymentsFetcher by lazy {
-        PaymentsFetcher(loggerFactory = loggerFactory, paymentsManager = this, cacheSizeLimit = 250)
-    }
-
     fun makePageFetcher(): PaymentsPageFetcher {
         return PaymentsPageFetcher(loggerFactory, databaseManager, contactsManager)
     }
