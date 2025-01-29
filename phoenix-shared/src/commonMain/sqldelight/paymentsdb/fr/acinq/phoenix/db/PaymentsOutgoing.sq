@@ -94,6 +94,11 @@ WHERE
     succeeded_at BETWEEN :succeeded_at_from AND :succeeded_at_to
 LIMIT :limit OFFSET :offset;
 
+scanCompleted:
+SELECT id, completed_at
+FROM payments_outgoing
+WHERE completed_at IS NOT NULL;
+
 -- use this in a `transaction` block to know how many rows were changed after an UPDATE
 changes:
 SELECT changes();

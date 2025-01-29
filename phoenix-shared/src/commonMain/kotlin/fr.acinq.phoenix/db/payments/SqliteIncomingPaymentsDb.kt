@@ -23,6 +23,7 @@ import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.IncomingPaymentsDb
 import fr.acinq.lightning.db.LightningIncomingPayment
 import fr.acinq.lightning.db.OnChainIncomingPayment
+import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.db.PaymentsDatabase
 import fr.acinq.phoenix.db.didDeleteWalletPayment
@@ -34,33 +35,35 @@ import kotlinx.coroutines.withContext
 class SqliteIncomingPaymentsDb(private val database: PaymentsDatabase) : IncomingPaymentsDb {
 
     override suspend fun addIncomingPayment(incomingPayment: IncomingPayment) {
-        return withContext(Dispatchers.Default) {
-            database.transaction {
-                database.paymentsIncomingQueries.insert(
-                    id = incomingPayment.id,
-                    payment_hash = (incomingPayment as? LightningIncomingPayment)?.paymentHash,
-                    tx_id = when (incomingPayment) {
-                        is LightningIncomingPayment -> incomingPayment.liquidityPurchaseDetails?.txId
-                        is OnChainIncomingPayment -> incomingPayment.txId
-                        else -> null
-                    },
-                    created_at = incomingPayment.createdAt,
-                    received_at = incomingPayment.completedAt,
-                    data_ = incomingPayment
-                )
-                // if the payment is on-chain, save the tx id link to the db
-                when (incomingPayment) {
-                    is OnChainIncomingPayment ->
-                        database.onChainTransactionsQueries.insert(
-                            payment_id = incomingPayment.id,
-                            tx_id = incomingPayment.txId
-                        )
-
-                    else -> {}
-                }
-                didSaveWalletPayment(incomingPayment.id, database)
-            }
+        withContext(Dispatchers.Default) {
+            _addIncomingPayment(incomingPayment)
         }
+    }
+
+    fun _addIncomingPayment(incomingPayment: IncomingPayment) = database.transaction {
+        database.paymentsIncomingQueries.insert(
+            id = incomingPayment.id,
+            payment_hash = (incomingPayment as? LightningIncomingPayment)?.paymentHash,
+            tx_id = when (incomingPayment) {
+                is LightningIncomingPayment -> incomingPayment.liquidityPurchaseDetails?.txId
+                is OnChainIncomingPayment -> incomingPayment.txId
+                else -> null
+            },
+            created_at = incomingPayment.createdAt,
+            received_at = incomingPayment.completedAt,
+            data_ = incomingPayment
+        )
+        // if the payment is on-chain, save the tx id link to the db
+        when (incomingPayment) {
+            is OnChainIncomingPayment ->
+                database.onChainTransactionsQueries.insert(
+                    payment_id = incomingPayment.id,
+                    tx_id = incomingPayment.txId
+                )
+
+            else -> {}
+        }
+        didSaveWalletPayment(incomingPayment.id, database)
     }
 
     override suspend fun getLightningIncomingPayment(paymentHash: ByteVector32): LightningIncomingPayment? =

@@ -5,6 +5,7 @@ import app.cash.sqldelight.coroutines.asFlow
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.data.ContactInfo
+import kotlin.collections.List
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
