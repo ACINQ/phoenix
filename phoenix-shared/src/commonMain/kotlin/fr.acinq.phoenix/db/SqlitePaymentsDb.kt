@@ -46,25 +46,13 @@ class SqlitePaymentsDb(
     PaymentsDb {
 
     val metadataQueries = PaymentsMetadataQueries(database)
-    private var metadataQueue = MutableStateFlow(mapOf<UUID, WalletPaymentMetadataRow>())
 
-    suspend fun getPayment(id: UUID): Pair<WalletPayment, WalletPaymentMetadata?>? = withContext(Dispatchers.Default) {
-        _getPayment(id)
-    }
-
-    fun _getPayment(id: UUID): Pair<WalletPayment, WalletPaymentMetadata?>? = database.transactionWithResult {
-        (database.paymentsIncomingQueries.get(id).executeAsOneOrNull() ?: database.paymentsOutgoingQueries.get(id).executeAsOneOrNull())?.let { payment ->
-            val metadata = metadataQueries.get(id)
-            payment to metadata
-        }
-    }
-
-    @Suppress("DEPRECATION")
     override suspend fun getInboundLiquidityPurchase(txId: TxId): LiquidityAds.LiquidityTransactionDetails? {
         val payment = buildList {
             addAll(database.paymentsIncomingQueries.listByTxId(txId).executeAsList())
             addAll(database.paymentsOutgoingQueries.listByTxId(txId).executeAsList())
         }.firstOrNull()
+        @Suppress("DEPRECATION")
         return when (payment) {
             is LightningIncomingPayment -> payment.liquidityPurchaseDetails
             is OnChainIncomingPayment -> payment.liquidityPurchaseDetails
@@ -108,6 +96,17 @@ class SqlitePaymentsDb(
                 database.paymentsOutgoingQueries.update(id = payment1.id, data = payment1, completed_at = payment1.completedAt, succeeded_at = payment1.succeededAt)
                 didSaveWalletPayment(payment1.id, database)
             }
+        }
+    }
+
+    suspend fun getPayment(id: UUID): Pair<WalletPayment, WalletPaymentMetadata?>? = withContext(Dispatchers.Default) {
+        _getPayment(id)
+    }
+
+    fun _getPayment(id: UUID): Pair<WalletPayment, WalletPaymentMetadata?>? = database.transactionWithResult {
+        (database.paymentsIncomingQueries.get(id).executeAsOneOrNull() ?: database.paymentsOutgoingQueries.get(id).executeAsOneOrNull())?.let { payment ->
+            val metadata = metadataQueries.get(id)
+            payment to metadata
         }
     }
 
@@ -201,6 +200,8 @@ class SqlitePaymentsDb(
     suspend fun countCompletedInRange(startDate: Long, endDate: Long): Long = withContext(Dispatchers.Default) {
         database.paymentsQueries.countCompletedInRange(completed_at_from = startDate, completed_at_to = endDate).executeAsOne()
     }
+
+    private var metadataQueue = MutableStateFlow(mapOf<UUID, WalletPaymentMetadataRow>())
 
     /**
      * The lightning-kmp layer triggers the addition of a payment to the database.
