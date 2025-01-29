@@ -33,13 +33,6 @@ class CloudKitPaymentsDb(
         val recordBlob: ByteArray
     )
 
-    data class MetadataStats(
-        val mean: Double,
-        val standardDeviation: Double
-    ) {
-        constructor(): this(mean = 0.0, standardDeviation = 0.0)
-    }
-
     data class FetchQueueBatchResult(
 
         // The fetched rowid values from the `cloudkit_payments_queue` table
@@ -56,11 +49,7 @@ class CloudKitPaymentsDb(
 
         // Maps to `cloudkit_payments_metadata.ckrecord_info`.
         // If missing from the map, then then record doesn't exist in the database.
-        val metadataMap: Map<UUID, ByteArray>,
-
-        // The `cloudkit_payments_metadata` stores the size of the non-padded record.
-        // Statistics about these values are returned, rowMap is non-empty.
-        val stats: MetadataStats,
+        val metadataMap: Map<UUID, ByteArray>
     )
 
     init {
@@ -92,17 +81,16 @@ class CloudKitPaymentsDb(
             val rowidMap = mutableMapOf<Long, UUID>()
             val rowMap = mutableMapOf<UUID, WalletPaymentInfo>()
             val metadataMap = mutableMapOf<UUID, ByteArray>()
-            var stats = MetadataStats()
 
             db.transaction {
 
-                // Step 1 of 5:
+                // Step 1 of 4:
                 // Fetch the rows from the `cloudkit_payments_queue` batch.
                 // We are fetching the next/oldest X rows from the queue.
 
                 val batch = ckQueries.fetchQueueBatch(limit).executeAsList()
 
-                // Step 2 of 5:
+                // Step 2 of 4:
                 // Process the batch, and fill out the `rowids` & `rowidMap` variable.
 
                 batch.forEach { row ->
@@ -113,7 +101,7 @@ class CloudKitPaymentsDb(
                 // Remember: there could be duplicates
                 val uniquePaymentIds = rowidMap.values.toSet()
 
-                // Step 3 of 5:
+                // Step 3 of 4:
                 // Fetch the corresponding payment info from the database.
                 // In order to optimize disk access, we fetch from 1 table at a time.
 
@@ -140,7 +128,7 @@ class CloudKitPaymentsDb(
                     }
                 } // </payments_metadata>
 
-                // Step 4 of 5:
+                // Step 4 of 4:
                 // Fetch the corresponding `cloudkit_payments_metadata.ckrecord_info`
 
                 uniquePaymentIds.forEach { paymentId ->
@@ -149,43 +137,13 @@ class CloudKitPaymentsDb(
                     }
                 }
 
-                // Step 5 of 5:
-                // Fetch the metadata statistics (if needed).
-
-                if (rowMap.isNotEmpty()) {
-
-                    val process = { list: List<Long> ->
-                        val mean = list.sum().toDouble() / list.size.toDouble()
-                        val variance = list.sumOf {
-                            val diff = it.toDouble() - mean
-                            diff.pow(2)
-                        }
-                        val standardDeviation = sqrt(variance)
-
-                        MetadataStats(
-                            mean = mean,
-                            standardDeviation = standardDeviation
-                        )
-                    }
-
-                    val sizeList = mutableListOf<Long>()
-                    ckQueries.scanSizes().executeAsList().forEach { row ->
-                        if (row.unpadded_size > 0) {
-                            sizeList.add(row.unpadded_size)
-                        }
-                    }
-
-                    stats = process(sizeList)
-                }
-
             } // </db.transaction>
 
             FetchQueueBatchResult(
                 rowids = rowids,
                 rowidMap = rowidMap,
                 rowMap = rowMap,
-                metadataMap = metadataMap,
-                stats = stats
+                metadataMap = metadataMap
             )
         }
     }
@@ -246,15 +204,6 @@ class CloudKitPaymentsDb(
         downloadedPaymentsMetadata: Map<UUID, WalletPaymentMetadataRow>,
         updateMetadata: Map<UUID, MetadataRow>
     ) {
-        // We are seeing crashes when accessing the values within the List<PaymentRow>.
-        // Perhaps because the List was created in Swift ?
-        // The workaround seems to be to copy the list here,
-        // or otherwise process it outside of the `withContext` below.
-        //
-        // TEST: Is this copy still needed ???
-        //
-    //  val incomingList = downloadedPayments.filterIsInstance<IncomingPayment>()
-
         withContext(Dispatchers.Default) {
 
             val inQueries = paymentsDb.database.paymentsIncomingQueries
@@ -321,6 +270,25 @@ class CloudKitPaymentsDb(
                         )
                     }
                 } // </cloudkit_payments_metadata table>
+            }
+        }
+    }
+
+    suspend fun enqueueOutdatedItems() = withContext(Dispatchers.Default) {
+
+        val ckQueries = paymentsDb.database.cloudKitPaymentsQueries
+        db.transaction {
+
+            val paymentIds = mutableListOf<UUID>()
+            ckQueries.listNonZeroSizes().executeAsList().forEach { row ->
+                paymentIds.add(row.id)
+            }
+
+            for (paymentId in paymentIds) {
+                ckQueries.addToQueue(
+                    id = paymentId,
+                    date_added = currentTimestampMillis()
+                )
             }
         }
     }

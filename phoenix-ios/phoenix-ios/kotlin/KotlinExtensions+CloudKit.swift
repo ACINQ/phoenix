@@ -47,7 +47,6 @@ struct FetchPaymentsQueueBatchResult {
 	let rowidMap: [Int64: Lightning_kmpUUID]
 	let rowMap: [Lightning_kmpUUID : WalletPaymentInfo]
 	let metadataMap: [Lightning_kmpUUID : KotlinByteArray]
-	let stats: CloudKitPaymentsDb.MetadataStats
 	
 	func uniquePaymentIds() -> Set<Lightning_kmpUUID> {
 		return Set<Lightning_kmpUUID>(rowidMap.values)
@@ -79,8 +78,7 @@ struct FetchPaymentsQueueBatchResult {
 			rowids: [],
 			rowidMap: [:],
 			rowMap: [:],
-			metadataMap: [:],
-			stats: CloudKitPaymentsDb.MetadataStats()
+			metadataMap: [:]
 		)
 	}
 }
@@ -154,8 +152,7 @@ extension CloudKitPaymentsDb.FetchQueueBatchResult {
 			rowids: _rowids,
 			rowidMap: _rowidMap,
 			rowMap: self.rowMap,
-			metadataMap: self.metadataMap,
-			stats: self.stats
+			metadataMap: self.metadataMap
 		)
 	}
 }

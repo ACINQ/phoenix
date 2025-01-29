@@ -12,9 +12,9 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 fileprivate struct DownloadedPayment {
 	let record: CKRecord
-	let unpaddedSize: Int
 	let payment: Lightning_kmpWalletPayment
 	let metadata: WalletPaymentMetadataRow?
+	let unpaddedSize: Int
 }
 
 fileprivate struct UploadPaymentsOperationInfo {
@@ -39,16 +39,14 @@ extension SyncBackupManager {
 	func downloadPayments(_ downloadProgress: SyncBackupManager_State_Downloading) {
 		log.trace("downloadPayments()")
 		
-		Task {
+		Task { @MainActor in
 			
-			// Step 1 of 4:
+			// Step 1 of 6:
 			//
 			// We are downloading payments from newest to oldest.
 			// So first we fetch the oldest payment date in the table (if there is one)
 			
-			let millis: KotlinLong? = try await Task { @MainActor in
-				return try await self.cloudKitDb.payments.fetchOldestCreation()
-			}.value
+			let millis: KotlinLong? = try await self.cloudKitDb.payments.fetchOldestCreation()
 			
 			let oldestCreationDate = millis?.int64Value.toDate(from: .milliseconds)
 			downloadProgress.setPayments_oldestCompletedDownload(oldestCreationDate)
@@ -78,16 +76,16 @@ extension SyncBackupManager {
 			 * our current choice is to sacrifice the progress details.
 			 */
 			
-			let privateCloudDatabase = CKContainer.default().privateCloudDatabase
+			let privDb = CKContainer.default().privateCloudDatabase
 			let zoneID = self.recordZoneID()
 			
 			let configuration = CKOperation.Configuration()
 			configuration.allowsCellularAccess = true
 			
 			do {
-				try await privateCloudDatabase.configuredWith(configuration: configuration) { database in
+				try await privDb.configuredWith(configuration: configuration) { database in
 					
-					// Step 2 of 4:
+					// Step 2 of 6:
 					//
 					// Execute a CKQuery to download a batch of payments from the cloud.
 					// There may be multiple batches available for download.
@@ -110,7 +108,7 @@ extension SyncBackupManager {
 					var done = false
 					var batch = 0
 					var cursor: CKQueryOperation.Cursor? = nil
-					
+						
 					while !done {
 						
 						// For the first batch, we want to quickly fetch an item from the cloud,
@@ -148,21 +146,15 @@ extension SyncBackupManager {
 						var items: [DownloadedPayment] = []
 						for (_, result) in results {
 							if case .success(let record) = result {
-								let (payment, metadata, unpaddedSize) = self.decryptAndDeserializePayment(record)
-								if let payment {
-									items.append(DownloadedPayment(
-										record: record,
-										unpaddedSize: unpaddedSize,
-										payment: payment,
-										metadata: metadata
-									))
+								if let info = self.decryptAndDeserializePayment(record) {
+									items.append(info)
 								}
 							}
 						}
 						
 						log.trace("downloadPayments(): batchFetch: received \(items.count)")
 						
-						// Step 3 of 4:
+						// Step 3 of 6:
 						//
 						// Save the downloaded results to the database.
 						
@@ -227,14 +219,26 @@ extension SyncBackupManager {
 				
 				log.trace("downloadPayments(): enqueueMissingItems()...")
 				
-				// Step 4 of 4:
+				// Step 4 of 6:
+				//
+				// Run the `finishCloudKitRestore` task to cleanup any old payments.
+				
+				let sqlitePaymentsDb = try await Biz.business.databaseManager.paymentsDb()
+				try await sqlitePaymentsDb.finishCloudkitRestore()
+				
+				// Step 5 of 6:
+				//
+				// If there were any "old" versions in the cloud (CloudData.V0),
+				// let's re-upload those using the new version (CloudData.V1).
+				
+				try await self.cloudKitDb.payments.enqueueOutdatedItems()
+				
+				// Step 6 of 6:
 				//
 				// There may be payments that we've added to the database since we started the download process.
 				// So we enqueue these for upload now.
 				
-				try await Task { @MainActor in
-					try await self.cloudKitDb.payments.enqueueMissingItems()
-				}.value
+				try await self.cloudKitDb.payments.enqueueMissingItems()
 				
 				log.trace("downloadPayments(): finish: success")
 				
@@ -737,15 +741,15 @@ extension SyncBackupManager {
 	
 	private func decryptAndDeserializePayment(
 		_ record: CKRecord
-	) -> (Lightning_kmpWalletPayment?, WalletPaymentMetadataRow?, Int) {
+	) -> DownloadedPayment? {
 		
 		log.debug("Received record:")
 		log.debug(" - recordID: \(record.recordID)")
 		log.debug(" - creationDate: \(record.creationDate ?? Date.distantPast)")
 		
-		var unpaddedSize: Int = 0
 		var payment: Lightning_kmpWalletPayment? = nil
 		var metadata: WalletPaymentMetadataRow? = nil
+		var unpaddedSize: Int = 0
 		
 		if let ciphertext = record[payments_record_column_data] as? Data {
 		//	log.debug(" - data.count: \(ciphertext.count)")
@@ -787,7 +791,7 @@ extension SyncBackupManager {
 					
 				} else if let wrapper_v1 = wrapper as? CloudData.V1 {
 					payment = wrapper_v1.payment
-					unpaddedSize = cleartext.count
+					unpaddedSize = 0 // Deprecated: Only used by CloudData.V0; Must be zero for newer versions.
 				} else {
 					log.error("Error deserializing record.data: skipping \(record.recordID)")
 				}
@@ -838,7 +842,16 @@ extension SyncBackupManager {
 			}
 		}
 		
-		return (payment, metadata, unpaddedSize)
+		if let payment {
+			return DownloadedPayment(
+				record: record,
+				payment: payment,
+				metadata: metadata,
+				unpaddedSize: unpaddedSize
+			)
+		} else {
+			return nil
+		}
 	}
 	
 	// ----------------------------------------

@@ -51,8 +51,8 @@ WHERE id = ?;
 scanMetadata:
 SELECT id FROM cloudkit_payments_metadata;
 
-scanSizes:
-SELECT id, unpadded_size FROM cloudkit_payments_metadata;
+listNonZeroSizes:
+SELECT id, unpadded_size FROM cloudkit_payments_metadata WHERE unpadded_size > 0;
 
 fetchOldestCreation:
 SELECT id, record_creation FROM cloudkit_payments_metadata
