@@ -790,12 +790,12 @@ struct HomeView : MVIView {
 			lastCompletedPaymentId = paymentId
 		}
 		
-	//	Biz.business.paymentsManager.getPayment(id: paymentId) { result, _ in
-	//		
-	//		if activeSheet == nil, let result = result {
-	//			activeSheet = .paymentView(payment: result) // triggers display of PaymentView sheet
-	//		}
-	//	}
+		Biz.business.paymentsManager.getPayment(id: paymentId) { result, _ in
+			
+			if activeSheet == nil, let result = result {
+				activeSheet = .paymentView(payment: result) // triggers display of PaymentView sheet
+			}
+		}
 	}
 	
 	func swapInWalletChanged(_ newWallet: Lightning_kmpWalletState.WalletWithConfirmations) {

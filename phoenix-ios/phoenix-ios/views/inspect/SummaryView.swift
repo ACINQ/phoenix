@@ -1103,13 +1103,13 @@ struct SummaryView: View {
 			// The payment metadata may have changed (e.g. description/notes modified).
 			// So we need to refresh the payment info.
 			
-		//	Biz.business.paymentsManager.getPayment(id: paymentInfo.payment.id) {
-		//		(result: WalletPaymentInfo?, _) in
-		//		
-		//		if let result {
-		//			paymentInfo = result
-		//		}
-		//	}
+			Biz.business.paymentsManager.getPayment(id: paymentInfo.payment.id) {
+				(result: WalletPaymentInfo?, _) in
+				
+				if let result {
+					paymentInfo = result
+				}
+			}
 			
 			if let destination = popToDestination {
 				log.debug("popToDestination: \(destination)")
@@ -1209,15 +1209,15 @@ struct SummaryView: View {
 	func switchToPayment(_ paymentId: Lightning_kmpUUID) {
 		log.trace("switchToPayment: \(paymentId.description())")
 		
-	//	Biz.business.paymentsManager.getPayment(id: paymentId) {
-	//		(result: WalletPaymentInfo?, _) in
-	//		
-	//		if let result {
-	//			paymentInfo = result
-	//			relatedPaymentIds = []
-	//			blockchainConfirmations = nil
-	//		}
-	//	}
+		Biz.business.paymentsManager.getPayment(id: paymentId) {
+			(result: WalletPaymentInfo?, _) in
+			
+			if let result {
+				paymentInfo = result
+				relatedPaymentIds = []
+				blockchainConfirmations = nil
+			}
+		}
 	}
 	
 	func exploreTx(_ txId: Bitcoin_kmpTxId, website: BlockchainExplorer.Website) {
