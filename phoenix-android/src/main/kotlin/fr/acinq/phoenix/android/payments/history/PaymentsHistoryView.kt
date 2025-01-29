@@ -108,7 +108,7 @@ fun PaymentsHistoryView(
         val timezone = TimeZone.currentSystemDefault()
         val (todaysDayOfWeek, today) = java.time.LocalDate.now().atTime(23, 59, 59).toKotlinLocalDateTime().let { it.dayOfWeek to it.toInstant(timezone) }
         payments.values.groupBy {
-            val paymentInstant = Instant.fromEpochMilliseconds(it.paymentInfo.payment.createdAt)
+            val paymentInstant = Instant.fromEpochMilliseconds(it.payment.createdAt)
             val daysElapsed = paymentInstant.daysUntil(today, timezone)
             when {
                 daysElapsed == 0 -> PaymentsGroup.Today
@@ -149,12 +149,12 @@ fun PaymentsHistoryView(
                     val isFirstVisible = topIndex == 0
                     val isLastVisible = bottomIndex + 10 >= listSize - 1
                     val hasMorePaymentsAbove = paymentsPage.offset > 0
-                    val hasMorePaymentsBelow = paymentsPage.offset + paymentsPage.count < allPaymentsCount
+                    val hasMorePaymentsBelow = paymentsPage.rows.isNotEmpty()
                     log.debug("[$topIndex:$bottomIndex ($listSize) isFirstVisible=$isFirstVisible hasMoreAbove=$hasMorePaymentsAbove isLastVisible=$isLastVisible hasMoreBelow=$hasMorePaymentsBelow")
-                    if (hasMorePaymentsAbove && isFirstVisible) {
-                        paymentsPage.offset - PaymentsViewModel.pageSize / 2
-                    } else if (hasMorePaymentsBelow && isLastVisible) {
+                    if (hasMorePaymentsBelow && isLastVisible) {
                         paymentsPage.offset + PaymentsViewModel.pageSize / 2
+                    } else if (hasMorePaymentsAbove && isFirstVisible) {
+                        paymentsPage.offset - PaymentsViewModel.pageSize / 2
                     } else null
                 }
                 .filterNotNull()
@@ -187,7 +187,7 @@ fun PaymentsHistoryView(
                 }
                 itemsIndexed(items = payments) { index, item ->
                     ItemCard(index = index, maxItemsCount = payments.size) {
-                        PaymentLine(item.paymentInfo, null, onPaymentClick)
+                        PaymentLine(item, null, onPaymentClick)
                     }
                 }
             }

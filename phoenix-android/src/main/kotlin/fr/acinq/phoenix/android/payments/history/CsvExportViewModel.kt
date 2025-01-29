@@ -29,12 +29,8 @@ import androidx.lifecycle.viewModelScope
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
-import fr.acinq.phoenix.android.utils.extensions.basicDescription
 import fr.acinq.phoenix.csv.WalletPaymentCsvWriter
 import fr.acinq.phoenix.managers.DatabaseManager
-import fr.acinq.phoenix.managers.PaymentsFetcher
-import fr.acinq.phoenix.managers.PeerManager
-import fr.acinq.phoenix.utils.CsvWriter
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -131,7 +127,7 @@ class CsvExportViewModel(
             log.error("failed to get oldest completed payment timestamp: ", e)
             state = CsvExportState.Failed(e)
         }) {
-            dbManager.paymentsDb().getOldestCompletedTimestamp().let {
+            dbManager.paymentsDb().getOldestCompletedDate().let {
                 oldestCompletedTimestamp = it
                 if (startTimestampMillis == null) startTimestampMillis = it
             }

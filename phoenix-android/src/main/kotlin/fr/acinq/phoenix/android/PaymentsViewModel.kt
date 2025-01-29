@@ -19,30 +19,21 @@ package fr.acinq.phoenix.android
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import fr.acinq.lightning.db.Bolt12IncomingPayment
-import fr.acinq.lightning.db.LightningOutgoingPayment
-import fr.acinq.lightning.payment.OfferPaymentMetadata
 import fr.acinq.lightning.utils.UUID
-import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.data.WalletPaymentInfo
-import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import fr.acinq.phoenix.managers.ContactsManager
 import fr.acinq.phoenix.managers.PaymentsManager
 import fr.acinq.phoenix.managers.PaymentsPageFetcher
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
-
-data class PaymentRowState(
-    val paymentInfo: WalletPaymentInfo,
-    val contactInfo: ContactInfo?,
-) {
-    val orderRow : WalletPaymentOrderRow
-        get() = paymentInfo.toOrderRow()
-}
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PaymentsViewModel(
@@ -57,15 +48,8 @@ class PaymentsViewModel(
 
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    private val _paymentsFlow = MutableStateFlow<Map<UUID, PaymentRowState>>(HashMap())
-    /**
-     * A flow of known payments. The key is an [UUID], the value is the payments details
-     * which are basic at first, and then updated asynchronously (see [fetchPaymentDetails]).
-     *
-     * This flow is initialized by the view model, and then updated by [subscribeToPayments] which is
-     * called by the UI when needed (paging with scrolling, see the payments history view).
-     */
-    val paymentsFlow: StateFlow<Map<UUID, PaymentRowState>> = _paymentsFlow.asStateFlow()
+    private val _paymentsFlow = MutableStateFlow<Map<UUID, WalletPaymentInfo>>(HashMap())
+    val paymentsFlow: StateFlow<Map<UUID, WalletPaymentInfo>> = _paymentsFlow.asStateFlow()
 
     private val homePageFetcher: PaymentsPageFetcher = paymentsManager.makePageFetcher()
     val homePaymentsFlow = homePageFetcher.paymentsPage.mapLatest { it.rows }.stateIn(
@@ -87,53 +71,8 @@ class PaymentsViewModel(
             log.error("error when collecting payments-page items: ", e)
         }) {
             paymentsPageFetcher.paymentsPage.collect { page ->
-                viewModelScope.launch(Dispatchers.Default) {
-                    val newElts = page.rows.associate { newRow ->
-                        val paymentId = newRow.payment.id
-                        val existingData = paymentsFlow.value[paymentId]
-
-                        // We look at the row to check if the payment has changed (the row contains timestamps)
-                        if (existingData?.orderRow != newRow.toOrderRow()) {
-                            fetchContactDetails(newRow)
-                            paymentId to PaymentRowState(paymentInfo = newRow, contactInfo = null)
-                        } else {
-                            paymentId to existingData
-                        }
-                    }
-                    if (page.offset == 0) {
-                        _paymentsFlow.value = newElts
-                    } else {
-                        _paymentsFlow.value += newElts
-                    }
-                }
+                _paymentsFlow.value += page.rows.associateBy { it.payment.id }
             }
-        }
-    }
-
-    /** Fetches the contact details for a given payment and updates [paymentsFlow]. */
-    private fun fetchContactDetails(walletPaymentInfo: WalletPaymentInfo) {
-        when (val payment = walletPaymentInfo.payment) {
-            is Bolt12IncomingPayment -> {
-                val metadata = payment.metadata
-                if (metadata is OfferPaymentMetadata.V1) {
-                    viewModelScope.launch(Dispatchers.Main) {
-                        contactsManager.getContactForPayerPubkey(metadata.payerKey)?.let {
-                            _paymentsFlow.value += (payment.id to PaymentRowState(walletPaymentInfo, it))
-                        }
-                    }
-                }
-            }
-            is LightningOutgoingPayment -> {
-                val details = payment.details
-                if (details is LightningOutgoingPayment.Details.Blinded) {
-                    viewModelScope.launch(Dispatchers.Main) {
-                        contactsManager.getContactForOffer(details.paymentRequest.invoiceRequest.offer)?.let {
-                            _paymentsFlow.value += (payment.id to PaymentRowState(walletPaymentInfo, it))
-                        }
-                    }
-                }
-            }
-            else -> Unit
         }
     }
 
