@@ -84,9 +84,13 @@ class SqliteOutgoingPaymentsDb(private val database: PaymentsDatabase) : Outgoin
                     succeeded_at = outgoingPayment.succeededAt,
                     data_ = outgoingPayment
                 )
+                // The payment may have been downloaded from the cloud.
+                // So it may already be confirmed/locked.
                 database.onChainTransactionsQueries.insert(
                     payment_id = outgoingPayment.id,
-                    tx_id = outgoingPayment.txId
+                    tx_id = outgoingPayment.txId,
+                    confirmed_at = outgoingPayment.confirmedAt,
+                    locked_at = outgoingPayment.lockedAt
                 )
             }
         }
