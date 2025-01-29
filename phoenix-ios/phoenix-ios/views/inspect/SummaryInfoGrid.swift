@@ -11,12 +11,11 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture discussion
 	
 	@Binding var paymentInfo: WalletPaymentInfo
-	@Binding var relatedPaymentIds: [WalletPaymentId]
-	@Binding var liquidityPayment: Lightning_kmpInboundLiquidityOutgoingPayment?
+	@Binding var relatedPaymentIds: [Lightning_kmpUUID]
 	@Binding var showOriginalFiatValue: Bool
 	
 	let showContactView: (_ contact: ContactInfo) -> Void
-	let switchToPayment: (_ paymentId: WalletPaymentId) -> Void
+	let switchToPayment: (_ paymentId: Lightning_kmpUUID) -> Void
 	
 	// <InfoGridView Protocol>
 	let minKeyColumnWidth: CGFloat = 50
@@ -598,7 +597,7 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 	func paymentDurationRow() -> some View {
 		let identifier: String = #function
 		
-		if let _ = paymentInfo.payment as? Lightning_kmpInboundLiquidityOutgoingPayment {
+		if let _ = paymentInfo.payment as? Lightning_kmpManualLiquidityPurchasePayment {
 			
 			InfoGridRow(
 				identifier: identifier,
@@ -641,7 +640,7 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 					Button {
 						switchToPayment(paymentId)
 					} label: {
-						Text(verbatim: "\(paymentId.dbId.prefix(maxLength: 8))…")
+						Text(verbatim: "\(paymentId.description().prefix(maxLength: 8))…")
 							.lineLimit(1)
 							.truncationMode(.middle)
 					}
@@ -700,16 +699,8 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 	
 	func minerFees() -> (Int64, String, String)? {
 		
-		if let liquidity = paymentInfo.payment as? Lightning_kmpInboundLiquidityOutgoingPayment,
-			liquidity.hidesFees {
-			// We don't display the fees here.
-			// Instead we're displaying the fees on the corresponding IncomingPayment.
-			return nil
-		} else if let result = paymentInfo.payment.minerFees() {
+		if let result = paymentInfo.payment.minerFees() {
 			return result
-		} else if let liquidityPayment, liquidityPayment.hidesFees {
-			// This is the corresponding IncomingPayment, and we have the linked liquidityPayment.
-			return liquidityPayment.minerFees()
 		} else {
 			return nil
 		}
@@ -717,16 +708,8 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 	
 	func serviceFees() -> (Int64, String, String)? {
 		
-		if let liquidity = paymentInfo.payment as? Lightning_kmpInboundLiquidityOutgoingPayment,
-			liquidity.hidesFees {
-			// We don't display the fees here.
-			// Instead we're displaying the fees on the corresponding IncomingPayment.
-			return nil
-		} else if let result = paymentInfo.payment.serviceFees() {
+		if let result = paymentInfo.payment.serviceFees() {
 			return result
-		} else if let liquidityPayment, liquidityPayment.hidesFees {
-			// This is the corresponding IncomingPayment, and we have the linked liquidityPayment.
-			return liquidityPayment.serviceFees()
 		} else {
 			return nil
 		}
@@ -753,14 +736,14 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 		
 		guard
 			let outgoingPayment = paymentInfo.payment as? Lightning_kmpLightningOutgoingPayment,
-			let offchainSuccess = outgoingPayment.status.asOffChain()
+			let successSuccess = outgoingPayment.status.asSucceeded()
 		else {
 			return nil
 		}
 		
 		do {
 			let aes = try AES256(
-				key: offchainSuccess.preimage.toSwiftData(),
+				key: successSuccess.preimage.toSwiftData(),
 				iv: sa_aes.iv.toSwiftData()
 			)
 			

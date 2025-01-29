@@ -32,7 +32,7 @@ struct HomeView : MVIView {
 	
 	let recentPaymentsConfigPublisher = Prefs.shared.recentPaymentsConfigPublisher
 	@State var recentPaymentsConfig = Prefs.shared.recentPaymentsConfig
-	@State var lastCompletedPaymentId: WalletPaymentId? = nil
+	@State var lastCompletedPaymentId: Lightning_kmpUUID? = nil
 	
 	let paymentsPagePublisher: AnyPublisher<PaymentsPage, Never>
 	@State var paymentsPage = PaymentsPage(offset: 0, count: 0, rows: [])
@@ -559,25 +559,11 @@ struct HomeView : MVIView {
 		
 		ScrollView(.vertical) {
 			VStack {
-				// paymentsPage.rows: [WalletPaymentOrderRow]
-				//
-				// Here's how this works:
-				// - ForEach uses the given type (which conforms to Swift's Identifiable protocol)
-				//   to determine whether or not the row is new/modified or the same as before.
-				// - If the row is new/modified, then it it initialized with fresh state,
-				//   and the row's `onAppear` will fire.
-				// - If the row is unmodified, then it is initialized with existing state,
-				//   and the row's `onAppear` with NOT fire.
-				//
-				// Since we ultimately use WalletPaymentOrderRow.identifier, our unique identifier
-				// contains the row's completedAt date, which is modified when the row changes.
-				// Thus our row is automatically refreshed after it fails/succeeds.
-				//
 				ForEach(paymentsPage.rows) { row in
 					Button {
 						didSelectPayment(row: row)
 					} label: {
-						PaymentCell(row: row, didAppearCallback: nil)
+						PaymentCell(info: row, didAppearCallback: nil)
 					}
 				}
 				
@@ -795,7 +781,7 @@ struct HomeView : MVIView {
 	func lastCompletedPaymentChanged(_ payment: Lightning_kmpWalletPayment) {
 		log.trace("lastCompletedPaymentChanged()")
 		
-		let paymentId = payment.walletPaymentId()
+		let paymentId = payment.id
 		
 		if paymentId.isEqual(lastCompletedPaymentId) {
 			// Ignoring duplicate (rebroadcast when returning to this View)
@@ -806,14 +792,14 @@ struct HomeView : MVIView {
 		
 		// SummaryView will need `WalletPaymentFetchOptions.companion.All`,
 		// so as long as we're fetching from the database, we might as well fetch everything we need.
-		let options = WalletPaymentFetchOptions.companion.All
-		
-		Biz.business.paymentsManager.getPayment(id: paymentId, options: options) { result, _ in
-			
-			if activeSheet == nil, let result = result {
-				activeSheet = .paymentView(payment: result) // triggers display of PaymentView sheet
-			}
-		}
+	//	let options = WalletPaymentFetchOptions.companion.All
+	//
+	//	Biz.business.paymentsManager.getPayment(id: paymentId, options: options) { result, _ in
+	//
+	//		if activeSheet == nil, let result = result {
+	//			activeSheet = .paymentView(payment: result) // triggers display of PaymentView sheet
+	//		}
+	//	}
 	}
 	
 	func swapInWalletChanged(_ newWallet: Lightning_kmpWalletState.WalletWithConfirmations) {
@@ -868,7 +854,7 @@ struct HomeView : MVIView {
 	func contactsChanged(_ contacts: [ContactInfo]) {
 		log.trace("contactsChanged()")
 		
-		paymentsPage = paymentsPage.forceRefresh()
+		// Todo: Re-fetch the visible rows
 	}
 	
 	fileprivate func footerCellDidAppear() {
@@ -1012,17 +998,11 @@ struct HomeView : MVIView {
 		}
 	}
 	
-	func didSelectPayment(row: WalletPaymentOrderRow) -> Void {
+	func didSelectPayment(row: WalletPaymentInfo) -> Void {
 		log.trace("didSelectPayment()")
 		
-		// pretty much guaranteed to be in the cache
-		let fetcher = Biz.business.paymentsManager.fetcher
-		let options = PaymentCell.fetchOptions
-		fetcher.getPayment(row: row, options: options) { (result: WalletPaymentInfo?, _) in
-			
-			if activeSheet == nil, let result = result {
-				activeSheet = .paymentView(payment: result)
-			}
+		if activeSheet == nil {
+			activeSheet = .paymentView(payment: row)
 		}
 	}
 	
