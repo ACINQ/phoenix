@@ -347,40 +347,19 @@ class CloudKitPaymentsDb(
                 }
 
                 val missing = mutableListOf<MissingItem>()
-
                 run {
                     val inQueries = paymentsDb.database.paymentsIncomingQueries
-                    val count: Long = 100
-                    var offset: Long = 0
-                    while (true) {
-                        val batch = inQueries.scanCompleted().executeAsList()
-                        batch.forEach { row ->
-                            if (!existing.contains(row.id)) {
-                                missing.add(MissingItem(row.id, row.received_at))
-                            }
-                        }
-                        if (batch.size < count) {
-                            break
-                        } else {
-                            offset += batch.size
+                    inQueries.scanCompleted().executeAsList().forEach { row ->
+                        if (!existing.contains(row.id)) {
+                            missing.add(MissingItem(row.id, row.received_at))
                         }
                     }
                 }
                 run {
                     val outQueries = paymentsDb.database.paymentsOutgoingQueries
-                    val count: Long = 100
-                    var offset: Long = 0
-                    while (true) {
-                        val batch = outQueries.scanCompleted().executeAsList()
-                        batch.forEach { row ->
-                            if (!existing.contains(row.id)) {
-                                missing.add(MissingItem(row.id, row.completed_at))
-                            }
-                        }
-                        if (batch.size < count) {
-                            break
-                        } else {
-                            offset += batch.size
+                    outQueries.scanCompleted().executeAsList().forEach { row ->
+                        if (!existing.contains(row.id)) {
+                            missing.add(MissingItem(row.id, row.completed_at))
                         }
                     }
                 }
