@@ -84,7 +84,7 @@ fun SplashStatusIncoming(payment: IncomingPayment, fromEvent: Boolean) {
         }
         else -> {
             PaymentStatusIcon(
-                message = { Text(text = annotatedStringResource(id = R.string.paymentdetails_status_received_successful, payment.completedAt!!.toRelativeDateString())) },
+                message = { Text(text = annotatedStringResource(id = R.string.paymentdetails_status_received_successful, payment.completedAt?.toRelativeDateString() ?: stringResource(id = R.string.utils_unknown))) },
                 imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
                 isAnimated = fromEvent,
                 color = positiveColor,

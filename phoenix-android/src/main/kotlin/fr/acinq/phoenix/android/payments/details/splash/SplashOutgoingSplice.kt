@@ -72,7 +72,7 @@ fun SplashStatusSpliceOut(payment: SpliceOutgoingPayment, fromEvent: Boolean, on
         else -> {
             PaymentStatusIcon(
                 message = {
-                    Text(text = annotatedStringResource(id = R.string.paymentdetails_status_sent_successful, payment.completedAt!!.toRelativeDateString()))
+                    Text(text = annotatedStringResource(id = R.string.paymentdetails_status_sent_successful, payment.completedAt?.toRelativeDateString() ?: stringResource(id = R.string.utils_unknown)))
                 },
                 imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
                 isAnimated = fromEvent,
