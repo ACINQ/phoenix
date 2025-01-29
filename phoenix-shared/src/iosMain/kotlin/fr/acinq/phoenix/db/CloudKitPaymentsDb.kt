@@ -341,10 +341,16 @@ class CloudKitPaymentsDb(
             val ckQueries = paymentsDb.database.cloudKitPaymentsQueries
             db.transaction {
 
+                // Step 1 of 3:
+                // Fetch list of payment ID's that are already represented in the cloud.
+
                 val existing = mutableSetOf<UUID>()
                 ckQueries.scanMetadata().executeAsList().forEach { uuid ->
                     existing.add(uuid)
                 }
+
+                // Step 2 of 3:
+                // Scan local payment ID's, looking to see if any are missing from the cloud.
 
                 val missing = mutableListOf<MissingItem>()
                 run {
@@ -364,19 +370,26 @@ class CloudKitPaymentsDb(
                     }
                 }
 
-                // Now we're going to add them to the database.
+                // Step 3 of 3:
+                // Add any missing items to the queue.
+                //
                 // But in what order do we want to upload them to the cloud ?
                 //
-                // We will choose to upload the newest item first.
+                // We will choose to upload the OLDEST item first.
+                // This matches how they normally would have been uploaded.
+                // Also, when a user restores their wallet (e.g. on a new phone),
+                // we always want to download the newest payments first.
+                // And this assumes the newest items in the cloud are the newest payments.
+                //
                 // Since items are uploaded in FIFO order,
-                // we just need to make the newest item have the
+                // we just need to make the oldest item have the
                 // smallest `date_added` value.
 
-                missing.sortBy { it.timestamp }
+                missing.sortByDescending { it.timestamp }
 
-                // The list is now sorted in ascending order.
-                // Which means the oldest payment is at index 0,
-                // and the newest payment is at index <last>.
+                // The list is now sorted in descending order.
+                // Which means the newest item is at index 0,
+                // and the oldest item is at index <last>.
 
                 val now = currentTimestampMillis()
                 missing.forEachIndexed { idx, item ->
