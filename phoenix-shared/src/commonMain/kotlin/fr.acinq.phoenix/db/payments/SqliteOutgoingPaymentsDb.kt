@@ -130,8 +130,9 @@ class SqliteOutgoingPaymentsDb(private val database: PaymentsDatabase) : Outgoin
     override suspend fun getLightningOutgoingPaymentFromPartId(partId: UUID): LightningOutgoingPayment? {
         return withContext(Dispatchers.Default) {
             database.transactionWithResult {
-                val paymentId = database.paymentsOutgoingQueries.getParentId(partId).executeAsOneOrNull()!!
-                database.paymentsOutgoingQueries.get(paymentId).executeAsOneOrNull() as? LightningOutgoingPayment
+                database.paymentsOutgoingQueries.getParentId(partId).executeAsOneOrNull()?.let { paymentId ->
+                    database.paymentsOutgoingQueries.get(paymentId).executeAsOneOrNull() as? LightningOutgoingPayment
+                }
             }
         }
     }

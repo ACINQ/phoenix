@@ -96,6 +96,7 @@ class SqlitePaymentsDb(
             database.onChainTransactionsQueries.setConfirmed(tx_id = txId, confirmed_at = confirmedAt)
             database.paymentsIncomingQueries.listByTxId(txId).executeAsList().filterIsInstance<OnChainIncomingPayment>().forEach { payment ->
                 val payment1 = payment.setConfirmed(confirmedAt)
+                // receivedAt must still set to lockedAt, and not confirmedAt.
                 database.paymentsIncomingQueries.update(id = payment1.id, data = payment1, txId = payment1.txId, receivedAt = payment1.lockedAt)
                 didSaveWalletPayment(payment1.id, database)
             }
