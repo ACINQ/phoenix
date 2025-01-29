@@ -313,7 +313,7 @@ struct TxHistoryExporter: View {
 				return
 			}
 			
-			paymentsDb.altGetOldestCompletedDate { (millis: KotlinLong?, _) in
+			paymentsDb.getOldestCompletedDate { (millis: KotlinLong?, _) in
 				
 				if let oldestDate = self.millisToDate(millis) {
 					log.debug("oldestDate = \(oldestDate)")

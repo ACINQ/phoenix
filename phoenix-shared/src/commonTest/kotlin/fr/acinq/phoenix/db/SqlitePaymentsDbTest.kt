@@ -50,7 +50,7 @@ class SqlitePaymentsDbTest {
     @Test
     fun `read v1 db`() = runTest {
         val driver = testPaymentsDriverFromResource("sampledbs/v1/old.payments-testnet-fedc36138a62ceadc8a93861d2c46f5ca5e8b418.sqlite")
-        val paymentsDb = createSqlitePaymentsDb(driver, currencyManager = null)
+        val paymentsDb = createSqlitePaymentsDb(driver, contactsManager = null, currencyManager = null)
 
         val payments = paymentsDb.database.paymentsQueries.list(limit = Long.MAX_VALUE, offset = 0)
             .executeAsList()
@@ -76,7 +76,7 @@ class SqlitePaymentsDbTest {
     @Test
     fun `read v1 db - additional`() = runTest {
         val driver = testPaymentsDriverFromResource("sampledbs/v1/old.payments-testnet-a224978853d2f4c94ac8e2dbb2acf8344e0146d0.sqlite")
-        val paymentsDb = createSqlitePaymentsDb(driver, currencyManager = null)
+        val paymentsDb = createSqlitePaymentsDb(driver, contactsManager = null, currencyManager = null)
 
         val payments = paymentsDb.database.paymentsQueries.list(limit = Long.MAX_VALUE, offset = 0)
             .executeAsList()
@@ -102,7 +102,7 @@ class SqlitePaymentsDbTest {
     @Test
     fun `read v6 db`() = runTest {
         val driver = testPaymentsDriverFromResource("sampledbs/v6/old.payments-testnet-700486fc7a90d5922d6f993f2941ab9f9f1a9d85.sqlite")
-        val paymentsDb = createSqlitePaymentsDb(driver, currencyManager = null)
+        val paymentsDb = createSqlitePaymentsDb(driver, contactsManager = null, currencyManager = null)
 
         val payments = paymentsDb.database.paymentsQueries.list(limit = Long.MAX_VALUE, offset = 0)
             .executeAsList()
@@ -128,7 +128,7 @@ class SqlitePaymentsDbTest {
     @Test
     fun `read v10 db`() = runTest {
         val driver = testPaymentsDriverFromResource("sampledbs/v10/payments-testnet-28903aff.sqlite")
-        val paymentsDb = createSqlitePaymentsDb(driver, currencyManager = null)
+        val paymentsDb = createSqlitePaymentsDb(driver, contactsManager = null, currencyManager = null)
 
         val payments = paymentsDb.database.paymentsQueries.list(limit = Long.MAX_VALUE, offset = 0)
             .executeAsList()

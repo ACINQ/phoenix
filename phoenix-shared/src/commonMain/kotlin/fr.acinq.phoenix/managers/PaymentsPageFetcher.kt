@@ -88,14 +88,10 @@ class PaymentsPageFetcher(
                 skip = offsetSnapshot.toLong()
             ).collect { rows ->
                 if (subscriptionIdxSnapshot == subscriptionIdx) {
-                    val updatedRows = rows.map { info ->
-                        val contact = contactsManager.contactForPayment(info.payment)
-                        info.copy(contact = contact, fetchOptions = WalletPaymentFetchOptions.All)
-                    }
                     _paymentsPage.value = PaymentsPage(
                         offset = offsetSnapshot,
                         count = countSnapshot,
-                        rows = updatedRows
+                        rows = rows
                     )
                 }
             }
@@ -131,14 +127,10 @@ class PaymentsPageFetcher(
                 skip = offsetSnapshot.toLong()
             ).collect { rows ->
                 if (subscriptionIdxSnapshot == subscriptionIdx) {
-                    val updatedRows = rows.map { info ->
-                        val contact = contactsManager.contactForPayment(info.payment)
-                        info.copy(contact = contact, fetchOptions = WalletPaymentFetchOptions.All)
-                    }
                     _paymentsPage.value = PaymentsPage(
                         offset = offsetSnapshot,
                         count = countSnapshot,
-                        rows = updatedRows
+                        rows = rows
                     )
                 }
             }
@@ -192,14 +184,10 @@ class PaymentsPageFetcher(
                 sinceDate = date.toEpochMilliseconds()
             ).collect { rows ->
                 if (subscriptionIdxSnapshot == subscriptionIdx) {
-                    val updatedRows = rows.map { info ->
-                        val contact = contactsManager.contactForPayment(info.payment)
-                        info.copy(contact = contact, fetchOptions = WalletPaymentFetchOptions.All)
-                    }
                     _paymentsPage.value = PaymentsPage(
                         offset = offsetSnapshot,
                         count = countSnapshot,
-                        rows = updatedRows
+                        rows = rows
                     )
                     resetRefreshJob(idx, rows)
                 }
