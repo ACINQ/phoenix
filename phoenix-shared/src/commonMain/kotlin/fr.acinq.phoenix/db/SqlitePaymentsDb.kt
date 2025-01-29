@@ -278,8 +278,13 @@ class SqlitePaymentsDb(
     }
 
     suspend fun deletePayment(paymentId: UUID): Unit = withContext(Dispatchers.Default) {
-        TODO("add a parameter to know which table we should delete paymentId from")
-        // didDeleteWalletPayment(paymentId, database)
+        database.transaction {
+            database.paymentsIncomingQueries.deleteById(id = paymentId)
+            if (database.paymentsIncomingQueries.changes().executeAsOne() == 0L) {
+                database.paymentsOutgoingQueries.deleteById(id = paymentId)
+            }
+            didDeleteWalletPayment(paymentId, database)
+        }
     }
 
     /**

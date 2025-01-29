@@ -77,7 +77,11 @@ SELECT id, received_at
 FROM payments_incoming
 WHERE received_at IS NOT NULL;
 
-delete:
+deleteById:
+DELETE FROM payments_incoming
+WHERE id = ?;
+
+deleteByPaymentHash:
 DELETE FROM payments_incoming
 WHERE payment_hash = ?;
 
