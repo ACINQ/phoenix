@@ -35,39 +35,7 @@ class PaymentsMetadataQueries(val database: PaymentsDatabase) {
         didUpdateWalletPaymentMetadata(id, database)
     }
 
-    fun get(
-        id: UUID,
-        options: WalletPaymentFetchOptions
-    ): WalletPaymentMetadata? {
-        // The following are commonly used, and so are optimized:
-        // - descriptions + originalFiat
-        // - descriptions
-        // Other combinations are uncommon or never used, so remain unoptimized at this point.
-        return when (options - WalletPaymentFetchOptions.Contact) {
-            WalletPaymentFetchOptions.None -> {
-                null
-            }
-            WalletPaymentFetchOptions.Descriptions + WalletPaymentFetchOptions.OriginalFiat -> {
-                getDescriptionsAndOriginalFiat(id)
-            }
-            WalletPaymentFetchOptions.Descriptions -> {
-                getDescriptions(id)
-            }
-            else -> {
-                get(id)
-            }
-        }
-    }
-
-    private fun getDescriptions(id: UUID): WalletPaymentMetadata? {
-        return queries.getDescriptions(payment_id = id, mapper = ::mapDescriptions).executeAsOneOrNull()
-    }
-
-    private fun getDescriptionsAndOriginalFiat(id: UUID): WalletPaymentMetadata? {
-        return queries.getDescriptionsAndOriginalFiat(payment_id = id, mapper = ::mapDescriptionsAndOriginalFiat).executeAsOneOrNull()
-    }
-
-    private fun get(id: UUID): WalletPaymentMetadata? {
+    fun get(id: UUID): WalletPaymentMetadata? {
         return queries.get(payment_id = id, mapper = ::mapAll).executeAsOneOrNull()
     }
 
@@ -108,44 +76,6 @@ class PaymentsMetadataQueries(val database: PaymentsDatabase) {
     }
 
     companion object {
-        fun mapDescriptions(
-            lnurl_description: String?,
-            user_description: String?,
-            modified_at: Long?
-        ): WalletPaymentMetadata {
-            return WalletPaymentMetadata(
-                userDescription = user_description,
-                lnurl = lnurl_description?.let { LnurlPayMetadata.placeholder(it) },
-                modifiedAt = modified_at
-            )
-        }
-
-        fun mapDescriptionsAndOriginalFiat(
-            lnurl_description: String?,
-            user_description: String?,
-            modified_at: Long?,
-            original_fiat_type: String?,
-            original_fiat_rate: Double?
-        ): WalletPaymentMetadata {
-            val originalFiat =
-                if (original_fiat_type != null && original_fiat_rate != null) {
-                    FiatCurrency.valueOfOrNull(original_fiat_type)?.let { fiatCurrency ->
-                        ExchangeRate.BitcoinPriceRate(
-                            fiatCurrency = fiatCurrency,
-                            price = original_fiat_rate,
-                            source = "originalFiat",
-                            timestampMillis = 0
-                        )
-                    }
-                } else null
-
-            return WalletPaymentMetadata(
-                lnurl = lnurl_description?.let { LnurlPayMetadata.placeholder(it) },
-                originalFiat = originalFiat,
-                userDescription = user_description,
-                modifiedAt = modified_at
-            )
-        }
 
         @Suppress("UNUSED_PARAMETER")
         fun mapAll(

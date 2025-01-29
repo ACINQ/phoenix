@@ -23,7 +23,6 @@ import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.utils.*
 import fr.acinq.lightning.wire.LiquidityAds
-import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.db.payments.*
@@ -55,7 +54,7 @@ class SqlitePaymentsDb(
 
     fun _getPayment(id: UUID): Pair<WalletPayment, WalletPaymentMetadata?>? = database.transactionWithResult {
         (database.paymentsIncomingQueries.get(id).executeAsOneOrNull() ?: database.paymentsOutgoingQueries.get(id).executeAsOneOrNull())?.let { payment ->
-            val metadata = metadataQueries.get(id, WalletPaymentFetchOptions.All)
+            val metadata = metadataQueries.get(id)
             payment to metadata
         }
     }
@@ -132,8 +131,9 @@ class SqlitePaymentsDb(
             .map { list ->
                 withContext(Dispatchers.Default) {
                     list.map { info ->
-                        val contact = contactsManager?.contactForPayment(info.payment)
-                        info.copy(contact = contact, fetchOptions = WalletPaymentFetchOptions.All)
+                        contactsManager?.contactForPayment(info.payment)?.let {
+                            info.copy(contact = it)
+                        } ?: info
                     }
                 }
             }
@@ -146,8 +146,9 @@ class SqlitePaymentsDb(
             .map { list ->
                 withContext(Dispatchers.Default) {
                     list.map { info ->
-                        val contact = contactsManager?.contactForPayment(info.payment)
-                        info.copy(contact = contact, fetchOptions = WalletPaymentFetchOptions.All)
+                        contactsManager?.contactForPayment(info.payment)?.let {
+                            info.copy(contact = it)
+                        } ?: info
                     }
                 }
             }
@@ -161,16 +162,34 @@ class SqlitePaymentsDb(
             .map { list ->
                 withContext(Dispatchers.Default) {
                     list.map { info ->
-                        val contact = contactsManager?.contactForPayment(info.payment)
-                        info.copy(contact = contact, fetchOptions = WalletPaymentFetchOptions.All)
+                        contactsManager?.contactForPayment(info.payment)?.let {
+                            info.copy(contact = it)
+                        } ?: info
                     }
                 }
             }
     }
 
-    suspend fun listCompletedPayments(count: Long, skip: Long, startDate: Long, endDate: Long): List<WalletPaymentInfo> = withContext(Dispatchers.Default) {
-        database.paymentsQueries.listSucceeded(succeeded_at_from = startDate, succeeded_at_to = endDate, limit = count, offset = skip, mapper = ::mapPaymentsAndMetadata).executeAsList()
+    suspend fun listCompletedPayments(count: Long, skip: Long, startDate: Long, endDate: Long): List<WalletPaymentInfo> {
+        return withContext(Dispatchers.Default) {
+            database.paymentsQueries.listSucceeded(
+                succeeded_at_from = startDate,
+                succeeded_at_to = endDate,
+                limit = count,
+                offset = skip,
+                mapper = ::mapPaymentsAndMetadata
+            )
+            .executeAsList()
             .discardReceivedAutomaticLiquidity()
+        }.let { list ->
+            withContext(Dispatchers.Main) {
+                list.map { info ->
+                    contactsManager?.contactForPayment(info.payment)?.let {
+                        info.copy(contact = it)
+                    } ?: info
+                }
+            }
+        }
     }
 
     /** [AutomaticLiquidityPurchasePayment] should be ignored if the payment they are associated with has been received, because the liquidity data are already contained in that payment. */
@@ -191,8 +210,7 @@ class SqlitePaymentsDb(
                 lnurl_base_type, lnurl_base_blob, lnurl_description, lnurl_metadata_type, lnurl_metadata_blob,
                 lnurl_successAction_type, lnurl_successAction_blob,
                 user_description, user_notes, modified_at, original_fiat_type, original_fiat_rate),
-            contact = null,
-            fetchOptions = WalletPaymentFetchOptions.Metadata
+            contact = null
         )
     }
 
@@ -231,8 +249,7 @@ class SqlitePaymentsDb(
         return WalletPaymentInfo(
             payment = payment,
             metadata = metadata,
-            contact = null,
-            fetchOptions = WalletPaymentFetchOptions.Metadata
+            contact = null
         )
     }
 

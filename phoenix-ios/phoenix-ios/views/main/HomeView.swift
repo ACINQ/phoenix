@@ -790,12 +790,8 @@ struct HomeView : MVIView {
 			lastCompletedPaymentId = paymentId
 		}
 		
-		// SummaryView will need `WalletPaymentFetchOptions.companion.All`,
-		// so as long as we're fetching from the database, we might as well fetch everything we need.
-	//	let options = WalletPaymentFetchOptions.companion.All
-	//
-	//	Biz.business.paymentsManager.getPayment(id: paymentId, options: options) { result, _ in
-	//
+	//	Biz.business.paymentsManager.getPayment(id: paymentId) { result, _ in
+	//		
 	//		if activeSheet == nil, let result = result {
 	//			activeSheet = .paymentView(payment: result) // triggers display of PaymentView sheet
 	//		}
@@ -860,10 +856,9 @@ struct HomeView : MVIView {
 		let updatedRows = paymentsPage.rows.map { info in
 			let updatedContact = contactsManager.contactForPayment(payment: info.payment)
 			return WalletPaymentInfo(
-				payment      : info.payment,
-				metadata     : info.metadata,
-				contact      : updatedContact,
-				fetchOptions : info.fetchOptions
+				payment  : info.payment,
+				metadata : info.metadata,
+				contact  : updatedContact
 			)
 		}
 		let updatedPage = PaymentsPage(

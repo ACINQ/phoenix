@@ -140,7 +140,7 @@ class PaymentsManager(
     }
 
     suspend fun getPayment(
-        id: UUID,
+        id: UUID
     ): WalletPaymentInfo? {
         return paymentsDb().getPayment(id)?.let {
             val payment = it.first
@@ -148,8 +148,7 @@ class PaymentsManager(
             WalletPaymentInfo(
                 payment = payment,
                 metadata = it.second ?: WalletPaymentMetadata(),
-                contact = contact,
-                fetchOptions = WalletPaymentFetchOptions.All
+                contact = contact
             )
         }
     }

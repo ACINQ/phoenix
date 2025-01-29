@@ -528,20 +528,18 @@ struct TransactionsView: View {
 		let updatedCachedRows = cachedRows.map { row in
 			let updatedContact = contactsManager.contactForPayment(payment: row.payment)
 			return WalletPaymentInfo(
-				payment      : row.payment,
-				metadata     : row.metadata,
-				contact      : updatedContact,
-				fetchOptions : row.fetchOptions
+				payment  : row.payment,
+				metadata : row.metadata,
+				contact  : updatedContact
 			)
 		}
 		
 		let updatedPaymentsPageRows = paymentsPage.rows.map { row in
 			let updatedContact = contactsManager.contactForPayment(payment: row.payment)
 			return WalletPaymentInfo(
-				payment      : row.payment,
-				metadata     : row.metadata,
-				contact      : updatedContact,
-				fetchOptions : row.fetchOptions
+				payment  : row.payment,
+				metadata : row.metadata,
+				contact  : updatedContact
 			)
 		}
 		let updatedPage = PaymentsPage(
