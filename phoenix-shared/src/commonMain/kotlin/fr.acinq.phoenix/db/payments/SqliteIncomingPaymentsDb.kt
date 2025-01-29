@@ -40,7 +40,14 @@ class SqliteIncomingPaymentsDb(private val database: PaymentsDatabase) : Incomin
         }
     }
 
-    fun _addIncomingPayment(incomingPayment: IncomingPayment) = database.transaction {
+    /**
+     * Internal version:
+     * Used to add multiple incoming payments in a single database transaction.
+     *
+     * @param notify Set to false if `didSaveWalletPayment` should not be invoked
+     *               (e.g. when downloading payments from the cloud)
+     */
+    fun _addIncomingPayment(incomingPayment: IncomingPayment, notify: Boolean = true) = database.transaction {
         database.paymentsIncomingQueries.insert(
             id = incomingPayment.id,
             payment_hash = (incomingPayment as? LightningIncomingPayment)?.paymentHash,
@@ -63,7 +70,9 @@ class SqliteIncomingPaymentsDb(private val database: PaymentsDatabase) : Incomin
 
             else -> {}
         }
-        didSaveWalletPayment(incomingPayment.id, database)
+        if (notify) {
+            didSaveWalletPayment(incomingPayment.id, database)
+        }
     }
 
     override suspend fun getLightningIncomingPayment(paymentHash: ByteVector32): LightningIncomingPayment? =

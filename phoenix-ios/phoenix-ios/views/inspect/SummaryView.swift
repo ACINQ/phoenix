@@ -1244,14 +1244,14 @@ struct SummaryView: View {
 	func deletePayment() {
 		log.trace("deletePayment()")
 		
-		Biz.business.databaseManager.paymentsDb { paymentsDb, _ in
-			
-			paymentsDb?.deletePayment(paymentId: paymentInfo.payment.id, completionHandler: { error in
+		Task { @MainActor in
+			do {
+				let paymentsDb = try await Biz.business.databaseManager.paymentsDb()
+				try await paymentsDb.deletePayment(paymentId: paymentInfo.payment.id, notify: true)
 				
-				if let error = error {
-					log.error("Error deleting payment: \(String(describing: error))")
-				}
-			})
+			} catch {
+				log.error("Error deleting payment: \(error)")
+			}
 		}
 		
 		switch location {

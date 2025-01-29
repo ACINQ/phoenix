@@ -2,7 +2,6 @@ package fr.acinq.phoenix.managers
 
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.logging.debug
-import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow

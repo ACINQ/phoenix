@@ -54,7 +54,14 @@ class SqliteOutgoingPaymentsDb(private val database: PaymentsDatabase) : Outgoin
         }
     }
 
-    fun _addOutgoingPayment(outgoingPayment: OutgoingPayment) = database.transaction {
+    /**
+     * Internal version:
+     * Used to add multiple incoming payments in a single database transaction.
+     *
+     * @param notify Set to false if `didSaveWalletPayment` should not be invoked
+     *               (e.g. when downloading payments from the cloud)
+     */
+    fun _addOutgoingPayment(outgoingPayment: OutgoingPayment, notify: Boolean = true) = database.transaction {
         when (outgoingPayment) {
             is LightningOutgoingPayment -> {
                 database.paymentsOutgoingQueries.insert(
@@ -83,7 +90,9 @@ class SqliteOutgoingPaymentsDb(private val database: PaymentsDatabase) : Outgoin
                 )
             }
         }
-        didSaveWalletPayment(outgoingPayment.id, database)
+        if (notify) {
+            didSaveWalletPayment(outgoingPayment.id, database)
+        }
     }
 
     override suspend fun completeLightningOutgoingPayment(id: UUID, status: LightningOutgoingPayment.Status.Completed) {
