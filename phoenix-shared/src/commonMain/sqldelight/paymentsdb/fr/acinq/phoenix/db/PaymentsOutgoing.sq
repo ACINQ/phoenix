@@ -79,11 +79,6 @@ deleteByPaymentHash:
 DELETE FROM payments_outgoing
 WHERE payment_hash = ?;
 
--- used after a restore from cloudkit, to finish migration
-delete:
-DELETE FROM payments_outgoing
-WHERE id = ?;
-
 list:
 SELECT data
 FROM  payments_outgoing

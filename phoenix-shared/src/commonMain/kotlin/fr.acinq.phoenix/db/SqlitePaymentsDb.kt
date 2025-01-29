@@ -283,7 +283,7 @@ class SqlitePaymentsDb(
                                     data = incomingPayment1,
                                     id = incomingPayment1.id
                                 )
-                                database.paymentsOutgoingQueries.delete(manualLiquidityPayment.id)
+                                database.paymentsOutgoingQueries.deleteById(manualLiquidityPayment.id)
                                 didSaveWalletPayment(incomingPayment.id, database)
                                 didDeleteWalletPayment(manualLiquidityPayment.id, database)
                             }
