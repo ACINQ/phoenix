@@ -257,6 +257,8 @@ class CloudKitPaymentsDb(
 
         withContext(Dispatchers.Default) {
 
+            val inQueries = paymentsDb.database.paymentsIncomingQueries
+            val outQueries = paymentsDb.database.paymentsOutgoingQueries
             val ckQueries = paymentsDb.database.cloudKitPaymentsQueries
             val metaQueries = paymentsDb.database.paymentsMetadataQueries
 
@@ -268,18 +270,16 @@ class CloudKitPaymentsDb(
                 downloadedPayments.forEach { payment ->
 
                     val paymentId: UUID = payment.id
-                    val existing: WalletPayment? = paymentsDb._getPayment(
-                        id = paymentId
-                    )?.first
-
-                    if (existing == null) {
-                        if (payment is IncomingPayment) {
+                    if (payment is IncomingPayment) {
+                        val existing = inQueries.get(paymentId).executeAsOneOrNull()
+                        if (existing == null) {
                             incomingPaymentsDb._addIncomingPayment(payment, notify = false)
-                        } else if (payment is OutgoingPayment) {
+                        }
+                    } else if (payment is OutgoingPayment) {
+                        val existing = outQueries.get(paymentId).executeAsOneOrNull()
+                        if (existing == null) {
                             outgoingPaymentsDb._addOutgoingPayment(payment, notify = false)
                         }
-                    } else {
-                        // We don't support sync (yet) - just backup.
                     }
                 }
 
