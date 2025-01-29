@@ -148,7 +148,7 @@ class SqlitePaymentsDb(
 
     suspend fun listCompletedPayments(count: Long, skip: Long, startDate: Long, endDate: Long): List<WalletPaymentInfo> {
         return withContext(Dispatchers.Default) {
-            database.paymentsQueries.listSucceeded(succeeded_at_from = startDate, succeeded_at_to = endDate, limit = count, offset = skip, mapper = ::mapPaymentsAndMetadata)
+            database.paymentsQueries.listSuccessful(succeeded_at_from = startDate, succeeded_at_to = endDate, limit = count, offset = skip, mapper = ::mapPaymentsAndMetadata)
                 .executeAsList().postProcess()
         }
     }
