@@ -458,9 +458,9 @@ val AfterVersion11 = AfterVersion(11) { driver ->
         }
 
     listOf(
+        "DROP TABLE outgoing_payment_parts",            // Foreign key constraint: must be before `outgoing_payments`
+        "DROP TABLE outgoing_payment_closing_tx_parts", // Foreign key constraint: must be before `outgoing_payments`
         "DROP TABLE outgoing_payments",
-        "DROP TABLE outgoing_payment_parts",
-        "DROP TABLE outgoing_payment_closing_tx_parts",
         "DROP TABLE inbound_liquidity_outgoing_payments",
         "DROP TABLE splice_outgoing_payments",
         "DROP TABLE splice_cpfp_outgoing_payments",
