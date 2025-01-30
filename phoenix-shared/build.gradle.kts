@@ -108,6 +108,7 @@ kotlin {
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
                 implementation("io.ktor:ktor-client-mock:${Versions.ktor}")
+                implementation("com.squareup.okio:okio:${Versions.okio}")
             }
         }
 

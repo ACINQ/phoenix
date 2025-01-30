@@ -7,6 +7,7 @@ object Versions {
 
     const val ktor = "2.3.7"
     const val sqlDelight = "2.0.1"
+    val okio = "3.8.0"
 
     const val slf4j = "1.7.30"
     const val junit = "4.13"

@@ -40,6 +40,8 @@ import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.runTest
 import fr.acinq.phoenix.utils.extensions.WalletPaymentState
 import fr.acinq.phoenix.utils.extensions.state
+import kotlinx.datetime.Clock
+import okio.FileSystem
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -214,6 +216,13 @@ class SqlitePaymentsDbTest {
                     ), it
                 )
             }
+    }
+
+    @Test
+    fun testOkio() {
+        val testdir = FileSystem.SYSTEM_TEMPORARY_DIRECTORY / "phoenix_tests" / "phoenix_testdb_${Clock.System.now().toEpochMilliseconds()}"
+        FileSystem.SYSTEM.createDirectories(testdir)
+        println(testdir)
     }
 }
 
