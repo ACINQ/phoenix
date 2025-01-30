@@ -21,7 +21,6 @@ import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toByteVector32
-import fr.acinq.phoenix.db.PaymentsDatabase
 import fr.acinq.phoenix.db.migrations.v11.types.OutgoingPartClosingInfoData
 import fr.acinq.phoenix.db.migrations.v11.types.OutgoingPartClosingInfoTypeVersion
 

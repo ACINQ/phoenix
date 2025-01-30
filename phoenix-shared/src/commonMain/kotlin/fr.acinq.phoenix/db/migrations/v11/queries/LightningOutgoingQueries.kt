@@ -21,10 +21,8 @@ import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.ShortChannelId
 import fr.acinq.lightning.db.LightningOutgoingPayment
-import fr.acinq.lightning.db.LightningOutgoingPayment.Part.HopDesc
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.utils.*
-import fr.acinq.phoenix.db.PaymentsDatabase
 import fr.acinq.phoenix.db.migrations.v11.types.OutgoingDetailsData
 import fr.acinq.phoenix.db.migrations.v11.types.OutgoingDetailsTypeVersion
 import fr.acinq.phoenix.db.migrations.v11.types.OutgoingPartClosingInfoTypeVersion

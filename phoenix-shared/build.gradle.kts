@@ -166,15 +166,15 @@ kotlin {
 sqldelight {
     databases {
         create("ChannelsDatabase") {
-            packageName.set("fr.acinq.phoenix.db")
+            packageName.set("fr.acinq.phoenix.db.sqldelight")
             srcDirs.from("src/commonMain/sqldelight/channelsdb")
         }
         create("PaymentsDatabase") {
-            packageName.set("fr.acinq.phoenix.db")
+            packageName.set("fr.acinq.phoenix.db.sqldelight")
             srcDirs.from("src/commonMain/sqldelight/paymentsdb")
         }
         create("AppDatabase") {
-            packageName.set("fr.acinq.phoenix.db")
+            packageName.set("fr.acinq.phoenix.db.sqldelight")
             srcDirs.from("src/commonMain/sqldelight/appdb")
         }
     }

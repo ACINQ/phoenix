@@ -21,6 +21,9 @@ import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import fr.acinq.bitcoin.Chain
 import fr.acinq.phoenix.db.migrations.v10.AfterVersion10
 import fr.acinq.phoenix.db.migrations.v11.AfterVersion11
+import fr.acinq.phoenix.db.sqldelight.AppDatabase
+import fr.acinq.phoenix.db.sqldelight.ChannelsDatabase
+import fr.acinq.phoenix.db.sqldelight.PaymentsDatabase
 import fr.acinq.phoenix.utils.PlatformContext
 import fr.acinq.phoenix.utils.extensions.phoenixName
 

@@ -27,6 +27,7 @@ import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.phoenix.db.sqldelight.*
 import fr.acinq.phoenix.managers.ContactsManager
 import fr.acinq.phoenix.managers.CurrencyManager
 import fr.acinq.phoenix.utils.extensions.toByteArray

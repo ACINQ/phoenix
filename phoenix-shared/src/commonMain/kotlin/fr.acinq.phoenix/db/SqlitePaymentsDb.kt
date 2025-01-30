@@ -27,6 +27,7 @@ import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.db.payments.*
 import fr.acinq.phoenix.db.payments.PaymentsMetadataQueries
+import fr.acinq.phoenix.db.sqldelight.PaymentsDatabase
 import fr.acinq.phoenix.managers.ContactsManager
 import fr.acinq.phoenix.managers.CurrencyManager
 import kotlin.collections.List

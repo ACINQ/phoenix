@@ -21,7 +21,6 @@ import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toByteVector32
-import fr.acinq.phoenix.db.PaymentsDatabase
 
 object SpliceCpfpOutgoingQueries {
 
