@@ -29,69 +29,65 @@ import fr.acinq.lightning.serialization.payment.Serialization
 import fr.acinq.phoenix.utils.extensions.toByteArray
 
 val AfterVersion10 = AfterVersion(10) { driver ->
-    val transacter = object : TransacterImpl(driver) {}
-
-    transacter.transaction {
-        val payments = driver.executeQuery(
-            identifier = null,
-            sql = "SELECT * FROM incoming_payments",
-            parameters = 0,
-            mapper = { cursor ->
-                val result = buildList {
-                    while (cursor.next().value) {
-                        val o = mapIncomingPaymentFromV10(
-                            payment_hash = cursor.getBytes(0)!!,
-                            preimage = cursor.getBytes(1)!!,
-                            created_at = cursor.getLong(2)!!,
-                            origin_type = cursor.getString(3)!!,
-                            origin_blob = cursor.getBytes(4)!!,
-                            received_amount_msat = cursor.getLong(5),
-                            received_at = cursor.getLong(6),
-                            received_with_type = cursor.getString(7),
-                            received_with_blob = cursor.getBytes(8),
-                        )
-                        add(o)
-                    }
-                }
-                QueryResult.Value(result)
-            }
-        ).value
-
-        driver.execute(identifier = null, sql = "DROP TABLE incoming_payments", parameters = 0)
-
-        payments
-            .forEach { payment ->
-                driver.execute(
-                    identifier = null,
-                    sql = "INSERT INTO payments_incoming (id, payment_hash, tx_id, created_at, received_at, data) VALUES (?, ?, ?, ?, ?, ?)",
-                    parameters = 6
-                ) {
-                    when (payment) {
-                        is LightningIncomingPayment -> {
-                            bindBytes(0, payment.paymentHash.deriveUUID().toByteArray())
-                            bindBytes(1, payment.paymentHash.toByteArray())
-                            bindBytes(2, null)
-                        }
-                        is @Suppress("DEPRECATION") LegacyPayToOpenIncomingPayment -> {
-                            bindBytes(0, payment.paymentHash.deriveUUID().toByteArray())
-                            bindBytes(1, payment.paymentHash.toByteArray())
-                            bindBytes(2, null)
-                        }
-                        is @Suppress("DEPRECATION") LegacySwapInIncomingPayment -> {
-                            bindBytes(0, payment.id.toByteArray())
-                            bindBytes(1, null)
-                            bindBytes(2, null)
-                        }
-                        is OnChainIncomingPayment -> {
-                            bindBytes(0, payment.id.toByteArray())
-                            bindBytes(1, null)
-                            bindBytes(2, payment.txId.value.toByteArray())
-                        }
-                    }
-                    bindLong(3, payment.createdAt)
-                    bindLong(4, payment.completedAt)
-                    bindBytes(5, Serialization.serialize(payment))
+    val payments = driver.executeQuery(
+        identifier = null,
+        sql = "SELECT * FROM incoming_payments",
+        parameters = 0,
+        mapper = { cursor ->
+            val result = buildList {
+                while (cursor.next().value) {
+                    val o = mapIncomingPaymentFromV10(
+                        payment_hash = cursor.getBytes(0)!!,
+                        preimage = cursor.getBytes(1)!!,
+                        created_at = cursor.getLong(2)!!,
+                        origin_type = cursor.getString(3)!!,
+                        origin_blob = cursor.getBytes(4)!!,
+                        received_amount_msat = cursor.getLong(5),
+                        received_at = cursor.getLong(6),
+                        received_with_type = cursor.getString(7),
+                        received_with_blob = cursor.getBytes(8),
+                    )
+                    add(o)
                 }
             }
-    }
+            QueryResult.Value(result)
+        }
+    ).value
+
+    driver.execute(identifier = null, sql = "DROP TABLE incoming_payments", parameters = 0)
+
+    payments
+        .forEach { payment ->
+            driver.execute(
+                identifier = null,
+                sql = "INSERT INTO payments_incoming (id, payment_hash, tx_id, created_at, received_at, data) VALUES (?, ?, ?, ?, ?, ?)",
+                parameters = 6
+            ) {
+                when (payment) {
+                    is LightningIncomingPayment -> {
+                        bindBytes(0, payment.paymentHash.deriveUUID().toByteArray())
+                        bindBytes(1, payment.paymentHash.toByteArray())
+                        bindBytes(2, null)
+                    }
+                    is @Suppress("DEPRECATION") LegacyPayToOpenIncomingPayment -> {
+                        bindBytes(0, payment.paymentHash.deriveUUID().toByteArray())
+                        bindBytes(1, payment.paymentHash.toByteArray())
+                        bindBytes(2, null)
+                    }
+                    is @Suppress("DEPRECATION") LegacySwapInIncomingPayment -> {
+                        bindBytes(0, payment.id.toByteArray())
+                        bindBytes(1, null)
+                        bindBytes(2, null)
+                    }
+                    is OnChainIncomingPayment -> {
+                        bindBytes(0, payment.id.toByteArray())
+                        bindBytes(1, null)
+                        bindBytes(2, payment.txId.value.toByteArray())
+                    }
+                }
+                bindLong(3, payment.createdAt)
+                bindLong(4, payment.completedAt)
+                bindBytes(5, Serialization.serialize(payment))
+            }
+        }
 }
