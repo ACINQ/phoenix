@@ -16,8 +16,8 @@
 
 package fr.acinq.phoenix.db
 
-import app.cash.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.OutPoint
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.db.AutomaticLiquidityPurchasePayment
@@ -38,18 +38,42 @@ import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.runTest
+import fr.acinq.phoenix.utils.PlatformContext
 import fr.acinq.phoenix.utils.extensions.WalletPaymentState
 import fr.acinq.phoenix.utils.extensions.state
+import okio.FileSystem
+import okio.Path
+import okio.Path.Companion.toPath
+import kotlin.collections.List
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+expect abstract class UsingContextTest() {
+    fun getPlatformContext(): PlatformContext
+
+    /**
+     * Sets up the original sample database files in the testing environment, so that the driver can find them when the tests are run.
+     * For example, on Android, this method puts the database files in the database folder of the robolectric's simulated Android.
+     */
+    fun setUpDatabase(context: PlatformContext, databasePaths: List<Path>)
+}
 
 @Suppress("DEPRECATION")
-class SqlitePaymentsDbTest {
+class SqlitePaymentsDbTest : UsingContextTest() {
+
+    @BeforeTest
+    fun setupDatabases() {
+        val sampleDbs = "src/commonTest/resources/sampledbs"
+        val v1: List<Path> = FileSystem.SYSTEM.list("$sampleDbs/v1".toPath())
+        val v6: List<Path> = FileSystem.SYSTEM.list("$sampleDbs/v6".toPath())
+        val v10: List<Path> = FileSystem.SYSTEM.list("$sampleDbs/v10".toPath())
+        setUpDatabase(getPlatformContext(), v1 + v6 + v10)
+    }
 
     @Test
     fun `read v1 db`() = runTest {
-        val driver = testPaymentsDriverFromResource("sampledbs/v1/old.payments-testnet-fedc36138a62ceadc8a93861d2c46f5ca5e8b418.sqlite")
+        val driver = createPaymentsDbDriver(getPlatformContext(), chain = Chain.Testnet3, nodeIdHash = "fedc36138a62ceadc8a93861d2c46f5ca5e8b418")
         val paymentsDb = createSqlitePaymentsDb(driver, contactsManager = null, currencyManager = null)
 
         val payments = paymentsDb.database.paymentsQueries.list(limit = Long.MAX_VALUE, offset = 0)
@@ -75,7 +99,7 @@ class SqlitePaymentsDbTest {
 
     @Test
     fun `read v1 db - additional`() = runTest {
-        val driver = testPaymentsDriverFromResource("sampledbs/v1/old.payments-testnet-a224978853d2f4c94ac8e2dbb2acf8344e0146d0.sqlite")
+        val driver = createPaymentsDbDriver(getPlatformContext(), chain = Chain.Testnet3, nodeIdHash = "a224978853d2f4c94ac8e2dbb2acf8344e0146d0")
         val paymentsDb = createSqlitePaymentsDb(driver, contactsManager = null, currencyManager = null)
 
         val payments = paymentsDb.database.paymentsQueries.list(limit = Long.MAX_VALUE, offset = 0)
@@ -101,7 +125,7 @@ class SqlitePaymentsDbTest {
 
     @Test
     fun `read v6 db`() = runTest {
-        val driver = testPaymentsDriverFromResource("sampledbs/v6/old.payments-testnet-700486fc7a90d5922d6f993f2941ab9f9f1a9d85.sqlite")
+        val driver = createPaymentsDbDriver(getPlatformContext(), chain = Chain.Testnet3, nodeIdHash = "700486fc7a90d5922d6f993f2941ab9f9f1a9d85")
         val paymentsDb = createSqlitePaymentsDb(driver, contactsManager = null, currencyManager = null)
 
         val payments = paymentsDb.database.paymentsQueries.list(limit = Long.MAX_VALUE, offset = 0)
@@ -127,7 +151,7 @@ class SqlitePaymentsDbTest {
 
     @Test
     fun `read v10 db`() = runTest {
-        val driver = testPaymentsDriverFromResource("sampledbs/v10/payments-testnet-28903aff.sqlite")
+        val driver = createPaymentsDbDriver(getPlatformContext(), chain = Chain.Testnet3, nodeIdHash = "28903aff")
         val paymentsDb = createSqlitePaymentsDb(driver, contactsManager = null, currencyManager = null)
 
         val payments = paymentsDb.database.paymentsQueries.list(limit = Long.MAX_VALUE, offset = 0)
@@ -216,5 +240,3 @@ class SqlitePaymentsDbTest {
             }
     }
 }
-
-expect fun testPaymentsDriverFromResource(path: String): SqlDriver

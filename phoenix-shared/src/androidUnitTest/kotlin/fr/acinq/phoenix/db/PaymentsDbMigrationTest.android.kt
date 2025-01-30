@@ -16,38 +16,47 @@
 
 package fr.acinq.phoenix.db
 
-import app.cash.sqldelight.db.SqlDriver
-import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
-import fr.acinq.phoenix.db.PaymentsDatabase
-import fr.acinq.phoenix.db.migrations.v10.AfterVersion10
-import fr.acinq.phoenix.db.migrations.v11.AfterVersion11
-import kotlinx.datetime.Clock
-import java.io.File
-import java.io.FileOutputStream
-import java.util.Properties
+import android.content.Context
+import androidx.test.core.app.ApplicationProvider
+import fr.acinq.phoenix.utils.PlatformContext
+import okio.Path
+import okio.Path.Companion.toPath
+import org.junit.After
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+import kotlin.collections.List
+import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.name
 
 
-actual fun testPaymentsDriverFromResource(path: String): SqlDriver {
+@RunWith(RobolectricTestRunner::class)
+@Config(manifest = Config.NONE)
+actual abstract class UsingContextTest {
 
-    // loading original database file
-    val loader = PaymentsDatabase::class.java.classLoader!!
-    val originalDb = loader.getResourceAsStream(path)!!
+    actual fun setUpDatabase(context: PlatformContext, databasePaths: List<Path>) {
+        val dbDir = context.applicationContext.getDatabasePath("test").toPath().parent
+        Files.createDirectories(dbDir)
+        databasePaths.map { it.toNioPath() }.forEach { source ->
+            val dest = dbDir.resolve(source.name)
+            Files.copy(source, dest, StandardCopyOption.REPLACE_EXISTING)
+        }
+    }
 
-    // make a copy in a temporary folder that we can safely edit later when testing the migration
-    // TODO: fix temporary file creation
-    val testFile = File.createTempFile("phoenix_testdb_${Clock.System.now().toEpochMilliseconds()}", ".sqlite", File("phoenix_tests").apply { mkdir() })
-    testFile.deleteOnExit()
-    val fos = FileOutputStream(testFile)
-    fos.write(originalDb.readBytes())
+    @After
+    fun copyMigratedFiles() {
+        val destDir = "build/test-results/migration-v10-v11/android".toPath()
+        Files.createDirectories(destDir.toNioPath())
 
-    val driver: SqlDriver = JdbcSqliteDriver(
-        url = "jdbc:sqlite:${testFile.path}",
-        properties = Properties(),
-        schema = PaymentsDatabase.Schema,
-        migrateEmptySchema = false,
-        AfterVersion10,
-        AfterVersion11,
-    )
+        val dbDir = ApplicationProvider.getApplicationContext<Context>().applicationContext.getDatabasePath("test").toPath().parent
+        dbDir.listDirectoryEntries().forEach { migratedFile ->
+            val dest = destDir.resolve(migratedFile.name)
+            Files.copy(migratedFile, dest.toNioPath(), StandardCopyOption.REPLACE_EXISTING)
+            println("copied migrated file=${migratedFile.name} to $destDir")
+        }
+    }
 
-    return driver
+    actual fun getPlatformContext(): PlatformContext = PlatformContext(ApplicationProvider.getApplicationContext())
 }

@@ -108,6 +108,7 @@ kotlin {
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
                 implementation("io.ktor:ktor-client-mock:${Versions.ktor}")
+                implementation("com.squareup.okio:okio:${Versions.okio}")
             }
         }
 
@@ -128,6 +129,7 @@ kotlin {
                     implementation(kotlin("test-junit"))
                     implementation("androidx.test.ext:junit:1.1.3")
                     implementation("androidx.test.espresso:espresso-core:3.4.0")
+                    implementation("org.robolectric:robolectric:4.13")
                     val currentOs = org.gradle.internal.os.OperatingSystem.current()
                     val target = when {
                         currentOs.isLinux -> "linux"

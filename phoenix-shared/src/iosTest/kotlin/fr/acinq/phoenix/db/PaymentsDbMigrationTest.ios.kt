@@ -16,8 +16,13 @@
 
 package fr.acinq.phoenix.db
 
-import app.cash.sqldelight.db.SqlDriver
+import fr.acinq.phoenix.utils.PlatformContext
+import okio.Path
+import kotlin.collections.List
 
-actual fun testPaymentsDriverFromResource(path: String): SqlDriver {
-    TODO("Not yet implemented")
+actual abstract class UsingContextTest {
+    actual fun getPlatformContext(): PlatformContext = PlatformContext()
+    actual fun setUpDatabase(context: PlatformContext, databasePaths: List<Path>) {
+        TODO()
+    }
 }
