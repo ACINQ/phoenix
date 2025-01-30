@@ -447,7 +447,7 @@ val AfterVersion11 = AfterVersion(11) { driver ->
         .forEach { (paymentId, metadata) ->
             driver.execute(
                 identifier = null,
-                sql = "INSERT INTO cloudkit_payments_metadata (payment_id, unpadded_size, record_creation, record_blob VALUES (?, ?, ?, ?)",
+                sql = "INSERT INTO cloudkit_payments_metadata (id, unpadded_size, record_creation, record_blob) VALUES (?, ?, ?, ?)",
                 parameters = 4
             ) {
                 bindBytes(0, paymentId.toByteArray())
