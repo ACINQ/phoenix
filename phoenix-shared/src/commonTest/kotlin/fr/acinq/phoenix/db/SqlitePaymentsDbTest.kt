@@ -231,7 +231,7 @@ class SqlitePaymentsDbTest : UsingContextTest() {
                         amountReceived = 878721000.msat,
                         miningFee = 1135.sat,
                         serviceFee = 1000000.msat,
-                        liquidityPurchase = LiquidityAds.Purchase.Standard(amount = 1.sat, fees = LiquidityAds.Fees(serviceFee = 1000.sat, miningFee = 542.sat), paymentDetails = LiquidityAds.PaymentDetails.FromChannelBalance),
+                        liquidityPurchase = LiquidityAds.Purchase.Standard(amount = 1.sat, fees = LiquidityAds.Fees(miningFee = 542.sat, serviceFee = 1000.sat), paymentDetails = LiquidityAds.PaymentDetails.FromChannelBalance),
                         channelId = ByteVector32("7d508efbcd8070244db638062a7da90a2b68491f807dab2cdc2a4fe95afb235b"),
                         txId = TxId("2e1ed22ea8871365260c8bc413e765cc7435e97f67a8f363b1a74298f4c423ec"),
                         localInputs = setOf(
@@ -264,7 +264,7 @@ class SqlitePaymentsDbTest : UsingContextTest() {
                         serviceFee = 1_000.sat.toMilliSatoshi(),
                         liquidityPurchase = LiquidityAds.Purchase.Standard(
                             amount = 1.sat,
-                            fees = LiquidityAds.Fees(serviceFee = 1_000.sat, miningFee = 406.sat),
+                            fees = LiquidityAds.Fees(miningFee = 406.sat, serviceFee = 1_000.sat),
                             paymentDetails = LiquidityAds.PaymentDetails.FromChannelBalance
                         ),
                         channelId = ByteVector32.fromValidHex("12ac9f375e105a3e00f85e58bb820be9225a2ae5f08072e86e76632f8df768f2"),
@@ -289,7 +289,7 @@ class SqlitePaymentsDbTest : UsingContextTest() {
                         miningFee = 161_593.sat,
                         liquidityPurchase = LiquidityAds.Purchase.Standard(
                             amount = 100_000.sat,
-                            fees = LiquidityAds.Fees(serviceFee = 1_000.sat, miningFee = 76_693.sat),
+                            fees = LiquidityAds.Fees(miningFee = 76_693.sat, serviceFee = 1_000.sat),
                             paymentDetails = LiquidityAds.PaymentDetails.FromChannelBalance
                         ),
                         channelId = ByteVector32.fromValidHex("12ac9f375e105a3e00f85e58bb820be9225a2ae5f08072e86e76632f8df768f2"),
@@ -360,7 +360,7 @@ class SqlitePaymentsDbTest : UsingContextTest() {
                 assertIs<SpliceOutgoingPayment>(it)
             }
 
-        // lightning-incoming 200_000 sat + liquidity purchase from future htlc => received 197_144 sat after fees
+        // pay-to-splice 200_000 sat + on-the-fly liquidity purchase => received 197_144 sat after fees
         paymentsDb.database.paymentsIncomingQueries
             .get(UUID.fromString("9e1f4892-15fd-4b3f-ba0b-e9da997737f6"))
             .executeAsOne()
@@ -383,13 +383,37 @@ class SqlitePaymentsDbTest : UsingContextTest() {
                             miningFee = 856.sat,
                             purchase = LiquidityAds.Purchase.Standard(
                                 amount = 200_000.sat,
-                                fees = LiquidityAds.Fees(serviceFee = 2_000.sat, miningFee = 406.sat),
+                                fees = LiquidityAds.Fees(miningFee = 406.sat, serviceFee = 2_000.sat),
                                 paymentDetails = LiquidityAds.PaymentDetails.FromChannelBalanceForFutureHtlc(
                                     paymentHashes = listOf(ByteVector32.fromValidHex("9e1f489215fd2b3f3a0be9da997737f61421c03f00f06b4a8a16000c25e18b34"))
                                 )
                             ),
                         ),
                         createdAt = 1738334460105L,
+                    ), it
+                )
+            }
+
+        // the pay-to-splice is tied to an auto-liquidity with a non-null `incomingPaymentReceivedAt` (i.e., not visible in the UI)
+        paymentsDb.database.paymentsOutgoingQueries
+            .get(UUID.fromString("1aa9ca75-ff7c-44bb-8595-9df94b404f2b"))
+            .executeAsOne()
+            .also {
+                assertEquals(
+                    AutomaticLiquidityPurchasePayment(
+                        id = UUID.fromString("1aa9ca75-ff7c-44bb-8595-9df94b404f2b"),
+                        miningFee = 856.sat,
+                        channelId = ByteVector32.fromValidHex("8aca84879c0d7517445ecaf399b427d1e79ecc55e9bfe2421e227679993c461e"),
+                        txId = TxId("4eeffee8bdfc4f63cbb5eb0f20408af924e122099d5d6af2cec0d5a72a7d97f7"),
+                        liquidityPurchase = LiquidityAds.Purchase.Standard(
+                            amount = 200_000.sat,
+                            fees = LiquidityAds.Fees(miningFee = 406.sat, serviceFee = 2_000.sat),
+                            paymentDetails = LiquidityAds.PaymentDetails.FromChannelBalanceForFutureHtlc(paymentHashes = listOf(ByteVector32.fromValidHex("9e1f489215fd2b3f3a0be9da997737f61421c03f00f06b4a8a16000c25e18b34")))
+                        ),
+                        createdAt = 1738334767765L,
+                        confirmedAt = 1738335294588,
+                        lockedAt = 1738335394430L,
+                        incomingPaymentReceivedAt = 1738335394871L
                     ), it
                 )
             }
@@ -405,7 +429,7 @@ class SqlitePaymentsDbTest : UsingContextTest() {
                         miningFee = 161_593.sat,
                         liquidityPurchase = LiquidityAds.Purchase.Standard(
                             amount = 250_000.sat,
-                            fees = LiquidityAds.Fees(serviceFee = 2_500.sat, miningFee = 76_693.sat),
+                            fees = LiquidityAds.Fees(miningFee = 76_693.sat, serviceFee = 2_500.sat),
                             paymentDetails = LiquidityAds.PaymentDetails.FromChannelBalance
                         ),
                         channelId = ByteVector32.fromValidHex("8aca84879c0d7517445ecaf399b427d1e79ecc55e9bfe2421e227679993c461e"),
@@ -486,13 +510,37 @@ class SqlitePaymentsDbTest : UsingContextTest() {
                             miningFee = 1_015.sat,
                             purchase = LiquidityAds.Purchase.Standard(
                                 amount = 350_000.sat,
-                                fees = LiquidityAds.Fees(serviceFee = 4_500.sat, miningFee = 1015.sat),
+                                fees = LiquidityAds.Fees(miningFee = 1_015.sat, serviceFee = 4_500.sat),
                                 paymentDetails = LiquidityAds.PaymentDetails.FromFutureHtlc(
                                     paymentHashes = listOf(ByteVector32.fromValidHex("e1d7fecc8e7c823e752fcb853c2c01bd75df56b3d428b4354cb40050c9db0f7f"))
                                 )
                             ),
                         ),
                         createdAt = 1738336431048L,
+                    ), it
+                )
+            }
+
+        // the pay-to-open is tied to an auto-liquidity with a non-null `incomingPaymentReceivedAt`
+        paymentsDb.database.paymentsOutgoingQueries
+            .get(UUID.fromString("8c64f372-9dbe-439e-b496-e442c8549df7"))
+            .executeAsOne()
+            .also {
+                assertEquals(
+                    AutomaticLiquidityPurchasePayment(
+                        id = UUID.fromString("8c64f372-9dbe-439e-b496-e442c8549df7"),
+                        miningFee = 1_015.sat,
+                        channelId = ByteVector32.fromValidHex("887ef839742d05217508107b40898439a11511aa46f924a7e930e9e5912852c1"),
+                        txId = TxId("adbad2af375305ddb78526ae52e5ccb13a220a8553b1187d05d033451edb19c0"),
+                        liquidityPurchase = LiquidityAds.Purchase.Standard(
+                            amount = 350_000.sat,
+                            fees = LiquidityAds.Fees(miningFee = 1_015.sat, serviceFee = 4_500.sat),
+                            paymentDetails = LiquidityAds.PaymentDetails.FromFutureHtlc(paymentHashes = listOf(ByteVector32.fromValidHex("e1d7fecc8e7c823e752fcb853c2c01bd75df56b3d428b4354cb40050c9db0f7f")))
+                        ),
+                        createdAt = 1738336437553L,
+                        confirmedAt = null,
+                        lockedAt = 1738337194363L,
+                        incomingPaymentReceivedAt = 1738337194625L
                     ), it
                 )
             }
