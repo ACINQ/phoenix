@@ -50,6 +50,7 @@ import kotlin.collections.List
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 
 expect abstract class UsingContextTest() {
     fun getPlatformContext(): PlatformContext
@@ -243,36 +244,59 @@ class SqlitePaymentsDbTest : UsingContextTest() {
     }
 
     @Test
-    fun `read v10 db - test2`() = runTest {
+    fun `read v10 db - fees`() = runTest {
         val driver = createPaymentsDbDriver(getPlatformContext(), chain = Chain.Testnet3, nodeIdHash = "f921bddf")
         val paymentsDb = createSqlitePaymentsDb(driver, contactsManager = null, currencyManager = null)
 
-        val payments = paymentsDb.database.paymentsQueries.list(limit = Long.MAX_VALUE, offset = 0)
-            .executeAsList()
-            .map { Serialization.deserialize(it.data_).getOrThrow() }
+        // On-chain deposit of 200k sat that triggered a liquidity purchase.
+        // The effectively received amount was 198 150 sat after fees.
+        paymentsDb.database.paymentsIncomingQueries
+            .get(UUID.fromString("7149cca7-d1d7-428d-8ee1-d9f43e44e9d8"))
+            .executeAsOne()
+            .also {
+                assertEquals(
+                    NewChannelIncomingPayment(
+                        id = UUID.fromString("7149cca7-d1d7-428d-8ee1-d9f43e44e9d8"),
+                        amountReceived = 198_150.sat.toMilliSatoshi(),
+                        miningFee = 444.sat + 406.sat,
+                        serviceFee = 1_000.sat.toMilliSatoshi(),
+                        liquidityPurchase = LiquidityAds.Purchase.Standard(
+                            amount = 1.sat,
+                            fees = LiquidityAds.Fees(serviceFee = 1_000.sat, miningFee = 406.sat),
+                            paymentDetails = LiquidityAds.PaymentDetails.FromChannelBalance
+                        ),
+                        channelId = ByteVector32.fromValidHex("12ac9f375e105a3e00f85e58bb820be9225a2ae5f08072e86e76632f8df768f2"),
+                        txId = TxId("976dd66d48b8831b571644ad56a8aed4eb596b58f59620289b64bd4a40a70900"),
+                        localInputs = setOf(OutPoint(TxHash("87de58628bfeaf8d153a0c27ddb091aa2911c159223c3b183cf913f236add35c"), 0)),
+                        createdAt = 1738154761716L,
+                        confirmedAt = 1738154906824L,
+                        lockedAt = 1738155391461L,
+                    ), it
+                )
+            }
 
-        assertEquals(6, payments.size)
-
-        // the first payment received was an on-chain deposit of 200k sat that triggered a liquidity purchase.
-        // It must be mapped to a [NewChannelIncomingPayment] with the correct liquidity purchase data.
-        assertEquals(
-            NewChannelIncomingPayment(
-                id = UUID.fromString("7149cca7-d1d7-428d-8ee1-d9f43e44e9d8"),
-                amountReceived = 198_150.sat.toMilliSatoshi(),
-                miningFee = 444.sat,
-                serviceFee = 1_000.sat.toMilliSatoshi(),
-                liquidityPurchase = LiquidityAds.Purchase.Standard(
-                    amount = 1.sat,
-                    fees = LiquidityAds.Fees(serviceFee = 1_000.sat, miningFee = 406.sat),
-                    paymentDetails = LiquidityAds.PaymentDetails.FromChannelBalance
-                ),
-                channelId = ByteVector32.fromValidHex("12ac9f375e105a3e00f85e58bb820be9225a2ae5f08072e86e76632f8df768f2"),
-                txId = TxId("976dd66d48b8831b571644ad56a8aed4eb596b58f59620289b64bd4a40a70900"),
-                localInputs = setOf(OutPoint(TxHash("87de58628bfeaf8d153a0c27ddb091aa2911c159223c3b183cf913f236add35c"), 0)),
-                createdAt = 1738154761716,
-                lockedAt = 1738155391461L,
-                confirmedAt = 1738154906824L,
-            ), payments[5]
-        )
+        // Manual liquidity purchase for 100k sat.
+        // The total fee was 162 593 sat.
+        paymentsDb.database.paymentsOutgoingQueries
+            .get(UUID.fromString("86a375bb-e8f7-4bf6-b3cc-2dde60f34058"))
+            .executeAsOne()
+            .also {
+                assertEquals(
+                    ManualLiquidityPurchasePayment(
+                        id = UUID.fromString("86a375bb-e8f7-4bf6-b3cc-2dde60f34058"),
+                        miningFee = 161_593.sat,
+                        liquidityPurchase = LiquidityAds.Purchase.Standard(
+                            amount = 100_000.sat,
+                            fees = LiquidityAds.Fees(serviceFee = 1_000.sat, miningFee = 76_693.sat),
+                            paymentDetails = LiquidityAds.PaymentDetails.FromChannelBalance
+                        ),
+                        channelId = ByteVector32.fromValidHex("12ac9f375e105a3e00f85e58bb820be9225a2ae5f08072e86e76632f8df768f2"),
+                        txId = TxId("0c14d101796a8ae38dec800e23c90630a99051bae8d3ce5c29149f97b69ac40a"),
+                        createdAt = 1738157412970L,
+                        confirmedAt = 1738157661772L,
+                        lockedAt = 1738158091535L,
+                    ), it
+                )
+            }
     }
 }
