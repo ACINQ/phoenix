@@ -31,6 +31,7 @@ import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.db.ManualLiquidityPurchasePayment
 import fr.acinq.lightning.db.NewChannelIncomingPayment
 import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
+import fr.acinq.lightning.db.SpliceInIncomingPayment
 import fr.acinq.lightning.db.SpliceOutgoingPayment
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.serialization.payment.Serialization
@@ -51,6 +52,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlin.test.assertNull
 
 expect abstract class UsingContextTest() {
     fun getPlatformContext(): PlatformContext
@@ -153,7 +155,7 @@ class SqlitePaymentsDbTest : UsingContextTest() {
     }
 
     @Test
-    fun `read v10 db`() = runTest {
+    fun `read v10 db - large dataset`() = runTest {
         val driver = createPaymentsDbDriver(getPlatformContext(), chain = Chain.Testnet3, nodeIdHash = "28903aff")
         val paymentsDb = createSqlitePaymentsDb(driver, contactsManager = null, currencyManager = null)
 
@@ -295,6 +297,202 @@ class SqlitePaymentsDbTest : UsingContextTest() {
                         createdAt = 1738157412970L,
                         confirmedAt = 1738157661772L,
                         lockedAt = 1738158091535L,
+                    ), it
+                )
+            }
+    }
+
+    @Test
+    fun `read v10 db - liquidity`() = runTest {
+        val driver = createPaymentsDbDriver(getPlatformContext(), chain = Chain.Testnet3, nodeIdHash = "6a5e6f")
+        val paymentsDb = createSqlitePaymentsDb(driver, contactsManager = null, currencyManager = null)
+
+        // swap-in 200_000 sat + liquidity purchase from channel balance => received 198_433 sat after fees.
+        paymentsDb.database.paymentsIncomingQueries
+            .get(UUID.fromString("2226371f-c13d-4f41-b2c2-99a1596ba895"))
+            .executeAsOne()
+            .also {
+                assertEquals(
+                    NewChannelIncomingPayment(
+                        id = UUID.fromString("2226371f-c13d-4f41-b2c2-99a1596ba895"),
+                        amountReceived = 198_433.sat.toMilliSatoshi(),
+                        miningFee = 296.sat + 271.sat,
+                        serviceFee = 1_000.sat.toMilliSatoshi(),
+                        liquidityPurchase = LiquidityAds.Purchase.Standard(
+                            amount = 1.sat,
+                            fees = LiquidityAds.Fees(miningFee = 271.sat, serviceFee = 1_000.sat),
+                            paymentDetails = LiquidityAds.PaymentDetails.FromChannelBalance,
+                        ),
+                        channelId = ByteVector32.fromValidHex("8aca84879c0d7517445ecaf399b427d1e79ecc55e9bfe2421e227679993c461e"),
+                        txId = TxId("c4c1499ac137b210a189c22926b7a061a49eb04a489a116d7f276b348bc6dc46"),
+                        localInputs = setOf(OutPoint(TxHash("b4df0f80e1d057638ec5969d1c2cc5896f7affd2fd787be728c405f20c79d717"), 1)),
+                        createdAt = 1738332646763L,
+                        confirmedAt = 1738334286135L,
+                        lockedAt = 1738332694407L,
+                    ), it
+                )
+            }
+
+        // swap-in 300_000 sat => received 299_584 sat after fees
+        paymentsDb.database.paymentsIncomingQueries
+            .get(UUID.fromString("8bbd702f-4da0-4287-8a66-000d82c34ef2"))
+            .executeAsOne()
+            .also {
+                assertIs<SpliceInIncomingPayment>(it)
+                assertEquals(299_584.sat.toMilliSatoshi(), it.amountReceived)
+                assertEquals(416.sat, it.miningFee)
+                assertNull(it.liquidityPurchase)
+            }
+
+        // ln-outgoing -5_044 sat including fee 24 sat
+        paymentsDb.database.paymentsOutgoingQueries
+            .get(UUID.fromString("f51b9ef3-bade-445b-b8f1-e2ade93193ef"))
+            .executeAsOne()
+            .also {
+                assertIs<LightningOutgoingPayment>(it)
+            }
+
+        // splice-out -151_810 sat fee=1_810 sat
+        paymentsDb.database.paymentsOutgoingQueries
+            .get(UUID.fromString("d87bd8e9-4e4d-46a2-bf2e-404017dbd111"))
+            .executeAsOne()
+            .also {
+                assertIs<SpliceOutgoingPayment>(it)
+            }
+
+        // lightning-incoming 200_000 sat + liquidity purchase from future htlc => received 197_144 sat after fees
+        paymentsDb.database.paymentsIncomingQueries
+            .get(UUID.fromString("9e1f4892-15fd-4b3f-ba0b-e9da997737f6"))
+            .executeAsOne()
+            .also {
+                assertEquals(
+                    Bolt11IncomingPayment(
+                        preimage = ByteVector32.fromValidHex("2a97a6923ae4fe68f0ed975bea272ce4e95d1896ec77b83597c0a960ffabcc8c"),
+                        paymentRequest = Bolt11Invoice.read("lntb2m1pneec8upp5nc053ys4l54n7wsta8dfjaeh7c2zrsplqrcxkj52zcqqcf0p3v6qcqzyssp550dg5h4t6kg02s9v0u6azxrzfj8nnjsppjlx2yl5wetvafx9vufs9q7sqqqqqqqqqqqqqqqqqqqsqqqqqysgqdq4wpshjtt5dukhxurvd93k2mqz9gxqyjw5qrzjqwfn3p9278ttzzpe0e00uhyxhned3j5d9acqak5emwfpflp8z2cnflla25gajw4h0yqqqqlgqqqqqeqqjqzm4g3f8pudsudf4sq2ckuhjsuna6r543pcm7rw020er9y9kwd0fzq9scy6edqmfeffafmn2duufn0s8hcjzfkrkwrwgmyl5sxggvvespkcev7p").get(),
+                        parts = listOf(
+                            LightningIncomingPayment.Part.Htlc(
+                                amountReceived = 197_144.sat.toMilliSatoshi(),
+                                channelId = ByteVector32.fromValidHex("8aca84879c0d7517445ecaf399b427d1e79ecc55e9bfe2421e227679993c461e"),
+                                htlcId = 0,
+                                fundingFee = LiquidityAds.FundingFee(amount = 0.msat, fundingTxId = TxId("4eeffee8bdfc4f63cbb5eb0f20408af924e122099d5d6af2cec0d5a72a7d97f7")),
+                                receivedAt = 1738335394871L
+                            )
+                        ),
+                        liquidityPurchaseDetails = LiquidityAds.LiquidityTransactionDetails(
+                            txId = TxId("4eeffee8bdfc4f63cbb5eb0f20408af924e122099d5d6af2cec0d5a72a7d97f7"),
+                            miningFee = 856.sat,
+                            purchase = LiquidityAds.Purchase.Standard(
+                                amount = 200_000.sat,
+                                fees = LiquidityAds.Fees(serviceFee = 2_000.sat, miningFee = 406.sat),
+                                paymentDetails = LiquidityAds.PaymentDetails.FromChannelBalanceForFutureHtlc(
+                                    paymentHashes = listOf(ByteVector32.fromValidHex("9e1f489215fd2b3f3a0be9da997737f61421c03f00f06b4a8a16000c25e18b34"))
+                                )
+                            ),
+                        ),
+                        createdAt = 1738334460105L,
+                    ), it
+                )
+            }
+
+        // manual-liquidity of 250_000 sat, with mining fee of 161_593 sat => total costs 164_093 sat
+        paymentsDb.database.paymentsOutgoingQueries
+            .get(UUID.fromString("fda1bd70-4baf-4ef3-ae1f-c61a0cc50aa1"))
+            .executeAsOne()
+            .also {
+                assertEquals(
+                    ManualLiquidityPurchasePayment(
+                        id = UUID.fromString("fda1bd70-4baf-4ef3-ae1f-c61a0cc50aa1"),
+                        miningFee = 161_593.sat,
+                        liquidityPurchase = LiquidityAds.Purchase.Standard(
+                            amount = 250_000.sat,
+                            fees = LiquidityAds.Fees(serviceFee = 2_500.sat, miningFee = 76_693.sat),
+                            paymentDetails = LiquidityAds.PaymentDetails.FromChannelBalance
+                        ),
+                        channelId = ByteVector32.fromValidHex("8aca84879c0d7517445ecaf399b427d1e79ecc55e9bfe2421e227679993c461e"),
+                        txId = TxId("9621b533ed313ac4ed76f582d9523b473f8103bac35b52c9d8e0ededb7ba6962"),
+                        createdAt = 1738335653481L,
+                        confirmedAt = 1738336277864L,
+                        lockedAt = 1738336294405L,
+                    ), it
+                )
+            }
+
+        // lightning-incoming => received 170_000 sat without liquidity purchase
+        paymentsDb.database.paymentsIncomingQueries
+            .get(UUID.fromString("90103df3-0b54-4fbf-a508-13c28a272263"))
+            .executeAsOne()
+            .also {
+                assertEquals(
+                    Bolt11IncomingPayment(
+                        preimage = ByteVector32.fromValidHex("e38cb98d6d973639e1ffb63e84db39b9dca56086dc7ccbe30cf22f2f45cf69af"),
+                        paymentRequest = Bolt11Invoice.read("lntb1700u1pnee6zvpp5jqgrmuct2j0mleggz0pg5fezv0uwhsqaglr3y0csff09wm7qehtscqzyssp52kxmxdcpfgzvpk0s6agl3tz7ws4w3u6madevhs35txlnlr9z29ns9q7sqqqqqqqqqqqqqqqqqqqsqqqqqysgqdpyd35kw6r5de5kueeqdehhggrpypehqmrfvdjsmqz9gxqyjw5qrzjqwfn3p9278ttzzpe0e00uhyxhned3j5d9acqak5emwfpflp8z2cnflla25gajw4h0yqqqqlgqqqqqeqqjqty3kr0qzya30cqjs9gfqs39r0eq2euz3wd6y7ljye75cx4fcm60kdp53pv50qyngqu9vrlkqv83r9xxpzjdv0u56tyhtqaa5yunv2uqphrhtwe").get(),
+                        parts = listOf(
+                            LightningIncomingPayment.Part.Htlc(
+                                amountReceived = 170_000.sat.toMilliSatoshi(),
+                                channelId = ByteVector32.fromValidHex("8aca84879c0d7517445ecaf399b427d1e79ecc55e9bfe2421e227679993c461e"),
+                                htlcId = 1,
+                                fundingFee = null,
+                                receivedAt = 1738336348600L,
+                            )
+                        ),
+                        liquidityPurchaseDetails = null,
+                        createdAt = 1738336332667L,
+                    ), it
+                )
+            }
+
+        // channel close => spending 544_213 sat
+        paymentsDb.database.paymentsOutgoingQueries
+            .get(UUID.fromString("823feea4-eead-4aa4-9141-0fadee874f8e"))
+            .executeAsOne()
+            .also {
+                assertEquals(
+                    ChannelCloseOutgoingPayment(
+                        id = UUID.fromString("823feea4-eead-4aa4-9141-0fadee874f8e"),
+                        recipientAmount = 544_213.sat,
+                        address = "tb1qrcppmta4c4q0ztk3an2m8hn34r32sd40xkxfnn",
+                        isSentToDefaultAddress = false,
+                        miningFee = 0.sat,
+                        channelId = ByteVector32.fromValidHex("8aca84879c0d7517445ecaf399b427d1e79ecc55e9bfe2421e227679993c461e"),
+                        txId = TxId("2b16121e6745b407993e114d7a4217f779f76c267c1cf190a2397d1731d3d653"),
+                        createdAt = 1738336392835L,
+                        confirmedAt = null,
+                        lockedAt = 1738336477169L,
+                        closingType = ChannelCloseOutgoingPayment.ChannelClosingType.Mutual,
+                    ), it
+                )
+            }
+
+        // pay-to-open 350_000 sat with liquidity purchase => received 344_485 sat after fees
+        paymentsDb.database.paymentsIncomingQueries
+            .get(UUID.fromString("e1d7fecc-8e7c-423e-b52f-cb853c2c01bd"))
+            .executeAsOne()
+            .also {
+                assertEquals(
+                    Bolt11IncomingPayment(
+                        preimage = ByteVector32.fromValidHex("86cc39d5baa6a2a2757c47a6c3e1a0facd36c86127e957853889c1a44a5b1e32"),
+                        paymentRequest = Bolt11Invoice.read("lntb3500u1pnee690pp5u8tlanyw0jpruaf0ewznctqph46a744n6s5tgd2vksq9pjwmpalscqzyssp5qs3qmcqhyj3e0mmu7r47zfuqm9vuzgsnf3dnzceemdd3fupeq7aq9q7sqqqqqqqqqqqqqqqqqqqsqqqqqysgqdqjwpshjtt5dukk7ur9dcmqz9gxqyjw5qrzjqwfn3p9278ttzzpe0e00uhyxhned3j5d9acqak5emwfpflp8z2cnflla25gajw4h0yqqqqlgqqqqqeqqjqsmga84r7jg2f54epdcfd4r579jgaw9x3t6r5eg82kzt65esu0ue9536caqfuep7a7w2ge0ttu4fzrpyxm3d0qdamgl2vkhlu4jh0q5gqyd4rw6").get(),
+                        parts = listOf(
+                            LightningIncomingPayment.Part.Htlc(
+                                amountReceived = 344_485.sat.toMilliSatoshi(),
+                                channelId = ByteVector32.fromValidHex("887ef839742d05217508107b40898439a11511aa46f924a7e930e9e5912852c1"),
+                                htlcId = 0,
+                                fundingFee = LiquidityAds.FundingFee(amount = 5_515_000.msat, fundingTxId = TxId("adbad2af375305ddb78526ae52e5ccb13a220a8553b1187d05d033451edb19c0")),
+                                receivedAt = 1738337194625L
+                            )
+                        ),
+                        liquidityPurchaseDetails = LiquidityAds.LiquidityTransactionDetails(
+                            txId = TxId("adbad2af375305ddb78526ae52e5ccb13a220a8553b1187d05d033451edb19c0"),
+                            miningFee = 1_015.sat,
+                            purchase = LiquidityAds.Purchase.Standard(
+                                amount = 350_000.sat,
+                                fees = LiquidityAds.Fees(serviceFee = 4_500.sat, miningFee = 1015.sat),
+                                paymentDetails = LiquidityAds.PaymentDetails.FromFutureHtlc(
+                                    paymentHashes = listOf(ByteVector32.fromValidHex("e1d7fecc8e7c823e752fcb853c2c01bd75df56b3d428b4354cb40050c9db0f7f"))
+                                )
+                            ),
+                        ),
+                        createdAt = 1738336431048L,
                     ), it
                 )
             }
