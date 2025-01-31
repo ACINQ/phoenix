@@ -537,23 +537,10 @@ fun AppView(
         }
     }
 
-    val isDataMigrationExpected by LegacyPrefsDatastore.getDataMigrationExpected(context).collectAsState(initial = null)
     val lastCompletedPayment by business.paymentsManager.lastCompletedPayment.collectAsState()
-    val userPrefs = userPrefs
-    val exchangeRates = fiatRates
     lastCompletedPayment?.let { payment ->
         LaunchedEffect(key1 = payment.id) {
-            try {
-                if (isDataMigrationExpected == false) {
-                    when (payment) {
-                        is ChannelCloseOutgoingPayment -> Unit
-                        is Bolt12IncomingPayment -> SystemNotificationHelper.notifyPaymentsReceived(context, userPrefs, id = payment.id, amount = payment.amount, rates = exchangeRates, isHeadless = false)
-                        else -> navigateToPaymentDetails(navController, id = payment.id, isFromEvent = true)
-                    }
-                }
-            } catch (e: Exception) {
-                log.warn("failed to notify UI of completed payment: {}", e.localizedMessage)
-            }
+            navigateToPaymentDetails(navController, id = payment.id, isFromEvent = true)
         }
     }
 

@@ -3,7 +3,8 @@ package fr.acinq.phoenix.managers
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.PaymentEvents
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
-import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.db.Bolt11IncomingPayment
+import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.logging.debug
@@ -17,6 +18,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -49,12 +51,7 @@ class PaymentsManager(
     private val _paymentsCount = MutableStateFlow<Long>(0)
     val paymentsCount: StateFlow<Long> = _paymentsCount
 
-    /**
-     * Broadcasts the most recently completed payment since the app was launched.
-     * This includes incoming & outgoing payments (both successful & failed).
-     *
-     * If we haven't completed any payments since app launch, the value will be null.
-     */
+    /** Contains the most recently completed payment (only bolt11 incoming, or bolt11/bolt12 outgoing). */
     private val _lastCompletedPayment = MutableStateFlow<WalletPayment?>(null)
     val lastCompletedPayment: StateFlow<WalletPayment?> = _lastCompletedPayment
 
@@ -74,14 +71,12 @@ class PaymentsManager(
         paymentsDb().countPaymentsAsFlow().collect { _paymentsCount.value = it }
     }
 
-    /** Monitors the payments database and push any new payments in the [_lastCompletedPayment] flow. */
     private suspend fun monitorLastCompletedPayment() {
         val nodeParams = nodeParamsManager.nodeParams.filterNotNull().first()
-        nodeParams.nodeEvents.collect {
+        nodeParams.nodeEvents.filterIsInstance<PaymentEvents>().collect {
             when (it) {
-                is PaymentEvents.PaymentReceived -> _lastCompletedPayment.value = it.payment
-                is PaymentEvents.PaymentSent -> _lastCompletedPayment.value = it.payment
-                else -> Unit
+                is PaymentEvents.PaymentReceived -> if (it.payment is Bolt11IncomingPayment) _lastCompletedPayment.value = it.payment
+                is PaymentEvents.PaymentSent -> if (it.payment is LightningOutgoingPayment) _lastCompletedPayment.value = it.payment
             }
         }
     }
@@ -125,18 +120,6 @@ class PaymentsManager(
      */
     suspend fun listPaymentsForTxId(txId: TxId): List<WalletPayment> {
         return paymentsDb().listPaymentsForTxId(txId)
-    }
-
-    /**
-     * Returns the incoming [WalletPayment] that match a given transaction Id.
-     *
-     * It is used to find the payments that could have triggered a liquidity event, using that event's txId.
-     * Similar to [InboundLiquidityOutgoingPayment.relatedPaymentIds].
-     */
-    suspend fun listIncomingPaymentsForTxId(
-        txId: TxId
-    ): List<IncomingPayment> {
-        return paymentsDb().database.paymentsIncomingQueries.listByTxId(txId).executeAsList()
     }
 
     suspend fun getPayment(
