@@ -62,7 +62,7 @@ object LightningOutgoingQueries {
         } else throw IllegalArgumentException("cannot handle closing payment at this stage, use LegacyChannelCloseHelper")
     }
 
-    @Suppress("UNUSED_PARAMETER")
+    @Suppress("UNUSED_PARAMETER", "DEPRECATION")
     fun mapLightningOutgoingPayment(
         id: String,
         recipient_amount_msat: Long,

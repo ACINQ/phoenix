@@ -21,6 +21,7 @@ import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.native.NativeSqliteDriver
 import app.cash.sqldelight.driver.native.wrapConnection
 import fr.acinq.lightning.Lightning
+import fr.acinq.phoenix.db.sqldelight.ChannelsDatabase
 import fr.acinq.phoenix.utils.PlatformContext
 import fr.acinq.phoenix.utils.getDatabaseFilesDirectoryPath
 

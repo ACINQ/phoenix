@@ -98,6 +98,7 @@ fun LightningOutgoingPayment.explainAsFinalFailure(): FinalFailure? {
 fun LightningOutgoingPayment.Details.asNormal(): LightningOutgoingPayment.Details.Normal? =
     (this as? LightningOutgoingPayment.Details.Normal)
 
+@Suppress("DEPRECATION")
 fun LightningOutgoingPayment.Details.asSwapOut(): LightningOutgoingPayment.Details.SwapOut? =
     (this as? LightningOutgoingPayment.Details.SwapOut)
 

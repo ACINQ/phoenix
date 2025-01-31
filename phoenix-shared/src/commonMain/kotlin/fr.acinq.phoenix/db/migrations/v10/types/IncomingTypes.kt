@@ -31,22 +31,13 @@ import fr.acinq.bitcoin.OutPoint
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.db.Bolt11IncomingPayment
-import fr.acinq.lightning.db.Bolt12IncomingPayment
-import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.db.LegacyPayToOpenIncomingPayment
-import fr.acinq.lightning.db.LegacySwapInIncomingPayment
-import fr.acinq.lightning.db.LightningIncomingPayment
-import fr.acinq.lightning.db.NewChannelIncomingPayment
-import fr.acinq.lightning.db.SpliceInIncomingPayment
+import fr.acinq.lightning.db.*
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.OfferPaymentMetadata
 import fr.acinq.lightning.utils.UUID
-import fr.acinq.lightning.utils.UUID.Companion.randomUUID
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.sum
-import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.db.migrations.v11.types.liquidityads.FundingFeeData
 import fr.acinq.phoenix.db.migrations.v10.json.ByteVector32Serializer
 import fr.acinq.phoenix.db.migrations.v10.json.ByteVectorSerializer
@@ -238,6 +229,7 @@ private sealed class IncomingOriginData {
     }
 }
 
+@Suppress("DEPRECATION")
 private fun mapLightningIncomingPaymentPart(part: IncomingReceivedWithData, receivedAt: Long, receivedAmountFallback: MilliSatoshi?): LightningIncomingPayment.Part = when (part) {
     is IncomingReceivedWithData.LightningPayment.V0 -> LightningIncomingPayment.Part.Htlc(
         amountReceived = receivedAmountFallback ?: 0.msat,
@@ -270,7 +262,7 @@ private fun mapLightningIncomingPaymentPart(part: IncomingReceivedWithData, rece
 
 @Suppress("DEPRECATION")
 fun mapIncomingPaymentFromV10(
-    @Suppress("UNUSED_PARAMETER") payment_hash: ByteArray,
+    payment_hash: ByteArray,
     preimage: ByteArray,
     created_at: Long,
     origin_type: String,

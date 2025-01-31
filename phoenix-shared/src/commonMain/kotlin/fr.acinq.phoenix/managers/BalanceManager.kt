@@ -18,15 +18,11 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class BalanceManager(
-    loggerFactory: LoggerFactory,
     private val peerManager: PeerManager,
-    private val databaseManager: DatabaseManager
 ) : CoroutineScope by MainScope() {
 
     constructor(business: PhoenixBusiness): this(
-        loggerFactory = business.loggerFactory,
         peerManager = business.peerManager,
-        databaseManager = business.databaseManager
     )
 
     /** The aggregated channels' balance. This is the user's LN funds in the wallet. See [ChannelState.localBalance] */

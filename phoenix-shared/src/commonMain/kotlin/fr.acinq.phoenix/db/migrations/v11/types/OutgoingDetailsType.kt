@@ -74,6 +74,7 @@ sealed class OutgoingDetailsData {
     }
 
     companion object {
+        @Suppress("DEPRECATION")
         /** Deserialize the details of an outgoing payment. Return null if the details is for a legacy channel closing payment (see [deserializeLegacyClosingDetails]). */
         fun deserialize(typeVersion: OutgoingDetailsTypeVersion, blob: ByteArray): LightningOutgoingPayment.Details? =
             when (typeVersion) {

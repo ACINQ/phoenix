@@ -20,17 +20,7 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.db.AutomaticLiquidityPurchasePayment
-import fr.acinq.lightning.db.Bolt11IncomingPayment
-import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
-import fr.acinq.lightning.db.LegacyPayToOpenIncomingPayment
-import fr.acinq.lightning.db.LegacySwapInIncomingPayment
-import fr.acinq.lightning.db.LightningIncomingPayment
-import fr.acinq.lightning.db.LightningOutgoingPayment
-import fr.acinq.lightning.db.ManualLiquidityPurchasePayment
-import fr.acinq.lightning.db.OnChainIncomingPayment
-import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
-import fr.acinq.lightning.db.SpliceOutgoingPayment
+import fr.acinq.lightning.db.*
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.msat
@@ -136,6 +126,7 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
         )
     }
 
+    @Suppress("DEPRECATION")
     fun add(payment: WalletPayment, metadata: WalletPaymentMetadata?) {
         val timestamp = payment.completedAt ?: payment.createdAt
         val id = payment.id

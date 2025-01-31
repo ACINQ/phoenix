@@ -16,13 +16,9 @@
 
 package fr.acinq.phoenix.db.migrations.v10
 
-import app.cash.sqldelight.TransacterImpl
 import app.cash.sqldelight.db.AfterVersion
 import app.cash.sqldelight.db.QueryResult
-import fr.acinq.lightning.db.LegacyPayToOpenIncomingPayment
-import fr.acinq.lightning.db.LegacySwapInIncomingPayment
-import fr.acinq.lightning.db.LightningIncomingPayment
-import fr.acinq.lightning.db.OnChainIncomingPayment
+import fr.acinq.lightning.db.*
 import fr.acinq.phoenix.db.migrations.v10.types.mapIncomingPaymentFromV10
 import fr.acinq.phoenix.utils.extensions.deriveUUID
 import fr.acinq.lightning.serialization.payment.Serialization

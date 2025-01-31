@@ -51,6 +51,10 @@ val buildVersionsTask by tasks.registering(Sync::class) {
 }
 
 kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
+
     if (includeAndroid) {
         androidTarget {
             compilations.all {

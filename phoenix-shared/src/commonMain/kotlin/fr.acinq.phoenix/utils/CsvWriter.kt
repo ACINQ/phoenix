@@ -46,6 +46,7 @@ class CsvWriter {
             return header
         }
 
+        @Suppress("DEPRECATION")
         /**
          * Creates and returns the row for the given payment.
          * This includes the CRLF that terminates the row.
