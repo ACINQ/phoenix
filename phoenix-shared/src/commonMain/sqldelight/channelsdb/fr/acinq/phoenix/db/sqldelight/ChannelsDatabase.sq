@@ -2,8 +2,6 @@ import fr.acinq.bitcoin.ByteVector32;
 import fr.acinq.lightning.channel.states.PersistedChannelState;
 import kotlin.Boolean;
 
-PRAGMA foreign_keys = 1;
-
 -- channels table
 -- note: boolean are stored as INTEGER, with 0=false
 CREATE TABLE local_channels (
