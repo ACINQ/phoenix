@@ -22,6 +22,7 @@ import fr.acinq.phoenix.utils.PlatformContext
 import okio.Path
 import okio.Path.Companion.toPath
 import org.junit.After
+import org.junit.AfterClass
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
@@ -45,18 +46,21 @@ actual abstract class UsingContextTest {
         }
     }
 
-    @After
-    fun copyMigratedFiles() {
-        val destDir = "build/test-results/migration-v10-v11/android".toPath()
-        Files.createDirectories(destDir.toNioPath())
+    actual fun getPlatformContext(): PlatformContext = PlatformContext(ApplicationProvider.getApplicationContext())
 
-        val dbDir = ApplicationProvider.getApplicationContext<Context>().applicationContext.getDatabasePath("test").toPath().parent
-        dbDir.listDirectoryEntries().forEach { migratedFile ->
-            val dest = destDir.resolve(migratedFile.name)
-            Files.copy(migratedFile, dest.toNioPath(), StandardCopyOption.REPLACE_EXISTING)
-            println("copied migrated file=${migratedFile.name} to $destDir")
+    companion object {
+        @AfterClass
+        @JvmStatic
+        fun copyMigratedFiles() {
+            val destDir = "build/test-results/migration-v10-v11/android".toPath()
+            Files.createDirectories(destDir.toNioPath())
+
+            val dbDir = ApplicationProvider.getApplicationContext<Context>().applicationContext.getDatabasePath("test").toPath().parent
+            dbDir.listDirectoryEntries().forEach { migratedFile ->
+                val dest = destDir.resolve(migratedFile.name)
+                Files.copy(migratedFile, dest.toNioPath(), StandardCopyOption.REPLACE_EXISTING)
+                println("copied migrated dbfile=${migratedFile.name} to $destDir")
+            }
         }
     }
-
-    actual fun getPlatformContext(): PlatformContext = PlatformContext(ApplicationProvider.getApplicationContext())
 }
