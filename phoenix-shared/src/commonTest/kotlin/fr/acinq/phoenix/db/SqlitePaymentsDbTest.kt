@@ -19,6 +19,7 @@ package fr.acinq.phoenix.db
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.OutPoint
+import fr.acinq.bitcoin.TxHash
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.db.AutomaticLiquidityPurchasePayment
 import fr.acinq.lightning.db.Bolt11IncomingPayment
@@ -36,6 +37,7 @@ import fr.acinq.lightning.serialization.payment.Serialization
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
+import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.runTest
 import fr.acinq.phoenix.utils.PlatformContext
@@ -238,5 +240,39 @@ class SqlitePaymentsDbTest : UsingContextTest() {
                     ), it
                 )
             }
+    }
+
+    @Test
+    fun `read v10 db - test2`() = runTest {
+        val driver = createPaymentsDbDriver(getPlatformContext(), chain = Chain.Testnet3, nodeIdHash = "f921bddf")
+        val paymentsDb = createSqlitePaymentsDb(driver, contactsManager = null, currencyManager = null)
+
+        val payments = paymentsDb.database.paymentsQueries.list(limit = Long.MAX_VALUE, offset = 0)
+            .executeAsList()
+            .map { Serialization.deserialize(it.data_).getOrThrow() }
+
+        assertEquals(6, payments.size)
+
+        // the first payment received was an on-chain deposit of 200k sat that triggered a liquidity purchase.
+        // It must be mapped to a [NewChannelIncomingPayment] with the correct liquidity purchase data.
+        assertEquals(
+            NewChannelIncomingPayment(
+                id = UUID.fromString("7149cca7-d1d7-428d-8ee1-d9f43e44e9d8"),
+                amountReceived = 198_150.sat.toMilliSatoshi(),
+                miningFee = 444.sat,
+                serviceFee = 1_000.sat.toMilliSatoshi(),
+                liquidityPurchase = LiquidityAds.Purchase.Standard(
+                    amount = 1.sat,
+                    fees = LiquidityAds.Fees(serviceFee = 1_000.sat, miningFee = 406.sat),
+                    paymentDetails = LiquidityAds.PaymentDetails.FromChannelBalance
+                ),
+                channelId = ByteVector32.fromValidHex("12ac9f375e105a3e00f85e58bb820be9225a2ae5f08072e86e76632f8df768f2"),
+                txId = TxId("976dd66d48b8831b571644ad56a8aed4eb596b58f59620289b64bd4a40a70900"),
+                localInputs = setOf(OutPoint(TxHash("87de58628bfeaf8d153a0c27ddb091aa2911c159223c3b183cf913f236add35c"), 0)),
+                createdAt = 1738154761716,
+                lockedAt = 1738155391461L,
+                confirmedAt = 1738154906824L,
+            ), payments[5]
+        )
     }
 }
