@@ -376,7 +376,8 @@ class SqlitePaymentsDbTest : UsingContextTest() {
                         paymentRequest = Bolt11Invoice.read("lntb2m1pneec8upp5nc053ys4l54n7wsta8dfjaeh7c2zrsplqrcxkj52zcqqcf0p3v6qcqzyssp550dg5h4t6kg02s9v0u6azxrzfj8nnjsppjlx2yl5wetvafx9vufs9q7sqqqqqqqqqqqqqqqqqqqsqqqqqysgqdq4wpshjtt5dukhxurvd93k2mqz9gxqyjw5qrzjqwfn3p9278ttzzpe0e00uhyxhned3j5d9acqak5emwfpflp8z2cnflla25gajw4h0yqqqqlgqqqqqeqqjqzm4g3f8pudsudf4sq2ckuhjsuna6r543pcm7rw020er9y9kwd0fzq9scy6edqmfeffafmn2duufn0s8hcjzfkrkwrwgmyl5sxggvvespkcev7p").get(),
                         parts = listOf(
                             LightningIncomingPayment.Part.Htlc(
-                                amountReceived = 197_144.sat.toMilliSatoshi(),
+                                // amountReceived must be 200_000, i.e. before liquidity fees, because liquidity is FromChannelBalanceForFutureHtlc
+                                amountReceived = 200_000.sat.toMilliSatoshi(),
                                 channelId = ByteVector32.fromValidHex("8aca84879c0d7517445ecaf399b427d1e79ecc55e9bfe2421e227679993c461e"),
                                 htlcId = 0,
                                 fundingFee = LiquidityAds.FundingFee(amount = 0.msat, fundingTxId = TxId("4eeffee8bdfc4f63cbb5eb0f20408af924e122099d5d6af2cec0d5a72a7d97f7")),
@@ -397,6 +398,8 @@ class SqlitePaymentsDbTest : UsingContextTest() {
                         createdAt = 1738334460105L,
                     ), it
                 )
+                // the amount received must take the cost of the liquidity into account
+                assertEquals(197_144.sat.toMilliSatoshi(), it.amountReceived)
             }
 
         // the pay-to-splice is tied to an auto-liquidity with a non-null `incomingPaymentReceivedAt` (i.e., not visible in the UI)
@@ -503,6 +506,7 @@ class SqlitePaymentsDbTest : UsingContextTest() {
                         paymentRequest = Bolt11Invoice.read("lntb3500u1pnee690pp5u8tlanyw0jpruaf0ewznctqph46a744n6s5tgd2vksq9pjwmpalscqzyssp5qs3qmcqhyj3e0mmu7r47zfuqm9vuzgsnf3dnzceemdd3fupeq7aq9q7sqqqqqqqqqqqqqqqqqqqsqqqqqysgqdqjwpshjtt5dukk7ur9dcmqz9gxqyjw5qrzjqwfn3p9278ttzzpe0e00uhyxhned3j5d9acqak5emwfpflp8z2cnflla25gajw4h0yqqqqlgqqqqqeqqjqsmga84r7jg2f54epdcfd4r579jgaw9x3t6r5eg82kzt65esu0ue9536caqfuep7a7w2ge0ttu4fzrpyxm3d0qdamgl2vkhlu4jh0q5gqyd4rw6").get(),
                         parts = listOf(
                             LightningIncomingPayment.Part.Htlc(
+                                // amountReceived must take into account the cost of the liquidity, because the liquidity is FromFutureHtlc
                                 amountReceived = 344_485.sat.toMilliSatoshi(),
                                 channelId = ByteVector32.fromValidHex("887ef839742d05217508107b40898439a11511aa46f924a7e930e9e5912852c1"),
                                 htlcId = 0,
