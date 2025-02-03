@@ -71,7 +71,7 @@ object InboundLiquidityQueries {
                 }
                 val liquidityPayment = AutomaticLiquidityPurchasePayment(
                     id = UUID.fromString(id),
-                    miningFee = miningFee - purchase.fees.miningFee,
+                    miningFee = miningFee,
                     channelId = channelId,
                     txId = txId,
                     liquidityPurchase = purchase,
