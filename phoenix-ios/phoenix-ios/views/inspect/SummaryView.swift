@@ -1131,17 +1131,18 @@ struct SummaryView: View {
 	
 	func paymentInfoChanged() {
 		log.trace("paymentInfoChanged()")
-		
+
 		blockchainMonitorState.paymentInfoPublisher.send(paymentInfo)
-		
+
 		if let liquidity = paymentInfo.payment as? Lightning_kmpAutomaticLiquidityPurchasePayment {
 			Task { @MainActor in
 				do {
-					let paymentsManager = Biz.business.paymentsManager
-					let rpayments = try await paymentsManager.listIncomingPaymentsForTxId(txId: liquidity.txId)
-					let rpids = rpayments.map { $0.id }
-					log.debug("relatedPaymentIds.count = \(rpids.count) (via listIncomingPaymentsForTxId)")
-					relatedPaymentIds = rpids
+					// should not be needed anymore after the db migration
+					//let paymentsManager = Biz.business.paymentsManager
+					//let rpayments = try await paymentsManager.listIncomingPaymentsForTxId(txId: liquidity.txId)
+					//let rpids = rpayments.map { $0.id }
+					//log.debug("relatedPaymentIds.count = \(rpids.count) (via listIncomingPaymentsForTxId)")
+					//relatedPaymentIds = rpids
 				} catch {
 					log.error("listIncomingPaymentsForTxId(): error: \(error)")
 				}

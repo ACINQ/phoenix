@@ -62,8 +62,6 @@ class SqliteIncomingPaymentsDb(private val database: PaymentsDatabase) : Incomin
         // if the payment is on-chain, save the tx id link to the db
         when (incomingPayment) {
             is OnChainIncomingPayment ->
-                // The payment may have been downloaded from the cloud.
-                // So it may already be confirmed/locked.
                 database.onChainTransactionsQueries.insert(
                     payment_id = incomingPayment.id,
                     tx_id = incomingPayment.txId,
