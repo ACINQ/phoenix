@@ -21,14 +21,12 @@ import androidx.test.core.app.ApplicationProvider
 import fr.acinq.phoenix.utils.PlatformContext
 import okio.Path
 import okio.Path.Companion.toPath
-import org.junit.After
 import org.junit.AfterClass
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
-import kotlin.collections.List
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 

@@ -8,8 +8,8 @@ CREATE TABLE payments_outgoing (
     payment_hash BLOB AS ByteVector32,
     tx_id BLOB AS TxId,
     created_at INTEGER NOT NULL,
-    completed_at INTEGER DEFAULT NULL, -- a completed outgoing payment can be a success or a failure
-    succeeded_at INTEGER DEFAULT NULL, -- will only be set for a successful payment
+    completed_at INTEGER, -- a completed outgoing payment can be a success or a failure
+    succeeded_at INTEGER, -- will only be set for a successful payment
     data BLOB AS OutgoingPayment NOT NULL
 );
 

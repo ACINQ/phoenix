@@ -9,7 +9,7 @@ CREATE TABLE payments_incoming (
     payment_hash BLOB AS ByteVector32 UNIQUE,
     tx_id BLOB AS TxId,
     created_at INTEGER NOT NULL,
-    received_at INTEGER DEFAULT NULL,
+    received_at INTEGER,
     data BLOB AS IncomingPayment NOT NULL
 );
 

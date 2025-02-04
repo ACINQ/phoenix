@@ -23,10 +23,10 @@ CREATE TABLE IF NOT EXISTS payments_metadata (
     lnurl_successAction_type TEXT AS LnurlSuccessAction.TypeVersion,
     lnurl_successAction_blob BLOB,
     user_description TEXT,
-    user_notes TEXT DEFAULT NULL,
-    modified_at INTEGER DEFAULT NULL,
-    original_fiat_type TEXT DEFAULT NULL,
-    original_fiat_rate REAL DEFAULT NULL
+    user_notes TEXT,
+    modified_at INTEGER,
+    original_fiat_type TEXT,
+    original_fiat_rate REAL
 );
 
 -- queries for payments_metadata table
