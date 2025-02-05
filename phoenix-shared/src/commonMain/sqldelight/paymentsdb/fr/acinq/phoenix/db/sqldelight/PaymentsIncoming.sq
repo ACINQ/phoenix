@@ -72,7 +72,7 @@ SELECT data
 FROM   payments_incoming
 WHERE  tx_id=?;
 
-scanCompleted:
+listSuccessfulIds:
 SELECT id, received_at
 FROM payments_incoming
 WHERE received_at IS NOT NULL;

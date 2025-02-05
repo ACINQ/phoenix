@@ -318,7 +318,7 @@ class CloudKitPaymentsDb(
                 val missing = mutableListOf<MissingItem>()
                 run {
                     val inQueries = paymentsDb.database.paymentsIncomingQueries
-                    inQueries.scanCompleted().executeAsList().forEach { row ->
+                    inQueries.listSuccessfulIds().executeAsList().forEach { row ->
                         if (!existing.contains(row.id)) {
                             missing.add(MissingItem(row.id, row.received_at))
                         }
@@ -326,7 +326,7 @@ class CloudKitPaymentsDb(
                 }
                 run {
                     val outQueries = paymentsDb.database.paymentsOutgoingQueries
-                    outQueries.scanCompleted().executeAsList().forEach { row ->
+                    outQueries.listSuccessfulIds().executeAsList().forEach { row ->
                         if (!existing.contains(row.id)) {
                             missing.add(MissingItem(row.id, row.completed_at))
                         }
