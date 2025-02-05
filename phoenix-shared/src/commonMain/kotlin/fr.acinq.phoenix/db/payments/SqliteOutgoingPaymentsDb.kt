@@ -50,18 +50,20 @@ class SqliteOutgoingPaymentsDb(private val database: PaymentsDatabase) : Outgoin
 
     override suspend fun addOutgoingPayment(outgoingPayment: OutgoingPayment) {
         withContext(Dispatchers.Default) {
-            _addOutgoingPayment(outgoingPayment)
+            database.transaction {
+                _addOutgoingPayment(outgoingPayment)
+            }
         }
     }
 
     /**
-     * Internal version:
-     * Used to add multiple incoming payments in a single database transaction.
+     * This method must be called inside a transaction block.
+     * Non suspending so the iOS app can call it when restoring data from the cloud.
      *
      * @param notify Set to false if `didSaveWalletPayment` should not be invoked
      *               (e.g. when downloading payments from the cloud)
      */
-    fun _addOutgoingPayment(outgoingPayment: OutgoingPayment, notify: Boolean = true) = database.transaction {
+    fun _addOutgoingPayment(outgoingPayment: OutgoingPayment, notify: Boolean = true) {
         when (outgoingPayment) {
             is LightningOutgoingPayment -> {
                 database.paymentsOutgoingQueries.insert(

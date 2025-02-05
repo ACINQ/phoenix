@@ -35,18 +35,20 @@ class SqliteIncomingPaymentsDb(private val database: PaymentsDatabase) : Incomin
 
     override suspend fun addIncomingPayment(incomingPayment: IncomingPayment) {
         withContext(Dispatchers.Default) {
-            _addIncomingPayment(incomingPayment)
+            database.transaction {
+                _addIncomingPayment(incomingPayment)
+            }
         }
     }
 
     /**
-     * Internal version:
-     * Used to add multiple incoming payments in a single database transaction.
+     * This method must be called inside a transaction block.
+     * Non suspending so the iOS app can call it when restoring data from the cloud.
      *
      * @param notify Set to false if `didSaveWalletPayment` should not be invoked
      *               (e.g. when downloading payments from the cloud)
      */
-    fun _addIncomingPayment(incomingPayment: IncomingPayment, notify: Boolean = true) = database.transaction {
+    fun _addIncomingPayment(incomingPayment: IncomingPayment, notify: Boolean = true) {
         database.paymentsIncomingQueries.insert(
             id = incomingPayment.id,
             payment_hash = (incomingPayment as? LightningIncomingPayment)?.paymentHash,
