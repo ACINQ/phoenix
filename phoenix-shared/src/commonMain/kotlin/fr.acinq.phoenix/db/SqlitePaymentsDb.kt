@@ -154,13 +154,11 @@ class SqlitePaymentsDb(
     }
 
     /**
-     * - [AutomaticLiquidityPurchasePayment] should be ignored if the payment they are associated with has been received, because the liquidity data are already contained in that payment.
      * - fetch contact details for incoming/outgoing bolt12 payments.
      */
-    private fun List<WalletPaymentInfo>.postProcess(): List<WalletPaymentInfo> = this.mapNotNull { paymentInfo ->
+    private fun List<WalletPaymentInfo>.postProcess(): List<WalletPaymentInfo> = this.map { paymentInfo ->
         val payment = paymentInfo.payment
         when {
-            payment is AutomaticLiquidityPurchasePayment && payment.incomingPaymentReceivedAt != null -> null
             payment is Bolt12IncomingPayment || (payment is LightningOutgoingPayment && payment.details is LightningOutgoingPayment.Details.Blinded) -> {
                 paymentInfo.copy(contact = contactsManager?.contactForPayment(payment))
             }
