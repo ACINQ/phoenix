@@ -43,9 +43,11 @@ fun ReleaseNoteDialog(sinceCode: Int) {
     }) {
         Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             if (sinceCode <= 98) {
-                Text(text = stringResource(id = R.string.notes_code_99_title), style = MaterialTheme.typography.h4)
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = stringResource(id = R.string.notes_code_99_body))
+                Column {
+                    Text(text = stringResource(id = R.string.notes_code_99_title), style = MaterialTheme.typography.h4)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = stringResource(id = R.string.notes_code_99_body))
+                }
             }
         }
     }

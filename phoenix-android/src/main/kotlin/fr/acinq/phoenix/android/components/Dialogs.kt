@@ -79,7 +79,9 @@ fun Dialog(
             // buttons
             if (buttons != null) {
                 Spacer(Modifier.height(buttonsTopMargin))
-                Row(modifier = Modifier.align(Alignment.End).padding(8.dp)) {
+                Row(modifier = Modifier
+                    .align(Alignment.End)
+                    .padding(8.dp)) {
                     buttons()
                 }
             }
@@ -144,6 +146,18 @@ fun ConfirmDialog(
         Column(Modifier.padding(horizontal = 24.dp, vertical = if (title == null) 24.dp else 0.dp)) {
             content()
         }
+    }
+}
+
+@Composable
+fun NonDismissableDialog(
+    content: @Composable ColumnScope.() -> Unit
+) {
+    androidx.compose.ui.window.Dialog(
+        onDismissRequest = {},
+        properties = DialogProperties(usePlatformDefaultWidth = false, dismissOnBackPress = false, dismissOnClickOutside = false),
+    ) {
+        DialogBody { content() }
     }
 }
 
