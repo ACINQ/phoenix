@@ -25762,6 +25762,9 @@
         }
       }
     },
+    "Make sure your Tor VPN is active and running." : {
+
+    },
     "Malformed JPG image data" : {
       "localizations" : {
         "ar" : {
@@ -43165,7 +43168,6 @@
       }
     },
     "Tor is enabled" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

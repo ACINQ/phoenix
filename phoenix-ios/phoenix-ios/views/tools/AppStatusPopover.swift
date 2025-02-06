@@ -14,6 +14,8 @@ struct AppStatusPopover: View {
 
 	@StateObject var connectionsMonitor = ObservableConnectionsMonitor()
 	
+	@State var isTorEnabled = GroupPrefs.shared.isTorEnabled
+	
 	@State var srvExtConnectedToPeer = Biz.srvExtConnectedToPeer.value
 	
 	@State var syncState: SyncBackupManager_State = .initializing
@@ -33,6 +35,33 @@ struct AppStatusPopover: View {
 	@ViewBuilder
 	var body: some View {
 		
+		ZStack(alignment: Alignment.topTrailing) {
+			// I think it looks cleaner without the explicit closeButton
+		//	closeButton()
+			
+			content()
+		}
+	}
+	
+	@ViewBuilder
+	func closeButton() -> some View {
+		
+		Button {
+			closePopover()
+		} label: {
+			Image(systemName: "xmark")
+				.imageScale(.medium)
+				.font(.title2)
+				.foregroundStyle(Color.secondary)
+		}
+		.accessibilityLabel("Close")
+		.accessibilityHidden(popoverState.dismissable)
+		.padding([.top, .trailing])
+	}
+	
+	@ViewBuilder
+	func content() -> some View {
+		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 			
 			connectionStatusSection()
@@ -45,22 +74,6 @@ struct AppStatusPopover: View {
 			syncStatusSection()
 				.padding([.leading, .trailing])
 				.padding(.bottom, 25)
-			
-			HStack {
-				Spacer()
-				Button(NSLocalizedString("Close", comment: "Button")) {
-					close()
-				}
-				.font(.title2)
-				.accessibilityHidden(popoverState.dismissable)
-				
-			}
-			.padding(.top, 10)
-			.padding([.leading, .trailing])
-			.padding(.bottom, 10)
-			.background(
-				Color(UIColor.secondarySystemBackground)
-			)
 		}
 		.assignMaxPreference(for: titleIconWidthReader.key, to: $titleIconWidth)
 		.onReceive(Biz.srvExtConnectedToPeer) {
@@ -109,6 +122,10 @@ struct AppStatusPopover: View {
 				connection: connectionsMonitor.connections.electrum,
 				label: "Electrum server"
 			)
+			
+			if isTorEnabled {
+				torWarning()
+			}
 		
 		} // </VStack>
 	}
@@ -133,6 +150,28 @@ struct AppStatusPopover: View {
 		}
 		
 		return (txt, img)
+	}
+	
+	@ViewBuilder
+	func torWarning() -> some View {
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+			VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
+				Label {
+					Text("Tor is enabled").bold()
+				} icon: {
+					Image(systemName: "shield.lefthalf.filled")
+				}
+				
+				Text("Make sure your Tor VPN is active and running.")
+					.foregroundStyle(.secondary)
+			}
+			
+			Spacer()
+		}// </HStack>
+		.padding(.all, 10)
+		.background(Color(.systemGroupedBackground))
+		.cornerRadius(10)
 	}
 	
 	@ViewBuilder
@@ -364,12 +403,10 @@ struct AppStatusPopover: View {
 		pendingSettings = newPendingSettings
 	}
 	
-	func close() {
-		log.trace("close()")
+	func closePopover() {
+		log.trace("closePopover()")
 		
-		withAnimation {
-			popoverState.close()
-		}
+		popoverState.close()
 	}
 }
 
