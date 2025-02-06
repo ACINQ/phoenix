@@ -98,14 +98,6 @@ struct AppStatusPopover: View {
 			)
 			.padding(.bottom, 8)
 			
-			if connectionsMonitor.connections.torEnabled {
-				ConnectionCell(
-					connection: connectionsMonitor.connections.tor,
-					label: "Tor"
-				)
-				.padding(.bottom, 8)
-			}
-			
 			ConnectionCell(
 				connection: connectionsMonitor.connections.peer,
 				label: "Lightning peer",

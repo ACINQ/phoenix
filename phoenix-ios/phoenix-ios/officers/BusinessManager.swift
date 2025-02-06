@@ -120,8 +120,15 @@ class BusinessManager {
 
 	public func start() {
 		
-		let electrumConfig = GroupPrefs.shared.electrumConfig
-		business.appConfigurationManager.updateElectrumConfig(server: electrumConfig?.serverAddress)
+		if let electrumConfigPrefs = GroupPrefs.shared.electrumConfig {
+			let electrumConfig = ElectrumConfig.Custom.companion.create(
+				server: electrumConfigPrefs.serverAddress,
+				requireOnionIfTorEnabled: true
+			)
+			business.appConfigurationManager.updateElectrumConfig(config: electrumConfig)
+		} else {
+			business.appConfigurationManager.updateElectrumConfig(config: nil)
+		}
 		
 		let preferredFiatCurrencies = AppConfigurationManager.PreferredFiatCurrencies(
 			primary: GroupPrefs.shared.fiatCurrency,

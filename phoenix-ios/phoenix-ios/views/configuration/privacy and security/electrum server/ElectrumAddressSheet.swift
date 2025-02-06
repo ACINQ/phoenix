@@ -693,7 +693,6 @@ struct ElectrumAddressSheet: View {
 		   let checkedPort: UInt16 = checkPort()
 		{
 			let pinnedPubKey: String?
-			let tls: Lightning_kmpTcpSocketTLS
 			if let cert = untrustedCert {
 				guard let pubKey = pubKey(cert) else {
 					return toast.pop(
@@ -703,27 +702,27 @@ struct ElectrumAddressSheet: View {
 					)
 				}
 				pinnedPubKey = pubKey
-				tls = Lightning_kmpTcpSocketTLS.PINNED_PUBLIC_KEY(pubKey: pubKey)
 			} else {
 				pinnedPubKey = nil
-				tls = Lightning_kmpTcpSocketTLS.TRUSTED_CERTIFICATES(expectedHostName: nil)
 			}
 			
-			GroupPrefs.shared.electrumConfig = ElectrumConfigPrefs(
+			let prefs = ElectrumConfigPrefs(
 				host: checkedHost,
 				port: checkedPort,
 				pinnedPubKey: pinnedPubKey
 			)
-			mvi.intent(ElectrumConfiguration.IntentUpdateElectrumServer(server: Lightning_kmpServerAddress(
-				host: checkedHost,
-				port: Int32(checkedPort),
-				tls: tls
-			)))
+			GroupPrefs.shared.electrumConfig = prefs
+			
+			let config = ElectrumConfig.Custom.companion.create(
+				server: prefs.serverAddress,
+				requireOnionIfTorEnabled: true
+			)
+			mvi.intent(ElectrumConfiguration.IntentUpdateElectrumServer(config: config))
 			
 		} else {
 			
 			GroupPrefs.shared.electrumConfig = nil
-			mvi.intent(ElectrumConfiguration.IntentUpdateElectrumServer(server: nil))
+			mvi.intent(ElectrumConfiguration.IntentUpdateElectrumServer(config: nil))
 		}
 		
 		smartModalState.close()
