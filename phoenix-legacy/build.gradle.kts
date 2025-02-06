@@ -59,6 +59,7 @@ android {
   buildFeatures {
     dataBinding = true
     viewBinding = true
+    buildConfig = true
   }
   externalNativeBuild {
     cmake {

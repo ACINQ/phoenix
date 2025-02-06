@@ -13,13 +13,12 @@ struct DetailsView: View {
 	let location: PaymentView.Location
 	
 	@Binding var paymentInfo: WalletPaymentInfo
-	@Binding var relatedPaymentIds: [WalletPaymentId]
-	@Binding var liquidityPayment: Lightning_kmpInboundLiquidityOutgoingPayment?
+	@Binding var relatedPaymentIds: [Lightning_kmpUUID]
 	
 	@Binding var showOriginalFiatValue: Bool
 	@Binding var showFiatValueExplanation: Bool
 	
-	let switchToPayment: (_ paymentId: WalletPaymentId) -> Void
+	let switchToPayment: (_ paymentId: Lightning_kmpUUID) -> Void
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
@@ -53,7 +52,7 @@ struct DetailsView: View {
 				
 			DetailsInfoGrid(
 				paymentInfo: $paymentInfo,
-				liquidityPayment: $liquidityPayment,
+				relatedPaymentIds: $relatedPaymentIds,
 				showOriginalFiatValue: $showOriginalFiatValue,
 				showFiatValueExplanation: $showFiatValueExplanation,
 				switchToPayment: switchToPayment
@@ -98,12 +97,12 @@ struct DetailsView: View {
 fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	@Binding var paymentInfo: WalletPaymentInfo
-	@Binding var liquidityPayment: Lightning_kmpInboundLiquidityOutgoingPayment?
+	@Binding var relatedPaymentIds: [Lightning_kmpUUID]
 	
 	@Binding var showOriginalFiatValue: Bool
 	@Binding var showFiatValueExplanation: Bool
 	
-	let switchToPayment: (_ paymentId: WalletPaymentId) -> Void
+	let switchToPayment: (_ paymentId: Lightning_kmpUUID) -> Void
 	
 	@State var showBlockchainExplorerOptions = false
 	
@@ -167,7 +166,8 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	@ViewBuilder
 	func sections_incomingPayment(_ incomingPayment: Lightning_kmpIncomingPayment) -> some View {
 		
-		if let paymentRequest = incomingPayment.origin.asInvoice()?.paymentRequest {
+		if let bolt11 = incomingPayment as? Lightning_kmpBolt11IncomingPayment {
+			let paymentRequest = bolt11.paymentRequest
 
 			InlineSection {
 				header("Payment Request")
@@ -181,29 +181,34 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			}
 		}
 
-		if let received = incomingPayment.received {
-
+		if incomingPayment.completedAt != nil {
+			
 			InlineSection {
 				header("Payment Received")
 			} content: {
-				paymentReceived_receivedAt(received)
-				common_amountReceived(msat: received.amount)
+				paymentReceived_receivedAt(incomingPayment)
+				common_amountReceived(msat: incomingPayment.amountReceived)
 				payment_standardFees(incomingPayment)
 				payment_minerFees(incomingPayment)
 				payment_serviceFees(incomingPayment)
 			}
-
-			let receivedWithArray = received.receivedWith.sorted { $0.hash < $1.hash }
-			ForEach(receivedWithArray.indices, id: \.self) { idx in
-
-				let receivedWith = receivedWithArray[idx]
+		}
+		
+		if let lightningPayment = incomingPayment as? Lightning_kmpLightningIncomingPayment {
+			
+			let sortedParts: [Lightning_kmpLightningIncomingPayment.Part] =
+				lightningPayment.parts.sorted { $0.hash < $1.hash }
+			
+			ForEach(sortedParts.indices, id: \.self) { idx in
+				
+				let part = sortedParts[idx]
 
 				InlineSection {
 					header("Payment Part #\(idx+1)")
 				} content: {
-					paymentReceived_via(receivedWith)
-					paymentReceived_channelId(receivedWith)
-					paymentReceived_fundingTxId(receivedWith)
+					paymentReceived_via(part)
+					paymentReceived_channelId(part)
+					paymentReceived_fundingTxId(part)
 				}
 			}
 		}
@@ -247,12 +252,12 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				}
 			}
 			
-			if let offChain = lightningPayment.status.asOffChain() {
+			if let sentAtDate = lightningPayment.completedAtDate {
 				
 				InlineSection {
 					header("Payment Sent")
 				} content: {
-					offChain_completedAt(offChain)
+					offChain_sentAt(sentAtDate)
 					offChain_elapsed(outgoingPayment)
 					common_amountSent(msat: outgoingPayment.amount)
 					offChain_fees(outgoingPayment)
@@ -268,7 +273,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 					failed_failedAt(failed)
 					if let finalFailure = lightningPayment.explainAsFinalFailure() {
 						failed_explain_finalFailure(finalFailure)
-					} else if let partFailure = lightningPayment.explainAsPartFailure() {
+					} else if let partFailure = lightningPayment.explainAsPartFailed() {
 						failed_explain_partFailure(partFailure)
 					}
 				}
@@ -319,7 +324,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				onChain_btcTxid(spliceCpfp)
 			}
 			
-		} else if let liquidityPayment = outgoingPayment as? Lightning_kmpInboundLiquidityOutgoingPayment {
+		} else if let liquidityPayment = outgoingPayment as? Lightning_kmpManualLiquidityPurchasePayment {
 			
 			InlineSection {
 				header("Inbound Liquidity")
@@ -553,7 +558,9 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func paymentRequest_paymentHash(_ paymentRequest: Lightning_kmpPaymentRequest) -> some View {
+	func paymentRequest_paymentHash(
+		_ paymentRequest: Lightning_kmpPaymentRequest
+	) -> some View {
 		let identifier: String = #function
 		
 		InfoGridRowWrapper(
@@ -564,7 +571,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			
 		} valueColumn: {
 			
-			let paymentHash = paymentInfo.payment.paymentHashString()
+			let paymentHash = paymentRequest.paymentHash.toHex()
 			Text(paymentHash)
 				.contextMenu {
 					Button(action: {
@@ -630,19 +637,21 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	@ViewBuilder
 	func paymentReceived_receivedAt(
-		_ received: Lightning_kmpIncomingPayment.Received
+		_ incomingPayment: Lightning_kmpIncomingPayment
 	) -> some View {
 		let identifier: String = #function
 		
-		InfoGridRowWrapper(
-			identifier: identifier,
-			keyColumnWidth: keyColumnWidth(identifier: identifier)
-		) {
-			keyColumn("received at")
-					
-		} valueColumn: {
-					
-			commonValue_date(date: received.receivedAtDate)
+		if let date = incomingPayment.completedAtDate {
+			InfoGridRowWrapper(
+				identifier: identifier,
+				keyColumnWidth: keyColumnWidth(identifier: identifier)
+			) {
+				keyColumn("received at")
+						
+			} valueColumn: {
+						
+				commonValue_date(date: date)
+			}
 		}
 	}
 	
@@ -663,7 +672,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func paymentReceived_via(_ receivedWith: Lightning_kmpIncomingPayment.ReceivedWith) -> some View {
+	func paymentReceived_via(_ part: Lightning_kmpLightningIncomingPayment.Part) -> some View {
 		let identifier: String = #function
 		
 		InfoGridRowWrapper(
@@ -674,15 +683,10 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		
 		} valueColumn: {
 		
-			if let _ = receivedWith.asLightningPayment() {
-				Text("Lightning network")
-		
-			} else if let _ = receivedWith.asNewChannel() {
-				Text("New Channel (auto-created)")
-				
-			} else if let _ = receivedWith.asSpliceIn() {
-				Text("Splice-In")
-			
+			if let _ = part as? Lightning_kmpLightningIncomingPayment.PartHtlc {
+				Text("HTLC")
+			} else if let _ = part as? Lightning_kmpLightningIncomingPayment.PartFeeCredit {
+				Text("Fee Credit")
 			} else {
 				Text(verbatim: "")
 			}
@@ -690,19 +694,21 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func paymentReceived_channelId(_ receivedWith: Lightning_kmpIncomingPayment.ReceivedWith) -> some View {
+	func paymentReceived_channelId(_ part: Lightning_kmpLightningIncomingPayment.Part) -> some View {
 		
-		if let channelId = receivedWith.asNewChannel()?.channelId ?? receivedWith.asSpliceIn()?.channelId {
+		if let htlc = part as? Lightning_kmpLightningIncomingPayment.PartHtlc {
 			
-			common_channelId(channelId)
+			common_channelId(htlc.channelId)
 		}
 	}
 	
 	@ViewBuilder
-	func paymentReceived_fundingTxId(_ receivedWith: Lightning_kmpIncomingPayment.ReceivedWith) -> some View {
+	func paymentReceived_fundingTxId(_ part: Lightning_kmpLightningIncomingPayment.Part) -> some View {
 		
-		if let txId = self.txId(receivedWith: receivedWith) {
-			common_btcTxid(txId, title: "funding txid")
+		if let htlc = part as? Lightning_kmpLightningIncomingPayment.PartHtlc,
+		   let fundingFee = htlc.fundingFee
+		{
+			common_btcTxid(fundingFee.fundingTxId, title: "funding txid")
 		}
 	}
 	
@@ -813,11 +819,11 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		} valueColumn: {
 			
 			switch channelClosing.closingType {
-				case Lightning_kmpChannelClosingType.local   : Text(verbatim: "Local")
-				case Lightning_kmpChannelClosingType.mutual  : Text(verbatim: "Mutual")
-				case Lightning_kmpChannelClosingType.remote  : Text(verbatim: "Remote")
-				case Lightning_kmpChannelClosingType.revoked : Text(verbatim: "Revoked")
-				case Lightning_kmpChannelClosingType.other   : Text(verbatim: "Other")
+				case Lightning_kmpChannelCloseOutgoingPayment.ChannelClosingType.local   : Text(verbatim: "Local")
+				case Lightning_kmpChannelCloseOutgoingPayment.ChannelClosingType.mutual  : Text(verbatim: "Mutual")
+				case Lightning_kmpChannelCloseOutgoingPayment.ChannelClosingType.remote  : Text(verbatim: "Remote")
+				case Lightning_kmpChannelCloseOutgoingPayment.ChannelClosingType.revoked : Text(verbatim: "Revoked")
+				case Lightning_kmpChannelCloseOutgoingPayment.ChannelClosingType.other   : Text(verbatim: "Other")
 			}
 		}
 	}
@@ -875,8 +881,8 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func offChain_completedAt(
-		_ offChain: Lightning_kmpLightningOutgoingPayment.StatusCompletedSucceededOffChain
+	func offChain_sentAt(
+		_ date: Date
 	) -> some View {
 		let identifier: String = #function
 		
@@ -888,7 +894,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			
 		} valueColumn: {
 			
-			commonValue_date(date: offChain.completedAtDate)
+			commonValue_date(date: date)
 		}
 	}
 	
@@ -1016,7 +1022,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	@ViewBuilder
 	func failed_failedAt(
-		_ failed: Lightning_kmpLightningOutgoingPayment.StatusCompletedFailed
+		_ failed: Lightning_kmpLightningOutgoingPayment.StatusFailed
 	) -> some View {
 		let identifier: String = #function
 		
@@ -1054,7 +1060,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	@ViewBuilder
 	func failed_explain_partFailure(
-		_ partFailure: Lightning_kmpLightningOutgoingPayment.PartStatusFailure
+		_ partFailure: Lightning_kmpLightningOutgoingPayment.PartStatusFailedFailure
 	) -> some View {
 		let identifier: String = #function
 		
@@ -1074,7 +1080,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	@ViewBuilder
 	func liquidityPayment_purchaseType(
-		_ payment: Lightning_kmpInboundLiquidityOutgoingPayment
+		_ payment: Lightning_kmpManualLiquidityPurchasePayment
 	) -> some View {
 		let identifier: String = #function
 		
@@ -1086,23 +1092,23 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			
 		} valueColumn: {
 			
-			if payment.isManualPurchase() {
+		//	if payment.isManualPurchase() {
 				Text("Manual")
-			} else if payment.purchase.paymentDetails is Lightning_kmpLiquidityAdsPaymentDetailsFromFutureHtlc {
-				Text("Automatic [FromFutureHtlc]")
-			} else {
-				Text("Automatic [FromChannelBalance]")
-			}
+		//	} else if payment.purchase.paymentDetails is Lightning_kmpLiquidityAdsPaymentDetailsFromFutureHtlc {
+		//		Text("Automatic [FromFutureHtlc]")
+		//	} else {
+		//		Text("Automatic [FromChannelBalance]")
+		//	}
 		}
 	}
 	
 	@ViewBuilder
 	func liquidityPayment_causedBy(
-		_ payment: Lightning_kmpInboundLiquidityOutgoingPayment
+		_ payment: Lightning_kmpManualLiquidityPurchasePayment
 	) -> some View {
 		let identifier: String = #function
 		
-		if let paymentId = payment.relatedPaymentIds().first {
+		if let paymentId = relatedPaymentIds.first {
 			
 			InfoGridRowWrapper(
 				identifier: identifier,
@@ -1115,7 +1121,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				Button {
 					requestSwitchToPayment(paymentId)
 				} label: {
-					Text(verbatim: "\(paymentId.dbId.prefix(maxLength: 8))…")
+					Text(verbatim: "\(paymentId.description().prefix(maxLength: 8))…")
 						.lineLimit(1)
 						.truncationMode(.middle)
 				}
@@ -1125,7 +1131,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	@ViewBuilder
 	func liquidityPayment_liqudityAmount(
-		_ payment: Lightning_kmpInboundLiquidityOutgoingPayment
+		_ payment: Lightning_kmpManualLiquidityPurchasePayment
 	) -> some View {
 		let identifier: String = #function
 		
@@ -1140,7 +1146,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			commonValue_amounts(
 				identifier: identifier,
 				displayAmounts: displayAmounts(
-					sat: payment.purchase.amount,
+					sat: payment.liquidityPurchase.amount,
 					originalFiat: paymentInfo.metadata.originalFiat
 				)
 			)
@@ -1149,7 +1155,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	@ViewBuilder
 	func liquidityPayment_spliceTxid(
-		_ payment: Lightning_kmpInboundLiquidityOutgoingPayment
+		_ payment: Lightning_kmpManualLiquidityPurchasePayment
 	) -> some View {
 		
 		common_btcTxid(payment.txId, title: "transaction")
@@ -1157,7 +1163,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	@ViewBuilder
 	func liquidityPayment_channelId(
-		_ payment: Lightning_kmpInboundLiquidityOutgoingPayment
+		_ payment: Lightning_kmpManualLiquidityPurchasePayment
 	) -> some View {
 		
 		common_channelId(payment.channelId)
@@ -1494,16 +1500,8 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	func minerFees() -> (Int64, String, String)? {
 		
-		if let liquidity = paymentInfo.payment as? Lightning_kmpInboundLiquidityOutgoingPayment,
-			liquidity.hidesFees {
-			// We don't display the fees here.
-			// Instead we're displaying the fees on the corresponding IncomingPayment.
-			return nil
-		} else if let result = paymentInfo.payment.minerFees() {
+		if let result = paymentInfo.payment.minerFees() {
 			return result
-		} else if let liquidityPayment, liquidityPayment.hidesFees {
-			// This is the corresponding IncomingPayment, and we have the linked liquidityPayment.
-			return liquidityPayment.minerFees()
 		} else {
 			return nil
 		}
@@ -1511,16 +1509,8 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	func serviceFees() -> (Int64, String, String)? {
 		
-		if let liquidity = paymentInfo.payment as? Lightning_kmpInboundLiquidityOutgoingPayment,
-			liquidity.hidesFees {
-			// We don't display the fees here.
-			// Instead we're displaying the fees on the corresponding IncomingPayment.
-			return nil
-		} else if let result = paymentInfo.payment.serviceFees() {
+		if let result = paymentInfo.payment.serviceFees() {
 			return result
-		} else if let liquidityPayment, liquidityPayment.hidesFees {
-			// This is the corresponding IncomingPayment, and we have the linked liquidityPayment.
-			return liquidityPayment.serviceFees()
 		} else {
 			return nil
 		}
@@ -1644,32 +1634,17 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	func paymentPreimage() -> String? {
 		
 		if let incomingPayment = paymentInfo.payment as? Lightning_kmpIncomingPayment {
-			return incomingPayment.preimage.toHex()
-		}
-		
-		if let outgoingPayment = paymentInfo.payment as? Lightning_kmpOutgoingPayment,
-		   let lightningPayment = outgoingPayment as? Lightning_kmpLightningOutgoingPayment,
-		   let offChain = lightningPayment.status.asOffChain()
-		{
-			return offChain.preimage.toHex()
-		}
-		
-		return nil
-	}
-	
-	func txId(receivedWith: Lightning_kmpIncomingPayment.ReceivedWith) -> Bitcoin_kmpTxId? {
-		
-		if let newChannel = receivedWith.asNewChannel() {
-			
-			if let channel = Biz.business.peerManager.getChannelWithCommitments(channelId: newChannel.channelId),
-				let active = channel.commitments.active.first
-			{
-				return active.fundingTxId
+			if let bolt11Payment = incomingPayment as? Lightning_kmpBolt11IncomingPayment {
+				return bolt11Payment.paymentPreimage.toHex()
 			}
-			
-		} else if let spliceIn = receivedWith.asSpliceIn() {
-			
-			return spliceIn.txId
+		}
+		
+		if let outgoingPayment = paymentInfo.payment as? Lightning_kmpOutgoingPayment {
+			if let lightningPayment = outgoingPayment as? Lightning_kmpLightningOutgoingPayment {
+				if let success = lightningPayment.status as? Lightning_kmpLightningOutgoingPayment.StatusSucceeded {
+					return success.preimage.toHex()
+				}
+			}
 		}
 		
 		return nil
@@ -1692,7 +1667,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	// MARK: Actions
 	// --------------------------------------------------
 	
-	func requestSwitchToPayment(_ paymentId: WalletPaymentId) {
+	func requestSwitchToPayment(_ paymentId: Lightning_kmpUUID) {
 		log.trace("requestSwitchToPayment()")
 		
 		presentationMode.wrappedValue.dismiss()

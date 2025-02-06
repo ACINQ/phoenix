@@ -47,9 +47,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
-import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.db.AutomaticLiquidityPurchasePayment
+import fr.acinq.lightning.db.LegacyPayToOpenIncomingPayment
+import fr.acinq.lightning.db.LegacySwapInIncomingPayment
+import fr.acinq.lightning.db.ManualLiquidityPurchasePayment
+import fr.acinq.lightning.db.NewChannelIncomingPayment
 import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
+import fr.acinq.lightning.db.SpliceInIncomingPayment
 import fr.acinq.lightning.db.SpliceOutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.phoenix.android.LocalBitcoinUnit
@@ -78,7 +82,6 @@ import fr.acinq.phoenix.android.utils.monoTypo
 import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.android.utils.share
 import fr.acinq.phoenix.data.LocalChannelInfo
-import fr.acinq.phoenix.data.walletPaymentId
 
 
 @Composable
@@ -214,16 +217,19 @@ private fun CommitmentDetailsView(
                     Column(modifier = Modifier.alignByBaseline()) {
                         linkedPayments.forEach { payment ->
                             InlineButton(
-                                text = when {
-                                    payment is IncomingPayment && payment.origin is IncomingPayment.Origin.Invoice -> "pay-to-open"
-                                    payment is IncomingPayment && payment.origin is IncomingPayment.Origin.OnChain -> "swap-in"
-                                    payment is SpliceOutgoingPayment -> "swap-out"
-                                    payment is SpliceCpfpOutgoingPayment -> "cpfp"
-                                    payment is InboundLiquidityOutgoingPayment -> "inbound liquidity"
+                                text = when (payment) {
+                                    is LegacySwapInIncomingPayment -> "swap-in (legacy)"
+                                    is LegacyPayToOpenIncomingPayment -> "pay-to-open (legacy)"
+                                    is NewChannelIncomingPayment -> "new-channel"
+                                    is SpliceInIncomingPayment -> "splice-in"
+                                    is SpliceOutgoingPayment -> "splice-out"
+                                    is SpliceCpfpOutgoingPayment -> "cpfp"
+                                    is ManualLiquidityPurchasePayment -> "manual liquidity"
+                                    is AutomaticLiquidityPurchasePayment -> "auto liquidity"
                                     else -> "other"
                                 },
                                 onClick = {
-                                    navigateToPaymentDetails(navController, payment.walletPaymentId(), isFromEvent = false)
+                                    navigateToPaymentDetails(navController, payment.id, isFromEvent = false)
                                 },
                                 fontSize = 14.sp,
                             )

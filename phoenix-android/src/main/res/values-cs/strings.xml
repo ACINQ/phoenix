@@ -292,7 +292,6 @@
     <string name="paymentdetails_status_unconfirmed_zero">0 potvrzení</string>
     <string name="paymentdetails_status_unconfirmed_zero_bump">Klepnutím zrychlíte</string>
     <string name="paymentdetails_status_unconfirmed_default">%1$d potvrzení</string>
-    <string name="paymentdetails_status_unconfirmed_with_depth">%1$d/%2$d potvrzení</string>
     <string name="paymentdetails_status_confirmed">Potrvzeno On-Chain</string>
 
     <string name="paymentdetails_offer_note_label">Zpráva</string>
@@ -338,24 +337,20 @@
 
     <string name="paymentdetails_technical_title">Technické detaily</string>
     <string name="paymentdetails_payment_type_label">Typ platby</string>
-    <string name="paymentdetails_closing">Platba uzavírající kanál</string>
-    <string name="paymentdetails_splice_outgoing">Odchozí splice platba</string>
-    <string name="paymentdetails_splice_cpfp_outgoing">Zrychlení On-Chain transakcí</string>
-    <string name="paymentdetails_inbound_liquidity">Vyžádat příchozí likviditu</string>
-    <string name="paymentdetails_normal_outgoing">Odchozí Lightning platba (standardní)</string>
-    <string name="paymentdetails_normal_incoming">Příchozí Lightning platba (standardní)</string>
-    <string name="paymentdetails_swapin">Swap-in vklad Bitcoinu</string>
-    <string name="paymentdetails_swapout">Swap-out na Bitcoinovou adresu</string>
-
-    <string name="paymentdetails_offer_outgoing">Odchozí platba Lightning (nabídka)</string>
-    <string name="paymentdetails_offer_incoming">Příchozí platba Lightning (nabídka)</string>
+    <string name="paymentdetails_type_outgoing_close">Platba uzavírající kanál</string>
+    <string name="paymentdetails_type_outgoing_splice">Odchozí splice platba</string>
+    <string name="paymentdetails_type_outgoing_splice_cpfp">Zrychlení On-Chain transakcí</string>
+    <string name="paymentdetails_type_outgoing_liquidity_manual">Vyžádat příchozí likviditu (manual)</string>
+    <string name="paymentdetails_type_outgoing_liquidity_auto">Vyžádat příchozí likviditu (auto)</string>
+    <string name="paymentdetails_type_outgoing_bolt11">Odchozí Lightning platba (bolt11)</string>
+    <string name="paymentdetails_type_outgoing_bolt12">Odchozí Lightning platba (bolt12)</string>
+    <string name="paymentdetails_type_incoming_bolt11">Příchozí Lightning platba (bolt11)</string>
+    <string name="paymentdetails_type_incoming_bolt12">Příchozí Lightning platba (bolt12)</string>
 
     <string name="paymentdetails_swapin_address_label">Adresa vkladu</string>
     <string name="paymentdetails_bitcoin_address_label">Bitcoinová adresa</string>
 
     <string name="paymentdetails_splice_out_channel_label">Spliced kanál</string>
-    <string name="paymentdetails_dualswapin_tx_label">Transakce</string>
-    <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
 
     <string name="paymentdetails_closing_type_label">Typ uzavření</string>
     <string name="paymentdetails_closing_type_mutual">Vzájemný</string>
@@ -365,9 +360,9 @@
     <string name="paymentdetails_closing_type_other">Ostatní</string>
 
     <string name="paymentdetails_pubkey_label">Cílový veřejný klíč</string>
-    <string name="paymentdetails_payment_request_description_label">Popis faktury</string>
+    <string name="paymentdetails_bolt11_description_label">Popis faktury</string>
     <string name="paymentdetails_payment_hash_label">Hash platby</string>
-    <string name="paymentdetails_payment_request_label">Faktura</string>
+    <string name="paymentdetails_bolt11_label">Faktura</string>
     <string name="paymentdetails_preimage_label">Předobraz</string>
     <string name="paymentdetails_payerkey_label">Plátcův klíč</string>
     <string name="paymentdetails_offer_label">Nabídka</string>
@@ -385,8 +380,6 @@
     <string name="paymentdetails_part_hops_label">Skoky</string>
 
     <string name="paymentdetails_received_with_label">Přijato přes</string>
-    <string name="paymentdetails_received_with_splicein">Splice-in (přidání do existujícího kanálu)</string>
-    <string name="paymentdetails_received_with_channel">Nový kanál (automaticky vytvořen)</string>
     <string name="paymentdetails_received_with_lightning">Lightningová platba</string>
     <string name="paymentdetails_channel_id_label">ID kanálu</string>
     <string name="paymentdetails_tx_id_label">Transakce</string>

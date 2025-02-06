@@ -24,9 +24,9 @@ import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.data.ContactInfo
-import fr.acinq.phoenix.db.AppDatabase
 import fr.acinq.phoenix.db.didDeleteContact
 import fr.acinq.phoenix.db.didSaveContact
+import fr.acinq.phoenix.db.sqldelight.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow

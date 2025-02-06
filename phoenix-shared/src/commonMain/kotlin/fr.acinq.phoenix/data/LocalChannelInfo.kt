@@ -144,7 +144,7 @@ data class LocalChannelInfo(
  *          - there's at least 1 NORMAL channel.
  */
 fun Map<ByteVector32, LocalChannelInfo>?.availableForReceive(): MilliSatoshi? {
-    return this?.values?.availableForReceive() ?: null
+    return this?.values?.availableForReceive()
 }
 
 fun Collection<LocalChannelInfo>.availableForReceive(): MilliSatoshi? {

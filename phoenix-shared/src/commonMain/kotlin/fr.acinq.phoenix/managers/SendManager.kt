@@ -19,7 +19,6 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.BitcoinUri
 import fr.acinq.phoenix.data.BitcoinUriError
 import fr.acinq.phoenix.data.LnurlPayMetadata
-import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.data.lnurl.Lnurl
 import fr.acinq.phoenix.data.lnurl.LnurlAuth
@@ -216,7 +215,7 @@ class SendManager(
         // parallel pending payments on the same payment hash can trigger force-closes
         // FIXME: this check should be done in lightning-kmp, not in Phoenix
         return when {
-            similarPayments.any { it.status is LightningOutgoingPayment.Status.Completed.Succeeded || it.parts.any { part -> part.status is LightningOutgoingPayment.Part.Status.Succeeded } } ->
+            similarPayments.any { it.status is LightningOutgoingPayment.Status.Succeeded || it.parts.any { part -> part.status is LightningOutgoingPayment.Part.Status.Succeeded } } ->
                 BadRequestReason.AlreadyPaidInvoice
             similarPayments.any { it.status is LightningOutgoingPayment.Status.Pending || it.parts.any { part -> part.status is LightningOutgoingPayment.Part.Status.Pending } } ->
                 BadRequestReason.PaymentPending
@@ -444,10 +443,7 @@ class SendManager(
 
         // save lnurl metadata if any
         metadata?.let { WalletPaymentMetadataRow.serialize(it) }?.let { row ->
-            databaseManager.paymentsDb().enqueueMetadata(
-                row = row,
-                id = WalletPaymentId.LightningOutgoingPaymentId(paymentId)
-            )
+            databaseManager.paymentsDb().enqueueMetadata(row = row, id = paymentId)
         }
 
         peer.send(

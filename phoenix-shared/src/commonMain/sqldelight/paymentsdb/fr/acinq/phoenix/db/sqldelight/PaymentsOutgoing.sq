@@ -1,0 +1,99 @@
+import fr.acinq.bitcoin.ByteVector32;
+import fr.acinq.bitcoin.TxId;
+import fr.acinq.lightning.db.OutgoingPayment;
+import fr.acinq.lightning.utils.UUID;
+
+CREATE TABLE payments_outgoing (
+    id BLOB AS UUID NOT NULL PRIMARY KEY,
+    payment_hash BLOB AS ByteVector32,
+    tx_id BLOB AS TxId,
+    created_at INTEGER NOT NULL,
+    completed_at INTEGER, -- a completed outgoing payment can be a success or a failure
+    succeeded_at INTEGER, -- will only be set for a successful payment
+    data BLOB AS OutgoingPayment NOT NULL
+);
+
+CREATE INDEX payments_outgoing_payment_hash_idx ON payments_outgoing(payment_hash);
+CREATE INDEX payments_outgoing_tx_id_idx ON payments_outgoing(tx_id);
+
+-- Create indexes to optimize the queries in AggregatedQueries.
+-- Tip: Use "explain query plan" to ensure they're actually being used.
+CREATE INDEX payments_outgoing_filter_idx ON payments_outgoing(completed_at) WHERE completed_at IS NOT NULL;
+
+CREATE TABLE link_lightning_outgoing_payment_parts (
+    part_id BLOB AS UUID NOT NULL PRIMARY KEY,
+    parent_id BLOB AS UUID NOT NULL
+);
+
+-- queries
+
+insert:
+INSERT INTO payments_outgoing (
+            id,
+            payment_hash,
+            tx_id,
+            created_at,
+            completed_at,
+            succeeded_at,
+            data)
+VALUES (?, ?, ?, ?, ?, ?, ?);
+
+insertPartLink:
+INSERT INTO link_lightning_outgoing_payment_parts(
+            part_id,
+            parent_id)
+VALUES (?, ?);
+
+update:
+UPDATE payments_outgoing
+SET    completed_at=?,
+       succeeded_at=?,
+       data=:data
+WHERE  id = :id;
+
+get:
+SELECT data
+FROM   payments_outgoing
+WHERE  id=?;
+
+getParentId:
+SELECT parent_id
+FROM   link_lightning_outgoing_payment_parts
+WHERE  part_id=?;
+
+listByPaymentHash:
+SELECT data
+FROM   payments_outgoing
+WHERE  payment_hash=?;
+
+listByTxId:
+SELECT data
+FROM   payments_outgoing
+WHERE  tx_id=?;
+
+deleteById:
+DELETE FROM payments_outgoing
+WHERE id = ?;
+
+deleteByPaymentHash:
+DELETE FROM payments_outgoing
+WHERE payment_hash = ?;
+
+list:
+SELECT data
+FROM  payments_outgoing
+WHERE
+    created_at BETWEEN :created_at_from AND :created_at_to
+LIMIT :limit OFFSET :offset;
+
+listSuccessful:
+SELECT data
+FROM  payments_outgoing
+WHERE
+    succeeded_at BETWEEN :succeeded_at_from AND :succeeded_at_to
+LIMIT :limit OFFSET :offset;
+
+listSuccessfulIds:
+SELECT id, completed_at
+FROM payments_outgoing
+WHERE completed_at IS NOT NULL;

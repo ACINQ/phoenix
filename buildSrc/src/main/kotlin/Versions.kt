@@ -1,5 +1,5 @@
 object Versions {
-    const val lightningKmp = "1.8.4"
+    const val lightningKmp = "1.8.5-SNAPSHOT"
     const val secp256k1 = "0.14.0"
     const val torMobile = "0.2.0"
 
@@ -7,6 +7,7 @@ object Versions {
 
     const val ktor = "2.3.7"
     const val sqlDelight = "2.0.1"
+    const val okio = "3.8.0"
 
     const val slf4j = "1.7.30"
     const val junit = "4.13"

@@ -45,6 +45,7 @@ import androidx.constraintlayout.compose.MotionLayout
 import androidx.constraintlayout.compose.MotionScene
 import androidx.constraintlayout.compose.layoutId
 import fr.acinq.lightning.blockchain.electrum.balance
+import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.NoticesViewModel
@@ -59,7 +60,6 @@ import fr.acinq.phoenix.android.utils.FCMHelper
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
 import fr.acinq.phoenix.android.utils.extensions.findActivity
-import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.canRequestLiquidity
 import fr.acinq.phoenix.data.inFlightPaymentsCount
 import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
@@ -71,7 +71,7 @@ import kotlinx.coroutines.launch
 fun HomeView(
     paymentsViewModel: PaymentsViewModel,
     noticesViewModel: NoticesViewModel,
-    onPaymentClick: (WalletPaymentId) -> Unit,
+    onPaymentClick: (UUID) -> Unit,
     onSettingsClick: () -> Unit,
     onReceiveClick: () -> Unit,
     onSendClick: () -> Unit,
@@ -110,10 +110,9 @@ fun HomeView(
     }
 
     val allPaymentsCount by business.paymentsManager.paymentsCount.collectAsState()
-    val payments by paymentsViewModel.latestPaymentsFlow.collectAsState()
+    val payments by paymentsViewModel.homePaymentsFlow.collectAsState()
     val swapInBalance = business.balanceManager.swapInWalletBalance.collectAsState()
     val finalWallet = business.peerManager.finalWallet.collectAsState()
-    val pendingChannelsBalance = business.balanceManager.pendingChannelsBalance.collectAsState()
 
     BackHandler {
         // force the back button to minimize the app
@@ -242,7 +241,6 @@ fun HomeView(
                     balanceDisplayMode = balanceDisplayMode,
                     swapInBalance = swapInBalance.value,
                     finalWalletBalance = finalWallet.value?.all?.balance ?: 0.sat,
-                    unconfirmedChannelsBalance = pendingChannelsBalance.value,
                     onNavigateToSwapInWallet = onNavigateToSwapInWallet,
                     onNavigateToFinalWallet = onNavigateToFinalWallet,
                 )
@@ -263,7 +261,6 @@ fun HomeView(
                 balanceDisplayMode = balanceDisplayMode,
                 onPaymentClick = onPaymentClick,
                 onPaymentsHistoryClick = onPaymentsHistoryClick,
-                fetchPaymentDetails = { paymentsViewModel.fetchPaymentDetails(it) },
                 payments = payments,
                 allPaymentsCount = allPaymentsCount
             )

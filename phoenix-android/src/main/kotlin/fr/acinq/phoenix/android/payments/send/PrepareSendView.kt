@@ -69,6 +69,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import fr.acinq.phoenix.android.R
@@ -135,25 +136,28 @@ fun SendView(
 
     when (val parseState = vm.parsePaymentState) {
         // if payment data has been successfully parsed, redirect to the relevant payment screen
-        is ParsePaymentState.Success -> when (val data = parseState.data) {
-            is SendManager.ParseResult.Bolt11Invoice -> {
-                SendToBolt11View(invoice = data.invoice, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() })
-            }
-            is SendManager.ParseResult.Bolt12Offer -> {
-                SendToOfferView(offer = data.offer, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() })
-            }
-            is SendManager.ParseResult.Uri -> {
-                SendSpliceOutView(requestedAmount = data.uri.amount, address = data.uri.address, onBackClick = onBackClick, onSpliceOutSuccess = { navController.popToHome() })
-            }
-            is SendManager.ParseResult.Lnurl.Pay -> {
-                LnurlPayView(payIntent = data.paymentIntent, onBackClick, onPaymentSent = { navController.popToHome() })
-            }
-            is SendManager.ParseResult.Lnurl.Withdraw -> {
-                LnurlWithdrawView(withdraw = data.lnurlWithdraw, onBackClick = onBackClick, onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) }, onWithdrawDone = { navController.popToHome() })
-            }
-            is SendManager.ParseResult.Lnurl.Auth -> {
-                LnurlAuthView(auth = data.auth, onBackClick = { navController.popBackStack() }, onChangeAuthSchemeSettingClick = { navController.navigate("${Screen.PaymentSettings.route}?showAuthSchemeDialog=true") },
-                    onAuthDone = { navController.popToHome() },)
+        is ParsePaymentState.Success -> {
+            LocalViewModelStoreOwner.current?.viewModelStore?.clear()
+            when (val data = parseState.data) {
+                is SendManager.ParseResult.Bolt11Invoice -> {
+                    SendToBolt11View(invoice = data.invoice, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() })
+                }
+                is SendManager.ParseResult.Bolt12Offer -> {
+                    SendToOfferView(offer = data.offer, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() })
+                }
+                is SendManager.ParseResult.Uri -> {
+                    SendSpliceOutView(requestedAmount = data.uri.amount, address = data.uri.address, onBackClick = onBackClick, onSpliceOutSuccess = { navController.popToHome() })
+                }
+                is SendManager.ParseResult.Lnurl.Pay -> {
+                    LnurlPayView(payIntent = data.paymentIntent, onBackClick, onPaymentSent = { navController.popToHome() })
+                }
+                is SendManager.ParseResult.Lnurl.Withdraw -> {
+                    LnurlWithdrawView(withdraw = data.lnurlWithdraw, onBackClick = onBackClick, onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) }, onWithdrawDone = { navController.popToHome() })
+                }
+                is SendManager.ParseResult.Lnurl.Auth -> {
+                    LnurlAuthView(auth = data.auth, onBackClick = { navController.popBackStack() }, onChangeAuthSchemeSettingClick = { navController.navigate("${Screen.PaymentSettings.route}?showAuthSchemeDialog=true") },
+                        onAuthDone = { navController.popToHome() },)
+                }
             }
         }
         is ParsePaymentState.Ready, is ParsePaymentState.Processing, is ParsePaymentState.Error, is ParsePaymentState.ChoosePaymentMode -> {

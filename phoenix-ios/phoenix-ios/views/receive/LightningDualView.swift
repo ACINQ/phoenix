@@ -725,9 +725,12 @@ struct LightningDualView: View {
 		}
 		
 		let state = lastIncomingPayment.state()
-		if state == WalletPaymentState.successOnChain || state == WalletPaymentState.successOffChain {
-			if lastIncomingPayment.paymentHash.toHex() == model.paymentHash {
-				presentationMode.wrappedValue.dismiss()
+		if state == WalletPaymentState.successOffChain {
+			
+			if let lightningPayment = lastIncomingPayment as? Lightning_kmpLightningIncomingPayment {
+				if lightningPayment.paymentHash.toHex() == model.paymentHash {
+					presentationMode.wrappedValue.dismiss()
+				}
 			}
 		}
 	}

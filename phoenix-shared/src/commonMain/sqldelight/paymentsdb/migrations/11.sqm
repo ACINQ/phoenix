@@ -1,0 +1,92 @@
+-- Migration: v11 -> v12
+--
+-- Changes:
+-- * add table payments_outgoing, which stores all types of outgoing payments.
+-- * add table link_lightning_outgoing_payment_parts, which links lightning parts with the parent.
+--
+-- /!\ There is also a code migration, see AfterVersion11.kt.
+-- This code migration moves existing data to the new tables and drops the old tables.
+
+CREATE TABLE payments_outgoing (
+    id BLOB AS UUID NOT NULL PRIMARY KEY,
+    payment_hash BLOB AS ByteVector32,
+    tx_id BLOB AS TxId,
+    created_at INTEGER NOT NULL,
+    completed_at INTEGER, -- a completed outgoing payment can be a success or a failure
+    succeeded_at INTEGER, -- will only be set for a successful payment
+    data BLOB AS OutgoingPayment NOT NULL
+);
+
+CREATE INDEX payments_outgoing_payment_hash_idx ON payments_outgoing(payment_hash);
+CREATE INDEX payments_outgoing_tx_id_idx ON payments_outgoing(tx_id);
+
+-- Create indexes to optimize the queries in AggregatedQueries.
+-- Tip: Use "explain query plan" to ensure they're actually being used.
+CREATE INDEX payments_outgoing_filter_idx ON payments_outgoing(completed_at) WHERE completed_at IS NOT NULL;
+
+CREATE TABLE link_lightning_outgoing_payment_parts (
+    part_id BLOB AS UUID NOT NULL PRIMARY KEY,
+    parent_id BLOB AS UUID NOT NULL
+);
+
+-- This table will be read then deleted in the code migration
+ALTER TABLE payments_metadata RENAME TO payments_metadata_old;
+
+CREATE TABLE IF NOT EXISTS payments_metadata (
+    payment_id BLOB AS UUID NOT NULL PRIMARY KEY,
+    lnurl_base_type TEXT AS LnurlBase.TypeVersion,
+    lnurl_base_blob BLOB,
+    lnurl_description TEXT,
+    lnurl_metadata_type TEXT AS LnurlMetadata.TypeVersion,
+    lnurl_metadata_blob BLOB,
+    lnurl_successAction_type TEXT AS LnurlSuccessAction.TypeVersion,
+    lnurl_successAction_blob BLOB,
+    user_description TEXT,
+    user_notes TEXT,
+    modified_at INTEGER,
+    original_fiat_type TEXT,
+    original_fiat_rate REAL
+);
+
+CREATE TABLE on_chain_txs (
+    payment_id BLOB AS UUID NOT NULL PRIMARY KEY,
+    tx_id BLOB AS TxId NOT NULL,
+    confirmed_at INTEGER,
+    locked_at INTEGER
+);
+
+CREATE INDEX on_chain_txs_tx_id ON on_chain_txs(tx_id);
+
+CREATE VIEW payments
+AS SELECT id, created_at, completed_at, succeeded_at, order_ts, data
+FROM (
+    SELECT id, created_at, received_at AS completed_at, received_at AS succeeded_at, received_at AS order_ts, data
+    FROM payments_incoming
+    WHERE received_at IS NOT NULL -- we only consider completed incoming payments
+UNION ALL
+    SELECT id, created_at, completed_at, succeeded_at, created_at AS order_ts, data
+    FROM payments_outgoing
+);
+
+-- This table will be read then deleted in the code migration
+ALTER TABLE cloudkit_payments_metadata RENAME TO cloudkit_payments_metadata_old;
+DROP INDEX record_creation_idx;
+
+CREATE TABLE IF NOT EXISTS cloudkit_payments_metadata (
+    id BLOB AS UUID NOT NULL PRIMARY KEY,
+    unpadded_size INTEGER NOT NULL,
+    record_creation INTEGER NOT NULL,
+    record_blob BLOB NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS record_creation_idx
+    ON cloudkit_payments_metadata(record_creation);
+
+-- This table will be read then deleted in the code migration
+ALTER TABLE cloudkit_payments_queue RENAME TO cloudkit_payments_queue_old;
+CREATE TABLE IF NOT EXISTS cloudkit_payments_queue (
+    rowid INTEGER PRIMARY KEY,
+    id BLOB AS UUID NOT NULL,
+    date_added INTEGER NOT NULL
+);
+

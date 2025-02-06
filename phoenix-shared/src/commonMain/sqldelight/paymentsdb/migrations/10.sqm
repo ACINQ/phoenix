@@ -1,0 +1,22 @@
+-- Migration: v10 -> v11
+--
+-- This is a code migration, see AfterVersion10.kt
+
+-- incoming payments
+CREATE TABLE payments_incoming (
+    id BLOB AS UUID NOT NULL PRIMARY KEY,
+    payment_hash BLOB AS ByteVector32 UNIQUE,
+    tx_id BLOB AS TxId,
+    created_at INTEGER NOT NULL,
+    received_at INTEGER,
+    data BLOB AS IncomingPayment NOT NULL
+);
+
+CREATE INDEX payments_incoming_payment_hash_idx ON payments_incoming(payment_hash);
+CREATE INDEX payments_incoming_tx_id_idx ON payments_incoming(tx_id);
+
+-- Create indexes to optimize the queries in AggregatedQueries.
+-- Tip: Use "explain query plan" to ensure they're actually being used.
+CREATE INDEX payments_incoming_filter_idx
+    ON payments_incoming(received_at)
+ WHERE received_at IS NOT NULL;

@@ -2,23 +2,10 @@ package fr.acinq.phoenix.db
 
 import app.cash.sqldelight.Transacter
 import app.cash.sqldelight.coroutines.asFlow
-import fr.acinq.bitcoin.utils.Try
-import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
-import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
-import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.db.LightningOutgoingPayment
-import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
-import fr.acinq.lightning.db.SpliceOutgoingPayment
-import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
-import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.data.ContactInfo
-import fr.acinq.phoenix.data.WalletPaymentId
-import fr.acinq.phoenix.db.CloudKitPaymentsDb.MetadataRow
-import fr.acinq.phoenix.db.payments.IncomingQueries
-import fr.acinq.phoenix.db.payments.WalletPaymentMetadataRow
-import fr.acinq.phoenix.db.payments.mapToDb
+import kotlin.collections.List
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -289,12 +276,21 @@ class CloudKitContactsDb(
                 //
                 // But in what order do we want to upload them to the cloud ?
                 //
-                // We will choose to upload the newest item first.
+                // We will choose to upload the OLDEST item first.
+                // This matches how they normally would have been uploaded.
+                // Also, when a user restores their wallet (e.g. on a new phone),
+                // we always want to download the newest contacts first.
+                // And this assumes the newest items in the cloud are the newest contacts.
+                //
                 // Since items are uploaded in FIFO order,
-                // we just need to make the newest item have the
+                // we just need to make the oldest item have the
                 // smallest `date_added` value.
 
-                missing.sortBy { it.timestamp }
+                missing.sortByDescending { it.timestamp }
+
+                // The list is now sorted in descending order.
+                // Which means the newest item is at index 0,
+                // and the oldest item is at index <last>.
 
                 val now = currentTimestampMillis()
                 missing.forEachIndexed { idx, item ->

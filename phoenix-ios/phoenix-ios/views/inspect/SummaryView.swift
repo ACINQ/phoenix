@@ -31,12 +31,8 @@ struct SummaryView: View {
 	let location: PaymentView.Location
 	
 	@State var paymentInfo: WalletPaymentInfo
-	@State var paymentInfoIsStale: Bool
 	
-	@State var relatedPaymentIds: [WalletPaymentId] = []
-	@State var liquidityPayment: Lightning_kmpInboundLiquidityOutgoingPayment? = nil
-	
-	let fetchOptions = WalletPaymentFetchOptions.companion.All
+	@State var relatedPaymentIds: [Lightning_kmpUUID] = []
 	
 	@State var blockchainConfirmations: Int? = nil
 	@State var showBlockchainExplorerOptions = false
@@ -91,28 +87,7 @@ struct SummaryView: View {
 	init(location: PaymentView.Location, paymentInfo: WalletPaymentInfo) {
 		
 		self.location = location
-		
-		// Try to optimize by using the in-memory cache.
-		// If we get a cache hit, we can skip the UI refresh/flicker.
-		if let row = paymentInfo.toOrderRow() {
-			
-			let fetcher = Biz.business.paymentsManager.fetcher
-			if let result = fetcher.getCachedPayment(row: row, options: fetchOptions) {
-				
-				self._paymentInfo = State(initialValue: result)
-				self._paymentInfoIsStale = State(initialValue: false)
-				
-			} else {
-				
-				self._paymentInfo = State(initialValue: paymentInfo)
-				self._paymentInfoIsStale = State(initialValue: true)
-			}
-			
-		} else {
-			
-			self._paymentInfo = State(initialValue: paymentInfo)
-			self._paymentInfoIsStale = State(initialValue: true)
-		}
+		self.paymentInfo = paymentInfo
 	}
 	
 	// --------------------------------------------------
@@ -189,9 +164,7 @@ struct SummaryView: View {
 		VStack {
 			Spacer(minLength: 25)
 			header_status()
-			if !isLiquidityWithFeesDisplayedElsewhere() {
-				header_amount()
-			}
+			header_amount()
 			summaryInfoGrid()
 			buttonList()
 			Spacer(minLength: 25)
@@ -217,7 +190,9 @@ struct SummaryView: View {
 				.accessibilityHidden(true)
 			VStack {
 				Group {
-					if payment is Lightning_kmpInboundLiquidityOutgoingPayment {
+					if payment is Lightning_kmpAutomaticLiquidityPurchasePayment ||
+					   payment is Lightning_kmpManualLiquidityPurchasePayment
+					{
 						Text("Channel Resized")
 					}
 					else if payment is Lightning_kmpOutgoingPayment {
@@ -529,7 +504,6 @@ struct SummaryView: View {
 		SummaryInfoGrid(
 			paymentInfo: $paymentInfo,
 			relatedPaymentIds: $relatedPaymentIds,
-			liquidityPayment: $liquidityPayment,
 			showOriginalFiatValue: $showOriginalFiatValue,
 			showContactView: showContactView,
 			switchToPayment: switchToPayment
@@ -866,7 +840,6 @@ struct SummaryView: View {
 				location: wrappedLocation(),
 				paymentInfo: $paymentInfo,
 				relatedPaymentIds: $relatedPaymentIds,
-				liquidityPayment: $liquidityPayment,
 				showOriginalFiatValue: $showOriginalFiatValue,
 				showFiatValueExplanation: $showFiatValueExplanation,
 				switchToPayment: switchToPayment
@@ -905,15 +878,6 @@ struct SummaryView: View {
 			get: { navLinkTag != nil },
 			set: { if !$0 { navLinkTag = nil }}
 		)
-	}
-	
-	func isLiquidityWithFeesDisplayedElsewhere() -> Bool {
-		
-		if let liquidity = paymentInfo.payment as? Lightning_kmpInboundLiquidityOutgoingPayment {
-			return liquidity.hidesFees
-		} else {
-			return false
-		}
 	}
 	
 	func formattedAmount() -> FormattedAmount {
@@ -985,17 +949,17 @@ struct SummaryView: View {
 		// This means our Task to monitor the blockchain needs to properly respond whenever
 		// the `paymentInfo` property is changed.
 		
-		var lastPaymentId: WalletPaymentId? = nil
+		var lastPaymentId: Lightning_kmpUUID? = nil
 		
 		// Note: When the task is cancelled, the `values` stream returns nil, and we exit the loop
 		
 		for await paymentInfo in blockchainMonitorState.paymentInfoPublisher.values {
 			
-			if let paymentInfo, paymentInfo.id() == lastPaymentId {
+			if let paymentInfo, paymentInfo.payment.id == lastPaymentId {
 				log.debug("monitorBlockchain: ignoring duplicate paymentInfo")
 				continue
 			}
-			lastPaymentId = paymentInfo?.id()
+			lastPaymentId = paymentInfo?.payment.id
 			
 			if let currentTask = blockchainMonitorState.currentTaskPublisher.value {
 				log.debug("monitorBlockchain: currentTask.cancel()")
@@ -1026,7 +990,7 @@ struct SummaryView: View {
 	
 	func monitorBlockchain(_ paymentInfo: WalletPaymentInfo) async {
 		
-		let pid: String = paymentInfo.id().dbId.prefix(maxLength: 8)
+		let pid: String = paymentInfo.payment.id.description().prefix(maxLength: 8)
 		log.trace("monitorBlockchain(\(pid))")
 		
 		guard let onChainPayment = paymentInfo.payment as? Lightning_kmpOnChainOutgoingPayment else {
@@ -1130,43 +1094,7 @@ struct SummaryView: View {
 			
 			// First time displaying the SummaryView (coming from HomeView)
 			
-			// Not triggered in this particular case, so we need to trigger it manually.
-			//
-			// Note:
-			// The flow below won't automatically trigger `paymentInfoChanged` if:
-			// - !paymentInfoIsState
-			// - or the fetched payment is equal to the existing payment
-			//
-			// The latter happens when:
-			// - lastCompletedPaymentPublisher fires
-			// - HomeView fetches the payment with FetchOptions.All
-			// - HomeView displays the PaymentView with fetched `paymentInfo`
-			// - If we fetch the payment again here, it's equal to the existing payment
-			//
 			paymentInfoChanged()
-			
-			if paymentInfoIsStale {
-				// We either don't have the full payment information (missing metadata info),
-				// or the payment information is possibly stale, and needs to be refreshed.
-				
-				if let row = paymentInfo.toOrderRow() {
-					Biz.business.paymentsManager.fetcher.getPayment(row: row, options: fetchOptions) {
-						(result: WalletPaymentInfo?, _) in
-						
-						if let result {
-							paymentInfo = result
-						}
-					}
-				} else {
-					Biz.business.paymentsManager.getPayment(id: paymentInfo.id(), options: fetchOptions) {
-						(result: WalletPaymentInfo?, _) in
-						
-						if let result {
-							paymentInfo = result
-						}
-					}
-				}
-			}
 			
 		} else {
 			log.trace("subsequent appearance")
@@ -1175,7 +1103,7 @@ struct SummaryView: View {
 			// The payment metadata may have changed (e.g. description/notes modified).
 			// So we need to refresh the payment info.
 			
-			Biz.business.paymentsManager.getPayment(id: paymentInfo.id(), options: fetchOptions) {
+			Biz.business.paymentsManager.getPayment(id: paymentInfo.payment.id) {
 				(result: WalletPaymentInfo?, _) in
 				
 				if let result {
@@ -1203,50 +1131,25 @@ struct SummaryView: View {
 	
 	func paymentInfoChanged() {
 		log.trace("paymentInfoChanged()")
-		
+
 		blockchainMonitorState.paymentInfoPublisher.send(paymentInfo)
-		
-		if let liquidity = paymentInfo.payment as? Lightning_kmpInboundLiquidityOutgoingPayment {
-			if liquidity.purchase.paymentDetails is Lightning_kmpLiquidityAdsPaymentDetailsFromChannelBalance {
-				Task { @MainActor in
-					do {
-						let paymentsManager = Biz.business.paymentsManager
-						let rpids = try await paymentsManager.listIncomingPaymentsForTxId(txId: liquidity.txId)
-						log.debug("relatedPaymentIds.count = \(rpids.count) (via listIncomingPaymentsForTxId)")
-						relatedPaymentIds = rpids
-					} catch {
-						log.error("listIncomingPaymentsForTxId(): error: \(error)")
-					}
+
+		if let liquidity = paymentInfo.payment as? Lightning_kmpAutomaticLiquidityPurchasePayment {
+			Task { @MainActor in
+				do {
+					// should not be needed anymore after the db migration
+					//let paymentsManager = Biz.business.paymentsManager
+					//let rpayments = try await paymentsManager.listIncomingPaymentsForTxId(txId: liquidity.txId)
+					//let rpids = rpayments.map { $0.id }
+					//log.debug("relatedPaymentIds.count = \(rpids.count) (via listIncomingPaymentsForTxId)")
+					//relatedPaymentIds = rpids
+				} catch {
+					log.error("listIncomingPaymentsForTxId(): error: \(error)")
 				}
-			} else {
-				let rpids = liquidity.relatedPaymentIds()
-				log.debug("relatedPaymentIds.count = \(rpids.count) (direct)")
-				relatedPaymentIds = rpids
 			}
 		} else {
 			log.debug("relatedPaymentIds.count = 0 (payment !is InboundLiquidityOutgoingPayment)")
 			relatedPaymentIds = []
-		}
-		
-		if let incomingPayment = paymentInfo.payment as? Lightning_kmpIncomingPayment,
-			let fundingTxId = incomingPayment.lightningPaymentFundingTxId
-		{
-			Task { @MainActor in
-				do {
-					let paymentsManager = Biz.business.paymentsManager
-					let lp = try await paymentsManager.getLiquidityPurchaseForTxId(txId: fundingTxId)
-					if let lp {
-						log.debug("liquidityPayment = \(lp.walletPaymentId().dbId)")
-						liquidityPayment = lp
-					} else {
-						log.debug("liquidityPayment = nil")
-					}
-					
-				} catch {
-					log.error("getLiquidityPurchaseForTxId(): error: \(error)")
-				}
-				
-			}
 		}
 	}
 	
@@ -1304,16 +1207,15 @@ struct SummaryView: View {
 		navigateTo(.ContactView(contact: contact))
 	}
 	
-	func switchToPayment(_ paymentId: WalletPaymentId) {
-		log.trace("switchToPayment: \(paymentId.dbId)")
+	func switchToPayment(_ paymentId: Lightning_kmpUUID) {
+		log.trace("switchToPayment: \(paymentId.description())")
 		
-		Biz.business.paymentsManager.getPayment(id: paymentId, options: fetchOptions) {
+		Biz.business.paymentsManager.getPayment(id: paymentId) {
 			(result: WalletPaymentInfo?, _) in
 			
 			if let result {
 				paymentInfo = result
 				relatedPaymentIds = []
-				liquidityPayment = nil
 				blockchainConfirmations = nil
 			}
 		}
@@ -1341,14 +1243,14 @@ struct SummaryView: View {
 	func deletePayment() {
 		log.trace("deletePayment()")
 		
-		Biz.business.databaseManager.paymentsDb { paymentsDb, _ in
-			
-			paymentsDb?.deletePayment(paymentId: paymentInfo.id(), completionHandler: { error in
+		Task { @MainActor in
+			do {
+				let paymentsDb = try await Biz.business.databaseManager.paymentsDb()
+				try await paymentsDb.deletePayment(paymentId: paymentInfo.payment.id, notify: true)
 				
-				if let error = error {
-					log.error("Error deleting payment: \(String(describing: error))")
-				}
-			})
+			} catch {
+				log.error("Error deleting payment: \(error)")
+			}
 		}
 		
 		switch location {

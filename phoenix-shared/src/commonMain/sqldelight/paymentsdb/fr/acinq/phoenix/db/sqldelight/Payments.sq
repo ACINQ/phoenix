@@ -1,0 +1,63 @@
+-- This view returns all outgoing payments, but only successful incoming payments.
+CREATE VIEW payments
+AS SELECT id, created_at, completed_at, succeeded_at, order_ts, data
+FROM (
+    SELECT id, created_at, received_at AS completed_at, received_at AS succeeded_at, received_at AS order_ts, data
+    FROM payments_incoming
+    WHERE received_at IS NOT NULL -- we only consider completed incoming payments
+UNION ALL
+    SELECT id, created_at, completed_at, succeeded_at, created_at AS order_ts, data
+    FROM payments_outgoing
+);
+
+get:
+SELECT data
+FROM payments
+WHERE id=:id;
+
+list:
+SELECT p.data, pm.*
+FROM payments AS p
+LEFT OUTER JOIN payments_metadata AS pm ON pm.payment_id = p.id
+ORDER BY order_ts DESC
+LIMIT :limit OFFSET :offset;
+
+listSuccessful:
+SELECT p.data, pm.*
+FROM payments AS p
+LEFT OUTER JOIN payments_metadata AS pm ON pm.payment_id = p.id
+WHERE
+    succeeded_at BETWEEN :succeeded_at_from AND :succeeded_at_to
+ORDER BY order_ts
+LIMIT :limit OFFSET :offset;
+
+listInFlight:
+SELECT p.data, pm.*
+FROM payments AS p
+LEFT OUTER JOIN payments_metadata AS pm ON pm.payment_id = p.id
+WHERE
+    completed_at IS NULL
+ORDER BY order_ts DESC
+LIMIT :limit OFFSET :offset;
+
+listRecent:
+SELECT p.data, pm.*
+FROM payments AS p
+LEFT OUTER JOIN payments_metadata AS pm ON pm.payment_id = p.id
+WHERE
+    order_ts >= :min_ts
+ORDER BY order_ts DESC
+LIMIT :limit OFFSET :offset;
+
+getOldestCompletedAt:
+SELECT min(completed_at) AS completed_at
+FROM payments;
+
+count:
+SELECT count(id)
+FROM payments;
+
+countCompletedInRange:
+SELECT   count(id)
+FROM     payments
+WHERE    completed_at BETWEEN :completed_at_from AND :completed_at_to;

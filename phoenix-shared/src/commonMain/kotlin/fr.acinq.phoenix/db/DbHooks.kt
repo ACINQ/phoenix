@@ -1,8 +1,9 @@
 package fr.acinq.phoenix.db
 
 import fr.acinq.lightning.utils.UUID
-import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.db.payments.CloudKitInterface
+import fr.acinq.phoenix.db.sqldelight.AppDatabase
+import fr.acinq.phoenix.db.sqldelight.PaymentsDatabase
 
 /**
  * Implement this function to execute platform specific code when a payment is saved to the database.
@@ -12,13 +13,13 @@ import fr.acinq.phoenix.db.payments.CloudKitInterface
  * This means any database operations performed in this function are atomic,
  * with respect to the referenced row.
  */
-expect fun didSaveWalletPayment(id: WalletPaymentId, database: PaymentsDatabase)
+expect fun didSaveWalletPayment(id: UUID, database: PaymentsDatabase)
 
 /**
  * Implement this function to execute platform specific code when a payment is deleted.
  * For example, on iOS this is used to enqueue an operation to delete the payment from CloudKit.
  */
-expect fun didDeleteWalletPayment(id: WalletPaymentId, database: PaymentsDatabase)
+expect fun didDeleteWalletPayment(id: UUID, database: PaymentsDatabase)
 
 /**
  * Implement this function to execute platform specific code when a payment's metadata is updated.
@@ -28,7 +29,7 @@ expect fun didDeleteWalletPayment(id: WalletPaymentId, database: PaymentsDatabas
  * This means any database operations performed in this function are atomic,
  * with respect to the referenced row.
  */
-expect fun didUpdateWalletPaymentMetadata(id: WalletPaymentId, database: PaymentsDatabase)
+expect fun didUpdateWalletPaymentMetadata(id: UUID, database: PaymentsDatabase)
 
 /**
  * Implement this function to execute platform specific code when a contact is saved to the database.

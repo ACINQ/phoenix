@@ -21,13 +21,13 @@ import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
-import fr.acinq.lightning.db.ChannelClosingType
+import fr.acinq.lightning.db.ChannelCloseOutgoingPayment.ChannelClosingType
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat
-import fr.acinq.phoenix.db.payments.OutgoingDetailsData
-import fr.acinq.phoenix.db.payments.OutgoingPartClosingInfoData
-import fr.acinq.phoenix.db.payments.OutgoingPartClosingInfoTypeVersion
-import fr.acinq.phoenix.db.payments.OutgoingStatusData
+import fr.acinq.phoenix.db.migrations.v11.types.OutgoingDetailsData
+import fr.acinq.phoenix.db.migrations.v11.types.OutgoingPartClosingInfoData
+import fr.acinq.phoenix.db.migrations.v11.types.OutgoingPartClosingInfoTypeVersion
+import fr.acinq.phoenix.db.migrations.v11.types.OutgoingStatusData
 
 object LegacyChannelCloseHelper {
 
@@ -82,7 +82,7 @@ object LegacyChannelCloseHelper {
                         || closingType == ChannelClosingType.Revoked
                         || closingType == ChannelClosingType.Remote
                         || closingType == ChannelClosingType.Other),
-            miningFees = fees,
+            miningFee = fees,
             txId = TxId(closingTxId ?: ByteVector32.Zeroes),
             createdAt = createdAt,
             confirmedAt = confirmedAt ?: createdAt,

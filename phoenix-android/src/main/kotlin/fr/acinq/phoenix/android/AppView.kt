@@ -40,6 +40,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -59,7 +60,10 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.firebase.messaging.FirebaseMessaging
+import fr.acinq.lightning.db.Bolt12IncomingPayment
+import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
 import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.components.Button
@@ -74,7 +78,7 @@ import fr.acinq.phoenix.android.intro.IntroView
 import fr.acinq.phoenix.android.payments.details.PaymentDetailsView
 import fr.acinq.phoenix.android.payments.history.CsvExportView
 import fr.acinq.phoenix.android.payments.history.PaymentsHistoryView
-import fr.acinq.phoenix.android.payments.liquidity.RequestLiquidityView
+import fr.acinq.phoenix.android.payments.send.liquidity.RequestLiquidityView
 import fr.acinq.phoenix.android.payments.receive.ReceiveView
 import fr.acinq.phoenix.android.payments.send.SendView
 import fr.acinq.phoenix.android.services.NodeServiceState
@@ -114,8 +118,6 @@ import fr.acinq.phoenix.android.utils.extensions.findActivitySafe
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
-import fr.acinq.phoenix.data.WalletPaymentId
-import fr.acinq.phoenix.data.walletPaymentId
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import io.ktor.http.decodeURLPart
@@ -305,24 +307,26 @@ fun AppView(
                         }
                     }
                     composable(
-                        route = "${Screen.PaymentDetails.route}?direction={direction}&id={id}&fromEvent={fromEvent}",
+                        route = "${Screen.PaymentDetails.route}?id={id}&fromEvent={fromEvent}",
                         arguments = listOf(
-                            navArgument("direction") { type = NavType.LongType },
                             navArgument("id") { type = NavType.StringType },
                             navArgument("fromEvent") {
                                 type = NavType.BoolType
                                 defaultValue = false
                             }
                         ),
-                        deepLinks = listOf(navDeepLink { uriPattern = "phoenix:payments/{direction}/{id}" })
+                        deepLinks = listOf(navDeepLink { uriPattern = "phoenix:payments/{id}" })
                     ) {
-                        val direction = it.arguments?.getLong("direction")
-                        val id = it.arguments?.getString("id")
-
-                        val paymentId = if (id != null && direction != null) WalletPaymentId.create(direction, id) else null
+                        val paymentId = remember {
+                            try {
+                                UUID.fromString(it.arguments!!.getString("id")!!)
+                            } catch (e: Exception) {
+                                null
+                            }
+                        }
                         if (paymentId != null) {
-                            RequireStarted(walletState, nextUri = "phoenix:payments/${direction}/${id}") {
-                                log.debug("navigating to payment-details id=$id")
+                            RequireStarted(walletState, nextUri = "phoenix:payments/${id}") {
+                                log.debug("navigating to payment=$id")
                                 val fromEvent = it.arguments?.getBoolean("fromEvent") ?: false
                                 PaymentDetailsView(
                                     paymentId = paymentId,
@@ -533,25 +537,10 @@ fun AppView(
         }
     }
 
-    val isDataMigrationExpected by LegacyPrefsDatastore.getDataMigrationExpected(context).collectAsState(initial = null)
     val lastCompletedPayment by business.paymentsManager.lastCompletedPayment.collectAsState()
-    val userPrefs = userPrefs
-    val exchangeRates = fiatRates
     lastCompletedPayment?.let { payment ->
-        LaunchedEffect(key1 = payment.walletPaymentId()) {
-            try {
-                if (isDataMigrationExpected == false) {
-                    if (payment is IncomingPayment && payment.origin is IncomingPayment.Origin.Offer) {
-                        SystemNotificationHelper.notifyPaymentsReceived(
-                            context, userPrefs, paymentHash = payment.paymentHash, amount = payment.amount, rates = exchangeRates, isHeadless = false
-                        )
-                    } else {
-                        navigateToPaymentDetails(navController, id = payment.walletPaymentId(), isFromEvent = true)
-                    }
-                }
-            } catch (e: Exception) {
-                log.warn("failed to notify UI of completed payment: {}", e.localizedMessage)
-            }
+        LaunchedEffect(key1 = payment.id) {
+            navigateToPaymentDetails(navController, id = payment.id, isFromEvent = true)
         }
     }
 
@@ -561,9 +550,9 @@ fun AppView(
     }
 }
 
-fun navigateToPaymentDetails(navController: NavController, id: WalletPaymentId, isFromEvent: Boolean) {
+fun navigateToPaymentDetails(navController: NavController, id: UUID, isFromEvent: Boolean) {
     try {
-        navController.navigate("${Screen.PaymentDetails.route}?direction=${id.dbType.value}&id=${id.dbId}&fromEvent=${isFromEvent}")
+        navController.navigate("${Screen.PaymentDetails.route}?id=${id}&fromEvent=${isFromEvent}")
     } catch (_: Exception) { }
 }
 

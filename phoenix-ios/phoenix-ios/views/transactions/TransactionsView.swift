@@ -28,11 +28,12 @@ struct TransactionsView: View {
 	
 	let paymentsPagePublisher: AnyPublisher<PaymentsPage, Never>
 	@State var paymentsPage = PaymentsPage(offset: 0, count: 0, rows: [])
-	@State var cachedRows: [WalletPaymentOrderRow] = []
+	@State var cachedRows: [WalletPaymentInfo] = []
 	@State var sections: [PaymentsSection] = []
-	@State var visibleRows: Set<WalletPaymentOrderRow> = Set()
 	
 	@State var selectedItem: WalletPaymentInfo? = nil
+	
+	let contactsPublisher = Biz.business.contactsManager.contactsListPublisher()
 	
 	let syncStatePublisher = Biz.syncManager!.syncBackupManager.statePublisher
 	@State var isDownloadingTxs: Bool = false
@@ -92,6 +93,9 @@ struct TransactionsView: View {
 		.onReceive(paymentsPagePublisher) {
 			paymentsPageChanged($0)
 		}
+		.onReceive(contactsPublisher) {
+			contactsChanged($0)
+		}
 		.onReceive(syncStatePublisher) {
 			syncStateChanged($0)
 		}
@@ -111,18 +115,7 @@ struct TransactionsView: View {
 		
 		ScrollView {
 			LazyVStack(pinnedViews: [.sectionHeaders]) {
-				// Reminder:
-				// - ForEach uses the given type (which conforms to Swift's Identifiable protocol)
-				//   to determine whether or not the row is new/modified or the same as before.
-				// - If the row is new/modified, then it it initialized with fresh state,
-				//   and the row's `onAppear` will fire.
-				// - If the row is unmodified, then it is initialized with existing state,
-				//   and the row's `onAppear` with NOT fire.
-				//
-				// Since we ultimately use WalletPaymentOrderRow.identifier, our unique identifier
-				// contains the row's completedAt date, which is modified when the row changes.
-				// Thus our row is automatically refreshed after it fails/succeeds.
-				//
+				
 				ForEach(sections) { section in
 					Section {
 						ForEach(section.payments) { row in
@@ -130,9 +123,9 @@ struct TransactionsView: View {
 								didSelectPayment(row: row)
 							} label: {
 								PaymentCell(
-									row: row,
+									info: row,
 									didAppearCallback: paymentCellDidAppear,
-									didDisappearCallback: paymentCellDidDisappear
+									didDisappearCallback: nil
 								)
 							}
 						}
@@ -262,6 +255,7 @@ struct TransactionsView: View {
 			
 		} else {
 			
+			selectedItem = nil
 			if let destination = popToDestination {
 				log.debug("popToDestination: \(destination)")
 				
@@ -319,7 +313,7 @@ struct TransactionsView: View {
 			//
 			// So it's better to code more defensively, and don't assume perfect sort order.
 			
-			let date = row.sortDate
+			let date = row.payment.sortDate
 			let comps = calendar.dateComponents([.year, .month], from: date)
 			
 			let year = comps.year!
@@ -347,22 +341,10 @@ struct TransactionsView: View {
 		
 		paymentsPage = page
 		sections = newSections
-		
-		let sortedVisibleRows = visibleRows.sorted { a, b in
-			// return true if `a` should be ordered before `b`; otherwise return false
-			return a.sortDate > b.sortDate
-		}
-		
-		if let topVisibleRow = sortedVisibleRows.first {
-			paymentCellDidAppear(topVisibleRow)
-			if let bottomVisibleRow = sortedVisibleRows.last {
-				paymentCellDidAppear(bottomVisibleRow)
-			}
-		}
 	}
 	
-	func paymentCellDidAppear(_ visibleRow: WalletPaymentOrderRow) -> Void {
-		log.trace("paymentCellDidAppear(): \(visibleRow.id)")
+	func paymentCellDidAppear(_ visibleRow: WalletPaymentInfo) -> Void {
+	//	log.trace("paymentCellDidAppear(): \(visibleRow.payment.id)")
 		
 		// Infinity Scrolling
 		//
@@ -430,7 +412,7 @@ struct TransactionsView: View {
 		//    and trim the cache.
 		//
 		// 4) Since we're using a LazyVStack, only the visisble rows are kept in memory.
-		//    All non-visible rows are only represnted as an instance of `WalletPaymentOrderRow` in memory.
+		//    All non-visible rows are only represnted as an instance of `WalletPaymentInfo` in memory.
 		//
 		//
 		// There's one other detail to discuss:
@@ -476,8 +458,7 @@ struct TransactionsView: View {
 		// - in `paymentsPageChanged`, just invoke `paymentCellDidAppear` for first & last rows
 		// - this will perform the standard check (like during scrolling) to see if offset needs to change
 		
-		visibleRows.insert(visibleRow)
-		let allRows = sections.flatMap { $0.payments }
+		let allRows: [WalletPaymentInfo] = sections.flatMap { $0.payments }
 		
 		guard let rowIdx = allRows.firstIndexAsInt(of: visibleRow) else {
 			// Row not found within current page.
@@ -539,10 +520,36 @@ struct TransactionsView: View {
 		}
 	}
 	
-	func paymentCellDidDisappear(_ visibleRow: WalletPaymentOrderRow) -> Void {
-		log.trace("paymentCellDidDisappear(): \(visibleRow.id)")
+	func contactsChanged(_ contacts: [ContactInfo]) {
+		log.trace("contactsChanged()")
 		
-		visibleRows.remove(visibleRow)
+		let contactsManager = Biz.business.contactsManager
+		
+		let updatedCachedRows = cachedRows.map { row in
+			let updatedContact = contactsManager.contactForPayment(payment: row.payment)
+			return WalletPaymentInfo(
+				payment  : row.payment,
+				metadata : row.metadata,
+				contact  : updatedContact
+			)
+		}
+		
+		let updatedPaymentsPageRows = paymentsPage.rows.map { row in
+			let updatedContact = contactsManager.contactForPayment(payment: row.payment)
+			return WalletPaymentInfo(
+				payment  : row.payment,
+				metadata : row.metadata,
+				contact  : updatedContact
+			)
+		}
+		let updatedPage = PaymentsPage(
+			offset : paymentsPage.offset,
+			count  : paymentsPage.count,
+			rows   : updatedPaymentsPageRows
+		)
+		
+		cachedRows = updatedCachedRows
+		paymentsPageChanged(updatedPage)
 	}
 	
 	func syncStateChanged(_ state: SyncBackupManager_State) {
@@ -559,7 +566,7 @@ struct TransactionsView: View {
 	// MARK: Utilities
 	// --------------------------------------------------
 	
-	func preOffsetPayments(page: PaymentsPage) -> [WalletPaymentOrderRow] {
+	func preOffsetPayments(page: PaymentsPage) -> [WalletPaymentInfo] {
 		
 		if cachedRows.isEmpty {
 			return []
@@ -574,8 +581,10 @@ struct TransactionsView: View {
 		// Step 1:
 		// First we simply exclude any duplicate payments.
 		
-		let pagePaymentIds = Set(page.rows.map { $0.walletPaymentId })
-		var preOffsetPayments = cachedRows.filter { !pagePaymentIds.contains($0.walletPaymentId) }
+		let pagePaymentIds: Set<Lightning_kmpUUID> = Set(page.rows.map { $0.payment.id })
+		var preOffsetPayments: [WalletPaymentInfo] = cachedRows.filter {
+			!pagePaymentIds.contains($0.payment.id)
+		}
 		
 		// Step 2:
 		// In the unlikely chance that the cached list not only overlaps the page,
@@ -585,9 +594,9 @@ struct TransactionsView: View {
 		// But only if the user receives a large batch of payments while scrolling.
 		
 		if let first = page.rows.first {
-			let firstDate = first.sortDate
+			let firstDate = first.payment.sortDate
 			
-			preOffsetPayments = preOffsetPayments.filter { $0.sortDate >= firstDate }
+			preOffsetPayments = preOffsetPayments.filter { $0.payment.sortDate >= firstDate }
 		}
 		
 		return preOffsetPayments
@@ -617,18 +626,14 @@ struct TransactionsView: View {
 		}
 	}
 	
-	func didSelectPayment(row: WalletPaymentOrderRow) -> Void {
+	func didSelectPayment(row: WalletPaymentInfo) {
 		log.trace("didSelectPayment()")
 		
-		// pretty much guaranteed to be in the cache
-		let fetcher = Biz.business.paymentsManager.fetcher
-		let options = PaymentCell.fetchOptions
-		fetcher.getPayment(row: row, options: options) { (result: WalletPaymentInfo?, _) in
-			
-			if let result = result {
-				selectedItem = result
-				navigateTo(.PaymentView)
-			}
+		if selectedItem == nil {
+			selectedItem = row
+			navigateTo(.PaymentView)
+		} else {
+			log.warning("selectItem != nil")
 		}
 	}
 }

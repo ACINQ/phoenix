@@ -6,33 +6,24 @@ import fr.acinq.lightning.blockchain.electrum.SwapInManager
 import fr.acinq.lightning.blockchain.electrum.WalletState
 import fr.acinq.lightning.blockchain.electrum.balance
 import fr.acinq.lightning.channel.states.ChannelState
-import fr.acinq.lightning.channel.states.PersistedChannelState
 import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.logging.LoggerFactory
-import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.sum
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.utils.extensions.localBalance
-import fr.acinq.lightning.logging.debug
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class BalanceManager(
-    loggerFactory: LoggerFactory,
     private val peerManager: PeerManager,
-    private val databaseManager: DatabaseManager
 ) : CoroutineScope by MainScope() {
 
     constructor(business: PhoenixBusiness): this(
-        loggerFactory = business.loggerFactory,
         peerManager = business.peerManager,
-        databaseManager = business.databaseManager
     )
-
-    private val log = loggerFactory.newLogger(this::class)
 
     /** The aggregated channels' balance. This is the user's LN funds in the wallet. See [ChannelState.localBalance] */
     private val _balance = MutableStateFlow<MilliSatoshi?>(null)
@@ -46,32 +37,15 @@ class BalanceManager(
     private val _swapInWalletBalance = MutableStateFlow(WalletBalance.empty())
     val swapInWalletBalance: StateFlow<WalletBalance> = _swapInWalletBalance
 
-    /** The balance of incoming payments whose funding tx is not yet confirmed - as seen from the database. */
-    private val _pendingChannelsBalance = MutableStateFlow(0.msat)
-    val pendingChannelsBalance: StateFlow<MilliSatoshi> = _pendingChannelsBalance
-
     init {
-        launch {
-            val peer = peerManager.peerState.filterNotNull().first()
-            launch { monitorChannelsBalance(peerManager) }
-            launch { monitorSwapInBalance(peer) }
-            launch { monitorIncomingPaymentNotYetConfirmed() }
-        }
+        launch { monitorChannelsBalance(peerManager) }
+        launch { monitorSwapInBalance() }
     }
 
     /** Monitors the channels' balance, first using the channels data from our database, then the live channels. */
     private suspend fun monitorChannelsBalance(peerManager: PeerManager) {
         peerManager.channelsFlow.collect { channels ->
             _balance.value = channels?.mapNotNull { it.value.state.localBalance() }?.sum()
-        }
-    }
-
-    /** Monitors the database for incoming payments that are received but whose funds are not yet usable (e.g., need confirmation). */
-    private suspend fun monitorIncomingPaymentNotYetConfirmed() {
-        databaseManager.paymentsDb().listIncomingPaymentsNotYetConfirmed().collect { payments ->
-            val unconfirmedOnchain = payments.filter { it.completedAt == null }
-            log.debug { "monitoring ${unconfirmedOnchain.size} unconfirmed on-chain payments" }
-            _pendingChannelsBalance.value = unconfirmedOnchain.map { it.amount }.sum()
         }
     }
 
@@ -84,7 +58,7 @@ class BalanceManager(
      *
      * See [SwapInManager.reservedWalletInputs] for details.
      */
-    private suspend fun monitorSwapInBalance(peer: Peer) {
+    private suspend fun monitorSwapInBalance() {
         peerManager.swapInWallet.filterNotNull().collect { wallet ->
             _swapInWallet.value = wallet
             _swapInWalletBalance.value = WalletBalance(

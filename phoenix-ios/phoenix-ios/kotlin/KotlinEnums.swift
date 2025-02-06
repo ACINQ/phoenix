@@ -57,62 +57,69 @@ extension Lightning_kmpFinalFailure {
 	}
 }
 
-extension Lightning_kmpLightningOutgoingPayment.PartStatusFailure {
+extension Lightning_kmpLightningOutgoingPayment.PartStatusFailedFailure {
 	
 	func localizedDescription() -> String {
-		if let _ =  self.asChannelIsClosing() {
+		switch onEnum(of: self) {
+		case .channelIsClosing(_):
 			return String(localized:
 				"Channels are closing.")
-		}
-		if let _ = self.asChannelIsSplicing() {
+			
+		case .channelIsSplicing(_):
 			return String(localized:
 				"Channels are already processing a splice. Try again later.")
-		}
-		if let _ = self.asNotEnoughFees() {
+			
+		case .notEnoughFees(_):
 			return String(localized:
 				"Fee is insufficient.")
-		}
-		if let _ = self.asNotEnoughFunds() {
+			
+		case .notEnoughFunds(_):
 			return String(localized:
 				"This payment exceeds your balance.")
-		}
-		if let _ = self.asPaymentAmountTooBig() {
+			
+		case .paymentAmountTooBig(_):
 			return String(localized:
 				"The payment amount is too big - try splitting it in several parts.")
-		}
-		if let _ = self.asPaymentAmountTooSmall() {
+			
+		case .paymentAmountTooSmall(_):
 			return String(localized:
 				"The payment amount is too small.")
-		}
-		if let _ = self.asPaymentExpiryTooBig() {
+			
+		case .paymentExpiryTooBig(_):
 			return String(localized:
 				"The expiry of this payment is too far in the future.")
-		}
-		if let _ = self.asRecipientIsOffline() {
-			return String(localized:
-				"The recipient is offline.")
-		}
-		if let _ = self.asRecipientLiquidityIssue() {
-			return String(localized:
-				"The payment could not be relayed to the recipient (probably insufficient inbound liquidity).")
-		}
-		if let _ = self.asRecipientRejectedPayment() {
+			
+		case .recipientRejectedPayment(_):
 			return String(localized:
 				"The payment was rejected by the recipient. This particular invoice may have already been paid.")
-		}
-		if let _ = self.asTemporaryRemoteFailure() {
-			return String(localized:
-				"An error occurred on a node in the payment route. The payment may succeed if you try again.")
-		}
-		if let _ = self.asTooManyPendingPayments() {
+			
+		case .tooManyPendingPayments(_):
 			return String(localized:
 				"You have too many pending payments. Try again once they are settled.")
+			
+		case .uninterpretable(let partStatus):
+			return partStatus.message
+			
+		case .routeFailure(let routeFailure):
+			switch onEnum(of: routeFailure) {
+			case .recipientIsOffline(_):
+				return String(localized:
+					"The recipient is offline.")
+				
+			case .recipientLiquidityIssue(_):
+				return String(localized:
+					"The payment could not be relayed to the recipient (probably insufficient inbound liquidity).")
+				
+			case .temporaryRemoteFailure(_):
+				return String(localized:
+					"An error occurred on a node in the payment route. The payment may succeed if you try again.")
+				
+			@unknown default:
+				return String(localized: "An unknown error occurred and payment has failed.")
+			}
+			
+		@unknown default:
+			return String(localized: "An unknown error occurred and payment has failed.")
 		}
-		if let partFailure = self.asUninterpretable() {
-			return partFailure.message
-		}
-		
-		return String(localized:
-			"An unknown error occurred and payment has failed.")
 	}
 }

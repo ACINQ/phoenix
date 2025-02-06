@@ -51,6 +51,10 @@ val buildVersionsTask by tasks.registering(Sync::class) {
 }
 
 kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
+
     if (includeAndroid) {
         androidTarget {
             compilations.all {
@@ -88,7 +92,7 @@ kotlin {
             kotlin.srcDir(buildVersionsTask.map { it.destinationDir })
             dependencies {
                 // lightning-kmp
-                api("fr.acinq.lightning:lightning-kmp:${Versions.lightningKmp}")
+                api("fr.acinq.lightning:lightning-kmp-core:${Versions.lightningKmp}")
                 api("fr.acinq.tor:tor-mobile-kmp:${Versions.torMobile}")
                 // ktor
                 implementation("io.ktor:ktor-client-core:${Versions.ktor}")
@@ -108,6 +112,7 @@ kotlin {
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
                 implementation("io.ktor:ktor-client-mock:${Versions.ktor}")
+                implementation("com.squareup.okio:okio:${Versions.okio}")
             }
         }
 
@@ -128,6 +133,7 @@ kotlin {
                     implementation(kotlin("test-junit"))
                     implementation("androidx.test.ext:junit:1.1.3")
                     implementation("androidx.test.espresso:espresso-core:3.4.0")
+                    implementation("org.robolectric:robolectric:4.13")
                     val currentOs = org.gradle.internal.os.OperatingSystem.current()
                     val target = when {
                         currentOs.isLinux -> "linux"
@@ -164,16 +170,16 @@ kotlin {
 sqldelight {
     databases {
         create("ChannelsDatabase") {
-            packageName.set("fr.acinq.phoenix.db")
-            srcDirs.from("src/commonMain/channelsdb")
+            packageName.set("fr.acinq.phoenix.db.sqldelight")
+            srcDirs.from("src/commonMain/sqldelight/channelsdb")
         }
         create("PaymentsDatabase") {
-            packageName.set("fr.acinq.phoenix.db")
-            srcDirs.from("src/commonMain/paymentsdb")
+            packageName.set("fr.acinq.phoenix.db.sqldelight")
+            srcDirs.from("src/commonMain/sqldelight/paymentsdb")
         }
         create("AppDatabase") {
-            packageName.set("fr.acinq.phoenix.db")
-            srcDirs.from("src/commonMain/appdb")
+            packageName.set("fr.acinq.phoenix.db.sqldelight")
+            srcDirs.from("src/commonMain/sqldelight/appdb")
         }
     }
 }

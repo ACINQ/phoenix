@@ -4,19 +4,25 @@ import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.db.Databases
 import fr.acinq.lightning.logging.LoggerFactory
+import fr.acinq.lightning.logging.debug
 import fr.acinq.phoenix.PhoenixBusiness
+import fr.acinq.phoenix.db.SqliteAppDb
 import fr.acinq.phoenix.db.SqliteChannelsDb
 import fr.acinq.phoenix.db.SqlitePaymentsDb
 import fr.acinq.phoenix.db.createChannelsDbDriver
 import fr.acinq.phoenix.db.createPaymentsDbDriver
-import fr.acinq.phoenix.utils.PlatformContext
-import fr.acinq.lightning.logging.debug
-import fr.acinq.phoenix.db.SqliteAppDb
+import fr.acinq.phoenix.db.createSqliteChannelsDb
+import fr.acinq.phoenix.db.createSqlitePaymentsDb
 import fr.acinq.phoenix.db.makeCloudKitDb
 import fr.acinq.phoenix.db.payments.CloudKitInterface
+import fr.acinq.phoenix.utils.PlatformContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class DatabaseManager(
@@ -25,6 +31,7 @@ class DatabaseManager(
     private val chain: Chain,
     private val appDb: SqliteAppDb,
     private val nodeParamsManager: NodeParamsManager,
+    private val contactsManager: ContactsManager,
     private val currencyManager: CurrencyManager
 ) : CoroutineScope by MainScope() {
 
@@ -34,6 +41,7 @@ class DatabaseManager(
         appDb = business.appDb,
         chain = business.chain,
         nodeParamsManager = business.nodeParamsManager,
+        contactsManager = business.contactsManager,
         currencyManager = business.currencyManager
     )
 
@@ -49,20 +57,16 @@ class DatabaseManager(
                 log.debug { "nodeParams available: building databases..." }
 
                 val nodeIdHash = nodeParams.nodeId.hash160().byteVector().toHex()
-                val channelsDb = SqliteChannelsDb(
-                    driver = createChannelsDbDriver(ctx, chain, nodeIdHash)
-                )
-                val paymentsDb = SqlitePaymentsDb(
-                    loggerFactory = loggerFactory,
-                    driver = createPaymentsDbDriver(ctx, chain, nodeIdHash),
-                    currencyManager = currencyManager
-                )
+                val channelsDbDriver = createChannelsDbDriver(ctx, chain, nodeIdHash)
+                val channelsDb = createSqliteChannelsDb(channelsDbDriver)
+                val paymentsDbDriver = createPaymentsDbDriver(ctx, chain, nodeIdHash)
+                val paymentsDb = createSqlitePaymentsDb(paymentsDbDriver, contactsManager, currencyManager)
                 val cloudKitDb = makeCloudKitDb(appDb, paymentsDb)
                 log.debug { "databases object created" }
                 _databases.value = PhoenixDatabases(
                     channels = channelsDb,
                     payments = paymentsDb,
-                    cloudKit = cloudKitDb
+                    cloudKit = cloudKitDb,
                 )
             }
         }
@@ -90,5 +94,5 @@ class DatabaseManager(
 data class PhoenixDatabases(
     override val channels: SqliteChannelsDb,
     override val payments: SqlitePaymentsDb,
-    val cloudKit: CloudKitInterface?
+    val cloudKit: CloudKitInterface?,
 ): Databases

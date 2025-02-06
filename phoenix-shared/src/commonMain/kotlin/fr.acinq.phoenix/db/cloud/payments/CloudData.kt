@@ -1,11 +1,14 @@
-package fr.acinq.phoenix.db.cloud
+package fr.acinq.phoenix.db.cloud.payments
 
-import fr.acinq.lightning.db.*
-import fr.acinq.phoenix.db.cloud.payments.InboundLiquidityLegacyWrapper
-import fr.acinq.phoenix.db.cloud.payments.InboundLiquidityPaymentWrapper
-import kotlinx.serialization.*
+import fr.acinq.lightning.db.WalletPayment
+import fr.acinq.lightning.serialization.payment.Serialization
+import fr.acinq.phoenix.db.cloud.cborSerializer
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.ByteString
-import kotlinx.serialization.cbor.Cbor
+import kotlinx.serialization.decodeFromByteArray
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 // Architecture & Notes:
@@ -56,87 +59,88 @@ enum class CloudDataVersion(val value: Int) {
     // Future versions go here
 }
 
-@Serializable
-@OptIn(ExperimentalSerializationApi::class)
-data class CloudData(
-    @SerialName("i")
-    val incoming: IncomingPaymentWrapper?,
-    @SerialName("o")
-    val outgoing: LightningOutgoingPaymentWrapper?,
-    @SerialName("so")
-    val spliceOutgoing: SpliceOutgoingPaymentWrapper? = null,
-    @SerialName("cc")
-    val channelClose: ChannelClosePaymentWrapper? = null,
-    @SerialName("sc")
-    val spliceCpfp: SpliceCpfpPaymentWrapper? = null,
-    @SerialName("il")
-    val inboundLegacyLiquidity: InboundLiquidityLegacyWrapper? = null,
-    @SerialName("ip")
-    val inboundPurchaseLiquidity: InboundLiquidityPaymentWrapper? = null,
-    @SerialName("v")
-    val version: Int,
-    @ByteString
-    @SerialName("p")
-    val padding: ByteArray?,
-) {
-    constructor(incoming: IncomingPayment) : this(
-        incoming = IncomingPaymentWrapper(incoming),
-        outgoing = null,
-        spliceOutgoing = null,
-        channelClose = null,
-        spliceCpfp = null,
-        inboundLegacyLiquidity = null,
-        inboundPurchaseLiquidity = null,
-        version = CloudDataVersion.V0.value,
-        padding = ByteArray(size = 0)
-    )
+sealed class CloudData {
+    @Serializable
+    data class V0 @OptIn(ExperimentalSerializationApi::class) constructor(
+        @SerialName("i")
+        val incoming: IncomingPaymentWrapperV10Legacy? = null,
+        @ByteString
+        @SerialName("o")
+        val outgoing: LightningOutgoingPaymentWrapper? = null,
+        @SerialName("so")
+        val spliceOutgoing: SpliceOutgoingPaymentWrapper? = null,
+        @SerialName("cc")
+        val channelClose: ChannelClosePaymentWrapper? = null,
+        @SerialName("sc")
+        val spliceCpfp: SpliceCpfpPaymentWrapper? = null,
+        @SerialName("il")
+        val inboundLegacyLiquidity: InboundLiquidityLegacyWrapper? = null,
+        @SerialName("ip")
+        val inboundPurchaseLiquidity: InboundLiquidityPaymentWrapper? = null,
+        @SerialName("v")
+        val version: Int,
+        @ByteString
+        @SerialName("p")
+        val padding: ByteArray?,
+    ) : CloudData() {
 
-    constructor(outgoing: OutgoingPayment) : this(
-        incoming = null,
-        outgoing = if (outgoing is LightningOutgoingPayment) LightningOutgoingPaymentWrapper(outgoing) else null,
-        spliceOutgoing = if (outgoing is SpliceOutgoingPayment) SpliceOutgoingPaymentWrapper(outgoing) else null,
-        channelClose = if (outgoing is ChannelCloseOutgoingPayment) ChannelClosePaymentWrapper(outgoing) else null,
-        spliceCpfp = if (outgoing is SpliceCpfpOutgoingPayment) SpliceCpfpPaymentWrapper(outgoing) else null,
-        inboundLegacyLiquidity = null,
-        inboundPurchaseLiquidity = if (outgoing is InboundLiquidityOutgoingPayment) InboundLiquidityPaymentWrapper(outgoing) else null,
-        version = CloudDataVersion.V0.value,
-        padding = ByteArray(size = 0)
-    )
+        /**
+         * This function exists because the Kotlin-generated
+         * copy function doesn't translate to iOS very well.
+         */
+        fun copyWithPadding(padding: ByteArray): CloudData.V0 {
+            return this.copy(padding = padding)
+        }
 
-    /**
-     * This function exists because the Kotlin-generated
-     * copy function doesn't translate to iOS very well.
-     */
-    fun copyWithPadding(padding: ByteArray): CloudData {
-        return this.copy(padding = padding)
+        @Throws(Exception::class)
+        fun unwrap(): WalletPayment? = when {
+            incoming != null -> incoming.unwrap()
+            outgoing != null -> outgoing.unwrap()
+            spliceOutgoing != null -> spliceOutgoing.unwrap()
+            channelClose != null -> channelClose.unwrap()
+            spliceCpfp != null -> spliceCpfp.unwrap()
+            inboundLegacyLiquidity != null -> inboundLegacyLiquidity.unwrap()
+            inboundPurchaseLiquidity != null -> inboundPurchaseLiquidity.unwrap()
+            else -> null
+        }
+
+        override fun serialize(): ByteArray = throw NotImplementedError("cannot create V0 cloud data anymore")
+
+        companion object {
+            @OptIn(ExperimentalSerializationApi::class)
+            private fun cborDeserialize(blob: ByteArray): CloudData {
+                return cborSerializer().decodeFromByteArray(blob)
+            }
+        }
     }
 
-    @Throws(Exception::class)
-    fun unwrap(): WalletPayment? = when {
-        incoming != null -> incoming.unwrap()
-        outgoing != null -> outgoing.unwrap()
-        spliceOutgoing != null -> spliceOutgoing.unwrap()
-        channelClose != null -> channelClose.unwrap()
-        spliceCpfp != null -> spliceCpfp.unwrap()
-        inboundLegacyLiquidity != null -> inboundLegacyLiquidity.unwrap()
-        inboundPurchaseLiquidity != null -> inboundPurchaseLiquidity.unwrap()
-        else -> null
+    data class V1(val payment: WalletPayment) : CloudData() {
+        override fun serialize(): ByteArray {
+            val version = byteArrayOf(1.toByte())
+            val serializedDate = Serialization.serialize(payment)
+            return version + serializedDate
+        }
     }
 
-    companion object
-}
-
-@OptIn(ExperimentalSerializationApi::class)
-fun CloudData.cborSerialize(): ByteArray {
-    return Cbor.encodeToByteArray(this)
-}
-
-@OptIn(ExperimentalSerializationApi::class)
-@Throws(Exception::class)
-fun CloudData.Companion.cborDeserialize(
-    blob: ByteArray
-): CloudData {
-    return cborSerializer().decodeFromByteArray(blob)
+    abstract fun serialize(): ByteArray
+    companion object {
+        @OptIn(ExperimentalSerializationApi::class)
+        fun deserialize(data: ByteArray): CloudData? {
+            return kotlin.runCatching {
+                when (val version = data.first()) {
+                    1.toByte() -> {
+                        val serializedData = data.sliceArray(1..<data.size)
+                        V1(Serialization.deserialize(serializedData).getOrThrow())
+                    }
+                    else -> {
+                        throw IllegalArgumentException("unknown version: $version")
+                    }
+                }
+            }.recoverCatching {
+                cborSerializer().decodeFromByteArray<V0>(data)
+            }.getOrNull()
+        }
+    }
 }
 
 /**

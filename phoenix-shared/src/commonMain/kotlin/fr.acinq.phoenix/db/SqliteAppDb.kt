@@ -12,8 +12,9 @@ import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.Notification
 import fr.acinq.phoenix.db.notifications.ContactQueries
 import fr.acinq.phoenix.db.notifications.NotificationsQueries
-import fracinqphoenixdb.Exchange_rates
-import fracinqphoenixdb.Notifications
+import fr.acinq.phoenix.db.sqldelight.AppDatabase
+import fr.acinq.phoenix.db.sqldelight.Exchange_rates
+import kotlin.collections.List
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

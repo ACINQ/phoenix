@@ -16,7 +16,6 @@
 
 package fr.acinq.phoenix.utils.extensions
 
-import fr.acinq.bitcoin.Chain
 import fr.acinq.lightning.Feature
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.Bolt12Invoice
@@ -30,19 +29,6 @@ fun Bolt11Invoice.isAmountlessTrampoline() = this.amount == null && this.feature
  * So we need to alias it.
  */
 fun Bolt11Invoice.desc(): String? = this.description
-
-val PaymentRequest.chain: Chain
-    get() = when (this) {
-        is Bolt11Invoice -> {
-            when (prefix) {
-                "lnbc" -> Chain.Mainnet
-                "lntb" -> Chain.Testnet3
-                "lnbcrt" -> Chain.Regtest
-                else -> throw IllegalArgumentException("unhandled invoice prefix=$prefix")
-            }
-        }
-        is Bolt12Invoice -> TODO()
-    }
 
 val PaymentRequest.desc: String?
     get() = when (this) {
