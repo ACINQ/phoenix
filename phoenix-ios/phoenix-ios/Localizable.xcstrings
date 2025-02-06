@@ -4993,6 +4993,9 @@
         }
       }
     },
+    "A Tor VPN must be running on your device. This VPN is not provided by Phoenix. You need to install one." : {
+
+    },
     "Abort" : {
       "localizations" : {
         "ar" : {
@@ -7267,6 +7270,9 @@
         }
       }
     },
+    "Are you sure you want to proceed ?" : {
+
+    },
     "Are you sure you want to proceed?" : {
       "localizations" : {
         "ar" : {
@@ -8320,6 +8326,9 @@
           }
         }
       }
+    },
+    "Be advised" : {
+
     },
     "Be careful with messages from unknown sources" : {
       "localizations" : {
@@ -15536,6 +15545,9 @@
         }
       }
     },
+    "Disabling Tor" : {
+
+    },
     "Discard changes" : {
       "localizations" : {
         "ar" : {
@@ -17025,6 +17037,9 @@
           }
         }
       }
+    },
+    "Enabling this option will force Phoenix to only connect to onion services for Lightning and Electrum. Note that a Tor proxy application is required." : {
+
     },
     "End date" : {
       "localizations" : {
@@ -20907,6 +20922,9 @@
         }
       }
     },
+    "How it works" : {
+
+    },
     "How to use" : {
       "localizations" : {
         "ar" : {
@@ -21756,6 +21774,9 @@
           }
         }
       }
+    },
+    "If you disable Tor, your IP address may be revealed to various service providers." : {
+
     },
     "If you do not back it up and you lose access to Phoenix you will **lose your funds**!" : {
       "comment" : "BackupView",
@@ -43099,7 +43120,11 @@
         }
       }
     },
+    "Tor can improve privacy, but may cause performance issues and missed payments." : {
+
+    },
     "Tor is disabled" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -43140,6 +43165,7 @@
       }
     },
     "Tor is enabled" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -45184,6 +45210,12 @@
         }
       }
     },
+    "Use Tor" : {
+
+    },
+    "Using Tor" : {
+
+    },
     "Version %@" : {
       "localizations" : {
         "ar" : {
@@ -47032,6 +47064,9 @@
         }
       }
     },
+    "With Tor enabled, Phoenix will require onion addresses for Lightning and Electrum connections." : {
+
+    },
     "Would you like to be notified when somebody sends you a payment?" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -47440,6 +47475,7 @@
       }
     },
     "You can improve your privacy by only using Tor when connecting to an Electrum server or to your Lightning peer. This will slightly slow down your transactions." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
