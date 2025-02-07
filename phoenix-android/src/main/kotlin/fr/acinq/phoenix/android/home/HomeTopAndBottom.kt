@@ -62,7 +62,6 @@ fun TopBar(
     modifier: Modifier = Modifier,
     onConnectionsStateButtonClick: () -> Unit,
     connections: Connections,
-    electrumBlockheight: Int,
     onTorClick: () -> Unit,
     isFCMUnavailable: Boolean,
     isPowerSaverMode: Boolean,
@@ -82,7 +81,6 @@ fun TopBar(
         ConnectionBadge(
             onConnectionsStateButtonClick = onConnectionsStateButtonClick,
             connections = connections,
-            electrumBlockheight = electrumBlockheight,
             onTorClick = onTorClick,
         )
 
@@ -123,7 +121,6 @@ fun TopBar(
 private fun ConnectionBadge(
     onConnectionsStateButtonClick: () -> Unit,
     connections: Connections,
-    electrumBlockheight: Int,
     onTorClick: () -> Unit,
 ) {
     val torEnabled = userPrefs.getIsTorEnabled.collectAsState(initial = null)

@@ -238,7 +238,7 @@ private fun SpliceOutReadyView(
         Spacer(modifier = Modifier.height(16.dp))
     }
     val total = state.userAmount + state.estimatedFee
-    SpliceOutFeeSummaryView(fee = state.estimatedFee, total = total, userFeerate = state.userFeerate, actualFeerate = state.actualFeerate)
+    SpliceOutFeeSummaryView(fee = state.estimatedFee, total = total, actualFeerate = state.actualFeerate)
 
     Spacer(modifier = Modifier.height(24.dp))
 
@@ -258,7 +258,6 @@ private fun SpliceOutReadyView(
 @Composable
 private fun SpliceOutFeeSummaryView(
     fee: Satoshi,
-    userFeerate: FeeratePerKw,
     actualFeerate: FeeratePerKw,
     total: Satoshi,
 ) {

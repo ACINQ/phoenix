@@ -124,7 +124,7 @@ fun ContactDetailsView(
 @Composable
 private fun ContactNameAndPhoto(
     contact: ContactInfo,
-    currentOffer: OfferTypes.Offer?,
+    @Suppress("UNUSED_PARAMETER") currentOffer: OfferTypes.Offer?,
     onContactChange: ((ContactInfo?) -> Unit)?,
     onDismiss: () -> Unit,
     onOffersClick: () -> Unit,

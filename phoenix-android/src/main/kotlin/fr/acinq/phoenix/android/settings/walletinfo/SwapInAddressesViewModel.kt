@@ -68,7 +68,6 @@ class SwapInAddressesViewModel(private val peerManager: PeerManager) : ViewModel
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-            val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as? PhoenixApplication)
             @Suppress("UNCHECKED_CAST")
             return SwapInAddressesViewModel(peerManager) as T
         }

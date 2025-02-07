@@ -44,7 +44,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -121,12 +120,12 @@ class DailyConnect(context: Context, workerParams: WorkerParameters) : Coroutine
                                 log.info("node service in state=${state.name}, starting an isolated business")
 
                                 jobWatchingChannels = launch {
-                                    WorkerHelper.startIsolatedBusiness(application, business!!, encryptedSeed, userPrefs)
+                                    WorkerHelper.startIsolatedBusiness(business!!, encryptedSeed, userPrefs)
 
                                     business?.connectionsManager?.connections?.first { it.global is Connection.ESTABLISHED }
                                     log.debug("connections established")
 
-                                    business?.peerManager?.channelsFlow?.filterNotNull()?.collectIndexed { index, channels ->
+                                    business?.peerManager?.channelsFlow?.filterNotNull()?.collect { channels ->
                                         when {
                                             channels.isEmpty() -> {
                                                 log.info("completing $name: no channels found")

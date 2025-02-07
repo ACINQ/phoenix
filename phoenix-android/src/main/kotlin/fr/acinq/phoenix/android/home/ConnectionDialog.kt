@@ -58,7 +58,6 @@ import fr.acinq.phoenix.utils.extensions.isOnion
 @Composable
 fun ConnectionDialog(
     connections: Connections,
-    electrumBlockheight: Int,
     onClose: () -> Unit,
     onTorClick: () -> Unit,
     onElectrumClick: () -> Unit,

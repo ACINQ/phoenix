@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package fr.acinq.phoenix.android.payments.details.splash
 
 import androidx.compose.foundation.layout.Spacer
@@ -37,8 +39,6 @@ import fr.acinq.phoenix.android.utils.extensions.smartDescription
 import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.utils.extensions.state
 
-
-@Suppress("DEPRECATION")
 @Composable
 fun SplashIncomingLegacyPayToOpen(
     payment: LegacyPayToOpenIncomingPayment,
@@ -55,7 +55,6 @@ fun SplashIncomingLegacyPayToOpen(
     SplashFee(payment)
 }
 
-@Suppress("DEPRECATION")
 @Composable
 private fun SplashFee(payment: LegacyPayToOpenIncomingPayment) {
     val serviceFee = payment.parts.filterIsInstance<LegacyPayToOpenIncomingPayment.Part.OnChain>().map { it.serviceFee }.sum()

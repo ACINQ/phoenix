@@ -105,7 +105,6 @@ fun FinalWalletRefundView(
                         }
                     }
                     AvailableForRefund(
-                        availableForRefund = available,
                         state = state,
                         onResetState = { vm.state.value = FinalWalletRefundState.Init },
                         onEstimateRefundFee = vm::estimateRefundFee,
@@ -166,7 +165,6 @@ private fun AddressInputAndFeeSlider(
 
 @Composable
 private fun ColumnScope.AvailableForRefund(
-    availableForRefund: Satoshi,
     state: FinalWalletRefundState,
     onResetState: () -> Unit,
     onEstimateRefundFee: (String, FeeratePerByte) -> Unit,

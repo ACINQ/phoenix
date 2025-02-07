@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
 
 package fr.acinq.phoenix.android.settings.channels
-
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -118,7 +118,6 @@ private fun NoChannelFound() {
 private fun ChannelSummaryView(
     channel: LocalChannelInfo
 ) {
-    val btcUnit = LocalBitcoinUnit.current
     var showJsonDialog by remember { mutableStateOf(false) }
 
     if (showJsonDialog) {
