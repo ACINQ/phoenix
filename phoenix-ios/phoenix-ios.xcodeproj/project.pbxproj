@@ -35,6 +35,7 @@
 		DC09085825B5E43900A46136 /* String+VersionComparison.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC09085725B5E43900A46136 /* String+VersionComparison.swift */; };
 		DC09086325B626B300A46136 /* AppStatusPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC09086225B626B300A46136 /* AppStatusPopover.swift */; };
 		DC0994B0263A074C003031CA /* InfoGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0994AF263A074C003031CA /* InfoGrid.swift */; };
+		DC09FC392D56A0BA00E6579A /* CustomElectrumServerObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC09FC372D56A0B700E6579A /* CustomElectrumServerObserver.swift */; };
 		DC0C52662BF3C31700143831 /* WhichPinSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0C52652BF3C31700143831 /* WhichPinSheet.swift */; };
 		DC0C52682BF4FF6100143831 /* AuthenticateWithPinSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0C52672BF4FF6100143831 /* AuthenticateWithPinSheet.swift */; };
 		DC0D2EA52939269800284608 /* KotlinExtensions+CloudKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0D2EA42939269800284608 /* KotlinExtensions+CloudKit.swift */; };
@@ -189,7 +190,7 @@
 		DC6F19BF2C46FB0F004EC469 /* NSItemProvider+Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F19BE2C46FB0F004EC469 /* NSItemProvider+Async.swift */; };
 		DC6F19C12C470F70004EC469 /* PickerResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F19C02C470F70004EC469 /* PickerResult.swift */; };
 		DC70A99C2BBB6093002DBFF8 /* InboundFeeWarning.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC70A99B2BBB6093002DBFF8 /* InboundFeeWarning.swift */; };
-		DC71E7302723240E0063613D /* KotlinObservables.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC71E72F2723240E0063613D /* KotlinObservables.swift */; };
+		DC71E7302723240E0063613D /* ObservableConnectionsMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC71E72F2723240E0063613D /* ObservableConnectionsMonitor.swift */; };
 		DC71E7332728645B0063613D /* CurrencyConverterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC71E7322728645B0063613D /* CurrencyConverterView.swift */; };
 		DC71E7352728A5720063613D /* KotlinIdentifiable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC71E7342728A5720063613D /* KotlinIdentifiable.swift */; };
 		DC72C2F125A3CBD6008A927A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DC72C2F025A3CBD6008A927A /* GoogleService-Info.plist */; };
@@ -463,6 +464,7 @@
 		DC09085725B5E43900A46136 /* String+VersionComparison.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+VersionComparison.swift"; sourceTree = "<group>"; };
 		DC09086225B626B300A46136 /* AppStatusPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStatusPopover.swift; sourceTree = "<group>"; };
 		DC0994AF263A074C003031CA /* InfoGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoGrid.swift; sourceTree = "<group>"; };
+		DC09FC372D56A0B700E6579A /* CustomElectrumServerObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomElectrumServerObserver.swift; sourceTree = "<group>"; };
 		DC0C52652BF3C31700143831 /* WhichPinSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhichPinSheet.swift; sourceTree = "<group>"; };
 		DC0C52672BF4FF6100143831 /* AuthenticateWithPinSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticateWithPinSheet.swift; sourceTree = "<group>"; };
 		DC0D2EA42939269800284608 /* KotlinExtensions+CloudKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KotlinExtensions+CloudKit.swift"; sourceTree = "<group>"; };
@@ -600,7 +602,7 @@
 		DC6F19BE2C46FB0F004EC469 /* NSItemProvider+Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSItemProvider+Async.swift"; sourceTree = "<group>"; };
 		DC6F19C02C470F70004EC469 /* PickerResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerResult.swift; sourceTree = "<group>"; };
 		DC70A99B2BBB6093002DBFF8 /* InboundFeeWarning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboundFeeWarning.swift; sourceTree = "<group>"; };
-		DC71E72F2723240E0063613D /* KotlinObservables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinObservables.swift; sourceTree = "<group>"; };
+		DC71E72F2723240E0063613D /* ObservableConnectionsMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservableConnectionsMonitor.swift; sourceTree = "<group>"; };
 		DC71E7322728645B0063613D /* CurrencyConverterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverterView.swift; sourceTree = "<group>"; };
 		DC71E7342728A5720063613D /* KotlinIdentifiable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinIdentifiable.swift; sourceTree = "<group>"; };
 		DC72C2B925A3A450008A927A /* Phoenix.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Phoenix.entitlements; sourceTree = "<group>"; };
@@ -1069,24 +1071,25 @@
 		DC46BAEC26CACCF700E760A6 /* kotlin */ = {
 			isa = PBXGroup;
 			children = (
+				DC09FC372D56A0B700E6579A /* CustomElectrumServerObserver.swift */,
 				DC46BAF226CACCF700E760A6 /* KotlinAssociatedObject.swift */,
+				DC3780382C04D60400937C8E /* KotlinEnums.swift */,
+				DC49FE982AC49C6300D8D2E2 /* KotlinExtensions+Bitcoin.swift */,
 				DC0D2EA42939269800284608 /* KotlinExtensions+CloudKit.swift */,
 				DC46BAF126CACCF700E760A6 /* KotlinExtensions+Conversion.swift */,
 				DC16965E27FE0FAC003DE1DD /* KotlinExtensions+Currency.swift */,
-				DC0D2EA62939273B00284608 /* KotlinExtensions+Payments.swift */,
+				DC49FE9A2AC49CB500D8D2E2 /* KotlinExtensions+Lightning.swift */,
 				DC5631C62C5944CF00DCB5BF /* KotlinExtensions+Manager.swift */,
 				DC46BAED26CACCF700E760A6 /* KotlinExtensions+Other.swift */,
-				DC49FE9A2AC49CB500D8D2E2 /* KotlinExtensions+Lightning.swift */,
-				DC49FE982AC49C6300D8D2E2 /* KotlinExtensions+Bitcoin.swift */,
+				DC0D2EA62939273B00284608 /* KotlinExtensions+Payments.swift */,
 				DC46BAEE26CACCF700E760A6 /* KotlinFlow.swift */,
 				DC46BAF026CACCF700E760A6 /* KotlinFutures.swift */,
 				DC71E7342728A5720063613D /* KotlinIdentifiable.swift */,
-				DC71E72F2723240E0063613D /* KotlinObservables.swift */,
-				DC46BAEF26CACCF700E760A6 /* KotlinPublishers+Phoenix.swift */,
-				DCB62F462A5DF19D00912A71 /* KotlinPublishers+Lightning.swift */,
-				DC74174A270F332700F7E3E3 /* KotlinTypes.swift */,
 				DCCFE6A32B63021E002FFF11 /* KotlinLogger.swift */,
-				DC3780382C04D60400937C8E /* KotlinEnums.swift */,
+				DCB62F462A5DF19D00912A71 /* KotlinPublishers+Lightning.swift */,
+				DC46BAEF26CACCF700E760A6 /* KotlinPublishers+Phoenix.swift */,
+				DC74174A270F332700F7E3E3 /* KotlinTypes.swift */,
+				DC71E72F2723240E0063613D /* ObservableConnectionsMonitor.swift */,
 			);
 			path = kotlin;
 			sourceTree = "<group>";
@@ -1946,7 +1949,7 @@
 				DC1916B029CB6C1D00917F06 /* Text_CurrencyName.swift in Sources */,
 				DCD7E0AF28EC3C0D009C30E5 /* WatchTower.swift in Sources */,
 				DCB493CB269F3B06001B0F09 /* Result+Deugly.swift in Sources */,
-				DC71E7302723240E0063613D /* KotlinObservables.swift in Sources */,
+				DC71E7302723240E0063613D /* ObservableConnectionsMonitor.swift in Sources */,
 				DC0C52682BF4FF6100143831 /* AuthenticateWithPinSheet.swift in Sources */,
 				DC0D2EA52939269800284608 /* KotlinExtensions+CloudKit.swift in Sources */,
 				DC5E28CC2C63EF8E0037B3D3 /* NavigationLink_16.swift in Sources */,
@@ -1981,6 +1984,7 @@
 				DC5567452C2F1A6900008E11 /* ContactsList.swift in Sources */,
 				53BEF4D5663CD782DC63DF63 /* AppColors.swift in Sources */,
 				DC27E4CC2791D17A00C777CC /* CloudBackupView.swift in Sources */,
+				DC09FC392D56A0BA00E6579A /* CustomElectrumServerObserver.swift in Sources */,
 				DC118BFE27B451890080BBAC /* MetadataSheet.swift in Sources */,
 				DCFD079126D84A380020DD8E /* HorizontalActivity.swift in Sources */,
 				DC641C6D2820826000862DCD /* AppMigration.swift in Sources */,

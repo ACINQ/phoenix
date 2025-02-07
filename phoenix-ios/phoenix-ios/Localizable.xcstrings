@@ -9464,6 +9464,7 @@
       }
     },
     "By default, Phoenix connects to random Electrum servers in order to access the Bitcoin blockchain. You can also choose to connect to your own Electrum server." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -43005,6 +43006,9 @@
         }
       }
     },
+    "To secure your payment channels Phoenix monitors the Bitcoin blockchain through Electrum servers.\n\nBy default, random servers are used. You can also configure Phoenix to connect only to your own server." : {
+
+    },
     "to speed up on-chain payments" : {
       "localizations" : {
         "ar" : {
@@ -43209,6 +43213,9 @@
           }
         }
       }
+    },
+    "Tor is enabled. This server should use an onion address." : {
+
     },
     "Tor Settings" : {
       "comment" : "Navigation bar title",
