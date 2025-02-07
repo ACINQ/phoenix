@@ -27,7 +27,7 @@ import fr.acinq.phoenix.utils.MnemonicLanguage
 import kotlinx.coroutines.flow.first
 
 object WorkerHelper {
-    suspend fun startIsolatedBusiness(context: Context, business: PhoenixBusiness, encryptedSeed: EncryptedSeed.V2.NoAuth, userPrefs: UserPrefsRepository) {
+    suspend fun startIsolatedBusiness(business: PhoenixBusiness, encryptedSeed: EncryptedSeed.V2.NoAuth, userPrefs: UserPrefsRepository) {
         val mnemonics = encryptedSeed.decrypt()
 
         // retrieve preferences before starting business

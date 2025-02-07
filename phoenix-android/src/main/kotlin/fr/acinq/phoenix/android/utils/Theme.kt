@@ -350,7 +350,6 @@ fun updateScreenBrightnesss(context: Context, toMax: Boolean) {
 @Composable
 fun appBackground(): Brush {
     // -- gradient Brush
-    val isDark = isDarkTheme
     return Brush.linearGradient(
         0.2f to topGradientColor,
         1.0f to bottomGradientColor,

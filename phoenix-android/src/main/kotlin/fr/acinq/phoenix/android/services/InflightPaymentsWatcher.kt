@@ -136,7 +136,7 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
                                     log.info("node service in state=${state.name}, starting an isolated business")
 
                                     jobChannelsWatcher = launch {
-                                        WorkerHelper.startIsolatedBusiness(application, business!!, encryptedSeed, userPrefs)
+                                        WorkerHelper.startIsolatedBusiness(business!!, encryptedSeed, userPrefs)
 
                                         business?.connectionsManager?.connections?.first { it.global is Connection.ESTABLISHED }
                                         log.debug("connections established, watching channels for in-flight payments...")

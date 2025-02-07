@@ -188,6 +188,7 @@ fun AppView(
                             navArgument("next") { type = NavType.StringType; nullable = true }
                         ),
                     ) {
+                        @Suppress("DEPRECATION")
                         val intent = try {
                             it.arguments?.getParcelable<Intent>(NavController.KEY_DEEP_LINK_INTENT)
                         } catch (e: Exception) {
@@ -252,7 +253,6 @@ fun AppView(
                     }
                     composable(Screen.Receive.route) {
                         ReceiveView(
-                            onSwapInReceived = { navController.popToHome() },
                             onBackClick = { navController.popBackStack() },
                             onScanDataClick = { navController.navigate(Screen.Send.route) },
                             onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) },
@@ -276,6 +276,7 @@ fun AppView(
                             navDeepLink { uriPattern = "scanview:{data}" },
                         )
                     ) {
+                        @Suppress("DEPRECATION")
                         val intent = try {
                             it.arguments?.getParcelable<Intent>(NavController.KEY_DEEP_LINK_INTENT)
                         } catch (e: Exception) {

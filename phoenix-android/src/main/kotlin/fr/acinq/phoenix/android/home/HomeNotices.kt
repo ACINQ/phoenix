@@ -60,7 +60,6 @@ fun HomeNotices(
     notices: List<Notice>,
     notifications: List<Pair<Set<UUID>, Notification>>,
     onNavigateToSwapInWallet: () -> Unit,
-    onNavigateToFinalWallet: () -> Unit,
     onNavigateToNotificationsList: () -> Unit,
 ) {
     val filteredNotices = remember(notices) { notices.filterIsInstance<Notice.ShowInHome>().sortedBy { it.priority } }
@@ -80,7 +79,6 @@ fun HomeNotices(
                 notice = it,
                 messagesCount = notices.size + notifications.size,
                 onNavigateToSwapInWallet = onNavigateToSwapInWallet,
-                onNavigateToFinalWallet = onNavigateToFinalWallet,
                 onNavigateToNotificationsList = onNavigateToNotificationsList
             )
         }
@@ -94,7 +92,6 @@ private fun FirstNoticeView(
     notice: Notice.ShowInHome,
     messagesCount: Int,
     onNavigateToSwapInWallet: () -> Unit,
-    onNavigateToFinalWallet: () -> Unit,
     onNavigateToNotificationsList: () -> Unit,
 ) {
     val context = LocalContext.current

@@ -85,7 +85,6 @@ fun StartupView(
     onKeyAbsent: () -> Unit,
     onBusinessStarted: () -> Unit,
 ) {
-    val context = LocalContext.current
     val serviceState by appVM.serviceState.observeAsState()
 
     val showIntroState = internalData.getShowIntro.collectAsState(initial = null)
@@ -134,7 +133,6 @@ private fun DecryptSeedAndStartBusiness(
     onKeyAbsent: () -> Unit,
 ) {
     val context = LocalContext.current
-    val log = logger("StartupView")
     val vm = viewModel<StartupViewModel>()
 
     val seedFileState = produceState<SeedFileState>(initialValue = SeedFileState.Unknown, true) {

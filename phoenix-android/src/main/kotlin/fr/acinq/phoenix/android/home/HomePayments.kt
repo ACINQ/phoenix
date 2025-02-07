@@ -42,7 +42,6 @@ import fr.acinq.phoenix.managers.WalletBalance
 @Composable
 fun ColumnScope.PaymentsList(
     modifier: Modifier = Modifier,
-    swapInBalance: WalletBalance,
     balanceDisplayMode: HomeAmountDisplayMode,
     onPaymentClick: (UUID) -> Unit,
     onPaymentsHistoryClick: () -> Unit,

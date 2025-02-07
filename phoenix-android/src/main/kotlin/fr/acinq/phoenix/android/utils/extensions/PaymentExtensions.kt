@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package fr.acinq.phoenix.android.utils.extensions
 
 import androidx.compose.runtime.Composable

@@ -20,15 +20,11 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,7 +34,6 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.Dimension
 import androidx.constraintlayout.compose.MotionLayout
@@ -50,23 +45,16 @@ import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.NoticesViewModel
 import fr.acinq.phoenix.android.PaymentsViewModel
-import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.Dialog
 import fr.acinq.phoenix.android.components.PrimarySeparator
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.home.releasenotes.ReleaseNoteDialog
-import fr.acinq.phoenix.android.internalData
 import fr.acinq.phoenix.android.utils.FCMHelper
-import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
 import fr.acinq.phoenix.android.utils.extensions.findActivity
 import fr.acinq.phoenix.data.canRequestLiquidity
 import fr.acinq.phoenix.data.inFlightPaymentsCount
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 
 @Composable
 fun HomeView(
@@ -94,7 +82,6 @@ fun HomeView(
     val balanceDisplayMode by userPrefs.getHomeAmountDisplayMode.collectAsState(initial = HomeAmountDisplayMode.REDACTED)
 
     val connections by business.connectionsManager.connections.collectAsState()
-    val electrumMessages by business.appConfigurationManager.electrumMessages.collectAsState()
     val channels by business.peerManager.channelsFlow.collectAsState()
     val inFlightPaymentsCount = remember(channels) { channels.inFlightPaymentsCount() }
 
@@ -102,7 +89,6 @@ fun HomeView(
     if (showConnectionsDialog) {
         ConnectionDialog(
             connections = connections,
-            electrumBlockheight = electrumMessages?.blockHeight ?: 0,
             onClose = { showConnectionsDialog = false },
             onTorClick = onTorClick,
             onElectrumClick = onElectrumClick
@@ -226,7 +212,6 @@ fun HomeView(
                     modifier = Modifier.layoutId("topBar"),
                     onConnectionsStateButtonClick = { showConnectionsDialog = true },
                     connections = connections,
-                    electrumBlockheight = electrumMessages?.blockHeight ?: 0,
                     inFlightPaymentsCount = inFlightPaymentsCount,
                     onTorClick = onTorClick,
                     isFCMUnavailable = fcmToken == null || !isFCMAvailable,
@@ -249,14 +234,12 @@ fun HomeView(
                     notices = notices.toList(),
                     notifications = notifications,
                     onNavigateToSwapInWallet = onNavigateToSwapInWallet,
-                    onNavigateToFinalWallet = onNavigateToFinalWallet,
                     onNavigateToNotificationsList = onShowNotifications,
                 )
             }
 
             PaymentsList(
                 modifier = Modifier.nestedScroll(nestedScrollConnection),
-                swapInBalance = swapInBalance.value,
                 balanceDisplayMode = balanceDisplayMode,
                 onPaymentClick = onPaymentClick,
                 onPaymentsHistoryClick = onPaymentsHistoryClick,
