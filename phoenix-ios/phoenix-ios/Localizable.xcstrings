@@ -12102,7 +12102,7 @@
       }
     },
     "Connected" : {
-      "comment" : "Connection state\nConnection status",
+      "comment" : "Connection state",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -12307,7 +12307,7 @@
       }
     },
     "Connecting…" : {
-      "comment" : "Connection state\nConnection status",
+      "comment" : "Connection state",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -23229,6 +23229,9 @@
         }
       }
     },
+    "Invalid address" : {
+      "comment" : "Connection state"
+    },
     "Invalid BIP353 DNS address" : {
       "comment" : "Error message - dns record contains an invalid offer",
       "extractionState" : "stale",
@@ -28578,7 +28581,7 @@
       }
     },
     "Offline" : {
-      "comment" : "Connection state\nConnection status",
+      "comment" : "Connection state",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

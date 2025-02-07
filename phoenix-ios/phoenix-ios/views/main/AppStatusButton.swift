@@ -13,7 +13,8 @@ struct AppStatusButton: View {
 	let headerButtonHeightReader: GeometryPreferenceReader<AppendValue<HeaderButtonHeight>, [CGFloat]>
 	@Binding var headerButtonHeight: CGFloat?
 	
-	@State var dimStatus = false
+	@State var isTorEnabled: Bool = Biz.business.appConfigurationManager.isTorEnabledValue
+	@State var electrumConfig: ElectrumConfig = Biz.business.appConfigurationManager.electrumConfigValue
 	
 	@State var syncState: SyncBackupManager_State = .initializing
 	@State var pendingSettings: SyncBackupManager_PendingSettings? = nil
@@ -61,6 +62,12 @@ struct AppStatusButton: View {
 		.onReceive(syncBackupManager.pendingSettingsPublisher) {
 			syncBackupManagerPendingSettingsChanged($0)
 		}
+		.onReceive(Biz.business.appConfigurationManager.isTorEnabledPublisher()) {
+			isTorEnabledChanged($0)
+		}
+		.onReceive(Biz.business.appConfigurationManager.electrumConfigPublisher()) {
+			electrumConfigChanged($0)
+		}
 	}
 	
 	@ViewBuilder
@@ -85,7 +92,18 @@ struct AppStatusButton: View {
 	func buttonContent() -> some View {
 		
 		let connectionStatus = connectionsMonitor.connections.global
-		if connectionStatus.isClosed() {
+		
+		if isInvalidElectrumAddress {
+			HStack(alignment: .firstTextBaseline, spacing: 0) {
+				Text(NSLocalizedString("Invalid address", comment: "Connection state"))
+					.font(.caption2)
+					.padding(.leading, 10)
+					.padding(.trailing, -5)
+				AppStatusButtonIcon.invalidElectrumAddress.view()
+					.frame(minHeight: headerButtonHeight)
+					.squareFrame()
+			}
+		} else if connectionStatus.isClosed() {
 			HStack(alignment: .firstTextBaseline, spacing: 0) {
 				if showText {
 					Text(NSLocalizedString("Offline", comment: "Connection state"))
@@ -147,6 +165,17 @@ struct AppStatusButton: View {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
+	var isInvalidElectrumAddress: Bool {
+		
+		if isTorEnabled {
+			if let customConfig = electrumConfig as? ElectrumConfig.Custom {
+				return !customConfig.server.isOnion && customConfig.requireOnionIfTorEnabled
+			}
+		}
+	
+		return false
+	}
+	
 	func buttonizeSyncStatus() -> (Bool, Bool, Bool) {
 		
 		var isSyncing = false
@@ -198,6 +227,18 @@ struct AppStatusButton: View {
 		log.trace("syncBackupManagerPendingSettingsChanged()")
 		
 		pendingSettings = newPendingSettings
+	}
+	
+	func isTorEnabledChanged(_ newValue: Bool) {
+		log.trace("isTorEnabledChanged(\(newValue))")
+		
+		isTorEnabled = newValue
+	}
+	
+	func electrumConfigChanged(_ newValue: ElectrumConfig) {
+		log.trace("electrumConfigChanged()")
+		
+		electrumConfig = newValue
 	}
 	
 	// --------------------------------------------------
@@ -269,7 +310,8 @@ fileprivate enum AppStatusButtonIcon: CaseIterable, Identifiable {
 	case connectedWithTor
 	case syncing
 	case waiting
-	case error;
+	case error
+	case invalidElectrumAddress;
 
 	var id: Self { self }
 
@@ -307,6 +349,11 @@ fileprivate enum AppStatusButtonIcon: CaseIterable, Identifiable {
 				.padding(.all, 7)
 		case .error:
 			Image(systemName: "exclamationmark.triangle")
+				.imageScale(.large)
+				.font(.caption2)
+				.padding(.all, 7)
+		case .invalidElectrumAddress:
+			Image(systemName: "shield.lefthalf.filled.slash")
 				.imageScale(.large)
 				.font(.caption2)
 				.padding(.all, 7)

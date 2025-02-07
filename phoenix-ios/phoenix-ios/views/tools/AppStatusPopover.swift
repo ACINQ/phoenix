@@ -14,7 +14,8 @@ struct AppStatusPopover: View {
 
 	@StateObject var connectionsMonitor = ObservableConnectionsMonitor()
 	
-	@State var isTorEnabled = GroupPrefs.shared.isTorEnabled
+	@State var isTorEnabled: Bool = Biz.business.appConfigurationManager.isTorEnabledValue
+	@State var electrumConfig: ElectrumConfig = Biz.business.appConfigurationManager.electrumConfigValue
 	
 	@State var srvExtConnectedToPeer = Biz.srvExtConnectedToPeer.value
 	
@@ -22,6 +23,7 @@ struct AppStatusPopover: View {
 	@State var pendingSettings: SyncBackupManager_PendingSettings? = nil
 	
 	@EnvironmentObject var popoverState: PopoverState
+	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	let syncManager = Biz.syncManager!.syncBackupManager
 	
@@ -64,7 +66,7 @@ struct AppStatusPopover: View {
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 			
-			connectionStatusSection()
+			connectionStatus_section()
 				.padding([.top, .leading, .trailing])
 			
 			Divider()
@@ -88,72 +90,110 @@ struct AppStatusPopover: View {
 	}
 	
 	@ViewBuilder
-	func connectionStatusSection() -> some View {
+	func connectionStatus_section() -> some View {
 		
 		VStack(alignment: .leading) {
 			
-			let (txt, img) = connectionStatusHeader()
-			Label {
-				Text(verbatim: txt)
-			} icon: {
-				Image(systemName: img)
-					.imageScale(.medium)
-					.read(titleIconWidthReader)
-					.frame(width: titleIconWidth, alignment: .center)
-			}
-			.font(.title3)
-			.padding(.bottom, 15)
-			.accessibilityLabel("Connection status: \(txt)")
+			connectionStatus_header()
+				.padding(.bottom, 15)
 			
-			ConnectionCell(
-				connection: connectionsMonitor.connections.internet,
-				label: "Internet"
-			)
-			.padding(.bottom, 8)
+			connectionStatus_cell_internet()
+				.padding(.bottom, 8)
 			
-			ConnectionCell(
-				connection: connectionsMonitor.connections.peer,
-				label: "Lightning peer",
-				status: srvExtConnectedToPeer ? "Receiving in background…" : nil
-			)
-			.padding(.bottom, 8)
+			connectionStatus_cell_peer()
+				.padding(.bottom, 8)
 			
-			ConnectionCell(
-				connection: connectionsMonitor.connections.electrum,
-				label: "Electrum server"
-			)
+			connectionStatus_cell_electrum()
 			
 			if isTorEnabled {
-				torWarning()
+				connectionStatus_torWarning()
 			}
 		
 		} // </VStack>
 	}
 	
-	func connectionStatusHeader() -> (String, String) {
+	@ViewBuilder
+	func connectionStatus_header() -> some View {
 		
 		let globalStatus = connectionsMonitor.connections.global
-		let txt: String
-		let img: String
-		
-		if globalStatus.isClosed() {
-			txt = NSLocalizedString("Offline", comment: "Connection status")
-			img = "bolt.slash.fill"
+		Label {
+			Text(globalStatus.localizedText())
 			
-		} else if globalStatus.isEstablishing() {
-			txt = NSLocalizedString("Connecting…", comment: "Connection status")
-			img = "bolt.slash"
-			
-		} else {
-			txt = NSLocalizedString("Connected", comment: "Connection status")
-			img = "bolt.fill"
+		} icon: {
+			Group {
+				if globalStatus.isClosed() {
+					Image(systemName: "bolt.slash.fill")
+				} else if globalStatus.isEstablishing() {
+					Image(systemName: "bolt.slash")
+				} else {
+					Image(systemName: "bolt.fill")
+				}
+			}
+			.imageScale(.medium)
+			.read(titleIconWidthReader)
+			.frame(width: titleIconWidth, alignment: .center)
 		}
-		
-		return (txt, img)
+		.font(.title3)
+		.accessibilityLabel("Connection status: \(globalStatus.localizedText())")
 	}
 	
 	@ViewBuilder
-	func torWarning() -> some View {
+	func connectionStatus_cell_internet() -> some View {
+		
+		ConnectionCell(
+			connection: connectionsMonitor.connections.internet,
+			label: "Internet"
+		)
+	}
+	
+	@ViewBuilder
+	func connectionStatus_cell_peer() -> some View {
+		
+		if srvExtConnectedToPeer {
+			ConnectionCell(
+				connection: connectionsMonitor.connections.peer,
+				label: "Lightning peer",
+				status: {
+					Text("Receiving in background…")
+						.lineLimit(3)
+						.multilineTextAlignment(.trailing)
+						.fixedSize(horizontal: false, vertical: true) // text truncation bugs
+				}
+			)
+		} else {
+			ConnectionCell(
+				connection: connectionsMonitor.connections.peer,
+				label: "Lightning peer"
+			)
+		}
+	}
+	
+	@ViewBuilder
+	func connectionStatus_cell_electrum() -> some View {
+		
+		if isInvalidElectrumAddress {
+			ConnectionCell(
+				connection: connectionsMonitor.connections.electrum,
+				label: "Electrum server",
+				status: {
+					Text("Invalid address")
+						.foregroundStyle(Color.appAccent)
+						.lineLimit(3)
+						.multilineTextAlignment(.trailing)
+						.fixedSize(horizontal: false, vertical: true) // text truncation bugs
+				},
+				onTap: navigateToElectrumSettings
+			)
+		} else {
+			ConnectionCell(
+				connection: connectionsMonitor.connections.electrum,
+				label: "Electrum server"
+			)
+		}
+	}
+	
+	@ViewBuilder
+	func connectionStatus_torWarning() -> some View {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 0) {
 			VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
@@ -385,6 +425,17 @@ struct AppStatusPopover: View {
 		} // </VStack>
 	}
 	
+	var isInvalidElectrumAddress: Bool {
+		
+		if isTorEnabled {
+			if let customConfig = electrumConfig as? ElectrumConfig.Custom {
+				return !customConfig.server.isOnion && customConfig.requireOnionIfTorEnabled
+			}
+		}
+	
+		return false
+	}
+	
 	func srvExtConnectedToPeerChanged(_ newValue: Bool) {
 		log.trace("srvExtConnectedToPeerChanged()")
 		
@@ -403,6 +454,13 @@ struct AppStatusPopover: View {
 		pendingSettings = newPendingSettings
 	}
 	
+	func navigateToElectrumSettings() {
+		log.trace("navigateToElectrumSettings()")
+		
+		deepLinkManager.broadcast(.electrum)
+		popoverState.close()
+	}
+	
 	func closePopover() {
 		log.trace("closePopover()")
 		
@@ -410,16 +468,23 @@ struct AppStatusPopover: View {
 	}
 }
 
-fileprivate struct ConnectionCell: View {
+fileprivate struct ConnectionCell<Content: View>: View {
 	
 	let connection: Lightning_kmpConnection
 	let label: LocalizedStringKey
-	let status: LocalizedStringKey?
+	let status: Content
+	let onTap: (() -> Void)?
 	
-	init(connection: Lightning_kmpConnection, label: LocalizedStringKey, status: LocalizedStringKey? = nil) {
+	init(
+		connection: Lightning_kmpConnection,
+		label: LocalizedStringKey,
+		@ViewBuilder status: () -> Content = { EmptyView() },
+		onTap: (() -> Void)? = nil
+	) {
 		self.connection = connection
+		self.onTap = onTap
 		self.label = label
-		self.status = status
+		self.status = status()
 	}
 	
 	@ViewBuilder
@@ -449,11 +514,8 @@ fileprivate struct ConnectionCell: View {
 				.layoutPriority(2)
 			
 			Spacer()
-			if let status {
-				Text(status)
-					.lineLimit(3)
-					.multilineTextAlignment(.trailing)
-					.fixedSize(horizontal: false, vertical: true) // text truncation bugs
+			if !(status is EmptyView) {
+				status
 			} else {
 				Text(connection.localizedText())
 					.lineLimit(3)
@@ -465,6 +527,10 @@ fileprivate struct ConnectionCell: View {
 		} // </HStack>
 		.font(.callout)
 		.accessibilityElement(children: .combine)
+		.contentShape(Rectangle()) // make Spacer area tappable
+		.onTapGesture {
+			if let onTap { onTap() }
+		}
 	}
 }
 
