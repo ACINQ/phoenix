@@ -32,9 +32,6 @@ Phoenix is separated in 3 modules:
 
 Instructions to build the iOS and the Android apps are provided [here](https://github.com/ACINQ/phoenix/blob/master/BUILD.md).
 
-Deprecated module:
-- `phoenix-legacy`: contains the old, legacy Android application (version 1.x), using [eclair-core](https://github.com/ACINQ/eclair) for Lightning, which has been replaced by `phoenix-android`. However, this legacy app is still embedded in the new production application for migration purposes so the code remains. It will be removed eventually.
-
 ## Contribute
 
 We use GitHub for bug tracking. Search [the existing issues](https://github.com/ACINQ/phoenix/issues) for your bug and create a new one if needed.

@@ -92,7 +92,6 @@
     <string name="home_background_restriction_title">Hintergrundverarbeitung eingeschränkt</string>
     <string name="home_background_restriction_body_1">Phoenix kann keine Zahlungen empfangen, wenn es im Hintergrund läuft oder geschlossen ist.</string>
     <string name="home_background_restriction_body_2">Dies geschieht, weil:</string>
-    <string name="home_background_restriction_tor">Tor ist aktiviert</string>
     <string name="home_background_restriction_powersaver">Das Gerät ist im Energiesparmodus</string>
     <string name="home_background_restriction_fcm">FCM-Benachrichtigungen nicht verfügbar</string>
     <string name="home_background_restriction_fcm_details">Wenn Sie GrapheneOS oder CalyxOS verwenden, installieren Sie Google Play Services, um FCM-Benachrichtigungen zu erhalten. Lesen Sie die FAQ für Hilfe.</string>
@@ -168,7 +167,6 @@
 
     <string name="receive_tor_warning_title">Tor ist aktiviert</string>
     <string name="receive_tor_warning_dialog_content_1">Phoenix kann keine Zahlungen im Hintergrund empfangen.</string>
-    <string name="receive_tor_warning_dialog_content_2">Um Zahlungsausfälle zu vermeiden, verwenden Sie stattdessen Orbot, oder stellen Sie sicher, dass Phoenix im Vordergrund sichtbar bleibt, wenn Zahlungen an Sie gesendet werden.</string>
 
     <!-- scanning errors -->
 
@@ -205,11 +203,6 @@
     <string name="forceclose_button">Schließung all meiner Kanäle erzwingen</string>
 
     <!-- in-app notifications -->
-
-    <string name="inappnotif_migration_from_legacy">Glückwunsch! Ihre Wallet wurde aktualisiert.</string>
-    <string name="inappnotif_migration_from_legacy_action">Änderungen einsehen</string>
-    <string name="inappnotif_migration_from_legacy_dialog_title">Ihre On-Chain Bitcoin-Adresse hat sich geändert</string>
-    <string name="inappnotif_migration_from_legacy_dialog_body">Verwenden Sie Ihre alten Adressen NICHT wieder! Sie werden nicht mehr funktionieren.\n\nKontaktieren Sie den Support, wenn Sie dies versehentlich getan haben.</string>
 
     <string name="inappnotif_backup_seed_message">Erstellen Sie ein Backup Ihrer Wallet, um keine Bitcoins zu verlieren.</string>
     <string name="inappnotif_backup_seed_action">Wallet-Backup erstellen</string>
@@ -278,12 +271,6 @@
     <string name="lnurl_withdraw_success">Der Antrag auf Auszahlung wurde an <b>%1$s</b> übermittelt.\n\nEs kann einige Zeit dauern, bis das Guthaben überwiesen wird. Bitte lassen Sie die App in der Zwischenzeit geöffnet.</string>
 
     <!-- Tor -->
-
-    <string name="tor_settings_subtitle">Phoenix kann Tor verwenden, um Ihre IP vor den anderen Knoten im Lightning Netzwerk und den Electrum Servern zu schützen.</string>
-
-    <string name="tor_confirm_dialog_title">Tor aktivieren?</string>
-    <string name="tor_confirm_dialog_details_1">Tor ist langsam und wird die Leistung Ihrer Zahlungen beeinträchtigen.</string>
-    <string name="tor_confirm_dialog_details_2">Speziell werden Sie <b>keine Zahlungen empfangen können</b>, wenn Phoenix im Hintergrund läuft oder geschlossen ist.</string>
 
     <!-- about -->
 

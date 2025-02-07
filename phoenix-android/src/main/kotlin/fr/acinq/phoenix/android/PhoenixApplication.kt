@@ -16,23 +16,31 @@
 
 package fr.acinq.phoenix.android
 
+import android.app.Application
+import android.content.Context
 import android.content.Intent
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.utils.Logging
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
 import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
 import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
-import fr.acinq.phoenix.legacy.AppContext
-import fr.acinq.phoenix.legacy.internalData
-import fr.acinq.phoenix.legacy.userPrefs
-import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
 import fr.acinq.phoenix.utils.PlatformContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import org.slf4j.LoggerFactory
 
-class PhoenixApplication : AppContext() {
+/** This datastore persists user's preferences (theme, currencies, ...). */
+val Context.userPrefs: DataStore<Preferences> by preferencesDataStore(name = "userprefs")
+/** This datastore persists miscellaneous internal data representing various states of the app. */
+val Context.internalData: DataStore<Preferences> by preferencesDataStore(name = "internaldata")
 
+class PhoenixApplication : Application() {
+
+    private val log = LoggerFactory.getLogger(this::class.java)
     private val _business = MutableStateFlow<PhoenixBusiness?>(null)
     val business = _business.asStateFlow()
 
@@ -48,25 +56,18 @@ class PhoenixApplication : AppContext() {
         userPrefs = UserPrefsRepository(applicationContext.userPrefs)
     }
 
-    override fun onLegacyFinish() {
-        applicationContext.startActivity(Intent(applicationContext, MainActivity::class.java).apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        })
-    }
-
     fun shutdownBusiness() {
-        log.info("business=${business.value}")
+        log.debug("shutting down business={}", business.value)
         business.value?.appConnectionsDaemon?.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.All)
         business.value?.stop()
     }
     fun resetBusiness() {
         _business.value = PhoenixBusiness(PlatformContext(this))
-        log.info("business=$business")
+        log.debug("business has been reset to {}", business)
     }
 
     suspend fun clearPreferences() {
         internalDataRepository.clear()
         userPrefs.clear()
-        LegacyPrefsDatastore.clear(applicationContext)
     }
 }

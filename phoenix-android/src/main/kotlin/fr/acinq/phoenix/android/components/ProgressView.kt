@@ -36,9 +36,11 @@ fun ProgressView(
     progressCircleSize: Dp = 20.dp,
     progressCircleWidth: Dp = 2.dp,
     space: Dp = 8.dp,
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
 ) {
     Row(
         modifier.padding(padding),
+        horizontalArrangement = horizontalArrangement,
     ) {
         CircularProgressIndicator(Modifier.size(progressCircleSize), strokeWidth = progressCircleWidth)
         Spacer(Modifier.width(space))

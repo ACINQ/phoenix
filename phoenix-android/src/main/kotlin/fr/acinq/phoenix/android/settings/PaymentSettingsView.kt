@@ -58,7 +58,6 @@ fun PaymentSettingsView(
     var showDescriptionDialog by rememberSaveable { mutableStateOf(false) }
 
     val invoiceDefaultDesc by userPrefs.getInvoiceDefaultDesc.collectAsState(initial = "")
-    val invoiceDefaultExpiry by userPrefs.getInvoiceDefaultExpiry.collectAsState(null)
     val swapAddressFormatState = userPrefs.getSwapAddressFormat.collectAsState(initial = null)
 
     DefaultScreenLayout {
@@ -191,12 +190,12 @@ private fun Bolt11ExpiryPreference() {
         PreferenceItem(item = 14.days.inWholeSeconds, title = stringResource(id = R.string.paymentsettings_expiry_two_weeks)),
         PreferenceItem(item = 21.days.inWholeSeconds, title = stringResource(id = R.string.paymentsettings_expiry_three_weeks)),
     )
-    val expiry = userPrefs.getInvoiceDefaultExpiry.collectAsState(initial = null)
-    expiry.value?.let { expiry ->
+    val expiry by userPrefs.getInvoiceDefaultExpiry.collectAsState(initial = null)
+    expiry?.let {
         ListPreferenceButton(
             title = stringResource(id = R.string.paymentsettings_expiry_title),
             subtitle = {
-                Text(text = when (expiry) {
+                Text(text = when (it) {
                     1.hours.inWholeSeconds -> stringResource(id = R.string.paymentsettings_expiry_one_hour)
                     1.days.inWholeSeconds -> stringResource(id = R.string.paymentsettings_expiry_one_day)
                     7.days.inWholeSeconds -> stringResource(id = R.string.paymentsettings_expiry_one_week)
@@ -205,7 +204,7 @@ private fun Bolt11ExpiryPreference() {
                     else -> stringResource(id = R.string.paymentsettings_expiry_value, NumberFormat.getInstance().format(expiry))
                 })
             },
-            selectedItem = expiry,
+            selectedItem = it,
             preferences = preferences,
             enabled = true,
             onPreferenceSubmit = {

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package fr.acinq.phoenix.android.payments.details.splash
 
 import androidx.compose.foundation.layout.Spacer
@@ -36,7 +38,6 @@ import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.utils.extensions.state
 
 
-@Suppress("DEPRECATION")
 @Composable
 fun SplashIncomingLegacySwapIn(
     payment: LegacySwapInIncomingPayment,
@@ -53,7 +54,6 @@ fun SplashIncomingLegacySwapIn(
     SplashFee(payment)
 }
 
-@Suppress("DEPRECATION")
 @Composable
 private fun SplashFee(payment: LegacySwapInIncomingPayment) {
     if (payment.fees > 0.msat) {

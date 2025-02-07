@@ -230,7 +230,7 @@ private fun RequestLiquidityBottomSection(
                 HSeparator(width = 60.dp)
                 Spacer(modifier = Modifier.height(12.dp))
             }
-            LeaseEstimationView(amountRequested = amount, leaseFees = state.fees, actualFeerate = state.actualFeerate)
+            LeaseEstimationView(amountRequested = amount, leaseFees = state.fees)
             Spacer(modifier = Modifier.height(24.dp))
             if ((state.fees.serviceFee + state.fees.miningFee).toMilliSatoshi() > balance) {
                 ErrorMessage(header = stringResource(id = R.string.liquidityads_over_balance))
@@ -273,7 +273,6 @@ private fun RequestLiquidityBottomSection(
 private fun LeaseEstimationView(
     amountRequested: Satoshi,
     leaseFees: ChannelManagementFees,
-    actualFeerate: FeeratePerKw
 ) {
     SplashLabelRow(
         label = stringResource(id = R.string.liquidityads_estimate_details_miner_fees),

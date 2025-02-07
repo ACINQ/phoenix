@@ -43,9 +43,6 @@ extension Connections {
 		if self.electrum.isEstablishing() {
 			return true
 		}
-		if self.torEnabled && self.tor.isEstablishing() {
-			return true
-		}
 		return false
 	}
 	
@@ -61,11 +58,6 @@ extension Connections {
 		}
 		if target.containsElectrum {
 			if !self.electrum.isEstablished() {
-				return false
-			}
-		}
-		if target.containsTor && self.torEnabled {
-			if !self.tor.isEstablished() {
 				return false
 			}
 		}

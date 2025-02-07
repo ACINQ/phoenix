@@ -36,8 +36,6 @@ import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.SeedManager
-import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
-import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
 import fr.acinq.phoenix.utils.PlatformContext
 import kotlinx.coroutines.Dispatchers
@@ -46,7 +44,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -80,18 +77,6 @@ class DailyConnect(context: Context, workerParams: WorkerParameters) : Coroutine
         try {
             val application = (applicationContext as PhoenixApplication)
             val userPrefs = application.userPrefs
-
-            // check various preferences -- this job may abort early
-            val legacyAppStatus = LegacyPrefsDatastore.getLegacyAppStatus(applicationContext).filterNotNull().first()
-            if (legacyAppStatus !is LegacyAppStatus.NotRequired) {
-                log.warn("aborting $name: legacy_status=${legacyAppStatus.name()}")
-                return Result.success()
-            }
-
-            if (LegacyPrefsDatastore.getPrefsMigrationExpected(applicationContext).first() == true) {
-                log.warn("aborting $name: legacy data migration is required")
-                return Result.failure()
-            }
 
             val encryptedSeed = SeedManager.loadSeedFromDisk(applicationContext) as? EncryptedSeed.V2.NoAuth ?: run {
                 log.error("aborting $name: unhandled seed type")
@@ -135,12 +120,12 @@ class DailyConnect(context: Context, workerParams: WorkerParameters) : Coroutine
                                 log.info("node service in state=${state.name}, starting an isolated business")
 
                                 jobWatchingChannels = launch {
-                                    WorkerHelper.startIsolatedBusiness(application, business!!, encryptedSeed, userPrefs)
+                                    WorkerHelper.startIsolatedBusiness(business!!, encryptedSeed, userPrefs)
 
                                     business?.connectionsManager?.connections?.first { it.global is Connection.ESTABLISHED }
                                     log.debug("connections established")
 
-                                    business?.peerManager?.channelsFlow?.filterNotNull()?.collectIndexed { index, channels ->
+                                    business?.peerManager?.channelsFlow?.filterNotNull()?.collect { channels ->
                                         when {
                                             channels.isEmpty() -> {
                                                 log.info("completing $name: no channels found")

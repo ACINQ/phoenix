@@ -1,12 +1,13 @@
 package fr.acinq.phoenix.data
 
-import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.TxId
+import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.wire.InitTlv
+import fr.acinq.phoenix.utils.extensions.isOnion
 import kotlinx.serialization.Serializable
 
 
@@ -24,7 +25,7 @@ enum class BitcoinUnit(override val displayCode: String) : CurrencyUnit {
     }
 
     companion object {
-        val values = values().toList()
+        val values = entries
 
         fun valueOfOrNull(code: String): BitcoinUnit? = try {
             valueOf(code)
@@ -197,7 +198,7 @@ enum class FiatCurrency(override val displayCode: String, val flag: String = "ðŸ
     ZMW(displayCode = "ZMW", flag = "ðŸ‡¿ðŸ‡²"); // Zambian Kwacha
 
     companion object {
-        val values = values().toList()
+        val values = entries
         fun valueOfOrNull(code: String): FiatCurrency? = try {
             valueOf(code)
         } catch (e: Exception) {
@@ -207,7 +208,21 @@ enum class FiatCurrency(override val displayCode: String, val flag: String = "ðŸ
 }
 
 sealed class ElectrumConfig {
-    data class Custom(val server: ServerAddress) : ElectrumConfig()
+    /**
+     * Note : constructor is private because we want to enforce a disabled tls policy on onion hosts.
+     *
+     * @param requireOnionIfTorEnabled if this option is true, Phoenix will require this custom server to use an onion address when Tor is enabled, otherwise
+     *          it will not connect to it. This parameter should be true in the normal case. However, the user may want to override this requirement, for
+     *          example, if he's connecting to his own server and does not care about leaking his IP if the Tor proxy fails.
+     */
+    class Custom private constructor(val server: ServerAddress, val requireOnionIfTorEnabled: Boolean) : ElectrumConfig() {
+        companion object {
+            fun create(server: ServerAddress, requireOnionIfTorEnabled: Boolean) = Custom(
+                server = if (server.isOnion) server.copy(tls = TcpSocket.TLS.DISABLED) else server,
+                requireOnionIfTorEnabled = requireOnionIfTorEnabled
+            )
+        }
+    }
     object Random : ElectrumConfig()
 
     override operator fun equals(other: Any?): Boolean {
@@ -218,7 +233,7 @@ sealed class ElectrumConfig {
             is Custom -> {
                 when (other) {
                     is Custom -> this === other // custom =?= custom
-                    is Random -> false         // custom != random
+                    is Random -> false          // custom != random
                 }
             }
             is Random -> {
@@ -232,20 +247,9 @@ sealed class ElectrumConfig {
 }
 
 data class StartupParams(
-    /** When true, we use a [InitTlv] to ask our peer whether there are legacy channels to reestablish for the legacy node id. */
-    val requestCheckLegacyChannels: Boolean = false,
-    /** Tor state must be defined before the node starts. */
+    /** If true, we'll use onion addresses when connecting to the peer and to Electrum servers. */
     val isTorEnabled: Boolean,
     /** The liquidity policy must be injected into the node params manager. */
     val liquidityPolicy: LiquidityPolicy,
-    /** List of transaction ids that can be used for swap-in even if they are zero-conf. */
-    val trustedSwapInTxs: Set<TxId>,
     // TODO: add custom electrum address, fiat currencies, ...
 )
-
-object PaymentOptionsConstants {
-    val minBaseFee: Satoshi = 0.sat
-    val maxBaseFee: Satoshi = 100_000.sat
-    const val minProportionalFeePercent: Double = 0.0 // 0%
-    const val maxProportionalFeePercent: Double = 50.0 // 50%
-}

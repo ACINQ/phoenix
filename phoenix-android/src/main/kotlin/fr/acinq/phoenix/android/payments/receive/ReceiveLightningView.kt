@@ -106,7 +106,6 @@ import java.text.DecimalFormat
 fun LightningInvoiceView(
     vm: ReceiveViewModel,
     onFeeManagementClick: () -> Unit,
-    onScanDataClick: () -> Unit,
     defaultDescription: String,
     defaultExpiry: Long,
     maxWidth: Dp,

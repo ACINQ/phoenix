@@ -60,7 +60,6 @@ fun HomeNotices(
     notices: List<Notice>,
     notifications: List<Pair<Set<UUID>, Notification>>,
     onNavigateToSwapInWallet: () -> Unit,
-    onNavigateToFinalWallet: () -> Unit,
     onNavigateToNotificationsList: () -> Unit,
 ) {
     val filteredNotices = remember(notices) { notices.filterIsInstance<Notice.ShowInHome>().sortedBy { it.priority } }
@@ -80,7 +79,6 @@ fun HomeNotices(
                 notice = it,
                 messagesCount = notices.size + notifications.size,
                 onNavigateToSwapInWallet = onNavigateToSwapInWallet,
-                onNavigateToFinalWallet = onNavigateToFinalWallet,
                 onNavigateToNotificationsList = onNavigateToNotificationsList
             )
         }
@@ -94,7 +92,6 @@ private fun FirstNoticeView(
     notice: Notice.ShowInHome,
     messagesCount: Int,
     onNavigateToSwapInWallet: () -> Unit,
-    onNavigateToFinalWallet: () -> Unit,
     onNavigateToNotificationsList: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -102,10 +99,6 @@ private fun FirstNoticeView(
 
     val onClick = if (messagesCount == 1) {
         when (notice) {
-            is Notice.MigrationFromLegacy -> {
-                { openLink(context, "https://acinq.co/blog/phoenix-splicing-update") }
-            }
-
             is Notice.BackupSeedReminder -> {
                 { navController?.navigate(Screen.DisplaySeed.route) ?: Unit }
             }
@@ -157,9 +150,6 @@ private fun FirstNoticeView(
         verticalAlignment = Alignment.Top
     ) {
         when (notice) {
-            Notice.MigrationFromLegacy -> {
-                NoticeTextView(text = stringResource(id = R.string.inappnotif_migration_from_legacy), icon = R.drawable.ic_party_popper)
-            }
 
             Notice.MempoolFull -> {
                 NoticeTextView(text = stringResource(id = R.string.inappnotif_mempool_full_message), icon = R.drawable.ic_info)

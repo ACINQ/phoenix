@@ -59,7 +59,6 @@ fun LiquidityPolicyView(
     onAdvancedClick: () -> Unit,
     onRequestLiquidityClick: () -> Unit,
 ) {
-    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val userPrefs = userPrefs
 

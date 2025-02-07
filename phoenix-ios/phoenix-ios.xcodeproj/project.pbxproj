@@ -203,6 +203,8 @@
 		DC784A112B31EA180018DC4A /* LiquidityAdsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC784A102B31EA180018DC4A /* LiquidityAdsView.swift */; };
 		DC7BAA002CADAAE70074B568 /* WalletIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC7BA9FF2CADAAE70074B568 /* WalletIdentifier.swift */; };
 		DC7DA9F62AD84DF200F86B99 /* String+Substring.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC7DA9F52AD84DF200F86B99 /* String+Substring.swift */; };
+		DC808E9B2D5541F50019AE30 /* UsingTorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC808E9A2D5541F10019AE30 /* UsingTorSheet.swift */; };
+		DC808E9D2D554A430019AE30 /* DisablingTorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC808E9C2D554A3E0019AE30 /* DisablingTorSheet.swift */; };
 		DC81B79F25BF2AA200F5A52C /* MVI.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC81B79E25BF2AA200F5A52C /* MVI.swift */; };
 		DC82EED629789853007A5853 /* TxHistoryExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC82EED529789853007A5853 /* TxHistoryExporter.swift */; };
 		DC89857F25914747007B253F /* UIApplicationState+Phoenix.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC89857E25914747007B253F /* UIApplicationState+Phoenix.swift */; };
@@ -613,6 +615,8 @@
 		DC784A102B31EA180018DC4A /* LiquidityAdsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidityAdsView.swift; sourceTree = "<group>"; };
 		DC7BA9FF2CADAAE70074B568 /* WalletIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletIdentifier.swift; sourceTree = "<group>"; };
 		DC7DA9F52AD84DF200F86B99 /* String+Substring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Substring.swift"; sourceTree = "<group>"; };
+		DC808E9A2D5541F10019AE30 /* UsingTorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsingTorSheet.swift; sourceTree = "<group>"; };
+		DC808E9C2D554A3E0019AE30 /* DisablingTorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisablingTorSheet.swift; sourceTree = "<group>"; };
 		DC81B79E25BF2AA200F5A52C /* MVI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVI.swift; sourceTree = "<group>"; };
 		DC82EED529789853007A5853 /* TxHistoryExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TxHistoryExporter.swift; sourceTree = "<group>"; };
 		DC89857E25914747007B253F /* UIApplicationState+Phoenix.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplicationState+Phoenix.swift"; sourceTree = "<group>"; };
@@ -1207,6 +1211,16 @@
 			path = "liquidity management";
 			sourceTree = "<group>";
 		};
+		DC808E992D5524E90019AE30 /* tor */ = {
+			isa = PBXGroup;
+			children = (
+				DC808E9C2D554A3E0019AE30 /* DisablingTorSheet.swift */,
+				C8D7A2BD01ADA0DE6034AE0F /* TorConfigurationView.swift */,
+				DC808E9A2D5541F10019AE30 /* UsingTorSheet.swift */,
+			);
+			path = tor;
+			sourceTree = "<group>";
+		};
 		DC949E6B2B45FC5E00E80BB5 /* fees */ = {
 			isa = PBXGroup;
 			children = (
@@ -1331,7 +1345,7 @@
 				DC4CF3C72BE91FAE003A957F /* app access */,
 				DC27E4CD2791D18600C777CC /* recovery phrase */,
 				DCA3B41C2A533B8600E6B231 /* electrum server */,
-				C8D7A2BD01ADA0DE6034AE0F /* TorConfigurationView.swift */,
+				DC808E992D5524E90019AE30 /* tor */,
 				DC27E4C32791C58C00C777CC /* PaymentsBackupView.swift */,
 			);
 			path = "privacy and security";
@@ -1883,6 +1897,7 @@
 				DCB30E542A0AABAF00E7D7A2 /* InfoPopoverWindow.swift in Sources */,
 				DCA6DEC62829BDEB0073C658 /* XPC.swift in Sources */,
 				DC682FE8258175CE00CA1114 /* Popover.swift in Sources */,
+				DC808E9D2D554A430019AE30 /* DisablingTorSheet.swift in Sources */,
 				DC1844032A2690BB004D9578 /* MinerFeeSheet.swift in Sources */,
 				DC39A2662A12C04D00F59E39 /* LiquidityPolicyHelp.swift in Sources */,
 				DC49FE9B2AC49CB500D8D2E2 /* KotlinExtensions+Lightning.swift in Sources */,
@@ -2061,6 +2076,7 @@
 				DC72CEF52C99DCEB00C810A8 /* LnurlFlowErrorNotice.swift in Sources */,
 				DC5631C52C541E5C00DCB5BF /* Experimental.swift in Sources */,
 				DCF8E3AC2BC4968D009299EE /* LowMinerFeeWarning.swift in Sources */,
+				DC808E9B2D5541F50019AE30 /* UsingTorSheet.swift in Sources */,
 				DC65D86428E2F7D700686355 /* ResetWalletView_Action.swift in Sources */,
 				DC71E7332728645B0063613D /* CurrencyConverterView.swift in Sources */,
 				DCA3B41F2A5471C900E6B231 /* MinerFeeInfo.swift in Sources */,

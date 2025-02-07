@@ -170,7 +170,6 @@ private fun CopyAddressDialog(
     offer: String,
     onDismiss: () -> Unit
 ) {
-    val context = LocalContext.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(

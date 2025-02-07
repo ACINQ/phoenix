@@ -148,7 +148,7 @@ private fun SeedDialog(words: List<String>, onDismiss: () -> Unit) {
             )
             Spacer(modifier = Modifier.height(32.dp))
             val groupedWords: List<Pair<String, String>> = remember(words) {
-                words.mapIndexed { i, w ->
+                List(words.size) { i ->
                     if (i + (words.size / 2) < words.size) {
                         words[i] to words[i + (words.size / 2)]
                     } else {

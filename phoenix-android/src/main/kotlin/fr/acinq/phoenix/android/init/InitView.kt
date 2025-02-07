@@ -29,16 +29,18 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
+import fr.acinq.phoenix.android.BuildConfig
+import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIControllerViewModel
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.SeedManager
+import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
 import fr.acinq.phoenix.controllers.ControllerFactory
 import fr.acinq.phoenix.controllers.InitializationController
 import fr.acinq.phoenix.controllers.init.Initialization
-import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
-import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -80,7 +82,7 @@ sealed class WritingSeedState {
     data class Error(val e: Throwable) : WritingSeedState()
 }
 
-class InitViewModel(controller: InitializationController) : MVIControllerViewModel<Initialization.Model, Initialization.Intent>(controller) {
+class InitViewModel(controller: InitializationController, val internalDataRepository: InternalDataRepository) : MVIControllerViewModel<Initialization.Model, Initialization.Intent>(controller) {
 
     /** State of the view */
     var writingState by mutableStateOf<WritingSeedState>(WritingSeedState.Init)
@@ -127,9 +129,8 @@ class InitViewModel(controller: InitializationController) : MVIControllerViewMod
                     val encrypted = EncryptedSeed.V2.NoAuth.encrypt(EncryptedSeed.fromMnemonics(mnemonics))
                     SeedManager.writeSeedToDisk(context, encrypted)
                     writingState = WritingSeedState.WrittenToDisk(encrypted)
-                    LegacyPrefsDatastore.saveStartLegacyApp(context, if (isNewWallet) LegacyAppStatus.NotRequired else LegacyAppStatus.Unknown)
                     if (isNewWallet) {
-                        log.info("new seed successfully created and written to disk")
+                        log.info("wallet successfully created from new seed and written to disk")
                     } else {
                         log.info("wallet successfully restored from mnemonics and written to disk")
                     }
@@ -138,6 +139,7 @@ class InitViewModel(controller: InitializationController) : MVIControllerViewMod
                     writingState = WritingSeedState.WrittenToDisk(existing)
                 }
                 viewModelScope.launch(Dispatchers.Main) {
+                    internalDataRepository.saveLastUsedAppCode(BuildConfig.VERSION_CODE)
                     delay(1000)
                     onSeedWritten()
                 }
@@ -152,9 +154,10 @@ class InitViewModel(controller: InitializationController) : MVIControllerViewMod
         private val controllerFactory: ControllerFactory,
         private val getController: ControllerFactory.() -> InitializationController
     ) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
+            val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as? PhoenixApplication)
             @Suppress("UNCHECKED_CAST")
-            return InitViewModel(controllerFactory.getController()) as T
+            return InitViewModel(controllerFactory.getController(), application.internalDataRepository) as T
         }
     }
 }

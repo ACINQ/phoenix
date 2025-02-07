@@ -48,7 +48,6 @@ object SeedManager {
         when (val seed = loadSeedFromDisk(context)) {
             null -> SeedFileState.Absent
             is EncryptedSeed.V2.NoAuth -> SeedFileState.Present(seed)
-            else -> SeedFileState.Error.UnhandledSeedType
         }
     } catch (e: Exception) {
         log.error("failed to read seed: ", e)

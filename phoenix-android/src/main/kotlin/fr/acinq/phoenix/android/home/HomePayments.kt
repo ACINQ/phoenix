@@ -42,7 +42,6 @@ import fr.acinq.phoenix.managers.WalletBalance
 @Composable
 fun ColumnScope.PaymentsList(
     modifier: Modifier = Modifier,
-    swapInBalance: WalletBalance,
     balanceDisplayMode: HomeAmountDisplayMode,
     onPaymentClick: (UUID) -> Unit,
     onPaymentsHistoryClick: () -> Unit,
@@ -52,7 +51,7 @@ fun ColumnScope.PaymentsList(
     Column(modifier = modifier.weight(1f, fill = true), horizontalAlignment = Alignment.CenterHorizontally) {
         if (payments.isEmpty()) {
             Text(
-                text = stringResource(id = R.string.home__payments_none),
+                text = stringResource(id = R.string.home_payments_none),
                 style = MaterialTheme.typography.caption.copy(textAlign = TextAlign.Center, fontSize = 14.sp),
                 modifier = Modifier
                     .padding(horizontal = 32.dp)
@@ -80,7 +79,7 @@ private fun ColumnScope.LatestPaymentsList(
 ) {
     val morePaymentsButton: @Composable () -> Unit = {
         FilledButton(
-            text = stringResource(id = R.string.home__payments_more_button),
+            text = stringResource(id = R.string.home_payments_more_button),
             icon = R.drawable.ic_chevron_down,
             iconTint = MaterialTheme.typography.caption.color,
             onClick = onPaymentsHistoryClick,

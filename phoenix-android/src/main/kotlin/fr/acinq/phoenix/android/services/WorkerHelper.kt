@@ -22,20 +22,18 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
 import fr.acinq.phoenix.data.StartupParams
-import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import fr.acinq.phoenix.managers.AppConfigurationManager
 import fr.acinq.phoenix.utils.MnemonicLanguage
 import kotlinx.coroutines.flow.first
 
 object WorkerHelper {
-    suspend fun startIsolatedBusiness(context: Context, business: PhoenixBusiness, encryptedSeed: EncryptedSeed.V2.NoAuth, userPrefs: UserPrefsRepository) {
+    suspend fun startIsolatedBusiness(business: PhoenixBusiness, encryptedSeed: EncryptedSeed.V2.NoAuth, userPrefs: UserPrefsRepository) {
         val mnemonics = encryptedSeed.decrypt()
 
         // retrieve preferences before starting business
         val electrumServer = userPrefs.getElectrumServer.first()
         val isTorEnabled = userPrefs.getIsTorEnabled.first()
         val liquidityPolicy = userPrefs.getLiquidityPolicy.first()
-        val trustedSwapInTxs = LegacyPrefsDatastore.getMigrationTrustedSwapInTxs(context).first()
         val preferredFiatCurrency = userPrefs.getFiatCurrency.first()
 
         // preparing business
@@ -49,10 +47,8 @@ object WorkerHelper {
         // start business
         business.start(
             StartupParams(
-                requestCheckLegacyChannels = false,
                 isTorEnabled = isTorEnabled,
                 liquidityPolicy = liquidityPolicy,
-                trustedSwapInTxs = trustedSwapInTxs.map { TxId(it) }.toSet()
             )
         )
 

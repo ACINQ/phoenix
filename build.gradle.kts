@@ -10,11 +10,6 @@ buildscript {
         classpath("org.jetbrains.kotlin:kotlin-serialization:${Versions.kotlin}")
         classpath("app.cash.sqldelight:gradle-plugin:${Versions.sqlDelight}")
 
-        if (System.getProperty("includeAndroid")?.toBoolean() == true) {
-            // Plugins for the legacy android app
-            // Argument classes generation plugin for the androidx navigation component
-            classpath("androidx.navigation:navigation-safe-args-gradle-plugin:${Versions.AndroidLegacy.safeArgs}")
-        }
         // Firebase cloud messaging plugin
         classpath("com.google.gms:google-services:${Versions.fcmPlugin}")
     }

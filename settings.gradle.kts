@@ -8,7 +8,7 @@ pluginManagement {
 
 rootProject.name = "phoenix"
 
-// Android apps (legacy and kmm) may be skipped to make life easier on iOS developers.
+// Android app may be skipped to make life easier on iOS developers.
 // Use `skip.android` in `local.properties` to define whether android app are built or not.
 // By default, Android apps are NOT skipped.
 val skipAndroid = File("$rootDir/local.properties").takeIf { it.exists() }
@@ -25,5 +25,4 @@ include(":phoenix-shared")
 // Android apps are optional.
 if (!skipAndroid) {
     include(":phoenix-android")
-    include(":phoenix-legacy")
 }
