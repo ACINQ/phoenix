@@ -23,41 +23,9 @@ struct ElectrumConfigurationView: MVIView {
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	@EnvironmentObject var smartModalState: SmartModalState
 	
-	func connectionInfo() -> (String, String) {
-		
-		var status: String
-		var address: String
-		
-		if mvi.model.connection.isEstablished() {
-			
-			status = NSLocalizedString("Connected to:", comment: "Connection status")
-			if let server = mvi.model.currentServer {
-				address = "\(server.host):\(server.port)"
-			} else {
-				address = "?" // this state shouldn't be possible
-			}
-			
-		} else if mvi.model.connection.isEstablishing() {
-			
-			status = NSLocalizedString("Connecting to:", comment: "Connection status")
-			if let server = mvi.model.currentServer {
-				address = "\(server.host):\(server.port)"
-			} else {
-				address = "?" // this state shouldn't be possible
-			}
-			
-		} else {
-			
-			status = NSLocalizedString("Will connect to:", comment: "Connection status")
-			if let customConfig = mvi.model.configuration as? ElectrumConfig.Custom {
-				address = "\(customConfig.server.host):\(customConfig.server.port)"
-			} else {
-				address = NSLocalizedString("Random server", comment: "Connection info")
-			}
-		}
-		
-		return (status, address)
-	}
+	// --------------------------------------------------
+	// MARK: View Builders
+	// --------------------------------------------------
 	
 	@ViewBuilder
 	var view: some View {
@@ -71,11 +39,11 @@ struct ElectrumConfigurationView: MVIView {
 	func content() -> some View {
 		
 		List {
-			section_header()
+			section_info()
 			section_configuration()
 			section_status()
 		}
-		.listStyle(GroupedListStyle())
+		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
 		.onAppear() {
 			onAppear()
@@ -83,16 +51,25 @@ struct ElectrumConfigurationView: MVIView {
 	}
 	
 	@ViewBuilder
-	func section_header() -> some View {
+	func section_info() -> some View {
 		
-		Section(header: ListHeader(), content: {}).textCase(nil)
+		Section {
+			Text(
+				"""
+				To secure your payment channels Phoenix monitors the Bitcoin blockchain \
+				through Electrum servers.
+				
+				By default, random servers are used. You can also configure Phoenix to \
+				connect only to your own server.
+				"""
+			)
+		} // </Section>
 	}
 	
 	@ViewBuilder
 	func section_configuration() -> some View {
 		
-		Section(header: Text("Configuration")) {
-		
+		Section {
 			VStack(alignment: .leading) {
 				
 				let (status, address) = connectionInfo()
@@ -115,12 +92,22 @@ struct ElectrumConfigurationView: MVIView {
 				Text(address).bold()
 					.padding(.top, 2)
 				
-				if customElectrumServerObserver.problem == .badCertificate {
-					Text("Bad certificate !")
-						.foregroundColor(Color.appNegative)
-						.padding(.top, 2)
+				if let problem = customElectrumServerObserver.problem {
+					Group {
+						switch problem {
+						case .requiresOnionAddress:
+							Text("Tor is enabled. This server should use an onion address.")
+						case .badCertificate:
+							Text("Bad certificate !")
+						}
+					}
+					.foregroundColor(Color.appNegative)
+					.padding(.top, 2)
 				}
 			} // </VStack>
+			
+		} header: {
+			Text("Configuration")
 		} // </Section>
 	}
 	
@@ -157,6 +144,46 @@ struct ElectrumConfigurationView: MVIView {
 		} // </Section>
 	}
 	
+	// --------------------------------------------------
+	// MARK: View Helpers
+	// --------------------------------------------------
+	
+	func connectionInfo() -> (String, String) {
+		
+		var status: String
+		var address: String
+		
+		if mvi.model.connection.isEstablished() {
+			
+			status = NSLocalizedString("Connected to:", comment: "Connection status")
+			if let server = mvi.model.currentServer {
+				address = "\(server.host):\(server.port)"
+			} else {
+				address = "?" // this state shouldn't be possible
+			}
+			
+		} else if mvi.model.connection.isEstablishing() {
+			
+			status = NSLocalizedString("Connecting to:", comment: "Connection status")
+			if let server = mvi.model.currentServer {
+				address = "\(server.host):\(server.port)"
+			} else {
+				address = "?" // this state shouldn't be possible
+			}
+			
+		} else {
+			
+			status = NSLocalizedString("Will connect to:", comment: "Connection status")
+			if let customConfig = mvi.model.configuration as? ElectrumConfig.Custom {
+				address = "\(customConfig.server.host):\(customConfig.server.port)"
+			} else {
+				address = NSLocalizedString("Random server", comment: "Connection info")
+			}
+		}
+		
+		return (status, address)
+	}
+	
 	func formatInDecimalStyle(_ value: Int32) -> String {
 		return formatInDecimalStyle(NSNumber(value: value))
 	}
@@ -171,6 +198,10 @@ struct ElectrumConfigurationView: MVIView {
 		formatter.usesGroupingSeparator = true
 		return formatter.string(from: value)!
 	}
+	
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
 	
 	func onAppear() {
 		log.trace("onAppear()")
@@ -187,6 +218,10 @@ struct ElectrumConfigurationView: MVIView {
 		}
 	}
 	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
+	
 	func didTapModify() {
 		log.trace("didTapModify()")
 		
@@ -195,45 +230,29 @@ struct ElectrumConfigurationView: MVIView {
 			ElectrumAddressSheet(mvi: mvi)
 		}
 	}
+}
+
+fileprivate struct ListItem<Content>: View where Content: View {
 	
-	struct ListHeader: View {
-		
-		var body: some View {
-			
-			Text(
-				"""
-				By default, Phoenix connects to random Electrum servers in order to access the \
-				Bitcoin blockchain. You can also choose to connect to your own Electrum server.
-				"""
-			)
-			.font(.body)
-			.foregroundColor(Color.primary)
-			.padding(.top, 10)
-		}
+	let header: Text
+	let content: () -> Content
+	
+	init(header: Text, @ViewBuilder content: @escaping () -> Content) {
+		self.header = header
+		self.content = content
 	}
 	
-	struct ListItem<Content>: View where Content: View {
+	var body: some View {
 		
-		let header: Text
-		let content: () -> Content
-		
-		init(header: Text, @ViewBuilder content: @escaping () -> Content) {
-			self.header = header
-			self.content = content
-		}
-		
-		var body: some View {
-			
-			HStack(alignment: .top) {
-				header
-					.font(.subheadline)
-					.fontWeight(.thin)
-					.frame(width: 90, alignment: .leading)
+		HStack(alignment: .top) {
+			header
+				.font(.subheadline)
+				.fontWeight(.thin)
+				.frame(width: 90, alignment: .leading)
 
-				content()
-					.frame(maxWidth: .infinity, alignment: .leading)
-			}
-			.frame(maxWidth: .infinity, alignment: .leading)
+			content()
+				.frame(maxWidth: .infinity, alignment: .leading)
 		}
+		.frame(maxWidth: .infinity, alignment: .leading)
 	}
 }

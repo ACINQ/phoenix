@@ -15,10 +15,10 @@ extension Lightning_kmpConnection {
 	
 	func localizedText() -> String {
 		switch self {
-		case is CLOSED       : return NSLocalizedString("Offline", comment: "Connection state")
-		case is ESTABLISHING : return NSLocalizedString("Connecting…", comment: "Connection state")
-		case is ESTABLISHED  : return NSLocalizedString("Connected", comment: "Connection state")
-		default              : return NSLocalizedString("Unknown", comment: "Connection state")
+		case is CLOSED       : return String(localized: "Offline", comment: "Connection state")
+		case is ESTABLISHING : return String(localized: "Connecting…", comment: "Connection state")
+		case is ESTABLISHED  : return String(localized: "Connected", comment: "Connection state")
+		default              : return String(localized: "Unknown", comment: "Connection state")
 		}
 	}
 }

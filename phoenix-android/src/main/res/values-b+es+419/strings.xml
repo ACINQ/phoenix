@@ -257,16 +257,16 @@
 
     <!-- home: balance section & misc -->
 
-    <string name="home__balance_loading">Cargando…</string>
-    <string name="home__onchain_incoming">+%1$s</string>
+    <string name="home_balance_loading">Cargando…</string>
+    <string name="home_onchain_incoming">+%1$s</string>
 
-    <string name="home__faq_button">FAQ</string>
-    <string name="home__payments_none">Usa los botones Recibir y Enviar en la parte inferior de esta pantalla para empezar.</string>
-    <string name="home__payments_more_button">Mostrar todos los pagos…</string>
-    <string name="home__connection__electrum_late">Retraso de Electrum</string>
-    <string name="home__connection__bad_cert">Certificado de Electrum</string>
-    <string name="home__connection__connecting">Conectando…</string>
-    <string name="home__connection__tor_active">Tor</string>
+    <string name="home_faq_button">FAQ</string>
+    <string name="home_payments_none">Usa los botones Recibir y Enviar en la parte inferior de esta pantalla para empezar.</string>
+    <string name="home_payments_more_button">Mostrar todos los pagos…</string>
+    <string name="home_connection_electrum_late">Retraso de Electrum</string>
+    <string name="home_connection_bad_cert">Certificado de Electrum</string>
+    <string name="home_connection_connecting">Conectando…</string>
+    <string name="home_connection_tor_active">Tor</string>
 
     <!-- in-app notifications -->
 
@@ -537,27 +537,17 @@
     <!-- settings: Tor -->
 
     <string name="tor_settings_title">Tor</string>
-    <string name="tor_settings_unknown">Comprobando preferencias…</string>
-    <string name="tor_settings_enabled">Tor está activada</string>
-    <string name="tor_settings_disabled">Tor está desactivada</string>
-    <string name="tor_settings_state_unknown">El proxy de Tor aún no se ha iniciado.</string>
-    <string name="tor_settings_state_closed">El proxy de Tor está apagado. \nEspera y comprueba tu conexión a Internet.</string>
-    <string name="tor_settings_state_starting">Iniciando proxy de Tor…</string>
-    <string name="tor_settings_state_started">Tor está en línea</string>
 
     <!-- home: connectivity dialog -->
 
     <string name="conndialog_title">Estado de las conexiones</string>
     <string name="conndialog_summary_not_ok">La aplicación no funcionará correctamente hasta que se hayan establecido todas las conexiones.</string>
     <string name="conndialog_network">Tu dispositivo no tiene conexión a Internet. La aplicación no funcionará correctamente.\n\nComprueba la configuración de tu dispositivo.</string>
-    <string name="conndialog_internet">Internet</string>
     <string name="conndialog_electrum">Electrum</string>
-    <string name="conndialog_tor">Tor</string>
     <string name="conndialog_lightning">Par</string>
     <string name="conndialog_accessibility_desc">Gestionar la conexión para %1$s</string>
     <string name="conndialog_connecting">Conectando…</string>
     <string name="conndialog_connected">Conectado</string>
-    <string name="conndialog_connected_electrum_behind">El servidor de Electrum registra un retraso (bloque $1$d)</string>
     <string name="conndialog_closed">Desconectado</string>
     <string name="conndialog_closed_bad_cert">Certificado defectuoso</string>
 

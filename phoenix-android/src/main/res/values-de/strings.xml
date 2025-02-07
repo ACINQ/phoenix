@@ -261,16 +261,16 @@
 
     <!-- home: balance section & misc -->
 
-    <string name="home__balance_loading">Lädt…</string>
-    <string name="home__onchain_incoming">+%1$s</string>
+    <string name="home_balance_loading">Lädt…</string>
+    <string name="home_onchain_incoming">+%1$s</string>
 
-    <string name="home__faq_button">FAQ</string>
-    <string name="home__payments_none">Verwenden Sie die Schaltflächen Empfangen und Senden unten auf diesem Fenster, um loszulegen!</string>
-    <string name="home__payments_more_button">Alle Zahlungen anzeigen…</string>
-    <string name="home__connection__electrum_late">Electrum unsynchron</string>
-    <string name="home__connection__bad_cert">Electrum-Zertifikat</string>
-    <string name="home__connection__connecting">Verbinde…</string>
-    <string name="home__connection__tor_active">Tor</string>
+    <string name="home_faq_button">FAQ</string>
+    <string name="home_payments_none">Verwenden Sie die Schaltflächen Empfangen und Senden unten auf diesem Fenster, um loszulegen!</string>
+    <string name="home_payments_more_button">Alle Zahlungen anzeigen…</string>
+    <string name="home_connection_electrum_late">Electrum unsynchron</string>
+    <string name="home_connection_bad_cert">Electrum-Zertifikat</string>
+    <string name="home_connection_connecting">Verbinde…</string>
+    <string name="home_connection_tor_active">Tor</string>
     <string name="home_request_liquidity">Liquidität anfordern</string>
     <string name="home_inflight_payments">Du hast derzeit %1$d Zahlung(en) in deiner Brieftasche ausstehend.\n\nHalte die App geöffnet, um sicherzustellen, dass diese Zahlungen ohne Probleme abgerechnet werden.</string>
 
@@ -550,27 +550,17 @@
     <!-- settings: Tor -->
 
     <string name="tor_settings_title">Tor</string>
-    <string name="tor_settings_unknown">Einstellungen werden geprüft…</string>
-    <string name="tor_settings_enabled">Tor ist aktiviert</string>
-    <string name="tor_settings_disabled">Tor ist deaktiviert</string>
-    <string name="tor_settings_state_unknown">Der Tor-Proxy ist noch nicht gestartet.</string>
-    <string name="tor_settings_state_closed">Der Tor-Proxy wird abgeschaltet.\nBitte warten Sie und überprüfen Sie Ihre Internetverbindung.</string>
-    <string name="tor_settings_state_starting">Starte Tor-Proxy…</string>
-    <string name="tor_settings_state_started">Tor ist online</string>
 
     <!-- home: connectivity dialog -->
 
     <string name="conndialog_title">Verbindungs-Status</string>
     <string name="conndialog_summary_not_ok">Die App funktioniert erst dann richtig, wenn alle Verbindungen hergestellt sind.</string>
     <string name="conndialog_network">Ihr Gerät hat keine Internetverbindung. Die App wird nicht richtig funktionieren.\n\nBitte überprüfen Sie die Einstellungen Ihres Geräts.</string>
-    <string name="conndialog_internet">Internet</string>
     <string name="conndialog_electrum">Electrum</string>
-    <string name="conndialog_tor">Tor</string>
     <string name="conndialog_lightning">Gegenstelle</string>
     <string name="conndialog_accessibility_desc">Verbindung verwalten für %1$s</string>
     <string name="conndialog_connecting">Verbinde…</string>
     <string name="conndialog_connected">Verbunden</string>
-    <string name="conndialog_connected_electrum_behind">Electrum-Server ist nicht synchronisiert (Block $1$d)</string>
     <string name="conndialog_closed">Getrennt</string>
     <string name="conndialog_closed_bad_cert">Ungültiges Zertifikat</string>
 

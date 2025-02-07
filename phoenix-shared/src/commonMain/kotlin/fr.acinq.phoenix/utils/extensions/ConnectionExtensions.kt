@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
+package fr.acinq.phoenix.utils.extensions
+
+import fr.acinq.lightning.NodeUri
 import fr.acinq.lightning.utils.Connection
+import fr.acinq.lightning.utils.ServerAddress
 
 operator fun Connection?.plus(other: Connection?) : Connection =
     when {
@@ -24,3 +28,6 @@ operator fun Connection?.plus(other: Connection?) : Connection =
         other is Connection.CLOSED -> other
         else -> this ?: other ?: error("cannot combine connections [$this + $other]")
     }
+
+val ServerAddress.isOnion get() = this.host.endsWith(".onion")
+val NodeUri.isOnion get() = this.host.endsWith(".onion")

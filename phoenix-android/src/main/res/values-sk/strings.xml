@@ -274,16 +274,16 @@
 
     <!-- home: balance section & misc -->
 
-    <string name="home__balance_loading">Načítavanie…</string>
-    <string name="home__onchain_incoming">+%1$s</string>
+    <string name="home_balance_loading">Načítavanie…</string>
+    <string name="home_onchain_incoming">+%1$s</string>
 
-    <string name="home__faq_button">FAQ</string>
-    <string name="home__payments_none">Pomocou tlačidiel Prijať a Odoslať v dolnej časti tejto obrazovky môžete začať!</string>
-    <string name="home__payments_more_button">Zobraziť všetky platby…</string>
-    <string name="home__connection__electrum_late">Electrum mešká</string>
-    <string name="home__connection__bad_cert">Electrum certifikát</string>
-    <string name="home__connection__connecting">Pripájanie…</string>
-    <string name="home__connection__tor_active">Tor</string>
+    <string name="home_faq_button">FAQ</string>
+    <string name="home_payments_none">Pomocou tlačidiel Prijať a Odoslať v dolnej časti tejto obrazovky môžete začať!</string>
+    <string name="home_payments_more_button">Zobraziť všetky platby…</string>
+    <string name="home_connection_electrum_late">Electrum mešká</string>
+    <string name="home_connection_bad_cert">Electrum certifikát</string>
+    <string name="home_connection_connecting">Pripájanie…</string>
+    <string name="home_connection_tor_active">Tor</string>
     <string name="home_request_liquidity">Vyžiadať likviditu</string>
     <string name="home_inflight_payments">Momentálne máte %1$d platieb nepotvrdených vo vašej peňaženke.\n\nNechajte aplikáciu otvorenú, aby ste sa uistili, že sa tieto platby správne a bez problémov vyrovnajú..</string>
 
@@ -589,27 +589,17 @@
     <!-- settings: Tor -->
 
     <string name="tor_settings_title">Tor</string>
-    <string name="tor_settings_unknown">Kontrola nastavení…</string>
-    <string name="tor_settings_enabled">Tor je zapnutý</string>
-    <string name="tor_settings_disabled">Tor je vypnutý</string>
-    <string name="tor_settings_state_unknown">Tor proxy server ešte nebol spustený.</string>
-    <string name="tor_settings_state_closed">Tor proxy server je vypnutý.\nPočkajte prosím a skontrolujte svoje internetové pripojenie.</string>
-    <string name="tor_settings_state_starting">Zapínanie Tor proxy servera…</string>
-    <string name="tor_settings_state_started">Tor je pripojený</string>
 
     <!-- home: connectivity dialog -->
 
     <string name="conndialog_title">Stav pripojenia</string>
     <string name="conndialog_summary_not_ok">Aplikácia nebude správne fungovať, kým nebudú nadviazané všetky pripojenia.</string>
     <string name="conndialog_network">Vaše zariadenie nemá pripojenie k internetu. Aplikácia nebude fungovať správne.\n\nSkontrolujte prosím nastavenia vášho zariadenia.</string>
-    <string name="conndialog_internet">Internet</string>
     <string name="conndialog_electrum">Electrum</string>
-    <string name="conndialog_tor">Tor</string>
     <string name="conndialog_lightning">Peer</string>
     <string name="conndialog_accessibility_desc">Spravovať pripojenia pre %1$s</string>
     <string name="conndialog_connecting">Pripájanie…</string>
     <string name="conndialog_connected">Pripojené</string>
-    <string name="conndialog_connected_electrum_behind">Electrum server zaostáva (blok $1$d)</string>
     <string name="conndialog_closed">Odpojené</string>
     <string name="conndialog_closed_bad_cert">Zlý certifikát</string>
 

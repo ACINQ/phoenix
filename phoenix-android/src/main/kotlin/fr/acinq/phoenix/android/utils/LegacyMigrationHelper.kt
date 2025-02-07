@@ -44,6 +44,7 @@ import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
 import fr.acinq.phoenix.data.BitcoinUnit
+import fr.acinq.phoenix.data.ElectrumConfig
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.data.lnurl.LnurlAuth
@@ -122,7 +123,7 @@ object LegacyMigrationHelper {
         Prefs.getElectrumServer(context).takeIf { it.isNotBlank() }?.let {
             val hostPort = HostAndPort.fromString(it).withDefaultPort(50002)
             // TODO: handle onion addresses and TOR
-            ServerAddress(hostPort.host, hostPort.port, TcpSocket.TLS.TRUSTED_CERTIFICATES())
+            ElectrumConfig.Custom.create(ServerAddress(hostPort.host, hostPort.port, TcpSocket.TLS.TRUSTED_CERTIFICATES()), false)
         }?.let {
             userPrefs.saveElectrumServer(it)
             appConfigurationManager.updateElectrumConfig(it)

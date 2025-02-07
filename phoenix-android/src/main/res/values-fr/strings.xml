@@ -268,16 +268,16 @@
 
     <!-- home: balance section & misc -->
 
-    <string name="home__balance_loading">Chargement…</string>
-    <string name="home__onchain_incoming">+%1$s</string>
+    <string name="home_balance_loading">Chargement…</string>
+    <string name="home_onchain_incoming">+%1$s</string>
 
-    <string name="home__faq_button">FAQ</string>
-    <string name="home__payments_none">Utilisez les boutons Envoyer et Recevoir ci-dessous pour débuter !</string>
-    <string name="home__payments_more_button">Montrer tous les paiements…</string>
-    <string name="home__connection__electrum_late">Electrum en retard</string>
-    <string name="home__connection__bad_cert">Certificat Electrum</string>
-    <string name="home__connection__connecting">Connexion…</string>
-    <string name="home__connection__tor_active">Tor</string>
+    <string name="home_faq_button">FAQ</string>
+    <string name="home_payments_none">Utilisez les boutons Envoyer et Recevoir ci-dessous pour débuter !</string>
+    <string name="home_payments_more_button">Montrer tous les paiements…</string>
+    <string name="home_connection_electrum_late">Electrum en retard</string>
+    <string name="home_connection_bad_cert">Certificat Electrum</string>
+    <string name="home_connection_connecting">Connexion…</string>
+    <string name="home_connection_tor_active">Tor</string>
 
     <!-- in-app notifications -->
 
@@ -588,26 +588,16 @@
     <!-- settings: Tor -->
 
     <string name="tor_settings_title">Tor</string>
-    <string name="tor_settings_unknown">Vérification des préférences…</string>
-    <string name="tor_settings_enabled">Tor est activé</string>
-    <string name="tor_settings_disabled">Tor est désactivé</string>
-    <string name="tor_settings_state_unknown">Le proxy Tor n\'est pas encore démarré.</string>
-    <string name="tor_settings_state_closed">Le proxy Tor est éteint.</string>
-    <string name="tor_settings_state_starting">Démarrage du proxy Tor…</string>
-    <string name="tor_settings_state_started">Tor est en fonctionnement</string>
 
     <!-- home: connectivity dialog -->
 
     <string name="conndialog_title">Statut des connexions</string>
     <string name="conndialog_summary_not_ok">L\'application ne fonctionnera pas correctement tant que chaque connexion n\'est pas établie.</string>
     <string name="conndialog_network">Votre appareil n\'a pas de connexion internet. L\'application ne fonctionnera pas correctement.\n\nVérifiez votre configuration réseau.</string>
-    <string name="conndialog_internet">Internet</string>
     <string name="conndialog_electrum">Electrum</string>
-    <string name="conndialog_tor">Tor</string>
     <string name="conndialog_lightning">Lightning</string>
     <string name="conndialog_connecting">Connexion…</string>
     <string name="conndialog_connected">Connecté</string>
-    <string name="conndialog_connected_electrum_behind">Serveur électrum en retard (bloc $1$d)</string>
     <string name="conndialog_closed">Déconnecté</string>
     <string name="conndialog_closed_bad_cert">Certificat invalide</string>
 

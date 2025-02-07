@@ -79,7 +79,7 @@ fun HomeBalance(
     balanceDisplayMode: HomeAmountDisplayMode,
 ) {
     if (balance == null) {
-        ProgressView(modifier = modifier, text = stringResource(id = R.string.home__balance_loading))
+        ProgressView(modifier = modifier, text = stringResource(id = R.string.home_balance_loading))
     } else {
         val isAmountRedacted = balanceDisplayMode == HomeAmountDisplayMode.REDACTED
         Column(
@@ -134,7 +134,7 @@ private fun OnChainBalance(
             ) {
                 TextWithIcon(
                     text = if (balanceDisplayMode == HomeAmountDisplayMode.REDACTED) "****" else {
-                        stringResource(id = R.string.home__onchain_incoming, availableOnchainBalance.toPrettyString(preferredAmountUnit, fiatRate, withUnit = true))
+                        stringResource(id = R.string.home_onchain_incoming, availableOnchainBalance.toPrettyString(preferredAmountUnit, fiatRate, withUnit = true))
                     },
                     textStyle = MaterialTheme.typography.caption,
                     icon = R.drawable.ic_chain,

@@ -55,7 +55,7 @@ class AppElectrumConfigurationController(
     override fun process(intent: ElectrumConfiguration.Intent) {
         when (intent) {
             is ElectrumConfiguration.Intent.UpdateElectrumServer -> {
-                configurationManager.updateElectrumConfig(intent.server)
+                configurationManager.updateElectrumConfig(intent.config)
             }
         }
     }

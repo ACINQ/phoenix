@@ -237,16 +237,16 @@
 
     <!-- home: balance section & misc -->
 
-    <string name="home__balance_loading">Načítání…</string>
-    <string name="home__onchain_incoming">+%1$s</string>
+    <string name="home_balance_loading">Načítání…</string>
+    <string name="home_onchain_incoming">+%1$s</string>
 
-    <string name="home__faq_button">FAQ</string>
-    <string name="home__payments_none">Pomocí tlačítek Přijmout a Odeslat v dolní části této obrazovky můžete začít!</string>
-    <string name="home__payments_more_button">Ukázat všechny platby…</string>
-    <string name="home__connection__electrum_late">Electrum late</string>
-    <string name="home__connection__bad_cert">Electrum certifikát</string>
-    <string name="home__connection__connecting">Připojování…</string>
-    <string name="home__connection__tor_active">Tor</string>
+    <string name="home_faq_button">FAQ</string>
+    <string name="home_payments_none">Pomocí tlačítek Přijmout a Odeslat v dolní části této obrazovky můžete začít!</string>
+    <string name="home_payments_more_button">Ukázat všechny platby…</string>
+    <string name="home_connection_electrum_late">Electrum late</string>
+    <string name="home_connection_bad_cert">Electrum certifikát</string>
+    <string name="home_connection_connecting">Připojování…</string>
+    <string name="home_connection_tor_active">Tor</string>
 
     <!-- in-app notifications -->
 
@@ -542,27 +542,17 @@
     <!-- settings: Tor -->
 
     <string name="tor_settings_title">Tor</string>
-    <string name="tor_settings_unknown">Kontrola nastavneí…</string>
-    <string name="tor_settings_enabled">Tor je zapnutý</string>
-    <string name="tor_settings_disabled">Tor je vypnutý</string>
-    <string name="tor_settings_state_unknown">Tor proxy server ještě nebyl spuštěn.</string>
-    <string name="tor_settings_state_closed">Tor proxy server je vypnutý.</string>
-    <string name="tor_settings_state_starting">Zapínání Tor proxy serveru…</string>
-    <string name="tor_settings_state_started">Tor je připojen</string>
 
     <!-- home: connectivity dialog -->
 
     <string name="conndialog_title">Stav připojení</string>
     <string name="conndialog_summary_not_ok">Aplikace nebude správně fungovat, dokud nebudou navázána všechna připojení.</string>
     <string name="conndialog_network">Vaše zařízení nemá připojení k internetu. Aplikace nebude fungovat správně.\n\nZkontrolujte prosím nastavení vašeho zařízení.</string>
-    <string name="conndialog_internet">Internet</string>
     <string name="conndialog_electrum">Electrum</string>
-    <string name="conndialog_tor">Tor</string>
     <string name="conndialog_lightning">Peer</string>
     <string name="conndialog_accessibility_desc">Spravovat připojení pro %1$s</string>
     <string name="conndialog_connecting">Připojování…</string>
     <string name="conndialog_connected">Připojeno</string>
-    <string name="conndialog_connected_electrum_behind">Electrum server zaostává (blok $1$d)</string>
     <string name="conndialog_closed">Odpojeno</string>
     <string name="conndialog_closed_bad_cert">Špatný certifikát</string>
 
