@@ -169,7 +169,7 @@
     <!-- receive: Tor warning -->
 
     <string name="receive_tor_warning_title">Tor je povolen</string>
-    <string name="receive_tor_warning_dialog_content_1">Fénix nemůže přijímat platby na pozadí </string>
+    <string name="receive_tor_warning_dialog_content_1">Fénix nemůže přijímat platby na pozadí.</string>
 
     <!-- scanning errors -->
 
@@ -206,11 +206,6 @@
     <string name="forceclose_button">Vynútiť zatvorenie všetkých mojich kanálov</string>
 
     <!-- in-app notifications -->
-
-    <string name="inappnotif_migration_from_legacy">Gratulujeme! Vaša peňaženka bola aktualizovaná.</string>
-    <string name="inappnotif_migration_from_legacy_action">Pozrite si zmeny</string>
-    <string name="inappnotif_migration_from_legacy_dialog_title">Vaša on-chain Bitcoin adresa sa zmenila</string>
-    <string name="inappnotif_migration_from_legacy_dialog_body">Neopakujte použitie svojich starých adries! Už nebudú fungovať.\n\nAk ste tak urobili omylom, kontaktujte podporu.</string>
 
     <string name="inappnotif_backup_seed_message">Zálohujte svoju peňaženku, aby ste zabránili strate bitcoinov.</string>
     <string name="inappnotif_backup_seed_action">Zálohovanie peňaženky</string>

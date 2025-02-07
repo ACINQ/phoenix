@@ -102,10 +102,6 @@ private fun FirstNoticeView(
 
     val onClick = if (messagesCount == 1) {
         when (notice) {
-            is Notice.MigrationFromLegacy -> {
-                { openLink(context, "https://acinq.co/blog/phoenix-splicing-update") }
-            }
-
             is Notice.BackupSeedReminder -> {
                 { navController?.navigate(Screen.DisplaySeed.route) ?: Unit }
             }
@@ -157,9 +153,6 @@ private fun FirstNoticeView(
         verticalAlignment = Alignment.Top
     ) {
         when (notice) {
-            Notice.MigrationFromLegacy -> {
-                NoticeTextView(text = stringResource(id = R.string.inappnotif_migration_from_legacy), icon = R.drawable.ic_party_popper)
-            }
 
             Notice.MempoolFull -> {
                 NoticeTextView(text = stringResource(id = R.string.inappnotif_mempool_full_message), icon = R.drawable.ic_info)

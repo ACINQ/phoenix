@@ -40,7 +40,6 @@ import fr.acinq.phoenix.android.security.SeedFileState
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.controllers.init.Initialization
-import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import fr.acinq.phoenix.utils.MnemonicLanguage
 
 
@@ -87,8 +86,6 @@ fun CreateWalletView(
                             }
                             LaunchedEffect(true) {
                                 vm.writeSeed(context, model.mnemonics, isNewWallet = true, onSeedWritten)
-                                LegacyPrefsDatastore.savePrefsMigrationExpected(context, false)
-                                LegacyPrefsDatastore.saveDataMigrationExpected(context, false)
                             }
                         }
                     }

@@ -54,7 +54,6 @@
 
     <string name="startup_binding_service">Pripájanie služby…</string>
     <string name="startup_wait">Pripravovanie peňaženky…</string>
-    <string name="startup_wait_legacy_check">Kontrola staršej peňaženky…</string>
     <string name="startup_checking_seed">Odomykanie…</string>
     <string name="startup_unlocked">Prístup povolený…</string>
     <string name="startup_unlock_failure">Odomknutie zlyhalo</string>
@@ -75,11 +74,6 @@
 
     <string name="startup_starting">Spúšťanie…</string>
     <string name="startup_error_generic">Aplikáciu nebolo možné spustiť.</string>
-
-    <!-- Switch between legacy/modern apps -->
-
-    <string name="legacyswitch_title">Zastaraná aplikácia</string>
-    <string name="legacyswitch_restart">Reštartovať zastaranú aplikáciu</string>
 
     <!-- Payment line -->
 

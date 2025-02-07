@@ -65,7 +65,6 @@
 
     <string name="startup_binding_service">Kuunganisha huduma…</string>
     <string name="startup_wait">Kuandaa pochi…</string>
-    <string name="startup_wait_legacy_check">Kuangalia pochi ya zamani…</string>
     <string name="startup_checking_seed">Kufungua…</string>
     <string name="startup_unlocked">Ufikiaji umekubaliwa…</string>
     <string name="startup_unlock_failure">Kufungua kumeshindikana</string>
@@ -86,11 +85,6 @@
 
     <string name="startup_starting">Inaanzisha…</string>
     <string name="startup_error_generic">Programu haikuweza kuanza.</string>
-
-    <!-- Switch between legacy/modern apps -->
-
-    <string name="legacyswitch_title">Programu ya zamani</string>
-    <string name="legacyswitch_restart">Anzisha upya programu ya zamani</string>
 
     <!-- Payment line -->
 

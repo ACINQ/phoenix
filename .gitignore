@@ -23,8 +23,6 @@ phoenix-android/release/
 .externalNativeBuild
 sdk-dependencies
 apk
-phoenix-legacy/release
-phoenix-legacy/debug
 .cxx
 
 # LangTool

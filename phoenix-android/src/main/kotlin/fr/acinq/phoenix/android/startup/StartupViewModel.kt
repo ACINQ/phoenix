@@ -66,7 +66,7 @@ class StartupViewModel : ViewModel() {
     val log = LoggerFactory.getLogger(this::class.java)
     val decryptionState = mutableStateOf<StartupDecryptionState>(StartupDecryptionState.Init)
 
-    fun decryptSeedAndStart(encryptedSeed: EncryptedSeed, service: NodeService, checkLegacyChannels: Boolean) {
+    fun decryptSeedAndStart(encryptedSeed: EncryptedSeed, service: NodeService) {
         if (decryptionState.value is StartupDecryptionState.DecryptingSeed) return
         decryptionState.value = StartupDecryptionState.DecryptingSeed
         viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
@@ -83,7 +83,7 @@ class StartupViewModel : ViewModel() {
                     val seed = encryptedSeed.decrypt()
                     log.debug("seed decrypted!")
                     decryptionState.value = StartupDecryptionState.DecryptionSuccess
-                    service.startBusiness(seed, checkLegacyChannels)
+                    service.startBusiness(seed)
                 }
             }
         }

@@ -91,7 +91,6 @@ kotlin {
 
 dependencies {
     implementation(project(":phoenix-shared"))
-    api(project(":phoenix-legacy"))
 
     implementation("com.google.android.material:material:1.7.0")
 
@@ -105,7 +104,7 @@ dependencies {
     // -- AndroidX: biometric
     implementation("androidx.biometric:biometric:${Versions.Android.biometrics}")
     // -- AndroidX: work manager
-    implementation("androidx.work:work-runtime-ktx:${Versions.AndroidLegacy.work}")
+    implementation("androidx.work:work-runtime-ktx:${Versions.Android.work}")
 
 
     // -- jetpack compose
@@ -138,8 +137,6 @@ dependencies {
     // firebase cloud messaging
     implementation("com.google.firebase:firebase-messaging:${Versions.Android.fcm}")
     implementation("com.google.android.gms:play-services-base:18.5.0")
-
-    implementation("com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava")
 
     testImplementation("junit:junit:${Versions.junit}")
     testImplementation("app.cash.sqldelight:sqlite-driver:${Versions.sqlDelight}")

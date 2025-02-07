@@ -6,7 +6,6 @@ on:
   push:
     branches: [ master, test-ci-build, offer ]
     paths:
-      - 'phoenix-legacy/**'
       - 'phoenix-android/**'
       - '.github/workflows/**'
 

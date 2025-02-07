@@ -227,11 +227,6 @@
     <string name="inappnotif_mempool_full_message">Le mempool Bitcoin est plein, et les frais sur la chaîne sont élevés.</string>
     <string name="inappnotif_mempool_full_action">Voir en quoi Phoenix est affecté</string>
 
-    <string name="inappnotif_migration_from_legacy">Félicitations! Votre wallet a été mis à jour.</string>
-    <string name="inappnotif_migration_from_legacy_action">Voir les nouveautés</string>
-    <string name="inappnotif_migration_from_legacy_dialog_title">Votre adresse Bitcoin a changé</string>
-    <string name="inappnotif_migration_from_legacy_dialog_body">Ne réutilisez pas vos anciennes adresses de swap ! Elles ne fonctionneront plus.\n\nContactez le support si vous le faisiez accidentellement.</string>
-
     <string name="inappnotif_payment_onchain_pending_title">Dépôt on-chain en attente (+%1$s)</string>
     <string name="inappnotif_payments_rejection_overview_one">Un paiement entrant a été refusé récemment</string>
     <string name="inappnotif_payments_rejection_overview_many">%1$d paiements entrants refusés récemment</string>
