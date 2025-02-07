@@ -64,7 +64,6 @@ import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
 import fr.acinq.phoenix.android.utils.extensions.findActivity
 import fr.acinq.phoenix.data.canRequestLiquidity
 import fr.acinq.phoenix.data.inFlightPaymentsCount
-import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -268,27 +267,6 @@ fun HomeView(
         }
     }
 
-    var showAddressWarningDialog by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
-    if (showAddressWarningDialog) {
-        Dialog(
-            onDismiss = { scope.launch { internalData.saveLegacyMigrationAddressWarningShown(true) } },
-            title = stringResource(id = R.string.inappnotif_migration_from_legacy_dialog_title),
-        ) {
-            Text(text = annotatedStringResource(id = R.string.inappnotif_migration_from_legacy_dialog_body), modifier = Modifier.padding(horizontal = 24.dp, vertical = 0.dp))
-        }
-    }
-
     val releaseNoteCode by internalData.showReleaseNoteSinceCode.collectAsState(initial = null)
     releaseNoteCode?.let { ReleaseNoteDialog(sinceCode = it) }
-
-    LaunchedEffect(Unit) {
-        if (LegacyPrefsDatastore.hasMigratedFromLegacy(context).first()) {
-            combine(internalData.getLegacyMigrationMessageShown, internalData.getLegacyMigrationAddressWarningShown) { noticeShown, dialogShown ->
-                noticeShown || dialogShown
-            }.collect {
-                showAddressWarningDialog = !it
-            }
-        }
-    }
 }

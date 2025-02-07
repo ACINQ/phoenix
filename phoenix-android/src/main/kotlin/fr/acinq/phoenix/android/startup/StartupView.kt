@@ -18,7 +18,6 @@ package fr.acinq.phoenix.android.startup
 
 import android.content.Context
 import android.widget.Toast
-import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -68,22 +67,15 @@ import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
-import fr.acinq.phoenix.android.components.screenlock.LockPrompt
 import fr.acinq.phoenix.android.internalData
 import fr.acinq.phoenix.android.security.SeedFileState
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.services.NodeServiceState
-import fr.acinq.phoenix.android.userPrefs
-import fr.acinq.phoenix.android.utils.BiometricsHelper
 import fr.acinq.phoenix.android.utils.Logging
 import fr.acinq.phoenix.android.utils.errorOutlinedTextFieldColors
-import fr.acinq.phoenix.android.utils.extensions.findActivity
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.outlinedTextFieldColors
 import fr.acinq.phoenix.android.utils.shareFile
-import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
-import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
-import fr.acinq.phoenix.legacy.utils.Wallet
 
 
 @Composable
@@ -119,7 +111,7 @@ fun StartupView(
                 when (val currentState = serviceState) {
                     null, is NodeServiceState.Disconnected -> Text(stringResource(id = R.string.startup_binding_service))
                     is NodeServiceState.Off -> DecryptSeedAndStartBusiness(appVM = appVM, onKeyAbsent = onKeyAbsent)
-                    is NodeServiceState.Init -> Text(stringResource(id = R.string.startup_starting))
+                    is NodeServiceState.Init -> Text(stringResource(id = R.string.startup_init))
                     is NodeServiceState.Error -> {
                         ErrorMessage(
                             header = stringResource(id = R.string.startup_error_generic),
@@ -127,18 +119,8 @@ fun StartupView(
                         )
                     }
                     is NodeServiceState.Running -> {
-                        val legacyAppStatus by LegacyPrefsDatastore.getLegacyAppStatus(context).collectAsState(null)
-                        when (legacyAppStatus) {
-                            LegacyAppStatus.Unknown -> {
-                                Text(stringResource(id = R.string.startup_wait_legacy_check))
-                            }
-                            LegacyAppStatus.NotRequired -> {
-                                LaunchedEffect(true) { onBusinessStarted() }
-                            }
-                            else -> {
-                                Text(stringResource(id = R.string.startup_starting))
-                            }
-                        }
+                        Text(text = stringResource(id = R.string.startup_starting))
+                        LaunchedEffect(true) { onBusinessStarted() }
                     }
                 }
             }
@@ -155,8 +137,6 @@ private fun DecryptSeedAndStartBusiness(
     val log = logger("StartupView")
     val vm = viewModel<StartupViewModel>()
 
-    val legacyAppStatus by LegacyPrefsDatastore.getLegacyAppStatus(context).collectAsState(null)
-
     val seedFileState = produceState<SeedFileState>(initialValue = SeedFileState.Unknown, true) {
         value = SeedManager.getSeedState(context)
     }.value
@@ -167,34 +147,11 @@ private fun DecryptSeedAndStartBusiness(
         is SeedFileState.Error.Unreadable -> Text(stringResource(id = R.string.startup_error_generic, seedFileState.message ?: ""))
         is SeedFileState.Error.UnhandledSeedType -> Text(stringResource(id = R.string.startup_error_generic, "Unhandled seed type"))
         is SeedFileState.Present -> {
-            log.debug("wallet ready to start with legacyAppStatus=${legacyAppStatus?.name()}")
             val decryptionState by vm.decryptionState
             when (val state = decryptionState) {
                 is StartupDecryptionState.Init -> {
-                    // first check if we need to start the legacy application
-                    when (legacyAppStatus) {
-                        null -> Text(stringResource(id = R.string.startup_wait))
-                        is LegacyAppStatus.Required -> {
-                            Text(stringResource(id = R.string.startup_wait_legacy_check))
-                        }
-                        LegacyAppStatus.Unknown -> {
-                            if (Wallet.getEclairDBFile(context).exists()) {
-                                Text(stringResource(id = R.string.startup_wait_legacy_check))
-                                log.debug("found legacy database file while in unknown legacy status; switching to legacy app")
-                                LaunchedEffect(true) {
-                                    LegacyPrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.Expected)
-                                }
-                            } else {
-                                LaunchedEffect(seedFileState.encryptedSeed) {
-                                    appVM.service?.let { vm.decryptSeedAndStart(seedFileState.encryptedSeed, it, checkLegacyChannels = true) }
-                                }
-                            }
-                        }
-                        LegacyAppStatus.NotRequired -> {
-                            LaunchedEffect(seedFileState.encryptedSeed) {
-                                appVM.service?.let { vm.decryptSeedAndStart(seedFileState.encryptedSeed, it, checkLegacyChannels = false) }
-                            }
-                        }
+                    LaunchedEffect(seedFileState.encryptedSeed) {
+                        appVM.service?.let { vm.decryptSeedAndStart(seedFileState.encryptedSeed, it) }
                     }
                 }
                 is StartupDecryptionState.DecryptingSeed -> {
@@ -208,9 +165,7 @@ private fun DecryptSeedAndStartBusiness(
                 }
                 is StartupDecryptionState.SeedInputFallback -> {
                     StartupSeedFallback(state = state, checkSeedFallback = { ctx, words ->
-                        vm.checkSeedFallback(ctx, words, onSuccess = { seed ->
-                            appVM.service!!.startBusiness(seed, requestCheckLegacyChannels = legacyAppStatus is LegacyAppStatus.Unknown)
-                        })
+                        vm.checkSeedFallback(ctx, words, onSuccess = { appVM.service!!.startBusiness(it) })
                     })
                 }
             }

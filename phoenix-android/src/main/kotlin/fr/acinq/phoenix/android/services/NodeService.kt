@@ -18,7 +18,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.work.WorkManager
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
-import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.PaymentEvents
@@ -29,13 +28,11 @@ import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.SeedManager
-import fr.acinq.phoenix.android.utils.LegacyMigrationHelper
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
 import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
 import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
 import fr.acinq.phoenix.data.StartupParams
 import fr.acinq.phoenix.data.inFlightPaymentsCount
-import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import fr.acinq.phoenix.managers.AppConfigurationManager
 import fr.acinq.phoenix.managers.CurrencyManager
 import fr.acinq.phoenix.managers.NodeParamsManager
@@ -174,7 +171,7 @@ class NodeService : Service() {
                 val seed = encryptedSeed.decrypt()
                 log.debug("successfully decrypted seed in the background, starting wallet...")
                 val notif = SystemNotificationHelper.notifyRunningHeadless(applicationContext)
-                startBusiness(seed, requestCheckLegacyChannels = false)
+                startBusiness(seed)
                 startForeground(notif)
             }
             else -> {
@@ -203,7 +200,7 @@ class NodeService : Service() {
      * Start the node business logic.
      * @param decryptedMnemonics Must be the decrypted payload of an [EncryptedSeed] object.
      */
-    fun startBusiness(decryptedMnemonics: ByteArray, requestCheckLegacyChannels: Boolean) {
+    fun startBusiness(decryptedMnemonics: ByteArray) {
         stateLock.lock()
         if (_state.value != NodeServiceState.Off) {
             log.warn("ignore attempt to start business in state=${_state.value}")
@@ -229,8 +226,8 @@ class NodeService : Service() {
                 wm.cancelWorkById(it.id).result.get()
             }
 
-            log.info("starting node from service state=${_state.value?.name} with checkLegacyChannels=$requestCheckLegacyChannels")
-            doStartBusiness(decryptedMnemonics, requestCheckLegacyChannels)
+            log.info("starting node from service state=${_state.value?.name}")
+            doStartBusiness(decryptedMnemonics)
             ChannelsWatcher.schedule(applicationContext)
             ContactsPhotoCleaner.scheduleASAP(applicationContext)
             _state.postValue(NodeServiceState.Running)
@@ -239,14 +236,7 @@ class NodeService : Service() {
 
     private suspend fun doStartBusiness(
         decryptedMnemonics: ByteArray,
-        requestCheckLegacyChannels: Boolean,
     ) {
-        // migrate legacy preferences if needed
-        if (LegacyPrefsDatastore.getPrefsMigrationExpected(applicationContext).first() == true) {
-            LegacyMigrationHelper.migrateLegacyPreferences(applicationContext)
-            LegacyPrefsDatastore.savePrefsMigrationExpected(applicationContext, false)
-        }
-
         // retrieve preferences before starting business
         val application = (applicationContext as? PhoenixApplication) ?: throw RuntimeException("invalid context type, should be PhoenixApplication")
         val userPrefs = application.userPrefs
@@ -263,7 +253,6 @@ class NodeService : Service() {
              internalData.saveShowReleaseNoteSinceCode(lastVersionUsed)
         }
         val liquidityPolicy = userPrefs.getLiquidityPolicy.first()
-        val trustedSwapInTxs = LegacyPrefsDatastore.getMigrationTrustedSwapInTxs(applicationContext).first()
         val preferredFiatCurrency = userPrefs.getFiatCurrency.first()
 
         monitorPaymentsJob = serviceScope.launch { monitorPaymentsWhenHeadless(business.nodeParamsManager, business.currencyManager, userPrefs) }
@@ -282,10 +271,8 @@ class NodeService : Service() {
         // start business
         business.start(
             StartupParams(
-                requestCheckLegacyChannels = requestCheckLegacyChannels,
                 isTorEnabled = isTorEnabled,
                 liquidityPolicy = liquidityPolicy,
-                trustedSwapInTxs = trustedSwapInTxs.map { TxId(it) }.toSet()
             )
         )
 

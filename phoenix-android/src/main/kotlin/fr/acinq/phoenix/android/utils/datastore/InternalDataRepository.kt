@@ -47,7 +47,6 @@ class InternalDataRepository(private val internalData: DataStore<Preferences>) {
         private val SEED_MANUAL_BACKUP_DONE = booleanPreferencesKey("SEED_MANUAL_BACKUP_DONE")
         private val LAST_USED_APP_CODE = intPreferencesKey("LAST_USED_APP_CODE")
         private val SEED_LOSS_DISCLAIMER_READ = booleanPreferencesKey("SEED_LOSS_DISCLAIMER_READ")
-        private val LEGACY_MIGRATION_ADDRESS_WARNING_SHOWN = booleanPreferencesKey("LEGACY_MIGRATION_ADDRESS_WARNING_SHOWN")
         private val LEGACY_MIGRATION_MESSSAGE_SHOWN = booleanPreferencesKey("LEGACY_MIGRATION_MESSSAGE_SHOWN")
         private val SHOW_INTRO = booleanPreferencesKey("SHOW_INTRO")
         private val FCM_TOKEN = stringPreferencesKey("FCM_TOKEN")
@@ -107,10 +106,6 @@ class InternalDataRepository(private val internalData: DataStore<Preferences>) {
     /** True if a migration notice has already be shown. */
     val getLegacyMigrationMessageShown: Flow<Boolean> = safeData.map { it[LEGACY_MIGRATION_MESSSAGE_SHOWN] ?: false }
     suspend fun saveLegacyMigrationMessageShown(isShown: Boolean) = internalData.edit { it[LEGACY_MIGRATION_MESSSAGE_SHOWN] = isShown }
-
-    /** True if a dialog about the swap-in address change following the migration has been shown. */
-    val getLegacyMigrationAddressWarningShown: Flow<Boolean> = safeData.map { it[LEGACY_MIGRATION_ADDRESS_WARNING_SHOWN] ?: false }
-    suspend fun saveLegacyMigrationAddressWarningShown(isShown: Boolean) = internalData.edit { it[LEGACY_MIGRATION_ADDRESS_WARNING_SHOWN] = isShown }
 
     /** True if the intro screen must be shown. True by default. */
     val getShowIntro: Flow<Boolean> = safeData.map { it[SHOW_INTRO] ?: true }

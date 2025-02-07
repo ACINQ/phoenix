@@ -16,34 +16,20 @@
 
 package fr.acinq.phoenix.android.settings
 
-import android.widget.Toast
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.NoticesViewModel
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.CardHeader
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
@@ -51,9 +37,6 @@ import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.MenuButton
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.negativeColor
-import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
-import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
-import kotlinx.coroutines.launch
 
 
 @Composable
@@ -61,9 +44,6 @@ fun SettingsView(
     noticesViewModel: NoticesViewModel
 ) {
     val nc = navController
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    var debugClickCount by remember { mutableIntStateOf(0) }
     val notices = noticesViewModel.notices
     val notifications = business.notificationsManager.notifications.collectAsState()
 
@@ -71,31 +51,8 @@ fun SettingsView(
         DefaultScreenHeader(onBackClick = { nc.navigate(Screen.Home.route) }) {
             Text(
                 text = stringResource(id = R.string.menu_settings),
-                modifier = Modifier
-                    .padding(vertical = 12.dp)
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = { debugClickCount += 1 }
-                    )
+                modifier = Modifier.padding(vertical = 12.dp)
             )
-        }
-
-        if (debugClickCount > 10) {
-            LaunchedEffect(key1 = Unit) {
-                Toast.makeText(context, "Debug mode enabled", Toast.LENGTH_SHORT).show()
-            }
-            // -- debug
-            CardHeader(text = "DEBUG")
-            Card {
-                MenuButton(
-                    text = "Switch to legacy app (DEBUG)",
-                    icon = R.drawable.ic_settings,
-                    onClick = {
-                        scope.launch { LegacyPrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.Expected) }
-                    },
-                )
-            }
         }
 
         // -- general

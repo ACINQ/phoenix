@@ -53,7 +53,6 @@
 
     <string name="startup_binding_service">Vinculando el servicio…</string>
     <string name="startup_wait">Preparando la billetera…</string>
-    <string name="startup_wait_legacy_check">Comprobando la billetera heredada…</string>
     <string name="startup_checking_seed">Desbloqueando…</string>
     <string name="startup_unlocked">Acceso concedido…</string>
     <string name="startup_unlock_failure">Error al desbloquear</string>
@@ -74,11 +73,6 @@
 
     <string name="startup_starting">Iniciando…</string>
     <string name="startup_error_generic">No se pudo iniciar la aplicación.</string>
-
-    <!-- Switch between legacy/modern apps -->
-
-    <string name="legacyswitch_title">Aplicación heredada</string>
-    <string name="legacyswitch_restart">Reiniciar la aplicación heredada</string>
 
     <!-- Payment line -->
 

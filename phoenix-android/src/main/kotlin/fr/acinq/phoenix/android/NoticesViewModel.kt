@@ -43,7 +43,6 @@ sealed class Notice() {
     abstract val priority: Int
     sealed class ShowInHome(override val priority: Int) : Notice()
 
-    data object MigrationFromLegacy : ShowInHome(1)
     data class RemoteMessage(val notice: WalletNotice) : ShowInHome(1)
     data object CriticalUpdateAvailable : ShowInHome(2)
     data object SwapInCloseToTimeout : ShowInHome(3)

@@ -20,11 +20,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -36,10 +33,8 @@ import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
-import fr.acinq.phoenix.android.components.feedback.InfoMessage
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.share
-import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 
 @Composable
 fun BitcoinAddressView(

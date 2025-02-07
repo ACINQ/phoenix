@@ -65,7 +65,6 @@
 
     <string name="startup_binding_service">Kuunganisha huduma…</string>
     <string name="startup_wait">Kuandaa pochi…</string>
-    <string name="startup_wait_legacy_check">Kuangalia pochi ya zamani…</string>
     <string name="startup_checking_seed">Kufungua…</string>
     <string name="startup_unlocked">Ufikiaji umekubaliwa…</string>
     <string name="startup_unlock_failure">Kufungua kumeshindikana</string>
@@ -86,11 +85,6 @@
 
     <string name="startup_starting">Inaanzisha…</string>
     <string name="startup_error_generic">Programu haikuweza kuanza.</string>
-
-    <!-- Switch between legacy/modern apps -->
-
-    <string name="legacyswitch_title">Programu ya zamani</string>
-    <string name="legacyswitch_restart">Anzisha upya programu ya zamani</string>
 
     <!-- Payment line -->
 
@@ -442,8 +436,6 @@
     <string name="paymentdetails_part_hops_label">Hops</string>
 
     <string name="paymentdetails_received_with_label">Imepokelewa kupitia</string>
-    <string name="paymentdetails_received_with_splicein">Splice-in (kuongeza kwenye channel iliyopo)</string>
-    <string name="paymentdetails_received_with_channel">Channel mpya (iliyoundwa kiotomatiki)</string>
     <string name="paymentdetails_received_with_lightning">Malipo ya Lightning</string>
     <string name="paymentdetails_channel_id_label">Kitambulisho cha channel</string>
     <string name="paymentdetails_tx_id_label">Muamala</string>

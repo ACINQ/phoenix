@@ -67,7 +67,6 @@
 
     <string name="startup_binding_service">Binding service…</string>
     <string name="startup_wait">Preparing wallet…</string>
-    <string name="startup_wait_legacy_check">Checking legacy wallet…</string>
     <string name="startup_checking_seed">Unlocking…</string>
     <string name="startup_unlocked">Access granted…</string>
     <string name="startup_unlock_failure">Unlock failed</string>
@@ -87,13 +86,9 @@
     <string name="startup_fallback_success_match">Seed matches.\nWriting to disk…</string>
     <string name="startup_fallback_success_starting">Starting Phoenix…</string>
 
+    <string name="startup_init">Initialising…</string>
     <string name="startup_starting">Starting…</string>
     <string name="startup_error_generic">The application could not start.</string>
-
-    <!-- Switch between legacy/modern apps -->
-
-    <string name="legacyswitch_title">Legacy app</string>
-    <string name="legacyswitch_restart">Restart legacy app</string>
 
     <!-- Payment line -->
 
