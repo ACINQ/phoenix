@@ -6579,6 +6579,9 @@
         }
       }
     },
+    "Amount required for card payment" : {
+
+    },
     "amount sent" : {
       "comment" : "Label in DetailsView_IncomingPayment",
       "localizations" : {
@@ -7795,6 +7798,9 @@
           }
         }
       }
+    },
+    "Awaiting payment…" : {
+
     },
     "Back" : {
       "localizations" : {
@@ -9774,6 +9780,9 @@
         }
       }
     },
+    "card" : {
+      "comment" : "button label - try to make it short"
+    },
     "caused by" : {
 
     },
@@ -11526,6 +11535,9 @@
         }
       }
     },
+    "Communicating with card's host…" : {
+
+    },
     "completed at" : {
       "comment" : "Label in DetailsView_IncomingPayment",
       "extractionState" : "manual",
@@ -13270,6 +13282,12 @@
         }
       }
     },
+    "Could not communicate with card's wallet" : {
+      "comment" : "Error message - scanning lightning invoice"
+    },
+    "Could not connect to card's host" : {
+      "comment" : "Error message - processing bolt card payment"
+    },
     "Could not connect to host:" : {
       "localizations" : {
         "ar" : {
@@ -13476,6 +13494,9 @@
           }
         }
       }
+    },
+    "Cound not communicate with card's wallet" : {
+
     },
     "Create new wallet" : {
       "localizations" : {
@@ -16058,6 +16079,9 @@
         }
       }
     },
+    "Does not appear to be a bolt card." : {
+
+    },
     "Don't lose your funds:" : {
       "localizations" : {
         "ar" : {
@@ -17510,6 +17534,9 @@
           }
         }
       }
+    },
+    "Error reading tag" : {
+
     },
     "Error: %@" : {
       "localizations" : {
@@ -27704,6 +27731,12 @@
         }
       }
     },
+    "NFC cababilities not available on this device" : {
+
+    },
+    "NFC reader is already scanning" : {
+
+    },
     "No" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -28230,6 +28263,9 @@
         }
       }
     },
+    "No URI detected in NFC tag" : {
+
+    },
     "Node id" : {
       "localizations" : {
         "ar" : {
@@ -28472,6 +28508,9 @@
           }
         }
       }
+    },
+    "Nothing scanned" : {
+
     },
     "Notifications" : {
       "localizations" : {
@@ -33900,6 +33939,9 @@
           }
         }
       }
+    },
+    "Requesting payment…" : {
+
     },
     "Requesting Swap-In Address..." : {
       "extractionState" : "manual",
@@ -39396,6 +39438,12 @@
         }
       }
     },
+    "The card's host returned error code: %d" : {
+      "comment" : "Error message - processing bolt card payment"
+    },
+    "The card's host returned error message: %@" : {
+      "comment" : "Error message - processing bolt card payment"
+    },
     "The closing transaction is in your transactions list." : {
       "comment" : "label text",
       "localizations" : {
@@ -41403,6 +41451,7 @@
       }
     },
     "This appears to be a website (not a lightning invoice):" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -41441,6 +41490,9 @@
           }
         }
       }
+    },
+    "This appears to be a website:" : {
+
     },
     "This doesn't appear to be a Lightning invoice" : {
       "comment" : "Error message - scanning lightning invoice",
@@ -44567,6 +44619,9 @@
           }
         }
       }
+    },
+    "Unreadable response from card's host" : {
+      "comment" : "Error message - processing bolt card payment"
     },
     "Unreadable response from service: (origin)" : {
       "comment" : "Error message - scanning lightning invoice",
