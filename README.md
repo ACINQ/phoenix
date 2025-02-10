@@ -1,5 +1,5 @@
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
-[![Testnet Build](https://github.com/ACINQ/phoenix/workflows/TESTNET%20Build/badge.svg)](https://github.com/ACINQ/phoenix/actions?query=workflow%3A%22TESTNET+Build%22)
+[![Testnet Build](https://github.com/ACINQ/phoenix/actions/workflows/testnet-build.yml/badge.svg)](https://github.com/ACINQ/phoenix/actions?query=testnet-build)
 [![Download Testnet APK](https://img.shields.io/badge/Download-Testnet%20APK-green?style=flat&logo=android&logoColor=white)](https://acinq.co/pub/phoenix/phoenix-testnet-latest.apk)
 
 ![Phoenix Logo](.readme/phoenix_text.png)
