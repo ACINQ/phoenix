@@ -4,7 +4,7 @@ name: Build
 on:
   workflow_dispatch:
   push:
-    branches: [ master, test-ci-build, remove-legacy ]
+    branches: [ master, test-ci-build ]
     paths:
       - 'phoenix-android/**'
       - '.github/workflows/**'
