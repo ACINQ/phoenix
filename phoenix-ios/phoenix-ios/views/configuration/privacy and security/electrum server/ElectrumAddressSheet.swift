@@ -197,7 +197,7 @@ struct ElectrumAddressSheet: View {
 			HStack {
 				TextField("example.com", text: $host,
 					onCommit: {
-						onHostDidCommit()
+						hostDidCommit()
 					}
 				)
 				.keyboardType(.URL)
@@ -205,7 +205,7 @@ struct ElectrumAddressSheet: View {
 				.autocapitalization(.none)
 				.foregroundColor(disableTextFields ? .secondary : .primary)
 				.onChange(of: host) { _ in
-					onHostDidChange()
+					hostDidChange()
 				}
 
 				Button {
@@ -251,14 +251,14 @@ struct ElectrumAddressSheet: View {
 			HStack {
 				TextField(verbatim: "\(DEFAULT_PORT)", text: $port,
 					onCommit: {
-						onPortDidCommit()
+						portDidCommit()
 					}
 				)
 				.keyboardType(.numberPad)
 				.disableAutocorrection(true)
 				.foregroundColor(disableTextFields ? .secondary : .primary)
 				.onChange(of: port) { _ in
-					onPortDidChange()
+					portDidChange()
 				}
 
 				Button {
@@ -304,6 +304,9 @@ struct ElectrumAddressSheet: View {
 					onImage: checkmarkImage_on(),
 					offImage: checkmarkImage_off()
 				))
+				.onChange(of: noRequireOnionAddress) { _ in
+					noRequireOnionAddressToggleDidChange()
+				}
 			}
 			
 			Spacer()
@@ -680,24 +683,29 @@ struct ElectrumAddressSheet: View {
 		}
 	}
 	
-	func onHostDidChange() {
-		log.trace("onHostDidChange()")
+	func hostDidChange() {
+		log.trace("hostDidChange()")
 		userHasMadeChanges = true
 	}
 	
-	func onHostDidCommit() {
-		log.trace("onHostDidCommit()")
+	func hostDidCommit() {
+		log.trace("hostDidCommit()")
 		checkHost()
 	}
 	
-	func onPortDidChange() {
-		log.trace("onPortDidChange()")
+	func portDidChange() {
+		log.trace("portDidChange()")
 		userHasMadeChanges = true
 	}
 	
-	func onPortDidCommit() {
-		log.trace("onPortDidCommit()")
+	func portDidCommit() {
+		log.trace("portDidCommit()")
 		checkPort()
+	}
+	
+	func noRequireOnionAddressToggleDidChange() {
+		log.trace("noRequireOnionAddressToggleDidChange()")
+		userHasMadeChanges = true
 	}
 	
 	func closeSheet() {
