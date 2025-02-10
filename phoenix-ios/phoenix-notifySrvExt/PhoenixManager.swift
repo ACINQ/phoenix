@@ -78,11 +78,7 @@ class PhoenixManager {
 		newBusiness.currencyManager.disableAutoRefresh()
 
 		if let electrumConfigPrefs = GroupPrefs.shared.electrumConfig {
-			let electrumConfig = ElectrumConfig.Custom.companion.create(
-				server: electrumConfigPrefs.serverAddress,
-				requireOnionIfTorEnabled: true
-			)
-			newBusiness.appConfigurationManager.updateElectrumConfig(config: electrumConfig)
+			newBusiness.appConfigurationManager.updateElectrumConfig(config: electrumConfigPrefs.customConfig)
 		} else {
 			newBusiness.appConfigurationManager.updateElectrumConfig(config: nil)
 		}

@@ -28258,6 +28258,9 @@
         }
       }
     },
+    "No, I don't want to use an onion address" : {
+
+    },
     "Node id" : {
       "localizations" : {
         "ar" : {
@@ -37878,6 +37881,9 @@
           }
         }
       }
+    },
+    "Since you've enabled Tor, you should use an onion address for this server." : {
+
     },
     "Skip" : {
       "localizations" : {

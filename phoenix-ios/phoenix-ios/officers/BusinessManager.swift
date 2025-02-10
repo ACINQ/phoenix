@@ -121,11 +121,7 @@ class BusinessManager {
 	public func start() {
 		
 		if let electrumConfigPrefs = GroupPrefs.shared.electrumConfig {
-			let electrumConfig = ElectrumConfig.Custom.companion.create(
-				server: electrumConfigPrefs.serverAddress,
-				requireOnionIfTorEnabled: true
-			)
-			business.appConfigurationManager.updateElectrumConfig(config: electrumConfig)
+			business.appConfigurationManager.updateElectrumConfig(config: electrumConfigPrefs.customConfig)
 		} else {
 			business.appConfigurationManager.updateElectrumConfig(config: nil)
 		}

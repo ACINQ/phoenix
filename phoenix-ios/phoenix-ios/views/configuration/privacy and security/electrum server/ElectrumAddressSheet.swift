@@ -36,9 +36,12 @@ struct ElectrumAddressSheet: View {
 	
 	@ObservedObject var mvi: MVIState<ElectrumConfiguration.Model, ElectrumConfiguration.Intent>
 	
+	@State var isTorEnabled: Bool = Biz.business.appConfigurationManager.isTorEnabledValue
+	
 	@State var isCustomized: Bool
 	@State var host: String
 	@State var port: String
+	@State var noRequireOnionAddress: Bool
 	
 	@State var invalidHost = false
 	@State var invalidPort = false
@@ -77,11 +80,13 @@ struct ElectrumAddressSheet: View {
 		let port = customConfig?.server.port ?? 0
 		
 		if mvi.model.isCustom() && host.count > 0 {
-			_host = State(initialValue: host)
-			_port = State(initialValue: String(port))
+			self.host = host
+			self.port = String(port)
+			self.noRequireOnionAddress = !(customConfig?.requireOnionIfTorEnabled ?? true)
 		} else {
-			_host = State(initialValue: "")
-			_port = State(initialValue: "")
+			self.host = ""
+			self.port = ""
+			self.noRequireOnionAddress = false
 		}
 	}
 
@@ -164,9 +169,14 @@ struct ElectrumAddressSheet: View {
 				.padding(.bottom)
 
 			customizeServerView_port()
-				.padding(.bottom, 30)
 
+			if isTorEnabled {
+				customizeServerView_torInfo()
+					.padding(.top)
+			}
+			
 			customizeServerView_status()
+				.padding(.top, 30)
 
 		} // </VStack>
 		.assignMaxPreference(for: titleWidthReader.key, to: $titleWidth)
@@ -276,6 +286,31 @@ struct ElectrumAddressSheet: View {
 			)
 		} // </HStack> (row)
 		.frame(maxWidth: .infinity)
+	}
+	
+	@ViewBuilder
+	func customizeServerView_torInfo() -> some View {
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+			VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
+				Text("Since you've enabled Tor, you should use an onion address for this server.")
+				
+				Toggle(isOn: $noRequireOnionAddress) {
+					Text("No, I don't want to use an onion address")
+						.foregroundColor(.appAccent)
+						.bold()
+				}
+				.toggleStyle(CheckboxToggleStyle(
+					onImage: checkmarkImage_on(),
+					offImage: checkmarkImage_off()
+				))
+			}
+			
+			Spacer()
+		} // </HStack>
+		.padding(.all, 10)
+		.background(Color(.systemGroupedBackground))
+		.cornerRadius(10)
 	}
 	
 	@ViewBuilder
@@ -473,7 +508,7 @@ struct ElectrumAddressSheet: View {
 					checkServerConnection()
 				}
 			}
-			.disabled(!userHasMadeChanges || activeCheck != nil || (isUntrustedCert && !shouldTrustPubKey))
+			.disabled(customServer_saveButtonDisabled)
 			.font(.title2)
 		}
 	}
@@ -493,6 +528,46 @@ struct ElectrumAddressSheet: View {
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
+	
+	var hostIsOnion: Bool {
+		
+		let rawHost = host.trimmingCharacters(in: .whitespacesAndNewlines)
+		
+		// careful: URL(string: "http://") return non-nil
+		if rawHost.isEmpty {
+			return false
+		}
+		
+		guard
+			let url = URL(string: "http://\(rawHost)"),
+			let tld = url.host(percentEncoded: false)?.components(separatedBy: ".").last
+		else {
+			return false
+		}
+		
+		return tld.lowercased() == "onion"
+	}
+	
+	var customServer_saveButtonDisabled: Bool {
+		
+		if !userHasMadeChanges {
+			return true
+		}
+		
+		if activeCheck != nil {
+			return true
+		}
+		
+		if isUntrustedCert && !shouldTrustPubKey {
+			return true
+		}
+		
+		if isTorEnabled && !hostIsOnion && !noRequireOnionAddress {
+			return true
+		}
+		
+		return false
+	}
 	
 	var untrustedCert: SecCertificate? {
 		switch checkResult {
@@ -721,18 +796,14 @@ struct ElectrumAddressSheet: View {
 				pinnedPubKey = nil
 			}
 			
-			let prefs = ElectrumConfigPrefs(
+			let newPrefs = ElectrumConfigPrefs(
 				host: checkedHost,
 				port: checkedPort,
-				pinnedPubKey: pinnedPubKey
+				pinnedPubKey: pinnedPubKey,
+				requireOnionIfTorEnabled: !noRequireOnionAddress
 			)
-			GroupPrefs.shared.electrumConfig = prefs
-			
-			let config = ElectrumConfig.Custom.companion.create(
-				server: prefs.serverAddress,
-				requireOnionIfTorEnabled: true
-			)
-			mvi.intent(ElectrumConfiguration.IntentUpdateElectrumServer(config: config))
+			GroupPrefs.shared.electrumConfig = newPrefs
+			mvi.intent(ElectrumConfiguration.IntentUpdateElectrumServer(config: newPrefs.customConfig))
 			
 		} else {
 			

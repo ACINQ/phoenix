@@ -204,6 +204,7 @@ struct AppStatusPopover: View {
 				}
 				
 				Text("Make sure your Tor VPN is active and running.")
+					.fixedSize(horizontal: false, vertical: true) // text truncation bugs
 					.foregroundStyle(.secondary)
 			}
 			
