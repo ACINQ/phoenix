@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package fr.acinq.phoenix.utils.extensions
 
 import fr.acinq.lightning.db.AutomaticLiquidityPurchasePayment
@@ -33,7 +35,6 @@ import fr.acinq.lightning.wire.OfferTypes
 
 enum class WalletPaymentState { SuccessOnChain, SuccessOffChain, PendingOnChain, PendingOffChain, Failure }
 
-@Suppress("DEPRECATION")
 fun WalletPayment.state(): WalletPaymentState = when (this) {
     is ManualLiquidityPurchasePayment -> when (lockedAt) {
         null -> WalletPaymentState.PendingOnChain

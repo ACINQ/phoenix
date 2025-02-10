@@ -75,10 +75,6 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = Versions.Android.composeCompiler
     }
-
-    packagingOptions {
-        resources.merges.add("reference.conf")
-    }
 }
 
 kotlin {
