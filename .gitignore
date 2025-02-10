@@ -24,6 +24,7 @@ phoenix-android/release/
 sdk-dependencies
 apk
 .cxx
+logs/
 
 # LangTool
 .langtool/deepl.authtoken
