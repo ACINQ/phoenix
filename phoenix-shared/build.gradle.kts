@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import java.io.ByteArrayOutputStream
 import co.touchlab.skie.configuration.FlowInterop
 import co.touchlab.skie.configuration.SuspendInterop
@@ -11,7 +10,7 @@ plugins {
     if (System.getProperty("includeAndroid")?.toBoolean() == true) {
         id("com.android.library")
     }
-    id("co.touchlab.skie") version "0.9.3"
+    id("co.touchlab.skie") version Versions.skie
 }
 
 val includeAndroid = System.getProperty("includeAndroid")?.toBoolean() ?: false
@@ -102,7 +101,7 @@ kotlin {
                 implementation("app.cash.sqldelight:runtime:${Versions.sqlDelight}")
                 implementation("app.cash.sqldelight:coroutines-extensions:${Versions.sqlDelight}")
                 // SKEI
-                implementation("co.touchlab.skie:configuration-annotations:0.9.3")
+                implementation("co.touchlab.skie:configuration-annotations:${Versions.skie}")
             }
         }
 

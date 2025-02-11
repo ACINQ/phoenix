@@ -2,10 +2,11 @@ object Versions {
     const val lightningKmp = "1.8.5-SNAPSHOT"
     const val secp256k1 = "0.14.0"
 
-    const val kotlin = "2.0.21"
+    const val kotlin = "2.1.10"
+    const val skie = "0.10.1"
 
     const val ktor = "2.3.7"
-    const val sqlDelight = "2.0.1"
+    const val sqlDelight = "2.0.2"
     const val okio = "3.8.0"
 
     const val slf4j = "1.7.30"
@@ -32,7 +33,6 @@ object Versions {
         const val constraint = "2.0.4"
         const val work = "2.8.1"
 
-        const val testRunner = "1.3.0"
         const val espresso = "3.3.0"
     }
 }
