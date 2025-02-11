@@ -77,8 +77,8 @@ extension Lightning_kmpWalletState.WalletWithConfirmations {
 	}
 	
 	var totalBalance: Bitcoin_kmpSatoshi {
-		let allTx = unconfirmed + weaklyConfirmed + deeplyConfirmed
-		let balance = allTx.map { $0.amount.toLong() }.sum()
+		// all: unconfirmed + weaklyConfirmed + deeplyConfirmed + lockedUntilRefund + readyForRefund
+		let balance = all.map { $0.amount.toLong() }.sum()
 		return Bitcoin_kmpSatoshi(sat: balance)
 	}
 	
