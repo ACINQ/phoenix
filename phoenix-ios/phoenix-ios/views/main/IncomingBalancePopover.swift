@@ -10,6 +10,9 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct IncomingBalancePopover: View {
 	
+	let showSwapInWallet: () -> Void
+	let showFinalWallet: () -> Void
+	
 	@State var swapInWallet = Biz.business.balanceManager.swapInWalletValue()
 	let swapInWalletPublisher = Biz.business.balanceManager.swapInWalletPublisher()
 	
@@ -52,10 +55,17 @@ struct IncomingBalancePopover: View {
 	@ViewBuilder
 	func group_fundsBeingConfirmed() -> some View {
 		
+	#if DEBUG
+		let fundsBeingConfirmed: Int64 =
+			swapInWallet.unconfirmedBalance.toMsat() +
+			swapInWallet.weaklyConfirmedBalance.toMsat() +
+			pendingChannelsBalance.msat // + 1_000_000
+	#else
 		let fundsBeingConfirmed: Int64 =
 			swapInWallet.unconfirmedBalance.toMsat() +
 			swapInWallet.weaklyConfirmedBalance.toMsat() +
 			pendingChannelsBalance.msat
+	#endif
 		
 		if fundsBeingConfirmed > 0 {
 			VStack(alignment: HorizontalAlignment.leading, spacing: 5) {
@@ -83,6 +93,9 @@ struct IncomingBalancePopover: View {
 			.padding(10)
 			.background(Color(.secondarySystemBackground))
 			.cornerRadius(16)
+			.onTapGesture {
+				didTapSection_swapInWallet()
+			}
 			.padding(.horizontal, 10)
 		}
 	}
@@ -166,6 +179,9 @@ struct IncomingBalancePopover: View {
 			.padding(10)
 			.background(Color(.secondarySystemBackground))
 			.cornerRadius(16)
+			.onTapGesture {
+				didTapSection_swapInWallet()
+			}
 			.padding(.horizontal, 10)
 		}
 	}
@@ -211,6 +227,9 @@ struct IncomingBalancePopover: View {
 			.padding(10)
 			.background(Color(.secondarySystemBackground))
 			.cornerRadius(16)
+			.onTapGesture {
+				didTapSection_swapInWallet()
+			}
 			.padding(.horizontal, 10)
 		}
 	}
@@ -252,6 +271,9 @@ struct IncomingBalancePopover: View {
 			.padding(10)
 			.background(Color(.secondarySystemBackground))
 			.cornerRadius(16)
+			.onTapGesture {
+				didTapSection_finalWallet()
+			}
 			.padding(.horizontal, 10)
 		}
 	}
@@ -324,5 +346,23 @@ struct IncomingBalancePopover: View {
 		log.trace("liquidityPolicyChanged()")
 		
 		liquidityPolicy = newValue
+	}
+	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
+	
+	func didTapSection_swapInWallet() {
+		log.trace("didTapSection_swapInWallet()")
+		
+		popoverState.close()
+		showSwapInWallet()
+	}
+	
+	func didTapSection_finalWallet() {
+		log.trace("didTapSection_finalWallet()")
+		
+		popoverState.close()
+		showFinalWallet()
 	}
 }

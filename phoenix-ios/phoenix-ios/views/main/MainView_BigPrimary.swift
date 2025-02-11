@@ -127,8 +127,9 @@ struct MainView_BigPrimary: View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			HomeView(
+				showLiquidityAds: showLiquidityAds,
 				showSwapInWallet: showSwapInWallet,
-				showLiquidityAds: showLiquidityAds
+				showFinalWallet: showFinalWallet
 			)
 			.padding(.bottom, 15)
 			footer()
@@ -314,15 +315,6 @@ struct MainView_BigPrimary: View {
 		}
 	}
 	
-	func showSwapInWallet() {
-		log.trace("showSwapInWallet()")
-		
-		popoverState.display(dismissable: true) {
-			SwapInWalletDetails(location: .popover, popTo: popTo)
-				.frame(maxHeight: 600)
-		}
-	}
-	
 	func showLiquidityAds() {
 		log.trace("showLiquidityAds()")
 		
@@ -330,6 +322,36 @@ struct MainView_BigPrimary: View {
 			LiquidityAdsView(location: .popover)
 				.frame(maxHeight: 600)
 		}
+	}
+	
+	func showSwapInWallet() {
+		log.trace("showSwapInWallet()")
+		
+		// We used to show this in a popover:
+	//	popoverState.display(dismissable: true) {
+	//		SwapInWalletDetails(location: .popover, popTo: popTo)
+	//			.frame(maxHeight: 600)
+	//	}
+		
+		// But on iPad, it's just as clean to jump straight to the configuration setting.
+		deepLinkManager.broadcast(.swapInWallet)
+	}
+	
+	func showFinalWallet() {
+		log.trace("showFinalWallet()")
+		
+		// It's currently not possible to use a popover here.
+		// The problem is:
+		// > FinalWalletDetails > SpendOnChainFunds > showMinerFeeSheet()
+		//
+		// So we have a view(SpendOnChainFunds) within a popover,
+		// that needs to display another popover(MinerFeeSheet).
+		// So the user never returns to the SpendOnChainFunds view.
+		//
+		// This is fixable with a bit of work.
+		// But on iPad, it's just as clean to jump straight to the configuration setting.
+		
+		deepLinkManager.broadcast(.finalWallet)
 	}
 	
 	// --------------------------------------------------

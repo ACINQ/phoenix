@@ -18,8 +18,9 @@ struct HomeView : MVIView {
 	
 	private let paymentsPageFetcher = Biz.getPaymentsPageFetcher(name: "HomeView")
 	
-	let showSwapInWallet: () -> Void
 	let showLiquidityAds: () -> Void
+	let showSwapInWallet: () -> Void
+	let showFinalWallet: () -> Void
 	
 	@StateObject var mvi = MVIState({ $0.home() })
 
@@ -90,11 +91,14 @@ struct HomeView : MVIView {
 	// --------------------------------------------------
 	
 	init(
+		showLiquidityAds: @escaping () -> Void,
 		showSwapInWallet: @escaping () -> Void,
-		showLiquidityAds: @escaping () -> Void
+		showFinalWallet: @escaping () -> Void
 	) {
-		self.showSwapInWallet = showSwapInWallet
 		self.showLiquidityAds = showLiquidityAds
+		self.showSwapInWallet = showSwapInWallet
+		self.showFinalWallet = showFinalWallet
+		
 		self.paymentsPagePublisher = paymentsPageFetcher.paymentsPagePublisher()
 	}
 	
@@ -1007,7 +1011,10 @@ struct HomeView : MVIView {
 		log.trace("showIncomingBalancePopover()")
 		
 		popoverState.display(dismissable: true) {
-			IncomingBalancePopover()
+			IncomingBalancePopover(
+				showSwapInWallet: showSwapInWallet,
+				showFinalWallet: showFinalWallet
+			)
 		}
 	}
 	
