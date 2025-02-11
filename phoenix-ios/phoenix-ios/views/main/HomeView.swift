@@ -42,6 +42,12 @@ struct HomeView : MVIView {
 	let swapInWalletPublisher = Biz.business.balanceManager.swapInWalletPublisher()
 	@State var swapInWallet = Biz.business.balanceManager.swapInWalletValue()
 	
+	@State var finalWallet = Biz.business.peerManager.finalWalletValue()
+	let finalWalletPublisher = Biz.business.peerManager.finalWalletPublisher()
+	
+	@State var pendingChannelsBalance = Biz.business.balanceManager.pendingChannelsBalanceValue()
+	let pendingChannelsBalancePublisher = Biz.business.balanceManager.pendingChannelsBalancePublisher()
+	
 	@State var channels: [LocalChannelInfo] = []
 	let channelsPublisher = Biz.business.peerManager.channelsPublisher()
 	
@@ -128,6 +134,12 @@ struct HomeView : MVIView {
 			}
 			.onReceive(swapInWalletPublisher) {
 				swapInWalletChanged($0)
+			}
+			.onReceive(finalWalletPublisher) {
+				finalWalletChanged($0)
+			}
+			.onReceive(pendingChannelsBalancePublisher) {
+				pendingChannelsBalanceChanged($0)
 			}
 			.onReceive(channelsPublisher) {
 				channelsChanged($0)
@@ -286,29 +298,40 @@ struct HomeView : MVIView {
 	@ViewBuilder
 	func incomingBalance() -> some View {
 		
-		let incomingSat = swapInWallet.totalBalance.sat
-		if incomingSat > 0 {
+		let swapInWalletBalance: Int64 = swapInWallet.totalBalance.toMsat()
+		let finalWalletBalance: Int64 = finalWallet.totalBalance.toMsat()
+		let pendingBalance: Int64 = pendingChannelsBalance.msat
+		
+		let incomingBalance = swapInWalletBalance + finalWalletBalance + pendingBalance
+		if incomingBalance > 0 {
 			let formattedAmount = currencyPrefs.hideAmounts
 				? Utils.hiddenAmount(currencyPrefs)
-				: Utils.format(currencyPrefs, sat: incomingSat)
+				: Utils.format(currencyPrefs, sat: incomingBalance)
 			
-			let unconfirmedBalance = swapInWallet.unconfirmedBalance.sat
-			let weaklyConfirmedBalance = swapInWallet.weaklyConfirmedBalance.sat
+			let hasNonSwapInBalance = (finalWalletBalance > 0) || (pendingBalance > 0)
 			
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 			
-				if let days = swapInWallet.expirationWarningInDays(), days <= 1 {
-					Image(systemName: "exclamationmark.triangle")
-						.foregroundColor(.appNegative)
-						.padding(.trailing, 2)
-				} else if unconfirmedBalance == 0 && weaklyConfirmedBalance == 0 {
-					Image(systemName: "zzz")
-						.foregroundColor(.appWarn)
-						.padding(.trailing, 2)
-				} else {
-					Image(systemName: "clock")
-						.padding(.trailing, 2)
-				}
+				Group {
+					if hasNonSwapInBalance {
+						Image(systemName: "link")
+					} else {
+						let unconfirmedBalance = swapInWallet.unconfirmedBalance.sat
+						let weaklyConfirmedBalance = swapInWallet.weaklyConfirmedBalance.sat
+						
+						if let days = swapInWallet.expirationWarningInDays(), days <= 7 {
+							Image(systemName: "exclamationmark.triangle")
+								.foregroundColor(.appNegative)
+						} else if unconfirmedBalance == 0 && weaklyConfirmedBalance == 0 {
+							Image(systemName: "zzz")
+								.foregroundColor(.appWarn)
+								
+						} else {
+							Image(systemName: "clock")
+						}
+					}
+				} // </Group>
+				.padding(.trailing, 2)
 				
 				if currencyPrefs.hideAmounts {
 					Text("+\(formattedAmount.digits)".lowercased()) // digits => "***"
@@ -320,7 +343,13 @@ struct HomeView : MVIView {
 			}
 			.font(.callout)
 			.foregroundColor(.secondary)
-			.onTapGesture { showSwapInWallet() }
+			.onTapGesture {
+				if hasNonSwapInBalance {
+					showIncomingBalancePopover()
+				} else {
+					showSwapInWallet()
+				}
+			}
 			.padding(.top, 7)
 			.padding(.bottom, 2)
 			.scaleEffect(incomingSwapScaleFactor, anchor: .top)
@@ -813,6 +842,18 @@ struct HomeView : MVIView {
 		}
 	}
 	
+	func finalWalletChanged(_ newValue: Lightning_kmpWalletState.WalletWithConfirmations) {
+		log.trace("finalWalletChanged()")
+		
+		finalWallet = newValue
+	}
+	
+	func pendingChannelsBalanceChanged(_ newValue: Lightning_kmpMilliSatoshi) {
+		log.trace("pendingChannelsBalanceChanged()")
+		
+		pendingChannelsBalance = newValue
+	}
+	
 	func channelsChanged(_ channels: [LocalChannelInfo]) {
 		log.trace("channelsChanged()")
 		
@@ -959,6 +1000,14 @@ struct HomeView : MVIView {
 			
 		} else if currencyPrefs.currencyType == .fiat {
 			currencyPrefs.toggleHideAmounts()
+		}
+	}
+	
+	func showIncomingBalancePopover() {
+		log.trace("showIncomingBalancePopover()")
+		
+		popoverState.display(dismissable: true) {
+			IncomingBalancePopover()
 		}
 	}
 	

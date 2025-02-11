@@ -7433,6 +7433,9 @@
         }
       }
     },
+    "Attention! Some funds will expire soon and won't be eligible for a swap anymore." : {
+
+    },
     "Authenticate" : {
       "comment" : "lnurl-auth: login button title",
       "localizations" : {
@@ -9663,6 +9666,9 @@
           }
         }
       }
+    },
+    "Cannot be swapped anymore, after 4 months waiting. These funds must be spent manually." : {
+
     },
     "Cannot create commit tx" : {
       "localizations" : {
@@ -12101,6 +12107,9 @@
           }
         }
       }
+    },
+    "Confirming: " : {
+
     },
     "Connected" : {
       "comment" : "Connection state",
@@ -17930,6 +17939,9 @@
         }
       }
     },
+    "Expired: " : {
+
+    },
     "Explore" : {
       "localizations" : {
         "ar" : {
@@ -19391,6 +19403,9 @@
           }
         }
       }
+    },
+    "Final wallet: " : {
+
     },
     "Fix It" : {
       "localizations" : {
@@ -41200,6 +41215,9 @@
         }
       }
     },
+    "These funds come from closed Lightning channels. They must be spent manually." : {
+
+    },
     "These funds were not swapped in time. Tap to spend." : {
       "localizations" : {
         "ar" : {
@@ -45524,6 +45542,9 @@
         }
       }
     },
+    "Waiting for confirmation first before they can be swapped to Lightning." : {
+
+    },
     "waiting for confirmations" : {
       "comment" : "explanation for pending transaction",
       "localizations" : {
@@ -45885,6 +45906,9 @@
           }
         }
       }
+    },
+    "Waiting for swap: " : {
+
     },
     "Waiting to start…" : {
       "localizations" : {
@@ -46808,6 +46832,19 @@
         }
       }
     },
+    "Will automatically be swapped to Lightning if the fee is **less than %@** (%@) of the amount." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Will automatically be swapped to Lightning if the fee is **less than %1$@** (%2$@) of the amount."
+          }
+        }
+      }
+    },
+    "Will automatically be swapped to Lightning if the fee is **less than %@**." : {
+
+    },
     "will be sent to:" : {
       "localizations" : {
         "ar" : {
@@ -46968,6 +47005,9 @@
           }
         }
       }
+    },
+    "Will remain on-chain because automated channels management is disabled." : {
+
     },
     "With configured proportional fee, we recommend a base fee of at least %@." : {
       "extractionState" : "manual",
