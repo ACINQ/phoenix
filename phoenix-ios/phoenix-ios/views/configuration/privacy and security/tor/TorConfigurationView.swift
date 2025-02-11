@@ -11,6 +11,8 @@ struct TorConfigurationView: View {
 
 	@State var toggleState = GroupPrefs.shared.isTorEnabled
 	@State var isTorEnabled = GroupPrefs.shared.isTorEnabled
+	
+	@State var ignoreToggleStateChange = false
 
 	@EnvironmentObject var smartModalState: SmartModalState
 	
@@ -91,15 +93,31 @@ struct TorConfigurationView: View {
 	func toggleStateChanged(_ isEnabled: Bool) {
 		log.trace("toggleStateChanged: \(isEnabled)")
 		
-		if isEnabled {
+		if ignoreToggleStateChange {
+			ignoreToggleStateChange = false
+			
+		} else if isEnabled {
 			smartModalState.display(dismissable: false) {
-				UsingTorSheet(didConfirm: usingTorSheet_didConfirm)
+				UsingTorSheet(
+					didCancel: usingTorSheet_didCancel,
+					didConfirm: usingTorSheet_didConfirm
+				)
 			}
 		} else {
 			smartModalState.display(dismissable: false) {
-				DisablingTorSheet(didConfirm: disablingTorSheet_didConfirm)
+				DisablingTorSheet(
+					didCancel: disablingTorSheet_didCancel,
+					didConfirm: disablingTorSheet_didConfirm
+				)
 			}
 		}
+	}
+	
+	func usingTorSheet_didCancel() {
+		log.trace("usingTorSheet_didCancel()")
+		
+		ignoreToggleStateChange = true
+		toggleState = false
 	}
 	
 	func usingTorSheet_didConfirm() {
@@ -107,6 +125,13 @@ struct TorConfigurationView: View {
 		
 		isTorEnabled = true
 		GroupPrefs.shared.isTorEnabled = true
+	}
+	
+	func disablingTorSheet_didCancel() {
+		log.trace("disablingTorSheet_didCancel()")
+		
+		ignoreToggleStateChange = true
+		toggleState = true
 	}
 	
 	func disablingTorSheet_didConfirm() {

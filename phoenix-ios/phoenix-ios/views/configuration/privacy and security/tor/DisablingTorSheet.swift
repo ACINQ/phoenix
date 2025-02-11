@@ -9,6 +9,7 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct DisablingTorSheet: View {
 	
+	let didCancel: () -> Void
 	let didConfirm: () -> Void
 	
 	@EnvironmentObject var smartModalState: SmartModalState
@@ -32,14 +33,6 @@ struct DisablingTorSheet: View {
 				.accessibilitySortPriority(100)
 			
 			Spacer()
-			
-			Button {
-				closeSheet()
-			} label: {
-				Image(systemName: "xmark").imageScale(.medium).font(.title2)
-			}
-			.accessibilityLabel("Close")
-			.accessibilityHidden(smartModalState.dismissable)
 		}
 		.padding(.horizontal)
 		.padding(.vertical, 8)
@@ -98,7 +91,9 @@ struct DisablingTorSheet: View {
 	func cancelButtonTapped() {
 		log.trace("cancelButtonTapped()")
 		
-		smartModalState.close()
+		smartModalState.close(animationCompletion: {
+			didCancel()
+		})
 	}
 	
 	func confirmButtonTapped() {
@@ -107,11 +102,5 @@ struct DisablingTorSheet: View {
 		smartModalState.close(animationCompletion: {
 			didConfirm()
 		})
-	}
-	
-	func closeSheet() {
-		log.trace("closeSheet()")
-		
-		smartModalState.close()
 	}
 }
