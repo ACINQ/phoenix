@@ -60,9 +60,6 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.firebase.messaging.FirebaseMessaging
-import fr.acinq.lightning.db.Bolt12IncomingPayment
-import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
-import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.PhoenixBusiness
@@ -85,7 +82,7 @@ import fr.acinq.phoenix.android.services.NodeServiceState
 import fr.acinq.phoenix.android.settings.AboutView
 import fr.acinq.phoenix.android.settings.AppAccessSettings
 import fr.acinq.phoenix.android.settings.DisplayPrefsView
-import fr.acinq.phoenix.android.settings.ElectrumView
+import fr.acinq.phoenix.android.settings.electrum.ElectrumView
 import fr.acinq.phoenix.android.settings.ExperimentalView
 import fr.acinq.phoenix.android.settings.ForceCloseView
 import fr.acinq.phoenix.android.settings.LogsView
@@ -112,7 +109,6 @@ import fr.acinq.phoenix.android.settings.walletinfo.SwapInWallet
 import fr.acinq.phoenix.android.settings.walletinfo.WalletInfoView
 import fr.acinq.phoenix.android.startup.LegacySwitcherView
 import fr.acinq.phoenix.android.startup.StartupView
-import fr.acinq.phoenix.android.utils.SystemNotificationHelper
 import fr.acinq.phoenix.android.utils.appBackground
 import fr.acinq.phoenix.android.utils.extensions.findActivitySafe
 import fr.acinq.phoenix.android.utils.logger
@@ -367,10 +363,10 @@ fun AppView(
                         DisplaySeedView()
                     }
                     composable(Screen.ElectrumServer.route) {
-                        ElectrumView()
+                        ElectrumView(onBackClick = { navController.popBackStack() })
                     }
                     composable(Screen.TorConfig.route) {
-                        TorConfigView()
+                        TorConfigView(appViewModel = appVM, onBackClick = { navController.popBackStack() }, onBusinessTeardown = { navController.popToHome() })
                     }
                     composable(Screen.Channels.route) {
                         ChannelsView(
@@ -627,15 +623,20 @@ private fun RequireStarted(
     nextUri: String? = null,
     children: @Composable () -> Unit
 ) {
-    if (serviceState == null) {
-        // do nothing
-    } else if (serviceState !is NodeServiceState.Running) {
-        val nc = navController
-        nc.navigate("${Screen.Startup.route}?next=${nextUri?.encodeURLParameter()}") {
-            popUpTo(nc.graph.id) { inclusive = true }
+    children()
+
+    val navController = navController
+    val currentRoute = navController.currentDestination?.route
+    if (serviceState != null && serviceState is NodeServiceState.Off && currentRoute != null) {
+        if (currentRoute != Screen.Startup.route || currentRoute != Screen.SwitchToLegacy.route) {
+            val log = logger("Navigation")
+            LaunchedEffect(key1 = Unit) {
+                log.info("service off, navigating to startup then $nextUri")
+                navController.navigate("${Screen.Startup.route}?next=${nextUri?.encodeURLParameter()}") {
+                    popUpTo(navController.graph.id) { inclusive = true }
+                }
+            }
         }
-    } else {
-        children()
     }
 }
 

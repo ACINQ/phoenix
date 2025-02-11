@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 ACINQ SAS
+ * Copyright 2024 ACINQ SAS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.settings
+package fr.acinq.phoenix.android.settings.electrum
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -89,8 +89,8 @@ class ElectrumDialogViewModel : ViewModel() {
     }
 
     sealed class CertificateCheckState {
-        object Init : CertificateCheckState()
-        object Checking : CertificateCheckState()
+        data object Init : CertificateCheckState()
+        data object Checking : CertificateCheckState()
         data class Rejected(val host: String, val port: Int, val certificate: Certificate) : CertificateCheckState()
         data class Failure(val e: Throwable) : CertificateCheckState()
     }

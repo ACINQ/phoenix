@@ -56,6 +56,8 @@ import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.Dialog
 import fr.acinq.phoenix.android.components.PrimarySeparator
 import fr.acinq.phoenix.android.components.mvi.MVIView
+import fr.acinq.phoenix.android.home.releasenotes.ReleaseNoteDialog
+import fr.acinq.phoenix.android.internalData
 import fr.acinq.phoenix.android.utils.FCMHelper
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
@@ -90,7 +92,6 @@ fun HomeView(
     val isPowerSaverModeOn = noticesViewModel.isPowerSaverModeOn
     val fcmToken by internalData.getFcmToken.collectAsState(initial = "")
     val isFCMAvailable = remember { FCMHelper.isFCMAvailable(context) }
-    val torEnabledState = userPrefs.getIsTorEnabled.collectAsState(initial = null)
     val balanceDisplayMode by userPrefs.getHomeAmountDisplayMode.collectAsState(initial = HomeAmountDisplayMode.REDACTED)
 
     val connections by business.connectionsManager.connections.collectAsState()
@@ -228,7 +229,6 @@ fun HomeView(
                     connections = connections,
                     electrumBlockheight = electrumMessages?.blockHeight ?: 0,
                     inFlightPaymentsCount = inFlightPaymentsCount,
-                    isTorEnabled = torEnabledState.value,
                     onTorClick = onTorClick,
                     isFCMUnavailable = fcmToken == null || !isFCMAvailable,
                     isPowerSaverMode = isPowerSaverModeOn,
@@ -270,7 +270,7 @@ fun HomeView(
 
     var showAddressWarningDialog by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
-    if (showAddressWarningDialog){
+    if (showAddressWarningDialog) {
         Dialog(
             onDismiss = { scope.launch { internalData.saveLegacyMigrationAddressWarningShown(true) } },
             title = stringResource(id = R.string.inappnotif_migration_from_legacy_dialog_title),
@@ -278,6 +278,9 @@ fun HomeView(
             Text(text = annotatedStringResource(id = R.string.inappnotif_migration_from_legacy_dialog_body), modifier = Modifier.padding(horizontal = 24.dp, vertical = 0.dp))
         }
     }
+
+    val releaseNoteCode by internalData.showReleaseNoteSinceCode.collectAsState(initial = null)
+    releaseNoteCode?.let { ReleaseNoteDialog(sinceCode = it) }
 
     LaunchedEffect(Unit) {
         if (LegacyPrefsDatastore.hasMigratedFromLegacy(context).first()) {

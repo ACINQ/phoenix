@@ -29,6 +29,7 @@ import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.utils.UserTheme
 import fr.acinq.phoenix.data.BitcoinUnit
+import fr.acinq.phoenix.data.ElectrumConfig
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.lnurl.LnurlAuth
 import fr.acinq.phoenix.db.migrations.v10.json.SatoshiSerializer
@@ -72,6 +73,7 @@ class UserPrefsRepository(private val data: DataStore<Preferences>) {
         // electrum
         val PREFS_ELECTRUM_ADDRESS_HOST = stringPreferencesKey("PREFS_ELECTRUM_ADDRESS_HOST")
         val PREFS_ELECTRUM_ADDRESS_PORT = intPreferencesKey("PREFS_ELECTRUM_ADDRESS_PORT")
+        val PREFS_ELECTRUM_ADDRESS_REQUIRE_ONION_IF_TOR_ENABLED = booleanPreferencesKey("PREFS_ELECTRUM_ADDRESS_REQUIRE_ONION_IF_TOR_ENABLED")
         val PREFS_ELECTRUM_ADDRESS_PINNED_KEY = stringPreferencesKey("PREFS_ELECTRUM_ADDRESS_PINNED_KEY")
         // access control
         val PREFS_SCREEN_LOCK_BIOMETRICS = booleanPreferencesKey("PREFS_SCREEN_LOCK")
@@ -123,29 +125,32 @@ class UserPrefsRepository(private val data: DataStore<Preferences>) {
     val getHideBalance: Flow<Boolean> = safeData.map { it[HIDE_BALANCE] ?: false }
     suspend fun saveHideBalance(hideBalance: Boolean) = data.edit { it[HIDE_BALANCE] = hideBalance }
 
-    val getElectrumServer: Flow<ServerAddress?> = safeData.map {
+    val getElectrumServer: Flow<ElectrumConfig.Custom?> = safeData.map {
         val host = it[PREFS_ELECTRUM_ADDRESS_HOST]?.takeIf { it.isNotBlank() }
         val port = it[PREFS_ELECTRUM_ADDRESS_PORT]
+        val requireOnionIfTorEnabled = it[PREFS_ELECTRUM_ADDRESS_REQUIRE_ONION_IF_TOR_ENABLED] ?: true
         val pinnedKey = it[PREFS_ELECTRUM_ADDRESS_PINNED_KEY]?.takeIf { it.isNotBlank() }
         log.debug("retrieved electrum address from datastore, host=$host port=$port key=$pinnedKey")
         if (host != null && port != null && pinnedKey == null) {
-            ServerAddress(host, port, TcpSocket.TLS.TRUSTED_CERTIFICATES())
+            ElectrumConfig.Custom.create(ServerAddress(host, port, TcpSocket.TLS.TRUSTED_CERTIFICATES()), requireOnionIfTorEnabled)
         } else if (host != null && port != null && pinnedKey != null) {
-            ServerAddress(host, port, TcpSocket.TLS.PINNED_PUBLIC_KEY(pinnedKey))
+            ElectrumConfig.Custom.create(ServerAddress(host, port, TcpSocket.TLS.PINNED_PUBLIC_KEY(pinnedKey)), requireOnionIfTorEnabled)
         } else {
             null
         }
     }
 
-    suspend fun saveElectrumServer(address: ServerAddress?) = data.edit {
-        if (address == null) {
+    suspend fun saveElectrumServer(config: ElectrumConfig.Custom?) = data.edit {
+        if (config == null) {
             it.remove(PREFS_ELECTRUM_ADDRESS_HOST)
             it.remove(PREFS_ELECTRUM_ADDRESS_PORT)
             it.remove(PREFS_ELECTRUM_ADDRESS_PINNED_KEY)
+            it.remove(PREFS_ELECTRUM_ADDRESS_REQUIRE_ONION_IF_TOR_ENABLED)
         } else {
-            it[PREFS_ELECTRUM_ADDRESS_HOST] = address.host
-            it[PREFS_ELECTRUM_ADDRESS_PORT] = address.port
-            val tls = address.tls
+            it[PREFS_ELECTRUM_ADDRESS_HOST] = config.server.host
+            it[PREFS_ELECTRUM_ADDRESS_PORT] = config.server.port
+            it[PREFS_ELECTRUM_ADDRESS_REQUIRE_ONION_IF_TOR_ENABLED] = config.requireOnionIfTorEnabled
+            val tls = config.server.tls
             if (tls is TcpSocket.TLS.PINNED_PUBLIC_KEY) {
                 it[PREFS_ELECTRUM_ADDRESS_PINNED_KEY] = tls.pubKey
             } else {

@@ -99,7 +99,6 @@
     <string name="home_background_restriction_title">Usindikaji wa nyuma umepunguzwa</string>
     <string name="home_background_restriction_body_1">Phoenix haitaweza kupokea malipo wakati iko nyuma, au wakati imefungwa.</string>
     <string name="home_background_restriction_body_2">Hii hutokea kwa sababu:</string>
-    <string name="home_background_restriction_tor">Tor imewashwa</string>
     <string name="home_background_restriction_powersaver">Kifaa kipo kwenye hali ya kuokoa nguvu</string>
     <string name="home_background_restriction_fcm">Arifa za FCM hazipatikani</string>
     <string name="home_background_restriction_fcm_details">Kama uko kwenye GrapheneOS au CalyxOS, weka Huduma za Google Play kupata arifa za FCM. Angalia FAQ kwa mwongozo.</string>
@@ -174,7 +173,6 @@
 
     <string name="receive_tor_warning_title">Tor imewezeshwa</string>
     <string name="receive_tor_warning_dialog_content_1">Phoenix haiwezi kupokea malipo katika usuli.</string>
-    <string name="receive_tor_warning_dialog_content_2">Ili kuepuka kushindwa kwa malipo, tumia Orbot badala yake, au hakikisha Phoenix inaonekana mbele wakati malipo yanatumwa kwako.</string>
 
     <!-- scanning errors -->
 
@@ -283,13 +281,16 @@
   <string name="lnurl_withdraw_header">Unaweza kutoa fedha kutoka\n<b>%1$s</b>.</string>
   <string name="lnurl_withdraw_success">Ombi la kutoa fedha limepelekwa kwa <b>%1$s</b>.\n\nInaweza kuchukua muda kabla ya wao kutuma fedha. Tafadhali weka programu kwenye mtandao kwa wakati huu.</string>
 
-  <!-- Tor -->
+    <!-- Tor -->
 
-  <string name="tor_settings_subtitle">Phoenix inaweza kutumia Tor kuficha IP yako kutoka kwa nodi zingine kwenye Mtandao wa Lightning na seva za Electrum.</string>
-
-  <string name="tor_confirm_dialog_title">Wezesha Tor?</string>
-  <string name="tor_confirm_dialog_details_1">Tor ni polepole na itaathiri utendaji wa malipo yako.</string>
-  <string name="tor_confirm_dialog_details_2">Hasa, <b>hutoweza kupokea malipo</b> ikiwa Phoenix iko kwenye usuli, au ikiwa imefungwa.</string>
+    <string name="tor_dialog_enable_title_1">Kwa kutumia Tor</string>
+    <string name="tor_dialog_enable_details_1">Kuwasha chaguo hili kutahitaji Phoenix kutumia anwani za vitunguu inapounganisha kwenye Umeme na Electrum. Kumbuka kwamba programu ya proksi ya Tor inahitajika.</string>
+    <string name="tor_dialog_enable_title_2">Pata ushauri</string>
+    <string name="tor_dialog_enable_details_2">Tor inaweza kuboresha faragha, lakini inaweza kusababisha matatizo ya utendakazi na kukosa malipo.</string>
+    <string name="tor_dialog_disable_title">Inalemaza Kivinjari</string>
+    <string name="tor_dialog_disable_details_1">Ukizima chaguo hili, anwani yako ya IP inaweza kufichuliwa kwa watoa huduma mbalimbali.</string>
+    <string name="tor_dialog_disable_details_2">Je, una uhakika unataka kuendelea?</string>
+    <string name="tor_dialog_processing">Inachakata mabadiliko…</string>
 
   <!-- about -->
 

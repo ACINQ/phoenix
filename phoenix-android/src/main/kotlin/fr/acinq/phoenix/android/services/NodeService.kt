@@ -253,6 +253,15 @@ class NodeService : Service() {
         val business = application.business.filterNotNull().first()
         val electrumServer = userPrefs.getElectrumServer.first()
         val isTorEnabled = userPrefs.getIsTorEnabled.first()
+        val lastVersionUsed = internalData.getLastUsedAppCode.first()
+        log.info("last_version_used=$lastVersionUsed")
+        if (lastVersionUsed == null) {
+            if (isTorEnabled) {
+                internalData.saveShowReleaseNoteSinceCode(98)
+            }
+        } else if (lastVersionUsed < BuildConfig.VERSION_CODE) {
+             internalData.saveShowReleaseNoteSinceCode(lastVersionUsed)
+        }
         val liquidityPolicy = userPrefs.getLiquidityPolicy.first()
         val trustedSwapInTxs = LegacyPrefsDatastore.getMigrationTrustedSwapInTxs(applicationContext).first()
         val preferredFiatCurrency = userPrefs.getFiatCurrency.first()
@@ -279,6 +288,8 @@ class NodeService : Service() {
                 trustedSwapInTxs = trustedSwapInTxs.map { TxId(it) }.toSet()
             )
         )
+
+        internalData.saveLastUsedAppCode(BuildConfig.VERSION_CODE)
 
         // start the swap-in wallet watcher
         serviceScope.launch {

@@ -92,6 +92,7 @@ class NodeParamsManager(
         val chain = Chain.Testnet3
         val trampolineNodeId = PublicKey.fromHex("03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134")
         val trampolineNodeUri = NodeUri(id = trampolineNodeId, "13.248.222.197", 9735)
+        val trampolineNodeOnionUri = NodeUri(id = trampolineNodeId, "iq7zhmhck54vcax2vlrdcavq2m32wao7ekh6jyeglmnuuvv3js57r4id.onion", 9735)
         const val remoteSwapInXpub = "tpubDAmCFB21J9ExKBRPDcVxSvGs9jtcf8U1wWWbS1xTYmnUsuUHPCoFdCnEGxLE3THSWcQE48GHJnyz8XPbYUivBMbLSMBifFd3G9KmafkM9og"
         val defaultLiquidityPolicy = LiquidityPolicy.Auto(
             inboundLiquidityTarget = null, // auto inbound liquidity is disabled (it must be purchased manually)

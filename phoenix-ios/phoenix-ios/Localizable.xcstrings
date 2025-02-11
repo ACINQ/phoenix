@@ -4993,6 +4993,9 @@
         }
       }
     },
+    "A Tor VPN must be running on your device. This VPN is not provided by Phoenix. You need to install one." : {
+
+    },
     "Abort" : {
       "localizations" : {
         "ar" : {
@@ -7267,6 +7270,9 @@
         }
       }
     },
+    "Are you sure you want to proceed ?" : {
+
+    },
     "Are you sure you want to proceed?" : {
       "localizations" : {
         "ar" : {
@@ -8320,6 +8326,9 @@
           }
         }
       }
+    },
+    "Be advised" : {
+
     },
     "Be careful with messages from unknown sources" : {
       "localizations" : {
@@ -9455,6 +9464,7 @@
       }
     },
     "By default, Phoenix connects to random Electrum servers in order to access the Bitcoin blockchain. You can also choose to connect to your own Electrum server." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -12093,7 +12103,7 @@
       }
     },
     "Connected" : {
-      "comment" : "Connection state\nConnection status",
+      "comment" : "Connection state",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -12298,7 +12308,7 @@
       }
     },
     "Connecting…" : {
-      "comment" : "Connection state\nConnection status",
+      "comment" : "Connection state",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -15536,6 +15546,9 @@
         }
       }
     },
+    "Disabling Tor" : {
+
+    },
     "Discard changes" : {
       "localizations" : {
         "ar" : {
@@ -17025,6 +17038,9 @@
           }
         }
       }
+    },
+    "Enabling this option will force Phoenix to only connect to onion services for Lightning and Electrum. Note that a Tor proxy application is required." : {
+
     },
     "End date" : {
       "localizations" : {
@@ -20907,6 +20923,9 @@
         }
       }
     },
+    "How it works" : {
+
+    },
     "How to use" : {
       "localizations" : {
         "ar" : {
@@ -21756,6 +21775,9 @@
           }
         }
       }
+    },
+    "If you disable Tor, your IP address may be revealed to various service providers." : {
+
     },
     "If you do not back it up and you lose access to Phoenix you will **lose your funds**!" : {
       "comment" : "BackupView",
@@ -23207,6 +23229,9 @@
           }
         }
       }
+    },
+    "Invalid address" : {
+      "comment" : "Connection state"
     },
     "Invalid BIP353 DNS address" : {
       "comment" : "Error message - dns record contains an invalid offer",
@@ -25741,6 +25766,9 @@
         }
       }
     },
+    "Make sure your Tor VPN is active and running." : {
+
+    },
     "Malformed JPG image data" : {
       "localizations" : {
         "ar" : {
@@ -28230,6 +28258,9 @@
         }
       }
     },
+    "No, I don't want to use an onion address" : {
+
+    },
     "Node id" : {
       "localizations" : {
         "ar" : {
@@ -28554,7 +28585,7 @@
       }
     },
     "Offline" : {
-      "comment" : "Connection state\nConnection status",
+      "comment" : "Connection state",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -31678,6 +31709,9 @@
         }
       }
     },
+    "Phoenix now forces onion addresses for Lightning and Electrum connections when Tor is enabled.\n\nHowever, the embedded Tor proxy has been removed ; instead you need to install a third-party Tor Proxy VPN application such as Orbot to connect." : {
+
+    },
     "Phoenix uses payment channels to make Bitcoin fast and private." : {
       "localizations" : {
         "ar" : {
@@ -34106,6 +34140,9 @@
     },
     "Resolving lightning address" : {
       "comment" : "Progress title"
+    },
+    "Restart required" : {
+
     },
     "Restore my wallet" : {
       "comment" : "Navigation bar title",
@@ -37850,6 +37887,9 @@
           }
         }
       }
+    },
+    "Since you've enabled Tor, you should use an onion address for this server." : {
+
     },
     "Skip" : {
       "localizations" : {
@@ -42978,6 +43018,9 @@
         }
       }
     },
+    "To secure your payment channels Phoenix monitors the Bitcoin blockchain through Electrum servers.\n\nBy default, random servers are used. You can also configure Phoenix to connect only to your own server." : {
+
+    },
     "to speed up on-chain payments" : {
       "localizations" : {
         "ar" : {
@@ -43099,7 +43142,11 @@
         }
       }
     },
+    "Tor can improve privacy, but may cause performance issues and missed payments." : {
+
+    },
     "Tor is disabled" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -43178,6 +43225,9 @@
           }
         }
       }
+    },
+    "Tor is enabled. This server should use an onion address." : {
+
     },
     "Tor Settings" : {
       "comment" : "Navigation bar title",
@@ -45184,6 +45234,12 @@
         }
       }
     },
+    "Use Tor" : {
+
+    },
+    "Using Tor" : {
+
+    },
     "Version %@" : {
       "localizations" : {
         "ar" : {
@@ -45263,6 +45319,9 @@
           }
         }
       }
+    },
+    "Version 2.5.0: Tor changes" : {
+
     },
     "via" : {
       "comment" : "Label in DetailsView_IncomingPayment",
@@ -47032,6 +47091,9 @@
         }
       }
     },
+    "With Tor enabled, Phoenix will require onion addresses for Lightning and Electrum connections." : {
+
+    },
     "Would you like to be notified when somebody sends you a payment?" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -47440,6 +47502,7 @@
       }
     },
     "You can improve your privacy by only using Tor when connecting to an Electrum server or to your Lightning peer. This will slightly slow down your transactions." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -48282,6 +48345,9 @@
           }
         }
       }
+    },
+    "You must restart Phoenix for the changes to take affect." : {
+
     },
     "You need at least one channel to claim your address. Try adding funds to your wallet and try again." : {
       "localizations" : {

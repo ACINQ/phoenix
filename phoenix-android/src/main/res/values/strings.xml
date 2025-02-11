@@ -338,16 +338,17 @@
 
     <!-- home: balance section & misc -->
 
-    <string name="home__balance_loading">Loading…</string>
-    <string name="home__onchain_incoming">+%1$s</string>
+    <string name="home_balance_loading">Loading…</string>
+    <string name="home_onchain_incoming">+%1$s</string>
 
-    <string name="home__faq_button">FAQ</string>
-    <string name="home__payments_none">Use the Receive and Send buttons at the bottom of this screen to get started!</string>
-    <string name="home__payments_more_button">Show all payments…</string>
-    <string name="home__connection__electrum_late">Electrum late</string>
-    <string name="home__connection__bad_cert">Electrum certificate</string>
-    <string name="home__connection__connecting">Connecting…</string>
-    <string name="home__connection__tor_active">Tor</string>
+    <string name="home_faq_button">FAQ</string>
+    <string name="home_payments_none">Use the Receive and Send buttons at the bottom of this screen to get started!</string>
+    <string name="home_payments_more_button">Show all payments…</string>
+    <string name="home_connection_electrum_late">Desync!</string>
+    <string name="home_connection_bad_cert">Certificate</string>
+    <string name="home_connection_onion">Invalid address</string>
+    <string name="home_connection_connecting">Connecting…</string>
+    <string name="home_connection_tor_active">Tor</string>
     <string name="home_request_liquidity">Request liquidity</string>
     <string name="home_inflight_payments">You currently have %1$d payment(s) pending in your wallet.\n\nKeep the app open to make sure these payments settle properly without issues.</string>
 
@@ -656,7 +657,9 @@
     <string name="electrum_about">To secure your payment channels Phoenix monitors the Bitcoin blockchain through Electrum servers.\n\nBy default, random servers are used. You can also configure Phoenix to connect only to your own server.</string>
     <string name="electrum_block_height_label">Block height</string>
     <string name="electrum_connection_dialog_tls_port">Use the TLS port (default 50002).</string>
-    <string name="electrum_connection_dialog_onion_port">Use the plain TCP port, not the TLS one, since this is an onion service.</string>
+    <string name="electrum_connection_dialog_onion_port">For onion services, use the plain TCP port, not the TLS one.</string>
+    <string name="electrum_connection_dialog_tor_enabled_warning">Since you\'ve enabled Tor, you should use an onion address for this server.</string>
+    <string name="electrum_connection_dialog_tor_enabled_ignore_box">No, I don\'t want to use an onion address</string>
 
     <string name="electrum_connection_closed_with_random">Disconnected from Electrum</string>
     <string name="electrum_connection_closed_with_custom">Disconnected from %1$s</string>
@@ -666,6 +669,7 @@
 
     <string name="electrum_description_custom">You are using a custom server</string>
     <string name="electrum_description_bad_certificate">This server provided an unknown certificate. Connection is rejected.</string>
+    <string name="electrum_description_not_onion">Tor is enabled. This server should use an onion address.</string>
 
     <string name="electrum_dialog_checkbox">Use a custom server</string>
     <string name="electrum_dialog_input">Server address (host:port)</string>
@@ -686,29 +690,27 @@
     <!-- settings: Tor -->
 
     <string name="tor_settings_title">Tor</string>
-    <string name="tor_settings_unknown">Checking preferences…</string>
-    <string name="tor_settings_enabled">Tor is enabled</string>
-    <string name="tor_settings_disabled">Tor is disabled</string>
-    <string name="tor_settings_state_unknown">The Tor proxy is not started yet.</string>
-    <string name="tor_settings_state_closed">The Tor proxy is shutdown.</string>
-    <string name="tor_settings_state_starting">Starting Tor proxy…</string>
-    <string name="tor_settings_state_started">Tor is online</string>
+    <string name="tor_settings_switch_label">Enable Tor</string>
+    <string name="tor_settings_instructions_title">How it works</string>
+    <string name="tor_settings_instructions_1">With Tor enabled, Phoenix will require onion addresses for Lightning and Electrum connections.</string>
+    <string name="tor_settings_instructions_2">A Tor VPN must be running on your device. This VPN is not provided by Phoenix. You need to install one.</string>
+    <string name="tor_settings_instructions_help_button">Learn more</string>
 
     <!-- home: connectivity dialog -->
 
     <string name="conndialog_title">Connections status</string>
-    <string name="conndialog_summary_not_ok">The app will not function correctly until all connections are established.</string>
+    <string name="conndialog_summary_not_ok">Some connections are not established yet. The app will not function correctly until they are.</string>
     <string name="conndialog_network">Your device has no Internet connection. The app will not function properly.\n\nPlease check your device\'s setting.</string>
-    <string name="conndialog_internet">Internet</string>
     <string name="conndialog_electrum">Electrum</string>
-    <string name="conndialog_tor">Tor</string>
     <string name="conndialog_lightning">Peer</string>
     <string name="conndialog_accessibility_desc">Manage connection for %1$s</string>
     <string name="conndialog_connecting">Connecting…</string>
     <string name="conndialog_connected">Connected</string>
-    <string name="conndialog_connected_electrum_behind">Electrum server is late (block $1$d)</string>
     <string name="conndialog_closed">Disconnected</string>
-    <string name="conndialog_closed_bad_cert">Bad certificate</string>
+    <string name="conndialog_closed_bad_cert">Bad certificate!</string>
+    <string name="conndialog_electrum_not_onion">Invalid address!</string>
+    <string name="conndialog_tor_disclaimer_title">Tor is enabled!</string>
+    <string name="conndialog_tor_disclaimer_body">Make sure your Tor VPN is active and running.</string>
 
     <!-- settings: about -->
 

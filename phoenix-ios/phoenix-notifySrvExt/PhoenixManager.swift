@@ -77,8 +77,11 @@ class PhoenixManager {
 		newBusiness.networkMonitor.disable()
 		newBusiness.currencyManager.disableAutoRefresh()
 
-		let electrumConfig = GroupPrefs.shared.electrumConfig
-		newBusiness.appConfigurationManager.updateElectrumConfig(server: electrumConfig?.serverAddress)
+		if let electrumConfigPrefs = GroupPrefs.shared.electrumConfig {
+			newBusiness.appConfigurationManager.updateElectrumConfig(config: electrumConfigPrefs.customConfig)
+		} else {
+			newBusiness.appConfigurationManager.updateElectrumConfig(config: nil)
+		}
 		
 		let primaryFiatCurrency = GroupPrefs.shared.fiatCurrency
 		let preferredFiatCurrencies = AppConfigurationManager.PreferredFiatCurrencies(

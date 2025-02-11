@@ -263,16 +263,16 @@
 
     <!-- home: balance section & misc -->
 
-    <string name="home__balance_loading">Đang tải…</string>
-    <string name="home__onchain_incoming">+%1$s</string>
+    <string name="home_balance_loading">Đang tải…</string>
+    <string name="home_onchain_incoming">+%1$s</string>
 
-    <string name="home__faq_button">FAQ</string>
-    <string name="home__payments_none">Sử dụng các nút Nhận và Gửi ở cuối màn hình này để bắt đầu!</string>
-    <string name="home__payments_more_button">Hiển thị tất cả các khoản thanh toán…</string>
-    <string name="home__connection__electrum_late">Electrum muộn</string>
-    <string name="home__connection__bad_cert">Chứng nhận Electrum</string>
-    <string name="home__connection__connecting">Đang kết nối…</string>
-    <string name="home__connection__tor_active">Tor</string>
+    <string name="home_faq_button">FAQ</string>
+    <string name="home_payments_none">Sử dụng các nút Nhận và Gửi ở cuối màn hình này để bắt đầu!</string>
+    <string name="home_payments_more_button">Hiển thị tất cả các khoản thanh toán…</string>
+    <string name="home_connection_electrum_late">Electrum muộn</string>
+    <string name="home_connection_bad_cert">Chứng nhận Electrum</string>
+    <string name="home_connection_connecting">Đang kết nối…</string>
+    <string name="home_connection_tor_active">Tor</string>
     <string name="home_request_liquidity">Yêu cầu thanh khoản</string>
 
     <!-- in-app notifications -->
@@ -550,27 +550,17 @@
     <!-- settings: Tor -->
 
     <string name="tor_settings_title">Tor</string>
-    <string name="tor_settings_unknown">Đang kiểm tra tùy chọn…</string>
-    <string name="tor_settings_enabled">Đã bật Tor</string>
-    <string name="tor_settings_disabled">Đã tắt Tor</string>
-    <string name="tor_settings_state_unknown">Proxy của Tor chưa được khởi động.</string>
-    <string name="tor_settings_state_closed">Proxy của Tor đang bị đóng.\nVui lòng chờ đợi và kiểm tra kết nối mạng Internet của bạn.</string>
-    <string name="tor_settings_state_starting">Đang khởi động Proxy của Tor…</string>
-    <string name="tor_settings_state_started">Tor đang kết nối trực tuyến</string>
 
     <!-- home: connectivity dialog -->
 
     <string name="conndialog_title">Trạng thái kết nối</string>
     <string name="conndialog_summary_not_ok">Ứng dụng sẽ không hoạt động chuẩn xác cho đến khi tất cả các kết nối được thiết lập.</string>
     <string name="conndialog_network">Thiết bị của bạn không có kết nối Internet. Ứng dụng sẽ không hoạt động hiệu quả.\n\nVui lòng kiểm tra cài đặt thiết bị của bạn.</string>
-    <string name="conndialog_internet">Internet</string>
     <string name="conndialog_electrum">Electrum</string>
-    <string name="conndialog_tor">Tor</string>
     <string name="conndialog_lightning">Máy ngang hàng</string>
     <string name="conndialog_accessibility_desc">Quản lý kết nối cho %1$s</string>
     <string name="conndialog_connecting">Đang kết nối…</string>
     <string name="conndialog_connected">Đã kết nối</string>
-    <string name="conndialog_connected_electrum_behind">Máy chủ Electrum bị chậm (khối $1$d)</string>
     <string name="conndialog_closed">Đã ngắt kết nối</string>
     <string name="conndialog_closed_bad_cert">Chứng nhận tồi</string>
 

@@ -73,6 +73,8 @@ extension AppConfigurationManager {
 	fileprivate struct _Key {
 		static var walletContextPublisher = 0
 		static var walletNoticePublisher = 0
+		static var isTorEnabledPublisher = 0
+		static var electrumConfigPublisher = 0
 	}
 	
 	func walletContextPublisher() -> AnyPublisher<WalletContext, Never> {
@@ -99,6 +101,36 @@ extension AppConfigurationManager {
 			//
 			KotlinCurrentValueSubject<WalletNotice>(
 				self.walletNotice
+			)
+			.compactMap { $0 }
+			.eraseToAnyPublisher()
+		}
+	}
+	
+	func isTorEnabledPublisher() -> AnyPublisher<Bool, Never> {
+		
+		self.getSetAssociatedObject(storageKey: &_Key.isTorEnabledPublisher) {
+			
+			// Transforming from Kotlin:
+			// `isTorEnabled = StateFlow<Boolean?>`
+			//
+			KotlinCurrentValueSubject<NSNumber>(
+				self.isTorEnabled
+			)
+			.compactMap { $0?.boolValue }
+			.eraseToAnyPublisher()
+		}
+	}
+	
+	func electrumConfigPublisher() -> AnyPublisher<ElectrumConfig, Never> {
+		
+		self.getSetAssociatedObject(storageKey: &_Key.electrumConfigPublisher) {
+			
+			// Transforming from Kotlin:
+			// `electrumConfig: StateFlow<ElectrumConfig?>`
+			//
+			KotlinCurrentValueSubject<ElectrumConfig>(
+				self.electrumConfig
 			)
 			.compactMap { $0 }
 			.eraseToAnyPublisher()

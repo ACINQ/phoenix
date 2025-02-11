@@ -95,7 +95,6 @@
     <string name="home_background_restriction_title">Omedzené spracovanie pozadia</string>
     <string name="home_background_restriction_body_1">Fénix nebude môcť prijímať platby, keď je na pozadí alebo keď je zatvorený.</string>
     <string name="home_background_restriction_body_2">Deje sa tak, pretože:</string>
-    <string name="home_background_restriction_tor">Tor je povolený</string>
     <string name="home_background_restriction_powersaver">Zariadenie je v úspornom režime</string>
     <string name="home_background_restriction_fcm">Oznamy FCM nie sú k dispozícii</string>
     <string name="home_background_restriction_fcm_details">Ak používate GrapheneOS alebo CalyxOS, nainštalujte si Google Play Services, aby ste mohli dostávať oznámenia FCM. Pozrite si často kladené otázky, kde nájdete návod.</string>
@@ -170,8 +169,7 @@
     <!-- receive: Tor warning -->
 
     <string name="receive_tor_warning_title">Tor je povolen</string>
-    <string name="receive_tor_warning_dialog_content_1">Fénix nemůže přijímat platby na pozadí </string>.
-    <string name="receive_tor_warning_dialog_content_2">Chcete-li se vyhnout selhání plateb, použijte místo toho Orbot nebo se ujistěte, že Fénix zůstává viditelný v popředí, když jsou vám odesílány platby.</string>
+    <string name="receive_tor_warning_dialog_content_1">Fénix nemůže přijímat platby na pozadí </string>
 
     <!-- scanning errors -->
 
@@ -282,11 +280,14 @@
 
     <!-- Tor -->
 
-    <string name="tor_settings_subtitle">Phoenix môže použiť Tor na skrytie vašej IP adresy pred ostatnými uzlami siete Lightning Network a servermi Electrum.</string>
-
-    <string name="tor_confirm_dialog_title">Povolenie Tor?</string>
-    <string name="tor_confirm_dialog_details_1">Tor je pomalý a ovplyvní výkon vašich platieb.</string>
-    <string name="tor_confirm_dialog_details_2">Konkrétne, <b>nebudete môcť prijímať platby</b>, ak je Phoenix na pozadí alebo ak je zatvorený.</string>
+    <string name="tor_dialog_enable_title_1">Používanie Tor</string>
+    <string name="tor_dialog_enable_details_1">Povolenie tejto možnosti bude vyžadovať, aby Phoenix pri pripájaní k Lightning a Electrum používal onion adresy. Upozorňujeme, že je potrebná aplikácia Tor proxy.</string>
+    <string name="tor_dialog_enable_title_2">Upozorňujeme</string>
+    <string name="tor_dialog_enable_details_2">Tor môže zlepšiť súkromie, ale môže spôsobiť problémy s výkonom a zmeškané platby.</string>
+    <string name="tor_dialog_disable_title">Zakázanie Tor</string>
+    <string name="tor_dialog_disable_details_1">Ak túto možnosť zakážete, vaša IP adresa môže byť odhalená rôznym poskytovateľom služieb.</string>
+    <string name="tor_dialog_disable_details_2">Naozaj chcete pokračovať?</string>
+    <string name="tor_dialog_processing">Spracúvajú sa zmeny…</string>
 
     <!-- about -->
 

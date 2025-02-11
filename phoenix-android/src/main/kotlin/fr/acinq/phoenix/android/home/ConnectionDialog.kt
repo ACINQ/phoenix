@@ -18,8 +18,10 @@ package fr.acinq.phoenix.android.home
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -30,24 +32,27 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.Dialog
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.extensions.isBadCertificate
 import fr.acinq.phoenix.android.utils.monoTypo
+import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.orange
 import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.managers.Connections
+import fr.acinq.phoenix.utils.extensions.isOnion
 
 
 @Composable
@@ -66,45 +71,30 @@ fun ConnectionDialog(
                     modifier = Modifier.padding(top = 16.dp, start = 24.dp, end = 24.dp)
                 )
             } else {
-                if (connections.electrum != Connection.ESTABLISHED || connections.peer != Connection.ESTABLISHED) {
+                val isTorEnabled = userPrefs.getIsTorEnabled.collectAsState(initial = null).value
+                val hasConnectionIssues = connections.electrum != Connection.ESTABLISHED || connections.peer != Connection.ESTABLISHED
+                if (hasConnectionIssues) {
                     Text(text = stringResource(id = R.string.conndialog_summary_not_ok), Modifier.padding(horizontal = 24.dp))
                 }
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(16.dp))
                 HSeparator()
-
-                val isTorEnabled = userPrefs.getIsTorEnabled.collectAsState(initial = null).value
-                if (isTorEnabled != null && isTorEnabled) {
-                    ConnectionDialogLine(label = stringResource(id = R.string.conndialog_tor), connection = connections.tor, onClick = onTorClick)
-                    HSeparator()
-                }
-
                 ConnectionDialogLine(label = stringResource(id = R.string.conndialog_electrum), connection = connections.electrum, onClick = onElectrumClick) {
                     when (val connection = connections.electrum) {
                         Connection.ESTABLISHING -> {
                             Text(text = stringResource(R.string.conndialog_connecting), style = monoTypo)
                         }
                         Connection.ESTABLISHED -> {
-                            Column {
-                                Text(text = stringResource(R.string.conndialog_connected), style = monoTypo)
-                                if (electrumBlockheight < 795_000) { // FIXME use a dynamic blockheight
-                                    TextWithIcon(
-                                        text = stringResource(id = R.string.conndialog_connected_electrum_behind, electrumBlockheight),
-                                        textStyle = MaterialTheme.typography.body1.copy(fontSize = 14.sp),
-                                        icon = R.drawable.ic_alert_triangle,
-                                        iconTint = negativeColor
-                                    )
-                                }
-                            }
+                            Text(text = stringResource(R.string.conndialog_connected), style = monoTypo)
                         }
                         else -> {
-                            Text(
-                                text = if (connection is Connection.CLOSED && connection.isBadCertificate()) {
-                                    stringResource(R.string.conndialog_closed_bad_cert)
-                                } else {
-                                    stringResource(R.string.conndialog_closed)
-                                },
-                                style = monoTypo
-                            )
+                            val customElectrumServer by userPrefs.getElectrumServer.collectAsState(initial = null)
+                            if (isTorEnabled == true && customElectrumServer?.server?.isOnion == false && customElectrumServer?.requireOnionIfTorEnabled == true) {
+                                TextWithIcon(text = stringResource(R.string.conndialog_electrum_not_onion), textStyle = monoTypo, icon = R.drawable.ic_alert_triangle, iconTint = negativeColor)
+                            } else if (connection is Connection.CLOSED && connection.isBadCertificate()) {
+                                TextWithIcon(text = stringResource(R.string.conndialog_closed_bad_cert), textStyle = monoTypo, icon = R.drawable.ic_alert_triangle, iconTint = negativeColor)
+                            } else {
+                                Text(text = stringResource(R.string.conndialog_closed), style = monoTypo)
+                            }
                         }
                     }
                 }
@@ -112,6 +102,15 @@ fun ConnectionDialog(
                 ConnectionDialogLine(label = stringResource(id = R.string.conndialog_lightning), connection = connections.peer)
                 HSeparator()
                 Spacer(Modifier.height(16.dp))
+
+
+                if (hasConnectionIssues && isTorEnabled == true) {
+                    Card(backgroundColor = mutedBgColor, modifier = Modifier.fillMaxWidth(), internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp), onClick = onTorClick) {
+                        TextWithIcon(text = stringResource(id = R.string.conndialog_tor_disclaimer_title), icon = R.drawable.ic_tor_shield, textStyle = MaterialTheme.typography.body2)
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(text = stringResource(id = R.string.conndialog_tor_disclaimer_body))
+                    }
+                }
             }
         }
     }
@@ -147,7 +146,7 @@ private fun ConnectionDialogLine(
             .then(
                 if (onClick != null) Modifier.clickable(role = Role.Button, onClickLabel = stringResource(id = R.string.conndialog_accessibility_desc, label), onClick = onClick) else Modifier
             )
-            .padding(vertical = 12.dp, horizontal = 24.dp),
+            .padding(vertical = 16.dp, horizontal = 24.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Surface(
@@ -161,6 +160,7 @@ private fun ConnectionDialogLine(
         ) {}
         Spacer(modifier = Modifier.width(16.dp))
         Text(text = label, modifier = Modifier.weight(1.0f))
+        Spacer(modifier = Modifier.width(24.dp))
         content()
     }
 }

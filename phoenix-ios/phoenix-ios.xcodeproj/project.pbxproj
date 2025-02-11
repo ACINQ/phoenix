@@ -35,6 +35,9 @@
 		DC09085825B5E43900A46136 /* String+VersionComparison.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC09085725B5E43900A46136 /* String+VersionComparison.swift */; };
 		DC09086325B626B300A46136 /* AppStatusPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC09086225B626B300A46136 /* AppStatusPopover.swift */; };
 		DC0994B0263A074C003031CA /* InfoGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0994AF263A074C003031CA /* InfoGrid.swift */; };
+		DC09FC392D56A0BA00E6579A /* CustomElectrumServerObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC09FC372D56A0B700E6579A /* CustomElectrumServerObserver.swift */; };
+		DC09FC3C2D5AAAAA00E6579A /* V85Popover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC09FC3B2D5AAAA200E6579A /* V85Popover.swift */; };
+		DC09FC3F2D5BADB900E6579A /* RestartPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC09FC3E2D5BADB400E6579A /* RestartPopover.swift */; };
 		DC0C52662BF3C31700143831 /* WhichPinSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0C52652BF3C31700143831 /* WhichPinSheet.swift */; };
 		DC0C52682BF4FF6100143831 /* AuthenticateWithPinSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0C52672BF4FF6100143831 /* AuthenticateWithPinSheet.swift */; };
 		DC0D2EA52939269800284608 /* KotlinExtensions+CloudKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0D2EA42939269800284608 /* KotlinExtensions+CloudKit.swift */; };
@@ -189,7 +192,7 @@
 		DC6F19BF2C46FB0F004EC469 /* NSItemProvider+Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F19BE2C46FB0F004EC469 /* NSItemProvider+Async.swift */; };
 		DC6F19C12C470F70004EC469 /* PickerResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F19C02C470F70004EC469 /* PickerResult.swift */; };
 		DC70A99C2BBB6093002DBFF8 /* InboundFeeWarning.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC70A99B2BBB6093002DBFF8 /* InboundFeeWarning.swift */; };
-		DC71E7302723240E0063613D /* KotlinObservables.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC71E72F2723240E0063613D /* KotlinObservables.swift */; };
+		DC71E7302723240E0063613D /* ObservableConnectionsMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC71E72F2723240E0063613D /* ObservableConnectionsMonitor.swift */; };
 		DC71E7332728645B0063613D /* CurrencyConverterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC71E7322728645B0063613D /* CurrencyConverterView.swift */; };
 		DC71E7352728A5720063613D /* KotlinIdentifiable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC71E7342728A5720063613D /* KotlinIdentifiable.swift */; };
 		DC72C2F125A3CBD6008A927A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DC72C2F025A3CBD6008A927A /* GoogleService-Info.plist */; };
@@ -203,6 +206,8 @@
 		DC784A112B31EA180018DC4A /* LiquidityAdsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC784A102B31EA180018DC4A /* LiquidityAdsView.swift */; };
 		DC7BAA002CADAAE70074B568 /* WalletIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC7BA9FF2CADAAE70074B568 /* WalletIdentifier.swift */; };
 		DC7DA9F62AD84DF200F86B99 /* String+Substring.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC7DA9F52AD84DF200F86B99 /* String+Substring.swift */; };
+		DC808E9B2D5541F50019AE30 /* UsingTorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC808E9A2D5541F10019AE30 /* UsingTorSheet.swift */; };
+		DC808E9D2D554A430019AE30 /* DisablingTorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC808E9C2D554A3E0019AE30 /* DisablingTorSheet.swift */; };
 		DC81B79F25BF2AA200F5A52C /* MVI.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC81B79E25BF2AA200F5A52C /* MVI.swift */; };
 		DC82EED629789853007A5853 /* TxHistoryExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC82EED529789853007A5853 /* TxHistoryExporter.swift */; };
 		DC89857F25914747007B253F /* UIApplicationState+Phoenix.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC89857E25914747007B253F /* UIApplicationState+Phoenix.swift */; };
@@ -461,6 +466,9 @@
 		DC09085725B5E43900A46136 /* String+VersionComparison.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+VersionComparison.swift"; sourceTree = "<group>"; };
 		DC09086225B626B300A46136 /* AppStatusPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStatusPopover.swift; sourceTree = "<group>"; };
 		DC0994AF263A074C003031CA /* InfoGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoGrid.swift; sourceTree = "<group>"; };
+		DC09FC372D56A0B700E6579A /* CustomElectrumServerObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomElectrumServerObserver.swift; sourceTree = "<group>"; };
+		DC09FC3B2D5AAAA200E6579A /* V85Popover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V85Popover.swift; sourceTree = "<group>"; };
+		DC09FC3E2D5BADB400E6579A /* RestartPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestartPopover.swift; sourceTree = "<group>"; };
 		DC0C52652BF3C31700143831 /* WhichPinSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhichPinSheet.swift; sourceTree = "<group>"; };
 		DC0C52672BF4FF6100143831 /* AuthenticateWithPinSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticateWithPinSheet.swift; sourceTree = "<group>"; };
 		DC0D2EA42939269800284608 /* KotlinExtensions+CloudKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KotlinExtensions+CloudKit.swift"; sourceTree = "<group>"; };
@@ -598,7 +606,7 @@
 		DC6F19BE2C46FB0F004EC469 /* NSItemProvider+Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSItemProvider+Async.swift"; sourceTree = "<group>"; };
 		DC6F19C02C470F70004EC469 /* PickerResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerResult.swift; sourceTree = "<group>"; };
 		DC70A99B2BBB6093002DBFF8 /* InboundFeeWarning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboundFeeWarning.swift; sourceTree = "<group>"; };
-		DC71E72F2723240E0063613D /* KotlinObservables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinObservables.swift; sourceTree = "<group>"; };
+		DC71E72F2723240E0063613D /* ObservableConnectionsMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservableConnectionsMonitor.swift; sourceTree = "<group>"; };
 		DC71E7322728645B0063613D /* CurrencyConverterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverterView.swift; sourceTree = "<group>"; };
 		DC71E7342728A5720063613D /* KotlinIdentifiable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinIdentifiable.swift; sourceTree = "<group>"; };
 		DC72C2B925A3A450008A927A /* Phoenix.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Phoenix.entitlements; sourceTree = "<group>"; };
@@ -613,6 +621,8 @@
 		DC784A102B31EA180018DC4A /* LiquidityAdsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidityAdsView.swift; sourceTree = "<group>"; };
 		DC7BA9FF2CADAAE70074B568 /* WalletIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletIdentifier.swift; sourceTree = "<group>"; };
 		DC7DA9F52AD84DF200F86B99 /* String+Substring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Substring.swift"; sourceTree = "<group>"; };
+		DC808E9A2D5541F10019AE30 /* UsingTorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsingTorSheet.swift; sourceTree = "<group>"; };
+		DC808E9C2D554A3E0019AE30 /* DisablingTorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisablingTorSheet.swift; sourceTree = "<group>"; };
 		DC81B79E25BF2AA200F5A52C /* MVI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVI.swift; sourceTree = "<group>"; };
 		DC82EED529789853007A5853 /* TxHistoryExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TxHistoryExporter.swift; sourceTree = "<group>"; };
 		DC89857E25914747007B253F /* UIApplicationState+Phoenix.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplicationState+Phoenix.swift"; sourceTree = "<group>"; };
@@ -852,6 +862,7 @@
 			children = (
 				DC46CB1028D9AA8000C4EAC7 /* content */,
 				DCDD9ECC28637390001800A3 /* main */,
+				DC09FC3A2D5AAA9000E6579A /* updates */,
 				DCA3B41A2A5220A200E6B231 /* notifications */,
 				DC2F431227B696A40006FCC4 /* receive */,
 				DC118BF627B44E4C0080BBAC /* send */,
@@ -979,6 +990,14 @@
 			path = configuration;
 			sourceTree = "<group>";
 		};
+		DC09FC3A2D5AAA9000E6579A /* updates */ = {
+			isa = PBXGroup;
+			children = (
+				DC09FC3B2D5AAAA200E6579A /* V85Popover.swift */,
+			);
+			path = updates;
+			sourceTree = "<group>";
+		};
 		DC118BF627B44E4C0080BBAC /* send */ = {
 			isa = PBXGroup;
 			children = (
@@ -1065,24 +1084,25 @@
 		DC46BAEC26CACCF700E760A6 /* kotlin */ = {
 			isa = PBXGroup;
 			children = (
+				DC09FC372D56A0B700E6579A /* CustomElectrumServerObserver.swift */,
 				DC46BAF226CACCF700E760A6 /* KotlinAssociatedObject.swift */,
+				DC3780382C04D60400937C8E /* KotlinEnums.swift */,
+				DC49FE982AC49C6300D8D2E2 /* KotlinExtensions+Bitcoin.swift */,
 				DC0D2EA42939269800284608 /* KotlinExtensions+CloudKit.swift */,
 				DC46BAF126CACCF700E760A6 /* KotlinExtensions+Conversion.swift */,
 				DC16965E27FE0FAC003DE1DD /* KotlinExtensions+Currency.swift */,
-				DC0D2EA62939273B00284608 /* KotlinExtensions+Payments.swift */,
+				DC49FE9A2AC49CB500D8D2E2 /* KotlinExtensions+Lightning.swift */,
 				DC5631C62C5944CF00DCB5BF /* KotlinExtensions+Manager.swift */,
 				DC46BAED26CACCF700E760A6 /* KotlinExtensions+Other.swift */,
-				DC49FE9A2AC49CB500D8D2E2 /* KotlinExtensions+Lightning.swift */,
-				DC49FE982AC49C6300D8D2E2 /* KotlinExtensions+Bitcoin.swift */,
+				DC0D2EA62939273B00284608 /* KotlinExtensions+Payments.swift */,
 				DC46BAEE26CACCF700E760A6 /* KotlinFlow.swift */,
 				DC46BAF026CACCF700E760A6 /* KotlinFutures.swift */,
 				DC71E7342728A5720063613D /* KotlinIdentifiable.swift */,
-				DC71E72F2723240E0063613D /* KotlinObservables.swift */,
-				DC46BAEF26CACCF700E760A6 /* KotlinPublishers+Phoenix.swift */,
-				DCB62F462A5DF19D00912A71 /* KotlinPublishers+Lightning.swift */,
-				DC74174A270F332700F7E3E3 /* KotlinTypes.swift */,
 				DCCFE6A32B63021E002FFF11 /* KotlinLogger.swift */,
-				DC3780382C04D60400937C8E /* KotlinEnums.swift */,
+				DCB62F462A5DF19D00912A71 /* KotlinPublishers+Lightning.swift */,
+				DC46BAEF26CACCF700E760A6 /* KotlinPublishers+Phoenix.swift */,
+				DC74174A270F332700F7E3E3 /* KotlinTypes.swift */,
+				DC71E72F2723240E0063613D /* ObservableConnectionsMonitor.swift */,
 			);
 			path = kotlin;
 			sourceTree = "<group>";
@@ -1205,6 +1225,17 @@
 				DCE443AB2B3482C800CABA96 /* LiquidityFeeInfo.swift */,
 			);
 			path = "liquidity management";
+			sourceTree = "<group>";
+		};
+		DC808E992D5524E90019AE30 /* tor */ = {
+			isa = PBXGroup;
+			children = (
+				DC09FC3E2D5BADB400E6579A /* RestartPopover.swift */,
+				DC808E9C2D554A3E0019AE30 /* DisablingTorSheet.swift */,
+				C8D7A2BD01ADA0DE6034AE0F /* TorConfigurationView.swift */,
+				DC808E9A2D5541F10019AE30 /* UsingTorSheet.swift */,
+			);
+			path = tor;
 			sourceTree = "<group>";
 		};
 		DC949E6B2B45FC5E00E80BB5 /* fees */ = {
@@ -1331,7 +1362,7 @@
 				DC4CF3C72BE91FAE003A957F /* app access */,
 				DC27E4CD2791D18600C777CC /* recovery phrase */,
 				DCA3B41C2A533B8600E6B231 /* electrum server */,
-				C8D7A2BD01ADA0DE6034AE0F /* TorConfigurationView.swift */,
+				DC808E992D5524E90019AE30 /* tor */,
 				DC27E4C32791C58C00C777CC /* PaymentsBackupView.swift */,
 			);
 			path = "privacy and security";
@@ -1883,6 +1914,7 @@
 				DCB30E542A0AABAF00E7D7A2 /* InfoPopoverWindow.swift in Sources */,
 				DCA6DEC62829BDEB0073C658 /* XPC.swift in Sources */,
 				DC682FE8258175CE00CA1114 /* Popover.swift in Sources */,
+				DC808E9D2D554A430019AE30 /* DisablingTorSheet.swift in Sources */,
 				DC1844032A2690BB004D9578 /* MinerFeeSheet.swift in Sources */,
 				DC39A2662A12C04D00F59E39 /* LiquidityPolicyHelp.swift in Sources */,
 				DC49FE9B2AC49CB500D8D2E2 /* KotlinExtensions+Lightning.swift in Sources */,
@@ -1931,13 +1963,14 @@
 				DC1916B029CB6C1D00917F06 /* Text_CurrencyName.swift in Sources */,
 				DCD7E0AF28EC3C0D009C30E5 /* WatchTower.swift in Sources */,
 				DCB493CB269F3B06001B0F09 /* Result+Deugly.swift in Sources */,
-				DC71E7302723240E0063613D /* KotlinObservables.swift in Sources */,
+				DC71E7302723240E0063613D /* ObservableConnectionsMonitor.swift in Sources */,
 				DC0C52682BF4FF6100143831 /* AuthenticateWithPinSheet.swift in Sources */,
 				DC0D2EA52939269800284608 /* KotlinExtensions+CloudKit.swift in Sources */,
 				DC5E28CC2C63EF8E0037B3D3 /* NavigationLink_16.swift in Sources */,
 				DCA02BA02BD1A5FC0080520F /* ChannelSizeImpactWarning.swift in Sources */,
 				DC355E232A45FAF2008E8A8E /* NestedObservableObject.swift in Sources */,
 				DC5F1C4A28DDAA49007A55ED /* ResetWalletView_Confirm.swift in Sources */,
+				DC09FC3C2D5AAAAA00E6579A /* V85Popover.swift in Sources */,
 				DC7BAA002CADAAE70074B568 /* WalletIdentifier.swift in Sources */,
 				DC39D4E7286BB2130030F18D /* PaymentLayerChoice.swift in Sources */,
 				DC46BAF626CACCF700E760A6 /* KotlinFutures.swift in Sources */,
@@ -1966,6 +1999,7 @@
 				DC5567452C2F1A6900008E11 /* ContactsList.swift in Sources */,
 				53BEF4D5663CD782DC63DF63 /* AppColors.swift in Sources */,
 				DC27E4CC2791D17A00C777CC /* CloudBackupView.swift in Sources */,
+				DC09FC392D56A0BA00E6579A /* CustomElectrumServerObserver.swift in Sources */,
 				DC118BFE27B451890080BBAC /* MetadataSheet.swift in Sources */,
 				DCFD079126D84A380020DD8E /* HorizontalActivity.swift in Sources */,
 				DC641C6D2820826000862DCD /* AppMigration.swift in Sources */,
@@ -2055,12 +2089,14 @@
 				DC72C33925A663CA008A927A /* QRCode.swift in Sources */,
 				DC20D77A2BC5982400C37255 /* ServerMessageMonitor.swift in Sources */,
 				DC5CA4ED28F83C3B0048A737 /* DrainWalletView.swift in Sources */,
+				DC09FC3F2D5BADB900E6579A /* RestartPopover.swift in Sources */,
 				DC5E288E2C62C3DF0037B3D3 /* NavigationStackDestination.swift in Sources */,
 				DC784A112B31EA180018DC4A /* LiquidityAdsView.swift in Sources */,
 				DC6D26E329E76557006A7814 /* AnimatedClock.swift in Sources */,
 				DC72CEF52C99DCEB00C810A8 /* LnurlFlowErrorNotice.swift in Sources */,
 				DC5631C52C541E5C00DCB5BF /* Experimental.swift in Sources */,
 				DCF8E3AC2BC4968D009299EE /* LowMinerFeeWarning.swift in Sources */,
+				DC808E9B2D5541F50019AE30 /* UsingTorSheet.swift in Sources */,
 				DC65D86428E2F7D700686355 /* ResetWalletView_Action.swift in Sources */,
 				DC71E7332728645B0063613D /* CurrencyConverterView.swift in Sources */,
 				DCA3B41F2A5471C900E6B231 /* MinerFeeInfo.swift in Sources */,

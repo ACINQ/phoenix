@@ -92,7 +92,6 @@
     <string name="home_background_restriction_title">Hintergrundverarbeitung eingeschränkt</string>
     <string name="home_background_restriction_body_1">Phoenix kann keine Zahlungen empfangen, wenn es im Hintergrund läuft oder geschlossen ist.</string>
     <string name="home_background_restriction_body_2">Dies geschieht, weil:</string>
-    <string name="home_background_restriction_tor">Tor ist aktiviert</string>
     <string name="home_background_restriction_powersaver">Das Gerät ist im Energiesparmodus</string>
     <string name="home_background_restriction_fcm">FCM-Benachrichtigungen nicht verfügbar</string>
     <string name="home_background_restriction_fcm_details">Wenn Sie GrapheneOS oder CalyxOS verwenden, installieren Sie Google Play Services, um FCM-Benachrichtigungen zu erhalten. Lesen Sie die FAQ für Hilfe.</string>
@@ -168,7 +167,6 @@
 
     <string name="receive_tor_warning_title">Tor ist aktiviert</string>
     <string name="receive_tor_warning_dialog_content_1">Phoenix kann keine Zahlungen im Hintergrund empfangen.</string>
-    <string name="receive_tor_warning_dialog_content_2">Um Zahlungsausfälle zu vermeiden, verwenden Sie stattdessen Orbot, oder stellen Sie sicher, dass Phoenix im Vordergrund sichtbar bleibt, wenn Zahlungen an Sie gesendet werden.</string>
 
     <!-- scanning errors -->
 
@@ -279,11 +277,14 @@
 
     <!-- Tor -->
 
-    <string name="tor_settings_subtitle">Phoenix kann Tor verwenden, um Ihre IP vor den anderen Knoten im Lightning Netzwerk und den Electrum Servern zu schützen.</string>
-
-    <string name="tor_confirm_dialog_title">Tor aktivieren?</string>
-    <string name="tor_confirm_dialog_details_1">Tor ist langsam und wird die Leistung Ihrer Zahlungen beeinträchtigen.</string>
-    <string name="tor_confirm_dialog_details_2">Speziell werden Sie <b>keine Zahlungen empfangen können</b>, wenn Phoenix im Hintergrund läuft oder geschlossen ist.</string>
+    <string name="tor_dialog_enable_title_1">Tor verwenden</string>
+    <string name="tor_dialog_enable_details_1">Wenn diese Option aktiviert ist, muss Phoenix bei der Verbindung mit Lightning und Electrum Onion-Adressen verwenden. Beachten Sie, dass eine Tor-Proxy-Anwendung erforderlich ist.</string>
+    <string name="tor_dialog_enable_title_2">Hinweis</string>
+    <string name="tor_dialog_enable_details_2">Tor kann die Privatsphäre verbessern, kann aber zu Leistungsproblemen und verpassten Zahlungen führen.</string>
+    <string name="tor_dialog_disable_title">Tor deaktivieren</string>
+    <string name="tor_dialog_disable_details_1">Wenn Sie diese Option deaktivieren, kann Ihre IP-Adresse verschiedenen Dienstanbietern offengelegt werden.</string>
+    <string name="tor_dialog_disable_details_2">Möchten Sie wirklich fortfahren?</string>
+    <string name="tor_dialog_processing">Änderungen werden verarbeitet…</string>
 
     <!-- about -->
 

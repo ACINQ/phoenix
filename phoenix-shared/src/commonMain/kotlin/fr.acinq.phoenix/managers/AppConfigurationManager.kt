@@ -30,7 +30,6 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class AppConfigurationManager(
-    private val appDb: SqliteAppDb,
     private val httpClient: HttpClient,
     private val electrumWatcher: ElectrumWatcher,
     private val chain: Chain,
@@ -40,7 +39,6 @@ class AppConfigurationManager(
     constructor(business: PhoenixBusiness) : this(
         loggerFactory = business.loggerFactory,
         chain = business.chain,
-        appDb = business.appDb,
         httpClient = business.httpClient,
         electrumWatcher = business.electrumWatcher,
     )
@@ -207,19 +205,13 @@ class AppConfigurationManager(
      * Use this method to set a server to connect to.
      * If null, will connect to a random server from the hard-coded list.
      */
-    fun updateElectrumConfig(server: ServerAddress?) {
-        _electrumConfig.value = server?.let {
-            if (it.host.endsWith(".onion")) {
-                ElectrumConfig.Custom(it.copy(tls = TcpSocket.TLS.DISABLED))
-            } else {
-                ElectrumConfig.Custom(it)
-            }
-        } ?: ElectrumConfig.Random
+    fun updateElectrumConfig(config: ElectrumConfig.Custom?) {
+        _electrumConfig.value = config ?: ElectrumConfig.Random
     }
 
-    fun randomElectrumServer() = when (chain) {
-        Chain.Mainnet -> mainnetElectrumServers.random()
-        Chain.Testnet3 -> testnetElectrumServers.random()
+    fun randomElectrumServer(isTorEnabled: Boolean) = when (chain) {
+        Chain.Mainnet -> if (isTorEnabled) mainnetElectrumServersOnion.random() else mainnetElectrumServers.random()
+        Chain.Testnet3 -> if (isTorEnabled) testnetElectrumServersOnion.random() else testnetElectrumServers.random()
         Chain.Testnet4 -> TODO()
         Chain.Signet -> TODO()
         Chain.Regtest -> platformElectrumRegtestConf()
