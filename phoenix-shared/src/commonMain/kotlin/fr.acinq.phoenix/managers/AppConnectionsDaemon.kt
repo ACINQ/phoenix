@@ -206,7 +206,7 @@ class AppConnectionsDaemon(
                         logger.debug { "starting peer connection loop" }
                         peerConnectionJob = connectionLoop(
                             name = "Peer",
-                            statusStateFlow = peer.connectionState,
+                            statusStateFlow = peer.connectionState.stateIn(this)
                         ) { connectionAttempt ->
                             peer.socketBuilder = tcpSocketBuilder()
                             try {
@@ -221,7 +221,8 @@ class AppConnectionsDaemon(
                                 if (it.torIsEnabled && !peer.walletParams.trampolineNode.isOnion) {
                                     logger.error { "PEER CONNECTION ABORTED: MUST USE AN ONION ADDRESS" }
                                 } else {
-                                    peer.connect(connectTimeout = connectTimeout, handshakeTimeout = handshakeTimeout)
+                                    val res = peer.connect(connectTimeout = connectTimeout, handshakeTimeout = handshakeTimeout)
+                                    logger.debug { "finished peer.connect ($res) " }
                                 }
                             } catch (e: Exception) {
                                 logger.error { "error when connecting to peer: ${e.message ?: e::class.simpleName}" }
@@ -437,6 +438,7 @@ class AppConnectionsDaemon(
         // when connection keeps failing, this loop is paused for a bit
         var connectionCounter = 0
         statusStateFlow.collect {
+            logger.debug { "$name connection state is $it" }
             if (it is Connection.CLOSED) {
                 val pause = connectionPause(connectionCounter)
                 logger.info { "next $name connection attempt #$connectionCounter in $pause" }
