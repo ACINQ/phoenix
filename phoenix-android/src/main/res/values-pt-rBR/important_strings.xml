@@ -169,7 +169,6 @@
 
     <string name="receive_tor_warning_title">O Tor está ativado</string>
     <string name="receive_tor_warning_dialog_content_1">O Phoenix não pode receber pagamentos em segundo plano.</string>
-    <string name="receive_tor_warning_dialog_content_2">Para evitar falhas nos pagamentos, use o Orbot ou certifique-se de que o Phoenix permaneça visível em primeiro plano quando os pagamentos forem enviados a você.</string>
 
     <!-- scanning errors -->
 
@@ -280,6 +279,15 @@
     <string name="lnurl_withdraw_success">A solicitação de saque foi enviada para <b>%1$s</b>.\n\nPode levar algum tempo até que os fundos sejam enviados. Enquanto isso, mantenha o aplicativo on-line.</string>
 
     <!-- Tor -->
+
+    <string name="tor_dialog_enable_title_1">Usando o Tor</string>
+    <string name="tor_dialog_enable_details_1">Habilitar esta opção exigirá que o Phoenix use endereços onion ao se conectar ao Lightning e ao Electrum. Observe que um aplicativo proxy Tor é necessário.</string>
+    <string name="tor_dialog_enable_title_2">Esteja ciente</string>
+    <string name="tor_dialog_enable_details_2">O Tor pode melhorar a privacidade, mas pode causar problemas de desempenho e pagamentos perdidos.</string>
+    <string name="tor_dialog_disable_title">Desabilitando o Tor</string>
+    <string name="tor_dialog_disable_details_1">Se você desabilitar esta opção, seu endereço IP poderá ser revelado a vários provedores de serviço.</string>
+    <string name="tor_dialog_disable_details_2">Tem certeza de que deseja prosseguir?</string>
+    <string name="tor_dialog_processing">Processando alterações…</string>
 
     <!-- about -->
 

@@ -167,7 +167,6 @@
 
     <string name="receive_tor_warning_title">Tor ist aktiviert</string>
     <string name="receive_tor_warning_dialog_content_1">Phoenix kann keine Zahlungen im Hintergrund empfangen.</string>
-    <string name="receive_tor_warning_dialog_content_2">Um Zahlungsausfälle zu vermeiden, verwenden Sie stattdessen Orbot, oder stellen Sie sicher, dass Phoenix im Vordergrund sichtbar bleibt, wenn Zahlungen an Sie gesendet werden.</string>
 
     <!-- scanning errors -->
 
@@ -277,6 +276,15 @@
     <string name="lnurl_withdraw_success">Der Antrag auf Auszahlung wurde an <b>%1$s</b> übermittelt.\n\nEs kann einige Zeit dauern, bis das Guthaben überwiesen wird. Bitte lassen Sie die App in der Zwischenzeit geöffnet.</string>
 
     <!-- Tor -->
+
+    <string name="tor_dialog_enable_title_1">Tor verwenden</string>
+    <string name="tor_dialog_enable_details_1">Wenn diese Option aktiviert ist, muss Phoenix bei der Verbindung mit Lightning und Electrum Onion-Adressen verwenden. Beachten Sie, dass eine Tor-Proxy-Anwendung erforderlich ist.</string>
+    <string name="tor_dialog_enable_title_2">Hinweis</string>
+    <string name="tor_dialog_enable_details_2">Tor kann die Privatsphäre verbessern, kann aber zu Leistungsproblemen und verpassten Zahlungen führen.</string>
+    <string name="tor_dialog_disable_title">Tor deaktivieren</string>
+    <string name="tor_dialog_disable_details_1">Wenn Sie diese Option deaktivieren, kann Ihre IP-Adresse verschiedenen Dienstanbietern offengelegt werden.</string>
+    <string name="tor_dialog_disable_details_2">Möchten Sie wirklich fortfahren?</string>
+    <string name="tor_dialog_processing">Änderungen werden verarbeitet…</string>
 
     <!-- about -->
 

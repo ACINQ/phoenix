@@ -169,8 +169,7 @@
     <!-- receive: Tor warning -->
 
     <string name="receive_tor_warning_title">Tor je povolen</string>
-    <string name="receive_tor_warning_dialog_content_1">Fénix nemůže přijímat platby na pozadí </string>.
-    <string name="receive_tor_warning_dialog_content_2">Chcete-li se vyhnout selhání plateb, použijte místo toho Orbot nebo se ujistěte, že Fénix zůstává viditelný v popředí, když jsou vám odesílány platby.</string>
+    <string name="receive_tor_warning_dialog_content_1">Fénix nemůže přijímat platby na pozadí </string>
 
     <!-- scanning errors -->
 
@@ -280,6 +279,15 @@
     <string name="lnurl_withdraw_success">Žiadosť o výber bola odoslaná službe <b>%1$s</b>.\n\nNež vám pošlú peniaze, môže to chvíľu trvať. Medzitým prosím nechajte aplikáciu online.</string>
 
     <!-- Tor -->
+
+    <string name="tor_dialog_enable_title_1">Používanie Tor</string>
+    <string name="tor_dialog_enable_details_1">Povolenie tejto možnosti bude vyžadovať, aby Phoenix pri pripájaní k Lightning a Electrum používal onion adresy. Upozorňujeme, že je potrebná aplikácia Tor proxy.</string>
+    <string name="tor_dialog_enable_title_2">Upozorňujeme</string>
+    <string name="tor_dialog_enable_details_2">Tor môže zlepšiť súkromie, ale môže spôsobiť problémy s výkonom a zmeškané platby.</string>
+    <string name="tor_dialog_disable_title">Zakázanie Tor</string>
+    <string name="tor_dialog_disable_details_1">Ak túto možnosť zakážete, vaša IP adresa môže byť odhalená rôznym poskytovateľom služieb.</string>
+    <string name="tor_dialog_disable_details_2">Naozaj chcete pokračovať?</string>
+    <string name="tor_dialog_processing">Spracúvajú sa zmeny…</string>
 
     <!-- about -->
 

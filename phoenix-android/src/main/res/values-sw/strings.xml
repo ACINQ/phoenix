@@ -442,8 +442,6 @@
     <string name="paymentdetails_part_hops_label">Hops</string>
 
     <string name="paymentdetails_received_with_label">Imepokelewa kupitia</string>
-    <string name="paymentdetails_received_with_splicein">Splice-in (kuongeza kwenye channel iliyopo)</string>
-    <string name="paymentdetails_received_with_channel">Channel mpya (iliyoundwa kiotomatiki)</string>
     <string name="paymentdetails_received_with_lightning">Malipo ya Lightning</string>
     <string name="paymentdetails_channel_id_label">Kitambulisho cha channel</string>
     <string name="paymentdetails_tx_id_label">Muamala</string>

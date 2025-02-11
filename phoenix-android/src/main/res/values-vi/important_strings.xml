@@ -177,7 +177,6 @@
 
     <string name="receive_tor_warning_title">Tor đã được bật</string>
     <string name="receive_tor_warning_dialog_content_1">Phoenix không thể nhận thanh toán ở chế độ nền.</string>
-    <string name="receive_tor_warning_dialog_content_2">Để tránh thanh toán thất bại, thay vào đó hãy sử dụng Orbot hoặc đảm bảo Phoenix vẫn hiển thị ở nền trước khi thanh toán được gửi cho bạn.</string>
 
     <!-- scanning errors -->
 
@@ -287,6 +286,15 @@
     <string name="lnurl_withdraw_success">Yêu cầu rút tiền đã được gửi tới <b>%1$s</b>.\n\nViệc gửi vốn sẽ mất một chút thời gian. Vui lòng giữ ứng dụng kết nối trực tuyến trong thời gian chờ đợi.</string>
 
     <!-- Tor -->
+
+    <string name="tor_dialog_enable_title_1">Sử dụng Tor</string>
+    <string name="tor_dialog_enable_details_1">Bật tùy chọn này sẽ yêu cầu Phoenix sử dụng địa chỉ onion khi kết nối với Lightning và Electrum. Lưu ý rằng cần có ứng dụng proxy Tor.</string>
+    <string name="tor_dialog_enable_title_2">Xin lưu ý</string>
+    <string name="tor_dialog_enable_details_2">Tor có thể cải thiện quyền riêng tư, nhưng có thể gây ra các vấn đề về hiệu suất và thanh toán bị mất.</string>
+    <string name="tor_dialog_disable_title">Vô hiệu hóa Tor</string>
+    <string name="tor_dialog_disable_details_1">Nếu bạn vô hiệu hóa tùy chọn này, địa chỉ IP của bạn có thể bị tiết lộ cho nhiều nhà cung cấp dịch vụ khác nhau.</string>
+    <string name="tor_dialog_disable_details_2">Bạn có chắc chắn muốn tiếp tục không?</string>
+    <string name="tor_dialog_processing">Đang xử lý các thay đổi…</string>
 
     <!-- about -->
 
