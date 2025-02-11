@@ -35,6 +35,7 @@ struct IncomingBalancePopover: View {
 			group_finalWalletBalance()
 		}
 		.padding(.vertical, 10)
+		.background(Color.primaryBackground)
 		.onReceive(swapInWalletPublisher) {
 			swapInWalletChanged($0)
 		}
@@ -49,10 +50,10 @@ struct IncomingBalancePopover: View {
 	@ViewBuilder
 	func group_fundsBeingConfirmed() -> some View {
 		
-	#if DEBUG
+	#if DEBUG && false
 		let fundsBeingConfirmed: Int64 =
 			swapInWallet.unconfirmedBalance.toMsat() +
-			swapInWallet.weaklyConfirmedBalance.toMsat() // + 1_000_000
+			swapInWallet.weaklyConfirmedBalance.toMsat() + 1_000_000
 	#else
 		let fundsBeingConfirmed: Int64 =
 			swapInWallet.unconfirmedBalance.toMsat() +
@@ -83,7 +84,7 @@ struct IncomingBalancePopover: View {
 			} // </VStack>
 			.frame(maxWidth: .infinity, alignment: .leading)
 			.padding(10)
-			.background(Color(.secondarySystemBackground))
+			.background(Color(UIColor.secondarySystemGroupedBackground))
 			.cornerRadius(16)
 			.onTapGesture {
 				didTapSection_swapInWallet()
@@ -95,8 +96,8 @@ struct IncomingBalancePopover: View {
 	@ViewBuilder
 	func group_fundsConfirmedNotLocked() -> some View {
 		
-	#if DEBUG
-		let fundsConfirmedNotLocked: Int64 = swapInWallet.deeplyConfirmedBalance.sat // + 1_000_000
+	#if DEBUG && false
+		let fundsConfirmedNotLocked: Int64 = swapInWallet.deeplyConfirmedBalance.sat + 1_000_000
 	#else
 		let fundsConfirmedNotLocked: Int64 = swapInWallet.deeplyConfirmedBalance.sat
 	#endif
@@ -169,7 +170,7 @@ struct IncomingBalancePopover: View {
 			} // </VStack>
 			.frame(maxWidth: .infinity, alignment: .leading)
 			.padding(10)
-			.background(Color(.secondarySystemBackground))
+			.background(Color(UIColor.secondarySystemGroupedBackground))
 			.cornerRadius(16)
 			.onTapGesture {
 				didTapSection_swapInWallet()
@@ -181,10 +182,10 @@ struct IncomingBalancePopover: View {
 	@ViewBuilder
 	func group_fundsConfirmedExpired() -> some View {
 		
-	#if DEBUG
+	#if DEBUG && false
 		let fundsConfirmedExpired =
 			swapInWallet.lockedUntilRefundBalance.sat +
-			swapInWallet.readyForRefundBalance.sat // + 1_000_000
+			swapInWallet.readyForRefundBalance.sat + 1_000_000
 	#else
 		let fundsConfirmedExpired =
 			swapInWallet.lockedUntilRefundBalance.sat +
@@ -217,7 +218,7 @@ struct IncomingBalancePopover: View {
 			} // </VStack>
 			.frame(maxWidth: .infinity, alignment: .leading)
 			.padding(10)
-			.background(Color(.secondarySystemBackground))
+			.background(Color(UIColor.secondarySystemGroupedBackground))
 			.cornerRadius(16)
 			.onTapGesture {
 				didTapSection_swapInWallet()
@@ -229,8 +230,8 @@ struct IncomingBalancePopover: View {
 	@ViewBuilder
 	func group_finalWalletBalance() -> some View {
 		
-	#if DEBUG
-		let finalWalletBalance = finalWallet.totalBalance.sat // + 1_000_000
+	#if DEBUG && false
+		let finalWalletBalance = finalWallet.totalBalance.sat + 1_000_000
 	#else
 		let finalWalletBalance = finalWallet.totalBalance.sat
 	#endif
@@ -261,7 +262,7 @@ struct IncomingBalancePopover: View {
 			} // </VStack>
 			.frame(maxWidth: .infinity, alignment: .leading)
 			.padding(10)
-			.background(Color(.secondarySystemBackground))
+			.background(Color(UIColor.secondarySystemGroupedBackground))
 			.cornerRadius(16)
 			.onTapGesture {
 				didTapSection_finalWallet()
