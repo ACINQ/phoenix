@@ -34141,6 +34141,9 @@
     "Resolving lightning address" : {
       "comment" : "Progress title"
     },
+    "Restart required" : {
+
+    },
     "Restore my wallet" : {
       "comment" : "Navigation bar title",
       "localizations" : {
@@ -48342,6 +48345,9 @@
           }
         }
       }
+    },
+    "You must restart Phoenix for the changes to take affect." : {
+
     },
     "You need at least one channel to claim your address. Try adding funds to your wallet and try again." : {
       "localizations" : {

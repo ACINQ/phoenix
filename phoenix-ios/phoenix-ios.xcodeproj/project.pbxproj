@@ -37,6 +37,7 @@
 		DC0994B0263A074C003031CA /* InfoGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0994AF263A074C003031CA /* InfoGrid.swift */; };
 		DC09FC392D56A0BA00E6579A /* CustomElectrumServerObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC09FC372D56A0B700E6579A /* CustomElectrumServerObserver.swift */; };
 		DC09FC3C2D5AAAAA00E6579A /* V85Popover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC09FC3B2D5AAAA200E6579A /* V85Popover.swift */; };
+		DC09FC3F2D5BADB900E6579A /* RestartPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC09FC3E2D5BADB400E6579A /* RestartPopover.swift */; };
 		DC0C52662BF3C31700143831 /* WhichPinSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0C52652BF3C31700143831 /* WhichPinSheet.swift */; };
 		DC0C52682BF4FF6100143831 /* AuthenticateWithPinSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0C52672BF4FF6100143831 /* AuthenticateWithPinSheet.swift */; };
 		DC0D2EA52939269800284608 /* KotlinExtensions+CloudKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0D2EA42939269800284608 /* KotlinExtensions+CloudKit.swift */; };
@@ -467,6 +468,7 @@
 		DC0994AF263A074C003031CA /* InfoGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoGrid.swift; sourceTree = "<group>"; };
 		DC09FC372D56A0B700E6579A /* CustomElectrumServerObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomElectrumServerObserver.swift; sourceTree = "<group>"; };
 		DC09FC3B2D5AAAA200E6579A /* V85Popover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V85Popover.swift; sourceTree = "<group>"; };
+		DC09FC3E2D5BADB400E6579A /* RestartPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestartPopover.swift; sourceTree = "<group>"; };
 		DC0C52652BF3C31700143831 /* WhichPinSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhichPinSheet.swift; sourceTree = "<group>"; };
 		DC0C52672BF4FF6100143831 /* AuthenticateWithPinSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticateWithPinSheet.swift; sourceTree = "<group>"; };
 		DC0D2EA42939269800284608 /* KotlinExtensions+CloudKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KotlinExtensions+CloudKit.swift"; sourceTree = "<group>"; };
@@ -1228,6 +1230,7 @@
 		DC808E992D5524E90019AE30 /* tor */ = {
 			isa = PBXGroup;
 			children = (
+				DC09FC3E2D5BADB400E6579A /* RestartPopover.swift */,
 				DC808E9C2D554A3E0019AE30 /* DisablingTorSheet.swift */,
 				C8D7A2BD01ADA0DE6034AE0F /* TorConfigurationView.swift */,
 				DC808E9A2D5541F10019AE30 /* UsingTorSheet.swift */,
@@ -2086,6 +2089,7 @@
 				DC72C33925A663CA008A927A /* QRCode.swift in Sources */,
 				DC20D77A2BC5982400C37255 /* ServerMessageMonitor.swift in Sources */,
 				DC5CA4ED28F83C3B0048A737 /* DrainWalletView.swift in Sources */,
+				DC09FC3F2D5BADB900E6579A /* RestartPopover.swift in Sources */,
 				DC5E288E2C62C3DF0037B3D3 /* NavigationStackDestination.swift in Sources */,
 				DC784A112B31EA180018DC4A /* LiquidityAdsView.swift in Sources */,
 				DC6D26E329E76557006A7814 /* AnimatedClock.swift in Sources */,

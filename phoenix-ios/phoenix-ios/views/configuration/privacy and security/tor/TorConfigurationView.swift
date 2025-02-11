@@ -14,6 +14,7 @@ struct TorConfigurationView: View {
 	
 	@State var ignoreToggleStateChange = false
 
+	@EnvironmentObject var popoverState: PopoverState
 	@EnvironmentObject var smartModalState: SmartModalState
 	
 	@ViewBuilder
@@ -125,6 +126,10 @@ struct TorConfigurationView: View {
 		
 		isTorEnabled = true
 		GroupPrefs.shared.isTorEnabled = true
+		
+		popoverState.display(dismissable: false) {
+			RestartPopover()
+		}
 	}
 	
 	func disablingTorSheet_didCancel() {
@@ -139,6 +144,10 @@ struct TorConfigurationView: View {
 		
 		isTorEnabled = false
 		GroupPrefs.shared.isTorEnabled = false
+		
+		popoverState.display(dismissable: false) {
+			RestartPopover()
+		}
 	}
 	
 	func openLink() {
