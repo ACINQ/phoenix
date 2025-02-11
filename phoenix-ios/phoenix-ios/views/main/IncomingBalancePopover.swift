@@ -19,9 +19,6 @@ struct IncomingBalancePopover: View {
 	@State var finalWallet = Biz.business.peerManager.finalWalletValue()
 	let finalWalletPublisher = Biz.business.peerManager.finalWalletPublisher()
 	
-	@State var pendingChannelsBalance = Biz.business.balanceManager.pendingChannelsBalanceValue()
-	let pendingChannelsBalancePublisher = Biz.business.balanceManager.pendingChannelsBalancePublisher()
-	
 	@State var liquidityPolicy: LiquidityPolicy = GroupPrefs.shared.liquidityPolicy
 	let liquidityPolicyPublisher = GroupPrefs.shared.liquidityPolicyPublisher
 	
@@ -44,9 +41,6 @@ struct IncomingBalancePopover: View {
 		.onReceive(finalWalletPublisher) {
 			finalWalletChanged($0)
 		}
-		.onReceive(pendingChannelsBalancePublisher) {
-			pendingChannelsBalanceChanged($0)
-		}
 		.onReceive(liquidityPolicyPublisher) {
 			liquidityPolicyChanged($0)
 		}
@@ -58,13 +52,11 @@ struct IncomingBalancePopover: View {
 	#if DEBUG
 		let fundsBeingConfirmed: Int64 =
 			swapInWallet.unconfirmedBalance.toMsat() +
-			swapInWallet.weaklyConfirmedBalance.toMsat() +
-			pendingChannelsBalance.msat // + 1_000_000
+			swapInWallet.weaklyConfirmedBalance.toMsat() // + 1_000_000
 	#else
 		let fundsBeingConfirmed: Int64 =
 			swapInWallet.unconfirmedBalance.toMsat() +
-			swapInWallet.weaklyConfirmedBalance.toMsat() +
-			pendingChannelsBalance.msat
+			swapInWallet.weaklyConfirmedBalance.toMsat()
 	#endif
 		
 		if fundsBeingConfirmed > 0 {
@@ -334,12 +326,6 @@ struct IncomingBalancePopover: View {
 		log.trace("finalWalletChanged()")
 		
 		finalWallet = newValue
-	}
-	
-	func pendingChannelsBalanceChanged(_ newValue: Lightning_kmpMilliSatoshi) {
-		log.trace("pendingChannelsBalanceChanged()")
-		
-		pendingChannelsBalance = newValue
 	}
 	
 	func liquidityPolicyChanged(_ newValue: LiquidityPolicy) {

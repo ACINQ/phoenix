@@ -46,9 +46,6 @@ struct HomeView : MVIView {
 	@State var finalWallet = Biz.business.peerManager.finalWalletValue()
 	let finalWalletPublisher = Biz.business.peerManager.finalWalletPublisher()
 	
-	@State var pendingChannelsBalance = Biz.business.balanceManager.pendingChannelsBalanceValue()
-	let pendingChannelsBalancePublisher = Biz.business.balanceManager.pendingChannelsBalancePublisher()
-	
 	@State var channels: [LocalChannelInfo] = []
 	let channelsPublisher = Biz.business.peerManager.channelsPublisher()
 	
@@ -141,9 +138,6 @@ struct HomeView : MVIView {
 			}
 			.onReceive(finalWalletPublisher) {
 				finalWalletChanged($0)
-			}
-			.onReceive(pendingChannelsBalancePublisher) {
-				pendingChannelsBalanceChanged($0)
 			}
 			.onReceive(channelsPublisher) {
 				channelsChanged($0)
@@ -304,15 +298,14 @@ struct HomeView : MVIView {
 		
 		let swapInWalletBalance: Int64 = swapInWallet.totalBalance.toMsat()
 		let finalWalletBalance: Int64 = finalWallet.totalBalance.toMsat()
-		let pendingBalance: Int64 = pendingChannelsBalance.msat
 		
-		let incomingBalance = swapInWalletBalance + finalWalletBalance + pendingBalance
+		let incomingBalance = swapInWalletBalance + finalWalletBalance
 		if incomingBalance > 0 {
 			let formattedAmount = currencyPrefs.hideAmounts
 				? Utils.hiddenAmount(currencyPrefs)
 				: Utils.format(currencyPrefs, sat: incomingBalance)
 			
-			let hasNonSwapInBalance = (finalWalletBalance > 0) || (pendingBalance > 0)
+			let hasNonSwapInBalance = (finalWalletBalance > 0)
 			
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 			
@@ -850,12 +843,6 @@ struct HomeView : MVIView {
 		log.trace("finalWalletChanged()")
 		
 		finalWallet = newValue
-	}
-	
-	func pendingChannelsBalanceChanged(_ newValue: Lightning_kmpMilliSatoshi) {
-		log.trace("pendingChannelsBalanceChanged()")
-		
-		pendingChannelsBalance = newValue
 	}
 	
 	func channelsChanged(_ channels: [LocalChannelInfo]) {

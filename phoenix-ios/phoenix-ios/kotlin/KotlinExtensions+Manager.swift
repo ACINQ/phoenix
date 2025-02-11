@@ -30,14 +30,6 @@ extension BalanceManager {
 			return Lightning_kmpWalletState.WalletWithConfirmations.empty()
 		}
 	}
-	
-	func pendingChannelsBalanceValue() -> Lightning_kmpMilliSatoshi {
-		if let value = self.pendingChannelsBalance.value as? Lightning_kmpMilliSatoshi {
-			return value
-		} else {
-			return Lightning_kmpMilliSatoshi(msat: 0)
-		}
-	}
 }
 
 extension ConnectionsManager {

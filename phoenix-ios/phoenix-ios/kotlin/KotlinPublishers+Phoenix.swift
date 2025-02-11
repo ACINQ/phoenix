@@ -144,7 +144,6 @@ extension BalanceManager {
 	fileprivate struct _Key {
 		static var balancePublisher = 0
 		static var swapInWalletPublisher = 0
-		static var pendingChanenslBalancePublisher = 0
 	}
 	
 	func balancePublisher() -> AnyPublisher<Lightning_kmpMilliSatoshi?, Never> {
@@ -173,22 +172,6 @@ extension BalanceManager {
 				self.swapInWallet
 			)
 			.map { $0 ?? Lightning_kmpWalletState.WalletWithConfirmations.empty() }
-			.eraseToAnyPublisher()
-		}
-	}
-	
-	func pendingChannelsBalancePublisher() -> AnyPublisher<Lightning_kmpMilliSatoshi, Never> {
-		
-		self.getSetAssociatedObject(storageKey: &_Key.pendingChanenslBalancePublisher) {
-			
-			// Transforming from Kotlin:
-			// ```
-			// pendingChannelsBalance: StateFlow<MilliSatoshi>
-			// ```
-			KotlinCurrentValueSubject<Lightning_kmpMilliSatoshi>(
-				self.pendingChannelsBalance
-			)
-			.compactMap { $0 }
 			.eraseToAnyPublisher()
 		}
 	}
