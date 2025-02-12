@@ -107,15 +107,12 @@ import fr.acinq.phoenix.android.settings.walletinfo.SwapInAddresses
 import fr.acinq.phoenix.android.settings.walletinfo.SwapInSignerView
 import fr.acinq.phoenix.android.settings.walletinfo.SwapInWallet
 import fr.acinq.phoenix.android.settings.walletinfo.WalletInfoView
-import fr.acinq.phoenix.android.startup.LegacySwitcherView
 import fr.acinq.phoenix.android.startup.StartupView
 import fr.acinq.phoenix.android.utils.appBackground
 import fr.acinq.phoenix.android.utils.extensions.findActivitySafe
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
-import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
-import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import io.ktor.http.decodeURLPart
 import io.ktor.http.encodeURLParameter
 import kotlinx.coroutines.flow.filterNotNull
@@ -191,6 +188,7 @@ fun AppView(
                             navArgument("next") { type = NavType.StringType; nullable = true }
                         ),
                     ) {
+                        @Suppress("DEPRECATION")
                         val intent = try {
                             it.arguments?.getParcelable<Intent>(NavController.KEY_DEEP_LINK_INTENT)
                         } catch (e: Exception) {
@@ -255,7 +253,6 @@ fun AppView(
                     }
                     composable(Screen.Receive.route) {
                         ReceiveView(
-                            onSwapInReceived = { navController.popToHome() },
                             onBackClick = { navController.popBackStack() },
                             onScanDataClick = { navController.navigate(Screen.Send.route) },
                             onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) },
@@ -279,6 +276,7 @@ fun AppView(
                             navDeepLink { uriPattern = "scanview:{data}" },
                         )
                     ) {
+                        @Suppress("DEPRECATION")
                         val intent = try {
                             it.arguments?.getParcelable<Intent>(NavController.KEY_DEEP_LINK_INTENT)
                         } catch (e: Exception) {
@@ -417,9 +415,6 @@ fun AppView(
                     composable(Screen.Logs.route) {
                         LogsView()
                     }
-                    composable(Screen.SwitchToLegacy.route) {
-                        LegacySwitcherView(onProceedNormally = { navController.navigate(Screen.Startup.route) })
-                    }
                     composable(Screen.WalletInfo.route) {
                         WalletInfoView(
                             onBackClick = { navController.popBackStack() },
@@ -503,11 +498,6 @@ fun AppView(
                         ExperimentalView(onBackClick = { navController.popBackStack() })
                     }
                 }
-
-                val legacyAppStatus = LegacyPrefsDatastore.getLegacyAppStatus(context).collectAsState(null)
-                if (legacyAppStatus.value is LegacyAppStatus.Required && navController.currentDestination?.route != Screen.SwitchToLegacy.route) {
-                    navController.navigate(Screen.SwitchToLegacy.route)
-                }
             }
 
             val isScreenLocked by appVM.isScreenLocked
@@ -558,7 +548,6 @@ fun navigateToPaymentDetails(navController: NavController, id: UUID, isFromEvent
 private fun MonitorNotices(
     vm: NoticesViewModel
 ) {
-    val context = LocalContext.current
     val internalData = internalData
     val userPrefs = userPrefs
 
@@ -603,18 +592,6 @@ private fun MonitorNotices(
             }
         }
     }
-
-    LaunchedEffect(Unit) {
-        if (LegacyPrefsDatastore.hasMigratedFromLegacy(context).first()) {
-            internalData.getLegacyMigrationMessageShown.collect { shown ->
-                if (!shown) {
-                    vm.addNotice(Notice.MigrationFromLegacy)
-                } else {
-                    vm.removeNotice<Notice.MigrationFromLegacy>()
-                }
-            }
-        }
-    }
 }
 
 @Composable
@@ -627,14 +604,12 @@ private fun RequireStarted(
 
     val navController = navController
     val currentRoute = navController.currentDestination?.route
-    if (serviceState != null && serviceState is NodeServiceState.Off && currentRoute != null) {
-        if (currentRoute != Screen.Startup.route || currentRoute != Screen.SwitchToLegacy.route) {
-            val log = logger("Navigation")
-            LaunchedEffect(key1 = Unit) {
-                log.info("service off, navigating to startup then $nextUri")
-                navController.navigate("${Screen.Startup.route}?next=${nextUri?.encodeURLParameter()}") {
-                    popUpTo(navController.graph.id) { inclusive = true }
-                }
+    if (serviceState != null && serviceState is NodeServiceState.Off && currentRoute != Screen.Startup.route) {
+        val log = logger("Navigation")
+        LaunchedEffect(key1 = Unit) {
+            log.info("service off, navigating to startup then $nextUri")
+            navController.navigate("${Screen.Startup.route}?next=${nextUri?.encodeURLParameter()}") {
+                popUpTo(navController.graph.id) { inclusive = true }
             }
         }
     }

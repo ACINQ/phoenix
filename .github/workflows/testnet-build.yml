@@ -4,9 +4,8 @@ name: Build
 on:
   workflow_dispatch:
   push:
-    branches: [ master, test-ci-build, offer ]
+    branches: [ master, test-ci-build ]
     paths:
-      - 'phoenix-legacy/**'
       - 'phoenix-android/**'
       - '.github/workflows/**'
 
@@ -29,27 +28,7 @@ jobs:
         ref: master
         path: lightning-kmp
 
-    - name: Checkout eclair-core
-      uses: actions/checkout@v2
-      with:
-        repository: ACINQ/eclair
-        ref: android-phoenix
-        path: eclair-core
-
-    - name: Checkout Tor_Onion_Proxy_Library (Tor for legacy android app)
-      uses: actions/checkout@v2
-      with:
-        repository: ACINQ/Tor_Onion_Proxy_Library
-        path: tor-lib
-
     # 2 - setup cache/jdk
-
-    - name: Cache maven dependencies
-      uses: actions/cache@v4
-      with:
-        path: ~/.m2
-        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-        restore-keys: ${{ runner.os }}-m2
 
     - name: Cached Konan
       uses: actions/cache@v4
@@ -61,7 +40,7 @@ jobs:
     - name: Set up jdk 1.17
       uses: actions/setup-java@v1
       with:
-         java-version: 17
+        java-version: 17
 
     # 3 - build dependencies & app
 
@@ -70,20 +49,7 @@ jobs:
         cd lightning-kmp
         ./gradlew clean build publishToMavenLocal -x check
 
-    - name: Build eclair-core and install to local maven repo
-      run: |
-        cd eclair-core
-        mvn clean install -pl eclair-core -am -Dmaven.test.skip=true
-
-    - name: Build Tor_Onion_Proxy_Library and install to local maven repo
-      run: |
-        cd tor-lib
-        ./gradlew :universal:build
-        ./gradlew :universal:publishToMavenLocal
-        ./gradlew :android:build
-        ./gradlew :android:publishToMavenLocal
-
-    - name: Assemble new android app apk
+    - name: Assemble the android apk
       run: |
         cd phoenix
         ./gradlew clean
@@ -102,7 +68,7 @@ jobs:
       run: |
         mkdir upload
         mv phoenix/phoenix-android/build/outputs/apk/release/phoenix-*.apk upload/phoenix-testnet-latest.apk
-        /usr/local/lib/android/sdk/build-tools/30.0.3/apksigner sign --ks signingkey --ks-pass pass:$TESTNET_STORE_PASS --ks-key-alias $TESTNET_ALIAS --key-pass pass:$TESTNET_KEY_PASS upload/phoenix-testnet-latest.apk
+        /usr/local/lib/android/sdk/build-tools/34.0.0/apksigner sign --ks signingkey --ks-pass pass:$TESTNET_STORE_PASS --ks-key-alias $TESTNET_ALIAS --key-pass pass:$TESTNET_KEY_PASS upload/phoenix-testnet-latest.apk
       shell: bash
       env:
         TESTNET_STORE_PASS: ${{secrets.TESTNET_STORE_PASS}}

@@ -19,7 +19,6 @@ package fr.acinq.phoenix.android
 import androidx.navigation.NavController
 
 sealed class Screen(val route: String) {
-    data object SwitchToLegacy : Screen("switchtolegacy")
     data object Intro : Screen("intro")
     data object InitWallet : Screen("initwallet")
     data object CreateWallet : Screen("createwallet")

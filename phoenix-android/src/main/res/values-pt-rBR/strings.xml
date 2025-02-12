@@ -52,7 +52,6 @@
 
     <string name="startup_binding_service">Vinculando o serviço…</string>
     <string name="startup_wait">Preparando a carteira…</string>
-    <string name="startup_wait_legacy_check">Verificando carteira herdada…</string>
     <string name="startup_checking_seed">Desbloqueando…</string>
     <string name="startup_unlocked">Acesso concedido…</string>
     <string name="startup_unlock_failure">Falha no desbloqueio</string>
@@ -73,11 +72,6 @@
 
     <string name="startup_starting">Iniciando…</string>
     <string name="startup_error_generic">Não foi possível iniciar o aplicativo.</string>
-
-    <!-- Switch between legacy/modern apps -->
-
-    <string name="legacyswitch_title">Aplicativo legado</string>
-    <string name="legacyswitch_restart">Reinicie o aplicativo legado</string>
 
     <!-- Payment line -->
 

@@ -1,5 +1,5 @@
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
-[![Testnet Build](https://github.com/ACINQ/phoenix/workflows/TESTNET%20Build/badge.svg)](https://github.com/ACINQ/phoenix/actions?query=workflow%3A%22TESTNET+Build%22)
+[![Testnet Build](https://github.com/ACINQ/phoenix/actions/workflows/testnet-build.yml/badge.svg)](https://github.com/ACINQ/phoenix/actions?query=testnet-build)
 [![Download Testnet APK](https://img.shields.io/badge/Download-Testnet%20APK-green?style=flat&logo=android&logoColor=white)](https://acinq.co/pub/phoenix/phoenix-testnet-latest.apk)
 
 ![Phoenix Logo](.readme/phoenix_text.png)
@@ -31,9 +31,6 @@ Phoenix is separated in 3 modules:
 - `phoenix-ios`: the UI for the iOS application, written in Swift.
 
 Instructions to build the iOS and the Android apps are provided [here](https://github.com/ACINQ/phoenix/blob/master/BUILD.md).
-
-Deprecated module:
-- `phoenix-legacy`: contains the old, legacy Android application (version 1.x), using [eclair-core](https://github.com/ACINQ/eclair) for Lightning, which has been replaced by `phoenix-android`. However, this legacy app is still embedded in the new production application for migration purposes so the code remains. It will be removed eventually.
 
 ## Contribute
 

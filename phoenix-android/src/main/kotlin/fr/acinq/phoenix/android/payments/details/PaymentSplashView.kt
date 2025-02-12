@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package fr.acinq.phoenix.android.payments.details
 
 import androidx.compose.foundation.layout.Spacer

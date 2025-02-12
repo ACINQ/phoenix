@@ -77,7 +77,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun ReceiveView(
     onBackClick: () -> Unit,
-    onSwapInReceived: () -> Unit,
     onFeeManagementClick: () -> Unit,
     onScanDataClick: () -> Unit,
 ) {
@@ -106,7 +105,7 @@ fun ReceiveView(
                 Spacer(modifier = Modifier.width(16.dp))
             },
         )
-        ReceiveViewPages(vm, onFeeManagementClick, onScanDataClick)
+        ReceiveViewPages(vm, onFeeManagementClick)
     }
 }
 
@@ -115,7 +114,6 @@ fun ReceiveView(
 private fun ReceiveViewPages(
     vm: ReceiveViewModel,
     onFeeManagementClick: () -> Unit,
-    onScanDataClick: () -> Unit,
 ) {
     val pagerState = rememberPagerState(pageCount = { 2 })
     // we need to be responsive in some subcomponents, like the edit-invoice buttons
@@ -155,7 +153,7 @@ private fun ReceiveViewPages(
                         val defaultInvoiceExpiry by userPrefs.getInvoiceDefaultExpiry.collectAsState(null)
                         val defaultInvoiceDesc by userPrefs.getInvoiceDefaultDesc.collectAsState(null)
                         safeLet(defaultInvoiceDesc, defaultInvoiceExpiry) { desc, expiry ->
-                            LightningInvoiceView(vm = vm, onFeeManagementClick = onFeeManagementClick, onScanDataClick = onScanDataClick,
+                            LightningInvoiceView(vm = vm, onFeeManagementClick = onFeeManagementClick,
                                 defaultDescription = desc, defaultExpiry = expiry, maxWidth = maxWidth, isPageActive = pagerState.currentPage == 0)
                         } ?: ProgressView(text = stringResource(id = R.string.utils_loading_prefs))
                     }

@@ -123,20 +123,6 @@ private fun PermamentNotice(
     val scope = rememberCoroutineScope()
 
     when (notice) {
-        Notice.MigrationFromLegacy -> {
-            ImportantNotification(
-                icon = R.drawable.ic_party_popper,
-                message = stringResource(id = R.string.inappnotif_migration_from_legacy),
-                actionText = stringResource(id = R.string.inappnotif_migration_from_legacy_action),
-                onActionClick = {
-                    openLink(context, "https://acinq.co/blog/phoenix-splicing-update")
-                    scope.launch {
-                        internalData.saveLegacyMigrationMessageShown(true)
-                    }
-                }
-            )
-        }
-
         Notice.BackupSeedReminder -> {
             ImportantNotification(
                 icon = R.drawable.ic_key,

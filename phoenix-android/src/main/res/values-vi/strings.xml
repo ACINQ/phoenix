@@ -55,7 +55,6 @@
 
     <string name="startup_binding_service">Binding dịch vụ…</string>
     <string name="startup_wait">Đang chuẩn bị ví…</string>
-    <string name="startup_wait_legacy_check">Đang kiểm tra ví cũ…</string>
     <string name="startup_checking_seed">Đang mở khoá…</string>
     <string name="startup_unlocked">Quyền truy cập được chấp nhận…</string>
     <string name="startup_unlock_failure">Mở khóa không thành công</string>
@@ -76,11 +75,6 @@
 
     <string name="startup_starting">Đang khởi động…</string>
     <string name="startup_error_generic">Ứng dụng không khởi động được.</string>
-
-    <!-- Switch between legacy/modern apps -->
-
-    <string name="legacyswitch_title">Ứng dụng cũ</string>
-    <string name="legacyswitch_restart">Khởi động ứng dụng cũ</string>
 
     <!-- Payment line -->
 

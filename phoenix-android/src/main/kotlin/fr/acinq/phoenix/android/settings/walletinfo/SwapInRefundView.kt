@@ -107,7 +107,6 @@ private fun AvailableForRefundView(
     peerManager: PeerManager,
     availableForRefund: Satoshi,
 ) {
-    val context = LocalContext.current
     val electrumClient = business.electrumClient
     val walletManager = business.walletManager
     val vm = viewModel<SwapInRefundViewModel>(factory = SwapInRefundViewModel.Factory(peerManager, walletManager, electrumClient))

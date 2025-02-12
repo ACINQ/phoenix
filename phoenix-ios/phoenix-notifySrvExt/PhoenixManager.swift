@@ -93,10 +93,8 @@ class PhoenixManager {
 		)
 
 		let startupParams = StartupParams(
-			requestCheckLegacyChannels: false,
 			isTorEnabled: GroupPrefs.shared.isTorEnabled,
-			liquidityPolicy: GroupPrefs.shared.liquidityPolicy.toKotlin(),
-			trustedSwapInTxs: Set()
+			liquidityPolicy: GroupPrefs.shared.liquidityPolicy.toKotlin()
 		)
 		newBusiness.start(startupParams: startupParams)
 

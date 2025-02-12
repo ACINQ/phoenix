@@ -207,11 +207,6 @@
 
     <!-- in-app notifications -->
 
-    <string name="inappnotif_migration_from_legacy">Gratulujeme! Vaše peněženka byla aktualizována.</string>
-    <string name="inappnotif_migration_from_legacy_action">Podívejte se na změny</string>
-    <string name="inappnotif_migration_from_legacy_dialog_title">Vaše On-Chain Bitcoin adresa se změnila</string>
-    <string name="inappnotif_migration_from_legacy_dialog_body">Nepoužívejte znovu své staré adresy! Nebudou již fungovat.\n\nPokud jste tak omylem učinili, kontaktujte podporu.</string>
-
     <string name="inappnotif_backup_seed_message">Zálohujte svou peněženku, abyste zabránili ztrátě bitcoinů.</string>
     <string name="inappnotif_backup_seed_action">Zálohování peněženky</string>
 

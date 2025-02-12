@@ -133,10 +133,8 @@ class BusinessManager {
 		business.appConfigurationManager.updatePreferredFiatCurrencies(current: preferredFiatCurrencies)
 		
 		let startupParams = StartupParams(
-			requestCheckLegacyChannels: false,
 			isTorEnabled: GroupPrefs.shared.isTorEnabled,
-			liquidityPolicy: GroupPrefs.shared.liquidityPolicy.toKotlin(),
-			trustedSwapInTxs: Set()
+			liquidityPolicy: GroupPrefs.shared.liquidityPolicy.toKotlin()
 		)
 		business.start(startupParams: startupParams)
 		

@@ -41,8 +41,6 @@ import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
 import fr.acinq.phoenix.controllers.ControllerFactory
 import fr.acinq.phoenix.controllers.InitializationController
 import fr.acinq.phoenix.controllers.init.Initialization
-import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
-import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -131,9 +129,8 @@ class InitViewModel(controller: InitializationController, val internalDataReposi
                     val encrypted = EncryptedSeed.V2.NoAuth.encrypt(EncryptedSeed.fromMnemonics(mnemonics))
                     SeedManager.writeSeedToDisk(context, encrypted)
                     writingState = WritingSeedState.WrittenToDisk(encrypted)
-                    LegacyPrefsDatastore.saveStartLegacyApp(context, if (isNewWallet) LegacyAppStatus.NotRequired else LegacyAppStatus.Unknown)
                     if (isNewWallet) {
-                        log.info("new seed successfully created and written to disk")
+                        log.info("wallet successfully created from new seed and written to disk")
                     } else {
                         log.info("wallet successfully restored from mnemonics and written to disk")
                     }

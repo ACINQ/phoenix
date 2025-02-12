@@ -206,11 +206,6 @@
 
     <!-- in-app notifications -->
 
-    <string name="inappnotif_migration_from_legacy">Parabéns! Sua carteira foi atualizada.</string>
-    <string name="inappnotif_migration_from_legacy_action">Veja as mudanças</string>
-    <string name="inappnotif_migration_from_legacy_dialog_title">Seu endereço de Bitcoin na cadeia foi alterado</string>
-    <string name="inappnotif_migration_from_legacy_dialog_body">Não reutilize seus endereços antigos! Eles não funcionarão mais.\n\nEntre em contato com o suporte se tiver feito isso acidentalmente.</string>
-
     <string name="inappnotif_backup_seed_message">Faça backup de sua carteira para evitar a perda de seus bitcoins.</string>
     <string name="inappnotif_backup_seed_action">Fazer backup da minha carteira</string>
 

@@ -176,20 +176,9 @@ class PeerManager(
                 ),
             )
 
-            var initTlvs = TlvStream.empty<InitTlv>()
-            if (startupParams.requestCheckLegacyChannels) {
-                val legacyKey = nodeParams.keyManager.nodeKeys.legacyNodeKey
-                val signature = Crypto.sign(
-                    data = Crypto.sha256(legacyKey.publicKey.toUncompressedBin()),
-                    privateKey = legacyKey.privateKey
-                )
-                initTlvs = initTlvs.addOrUpdate(InitTlv.PhoenixAndroidLegacyNodeId(legacyNodeId = legacyKey.publicKey, signature = signature))
-            }
-
-            logger.info { "instantiating peer with:\n    walletParams=$walletParams\n    initTlvs=$initTlvs\n    startupParams=$startupParams" }
+            logger.info { "instantiating peer with:\n    walletParams=$walletParams\n    startupParams=$startupParams" }
 
             val peer = Peer(
-                initTlvStream = initTlvs,
                 nodeParams = nodeParams,
                 walletParams = walletParams,
                 client = electrumClient,

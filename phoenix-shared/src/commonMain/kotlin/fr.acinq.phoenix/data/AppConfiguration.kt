@@ -247,13 +247,9 @@ sealed class ElectrumConfig {
 }
 
 data class StartupParams(
-    /** When true, we use a [InitTlv] to ask our peer whether there are legacy channels to reestablish for the legacy node id. */
-    val requestCheckLegacyChannels: Boolean = false,
     /** If true, we'll use onion addresses when connecting to the peer and to Electrum servers. */
     val isTorEnabled: Boolean,
     /** The liquidity policy must be injected into the node params manager. */
     val liquidityPolicy: LiquidityPolicy,
-    /** List of transaction ids that can be used for swap-in even if they are zero-conf. */
-    val trustedSwapInTxs: Set<TxId>,
     // TODO: add custom electrum address, fiat currencies, ...
 )

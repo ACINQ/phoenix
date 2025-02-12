@@ -210,11 +210,6 @@
 
     <!-- in-app notifications -->
 
-    <string name="inappnotif_migration_from_legacy">Hongera! Pochi yako imesasishwa.</string>
-    <string name="inappnotif_migration_from_legacy_action">Angalia kilichobadilika</string>
-    <string name="inappnotif_migration_from_legacy_dialog_title">Anwani yako ya Bitcoin ya mtandaoni imebadilika</string>
-    <string name="inappnotif_migration_from_legacy_dialog_body">Usitumie anwani zako za zamani! Hazitafanya kazi tena.\n\nWasiliana na msaada ikiwa ulifanya hivyo kwa bahati mbaya.</string>
-
     <string name="inappnotif_backup_seed_message">Hifadhi nakala ya pochi yako ili kuepuka kupoteza bitcoins zako.</string>
     <string name="inappnotif_backup_seed_action">Hifadhi pochi yangu</string>
 

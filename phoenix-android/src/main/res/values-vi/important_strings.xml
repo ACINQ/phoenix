@@ -214,11 +214,6 @@
 
     <!-- in-app notifications -->
 
-    <string name="inappnotif_migration_from_legacy">Xin chúc mừng! Ví của bạn đã được cập nhật.</string>
-    <string name="inappnotif_migration_from_legacy_action">Xem các thay đổi</string>
-    <string name="inappnotif_migration_from_legacy_dialog_title">Địa chỉ on-chain Bitcoin của bạn đã thay đổi</string>
-    <string name="inappnotif_migration_from_legacy_dialog_body">KHÔNG dùng lại các địa chỉ cũ của bạn! Các địa chỉ cũ này không còn hoạt động nữa.\n\nLiên lạc với bộ phận hỗ trợ nếu bạn vô tình sử dụng chúng.</string>
-
     <string name="inappnotif_backup_seed_message">Sao lưu ví của bạn để tránh bị mất Bitcoins.</string>
     <string name="inappnotif_backup_seed_action">Sao lưu ví của tôi</string>
 

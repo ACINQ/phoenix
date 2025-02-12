@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package fr.acinq.phoenix.android.payments.details.technical
 
 import androidx.compose.material.Text
@@ -37,7 +39,6 @@ import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
 import fr.acinq.phoenix.data.ExchangeRate
 
 
-@Suppress("DEPRECATION")
 @Composable
 fun TechnicalIncomingLegacyPayToOpen(
     payment: LegacyPayToOpenIncomingPayment,

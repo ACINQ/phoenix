@@ -16,7 +16,6 @@ object Versions {
     object Android {
         const val coreKtx = "1.9.0"
         const val lifecycle = "2.6.0"
-        const val prefs = "1.2.0"
         const val datastore = "1.0.0"
         const val compose = "1.6.8"
         const val composeCompiler = "1.5.8"
@@ -29,24 +28,12 @@ object Versions {
         const val fcm = "24.0.0"
         const val logback = "2.0.0"
 
-        const val testRunner = "1.3.0"
-        const val espresso = "3.3.0"
-    }
-
-    object AndroidLegacy {
-        const val eclair = "0.4.25-android-phoenix"
-
-        const val safeArgs = "2.6.0"
-        const val appCompat = "1.3.0"
         const val material = "1.7.0"
         const val navigation = "2.4.2"
         const val constraint = "2.0.4"
-        const val lifecycleExtensions = "2.2.0"
-        const val lifecycle = "2.7.0"
         const val work = "2.8.1"
-        const val viewpager = "1.0.0"
-        const val eventbus = "3.1.1"
-        const val torWrapper = "0.0.6"
-        const val torCtl = "0.4"
+
+        const val testRunner = "1.3.0"
+        const val espresso = "3.3.0"
     }
 }
