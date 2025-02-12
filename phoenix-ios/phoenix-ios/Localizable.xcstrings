@@ -324,6 +324,9 @@
         }
       }
     },
+    ": %@" : {
+
+    },
     "? confirmations" : {
 
     },
@@ -5601,6 +5604,12 @@
         }
       }
     },
+    "Add to contacts" : {
+
+    },
+    "Add to existing contact" : {
+
+    },
     "adding to existing channel" : {
       "comment" : "Transaction Info: Explanation",
       "localizations" : {
@@ -9223,6 +9232,7 @@
       }
     },
     "Bolt12 offer:" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -9263,6 +9273,7 @@
       }
     },
     "Bolt12 offers" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -9301,6 +9312,9 @@
           }
         }
       }
+    },
+    "Bolt12 offers:" : {
+
     },
     "broadcast" : {
       "localizations" : {
@@ -13487,6 +13501,9 @@
         }
       }
     },
+    "Create new contact" : {
+
+    },
     "Create new wallet" : {
       "localizations" : {
         "ar" : {
@@ -16391,6 +16408,12 @@
           }
         }
       }
+    },
+    "Duplicate in %@" : {
+
+    },
+    "Duplicate within this contact" : {
+
     },
     "Duration" : {
       "localizations" : {
@@ -23359,6 +23382,9 @@
         }
       }
     },
+    "Invalid format" : {
+
+    },
     "Invalid Lightning Request" : {
       "comment" : "toast warning",
       "extractionState" : "manual",
@@ -23442,6 +23468,7 @@
       }
     },
     "Invalid offer" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -24047,6 +24074,9 @@
         }
       }
     },
+    "label (optional)" : {
+
+    },
     "Last attempt failed" : {
       "localizations" : {
         "ar" : {
@@ -24490,6 +24520,9 @@
           }
         }
       }
+    },
+    "Lightning addresses:" : {
+
     },
     "lightning fee" : {
       "extractionState" : "stale",
@@ -25321,6 +25354,9 @@
           }
         }
       }
+    },
+    "lno1... (paste offer here)" : {
+
     },
     "lnurl-auth" : {
       "localizations" : {
@@ -28300,6 +28336,9 @@
           }
         }
       }
+    },
+    "none" : {
+
     },
     "None" : {
       "comment" : "TextField placeholder",

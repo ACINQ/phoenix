@@ -17,26 +17,47 @@
 package fr.acinq.phoenix.db.notifications
 
 import app.cash.sqldelight.coroutines.asFlow
-import app.cash.sqldelight.coroutines.mapToList
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.byteVector32
 import fr.acinq.bitcoin.utils.Try
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.wire.OfferTypes
+import fr.acinq.phoenix.data.ContactAddress
 import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.db.didDeleteContact
 import fr.acinq.phoenix.db.didSaveContact
 import fr.acinq.phoenix.db.sqldelight.AppDatabase
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
+import fr.acinq.phoenix.data.ContactOffer
+import fr.acinq.phoenix.db.sqldelight.Contact_addresses
+import fr.acinq.phoenix.db.sqldelight.Contact_offers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
+import kotlinx.datetime.Instant
+import kotlin.coroutines.CoroutineContext
 
 class ContactQueries(val database: AppDatabase) {
 
     val queries = database.contactsQueries
 
     fun saveContact(contact: ContactInfo, notify: Boolean = true) {
+        database.transaction {
+            val contactExists = queries.existsContact(
+                id = contact.id.toString()
+            ).executeAsOne() > 0
+            if (contactExists) {
+                updateExistingContact(contact)
+            } else {
+                saveNewContact(contact)
+            }
+            if (notify) {
+                didSaveContact(contact.id, database)
+            }
+        }
+    }
+
+    private fun saveNewContact(contact: ContactInfo) {
         database.transaction {
             queries.insertContact(
                 id = contact.id.toString(),
@@ -46,21 +67,28 @@ class ContactQueries(val database: AppDatabase) {
                 createdAt = currentTimestampMillis(),
                 updatedAt = null
             )
-            contact.offers.forEach { offer ->
+            contact.offers.forEach { row ->
                 queries.insertOfferForContact(
-                    offerId = offer.offerId.toByteArray(),
+                    offerId = row.offer.offerId.toByteArray(),
                     contactId = contact.id.toString(),
-                    offer = offer.encode(),
-                    createdAt = currentTimestampMillis(),
+                    offer = row.offer.encode(),
+                    label = row.label,
+                    createdAt = row.createdAt.toEpochMilliseconds()
                 )
             }
-            if (notify) {
-                didSaveContact(contact.id, database)
+            contact.addresses.forEach { row ->
+                queries.insertAddressForContact(
+                    addressHash = row.id.toByteArray(),
+                    contactId = contact.id.toString(),
+                    address = row.address,
+                    label = row.label,
+                    createdAt = row.createdAt.toEpochMilliseconds()
+                )
             }
         }
     }
 
-    fun updateContact(contact: ContactInfo) {
+    private fun updateExistingContact(contact: ContactInfo) {
         database.transaction {
             queries.updateContact(
                 name = contact.name,
@@ -69,7 +97,85 @@ class ContactQueries(val database: AppDatabase) {
                 updatedAt = currentTimestampMillis(),
                 contactId = contact.id.toString()
             )
-            didSaveContact(contact.id, database)
+
+            val existingOffers: MutableMap<ByteVector32, ContactOffer> =
+                queries.listOffersForContact(
+                    contactId = contact.id.toString()
+                ).executeAsList().mapNotNull { offerRow ->
+                    parseOfferRow(offerRow)?.let { offer ->
+                        offerRow.offer_id.byteVector32() to offer
+                    }
+                }.toMap().toMutableMap()
+            contact.offers.forEach { row ->
+                val result: ComparisonResult =
+                    existingOffers.remove(row.id)?.let { existingOffer ->
+                        compareOffers(existingOffer, row)
+                    } ?: ComparisonResult.IsNew
+                when (result) {
+                    ComparisonResult.IsNew -> {
+                        queries.insertOfferForContact(
+                            offerId = row.id.toByteArray(),
+                            contactId = contact.id.toString(),
+                            offer = row.offer.encode(),
+                            label = row.label,
+                            createdAt = row.createdAt.toEpochMilliseconds()
+                        )
+                    }
+                    ComparisonResult.IsUpdated -> {
+                        queries.updateContactOffer(
+                            label = row.label,
+                            offerId = row.id.toByteArray()
+                        )
+                    }
+                    ComparisonResult.NoChanges -> {}
+                }
+            }
+            // In the loop above we removed every matching offer.
+            // So any items leftover have been deleted from the contact.
+            existingOffers.forEach { (key, _) ->
+                queries.deleteContactOfferForOfferId(
+                    offerId = key.toByteArray()
+                )
+            }
+
+            val existingAddresses: MutableMap<ByteVector32, ContactAddress> =
+                queries.listAddressesForContact(
+                    contactId = contact.id.toString()
+                ).executeAsList().map { addressRow ->
+                    addressRow.address_hash.byteVector32() to parseAddressRow(addressRow)
+                }.toMap().toMutableMap()
+            contact.addresses.forEach { row ->
+                val result: ComparisonResult =
+                    existingAddresses.remove(row.id)?.let { existing ->
+                        compareAddresses(existing, row)
+                    } ?: ComparisonResult.IsNew
+                when (result) {
+                    ComparisonResult.IsNew -> {
+                        queries.insertAddressForContact(
+                            addressHash = row.id.toByteArray(),
+                            contactId = contact.id.toString(),
+                            address = row.address,
+                            label = row.label,
+                            createdAt = row.createdAt.toEpochMilliseconds()
+                        )
+                    }
+                    ComparisonResult.IsUpdated -> {
+                        queries.updateContactAddress(
+                            label = row.label,
+                            address = row.address,
+                            addressHash = row.id.toByteArray()
+                        )
+                    }
+                    ComparisonResult.NoChanges -> {}
+                }
+            }
+            // In the loop above we removed every matching address.
+            // So any items leftover have been deleted from the contact.
+            existingAddresses.forEach { (key, _) ->
+                queries.deleteContactAddressForAddressHash(
+                    addressHash = key.toByteArray()
+                )
+            }
         }
     }
 
@@ -83,72 +189,135 @@ class ContactQueries(val database: AppDatabase) {
 
     fun getContact(contactId: UUID): ContactInfo? {
         return database.transactionWithResult {
-            queries.getContact(contactId = contactId.toString()).executeAsOneOrNull()?.let {
-                val offers = it.offers.split(",").map {
-                    OfferTypes.Offer.decode(it)
-                }.filterIsInstance<Try.Success<OfferTypes.Offer>>().map {
-                    it.get()
+            queries.getContact2(
+                contactId = contactId.toString()
+            ).executeAsOneOrNull()?.let { contactRow ->
+                val offers: List<ContactOffer> = queries.listOffersForContact(
+                    contactId = contactId.toString()
+                ).executeAsList().mapNotNull { offerRow ->
+                    parseOfferRow(offerRow)
                 }
-                ContactInfo(contactId, it.name, it.photo_uri, it.use_offer_key, offers)
-            }
-        }
-    }
-
-    /** Retrieve a contact from a transaction ID - should be done in a transaction. */
-    fun getContactForOffer(offerId: ByteVector32): ContactInfo? {
-        return database.transactionWithResult {
-            queries.getContactIdForOffer(offerId = offerId.toByteArray()).executeAsOneOrNull()?.let {
-                val contactId = it.contact_id
-                queries.getContact(contactId = contactId).executeAsOneOrNull()
-            }?.let {
-                val offers = it.offers.split(",").map {
-                    OfferTypes.Offer.decode(it)
-                }.filterIsInstance<Try.Success<OfferTypes.Offer>>().map {
-                    it.get()
+                val addresses: List<ContactAddress> = queries.listAddressesForContact(
+                    contactId = contactId.toString()
+                ).executeAsList().map { addressRow ->
+                    parseAddressRow(addressRow)
                 }
-                if (offers.isEmpty()) {
-                    null
-                } else {
-                    ContactInfo(UUID.fromString(it.id), it.name, it.photo_uri, it.use_offer_key, offers)
-                }
+                ContactInfo(
+                    id = contactId,
+                    name = contactRow.name,
+                    photoUri = contactRow.photo_uri,
+                    useOfferKey = contactRow.use_offer_key,
+                    offers = offers,
+                    addresses = addresses
+                )
             }
         }
     }
 
     fun listContacts(): List<ContactInfo> {
-        return queries.listContacts().executeAsList().map {
-            val offers = it.offers?.split(",")?.map {
-                OfferTypes.Offer.decode(it)
-            }?.filterIsInstance<Try.Success<OfferTypes.Offer>>()?.map {
-                it.get()
-            } ?: emptyList()
-            ContactInfo(UUID.fromString(it.id), it.name, it.photo_uri, it.use_offer_key, offers)
+        return database.transactionWithResult {
+
+            val offers: MutableMap<UUID, MutableList<ContactOffer>> = mutableMapOf()
+            queries.listContactOffers().executeAsList().forEach { offerRow ->
+                parseOfferRow(offerRow)?.let { offer ->
+                    val contactId = UUID.fromString(offerRow.contact_id)
+                    offers[contactId]?.add(offer) ?: run {
+                        offers[contactId] = mutableListOf(offer)
+                    }
+                }
+            }
+
+            val addresses: MutableMap<UUID, MutableList<ContactAddress>> = mutableMapOf()
+            queries.listContactAddresses().executeAsList().forEach { addressRow ->
+                parseAddressRow(addressRow).let { address ->
+                    val contactId = UUID.fromString(addressRow.contact_id)
+                    addresses[contactId]?.add(address) ?: run {
+                        addresses[contactId] = mutableListOf(address)
+                    }
+                }
+            }
+
+            queries.listContacts2().executeAsList().map { contactRow ->
+                val contactId = UUID.fromString(contactRow.id)
+                ContactInfo(
+                    id = contactId,
+                    name = contactRow.name,
+                    photoUri = contactRow.photo_uri,
+                    useOfferKey = contactRow.use_offer_key,
+                    offers = offers[contactId]?.toList() ?: listOf(),
+                    addresses = addresses[contactId]?.toList() ?: listOf()
+                )
+            }
         }
     }
 
-    fun monitorContactsFlow(): Flow<List<ContactInfo>> {
-        return queries.listContacts().asFlow().mapToList(Dispatchers.IO).map { list ->
-            list.map {
-                val offers = it.offers?.split(",")?.map {
-                    OfferTypes.Offer.decode(it)
-                }?.filterIsInstance<Try.Success<OfferTypes.Offer>>()?.map {
-                    it.get()
-                } ?: emptyList()
-                ContactInfo(UUID.fromString(it.id), it.name, it.photo_uri, it.use_offer_key, offers)
+    fun monitorContactsFlow(context: CoroutineContext): Flow<List<ContactInfo>> {
+        return queries.listContacts2().asFlow().map {
+            withContext(context) {
+                listContacts()
             }
         }
     }
 
     fun deleteContact(contactId: UUID) {
         database.transaction {
-            queries.deleteContactOfferForContactId(contactId = contactId.toString())
+            queries.deleteContactOffersForContactId(contactId = contactId.toString())
+            queries.deleteContactAddressesForContactId(contactId = contactId.toString())
             queries.deleteContact(contactId = contactId.toString())
             didDeleteContact(contactId, database)
         }
     }
 
-    fun deleteOfferContactLink(offerId: ByteVector32) {
-        queries.deleteContactOfferForOfferId(offerId.toByteArray())
+    private fun parseOfferRow(row: Contact_offers): ContactOffer? {
+        return when (val result = OfferTypes.Offer.decode(row.offer)) {
+            is Try.Success -> ContactOffer(
+                id = row.offer_id.byteVector32(),
+                offer = result.get(),
+                label = row.label ?: "",
+                createdAt = Instant.fromEpochMilliseconds(row.created_at)
+            )
+            is Try.Failure -> null
+        }
     }
 
+    private fun parseAddressRow(row: Contact_addresses): ContactAddress {
+        return ContactAddress(
+            id = row.address_hash.byteVector32(),
+            address = row.address,
+            label = row.label ?: "",
+            createdAt = Instant.fromEpochMilliseconds(row.created_at)
+        )
+    }
+
+    private enum class ComparisonResult {
+        IsNew,
+        IsUpdated,
+        NoChanges
+    }
+
+    private fun compareOffers(
+        existing: ContactOffer,
+        current: ContactOffer
+    ): ComparisonResult {
+        return if (existing.label != current.label) {
+            ComparisonResult.IsUpdated
+        } else {
+            ComparisonResult.NoChanges
+        }
+    }
+
+    private fun compareAddresses(
+        existing: ContactAddress,
+        current: ContactAddress
+    ): ComparisonResult {
+        // Note: The address can be changed without changing the hash.
+        // For example: old("johndoe@foobar.co") -> new("JohnDoe@foobar.co")
+        // Since the hash is case-insensitive it remains unchanged.
+        // In other words, this is just a requested formatting change by the user.
+        return if ((existing.label != current.label) || (existing.address != current.address)) {
+            ComparisonResult.IsUpdated
+        } else {
+            ComparisonResult.NoChanges
+        }
+    }
 }
