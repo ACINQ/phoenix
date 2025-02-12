@@ -249,6 +249,7 @@ fun translatePaymentError(paymentFailure: OutgoingPaymentFailure): String {
                 when (result.value) {
                     FinalFailure.InvalidPaymentId -> context.getString(R.string.outgoing_failuremessage_invalid_id)
                     FinalFailure.AlreadyPaid -> context.getString(R.string.outgoing_failuremessage_alreadypaid)
+                    FinalFailure.AlreadyInProgress -> context.getString(R.string.send_error_payment_pending)
                     FinalFailure.ChannelClosing -> context.getString(R.string.outgoing_failuremessage_channel_closing)
                     FinalFailure.ChannelNotConnected -> context.getString(R.string.outgoing_failuremessage_not_connected)
                     FinalFailure.ChannelOpening -> context.getString(R.string.outgoing_failuremessage_channel_opening)

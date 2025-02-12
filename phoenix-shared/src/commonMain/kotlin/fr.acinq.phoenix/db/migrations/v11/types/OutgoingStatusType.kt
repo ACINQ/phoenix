@@ -101,6 +101,7 @@ sealed class OutgoingStatusData {
             FinalFailure.ChannelOpening::class.simpleName -> FinalFailure.ChannelOpening
             FinalFailure.ChannelNotConnected::class.simpleName -> FinalFailure.ChannelNotConnected
             FinalFailure.FeaturesNotSupported::class.simpleName -> FinalFailure.FeaturesNotSupported
+            FinalFailure.AlreadyInProgress::class.simpleName -> FinalFailure.AlreadyInProgress
             else -> FinalFailure.UnknownError
         }
     }
