@@ -22,6 +22,7 @@ data class WalletPaymentMetadata(
     val originalFiat: ExchangeRate.BitcoinPriceRate? = null,
     val userDescription: String? = null,
     val userNotes: String? = null,
+    val lightningAddress: String? = null,
     val modifiedAt: Long? = null
 )
 

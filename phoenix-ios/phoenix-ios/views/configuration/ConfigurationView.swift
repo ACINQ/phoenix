@@ -207,7 +207,7 @@ struct ConfigurationList: View {
 				.id(linkID_PaymentOptions)
 			} // </if hasWallet>
 			
-			if hasWallet && CONTACTS_ENABLED {
+			if hasWallet {
 				navLink_label(.ContactsList) {
 					Label { Text("Contacts") } icon: {
 						Image(systemName: "person.2")
