@@ -68,7 +68,7 @@ jobs:
       run: |
         mkdir upload
         mv phoenix/phoenix-android/build/outputs/apk/release/phoenix-*.apk upload/phoenix-testnet-latest.apk
-        /usr/local/lib/android/sdk/build-tools/30.0.3/apksigner sign --ks signingkey --ks-pass pass:$TESTNET_STORE_PASS --ks-key-alias $TESTNET_ALIAS --key-pass pass:$TESTNET_KEY_PASS upload/phoenix-testnet-latest.apk
+        /usr/local/lib/android/sdk/build-tools/34.0.0/apksigner sign --ks signingkey --ks-pass pass:$TESTNET_STORE_PASS --ks-key-alias $TESTNET_ALIAS --key-pass pass:$TESTNET_KEY_PASS upload/phoenix-testnet-latest.apk
       shell: bash
       env:
         TESTNET_STORE_PASS: ${{secrets.TESTNET_STORE_PASS}}
