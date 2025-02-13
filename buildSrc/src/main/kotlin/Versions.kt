@@ -5,11 +5,11 @@ object Versions {
     const val kotlin = "2.1.10"
     const val skie = "0.10.1"
 
-    const val ktor = "2.3.7"
+    const val ktor = "2.3.13"
     const val sqlDelight = "2.0.2"
     const val okio = "3.8.0"
 
-    const val slf4j = "1.7.30"
+    const val slf4j = "2.0.16"
     const val junit = "4.13"
 
     const val fcmPlugin = "4.4.2"
@@ -26,7 +26,7 @@ object Versions {
 
         const val zxing = "4.1.0"
         const val fcm = "24.0.0"
-        const val logback = "2.0.0"
+        const val logback = "3.0.0"
 
         const val material = "1.7.0"
         const val navigation = "2.4.2"
