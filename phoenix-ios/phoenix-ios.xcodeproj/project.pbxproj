@@ -1578,6 +1578,7 @@
 				7555FF79242A565900829871 /* Resources */,
 				F43B86AD24A49FA7004C1291 /* Embed Frameworks */,
 				DCB511B0281AECF8001BC525 /* Embed Foundation Extensions */,
+				DC6089372D5E459600D80222 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -1762,8 +1763,27 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		DC6089372D5E459600D80222 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "DupFramework=\"$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME/PlugIns/phoenix-notifySrvExt.appex/Frameworks/PhoenixShared.framework\"\necho \"Removing duplicated framework...\"\necho \"rm -rf $DupFramework\"\nrm -rf \"$DupFramework\"\n";
+		};
 		DCA538EB2CA5AE7700B17C8B /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -1781,6 +1801,7 @@
 		};
 		DCA538EC2CA5AF2A00B17C8B /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
