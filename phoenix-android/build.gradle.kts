@@ -5,6 +5,7 @@ plugins {
     kotlin("android")
     id("com.google.gms.google-services")
     id("kotlinx-serialization")
+    id("org.jetbrains.kotlin.plugin.compose") version Versions.kotlin
 }
 
 fun gitCommitHash(): String {
@@ -70,10 +71,6 @@ android {
         viewBinding = true
         dataBinding = true
         buildConfig = true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = Versions.Android.composeCompiler
     }
 }
 
