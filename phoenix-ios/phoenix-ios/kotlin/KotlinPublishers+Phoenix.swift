@@ -452,6 +452,28 @@ extension PaymentsPageFetcher {
 
 
 // MARK: -
+extension CloudKitCardsDb {
+	
+	fileprivate struct _Key {
+		static var queueCountPublisher = 0
+	}
+	
+	func queueCountPublisher() -> AnyPublisher<Int64, Never> {
+		
+		self.getSetAssociatedObject(storageKey: &_Key.queueCountPublisher) {
+			
+			/// Transforming from Kotlin:
+			/// `queueCount: StateFlow<Long>`
+			///
+			KotlinCurrentValueSubject<KotlinLong>(
+				self.queueCount
+			)
+			.compactMap { $0?.int64Value }
+			.eraseToAnyPublisher()
+		}
+	}
+}
+
 extension CloudKitContactsDb {
 	
 	fileprivate struct _Key {

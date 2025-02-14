@@ -12,6 +12,7 @@ import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.SpendingLimit
 import fr.acinq.phoenix.db.Bolt_cards
 import fr.acinq.phoenix.db.didSaveCard
+import fr.acinq.phoenix.db.didDeleteCard
 import fr.acinq.phoenix.db.sqldelight.AppDatabase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -101,9 +102,12 @@ class BoltCardQueries(val database: AppDatabase) {
         }
     }
 
-    fun deleteCard(cardId: UUID) {
+    fun deleteCard(cardId: UUID, notify: Boolean = true) {
         return database.transaction {
             queries.deleteCard(cardId = cardId.toString())
+            if (notify) {
+                didDeleteCard(cardId, database)
+            }
         }
     }
 

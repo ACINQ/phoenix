@@ -58,6 +58,12 @@ expect fun didDeleteContact(contactId: UUID, database: AppDatabase)
 expect fun didSaveCard(cardId: UUID, database: AppDatabase)
 
 /**
+ * Implement this function to execute platform specific code when a card is deleted.
+ * For example, on iOS this is used to enqueue an operation to delete the card from CloudKit.
+ */
+expect fun didDeleteCard(cardId: UUID, database: AppDatabase)
+
+/**
  * Implemented on Apple platforms with support for CloudKit.
  */
 expect fun makeCloudKitDb(appDb: SqliteAppDb, paymentsDb: SqlitePaymentsDb): CloudKitInterface?
