@@ -17,7 +17,7 @@
 package fr.acinq.phoenix.utils
 
 import fr.acinq.lightning.utils.Connection
-import plus
+import fr.acinq.phoenix.utils.extensions.plus
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

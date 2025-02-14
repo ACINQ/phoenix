@@ -179,27 +179,13 @@ sqldelight {
 }
 
 if (includeAndroid) {
-    extensions.configure<com.android.build.gradle.LibraryExtension>("android") {
+    android {
         namespace = "fr.acinq.phoenix.shared"
         compileSdk = 34
         defaultConfig {
             minSdk = 26
             testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }
-
-        lint {
-            disable.add("Deprecation")
-        }
-
-        compileOptions {
-            sourceCompatibility = JavaVersion.VERSION_1_8
-            targetCompatibility = JavaVersion.VERSION_1_8
-        }
-
-        testOptions {
-            unitTests.isReturnDefaultValues = true
-        }
-
         sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     }
 }
