@@ -191,10 +191,20 @@ struct SimulatorWriteSheet: View {
 		
 		let keys = BoltCardKeySet.companion.random()
 		
-		let baseUrl = URL(string: "https://phoenix.deusty.com/v1/pub/lnurlw/info?id=\(hexAddr)")!
-		let template = Ndef.Template(baseUrl: baseUrl)!
+		let baseUrl = URL(string: "https://phoenix.deusty.com/v1/pub/lnurlw/info")!
 		
-		log.debug("template.url: \(template.urlString)")
+		var queryItems: [URLQueryItem] = [URLQueryItem(name: "id", value: hexAddr)]
+		if let lnAddr = AppSecurity.shared.getBip353Address() {
+			queryItems.append(URLQueryItem(name: "v2", value: lnAddr))
+		}
+		
+		var comps = URLComponents(url: baseUrl, resolvingAgainstBaseURL: false)!
+		comps.queryItems = queryItems
+		
+		let resolvedUrl = comps.url!
+		let template = Ndef.Template(baseUrl: resolvedUrl)!
+		
+		log.debug("template.value: \(template.valueString)")
 		log.debug("template.piccDataOffset: \(template.piccDataOffset)")
 		log.debug("template.cmacOffset: \(template.cmacOffset)")
 		

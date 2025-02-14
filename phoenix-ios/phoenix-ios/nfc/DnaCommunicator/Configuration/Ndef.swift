@@ -40,7 +40,7 @@ public class Ndef {
 	
 	static let HEADER_SIZE = 7
 	
-	class func ndefDataForUrl(url: URL) -> [UInt8] {
+	class func ndefDataForUrl(_ url: URL) -> [UInt8] {
 		
 		// See pgs. 30-31 of AN12196
 		
@@ -72,17 +72,60 @@ public class Ndef {
 		return result
 	}
 	
+	class func ndefDataForText(_ text: String) -> [UInt8] {
+		
+		// See pgs. 30-31 of AN12196
+		
+		let flags: NdefHeaderFlags = [.MB, .ME, .SR, .TNF_WELL_KNOWN]
+		let type = NdefHeaderType.TEXT
+		
+		let header: [UInt8] = [
+			0x00,           // Placeholder for data size (two bytes MSB)
+			0x00,
+			flags.rawValue, // NDEF header flags
+			0x01,           // Length of "type" field
+			0x00,           // URL size placeholder
+			type.rawValue,  // This will be a URL record
+			0x00            // Just the URI (no prepended protocol)
+		]
+		
+		let textData = text.data(using: .utf8) ?? Data()
+		var textBytes = Helper.bytesFromData(data: textData)
+		
+		let maxTextSize = 255 - header.count
+		if textBytes.count > maxTextSize {
+			textBytes = Array(textBytes[0..<maxTextSize])
+		}
+		
+		var result: [UInt8] = header + textBytes
+		result[1] = UInt8(result.count - 2)    // Length of everything that isn't the length
+		result[4] = UInt8(textBytes.count + 1) // Everything after type field
+		
+		return result
+	}
+	
+	class func ndefDataForTemplate(_ template: Template) -> [UInt8] {
+		
+		switch template.value {
+		case .Left(let url):
+			return ndefDataForUrl(url)
+		case .Right(let text):
+			return ndefDataForText(text)
+		}
+	}
+	
 	struct Template {
-		let url: URL
+		let value: Either<URL, String>
 		let piccDataOffset: Int
 		let cmacOffset: Int
 		
-		var urlString: String {
-			return url.absoluteString
-		}
-		
-		var urlData: Data {
-			return urlString.data(using: .utf8) ?? Data()
+		var valueString: String {
+			switch value {
+			case .Left(let url):
+				return url.absoluteString
+			case .Right(let text):
+				return text
+			}
 		}
 		
 		init?(baseUrl: URL) {
@@ -93,7 +136,7 @@ public class Ndef {
 			
 			var queryItems = comps.queryItems ?? []
 			
-			// The `baseUrl` should NOT have either `picc_data` or `cmac` parameters.
+			// The `baseUrl` SHOULD NOT have either `picc_data` or `cmac` parameters.
 			// But just to be safe, we'll remove them if they're present.
 			//
 			queryItems.removeAll(where: { item in
@@ -132,9 +175,33 @@ public class Ndef {
 			}
 			let offset2 = urlUtf8.distance(from: urlUtf8.startIndex, to: range2.upperBound)
 			
-			self.url = resolvedUrl
+			self.value = Either.Left(resolvedUrl)
 			self.piccDataOffset = offset1 + Ndef.HEADER_SIZE
 			self.cmacOffset = offset2 + Ndef.HEADER_SIZE
 		}
-	}
+		
+		init(baseText: String) {
+			
+			// picc_data=(16_bytes_hexadecimal)
+			// cmac=(8_bytes_hexadecimal)
+			
+			let fullText = "\(baseText)?picc_data=00000000000000000000000000000000&cmac=0000000000000000"
+			//                         +123456789 123456789 123456789 123456789 123456789
+			//                                    ^+11                                  ^+49
+			
+			// Ultimately, the value gets encoded as UTF-8,
+			// and the offsets are used as indexes within this UTF-8 representation.
+			//
+			// So we need to do our calculations within the string's utf8View.
+			
+			let baseTextLength = fullText.utf8.count
+			let offset1 = baseTextLength + 11
+			let offset2 = baseTextLength + 49
+			
+			self.value = Either.Right(fullText)
+			self.piccDataOffset = offset1 + Ndef.HEADER_SIZE
+			self.cmacOffset = offset2 + Ndef.HEADER_SIZE
+		}
+		
+	} // </struct Template>
 }
