@@ -26,6 +26,7 @@ struct BoltCardsList: View {
 	
 	@State var isFetchingLnurlwAddr: Bool = false
 	@State var lnurlwAddrFetchError: Bool = false
+	@State var missingLnAddressError: Bool = false
 	
 	@State var archivedCardsHidden: Bool = true
 	@State var nfcUnavailable: Bool = false
@@ -232,6 +233,17 @@ struct BoltCardsList: View {
 		Section {
 			VStack(alignment: HorizontalAlignment.center, spacing: 10) {
 				
+			#if targetEnvironment(simulator)
+				Button {
+					showVersionSelector()
+				} label: {
+					Text("Create New Debit Card")
+						.font(.title3.weight(.medium))
+				}
+				.buttonStyle(.borderedProminent)
+				.buttonBorderShape(.capsule)
+				.disabled(nfcUnavailable || isFetchingLnurlwAddr)
+			#else
 			#if DEBUG
 				Button {/* using simultaneousGesture below */} label: {
 					Text("Create New Debit Card")
@@ -246,7 +258,7 @@ struct BoltCardsList: View {
 				})
 				.simultaneousGesture(LongPressGesture(minimumDuration: 2.0).onEnded { _ in
 					log.debug("simultaneousGesture: LongPressGesture")
-					createDebitCardForSimulator()
+					showVersionSelector()
 				})
 			#else
 				Button {
@@ -259,12 +271,17 @@ struct BoltCardsList: View {
 				.buttonBorderShape(.capsule)
 				.disabled(nfcUnavailable || isFetchingLnurlwAddr)
 			#endif
+			#endif
 				
 				if nfcUnavailable {
 					Text("NFC capabilities not available on this device.")
 						.multilineTextAlignment(.center)
 						.foregroundStyle(Color.appNegative)
 				} else if lnurlwAddrFetchError {
+					Text("Error fetching registration. Please check internet connection.")
+						.multilineTextAlignment(.center)
+						.foregroundStyle(Color.appNegative)
+				} else if missingLnAddressError {
 					Text("Error fetching registration. Please check internet connection.")
 						.multilineTextAlignment(.center)
 						.foregroundStyle(Color.appNegative)
@@ -387,13 +404,31 @@ struct BoltCardsList: View {
 		}
 	}
 	
-	func createNewDebitCard() {
+	func showVersionSelector() {
+		log.trace("showVersionSelector()")
+		
+		smartModalState.display(dismissable: true) {
+			VersionSelectorSheet(didSelect: didSelectVersion)
+		}
+	}
+	
+	func didSelectVersion(_ version: CardVersion) {
+		log.trace("didSelectVersion: \(version)")
+		
+	#if targetEnvironment(simulator)
+		
+	#else
+		
+	#endif
+	}
+	
+	func createNewDebitCard_default() {
 		log.trace("createNewDebitCard()")
 		
 		fetchLnurlWithdrawAddress()
 	}
 	
-	func createDebitCardForSimulator() {
+	func createNewDebitCard_simulator(_version: CardVersion) {
 		log.trace("createDebitCardForSimulator()")
 		
 		smartModalState.display(dismissable: true) {
@@ -441,8 +476,10 @@ struct BoltCardsList: View {
 	func presentSimulatorPasteSheet(_ hexAddr: String) {
 		log.trace("presentSimulatorPasteSheet()")
 		
-		smartModalState.display(dismissable: true) {
-			SimulatorPasteSheet(hexAddr: hexAddr)
+		if let lnAddress = AppSecurity.shared.getBip353Address() {
+			smartModalState.display(dismissable: true) {
+				SimulatorPasteSheet(hexAddr: hexAddr, lnAddress: lnAddress)
+			}
 		}
 	}
 	

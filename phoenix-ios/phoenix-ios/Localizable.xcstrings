@@ -9897,6 +9897,9 @@
     "Card not associated with this wallet." : {
 
     },
+    "Card options" : {
+
+    },
     "caused by" : {
 
     },
@@ -13195,6 +13198,9 @@
           }
         }
       }
+    },
+    "Copy simulator's info:" : {
+
     },
     "Copy Text" : {
       "extractionState" : "stale",
@@ -45645,6 +45651,15 @@
           }
         }
       }
+    },
+    "Version 1 (lnurl-withdraw)" : {
+
+    },
+    "Version 1 & 2 (lnurl-withdraw + v2 param)" : {
+
+    },
+    "Version 2 (bip-353 & onion messages)" : {
+
     },
     "via" : {
       "comment" : "Label in DetailsView_IncomingPayment",
