@@ -244,6 +244,7 @@
 		DC7DA9F62AD84DF200F86B99 /* String+Substring.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC7DA9F52AD84DF200F86B99 /* String+Substring.swift */; };
 		DC808E9B2D5541F50019AE30 /* UsingTorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC808E9A2D5541F10019AE30 /* UsingTorSheet.swift */; };
 		DC808E9D2D554A430019AE30 /* DisablingTorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC808E9C2D554A3E0019AE30 /* DisablingTorSheet.swift */; };
+		DC808E982D5500C70019AE30 /* BoltCardInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC808E972D5500C20019AE30 /* BoltCardInput.swift */; };
 		DC81B79F25BF2AA200F5A52C /* MVI.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC81B79E25BF2AA200F5A52C /* MVI.swift */; };
 		DC82EED629789853007A5853 /* TxHistoryExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC82EED529789853007A5853 /* TxHistoryExporter.swift */; };
 		DC89857F25914747007B253F /* UIApplicationState+Phoenix.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC89857E25914747007B253F /* UIApplicationState+Phoenix.swift */; };
@@ -380,7 +381,7 @@
 		DCDD9ED428637EBB001800A3 /* ToolsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDD9ED328637EBB001800A3 /* ToolsButton.swift */; };
 		DCDD9ED628637FD7001800A3 /* AppStatusButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDD9ED528637FD7001800A3 /* AppStatusButton.swift */; };
 		DCE0FAC72D52ACCD00F7D29D /* String+Email.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE0FAC62D52ACCA00F7D29D /* String+Email.swift */; };
-		DCE15CCD2D53C9D100295857 /* VersionSelectorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE15CCC2D53C9AA00295857 /* VersionSelectorSheet.swift */; };
+		DCE15CCD2D53C9D100295857 /* CardOptionsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE15CCC2D53C9AA00295857 /* CardOptionsSheet.swift */; };
 		DCE1E5FA26418183005465B8 /* Toast.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE1E5F926418183005465B8 /* Toast.swift */; };
 		DCE2B9B52C939631000430B8 /* ValidateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE2B9B42C939631000430B8 /* ValidateView.swift */; };
 		DCE3C7AB2A6AD3CC00F4D385 /* MempoolMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE3C7AA2A6AD3CC00F4D385 /* MempoolMonitor.swift */; };
@@ -708,6 +709,7 @@
 		DC7DA9F52AD84DF200F86B99 /* String+Substring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Substring.swift"; sourceTree = "<group>"; };
 		DC808E9A2D5541F10019AE30 /* UsingTorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsingTorSheet.swift; sourceTree = "<group>"; };
 		DC808E9C2D554A3E0019AE30 /* DisablingTorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisablingTorSheet.swift; sourceTree = "<group>"; };
+		DC808E972D5500C20019AE30 /* BoltCardInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoltCardInput.swift; sourceTree = "<group>"; };
 		DC81B79E25BF2AA200F5A52C /* MVI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVI.swift; sourceTree = "<group>"; };
 		DC82EED529789853007A5853 /* TxHistoryExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TxHistoryExporter.swift; sourceTree = "<group>"; };
 		DC89857E25914747007B253F /* UIApplicationState+Phoenix.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplicationState+Phoenix.swift"; sourceTree = "<group>"; };
@@ -818,7 +820,7 @@
 		DCDD9ED328637EBB001800A3 /* ToolsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolsButton.swift; sourceTree = "<group>"; };
 		DCDD9ED528637FD7001800A3 /* AppStatusButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStatusButton.swift; sourceTree = "<group>"; };
 		DCE0FAC62D52ACCA00F7D29D /* String+Email.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Email.swift"; sourceTree = "<group>"; };
-		DCE15CCC2D53C9AA00295857 /* VersionSelectorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionSelectorSheet.swift; sourceTree = "<group>"; };
+		DCE15CCC2D53C9AA00295857 /* CardOptionsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardOptionsSheet.swift; sourceTree = "<group>"; };
 		DCE1E5F926418183005465B8 /* Toast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Toast.swift; sourceTree = "<group>"; };
 		DCE2B9B42C939631000430B8 /* ValidateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidateView.swift; sourceTree = "<group>"; };
 		DCE3C7AA2A6AD3CC00F4D385 /* MempoolMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MempoolMonitor.swift; sourceTree = "<group>"; };
@@ -1306,8 +1308,10 @@
 			isa = PBXGroup;
 			children = (
 				DC1530022D0C6B21001D6BA6 /* ArchiveCardSheet.swift */,
+				DC808E972D5500C20019AE30 /* BoltCardInput.swift */,
 				DC71CAC42CF0C75400EBCBD6 /* BoltCardsHelp.swift */,
 				DC71CA812CEFABEA00EBCBD6 /* BoltCardsList.swift */,
+				DCE15CCC2D53C9AA00295857 /* CardOptionsSheet.swift */,
 				DC1530042D0C8891001D6BA6 /* DeleteCardSheet.swift */,
 				DC1850E52D11CD840076BFF6 /* LnurlwRegistration.swift */,
 				DC71CAC22CF0AC5300EBCBD6 /* ManageBoltCard.swift */,
@@ -1318,7 +1322,6 @@
 				DC1850E32D11C3CF0076BFF6 /* ResetSuccessSheet.swift */,
 				DCA43A282D22FB9D00AA8FB1 /* SimulatorPasteSheet.swift */,
 				DCA43A2A2D2336D600AA8FB1 /* SimulatorWriteSheet.swift */,
-				DCE15CCC2D53C9AA00295857 /* VersionSelectorSheet.swift */,
 				DC1850DF2D10C07A0076BFF6 /* WriteErrorSheet.swift */,
 			);
 			path = "bolt card";
@@ -2111,7 +2114,7 @@
 				DC5F1C4C28DDF702007A55ED /* DrainWalletView_Action.swift in Sources */,
 				DCE1E5FA26418183005465B8 /* Toast.swift in Sources */,
 				DC81B79F25BF2AA200F5A52C /* MVI.swift in Sources */,
-				DCE15CCD2D53C9D100295857 /* VersionSelectorSheet.swift in Sources */,
+				DCE15CCD2D53C9D100295857 /* CardOptionsSheet.swift in Sources */,
 				DCA7263D2C80BC0800600716 /* SyncBackupManager+Contacts.swift in Sources */,
 				DC01DD6E2CF764F1009D2B78 /* KeySpecifier.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
@@ -2194,6 +2197,7 @@
 				DC641C7E2821744000862DCD /* Currency+CurrencyPrefs.swift in Sources */,
 				DC175C1C28F008AE0086B9A6 /* WalletReset.swift in Sources */,
 				DC23F80F2B55923F00389A10 /* WalletCreationOptions.swift in Sources */,
+				DC808E982D5500C70019AE30 /* BoltCardInput.swift in Sources */,
 				DC4CF3D02BEA8C13003A957F /* EditPinView.swift in Sources */,
 				DC1D2B502594CE900036AD38 /* FormattedAmount.swift in Sources */,
 				DC7AFF0D2CFA49BD00A2F62A /* PushNotification.swift in Sources */,

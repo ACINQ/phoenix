@@ -85,8 +85,8 @@ public class Ndef {
 			flags.rawValue, // NDEF header flags
 			0x01,           // Length of "type" field
 			0x00,           // URL size placeholder
-			type.rawValue,  // This will be a URL record
-			0x00            // Just the URI (no prepended protocol)
+			type.rawValue,  // This will be a TEXT record
+			0x00            // Just the text (no prepended protocol)
 		]
 		
 		let textData = text.data(using: .utf8) ?? Data()
