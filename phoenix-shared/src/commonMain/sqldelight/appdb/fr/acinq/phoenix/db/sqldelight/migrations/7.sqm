@@ -1,0 +1,24 @@
+-- Migration: v7 -> v8
+--
+-- Changes:
+-- * Added table bolt_cards
+--
+-- See BoltCards.sq for more details.
+
+CREATE TABLE IF NOT EXISTS bolt_cards (
+     id TEXT NOT NULL PRIMARY KEY,
+     name TEXT NOT NULL,
+     key0 BLOB NOT NULL,
+     uid BLOB NOT NULL,
+     counter INTEGER NOT NULL,
+     is_frozen INTEGER AS Boolean NOT NULL,
+     is_archived INTEGER AS Boolean NOT NULL,
+     is_reset INTEGER AS Boolean NOT NULL,
+     is_foreign INTEGER AS Boolean NOT NULL,
+     daily_limit_currency TEXT,
+     daily_limit_amount REAL,
+     monthly_limit_currency TEXT,
+     monthly_limit_amount REAL,
+     created_at INTEGER NOT NULL,
+     updated_at INTEGER DEFAULT NULL
+);
