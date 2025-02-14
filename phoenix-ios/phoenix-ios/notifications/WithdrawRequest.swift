@@ -371,13 +371,10 @@ extension PhoenixBusiness {
 		if matchingCard.dailyLimit != nil || matchingCard.monthlyLimit != nil {
 		
 			do {
-				let cardPaymentsMap: [Lightning_kmpUUID : CardsManager.CardPayments] =
-					try await self.cardsManager.fetchCardPayments()
+				let cardPayments: CardsManager.CardPayments =
+					try await self.cardsManager.fetchCardPayments(cardId: matchingCard.id)
 				
-				var cardAmounts = CardsManager.CardAmounts(daily: [], monthly: [])
-				if let cardPayments = cardPaymentsMap[matchingCard.id] {
-					cardAmounts = self.cardsManager.getCardAmounts(payments : cardPayments)
-				}
+				let cardAmounts = self.cardsManager.getCardAmounts(payments : cardPayments)
 				
 				if let dailyLimit = matchingCard.dailyLimit?.toCurrencyAmount() {
 					if let error = checkSpendingLimit(cardAmounts, dailyLimit, true) {

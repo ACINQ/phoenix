@@ -98,7 +98,7 @@ class CardsManager(
         }
     }
 
-    suspend fun fetchCardPayments(): Map<UUID, CardPayments> {
+    suspend fun fetchCardPayments(cardId: UUID): CardPayments {
         val nowInstant = Clock.System.now()
         val timezone = TimeZone.currentSystemDefault()
         val nowLDT = nowInstant.toLocalDateTime(timezone)
@@ -108,16 +108,10 @@ class CardsManager(
             hour = 0, minute = 0, second = 0, nanosecond = 0
         )
 
-        val fullList = fetchRecentCardPayments(minInstant = startOfMonth.toInstant(timezone))
-
-        val tempResults: MutableMap<UUID, MutableList<WalletPaymentInfo>> = mutableMapOf()
-        fullList.forEach { row ->
-            row.metadata.cardId?.let { cardId ->
-                tempResults[cardId]?.add(row) ?: run {
-                    tempResults[cardId] = mutableListOf(row)
-                }
-            }
-        }
+        val monthly = fetchRecentCardPayments(
+            cardId = cardId,
+            minInstant = startOfMonth.toInstant(timezone)
+        )
 
         val startOfDay = LocalDateTime(
             date = nowLDT.date,
@@ -125,15 +119,16 @@ class CardsManager(
         )
         val startOfDayMillis = startOfDay.toInstant(timezone).toEpochMilliseconds()
 
-        return tempResults.mapValues {
-            CardPayments.fromMonthly(
-                monthly = it.value,
-                startOfDay = startOfDayMillis
-            )
-        }
+        return CardPayments.fromMonthly(
+            monthly = monthly,
+            startOfDay = startOfDayMillis
+        )
     }
 
-    private suspend fun fetchRecentCardPayments(minInstant: Instant): List<WalletPaymentInfo> {
+    private suspend fun fetchRecentCardPayments(
+        cardId: UUID,
+        minInstant: Instant
+    ): List<WalletPaymentInfo> {
         val paymentsDb = databaseManager.paymentsDb()
 
         var done = false
@@ -144,6 +139,7 @@ class CardsManager(
             val batch = paymentsDb.listRecentCardPayments(
                 count = maxBatchCount.toLong(),
                 skip = offset.toLong(),
+                cardId = cardId,
                 sinceDate = minInstant.toEpochMilliseconds()
             )
             results.addAll(batch)
@@ -268,6 +264,8 @@ class CardsManager(
         payments: CardPayments
     ): CardAmounts {
 
+        val dailyPaymentIds = payments.daily.map { it.id }
+
         val daily: MutableList<CardAmounts.Info> = mutableListOf()
         val monthly: MutableList<CardAmounts.Info> = mutableListOf()
         payments.monthly.forEach { row ->
@@ -276,7 +274,7 @@ class CardsManager(
                 originalFiat = row.metadata.originalFiat
             )
             monthly.add(info)
-            if (payments.daily.contains(row)) {
+            if (dailyPaymentIds.contains(row.id)) {
                 daily.add(info)
             }
         }
