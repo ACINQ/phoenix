@@ -113,7 +113,7 @@ struct BoltCardsHelp: View {
 			
 			Text(
 				"""
-				The NFC card is programmed with a BLIP 42 address and a set of secure keys. \
+				The NFC card is programmed with a BLIP XX address and a set of secure keys. \
 				The card then produces the address plus two unique hashes that change each \
 				time the card is scanned.
 				"""
