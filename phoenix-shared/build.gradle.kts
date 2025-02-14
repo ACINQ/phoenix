@@ -2,8 +2,6 @@ import java.io.ByteArrayOutputStream
 import co.touchlab.skie.configuration.FlowInterop
 import co.touchlab.skie.configuration.SuspendInterop
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
-
 plugins {
     kotlin("multiplatform")
     id("kotlinx-serialization")
@@ -11,7 +9,7 @@ plugins {
     if (System.getProperty("includeAndroid")?.toBoolean() == true) {
         id("com.android.library")
     }
-    id("co.touchlab.skie") version Versions.skie
+    id("co.touchlab.skie") version libs.versions.skie.get()
 }
 
 val includeAndroid = System.getProperty("includeAndroid")?.toBoolean() ?: false
@@ -38,7 +36,7 @@ val buildVersionsTask by tasks.registering(Sync::class) {
             |
             |object BuildVersions {
             |    const val PHOENIX_COMMIT = "${gitCommitHash()}"
-            |    const val LIGHTNING_KMP_VERSION = "${Versions.lightningKmp}"
+            |    const val LIGHTNING_KMP_VERSION = "${libs.versions.lightningkmp.get()}"
             |}
             |
             """.trimMargin()
@@ -88,17 +86,17 @@ kotlin {
             kotlin.srcDir(buildVersionsTask.map { it.destinationDir })
             dependencies {
                 // lightning-kmp
-                api("fr.acinq.lightning:lightning-kmp-core:${Versions.lightningKmp}")
+                api("fr.acinq.lightning:lightning-kmp-core:${libs.versions.lightningkmp.get()}")
                 // ktor
-                implementation("io.ktor:ktor-client-core:${Versions.ktor}")
-                implementation("io.ktor:ktor-client-json:${Versions.ktor}")
-                implementation("io.ktor:ktor-serialization-kotlinx-json:${Versions.ktor}")
-                implementation("io.ktor:ktor-client-content-negotiation:${Versions.ktor}")
+                implementation("io.ktor:ktor-client-core:${libs.versions.ktor.get()}")
+                implementation("io.ktor:ktor-client-json:${libs.versions.ktor.get()}")
+                implementation("io.ktor:ktor-serialization-kotlinx-json:${libs.versions.ktor.get()}")
+                implementation("io.ktor:ktor-client-content-negotiation:${libs.versions.ktor.get()}")
                 // sqldelight
-                implementation("app.cash.sqldelight:runtime:${Versions.sqlDelight}")
-                implementation("app.cash.sqldelight:coroutines-extensions:${Versions.sqlDelight}")
+                implementation("app.cash.sqldelight:runtime:${libs.versions.sqldelight.get()}")
+                implementation("app.cash.sqldelight:coroutines-extensions:${libs.versions.sqldelight.get()}")
                 // SKEI
-                implementation("co.touchlab.skie:configuration-annotations:${Versions.skie}")
+                implementation("co.touchlab.skie:configuration-annotations:${libs.versions.skie.get()}")
             }
         }
 
@@ -106,29 +104,30 @@ kotlin {
             dependencies {
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
-                implementation("io.ktor:ktor-client-mock:${Versions.ktor}")
-                implementation("com.squareup.okio:okio:${Versions.okio}")
+                implementation("io.ktor:ktor-client-mock:${libs.versions.ktor.get()}")
+                implementation("com.squareup.okio:okio:${libs.versions.okio.get()}")
             }
         }
 
         // -- android sources
         if (includeAndroid) {
             val androidMain by getting {
+                //noinspection UseTomlInstead
                 dependencies {
-                    implementation("androidx.core:core-ktx:${Versions.Android.coreKtx}")
-                    implementation("fr.acinq.secp256k1:secp256k1-kmp-jni-android:${Versions.secp256k1}")
-                    implementation("io.ktor:ktor-network:${Versions.ktor}")
-                    implementation("io.ktor:ktor-network-tls:${Versions.ktor}")
-                    implementation("io.ktor:ktor-client-android:${Versions.ktor}")
-                    implementation("app.cash.sqldelight:android-driver:${Versions.sqlDelight}")
+//                    implementation("androidx.core:core-ktx:${libs.versions.androidx.corektx.get()}")
+                    implementation("fr.acinq.secp256k1:secp256k1-kmp-jni-android:${libs.versions.secp256k1.get()}")
+                    implementation("io.ktor:ktor-network:${libs.versions.ktor.get()}")
+                    implementation("io.ktor:ktor-network-tls:${libs.versions.ktor.get()}")
+                    implementation("io.ktor:ktor-client-android:${libs.versions.ktor.get()}")
+                    implementation("app.cash.sqldelight:android-driver:${libs.versions.sqldelight.get()}")
                 }
             }
             val androidUnitTest by getting {
                 dependencies {
                     implementation(kotlin("test-junit"))
-                    implementation("androidx.test.ext:junit:1.1.3")
-                    implementation("androidx.test.espresso:espresso-core:3.4.0")
-                    implementation("org.robolectric:robolectric:4.13")
+                    implementation("androidx.test.ext:junit:${libs.versions.androidx.junit.get()}")
+                    implementation("androidx.test.espresso:espresso-core:${libs.versions.espresso.get()}")
+                    implementation("org.robolectric:robolectric:${libs.versions.robolectric.get()}")
                     val currentOs = org.gradle.internal.os.OperatingSystem.current()
                     val target = when {
                         currentOs.isLinux -> "linux"
@@ -136,8 +135,8 @@ kotlin {
                         currentOs.isWindows -> "mingw"
                         else -> error("Unsupported OS $currentOs")
                     }
-                    implementation("fr.acinq.secp256k1:secp256k1-kmp-jni-jvm-$target:${Versions.secp256k1}")
-                    implementation("app.cash.sqldelight:sqlite-driver:${Versions.sqlDelight}")
+                    implementation("fr.acinq.secp256k1:secp256k1-kmp-jni-jvm-$target:${libs.versions.secp256k1.get()}")
+                    implementation("app.cash.sqldelight:sqlite-driver:${libs.versions.sqldelight.get()}")
                 }
             }
         }
@@ -145,14 +144,14 @@ kotlin {
         // -- ios sources
         val iosMain by creating {
             dependencies {
-                implementation("io.ktor:ktor-client-ios:${Versions.ktor}")
-                implementation("app.cash.sqldelight:native-driver:${Versions.sqlDelight}")
+                implementation("io.ktor:ktor-client-ios:${libs.versions.ktor.get()}")
+                implementation("app.cash.sqldelight:native-driver:${libs.versions.sqldelight.get()}")
             }
         }
 
         val iosTest by creating {
             dependencies {
-                implementation("app.cash.sqldelight:native-driver:${Versions.sqlDelight}")
+                implementation("app.cash.sqldelight:native-driver:${libs.versions.sqldelight.get()}")
             }
         }
 

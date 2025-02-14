@@ -1,12 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="Theme.PhoenixAndroid" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <!-- Primary brand color. -->
+    <style name="Theme.PhoenixAndroid" parent="Theme.AppCompat.DayNight.DarkActionBar">
         <item name="colorPrimary">@color/azur</item>
-        <item name="colorPrimaryVariant">@color/azur</item>
-        <item name="colorOnPrimary">@color/white</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/azur</item>
-        <item name="colorSecondaryVariant">@color/azur</item>
-        <item name="colorOnSecondary">@color/white</item>
     </style>
 </resources>
