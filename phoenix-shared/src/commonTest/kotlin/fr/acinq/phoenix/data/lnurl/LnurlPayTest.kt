@@ -43,8 +43,8 @@ class LnurlPayTest {
     private fun fakeClient(engine: MockEngine) = HttpClient(engine) {
         install(ContentNegotiation) {
             json(json = Json { ignoreUnknownKeys = true })
-            expectSuccess = false
         }
+        expectSuccess = false
     }
 
     @Test

@@ -647,7 +647,6 @@ class CurrencyManager(
         //
         val http = HttpClient {
             engine {
-                threadsCount = 1
                 pipelining = true
             }
         }

@@ -22,6 +22,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Text
+import androidx.compose.material.ripple
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -59,7 +60,7 @@ fun Checkbox(
             onCheckedChange = null,
             modifier = Modifier.indication(
                 interactionSource = interactionSource,
-                indication = rememberRipple(bounded = false, color = if (isDarkTheme) gray300 else gray600, radius = 28.dp)
+                indication = ripple(bounded = false, color = if (isDarkTheme) gray300 else gray600, radius = 28.dp)
             )
         )
         Spacer(Modifier.width(12.dp))

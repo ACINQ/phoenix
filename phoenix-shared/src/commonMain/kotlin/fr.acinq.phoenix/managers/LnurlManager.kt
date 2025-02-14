@@ -48,8 +48,8 @@ class LnurlManager(
         HttpClient {
             install(ContentNegotiation) {
                 json(json = Json { ignoreUnknownKeys = true })
-                expectSuccess = false
             }
+            expectSuccess = false
         }
     }
 

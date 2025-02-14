@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
+import androidx.compose.material.ripple
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -78,7 +79,7 @@ fun SwitchView(
                 .offset(y = 4.dp)
                 .indication(
                     interactionSource = interactionSource,
-                    indication = rememberRipple(bounded = false, color = if (isDarkTheme) gray300 else gray600, radius = 28.dp)
+                    indication = ripple(bounded = false, color = if (isDarkTheme) gray300 else gray600, radius = 28.dp)
                 )
         )
     }
@@ -117,7 +118,7 @@ fun BasicSwitchWithText(
                 .offset(y = (-2).dp)
                 .indication(
                     interactionSource = interactionSource,
-                    indication = rememberRipple(bounded = false, color = if (isDarkTheme) gray300 else gray600, radius = 28.dp)
+                    indication = ripple(bounded = false, color = if (isDarkTheme) gray300 else gray600, radius = 28.dp)
                 )
         )
         Spacer(modifier = Modifier.width(8.dp))

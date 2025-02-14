@@ -47,6 +47,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.ripple
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -433,7 +434,7 @@ private fun RowScope.ReadDataButton(
         ) {
             Box(
                 modifier = Modifier
-                    .indication(interactionSource, rememberRipple(bounded = false, color = if (isDarkTheme) gray300 else gray800, radius = 32.dp))
+                    .indication(interactionSource, ripple(bounded = false, color = if (isDarkTheme) gray300 else gray800, radius = 32.dp))
                     .clip(CircleShape)
                     .border(width = 1.dp, color = MaterialTheme.colors.primary, shape = CircleShape)
                     .background(MaterialTheme.colors.surface)

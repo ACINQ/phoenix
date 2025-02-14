@@ -234,7 +234,7 @@ fun PhoenixAndroidTheme(
                     setNavigationBarColor(navBarColor, darkIcons = !isDarkTheme)
                 }
             }
-            val rippleIndication = rememberRipple(color = if (isDarkTheme) gray300 else gray600)
+            val rippleIndication = ripple(color = if (isDarkTheme) gray300 else gray600)
             CompositionLocalProvider(LocalIndication provides rippleIndication) {
                 content()
             }

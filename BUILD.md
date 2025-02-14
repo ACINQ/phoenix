@@ -12,9 +12,7 @@ You'll need to install the following:
 
 Phoenix is an actual lightning node running on your phone. It contains much of the bitcoin/lightning protocol, contained in the [lightning-kmp](https://github.com/ACINQ/lightning-kmp) library, also developed by ACINQ.
 
-Tags of the lightning-kmp library are released on public Maven repository, so you'll likely not have to build it yourself.
-
-However, from time to time, Phoenix uses a SNAPSHOT development version of lightning-kmp. When that happens, you will have to build this library yourself on your local machine. To do that, follow [the lightning-kmp build instructions](https://github.com/ACINQ/lightning-kmp/blob/master/BUILD.md).
+Tags of the lightning-kmp library are released on a public Maven repository. Sometimes during development, Phoenix uses a `snapshot`version ; this you will have to [build yourself](https://github.com/ACINQ/lightning-kmp/blob/master/BUILD.md).
 
 ## Build the application
 
@@ -56,11 +54,7 @@ skip.android=true
 
 ### Lightning-kmp versions
 
-Make sure that the lightning-kmp version that phoenix depends on is the same that the lightning-kmp version you are building. Your local lightning-kmp repository may not be pointing to the version that `phoenix-android` requires.
-
-Phoenix defines its lightning-kmp version in `buildSrc/src/main/kotlin/Versions.kt`, through the `val lightningKmp = "xxx"` field.
-
-If this value is `snapshot` it means that the current phoenix `master` branch is using a development version of this library. In that case, there may be API changes in lightning-kmp which are not yet supported here.
+The lightning-kmp version is set in  `gradle/libs.version.toml`. If this version is a `snapshot`, phoenix is using a development version of lightning-kmp. Not only will you need to build it yourself, but Phoenix may also need to be patched if there are API changes.
 
 ## Release the Android app
 
@@ -68,7 +62,7 @@ Phoenix releases are built using a dockerized Linux environment. The build is no
 
 Notes:
 
-- This tool works on Linux and Windows.
+- This tool works on Macos, Linux and Windows.
 - Following instructions only work for releases after v.1.3.1 (excluded).
 
 ### Prerequisites
@@ -99,7 +93,7 @@ docker build -t phoenix_build .
 5. Build the APKs using the docker image (takes typically ~10min):
 
 ```shell
-# If you're on linux:
+# If you're on macOS/linux:
 docker run --rm -v $(pwd):/home/ubuntu/phoenix/phoenix-android/build/outputs -w /home/ubuntu/phoenix phoenix_build ./gradlew :phoenix-android:assembleRelease
 
 # If you're on Windows:

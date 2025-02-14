@@ -5,6 +5,7 @@ plugins {
     kotlin("android")
     id("com.google.gms.google-services")
     id("kotlinx-serialization")
+    alias(libs.plugins.compose)
 }
 
 fun gitCommitHash(): String {
@@ -28,7 +29,6 @@ android {
         versionCode = 98
         versionName = gitCommitHash()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        resourceConfigurations.addAll(listOf("en", "fr", "de", "es", "b+es+419", "cs", "pt-rBR", "sk", "vi", "sw"))
     }
 
     buildTypes {
@@ -40,7 +40,7 @@ android {
         getByName("release") {
             resValue("string", "CHAIN", chain)
             buildConfigField("String", "CHAIN", chain)
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             isDebuggable = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -52,6 +52,12 @@ android {
                 val apkName = "phoenix-${defaultConfig.versionCode}-${defaultConfig.versionName}-${chain.drop(1).dropLast(1)}-${buildType.name}.apk"
                 (it as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName = apkName
             }
+        }
+    }
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(17)
         }
     }
 
@@ -72,70 +78,69 @@ android {
         buildConfig = true
     }
 
-    composeOptions {
-        kotlinCompilerExtensionVersion = Versions.Android.composeCompiler
+    androidResources {
+        localeFilters.addAll(listOf("en", "fr", "de", "es", "b+es+419", "cs", "pt-rBR", "sk", "vi", "sw"))
     }
 }
 
 kotlin {
     target {
-        compilations.all {
-            kotlinOptions.freeCompilerArgs += listOf("-Xskip-metadata-version-check", "-Xinline-classes", "-Xopt-in=kotlin.RequiresOptIn")
+        compilerOptions {
+            optIn.addAll("kotlin.RequiresOptIn")
+            freeCompilerArgs.addAll(listOf("-Xskip-metadata-version-check", "-Xinline-classes"))
         }
     }
 }
 
+//noinspection UseTomlInstead
 dependencies {
     implementation(project(":phoenix-shared"))
 
-    implementation("com.google.android.material:material:1.7.0")
-
     // -- AndroidX
-    implementation("androidx.core:core-ktx:${Versions.Android.coreKtx}")
+    implementation("androidx.core:core-ktx:${libs.versions.androidx.corektx.get()}")
+    implementation("androidx.appcompat:appcompat:${libs.versions.androidx.appcompat.get()}")
     // -- AndroidX: livedata
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:${Versions.Android.lifecycle}")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:${Versions.Android.lifecycle}")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:${libs.versions.androidx.lifecycle.get()}")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:${libs.versions.androidx.lifecycle.get()}")
     // -- AndroidX: preferences datastore
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("androidx.datastore:datastore-preferences:${libs.versions.androidx.datastore.get()}")
     // -- AndroidX: biometric
-    implementation("androidx.biometric:biometric:${Versions.Android.biometrics}")
+    implementation("androidx.biometric:biometric:${libs.versions.androidx.biometrics.get()}")
     // -- AndroidX: work manager
-    implementation("androidx.work:work-runtime-ktx:${Versions.Android.work}")
-
+    implementation("androidx.work:work-runtime-ktx:${libs.versions.androidx.workmanager.get()}")
 
     // -- jetpack compose
-    implementation("androidx.compose.ui:ui:${Versions.Android.compose}")
-    implementation("androidx.compose.foundation:foundation:${Versions.Android.compose}")
-    implementation("androidx.compose.foundation:foundation-layout:${Versions.Android.compose}")
-    implementation("androidx.compose.ui:ui-tooling:${Versions.Android.compose}")
-    implementation("androidx.compose.ui:ui-util:${Versions.Android.compose}")
-    implementation("androidx.compose.ui:ui-viewbinding:${Versions.Android.compose}")
-    implementation("androidx.compose.runtime:runtime-livedata:${Versions.Android.compose}")
-    implementation("androidx.compose.material:material:${Versions.Android.compose}")
-    implementation("androidx.compose.animation:animation:${Versions.Android.compose}")
-    implementation("androidx.compose.animation:animation-graphics:${Versions.Android.compose}")
-    implementation("androidx.compose.material3:material3:1.1.2")
+    implementation("androidx.compose.ui:ui:${libs.versions.androidx.compose.common.get()}")
+    implementation("androidx.compose.foundation:foundation:${libs.versions.androidx.compose.common.get()}")
+    implementation("androidx.compose.foundation:foundation-layout:${libs.versions.androidx.compose.common.get()}")
+    implementation("androidx.compose.ui:ui-tooling:${libs.versions.androidx.compose.common.get()}")
+    implementation("androidx.compose.ui:ui-util:${libs.versions.androidx.compose.common.get()}")
+    implementation("androidx.compose.ui:ui-viewbinding:${libs.versions.androidx.compose.common.get()}")
+    implementation("androidx.compose.runtime:runtime-livedata:${libs.versions.androidx.compose.common.get()}")
+    implementation("androidx.compose.material:material:${libs.versions.androidx.compose.common.get()}")
+    implementation("androidx.compose.animation:animation:${libs.versions.androidx.compose.common.get()}")
+    implementation("androidx.compose.animation:animation-graphics:${libs.versions.androidx.compose.common.get()}")
+    implementation("androidx.compose.material3:material3:${libs.versions.androidx.compose.material3.get()}")
     // -- jetpack compose: navigation
-    implementation("androidx.navigation:navigation-compose:${Versions.Android.navCompose}")
+    implementation("androidx.navigation:navigation-compose:${libs.versions.androidx.compose.navigation.get()}")
     // -- jetpack compose: accompanist (utility library for compose)
-    implementation("com.google.accompanist:accompanist-systemuicontroller:${Versions.Android.accompanist}")
-    implementation("com.google.accompanist:accompanist-permissions:${Versions.Android.accompanist}")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:${libs.versions.accompanist.get()}")
+    implementation("com.google.accompanist:accompanist-permissions:${libs.versions.accompanist.get()}")
     // -- constraint layout for compose
-    implementation("androidx.constraintlayout:constraintlayout-compose:${Versions.Android.composeConstraintLayout}")
+    implementation("androidx.constraintlayout:constraintlayout-compose:${libs.versions.androidx.compose.constraintlayout.get()}")
 
     // -- scanner zxing
-    implementation("com.journeyapps:zxing-android-embedded:${Versions.Android.zxing}")
+    implementation("com.journeyapps:zxing-android-embedded:${libs.versions.zxing.get()}")
 
     // logging
-    implementation("org.slf4j:slf4j-api:${Versions.slf4j}")
-    implementation("com.github.tony19:logback-android:${Versions.Android.logback}")
+    implementation("org.slf4j:slf4j-api:${libs.versions.slf4j.get()}")
+    implementation("com.github.tony19:logback-android:${libs.versions.logback.get()}")
 
     // firebase cloud messaging
-    implementation("com.google.firebase:firebase-messaging:${Versions.Android.fcm}")
-    implementation("com.google.android.gms:play-services-base:18.5.0")
+    implementation("com.google.firebase:firebase-messaging:${libs.versions.fcm.get()}")
+    implementation("com.google.android.gms:play-services-base:${libs.versions.playservices.get()}")
 
-    testImplementation("junit:junit:${Versions.junit}")
-    testImplementation("app.cash.sqldelight:sqlite-driver:${Versions.sqlDelight}")
-    androidTestImplementation("androidx.test.ext:junit:1.1.4")
-    androidTestImplementation("androidx.test.espresso:espresso-core:${Versions.Android.espresso}")
+    testImplementation("app.cash.sqldelight:sqlite-driver:${libs.versions.sqldelight.get()}")
+    androidTestImplementation("androidx.test.ext:junit:${libs.versions.androidx.junit.get()}")
+    androidTestImplementation("androidx.test.espresso:espresso-core:${libs.versions.espresso.get()}")
 }

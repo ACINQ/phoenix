@@ -54,8 +54,8 @@ enum class DnsResolvers {
             HttpClient {
                 install(ContentNegotiation) {
                     json(json = Json { ignoreUnknownKeys = true })
-                    expectSuccess = true
                 }
+                expectSuccess = true
             }
         }
 
