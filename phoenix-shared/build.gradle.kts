@@ -179,7 +179,7 @@ sqldelight {
 }
 
 if (includeAndroid) {
-    android {
+    extensions.configure<com.android.build.gradle.LibraryExtension>("android") {
         namespace = "fr.acinq.phoenix.shared"
         compileSdk = 34
         defaultConfig {
