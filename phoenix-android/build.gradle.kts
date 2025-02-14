@@ -29,7 +29,6 @@ android {
         versionCode = 98
         versionName = gitCommitHash()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        resourceConfigurations.addAll(listOf("en", "fr", "de", "es", "b+es+419", "cs", "pt-rBR", "sk", "vi", "sw"))
     }
 
     buildTypes {
@@ -71,6 +70,10 @@ android {
         viewBinding = true
         dataBinding = true
         buildConfig = true
+    }
+
+    androidResources {
+        localeFilters.addAll(listOf("en", "fr", "de", "es", "b+es+419", "cs", "pt-rBR", "sk", "vi", "sw"))
     }
 }
 

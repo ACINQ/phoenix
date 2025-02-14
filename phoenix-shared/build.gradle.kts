@@ -2,6 +2,7 @@ import java.io.ByteArrayOutputStream
 import co.touchlab.skie.configuration.FlowInterop
 import co.touchlab.skie.configuration.SuspendInterop
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     kotlin("multiplatform")
     id("kotlinx-serialization")
@@ -114,7 +115,6 @@ kotlin {
             val androidMain by getting {
                 //noinspection UseTomlInstead
                 dependencies {
-//                    implementation("androidx.core:core-ktx:${libs.versions.androidx.corektx.get()}")
                     implementation("fr.acinq.secp256k1:secp256k1-kmp-jni-android:${libs.versions.secp256k1.get()}")
                     implementation("io.ktor:ktor-network:${libs.versions.ktor.get()}")
                     implementation("io.ktor:ktor-network-tls:${libs.versions.ktor.get()}")
