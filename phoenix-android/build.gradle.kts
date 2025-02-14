@@ -40,7 +40,7 @@ android {
         getByName("release") {
             resValue("string", "CHAIN", chain)
             buildConfigField("String", "CHAIN", chain)
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             isDebuggable = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
