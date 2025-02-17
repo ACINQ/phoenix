@@ -148,7 +148,19 @@ extension WalletPaymentInfo {
 	func addToContactsInfo() -> AddToContactsInfo? {
 	
 		if payment is Lightning_kmpOutgoingPayment {
-			// Todo: check for lightning address (requires db change in metadata table)
+			
+			// First check for a lightning address.
+			// Remember that an outgoing payment might have both an address & offer (i.e. BIP-353).
+			// But from the user's perspective, they sent a payment to the address.
+			// The fact that it used an offer under-the-hood is just a technicality.
+			// What they expect to save is the lightning address.
+			//
+			// Note: in the future we may support something like "offer pinning" for an LN address.
+			// But that's a different feature. The user's perspective remains the same.
+			//
+			if let address = self.metadata.lightningAddress {
+				return AddToContactsInfo(offer: nil, address: address)
+			}
 			
 			let invoiceRequest = payment.outgoingInvoiceRequest()
 			if let offer = invoiceRequest?.offer {
@@ -168,6 +180,7 @@ extension WalletPaymentMetadata {
 			originalFiat: nil,
 			userDescription: nil,
 			userNotes: nil,
+			lightningAddress: nil,
 			modifiedAt: nil
 		)
 	}

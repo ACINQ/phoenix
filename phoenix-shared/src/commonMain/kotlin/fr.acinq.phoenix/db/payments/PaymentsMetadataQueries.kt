@@ -30,7 +30,8 @@ class PaymentsMetadataQueries(val database: PaymentsDatabase) {
             user_notes = data.user_notes,
             modified_at = data.modified_at,
             original_fiat_type = data.original_fiat?.first,
-            original_fiat_rate = data.original_fiat?.second
+            original_fiat_rate = data.original_fiat?.second,
+            lightning_address = data.lightning_address
         )
         didUpdateWalletPaymentMetadata(id, database)
     }
@@ -68,7 +69,8 @@ class PaymentsMetadataQueries(val database: PaymentsDatabase) {
                     user_notes = userNotes,
                     modified_at = modifiedAt,
                     original_fiat_type = null,
-                    original_fiat_rate = null
+                    original_fiat_rate = null,
+                    lightning_address = null
                 )
             }
             didUpdateWalletPaymentMetadata(id, database)
@@ -91,7 +93,8 @@ class PaymentsMetadataQueries(val database: PaymentsDatabase) {
             user_notes: String?,
             modified_at: Long?,
             original_fiat_type: String?,
-            original_fiat_rate: Double?
+            original_fiat_rate: Double?,
+            lightning_address: String?
         ): WalletPaymentMetadata {
             val lnurlBase =
                 if (lnurl_base_type != null && lnurl_base_blob != null) {
@@ -121,6 +124,7 @@ class PaymentsMetadataQueries(val database: PaymentsDatabase) {
                 original_fiat = originalFiat,
                 user_description = user_description,
                 user_notes = user_notes,
+                lightning_address = lightning_address,
                 modified_at = modified_at
             ).deserialize()
         }
