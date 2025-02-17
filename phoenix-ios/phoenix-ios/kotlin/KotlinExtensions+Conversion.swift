@@ -83,3 +83,19 @@ extension Array {
 		}
 	}
 }
+
+extension Kotlinx_datetimeInstant {
+	
+	func toDate() -> Date {
+		let milliseconds: Int64 = self.toEpochMilliseconds()
+		return Date(timeIntervalSince1970: TimeInterval(milliseconds) / TimeInterval(1_000))
+	}
+}
+
+extension Date {
+	
+	func toKotlinInstant() -> Kotlinx_datetimeInstant {
+		let milliseconds = Int64(self.timeIntervalSince1970 * 1_000)
+		return Kotlinx_datetimeInstant.companion.fromEpochMilliseconds(epochMilliseconds: milliseconds)
+	}
+}

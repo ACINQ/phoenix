@@ -33,6 +33,10 @@ actual fun didDeleteContact(contactId: UUID, database: AppDatabase) {
     )
 }
 
+actual fun didSaveCard(cardId: UUID, database: AppDatabase) {
+    // Todo...
+}
+
 actual fun makeCloudKitDb(appDb: SqliteAppDb, paymentsDb: SqlitePaymentsDb): CloudKitInterface? {
     return CloudKitDb(appDb, paymentsDb)
 }

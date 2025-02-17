@@ -166,18 +166,94 @@ class SqlitePaymentsDb(
         }
     }
 
+    suspend fun listRecentCardPayments(count: Long, skip: Long, sinceDate: Long): List<WalletPaymentInfo> {
+        return withContext(Dispatchers.Default) {
+            database.paymentsOutgoingQueries.listRecentCardPayments(
+                min_ts = sinceDate,
+                limit = count,
+                offset = skip,
+                mapper = ::mapOutgoingPaymentsAndMetadata
+            ).executeAsList()
+        }
+    }
+
     @Suppress("UNUSED_PARAMETER")
-    private fun mapPaymentsAndMetadata(data_: ByteArray, payment_id: UUID?,
-                                       lnurl_base_type: LnurlBase.TypeVersion?, lnurl_base_blob: ByteArray?, lnurl_description: String?, lnurl_metadata_type: LnurlMetadata.TypeVersion?, lnurl_metadata_blob: ByteArray?,
-                                       lnurl_successAction_type: LnurlSuccessAction.TypeVersion?, lnurl_successAction_blob: ByteArray?,
-                                       user_description: String?, user_notes: String?, modified_at: Long?, original_fiat_type: String?, original_fiat_rate: Double?): WalletPaymentInfo {
+    private fun mapPaymentsAndMetadata(
+        data_: ByteArray,
+        payment_id: UUID?,
+        lnurl_base_type: LnurlBase.TypeVersion?,
+        lnurl_base_blob: ByteArray?,
+        lnurl_description: String?,
+        lnurl_metadata_type: LnurlMetadata.TypeVersion?,
+        lnurl_metadata_blob: ByteArray?,
+        lnurl_successAction_type: LnurlSuccessAction.TypeVersion?,
+        lnurl_successAction_blob: ByteArray?,
+        user_description: String?,
+        user_notes: String?,
+        modified_at: Long?,
+        original_fiat_type: String?,
+        original_fiat_rate: Double?,
+        card_id: String?
+    ): WalletPaymentInfo {
         val payment = WalletPaymentAdapter.decode(data_)
         return WalletPaymentInfo(
             payment = payment,
-            metadata = PaymentsMetadataQueries.mapAll(payment.id,
-                lnurl_base_type, lnurl_base_blob, lnurl_description, lnurl_metadata_type, lnurl_metadata_blob,
-                lnurl_successAction_type, lnurl_successAction_blob,
-                user_description, user_notes, modified_at, original_fiat_type, original_fiat_rate),
+            metadata = PaymentsMetadataQueries.mapAll(
+                id = payment.id,
+                lnurl_base_type = lnurl_base_type,
+                lnurl_base_blob = lnurl_base_blob,
+                lnurl_description = lnurl_description,
+                lnurl_metadata_type = lnurl_metadata_type,
+                lnurl_metadata_blob = lnurl_metadata_blob,
+                lnurl_successAction_type = lnurl_successAction_type,
+                lnurl_successAction_blob = lnurl_successAction_blob,
+                user_description = user_description,
+                user_notes = user_notes,
+                modified_at = modified_at,
+                original_fiat_type = original_fiat_type,
+                original_fiat_rate = original_fiat_rate,
+                card_id = card_id
+            ),
+            contact = null
+        )
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    private fun mapOutgoingPaymentsAndMetadata(
+        data_: OutgoingPayment,
+        payment_id: UUID?,
+        lnurl_base_type: LnurlBase.TypeVersion?,
+        lnurl_base_blob: ByteArray?,
+        lnurl_description: String?,
+        lnurl_metadata_type: LnurlMetadata.TypeVersion?,
+        lnurl_metadata_blob: ByteArray?,
+        lnurl_successAction_type: LnurlSuccessAction.TypeVersion?,
+        lnurl_successAction_blob: ByteArray?,
+        user_description: String?,
+        user_notes: String?,
+        modified_at: Long?,
+        original_fiat_type: String?,
+        original_fiat_rate: Double?,
+        card_id: String?
+    ): WalletPaymentInfo {
+        return WalletPaymentInfo(
+            payment = data_,
+            metadata = PaymentsMetadataQueries.mapAll(
+                id = data_.id,
+                lnurl_base_type = lnurl_base_type,
+                lnurl_base_blob = lnurl_base_blob,
+                lnurl_description = lnurl_description,
+                lnurl_metadata_type = lnurl_metadata_type,
+                lnurl_metadata_blob = lnurl_metadata_blob,
+                lnurl_successAction_type = lnurl_successAction_type,
+                lnurl_successAction_blob = lnurl_successAction_blob,
+                user_description = user_description,
+                user_notes = user_notes,
+                modified_at = modified_at,
+                original_fiat_type = original_fiat_type,
+                original_fiat_rate = original_fiat_rate,
+                card_id = card_id
+            ),
             contact = null
         )
     }
