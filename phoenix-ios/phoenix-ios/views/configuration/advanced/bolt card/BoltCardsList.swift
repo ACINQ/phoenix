@@ -26,7 +26,6 @@ struct BoltCardsList: View {
 	
 	@State var isFetchingLnurlwAddr: Bool = false
 	@State var lnurlwAddrFetchError: Bool = false
-	@State var missingLnAddressError: Bool = false
 	
 	@State var archivedCardsHidden: Bool = true
 	@State var nfcUnavailable: Bool = false
@@ -235,7 +234,7 @@ struct BoltCardsList: View {
 				
 			#if targetEnvironment(simulator)
 				Button {
-					showVersionSelector()
+					showCardOptions()
 				} label: {
 					Text("Create New Debit Card")
 						.font(.title3.weight(.medium))
@@ -258,7 +257,7 @@ struct BoltCardsList: View {
 				})
 				.simultaneousGesture(LongPressGesture(minimumDuration: 2.0).onEnded { _ in
 					log.debug("simultaneousGesture: LongPressGesture")
-					showVersionSelector()
+					showCardOptions()
 				})
 			#else
 				Button {
@@ -278,10 +277,6 @@ struct BoltCardsList: View {
 						.multilineTextAlignment(.center)
 						.foregroundStyle(Color.appNegative)
 				} else if lnurlwAddrFetchError {
-					Text("Error fetching registration. Please check internet connection.")
-						.multilineTextAlignment(.center)
-						.foregroundStyle(Color.appNegative)
-				} else if missingLnAddressError {
 					Text("Error fetching registration. Please check internet connection.")
 						.multilineTextAlignment(.center)
 						.foregroundStyle(Color.appNegative)
@@ -404,35 +399,72 @@ struct BoltCardsList: View {
 		}
 	}
 	
-	func showVersionSelector() {
-		log.trace("showVersionSelector()")
+	func showCardOptions() {
+		log.trace("showCardOptions()")
 		
 		smartModalState.display(dismissable: true) {
-			VersionSelectorSheet(didSelect: didSelectVersion)
+			CardOptionsSheet(
+				didSelectVersion: didSelectVersion,
+				didSelectSimulator: didSelectSimulator
+			)
 		}
 	}
 	
-	func didSelectVersion(_ version: CardVersion) {
+	func didSelectVersion(_ version: BoltCardVersion) {
 		log.trace("didSelectVersion: \(version)")
 		
+		var missingLnAddress = false
+		switch version {
+		case .V1:
+			fetchLnurlWithdrawAddress(lnAddress: nil)
+			
+		case .V1AndV2:
+			if let lnAddress = AppSecurity.shared.getBip353Address() {
+				fetchLnurlWithdrawAddress(lnAddress: lnAddress)
+			} else {
+				missingLnAddress = true
+			}
+			
+		case .V2:
+			if let lnAddress = AppSecurity.shared.getBip353Address() {
+				let input = BoltCardInput.V2(lnAddress: lnAddress)
+			#if targetEnvironment(simulator)
+				presentSimulatorPasteSheet(input)
+			#else
+				writeToNfcCard(input)
+			#endif
+			} else {
+				missingLnAddress = true
+			}
+		}
+		
+		if missingLnAddress {
+			// Todo...
+		}
+	}
+	
+	func didSelectSimulator() {
+		log.trace("didSelectSimulator()")
+		
 	#if targetEnvironment(simulator)
-		
+		log.warning("didSelectSimulator(): ignorning - we are in the simulator")
+		return
 	#else
-		
+		smartModalState.display(dismissable: true) {
+			SimulatorWriteSheet()
+		}
 	#endif
 	}
 	
-	func createNewDebitCard_default() {
+	func createNewDebitCard() {
 		log.trace("createNewDebitCard()")
 		
-		fetchLnurlWithdrawAddress()
-	}
-	
-	func createNewDebitCard_simulator(_version: CardVersion) {
-		log.trace("createDebitCardForSimulator()")
-		
-		smartModalState.display(dismissable: true) {
-			SimulatorWriteSheet()
+		if let lnAddress = AppSecurity.shared.getBip353Address() {
+			let input = BoltCardInput.V2(lnAddress: lnAddress)
+			writeToNfcCard(input)
+			
+		} else {
+			// Todo..
 		}
 	}
 	
@@ -440,7 +472,7 @@ struct BoltCardsList: View {
 	// MARK: Create Card
 	// --------------------------------------------------
 	
-	func fetchLnurlWithdrawAddress() {
+	func fetchLnurlWithdrawAddress(lnAddress: String?) {
 		log.trace("fetchLnurlWithdrawAddress()")
 		
 		// Developer Note:
@@ -449,10 +481,17 @@ struct BoltCardsList: View {
 		let continueToNextStep = {(registration: LnurlWithdrawRegistration?) in
 			
 			if let hexAddr = registration?.hexAddr {
+				let input: BoltCardInput
+				if let lnAddress {
+					input = BoltCardInput.V1AndV2(lnurlWithdrawId: hexAddr, lnAddress: lnAddress)
+				} else {
+					input = BoltCardInput.V1(lnurlWithdrawId: hexAddr)
+				}
+				
 			#if targetEnvironment(simulator)
-				presentSimulatorPasteSheet(hexAddr)
+				presentSimulatorPasteSheet(input)
 			#else
-				writeToNfcCard(hexAddr)
+				writeToNfcCard(input)
 			#endif
 			} else {
 				lnurlwAddrFetchError = true
@@ -473,46 +512,58 @@ struct BoltCardsList: View {
 		}
 	}
 	
-	func presentSimulatorPasteSheet(_ hexAddr: String) {
+	func presentSimulatorPasteSheet(_ input: BoltCardInput) {
 		log.trace("presentSimulatorPasteSheet()")
 		
-		if let lnAddress = AppSecurity.shared.getBip353Address() {
-			smartModalState.display(dismissable: true) {
-				SimulatorPasteSheet(hexAddr: hexAddr, lnAddress: lnAddress)
-			}
+		smartModalState.display(dismissable: true) {
+			SimulatorPasteSheet(input: input)
 		}
 	}
 	
-	func writeToNfcCard(_ hexAddr: String) {
+	func writeToNfcCard(_ cardInput: BoltCardInput) {
 		log.trace("writeToNfcCard()")
 		
-		let keys = BoltCardKeySet.companion.random()
+		let lnurlWithdrawBaseUrl = URL(string: "https://phoenix.deusty.com/v1/pub/lnurlw/info")!
+		var queryItems: [URLQueryItem] = []
 		
-		let baseUrl = URL(string: "https://phoenix.deusty.com/v1/pub/lnurlw/info")!
-		
-		var queryItems: [URLQueryItem] = [URLQueryItem(name: "id", value: hexAddr)]
-		if let lnAddr = AppSecurity.shared.getBip353Address() {
-			queryItems.append(URLQueryItem(name: "v2", value: lnAddr))
+		let template: Ndef.Template
+		switch cardInput {
+		case .V1(let lnurlWithdrawId):
+			queryItems.append(URLQueryItem(name: "id", value: lnurlWithdrawId))
+			
+			var comps = URLComponents(url: lnurlWithdrawBaseUrl, resolvingAgainstBaseURL: false)!
+			comps.queryItems = queryItems
+			let resolvedUrl = comps.url!
+			
+			template = Ndef.Template(baseUrl: resolvedUrl)!
+			
+		case .V1AndV2(let lnurlWithdrawId, let lnAddress):
+			queryItems.append(URLQueryItem(name: "id", value: lnurlWithdrawId))
+			queryItems.append(URLQueryItem(name: "v2", value: lnAddress))
+			
+			var comps = URLComponents(url: lnurlWithdrawBaseUrl, resolvingAgainstBaseURL: false)!
+			comps.queryItems = queryItems
+			let resolvedUrl = comps.url!
+			
+			template = Ndef.Template(baseUrl: resolvedUrl)!
+			
+		case .V2(let lnAddress):
+			template = Ndef.Template(baseText: lnAddress)
 		}
-		
-		var comps = URLComponents(url: baseUrl, resolvingAgainstBaseURL: false)!
-		comps.queryItems = queryItems
-		
-		let resolvedUrl = comps.url!
-		let template = Ndef.Template(baseUrl: resolvedUrl)!
 		
 		log.debug("template.value: \(template.valueString)")
 		log.debug("template.piccDataOffset: \(template.piccDataOffset)")
 		log.debug("template.cmacOffset: \(template.cmacOffset)")
 		
-		let input = NfcWriter.WriteInput(
+		let keys = BoltCardKeySet.companion.random()
+		let nfcInput = NfcWriter.WriteInput(
 			template    : template,
 			key0        : keys.key0_bytes,
 			piccDataKey : keys.piccDataKey_bytes,
 			cmacKey     : keys.cmacKey_bytes
 		)
 
-		NfcWriter.shared.writeCard(input) { (result: Result<NfcWriter.WriteOutput, NfcWriter.WriteError>) in
+		NfcWriter.shared.writeCard(nfcInput) { (result: Result<NfcWriter.WriteOutput, NfcWriter.WriteError>) in
 			
 			switch result {
 			case .failure(let error):

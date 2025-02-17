@@ -1,22 +1,17 @@
 import SwiftUI
 import PhoenixShared
 
-fileprivate let filename = "VersionSelectorSheet"
+fileprivate let filename = "CardOptionsSheet"
 #if DEBUG && true
 fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-enum CardVersion {
-	case V1
-	case V1AndV2
-	case V2
-}
-
-struct VersionSelectorSheet: View {
+struct CardOptionsSheet: View {
 	
-	let didSelect: (CardVersion) -> Void
+	let didSelectVersion: (BoltCardVersion) -> Void
+	let didSelectSimulator: () -> Void
 	
 	@EnvironmentObject var smartModalState: SmartModalState
 	
@@ -66,6 +61,9 @@ struct VersionSelectorSheet: View {
 			button_v1()
 			button_v1_and_v2()
 			button_v2()
+		#if !targetEnvironment(simulator)
+			button_simulator()
+		#endif
 		} // </VStack>
 		.frame(maxWidth: .infinity)
 		.padding(.all)
@@ -75,7 +73,7 @@ struct VersionSelectorSheet: View {
 	func button_v1() -> some View {
 		
 		Button {
-			didTapButton(CardVersion.V1)
+			didTapVersion(BoltCardVersion.V1)
 		} label: {
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 				VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
@@ -88,26 +86,22 @@ struct VersionSelectorSheet: View {
 						.truncationMode(.tail)
 						.foregroundColor(.secondary)
 				} // </VStack>
+				.multilineTextAlignment(.leading)
 				
 				Spacer()
 			} // </HStack>
-			.padding([.top, .bottom], 8)
-			.padding([.leading, .trailing], 16)
+			.padding(.all, 8)
 			.contentShape(Rectangle()) // make Spacer area tappable
 		}
-		.buttonStyle(
-			ScaleButtonStyle(
-				cornerRadius: 16,
-				borderStroke: Color.appAccent
-			)
-		)
+		.buttonStyle(.bordered)
+		.buttonBorderShape(.roundedRectangle(radius: 16))
 	}
 	
 	@ViewBuilder
 	func button_v1_and_v2() -> some View {
 		
 		Button {
-			didTapButton(CardVersion.V1AndV2)
+			didTapVersion(BoltCardVersion.V1AndV2)
 		} label: {
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 				VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
@@ -119,62 +113,90 @@ struct VersionSelectorSheet: View {
 						.truncationMode(.tail)
 						.foregroundColor(.secondary)
 				} // </VStack>
+				.multilineTextAlignment(.leading)
 				
 				Spacer()
 			} // </HStack>
-			.padding([.top, .bottom], 8)
-			.padding([.leading, .trailing], 16)
+			.padding(.all, 8)
 			.contentShape(Rectangle()) // make Spacer area tappable
 		}
-		.buttonStyle(
-			ScaleButtonStyle(
-				cornerRadius: 16,
-				borderStroke: Color.appAccent
-			)
-		)
+		.buttonStyle(.bordered)
+		.buttonBorderShape(.roundedRectangle(radius: 16))
 	}
 	
 	@ViewBuilder
 	func button_v2() -> some View {
 		
 		Button {
-			didTapButton(CardVersion.V2)
+			didTapVersion(BoltCardVersion.V2)
 		} label: {
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 				VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
 					Text("Version 2 (bip-353 & onion messages)")
 						.font(.body)
 					
-					Text(verbatim: "alice@phoenixwallet.me?picc_data=X&cmac=Y")
+					Text(verbatim: "₿alice@phoenixwallet.me?picc_data=X&cmac=Y")
 						.font(.footnote)
 						.lineLimit(2)
 						.truncationMode(.tail)
 						.foregroundColor(.secondary)
 				} // </VStack>
+				.multilineTextAlignment(.leading)
 				
 				Spacer()
 			} // </HStack>
-			.padding([.top, .bottom], 8)
-			.padding([.leading, .trailing], 16)
+			.padding(.all, 8)
 			.contentShape(Rectangle()) // make Spacer area tappable
 		}
-		.buttonStyle(
-			ScaleButtonStyle(
-				cornerRadius: 16,
-				borderStroke: Color.appAccent
-			)
-		)
+		.buttonStyle(.bordered)
+		.buttonBorderShape(.roundedRectangle(radius: 16))
+	}
+	
+	@ViewBuilder
+	func button_simulator() -> some View {
+		
+		Button {
+			didTapSimulator()
+		} label: {
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+					Text("Write card for simulator")
+						.font(.body)
+					
+					Text(verbatim: "Copy/paste info from simulator")
+						.font(.footnote)
+						.lineLimit(2)
+						.truncationMode(.tail)
+						.foregroundColor(.secondary)
+				} // </VStack>
+				.multilineTextAlignment(.leading)
+				
+				Spacer()
+			} // </HStack>
+			.padding(.all, 8)
+			.contentShape(Rectangle()) // make Spacer area tappable
+		}
+		.buttonStyle(.bordered)
+		.buttonBorderShape(.roundedRectangle(radius: 16))
 	}
 	
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
 	
-	func didTapButton(_ version: CardVersion) {
-		log.trace("didTapButton()")
+	func didTapVersion(_ version: BoltCardVersion) {
+		log.trace("didTapVersion(\(version))")
 		
 		smartModalState.close(animationCompletion: {
-			didSelect(version)
+			didSelectVersion(version)
+		})
+	}
+	
+	func didTapSimulator() {
+		log.trace("didTapSimulator()")
+		
+		smartModalState.close(animationCompletion: {
+			didSelectSimulator()
 		})
 	}
 	

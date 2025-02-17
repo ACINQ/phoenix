@@ -8,20 +8,9 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-struct SimulatorInfo: Codable {
-	let hexAddr: String
-	let lnAddress: String
-}
-
-struct SimulatorBoltCardInput: Codable {
-	let key0: String
-	let chipUid: String
-}
-
 struct SimulatorPasteSheet: View {
 	
-	let hexAddr: String
-	let lnAddress: String
+	let input: BoltCardInput
 	
 	@State var jsonInput: String = ""
 	
@@ -185,9 +174,7 @@ struct SimulatorPasteSheet: View {
 	func simulatorInfo() -> String {
 		
 		do {
-			let info = SimulatorInfo(hexAddr: hexAddr, lnAddress: lnAddress)
-			let jsonData = try JSONEncoder().encode(info)
-			
+			let jsonData = try JSONEncoder().encode(input)
 			return String(data: jsonData, encoding: .utf8) ?? ""
 		} catch {
 			return ""
