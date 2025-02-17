@@ -378,6 +378,7 @@
 		DCDD9ED2286377C5001800A3 /* MainView_Small.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDD9ED1286377C5001800A3 /* MainView_Small.swift */; };
 		DCDD9ED428637EBB001800A3 /* ToolsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDD9ED328637EBB001800A3 /* ToolsButton.swift */; };
 		DCDD9ED628637FD7001800A3 /* AppStatusButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDD9ED528637FD7001800A3 /* AppStatusButton.swift */; };
+		DCE0FAC72D52ACCD00F7D29D /* String+Email.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE0FAC62D52ACCA00F7D29D /* String+Email.swift */; };
 		DCE1E5FA26418183005465B8 /* Toast.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE1E5F926418183005465B8 /* Toast.swift */; };
 		DCE2B9B52C939631000430B8 /* ValidateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE2B9B42C939631000430B8 /* ValidateView.swift */; };
 		DCE3C7AB2A6AD3CC00F4D385 /* MempoolMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE3C7AA2A6AD3CC00F4D385 /* MempoolMonitor.swift */; };
@@ -799,6 +800,7 @@
 		DCDD9ED1286377C5001800A3 /* MainView_Small.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView_Small.swift; sourceTree = "<group>"; };
 		DCDD9ED328637EBB001800A3 /* ToolsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolsButton.swift; sourceTree = "<group>"; };
 		DCDD9ED528637FD7001800A3 /* AppStatusButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStatusButton.swift; sourceTree = "<group>"; };
+		DCE0FAC62D52ACCA00F7D29D /* String+Email.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Email.swift"; sourceTree = "<group>"; };
 		DCE1E5F926418183005465B8 /* Toast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Toast.swift; sourceTree = "<group>"; };
 		DCE2B9B42C939631000430B8 /* ValidateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidateView.swift; sourceTree = "<group>"; };
 		DCE3C7AA2A6AD3CC00F4D385 /* MempoolMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MempoolMonitor.swift; sourceTree = "<group>"; };
@@ -1450,24 +1452,25 @@
 		DCACF6EE2566D0A60009B01E /* extensions */ = {
 			isa = PBXGroup;
 			children = (
+				DC2CE3AE29AFEB0500BA0B00 /* Bundle+Icon.swift */,
 				DCEE3E532931446A00EB4DFF /* Collections+AsInt.swift */,
 				DCACF6EF2566D0A60009B01E /* Data+Hexadecimal.swift */,
 				DC422F3229392ABD00E72253 /* Date+Format.swift */,
+				DCFB8DF82A94112A00947698 /* Dictionary+MapKeys.swift */,
+				DC5A935229846043004F19FD /* FileHandle+Async.swift */,
 				DCB493CC269F8531001B0F09 /* Int+TimeInterval.swift */,
 				DC422F3429392B0500E72253 /* Int+ToDate.swift */,
+				DCA4DA312C6674A20010363C /* NavigationPath+RemoveAll.swift */,
+				DC6F19BE2C46FB0F004EC469 /* NSItemProvider+Async.swift */,
 				DCB493CA269F3B05001B0F09 /* Result+Deugly.swift */,
 				DC59377027516296003B4B53 /* Sequence+Sum.swift */,
+				DCE0FAC62D52ACCA00F7D29D /* String+Email.swift */,
 				DC4CF3CB2BE93311003A957F /* String+PIN.swift */,
 				DC7DA9F52AD84DF200F86B99 /* String+Substring.swift */,
 				DC09085725B5E43900A46136 /* String+VersionComparison.swift */,
+				DCFB8DF62A94066100947698 /* Task+Sleep.swift */,
 				DC384D82265C32F100131772 /* TextField+Verbatim.swift */,
 				DC89857E25914747007B253F /* UIApplicationState+Phoenix.swift */,
-				DC5A935229846043004F19FD /* FileHandle+Async.swift */,
-				DC2CE3AE29AFEB0500BA0B00 /* Bundle+Icon.swift */,
-				DCFB8DF62A94066100947698 /* Task+Sleep.swift */,
-				DCFB8DF82A94112A00947698 /* Dictionary+MapKeys.swift */,
-				DC6F19BE2C46FB0F004EC469 /* NSItemProvider+Async.swift */,
-				DCA4DA312C6674A20010363C /* NavigationPath+RemoveAll.swift */,
 			);
 			path = extensions;
 			sourceTree = "<group>";
@@ -2042,6 +2045,7 @@
 				DC33369826BAF721000E3F49 /* ShortSheet.swift in Sources */,
 				DC3780412C077E0300937C8E /* PriorityBoxStyle.swift in Sources */,
 				DC3FDCAF2C3306AB002C5931 /* LightningDualView.swift in Sources */,
+				DCE0FAC72D52ACCD00F7D29D /* String+Email.swift in Sources */,
 				DC99E90925B78FA800FB20F7 /* EnabledSecurity.swift in Sources */,
 				DCB493CF269F859E001B0F09 /* SyncBackupManager_State.swift in Sources */,
 				DC82EED629789853007A5853 /* TxHistoryExporter.swift in Sources */,
