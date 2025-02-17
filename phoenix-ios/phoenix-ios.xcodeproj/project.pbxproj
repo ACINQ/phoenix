@@ -227,6 +227,7 @@
 		DC9B8EE225D72CC200E13818 /* ForceCloseChannelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9B8EE125D72CC200E13818 /* ForceCloseChannelsView.swift */; };
 		DC9CF83D2D2C6D37003F3B0F /* ScrollView_18.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9CF83C2D2C6D31003F3B0F /* ScrollView_18.swift */; };
 		DC9CF83F2D2DC3F3003F3B0F /* GeometryGroup_17.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9CF83E2D2DC3ED003F3B0F /* GeometryGroup_17.swift */; };
+		DC9CF8412D2ECF08003F3B0F /* IncomingBalancePopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9CF8402D2ECEF7003F3B0F /* IncomingBalancePopover.swift */; };
 		DC9E7EC32A12955300A5F1D0 /* LiquidityHTML.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9E7EC22A12955300A5F1D0 /* LiquidityHTML.swift */; };
 		DC9E7EC62A1295B100A5F1D0 /* liquidity.html in Resources */ = {isa = PBXBuildFile; fileRef = DC9E7EC82A1295B100A5F1D0 /* liquidity.html */; };
 		DCA02B9D2BD065BF0080520F /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = DCA02B9C2BD065BF0080520F /* PrivacyInfo.xcprivacy */; };
@@ -623,6 +624,7 @@
 		DC9B8EE125D72CC200E13818 /* ForceCloseChannelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForceCloseChannelsView.swift; sourceTree = "<group>"; };
 		DC9CF83C2D2C6D31003F3B0F /* ScrollView_18.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollView_18.swift; sourceTree = "<group>"; };
 		DC9CF83E2D2DC3ED003F3B0F /* GeometryGroup_17.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeometryGroup_17.swift; sourceTree = "<group>"; };
+		DC9CF8402D2ECEF7003F3B0F /* IncomingBalancePopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IncomingBalancePopover.swift; sourceTree = "<group>"; };
 		DC9E7EC22A12955300A5F1D0 /* LiquidityHTML.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidityHTML.swift; sourceTree = "<group>"; };
 		DC9E7EC72A1295B100A5F1D0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/liquidity.html; sourceTree = "<group>"; };
 		DCA02B9C2BD065BF0080520F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
@@ -1502,6 +1504,7 @@
 				DCDD9ECF286377B7001800A3 /* MainView_Big.swift */,
 				DC33C5622A7C15D40053D785 /* MainView_BigPrimary.swift */,
 				53BEFE171C182513A5762686 /* HomeView.swift */,
+				DC9CF8402D2ECEF7003F3B0F /* IncomingBalancePopover.swift */,
 				DCDD9ED528637FD7001800A3 /* AppStatusButton.swift */,
 				DCDD9ED328637EBB001800A3 /* ToolsButton.swift */,
 				DC4864D929D4E52C00ACD539 /* BgRefreshDisabledPopover.swift */,
@@ -2017,6 +2020,7 @@
 				DCDD9ECE28637474001800A3 /* Orientation.swift in Sources */,
 				DCCFE6B02B64326F002FFF11 /* OSLogHandler.swift in Sources */,
 				DCDD9ECB28637242001800A3 /* MainView.swift in Sources */,
+				DC9CF8412D2ECF08003F3B0F /* IncomingBalancePopover.swift in Sources */,
 				DCDD9ED2286377C5001800A3 /* MainView_Small.swift in Sources */,
 				C8D7AFF5BC5754DBBEEB2688 /* ElectrumConfigurationView.swift in Sources */,
 				53BEFBECABE13063AB28A4D6 /* publishers.swift in Sources */,

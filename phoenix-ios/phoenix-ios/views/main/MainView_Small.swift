@@ -17,6 +17,7 @@ struct MainView_Small: View {
 		case SendView
 		case CurrencyConverter
 		case SwapInWalletDetails
+		case FinalWalletDetails
 		case LiquidityAdsView
 		case LoginView(flow: SendManager.ParseResult_Lnurl_Auth)
 		case ValidateView(flow: SendManager.ParseResult)
@@ -29,6 +30,7 @@ struct MainView_Small: View {
 				case .SendView            : return "SendView"
 				case .CurrencyConverter   : return "CurrencyConverter"
 				case .SwapInWalletDetails : return "SwapInWalletDetails"
+				case .FinalWalletDetails  : return "FinalWalletDetails"
 				case .LiquidityAdsView    : return "LiquidityAdsView"
 				case .LoginView(_)        : return "LoginView"
 				case .ValidateView(_)     : return "ValidateView"
@@ -172,8 +174,9 @@ struct MainView_Small: View {
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			header()
 			HomeView(
+				showLiquidityAds: showLiquidityAds,
 				showSwapInWallet: showSwapInWallet,
-				showLiquidityAds: showLiquidityAds
+				showFinalWallet: showFinalWallet
 			)
 			footer()
 		}
@@ -541,6 +544,9 @@ struct MainView_Small: View {
 		case .SwapInWalletDetails:
 			SwapInWalletDetails(location: .embedded, popTo: popTo)
 			
+		case .FinalWalletDetails:
+			FinalWalletDetails()
+			
 		case .LiquidityAdsView:
 			LiquidityAdsView(location: .embedded)
 			
@@ -613,16 +619,22 @@ struct MainView_Small: View {
 		}
 	}
 	
+	func showLiquidityAds() {
+		log.trace("showLiquidityAds()")
+		
+		navigateTo(.LiquidityAdsView)
+	}
+	
 	func showSwapInWallet() {
 		log.trace("showSwapInWallet()")
 		
 		navigateTo(.SwapInWalletDetails)
 	}
 	
-	func showLiquidityAds() {
-		log.trace("showLiquidityAds()")
+	func showFinalWallet() {
+		log.trace("showFinalWallet()")
 		
-		navigateTo(.LiquidityAdsView)
+		navigateTo(.FinalWalletDetails)
 	}
 	
 	// --------------------------------------------------
@@ -680,6 +692,11 @@ struct MainView_Small: View {
 					navCoordinator.path.append(NavLinkTag.ConfigurationView)
 					navCoordinator.path.append(ConfigurationList.NavLinkTag.WalletInfo)
 					navCoordinator.path.append(WalletInfoView.NavLinkTag.SwapInWalletDetails)
+					
+				case .finalWallet:
+					navCoordinator.path.append(NavLinkTag.ConfigurationView)
+					navCoordinator.path.append(ConfigurationList.NavLinkTag.WalletInfo)
+					navCoordinator.path.append(WalletInfoView.NavLinkTag.FinalWalletDetails)
 				}
 			}
 			
@@ -698,6 +715,7 @@ struct MainView_Small: View {
 					case .liquiditySettings  : newNavLinkTag = .ConfigurationView ; delay *= 3
 					case .forceCloseChannels : newNavLinkTag = .ConfigurationView ; delay *= 2
 					case .swapInWallet       : newNavLinkTag = .ConfigurationView ; delay *= 2
+					case .finalWallet        : newNavLinkTag = .ConfigurationView ; delay *= 2
 				}
 				
 				if let newNavLinkTag = newNavLinkTag {
