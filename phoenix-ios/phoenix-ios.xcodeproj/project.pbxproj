@@ -340,6 +340,7 @@
 		DCCA89BC2D63DB6200AD5428 /* DeleteCardSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCA89A32D63DB6200AD5428 /* DeleteCardSheet.swift */; };
 		DCCA89BE2D63DB9500AD5428 /* SwCrypt in Frameworks */ = {isa = PBXBuildFile; productRef = DCCA89BD2D63DB9500AD5428 /* SwCrypt */; };
 		DCCA89C12D63DBEB00AD5428 /* BoltCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCA89C02D63DBEB00AD5428 /* BoltCardView.swift */; };
+		DCCA89C32D63E04700AD5428 /* VersionSelectorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCA89C22D63E04700AD5428 /* VersionSelectorSheet.swift */; };
 		DCCC7FD526B0A006008ACD9B /* SquareSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCC7FD426B0A006008ACD9B /* SquareSize.swift */; };
 		DCCCEAB528F6DA2A0047871A /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCCEAB428F6DA2A0047871A /* RootView.swift */; };
 		DCCD045D27EE0173007D57A5 /* EditInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCD045C27EE0173007D57A5 /* EditInfoView.swift */; };
@@ -771,6 +772,7 @@
 		DCCA89AC2D63DB6200AD5428 /* SimulatorWriteSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulatorWriteSheet.swift; sourceTree = "<group>"; };
 		DCCA89AD2D63DB6200AD5428 /* WriteErrorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WriteErrorSheet.swift; sourceTree = "<group>"; };
 		DCCA89C02D63DBEB00AD5428 /* BoltCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoltCardView.swift; sourceTree = "<group>"; };
+		DCCA89C22D63E04700AD5428 /* VersionSelectorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionSelectorSheet.swift; sourceTree = "<group>"; };
 		DCCC7FD426B0A006008ACD9B /* SquareSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SquareSize.swift; sourceTree = "<group>"; };
 		DCCCEAB428F6DA2A0047871A /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		DCCD045C27EE0173007D57A5 /* EditInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditInfoView.swift; sourceTree = "<group>"; };
@@ -1630,6 +1632,7 @@
 				DCCA89AA2D63DB6200AD5428 /* ResetSuccessSheet.swift */,
 				DCCA89AB2D63DB6200AD5428 /* SimulatorPasteSheet.swift */,
 				DCCA89AC2D63DB6200AD5428 /* SimulatorWriteSheet.swift */,
+				DCCA89C22D63E04700AD5428 /* VersionSelectorSheet.swift */,
 				DCCA89AD2D63DB6200AD5428 /* WriteErrorSheet.swift */,
 			);
 			path = "bolt card";
@@ -2324,6 +2327,7 @@
 				DC2ABAD92BED142900C11C9C /* ShakeEffect.swift in Sources */,
 				DC72CEFD2C9B25CC00C810A8 /* PaymentDetails.swift in Sources */,
 				DCFBC55B2AEAC2B000E3A418 /* ImportChannelsView.swift in Sources */,
+				DCCA89C32D63E04700AD5428 /* VersionSelectorSheet.swift in Sources */,
 				DCFB8DF72A94066100947698 /* Task+Sleep.swift in Sources */,
 				DC4CF3CA2BE91FED003A957F /* SetNewPinView.swift in Sources */,
 				DC39D4EF287497440030F18D /* SmartModal.swift in Sources */,
