@@ -454,6 +454,7 @@ class BusinessManager {
 		
 		self.walletInfo = _walletInfo
 		maybeRegisterFcmToken()
+		maybeRegisterPushToken()
 		
 		let walletId = WalletIdentifier(chain: business.chain, walletInfo: _walletInfo)
 		
@@ -534,7 +535,7 @@ class BusinessManager {
 		assertMainThread()
 		
 		self.pushToken = value
-		maybeRegisterFcmToken()
+		maybeRegisterPushToken()
 	}
 	
 	public func setFcmToken(_ value: String) {
@@ -554,6 +555,7 @@ class BusinessManager {
 		
 		if !oldPeerConnectionState.isEstablished() && newPeerConnectionState.isEstablished() {
 			maybeRegisterFcmToken()
+			maybeRegisterPushToken()
 		}
 	}
 	
@@ -561,24 +563,19 @@ class BusinessManager {
 		log.trace("maybeRegisterFcmToken()")
 		assertMainThread()
 		
-		if walletInfo == nil {
-			log.debug("maybeRegisterFcmToken: walletInfo is nil")
-			return
-		}
-		if fcmToken == nil {
+		guard let fcmToken else {
 			log.debug("maybeRegisterFcmToken: fcmToken is nil")
 			return
 		}
-		if !(peerConnectionState is Lightning_kmpConnection.ESTABLISHED) {
+		guard peerConnectionState is Lightning_kmpConnection.ESTABLISHED else {
 			log.debug("maybeRegisterFcmToken: peerConnection not established")
 			return
 		}
 		
-		let token = self.fcmToken
-		log.debug("registering fcm token: \(token?.description ?? "<nil>")")
-		business.registerFcmToken(token: token) { error in
-			if let e = error {
-				log.error("failed to register fcm token: \(e.localizedDescription)")
+		log.debug("registering fcm token: \(fcmToken.description)")
+		business.registerFcmToken(token: fcmToken) { error in
+			if let error {
+				log.error("failed to register fcm token: \(error.localizedDescription)")
 			}
 		}
 		
@@ -599,6 +596,105 @@ class BusinessManager {
 		//
 		// The ideal solution would be to have the server send some kind of Ack for the
 		// registration. Which we could then use to trigger a storage in UserDefaults.
+	}
+	
+	func maybeRegisterPushToken() -> Void {
+		log.trace("maybeRegisterPushToken()")
+		assertMainThread()
+		
+		guard let pushToken else {
+			log.debug("maybeRegisterPushToken: pushToken is nil")
+			return
+		}
+		guard let walletInfo else {
+			log.debug("maybeRegisterPushToken: walletInfo is nil")
+			return
+		}
+		guard peerConnectionState is Lightning_kmpConnection.ESTABLISHED else {
+			log.debug("maybeRegisterPushToken: peerConnection not established")
+			return
+		}
+			
+		let nodeIdHash = walletInfo.nodeId.hash160().toSwiftData().toHex()
+		assert(nodeIdHash == walletInfo.nodeIdHash)
+		
+		if let prvRegistration = Prefs.shared.pushTokenRegistration {
+
+			if prvRegistration.pushToken == pushToken &&
+			   prvRegistration.nodeIdHash == nodeIdHash
+			{
+				// We've already registered our {pushToken, nodeId} tuple.
+
+				if abs(prvRegistration.registrationDate.timeIntervalSinceNow) < 30.days() {
+					// The last registration was recent, so we can skip registration.
+					log.debug("Push token already registered")
+					return
+
+				} else {
+					// It's been awhile since we last registered, so let's re-register.
+					// This is a self-healing mechanism, in case of server problems.
+				}
+			}
+		}
+		
+		let registration = PushTokenRegistration(
+			pushToken: pushToken,
+			nodeIdHash: nodeIdHash,
+			registrationDate: Date()
+		)
+		
+		let url = URL(string: "https://s7r6lsmzk7.execute-api.us-west-2.amazonaws.com/v1/pub/push/register")
+		guard let requestUrl = url else { return }
+		
+		#if DEBUG
+		let platform = "iOS-development"
+		#else
+		// Note: This is actually wrong if you build-and-run using RELEASE mode.
+		let platform = "iOS-production"
+		#endif
+		
+		let body = [
+			"app_id"     : "co.acinq.phoenix",
+			"platform"   : platform,
+			"push_token" : pushToken,
+			"node_id"    : walletInfo.nodeId.value.toHex()
+		]
+		let bodyData = try? JSONSerialization.data(
+			withJSONObject: body,
+			options: []
+		)
+		
+		var request = URLRequest(url: requestUrl)
+		request.httpMethod = "POST"
+		request.httpBody = bodyData
+			
+		let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+			
+			var statusCode = 418
+			var success = false
+			if let httpResponse = response as? HTTPURLResponse {
+				statusCode = httpResponse.statusCode
+				if statusCode >= 200 && statusCode < 300 {
+					success = true
+				}
+			}
+			
+			if success {
+				log.debug("/push/register: success")
+				Prefs.shared.pushTokenRegistration = registration
+			}
+			else if let error = error {
+				log.debug("/push/register: error: \(String(describing: error))")
+			} else {
+				log.debug("/push/register: statusCode: \(statusCode)")
+				if let data = data, let dataString = String(data: data, encoding: .utf8) {
+					log.debug("/push/register: response:\n\(dataString)")
+				}
+			}
+		}
+		
+		log.debug("/push/register ...")
+		task.resume()
 	}
 	
 	// --------------------------------------------------

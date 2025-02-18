@@ -56,6 +56,9 @@ extension ContactInfo: @retroactive Identifiable {
 	}
 }
 
+extension BoltCardInfo: @retroactive Identifiable {
+}
+
 extension Lightning_kmpWalletState.Utxo: @retroactive Identifiable {
 	
 	public var id: String {
