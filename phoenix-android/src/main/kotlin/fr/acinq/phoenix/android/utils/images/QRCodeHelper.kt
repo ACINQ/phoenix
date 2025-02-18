@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.utils
+package fr.acinq.phoenix.android.utils.images
 
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.os.Build
 import android.provider.MediaStore
-import android.util.Base64
 import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import com.google.zxing.qrcode.encoder.Encoder
@@ -35,9 +33,9 @@ import org.slf4j.LoggerFactory
 import java.util.*
 
 
-object BitmapHelper {
+object QRCodeHelper {
 
-    val log = LoggerFactory.getLogger(this::class.java)
+    private val log = LoggerFactory.getLogger(this::class.java)
 
     /** Create a Bitmap QR code from a String. */
     fun generateBitmap(source: String): Bitmap {
@@ -58,15 +56,7 @@ object BitmapHelper {
         return Bitmap.createScaledBitmap(Bitmap.createBitmap(rgbArray, width, height, Bitmap.Config.RGB_565), 260, 260, false)
     }
 
-    /** Decode a base 64 encoded JPG or PNG image and return a [Bitmap] object. This may be used by lnurl-pay services when they want to provide an image for a payment. */
-    fun decodeBase64Image(source: String): Bitmap? = try {
-        val imageBytes = Base64.decode(source, Base64.DEFAULT)
-        BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-    } catch (e: Exception) {
-        log.debug("source=${source.take(40)} is not a valid image: ", e)
-        null
-    }
-
+    /** Saves a bitmap to the device's [MediaStore.Images] after adding white padding around it. */
     suspend fun saveQRToGallery(context: Context, bitmap: Bitmap) {
         withContext(Dispatchers.IO) {
             try {

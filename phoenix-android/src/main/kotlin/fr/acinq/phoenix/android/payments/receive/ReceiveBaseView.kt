@@ -68,7 +68,7 @@ import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.feedback.WarningMessage
 import fr.acinq.phoenix.android.userPrefs
-import fr.acinq.phoenix.android.utils.BitmapHelper
+import fr.acinq.phoenix.android.utils.images.QRCodeHelper
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.extensions.safeLet
 import fr.acinq.phoenix.android.utils.updateScreenBrightnesss
@@ -279,7 +279,7 @@ fun QRCodeImage(
                         onClick = {
                             scope.launch {
                                 isSavingToDisk = true
-                                BitmapHelper.saveQRToGallery(context, bitmap.asAndroidBitmap())
+                                QRCodeHelper.saveQRToGallery(context, bitmap.asAndroidBitmap())
                                 isSavingToDisk = false
                                 Toast.makeText(context, "Image saved!", Toast.LENGTH_SHORT).show()
                             }

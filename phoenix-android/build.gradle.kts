@@ -109,7 +109,7 @@ dependencies {
     // -- AndroidX: work manager
     implementation("androidx.work:work-runtime-ktx:${libs.versions.androidx.workmanager.get()}")
 
-    // -- jetpack compose
+    // -- AndroidX: jetpack compose
     implementation("androidx.compose.ui:ui:${libs.versions.androidx.compose.common.get()}")
     implementation("androidx.compose.foundation:foundation:${libs.versions.androidx.compose.common.get()}")
     implementation("androidx.compose.foundation:foundation-layout:${libs.versions.androidx.compose.common.get()}")
@@ -121,22 +121,26 @@ dependencies {
     implementation("androidx.compose.animation:animation:${libs.versions.androidx.compose.common.get()}")
     implementation("androidx.compose.animation:animation-graphics:${libs.versions.androidx.compose.common.get()}")
     implementation("androidx.compose.material3:material3:${libs.versions.androidx.compose.material3.get()}")
-    // -- jetpack compose: navigation
+    implementation("androidx.constraintlayout:constraintlayout-compose:${libs.versions.androidx.compose.constraintlayout.get()}")
     implementation("androidx.navigation:navigation-compose:${libs.versions.androidx.compose.navigation.get()}")
-    // -- jetpack compose: accompanist (utility library for compose)
+    // -- accompanist: utility library for compose
     implementation("com.google.accompanist:accompanist-systemuicontroller:${libs.versions.accompanist.get()}")
     implementation("com.google.accompanist:accompanist-permissions:${libs.versions.accompanist.get()}")
-    // -- constraint layout for compose
-    implementation("androidx.constraintlayout:constraintlayout-compose:${libs.versions.androidx.compose.constraintlayout.get()}")
 
-    // -- scanner zxing
-    implementation("com.journeyapps:zxing-android-embedded:${libs.versions.zxing.get()}")
+    // -- zxing: read/write QR codes
+    implementation("com.google.zxing:core:${libs.versions.zxing.get()}")
 
-    // logging
+    // -- CameraX: camera device compatibility & fixes + lifecycle handling
+    implementation("androidx.camera:camera-core:1.4.1")
+    implementation("androidx.camera:camera-camera2:1.4.1")
+    implementation("androidx.camera:camera-lifecycle:1.4.1")
+    implementation("androidx.camera:camera-view:1.4.1")
+
+    // -- logging
     implementation("org.slf4j:slf4j-api:${libs.versions.slf4j.get()}")
     implementation("com.github.tony19:logback-android:${libs.versions.logback.get()}")
 
-    // firebase cloud messaging
+    // -- firebase cloud messaging
     implementation("com.google.firebase:firebase-messaging:${libs.versions.fcm.get()}")
     implementation("com.google.android.gms:play-services-base:${libs.versions.playservices.get()}")
 

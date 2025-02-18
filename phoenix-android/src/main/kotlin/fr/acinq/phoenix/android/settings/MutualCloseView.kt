@@ -24,14 +24,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import fr.acinq.bitcoin.BitcoinError
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.utils.msat
@@ -39,8 +37,7 @@ import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIView
-import fr.acinq.phoenix.android.payments.send.CameraPermissionsView
-import fr.acinq.phoenix.android.payments.send.ScannerView
+import fr.acinq.phoenix.android.components.scanner.ScannerView
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.monoTypo
@@ -64,38 +61,16 @@ fun MutualCloseView(
 
     MVIView(CF::closeChannelsConfiguration) { model, postIntent ->
         if (showScannerView) {
-            var scanView by remember { mutableStateOf<DecoratedBarcodeView?>(null) }
             Box(Modifier.fillMaxSize()) {
                 ScannerView(
-                    onScanViewBinding = { scanView = it },
                     onScannedText = {
                         address = Parser.trimMatchingPrefix(Parser.removeExcessInput(it), Parser.bitcoinPrefixes)
                         addressErrorMessage = ""
                         showScannerView = false
-                    }
+                    },
+                    isPaused = false,
+                    onDismiss = { showScannerView = false }
                 )
-
-                CameraPermissionsView {
-                    LaunchedEffect(key1 = model) {
-                        if (showScannerView) scanView?.resume()
-                    }
-                }
-
-                // buttons at the bottom of the screen
-                Column(
-                    Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(24.dp)
-                        .clip(RoundedCornerShape(24.dp))
-                        .background(MaterialTheme.colors.surface)
-                ) {
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = stringResource(id = R.string.btn_cancel),
-                        icon = R.drawable.ic_arrow_back,
-                        onClick = { showScannerView = false }
-                    )
-                }
             }
         } else {
             DefaultScreenLayout {

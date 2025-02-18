@@ -32,7 +32,7 @@ import fr.acinq.lightning.Lightning
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.phoenix.android.PhoenixApplication
-import fr.acinq.phoenix.android.utils.BitmapHelper
+import fr.acinq.phoenix.android.utils.images.QRCodeHelper
 import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
 import fr.acinq.phoenix.android.utils.datastore.SwapAddressFormat
 import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
@@ -111,7 +111,7 @@ class ReceiveViewModel(
                 description = Either.Left(description),
                 expiry = expirySeconds.seconds
             )
-            lightningQRBitmap = BitmapHelper.generateBitmap(pr.write()).asImageBitmap()
+            lightningQRBitmap = QRCodeHelper.generateBitmap(pr.write()).asImageBitmap()
             log.debug("generated new invoice=${pr.write()}")
             lightningInvoiceState = LightningInvoiceState.Show(pr)
         }
@@ -123,19 +123,19 @@ class ReceiveViewModel(
             val swapAddressFormat = userPrefs.getSwapAddressFormat.first()
             if (swapAddressFormat == SwapAddressFormat.LEGACY) {
                 val legacySwapInAddress = peerManager.getPeer().phoenixSwapInWallet.legacySwapInAddress
-                val image = BitmapHelper.generateBitmap(legacySwapInAddress).asImageBitmap()
+                val image = QRCodeHelper.generateBitmap(legacySwapInAddress).asImageBitmap()
                 currentSwapAddress = BitcoinAddressState.Show(0, legacySwapInAddress, image)
             } else {
                 // immediately set an address using the index saved in settings, so that the user does not have to wait for the wallet to synchronise
                 val keyManager = walletManager.keyManager.filterNotNull().first()
                 val startIndex = internalDataRepository.getLastUsedSwapIndex.first()
                 val startAddress = keyManager.swapInOnChainWallet.getSwapInProtocol(startIndex).address(chain)
-                val image = BitmapHelper.generateBitmap(startAddress).asImageBitmap()
+                val image = QRCodeHelper.generateBitmap(startAddress).asImageBitmap()
                 currentSwapAddress = BitcoinAddressState.Show(startIndex, startAddress, image)
 
                 // monitor the actual address from the swap-in wallet -- might take some time since the wallet must check all previous addresses
                 peerManager.getPeer().phoenixSwapInWallet.swapInAddressFlow.filterNotNull().collect { (newAddress, newIndex) ->
-                    val newImage = BitmapHelper.generateBitmap(newAddress).asImageBitmap()
+                    val newImage = QRCodeHelper.generateBitmap(newAddress).asImageBitmap()
                     internalDataRepository.saveLastUsedSwapIndex(newIndex)
                     currentSwapAddress = BitcoinAddressState.Show(newIndex, newAddress, newImage)
                 }
@@ -147,7 +147,7 @@ class ReceiveViewModel(
         viewModelScope.launch {
             val offerData = nodeParamsManager.defaultOffer()
             val encoded = offerData.defaultOffer.encode()
-            val image = BitmapHelper.generateBitmap(encoded).asImageBitmap()
+            val image = QRCodeHelper.generateBitmap(encoded).asImageBitmap()
             offerState = OfferState.Show(encoded, image)
         }
     }
