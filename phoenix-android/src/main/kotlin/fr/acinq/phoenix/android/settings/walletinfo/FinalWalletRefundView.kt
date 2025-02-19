@@ -85,32 +85,18 @@ fun FinalWalletRefundView(
                 ProgressView(text = stringResource(id = R.string.utils_loading_data))
             }
             else -> {
-                if (available == 0.sat) {
-                    Text(text = stringResource(id = R.string.finalwallet_refund_available_none), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center, style = MaterialTheme.typography.caption)
-                    Spacer(modifier = Modifier.height(16.dp))
-                } else {
-                    Card(internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp), modifier = Modifier.fillMaxWidth()) {
-                        Row {
-                            Text(text = stringResource(id = R.string.finalwallet_refund_available))
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Column { AmountWithFiatBelow(amount = available.toMilliSatoshi(), amountTextStyle = MaterialTheme.typography.body2) }
-                        }
-                    }
-                    AvailableForRefund(
-                        state = state,
-                        onResetState = { vm.state.value = FinalWalletRefundState.Init },
-                        onEstimateRefundFee = vm::estimateRefundFee,
-                        onExecuteRefund = vm::executeRefund,
-                    )
-
-                }
-
+                AvailableForRefund(
+                    available = available,
+                    state = state,
+                    onResetState = { vm.state.value = FinalWalletRefundState.Init },
+                    onEstimateRefundFee = vm::estimateRefundFee,
+                    onExecuteRefund = vm::executeRefund,
+                )
                 if (state is FinalWalletRefundState.Success) {
                     SuccessTx(state = state)
                 }
             }
         }
-        Spacer(modifier = Modifier.height(60.dp))
     }
 }
 
@@ -157,6 +143,7 @@ private fun AddressInputAndFeeSlider(
 
 @Composable
 private fun ColumnScope.AvailableForRefund(
+    available: Satoshi,
     state: FinalWalletRefundState,
     onResetState: () -> Unit,
     onEstimateRefundFee: (String, FeeratePerByte) -> Unit,
@@ -179,6 +166,19 @@ private fun ColumnScope.AvailableForRefund(
             }
         )
         return
+    }
+
+    Card(internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp), modifier = Modifier.fillMaxWidth()) {
+        if (available == 0.sat) {
+            Text(text = stringResource(id = R.string.finalwallet_refund_available_none), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center, style = MaterialTheme.typography.caption)
+            Spacer(modifier = Modifier.height(16.dp))
+        } else {
+            Row {
+                Text(text = stringResource(id = R.string.finalwallet_refund_available))
+                Spacer(modifier = Modifier.width(8.dp))
+                Column { AmountWithFiatBelow(amount = available.toMilliSatoshi(), amountTextStyle = MaterialTheme.typography.body2) }
+            }
+        }
     }
 
     Card(internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp), modifier = Modifier.fillMaxWidth()) {
@@ -283,6 +283,8 @@ private fun ColumnScope.AvailableForRefund(
         )
         Spacer(modifier = Modifier.height(16.dp))
     }
+
+    Spacer(modifier = Modifier.height(60.dp))
 }
 
 @Composable
