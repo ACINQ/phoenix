@@ -210,6 +210,13 @@ extension Lightning_kmpIncomingPayment {
 	}
 }
 
+extension Lightning_kmpLightningIncomingPayment.Part {
+	
+	var receivedAtDate: Date {
+		return self.receivedAt.toDate(from: .milliseconds)
+	}
+}
+
 extension Lightning_kmpLightningOutgoingPayment.Part {
 	
 	var createdAtDate: Date {

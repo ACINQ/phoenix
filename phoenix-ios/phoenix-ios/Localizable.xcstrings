@@ -6007,6 +6007,9 @@
         }
       }
     },
+    "Amount added to fee credit" : {
+
+    },
     "amount at time of payment" : {
       "localizations" : {
         "ar" : {
@@ -6540,6 +6543,9 @@
           }
         }
       }
+    },
+    "Amount received" : {
+
     },
     "amount requested" : {
       "comment" : "Label in DetailsView_IncomingPayment",
@@ -7723,6 +7729,9 @@
           }
         }
       }
+    },
+    "automaticLiquidityPurchase" : {
+
     },
     "Available" : {
       "localizations" : {
@@ -10041,6 +10050,9 @@
         }
       }
     },
+    "Channel id" : {
+
+    },
     "Channel management" : {
       "comment" : "Navigation Bar Title",
       "localizations" : {
@@ -10081,6 +10093,9 @@
           }
         }
       }
+    },
+    "Channel operation (new or splice-in)" : {
+
     },
     "Channel Resized" : {
 
@@ -10124,6 +10139,9 @@
           }
         }
       }
+    },
+    "channelClose" : {
+
     },
     "Channels are already processing a splice. Try again later." : {
       "localizations" : {
@@ -11583,6 +11601,9 @@
           }
         }
       }
+    },
+    "Completed at" : {
+
     },
     "Concurrent splice in progress" : {
       "localizations" : {
@@ -13535,6 +13556,9 @@
           }
         }
       }
+    },
+    "Created at" : {
+
     },
     "created: %@" : {
       "localizations" : {
@@ -18545,6 +18569,9 @@
         }
       }
     },
+    "Fee credit" : {
+
+    },
     "Fee Credit" : {
 
     },
@@ -22803,6 +22830,15 @@
         }
       }
     },
+    "Incoming Lightning payment (bolt11)" : {
+
+    },
+    "Incoming Lightning payment (bolt12)" : {
+
+    },
+    "Incoming on-chain payment (legacy swap-in)" : {
+
+    },
     "Incoming payment expiry" : {
       "localizations" : {
         "ar" : {
@@ -24344,6 +24380,9 @@
         }
       }
     },
+    "legacySwapIn" : {
+
+    },
     "Legal" : {
       "localizations" : {
         "ar" : {
@@ -24465,6 +24504,9 @@
           }
         }
       }
+    },
+    "lightning" : {
+
     },
     "Lightning" : {
       "localizations" : {
@@ -25012,6 +25054,9 @@
           }
         }
       }
+    },
+    "Lightning payment" : {
+
     },
     "Lightning payments are fast and best suited for smaller payments." : {
       "localizations" : {
@@ -26075,6 +26120,9 @@
         }
       }
     },
+    "manualLiquidityPurchase" : {
+
+    },
     "Master public key" : {
       "localizations" : {
         "ar" : {
@@ -27130,6 +27178,9 @@
         }
       }
     },
+    "Miner fees" : {
+
+    },
     "Miner Fees" : {
       "comment" : "Label in SummaryInfoGrid",
       "localizations" : {
@@ -27706,6 +27757,9 @@
           }
         }
       }
+    },
+    "newChannel" : {
+
     },
     "Next" : {
       "localizations" : {
@@ -29901,6 +29955,9 @@
         }
       }
     },
+    "Payer key" : {
+
+    },
     "Payment" : {
       "localizations" : {
         "ar" : {
@@ -31079,6 +31136,9 @@
         }
       }
     },
+    "Payment status" : {
+
+    },
     "Payment to %@" : {
       "localizations" : {
         "ar" : {
@@ -31362,6 +31422,9 @@
           }
         }
       }
+    },
+    "Pending" : {
+
     },
     "PENDING" : {
       "localizations" : {
@@ -33423,6 +33486,9 @@
           }
         }
       }
+    },
+    "Received via" : {
+
     },
     "Receiving in background…" : {
       "localizations" : {
@@ -36067,6 +36133,9 @@
         }
       }
     },
+    "Service fees" : {
+
+    },
     "Service Fees" : {
       "comment" : "Label in SummaryInfoGrid",
       "localizations" : {
@@ -38351,6 +38420,15 @@
         }
       }
     },
+    "spliceCpfp" : {
+
+    },
+    "spliceIn" : {
+
+    },
+    "spliceOut" : {
+
+    },
     "Splicing" : {
       "localizations" : {
         "ar" : {
@@ -38630,6 +38708,9 @@
           }
         }
       }
+    },
+    "Successful" : {
+
     },
     "Suggestions" : {
 
@@ -43742,6 +43823,9 @@
         }
       }
     },
+    "Transaction" : {
+
+    },
     "Transactions" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -44145,6 +44229,9 @@
           }
         }
       }
+    },
+    "Type of payment" : {
+
     },
     "Unable to extract public key!" : {
       "comment" : "Toast message",

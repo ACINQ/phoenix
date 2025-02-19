@@ -130,6 +130,13 @@
 		DC49FE9B2AC49CB500D8D2E2 /* KotlinExtensions+Lightning.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC49FE9A2AC49CB500D8D2E2 /* KotlinExtensions+Lightning.swift */; };
 		DC49FE9C2AC49E0400D8D2E2 /* KotlinExtensions+Lightning.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC49FE9A2AC49CB500D8D2E2 /* KotlinExtensions+Lightning.swift */; };
 		DC49FE9D2AC49E0800D8D2E2 /* KotlinExtensions+Bitcoin.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC49FE982AC49C6300D8D2E2 /* KotlinExtensions+Bitcoin.swift */; };
+		DC4CBC752D64DAC600129BDB /* Details_Incoming_Bolt11.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CBC742D64DAAF00129BDB /* Details_Incoming_Bolt11.swift */; };
+		DC4CBC792D64DF9D00129BDB /* InlineSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CBC782D64DF9A00129BDB /* InlineSection.swift */; };
+		DC4CBC7C2D64E74900129BDB /* Details_Deprecated.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CBC7B2D64E74500129BDB /* Details_Deprecated.swift */; };
+		DC4CBC7E2D650C5200129BDB /* DetailsInfoGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CBC7D2D650C4C00129BDB /* DetailsInfoGrid.swift */; };
+		DC4CBC802D650FFC00129BDB /* DetailsRowWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CBC7F2D650FF700129BDB /* DetailsRowWrapper.swift */; };
+		DC4CBC822D6619B700129BDB /* Details_Incoming_Bolt12.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CBC812D6619B000129BDB /* Details_Incoming_Bolt12.swift */; };
+		DC4CBC842D66235A00129BDB /* Details_Incoming_LegacyPayToOpen.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CBC832D66234F00129BDB /* Details_Incoming_LegacyPayToOpen.swift */; };
 		DC4CF3C42BE583A6003A957F /* NumberPadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CF3C32BE583A6003A957F /* NumberPadView.swift */; };
 		DC4CF3CA2BE91FED003A957F /* SetNewPinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CF3C92BE91FED003A957F /* SetNewPinView.swift */; };
 		DC4CF3CC2BE93311003A957F /* String+PIN.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CF3CB2BE93311003A957F /* String+PIN.swift */; };
@@ -539,6 +546,13 @@
 		DC49DA8D258BB882005BC4BC /* ScaledButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScaledButtonStyle.swift; sourceTree = "<group>"; };
 		DC49FE982AC49C6300D8D2E2 /* KotlinExtensions+Bitcoin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KotlinExtensions+Bitcoin.swift"; sourceTree = "<group>"; };
 		DC49FE9A2AC49CB500D8D2E2 /* KotlinExtensions+Lightning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KotlinExtensions+Lightning.swift"; sourceTree = "<group>"; };
+		DC4CBC742D64DAAF00129BDB /* Details_Incoming_Bolt11.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Details_Incoming_Bolt11.swift; sourceTree = "<group>"; };
+		DC4CBC782D64DF9A00129BDB /* InlineSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InlineSection.swift; sourceTree = "<group>"; };
+		DC4CBC7B2D64E74500129BDB /* Details_Deprecated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Details_Deprecated.swift; sourceTree = "<group>"; };
+		DC4CBC7D2D650C4C00129BDB /* DetailsInfoGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailsInfoGrid.swift; sourceTree = "<group>"; };
+		DC4CBC7F2D650FF700129BDB /* DetailsRowWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailsRowWrapper.swift; sourceTree = "<group>"; };
+		DC4CBC812D6619B000129BDB /* Details_Incoming_Bolt12.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Details_Incoming_Bolt12.swift; sourceTree = "<group>"; };
+		DC4CBC832D66234F00129BDB /* Details_Incoming_LegacyPayToOpen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Details_Incoming_LegacyPayToOpen.swift; sourceTree = "<group>"; };
 		DC4CF3C32BE583A6003A957F /* NumberPadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberPadView.swift; sourceTree = "<group>"; };
 		DC4CF3C92BE91FED003A957F /* SetNewPinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetNewPinView.swift; sourceTree = "<group>"; };
 		DC4CF3CB2BE93311003A957F /* String+PIN.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+PIN.swift"; sourceTree = "<group>"; };
@@ -1120,6 +1134,21 @@
 			path = style;
 			sourceTree = "<group>";
 		};
+		DC4CBC762D64DF8300129BDB /* Details */ = {
+			isa = PBXGroup;
+			children = (
+				DC4CBC7B2D64E74500129BDB /* Details_Deprecated.swift */,
+				DC4CBC742D64DAAF00129BDB /* Details_Incoming_Bolt11.swift */,
+				DC4CBC812D6619B000129BDB /* Details_Incoming_Bolt12.swift */,
+				DC4CBC832D66234F00129BDB /* Details_Incoming_LegacyPayToOpen.swift */,
+				DC4CBC7D2D650C4C00129BDB /* DetailsInfoGrid.swift */,
+				DC4CBC7F2D650FF700129BDB /* DetailsRowWrapper.swift */,
+				DCCD046027EE045C007D57A5 /* DetailsView.swift */,
+				DC4CBC782D64DF9A00129BDB /* InlineSection.swift */,
+			);
+			path = Details;
+			sourceTree = "<group>";
+		};
 		DC4CF3C72BE91FAE003A957F /* app access */ = {
 			isa = PBXGroup;
 			children = (
@@ -1454,7 +1483,7 @@
 				53BEF4DAE061532668494988 /* PaymentView.swift */,
 				DCCD045E27EE0301007D57A5 /* SummaryView.swift */,
 				DC6F04222C35EB9900627B4F /* SummaryInfoGrid.swift */,
-				DCCD046027EE045C007D57A5 /* DetailsView.swift */,
+				DC4CBC762D64DF8300129BDB /* Details */,
 				DCCD045C27EE0173007D57A5 /* EditInfoView.swift */,
 				DCCD046227EE04E1007D57A5 /* WalletPaymentExtensions.swift */,
 				DC65BBF12A58A40700EBA651 /* CpfpView.swift */,
@@ -1857,6 +1886,7 @@
 				DC9CF83D2D2C6D37003F3B0F /* ScrollView_18.swift in Sources */,
 				DC33C5632A7C15D40053D785 /* MainView_BigPrimary.swift in Sources */,
 				DC6F19C12C470F70004EC469 /* PickerResult.swift in Sources */,
+				DC4CBC7E2D650C5200129BDB /* DetailsInfoGrid.swift in Sources */,
 				DCEE8998288605FD00FE42DD /* PaymentCell.swift in Sources */,
 				DCDD9ED428637EBB001800A3 /* ToolsButton.swift in Sources */,
 				DCDD9ED0286377B7001800A3 /* MainView_Big.swift in Sources */,
@@ -1943,6 +1973,8 @@
 				DCA02BA02BD1A5FC0080520F /* ChannelSizeImpactWarning.swift in Sources */,
 				DC355E232A45FAF2008E8A8E /* NestedObservableObject.swift in Sources */,
 				DC5F1C4A28DDAA49007A55ED /* ResetWalletView_Confirm.swift in Sources */,
+				DC4CBC842D66235A00129BDB /* Details_Incoming_LegacyPayToOpen.swift in Sources */,
+				DC4CBC792D64DF9D00129BDB /* InlineSection.swift in Sources */,
 				DC09FC3C2D5AAAAA00E6579A /* V85Popover.swift in Sources */,
 				DC7BAA002CADAAE70074B568 /* WalletIdentifier.swift in Sources */,
 				DC39D4E7286BB2130030F18D /* PaymentLayerChoice.swift in Sources */,
@@ -2022,6 +2054,7 @@
 				DCDD9ECB28637242001800A3 /* MainView.swift in Sources */,
 				DC9CF8412D2ECF08003F3B0F /* IncomingBalancePopover.swift in Sources */,
 				DCDD9ED2286377C5001800A3 /* MainView_Small.swift in Sources */,
+				DC4CBC752D64DAC600129BDB /* Details_Incoming_Bolt11.swift in Sources */,
 				C8D7AFF5BC5754DBBEEB2688 /* ElectrumConfigurationView.swift in Sources */,
 				53BEFBECABE13063AB28A4D6 /* publishers.swift in Sources */,
 				DCC3E57F2D08A63900CCDA40 /* XPC+Foreground.swift in Sources */,
@@ -2037,6 +2070,7 @@
 				DCB493D1269F890D001B0F09 /* SyncBackupManager_PendingSettings.swift in Sources */,
 				DCAEF8F727628BEB00015993 /* Either.swift in Sources */,
 				DCA6DECC282AAA740073C658 /* SharedSecurity.swift in Sources */,
+				DC4CBC802D650FFC00129BDB /* DetailsRowWrapper.swift in Sources */,
 				DC5CA4EF28F842F10048A737 /* MVI+Extensions.swift in Sources */,
 				DC6ACC582B10F0220079179B /* RecoveryPhrase.swift in Sources */,
 				DCD7E0F128ED89A0009C30E5 /* GlobalEnvironment.swift in Sources */,
@@ -2048,6 +2082,7 @@
 				DCAEF8D9275E69B000015993 /* SyncSeedManager_State.swift in Sources */,
 				DCB04685260D162C007FDA37 /* ViewName.swift in Sources */,
 				DC4CF3CE2BE96C36003A957F /* DisablePinView.swift in Sources */,
+				DC4CBC822D6619B700129BDB /* Details_Incoming_Bolt12.swift in Sources */,
 				DCB30E522A0A948000E7D7A2 /* WalletInfoView.swift in Sources */,
 				DCFA876D260E91E600AE8953 /* IntroContainer.swift in Sources */,
 				DCA5391C29F7202F001BD3D5 /* ChannelInfoPopup.swift in Sources */,
@@ -2057,6 +2092,7 @@
 				C8D7A70EFE0F071ACA0AE246 /* QRCodeScanner.swift in Sources */,
 				DC2CE55028A52AD90070A2E1 /* RecentPaymentsConfig.swift in Sources */,
 				DC5A935329846044004F19FD /* FileHandle+Async.swift in Sources */,
+				DC4CBC7C2D64E74900129BDB /* Details_Deprecated.swift in Sources */,
 				53BEF2924096C8E7976D46E3 /* shapes.swift in Sources */,
 				DC2B74C32C121571001BA1FD /* Bolt12Sheet.swift in Sources */,
 				DC0D2EA72939273B00284608 /* KotlinExtensions+Payments.swift in Sources */,

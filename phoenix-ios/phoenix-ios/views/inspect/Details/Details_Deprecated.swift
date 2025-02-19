@@ -1,100 +1,14 @@
 import SwiftUI
 import PhoenixShared
 
-fileprivate let filename = "DetailsView"
+fileprivate let filename = "Details_Deprecated"
 #if DEBUG && false
 fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-struct DetailsView: View {
-	
-	let location: PaymentView.Location
-	
-	@Binding var paymentInfo: WalletPaymentInfo
-	@Binding var relatedPaymentIds: [Lightning_kmpUUID]
-	
-	@Binding var showOriginalFiatValue: Bool
-	@Binding var showFiatValueExplanation: Bool
-	
-	let switchToPayment: (_ paymentId: Lightning_kmpUUID) -> Void
-	
-	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-	
-	@ViewBuilder
-	var body: some View {
-		
-		switch location {
-		case .sheet:
-			content()
-				.navigationTitle(NSLocalizedString("Details", comment: "Navigation bar title"))
-				.navigationBarTitleDisplayMode(.inline)
-				.navigationBarHidden(true)
-			
-		case .embedded:
-			
-			content()
-				.navigationTitle(NSLocalizedString("Payment Details", comment: "Navigation bar title"))
-				.navigationBarTitleDisplayMode(.inline)
-				.background(
-					Color.primaryBackground.ignoresSafeArea(.all, edges: .bottom)
-				)
-		}
-	}
-	
-	@ViewBuilder
-	func content() -> some View {
-		
-		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-			
-			header()
-				
-			DetailsInfoGrid(
-				paymentInfo: $paymentInfo,
-				relatedPaymentIds: $relatedPaymentIds,
-				showOriginalFiatValue: $showOriginalFiatValue,
-				showFiatValueExplanation: $showFiatValueExplanation,
-				switchToPayment: switchToPayment
-			)
-		}
-		.background(Color.primaryBackground)
-	}
-	
-	@ViewBuilder
-	func header() -> some View {
-		
-		if case .sheet(let closeAction) = location {
-			HStack(alignment: VerticalAlignment.center, spacing: 0) {
-				Button {
-					presentationMode.wrappedValue.dismiss()
-				} label: {
-					Image(systemName: "chevron.backward")
-						.imageScale(.medium)
-						.font(.title3.weight(.semibold))
-				}
-				Spacer()
-				Button {
-					closeAction()
-				} label: {
-					Image(systemName: "xmark")
-						.imageScale(.medium)
-						.font(.title3)
-				}
-			} // </VStack>
-			.padding()
-			
-		} else {
-			Spacer().frame(height: 25)
-		}
-	}
-}
-
-// --------------------------------------------------
-// MARK: -
-// --------------------------------------------------
-
-fileprivate struct DetailsInfoGrid: InfoGridView {
+struct Details_Deprecated: InfoGridView {
 	
 	@Binding var paymentInfo: WalletPaymentInfo
 	@Binding var relatedPaymentIds: [Lightning_kmpUUID]
@@ -109,24 +23,9 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	@State var truncatedText: [String: Bool] = [:]
 	
 	// <InfoGridView Protocol>
+	@StateObject var infoGridViewState = InfoGridViewState()
 	let minKeyColumnWidth: CGFloat = 50
 	let maxKeyColumnWidth: CGFloat = 140
-	
-	@State var keyColumnSizes: [InfoGridRow_KeyColumn_Size] = []
-	func setKeyColumnSizes(_ value: [InfoGridRow_KeyColumn_Size]) {
-		keyColumnSizes = value
-	}
-	func getKeyColumnSizes() -> [InfoGridRow_KeyColumn_Size] {
-		return keyColumnSizes
-	}
-	
-	@State var rowSizes: [InfoGridRow_Size] = []
-	func setRowSizes(_ sizes: [InfoGridRow_Size]) {
-		rowSizes = sizes
-	}
-	func getRowSizes() -> [InfoGridRow_Size] {
-		return rowSizes
-	}
 	// </InfoGridView Protocol>
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
@@ -392,7 +291,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	func lnurl_service(_ lnurlPay: LnurlPay.Intent) -> some View {
 		let identifier: String = #function
 		
-		InfoGridRowWrapper(
+		DetailsRowWrapper(
 			identifier: identifier,
 			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
@@ -410,7 +309,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		
 		if lnurlPay.maxSendable.msat > lnurlPay.minSendable.msat {
 			
-			InfoGridRowWrapper(
+			DetailsRowWrapper(
 				identifier: identifier,
 				keyColumnWidth: keyColumnWidth(identifier: identifier)
 			) {
@@ -494,7 +393,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		
 		if let createdAtDate = paymentRequest.createdAtDate {
 			
-			InfoGridRowWrapper(
+			DetailsRowWrapper(
 				identifier: identifier,
 				keyColumnWidth: keyColumnWidth(identifier: identifier)
 			) {
@@ -513,7 +412,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		
 		if let rawDescription = paymentRequest.invoiceDescription_ {
 			
-			InfoGridRowWrapper(
+			DetailsRowWrapper(
 				identifier: identifier,
 				keyColumnWidth: keyColumnWidth(identifier: identifier)
 			) {
@@ -535,7 +434,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	func paymentRequest_amountRequested(_ paymentRequest: Lightning_kmpPaymentRequest) -> some View {
 		let identifier: String = #function
 		
-		InfoGridRowWrapper(
+		DetailsRowWrapper(
 			identifier: identifier,
 			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
@@ -563,7 +462,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	) -> some View {
 		let identifier: String = #function
 		
-		InfoGridRowWrapper(
+		DetailsRowWrapper(
 			identifier: identifier,
 			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
@@ -589,7 +488,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		
 		if let preimage = paymentPreimage() {
 			
-			InfoGridRowWrapper(
+			DetailsRowWrapper(
 				identifier: identifier,
 				keyColumnWidth: keyColumnWidth(identifier: identifier)
 			) {
@@ -605,7 +504,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 							Text("Copy")
 						}
 					}
-			} // </InfoGridRowWrapper>
+			} // </DetailsRowWrapper>
 		}
 	}
 	
@@ -613,7 +512,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	func paymentRequest_invoice(_ paymentRequest: Lightning_kmpPaymentRequest) -> some View {
 		let identifier: String = #function
 		
-		InfoGridRowWrapper(
+		DetailsRowWrapper(
 			identifier: identifier,
 			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
@@ -632,7 +531,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 						Text("Copy")
 					}
 				}
-		} // </InfoGridRowWrapper>
+		} // </DetailsRowWrapper>
 	}
 	
 	@ViewBuilder
@@ -642,7 +541,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		let identifier: String = #function
 		
 		if let date = incomingPayment.completedAtDate {
-			InfoGridRowWrapper(
+			DetailsRowWrapper(
 				identifier: identifier,
 				keyColumnWidth: keyColumnWidth(identifier: identifier)
 			) {
@@ -659,7 +558,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	func swapOut_address(_ address: String) -> some View {
 		let identifier: String = #function
 		
-		InfoGridRowWrapper(
+		DetailsRowWrapper(
 			identifier: identifier,
 			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
@@ -675,7 +574,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	func paymentReceived_via(_ part: Lightning_kmpLightningIncomingPayment.Part) -> some View {
 		let identifier: String = #function
 		
-		InfoGridRowWrapper(
+		DetailsRowWrapper(
 			identifier: identifier,
 			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
@@ -706,7 +605,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	func paymentReceived_fundingTxId(_ part: Lightning_kmpLightningIncomingPayment.Part) -> some View {
 		
 		if let htlc = part as? Lightning_kmpLightningIncomingPayment.PartHtlc,
-		   let fundingFee = htlc.fundingFee
+			let fundingFee = htlc.fundingFee
 		{
 			common_btcTxid(fundingFee.fundingTxId, title: "funding txid")
 		}
@@ -720,7 +619,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		
 		if let standardFees = standardFees(), standardFees.0 > 0 {
 			
-			InfoGridRowWrapper(
+			DetailsRowWrapper(
 				identifier: identifier,
 				keyColumnWidth: keyColumnWidth(identifier: identifier)
 			) {
@@ -748,7 +647,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		
 		if let minerFees = minerFees(), minerFees.0 > 0 {
 			
-			InfoGridRowWrapper(
+			DetailsRowWrapper(
 				identifier: identifier,
 				keyColumnWidth: keyColumnWidth(identifier: identifier)
 			) {
@@ -762,7 +661,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 					displayAmounts: displayAmounts(
 						msat: Lightning_kmpMilliSatoshi(msat: minerFees.0),
 						originalFiat: paymentInfo.metadata.originalFiat
-			 		)
+					)
 				)
 			}
 		}
@@ -776,7 +675,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		
 		if let serviceFees = serviceFees(), serviceFees.0 > 0 {
 			
-			InfoGridRowWrapper(
+			DetailsRowWrapper(
 				identifier: identifier,
 				keyColumnWidth: keyColumnWidth(identifier: identifier)
 			) {
@@ -810,7 +709,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	) -> some View {
 		let identifier: String = #function
 		
-		InfoGridRowWrapper(
+		DetailsRowWrapper(
 			identifier: identifier,
 			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
@@ -834,7 +733,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	) -> some View {
 		let identifier: String = #function
 		
-		InfoGridRowWrapper(
+		DetailsRowWrapper(
 			identifier: identifier,
 			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
@@ -860,7 +759,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	) -> some View {
 		let identifier: String = #function
 		
-		InfoGridRowWrapper(
+		DetailsRowWrapper(
 			identifier: identifier,
 			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
@@ -886,7 +785,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	) -> some View {
 		let identifier: String = #function
 		
-		InfoGridRowWrapper(
+		DetailsRowWrapper(
 			identifier: identifier,
 			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
@@ -906,7 +805,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		
 		if let milliseconds = outgoingPayment.paymentTimeElapsed() {
 			
-			InfoGridRowWrapper(
+			DetailsRowWrapper(
 				identifier: identifier,
 				keyColumnWidth: keyColumnWidth(identifier: identifier)
 			) {
@@ -933,7 +832,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	func offChain_fees(_ outgoingPayment: Lightning_kmpOutgoingPayment) -> some View {
 		let identifier: String = #function
 		
-		InfoGridRowWrapper(
+		DetailsRowWrapper(
 			identifier: identifier,
 			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
@@ -946,11 +845,11 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				displayAmounts: displayAmounts(
 					msat: outgoingPayment.fees,
 					originalFiat: paymentInfo.metadata.originalFiat
-			 	),
+				),
 				displayFeePercent: displayFeePercent(
 					fees: outgoingPayment.fees,
 					total: outgoingPayment.amount
-			 	)
+				)
 			)
 		}
 	}
@@ -961,7 +860,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	) -> some View {
 		let identifier: String = #function
 		
-		InfoGridRowWrapper(
+		DetailsRowWrapper(
 			identifier: identifier,
 			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
@@ -979,7 +878,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	) -> some View {
 		let identifier: String = #function
 		
-		InfoGridRowWrapper(
+		DetailsRowWrapper(
 			identifier: identifier,
 			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
@@ -999,7 +898,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		
 		if let confirmedAtDate = onChain.confirmedAtDate {
 			
-			InfoGridRowWrapper(
+			DetailsRowWrapper(
 				identifier: identifier,
 				keyColumnWidth: keyColumnWidth(identifier: identifier)
 			) {
@@ -1026,7 +925,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	) -> some View {
 		let identifier: String = #function
 		
-		InfoGridRowWrapper(
+		DetailsRowWrapper(
 			identifier: identifier,
 			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
@@ -1035,7 +934,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		} valueColumn: {
 			commonValue_date(date: failed.completedAtDate)
 			
-		} // </InfoGridRowWrapper>
+		} // </DetailsRowWrapper>
 	}
 	
 	@ViewBuilder
@@ -1044,7 +943,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	) -> some View {
 		let identifier: String = #function
 		
-		InfoGridRowWrapper(
+		DetailsRowWrapper(
 			identifier: identifier,
 			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
@@ -1055,7 +954,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			let localizedErrMsg = finalFailure.localizedDescription()
 			Text(verbatim: localizedErrMsg)
 			
-		} // </InfoGridRowWrapper>
+		} // </DetailsRowWrapper>
 	}
 	
 	@ViewBuilder
@@ -1064,7 +963,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	) -> some View {
 		let identifier: String = #function
 		
-		InfoGridRowWrapper(
+		DetailsRowWrapper(
 			identifier: identifier,
 			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
@@ -1075,7 +974,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			let localizedErrMsg = partFailure.localizedDescription()
 			Text(verbatim: localizedErrMsg)
 			
-		} // </InfoGridRowWrapper>
+		} // </DetailsRowWrapper>
 	}
 	
 	@ViewBuilder
@@ -1084,7 +983,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	) -> some View {
 		let identifier: String = #function
 		
-		InfoGridRowWrapper(
+		DetailsRowWrapper(
 			identifier: identifier,
 			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
@@ -1110,7 +1009,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		
 		if let paymentId = relatedPaymentIds.first {
 			
-			InfoGridRowWrapper(
+			DetailsRowWrapper(
 				identifier: identifier,
 				keyColumnWidth: keyColumnWidth(identifier: identifier)
 			) {
@@ -1135,7 +1034,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	) -> some View {
 		let identifier: String = #function
 		
-		InfoGridRowWrapper(
+		DetailsRowWrapper(
 			identifier: identifier,
 			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
@@ -1179,7 +1078,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	) -> some View {
 		let identifier: String = #function
 		
-		InfoGridRowWrapper(
+		DetailsRowWrapper(
 			identifier: identifier,
 			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
@@ -1203,7 +1102,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	) -> some View {
 		let identifier: String = #function
 		
-		InfoGridRowWrapper(
+		DetailsRowWrapper(
 			identifier: identifier,
 			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
@@ -1227,7 +1126,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	) -> some View {
 		let identifier: String = #function
 		
-		InfoGridRowWrapper(
+		DetailsRowWrapper(
 			identifier: identifier,
 			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
@@ -1251,7 +1150,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	) -> some View {
 		let identifier: String = #function
 		
-		InfoGridRowWrapper(
+		DetailsRowWrapper(
 			identifier: identifier,
 			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
@@ -1278,7 +1177,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	) -> some View {
 		let identifier: String = #function
 		
-		InfoGridRowWrapper(
+		DetailsRowWrapper(
 			identifier: identifier,
 			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
@@ -1316,7 +1215,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 					}
 				} // </confirmationDialog>
 			
-		} // </InfoGridRowWrapper>
+		} // </DetailsRowWrapper>
 	}
 	
 	// --------------------------------------------------
@@ -1688,79 +1587,8 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 // MARK: -
 // --------------------------------------------------
 
-fileprivate struct DisplayAmounts {
+struct DisplayAmounts {
 	let bitcoin: FormattedAmount
 	let fiatCurrent: FormattedAmount?
 	let fiatOriginal: FormattedAmount?
-}
-
-fileprivate struct InlineSection<Header: View, Content: View>: View {
-	
-	let header: Header
-	let content: Content
-	
-	init(
-		@ViewBuilder header headerBuilder: () -> Header,
-		@ViewBuilder content contentBuilder: () -> Content
-	) {
-		header = headerBuilder()
-		content = contentBuilder()
-	}
-	
-	@ViewBuilder
-	var body: some View {
-		
-		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-			header
-			HStack(alignment: VerticalAlignment.center, spacing: 0) {
-				VStack(alignment: HorizontalAlignment.leading, spacing: 12) {
-					content
-				}
-				Spacer(minLength: 0)
-			}
-			.padding(.vertical, 10)
-			.padding(.horizontal, 16)
-			.background {
-				Color(UIColor.secondarySystemGroupedBackground).cornerRadius(10)
-			}
-			.padding(.horizontal, 16)
-		}
-		.padding(.vertical, 16)
-	}
-}
-
-fileprivate struct InfoGridRowWrapper<KeyColumn: View, ValueColumn: View>: View {
-	
-	let identifier: String
-	let keyColumnWidth: CGFloat
-	let keyColumn: KeyColumn
-	let valueColumn: ValueColumn
-	
-	init(
-		identifier: String,
-		keyColumnWidth: CGFloat,
-		@ViewBuilder keyColumn keyColumnBuilder: () -> KeyColumn,
-		@ViewBuilder valueColumn valueColumnBuilder: () -> ValueColumn
-	) {
-		self.identifier = identifier
-		self.keyColumnWidth = keyColumnWidth
-		self.keyColumn = keyColumnBuilder()
-		self.valueColumn = valueColumnBuilder()
-	}
-	
-	@ViewBuilder
-	var body: some View {
-		
-		InfoGridRow(
-			identifier: identifier,
-			vAlignment: .firstTextBaseline,
-			hSpacing: 8,
-			keyColumnWidth: keyColumnWidth,
-			keyColumnAlignment: .trailing
-		) {
-			keyColumn
-		} valueColumn: {
-			valueColumn.font(.callout)
-		}
-	}
 }

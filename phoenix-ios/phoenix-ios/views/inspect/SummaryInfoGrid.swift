@@ -17,27 +17,6 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 	let showContactView: (_ contact: ContactInfo) -> Void
 	let switchToPayment: (_ paymentId: Lightning_kmpUUID) -> Void
 	
-	// <InfoGridView Protocol>
-	let minKeyColumnWidth: CGFloat = 50
-	let maxKeyColumnWidth: CGFloat = 200
-	
-	@State var keyColumnSizes: [InfoGridRow_KeyColumn_Size] = []
-	func setKeyColumnSizes(_ value: [InfoGridRow_KeyColumn_Size]) {
-		keyColumnSizes = value
-	}
-	func getKeyColumnSizes() -> [InfoGridRow_KeyColumn_Size] {
-		return keyColumnSizes
-	}
-	
-	@State var rowSizes: [InfoGridRow_Size] = []
-	func setRowSizes(_ sizes: [InfoGridRow_Size]) {
-		rowSizes = sizes
-	}
-	func getRowSizes() -> [InfoGridRow_Size] {
-		return rowSizes
-	}
-	// </InfoGridView Protocol>
-	
 	private let verticalSpacingBetweenRows: CGFloat = 12
 	private let horizontalSpacingBetweenColumns: CGFloat = 8
 	
@@ -45,6 +24,12 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 	@State var popoverPresent_minerFees = false
 	@State var popoverPresent_serviceFees = false
 	@State var popoverPresent_liquidityCause = false
+	
+	// <InfoGridView Protocol>
+	@StateObject var infoGridViewState = InfoGridViewState()
+	let minKeyColumnWidth: CGFloat = 50
+	let maxKeyColumnWidth: CGFloat = 200
+	// </InfoGridView Protocol>
 	
 	@Environment(\.openURL) var openURL
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
