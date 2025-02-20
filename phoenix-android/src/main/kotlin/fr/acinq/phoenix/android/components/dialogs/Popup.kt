@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 ACINQ SAS
+ * Copyright 2025 ACINQ SAS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.components
+package fr.acinq.phoenix.android.components.dialogs
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,9 +28,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -45,139 +39,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.Popup
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.components.BorderButton
+import fr.acinq.phoenix.android.components.WebLink
 import fr.acinq.phoenix.android.utils.mutedTextColor
-
-
-@Composable
-fun Dialog(
-    onDismiss: () -> Unit,
-    title: String? = null,
-    properties: DialogProperties = DialogProperties(usePlatformDefaultWidth = false),
-    isScrollable: Boolean = true,
-    buttonsTopMargin: Dp = 20.dp,
-    buttons: (@Composable RowScope.() -> Unit)? = { Button(onClick = onDismiss, text = stringResource(id = R.string.btn_ok), padding = PaddingValues(16.dp), shape = RoundedCornerShape(16.dp)) },
-    content: @Composable ColumnScope.() -> Unit,
-) {
-    androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss, properties = properties) {
-        DialogBody(isScrollable) {
-            // optional title
-            title?.run {
-                Text(text = title, modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 20.dp, bottom = 12.dp), style = MaterialTheme.typography.h4)
-            }
-            // content, must set the padding etc...
-            content()
-            // buttons
-            if (buttons != null) {
-                Spacer(Modifier.height(buttonsTopMargin))
-                Row(modifier = Modifier
-                    .align(Alignment.End)
-                    .padding(8.dp)) {
-                    buttons()
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun DialogBody(
-    isScrollable: Boolean = true,
-    content: @Composable ColumnScope.() -> Unit,
-) {
-    Column(
-        Modifier
-            .padding(vertical = 16.dp, horizontal = 16.dp) // min padding for tall/wide dialogs
-            .clip(MaterialTheme.shapes.large)
-            .background(MaterialTheme.colors.surface)
-            .widthIn(max = 600.dp)
-            .then(
-                if (isScrollable) {
-                    Modifier.verticalScroll(rememberScrollState())
-                } else {
-                    Modifier
-                }
-            )
-    ) {
-        content()
-    }
-}
-
-@Composable
-fun ConfirmDialog(
-    title: String?,
-    message: String,
-    onConfirm: () -> Unit,
-    onDismiss: () -> Unit
-) {
-    ConfirmDialog(
-        title = title,
-        onDismiss = onDismiss,
-        onConfirm = onConfirm,
-    ) {
-        Text(text = message)
-    }
-}
-
-@Composable
-fun ConfirmDialog(
-    onConfirm: () -> Unit,
-    onDismiss: () -> Unit,
-    title: String?,
-    content: @Composable ColumnScope.() -> Unit,
-) {
-    Dialog(
-        title = title,
-        onDismiss = onDismiss,
-        buttons = {
-            Button(text = stringResource(id = R.string.btn_cancel), onClick = onDismiss)
-            Button(text = stringResource(id = R.string.btn_confirm), onClick = onConfirm)
-        }
-    ) {
-        Column(Modifier.padding(horizontal = 24.dp, vertical = if (title == null) 24.dp else 0.dp)) {
-            content()
-        }
-    }
-}
-
-@Composable
-fun NonDismissableDialog(
-    content: @Composable ColumnScope.() -> Unit
-) {
-    androidx.compose.ui.window.Dialog(
-        onDismissRequest = {},
-        properties = DialogProperties(usePlatformDefaultWidth = false, dismissOnBackPress = false, dismissOnClickOutside = false),
-    ) {
-        DialogBody { content() }
-    }
-}
-
-@Composable
-fun FullScreenDialog(
-    onDismiss: () -> Unit,
-    content: @Composable () -> Unit
-) {
-    androidx.compose.ui.window.Dialog(
-        onDismissRequest = onDismiss,
-        properties = DialogProperties(usePlatformDefaultWidth = false),
-    ) {
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        ) {
-            content()
-        }
-    }
-}
 
 @Composable
 fun RowScope.IconPopup(

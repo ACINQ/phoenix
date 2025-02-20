@@ -45,7 +45,7 @@ import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountHeroInput
 import fr.acinq.phoenix.android.components.BackButtonWithBalance
 import fr.acinq.phoenix.android.components.Button
-import fr.acinq.phoenix.android.components.Dialog
+import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.SplashClickableContent

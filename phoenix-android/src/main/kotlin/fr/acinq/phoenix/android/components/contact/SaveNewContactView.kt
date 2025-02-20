@@ -18,6 +18,7 @@ package fr.acinq.phoenix.android.components.contact
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -27,9 +28,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,6 +48,7 @@ import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.SwitchView
 import fr.acinq.phoenix.android.components.TextInput
+import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.components.scanner.ScannerView
 import fr.acinq.phoenix.data.ContactInfo
 import kotlinx.coroutines.launch
@@ -61,7 +60,6 @@ import kotlinx.coroutines.launch
  *
  * The contact can be edited and deleted from that screen.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SaveNewContactDialog(
     initialOffer: OfferTypes.Offer?,
@@ -70,7 +68,6 @@ fun SaveNewContactDialog(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     var offer by remember { mutableStateOf(initialOffer?.encode() ?: "") }
     var offerErrorMessage by remember { mutableStateOf("") }
@@ -81,13 +78,11 @@ fun SaveNewContactDialog(
     val contactsManager = business.contactsManager
 
     ModalBottomSheet(
-        sheetState = sheetState,
-        onDismissRequest = onDismiss,
-        containerColor = MaterialTheme.colors.surface,
-        contentColor = MaterialTheme.colors.onSurface,
-        scrimColor = MaterialTheme.colors.onBackground.copy(alpha = 0.2f),
+        onDismiss = onDismiss,
+        skipPartiallyExpanded = true,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        internalPadding = PaddingValues(top = 0.dp, start = 24.dp, end = 24.dp, bottom = 100.dp)
     ) {
-
         var showScannerView by remember { mutableStateOf(false) }
         if (showScannerView) {
             OfferScanner(
@@ -99,87 +94,80 @@ fun SaveNewContactDialog(
                 }
             )
         } else {
-            Column(
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-                    .padding(top = 0.dp, start = 24.dp, end = 24.dp, bottom = 100.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(text = stringResource(id = R.string.contact_add_title), style = MaterialTheme.typography.h4, textAlign = TextAlign.Center)
-                Spacer(modifier = Modifier.height(24.dp))
-                ContactPhotoView(photoUri = photoUri, name = name, onChange = { photoUri = it }, imageSize = 120.dp, borderSize = 4.dp)
-                Spacer(modifier = Modifier.height(24.dp))
-                TextInput(
-                    text = name,
-                    onTextChange = { name = it },
-                    textStyle = MaterialTheme.typography.h3,
-                    staticLabel = stringResource(id = R.string.contact_name_label),
-                )
-                TextInput(
-                    text = offer,
-                    onTextChange = { offer = it },
-                    enabled = initialOffer == null,
-                    enabledEffect = false,
-                    staticLabel = stringResource(id = R.string.contact_offer_label),
-                    trailingIcon = {
-                        Button(
-                            onClick = { showScannerView = true },
-                            icon = R.drawable.ic_scan_qr,
-                            iconTint = MaterialTheme.colors.primary
-                        )
-                    },
-                    maxLines = 4,
-                    errorMessage = offerErrorMessage,
-                    showResetButton = false
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                SwitchView(
-                    text = stringResource(id = R.string.contact_offer_key_title),
-                    description = if (useOfferKey) {
-                        stringResource(id = R.string.contact_offer_key_enabled)
-                    } else {
-                        stringResource(id = R.string.contact_offer_key_disabled)
-                    },
-                    checked = useOfferKey,
-                    onCheckedChange = { useOfferKey = it }
-                )
-                Spacer(modifier = Modifier.height(24.dp))
-                FilledButton(
-                    text = stringResource(id = R.string.contact_add_contact_button),
-                    icon = R.drawable.ic_check,
-                    onClick = {
-                        scope.launch {
-                            if (initialOffer == null) {
-                                offerErrorMessage = ""
-                                when (val res = OfferTypes.Offer.decode(offer)) {
-                                    is Try.Success -> {
-                                        val decodedOffer = res.result
-                                        val existingContact = contactsManager.getContactForOffer(decodedOffer)
-                                        if (existingContact != null) {
-                                            offerErrorMessage = context.getString(R.string.contact_error_offer_known, existingContact.name)
-                                        } else {
-                                            val contact = contactsManager.saveNewContact(name, photoUri, useOfferKey, res.result)
-                                            onSaved(contact)
-                                        }
+            Text(text = stringResource(id = R.string.contact_add_title), style = MaterialTheme.typography.h4, textAlign = TextAlign.Center)
+            Spacer(modifier = Modifier.height(24.dp))
+            ContactPhotoView(photoUri = photoUri, name = name, onChange = { photoUri = it }, imageSize = 120.dp, borderSize = 4.dp)
+            Spacer(modifier = Modifier.height(24.dp))
+            TextInput(
+                text = name,
+                onTextChange = { name = it },
+                textStyle = MaterialTheme.typography.h3,
+                staticLabel = stringResource(id = R.string.contact_name_label),
+            )
+            TextInput(
+                text = offer,
+                onTextChange = { offer = it },
+                enabled = initialOffer == null,
+                enabledEffect = false,
+                staticLabel = stringResource(id = R.string.contact_offer_label),
+                trailingIcon = {
+                    Button(
+                        onClick = { showScannerView = true },
+                        icon = R.drawable.ic_scan_qr,
+                        iconTint = MaterialTheme.colors.primary
+                    )
+                },
+                maxLines = 4,
+                errorMessage = offerErrorMessage,
+                showResetButton = false
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            SwitchView(
+                text = stringResource(id = R.string.contact_offer_key_title),
+                description = if (useOfferKey) {
+                    stringResource(id = R.string.contact_offer_key_enabled)
+                } else {
+                    stringResource(id = R.string.contact_offer_key_disabled)
+                },
+                checked = useOfferKey,
+                onCheckedChange = { useOfferKey = it }
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            FilledButton(
+                text = stringResource(id = R.string.contact_add_contact_button),
+                icon = R.drawable.ic_check,
+                onClick = {
+                    scope.launch {
+                        if (initialOffer == null) {
+                            offerErrorMessage = ""
+                            when (val res = OfferTypes.Offer.decode(offer)) {
+                                is Try.Success -> {
+                                    val decodedOffer = res.result
+                                    val existingContact = contactsManager.getContactForOffer(decodedOffer)
+                                    if (existingContact != null) {
+                                        offerErrorMessage = context.getString(R.string.contact_error_offer_known, existingContact.name)
+                                    } else {
+                                        val contact = contactsManager.saveNewContact(name, photoUri, useOfferKey, res.result)
+                                        onSaved(contact)
                                     }
-                                    is Try.Failure -> { offerErrorMessage = context.getString(R.string.contact_error_offer_invalid) }
                                 }
-                            } else {
-                                val existingContact = contactsManager.getContactForOffer(initialOffer)
-                                if (existingContact != null) {
-                                    offerErrorMessage = context.getString(R.string.contact_error_offer_known, existingContact.name)
-                                } else {
-                                    val contact = contactsManager.saveNewContact(name, photoUri, useOfferKey, initialOffer)
-                                    onSaved(contact)
-                                }
-
+                                is Try.Failure -> { offerErrorMessage = context.getString(R.string.contact_error_offer_invalid) }
                             }
+                        } else {
+                            val existingContact = contactsManager.getContactForOffer(initialOffer)
+                            if (existingContact != null) {
+                                offerErrorMessage = context.getString(R.string.contact_error_offer_known, existingContact.name)
+                            } else {
+                                val contact = contactsManager.saveNewContact(name, photoUri, useOfferKey, initialOffer)
+                                onSaved(contact)
+                            }
+
                         }
-                    },
-                    shape = CircleShape,
-                    modifier = Modifier.align(Alignment.End),
-                )
-            }
+                    }
+                },
+                shape = CircleShape,
+                modifier = Modifier.align(Alignment.End),
+            )
         }
     }
 }

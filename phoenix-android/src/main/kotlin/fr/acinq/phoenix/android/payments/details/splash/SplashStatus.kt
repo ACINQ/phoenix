@@ -54,7 +54,7 @@ import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.components.Dialog
+import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.TextWithIcon

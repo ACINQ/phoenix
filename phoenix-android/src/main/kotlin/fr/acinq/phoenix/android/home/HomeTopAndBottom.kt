@@ -44,7 +44,7 @@ import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.BorderButton
 import fr.acinq.phoenix.android.components.Button
-import fr.acinq.phoenix.android.components.Dialog
+import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.VSeparator

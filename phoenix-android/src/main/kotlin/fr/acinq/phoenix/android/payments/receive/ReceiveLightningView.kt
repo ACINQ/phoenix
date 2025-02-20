@@ -28,20 +28,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -54,7 +45,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.LocalContext
@@ -66,7 +56,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.Bolt11IncomingPayment
-import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.currentTimestampMillis
@@ -83,22 +72,19 @@ import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.Clickable
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.HSeparator
-import fr.acinq.phoenix.android.components.IconPopup
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.TextInput
+import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.feedback.InfoMessage
 import fr.acinq.phoenix.android.components.feedback.WarningMessage
-import fr.acinq.phoenix.android.internalData
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.borderColor
 import fr.acinq.phoenix.android.utils.copyToClipboard
-import fr.acinq.phoenix.android.utils.red500
 import fr.acinq.phoenix.android.utils.share
 import fr.acinq.phoenix.data.availableForReceive
 import fr.acinq.phoenix.data.canRequestLiquidity
-import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 
 
@@ -471,7 +457,6 @@ fun EvaluateLiquidityIssuesForPayment(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 private fun IncomingLiquidityWarning(
     header: String,
@@ -482,63 +467,42 @@ private fun IncomingLiquidityWarning(
     isSevere: Boolean,
     useEnablePolicyWording: Boolean,
 ) {
-    val scope = rememberCoroutineScope()
-    val sheetState = rememberModalBottomSheetState()
     var showSheet by remember { mutableStateOf(showDialogImmediately) }
     if (showSheet) {
         ModalBottomSheet(
-            sheetState = sheetState,
-            onDismissRequest = {
-                // executed when user click outside the sheet, and after sheet has been hidden thru state.
-                showSheet = false
-            },
-            modifier = Modifier.heightIn(max = 700.dp),
-            containerColor = MaterialTheme.colors.surface,
-            contentColor = MaterialTheme.colors.onSurface,
-            scrimColor = MaterialTheme.colors.onBackground.copy(alpha = 0.1f),
+            onDismiss = { showSheet = false },
+            internalPadding = PaddingValues(top = 0.dp, start = 24.dp, end = 24.dp, bottom = 50.dp)
         ) {
             LaunchedEffect(key1 = Unit) { onDialogShown() }
+            Text(
+                text = header,
+                style = MaterialTheme.typography.h4
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = message)
+            Spacer(modifier = Modifier.height(24.dp))
             Column(
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-                    .padding(top = 0.dp, start = 24.dp, end = 24.dp, bottom = 50.dp)
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.End
             ) {
-                Text(
-                    text = header,
-                    style = MaterialTheme.typography.h4
+                BorderButton(
+                    text = stringResource(
+                        id = if (useEnablePolicyWording) {
+                            R.string.receive_lightning_sheet_button_enable
+                        } else {
+                            R.string.receive_lightning_sheet_button_configure
+                        }
+                    ),
+                    icon = if (useEnablePolicyWording) R.drawable.ic_tool else R.drawable.ic_plus,
+                    onClick = onFeeManagementClick,
                 )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = message)
-                Spacer(modifier = Modifier.height(24.dp))
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.End
-                ) {
-                    BorderButton(
-                        text = stringResource(
-                            id = if (useEnablePolicyWording) {
-                                R.string.receive_lightning_sheet_button_enable
-                            } else {
-                                R.string.receive_lightning_sheet_button_configure
-                            }
-                        ),
-                        icon = if (useEnablePolicyWording) R.drawable.ic_tool else R.drawable.ic_plus,
-                        onClick = onFeeManagementClick,
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    BorderButton(
-                        text = stringResource(id = R.string.receive_lightning_sheet_dismiss),
-                        icon = R.drawable.ic_cross,
-                        borderColor = Color.Transparent,
-                        onClick = {
-                            scope.launch {
-                                sheetState.hide()
-                            }.invokeOnCompletion {
-                                if (!sheetState.isVisible) showSheet = false
-                            }
-                        },
-                    )
-                }
+                Spacer(modifier = Modifier.height(16.dp))
+                BorderButton(
+                    text = stringResource(id = R.string.receive_lightning_sheet_dismiss),
+                    icon = R.drawable.ic_cross,
+                    borderColor = Color.Transparent,
+                    onClick = { showSheet = false }
+                )
             }
         }
     }

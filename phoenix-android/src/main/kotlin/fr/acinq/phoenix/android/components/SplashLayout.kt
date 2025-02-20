@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.components.dialogs.IconPopup
 
 
 @Composable

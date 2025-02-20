@@ -34,9 +34,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
@@ -66,6 +63,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.dialogs.FullScreenDialog
+import fr.acinq.phoenix.android.components.dialogs.IconPopup
+import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.components.feedback.WarningMessage
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.images.QRCodeHelper
@@ -109,7 +109,6 @@ fun ReceiveView(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ReceiveViewPages(
     vm: ReceiveViewModel,
@@ -353,7 +352,6 @@ fun CopyShareEditButtons(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TorWarning() {
     val isTorEnabled by userPrefs.getIsTorEnabled.collectAsState(initial = null)
@@ -361,7 +359,6 @@ fun TorWarning() {
     if (isTorEnabled == true) {
 
         var showTorWarningDialog by remember { mutableStateOf(false) }
-        val sheetState = rememberModalBottomSheetState()
 
         Clickable(onClick = { showTorWarningDialog = true }, shape = RoundedCornerShape(12.dp)) {
             WarningMessage(
@@ -373,25 +370,11 @@ fun TorWarning() {
 
         if (showTorWarningDialog) {
             ModalBottomSheet(
-                sheetState = sheetState,
-                onDismissRequest = {
-                    // executed when user click outside the sheet, and after sheet has been hidden thru state.
-                    showTorWarningDialog = false
-                },
-                containerColor = MaterialTheme.colors.surface,
-                contentColor = MaterialTheme.colors.onSurface,
-                scrimColor = MaterialTheme.colors.onBackground.copy(alpha = 0.1f),
+                onDismiss = { showTorWarningDialog = false },
             ) {
-                Column(
-                    modifier = Modifier
-                        .verticalScroll(rememberScrollState())
-                        .heightIn(min = 200.dp)
-                        .padding(top = 0.dp, start = 24.dp, end = 24.dp, bottom = 90.dp)
-                ) {
-                    Text(text = stringResource(id = R.string.receive_tor_warning_title), style = MaterialTheme.typography.h4)
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(text = stringResource(id = R.string.receive_tor_warning_dialog_content_1))
-                }
+                Text(text = stringResource(id = R.string.receive_tor_warning_title), style = MaterialTheme.typography.h4)
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(text = stringResource(id = R.string.receive_tor_warning_dialog_content_1))
             }
         }
     }

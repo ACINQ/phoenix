@@ -18,6 +18,7 @@ package fr.acinq.phoenix.android.payments.details.splash
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,9 +29,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,6 +46,7 @@ import fr.acinq.phoenix.android.components.SplashClickableContent
 import fr.acinq.phoenix.android.components.SplashLabelRow
 import fr.acinq.phoenix.android.components.TextInput
 import fr.acinq.phoenix.android.components.TextWithIcon
+import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 
 @Composable
 fun SplashDescription(
@@ -104,51 +103,41 @@ fun SplashDescription(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CustomNoteDialog(
     initialDescription: String?,
     onConfirm: (String?) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     var description by rememberSaveable { mutableStateOf(initialDescription) }
 
     ModalBottomSheet(
-        sheetState = sheetState,
-        onDismissRequest = onDismiss,
-        containerColor = MaterialTheme.colors.surface,
-        contentColor = MaterialTheme.colors.onSurface,
-        scrimColor = MaterialTheme.colors.onBackground.copy(alpha = 0.1f),
+        onDismiss = onDismiss,
+        skipPartiallyExpanded = false,
+        internalPadding = PaddingValues(top = 0.dp, start = 24.dp, end = 24.dp, bottom = 70.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .padding(top = 0.dp, start = 24.dp, end = 24.dp, bottom = 70.dp),
-        ) {
-            Text(text = stringResource(id = R.string.paymentdetails_edit_dialog_title), style = MaterialTheme.typography.body2)
-            Spacer(modifier = Modifier.height(16.dp))
-            TextInput(
-                modifier = Modifier.fillMaxWidth(),
-                text = description ?: "",
-                onTextChange = { description = it.takeIf { it.isNotBlank() } },
-                minLines = 2,
-                maxLines = 6,
-                maxChars = 280,
-                staticLabel = stringResource(id = R.string.paymentdetails_edit_dialog_input_label)
+        Text(text = stringResource(id = R.string.paymentdetails_edit_dialog_title), style = MaterialTheme.typography.body2)
+        Spacer(modifier = Modifier.height(16.dp))
+        TextInput(
+            modifier = Modifier.fillMaxWidth(),
+            text = description ?: "",
+            onTextChange = { description = it.takeIf { it.isNotBlank() } },
+            minLines = 2,
+            maxLines = 6,
+            maxChars = 280,
+            staticLabel = stringResource(id = R.string.paymentdetails_edit_dialog_input_label)
+        )
+        Spacer(modifier = Modifier.height(24.dp))
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+            Button(onClick = onDismiss, text = stringResource(id = R.string.btn_cancel), shape = CircleShape)
+            Button(
+                onClick = { onConfirm(description) },
+                text = stringResource(id = R.string.btn_save),
+                icon = R.drawable.ic_check,
+                enabled = description != initialDescription,
+                space = 8.dp,
+                shape = CircleShape
             )
-            Spacer(modifier = Modifier.height(24.dp))
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                Button(onClick = onDismiss, text = stringResource(id = R.string.btn_cancel), shape = CircleShape)
-                Button(
-                    onClick = { onConfirm(description) },
-                    text = stringResource(id = R.string.btn_save),
-                    icon = R.drawable.ic_check,
-                    enabled = description != initialDescription,
-                    space = 8.dp,
-                    shape = CircleShape
-                )
-            }
         }
     }
 }

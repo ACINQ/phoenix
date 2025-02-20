@@ -30,7 +30,7 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
-import fr.acinq.phoenix.android.components.IconPopup
+import fr.acinq.phoenix.android.components.dialogs.IconPopup
 import fr.acinq.phoenix.android.components.contact.ContactDetailsView
 import fr.acinq.phoenix.android.components.contact.ContactsListView
 import fr.acinq.phoenix.android.components.contact.SaveNewContactDialog

@@ -66,7 +66,7 @@ import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.components.Button
-import fr.acinq.phoenix.android.components.Dialog
+import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.openLink
 import fr.acinq.phoenix.android.components.screenlock.LockPrompt
 import fr.acinq.phoenix.android.home.HomeView

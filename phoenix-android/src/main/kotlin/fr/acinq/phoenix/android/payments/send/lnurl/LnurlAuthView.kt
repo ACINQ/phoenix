@@ -32,6 +32,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.data.lnurl.LnurlAuth

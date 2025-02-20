@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.dialogs.ConfirmDialog
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.monoTypo

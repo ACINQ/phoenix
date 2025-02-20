@@ -34,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.settings.ListPreferenceButton
 import fr.acinq.phoenix.android.components.settings.PreferenceItem
 import fr.acinq.phoenix.android.components.settings.Setting

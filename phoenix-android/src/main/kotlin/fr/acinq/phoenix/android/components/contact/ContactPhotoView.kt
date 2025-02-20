@@ -32,22 +32,19 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
@@ -68,6 +65,7 @@ import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.Button
+import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.isDarkTheme
 import fr.acinq.phoenix.android.utils.gray70
 import fr.acinq.phoenix.android.utils.gray800
@@ -76,7 +74,7 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileOutputStream
 
-@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun ContactPhotoView(
     photoUri: String?,
@@ -163,14 +161,11 @@ fun ContactPhotoView(
         }
     }
 
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     if (showImageSourcePicker) {
         ModalBottomSheet(
-            sheetState = sheetState,
-            onDismissRequest = { showImageSourcePicker = false },
-            containerColor = MaterialTheme.colors.surface,
-            contentColor = MaterialTheme.colors.onSurface,
-            scrimColor = MaterialTheme.colors.onBackground.copy(alpha = 0.2f),
+            onDismiss = { showImageSourcePicker = false },
+            internalPadding = PaddingValues(bottom = 32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Button(
                 text = stringResource(id = R.string.contact_photo_open_camera),
@@ -218,7 +213,6 @@ fun ContactPhotoView(
                 },
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }

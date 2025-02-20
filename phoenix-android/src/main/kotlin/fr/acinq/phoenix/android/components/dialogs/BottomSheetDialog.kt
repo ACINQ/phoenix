@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.components
+package fr.acinq.phoenix.android.components.dialogs
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -31,17 +32,21 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
+/** Provides a Material3 [ModalBottomSheet] with some presets. Content is contained in a [Column] with [internalPadding]. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BottomSheetDialog(
+fun ModalBottomSheet(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
-    skipPartiallyExpanded: Boolean = true,
+    skipPartiallyExpanded: Boolean = false,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     scrimAlpha: Float = 0.2f,
+    contentHeight: Dp = Dp.Unspecified,
     internalPadding: PaddingValues = PaddingValues(top = 0.dp, start = 20.dp, end = 20.dp, bottom = 64.dp),
+    isContentScrollable: Boolean = true,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded)
@@ -51,6 +56,7 @@ fun BottomSheetDialog(
             // executed when user click outside the sheet, and after sheet has been hidden thru state.
             onDismiss()
         },
+        sheetMaxWidth = 500.dp,
         modifier = modifier,
         containerColor = MaterialTheme.colors.surface,
         contentColor = MaterialTheme.colors.onSurface,
@@ -60,8 +66,8 @@ fun BottomSheetDialog(
             horizontalAlignment = horizontalAlignment,
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight()
-                .verticalScroll(rememberScrollState())
+                .height(contentHeight)
+                .then(if (isContentScrollable) Modifier.verticalScroll(rememberScrollState()) else Modifier)
                 .padding(internalPadding)
         ) {
             content()

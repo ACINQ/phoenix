@@ -70,7 +70,7 @@ import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountView
 import fr.acinq.phoenix.android.components.Clickable
-import fr.acinq.phoenix.android.components.IconPopup
+import fr.acinq.phoenix.android.components.dialogs.IconPopup
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.openLink
 import fr.acinq.phoenix.android.components.txUrl

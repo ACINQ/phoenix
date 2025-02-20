@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.components.Dialog
+import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.userPrefs

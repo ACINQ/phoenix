@@ -55,7 +55,7 @@ import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
-import fr.acinq.phoenix.android.components.Dialog
+import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.FeerateSlider
 import fr.acinq.phoenix.android.components.InlineTransactionLink
 import fr.acinq.phoenix.android.components.ProgressView

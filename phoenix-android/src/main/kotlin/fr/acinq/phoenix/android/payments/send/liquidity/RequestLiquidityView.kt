@@ -33,9 +33,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -51,8 +48,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.blockchain.fee.FeeratePerKw
-import fr.acinq.lightning.channel.ChannelCommand
 import fr.acinq.lightning.channel.ChannelFundingResponse
 import fr.acinq.lightning.channel.ChannelManagementFees
 import fr.acinq.lightning.utils.sat
@@ -69,11 +64,12 @@ import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Checkbox
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.HSeparator
-import fr.acinq.phoenix.android.components.IconPopup
+import fr.acinq.phoenix.android.components.dialogs.IconPopup
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.SatoshiSlider
 import fr.acinq.phoenix.android.components.SplashLabelRow
 import fr.acinq.phoenix.android.components.SplashLayout
+import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.components.enableOrFade
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.feedback.InfoMessage
@@ -323,52 +319,37 @@ private fun LeaseEstimationView(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ReviewLiquidityRequest(
     onConfirm: () -> Unit,
 ) {
-    val sheetState = rememberModalBottomSheetState()
     var showSheet by remember { mutableStateOf(false) }
     var confirmLiquidity by remember { mutableStateOf(false) }
     if (showSheet) {
         ModalBottomSheet(
-            sheetState = sheetState,
-            onDismissRequest = {
-                // executed when user click outside the sheet, and after sheet has been hidden thru state.
-                showSheet = false
-            },
-            modifier = Modifier.heightIn(max = 700.dp),
-            containerColor = MaterialTheme.colors.surface,
-            contentColor = MaterialTheme.colors.onSurface,
-            scrimColor = MaterialTheme.colors.onBackground.copy(alpha = 0.1f),
+            onDismiss = { showSheet = false },
+            skipPartiallyExpanded = true,
         ) {
-            Column(
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-                    .padding(top = 0.dp, start = 24.dp, end = 24.dp, bottom = 50.dp)
-            ) {
-                Text(text = annotatedStringResource(id = R.string.liquidityads_disclaimer_body1))
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = stringResource(id = R.string.liquidityads_disclaimer_body2))
-                Spacer(modifier = Modifier.height(8.dp))
-                Checkbox(text = stringResource(id = R.string.utils_ack), checked = confirmLiquidity, onCheckedChange = { confirmLiquidity = it })
+            Text(text = annotatedStringResource(id = R.string.liquidityads_disclaimer_body1))
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = stringResource(id = R.string.liquidityads_disclaimer_body2))
+            Spacer(modifier = Modifier.height(8.dp))
+            Checkbox(text = stringResource(id = R.string.utils_ack), checked = confirmLiquidity, onCheckedChange = { confirmLiquidity = it })
 
-                Spacer(modifier = Modifier.height(24.dp))
-                FilledButton(
-                    text = stringResource(id = R.string.btn_confirm),
-                    icon = R.drawable.ic_check,
-                    onClick = onConfirm,
-                    enabled = confirmLiquidity,
-                    modifier = Modifier.align(Alignment.End),
-                )
-                Button(
-                    text = stringResource(id = R.string.btn_cancel),
-                    onClick = { showSheet = false },
-                    shape = CircleShape,
-                    modifier = Modifier.align(Alignment.End),
-                )
-            }
+            Spacer(modifier = Modifier.height(24.dp))
+            FilledButton(
+                text = stringResource(id = R.string.btn_confirm),
+                icon = R.drawable.ic_check,
+                onClick = onConfirm,
+                enabled = confirmLiquidity,
+                modifier = Modifier.align(Alignment.End),
+            )
+            Button(
+                text = stringResource(id = R.string.btn_cancel),
+                onClick = { showSheet = false },
+                shape = CircleShape,
+                modifier = Modifier.align(Alignment.End),
+            )
         }
     }
 

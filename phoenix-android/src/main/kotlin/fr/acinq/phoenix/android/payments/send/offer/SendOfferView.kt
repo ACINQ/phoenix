@@ -17,21 +17,16 @@
 package fr.acinq.phoenix.android.payments.send.offer
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.sizeIn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -57,13 +52,13 @@ import fr.acinq.phoenix.android.components.AmountHeroInput
 import fr.acinq.phoenix.android.components.AmountWithFiatRowView
 import fr.acinq.phoenix.android.components.BackButtonWithBalance
 import fr.acinq.phoenix.android.components.Clickable
-import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.SplashLabelRow
 import fr.acinq.phoenix.android.components.SplashLayout
 import fr.acinq.phoenix.android.components.TextInput
 import fr.acinq.phoenix.android.components.contact.ContactOrOfferView
+import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.payments.details.splash.translatePaymentError
 import fr.acinq.phoenix.android.userPrefs
@@ -232,44 +227,31 @@ private fun SendOfferStateButton(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PayerNoteInput(
     initialMessage: String,
     onMessageChange: (String) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
     ModalBottomSheet(
-        sheetState = sheetState,
-        onDismissRequest = onDismiss,
-        containerColor = MaterialTheme.colors.surface,
-        contentColor = MaterialTheme.colors.onSurface,
-        scrimColor = MaterialTheme.colors.onBackground.copy(alpha = 0.2f),
+        onDismiss = onDismiss,
+        skipPartiallyExpanded = true,
+        internalPadding = PaddingValues(horizontal = 24.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 32.dp)
-                .sizeIn(maxHeight = 600.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(text = stringResource(id = R.string.send_offer_payer_note_dialog_title), style = MaterialTheme.typography.h4, textAlign = TextAlign.Center)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = stringResource(id = R.string.send_offer_payer_note_dialog_subtitle), style = MaterialTheme.typography.caption, textAlign = TextAlign.Center)
-            Spacer(modifier = Modifier.height(16.dp))
-            TextInput(
-                text = initialMessage,
-                staticLabel = null,
-                onTextChange = onMessageChange,
-                placeholder = { Text(text = stringResource(id = R.string.send_offer_payer_note_dialog_placeholder) )},
-                maxChars = 64,
-                singleLine = true
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            FilledButton(text = stringResource(id = R.string.btn_ok), icon = R.drawable.ic_check, onClick = onDismiss, modifier = Modifier.align(Alignment.End))
-            Spacer(modifier = Modifier.height(80.dp))
-        }
+        Text(text = stringResource(id = R.string.send_offer_payer_note_dialog_title), style = MaterialTheme.typography.h4, textAlign = TextAlign.Center)
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(text = stringResource(id = R.string.send_offer_payer_note_dialog_subtitle), style = MaterialTheme.typography.caption, textAlign = TextAlign.Center)
+        Spacer(modifier = Modifier.height(16.dp))
+        TextInput(
+            text = initialMessage,
+            staticLabel = null,
+            onTextChange = onMessageChange,
+            placeholder = { Text(text = stringResource(id = R.string.send_offer_payer_note_dialog_placeholder) )},
+            maxChars = 64,
+            singleLine = true
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        FilledButton(text = stringResource(id = R.string.btn_ok), icon = R.drawable.ic_check, onClick = onDismiss, modifier = Modifier.align(Alignment.End))
+        Spacer(modifier = Modifier.height(80.dp))
     }
 }
