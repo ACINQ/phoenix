@@ -6629,6 +6629,9 @@
         }
       }
     },
+    "Amount sent (fees included)" : {
+
+    },
     "amount to receive" : {
       "comment" : "SendView: lnurl-withdraw flow",
       "localizations" : {
@@ -10140,9 +10143,6 @@
         }
       }
     },
-    "channelClose" : {
-
-    },
     "Channels are already processing a splice. Try again later." : {
       "localizations" : {
         "ar" : {
@@ -11196,6 +11196,9 @@
         }
       }
     },
+    "Closing type" : {
+
+    },
     "Cloud backup" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -12128,6 +12131,9 @@
           }
         }
       }
+    },
+    "Confirmed on-chain" : {
+
     },
     "Confirming: " : {
 
@@ -15172,6 +15178,9 @@
           }
         }
       }
+    },
+    "Deposit address" : {
+
     },
     "Deposits must be at least **%@**. The fee is **%@%%** (%@ minimum)." : {
       "comment" : "Minimum amount description.",
@@ -18287,6 +18296,9 @@
           }
         }
       }
+    },
+    "Failed" : {
+
     },
     "FAILED" : {
       "localizations" : {
@@ -22836,7 +22848,16 @@
     "Incoming Lightning payment (bolt12)" : {
 
     },
+    "Incoming on-chain payment (legacy pay-to-open)" : {
+
+    },
     "Incoming on-chain payment (legacy swap-in)" : {
+
+    },
+    "Incoming on-chain payment (new channel)" : {
+
+    },
+    "Incoming on-chain payment (splice)" : {
 
     },
     "Incoming payment expiry" : {
@@ -24380,9 +24401,6 @@
         }
       }
     },
-    "legacySwapIn" : {
-
-    },
     "Legal" : {
       "localizations" : {
         "ar" : {
@@ -24504,9 +24522,6 @@
           }
         }
       }
-    },
-    "lightning" : {
-
     },
     "Lightning" : {
       "localizations" : {
@@ -25541,6 +25556,9 @@
           }
         }
       }
+    },
+    "Local" : {
+
     },
     "Logged In" : {
       "comment" : "lnurl-auth: success text",
@@ -27392,6 +27410,12 @@
         }
       }
     },
+    "Mutual" : {
+
+    },
+    "N/A" : {
+
+    },
     "Name" : {
       "localizations" : {
         "ar" : {
@@ -27757,9 +27781,6 @@
           }
         }
       }
-    },
-    "newChannel" : {
-
     },
     "Next" : {
       "localizations" : {
@@ -29424,6 +29445,15 @@
           }
         }
       }
+    },
+    "Outgoing Lightning payment (bolt11)" : {
+
+    },
+    "Outgoing Lightning payment (bolt12)" : {
+
+    },
+    "Outgoing on-chain payment (legacy swap)" : {
+
     },
     "Outgoing payments" : {
       "localizations" : {
@@ -33976,6 +34006,9 @@
         }
       }
     },
+    "Remote" : {
+
+    },
     "Remove" : {
       "localizations" : {
         "ar" : {
@@ -34465,6 +34498,9 @@
           }
         }
       }
+    },
+    "Revoked" : {
+
     },
     "Revoked commits found on %lld channel(s)!" : {
       "comment" : "translate: s",
@@ -38421,9 +38457,6 @@
       }
     },
     "spliceCpfp" : {
-
-    },
-    "spliceIn" : {
 
     },
     "spliceOut" : {

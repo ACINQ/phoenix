@@ -28,8 +28,6 @@ struct Details_Incoming_Bolt12: DetailsInfoGrid {
 	@StateObject var detailsInfoGridState = DetailsInfoGridState()
 	// </DetailsInfoGrid Protocol>
 	
-	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	// --------------------------------------------------
@@ -59,6 +57,10 @@ struct Details_Incoming_Bolt12: DetailsInfoGrid {
 		.background(Color.primaryBackground)
 	}
 	
+	// --------------------------------------------------
+	// MARK: Section: General
+	// --------------------------------------------------
+	
 	@ViewBuilder
 	func section_general() -> some View {
 		
@@ -67,17 +69,6 @@ struct Details_Incoming_Bolt12: DetailsInfoGrid {
 		} content: {
 			general_type()
 			general_status()
-		}
-	}
-	
-	@ViewBuilder
-	func section_incoming() -> some View {
-		
-		InlineSection {
-			EmptyView()
-		} content: {
-			incoming_amountReceived()
-			subsection_bolt12Offer(payment.metadata)
 		}
 	}
 	
@@ -103,6 +94,21 @@ struct Details_Incoming_Bolt12: DetailsInfoGrid {
 			} else {
 				Text("Successful")
 			}
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Section: Incoming
+	// --------------------------------------------------
+	
+	@ViewBuilder
+	func section_incoming() -> some View {
+		
+		InlineSection {
+			EmptyView()
+		} content: {
+			incoming_amountReceived()
+			subsection_bolt12Offer(payment.metadata)
 		}
 	}
 	

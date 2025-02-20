@@ -137,6 +137,14 @@
 		DC4CBC802D650FFC00129BDB /* DetailsRowWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CBC7F2D650FF700129BDB /* DetailsRowWrapper.swift */; };
 		DC4CBC822D6619B700129BDB /* Details_Incoming_Bolt12.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CBC812D6619B000129BDB /* Details_Incoming_Bolt12.swift */; };
 		DC4CBC842D66235A00129BDB /* Details_Incoming_LegacyPayToOpen.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CBC832D66234F00129BDB /* Details_Incoming_LegacyPayToOpen.swift */; };
+		DC4CBC862D663BF400129BDB /* Details_Incoming_LegacySwapIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CBC852D663BEB00129BDB /* Details_Incoming_LegacySwapIn.swift */; };
+		DC4CBC882D66416800129BDB /* Details_Incoming_NewChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CBC872D66416100129BDB /* Details_Incoming_NewChannel.swift */; };
+		DC4CBC8A2D6677A900129BDB /* Details_Incoming_SpliceIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CBC892D6677A200129BDB /* Details_Incoming_SpliceIn.swift */; };
+		DC4CBC8C2D67799B00129BDB /* DetailsInfoGrid+CommonValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CBC8B2D67799300129BDB /* DetailsInfoGrid+CommonValues.swift */; };
+		DC4CBC8E2D677A0500129BDB /* DetailsInfoGrid+CommonSections.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CBC8D2D6779FE00129BDB /* DetailsInfoGrid+CommonSections.swift */; };
+		DC4CBC902D677AA700129BDB /* DetailsInfoGrid+ViewHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CBC8F2D677AA100129BDB /* DetailsInfoGrid+ViewHelpers.swift */; };
+		DC4CBC922D677D4F00129BDB /* Details_Outgoing_ChannelClose.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CBC912D677D4700129BDB /* Details_Outgoing_ChannelClose.swift */; };
+		DC4CBC942D678ED700129BDB /* Details_Outgoing_Lightning.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CBC932D678ECE00129BDB /* Details_Outgoing_Lightning.swift */; };
 		DC4CF3C42BE583A6003A957F /* NumberPadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CF3C32BE583A6003A957F /* NumberPadView.swift */; };
 		DC4CF3CA2BE91FED003A957F /* SetNewPinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CF3C92BE91FED003A957F /* SetNewPinView.swift */; };
 		DC4CF3CC2BE93311003A957F /* String+PIN.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CF3CB2BE93311003A957F /* String+PIN.swift */; };
@@ -553,6 +561,14 @@
 		DC4CBC7F2D650FF700129BDB /* DetailsRowWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailsRowWrapper.swift; sourceTree = "<group>"; };
 		DC4CBC812D6619B000129BDB /* Details_Incoming_Bolt12.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Details_Incoming_Bolt12.swift; sourceTree = "<group>"; };
 		DC4CBC832D66234F00129BDB /* Details_Incoming_LegacyPayToOpen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Details_Incoming_LegacyPayToOpen.swift; sourceTree = "<group>"; };
+		DC4CBC852D663BEB00129BDB /* Details_Incoming_LegacySwapIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Details_Incoming_LegacySwapIn.swift; sourceTree = "<group>"; };
+		DC4CBC872D66416100129BDB /* Details_Incoming_NewChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Details_Incoming_NewChannel.swift; sourceTree = "<group>"; };
+		DC4CBC892D6677A200129BDB /* Details_Incoming_SpliceIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Details_Incoming_SpliceIn.swift; sourceTree = "<group>"; };
+		DC4CBC8B2D67799300129BDB /* DetailsInfoGrid+CommonValues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DetailsInfoGrid+CommonValues.swift"; sourceTree = "<group>"; };
+		DC4CBC8D2D6779FE00129BDB /* DetailsInfoGrid+CommonSections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DetailsInfoGrid+CommonSections.swift"; sourceTree = "<group>"; };
+		DC4CBC8F2D677AA100129BDB /* DetailsInfoGrid+ViewHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DetailsInfoGrid+ViewHelpers.swift"; sourceTree = "<group>"; };
+		DC4CBC912D677D4700129BDB /* Details_Outgoing_ChannelClose.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Details_Outgoing_ChannelClose.swift; sourceTree = "<group>"; };
+		DC4CBC932D678ECE00129BDB /* Details_Outgoing_Lightning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Details_Outgoing_Lightning.swift; sourceTree = "<group>"; };
 		DC4CF3C32BE583A6003A957F /* NumberPadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberPadView.swift; sourceTree = "<group>"; };
 		DC4CF3C92BE91FED003A957F /* SetNewPinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetNewPinView.swift; sourceTree = "<group>"; };
 		DC4CF3CB2BE93311003A957F /* String+PIN.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+PIN.swift"; sourceTree = "<group>"; };
@@ -1141,7 +1157,15 @@
 				DC4CBC742D64DAAF00129BDB /* Details_Incoming_Bolt11.swift */,
 				DC4CBC812D6619B000129BDB /* Details_Incoming_Bolt12.swift */,
 				DC4CBC832D66234F00129BDB /* Details_Incoming_LegacyPayToOpen.swift */,
+				DC4CBC852D663BEB00129BDB /* Details_Incoming_LegacySwapIn.swift */,
+				DC4CBC872D66416100129BDB /* Details_Incoming_NewChannel.swift */,
+				DC4CBC892D6677A200129BDB /* Details_Incoming_SpliceIn.swift */,
+				DC4CBC912D677D4700129BDB /* Details_Outgoing_ChannelClose.swift */,
+				DC4CBC932D678ECE00129BDB /* Details_Outgoing_Lightning.swift */,
 				DC4CBC7D2D650C4C00129BDB /* DetailsInfoGrid.swift */,
+				DC4CBC8D2D6779FE00129BDB /* DetailsInfoGrid+CommonSections.swift */,
+				DC4CBC8B2D67799300129BDB /* DetailsInfoGrid+CommonValues.swift */,
+				DC4CBC8F2D677AA100129BDB /* DetailsInfoGrid+ViewHelpers.swift */,
 				DC4CBC7F2D650FF700129BDB /* DetailsRowWrapper.swift */,
 				DCCD046027EE045C007D57A5 /* DetailsView.swift */,
 				DC4CBC782D64DF9A00129BDB /* InlineSection.swift */,
@@ -1933,11 +1957,13 @@
 				DC1D2B4B2593EB860036AD38 /* Currency.swift in Sources */,
 				DC118C0827B457520080BBAC /* FetchActivityNotice.swift in Sources */,
 				DCD7E0AC28EC32CB009C30E5 /* BusinessManager.swift in Sources */,
+				DC4CBC882D66416800129BDB /* Details_Incoming_NewChannel.swift in Sources */,
 				DC4864DA29D4E52C00ACD539 /* BgRefreshDisabledPopover.swift in Sources */,
 				DCE7233027B167240017CF56 /* SyncSeedManager_Actor.swift in Sources */,
 				DCBA371B2758076F00610EC8 /* SyncSeedManager.swift in Sources */,
 				DC39D4F12874DDF40030F18D /* View+If.swift in Sources */,
 				DC370A8B2B7FFFC70093C56F /* SwapInAddresses.swift in Sources */,
+				DC4CBC862D663BF400129BDB /* Details_Incoming_LegacySwapIn.swift in Sources */,
 				53BEFD54160278C5E393E319 /* HomeView.swift in Sources */,
 				DC0C52662BF3C31700143831 /* WhichPinSheet.swift in Sources */,
 				DCD1208728663F4A00EB39C5 /* TransactionsView.swift in Sources */,
@@ -1997,6 +2023,7 @@
 				DC3345D02C2B4C1200EDD2D4 /* ManageContact.swift in Sources */,
 				DCE7232E27AD68CD0017CF56 /* SyncBackupManager_Actor.swift in Sources */,
 				DC16965F27FE0FAC003DE1DD /* KotlinExtensions+Currency.swift in Sources */,
+				DC4CBC902D677AA700129BDB /* DetailsInfoGrid+ViewHelpers.swift in Sources */,
 				DC65BBF22A58A40700EBA651 /* CpfpView.swift in Sources */,
 				DC422F3329392ABD00E72253 /* Date+Format.swift in Sources */,
 				DC9AD1F12C9B81450019BEE9 /* PaymentRequestedView.swift in Sources */,
@@ -2035,12 +2062,14 @@
 				DC46BAF826CACCF700E760A6 /* KotlinAssociatedObject.swift in Sources */,
 				DC37803D2C05215600937C8E /* ScanBitcoinAddressSheet.swift in Sources */,
 				DC4CF3C42BE583A6003A957F /* NumberPadView.swift in Sources */,
+				DC4CBC8C2D67799B00129BDB /* DetailsInfoGrid+CommonValues.swift in Sources */,
 				DC0994B0263A074C003031CA /* InfoGrid.swift in Sources */,
 				DC46BAF526CACCF700E760A6 /* KotlinPublishers+Phoenix.swift in Sources */,
 				DC72CEFF2C9B2B3100C810A8 /* LoginView.swift in Sources */,
 				C8D7ABB189B14D3104ABB50D /* AboutView.swift in Sources */,
 				DCCD045F27EE0301007D57A5 /* SummaryView.swift in Sources */,
 				C8D7AA4B09B32AD99C88BB5E /* DisplayConfigurationView.swift in Sources */,
+				DC4CBC922D677D4F00129BDB /* Details_Outgoing_ChannelClose.swift in Sources */,
 				DCE77A5827C671D600F0FA24 /* ElectrumAddressSheet.swift in Sources */,
 				DC384D81265C12B700131772 /* Cache.swift in Sources */,
 				DC4CF3CC2BE93311003A957F /* String+PIN.swift in Sources */,
@@ -2101,9 +2130,11 @@
 				DC5CA4ED28F83C3B0048A737 /* DrainWalletView.swift in Sources */,
 				DC09FC3F2D5BADB900E6579A /* RestartPopover.swift in Sources */,
 				DC5E288E2C62C3DF0037B3D3 /* NavigationStackDestination.swift in Sources */,
+				DC4CBC8E2D677A0500129BDB /* DetailsInfoGrid+CommonSections.swift in Sources */,
 				DC784A112B31EA180018DC4A /* LiquidityAdsView.swift in Sources */,
 				DC6D26E329E76557006A7814 /* AnimatedClock.swift in Sources */,
 				DC72CEF52C99DCEB00C810A8 /* LnurlFlowErrorNotice.swift in Sources */,
+				DC4CBC8A2D6677A900129BDB /* Details_Incoming_SpliceIn.swift in Sources */,
 				DC5631C52C541E5C00DCB5BF /* Experimental.swift in Sources */,
 				DCF8E3AC2BC4968D009299EE /* LowMinerFeeWarning.swift in Sources */,
 				DC808E9B2D5541F50019AE30 /* UsingTorSheet.swift in Sources */,
@@ -2141,6 +2172,7 @@
 				DCEAE5B92943D64B00320C46 /* MsatRange.swift in Sources */,
 				DC43096E2A7953F400E28995 /* FinalWalletDetails.swift in Sources */,
 				DC74174D270F455D00F7E3E3 /* AES256.swift in Sources */,
+				DC4CBC942D678ED700129BDB /* Details_Outgoing_Lightning.swift in Sources */,
 				C8D7AB09E80CE2B6AE270A97 /* TorConfigurationView.swift in Sources */,
 				DC27E4C42791C58C00C777CC /* PaymentsBackupView.swift in Sources */,
 				DC59377127516297003B4B53 /* Sequence+Sum.swift in Sources */,

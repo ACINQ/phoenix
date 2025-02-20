@@ -1,14 +1,14 @@
 import SwiftUI
 import PhoenixShared
 
-fileprivate let filename = "Details_Incoming_Bolt11"
+fileprivate let filename = "Details_Incoming_SpliceIn"
 #if DEBUG && false
 fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-struct Details_Incoming_Bolt11: DetailsInfoGrid {
+struct Details_Incoming_SpliceIn: DetailsInfoGrid {
 	
 	@Binding var paymentInfo: WalletPaymentInfo
 	@Binding var showOriginalFiatValue: Bool
@@ -50,8 +50,7 @@ struct Details_Incoming_Bolt11: DetailsInfoGrid {
 			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 				section_general()
 				section_timestamps()
-				section_incoming()
-				section_lightningParts(payment)
+				section_onChainIncoming(payment, $showBlockchainExplorerOptions)
 			}
 		}
 		.background(Color.primaryBackground)
@@ -78,7 +77,7 @@ struct Details_Incoming_Bolt11: DetailsInfoGrid {
 		detailsRow(
 			identifier: #function,
 			keyColumnTitle: "Type of payment",
-			valueColumnText: "Incoming Lightning payment (bolt11)"
+			valueColumnText: "Incoming on-chain payment (splice)"
 		)
 	}
 	
@@ -89,43 +88,13 @@ struct Details_Incoming_Bolt11: DetailsInfoGrid {
 			identifier: #function,
 			keyColumnTitle: "Payment status"
 		) {
-			if payment.completedAt == nil {
+			if payment.lockedAt == nil {
 				Text("Pending")
-			} else {
+			} else if payment.lockedAt != nil && payment.completedAt == nil {
 				Text("Successful")
+			} else {
+				Text("Confirmed on-chain")
 			}
-		}
-	}
-	
-	// --------------------------------------------------
-	// MARK: Section: Incoming
-	// --------------------------------------------------
-	
-	@ViewBuilder
-	func section_incoming() -> some View {
-		
-		InlineSection {
-			EmptyView()
-		} content: {
-			incoming_amountReceived()
-			subsection_bolt11Invoice(payment.paymentRequest, preimage: payment.paymentPreimage)
-		}
-	}
-	
-	@ViewBuilder
-	func incoming_amountReceived() -> some View {
-		
-		detailsRow(
-			identifier: #function,
-			keyColumnTitle: "amount received"
-		) {
-			commonValue_amounts(
-				identifier: #function,
-				displayAmounts: displayAmounts(
-					msat: payment.amountReceived,
-					originalFiat: paymentInfo.metadata.originalFiat
-				)
-			)
 		}
 	}
 	
@@ -133,9 +102,9 @@ struct Details_Incoming_Bolt11: DetailsInfoGrid {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
-	var payment: Lightning_kmpBolt11IncomingPayment {
+	var payment: Lightning_kmpSpliceInIncomingPayment {
 		
-		guard let required = paymentInfo.payment as? Lightning_kmpBolt11IncomingPayment else {
+		guard let required = paymentInfo.payment as? Lightning_kmpSpliceInIncomingPayment else {
 			fatalError("Invalid payment type")
 		}
 		return required

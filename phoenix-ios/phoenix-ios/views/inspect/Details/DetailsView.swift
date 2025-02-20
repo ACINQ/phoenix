@@ -127,10 +127,20 @@ struct DetailsView: View {
 		case .onChainIncomingPayment(let onChain):
 			switch onEnum(of: onChain) {
 			case .newChannelIncomingPayment(_):
-				Text("newChannel")
+				Details_Incoming_NewChannel(
+					paymentInfo: $paymentInfo,
+					showOriginalFiatValue: $showOriginalFiatValue,
+					showFiatValueExplanation: $showFiatValueExplanation,
+					switchToPayment: switchToPayment
+				)
 				
 			case .spliceInIncomingPayment(_):
-				Text("spliceIn")
+				Details_Incoming_SpliceIn(
+					paymentInfo: $paymentInfo,
+					showOriginalFiatValue: $showOriginalFiatValue,
+					showFiatValueExplanation: $showFiatValueExplanation,
+					switchToPayment: switchToPayment
+				)
 			}
 			
 		case .legacyPayToOpenIncomingPayment(_):
@@ -142,7 +152,12 @@ struct DetailsView: View {
 			)
 			
 		case .legacySwapInIncomingPayment(_):
-			Text("legacySwapIn")
+			Details_Incoming_LegacySwapIn(
+				paymentInfo: $paymentInfo,
+				showOriginalFiatValue: $showOriginalFiatValue,
+				showFiatValueExplanation: $showFiatValueExplanation,
+				switchToPayment: switchToPayment
+			)
 		}
 	}
 	
@@ -151,7 +166,12 @@ struct DetailsView: View {
 		
 		switch onEnum(of: outgoingPayment) {
 		case .lightningOutgoingPayment(_):
-			Text("lightning")
+			Details_Outgoing_Lightning(
+				paymentInfo: $paymentInfo,
+				showOriginalFiatValue: $showOriginalFiatValue,
+				showFiatValueExplanation: $showFiatValueExplanation,
+				switchToPayment: switchToPayment
+			)
 			
 		case .onChainOutgoingPayment(let onChain):
 			switch onEnum(of: onChain) {
@@ -168,7 +188,12 @@ struct DetailsView: View {
 				Text("manualLiquidityPurchase")
 				
 			case .channelCloseOutgoingPayment(_):
-				Text("channelClose")
+				Details_Outgoing_ChannelClose(
+					paymentInfo: $paymentInfo,
+					showOriginalFiatValue: $showOriginalFiatValue,
+					showFiatValueExplanation: $showFiatValueExplanation,
+					switchToPayment: switchToPayment
+				)
 			}
 		}
 	}

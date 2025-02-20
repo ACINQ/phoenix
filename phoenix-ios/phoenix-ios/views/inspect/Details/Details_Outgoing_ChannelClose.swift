@@ -1,14 +1,14 @@
 import SwiftUI
 import PhoenixShared
 
-fileprivate let filename = "Details_Incoming_Bolt11"
+fileprivate let filename = "Details_Outgoing_ChannelClose"
 #if DEBUG && false
 fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-struct Details_Incoming_Bolt11: DetailsInfoGrid {
+struct Details_Outgoing_ChannelClose: DetailsInfoGrid {
 	
 	@Binding var paymentInfo: WalletPaymentInfo
 	@Binding var showOriginalFiatValue: Bool
@@ -50,8 +50,7 @@ struct Details_Incoming_Bolt11: DetailsInfoGrid {
 			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 				section_general()
 				section_timestamps()
-				section_incoming()
-				section_lightningParts(payment)
+				section_outgoing()
 			}
 		}
 		.background(Color.primaryBackground)
@@ -78,7 +77,7 @@ struct Details_Incoming_Bolt11: DetailsInfoGrid {
 		detailsRow(
 			identifier: #function,
 			keyColumnTitle: "Type of payment",
-			valueColumnText: "Incoming Lightning payment (bolt11)"
+			valueColumnText: "Channel closing"
 		)
 	}
 	
@@ -89,7 +88,7 @@ struct Details_Incoming_Bolt11: DetailsInfoGrid {
 			identifier: #function,
 			keyColumnTitle: "Payment status"
 		) {
-			if payment.completedAt == nil {
+			if payment.confirmedAt == nil {
 				Text("Pending")
 			} else {
 				Text("Successful")
@@ -98,34 +97,68 @@ struct Details_Incoming_Bolt11: DetailsInfoGrid {
 	}
 	
 	// --------------------------------------------------
-	// MARK: Section: Incoming
+	// MARK: Section: Outgoing
 	// --------------------------------------------------
 	
 	@ViewBuilder
-	func section_incoming() -> some View {
+	func section_outgoing() -> some View {
 		
 		InlineSection {
 			EmptyView()
 		} content: {
-			incoming_amountReceived()
-			subsection_bolt11Invoice(payment.paymentRequest, preimage: payment.paymentPreimage)
+			subsection_outgoingAmounts(payment)
+			outgoing_channelId()
+			outgoing_btcAddress()
+			outgoing_btcTxid()
+			outgoing_closingType()
 		}
 	}
 	
 	@ViewBuilder
-	func incoming_amountReceived() -> some View {
+	func outgoing_channelId() -> some View {
 		
 		detailsRow(
 			identifier: #function,
-			keyColumnTitle: "amount received"
+			keyColumnTitle: "Channel id",
+			valueColumnVerbatim: payment.channelId.toHex()
+		)
+	}
+	
+	@ViewBuilder
+	func outgoing_btcAddress() -> some View {
+		
+		detailsRowCopyable(
+			identifier: #function,
+			keyColumnTitle: "Bitcoin address",
+			valueColumnText: payment.address
+		)
+	}
+	
+	@ViewBuilder
+	func outgoing_btcTxid() -> some View {
+		
+		detailsRow(
+			identifier: #function,
+			keyColumnTitle: "Transaction"
 		) {
-			commonValue_amounts(
-				identifier: #function,
-				displayAmounts: displayAmounts(
-					msat: payment.amountReceived,
-					originalFiat: paymentInfo.metadata.originalFiat
-				)
-			)
+			commonValue_btcTxid(payment.txId, $showBlockchainExplorerOptions)
+		}
+	}
+	
+	@ViewBuilder
+	func outgoing_closingType() -> some View {
+		
+		detailsRow(
+			identifier: #function,
+			keyColumnTitle: "Closing type"
+		) {
+			switch payment.closingType {
+				case .mutual  : Text("Mutual")
+				case .local   : Text("Local")
+				case .remote  : Text("Remote")
+				case .revoked : Text("Revoked")
+				case .other   : Text("Other")
+			}
 		}
 	}
 	
@@ -133,9 +166,9 @@ struct Details_Incoming_Bolt11: DetailsInfoGrid {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
-	var payment: Lightning_kmpBolt11IncomingPayment {
+	var payment: Lightning_kmpChannelCloseOutgoingPayment {
 		
-		guard let required = paymentInfo.payment as? Lightning_kmpBolt11IncomingPayment else {
+		guard let required = paymentInfo.payment as? Lightning_kmpChannelCloseOutgoingPayment else {
 			fatalError("Invalid payment type")
 		}
 		return required
