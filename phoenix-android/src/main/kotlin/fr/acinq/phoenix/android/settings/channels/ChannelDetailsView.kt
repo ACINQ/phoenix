@@ -65,7 +65,7 @@ import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.CardHeader
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
-import fr.acinq.phoenix.android.components.Dialog
+import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.InlineButton
 import fr.acinq.phoenix.android.components.ItemCard
 import fr.acinq.phoenix.android.components.PhoenixIcon

@@ -52,7 +52,7 @@ import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.Checkbox
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
-import fr.acinq.phoenix.android.components.Dialog
+import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.openLink
 import fr.acinq.phoenix.android.components.settings.SettingSwitch

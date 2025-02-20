@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.components.dialogs.IconPopup
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.borderColor
 import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode

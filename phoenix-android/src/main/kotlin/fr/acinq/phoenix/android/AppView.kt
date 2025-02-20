@@ -22,6 +22,8 @@ import android.net.Uri
 import android.os.Build
 import android.text.format.DateUtils
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -64,7 +66,7 @@ import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.components.Button
-import fr.acinq.phoenix.android.components.Dialog
+import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.openLink
 import fr.acinq.phoenix.android.components.screenlock.LockPrompt
 import fr.acinq.phoenix.android.home.HomeView
@@ -181,6 +183,8 @@ fun AppView(
                 NavHost(
                     navController = navController,
                     startDestination = "${Screen.Startup.route}?next={next}",
+                    enterTransition = { EnterTransition.None },
+                    exitTransition = { ExitTransition.None },
                 ) {
                     composable(
                         route = "${Screen.Startup.route}?next={next}",
