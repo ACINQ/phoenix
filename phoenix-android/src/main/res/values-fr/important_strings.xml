@@ -291,7 +291,7 @@
     <string name="about_seed_title">Sauvegarde de votre clé</string>
     <string name="about_seed_content">Ce wallet est dit souverain (aussi appelé "self-custodial") : <b>vous seul détenez la clé de 12 mots contrôlant le wallet</b>.\n\nCette clé donne accès aux fonds. Ne la révélez à personne. Faites attention aux arnaques.</string>
     <string name="about_rates_title">Conversion fiduciaire</string>
-    <string name="about_rates_content">La conversion Bitcoin/monnaie fiduciaire est faite par l\'intermédiaire de plateformes tierces :\n\n- Blockchain.info\n- powered by Coindesk.com\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nCes taux de conversion peuvent être imprécis. Vérifiez toujours le montant effectif en Bitcoin avant d\'envoyer un paiement.</string>
+    <string name="about_rates_content">La conversion Bitcoin/monnaie fiduciaire est faite par l\'intermédiaire de plateformes tierces :\n\n- Blockchain.info\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nCes taux de conversion peuvent être imprécis. Vérifiez toujours le montant effectif en Bitcoin avant d\'envoyer un paiement.</string>
 
     <!-- introduction screens -->
 

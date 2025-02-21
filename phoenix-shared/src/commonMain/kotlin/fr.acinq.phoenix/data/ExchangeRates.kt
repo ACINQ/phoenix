@@ -117,49 +117,6 @@ data class CoinbaseResponse(
 }
 
 /**
- * Coindesk example:
- * {
- *   "time":{
- *     "updated":"Oct 21, 2021 19:47:00 UTC",
- *     "updatedISO":"2021-10-21T19:47:00+00:00",
- *     "updateduk":"Oct 21, 2021 at 20:47 BST"
- *   },
- *   "disclaimer":"...",
- *   "bpi":{
- *     "USD":{
- *       "code":"USD",
- *       "rate":"62,980.0572",
- *       "description":"United States Dollar",
- *       "rate_float":62980.0572
- *     },
- *     "ILS":{
- *       "code":"ILS",
- *       "rate":"202,056.4047",
- *       "description":"Israeli New Sheqel",
- *       "rate_float":202056.4047
- *     }
- *   }
- * }
- */
-
-@Serializable
-data class CoinDeskResponse(
-    val time: Time,
-    val bpi: Map<String, Rate>
-) {
-    @Serializable
-    data class Time(
-        val updatedISO: Instant
-    )
-
-    @Serializable
-    data class Rate(
-        @SerialName("rate_float")
-        val rate: Double
-    )
-}
-
-/**
  * Bluelytics example:
  * {
  *   "oficial":{

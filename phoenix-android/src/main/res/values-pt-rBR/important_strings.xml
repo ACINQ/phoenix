@@ -290,7 +290,7 @@
     <string name="about_seed_title">Proteção de sua chave</string>
     <string name="about_seed_content">Essa carteira tem custódia própria: <b>você tem a custódia exclusiva da chave semente de 12 palavras da carteira</b>.\n\nEssa chave dá acesso ao seu dinheiro. Não a revele a ninguém e tome cuidado com phishing.</string>
     <string name="about_rates_title">Taxas de câmbio</string>
-    <string name="about_rates_content">As taxas de câmbio de Bitcoin/fiat são recuperadas de várias APIs de terceiros:\n\n- Blockchain.info\n- powered by Coindesk.com\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nEssas taxas podem não ser precisas. Sempre verifique o valor real do Bitcoin antes de enviar um pagamento.</string>
+    <string name="about_rates_content">As taxas de câmbio de Bitcoin/fiat são recuperadas de várias APIs de terceiros:\n\n- Blockchain.info\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nEssas taxas podem não ser precisas. Sempre verifique o valor real do Bitcoin antes de enviar um pagamento.</string>
 
     <!-- introduction screens -->
 

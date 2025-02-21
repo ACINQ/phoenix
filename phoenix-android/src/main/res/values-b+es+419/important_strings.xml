@@ -288,7 +288,7 @@
     <string name="about_seed_title">Protección de la clave</string>
     <string name="about_seed_content">Esta billetera es autocustodiada, es decir que <b>tienes la custodia exclusiva de la clave semilla de la billetera, compuesta por 12 palabras</b>.\n\nEsta clave te da acceso a tu dinero. No se la reveles a nadie y ten cuidado con el phishing.</string>
     <string name="about_rates_title">Tasas de cambio</string>
-    <string name="about_rates_content">Las tasas de cambio entre Bitcoin y dinero fíat se obtienen de varias API de terceros:\n\n- Blockchain.info\n- Coindesk.com\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nEs posible que las tasas no sean exactas. Comprueba siempre la cantidad real de Bitcoin antes de enviar un pago.</string>
+    <string name="about_rates_content">Las tasas de cambio entre Bitcoin y dinero fíat se obtienen de varias API de terceros:\n\n- Blockchain.info\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nEs posible que las tasas no sean exactas. Comprueba siempre la cantidad real de Bitcoin antes de enviar un pago.</string>
 
     <!-- introduction screens -->
 

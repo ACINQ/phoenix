@@ -291,7 +291,7 @@
     <string name="about_seed_title">Proteja sus semillas</string>
     <string name="about_seed_content">Esta cartera es de autocustodia: <b>usted tiene la custodia exclusiva de la clave de 12 palabras de la semilla</b>.\n\nEsta clave le da acceso a su dinero. No la reveles a nadie y ten cuidado con el phishing.</string>
     <string name="about_rates_title">Tipos de cambio</string>
-    <string name="about_rates_content">Los tipos de cambio Bitcoin/fiat se obtienen de varias API de terceros:\n\n- Blockchain.info\n- powered by Coindesk.com\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nEstas tarifas pueden no ser exactas. Comprueba siempre la cantidad real de Bitcoin antes de enviar un pago.</string>
+    <string name="about_rates_content">Los tipos de cambio Bitcoin/fiat se obtienen de varias API de terceros:\n\n- Blockchain.info\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nEstas tarifas pueden no ser exactas. Comprueba siempre la cantidad real de Bitcoin antes de enviar un pago.</string>
 
     <!-- introduction screens -->
 

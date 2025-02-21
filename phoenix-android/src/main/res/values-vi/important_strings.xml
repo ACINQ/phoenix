@@ -297,7 +297,7 @@
     <string name="about_seed_title">Bảo vệ khóa của bạn</string>
     <string name="about_seed_content">Ví này có tính năng tự quản: <b>Chỉ bạn mới có toàn quyền quản lý khóa hạt giống gồm 12 từ khôi phục của ví</b>.\n\nKhóa này cho phép truy cập vào tiền của bạn. Không tiết lộ nó cho bất cứ ai và hãy cẩn trọng với các hành vi lừa đảo.</string>
     <string name="about_rates_title">Tỷ giá hối đoái</string>
-    <string name="about_rates_content">Tỷ giá hối đoái giữa bitcoin và tiền pháp định được lấy từ các nguồn thứ ba:\n\n- Blockchain.info\n- powered by Coindesk.com\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nCác tỷ giá này có thể không chính xác. Luôn kiểm tra số lượng Bitcoin thực trước khi gửi tiền thanh toán.</string>
+    <string name="about_rates_content">Tỷ giá hối đoái giữa bitcoin và tiền pháp định được lấy từ các nguồn thứ ba:\n\n- Blockchain.info\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nCác tỷ giá này có thể không chính xác. Luôn kiểm tra số lượng Bitcoin thực trước khi gửi tiền thanh toán.</string>
 
     <!-- introduction screens -->
 

@@ -290,7 +290,7 @@
     <string name="about_seed_title">Zabezpečenie kľúča</string>
     <string name="about_seed_content">Túto peňaženku si spravujete sami (self-custody): <b>Iba vy ste zodpovední za správu 12-slovnej obnovovacej frázy (seedu)</b>.\n\nTento kľúč umožňuje prístup k vašim prostriedkom. Nikomu ho neprezraďte a dávajte si pozor na phishing.</string>
     <string name="about_rates_title">Výmenné kurzy</string>
-    <string name="about_rates_content">Výmenné kurzy bitcoin/fiat sú získavané z rôznych API tretích strán:\n\n- Blockchain.info\n- powered by Coindesk.com\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nTieto kurzy nemusia byť presné. Vždy skontrolujte skutočnú sumu v bitcoinoch pred odoslaním platby.</string>
+    <string name="about_rates_content">Výmenné kurzy bitcoin/fiat sú získavané z rôznych API tretích strán:\n\n- Blockchain.info\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nTieto kurzy nemusia byť presné. Vždy skontrolujte skutočnú sumu v bitcoinoch pred odoslaním platby.</string>
 
     <!-- introduction screens -->
 

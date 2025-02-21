@@ -287,7 +287,7 @@
     <string name="about_seed_title">Sicherung Ihres Schlüssels</string>
     <string name="about_seed_content">Diese Wallet ist self-custodial: <b>Sie haben die alleinige Verfügungsgewalt über den 12 Wörter umfassenden Seed-Schlüssel der Wallet</b>.\n\nMit diesem Schlüssel haben Sie Zugang zu Ihrem Guthaben. Geben Sie ihn niemandem weiter und schützen Sie sich vor Phishing.</string>
     <string name="about_rates_title">Wechselkurse</string>
-    <string name="about_rates_content">Bitcoin/Fiat-Wechselkurse werden von verschiedenen Drittanbieter-APIs abgerufen:\n\n- Blockchain.info\n- powered by Coindesk.com\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nDiese Kurse sind möglicherweise nicht ganz korrekt. Überprüfen Sie immer den tatsächlichen Bitcoin-Betrag, bevor Sie eine Zahlung senden.</string>
+    <string name="about_rates_content">Bitcoin/Fiat-Wechselkurse werden von verschiedenen Drittanbieter-APIs abgerufen:\n\n- Blockchain.info\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nDiese Kurse sind möglicherweise nicht ganz korrekt. Überprüfen Sie immer den tatsächlichen Bitcoin-Betrag, bevor Sie eine Zahlung senden.</string>
 
     <!-- introduction screens -->
 

@@ -293,7 +293,7 @@
   <string name="about_seed_title">Kulinda ufunguo wako</string>
   <string name="about_seed_content">Pochi hii ni ya kujisimamia: <b>wewe una mamlaka kamili ya mbegu ya maneno 12 ya pochi</b>.\n\nMbegu hii inatoa ufikiaji wa fedha zako. Usifunue kwa mtu yeyote, na jihadhari na ulaghai.</string>
   <string name="about_rates_title">Viwango vya kubadilisha fedha</string>
-  <string name="about_rates_content">Viwango vya kubadilisha Bitcoin/fiat vinapatikana kutoka kwenye API za wahusika wengine mbalimbali:\n\n- Blockchain.info\n- powered by Coindesk.com\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nViwango hivyo vinaweza kuwa si sahihi. Daima hakikisha kiasi halisi cha Bitcoin kabla ya kutuma malipo.</string>
+  <string name="about_rates_content">Viwango vya kubadilisha Bitcoin/fiat vinapatikana kutoka kwenye API za wahusika wengine mbalimbali:\n\n- Blockchain.info\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nViwango hivyo vinaweza kuwa si sahihi. Daima hakikisha kiasi halisi cha Bitcoin kabla ya kutuma malipo.</string>
 
   <!-- introduction screens -->
 
