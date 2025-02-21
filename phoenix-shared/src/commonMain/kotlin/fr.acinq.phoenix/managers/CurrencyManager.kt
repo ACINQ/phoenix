@@ -73,6 +73,16 @@ class CurrencyManager(
         FiatCurrency.LBP_BM  // Lebanese Pound (black market)
     )
 
+    private val missingFromCoinbase = setOf(
+        FiatCurrency.CUP, // Cuban Peso
+        FiatCurrency.ERN, // Eritrean Nakfa (exists in response, but refers to ERN altcoin)
+        FiatCurrency.IRR, // Iranian Rial
+        FiatCurrency.KPW, // North Korean Won
+        FiatCurrency.SDG, // Sudanese Pound
+        FiatCurrency.SOS, // Somali Shilling
+        FiatCurrency.SYP  // Syrian Pound
+    )
+
     /**
      * We use a number of different APIs to fetch all the data we need.
      * This interface defines the shared format for each API.
@@ -118,7 +128,8 @@ class CurrencyManager(
         override val refreshDelay = 60.minutes
         override val fiatCurrencies = FiatCurrency.values.filter {
             !highLiquidityMarkets.contains(it) &&
-            !specialMarkets.contains(it)
+            !specialMarkets.contains(it) &&
+            !missingFromCoinbase.contains(it)
         }.toSet()
     }
 
@@ -270,6 +281,26 @@ class CurrencyManager(
     private fun stopAutoRefresh() = launch {
         autoRefreshJob?.cancelAndJoin()
         autoRefreshJob = null
+    }
+
+    fun refreshAll(targets: List<FiatCurrency>, force: Boolean = true) = launch {
+        stopAutoRefresh().join()
+        val targetSet = prepTargets(targets)
+
+        val deferred1 = async {
+            refresh(targetSet, blockchainInfoAPI, forceRefresh = force)
+        }
+        val deferred2 = async {
+            refresh(targetSet, coinbaseAPI, forceRefresh = force)
+        }
+        val deferred3 = async {
+            refresh(targetSet, bluelyticsAPI, forceRefresh = force)
+        }
+        val deferred4 = async {
+            refresh(targetSet, yadioAPI, forceRefresh = force)
+        }
+        listOf(deferred1, deferred2, deferred3, deferred4).awaitAll()
+        maybeStartAutoRefresh()
     }
 
     private fun launchAutoRefreshJob() = launch {
