@@ -332,6 +332,8 @@ fun EvaluateLiquidityIssuesForPayment(
     val canRequestLiquidity = remember(channelsMap) { channelsMap.canRequestLiquidity() }
     val availableForReceive = remember(channelsMap) { channelsMap.availableForReceive() }
 
+    // TODO: add a delay before evaluating liquidity to make sure we have all data necessary before displaying a warning, in order to avoid the dialog being displayed too eagerly with some flickering
+
     val mempoolFeerate by business.appConfigurationManager.mempoolFeerate.collectAsState()
     val swapFee = remember(mempoolFeerate, amount) { mempoolFeerate?.payToOpenEstimationFee(amount = amount ?: 0.msat, hasNoChannels = channelsMap?.values?.filterNot { it.isTerminated }.isNullOrEmpty()) }
 
