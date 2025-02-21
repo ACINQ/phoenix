@@ -163,24 +163,9 @@ fileprivate struct ChannelInfoPopup_Summary: InfoGridView, ViewName {
 	@Binding var sharing: String?
 	
 	// <InfoGridView Protocol>
+	@StateObject var infoGridState = InfoGridState()
 	let minKeyColumnWidth: CGFloat = 50
 	let maxKeyColumnWidth: CGFloat = 150 // 200
-	
-	@State var keyColumnSizes: [InfoGridRow_KeyColumn_Size] = []
-	func setKeyColumnSizes(_ sizes: [InfoGridRow_KeyColumn_Size]) {
-		keyColumnSizes = sizes
-	}
-	func getKeyColumnSizes() -> [InfoGridRow_KeyColumn_Size] {
-		return keyColumnSizes
-	}
-	
-	@State var rowSizes: [InfoGridRow_Size] = []
-	func setRowSizes(_ sizes: [InfoGridRow_Size]) {
-		rowSizes = sizes
-	}
-	func getRowSizes() -> [InfoGridRow_Size] {
-		return rowSizes
-	}
 	// </InfoGridView Protocol>
 	
 	@State var showBlockchainExplorerOptions = false

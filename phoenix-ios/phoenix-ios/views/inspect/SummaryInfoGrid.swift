@@ -11,32 +11,10 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture discussion
 	
 	@Binding var paymentInfo: WalletPaymentInfo
-	@Binding var relatedPaymentIds: [Lightning_kmpUUID]
 	@Binding var showOriginalFiatValue: Bool
 	
 	let showContactView: (_ contact: ContactInfo) -> Void
 	let switchToPayment: (_ paymentId: Lightning_kmpUUID) -> Void
-	
-	// <InfoGridView Protocol>
-	let minKeyColumnWidth: CGFloat = 50
-	let maxKeyColumnWidth: CGFloat = 200
-	
-	@State var keyColumnSizes: [InfoGridRow_KeyColumn_Size] = []
-	func setKeyColumnSizes(_ value: [InfoGridRow_KeyColumn_Size]) {
-		keyColumnSizes = value
-	}
-	func getKeyColumnSizes() -> [InfoGridRow_KeyColumn_Size] {
-		return keyColumnSizes
-	}
-	
-	@State var rowSizes: [InfoGridRow_Size] = []
-	func setRowSizes(_ sizes: [InfoGridRow_Size]) {
-		rowSizes = sizes
-	}
-	func getRowSizes() -> [InfoGridRow_Size] {
-		return rowSizes
-	}
-	// </InfoGridView Protocol>
 	
 	private let verticalSpacingBetweenRows: CGFloat = 12
 	private let horizontalSpacingBetweenColumns: CGFloat = 8
@@ -45,6 +23,12 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 	@State var popoverPresent_minerFees = false
 	@State var popoverPresent_serviceFees = false
 	@State var popoverPresent_liquidityCause = false
+	
+	// <InfoGridView Protocol>
+	@StateObject var infoGridState = InfoGridState()
+	let minKeyColumnWidth: CGFloat = 50
+	let maxKeyColumnWidth: CGFloat = 200
+	// </InfoGridView Protocol>
 	
 	@Environment(\.openURL) var openURL
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
@@ -77,11 +61,6 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 			paymentFeesRow_StandardFees()
 			paymentFeesRow_MinerFees()
 			paymentFeesRow_ServiceFees()
-			
-			causedByRow()
-			
-			// How do we detect leased liquidity now ?
-		//	paymentDurationRow()
 			
 			paymentErrorRow()
 		}
@@ -591,77 +570,6 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 			} // </HStack>
 			
 		} // </InfoGridRow>
-	}
-	
-	@ViewBuilder
-	func paymentDurationRow() -> some View {
-		let identifier: String = #function
-		
-		if let _ = paymentInfo.payment as? Lightning_kmpManualLiquidityPurchasePayment {
-			
-			InfoGridRow(
-				identifier: identifier,
-				vAlignment: .firstTextBaseline,
-				hSpacing: horizontalSpacingBetweenColumns,
-				keyColumnWidth: keyColumnWidth(identifier: identifier),
-				keyColumnAlignment: .trailing
-			) {
-				
-				keyColumn("Duration")
-				
-			} valueColumn: {
-				
-				Text("1 year")
-				
-			} // </InfoGridRow>
-		}
-	}
-	
-	@ViewBuilder
-	func causedByRow() -> some View {
-		let identifier: String = #function
-		
-		if let paymentId = relatedPaymentIds.first {
-			
-			InfoGridRow(
-				identifier: identifier,
-				vAlignment: .firstTextBaseline,
-				hSpacing: horizontalSpacingBetweenColumns,
-				keyColumnWidth: keyColumnWidth(identifier: identifier),
-				keyColumnAlignment: .trailing
-			) {
-				
-				keyColumn("Caused by")
-				
-			} valueColumn: {
-				
-				HStack(alignment: VerticalAlignment.center, spacing: 6) {
-					
-					Button {
-						switchToPayment(paymentId)
-					} label: {
-						Text(verbatim: "\(paymentId.description().prefix(maxLength: 8))…")
-							.lineLimit(1)
-							.truncationMode(.middle)
-					}
-					
-					Button {
-						popoverPresent_liquidityCause.toggle()
-					} label: {
-						Image(systemName: "questionmark.circle")
-							.renderingMode(.template)
-							.foregroundColor(.secondary)
-							.font(.body)
-					}
-					.popover(present: $popoverPresent_liquidityCause) {
-						InfoPopoverWindow {
-							Text("This liquidity was required to receive a payment")
-						}
-					}
-				}
-				
-			} // </InfoGridRow>
-		}
 	}
 	
 	@ViewBuilder
