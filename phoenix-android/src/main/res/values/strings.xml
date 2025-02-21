@@ -444,7 +444,7 @@
     <string name="paymentdetails_type_outgoing_close">Channel closing</string>
     <string name="paymentdetails_type_incoming_onchain_splice">Incoming on-chain payment (splice)</string>
     <string name="paymentdetails_type_incoming_onchain_newchannel">Incoming on-chain payment (new channel)</string>
-    <string name="paymentdetails_type_incoming_legacy_paytoopen">Incoming payment (legacy pay-to-open)</string>
+    <string name="paymentdetails_type_incoming_legacy_paytopen">Incoming payment (legacy pay-to-open)</string>
     <string name="paymentdetails_type_incoming_legacy_swapin">Incoming on-chain payment (legacy swap-in)</string>
     <string name="paymentdetails_type_incoming_bolt11">Incoming Lightning payment (bolt11)</string>
     <string name="paymentdetails_type_incoming_bolt12">Incoming Lightning payment (bolt12)</string>
