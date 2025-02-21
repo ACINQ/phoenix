@@ -48,27 +48,20 @@ import SwiftUI
 // - This triggers InfoGrid.onPreferenceChange(InfoGrid_KeyColumn_MeasuredWidth.self)
 // - Which triggers a second layout pass
 
+class InfoGridState: ObservableObject {
+	@Published var keyColumnSizes: [InfoGridRow_KeyColumn_Size] = []
+	@Published var rowSizes: [InfoGridRow_Size] = []
+}
 
 protocol InfoGridView: View {
 	
 	// Add this to your implementation:
-	// @State var keyColumnSizes: [InfoGridRow_KeyColumn_Size] = []
+	// @StateObject var infoGridState = InfoGridState()
 	//
-	// And then implement these methods to get/set the @State property.
-	//
-	func setKeyColumnSizes(_ value: [InfoGridRow_KeyColumn_Size]) -> Void
-	func getKeyColumnSizes() -> [InfoGridRow_KeyColumn_Size]
+	var infoGridState: InfoGridState { get }
 	
 	var minKeyColumnWidth: CGFloat { get }
 	var maxKeyColumnWidth: CGFloat { get }
-	
-	// Add this to your implementation:
-	// @State var rowSizes: [InfoGridRow_Size] = []
-	//
-	// And then implement these methods to get/set the @State property.
-	//
-	func setRowSizes(_ value: [InfoGridRow_Size]) -> Void
-	func getRowSizes() -> [InfoGridRow_Size]
 	
 	// Do not override these.
 	// They have a default implementation which is correct.
@@ -86,12 +79,12 @@ extension InfoGridView {
 	
 	func rowSize(identifier: String) -> CGSize? {
 		
-		return getRowSizes().first { $0.identifier == identifier }?.size
+		return infoGridState.rowSizes.first { $0.identifier == identifier }?.size
 	}
 	
 	func keyColumnSize(identifier: String) -> CGSize? {
 		
-		return getKeyColumnSizes().first { $0.identifier == identifier }?.size
+		return infoGridState.keyColumnSizes.first { $0.identifier == identifier }?.size
 	}
 	
 	func keyColumnWidth(identifier: String) -> CGFloat {
@@ -114,7 +107,7 @@ extension InfoGridView {
 		// So during the first rendering pass, we need to ensure
 		// that the proposed size.width is big enough to achieve our goals.
 		
-		let values = getKeyColumnSizes()
+		let values = infoGridState.keyColumnSizes
 		
 		// If we recently added a new row, then it's identifier won't be in the list.
 		// In this case, we must not use the calculated value, since it might be too small.
@@ -134,10 +127,10 @@ extension InfoGridView {
 		
 		infoGridRows
 			.onPreferenceChange(InfoGridRow_KeyColumn_MeasuredSize.self) {(sizes: [InfoGridRow_KeyColumn_Size]) in
-				setKeyColumnSizes(sizes)
+				infoGridState.keyColumnSizes = sizes
 			}
 			.onPreferenceChange(InfoGridRow_MeasuredSize.self) {(sizes: [InfoGridRow_Size]) in
-				setRowSizes(sizes)
+				infoGridState.rowSizes = sizes
 			}
 	}
 }
