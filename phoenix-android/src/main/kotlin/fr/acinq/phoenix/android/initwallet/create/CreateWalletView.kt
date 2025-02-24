@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 ACINQ SAS
+ * Copyright 2025 ACINQ SAS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.init
+package fr.acinq.phoenix.android.initwallet.create
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,15 +29,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.Lightning
 import fr.acinq.phoenix.android.CF
+import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.mvi.MVIView
-import fr.acinq.phoenix.android.controllerFactory
+import fr.acinq.phoenix.android.initwallet.InitViewModel
+import fr.acinq.phoenix.android.initwallet.WritingSeedState
 import fr.acinq.phoenix.android.security.SeedFileState
 import fr.acinq.phoenix.android.security.SeedManager
+import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.controllers.init.Initialization
 import fr.acinq.phoenix.utils.MnemonicLanguage
@@ -50,7 +56,7 @@ fun CreateWalletView(
     val log = logger("CreateWallet")
     val context = LocalContext.current
 
-    val vm: InitViewModel = viewModel(factory = InitViewModel.Factory(controllerFactory, CF::initialization))
+    val vm = viewModel<CreateWalletViewModel>(factory = CreateWalletViewModel.Factory())
 
     val seedFileState = produceState<SeedFileState>(initialValue = SeedFileState.Unknown, true) {
         value = SeedManager.getSeedState(context)
@@ -63,7 +69,7 @@ fun CreateWalletView(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        when (seedFileState.value) {
+        when (val state = seedFileState.value) {
             is SeedFileState.Absent -> {
                 Text(stringResource(id = R.string.autocreate_generating))
                 MVIView(CF::initialization) { model, postIntent ->
@@ -80,7 +86,10 @@ fun CreateWalletView(
                             if (writingState is WritingSeedState.Error) {
                                 ErrorMessage(
                                     header = stringResource(id = R.string.autocreate_error),
-                                    details = writingState.e.localizedMessage ?: writingState.e::class.java.simpleName,
+                                    details = when (writingState) {
+                                        is WritingSeedState.Error.Generic -> writingState.cause.localizedMessage ?: writingState.cause::class.java.simpleName
+                                        is WritingSeedState.Error.SeedAlreadyExist -> stringResource(R.string.autocreate_error_cannot_overwrite)
+                                    },
                                     alignment = Alignment.CenterHorizontally,
                                 )
                             }
@@ -96,11 +105,21 @@ fun CreateWalletView(
             }
             else -> {
                 // we should not be here
-                Text(stringResource(id = R.string.startup_wait))
                 LaunchedEffect(true) {
                     onSeedWritten()
                 }
             }
+        }
+    }
+}
+
+class CreateWalletViewModel(override val internalDataRepository: InternalDataRepository) : InitViewModel() {
+
+    class Factory : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
+            val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as? PhoenixApplication)
+            @Suppress("UNCHECKED_CAST")
+            return CreateWalletViewModel(application.internalDataRepository) as T
         }
     }
 }
