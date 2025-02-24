@@ -1105,6 +1105,15 @@ struct LightningDualView: View {
 		}
 	}
 	
+	func didCopyLink() {
+		log.trace("didCopyLink()")
+		
+		toast.pop(
+			NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
+			colorScheme: colorScheme.opposite
+		)
+	}
+	
 	// --------------------------------------------------
 	// MARK: Utilities
 	// --------------------------------------------------
@@ -1196,6 +1205,10 @@ struct LightningDualView: View {
 					nfcErrorMessage = nil
 					handleScannedUri(scannedUri)
 					
+				} else if let scannedText {
+					nfcErrorMessage = nil
+					handleScannedText(scannedText)
+					
 				} else {
 					nfcErrorMessage = String(localized: "No URI detected in NFC tag")
 				}
@@ -1206,11 +1219,7 @@ struct LightningDualView: View {
 	func handleScannedUri(_ scannedUri: URL) {
 		log.trace("handleScannedUri(\(scannedUri.absoluteString))")
 		
-		nfcParsing = true
-		nfcParseIndex += 1
-		let index = nfcParseIndex
-		
-		var request = scannedUri.absoluteString
+		var v2Request: String? = nil
 		var cardParams = ""
 		if var comps = URLComponents(url: scannedUri, resolvingAgainstBaseURL: false) {
 			var queryItems = comps.queryItems ?? []
@@ -1226,12 +1235,52 @@ struct LightningDualView: View {
 				cardParams = comps.percentEncodedQuery ?? ""
 				
 				if v2Value.isValidEmailAddress() {
-					request = "₿\(v2Value)"
+					v2Request = "₿\(v2Value)"
 				} else {
-					request = v2Value
+					v2Request = v2Value
 				}
 			}
 		}
+		
+		if let v2Request {
+			handleV2(v2Request, cardParams)
+		} else {
+			handleV1(scannedUri, cardParams)
+		}
+	}
+	
+	func handleScannedText(_ scannedText: String) {
+		log.trace("handleScannedText(\(scannedText))")
+		
+		var request: String
+		var cardParams: String
+		
+		let comps = scannedText.split(separator: "?", maxSplits: 1, omittingEmptySubsequences: true)
+		if comps.count == 2 {
+			request = String(comps[0])
+			cardParams = String(comps[1])
+		} else {
+			request = scannedText
+			cardParams = ""
+		}
+		
+		if request.isValidEmailAddress() && !request.starts(with: "₿") {
+			request = "₿\(request)"
+		}
+		
+		handleV2(request, cardParams)
+	}
+	
+	// --------------------------------------------------
+	// MARK: Card Payment: V1
+	// --------------------------------------------------
+	
+	func handleV1(_ uri: URL, _ cardParams: String) {
+		log.trace("handleV1(\(uri.absoluteString), \(cardParams)")
+		
+		nfcParsing = true
+		nfcParseIndex += 1
+		let index = nfcParseIndex
 		
 		Task { @MainActor in
 			do {
@@ -1239,59 +1288,45 @@ struct LightningDualView: View {
 					if index == nfcParseIndex {
 						nfcParseProgress = progress
 					} else {
-						log.warning("handleScannedUri: progressHandler: ignoring: cancelled")
+						log.warning("handleV1: progressHandler: ignoring: cancelled")
 					}
 				}
 				
 				let result: SendManager.ParseResult = try await Biz.business.sendManager.parse(
-					request: request,
+					request: uri.absoluteString,
 					progress: progressHandler
 				)
 				
 				if index == nfcParseIndex {
 					nfcParsing = false
 					nfcParseProgress = nil
-					handleParseResult(result, cardParams)
+					handleV1_ParseResult(result, cardParams)
 				} else {
-					log.info("handleScannedUri: result: ignoring: cancelled")
+					log.info("handleV1: result: ignoring: cancelled")
 				}
 				
 			} catch {
-				log.error("handleScannedUri: error: \(error)")
+				log.error("handleV1: error: \(error)")
 				
 				if index == nfcParseIndex {
 					nfcParsing = false
 					nfcParseProgress = nil
 					nfcErrorMessage = String(localized: "Could not communicate with card's wallet")
 				} else {
-					log.info("handleScannedUri: error: ignoring: cancelled")
+					log.info("handleV1: error: ignoring: cancelled")
 				}
 			}
 			
 		} // </Task>
 	}
 	
-	func handleScannedText(_ scannedText: String) {
-		log.trace("handleScannedText(\(scannedText))")
+	func handleV1_ParseResult(_ result: SendManager.ParseResult, _ cardParams: String) {
+		log.trace("handleV1_ParseResult()")
 		
-		// Todo...
-	}
-	
-	func handleParseResult(_ result: SendManager.ParseResult, _ cardParams: String) {
-		log.trace("handleParseResult()")
-		
-		if let lnurlWResult = result as? SendManager.ParseResult_Lnurl_Withdraw {
-			handleParseResult_Lnurl_Withdraw(lnurlWResult)
-		} else if let bolt12Offer = result as? SendManager.ParseResult_Bolt12Offer {
-			handleParseResult_Bolt12Offer(bolt12Offer, cardParams)
-		}
-		else {
+		guard let lnurlWResult = result as? SendManager.ParseResult_Lnurl_Withdraw else {
 			handleParseError(result)
+			return
 		}
-	}
-	
-	func handleParseResult_Lnurl_Withdraw(_ result: SendManager.ParseResult_Lnurl_Withdraw) {
-		log.trace("handleParseResult_Lnurl_Withdraw()")
 		
 		guard let model = mvi.model as? Receive.Model_Generated else {
 			return
@@ -1303,17 +1338,16 @@ struct LightningDualView: View {
 		
 		Task { @MainActor in
 			do {
-				
 				let err: SendManager.LnurlWithdrawError? =
 					try await Biz.business.sendManager.lnurlWithdraw_sendInvoice(
-						lnurlWithdraw: result.lnurlWithdraw,
+						lnurlWithdraw: lnurlWResult.lnurlWithdraw,
 						invoice: model.invoice
 					)
 				
 				if index == nfcRequestIndex {
 					nfcRequesting = false
 					if let remoteErr = err as? SendManager.LnurlWithdrawErrorRemoteError {
-						handleRequestError(remoteErr)
+						handleV1_RequestError(remoteErr)
 					} else {
 						nfcReceiving = true
 					}
@@ -1326,7 +1360,7 @@ struct LightningDualView: View {
 				
 				if index == nfcRequestIndex {
 					nfcRequesting = false
-					nfcErrorMessage = String(localized: "Cound not communicate with card's wallet")
+					nfcErrorMessage = String(localized: "Cound not communicate with card's host")
 				} else {
 					log.error("handleParseResult_Lnurl_Withdraw: error: ignoring: cancelled")
 				}
@@ -1334,8 +1368,100 @@ struct LightningDualView: View {
 		} // </Task>
 	}
 	
-	func handleParseResult_Bolt12Offer(_ result: SendManager.ParseResult_Bolt12Offer, _ cardParams: String) {
-		log.trace("handleParseResult_Bolt12Offer()")
+	func handleV1_RequestError(_ result: SendManager.LnurlWithdrawErrorRemoteError) {
+		log.trace("handleV1_RequestError()")
+		
+		let remoteFailure = result.err
+		switch remoteFailure {
+		
+		case is LnurlError.RemoteFailure_CouldNotConnect:
+			nfcErrorMessage = String(
+				localized: "Could not connect to card's host",
+				comment: "Error message - processing bolt card payment"
+			)
+			
+		case is LnurlError.RemoteFailure_Unreadable:
+			nfcErrorMessage = String(
+				localized: "Unreadable response from card's host",
+				comment: "Error message - processing bolt card payment"
+			)
+			
+		case let rfDetailed as LnurlError.RemoteFailure_Detailed:
+			nfcErrorMessage = String(
+				localized: "The card's host returned error message: \(rfDetailed.reason)",
+				comment: "Error message - processing bolt card payment"
+			)
+			
+		case let rfCode as LnurlError.RemoteFailure_Code:
+			nfcErrorMessage = String(
+				localized: "The card's host returned error code: \(rfCode.code.value)",
+				comment: "Error message - processing bolt card payment"
+			)
+			
+		default:
+			nfcErrorMessage = String(
+				localized: "Could not communicate with card's host",
+				comment: "Error message - scanning lightning invoice"
+			)
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Card Payment: V2
+	// --------------------------------------------------
+	
+	func handleV2(_ address: String, _ cardParams: String) {
+		log.trace("handleV2(\(address), \(cardParams)")
+		
+		nfcParsing = true
+		nfcParseIndex += 1
+		let index = nfcParseIndex
+		
+		Task { @MainActor in
+			do {
+				let progressHandler = {(progress: SendManager.ParseProgress) -> Void in
+					if index == nfcParseIndex {
+						nfcParseProgress = progress
+					} else {
+						log.warning("handleV2: progressHandler: ignoring: cancelled")
+					}
+				}
+				
+				let result: SendManager.ParseResult = try await Biz.business.sendManager.parse(
+					request: address,
+					progress: progressHandler
+				)
+				
+				if index == nfcParseIndex {
+					nfcParsing = false
+					nfcParseProgress = nil
+					handleV2_ParseResult(result, cardParams)
+				} else {
+					log.info("handleV2: result: ignoring: cancelled")
+				}
+				
+			} catch {
+				log.error("handleV2: error: \(error)")
+				
+				if index == nfcParseIndex {
+					nfcParsing = false
+					nfcParseProgress = nil
+					nfcErrorMessage = String(localized: "Could not communicate with card's wallet")
+				} else {
+					log.info("handleV2: error: ignoring: cancelled")
+				}
+			}
+			
+		} // </Task>
+	}
+	
+	func handleV2_ParseResult(_ result: SendManager.ParseResult, _ cardParams: String) {
+		log.trace("handleV2_ParseResult()")
+		
+		guard let bolt12Offer = result as? SendManager.ParseResult_Bolt12Offer else {
+			handleParseError(result)
+			return
+		}
 		
 		guard
 			let model = mvi.model as? Receive.Model_Generated,
@@ -1353,7 +1479,7 @@ struct LightningDualView: View {
 			do {
 				try await peer.requestCardPayment(
 					amount: msat,
-					cardHolderOffer: result.offer,
+					cardHolderOffer: bolt12Offer.offer,
 					cardParams: cardParams
 				)
 				
@@ -1361,21 +1487,25 @@ struct LightningDualView: View {
 					nfcRequesting = false
 					nfcReceiving = true
 				} else {
-					log.info("handleParseResult_Bolt12Offer: result: ignoring: cancelled")
+					log.info("handleV2_ParseResult: result: ignoring: cancelled")
 				}
 				
 			} catch {
-				log.error("handleParseResult_Bolt12Offer: error: \(error)")
+				log.error("handleV2_ParseResult: error: \(error)")
 				
 				if index == nfcRequestIndex {
 					nfcRequesting = false
-					nfcErrorMessage = String(localized: "Cound not communicate with card's wallet")
+					nfcErrorMessage = String(localized: "Cound not communicate with card's host")
 				} else {
-					log.error("handleParseResult_Bolt12Offer: error: ignoring: cancelled")
+					log.error("handleV2_ParseResult: error: ignoring: cancelled")
 				}
 			}
 		} // </Task>
 	}
+	
+	// --------------------------------------------------
+	// MARK: Card Payment: Errors
+	// --------------------------------------------------
 	
 	func handleParseError(_ result: SendManager.ParseResult) {
 		log.trace("handleParseError()")
@@ -1412,52 +1542,5 @@ struct LightningDualView: View {
 		} else {
 			nfcErrorMessage = msg
 		}
-	}
-	
-	func handleRequestError(_ result: SendManager.LnurlWithdrawErrorRemoteError) {
-		log.trace("handleRequestError()")
-		
-		let remoteFailure = result.err
-		switch remoteFailure {
-		
-		case is LnurlError.RemoteFailure_CouldNotConnect:
-			nfcErrorMessage = String(
-				localized: "Could not connect to card's host",
-				comment: "Error message - processing bolt card payment"
-			)
-			
-		case is LnurlError.RemoteFailure_Unreadable:
-			nfcErrorMessage = String(
-				localized: "Unreadable response from card's host",
-				comment: "Error message - processing bolt card payment"
-			)
-			
-		case let rfDetailed as LnurlError.RemoteFailure_Detailed:
-			nfcErrorMessage = String(
-				localized: "The card's host returned error message: \(rfDetailed.reason)",
-				comment: "Error message - processing bolt card payment"
-			)
-			
-		case let rfCode as LnurlError.RemoteFailure_Code:
-			nfcErrorMessage = String(
-				localized: "The card's host returned error code: \(rfCode.code.value)",
-				comment: "Error message - processing bolt card payment"
-			)
-			
-		default:
-			nfcErrorMessage = String(
-				localized: "Could not communicate with card's wallet",
-				comment: "Error message - scanning lightning invoice"
-			)
-		}
-	}
-	
-	func didCopyLink() {
-		log.trace("didCopyLink()")
-		
-		toast.pop(
-			NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
-			colorScheme: colorScheme.opposite
-		)
 	}
 }

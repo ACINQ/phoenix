@@ -41,6 +41,36 @@ enum BoltCardInput: Codable {
 			return .V2
 		}
 	}
+	
+	func toTemplate() -> Ndef.Template {
+		
+		let lnurlWithdrawBaseUrl = URL(string: "https://phoenix.deusty.com/v1/pub/lnurlw/info")!
+		var queryItems: [URLQueryItem] = []
+		
+		switch self {
+		case .V1(let lnurlWithdrawId):
+			queryItems.append(URLQueryItem(name: "id", value: lnurlWithdrawId))
+			
+			var comps = URLComponents(url: lnurlWithdrawBaseUrl, resolvingAgainstBaseURL: false)!
+			comps.queryItems = queryItems
+			let resolvedUrl = comps.url!
+			
+			return Ndef.Template(baseUrl: resolvedUrl)!
+			
+		case .V1AndV2(let lnurlWithdrawId, let lnAddress):
+			queryItems.append(URLQueryItem(name: "id", value: lnurlWithdrawId))
+			queryItems.append(URLQueryItem(name: "v2", value: lnAddress))
+			
+			var comps = URLComponents(url: lnurlWithdrawBaseUrl, resolvingAgainstBaseURL: false)!
+			comps.queryItems = queryItems
+			let resolvedUrl = comps.url!
+			
+			return Ndef.Template(baseUrl: resolvedUrl)!
+			
+		case .V2(let lnAddress):
+			return Ndef.Template(baseText: lnAddress)
+		}
+	}
 }
 
 /// The iOS simulator doesn't support NFC.

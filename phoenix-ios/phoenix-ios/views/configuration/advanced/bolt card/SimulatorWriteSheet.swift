@@ -10,7 +10,7 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct SimulatorWriteSheet: View {
 	
-	@State var hexAddrString: String = ""
+	@State var input: String = ""
 	@State var jsonOutput: String = ""
 	
 	@EnvironmentObject var smartModalState: SmartModalState
@@ -22,8 +22,8 @@ struct SimulatorWriteSheet: View {
 			header()
 			content()
 		}
-		.onChange(of: hexAddrString) { _ in
-			hexAddrStringChanged()
+		.onChange(of: input) { _ in
+			inputChanged()
 		}
 	}
 	
@@ -62,7 +62,7 @@ struct SimulatorWriteSheet: View {
 				.fixedSize(horizontal: false, vertical: true)
 			
 			content_notes()
-			content_address()
+			content_input()
 			if !jsonOutput.isEmpty {
 				content_json()
 			}
@@ -112,7 +112,7 @@ struct SimulatorWriteSheet: View {
 	}
 	
 	@ViewBuilder
-	func content_address() -> some View {
+	func content_input() -> some View {
 		
 		Grid(
 			alignment: Alignment.trailing,
@@ -120,11 +120,11 @@ struct SimulatorWriteSheet: View {
 			verticalSpacing: 8
 		) {
 			GridRow {
-				Text("Simulator's HEX address:")
+				Text("Simulator Info:")
 					.foregroundStyle(.secondary)
 					.gridCellAnchor(.trailing)
 				
-				TextField("Paste here", text: $hexAddrString)
+				TextField("Paste here", text: $input)
 					.padding(.all, 8)
 					.background(
 						RoundedRectangle(cornerRadius: 8)
@@ -171,14 +171,16 @@ struct SimulatorWriteSheet: View {
 	// MARK: Notifications
 	// --------------------------------------------------
 	
-	func hexAddrStringChanged() {
+	func inputChanged() {
 		log.trace("hexAddrStringChanged()")
 		
-		let trimmed = hexAddrString.trimmingCharacters(in: .whitespacesAndNewlines)
-		if trimmed.count == 8, let hexAddrData = Data(fromHex: trimmed) {
+		do {
+			let data = input.data(using: .utf8)!
+			let result = try JSONDecoder().decode(BoltCardInput.self, from: data)
 			
-			let sanitizedHexAddr = hexAddrData.toHex(options: .lowerCase)
-			writeToNfcCard(sanitizedHexAddr)
+			writeToNfcCard(result)
+		} catch {
+			log.debug("Invalid JSON")
 		}
 	}
 	
@@ -186,28 +188,16 @@ struct SimulatorWriteSheet: View {
 	// MARK: Actions
 	// --------------------------------------------------
 	
-	func writeToNfcCard(_ hexAddr: String) {
+	func writeToNfcCard(_ cardInput: BoltCardInput) {
 		log.trace("writeToNfcCard()")
 		
-		let keys = BoltCardKeySet.companion.random()
-		
-		let baseUrl = URL(string: "https://phoenix.deusty.com/v1/pub/lnurlw/info")!
-		
-		var queryItems: [URLQueryItem] = [URLQueryItem(name: "id", value: hexAddr)]
-		if let lnAddr = AppSecurity.shared.getBip353Address() {
-			queryItems.append(URLQueryItem(name: "v2", value: lnAddr))
-		}
-		
-		var comps = URLComponents(url: baseUrl, resolvingAgainstBaseURL: false)!
-		comps.queryItems = queryItems
-		
-		let resolvedUrl = comps.url!
-		let template = Ndef.Template(baseUrl: resolvedUrl)!
+		let template = cardInput.toTemplate()
 		
 		log.debug("template.value: \(template.valueString)")
 		log.debug("template.piccDataOffset: \(template.piccDataOffset)")
 		log.debug("template.cmacOffset: \(template.cmacOffset)")
 		
+		let keys = BoltCardKeySet.companion.random()
 		let input = NfcWriter.WriteInput(
 			template    : template,
 			key0        : keys.key0_bytes,

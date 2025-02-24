@@ -523,33 +523,7 @@ struct BoltCardsList: View {
 	func writeToNfcCard(_ cardInput: BoltCardInput) {
 		log.trace("writeToNfcCard()")
 		
-		let lnurlWithdrawBaseUrl = URL(string: "https://phoenix.deusty.com/v1/pub/lnurlw/info")!
-		var queryItems: [URLQueryItem] = []
-		
-		let template: Ndef.Template
-		switch cardInput {
-		case .V1(let lnurlWithdrawId):
-			queryItems.append(URLQueryItem(name: "id", value: lnurlWithdrawId))
-			
-			var comps = URLComponents(url: lnurlWithdrawBaseUrl, resolvingAgainstBaseURL: false)!
-			comps.queryItems = queryItems
-			let resolvedUrl = comps.url!
-			
-			template = Ndef.Template(baseUrl: resolvedUrl)!
-			
-		case .V1AndV2(let lnurlWithdrawId, let lnAddress):
-			queryItems.append(URLQueryItem(name: "id", value: lnurlWithdrawId))
-			queryItems.append(URLQueryItem(name: "v2", value: lnAddress))
-			
-			var comps = URLComponents(url: lnurlWithdrawBaseUrl, resolvingAgainstBaseURL: false)!
-			comps.queryItems = queryItems
-			let resolvedUrl = comps.url!
-			
-			template = Ndef.Template(baseUrl: resolvedUrl)!
-			
-		case .V2(let lnAddress):
-			template = Ndef.Template(baseText: lnAddress)
-		}
+		let template = cardInput.toTemplate()
 		
 		log.debug("template.value: \(template.valueString)")
 		log.debug("template.piccDataOffset: \(template.piccDataOffset)")

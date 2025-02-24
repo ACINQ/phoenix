@@ -13427,6 +13427,9 @@
     "Could not authenticate with card." : {
 
     },
+    "Could not communicate with card's host" : {
+      "comment" : "Error message - scanning lightning invoice"
+    },
     "Could not communicate with card's wallet" : {
       "comment" : "Error message - scanning lightning invoice"
     },
@@ -13643,7 +13646,7 @@
         }
       }
     },
-    "Cound not communicate with card's wallet" : {
+    "Cound not communicate with card's host" : {
 
     },
     "Create New Debit Card" : {
@@ -38218,10 +38221,10 @@
     "Simulator debugging" : {
 
     },
-    "Simulator instructions" : {
+    "Simulator Info:" : {
 
     },
-    "Simulator's HEX address:" : {
+    "Simulator instructions" : {
 
     },
     "Since you've enabled Tor, you should use an onion address for this server." : {
