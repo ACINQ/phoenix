@@ -26,13 +26,12 @@ import fr.acinq.phoenix.db.sqldelight.AppDatabase
 import fr.acinq.phoenix.db.sqldelight.ChannelsDatabase
 import fr.acinq.phoenix.db.sqldelight.PaymentsDatabase
 import fr.acinq.phoenix.utils.PlatformContext
-import fr.acinq.phoenix.utils.extensions.phoenixName
 
-actual fun createChannelsDbDriver(ctx: PlatformContext, chain: Chain, nodeIdHash: String): SqlDriver {
+actual fun createChannelsDbDriver(ctx: PlatformContext, fileName: String): SqlDriver {
     return AndroidSqliteDriver(
         schema = ChannelsDatabase.Schema,
         context = ctx.applicationContext,
-        name = "channels-${chain.phoenixName}-$nodeIdHash.sqlite",
+        name = fileName,
         callback = object : AndroidSqliteDriver.Callback(schema = ChannelsDatabase.Schema) {
             override fun onConfigure(db: SupportSQLiteDatabase) {
                 super.onConfigure(db)
@@ -42,11 +41,11 @@ actual fun createChannelsDbDriver(ctx: PlatformContext, chain: Chain, nodeIdHash
     )
 }
 
-actual fun createPaymentsDbDriver(ctx: PlatformContext, chain: Chain, nodeIdHash: String): SqlDriver {
+actual fun createPaymentsDbDriver(ctx: PlatformContext, fileName: String): SqlDriver {
     return AndroidSqliteDriver(
         schema = PaymentsDatabase.Schema,
         context = ctx.applicationContext,
-        name = "payments-${chain.phoenixName}-$nodeIdHash.sqlite",
+        name = fileName,
         callback = object : AndroidSqliteDriver.Callback(
             schema = PaymentsDatabase.Schema,
             AfterVersion10,

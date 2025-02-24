@@ -33,10 +33,9 @@ import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.android.PaymentsViewModel
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.FilledButton
-import fr.acinq.phoenix.android.payments.history.PaymentLine
+import fr.acinq.phoenix.android.payments.details.PaymentLine
 import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
 import fr.acinq.phoenix.data.WalletPaymentInfo
-import fr.acinq.phoenix.managers.WalletBalance
 
 
 @Composable

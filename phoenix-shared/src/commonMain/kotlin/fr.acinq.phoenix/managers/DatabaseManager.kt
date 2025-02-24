@@ -1,6 +1,7 @@
 package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.Chain
+import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.db.Databases
 import fr.acinq.lightning.logging.LoggerFactory
@@ -16,6 +17,7 @@ import fr.acinq.phoenix.db.createSqlitePaymentsDb
 import fr.acinq.phoenix.db.makeCloudKitDb
 import fr.acinq.phoenix.db.payments.CloudKitInterface
 import fr.acinq.phoenix.utils.PlatformContext
+import fr.acinq.phoenix.utils.extensions.phoenixName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -56,10 +58,9 @@ class DatabaseManager(
                 if (nodeParams == null) return@collect
                 log.debug { "nodeParams available: building databases..." }
 
-                val nodeIdHash = nodeParams.nodeId.hash160().byteVector().toHex()
-                val channelsDbDriver = createChannelsDbDriver(ctx, chain, nodeIdHash)
+                val channelsDbDriver = createChannelsDbDriver(ctx, channelsDbName(chain, nodeParams.nodeId))
                 val channelsDb = createSqliteChannelsDb(channelsDbDriver)
-                val paymentsDbDriver = createPaymentsDbDriver(ctx, chain, nodeIdHash)
+                val paymentsDbDriver = createPaymentsDbDriver(ctx, paymentsDbName(chain, nodeParams.nodeId))
                 val paymentsDb = createSqlitePaymentsDb(paymentsDbDriver, contactsManager, currencyManager)
                 val cloudKitDb = makeCloudKitDb(appDb, paymentsDb)
                 log.debug { "databases object created" }
@@ -88,6 +89,16 @@ class DatabaseManager(
     suspend fun cloudKitDb(): CloudKitInterface? {
         val db = databases.filterNotNull().first()
         return db.cloudKit
+    }
+
+    companion object {
+        fun channelsDbName(chain: Chain, nodeId: PublicKey): String {
+            return "channels-${chain.phoenixName.lowercase()}-${nodeId.hash160().byteVector().toHex()}.sqlite"
+        }
+
+        fun paymentsDbName(chain: Chain, nodeId: PublicKey): String {
+            return "payments-${chain.phoenixName.lowercase()}-${nodeId.hash160().byteVector().toHex()}.sqlite"
+        }
     }
 }
 
