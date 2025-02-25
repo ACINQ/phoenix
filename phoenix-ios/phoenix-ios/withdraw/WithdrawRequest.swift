@@ -10,98 +10,73 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
 struct WithdrawRequest {
-	let nodeId: String
 	let piccData: Data
 	let cmac: Data
-	let invoice: String
-	let timestamp: Date
-	let withdrawHash: String
+	let method: WithdrawRequestMethod
+	let amount: Lightning_kmpMilliSatoshi
+	let databaseHash: String
 	
-	init(nodeId: String, piccData: Data, cmac: Data, invoice: String, timestamp: Date) {
-		self.nodeId = nodeId
-		self.piccData = piccData
-		self.cmac = cmac
-		self.invoice = invoice
-		self.timestamp = timestamp
-		self.withdrawHash = Self.calculateWithdrawHash(
-			nodeId: nodeId, piccData: piccData, cmac: cmac, invoice: invoice
+	init(piccData: Data, cmac: Data, method: WithdrawRequestMethod, amount: Lightning_kmpMilliSatoshi) {
+		self.piccData     = piccData
+		self.cmac         = cmac
+		self.method       = method
+		self.amount       = amount
+		self.databaseHash = Self.calculateDatabaseHash(
+			piccData: piccData, cmac: cmac, method: method, amount: amount
 		)
 	}
 	
-	private static func calculateWithdrawHash(
-		nodeId   : String,
+	/// We use a hash to mark the request as "processed" within the database.
+	/// The hash encompasses all the relavent parts of the request.
+	///
+	private static func calculateDatabaseHash(
 		piccData : Data,
 		cmac     : Data,
-		invoice  : String
+		method   : WithdrawRequestMethod,
+		amount   : Lightning_kmpMilliSatoshi
 	) -> String {
 		
 		var hashMe = Data()
-		hashMe.append(nodeId.lowercased().data(using: .utf8)!)
 		hashMe.append(piccData.toHex(options: .lowerCase).data(using: .utf8)!)
 		hashMe.append(cmac.toHex(options: .lowerCase).data(using: .utf8)!)
-		hashMe.append(invoice.data(using: .utf8)!)
-		
+		hashMe.append(method.encode().data(using: .utf8)!)
+		hashMe.append(String(amount.msat).data(using: .utf8)!)
+
 		let digest = SHA256.hash(data: hashMe)
 		return digest.toHex(options: .lowerCase)
 	}
+}
+
+enum WithdrawRequestMethod {
+	case bolt11Invoice(invoice: Lightning_kmpBolt11Invoice)
+	case bolt12Offer(offer: Lightning_kmpOfferTypesOffer)
 	
-	func postResponse(errorReason: String?) async -> Bool {
-		log.trace("postResponse(\(errorReason ?? "<nil>"))")
-		
-		let url = URL(string: "https://phoenix.deusty.com/v1/pub/lnurlw/response")!
-		
-		var body: [String: String] = [
-			"node_id"       : nodeId,
-			"withdraw_hash" : withdrawHash,
-		]
-		if let errorReason {
-			body["err_message"] = errorReason
+	func encode() -> String {
+		switch self {
+		case .bolt11Invoice(let invoice):
+			return invoice.write()
+			
+		case .bolt12Offer(let offer):
+			return offer.encode()
 		}
-		
-		let bodyData = try? JSONSerialization.data(
-			withJSONObject: body,
-			options: []
-		)
-		
-		var request = URLRequest(url: url)
-		request.httpMethod = "POST"
-		request.httpBody = bodyData
-		
-		do {
-			log.debug("/v1/pub/lnurlw/response: sending...")
-			let (data, response) = try await URLSession.shared.data(for: request)
+	}
+	
+	var description: String? {
+		switch self {
+		case .bolt11Invoice(let invoice):
+			return invoice.description_
 			
-			var statusCode = 418
-			var success = false
-			if let httpResponse = response as? HTTPURLResponse {
-				statusCode = httpResponse.statusCode
-				if statusCode >= 200 && statusCode < 300 {
-					success = true
-				}
-			}
-			
-			if success {
-				log.debug("/v1/pub/lnurlw/response: success")
-			} else {
-				log.debug("/v1/pub/lnurlw/response: statusCode: \(statusCode)")
-				if let dataString = String(data: data, encoding: .utf8) {
-					log.debug("/v1/pub/lnurlw/response: response:\n\(dataString)")
-				}
-			}
-			
-			return success
-		} catch {
-			log.debug("/v1/pub/lnurlw/response: error: \(String(describing: error))")
-			return false
+		case .bolt12Offer(let offer):
+			return offer.description_
 		}
 	}
 }
 
 enum WithdrawRequestStatus {
 	case continueAndSendPayment(
-		card    : BoltCardInfo,
-		invoice : Lightning_kmpBolt11Invoice,
-		amount  : Lightning_kmpMilliSatoshi
+		card   : BoltCardInfo,
+		method : WithdrawRequestMethod,
+		amount : Lightning_kmpMilliSatoshi
 	)
 	case abortHandledElsewhere(card: BoltCardInfo)
 }
@@ -119,15 +94,15 @@ enum WithdrawRequestError: Error, CustomStringConvertible {
 	
 	var description: String {
 		switch self {
-			case .unknownCard          : return "unknown card"
-			case .replayDetected       : return "replay detected"
-			case .frozenCard           : return "frozen card"
-			case .dailyLimitExceeded   : return "daily limit exceeded"
-			case .monthlyLimitExceeded : return "monthly limit exceeded"
-			case .badInvoice           : return "bad invoice"
-			case .alreadyPaidInvoice   : return "already paid invoice"
-			case .paymentPending       : return "payment pending"
-			case .internalError        : return "internal error"
+			case .unknownCard                   : return "unknown card"
+			case .replayDetected                : return "replay detected"
+			case .frozenCard                    : return "frozen card"
+			case .dailyLimitExceeded            : return "daily limit exceeded"
+			case .monthlyLimitExceeded          : return "monthly limit exceeded"
+			case .badInvoice                    : return "bad invoice"
+			case .alreadyPaidInvoice            : return "already paid invoice"
+			case .paymentPending                : return "payment pending"
+			case .internalError(_, let details) : return "internal error: \(details)"
 		}
 	}
 }
@@ -141,7 +116,7 @@ extension PhoenixBusiness {
 		
 		log.trace("checkWithdrawRequest()")
 		
-		// Step 1 of 9:
+		// Step 1 of 7:
 		// Decrypt the piccData & verify the cmac values.
 		//
 		// Note that the user may have multiple cards,
@@ -196,7 +171,7 @@ extension PhoenixBusiness {
 			return .failure(.unknownCard)
 		}
 		
-		// Step 2 of 9:
+		// Step 2 of 7:
 		// Check to make sure the counter has been incremented.
 		
 		guard piccDataInfo.counter > matchingCard.lastKnownCounter else {
@@ -226,7 +201,7 @@ extension PhoenixBusiness {
 			return result
 		}
 		
-		// Step 3 of 9:
+		// Step 3 of 7:
 		// Check to make sure the card isn't frozen.
 		
 		guard matchingCard.isActive else {
@@ -234,20 +209,7 @@ extension PhoenixBusiness {
 			return await asyncDeferred(.failure(.frozenCard(card: matchingCard)))
 		}
 		
-		// Step 4 of 9:
-		// Check to make sure the given invoice is a valid Bolt11 invoice.
-		
-		guard let invoice = Parser.shared.readBolt11Invoice(input: request.invoice) else {
-			log.debug("request.invoice is not Bolt11Invoice")
-			return await asyncDeferred(.failure(.badInvoice(card: matchingCard, details: "not bolt 11 invoice")))
-		}
-		
-		guard let invoiceAmount: Lightning_kmpMilliSatoshi = invoice.amount else {
-			log.debug("request.invoice.amount is nil")
-			return await asyncDeferred(.failure(.badInvoice(card: matchingCard, details: "amountless invoice")))
-		}
-		
-		// Step 5 of 9:
+		// Step 4 of 7:
 		// Validate the invoice.
 		//
 		// We know the invoice is a proper Bolt 11 invoice.
@@ -265,7 +227,7 @@ extension PhoenixBusiness {
 		do {
 			let result: SendManager.ParseResult =
 				try await self.sendManager.parse(
-					request: request.invoice,
+					request: request.method.encode(),
 					progress: { _ in /* ignore */ }
 				)
 			
@@ -299,11 +261,13 @@ extension PhoenixBusiness {
 			return await asyncDeferred(.failure(.internalError(card: matchingCard, details: "parse error")))
 		}
 		
-		// Step 6 of 9:
+		// Step 5 of 7:
 		// Check the amount against any set daily/monthly spending limits.
 		
 		let checkSpendingLimit = {
 		(cardAmounts: CardsManager.CardAmounts, limit: CurrencyAmount, isDaily: Bool) -> WithdrawRequestError? in
+			
+			let invoiceMsat: Int64 = request.amount.msat
 			
 			switch limit.currency {
 			case .bitcoin(let bitcoinUnit):
@@ -313,17 +277,17 @@ extension PhoenixBusiness {
 					? cardAmounts.dailyBitcoinAmount().msat
 					: cardAmounts.monthlyBitcoinAmount().msat
 				
-				let newSpendMsat: Int64 = prvSpendMsat + invoiceAmount.msat
+				let newSpendMsat: Int64 = prvSpendMsat + invoiceMsat
 				
 				log.debug(
 					"""
 					\(isDaily ? "dailySpendingLimit" : "monthlySpendingLimit"): \
-					prvSpendMsat(\(prvSpendMsat)) + invoiceMsat(\(invoiceAmount.msat)) = \
+					prvSpendMsat(\(prvSpendMsat)) + invoiceMsat(\(invoiceMsat)) = \
 					newSpendMsat(\(newSpendMsat)) ?>? limitMsat(\(limitMsat))
 					""")
 				
 				if newSpendMsat > limitMsat {
-					let targetAmt = Utils.convertBitcoin(msat: invoiceAmount.msat, to: bitcoinUnit)
+					let targetAmt = Utils.convertBitcoin(msat: invoiceMsat, to: bitcoinUnit)
 					let currencyAmt = CurrencyAmount(currency: limit.currency, amount: targetAmt)
 					
 					return isDaily
@@ -338,10 +302,7 @@ extension PhoenixBusiness {
 				guard let exchangeRate = Utils.exchangeRate(for: fiatCurrency, fromRates: exchangeRates) else {
 					return .internalError(card: matchingCard, details: "missing exchange rate")
 				}
-				let invoiceFiat: Double = Utils.convertToFiat(
-					msat: invoiceAmount.msat,
-					exchangeRate: exchangeRate
-				)
+				let invoiceFiat: Double = Utils.convertToFiat(msat: invoiceMsat, exchangeRate: exchangeRate)
 				
 				let prvSpendFiat: Double = isDaily
 					? cardAmounts.dailyFiatAmount(target: fiatCurrency, exchangeRates: exchangeRates)
@@ -394,7 +355,7 @@ extension PhoenixBusiness {
 			}
 		}
 		
-		// Step 7 of 9:
+		// Step 6 of 7:
 		// Wait until our peer is connected & all channels are ready.
 		//
 		// Note that there are safety mechanisms in place to ensure that
@@ -422,7 +383,7 @@ extension PhoenixBusiness {
 			}
 		}
 		
-		// Step 8 of 9:
+		// Step 7 of 7:
 		// Atomically mark request as handled.
 		//
 		// At this point we've decided that it's safe to pay the invoice.
@@ -438,7 +399,7 @@ extension PhoenixBusiness {
 		
 		if handledByUs {
 			return await asyncDeferred(.success(.continueAndSendPayment(
-				card: matchingCard, invoice: invoice, amount: invoiceAmount
+				card: matchingCard, method: request.method, amount: request.amount
 			)))
 		} else {
 			// The payment is being handled else.
@@ -459,8 +420,8 @@ extension SqliteAppDb {
 		case notifySrvExt = "notifySrvExt"
 	}
 
-	struct LnurlWithdrawHandler: Codable {
-		let withdrawHash: String
+	struct WithdrawRequestHandler: Codable {
+		let hash: String
 		let process: ProcessId
 		let date: Date
 	}
@@ -468,21 +429,21 @@ extension SqliteAppDb {
 	@MainActor
 	func tryMarkHandled(_ request: WithdrawRequest, process: ProcessId) async -> Bool {
 		
-		let key = "lnurlWithdrawHandlers"
+		let key = "WithdrawRequestHandlers"
 		do {
 			while true {
 				let existing: KotlinPair<KotlinByteArray, KotlinLong>? = try await self.getValue(key: key)
 				
-				var handlers: [LnurlWithdrawHandler] = []
+				var handlers: [WithdrawRequestHandler] = []
 				if let existing, let existingData = existing.first?.toSwiftData() {
 					
-					handlers = try JSONDecoder().decode([LnurlWithdrawHandler].self, from: existingData)
+					handlers = try JSONDecoder().decode([WithdrawRequestHandler].self, from: existingData)
 				}
 				
 				log.debug("tryMarkHandled(): existing handlers.count = \(handlers.count)")
 				
-				let isHandledAlready = handlers.contains(where: { (item: LnurlWithdrawHandler) in
-					item.withdrawHash == request.withdrawHash
+				let isHandledAlready = handlers.contains(where: { (item: WithdrawRequestHandler) in
+					item.hash == request.databaseHash
 				})
 				
 				if isHandledAlready {
@@ -501,10 +462,10 @@ extension SqliteAppDb {
 					log.debug("tryMarkHandled(): post-clean: handlers.count = \(handlers.count)")
 				}
 				
-				handlers.append(LnurlWithdrawHandler(
-					withdrawHash : request.withdrawHash,
-					process      : process,
-					date         : Date.now
+				handlers.append(WithdrawRequestHandler(
+					hash    : request.databaseHash,
+					process : process,
+					date    : Date.now
 				))
 				
 				log.debug("tryMarkHandled(): new handlers.count = \(handlers.count)")

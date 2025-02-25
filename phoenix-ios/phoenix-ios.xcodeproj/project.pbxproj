@@ -204,6 +204,10 @@
 		DC74174B270F332700F7E3E3 /* KotlinTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC74174A270F332700F7E3E3 /* KotlinTypes.swift */; };
 		DC74174D270F455D00F7E3E3 /* AES256.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC74174C270F455D00F7E3E3 /* AES256.swift */; };
 		DC784A112B31EA180018DC4A /* LiquidityAdsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC784A102B31EA180018DC4A /* LiquidityAdsView.swift */; };
+		DC7A7A922D6E108E00DE586F /* LnurlWithdrawNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC7A7A912D6E108800DE586F /* LnurlWithdrawNotification.swift */; };
+		DC7A7A932D6E108E00DE586F /* LnurlWithdrawNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC7A7A912D6E108800DE586F /* LnurlWithdrawNotification.swift */; };
+		DC7A7A962D6E60E000DE586F /* CardRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC7A7A952D6E60DB00DE586F /* CardRequest.swift */; };
+		DC7A7A972D6E60E000DE586F /* CardRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC7A7A952D6E60DB00DE586F /* CardRequest.swift */; };
 		DC7BAA002CADAAE70074B568 /* WalletIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC7BA9FF2CADAAE70074B568 /* WalletIdentifier.swift */; };
 		DC7DA9F62AD84DF200F86B99 /* String+Substring.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC7DA9F52AD84DF200F86B99 /* String+Substring.swift */; };
 		DC808E9B2D5541F50019AE30 /* UsingTorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC808E9A2D5541F10019AE30 /* UsingTorSheet.swift */; };
@@ -341,7 +345,6 @@
 		DCCA89BB2D63DB6200AD5428 /* ArchiveCardSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCA89A02D63DB6200AD5428 /* ArchiveCardSheet.swift */; };
 		DCCA89BC2D63DB6200AD5428 /* DeleteCardSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCA89A32D63DB6200AD5428 /* DeleteCardSheet.swift */; };
 		DCCA89BE2D63DB9500AD5428 /* SwCrypt in Frameworks */ = {isa = PBXBuildFile; productRef = DCCA89BD2D63DB9500AD5428 /* SwCrypt */; };
-		DCCA89C12D63DBEB00AD5428 /* BoltCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCA89C02D63DBEB00AD5428 /* BoltCardView.swift */; };
 		DCCC7FD526B0A006008ACD9B /* SquareSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCC7FD426B0A006008ACD9B /* SquareSize.swift */; };
 		DCCCEAB528F6DA2A0047871A /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCCEAB428F6DA2A0047871A /* RootView.swift */; };
 		DCCD045D27EE0173007D57A5 /* EditInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCD045C27EE0173007D57A5 /* EditInfoView.swift */; };
@@ -655,6 +658,8 @@
 		DC74174A270F332700F7E3E3 /* KotlinTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinTypes.swift; sourceTree = "<group>"; };
 		DC74174C270F455D00F7E3E3 /* AES256.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AES256.swift; sourceTree = "<group>"; };
 		DC784A102B31EA180018DC4A /* LiquidityAdsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidityAdsView.swift; sourceTree = "<group>"; };
+		DC7A7A912D6E108800DE586F /* LnurlWithdrawNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LnurlWithdrawNotification.swift; sourceTree = "<group>"; };
+		DC7A7A952D6E60DB00DE586F /* CardRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardRequest.swift; sourceTree = "<group>"; };
 		DC7BA9FF2CADAAE70074B568 /* WalletIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletIdentifier.swift; sourceTree = "<group>"; };
 		DC7DA9F52AD84DF200F86B99 /* String+Substring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Substring.swift"; sourceTree = "<group>"; };
 		DC808E9A2D5541F10019AE30 /* UsingTorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsingTorSheet.swift; sourceTree = "<group>"; };
@@ -774,7 +779,6 @@
 		DCCA89AB2D63DB6200AD5428 /* SimulatorPasteSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulatorPasteSheet.swift; sourceTree = "<group>"; };
 		DCCA89AC2D63DB6200AD5428 /* SimulatorWriteSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulatorWriteSheet.swift; sourceTree = "<group>"; };
 		DCCA89AD2D63DB6200AD5428 /* WriteErrorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WriteErrorSheet.swift; sourceTree = "<group>"; };
-		DCCA89C02D63DBEB00AD5428 /* BoltCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoltCardView.swift; sourceTree = "<group>"; };
 		DCCC7FD426B0A006008ACD9B /* SquareSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SquareSize.swift; sourceTree = "<group>"; };
 		DCCCEAB428F6DA2A0047871A /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		DCCD045C27EE0173007D57A5 /* EditInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditInfoView.swift; sourceTree = "<group>"; };
@@ -1025,6 +1029,7 @@
 				DCA6DEC42829BD060073C658 /* xpc */,
 				DCD1BFD42CE775CE00C2B811 /* nfc */,
 				DCCA898F2D63D6B800AD5428 /* notifications */,
+				DC7A7A942D6E5FA200DE586F /* withdraw */,
 				DCE3C7A92A6AD39E00F4D385 /* mempool */,
 				DCCFE6AC2B6430BD002FFF11 /* logging */,
 			);
@@ -1139,7 +1144,6 @@
 				DC98D3972AF2AE41005BD177 /* ReceiveView.swift */,
 				DC3FDCAE2C3306AB002C5931 /* LightningDualView.swift */,
 				DC2F431327B6972C0006FCC4 /* SwapInView.swift */,
-				DCCA89C02D63DBEB00AD5428 /* BoltCardView.swift */,
 				DC5631C92C597B8600DCB5BF /* SourceInfo.swift */,
 				DC2F431527B6983B0006FCC4 /* CopyShareOptionsSheet.swift */,
 				DC2F431927B699800006FCC4 /* ModifyInvoiceSheet.swift */,
@@ -1309,6 +1313,15 @@
 				DCE443AB2B3482C800CABA96 /* LiquidityFeeInfo.swift */,
 			);
 			path = "liquidity management";
+			sourceTree = "<group>";
+		};
+		DC7A7A942D6E5FA200DE586F /* withdraw */ = {
+			isa = PBXGroup;
+			children = (
+				DC7A7A952D6E60DB00DE586F /* CardRequest.swift */,
+				DCCA898E2D63D6B800AD5428 /* WithdrawRequest.swift */,
+			);
+			path = withdraw;
 			sourceTree = "<group>";
 		};
 		DC808E992D5524E90019AE30 /* tor */ = {
@@ -1613,7 +1626,7 @@
 			isa = PBXGroup;
 			children = (
 				DCCA898D2D63D6B800AD5428 /* PushNotification.swift */,
-				DCCA898E2D63D6B800AD5428 /* WithdrawRequest.swift */,
+				DC7A7A912D6E108800DE586F /* LnurlWithdrawNotification.swift */,
 			);
 			path = notifications;
 			sourceTree = "<group>";
@@ -2066,6 +2079,7 @@
 				DC33C5632A7C15D40053D785 /* MainView_BigPrimary.swift in Sources */,
 				DC6F19C12C470F70004EC469 /* PickerResult.swift in Sources */,
 				DCEE8998288605FD00FE42DD /* PaymentCell.swift in Sources */,
+				DC7A7A922D6E108E00DE586F /* LnurlWithdrawNotification.swift in Sources */,
 				DCDD9ED428637EBB001800A3 /* ToolsButton.swift in Sources */,
 				DCDD9ED0286377B7001800A3 /* MainView_Big.swift in Sources */,
 				DC355E1F2A44A235008E8A8E /* NotificationCell.swift in Sources */,
@@ -2192,7 +2206,6 @@
 				DCE6FB8C28D0B5F200054511 /* ResetWalletView.swift in Sources */,
 				DC3345D02C2B4C1200EDD2D4 /* ManageContact.swift in Sources */,
 				DCE7232E27AD68CD0017CF56 /* SyncBackupManager_Actor.swift in Sources */,
-				DCCA89C12D63DBEB00AD5428 /* BoltCardView.swift in Sources */,
 				DC16965F27FE0FAC003DE1DD /* KotlinExtensions+Currency.swift in Sources */,
 				DCA3DE112D63E58300649310 /* CardOptionsSheet.swift in Sources */,
 				DC65BBF22A58A40700EBA651 /* CpfpView.swift in Sources */,
@@ -2250,6 +2263,7 @@
 				DC6F042B2C3DA7AD00627B4F /* ContactsListSheet.swift in Sources */,
 				DC9473FA261270B4008D7242 /* MVI+Mock.swift in Sources */,
 				DCDD9ECE28637474001800A3 /* Orientation.swift in Sources */,
+				DC7A7A962D6E60E000DE586F /* CardRequest.swift in Sources */,
 				DCCFE6B02B64326F002FFF11 /* OSLogHandler.swift in Sources */,
 				DCDD9ECB28637242001800A3 /* MainView.swift in Sources */,
 				DC9CF8412D2ECF08003F3B0F /* IncomingBalancePopover.swift in Sources */,
@@ -2404,10 +2418,12 @@
 				DCCFE6A82B63083F002FFF11 /* UnfairLock.swift in Sources */,
 				DCA6DEC82829C3150073C658 /* GenericPasswordStore.swift in Sources */,
 				DCCA89972D63D80900AD5428 /* KotlinExtensions+Cards.swift in Sources */,
+				DC7A7A972D6E60E000DE586F /* CardRequest.swift in Sources */,
 				DCA6DECD282AB10C0073C658 /* SharedSecurity.swift in Sources */,
 				DCEB2799282D7B260096B87E /* KotlinExtensions+Conversion.swift in Sources */,
 				DCCA89982D63D85200AD5428 /* Helper.swift in Sources */,
 				DCC3E5822D08A65400CCDA40 /* XPC+Background.swift in Sources */,
+				DC7A7A932D6E108E00DE586F /* LnurlWithdrawNotification.swift in Sources */,
 				DCCA899F2D63DB1000AD5428 /* Ntag424.swift in Sources */,
 				DCEB2795282D7A9F0096B87E /* KotlinPublishers+Phoenix.swift in Sources */,
 				DC641C6B2820803100862DCD /* PhoenixManager.swift in Sources */,

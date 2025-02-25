@@ -197,6 +197,21 @@ class BusinessManager {
 			}
 			.store(in: &cancellables)
 		
+		// Card payment requests
+		business.peerManager.peerStatePublisher()
+			.flatMap { $0.eventsFlowPublisher() }
+			.sink { (event: Lightning_kmpPeerEvent) in
+				
+				if let msg = event as? Lightning_kmp_coreCardRequestReceived,
+				   let cardRequest = CardRequest.fromOnionMessage(msg)
+				{
+					Task { @MainActor in
+						await self.handleCardRequest(cardRequest)
+					}
+				}
+			}
+			.store(in: &cancellables)
+		
 		// Tor configuration observer
 		GroupPrefs.shared.isTorEnabledPublisher
 			.sink { (isTorEnabled: Bool) in
@@ -741,6 +756,56 @@ class BusinessManager {
 			business.appConnectionsDaemon?.incrementDisconnectCount(
 				target: AppConnectionsDaemon.ControlTarget.companion.All
 			)
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Card Payments
+	// --------------------------------------------------
+	
+	@MainActor
+	func handleCardRequest(
+		_ cardRequest: CardRequest
+	) async {
+		log.trace("handleCardRequest()")
+		
+		let result: Result<WithdrawRequestStatus, WithdrawRequestError> =
+			await business.checkWithdrawRequest(cardRequest.toWithdrawRequest())
+		
+		switch result {
+		case .failure(let error):
+			log.error("handleCardRequest: error: \(error.description)")
+			
+		case .success(let status):
+			switch status {
+			case .abortHandledElsewhere(_):
+				log.warning("handleCardReqeust: abort: handled elsewhere")
+				
+			case .continueAndSendPayment(let card, _, _):
+				log.debug("handleCardReqeust: continue: send payment")
+				
+				guard
+					let peer = business.peerManager.peerStateValue(),
+					let defaultTrampolineFees = peer.walletParams.trampolineFees.first
+				else {
+					log.error("handleCardReqeust: peer is nil")
+					return
+				}
+				
+				let paymentId = Lightning_kmpUUID.companion.randomUUID()
+				do {
+					try await peer.betterPayOffer(
+						paymentId: paymentId,
+						amount: cardRequest.amount,
+						offer: cardRequest.offer,
+						payerKey: Lightning_randomKey(),
+						payerNote: nil,
+						fetchInvoiceTimeoutInSeconds: 30
+					)
+				} catch {
+					log.error("peer.payOffer(): error: \(error)")
+				}
+			}
 		}
 	}
 	

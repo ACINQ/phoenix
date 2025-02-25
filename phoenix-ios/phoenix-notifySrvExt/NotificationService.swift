@@ -170,7 +170,7 @@ class NotificationService: UNNotificationServiceExtension {
 		log.trace("processRequest_aws()")
 		assertMainThread()
 		
-		if let withdrawRequest = PushNotification.parseWithdrawRequest(userInfo: userInfo) {
+		if let withdrawRequest = PushNotification.parseLnurlWithdraw(userInfo: userInfo) {
 			pushNotificationReason = .withdrawRequest
 			log.debug("pushNotificationReason = \(pushNotificationReason)")
 			
@@ -187,7 +187,7 @@ class NotificationService: UNNotificationServiceExtension {
 	
 	@MainActor
 	private func processRequest_aws_withdraw(
-		_ request: WithdrawRequest
+		_ request: LnurlWithdrawNotification
 	) async {
 		log.trace("processRequest_aws_withdraw()")
 		
@@ -209,7 +209,7 @@ class NotificationService: UNNotificationServiceExtension {
 			self.displayPushNotification()
 		}
 		
-		let result = await business.checkWithdrawRequest(request)
+		let result = await business.checkWithdrawRequest(request.toWithdrawRequest())
 		withdrawRequestResult = result
 		
 		switch result {
@@ -221,7 +221,7 @@ class NotificationService: UNNotificationServiceExtension {
 			case .abortHandledElsewhere:
 				displayPushNotification()
 			
-			case .continueAndSendPayment(let card, let invoice, let amount):
+			case .continueAndSendPayment(let card, _, _):
 				guard
 					let peer = business.peerManager.peerStateValue(),
 					let defaultTrampolineFees = peer.walletParams.trampolineFees.first
@@ -231,9 +231,9 @@ class NotificationService: UNNotificationServiceExtension {
 				
 				do {
 					try await business.sendManager.payBolt11Invoice(
-						amountToSend   : amount,
+						amountToSend   : request.invoiceAmount,
 						trampolineFees : defaultTrampolineFees,
-						invoice        : invoice,
+						invoice        : request.invoice,
 						metadata       : WalletPaymentMetadata.withCard(card.id)
 					)
 				} catch {
@@ -262,7 +262,7 @@ class NotificationService: UNNotificationServiceExtension {
 					if let lnPayment = payment as? Lightning_kmpLightningOutgoingPayment,
 						let details = lnPayment.details as? Lightning_kmpLightningOutgoingPayment.DetailsNormal
 					{
-						if details.paymentHash == invoice.paymentHash {
+						if details.paymentHash == request.invoice.paymentHash {
 							self.sentPayment = lnPayment
 							log.debug("sentPayment = \(lnPayment)")
 							
@@ -274,7 +274,6 @@ class NotificationService: UNNotificationServiceExtension {
 				}
 				.store(in: &cancellables)
 				
-			//	return accept(request)
 			} // </switch status>
 		} // </switch result>
 	}
@@ -673,7 +672,7 @@ class NotificationService: UNNotificationServiceExtension {
 				bestAttemptContent.subtitle = card.sanitizedName
 				bestAttemptContent.body = String(localized: "Handled elsewhere in the system")
 				
-			case .continueAndSendPayment(let card, let invoice, let amount):
+			case .continueAndSendPayment(let card, let method, let amount):
 				
 				if let sentPayment, let failedStatus = sentPayment.status.asFailed() {
 					
@@ -703,7 +702,7 @@ class NotificationService: UNNotificationServiceExtension {
 					bestAttemptContent.title = String(localized: "Payment successful 💳")
 					let amountString = formatAmount(msat: amount.msat)
 					
-					if let desc = invoice.description_ {
+					if let desc = method.description {
 						bestAttemptContent.body = String(localized:
 							"""
 							\(amountString)
