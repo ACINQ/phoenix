@@ -25,6 +25,8 @@ import fr.acinq.bitcoin.SigHash
 import fr.acinq.bitcoin.SigVersion
 import fr.acinq.bitcoin.Script
 import fr.acinq.bitcoin.Transaction
+import fr.acinq.bitcoin.TxId
+import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.channel.states.ChannelStateWithCommitments
 import fr.acinq.lightning.channel.states.PersistedChannelState
 import fr.acinq.lightning.logging.error
@@ -116,10 +118,10 @@ object SpendChannelAddressHelper {
 
             val sig = Transactions.sign(tx = tx, inputIndex = 0, Script.write(fundingScript), amount, localFundingKey)
             val signedData = tx.hashForSigning(0, Script.write(fundingScript), SigHash.SIGHASH_ALL, amount, SigVersion.SIGVERSION_WITNESS_V0)
-            if (!Crypto.verifySignature(signedData, sig, localFundingKey.publicKey())) {
-                return SpendChannelAddressResult.Failure.InvalidSig(tx.txid, localFundingKey.publicKey(), Script.write(fundingScript).byteVector())
+            return if (!Crypto.verifySignature(signedData, sig, localFundingKey.publicKey())) {
+                SpendChannelAddressResult.Failure.InvalidSig(tx.txid, localFundingKey.publicKey(), Script.write(fundingScript).byteVector(), sig)
             } else {
-                return SpendChannelAddressResult.Success(tx.txid, localFundingKey.publicKey(), Script.write(fundingScript).byteVector(), sig)
+                SpendChannelAddressResult.Success(tx.txid, localFundingKey.publicKey(), Script.write(fundingScript).byteVector(), sig)
             }
         } catch (e: Exception) {
             log.error { "error when spending from channel address: ${e.message}" }
@@ -138,6 +140,6 @@ sealed class SpendChannelAddressResult {
         data class ChannelDataUnhandledVersion(val version: Int) : Failure()
         data class TransactionMalformed(val details: String) : Failure()
         data class RemoteFundingPubkeyMalformed(val details: String) : Failure()
-        data class InvalidSig(val txId: TxId, val publicKey: PublicKey, val fundingScript: ByteVector) : Failure()
+        data class InvalidSig(val txId: TxId, val publicKey: PublicKey, val fundingScript: ByteVector, val signature: ByteVector64) : Failure()
     }
 }
