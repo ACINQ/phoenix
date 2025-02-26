@@ -18,22 +18,15 @@ package fr.acinq.phoenix.android.components.screenlock
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,11 +39,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.TextWithIcon
+import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.components.screenlock.PinDialog.PIN_LENGTH
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun BasePinDialog(
     stateLabel: @Composable () -> Unit,
@@ -59,56 +52,43 @@ internal fun BasePinDialog(
     enabled: Boolean,
     initialPin: String = "",
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     var pinValue by remember(initialPin) { mutableStateOf(initialPin) }
 
     ModalBottomSheet(
-        sheetState = sheetState,
-        onDismissRequest = {
-            // executed when user click outside the sheet, and after sheet has been hidden thru state.
-            onDismiss()
-        },
-        containerColor = MaterialTheme.colors.surface,
-        contentColor = MaterialTheme.colors.onSurface,
-        scrimColor = MaterialTheme.colors.onBackground.copy(alpha = 0.3f),
+        onDismiss = onDismiss,
+        skipPartiallyExpanded = true,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Spacer(modifier = Modifier.height(12.dp))
-            stateLabel()
-            Spacer(modifier = Modifier.height(36.dp))
-            Box {
-                PinDisplay(cursorPosition = -1)
-                PinDisplay(cursorPosition = pinValue.length)
-            }
-            Spacer(modifier = Modifier.height(40.dp))
-            PinKeyboard(
-                onPinPress = { digit ->
-                    when (pinValue.length + 1) {
-                        in 0..<PIN_LENGTH -> {
-                            pinValue += digit
-                        }
-
-                        PIN_LENGTH -> {
-                            pinValue += digit
-                            onPinSubmit(pinValue)
-                        }
-
-                        else -> {
-                            // ignore or error
-                        }
-                    }
-                },
-                onResetPress = { pinValue = "" },
-                isEnabled = enabled && pinValue.length in 0..6
-            )
-            Spacer(modifier = Modifier.height(40.dp))
+        Spacer(modifier = Modifier.height(12.dp))
+        stateLabel()
+        Spacer(modifier = Modifier.height(36.dp))
+        Box {
+            PinDisplay(cursorPosition = -1)
+            PinDisplay(cursorPosition = pinValue.length)
         }
+        Spacer(modifier = Modifier.height(40.dp))
+        PinKeyboard(
+            onPinPress = { digit ->
+                when (pinValue.length + 1) {
+                    in 0..<PIN_LENGTH -> {
+                        pinValue += digit
+                    }
+
+                    PIN_LENGTH -> {
+                        pinValue += digit
+                        onPinSubmit(pinValue)
+                    }
+
+                    else -> {
+                        // ignore or error
+                    }
+                }
+            },
+            onResetPress = { pinValue = "" },
+            isEnabled = enabled && pinValue.length in 0..6
+        )
+        Spacer(modifier = Modifier.height(40.dp))
     }
 }
 

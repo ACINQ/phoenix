@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Clickable
-import fr.acinq.phoenix.android.components.Dialog
+import fr.acinq.phoenix.android.components.dialogs.Dialog
 
 
 internal data class PreferenceItem<T>(val item: T, val title: String, val description: String? = null)

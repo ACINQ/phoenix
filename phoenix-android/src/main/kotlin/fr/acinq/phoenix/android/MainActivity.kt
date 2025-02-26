@@ -29,19 +29,11 @@ import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.*
 import androidx.navigation.compose.rememberNavController
-import fr.acinq.lightning.io.PhoenixAndroidLegacyInfoEvent
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.services.NodeService
-import fr.acinq.phoenix.android.utils.LegacyMigrationHelper
 import fr.acinq.phoenix.android.utils.PhoenixAndroidTheme
-import fr.acinq.phoenix.legacy.utils.*
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flattenMerge
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -71,46 +63,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         intent?.fixUri()
-
-        // reset required status to expected if needed
-        lifecycleScope.launch {
-            if (LegacyPrefsDatastore.getLegacyAppStatus(applicationContext).filterNotNull().first() is LegacyAppStatus.Required) {
-                LegacyPrefsDatastore.saveStartLegacyApp(applicationContext, LegacyAppStatus.Required.Expected)
-            }
-        }
-
-        // migrate legacy data if needed
-        lifecycleScope.launch {
-            val doDataMigration = LegacyPrefsDatastore.getDataMigrationExpected(applicationContext).filterNotNull().first()
-            if (doDataMigration) {
-                delay(3_000)
-                LegacyMigrationHelper.migrateLegacyPayments(applicationContext)
-                delay(1_000)
-                LegacyPrefsDatastore.saveDataMigrationExpected(applicationContext, false)
-                tryReconnect()
-            }
-        }
-
-        // listen to legacy channels events on the peer's event bus
-        lifecycleScope.launch {
-            val application = (application as PhoenixApplication)
-            application.business.filterNotNull().map { it.peerManager.getPeer().eventsFlow }.flattenMerge().collect {
-                if (it is PhoenixAndroidLegacyInfoEvent) {
-                    if (it.info.hasChannels) {
-                        val legacyState = LegacyPrefsDatastore.getLegacyAppStatus(applicationContext).filterNotNull().first()
-                        log.info("legacy channels have been found, in legacy_state=$legacyState")
-                        if (legacyState is LegacyAppStatus.Required || legacyState is LegacyAppStatus.Unknown) {
-                            LegacyPrefsDatastore.saveStartLegacyApp(applicationContext, LegacyAppStatus.Required.Expected)
-                        }
-                    } else {
-                        log.info("no legacy channels were found")
-                        LegacyPrefsDatastore.savePrefsMigrationExpected(applicationContext, false)
-                        LegacyPrefsDatastore.saveDataMigrationExpected(applicationContext, false)
-                        LegacyPrefsDatastore.saveStartLegacyApp(applicationContext, LegacyAppStatus.NotRequired)
-                    }
-                }
-            }
-        }
 
         // lock screen when screen is off
         val intentFilter = IntentFilter(Intent.ACTION_SCREEN_ON)
@@ -167,24 +119,19 @@ class MainActivity : AppCompatActivity() {
 
     private fun tryReconnect() {
         lifecycleScope.launch {
-            val isDataMigrationExpected = LegacyPrefsDatastore.getDataMigrationExpected(applicationContext).filterNotNull().first()
-            if (isDataMigrationExpected) {
-                log.debug("ignoring tryReconnect when data migration is in progress")
-            } else {
-                (application as? PhoenixApplication)?.business?.value?.let { business ->
-                    val daemon = business.appConnectionsDaemon ?: return@launch
-                    val connections = business.connectionsManager.connections.value
-                    if (connections.electrum !is Connection.ESTABLISHED) {
-                        lifecycleScope.launch {
-                            log.info("resuming app with electrum conn=${connections.electrum}, forcing reconnection...")
-                            daemon.forceReconnect(AppConnectionsDaemon.ControlTarget.Electrum)
-                        }
+            (application as? PhoenixApplication)?.business?.value?.let { business ->
+                val daemon = business.appConnectionsDaemon ?: return@launch
+                val connections = business.connectionsManager.connections.value
+                if (connections.electrum !is Connection.ESTABLISHED) {
+                    lifecycleScope.launch {
+                        log.info("resuming app with electrum conn=${connections.electrum}, forcing reconnection...")
+                        daemon.forceReconnect(AppConnectionsDaemon.ControlTarget.Electrum)
                     }
-                    if (connections.peer !is Connection.ESTABLISHED) {
-                        lifecycleScope.launch {
-                            log.info("resuming app with peer conn=${connections.peer}, forcing reconnection...")
-                            daemon.forceReconnect(AppConnectionsDaemon.ControlTarget.Peer)
-                        }
+                }
+                if (connections.peer !is Connection.ESTABLISHED) {
+                    lifecycleScope.launch {
+                        log.info("resuming app with peer conn=${connections.peer}, forcing reconnection...")
+                        daemon.forceReconnect(AppConnectionsDaemon.ControlTarget.Peer)
                     }
                 }
             }

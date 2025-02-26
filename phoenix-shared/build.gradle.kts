@@ -1,8 +1,7 @@
-import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import java.io.ByteArrayOutputStream
 import co.touchlab.skie.configuration.FlowInterop
 import co.touchlab.skie.configuration.SuspendInterop
-
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     kotlin("multiplatform")
@@ -11,7 +10,7 @@ plugins {
     if (System.getProperty("includeAndroid")?.toBoolean() == true) {
         id("com.android.library")
     }
-    id("co.touchlab.skie") version "0.8.1"
+    id("co.touchlab.skie") version libs.versions.skie.get()
 }
 
 val includeAndroid = System.getProperty("includeAndroid")?.toBoolean() ?: false
@@ -38,7 +37,7 @@ val buildVersionsTask by tasks.registering(Sync::class) {
             |
             |object BuildVersions {
             |    const val PHOENIX_COMMIT = "${gitCommitHash()}"
-            |    const val LIGHTNING_KMP_VERSION = "${Versions.lightningKmp}"
+            |    const val LIGHTNING_KMP_VERSION = "${libs.versions.lightningkmp.get()}"
             |}
             |
             """.trimMargin()
@@ -51,31 +50,31 @@ val buildVersionsTask by tasks.registering(Sync::class) {
 }
 
 kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
+
     if (includeAndroid) {
         androidTarget {
-            compilations.all {
-                kotlinOptions.jvmTarget = "1.8"
+            compilerOptions {
+                jvmTarget.set(JvmTarget.JVM_1_8)
             }
         }
     }
 
-    listOf(iosX64(), iosArm64()).forEach {
+    listOf(iosX64(), iosArm64(), iosSimulatorArm64()).forEach {
         it.binaries {
             framework {
-                optimized = false
                 baseName = "PhoenixShared"
             }
             configureEach {
                 it.compilations.all {
-                    kotlinOptions.freeCompilerArgs += "-Xoverride-konan-properties=osVersionMin.ios_x64=15.0;osVersionMin.ios_arm64=15.0"
+                    freeCompilerArgs += "-Xoverride-konan-properties=osVersionMin.ios_x64=16.0;osVersionMin.ios_arm64=16.0"
                     // The notification-service-extension is limited to 24 MB of memory.
                     // With mimalloc we can easily hit the 24 MB limit, and the OS kills the process.
                     // But with standard allocation, we're using less then half the limit.
-                    kotlinOptions.freeCompilerArgs += "-Xallocator=std"
-                    kotlinOptions.freeCompilerArgs += listOf("-linker-options", "-application_extension")
-                    // workaround for xcode 15 and kotlin < 1.9.10: 
-                    // https://youtrack.jetbrains.com/issue/KT-60230/Native-unknown-options-iossimulatorversionmin-sdkversion-with-Xcode-15-beta-3
-                    linkerOpts += "-ld64"
+                    freeCompilerArgs += "-Xallocator=std"
+                    freeCompilerArgs += listOf("-linker-options", "-application_extension")
                 }
             }
         }
@@ -88,18 +87,17 @@ kotlin {
             kotlin.srcDir(buildVersionsTask.map { it.destinationDir })
             dependencies {
                 // lightning-kmp
-                api("fr.acinq.lightning:lightning-kmp:${Versions.lightningKmp}")
-                api("fr.acinq.tor:tor-mobile-kmp:${Versions.torMobile}")
+                api("fr.acinq.lightning:lightning-kmp-core:${libs.versions.lightningkmp.get()}")
                 // ktor
-                implementation("io.ktor:ktor-client-core:${Versions.ktor}")
-                implementation("io.ktor:ktor-client-json:${Versions.ktor}")
-                implementation("io.ktor:ktor-serialization-kotlinx-json:${Versions.ktor}")
-                implementation("io.ktor:ktor-client-content-negotiation:${Versions.ktor}")
+                implementation("io.ktor:ktor-client-core:${libs.versions.ktor.get()}")
+                implementation("io.ktor:ktor-client-json:${libs.versions.ktor.get()}")
+                implementation("io.ktor:ktor-serialization-kotlinx-json:${libs.versions.ktor.get()}")
+                implementation("io.ktor:ktor-client-content-negotiation:${libs.versions.ktor.get()}")
                 // sqldelight
-                implementation("app.cash.sqldelight:runtime:${Versions.sqlDelight}")
-                implementation("app.cash.sqldelight:coroutines-extensions:${Versions.sqlDelight}")
+                implementation("app.cash.sqldelight:runtime:${libs.versions.sqldelight.get()}")
+                implementation("app.cash.sqldelight:coroutines-extensions:${libs.versions.sqldelight.get()}")
                 // SKEI
-                implementation("co.touchlab.skie:configuration-annotations:0.8.1")
+                implementation("co.touchlab.skie:configuration-annotations:${libs.versions.skie.get()}")
             }
         }
 
@@ -107,27 +105,29 @@ kotlin {
             dependencies {
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
-                implementation("io.ktor:ktor-client-mock:${Versions.ktor}")
+                implementation("io.ktor:ktor-client-mock:${libs.versions.ktor.get()}")
+                implementation("com.squareup.okio:okio:${libs.versions.okio.get()}")
             }
         }
 
         // -- android sources
         if (includeAndroid) {
             val androidMain by getting {
+                //noinspection UseTomlInstead
                 dependencies {
-                    implementation("androidx.core:core-ktx:${Versions.Android.coreKtx}")
-                    implementation("fr.acinq.secp256k1:secp256k1-kmp-jni-android:${Versions.secp256k1}")
-                    implementation("io.ktor:ktor-network:${Versions.ktor}")
-                    implementation("io.ktor:ktor-network-tls:${Versions.ktor}")
-                    implementation("io.ktor:ktor-client-android:${Versions.ktor}")
-                    implementation("app.cash.sqldelight:android-driver:${Versions.sqlDelight}")
+                    implementation("fr.acinq.secp256k1:secp256k1-kmp-jni-android:${libs.versions.secp256k1.get()}")
+                    implementation("io.ktor:ktor-network:${libs.versions.ktor.get()}")
+                    implementation("io.ktor:ktor-network-tls:${libs.versions.ktor.get()}")
+                    implementation("io.ktor:ktor-client-android:${libs.versions.ktor.get()}")
+                    implementation("app.cash.sqldelight:android-driver:${libs.versions.sqldelight.get()}")
                 }
             }
             val androidUnitTest by getting {
                 dependencies {
                     implementation(kotlin("test-junit"))
-                    implementation("androidx.test.ext:junit:1.1.3")
-                    implementation("androidx.test.espresso:espresso-core:3.4.0")
+                    implementation("androidx.test.ext:junit:${libs.versions.androidx.junit.get()}")
+                    implementation("androidx.test.espresso:espresso-core:${libs.versions.espresso.get()}")
+                    implementation("org.robolectric:robolectric:${libs.versions.robolectric.get()}")
                     val currentOs = org.gradle.internal.os.OperatingSystem.current()
                     val target = when {
                         currentOs.isLinux -> "linux"
@@ -135,8 +135,8 @@ kotlin {
                         currentOs.isWindows -> "mingw"
                         else -> error("Unsupported OS $currentOs")
                     }
-                    implementation("fr.acinq.secp256k1:secp256k1-kmp-jni-jvm-$target:${Versions.secp256k1}")
-                    implementation("app.cash.sqldelight:sqlite-driver:${Versions.sqlDelight}")
+                    implementation("fr.acinq.secp256k1:secp256k1-kmp-jni-jvm-$target:${libs.versions.secp256k1.get()}")
+                    implementation("app.cash.sqldelight:sqlite-driver:${libs.versions.sqldelight.get()}")
                 }
             }
         }
@@ -144,14 +144,14 @@ kotlin {
         // -- ios sources
         val iosMain by creating {
             dependencies {
-                implementation("io.ktor:ktor-client-ios:${Versions.ktor}")
-                implementation("app.cash.sqldelight:native-driver:${Versions.sqlDelight}")
+                implementation("io.ktor:ktor-client-ios:${libs.versions.ktor.get()}")
+                implementation("app.cash.sqldelight:native-driver:${libs.versions.sqldelight.get()}")
             }
         }
 
         val iosTest by creating {
             dependencies {
-                implementation("app.cash.sqldelight:native-driver:${Versions.sqlDelight}")
+                implementation("app.cash.sqldelight:native-driver:${libs.versions.sqldelight.get()}")
             }
         }
 
@@ -164,16 +164,16 @@ kotlin {
 sqldelight {
     databases {
         create("ChannelsDatabase") {
-            packageName.set("fr.acinq.phoenix.db")
-            srcDirs.from("src/commonMain/channelsdb")
+            packageName.set("fr.acinq.phoenix.db.sqldelight")
+            srcDirs.from("src/commonMain/sqldelight/channelsdb")
         }
         create("PaymentsDatabase") {
-            packageName.set("fr.acinq.phoenix.db")
-            srcDirs.from("src/commonMain/paymentsdb")
+            packageName.set("fr.acinq.phoenix.db.sqldelight")
+            srcDirs.from("src/commonMain/sqldelight/paymentsdb")
         }
         create("AppDatabase") {
-            packageName.set("fr.acinq.phoenix.db")
-            srcDirs.from("src/commonMain/appdb")
+            packageName.set("fr.acinq.phoenix.db.sqldelight")
+            srcDirs.from("src/commonMain/sqldelight/appdb")
         }
     }
 }
@@ -186,20 +186,6 @@ if (includeAndroid) {
             minSdk = 26
             testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }
-
-        lint {
-            disable.add("Deprecation")
-        }
-
-        compileOptions {
-            sourceCompatibility = JavaVersion.VERSION_1_8
-            targetCompatibility = JavaVersion.VERSION_1_8
-        }
-
-        testOptions {
-            unitTests.isReturnDefaultValues = true
-        }
-
         sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     }
 }

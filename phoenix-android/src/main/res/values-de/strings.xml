@@ -54,7 +54,6 @@
 
     <string name="startup_binding_service">Dienst wird eingebunden…</string>
     <string name="startup_wait">Wallet wird vorbereitet…</string>
-    <string name="startup_wait_legacy_check">Überprüfe Legacy-Wallet…</string>
     <string name="startup_checking_seed">Entsperren…</string>
     <string name="startup_unlocked">Zugang gewährt..</string>
     <string name="startup_unlock_failure">Entsperren fehlgeschlagen</string>
@@ -75,11 +74,6 @@
 
     <string name="startup_starting">Starten…</string>
     <string name="startup_error_generic">Die App konnte nicht gestartet werden.</string>
-
-    <!-- Switch between legacy/modern apps -->
-
-    <string name="legacyswitch_title">Legacy-App</string>
-    <string name="legacyswitch_restart">Legacy-App neustarten</string>
 
     <!-- Payment line -->
 
@@ -261,16 +255,16 @@
 
     <!-- home: balance section & misc -->
 
-    <string name="home__balance_loading">Lädt…</string>
-    <string name="home__onchain_incoming">+%1$s</string>
+    <string name="home_balance_loading">Lädt…</string>
+    <string name="home_onchain_incoming">+%1$s</string>
 
-    <string name="home__faq_button">FAQ</string>
-    <string name="home__payments_none">Verwenden Sie die Schaltflächen Empfangen und Senden unten auf diesem Fenster, um loszulegen!</string>
-    <string name="home__payments_more_button">Alle Zahlungen anzeigen…</string>
-    <string name="home__connection__electrum_late">Electrum unsynchron</string>
-    <string name="home__connection__bad_cert">Electrum-Zertifikat</string>
-    <string name="home__connection__connecting">Verbinde…</string>
-    <string name="home__connection__tor_active">Tor</string>
+    <string name="home_faq_button">FAQ</string>
+    <string name="home_payments_none">Verwenden Sie die Schaltflächen Empfangen und Senden unten auf diesem Fenster, um loszulegen!</string>
+    <string name="home_payments_more_button">Alle Zahlungen anzeigen…</string>
+    <string name="home_connection_electrum_late">Electrum unsynchron</string>
+    <string name="home_connection_bad_cert">Electrum-Zertifikat</string>
+    <string name="home_connection_connecting">Verbinde…</string>
+    <string name="home_connection_tor_active">Tor</string>
     <string name="home_request_liquidity">Liquidität anfordern</string>
     <string name="home_inflight_payments">Du hast derzeit %1$d Zahlung(en) in deiner Brieftasche ausstehend.\n\nHalte die App geöffnet, um sicherzustellen, dass diese Zahlungen ohne Probleme abgerechnet werden.</string>
 
@@ -321,7 +315,6 @@
     <string name="paymentdetails_status_unconfirmed_zero">0 Bestätigungen</string>
     <string name="paymentdetails_status_unconfirmed_zero_bump">Tippen zum Beschleunigen</string>
     <string name="paymentdetails_status_unconfirmed_default">%1$d Bestätigung(en)</string>
-    <string name="paymentdetails_status_unconfirmed_with_depth">%1$d/%2$d Bestätigung(en)</string>
     <string name="paymentdetails_status_confirmed">Bestätigt (On-Chain)</string>
 
     <string name="paymentdetails_lnurlpay_service">Bedient von</string>
@@ -362,20 +355,19 @@
 
     <string name="paymentdetails_technical_title">Technische Details</string>
     <string name="paymentdetails_payment_type_label">Zahlungsart</string>
-    <string name="paymentdetails_closing">Kanal-Schließung</string>
-    <string name="paymentdetails_splice_outgoing">Ausgehender Splice</string>
-    <string name="paymentdetails_splice_cpfp_outgoing">Beschleunigte On-Chain Transaktion</string>
-    <string name="paymentdetails_inbound_liquidity">Inbound-Liquidität anfordern</string>
-    <string name="paymentdetails_normal_outgoing">Ausgehende Lightning-Zahlung (standard)</string>
-    <string name="paymentdetails_normal_incoming">Eingehende Lightning-Zahlung (standard)</string>
-    <string name="paymentdetails_swapin">Swap-in Bitcoin-Einzahlung</string>
-    <string name="paymentdetails_swapout">Swap-out an Bitcoin-Adresse</string>
+    <string name="paymentdetails_type_outgoing_close">Kanal-Schließung</string>
+    <string name="paymentdetails_type_outgoing_splice">Ausgehender Splice</string>
+    <string name="paymentdetails_type_outgoing_splice_cpfp">Beschleunigte On-Chain Transaktion</string>
+    <string name="paymentdetails_type_outgoing_liquidity_manual">Inbound-Liquidität anfordern (manual)</string>
+    <string name="paymentdetails_type_outgoing_liquidity_auto">Inbound-Liquidität anfordern (auto)</string>
+    <string name="paymentdetails_type_outgoing_bolt11">Ausgehende Lightning-Zahlung (bolt11)</string>
+    <string name="paymentdetails_type_outgoing_bolt12">Ausgehende Lightning-Zahlung (bolt12)</string>
+    <string name="paymentdetails_type_incoming_bolt11">Eingehende Lightning-Zahlung (bolt11)</string>
+    <string name="paymentdetails_type_incoming_bolt12">Eingehende Lightning-Zahlung (bolt12)</string>
     <string name="paymentdetails_swapin_address_label">Einzahlungs-Adresse</string>
     <string name="paymentdetails_bitcoin_address_label">Bitcoin-Adresse</string>
 
     <string name="paymentdetails_splice_out_channel_label">Gespleißter Kanal</string>
-    <string name="paymentdetails_dualswapin_tx_label">Transaktionen</string>
-    <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
 
     <string name="paymentdetails_liquidity_amount_label">Geforderter Betrag</string>
 
@@ -387,9 +379,9 @@
     <string name="paymentdetails_closing_type_other">Andere</string>
 
     <string name="paymentdetails_pubkey_label">Öffentlicher Zielschlüssel</string>
-    <string name="paymentdetails_payment_request_description_label">Rechnungs-Beschreibung</string>
+    <string name="paymentdetails_bolt11_description_label">Rechnungs-Beschreibung</string>
     <string name="paymentdetails_payment_hash_label">Zahlungs-Hash</string>
-    <string name="paymentdetails_payment_request_label">Rechnung</string>
+    <string name="paymentdetails_bolt11_label">Rechnung</string>
     <string name="paymentdetails_preimage_label">Preimage</string>
 
     <string name="paymentdetails_status_label">Zahlungs-Status</string>
@@ -403,8 +395,6 @@
     <string name="paymentdetails_part_hops_label">Hops</string>
 
     <string name="paymentdetails_received_with_label">Empfangen über</string>
-    <string name="paymentdetails_received_with_splicein">Splice-in (bestehendem Kanal hinzugefügt)</string>
-    <string name="paymentdetails_received_with_channel">Neuer Kanal (automatisch geöffnet)</string>
     <string name="paymentdetails_received_with_lightning">Lightning-Zahlung</string>
     <string name="paymentdetails_channel_id_label">Kanal-ID</string>
     <string name="paymentdetails_tx_id_label">Transaktion</string>
@@ -554,27 +544,17 @@
     <!-- settings: Tor -->
 
     <string name="tor_settings_title">Tor</string>
-    <string name="tor_settings_unknown">Einstellungen werden geprüft…</string>
-    <string name="tor_settings_enabled">Tor ist aktiviert</string>
-    <string name="tor_settings_disabled">Tor ist deaktiviert</string>
-    <string name="tor_settings_state_unknown">Der Tor-Proxy ist noch nicht gestartet.</string>
-    <string name="tor_settings_state_closed">Der Tor-Proxy wird abgeschaltet.\nBitte warten Sie und überprüfen Sie Ihre Internetverbindung.</string>
-    <string name="tor_settings_state_starting">Starte Tor-Proxy…</string>
-    <string name="tor_settings_state_started">Tor ist online</string>
 
     <!-- home: connectivity dialog -->
 
     <string name="conndialog_title">Verbindungs-Status</string>
     <string name="conndialog_summary_not_ok">Die App funktioniert erst dann richtig, wenn alle Verbindungen hergestellt sind.</string>
     <string name="conndialog_network">Ihr Gerät hat keine Internetverbindung. Die App wird nicht richtig funktionieren.\n\nBitte überprüfen Sie die Einstellungen Ihres Geräts.</string>
-    <string name="conndialog_internet">Internet</string>
     <string name="conndialog_electrum">Electrum</string>
-    <string name="conndialog_tor">Tor</string>
     <string name="conndialog_lightning">Gegenstelle</string>
     <string name="conndialog_accessibility_desc">Verbindung verwalten für %1$s</string>
     <string name="conndialog_connecting">Verbinde…</string>
     <string name="conndialog_connected">Verbunden</string>
-    <string name="conndialog_connected_electrum_behind">Electrum-Server ist nicht synchronisiert (Block $1$d)</string>
     <string name="conndialog_closed">Getrennt</string>
     <string name="conndialog_closed_bad_cert">Ungültiges Zertifikat</string>
 

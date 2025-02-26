@@ -8,14 +8,6 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-enum Problem: Error {
-	case emptyInput
-	case invalidInput
-	case amountExceedsBalance
-	case finalAmountExceedsBalance // including minerFee
-	case amountOutOfRange
-}
-
 struct ValidateView: View {
 	
 	enum NavLinkTag: Hashable, CustomStringConvertible {
@@ -45,6 +37,14 @@ struct ValidateView: View {
 	@State var parsedAmount: Result<Double, TextFieldCurrencyStylerError> = Result.failure(.emptyInput)
 	
 	@State var altAmount: String = ""
+	
+	enum Problem: Error {
+		case emptyInput
+		case invalidInput
+		case amountExceedsBalance
+		case finalAmountExceedsBalance // including minerFee
+		case amountOutOfRange
+	}
 	@State var problem: Problem? = nil
 	
 	@State var paymentInProgress: Bool = false
@@ -526,7 +526,7 @@ struct ValidateView: View {
 			CurrencyConverterView(
 				initialAmount: currentAmount(),
 				didChange: currencyConverterAmountChanged,
-				didClose: {}
+				didClose: nil
 			)
 			
 		case .PaymentRequestedView(let invoice):
@@ -2111,21 +2111,7 @@ struct ValidateView: View {
 			currency = newAmt.currency
 			currencyPickerChoice = newAmt.currency.shortName
 
-			let formattedAmt: FormattedAmount
-			switch newAmt.currency {
-			case .bitcoin(let bitcoinUnit):
-				formattedAmt = Utils.formatBitcoin(
-					amount: newAmt.amount,
-					bitcoinUnit: bitcoinUnit,
-					policy: .showMsatsIfNonZero
-				)
-			case .fiat(let fiatCurrency):
-				formattedAmt = Utils.formatFiat(
-					amount: newAmt.amount,
-					fiatCurrency: fiatCurrency
-				)
-			}
-
+			let formattedAmt = Utils.format(currencyAmount: newAmt, policy: .showMsatsIfNonZero)
 			parsedAmount = Result.success(newAmt.amount)
 			amount = formattedAmt.digits
 

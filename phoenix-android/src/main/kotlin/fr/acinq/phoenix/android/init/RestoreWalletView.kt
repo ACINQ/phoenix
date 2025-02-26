@@ -81,7 +81,7 @@ fun RestoreWalletView(
         )
         when (seedFileState.value) {
             is SeedFileState.Absent -> {
-                when (val state = vm.restoreWalletState) {
+                when (vm.restoreWalletState) {
                     is RestoreWalletViewState.Disclaimer -> {
                         DisclaimerView(onClickNext = { vm.restoreWalletState = RestoreWalletViewState.Restore })
                     }

@@ -1,14 +1,15 @@
 package fr.acinq.phoenix.db.cloud.payments
 
 import fr.acinq.bitcoin.TxId
-import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
+import fr.acinq.lightning.db.AutomaticLiquidityPurchasePayment
+import fr.acinq.lightning.db.ManualLiquidityPurchasePayment
+import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toByteVector32
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.db.cloud.UUIDSerializer
-import fr.acinq.phoenix.db.payments.liquidityads.PurchaseData
-import fr.acinq.phoenix.db.payments.liquidityads.PurchaseData.Companion.encodeAsDb
+import fr.acinq.phoenix.db.migrations.v11.types.liquidityads.PurchaseData
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.ByteString
@@ -29,43 +30,40 @@ data class InboundLiquidityPaymentWrapper(
     val confirmedAt: Long?,
     val lockedAt: Long?,
 ) {
-    constructor(src: InboundLiquidityOutgoingPayment) : this(
-        id = src.id,
-        channelId = src.channelId.toByteArray(),
-        txId = src.txId.value.toByteArray(),
-        // see lightning-kmp#710 and comment in InboundLiquidityQueries mapper
-        // miningFeesSat contains the local fee + the purchase fee
-        miningFeesSat = src.miningFees.sat,
-        purchase = LiquidityAdsPurchaseWrapper(src.purchase),
-        createdAt = src.createdAt,
-        confirmedAt = src.confirmedAt,
-        lockedAt = src.lockedAt
-    )
-
     @Throws(Exception::class)
-    fun unwrap(): InboundLiquidityOutgoingPayment {
+    fun unwrap(): WalletPayment {
         val purchase = this.purchase.unwrap()
-        return InboundLiquidityOutgoingPayment(
-            id = this.id,
-            channelId = this.channelId.toByteVector32(),
-            txId = TxId(this.txId),
-            // see lightning-kmp#710 and comment in InboundLiquidityQueries mapper
-            // miningFeesSat contains the local fee + the purchase fee
-            localMiningFees = this.miningFeesSat.sat - purchase.fees.miningFee,
-            purchase = purchase,
-            createdAt = this.createdAt,
-            confirmedAt = this.confirmedAt,
-            lockedAt = this.lockedAt,
-        )
+        return when (purchase.paymentDetails) {
+            is LiquidityAds.PaymentDetails.FromFutureHtlc, is LiquidityAds.PaymentDetails.FromFutureHtlcWithPreimage, is LiquidityAds.PaymentDetails.FromChannelBalanceForFutureHtlc -> {
+                AutomaticLiquidityPurchasePayment(
+                    id = this.id,
+                    channelId = this.channelId.toByteVector32(),
+                    txId = TxId(this.txId),
+                    miningFee = this.miningFeesSat.sat,
+                    liquidityPurchase = purchase,
+                    createdAt = this.createdAt,
+                    confirmedAt = this.confirmedAt,
+                    lockedAt = this.lockedAt,
+                    incomingPaymentReceivedAt = this.confirmedAt
+                )
+            }
+            is LiquidityAds.PaymentDetails.FromChannelBalance -> {
+                ManualLiquidityPurchasePayment(
+                    id = this.id,
+                    channelId = this.channelId.toByteVector32(),
+                    txId = TxId(this.txId),
+                    miningFee = this.miningFeesSat.sat,
+                    liquidityPurchase = purchase,
+                    createdAt = this.createdAt,
+                    confirmedAt = this.confirmedAt,
+                    lockedAt = this.lockedAt,
+                )
+            }
+        }
     }
 
     @Serializable
     data class LiquidityAdsPurchaseWrapper(@ByteString val blob: ByteArray) {
-        companion object {
-            operator fun invoke(purchase: LiquidityAds.Purchase): LiquidityAdsPurchaseWrapper {
-                return LiquidityAdsPurchaseWrapper(purchase.encodeAsDb())
-            }
-        }
         fun unwrap(): LiquidityAds.Purchase {
             return PurchaseData.decodeAsCanonical("", blob)
         }
@@ -88,20 +86,35 @@ data class InboundLiquidityLegacyWrapper(
     val lockedAt: Long?,
 ) {
     @Throws(Exception::class)
-    fun unwrap(): InboundLiquidityOutgoingPayment {
-        val lease = this.lease.unwrap()
-        return InboundLiquidityOutgoingPayment(
-            id = this.id,
-            channelId = this.channelId.toByteVector32(),
-            txId = TxId(this.txId),
-            // see lightning-kmp#710 and comment in InboundLiquidityQueries mapper
-            // miningFeesSat contains the local fee + the purchase fee (even for legacy data)
-            localMiningFees = this.miningFeesSat.sat - lease.fees.miningFee,
-            purchase = lease,
-            createdAt = this.createdAt,
-            confirmedAt = this.confirmedAt,
-            lockedAt = this.lockedAt,
-        )
+    fun unwrap(): WalletPayment {
+        val purchase = this.lease.unwrap()
+        return when (purchase.paymentDetails) {
+            is LiquidityAds.PaymentDetails.FromFutureHtlc, is LiquidityAds.PaymentDetails.FromFutureHtlcWithPreimage, is LiquidityAds.PaymentDetails.FromChannelBalanceForFutureHtlc -> {
+                AutomaticLiquidityPurchasePayment(
+                    id = this.id,
+                    channelId = this.channelId.toByteVector32(),
+                    txId = TxId(this.txId),
+                    miningFee = this.miningFeesSat.sat,
+                    liquidityPurchase = purchase,
+                    createdAt = this.createdAt,
+                    confirmedAt = this.confirmedAt,
+                    lockedAt = this.lockedAt,
+                    incomingPaymentReceivedAt = this.confirmedAt
+                )
+            }
+            is LiquidityAds.PaymentDetails.FromChannelBalance -> {
+                ManualLiquidityPurchasePayment(
+                    id = this.id,
+                    channelId = this.channelId.toByteVector32(),
+                    txId = TxId(this.txId),
+                    miningFee = this.miningFeesSat.sat,
+                    liquidityPurchase = purchase,
+                    createdAt = this.createdAt,
+                    confirmedAt = this.confirmedAt,
+                    lockedAt = this.lockedAt,
+                )
+            }
+        }
     }
 
     @Serializable

@@ -95,7 +95,6 @@
     <string name="home_background_restriction_title">Fonctionnement en arrière plan restreint</string>
     <string name="home_background_restriction_body_1">Phoenix ne pourra pas recevoir de paiements quand l\'application est en arrière plan ou est fermée.</string>
     <string name="home_background_restriction_body_2">Cela vient du fait que:</string>
-    <string name="home_background_restriction_tor">Tor est activé</string>
     <string name="home_background_restriction_powersaver">Le téléphone est en mode économie d\'énergie</string>
     <string name="home_background_restriction_fcm">Les notifications FCM sont indisponibles</string>
     <string name="home_background_restriction_fcm_details">Si vous êtes sur GrapheneOS ou CalyxOS, installez les Google Play Services pour avoir accès aux notifications FCM. Consultez la FAQ pour plus d\'infos.</string>
@@ -172,7 +171,6 @@
 
     <string name="receive_tor_warning_title">Tor est activé</string>
     <string name="receive_tor_warning_dialog_content_1">Phoenix ne peut pas recevoir de paiements en arrière-plan.</string>
-    <string name="receive_tor_warning_dialog_content_2">Pour éviter des échecs de paiements, utilisez Orbot, ou bien assurez-vous que Phoenix reste visible au premier plan lorsque des paiements vous sont envoyés.</string>
 
     <!-- scanning errors -->
 
@@ -229,11 +227,6 @@
     <string name="inappnotif_mempool_full_message">Le mempool Bitcoin est plein, et les frais sur la chaîne sont élevés.</string>
     <string name="inappnotif_mempool_full_action">Voir en quoi Phoenix est affecté</string>
 
-    <string name="inappnotif_migration_from_legacy">Félicitations! Votre wallet a été mis à jour.</string>
-    <string name="inappnotif_migration_from_legacy_action">Voir les nouveautés</string>
-    <string name="inappnotif_migration_from_legacy_dialog_title">Votre adresse Bitcoin a changé</string>
-    <string name="inappnotif_migration_from_legacy_dialog_body">Ne réutilisez pas vos anciennes adresses de swap ! Elles ne fonctionneront plus.\n\nContactez le support si vous le faisiez accidentellement.</string>
-
     <string name="inappnotif_payment_onchain_pending_title">Dépôt on-chain en attente (+%1$s)</string>
     <string name="inappnotif_payments_rejection_overview_one">Un paiement entrant a été refusé récemment</string>
     <string name="inappnotif_payments_rejection_overview_many">%1$d paiements entrants refusés récemment</string>
@@ -283,11 +276,14 @@
 
     <!-- Tor -->
 
-    <string name="tor_settings_subtitle">Phoenix peut utiliser Tor pour masquer votre IP des autres noeuds du réseau Lightning et des serveurs Electrum.</string>
-
-    <string name="tor_confirm_dialog_title">Activer Tor ?</string>
-    <string name="tor_confirm_dialog_details_1">Tor est lent et va impacter les performances de vos paiements.</string>
-    <string name="tor_confirm_dialog_details_2">En particulier, vous <b>ne pourrez pas recevoir de paiements</b> si Phoenix est en arrière-plan, ou est fermée.</string>
+    <string name="tor_dialog_enable_title_1">Activer Tor</string>
+    <string name="tor_dialog_enable_details_1">L\'activation de cette option obligera Phoenix à utiliser des adresses onion pour ses connexions à Lightning et Electrum. Notez qu\'une application proxy Tor sera nécessaire.</string>
+    <string name="tor_dialog_enable_title_2">Attention</string>
+    <string name="tor_dialog_enable_details_2">Tor peut améliorer votre confidentialité, mais peut aussi causer des problèmes de performances et des paiements manqués.</string>
+    <string name="tor_dialog_disable_title">Désactivation de Tor</string>
+    <string name="tor_dialog_disable_details_1">Si vous désactivez cette option, votre adresse IP pourra être révélée à divers fournisseurs de services.</string>
+    <string name="tor_dialog_disable_details_2">Êtes-vous sûr de vouloir continuer ?</string>
+    <string name="tor_dialog_processing">Traitement…</string>
 
     <!-- about -->
 
@@ -295,7 +291,7 @@
     <string name="about_seed_title">Sauvegarde de votre clé</string>
     <string name="about_seed_content">Ce wallet est dit souverain (aussi appelé "self-custodial") : <b>vous seul détenez la clé de 12 mots contrôlant le wallet</b>.\n\nCette clé donne accès aux fonds. Ne la révélez à personne. Faites attention aux arnaques.</string>
     <string name="about_rates_title">Conversion fiduciaire</string>
-    <string name="about_rates_content">La conversion Bitcoin/monnaie fiduciaire est faite par l\'intermédiaire de plateformes tierces :\n\n- Blockchain.info\n- powered by Coindesk.com\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nCes taux de conversion peuvent être imprécis. Vérifiez toujours le montant effectif en Bitcoin avant d\'envoyer un paiement.</string>
+    <string name="about_rates_content">La conversion Bitcoin/monnaie fiduciaire est faite par l\'intermédiaire de plateformes tierces :\n\n- Blockchain.info\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nCes taux de conversion peuvent être imprécis. Vérifiez toujours le montant effectif en Bitcoin avant d\'envoyer un paiement.</string>
 
     <!-- introduction screens -->
 

@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.data.MempoolFeerate
 

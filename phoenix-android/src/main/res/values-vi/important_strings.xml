@@ -102,7 +102,6 @@
     <string name="home_background_restriction_title">Hạn chế xử lý nền</string>
     <string name="home_background_restriction_body_1">Phoenix sẽ không thể nhận thanh toán khi nó ở chế độ nền hoặc khi nó bị đóng.</string>
     <string name="home_background_restriction_body_2">Điều này xảy ra vì:</string>
-    <string name="home_background_restriction_tor">Tor đã được bật</string>
     <string name="home_background_restriction_powersaver">Thiết bị đang ở chế độ tiết kiệm năng lượng</string>
     <string name="home_background_restriction_fcm">Thông báo FCM không khả dụng</string>
     <string name="home_background_restriction_fcm_details">Nếu bạn đang sử dụng GrapheneOS hoặc CalyxOS, hãy cài đặt Dịch vụ Google Play để nhận thông báo FCM. Hãy xem Câu hỏi thường gặp để được trợ giúp.</string>
@@ -178,7 +177,6 @@
 
     <string name="receive_tor_warning_title">Tor đã được bật</string>
     <string name="receive_tor_warning_dialog_content_1">Phoenix không thể nhận thanh toán ở chế độ nền.</string>
-    <string name="receive_tor_warning_dialog_content_2">Để tránh thanh toán thất bại, thay vào đó hãy sử dụng Orbot hoặc đảm bảo Phoenix vẫn hiển thị ở nền trước khi thanh toán được gửi cho bạn.</string>
 
     <!-- scanning errors -->
 
@@ -215,11 +213,6 @@
     <string name="forceclose_button">Buộc đóng tất cả các kênh của tôi</string>
 
     <!-- in-app notifications -->
-
-    <string name="inappnotif_migration_from_legacy">Xin chúc mừng! Ví của bạn đã được cập nhật.</string>
-    <string name="inappnotif_migration_from_legacy_action">Xem các thay đổi</string>
-    <string name="inappnotif_migration_from_legacy_dialog_title">Địa chỉ on-chain Bitcoin của bạn đã thay đổi</string>
-    <string name="inappnotif_migration_from_legacy_dialog_body">KHÔNG dùng lại các địa chỉ cũ của bạn! Các địa chỉ cũ này không còn hoạt động nữa.\n\nLiên lạc với bộ phận hỗ trợ nếu bạn vô tình sử dụng chúng.</string>
 
     <string name="inappnotif_backup_seed_message">Sao lưu ví của bạn để tránh bị mất Bitcoins.</string>
     <string name="inappnotif_backup_seed_action">Sao lưu ví của tôi</string>
@@ -289,11 +282,14 @@
 
     <!-- Tor -->
 
-    <string name="tor_settings_subtitle">Phoenix có thể sử dụng Tor để bảo vệ IP của bạn khỏi các nút mạng khác trên mạng Lightning và máy chủ Electrum.</string>
-
-    <string name="tor_confirm_dialog_title">Bật Tor ?</string>
-    <string name="tor_confirm_dialog_details_1">Tor chạy chậm và sẽ ảnh hưởng đến hiệu suất thanh toán của bạn.</string>
-    <string name="tor_confirm_dialog_details_2">Đặc biệt, bạn <b>sẽ không thể nhận thanh toán</b> nếu Phoenix ở chế độ nền hoặc nếu nó bị đóng.</string>
+    <string name="tor_dialog_enable_title_1">Sử dụng Tor</string>
+    <string name="tor_dialog_enable_details_1">Bật tùy chọn này sẽ yêu cầu Phoenix sử dụng địa chỉ onion khi kết nối với Lightning và Electrum. Lưu ý rằng cần có ứng dụng proxy Tor.</string>
+    <string name="tor_dialog_enable_title_2">Xin lưu ý</string>
+    <string name="tor_dialog_enable_details_2">Tor có thể cải thiện quyền riêng tư, nhưng có thể gây ra các vấn đề về hiệu suất và thanh toán bị mất.</string>
+    <string name="tor_dialog_disable_title">Vô hiệu hóa Tor</string>
+    <string name="tor_dialog_disable_details_1">Nếu bạn vô hiệu hóa tùy chọn này, địa chỉ IP của bạn có thể bị tiết lộ cho nhiều nhà cung cấp dịch vụ khác nhau.</string>
+    <string name="tor_dialog_disable_details_2">Bạn có chắc chắn muốn tiếp tục không?</string>
+    <string name="tor_dialog_processing">Đang xử lý các thay đổi…</string>
 
     <!-- about -->
 
@@ -301,7 +297,7 @@
     <string name="about_seed_title">Bảo vệ khóa của bạn</string>
     <string name="about_seed_content">Ví này có tính năng tự quản: <b>Chỉ bạn mới có toàn quyền quản lý khóa hạt giống gồm 12 từ khôi phục của ví</b>.\n\nKhóa này cho phép truy cập vào tiền của bạn. Không tiết lộ nó cho bất cứ ai và hãy cẩn trọng với các hành vi lừa đảo.</string>
     <string name="about_rates_title">Tỷ giá hối đoái</string>
-    <string name="about_rates_content">Tỷ giá hối đoái giữa bitcoin và tiền pháp định được lấy từ các nguồn thứ ba:\n\n- Blockchain.info\n- powered by Coindesk.com\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nCác tỷ giá này có thể không chính xác. Luôn kiểm tra số lượng Bitcoin thực trước khi gửi tiền thanh toán.</string>
+    <string name="about_rates_content">Tỷ giá hối đoái giữa bitcoin và tiền pháp định được lấy từ các nguồn thứ ba:\n\n- Blockchain.info\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nCác tỷ giá này có thể không chính xác. Luôn kiểm tra số lượng Bitcoin thực trước khi gửi tiền thanh toán.</string>
 
     <!-- introduction screens -->
 

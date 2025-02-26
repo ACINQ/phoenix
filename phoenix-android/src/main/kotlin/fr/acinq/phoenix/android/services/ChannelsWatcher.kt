@@ -35,8 +35,6 @@ import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
 import fr.acinq.phoenix.data.StartupParams
 import fr.acinq.phoenix.data.WatchTowerOutcome
-import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
-import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
 import fr.acinq.phoenix.managers.NotificationsManager
 import fr.acinq.phoenix.utils.MnemonicLanguage
@@ -59,12 +57,6 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
         val application = applicationContext as PhoenixApplication
         val internalData = application.internalDataRepository
         val userPrefs = application.userPrefs
-        val legacyAppStatus = LegacyPrefsDatastore.getLegacyAppStatus(applicationContext).filterNotNull().first()
-        if (legacyAppStatus !is LegacyAppStatus.NotRequired) {
-            log.info("aborting channels-watcher service in state=${legacyAppStatus.name()}")
-            internalData.saveChannelsWatcherOutcome(Outcome.Nominal(currentTimestampMillis()))
-            return Result.success()
-        }
 
         val business = PhoenixBusiness(PlatformContext(applicationContext))
         try {
@@ -79,7 +71,7 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
                     val electrumServer = userPrefs.getElectrumServer.first()
 
                     business.appConfigurationManager.updateElectrumConfig(electrumServer)
-                    business.start(StartupParams(requestCheckLegacyChannels = false, isTorEnabled = isTorEnabled, liquidityPolicy = liquidityPolicy, trustedSwapInTxs = emptySet()))
+                    business.start(StartupParams(isTorEnabled = isTorEnabled, liquidityPolicy = liquidityPolicy))
                 }
                 else -> {
                     internalData.saveChannelsWatcherOutcome(Outcome.Unknown(currentTimestampMillis()))

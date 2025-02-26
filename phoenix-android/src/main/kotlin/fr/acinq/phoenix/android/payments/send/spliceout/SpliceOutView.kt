@@ -26,9 +26,6 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,7 +39,6 @@ import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
-import fr.acinq.lightning.channel.ChannelCommand
 import fr.acinq.lightning.channel.ChannelFundingResponse
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
@@ -50,6 +46,7 @@ import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.internalData
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
@@ -239,7 +236,7 @@ private fun SpliceOutReadyView(
         Spacer(modifier = Modifier.height(16.dp))
     }
     val total = state.userAmount + state.estimatedFee
-    SpliceOutFeeSummaryView(fee = state.estimatedFee, total = total, userFeerate = state.userFeerate, actualFeerate = state.actualFeerate)
+    SpliceOutFeeSummaryView(fee = state.estimatedFee, total = total, actualFeerate = state.actualFeerate)
 
     Spacer(modifier = Modifier.height(24.dp))
 
@@ -259,7 +256,6 @@ private fun SpliceOutReadyView(
 @Composable
 private fun SpliceOutFeeSummaryView(
     fee: Satoshi,
-    userFeerate: FeeratePerKw,
     actualFeerate: FeeratePerKw,
     total: Satoshi,
 ) {
@@ -337,7 +333,6 @@ fun ColumnScope.SpliceOutCapacityDisclaimer(onConfirm: () -> Unit, onCancel: () 
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun ReviewSpliceOutAndConfirm(
     onExecute: () -> Unit,
@@ -347,20 +342,13 @@ private fun ReviewSpliceOutAndConfirm(
     showSpliceoutCapacityDisclaimer: Boolean,
 ) {
     val scope = rememberCoroutineScope()
-    val sheetState = rememberModalBottomSheetState()
     var showSheet by remember { mutableStateOf(false) }
 
     if (showSheet) {
         ModalBottomSheet(
-            sheetState = sheetState,
-            onDismissRequest = {
-                // executed when user click outside the sheet, and after sheet has been hidden thru state.
-                showSheet = false
-            },
-            modifier = Modifier.heightIn(max = 700.dp),
-            containerColor = MaterialTheme.colors.surface,
-            contentColor = MaterialTheme.colors.onSurface,
-            scrimColor = MaterialTheme.colors.onBackground.copy(alpha = 0.1f),
+            onDismiss = { showSheet = false },
+            internalPadding = PaddingValues(0.dp),
+            isContentScrollable = false
         ) {
             val pagerState = rememberPagerState(
                 initialPage = when {

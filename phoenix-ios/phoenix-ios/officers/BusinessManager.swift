@@ -106,6 +106,12 @@ class BusinessManager {
 		}.store(in: &appCancellables)
 		
 		WatchTower.shared.prepare()
+		
+	#if DEBUG
+		if let path = PlatformIosKt.getDatabaseFilesDirectoryPath(ctx: PlatformContext.default) {
+			log.debug("DB path: \(path)")
+		}
+	#endif
 	}
 	
 	// --------------------------------------------------
@@ -114,8 +120,11 @@ class BusinessManager {
 
 	public func start() {
 		
-		let electrumConfig = GroupPrefs.shared.electrumConfig
-		business.appConfigurationManager.updateElectrumConfig(server: electrumConfig?.serverAddress)
+		if let electrumConfigPrefs = GroupPrefs.shared.electrumConfig {
+			business.appConfigurationManager.updateElectrumConfig(config: electrumConfigPrefs.customConfig)
+		} else {
+			business.appConfigurationManager.updateElectrumConfig(config: nil)
+		}
 		
 		let preferredFiatCurrencies = AppConfigurationManager.PreferredFiatCurrencies(
 			primary: GroupPrefs.shared.fiatCurrency,
@@ -124,10 +133,8 @@ class BusinessManager {
 		business.appConfigurationManager.updatePreferredFiatCurrencies(current: preferredFiatCurrencies)
 		
 		let startupParams = StartupParams(
-			requestCheckLegacyChannels: false,
 			isTorEnabled: GroupPrefs.shared.isTorEnabled,
-			liquidityPolicy: GroupPrefs.shared.liquidityPolicy.toKotlin(),
-			trustedSwapInTxs: Set()
+			liquidityPolicy: GroupPrefs.shared.liquidityPolicy.toKotlin()
 		)
 		business.start(startupParams: startupParams)
 		

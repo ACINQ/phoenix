@@ -80,7 +80,7 @@ val gray200 = Color(0xFFB5BBC9)
 val gray100 = Color(0xffd1d7e3)
 val gray70 = Color(0xFFDDE8EB)
 val gray50 = Color(0xFFE9F1F3)
-val gray30 = Color(0xFFEFF4F5)
+val gray30 = Color(0xFFF2F6F7)
 val gray20 = Color(0xFFF4F7F9)
 val gray10 = Color(0xFFF9FAFC)
 
@@ -234,7 +234,7 @@ fun PhoenixAndroidTheme(
                     setNavigationBarColor(navBarColor, darkIcons = !isDarkTheme)
                 }
             }
-            val rippleIndication = rememberRipple(color = if (isDarkTheme) gray300 else gray600)
+            val rippleIndication = ripple(color = if (isDarkTheme) gray300 else gray600)
             CompositionLocalProvider(LocalIndication provides rippleIndication) {
                 content()
             }
@@ -350,7 +350,6 @@ fun updateScreenBrightnesss(context: Context, toMax: Boolean) {
 @Composable
 fun appBackground(): Brush {
     // -- gradient Brush
-    val isDark = isDarkTheme
     return Brush.linearGradient(
         0.2f to topGradientColor,
         1.0f to bottomGradientColor,

@@ -30,7 +30,6 @@ import androidx.work.Operation
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.channel.states.Syncing
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.PhoenixBusiness
@@ -39,15 +38,9 @@ import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
-import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
 import fr.acinq.phoenix.data.LocalChannelInfo
-import fr.acinq.phoenix.data.StartupParams
 import fr.acinq.phoenix.data.inFlightPaymentsCount
-import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
-import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
-import fr.acinq.phoenix.managers.AppConfigurationManager
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
-import fr.acinq.phoenix.utils.MnemonicLanguage
 import fr.acinq.phoenix.utils.PlatformContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -99,18 +92,6 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
                 return Result.success()
             } else {
 
-                // check various preferences -- this job may abort early
-                val legacyAppStatus = LegacyPrefsDatastore.getLegacyAppStatus(applicationContext).filterNotNull().first()
-                if (legacyAppStatus !is LegacyAppStatus.NotRequired) {
-                    log.warn("aborting $name: legacy_status=${legacyAppStatus.name()}")
-                    return Result.success()
-                }
-
-                if (LegacyPrefsDatastore.getPrefsMigrationExpected(applicationContext).first() == true) {
-                    log.warn("aborting $name: legacy data migration is required")
-                    return Result.failure()
-                }
-
                 val encryptedSeed = SeedManager.loadSeedFromDisk(applicationContext) as? EncryptedSeed.V2.NoAuth ?: run {
                     log.error("aborting $name: unhandled seed type")
                     return Result.failure()
@@ -155,7 +136,7 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
                                     log.info("node service in state=${state.name}, starting an isolated business")
 
                                     jobChannelsWatcher = launch {
-                                        WorkerHelper.startIsolatedBusiness(application, business!!, encryptedSeed, userPrefs)
+                                        WorkerHelper.startIsolatedBusiness(business!!, encryptedSeed, userPrefs)
 
                                         business?.connectionsManager?.connections?.first { it.global is Connection.ESTABLISHED }
                                         log.debug("connections established, watching channels for in-flight payments...")

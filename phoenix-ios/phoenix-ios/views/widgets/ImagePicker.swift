@@ -93,4 +93,4 @@ struct ImagePicker: UIViewControllerRepresentable {
 //
 // This just silences the compiler until Apple marks NSItemProvider as Sendable
 //
-extension NSItemProvider: @unchecked Sendable { }
+extension NSItemProvider: @unchecked @retroactive Sendable { }

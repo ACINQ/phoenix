@@ -55,7 +55,6 @@
 
     <string name="startup_binding_service">Binding dịch vụ…</string>
     <string name="startup_wait">Đang chuẩn bị ví…</string>
-    <string name="startup_wait_legacy_check">Đang kiểm tra ví cũ…</string>
     <string name="startup_checking_seed">Đang mở khoá…</string>
     <string name="startup_unlocked">Quyền truy cập được chấp nhận…</string>
     <string name="startup_unlock_failure">Mở khóa không thành công</string>
@@ -76,11 +75,6 @@
 
     <string name="startup_starting">Đang khởi động…</string>
     <string name="startup_error_generic">Ứng dụng không khởi động được.</string>
-
-    <!-- Switch between legacy/modern apps -->
-
-    <string name="legacyswitch_title">Ứng dụng cũ</string>
-    <string name="legacyswitch_restart">Khởi động ứng dụng cũ</string>
 
     <!-- Payment line -->
 
@@ -263,16 +257,16 @@
 
     <!-- home: balance section & misc -->
 
-    <string name="home__balance_loading">Đang tải…</string>
-    <string name="home__onchain_incoming">+%1$s</string>
+    <string name="home_balance_loading">Đang tải…</string>
+    <string name="home_onchain_incoming">+%1$s</string>
 
-    <string name="home__faq_button">FAQ</string>
-    <string name="home__payments_none">Sử dụng các nút Nhận và Gửi ở cuối màn hình này để bắt đầu!</string>
-    <string name="home__payments_more_button">Hiển thị tất cả các khoản thanh toán…</string>
-    <string name="home__connection__electrum_late">Electrum muộn</string>
-    <string name="home__connection__bad_cert">Chứng nhận Electrum</string>
-    <string name="home__connection__connecting">Đang kết nối…</string>
-    <string name="home__connection__tor_active">Tor</string>
+    <string name="home_faq_button">FAQ</string>
+    <string name="home_payments_none">Sử dụng các nút Nhận và Gửi ở cuối màn hình này để bắt đầu!</string>
+    <string name="home_payments_more_button">Hiển thị tất cả các khoản thanh toán…</string>
+    <string name="home_connection_electrum_late">Electrum muộn</string>
+    <string name="home_connection_bad_cert">Chứng nhận Electrum</string>
+    <string name="home_connection_connecting">Đang kết nối…</string>
+    <string name="home_connection_tor_active">Tor</string>
     <string name="home_request_liquidity">Yêu cầu thanh khoản</string>
 
     <!-- in-app notifications -->
@@ -322,7 +316,6 @@
     <string name="paymentdetails_status_unconfirmed_zero">0 xác nhận</string>
     <string name="paymentdetails_status_unconfirmed_zero_bump">Nhấn để tăng tốc</string>
     <string name="paymentdetails_status_unconfirmed_default">%1$d (các) xác nhận</string>
-    <string name="paymentdetails_status_unconfirmed_with_depth">%1$d/%2$d (các) xác nhận</string>
     <string name="paymentdetails_status_confirmed">Đã xác nhận on-chain</string>
 
     <string name="paymentdetails_lnurlpay_service">Dịch vụ cung cấp bởi</string>
@@ -362,20 +355,19 @@
 
     <string name="paymentdetails_technical_title">Chi tiết kỹ thuật</string>
     <string name="paymentdetails_payment_type_label">Hình thức thanh toán</string>
-    <string name="paymentdetails_closing">Thanh toán đóng kênh</string>
-    <string name="paymentdetails_splice_outgoing">Thanh toán splice đầu ra</string>
-    <string name="paymentdetails_splice_cpfp_outgoing">Tăng tốc các giao dịch on-chain</string>
-    <string name="paymentdetails_inbound_liquidity">Yêu cầu thanh khoản đầu vào</string>
-    <string name="paymentdetails_normal_outgoing">Thanh toán đầu ra Lightning (tiêu chuẩn)</string>
-    <string name="paymentdetails_normal_incoming">Thanh toán đầu vào Lightning (tiêu chuẩn)</string>
-    <string name="paymentdetails_swapin">Swap-in tiền cọc Bitcoin</string>
-    <string name="paymentdetails_swapout">Swap-out đến địa chỉ Bitcoin</string>
+    <string name="paymentdetails_type_outgoing_close">Thanh toán đóng kênh</string>
+    <string name="paymentdetails_type_outgoing_splice">Thanh toán splice đầu ra</string>
+    <string name="paymentdetails_type_outgoing_splice_cpfp">Tăng tốc các giao dịch on-chain</string>
+    <string name="paymentdetails_type_outgoing_liquidity_manual">Yêu cầu thanh khoản đầu vào (manual)</string>
+    <string name="paymentdetails_type_outgoing_liquidity_auto">Yêu cầu thanh khoản đầu vào (auto)</string>
+    <string name="paymentdetails_type_outgoing_bolt11">Thanh toán đầu ra Lightning (bolt11)</string>
+    <string name="paymentdetails_type_outgoing_bolt12">Thanh toán đầu ra Lightning (bolt12)</string>
+    <string name="paymentdetails_type_incoming_bolt11">Thanh toán đầu vào Lightning (bolt11)</string>
+    <string name="paymentdetails_type_incoming_bolt12">Thanh toán đầu vào Lightning (bolt12)</string>
     <string name="paymentdetails_swapin_address_label">Địa chỉ tiền cọc</string>
     <string name="paymentdetails_bitcoin_address_label">Điạ chỉ Bitcoin</string>
 
     <string name="paymentdetails_splice_out_channel_label">Kênh đã splice </string>
-    <string name="paymentdetails_dualswapin_tx_label">Giao dịch</string>
-    <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
 
     <string name="paymentdetails_liquidity_amount_label">Số tiền yêu cầu</string>
 
@@ -387,9 +379,9 @@
     <string name="paymentdetails_closing_type_other">Hình thức khác</string>
 
     <string name="paymentdetails_pubkey_label">Mục tiêu khóa công khai</string>
-    <string name="paymentdetails_payment_request_description_label">Mô tả hoá đơn</string>
+    <string name="paymentdetails_bolt11_description_label">Mô tả hoá đơn</string>
     <string name="paymentdetails_payment_hash_label">Thanh toán băm</string>
-    <string name="paymentdetails_payment_request_label">Hoá đơn</string>
+    <string name="paymentdetails_bolt11_label">Hoá đơn</string>
     <string name="paymentdetails_preimage_label">Nghịch ảnh</string>
 
     <string name="paymentdetails_status_label">Trạng thái thanh toán</string>
@@ -403,8 +395,6 @@
     <string name="paymentdetails_part_hops_label">Các bước nhảy</string>
 
     <string name="paymentdetails_received_with_label">Nhận được qua</string>
-    <string name="paymentdetails_received_with_splicein">Splice-in (thêm vào kênh có sẵn)</string>
-    <string name="paymentdetails_received_with_channel">Kênh mới (tự động tạo nên)</string>
     <string name="paymentdetails_received_with_lightning">Thanh toán Lightning</string>
     <string name="paymentdetails_channel_id_label">Mã nhận dạng kênh</string>
     <string name="paymentdetails_tx_id_label">Giao dịch</string>
@@ -554,27 +544,17 @@
     <!-- settings: Tor -->
 
     <string name="tor_settings_title">Tor</string>
-    <string name="tor_settings_unknown">Đang kiểm tra tùy chọn…</string>
-    <string name="tor_settings_enabled">Đã bật Tor</string>
-    <string name="tor_settings_disabled">Đã tắt Tor</string>
-    <string name="tor_settings_state_unknown">Proxy của Tor chưa được khởi động.</string>
-    <string name="tor_settings_state_closed">Proxy của Tor đang bị đóng.\nVui lòng chờ đợi và kiểm tra kết nối mạng Internet của bạn.</string>
-    <string name="tor_settings_state_starting">Đang khởi động Proxy của Tor…</string>
-    <string name="tor_settings_state_started">Tor đang kết nối trực tuyến</string>
 
     <!-- home: connectivity dialog -->
 
     <string name="conndialog_title">Trạng thái kết nối</string>
     <string name="conndialog_summary_not_ok">Ứng dụng sẽ không hoạt động chuẩn xác cho đến khi tất cả các kết nối được thiết lập.</string>
     <string name="conndialog_network">Thiết bị của bạn không có kết nối Internet. Ứng dụng sẽ không hoạt động hiệu quả.\n\nVui lòng kiểm tra cài đặt thiết bị của bạn.</string>
-    <string name="conndialog_internet">Internet</string>
     <string name="conndialog_electrum">Electrum</string>
-    <string name="conndialog_tor">Tor</string>
     <string name="conndialog_lightning">Máy ngang hàng</string>
     <string name="conndialog_accessibility_desc">Quản lý kết nối cho %1$s</string>
     <string name="conndialog_connecting">Đang kết nối…</string>
     <string name="conndialog_connected">Đã kết nối</string>
-    <string name="conndialog_connected_electrum_behind">Máy chủ Electrum bị chậm (khối $1$d)</string>
     <string name="conndialog_closed">Đã ngắt kết nối</string>
     <string name="conndialog_closed_bad_cert">Chứng nhận tồi</string>
 

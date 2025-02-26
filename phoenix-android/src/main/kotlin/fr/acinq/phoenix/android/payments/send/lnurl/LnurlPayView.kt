@@ -45,7 +45,7 @@ import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountHeroInput
 import fr.acinq.phoenix.android.components.BackButtonWithBalance
 import fr.acinq.phoenix.android.components.Button
-import fr.acinq.phoenix.android.components.Dialog
+import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.SplashClickableContent
@@ -55,11 +55,11 @@ import fr.acinq.phoenix.android.components.TextInput
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.fiatRate
 import fr.acinq.phoenix.android.preferredAmountUnit
-import fr.acinq.phoenix.android.utils.BitmapHelper
 import fr.acinq.phoenix.android.utils.Converter.toPrettyStringWithFallback
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.extensions.safeLet
 import fr.acinq.phoenix.android.utils.extensions.toLocalisedMessage
+import fr.acinq.phoenix.android.utils.images.ImageDecoder
 import fr.acinq.phoenix.data.lnurl.LnurlError
 import fr.acinq.phoenix.data.lnurl.LnurlPay
 import fr.acinq.phoenix.managers.SendManager
@@ -113,7 +113,7 @@ fun LnurlPayView(
     ) {
         val image = remember(payIntent.metadata.imagePng + payIntent.metadata.imageJpg) {
             listOfNotNull(payIntent.metadata.imagePng, payIntent.metadata.imageJpg).firstOrNull()?.let {
-                BitmapHelper.decodeBase64Image(it)?.asImageBitmap()
+                ImageDecoder.decodeBase64Image(it)?.asImageBitmap()
             }
         }
         image?.let {

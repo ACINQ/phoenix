@@ -1,6 +1,25 @@
 import Foundation
-import PhoenixShared
+@preconcurrency import PhoenixShared
 import Combine
+
+extension AppConfigurationManager {
+	
+	var isTorEnabledValue: Bool {
+		if let value = self.isTorEnabled.value as? Bool {
+			return value
+		} else {
+			return false
+		}
+	}
+	
+	var electrumConfigValue: ElectrumConfig {
+		if let value = self.electrumConfig.value as? ElectrumConfig {
+			return value
+		} else {
+			return ElectrumConfig.Random()
+		}
+	}
+}
 
 extension BalanceManager {
 	

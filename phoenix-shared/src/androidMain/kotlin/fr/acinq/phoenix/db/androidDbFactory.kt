@@ -16,20 +16,55 @@
 
 package fr.acinq.phoenix.db
 
+import androidx.sqlite.db.SupportSQLiteDatabase
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import fr.acinq.bitcoin.Chain
+import fr.acinq.phoenix.db.migrations.v10.AfterVersion10
+import fr.acinq.phoenix.db.migrations.v11.AfterVersion11
+import fr.acinq.phoenix.db.sqldelight.AppDatabase
+import fr.acinq.phoenix.db.sqldelight.ChannelsDatabase
+import fr.acinq.phoenix.db.sqldelight.PaymentsDatabase
 import fr.acinq.phoenix.utils.PlatformContext
 import fr.acinq.phoenix.utils.extensions.phoenixName
 
 actual fun createChannelsDbDriver(ctx: PlatformContext, chain: Chain, nodeIdHash: String): SqlDriver {
-    return AndroidSqliteDriver(ChannelsDatabase.Schema, ctx.applicationContext, "channels-${chain.phoenixName}-$nodeIdHash.sqlite")
+    return AndroidSqliteDriver(
+        schema = ChannelsDatabase.Schema,
+        context = ctx.applicationContext,
+        name = "channels-${chain.phoenixName}-$nodeIdHash.sqlite",
+        callback = object : AndroidSqliteDriver.Callback(schema = ChannelsDatabase.Schema) {
+            override fun onConfigure(db: SupportSQLiteDatabase) {
+                super.onConfigure(db)
+                db.setForeignKeyConstraintsEnabled(true)
+            }
+        }
+    )
 }
 
 actual fun createPaymentsDbDriver(ctx: PlatformContext, chain: Chain, nodeIdHash: String): SqlDriver {
-    return AndroidSqliteDriver(PaymentsDatabase.Schema, ctx.applicationContext, "payments-${chain.phoenixName}-$nodeIdHash.sqlite")
+    return AndroidSqliteDriver(
+        schema = PaymentsDatabase.Schema,
+        context = ctx.applicationContext,
+        name = "payments-${chain.phoenixName}-$nodeIdHash.sqlite",
+        callback = object : AndroidSqliteDriver.Callback(
+            schema = PaymentsDatabase.Schema,
+            AfterVersion10,
+            AfterVersion11,
+        ) {
+            override fun onConfigure(db: SupportSQLiteDatabase) {
+                super.onConfigure(db)
+                db.setForeignKeyConstraintsEnabled(true)
+            }
+        }
+    )
 }
 
 actual fun createAppDbDriver(ctx: PlatformContext): SqlDriver {
-    return AndroidSqliteDriver(AppDatabase.Schema, ctx.applicationContext, "appdb.sqlite")
+    return AndroidSqliteDriver(AppDatabase.Schema, ctx.applicationContext, "appdb.sqlite", callback = object : AndroidSqliteDriver.Callback(schema = AppDatabase.Schema) {
+        override fun onConfigure(db: SupportSQLiteDatabase) {
+            super.onConfigure(db)
+            db.setForeignKeyConstraintsEnabled(true)
+        }
+    })
 }

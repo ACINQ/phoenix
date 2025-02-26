@@ -9,6 +9,7 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
+@MainActor
 class InboundFeeState: ObservableObject {
 	
 	@Published var connections: Connections = Biz.business.connectionsManager.currentValue

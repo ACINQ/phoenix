@@ -30,7 +30,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -42,6 +41,7 @@ import fr.acinq.phoenix.android.LocalFiatCurrency
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.dialogs.IconPopup
 import fr.acinq.phoenix.android.components.settings.SettingSwitch
 import fr.acinq.phoenix.android.fiatRate
 import fr.acinq.phoenix.android.userPrefs
@@ -59,7 +59,6 @@ fun LiquidityPolicyView(
     onAdvancedClick: () -> Unit,
     onRequestLiquidityClick: () -> Unit,
 ) {
-    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val userPrefs = userPrefs
 

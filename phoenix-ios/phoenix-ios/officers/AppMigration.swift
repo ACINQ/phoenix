@@ -14,6 +14,10 @@ class AppMigration {
 	/// Singleton instance
 	public static let shared = AppMigration()
 	
+	public private(set) var previousBuildNumber: String = ""
+	public private(set) var currentBuildNumber: String = ""
+	public private(set) var didUpdate: Bool = false
+	
 	private let completionPublisher = CurrentValueSubject<Int, Never>(1)
 	private var cancellables = Set<AnyCancellable>()
 	
@@ -22,6 +26,10 @@ class AppMigration {
 		let key = "lastVersionCheck"
 		let previousBuild = UserDefaults.standard.string(forKey: key) ?? "17"
 		let currentBuild = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "0"
+		
+		self.previousBuildNumber = previousBuild
+		self.currentBuildNumber = currentBuild
+		self.didUpdate = currentBuild.isVersion(greaterThan: previousBuild)
 		
 		completionPublisher.sink { value in
 			if value == 0 { // migration complete !

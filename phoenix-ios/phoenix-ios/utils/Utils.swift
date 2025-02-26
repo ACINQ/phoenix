@@ -12,10 +12,10 @@ enum MsatsPolicy {
 
 class Utils {
 	
-	public static let Millisatoshis_Per_Satoshi      =           1_000.0
-	public static let Millisatoshis_Per_Bit          =         100_000.0
-	public static let Millisatoshis_Per_Millibitcoin =     100_000_000.0
-	public static let Millisatoshis_Per_Bitcoin      = 100_000_000_000.0
+	public static let Millisatoshis_Per_Satoshi      : Int64 =           1_000
+	public static let Millisatoshis_Per_Bit          : Int64 =         100_000
+	public static let Millisatoshis_Per_Millibitcoin : Int64 =     100_000_000
+	public static let Millisatoshis_Per_Bitcoin      : Int64 = 100_000_000_000
 	
 	// --------------------------------------------------
 	// MARK: Conversion
@@ -43,7 +43,7 @@ class Utils {
 	/// Converts from satoshi to millisatoshi
 	///
 	static func toMsat(sat: Int64) -> Int64 {
-		return sat * Int64(Millisatoshis_Per_Satoshi)
+		return sat * Millisatoshis_Per_Satoshi
 	}
 	
 	/// Converts to millisatoshi, the preferred unit for performing conversions.
@@ -52,10 +52,10 @@ class Utils {
 		
 		var msat: Double
 		switch bitcoinUnit {
-			case .sat          : msat = amount * Millisatoshis_Per_Satoshi
-			case .bit          : msat = amount * Millisatoshis_Per_Bit
-			case .mbtc         : msat = amount * Millisatoshis_Per_Millibitcoin
-			default/*.bitcoin*/: msat = amount * Millisatoshis_Per_Bitcoin
+			case .sat          : msat = amount * Double(Millisatoshis_Per_Satoshi)
+			case .bit          : msat = amount * Double(Millisatoshis_Per_Bit)
+			case .mbtc         : msat = amount * Double(Millisatoshis_Per_Millibitcoin)
+			default/*.bitcoin*/: msat = amount * Double(Millisatoshis_Per_Bitcoin)
 		}
 		
 		if let result = Int64(exactly: msat.rounded(.toNearestOrAwayFromZero)) {
@@ -80,10 +80,11 @@ class Utils {
 	static func convertBitcoin(msat: Int64, to bitcoinUnit: BitcoinUnit) -> Double {
 		
 		switch bitcoinUnit {
-			case .sat          : return Double(msat) / Millisatoshis_Per_Satoshi
-			case .bit          : return Double(msat) / Millisatoshis_Per_Bit
-			case .mbtc         : return Double(msat) / Millisatoshis_Per_Millibitcoin
-			default/*.bitcoin*/: return Double(msat) / Millisatoshis_Per_Bitcoin
+			case .sat        : return Double(msat) / Double(Millisatoshis_Per_Satoshi)
+			case .bit        : return Double(msat) / Double(Millisatoshis_Per_Bit)
+			case .mbtc       : return Double(msat) / Double(Millisatoshis_Per_Millibitcoin)
+			case .btc        : return Double(msat) / Double(Millisatoshis_Per_Bitcoin)
+			@unknown default : fatalError("Unknown BitcoinUnit")
 		}
 	}
 	
@@ -94,7 +95,7 @@ class Utils {
 		//
 		// exchangeRate.price => value of 1.0 BTC in fiat
 		
-		let btc = Double(msat) / Millisatoshis_Per_Bitcoin
+		let btc = Double(msat) / Double(Millisatoshis_Per_Bitcoin)
 		let fiat = btc * exchangeRate.price
 		
 		return fiat
@@ -475,7 +476,35 @@ class Utils {
 	}
 	
 	// --------------------------------------------------
-	// MARK: Alt Formatting
+	// MARK: Switched Formatting
+	// --------------------------------------------------
+
+	static func format(
+		currencyAmount : CurrencyAmount,
+		policy         : MsatsPolicy = .hideMsats,
+		locale         : Locale? = nil
+	) -> FormattedAmount {
+		
+		switch currencyAmount.currency {
+		case .bitcoin(let bitcoinUnit):
+			return formatBitcoin(
+				amount      : currencyAmount.amount,
+				bitcoinUnit : bitcoinUnit,
+				policy      : policy,
+				locale      : locale
+			)
+			
+		case .fiat(let fiatCurrency):
+			return formatFiat(
+				amount       : currencyAmount.amount,
+				fiatCurrency : fiatCurrency,
+				locale       : locale
+			)
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Unknown Amount
 	// --------------------------------------------------
 	
 	static func unknownBitcoinAmount(

@@ -1092,7 +1092,7 @@ struct ManageContact: View {
 				
 				if let oldPhotoName, oldPhotoName != newPhotoName {
 					log.debug("Deleting old photo from disk...")
-					try await PhotosManager.shared.deleteFromDisk(fileName: oldPhotoName)
+					await PhotosManager.shared.deleteFromDisk(fileName: oldPhotoName)
 				}
 				
 				success = true

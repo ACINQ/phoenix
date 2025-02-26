@@ -16,14 +16,12 @@
 
 package fr.acinq.phoenix.android.components.contact
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -36,9 +34,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -64,6 +59,7 @@ import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.SwitchView
 import fr.acinq.phoenix.android.components.TextInput
+import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.invisibleOutlinedTextFieldColors
@@ -79,7 +75,6 @@ import kotlinx.coroutines.launch
  *
  * The contact may be edited and deleted from that screen.
  */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun ContactDetailsView(
     contact: ContactInfo,
@@ -88,18 +83,16 @@ fun ContactDetailsView(
     onContactChange: ((ContactInfo?) -> Unit)?,
 ) {
     val scope = rememberCoroutineScope()
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
-        sheetState = sheetState,
-        onDismissRequest = onDismiss,
-        modifier = Modifier.fillMaxHeight(.7f),
-        containerColor = MaterialTheme.colors.surface,
-        contentColor = MaterialTheme.colors.onSurface,
-        scrimColor = MaterialTheme.colors.onBackground.copy(alpha = 0.2f),
+        onDismiss = onDismiss,
+        skipPartiallyExpanded = true,
+        isContentScrollable = false,
+        contentHeight = 550.dp,
+        internalPadding = PaddingValues(0.dp)
     ) {
         val pagerState = rememberPagerState(pageCount = { 2 })
-        HorizontalPager(state = pagerState, verticalAlignment = Alignment.Top) { index ->
+        HorizontalPager(state = pagerState, verticalAlignment = Alignment.Top, modifier = Modifier.height(700.dp)) { index ->
             when (index) {
                 0 -> ContactNameAndPhoto(
                     contact = contact,
@@ -124,7 +117,7 @@ fun ContactDetailsView(
 @Composable
 private fun ContactNameAndPhoto(
     contact: ContactInfo,
-    currentOffer: OfferTypes.Offer?,
+    @Suppress("UNUSED_PARAMETER") currentOffer: OfferTypes.Offer?,
     onContactChange: ((ContactInfo?) -> Unit)?,
     onDismiss: () -> Unit,
     onOffersClick: () -> Unit,

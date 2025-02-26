@@ -2,8 +2,8 @@ package fr.acinq.phoenix.utils.channels
 
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.lightning.channel.states.PersistedChannelState
-import fr.acinq.lightning.serialization.Encryption.from
-import fr.acinq.lightning.serialization.Serialization
+import fr.acinq.lightning.serialization.channel.Encryption.from
+import fr.acinq.lightning.serialization.channel.Serialization
 import fr.acinq.lightning.wire.EncryptedChannelData
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.lightning.logging.error

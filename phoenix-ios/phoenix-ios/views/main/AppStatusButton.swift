@@ -13,7 +13,8 @@ struct AppStatusButton: View {
 	let headerButtonHeightReader: GeometryPreferenceReader<AppendValue<HeaderButtonHeight>, [CGFloat]>
 	@Binding var headerButtonHeight: CGFloat?
 	
-	@State var dimStatus = false
+	@State var isTorEnabled: Bool = Biz.business.appConfigurationManager.isTorEnabledValue
+	@State var electrumConfig: ElectrumConfig = Biz.business.appConfigurationManager.electrumConfigValue
 	
 	@State var syncState: SyncBackupManager_State = .initializing
 	@State var pendingSettings: SyncBackupManager_PendingSettings? = nil
@@ -23,6 +24,9 @@ struct AppStatusButton: View {
 	let showTextDelay: TimeInterval = 10 // seconds
 	
 	@StateObject var connectionsMonitor = ObservableConnectionsMonitor()
+	
+	@State var channels = Biz.business.peerManager.channelsValue()
+	let channelsPublisher = Biz.business.peerManager.channelsPublisher()
 	
 	@EnvironmentObject var popoverState: PopoverState
 	@EnvironmentObject var deviceInfo: DeviceInfo
@@ -61,6 +65,15 @@ struct AppStatusButton: View {
 		.onReceive(syncBackupManager.pendingSettingsPublisher) {
 			syncBackupManagerPendingSettingsChanged($0)
 		}
+		.onReceive(Biz.business.appConfigurationManager.isTorEnabledPublisher()) {
+			isTorEnabledChanged($0)
+		}
+		.onReceive(Biz.business.appConfigurationManager.electrumConfigPublisher()) {
+			electrumConfigChanged($0)
+		}
+		.onReceive(channelsPublisher) {
+			channelsChanged($0)
+		}
 	}
 	
 	@ViewBuilder
@@ -85,10 +98,21 @@ struct AppStatusButton: View {
 	func buttonContent() -> some View {
 		
 		let connectionStatus = connectionsMonitor.connections.global
-		if connectionStatus.isClosed() {
+		
+		if isInvalidElectrumAddress {
+			HStack(alignment: .firstTextBaseline, spacing: 0) {
+				Text(NSLocalizedString("Invalid address", comment: "Connection state"))
+					.font(.caption2)
+					.padding(.leading, 10)
+					.padding(.trailing, -5)
+				AppStatusButtonIcon.invalidElectrumAddress.view()
+					.frame(minHeight: headerButtonHeight)
+					.squareFrame()
+			}
+		} else if connectionStatus.isClosed() {
 			HStack(alignment: .firstTextBaseline, spacing: 0) {
 				if showText {
-					Text(NSLocalizedString("Offline", comment: "Connection state"))
+					Text("Offline", comment: "Connection state")
 						.font(.caption2)
 						.padding(.leading, 10)
 						.padding(.trailing, -5)
@@ -101,7 +125,7 @@ struct AppStatusButton: View {
 		else if connectionStatus.isEstablishing() {
 			HStack(alignment: .firstTextBaseline, spacing: 0) {
 				if showText {
-					Text(NSLocalizedString("Connecting…", comment: "Connection state"))
+					Text("Connecting…", comment: "Connection state")
 						.font(.caption2)
 						.padding(.leading, 10)
 						.padding(.trailing, -5)
@@ -112,13 +136,26 @@ struct AppStatusButton: View {
 			}
 		} else /* .established */ {
 			
-			if pendingSettings != nil {
+			let inFlightPaymentsCount = channels.inFlightPaymentsCount()
+			if inFlightPaymentsCount > 0 {
+				HStack(alignment: .firstTextBaseline, spacing: 0) {
+					Text(verbatim: "\(inFlightPaymentsCount)")
+						.font(.footnote)
+						.padding(.leading, 10)
+						.padding(.trailing, -5)
+					AppStatusButtonIcon.paymentsInFlight.view()
+						.frame(minHeight: headerButtonHeight)
+						.squareFrame()
+				}
+				
+			} else if pendingSettings != nil {
 				// The user enabled/disabled cloud sync.
 				// We are using a 30 second delay before we start operating on the user's decision.
-				// Just in-case it was an accidental change, or the user changes his/her mind.
+				// This is a safety measure, in case it was an accidental change, or the user changes their mind.
 				AppStatusButtonIcon.waiting.view()
 					.frame(minHeight: headerButtonHeight)
 					.squareFrame()
+				
 			} else {
 				let (isSyncing, isWaiting, isError) = buttonizeSyncStatus()
 				if isSyncing {
@@ -135,15 +172,9 @@ struct AppStatusButton: View {
 						.squareFrame()
 				} else {
 					// Everything is good: connected + {synced|disabled|initializing}
-					if connectionsMonitor.connections.torEnabled {
-						AppStatusButtonIcon.connectedWithTor.view()
-							.frame(minHeight: headerButtonHeight)
-							.squareFrame()
-					} else {
-						AppStatusButtonIcon.connected.view()
-							.frame(minHeight: headerButtonHeight)
-							.squareFrame()
-					}
+					AppStatusButtonIcon.connected.view()
+						.frame(minHeight: headerButtonHeight)
+						.squareFrame()
 				}
 			}
 		}
@@ -152,6 +183,17 @@ struct AppStatusButton: View {
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
+	
+	var isInvalidElectrumAddress: Bool {
+		
+		if isTorEnabled {
+			if let customConfig = electrumConfig as? ElectrumConfig.Custom {
+				return !customConfig.server.isOnion && customConfig.requireOnionIfTorEnabled
+			}
+		}
+	
+		return false
+	}
 	
 	func buttonizeSyncStatus() -> (Bool, Bool, Bool) {
 		
@@ -204,6 +246,24 @@ struct AppStatusButton: View {
 		log.trace("syncBackupManagerPendingSettingsChanged()")
 		
 		pendingSettings = newPendingSettings
+	}
+	
+	func isTorEnabledChanged(_ newValue: Bool) {
+		log.trace("isTorEnabledChanged(\(newValue))")
+		
+		isTorEnabled = newValue
+	}
+	
+	func electrumConfigChanged(_ newValue: ElectrumConfig) {
+		log.trace("electrumConfigChanged()")
+		
+		electrumConfig = newValue
+	}
+	
+	func channelsChanged(_ newChannels: [LocalChannelInfo]) {
+		log.trace("channelsChanged()")
+		
+		channels = newChannels
 	}
 	
 	// --------------------------------------------------
@@ -273,9 +333,11 @@ fileprivate enum AppStatusButtonIcon: CaseIterable, Identifiable {
 	case connecting
 	case connected
 	case connectedWithTor
+	case paymentsInFlight
 	case syncing
 	case waiting
-	case error;
+	case error
+	case invalidElectrumAddress;
 
 	var id: Self { self }
 
@@ -301,6 +363,11 @@ fileprivate enum AppStatusButtonIcon: CaseIterable, Identifiable {
 				.imageScale(.large)
 				.font(.subheadline) // bigger
 				.padding(.all, 0)   // bigger
+		case .paymentsInFlight:
+			Image(systemName: "paperplane")
+				.imageScale(.large)
+				.font(.caption2)
+				.padding(.all, 7)
 		case .syncing:
 			Image(systemName: "icloud")
 				.imageScale(.large)
@@ -313,6 +380,11 @@ fileprivate enum AppStatusButtonIcon: CaseIterable, Identifiable {
 				.padding(.all, 7)
 		case .error:
 			Image(systemName: "exclamationmark.triangle")
+				.imageScale(.large)
+				.font(.caption2)
+				.padding(.all, 7)
+		case .invalidElectrumAddress:
+			Image(systemName: "shield.lefthalf.filled.slash")
 				.imageScale(.large)
 				.font(.caption2)
 				.padding(.all, 7)

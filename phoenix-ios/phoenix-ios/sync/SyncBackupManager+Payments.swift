@@ -10,11 +10,15 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
+fileprivate let payments_record_table_name = "payments"
+fileprivate let payments_record_column_data = "encryptedData"
+fileprivate let payments_record_column_meta = "encryptedMeta"
+
 fileprivate struct DownloadedPayment {
 	let record: CKRecord
-	let unpaddedSize: Int
 	let payment: Lightning_kmpWalletPayment
 	let metadata: WalletPaymentMetadataRow?
+	let unpaddedSize: Int
 }
 
 fileprivate struct UploadPaymentsOperationInfo {
@@ -23,12 +27,11 @@ fileprivate struct UploadPaymentsOperationInfo {
 	let recordsToSave: [CKRecord]
 	let recordIDsToDelete: [CKRecord.ID]
 	
-	let reverseMap: [CKRecord.ID: WalletPaymentId]
-	let unpaddedMap: [WalletPaymentId: Int]
+	let reverseMap: [CKRecord.ID: Lightning_kmpUUID]
 	
 	var completedRowids: [Int64] = []
 	
-	var partialFailures: [WalletPaymentId: CKError?] = [:]
+	var partialFailures: [Lightning_kmpUUID: CKError?] = [:]
 	
 	var savedRecords: [CKRecord] = []
 	var deletedRecordIds: [CKRecord.ID] = []
@@ -36,19 +39,78 @@ fileprivate struct UploadPaymentsOperationInfo {
 
 extension SyncBackupManager {
 	
+	func startPaymentsQueueCountMonitor() {
+		log.trace("startPaymentsQueueCountMonitor()")
+		
+		// Kotlin suspend functions are currently only supported on the main thread
+		assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
+		
+		self.cloudKitDb.payments.queueCountPublisher().sink {[weak self] (queueCount: Int64) in
+			log.debug("payments.queueCountPublisher().sink(): count = \(queueCount)")
+			
+			guard let self = self else {
+				return
+			}
+			
+			let count = Int(clamping: queueCount)
+			
+			let wait: SyncBackupManager_State_Waiting?
+			if Prefs.shared.backupTransactions.useUploadDelay {
+				let delay = TimeInterval.random(in: 10 ..< 900)
+				wait = SyncBackupManager_State_Waiting(
+					kind: .randomizedUploadDelay,
+					parent: self,
+					delay: delay
+				)
+			} else {
+				wait = nil
+			}
+			
+			Task {
+				if let newState = await self.actor.paymentsQueueCountChanged(count, wait: wait) {
+					self.handleNewState(newState)
+				}
+			}
+
+		}.store(in: &cancellables)
+	}
+	
+	func startPaymentsMigrations() {
+		log.trace("startPaymentsMigrations()")
+		
+		let hasDownloadedPayments = Prefs.shared.backupTransactions.hasDownloadedPayments(walletId)
+		let hasReUploadedPayments = Prefs.shared.backupTransactions.hasReUploadedPayments(walletId)
+		
+		let needsMigration = hasDownloadedPayments && !hasReUploadedPayments
+		
+		guard needsMigration else {
+			log.debug("startPaymentsMigrations(): no migration needed")
+			return
+		}
+		
+		log.debug("startPaymentsMigrations(): starting...")
+		Task { @MainActor in
+		
+			try await self.cloudKitDb.payments.enqueueOutdatedItems()
+			Prefs.shared.backupTransactions.markHasReUploadedPayments(walletId)
+		}
+	}
+	
+	// ----------------------------------------
+	// MARK: IO
+	// ----------------------------------------
+	
 	func downloadPayments(_ downloadProgress: SyncBackupManager_State_Downloading) {
 		log.trace("downloadPayments()")
 		
-		Task {
+		Task { @MainActor in
 			
-			// Step 1 of 4:
+			// Step 1 of 6:
 			//
 			// We are downloading payments from newest to oldest.
 			// So first we fetch the oldest payment date in the table (if there is one)
 			
-			let millis: KotlinLong? = try await Task { @MainActor in
-				return try await self.cloudKitDb.payments.fetchOldestCreation()
-			}.value
+			let millis: KotlinLong? = try await self.cloudKitDb.payments.fetchOldestCreation()
 			
 			let oldestCreationDate = millis?.int64Value.toDate(from: .milliseconds)
 			downloadProgress.setPayments_oldestCompletedDownload(oldestCreationDate)
@@ -78,16 +140,16 @@ extension SyncBackupManager {
 			 * our current choice is to sacrifice the progress details.
 			 */
 			
-			let privateCloudDatabase = CKContainer.default().privateCloudDatabase
+			let privDb = CKContainer.default().privateCloudDatabase
 			let zoneID = self.recordZoneID()
 			
 			let configuration = CKOperation.Configuration()
 			configuration.allowsCellularAccess = true
 			
 			do {
-				try await privateCloudDatabase.configuredWith(configuration: configuration) { database in
+				try await privDb.configuredWith(configuration: configuration) { database in
 					
-					// Step 2 of 4:
+					// Step 2 of 6:
 					//
 					// Execute a CKQuery to download a batch of payments from the cloud.
 					// There may be multiple batches available for download.
@@ -110,7 +172,7 @@ extension SyncBackupManager {
 					var done = false
 					var batch = 0
 					var cursor: CKQueryOperation.Cursor? = nil
-					
+						
 					while !done {
 						
 						// For the first batch, we want to quickly fetch an item from the cloud,
@@ -148,21 +210,15 @@ extension SyncBackupManager {
 						var items: [DownloadedPayment] = []
 						for (_, result) in results {
 							if case .success(let record) = result {
-								let (payment, metadata, unpaddedSize) = self.decryptAndDeserializePayment(record)
-								if let payment {
-									items.append(DownloadedPayment(
-										record: record,
-										unpaddedSize: unpaddedSize,
-										payment: payment,
-										metadata: metadata
-									))
+								if let info = self.decryptAndDeserializePayment(record) {
+									items.append(info)
 								}
 							}
 						}
 						
 						log.trace("downloadPayments(): batchFetch: received \(items.count)")
 						
-						// Step 3 of 4:
+						// Step 3 of 6:
 						//
 						// Save the downloaded results to the database.
 						
@@ -171,14 +227,14 @@ extension SyncBackupManager {
 							var oldest: Date? = nil
 							
 							var paymentRows: [Lightning_kmpWalletPayment] = []
-							var paymentMetadataRows: [WalletPaymentId: WalletPaymentMetadataRow] = [:]
-							var metadataMap: [WalletPaymentId: CloudKitPaymentsDb.MetadataRow] = [:]
+							var paymentMetadataRows: [Lightning_kmpUUID: WalletPaymentMetadataRow] = [:]
+							var metadataMap: [Lightning_kmpUUID: CloudKitPaymentsDb.MetadataRow] = [:]
 							
 							for item in items {
 								
 								paymentRows.append(item.payment)
 								
-								let paymentId = item.payment.walletPaymentId()
+								let paymentId = item.payment.id
 								paymentMetadataRows[paymentId] = item.metadata
 								
 								let creationDate = item.record.creationDate ?? Date()
@@ -227,18 +283,31 @@ extension SyncBackupManager {
 				
 				log.trace("downloadPayments(): enqueueMissingItems()...")
 				
-				// Step 4 of 4:
+				// Step 4 of 6:
+				//
+				// Run the `finishCloudKitRestore` task to cleanup any old payments.
+				
+				let sqlitePaymentsDb = try await Biz.business.databaseManager.paymentsDb()
+				try await sqlitePaymentsDb.finishCloudkitRestore()
+				
+				// Step 5 of 6:
+				//
+				// If there were any "old" versions in the cloud (CloudData.V0),
+				// let's re-upload those using the new version (CloudData.V1).
+				
+				try await self.cloudKitDb.payments.enqueueOutdatedItems()
+				
+				// Step 6 of 6:
 				//
 				// There may be payments that we've added to the database since we started the download process.
 				// So we enqueue these for upload now.
 				
-				try await Task { @MainActor in
-					try await self.cloudKitDb.payments.enqueueMissingItems()
-				}.value
+				try await self.cloudKitDb.payments.enqueueMissingItems()
 				
 				log.trace("downloadPayments(): finish: success")
 				
 				Prefs.shared.backupTransactions.markHasDownloadedPayments(walletId)
+				Prefs.shared.backupTransactions.markHasReUploadedPayments(walletId)
 				self.consecutiveErrorCount = 0
 				
 				if let newState = await self.actor.didDownloadPayments() {
@@ -272,8 +341,7 @@ extension SyncBackupManager {
 			var recordsToSave = [CKRecord]()
 			var recordIDsToDelete = [CKRecord.ID]()
 			
-			var reverseMap = [CKRecord.ID: WalletPaymentId]()
-			var unpaddedMap = [WalletPaymentId: Int]()
+			var reverseMap = [CKRecord.ID: Lightning_kmpUUID]()
 			
 			// NB: batch.rowidMap may contain the same paymentRowId multiple times.
 			// And if we include the same record multiple times in the CKModifyRecordsOperation,
@@ -290,7 +358,7 @@ extension SyncBackupManager {
 				
 				if let row = batch.rowMap[paymentId] {
 					
-					if let (ciphertext, unpaddedSize) = self.serializeAndEncryptPayment(row.payment, batch) {
+					if let ciphertext = self.serializeAndEncryptPayment(row.payment, batch) {
 						
 						let record = existingRecord ?? CKRecord(
 							recordType: payments_record_table_name,
@@ -305,7 +373,6 @@ extension SyncBackupManager {
 						
 						recordsToSave.append(record)
 						reverseMap[record.recordID] = paymentId
-						unpaddedMap[paymentId] = unpaddedSize
 					}
 					
 				} else {
@@ -324,13 +391,12 @@ extension SyncBackupManager {
 				batch: batch,
 				recordsToSave: recordsToSave,
 				recordIDsToDelete: recordIDsToDelete,
-				reverseMap: reverseMap,
-				unpaddedMap: unpaddedMap
+				reverseMap: reverseMap
 			)
 			
-			// Edge-case: A rowid wasn't able to be converted to a WalletPaymentId.
-			// This may happen when we add a new type to the database,
-			// and we don't have code in place within `cloudKitDb.fetchQueueBatch()` to handle it.
+			// Edge-case: A rowid wasn't able to be converted to a UUID.
+			// This was possible in the past, when we added new types to the database.
+			// Very unlikely now that we've standardized on UUID for all paymentId's.
 			//
 			// So the rowid is not represented in either `rowidMap` or `uniquePaymentIds()`.
 			// Nor is it reprensented in `recordsToSave` or `recordIDsToDelete`.
@@ -489,8 +555,8 @@ extension SyncBackupManager {
 			log.trace("uploadPayments(): updateDatabase()")
 			
 			var deleteFromQueue = [KotlinLong]()
-			var deleteFromMetadata = [WalletPaymentId]()
-			var updateMetadata = [WalletPaymentId: CloudKitPaymentsDb.MetadataRow]()
+			var deleteFromMetadata = [Lightning_kmpUUID]()
+			var updateMetadata = [Lightning_kmpUUID: CloudKitPaymentsDb.MetadataRow]()
 			
 			for (rowid) in opInfo.completedRowids {
 				deleteFromQueue.append(KotlinLong(longLong: rowid))
@@ -503,12 +569,11 @@ extension SyncBackupManager {
 			for record in opInfo.savedRecords {
 				if let paymentRowId = opInfo.reverseMap[record.recordID] {
 					
-					let unpaddedSize = opInfo.unpaddedMap[paymentRowId] ?? 0
 					let creation = self.dateToMillis(record.creationDate ?? Date())
 					let metadata = self.metadataForRecord(record)
 					
 					updateMetadata[paymentRowId] = CloudKitPaymentsDb.MetadataRow(
-						unpaddedSize: Int64(unpaddedSize),
+						unpaddedSize: Int64(0),
 						recordCreation: creation,
 						recordBlob:  metadata.toKotlinByteArray()
 					)
@@ -644,18 +709,18 @@ extension SyncBackupManager {
 	// MARK: Record ID
 	// ----------------------------------------
 	
-	private func recordID(paymentId: WalletPaymentId) -> CKRecord.ID {
+	private func recordID(paymentId: Lightning_kmpUUID) -> CKRecord.ID {
 		
 		// The recordID is:
 		// - deterministic => by hashing the paymentId
 		// - secure => by mixing in the secret cloudKey (derived from seed)
 		
 		let prefix = SHA256.hash(data: cloudKey.rawRepresentation)
-		let suffix = paymentId.dbId.data(using: .utf8)!
+		let suffix = paymentId.description().data(using: .utf8)!
 		
 		let hashMe = prefix + suffix
 		let digest = SHA256.hash(data: hashMe)
-		let hash = digest.map { String(format: "%02hhx", $0) }.joined()
+		let hash = digest.toHex(options: .lowerCase)
 		
 		return CKRecord.ID(recordName: hash, zoneID: recordZoneID())
 	}
@@ -672,128 +737,28 @@ extension SyncBackupManager {
 	private func serializeAndEncryptPayment(
 		_ row: Lightning_kmpWalletPayment,
 		_ batch: FetchPaymentsQueueBatchResult
-	) -> (Data, Int)? {
+	) -> Data? {
 		
-		var wrapper: CloudData? = nil
+		let wrapper = CloudData.V1(payment: row)
 		
-		if let incoming = row as? Lightning_kmpIncomingPayment {
-			wrapper = CloudData(incoming: incoming)
-			
-		} else if let outgoing = row as? Lightning_kmpOutgoingPayment {
-			wrapper = CloudData(outgoing: outgoing)
-		}
+		let cleartext: Data = wrapper.serialize().toSwiftData()
 		
-		var cleartext: Data? = nil
-		var unpaddedSize: Int = 0
-		
-		if let wrapper = wrapper {
-			
-			let cbor = wrapper.cborSerialize().toSwiftData()
-			cleartext = cbor
-			unpaddedSize = cbor.count
-			
-			#if DEBUG
-		//	let jsonData = wrapper.jsonSerialize().toSwiftData()
-		//	let jsonStr = String(data: jsonData, encoding: .utf8)
-		//	log.debug("Uploading record (JSON representation):\n\(jsonStr ?? "<nil>")")
-			#endif
-			
-			// We want to add padding to obfuscate the payment type. That is,
-			// it should not be possible to determine the type of payment (incoming vs outgoing),
-			// simply by inspecting the size of the encrypted blob.
-			//
-			// Generally speaking, an IncomingPayment is smaller than an OutgoingPayment.
-			// But this depends on many factors, including the size of the PaymentRequest.
-			// And this may change over time, as the Phoenix codebase evolves.
-			//
-			// So our technique is dynamic and adaptive:
-			// For every payment stored in the cloud, we track (in the local database)
-			// the raw/unpadded size of the serialized payment.
-			//
-			// This allows us to generate the {mean, standardDeviation} for each payment type.
-			// Using this information, we generate a target range for the size of the encrypted blob.
-			// And then we and a random amount of padding to reach our target range.
-			
-			let makeRange = { (stats: CloudKitPaymentsDb.MetadataStats) -> (Int, Int) in
-				
-				var rangeMin: Int = 0
-				var rangeMax: Int = 0
-				
-				if stats.mean > 0 {
-					
-					let deviation = stats.standardDeviation * 1.5
-					
-					let minRange = stats.mean - deviation
-					let maxRange = stats.mean + deviation
-					
-					if minRange > 0 {
-						rangeMin = Int(minRange.rounded(.toNearestOrAwayFromZero))
-						rangeMax = Int(maxRange.rounded(.up))
-					}
-				}
-				
-				return (rangeMin, rangeMax)
-			}
-			
-			let (rangeMin_incoming, rangeMax_incoming) = makeRange(batch.incomingStats)
-			let (rangeMin_outgoing, rangeMax_outgoing) = makeRange(batch.outgoingStats)
-			
-			var rangeMin = 0
-			var rangeMax = 0
-			
-			if rangeMax_outgoing > rangeMax_incoming {
-				rangeMin = rangeMin_outgoing
-				rangeMax = rangeMax_outgoing
-				
-			} else if rangeMax_incoming > rangeMax_outgoing {
-				rangeMin = rangeMin_incoming
-				rangeMax = rangeMax_incoming
-			}
-			
-			var padSize = 0
-			if rangeMin > 0, rangeMax > 0, rangeMin < rangeMax, unpaddedSize < rangeMin {
-				
-				padSize = (rangeMin - unpaddedSize)
-				padSize += Int.random(in: 0 ..< (rangeMax - rangeMin))
-					
-			} else {
-				// Add a smaller amount of padding
-				padSize += Int.random(in: 0 ..< 256)
-			}
-			
-			let padding: Data
-			if padSize > 0 {
-				padding = genRandomBytes(padSize)
-			} else {
-				padding = Data()
-			}
-			
-			let padded = wrapper.doCopyWithPadding(padding: padding.toKotlinByteArray())
-			
-			let paddedCbor = padded.cborSerialize().toSwiftData()
-			cleartext = paddedCbor
-			
-			log.debug("unpadded=\(unpaddedSize), padded=\(cleartext!.count)")
-		}
+		#if DEBUG
+	//	let jsonData = wrapper.jsonSerialize().toSwiftData()
+	//	let jsonStr = String(data: jsonData, encoding: .utf8)
+	//	log.debug("Uploading record (JSON representation):\n\(jsonStr ?? "<nil>")")
+		#endif
 		
 		var ciphertext: Data? = nil
-		
-		if let cleartext = cleartext {
+		do {
+			let box = try ChaChaPoly.seal(cleartext, using: self.cloudKey)
+			ciphertext = box.combined
 			
-			do {
-				let box = try ChaChaPoly.seal(cleartext, using: self.cloudKey)
-				ciphertext = box.combined
-				
-			} catch {
-				log.error("Error encrypting row with ChaChaPoly: \(String(describing: error))")
-			}
+		} catch {
+			log.error("Error encrypting row with ChaChaPoly: \(String(describing: error))")
 		}
 		
-		if let ciphertext = ciphertext {
-			return (ciphertext, unpaddedSize)
-		} else {
-			return nil
-		}
+		return ciphertext
 	}
 	
 	private func serializeAndEncryptMetadata(
@@ -832,15 +797,15 @@ extension SyncBackupManager {
 	
 	private func decryptAndDeserializePayment(
 		_ record: CKRecord
-	) -> (Lightning_kmpWalletPayment?, WalletPaymentMetadataRow?, Int) {
+	) -> DownloadedPayment? {
 		
 		log.debug("Received record:")
 		log.debug(" - recordID: \(record.recordID)")
 		log.debug(" - creationDate: \(record.creationDate ?? Date.distantPast)")
 		
-		var unpaddedSize: Int = 0
 		var payment: Lightning_kmpWalletPayment? = nil
 		var metadata: WalletPaymentMetadataRow? = nil
+		var unpaddedSize: Int = 0
 		
 		if let ciphertext = record[payments_record_column_data] as? Data {
 		//	log.debug(" - data.count: \(ciphertext.count)")
@@ -859,29 +824,32 @@ extension SyncBackupManager {
 			
 			var wrapper: CloudData? = nil
 			if let cleartext {
-				do {
-					let cleartext_kotlin = cleartext.toKotlinByteArray()
-					wrapper = try CloudData.companion.cborDeserialize(blob: cleartext_kotlin)
+				
+				let cleartext_kotlin = cleartext.toKotlinByteArray()
+				wrapper = CloudData.companion.deserialize(data: cleartext_kotlin)
 					
-				//	#if DEBUG
-				//	let jsonData = wrapper.jsonSerialize().toSwiftData()
-				//	let jsonStr = String(data: jsonData, encoding: .utf8)
-				//	log.debug(" - raw JSON:\n\(jsonStr ?? "<nil>")")
-				//	#endif
+			//	#if DEBUG
+			//	let jsonData = wrapper.jsonSerialize().toSwiftData()
+			//	let jsonStr = String(data: jsonData, encoding: .utf8)
+			//	log.debug(" - raw JSON:\n\(jsonStr ?? "<nil>")")
+			//	#endif
 
+				if let wrapper_v0 = wrapper as? CloudData.V0 {
+					do {
+						payment = try wrapper_v0.unwrap()
+					} catch {
+						log.error("Error unwrapping record.data: skipping \(record.recordID)")
+					}
+					
 					let paddedSize = cleartext.count
-					let paddingSize = Int(wrapper!.padding?.size ?? 0)
+					let paddingSize = Int(wrapper_v0.padding?.size ?? 0)
 					unpaddedSize = paddedSize - paddingSize
-				} catch {
+					
+				} else if let wrapper_v1 = wrapper as? CloudData.V1 {
+					payment = wrapper_v1.payment
+					unpaddedSize = 0 // Deprecated: Only used by CloudData.V0; Must be zero for newer versions.
+				} else {
 					log.error("Error deserializing record.data: skipping \(record.recordID)")
-				}
-			}
-			
-			if let wrapper {
-				do {
-					payment = try wrapper.unwrap()
-				} catch {
-					log.error("Error unwrapping record.data: skipping \(record.recordID)")
 				}
 			}
 		}
@@ -930,7 +898,16 @@ extension SyncBackupManager {
 			}
 		}
 		
-		return (payment, metadata, unpaddedSize)
+		if let payment {
+			return DownloadedPayment(
+				record: record,
+				payment: payment,
+				metadata: metadata,
+				unpaddedSize: unpaddedSize
+			)
+		} else {
+			return nil
+		}
 	}
 	
 	// ----------------------------------------

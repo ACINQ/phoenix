@@ -16,7 +16,6 @@
 
 package fr.acinq.phoenix.android.settings.walletinfo
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,17 +23,13 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,13 +37,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.Transaction
 import fr.acinq.lightning.blockchain.electrum.balance
@@ -62,15 +55,14 @@ import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
-import fr.acinq.phoenix.android.components.Dialog
+import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.FeerateSlider
 import fr.acinq.phoenix.android.components.InlineTransactionLink
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.SplashLabelRow
 import fr.acinq.phoenix.android.components.TextInput
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
-import fr.acinq.phoenix.android.payments.send.CameraPermissionsView
-import fr.acinq.phoenix.android.payments.send.ScannerView
+import fr.acinq.phoenix.android.components.scanner.ScannerView
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.data.MempoolFeerate
 import fr.acinq.phoenix.utils.Parser
@@ -93,33 +85,18 @@ fun FinalWalletRefundView(
                 ProgressView(text = stringResource(id = R.string.utils_loading_data))
             }
             else -> {
-                if (available == 0.sat) {
-                    Text(text = stringResource(id = R.string.finalwallet_refund_available_none), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center, style = MaterialTheme.typography.caption)
-                    Spacer(modifier = Modifier.height(16.dp))
-                } else {
-                    Card(internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp), modifier = Modifier.fillMaxWidth()) {
-                        Row {
-                            Text(text = stringResource(id = R.string.finalwallet_refund_available))
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Column { AmountWithFiatBelow(amount = available.toMilliSatoshi(), amountTextStyle = MaterialTheme.typography.body2) }
-                        }
-                    }
-                    AvailableForRefund(
-                        availableForRefund = available,
-                        state = state,
-                        onResetState = { vm.state.value = FinalWalletRefundState.Init },
-                        onEstimateRefundFee = vm::estimateRefundFee,
-                        onExecuteRefund = vm::executeRefund,
-                    )
-
-                }
-
+                AvailableForRefund(
+                    available = available,
+                    state = state,
+                    onResetState = { vm.state.value = FinalWalletRefundState.Init },
+                    onEstimateRefundFee = vm::estimateRefundFee,
+                    onExecuteRefund = vm::executeRefund,
+                )
                 if (state is FinalWalletRefundState.Success) {
                     SuccessTx(state = state)
                 }
             }
         }
-        Spacer(modifier = Modifier.height(60.dp))
     }
 }
 
@@ -166,7 +143,7 @@ private fun AddressInputAndFeeSlider(
 
 @Composable
 private fun ColumnScope.AvailableForRefund(
-    availableForRefund: Satoshi,
+    available: Satoshi,
     state: FinalWalletRefundState,
     onResetState: () -> Unit,
     onEstimateRefundFee: (String, FeeratePerByte) -> Unit,
@@ -189,6 +166,19 @@ private fun ColumnScope.AvailableForRefund(
             }
         )
         return
+    }
+
+    Card(internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp), modifier = Modifier.fillMaxWidth()) {
+        if (available == 0.sat) {
+            Text(text = stringResource(id = R.string.finalwallet_refund_available_none), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center, style = MaterialTheme.typography.caption)
+            Spacer(modifier = Modifier.height(16.dp))
+        } else {
+            Row {
+                Text(text = stringResource(id = R.string.finalwallet_refund_available))
+                Spacer(modifier = Modifier.width(8.dp))
+                Column { AmountWithFiatBelow(amount = available.toMilliSatoshi(), amountTextStyle = MaterialTheme.typography.body2) }
+            }
+        }
     }
 
     Card(internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp), modifier = Modifier.fillMaxWidth()) {
@@ -293,6 +283,8 @@ private fun ColumnScope.AvailableForRefund(
         )
         Spacer(modifier = Modifier.height(16.dp))
     }
+
+    Spacer(modifier = Modifier.height(60.dp))
 }
 
 @Composable
@@ -340,34 +332,7 @@ private fun ColumnScope.RefundScanner(
     onScannerDismiss: () -> Unit,
     onAddressChange: (String) -> Unit,
 ) {
-    var scanView by remember { mutableStateOf<DecoratedBarcodeView?>(null) }
-    Box(
-        Modifier
-            .fillMaxWidth()
-            .weight(1f)) {
-        ScannerView(
-            onScanViewBinding = { scanView = it },
-            onScannedText = { onAddressChange(it) }
-        )
-
-        CameraPermissionsView {
-            LaunchedEffect(Unit) { scanView?.resume() }
-        }
-
-        // buttons at the bottom of the screen
-        Column(
-            Modifier
-                .align(Alignment.BottomCenter)
-                .padding(24.dp)
-                .clip(RoundedCornerShape(24.dp))
-                .background(MaterialTheme.colors.surface)
-        ) {
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                text = stringResource(id = R.string.btn_cancel),
-                icon = R.drawable.ic_arrow_back,
-                onClick = onScannerDismiss
-            )
-        }
+    Box(Modifier.fillMaxWidth().weight(1f)) {
+        ScannerView(onScannedText = onAddressChange, isPaused = false, onDismiss = onScannerDismiss)
     }
 }

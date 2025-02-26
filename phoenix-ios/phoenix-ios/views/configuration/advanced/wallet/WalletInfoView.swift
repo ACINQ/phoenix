@@ -612,6 +612,7 @@ struct WalletInfoView: View {
 					case .liquiditySettings  : break
 					case .forceCloseChannels : break
 					case .swapInWallet       : newNavLinkTag = NavLinkTag.SwapInWalletDetails
+					case .finalWallet        : newNavLinkTag = NavLinkTag.FinalWalletDetails
 				}
 				
 				if let newNavLinkTag {

@@ -18,8 +18,9 @@ struct HomeView : MVIView {
 	
 	private let paymentsPageFetcher = Biz.getPaymentsPageFetcher(name: "HomeView")
 	
-	let showSwapInWallet: () -> Void
 	let showLiquidityAds: () -> Void
+	let showSwapInWallet: () -> Void
+	let showFinalWallet: () -> Void
 	
 	@StateObject var mvi = MVIState({ $0.home() })
 
@@ -32,7 +33,7 @@ struct HomeView : MVIView {
 	
 	let recentPaymentsConfigPublisher = Prefs.shared.recentPaymentsConfigPublisher
 	@State var recentPaymentsConfig = Prefs.shared.recentPaymentsConfig
-	@State var lastCompletedPaymentId: WalletPaymentId? = nil
+	@State var lastCompletedPaymentId: Lightning_kmpUUID? = nil
 	
 	let paymentsPagePublisher: AnyPublisher<PaymentsPage, Never>
 	@State var paymentsPage = PaymentsPage(offset: 0, count: 0, rows: [])
@@ -41,6 +42,9 @@ struct HomeView : MVIView {
 	
 	let swapInWalletPublisher = Biz.business.balanceManager.swapInWalletPublisher()
 	@State var swapInWallet = Biz.business.balanceManager.swapInWalletValue()
+	
+	@State var finalWallet = Biz.business.peerManager.finalWalletValue()
+	let finalWalletPublisher = Biz.business.peerManager.finalWalletPublisher()
 	
 	@State var channels: [LocalChannelInfo] = []
 	let channelsPublisher = Biz.business.peerManager.channelsPublisher()
@@ -56,7 +60,7 @@ struct HomeView : MVIView {
 	let contactsPublisher = Biz.business.contactsManager.contactsListPublisher()
 	
 	@State var didAppear = false
-	
+		
 	enum NoticeBoxContentHeight: Preference {}
 	let noticeBoxContentHeightReader = GeometryPreferenceReader(
 		key: AppendValue<NoticeBoxContentHeight>.self,
@@ -84,11 +88,14 @@ struct HomeView : MVIView {
 	// --------------------------------------------------
 	
 	init(
+		showLiquidityAds: @escaping () -> Void,
 		showSwapInWallet: @escaping () -> Void,
-		showLiquidityAds: @escaping () -> Void
+		showFinalWallet: @escaping () -> Void
 	) {
-		self.showSwapInWallet = showSwapInWallet
 		self.showLiquidityAds = showLiquidityAds
+		self.showSwapInWallet = showSwapInWallet
+		self.showFinalWallet = showFinalWallet
+		
 		self.paymentsPagePublisher = paymentsPageFetcher.paymentsPagePublisher()
 	}
 	
@@ -107,37 +114,40 @@ struct HomeView : MVIView {
 	@ViewBuilder
 	var view: some View {
 		
-		ZStack {
-			content()
-		}
-		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.onChange(of: mvi.model) { newModel in
-			onModelChange(model: newModel)
-		}
-		.onChange(of: currencyPrefs.hideAmounts) { _ in
-			hideAmountsChanged()
-		}
-		.onReceive(recentPaymentsConfigPublisher) {
-			recentPaymentsConfigChanged($0)
-		}
-		.onReceive(paymentsPagePublisher) {
-			paymentsPageChanged($0)
-		}
-		.onReceive(lastCompletedPaymentPublisher) {
-			lastCompletedPaymentChanged($0)
-		}
-		.onReceive(swapInWalletPublisher) {
-			swapInWalletChanged($0)
-		}
-		.onReceive(channelsPublisher) {
-			channelsChanged($0)
-		}
-		.onReceive(bizNotificationsPublisher) {
-			bizNotificationsChanged($0)
-		}
-		.onReceive(contactsPublisher) {
-			contactsChanged($0)
-		}
+		content()
+			.onAppear {
+				onAppear()
+			}
+			.onChange(of: mvi.model) { newModel in
+				onModelChange(model: newModel)
+			}
+			.onChange(of: currencyPrefs.hideAmounts) { _ in
+				hideAmountsChanged()
+			}
+			.onReceive(recentPaymentsConfigPublisher) {
+				recentPaymentsConfigChanged($0)
+			}
+			.onReceive(paymentsPagePublisher) {
+				paymentsPageChanged($0)
+			}
+			.onReceive(lastCompletedPaymentPublisher) {
+				lastCompletedPaymentChanged($0)
+			}
+			.onReceive(swapInWalletPublisher) {
+				swapInWalletChanged($0)
+			}
+			.onReceive(finalWalletPublisher) {
+				finalWalletChanged($0)
+			}
+			.onReceive(channelsPublisher) {
+				channelsChanged($0)
+			}
+			.onReceive(bizNotificationsPublisher) {
+				bizNotificationsChanged($0)
+			}
+			.onReceive(contactsPublisher) {
+				contactsChanged($0)
+			}
 	}
 
 	@ViewBuilder
@@ -155,9 +165,7 @@ struct HomeView : MVIView {
 			notices()
 			paymentsList()
 		}
-		.onAppear {
-			onAppear()
-		}
+		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.sheet(isPresented: Binding( // SwiftUI only allows for 1 ".sheet"
 			get: { activeSheet != nil },
 			set: { if !$0 { activeSheet = nil }}
@@ -288,29 +296,39 @@ struct HomeView : MVIView {
 	@ViewBuilder
 	func incomingBalance() -> some View {
 		
-		let incomingSat = swapInWallet.totalBalance.sat
-		if incomingSat > 0 {
+		let swapInWalletBalance: Int64 = swapInWallet.totalBalance.toMsat()
+		let finalWalletBalance: Int64 = finalWallet.totalBalance.toMsat()
+		
+		let incomingBalance = swapInWalletBalance + finalWalletBalance
+		if incomingBalance > 0 {
 			let formattedAmount = currencyPrefs.hideAmounts
 				? Utils.hiddenAmount(currencyPrefs)
-				: Utils.format(currencyPrefs, sat: incomingSat)
+				: Utils.format(currencyPrefs, sat: incomingBalance)
 			
-			let unconfirmedBalance = swapInWallet.unconfirmedBalance.sat
-			let weaklyConfirmedBalance = swapInWallet.weaklyConfirmedBalance.sat
+			let hasNonSwapInBalance = (finalWalletBalance > 0)
 			
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 			
-				if let days = swapInWallet.expirationWarningInDays(), days <= 1 {
-					Image(systemName: "exclamationmark.triangle")
-						.foregroundColor(.appNegative)
-						.padding(.trailing, 2)
-				} else if unconfirmedBalance == 0 && weaklyConfirmedBalance == 0 {
-					Image(systemName: "zzz")
-						.foregroundColor(.appWarn)
-						.padding(.trailing, 2)
-				} else {
-					Image(systemName: "clock")
-						.padding(.trailing, 2)
-				}
+				Group {
+					if hasNonSwapInBalance {
+						Image(systemName: "link")
+					} else {
+						let unconfirmedBalance = swapInWallet.unconfirmedBalance.sat
+						let weaklyConfirmedBalance = swapInWallet.weaklyConfirmedBalance.sat
+						
+						if let days = swapInWallet.expirationWarningInDays(), days <= 7 {
+							Image(systemName: "exclamationmark.triangle")
+								.foregroundColor(.appNegative)
+						} else if unconfirmedBalance == 0 && weaklyConfirmedBalance == 0 {
+							Image(systemName: "zzz")
+								.foregroundColor(.appWarn)
+								
+						} else {
+							Image(systemName: "clock")
+						}
+					}
+				} // </Group>
+				.padding(.trailing, 2)
 				
 				if currencyPrefs.hideAmounts {
 					Text("+\(formattedAmount.digits)".lowercased()) // digits => "***"
@@ -322,7 +340,13 @@ struct HomeView : MVIView {
 			}
 			.font(.callout)
 			.foregroundColor(.secondary)
-			.onTapGesture { showSwapInWallet() }
+			.onTapGesture {
+				if hasNonSwapInBalance {
+					showIncomingBalancePopover()
+				} else {
+					showSwapInWallet()
+				}
+			}
 			.padding(.top, 7)
 			.padding(.bottom, 2)
 			.scaleEffect(incomingSwapScaleFactor, anchor: .top)
@@ -559,27 +583,13 @@ struct HomeView : MVIView {
 	@ViewBuilder
 	func paymentsList() -> some View {
 		
-		ScrollView {
-			LazyVStack {
-				// paymentsPage.rows: [WalletPaymentOrderRow]
-				//
-				// Here's how this works:
-				// - ForEach uses the given type (which conforms to Swift's Identifiable protocol)
-				//   to determine whether or not the row is new/modified or the same as before.
-				// - If the row is new/modified, then it it initialized with fresh state,
-				//   and the row's `onAppear` will fire.
-				// - If the row is unmodified, then it is initialized with existing state,
-				//   and the row's `onAppear` with NOT fire.
-				//
-				// Since we ultimately use WalletPaymentOrderRow.identifier, our unique identifier
-				// contains the row's completedAt date, which is modified when the row changes.
-				// Thus our row is automatically refreshed after it fails/succeeds.
-				//
+		ScrollView(.vertical) {
+			VStack {
 				ForEach(paymentsPage.rows) { row in
 					Button {
 						didSelectPayment(row: row)
 					} label: {
-						PaymentCell(row: row, didAppearCallback: nil)
+						PaymentCell(info: row)
 					}
 				}
 				
@@ -592,8 +602,10 @@ struct HomeView : MVIView {
 					didAppearCallback: footerCellDidAppear
 				)
 				.accessibilitySortPriority(10)
-			}
-		}
+				
+			} // </VStack>
+			
+		} // </ScrollView>
 		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
 	}
 	
@@ -787,7 +799,7 @@ struct HomeView : MVIView {
 	}
 	
 	func paymentsPageChanged(_ page: PaymentsPage) {
-		log.trace("paymentsPageChanged()")
+		log.trace("paymentsPageChanged(count: \(page.count), offset: \(page.offset))")
 		
 		paymentsPage = page
 	}
@@ -795,7 +807,7 @@ struct HomeView : MVIView {
 	func lastCompletedPaymentChanged(_ payment: Lightning_kmpWalletPayment) {
 		log.trace("lastCompletedPaymentChanged()")
 		
-		let paymentId = payment.walletPaymentId()
+		let paymentId = payment.id
 		
 		if paymentId.isEqual(lastCompletedPaymentId) {
 			// Ignoring duplicate (rebroadcast when returning to this View)
@@ -804,11 +816,7 @@ struct HomeView : MVIView {
 			lastCompletedPaymentId = paymentId
 		}
 		
-		// SummaryView will need `WalletPaymentFetchOptions.companion.All`,
-		// so as long as we're fetching from the database, we might as well fetch everything we need.
-		let options = WalletPaymentFetchOptions.companion.All
-		
-		Biz.business.paymentsManager.getPayment(id: paymentId, options: options) { result, _ in
+		Biz.business.paymentsManager.getPayment(id: paymentId) { result, _ in
 			
 			if activeSheet == nil, let result = result {
 				activeSheet = .paymentView(payment: result) // triggers display of PaymentView sheet
@@ -829,6 +837,12 @@ struct HomeView : MVIView {
 			// So let's add a little animation to draw the user's attention to it.
 			startAnimatingIncomingSwapText()
 		}
+	}
+	
+	func finalWalletChanged(_ newValue: Lightning_kmpWalletState.WalletWithConfirmations) {
+		log.trace("finalWalletChanged()")
+		
+		finalWallet = newValue
 	}
 	
 	func channelsChanged(_ channels: [LocalChannelInfo]) {
@@ -868,7 +882,23 @@ struct HomeView : MVIView {
 	func contactsChanged(_ contacts: [ContactInfo]) {
 		log.trace("contactsChanged()")
 		
-		paymentsPage = paymentsPage.forceRefresh()
+		// Update WalletPaymentInfo.contact for all rows
+		
+		let contactsManager = Biz.business.contactsManager
+		let updatedRows = paymentsPage.rows.map { info in
+			let updatedContact = contactsManager.contactForPayment(payment: info.payment)
+			return WalletPaymentInfo(
+				payment  : info.payment,
+				metadata : info.metadata,
+				contact  : updatedContact
+			)
+		}
+		let updatedPage = PaymentsPage(
+			offset : paymentsPage.offset,
+			count  : paymentsPage.count,
+			rows   : updatedRows
+		)
+		paymentsPage = updatedPage
 	}
 	
 	fileprivate func footerCellDidAppear() {
@@ -964,6 +994,17 @@ struct HomeView : MVIView {
 		}
 	}
 	
+	func showIncomingBalancePopover() {
+		log.trace("showIncomingBalancePopover()")
+		
+		popoverState.display(dismissable: true) {
+			IncomingBalancePopover(
+				showSwapInWallet: showSwapInWallet,
+				showFinalWallet: showFinalWallet
+			)
+		}
+	}
+	
 	func dismissServerMessage(index: Int) {
 		log.trace("dismissServerMessage(index: \(index))")
 		
@@ -1012,17 +1053,11 @@ struct HomeView : MVIView {
 		}
 	}
 	
-	func didSelectPayment(row: WalletPaymentOrderRow) -> Void {
+	func didSelectPayment(row: WalletPaymentInfo) -> Void {
 		log.trace("didSelectPayment()")
 		
-		// pretty much guaranteed to be in the cache
-		let fetcher = Biz.business.paymentsManager.fetcher
-		let options = PaymentCell.fetchOptions
-		fetcher.getPayment(row: row, options: options) { (result: WalletPaymentInfo?, _) in
-			
-			if activeSheet == nil, let result = result {
-				activeSheet = .paymentView(payment: result)
-			}
+		if activeSheet == nil {
+			activeSheet = .paymentView(payment: row)
 		}
 	}
 	

@@ -20,15 +20,11 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,40 +34,33 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.Dimension
 import androidx.constraintlayout.compose.MotionLayout
 import androidx.constraintlayout.compose.MotionScene
 import androidx.constraintlayout.compose.layoutId
 import fr.acinq.lightning.blockchain.electrum.balance
+import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.NoticesViewModel
 import fr.acinq.phoenix.android.PaymentsViewModel
-import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.Dialog
 import fr.acinq.phoenix.android.components.PrimarySeparator
 import fr.acinq.phoenix.android.components.mvi.MVIView
+import fr.acinq.phoenix.android.home.releasenotes.ReleaseNoteDialog
 import fr.acinq.phoenix.android.utils.FCMHelper
-import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
 import fr.acinq.phoenix.android.utils.extensions.findActivity
-import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.canRequestLiquidity
 import fr.acinq.phoenix.data.inFlightPaymentsCount
-import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 
 @Composable
 fun HomeView(
     paymentsViewModel: PaymentsViewModel,
     noticesViewModel: NoticesViewModel,
-    onPaymentClick: (WalletPaymentId) -> Unit,
+    onPaymentClick: (UUID) -> Unit,
     onSettingsClick: () -> Unit,
     onReceiveClick: () -> Unit,
     onSendClick: () -> Unit,
@@ -90,11 +79,9 @@ fun HomeView(
     val isPowerSaverModeOn = noticesViewModel.isPowerSaverModeOn
     val fcmToken by internalData.getFcmToken.collectAsState(initial = "")
     val isFCMAvailable = remember { FCMHelper.isFCMAvailable(context) }
-    val torEnabledState = userPrefs.getIsTorEnabled.collectAsState(initial = null)
     val balanceDisplayMode by userPrefs.getHomeAmountDisplayMode.collectAsState(initial = HomeAmountDisplayMode.REDACTED)
 
     val connections by business.connectionsManager.connections.collectAsState()
-    val electrumMessages by business.appConfigurationManager.electrumMessages.collectAsState()
     val channels by business.peerManager.channelsFlow.collectAsState()
     val inFlightPaymentsCount = remember(channels) { channels.inFlightPaymentsCount() }
 
@@ -102,7 +89,6 @@ fun HomeView(
     if (showConnectionsDialog) {
         ConnectionDialog(
             connections = connections,
-            electrumBlockheight = electrumMessages?.blockHeight ?: 0,
             onClose = { showConnectionsDialog = false },
             onTorClick = onTorClick,
             onElectrumClick = onElectrumClick
@@ -110,10 +96,9 @@ fun HomeView(
     }
 
     val allPaymentsCount by business.paymentsManager.paymentsCount.collectAsState()
-    val payments by paymentsViewModel.latestPaymentsFlow.collectAsState()
+    val payments by paymentsViewModel.homePaymentsFlow.collectAsState()
     val swapInBalance = business.balanceManager.swapInWalletBalance.collectAsState()
     val finalWallet = business.peerManager.finalWallet.collectAsState()
-    val pendingChannelsBalance = business.balanceManager.pendingChannelsBalance.collectAsState()
 
     BackHandler {
         // force the back button to minimize the app
@@ -227,9 +212,7 @@ fun HomeView(
                     modifier = Modifier.layoutId("topBar"),
                     onConnectionsStateButtonClick = { showConnectionsDialog = true },
                     connections = connections,
-                    electrumBlockheight = electrumMessages?.blockHeight ?: 0,
                     inFlightPaymentsCount = inFlightPaymentsCount,
-                    isTorEnabled = torEnabledState.value,
                     onTorClick = onTorClick,
                     isFCMUnavailable = fcmToken == null || !isFCMAvailable,
                     isPowerSaverMode = isPowerSaverModeOn,
@@ -242,7 +225,6 @@ fun HomeView(
                     balanceDisplayMode = balanceDisplayMode,
                     swapInBalance = swapInBalance.value,
                     finalWalletBalance = finalWallet.value?.all?.balance ?: 0.sat,
-                    unconfirmedChannelsBalance = pendingChannelsBalance.value,
                     onNavigateToSwapInWallet = onNavigateToSwapInWallet,
                     onNavigateToFinalWallet = onNavigateToFinalWallet,
                 )
@@ -252,18 +234,15 @@ fun HomeView(
                     notices = notices.toList(),
                     notifications = notifications,
                     onNavigateToSwapInWallet = onNavigateToSwapInWallet,
-                    onNavigateToFinalWallet = onNavigateToFinalWallet,
                     onNavigateToNotificationsList = onShowNotifications,
                 )
             }
 
             PaymentsList(
                 modifier = Modifier.nestedScroll(nestedScrollConnection),
-                swapInBalance = swapInBalance.value,
                 balanceDisplayMode = balanceDisplayMode,
                 onPaymentClick = onPaymentClick,
                 onPaymentsHistoryClick = onPaymentsHistoryClick,
-                fetchPaymentDetails = { paymentsViewModel.fetchPaymentDetails(it) },
                 payments = payments,
                 allPaymentsCount = allPaymentsCount
             )
@@ -271,24 +250,6 @@ fun HomeView(
         }
     }
 
-    var showAddressWarningDialog by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
-    if (showAddressWarningDialog){
-        Dialog(
-            onDismiss = { scope.launch { internalData.saveLegacyMigrationAddressWarningShown(true) } },
-            title = stringResource(id = R.string.inappnotif_migration_from_legacy_dialog_title),
-        ) {
-            Text(text = annotatedStringResource(id = R.string.inappnotif_migration_from_legacy_dialog_body), modifier = Modifier.padding(horizontal = 24.dp, vertical = 0.dp))
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        if (LegacyPrefsDatastore.hasMigratedFromLegacy(context).first()) {
-            combine(internalData.getLegacyMigrationMessageShown, internalData.getLegacyMigrationAddressWarningShown) { noticeShown, dialogShown ->
-                noticeShown || dialogShown
-            }.collect {
-                showAddressWarningDialog = !it
-            }
-        }
-    }
+    val releaseNoteCode by internalData.showReleaseNoteSinceCode.collectAsState(initial = null)
+    releaseNoteCode?.let { ReleaseNoteDialog(sinceCode = it) }
 }

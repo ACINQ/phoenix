@@ -10,20 +10,11 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct PaymentCell : View {
 	
-	static let fetchOptions = WalletPaymentFetchOptions.companion.Descriptions.plus(
-		other: WalletPaymentFetchOptions.companion.OriginalFiat
-	).plus(
-		other: WalletPaymentFetchOptions.companion.Contact
-	)
-	
 	private let paymentsManager = Biz.business.paymentsManager
 	
-	let row: WalletPaymentOrderRow
-	let didAppearCallback: ((WalletPaymentOrderRow) -> Void)?
-	let didDisappearCallback: ((WalletPaymentOrderRow) -> Void)?
-	
-	@State var fetched: WalletPaymentInfo?
-	@State var fetchedIsStale: Bool
+	let info: WalletPaymentInfo
+	let didAppearCallback: ((WalletPaymentInfo) -> Void)?
+	let didDisappearCallback: ((WalletPaymentInfo) -> Void)?
 	
 	@ScaledMetric var textScaling: CGFloat = 100
 	
@@ -33,26 +24,13 @@ struct PaymentCell : View {
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 
 	init(
-		row: WalletPaymentOrderRow,
-		didAppearCallback: ((WalletPaymentOrderRow) -> Void)?,
-		didDisappearCallback: ((WalletPaymentOrderRow) -> Void)? = nil
+		info: WalletPaymentInfo,
+		didAppearCallback: ((WalletPaymentInfo) -> Void)? = nil,
+		didDisappearCallback: ((WalletPaymentInfo) -> Void)? = nil
 	) {
-		self.row = row
+		self.info = info
 		self.didAppearCallback = didAppearCallback
 		self.didDisappearCallback = didDisappearCallback
-		
-		var result = paymentsManager.fetcher.getCachedPayment(row: row, options: PaymentCell.fetchOptions)
-		if let _ = result {
-			
-			self._fetched = State(initialValue: result)
-			self._fetchedIsStale = State(initialValue: false)
-		} else {
-			
-			result = paymentsManager.fetcher.getCachedStalePayment(row: row, options: PaymentCell.fetchOptions)
-			
-			self._fetched = State(initialValue: result)
-			self._fetchedIsStale = State(initialValue: true)
-		}
 	}
 	
 	// --------------------------------------------------
@@ -145,16 +123,13 @@ struct PaymentCell : View {
 	func paymentImage() -> some View {
 		
 		Group {
-			if let payment = fetched?.payment {
-				switch payment.state() {
-					case WalletPaymentState.successOnChain  : Image(systemName: "link.circle.fill")
-					case WalletPaymentState.successOffChain : Image(systemName: "checkmark.circle.fill")
-					case WalletPaymentState.pendingOnChain  : Image(systemName: "clock.fill")
-					case WalletPaymentState.pendingOffChain : Image(systemName: "clock.fill")
-					case WalletPaymentState.failure         : Image(systemName: "x.circle.fill")
-				}
-			} else {
-				Image(systemName: "magnifyingglass.circle.fill")
+			switch info.payment.state() {
+				case WalletPaymentState.successOnChain  : Image(systemName: "link.circle.fill")
+				case WalletPaymentState.successOffChain : Image(systemName: "checkmark.circle.fill")
+				case WalletPaymentState.pendingOnChain  : Image(systemName: "clock.fill")
+				case WalletPaymentState.pendingOffChain : Image(systemName: "clock.fill")
+				case WalletPaymentState.failure         : Image(systemName: "x.circle.fill")
+				@unknown default                        : Image(systemName: "magnifyingglass.circle.fill")
 			}
 		}
 		.font(.title3)
@@ -166,12 +141,7 @@ struct PaymentCell : View {
 	func paymentAmount() -> some View {
 		
 		let (amount, isFailure, isOutgoing) = paymentAmountInfo()
-		if isLiquidityWithFeesDisplayedElsewhere() {
-			
-			Text(verbatim: "")
-				.accessibilityHidden(true)
-			
-		} else if currencyPrefs.hideAmounts {
+		if currencyPrefs.hideAmounts {
 			
 			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 				
@@ -215,18 +185,12 @@ struct PaymentCell : View {
 	
 	func line1() -> String {
 
-		if let fetched = fetched {
-			return fetched.paymentDescription() ?? fetched.defaultPaymentDescription()
-		} else {
-			return ""
-		}
+		return info.paymentDescription() ?? info.defaultPaymentDescription()
 	}
 	
 	func line2() -> String {
 
-		guard let payment = fetched?.payment else {
-			return ""
-		}
+		let payment = info.payment
 		
 		guard let completedAtDate = payment.completedAtDate else {
 			if payment.isOnChain() {
@@ -244,18 +208,19 @@ struct PaymentCell : View {
 		
 		let timestamp = stringForDate(completedAtDate)
 		
-		if let contact = fetched?.contact {
-			if let payment = fetched?.payment, payment.isIncoming() {
+		if let contact = info.contact {
+			if payment.isIncoming() {
 				return String(localized: "\(timestamp) ∙ from \(contact.name)")
 			} else {
 				return String(localized: "\(timestamp) ∙ to \(contact.name)")
 			}
 			
-		} else if
-			let payment = fetched?.payment,
-			let liquidity = payment as? Lightning_kmpInboundLiquidityOutgoingPayment
-		{
-			let amount = Utils.formatBitcoin(sat: liquidity.purchase.amount, bitcoinUnit: .sat)
+		} else if let liquidity = payment as? Lightning_kmpAutomaticLiquidityPurchasePayment {
+			let amount = Utils.formatBitcoin(sat: liquidity.liquidityPurchase.amount, bitcoinUnit: .sat)
+			return "\(timestamp)  ∙  +\(amount.string)"
+			
+		} else if let liquidity = payment as? Lightning_kmpManualLiquidityPurchasePayment {
+			let amount = Utils.formatBitcoin(sat: liquidity.liquidityPurchase.amount, bitcoinUnit: .sat)
 			return "\(timestamp)  ∙  +\(amount.string)"
 			
 		} else {
@@ -265,12 +230,14 @@ struct PaymentCell : View {
 	
 	func line2HasExtraInfo() -> Bool {
 		
-		if fetched?.contact != nil {
+		if info.contact != nil {
 			// Also going to display contact name
 			return true
 		}
 		
-		if fetched?.payment is Lightning_kmpInboundLiquidityOutgoingPayment {
+		if info.payment is Lightning_kmpAutomaticLiquidityPurchasePayment ||
+		   info.payment is Lightning_kmpManualLiquidityPurchasePayment
+		{
 			// Also going to display liquidity amount
 			return true
 		}
@@ -312,50 +279,28 @@ struct PaymentCell : View {
 	
 	func paymentAmountInfo() -> (FormattedAmount, Bool, Bool) {
 
-		if let payment = fetched?.payment {
+		let payment = info.payment
 
-			let amount: FormattedAmount
-			if currencyPrefs.hideAmounts {
-				amount = Utils.hiddenAmount(currencyPrefs)
-				
-			} else if currencyPrefs.showOriginalFiatValue && currencyPrefs.currencyType == .fiat {
-				
-				if let originalExchangeRate = fetched?.metadata.originalFiat {
-					amount = Utils.formatFiat(msat: payment.amount, exchangeRate: originalExchangeRate)
-				} else {
-					amount = Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
-				}
+		let amount: FormattedAmount
+		if currencyPrefs.hideAmounts {
+			amount = Utils.hiddenAmount(currencyPrefs)
+			
+		} else if currencyPrefs.showOriginalFiatValue && currencyPrefs.currencyType == .fiat {
+			
+			if let originalExchangeRate = info.metadata.originalFiat {
+				amount = Utils.formatFiat(msat: payment.amount, exchangeRate: originalExchangeRate)
 			} else {
-				
-				amount = Utils.format(currencyPrefs, msat: payment.amount)
+				amount = Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
 			}
-
-			let isFailure = payment.state() == WalletPaymentState.failure
-			let isOutgoing = payment is Lightning_kmpOutgoingPayment
-
-			return (amount, isFailure, isOutgoing)
-
 		} else {
 			
-			let currency = currencyPrefs.currency
-			let amount = FormattedAmount(amount: 0.0, currency: currency, digits: "", decimalSeparator: " ")
-
-			let isFailure = false
-			let isOutgoing = true
-
-			return (amount, isFailure, isOutgoing)
+			amount = Utils.format(currencyPrefs, msat: payment.amount)
 		}
-	}
-	
-	func isLiquidityWithFeesDisplayedElsewhere() -> Bool {
 		
-		if let payment = fetched?.payment,
-		   let liquidity = payment as? Lightning_kmpInboundLiquidityOutgoingPayment
-		{
-			return liquidity.hidesFees
-		} else {
-			return false
-		}
+		let isFailure = payment.state() == WalletPaymentState.failure
+		let isOutgoing = payment is Lightning_kmpOutgoingPayment
+		
+		return (amount, isFailure, isOutgoing)
 	}
 	
 	// --------------------------------------------------
@@ -364,26 +309,15 @@ struct PaymentCell : View {
 	
 	func onAppear() {
 		
-		if fetched == nil || fetchedIsStale {
-			
-			paymentsManager.fetcher.getPayment(
-				row: row,
-				options: PaymentCell.fetchOptions
-			) { (result: WalletPaymentInfo?, _) in
-				
-				self.fetched = result
-			}
-		}
-		
-		if let didAppearCallback = didAppearCallback {
-			didAppearCallback(row)
+		if let didAppearCallback {
+			didAppearCallback(info)
 		}
 	}
 	
 	func onDisappear() {
 		
-		if let didDisappearCallback = didDisappearCallback {
-			didDisappearCallback(row)
+		if let didDisappearCallback {
+			didDisappearCallback(info)
 		}
 	}
 }

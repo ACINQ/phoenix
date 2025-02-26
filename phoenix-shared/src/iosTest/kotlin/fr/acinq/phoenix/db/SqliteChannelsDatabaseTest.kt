@@ -21,6 +21,7 @@ import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.native.NativeSqliteDriver
 import app.cash.sqldelight.driver.native.wrapConnection
 import fr.acinq.lightning.Lightning
+import fr.acinq.phoenix.db.sqldelight.ChannelsDatabase
 import fr.acinq.phoenix.utils.PlatformContext
 import fr.acinq.phoenix.utils.getDatabaseFilesDirectoryPath
 
@@ -59,41 +60,4 @@ actual fun testChannelsDriver(): SqlDriver {
         }
     )
     return NativeSqliteDriver(configuration)
-}
-
-actual fun testPaymentsDriver(): SqlDriver {
-    val schema = PaymentsDatabase.Schema
-
-    // In-memory databases don't seem to work on native/iOS.
-    // See explanation above.
-//  val name = ":memory:"
-    val name = Lightning.randomBytes32().toHex()
-
-    val dbDir = getDatabaseFilesDirectoryPath(PlatformContext())
-    val configuration = DatabaseConfiguration(
-        name = name,
-        version = schema.version.toInt(),
-        extendedConfig = DatabaseConfiguration.Extended(
-            basePath = dbDir,
-            foreignKeyConstraints = true // <= official solution doesn't work :(
-        ),
-        create = { connection ->
-            wrapConnection(connection) { schema.create(it) }
-        },
-        upgrade = { connection, oldVersion, newVersion ->
-            wrapConnection(connection) {
-                schema.migrate(
-                    driver = it,
-                    oldVersion = oldVersion.toLong(),
-                    newVersion = newVersion.toLong()
-                )
-            }
-        }
-    )
-    return NativeSqliteDriver(configuration)
-}
-
-// Workaround for known bugs in SQLDelight on native/iOS.
-actual fun isIOS(): Boolean {
-    return true
 }

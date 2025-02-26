@@ -52,7 +52,6 @@
 
     <string name="startup_binding_service">Vinculando o serviço…</string>
     <string name="startup_wait">Preparando a carteira…</string>
-    <string name="startup_wait_legacy_check">Verificando carteira herdada…</string>
     <string name="startup_checking_seed">Desbloqueando…</string>
     <string name="startup_unlocked">Acesso concedido…</string>
     <string name="startup_unlock_failure">Falha no desbloqueio</string>
@@ -73,11 +72,6 @@
 
     <string name="startup_starting">Iniciando…</string>
     <string name="startup_error_generic">Não foi possível iniciar o aplicativo.</string>
-
-    <!-- Switch between legacy/modern apps -->
-
-    <string name="legacyswitch_title">Aplicativo legado</string>
-    <string name="legacyswitch_restart">Reinicie o aplicativo legado</string>
 
     <!-- Payment line -->
 
@@ -254,16 +248,16 @@
 
     <!-- home: balance section & misc -->
 
-    <string name="home__balance_loading">Carregando…</string>
-    <string name="home__onchain_incoming">+%1$s</string>
+    <string name="home_balance_loading">Carregando…</string>
+    <string name="home_onchain_incoming">+%1$s</string>
 
-    <string name="home__faq_button">Perguntas frequentes</string>
-    <string name="home__payments_none">Use os botões Receber e Enviar na parte inferior desta tela para começar.</string>
-    <string name="home__payments_more_button">Mostrar todos os pagamentos…</string>
-    <string name="home__connection__electrum_late">Atraso de Eletro</string>
-    <string name="home__connection__bad_cert">Certificado Electro</string>
-    <string name="home__connection__connecting">Conectando…</string>
-    <string name="home__connection__tor_active">Tor</string>
+    <string name="home_faq_button">Perguntas frequentes</string>
+    <string name="home_payments_none">Use os botões Receber e Enviar na parte inferior desta tela para começar.</string>
+    <string name="home_payments_more_button">Mostrar todos os pagamentos…</string>
+    <string name="home_connection_electrum_late">Atraso de Eletro</string>
+    <string name="home_connection_bad_cert">Certificado Electro</string>
+    <string name="home_connection_connecting">Conectando…</string>
+    <string name="home_connection_tor_active">Tor</string>
 
     <!-- in-app notifications -->
 
@@ -311,7 +305,6 @@
     <string name="paymentdetails_status_unconfirmed_zero">0 confirmações</string>
     <string name="paymentdetails_status_unconfirmed_zero_bump">Toque para acelerar</string>
     <string name="paymentdetails_status_unconfirmed_default">%1$d confirmações</string>
-    <string name="paymentdetails_status_unconfirmed_with_depth">%1$d/%2$d confirmação(ões)</string>
     <string name="paymentdetails_status_confirmed">Confirmado em string</string>
 
     <string name="paymentdetails_lnurlpay_service">Serviço por</string>
@@ -352,19 +345,17 @@
 
     <string name="paymentdetails_technical_title">Detalhes técnicos</string>
     <string name="paymentdetails_payment_type_label">Tipo de pagamento</string>
-    <string name="paymentdetails_closing">Pagamento pelo encerramento do canal</string>
-    <string name="paymentdetails_splice_outgoing">Pagamento pela emenda de saída</string>
-    <string name="paymentdetails_splice_cpfp_outgoing">Acelere as transações na rede</string>
-    <string name="paymentdetails_normal_outgoing">Pagamento relâmpago (padrão)</string>
-    <string name="paymentdetails_normal_incoming">Recebimento de pagamento relâmpago (padrão)</string>
-    <string name="paymentdetails_swapin">Depósito de Bitcoin para troca</string>
-    <string name="paymentdetails_swapout">Trocar para endereço Bitcoin</string>
+    <string name="paymentdetails_type_outgoing_close">Pagamento pelo encerramento do canal</string>
+    <string name="paymentdetails_type_outgoing_splice">Pagamento pela emenda de saída</string>
+    <string name="paymentdetails_type_outgoing_splice_cpfp">Acelere as transações na rede</string>
+    <string name="paymentdetails_type_outgoing_bolt11">Pagamento relâmpago (bolt11)</string>
+    <string name="paymentdetails_type_outgoing_bolt12">Pagamento relâmpago (bolt12)</string>
+    <string name="paymentdetails_type_incoming_bolt11">Recebimento de pagamento relâmpago (bolt11)</string>
+    <string name="paymentdetails_type_incoming_bolt12">Recebimento de pagamento relâmpago (bolt12)</string>
     <string name="paymentdetails_swapin_address_label">Endereço de depósito</string>
     <string name="paymentdetails_bitcoin_address_label">Endereço Bitcoin</string>
 
     <string name="paymentdetails_splice_out_channel_label">Canal emendado</string>
-    <string name="paymentdetails_dualswapin_tx_label">Transações</string>
-    <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
 
     <string name="paymentdetails_closing_type_label">Tipo de fechamento</string>
     <string name="paymentdetails_closing_type_mutual">Muto</string>
@@ -374,9 +365,9 @@
     <string name="paymentdetails_closing_type_other">Outro</string>
 
     <string name="paymentdetails_pubkey_label">Chave pública de destino</string>
-    <string name="paymentdetails_payment_request_description_label">Descrição da fatura</string>
+    <string name="paymentdetails_bolt11_description_label">Descrição da fatura</string>
     <string name="paymentdetails_payment_hash_label">Hash de pagamento</string>
-    <string name="paymentdetails_payment_request_label">Fatura</string>
+    <string name="paymentdetails_bolt11_label">Fatura</string>
     <string name="paymentdetails_preimage_label">Pré-imagem</string>
 
     <string name="paymentdetails_status_label">Status do pagamento</string>
@@ -390,8 +381,6 @@
     <string name="paymentdetails_part_hops_label">Lúpulos</string>
 
     <string name="paymentdetails_received_with_label">Recebido via</string>
-    <string name="paymentdetails_received_with_splicein">Splice (adicionando ao canal existente)</string>
-    <string name="paymentdetails_received_with_channel">Novo canal (criado automaticamente)</string>
     <string name="paymentdetails_received_with_lightning">Pagamento relâmpago</string>
     <string name="paymentdetails_channel_id_label">Identificador do canal</string>
     <string name="paymentdetails_tx_id_label">Transação</string>
@@ -539,27 +528,17 @@
     <!-- settings: Tor -->
 
     <string name="tor_settings_title">Tor</string>
-    <string name="tor_settings_unknown">Verificando preferências…</string>
-    <string name="tor_settings_enabled">Tor está ativado</string>
-    <string name="tor_settings_disabled">Tor está desabilitado</string>
-    <string name="tor_settings_state_unknown">O proxy Tor ainda não foi iniciado.</string>
-    <string name="tor_settings_state_closed">O proxy Tor está desativado.\nAguarde e verifique sua conexão com a Internet.</string>
-    <string name="tor_settings_state_starting">Iniciando o proxy Tor…</string>
-    <string name="tor_settings_state_started">Tor está online</string>
 
     <!-- home: connectivity dialog -->
 
     <string name="conndialog_title">Status da conexão</string>
     <string name="conndialog_summary_not_ok">O aplicativo não funcionará corretamente até que todas as conexões tenham sido estabelecidas.</string>
     <string name="conndialog_network">Seu dispositivo não possui conexão com a Internet. O app não funcionará corretamente.\n\nVerifique as configurações do seu dispositivo.</string>
-    <string name="conndialog_internet">Internet</string>
     <string name="conndialog_electrum">Electrum</string>
-    <string name="conndialog_tor">Tor</string>
     <string name="conndialog_lightning">Par</string>
     <string name="conndialog_accessibility_desc">Gerenciar conexão para %1$s</string>
     <string name="conndialog_connecting">Conectando…</string>
     <string name="conndialog_connected">Conectado</string>
-    <string name="conndialog_connected_electrum_behind">O servidor Electrum registra um atraso (bloco $1$d)</string>
     <string name="conndialog_closed">Desconectado</string>
     <string name="conndialog_closed_bad_cert">Certificado com defeito</string>
 

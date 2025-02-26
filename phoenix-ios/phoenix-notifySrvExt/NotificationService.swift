@@ -27,7 +27,7 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
  *
  * This means that the following instances are recycled (continue existing in memory):
  * - PhoenixManager.shared
- * - XpcManager.shared
+ * - XPC.shared
  */
 class NotificationService: UNNotificationServiceExtension {
 
@@ -175,9 +175,11 @@ class NotificationService: UNNotificationServiceExtension {
 		if !xpcStarted && !srvExtDone {
 			xpcStarted = true
 			
-			XpcManager.shared.register {[weak self] in
-				self?.didReceiveXpcMessage()
-			}
+			XPC.shared.receivedMessagePublisher.sink {[weak self](msg: XpcMessage) in
+				self?.didReceiveXpcMessage(msg)
+			}.store(in: &cancellables)
+			
+			XPC.shared.resume()
 		}
 	}
 	
@@ -188,33 +190,36 @@ class NotificationService: UNNotificationServiceExtension {
 		if xpcStarted {
 			xpcStarted = false
 			
-			XpcManager.shared.unregister()
+			XPC.shared.suspend()
 		}
 	}
 	
-	private func didReceiveXpcMessage() {
+	private func didReceiveXpcMessage(_ msg: XpcMessage) {
 		log.trace("didReceiveXpcMessage()")
 		assertMainThread()
 		
-		// This means the main phoenix app is running.
-		
-		if isConnectedToPeer {
-		
-			// But we're already connected to the peer, and processing the payment.
-			// So we're going to continue working on the payment,
-			// and the main app will have to wait for us to finish before connecting to the peer itself.
+		if msg == .available {
 			
-			log.debug("isConnectedToPeer is true => continue processing incoming payment")
+			// The main phoenix app is running.
 			
-		} else {
-			
-			// Since we're not connected yet, we'll just go ahead and allow the main app to handle the payment.
-			//
-			// And we don't have to wait for the main app to finish handling the payment.
-			// Because whatever we emit from this app extension won't be displayed to the user.
-			// That is, the modified push content we emit isn't actually shown to the user.
-			
-			displayPushNotification()
+			if isConnectedToPeer {
+				
+				// But we're already connected to the peer, and processing the payment.
+				// So we're going to continue working on the payment,
+				// and the main app will have to wait for us to finish before connecting to the peer itself.
+				
+				log.debug("isConnectedToPeer is true => continue processing incoming payment")
+				
+			} else {
+				
+				// Since we're not connected yet, we'll just go ahead and allow the main app to handle the payment.
+				//
+				// And we don't have to wait for the main app to finish handling the payment.
+				// Because whatever we emit from this app extension won't be displayed to the user.
+				// That is, the modified push content we emit isn't actually shown to the user.
+				
+				displayPushNotification()
+			}
 		}
 	}
 	
@@ -229,14 +234,30 @@ class NotificationService: UNNotificationServiceExtension {
 		if !phoenixStarted && !srvExtDone {
 			phoenixStarted = true
 			
-			PhoenixManager.shared.register(
-				connectionsListener: {[weak self](connections: Connections) in
-					self?.connectionsChanged(connections)
-				},
-				paymentListener: {[weak self](payment: Lightning_kmpIncomingPayment) in
-					self?.didReceivePayment(payment)
+			let newBusiness = PhoenixManager.shared.setupBusiness()
+			
+			newBusiness.connectionsManager.connectionsPublisher().sink {
+				[weak self](connections: Connections) in
+					
+				self?.connectionsChanged(connections)
+			}
+			.store(in: &cancellables)
+
+			let pushReceivedAt = Date()
+			newBusiness.paymentsManager.lastIncomingPaymentPublisher().sink {
+				[weak self](payment: Lightning_kmpIncomingPayment) in
+				
+				guard
+					let paymentReceivedAt = payment.completedAtDate,
+					paymentReceivedAt > pushReceivedAt
+				else {
+					// Ignoring - this is the most recently received incomingPayment, but not a new one
+					return
 				}
-			)
+		
+				self?.didReceivePayment(payment)
+			}
+			.store(in: &cancellables)
 		}
 	}
 	
@@ -247,7 +268,7 @@ class NotificationService: UNNotificationServiceExtension {
 		if phoenixStarted {
 			phoenixStarted = false
 			
-			PhoenixManager.shared.unregister()
+			PhoenixManager.shared.teardownBusiness()
 		}
 	}
 	
@@ -320,10 +341,7 @@ class NotificationService: UNNotificationServiceExtension {
 		}
 		srvExtDone = true
 		
-		guard
-			let contentHandler = contentHandler,
-			let bestAttemptContent = bestAttemptContent
-		else {
+		guard let contentHandler, let bestAttemptContent else {
 			return
 		}
 		
@@ -336,6 +354,18 @@ class NotificationService: UNNotificationServiceExtension {
 		stopXpc()
 		stopPhoenix()
 		
+		updateBestAttemptContent()
+		contentHandler(bestAttemptContent)
+	}
+	
+	private func updateBestAttemptContent() {
+		log.trace("updateBestAttemptContent()")
+		assertMainThread()
+		
+		guard let bestAttemptContent else {
+			return
+		}
+		
 		if receivedPayments.isEmpty {
 			
 			if pushNotificationReason() == .pendingSettlement {
@@ -347,37 +377,24 @@ class NotificationService: UNNotificationServiceExtension {
 			
 		} else { // received 1 or more payments
 			
-			let bitcoinUnit = GroupPrefs.shared.bitcoinUnit
-			let fiatCurrency = GroupPrefs.shared.fiatCurrency
-			let exchangeRate = PhoenixManager.shared.exchangeRate(fiatCurrency: fiatCurrency)
-			
 			var msat: Int64 = 0
 			for payment in receivedPayments {
 				msat += payment.amount.msat
 			}
 			
-			let bitcoinAmt = Utils.formatBitcoin(msat: msat, bitcoinUnit: bitcoinUnit)
-			
-			var fiatAmt: FormattedAmount? = nil
-			if let exchangeRate {
-				fiatAmt = Utils.formatFiat(msat: msat, exchangeRate: exchangeRate)
-			}
-			
-			var amountString = bitcoinAmt.string
-			if let fiatAmt {
-				amountString += " (≈\(fiatAmt.string))"
-			}
+			let amountString = formatAmount(msat: msat)
 			
 			if receivedPayments.count == 1 {
-				bestAttemptContent.title =
-					NSLocalizedString("Received payment", comment: "Push notification title")
+				bestAttemptContent.title = String(
+					localized: "Received payment",
+					comment: "Push notification title"
+				)
 				
 				if !GroupPrefs.shared.discreetNotifications {
 					let paymentInfo = WalletPaymentInfo(
 						payment: receivedPayments.first!,
 						metadata: WalletPaymentMetadata.empty(),
-						contact: nil,
-						fetchOptions: WalletPaymentFetchOptions.companion.None
+						contact: nil
 					)
 					if let desc = paymentInfo.paymentDescription(), desc.count > 0 {
 						bestAttemptContent.body = "\(amountString): \(desc)"
@@ -387,8 +404,10 @@ class NotificationService: UNNotificationServiceExtension {
 				}
 				
 			} else {
-				bestAttemptContent.title =
-					NSLocalizedString("Received multiple payments", comment: "Push notification title")
+				bestAttemptContent.title = String(
+					localized: "Received multiple payments",
+					comment: "Push notification title"
+				)
 				
 				if !GroupPrefs.shared.discreetNotifications {
 					bestAttemptContent.body = amountString
@@ -403,7 +422,22 @@ class NotificationService: UNNotificationServiceExtension {
 			GroupPrefs.shared.badgeCount += receivedPayments.count
 			bestAttemptContent.badge = NSNumber(value: GroupPrefs.shared.badgeCount)
 		}
+	}
+	
+	private func formatAmount(msat: Int64) -> String {
 		
-		contentHandler(bestAttemptContent)
+		let bitcoinUnit = GroupPrefs.shared.bitcoinUnit
+		let fiatCurrency = GroupPrefs.shared.fiatCurrency
+		let exchangeRate = PhoenixManager.shared.exchangeRate(fiatCurrency: fiatCurrency)
+		
+		let bitcoinAmt = Utils.formatBitcoin(msat: msat, bitcoinUnit: bitcoinUnit)
+		var amountString = bitcoinAmt.string
+		
+		if let exchangeRate {
+			let fiatAmt = Utils.formatFiat(msat: msat, exchangeRate: exchangeRate)
+			amountString += " (≈\(fiatAmt.string))"
+		}
+		
+		return amountString
 	}
 }

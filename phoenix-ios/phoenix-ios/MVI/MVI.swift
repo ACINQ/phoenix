@@ -75,7 +75,8 @@ class MVIState<Model: MVI.Model, Intent: MVI.Intent>: ObservableObject {
 	}
 
 	fileprivate func subscribe() {
-		log.debug("subscribe()")
+		log.trace("subscribe()")
+		
 		if unsub == nil {
 			unsub = _controller!.subscribe {[weak self](newModel: Model) in
 				self?._model = newModel
@@ -86,13 +87,17 @@ class MVIState<Model: MVI.Model, Intent: MVI.Intent>: ObservableObject {
 	}
 
 	fileprivate func unsubscribe() {
-		log.debug("unsubscribe()")
-		subCount -= 1
-		log.debug("subcount = \(self.subCount)")
-		if subCount < 0 { fatalError("subCount < 0") }
-		if subCount == 0 {
-			unsub!()
-			unsub = nil
+		log.trace("unsubscribe()")
+		
+		if subCount > 0 {
+			subCount -= 1
+			log.debug("subcount = \(self.subCount)")
+			if subCount == 0 {
+				unsub!()
+				unsub = nil
+			}
+		} else {
+			log.warning("unsubscribe(): invoked too many times")
 		}
 	}
 

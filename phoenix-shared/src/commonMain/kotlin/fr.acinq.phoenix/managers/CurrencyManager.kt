@@ -134,19 +134,6 @@ class CurrencyManager(
     }
 
     /**
-     * The coindesk API is used to refresh select UsdPriceRates that are not available from Coinbase.
-     * Since fiat prices are less volatile, we refresh them less often.
-     * Also, the source only refreshes the values once per hour.
-     */
-    private val coindeskAPI = object : API {
-        override val name = "coindesk"
-        override val refreshDelay = 60.minutes
-        override val fiatCurrencies = FiatCurrency.values.filter {
-            missingFromCoinbase.contains(it)
-        }.toSet()
-    }
-
-    /**
      * The bluelytics API is used to fetch the "blue market" price for the Argentine Peso.
      * - ARS => government controlled exchange rate
      * - ARS_BM => free market exchange rate
@@ -307,22 +294,18 @@ class CurrencyManager(
             refresh(targetSet, coinbaseAPI, forceRefresh = force)
         }
         val deferred3 = async {
-            refresh(targetSet, coindeskAPI, forceRefresh = force)
-        }
-        val deferred4 = async {
             refresh(targetSet, bluelyticsAPI, forceRefresh = force)
         }
-        val deferred5 = async {
+        val deferred4 = async {
             refresh(targetSet, yadioAPI, forceRefresh = force)
         }
-        listOf(deferred1, deferred2, deferred3, deferred4, deferred5).awaitAll()
+        listOf(deferred1, deferred2, deferred3, deferred4).awaitAll()
         maybeStartAutoRefresh()
     }
 
     private fun launchAutoRefreshJob() = launch {
         var blockchainInfoJob: Job? = null
         var coinbaseJob: Job? = null
-        var coindeskJob: Job? = null
         var bluelyticsJob: Job? = null
         var yadioJob: Job? = null
 
@@ -340,9 +323,6 @@ class CurrencyManager(
 
             coinbaseJob?.cancel()
             coinbaseJob = launchAutoRefreshJob(targetSet, coinbaseAPI)
-
-            coindeskJob?.cancel()
-            coindeskJob = launchAutoRefreshJob(targetSet, coindeskAPI)
 
             bluelyticsJob?.cancel()
             bluelyticsJob = launchAutoRefreshJob(targetSet, bluelyticsAPI)
@@ -510,7 +490,6 @@ class CurrencyManager(
         val fetchedRates = when (api) {
             blockchainInfoAPI -> fetchFromBlockchainInfo(targets)
             coinbaseAPI -> fetchFromCoinbase(targets)
-            coindeskAPI -> fetchFromCoinDesk(targets)
             bluelyticsAPI -> fetchFromBluelytics(targets)
             yadioAPI -> fetchFromYadio(targets)
             else -> listOf()
@@ -609,98 +588,6 @@ class CurrencyManager(
         return fetchedRates
     }
 
-    private suspend fun fetchFromCoinDesk(
-        targets: Set<FiatCurrency>
-    ): List<ExchangeRate> {
-
-        // Performance notes:
-        //
-        // The CoinDesk API forces us to fetch each rate individually. E.g.:
-        // https://api.coindesk.com/v1/bpi/currentprice/COP.json
-        //
-        // This was a big problem when we were using CoinDesk for ~146 fiat currencies.
-        // It's much less of a problem now that we're only using it for 7.
-        //
-        // In the past, we explored this problem in depth, since it was a bigger issue.
-        // Here's the historical notes:
-        //
-        // > - If we use zero concurrency, by fetching each URL one-at-a-time,
-        // >   and writing to the database after each one,
-        // >   then the whole process takes around 46 seconds.
-        // >
-        // > - If we maximize concurrency by fetching all of them,
-        // >   and then writing to the database once afterwards,
-        // >   then the whole process takes around 10 seconds.
-        // >
-        // > This should be much faster, because:
-        // > - the HttpClient should use 1 or 2 connections in total
-        // > - it should keep those connections open
-        // > - it should send multiple requests over the same connection
-        // >
-        // > It probably does this correctly on Android.
-        // > But on iOS there was a BUG, and it opened a different connection for each request.
-        // > So that's 146 TCP handshakes, and 146 TLS handshakes...
-        // > This bug was reported:
-        // > - https://youtrack.jetbrains.com/issue/KTOR-3362
-        // >
-        // > If that bug is fixed, the process will take around 800 milliseconds on iOS.
-        //
-        val http = HttpClient {
-            engine {
-                threadsCount = 1
-                pipelining = true
-            }
-        }
-
-        targets.map { fiatCurrency ->
-            val fiat = fiatCurrency.name // e.g.: "AUD"
-            async {
-                val httpResponse: HttpResponse = try {
-                    http.get("https://api.coindesk.com/v1/bpi/currentprice/$fiat.json")
-                } catch (e: Exception) {
-                    throw WrappedException(e, fiatCurrency, "failed to get exchange rates from api.coindesk.com")
-                }
-                val parsedResponse: CoinDeskResponse = try {
-                    json.decodeFromString(httpResponse.body())
-                } catch (e: Exception) {
-                    throw WrappedException(e, fiatCurrency, "failed to read exchange rates response from api.coindesk.com")
-                }
-                val usdRate = parsedResponse.bpi["USD"]
-                val fiatRate = parsedResponse.bpi[fiat]
-                if (usdRate == null || fiatRate == null) {
-                    throw WrappedException(null, fiatCurrency, "failed to extract USD or FIAT price from api.coindesk.com")
-                }
-
-                // Example (fiat = "ILS"):
-                // usdRate.rate = 62,980.0572
-                // fiatRate.rate = 202,056.4047
-                // 202,056.4047 / 62,980.0572 = 3.2082
-                // This means that:
-                // - 1 USD = 3.2082 ILS
-                // - 1 ILS = 62,980.0572 * 3.2082 BTC = 202,056.4047 BTC
-                val price = fiatRate.rate / usdRate.rate
-                ExchangeRate.UsdPriceRate(
-                    fiatCurrency = fiatCurrency,
-                    price = price,
-                    source = "coindesk.com",
-                    timestampMillis = Clock.System.now().toEpochMilliseconds()
-                )
-            }
-        }.map { request -> // Deferred<ExchangeRate.UsdPriceRate>
-            try {
-                Result.success(request.await())
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
-        }.let { results -> // List<Result<ExchangeRate.UsdPriceRate>>
-
-        //  val fetchedRates = results.mapNotNull { it.getOrNull() }
-        //  val failedRates = results.mapNotNull { it.exceptionOrNull() }
-
-            return results.mapNotNull { it.getOrNull() }
-        }
-    }
-
     private suspend fun fetchFromBluelytics(
         targets: Set<FiatCurrency>
     ): List<ExchangeRate> {
@@ -770,50 +657,5 @@ class CurrencyManager(
         } ?: listOf()
 
         return fetchedRates
-    }
-
-    /**
-     * For debugging purposes.
-     *
-     * It was discovered that Coinbase's currency rate for "ERN" wasn't accurate.
-     * It turns out that "ERN" didn't mean "Eritrean Nakfa", but instead refers to an altcoin.
-     * How did this happen ?
-     * It might be because the USA is sanctioning the country.
-     * After all, the other missing currencies from coinbase are sanctioned countries.
-     * However, it might also be an accident.
-     * And if it was an accident, this would imply that anytime an altcoin name happens
-     * to conflict with an existing currency name, the altcoin might take precedence.
-     * I think this is unlikely.
-     * But this function is a "quick-and-dirty" way to scan the list for suspicious exchange rates.
-     */
-    private suspend fun compareCoinbaseVsCoindesk() {
-
-        val fiatCurrencies = FiatCurrency.values.filter {
-            it != FiatCurrency.USD &&
-            it != FiatCurrency.EUR &&
-            it != FiatCurrency.ARS_BM
-        }.toSet()
-
-        val coinbaseRates = fetchFromCoinbase(fiatCurrencies)
-        val coindeskRates = fetchFromCoinDesk(fiatCurrencies)
-
-        val coinbaseMap = coinbaseRates.associateBy { it.fiatCurrency }
-        val coindeskMap = coindeskRates.associateBy { it.fiatCurrency }
-
-        for (fiatCurrency in fiatCurrencies) {
-            val coinbaseRate = coinbaseMap[fiatCurrency]
-            val coindeskRate = coindeskMap[fiatCurrency]
-
-            val coinbaseValue = when (coinbaseRate) {
-                is ExchangeRate.UsdPriceRate -> coinbaseRate.price.toString()
-                else -> "null"
-            }
-            val coindeskValue = when (coindeskRate) {
-                is ExchangeRate.UsdPriceRate -> coindeskRate.price.toString()
-                else -> "null"
-            }
-
-            log.debug { "${fiatCurrency.name}: coinbase($coinbaseValue), coindesk($coindeskValue)" }
-        }
     }
 }

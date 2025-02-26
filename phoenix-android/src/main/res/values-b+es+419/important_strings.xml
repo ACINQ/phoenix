@@ -92,7 +92,6 @@
     <string name="home_background_restriction_title">Procesamiento en segundo plano restringido</string>.
     <string name="home_background_restriction_body_1">Phoenix no podrá recibir pagos cuando esté en segundo plano, o cuando esté cerrado.</string>
     <string name="home_background_restriction_body_2">Esto ocurre porque:</string>
-    <string name="home_background_restriction_tor">Tor está activado</string>
     <string name="home_background_restriction_powersaver">El dispositivo está en modo de ahorro de energía</string>
     <string name="home_background_restriction_fcm">FCM notificaciones no disponibles</string>
     <string name="home_background_restriction_fcm_details">Si utilizas GrapheneOS o CalyxOS, instala Google Play Services para recibir notificaciones de FCM. Consulta las preguntas frecuentes para obtener más información.</string>
@@ -169,7 +168,6 @@
 
     <string name="receive_tor_warning_title">Tor está activado</string>
     <string name="receive_tor_warning_dialog_content_1">Phoenix no puede recibir pagos en segundo plano.</string>
-    <string name="receive_tor_warning_dialog_content_2">Para evitar fallos en los pagos, utilice Orbot, o asegúrese de que Phoenix permanece visible en primer plano cuando se le envíen los pagos.</string>
 
     <!-- scanning errors -->
 
@@ -206,11 +204,6 @@
     <string name="forceclose_button">Forzar el cierre de todos mis canales</string>
 
     <!-- in-app notifications -->
-
-    <string name="inappnotif_migration_from_legacy">¡Felicitaciones! Tu billetera se actualizó.</string>
-    <string name="inappnotif_migration_from_legacy_action">Ver los cambios</string>
-    <string name="inappnotif_migration_from_legacy_dialog_title">Se modificó tu dirección de Bitcoin en la cadena</string>
-    <string name="inappnotif_migration_from_legacy_dialog_body">¡NO reutilices direcciones antiguas! Ya no funcionarán.\n\nPonte en contacto con el servicio de asistencia si lo hiciste accidentalmente.</string>
 
     <string name="inappnotif_backup_seed_message">Haz una copia de seguridad de la billetera para evitar la pérdida de tu Bitcoin.</string>
     <string name="inappnotif_backup_seed_action">Hacer una copia de seguridad de mi billetera</string>
@@ -280,11 +273,14 @@
 
     <!-- Tor -->
 
-    <string name="tor_settings_subtitle">Phoenix puede usar Tor para proteger tu IP de los demás nodos de la red Lightning y los servidores de Electrum.</string>
-
-    <string name="tor_confirm_dialog_title">¿Habilitar Tor?</string>
-    <string name="tor_confirm_dialog_details_1">Tor es lento y afectará al rendimiento de tus pagos.</string>
-    <string name="tor_confirm_dialog_details_2">Específicamente, <b>no podrá recibir pagos</b> si Phoenix está en segundo plano, o si está cerrado.</string>
+    <string name="tor_dialog_enable_title_1">Uso de Tor</string>
+    <string name="tor_dialog_enable_details_1">Para habilitar esta opción, Phoenix deberá usar direcciones Onion al conectarse a Lightning y Electrum. Tenga en cuenta que se necesita una aplicación proxy Tor.</string>
+    <string name="tor_dialog_enable_title_2">Recuerde:</string>
+    <string name="tor_dialog_enable_details_2">Tor puede mejorar la privacidad, pero puede causar problemas de rendimiento y pagos atrasados.</string>
+    <string name="tor_dialog_disable_title">Deshabilitar Tor</string>
+    <string name="tor_dialog_disable_details_1">Si deshabilita esta opción, su dirección IP puede ser revelada a varios proveedores de servicios.</string>
+    <string name="tor_dialog_disable_details_2">¿Está seguro de que desea continuar?</string>
+    <string name="tor_dialog_processing">Procesando cambios…</string>
 
     <!-- about -->
 
@@ -292,7 +288,7 @@
     <string name="about_seed_title">Protección de la clave</string>
     <string name="about_seed_content">Esta billetera es autocustodiada, es decir que <b>tienes la custodia exclusiva de la clave semilla de la billetera, compuesta por 12 palabras</b>.\n\nEsta clave te da acceso a tu dinero. No se la reveles a nadie y ten cuidado con el phishing.</string>
     <string name="about_rates_title">Tasas de cambio</string>
-    <string name="about_rates_content">Las tasas de cambio entre Bitcoin y dinero fíat se obtienen de varias API de terceros:\n\n- Blockchain.info\n- Coindesk.com\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nEs posible que las tasas no sean exactas. Comprueba siempre la cantidad real de Bitcoin antes de enviar un pago.</string>
+    <string name="about_rates_content">Las tasas de cambio entre Bitcoin y dinero fíat se obtienen de varias API de terceros:\n\n- Blockchain.info\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nEs posible que las tasas no sean exactas. Comprueba siempre la cantidad real de Bitcoin antes de enviar un pago.</string>
 
     <!-- introduction screens -->
 

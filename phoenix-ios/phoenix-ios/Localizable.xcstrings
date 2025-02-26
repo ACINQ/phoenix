@@ -869,6 +869,7 @@
     },
     "(derived from your seed)" : {
       "comment" : "Type of text being copied.",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1560,6 +1561,7 @@
       }
     },
     "(you provided this address)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -4993,6 +4995,9 @@
         }
       }
     },
+    "A Tor VPN must be running on your device. This VPN is not provided by Phoenix. You need to install one." : {
+
+    },
     "Abort" : {
       "localizations" : {
         "ar" : {
@@ -5113,6 +5118,9 @@
           }
         }
       }
+    },
+    "Accelerate on-chain transactions" : {
+
     },
     "Accelerate transaction" : {
       "localizations" : {
@@ -5641,6 +5649,7 @@
     },
     "address" : {
       "comment" : "Label in DetailsView_IncomingPayment",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -5682,6 +5691,7 @@
     },
     "address type" : {
       "comment" : "Label in DetailsView_IncomingPayment",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -6003,6 +6013,9 @@
           }
         }
       }
+    },
+    "Amount added to fee credit" : {
+
     },
     "amount at time of payment" : {
       "localizations" : {
@@ -6538,6 +6551,9 @@
         }
       }
     },
+    "Amount received" : {
+
+    },
     "amount requested" : {
       "comment" : "Label in DetailsView_IncomingPayment",
       "localizations" : {
@@ -6579,8 +6595,12 @@
         }
       }
     },
+    "Amount requested" : {
+
+    },
     "amount sent" : {
       "comment" : "Label in DetailsView_IncomingPayment",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -6619,6 +6639,9 @@
           }
         }
       }
+    },
+    "Amount sent (fees included)" : {
+
     },
     "amount to receive" : {
       "comment" : "SendView: lnurl-withdraw flow",
@@ -7267,6 +7290,9 @@
         }
       }
     },
+    "Are you sure you want to proceed ?" : {
+
+    },
     "Are you sure you want to proceed?" : {
       "localizations" : {
         "ar" : {
@@ -7426,6 +7452,9 @@
           }
         }
       }
+    },
+    "Attention! Some funds will expire soon and won't be eligible for a swap anymore." : {
+
     },
     "Authenticate" : {
       "comment" : "lnurl-auth: login button title",
@@ -7673,12 +7702,6 @@
     },
     "Automated liquidity" : {
       "comment" : "Payment description for inbound liquidity"
-    },
-    "Automatic [FromChannelBalance]" : {
-
-    },
-    "Automatic [FromFutureHtlc]" : {
-
     },
     "Automatic Channel Creation" : {
       "extractionState" : "manual",
@@ -8327,6 +8350,9 @@
         }
       }
     },
+    "Be advised" : {
+
+    },
     "Be careful with messages from unknown sources" : {
       "localizations" : {
         "ar" : {
@@ -8649,6 +8675,7 @@
     },
     "bitcoin address" : {
       "comment" : "Label in DetailsView_IncomingPayment",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -9015,6 +9042,7 @@
       }
     },
     "bitcoin txid" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -9175,9 +9203,6 @@
         }
       }
     },
-    "Blockchain Info" : {
-
-    },
     "blockchain tx" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -9218,6 +9243,9 @@
           }
         }
       }
+    },
+    "Bolt12 invoice" : {
+
     },
     "Bolt12 offer:" : {
       "localizations" : {
@@ -9340,6 +9368,7 @@
       }
     },
     "broadcast at" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -9380,6 +9409,7 @@
       }
     },
     "Bump Fee (CPFP)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -9461,6 +9491,7 @@
       }
     },
     "By default, Phoenix connects to random Electrum servers in order to access the Bitcoin blockchain. You can also choose to connect to your own Electrum server." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -9660,6 +9691,9 @@
         }
       }
     },
+    "Cannot be swapped anymore, after 4 months waiting. These funds must be spent manually." : {
+
+    },
     "Cannot create commit tx" : {
       "localizations" : {
         "ar" : {
@@ -9779,12 +9813,6 @@
           }
         }
       }
-    },
-    "caused by" : {
-
-    },
-    "Caused by" : {
-
     },
     "Chain mismatch" : {
       "comment" : "Error title",
@@ -10031,6 +10059,9 @@
         }
       }
     },
+    "Channel id" : {
+
+    },
     "Channel management" : {
       "comment" : "Navigation Bar Title",
       "localizations" : {
@@ -10071,6 +10102,9 @@
           }
         }
       }
+    },
+    "Channel operation (new or splice-in)" : {
+
     },
     "Channel Resized" : {
 
@@ -11129,6 +11163,7 @@
     },
     "Closing Status" : {
       "comment" : "Title in DetailsView_IncomingPayment",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -11167,6 +11202,9 @@
           }
         }
       }
+    },
+    "Closing type" : {
+
     },
     "Cloud backup" : {
       "extractionState" : "manual",
@@ -11573,6 +11611,9 @@
           }
         }
       }
+    },
+    "Completed at" : {
+
     },
     "Concurrent splice in progress" : {
       "localizations" : {
@@ -12019,6 +12060,7 @@
       }
     },
     "confirmed at" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -12098,8 +12140,14 @@
         }
       }
     },
+    "Confirmed on-chain" : {
+
+    },
+    "Confirming: " : {
+
+    },
     "Connected" : {
-      "comment" : "Connection state\nConnection status",
+      "comment" : "Connection state",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -12304,7 +12352,7 @@
       }
     },
     "Connecting…" : {
-      "comment" : "Connection state\nConnection status",
+      "comment" : "Connection state",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -13522,6 +13570,9 @@
           }
         }
       }
+    },
+    "Created at" : {
+
     },
     "created: %@" : {
       "localizations" : {
@@ -15136,6 +15187,9 @@
         }
       }
     },
+    "Deposit address" : {
+
+    },
     "Deposits must be at least **%@**. The fee is **%@%%** (%@ minimum)." : {
       "comment" : "Minimum amount description.",
       "extractionState" : "manual",
@@ -15541,6 +15595,9 @@
           }
         }
       }
+    },
+    "Disabling Tor" : {
+
     },
     "Discard changes" : {
       "localizations" : {
@@ -17032,6 +17089,9 @@
         }
       }
     },
+    "Enabling this option will force Phoenix to only connect to onion services for Lightning and Electrum. Note that a Tor proxy application is required." : {
+
+    },
     "End date" : {
       "localizations" : {
         "ar" : {
@@ -17920,6 +17980,9 @@
         }
       }
     },
+    "Expired: " : {
+
+    },
     "Explore" : {
       "localizations" : {
         "ar" : {
@@ -18163,6 +18226,7 @@
       }
     },
     "External" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -18241,6 +18305,9 @@
           }
         }
       }
+    },
+    "Failed" : {
+
     },
     "FAILED" : {
       "localizations" : {
@@ -18522,6 +18589,9 @@
           }
         }
       }
+    },
+    "Fee credit" : {
+
     },
     "Fee for on-the-fly channel creation:" : {
       "extractionState" : "manual",
@@ -18853,6 +18923,7 @@
     },
     "fees paid" : {
       "comment" : "Label in DetailsView_IncomingPayment",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -19378,6 +19449,9 @@
           }
         }
       }
+    },
+    "Final wallet: " : {
+
     },
     "Fix It" : {
       "localizations" : {
@@ -19986,6 +20060,7 @@
       }
     },
     "funding txid" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -20910,6 +20985,9 @@
         }
       }
     },
+    "How it works" : {
+
+    },
     "How to use" : {
       "localizations" : {
         "ar" : {
@@ -21757,6 +21835,9 @@
         }
       }
     },
+    "If you disable Tor, your IP address may be revealed to various service providers." : {
+
+    },
     "If you do not back it up and you lose access to Phoenix you will **lose your funds**!" : {
       "comment" : "BackupView",
       "localizations" : {
@@ -22525,6 +22606,12 @@
         }
       }
     },
+    "Inbound liquidity request (auto)" : {
+
+    },
+    "Inbound liquidity request (manual)" : {
+
+    },
     "Include amount received" : {
       "localizations" : {
         "ar" : {
@@ -22765,6 +22852,24 @@
           }
         }
       }
+    },
+    "Incoming Lightning payment (bolt11)" : {
+
+    },
+    "Incoming Lightning payment (bolt12)" : {
+
+    },
+    "Incoming on-chain payment (legacy pay-to-open)" : {
+
+    },
+    "Incoming on-chain payment (legacy swap-in)" : {
+
+    },
+    "Incoming on-chain payment (new channel)" : {
+
+    },
+    "Incoming on-chain payment (splice)" : {
+
     },
     "Incoming payment expiry" : {
       "localizations" : {
@@ -23207,6 +23312,9 @@
           }
         }
       }
+    },
+    "Invalid address" : {
+      "comment" : "Connection state"
     },
     "Invalid BIP353 DNS address" : {
       "comment" : "Error message - dns record contains an invalid offer",
@@ -23659,6 +23767,7 @@
     },
     "invoice created" : {
       "comment" : "Label in DetailsView_IncomingPayment",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -23737,6 +23846,9 @@
           }
         }
       }
+    },
+    "Invoice description" : {
+
     },
     "Invoice expiration" : {
       "localizations" : {
@@ -24852,6 +24964,7 @@
       }
     },
     "Lightning network" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -24971,6 +25084,9 @@
           }
         }
       }
+    },
+    "Lightning payment" : {
+
     },
     "Lightning payments are fast and best suited for smaller payments." : {
       "localizations" : {
@@ -25217,6 +25333,7 @@
       }
     },
     "liquidity amount" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -25255,6 +25372,9 @@
           }
         }
       }
+    },
+    "Liquidity requested" : {
+
     },
     "Liquidity successfully added!" : {
       "localizations" : {
@@ -25337,6 +25457,7 @@
       }
     },
     "lnurl-pay" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -25455,6 +25576,9 @@
           }
         }
       }
+    },
+    "Local" : {
+
     },
     "Logged In" : {
       "comment" : "lnurl-auth: success text",
@@ -25740,6 +25864,9 @@
         }
       }
     },
+    "Make sure your Tor VPN is active and running." : {
+
+    },
     "Malformed JPG image data" : {
       "localizations" : {
         "ar" : {
@@ -25859,9 +25986,6 @@
           }
         }
       }
-    },
-    "Manual" : {
-
     },
     "Manual Backup" : {
       "comment" : "Navigation bar title",
@@ -27086,6 +27210,9 @@
         }
       }
     },
+    "Miner fees" : {
+
+    },
     "Miner Fees" : {
       "comment" : "Label in SummaryInfoGrid",
       "localizations" : {
@@ -27296,6 +27423,12 @@
           }
         }
       }
+    },
+    "Mutual" : {
+
+    },
+    "N/A" : {
+
     },
     "Name" : {
       "localizations" : {
@@ -27543,6 +27676,7 @@
       }
     },
     "New Channel (auto-created)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -28228,6 +28362,9 @@
         }
       }
     },
+    "No, I don't want to use an onion address" : {
+
+    },
     "Node id" : {
       "localizations" : {
         "ar" : {
@@ -28551,8 +28688,11 @@
         }
       }
     },
+    "Offer" : {
+
+    },
     "Offline" : {
-      "comment" : "Connection state\nConnection status",
+      "comment" : "Connection state",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -29323,6 +29463,18 @@
         }
       }
     },
+    "Outgoing Lightning payment (bolt11)" : {
+
+    },
+    "Outgoing Lightning payment (bolt12)" : {
+
+    },
+    "Outgoing on-chain payment" : {
+
+    },
+    "Outgoing on-chain payment (legacy swap)" : {
+
+    },
     "Outgoing payments" : {
       "localizations" : {
         "ar" : {
@@ -29853,6 +30005,9 @@
         }
       }
     },
+    "Payer key" : {
+
+    },
     "Payment" : {
       "localizations" : {
         "ar" : {
@@ -30221,6 +30376,7 @@
       }
     },
     "Payment Failed" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -30340,6 +30496,9 @@
           }
         }
       }
+    },
+    "Payment Hash" : {
+
     },
     "Payment history" : {
       "localizations" : {
@@ -30709,6 +30868,7 @@
     },
     "Payment Received" : {
       "comment" : "Title in DetailsView_IncomingPayment",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -30790,6 +30950,7 @@
     },
     "Payment Request" : {
       "comment" : "Title in DetailsView_IncomingPayment",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -30992,6 +31153,7 @@
     },
     "Payment Sent" : {
       "comment" : "Title in DetailsView_IncomingPayment",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -31030,6 +31192,9 @@
           }
         }
       }
+    },
+    "Payment status" : {
+
     },
     "Payment to %@" : {
       "localizations" : {
@@ -31315,6 +31480,9 @@
         }
       }
     },
+    "Pending" : {
+
+    },
     "PENDING" : {
       "localizations" : {
         "ar" : {
@@ -31597,6 +31765,7 @@
       }
     },
     "Phoenix generated" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -31675,6 +31844,9 @@
           }
         }
       }
+    },
+    "Phoenix now forces onion addresses for Lightning and Electrum connections when Tor is enabled.\n\nHowever, the embedded Tor proxy has been removed ; instead you need to install a third-party Tor Proxy VPN application such as Orbot to connect." : {
+
     },
     "Phoenix uses payment channels to make Bitcoin fast and private." : {
       "localizations" : {
@@ -32480,6 +32652,9 @@
         }
       }
     },
+    "Preimage" : {
+
+    },
     "Prepare Transaction" : {
       "localizations" : {
         "ar" : {
@@ -32682,7 +32857,7 @@
         }
       }
     },
-    "purchase type" : {
+    "Purchase type" : {
 
     },
     "QR code" : {
@@ -33051,6 +33226,7 @@
     },
     "reason" : {
       "comment" : "Label in DetailsView_IncomingPayment",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -33293,6 +33469,7 @@
     },
     "received at" : {
       "comment" : "Label in DetailsView_IncomingPayment",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -33372,6 +33549,9 @@
           }
         }
       }
+    },
+    "Received via" : {
+
     },
     "Receiving in background…" : {
       "localizations" : {
@@ -33495,6 +33675,7 @@
     },
     "recipient pubkey" : {
       "comment" : "Label in DetailsView_IncomingPayment",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -33859,6 +34040,9 @@
         }
       }
     },
+    "Remote" : {
+
+    },
     "Remove" : {
       "localizations" : {
         "ar" : {
@@ -34105,6 +34289,9 @@
     "Resolving lightning address" : {
       "comment" : "Progress title"
     },
+    "Restart required" : {
+
+    },
     "Restore my wallet" : {
       "comment" : "Navigation bar title",
       "localizations" : {
@@ -34345,6 +34532,9 @@
           }
         }
       }
+    },
+    "Revoked" : {
+
     },
     "Revoked commits found on %lld channel(s)!" : {
       "comment" : "translate: s",
@@ -35445,6 +35635,7 @@
     },
     "sent at" : {
       "comment" : "Label in DetailsView_IncomingPayment",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -35809,6 +36000,7 @@
     },
     "service" : {
       "comment" : "Label in DetailsView_IncomingPayment",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -36012,6 +36204,9 @@
           }
         }
       }
+    },
+    "Service fees" : {
+
     },
     "Service Fees" : {
       "comment" : "Label in SummaryInfoGrid",
@@ -37849,6 +38044,9 @@
         }
       }
     },
+    "Since you've enabled Tor, you should use an onion address for this server." : {
+
+    },
     "Skip" : {
       "localizations" : {
         "ar" : {
@@ -38174,6 +38372,7 @@
       }
     },
     "Splice Out" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -38333,6 +38532,9 @@
           }
         }
       }
+    },
+    "Standard" : {
+
     },
     "Start date" : {
       "localizations" : {
@@ -38574,6 +38776,9 @@
         }
       }
     },
+    "Successful" : {
+
+    },
     "Suggestions" : {
 
     },
@@ -38742,6 +38947,7 @@
     },
     "Swap Out" : {
       "comment" : "Title in DetailsView_IncomingPayment",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -39145,6 +39351,9 @@
           }
         }
       }
+    },
+    "Target public key" : {
+
     },
     "Terminate App" : {
       "localizations" : {
@@ -41158,6 +41367,9 @@
         }
       }
     },
+    "These funds come from closed Lightning channels. They must be spent manually." : {
+
+    },
     "These funds were not swapped in time. Tap to spend." : {
       "localizations" : {
         "ar" : {
@@ -41966,9 +42178,6 @@
         }
       }
     },
-    "This liquidity was required to receive a payment" : {
-
-    },
     "This means you will not be able to receive payments when Phoenix is in the background. To receive payments, Phoenix must be open and in the foreground." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -42448,6 +42657,7 @@
     },
     "timestamp" : {
       "comment" : "Label in DetailsView_IncomingPayment",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -42976,6 +43186,9 @@
         }
       }
     },
+    "To secure your payment channels Phoenix monitors the Bitcoin blockchain through Electrum servers.\n\nBy default, random servers are used. You can also configure Phoenix to connect only to your own server." : {
+
+    },
     "to speed up on-chain payments" : {
       "localizations" : {
         "ar" : {
@@ -43097,7 +43310,11 @@
         }
       }
     },
+    "Tor can improve privacy, but may cause performance issues and missed payments." : {
+
+    },
     "Tor is disabled" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -43176,6 +43393,9 @@
           }
         }
       }
+    },
+    "Tor is enabled. This server should use an onion address." : {
+
     },
     "Tor Settings" : {
       "comment" : "Navigation bar title",
@@ -43633,6 +43853,7 @@
       }
     },
     "transaction" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -43671,6 +43892,9 @@
           }
         }
       }
+    },
+    "Transaction" : {
+
     },
     "Transactions" : {
       "extractionState" : "manual",
@@ -43956,6 +44180,7 @@
     },
     "type" : {
       "comment" : "Label in DetailsView_IncomingPayment",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -44075,6 +44300,9 @@
           }
         }
       }
+    },
+    "Type of payment" : {
+
     },
     "Unable to extract public key!" : {
       "comment" : "Toast message",
@@ -45182,6 +45410,12 @@
         }
       }
     },
+    "Use Tor" : {
+
+    },
+    "Using Tor" : {
+
+    },
     "Version %@" : {
       "localizations" : {
         "ar" : {
@@ -45262,8 +45496,12 @@
         }
       }
     },
+    "Version 2.5.0: Tor changes" : {
+
+    },
     "via" : {
       "comment" : "Label in DetailsView_IncomingPayment",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -45462,6 +45700,9 @@
           }
         }
       }
+    },
+    "Waiting for confirmation first before they can be swapped to Lightning." : {
+
     },
     "waiting for confirmations" : {
       "comment" : "explanation for pending transaction",
@@ -45824,6 +46065,9 @@
           }
         }
       }
+    },
+    "Waiting for swap: " : {
+
     },
     "Waiting to start…" : {
       "localizations" : {
@@ -46747,6 +46991,19 @@
         }
       }
     },
+    "Will automatically be swapped to Lightning if the fee is **less than %@** (%@) of the amount." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Will automatically be swapped to Lightning if the fee is **less than %1$@** (%2$@) of the amount."
+          }
+        }
+      }
+    },
+    "Will automatically be swapped to Lightning if the fee is **less than %@**." : {
+
+    },
     "will be sent to:" : {
       "localizations" : {
         "ar" : {
@@ -46908,6 +47165,9 @@
         }
       }
     },
+    "Will remain on-chain because automated channels management is disabled." : {
+
+    },
     "With configured proportional fee, we recommend a base fee of at least %@." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -47029,6 +47289,9 @@
           }
         }
       }
+    },
+    "With Tor enabled, Phoenix will require onion addresses for Lightning and Electrum connections." : {
+
     },
     "Would you like to be notified when somebody sends you a payment?" : {
       "extractionState" : "manual",
@@ -47438,6 +47701,7 @@
       }
     },
     "You can improve your privacy by only using Tor when connecting to an Electrum server or to your Lightning peer. This will slightly slow down your transactions." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -48280,6 +48544,9 @@
           }
         }
       }
+    },
+    "You must restart Phoenix for the changes to take affect." : {
+
     },
     "You need at least one channel to claim your address. Try adding funds to your wallet and try again." : {
       "localizations" : {

@@ -29,10 +29,14 @@ extension GenericPasswordConvertible {
 }
 
 // Declare that the Curve25519 keys are generic password convertible.
+extension Curve25519.KeyAgreement.PrivateKey: @retroactive CustomStringConvertible {}
 extension Curve25519.KeyAgreement.PrivateKey: GenericPasswordConvertible {}
+
+extension Curve25519.Signing.PrivateKey: @retroactive CustomStringConvertible {}
 extension Curve25519.Signing.PrivateKey: GenericPasswordConvertible {}
 
 // Extend SymmetricKey to conform to GenericPasswordConvertible.
+extension SymmetricKey: @retroactive CustomStringConvertible {}
 extension SymmetricKey: GenericPasswordConvertible {
 	
     init<D>(rawRepresentation data: D) throws where D: ContiguousBytes {
@@ -45,6 +49,7 @@ extension SymmetricKey: GenericPasswordConvertible {
 }
 
 // Extend SecureEnclave keys to conform to GenericPasswordConvertible.
+extension SecureEnclave.P256.KeyAgreement.PrivateKey: @retroactive CustomStringConvertible {}
 extension SecureEnclave.P256.KeyAgreement.PrivateKey: GenericPasswordConvertible {
 	
     init<D>(rawRepresentation data: D) throws where D: ContiguousBytes {
@@ -55,7 +60,7 @@ extension SecureEnclave.P256.KeyAgreement.PrivateKey: GenericPasswordConvertible
         return dataRepresentation  // Contiguous bytes repackaged as a Data instance.
     }
 }
-
+extension SecureEnclave.P256.Signing.PrivateKey: @retroactive CustomStringConvertible {}
 extension SecureEnclave.P256.Signing.PrivateKey: GenericPasswordConvertible {
 	
     init<D>(rawRepresentation data: D) throws where D: ContiguousBytes {

@@ -54,7 +54,7 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountView
 import fr.acinq.phoenix.android.components.Clickable
-import fr.acinq.phoenix.android.components.Dialog
+import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.TextWithIcon
@@ -74,13 +74,12 @@ fun HomeBalance(
     balance: MilliSatoshi?,
     swapInBalance: WalletBalance,
     finalWalletBalance: Satoshi,
-    unconfirmedChannelsBalance: MilliSatoshi,
     onNavigateToSwapInWallet: () -> Unit,
     onNavigateToFinalWallet: () -> Unit,
     balanceDisplayMode: HomeAmountDisplayMode,
 ) {
     if (balance == null) {
-        ProgressView(modifier = modifier, text = stringResource(id = R.string.home__balance_loading))
+        ProgressView(modifier = modifier, text = stringResource(id = R.string.home_balance_loading))
     } else {
         val isAmountRedacted = balanceDisplayMode == HomeAmountDisplayMode.REDACTED
         Column(
@@ -106,7 +105,7 @@ fun HomeBalance(
                     }
                 }
             )
-            OnChainBalance(swapInBalance, unconfirmedChannelsBalance, finalWalletBalance, onNavigateToSwapInWallet, onNavigateToFinalWallet, balanceDisplayMode)
+            OnChainBalance(swapInBalance, finalWalletBalance, onNavigateToSwapInWallet, onNavigateToFinalWallet, balanceDisplayMode)
         }
     }
 }
@@ -114,14 +113,13 @@ fun HomeBalance(
 @Composable
 private fun OnChainBalance(
     swapInBalance: WalletBalance,
-    pendingChannelsBalance: MilliSatoshi,
     finalWalletBalance: Satoshi,
     onNavigateToSwapInWallet: () -> Unit,
     onNavigateToFinalWallet: () -> Unit,
     balanceDisplayMode: HomeAmountDisplayMode,
 ) {
     var showOnchainDialog by remember { mutableStateOf(false) }
-    val availableOnchainBalance = swapInBalance.total.toMilliSatoshi() + pendingChannelsBalance + finalWalletBalance.toMilliSatoshi()
+    val availableOnchainBalance = swapInBalance.total.toMilliSatoshi() + finalWalletBalance.toMilliSatoshi()
 
     if (availableOnchainBalance > 0.msat) {
         val nextSwapTimeout by business.peerManager.swapInNextTimeout.collectAsState(initial = null)
@@ -136,7 +134,7 @@ private fun OnChainBalance(
             ) {
                 TextWithIcon(
                     text = if (balanceDisplayMode == HomeAmountDisplayMode.REDACTED) "****" else {
-                        stringResource(id = R.string.home__onchain_incoming, availableOnchainBalance.toPrettyString(preferredAmountUnit, fiatRate, withUnit = true))
+                        stringResource(id = R.string.home_onchain_incoming, availableOnchainBalance.toPrettyString(preferredAmountUnit, fiatRate, withUnit = true))
                     },
                     textStyle = MaterialTheme.typography.caption,
                     icon = R.drawable.ic_chain,
@@ -167,7 +165,7 @@ private fun OnChainBalance(
                             verticalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
                             // 1) funds being confirmed (swap deposits or LN channels waiting for confirmation
-                            val fundsBeingConfirmed = (swapInBalance.unconfirmed + swapInBalance.weaklyConfirmed).toMilliSatoshi() + pendingChannelsBalance
+                            val fundsBeingConfirmed = (swapInBalance.unconfirmed + swapInBalance.weaklyConfirmed).toMilliSatoshi()
                             if (fundsBeingConfirmed > 0.msat) {
                                 OnChainBalanceEntry(
                                     label = stringResource(id = R.string.home_swapin_confirming_title),

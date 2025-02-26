@@ -1,0 +1,90 @@
+import fr.acinq.bitcoin.ByteVector32;
+import fr.acinq.bitcoin.TxId;
+import fr.acinq.lightning.db.IncomingPayment;
+import fr.acinq.lightning.utils.UUID;
+
+-- incoming payments
+CREATE TABLE payments_incoming (
+    id BLOB AS UUID NOT NULL PRIMARY KEY,
+    payment_hash BLOB AS ByteVector32 UNIQUE,
+    tx_id BLOB AS TxId,
+    created_at INTEGER NOT NULL,
+    received_at INTEGER,
+    data BLOB AS IncomingPayment NOT NULL
+);
+
+CREATE INDEX payments_incoming_payment_hash_idx ON payments_incoming(payment_hash);
+CREATE INDEX payments_incoming_tx_id_idx ON payments_incoming(tx_id);
+
+-- Create indexes to optimize the queries in AggregatedQueries.
+-- Tip: Use "explain query plan" to ensure they're actually being used.
+CREATE INDEX payments_incoming_filter_idx
+    ON payments_incoming(received_at)
+ WHERE received_at IS NOT NULL;
+
+-- queries
+
+insert:
+INSERT INTO payments_incoming (
+            id,
+            payment_hash,
+            tx_id,
+            created_at,
+            received_at,
+            data)
+VALUES (?, ?, ?, ?, ?, ?);
+
+update:
+UPDATE payments_incoming
+SET    received_at=:receivedAt,
+       tx_id=:txId,
+       data=:data
+WHERE  id=:id;
+
+get:
+SELECT data
+FROM   payments_incoming
+WHERE  id=?;
+
+getByPaymentHash:
+SELECT data
+FROM   payments_incoming
+WHERE  payment_hash=?;
+
+list:
+SELECT payment.data
+FROM   payments_incoming AS payment
+WHERE
+    payment.created_at BETWEEN :created_at_from AND :created_at_to
+ORDER BY payment.created_at DESC
+LIMIT :limit OFFSET :offset;
+
+listSuccessful:
+SELECT payment.data
+FROM   payments_incoming AS payment
+WHERE
+    payment.received_at BETWEEN :received_at_from AND :received_at_to
+ORDER BY payment.received_at DESC
+LIMIT :limit OFFSET :offset;
+
+listByTxId:
+SELECT data
+FROM   payments_incoming
+WHERE  tx_id=?;
+
+listSuccessfulIds:
+SELECT id, received_at
+FROM payments_incoming
+WHERE received_at IS NOT NULL;
+
+deleteById:
+DELETE FROM payments_incoming
+WHERE id = ?;
+
+deleteByPaymentHash:
+DELETE FROM payments_incoming
+WHERE payment_hash = ?;
+
+-- use this in a `transaction` block to know how many rows were changed after an UPDATE
+changes:
+SELECT changes();

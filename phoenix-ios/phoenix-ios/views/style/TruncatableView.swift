@@ -146,7 +146,7 @@ private struct SizePreferenceKey: PreferenceKey {
 	static func reduce(value: inout CGSize, nextValue: () -> CGSize) {}
 }
 
-extension DynamicTypeSize: CustomStringConvertible {
+extension DynamicTypeSize: @retroactive CustomStringConvertible {
 	public var description: String {
 		switch self {
 			case .xSmall         : return "xSmall"

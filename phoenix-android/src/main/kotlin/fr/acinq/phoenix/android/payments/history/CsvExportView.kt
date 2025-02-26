@@ -42,15 +42,10 @@ fun CsvExportView(
     onBackClick: () -> Unit,
 ) {
     val context = LocalContext.current
-    val vm: CsvExportViewModel = viewModel(
-        factory = CsvExportViewModel.Factory(
-            peerManager = business.peerManager,
-            dbManager = business.databaseManager,
-            paymentsFetcher = business.paymentsManager.fetcher,
-        )
-    )
+    val vm: CsvExportViewModel = viewModel(factory = CsvExportViewModel.Factory(dbManager = business.databaseManager))
     val startTimestamp = vm.startTimestampMillis
     val endTimestamp = vm.endTimestampMillis
+
     DefaultScreenLayout {
         DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(R.string.payments_export_title))
         Card(internalPadding = PaddingValues(16.dp)) {
@@ -130,11 +125,11 @@ fun CsvExportView(
                     }
                 }
                 is CsvExportState.Generating -> {
-                    ProgressView(text = stringResource(id = R.string.payments_export_in_progress, state.exportedCount))
+                    ProgressView(text = stringResource(id = R.string.payments_export_in_progress))
                 }
                 is CsvExportState.Success -> {
                     TextWithIcon(
-                        text = stringResource(id = R.string.payments_export_success, state.paymentsCount),
+                        text = stringResource(id = R.string.payments_export_success),
                         icon = R.drawable.ic_check,
                         iconTint = positiveColor,
                         modifier = Modifier.padding(16.dp)

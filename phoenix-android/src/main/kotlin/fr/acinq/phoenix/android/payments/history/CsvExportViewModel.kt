@@ -29,12 +29,8 @@ import androidx.lifecycle.viewModelScope
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
-import fr.acinq.phoenix.android.utils.extensions.basicDescription
-import fr.acinq.phoenix.data.WalletPaymentFetchOptions
+import fr.acinq.phoenix.csv.WalletPaymentCsvWriter
 import fr.acinq.phoenix.managers.DatabaseManager
-import fr.acinq.phoenix.managers.PaymentsFetcher
-import fr.acinq.phoenix.managers.PeerManager
-import fr.acinq.phoenix.utils.CsvWriter
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -43,17 +39,15 @@ import java.io.File
 import java.io.FileWriter
 
 sealed class CsvExportState {
-    object Init : CsvExportState()
-    data class Generating(val exportedCount: Int) : CsvExportState()
-    data class Success(val paymentsCount: Int, val uri: Uri, val content: String) : CsvExportState()
-    object NoData : CsvExportState()
+    data object Init : CsvExportState()
+    data object Generating : CsvExportState()
+    data class Success(val uri: Uri, val content: String) : CsvExportState()
+    data object NoData : CsvExportState()
     data class Failed(val error: Throwable) : CsvExportState()
 }
 
 class CsvExportViewModel(
-    private val peerManager: PeerManager,
     private val dbManager: DatabaseManager,
-    private val paymentsFetcher: PaymentsFetcher,
 ) : ViewModel() {
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -86,40 +80,26 @@ class CsvExportViewModel(
         }) {
             if (state is CsvExportState.Generating) return@launch
             if (startTimestampMillis == null) throw IllegalArgumentException("start timestamp is undefined")
-            state = CsvExportState.Generating(exportedCount = 0)
-            val csvConfig = CsvWriter.Configuration(
+            state = CsvExportState.Generating
+            val csvConfig = WalletPaymentCsvWriter.Configuration(
                 includesFiat = includesFiat,
                 includesDescription = includesDescription,
                 includesNotes = includesNotes,
                 includesOriginDestination = includesOriginDestination,
             )
+            val csvWriter = WalletPaymentCsvWriter(csvConfig)
             log.debug("exporting payments data between start={} end={} config={}", startTimestampMillis?.toAbsoluteDateTimeString(), endTimestampMillis.toAbsoluteDateTimeString(), csvConfig)
             val batchSize = 32
             var batchOffset = 0
             var fetching = true
-            val rows = mutableListOf<String>()
-            rows += CsvWriter.makeHeaderRow(csvConfig)
             while (fetching) {
-                dbManager.paymentsDb().listRangeSuccessfulPaymentsOrder(
+                dbManager.paymentsDb().listCompletedPayments(
                     startDate = startTimestampMillis!!,
                     endDate = endTimestampMillis,
-                    count = batchSize,
-                    skip = batchOffset
-                ).map { paymentRow ->
-                    paymentsFetcher.getPayment(paymentRow, WalletPaymentFetchOptions.All)?.let { info ->
-                        val descriptions = listOf(
-                            info.payment.basicDescription(),
-                            info.metadata.userDescription,
-                            info.metadata.lnurl?.pay?.metadata?.longDesc
-                        ).mapNotNull { it.takeIf { !it.isNullOrBlank() } }
-                        val row = CsvWriter.makeRow(
-                            info = info,
-                            localizedDescription = descriptions.joinToString("\n"),
-                            config = csvConfig
-                        )
-                        state = CsvExportState.Generating(rows.size - 1)
-                        rows += row
-                    }
+                    count = batchSize.toLong(),
+                    skip = batchOffset.toLong(),
+                ).map {
+                    csvWriter.add(it.payment, it.metadata)
                 }.let { result ->
                     if (result.isEmpty()) {
                         fetching = false
@@ -128,25 +108,17 @@ class CsvExportViewModel(
                     }
                 }
             }
-            val paymentsCount = rows.size - 1 // offset header row
-            if (paymentsCount <= 1) {
-                log.debug("no data found for this export attempt")
-                state = CsvExportState.NoData
-            } else {
-                // create file & write to disk
-                val exportDir = File(context.cacheDir, "payments")
-                if (!exportDir.exists()) exportDir.mkdir()
-                val file = File.createTempFile("phoenix-", ".csv", exportDir)
-                val writer = FileWriter(file, true)
-                rows.forEach {
-                    writer.write(it)
-                }
-                writer.close()
-                val uri = FileProvider.getUriForFile(context, authority, file)
-                val content = rows.joinToString(separator = "")
-                log.info("processed $paymentsCount payments CSV export")
-                state = CsvExportState.Success(paymentsCount, uri, content)
-            }
+            val content = csvWriter.getContent()
+            // create file & write to disk
+            val exportDir = File(context.cacheDir, "payments")
+            if (!exportDir.exists()) exportDir.mkdir()
+            val file = File.createTempFile("phoenix-", ".csv", exportDir)
+            val writer = FileWriter(file, true)
+            writer.write(content)
+            writer.close()
+            val uri = FileProvider.getUriForFile(context, authority, file)
+            log.info("processed payments CSV export")
+            state = CsvExportState.Success(uri, content)
         }
     }
 
@@ -163,13 +135,11 @@ class CsvExportViewModel(
     }
 
     class Factory(
-        private val peerManager: PeerManager,
         private val dbManager: DatabaseManager,
-        private val paymentsFetcher: PaymentsFetcher,
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return CsvExportViewModel(peerManager, dbManager, paymentsFetcher) as T
+            return CsvExportViewModel(dbManager) as T
         }
     }
 }

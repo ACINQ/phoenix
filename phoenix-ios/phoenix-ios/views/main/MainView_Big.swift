@@ -621,6 +621,7 @@ struct MainView_Big: View {
 				case .liquiditySettings  : showSettings()
 				case .forceCloseChannels : showSettings()
 				case .swapInWallet       : showSettings()
+				case .finalWallet        : showSettings()
 			}
 			
 			if #available(iOS 17, *) {
@@ -658,6 +659,11 @@ struct MainView_Big: View {
 					navCoordinator_settings.path.removeAll()
 					navCoordinator_settings.path.append(ConfigurationList.NavLinkTag.WalletInfo)
 					navCoordinator_settings.path.append(WalletInfoView.NavLinkTag.SwapInWalletDetails)
+					
+				case .finalWallet:
+					navCoordinator_settings.path.removeAll()
+					navCoordinator_settings.path.append(ConfigurationList.NavLinkTag.WalletInfo)
+					navCoordinator_settings.path.append(WalletInfoView.NavLinkTag.FinalWalletDetails)
 				}
 			}
 		}

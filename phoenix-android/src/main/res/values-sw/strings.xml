@@ -65,7 +65,6 @@
 
     <string name="startup_binding_service">Kuunganisha huduma…</string>
     <string name="startup_wait">Kuandaa pochi…</string>
-    <string name="startup_wait_legacy_check">Kuangalia pochi ya zamani…</string>
     <string name="startup_checking_seed">Kufungua…</string>
     <string name="startup_unlocked">Ufikiaji umekubaliwa…</string>
     <string name="startup_unlock_failure">Kufungua kumeshindikana</string>
@@ -86,11 +85,6 @@
 
     <string name="startup_starting">Inaanzisha…</string>
     <string name="startup_error_generic">Programu haikuweza kuanza.</string>
-
-    <!-- Switch between legacy/modern apps -->
-
-    <string name="legacyswitch_title">Programu ya zamani</string>
-    <string name="legacyswitch_restart">Anzisha upya programu ya zamani</string>
 
     <!-- Payment line -->
 
@@ -293,16 +287,16 @@
 
     <!-- home: balance section & misc -->
 
-    <string name="home__balance_loading">Inapakia…</string>
-    <string name="home__onchain_incoming">+%1$s</string>
+    <string name="home_balance_loading">Inapakia…</string>
+    <string name="home_onchain_incoming">+%1$s</string>
 
-    <string name="home__faq_button">Maswali Yanayoulizwa Mara Kwa Mara (FAQ)</string>
-    <string name="home__payments_none">Tumia vitufe vya Kupokea na Kutuma vilivyo chini ya skrini hii ili kuanza!</string>
-    <string name="home__payments_more_button">Onyesha malipo yote…</string>
-    <string name="home__connection__electrum_late">Electrum imechelewa</string>
-    <string name="home__connection__bad_cert">Cheti cha Electrum</string>
-    <string name="home__connection__connecting">Inajiunganisha…</string>
-    <string name="home__connection__tor_active">Tor</string>
+    <string name="home_faq_button">Maswali Yanayoulizwa Mara Kwa Mara (FAQ)</string>
+    <string name="home_payments_none">Tumia vitufe vya Kupokea na Kutuma vilivyo chini ya skrini hii ili kuanza!</string>
+    <string name="home_payments_more_button">Onyesha malipo yote…</string>
+    <string name="home_connection_electrum_late">Electrum imechelewa</string>
+    <string name="home_connection_bad_cert">Cheti cha Electrum</string>
+    <string name="home_connection_connecting">Inajiunganisha…</string>
+    <string name="home_connection_tor_active">Tor</string>
     <string name="home_request_liquidity">Omba fedha</string>
     <string name="home_inflight_payments">Kwa sasa una malipo %1$d yanayosubiri kwenye pochi yako.\n\nHifadhi programu wazi ili kuhakikisha malipo haya yanaweza kutekelezwa vizuri bila matatizo.</string>
 
@@ -353,7 +347,6 @@
     <string name="paymentdetails_status_unconfirmed_zero">0 uthibitisho</string>
     <string name="paymentdetails_status_unconfirmed_zero_bump">Gonga ili kuharakisha</string>
     <string name="paymentdetails_status_unconfirmed_default">%1$d uthibitisho(s)</string>
-    <string name="paymentdetails_status_unconfirmed_with_depth">%1$d/%2$d uthibitisho(s)</string>
     <string name="paymentdetails_status_confirmed">Imethibitishwa kwenye blockchain</string>
 
     <string name="paymentdetails_offer_note_label">Ujumbe</string>
@@ -398,22 +391,19 @@
 
     <string name="paymentdetails_technical_title">Maelezo ya kiufundi</string>
     <string name="paymentdetails_payment_type_label">Aina ya malipo</string>
-    <string name="paymentdetails_closing">Malipo ya kufunga channel</string>
-    <string name="paymentdetails_splice_outgoing">Malipo ya splice ya kutuma</string>
-    <string name="paymentdetails_splice_cpfp_outgoing">Harakisha muamala wa on-chain</string>
-    <string name="paymentdetails_inbound_liquidity">Omba fedha za ndani</string>
-    <string name="paymentdetails_normal_outgoing">Malipo ya Lightning ya kutuma (kawaida)</string>
-    <string name="paymentdetails_normal_incoming">Malipo ya Lightning ya kupokea (kawaida)</string>
-    <string name="paymentdetails_swapin">Depo ya Bitcoin ya swap-in</string>
-    <string name="paymentdetails_swapout">Kubadilisha kwa anwani ya Bitcoin</string>
-    <string name="paymentdetails_offer_outgoing">Malipo ya Lightning ya kutuma (offer)</string>
-    <string name="paymentdetails_offer_incoming">Malipo ya Lightning ya kupokea (offer)</string>
+    <string name="paymentdetails_type_outgoing_close">Malipo ya kufunga channel</string>
+    <string name="paymentdetails_type_outgoing_splice">Malipo ya splice ya kutuma</string>
+    <string name="paymentdetails_type_outgoing_splice_cpfp">Harakisha muamala wa on-chain</string>
+    <string name="paymentdetails_type_outgoing_liquidity_manual">Omba fedha za ndani (manual)</string>
+    <string name="paymentdetails_type_outgoing_liquidity_auto">Omba fedha za ndani (auto)</string>
+    <string name="paymentdetails_type_outgoing_bolt11">Malipo ya Lightning ya kutuma (bolt11)</string>
+    <string name="paymentdetails_type_outgoing_bolt12">Malipo ya Lightning ya kutuma (bolt12)</string>
+    <string name="paymentdetails_type_incoming_bolt11">Malipo ya Lightning ya kupokea (bolt11)</string>
+    <string name="paymentdetails_type_incoming_bolt12">Malipo ya Lightning ya kupokea (bolt12)</string>
     <string name="paymentdetails_swapin_address_label">Anwani ya depo</string>
     <string name="paymentdetails_bitcoin_address_label">Anwani ya Bitcoin</string>
 
     <string name="paymentdetails_splice_out_channel_label">Channel ya splice</string>
-    <string name="paymentdetails_dualswapin_tx_label">Muamala</string>
-    <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
 
     <string name="paymentdetails_liquidity_amount_label">Kiasi kilichoombwa</string>
 
@@ -425,9 +415,9 @@
     <string name="paymentdetails_closing_type_other">Mengine</string>
 
     <string name="paymentdetails_pubkey_label">Funguo ya umma wa lengwa</string>
-    <string name="paymentdetails_payment_request_description_label">Maelezo ya ankara</string>
+    <string name="paymentdetails_bolt11_description_label">Maelezo ya ankara</string>
     <string name="paymentdetails_payment_hash_label">Hash ya Malipo</string>
-    <string name="paymentdetails_payment_request_label">Ankara</string>
+    <string name="paymentdetails_bolt11_label">Ankara</string>
     <string name="paymentdetails_preimage_label">Picha ya awali</string>
     <string name="paymentdetails_payerkey_label">Funguo ya Mlipaji</string>
     <string name="paymentdetails_payerkey_is_mine">Funguo yako ya offer</string>
@@ -446,8 +436,6 @@
     <string name="paymentdetails_part_hops_label">Hops</string>
 
     <string name="paymentdetails_received_with_label">Imepokelewa kupitia</string>
-    <string name="paymentdetails_received_with_splicein">Splice-in (kuongeza kwenye channel iliyopo)</string>
-    <string name="paymentdetails_received_with_channel">Channel mpya (iliyoundwa kiotomatiki)</string>
     <string name="paymentdetails_received_with_lightning">Malipo ya Lightning</string>
     <string name="paymentdetails_channel_id_label">Kitambulisho cha channel</string>
     <string name="paymentdetails_tx_id_label">Muamala</string>
@@ -617,27 +605,17 @@
     <!-- settings: Tor -->
 
     <string name="tor_settings_title">Tor</string>
-    <string name="tor_settings_unknown">Inakagua mapendeleo…</string>
-    <string name="tor_settings_enabled">Tor imewezeshwa</string>
-    <string name="tor_settings_disabled">Tor haijawezeshwa</string>
-    <string name="tor_settings_state_unknown">Kipande cha Tor hakijaanza bado.</string>
-    <string name="tor_settings_state_closed">Kipande cha Tor kimefungwa.</string>
-    <string name="tor_settings_state_starting">Kuanza kwa kipande cha Tor…</string>
-    <string name="tor_settings_state_started">Tor iko mtandaoni</string>
 
     <!-- home: connectivity dialog -->
 
     <string name="conndialog_title">Hali ya Muunganisho</string>
     <string name="conndialog_summary_not_ok">Programu haitafanya kazi ipasavyo hadi muunganisho wote utakapowekwa.</string>
     <string name="conndialog_network">Kifaa chako hakina muunganisho wa Intaneti. Programu haitafanya kazi vizuri.\n\nTafadhali angalia mipangilio ya kifaa chako.</string>
-    <string name="conndialog_internet">Intaneti</string>
     <string name="conndialog_electrum">Electrum</string>
-    <string name="conndialog_tor">Tor</string>
     <string name="conndialog_lightning">Mwenzi</string>
     <string name="conndialog_accessibility_desc">Simamia muunganisho kwa %1$s</string>
     <string name="conndialog_connecting">Kuunganisha…</string>
     <string name="conndialog_connected">Imepangwa</string>
-    <string name="conndialog_connected_electrum_behind">Seva ya Electrum inachelewa (block $1$d)</string>
     <string name="conndialog_closed">Imetenganishwa</string>
     <string name="conndialog_closed_bad_cert">Cheti kibaya</string>
 

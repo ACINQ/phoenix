@@ -38,6 +38,7 @@ struct LogFileHandler: LogHandler {
 		level: Logging.Logger.Level,
 		message: Logging.Logger.Message,
 		metadata: Logging.Logger.Metadata?,
+		source: String,
 		file: String,
 		function: String,
 		line: UInt

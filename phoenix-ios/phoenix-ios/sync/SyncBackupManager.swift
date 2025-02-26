@@ -24,14 +24,6 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
  *         target where the action is delete self   :   750
 */
 
-let payments_record_table_name = "payments"
-let payments_record_column_data = "encryptedData"
-let payments_record_column_meta = "encryptedMeta"
-
-let contacts_record_table_name = "contacts"
-let contacts_record_column_data = "encryptedData"
-let contacts_record_column_photo = "photo" // CKAsset: automatically encrypted by CloudKit
-
 struct ConsecutivePartialFailure {
 	var count: Int
 	var error: CKError?
@@ -43,7 +35,7 @@ struct ConsecutivePartialFailure {
 
 /// Encompasses the logic for syncing data with Apple's CloudKit database.
 ///
-class SyncBackupManager {
+class SyncBackupManager: @unchecked Sendable {
 	
 	/// Access to parent for shared logic.
 	///
@@ -82,9 +74,9 @@ class SyncBackupManager {
 	var consecutiveErrorCount = 0
 	var consecutivePartialFailures: [String: ConsecutivePartialFailure] = [:]
 	
-	private var _cloudKitDb: CloudKitDb? = nil // see getter method
+	var cancellables = Set<AnyCancellable>()
 	
-	private var cancellables = Set<AnyCancellable>()
+	private var _cloudKitDb: CloudKitDb? = nil // see getter method
 	
 	init(
 		chain: Bitcoin_kmpChain,
@@ -120,67 +112,6 @@ class SyncBackupManager {
 	// ----------------------------------------
 	// MARK: Monitors
 	// ----------------------------------------
-	
-	private func startPaymentsQueueCountMonitor() {
-		log.trace("startPaymentsQueueCountMonitor()")
-		
-		// Kotlin suspend functions are currently only supported on the main thread
-		assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
-		
-		self.cloudKitDb.payments.queueCountPublisher().sink {[weak self] (queueCount: Int64) in
-			log.debug("payments.queueCountPublisher().sink(): count = \(queueCount)")
-			
-			guard let self = self else {
-				return
-			}
-			
-			let count = Int(clamping: queueCount)
-			
-			let wait: SyncBackupManager_State_Waiting?
-			if Prefs.shared.backupTransactions.useUploadDelay {
-				let delay = TimeInterval.random(in: 10 ..< 900)
-				wait = SyncBackupManager_State_Waiting(
-					kind: .randomizedUploadDelay,
-					parent: self,
-					delay: delay
-				)
-			} else {
-				wait = nil
-			}
-			
-			Task {
-				if let newState = await self.actor.paymentsQueueCountChanged(count, wait: wait) {
-					self.handleNewState(newState)
-				}
-			}
-
-		}.store(in: &cancellables)
-	}
-	
-	private func startContactsQueueCountMonitor() {
-		log.trace("startContactsQueueCountMonitor()")
-		
-		// Kotlin suspend functions are currently only supported on the main thread
-		assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
-		
-		self.cloudKitDb.contacts.queueCountPublisher().sink {[weak self] (queueCount: Int64) in
-			log.debug("contacts.queueCountPublisher().sink(): count = \(queueCount)")
-			
-			guard let self = self else {
-				return
-			}
-			
-			// Note: Upload delay doesn't apply to contacts.
-			
-			let count = Int(clamping: queueCount)
-			Task {
-				if let newState = await self.actor.contactsQueueCountChanged(count, wait: nil) {
-					self.handleNewState(newState)
-				}
-			}
-
-		}.store(in: &cancellables)
-	}
 	
 	private func startPreferencesMonitor() {
 		log.trace("startPreferencesMonitor()")
@@ -382,6 +313,7 @@ class SyncBackupManager {
 				
 				DispatchQueue.main.async {
 					self.startPaymentsQueueCountMonitor()
+					self.startPaymentsMigrations()
 					self.startContactsQueueCountMonitor()
 					self.startPreferencesMonitor()
 				}

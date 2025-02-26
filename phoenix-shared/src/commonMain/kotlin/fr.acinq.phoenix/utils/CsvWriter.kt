@@ -1,10 +1,7 @@
 package fr.acinq.phoenix.utils
 
 import fr.acinq.lightning.db.*
-import fr.acinq.lightning.utils.msat
-import fr.acinq.lightning.utils.sum
 import fr.acinq.phoenix.data.WalletPaymentInfo
-import fr.acinq.phoenix.utils.extensions.isManualPurchase
 import kotlinx.datetime.Instant
 
 class CsvWriter {
@@ -49,11 +46,12 @@ class CsvWriter {
             return header
         }
 
+        @Suppress("DEPRECATION")
         /**
          * Creates and returns the row for the given payment.
          * This includes the CRLF that terminates the row.
          *
-         * @param info Payment fetched via PaymentsFetcher
+         * @param info Payment info fetched from database
          * @param localizedDescription As displayed in app (might be a localized default value)
          * @param config The configuration for the CSV file
          */
@@ -70,21 +68,8 @@ class CsvWriter {
             var row = processField(dateStr)
 
             val amtMsat = payment.amount.msat
-            // for the fee, we should ignore the fee returned by lightning parts, because it may contain a funding fee which is already accounted for in the liquidity payments
-            val feesMsat = when (payment) {
-                is IncomingPayment -> when (payment.origin) {
-                    is IncomingPayment.Origin.Invoice, is IncomingPayment.Origin.Offer -> {
-                        payment.received?.receivedWith.orEmpty().map { part ->
-                            when (part) {
-                                is IncomingPayment.ReceivedWith.LightningPayment, is IncomingPayment.ReceivedWith.AddedToFeeCredit -> 0.msat
-                                else -> part.fees
-                            }
-                        }.sum().msat
-                    }
-                    else -> payment.fees.msat
-                }
-                else -> payment.fees.msat
-            }
+            // TODO: for the fee, we should ignore the fee returned by lightning parts, because it may contain a funding fee which is already accounted for in the liquidity payments
+            val feesMsat = payment.fees.msat
             val isOutgoing = info.payment is OutgoingPayment
 
             val amtMsatStr = if (isOutgoing) "-$amtMsat" else "$amtMsat"
@@ -136,28 +121,26 @@ class CsvWriter {
             }
 
             if (config.includesOriginDestination) {
-                val details = when (val payment = info.payment) {
-                    is IncomingPayment -> when (val origin = payment.origin) {
-                        is IncomingPayment.Origin.Invoice -> "Incoming LN payment"
-                        is IncomingPayment.Origin.SwapIn -> "Swap-in to ${origin.address ?: "N/A"}"
-                        is IncomingPayment.Origin.OnChain -> "On-chain deposit"
-                        is IncomingPayment.Origin.Offer -> "Incoming LN payment (offer)"
-                    }
+                val details = when (payment) {
+                    is Bolt11IncomingPayment -> "Incoming LN payment"
+                    is Bolt12IncomingPayment -> "Incoming LN payment (offer)"
+                    is OnChainIncomingPayment -> "Incoming on-chain payment"
+                    is LegacyPayToOpenIncomingPayment -> "Incoming LN payment"
+                    is LegacySwapInIncomingPayment -> "Incoming on-chain payment to ${payment.address ?: "N/A"}"
                     is LightningOutgoingPayment -> when (val details = payment.details) {
                         is LightningOutgoingPayment.Details.Normal -> "Outgoing LN payment to ${details.paymentRequest.nodeId.toHex()}"
                         is LightningOutgoingPayment.Details.SwapOut -> "Outgoing Swap to ${details.address}"
                         is LightningOutgoingPayment.Details.Blinded -> {
-                            details.paymentRequest.invoiceRequest.offer.contactNodeIds.firstOrNull()?.let { "Outgoing LN payment (offer) to ${it.toHex()}" }
+                            details.paymentRequest.invoiceRequest.offer.contactInfos.map { it.nodeId }.firstOrNull()?.let { "Outgoing LN payment (offer) to ${it.toHex()}" }
                                 ?: "Outgoing LN payment (offer)"
                         }
                     }
                     is SpliceOutgoingPayment -> "Outgoing splice to ${payment.address}"
                     is ChannelCloseOutgoingPayment -> "Channel closing to ${payment.address}"
                     is SpliceCpfpOutgoingPayment -> "Accelerate transactions with CPFP"
-                    is InboundLiquidityOutgoingPayment -> when {
-                        payment.isManualPurchase() -> "Manual liquidity (+${payment.purchase.amount.sat} sat)"
-                        else -> "Channel management"
-                    }
+                    is AutomaticLiquidityPurchasePayment -> "Channel management"
+                    is ManualLiquidityPurchasePayment -> "Manual liquidity purchase"
+                    else -> TODO()
                 }
                 row += ",${processField(details)}"
             }

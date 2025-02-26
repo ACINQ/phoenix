@@ -95,7 +95,6 @@
     <string name="home_background_restriction_title">Processamento em segundo plano restrito</string>
     <string name="home_background_restriction_body_1">O Phoenix não poderá receber pagamentos quando estiver em segundo plano ou quando estiver fechado.</string>
     <string name="home_background_restriction_body_2">Isso acontece porque:</string>
-    <string name="home_background_restriction_tor">Tor está ativado</string>
     <string name="home_background_restriction_powersaver">O dispositivo está no modo de economia de energia</string>
     <string name="home_background_restriction_fcm">FCM notificações indisponíveis</string>
     <string name="home_background_restriction_fcm_details">Se você estiver usando GrapheneOS ou CalyxOS, instale o Google Play Services para receber notificações FCM. Consulte as Perguntas frequentes para obter ajuda.</string>
@@ -170,7 +169,6 @@
 
     <string name="receive_tor_warning_title">O Tor está ativado</string>
     <string name="receive_tor_warning_dialog_content_1">O Phoenix não pode receber pagamentos em segundo plano.</string>
-    <string name="receive_tor_warning_dialog_content_2">Para evitar falhas nos pagamentos, use o Orbot ou certifique-se de que o Phoenix permaneça visível em primeiro plano quando os pagamentos forem enviados a você.</string>
 
     <!-- scanning errors -->
 
@@ -207,11 +205,6 @@
     <string name="forceclose_button">Forçar o fechamento de todos os meus canais</string>
 
     <!-- in-app notifications -->
-
-    <string name="inappnotif_migration_from_legacy">Parabéns! Sua carteira foi atualizada.</string>
-    <string name="inappnotif_migration_from_legacy_action">Veja as mudanças</string>
-    <string name="inappnotif_migration_from_legacy_dialog_title">Seu endereço de Bitcoin na cadeia foi alterado</string>
-    <string name="inappnotif_migration_from_legacy_dialog_body">Não reutilize seus endereços antigos! Eles não funcionarão mais.\n\nEntre em contato com o suporte se tiver feito isso acidentalmente.</string>
 
     <string name="inappnotif_backup_seed_message">Faça backup de sua carteira para evitar a perda de seus bitcoins.</string>
     <string name="inappnotif_backup_seed_action">Fazer backup da minha carteira</string>
@@ -282,7 +275,14 @@
 
     <!-- Tor -->
 
-    <string name="tor_settings_subtitle">A Phoenix pode usar o Tor para proteger seu IP dos outros nós da Lightning Network e dos servidores da Electrum.</string>
+    <string name="tor_dialog_enable_title_1">Usando o Tor</string>
+    <string name="tor_dialog_enable_details_1">Habilitar esta opção exigirá que o Phoenix use endereços onion ao se conectar ao Lightning e ao Electrum. Observe que um aplicativo proxy Tor é necessário.</string>
+    <string name="tor_dialog_enable_title_2">Esteja ciente</string>
+    <string name="tor_dialog_enable_details_2">O Tor pode melhorar a privacidade, mas pode causar problemas de desempenho e pagamentos perdidos.</string>
+    <string name="tor_dialog_disable_title">Desabilitando o Tor</string>
+    <string name="tor_dialog_disable_details_1">Se você desabilitar esta opção, seu endereço IP poderá ser revelado a vários provedores de serviço.</string>
+    <string name="tor_dialog_disable_details_2">Tem certeza de que deseja prosseguir?</string>
+    <string name="tor_dialog_processing">Processando alterações…</string>
 
     <!-- about -->
 
@@ -290,7 +290,7 @@
     <string name="about_seed_title">Proteção de sua chave</string>
     <string name="about_seed_content">Essa carteira tem custódia própria: <b>você tem a custódia exclusiva da chave semente de 12 palavras da carteira</b>.\n\nEssa chave dá acesso ao seu dinheiro. Não a revele a ninguém e tome cuidado com phishing.</string>
     <string name="about_rates_title">Taxas de câmbio</string>
-    <string name="about_rates_content">As taxas de câmbio de Bitcoin/fiat são recuperadas de várias APIs de terceiros:\n\n- Blockchain.info\n- powered by Coindesk.com\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nEssas taxas podem não ser precisas. Sempre verifique o valor real do Bitcoin antes de enviar um pagamento.</string>
+    <string name="about_rates_content">As taxas de câmbio de Bitcoin/fiat são recuperadas de várias APIs de terceiros:\n\n- Blockchain.info\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nEssas taxas podem não ser precisas. Sempre verifique o valor real do Bitcoin antes de enviar um pagamento.</string>
 
     <!-- introduction screens -->
 

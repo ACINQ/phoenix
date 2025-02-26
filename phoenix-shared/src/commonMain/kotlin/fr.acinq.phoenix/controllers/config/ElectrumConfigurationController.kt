@@ -30,22 +30,24 @@ class AppElectrumConfigurationController(
 
     init {
         launch {
-            combine(
-                configurationManager.electrumConfig,
-                appConnectionsDaemon?.lastElectrumServerAddress ?: flow { null },
-                electrumClient.connectionStatus,
-                configurationManager.electrumMessages,
-                transform = { configState, currentServer, connectionStatus, message ->
-                    ElectrumConfiguration.Model(
-                        configuration = configState,
-                        currentServer = currentServer,
-                        connection = connectionStatus.toConnectionState(),
-                        blockHeight = message?.blockHeight ?: 0,
-                        tipTimestamp = message?.header?.time ?: 0,
-                    )
+            if (appConnectionsDaemon != null) {
+                combine(
+                    configurationManager.electrumConfig,
+                    appConnectionsDaemon.lastElectrumServerAddress,
+                    electrumClient.connectionStatus,
+                    configurationManager.electrumMessages,
+                    transform = { configState, currentServer, connectionStatus, message ->
+                        ElectrumConfiguration.Model(
+                            configuration = configState,
+                            currentServer = currentServer,
+                            connection = connectionStatus.toConnectionState(),
+                            blockHeight = message?.blockHeight ?: 0,
+                            tipTimestamp = message?.header?.time ?: 0,
+                        )
+                    }
+                ).collect {
+                    model(it)
                 }
-            ).collect {
-                model(it)
             }
         }
     }
@@ -53,7 +55,7 @@ class AppElectrumConfigurationController(
     override fun process(intent: ElectrumConfiguration.Intent) {
         when (intent) {
             is ElectrumConfiguration.Intent.UpdateElectrumServer -> {
-                configurationManager.updateElectrumConfig(intent.server)
+                configurationManager.updateElectrumConfig(intent.config)
             }
         }
     }

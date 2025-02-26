@@ -97,9 +97,8 @@
     <string name="home_final_desc">These funds come from closed Lightning channels. They must be spent manually.</string>
 
     <string name="home_background_restriction_title">Background processing restricted</string>
-    <string name="home_background_restriction_body_1">Phoenix will not be able to receive payments when it is in the background, or when it is closed.</string>
+    <string name="home_background_restriction_body_1">Phoenix may not be able to receive payments when it is in the background, or when it is closed.</string>
     <string name="home_background_restriction_body_2">This happens because:</string>
-    <string name="home_background_restriction_tor">Tor is enabled</string>
     <string name="home_background_restriction_powersaver">The device is in power saving mode</string>
     <string name="home_background_restriction_fcm">FCM notifications unavailable</string>
     <string name="home_background_restriction_fcm_details">If you\'re on GrapheneOS or CalyxOS, install Google Play Services to get FCM notifications. Check the FAQ for guidance.</string>
@@ -173,8 +172,7 @@
     <!-- receive: Tor warning -->
 
     <string name="receive_tor_warning_title">Tor is enabled</string>
-    <string name="receive_tor_warning_dialog_content_1">Phoenix cannot receive payments in the background.</string>
-    <string name="receive_tor_warning_dialog_content_2">To avoid payment failures, use Orbot instead, or make sure Phoenix remain visible in the foreground when payments are sent to you.</string>
+    <string name="receive_tor_warning_dialog_content_1">Phoenix may have issues receiving payments. Make sure the app stays open in the foreground and that connection is stable.</string>
 
     <!-- send errors -->
 
@@ -211,11 +209,6 @@
     <string name="forceclose_button">Force-close all my channels</string>
 
     <!-- in-app notifications -->
-
-    <string name="inappnotif_migration_from_legacy">Congratulations! Your wallet has been updated.</string>
-    <string name="inappnotif_migration_from_legacy_action">See what\'s changed</string>
-    <string name="inappnotif_migration_from_legacy_dialog_title">Your on-chain Bitcoin address has changed</string>
-    <string name="inappnotif_migration_from_legacy_dialog_body">Do NOT reuse your old addresses! They will not work anymore.\n\nContact support if you accidentally did.</string>
 
     <string name="inappnotif_backup_seed_message">Backup your wallet to prevent losing your bitcoins.</string>
     <string name="inappnotif_backup_seed_action">Backup my wallet</string>
@@ -286,11 +279,14 @@
 
     <!-- Tor -->
 
-    <string name="tor_settings_subtitle">Phoenix can use Tor to shield your IP from the other nodes in the Lightning Network and Electrum servers.</string>
-
-    <string name="tor_confirm_dialog_title">Enable Tor ?</string>
-    <string name="tor_confirm_dialog_details_1">Tor is slow and will impact the performance of your payments.</string>
-    <string name="tor_confirm_dialog_details_2">Specifically, you <b>will not be able to receive payments</b> if Phoenix is in the background, or if it\'s closed.</string>
+    <string name="tor_dialog_enable_title_1">Using Tor</string>
+    <string name="tor_dialog_enable_details_1">Enabling this option will force Phoenix to only connect to onion services for Lightning and Electrum. Note that a Tor proxy application is required.</string>
+    <string name="tor_dialog_enable_title_2">Be advised</string>
+    <string name="tor_dialog_enable_details_2">Tor can improve privacy, but may cause performance issues and missed payments.</string>
+    <string name="tor_dialog_disable_title">Disabling Tor</string>
+    <string name="tor_dialog_disable_details_1">If you disable this option, your IP address may be revealed to various service providers.</string>
+    <string name="tor_dialog_disable_details_2">Are you sure you want to proceed ?</string>
+    <string name="tor_dialog_processing">Processing changes…</string>
 
     <!-- about -->
 
@@ -298,7 +294,7 @@
     <string name="about_seed_title">Safeguarding your key</string>
     <string name="about_seed_content">This wallet is self-custodial: <b>you have sole custody of the wallet\'s 12-words seed key</b>.\n\nThis key gives access to your money. Do not reveal it to anyone, and beware of phishing.</string>
     <string name="about_rates_title">Exchange rates</string>
-    <string name="about_rates_content">Bitcoin/fiat exchange rates are retrieved from various third-party APIs:\n\n- Blockchain.info\n- powered by Coindesk.com\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nThose rates may not be accurate. Always check the actual Bitcoin amount before sending a payment.</string>
+    <string name="about_rates_content">Bitcoin/fiat exchange rates are retrieved from various third-party APIs:\n\n- Blockchain.info\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nThose rates may not be accurate. Always check the actual Bitcoin amount before sending a payment.</string>
 
     <!-- introduction screens -->
 

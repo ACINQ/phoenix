@@ -1,4 +1,4 @@
-package fr.acinq.phoenix.db.cloud
+package fr.acinq.phoenix.db.cloud.payments
 
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.byteVector32
@@ -8,14 +8,17 @@ import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
-import fr.acinq.phoenix.db.payments.*
+import fr.acinq.phoenix.db.cloud.UUIDSerializer
+import fr.acinq.phoenix.db.cloud.cborSerializer
+import fr.acinq.phoenix.db.migrations.v11.types.OutgoingDetailsData
+import fr.acinq.phoenix.db.migrations.v11.types.OutgoingDetailsTypeVersion
+import fr.acinq.phoenix.db.migrations.v11.types.OutgoingStatusData
+import fr.acinq.phoenix.db.migrations.v11.types.OutgoingStatusTypeVersion
 import fr.acinq.phoenix.utils.migrations.LegacyChannelCloseHelper
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.ByteString
-import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.decodeFromByteArray
-import kotlinx.serialization.encodeToByteArray
 
 @Serializable
 @OptIn(ExperimentalSerializationApi::class)
@@ -32,16 +35,6 @@ data class LightningOutgoingPaymentWrapper(
     val status: StatusWrapper?,
     val createdAt: Long
 ) {
-    constructor(payment: LightningOutgoingPayment) : this(
-        id = payment.id,
-        msat = payment.recipientAmount.msat,
-        recipient = payment.recipient.value.toByteArray(),
-        details = DetailsWrapper(payment.details),
-        parts = payment.parts.map { LightningOutgoingPartWrapper(it) },
-        status = StatusWrapper(payment.status),
-        createdAt = payment.createdAt
-    )
-
     /**
      * Unwraps a cbor-serialized outgoing payment. Should return a [LightningOutgoingPayment], but on may also return a
      * [ChannelCloseOutgoingPayment] in case the data are legacy and actually contain data for a channel closing.
@@ -87,17 +80,6 @@ data class LightningOutgoingPaymentWrapper(
         @ByteString
         val blob: ByteArray
     ) {
-        companion object {
-            // constructor
-            operator fun invoke(details: LightningOutgoingPayment.Details): DetailsWrapper {
-                val (type, blob) = details.mapToDb()
-                return DetailsWrapper(
-                    type = type.name,
-                    blob = blob
-                )
-            }
-        }
-
         fun unwrap(): LightningOutgoingPayment.Details? {
             return OutgoingDetailsData.deserialize(
                 typeVersion = OutgoingDetailsTypeVersion.valueOf(type),
@@ -114,30 +96,6 @@ data class LightningOutgoingPaymentWrapper(
         @ByteString
         val blob: ByteArray
     ) {
-        companion object {
-            // constructor
-            operator fun invoke(status: LightningOutgoingPayment.Status): StatusWrapper? {
-                return when (status) {
-                    is LightningOutgoingPayment.Status.Pending -> null
-                    is LightningOutgoingPayment.Status.Completed.Failed -> {
-                        val (type, blob) = status.mapToDb()
-                        StatusWrapper(
-                            ts = status.completedAt,
-                            type = type.name,
-                            blob = blob
-                        )
-                    }
-                    is LightningOutgoingPayment.Status.Completed.Succeeded -> {
-                        val (type, blob) = status.mapToDb()
-                        StatusWrapper(
-                            ts = status.completedAt,
-                            type = type.name,
-                            blob = blob
-                        )
-                    }
-                }
-            }
-        } // </companion object>
 
         fun unwrap(): LightningOutgoingPayment.Status {
             return OutgoingStatusData.deserialize(
@@ -148,20 +106,4 @@ data class LightningOutgoingPaymentWrapper(
         }
 
     } // </StatusWrapper>
-
-    companion object
 } // </OutgoingPaymentWrapper>
-
-@OptIn(ExperimentalSerializationApi::class)
-fun LightningOutgoingPayment.cborSerialize(): ByteArray {
-    val wrapper = LightningOutgoingPaymentWrapper(payment = this)
-    return Cbor.encodeToByteArray(wrapper)
-}
-
-@OptIn(ExperimentalSerializationApi::class)
-@Throws(Exception::class)
-fun LightningOutgoingPaymentWrapper.cborDeserialize(
-    blob: ByteArray
-): LightningOutgoingPaymentWrapper {
-    return cborSerializer().decodeFromByteArray(blob)
-}

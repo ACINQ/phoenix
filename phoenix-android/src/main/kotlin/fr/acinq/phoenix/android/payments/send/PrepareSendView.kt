@@ -47,9 +47,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -69,8 +68,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.business
@@ -78,14 +77,14 @@ import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Clickable
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
-import fr.acinq.phoenix.android.components.Dialog
-import fr.acinq.phoenix.android.components.FilledButton
+import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.contact.ContactPhotoView
 import fr.acinq.phoenix.android.components.enableOrFade
 import fr.acinq.phoenix.android.components.openLink
+import fr.acinq.phoenix.android.components.scanner.ScannerView
 import fr.acinq.phoenix.android.isDarkTheme
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.payments.send.bolt11.SendToBolt11View
@@ -135,25 +134,28 @@ fun SendView(
 
     when (val parseState = vm.parsePaymentState) {
         // if payment data has been successfully parsed, redirect to the relevant payment screen
-        is ParsePaymentState.Success -> when (val data = parseState.data) {
-            is SendManager.ParseResult.Bolt11Invoice -> {
-                SendToBolt11View(invoice = data.invoice, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() })
-            }
-            is SendManager.ParseResult.Bolt12Offer -> {
-                SendToOfferView(offer = data.offer, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() })
-            }
-            is SendManager.ParseResult.Uri -> {
-                SendSpliceOutView(requestedAmount = data.uri.amount, address = data.uri.address, onBackClick = onBackClick, onSpliceOutSuccess = { navController.popToHome() })
-            }
-            is SendManager.ParseResult.Lnurl.Pay -> {
-                LnurlPayView(payIntent = data.paymentIntent, onBackClick, onPaymentSent = { navController.popToHome() })
-            }
-            is SendManager.ParseResult.Lnurl.Withdraw -> {
-                LnurlWithdrawView(withdraw = data.lnurlWithdraw, onBackClick = onBackClick, onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) }, onWithdrawDone = { navController.popToHome() })
-            }
-            is SendManager.ParseResult.Lnurl.Auth -> {
-                LnurlAuthView(auth = data.auth, onBackClick = { navController.popBackStack() }, onChangeAuthSchemeSettingClick = { navController.navigate("${Screen.PaymentSettings.route}?showAuthSchemeDialog=true") },
-                    onAuthDone = { navController.popToHome() },)
+        is ParsePaymentState.Success -> {
+            LocalViewModelStoreOwner.current?.viewModelStore?.clear()
+            when (val data = parseState.data) {
+                is SendManager.ParseResult.Bolt11Invoice -> {
+                    SendToBolt11View(invoice = data.invoice, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() })
+                }
+                is SendManager.ParseResult.Bolt12Offer -> {
+                    SendToOfferView(offer = data.offer, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() })
+                }
+                is SendManager.ParseResult.Uri -> {
+                    SendSpliceOutView(requestedAmount = data.uri.amount, address = data.uri.address, onBackClick = onBackClick, onSpliceOutSuccess = { navController.popToHome() })
+                }
+                is SendManager.ParseResult.Lnurl.Pay -> {
+                    LnurlPayView(payIntent = data.paymentIntent, onBackClick, onPaymentSent = { navController.popToHome() })
+                }
+                is SendManager.ParseResult.Lnurl.Withdraw -> {
+                    LnurlWithdrawView(withdraw = data.lnurlWithdraw, onBackClick = onBackClick, onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) }, onWithdrawDone = { navController.popToHome() })
+                }
+                is SendManager.ParseResult.Lnurl.Auth -> {
+                    LnurlAuthView(auth = data.auth, onBackClick = { navController.popBackStack() }, onChangeAuthSchemeSettingClick = { navController.navigate("${Screen.PaymentSettings.route}?showAuthSchemeDialog=true") },
+                        onAuthDone = { navController.popToHome() },)
+                }
             }
         }
         is ParsePaymentState.Ready, is ParsePaymentState.Processing, is ParsePaymentState.Error, is ParsePaymentState.ChoosePaymentMode -> {
@@ -357,50 +359,24 @@ private fun ScannerBox(
     onDismiss: () -> Unit,
     onSubmit: (String) -> Unit,
 ) {
-    var scanView by remember { mutableStateOf<DecoratedBarcodeView?>(null) }
     Box(Modifier.fillMaxSize()) {
         ScannerView(
-            onScanViewBinding = { scanView = it },
-            onScannedText = onSubmit
+            onScannedText = onSubmit,
+            isPaused = state !is ParsePaymentState.Ready,
+            onDismiss = onDismiss
         )
-        CameraPermissionsView {
-            DisposableEffect(Unit) {
-                scanView?.resume()
-                onDispose { scanView?.pause() }
-            }
-        }
-
         BackHandler(onBack = onDismiss)
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-        ) {
-            if (state is ParsePaymentState.Error) {
-                Dialog(onDismiss = { onReset() ; scanView?.resume() }) {
-                    PaymentDataError(
-                        errorMessage = when (state) {
-                            is ParsePaymentState.GenericError -> state.errorMessage
-                            is ParsePaymentState.ParsingFailure -> state.error.toLocalisedMessage()
-                        },
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }
-                Spacer(modifier = Modifier.height(16.dp))
+        if (state is ParsePaymentState.Error) {
+            Dialog(onDismiss = onReset) {
+                BackHandler(onBack = onDismiss)
+                PaymentDataError(
+                    errorMessage = when (state) {
+                        is ParsePaymentState.GenericError -> state.errorMessage
+                        is ParsePaymentState.ParsingFailure -> state.error.toLocalisedMessage()
+                    },
+                    modifier = Modifier.padding(16.dp)
+                )
             }
-            FilledButton(
-                text = stringResource(id = R.string.btn_cancel),
-                icon = R.drawable.ic_arrow_back,
-                iconTint = MaterialTheme.colors.onSurface,
-                backgroundColor = MaterialTheme.colors.surface,
-                textStyle = MaterialTheme.typography.button,
-                padding = PaddingValues(16.dp),
-                onClick = onDismiss,
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }
@@ -429,7 +405,7 @@ private fun RowScope.ReadDataButton(
         ) {
             Box(
                 modifier = Modifier
-                    .indication(interactionSource, rememberRipple(bounded = false, color = if (isDarkTheme) gray300 else gray800, radius = 32.dp))
+                    .indication(interactionSource, ripple(bounded = false, color = if (isDarkTheme) gray300 else gray800, radius = 32.dp))
                     .clip(CircleShape)
                     .border(width = 1.dp, color = MaterialTheme.colors.primary, shape = CircleShape)
                     .background(MaterialTheme.colors.surface)

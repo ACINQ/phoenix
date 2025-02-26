@@ -1,5 +1,5 @@
 import SwiftUI
-import WebKit
+@preconcurrency import WebKit
 
 /// Allows you to display an embedded HTML file.
 ///

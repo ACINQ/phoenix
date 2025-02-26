@@ -36,9 +36,12 @@ struct ElectrumAddressSheet: View {
 	
 	@ObservedObject var mvi: MVIState<ElectrumConfiguration.Model, ElectrumConfiguration.Intent>
 	
+	@State var isTorEnabled: Bool = Biz.business.appConfigurationManager.isTorEnabledValue
+	
 	@State var isCustomized: Bool
 	@State var host: String
 	@State var port: String
+	@State var noRequireOnionAddress: Bool
 	
 	@State var invalidHost = false
 	@State var invalidPort = false
@@ -54,21 +57,6 @@ struct ElectrumAddressSheet: View {
 	
 	@StateObject var toast = Toast()
 	
-	var untrustedCert: SecCertificate? {
-		switch checkResult {
-			case .success(let status):
-				switch status {
-					case .untrusted(let cert): return cert
-					default: return nil
-				}
-			default: return nil
-		}
-	}
-	
-	var isUntrustedCert: Bool {
-		return (untrustedCert != nil)
-	}
-	
 	enum TitleWidth: Preference {}
 	let titleWidthReader = GeometryPreferenceReader(
 		key: AppendValue<TitleWidth>.self,
@@ -79,6 +67,10 @@ struct ElectrumAddressSheet: View {
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@EnvironmentObject var smartModalState: SmartModalState
 	
+	// --------------------------------------------------
+	// MARK: Init
+	// --------------------------------------------------
+	
 	init(mvi: MVIState<ElectrumConfiguration.Model, ElectrumConfiguration.Intent>) {
 		self.mvi = mvi
 		
@@ -88,16 +80,18 @@ struct ElectrumAddressSheet: View {
 		let port = customConfig?.server.port ?? 0
 		
 		if mvi.model.isCustom() && host.count > 0 {
-			_host = State(initialValue: host)
-			_port = State(initialValue: String(port))
+			self.host = host
+			self.port = String(port)
+			self.noRequireOnionAddress = !(customConfig?.requireOnionIfTorEnabled ?? true)
 		} else {
-			_host = State(initialValue: "")
-			_port = State(initialValue: "")
+			self.host = ""
+			self.port = ""
+			self.noRequireOnionAddress = false
 		}
 	}
 
 	// --------------------------------------------------
-	// MARK: ViewBuilders
+	// MARK: View Builders
 	// --------------------------------------------------
 	
 	@ViewBuilder
@@ -171,111 +165,155 @@ struct ElectrumAddressSheet: View {
 		
 		VStack(alignment: HorizontalAlignment.leading) {
 
-			// == Server: ([TextField][X]) ===
-			HStack(alignment: .firstTextBaseline) {
-				Text("Server")
-					.font(.subheadline)
-					.fontWeight(.thin)
-					.foregroundColor(invalidHost ? Color.appNegative : Color.primary)
-					.read(titleWidthReader)
-					.frame(width: titleWidth, alignment: .leading)
+			customizeServerView_server()
+				.padding(.bottom)
 
-				HStack {
-					TextField("example.com", text: $host,
-						onCommit: {
-							onHostDidCommit()
-						}
-					)
-					.keyboardType(.URL)
-					.disableAutocorrection(true)
-					.autocapitalization(.none)
-					.foregroundColor(disableTextFields ? .secondary : .primary)
-					.onChange(of: host) { _ in
-						onHostDidChange()
-					}
+			customizeServerView_port()
 
-					Button {
-						host = ""
-					} label: {
-						Image(systemName: "multiply.circle.fill")
-							.foregroundColor(Color(UIColor.tertiaryLabel))
-					}
-					.isHidden(!isCustomized || host == "")
-
-				} // </HStack> (textfield with clear button)
-				.disabled(disableTextFields)
-				.padding([.top, .bottom], 8)
-				.padding(.leading, 16)
-				.padding(.trailing, 8)
-				.background(
-					ZStack {
-						Capsule()
-							.fill(disableTextFields
-								? Color(UIColor.systemFill)
-								: Color(UIColor.systemBackground)
-							)
-						Capsule()
-							.strokeBorder(Color.textFieldBorder)
-					}
-				)
-			} // </HStack> (row)
-			.frame(maxWidth: .infinity)
-			.padding(.bottom)
-
-			// == Port: ([TextField][X]) ===
-			HStack(alignment: .firstTextBaseline) {
-				Text("Port")
-					.font(.subheadline)
-					.fontWeight(.thin)
-					.foregroundColor(invalidPort ? Color.appNegative : Color.primary)
-					.read(titleWidthReader)
-					.frame(width: titleWidth, alignment: .leading)
-
-				HStack {
-					TextField(verbatim: "\(DEFAULT_PORT)", text: $port,
-						onCommit: {
-							onPortDidCommit()
-						}
-					)
-					.keyboardType(.numberPad)
-					.disableAutocorrection(true)
-					.foregroundColor(disableTextFields ? .secondary : .primary)
-					.onChange(of: port) { _ in
-						onPortDidChange()
-					}
-
-					Button {
-						port = ""
-					} label: {
-						Image(systemName: "multiply.circle.fill")
-							.foregroundColor(Color(UIColor.tertiaryLabel))
-					}
-					.isHidden(!isCustomized || port == "")
-				} // </HStack> (textfield with clear button)
-				.disabled(disableTextFields)
-				.padding([.top, .bottom], 8)
-				.padding(.leading, 16)
-				.padding(.trailing, 8)
-				.background(
-					ZStack {
-						Capsule()
-							.fill(disableTextFields
-								? Color(UIColor.systemFill)
-								: Color(UIColor.systemBackground)
-							)
-						Capsule()
-							.strokeBorder(Color.textFieldBorder)
-					}
-				)
-			} // </HStack> (row)
-			.frame(maxWidth: .infinity)
-			.padding(.bottom, 30)
-
+			if isTorEnabled {
+				customizeServerView_torInfo()
+					.padding(.top)
+			}
+			
 			customizeServerView_status()
+				.padding(.top, 30)
 
 		} // </VStack>
 		.assignMaxPreference(for: titleWidthReader.key, to: $titleWidth)
+	}
+	
+	@ViewBuilder
+	func customizeServerView_server() -> some View {
 		
+		// == Server: ([TextField][X]) ===
+		HStack(alignment: .firstTextBaseline) {
+			Text("Server")
+				.font(.subheadline)
+				.fontWeight(.thin)
+				.foregroundColor(invalidHost ? Color.appNegative : Color.primary)
+				.read(titleWidthReader)
+				.frame(width: titleWidth, alignment: .leading)
+
+			HStack {
+				TextField("example.com", text: $host,
+					onCommit: {
+						hostDidCommit()
+					}
+				)
+				.keyboardType(.URL)
+				.disableAutocorrection(true)
+				.autocapitalization(.none)
+				.foregroundColor(disableTextFields ? .secondary : .primary)
+				.onChange(of: host) { _ in
+					hostDidChange()
+				}
+
+				Button {
+					host = ""
+				} label: {
+					Image(systemName: "multiply.circle.fill")
+						.foregroundColor(Color(UIColor.tertiaryLabel))
+				}
+				.isHidden(!isCustomized || host == "")
+
+			} // </HStack> (textfield with clear button)
+			.disabled(disableTextFields)
+			.padding([.top, .bottom], 8)
+			.padding(.leading, 16)
+			.padding(.trailing, 8)
+			.background(
+				ZStack {
+					Capsule()
+						.fill(disableTextFields
+							? Color(UIColor.systemFill)
+							: Color(UIColor.systemBackground)
+						)
+					Capsule()
+						.strokeBorder(Color.textFieldBorder)
+				}
+			)
+		} // </HStack> (row)
+		.frame(maxWidth: .infinity)
+	}
+	
+	@ViewBuilder
+	func customizeServerView_port() -> some View {
+		
+		// == Port: ([TextField][X]) ===
+		HStack(alignment: .firstTextBaseline) {
+			Text("Port")
+				.font(.subheadline)
+				.fontWeight(.thin)
+				.foregroundColor(invalidPort ? Color.appNegative : Color.primary)
+				.read(titleWidthReader)
+				.frame(width: titleWidth, alignment: .leading)
+
+			HStack {
+				TextField(verbatim: "\(DEFAULT_PORT)", text: $port,
+					onCommit: {
+						portDidCommit()
+					}
+				)
+				.keyboardType(.numberPad)
+				.disableAutocorrection(true)
+				.foregroundColor(disableTextFields ? .secondary : .primary)
+				.onChange(of: port) { _ in
+					portDidChange()
+				}
+
+				Button {
+					port = ""
+				} label: {
+					Image(systemName: "multiply.circle.fill")
+						.foregroundColor(Color(UIColor.tertiaryLabel))
+				}
+				.isHidden(!isCustomized || port == "")
+			} // </HStack> (textfield with clear button)
+			.disabled(disableTextFields)
+			.padding([.top, .bottom], 8)
+			.padding(.leading, 16)
+			.padding(.trailing, 8)
+			.background(
+				ZStack {
+					Capsule()
+						.fill(disableTextFields
+							? Color(UIColor.systemFill)
+							: Color(UIColor.systemBackground)
+						)
+					Capsule()
+						.strokeBorder(Color.textFieldBorder)
+				}
+			)
+		} // </HStack> (row)
+		.frame(maxWidth: .infinity)
+	}
+	
+	@ViewBuilder
+	func customizeServerView_torInfo() -> some View {
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+			VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
+				Text("Since you've enabled Tor, you should use an onion address for this server.")
+				
+				Toggle(isOn: $noRequireOnionAddress) {
+					Text("No, I don't want to use an onion address")
+						.foregroundColor(.appAccent)
+						.bold()
+				}
+				.toggleStyle(CheckboxToggleStyle(
+					onImage: checkmarkImage_on(),
+					offImage: checkmarkImage_off()
+				))
+				.onChange(of: noRequireOnionAddress) { _ in
+					noRequireOnionAddressToggleDidChange()
+				}
+			}
+			
+			Spacer()
+		} // </HStack>
+		.padding(.all, 10)
+		.background(Color(.systemGroupedBackground))
+		.cornerRadius(10)
 	}
 	
 	@ViewBuilder
@@ -473,7 +511,7 @@ struct ElectrumAddressSheet: View {
 					checkServerConnection()
 				}
 			}
-			.disabled(!userHasMadeChanges || activeCheck != nil || (isUntrustedCert && !shouldTrustPubKey))
+			.disabled(customServer_saveButtonDisabled)
 			.font(.title2)
 		}
 	}
@@ -491,8 +529,63 @@ struct ElectrumAddressSheet: View {
 	}
 	
 	// --------------------------------------------------
-	// MARK: UI Content Helpers
+	// MARK: View Helpers
 	// --------------------------------------------------
+	
+	var hostIsOnion: Bool {
+		
+		let rawHost = host.trimmingCharacters(in: .whitespacesAndNewlines)
+		
+		// careful: URL(string: "http://") return non-nil
+		if rawHost.isEmpty {
+			return false
+		}
+		
+		guard
+			let url = URL(string: "http://\(rawHost)"),
+			let tld = url.host(percentEncoded: false)?.components(separatedBy: ".").last
+		else {
+			return false
+		}
+		
+		return tld.lowercased() == "onion"
+	}
+	
+	var customServer_saveButtonDisabled: Bool {
+		
+		if !userHasMadeChanges {
+			return true
+		}
+		
+		if activeCheck != nil {
+			return true
+		}
+		
+		if isUntrustedCert && !shouldTrustPubKey {
+			return true
+		}
+		
+		if isTorEnabled && !hostIsOnion && !noRequireOnionAddress {
+			return true
+		}
+		
+		return false
+	}
+	
+	var untrustedCert: SecCertificate? {
+		switch checkResult {
+			case .success(let status):
+				switch status {
+					case .untrusted(let cert): return cert
+					default: return nil
+				}
+			default: return nil
+		}
+	}
+	
+	var isUntrustedCert: Bool {
+		return (untrustedCert != nil)
+	}
 	
 	/**
 	 * The fingerprint of an X509 cert is simply the hash of the raw DER-encoded data.
@@ -590,24 +683,29 @@ struct ElectrumAddressSheet: View {
 		}
 	}
 	
-	func onHostDidChange() {
-		log.trace("onHostDidChange()")
+	func hostDidChange() {
+		log.trace("hostDidChange()")
 		userHasMadeChanges = true
 	}
 	
-	func onHostDidCommit() {
-		log.trace("onHostDidCommit()")
+	func hostDidCommit() {
+		log.trace("hostDidCommit()")
 		checkHost()
 	}
 	
-	func onPortDidChange() {
-		log.trace("onPortDidChange()")
+	func portDidChange() {
+		log.trace("portDidChange()")
 		userHasMadeChanges = true
 	}
 	
-	func onPortDidCommit() {
-		log.trace("onPortDidCommit()")
+	func portDidCommit() {
+		log.trace("portDidCommit()")
 		checkPort()
+	}
+	
+	func noRequireOnionAddressToggleDidChange() {
+		log.trace("noRequireOnionAddressToggleDidChange()")
+		userHasMadeChanges = true
 	}
 	
 	func closeSheet() {
@@ -693,7 +791,6 @@ struct ElectrumAddressSheet: View {
 		   let checkedPort: UInt16 = checkPort()
 		{
 			let pinnedPubKey: String?
-			let tls: Lightning_kmpTcpSocketTLS
 			if let cert = untrustedCert {
 				guard let pubKey = pubKey(cert) else {
 					return toast.pop(
@@ -703,27 +800,23 @@ struct ElectrumAddressSheet: View {
 					)
 				}
 				pinnedPubKey = pubKey
-				tls = Lightning_kmpTcpSocketTLS.PINNED_PUBLIC_KEY(pubKey: pubKey)
 			} else {
 				pinnedPubKey = nil
-				tls = Lightning_kmpTcpSocketTLS.TRUSTED_CERTIFICATES(expectedHostName: nil)
 			}
 			
-			GroupPrefs.shared.electrumConfig = ElectrumConfigPrefs(
+			let newPrefs = ElectrumConfigPrefs(
 				host: checkedHost,
 				port: checkedPort,
-				pinnedPubKey: pinnedPubKey
+				pinnedPubKey: pinnedPubKey,
+				requireOnionIfTorEnabled: !noRequireOnionAddress
 			)
-			mvi.intent(ElectrumConfiguration.IntentUpdateElectrumServer(server: Lightning_kmpServerAddress(
-				host: checkedHost,
-				port: Int32(checkedPort),
-				tls: tls
-			)))
+			GroupPrefs.shared.electrumConfig = newPrefs
+			mvi.intent(ElectrumConfiguration.IntentUpdateElectrumServer(config: newPrefs.customConfig))
 			
 		} else {
 			
 			GroupPrefs.shared.electrumConfig = nil
-			mvi.intent(ElectrumConfiguration.IntentUpdateElectrumServer(server: nil))
+			mvi.intent(ElectrumConfiguration.IntentUpdateElectrumServer(config: nil))
 		}
 		
 		smartModalState.close()

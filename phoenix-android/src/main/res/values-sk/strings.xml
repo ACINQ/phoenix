@@ -54,7 +54,6 @@
 
     <string name="startup_binding_service">Pripájanie služby…</string>
     <string name="startup_wait">Pripravovanie peňaženky…</string>
-    <string name="startup_wait_legacy_check">Kontrola staršej peňaženky…</string>
     <string name="startup_checking_seed">Odomykanie…</string>
     <string name="startup_unlocked">Prístup povolený…</string>
     <string name="startup_unlock_failure">Odomknutie zlyhalo</string>
@@ -75,11 +74,6 @@
 
     <string name="startup_starting">Spúšťanie…</string>
     <string name="startup_error_generic">Aplikáciu nebolo možné spustiť.</string>
-
-    <!-- Switch between legacy/modern apps -->
-
-    <string name="legacyswitch_title">Zastaraná aplikácia</string>
-    <string name="legacyswitch_restart">Reštartovať zastaranú aplikáciu</string>
 
     <!-- Payment line -->
 
@@ -274,16 +268,16 @@
 
     <!-- home: balance section & misc -->
 
-    <string name="home__balance_loading">Načítavanie…</string>
-    <string name="home__onchain_incoming">+%1$s</string>
+    <string name="home_balance_loading">Načítavanie…</string>
+    <string name="home_onchain_incoming">+%1$s</string>
 
-    <string name="home__faq_button">FAQ</string>
-    <string name="home__payments_none">Pomocou tlačidiel Prijať a Odoslať v dolnej časti tejto obrazovky môžete začať!</string>
-    <string name="home__payments_more_button">Zobraziť všetky platby…</string>
-    <string name="home__connection__electrum_late">Electrum mešká</string>
-    <string name="home__connection__bad_cert">Electrum certifikát</string>
-    <string name="home__connection__connecting">Pripájanie…</string>
-    <string name="home__connection__tor_active">Tor</string>
+    <string name="home_faq_button">FAQ</string>
+    <string name="home_payments_none">Pomocou tlačidiel Prijať a Odoslať v dolnej časti tejto obrazovky môžete začať!</string>
+    <string name="home_payments_more_button">Zobraziť všetky platby…</string>
+    <string name="home_connection_electrum_late">Electrum mešká</string>
+    <string name="home_connection_bad_cert">Electrum certifikát</string>
+    <string name="home_connection_connecting">Pripájanie…</string>
+    <string name="home_connection_tor_active">Tor</string>
     <string name="home_request_liquidity">Vyžiadať likviditu</string>
     <string name="home_inflight_payments">Momentálne máte %1$d platieb nepotvrdených vo vašej peňaženke.\n\nNechajte aplikáciu otvorenú, aby ste sa uistili, že sa tieto platby správne a bez problémov vyrovnajú..</string>
 
@@ -334,7 +328,6 @@
     <string name="paymentdetails_status_unconfirmed_zero">0 potvrdení</string>
     <string name="paymentdetails_status_unconfirmed_zero_bump">Kliknutím urýchlite</string>
     <string name="paymentdetails_status_unconfirmed_default">%1$d potvrdení</string>
-    <string name="paymentdetails_status_unconfirmed_with_depth">%1$d/%2$d potvrdení</string>
     <string name="paymentdetails_status_confirmed">Potvrdené on-chain</string>
 
     <string name="paymentdetails_offer_note_label">Správa</string>
@@ -381,22 +374,19 @@
 
     <string name="paymentdetails_technical_title">Technické detaily</string>
     <string name="paymentdetails_payment_type_label">Typ platby</string>
-    <string name="paymentdetails_closing">Platba uzatvárajúca kanál</string>
-    <string name="paymentdetails_splice_outgoing">Odchádzajúca splice platba</string>
-    <string name="paymentdetails_splice_cpfp_outgoing">Urýchlenie on-chain transakcií</string>
-    <string name="paymentdetails_inbound_liquidity">Požiadavka na prichádzajúcu likviditu</string>
-    <string name="paymentdetails_normal_outgoing">Odchádzajúca Lightning platba (štandard)</string>
-    <string name="paymentdetails_normal_incoming">Prichádzajúca Lightning platba (štandard)</string>
-    <string name="paymentdetails_swapin">Swap-in vklad Bitcoinu</string>
-    <string name="paymentdetails_swapout">Swap-out na Bitcoinovú adresu</string>
-    <string name="paymentdetails_offer_outgoing">Odchádzajúca platba Lightning (ponuka)</string>
-    <string name="paymentdetails_offer_incoming">Prichádzajúca platba Lightning (ponuka)</string>
+    <string name="paymentdetails_type_outgoing_close">Platba uzatvárajúca kanál</string>
+    <string name="paymentdetails_type_outgoing_splice">Odchádzajúca splice platba</string>
+    <string name="paymentdetails_type_outgoing_splice_cpfp">Urýchlenie on-chain transakcií</string>
+    <string name="paymentdetails_type_outgoing_liquidity_manual">Požiadavka na prichádzajúcu likviditu (manual)</string>
+    <string name="paymentdetails_type_outgoing_liquidity_auto">Požiadavka na prichádzajúcu likviditu (auto)</string>
+    <string name="paymentdetails_type_outgoing_bolt11">Odchádzajúca Lightning platba (bolt11)</string>
+    <string name="paymentdetails_type_outgoing_bolt12">Odchádzajúca Lightning platba (bolt12)</string>
+    <string name="paymentdetails_type_incoming_bolt11">Prichádzajúca Lightning platba (bolt11)</string>
+    <string name="paymentdetails_type_incoming_bolt12">Prichádzajúca Lightning platba (bolt12)</string>
     <string name="paymentdetails_swapin_address_label">Adresa vkladu</string>
     <string name="paymentdetails_bitcoin_address_label">Bitcoinová adresa</string>
 
     <string name="paymentdetails_splice_out_channel_label">Spliced kanál</string>
-    <string name="paymentdetails_dualswapin_tx_label">Transakcia</string>
-    <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
 
     <string name="paymentdetails_liquidity_amount_label">Požadovaná suma</string>
 
@@ -408,9 +398,9 @@
     <string name="paymentdetails_closing_type_other">Iné</string>
 
     <string name="paymentdetails_pubkey_label">Cieľový verejný kľúč</string>
-    <string name="paymentdetails_payment_request_description_label">Popis faktúry</string>
+    <string name="paymentdetails_bolt11_description_label">Popis faktúry</string>
     <string name="paymentdetails_payment_hash_label">Hash platby</string>
-    <string name="paymentdetails_payment_request_label">Faktúra</string>
+    <string name="paymentdetails_bolt11_label">Faktúra</string>
     <string name="paymentdetails_preimage_label">Preimage</string>
     <string name="paymentdetails_payerkey_label">Kľúč platiteľa</string>
     <string name="paymentdetails_offer_label">Ponuka</string>
@@ -428,8 +418,6 @@
     <string name="paymentdetails_part_hops_label">Skoky</string>
 
     <string name="paymentdetails_received_with_label">Prijaté cez</string>
-    <string name="paymentdetails_received_with_splicein">Splice-in (pridanie do existujúceho kanála)</string>
-    <string name="paymentdetails_received_with_channel">Nový kanál (automaticky vytvorený)</string>
     <string name="paymentdetails_received_with_lightning">Lightningová platba</string>
     <string name="paymentdetails_channel_id_label">ID kanála</string>
     <string name="paymentdetails_tx_id_label">Transakcia</string>
@@ -595,27 +583,17 @@
     <!-- settings: Tor -->
 
     <string name="tor_settings_title">Tor</string>
-    <string name="tor_settings_unknown">Kontrola nastavení…</string>
-    <string name="tor_settings_enabled">Tor je zapnutý</string>
-    <string name="tor_settings_disabled">Tor je vypnutý</string>
-    <string name="tor_settings_state_unknown">Tor proxy server ešte nebol spustený.</string>
-    <string name="tor_settings_state_closed">Tor proxy server je vypnutý.\nPočkajte prosím a skontrolujte svoje internetové pripojenie.</string>
-    <string name="tor_settings_state_starting">Zapínanie Tor proxy servera…</string>
-    <string name="tor_settings_state_started">Tor je pripojený</string>
 
     <!-- home: connectivity dialog -->
 
     <string name="conndialog_title">Stav pripojenia</string>
     <string name="conndialog_summary_not_ok">Aplikácia nebude správne fungovať, kým nebudú nadviazané všetky pripojenia.</string>
     <string name="conndialog_network">Vaše zariadenie nemá pripojenie k internetu. Aplikácia nebude fungovať správne.\n\nSkontrolujte prosím nastavenia vášho zariadenia.</string>
-    <string name="conndialog_internet">Internet</string>
     <string name="conndialog_electrum">Electrum</string>
-    <string name="conndialog_tor">Tor</string>
     <string name="conndialog_lightning">Peer</string>
     <string name="conndialog_accessibility_desc">Spravovať pripojenia pre %1$s</string>
     <string name="conndialog_connecting">Pripájanie…</string>
     <string name="conndialog_connected">Pripojené</string>
-    <string name="conndialog_connected_electrum_behind">Electrum server zaostáva (blok $1$d)</string>
     <string name="conndialog_closed">Odpojené</string>
     <string name="conndialog_closed_bad_cert">Zlý certifikát</string>
 

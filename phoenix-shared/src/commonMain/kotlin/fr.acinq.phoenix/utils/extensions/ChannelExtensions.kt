@@ -23,12 +23,6 @@ import fr.acinq.lightning.channel.states.*
 import fr.acinq.lightning.utils.msat
 
 
-fun ChannelStateWithCommitments.minDepthForFunding(nodeParams: NodeParams): Int {
-    return Helpers.minDepthForFunding(
-        nodeParams = nodeParams,
-        fundingAmount = commitments.latest.fundingAmount
-    )
-}
 
 fun ChannelState.isTerminated(): Boolean {
     return when (this) {

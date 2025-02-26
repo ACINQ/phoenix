@@ -409,7 +409,7 @@ struct SwapInWalletDetails: View {
 		
 		let absoluteMax: Int64 = liquidityPolicy.effectiveMaxFeeSats
 		
-		let swapInBalance: Int64 = swapInWallet.totalBalance.sat
+		let swapInBalance: Int64 = swapInWallet.unconfirmedBalance.sat + swapInWallet.anyConfirmedBalance.sat
 		if swapInBalance > 0 {
 			
 			let maxPercent: Double = Double(liquidityPolicy.effectiveMaxFeeBasisPoints) / Double(10_000)
@@ -475,7 +475,7 @@ struct SwapInWalletDetails: View {
 	
 	func confirmedBalance() -> (FormattedAmount, FormattedAmount) {
 		
-		let sats = swapInWallet.readyForSwapBalance
+		let sats = swapInWallet.deeplyConfirmedBalance
 		return formattedBalances(sats)
 	}
 	
