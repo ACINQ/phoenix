@@ -154,7 +154,9 @@ fun SpendFromChannelAddress(
                         ErrorMessage(
                             header = stringResource(id = R.string.spendchanneladdress_error_generic),
                             details = when (state) {
-                                is SpendFromChannelAddressViewState.Error.Generic -> state.cause.localizedMessage
+                                is SpendFromChannelAddressViewState.Error.Generic -> {
+                                    state.cause.localizedMessage
+                                }
                                 is SpendFromChannelAddressViewState.Error.AmountMissing -> {
                                     stringResource(id = R.string.spendchanneladdress_error_amount)
                                 }
@@ -179,9 +181,30 @@ fun SpendFromChannelAddress(
                                 is SpendFromChannelAddressViewState.Error.TransactionMalformed -> {
                                     stringResource(id = R.string.spendchanneladdress_error_tx, state.details)
                                 }
+                                is SpendFromChannelAddressViewState.Error.InvalidSig -> {
+                                    stringResource(R.string.spendchanneladdress_error_invalid_sig)
+                                }
                             },
                             alignment = Alignment.CenterHorizontally
                         )
+                        if (state is SpendFromChannelAddressViewState.Error.InvalidSig) {
+                            val context = LocalContext.current
+                            FilledButton(
+                                text = "Copy error data",
+                                onClick = {
+                                    copyToClipboard(
+                                        context = context,
+                                        data = """
+                                            tx_id=${state.txId}
+                                            funding_script=${state.fundingScript.toHex()}
+                                            public_key=${state.publicKey.toHex()}
+                                            signature=${state.signature.toHex()}
+                                        """.trimIndent(),
+                                        dataLabel = "signature error data"
+                                    )
+                                }
+                            )
+                        }
                     }
 
                     Card {

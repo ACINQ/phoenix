@@ -330,6 +330,7 @@
     <string name="spendchanneladdress_error_unsigned_tx">Malformed unsigned tx [%1$s]</string>
     <string name="spendchanneladdress_error_remote_funding_pubkey">Malformed remote funding pubkey [%1$s]</string>
     <string name="spendchanneladdress_error_tx">Malformed transaction [%1$s]</string>
+    <string name="spendchanneladdress_error_invalid_sig">Invalid signature</string>
 
     <!-- home: balance section & misc -->
 
