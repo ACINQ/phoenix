@@ -36,6 +36,16 @@ open class CsvWriter {
         return sb.toString()
     }
 
+    /**
+     * On Android & iOS we are currently handling the file IO separately (using native code).
+     * This method allows us to dump the buffer in batches to perform file IO during the export process.
+     */
+    fun dumpAndClear(): String {
+        val content = sb.toString()
+        sb.clear()
+        return content
+    }
+
     private fun processField(str: String): String {
         return str.findAnyOf(listOf(",", "\"", "\n"))?.let {
             // - field must be enclosed in double-quotes
