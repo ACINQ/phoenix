@@ -141,7 +141,12 @@ struct PaymentCell : View {
 	func paymentAmount() -> some View {
 		
 		let (amount, isFailure, isOutgoing) = paymentAmountInfo()
-		if currencyPrefs.hideAmounts {
+		if isLiquidityWithFeesDisplayedElsewhere() {
+			
+			Text(verbatim: "")
+				.accessibilityHidden(true)
+					
+		} else if currencyPrefs.hideAmounts {
 			
 			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 				
@@ -301,6 +306,22 @@ struct PaymentCell : View {
 		let isOutgoing = payment is Lightning_kmpOutgoingPayment
 		
 		return (amount, isFailure, isOutgoing)
+	}
+	
+	func isLiquidityWithFeesDisplayedElsewhere() -> Bool {
+		
+		if let autoLiquidity = info.payment as? Lightning_kmpAutomaticLiquidityPurchasePayment {
+			
+			// payment.incomingPaymentReceivedAt:
+			// - if null, we should show the amount
+			// - if non-null it means the related payment was received
+			//   and so we should hide the channel management amount
+			//
+			return autoLiquidity.incomingPaymentReceivedAt != nil
+			
+		} else {
+			return false
+		}
 	}
 	
 	// --------------------------------------------------
