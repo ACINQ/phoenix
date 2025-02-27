@@ -689,6 +689,12 @@
             "state" : "translated",
             "value" : "%1$@ ∙ de %2$@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ ∙ de %2$@"
+          }
         }
       }
     },
@@ -728,6 +734,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ ∙ a %2$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ ∙ to %2$@"
           }
         }
       }
@@ -3568,6 +3580,12 @@
             "state" : "translated",
             "value" : "confirmaciones"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "? confirmations"
+          }
         }
       }
     },
@@ -4229,6 +4247,12 @@
             "state" : "translated",
             "value" : "Acelera las transacciones en la cadena"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accélération de transactions on-chain"
+          }
         }
       }
     },
@@ -4462,6 +4486,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Añade contactos para pagar fácil y rápidamente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajoutez des contacts pour des paiements faciles et rapides"
           }
         }
       }
@@ -4900,6 +4930,12 @@
             "state" : "translated",
             "value" : "Importe añadido al crédito de tasas"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montant ajouté au crédit de redevance"
+          }
         }
       }
     },
@@ -5055,6 +5091,12 @@
             "state" : "translated",
             "value" : "Importe recibido"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montant reçu"
+          }
         }
       }
     },
@@ -5089,6 +5131,12 @@
             "state" : "translated",
             "value" : "Importe solicitado"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montant demandé"
+          }
         }
       }
     },
@@ -5122,6 +5170,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Importe enviado (tasas incluidas)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montant envoyé (frais inclus)"
           }
         }
       }
@@ -5722,6 +5776,12 @@
             "state" : "translated",
             "value" : "¿Estás seguro de que quieres continuar?"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Êtes-vous sûr de vouloir continuer ?"
+          }
         }
       }
     },
@@ -5875,6 +5935,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "¡Atención! Algunos fondos caducarán pronto y ya no se podrán canjear."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attention ! Certains fonds expireront bientôt et ne pourront plus faire l'objet d'un échange."
           }
         }
       }
@@ -6883,7 +6949,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Prenez garde aux message venant d\\'inconnus"
+            "value" : "Prenez garde aux messages de source inconnue"
           }
         }
       }
@@ -7526,6 +7592,12 @@
             "state" : "translated",
             "value" : "Factura Bolt12"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Facture Bolt12"
+          }
         }
       }
     },
@@ -7761,6 +7833,12 @@
             "state" : "translated",
             "value" : "Ya no se pueden canjear, tras 4 meses de espera. Estos fondos deben gastarse manualmente."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ne peuvent plus être swappés sur Lightning, après 4 mois d\\'attente. Ces fonds doivent être dépensés manuellement."
+          }
         }
       }
     },
@@ -7874,6 +7952,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Causado por"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Causé par"
           }
         }
       }
@@ -8036,7 +8120,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Clôture de canal"
+            "value" : "Clôture de canal de paiement"
           }
         }
       }
@@ -8113,6 +8197,12 @@
             "state" : "translated",
             "value" : "Id de canal"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Identifiant du canal"
+          }
         }
       }
     },
@@ -8187,6 +8277,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Funcionamiento del canal (nuevo o empalmado)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fonctionnement de la chaîne (nouvelle ou épissée)"
           }
         }
       }
@@ -9147,6 +9243,12 @@
             "state" : "translated",
             "value" : "Tipo de cierre"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type de clôture"
+          }
         }
       }
     },
@@ -9503,6 +9605,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Completado en"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terminé le"
           }
         }
       }
@@ -9906,7 +10014,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Confirmez le nouveau code PIN"
+            "value" : "Confirmer le nouveau PIN"
           }
         }
       }
@@ -9982,6 +10090,12 @@
             "state" : "translated",
             "value" : "Confirmado en cadena"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirmé sur la chaîne"
+          }
         }
       }
     },
@@ -10015,6 +10129,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Confirmando: "
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirmation : "
           }
         }
       }
@@ -10941,6 +11061,12 @@
             "state" : "translated",
             "value" : "No se ha podido conectar al servicio: %@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de se connecter au service : %@"
+          }
         }
       }
     },
@@ -11094,6 +11220,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Creado en"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Créé le"
           }
         }
       }
@@ -11335,7 +11467,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "PIN personnalisé"
+            "value" : "PIN Personnalisé"
           }
         }
       }
@@ -12174,6 +12306,12 @@
             "state" : "translated",
             "value" : "Eliminar el historial de pagos y los contactos de mi cuenta de iCloud."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer l'historique des paiements et les contacts de mon compte iCloud."
+          }
         }
       }
     },
@@ -12367,6 +12505,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Borrar **historial de pagos** y **contactos** de iCloud"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer **l'historique de paiement** et **les contacts** d'iCloud"
           }
         }
       }
@@ -12721,6 +12865,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dirección del depósito"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adresse de dépôt on-chain"
           }
         }
       }
@@ -13121,6 +13271,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Desactivar Tor"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Désactivation de Tor"
           }
         }
       }
@@ -14441,6 +14597,12 @@
             "state" : "translated",
             "value" : "Para activar Tor ahora es necesario instalar una aplicación VPN Proxy Tor de terceros, como Orbot.\n\nEsto hace que los pagos en segundo plano sean mucho más fiables con Tor.\n\nAdemás, ahora Phoenix utiliza siempre direcciones cebolla para las conexiones Lightning y Electrum cuando Tor está activado."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'activation de Tor nécessite maintenant l'installation d'une application VPN Proxy Tor tierce telle qu'Orbot.\n\nCela rend les paiements en arrière-plan beaucoup plus fiables avec Tor.\n\nDe plus, Phoenix utilise désormais toujours des adresses en oignon pour les connexions Lightning et Electrum lorsque Tor est activé."
+          }
         }
       }
     },
@@ -14762,7 +14924,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Saisissez un nouveau code PIN"
+            "value" : "Saisir un nouveau PIN"
           }
         }
       }
@@ -15201,6 +15363,12 @@
             "state" : "translated",
             "value" : "Caducado: "
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expiré : "
+          }
         }
       }
     },
@@ -15598,6 +15766,12 @@
             "state" : "translated",
             "value" : "Fallido"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Échoué"
+          }
         }
       }
     },
@@ -15831,6 +16005,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Crédito de tasas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crédit d'impôt"
           }
         }
       }
@@ -16640,6 +16820,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cartera final: "
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Portefeuille final : "
           }
         }
       }
@@ -18046,6 +18232,12 @@
             "state" : "translated",
             "value" : "Cómo funciona"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comment cela fonctionne-t-il ?"
+          }
         }
       }
     },
@@ -18603,6 +18795,12 @@
             "state" : "translated",
             "value" : "Si desactivas Tor, tu dirección IP puede ser revelada a varios proveedores de servicios."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si vous désactivez Tor, votre adresse IP peut être révélée à divers fournisseurs de services."
+          }
         }
       }
     },
@@ -18757,6 +18955,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Si cambias de dispositivo (o reinstalas la aplicación), perderás esta información."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si vous changez d'appareil (ou réinstallez l'application), vous perdrez ces informations."
           }
         }
       }
@@ -19315,6 +19519,12 @@
             "state" : "translated",
             "value" : "Solicitud de liquidez entrante (auto)"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demande de liquidité entrante (auto)"
+          }
         }
       }
     },
@@ -19348,6 +19558,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Solicitud de liquidez entrante (manual)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demande de liquidité entrante (manual)"
           }
         }
       }
@@ -19624,6 +19840,12 @@
             "state" : "translated",
             "value" : "Pago relámpago entrante (bolt11)"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paiement Lightning entrant (bolt11)"
+          }
         }
       }
     },
@@ -19657,6 +19879,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pago relámpago entrante (bolt12)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paiement Lightning entrant (bolt12)"
           }
         }
       }
@@ -19692,6 +19920,12 @@
             "state" : "translated",
             "value" : "Pago entrante en la cadena (pago por apertura heredado)"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paiement entrant sur la chaîne (anciennement \"pay-to-open\")"
+          }
         }
       }
     },
@@ -19725,6 +19959,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pago entrante en la cadena (swap-in heredado)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paiement entrant dans la chaîne (legacy swap-in)"
           }
         }
       }
@@ -19760,6 +20000,12 @@
             "state" : "translated",
             "value" : "Pago entrante en la cadena (nuevo canal)"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paiement entrant sur la chaîne (nouveau canal)"
+          }
         }
       }
     },
@@ -19793,6 +20039,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pago entrante en la cadena (splice)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paiement entrant sur la chaîne (splice)"
           }
         }
       }
@@ -20272,6 +20524,12 @@
             "state" : "translated",
             "value" : "Dirección no válida"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adresse invalide"
+          }
         }
       }
     },
@@ -20346,6 +20604,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Parámetros de canal no válidos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paramètres de canal non valides"
           }
         }
       }
@@ -20661,6 +20925,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Descripción de la factura"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Description de la requête de paiement"
           }
         }
       }
@@ -21464,6 +21734,12 @@
             "state" : "translated",
             "value" : "Tasas relámpago para encaminar el pago. El pago requiere %lld saltos."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frais de foudre pour l'acheminement du paiement. Le paiement nécessite %lld hops."
+          }
         }
       }
     },
@@ -21546,6 +21822,12 @@
             "state" : "translated",
             "value" : "Tasas de relámpago por enrutar el pago. El pago se dividió en %1$lld partes, utilizando %2$lld saltos."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frais de foudre pour l'acheminement du paiement. Le paiement a été divisé en %1$lld parties, utilisant %2$lld sauts."
+          }
         }
       }
     },
@@ -21620,6 +21902,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pago relámpago"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paiement lightning"
           }
         }
       }
@@ -21818,6 +22106,12 @@
             "state" : "translated",
             "value" : "Liquidez solicitada"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liquidité demandée"
+          }
         }
       }
     },
@@ -21971,6 +22265,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Local"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Locale"
           }
         }
       }
@@ -22290,6 +22590,12 @@
             "state" : "translated",
             "value" : "Asegúrate de que tu VPN Tor está activa y funcionando."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Assurez-vous que votre VPN Tor est actif et fonctionne."
+          }
         }
       }
     },
@@ -22486,6 +22792,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Liquidez manual"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liquidité manuelle"
           }
         }
       }
@@ -23334,6 +23646,12 @@
             "state" : "translated",
             "value" : "Tasas mineras"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frais de minage"
+          }
         }
       }
     },
@@ -23454,6 +23772,12 @@
             "state" : "translated",
             "value" : "Cantidad fuera de cadena demasiado baja."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montant manquant hors chaîne trop faible."
+          }
         }
       }
     },
@@ -23528,6 +23852,12 @@
             "state" : "translated",
             "value" : "Mutua"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mutuelle"
+          }
         }
       }
     },
@@ -23558,6 +23888,12 @@
           }
         },
         "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "N/A"
+          }
+        },
+        "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "N/A"
@@ -23999,6 +24335,12 @@
             "state" : "translated",
             "value" : "Sin contactos"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun contact"
+          }
         }
       }
     },
@@ -24434,6 +24776,12 @@
             "state" : "translated",
             "value" : "No, no quiero utilizar una dirección cebolla"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non, je ne veux pas utiliser une adresse en oignon"
+          }
         }
       }
     },
@@ -24790,6 +25138,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Oferta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offre"
           }
         }
       }
@@ -25396,6 +25750,12 @@
             "state" : "translated",
             "value" : "Pago relámpago saliente (bolt11)"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paiement sortant Lightning (bolt11)"
+          }
         }
       }
     },
@@ -25429,6 +25789,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pago relámpago saliente (bolt12)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paiement sortant Lightning (bolt12)"
           }
         }
       }
@@ -25464,6 +25830,12 @@
             "state" : "translated",
             "value" : "Pago en cadena saliente"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Splice sortant"
+          }
         }
       }
     },
@@ -25497,6 +25869,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pago saliente en cadena (canje heredado)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paiement sortant de la chaîne (legacy swap)"
           }
         }
       }
@@ -25697,7 +26075,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Erreur de code PIN !"
+            "value" : "PIN non correspondant !"
           }
         }
       }
@@ -25974,6 +26352,12 @@
             "state" : "translated",
             "value" : "Clave del pagador"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clé du payeur"
+          }
         }
       }
     },
@@ -26128,6 +26512,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hash de pago"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hash du paiement"
           }
         }
       }
@@ -26610,6 +27000,12 @@
             "state" : "translated",
             "value" : "El historial de pagos y los contactos no se almacenan en iCloud."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'historique des paiements et les contacts ne sont pas stockés dans iCloud."
+          }
         }
       }
     },
@@ -26925,6 +27321,12 @@
             "state" : "translated",
             "value" : "Estado del pago"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Statut du paiement"
+          }
         }
       }
     },
@@ -27160,6 +27562,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pendiente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En attente"
           }
         }
       }
@@ -28120,6 +28528,12 @@
             "state" : "translated",
             "value" : "Preimagen"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Préimage"
+          }
         }
       }
     },
@@ -28355,6 +28769,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tipo de compra"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type d'achat"
           }
         }
       }
@@ -28955,6 +29375,12 @@
             "state" : "translated",
             "value" : "Recibido a través de"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reçu via"
+          }
         }
       }
     },
@@ -29394,6 +29820,12 @@
             "state" : "translated",
             "value" : "Remoto"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remote"
+          }
         }
       }
     },
@@ -29672,6 +30104,12 @@
             "state" : "translated",
             "value" : "Resolución de la dirección del rayo"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Résolution de l'adresse éclair"
+          }
         }
       }
     },
@@ -29705,6 +30143,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reinicio necesario"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Redémarrage nécessaire"
           }
         }
       }
@@ -29745,7 +30189,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Restaurer mon portefeuille"
+            "value" : "Restaurer mon wallet"
           }
         }
       }
@@ -29940,6 +30384,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Revocada"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revocation"
           }
         }
       }
@@ -30337,6 +30787,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Escanear código QR"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scannez le code QR"
           }
         }
       }
@@ -31462,6 +31918,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tasas de servicio"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frais de service"
           }
         }
       }
@@ -33007,6 +33469,12 @@
             "state" : "translated",
             "value" : "Como has activado Tor, deberías utilizar una dirección onion para este servidor."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puisque vous avez activé Tor, vous devez utiliser une adresse en oignon pour ce serveur."
+          }
         }
       }
     },
@@ -33241,6 +33709,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gastar del monedero final"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dépenser à partir du portefeuille final"
           }
         }
       }
@@ -33517,6 +33991,12 @@
             "state" : "translated",
             "value" : "Estándar"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standard"
+          }
         }
       }
     },
@@ -33751,6 +34231,12 @@
             "state" : "translated",
             "value" : "Éxito"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Succès"
+          }
         }
       }
     },
@@ -33784,6 +34270,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sugerencias"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggestions"
           }
         }
       }
@@ -34347,6 +34839,12 @@
             "state" : "translated",
             "value" : "Clave pública objetivo"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clé publique du destinataire"
+          }
         }
       }
     },
@@ -34420,6 +34918,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "El **historial de pagos** y los **contactos** de este monedero se eliminarán de tu cuenta de iCloud."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'**historique des paiements** et les **contacts** de ce portefeuille seront supprimés de votre compte iCloud."
           }
         }
       }
@@ -35619,6 +36123,12 @@
             "state" : "translated",
             "value" : "La factura recibida ya está en curso."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La facture reçue est déjà en cours."
+          }
         }
       }
     },
@@ -35815,6 +36325,12 @@
             "state" : "translated",
             "value" : "El servicio (%@) parece estar desconectado, o tienen un servidor caído"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le service (%@) semble être hors ligne ou son serveur est en panne"
+          }
         }
       }
     },
@@ -35849,6 +36365,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "El servicio (%@) no admite direcciones Lightning, o no conoce a este usuario"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le service (%@) ne supporte pas les adresses Lightning, ou ne connaît pas cet utilisateur"
           }
         }
       }
@@ -35891,6 +36413,12 @@
             "state" : "translated",
             "value" : "El servicio (%1$@) ha devuelto el código de error: %2$d"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le service (%1$@) a renvoyé un code d'erreur : %2$d"
+          }
         }
       }
     },
@@ -35931,6 +36459,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "El servicio (%1$@) ha devuelto un mensaje de error: %2$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le service (%1$@) a renvoyé un message d'erreur : %2$@"
           }
         }
       }
@@ -36286,6 +36820,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Estos fondos proceden de canales cerrados de Rayo. Deben gastarse manualmente."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ces fonds proviennent de canaux Lightning fermés. Ils doivent être dépensés manuellement."
           }
         }
       }
@@ -37129,6 +37669,12 @@
             "state" : "translated",
             "value" : "Esta liquidez era necesaria para recibir un pago"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette liquidité était nécessaire pour recevoir un paiement"
+          }
         }
       }
     },
@@ -37290,7 +37836,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ce paiement est déjà en cours de traitement. Veuillez attendre qu'il soit terminé."
+            "value" : "Ce paiement est déjà en cours de traitement. Veuillez attendre qu\\'il soit terminé."
           }
         }
       }
@@ -37325,6 +37871,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Para ello es necesario instalar una aplicación VPN Tor Proxy de terceros, como Orbot."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cela nécessite l\\'installation d\\'une application VPN Tor Proxy tierce telle que Orbot."
           }
         }
       }
@@ -38044,6 +38596,12 @@
             "state" : "translated",
             "value" : "Para asegurar tus canales de pago, Phoenix monitoriza la blockchain de Bitcoin a través de los servidores de Electrum.\n\nPor defecto, se utilizan servidores aleatorios. También puedes configurar Phoenix para que se conecte sólo a tu propio servidor."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour sécuriser vos canaux de paiement, Phoenix surveille la blockchain Bitcoin par l'intermédiaire des serveurs Electrum.\n\nPar défaut, des serveurs aléatoires sont utilisés. Vous pouvez également configurer Phoenix pour qu'il se connecte uniquement à votre propre serveur."
+          }
         }
       }
     },
@@ -38241,6 +38799,12 @@
             "state" : "translated",
             "value" : "Tor está activado. Este servidor debe utilizar una dirección cebolla."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tor est activé. Ce serveur doit utiliser une adresse en oignon."
+          }
         }
       }
     },
@@ -38436,6 +39000,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Transacción"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transaction"
           }
         }
       }
@@ -38794,6 +39364,12 @@
             "state" : "translated",
             "value" : "Tipo de pago"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type de paiement"
+          }
         }
       }
     },
@@ -38948,6 +39524,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mensaje inesperado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Message inattendu"
           }
         }
       }
@@ -39350,6 +39932,12 @@
             "state" : "translated",
             "value" : "Respuesta ilegible del servicio: %@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réponse illisible du service : %@"
+          }
         }
       }
     },
@@ -39746,6 +40334,12 @@
             "state" : "translated",
             "value" : "Utiliza Tor"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utiliser Tor"
+          }
         }
       }
     },
@@ -39942,6 +40536,12 @@
             "state" : "translated",
             "value" : "Utiliza esta pantalla para gastar fondos de tu monedero final. Estos fondos proceden de canales que se han cerrado en el pasado. Esto no afecta a tus canales Lightning existentes."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utilisez cet écran pour dépenser les fonds de votre portefeuille final. Ces fonds proviennent de canaux qui ont été fermés par le passé. Cela n\\'affecte pas les canaux Lightning existants."
+          }
         }
       }
     },
@@ -39976,6 +40576,12 @@
             "state" : "translated",
             "value" : "Utiliza esta pantalla para gastar tus fondos en la cadena que no fueron canjeados a tiempo. La solicitud de canje ha caducado."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utilisez cet écran pour dépenser vos fonds sur la chaîne qui n'ont pas été échangés à temps. La demande de swap-in a maintenant expiré."
+          }
         }
       }
     },
@@ -40009,6 +40615,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Usar Tor"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utiliser Tor"
           }
         }
       }
@@ -40123,6 +40735,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Versión 2.5.0: Cambios en Tor"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version 2.5.0 : Changements de Tor"
           }
         }
       }
@@ -40317,6 +40935,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Esperando confirmación primero para poder cambiarlos a Rayo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En attente de confirmation avant de pouvoir les échanger contre Lightning."
           }
         }
       }
@@ -40591,6 +41215,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Esperando el intercambio: "
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En attendant l'échange : "
           }
         }
       }
@@ -41514,6 +42144,12 @@
             "state" : "translated",
             "value" : "Se cambiará automáticamente a Rayo si la comisión es **inferior al %1$@** (%2$@) del importe."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il sera automatiquement remplacé par Lightning si les frais sont **inférieurs à %1$@** (%2$@) du montant."
+          }
         }
       }
     },
@@ -41547,6 +42183,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Se cambiará automáticamente a Rayo si la cuota es **menor que %@**."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sera automatiquement remplacé par Lightning si les frais sont **moins élevés que %@**."
           }
         }
       }
@@ -41702,6 +42344,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Permanecerá en la cadena porque la gestión automatizada de canales está desactivada."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vont rester on-chain car la gestion automatisée des canaux est désactivée."
           }
         }
       }
@@ -43070,6 +43718,12 @@
             "state" : "translated",
             "value" : "Debes reiniciar Phoenix para que los cambios surtan efecto."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous devez redémarrer Phoenix pour que les modifications soient prises en compte."
+          }
         }
       }
     },
@@ -43634,6 +44288,12 @@
             "state" : "translated",
             "value" : "Tu historial de pagos y tus contactos sólo se almacenan en este dispositivo."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'historique de vos paiements et vos contacts ne sont stockés que sur cet appareil."
+          }
         }
       }
     },
@@ -43667,6 +44327,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tu historial de pagos y tus contactos se almacenarán en iCloud."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'historique de vos paiements et vos contacts seront stockés dans iCloud."
           }
         }
       }
@@ -44671,6 +45337,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "elegir imagen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "choisir l'image"
           }
         }
       }
@@ -46406,6 +47078,12 @@
             "state" : "translated",
             "value" : "nombre, dirección del rayo, oferta..."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nom, adresse éclair, offre..."
+          }
         }
       }
     },
@@ -46722,6 +47400,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "pegar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pâte"
           }
         }
       }
@@ -47120,6 +47804,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "escanear código qr"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "scanner un code qr"
           }
         }
       }
