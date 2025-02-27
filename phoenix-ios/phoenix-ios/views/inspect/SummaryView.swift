@@ -189,14 +189,16 @@ struct SummaryView: View {
 				.accessibilityHidden(true)
 			VStack {
 				Group {
-					if payment is Lightning_kmpAutomaticLiquidityPurchasePayment ||
-					   payment is Lightning_kmpManualLiquidityPurchasePayment
-					{
+					if payment is Lightning_kmpManualLiquidityPurchasePayment {
+						Text("Manual liquidity")
+						
+					} else if payment is Lightning_kmpAutomaticLiquidityPurchasePayment {
 						Text("Channel management")
-					}
-					else if payment is Lightning_kmpOutgoingPayment {
+						
+					} else if payment is Lightning_kmpOutgoingPayment {
 						Text("SENT")
 							.accessibilityLabel("Payment sent")
+						
 					} else {
 						Text("RECEIVED")
 							.accessibilityLabel("Payment received")

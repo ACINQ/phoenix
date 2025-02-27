@@ -108,7 +108,7 @@ extension WalletPaymentInfo {
 				return String(localized: "Bump fees", comment: "Payment description for splice CPFP")
 				
 			} else if let _ = outgoingPayment as? Lightning_kmpManualLiquidityPurchasePayment {
-				return String(localized: "Channel management", comment: "Payment description for inbound liquidity")
+				return String(localized: "Manual liquidity", comment: "Payment description for inbound liquidity")
 				
 			} else if let _ = outgoingPayment as? Lightning_kmpAutomaticLiquidityPurchasePayment {
 				return String(localized: "Channel management", comment: "Payment description for inbound liquidity")

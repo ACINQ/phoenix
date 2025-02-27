@@ -26108,6 +26108,9 @@
         }
       }
     },
+    "Manual liquidity" : {
+      "comment" : "Payment description for inbound liquidity"
+    },
     "Manual restore" : {
       "comment" : "Navigation bar title",
       "localizations" : {
