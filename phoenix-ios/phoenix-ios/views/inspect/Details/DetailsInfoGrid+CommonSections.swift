@@ -211,7 +211,7 @@ extension DetailsInfoGrid {
 			onChainIncoming_serviceFees(payment)
 			onChainIncoming_minerFees(payment)
 			onChainIncoming_channelId(payment)
-			onChainIncoming_txId(payment)
+			onChainIncoming_txId(payment, showBlockchainExplorerOptions)
 			onChainIncoming_inputs(payment, showBlockchainExplorerOptions)
 		}
 	}
@@ -261,7 +261,7 @@ extension DetailsInfoGrid {
 		
 		detailsRow(
 			identifier: #function,
-			keyColumnTitle: ""
+			keyColumnTitle: "Miner fees"
 		) {
 			commonValue_amounts(
 				identifier: #function,
@@ -287,14 +287,16 @@ extension DetailsInfoGrid {
 	
 	@ViewBuilder
 	func onChainIncoming_txId(
-		_ payment: Lightning_kmpOnChainIncomingPayment
+		_ payment: Lightning_kmpOnChainIncomingPayment,
+		_ showBlockchainExplorerOptions: Binding<Bool>
 	) -> some View {
 		
 		detailsRow(
 			identifier: #function,
-			keyColumnTitle: "Transaction",
-			valueColumnVerbatim: payment.txId.toHex()
-		)
+			keyColumnTitle: "Transaction"
+		) {
+			commonValue_btcTxid(payment.txId, showBlockchainExplorerOptions)
+		}
 	}
 	
 	@ViewBuilder
