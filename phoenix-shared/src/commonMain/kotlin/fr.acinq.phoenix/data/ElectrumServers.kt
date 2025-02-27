@@ -17,18 +17,18 @@ val mainnetElectrumServers = listOf(
     electrumServer(host = "electrum.acinq.co"),
     electrumServer(
         host = "E-X.not.fyi", publicKey =
-                "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAyVwW8xbiNJet4n23lSQ1" +
-                "SNZZ+3izTuxatOZKzhdvD8+k46fVq+vLK5cCu3ezd5BiP6PnmjoKetGTrgzsvfK3" +
-                "e3bAFfFWR89JrVv176zID+56yPq38J7bJKU3P3KgRalDuEA6D8xV30m8Sg/hyBik" +
-                "tlF/WqFssKkzjZ4mcImsJPAUZ1pEJCNm7WCR53ch8ZOjlYDY3Jrmev4eQ9m32PpM" +
-                "B9QhkJjWPRyUrdkoViTbW38j2rXRYqniaiHBJDt/7qxCl2bevnhItMQ7ytLKGilm" +
-                "Wkr2v2vJ2er+6I26/+YkebfqyxATuUEZInVcwqJlYueW/Iuk7k4GimYBskCAyCt4" +
-                "bfBBg3296NW6cmEi5JEk0MQvZe/kiT6FRAs28cSmDsE5BDyIWxmAg7wbSiDJfA2C" +
-                "ZLPIwswUGzyvbp2//KCFZyatkqwZlFlKV7W2aS5eVjBVCrg0seBLukzlhDdl0mkC" +
-                "lrc8zJLmfj6bThewcZNXwIqf3dxmUpq5dJx/7IRIfNBGQmYKy+Z2roWJZYsILXCH" +
-                "iM5cg4qjZaDahCiBD8RHjU1NbuMhKmc/2LO9wIIaK0msCg8Y0zogecs0y7VQMUxg" +
-                "HDxoTXjRk56q9CvAimA/aB7uCChWZ9BLn9ykEOe4eVK+96CEbnwaF10NzVUabYIW" +
-                "o3tlo0x9iOONU+QoTaOLP6kCAwEAAQ=="
+                "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA8wmp3hyau0aAOjszUUJY" +
+                "YcMlDqlQ0/Gi7xYf0id1CG+e0yjU2pHuPXgnEmtXdsLIF5GleU7LP5L1xPrzGQD3" +
+                "LZb8CGKcl7Ve9H167wt5kiehJ/AaF4xcL96uaGQ8ykZMxZrz01AD72mT7u9S7IJt" +
+                "ypdHbiSq9YiTQj/lscYw318woRV/VLf9qaPfANileffEDRuOJB4OT6FizB+1CDoD" +
+                "ayI8J7sEiPPYuV7/ttNIEGH6wQCQLxQHQAP6fkAAQ+WMuwl2UeG7NvDocHZJp5hA" +
+                "L0LJkgquH4LaoFzzA2Yh61Ep1uWeRH7KKlXQnhPRUkgUKfrgovhT5kyszIIpkZiZ" +
+                "Z2g15fXTRVp2WBxJSa9qPEgg310T37KFXwaV08XdnEEa7pz5oHYUcUPGlRWuYDVQ" +
+                "X7HAUYvwT84eRvEj+E6L3FhsI0EulzvaHUO8SvKjSK94yoG6FepFi95eNdAwIUXg" +
+                "LgOWKu/zsdCoDWbaA9nihIJw9ZPESbb8q1WDAOV+M6YLcAyE0hLWDzra3euxUAuB" +
+                "vIc/tP8RkJ1tzrHE+3KosNAO7y8mP4XlnPvkY5ZS01VXL6a+NoPcDL3+tZr1jjb4" +
+                "XBjxhaQKn4EhlvwTURL9VOoZADOnVU+DmGiTRJbKNIL84yio/nIubKrD4eONggUh" +
+                "QDEcaySiP9R+yKz5C9o/WlUCAwEAAQ=="
     ),
     electrumServer(
         host = "btc.cihar.com", publicKey =
@@ -40,21 +40,21 @@ val mainnetElectrumServers = listOf(
                 "2n62mHT9vfKhTGIoOXR989v6FA+EIYAklIL2ptX3vLqqvOnRjB122b9eT5ZpZhNi" +
                 "uwIDAQAB"
     ),
-    // electrumServer(host = "e.keff.org"), certificate has expired
+    electrumServer(host = "e.keff.org"), // certificate has expired
     electrumServer(
         host = "tardis.bauerj.eu", publicKey =
-                "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEArnwocjdtIf+Pfpw0DAW2" +
-                "QQlQUA3VV7s/ttr0KHrDFwnvhfm6odxfUgW9REfxvxcp7xRJsp2ovFZzKj6uwOWg" +
-                "43Ewr0sTvOjyPmJdVMHAxpDCmm6BcF4cD7zs9OZfYsz5Yv0tewN9yh6DBt6fPkXT" +
-                "/inDAvInnGJJNhKfBaz7ixPR5w1JJJufnGq0SZqwfysXdhidF+eSAR7YAGjEwxaQ" +
-                "O827wAe/lsE59sNv75b01sSlMaQmusIfsIZ8Sezo/zdTmE+MYS178oRYcQboMY/o" +
-                "PMAqEuQ1rbu6YlvvIQOTPcBdgM1mJbov0Uu8manO6jZSaQDx/Vn7liG8/SMjuP7A" +
-                "ySl/eJtFMzgosbCMjxLqfG4737X4oZp8/1KqCDYsY5OtBZYkqHNSO0Uv5I3lPH6/" +
-                "mE6LemZsIQs9+NT+jPSgNNcqnrlX5/hhTB7hWxNj/y/m0MsSi9IKjLU2tRJP5P5R" +
-                "FpnUWGuW4F+0MdBRwBwt0ar8uy/2mHxNCn62X6vtBDIjCVkI/Kl54PjmOLyUmbpr" +
-                "F4l7hYM8ZOtxq4pi1Xjy/e2uBCDcaogAik1ciLFSrR2ai33eevi3YcTiB0DjLK9z" +
-                "DUx5CoQGwyhJcRopglpX+AFQry659ngRnvxdFJYmUH7CQQ/ofvdkOZ6m4hv1tVVn" +
-                "3GtwazLKQKgN6dKyHuuaj0ECAwEAAQ=="
+                "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAxLHijYCSNS9SDOgcMPo3" +
+                "ldVzRTo3LYwozUOUI2P5P8ip7sLFmXPjLbRdzSaKi6YA1J56muie5MJgAimqPo8F" +
+                "vclOGQrArpU/mQEHbWBZJyPQiftldILRLGAN5OpZnAilLtNuPOtbqbEn5KtX7hyz" +
+                "K4Xq+RZd32PMpehVVpG9LZTL/QCB5m99iffUl5uR3BX36siOJIWpahPMizzJKdP0" +
+                "RNZcAKrx5YdWStUYtfprjfBDKXQN6SB5tOVHxVLPpQz3+Iv1mab2nBbQxqiuPTyW" +
+                "8KC1ZsaLfvnQdBgnWxSPcSuLmlc4hsjloC0oinUnH3j4MvqkaTrTsokUMF4ROHiX" +
+                "ks9UcbvzdTXHh9c+8Ia/fVLLAIZitKrc9glFKI1hkjFRAQeGlc3m4TFcsT8ue8a6" +
+                "C6btxW1XZ/BPhznpk9FdUtU0BjZKtwg12cuqSfBcqdFgIwN60jM5N16n1hQDrMHN" +
+                "eZuW5DcVBIR4gq8eZUZ15460Ck4qufliWFD/M6G7rO+hLOIxu9MEe6r5CF1bGaNw" +
+                "mNJhIZeg3JGN9fn1h7kX4VW5H+9v7YVpYGB/vGXCDEsOLjHlZVjgbtungBVJ1UML" +
+                "uOixmccwKWZecT5jXCypj671lzOxF6edUbRsD2xXFjkG5RoifqyNY6zM08bNTyVo" +
+                "BbQJhHwGCCFBV/e5RgVATIUCAwEAAQ=="
     ),
     electrumServer(
         host = "VPS.hsmiths.com", publicKey =
@@ -106,6 +106,7 @@ val mainnetElectrumServers = listOf(
                 "NGOIUagggRU2tVFeW6wjSm1T3Q/z/b6G5oIaldZnklqo//79d3B4Fjj+C8lnFhpP" +
                 "/wIDAQAB"
     ),
+    electrumServer(host = "electrum.hodlister.co"),
     electrumServer(host = "electrum3.hodlister.co"),
     electrumServer(host = "electrum5.hodlister.co"),
     electrumServer(
@@ -142,21 +143,6 @@ val testnetElectrumServers = listOf(
                 "qtMSZXiJIr9RH71VoJKjnds/hoILHuCKU3HOJeo0+4KSD8+q4g3tZLr/haIrsHg5" +
                 "uifT9db6tDML1PTKpbHkW+f3w9PdhSmsNUUXrgNmQ0MoBhxV7U2Qcug3jX3xaf1P" +
                 "gwWDg3nZZizhuvBceY0IYLECAwEAAQ=="
-    ),
-    electrumServer(
-        host = "tn.not.fyi", port = 55002, publicKey =
-                "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA7/z3CDZ2d6gJ/7mEt9yI" +
-                "9KNKxs5dbwzhKB99uYdWp1QogMHEo9Jg+uYGg2M7UhO76vOFaf1Hp2gstd1Q0n2G" +
-                "Lwtq3a0JSam3EIaC7QuX8V190IexyPSVdwaPtPBzN4KCZd8smfiR01oMJkhCH2MK" +
-                "aCrJKL7PJrSZMmrLMzo5yYTnHtBZVR9gL0T5bJeO3NTNuQBV1ft6kYaKa30d5zMO" +
-                "7j/CkzclQkh6d07RrS/YnkZNswfnqKdEqNNGa3FfuZ8vwSwRtpEQRAdkjxSFsLSo" +
-                "Iv+HoTx1nFhbmaqdZasFIxmn9Zp30KMb328k5j9fszcAn78y7tVodiddODBMgGSp" +
-                "ofq+nJDkNlKD0NVNLML50IB2U2BL/62+7c2RguvLYljNkTSB3HhF+b6DiGLZDbg4" +
-                "8ea12Hr+9Nxf4lW+hIKO3s/88MMlrB2lORORiuFtmiqYiiTc5YzJPXzXGhoCCmgQ" +
-                "xij6XYi0v4bpFr8wANtDobZhziWZSHm6T+u5RsSSkMGHc6hJaZmVg9xGznsD7RmR" +
-                "a+Wmf/Tl4sY0hI+nea4YyrN7+i1KT04EA9HrG6nBUKgKJkp2OciKmGGrINmdSCvk" +
-                "Z9laCxcGpEuAL0sI/WalmAXDTm/rjNdMZ0AClD3gCweqsblKZ07Ewtzh0DE65B7v" +
-                "tZWgWZM/wz4dnMYwY9VIrcUCAwEAAQ=="
     ),
     electrumServer(host = "testnet1.electrum.acinq.co", port = 51002),
     electrumServer(host = "blockstream.info", port = 993),
