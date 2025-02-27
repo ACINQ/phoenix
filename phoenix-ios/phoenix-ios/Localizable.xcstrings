@@ -17089,6 +17089,9 @@
     "Enabling this option will force Phoenix to only connect to onion services for Lightning and Electrum. Note that a Tor proxy application is required." : {
 
     },
+    "Enabling Tor now requires installing a third-party Tor Proxy VPN app such as Orbot.\n\nThis makes background payments much more reliable with Tor.\n\nAlso Phoenix now always uses onion addresses for Lightning and Electrum connections when Tor is enabled." : {
+
+    },
     "End date" : {
       "localizations" : {
         "ar" : {
@@ -31841,9 +31844,6 @@
           }
         }
       }
-    },
-    "Phoenix now forces onion addresses for Lightning and Electrum connections when Tor is enabled.\n\nHowever, the embedded Tor proxy has been removed ; instead you need to install a third-party Tor Proxy VPN application such as Orbot to connect." : {
-
     },
     "Phoenix uses payment channels to make Bitcoin fast and private." : {
       "localizations" : {
