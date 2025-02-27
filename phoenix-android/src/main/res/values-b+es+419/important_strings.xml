@@ -274,8 +274,7 @@
     <!-- Tor -->
 
     <string name="tor_dialog_enable_title_1">Uso de Tor</string>
-    <string name="tor_dialog_enable_details_1">Para habilitar esta opción, Phoenix deberá usar direcciones Onion al conectarse a Lightning y Electrum. Tenga en cuenta que se necesita una aplicación proxy Tor.</string>
-    <string name="tor_dialog_enable_title_2">Recuerde:</string>
+    <string name="tor_dialog_enable_details_1">Esto requiere instalar una aplicación Tor Proxy VPN de terceros, como Orbot.</string>
     <string name="tor_dialog_enable_details_2">Tor puede mejorar la privacidad, pero puede causar problemas de rendimiento y pagos atrasados.</string>
     <string name="tor_dialog_disable_title">Deshabilitar Tor</string>
     <string name="tor_dialog_disable_details_1">Si deshabilita esta opción, su dirección IP puede ser revelada a varios proveedores de servicios.</string>

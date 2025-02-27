@@ -21,12 +21,12 @@ struct V85Popover: View {
 			
 			Text(
 				"""
-				Phoenix now forces onion addresses for Lightning and Electrum \
-				connections when Tor is enabled.
+				Enabling Tor now requires installing a third-party Tor Proxy VPN app such as Orbot.
 				
-				However, the embedded Tor proxy has been removed ; instead you \
-				need to install a third-party Tor Proxy VPN application such \
-				as Orbot to connect.
+				This makes background payments much more reliable with Tor.
+				
+				Also Phoenix now always uses onion addresses for Lightning and Electrum \
+				connections when Tor is enabled.
 				"""
 			)
 			

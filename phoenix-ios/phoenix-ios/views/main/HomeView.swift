@@ -296,8 +296,8 @@ struct HomeView : MVIView {
 	@ViewBuilder
 	func incomingBalance() -> some View {
 		
-		let swapInWalletBalance: Int64 = swapInWallet.totalBalance.toMsat()
-		let finalWalletBalance: Int64 = finalWallet.totalBalance.toMsat()
+		let swapInWalletBalance: Int64 = swapInWallet.totalBalance.sat
+		let finalWalletBalance: Int64 = finalWallet.totalBalance.sat
 		
 		let incomingBalance = swapInWalletBalance + finalWalletBalance
 		if incomingBalance > 0 {

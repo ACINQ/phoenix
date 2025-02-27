@@ -32,7 +32,7 @@ struct MainView: View {
 	func onAppear() {
 		log.trace("onAppear()")
 		
-		if AppMigration.shared.didUpdate && AppMigration.shared.currentBuildNumber == "84" {
+		if AppMigration.shared.didUpdate && AppMigration.shared.currentBuildNumber == "85" {
 			if GroupPrefs.shared.isTorEnabled {
 				popoverState.display(dismissable: false) {
 					V85Popover()

@@ -276,8 +276,7 @@
     <!-- Tor -->
 
     <string name="tor_dialog_enable_title_1">Používanie Tor</string>
-    <string name="tor_dialog_enable_details_1">Povolenie tejto možnosti bude vyžadovať, aby Phoenix pri pripájaní k Lightning a Electrum používal onion adresy. Upozorňujeme, že je potrebná aplikácia Tor proxy.</string>
-    <string name="tor_dialog_enable_title_2">Upozorňujeme</string>
+    <string name="tor_dialog_enable_details_1">Vyžaduje si to inštaláciu aplikácie Tor Proxy VPN od tretej strany, ako je napríklad Orbot.</string>
     <string name="tor_dialog_enable_details_2">Tor môže zlepšiť súkromie, ale môže spôsobiť problémy s výkonom a zmeškané platby.</string>
     <string name="tor_dialog_disable_title">Zakázanie Tor</string>
     <string name="tor_dialog_disable_details_1">Ak túto možnosť zakážete, vaša IP adresa môže byť odhalená rôznym poskytovateľom služieb.</string>

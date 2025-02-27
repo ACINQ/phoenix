@@ -279,9 +279,8 @@
 
     <!-- Tor -->
 
-    <string name="tor_dialog_enable_title_1">Using Tor</string>
-    <string name="tor_dialog_enable_details_1">Enabling this option will force Phoenix to only connect to onion services for Lightning and Electrum. Note that a Tor proxy application is required.</string>
-    <string name="tor_dialog_enable_title_2">Be advised</string>
+    <string name="tor_dialog_enable_title_1">Enabling Tor</string>
+    <string name="tor_dialog_enable_details_1">This requires installing a third-party Tor Proxy VPN app such as Orbot.</string>
     <string name="tor_dialog_enable_details_2">Tor can improve privacy, but may cause performance issues and missed payments.</string>
     <string name="tor_dialog_disable_title">Disabling Tor</string>
     <string name="tor_dialog_disable_details_1">If you disable this option, your IP address may be revealed to various service providers.</string>
