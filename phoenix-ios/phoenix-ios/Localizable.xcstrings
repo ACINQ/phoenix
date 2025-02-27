@@ -666,6 +666,12 @@
             "value" : "%1$@ ∙ z %2$@"
           }
         },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ ∙ von %2$@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -686,6 +692,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ ∙ na %2$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ ∙ bis %2$@"
           }
         },
         "en" : {
@@ -3514,6 +3526,12 @@
             "state" : "translated",
             "value" : "? potvrzení"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "? Bestätigungen"
+          }
         }
       }
     },
@@ -4157,6 +4175,12 @@
             "state" : "translated",
             "value" : "Zrychlení transakcí v řetězci"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beschleunigung von On-Chain-Transaktionen"
+          }
         }
       }
     },
@@ -4372,6 +4396,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Přidejte kontakty pro snadné a rychlé platby"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontakte für einfache und schnelle Zahlungen hinzufügen"
           }
         }
       }
@@ -4792,6 +4822,12 @@
             "state" : "translated",
             "value" : "Částka připočtená k úvěru na poplatky"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Betrag, der dem Gebührenguthaben hinzugefügt wird"
+          }
         }
       }
     },
@@ -4929,6 +4965,12 @@
             "state" : "translated",
             "value" : "Obdržená částka"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erhaltene Beträge"
+          }
         }
       }
     },
@@ -4945,6 +4987,12 @@
             "state" : "translated",
             "value" : "Požadovaná částka"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beantragter Betrag"
+          }
         }
       }
     },
@@ -4960,6 +5008,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Odeslaná částka (včetně poplatků)"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Übermittelter Betrag (einschließlich Gebühren)"
           }
         }
       }
@@ -5542,6 +5596,12 @@
             "state" : "translated",
             "value" : "Jste si jisti, že chcete pokračovat?"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sind Sie sicher, dass Sie fortfahren wollen?"
+          }
         }
       }
     },
@@ -5677,6 +5737,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pozor! Platnost některých fondů brzy vyprší a nebudou již způsobilé pro výměnu."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Achtung! Einige Fonds werden bald auslaufen und können nicht mehr getauscht werden."
           }
         }
       }
@@ -7310,6 +7376,12 @@
             "state" : "translated",
             "value" : "Faktura Bolt12"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bolt12 Rechnung"
+          }
         }
       }
     },
@@ -7527,6 +7599,12 @@
             "state" : "translated",
             "value" : "Po 4 měsících čekání již nelze vyměnit. Tyto prostředky je nutné utratit ručně."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kann nicht mehr getauscht werden, nach 4 Monaten Wartezeit. Diese Mittel müssen manuell ausgegeben werden."
+          }
         }
       }
     },
@@ -7622,6 +7700,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Způsobeno"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verursacht durch"
           }
         }
       }
@@ -7843,6 +7927,12 @@
             "state" : "translated",
             "value" : "ID kanálu"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kanal-ID"
+          }
         }
       }
     },
@@ -7899,6 +7989,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Provoz kanálu (nový nebo spojovací)"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kanalbetrieb (neu oder eingespleißt)"
           }
         }
       }
@@ -8841,6 +8937,12 @@
             "state" : "translated",
             "value" : "Typ uzavření"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Art der Schließung"
+          }
         }
       }
     },
@@ -9179,6 +9281,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dokončeno v"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abgeschlossen am"
           }
         }
       }
@@ -9640,6 +9748,12 @@
             "state" : "translated",
             "value" : "Potvrzeno v řetězci"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bestätigt auf der Kette"
+          }
         }
       }
     },
@@ -9655,6 +9769,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Potvrzení: "
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bestätigen: "
           }
         }
       }
@@ -10563,6 +10683,12 @@
             "state" : "translated",
             "value" : "Nelze se připojit ke službě: %@"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konnte keine Verbindung zum Dienst: %@"
+          }
         }
       }
     },
@@ -10698,6 +10824,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vytvořeno v"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erstellt am"
           }
         }
       }
@@ -11760,6 +11892,12 @@
             "state" : "translated",
             "value" : "Odstranění historie plateb a kontaktů z mého účtu iCloud."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zahlungsverlauf und Kontakte aus meinem iCloud-Konto löschen."
+          }
         }
       }
     },
@@ -11935,6 +12073,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Odstranění **historie plateb** a **kontaktů** z iCloudu"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Löschen von **Zahlungsverläufen** und **Kontakten** aus iCloud"
           }
         }
       }
@@ -12271,6 +12415,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Adresa vkladu"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adresse der Hinterlegung"
           }
         }
       }
@@ -12653,6 +12803,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vypnutí služby Tor"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tor deaktivieren"
           }
         }
       }
@@ -13955,6 +14111,12 @@
             "state" : "translated",
             "value" : "Povolení služby Tor nyní vyžaduje instalaci aplikace Tor Proxy VPN třetí strany, například Orbot.\n\nDíky tomu jsou platby na pozadí s Tor mnohem spolehlivější.\n\nTaké Phoenix nyní vždy používá adresy onion pro připojení Lightning a Electrum, když je povolen Tor."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um Tor zu aktivieren, muss eine Tor-Proxy-VPN-App eines Drittanbieters wie Orbot installiert werden.\n\nDies macht Hintergrundzahlungen mit Tor viel zuverlässiger.\n\nAußerdem verwendet Phoenix jetzt immer Onion-Adressen für Lightning- und Electrum-Verbindungen, wenn Tor aktiviert ist."
+          }
         }
       }
     },
@@ -14697,6 +14859,12 @@
             "state" : "translated",
             "value" : "Platnost vypršela: "
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abgelaufen: "
+          }
         }
       }
     },
@@ -15076,6 +15244,12 @@
             "state" : "translated",
             "value" : "Neúspěšný"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gescheitert"
+          }
         }
       }
     },
@@ -15291,6 +15465,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zápočet poplatků"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gebührenkredit"
           }
         }
       }
@@ -16082,6 +16262,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Konečná peněženka: "
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Endgültige Brieftasche: "
           }
         }
       }
@@ -17470,6 +17656,12 @@
             "state" : "translated",
             "value" : "Jak to funguje"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wie es funktioniert"
+          }
         }
       }
     },
@@ -18009,6 +18201,12 @@
             "state" : "translated",
             "value" : "Pokud Tor zakážete, může být vaše IP adresa odhalena různým poskytovatelům služeb."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn du Tor deaktivierst, kann deine IP-Adresse verschiedenen Dienstanbietern mitgeteilt werden."
+          }
         }
       }
     },
@@ -18145,6 +18343,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pokud přejdete na nové zařízení (nebo aplikaci přeinstalujete), tyto informace ztratíte."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn Sie zu einem neuen Gerät wechseln (oder die App neu installieren), gehen diese Informationen verloren."
           }
         }
       }
@@ -18685,6 +18889,12 @@
             "state" : "translated",
             "value" : "Příchozí žádost o likviditu (auto)"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liquiditätsanforderung im Eingang (auto)"
+          }
         }
       }
     },
@@ -18700,6 +18910,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Příchozí žádost o likviditu (manual)"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liquiditätsanforderung im Eingang (manual)"
           }
         }
       }
@@ -18958,6 +19174,12 @@
             "state" : "translated",
             "value" : "Příchozí platba Lightning (bolt11)"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eingehende Blitzzahlung (bolt11)"
+          }
         }
       }
     },
@@ -18973,6 +19195,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Příchozí platba Lightning (bolt12)"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eingehende Blitzzahlung (bolt12)"
           }
         }
       }
@@ -18990,6 +19218,12 @@
             "state" : "translated",
             "value" : "Příchozí platba v řetězci (starší pay-to-open)"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eingehende On-Chain-Zahlung (altes Pay-to-Open)"
+          }
         }
       }
     },
@@ -19005,6 +19239,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Příchozí platba v řetězci (starší swap-in)"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eingehende On-Chain-Zahlung (Legacy Swap-in)"
           }
         }
       }
@@ -19022,6 +19262,12 @@
             "state" : "translated",
             "value" : "Příchozí platba v řetězci (nový kanál)"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On-Chain-Zahlungseingang (neuer Kanal)"
+          }
         }
       }
     },
@@ -19037,6 +19283,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Příchozí platba v řetězci (splice)"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eingehende On-Chain-Zahlung (splice)"
           }
         }
       }
@@ -19498,6 +19750,12 @@
             "state" : "translated",
             "value" : "Neplatná adresa"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ungültige Adresse"
+          }
         }
       }
     },
@@ -19554,6 +19812,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Neplatné parametry kanálu"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ungültige Kanalparameter"
           }
         }
       }
@@ -19851,6 +20115,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Popis faktury"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beschreibung der Rechnung"
           }
         }
       }
@@ -20636,6 +20906,12 @@
             "state" : "translated",
             "value" : "Bleskové poplatky za směrování platby. Platba vyžaduje %lld skoků."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lightning-Gebühren für die Weiterleitung der Zahlung. Die Zahlung erfordert %lld Hops."
+          }
         }
       }
     },
@@ -20693,6 +20969,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bleskové poplatky za směrování platby. Platba byla rozdělena na %1$lld částí s použitím %2$lld skoků."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lightning-Gebühren für die Weiterleitung der Zahlung. Die Zahlung wurde in %1$lld Teile aufgeteilt, die %2$lld Hops verwenden."
           }
         },
         "en" : {
@@ -20756,6 +21038,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Blesková platba"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blitzzahlung"
           }
         }
       }
@@ -20936,6 +21224,12 @@
             "state" : "translated",
             "value" : "Požadovaná likvidita"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geforderte Liquidität"
+          }
         }
       }
     },
@@ -21071,6 +21365,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Místní"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lokales"
           }
         }
       }
@@ -21372,6 +21672,12 @@
             "state" : "translated",
             "value" : "Ujistěte se, že je Tor VPN aktivní a spuštěná."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stellen Sie sicher, dass Ihr Tor-VPN aktiv ist und läuft."
+          }
         }
       }
     },
@@ -21550,6 +21856,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ruční likvidita"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manuelle Liquidität"
           }
         }
       }
@@ -22380,6 +22692,12 @@
             "state" : "translated",
             "value" : "Poplatky horníkům"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bergwerksgebühren"
+          }
         }
       }
     },
@@ -22482,6 +22800,12 @@
             "state" : "translated",
             "value" : "Chybějící množství mimo řetězec je příliš nízké."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fehlende Off-Chain-Menge zu niedrig."
+          }
         }
       }
     },
@@ -22538,6 +22862,12 @@
             "state" : "translated",
             "value" : "Vzájemné"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gegenseitig"
+          }
         }
       }
     },
@@ -22553,6 +22883,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "NEUPLATŇUJE SE"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "K.A"
           }
         }
       }
@@ -22973,6 +23309,12 @@
             "state" : "translated",
             "value" : "Žádné kontakty"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Kontakte"
+          }
         }
       }
     },
@@ -23390,6 +23732,12 @@
             "state" : "translated",
             "value" : "Ne, nechci používat adresu cibule"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nein, ich möchte keine Zwiebeladresse verwenden"
+          }
         }
       }
     },
@@ -23728,6 +24076,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nabídka"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Angebot"
           }
         }
       }
@@ -24316,6 +24670,12 @@
             "state" : "translated",
             "value" : "Odchozí platba Lightning (bolt11)"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgehende Blitzzahlung (bolt11)"
+          }
         }
       }
     },
@@ -24331,6 +24691,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Odchozí platba Lightning (bolt12)"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgehende Blitzzahlung (bolt12)"
           }
         }
       }
@@ -24348,6 +24714,12 @@
             "state" : "translated",
             "value" : "Odchozí platba v řetězci"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgehende On-Chain-Zahlung"
+          }
         }
       }
     },
@@ -24363,6 +24735,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Odchozí platba v řetězci (starší swap)"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgehende On-Chain-Zahlung (Legacy Swap)"
           }
         }
       }
@@ -24822,6 +25200,12 @@
             "state" : "translated",
             "value" : "Klíč plátce"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zahler-Schlüssel"
+          }
         }
       }
     },
@@ -24958,6 +25342,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Platba Hash"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zahlungs-Hash"
           }
         }
       }
@@ -25422,6 +25812,12 @@
             "state" : "translated",
             "value" : "Historie plateb a kontakty nejsou uloženy v iCloudu."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zahlungsverlauf und Kontakte werden nicht in iCloud gespeichert."
+          }
         }
       }
     },
@@ -25719,6 +26115,12 @@
             "state" : "translated",
             "value" : "Stav platby"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zahlungsstatus"
+          }
         }
       }
     },
@@ -25936,6 +26338,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Čeká se na"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anhängig"
           }
         }
       }
@@ -26878,6 +27286,12 @@
             "state" : "translated",
             "value" : "Preimage"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorschaubild"
+          }
         }
       }
     },
@@ -27095,6 +27509,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Typ nákupu"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Art des Kaufs"
           }
         }
       }
@@ -27677,6 +28097,12 @@
             "state" : "translated",
             "value" : "Přijato prostřednictvím"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empfangen über"
+          }
         }
       }
     },
@@ -28098,6 +28524,12 @@
             "state" : "translated",
             "value" : "Vzdálený"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fernbedienung"
+          }
         }
       }
     },
@@ -28358,6 +28790,12 @@
             "state" : "translated",
             "value" : "Řešení adresy blesku"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auflösende Blitzadresse"
+          }
         }
       }
     },
@@ -28373,6 +28811,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nutný restart"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neustart erforderlich"
           }
         }
       }
@@ -28590,6 +29034,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Odvoláno"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Widerrufen"
           }
         }
       }
@@ -28969,6 +29419,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Naskenování kódu QR"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR-Code scannen"
           }
         }
       }
@@ -30076,6 +30532,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Poplatky za služby"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Servicegebühren"
           }
         }
       }
@@ -31603,6 +32065,12 @@
             "state" : "translated",
             "value" : "Vzhledem k tomu, že jste povolili Tor, měli byste pro tento server použít adresu onion."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Da du Tor aktiviert hast, solltest du eine Onion-Adresse für diesen Server verwenden."
+          }
         }
       }
     },
@@ -31819,6 +32287,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Utratit z konečné peněženky"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgeben aus der endgültigen Geldbörse"
           }
         }
       }
@@ -32077,6 +32551,12 @@
             "state" : "translated",
             "value" : "Standardní"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standard"
+          }
         }
       }
     },
@@ -32293,6 +32773,12 @@
             "state" : "translated",
             "value" : "Úspěšné"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erfolgreich"
+          }
         }
       }
     },
@@ -32308,6 +32794,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Návrhy"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorschläge"
           }
         }
       }
@@ -32853,6 +33345,12 @@
             "state" : "translated",
             "value" : "Cílový veřejný klíč"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffentlicher Zielschlüssel"
+          }
         }
       }
     },
@@ -32908,6 +33406,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Historie** plateb** a **kontakty** pro tuto peněženku budou z vašeho účtu iCloud odstraněny."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der **Zahlungsverlauf** und die **Kontakte** für diese Geldbörse werden aus Ihrem iCloud-Konto gelöscht."
           }
         }
       }
@@ -34089,6 +34593,12 @@
             "state" : "translated",
             "value" : "Přijatá faktura již probíhá."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die eingegangene Rechnung ist bereits in Bearbeitung."
+          }
         }
       }
     },
@@ -34267,6 +34777,12 @@
             "state" : "translated",
             "value" : "Zdá se, že služba (%@) je offline, nebo mají nefunkční server"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Dienst (%@) scheint offline zu sein, oder der Server ist ausgefallen"
+          }
         }
       }
     },
@@ -34284,6 +34800,12 @@
             "state" : "translated",
             "value" : "Služba (%@) nepodporuje adresy Lightning nebo tohoto uživatele nezná"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Dienst (%@) unterstützt keine Lightning-Adressen, oder kennt diesen Benutzer nicht"
+          }
         }
       }
     },
@@ -34300,6 +34822,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Služba (%1$@) vrátila chybový kód: %2$d"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Dienst (%1$@) hat einen Fehlercode zurückgegeben: %2$d"
           }
         },
         "en" : {
@@ -34323,6 +34851,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Služba (%1$@) vrátila chybovou zprávu: %2$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Dienst (%1$@) hat eine Fehlermeldung zurückgegeben: %2$@"
           }
         },
         "en" : {
@@ -34666,6 +35200,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tyto prostředky pocházejí z uzavřených kanálů Blesku. Je třeba je utratit ručně."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Mittel stammen aus geschlossenen Blitzkanälen. Sie müssen manuell ausgegeben werden."
           }
         }
       }
@@ -35491,6 +36031,12 @@
             "state" : "translated",
             "value" : "Tato likvidita byla nutná pro získání platby"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Liquidität war erforderlich, um eine Zahlung zu erhalten"
+          }
         }
       }
     },
@@ -35669,6 +36215,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "To vyžaduje instalaci aplikace Tor Proxy VPN třetí strany, například Orbot."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dazu muss eine Tor-Proxy-VPN-App eines Drittanbieters wie Orbot installiert werden."
           }
         }
       }
@@ -36370,6 +36922,12 @@
             "state" : "translated",
             "value" : "Pro zabezpečení platebních kanálů sleduje společnost Phoenix blockchain Bitcoinu prostřednictvím serverů Electrum.\n\nVe výchozím nastavení se používají náhodné servery. Phoenix můžete také nakonfigurovat tak, aby se připojoval pouze k vašemu vlastnímu serveru."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um Ihre Zahlungskanäle zu sichern, überwacht Phoenix die Bitcoin-Blockchain über Electrum-Server.\n\nStandardmäßig werden zufällige Server verwendet. Sie können Phoenix auch so konfigurieren, dass es sich nur mit Ihrem eigenen Server verbindet."
+          }
         }
       }
     },
@@ -36549,6 +37107,12 @@
             "state" : "translated",
             "value" : "Tor je povolen. Tento server by měl používat adresu onion."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tor ist aktiviert. Dieser Server sollte eine Onion-Adresse verwenden."
+          }
         }
       }
     },
@@ -36726,6 +37290,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Transakce"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transaktion"
           }
         }
       }
@@ -37066,6 +37636,12 @@
             "state" : "translated",
             "value" : "Typ platby"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Art der Zahlung"
+          }
         }
       }
     },
@@ -37202,6 +37778,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Neočekávaná zpráva"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unerwartete Nachricht"
           }
         }
       }
@@ -37586,6 +38168,12 @@
             "state" : "translated",
             "value" : "Nečitelná odpověď služby: %@"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unleserliche Antwort vom Dienst: %@"
+          }
         }
       }
     },
@@ -37964,6 +38552,12 @@
             "state" : "translated",
             "value" : "Použijte Tor"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tor verwenden"
+          }
         }
       }
     },
@@ -38142,6 +38736,12 @@
             "state" : "translated",
             "value" : "Na této obrazovce můžete utrácet prostředky z konečné peněženky. Tyto prostředky pocházejí z kanálů, které byly v minulosti uzavřeny. To nemá vliv na vaše stávající kanály Lightning."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf diesem Bildschirm können Sie Guthaben aus Ihrer endgültigen Brieftasche ausgeben. Diese Gelder stammen aus Kanälen, die in der Vergangenheit geschlossen wurden. Dies hat keine Auswirkungen auf Ihre bestehenden Lightning-Kanäle."
+          }
         }
       }
     },
@@ -38158,6 +38758,12 @@
             "state" : "translated",
             "value" : "Na této obrazovce můžete utratit prostředky v řetězci, které nebyly včas vyměněny. Platnost žádosti o výměnu již vypršela."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwenden Sie diesen Bildschirm, um Ihre On-Chain-Gelder auszugeben, die nicht rechtzeitig getauscht wurden. Die Swap-In-Anforderung ist jetzt abgelaufen."
+          }
         }
       }
     },
@@ -38173,6 +38779,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Používání sítě Tor"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tor verwenden"
           }
         }
       }
@@ -38269,6 +38881,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Verze 2.5.0: Změny v Tor"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version 2.5.0: Tor-Änderungen"
           }
         }
       }
@@ -38445,6 +39063,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nejprve čekáme na potvrzení, než budou vyměněny za Lightning."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wir warten auf eine Bestätigung, bevor wir sie in Lightning umwandeln können."
           }
         }
       }
@@ -38701,6 +39325,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Čekání na výměnu: "
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ich warte auf den Tausch: "
           }
         }
       }
@@ -39601,6 +40231,12 @@
             "value" : "Pokud je poplatek **menší než %1$@** (%2$@) částky, bude automaticky převeden na Blesk."
           }
         },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird automatisch auf Lightning umgestellt, wenn die Gebühr **weniger als %1$@** (%2$@) des Betrags beträgt."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -39621,6 +40257,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pokud je poplatek **nižší než %@**, bude automaticky převeden na Lightning."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird automatisch auf Lightning umgestellt, wenn die Gebühr **weniger als %@** beträgt."
           }
         }
       }
@@ -39758,6 +40400,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zůstane v řetězci, protože automatická správa kanálů je zakázána."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bleibt in der Kette, da die automatische Kanalverwaltung deaktiviert ist."
           }
         }
       }
@@ -41108,6 +41756,12 @@
             "state" : "translated",
             "value" : "Aby se změny projevily, je třeba restartovat aplikaci Phoenix."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie müssen Phoenix neu starten, damit die Änderungen wirksam werden."
+          }
         }
       }
     },
@@ -41654,6 +42308,12 @@
             "state" : "translated",
             "value" : "Historie plateb a kontakty jsou uloženy pouze v tomto zařízení."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihr Zahlungsverhalten und Ihre Kontakte werden nur auf diesem Gerät gespeichert."
+          }
         }
       }
     },
@@ -41669,6 +42329,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Historie plateb a kontakty se ukládají na iCloudu."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihr Zahlungsverhalten und Ihre Kontakte werden in iCloud gespeichert."
           }
         }
       }
@@ -42655,6 +43321,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "vybrat obrázek"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "bild auswählen"
           }
         }
       }
@@ -44372,6 +45044,12 @@
             "state" : "translated",
             "value" : "jméno, blesková adresa, nabídka..."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "name, Blitzadresse, Angebot..."
+          }
         }
       }
     },
@@ -44670,6 +45348,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "vložit"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "einfügen"
           }
         }
       }
@@ -45050,6 +45734,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "skenování qr kódu"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "qr-code scannen"
           }
         }
       }
