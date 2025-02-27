@@ -144,6 +144,7 @@ dependencies {
     implementation("com.google.firebase:firebase-messaging:${libs.versions.fcm.get()}")
     implementation("com.google.android.gms:play-services-base:${libs.versions.playservices.get()}")
 
+    testImplementation("junit:junit:${libs.versions.junit.get()}")
     testImplementation("app.cash.sqldelight:sqlite-driver:${libs.versions.sqldelight.get()}")
     androidTestImplementation("androidx.test.ext:junit:${libs.versions.androidx.junit.get()}")
     androidTestImplementation("androidx.test.espresso:espresso-core:${libs.versions.espresso.get()}")

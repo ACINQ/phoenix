@@ -17,6 +17,7 @@
 package fr.acinq.phoenix.android.utils.images
 
 import android.graphics.ImageFormat
+import android.util.Size
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import com.google.zxing.*
@@ -31,6 +32,10 @@ class ZxingQrCodeAnalyzer(
 
     private val log = LoggerFactory.getLogger(this::class.java)
     private val reader = QRCodeReader()
+
+    override fun getDefaultTargetResolution(): Size {
+        return DEFAULT_RESOLUTION
+    }
 
     override fun analyze(image: ImageProxy) {
         if (image.format != ImageFormat.YUV_420_888) {
@@ -68,5 +73,9 @@ class ZxingQrCodeAnalyzer(
             log.debug("error when decoding: ", e)
         }
         image.close()
+    }
+
+    companion object {
+        val DEFAULT_RESOLUTION = Size(1200, 1600)
     }
 }

@@ -190,6 +190,7 @@
 
     <string name="scan_request_camera_access">Tap to grant camera permission</string>
     <string name="scan_request_camera_access_denied">Camera permission has been denied</string>
+    <string name="scan_help">Zoom or tap the QR to focus</string>
 
     <!-- prepare send payment -->
 

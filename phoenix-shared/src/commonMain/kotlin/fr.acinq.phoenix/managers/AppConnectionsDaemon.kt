@@ -195,7 +195,7 @@ class AppConnectionsDaemon(
                     }
                 if (forceDisconnect || !it.canConnect) {
                     peerConnectionJob?.let { job ->
-                        logger.debug { "cancel peer connection loop" }
+                        logger.info { "disconnect and cancel peer connection loop" }
                         job.cancelAndJoin()
                         peer.disconnect()
                         peerConnectionJob = null
@@ -248,7 +248,7 @@ class AppConnectionsDaemon(
                     }
                 if (forceDisconnect || !it.canConnect) {
                     electrumConnectionJob?.let { job ->
-                        logger.debug { "cancel electrum connection loop" }
+                        logger.info { "disconnect and cancel electrum connection loop" }
                         job.cancelAndJoin()
                         electrumClient.disconnect()
                         electrumConnectionJob = null
@@ -405,10 +405,10 @@ class AppConnectionsDaemon(
     fun forceReconnect(target: ControlTarget = ControlTarget.All) {
         launch {
             if (target.containsPeer) {
-                peerControlChanges.send { copy(disconnectCount = -1) }
+                peerControlChanges.send { copy(disconnectCount = -1, configVersion = this.configVersion + 1) }
             }
             if (target.containsElectrum) {
-                electrumControlChanges.send { copy(disconnectCount = -1) }
+                electrumControlChanges.send { copy(disconnectCount = -1, configVersion = this.configVersion + 1) }
             }
             if (target.containsHttp) {
                 httpApiControlChanges.send { copy(disconnectCount = -1) }

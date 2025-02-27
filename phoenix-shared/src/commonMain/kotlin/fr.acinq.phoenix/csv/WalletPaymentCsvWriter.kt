@@ -134,7 +134,7 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
         val details: Details? = when (payment) {
             is LightningIncomingPayment -> Details(
                 type = Type.lightning_received,
-                amount = payment.parts.filterIsInstance<LightningIncomingPayment.Part.Htlc>().map { it.amountReceived }.sum(),
+                amount = payment.amountReceived,
                 feeCredit = payment.parts.filterIsInstance<LightningIncomingPayment.Part.FeeCredit>().map { it.amountReceived }.sum() - (payment.liquidityPurchaseDetails?.feeCreditUsed ?: 0.msat),
                 miningFee = payment.liquidityPurchaseDetails?.miningFee ?: 0.sat,
                 serviceFee = payment.liquidityPurchaseDetails?.purchase?.fees?.serviceFee?.toMilliSatoshi() ?: 0.msat,

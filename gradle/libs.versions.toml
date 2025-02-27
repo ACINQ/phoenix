@@ -33,6 +33,7 @@ logback = "3.0.0"
 fcm = "24.1.0"
 playservices = "18.5.0"
 
+junit = "4.13"
 espresso = "3.3.0"
 robolectric = "4.13"
 agp = "8.8.0"

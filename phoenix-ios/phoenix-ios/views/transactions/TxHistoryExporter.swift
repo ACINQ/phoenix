@@ -30,13 +30,6 @@ struct TxHistoryExporter: View {
 	
 	let FETCH_ROWS_BATCH_COUNT = 32
 	
-	let FIELD_ID          = "ID"
-	let FIELD_DATE        = "Date"
-	let FIELD_AMOUNT_BTC  = "Amount BTC"
-	let FIELD_AMOUNT_FIAT = "Amount Fiat"
-	let FIELD_DESCRIPTION = "Description"
-	let FIELD_NOTES       = "Notes"
-	
 	// --------------------------------------------------
 	// MARK: View Builders
 	// --------------------------------------------------
@@ -315,7 +308,7 @@ struct TxHistoryExporter: View {
 			
 			paymentsDb.getOldestCompletedDate { (millis: KotlinLong?, _) in
 				
-				if let oldestDate = self.millisToDate(millis) {
+				if let oldestDate = millis?.int64Value.toDate(from: .milliseconds) {
 					log.debug("oldestDate = \(oldestDate)")
 					startDate = oldestDate
 				}
@@ -362,16 +355,6 @@ struct TxHistoryExporter: View {
 				// result no longer matches UI; user changed dates
 			}
 			
-		}
-	}
-	
-	private func millisToDate(_ millis: KotlinLong?) -> Date? {
-			
-		if let millis = millis {
-			let seconds: TimeInterval = millis.doubleValue / Double(1_000)
-			return Date(timeIntervalSince1970: seconds)
-		} else {
-			return nil
 		}
 	}
 	
@@ -428,20 +411,20 @@ struct TxHistoryExporter: View {
 		do {
 			let paymentsDb = try await databaseManager.paymentsDb()
 			
-			let config = CsvWriter_.Configuration(
+			let config = WalletPaymentCsvWriter.Configuration(
 				includesFiat: includeFiat,
 				includesDescription: includeDescription,
 				includesNotes: includeNotes,
 				includesOriginDestination: includeOriginDestination
 			)
+			let csvWriter = WalletPaymentCsvWriter(configuration: config)
+			
+			let headerRowStr = csvWriter.dumpAndClear()
+			let headerRowData = Data(headerRowStr.utf8)
+			try await fileHandle.asyncWrite(data: headerRowData)
 			
 			var done = false
 			var rowsOffset = 0
-			
-			let headerRowStr = CsvWriter_.companion.makeHeaderRow(config: config)
-			let headerRowData = Data(headerRowStr.utf8)
-			
-			try await fileHandle.asyncWrite(data: headerRowData)
 			
 			while !done {
 				
@@ -453,20 +436,14 @@ struct TxHistoryExporter: View {
 				)
 				
 				for row in rows {
-					
-					let localizedDescription = row.paymentDescription() ?? row.defaultPaymentDescription()
-					let rowStr = CsvWriter_.companion.makeRow(
-						info: row,
-						localizedDescription: localizedDescription,
-						config: config
-					)
-					let rowData = Data(rowStr.utf8)
-					
-					try await fileHandle.asyncWrite(data: rowData)
+					csvWriter.add(payment: row.payment, metadata: row.metadata)
 					exportedCount = (exportedCount ?? 0) + 1
-					
-				} // </for row in rows>
-		
+				}
+				
+				let batchStr: String = csvWriter.dumpAndClear()
+				let batchData = Data(batchStr.utf8)
+				try await fileHandle.asyncWrite(data: batchData)
+				
 				rowsOffset += rows.count
 				
 				if rows.count < FETCH_ROWS_BATCH_COUNT {

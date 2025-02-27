@@ -111,7 +111,7 @@ extension WalletPaymentInfo {
 				return String(localized: "Manual liquidity", comment: "Payment description for inbound liquidity")
 				
 			} else if let _ = outgoingPayment as? Lightning_kmpAutomaticLiquidityPurchasePayment {
-				return String(localized: "Automated liquidity", comment: "Payment description for inbound liquidity")
+				return String(localized: "Channel management", comment: "Payment description for inbound liquidity")
 			}
 		}
 	

@@ -4,6 +4,7 @@ import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.PaymentEvents
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.db.Bolt11IncomingPayment
+import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.logging.LoggerFactory
@@ -115,11 +116,16 @@ class PaymentsManager(
     }
 
     /**
-     * Returns the payment(s) that are related to a transaction id. Useful to link a commitment change in a channel to the
+     * Returns payment(s) related to a transaction id. Useful to link a commitment change in a channel to the
      * payment(s) that triggered that change.
      */
     suspend fun listPaymentsForTxId(txId: TxId): List<WalletPayment> {
         return paymentsDb().listPaymentsForTxId(txId)
+    }
+
+    /** Returns the first incoming payment related to a transaction id. Useful to find the incoming payment that triggered a liquidity purchase. */
+    suspend fun getIncomingPaymentForTxId(txId: TxId): WalletPayment? {
+        return listPaymentsForTxId(txId).filterIsInstance<IncomingPayment>().firstOrNull()
     }
 
     suspend fun getPayment(

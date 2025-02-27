@@ -44,6 +44,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import fr.acinq.lightning.db.AutomaticLiquidityPurchasePayment
 import fr.acinq.lightning.db.LightningIncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
@@ -87,12 +88,12 @@ fun PaymentLine(
             Row {
                 PaymentDescription(paymentInfo = paymentInfo, contactInfo = contactInfo, modifier = Modifier.weight(1.0f))
                 Spacer(modifier = Modifier.width(16.dp))
-                val hideAmount = payment.state() == WalletPaymentState.Failure
+                val hideAmount = payment.state() == WalletPaymentState.Failure || (payment is AutomaticLiquidityPurchasePayment && payment.incomingPaymentReceivedAt != null)
                 if (!hideAmount) {
-                    val isOutgoing = payment is OutgoingPayment
                     if (isAmountRedacted) {
                         Text(text = "****")
                     } else {
+                        val isOutgoing = payment is OutgoingPayment
                         AmountView(
                             amount = payment.amount,
                             amountTextStyle = MaterialTheme.typography.body1.copy(color = if (isOutgoing) negativeColor else positiveColor),
