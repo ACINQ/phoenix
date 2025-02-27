@@ -31,6 +31,7 @@ struct SummaryView: View {
 	let location: PaymentView.Location
 	
 	@State var paymentInfo: WalletPaymentInfo
+	@State var causedBy: Lightning_kmpWalletPayment? = nil
 	
 	@State var blockchainConfirmations: Int? = nil
 	@State var showBlockchainExplorerOptions = false
@@ -191,7 +192,7 @@ struct SummaryView: View {
 					if payment is Lightning_kmpAutomaticLiquidityPurchasePayment ||
 					   payment is Lightning_kmpManualLiquidityPurchasePayment
 					{
-						Text("Channel Resized")
+						Text("Channel management")
 					}
 					else if payment is Lightning_kmpOutgoingPayment {
 						Text("SENT")
@@ -501,6 +502,7 @@ struct SummaryView: View {
 		
 		SummaryInfoGrid(
 			paymentInfo: $paymentInfo,
+			causedBy: $causedBy,
 			showOriginalFiatValue: $showOriginalFiatValue,
 			showContactView: showContactView,
 			switchToPayment: switchToPayment
@@ -1129,6 +1131,21 @@ struct SummaryView: View {
 		log.trace("paymentInfoChanged()")
 
 		blockchainMonitorState.paymentInfoPublisher.send(paymentInfo)
+		
+		if let liquidity = paymentInfo.payment as? Lightning_kmpAutomaticLiquidityPurchasePayment {
+			Task { @MainActor in
+				do {
+					let paymentsManager = Biz.business.paymentsManager
+					causedBy = try await paymentsManager.getIncomingPaymentForTxId(txId: liquidity.txId)
+					log.debug("causedBy = \(causedBy?.id.description() ?? "<nil>")")
+				} catch {
+					log.error("listIncomingPaymentsForTxId(): error: \(error)")
+				}
+			}
+		} else {
+			log.debug("causedBy = nil (payment !is AutomaticLiquidityPurchasePayment)")
+			causedBy = nil
+		}
 	}
 	
 	// --------------------------------------------------

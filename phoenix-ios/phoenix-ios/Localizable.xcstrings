@@ -7700,9 +7700,6 @@
         }
       }
     },
-    "Automated liquidity" : {
-      "comment" : "Payment description for inbound liquidity"
-    },
     "Automatic Channel Creation" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -9814,6 +9811,9 @@
         }
       }
     },
+    "Caused by" : {
+
+    },
     "Chain mismatch" : {
       "comment" : "Error title",
       "localizations" : {
@@ -10063,7 +10063,7 @@
 
     },
     "Channel management" : {
-      "comment" : "Navigation Bar Title",
+      "comment" : "Navigation Bar Title\nPayment description for inbound liquidity",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -10104,9 +10104,6 @@
       }
     },
     "Channel operation (new or splice-in)" : {
-
-    },
-    "Channel Resized" : {
 
     },
     "Channel size impacted" : {
@@ -26110,9 +26107,6 @@
           }
         }
       }
-    },
-    "Manual liquidity" : {
-      "comment" : "Payment description for inbound liquidity"
     },
     "Manual restore" : {
       "comment" : "Navigation bar title",
@@ -42177,6 +42171,9 @@
           }
         }
       }
+    },
+    "This liquidity was required to receive a payment" : {
+
     },
     "This means you will not be able to receive payments when Phoenix is in the background. To receive payments, Phoenix must be open and in the foreground." : {
       "extractionState" : "manual",

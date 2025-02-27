@@ -11,6 +11,7 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture discussion
 	
 	@Binding var paymentInfo: WalletPaymentInfo
+	@Binding var causedBy: Lightning_kmpWalletPayment?
 	@Binding var showOriginalFiatValue: Bool
 	
 	let showContactView: (_ contact: ContactInfo) -> Void
@@ -62,6 +63,7 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 			paymentFeesRow_MinerFees()
 			paymentFeesRow_ServiceFees()
 			
+			causedByRow()
 			paymentErrorRow()
 		}
 		.padding([.leading, .trailing])
@@ -570,6 +572,53 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 			} // </HStack>
 			
 		} // </InfoGridRow>
+	}
+	
+	@ViewBuilder
+	func causedByRow() -> some View {
+		let identifier: String = #function
+		
+		if let paymentId = causedBy?.id {
+			
+			InfoGridRow(
+				identifier: identifier,
+				vAlignment: .firstTextBaseline,
+				hSpacing: horizontalSpacingBetweenColumns,
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
+			) {
+				
+				keyColumn("Caused by")
+				
+			} valueColumn: {
+				
+				HStack(alignment: VerticalAlignment.center, spacing: 6) {
+					
+					Button {
+						switchToPayment(paymentId)
+					} label: {
+						Text(verbatim: "\(paymentId.description().prefix(maxLength: 8))…")
+							.lineLimit(1)
+							.truncationMode(.middle)
+					}
+					
+					Button {
+						popoverPresent_liquidityCause.toggle()
+					} label: {
+						Image(systemName: "questionmark.circle")
+							.renderingMode(.template)
+							.foregroundColor(.secondary)
+							.font(.body)
+					}
+					.popover(present: $popoverPresent_liquidityCause) {
+						InfoPopoverWindow {
+							Text("This liquidity was required to receive a payment")
+						}
+					}
+				}
+				
+			} // </InfoGridRow>
+		}
 	}
 	
 	@ViewBuilder
