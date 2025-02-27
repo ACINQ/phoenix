@@ -144,7 +144,7 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
             )
 
             is LegacySwapInIncomingPayment -> Details(
-                Type.legacy_swap_in,
+                type = Type.legacy_swap_in,
                 amount = payment.amount,
                 feeCredit = 0.msat,
                 miningFee = payment.fees.truncateToSatoshi(),
@@ -166,7 +166,7 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
             )
 
             is OnChainIncomingPayment -> Details(
-                Type.swap_in,
+                type = Type.swap_in,
                 amount = payment.amount,
                 feeCredit = 0.msat,
                 miningFee = payment.miningFee,
@@ -177,7 +177,7 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
 
             is LightningOutgoingPayment -> when (val details = payment.details) {
                 is LightningOutgoingPayment.Details.Normal -> Details(
-                    Type.lightning_sent,
+                    type = Type.lightning_sent,
                     amount = -payment.amount,
                     feeCredit = 0.msat,
                     miningFee = 0.sat,
@@ -189,7 +189,7 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
                 )
 
                 is LightningOutgoingPayment.Details.SwapOut -> Details(
-                    Type.legacy_swap_out,
+                    type = Type.legacy_swap_out,
                     amount = -payment.amount,
                     feeCredit = 0.msat,
                     miningFee = details.swapOutFee,
@@ -200,7 +200,7 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
                 )
 
                 is LightningOutgoingPayment.Details.Blinded -> Details(
-                    Type.lightning_sent,
+                    type = Type.lightning_sent,
                     amount = -payment.amount,
                     feeCredit = 0.msat,
                     miningFee = 0.sat,
@@ -212,7 +212,7 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
             }
 
             is SpliceOutgoingPayment -> Details(
-                Type.swap_out,
+                type = Type.swap_out,
                 amount = -payment.amount,
                 feeCredit = 0.msat,
                 miningFee = payment.miningFee,
@@ -223,7 +223,7 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
             )
 
             is ChannelCloseOutgoingPayment -> Details(
-                Type.channel_close,
+                type = Type.channel_close,
                 amount = -payment.amount,
                 feeCredit = 0.msat,
                 miningFee = payment.miningFee,
@@ -234,7 +234,7 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
             )
 
             is SpliceCpfpOutgoingPayment -> Details(
-                Type.fee_bumping,
+                type = Type.fee_bumping,
                 amount = -payment.amount,
                 feeCredit = 0.msat,
                 miningFee = payment.miningFee,
@@ -245,7 +245,7 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
 
             is AutomaticLiquidityPurchasePayment -> if (payment.incomingPaymentReceivedAt == null) {
                 Details(
-                    Type.liquidity_purchase,
+                    type = Type.liquidity_purchase,
                     amount = -payment.amount,
                     feeCredit = -payment.liquidityPurchaseDetails.feeCreditUsed,
                     miningFee = payment.miningFee,
@@ -259,7 +259,7 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
             }
 
             is ManualLiquidityPurchasePayment -> Details(
-                Type.liquidity_purchase,
+                type = Type.liquidity_purchase,
                 amount = -payment.amount,
                 feeCredit = -payment.liquidityPurchaseDetails.feeCreditUsed,
                 miningFee = payment.miningFee,

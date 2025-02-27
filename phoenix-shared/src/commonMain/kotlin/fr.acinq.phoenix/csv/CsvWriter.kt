@@ -32,10 +32,6 @@ open class CsvWriter {
         addRow(*fields.toTypedArray())
     }
 
-    fun getContent(): String {
-        return sb.toString()
-    }
-
     /**
      * On Android & iOS we are currently handling the file IO separately (using native code).
      * This method allows us to dump the buffer in batches to perform file IO during the export process.

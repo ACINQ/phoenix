@@ -108,7 +108,7 @@ class CsvExportViewModel(
                     }
                 }
             }
-            val content = csvWriter.getContent()
+            val content = csvWriter.dumpAndClear()
             // create file & write to disk
             val exportDir = File(context.cacheDir, "payments")
             if (!exportDir.exists()) exportDir.mkdir()
