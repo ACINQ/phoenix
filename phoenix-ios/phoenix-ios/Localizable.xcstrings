@@ -677,6 +677,12 @@
             "state" : "new",
             "value" : "%1$@ ∙ from %2$@"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ ∙ de %2$@"
+          }
         }
       }
     },
@@ -704,6 +710,12 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$@ ∙ to %2$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ ∙ a %2$@"
           }
         }
       }
@@ -3532,6 +3544,12 @@
             "state" : "translated",
             "value" : "? Bestätigungen"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "confirmaciones"
+          }
         }
       }
     },
@@ -4181,6 +4199,12 @@
             "state" : "translated",
             "value" : "Beschleunigung von On-Chain-Transaktionen"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acelera las transacciones en la cadena"
+          }
         }
       }
     },
@@ -4402,6 +4426,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kontakte für einfache und schnelle Zahlungen hinzufügen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade contactos para pagar fácil y rápidamente"
           }
         }
       }
@@ -4828,6 +4858,12 @@
             "state" : "translated",
             "value" : "Betrag, der dem Gebührenguthaben hinzugefügt wird"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importe añadido al crédito de tasas"
+          }
         }
       }
     },
@@ -4971,6 +5007,12 @@
             "state" : "translated",
             "value" : "Erhaltene Beträge"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importe recibido"
+          }
         }
       }
     },
@@ -4993,6 +5035,12 @@
             "state" : "translated",
             "value" : "Beantragter Betrag"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importe solicitado"
+          }
         }
       }
     },
@@ -5014,6 +5062,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Übermittelter Betrag (einschließlich Gebühren)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importe enviado (tasas incluidas)"
           }
         }
       }
@@ -5602,6 +5656,12 @@
             "state" : "translated",
             "value" : "Sind Sie sicher, dass Sie fortfahren wollen?"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Estás seguro de que quieres continuar?"
+          }
         }
       }
     },
@@ -5743,6 +5803,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Achtung! Einige Fonds werden bald auslaufen und können nicht mehr getauscht werden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Atención! Algunos fondos caducarán pronto y ya no se podrán canjear."
           }
         }
       }
@@ -7382,6 +7448,12 @@
             "state" : "translated",
             "value" : "Bolt12 Rechnung"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Factura Bolt12"
+          }
         }
       }
     },
@@ -7605,6 +7677,12 @@
             "state" : "translated",
             "value" : "Kann nicht mehr getauscht werden, nach 4 Monaten Wartezeit. Diese Mittel müssen manuell ausgegeben werden."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ya no se pueden canjear, tras 4 meses de espera. Estos fondos deben gastarse manualmente."
+          }
         }
       }
     },
@@ -7706,6 +7784,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Verursacht durch"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Causado por"
           }
         }
       }
@@ -7933,6 +8017,12 @@
             "state" : "translated",
             "value" : "Kanal-ID"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Id de canal"
+          }
         }
       }
     },
@@ -7995,6 +8085,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kanalbetrieb (neu oder eingespleißt)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funcionamiento del canal (nuevo o empalmado)"
           }
         }
       }
@@ -8943,6 +9039,12 @@
             "state" : "translated",
             "value" : "Art der Schließung"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipo de cierre"
+          }
         }
       }
     },
@@ -9287,6 +9389,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Abgeschlossen am"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Completado en"
           }
         }
       }
@@ -9754,6 +9862,12 @@
             "state" : "translated",
             "value" : "Bestätigt auf der Kette"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirmado en cadena"
+          }
         }
       }
     },
@@ -9775,6 +9889,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bestätigen: "
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirmando: "
           }
         }
       }
@@ -10689,6 +10809,12 @@
             "state" : "translated",
             "value" : "Konnte keine Verbindung zum Dienst: %@"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se ha podido conectar al servicio: %@"
+          }
         }
       }
     },
@@ -10830,6 +10956,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erstellt am"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Creado en"
           }
         }
       }
@@ -11898,6 +12030,12 @@
             "state" : "translated",
             "value" : "Zahlungsverlauf und Kontakte aus meinem iCloud-Konto löschen."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar el historial de pagos y los contactos de mi cuenta de iCloud."
+          }
         }
       }
     },
@@ -12079,6 +12217,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Löschen von **Zahlungsverläufen** und **Kontakten** aus iCloud"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borrar **historial de pagos** y **contactos** de iCloud"
           }
         }
       }
@@ -12421,6 +12565,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Adresse der Hinterlegung"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dirección del depósito"
           }
         }
       }
@@ -12809,6 +12959,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tor deaktivieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desactivar Tor"
           }
         }
       }
@@ -14117,6 +14273,12 @@
             "state" : "translated",
             "value" : "Um Tor zu aktivieren, muss eine Tor-Proxy-VPN-App eines Drittanbieters wie Orbot installiert werden.\n\nDies macht Hintergrundzahlungen mit Tor viel zuverlässiger.\n\nAußerdem verwendet Phoenix jetzt immer Onion-Adressen für Lightning- und Electrum-Verbindungen, wenn Tor aktiviert ist."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para activar Tor ahora es necesario instalar una aplicación VPN Proxy Tor de terceros, como Orbot.\n\nEsto hace que los pagos en segundo plano sean mucho más fiables con Tor.\n\nAdemás, ahora Phoenix utiliza siempre direcciones cebolla para las conexiones Lightning y Electrum cuando Tor está activado."
+          }
         }
       }
     },
@@ -14865,6 +15027,12 @@
             "state" : "translated",
             "value" : "Abgelaufen: "
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Caducado: "
+          }
         }
       }
     },
@@ -15250,6 +15418,12 @@
             "state" : "translated",
             "value" : "Gescheitert"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fallido"
+          }
         }
       }
     },
@@ -15471,6 +15645,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gebührenkredit"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crédito de tasas"
           }
         }
       }
@@ -16268,6 +16448,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Endgültige Brieftasche: "
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cartera final: "
           }
         }
       }
@@ -17662,6 +17848,12 @@
             "state" : "translated",
             "value" : "Wie es funktioniert"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cómo funciona"
+          }
         }
       }
     },
@@ -18207,6 +18399,12 @@
             "state" : "translated",
             "value" : "Wenn du Tor deaktivierst, kann deine IP-Adresse verschiedenen Dienstanbietern mitgeteilt werden."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si desactivas Tor, tu dirección IP puede ser revelada a varios proveedores de servicios."
+          }
         }
       }
     },
@@ -18349,6 +18547,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wenn Sie zu einem neuen Gerät wechseln (oder die App neu installieren), gehen diese Informationen verloren."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si cambias de dispositivo (o reinstalas la aplicación), perderás esta información."
           }
         }
       }
@@ -18895,6 +19099,12 @@
             "state" : "translated",
             "value" : "Liquiditätsanforderung im Eingang (auto)"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solicitud de liquidez entrante (auto)"
+          }
         }
       }
     },
@@ -18916,6 +19126,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Liquiditätsanforderung im Eingang (manual)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solicitud de liquidez entrante (manual)"
           }
         }
       }
@@ -19180,6 +19396,12 @@
             "state" : "translated",
             "value" : "Eingehende Blitzzahlung (bolt11)"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pago relámpago entrante (bolt11)"
+          }
         }
       }
     },
@@ -19201,6 +19423,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Eingehende Blitzzahlung (bolt12)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pago relámpago entrante (bolt12)"
           }
         }
       }
@@ -19224,6 +19452,12 @@
             "state" : "translated",
             "value" : "Eingehende On-Chain-Zahlung (altes Pay-to-Open)"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pago entrante en la cadena (pago por apertura heredado)"
+          }
         }
       }
     },
@@ -19245,6 +19479,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Eingehende On-Chain-Zahlung (Legacy Swap-in)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pago entrante en la cadena (swap-in heredado)"
           }
         }
       }
@@ -19268,6 +19508,12 @@
             "state" : "translated",
             "value" : "On-Chain-Zahlungseingang (neuer Kanal)"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pago entrante en la cadena (nuevo canal)"
+          }
         }
       }
     },
@@ -19289,6 +19535,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Eingehende On-Chain-Zahlung (splice)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pago entrante en la cadena (splice)"
           }
         }
       }
@@ -19756,6 +20008,12 @@
             "state" : "translated",
             "value" : "Ungültige Adresse"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dirección no válida"
+          }
         }
       }
     },
@@ -19818,6 +20076,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ungültige Kanalparameter"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parámetros de canal no válidos"
           }
         }
       }
@@ -20121,6 +20385,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Beschreibung der Rechnung"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descripción de la factura"
           }
         }
       }
@@ -20912,6 +21182,12 @@
             "state" : "translated",
             "value" : "Lightning-Gebühren für die Weiterleitung der Zahlung. Die Zahlung erfordert %lld Hops."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tasas relámpago para encaminar el pago. El pago requiere %lld saltos."
+          }
         }
       }
     },
@@ -20982,6 +21258,12 @@
             "state" : "new",
             "value" : "Lightning fees for routing the payment. Payment was divided into %1$lld parts, using %2$lld hops."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tasas de relámpago por enrutar el pago. El pago se dividió en %1$lld partes, utilizando %2$lld saltos."
+          }
         }
       }
     },
@@ -21044,6 +21326,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Blitzzahlung"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pago relámpago"
           }
         }
       }
@@ -21230,6 +21518,12 @@
             "state" : "translated",
             "value" : "Geforderte Liquidität"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liquidez solicitada"
+          }
         }
       }
     },
@@ -21371,6 +21665,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lokales"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Local"
           }
         }
       }
@@ -21678,6 +21978,12 @@
             "state" : "translated",
             "value" : "Stellen Sie sicher, dass Ihr Tor-VPN aktiv ist und läuft."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asegúrate de que tu VPN Tor está activa y funcionando."
+          }
         }
       }
     },
@@ -21862,6 +22168,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Manuelle Liquidität"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liquidez manual"
           }
         }
       }
@@ -22698,6 +23010,12 @@
             "state" : "translated",
             "value" : "Bergwerksgebühren"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tasas mineras"
+          }
         }
       }
     },
@@ -22806,6 +23124,12 @@
             "state" : "translated",
             "value" : "Fehlende Off-Chain-Menge zu niedrig."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cantidad fuera de cadena demasiado baja."
+          }
         }
       }
     },
@@ -22868,6 +23192,12 @@
             "state" : "translated",
             "value" : "Gegenseitig"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mutua"
+          }
         }
       }
     },
@@ -22889,6 +23219,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "K.A"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "N/A"
           }
         }
       }
@@ -23315,6 +23651,12 @@
             "state" : "translated",
             "value" : "Keine Kontakte"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin contactos"
+          }
         }
       }
     },
@@ -23738,6 +24080,12 @@
             "state" : "translated",
             "value" : "Nein, ich möchte keine Zwiebeladresse verwenden"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No, no quiero utilizar una dirección cebolla"
+          }
         }
       }
     },
@@ -24082,6 +24430,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Angebot"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oferta"
           }
         }
       }
@@ -24676,6 +25030,12 @@
             "state" : "translated",
             "value" : "Ausgehende Blitzzahlung (bolt11)"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pago relámpago saliente (bolt11)"
+          }
         }
       }
     },
@@ -24697,6 +25057,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ausgehende Blitzzahlung (bolt12)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pago relámpago saliente (bolt12)"
           }
         }
       }
@@ -24720,6 +25086,12 @@
             "state" : "translated",
             "value" : "Ausgehende On-Chain-Zahlung"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pago en cadena saliente"
+          }
         }
       }
     },
@@ -24741,6 +25113,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ausgehende On-Chain-Zahlung (Legacy Swap)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pago saliente en cadena (canje heredado)"
           }
         }
       }
@@ -25206,6 +25584,12 @@
             "state" : "translated",
             "value" : "Zahler-Schlüssel"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clave del pagador"
+          }
         }
       }
     },
@@ -25348,6 +25732,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zahlungs-Hash"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hash de pago"
           }
         }
       }
@@ -25818,6 +26208,12 @@
             "state" : "translated",
             "value" : "Zahlungsverlauf und Kontakte werden nicht in iCloud gespeichert."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El historial de pagos y los contactos no se almacenan en iCloud."
+          }
         }
       }
     },
@@ -26121,6 +26517,12 @@
             "state" : "translated",
             "value" : "Zahlungsstatus"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estado del pago"
+          }
         }
       }
     },
@@ -26344,6 +26746,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Anhängig"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pendiente"
           }
         }
       }
@@ -27292,6 +27700,12 @@
             "state" : "translated",
             "value" : "Vorschaubild"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preimagen"
+          }
         }
       }
     },
@@ -27515,6 +27929,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Art des Kaufs"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipo de compra"
           }
         }
       }
@@ -28103,6 +28523,12 @@
             "state" : "translated",
             "value" : "Empfangen über"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recibido a través de"
+          }
         }
       }
     },
@@ -28530,6 +28956,12 @@
             "state" : "translated",
             "value" : "Fernbedienung"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remoto"
+          }
         }
       }
     },
@@ -28796,6 +29228,12 @@
             "state" : "translated",
             "value" : "Auflösende Blitzadresse"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resolución de la dirección del rayo"
+          }
         }
       }
     },
@@ -28817,6 +29255,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Neustart erforderlich"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reinicio necesario"
           }
         }
       }
@@ -29040,6 +29484,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Widerrufen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revocada"
           }
         }
       }
@@ -29425,6 +29875,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "QR-Code scannen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escanear código QR"
           }
         }
       }
@@ -30538,6 +30994,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Servicegebühren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tasas de servicio"
           }
         }
       }
@@ -32071,6 +32533,12 @@
             "state" : "translated",
             "value" : "Da du Tor aktiviert hast, solltest du eine Onion-Adresse für diesen Server verwenden."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Como has activado Tor, deberías utilizar una dirección onion para este servidor."
+          }
         }
       }
     },
@@ -32293,6 +32761,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ausgeben aus der endgültigen Geldbörse"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gastar del monedero final"
           }
         }
       }
@@ -32557,6 +33031,12 @@
             "state" : "translated",
             "value" : "Standard"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estándar"
+          }
         }
       }
     },
@@ -32779,6 +33259,12 @@
             "state" : "translated",
             "value" : "Erfolgreich"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Éxito"
+          }
         }
       }
     },
@@ -32800,6 +33286,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vorschläge"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sugerencias"
           }
         }
       }
@@ -33351,6 +33843,12 @@
             "state" : "translated",
             "value" : "Öffentlicher Zielschlüssel"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clave pública objetivo"
+          }
         }
       }
     },
@@ -33412,6 +33910,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Der **Zahlungsverlauf** und die **Kontakte** für diese Geldbörse werden aus Ihrem iCloud-Konto gelöscht."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El **historial de pagos** y los **contactos** de este monedero se eliminarán de tu cuenta de iCloud."
           }
         }
       }
@@ -34599,6 +35103,12 @@
             "state" : "translated",
             "value" : "Die eingegangene Rechnung ist bereits in Bearbeitung."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La factura recibida ya está en curso."
+          }
         }
       }
     },
@@ -34783,6 +35293,12 @@
             "state" : "translated",
             "value" : "Der Dienst (%@) scheint offline zu sein, oder der Server ist ausgefallen"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El servicio (%@) parece estar desconectado, o tienen un servidor caído"
+          }
         }
       }
     },
@@ -34805,6 +35321,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Der Dienst (%@) unterstützt keine Lightning-Adressen, oder kennt diesen Benutzer nicht"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El servicio (%@) no admite direcciones Lightning, o no conoce a este usuario"
           }
         }
       }
@@ -34835,6 +35357,12 @@
             "state" : "new",
             "value" : "The service (%1$@) returned error code: %2$d"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El servicio (%1$@) ha devuelto el código de error: %2$d"
+          }
         }
       }
     },
@@ -34863,6 +35391,12 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "The service (%1$@) returned error message: %2$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El servicio (%1$@) ha devuelto un mensaje de error: %2$@"
           }
         }
       }
@@ -35206,6 +35740,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Diese Mittel stammen aus geschlossenen Blitzkanälen. Sie müssen manuell ausgegeben werden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estos fondos proceden de canales cerrados de Rayo. Deben gastarse manualmente."
           }
         }
       }
@@ -36037,6 +36577,12 @@
             "state" : "translated",
             "value" : "Diese Liquidität war erforderlich, um eine Zahlung zu erhalten"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta liquidez era necesaria para recibir un pago"
+          }
         }
       }
     },
@@ -36221,6 +36767,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dazu muss eine Tor-Proxy-VPN-App eines Drittanbieters wie Orbot installiert werden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para ello es necesario instalar una aplicación VPN Tor Proxy de terceros, como Orbot."
           }
         }
       }
@@ -36928,6 +37480,12 @@
             "state" : "translated",
             "value" : "Um Ihre Zahlungskanäle zu sichern, überwacht Phoenix die Bitcoin-Blockchain über Electrum-Server.\n\nStandardmäßig werden zufällige Server verwendet. Sie können Phoenix auch so konfigurieren, dass es sich nur mit Ihrem eigenen Server verbindet."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para asegurar tus canales de pago, Phoenix monitoriza la blockchain de Bitcoin a través de los servidores de Electrum.\n\nPor defecto, se utilizan servidores aleatorios. También puedes configurar Phoenix para que se conecte sólo a tu propio servidor."
+          }
         }
       }
     },
@@ -37113,6 +37671,12 @@
             "state" : "translated",
             "value" : "Tor ist aktiviert. Dieser Server sollte eine Onion-Adresse verwenden."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tor está activado. Este servidor debe utilizar una dirección cebolla."
+          }
         }
       }
     },
@@ -37296,6 +37860,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Transaktion"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transacción"
           }
         }
       }
@@ -37642,6 +38212,12 @@
             "state" : "translated",
             "value" : "Art der Zahlung"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipo de pago"
+          }
         }
       }
     },
@@ -37784,6 +38360,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Unerwartete Nachricht"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mensaje inesperado"
           }
         }
       }
@@ -38174,6 +38756,12 @@
             "state" : "translated",
             "value" : "Unleserliche Antwort vom Dienst: %@"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Respuesta ilegible del servicio: %@"
+          }
         }
       }
     },
@@ -38558,6 +39146,12 @@
             "state" : "translated",
             "value" : "Tor verwenden"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utiliza Tor"
+          }
         }
       }
     },
@@ -38742,6 +39336,12 @@
             "state" : "translated",
             "value" : "Auf diesem Bildschirm können Sie Guthaben aus Ihrer endgültigen Brieftasche ausgeben. Diese Gelder stammen aus Kanälen, die in der Vergangenheit geschlossen wurden. Dies hat keine Auswirkungen auf Ihre bestehenden Lightning-Kanäle."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utiliza esta pantalla para gastar fondos de tu monedero final. Estos fondos proceden de canales que se han cerrado en el pasado. Esto no afecta a tus canales Lightning existentes."
+          }
         }
       }
     },
@@ -38764,6 +39364,12 @@
             "state" : "translated",
             "value" : "Verwenden Sie diesen Bildschirm, um Ihre On-Chain-Gelder auszugeben, die nicht rechtzeitig getauscht wurden. Die Swap-In-Anforderung ist jetzt abgelaufen."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utiliza esta pantalla para gastar tus fondos en la cadena que no fueron canjeados a tiempo. La solicitud de canje ha caducado."
+          }
         }
       }
     },
@@ -38785,6 +39391,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tor verwenden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar Tor"
           }
         }
       }
@@ -38887,6 +39499,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Version 2.5.0: Tor-Änderungen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versión 2.5.0: Cambios en Tor"
           }
         }
       }
@@ -39069,6 +39687,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wir warten auf eine Bestätigung, bevor wir sie in Lightning umwandeln können."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esperando confirmación primero para poder cambiarlos a Rayo."
           }
         }
       }
@@ -39331,6 +39955,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ich warte auf den Tausch: "
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esperando el intercambio: "
           }
         }
       }
@@ -40242,6 +40872,12 @@
             "state" : "new",
             "value" : "Will automatically be swapped to Lightning if the fee is **less than %1$@** (%2$@) of the amount."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se cambiará automáticamente a Rayo si la comisión es **inferior al %1$@** (%2$@) del importe."
+          }
         }
       }
     },
@@ -40263,6 +40899,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wird automatisch auf Lightning umgestellt, wenn die Gebühr **weniger als %@** beträgt."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se cambiará automáticamente a Rayo si la cuota es **menor que %@**."
           }
         }
       }
@@ -40406,6 +41048,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bleibt in der Kette, da die automatische Kanalverwaltung deaktiviert ist."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permanecerá en la cadena porque la gestión automatizada de canales está desactivada."
           }
         }
       }
@@ -41762,6 +42410,12 @@
             "state" : "translated",
             "value" : "Sie müssen Phoenix neu starten, damit die Änderungen wirksam werden."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Debes reiniciar Phoenix para que los cambios surtan efecto."
+          }
         }
       }
     },
@@ -42314,6 +42968,12 @@
             "state" : "translated",
             "value" : "Ihr Zahlungsverhalten und Ihre Kontakte werden nur auf diesem Gerät gespeichert."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu historial de pagos y tus contactos sólo se almacenan en este dispositivo."
+          }
         }
       }
     },
@@ -42335,6 +42995,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ihr Zahlungsverhalten und Ihre Kontakte werden in iCloud gespeichert."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu historial de pagos y tus contactos se almacenarán en iCloud."
           }
         }
       }
@@ -43327,6 +43993,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "bild auswählen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "elegir imagen"
           }
         }
       }
@@ -45050,6 +45722,12 @@
             "state" : "translated",
             "value" : "name, Blitzadresse, Angebot..."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nombre, dirección del rayo, oferta..."
+          }
         }
       }
     },
@@ -45354,6 +46032,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "einfügen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pegar"
           }
         }
       }
@@ -45740,6 +46424,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "qr-code scannen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "escanear código qr"
           }
         }
       }
