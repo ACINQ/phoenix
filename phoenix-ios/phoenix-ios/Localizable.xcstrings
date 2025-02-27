@@ -8347,9 +8347,6 @@
         }
       }
     },
-    "Be advised" : {
-
-    },
     "Be careful with messages from unknown sources" : {
       "localizations" : {
         "ar" : {
@@ -17086,7 +17083,7 @@
         }
       }
     },
-    "Enabling this option will force Phoenix to only connect to onion services for Lightning and Electrum. Note that a Tor proxy application is required." : {
+    "Enabling Tor now requires installing a third-party Tor Proxy VPN app such as Orbot.\n\nThis makes background payments much more reliable with Tor.\n\nAlso Phoenix now always uses onion addresses for Lightning and Electrum connections when Tor is enabled." : {
 
     },
     "End date" : {
@@ -31842,9 +31839,6 @@
         }
       }
     },
-    "Phoenix now forces onion addresses for Lightning and Electrum connections when Tor is enabled.\n\nHowever, the embedded Tor proxy has been removed ; instead you need to install a third-party Tor Proxy VPN application such as Orbot to connect." : {
-
-    },
     "Phoenix uses payment channels to make Bitcoin fast and private." : {
       "localizations" : {
         "ar" : {
@@ -42335,6 +42329,9 @@
         }
       }
     },
+    "This requires installing a third-party Tor Proxy VPN app such as Orbot." : {
+
+    },
     "This screen is a debugging tool that can be used to manually import encrypted channels data.\n\nUse with caution." : {
       "localizations" : {
         "ar" : {
@@ -43309,9 +43306,6 @@
           }
         }
       }
-    },
-    "Tor can improve privacy, but may cause performance issues and missed payments." : {
-
     },
     "Tor is disabled" : {
       "extractionState" : "stale",

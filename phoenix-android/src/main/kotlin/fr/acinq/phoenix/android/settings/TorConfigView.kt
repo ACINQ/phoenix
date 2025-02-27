@@ -101,9 +101,7 @@ fun TorConfigView(
                 val context = LocalContext.current
                 Text(text = stringResource(id = R.string.tor_settings_instructions_title), style = MaterialTheme.typography.body2)
                 Spacer(Modifier.height(8.dp))
-                Text(text = stringResource(id = R.string.tor_settings_instructions_1))
-                Spacer(Modifier.height(8.dp))
-                Text(text = stringResource(id = R.string.tor_settings_instructions_2))
+                Text(text = stringResource(id = R.string.tor_dialog_enable_details_1))
                 Spacer(Modifier.height(16.dp))
                 BorderButton(text = stringResource(id = R.string.tor_settings_instructions_help_button), icon = R.drawable.ic_external_link, onClick = { openLink(context, "https://phoenix.acinq.co/faq#how-to-use-tor-on-phoenix") })
             }
@@ -135,8 +133,6 @@ fun TorConfigView(
                         Text(text = stringResource(id = R.string.tor_dialog_enable_title_1), style = MaterialTheme.typography.h4)
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(text = stringResource(id = R.string.tor_dialog_enable_details_1))
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(text = annotatedStringResource(id = R.string.tor_dialog_enable_title_2), style = MaterialTheme.typography.h4)
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(text = annotatedStringResource(id = R.string.tor_dialog_enable_details_2))
                         Spacer(modifier = Modifier.height(16.dp))

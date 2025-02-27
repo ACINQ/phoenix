@@ -57,19 +57,10 @@ struct TorConfigurationView: View {
 			VStack(alignment: HorizontalAlignment.leading, spacing: 15) {
 				Text(
 					"""
-					With Tor enabled, Phoenix will require onion addresses \
-					for Lightning and Electrum connections.
+					This requires installing a third-party Tor Proxy VPN app such as Orbot.
 					"""
 				)
 				.padding(.top, 5)
-				
-				Text(
-					"""
-					A Tor VPN must be running on your device. \
-					This VPN is not provided by Phoenix. \
-					You need to install one.
-					"""
-				)
 				
 				HStack(alignment: VerticalAlignment.center, spacing: 0) {
 					Spacer()
