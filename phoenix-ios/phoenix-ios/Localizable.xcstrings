@@ -39,7 +39,8 @@
             "value" : ""
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     " (not available)" : {
       "localizations" : {
@@ -282,7 +283,8 @@
             "value" : "-"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "? confirmations" : {
 
@@ -325,7 +327,8 @@
             "value" : "..."
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "(additional space in bucket)" : {
       "localizations" : {
@@ -1383,52 +1386,6 @@
         }
       }
     },
-    "%@ %@" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ %2$@"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ %2$@"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ %2$@"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ %2$@"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ %2$@"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ %2$@"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ %2$@"
-          }
-        }
-      }
-    },
     "%@ ∙ from %@" : {
       "localizations" : {
         "en" : {
@@ -2341,7 +2298,8 @@
             "value" : "+"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "+%@" : {
       "extractionState" : "manual",
@@ -2580,46 +2538,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "≈ 30 minutes"
-          }
-        }
-      }
-    },
-    "≈%@" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "≈%@"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "≈%@"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "≈%@"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "≈%@"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "≈%@"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "≈%@"
           }
         }
       }

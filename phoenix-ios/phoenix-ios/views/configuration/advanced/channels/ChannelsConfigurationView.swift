@@ -150,9 +150,9 @@ struct ChannelsConfigurationView: View {
 				let remoteFiat = Utils.formatFiat(currencyPrefs, msat: remoteMsats)
 				
 				HStack(alignment: VerticalAlignment.center, spacing: 2) {
-					Text("≈\(localFiat.string)")
+					Text(verbatim: "≈\(localFiat.string)")
 					Spacer(minLength: 0)
-					Text("≈\(remoteFiat.string)")
+					Text(verbatim: "≈\(remoteFiat.string)")
 				}
 				.font(.callout)
 				.foregroundColor(.primary.opacity(0.6))
