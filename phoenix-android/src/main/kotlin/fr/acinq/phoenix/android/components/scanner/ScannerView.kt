@@ -122,7 +122,7 @@ fun BoxScope.ScannerView(
     ) {
         Spacer(Modifier.height(36.dp))
         TextWithIcon(
-            text = "Zoom or tap the QR to focus",
+            text = stringResource(R.string.scan_help),
             icon = R.drawable.ic_tap,
             textStyle = MaterialTheme.typography.body1.copy(color = Color.White),
             iconTint = Color.White,
