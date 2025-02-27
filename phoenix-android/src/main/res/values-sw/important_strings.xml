@@ -279,8 +279,7 @@
     <!-- Tor -->
 
     <string name="tor_dialog_enable_title_1">Kwa kutumia Tor</string>
-    <string name="tor_dialog_enable_details_1">Kuwasha chaguo hili kutahitaji Phoenix kutumia anwani za vitunguu inapounganisha kwenye Umeme na Electrum. Kumbuka kwamba programu ya proksi ya Tor inahitajika.</string>
-    <string name="tor_dialog_enable_title_2">Pata ushauri</string>
+    <string name="tor_dialog_enable_details_1">Hii inahitaji kusakinisha programu ya Tor Proxy VPN ya wahusika wengine kama vile Orbot.</string>
     <string name="tor_dialog_enable_details_2">Tor inaweza kuboresha faragha, lakini inaweza kusababisha matatizo ya utendakazi na kukosa malipo.</string>
     <string name="tor_dialog_disable_title">Inalemaza Kivinjari</string>
     <string name="tor_dialog_disable_details_1">Ukizima chaguo hili, anwani yako ya IP inaweza kufichuliwa kwa watoa huduma mbalimbali.</string>

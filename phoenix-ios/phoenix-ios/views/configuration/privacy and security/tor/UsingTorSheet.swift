@@ -60,17 +60,11 @@ struct UsingTorSheet: View {
 	func content_message() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 15) {
-			
 			Text(
 				"""
-				Enabling this option will force Phoenix to only connect \
-				to onion services for Lightning and Electrum. Note that a \
-				Tor proxy application is required.
+				This requires installing a third-party Tor Proxy VPN app such as Orbot.
 				"""
 			)
-			
-			Text("Be advised").font(.headline)
-			Text("Tor can improve privacy, but may cause performance issues and missed payments.")
 		}
 	}
 	

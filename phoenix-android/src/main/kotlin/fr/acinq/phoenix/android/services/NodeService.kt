@@ -246,9 +246,8 @@ class NodeService : Service() {
         val lastVersionUsed = internalData.getLastUsedAppCode.first()
         log.info("last_version_used=$lastVersionUsed")
         if (lastVersionUsed == null) {
-            if (isTorEnabled) {
-                internalData.saveShowReleaseNoteSinceCode(98)
-            }
+            // lastUsedAppCode was added in version 99, and is set up during the wallet creation. So if it's null, this Phoenix was installed prior v99 and we can show a patch note
+            internalData.saveShowReleaseNoteSinceCode(98)
         } else if (lastVersionUsed < BuildConfig.VERSION_CODE) {
              internalData.saveShowReleaseNoteSinceCode(lastVersionUsed)
         }
@@ -342,7 +341,6 @@ class NodeService : Service() {
     }
 
     private suspend fun monitorPaymentsWhenHeadless(nodeParamsManager: NodeParamsManager, currencyManager: CurrencyManager, userPrefs: UserPrefsRepository) {
-
         nodeParamsManager.nodeParams.filterNotNull().first().nodeEvents.collect { event ->
             when (event) {
                 is PaymentEvents.PaymentReceived -> {

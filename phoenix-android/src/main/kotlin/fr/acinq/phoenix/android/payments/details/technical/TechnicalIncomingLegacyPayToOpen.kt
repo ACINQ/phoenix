@@ -46,7 +46,7 @@ fun TechnicalIncomingLegacyPayToOpen(
 ) {
     Card {
         TechnicalRow(label = stringResource(id = R.string.paymentdetails_payment_type_label)) {
-            Text(text = stringResource(R.string.paymentdetails_type_incoming_legacy_swapin))
+            Text(text = stringResource(R.string.paymentdetails_type_incoming_legacy_paytopen))
         }
         TechnicalRow(label = stringResource(id = R.string.paymentdetails_status_label)) {
             Text(
