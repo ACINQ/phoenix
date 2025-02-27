@@ -688,8 +688,6 @@
     <string name="tor_settings_title">Tor</string>
     <string name="tor_settings_switch_label">Enable Tor</string>
     <string name="tor_settings_instructions_title">How it works</string>
-    <string name="tor_settings_instructions_1">With Tor enabled, Phoenix will require onion addresses for Lightning and Electrum connections.</string>
-    <string name="tor_settings_instructions_2">A Tor VPN must be running on your device. This VPN is not provided by Phoenix. You need to install one.</string>
     <string name="tor_settings_instructions_help_button">Learn more</string>
 
     <!-- home: connectivity dialog -->
