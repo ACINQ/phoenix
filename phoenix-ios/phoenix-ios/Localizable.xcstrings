@@ -41,46 +41,6 @@
         }
       }
     },
-    " " : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : " "
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : " "
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : " "
-          }
-        }
-      }
-    },
     " (not available)" : {
       "localizations" : {
         "ar" : {
@@ -447,132 +407,6 @@
         }
       }
     },
-    "(Bitcoin address)" : {
-      "comment" : "Type of text being copied",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(عنوان البيتكوين)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(Bitcoinová adresa)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(Bitcoin-Adresse)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(Dirección Bitcoin)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(Dirección de Bitcoin)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(adresse Bitcoin)"
-          }
-        }
-      }
-    },
-    "(completed) of (total)" : {
-      "comment" : "Upload progress information",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(completed) من (total)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(dokončeno) z (celkem)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(completed) von (total)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(completed) de (total)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(completed) de (total)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(completed) sur (total)"
-          }
-        }
-      }
-    },
-    "(completed) of (total), pushing batch of (inFlight)" : {
-      "comment" : "Upload progress information",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(completed) من (total)، يتم دفع مجموعة من (inFlight)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(dokončeno) z (celkem), posílání (inFlight)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(completed) von (total), schiebende Charge von (inFlight)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(completed) de (total), subiendo en grupos de (inFlight)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(completed) de (total), insertando lote de (inFlight)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(completed) sur (total), batch de (inFlight)"
-          }
-        }
-      }
-    },
     "(count) in-flight outgoing payments" : {
       "comment" : "Recent payments footer",
       "extractionState" : "manual",
@@ -611,300 +445,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "(count) paiements sortants en cours"
-          }
-        }
-      }
-    },
-    "(count) payments within the last 2 hours" : {
-      "comment" : "Recent payments footer",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) المدفوعات خلال آخر ساعتين"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) zaplacení za poslední 2 hodiny"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) Zahlungen innerhalb der letzten 2 Stunden"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) pagos en las últimas 2 horas"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) pagos en las últimas 2 horas"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) paiements les 2 dernières heures"
-          }
-        }
-      }
-    },
-    "(count) payments within the last 3 days" : {
-      "comment" : "Recent payments footer",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) المدفوعات خلال آخر 3 أيام"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) zaplacení za poslední 3 dny"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) Zahlungen innerhalb der letzten 3 Tage"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) pagos en los últimos 3 días"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) pagos en los últimos 3 días"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) paiements les 3 derniers jours"
-          }
-        }
-      }
-    },
-    "(count) payments within the last 7 days" : {
-      "comment" : "Recent payments footer",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) المدفوعات خلال آخر 7 أيام"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) zaplacení za posledních 7 dní"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) Zahlungen innerhalb der letzten 7 Tage"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) pagos en los últimos 7 días"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) pagos en los últimos 7 días"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) paiements les 7 derniers jours"
-          }
-        }
-      }
-    },
-    "(count) payments within the last 10 minutes" : {
-      "comment" : "Recent payments footer",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) المدفوعات خلال آخر 10 دقائق"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) zaplacení za posledních 10 minut"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) Zahlungen innerhalb der letzten 10 Minuten"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) pagos en los últimos 10 minutos"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) pagos en los últimos 10 minutos"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) paiements ces 10 dernières minutes"
-          }
-        }
-      }
-    },
-    "(count) payments within the last 24 hours" : {
-      "comment" : "Recent payments footer",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) المدفوعات خلال ال 24 ساعة الماضية"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) zaplacení za posledních 24 hodin"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) Zahlungen innerhalb der letzten 24 Stunden"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) pagos en las últimas 24 horas"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) pagos en las últimas 24 horas"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) paiements ces 24 dernières heures"
-          }
-        }
-      }
-    },
-    "(count) payments within the last minute" : {
-      "comment" : "Recent payments footer",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) المدفوعات خلال اللحظة الأخيرة"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) zaplacení za poslední minutu"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) Zahlungen innerhalb der letzten Minute"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) pagos en el último minuto"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) pagos en el último minuto"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(count) paiements il y a moins d'une minute"
-          }
-        }
-      }
-    },
-    "(derived from your seed)" : {
-      "comment" : "Type of text being copied.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(مشتق من عبارة الاسترداد الخاصة بك)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(odvozeno z vašeho seedu)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(abgeleitet von deinem Samen)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(derivado de tu semilla)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(derivada de tu semilla)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(dérivée de votre clé)"
           }
         }
       }
@@ -1234,47 +774,6 @@
         }
       }
     },
-    "(QR code)" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(رمز QR)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(QR kód)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(QR-Code)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(codigo QR)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(Código QR)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(QR code)"
-          }
-        }
-      }
-    },
     "(recommended)" : {
       "comment" : "translate: recommended",
       "localizations" : {
@@ -1472,131 +971,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "(Cette adresse vous appartient et est dérivée de votre clé. Vous seul en avez possession)"
-          }
-        }
-      }
-    },
-    "(totalPaymentCount) in-flight payments" : {
-      "comment" : "Recent payments footer",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(totalPaymentCount) المدفوعات على متن الطائرة"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(totalPaymentCount) platby během letu"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(totalPaymentCount) Zahlungen während des Fluges"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(totalPaymentCount) pagos en camino"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(totalPaymentCount) pagos en curso"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(totalPaymentCount) paiements en cours"
-          }
-        }
-      }
-    },
-    "(totalPaymentCount) recent payments" : {
-      "comment" : "Recent payments footer",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(totalPaymentCount) المدفوعات الأخيرة"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(totalPaymentCount) nedávné platby"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(totalPaymentCount) letzte Zahlungen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(totalPaymentCount) pagos recientes"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(totalPaymentCount) pagos recientes"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(totalPaymentCount) paiements récents"
-          }
-        }
-      }
-    },
-    "(you provided this address)" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(لقد قدمت انت هذا العنوان)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(uvedli jste tuto adresu)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(du hast diese Adresse angegeben)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(proporcionaste esta dirección)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(proporcionaste esta dirección)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(vous avez fourni cette adresse)"
           }
         }
       }
@@ -1965,100 +1339,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@"
-          }
-        }
-      }
-    },
-    "%@ - from %@" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$$$@ - من %2$$$@"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ - od %2$@"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ - von %2$@"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ - from %2$@"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ - de %2$@"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ - de %2$@"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ - de %2$@"
-          }
-        }
-      }
-    },
-    "%@ - to %@" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$$$@ - إلى %2$$$@"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ - na %2$@"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ - bis %2$@"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ - to %2$@"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ - a %2$@"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ - a %2$@"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ - à %2$@"
           }
         }
       }
@@ -3063,48 +2343,6 @@
         }
       }
     },
-    "+(amount.string) inbound liquidity" : {
-      "comment" : "Payment description for inbound liquidity",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "+(amount.string) سيولة داخلية "
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "+(amount.string) příchozí likvidita"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "+(amount.string) eingehende Liquidität"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "+(amount.string) liquidez entrante"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "+(amount.string) liquidez entrante"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "+(amount.string) liquidité entrante"
-          }
-        }
-      }
-    },
     "+%@" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3142,48 +2380,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "+%@"
-          }
-        }
-      }
-    },
-    "+%@ inbound liquidity" : {
-      "comment" : "Payment description for inbound liquidity",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "+%* السيولة الواردة"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "+%@ příchozí likvidita"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "+%@ eingehende Liquidität"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "+%@ liquidez entrante"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "+%@ liquidez entrante"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "+%@ de liquidité entrante"
           }
         }
       }
@@ -5644,90 +4840,6 @@
         }
       }
     },
-    "address" : {
-      "comment" : "Label in DetailsView_IncomingPayment",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "العنوان"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "adresa"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "adresse"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "dirección"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "dirección"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "adresse"
-          }
-        }
-      }
-    },
-    "address type" : {
-      "comment" : "Label in DetailsView_IncomingPayment",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "نوع العنوان"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Typ adresy"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "adresstyp"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tipo de dirección"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "tipo de dirección"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Type d’adresse"
-          }
-        }
-      }
-    },
     "Advanced" : {
       "localizations" : {
         "ar" : {
@@ -6255,258 +5367,6 @@
         }
       }
     },
-    "Amount must be (exactBitcoin.string)" : {
-      "comment" : "error message",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "يجب أن يكون المبلغ (exactBitcoin.string)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Částka musí být (exactBitcoin.string)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Betrag muss (exactBitcoin.string) sein"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La cantidad debe ser (exactBitcoin.string)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El importe debe ser (exactBitcoin.string)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le montant doit être (exactBitcoin.string)"
-          }
-        }
-      }
-    },
-    "Amount must be (exactBitcoin.string) (≈ (approxFiat.string))" : {
-      "comment" : "error message",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "يجب أن يكون المبلغ (exactBitcoin.string) (≈ (approxFiat.string))"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Částka musí být (exactBitcoin.string) (≈ (approxFiat.string))"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Betrag muss (exactBitcoin.string) (≈ (approxFiat.string)) sein"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La cantidad debe ser (exactBitcoin.string) (≈ (approxFiat.string))"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El importe debe ser (exactBitcoin.string) (≈ (approxFiat.string))"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le montant doit être (exactBitcoin.string) (≈ (approxFiat.string))"
-          }
-        }
-      }
-    },
-    "Amount must be at least (minBitcoin.string)" : {
-      "comment" : "error message",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "يجب أن يكون المبلغ على الأقل (minBitcoin.string)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Částka musí být alespoň (minBitcoin.string)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Betrag muss mindestens (minBitcoin.string) sein"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La cantidad debe ser al menos (minBitcoin.string)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El importe debe ser al menos (minBitcoin.string)."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le montant doit être au moins (minBitcoin.string)"
-          }
-        }
-      }
-    },
-    "Amount must be at least (minBitcoin.string) (≈ (approxFiat.string))" : {
-      "comment" : "error message",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "يجب أن يكون المبلغ على الأقل (minBitcoin.string) (≈ (approxFiat.string))"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Částka musí být alespoň (minBitcoin.string) (≈ (approxFiat.string))"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Betrag muss mindestens (minBitcoin.string) (≈ (approxFiat.string)) betragen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La cantidad debe ser al menos (minBitcoin.string) (≈ (approxFiat.string))"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El importe debe ser como mínimo (minBitcoin.string) (≈ (approxFiat.string))"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le montant doit être au moins (minBitcoin.string) (≈ (approxFiat.string))"
-          }
-        }
-      }
-    },
-    "Amount must be at most (maxBitcoin.string)" : {
-      "comment" : "error message",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "يجب ألا يتجاوز المبلغ (maxBitcoin.string)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Částka musí být nejvýše (maxBitcoin.string)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Betrag darf höchstens (maxBitcoin.string) sein"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La cantidad debe ser como máximo (maxBitcoin.string)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El importe debe ser como máximo (maxBitcoin.string)."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le montant ne peut excéder (maxBitcoin.string)"
-          }
-        }
-      }
-    },
-    "Amount must be at most (maxBitcoin.string) (≈ (approxFiat.string))" : {
-      "comment" : "error message",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "يجب ألا يتجاوز المبلغ (maxBitcoin.string) (≈ (approxFiat.string))"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Částka musí být nejvýše (maxBitcoin.string) (≈ (approxFiat.string))"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Betrag darf höchstens (maxBitcoin.string) (≈ (approxFiat.string)) betragen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La cantidad debe ser como máximo (maxBitcoin.string) (≈ (approxFiat.string))"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El importe debe ser como máximo (maxBitcoin.string) (≈ (approxFiat.string))"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le montant doit être au plus (maxBitcoin.string) (≈ (approxFiat.string))"
-          }
-        }
-      }
-    },
     "amount received" : {
       "comment" : "Label in DetailsView_IncomingPayment",
       "localizations" : {
@@ -6594,48 +5454,6 @@
     },
     "Amount requested" : {
 
-    },
-    "amount sent" : {
-      "comment" : "Label in DetailsView_IncomingPayment",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "المبلغ المرسل"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "odeslaná částka"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "gesendeter Betrag"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "cantidad enviada"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "importe enviado"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "montant envoyé"
-          }
-        }
-      }
     },
     "Amount sent (fees included)" : {
 
@@ -8302,48 +7120,6 @@
         }
       }
     },
-    "Base amount: (amountBitcoin), ≈(amountFiat)" : {
-      "comment" : "VoiceOver label: PaymentSummaryView",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "المبلغ الأساسي: (amountBitcoin), ≈(amountFiat)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Základní hodnota: (amountBitcoin), ≈(amountFiat)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Grundbetrag: (amountBitcoin), ≈(amountFiat)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cantidad base: (amountBitcoin), ≈(amountFiat)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Importe de base: (amountBitcoin), ≈(amountFiat)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Montant de base: (amountBitcoin), ≈(amountFiat)"
-          }
-        }
-      }
-    },
     "Be careful with messages from unknown sources" : {
       "localizations" : {
         "ar" : {
@@ -8660,48 +7436,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bitcoin"
-          }
-        }
-      }
-    },
-    "bitcoin address" : {
-      "comment" : "Label in DetailsView_IncomingPayment",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "عنوان بيتكوين"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "bitcoinová adresa"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "bitcoin-Adresse"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dirección Bitcoin"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "dirección de Bitcoin"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "adresse Bitcoin"
           }
         }
       }
@@ -9032,47 +7766,6 @@
         }
       }
     },
-    "bitcoin txid" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "البيتكوين txid"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "bitcoin txid"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "bitcoin txid"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "bitcoin txid"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "bitcoin txid"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "bitcoin txid"
-          }
-        }
-      }
-    },
     "Bitcoin unit" : {
       "comment" : "Navigation bar title",
       "localizations" : {
@@ -9358,88 +8051,6 @@
         }
       }
     },
-    "broadcast at" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "البث على"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "vysílání na"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "gesendet bei"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "fecha de transmisión"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "transmisión"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "émis à"
-          }
-        }
-      }
-    },
-    "Bump Fee (CPFP)" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "رسوم الترقية (CPFP)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Urychlení plateb (CPFP)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bump Fee (CPFP)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aumentar las tarifas (CPFP)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Comisión de impulso (CPFP)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Augmenter les frais (CPFP)"
-          }
-        }
-      }
-    },
     "Bump fees" : {
       "comment" : "Payment description for splice CPFP",
       "localizations" : {
@@ -9477,47 +8088,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Accélérer les transactions"
-          }
-        }
-      }
-    },
-    "By default, Phoenix connects to random Electrum servers in order to access the Bitcoin blockchain. You can also choose to connect to your own Electrum server." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "بشكل افتراضي، يتصل Phoenix بخوادم Electrum عشوائية لأجل الوصول إلى سلسلة كتل البيتكوين. يمكنك أيضًا اختيار الاتصال بخادم Electrum الخاص بك."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ve výchozím nastavení se Phoenix připojuje k náhodným Electrum serverům, aby získal přístup k bitcoinovému blockchainu. Můžete si také zvolit připojit se k vlastnímu serveru Electrum."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Standardmäßig verbindet sich Phoenix mit zufälligen Electrum-Servern, um auf die Bitcoin-Blockchain zuzugreifen. Du kannst dich aber auch mit deinem eigenen Electrum-Server verbinden."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Por defecto Phoenix se conecta a servidores Electrum aleatorios para acceder a la cadena de bloques de Bitcoin. También puede optar por conectarse a su propio servidor Electrum."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Phoenix se conecta de manera predeterminada a servidores aleatorios de Electrum con el fin de acceder a la cadena de bloques de Bitcoin. También puedes optar por conectarte a tu propio servidor de Electrum."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pour accéder à la blockchain Bitcoin, Phoenix se connecte à des serveurs Electrum choisis de façon aléatoire. Vous pouvez également choisir de ne vous connecter qu’à un seul serveur en particulier."
           }
         }
       }
@@ -10300,47 +8870,6 @@
         }
       }
     },
-    "Channels initializing..." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تهيئة القنوات..."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inicializace kanálů..."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kanäle werden initialisiert..."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Canales inicializándose..."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Canales inicializándose..."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Initialisation des canaux"
-          }
-        }
-      }
-    },
     "Channels with less than the Bitcoin dust limit (546 satoshi) cannot be migrated. Their balance go to the bitcoin miners." : {
       "localizations" : {
         "ar" : {
@@ -10664,47 +9193,6 @@
     },
     "choose image" : {
       "comment" : "button label - try to make it short"
-    },
-    "Choose image" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "اختر الصورة"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Výběr obrázku"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bild auswählen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Elige imagen"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Elegir imagen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choisir une image"
-          }
-        }
-      }
     },
     "Choose payment type" : {
       "localizations" : {
@@ -11148,48 +9636,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fermer la page"
-          }
-        }
-      }
-    },
-    "Closing Status" : {
-      "comment" : "Title in DetailsView_IncomingPayment",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "حالة الإغلاق"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Status zavírání"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abschlussstatus"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Estado de cierre"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Estado de cierre"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Statut de la fermeture"
           }
         }
       }
@@ -12050,47 +10496,6 @@
         }
       }
     },
-    "confirmed at" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تم التأكيد في"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "potvrzeno na"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "bestätigt am"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "confirmado en"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "confirmado a las"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "confirmé à"
-          }
-        }
-      }
-    },
     "Confirmed Balance" : {
       "localizations" : {
         "ar" : {
@@ -12747,48 +11152,6 @@
         }
       }
     },
-    "Copied QR code image to pasteboard!" : {
-      "comment" : "Toast message",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تم نسخ صورة رمز QR إلى الحافظة!"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Obrázek QR kódu byl zkopírován do schránky!"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kopiere das QR-Code-Bild auf die Pinnwand!"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Se copió la imagen de código QR en Pasteboard!"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Se copió la imagen del código QR al área de pegado"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "QR code copié dans le presse-papiers !"
-          }
-        }
-      }
-    },
     "Copied to pasteboard!" : {
       "comment" : "Toast message",
       "localizations" : {
@@ -12991,47 +11354,6 @@
         }
       }
     },
-    "Copy Image (QR code)" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "نسخ الصورة (رمز الاستجابة السريعة)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kopírování obrázku (QR kód)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bild kopieren (QR-Code)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copiar imagen (código QR)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copiar imagen (código QR)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copier le QR code"
-          }
-        }
-      }
-    },
     "Copy link" : {
       "localizations" : {
         "ar" : {
@@ -13108,129 +11430,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Options de copie"
-          }
-        }
-      }
-    },
-    "Copy Text" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "نسخ النص"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kopírovat text"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Text kopieren"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copiar texto"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copiar texto"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copier le texte"
-          }
-        }
-      }
-    },
-    "Copy Text (bitcoin address)" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "نسخ النص (عنوان البيتكوين)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kopírovat text (bitcoinová adresa)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Text kopieren (Bitcoin-Adresse)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copiar texto (dirección bitcoin)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copiar texto (dirección de Bitcoin)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copier le text (adresse Bitcoin)"
-          }
-        }
-      }
-    },
-    "Copy Text (lightning invoice)" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "نسخ النص (فاتورة البرق)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kopírovat text (blesková faktura)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Text kopieren (Blitzrechnung)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copiar texto (factura lightning)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copiar texto (factura de Lightning)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copier le texte (requête Lightning)"
           }
         }
       }
@@ -13393,48 +11592,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erreur de connexion au service"
-          }
-        }
-      }
-    },
-    "Could not connect to service: (origin)" : {
-      "comment" : "Error message - scanning lightning invoice",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تعذر الاتصال بالخدمة: (origin)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nelze se připojit ke službě: (origin)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Konnte keine Verbindung zum Dienst herstellen: (origin)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No se pudo conectar al servicio: (origin)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No se pudo conectar al servicio: (origin)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Impossible de se connecter au service: (origin)"
           }
         }
       }
@@ -14573,47 +12730,6 @@
     "Delete payment history and contacts from my iCloud account." : {
 
     },
-    "Delete payment history from my iCloud account." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "حذف سجل المدفوعات من حسابي على iCloud."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Odstranění historie plateb z mého účtu iCloud."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Das Zahlungsverhalten aus meinem iCloud-Konto löschen."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Eliminar el historial de pagos de mi cuenta de iCloud."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Borrar el historial de pagos en la cuenta de iCloud."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Supprimer l'historique de paiement de mon compte iCloud."
-          }
-        }
-      }
-    },
     "Delete payment?" : {
       "localizations" : {
         "ar" : {
@@ -14816,47 +12932,6 @@
     },
     "Deleting **payment history** and **contacts** from iCloud" : {
 
-    },
-    "Deleting **payment history** from iCloud" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "حذف **سجل المدفوعات** من iCloud"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Odstranění **historie plateb** z iCloudu"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Löschen der **Zahlungshistorie** aus der iCloud"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Eliminando **historial de pagos** de iCloud"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Borrando **historial de pagos** de iCloud"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Suppression de **l'historique des paiements** d'iCloud"
-          }
-        }
-      }
     },
     "Deleting **recovery phrase** from iCloud" : {
       "localizations" : {
@@ -15626,47 +13701,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rejeter les modifications"
-          }
-        }
-      }
-    },
-    "Discard Changes" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تجاهل التغييرات"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Změny vyřazování"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Änderungen verwerfen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Descartar los cambios"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Descartar cambios"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Annuler les changements"
           }
         }
       }
@@ -16635,48 +14669,6 @@
         }
       }
     },
-    "Edit Payment" : {
-      "comment" : "Navigation bar title",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تحرير الدفع"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Upravit platbu"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zahlung bearbeiten"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar Pago"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar pago"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Éditer le paiement"
-          }
-        }
-      }
-    },
     "Edit payment request" : {
       "localizations" : {
         "ar" : {
@@ -17119,47 +15111,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Date de fin"
-          }
-        }
-      }
-    },
-    "Enter a Lightning invoice, LNURL, or Lightning address you want to send money to." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "أدخل فاتورة برق أو LNURL أو عنوان برق تريد إرسال الأموال إليه."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zadejte Lightningovou fakturu, LNURL nebo Lightningovou adresu na kterou chcete poslat peníze."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gib eine Lightning-Rechnung, LNURL oder Lightning-Adresse ein, an die du Geld senden möchtest."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ingrese una factura Lightning, LNURL o una dirección Lightning a la que desea enviar dinero."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ingresa una factura de Lightning, LNURL o dirección de Lightning a la que quieras enviar dinero."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saisissez une requête Lightning, une LNURL ou une adresse Lightning que vous souhaitez payer."
           }
         }
       }
@@ -18216,47 +16167,6 @@
         }
       }
     },
-    "External" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "خارجي"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Externí"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Extern"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Externo"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Externo"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Externe"
-          }
-        }
-      }
-    },
     "Face ID" : {
       "localizations" : {
         "ar" : {
@@ -18908,48 +16818,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Les frais sont actuellement estimés aux alentours de **%1$@** (≈ %2$@)."
-          }
-        }
-      }
-    },
-    "fees paid" : {
-      "comment" : "Label in DetailsView_IncomingPayment",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الرسوم المدفوعة"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "zaplacené poplatky"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "gezahlte Gebühren"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tarifas pagadas"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "comisiones pagadas"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "frais payés"
           }
         }
       }
@@ -20046,47 +17914,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "transaction de création"
-          }
-        }
-      }
-    },
-    "funding txid" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تمويل txid"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "financování txid"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "finanzierung txid"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ID de transacción de financiación"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "identificador de la transacción de financiación"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "identifiant de la tx de création"
           }
         }
       }
@@ -21953,47 +19780,6 @@
     "If you switch to a new device (or reinstall the app) then you'll lose this information." : {
 
     },
-    "If you switch to a new device (or reinstall the app) then you'll lose your payment history." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "إذا قمت بالانتقال إلى جهاز جديد (أو أعدت تثبيت التطبيق)، فستفقد سجل المدفوعات الخاص بك."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pokud měníte zařízení (nebo reinstalujete aplikaci), tak ztratíte svou historii plateb."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wenn du zu einem neuen Gerät wechselst (oder die App neu installierst), verlierst du dein Zahlungsverhalten."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Si cambia a un nuevo dispositivo (o reinstala la aplicación), perderá su historial de pagos."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Si cambias de dispositivo (o reinstalas la aplicación), perderás el historial de pagos."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Si vous changez de téléphone (ou réinstallez l’appli), vous perdrez l’historique de vos paiements."
-          }
-        }
-      }
-    },
     "If you're planning on deleting your wallet data, we recommend waiting until after the closing transactions have been confirmed on the blockchain." : {
       "localizations" : {
         "ar" : {
@@ -23307,48 +21093,6 @@
     "Invalid address" : {
       "comment" : "Connection state"
     },
-    "Invalid BIP353 DNS address" : {
-      "comment" : "Error message - dns record contains an invalid offer",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "عنوان BIP353 DNS غير صالح"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Neplatná adresa DNS BIP353"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ungültige DNS-Adresse des BIP353"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dirección DNS BIP353 no válida"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dirección DNS BIP353 no válida"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Adresse DNS BIP353 invalide"
-          }
-        }
-      }
-    },
     "Invalid bitcoin address" : {
       "comment" : "Error message - parsing bitcoin address",
       "localizations" : {
@@ -23752,48 +21496,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "requête"
-          }
-        }
-      }
-    },
-    "invoice created" : {
-      "comment" : "Label in DetailsView_IncomingPayment",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تم إنشاء الفاتورة"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "faktura vytvořena"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "rechnung erstellt"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "factura creada"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "factura creada"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "requête créée"
           }
         }
       }
@@ -24447,47 +22149,6 @@
         }
       }
     },
-    "Less options" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "خيارات أقل"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Méně možností"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Weniger Optionen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Menos opciones"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Menos opciones"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Plus d'options"
-          }
-        }
-      }
-    },
     "Light" : {
       "comment" : "App theme option",
       "localizations" : {
@@ -24569,47 +22230,6 @@
         }
       }
     },
-    "lightning fee" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "رسوم البرق"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "poplatek za blesk"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "blitzschutzgebühr"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tarifa de Lightning "
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "comisión de Lightning"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "frais lightning"
-          }
-        }
-      }
-    },
     "Lightning fee" : {
       "localizations" : {
         "ar" : {
@@ -24646,48 +22266,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Frais Lightning"
-          }
-        }
-      }
-    },
-    "Lightning fee amount: (percent), (amountBitcoin), ≈(amountFiat)" : {
-      "comment" : "VoiceOver label: PaymentSummaryView",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "مبلغ رسوم البرق: (percent) (amountBitcoin) ، ، ≈(amountFiat)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Výše poplatku za blesk: (percent), (amountBitcoin), ≈(amountFiat)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lightning-Gebühr Betrag: (percent), (amountBitcoin), ≈(amountFiat)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Monto de la tarifa Lightning: (percent), (amountBitcoin), ≈(amountFiat)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Importe de la comisión de Lightning: (percent), (amountBitcoin), ≈(amountFiat)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Montant des frais Lightning : (percent), (amountBitcoin), ≈(amountFiat)"
           }
         }
       }
@@ -24733,48 +22311,6 @@
         }
       }
     },
-    "Lightning fees for routing the payment. Payment required %d hops." : {
-      "comment" : "Fees explanation",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "رسوم شبكة البرق لتمرير المبلغ. تطلب دفع هذه الفاتورة المرور بـ%d خطوات."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lightning poplatky za směrování platby. Platba vyžadovuje %d skoků."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lightning-Gebühren für die Weiterleitung der Zahlung. Die Zahlung benötigt %d Hops."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tarifas de Lightning para enrutar el pago. El pago requirió %d saltos."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Comisiones de Lightning para enrutar el pago. El pago requirió %d saltos."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Frais de routage Lightning. Le paiement a nécessité %d sauts."
-          }
-        }
-      }
-    },
     "Lightning fees for routing the payment. Payment required %lld hops." : {
       "comment" : "Fees explanation"
     },
@@ -24815,48 +22351,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Frais de routage Lightning. Le paiement a nécessité 1 saut."
-          }
-        }
-      }
-    },
-    "Lightning fees for routing the payment. Payment was divided into %d parts, using %d hops." : {
-      "comment" : "Fees explanation",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "رسوم شبكة البرق لتمرير المبلغ. تم تقسيم الدفعة إلى %d أجزاء، عن طريق المرور بـ%d خطوات."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lightning poplatky za směrování platby. Platba byla rozdělena na %d částí, pomocí %d skoků. "
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lightning-Gebühren für die Weiterleitung der Zahlung. Die Zahlung wurde in %d Teile aufgeteilt, wobei %d Hops verwendet wurden."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tarifas de Lightning para enrutar el pago. El pago fue dividido en %d partes, usando %d saltos. "
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Comisiones de Lightning para enrutar el pago. El pago se dividió en %d partes y requirió %d saltos."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Frais de routage Lightning. Le paiement a été divisé en %1$d parties et fait %2$d sauts."
           }
         }
       }
@@ -24950,47 +22444,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lightning Invoice"
-          }
-        }
-      }
-    },
-    "Lightning network" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "شبكة البرق"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sít Lightning"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Blitz-Netzwerk"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Red Lightning"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Red de Lightning"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Réseau Lightning"
           }
         }
       }
@@ -25282,88 +22735,6 @@
         }
       }
     },
-    "Liquidity Added" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "السيولة المضافة"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Přidaná likvidita"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zusätzliche Liquidität"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Liquidez añadida"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Liquidez añadida"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Liquidité ajoutée"
-          }
-        }
-      }
-    },
-    "liquidity amount" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "مبلغ السيولة"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "výše likvidity"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "liquiditätsbetrag"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "importe de liquidez"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "importe de liquidez"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "montant de la liquidité"
-          }
-        }
-      }
-    },
     "Liquidity requested" : {
 
     },
@@ -25443,47 +22814,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "lnurl-auth"
-          }
-        }
-      }
-    },
-    "lnurl-pay" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "lnurl-pay"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "lnurl-pay"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "lnurl-pay"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "lnurl-pay"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "lnurl-pay"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "lnurl-pay"
           }
         }
       }
@@ -26016,88 +23346,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sauvegarde manuelle"
-          }
-        }
-      }
-    },
-    "Manual input" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "إدخال يدوي"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ruční zadávání"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Manuelle Eingabe"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Entrada manual"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ingreso manual"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saisie manuelle"
-          }
-        }
-      }
-    },
-    "Manual Input" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "إدخال يدوي"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ruční zadávání"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Manuelle Eingabe"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Entrada manual"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Introducción manual"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saisie manuelle"
           }
         }
       }
@@ -26957,47 +24205,6 @@
         }
       }
     },
-    "miner fee" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "رسوم عامل المنجم"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "poplatek za těžbu"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "knappschaftsgebühr"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "tarifa de minero"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "comisión de minería"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "frais de minage"
-          }
-        }
-      }
-    },
     "Miner fee" : {
       "localizations" : {
         "ar" : {
@@ -27078,48 +24285,6 @@
         }
       }
     },
-    "Miner fee amount: (percent), (amountBitcoin), ≈(amountFiat)" : {
-      "comment" : "VoiceOver label: PaymentSummaryView",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "مبلغ رسوم التعدين: (percent) (amountBitcoin) ، ، ≈(amountFiat)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Velikost poplatku těžaře: (percent), (amountBitcoin), ≈(amountFiat)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Betrag der Miner-Gebühr: (percent), (amountBitcoin), ≈(amountFiat)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Monto de la tarifa del miner: (percent), (amountBitcoin), ≈(amountFiat)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Importe de la comisión de minería: (percent), (amountBitcoin), ≈(amountFiat)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Montant des frais de minage : (percent), (amountBitcoin), ≈(amountFiat)"
-          }
-        }
-      }
-    },
     "Miner fee:" : {
       "localizations" : {
         "ar" : {
@@ -27156,47 +24321,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Frais de minage :"
-          }
-        }
-      }
-    },
-    "miner fees" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "رسوم عمال المناجم"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "poplatky horníků"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "knappschaftsgebühren"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "tarifas de minero"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "comisiones de minería"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "frais de minage"
           }
         }
       }
@@ -27370,47 +24494,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Modifier"
-          }
-        }
-      }
-    },
-    "More options" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "المزيد من الخيارات"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Další možnosti"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mehr Optionen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mas opciones"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Más opciones"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Plus d'options"
           }
         }
       }
@@ -27662,47 +24745,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "NOUVEAU"
-          }
-        }
-      }
-    },
-    "New Channel (auto-created)" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "قناة جديدة (تم إنشاؤها تلقائيًا)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nový kanál (automaticky vytvořen)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Neuer Kanal (automatisch erstellt)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nuevo canal (creado automáticamente)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nuevo canal (autocreado)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nouveau canal (créé automatiquement)"
           }
         }
       }
@@ -29590,47 +26632,6 @@
         }
       }
     },
-    "Paste from clipboard" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "لصق من الحافظة"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vložit ze schránky"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Einfügen aus der Zwischenablage"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pegar desde el portapapeles"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pegar desde el portapapeles"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Coller depuis le presse-papiers."
-          }
-        }
-      }
-    },
     "Path" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -29748,170 +26749,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Payer"
-          }
-        }
-      }
-    },
-    "Pay " : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الراتب "
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Platit "
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bezahlen "
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pagar "
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pagar"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Payer"
-          }
-        }
-      }
-    },
-    "Pay %@" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الدفع %@"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Plat %@"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bezahlen %@"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pagar %@"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pagar %@"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Payer %@"
-          }
-        }
-      }
-    },
-    "Pay %@ " : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الدفع %@ "
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Plat %@ "
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bezahlen %@ "
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pagar %@ "
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pagar %@"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Payer %@"
-          }
-        }
-      }
-    },
-    "Pay Invoice" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "دفع الفاتورة"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zaplatit fakturu"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rechnung bezahlen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pagar factura"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pagar factura"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Payer la requête"
           }
         }
       }
@@ -30284,47 +27121,6 @@
         }
       }
     },
-    "payment description" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "وصف الدفع"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "popis platby"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "zahlungsbeschreibung"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "descripción de pago"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "descripción del pago"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "description du paiement"
-          }
-        }
-      }
-    },
     "Payment Details" : {
       "comment" : "Navigation bar title",
       "localizations" : {
@@ -30362,47 +27158,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Détails du paiement"
-          }
-        }
-      }
-    },
-    "Payment Failed" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "فشل الدفع"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Platba se nezdařila"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zahlung fehlgeschlagen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pago fallido"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pago fallido"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Échec du paiement"
           }
         }
       }
@@ -30573,47 +27328,6 @@
     },
     "Payment history and contacts not stored in iCloud." : {
 
-    },
-    "Payment history not stored in iCloud." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "لا يتم تخزين سجل الدفع في iCloud."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Historie plateb není uložena v iCloudu."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Das Zahlungsverhalten wird nicht in der iCloud gespeichert."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Historial de pagos no almacenado en iCloud."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El historial de pagos no se guarda en iCloud."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "L'historique des paiements n'est pas stocké sur iCloud"
-          }
-        }
-      }
     },
     "Payment options" : {
       "localizations" : {
@@ -30857,48 +27571,6 @@
         }
       }
     },
-    "Payment Received" : {
-      "comment" : "Title in DetailsView_IncomingPayment",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تم استلام المبلغ"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Platba přijata"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Erhaltene Zahlung"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pago recibido"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pago recibido"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Paiement reçu"
-          }
-        }
-      }
-    },
     "Payment rejected (+%@)" : {
       "localizations" : {
         "ar" : {
@@ -30935,48 +27607,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Paiement refusé (+%@)"
-          }
-        }
-      }
-    },
-    "Payment Request" : {
-      "comment" : "Title in DetailsView_IncomingPayment",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "طلب الدفع"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Platební žádost"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zahlungsantrag"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Solicitud de pago"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Solicitud de pago"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Requête de paiement"
           }
         }
       }
@@ -31114,48 +27744,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Odeslaná platba"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zahlung gesendet"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pago enviado"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pago enviado"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Paiement envoyé"
-          }
-        }
-      }
-    },
-    "Payment Sent" : {
-      "comment" : "Title in DetailsView_IncomingPayment",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تم الدفع"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Platba odeslána"
           }
         },
         "de" : {
@@ -31345,47 +27933,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Les paiements sont sauvés dans le cloud immédiatement."
-          }
-        }
-      }
-    },
-    "Payments backup" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "النسخ الاحتياطي للمدفوعات"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zálohování plateb"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sicherung der Zahlungen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Respaldo de pagos"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copia de seguridad de pagos"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sauvegarde des paiements"
           }
         }
       }
@@ -31751,47 +28298,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Phoenix ne supporte pas encore ce type de LNURL"
-          }
-        }
-      }
-    },
-    "Phoenix generated" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تم توليده بواسطة Phoenix"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Phoenix vygenerováno"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Phoenix erzeugt"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Phoenix generado"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Generado por Phoenix"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Généré par Phoenix"
           }
         }
       }
@@ -33212,48 +29718,6 @@
         }
       }
     },
-    "reason" : {
-      "comment" : "Label in DetailsView_IncomingPayment",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "السبب"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Důvod"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "grund"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Razón"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "motivo"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "cause"
-          }
-        }
-      }
-    },
     "Receive" : {
       "comment" : "Navigation bar title",
       "localizations" : {
@@ -33455,48 +29919,6 @@
         }
       }
     },
-    "received at" : {
-      "comment" : "Label in DetailsView_IncomingPayment",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تم الاستلام في"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "přijmuto v"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "erhalten bei"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "recibido el"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "recibido a las"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "reçu à"
-          }
-        }
-      }
-    },
     "Received payment" : {
       "comment" : "Push notification title",
       "localizations" : {
@@ -33657,48 +30079,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le destinataire de ce paiement n\\'est pas joignable, ou bien ne dispose pas de suffisamment de liquidité entrante."
-          }
-        }
-      }
-    },
-    "recipient pubkey" : {
-      "comment" : "Label in DetailsView_IncomingPayment",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "المفتاح العام للمتلقي"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "příjemce veřejného klíče"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "empfänger-Pubkey"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Receptor de clave publica"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "clave pública del destinatario"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "clé publique du destinataire"
           }
         }
       }
@@ -34766,48 +31146,6 @@
         }
       }
     },
-    "Scan a QR code" : {
-      "comment" : "Navigation bar title",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "امسح رمز QR"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Skenovat QR kód"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scanne einen QR-Code"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Escanea un código QR"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Escanear código QR"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scanner un QR code"
-          }
-        }
-      }
-    },
     "Scan Bitcoin Address" : {
       "localizations" : {
         "ar" : {
@@ -34853,47 +31191,6 @@
     },
     "Scan QR Code" : {
 
-    },
-    "Scan withdraw" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "سحب المسح الضوئي"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Stáhnout skenování"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scannen zurückziehen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Retirada del escáner"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Escanear retiro"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scanner un lien de retrait"
-          }
-        }
-      }
     },
     "Search" : {
       "localizations" : {
@@ -35417,89 +31714,6 @@
         }
       }
     },
-    "Sending payment" : {
-      "comment" : "Navigation bar title",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ارسال المبلغ"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Odesílání platby"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zahlung abschicken"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enviando pago"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enviando pago"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Envoi du paiement"
-          }
-        }
-      }
-    },
-    "Sending Payment..." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "جارِ إرسال المبلغ..."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Odesílání platby..."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zahlung senden..."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enviando pago..."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enviando pago..."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Envoi du paiement…"
-          }
-        }
-      }
-    },
     "Sending…" : {
       "localizations" : {
         "ar" : {
@@ -35617,48 +31831,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ENVOYÉ"
-          }
-        }
-      }
-    },
-    "sent at" : {
-      "comment" : "Label in DetailsView_IncomingPayment",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تم الارسال في"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "odeslat na"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "gesendet am"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "enviado el"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "enviado a las"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "envoyé vers"
           }
         }
       }
@@ -35982,48 +32154,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le serveur retourne une réponse invalide"
-          }
-        }
-      }
-    },
-    "service" : {
-      "comment" : "Label in DetailsView_IncomingPayment",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الخدمة"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "služba"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "service"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "servicio"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "servicio"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "service"
           }
         }
       }
@@ -36562,47 +32692,6 @@
         }
       }
     },
-    "Share Image (QR code)" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "مشاركة الصورة (رمز الاستجابة السريعة)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sdílet obrázek (QR kód)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bild teilen (QR-Code)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compartir imagen (código QR)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compartir imagen (código QR)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Partager l'image (QR code)"
-          }
-        }
-      }
-    },
     "Share options" : {
       "localizations" : {
         "ar" : {
@@ -36639,129 +32728,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Options sur actions"
-          }
-        }
-      }
-    },
-    "Share Text" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "مشاركة النص"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sdílet Text"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Text teilen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compartir texto"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compartir texto"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Partager le texte"
-          }
-        }
-      }
-    },
-    "Share Text (bitcoin address)" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "مشاركة النص (عنوان البيتكوين)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sdílet text (adresa bitcoinu)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Text teilen (Bitcoin-Adresse)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compartir texto (dirección bitcoin)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compartir texto (dirección bitcoin)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Partager le texte (adresse bitcoin)"
-          }
-        }
-      }
-    },
-    "Share Text (lightning invoice)" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "مشاركة النص (فاتورة البرق)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sdílet text (blesková faktura)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Text teilen (Blitzrechnung)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compartir texto (factura Lightning)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compartir texto (factura de Lightning)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Partager le texte (requête Lightning)"
           }
         }
       }
@@ -38359,47 +34325,6 @@
         }
       }
     },
-    "Splice Out" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "لصق خارجي"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Splice Out"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Splice Out"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Empalmar"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Empalme de salida"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Splice-out"
-          }
-        }
-      }
-    },
     "Splice-In" : {
       "comment" : "Transaction Info: Value",
       "localizations" : {
@@ -38933,48 +34858,6 @@
         }
       }
     },
-    "Swap Out" : {
-      "comment" : "Title in DetailsView_IncomingPayment",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "المبادلة"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Výměna"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Auswechseln"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Swap Out"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Intercambio saliente"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Swap-out"
-          }
-        }
-      }
-    },
     "Swap-In" : {
       "comment" : "Transaction Info: Value",
       "localizations" : {
@@ -39386,47 +35269,6 @@
     "The **payment history** and **contacts** for this wallet will be deleted from your iCloud account." : {
 
     },
-    "The **payment history** for this wallet will be deleted from your iCloud account." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "سيتم حذف ** سجل الدفع** لهذه المحفظة من حسابك على iCloud."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Historie** plateb této peněženky bude z vašeho účtu iCloud odstraněna."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der **Zahlungsverlauf** für dieses Wallet wird aus deinem iCloud-Konto gelöscht."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El **historial de pagos** de esta billetera se eliminará de su cuenta de iCloud."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El **historial de pagos** de esta billetera se eliminará de tu cuenta de iCloud."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "L'**historique de paiements** pour ce wallet sera supprimée de votre compte iCloud."
-          }
-        }
-      }
-    },
     "The **seed backup** for this wallet will be deleted from your iCloud account." : {
       "localizations" : {
         "ar" : {
@@ -39463,47 +35305,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La **sauvegarde de votre clé** sera supprimée de votre compte iCloud."
-          }
-        }
-      }
-    },
-    "The additional capacity will be preserved for that duration." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "سيتم الحفاظ على السعة الإضافية لتلك المدة."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dodatečná kapacita bude po tuto dobu zachována."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die zusätzliche Kapazität bleibt für diese Dauer erhalten."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La capacidad adicional se conservará durante ese tiempo."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La capacidad adicional se conservará durante ese tiempo."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La capacité supplémentaire sera préservée pendant cette durée."
           }
         }
       }
@@ -40305,48 +36106,6 @@
         }
       }
     },
-    "The invoice is not for (chainMismatch.expected.name)" : {
-      "comment" : "Error message - scanning lightning invoice",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الفاتورة ليست لـ (chainMismatch.expected.name)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Faktura není určena pro (chainMismatch.expected.name)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Rechnung ist nicht für (chainMismatch.expected.name)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La factura no es para (chainMismatch.expected.name)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La factura no es para (chainMismatch.expected.name)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La facture n'est pas pour (chainMismatch.expected.name)"
-          }
-        }
-      }
-    },
     "The invoice is not for %@" : {
       "comment" : "Error message - scanning lightning invoice",
       "localizations" : {
@@ -40834,174 +36593,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le QR code scanné n’est pas une adresse Bitcoin."
-          }
-        }
-      }
-    },
-    "The service ((origin)) appears to be offline, or they have a down server" : {
-      "comment" : "Error message - scanning lightning invoice",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "يبدو أن الخدمة ((origin)) غير متصلة بالإنترنت، أو أن لديهم خادمًا معطلاً"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Služba ((origin)) se zdá být offline nebo má neaktivní server."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Dienst ((origin)) scheint offline zu sein, oder der Server ist ausgefallen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El servicio ((origin)) parece estar fuera de línea, o tienen un servidor inactivo"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El servicio ((origin)) parece estar fuera de línea o hay un servidor caído."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le service ((origin)) semble être hors-ligne, ou leur serveur est indisponible."
-          }
-        }
-      }
-    },
-    "The service ((origin)) doesn't support Lightning addresses, or doesn't know this user" : {
-      "comment" : "Error message - scanning lightning invoice",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الخدمة ((origin)) لا تدعم عناوين Lightning، أو لا تعرف هذا المستخدم"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Služba ((origin)) nepodporuje Lightning adresy nebo nezná tohoto uživatele."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Dienst ((origin)) unterstützt keine Lightning-Adressen oder kennt diesen Benutzer nicht"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El servicio ((origin)) no admite direcciones Lightning o no conoce a este usuario"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El servicio ((origin)) no admite direcciones de Lightning o no conoce a este usuario."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le service ((origin)) ne supporte pas les adresses Lightning, ou bien ne connaît pas cet utilisateur."
-          }
-        }
-      }
-    },
-    "The service ((origin)) returned error code: (rfCode.code.value)" : {
-      "comment" : "Error message - scanning lightning invoice",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "قامت الخدمة ((origin)) بإرجاع رمز الخطأ: (rfCode.code.value)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Služba ((origin)) vrátila chybový kód: (rfCode.code.value)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Dienst ((origin)) hat einen Fehlercode zurückgegeben: (rfCode.code.value)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El servicio ((origin)) ha devuelto un código de error: (rfCode.code.value)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El servicio ((origin)) devolvió el código de error: (rfCode.code.value)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le service ((origin)) a renvoyé un code d'erreur : (rfCode.code.value)"
-          }
-        }
-      }
-    },
-    "The service ((origin)) returned error message: (rfDetailed.reason)" : {
-      "comment" : "Error message - scanning lightning invoice",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "قامت الخدمة ((origin)) بإرجاع رسالة خطأ: (rfDetailed.reason)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Služba ((origin)) vrátila chybovou zprávu: (rfDetailed.reason)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Dienst ((origin)) hat eine Fehlermeldung zurückgegeben: (rfDetailed.reason)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El servicio ((origin)) ha devuelto un mensaje de error: (rfDetailed.reason)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El servicio ((origin)) devolvió un mensaje de error: (rfDetailed.reason)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le service ((origin)) a renvoyé un message d'erreur : (rfDetailed.reason)"
           }
         }
       }
@@ -42649,48 +38240,6 @@
         }
       }
     },
-    "timestamp" : {
-      "comment" : "Label in DetailsView_IncomingPayment",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الزمن"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Časová značka"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "zeitstempel"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Marca de tiempo"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "marca de tiempo"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "horodatage"
-          }
-        }
-      }
-    },
     "tip" : {
       "comment" : "button label - try to make it short",
       "localizations" : {
@@ -42768,90 +38317,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Conseil"
-          }
-        }
-      }
-    },
-    "Tip amount: (percent), (amountBitcoin), ≈(amountFiat)" : {
-      "comment" : "VoiceOver label: PaymentSummaryView",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "مبلغ الإكرامية (percent) ، (amountBitcoin) ، ≈(amountFiat)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hodnota spropitného: (percent), (amountBitcoin), ≈(amountFiat)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tippbetrag: (percent), (amountBitcoin), ≈(amountFiat)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cantidad de propina: (percent), (amountBitcoin), ≈(amountFiat)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Importe del tip: (percent), (amountBitcoin), ≈(amountFiat)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Montant du pourboire : (percent), (amountBitcoin), ≈(amountFiat)"
-          }
-        }
-      }
-    },
-    "tip amount: (tipBtcn), ≈(tipFiat), total amount: (ttlBtcn), ≈(ttlFiat)" : {
-      "comment" : "VoiceOver information: Customize tip sheet",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "مبلغ الإكرامية: (tipBtcn) ، ≈(tipFiat) ، المبلغ الإجمالي: (ttlBtcn), ≈(ttlFiat)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hodnota dýška: (tipBtcn), ≈(tipFiat), cantidad total: (ttlBtcn), ≈(ttlFiat)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "trinkgeldbetrag: (tipBtcn), ≈(tipFiat), Gesamtbetrag: (ttlBtcn), ≈(ttlFiat)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cantidad de propina: (tipBtcn), ≈(tipFiat), cantidad total: (ttlBtcn), ≈(ttlFiat)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "importe del tip: (tipBtcn), ≈(tipFiat), importe total: (ttlBtcn), ≈(ttlFiat)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "montant du pourboire : (tipBtcn), ≈(tipFiat), montant total : (ttlBtcn), ≈(ttlFiat)"
           }
         }
       }
@@ -43304,47 +38769,6 @@
         }
       }
     },
-    "Tor is disabled" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تم تعطيل Tor"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tor je vypnutý"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tor ist deaktiviert"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tor está deshabilitado"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tor está desactivada"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tor est désactivé"
-          }
-        }
-      }
-    },
     "Tor is enabled" : {
       "localizations" : {
         "ar" : {
@@ -43426,47 +38850,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Réglages Tor"
-          }
-        }
-      }
-    },
-    "total" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الإجمالي"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "celkem"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "gesamt"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "total"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "total"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "total"
           }
         }
       }
@@ -43595,90 +38978,6 @@
         }
       }
     },
-    "Total amount: (amountBitcoin), ≈(amountFiat)" : {
-      "comment" : "VoiceOver label: PaymentSummaryView",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "المبلغ الإجمالي: (amountBitcoin), ≈(amountFiat)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Celková částka: (amountBitcoin), ≈(amountFiat)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gesamtbetrag: (amountBitcoin), ≈(amountFiat)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cantidad total: (amountBitcoin), ≈(amountFiat)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Importe total: (amountBitcoin), ≈(amountFiat)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Montant total : (amountBitcoin), ≈(amountFiat)"
-          }
-        }
-      }
-    },
-    "total amount: (btcnAmt.string), ≈(fiatAmt.string)" : {
-      "comment" : "VoiceOver hint",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "المبلغ الإجمالي: (btcnAmt.string), ≈(fiatAmt.string)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "celková částka: (btcnAmt.string), ≈(fiatAmt.string)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "gesamtbetrag: (btcnAmt.string), ≈(fiatAmt.string)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cantidad total: (btcnAmt.string), ≈(fiatAmt.string)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "importe total: (btcnAmt.string), ≈(fiatAmt.string)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "montant total : (btcnAmt.string), ≈(fiatAmt.string)"
-          }
-        }
-      }
-    },
     "total amount: (ttlBtcn) ≈(ttlFiat)" : {
       "comment" : "VoiceOver information: Customize tip sheet",
       "extractionState" : "manual",
@@ -43717,48 +39016,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "montant total : (ttlBtcn) ≈(ttlFiat)"
-          }
-        }
-      }
-    },
-    "total amount: ≈(btcnAmt.string)" : {
-      "comment" : "VoiceOver hint",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "المبلغ الإجمالي: ≈(btcnAmt.string)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "celková částka: ≈(btcnAmt.string)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "gesamtbetrag: ≈(btcnAmt.string)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cantidad total: ≈(btcnAmt.string)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "importe total: ≈(btcnAmt.string)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "montant total : ≈(btcnAmt.string)"
           }
         }
       }
@@ -43839,47 +39096,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Touch ID"
-          }
-        }
-      }
-    },
-    "transaction" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "المعاملات"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "transakce"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "transaktion"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "transacción"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "transacción"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "transaction"
           }
         }
       }
@@ -44165,48 +39381,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "index de la tx"
-          }
-        }
-      }
-    },
-    "type" : {
-      "comment" : "Label in DetailsView_IncomingPayment",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "نوع"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "typ"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "typ"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tipo"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "tipo"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "type"
           }
         }
       }
@@ -44785,48 +39959,6 @@
         }
       }
     },
-    "Unreadable response from service: (origin)" : {
-      "comment" : "Error message - scanning lightning invoice",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "استجابة غير مقروءة من الخدمة: (origin)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nečitelná odpověď služby: (origin)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unlesbare Antwort vom Dienst: (origin)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Respuesta ilegible del servicio: (origin)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Respuesta ilegible del servicio: (origin)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Réponse illisible du service : (origin)"
-          }
-        }
-      }
-    },
     "Unreadable response from service: %@" : {
       "comment" : "Error message - scanning lightning invoice"
     },
@@ -45360,47 +40492,6 @@
     "Use this screen to spend your on-chain funds that were not swapped in time. The swap-in request has now expired." : {
 
     },
-    "Use this screen to spend your on-chain funds that were not swapped in time. The swap-in request has now expired. " : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "استخدم هذه الشاشة لإنفاق أموالك في السلسلة التي لم يتم تبديلها في الوقت المناسب. انتهت صلاحية طلب المبادلة الآن. "
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Na této obrazovce můžete utratit prostředky v řetězci, které nebyly včas vyměněny. Platnost žádosti o výměnu již vypršela. "
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Verwenden Sie diesen Bildschirm, um Ihre On-Chain-Gelder auszugeben, die nicht rechtzeitig getauscht wurden. Die Swap-In-Anforderung ist jetzt abgelaufen. "
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Utiliza esta pantalla para gastar tus fondos en la cadena que no fueron canjeados a tiempo. La solicitud de canje ha caducado. "
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Utiliza esta pantalla para gastar tus fondos en la cadena que no fueron canjeados a tiempo. La solicitud de canje ha caducado. "
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Utilisez cet écran pour dépenser vos fonds sur la chaîne qui n'ont pas été échangés à temps. La demande de swap-in a maintenant expiré. "
-          }
-        }
-      }
-    },
     "Use Tor" : {
 
     },
@@ -45489,48 +40580,6 @@
     },
     "Version 2.5.0: Tor changes" : {
 
-    },
-    "via" : {
-      "comment" : "Label in DetailsView_IncomingPayment",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "عبر"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Přes"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "über"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vía"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "a través de"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "via"
-          }
-        }
-      }
     },
     "view on blockchain" : {
       "localizations" : {
@@ -47688,47 +42737,6 @@
         }
       }
     },
-    "You can improve your privacy by only using Tor when connecting to an Electrum server or to your Lightning peer. This will slightly slow down your transactions." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "يمكنك تحسين خصوصيتك فقط باستخدام Tor عند الاتصال بخادم Electrum أو بنظير شبكة البرق الخاص بك. سيؤدي هذا إلى إبطاء عمل حوالاتك بشكل طفيف."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Své soukromí můžete zlepšit pouze tím, že použijete Tor při připojení k serveru Electrum nebo k vašemu Lightning peeru."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Du kannst deine Privatsphäre verbessern, indem du Tor nur verwendest, wenn du dich mit einem Electrum-Server oder mit deinem Lightning-Peer verbindest. Das wird deine Transaktionen etwas verlangsamen."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Puede mejorar su privacidad usando Tor solo cuando se conecta a un servidor Electrum o a la par con Lightning. Esto ralentizará ligeramente sus transacciones."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Puedes usar Tor únicamente para mejorar tu privacidad cuando te conectes a un servidor de Electrum o a un par de Lightning. Esto retrasará ligeramente tus transacciones."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tor vous permet de protéger votre vie privée quand vous vous connectez à Electrum et à votre pair Lightning. Cette fonctionnalité va légèrement ralentir l’application."
-          }
-        }
-      }
-    },
     "You can make all your unconfirmed transactions use a higher effective feerate to encourage miners to favour your payments." : {
       "localizations" : {
         "ar" : {
@@ -49071,88 +44079,6 @@
     },
     "Your payment history and contacts will be stored in iCloud." : {
 
-    },
-    "Your payment history is only stored on this device." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "يتم تخزين سجل مدفوعاتك على هذا الجهاز فقط."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vaše historie plateb je uložena pouze v tomto zařízení."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dein Zahlungsverhalten wird nur auf diesem Gerät gespeichert."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Su historial de pagos solo se almacena en este dispositivo."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El historial de pagos solo se almacena en este dispositivo."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Votre historique de paiements ne sera stocké que sur cet appareil."
-          }
-        }
-      }
-    },
-    "Your payment history will be stored in iCloud." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "سيتم تخزين سجل مدفوعاتك على iCloud."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vaše historie plateb bude uložena na iCloudu."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dein Zahlungsverhalten wird in der iCloud gespeichert."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Su historial de pagos se almacenará en iCloud."
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El historial de pagos se almacenará en iCloud."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Votre historique de paiements sera stocké dans iCloud."
-          }
-        }
-      }
     },
     "Your recovery phrase is 12 words, generated using the BIP39 standard.\n\nEnglish is recommended. If you prefer another language, we provide recovery instructions on our website.\n\nYour selection here does **not** affect your ability to send or receive bitcoin within Phoenix." : {
       "localizations" : {
