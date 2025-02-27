@@ -172,7 +172,23 @@ val testnetElectrumServers = listOf(
     ),
 )
 
-val mainnetElectrumServersOnion: List<ServerAddress> by lazy { TODO() }
+val mainnetElectrumServersOnion: List<ServerAddress> by lazy {
+    listOf(
+        electrumServerOnion(host = "22mgr2fndslabzvx4sj7ialugn2jv3cfqjb3dnj67a6vnrkp7g4l37ad.onion", port = 50001),
+        electrumServerOnion(host = "bejqtnc64qttdempkczylydg7l3ordwugbdar7yqbndck53ukx7wnwad.onion", port = 50001),
+        electrumServerOnion(host = "egyh5mutxwcvwhlvjubf6wytwoq5xxvfb2522ocx77puc6ihmffrh6id.onion", port = 50001),
+        electrumServerOnion(host = "explorerzydxu5ecjrkwceayqybizmpjjznk5izmitf2modhcusuqlid.onion", port = 110),
+        electrumServerOnion(host = "kittycp2gatrqhlwpmbczk5rblw62enrpo2rzwtkfrrr27hq435d4vid.onion", port = 50001),
+        electrumServerOnion(host = "qly7g5n5t3f3h23xvbp44vs6vpmayurno4basuu5rcvrupli7y2jmgid.onion", port = 50001),
+        electrumServerOnion(host = "rzspa374ob3hlyjptkdgz6a62wim2mpanuw6m3shlwn2cxg2smy3p7yd.onion", port = 50003),
+        electrumServerOnion(host = "ty6cgwaf2pbc244gijtmpfvte3wwfp32wgz57eltjkgtsel2q7jufjyd.onion", port = 50001),
+        electrumServerOnion(host = "udfpzbte2hommnvag5f3qlouqkhvp3xybhlus2yvfeqdwlhjroe4bbyd.onion", port = 60001),
+        electrumServerOnion(host = "v7gtzf7nua6hdmb2wtqaqioqmesdb4xrlly4zwr7bvayxv2bpg665pqd.onion", port = 50001),
+        electrumServerOnion(host = "v7o2hkemnt677k3jxcbosmjjxw3p5khjyu7jwv7orfy6rwtkizbshwqd.onion", port = 57001),
+        electrumServerOnion(host = "venmrle3xuwkgkd42wg7f735l6cghst3sdfa3w3ryib2rochfhld6lid.onion", port = 50001),
+        electrumServerOnion(host = "wsw6tua3xl24gsmi264zaep6seppjyrkyucpsmuxnjzyt3f3j6swshad.onion", port = 50001),
+    )
+}
 
 val testnetElectrumServersOnion by lazy {
     listOf(
