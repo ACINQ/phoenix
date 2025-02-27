@@ -24,6 +24,7 @@ import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.PhoenixBusiness
+import fr.acinq.phoenix.data.ContactAddress
 import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.db.SqliteAppDb
 import fr.acinq.phoenix.utils.extensions.incomingOfferMetadata
@@ -35,7 +36,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-
 
 class ContactsManager(
     private val loggerFactory: LoggerFactory,
@@ -55,23 +55,25 @@ class ContactsManager(
     private val _contactsMap = MutableStateFlow<Map<UUID, ContactInfo>>(emptyMap())
     val contactsMap = _contactsMap.asStateFlow()
 
-    private val _offerMap = MutableStateFlow<Map<OfferTypes.Offer, UUID>>(emptyMap())
+    // Key(Offer.OfferId), Value(ContactId)
+    private val _offerMap = MutableStateFlow<Map<ByteVector32, UUID>>(emptyMap())
     val offerMap = _offerMap.asStateFlow()
 
+    // Key(Offer.contactNodeId), Value(ContactId)
     private val _publicKeyMap = MutableStateFlow<Map<PublicKey, UUID>>(emptyMap())
     val publicKeyMap = _publicKeyMap.asStateFlow()
 
-    val contactsWithOfferList = _contactsList.map { contacts ->
-        contacts.filter { it.offers.isNotEmpty()  }
-    }
+    // Key(lightningAddress.hash), Value(ContactId)
+    private val _addressMap = MutableStateFlow<Map<ByteVector32, UUID>>(emptyMap())
+    val addressMap = _addressMap.asStateFlow()
 
     init {
         launch {
-            appDb.monitorContacts().collect { list ->
+            appDb.monitorContactsFlow().collect { list ->
                 val newMap = list.associateBy { it.id }
                 val newOfferMap = list.flatMap { contact ->
-                    contact.offers.map { offer ->
-                        offer to contact.id
+                    contact.offers.map { row ->
+                        row.id to contact.id
                     }
                 }.toMap()
                 val newPublicKeyMap = list.flatMap { contact ->
@@ -79,55 +81,43 @@ class ContactsManager(
                         pubKey to contact.id
                     }
                 }.toMap()
+                val newAddressMap = list.flatMap { contact ->
+                    contact.addresses.map { row ->
+                        row.id to contact.id
+                    }
+                }.toMap()
                 _contactsList.value = list
                 _contactsMap.value = newMap
                 _offerMap.value = newOfferMap
                 _publicKeyMap.value = newPublicKeyMap
+                _addressMap.value = newAddressMap
             }
         }
     }
 
-    suspend fun getContactForOffer(offer: OfferTypes.Offer): ContactInfo? {
-        return appDb.getContactForOffer(offer.offerId)
-    }
-
-    suspend fun saveNewContact(
-        name: String,
-        photoUri: String?,
-        useOfferKey: Boolean,
-        offer: OfferTypes.Offer
-    ): ContactInfo {
-        val contact = ContactInfo(id = UUID.randomUUID(), name = name, photoUri = photoUri, useOfferKey = useOfferKey, offers = listOf(offer))
+    /**
+     * This method will:
+     * - insert or update the contact in the database (depending on whether it already exists)
+     * - insert any new offers
+     * - update any offers that have been changed (i.e. label changed)
+     * - delete offers that have been removed from the list
+     * - insert any new addresses
+     * - update any addresses that have been changed (i.e. label changed)
+     * - delete any addresses that have been removed
+     *
+     * In other words, the UI doesn't have to track which changes have been made.
+     * It can simply call this method, and the database will be properly updated.
+     */
+    suspend fun saveContact(contact: ContactInfo) {
         appDb.saveContact(contact)
-        return contact
-    }
-
-    suspend fun updateContact(
-        contactId: UUID,
-        name: String,
-        photoUri: String?,
-        useOfferKey: Boolean,
-        offers: List<OfferTypes.Offer>
-    ): ContactInfo {
-        val contact = ContactInfo(id = contactId, name = name, photoUri = photoUri, useOfferKey = useOfferKey, offers = offers)
-        appDb.updateContact(contact)
-        return contact
-    }
-
-    suspend fun getContactForPayerPubkey(payerPubkey: PublicKey): ContactInfo? {
-        return appDb.listContacts().firstOrNull { it.publicKeys.contains(payerPubkey) }
     }
 
     suspend fun deleteContact(contactId: UUID) {
         appDb.deleteContact(contactId)
     }
 
-    suspend fun detachOfferFromContact(offerId: ByteVector32) {
-        appDb.deleteOfferContactLink(offerId)
-    }
-
     /**
-     * In many cases there's no need to query the database since we have everything in memory.
+     * In most cases there's no need to query the database since we have everything in memory.
      */
 
     fun contactForId(contactId: UUID): ContactInfo? {
@@ -141,13 +131,51 @@ class ContactsManager(
             }
         } else {
             payment.outgoingInvoiceRequest()?.let {invoiceRequest ->
-                offerMap.value[invoiceRequest.offer]
+                offerMap.value[invoiceRequest.offer.offerId]
             }
         }
     }
 
     fun contactForPayment(payment: WalletPayment): ContactInfo? {
         return contactIdForPayment(payment)?.let { contactId ->
+            contactForId(contactId)
+        }
+    }
+
+    fun contactIdForOfferId(offerId: ByteVector32): UUID? {
+        return offerMap.value[offerId]
+    }
+
+    fun contactForOfferId(offerId: ByteVector32): ContactInfo? {
+        return contactIdForOfferId(offerId)?.let { contactId ->
+            contactForId(contactId)
+        }
+    }
+
+    fun contactIdForOffer(offer: OfferTypes.Offer): UUID? {
+        return contactIdForOfferId(offer.offerId)
+    }
+
+    fun contactForOffer(offer: OfferTypes.Offer): ContactInfo? {
+        return contactForOfferId(offer.offerId)
+    }
+
+    fun contactIdForPayerPubKey(payerPubKey: PublicKey): UUID? {
+        return publicKeyMap.value[payerPubKey]
+    }
+
+    fun contactForPayerPubKey(payerPubKey: PublicKey): ContactInfo? {
+        return contactIdForPayerPubKey(payerPubKey)?.let { contactId ->
+            contactForId(contactId)
+        }
+    }
+
+    fun contactIdForLightningAddress(address: String): UUID? {
+        return addressMap.value[ContactAddress.hash(address)]
+    }
+
+    fun contactForLightningAddress(address: String): ContactInfo? {
+        return contactIdForLightningAddress(address)?.let { contactId ->
             contactForId(contactId)
         }
     }

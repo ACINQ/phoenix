@@ -118,6 +118,10 @@ extension WalletPaymentInfo {
 		return String(localized: "No description", comment: "placeholder text")
 	}
 	
+	func hasAttachedMessage() -> Bool {
+		return attachedMessage() != nil
+	}
+	
 	func attachedMessage() -> String? {
 		
 		var msg: String? = nil
@@ -135,6 +139,24 @@ extension WalletPaymentInfo {
 		} else {
 			return nil
 		}
+	}
+	
+	func canAddToContacts() -> Bool {
+		return addToContactsInfo() != nil
+	}
+	
+	func addToContactsInfo() -> AddToContactsInfo? {
+	
+		if payment is Lightning_kmpOutgoingPayment {
+			// Todo: check for lightning address (requires db change in metadata table)
+			
+			let invoiceRequest = payment.outgoingInvoiceRequest()
+			if let offer = invoiceRequest?.offer {
+				return AddToContactsInfo(offer: offer, address: nil)
+			}
+		}
+
+		return nil
 	}
 }
 
