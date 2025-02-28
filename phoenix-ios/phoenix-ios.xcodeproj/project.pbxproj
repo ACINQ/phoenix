@@ -1847,7 +1847,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "DupFramework=\"$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME/PlugIns/phoenix-notifySrvExt.appex/Frameworks/PhoenixShared.framework\"\necho \"Removing duplicated framework...\"\necho \"rm -rf $DupFramework\"\nrm -rf \"$DupFramework\"\n";
+			shellScript = "DupFramework=\"$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME/PlugIns/phoenix-notifySrvExt.appex/Frameworks\"\necho \"Removing duplicated framework...\"\necho \"rm -rf $DupFramework\"\nrm -rf \"$DupFramework\"\n";
 		};
 		DCA538EB2CA5AE7700B17C8B /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
