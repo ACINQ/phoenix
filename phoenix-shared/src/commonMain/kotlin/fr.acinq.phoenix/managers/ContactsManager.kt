@@ -26,6 +26,7 @@ import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.ContactAddress
 import fr.acinq.phoenix.data.ContactInfo
+import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.db.SqliteAppDb
 import fr.acinq.phoenix.utils.extensions.incomingOfferMetadata
 import fr.acinq.phoenix.utils.extensions.outgoingInvoiceRequest
@@ -124,24 +125,6 @@ class ContactsManager(
         return contactsMap.value[contactId]
     }
 
-    fun contactIdForPayment(payment: WalletPayment): UUID? {
-        return if (payment is IncomingPayment) {
-            payment.incomingOfferMetadata()?.let { offerMetadata ->
-                publicKeyMap.value[offerMetadata.payerKey]
-            }
-        } else {
-            payment.outgoingInvoiceRequest()?.let {invoiceRequest ->
-                offerMap.value[invoiceRequest.offer.offerId]
-            }
-        }
-    }
-
-    fun contactForPayment(payment: WalletPayment): ContactInfo? {
-        return contactIdForPayment(payment)?.let { contactId ->
-            contactForId(contactId)
-        }
-    }
-
     fun contactIdForOfferId(offerId: ByteVector32): UUID? {
         return offerMap.value[offerId]
     }
@@ -176,6 +159,26 @@ class ContactsManager(
 
     fun contactForLightningAddress(address: String): ContactInfo? {
         return contactIdForLightningAddress(address)?.let { contactId ->
+            contactForId(contactId)
+        }
+    }
+
+    fun contactIdForPaymentInfo(paymentInfo: WalletPaymentInfo): UUID? {
+        return if (paymentInfo.payment is IncomingPayment) {
+            paymentInfo.payment.incomingOfferMetadata()?.let { offerMetadata ->
+                contactIdForPayerPubKey(offerMetadata.payerKey)
+            }
+        } else {
+            paymentInfo.metadata.lightningAddress?.let { address ->
+                contactIdForLightningAddress(address)
+            } ?: paymentInfo.payment.outgoingInvoiceRequest()?.let { invoiceRequest ->
+                contactIdForOfferId(invoiceRequest.offer.offerId)
+            }
+        }
+    }
+
+    fun contactForPaymentInfo(paymentInfo: WalletPaymentInfo): ContactInfo? {
+        return contactIdForPaymentInfo(paymentInfo)?.let { contactId ->
             contactForId(contactId)
         }
     }

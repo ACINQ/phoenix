@@ -1,0 +1,7 @@
+-- Migration: v12 -> v13
+--
+-- Changes:
+-- * Added a new column [lightning_address] in table [payments_metadata]
+
+ALTER TABLE payments_metadata
+    ADD COLUMN lightning_address TEXT;
