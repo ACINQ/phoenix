@@ -75,6 +75,9 @@ kotlin {
                     // But with standard allocation, we're using less then half the limit.
                     freeCompilerArgs += "-Xallocator=std"
                     freeCompilerArgs += listOf("-linker-options", "-application_extension")
+                    // workaround for IndexOutOfBoundsException with phoenix-shared:linkReleaseFrameworkIosArm64 in iOS Archive build
+                    // see https://youtrack.jetbrains.com/issue/KT-64508
+                    freeCompilerArgs += "-Xdisable-phases=RemoveRedundantCallsToStaticInitializersPhase"
                 }
             }
         }

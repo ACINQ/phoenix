@@ -275,8 +275,8 @@ struct HomeView : MVIView {
 				
 				let imgName = unknownBalance ? "circle.dotted" : "circle.fill"
 				Group {
-					Text(Image(systemName: imgName)) + Text("\u{202f}") +
-					Text(Image(systemName: imgName)) + Text("\u{202f}") +
+					Text(Image(systemName: imgName)) + Text(verbatim: "\u{202f}") +
+					Text(Image(systemName: imgName)) + Text(verbatim: "\u{202f}") +
 					Text(Image(systemName: imgName))
 				}
 				.font(.body)
