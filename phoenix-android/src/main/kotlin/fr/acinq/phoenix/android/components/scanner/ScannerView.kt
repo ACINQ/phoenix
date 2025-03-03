@@ -42,7 +42,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -65,9 +64,7 @@ import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.utils.images.ZxingQrCodeAnalyzer
-import kotlinx.coroutines.delay
 import java.util.concurrent.Executors
-import kotlin.time.Duration.Companion.seconds
 
 
 @SuppressLint("ClickableViewAccessibility")
@@ -84,13 +81,23 @@ fun BoxScope.ScannerView(
     val cameraController = remember { LifecycleCameraController(context) }
     var scannedText by remember { mutableStateOf<String?>(null) }
 
-    // let us execute the callback for an already scanned text with a throttle
-    var scanResetTick by remember { mutableIntStateOf(0) }
-    LaunchedEffect(Unit) {
-        while(true) {
-            delay(2.seconds)
-            scanResetTick++
+    var currentCallbackAttempt by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(isPaused) {
+        if (!isPaused) {
+            scannedText = null
+            currentCallbackAttempt = null
         }
+    }
+
+    LaunchedEffect(scannedText) {
+        if (!isPaused) currentCallbackAttempt = scannedText
+    }
+
+    LaunchedEffect(currentCallbackAttempt) {
+        if (isPaused) return@LaunchedEffect
+        val currentAttempt = currentCallbackAttempt ?: return@LaunchedEffect
+        onScannedText(currentAttempt)
     }
 
     AndroidView(
@@ -114,11 +121,12 @@ fun BoxScope.ScannerView(
         }
     )
 
-    Column(modifier = Modifier
-        .align(Alignment.BottomCenter)
-        .background(Brush.verticalGradient(colorStops = arrayOf(0.1f to Color.Transparent, 1f to Color(0x44000000))))
-        .padding(24.dp)
-        .systemGestureExclusion()
+    Column(
+        modifier = Modifier
+            .align(Alignment.BottomCenter)
+            .background(Brush.verticalGradient(colorStops = arrayOf(0.1f to Color.Transparent, 1f to Color(0x44000000))))
+            .padding(24.dp)
+            .systemGestureExclusion()
     ) {
         Spacer(Modifier.height(36.dp))
         TextWithIcon(
@@ -142,12 +150,6 @@ fun BoxScope.ScannerView(
     }
 
     CameraPermissionsView()
-
-    LaunchedEffect(scannedText, scanResetTick) {
-        scannedText?.let {
-            if (!isPaused) onScannedText(it)
-        }
-    }
 }
 
 @OptIn(ExperimentalPermissionsApi::class)
