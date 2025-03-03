@@ -178,6 +178,12 @@ extension PhoenixBusiness {
 			return .failure(.replayDetected(card: matchingCard))
 		}
 		
+		// From this point forward:
+		//
+		// The last step we should perform, before returning the result,
+		// is updating the CardInfo within the database.
+		// We want to ensure we update the `lastKnownCounter` value
+		// to protect against replay attacks.
 		
 		let asyncDeferred = { @MainActor (result: Result<WithdrawRequestStatus, WithdrawRequestError>) async
 			-> Result<WithdrawRequestStatus, WithdrawRequestError> in
@@ -388,14 +394,14 @@ extension PhoenixBusiness {
 		//
 		// At this point we've decided that it's safe to pay the invoice.
 		// The only question is WHO is going to pay it:
-		// - mainPhoenixApp (us)
-		// - notifySrvExt   (background process that could be running)
+		// - mainPhoenixApp (foreground process / main app with user interface)
+		// - notifySrvExt   (background process that could be running in response to a notification)
 		//
 		// So to be sure we don't accidentally pay an invoice TWICE,
 		// we have an atomic database method that will fail if the other
 		// process has already marked it as handled.
 		
-		let handledByUs = await self.appDb.tryMarkHandled(request, process: .phoenixApp)
+		let handledByUs = await self.appDb.tryMarkHandled(request)
 		
 		if handledByUs {
 			return await asyncDeferred(.success(.continueAndSendPayment(
@@ -427,7 +433,13 @@ extension SqliteAppDb {
 	}
 	
 	@MainActor
-	func tryMarkHandled(_ request: WithdrawRequest, process: ProcessId) async -> Bool {
+	func tryMarkHandled(_ request: WithdrawRequest) async -> Bool {
+		
+		let process: ProcessId
+		switch AppIdentifier.current {
+			case .foreground: process = .phoenixApp
+			case .background: process = .notifySrvExt
+		}
 		
 		let key = "WithdrawRequestHandlers"
 		do {
