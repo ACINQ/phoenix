@@ -110,6 +110,8 @@ enum WithdrawRequestError: Error, CustomStringConvertible {
 	case unknownCard
 	case replayDetected(card: BoltCardInfo)
 	case frozenCard(card: BoltCardInfo)
+	case dailyLimitExceeded(card: BoltCardInfo, amount: CurrencyAmount)
+	case monthlyLimitExceeded(card: BoltCardInfo, amount: CurrencyAmount)
 	case badInvoice(card: BoltCardInfo, details: String)
 	case alreadyPaidInvoice(card: BoltCardInfo)
 	case paymentPending(card: BoltCardInfo)
@@ -117,13 +119,15 @@ enum WithdrawRequestError: Error, CustomStringConvertible {
 	
 	var description: String {
 		switch self {
-			case .unknownCard        : return "unknown card"
-			case .replayDetected     : return "replay detected"
-			case .frozenCard         : return "frozen card"
-			case .badInvoice         : return "bad invoice"
-			case .alreadyPaidInvoice : return "already paid invoice"
-			case .paymentPending     : return "payment pending"
-			case .internalError      : return "internal error"
+			case .unknownCard          : return "unknown card"
+			case .replayDetected       : return "replay detected"
+			case .frozenCard           : return "frozen card"
+			case .dailyLimitExceeded   : return "daily limit exceeded"
+			case .monthlyLimitExceeded : return "monthly limit exceeded"
+			case .badInvoice           : return "bad invoice"
+			case .alreadyPaidInvoice   : return "already paid invoice"
+			case .paymentPending       : return "payment pending"
+			case .internalError        : return "internal error"
 		}
 	}
 }
@@ -211,13 +215,12 @@ extension PhoenixBusiness {
 			}
 			
 			if shouldUpdateCard {
-				// Temporarily disabled while I perform testing
-			//	var updatedCard = matchingCard.withUpdatedLastKnownCounter(piccDataInfo.counter)
-			//	do {
-			//		try await self.cardsManager.saveCard(card: updatedCard)
-			//	} catch {
-			//		log.error("cardsManager.saveCard(): error: \(error)")
-			//	}
+				let updatedCard = matchingCard.withUpdatedLastKnownCounter(piccDataInfo.counter)
+				do {
+					try await self.cardsManager.saveCard(card: updatedCard)
+				} catch {
+					log.error("cardsManager.saveCard(): error: \(error)")
+				}
 			}
 			
 			return result
@@ -239,7 +242,7 @@ extension PhoenixBusiness {
 			return await asyncDeferred(.failure(.badInvoice(card: matchingCard, details: "not bolt 11 invoice")))
 		}
 		
-		guard let invoiceAmount = invoice.amount else {
+		guard let invoiceAmount: Lightning_kmpMilliSatoshi = invoice.amount else {
 			log.debug("request.invoice.amount is nil")
 			return await asyncDeferred(.failure(.badInvoice(card: matchingCard, details: "amountless invoice")))
 		}
@@ -299,7 +302,100 @@ extension PhoenixBusiness {
 		// Step 6 of 9:
 		// Check the amount against any set daily/monthly spending limits.
 		
-		// Todo...
+		let checkSpendingLimit = {
+		(cardAmounts: CardsManager.CardAmounts, limit: CurrencyAmount, isDaily: Bool) -> WithdrawRequestError? in
+			
+			switch limit.currency {
+			case .bitcoin(let bitcoinUnit):
+				let limitMsat: Int64 = Utils.toMsat(from: limit.amount, bitcoinUnit: bitcoinUnit)
+				
+				let prvSpendMsat: Int64 = isDaily
+					? cardAmounts.dailyBitcoinAmount().msat
+					: cardAmounts.monthlyBitcoinAmount().msat
+				
+				let newSpendMsat: Int64 = prvSpendMsat + invoiceAmount.msat
+				
+				log.debug(
+					"""
+					\(isDaily ? "dailySpendingLimit" : "monthlySpendingLimit"): \
+					prvSpendMsat(\(prvSpendMsat)) + invoiceMsat(\(invoiceAmount.msat)) = \
+					newSpendMsat(\(newSpendMsat)) ?>? limitMsat(\(limitMsat))
+					""")
+				
+				if newSpendMsat > limitMsat {
+					let targetAmt = Utils.convertBitcoin(msat: invoiceAmount.msat, to: bitcoinUnit)
+					let currencyAmt = CurrencyAmount(currency: limit.currency, amount: targetAmt)
+					
+					return isDaily
+						? .dailyLimitExceeded(card: matchingCard, amount: currencyAmt)
+						: .monthlyLimitExceeded(card: matchingCard, amount: currencyAmt)
+				}
+				
+			case .fiat(let fiatCurrency):
+				let limitFiat: Double = limit.amount
+				
+				let exchangeRates = self.currencyManager.ratesFlowValue
+				guard let exchangeRate = Utils.exchangeRate(for: fiatCurrency, fromRates: exchangeRates) else {
+					return .internalError(card: matchingCard, details: "missing exchange rate")
+				}
+				let invoiceFiat: Double = Utils.convertToFiat(
+					msat: invoiceAmount.msat,
+					exchangeRate: exchangeRate
+				)
+				
+				let prvSpendFiat: Double = isDaily
+					? cardAmounts.dailyFiatAmount(target: fiatCurrency, exchangeRates: exchangeRates)
+					: cardAmounts.monthlyFiatAmount(target: fiatCurrency, exchangeRates: exchangeRates)
+				
+				let newSpendFiat: Double = prvSpendFiat + invoiceFiat
+				
+				log.debug(
+					"""
+					\(isDaily ? "dailySpendingLimit" : "monthlySpendingLimit"): \
+					prvSpendFiat(\(prvSpendFiat)) + invoiceFiatt(\(invoiceFiat)) = \
+					newSpendFiat(\(newSpendFiat)) ?>? limitFiat(\(limitFiat))
+					""")
+				
+				if newSpendFiat > limitFiat {
+					let targetAmt = CurrencyAmount(currency: limit.currency, amount: invoiceFiat)
+					
+					return isDaily
+						? .dailyLimitExceeded(card: matchingCard, amount: targetAmt)
+						: .monthlyLimitExceeded(card: matchingCard, amount: targetAmt)
+				}
+			}
+			
+			return nil
+		}
+		
+		if matchingCard.dailyLimit != nil || matchingCard.monthlyLimit != nil {
+		
+			do {
+				let cardPaymentsMap: [Lightning_kmpUUID : CardsManager.CardPayments] =
+					try await self.cardsManager.fetchCardPayments()
+				
+				var cardAmounts = CardsManager.CardAmounts(daily: [], monthly: [])
+				if let cardPayments = cardPaymentsMap[matchingCard.id] {
+					cardAmounts = self.cardsManager.getCardAmounts(payments : cardPayments)
+				}
+				
+				if let dailyLimit = matchingCard.dailyLimit?.toCurrencyAmount() {
+					if let error = checkSpendingLimit(cardAmounts, dailyLimit, true) {
+						return await asyncDeferred(.failure(error))
+					}
+				}
+				if let monthlyLimit = matchingCard.monthlyLimit?.toCurrencyAmount() {
+					if let error = checkSpendingLimit(cardAmounts, monthlyLimit, false) {
+						return await asyncDeferred(.failure(error))
+					}
+				}
+				
+			} catch {
+				return await asyncDeferred(.failure(
+					.internalError(card: matchingCard, details: "checking spending limits")
+				))
+			}
+		}
 		
 		// Step 7 of 9:
 		// Wait until our peer is connected & all channels are ready.

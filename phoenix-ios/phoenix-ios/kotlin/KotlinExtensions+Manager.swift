@@ -39,6 +39,13 @@ extension CardsManager {
 	}
 }
 
+extension CurrencyManager {
+	
+	var ratesFlowValue: [ExchangeRate] {
+		return self.ratesFlow.value as? [ExchangeRate] ?? []
+	}
+}
+
 extension ConnectionsManager {
 	
 	var currentValue: Connections {
