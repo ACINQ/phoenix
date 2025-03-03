@@ -4,20 +4,20 @@ import app.cash.sqldelight.Transacter
 import app.cash.sqldelight.coroutines.asFlow
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
-import fr.acinq.phoenix.data.ContactInfo
+import fr.acinq.phoenix.data.BoltCardInfo
 import kotlin.collections.List
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
-class CloudKitContactsDb(
+class CloudKitCardsDb(
     private val appDb: SqliteAppDb
 ): CoroutineScope by MainScope() {
 
     private val db: Transacter = appDb.database
-    private val queries = appDb.database.cloudKitContactsQueries
+    private val queries = appDb.database.cloudKitCardsQueries
 
     /**
-     * Provides a flow of the count of items within the cloudkit_contacts_queue table.
+     * Provides a flow of the count of items within the cloudkit_cards_queue table.
      */
     private val _queueCount = MutableStateFlow<Long>(0)
     val queueCount: StateFlow<Long> = _queueCount.asStateFlow()
@@ -28,32 +28,32 @@ class CloudKitContactsDb(
     )
 
     data class MissingItem(
-        val contactId: UUID,
+        val cardId: UUID,
         val timestamp: Long
     )
 
     data class FetchQueueBatchResult(
 
-        // The fetched rowid values from the `cloudkit_contacts_queue` table
+        // The fetched rowid values from the `cloudkit_cards_queue` table
         val rowids: List<Long>,
 
-        // Maps `cloudkit_contacts_queue.rowid` to the corresponding contactId.
-        // If missing from the map, then the `cloudkit_contacts_queue` row was
+        // Maps `cloudkit_cards_queue.rowid` to the corresponding cardId.
+        // If missing from the map, then the `cloudkit_cards_queue` row was
         // malformed or unrecognized.
         val rowidMap: Map<Long, UUID>,
 
-        // Maps to the contact information in the database.
-        // If missing from the map, then the contact has been deleted from the database.
-        val rowMap: Map<UUID, ContactInfo>,
+        // Maps to the card information in the database.
+        // If missing from the map, then the card has been deleted from the database.
+        val rowMap: Map<UUID, BoltCardInfo>,
 
-        // Maps to `cloudkit_contacts_metadata.ckrecord_info`.
+        // Maps to `cloudkit_cards_metadata.ckrecord_info`.
         // If missing from the map, then then record doesn't exist in the database.
         val metadataMap: Map<UUID, ByteArray>,
     )
 
     init {
         // N.B.: There appears to be a subtle bug in SQLDelight's
-        // `.asFlow().mapToX()`, as described here:
+        // `.asFlow().mapToX(Dispatchers.Default)`, as described here:
         // https://github.com/ACINQ/phoenix/pull/415
         launch {
             queries.fetchQueueCount()
@@ -76,15 +76,15 @@ class CloudKitContactsDb(
 
             val rowids = mutableListOf<Long>()
             val rowidMap = mutableMapOf<Long, UUID>()
-            val rowMap = mutableMapOf<UUID, ContactInfo>()
+            val rowMap = mutableMapOf<UUID, BoltCardInfo>()
             val metadataMap = mutableMapOf<UUID, ByteArray>()
 
-            val contactQueries = appDb.contactQueries
+            val cardQueries = appDb.cardQueries
 
             db.transaction {
 
                 // Step 1 of 3:
-                // Fetch the rows from the `cloudkit_contacts_queue` batch.
+                // Fetch the rows from the `cloudkit_cards_queue` batch.
                 // We are fetching the next/oldest X rows from the queue.
 
                 val batch = queries.fetchQueueBatch(limit).executeAsList()
@@ -95,8 +95,8 @@ class CloudKitContactsDb(
                 batch.forEach { row ->
                     rowids.add(row.rowid)
                     try {
-                        val contactId = UUID.fromString(row.id)
-                        rowidMap[row.rowid] = contactId
+                        val cardId = UUID.fromString(row.id)
+                        rowidMap[row.rowid] = cardId
                     } catch (e: Exception) {
                         // UUID appears to be malformed within the database.
                         // Nothing we can do here - but let's at least not crash.
@@ -104,29 +104,25 @@ class CloudKitContactsDb(
                 } // </batch.forEach>
 
                 // Remember: there could be duplicates
-                val uniqueContactIds = rowidMap.values.toSet()
+                val uniqueCardIds = rowidMap.values.toSet()
 
                 // Step 3 of 3:
-                // Fetch the corresponding contact info from the database.
+                // Fetch the corresponding card info from the database.
 
-                uniqueContactIds.forEach { contactId ->
-                    if (contactQueries.existsContact(contactId)) {
-                        // contactQueries.getContact() throws if the contact doesn't exist
-                        contactQueries.getContact(contactId)?.let {
-                            rowMap[contactId] = it
-                        }
+                uniqueCardIds.forEach { cardId ->
+                    cardQueries.getCard(cardId)?.let {
+                        rowMap[cardId] = it
                     }
-
                 }
 
                 // Step 4 of 5:
-                // Fetch the corresponding `cloudkit_contacts_metadata.ckrecord_info`
+                // Fetch the corresponding `cloudkit_cards_metadata.ckrecord_info`
 
-                uniqueContactIds.forEach { contactId ->
+                uniqueCardIds.forEach { cardId ->
                     queries.fetchMetadata(
-                        id = contactId.toString()
+                        id = cardId.toString()
                     ).executeAsOneOrNull()?.let { row ->
-                        metadataMap[contactId] = row.record_blob
+                        metadataMap[cardId] = row.record_blob
                     }
                 }
 
@@ -153,24 +149,24 @@ class CloudKitContactsDb(
                     queries.deleteFromQueue(rowid)
                 }
 
-                deleteFromMetadata.forEach { contactId ->
+                deleteFromMetadata.forEach { cardId ->
                     queries.deleteMetadata(
-                        id = contactId.toString()
+                        id = cardId.toString()
                     )
                 }
 
-                updateMetadata.forEach { (contactId, row) ->
+                updateMetadata.forEach { (cardId, row) ->
                     val rowExists = queries.existsMetadata(
-                        id = contactId.toString()
+                        id = cardId.toString()
                     ).executeAsOne() > 0
                     if (rowExists) {
                         queries.updateMetadata(
                             record_blob = row.recordBlob,
-                            id = contactId.toString()
+                            id = cardId.toString()
                         )
                     } else {
                         queries.addMetadata(
-                            id = contactId.toString(),
+                            id = cardId.toString(),
                             record_creation = row.recordCreation,
                             record_blob = row.recordBlob
                         )
@@ -182,71 +178,71 @@ class CloudKitContactsDb(
 
     suspend fun fetchOldestCreation(): Long? {
         return withContext(Dispatchers.Default) {
-            val row = queries.fetchOldestCreation_Contacts().executeAsOneOrNull()
+            val row = queries.fetchOldestCreation_Cards().executeAsOneOrNull()
             row?.record_creation
         }
     }
 
     suspend fun updateRows(
-        downloadedContacts: List<ContactInfo>,
+        downloadedCards: List<BoltCardInfo>,
         updateMetadata: Map<UUID, MetadataRow>
     ) {
-        // We are seeing crashes when accessing the values within the List<PaymentRow>.
+        // We are seeing crashes when accessing the values within the List<BoltCardInfo>.
         // Perhaps because the List was created in Swift ?
         // The workaround seems to be to copy the list here,
         // or otherwise process it outside of the `withContext` below.
-        val contacts = downloadedContacts.map { it.copy() }
+        val cards = downloadedCards.map { it.copy() }
 
         withContext(Dispatchers.Default) {
-            val contactQueries = appDb.contactQueries
+            val cardQueries = appDb.cardQueries
 
             db.transaction {
-                for (contact in contacts) {
+                for (card in cards) {
 
                     val rowExists = queries.existsMetadata(
-                        id = contact.id.toString()
+                        id = card.id.toString()
                     ).executeAsOne() > 0
                     if (!rowExists) {
-                        contactQueries.saveContact(contact, notify = false)
+                        cardQueries.saveCard(card, notify = false)
                     }
                 }
 
-                for ((contactId, row) in updateMetadata) {
+                for ((cardId, row) in updateMetadata) {
                     val rowExists = queries.existsMetadata(
-                        id = contactId.toString()
+                        id = cardId.toString()
                     ).executeAsOne() > 0
 
                     if (rowExists) {
                         queries.updateMetadata(
                             record_blob = row.recordBlob,
-                            id = contactId.toString()
+                            id = cardId.toString()
                         )
                     } else {
                         queries.addMetadata(
-                            id = contactId.toString(),
+                            id = cardId.toString(),
                             record_creation = row.recordCreation,
                             record_blob = row.recordBlob
                         )
                     }
-                } // </cloudkit_contacts_metadata table>
+                } // </cloudkit_card_metadata table>
             }
         }
     }
 
     suspend fun enqueueMissingItems() {
         withContext(Dispatchers.Default) {
-            val rawContactQueries = appDb.database.contactsQueries
+            val rawCardQueries = appDb.database.boltCardsQueries
 
             db.transaction {
 
                 // Step 1 of 3:
-                // Fetch list of contact ID's that are already represented in the cloud.
+                // Fetch list of card ID's that are already represented in the cloud.
 
-                val cloudContactIds = mutableSetOf<UUID>()
+                val cloudCardIds = mutableSetOf<UUID>()
                 queries.scanMetadata().executeAsList().forEach { id ->
                     try {
-                        val contactId = UUID.fromString(id)
-                        cloudContactIds.add(contactId)
+                        val cardId = UUID.fromString(id)
+                        cloudCardIds.add(cardId)
                     } catch (e: Exception) {
                         // UUID appears to be malformed within the database.
                         // Nothing we can do here - but let's at least not crash.
@@ -254,15 +250,15 @@ class CloudKitContactsDb(
                 }
 
                 // Step 2 of 3:
-                // Scan local contact ID's, looking to see if any are missing from the cloud.
+                // Scan local card ID's, looking to see if any are missing from the cloud.
 
                 val missing = mutableListOf<MissingItem>()
-                rawContactQueries.scanContacts().executeAsList().forEach { row ->
+                rawCardQueries.scanCards().executeAsList().forEach { row ->
                     try {
-                        val contactId = UUID.fromString(row.id)
-                        if (!cloudContactIds.contains(contactId)) {
+                        val cardId = UUID.fromString(row.id)
+                        if (!cloudCardIds.contains(cardId)) {
                             missing.add(MissingItem(
-                                contactId = contactId,
+                                cardId = cardId,
                                 timestamp = row.created_at
                             ))
                         }
@@ -281,7 +277,7 @@ class CloudKitContactsDb(
                 // This matches how they normally would have been uploaded.
                 // Also, when a user restores their wallet (e.g. on a new phone),
                 // we always want to download the newest items first.
-                // And this assumes the newest items in the cloud are the newest contacts.
+                // And this assumes the newest items in the cloud are the newest cards.
                 //
                 // Since items are uploaded in FIFO order,
                 // we just need to make the oldest item have the
@@ -296,7 +292,7 @@ class CloudKitContactsDb(
                 val now = currentTimestampMillis()
                 missing.forEachIndexed { idx, item ->
                     queries.addToQueue(
-                        id = item.contactId.toString(),
+                        id = item.cardId.toString(),
                         date_added = now - idx
                     )
                 }

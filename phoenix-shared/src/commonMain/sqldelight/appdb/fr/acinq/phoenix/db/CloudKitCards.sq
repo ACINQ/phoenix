@@ -1,7 +1,7 @@
--- This table stores the CKRecord metadata corresponding to a synced contact.
--- * id => stores the primary key of the contact row
+-- This table stores the CKRecord metadata corresponding to a synced card.
+-- * id => stores the primary key of the card row
 --
-CREATE TABLE IF NOT EXISTS cloudkit_contacts_metadata (
+CREATE TABLE IF NOT EXISTS cloudkit_cards_metadata (
     id TEXT NOT NULL PRIMARY KEY,
     record_creation INTEGER NOT NULL,
     record_blob BLOB NOT NULL
@@ -10,74 +10,74 @@ CREATE TABLE IF NOT EXISTS cloudkit_contacts_metadata (
 -- When resuming the download process (e.g. after app relaunch),
 -- we need to fetch the earliest creationDate.
 CREATE INDEX IF NOT EXISTS record_creation_idx
-ON cloudkit_contacts_metadata(record_creation);
+ON cloudkit_cards_metadata(record_creation);
 
 -- This table stores the queue of items that need to be pushed to the cloud.
 -- * rowid => because we might store the same `id` multiple times
--- * id => stores the primary key of the contact row
+-- * id => stores the primary key of the card row
 --
-CREATE TABLE IF NOT EXISTS cloudkit_contacts_queue (
+CREATE TABLE IF NOT EXISTS cloudkit_cards_queue (
     rowid INTEGER PRIMARY KEY,
     id TEXT NOT NULL,
     date_added INTEGER NOT NULL
 );
 
--- ########## cloudkit_contacts_metadata ##########
+-- ########## cloudkit_cards_metadata ##########
 
 addMetadata:
-INSERT INTO cloudkit_contacts_metadata (
+INSERT INTO cloudkit_cards_metadata (
             id,
             record_creation,
             record_blob)
 VALUES (?, ?, ?);
 
 updateMetadata:
-UPDATE cloudkit_contacts_metadata
+UPDATE cloudkit_cards_metadata
 SET    record_blob = ?
 WHERE  id = ?;
 
 existsMetadata:
-SELECT COUNT(*) FROM cloudkit_contacts_metadata
+SELECT COUNT(*) FROM cloudkit_cards_metadata
 WHERE id = ?;
 
 fetchMetadata:
-SELECT * FROM cloudkit_contacts_metadata
+SELECT * FROM cloudkit_cards_metadata
 WHERE id = ?;
 
 scanMetadata:
-SELECT id FROM cloudkit_contacts_metadata;
+SELECT id FROM cloudkit_cards_metadata;
 
-fetchOldestCreation_Contacts:
-SELECT id, record_creation FROM cloudkit_contacts_metadata
+fetchOldestCreation_Cards:
+SELECT id, record_creation FROM cloudkit_cards_metadata
 ORDER BY record_creation ASC
 LIMIT 1;
 
 deleteMetadata:
-DELETE FROM cloudkit_contacts_metadata
+DELETE FROM cloudkit_cards_metadata
 WHERE id = ?;
 
 deleteAllFromMetadata:
-DELETE FROM cloudkit_contacts_metadata;
+DELETE FROM cloudkit_cards_metadata;
 
--- ########## cloudkit_contacts_queue ##########
+-- ########## cloudkit_cards_queue ##########
 
 addToQueue:
-INSERT INTO cloudkit_contacts_queue (
+INSERT INTO cloudkit_cards_queue (
             id,
             date_added)
 VALUES (?, ?);
 
 fetchQueueBatch:
-SELECT * FROM cloudkit_contacts_queue
+SELECT * FROM cloudkit_cards_queue
 ORDER BY date_added ASC
 LIMIT :limit;
 
 fetchQueueCount:
-SELECT COUNT(*) FROM cloudkit_contacts_queue;
+SELECT COUNT(*) FROM cloudkit_cards_queue;
 
 deleteFromQueue:
-DELETE FROM cloudkit_contacts_queue
+DELETE FROM cloudkit_cards_queue
 WHERE rowid = ?;
 
 deleteAllFromQueue:
-DELETE FROM cloudkit_contacts_queue;
+DELETE FROM cloudkit_cards_queue;
