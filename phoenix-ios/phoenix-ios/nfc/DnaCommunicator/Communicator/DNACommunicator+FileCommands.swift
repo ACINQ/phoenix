@@ -47,8 +47,8 @@ extension DnaCommunicator {
 	) async -> Result<Void, Error> {
 		
 		// Pg. 75
-		let dataSizeBytes = Helper.byteArrayLE(from: Int32(data.count))[0...2]
-		let offsetBytes = Helper.byteArrayLE(from: Int32(offset))[0...2]
+		let offsetBytes = Helper.byteArrayLE(from: Int32(offset))[0...2]       // 3 bytes
+		let dataSizeBytes = Helper.byteArrayLE(from: Int32(data.count))[0...2] // 3 bytes
 		
 		let result = await nxpSwitchedCommand(
 			mode    : mode,

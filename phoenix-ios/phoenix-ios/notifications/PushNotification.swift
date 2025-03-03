@@ -54,8 +54,8 @@ class PushNotification {
 				 userInfo["reason"]             != nil // just in-case google changes format
 	}
 	
-	static func parseWithdrawRequest(userInfo: [AnyHashable : Any]) -> WithdrawRequest? {
-		log.trace("parseWithdrawRequest()")
+	static func parseLnurlWithdraw(userInfo: [AnyHashable : Any]) -> LnurlWithdrawNotification? {
+		log.trace("parseLnurlWithdraw()")
 		
 		// It should look like this:
 		//
@@ -85,23 +85,31 @@ class PushNotification {
 			log.debug("parseLnurlWithdraw: t != withdraw")
 			return nil
 		}
-		
 		guard let piccData = Data(fromHex: picc) else {
 			log.debug("parseLnurlWithdraw: picc is not hexadecimal")
 			return nil
 		}
-				
 		guard let cmacData = Data(fromHex: cmac) else {
 			log.debug("parseLnurlWithdraw: cmac is not hexadecimal")
 			return nil
 		}
+		guard let invoice = Parser.shared.readBolt11Invoice(input: invc) else {
+			log.debug("parseLnurlWithdraw: invc is not Bolt11Invoice")
+			return nil
+		}
+		guard let invoiceAmount = invoice.amount else {
+			log.debug("parseLnurlWithdraw: invoice.amount is nil")
+			return nil
+		}
 		
-		return WithdrawRequest(
-			nodeId    : n,
-			piccData  : piccData,
-			cmac      : cmacData,
-			invoice   : invc,
-			timestamp : ts.toDate(from: .milliseconds)
+		return LnurlWithdrawNotification(
+			nodeId        : n,
+			piccData      : piccData,
+			cmac          : cmacData,
+			invoice       : invoice,
+			invoiceAmount : invoiceAmount,
+			invoiceString : invc,
+			timestamp     : ts.toDate(from: .milliseconds)
 		)
 	}
 }

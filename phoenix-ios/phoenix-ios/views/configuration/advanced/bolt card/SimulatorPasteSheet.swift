@@ -8,18 +8,17 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-struct SimulatorBoltCardInput: Codable {
-	let key0: String
-	let chipUid: String
-}
-
 struct SimulatorPasteSheet: View {
 	
-	let hexAddr: String
+	let input: BoltCardInput
 	
 	@State var jsonInput: String = ""
 	
 	@EnvironmentObject var smartModalState: SmartModalState
+	
+	// --------------------------------------------------
+	// MARK: View Builders
+	// --------------------------------------------------
 	
 	@ViewBuilder
 	var body: some View {
@@ -73,8 +72,8 @@ struct SimulatorPasteSheet: View {
 			.fixedSize(horizontal: false, vertical: true) // text truncation bugs
 			
 			content_instructions()
-			content_address()
-			content_json()
+			content_copy()
+			content_paste()
 			
 		} // </VStack>
 		.frame(maxWidth: .infinity)
@@ -113,7 +112,7 @@ struct SimulatorPasteSheet: View {
 	}
 	
 	@ViewBuilder
-	func content_address() -> some View {
+	func content_copy() -> some View {
 		
 		Grid(
 			alignment: Alignment.trailing,
@@ -121,15 +120,17 @@ struct SimulatorPasteSheet: View {
 			verticalSpacing: 8
 		) {
 			GridRow {
-				Text("Simulator's HEX address:")
+				Text("Copy simulator's info:")
 					.foregroundStyle(.secondary)
 					.gridCellAnchor(.trailing)
 				
 				Button {
-					copyHexAddrToClipboard()
+					copySimInfoToClipboard()
 				} label: {
 					HStack(alignment: VerticalAlignment.center, spacing: 4) {
-						Text(hexAddr)
+						Text(simulatorInfo())
+							.lineLimit(1)
+							.truncationMode(.tail)
 						Image(systemName: "square.on.square")
 					}
 				}
@@ -139,7 +140,7 @@ struct SimulatorPasteSheet: View {
 	}
 	
 	@ViewBuilder
-	func content_json() -> some View {
+	func content_paste() -> some View {
 		
 		TextField("Paste JSON output from device here", text: $jsonInput, axis: .vertical)
 			.lineLimit(3, reservesSpace: true)
@@ -167,6 +168,20 @@ struct SimulatorPasteSheet: View {
 	}
 	
 	// --------------------------------------------------
+	// MARK: View Helpers
+	// --------------------------------------------------
+	
+	func simulatorInfo() -> String {
+		
+		do {
+			let jsonData = try JSONEncoder().encode(input)
+			return String(data: jsonData, encoding: .utf8) ?? ""
+		} catch {
+			return ""
+		}
+	}
+	
+	// --------------------------------------------------
 	// MARK: Notifications
 	// --------------------------------------------------
 	
@@ -188,10 +203,10 @@ struct SimulatorPasteSheet: View {
 	// MARK: Actions
 	// --------------------------------------------------
 	
-	func copyHexAddrToClipboard() {
-		log.trace("copyHexAddrToClipboard()")
+	func copySimInfoToClipboard() {
+		log.trace("copySimInfoToClipboard()")
 		
-		UIPasteboard.general.string = hexAddr
+		UIPasteboard.general.string = simulatorInfo()
 	}
 	
 	func importCard(_ input: SimulatorBoltCardInput) {

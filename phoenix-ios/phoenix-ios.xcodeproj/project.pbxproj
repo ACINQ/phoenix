@@ -223,6 +223,10 @@
 		DC74174B270F332700F7E3E3 /* KotlinTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC74174A270F332700F7E3E3 /* KotlinTypes.swift */; };
 		DC74174D270F455D00F7E3E3 /* AES256.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC74174C270F455D00F7E3E3 /* AES256.swift */; };
 		DC784A112B31EA180018DC4A /* LiquidityAdsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC784A102B31EA180018DC4A /* LiquidityAdsView.swift */; };
+		DC7A7A922D6E108E00DE586F /* LnurlWithdrawNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC7A7A912D6E108800DE586F /* LnurlWithdrawNotification.swift */; };
+		DC7A7A932D6E108E00DE586F /* LnurlWithdrawNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC7A7A912D6E108800DE586F /* LnurlWithdrawNotification.swift */; };
+		DC7A7A962D6E60E000DE586F /* CardRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC7A7A952D6E60DB00DE586F /* CardRequest.swift */; };
+		DC7A7A972D6E60E000DE586F /* CardRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC7A7A952D6E60DB00DE586F /* CardRequest.swift */; };
 		DC7BAA002CADAAE70074B568 /* WalletIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC7BA9FF2CADAAE70074B568 /* WalletIdentifier.swift */; };
 		DC7DA9F62AD84DF200F86B99 /* String+Substring.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC7DA9F52AD84DF200F86B99 /* String+Substring.swift */; };
 		DC808E9B2D5541F50019AE30 /* UsingTorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC808E9A2D5541F10019AE30 /* UsingTorSheet.swift */; };
@@ -255,6 +259,8 @@
 		DCA02BA02BD1A5FC0080520F /* ChannelSizeImpactWarning.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA02B9F2BD1A5FC0080520F /* ChannelSizeImpactWarning.swift */; };
 		DCA125752A27EDDB00DA2F7F /* MempoolRecommendedResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA125742A27EDDB00DA2F7F /* MempoolRecommendedResponse.swift */; };
 		DCA3B41F2A5471C900E6B231 /* MinerFeeInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA3B41E2A5471C900E6B231 /* MinerFeeInfo.swift */; };
+		DCA3DE0F2D63E57000649310 /* BoltCardInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA3DE0E2D63E57000649310 /* BoltCardInput.swift */; };
+		DCA3DE112D63E58300649310 /* CardOptionsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA3DE102D63E58300649310 /* CardOptionsSheet.swift */; };
 		DCA4DA322C6674A20010363C /* NavigationPath+RemoveAll.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA4DA312C6674A20010363C /* NavigationPath+RemoveAll.swift */; };
 		DCA4DA352C669FDF0010363C /* CurrencyConverterRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA4DA342C669FDF0010363C /* CurrencyConverterRow.swift */; };
 		DCA4DA372C66A0960010363C /* CurrencySelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA4DA362C66A0960010363C /* CurrencySelector.swift */; };
@@ -358,7 +364,6 @@
 		DCCA89BB2D63DB6200AD5428 /* ArchiveCardSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCA89A02D63DB6200AD5428 /* ArchiveCardSheet.swift */; };
 		DCCA89BC2D63DB6200AD5428 /* DeleteCardSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCA89A32D63DB6200AD5428 /* DeleteCardSheet.swift */; };
 		DCCA89BE2D63DB9500AD5428 /* SwCrypt in Frameworks */ = {isa = PBXBuildFile; productRef = DCCA89BD2D63DB9500AD5428 /* SwCrypt */; };
-		DCCA89C12D63DBEB00AD5428 /* BoltCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCA89C02D63DBEB00AD5428 /* BoltCardView.swift */; };
 		DCCC7FD526B0A006008ACD9B /* SquareSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCC7FD426B0A006008ACD9B /* SquareSize.swift */; };
 		DCCCEAB528F6DA2A0047871A /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCCEAB428F6DA2A0047871A /* RootView.swift */; };
 		DCCD045D27EE0173007D57A5 /* EditInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCD045C27EE0173007D57A5 /* EditInfoView.swift */; };
@@ -397,6 +402,7 @@
 		DCDD9ED2286377C5001800A3 /* MainView_Small.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDD9ED1286377C5001800A3 /* MainView_Small.swift */; };
 		DCDD9ED428637EBB001800A3 /* ToolsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDD9ED328637EBB001800A3 /* ToolsButton.swift */; };
 		DCDD9ED628637FD7001800A3 /* AppStatusButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDD9ED528637FD7001800A3 /* AppStatusButton.swift */; };
+		DCE0FAC72D52ACCD00F7D29D /* String+Email.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE0FAC62D52ACCA00F7D29D /* String+Email.swift */; };
 		DCE1E5FA26418183005465B8 /* Toast.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE1E5F926418183005465B8 /* Toast.swift */; };
 		DCE2B9B52C939631000430B8 /* ValidateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE2B9B42C939631000430B8 /* ValidateView.swift */; };
 		DCE3C7AB2A6AD3CC00F4D385 /* MempoolMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE3C7AA2A6AD3CC00F4D385 /* MempoolMonitor.swift */; };
@@ -690,6 +696,8 @@
 		DC74174A270F332700F7E3E3 /* KotlinTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinTypes.swift; sourceTree = "<group>"; };
 		DC74174C270F455D00F7E3E3 /* AES256.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AES256.swift; sourceTree = "<group>"; };
 		DC784A102B31EA180018DC4A /* LiquidityAdsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidityAdsView.swift; sourceTree = "<group>"; };
+		DC7A7A912D6E108800DE586F /* LnurlWithdrawNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LnurlWithdrawNotification.swift; sourceTree = "<group>"; };
+		DC7A7A952D6E60DB00DE586F /* CardRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardRequest.swift; sourceTree = "<group>"; };
 		DC7BA9FF2CADAAE70074B568 /* WalletIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletIdentifier.swift; sourceTree = "<group>"; };
 		DC7DA9F52AD84DF200F86B99 /* String+Substring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Substring.swift"; sourceTree = "<group>"; };
 		DC808E9A2D5541F10019AE30 /* UsingTorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsingTorSheet.swift; sourceTree = "<group>"; };
@@ -719,6 +727,8 @@
 		DCA02B9F2BD1A5FC0080520F /* ChannelSizeImpactWarning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelSizeImpactWarning.swift; sourceTree = "<group>"; };
 		DCA125742A27EDDB00DA2F7F /* MempoolRecommendedResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MempoolRecommendedResponse.swift; sourceTree = "<group>"; };
 		DCA3B41E2A5471C900E6B231 /* MinerFeeInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinerFeeInfo.swift; sourceTree = "<group>"; };
+		DCA3DE0E2D63E57000649310 /* BoltCardInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoltCardInput.swift; sourceTree = "<group>"; };
+		DCA3DE102D63E58300649310 /* CardOptionsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardOptionsSheet.swift; sourceTree = "<group>"; };
 		DCA4DA312C6674A20010363C /* NavigationPath+RemoveAll.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NavigationPath+RemoveAll.swift"; sourceTree = "<group>"; };
 		DCA4DA342C669FDF0010363C /* CurrencyConverterRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverterRow.swift; sourceTree = "<group>"; };
 		DCA4DA362C66A0960010363C /* CurrencySelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencySelector.swift; sourceTree = "<group>"; };
@@ -807,7 +817,6 @@
 		DCCA89AB2D63DB6200AD5428 /* SimulatorPasteSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulatorPasteSheet.swift; sourceTree = "<group>"; };
 		DCCA89AC2D63DB6200AD5428 /* SimulatorWriteSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulatorWriteSheet.swift; sourceTree = "<group>"; };
 		DCCA89AD2D63DB6200AD5428 /* WriteErrorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WriteErrorSheet.swift; sourceTree = "<group>"; };
-		DCCA89C02D63DBEB00AD5428 /* BoltCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoltCardView.swift; sourceTree = "<group>"; };
 		DCCC7FD426B0A006008ACD9B /* SquareSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SquareSize.swift; sourceTree = "<group>"; };
 		DCCCEAB428F6DA2A0047871A /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		DCCD045C27EE0173007D57A5 /* EditInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditInfoView.swift; sourceTree = "<group>"; };
@@ -837,6 +846,7 @@
 		DCDD9ED1286377C5001800A3 /* MainView_Small.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView_Small.swift; sourceTree = "<group>"; };
 		DCDD9ED328637EBB001800A3 /* ToolsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolsButton.swift; sourceTree = "<group>"; };
 		DCDD9ED528637FD7001800A3 /* AppStatusButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStatusButton.swift; sourceTree = "<group>"; };
+		DCE0FAC62D52ACCA00F7D29D /* String+Email.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Email.swift"; sourceTree = "<group>"; };
 		DCE1E5F926418183005465B8 /* Toast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Toast.swift; sourceTree = "<group>"; };
 		DCE2B9B42C939631000430B8 /* ValidateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidateView.swift; sourceTree = "<group>"; };
 		DCE3C7AA2A6AD3CC00F4D385 /* MempoolMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MempoolMonitor.swift; sourceTree = "<group>"; };
@@ -1057,6 +1067,7 @@
 				DCA6DEC42829BD060073C658 /* xpc */,
 				DCD1BFD42CE775CE00C2B811 /* nfc */,
 				DCCA898F2D63D6B800AD5428 /* notifications */,
+				DC7A7A942D6E5FA200DE586F /* withdraw */,
 				DCE3C7A92A6AD39E00F4D385 /* mempool */,
 				DCCFE6AC2B6430BD002FFF11 /* logging */,
 			);
@@ -1171,7 +1182,6 @@
 				DC98D3972AF2AE41005BD177 /* ReceiveView.swift */,
 				DC3FDCAE2C3306AB002C5931 /* LightningDualView.swift */,
 				DC2F431327B6972C0006FCC4 /* SwapInView.swift */,
-				DCCA89C02D63DBEB00AD5428 /* BoltCardView.swift */,
 				DC5631C92C597B8600DCB5BF /* SourceInfo.swift */,
 				DC2F431527B6983B0006FCC4 /* CopyShareOptionsSheet.swift */,
 				DC2F431927B699800006FCC4 /* ModifyInvoiceSheet.swift */,
@@ -1370,6 +1380,15 @@
 			path = "liquidity management";
 			sourceTree = "<group>";
 		};
+		DC7A7A942D6E5FA200DE586F /* withdraw */ = {
+			isa = PBXGroup;
+			children = (
+				DC7A7A952D6E60DB00DE586F /* CardRequest.swift */,
+				DCCA898E2D63D6B800AD5428 /* WithdrawRequest.swift */,
+			);
+			path = withdraw;
+			sourceTree = "<group>";
+		};
 		DC808E992D5524E90019AE30 /* tor */ = {
 			isa = PBXGroup;
 			children = (
@@ -1515,24 +1534,25 @@
 		DCACF6EE2566D0A60009B01E /* extensions */ = {
 			isa = PBXGroup;
 			children = (
+				DC2CE3AE29AFEB0500BA0B00 /* Bundle+Icon.swift */,
 				DCEE3E532931446A00EB4DFF /* Collections+AsInt.swift */,
 				DCACF6EF2566D0A60009B01E /* Data+Hexadecimal.swift */,
 				DC422F3229392ABD00E72253 /* Date+Format.swift */,
+				DCFB8DF82A94112A00947698 /* Dictionary+MapKeys.swift */,
+				DC5A935229846043004F19FD /* FileHandle+Async.swift */,
 				DCB493CC269F8531001B0F09 /* Int+TimeInterval.swift */,
 				DC422F3429392B0500E72253 /* Int+ToDate.swift */,
+				DCA4DA312C6674A20010363C /* NavigationPath+RemoveAll.swift */,
+				DC6F19BE2C46FB0F004EC469 /* NSItemProvider+Async.swift */,
 				DCB493CA269F3B05001B0F09 /* Result+Deugly.swift */,
 				DC59377027516296003B4B53 /* Sequence+Sum.swift */,
+				DCE0FAC62D52ACCA00F7D29D /* String+Email.swift */,
 				DC4CF3CB2BE93311003A957F /* String+PIN.swift */,
 				DC7DA9F52AD84DF200F86B99 /* String+Substring.swift */,
 				DC09085725B5E43900A46136 /* String+VersionComparison.swift */,
+				DCFB8DF62A94066100947698 /* Task+Sleep.swift */,
 				DC384D82265C32F100131772 /* TextField+Verbatim.swift */,
 				DC89857E25914747007B253F /* UIApplicationState+Phoenix.swift */,
-				DC5A935229846043004F19FD /* FileHandle+Async.swift */,
-				DC2CE3AE29AFEB0500BA0B00 /* Bundle+Icon.swift */,
-				DCFB8DF62A94066100947698 /* Task+Sleep.swift */,
-				DCFB8DF82A94112A00947698 /* Dictionary+MapKeys.swift */,
-				DC6F19BE2C46FB0F004EC469 /* NSItemProvider+Async.swift */,
-				DCA4DA312C6674A20010363C /* NavigationPath+RemoveAll.swift */,
 			);
 			path = extensions;
 			sourceTree = "<group>";
@@ -1671,7 +1691,7 @@
 			isa = PBXGroup;
 			children = (
 				DCCA898D2D63D6B800AD5428 /* PushNotification.swift */,
-				DCCA898E2D63D6B800AD5428 /* WithdrawRequest.swift */,
+				DC7A7A912D6E108800DE586F /* LnurlWithdrawNotification.swift */,
 			);
 			path = notifications;
 			sourceTree = "<group>";
@@ -1680,8 +1700,10 @@
 			isa = PBXGroup;
 			children = (
 				DCCA89A02D63DB6200AD5428 /* ArchiveCardSheet.swift */,
+				DCA3DE0E2D63E57000649310 /* BoltCardInput.swift */,
 				DCCA89A12D63DB6200AD5428 /* BoltCardsHelp.swift */,
 				DCCA89A22D63DB6200AD5428 /* BoltCardsList.swift */,
+				DCA3DE102D63E58300649310 /* CardOptionsSheet.swift */,
 				DCCA89A32D63DB6200AD5428 /* DeleteCardSheet.swift */,
 				DCCA89A42D63DB6200AD5428 /* LnurlwRegistration.swift */,
 				DCCA89A52D63DB6200AD5428 /* ManageBoltCard.swift */,
@@ -2108,6 +2130,7 @@
 				DC33369826BAF721000E3F49 /* ShortSheet.swift in Sources */,
 				DC3780412C077E0300937C8E /* PriorityBoxStyle.swift in Sources */,
 				DC3FDCAF2C3306AB002C5931 /* LightningDualView.swift in Sources */,
+				DCE0FAC72D52ACCD00F7D29D /* String+Email.swift in Sources */,
 				DC99E90925B78FA800FB20F7 /* EnabledSecurity.swift in Sources */,
 				DCB493CF269F859E001B0F09 /* SyncBackupManager_State.swift in Sources */,
 				DC82EED629789853007A5853 /* TxHistoryExporter.swift in Sources */,
@@ -2123,6 +2146,7 @@
 				DC6F19C12C470F70004EC469 /* PickerResult.swift in Sources */,
 				DC4CBC7E2D650C5200129BDB /* DetailsInfoGrid.swift in Sources */,
 				DCEE8998288605FD00FE42DD /* PaymentCell.swift in Sources */,
+				DC7A7A922D6E108E00DE586F /* LnurlWithdrawNotification.swift in Sources */,
 				DCDD9ED428637EBB001800A3 /* ToolsButton.swift in Sources */,
 				DCDD9ED0286377B7001800A3 /* MainView_Big.swift in Sources */,
 				DC355E1F2A44A235008E8A8E /* NotificationCell.swift in Sources */,
@@ -2256,9 +2280,9 @@
 				DCE6FB8C28D0B5F200054511 /* ResetWalletView.swift in Sources */,
 				DC3345D02C2B4C1200EDD2D4 /* ManageContact.swift in Sources */,
 				DCE7232E27AD68CD0017CF56 /* SyncBackupManager_Actor.swift in Sources */,
-				DCCA89C12D63DBEB00AD5428 /* BoltCardView.swift in Sources */,
 				DC16965F27FE0FAC003DE1DD /* KotlinExtensions+Currency.swift in Sources */,
 				DC4CBC902D677AA700129BDB /* DetailsInfoGrid+ViewHelpers.swift in Sources */,
+				DCA3DE112D63E58300649310 /* CardOptionsSheet.swift in Sources */,
 				DC65BBF22A58A40700EBA651 /* CpfpView.swift in Sources */,
 				DC422F3329392ABD00E72253 /* Date+Format.swift in Sources */,
 				DC9AD1F12C9B81450019BEE9 /* PaymentRequestedView.swift in Sources */,
@@ -2307,6 +2331,7 @@
 				DC4CBC922D677D4F00129BDB /* Details_Outgoing_ChannelClose.swift in Sources */,
 				DCE77A5827C671D600F0FA24 /* ElectrumAddressSheet.swift in Sources */,
 				DC384D81265C12B700131772 /* Cache.swift in Sources */,
+				DCA3DE0F2D63E57000649310 /* BoltCardInput.swift in Sources */,
 				DCD1BFD62CE775E900C2B811 /* NfcReader.swift in Sources */,
 				DC4CF3CC2BE93311003A957F /* String+PIN.swift in Sources */,
 				DCB30E592A0C3F8200E7D7A2 /* LiquidityPolicyView.swift in Sources */,
@@ -2315,6 +2340,7 @@
 				DC6F042B2C3DA7AD00627B4F /* ContactsListSheet.swift in Sources */,
 				DC9473FA261270B4008D7242 /* MVI+Mock.swift in Sources */,
 				DCDD9ECE28637474001800A3 /* Orientation.swift in Sources */,
+				DC7A7A962D6E60E000DE586F /* CardRequest.swift in Sources */,
 				DCCFE6B02B64326F002FFF11 /* OSLogHandler.swift in Sources */,
 				DCDD9ECB28637242001800A3 /* MainView.swift in Sources */,
 				DC9CF8412D2ECF08003F3B0F /* IncomingBalancePopover.swift in Sources */,
@@ -2476,10 +2502,12 @@
 				DCCFE6A82B63083F002FFF11 /* UnfairLock.swift in Sources */,
 				DCA6DEC82829C3150073C658 /* GenericPasswordStore.swift in Sources */,
 				DCCA89972D63D80900AD5428 /* KotlinExtensions+Cards.swift in Sources */,
+				DC7A7A972D6E60E000DE586F /* CardRequest.swift in Sources */,
 				DCA6DECD282AB10C0073C658 /* SharedSecurity.swift in Sources */,
 				DCEB2799282D7B260096B87E /* KotlinExtensions+Conversion.swift in Sources */,
 				DCCA89982D63D85200AD5428 /* Helper.swift in Sources */,
 				DCC3E5822D08A65400CCDA40 /* XPC+Background.swift in Sources */,
+				DC7A7A932D6E108E00DE586F /* LnurlWithdrawNotification.swift in Sources */,
 				DCCA899F2D63DB1000AD5428 /* Ntag424.swift in Sources */,
 				DCEB2795282D7A9F0096B87E /* KotlinPublishers+Phoenix.swift in Sources */,
 				DC641C6B2820803100862DCD /* PhoenixManager.swift in Sources */,

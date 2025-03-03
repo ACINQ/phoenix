@@ -1657,7 +1657,7 @@ struct ValidateView: View {
 			sendPayment_bolt11Invoice(model, msat)
 			
 		} else if let model = flow as? SendManager.ParseResult_Bolt12Offer {
-			sendPayment_bolt12Offer_C(model, msat)
+			sendPayment_bolt12Offer_B(model, msat)
 			
 		} else if let model = flow as? SendManager.ParseResult_Uri {
 			sendPayment_onChain(model, msat)
@@ -1704,29 +1704,11 @@ struct ValidateView: View {
 		} // </Task>
 	}
 	
-	func sendPayment_bolt12Offer_test(
+	func sendPayment_bolt12Offer_A(
 		_ model: SendManager.ParseResult_Bolt12Offer,
 		_ msat: Int64
 	) {
-		log.trace("sendPayment_bolt12Offer()_test")
-		
-		guard !paymentInProgress else {
-			log.warning("ignore: payment already in progress")
-			return
-		}
-		
-		paymentInProgress = true
-		DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) {
-			paymentInProgress = false
-			payOfferProblem = .noResponse
-		}
-	}
-	
-	func sendPayment_bolt12Offer_B(
-		_ model: SendManager.ParseResult_Bolt12Offer,
-		_ msat: Int64
-	) {
-		log.trace("sendPayment_bolt12Offer_B()")
+		log.trace("sendPayment_bolt12Offer_A()")
 		
 		guard !paymentInProgress else {
 			log.warning("ignore: payment already in progress")
@@ -1787,11 +1769,11 @@ struct ValidateView: View {
 		} // </Task>
 	}
 	
-	func sendPayment_bolt12Offer_C(
+	func sendPayment_bolt12Offer_B(
 		_ model: SendManager.ParseResult_Bolt12Offer,
 		_ msat: Int64
 	) {
-		log.trace("sendPayment_bolt12Offer_C()")
+		log.trace("sendPayment_bolt12Offer_B()")
 		
 		guard !paymentInProgress else {
 			log.warning("ignore: payment already in progress")
@@ -1820,7 +1802,10 @@ struct ValidateView: View {
 					payerKey = Lightning_randomKey()
 				}
 				
-				let response: Lightning_kmpOfferNotPaid? = try await peer.betterPayOffer(
+				let result: Bitcoin_kmpEither<
+					Lightning_kmpOfferNotPaid,
+					Lightning_kmpOfferInvoiceReceived
+				> = try await peer.betterPayOffer(
 					paymentId: paymentId,
 					amount: Lightning_kmpMilliSatoshi(msat: msat),
 					offer: model.offer,
@@ -1831,8 +1816,9 @@ struct ValidateView: View {
 				
 				paymentInProgress = false
 				
-				if let problem = PayOfferProblem.fromResponse(response) {
-					payOfferProblem = problem
+				if result.isLeft {
+					let notPaid: Lightning_kmpOfferNotPaid = result.left!
+					payOfferProblem = PayOfferProblem.fromResponse(notPaid)
 					Biz.endLongLivedTask(id: paymentId.description())
 					
 				} else {
