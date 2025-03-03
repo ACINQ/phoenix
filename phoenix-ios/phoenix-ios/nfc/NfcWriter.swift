@@ -291,7 +291,7 @@ class NfcWriter: NSObject, NFCTagReaderSessionDelegate {
 		// Write file2 data.
 		
 		do {
-			let data = Ndef.ndefDataForUrl(url: input.template.url)
+			let data = Ndef.ndefDataForTemplate(input.template)
 			try await writeFile2Data(dna, data, file2Settings).get()
 		} catch {
 			return writeDisconnect(error: .protocolError(.writeFile2Data, error))
@@ -439,7 +439,7 @@ class NfcWriter: NSObject, NFCTagReaderSessionDelegate {
 		
 		do {
 			let url = URL(string: "https://phoenix.acinq.co")!
-			let data = Ndef.ndefDataForUrl(url: url)
+			let data = Ndef.ndefDataForUrl(url)
 			try await writeFile2Data(dna, data, file2Settings).get()
 		} catch {
 			return resetDisconnect(error: .protocolError(.writeFile2Data, error))

@@ -232,6 +232,17 @@ struct BoltCardsList: View {
 		Section {
 			VStack(alignment: HorizontalAlignment.center, spacing: 10) {
 				
+			#if targetEnvironment(simulator)
+				Button {
+					showCardOptions()
+				} label: {
+					Text("Create New Debit Card")
+						.font(.title3.weight(.medium))
+				}
+				.buttonStyle(.borderedProminent)
+				.buttonBorderShape(.capsule)
+				.disabled(nfcUnavailable || isFetchingLnurlwAddr)
+			#else
 			#if DEBUG
 				Button {/* using simultaneousGesture below */} label: {
 					Text("Create New Debit Card")
@@ -246,7 +257,7 @@ struct BoltCardsList: View {
 				})
 				.simultaneousGesture(LongPressGesture(minimumDuration: 2.0).onEnded { _ in
 					log.debug("simultaneousGesture: LongPressGesture")
-					createDebitCardForSimulator()
+					showCardOptions()
 				})
 			#else
 				Button {
@@ -258,6 +269,7 @@ struct BoltCardsList: View {
 				.buttonStyle(.borderedProminent)
 				.buttonBorderShape(.capsule)
 				.disabled(nfcUnavailable || isFetchingLnurlwAddr)
+			#endif
 			#endif
 				
 				if nfcUnavailable {
@@ -387,17 +399,72 @@ struct BoltCardsList: View {
 		}
 	}
 	
+	func showCardOptions() {
+		log.trace("showCardOptions()")
+		
+		smartModalState.display(dismissable: true) {
+			CardOptionsSheet(
+				didSelectVersion: didSelectVersion,
+				didSelectSimulator: didSelectSimulator
+			)
+		}
+	}
+	
+	func didSelectVersion(_ version: BoltCardVersion) {
+		log.trace("didSelectVersion: \(version)")
+		
+		var missingLnAddress = false
+		switch version {
+		case .V1:
+			fetchLnurlWithdrawAddress(lnAddress: nil)
+			
+		case .V1AndV2:
+			if let lnAddress = AppSecurity.shared.getBip353Address() {
+				fetchLnurlWithdrawAddress(lnAddress: lnAddress)
+			} else {
+				missingLnAddress = true
+			}
+			
+		case .V2:
+			if let lnAddress = AppSecurity.shared.getBip353Address() {
+				let input = BoltCardInput.V2(lnAddress: lnAddress)
+			#if targetEnvironment(simulator)
+				presentSimulatorPasteSheet(input)
+			#else
+				writeToNfcCard(input)
+			#endif
+			} else {
+				missingLnAddress = true
+			}
+		}
+		
+		if missingLnAddress {
+			// Todo...
+		}
+	}
+	
+	func didSelectSimulator() {
+		log.trace("didSelectSimulator()")
+		
+	#if targetEnvironment(simulator)
+		log.warning("didSelectSimulator(): ignorning - we are in the simulator")
+		return
+	#else
+		smartModalState.display(dismissable: true) {
+			SimulatorWriteSheet()
+		}
+	#endif
+	}
+	
 	func createNewDebitCard() {
 		log.trace("createNewDebitCard()")
 		
-		fetchLnurlWithdrawAddress()
-	}
-	
-	func createDebitCardForSimulator() {
-		log.trace("createDebitCardForSimulator()")
-		
-		smartModalState.display(dismissable: true) {
-			SimulatorWriteSheet()
+		if let lnAddress = AppSecurity.shared.getBip353Address() {
+			let input = BoltCardInput.V2(lnAddress: lnAddress)
+			writeToNfcCard(input)
+			
+		} else {
+			// Todo..
 		}
 	}
 	
@@ -405,7 +472,7 @@ struct BoltCardsList: View {
 	// MARK: Create Card
 	// --------------------------------------------------
 	
-	func fetchLnurlWithdrawAddress() {
+	func fetchLnurlWithdrawAddress(lnAddress: String?) {
 		log.trace("fetchLnurlWithdrawAddress()")
 		
 		// Developer Note:
@@ -414,10 +481,17 @@ struct BoltCardsList: View {
 		let continueToNextStep = {(registration: LnurlWithdrawRegistration?) in
 			
 			if let hexAddr = registration?.hexAddr {
+				let input: BoltCardInput
+				if let lnAddress {
+					input = BoltCardInput.V1AndV2(lnurlWithdrawId: hexAddr, lnAddress: lnAddress)
+				} else {
+					input = BoltCardInput.V1(lnurlWithdrawId: hexAddr)
+				}
+				
 			#if targetEnvironment(simulator)
-				presentSimulatorPasteSheet(hexAddr)
+				presentSimulatorPasteSheet(input)
 			#else
-				writeToNfcCard(hexAddr)
+				writeToNfcCard(input)
 			#endif
 			} else {
 				lnurlwAddrFetchError = true
@@ -438,34 +512,32 @@ struct BoltCardsList: View {
 		}
 	}
 	
-	func presentSimulatorPasteSheet(_ hexAddr: String) {
+	func presentSimulatorPasteSheet(_ input: BoltCardInput) {
 		log.trace("presentSimulatorPasteSheet()")
 		
 		smartModalState.display(dismissable: true) {
-			SimulatorPasteSheet(hexAddr: hexAddr)
+			SimulatorPasteSheet(input: input)
 		}
 	}
 	
-	func writeToNfcCard(_ hexAddr: String) {
+	func writeToNfcCard(_ cardInput: BoltCardInput) {
 		log.trace("writeToNfcCard()")
 		
-		let keys = BoltCardKeySet.companion.random()
+		let template = cardInput.toTemplate()
 		
-		let baseUrl = URL(string: "https://phoenix.deusty.com/v1/pub/lnurlw/info?id=\(hexAddr)")!
-		let template = Ndef.Template(baseUrl: baseUrl)!
-		
-		log.debug("template.url: \(template.urlString)")
+		log.debug("template.value: \(template.valueString)")
 		log.debug("template.piccDataOffset: \(template.piccDataOffset)")
 		log.debug("template.cmacOffset: \(template.cmacOffset)")
 		
-		let input = NfcWriter.WriteInput(
+		let keys = BoltCardKeySet.companion.random()
+		let nfcInput = NfcWriter.WriteInput(
 			template    : template,
 			key0        : keys.key0_bytes,
 			piccDataKey : keys.piccDataKey_bytes,
 			cmacKey     : keys.cmacKey_bytes
 		)
 
-		NfcWriter.shared.writeCard(input) { (result: Result<NfcWriter.WriteOutput, NfcWriter.WriteError>) in
+		NfcWriter.shared.writeCard(nfcInput) { (result: Result<NfcWriter.WriteOutput, NfcWriter.WriteError>) in
 			
 			switch result {
 			case .failure(let error):

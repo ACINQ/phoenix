@@ -182,6 +182,8 @@ class BusinessManager {
 			.flatMap { $0.eventsFlowPublisher() }
 			.sink { (event: Lightning_kmpPeerEvent) in
 				
+				log.debug("eventsFlowPublisher(A): event: \(event)")
+				
 				if let paymentProgress = event as? Lightning_kmpPaymentProgress {
 					let paymentId = paymentProgress.request.paymentId.description()
 					self.beginLongLivedTask(id: paymentId)
@@ -193,6 +195,27 @@ class BusinessManager {
 				} else if let paymentNotSent = event as? Lightning_kmpPaymentNotSent {
 					let paymentId = paymentNotSent.request.paymentId.description()
 					self.endLongLivedTask(id: paymentId)
+				}
+			}
+			.store(in: &cancellables)
+		
+		// Card payment requests
+		business.peerManager.peerStatePublisher()
+			.flatMap { $0.eventsFlowPublisher() }
+			.sink { (event: Lightning_kmpPeerEvent) in
+				
+				log.debug("eventsFlowPublisher(B): event: \(event)")
+				
+				if let msg = event as? Lightning_kmp_corePaymentRequestReceived {
+					log.debug("found event: PaymentRequestReceived")
+					
+					if let cardRequest = CardRequest.fromOnionMessage(msg) {
+						Task { @MainActor in
+							await self.handleCardRequest(cardRequest)
+						}
+					} else {
+						log.debug("CardRequest.fromOnionMessage() failed")
+					}
 				}
 			}
 			.store(in: &cancellables)
@@ -741,6 +764,45 @@ class BusinessManager {
 			business.appConnectionsDaemon?.incrementDisconnectCount(
 				target: AppConnectionsDaemon.ControlTarget.companion.All
 			)
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Card Payments
+	// --------------------------------------------------
+	
+	@MainActor
+	func handleCardRequest(
+		_ cardRequest: CardRequest
+	) async {
+		log.trace("handleCardRequest()")
+		
+		let result: Result<WithdrawRequestStatus, WithdrawRequestError> =
+			await business.checkWithdrawRequest(cardRequest.toWithdrawRequest())
+		
+		switch result {
+		case .failure(let error):
+			log.error("handleCardRequest: error: \(error.description)")
+			
+		case .success(let status):
+			switch status {
+			case .abortHandledElsewhere(_):
+				log.warning("handleCardReqeust: abort: handled elsewhere")
+				
+			case .continueAndSendPayment(_, _, _):
+				log.debug("handleCardReqeust: continue: send payment")
+				
+				guard let peer = business.peerManager.peerStateValue() else {
+					log.error("handleCardReqeust: peer is nil")
+					return
+				}
+				
+				do {
+					try await peer.payUnsolicitedInvoice(invoice: cardRequest.invoice)
+				} catch {
+					log.error("peer.payUnsolicitedInvoice(): error: \(error)")
+				}
+			}
 		}
 	}
 	

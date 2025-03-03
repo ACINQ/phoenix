@@ -8891,6 +8891,9 @@
     "Card not associated with this wallet." : {
 
     },
+    "Card options" : {
+
+    },
     "Caused by" : {
       "localizations" : {
         "ar" : {
@@ -12253,6 +12256,9 @@
         }
       }
     },
+    "Copy simulator's info:" : {
+
+    },
     "Copy transaction id" : {
       "localizations" : {
         "ar" : {
@@ -12335,6 +12341,9 @@
     },
     "Could not authenticate with card." : {
 
+    },
+    "Could not communicate with card's host" : {
+      "comment" : "Error message - scanning lightning invoice"
     },
     "Could not communicate with card's wallet" : {
       "comment" : "Error message - scanning lightning invoice"
@@ -12548,7 +12557,7 @@
         }
       }
     },
-    "Cound not communicate with card's wallet" : {
+    "Cound not communicate with card's host" : {
 
     },
     "Create New Debit Card" : {
@@ -32575,9 +32584,6 @@
     "Read card" : {
 
     },
-    "Read Card" : {
-
-    },
     "Read card…" : {
 
     },
@@ -37223,10 +37229,10 @@
     "Simulator debugging" : {
 
     },
-    "Simulator instructions" : {
+    "Simulator Info:" : {
 
     },
-    "Simulator's HEX address:" : {
+    "Simulator instructions" : {
 
     },
     "Since you've enabled Tor, you should use an onion address for this server." : {
@@ -44811,6 +44817,15 @@
         }
       }
     },
+    "Version 1 (lnurl-withdraw)" : {
+
+    },
+    "Version 1 & 2 (lnurl-withdraw + v2 param)" : {
+
+    },
+    "Version 2 (bip-353 & onion messages)" : {
+
+    },
     "Version 2.5.0: Tor changes" : {
       "localizations" : {
         "ar" : {
@@ -46830,6 +46845,9 @@
           }
         }
       }
+    },
+    "Write card for simulator" : {
+
     },
     "Write error" : {
 

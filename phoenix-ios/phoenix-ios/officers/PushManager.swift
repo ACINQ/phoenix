@@ -51,7 +51,7 @@ class PushManager {
 	) {
 		log.trace("processRemoteNotification_aws()")
 		
-		if let withdrawRequest = PushNotification.parseWithdrawRequest(userInfo: userInfo) {
+		if let withdrawRequest = PushNotification.parseLnurlWithdraw(userInfo: userInfo) {
 			Task {
 				await processRemoteNotification_aws_withdraw(withdrawRequest, completionHandler)
 			}
@@ -63,13 +63,13 @@ class PushManager {
 	
 	@MainActor
 	private static func processRemoteNotification_aws_withdraw(
-		_ request: WithdrawRequest,
+		_ request: LnurlWithdrawNotification,
 		_ completionHandler: @escaping (UIBackgroundFetchResult) -> Void
 	) async {
 		
 		log.trace("processRequest_aws_withdraw()")
 		
-		let result = await Biz.business.checkWithdrawRequest(request)
+		let result = await Biz.business.checkWithdrawRequest(request.toWithdrawRequest())
 		
 		switch result {
 		case .failure(let error):
@@ -80,7 +80,7 @@ class PushManager {
 			case .abortHandledElsewhere:
 				return invoke(completionHandler, .newData)
 			
-			case .continueAndSendPayment(let card, let invoice, let amount):
+			case .continueAndSendPayment(let card, _, _):
 				guard
 					let peer = Biz.business.peerManager.peerStateValue(),
 					let defaultTrampolineFees = peer.walletParams.trampolineFees.first
@@ -94,9 +94,9 @@ class PushManager {
 				
 				do {
 					try await Biz.business.sendManager.payBolt11Invoice(
-						amountToSend   : amount,
+						amountToSend   : request.invoiceAmount,
 						trampolineFees : defaultTrampolineFees,
-						invoice        : invoice,
+						invoice        : request.invoice,
 						metadata       : WalletPaymentMetadata.withCard(card.id)
 					)
 				} catch {
@@ -114,7 +114,7 @@ class PushManager {
 	}
 	
 	private static func reject(
-		_ request : WithdrawRequest,
+		_ request : LnurlWithdrawNotification,
 		_ error   : WithdrawRequestError,
 		_ completionHandler: @escaping (UIBackgroundFetchResult) -> Void
 	) {
@@ -127,7 +127,7 @@ class PushManager {
 	}
 	
 	private static func accept(
-		_ request: WithdrawRequest,
+		_ request: LnurlWithdrawNotification,
 		_ completionHandler: @escaping (UIBackgroundFetchResult) -> Void
 	) {
 		log.trace("accept()")
