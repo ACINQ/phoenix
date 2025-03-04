@@ -688,7 +688,6 @@
     <string name="tor_settings_title">Tor</string>
     <string name="tor_settings_switch_label">Enable Tor</string>
     <string name="tor_settings_instructions_title">How it works</string>
-    <string name="tor_settings_instructions_help_button">Learn more</string>
 
     <!-- home: connectivity dialog -->
 

@@ -115,7 +115,6 @@ import fr.acinq.phoenix.android.utils.extensions.findActivitySafe
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
-import io.ktor.http.decodeURLPart
 import io.ktor.http.encodeURLParameter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -192,25 +191,18 @@ fun AppView(
                             navArgument("next") { type = NavType.StringType; nullable = true }
                         ),
                     ) {
-                        @Suppress("DEPRECATION")
-                        val intent = try {
-                            it.arguments?.getParcelable<Intent>(NavController.KEY_DEEP_LINK_INTENT)
-                        } catch (e: Exception) {
-                            null
-                        }
-                        val nextScreenLink = try {
-                            intent?.data?.getQueryParameter("next")?.decodeURLPart()
-                        } catch (e: Exception) {
-                            null
-                        }
+                        val nextScreenLink = it.arguments?.getString("next")
                         StartupView(
                             appVM = appVM,
                             onShowIntro = { navController.navigate(Screen.Intro.route) },
                             onKeyAbsent = { navController.navigate(Screen.InitWallet.route) },
                             onBusinessStarted = {
                                 val next = nextScreenLink?.takeUnless { it.isBlank() }?.let { Uri.parse(it) }
-                                if (next == null || !navController.graph.hasDeepLink(next)) {
+                                if (next == null) {
                                     log.debug("redirecting from startup to home")
+                                    navController.popToHome()
+                                } else if (!navController.graph.hasDeepLink(next)) {
+                                    log.debug("redirecting from startup to home, ignoring invalid next=$nextScreenLink")
                                     navController.popToHome()
                                 } else {
                                     log.debug("redirecting from startup to {}", next)
@@ -263,7 +255,7 @@ fun AppView(
                         )
                     }
                     composable(
-                        route = "${Screen.Send}?input={input}&openScanner={openScanner}",
+                        route = "${Screen.Send.route}?input={input}&openScanner={openScanner}",
                         arguments = listOf(
                             navArgument("input") { type = NavType.StringType ; nullable = true },
                             navArgument("openScanner") { type = NavType.BoolType ; defaultValue = false }
@@ -604,8 +596,6 @@ private fun RequireStarted(
     nextUri: String? = null,
     children: @Composable () -> Unit
 ) {
-    children()
-
     val navController = navController
     val currentRoute = navController.currentDestination?.route
     if (serviceState != null && serviceState is NodeServiceState.Off && currentRoute != Screen.Startup.route) {
@@ -616,6 +606,8 @@ private fun RequireStarted(
                 popUpTo(navController.graph.id) { inclusive = true }
             }
         }
+    } else {
+        children()
     }
 }
 
