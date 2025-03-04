@@ -1,5 +1,3 @@
-
-
 -- This table stores the CKRecord metadata corresponding to a synced contact.
 -- * id => stores the primary key of the contact row
 --

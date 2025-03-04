@@ -1,5 +1,6 @@
 import SwiftUI
 import PhoenixShared
+import CoreNFC
 
 fileprivate let filename = "LightningDualView"
 #if DEBUG && true
@@ -40,8 +41,21 @@ struct LightningDualView: View {
 	@State var notificationPermissions = NotificationsManager.shared.permissions.value
 	
 	@State var modificationAmount: CurrencyAmount? = nil
+	@State var modificationTitleType: ModifyInvoiceSheet.TitleType = .normal
 	
-	let lastIncomingPaymentPublisher = Biz.business.paymentsManager.lastIncomingPaymentPublisher()
+	@State var nfcPending: Bool = false
+	@State var nfcErrorMessage: String? = nil
+	
+	@State var nfcScanning: Bool = false
+	@State var nfcParsing: Bool = false
+	@State var nfcRequesting: Bool = false
+	@State var nfcReceiving: Bool = false
+	
+	@State var nfcParseIndex: Int = 0
+	@State var nfcRequestIndex: Int = 0
+	
+	@State var nfcParseProgress: SendManager.ParseProgress? = nil
+	@State var nfcOfferId: Bitcoin_kmpByteVector32? = nil
 	
 	// For the cicular buttons: [copy, share, edit]
 	enum MaxButtonWidth: Preference {}
@@ -50,6 +64,8 @@ struct LightningDualView: View {
 		value: { [$0.size.width] }
 	)
 	@State var maxButtonWidth: CGFloat? = nil
+	
+	let lastIncomingPaymentPublisher = Biz.business.paymentsManager.lastIncomingPaymentPublisher()
 	
 	// To workaround a bug in SwiftUI, we're using multiple namespaces for our animation.
 	// In particular, animating the border around the qrcode doesn't work well.
@@ -170,11 +186,15 @@ struct LightningDualView: View {
 			actionButtons()
 				.padding(.bottom)
 			
-			switchTypeButton()
-			
-			if activeType == .bolt12_offer {
-				howToUseButton()
-					.padding(.top)
+			if nfcScanning || nfcParsing || nfcRequesting || nfcReceiving {
+				nfcActivity()
+				
+			} else {
+				switchTypeButton()
+				if activeType == .bolt12_offer {
+					howToUseButton()
+						.padding(.top)
+				}
 			}
 			
 			if notificationPermissions == .disabled {
@@ -307,12 +327,12 @@ struct LightningDualView: View {
 		
 			if activeType == .bolt11_invoice {
 				invoiceAmountView()
-					.font(.footnote)
+					.font(.callout)
 					.foregroundColor(.secondary)
 			
 				invoiceDescriptionView()
 					.lineLimit(1)
-					.font(.footnote)
+					.font(.callout)
 					.foregroundColor(.secondary)
 				
 			} else {
@@ -321,7 +341,7 @@ struct LightningDualView: View {
 					bip353AddressView(address)
 						.lineLimit(2)
 						.multilineTextAlignment(.center)
-						.font(.footnote)
+						.font(.callout)
 						.foregroundColor(.secondary)
 					
 				} else {
@@ -415,6 +435,7 @@ struct LightningDualView: View {
 			shareButton()
 			if activeType == .bolt11_invoice {
 				editButton()
+				cardButton()
 			}
 		}
 		.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
@@ -468,7 +489,7 @@ struct LightningDualView: View {
 	func copyButton() -> some View {
 		
 		actionButton(
-			text: NSLocalizedString("copy", comment: "button label - try to make it short"),
+			text: String(localized: "copy", comment: "button label - try to make it short"),
 			image: Image(systemName: "square.on.square"),
 			width: 20, height: 20,
 			xOffset: 0, yOffset: 0
@@ -485,7 +506,7 @@ struct LightningDualView: View {
 	func shareButton() -> some View {
 		
 		actionButton(
-			text: NSLocalizedString("share", comment: "button label - try to make it short"),
+			text: String(localized: "share", comment: "button label - try to make it short"),
 			image: Image(systemName: "square.and.arrow.up"),
 			width: 21, height: 21,
 			xOffset: 0, yOffset: -1
@@ -502,7 +523,7 @@ struct LightningDualView: View {
 	func editButton() -> some View {
 		
 		actionButton(
-			text: NSLocalizedString("edit", comment: "button label - try to make it short"),
+			text: String(localized: "edit", comment: "button label - try to make it short"),
 			image: Image(systemName: "square.and.pencil"),
 			width: 19, height: 19,
 			xOffset: 1, yOffset: -1
@@ -510,6 +531,20 @@ struct LightningDualView: View {
 			didTapEditButton()
 		}
 		.disabled(!(mvi.model is Receive.Model_Generated))
+	}
+	
+	@ViewBuilder
+	func cardButton() -> some View {
+		
+		actionButton(
+			text: String(localized: "card", comment: "button label - try to make it short"),
+			image: Image(systemName: "creditcard"),
+			width: 21, height: 21,
+			xOffset: 0, yOffset: 0
+		) {
+			didTapCardButton()
+		}
+		.disabled(nfcScanning || nfcParsing || nfcRequesting || nfcReceiving)
 	}
 	
 	@ViewBuilder
@@ -560,6 +595,34 @@ struct LightningDualView: View {
 			showBolt12Sheet()
 		} label: {
 			Label("How to use", systemImage: "info.circle")
+		}
+	}
+	
+	@ViewBuilder
+	func nfcActivity() -> some View {
+		
+		if nfcParsing || nfcRequesting || nfcReceiving {
+			
+			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+				
+				HorizontalActivity(color: .appAccent, diameter: 10, speed: 1.6)
+					.frame(width: 240, height: 10)
+					.padding(.horizontal)
+					.padding(.bottom, 4)
+				
+				Group {
+					if nfcParsing {
+						Text("Communicating with card's host…")
+					} else if nfcRequesting {
+						Text("Requesting payment…")
+					} else {
+						Text("Awaiting payment…")
+					}
+				}
+				.multilineTextAlignment(.center)
+				
+			} // </VStack>
+			.padding(.top)
 		}
 	}
 	
@@ -659,7 +722,7 @@ struct LightningDualView: View {
 	// MARK: View Transitions
 	// --------------------------------------------------
 	
-	func onAppear() -> Void {
+	func onAppear() {
 		log.trace("onAppear()")
 		
 		// Careful: this function may be called multiple times
@@ -714,24 +777,70 @@ struct LightningDualView: View {
 				original: m.request,
 				rendered: m.request.uppercased()
 			))
+			
+			if nfcPending {
+				nfcPending = false
+				
+				if m.amount != nil {
+					startNfcReader()
+				}
+			}
 		}
 	}
 	
 	func lastIncomingPaymentChanged(_ lastIncomingPayment: Lightning_kmpIncomingPayment) {
 		log.trace("lastIncomingPaymentChanged()")
 		
-		guard let model = mvi.model as? Receive.Model_Generated else {
+		let state = lastIncomingPayment.state()
+		guard state == WalletPaymentState.successOffChain else {
+			log.debug("lastIncomingPaymentChanged(): state != .successOffChain")
 			return
 		}
 		
-		let state = lastIncomingPayment.state()
-		if state == WalletPaymentState.successOffChain {
+		guard let lightningPayment = lastIncomingPayment as? Lightning_kmpLightningIncomingPayment else {
+			log.debug("lastIncomingPaymentChanged(): not a Lightning_kmpLightningIncomingPayment")
+			return
+		}
+		
+		var didCompletePayment = false
+		
+		if let b11Payment = lightningPayment as? Lightning_kmpBolt11IncomingPayment {
 			
-			if let lightningPayment = lastIncomingPayment as? Lightning_kmpLightningIncomingPayment {
-				if lightningPayment.paymentHash.toHex() == model.paymentHash {
-					presentationMode.wrappedValue.dismiss()
+			// While waiting for the payment to arrive,
+			// the user might tap the "show reusable qr" button.
+			// This would switch them over to Bolt12 mode.
+			// But if a matching Bolt11 payment arrives during that moment,
+			// we should still kick them back to the Home screen,
+			// and show them the payment was received.
+			
+			if let model = mvi.model as? Receive.Model_Generated {
+				if b11Payment.paymentHash.toHex() == model.paymentHash {
+					didCompletePayment = true
 				}
 			}
+			
+		} else if let b12Payment = lightningPayment as? Lightning_kmpBolt12IncomingPayment {
+			
+			if let nfcOfferId {
+				// The user scanned a Bolt Card with a V2 value.
+				// So we generated a temporary offer, and sent it to the card holder's host/wallet,
+				// along with the CardParameters (encrypted data).
+				//
+				// We are therefore looking for an incoming Bolt12 payment,
+				// where the offerId matches our temporary.offerId.
+				//
+				if b12Payment.metadata.offerId == nfcOfferId {
+					didCompletePayment = true
+				}
+			}
+			
+			if activeType == .bolt12_offer {
+				didCompletePayment = true
+			}
+		}
+		
+		if didCompletePayment {
+			presentationMode.wrappedValue.dismiss()
 		}
 	}
 	
@@ -763,6 +872,14 @@ struct LightningDualView: View {
 		))
 	}
 	
+	func modifyInvoiceSheetDidCancel() {
+		log.trace("modifyInvoiceSheetDidCancel()")
+		
+		if nfcPending {
+			nfcPending = false
+		}
+	}
+	
 	func currencyConverterDidChange(_ amount: CurrencyAmount?) {
 		log.trace("currencyConverterDidChange()")
 		
@@ -782,11 +899,13 @@ struct LightningDualView: View {
 		smartModalState.display(dismissable: true) {
 			
 			ModifyInvoiceSheet(
+				titleType: modificationTitleType,
 				savedAmount: $modificationAmount,
 				amount: amount,
 				desc: desc ?? "",
 				openCurrencyConverter: openCurrencyConverter,
-				didSave: modifyInvoiceSheetDidSave
+				didSave: modifyInvoiceSheetDidSave,
+				didCancel: modifyInvoiceSheetDidCancel
 			)
 		}
 	}
@@ -909,19 +1028,55 @@ struct LightningDualView: View {
 		log.trace("didTapEditButton()")
 		
 		// The edit button is only displayed for Bolt 11 invoices.
+		guard let model = mvi.model as? Receive.Model_Generated else {
+			log.warning("didTapEditButton(): ignoring: model is not Receive.Model_Generated")
+			return
+		}
 		
-		if let model = mvi.model as? Receive.Model_Generated {
+		modificationTitleType = .normal
+		smartModalState.display(dismissable: true) {
 			
+			ModifyInvoiceSheet(
+				titleType: modificationTitleType,
+				savedAmount: $modificationAmount,
+				amount: model.amount,
+				desc: model.desc ?? "",
+				openCurrencyConverter: openCurrencyConverter,
+				didSave: modifyInvoiceSheetDidSave,
+				didCancel: modifyInvoiceSheetDidCancel
+			)
+		}
+	}
+	
+	func didTapCardButton() {
+		log.trace("didCardEditButton()")
+		
+		// The card button is only displayed for Bolt 11 invoices.
+		guard let model = mvi.model as? Receive.Model_Generated else {
+			log.warning("didTapCardButton(): ignoring: model is not Receive.Model_Generated")
+			return
+		}
+		
+		if model.amount == nil {
+			// We need the user to enter an amount first.
+			
+			nfcPending = true
+			modificationTitleType = .cardPaymentNeedsAmount
 			smartModalState.display(dismissable: true) {
 				
 				ModifyInvoiceSheet(
+					titleType: modificationTitleType,
 					savedAmount: $modificationAmount,
 					amount: model.amount,
 					desc: model.desc ?? "",
 					openCurrencyConverter: openCurrencyConverter,
-					didSave: modifyInvoiceSheetDidSave
+					didSave: modifyInvoiceSheetDidSave,
+					didCancel: modifyInvoiceSheetDidCancel
 				)
 			}
+			
+		} else {
+			startNfcReader()
 		}
 	}
 	
@@ -989,6 +1144,15 @@ struct LightningDualView: View {
 		}
 	}
 	
+	func didCopyLink() {
+		log.trace("didCopyLink()")
+		
+		toast.pop(
+			NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
+			colorScheme: colorScheme.opposite
+		)
+	}
+	
 	// --------------------------------------------------
 	// MARK: Utilities
 	// --------------------------------------------------
@@ -1027,5 +1191,397 @@ struct LightningDualView: View {
 		let uiImg = UIImage(cgImage: cgImage)
 		activeSheet = ActiveSheet.sharingImage(image: uiImg)
 	}
+	
+	// --------------------------------------------------
+	// MARK: Card Payment
+	// --------------------------------------------------
+	
+	func startNfcReader() {
+		log.trace("startNfcReader()")
+		
+		nfcScanning = true
+		NfcReader.shared.readCard { result in
+			
+			nfcScanning = false
+			switch result {
+			case .failure(let failure):
+				switch failure {
+				case .readingNotAvailable:
+					nfcErrorMessage = String(localized: "NFC cababilities not available on this device")
+				case .alreadyStarted:
+					nfcErrorMessage = String(localized: "NFC reader is already scanning")
+				case .scanningTerminated(_):
+					nfcErrorMessage = String(localized: "Nothing scanned")
+				case .errorReadingTag:
+					nfcErrorMessage = String(localized: "Error reading tag")
+				}
+				
+			case .success(let result):
+				log.debug("NFCNDEFMessage: \(result)")
+				
+				var scannedUri: URL? = nil
+				var scannedText: String? = nil
+				
+				result.records.forEach { payload in
+					if let uri = payload.wellKnownTypeURIPayload() {
+						log.debug("found uri = \(uri)")
+						if scannedUri == nil {
+							scannedUri = uri
+						}
+						
+					} else if let text = payload.wellKnownTypeTextPayload().0 {
+						log.debug("found text = \(text)")
+						if scannedText == nil {
+							scannedText = text
+						}
+						
+					} else {
+						log.debug("found tag with unknown type")
+					}
+				}
+				
+				if let scannedUri {
+					nfcErrorMessage = nil
+					handleScannedUri(scannedUri)
+					
+				} else if let scannedText {
+					nfcErrorMessage = nil
+					handleScannedText(scannedText)
+					
+				} else {
+					nfcErrorMessage = String(localized: "No URI detected in NFC tag")
+				}
+			}
+		}
+	}
+	
+	func handleScannedUri(_ scannedUri: URL) {
+		log.trace("handleScannedUri(\(scannedUri.absoluteString))")
+		
+		var v2Request: String? = nil
+		var cardParams = ""
+		if var comps = URLComponents(url: scannedUri, resolvingAgainstBaseURL: false) {
+			var queryItems = comps.queryItems ?? []
+			
+			let v2 = queryItems.first(where: {
+				$0.name.lowercased() == "v2" && $0.value != nil
+			})
+			
+			if let v2Value = v2?.value {
+				
+				queryItems.removeAll(where: { $0.name.lowercased() == "v2" })
+				comps.queryItems = queryItems
+				cardParams = comps.percentEncodedQuery ?? ""
+				
+				if v2Value.isValidEmailAddress() {
+					v2Request = "₿\(v2Value)"
+				} else {
+					v2Request = v2Value
+				}
+			}
+		}
+		
+		if let v2Request {
+			handleV2(v2Request, cardParams)
+		} else {
+			handleV1(scannedUri, cardParams)
+		}
+	}
+	
+	func handleScannedText(_ scannedText: String) {
+		log.trace("handleScannedText(\(scannedText))")
+		
+		var request: String
+		var cardParams: String
+		
+		let comps = scannedText.split(separator: "?", maxSplits: 1, omittingEmptySubsequences: true)
+		if comps.count == 2 {
+			request = String(comps[0])
+			cardParams = String(comps[1])
+		} else {
+			request = scannedText
+			cardParams = ""
+		}
+		
+		if request.isValidEmailAddress() && !request.starts(with: "₿") {
+			request = "₿\(request)"
+		}
+		
+		handleV2(request, cardParams)
+	}
+	
+	// --------------------------------------------------
+	// MARK: Card Payment: V1
+	// --------------------------------------------------
+	
+	func handleV1(_ uri: URL, _ cardParams: String) {
+		log.trace("handleV1(\(uri.absoluteString), \(cardParams)")
+		
+		nfcParsing = true
+		nfcParseIndex += 1
+		let index = nfcParseIndex
+		
+		Task { @MainActor in
+			do {
+				let progressHandler = {(progress: SendManager.ParseProgress) -> Void in
+					if index == nfcParseIndex {
+						nfcParseProgress = progress
+					} else {
+						log.warning("handleV1: progressHandler: ignoring: cancelled")
+					}
+				}
+				
+				let result: SendManager.ParseResult = try await Biz.business.sendManager.parse(
+					request: uri.absoluteString,
+					progress: progressHandler
+				)
+				
+				if index == nfcParseIndex {
+					nfcParsing = false
+					nfcParseProgress = nil
+					handleV1_ParseResult(result, cardParams)
+				} else {
+					log.info("handleV1: result: ignoring: cancelled")
+				}
+				
+			} catch {
+				log.error("handleV1: error: \(error)")
+				
+				if index == nfcParseIndex {
+					nfcParsing = false
+					nfcParseProgress = nil
+					nfcErrorMessage = String(localized: "Could not communicate with card's wallet")
+				} else {
+					log.info("handleV1: error: ignoring: cancelled")
+				}
+			}
+			
+		} // </Task>
+	}
+	
+	func handleV1_ParseResult(_ result: SendManager.ParseResult, _ cardParams: String) {
+		log.trace("handleV1_ParseResult()")
+		
+		guard let lnurlWResult = result as? SendManager.ParseResult_Lnurl_Withdraw else {
+			handleParseError(result)
+			return
+		}
+		
+		guard let model = mvi.model as? Receive.Model_Generated else {
+			return
+		}
+		
+		nfcRequesting = true
+		nfcRequestIndex += 1
+		let index = nfcRequestIndex
+		
+		Task { @MainActor in
+			do {
+				let err: SendManager.LnurlWithdrawError? =
+					try await Biz.business.sendManager.lnurlWithdraw_sendInvoice(
+						lnurlWithdraw: lnurlWResult.lnurlWithdraw,
+						invoice: model.invoice
+					)
+				
+				if index == nfcRequestIndex {
+					nfcRequesting = false
+					if let remoteErr = err as? SendManager.LnurlWithdrawErrorRemoteError {
+						handleV1_RequestError(remoteErr)
+					} else {
+						nfcReceiving = true
+					}
+				} else {
+					log.info("handleParseResult_Lnurl_Withdraw: result: ignoring: cancelled")
+				}
+				
+			} catch {
+				log.error("handleParseResult_Lnurl_Withdraw: error: \(error)")
+				
+				if index == nfcRequestIndex {
+					nfcRequesting = false
+					nfcErrorMessage = String(localized: "Cound not communicate with card's host")
+				} else {
+					log.error("handleParseResult_Lnurl_Withdraw: error: ignoring: cancelled")
+				}
+			}
+		} // </Task>
+	}
+	
+	func handleV1_RequestError(_ result: SendManager.LnurlWithdrawErrorRemoteError) {
+		log.trace("handleV1_RequestError()")
+		
+		let remoteFailure = result.err
+		switch remoteFailure {
+		
+		case is LnurlError.RemoteFailure_CouldNotConnect:
+			nfcErrorMessage = String(
+				localized: "Could not connect to card's host",
+				comment: "Error message - processing bolt card payment"
+			)
+			
+		case is LnurlError.RemoteFailure_Unreadable:
+			nfcErrorMessage = String(
+				localized: "Unreadable response from card's host",
+				comment: "Error message - processing bolt card payment"
+			)
+			
+		case let rfDetailed as LnurlError.RemoteFailure_Detailed:
+			nfcErrorMessage = String(
+				localized: "The card's host returned error message: \(rfDetailed.reason)",
+				comment: "Error message - processing bolt card payment"
+			)
+			
+		case let rfCode as LnurlError.RemoteFailure_Code:
+			nfcErrorMessage = String(
+				localized: "The card's host returned error code: \(rfCode.code.value)",
+				comment: "Error message - processing bolt card payment"
+			)
+			
+		default:
+			nfcErrorMessage = String(
+				localized: "Could not communicate with card's host",
+				comment: "Error message - scanning lightning invoice"
+			)
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Card Payment: V2
+	// --------------------------------------------------
+	
+	func handleV2(_ address: String, _ cardParams: String) {
+		log.trace("handleV2(\(address), \(cardParams)")
+		
+		nfcParsing = true
+		nfcParseIndex += 1
+		let index = nfcParseIndex
+		
+		Task { @MainActor in
+			do {
+				let progressHandler = {(progress: SendManager.ParseProgress) -> Void in
+					if index == nfcParseIndex {
+						nfcParseProgress = progress
+					} else {
+						log.warning("handleV2: progressHandler: ignoring: cancelled")
+					}
+				}
+				
+				let result: SendManager.ParseResult = try await Biz.business.sendManager.parse(
+					request: address,
+					progress: progressHandler
+				)
+				
+				if index == nfcParseIndex {
+					nfcParsing = false
+					nfcParseProgress = nil
+					handleV2_ParseResult(result, cardParams)
+				} else {
+					log.info("handleV2: result: ignoring: cancelled")
+				}
+				
+			} catch {
+				log.error("handleV2: error: \(error)")
+				
+				if index == nfcParseIndex {
+					nfcParsing = false
+					nfcParseProgress = nil
+					nfcErrorMessage = String(localized: "Could not communicate with card's wallet")
+				} else {
+					log.info("handleV2: error: ignoring: cancelled")
+				}
+			}
+			
+		} // </Task>
+	}
+	
+	func handleV2_ParseResult(_ result: SendManager.ParseResult, _ cardParams: String) {
+		log.trace("handleV2_ParseResult()")
+		
+		guard let bolt12Offer = result as? SendManager.ParseResult_Bolt12Offer else {
+			handleParseError(result)
+			return
+		}
+		
+		guard
+			let model = mvi.model as? Receive.Model_Generated,
+			let msat = model.amount,
+			let peer = Biz.business.peerManager.peerStateValue()
+		else {
+			return
+		}
+		
+		nfcRequesting = true
+		nfcRequestIndex += 1
+		let index = nfcRequestIndex
+		
+		Task { @MainActor in
+			do {
+				let tuple: KotlinPair<Lightning_kmpOfferTypesOffer, Bitcoin_kmpByteVector32> =
+					try await peer.requestCardPayment(
+						amount: msat,
+						cardHolderOffer: bolt12Offer.offer,
+						cardParams: cardParams
+					)
+				
+				if index == nfcRequestIndex {
+					nfcRequesting = false
+					nfcReceiving = true
+					nfcOfferId = tuple.second
+				} else {
+					log.info("handleV2_ParseResult: result: ignoring: cancelled")
+				}
+				
+			} catch {
+				log.error("handleV2_ParseResult: error: \(error)")
+				
+				if index == nfcRequestIndex {
+					nfcRequesting = false
+					nfcErrorMessage = String(localized: "Cound not communicate with card's host")
+				} else {
+					log.error("handleV2_ParseResult: error: ignoring: cancelled")
+				}
+			}
+		} // </Task>
+	}
+	
+	// --------------------------------------------------
+	// MARK: Card Payment: Errors
+	// --------------------------------------------------
+	
+	func handleParseError(_ result: SendManager.ParseResult) {
+		log.trace("handleParseError()")
+		
+		var msg = String(localized: "Does not appear to be a bolt card.")
+		var websiteLink: URL? = nil
+		
+		if let badRequest = result as? SendManager.ParseResult_BadRequest {
+			
+			if let serviceError = badRequest.reason as? SendManager.BadRequestReason_ServiceError {
+				
+				let remoteFailure: LnurlError.RemoteFailure = serviceError.error
+				let origin = remoteFailure.origin
+				
+				if remoteFailure is LnurlError.RemoteFailure_IsWebsite {
+					websiteLink = URL(string: serviceError.url.description())
+					msg = String(
+						localized: "Unreadable response from service: \(origin)",
+						comment: "Error message - scanning lightning invoice"
+					)
+				}
+			}
+		}
+		
+		if let websiteLink {
+			popoverState.display(dismissable: true) {
+				WebsiteLinkPopover(
+					link: websiteLink,
+					didCopyLink: didCopyLink,
+					didOpenLink: nil
+				)
+			}
+			
+		} else {
+			nfcErrorMessage = msg
+		}
+	}
 }
-
