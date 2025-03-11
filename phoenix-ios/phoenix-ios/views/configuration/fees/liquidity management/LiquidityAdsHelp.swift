@@ -73,7 +73,8 @@ struct LiquidityAdsHelp: View {
 			
 			HStack(alignment: .center, spacing: 0) {
 				Spacer()
-				Text("\(Image(systemName: "link")) [more info](https://phoenix.acinq.co/faq#what-is-inbound-liquidity)")
+				Text(Image(systemName: "link")) +
+				Text(" [more info](https://phoenix.acinq.co/faq#what-is-inbound-liquidity)")
 				Spacer()
 			}
 			.padding(.top)

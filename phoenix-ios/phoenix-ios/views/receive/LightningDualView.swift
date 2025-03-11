@@ -380,14 +380,20 @@ struct LightningDualView: View {
 		
 		let bAddress = "₿\(address)"
 		
-		Text(verbatim: "\(Image(systemName: "bitcoinsign.circle")) \(address)")
-			.contextMenu {
-				Button {
-					copyTextToPasteboard(bAddress)
-				} label: {
-					Text("Copy")
-				}
+		Group {
+			if #available(iOS 18, *) {
+				Text(verbatim: "\(Image(systemName: "bitcoinsign.circle")) \(address)")
+			} else {
+				Text(Image(systemName: "bitcoinsign.circle")) + Text(verbatim: " \(address)")
 			}
+		}
+		.contextMenu {
+			Button {
+				copyTextToPasteboard(bAddress)
+			} label: {
+				Text("Copy")
+			}
+		}
 	}
 	
 	@ViewBuilder
