@@ -45269,7 +45269,6 @@
       }
     },
     "Wallet creation options" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

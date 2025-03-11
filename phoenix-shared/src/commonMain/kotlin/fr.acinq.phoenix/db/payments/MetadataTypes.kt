@@ -287,42 +287,34 @@ data class WalletPaymentMetadataRow(
             && user_description == null
             && user_notes == null
     }
+}
 
-    companion object {
-        fun serialize(
-            metadata: WalletPaymentMetadata
-        ): WalletPaymentMetadataRow? {
+fun WalletPaymentMetadata.serialize(): WalletPaymentMetadataRow? {
 
-            var lnurlBase: Pair<LnurlBase.TypeVersion, ByteArray>? = null
-            var lnurlMetadata: Pair<LnurlMetadata.TypeVersion, ByteArray>? = null
-            var lnurlSuccessAction: Pair<LnurlSuccessAction.TypeVersion, ByteArray>? = null
-            var lnurlDescription: String? = null
+    var lnurlBase: Pair<LnurlBase.TypeVersion, ByteArray>? = null
+    var lnurlMetadata: Pair<LnurlMetadata.TypeVersion, ByteArray>? = null
+    var lnurlSuccessAction: Pair<LnurlSuccessAction.TypeVersion, ByteArray>? = null
+    var lnurlDescription: String? = null
 
-            metadata.lnurl?.let {
-                lnurlBase = LnurlBase.serialize(it.pay)
-                lnurlMetadata = LnurlMetadata.serialize(it.pay.metadata)
-                lnurlSuccessAction = it.successAction?.let { successAction ->
-                    LnurlSuccessAction.serialize(successAction)
-                }
-                lnurlDescription = it.pay.metadata.plainText
-            }
-
-            val originalFiat = metadata.originalFiat?.let {
-                Pair(it.fiatCurrency.name, it.price)
-            }
-
-            val row = WalletPaymentMetadataRow(
-                lnurl_base = lnurlBase,
-                lnurl_metadata = lnurlMetadata,
-                lnurl_successAction = lnurlSuccessAction,
-                lnurl_description = lnurlDescription,
-                original_fiat = originalFiat,
-                user_description = metadata.userDescription,
-                user_notes = metadata.userNotes,
-                modified_at = metadata.modifiedAt
-            )
-
-            return if (row.isEmpty()) null else row
+    lnurl?.let {
+        lnurlBase = LnurlBase.serialize(it.pay)
+        lnurlMetadata = LnurlMetadata.serialize(it.pay.metadata)
+        lnurlSuccessAction = it.successAction?.let { successAction ->
+            LnurlSuccessAction.serialize(successAction)
         }
+        lnurlDescription = it.pay.metadata.plainText
     }
+
+    val row = WalletPaymentMetadataRow(
+        lnurl_base = lnurlBase,
+        lnurl_metadata = lnurlMetadata,
+        lnurl_successAction = lnurlSuccessAction,
+        lnurl_description = lnurlDescription,
+        original_fiat = originalFiat?.let { Pair(it.fiatCurrency.name, it.price) },
+        user_description = userDescription,
+        user_notes = userNotes,
+        modified_at = modifiedAt
+    )
+
+    return if (row.isEmpty()) null else row
 }

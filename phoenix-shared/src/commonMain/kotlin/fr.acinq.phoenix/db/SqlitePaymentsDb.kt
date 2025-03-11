@@ -30,6 +30,7 @@ import fr.acinq.phoenix.db.payments.PaymentsMetadataQueries
 import fr.acinq.phoenix.db.sqldelight.PaymentsDatabase
 import fr.acinq.phoenix.managers.ContactsManager
 import fr.acinq.phoenix.managers.CurrencyManager
+import fr.acinq.phoenix.utils.MetadataQueue
 import kotlin.collections.List
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -40,10 +41,10 @@ import kotlinx.coroutines.withContext
 class SqlitePaymentsDb(
     val driver: SqlDriver,
     val database: PaymentsDatabase,
-    private val contactsManager: ContactsManager?,
-    private val currencyManager: CurrencyManager?
-) : IncomingPaymentsDb by SqliteIncomingPaymentsDb(database),
-    OutgoingPaymentsDb by SqliteOutgoingPaymentsDb(database),
+    val metadataQueue: MetadataQueue?,
+    private val contactsManager: ContactsManager?
+) : IncomingPaymentsDb by SqliteIncomingPaymentsDb(database, metadataQueue),
+    OutgoingPaymentsDb by SqliteOutgoingPaymentsDb(database, metadataQueue),
     PaymentsDb {
 
     val metadataQueries = PaymentsMetadataQueries(database)
@@ -198,40 +199,6 @@ class SqlitePaymentsDb(
 
     suspend fun countCompletedInRange(startDate: Long, endDate: Long): Long = withContext(Dispatchers.Default) {
         database.paymentsQueries.countCompletedInRange(completed_at_from = startDate, completed_at_to = endDate).executeAsOne()
-    }
-
-    private var metadataQueue = MutableStateFlow(mapOf<UUID, WalletPaymentMetadataRow>())
-
-    /**
-     * The lightning-kmp layer triggers the addition of a payment to the database.
-     * But sometimes there is associated metadata that we want to include,
-     * and we would like to write it to the database within the same transaction.
-     * So we have a system to enqueue/dequeue associated metadata.
-     */
-    internal fun enqueueMetadata(row: WalletPaymentMetadataRow, id: UUID) {
-        val oldMap = metadataQueue.value
-        val newMap = oldMap + (id to row)
-        metadataQueue.value = newMap
-    }
-
-    /**
-     * Returns any enqueued metadata, and also appends the current fiat exchange rate.
-     */
-    private fun dequeueMetadata(id: UUID): WalletPaymentMetadataRow {
-        val oldMap = metadataQueue.value
-        val newMap = oldMap - id
-        metadataQueue.value = newMap
-
-        val row = oldMap[id] ?: WalletPaymentMetadataRow()
-
-        // Append the current exchange rate, unless it was explicitly set earlier.
-        return if (row.original_fiat != null) {
-            row
-        } else {
-            row.copy(original_fiat = currencyManager?.calculateOriginalFiat()?.let {
-                Pair(it.fiatCurrency.name, it.price)
-            })
-        }
     }
 
     suspend fun updateUserInfo(id: UUID, userDescription: String?, userNotes: String?) = withContext(Dispatchers.Default) {

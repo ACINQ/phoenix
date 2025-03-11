@@ -25,7 +25,6 @@ import fr.acinq.phoenix.data.lnurl.LnurlAuth
 import fr.acinq.phoenix.data.lnurl.LnurlError
 import fr.acinq.phoenix.data.lnurl.LnurlPay
 import fr.acinq.phoenix.data.lnurl.LnurlWithdraw
-import fr.acinq.phoenix.db.payments.WalletPaymentMetadataRow
 import fr.acinq.phoenix.utils.DnsResolvers
 import fr.acinq.phoenix.utils.EmailLikeAddress
 import fr.acinq.phoenix.utils.Parser
@@ -442,8 +441,8 @@ class SendManager(
         val peer = peerManager.getPeer()
 
         // save lnurl metadata if any
-        metadata?.let { WalletPaymentMetadataRow.serialize(it) }?.let { row ->
-            databaseManager.paymentsDb().enqueueMetadata(row = row, id = paymentId)
+        metadata?.let { row ->
+            databaseManager.metadataQueue.enqueue(row = row, id = paymentId)
         }
 
         peer.send(
