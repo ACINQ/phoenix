@@ -27,6 +27,10 @@ struct ReadCardSheet: View {
 	
 	@EnvironmentObject var smartModalState: SmartModalState
 	
+	// --------------------------------------------------
+	// MARK: View Builders
+	// --------------------------------------------------
+	
 	@ViewBuilder
 	var body: some View {
 		
@@ -71,30 +75,26 @@ struct ReadCardSheet: View {
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
 			if let link = scannedUri?.absoluteString {
-				// The URL is long because of the query parameters.
-				// And when SwiftUI displays the text, it automatically adds
-				// hyphen characters at the end of some lines.
-				//
-				// E.g.
-				// id=3fabbe50&picc_data=FB9B4202A7-  <- added hyphen
-				// C37842120BE2D...
-				//
-				// I don't like this. And there's a simple way to prevent it.
-				// You just add zero-width characters in-between every character
-				// in the string.
-				//
-				// https://stackoverflow.com/q/78208090
-				//
-				let linkWitZeroWidthSpaces = link.map({ String($0) }).joined(separator: "\u{200B}")
+				
+				let sanitizedLink = preventAutoHyphenation(link)
 				Button {
 					openScannedUri()
 				} label: {
-					Text(linkWitZeroWidthSpaces)
+					Text(sanitizedLink)
 						.multilineTextAlignment(.leading)
 				}
 					
 			} else if let scannedText {
-				Text(scannedText)
+				
+				let sanitizedText = preventAutoHyphenation(scannedText)
+				Text(sanitizedText)
+					.contextMenu {
+						Button {
+							copyScannedText()
+						} label: {
+							Text("Copy")
+						}
+					} // </contextMenu>
 				
 			} else if scannedUnknown {
 				Text("Scanned NDEF tag with unknown type")
@@ -208,6 +208,30 @@ struct ReadCardSheet: View {
 		.padding()
 	}
 	
+	// --------------------------------------------------
+	// MARK: View Helpers
+	// --------------------------------------------------
+	
+	func preventAutoHyphenation(_ text: String) -> String {
+		
+		// The URL is long because of the query parameters.
+		// When SwiftUI displays long text, it automatically adds
+		// hyphen characters at the end of some lines.
+		//
+		// E.g.
+		// id=3fabbe50&picc_data=FB9B4202A7-  <- added hyphen
+		// C37842120BE2D...
+		//
+		// I don't like this. And there's a simple way to prevent it.
+		// You just add zero-width characters in-between every character
+		// in the string.
+		//
+		// https://stackoverflow.com/q/78208090
+		//
+		
+		return text.map({ String($0) }).joined(separator: "\u{200B}")
+	}
+	
 	func cardStatus(_ card: BoltCardInfo) -> String {
 		
 		if card.isArchived {
@@ -218,6 +242,10 @@ struct ReadCardSheet: View {
 			return String(localized: "Active")
 		}
 	}
+
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
 	
 	func onAppear() {
 		log.trace("onAppear()")
@@ -279,6 +307,11 @@ struct ReadCardSheet: View {
 				
 			} else if let detectedText {
 				scannedText = detectedText
+				let result = Ntag424.extractQueryItems(text: detectedText)
+				if case .success(let queryItems) = result {
+					isBoltCard = true
+					tryMatchCard(queryItems)
+				}
 				
 			} else if detectedUnknown {
 				scannedUnknown = true
@@ -288,6 +321,10 @@ struct ReadCardSheet: View {
 			}
 		}
 	}
+	
+	// --------------------------------------------------
+	// MARK: Utilities
+	// --------------------------------------------------
 	
 	func tryMatchCard(_ queryItems: Ntag424.QueryItems) {
 		log.trace("tryMatchCard()")
@@ -355,6 +392,10 @@ struct ReadCardSheet: View {
 		}
 	}
 	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
+	
 	func openScannedUri() {
 		log.trace("openScannedUri()")
 		
@@ -364,6 +405,14 @@ struct ReadCardSheet: View {
 		
 		if UIApplication.shared.canOpenURL(uri) {
 			UIApplication.shared.open(uri)
+		}
+	}
+	
+	func copyScannedText() {
+		log.trace("copyScannedText()")
+		
+		if let scannedText {
+			UIPasteboard.general.string = scannedText
 		}
 	}
 	

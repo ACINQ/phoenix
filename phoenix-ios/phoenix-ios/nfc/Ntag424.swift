@@ -24,6 +24,17 @@ class Ntag424 {
 	}
 	
 	static func extractQueryItems(
+		text: String
+	) -> Result<QueryItems, QueryItemsError> {
+		
+		if let url = URL(string: "lightning:\(text)") {
+			return extractQueryItems(url: url)
+		} else {
+			return .failure(.piccDataMissing)
+		}
+	}
+	
+	static func extractQueryItems(
 		url: URL
 	) -> Result<QueryItems, QueryItemsError> {
 	

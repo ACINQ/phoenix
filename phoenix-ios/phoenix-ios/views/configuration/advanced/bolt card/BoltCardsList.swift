@@ -40,6 +40,10 @@ struct BoltCardsList: View {
 	
 	@EnvironmentObject var smartModalState: SmartModalState
 	
+	// --------------------------------------------------
+	// MARK: View Builders
+	// --------------------------------------------------
+	
 	@ViewBuilder
 	var body: some View {
 		
