@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.payments.history
+package fr.acinq.phoenix.android.payments.details
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

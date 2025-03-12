@@ -16,9 +16,11 @@
 
 package fr.acinq.phoenix.android.components.feedback
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.positiveColor
 
@@ -28,6 +30,7 @@ fun SuccessMessage(
     modifier: Modifier = Modifier,
     details: String? = null,
     alignment: Alignment.Horizontal = Alignment.Start,
+    padding: PaddingValues = PaddingValues(16.dp),
 ) {
     FeedbackMessage(
         header = header,
@@ -36,5 +39,6 @@ fun SuccessMessage(
         iconColor = positiveColor,
         modifier = modifier,
         alignment = alignment,
+        padding = padding
     )
 }

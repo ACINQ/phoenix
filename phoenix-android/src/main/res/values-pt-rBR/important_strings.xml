@@ -135,6 +135,7 @@
 
     <string name="receive_lightning_warning_title_surefail">O pagamento falhará</string>
     <string name="receive_lightning_warning_title_fee_expected">Taxa esperada</string>
+    <string name="receive_lightning_warning_hint_show_details">Toque para saber mais</string>
 
     <string name="receive_lightning_sheet_dismiss">Fechar</string>
     <string name="receive_lightning_sheet_button_enable">Ativar o tratamento automatizado</string>
