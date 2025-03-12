@@ -697,6 +697,10 @@ struct MainView_Small: View {
 					navCoordinator.path.append(NavLinkTag.ConfigurationView)
 					navCoordinator.path.append(ConfigurationList.NavLinkTag.WalletInfo)
 					navCoordinator.path.append(WalletInfoView.NavLinkTag.FinalWalletDetails)
+					
+				case .bip353Registration:
+					navCoordinator.path.append(NavLinkTag.ConfigurationView)
+					navCoordinator.path.append(ConfigurationList.NavLinkTag.Experimental)
 				}
 			}
 			
@@ -716,6 +720,7 @@ struct MainView_Small: View {
 					case .forceCloseChannels : newNavLinkTag = .ConfigurationView ; delay *= 2
 					case .swapInWallet       : newNavLinkTag = .ConfigurationView ; delay *= 2
 					case .finalWallet        : newNavLinkTag = .ConfigurationView ; delay *= 2
+					case .bip353Registration : newNavLinkTag = .ConfigurationView ; delay *= 2
 				}
 				
 				if let newNavLinkTag = newNavLinkTag {

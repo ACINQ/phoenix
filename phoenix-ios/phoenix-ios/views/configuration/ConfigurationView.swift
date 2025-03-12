@@ -606,6 +606,7 @@ struct ConfigurationList: View {
 					case .forceCloseChannels : newNavLinkTag = .ForceCloseChannels   ; delay *= 1
 					case .swapInWallet       : newNavLinkTag = .WalletInfo           ; delay *= 2
 					case .finalWallet        : newNavLinkTag = .WalletInfo           ; delay *= 2
+					case .bip353Registration : newNavLinkTag = .Experimental         ; delay *= 1
 				}
 				
 				if let newNavLinkTag {

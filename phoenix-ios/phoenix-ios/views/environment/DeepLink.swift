@@ -17,6 +17,7 @@ enum DeepLink: String, Equatable {
 	case forceCloseChannels
 	case swapInWallet
 	case finalWallet
+	case bip353Registration
 }
 
 class DeepLinkManager: ObservableObject {

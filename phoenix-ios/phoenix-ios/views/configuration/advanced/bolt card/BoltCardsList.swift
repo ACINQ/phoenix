@@ -439,7 +439,9 @@ struct BoltCardsList: View {
 		}
 		
 		if missingLnAddress {
-			// Todo...
+			smartModalState.display(dismissable: true) {
+				PrerequisitesSheet()
+			}
 		}
 	}
 	
@@ -464,7 +466,9 @@ struct BoltCardsList: View {
 			writeToNfcCard(input)
 			
 		} else {
-			// Todo..
+			smartModalState.display(dismissable: true) {
+				PrerequisitesSheet()
+			}
 		}
 	}
 	
