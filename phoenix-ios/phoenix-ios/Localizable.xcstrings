@@ -243,6 +243,9 @@
         }
       }
     },
+    " [more info](https://phoenix.acinq.co/faq#what-is-inbound-liquidity)" : {
+
+    },
     "-" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1381,6 +1384,7 @@
       }
     },
     "%@ [more info](https://phoenix.acinq.co/faq#what-is-inbound-liquidity)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -45269,7 +45273,6 @@
       }
     },
     "Wallet creation options" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
