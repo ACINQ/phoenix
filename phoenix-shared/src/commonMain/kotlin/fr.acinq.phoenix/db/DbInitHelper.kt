@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalStdlibApi::class)
+
 package fr.acinq.phoenix.db
 
 
@@ -89,19 +91,29 @@ object PersistedChannelStateAdapter : ColumnAdapter<PersistedChannelState, ByteA
 }
 
 object IncomingPaymentAdapter : ColumnAdapter<IncomingPayment, ByteArray> {
-    override fun decode(databaseValue: ByteArray): IncomingPayment = fr.acinq.lightning.serialization.payment.Serialization.deserialize(databaseValue).getOrThrow() as IncomingPayment
+    override fun decode(databaseValue: ByteArray): IncomingPayment =
+        fr.acinq.lightning.serialization.payment.Serialization.deserialize(databaseValue).getOrNull()
+            ?.let { it as IncomingPayment }
+            ?: println("cannot deserialize ${databaseValue.toHexString()}").let {
+                throw RuntimeException("cannot deserialize ${databaseValue.toHexString()}")
+            }
 
     override fun encode(value: IncomingPayment): ByteArray = fr.acinq.lightning.serialization.payment.Serialization.serialize(value)
 }
 
 object OutgoingPaymentAdapter : ColumnAdapter<OutgoingPayment, ByteArray> {
-    override fun decode(databaseValue: ByteArray): OutgoingPayment = fr.acinq.lightning.serialization.payment.Serialization.deserialize(databaseValue).getOrThrow() as OutgoingPayment
+    override fun decode(databaseValue: ByteArray): OutgoingPayment =
+        fr.acinq.lightning.serialization.payment.Serialization.deserialize(databaseValue).getOrNull()
+            ?.let { it as OutgoingPayment }
+            ?: throw RuntimeException("cannot deserialize ${databaseValue.toHexString()}")
 
     override fun encode(value: OutgoingPayment): ByteArray = fr.acinq.lightning.serialization.payment.Serialization.serialize(value)
 }
 
 object WalletPaymentAdapter : ColumnAdapter<WalletPayment, ByteArray> {
-    override fun decode(databaseValue: ByteArray): WalletPayment = fr.acinq.lightning.serialization.payment.Serialization.deserialize(databaseValue).getOrThrow()
+    override fun decode(databaseValue: ByteArray): WalletPayment =
+        fr.acinq.lightning.serialization.payment.Serialization.deserialize(databaseValue).getOrNull()
+            ?: throw RuntimeException("cannot deserialize ${databaseValue.toHexString()}")
 
     override fun encode(value: WalletPayment): ByteArray = fr.acinq.lightning.serialization.payment.Serialization.serialize(value)
 }
