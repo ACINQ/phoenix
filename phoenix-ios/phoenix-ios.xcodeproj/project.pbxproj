@@ -84,6 +84,7 @@
 		DC2CE3AF29AFEB0500BA0B00 /* Bundle+Icon.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2CE3AE29AFEB0500BA0B00 /* Bundle+Icon.swift */; };
 		DC2CE54D28A3D2F50070A2E1 /* TruncatableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2CE54C28A3D2F50070A2E1 /* TruncatableView.swift */; };
 		DC2CE55028A52AD90070A2E1 /* RecentPaymentsConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2CE54F28A52AD90070A2E1 /* RecentPaymentsConfig.swift */; };
+		DC2D92282D83478A001B63A9 /* BoltCardScan.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2D92272D834787001B63A9 /* BoltCardScan.swift */; };
 		DC2DC8682906AC0B0079E570 /* BitcoinUnitSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2DC8672906AC0B0079E570 /* BitcoinUnitSelector.swift */; };
 		DC2DC86A2906AC620079E570 /* FiatCurrencySelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2DC8692906AC620079E570 /* FiatCurrencySelector.swift */; };
 		DC2F431427B6972C0006FCC4 /* SwapInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2F431327B6972C0006FCC4 /* SwapInView.swift */; };
@@ -572,6 +573,7 @@
 		DC2CE3AE29AFEB0500BA0B00 /* Bundle+Icon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+Icon.swift"; sourceTree = "<group>"; };
 		DC2CE54C28A3D2F50070A2E1 /* TruncatableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TruncatableView.swift; sourceTree = "<group>"; };
 		DC2CE54F28A52AD90070A2E1 /* RecentPaymentsConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecentPaymentsConfig.swift; sourceTree = "<group>"; };
+		DC2D92272D834787001B63A9 /* BoltCardScan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoltCardScan.swift; sourceTree = "<group>"; };
 		DC2DC8672906AC0B0079E570 /* BitcoinUnitSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitcoinUnitSelector.swift; sourceTree = "<group>"; };
 		DC2DC8692906AC620079E570 /* FiatCurrencySelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiatCurrencySelector.swift; sourceTree = "<group>"; };
 		DC2F431327B6972C0006FCC4 /* SwapInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwapInView.swift; sourceTree = "<group>"; };
@@ -1711,7 +1713,6 @@
 				DCCA89A42D63DB6200AD5428 /* LnurlwRegistration.swift */,
 				DCCA89A52D63DB6200AD5428 /* ManageBoltCard.swift */,
 				DCCA89A62D63DB6200AD5428 /* NewCardSheet.swift */,
-				DCCA89A72D63DB6200AD5428 /* NFCReaderError+Ignore.swift */,
 				DCBC37A42D821B31003BAFD9 /* PrerequisitesSheet.swift */,
 				DCCA89A82D63DB6200AD5428 /* ReadCardSheet.swift */,
 				DCCA89A92D63DB6200AD5428 /* ResetCardSheet.swift */,
@@ -1775,6 +1776,8 @@
 				DCD1BFD52CE775E500C2B811 /* NfcReader.swift */,
 				DCCA89782D63D66D00AD5428 /* NfcWriter.swift */,
 				DCCA89792D63D66D00AD5428 /* Ntag424.swift */,
+				DC2D92272D834787001B63A9 /* BoltCardScan.swift */,
+				DCCA89A72D63DB6200AD5428 /* NFCReaderError+Ignore.swift */,
 				DCCA89772D63D66D00AD5428 /* DnaCommunicator */,
 			);
 			path = nfc;
@@ -2310,6 +2313,7 @@
 				DCA7263B2C80BA0E00600716 /* SyncBackupManager+Payments.swift in Sources */,
 				DC5F1C4828DDA539007A55ED /* DrainWalletView_Confirm.swift in Sources */,
 				DC641C802821767D00862DCD /* Prefs+BackupTransactions.swift in Sources */,
+				DC2D92282D83478A001B63A9 /* BoltCardScan.swift in Sources */,
 				DC46BAF426CACCF700E760A6 /* KotlinFlow.swift in Sources */,
 				DCB493CD269F8531001B0F09 /* Int+TimeInterval.swift in Sources */,
 				DCCFE6B22B6445F3002FFF11 /* LogFileHandler.swift in Sources */,

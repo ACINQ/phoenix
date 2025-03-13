@@ -8352,6 +8352,9 @@
     "Bolt Card" : {
 
     },
+    "Bolt Card not detected in NFC tag" : {
+
+    },
     "Bolt Card:" : {
 
     },
@@ -27742,9 +27745,6 @@
           }
         }
       }
-    },
-    "No URI detected in NFC tag" : {
-
     },
     "No, I don't want to use an onion address" : {
       "localizations" : {

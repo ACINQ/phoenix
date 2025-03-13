@@ -58,8 +58,10 @@ enum BoltCardInput: Codable {
 			return Ndef.Template(baseUrl: resolvedUrl)!
 			
 		case .V1AndV2(let lnurlWithdrawId, let lnAddress):
+			let sanitizedLnAddress = lnAddress.starts(with: "₿") ? lnAddress : "₿\(lnAddress)"
+			
 			queryItems.append(URLQueryItem(name: "id", value: lnurlWithdrawId))
-			queryItems.append(URLQueryItem(name: "v2", value: lnAddress))
+			queryItems.append(URLQueryItem(name: "v2", value: sanitizedLnAddress))
 			
 			var comps = URLComponents(url: lnurlWithdrawBaseUrl, resolvingAgainstBaseURL: false)!
 			comps.queryItems = queryItems
@@ -68,7 +70,9 @@ enum BoltCardInput: Codable {
 			return Ndef.Template(baseUrl: resolvedUrl)!
 			
 		case .V2(let lnAddress):
-			return Ndef.Template(baseText: lnAddress)
+			let sanitizedLnAddress = lnAddress.starts(with: "₿") ? lnAddress : "₿\(lnAddress)"
+			
+			return Ndef.Template(baseText: sanitizedLnAddress)
 		}
 	}
 }

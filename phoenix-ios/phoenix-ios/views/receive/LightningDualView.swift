@@ -1217,106 +1217,38 @@ struct LightningDualView: View {
 					nfcErrorMessage = String(localized: "Error reading tag")
 				}
 				
-			case .success(let result):
-				log.debug("NFCNDEFMessage: \(result)")
+			case .success(let message):
+				log.debug("NFCNDEFMessage: \(message)")
 				
-				var scannedUri: URL? = nil
-				var scannedText: String? = nil
-				
-				result.records.forEach { payload in
-					if let uri = payload.wellKnownTypeURIPayload() {
-						log.debug("found uri = \(uri)")
-						if scannedUri == nil {
-							scannedUri = uri
+				if let result = BoltCardScan.parse(message) {
+					nfcErrorMessage = nil
+					
+					switch result {
+					case .v1(let v1):
+						if let v2 = v1.v2 {
+							handleV2(v2)
+						} else {
+							handleV1(v1)
 						}
-						
-					} else if let text = payload.wellKnownTypeTextPayload().0 {
-						log.debug("found text = \(text)")
-						if scannedText == nil {
-							scannedText = text
-						}
-						
-					} else {
-						log.debug("found tag with unknown type")
+					case .v2(let v2):
+						handleV2(v2)
 					}
-				}
-				
-				if let scannedUri {
-					nfcErrorMessage = nil
-					handleScannedUri(scannedUri)
-					
-				} else if let scannedText {
-					nfcErrorMessage = nil
-					handleScannedText(scannedText)
 					
 				} else {
-					nfcErrorMessage = String(localized: "No URI detected in NFC tag")
+					log.debug("BoltCardScan.parse() => nil")
+					
+					nfcErrorMessage = String(localized: "Bolt Card not detected in NFC tag")
 				}
 			}
 		}
-	}
-	
-	func handleScannedUri(_ scannedUri: URL) {
-		log.trace("handleScannedUri(\(scannedUri.absoluteString))")
-		
-		var v2Request: String? = nil
-		var cardParams = ""
-		if var comps = URLComponents(url: scannedUri, resolvingAgainstBaseURL: false) {
-			var queryItems = comps.queryItems ?? []
-			
-			let v2 = queryItems.first(where: {
-				$0.name.lowercased() == "v2" && $0.value != nil
-			})
-			
-			if let v2Value = v2?.value {
-				
-				queryItems.removeAll(where: { $0.name.lowercased() == "v2" })
-				comps.queryItems = queryItems
-				cardParams = comps.percentEncodedQuery ?? ""
-				
-				if v2Value.isValidEmailAddress() {
-					v2Request = "₿\(v2Value)"
-				} else {
-					v2Request = v2Value
-				}
-			}
-		}
-		
-		if let v2Request {
-			handleV2(v2Request, cardParams)
-		} else {
-			handleV1(scannedUri, cardParams)
-		}
-	}
-	
-	func handleScannedText(_ scannedText: String) {
-		log.trace("handleScannedText(\(scannedText))")
-		
-		var request: String
-		var cardParams: String
-		
-		let comps = scannedText.split(separator: "?", maxSplits: 1, omittingEmptySubsequences: true)
-		if comps.count == 2 {
-			request = String(comps[0])
-			cardParams = String(comps[1])
-		} else {
-			request = scannedText
-			cardParams = ""
-		}
-		
-		if request.isValidEmailAddress() && !request.starts(with: "₿") {
-			request = "₿\(request)"
-		}
-		
-		handleV2(request, cardParams)
 	}
 	
 	// --------------------------------------------------
 	// MARK: Card Payment: V1
 	// --------------------------------------------------
 	
-	func handleV1(_ uri: URL, _ cardParams: String) {
-		log.trace("handleV1(\(uri.absoluteString), \(cardParams)")
+	func handleV1(_ v1: BoltCardScan.V1) {
+		log.trace("handleV1(\(v1.url.absoluteString)")
 		
 		nfcParsing = true
 		nfcParseIndex += 1
@@ -1333,14 +1265,14 @@ struct LightningDualView: View {
 				}
 				
 				let result: SendManager.ParseResult = try await Biz.business.sendManager.parse(
-					request: uri.absoluteString,
+					request: v1.url.absoluteString,
 					progress: progressHandler
 				)
 				
 				if index == nfcParseIndex {
 					nfcParsing = false
 					nfcParseProgress = nil
-					handleV1_ParseResult(result, cardParams)
+					handleV1_ParseResult(v1, result)
 				} else {
 					log.info("handleV1: result: ignoring: cancelled")
 				}
@@ -1360,7 +1292,7 @@ struct LightningDualView: View {
 		} // </Task>
 	}
 	
-	func handleV1_ParseResult(_ result: SendManager.ParseResult, _ cardParams: String) {
+	func handleV1_ParseResult(_ v1: BoltCardScan.V1, _ result: SendManager.ParseResult) {
 		log.trace("handleV1_ParseResult()")
 		
 		guard let lnurlWResult = result as? SendManager.ParseResult_Lnurl_Withdraw else {
@@ -1450,8 +1382,8 @@ struct LightningDualView: View {
 	// MARK: Card Payment: V2
 	// --------------------------------------------------
 	
-	func handleV2(_ address: String, _ cardParams: String) {
-		log.trace("handleV2(\(address), \(cardParams)")
+	func handleV2(_ v2: BoltCardScan.V2) {
+		log.trace("handleV2(\(v2.baseText))")
 		
 		nfcParsing = true
 		nfcParseIndex += 1
@@ -1468,14 +1400,14 @@ struct LightningDualView: View {
 				}
 				
 				let result: SendManager.ParseResult = try await Biz.business.sendManager.parse(
-					request: address,
+					request: v2.baseText,
 					progress: progressHandler
 				)
 				
 				if index == nfcParseIndex {
 					nfcParsing = false
 					nfcParseProgress = nil
-					handleV2_ParseResult(result, cardParams)
+					handleV2_ParseResult(v2, result)
 				} else {
 					log.info("handleV2: result: ignoring: cancelled")
 				}
@@ -1495,7 +1427,7 @@ struct LightningDualView: View {
 		} // </Task>
 	}
 	
-	func handleV2_ParseResult(_ result: SendManager.ParseResult, _ cardParams: String) {
+	func handleV2_ParseResult(_ v2: BoltCardScan.V2, _ result: SendManager.ParseResult) {
 		log.trace("handleV2_ParseResult()")
 		
 		guard let bolt12Offer = result as? SendManager.ParseResult_Bolt12Offer else {
@@ -1521,7 +1453,7 @@ struct LightningDualView: View {
 					try await peer.requestCardPayment(
 						amount: msat,
 						cardHolderOffer: bolt12Offer.offer,
-						cardParams: cardParams
+						cardParams: v2.parametersText
 					)
 				
 				if index == nfcRequestIndex {
