@@ -24,19 +24,27 @@ import fr.acinq.lightning.db.IncomingPaymentsDb
 import fr.acinq.lightning.db.LightningIncomingPayment
 import fr.acinq.lightning.db.OnChainIncomingPayment
 import fr.acinq.lightning.wire.LiquidityAds
+import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.db.sqldelight.PaymentsDatabase
 import fr.acinq.phoenix.db.didDeleteWalletPayment
 import fr.acinq.phoenix.db.didSaveWalletPayment
+import fr.acinq.phoenix.utils.MetadataQueue
 import fr.acinq.phoenix.utils.extensions.deriveUUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class SqliteIncomingPaymentsDb(private val database: PaymentsDatabase) : IncomingPaymentsDb {
+class SqliteIncomingPaymentsDb(
+    private val database: PaymentsDatabase,
+    private val metadataQueue: MetadataQueue?
+) : IncomingPaymentsDb {
+
+    val metadataQueries = PaymentsMetadataQueries(database)
 
     override suspend fun addIncomingPayment(incomingPayment: IncomingPayment) {
+        val metadata = metadataQueue?.dequeue(incomingPayment.id)
         withContext(Dispatchers.Default) {
             database.transaction {
-                _addIncomingPayment(incomingPayment)
+                _addIncomingPayment(incomingPayment, metadata)
             }
         }
     }
@@ -48,7 +56,7 @@ class SqliteIncomingPaymentsDb(private val database: PaymentsDatabase) : Incomin
      * @param notify Set to false if `didSaveWalletPayment` should not be invoked
      *               (e.g. when downloading payments from the cloud)
      */
-    fun _addIncomingPayment(incomingPayment: IncomingPayment, notify: Boolean = true) {
+    fun _addIncomingPayment(incomingPayment: IncomingPayment, metadata: WalletPaymentMetadata?, notify: Boolean = true) {
         database.paymentsIncomingQueries.insert(
             id = incomingPayment.id,
             payment_hash = (incomingPayment as? LightningIncomingPayment)?.paymentHash,
@@ -72,6 +80,9 @@ class SqliteIncomingPaymentsDb(private val database: PaymentsDatabase) : Incomin
                 )
 
             else -> {}
+        }
+        metadata?.serialize()?.let { row ->
+            metadataQueries.addMetadata(incomingPayment.id, row)
         }
         if (notify) {
             didSaveWalletPayment(incomingPayment.id, database)
