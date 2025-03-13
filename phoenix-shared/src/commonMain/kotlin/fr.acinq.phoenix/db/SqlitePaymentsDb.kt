@@ -21,6 +21,8 @@ import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.db.*
+import fr.acinq.lightning.logging.LoggerFactory
+import fr.acinq.lightning.logging.error
 import fr.acinq.lightning.utils.*
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.data.WalletPaymentInfo
@@ -29,12 +31,10 @@ import fr.acinq.phoenix.db.payments.*
 import fr.acinq.phoenix.db.payments.PaymentsMetadataQueries
 import fr.acinq.phoenix.db.sqldelight.PaymentsDatabase
 import fr.acinq.phoenix.managers.ContactsManager
-import fr.acinq.phoenix.managers.CurrencyManager
 import fr.acinq.phoenix.utils.MetadataQueue
 import kotlin.collections.List
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
@@ -42,12 +42,15 @@ class SqlitePaymentsDb(
     val driver: SqlDriver,
     val database: PaymentsDatabase,
     val metadataQueue: MetadataQueue?,
-    private val contactsManager: ContactsManager?
+    private val contactsManager: ContactsManager?,
+    val loggerFactory: LoggerFactory
 ) : IncomingPaymentsDb by SqliteIncomingPaymentsDb(database, metadataQueue),
     OutgoingPaymentsDb by SqliteOutgoingPaymentsDb(database, metadataQueue),
     PaymentsDb {
 
     val metadataQueries = PaymentsMetadataQueries(database)
+
+    val log = loggerFactory.newLogger(SqlitePaymentsDb::class)
 
     override suspend fun getInboundLiquidityPurchase(txId: TxId): LiquidityAds.LiquidityTransactionDetails? {
         val payment = buildList {
@@ -172,7 +175,13 @@ class SqlitePaymentsDb(
                                        lnurl_base_type: LnurlBase.TypeVersion?, lnurl_base_blob: ByteArray?, lnurl_description: String?, lnurl_metadata_type: LnurlMetadata.TypeVersion?, lnurl_metadata_blob: ByteArray?,
                                        lnurl_successAction_type: LnurlSuccessAction.TypeVersion?, lnurl_successAction_blob: ByteArray?,
                                        user_description: String?, user_notes: String?, modified_at: Long?, original_fiat_type: String?, original_fiat_rate: Double?): WalletPaymentInfo {
-        val payment = WalletPaymentAdapter.decode(data_)
+        val payment = try {
+            WalletPaymentAdapter.decode(data_)
+        } catch (e: Exception) {
+            log.error(e) { "failed to deserialize payment: ${e.message}" }
+            throw e
+        }
+
         return WalletPaymentInfo(
             payment = payment,
             metadata = PaymentsMetadataQueries.mapAll(payment.id,

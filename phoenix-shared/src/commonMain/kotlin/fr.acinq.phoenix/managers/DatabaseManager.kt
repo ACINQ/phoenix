@@ -63,7 +63,7 @@ class DatabaseManager(
                 val channelsDbDriver = createChannelsDbDriver(ctx, chain, nodeIdHash)
                 val channelsDb = createSqliteChannelsDb(channelsDbDriver)
                 val paymentsDbDriver = createPaymentsDbDriver(ctx, chain, nodeIdHash)
-                val paymentsDb = createSqlitePaymentsDb(paymentsDbDriver, metadataQueue, contactsManager)
+                val paymentsDb = createSqlitePaymentsDb(paymentsDbDriver, metadataQueue, contactsManager, loggerFactory)
                 val cloudKitDb = makeCloudKitDb(appDb, paymentsDb)
                 log.debug { "databases object created" }
                 _databases.value = PhoenixDatabases(

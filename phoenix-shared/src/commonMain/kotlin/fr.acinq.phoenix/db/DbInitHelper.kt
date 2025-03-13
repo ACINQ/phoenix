@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalStdlibApi::class)
+
 package fr.acinq.phoenix.db
 
 
@@ -26,10 +28,11 @@ import fr.acinq.lightning.channel.states.PersistedChannelState
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
+import fr.acinq.lightning.logging.LoggerFactory
+import fr.acinq.lightning.logging.error
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.db.sqldelight.*
 import fr.acinq.phoenix.managers.ContactsManager
-import fr.acinq.phoenix.managers.CurrencyManager
 import fr.acinq.phoenix.utils.MetadataQueue
 import fr.acinq.phoenix.utils.extensions.toByteArray
 
@@ -44,13 +47,14 @@ fun createSqliteChannelsDb(driver: SqlDriver): SqliteChannelsDb {
     )
 }
 
-fun createSqlitePaymentsDb(driver: SqlDriver, metadataQueue: MetadataQueue?, contactsManager: ContactsManager?): SqlitePaymentsDb {
+fun createSqlitePaymentsDb(driver: SqlDriver, metadataQueue: MetadataQueue?, contactsManager: ContactsManager?, loggerFactory: LoggerFactory): SqlitePaymentsDb {
+    val onError: (String) -> Unit = { loggerFactory.newLogger(SqlitePaymentsDb::class).error { it } }
     return SqlitePaymentsDb(
         driver = driver,
         database = PaymentsDatabase(
             driver = driver,
-            payments_incomingAdapter = Payments_incoming.Adapter(UUIDAdapter, ByteVector32Adapter, TxIdAdapter, IncomingPaymentAdapter),
-            payments_outgoingAdapter = Payments_outgoing.Adapter(UUIDAdapter, ByteVector32Adapter, TxIdAdapter, OutgoingPaymentAdapter),
+            payments_incomingAdapter = Payments_incoming.Adapter(UUIDAdapter, ByteVector32Adapter, TxIdAdapter, IncomingPaymentAdapter(onError)),
+            payments_outgoingAdapter = Payments_outgoing.Adapter(UUIDAdapter, ByteVector32Adapter, TxIdAdapter, OutgoingPaymentAdapter(onError)),
             link_lightning_outgoing_payment_partsAdapter = Link_lightning_outgoing_payment_parts.Adapter(UUIDAdapter, UUIDAdapter),
             on_chain_txsAdapter = On_chain_txs.Adapter(UUIDAdapter, TxIdAdapter),
             payments_metadataAdapter = Payments_metadata.Adapter(UUIDAdapter, EnumColumnAdapter(), EnumColumnAdapter(), EnumColumnAdapter()),
@@ -58,7 +62,8 @@ fun createSqlitePaymentsDb(driver: SqlDriver, metadataQueue: MetadataQueue?, con
             cloudkit_payments_metadataAdapter = Cloudkit_payments_metadata.Adapter(UUIDAdapter),
         ),
         metadataQueue = metadataQueue,
-        contactsManager = contactsManager
+        contactsManager = contactsManager,
+        loggerFactory = loggerFactory
     )
 }
 
@@ -89,20 +94,34 @@ object PersistedChannelStateAdapter : ColumnAdapter<PersistedChannelState, ByteA
     override fun encode(value: PersistedChannelState): ByteArray = fr.acinq.lightning.serialization.channel.Serialization.serialize(value)
 }
 
-object IncomingPaymentAdapter : ColumnAdapter<IncomingPayment, ByteArray> {
-    override fun decode(databaseValue: ByteArray): IncomingPayment = fr.acinq.lightning.serialization.payment.Serialization.deserialize(databaseValue).getOrThrow() as IncomingPayment
+class IncomingPaymentAdapter(val onError: (String) -> Unit) : ColumnAdapter<IncomingPayment, ByteArray> {
+    @OptIn(ExperimentalStdlibApi::class)
+    override fun decode(databaseValue: ByteArray): IncomingPayment {
+        return fr.acinq.lightning.serialization.payment.Serialization.deserialize(databaseValue).getOrNull()
+            ?.let { it as IncomingPayment }
+            ?: onError("cannot deserialize ${databaseValue.toHexString()}").let {
+                throw RuntimeException("cannot deserialize ${databaseValue.toHexString()}")
+            }
+    }
 
     override fun encode(value: IncomingPayment): ByteArray = fr.acinq.lightning.serialization.payment.Serialization.serialize(value)
 }
 
-object OutgoingPaymentAdapter : ColumnAdapter<OutgoingPayment, ByteArray> {
-    override fun decode(databaseValue: ByteArray): OutgoingPayment = fr.acinq.lightning.serialization.payment.Serialization.deserialize(databaseValue).getOrThrow() as OutgoingPayment
+class OutgoingPaymentAdapter(val onError: (String) -> Unit) : ColumnAdapter<OutgoingPayment, ByteArray> {
+    override fun decode(databaseValue: ByteArray): OutgoingPayment =
+        fr.acinq.lightning.serialization.payment.Serialization.deserialize(databaseValue).getOrNull()
+            ?.let { it as OutgoingPayment }
+            ?: onError("cannot deserialize ${databaseValue.toHexString()}").let {
+                throw RuntimeException("cannot deserialize ${databaseValue.toHexString()}")
+            }
 
     override fun encode(value: OutgoingPayment): ByteArray = fr.acinq.lightning.serialization.payment.Serialization.serialize(value)
 }
 
 object WalletPaymentAdapter : ColumnAdapter<WalletPayment, ByteArray> {
-    override fun decode(databaseValue: ByteArray): WalletPayment = fr.acinq.lightning.serialization.payment.Serialization.deserialize(databaseValue).getOrThrow()
+    override fun decode(databaseValue: ByteArray): WalletPayment =
+        fr.acinq.lightning.serialization.payment.Serialization.deserialize(databaseValue).getOrNull()
+            ?: throw RuntimeException("cannot deserialize ${databaseValue.toHexString()}")
 
     override fun encode(value: WalletPayment): ByteArray = fr.acinq.lightning.serialization.payment.Serialization.serialize(value)
 }
