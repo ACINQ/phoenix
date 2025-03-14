@@ -526,7 +526,7 @@ struct TransactionsView: View {
 		let contactsManager = Biz.business.contactsManager
 		
 		let updatedCachedRows = cachedRows.map { row in
-			let updatedContact = contactsManager.contactForPayment(payment: row.payment)
+			let updatedContact = contactsManager.contactForPaymentInfo(paymentInfo: row)
 			return WalletPaymentInfo(
 				payment  : row.payment,
 				metadata : row.metadata,
@@ -535,7 +535,7 @@ struct TransactionsView: View {
 		}
 		
 		let updatedPaymentsPageRows = paymentsPage.rows.map { row in
-			let updatedContact = contactsManager.contactForPayment(payment: row.payment)
+			let updatedContact = contactsManager.contactForPaymentInfo(paymentInfo: row)
 			return WalletPaymentInfo(
 				payment  : row.payment,
 				metadata : row.metadata,
