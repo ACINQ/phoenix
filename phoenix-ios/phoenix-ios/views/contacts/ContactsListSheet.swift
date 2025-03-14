@@ -13,7 +13,9 @@ struct ContactsListSheet: View {
 	let didSelectContact: (ContactInfo) -> Void
 	
 	@State var sortedContacts: [ContactInfo] = []
-	@State var offers: [String: [String]] = [:]
+	
+	@State var search_offers: [Lightning_kmpUUID: [String]] = [:]
+	@State var search_addresses: [Lightning_kmpUUID: [String]] = [:]
 	
 	@State var searchText = ""
 	@State var filteredContacts: [ContactInfo]? = nil
@@ -86,8 +88,9 @@ struct ContactsListSheet: View {
 				}
 			}
 			if hasZeroMatchesForSearch {
-				zeroMatches()
-					.deleteDisabled(true)
+				zeroMatchesRow()
+			} else if hasZeroContacts {
+				zeroContactsRow()
 			}
 		} // </List>
 		.listStyle(.plain)
@@ -136,10 +139,36 @@ struct ContactsListSheet: View {
 	}
 	
 	@ViewBuilder
-	func zeroMatches() -> some View {
+	func zeroMatchesRow() -> some View {
 		
-		HStack(alignment: VerticalAlignment.center, spacing: 0) {
-			Text("No matches for search").foregroundStyle(.secondary)
+		HStack(alignment: VerticalAlignment.center, spacing: 8) {
+			Image(systemName: "person.crop.circle.badge.questionmark")
+				.resizable()
+				.scaledToFit()
+				.frame(width: 32, height: 32)
+			Text("No matches for search")
+			Spacer()
+		}
+		.foregroundStyle(.secondary)
+		.padding(.all, 4)
+	}
+	
+	@ViewBuilder
+	func zeroContactsRow() -> some View {
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 8) {
+			Image(systemName: "person.crop.circle.fill")
+				.resizable()
+				.scaledToFit()
+				.frame(width: 32, height: 32)
+			VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+				Text("No Contacts")
+					.font(.title3)
+					.foregroundColor(.primary)
+				Text("Add contacts for easy & quick payments")
+					.font(.subheadline)
+					.foregroundColor(.secondary)
+			}
 			Spacer()
 		}
 		.padding(.all, 4)
@@ -154,12 +183,20 @@ struct ContactsListSheet: View {
 	}
 	
 	var hasZeroMatchesForSearch: Bool {
-		
-		guard let filteredContacts else {
+		if sortedContacts.isEmpty {
+			// User has zero contacts.
+			// This is different from zero search results.
+			return false
+		} else if let filteredContacts {
+			return filteredContacts.isEmpty
+		} else {
+			// Not searching
 			return false
 		}
-		
-		return filteredContacts.isEmpty && !sortedContacts.isEmpty
+	}
+	
+	var hasZeroContacts: Bool {
+		return sortedContacts.isEmpty
 	}
 	
 	// --------------------------------------------------
@@ -171,15 +208,30 @@ struct ContactsListSheet: View {
 		
 		sortedContacts = updatedList
 		
-		var updatedOffers: [String: [String]] = [:]
-		for contact in sortedContacts {
-			let key: String = contact.id
-			let values: [String] = contact.offers.map { $0.encode().lowercased() }
+		do {
+			var offers: [Lightning_kmpUUID: [String]] = [:]
+			for contact in sortedContacts {
+				let key: Lightning_kmpUUID = contact.id
+				let values: [String] = contact.offers.map {
+					$0.offer.encode().lowercased()
+				}
+				offers[key] = values
+			}
 			
-			updatedOffers[key] = values
+			search_offers = offers
 		}
-		
-		offers = updatedOffers
+		do {
+			var addresses: [Lightning_kmpUUID: [String]] = [:]
+			for contact in sortedContacts {
+				let key: Lightning_kmpUUID = contact.id
+				let values: [String] = contact.addresses.map {
+					$0.address.trimmingCharacters(in: .whitespacesAndNewlines)
+				}
+				addresses[key] = values
+			}
+			
+			search_addresses = addresses
+		}
 	}
 	
 	func searchTextChanged() {
@@ -206,8 +258,14 @@ struct ContactsListSheet: View {
 				return true
 			}
 			
-			if let offers = offers[contact.id] {
+			if let offers = search_offers[contact.id] {
 				if offers.contains(searchtext) {
+					return true
+				}
+			}
+			
+			if let addresses = search_addresses[contact.id] {
+				if addresses.contains(where: { $0.contains(searchtext) }) {
 					return true
 				}
 			}
@@ -249,4 +307,5 @@ struct ContactsListSheet: View {
 		keyWindow?.endEditing(true)
 	}
 }
+
 

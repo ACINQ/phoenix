@@ -1,0 +1,23 @@
+-- Migration: v7 -> v8
+--
+-- Changes:
+-- * Added table contact_addresses
+-- * Added index on table: contact
+-- * Added index on table: contact_addresses
+--
+
+ALTER TABLE contact_offers
+    ADD COLUMN label TEXT DEFAULT NULL;
+
+CREATE TABLE IF NOT EXISTS contact_addresses (
+    address_hash BLOB NOT NULL PRIMARY KEY,
+    contact_id TEXT NOT NULL,
+    address TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    label TEXT,
+
+    FOREIGN KEY(contact_id) REFERENCES contacts(id)
+);
+
+CREATE INDEX contact_name_index ON contacts(name ASC);
+CREATE INDEX contact_id_index2 ON contact_addresses(contact_id);

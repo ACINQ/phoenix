@@ -117,7 +117,8 @@ class SendManager(
         ): Success()
 
         data class Bolt12Offer(
-            val offer: OfferTypes.Offer
+            val offer: OfferTypes.Offer,
+            val lightningAddress: String?
         ): Success()
 
         data class Uri(
@@ -126,7 +127,8 @@ class SendManager(
 
         sealed class Lnurl: Success() {
             data class Pay(
-                val paymentIntent: LnurlPay.Intent
+                val paymentIntent: LnurlPay.Intent,
+                val lightningAddress: String?
             ): Lnurl()
 
             data class Withdraw(
@@ -149,18 +151,18 @@ class SendManager(
             Parser.readBolt11Invoice(input)?.let {
                 processBolt11Invoice(it)
             } ?: Parser.readOffer(input)?.let {
-                processOffer(it)
+                processOffer(it, null)
             } ?: readEmailLikeAddress(input, progress)?.let {
                 when (it) {
-                    is Either.Left -> processOffer(it.value)
-                    is Either.Right -> processLnurl(it.value, progress)
+                    is Either.Left -> processOffer(it.value, input)
+                    is Either.Right -> processLnurl(it.value, input, progress)
                 }
             } ?: readLnurl(input)?.let {
-                processLnurl(it, progress)
+                processLnurl(it, null, progress)
             } ?: readBitcoinAddress(input)?.let {
                 processBitcoinAddress(input, it)
             } ?: readLNURLFallback(input)?.let {
-                processLnurl(it, progress)
+                processLnurl(it, null, progress)
             } ?: run {
                 ParseResult.BadRequest(
                     request = request,
@@ -223,7 +225,8 @@ class SendManager(
     }
 
     private fun processOffer(
-        offer: OfferTypes.Offer
+        offer: OfferTypes.Offer,
+        lightningAddress: String?
     ): ParseResult {
 
         return if (!offer.chains.contains(chain.chainHash)) {
@@ -232,7 +235,7 @@ class SendManager(
                 reason = BadRequestReason.ChainMismatch(expected = chain)
             )
         } else {
-            ParseResult.Bolt12Offer(offer = offer)
+            ParseResult.Bolt12Offer(offer, lightningAddress)
         }
     }
 
@@ -322,6 +325,7 @@ class SendManager(
 
     private suspend fun processLnurl(
         lnurl: Lnurl,
+        lightningAddress: String?,
         progress: (p: ParseProgress) -> Unit
     ): ParseResult? {
         return when (lnurl) {
@@ -338,7 +342,7 @@ class SendManager(
                 try {
                     when (val result: Lnurl = task.await()) {
                         is LnurlPay.Intent -> {
-                            ParseResult.Lnurl.Pay(paymentIntent = result)
+                            ParseResult.Lnurl.Pay(paymentIntent = result, lightningAddress)
                         }
                         is LnurlWithdraw -> {
                             ParseResult.Lnurl.Withdraw(lnurlWithdraw = result)
@@ -401,7 +405,7 @@ class SendManager(
                 when {
                     address.isNotBlank() -> ParseResult.Uri(uri = result.value)
                     bolt11 != null -> ParseResult.Bolt11Invoice(request = input, invoice = bolt11)
-                    bolt12 != null -> ParseResult.Bolt12Offer(offer = bolt12)
+                    bolt12 != null -> ParseResult.Bolt12Offer(offer = bolt12, lightningAddress = null)
                     else -> ParseResult.BadRequest(request = input, reason = BadRequestReason.UnknownFormat)
                 }
             }

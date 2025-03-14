@@ -50,9 +50,13 @@ struct PaymentDetails: View {
 			} else if requestDescription() != nil {
 				gridRows_description()
 			}
+			
 			if let model = parent.flow as? SendManager.ParseResult_Bolt12Offer {
 				gridRows_offer(model)
+			} else if let model = parent.flow as? SendManager.ParseResult_Lnurl_Pay {
+				gridRows_lnurlpay(model)
 			}
+			
 			if let paymentSummary = parent.paymentStrings() {
 				gridRows_paymentSummary(paymentSummary)
 			}
@@ -122,7 +126,12 @@ struct PaymentDetails: View {
 		GridRowWrapper(gridWidth: gridWidth) {
 			titleColumn("Send To")
 		} valueColumn: {
-			valueColumn_offer_sendTo(model)
+			if let contact = parent.contact {
+				valueColumn_sendTo_contact(contact)
+			} else {
+				let dst: String = model.lightningAddress ?? model.offer.encode()
+				valueColumn_sendTo_dst(dst)
+			}
 		} // </GridRowWrapper>
 		
 		GridRowWrapper(gridWidth: gridWidth) {
@@ -130,6 +139,26 @@ struct PaymentDetails: View {
 		} valueColumn: {
 			valueColumn_offer_message(model)
 		} // </GridRowWrapper>
+	}
+	
+	@ViewBuilder
+	func gridRows_lnurlpay(
+		_ model: SendManager.ParseResult_Lnurl_Pay
+	) -> some View {
+		
+		if let contact = parent.contact {
+			GridRowWrapper(gridWidth: gridWidth) {
+				titleColumn("Send To")
+			} valueColumn: {
+				valueColumn_sendTo_contact(contact)
+			} // </GridRowWrapper>
+		} else if let address = model.lightningAddress {
+			GridRowWrapper(gridWidth: gridWidth) {
+				titleColumn("Send To")
+			} valueColumn: {
+				valueColumn_sendTo_dst(address)
+			} // </GridRowWrapper>
+		}
 	}
 	
 	@ViewBuilder
@@ -230,46 +259,44 @@ struct PaymentDetails: View {
 	}
 	
 	@ViewBuilder
-	func valueColumn_offer_sendTo(
-		_ model: SendManager.ParseResult_Bolt12Offer
+	func valueColumn_sendTo_contact(
+		_ contact: ContactInfo
 	) -> some View {
 		
-		if CONTACTS_ENABLED, let contact = parent.contact {
-			
-			HStack(alignment: VerticalAlignment.center, spacing: 4) {
-				ContactPhoto(fileName: contact.photoUri, size: 32)
-				Text(contact.name)
-			} // <HStack>
-			.onTapGesture {
-				parent.showManageContactSheet()
-			}
-			
-		} else {
-			
-			let offer: String = model.offer.encode()
-			VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
-				Text(offer)
-					.lineLimit(2)
-					.truncationMode(.middle)
-					.contextMenu {
-						Button {
-							UIPasteboard.general.string = offer
-						} label: {
-							Text("Copy")
-						}
-					}
-				if CONTACTS_ENABLED {
+		HStack(alignment: VerticalAlignment.center, spacing: 4) {
+			ContactPhoto(fileName: contact.photoUri, size: 32)
+			Text(contact.name)
+		} // <HStack>
+		.onTapGesture {
+			parent.manageExistingContact()
+		}
+	}
+	
+	@ViewBuilder
+	func valueColumn_sendTo_dst(
+		_ dst: String
+	) -> some View {
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+			Text(dst)
+				.lineLimit(2)
+				.truncationMode(.middle)
+				.contextMenu {
 					Button {
-						parent.showManageContactSheet()
+						UIPasteboard.general.string = dst
 					} label: {
-						HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 2) {
-							Image(systemName: "person")
-							Text("Add contact")
-						}
+						Text("Copy")
 					}
 				}
-			} // </VStack>
-		}
+			Button {
+				parent.addContact()
+			} label: {
+				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 2) {
+					Image(systemName: "person")
+					Text("Add contact")
+				}
+			}
+		} // </VStack>
 	}
 	
 	@ViewBuilder
