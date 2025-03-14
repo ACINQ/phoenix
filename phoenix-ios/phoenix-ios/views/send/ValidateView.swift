@@ -1809,10 +1809,6 @@ struct ValidateView: View {
 			log.warning("ignore: payment already in progress")
 			return
 		}
-		guard let peer = Biz.business.peerManager.peerStateValue() else {
-			log.warning("ignore: peer == nil")
-			return
-		}
 		
 		paymentInProgress = true
 		payOfferProblem = nil
@@ -1832,14 +1828,16 @@ struct ValidateView: View {
 					payerKey = Lightning_randomKey()
 				}
 				
-				let response: Lightning_kmpOfferNotPaid? = try await peer.betterPayOffer(
-					paymentId: paymentId,
-					amount: Lightning_kmpMilliSatoshi(msat: msat),
-					offer: model.offer,
-					payerKey: payerKey,
-					payerNote: payerNote,
-					fetchInvoiceTimeoutInSeconds: 30
-				)
+				let response: Lightning_kmpOfferNotPaid? =
+					try await Biz.business.sendManager._payBolt12Offer(
+						paymentId: paymentId,
+						amount: Lightning_kmpMilliSatoshi(msat: msat),
+						offer: model.offer,
+						lightningAddress: model.lightningAddress,
+						payerKey: payerKey,
+						payerNote: payerNote,
+						fetchInvoiceTimeoutInSeconds: 30
+					)
 				
 				paymentInProgress = false
 				
@@ -1992,7 +1990,7 @@ struct ValidateView: View {
 				do {
 					let result1: Bitcoin_kmpEither<SendManager.LnurlPayError, LnurlPay.Invoice> =
 						try await Biz.business.sendManager.lnurlPay_requestInvoice(
-							paymentIntent: model.paymentIntent,
+							pay: model,
 							amount: updatedMsat,
 							comment: commentSnapshot
 						)
@@ -2014,7 +2012,7 @@ struct ValidateView: View {
 						let invoice: LnurlPay.Invoice = result1.right!
 						
 						try await Biz.business.sendManager.lnurlPay_payInvoice(
-							paymentIntent: model.paymentIntent,
+							pay: model,
 							amount: updatedMsat,
 							comment: commentSnapshot,
 							invoice: invoice,

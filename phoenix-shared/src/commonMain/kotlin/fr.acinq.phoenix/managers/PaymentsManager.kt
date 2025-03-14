@@ -132,13 +132,14 @@ class PaymentsManager(
         id: UUID
     ): WalletPaymentInfo? {
         return paymentsDb().getPayment(id)?.let {
-            val payment = it.first
-            val contact = contactsManager.contactForPayment(payment)
-            WalletPaymentInfo(
-                payment = payment,
+            val paymentInfo = WalletPaymentInfo(
+                payment = it.first,
                 metadata = it.second ?: WalletPaymentMetadata(),
-                contact = contact
+                contact = null
             )
+            contactsManager.contactForPaymentInfo(paymentInfo)?.let {
+                paymentInfo.copy(contact = it)
+            } ?: paymentInfo
         }
     }
 }

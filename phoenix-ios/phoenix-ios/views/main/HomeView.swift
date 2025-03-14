@@ -886,7 +886,7 @@ struct HomeView : MVIView {
 		
 		let contactsManager = Biz.business.contactsManager
 		let updatedRows = paymentsPage.rows.map { info in
-			let updatedContact = contactsManager.contactForPayment(payment: info.payment)
+			let updatedContact = contactsManager.contactForPaymentInfo(paymentInfo: info)
 			return WalletPaymentInfo(
 				payment  : info.payment,
 				metadata : info.metadata,
