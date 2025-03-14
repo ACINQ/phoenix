@@ -22,12 +22,19 @@ import fr.acinq.lightning.db.OnChainOutgoingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.OutgoingPaymentsDb
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.db.sqldelight.PaymentsDatabase
 import fr.acinq.phoenix.db.didSaveWalletPayment
+import fr.acinq.phoenix.utils.MetadataQueue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class SqliteOutgoingPaymentsDb(private val database: PaymentsDatabase) : OutgoingPaymentsDb {
+class SqliteOutgoingPaymentsDb(
+    private val database: PaymentsDatabase,
+    private val metadataQueue: MetadataQueue?
+) : OutgoingPaymentsDb {
+
+    val metadataQueries = PaymentsMetadataQueries(database)
 
     override suspend fun addLightningOutgoingPaymentParts(parentId: UUID, parts: List<LightningOutgoingPayment.Part>) {
         withContext(Dispatchers.Default) {
@@ -49,9 +56,10 @@ class SqliteOutgoingPaymentsDb(private val database: PaymentsDatabase) : Outgoin
     }
 
     override suspend fun addOutgoingPayment(outgoingPayment: OutgoingPayment) {
+        val metadata = metadataQueue?.dequeue(outgoingPayment.id)
         withContext(Dispatchers.Default) {
             database.transaction {
-                _addOutgoingPayment(outgoingPayment)
+                _addOutgoingPayment(outgoingPayment, metadata)
             }
         }
     }
@@ -63,7 +71,7 @@ class SqliteOutgoingPaymentsDb(private val database: PaymentsDatabase) : Outgoin
      * @param notify Set to false if `didSaveWalletPayment` should not be invoked
      *               (e.g. when downloading payments from the cloud)
      */
-    fun _addOutgoingPayment(outgoingPayment: OutgoingPayment, notify: Boolean = true) {
+    fun _addOutgoingPayment(outgoingPayment: OutgoingPayment, metadata: WalletPaymentMetadata?, notify: Boolean = true) {
         when (outgoingPayment) {
             is LightningOutgoingPayment -> {
                 database.paymentsOutgoingQueries.insert(
@@ -75,6 +83,9 @@ class SqliteOutgoingPaymentsDb(private val database: PaymentsDatabase) : Outgoin
                     succeeded_at = outgoingPayment.succeededAt,
                     data_ = outgoingPayment
                 )
+                outgoingPayment.parts.forEach { part ->
+                    database.paymentsOutgoingQueries.insertPartLink(part_id = part.id, parent_id = outgoingPayment.id)
+                }
             }
             is OnChainOutgoingPayment -> {
                 database.paymentsOutgoingQueries.insert(
@@ -93,6 +104,9 @@ class SqliteOutgoingPaymentsDb(private val database: PaymentsDatabase) : Outgoin
                     locked_at = outgoingPayment.lockedAt
                 )
             }
+        }
+        metadata?.serialize()?.let { row ->
+            metadataQueries.addMetadata(outgoingPayment.id, row)
         }
         if (notify) {
             didSaveWalletPayment(outgoingPayment.id, database)

@@ -21,6 +21,8 @@ import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.db.*
+import fr.acinq.lightning.logging.LoggerFactory
+import fr.acinq.lightning.logging.error
 import fr.acinq.lightning.utils.*
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.data.WalletPaymentInfo
@@ -29,24 +31,26 @@ import fr.acinq.phoenix.db.payments.*
 import fr.acinq.phoenix.db.payments.PaymentsMetadataQueries
 import fr.acinq.phoenix.db.sqldelight.PaymentsDatabase
 import fr.acinq.phoenix.managers.ContactsManager
-import fr.acinq.phoenix.managers.CurrencyManager
+import fr.acinq.phoenix.utils.MetadataQueue
 import kotlin.collections.List
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 class SqlitePaymentsDb(
     val driver: SqlDriver,
     val database: PaymentsDatabase,
+    val metadataQueue: MetadataQueue?,
     private val contactsManager: ContactsManager?,
-    private val currencyManager: CurrencyManager?
-) : IncomingPaymentsDb by SqliteIncomingPaymentsDb(database),
-    OutgoingPaymentsDb by SqliteOutgoingPaymentsDb(database),
+    val loggerFactory: LoggerFactory
+) : IncomingPaymentsDb by SqliteIncomingPaymentsDb(database, metadataQueue),
+    OutgoingPaymentsDb by SqliteOutgoingPaymentsDb(database, metadataQueue),
     PaymentsDb {
 
     val metadataQueries = PaymentsMetadataQueries(database)
+
+    val log = loggerFactory.newLogger(SqlitePaymentsDb::class)
 
     override suspend fun getInboundLiquidityPurchase(txId: TxId): LiquidityAds.LiquidityTransactionDetails? {
         val payment = buildList {
@@ -171,7 +175,13 @@ class SqlitePaymentsDb(
                                        lnurl_base_type: LnurlBase.TypeVersion?, lnurl_base_blob: ByteArray?, lnurl_description: String?, lnurl_metadata_type: LnurlMetadata.TypeVersion?, lnurl_metadata_blob: ByteArray?,
                                        lnurl_successAction_type: LnurlSuccessAction.TypeVersion?, lnurl_successAction_blob: ByteArray?,
                                        user_description: String?, user_notes: String?, modified_at: Long?, original_fiat_type: String?, original_fiat_rate: Double?): WalletPaymentInfo {
-        val payment = WalletPaymentAdapter.decode(data_)
+        val payment = try {
+            WalletPaymentAdapter.decode(data_)
+        } catch (e: Exception) {
+            log.error(e) { "failed to deserialize payment: ${e.message}" }
+            throw e
+        }
+
         return WalletPaymentInfo(
             payment = payment,
             metadata = PaymentsMetadataQueries.mapAll(payment.id,
@@ -198,40 +208,6 @@ class SqlitePaymentsDb(
 
     suspend fun countCompletedInRange(startDate: Long, endDate: Long): Long = withContext(Dispatchers.Default) {
         database.paymentsQueries.countCompletedInRange(completed_at_from = startDate, completed_at_to = endDate).executeAsOne()
-    }
-
-    private var metadataQueue = MutableStateFlow(mapOf<UUID, WalletPaymentMetadataRow>())
-
-    /**
-     * The lightning-kmp layer triggers the addition of a payment to the database.
-     * But sometimes there is associated metadata that we want to include,
-     * and we would like to write it to the database within the same transaction.
-     * So we have a system to enqueue/dequeue associated metadata.
-     */
-    internal fun enqueueMetadata(row: WalletPaymentMetadataRow, id: UUID) {
-        val oldMap = metadataQueue.value
-        val newMap = oldMap + (id to row)
-        metadataQueue.value = newMap
-    }
-
-    /**
-     * Returns any enqueued metadata, and also appends the current fiat exchange rate.
-     */
-    private fun dequeueMetadata(id: UUID): WalletPaymentMetadataRow {
-        val oldMap = metadataQueue.value
-        val newMap = oldMap - id
-        metadataQueue.value = newMap
-
-        val row = oldMap[id] ?: WalletPaymentMetadataRow()
-
-        // Append the current exchange rate, unless it was explicitly set earlier.
-        return if (row.original_fiat != null) {
-            row
-        } else {
-            row.copy(original_fiat = currencyManager?.calculateOriginalFiat()?.let {
-                Pair(it.fiatCurrency.name, it.price)
-            })
-        }
     }
 
     suspend fun updateUserInfo(id: UUID, userDescription: String?, userNotes: String?) = withContext(Dispatchers.Default) {

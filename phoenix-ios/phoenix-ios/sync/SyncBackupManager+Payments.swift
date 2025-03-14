@@ -765,7 +765,7 @@ extension SyncBackupManager {
 		_ metadata: WalletPaymentMetadata
 	) -> URL? {
 		
-		guard let row = WalletPaymentMetadataRow.companion.serialize(metadata: metadata) else {
+		guard let row = metadata.serialize() else {
 			return nil
 		}
 		

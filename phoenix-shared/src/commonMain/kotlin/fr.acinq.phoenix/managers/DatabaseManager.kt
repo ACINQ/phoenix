@@ -15,6 +15,7 @@ import fr.acinq.phoenix.db.createSqliteChannelsDb
 import fr.acinq.phoenix.db.createSqlitePaymentsDb
 import fr.acinq.phoenix.db.makeCloudKitDb
 import fr.acinq.phoenix.db.payments.CloudKitInterface
+import fr.acinq.phoenix.utils.MetadataQueue
 import fr.acinq.phoenix.utils.PlatformContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
@@ -50,6 +51,8 @@ class DatabaseManager(
     private val _databases = MutableStateFlow<PhoenixDatabases?>(null)
     val databases: StateFlow<PhoenixDatabases?> = _databases.asStateFlow()
 
+    val metadataQueue = MetadataQueue(currencyManager)
+
     init {
         launch {
             nodeParamsManager.nodeParams.collect { nodeParams ->
@@ -60,7 +63,7 @@ class DatabaseManager(
                 val channelsDbDriver = createChannelsDbDriver(ctx, chain, nodeIdHash)
                 val channelsDb = createSqliteChannelsDb(channelsDbDriver)
                 val paymentsDbDriver = createPaymentsDbDriver(ctx, chain, nodeIdHash)
-                val paymentsDb = createSqlitePaymentsDb(paymentsDbDriver, contactsManager, currencyManager)
+                val paymentsDb = createSqlitePaymentsDb(paymentsDbDriver, metadataQueue, contactsManager, loggerFactory)
                 val cloudKitDb = makeCloudKitDb(appDb, paymentsDb)
                 log.debug { "databases object created" }
                 _databases.value = PhoenixDatabases(

@@ -49,6 +49,7 @@ import fr.acinq.phoenix.db.payments.WalletPaymentMetadataRow
 import fr.acinq.phoenix.utils.extensions.deriveUUID
 import fr.acinq.phoenix.utils.extensions.toByteArray
 
+@OptIn(ExperimentalStdlibApi::class)
 val AfterVersion11 = AfterVersion(11) { driver ->
 
     fun insertPayment(payment: OutgoingPayment) {
@@ -181,7 +182,8 @@ val AfterVersion11 = AfterVersion(11) { driver ->
             val result = buildMap<TxId, IncomingPayment> {
                 while (cursor.next().value) {
                     val data = cursor.getBytes(0)!!
-                    when(val incomingPayment = Serialization.deserialize(data).getOrThrow()) {
+                    when(val incomingPayment = Serialization.deserialize(data).getOrNull()) {
+                        null -> println("cannot deserialize ${data.toHexString()}")
                         is LightningIncomingPayment ->
                             when (val txId = incomingPayment.parts
                                 .filterIsInstance<LightningIncomingPayment.Part.Htlc>()

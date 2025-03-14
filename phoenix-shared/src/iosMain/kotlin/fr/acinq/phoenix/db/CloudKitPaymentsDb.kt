@@ -211,8 +211,8 @@ class CloudKitPaymentsDb(
             val ckQueries = paymentsDb.database.cloudKitPaymentsQueries
             val metaQueries = paymentsDb.database.paymentsMetadataQueries
 
-            val incomingPaymentsDb = SqliteIncomingPaymentsDb(paymentsDb.database)
-            val outgoingPaymentsDb = SqliteOutgoingPaymentsDb(paymentsDb.database)
+            val incomingPaymentsDb = SqliteIncomingPaymentsDb(paymentsDb.database, paymentsDb.metadataQueue)
+            val outgoingPaymentsDb = SqliteOutgoingPaymentsDb(paymentsDb.database, paymentsDb.metadataQueue)
 
             db.transaction {
 
@@ -222,12 +222,12 @@ class CloudKitPaymentsDb(
                     if (payment is IncomingPayment) {
                         val existing = inQueries.get(paymentId).executeAsOneOrNull()
                         if (existing == null) {
-                            incomingPaymentsDb._addIncomingPayment(payment, notify = false)
+                            incomingPaymentsDb._addIncomingPayment(payment, metadata = null, notify = false)
                         }
                     } else if (payment is OutgoingPayment) {
                         val existing = outQueries.get(paymentId).executeAsOneOrNull()
                         if (existing == null) {
-                            outgoingPaymentsDb._addOutgoingPayment(payment, notify = false)
+                            outgoingPaymentsDb._addOutgoingPayment(payment, metadata = null, notify = false)
                         }
                     }
                 }
