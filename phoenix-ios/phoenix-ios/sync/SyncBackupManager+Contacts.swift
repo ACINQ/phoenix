@@ -686,7 +686,7 @@ extension SyncBackupManager {
 		_ contact: ContactInfo
 	) -> Data? {
 		
-		let wrapper = CloudContact_V2(contact: contact)
+		let wrapper = CloudContact.V1(contact: contact)
 		let cbor = wrapper.cborSerialize().toSwiftData()
 		
 		#if DEBUG
@@ -751,7 +751,7 @@ extension SyncBackupManager {
 			if let cleartext {
 				do {
 					let cleartext_kotlin = cleartext.toKotlinByteArray()
-					contact = try CloudContact_V2.companion.cborDeserializeAndUnwrap(
+					contact = try CloudContact.companion.cborDeserializeAndUnwrap(
 						blob: cleartext_kotlin,
 						photoUri: photoUri
 					)
