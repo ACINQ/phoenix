@@ -20,6 +20,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import fr.acinq.bitcoin.Chain
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.phoenix.db.migrations.v10.AfterVersion10
 import fr.acinq.phoenix.db.migrations.v11.AfterVersion11
 import fr.acinq.phoenix.db.sqldelight.AppDatabase
@@ -42,14 +43,15 @@ actual fun createChannelsDbDriver(ctx: PlatformContext, chain: Chain, nodeIdHash
     )
 }
 
-actual fun createPaymentsDbDriver(ctx: PlatformContext, chain: Chain, nodeIdHash: String): SqlDriver {
+actual fun createPaymentsDbDriver(ctx: PlatformContext, chain: Chain, nodeIdHash: String, onError: (String) -> Unit): SqlDriver {
+
     return AndroidSqliteDriver(
         schema = PaymentsDatabase.Schema,
         context = ctx.applicationContext,
         name = "payments-${chain.phoenixName}-$nodeIdHash.sqlite",
         callback = object : AndroidSqliteDriver.Callback(
             schema = PaymentsDatabase.Schema,
-            AfterVersion10,
+            AfterVersion10(onError),
             AfterVersion11,
         ) {
             override fun onConfigure(db: SupportSQLiteDatabase) {

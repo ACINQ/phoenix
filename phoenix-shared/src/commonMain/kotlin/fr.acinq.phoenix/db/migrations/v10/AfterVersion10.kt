@@ -24,7 +24,8 @@ import fr.acinq.phoenix.utils.extensions.deriveUUID
 import fr.acinq.lightning.serialization.payment.Serialization
 import fr.acinq.phoenix.utils.extensions.toByteArray
 
-val AfterVersion10 = AfterVersion(10) { driver ->
+@OptIn(ExperimentalStdlibApi::class)
+fun AfterVersion10(onError: (String) -> Unit) = AfterVersion(10) { driver ->
     val payments = driver.executeQuery(
         identifier = null,
         sql = "SELECT * FROM incoming_payments",
@@ -32,18 +33,25 @@ val AfterVersion10 = AfterVersion(10) { driver ->
         mapper = { cursor ->
             val result = buildList {
                 while (cursor.next().value) {
-                    val o = mapIncomingPaymentFromV10(
-                        payment_hash = cursor.getBytes(0)!!,
-                        preimage = cursor.getBytes(1)!!,
-                        created_at = cursor.getLong(2)!!,
-                        origin_type = cursor.getString(3)!!,
-                        origin_blob = cursor.getBytes(4)!!,
-                        received_amount_msat = cursor.getLong(5),
-                        received_at = cursor.getLong(6),
-                        received_with_type = cursor.getString(7),
-                        received_with_blob = cursor.getBytes(8),
-                    )
-                    add(o)
+                    try {
+                        val o = mapIncomingPaymentFromV10(
+                            payment_hash = cursor.getBytes(0)!!,
+                            preimage = cursor.getBytes(1)!!,
+                            created_at = cursor.getLong(2)!!,
+                            origin_type = cursor.getString(3)!!,
+                            origin_blob = cursor.getBytes(4)!!,
+                            received_amount_msat = cursor.getLong(5),
+                            received_at = cursor.getLong(6),
+                            received_with_type = cursor.getString(7),
+                            received_with_blob = cursor.getBytes(8),
+                        )
+                        add(o)
+                    } catch (e: Exception) {
+                        onError("cannot migrate legacy data:" +
+                                "\npayment_hash=${cursor.getBytes(0)?.toHexString()} preimage=${cursor.getBytes(1)?.toHexString()} received=${cursor.getLong(5)}" +
+                                "\norigin_type=${cursor.getString(3)} origin_blob=${cursor.getBytes(4)?.toHexString()}" +
+                                "\nrec_w_type=${cursor.getString(7)} rec_w_blob=${cursor.getBytes(8)?.toHexString()}")
+                    }
                 }
             }
             QueryResult.Value(result)
