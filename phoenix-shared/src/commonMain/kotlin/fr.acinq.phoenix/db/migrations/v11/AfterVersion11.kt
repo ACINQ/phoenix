@@ -50,7 +50,7 @@ import fr.acinq.phoenix.utils.extensions.deriveUUID
 import fr.acinq.phoenix.utils.extensions.toByteArray
 
 @OptIn(ExperimentalStdlibApi::class)
-val AfterVersion11 = AfterVersion(11) { driver ->
+fun AfterVersion11(onError: (String) -> Unit) = AfterVersion(11) { driver ->
 
     fun insertPayment(payment: OutgoingPayment) {
         driver.execute(
@@ -183,7 +183,7 @@ val AfterVersion11 = AfterVersion(11) { driver ->
                 while (cursor.next().value) {
                     val data = cursor.getBytes(0)!!
                     when(val incomingPayment = Serialization.deserialize(data).getOrNull()) {
-                        null -> println("cannot deserialize ${data.toHexString()}")
+                        null -> onError("(v11) cannot migrate legacy incoming data=${data.toHexString()}")
                         is LightningIncomingPayment ->
                             when (val txId = incomingPayment.parts
                                 .filterIsInstance<LightningIncomingPayment.Part.Htlc>()
