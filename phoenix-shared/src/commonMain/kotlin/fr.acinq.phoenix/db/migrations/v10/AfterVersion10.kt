@@ -47,10 +47,10 @@ fun AfterVersion10(onError: (String) -> Unit) = AfterVersion(10) { driver ->
                         )
                         add(o)
                     } catch (e: Exception) {
-                        onError("cannot migrate legacy data:" +
-                                "\npayment_hash=${cursor.getBytes(0)?.toHexString()} preimage=${cursor.getBytes(1)?.toHexString()} received=${cursor.getLong(5)}" +
-                                "\norigin_type=${cursor.getString(3)} origin_blob=${cursor.getBytes(4)?.toHexString()}" +
-                                "\nrec_w_type=${cursor.getString(7)} rec_w_blob=${cursor.getBytes(8)?.toHexString()}")
+                        onError("cannot migrate legacy data: ${e.message}" +
+                                "\n  payment_hash=${cursor.getBytes(0)?.toHexString()} preimage=${cursor.getBytes(1)?.toHexString()} received=${cursor.getLong(5)}" +
+                                "\n  origin_type=${cursor.getString(3)} origin_blob=${cursor.getBytes(4)?.toHexString()}" +
+                                "\n  rec_w_type=${cursor.getString(7)} rec_w_blob=${cursor.getBytes(8)?.toHexString()}")
                     }
                 }
             }
