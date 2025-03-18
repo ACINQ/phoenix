@@ -81,7 +81,7 @@ actual fun createPaymentsDbDriver(
             wrapConnection(connection) { schema.create(it) }
         },
         upgrade = { connection, oldVersion, newVersion ->
-            wrapConnection(connection) { schema.migrate(it, oldVersion.toLong(), newVersion.toLong(), AfterVersion10(onError), AfterVersion11) }
+            wrapConnection(connection) { schema.migrate(it, oldVersion.toLong(), newVersion.toLong(), AfterVersion10(onError), AfterVersion11(onError)) }
         }
     )
     return NativeSqliteDriver(configuration)

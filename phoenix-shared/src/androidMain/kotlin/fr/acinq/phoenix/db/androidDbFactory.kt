@@ -52,7 +52,7 @@ actual fun createPaymentsDbDriver(ctx: PlatformContext, chain: Chain, nodeIdHash
         callback = object : AndroidSqliteDriver.Callback(
             schema = PaymentsDatabase.Schema,
             AfterVersion10(onError),
-            AfterVersion11,
+            AfterVersion11(onError),
         ) {
             override fun onConfigure(db: SupportSQLiteDatabase) {
                 super.onConfigure(db)
