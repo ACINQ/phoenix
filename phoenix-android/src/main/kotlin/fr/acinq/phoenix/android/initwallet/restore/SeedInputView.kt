@@ -140,9 +140,9 @@ fun SeedInputView(
     Spacer(modifier = Modifier.height(8.dp))
 
     if (state is RestoreWalletState.SeedInput.Valid) {
-        ImportPaymentsDbView(
+        RestorePaymentsDbButton(
             restorePaymentDbState = vm.restorePaymentsDbState,
-            onImportDbClick = { vm.restorePaymentsDb(context, it) },
+            onImportDbClick = { vm.loadPaymentsDb(context, it) },
         )
         Spacer(modifier = Modifier.height(16.dp))
         Clickable(

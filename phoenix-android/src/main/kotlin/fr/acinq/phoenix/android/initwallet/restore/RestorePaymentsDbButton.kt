@@ -45,7 +45,7 @@ import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.feedback.InfoMessage
 
 @Composable
-fun ImportPaymentsDbView(restorePaymentDbState: RestorePaymentsDbState, onImportDbClick: (uri: Uri) -> Unit) {
+fun RestorePaymentsDbButton(restorePaymentDbState: RestorePaymentsDbState, onImportDbClick: (uri: Uri) -> Unit) {
     val filePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument(),
         onResult = { uri -> uri?.let { onImportDbClick(it) } }

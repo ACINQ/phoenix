@@ -56,7 +56,7 @@ sealed class RestoreWalletState {
 sealed class RestorePaymentsDbState {
     data object Init : RestorePaymentsDbState()
     data object Importing : RestorePaymentsDbState()
-    data class Success(val fileName: String, val modifiedAt: Long, val decryptedDatabase: ByteVector) : RestorePaymentsDbState()
+    data class Success(val fileName: String, val decryptedDatabase: ByteVector) : RestorePaymentsDbState()
 
     sealed class Failure : RestorePaymentsDbState() {
         data class Error(val e: Throwable) : Failure()
@@ -123,29 +123,8 @@ class RestoreWalletViewModel(override val internalDataRepository: InternalDataRe
                 }
             }
 
-             writeSeed(context, words, isNewWallet = false, onSeedWritten = onSeedWritten)
+            writeSeed(context, words, isNewWallet = false, onSeedWritten = onSeedWritten)
         }
-    }
-
-    private fun resolveUriContent(context: Context, uri: Uri): Triple<String, Long, ByteArray>? {
-        val resolver = context.contentResolver
-        val (fileName, modifiedAt) = resolver.query(uri,
-            arrayOf(
-                MediaStore.Files.FileColumns._ID,
-                MediaStore.Files.FileColumns.DISPLAY_NAME,
-                MediaStore.Files.FileColumns.DATE_MODIFIED, // fix date_modified not working
-            ),
-            null, null, null, null)?.use { cursor ->
-            val nameColumn = cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME)
-            val modifiedAtColumn = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATE_MODIFIED)
-            if (cursor.moveToFirst()) {
-                cursor.getString(nameColumn) to cursor.getLong(modifiedAtColumn) * 1000
-            } else null
-        } ?: return null
-
-        val data = resolver.openInputStream(uri)?.use { it.readBytes() } ?: return null
-
-        return Triple(fileName, modifiedAt, data)
     }
 
     /** Restore a database file to the app's database folder. If restoring a channels database, [canOverwrite] should ALWAYS be false. */
@@ -161,7 +140,7 @@ class RestoreWalletViewModel(override val internalDataRepository: InternalDataRe
         }
     }
 
-    fun restorePaymentsDb(context: Context, uri: Uri) {
+    fun loadPaymentsDb(context: Context, uri: Uri) {
         if (restorePaymentsDbState is RestorePaymentsDbState.Importing) return
 
         viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
@@ -190,8 +169,8 @@ class RestoreWalletViewModel(override val internalDataRepository: InternalDataRe
                     try {
                         delay(1000)
                         val keyManager = LocalKeyManager(seed = seed.byteVector(), chain = NodeParamsManager.chain, remoteSwapInExtendedPublicKey = NodeParamsManager.remoteSwapInXpub)
-                        val decryptedData = EncryptedData.read(result.third).decrypt(keyManager)
-                        restorePaymentsDbState = RestorePaymentsDbState.Success(result.first, result.second, decryptedData)
+                        val decryptedData = EncryptedData.read(result.second).decrypt(keyManager)
+                        restorePaymentsDbState = RestorePaymentsDbState.Success(result.first, decryptedData)
                     } catch (e: Exception) {
                         log.error("cannot decrypt payments-db file: ", e)
                         restorePaymentsDbState = RestorePaymentsDbState.Failure.CannotDecryptDatabase
@@ -200,6 +179,23 @@ class RestoreWalletViewModel(override val internalDataRepository: InternalDataRe
                 }
             }
         }
+    }
+
+    private fun resolveUriContent(context: Context, uri: Uri): Pair<String, ByteArray>? {
+        val resolver = context.contentResolver
+        val fileName = resolver.query(uri,
+            arrayOf(MediaStore.Files.FileColumns._ID, MediaStore.Files.FileColumns.DISPLAY_NAME,),
+            null, null, null, null
+        )?.use { cursor ->
+            val nameColumn = cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME)
+            if (cursor.moveToFirst()) {
+                cursor.getString(nameColumn)
+            } else null
+        } ?: return null
+
+        val data = resolver.openInputStream(uri)?.use { it.readBytes() } ?: return null
+
+        return Pair(fileName, data)
     }
 
     class Factory : ViewModelProvider.Factory {
