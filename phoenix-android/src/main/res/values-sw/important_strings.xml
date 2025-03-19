@@ -128,7 +128,7 @@
     <string name="restore_seed_invalid_details">Hakikisha umeingiza maneno sahihi kwa mpangilio sahihi.</string>
 
     <string name="restore_payments_button">Leta historia ya malipo</string>
-    <string name="restore_payments_button_details">Hiari. Tumia kitufe hiki kurejesha faili ya hifadhidata ya malipo kutoka kwa kifaa kingine.</ string >
+    <string name="restore_payments_button_details">Hiari. Tumia kitufe hiki kurejesha faili ya hifadhidata ya malipo kutoka kwa kifaa kingine.</string >
     <string name="restore_payments_success">Itarejesha historia ya malipo</string>
     <string name="restore_payments_success_button">Tumia faili nyingine</string>
     <string name="restore_payments_error_header">Haiwezi kurejesha malipo</string>
