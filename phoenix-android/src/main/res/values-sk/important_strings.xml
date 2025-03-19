@@ -123,6 +123,17 @@
     <string name="restore_seed_valid_details">Teraz môžete pokračovať a obnoviť peňaženku</string>
     <string name="restore_seed_invalid">Tento seed nie je platný</string>
     <string name="restore_seed_invalid_details">Uistite sa, že ste zadali správne slová v správnom poradí.</string>
+
+    <string name="restore_payments_button">Importovať históriu platieb</string>
+    <string name="restore_payments_button_details">Voliteľné. Toto tlačidlo použite na obnovenie súboru databázy platieb z iného zariadenia.</string>
+    <string name="restore_payments_success">Obnoví sa história platieb</string>
+    <string name="restore_payments_success_button">Použiť iný súbor</string>
+    <string name="restore_payments_error_header">Platby nie je možné obnoviť</string>
+    <string name="restore_payments_error_button">Skúste to znova</string>
+    <string name="restore_payments_error_encryption">Súbor sa nedá dešifrovať. Uistite sa, že používate databázový súbor Phoenix (nie CSV) a že sa tento súbor zhoduje s peňaženkou, ktorú obnovujete.</string>
+    <string name="restore_payments_error_open">Tento súbor sa nedá otvoriť. Skúste to znova.</string>
+    <string name="restore_payments_error_writing">Tento súbor sa nepodarilo zapísať do priečinka s údajmi aplikácie. Skúste to znova.</string>
+
     <string name="restore_import_button">Obnoviť</string>
 
     <!-- upgrade required dialog -->

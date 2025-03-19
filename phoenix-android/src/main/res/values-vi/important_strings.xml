@@ -130,6 +130,17 @@
     <string name="restore_seed_valid_details">Bạn có thể tiếp tục và khôi phục ví của mình</string>
     <string name="restore_seed_invalid">Hạt giống không hợp lệ</string>
     <string name="restore_seed_invalid_details">Hãy đảm bảo nhập đúng từ theo đúng thứ tự.</string>
+
+    <string name="restore_payments_button">Nhập lịch sử thanh toán</string>
+    <string name="restore_payments_button_details">Tùy chọn. Sử dụng nút này để khôi phục tệp cơ sở dữ liệu thanh toán từ thiết bị khác.</string>
+    <string name="restore_payments_success">Sẽ khôi phục lịch sử thanh toán</string>
+    <string name="restore_payments_success_button">Sử dụng tệp khác</string>
+    <string name="restore_payments_error_header">Không thể khôi phục thanh toán</string>
+    <string name="restore_payments_error_button">Thử lại</string>
+    <string name="restore_payments_error_encryption">Không thể giải mã tệp. Đảm bảo bạn đang sử dụng tệp cơ sở dữ liệu Phoenix (không phải CSV) và tệp này khớp với ví bạn đang khôi phục.</string>
+    <string name="restore_payments_error_open">Không thể mở tệp này. Hãy thử lại.</string>
+    <string name="restore_payments_error_writing">Không thể ghi tệp này vào thư mục dữ liệu của ứng dụng. Hãy thử lại.</string>
+
     <string name="restore_import_button">Khôi phục</string>
 
     <!-- upgrade required dialog -->
