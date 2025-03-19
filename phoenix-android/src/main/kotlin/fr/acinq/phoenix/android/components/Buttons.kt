@@ -51,6 +51,7 @@ import fr.acinq.bitcoin.TxId
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.utils.copyToClipboard
+import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.utils.BlockchainExplorer
 
 
@@ -123,6 +124,28 @@ fun FilledButton(
         textStyle = textStyle,
         padding = padding,
         modifier = modifier
+    )
+}
+
+@Composable
+fun MutedFilledButton(
+    modifier: Modifier = Modifier,
+    text: String? = null,
+    icon: Int? = null,
+    maxLines: Int = Int.MAX_VALUE,
+    enabled: Boolean = true,
+    enabledEffect: Boolean = true,
+    space: Dp = 12.dp,
+    padding: PaddingValues = PaddingValues(12.dp),
+    onClick: () -> Unit,
+) {
+    FilledButton(
+        shape = RoundedCornerShape(12.dp),
+        backgroundColor = mutedBgColor,
+        textStyle = MaterialTheme.typography.button,
+        iconTint = MaterialTheme.colors.onSurface,
+        modifier = modifier, text = text, icon = icon, maxLines = maxLines, enabled = enabled,
+        enabledEffect = enabledEffect, space = space, padding = padding, onClick = onClick,
     )
 }
 
