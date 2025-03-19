@@ -64,13 +64,13 @@ private fun ExportAsCsvView(
     val startTimestamp = vm.startTimestampMillis
     val endTimestamp = vm.endTimestampMillis
 
-    CardHeader(text = "CSV export")
+    CardHeader(text = stringResource(R.string.payments_export_csv_header))
     Card(internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)) {
-        Text(text = stringResource(id = R.string.payments_export_instructions))
+        Text(text = stringResource(id = R.string.payments_export_csv_instructions))
         Spacer(Modifier.height(16.dp))
         if (startTimestamp != null) {
             CalendarView(
-                label = stringResource(id = R.string.payments_export_start_label),
+                label = stringResource(id = R.string.payments_export_csv_start_label),
                 initialTimestampMillis = startTimestamp,
                 onDateSelected = {
                     vm.reset()
@@ -81,7 +81,7 @@ private fun ExportAsCsvView(
         }
         Spacer(Modifier.height(8.dp))
         CalendarView(
-            label = stringResource(id = R.string.payments_export_end_label),
+            label = stringResource(id = R.string.payments_export_csv_end_label),
             initialTimestampMillis = endTimestamp,
             onDateSelected = {
                 vm.reset()
@@ -92,7 +92,7 @@ private fun ExportAsCsvView(
         )
         Spacer(Modifier.height(8.dp))
         SwitchView(
-            text = stringResource(id = R.string.payments_export_context_label),
+            text = stringResource(id = R.string.payments_export_csv_context_label),
             enabled = vm.csvExportState !is CsvExportState.Generating,
             checked = vm.includesOriginDestination,
             onCheckedChange = {
@@ -102,7 +102,7 @@ private fun ExportAsCsvView(
             modifier = Modifier.padding(vertical = 4.dp),
         )
         SwitchView(
-            text = stringResource(id = R.string.payments_export_description_label),
+            text = stringResource(id = R.string.payments_export_csv_description_label),
             enabled = vm.csvExportState !is CsvExportState.Generating,
             checked = vm.includesDescription && vm.includesNotes,
             onCheckedChange = {
@@ -121,20 +121,20 @@ private fun ExportAsCsvView(
             when (val state = vm.csvExportState) {
                 CsvExportState.Init, is CsvExportState.Failed, is CsvExportState.NoData -> {
                     if (startTimestamp == null) {
-                        ErrorMessage(header = stringResource(id = R.string.payments_export_no_payments))
+                        ErrorMessage(header = stringResource(id = R.string.payments_export_csv_no_payments))
                     } else if (startTimestamp > endTimestamp) {
-                        ErrorMessage(header = stringResource(id = R.string.payments_export_invalid_timestamps))
+                        ErrorMessage(header = stringResource(id = R.string.payments_export_csv_invalid_timestamps))
                     } else {
                         if (state is CsvExportState.Failed) {
                             ErrorMessage(
-                                header = stringResource(id = R.string.payments_export_error),
+                                header = stringResource(id = R.string.payments_export_csv_error),
                                 details = state.error.localizedMessage,
                             )
                         } else if (state is CsvExportState.NoData) {
-                            ErrorMessage(header = stringResource(id = R.string.payments_export_no_data))
+                            ErrorMessage(header = stringResource(id = R.string.payments_export_csv_no_data))
                         }
                         FilledButton(
-                            text = stringResource(id = R.string.payments_export_generate_button),
+                            text = stringResource(id = R.string.payments_export_csv_generate_button),
                             icon = R.drawable.ic_build,
                             onClick = { vm.generateCSV(context) },
                             modifier = Modifier.fillMaxWidth(),
@@ -144,11 +144,11 @@ private fun ExportAsCsvView(
                     }
                 }
                 is CsvExportState.Generating -> {
-                    ProgressView(text = stringResource(id = R.string.payments_export_in_progress))
+                    ProgressView(text = stringResource(id = R.string.payments_export_csv_in_progress))
                 }
                 is CsvExportState.Success -> {
                     Button(
-                        text = stringResource(id = R.string.payments_export_share_button),
+                        text = stringResource(id = R.string.payments_export_csv_share_button),
                         icon = R.drawable.ic_share,
                         iconTint = MaterialTheme.colors.onPrimary,
                         onClick = {
@@ -156,10 +156,10 @@ private fun ExportAsCsvView(
                                 context = context,
                                 data = state.uri,
                                 subject = context.getString(
-                                    R.string.payments_export_share_subject,
+                                    R.string.payments_export_csv_share_subject,
                                     startTimestamp?.toBasicAbsoluteDateString() ?: "", endTimestamp.toBasicAbsoluteDateString()
                                 ),
-                                chooserTitle = context.getString(R.string.payments_export_share_title),
+                                chooserTitle = context.getString(R.string.payments_export_csv_share_title),
                                 mimeType = "text/csv"
                             )
                         },
@@ -171,7 +171,7 @@ private fun ExportAsCsvView(
                     )
                     Spacer(Modifier.height(8.dp))
                     MutedFilledButton(
-                        text = stringResource(R.string.payments_export_copy_button),
+                        text = stringResource(R.string.payments_export_csv_copy_button),
                         icon = R.drawable.ic_copy,
                         onClick = { copyToClipboard(context, data = state.content) },
                         modifier = Modifier.fillMaxWidth(),
@@ -224,15 +224,15 @@ private fun ExportDatabaseView(
             }
             is DatabaseExportState.Success -> {
                 Button(
-                    text = stringResource(id = R.string.payments_export_share_button),
+                    text = stringResource(id = R.string.payments_export_csv_share_button),
                     icon = R.drawable.ic_share,
                     iconTint = MaterialTheme.colors.onPrimary,
                     onClick = {
                         shareFile(
                             context = context,
                             data = state.uri,
-                            subject = context.getString(R.string.payments_export_share_title),
-                            chooserTitle = context.getString(R.string.payments_export_share_title),
+                            subject = context.getString(R.string.payments_export_csv_share_title),
+                            chooserTitle = context.getString(R.string.payments_export_csv_share_title),
                             mimeType = "text/csv"
                         )
                     },
