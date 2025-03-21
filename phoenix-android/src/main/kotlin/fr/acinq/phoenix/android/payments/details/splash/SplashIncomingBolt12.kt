@@ -80,7 +80,7 @@ private fun OfferSentBy(payerPubkey: PublicKey?, hasPayerNote: Boolean) {
     val contactState = remember { mutableStateOf<OfferContactState>(OfferContactState.Init) }
     LaunchedEffect(Unit) {
         contactState.value = payerPubkey?.let {
-            contactsManager.getContactForPayerPubkey(it)
+            contactsManager.contactForPayerPubKey(it)
         }?.let { OfferContactState.Found(it) } ?: OfferContactState.NotFound
     }
 

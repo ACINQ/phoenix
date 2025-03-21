@@ -42,6 +42,16 @@ extension FiatCurrency: @retroactive Identifiable {
 	}
 }
 
+extension ContactOffer: @retroactive Identifiable {
+	// Already defined:
+//	var id: Bitcoin_kmpByteVector32 { get }
+}
+
+extension ContactAddress: @retroactive Identifiable {
+	// Already defined:
+//	var id: Bitcoin_kmpByteVector32 { get }
+}
+
 extension ContactInfo: @retroactive Identifiable {
 	
 	/// In kotlin the variable is called `id`, but that's a reserved property name in objective-c.
@@ -51,9 +61,8 @@ extension ContactInfo: @retroactive Identifiable {
 		return self.kotlinId() // defined in PhoenixExposure.kt
 	}
 	
-	public var id: String {
-		return self.uuid.description()
-	}
+	// Already defined:
+//	var id: Lightning_kmpUUID { get }
 }
 
 extension Lightning_kmpWalletState.Utxo: @retroactive Identifiable {
