@@ -70,7 +70,7 @@ class SendOfferViewModel(
         viewModelScope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, e ->
             log.error("error when paying offer payment: ", e)
         }) {
-            val contact = contactsManager.getContactForOffer(offer)
+            val contact = contactsManager.contactForOffer(offer)
             val useRandomKey = contact == null || !contact.useOfferKey
             val payerKey = when (useRandomKey) {
                 true -> Lightning.randomKey()

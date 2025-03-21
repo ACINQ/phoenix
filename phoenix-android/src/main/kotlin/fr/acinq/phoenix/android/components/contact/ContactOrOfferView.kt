@@ -56,7 +56,7 @@ fun ContactOrOfferView(offer: OfferTypes.Offer) {
     val contactsManager = business.contactsManager
     val contactState = remember { mutableStateOf<OfferContactState>(OfferContactState.Init) }
     LaunchedEffect(Unit) {
-        contactState.value = contactsManager.getContactForOffer(offer)?.let { OfferContactState.Found(it) } ?: OfferContactState.NotFound
+        contactState.value = contactsManager.contactForOffer(offer)?.let { OfferContactState.Found(it) } ?: OfferContactState.NotFound
     }
 
     when (val state = contactState.value) {

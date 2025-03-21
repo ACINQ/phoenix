@@ -17,15 +17,11 @@
 package fr.acinq.phoenix.android.components.contact
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -41,6 +37,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import fr.acinq.bitcoin.utils.Try
+import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
@@ -51,11 +48,13 @@ import fr.acinq.phoenix.android.components.TextInput
 import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.components.scanner.ScannerView
 import fr.acinq.phoenix.data.ContactInfo
+import fr.acinq.phoenix.data.ContactOffer
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 
 
 /**
- * A contact detail is a bottom sheet dialog that display the contact's name, photo, and
+ * A contact detail is a bottom sheet dialog that displays the contact's name, photo, and
  * associated offers/lnids.
  *
  * The contact can be edited and deleted from that screen.
@@ -138,30 +137,28 @@ fun SaveNewContactDialog(
                 icon = R.drawable.ic_check,
                 onClick = {
                     scope.launch {
-                        if (initialOffer == null) {
-                            offerErrorMessage = ""
-                            when (val res = OfferTypes.Offer.decode(offer)) {
-                                is Try.Success -> {
-                                    val decodedOffer = res.result
-                                    val existingContact = contactsManager.getContactForOffer(decodedOffer)
-                                    if (existingContact != null) {
-                                        offerErrorMessage = context.getString(R.string.contact_error_offer_known, existingContact.name)
-                                    } else {
-                                        val contact = contactsManager.saveNewContact(name, photoUri, useOfferKey, res.result)
-                                        onSaved(contact)
-                                    }
+                        offerErrorMessage = ""
+                        when (val res = OfferTypes.Offer.decode(offer)) {
+                            is Try.Success -> {
+                                val decodedOffer = res.result
+                                val existingContact = contactsManager.contactForOffer(decodedOffer)
+                                if (existingContact != null) {
+                                    offerErrorMessage = context.getString(R.string.contact_error_offer_known, existingContact.name)
+                                } else {
+                                    val contactOffer = ContactOffer(res.result, label = null, createdAt = Clock.System.now())
+                                    val newContact = ContactInfo(
+                                        id = UUID.randomUUID(),
+                                        name = name,
+                                        photoUri = photoUri,
+                                        useOfferKey = useOfferKey,
+                                        offers = listOf(contactOffer),
+                                        addresses = emptyList()
+                                    )
+                                    contactsManager.saveContact(newContact)
+                                    onSaved(newContact)
                                 }
-                                is Try.Failure -> { offerErrorMessage = context.getString(R.string.contact_error_offer_invalid) }
                             }
-                        } else {
-                            val existingContact = contactsManager.getContactForOffer(initialOffer)
-                            if (existingContact != null) {
-                                offerErrorMessage = context.getString(R.string.contact_error_offer_known, existingContact.name)
-                            } else {
-                                val contact = contactsManager.saveNewContact(name, photoUri, useOfferKey, initialOffer)
-                                onSaved(contact)
-                            }
-
+                            is Try.Failure -> { offerErrorMessage = context.getString(R.string.contact_error_offer_invalid) }
                         }
                     }
                 },

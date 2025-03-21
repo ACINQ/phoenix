@@ -19,7 +19,6 @@ package fr.acinq.phoenix.managers
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.wire.OfferTypes
@@ -35,7 +34,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class ContactsManager(

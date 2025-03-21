@@ -66,7 +66,7 @@ import fr.acinq.phoenix.managers.SendManager
 
 @Composable
 fun LnurlPayView(
-    payIntent: LnurlPay.Intent,
+    pay: SendManager.ParseResult.Lnurl.Pay,
     onBackClick: () -> Unit,
     onPaymentSent: () -> Unit,
 ) {
@@ -78,6 +78,7 @@ fun LnurlPayView(
     val peer by business.peerManager.peerState.collectAsState()
     val trampolineFees = peer?.walletParams?.trampolineFees?.firstOrNull()
 
+    val payIntent = pay.paymentIntent
     val minRequestedAmount = payIntent.minSendable
     var amount by remember { mutableStateOf<MilliSatoshi?>(minRequestedAmount) }
     var amountErrorMessage by remember { mutableStateOf("") }
@@ -188,7 +189,7 @@ fun LnurlPayView(
                     enabled = mayDoPayments && amount != null && amountErrorMessage.isBlank() && trampolineFees != null,
                 ) {
                     safeLet(trampolineFees, amount) { fees, amt ->
-                        vm.requestAndPayInvoice(payIntent, amt, fees, comment?.takeIf { it.isNotBlank() }, onPaymentSent)
+                        vm.requestAndPayInvoice(pay, amt, fees, comment?.takeIf { it.isNotBlank() }, onPaymentSent)
                     }
                 }
             }
