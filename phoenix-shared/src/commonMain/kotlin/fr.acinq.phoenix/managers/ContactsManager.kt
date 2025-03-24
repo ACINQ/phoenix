@@ -31,9 +31,13 @@ import fr.acinq.phoenix.utils.extensions.incomingOfferMetadata
 import fr.acinq.phoenix.utils.extensions.outgoingInvoiceRequest
 import kotlin.collections.List
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class ContactsManager(
@@ -51,45 +55,52 @@ class ContactsManager(
     private val _contactsList = MutableStateFlow<List<ContactInfo>>(emptyList())
     val contactsList = _contactsList.asStateFlow()
 
-    private val _contactsMap = MutableStateFlow<Map<UUID, ContactInfo>>(emptyMap())
-    val contactsMap = _contactsMap.asStateFlow()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val contactsMap = _contactsList.mapLatest { list ->
+        list.associateBy { it.id }
+    }.stateIn(
+        scope = this,
+        started = SharingStarted.Eagerly,
+        initialValue = mapOf()
+    )
 
-    // Key(Offer.OfferId), Value(ContactId)
-    private val _offerMap = MutableStateFlow<Map<ByteVector32, UUID>>(emptyMap())
-    val offerMap = _offerMap.asStateFlow()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val offerMap = _contactsList.mapLatest { list ->
+        list.flatMap { contact ->
+            contact.offers.map { it.id to contact.id }
+        }.toMap()
+    }.stateIn(
+        scope = this,
+        started = SharingStarted.Eagerly,
+        initialValue = mapOf()
+    )
 
-    // Key(Offer.contactNodeId), Value(ContactId)
-    private val _publicKeyMap = MutableStateFlow<Map<PublicKey, UUID>>(emptyMap())
-    val publicKeyMap = _publicKeyMap.asStateFlow()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val publicKeyMap = _contactsList.mapLatest { list ->
+        list.flatMap { contact ->
+            contact.publicKeys.map { it to contact.id }
+        }.toMap()
+    }.stateIn(
+        scope = this,
+        started = SharingStarted.Eagerly,
+        initialValue = mapOf()
+    )
 
-    // Key(lightningAddress.hash), Value(ContactId)
-    private val _addressMap = MutableStateFlow<Map<ByteVector32, UUID>>(emptyMap())
-    val addressMap = _addressMap.asStateFlow()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val addressMap = _contactsList.mapLatest { list ->
+        list.flatMap { contact ->
+            contact.addresses.map { it.id to contact.id }
+        }.toMap()
+    }.stateIn(
+        scope = this,
+        started = SharingStarted.Eagerly,
+        initialValue = mapOf()
+    )
 
     init {
         launch {
             appDb.monitorContactsFlow().collect { list ->
-                val newMap = list.associateBy { it.id }
-                val newOfferMap = list.flatMap { contact ->
-                    contact.offers.map { row ->
-                        row.id to contact.id
-                    }
-                }.toMap()
-                val newPublicKeyMap = list.flatMap { contact ->
-                    contact.publicKeys.map { pubKey ->
-                        pubKey to contact.id
-                    }
-                }.toMap()
-                val newAddressMap = list.flatMap { contact ->
-                    contact.addresses.map { row ->
-                        row.id to contact.id
-                    }
-                }.toMap()
                 _contactsList.value = list
-                _contactsMap.value = newMap
-                _offerMap.value = newOfferMap
-                _publicKeyMap.value = newPublicKeyMap
-                _addressMap.value = newAddressMap
             }
         }
     }
