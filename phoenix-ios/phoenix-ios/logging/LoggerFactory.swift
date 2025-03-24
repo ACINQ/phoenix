@@ -30,13 +30,15 @@ class LoggerFactory {
 		logFileManager.prepare()
 	}
 	
-	class var friendlyProcessName_foreground: String {
-		return "Phoenix"
+	static var friendlyProcessName: String {
+		switch AppIdentifier.current {
+			case .foreground: return friendlyProcessName_foreground
+			case .background: return friendlyProcessName_background
+		}
 	}
 	
-	class var friendlyProcessName_background: String {
-		return "NotifySrvExt"
-	}
+	static let friendlyProcessName_foreground: String = "Phoenix"
+	static let friendlyProcessName_background: String = "NotifySrvExt"
 	
 	class var logFilePrefix: String {
 		return "\(self.friendlyProcessName)-"

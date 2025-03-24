@@ -385,6 +385,7 @@ struct PaymentOptionsList: View {
 					case .forceCloseChannels : break
 					case .swapInWallet       : break
 					case .finalWallet        : break
+					case .bip353Registration : break
 				}
 				
 				if let newNavLinkTag {

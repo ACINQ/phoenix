@@ -2,6 +2,7 @@ package fr.acinq.phoenix.db.payments
 
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.db.cloud.cborSerializer
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.data.lnurl.LnurlPay
@@ -223,6 +224,7 @@ data class WalletPaymentMetadataRow(
     val original_fiat: Pair<String, Double>? = null,
     val user_description: String? = null,
     val user_notes: String? = null,
+    val card_id: String? = null,
     val modified_at: Long? = null
 ) {
 
@@ -266,11 +268,18 @@ data class WalletPaymentMetadataRow(
             }
         }
 
+        val cardId = card_id?.let {
+            try {
+                UUID.fromString(card_id)
+            } catch (e: Exception) { null }
+        }
+
         return WalletPaymentMetadata(
             lnurl = lnurl,
             originalFiat = originalFiat,
             userDescription = user_description,
             userNotes = user_notes,
+            cardId = cardId,
             modifiedAt = modified_at
         )
     }
@@ -286,6 +295,7 @@ data class WalletPaymentMetadataRow(
             && original_fiat == null
             && user_description == null
             && user_notes == null
+            && card_id == null
     }
 }
 
@@ -313,6 +323,7 @@ fun WalletPaymentMetadata.serialize(): WalletPaymentMetadataRow? {
         original_fiat = originalFiat?.let { Pair(it.fiatCurrency.name, it.price) },
         user_description = userDescription,
         user_notes = userNotes,
+        card_id = cardId?.toString(),
         modified_at = modifiedAt
     )
 

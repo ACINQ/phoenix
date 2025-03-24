@@ -200,6 +200,30 @@ extension ConnectionsManager {
 	}
 }
 
+// MARK: -
+extension CardsManager {
+	
+	fileprivate struct _Key {
+		static var cardsListPublisher = 0
+	}
+	
+	func cardsListPublisher() -> AnyPublisher<[BoltCardInfo], Never> {
+		
+		self.getSetAssociatedObject(storageKey: &_Key.cardsListPublisher) {
+			
+			// Transforming from Kotlin:
+			// `cardsList: StateFlow<List<BoltCardInfo>>`
+			//
+			KotlinCurrentValueSubject<NSArray>(
+				self.cardsList
+			)
+			.compactMap { $0 as? [BoltCardInfo] }
+			.eraseToAnyPublisher()
+		}
+	}
+}
+
+// MARK: -
 extension ContactsManager {
 	
 	fileprivate struct _Key {
@@ -428,6 +452,28 @@ extension PaymentsPageFetcher {
 
 
 // MARK: -
+extension CloudKitCardsDb {
+	
+	fileprivate struct _Key {
+		static var queueCountPublisher = 0
+	}
+	
+	func queueCountPublisher() -> AnyPublisher<Int64, Never> {
+		
+		self.getSetAssociatedObject(storageKey: &_Key.queueCountPublisher) {
+			
+			/// Transforming from Kotlin:
+			/// `queueCount: StateFlow<Long>`
+			///
+			KotlinCurrentValueSubject<KotlinLong>(
+				self.queueCount
+			)
+			.compactMap { $0?.int64Value }
+			.eraseToAnyPublisher()
+		}
+	}
+}
+
 extension CloudKitContactsDb {
 	
 	fileprivate struct _Key {
