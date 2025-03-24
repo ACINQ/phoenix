@@ -45,13 +45,6 @@ class PaymentsManager(
 
     private val log = loggerFactory.newLogger(this::class)
 
-    /**
-     * A flow containing the total number of payments in the database,
-     * and automatically refreshed when the database changes.
-     */
-    private val _paymentsCount = MutableStateFlow<Long>(0)
-    val paymentsCount: StateFlow<Long> = _paymentsCount
-
     /** Contains the most recently completed payment (only bolt11 incoming, or bolt11/bolt12 outgoing). */
     private val _lastCompletedPayment = MutableStateFlow<WalletPayment?>(null)
     val lastCompletedPayment: StateFlow<WalletPayment?> = _lastCompletedPayment
@@ -61,15 +54,10 @@ class PaymentsManager(
     }
 
     init {
-        launch { monitorPaymentsCountInDb() }
 
         launch { monitorLastCompletedPayment() }
 
         launch { monitorUnconfirmedTransactions() }
-    }
-
-    private suspend fun monitorPaymentsCountInDb() {
-        paymentsDb().countPaymentsAsFlow().collect { _paymentsCount.value = it }
     }
 
     private suspend fun monitorLastCompletedPayment() {
