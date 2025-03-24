@@ -379,15 +379,15 @@ suspend fun Peer.betterPayOffer(
     payerKey: PrivateKey,
     payerNote: String?,
     fetchInvoiceTimeoutInSeconds: Int
-): OfferNotPaid? {
-    val res = CompletableDeferred<OfferNotPaid?>()
+): Either<OfferNotPaid, OfferInvoiceReceived> {
+    val res = CompletableDeferred<Either<OfferNotPaid, OfferInvoiceReceived>>()
     launch {
         eventsFlow.collect {
             if (it is OfferNotPaid && it.request.paymentId == paymentId) {
-                res.complete(it)
+                res.complete(Either.Left(it))
                 cancel()
             } else if (it is OfferInvoiceReceived && it.request.paymentId == paymentId) {
-                res.complete(null)
+                res.complete(Either.Right(it))
                 cancel()
             }
         }

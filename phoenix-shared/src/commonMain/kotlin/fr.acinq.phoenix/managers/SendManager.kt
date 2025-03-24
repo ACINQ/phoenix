@@ -1,6 +1,7 @@
 package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.BitcoinError
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.Lightning
@@ -12,6 +13,7 @@ import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.logging.debug
 import fr.acinq.lightning.logging.error
 import fr.acinq.lightning.payment.Bolt11Invoice
+import fr.acinq.lightning.payment.Bolt12Invoice
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampSeconds
 import fr.acinq.lightning.wire.OfferTypes
@@ -195,12 +197,12 @@ class SendManager(
         )
     }
 
-    private suspend fun checkForBadBolt11Invoice(
+    suspend fun checkForBadBolt11Invoice(
         invoice: Bolt11Invoice
     ): BadRequestReason? {
 
-        val actualChain = invoice.chain
-        if (chain != actualChain) {
+        val invoiceChain = invoice.chain
+        if (chain != invoiceChain) {
             return BadRequestReason.ChainMismatch(expected = chain)
         }
 
@@ -208,8 +210,28 @@ class SendManager(
             return BadRequestReason.Expired(invoice.timestampSeconds, invoice.expirySeconds ?: Bolt11Invoice.DEFAULT_EXPIRY_SECONDS.toLong())
         }
 
+        return checkPaymentHash(invoice.paymentHash)
+    }
+
+    suspend fun checkForBadBolt12Invoice(
+        invoice: Bolt12Invoice
+    ): BadRequestReason? {
+
+        val invoiceChainHash = invoice.chain
+        if (chain.chainHash != invoiceChainHash) {
+            return BadRequestReason.ChainMismatch(expected = chain)
+        }
+
+        if (invoice.isExpired(currentTimestampSeconds())) {
+            return BadRequestReason.Expired(invoice.createdAtSeconds, invoice.relativeExpirySeconds)
+        }
+
+        return checkPaymentHash(invoice.paymentHash)
+    }
+
+    private suspend fun checkPaymentHash(paymentHash: ByteVector32): BadRequestReason? {
         val db = databaseManager.databases.filterNotNull().first()
-        val similarPayments = db.payments.listLightningOutgoingPayments(invoice.paymentHash)
+        val similarPayments = db.payments.listLightningOutgoingPayments(paymentHash)
         // we MUST raise an error if this payment hash has already been paid, or is being paid.
         // parallel pending payments on the same payment hash can trigger force-closes
         // FIXME: this check should be done in lightning-kmp, not in Phoenix

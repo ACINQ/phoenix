@@ -1,0 +1,66 @@
+import kotlin.Boolean;
+
+CREATE TABLE IF NOT EXISTS bolt_cards (
+     id TEXT NOT NULL PRIMARY KEY,
+     name TEXT NOT NULL,
+     key0 BLOB NOT NULL,
+     uid BLOB NOT NULL,
+     counter INTEGER NOT NULL,
+     is_frozen INTEGER AS Boolean NOT NULL,
+     is_archived INTEGER AS Boolean NOT NULL,
+     is_reset INTEGER AS Boolean NOT NULL,
+     is_foreign INTEGER AS Boolean NOT NULL,
+     daily_limit_currency TEXT,
+     daily_limit_amount REAL,
+     monthly_limit_currency TEXT,
+     monthly_limit_amount REAL,
+     created_at INTEGER NOT NULL,
+     updated_at INTEGER DEFAULT NULL
+);
+
+listCards:
+SELECT * FROM bolt_cards
+ORDER BY created_at DESC;
+
+scanCards:
+SELECT id, created_at FROM bolt_cards;
+
+existsCard:
+SELECT COUNT(*) FROM bolt_cards
+WHERE id = :cardId;
+
+getCard:
+SELECT * FROM bolt_cards
+WHERE id = :cardId;
+
+insertCard:
+INSERT INTO bolt_cards(
+    id, name, key0, uid, counter,
+    is_frozen, is_archived, is_reset, is_foreign,
+    daily_limit_currency, daily_limit_amount,
+    monthly_limit_currency, monthly_limit_amount,
+    created_at, updated_at
+) VALUES (
+    :id, :name, :key0, :uid, :counter,
+    :isFrozen, :isArchived, :isReset, :isForeign,
+    :dailyLimitCurrency, :dailyLimitAmount,
+    :monthlyLimitCurrency, :monthlyLimitAmount,
+    :createdAt, :updatedAt
+);
+
+updateCard:
+UPDATE bolt_cards
+SET name=:name,
+    counter=:counter,
+    is_frozen=:isFrozen,
+    is_archived=:isArchived,
+    is_reset=:isReset,
+    daily_limit_currency=:dailyLimitCurrency,
+    daily_limit_amount=:dailyLimitAmount,
+    monthly_limit_currency=:monthlyLimitCurrency,
+    monthly_limit_amount=:monthlyLimitAmount,
+    updated_at=:updatedAt
+WHERE id=:cardId;
+
+deleteCard:
+DELETE FROM bolt_cards WHERE id=:cardId;
