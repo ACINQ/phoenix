@@ -35,12 +35,12 @@ CREATE INDEX contact_id_index2 ON contact_addresses(contact_id);
 
 -- ########## table: contacts ##########
 
-listContacts2:
+listContacts:
 SELECT *
 FROM contacts
 ORDER BY name ASC;
 
-getContact2:
+getContact:
 SELECT *
 FROM contacts
 WHERE id = :contactId;

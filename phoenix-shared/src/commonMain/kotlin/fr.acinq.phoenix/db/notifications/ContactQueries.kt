@@ -189,7 +189,7 @@ class ContactQueries(val database: AppDatabase) {
 
     fun getContact(contactId: UUID): ContactInfo? {
         return database.transactionWithResult {
-            queries.getContact2(
+            queries.getContact(
                 contactId = contactId.toString()
             ).executeAsOneOrNull()?.let { contactRow ->
                 val offers: List<ContactOffer> = queries.listOffersForContact(
@@ -237,7 +237,7 @@ class ContactQueries(val database: AppDatabase) {
                 }
             }
 
-            queries.listContacts2().executeAsList().map { contactRow ->
+            queries.listContacts().executeAsList().map { contactRow ->
                 val contactId = UUID.fromString(contactRow.id)
                 ContactInfo(
                     id = contactId,
@@ -252,7 +252,7 @@ class ContactQueries(val database: AppDatabase) {
     }
 
     fun monitorContactsFlow(context: CoroutineContext): Flow<List<ContactInfo>> {
-        return queries.listContacts2().asFlow().map {
+        return queries.listContacts().asFlow().map {
             withContext(context) {
                 listContacts()
             }
