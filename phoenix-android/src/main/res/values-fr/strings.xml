@@ -651,7 +651,7 @@
 
     <!-- payments history -->
 
-    <string name="payments_history_title">Paiements locaux (%1$d)</string>
+    <string name="payments_history_title">Paiements locaux</string>
     <string name="payments_history_export_button">Exporter</string>
     <string name="payments_history_today">Aujourd\'hui</string>
     <string name="payments_history_yesterday">Hier</string>

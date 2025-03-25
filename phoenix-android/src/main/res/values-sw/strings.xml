@@ -675,7 +675,7 @@
 
     <!-- Payments history -->
 
-    <string name="payments_history_title">Malipo ya ndani (%1$d)</string>
+    <string name="payments_history_title">Malipo ya ndani</string>
     <string name="payments_history_export_button">Hamisha</string>
     <string name="payments_history_today">Leo</string>
     <string name="payments_history_yesterday">Jana</string>

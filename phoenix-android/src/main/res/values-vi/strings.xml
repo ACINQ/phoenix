@@ -609,7 +609,7 @@
 
     <!-- payments history -->
 
-    <string name="payments_history_title">Thanh toán địa phương (%1$d)</string>
+    <string name="payments_history_title">Thanh toán địa phương</string>
     <string name="payments_history_export_button">Truy xuất</string>
     <string name="payments_history_today">Ngày hôm nay</string>
     <string name="payments_history_yesterday">Ngày hôm qua</string>

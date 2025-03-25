@@ -653,7 +653,7 @@
 
     <!-- payments history -->
 
-    <string name="payments_history_title">Lokálne platby (%1$d)</string>
+    <string name="payments_history_title">Lokálne platby</string>
     <string name="payments_history_export_button">Exportovať</string>
     <string name="payments_history_today">Dnes</string>
     <string name="payments_history_yesterday">Včera</string>

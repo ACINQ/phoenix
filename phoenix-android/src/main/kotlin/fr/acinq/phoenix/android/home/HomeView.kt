@@ -95,7 +95,6 @@ fun HomeView(
         )
     }
 
-    val allPaymentsCount by business.paymentsManager.paymentsCount.collectAsState()
     val payments by paymentsViewModel.homePaymentsFlow.collectAsState()
     val swapInBalance = business.balanceManager.swapInWalletBalance.collectAsState()
     val finalWallet = business.peerManager.finalWallet.collectAsState()
@@ -244,7 +243,6 @@ fun HomeView(
                 onPaymentClick = onPaymentClick,
                 onPaymentsHistoryClick = onPaymentsHistoryClick,
                 payments = payments,
-                allPaymentsCount = allPaymentsCount
             )
             BottomBar(Modifier, onSettingsClick, onReceiveClick, onSendClick)
         }

@@ -24,7 +24,6 @@ import android.net.Uri
 import android.provider.Settings
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.resolutionselector.ResolutionSelector
-import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
@@ -108,7 +107,6 @@ fun BoxScope.ScannerView(
                 cameraController.cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
                 cameraController.setEnabledUseCases(CameraController.IMAGE_ANALYSIS)
                 cameraController.imageAnalysisResolutionSelector = ResolutionSelector.Builder()
-                    .setResolutionStrategy(ResolutionStrategy(ZxingQrCodeAnalyzer.DEFAULT_RESOLUTION, ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER))
                     .setAllowedResolutionMode(ResolutionSelector.PREFER_HIGHER_RESOLUTION_OVER_CAPTURE_RATE)
                     .build()
                 cameraController.setImageAnalysisAnalyzer(analyserExecutor, ZxingQrCodeAnalyzer { result ->
