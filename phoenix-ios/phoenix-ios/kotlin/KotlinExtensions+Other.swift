@@ -200,14 +200,6 @@ extension Array where Element == LocalChannelInfo {
 	}
 }
 
-extension Date {
-	
-	func toInstant() -> Kotlinx_datetimeInstant {
-		let millis = self.toMilliseconds()
-		return Kotlinx_datetimeInstant.companion.fromEpochMilliseconds(epochMilliseconds: millis)
-	}
-}
-
 extension ContactAddress {
 	
 	var domain: String? {

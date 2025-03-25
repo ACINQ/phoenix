@@ -173,7 +173,11 @@ struct ManageContact: View {
 			}
 			var hasNewOffer = false
 			if let newOffer = info?.offer {
-				let offer = ContactOffer(offer: newOffer, label: "", createdAt: Date.now.toInstant())
+				let offer = ContactOffer(
+					offer: newOffer,
+					label: "",
+					createdAt: Date.now.toMilliseconds().toKotlinLong()
+				)
 				if !set.contains(offer.id) {
 					set.insert(offer.id)
 					rows.append(OfferRow(raw: offer, isReadonly: true))
@@ -199,7 +203,11 @@ struct ManageContact: View {
 			}
 			var hasNewAddress = false
 			if let newAddress = info?.address {
-				let address = ContactAddress(address: newAddress, label: "", createdAt: Date.now.toInstant())
+				let address = ContactAddress(
+					address: newAddress,
+					label: "",
+					createdAt: Date.now.toMilliseconds().toKotlinLong()
+				)
 				if !set.contains(address.id) {
 					set.insert(address.id)
 					rows.append(AddressRow(raw: address, isReadonly: true))
@@ -1602,7 +1610,11 @@ struct ManageContact: View {
 		}
 		
 		let offer: Lightning_kmpOfferTypesOffer = result.get()!
-		let raw = ContactOffer(offer: offer, label: label, createdAt: Date.now.toInstant())
+		let raw = ContactOffer(
+			offer: offer,
+			label: label,
+			createdAt: Date.now.toMilliseconds().toKotlinLong()
+		)
 		let row = OfferRow(raw: raw, isReadonly: false)
 		
 		// Check for local duplicates
@@ -1732,7 +1744,11 @@ struct ManageContact: View {
 			return false
 		}
 		
-		let raw = ContactAddress(address: text, label: label, createdAt: Date.now.toInstant())
+		let raw = ContactAddress(
+			address: text,
+			label: label,
+			createdAt: Date.now.toMilliseconds().toKotlinLong()
+		)
 		let row = AddressRow(raw: raw, isReadonly: false)
 		
 		// Check for local duplicates

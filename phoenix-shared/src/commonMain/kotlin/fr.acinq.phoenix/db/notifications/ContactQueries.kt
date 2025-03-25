@@ -34,7 +34,6 @@ import fr.acinq.phoenix.db.sqldelight.Contact_offers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.Instant
 import kotlin.coroutines.CoroutineContext
 
 class ContactQueries(val database: AppDatabase) {
@@ -73,7 +72,7 @@ class ContactQueries(val database: AppDatabase) {
                     contactId = contact.id.toString(),
                     offer = row.offer.encode(),
                     label = row.label,
-                    createdAt = row.createdAt.toEpochMilliseconds()
+                    createdAt = row.createdAt
                 )
             }
             contact.addresses.forEach { row ->
@@ -82,7 +81,7 @@ class ContactQueries(val database: AppDatabase) {
                     contactId = contact.id.toString(),
                     address = row.address,
                     label = row.label,
-                    createdAt = row.createdAt.toEpochMilliseconds()
+                    createdAt = row.createdAt
                 )
             }
         }
@@ -118,7 +117,7 @@ class ContactQueries(val database: AppDatabase) {
                             contactId = contact.id.toString(),
                             offer = row.offer.encode(),
                             label = row.label,
-                            createdAt = row.createdAt.toEpochMilliseconds()
+                            createdAt = row.createdAt
                         )
                     }
                     ComparisonResult.IsUpdated -> {
@@ -156,7 +155,7 @@ class ContactQueries(val database: AppDatabase) {
                             contactId = contact.id.toString(),
                             address = row.address,
                             label = row.label,
-                            createdAt = row.createdAt.toEpochMilliseconds()
+                            createdAt = row.createdAt
                         )
                     }
                     ComparisonResult.IsUpdated -> {
@@ -274,7 +273,7 @@ class ContactQueries(val database: AppDatabase) {
                 id = row.offer_id.byteVector32(),
                 offer = result.get(),
                 label = row.label ?: "",
-                createdAt = Instant.fromEpochMilliseconds(row.created_at)
+                createdAt = row.created_at
             )
             is Try.Failure -> null
         }
@@ -285,7 +284,7 @@ class ContactQueries(val database: AppDatabase) {
             id = row.address_hash.byteVector32(),
             address = row.address,
             label = row.label ?: "",
-            createdAt = Instant.fromEpochMilliseconds(row.created_at)
+            createdAt = row.created_at
         )
     }
 

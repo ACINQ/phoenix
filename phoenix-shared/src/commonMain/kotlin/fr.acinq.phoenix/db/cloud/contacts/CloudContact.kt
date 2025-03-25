@@ -1,6 +1,7 @@
 package fr.acinq.phoenix.db.cloud.contacts
 
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.data.ContactAddress
 import fr.acinq.phoenix.data.ContactInfo
@@ -8,15 +9,12 @@ import fr.acinq.phoenix.data.ContactOffer
 import fr.acinq.phoenix.db.cloud.OfferSerializer
 import fr.acinq.phoenix.db.cloud.UUIDSerializer
 import fr.acinq.phoenix.db.cloud.cborSerializer
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.decodeFromByteArray
 import kotlinx.serialization.encodeToByteArray
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 sealed class CloudContact {
@@ -47,7 +45,7 @@ sealed class CloudContact {
 
         @Throws(Exception::class)
         fun unwrap(photoUri: String?): ContactInfo {
-            val now = Clock.System.now()
+            val now = currentTimestampMillis()
             val mappedOffers: List<ContactOffer> = this.offers.map {
                 ContactOffer(offer = it, label = "", createdAt = now)
             }
@@ -127,7 +125,7 @@ sealed class CloudContact {
             constructor(offer: ContactOffer) : this(
                 offer = offer.offer,
                 label = offer.label ?: "",
-                createdAt = offer.createdAt.toEpochMilliseconds()
+                createdAt = offer.createdAt
             )
 
             @Throws(Exception::class)
@@ -135,7 +133,7 @@ sealed class CloudContact {
                 return ContactOffer(
                     offer = this.offer,
                     label = this.label,
-                    createdAt = Instant.fromEpochMilliseconds(this.createdAt)
+                    createdAt = this.createdAt
                 )
             }
         }
@@ -149,7 +147,7 @@ sealed class CloudContact {
             constructor(address: ContactAddress) : this(
                 address = address.address,
                 label = address.label ?: "",
-                createdAt = address.createdAt.toEpochMilliseconds()
+                createdAt = address.createdAt
             )
 
             @Throws(Exception::class)
@@ -157,7 +155,7 @@ sealed class CloudContact {
                 return ContactAddress(
                     address = this.address,
                     label = this.label,
-                    createdAt = Instant.fromEpochMilliseconds(this.createdAt)
+                    createdAt = this.createdAt
                 )
             }
         }

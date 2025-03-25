@@ -21,6 +21,7 @@ import fr.acinq.bitcoin.Crypto
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.byteVector32
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.wire.OfferTypes
 import io.ktor.utils.io.charsets.Charsets
 import io.ktor.utils.io.core.toByteArray
@@ -31,13 +32,13 @@ data class ContactOffer(
     val id: ByteVector32,
     val offer: OfferTypes.Offer,
     val label: String?,
-    val createdAt: Instant
+    val createdAt: Long
 ) {
-    constructor(offer: OfferTypes.Offer, label: String?, createdAt: Instant? = null) : this(
+    constructor(offer: OfferTypes.Offer, label: String?, createdAt: Long? = null) : this(
         id = offer.offerId, // see note below
         offer = offer,
         label = label,
-        createdAt = createdAt ?: Clock.System.now()
+        createdAt = createdAt ?: currentTimestampMillis()
     )
 
     // We purposefully store the calculated `offer.offerId` as a property,
@@ -50,13 +51,13 @@ data class ContactAddress(
     val id: ByteVector32,
     val address: String,
     val label: String?,
-    val createdAt: Instant
+    val createdAt: Long
 ) {
-    constructor(address: String, label: String?, createdAt: Instant? = null) : this(
-        id = ContactAddress.hash(address), // see note below
+    constructor(address: String, label: String?, createdAt: Long? = null) : this(
+        id = hash(address), // see note below
         address = address,
         label = label,
-        createdAt = createdAt ?: Clock.System.now()
+        createdAt = createdAt ?: currentTimestampMillis()
     )
 
     // We purposefully store the calculated `hash(address)` as a property,
@@ -95,6 +96,5 @@ data class ContactInfo(
         offers = offers,
         addresses = addresses,
         publicKeys = offers.map { it.offer.contactInfos.map { it.nodeId } }.flatten()
-    //  publicKeys = offers.map { it.offer.contactNodeIds }.flatten()
     )
 }
