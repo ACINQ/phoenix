@@ -23,9 +23,6 @@ struct TransactionsView: View {
 
 	private let paymentsPageFetcher = Biz.getPaymentsPageFetcher(name: "TransactionsView")
 	
-	let paymentsCountPublisher = Biz.business.paymentsManager.paymentsCountPublisher()
-	@State var paymentsCount: Int64 = 0
-	
 	let paymentsPagePublisher: AnyPublisher<PaymentsPage, Never>
 	@State var paymentsPage = PaymentsPage(offset: 0, count: 0, rows: [])
 	@State var cachedRows: [WalletPaymentInfo] = []
@@ -86,9 +83,6 @@ struct TransactionsView: View {
 		}
 		.onAppear {
 			onAppear()
-		}
-		.onReceive(paymentsCountPublisher) {
-			paymentsCountChanged($0)
 		}
 		.onReceive(paymentsPagePublisher) {
 			paymentsPageChanged($0)
@@ -282,12 +276,6 @@ struct TransactionsView: View {
 				}
 			}
 		}
-	}
-	
-	func paymentsCountChanged(_ count: Int64) {
-		log.trace("paymentsCountChanged() => \(count)")
-		
-		paymentsCount = count
 	}
 	
 	func paymentsPageChanged(_ page: PaymentsPage) {

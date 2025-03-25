@@ -46,7 +46,6 @@ fun ColumnScope.PaymentsList(
     onPaymentClick: (UUID) -> Unit,
     onPaymentsHistoryClick: () -> Unit,
     payments: List<WalletPaymentInfo>,
-    allPaymentsCount: Long,
 ) {
     Column(modifier = modifier.weight(1f, fill = true), horizontalAlignment = Alignment.CenterHorizontally) {
         if (payments.isEmpty()) {
@@ -59,7 +58,6 @@ fun ColumnScope.PaymentsList(
             )
         } else {
             LatestPaymentsList(
-                allPaymentsCount = allPaymentsCount,
                 payments = payments,
                 onPaymentClick = onPaymentClick,
                 onPaymentsHistoryClick = onPaymentsHistoryClick,
@@ -71,7 +69,6 @@ fun ColumnScope.PaymentsList(
 
 @Composable
 private fun ColumnScope.LatestPaymentsList(
-    allPaymentsCount: Long,
     payments: List<WalletPaymentInfo>,
     onPaymentClick: (UUID) -> Unit,
     onPaymentsHistoryClick: () -> Unit,
@@ -95,7 +92,7 @@ private fun ColumnScope.LatestPaymentsList(
         items(payments) {
             PaymentLine(it, null, onPaymentClick, isAmountRedacted)
         }
-        if (payments.isNotEmpty() && allPaymentsCount > PaymentsViewModel.paymentsCountInHome) {
+        if (payments.isNotEmpty()) {
             item {
                 Spacer(Modifier.height(16.dp))
                 morePaymentsButton()
