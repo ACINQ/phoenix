@@ -272,7 +272,7 @@ class ContactQueries(val database: AppDatabase) {
             is Try.Success -> ContactOffer(
                 id = row.offer_id.byteVector32(),
                 offer = result.get(),
-                label = row.label ?: "",
+                label = row.label,
                 createdAt = row.created_at
             )
             is Try.Failure -> null
@@ -283,7 +283,7 @@ class ContactQueries(val database: AppDatabase) {
         return ContactAddress(
             id = row.address_hash.byteVector32(),
             address = row.address,
-            label = row.label ?: "",
+            label = row.label,
             createdAt = row.created_at
         )
     }
