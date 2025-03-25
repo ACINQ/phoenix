@@ -126,6 +126,17 @@
     <string name="restore_seed_valid_details">Sasa unaweza kuendelea na kurejesha pochi yako</string>
     <string name="restore_seed_invalid">Mbegu hii sio halali</string>
     <string name="restore_seed_invalid_details">Hakikisha umeingiza maneno sahihi kwa mpangilio sahihi.</string>
+
+    <string name="restore_payments_button">Leta historia ya malipo</string>
+    <string name="restore_payments_button_details">Hiari. Tumia kitufe hiki kurejesha faili ya hifadhidata ya malipo kutoka kwa kifaa kingine.</string >
+    <string name="restore_payments_success">Itarejesha historia ya malipo</string>
+    <string name="restore_payments_success_button">Tumia faili nyingine</string>
+    <string name="restore_payments_error_header">Haiwezi kurejesha malipo</string>
+    <string name="restore_payments_error_button">Jaribu tena</string>
+    <string name="restore_payments_error_encryption">"Faili haiwezi kusimbwa. Hakikisha unatumia faili ya hifadhidata ya Phoenix (sio CSV), na kwamba faili hii inalingana na pochi unayorejesha.</string>
+    <string name="restore_payments_error_open">Faili hii haiwezi kufunguliwa. Jaribu tena.</string>
+    <string name="restore_payments_error_writing">Faili hii haikuweza kuandikwa kwenye folda ya data ya programu. Jaribu tena.</string>
+
     <string name="restore_import_button">Rejesha</string>
 
     <!-- upgrade required dialog -->

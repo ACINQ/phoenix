@@ -682,21 +682,21 @@
     <string name="payments_history_thisweek">Mapema wiki hii</string>
     <string name="payments_history_lastweek">Wiki iliyopita</string>
     <string name="payments_export_title">Hamisha malipo</string>
-    <string name="payments_export_instructions">Hamisha malipo yako ya ndani yaliyofanikiwa kwa format ya CSV (maadili yaliyoonyeshwa kwa koma).</string>
-    <string name="payments_export_start_label">Tarehe ya mwanzo</string>
-    <string name="payments_export_end_label">Tarehe ya mwisho</string>
-    <string name="payments_export_context_label">Jumuisha asili/malengo</string>
-    <string name="payments_export_description_label">Jumuisha maelezo</string>
-    <string name="payments_export_generate_button">Hamisha</string>
-    <string name="payments_export_no_payments">Hakuna malipo yaliyofanikiwa bado</string>
-    <string name="payments_export_invalid_timestamps">Tafadhali chagua tarehe sahihi ya mwanzo/mwisho</string>
-    <string name="payments_export_in_progress">Ikihamisha malipo #%1$d</string>
+    <string name="payments_export_csv_instructions">Hamisha malipo yako ya ndani yaliyofanikiwa kwa format ya CSV (maadili yaliyoonyeshwa kwa koma).</string>
+    <string name="payments_export_csv_start_label">Tarehe ya mwanzo</string>
+    <string name="payments_export_csv_end_label">Tarehe ya mwisho</string>
+    <string name="payments_export_csv_context_label">Jumuisha asili/malengo</string>
+    <string name="payments_export_csv_description_label">Jumuisha maelezo</string>
+    <string name="payments_export_csv_generate_button">Hamisha</string>
+    <string name="payments_export_csv_no_payments">Hakuna malipo yaliyofanikiwa bado</string>
+    <string name="payments_export_csv_invalid_timestamps">Tafadhali chagua tarehe sahihi ya mwanzo/mwisho</string>
+    <string name="payments_export_csv_in_progress">Ikihamisha malipo #%1$d</string>
     <string name="payments_export_success">%1$d malipo yametiwa alama kwa mafanikio</string>
-    <string name="payments_export_share_subject">Phoenix - malipo kutoka %1$s hadi %2$s</string>
-    <string name="payments_export_share_title">Shiriki malipo ya Phoenix…</string>
-    <string name="payments_export_share_button">Shiriki faili</string>
-    <string name="payments_export_error">Uhamisho umeshindwa.</string>
-    <string name="payments_export_no_data">Hakuna malipo yaliyoonekana.</string>
+    <string name="payments_export_csv_share_subject">Phoenix - malipo kutoka %1$s hadi %2$s</string>
+    <string name="payments_export_csv_share_title">Shiriki malipo ya Phoenix…</string>
+    <string name="payments_export_csv_share_button">Shiriki faili</string>
+    <string name="payments_export_csv_error">Uhamisho umeshindwa.</string>
+    <string name="payments_export_csv_no_data">Hakuna malipo yaliyoonekana.</string>
 
     <!-- Components -->
 

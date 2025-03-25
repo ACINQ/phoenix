@@ -123,6 +123,17 @@
     <string name="restore_seed_valid_details">Vous pouvez maintenant procéder à la restauration du wallet.</string>
     <string name="restore_seed_invalid">Cette seed n\'est pas valide</string>
     <string name="restore_seed_invalid_details">Veuillez vous assurer que les mots sont corrects, et saisis dans le bon ordre.</string>
+
+    <string name="restore_payments_button">Restaurer des paiements</string>
+    <string name="restore_payments_button_details">Facultatif. Utilisez ce bouton pour restaurer une base de données de paiements provenant d\'un autre appareil.</string>
+    <string name="restore_payments_success">Un historique de paiements sera importé</string>
+    <string name="restore_payments_success_button">Choisir un autre fichier</string>
+    <string name="restore_payments_error_header">Impossible de restaurer ces paiements</string>
+    <string name="restore_payments_error_button">Réessayer</string>
+    <string name="restore_payments_error_encryption">Le fichier ne peut pas être déchiffré. Assurez-vous d\'utiliser un fichier de base de données Phoenix (pas un CSV), et que ce fichier correspond au portefeuille que vous restaurez.</string>
+    <string name="restore_payments_error_open">Ce fichier ne peut pas être ouvert. Veuillez réessayer.</string>
+    <string name="restore_payments_error_writing">Ce fichier n\'a pas pu être écrit dans les dossiers de l\'application. Veuillez réessayer.</string>
+
     <string name="restore_import_button">Restaurer</string>
 
     <!-- upgrade required dialog -->
