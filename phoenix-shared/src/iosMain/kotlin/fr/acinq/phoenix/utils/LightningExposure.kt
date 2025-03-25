@@ -344,25 +344,3 @@ fun WalletState.WalletWithConfirmations._spendExpiredSwapIn(
 suspend fun Peer.fundingRate(amount: Satoshi): LiquidityAds.FundingRate? {
     return this.remoteFundingRates.filterNotNull().first().findRate(amount)
 }
-
-// kotlinx.datetime.Duration isn't properly exposed to iOS.
-// So we need this little workaround until that issue is fixed.
-suspend fun SendManager._payBolt12Offer(
-    paymentId: UUID,
-    amount: MilliSatoshi,
-    offer: OfferTypes.Offer,
-    lightningAddress: String?,
-    payerKey: PrivateKey,
-    payerNote: String?,
-    fetchInvoiceTimeoutInSeconds: Int
-): OfferNotPaid? {
-    return payBolt12Offer(
-        paymentId = paymentId,
-        amount = amount,
-        offer = offer,
-        lightningAddress = lightningAddress,
-        payerKey = payerKey,
-        payerNote = payerNote,
-        fetchInvoiceTimeout = fetchInvoiceTimeoutInSeconds.seconds
-    )
-}

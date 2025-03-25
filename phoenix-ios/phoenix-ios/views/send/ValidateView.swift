@@ -1829,7 +1829,7 @@ struct ValidateView: View {
 				}
 				
 				let response: Lightning_kmpOfferNotPaid? =
-					try await Biz.business.sendManager._payBolt12Offer(
+					try await Biz.business.sendManager.payBolt12Offer(
 						paymentId: paymentId,
 						amount: Lightning_kmpMilliSatoshi(msat: msat),
 						offer: model.offer,

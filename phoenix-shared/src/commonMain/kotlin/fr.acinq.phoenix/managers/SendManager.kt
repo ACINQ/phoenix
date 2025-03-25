@@ -474,7 +474,7 @@ class SendManager(
         lightningAddress: String?,
         payerKey: PrivateKey,
         payerNote: String?,
-        fetchInvoiceTimeout: Duration
+        fetchInvoiceTimeoutInSeconds: Int
     ): OfferNotPaid? {
         val peer = peerManager.getPeer()
 
@@ -501,7 +501,7 @@ class SendManager(
             payerNote = payerNote,
             amount = amount,
             offer = offer,
-            fetchInvoiceTimeout = fetchInvoiceTimeout
+            fetchInvoiceTimeout = fetchInvoiceTimeoutInSeconds.seconds
         ))
         return res.await()
     }
