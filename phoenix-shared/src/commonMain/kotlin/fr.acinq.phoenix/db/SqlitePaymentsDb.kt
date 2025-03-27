@@ -161,33 +161,55 @@ class SqlitePaymentsDb(
      * - fetch contact details for incoming/outgoing bolt12 payments.
      */
     private fun List<WalletPaymentInfo>.postProcess(): List<WalletPaymentInfo> = this.map { paymentInfo ->
-        val payment = paymentInfo.payment
-        when {
-            payment is Bolt12IncomingPayment || (payment is LightningOutgoingPayment && payment.details is LightningOutgoingPayment.Details.Blinded) -> {
-                paymentInfo.copy(contact = contactsManager?.contactForPayment(payment))
-            }
-            else -> paymentInfo
-        }
+        // There's no need to check payment types here - all those checks are already done in ContactsManager.
+        contactsManager?.contactForPaymentInfo(paymentInfo)?.let {
+            paymentInfo.copy(contact = it)
+        } ?: paymentInfo
     }
 
     @Suppress("UNUSED_PARAMETER")
-    private fun mapPaymentsAndMetadata(data_: ByteArray, payment_id: UUID?,
-                                       lnurl_base_type: LnurlBase.TypeVersion?, lnurl_base_blob: ByteArray?, lnurl_description: String?, lnurl_metadata_type: LnurlMetadata.TypeVersion?, lnurl_metadata_blob: ByteArray?,
-                                       lnurl_successAction_type: LnurlSuccessAction.TypeVersion?, lnurl_successAction_blob: ByteArray?,
-                                       user_description: String?, user_notes: String?, modified_at: Long?, original_fiat_type: String?, original_fiat_rate: Double?): WalletPaymentInfo {
+    private fun mapPaymentsAndMetadata(
+        data_: ByteArray,
+        payment_id: UUID?,
+        lnurl_base_type: LnurlBase.TypeVersion?,
+        lnurl_base_blob: ByteArray?,
+        lnurl_description: String?,
+        lnurl_metadata_type: LnurlMetadata.TypeVersion?,
+        lnurl_metadata_blob: ByteArray?,
+        lnurl_successAction_type: LnurlSuccessAction.TypeVersion?,
+        lnurl_successAction_blob: ByteArray?,
+        user_description: String?,
+        user_notes: String?,
+        modified_at: Long?,
+        original_fiat_type: String?,
+        original_fiat_rate: Double?,
+        lightning_address: String?
+    ): WalletPaymentInfo {
         val payment = try {
             WalletPaymentAdapter.decode(data_)
         } catch (e: Exception) {
             log.error(e) { "failed to deserialize payment: ${e.message}" }
             throw e
         }
-
+        val metadata = PaymentsMetadataQueries.mapAll(
+            id = payment.id,
+            lnurl_base_type = lnurl_base_type,
+            lnurl_base_blob = lnurl_base_blob,
+            lnurl_description = lnurl_description,
+            lnurl_metadata_type = lnurl_metadata_type,
+            lnurl_metadata_blob = lnurl_metadata_blob,
+            lnurl_successAction_type = lnurl_successAction_type,
+            lnurl_successAction_blob = lnurl_successAction_blob,
+            user_description = user_description,
+            user_notes = user_notes,
+            modified_at = modified_at,
+            original_fiat_type = original_fiat_type,
+            original_fiat_rate = original_fiat_rate,
+            lightning_address = lightning_address
+        )
         return WalletPaymentInfo(
             payment = payment,
-            metadata = PaymentsMetadataQueries.mapAll(payment.id,
-                lnurl_base_type, lnurl_base_blob, lnurl_description, lnurl_metadata_type, lnurl_metadata_blob,
-                lnurl_successAction_type, lnurl_successAction_blob,
-                user_description, user_notes, modified_at, original_fiat_type, original_fiat_rate),
+            metadata = metadata,
             contact = null
         )
     }

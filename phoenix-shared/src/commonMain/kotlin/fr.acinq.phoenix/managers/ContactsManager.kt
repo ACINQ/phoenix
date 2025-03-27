@@ -19,23 +19,26 @@ package fr.acinq.phoenix.managers
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.PhoenixBusiness
+import fr.acinq.phoenix.data.ContactAddress
 import fr.acinq.phoenix.data.ContactInfo
+import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.db.SqliteAppDb
 import fr.acinq.phoenix.utils.extensions.incomingOfferMetadata
 import fr.acinq.phoenix.utils.extensions.outgoingInvoiceRequest
 import kotlin.collections.List
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-
 
 class ContactsManager(
     private val loggerFactory: LoggerFactory,
@@ -52,102 +55,139 @@ class ContactsManager(
     private val _contactsList = MutableStateFlow<List<ContactInfo>>(emptyList())
     val contactsList = _contactsList.asStateFlow()
 
-    private val _contactsMap = MutableStateFlow<Map<UUID, ContactInfo>>(emptyMap())
-    val contactsMap = _contactsMap.asStateFlow()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val contactsMap = _contactsList.mapLatest { list ->
+        list.associateBy { it.id }
+    }.stateIn(
+        scope = this,
+        started = SharingStarted.Eagerly,
+        initialValue = mapOf()
+    )
 
-    private val _offerMap = MutableStateFlow<Map<OfferTypes.Offer, UUID>>(emptyMap())
-    val offerMap = _offerMap.asStateFlow()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val offerMap = _contactsList.mapLatest { list ->
+        list.flatMap { contact ->
+            contact.offers.map { it.id to contact.id }
+        }.toMap()
+    }.stateIn(
+        scope = this,
+        started = SharingStarted.Eagerly,
+        initialValue = mapOf()
+    )
 
-    private val _publicKeyMap = MutableStateFlow<Map<PublicKey, UUID>>(emptyMap())
-    val publicKeyMap = _publicKeyMap.asStateFlow()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val publicKeyMap = _contactsList.mapLatest { list ->
+        list.flatMap { contact ->
+            contact.publicKeys.map { it to contact.id }
+        }.toMap()
+    }.stateIn(
+        scope = this,
+        started = SharingStarted.Eagerly,
+        initialValue = mapOf()
+    )
 
-    val contactsWithOfferList = _contactsList.map { contacts ->
-        contacts.filter { it.offers.isNotEmpty()  }
-    }
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val addressMap = _contactsList.mapLatest { list ->
+        list.flatMap { contact ->
+            contact.addresses.map { it.id to contact.id }
+        }.toMap()
+    }.stateIn(
+        scope = this,
+        started = SharingStarted.Eagerly,
+        initialValue = mapOf()
+    )
 
     init {
         launch {
-            appDb.monitorContacts().collect { list ->
-                val newMap = list.associateBy { it.id }
-                val newOfferMap = list.flatMap { contact ->
-                    contact.offers.map { offer ->
-                        offer to contact.id
-                    }
-                }.toMap()
-                val newPublicKeyMap = list.flatMap { contact ->
-                    contact.publicKeys.map { pubKey ->
-                        pubKey to contact.id
-                    }
-                }.toMap()
+            appDb.monitorContactsFlow().collect { list ->
                 _contactsList.value = list
-                _contactsMap.value = newMap
-                _offerMap.value = newOfferMap
-                _publicKeyMap.value = newPublicKeyMap
             }
         }
     }
 
-    suspend fun getContactForOffer(offer: OfferTypes.Offer): ContactInfo? {
-        return appDb.getContactForOffer(offer.offerId)
-    }
-
-    suspend fun saveNewContact(
-        name: String,
-        photoUri: String?,
-        useOfferKey: Boolean,
-        offer: OfferTypes.Offer
-    ): ContactInfo {
-        val contact = ContactInfo(id = UUID.randomUUID(), name = name, photoUri = photoUri, useOfferKey = useOfferKey, offers = listOf(offer))
+    /**
+     * This method will:
+     * - insert or update the contact in the database (depending on whether it already exists)
+     * - insert any new offers
+     * - update any offers that have been changed (i.e. label changed)
+     * - delete offers that have been removed from the list
+     * - insert any new addresses
+     * - update any addresses that have been changed (i.e. label changed)
+     * - delete any addresses that have been removed
+     *
+     * In other words, the UI doesn't have to track which changes have been made.
+     * It can simply call this method, and the database will be properly updated.
+     */
+    suspend fun saveContact(contact: ContactInfo) {
         appDb.saveContact(contact)
-        return contact
-    }
-
-    suspend fun updateContact(
-        contactId: UUID,
-        name: String,
-        photoUri: String?,
-        useOfferKey: Boolean,
-        offers: List<OfferTypes.Offer>
-    ): ContactInfo {
-        val contact = ContactInfo(id = contactId, name = name, photoUri = photoUri, useOfferKey = useOfferKey, offers = offers)
-        appDb.updateContact(contact)
-        return contact
-    }
-
-    suspend fun getContactForPayerPubkey(payerPubkey: PublicKey): ContactInfo? {
-        return appDb.listContacts().firstOrNull { it.publicKeys.contains(payerPubkey) }
     }
 
     suspend fun deleteContact(contactId: UUID) {
         appDb.deleteContact(contactId)
     }
 
-    suspend fun detachOfferFromContact(offerId: ByteVector32) {
-        appDb.deleteOfferContactLink(offerId)
-    }
-
     /**
-     * In many cases there's no need to query the database since we have everything in memory.
+     * In most cases there's no need to query the database since we have everything in memory.
      */
 
     fun contactForId(contactId: UUID): ContactInfo? {
         return contactsMap.value[contactId]
     }
 
-    fun contactIdForPayment(payment: WalletPayment): UUID? {
-        return if (payment is IncomingPayment) {
-            payment.incomingOfferMetadata()?.let { offerMetadata ->
-                publicKeyMap.value[offerMetadata.payerKey]
+    fun contactIdForOfferId(offerId: ByteVector32): UUID? {
+        return offerMap.value[offerId]
+    }
+
+    fun contactForOfferId(offerId: ByteVector32): ContactInfo? {
+        return contactIdForOfferId(offerId)?.let { contactId ->
+            contactForId(contactId)
+        }
+    }
+
+    fun contactIdForOffer(offer: OfferTypes.Offer): UUID? {
+        return contactIdForOfferId(offer.offerId)
+    }
+
+    fun contactForOffer(offer: OfferTypes.Offer): ContactInfo? {
+        return contactForOfferId(offer.offerId)
+    }
+
+    fun contactIdForPayerPubKey(payerPubKey: PublicKey): UUID? {
+        return publicKeyMap.value[payerPubKey]
+    }
+
+    fun contactForPayerPubKey(payerPubKey: PublicKey): ContactInfo? {
+        return contactIdForPayerPubKey(payerPubKey)?.let { contactId ->
+            contactForId(contactId)
+        }
+    }
+
+    fun contactIdForLightningAddress(address: String): UUID? {
+        return addressMap.value[ContactAddress.hash(address)]
+    }
+
+    fun contactForLightningAddress(address: String): ContactInfo? {
+        return contactIdForLightningAddress(address)?.let { contactId ->
+            contactForId(contactId)
+        }
+    }
+
+    fun contactIdForPaymentInfo(paymentInfo: WalletPaymentInfo): UUID? {
+        return if (paymentInfo.payment is IncomingPayment) {
+            paymentInfo.payment.incomingOfferMetadata()?.let { offerMetadata ->
+                contactIdForPayerPubKey(offerMetadata.payerKey)
             }
         } else {
-            payment.outgoingInvoiceRequest()?.let {invoiceRequest ->
-                offerMap.value[invoiceRequest.offer]
+            paymentInfo.metadata.lightningAddress?.let { address ->
+                contactIdForLightningAddress(address)
+            } ?: paymentInfo.payment.outgoingInvoiceRequest()?.let { invoiceRequest ->
+                contactIdForOfferId(invoiceRequest.offer.offerId)
             }
         }
     }
 
-    fun contactForPayment(payment: WalletPayment): ContactInfo? {
-        return contactIdForPayment(payment)?.let { contactId ->
+    fun contactForPaymentInfo(paymentInfo: WalletPaymentInfo): ContactInfo? {
+        return contactIdForPaymentInfo(paymentInfo)?.let { contactId ->
             contactForId(contactId)
         }
     }
