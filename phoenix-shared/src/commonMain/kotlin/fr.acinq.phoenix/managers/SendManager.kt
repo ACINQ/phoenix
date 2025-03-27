@@ -9,6 +9,7 @@ import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.TrampolineFees
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.io.PayInvoice
+import fr.acinq.lightning.io.SendPaymentResult
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.logging.debug
 import fr.acinq.lightning.logging.error
@@ -475,6 +476,21 @@ class SendManager(
                 trampolineFeesOverride = listOf(trampolineFees)
             )
         )
+    }
+
+    suspend fun payUnsolicitedInvoice(
+        invoice: Bolt12Invoice,
+        metadata: WalletPaymentMetadata?
+    ): SendPaymentResult {
+        val paymentId: UUID = UUID.randomUUID()
+        val peer = peerManager.getPeer()
+
+        // save card metadata if any
+        metadata?.let { row ->
+            databaseManager.metadataQueue.enqueue(row = row, id = paymentId)
+        }
+
+        return peer.payUnsolicitedInvoice(invoice, paymentId)
     }
 
     /**

@@ -553,23 +553,20 @@ class NotificationService: UNNotificationServiceExtension {
 			case .abortHandledElsewhere(_):
 				log.warning("handleCardReqeust: abort: handled elsewhere")
 				
-			case .continueAndSendPayment(_, _, _):
+			case .continueAndSendPayment(let card, _, _):
 				log.debug("handleCardReqeust: continue: send payment")
-				
-				guard let peer = business.peerManager.peerStateValue() else {
-					log.error("handleCardReqeust: peer is nil")
-					return
-				}
 				
 				// Send the payment
 				do {
-					try await peer.payUnsolicitedInvoice(invoice: cardRequest.invoice)
+					try await business.sendManager.payUnsolicitedInvoice(
+						invoice: cardRequest.invoice,
+						metadata: WalletPaymentMetadata.withCard(card.id)
+					)
 				} catch {
 					log.error("peer.payUnsolicitedInvoice(): error: \(error)")
 				}
 				
 				// Wait for the outgoing payment to complete
-				let paymentHash = cardRequest.invoice.paymentHash
 				business.paymentsManager.lastCompletedPaymentPublisher().sink { payment in
 					if let lnPayment = payment as? Lightning_kmpLightningOutgoingPayment {
 						if lnPayment.details.paymentHash == cardRequest.invoice.paymentHash {

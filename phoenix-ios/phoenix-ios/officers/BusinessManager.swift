@@ -789,16 +789,14 @@ class BusinessManager {
 			case .abortHandledElsewhere(_):
 				log.warning("handleCardReqeust: abort: handled elsewhere")
 				
-			case .continueAndSendPayment(_, _, _):
+			case .continueAndSendPayment(let card, _, _):
 				log.debug("handleCardReqeust: continue: send payment")
 				
-				guard let peer = business.peerManager.peerStateValue() else {
-					log.error("handleCardReqeust: peer is nil")
-					return
-				}
-				
 				do {
-					try await peer.payUnsolicitedInvoice(invoice: cardRequest.invoice)
+					try await business.sendManager.payUnsolicitedInvoice(
+						invoice: cardRequest.invoice,
+						metadata: WalletPaymentMetadata.withCard(card.id)
+					)
 				} catch {
 					log.error("peer.payUnsolicitedInvoice(): error: \(error)")
 				}
