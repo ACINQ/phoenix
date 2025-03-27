@@ -97,82 +97,77 @@ class ContactQueries(val database: AppDatabase) {
                 contactId = contact.id.toString()
             )
 
-            val existingOffers: MutableMap<ByteVector32, ContactOffer> =
-                queries.listOffersForContact(
-                    contactId = contact.id.toString()
-                ).executeAsList().mapNotNull { offerRow ->
-                    parseOfferRow(offerRow)?.let { offer ->
-                        offerRow.offer_id.byteVector32() to offer
-                    }
-                }.toMap().toMutableMap()
-            contact.offers.forEach { row ->
-                val result: ComparisonResult =
-                    existingOffers.remove(row.id)?.let { existingOffer ->
-                        compareOffers(existingOffer, row)
-                    } ?: ComparisonResult.IsNew
-                when (result) {
-                    ComparisonResult.IsNew -> {
-                        queries.insertOfferForContact(
-                            offerId = row.id.toByteArray(),
-                            contactId = contact.id.toString(),
-                            offer = row.offer.encode(),
-                            label = row.label,
-                            createdAt = row.createdAt
-                        )
-                    }
-                    ComparisonResult.IsUpdated -> {
-                        queries.updateContactOffer(
-                            label = row.label,
-                            offerId = row.id.toByteArray()
-                        )
-                    }
-                    ComparisonResult.NoChanges -> {}
-                }
+            val contactIdString = contact.id.toString()
+
+            // Update offers
+
+            val existingOffers = queries.listOffersForContact(contactIdString)
+                .executeAsList().mapNotNull { parseOfferRow(it) }
+
+            val newOfferIds = contact.offers.map { it.id }.toSet()
+            val existingOfferIds = existingOffers.map { it.id }.toSet()
+
+            val (offerIdsToKeep, offerIdsToDelete) = existingOfferIds.partition { newOfferIds.contains(it) }
+            val (offersToCompare, offersToInsert) = contact.offers.partition { offerIdsToKeep.contains(it.id) }
+
+            val existingOffersMap = existingOffers.associateBy { it.id }
+            val offersToUpdate = offersToCompare.filterNot { it == existingOffersMap[it.id] }
+
+            offerIdsToDelete.forEach {
+                queries.deleteContactOfferForOfferId(it.toByteArray())
             }
-            // In the loop above we removed every matching offer.
-            // So any items leftover have been deleted from the contact.
-            existingOffers.forEach { (key, _) ->
-                queries.deleteContactOfferForOfferId(
-                    offerId = key.toByteArray()
+            offersToUpdate.forEach {
+                queries.updateContactOffer(
+                    offerId = it.id.toByteArray(),
+                    label = it.label,
+                )
+            }
+            offersToInsert.forEach {
+                queries.insertOfferForContact(
+                    offerId = it.id.toByteArray(),
+                    contactId = contactIdString,
+                    offer = it.offer.encode(),
+                    label = it.label,
+                    createdAt = it.createdAt
                 )
             }
 
-            val existingAddresses: MutableMap<ByteVector32, ContactAddress> =
-                queries.listAddressesForContact(
-                    contactId = contact.id.toString()
-                ).executeAsList().map { addressRow ->
-                    addressRow.address_hash.byteVector32() to parseAddressRow(addressRow)
-                }.toMap().toMutableMap()
-            contact.addresses.forEach { row ->
-                val result: ComparisonResult =
-                    existingAddresses.remove(row.id)?.let { existing ->
-                        compareAddresses(existing, row)
-                    } ?: ComparisonResult.IsNew
-                when (result) {
-                    ComparisonResult.IsNew -> {
-                        queries.insertAddressForContact(
-                            addressHash = row.id.toByteArray(),
-                            contactId = contact.id.toString(),
-                            address = row.address,
-                            label = row.label,
-                            createdAt = row.createdAt
-                        )
-                    }
-                    ComparisonResult.IsUpdated -> {
-                        queries.updateContactAddress(
-                            label = row.label,
-                            address = row.address,
-                            addressHash = row.id.toByteArray()
-                        )
-                    }
-                    ComparisonResult.NoChanges -> {}
-                }
+            // Update addresses
+            //
+            // Note: The address can be changed without changing the hash.
+            // For example: old("johndoe@foobar.co") -> new("JohnDoe@foobar.co")
+            // Since the hash is case-insensitive it remains unchanged.
+            // In other words, this is just a requested formatting change by the user.
+
+            val existingAddresses = queries.listAddressesForContact(contactIdString)
+                .executeAsList().map { parseAddressRow(it) }
+
+            val newAddressIds = contact.addresses.map { it.id }.toSet()
+            val existingAddressIds = existingAddresses.map { it.id }.toSet()
+
+            val (addressIdsToKeep, addressIdsToDelete) = existingAddressIds.partition { newAddressIds.contains(it) }
+            val (addressesToCompare, addressesToInsert) = contact.addresses.partition { addressIdsToKeep.contains(it.id) }
+
+            val existingAddressesMap = existingAddresses.associateBy { it.id }
+            val addressesToUpdate = addressesToCompare.filterNot { it == existingAddressesMap[it.id] }
+
+            addressIdsToDelete.forEach {
+                queries.deleteContactAddressForAddressHash(it.toByteArray())
             }
-            // In the loop above we removed every matching address.
-            // So any items leftover have been deleted from the contact.
-            existingAddresses.forEach { (key, _) ->
-                queries.deleteContactAddressForAddressHash(
-                    addressHash = key.toByteArray()
+            addressesToUpdate.forEach {
+                queries.updateContactAddress(
+                    label = it.label,
+                    address = it.address,
+                    addressHash = it.id.toByteArray()
+                )
+            }
+            addressesToInsert.forEach {
+                queries.insertAddressForContact(
+                    addressHash = it.id.toByteArray(),
+                    contactId = contactIdString,
+                    address = it.address,
+                    label = it.label,
+                    createdAt = it.createdAt
                 )
             }
         }
@@ -286,37 +281,5 @@ class ContactQueries(val database: AppDatabase) {
             label = row.label,
             createdAt = row.created_at
         )
-    }
-
-    private enum class ComparisonResult {
-        IsNew,
-        IsUpdated,
-        NoChanges
-    }
-
-    private fun compareOffers(
-        existing: ContactOffer,
-        current: ContactOffer
-    ): ComparisonResult {
-        return if (existing.label != current.label) {
-            ComparisonResult.IsUpdated
-        } else {
-            ComparisonResult.NoChanges
-        }
-    }
-
-    private fun compareAddresses(
-        existing: ContactAddress,
-        current: ContactAddress
-    ): ComparisonResult {
-        // Note: The address can be changed without changing the hash.
-        // For example: old("johndoe@foobar.co") -> new("JohnDoe@foobar.co")
-        // Since the hash is case-insensitive it remains unchanged.
-        // In other words, this is just a requested formatting change by the user.
-        return if ((existing.label != current.label) || (existing.address != current.address)) {
-            ComparisonResult.IsUpdated
-        } else {
-            ComparisonResult.NoChanges
-        }
     }
 }
