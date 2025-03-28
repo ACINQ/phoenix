@@ -10,11 +10,11 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
 class CloudKitContactsDb(
-    private val appDb: SqliteAppDb
+    private val paymentsDb: SqlitePaymentsDb
 ): CoroutineScope by MainScope() {
 
-    private val db: Transacter = appDb.database
-    private val queries = appDb.database.cloudKitContactsQueries
+    private val db: Transacter = paymentsDb.database
+    private val queries = paymentsDb.database.cloudKitContactsQueries
 
     /**
      * Provides a flow of the count of items within the cloudkit_contacts_queue table.
@@ -93,8 +93,8 @@ class CloudKitContactsDb(
                 batch.forEach { row ->
                     rowids.add(row.rowid)
                     try {
-                        val contactId = UUID.fromString(row.id)
-                        rowidMap[row.rowid] = contactId
+                        val contactId = row.id
+                        rowidMap[row.rowid] = UUID.fromString(contactId)
                     } catch (e: Exception) {
                         // UUID appears to be malformed within the database.
                         // Nothing we can do here - but let's at least not crash.
@@ -108,10 +108,10 @@ class CloudKitContactsDb(
                 // Fetch the corresponding contact info from the database.
 
                 uniqueContactIds.forEach { contactId ->
-                    if (appDb.contactQueries.existsContact(contactId)) {
+                    if (paymentsDb.contactQueries.existsContact(contactId)) {
                         // appDb.contactQueries.getContact() throws if the contact
                         // doesn't exist in database.
-                        appDb.contactQueries.getContact(contactId)?.let {
+                        paymentsDb.contactQueries.getContact(contactId)?.let {
                             rowMap[contactId] = it
                         }
                     }
@@ -197,7 +197,7 @@ class CloudKitContactsDb(
         val contacts = downloadedContacts.map { it.copy() }
 
         withContext(Dispatchers.Default) {
-            val contactQueries = appDb.contactQueries
+            val contactQueries = paymentsDb.contactQueries
 
             db.transaction {
                 for (contact in contacts) {
@@ -234,7 +234,7 @@ class CloudKitContactsDb(
 
     suspend fun enqueueMissingItems() {
         withContext(Dispatchers.Default) {
-            val rawContactQueries = appDb.database.contactsQueries
+            val rawContactQueries = paymentsDb.database.contactsQueries
 
             db.transaction {
 
@@ -258,10 +258,9 @@ class CloudKitContactsDb(
                 val missing = mutableListOf<MissingItem>()
                 rawContactQueries.scanContacts().executeAsList().forEach { row ->
                     try {
-                        val contactId = UUID.fromString(row.id)
-                        if (!cloudContactIds.contains(contactId)) {
+                        if (!cloudContactIds.contains(row.id)) {
                             missing.add(MissingItem(
-                                contactId = contactId,
+                                contactId = row.id,
                                 timestamp = row.created_at
                             ))
                         }

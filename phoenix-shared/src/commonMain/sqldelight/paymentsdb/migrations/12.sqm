@@ -3,5 +3,30 @@
 -- Changes:
 -- * Added a new column [lightning_address] in table [payments_metadata]
 
+import fr.acinq.lightning.utils.UUID;
+import fr.acinq.phoenix.data.ContactInfo;
+
 ALTER TABLE payments_metadata
     ADD COLUMN lightning_address TEXT;
+
+CREATE TABLE IF NOT EXISTS contacts (
+    id BLOB AS UUID NOT NULL PRIMARY KEY,
+    data BLOB AS ContactInfo NOT NULL,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS cloudkit_contacts_metadata (
+    id TEXT NOT NULL PRIMARY KEY,
+    record_creation INTEGER NOT NULL,
+    record_blob BLOB NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS record_creation_idx
+ON cloudkit_contacts_metadata(record_creation);
+
+CREATE TABLE IF NOT EXISTS cloudkit_contacts_queue (
+    rowid INTEGER PRIMARY KEY,
+    id TEXT NOT NULL,
+    date_added INTEGER NOT NULL
+);

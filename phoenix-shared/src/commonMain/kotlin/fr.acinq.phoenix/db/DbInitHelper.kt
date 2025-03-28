@@ -31,6 +31,7 @@ import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.logging.error
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.db.sqldelight.*
 import fr.acinq.phoenix.managers.ContactsManager
 import fr.acinq.phoenix.utils.MetadataQueue
@@ -60,6 +61,7 @@ fun createSqlitePaymentsDb(driver: SqlDriver, metadataQueue: MetadataQueue?, con
             payments_metadataAdapter = Payments_metadata.Adapter(UUIDAdapter, EnumColumnAdapter(), EnumColumnAdapter(), EnumColumnAdapter()),
             cloudkit_payments_queueAdapter = Cloudkit_payments_queue.Adapter(UUIDAdapter),
             cloudkit_payments_metadataAdapter = Cloudkit_payments_metadata.Adapter(UUIDAdapter),
+            contactsAdapter = Contacts.Adapter(UUIDAdapter, ContactInfoAdapter)
         ),
         metadataQueue = metadataQueue,
         contactsManager = contactsManager,
@@ -124,4 +126,12 @@ object WalletPaymentAdapter : ColumnAdapter<WalletPayment, ByteArray> {
             ?: throw RuntimeException("cannot deserialize ${databaseValue.toHexString()}")
 
     override fun encode(value: WalletPayment): ByteArray = fr.acinq.lightning.serialization.payment.Serialization.serialize(value)
+}
+
+object ContactInfoAdapter : ColumnAdapter<ContactInfo, ByteArray> {
+    override fun decode(databaseValue: ByteArray): ContactInfo =
+        fr.acinq.phoenix.db.serialization.contacts.Serialization.deserialize(databaseValue).getOrNull()
+            ?: throw RuntimeException("cannot deserialize ${databaseValue.toHexString()}")
+
+    override fun encode(value: ContactInfo): ByteArray = fr.acinq.phoenix.db.serialization.contacts.Serialization.serialize(value)
 }

@@ -687,15 +687,9 @@ extension SyncBackupManager {
 	) -> Data? {
 		
 		let wrapper = CloudContact.V1(contact: contact)
-		let cbor = wrapper.cborSerialize().toSwiftData()
+		let serializedData = wrapper.serialize().toSwiftData()
 		
-		#if DEBUG
-		let jsonData = wrapper.jsonSerialize().toSwiftData()
-		let jsonStr = String(data: jsonData, encoding: .utf8)
-		log.debug("Uploading record (JSON representation):\n\(jsonStr ?? "<nil>")")
-		#endif
-		
-		let cleartext: Data = cbor
+		let cleartext: Data = serializedData
 		var ciphertext: Data? = nil
 		do {
 			let box = try ChaChaPoly.seal(cleartext, using: self.cloudKey)
@@ -749,16 +743,11 @@ extension SyncBackupManager {
 			}
 			
 			if let cleartext {
-				do {
-					let cleartext_kotlin = cleartext.toKotlinByteArray()
-					contact = try CloudContact.companion.cborDeserializeAndUnwrap(
-						blob: cleartext_kotlin,
-						photoUri: photoUri
-					)
-
-				} catch {
-					log.error("Error deserializing record.data: skipping \(record.recordID)")
-				}
+				let cleartext_kotlin = cleartext.toKotlinByteArray()
+				contact = CloudContact.companion.deserialize(
+					blob: cleartext_kotlin,
+					photoUri: photoUri
+				)
 			}
 		}
 		

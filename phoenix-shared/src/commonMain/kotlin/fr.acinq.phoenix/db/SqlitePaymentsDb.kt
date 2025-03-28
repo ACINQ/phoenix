@@ -25,8 +25,10 @@ import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.logging.error
 import fr.acinq.lightning.utils.*
 import fr.acinq.lightning.wire.LiquidityAds
+import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.WalletPaymentMetadata
+import fr.acinq.phoenix.db.contacts.ContactQueries
 import fr.acinq.phoenix.db.payments.*
 import fr.acinq.phoenix.db.payments.PaymentsMetadataQueries
 import fr.acinq.phoenix.db.sqldelight.PaymentsDatabase
@@ -49,6 +51,7 @@ class SqlitePaymentsDb(
     PaymentsDb {
 
     val metadataQueries = PaymentsMetadataQueries(database)
+    val contactQueries = ContactQueries(database)
 
     val log = loggerFactory.newLogger(SqlitePaymentsDb::class)
 
@@ -318,6 +321,26 @@ class SqlitePaymentsDb(
                     }
                 }
         }
+    }
+
+    suspend fun getContact(contactId: UUID): ContactInfo? = withContext(Dispatchers.Default) {
+        contactQueries.getContact(contactId)
+    }
+
+    fun monitorContactsFlow(): Flow<List<ContactInfo>> {
+        return contactQueries.monitorContactsFlow(Dispatchers.Default)
+    }
+
+    suspend fun listContacts(): List<ContactInfo> = withContext(Dispatchers.Default) {
+        contactQueries.listContacts()
+    }
+
+    suspend fun saveContact(contact: ContactInfo) = withContext(Dispatchers.Default) {
+        contactQueries.saveContact(contact)
+    }
+
+    suspend fun deleteContact(contactId: UUID) = withContext(Dispatchers.Default) {
+        contactQueries.deleteContact(contactId)
     }
 
     fun close() = driver.close()

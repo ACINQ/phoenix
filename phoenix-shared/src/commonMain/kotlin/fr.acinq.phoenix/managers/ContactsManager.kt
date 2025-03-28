@@ -18,8 +18,13 @@ package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.PublicKey
+import fr.acinq.bitcoin.io.ByteArrayInput
+import fr.acinq.bitcoin.io.ByteArrayOutput
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.logging.LoggerFactory
+import fr.acinq.lightning.logging.debug
+import fr.acinq.lightning.serialization.InputExtensions.readBoolean
+import fr.acinq.lightning.serialization.OutputExtensions.writeBoolean
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.PhoenixBusiness
@@ -27,30 +32,50 @@ import fr.acinq.phoenix.data.ContactAddress
 import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.db.SqliteAppDb
+import fr.acinq.phoenix.db.contacts.ContactQueries
+import fr.acinq.phoenix.db.contacts.OldContactQueries
 import fr.acinq.phoenix.utils.extensions.incomingOfferMetadata
 import fr.acinq.phoenix.utils.extensions.outgoingInvoiceRequest
 import kotlin.collections.List
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ContactsManager(
     private val loggerFactory: LoggerFactory,
-    private val appDb: SqliteAppDb,
+    private val appDb: SqliteAppDb
 ) : CoroutineScope by MainScope() {
 
     constructor(business: PhoenixBusiness) : this(
         loggerFactory = business.loggerFactory,
         appDb = business.appDb,
-    )
+    ) {
+        launch {
+            databaseManagerFlow.value = business.databaseManager
+        }
+    }
 
     private val log = loggerFactory.newLogger(this::class)
+
+    /**
+     * DatabaseManager retains a reference to ContactsManager.
+     * So if ContactsManager also retains a reference to the DatabaseManager,
+     * then we end up crashing with a StackOverflow during init.
+     * One way to solve that would be a WeakReference, but it's not supported in KMP.
+     * So we use another workaround.
+     */
+    private val databaseManagerFlow = MutableStateFlow<DatabaseManager?>(null)
+    private suspend fun paymentsDb() = databaseManagerFlow.filterNotNull().first().paymentsDb()
 
     private val _contactsList = MutableStateFlow<List<ContactInfo>>(emptyList())
     val contactsList = _contactsList.asStateFlow()
@@ -99,7 +124,7 @@ class ContactsManager(
 
     init {
         launch {
-            appDb.monitorContactsFlow().collect { list ->
+            paymentsDb().monitorContactsFlow().collect { list ->
                 _contactsList.value = list
             }
         }
@@ -119,11 +144,11 @@ class ContactsManager(
      * It can simply call this method, and the database will be properly updated.
      */
     suspend fun saveContact(contact: ContactInfo) {
-        appDb.saveContact(contact)
+        paymentsDb().saveContact(contact)
     }
 
     suspend fun deleteContact(contactId: UUID) {
-        appDb.deleteContact(contactId)
+        paymentsDb().deleteContact(contactId)
     }
 
     /**
@@ -191,4 +216,66 @@ class ContactsManager(
             contactForId(contactId)
         }
     }
+
+    /**
+     * Run this to migrate the contacts from the appDb to the paymentsDb.
+     * This function can be run everytime the app is launched.
+     */
+    suspend fun migrateContactsIfNeeded() {
+
+        val KEY_MIGRATION_DONE = "contacts_migration"
+
+        log.debug { "Checking KEY_MIGRATION_DONE ..." }
+        val migrationDone = appDb.getValue(KEY_MIGRATION_DONE) { Boolean.fromByteArray(it) }?.first ?: false
+        if (migrationDone) {
+            log.debug { "Migration already complete" }
+            return
+        }
+
+        log.debug { "Starting migration..." }
+
+        val paymentsDb = paymentsDb()
+
+        val oldQueries = OldContactQueries(appDb.database)
+        val newQueries = ContactQueries(paymentsDb.database)
+
+        withContext(Dispatchers.Default) {
+            while (true) {
+                log.debug { "Fetching batch..." }
+                val batch = oldQueries.fetchContactsBatch(limit = 10)
+                log.debug { "Migrating batch of ${batch.size}..." }
+
+                if (batch.isEmpty()) {
+                    break
+                }
+
+                paymentsDb.database.transaction {
+                    batch.forEach { contact ->
+                        if (!newQueries.existsContact(contact.id)) {
+                            newQueries.saveContact(contact, notify = false)
+                        }
+                    }
+                }
+
+                log.debug { "Deleting batch of ${batch.size}..." }
+                oldQueries.deleteContacts(batch)
+            }
+        }
+
+        log.debug { "Migration now complete" }
+        appDb.setValue(true.toByteArray(), KEY_MIGRATION_DONE)
+    }
+}
+
+fun Boolean.toByteArray(): ByteArray {
+    val out = ByteArrayOutput()
+    out.writeBoolean(this)
+    return out.toByteArray()
+}
+
+fun Boolean.Companion.fromByteArray(bin: ByteArray): Boolean? {
+    val input = ByteArrayInput(bin)
+    return try {
+        input.readBoolean()
+    } catch (e: Exception) { null }
 }
