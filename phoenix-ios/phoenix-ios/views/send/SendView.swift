@@ -640,7 +640,10 @@ struct SendView: View {
 	func contactsListChanged(_ updatedList: [ContactInfo]) {
 		log.trace("contactsListChanged()")
 		
-		sortedContacts = updatedList
+		sortedContacts = updatedList.sorted {(a, b) in
+			// return true if `a` should be ordered before `b`; otherwise return false
+			return a.name.localizedCaseInsensitiveCompare(b.name) == .orderedAscending
+		}
 		
 		do {
 			var offers: [Lightning_kmpUUID: [String]] = [:]
