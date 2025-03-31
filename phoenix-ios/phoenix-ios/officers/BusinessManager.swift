@@ -383,15 +383,6 @@ class BusinessManager {
 				log.error("peer.startWatchSwapInWallet(): error: \(error)")
 			}
 		} // </Task>
-		
-		Task { @MainActor in
-			let contactsManager = self.business.contactsManager
-			do {
-				try await contactsManager.migrateContactsIfNeeded()
-			} catch {
-				log.error("contactsManager.migrateContactsIfNeeded(): error: \(error)")
-			}
-		} // </Task>
 	}
 	
 	// --------------------------------------------------

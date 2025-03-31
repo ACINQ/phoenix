@@ -128,6 +128,9 @@ class ContactsManager(
                 _contactsList.value = list
             }
         }
+        launch {
+            migrateContactsIfNeeded()
+        }
     }
 
     /**
@@ -221,7 +224,7 @@ class ContactsManager(
      * Run this to migrate the contacts from the appDb to the paymentsDb.
      * This function can be run everytime the app is launched.
      */
-    suspend fun migrateContactsIfNeeded() {
+    private suspend fun migrateContactsIfNeeded() {
 
         val KEY_MIGRATION_DONE = "contacts_migration"
 
