@@ -3,8 +3,8 @@ package fr.acinq.phoenix.managers
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.PaymentEvents
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
-import fr.acinq.lightning.db.Bolt11IncomingPayment
 import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.db.LightningIncomingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.logging.LoggerFactory
@@ -45,7 +45,7 @@ class PaymentsManager(
 
     private val log = loggerFactory.newLogger(this::class)
 
-    /** Contains the most recently completed payment (only bolt11 incoming, or bolt11/bolt12 outgoing). */
+    /** Contains the most recently completed payment (only Lightning incoming/outgoing). */
     private val _lastCompletedPayment = MutableStateFlow<WalletPayment?>(null)
     val lastCompletedPayment: StateFlow<WalletPayment?> = _lastCompletedPayment
 
@@ -64,7 +64,7 @@ class PaymentsManager(
         val nodeParams = nodeParamsManager.nodeParams.filterNotNull().first()
         nodeParams.nodeEvents.filterIsInstance<PaymentEvents>().collect {
             when (it) {
-                is PaymentEvents.PaymentReceived -> if (it.payment is Bolt11IncomingPayment) _lastCompletedPayment.value = it.payment
+                is PaymentEvents.PaymentReceived -> if (it.payment is LightningIncomingPayment) _lastCompletedPayment.value = it.payment
                 is PaymentEvents.PaymentSent -> if (it.payment is LightningOutgoingPayment) _lastCompletedPayment.value = it.payment
             }
         }
