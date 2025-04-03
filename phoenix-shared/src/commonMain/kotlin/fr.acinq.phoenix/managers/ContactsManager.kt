@@ -32,8 +32,6 @@ import fr.acinq.phoenix.data.ContactAddress
 import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.db.SqliteAppDb
-import fr.acinq.phoenix.db.contacts.ContactQueries
-import fr.acinq.phoenix.db.contacts.OldContactQueries
 import fr.acinq.phoenix.utils.extensions.incomingOfferMetadata
 import fr.acinq.phoenix.utils.extensions.outgoingInvoiceRequest
 import kotlin.collections.List
@@ -239,34 +237,23 @@ class ContactsManager(
 
         val paymentsDb = paymentsDb()
 
-        val oldQueries = OldContactQueries(appDb.database)
-        val newQueries = ContactQueries(paymentsDb.database)
-
         withContext(Dispatchers.Default) {
-            while (true) {
-                log.debug { "Fetching batch..." }
-                val batch = oldQueries.fetchContactsBatch(limit = 10)
-                log.debug { "Migrating batch of ${batch.size}..." }
-
-                if (batch.isEmpty()) {
-                    break
-                }
-
-                paymentsDb.database.transaction {
-                    batch.forEach { contact ->
-                        if (!newQueries.existsContact(contact.id)) {
-                            newQueries.saveContact(contact, notify = false)
-                        }
-                    }
-                }
-
-                log.debug { "Deleting batch of ${batch.size}..." }
-                oldQueries.deleteContacts(batch)
-            }
+            fr.acinq.phoenix.db.migrations.appDb.v7.AfterVersion7(
+                appDbDriver = appDb.driver,
+                paymentsDbDriver = paymentsDb.driver,
+                loggerFactory = loggerFactory
+            )
         }
 
         log.debug { "Migration now complete" }
         appDb.setValue(true.toByteArray(), KEY_MIGRATION_DONE)
+
+        // We updated the database directly, which skips the SqlDelight hooks.
+        // Which means things like `monitorContactsFlow()` won't get triggered.
+        // So we need to manually update the contactsList.
+        launch {
+            _contactsList.value = paymentsDb.listContacts()
+        }
     }
 }
 

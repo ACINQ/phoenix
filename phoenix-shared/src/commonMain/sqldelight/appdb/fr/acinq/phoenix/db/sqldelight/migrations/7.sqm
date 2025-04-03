@@ -22,5 +22,5 @@ DROP TABLE IF EXISTS contact_offers;
 ALTER TABLE contacts RENAME TO contacts_old;
 
 DROP INDEX IF EXISTS record_creation_idx;
-ALTER TABLE cloudkit_contacts_metadata RENAME TO cloudkit_contacts_metadata_old;
-ALTER TABLE cloudkit_contacts_queue RENAME TO cloudkit_contacts_queue_old;
+DROP TABLE IF EXISTS cloudkit_contacts_metadata;
+DROP TABLE IF EXISTS cloudkit_contacts_queue;

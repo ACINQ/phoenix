@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
-class SqliteAppDb(private val driver: SqlDriver) {
+class SqliteAppDb(val driver: SqlDriver) {
 
     internal val database = AppDatabase(
         driver = driver,
