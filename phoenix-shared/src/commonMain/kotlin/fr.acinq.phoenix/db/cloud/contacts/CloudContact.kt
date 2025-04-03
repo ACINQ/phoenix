@@ -1,80 +1,109 @@
 package fr.acinq.phoenix.db.cloud.contacts
 
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.data.ContactInfo
+import fr.acinq.phoenix.data.ContactOffer
 import fr.acinq.phoenix.db.cloud.OfferSerializer
 import fr.acinq.phoenix.db.cloud.UUIDSerializer
 import fr.acinq.phoenix.db.cloud.cborSerializer
+import fr.acinq.phoenix.db.serialization.contacts.Serialization
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.decodeFromByteArray
-import kotlinx.serialization.encodeToByteArray
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
-enum class CloudContactVersion(val value: Int) {
-    // Initial version
-    V0(0)
-    // Future versions go here
-}
+sealed class CloudContact {
 
-@Serializable
-data class CloudContact(
-    @SerialName("v")
-    val version: Int,
-    @Serializable(with = UUIDSerializer::class)
-    val id: UUID,
-    val name: String,
-    val useOfferKey: Boolean,
-    val offers: List<@Serializable(OfferSerializer::class) OfferTypes.Offer>,
-) {
-    constructor(contact: ContactInfo) : this(
-        version = CloudContactVersion.V0.value,
-        id = contact.id,
-        name = contact.name,
-        useOfferKey = contact.useOfferKey,
-        offers = contact.offers
-    )
-
-    @Throws(Exception::class)
-    fun unwrap(photoUri: String?): ContactInfo? {
-        return ContactInfo(
-            id = this.id,
-            name = this.name,
-            photoUri = photoUri,
-            useOfferKey = this.useOfferKey,
-            offers = this.offers
-        )
+    enum class Version(val value: Int) {
+        // Initial version
+        V0(0)
     }
 
-    companion object
-}
+    @Serializable
+    data class VersionSwitch(
+        @SerialName("v")
+        val version: Int
+    )
 
-@OptIn(ExperimentalSerializationApi::class)
-fun CloudContact.cborSerialize(): ByteArray {
-    return Cbor.encodeToByteArray(this)
-}
+    @Serializable
+    data class V0(
+        @SerialName("v")
+        val version: Int,
+        @Serializable(with = UUIDSerializer::class)
+        val id: UUID,
+        val name: String,
+        val useOfferKey: Boolean,
+        val offers: List<@Serializable(OfferSerializer::class) OfferTypes.Offer>,
+    ): CloudContact()  {
 
-@OptIn(ExperimentalSerializationApi::class)
-@Throws(Exception::class)
-fun CloudContact.Companion.cborDeserialize(
-    blob: ByteArray
-): CloudContact {
-    return cborSerializer().decodeFromByteArray(blob)
-}
+        @Throws(Exception::class)
+        fun unwrap(photoUri: String?): ContactInfo {
+            val now = currentTimestampMillis()
+            val mappedOffers: List<ContactOffer> = this.offers.map {
+                ContactOffer(offer = it, label = "", createdAt = now)
+            }
+            return ContactInfo(
+                id = this.id,
+                name = this.name,
+                photoUri = photoUri,
+                useOfferKey = this.useOfferKey,
+                offers = mappedOffers,
+                addresses = listOf()
+            )
+        }
 
-/**
- * For DEBUGGING:
- *
- * You can use the jsonSerializer to see what the data looks like.
- * Just keep in mind that the ByteArray's will be encoded super-inefficiently.
- * That's because we're optimizing for Cbor.
- * To optimize for JSON, you would use ByteVector's,
- * and encode the data as Base64 via ByteVectorJsonSerializer.
- */
-fun CloudContact.jsonSerialize(): ByteArray {
-    return Json.encodeToString(this).encodeToByteArray()
+        companion object
+    }
+
+    data class V1(
+        val contact: ContactInfo
+    ): CloudContact() {
+
+        fun serialize(): ByteArray {
+            val cleanContact = contact.copy(photoUri = null)
+            val cloudVersion = byteArrayOf(1.toByte())
+            val serializedData = Serialization.serialize(cleanContact)
+            return cloudVersion + serializedData
+        }
+    }
+
+    companion object {
+
+        @OptIn(ExperimentalSerializationApi::class)
+        @Throws(Exception::class)
+        private fun cborDeserializeAndUnwrap(
+            blob: ByteArray,
+            photoUri: String?
+        ): ContactInfo? {
+            val serializer = cborSerializer()
+            val header = serializer.decodeFromByteArray<VersionSwitch>(blob)
+            return when (header.version) {
+                Version.V0.value -> {
+                    serializer.decodeFromByteArray<V0>(blob).unwrap(photoUri)
+                }
+                else -> null
+            }
+        }
+
+        fun deserialize(
+            blob: ByteArray,
+            photoUri: String?
+        ): ContactInfo? {
+            return kotlin.runCatching {
+                when (val version = blob.first()) {
+                    1.toByte() -> {
+                        val serializedData = blob.sliceArray(1..<blob.size)
+                        Serialization.deserialize(serializedData).getOrThrow()
+                    }
+                    else -> {
+                        throw IllegalArgumentException("unknown version: $version")
+                    }
+                }.copy(photoUri = photoUri)
+            }.recoverCatching {
+                cborDeserializeAndUnwrap(blob, photoUri)
+            }.getOrNull()
+        }
+    }
 }

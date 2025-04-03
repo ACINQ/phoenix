@@ -3,14 +3,11 @@ package fr.acinq.phoenix.db
 import app.cash.sqldelight.EnumColumnAdapter
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.db.SqlDriver
-import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
-import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.Notification
-import fr.acinq.phoenix.db.notifications.ContactQueries
 import fr.acinq.phoenix.db.notifications.NotificationsQueries
 import fr.acinq.phoenix.db.sqldelight.AppDatabase
 import fr.acinq.phoenix.db.sqldelight.Exchange_rates
@@ -20,7 +17,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
-class SqliteAppDb(private val driver: SqlDriver) {
+class SqliteAppDb(val driver: SqlDriver) {
 
     internal val database = AppDatabase(
         driver = driver,
@@ -32,7 +29,6 @@ class SqliteAppDb(private val driver: SqlDriver) {
     private val priceQueries = database.exchangeRatesQueries
     private val keyValueStoreQueries = database.keyValueStoreQueries
     private val notificationsQueries = NotificationsQueries(database)
-    internal val contactQueries = ContactQueries(database)
 
     /**
      * Save a list of [ExchangeRate] items to the database.
@@ -168,38 +164,6 @@ class SqliteAppDb(private val driver: SqlDriver) {
 
     suspend fun listUnreadNotification(): Flow<List<Pair<Set<UUID>, Notification>>> = withContext(Dispatchers.Default) {
         notificationsQueries.listUnread()
-    }
-
-    suspend fun getContact(contactId: UUID): ContactInfo? = withContext(Dispatchers.Default) {
-        contactQueries.getContact(contactId)
-    }
-
-    suspend fun getContactForOffer(offerId: ByteVector32): ContactInfo? = withContext(Dispatchers.Default) {
-        contactQueries.getContactForOffer(offerId)
-    }
-
-    suspend fun monitorContacts(): Flow<List<ContactInfo>> = withContext(Dispatchers.Default) {
-        contactQueries.monitorContactsFlow()
-    }
-
-    suspend fun listContacts(): List<ContactInfo> = withContext(Dispatchers.Default) {
-        contactQueries.listContacts()
-    }
-
-    suspend fun saveContact(contact: ContactInfo) = withContext(Dispatchers.Default) {
-        contactQueries.saveContact(contact)
-    }
-
-    suspend fun updateContact(contact: ContactInfo) = withContext(Dispatchers.Default) {
-        contactQueries.updateContact(contact)
-    }
-
-    suspend fun deleteContact(contactId: UUID) = withContext(Dispatchers.Default) {
-        contactQueries.deleteContact(contactId)
-    }
-
-    suspend fun deleteOfferContactLink(offerId: ByteVector32) = withContext(Dispatchers.Default) {
-        contactQueries.deleteOfferContactLink(offerId)
     }
 
     fun close() {

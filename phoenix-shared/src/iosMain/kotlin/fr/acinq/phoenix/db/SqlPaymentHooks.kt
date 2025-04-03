@@ -19,14 +19,14 @@ actual fun didUpdateWalletPaymentMetadata(id: UUID, database: PaymentsDatabase) 
     database.cloudKitPaymentsQueries.addToQueue(id = id, date_added = currentTimestampMillis())
 }
 
-actual fun didSaveContact(contactId: UUID, database: AppDatabase) {
+actual fun didSaveContact(contactId: UUID, database: PaymentsDatabase) {
     database.cloudKitContactsQueries.addToQueue(
         id = contactId.toString(),
         date_added = currentTimestampMillis()
     )
 }
 
-actual fun didDeleteContact(contactId: UUID, database: AppDatabase) {
+actual fun didDeleteContact(contactId: UUID, database: PaymentsDatabase) {
     database.cloudKitContactsQueries.addToQueue(
         id = contactId.toString(),
         date_added = currentTimestampMillis()

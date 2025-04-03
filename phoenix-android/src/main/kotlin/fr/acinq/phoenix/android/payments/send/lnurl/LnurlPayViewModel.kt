@@ -46,7 +46,7 @@ class LnurlPayViewModel(private val sendManager: SendManager) : ViewModel() {
     val log = LoggerFactory.getLogger(this::class.java)
     val state = mutableStateOf<LnurlPayViewState>(LnurlPayViewState.Init)
 
-    fun requestAndPayInvoice(payIntent: LnurlPay.Intent, amount: MilliSatoshi, fees: TrampolineFees, comment: String?, onPaymentSent: () -> Unit) {
+    fun requestAndPayInvoice(pay: SendManager.ParseResult.Lnurl.Pay, amount: MilliSatoshi, fees: TrampolineFees, comment: String?, onPaymentSent: () -> Unit) {
         if (state.value is LnurlPayViewState.RequestingInvoice || state.value is LnurlPayViewState.PayingInvoice) return
         state.value = LnurlPayViewState.RequestingInvoice
 
@@ -54,12 +54,12 @@ class LnurlPayViewModel(private val sendManager: SendManager) : ViewModel() {
             log.error("failed to pay lnurl-pay intent: ", e)
             state.value = LnurlPayViewState.Error.Generic(e)
         }) {
-            when (val result = sendManager.lnurlPay_requestInvoice(payIntent, amount, comment)) {
+            when (val result = sendManager.lnurlPay_requestInvoice(pay, amount, comment)) {
                 is Either.Left -> state.value = LnurlPayViewState.Error.PayError(result.value)
                 is Either.Right -> {
                     val invoice = result.value
                     state.value = LnurlPayViewState.PayingInvoice(invoice)
-                    sendManager.lnurlPay_payInvoice(payIntent, amount, comment, invoice, fees)
+                    sendManager.lnurlPay_payInvoice(pay, amount, comment, invoice, fees)
                     viewModelScope.launch(Dispatchers.Main) {
                         onPaymentSent()
                     }

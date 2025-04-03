@@ -39,13 +39,13 @@ expect fun didUpdateWalletPaymentMetadata(id: UUID, database: PaymentsDatabase)
  * This means any database operations performed in this function are atomic,
  * with respect to the referenced row.
  */
-expect fun didSaveContact(contactId: UUID, database: AppDatabase)
+expect fun didSaveContact(contactId: UUID, database: PaymentsDatabase)
 
 /**
  * Implement this function to execute platform specific code when a contact is deleted.
  * For example, on iOS this is used to enqueue an operation to delete the contact from CloudKit.
  */
-expect fun didDeleteContact(contactId: UUID, database: AppDatabase)
+expect fun didDeleteContact(contactId: UUID, database: PaymentsDatabase)
 
 /**
  * Implemented on Apple platforms with support for CloudKit.

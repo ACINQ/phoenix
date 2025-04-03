@@ -1,4 +1,5 @@
 import Foundation
+import PhoenixShared
 
 
 enum TimestampType {
@@ -18,11 +19,19 @@ extension Int64 {
 	func minus(hours: Int) -> Int64 {
 		return self - Int64(1_000 * 60 * 60 * hours)
 	}
+	
+	func toKotlinLong() -> KotlinLong {
+		return KotlinLong(longLong: self)
+	}
 }
 
 extension Date {
 	
 	func toMilliseconds() -> Int64 {
 		return Int64(self.timeIntervalSince1970 * 1_000)
+	}
+	
+	func toMillisecondsKotlinLong() -> KotlinLong {
+		return self.toMilliseconds().toKotlinLong()
 	}
 }
