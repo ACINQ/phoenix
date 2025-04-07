@@ -38,6 +38,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import fr.acinq.bitcoin.utils.Try
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
@@ -50,7 +51,6 @@ import fr.acinq.phoenix.android.components.scanner.ScannerView
 import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.data.ContactOffer
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 
 
 /**
@@ -145,7 +145,7 @@ fun SaveNewContactDialog(
                                 if (existingContact != null) {
                                     offerErrorMessage = context.getString(R.string.contact_error_offer_known, existingContact.name)
                                 } else {
-                                    val contactOffer = ContactOffer(res.result, label = null, createdAt = Clock.System.now())
+                                    val contactOffer = ContactOffer(res.result, label = null, createdAt = currentTimestampMillis())
                                     val newContact = ContactInfo(
                                         id = UUID.randomUUID(),
                                         name = name,
