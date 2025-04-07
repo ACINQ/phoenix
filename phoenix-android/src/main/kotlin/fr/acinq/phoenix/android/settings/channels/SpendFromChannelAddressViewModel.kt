@@ -20,9 +20,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector64
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.Satoshi
+import fr.acinq.bitcoin.TxId
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.utils.channels.SpendChannelAddressHelper
 import fr.acinq.phoenix.utils.channels.SpendChannelAddressResult
@@ -48,6 +50,7 @@ sealed class SpendFromChannelAddressViewState {
         data class ChannelDataUnhandledVersion(val version: Int) : Error()
         data class PublicKeyMalformed(val details: String) : Error()
         data class TransactionMalformed(val details: String) : Error()
+        data class InvalidSig(val txId: TxId, val publicKey: PublicKey, val fundingScript: ByteVector, val signature: ByteVector64): Error()
     }
 
     val canProcess: Boolean = this !is Processing && this !is SignedTransaction
@@ -119,6 +122,9 @@ class SpendFromChannelAddressViewModel(
                 }
                 is SpendChannelAddressResult.Failure.TransactionMalformed -> {
                     state.value = SpendFromChannelAddressViewState.Error.TransactionMalformed(result.details)
+                }
+                is SpendChannelAddressResult.Failure.InvalidSig -> {
+                    state.value = SpendFromChannelAddressViewState.Error.InvalidSig(result.txId, result.publicKey, result.fundingScript, result.signature)
                 }
             }
         }
