@@ -18,10 +18,15 @@ package fr.acinq.phoenix.utils.channels
 
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector64
+import fr.acinq.bitcoin.Crypto
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.Satoshi
+import fr.acinq.bitcoin.SigHash
+import fr.acinq.bitcoin.SigVersion
 import fr.acinq.bitcoin.Script
 import fr.acinq.bitcoin.Transaction
+import fr.acinq.bitcoin.TxId
+import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.channel.states.ChannelStateWithCommitments
 import fr.acinq.lightning.channel.states.PersistedChannelState
 import fr.acinq.lightning.logging.error
@@ -112,8 +117,12 @@ object SpendChannelAddressHelper {
             val fundingScript = Scripts.multiSig2of2(localFundingKey.publicKey(), pubkey)
 
             val sig = Transactions.sign(tx = tx, inputIndex = 0, Script.write(fundingScript), amount, localFundingKey)
-            return SpendChannelAddressResult.Success(localFundingKey.publicKey(), sig)
-
+            val signedData = tx.hashForSigning(0, Script.write(fundingScript), SigHash.SIGHASH_ALL, amount, SigVersion.SIGVERSION_WITNESS_V0)
+            return if (!Crypto.verifySignature(signedData, sig, localFundingKey.publicKey())) {
+                SpendChannelAddressResult.Failure.InvalidSig(tx.txid, localFundingKey.publicKey(), Script.write(fundingScript).byteVector(), sig)
+            } else {
+                SpendChannelAddressResult.Success(tx.txid, localFundingKey.publicKey(), Script.write(fundingScript).byteVector(), sig)
+            }
         } catch (e: Exception) {
             log.error { "error when spending from channel address: ${e.message}" }
             return SpendChannelAddressResult.Failure.Generic(e)
@@ -122,7 +131,7 @@ object SpendChannelAddressHelper {
 }
 
 sealed class SpendChannelAddressResult {
-    data class Success(val publicKey: PublicKey, val signature: ByteVector64) : SpendChannelAddressResult()
+    data class Success(val txId: TxId, val publicKey: PublicKey, val fundingScript: ByteVector, val signature: ByteVector64) : SpendChannelAddressResult()
     sealed class Failure : SpendChannelAddressResult() {
         data class Generic(val error: Throwable) : Failure()
         data object ChannelDataMalformed : Failure()
@@ -131,5 +140,6 @@ sealed class SpendChannelAddressResult {
         data class ChannelDataUnhandledVersion(val version: Int) : Failure()
         data class TransactionMalformed(val details: String) : Failure()
         data class RemoteFundingPubkeyMalformed(val details: String) : Failure()
+        data class InvalidSig(val txId: TxId, val publicKey: PublicKey, val fundingScript: ByteVector, val signature: ByteVector64) : Failure()
     }
 }

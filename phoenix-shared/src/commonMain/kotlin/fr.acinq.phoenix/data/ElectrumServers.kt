@@ -144,7 +144,6 @@ val testnetElectrumServers = listOf(
                 "uifT9db6tDML1PTKpbHkW+f3w9PdhSmsNUUXrgNmQ0MoBhxV7U2Qcug3jX3xaf1P" +
                 "gwWDg3nZZizhuvBceY0IYLECAwEAAQ=="
     ),
-    electrumServer(host = "testnet1.electrum.acinq.co", port = 51002),
     electrumServer(host = "blockstream.info", port = 993),
     electrumServer(
         host = "testnet.aranguren.org", port = 51002, publicKey =

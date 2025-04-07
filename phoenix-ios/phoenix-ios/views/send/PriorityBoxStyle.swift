@@ -3,6 +3,7 @@ import SwiftUI
 struct PriorityBoxStyle: GroupBoxStyle {
 	
 	let width: CGFloat?
+	let height: CGFloat?
 	let disabled: Bool
 	let selected: Bool
 	let tapped: () -> Void
@@ -13,7 +14,7 @@ struct PriorityBoxStyle: GroupBoxStyle {
 				.font(.headline)
 			configuration.content
 		}
-		.frame(width: width?.advanced(by: -16.0))
+		.frame(width: width?.advanced(by: -16.0), height: height?.advanced(by: -16.0))
 		.padding(.all, 8)
 		.background(RoundedRectangle(cornerRadius: 8, style: .continuous)
 			.fill(Color(UIColor.quaternarySystemFill)))
