@@ -132,7 +132,7 @@ fun AmountHeroInput(
             ),
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.None,
-                autoCorrect = false,
+                autoCorrectEnabled = false,
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Done
             ),

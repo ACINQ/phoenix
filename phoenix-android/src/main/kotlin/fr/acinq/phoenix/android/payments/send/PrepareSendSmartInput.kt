@@ -132,7 +132,7 @@ fun SendSmartInput(
                     .background(colors.backgroundColor(true).value, shape),
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.None,
-                    autoCorrect = false,
+                    autoCorrectEnabled = false,
                     keyboardType = KeyboardType.Email,
                     imeAction = ImeAction.Send,
                 ),
