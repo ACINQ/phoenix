@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -34,18 +35,19 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.android.PaymentsViewModel
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.CardHeader
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.ItemCard
+import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.payments.details.PaymentLine
 import fr.acinq.phoenix.android.utils.logger
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -100,8 +102,8 @@ fun PaymentsHistoryView(
     onPaymentClick: (UUID) -> Unit,
     onCsvExportClick: () -> Unit,
 ) {
+    val log = logger("PaymentsHistory")
     val listState = rememberLazyListState()
-    val allPaymentsCount by business.paymentsManager.paymentsCount.collectAsState()
     val paymentsPage by paymentsViewModel.paymentsPage.collectAsState()
     val payments by paymentsViewModel.paymentsFlow.collectAsState()
 
@@ -121,15 +123,13 @@ fun PaymentsHistoryView(
         }
     }
 
-    val log = logger("PaymentsHistory")
-
     DefaultScreenLayout(
         isScrollable = false,
         backgroundColor = MaterialTheme.colors.background
     ) {
         DefaultScreenHeader(
             content = {
-                Text(text = stringResource(id = R.string.payments_history_title, allPaymentsCount))
+                Text(text = stringResource(id = R.string.payments_history_title))
                 Spacer(Modifier.weight(1f))
                 Button(
                     text = stringResource(id = R.string.payments_history_export_button),
@@ -163,6 +163,16 @@ fun PaymentsHistoryView(
                 .collect { offset ->
                     paymentsViewModel.subscribeToPayments(offset, PaymentsViewModel.pageSize)
                 }
+        }
+
+        if (groupedPayments.isEmpty()) {
+            TextWithIcon(
+                text = stringResource(R.string.payments_history_empty),
+                textStyle = MaterialTheme.typography.caption,
+                icon = R.drawable.ic_sleep,
+                iconTint = MaterialTheme.typography.caption.color,
+                modifier = Modifier.padding(top = 60.dp).align(Alignment.CenterHorizontally)
+            )
         }
 
         LazyColumn(

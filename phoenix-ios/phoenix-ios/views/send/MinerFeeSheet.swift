@@ -30,8 +30,9 @@ struct MinerFeeSheet: View {
 	@State var showLowMinerFeeWarning: Bool = false
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
-	@EnvironmentObject var smartModalState: SmartModalState
+	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@EnvironmentObject var smartModalState: SmartModalState
 	
 	enum Field: Hashable {
 		case satsPerByteTextField
@@ -44,6 +45,13 @@ struct MinerFeeSheet: View {
 		value: { [$0.size.width] }
 	)
 	@State var priorityBoxWidth: CGFloat? = nil
+	
+	enum PriorityBoxHeight: Preference {}
+	let priorityBoxHeightReader = GeometryPreferenceReader(
+		key: AppendValue<PriorityBoxWidth>.self,
+		value: { [$0.size.height] }
+	)
+	@State var priorityBoxHeight: CGFloat? = nil
 	
 	enum FooterContentHeight: Preference {}
 	let footerContentHeightReader = GeometryPreferenceReader(
@@ -65,20 +73,28 @@ struct MinerFeeSheet: View {
 					smartModalState.dismissable = false
 				}
 		} else {
-			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-				header()
+			main()
+				.onAppear {
+					smartModalState.dismissable = true
+				}
+		}
+	}
+	
+	@ViewBuilder
+	func main() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			header()
+			ScrollView(.vertical) {
 				content()
 				footer()
 			}
-			.onChange(of: satsPerByte) { _ in
-				satsPerByteChanged()
-			}
-			.onChange(of: mempoolRecommendedResponse) { _ in
-				mempoolRecommendedResponseChanged()
-			}
-			.onAppear {
-				smartModalState.dismissable = true
-			}
+		}
+		.onChange(of: satsPerByte) { _ in
+			satsPerByteChanged()
+		}
+		.onChange(of: mempoolRecommendedResponse) { _ in
+			mempoolRecommendedResponseChanged()
 		}
 	}
 	
@@ -127,34 +143,47 @@ struct MinerFeeSheet: View {
 	@ViewBuilder
 	func priorityBoxes() -> some View {
 		
-		priorityBoxes_ios16()
+		ViewThatFits {
+			priorityBoxes_normal()
+			priorityBoxes_accessibility()
+		}
+		.assignMaxPreference(for: priorityBoxWidthReader.key, to: $priorityBoxWidth)
+		.assignMaxPreference(for: priorityBoxHeightReader.key, to: $priorityBoxHeight)
 	}
 	
 	@ViewBuilder
-	func priorityBoxes_ios16() -> some View {
+	func priorityBoxes_normal() -> some View {
 		
-		ViewThatFits {
-			Grid(horizontalSpacing: 8, verticalSpacing: 8) {
-				GridRow(alignment: VerticalAlignment.center) {
-					priorityBox_economy()
-					priorityBox_low()
-					priorityBox_medium()
-					priorityBox_high()
-				}
-			} // </Grid>
-			Grid(horizontalSpacing: 8, verticalSpacing: 8) {
-				GridRow(alignment: VerticalAlignment.center) {
-					priorityBox_economy()
-					priorityBox_low()
-					
-				}
-				GridRow(alignment: VerticalAlignment.center) {
-					priorityBox_medium()
-					priorityBox_high()
-				}
-			} // </Grid>
-		}
-		.assignMaxPreference(for: priorityBoxWidthReader.key, to: $priorityBoxWidth)
+		Grid(horizontalSpacing: 8, verticalSpacing: 8) {
+			GridRow(alignment: VerticalAlignment.center) {
+				priorityBox_economy()
+				priorityBox_low()
+				
+			}
+			GridRow(alignment: VerticalAlignment.center) {
+				priorityBox_medium()
+				priorityBox_high()
+			}
+		} // </Grid>
+	}
+	
+	@ViewBuilder
+	func priorityBoxes_accessibility() -> some View {
+		
+		Grid(horizontalSpacing: 8, verticalSpacing: 8) {
+			GridRow(alignment: VerticalAlignment.center) {
+				priorityBox_economy()
+			}
+			GridRow(alignment: VerticalAlignment.center) {
+				priorityBox_low()
+			}
+			GridRow(alignment: VerticalAlignment.center) {
+				priorityBox_medium()
+			}
+			GridRow(alignment: VerticalAlignment.center) {
+				priorityBox_high()
+			}
+		} // </Grid>
 	}
 	
 	@ViewBuilder
@@ -172,11 +201,13 @@ struct MinerFeeSheet: View {
 		}
 		.groupBoxStyle(PriorityBoxStyle(
 			width: priorityBoxWidth,
+			height: priorityBoxHeight,
 			disabled: isPriorityDisabled(),
 			selected: isPrioritySelected(.none),
 			tapped: { priorityTapped(.none) }
 		))
 		.read(priorityBoxWidthReader)
+		.read(priorityBoxHeightReader)
 	}
 	
 	@ViewBuilder
@@ -194,11 +225,13 @@ struct MinerFeeSheet: View {
 		}
 		.groupBoxStyle(PriorityBoxStyle(
 			width: priorityBoxWidth,
+			height: priorityBoxHeight,
 			disabled: isPriorityDisabled(),
 			selected: isPrioritySelected(.low),
 			tapped: { priorityTapped(.low) }
 		))
 		.read(priorityBoxWidthReader)
+		.read(priorityBoxHeightReader)
 	}
 	
 	@ViewBuilder
@@ -216,11 +249,13 @@ struct MinerFeeSheet: View {
 		}
 		.groupBoxStyle(PriorityBoxStyle(
 			width: priorityBoxWidth,
+			height: priorityBoxHeight,
 			disabled: isPriorityDisabled(),
 			selected: isPrioritySelected(.medium),
 			tapped: { priorityTapped(.medium) }
 		))
 		.read(priorityBoxWidthReader)
+		.read(priorityBoxHeightReader)
 	}
 	
 	@ViewBuilder
@@ -238,11 +273,13 @@ struct MinerFeeSheet: View {
 		}
 		.groupBoxStyle(PriorityBoxStyle(
 			width: priorityBoxWidth,
+			height: priorityBoxHeight,
 			disabled: isPriorityDisabled(),
 			selected: isPrioritySelected(.high),
 			tapped: { priorityTapped(.high) }
 		))
 		.read(priorityBoxWidthReader)
+		.read(priorityBoxHeightReader)
 	}
 	
 	@ViewBuilder

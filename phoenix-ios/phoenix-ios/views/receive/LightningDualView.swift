@@ -726,18 +726,43 @@ struct LightningDualView: View {
 	func lastIncomingPaymentChanged(_ lastIncomingPayment: Lightning_kmpIncomingPayment) {
 		log.trace("lastIncomingPaymentChanged()")
 		
-		guard let model = mvi.model as? Receive.Model_Generated else {
+		let state = lastIncomingPayment.state()
+		guard state == WalletPaymentState.successOffChain else {
+			log.debug("lastIncomingPaymentChanged(): state != .successOffChain")
 			return
 		}
 		
-		let state = lastIncomingPayment.state()
-		if state == WalletPaymentState.successOffChain {
+		guard let lightningPayment = lastIncomingPayment as? Lightning_kmpLightningIncomingPayment else {
+			log.debug("lastIncomingPaymentChanged(): not a Lightning_kmpLightningIncomingPayment")
+			return
+		}
+		
+		var didCompletePayment = false
+		
+		if let b11Payment = lightningPayment as? Lightning_kmpBolt11IncomingPayment {
+					
+			// While waiting for the payment to arrive,
+			// the user might tap the "show reusable qr" button.
+			// This would switch them over to Bolt12 mode.
+			// But if a matching Bolt11 payment arrives during that moment,
+			// we should still kick them back to the Home screen,
+			// and show them the payment was received.
 			
-			if let lightningPayment = lastIncomingPayment as? Lightning_kmpLightningIncomingPayment {
-				if lightningPayment.paymentHash.toHex() == model.paymentHash {
-					presentationMode.wrappedValue.dismiss()
+			if let model = mvi.model as? Receive.Model_Generated {
+				if b11Payment.paymentHash.toHex() == model.paymentHash {
+					didCompletePayment = true
 				}
 			}
+			
+		} else if let b12Payment = lightningPayment as? Lightning_kmpBolt12IncomingPayment {
+			
+			if activeType == .bolt12_offer {
+				didCompletePayment = true
+			}
+		}
+		
+		if didCompletePayment {
+			presentationMode.wrappedValue.dismiss()
 		}
 	}
 	

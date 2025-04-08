@@ -1,17 +1,14 @@
 package fr.acinq.phoenix.controllers.main
 
-import co.touchlab.kermit.Logger
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.managers.BalanceManager
-import fr.acinq.phoenix.managers.PaymentsManager
 import kotlinx.coroutines.launch
 
 
 class AppHomeController(
     loggerFactory: LoggerFactory,
-    private val paymentsManager: PaymentsManager,
     private val balanceManager: BalanceManager
 ) : AppController<Home.Model, Home.Intent>(
     loggerFactory = loggerFactory,
@@ -19,7 +16,6 @@ class AppHomeController(
 ) {
     constructor(business: PhoenixBusiness): this(
         loggerFactory = business.loggerFactory,
-        paymentsManager = business.paymentsManager,
         balanceManager = business.balanceManager
     )
 
@@ -27,12 +23,6 @@ class AppHomeController(
         launch {
             balanceManager.balance.collect {
                 model { copy(balance = it) }
-            }
-        }
-
-        launch {
-            paymentsManager.paymentsCount.collect {
-                model { copy(paymentsCount = it) }
             }
         }
     }
