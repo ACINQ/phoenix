@@ -13,7 +13,7 @@ SELECT data
 FROM contacts;
 
 getContact:
-SELECT *
+SELECT data
 FROM contacts
 WHERE id = :contactId;
 

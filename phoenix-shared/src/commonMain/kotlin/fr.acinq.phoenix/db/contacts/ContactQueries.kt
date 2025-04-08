@@ -64,7 +64,7 @@ class ContactQueries(val database: PaymentsDatabase) {
 
     fun getContact(contactId: UUID): ContactInfo? {
         return database.transactionWithResult {
-            queries.getContact(contactId).executeAsOneOrNull()?.data_
+            queries.getContact(contactId).executeAsOneOrNull()
         }
     }
 
