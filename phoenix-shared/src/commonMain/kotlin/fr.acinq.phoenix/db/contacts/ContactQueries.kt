@@ -34,44 +34,34 @@ class ContactQueries(val database: PaymentsDatabase) {
     }
 
     private fun saveNewContact(contact: ContactInfo) {
-        database.transaction {
-            queries.insertContact(
-                id = contact.id,
-                data = contact,
-                createdAt = currentTimestampMillis(),
-                updatedAt = null
-            )
-        }
+        queries.insertContact(
+            id = contact.id,
+            data = contact,
+            createdAt = currentTimestampMillis(),
+            updatedAt = null
+        )
     }
 
     private fun updateExistingContact(contact: ContactInfo) {
-        database.transaction {
-            queries.updateContact(
-                data = contact,
-                updatedAt = currentTimestampMillis(),
-                contactId = contact.id
-            )
-        }
+        queries.updateContact(
+            data = contact,
+            updatedAt = currentTimestampMillis(),
+            contactId = contact.id
+        )
     }
 
     fun existsContact(contactId: UUID): Boolean {
-        return database.transactionWithResult {
-            queries.existsContact(
-                id = contactId
-            ).executeAsOne() > 0
-        }
+        return queries.existsContact(
+            id = contactId
+        ).executeAsOne() > 0
     }
 
     fun getContact(contactId: UUID): ContactInfo? {
-        return database.transactionWithResult {
-            queries.getContact(contactId).executeAsOneOrNull()
-        }
+        return queries.getContact(contactId).executeAsOneOrNull()
     }
 
     fun listContacts(): List<ContactInfo> {
-        return database.transactionWithResult {
-            queries.listContacts().executeAsList()
-        }
+        return queries.listContacts().executeAsList()
     }
 
     fun monitorContactsFlow(context: CoroutineContext): Flow<List<ContactInfo>> {
@@ -79,7 +69,7 @@ class ContactQueries(val database: PaymentsDatabase) {
     }
 
     fun deleteContact(contactId: UUID) {
-        database.transaction {
+        database.transaction { // transaction required: `didDeleteContact` MUST run in same tx
             queries.deleteContact(contactId)
             didDeleteContact(contactId, database)
         }
