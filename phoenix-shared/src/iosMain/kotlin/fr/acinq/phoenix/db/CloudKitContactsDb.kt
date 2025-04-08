@@ -108,10 +108,10 @@ class CloudKitContactsDb(
                 // Fetch the corresponding contact info from the database.
 
                 uniqueContactIds.forEach { contactId ->
-                    if (paymentsDb.contactQueries.existsContact(contactId)) {
+                    if (paymentsDb.contacts.contactQueries.existsContact(contactId)) {
                         // appDb.contactQueries.getContact() throws if the contact
                         // doesn't exist in database.
-                        paymentsDb.contactQueries.getContact(contactId)?.let {
+                        paymentsDb.contacts.contactQueries.getContact(contactId)?.let {
                             rowMap[contactId] = it
                         }
                     }
@@ -197,7 +197,7 @@ class CloudKitContactsDb(
         val contacts = downloadedContacts.map { it.copy() }
 
         withContext(Dispatchers.Default) {
-            val contactQueries = paymentsDb.contactQueries
+            val contactQueries = paymentsDb.contacts.contactQueries
 
             db.transaction {
                 for (contact in contacts) {

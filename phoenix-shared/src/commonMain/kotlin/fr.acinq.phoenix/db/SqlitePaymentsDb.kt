@@ -25,17 +25,16 @@ import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.logging.error
 import fr.acinq.lightning.utils.*
 import fr.acinq.lightning.wire.LiquidityAds
-import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.WalletPaymentMetadata
-import fr.acinq.phoenix.db.contacts.ContactQueries
+import fr.acinq.phoenix.db.contacts.SqliteContactsDb
 import fr.acinq.phoenix.db.payments.*
 import fr.acinq.phoenix.db.payments.PaymentsMetadataQueries
 import fr.acinq.phoenix.db.sqldelight.PaymentsDatabase
-import fr.acinq.phoenix.managers.ContactsManager
 import fr.acinq.phoenix.utils.MetadataQueue
 import kotlin.collections.List
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -44,14 +43,13 @@ class SqlitePaymentsDb(
     val driver: SqlDriver,
     val database: PaymentsDatabase,
     val metadataQueue: MetadataQueue?,
-    private val contactsManager: ContactsManager?,
     val loggerFactory: LoggerFactory
 ) : IncomingPaymentsDb by SqliteIncomingPaymentsDb(database, metadataQueue),
     OutgoingPaymentsDb by SqliteOutgoingPaymentsDb(database, metadataQueue),
     PaymentsDb {
 
     val metadataQueries = PaymentsMetadataQueries(database)
-    val contactQueries = ContactQueries(database)
+    val contacts = SqliteContactsDb(driver, database, loggerFactory)
 
     val log = loggerFactory.newLogger(SqlitePaymentsDb::class)
 
@@ -165,7 +163,7 @@ class SqlitePaymentsDb(
      */
     private fun List<WalletPaymentInfo>.postProcess(): List<WalletPaymentInfo> = this.map { paymentInfo ->
         // There's no need to check payment types here - all those checks are already done in ContactsManager.
-        contactsManager?.contactForPaymentInfo(paymentInfo)?.let {
+        contacts.contactForPaymentInfo(paymentInfo)?.let {
             paymentInfo.copy(contact = it)
         } ?: paymentInfo
     }
@@ -323,25 +321,8 @@ class SqlitePaymentsDb(
         }
     }
 
-    suspend fun getContact(contactId: UUID): ContactInfo? = withContext(Dispatchers.Default) {
-        contactQueries.getContact(contactId)
+    fun close() {
+        contacts.cancel()
+        driver.close()
     }
-
-    fun monitorContactsFlow(): Flow<List<ContactInfo>> {
-        return contactQueries.monitorContactsFlow(Dispatchers.Default)
-    }
-
-    suspend fun listContacts(): List<ContactInfo> = withContext(Dispatchers.Default) {
-        contactQueries.listContacts()
-    }
-
-    suspend fun saveContact(contact: ContactInfo) = withContext(Dispatchers.Default) {
-        contactQueries.saveContact(contact)
-    }
-
-    suspend fun deleteContact(contactId: UUID) = withContext(Dispatchers.Default) {
-        contactQueries.deleteContact(contactId)
-    }
-
-    fun close() = driver.close()
 }

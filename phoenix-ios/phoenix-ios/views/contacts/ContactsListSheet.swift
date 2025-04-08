@@ -67,7 +67,7 @@ struct ContactsListSheet: View {
 	func content() -> some View {
 		
 		list()
-			.onReceive(Biz.business.contactsManager.contactsListPublisher()) {
+			.onReceive(Biz.business.databaseManager.contactsListPublisher()) {
 				contactsListChanged($0)
 			}
 			.onChange(of: searchText) { _ in

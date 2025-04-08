@@ -68,7 +68,7 @@ struct ContactsList: View {
 		.onAppear() {
 			onAppear()
 		}
-		.onReceive(Biz.business.contactsManager.contactsListPublisher()) {
+		.onReceive(Biz.business.databaseManager.contactsListPublisher()) {
 			contactsListChanged($0)
 		}
 		.onChange(of: searchText) { _ in
@@ -393,11 +393,11 @@ struct ContactsList: View {
 		
 		Task { @MainActor in
 			
-			let contactsManager = Biz.business.contactsManager
 			do {
-				try await contactsManager.deleteContact(contactId: contact.id)
+				let contactsDb = try await Biz.business.databaseManager.contactsDb()
+				try await contactsDb.deleteContact(contactId: contact.id)
 			} catch {
-				log.error("contactsManager.deleteContact(): error: \(error)")
+				log.error("contactsDb.deleteContact(): error: \(error)")
 			}
 		}
 	}

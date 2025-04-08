@@ -57,7 +57,7 @@ struct HomeView : MVIView {
 	@State var bizNotifications_payment: [PhoenixShared.NotificationsManager.NotificationItem] = []
 	@State var bizNotifications_watchtower: [PhoenixShared.NotificationsManager.NotificationItem] = []
 	
-	let contactsPublisher = Biz.business.contactsManager.contactsListPublisher()
+	let contactsPublisher = Biz.business.databaseManager.contactsListPublisher()
 	
 	@State var didAppear = false
 		
@@ -884,9 +884,13 @@ struct HomeView : MVIView {
 		
 		// Update WalletPaymentInfo.contact for all rows
 		
-		let contactsManager = Biz.business.contactsManager
+		guard let contactsDb = Biz.business.databaseManager.contactsDbValue() else {
+			log.warning("contactsDb is nil")
+			return
+		}
+		
 		let updatedRows = paymentsPage.rows.map { info in
-			let updatedContact = contactsManager.contactForPaymentInfo(paymentInfo: info)
+			let updatedContact = contactsDb.contactForPaymentInfo(paymentInfo: info)
 			return WalletPaymentInfo(
 				payment  : info.payment,
 				metadata : info.metadata,

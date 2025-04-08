@@ -156,7 +156,7 @@ struct SendView: View {
 		.onAppear() {
 			onAppear()
 		}
-		.onReceive(Biz.business.contactsManager.contactsListPublisher()) {
+		.onReceive(Biz.business.databaseManager.contactsListPublisher()) {
 			contactsListChanged($0)
 		}
 		.onChange(of: inputFieldText) { _ in

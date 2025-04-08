@@ -1,21 +1,6 @@
-/*
- * Copyright 2024 ACINQ SAS
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+package fr.acinq.phoenix.db.contacts
 
-package fr.acinq.phoenix.managers
-
+import app.cash.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.io.ByteArrayInput
@@ -27,14 +12,13 @@ import fr.acinq.lightning.serialization.InputExtensions.readBoolean
 import fr.acinq.lightning.serialization.OutputExtensions.writeBoolean
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.wire.OfferTypes
-import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.ContactAddress
 import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.db.SqliteAppDb
+import fr.acinq.phoenix.db.sqldelight.PaymentsDatabase
 import fr.acinq.phoenix.utils.extensions.incomingOfferMetadata
 import fr.acinq.phoenix.utils.extensions.outgoingInvoiceRequest
-import kotlin.collections.List
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -42,44 +26,27 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ContactsManager(
-    private val loggerFactory: LoggerFactory,
-    private val appDb: SqliteAppDb
-) : CoroutineScope by MainScope() {
 
-    constructor(business: PhoenixBusiness) : this(
-        loggerFactory = business.loggerFactory,
-        appDb = business.appDb,
-    ) {
-        launch {
-            databaseManagerFlow.value = business.databaseManager
-        }
-    }
+class SqliteContactsDb(
+    val driver: SqlDriver,
+    val database: PaymentsDatabase,
+    val loggerFactory: LoggerFactory
+): CoroutineScope by MainScope() {
 
     private val log = loggerFactory.newLogger(this::class)
 
-    /**
-     * DatabaseManager retains a reference to ContactsManager.
-     * So if ContactsManager also retains a reference to the DatabaseManager,
-     * then we end up crashing with a StackOverflow during init.
-     * One way to solve that would be a WeakReference, but it's not supported in KMP.
-     * So we use another workaround.
-     */
-    private val databaseManagerFlow = MutableStateFlow<DatabaseManager?>(null)
-    private suspend fun paymentsDb() = databaseManagerFlow.filterNotNull().first().paymentsDb()
+    val contactQueries = ContactQueries(database)
 
     private val _contactsList = MutableStateFlow<List<ContactInfo>>(emptyList())
     val contactsList = _contactsList.asStateFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val contactsMap = _contactsList.mapLatest { list ->
+    private val contactsMap = _contactsList.mapLatest { list ->
         list.associateBy { it.id }
     }.stateIn(
         scope = this,
@@ -88,7 +55,7 @@ class ContactsManager(
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val offerMap = _contactsList.mapLatest { list ->
+    private val offerMap = _contactsList.mapLatest { list ->
         list.flatMap { contact ->
             contact.offers.map { it.id to contact.id }
         }.toMap()
@@ -99,7 +66,7 @@ class ContactsManager(
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val publicKeyMap = _contactsList.mapLatest { list ->
+    private val publicKeyMap = _contactsList.mapLatest { list ->
         list.flatMap { contact ->
             contact.publicKeys.map { it to contact.id }
         }.toMap()
@@ -110,7 +77,7 @@ class ContactsManager(
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val addressMap = _contactsList.mapLatest { list ->
+    private val addressMap = _contactsList.mapLatest { list ->
         list.flatMap { contact ->
             contact.addresses.map { it.id to contact.id }
         }.toMap()
@@ -122,38 +89,22 @@ class ContactsManager(
 
     init {
         launch {
-            paymentsDb().monitorContactsFlow().collect { list ->
+            contactQueries.monitorContactsFlow(Dispatchers.Default).collect { list ->
                 _contactsList.value = list
             }
         }
-        launch {
-            migrateContactsIfNeeded()
-        }
+    }
+
+    suspend fun saveContact(contact: ContactInfo) = withContext(Dispatchers.Default) {
+        contactQueries.saveContact(contact)
+    }
+
+    suspend fun deleteContact(contactId: UUID) = withContext(Dispatchers.Default) {
+        contactQueries.deleteContact(contactId)
     }
 
     /**
-     * This method will:
-     * - insert or update the contact in the database (depending on whether it already exists)
-     * - insert any new offers
-     * - update any offers that have been changed (i.e. label changed)
-     * - delete offers that have been removed from the list
-     * - insert any new addresses
-     * - update any addresses that have been changed (i.e. label changed)
-     * - delete any addresses that have been removed
-     *
-     * In other words, the UI doesn't have to track which changes have been made.
-     * It can simply call this method, and the database will be properly updated.
-     */
-    suspend fun saveContact(contact: ContactInfo) {
-        paymentsDb().saveContact(contact)
-    }
-
-    suspend fun deleteContact(contactId: UUID) {
-        paymentsDb().deleteContact(contactId)
-    }
-
-    /**
-     * In most cases there's no need to query the database since we have everything in memory.
+     * There's generally no need to query the database since we have everything in memory.
      */
 
     fun contactForId(contactId: UUID): ContactInfo? {
@@ -222,7 +173,7 @@ class ContactsManager(
      * Run this to migrate the contacts from the appDb to the paymentsDb.
      * This function can be run everytime the app is launched.
      */
-    private suspend fun migrateContactsIfNeeded() {
+    internal suspend fun migrateContactsIfNeeded(appDb: SqliteAppDb) {
 
         val KEY_MIGRATION_DONE = "contacts_migration"
 
@@ -235,12 +186,10 @@ class ContactsManager(
 
         log.debug { "Starting migration..." }
 
-        val paymentsDb = paymentsDb()
-
         withContext(Dispatchers.Default) {
             fr.acinq.phoenix.db.migrations.appDb.v7.AfterVersion7(
                 appDbDriver = appDb.driver,
-                paymentsDbDriver = paymentsDb.driver,
+                paymentsDbDriver = driver,
                 loggerFactory = loggerFactory
             )
         }
@@ -252,7 +201,9 @@ class ContactsManager(
         // Which means things like `monitorContactsFlow()` won't get triggered.
         // So we need to manually update the contactsList.
         launch {
-            _contactsList.value = paymentsDb.listContacts()
+            _contactsList.value = withContext(Dispatchers.Default) {
+                contactQueries.listContacts()
+            }
         }
     }
 }

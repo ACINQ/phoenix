@@ -152,7 +152,7 @@ struct SummaryView: View {
 		.onChange(of: paymentInfo) { _ in
 			paymentInfoChanged()
 		}
-		.onReceive(Biz.business.contactsManager.contactsListPublisher()) { _ in
+		.onReceive(Biz.business.databaseManager.contactsListPublisher()) { _ in
 			contactsChanged()
 		}
 		.task {
@@ -1247,7 +1247,7 @@ struct SummaryView: View {
 			return
 		}
 		
-		let count: Int = Biz.business.contactsManager.contactsListCurrentValue().count
+		let count: Int = Biz.business.databaseManager.contactsDbValue()?.contactsListCount() ?? 0
 		if count == 0 {
 			// User doesn't have any contacts.
 			// No choice but to create a new contact.

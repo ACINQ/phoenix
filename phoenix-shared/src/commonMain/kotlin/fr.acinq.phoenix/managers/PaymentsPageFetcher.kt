@@ -27,8 +27,7 @@ data class PaymentsPage(
 
 class PaymentsPageFetcher(
     loggerFactory: LoggerFactory,
-    private val databaseManager: DatabaseManager,
-    private val contactsManager: ContactsManager
+    private val databaseManager: DatabaseManager
 ): CoroutineScope by MainScope() {
 
     private val log = loggerFactory.newLogger(this::class)

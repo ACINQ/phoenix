@@ -1491,7 +1491,9 @@ struct ManageContact: View {
 					addresses: addresses.map { $0.raw }
 				)
 				
-				try await Biz.business.contactsManager.saveContact(contact: updatedContact)
+				let contactsDb = try await Biz.business.databaseManager.contactsDb()
+				
+				try await contactsDb.saveContact(contact: updatedContact)
 				
 				if let oldPhotoName, oldPhotoName != newPhotoName {
 					log.debug("Deleting old photo from disk...")
@@ -1501,7 +1503,7 @@ struct ManageContact: View {
 				close()
 				contactUpdated(updatedContact)
 			} catch {
-				log.error("contactsManager.saveContact(): error: \(error)")
+				log.error("contactsDb.saveContact(): error: \(error)")
 			}
 			
 			isSaving = false
@@ -1518,12 +1520,12 @@ struct ManageContact: View {
 		isSaving = true
 		Task { @MainActor in
 			
-			let contactsManager = Biz.business.contactsManager
 			do {
-				try await contactsManager.deleteContact(contactId: cid)
+				let contactsDb = try await Biz.business.databaseManager.contactsDb()
+				try await contactsDb.deleteContact(contactId: cid)
 				
 			} catch {
-				log.error("contactsManager: error: \(error)")
+				log.error("contactsDb.deleteContact(): error: \(error)")
 			}
 			
 			isSaving = false
@@ -1592,6 +1594,10 @@ struct ManageContact: View {
 			log.info("processEditedOffer(): ignoring: editOffer_index is nil")
 			return true
 		}
+		guard let contactsDb = Biz.business.databaseManager.contactsDbValue() else {
+			log.info("processEditedOffer(): ignoring: contactsDb is nil")
+			return true
+		}
 		
 		let label = editOffer_label.trimmingCharacters(in: .whitespacesAndNewlines)
 		let text = editOffer_text.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -1638,7 +1644,7 @@ struct ManageContact: View {
 		// Check for duplicates in the database
 		
 		var databaseDuplicate: ContactInfo? = nil
-		if let matchingContact = Biz.business.contactsManager.contactForOfferId(offerId: row.raw.id) {
+		if let matchingContact = contactsDb.contactForOfferId(offerId: row.raw.id) {
 			if let currentContact = contact {
 				if currentContact.id != matchingContact.id {
 					databaseDuplicate = matchingContact
@@ -1735,6 +1741,10 @@ struct ManageContact: View {
 			log.info("processEditedAddress(): ignoring: editAddress_index is nil")
 			return true
 		}
+		guard let contactsDb = Biz.business.databaseManager.contactsDbValue() else {
+			log.info("processEditedAddress(): ignoring: contactsDb is nil")
+			return true
+		}
 		
 		let label = editAddress_label.trimmingCharacters(in: .whitespacesAndNewlines)
 		let text = editAddress_text.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -1772,7 +1782,7 @@ struct ManageContact: View {
 		// Check for duplicates in the database
 		
 		var databaseDuplicate: ContactInfo? = nil
-		if let matchingContact = Biz.business.contactsManager.contactForLightningAddress(address: row.raw.address) {
+		if let matchingContact = contactsDb.contactForLightningAddress(address: row.raw.address) {
 			if let currentContact = contact {
 				if currentContact.id != matchingContact.id {
 					databaseDuplicate = matchingContact

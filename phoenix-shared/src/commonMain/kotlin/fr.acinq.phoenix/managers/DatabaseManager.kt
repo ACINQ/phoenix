@@ -9,6 +9,7 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.db.SqliteAppDb
 import fr.acinq.phoenix.db.SqliteChannelsDb
 import fr.acinq.phoenix.db.SqlitePaymentsDb
+import fr.acinq.phoenix.db.contacts.SqliteContactsDb
 import fr.acinq.phoenix.db.createChannelsDbDriver
 import fr.acinq.phoenix.db.createPaymentsDbDriver
 import fr.acinq.phoenix.db.createSqliteChannelsDb
@@ -32,7 +33,6 @@ class DatabaseManager(
     private val chain: Chain,
     private val appDb: SqliteAppDb,
     private val nodeParamsManager: NodeParamsManager,
-    private val contactsManager: ContactsManager,
     private val currencyManager: CurrencyManager
 ) : CoroutineScope by MainScope() {
 
@@ -42,7 +42,6 @@ class DatabaseManager(
         appDb = business.appDb,
         chain = business.chain,
         nodeParamsManager = business.nodeParamsManager,
-        contactsManager = business.contactsManager,
         currencyManager = business.currencyManager
     )
 
@@ -63,7 +62,7 @@ class DatabaseManager(
                 val channelsDbDriver = createChannelsDbDriver(ctx, chain, nodeIdHash)
                 val channelsDb = createSqliteChannelsDb(channelsDbDriver)
                 val paymentsDbDriver = createPaymentsDbDriver(ctx, chain, nodeIdHash)
-                val paymentsDb = createSqlitePaymentsDb(paymentsDbDriver, metadataQueue, contactsManager, loggerFactory)
+                val paymentsDb = createSqlitePaymentsDb(paymentsDbDriver, metadataQueue, loggerFactory)
                 val cloudKitDb = makeCloudKitDb(appDb, paymentsDb)
                 log.debug { "databases object created" }
                 _databases.value = PhoenixDatabases(
@@ -72,6 +71,9 @@ class DatabaseManager(
                     cloudKit = cloudKitDb,
                 )
             }
+        }
+        launch {
+            paymentsDb().contacts.migrateContactsIfNeeded(appDb)
         }
     }
 
@@ -86,6 +88,10 @@ class DatabaseManager(
     suspend fun paymentsDb(): SqlitePaymentsDb {
         val db = databases.filterNotNull().first()
         return db.payments
+    }
+
+    suspend fun contactsDb(): SqliteContactsDb {
+        return paymentsDb().contacts
     }
 
     suspend fun cloudKitDb(): CloudKitInterface? {

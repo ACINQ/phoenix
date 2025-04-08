@@ -1089,11 +1089,13 @@ struct ValidateView: View {
 			}
 		}
 		
-		if let address = lightningAddress() {
-			contact = Biz.business.contactsManager.contactForLightningAddress(address: address)
-		}
-		if contact == nil, let offer = bolt12Offer() {
-			contact = Biz.business.contactsManager.contactForOffer(offer: offer)
+		if let contactsDb = Biz.business.databaseManager.contactsDbValue() {
+			if let address = lightningAddress() {
+				contact = contactsDb.contactForLightningAddress(address: address)
+			}
+			if contact == nil, let offer = bolt12Offer() {
+				contact = contactsDb.contactForOffer(offer: offer)
+			}
 		}
 	}
 	
@@ -1637,7 +1639,7 @@ struct ValidateView: View {
 		
 		let info = AddToContactsInfo(offer: offer, address: address)
 		
-		let count: Int = Biz.business.contactsManager.contactsListCurrentValue().count
+		let count: Int = Biz.business.databaseManager.contactsDbValue()?.contactsListCount() ?? 0
 		if count == 0 {
 			// User doesn't have any contacts.
 			// No choice but to create a new contact.

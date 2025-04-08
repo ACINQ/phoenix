@@ -200,28 +200,6 @@ extension ConnectionsManager {
 	}
 }
 
-extension ContactsManager {
-	
-	fileprivate struct _Key {
-		static var contactsListPublisher = 0
-	}
-	
-	func contactsListPublisher() -> AnyPublisher<[ContactInfo], Never> {
-		
-		self.getSetAssociatedObject(storageKey: &_Key.contactsListPublisher) {
-			
-			// Transforming from Kotlin:
-			// `contactsList: StateFlow<List<ContactInfo>>`
-			//
-			KotlinCurrentValueSubject<NSArray>(
-				self.contactsList
-			)
-			.compactMap { $0 as? [ContactInfo] }
-			.eraseToAnyPublisher()
-		}
-	}
-}
-
 // MARK: -
 extension CurrencyManager {
 	
@@ -261,6 +239,36 @@ extension CurrencyManager {
 			}
 			.eraseToAnyPublisher()
 		}
+	}
+}
+
+extension DatabaseManager {
+	
+	fileprivate struct _Key {
+		static var databasesPublisher = 0
+		static var contactsListPublisher = 0
+	}
+	
+	func databasesPublisher() -> AnyPublisher<PhoenixDatabases, Never> {
+		
+		self.getSetAssociatedObject(storageKey: &_Key.databasesPublisher) {
+			
+			// Transforming from Kotlin:
+			// `databases: StateFlow<PhoenixDatabases?>`
+			//
+			KotlinCurrentValueSubject<PhoenixDatabases>(
+				self.databases
+			)
+			.compactMap { $0 }
+			.eraseToAnyPublisher()
+		}
+	}
+	
+	func contactsListPublisher() -> AnyPublisher<[ContactInfo], Never> {
+		
+		return databasesPublisher()
+			.flatMap { $0.payments.contacts.contactsListPublisher() }
+			.eraseToAnyPublisher()
 	}
 }
 
@@ -421,6 +429,29 @@ extension PaymentsPageFetcher {
 				self.paymentsPage
 			)
 			.compactMap { $0 }
+			.eraseToAnyPublisher()
+		}
+	}
+}
+
+// MARK: -
+extension SqliteContactsDb {
+	
+	fileprivate struct _Key {
+		static var contactsListPublisher = 0
+	}
+	
+	func contactsListPublisher() -> AnyPublisher<[ContactInfo], Never> {
+		
+		self.getSetAssociatedObject(storageKey: &_Key.contactsListPublisher) {
+			
+			// Transforming from Kotlin:
+			// `contactsList: StateFlow<List<ContactInfo>>`
+			//
+			KotlinCurrentValueSubject<NSArray>(
+				self.contactsList
+			)
+			.compactMap { $0 as? [ContactInfo] }
 			.eraseToAnyPublisher()
 		}
 	}
