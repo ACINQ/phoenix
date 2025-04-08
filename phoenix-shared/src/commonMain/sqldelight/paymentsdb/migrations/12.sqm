@@ -2,6 +2,11 @@
 --
 -- Changes:
 -- * Added a new column [lightning_address] in table [payments_metadata]
+-- * Migration of contacts from appDb to paymentsDb:
+--   * Added new table: contacts
+--   * Added new table: cloudkit_contacts_metadata
+--   * Added new table: cloudkit_contacts_queue
+--   * Added new index: record_creation_idx
 
 import fr.acinq.lightning.utils.UUID;
 import fr.acinq.phoenix.data.ContactInfo;
