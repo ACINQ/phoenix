@@ -26,6 +26,93 @@ fun AfterVersion7(
     loggerFactory: LoggerFactory
 ): AfterVersion7Result {
 
+    data class MetadataRow(
+        val id: String,
+        val recordCreation: Long,
+        val recordBlob: ByteArray
+    )
+
+    fun fetchMetadataBatch(): List<MetadataRow> {
+
+        return appDbDriver.executeQuery(
+            identifier = null,
+            sql = "SELECT * FROM cloudkit_contacts_metadata_old LIMIT 10;",
+            mapper = { cursor ->
+                val result = buildList {
+                    while (cursor.next().value) {
+                        val o = MetadataRow(
+                            id = cursor.getString(0)!!,
+                            recordCreation = cursor.getLong(1)!!,
+                            recordBlob = cursor.getBytes(2)!!
+                        )
+                        add(o)
+                    }
+                }
+                QueryResult.Value(result)
+            },
+            parameters = 0
+        ).value
+    }
+
+    fun insertMetadataBatch(list: List<MetadataRow>) {
+
+        val driver: SqlDriver = paymentsDbDriver // avoid typos; always refer to correct driver
+        val transacter = object : TransacterImpl(driver) {}
+        transacter.transaction {
+
+            list.forEach { metadata ->
+                val exists = driver.executeQuery(
+                    identifier = null,
+                    sql = "SELECT COUNT(*) FROM cloudkit_contacts_metadata WHERE id = ?;",
+                    mapper = { cursor ->
+                        val count: Long = if (cursor.next().value) {
+                            cursor.getLong(0) ?: 0
+                        } else {
+                            0
+                        }
+                        QueryResult.Value(count)
+                    },
+                    parameters = 1,
+                    binders = {
+                        bindString(0, metadata.id)
+                    }
+                ).value > 0
+                if (!exists) {
+                    driver.execute(
+                        identifier = null,
+                        sql = "INSERT INTO cloudkit_contacts_metadata(id, record_creation, record_blob)\n" +
+                                " VALUES (?, ?, ?);",
+                        parameters = 4,
+                        binders = {
+                            bindString(0, metadata.id)
+                            bindLong(1, metadata.recordCreation)
+                            bindBytes(2, metadata.recordBlob)
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+    fun deleteMetadataBatch(list: List<MetadataRow>) {
+
+        val driver: SqlDriver = appDbDriver // avoid typos; always refer to correct driver
+        val transacter = object : TransacterImpl(driver) {}
+        transacter.transaction {
+
+            list.forEach { metadata ->
+                driver.execute(
+                    identifier = null,
+                    sql = "DELETE FROM cloudkit_contacts_metadata_old WHERE id = ?;",
+                    parameters = 1,
+                    binders = {
+                        bindString(0, metadata.id)
+                    }
+                )
+            }
+        }
+    }
+
     @Suppress("UNUSED_PARAMETER")
     fun mapContact(
         id: String,
@@ -64,7 +151,7 @@ fun AfterVersion7(
         }
     }
 
-    fun fetchBatch(): List<ContactInfo> {
+    fun fetchContactsBatch(): List<ContactInfo> {
 
         val driver: SqlDriver = appDbDriver // avoid typos; always refer to correct driver
         val transacter = object : TransacterImpl(driver) {}
@@ -122,11 +209,11 @@ fun AfterVersion7(
         }
     }
 
-    fun insertBatch(contacts: List<ContactInfo>) {
+    fun insertContactsBatch(contacts: List<ContactInfo>) {
 
         val driver: SqlDriver = paymentsDbDriver // avoid typos; always refer to correct driver
         val transacter = object : TransacterImpl(driver) {}
-        return transacter.transaction {
+        transacter.transaction {
 
             contacts.forEach { contact ->
                 val exists = driver.executeQuery(
@@ -163,11 +250,11 @@ fun AfterVersion7(
         }
     }
 
-    fun deleteBatch(contacts: List<ContactInfo>) {
+    fun deleteContactsBatch(contacts: List<ContactInfo>) {
 
         val driver: SqlDriver = appDbDriver // avoid typos; always refer to correct driver
         val transacter = object : TransacterImpl(driver) {}
-        return transacter.transaction {
+        transacter.transaction {
 
             contacts.forEach { contact ->
                 driver.execute(
@@ -203,6 +290,11 @@ fun AfterVersion7(
 
             driver.execute(
                 identifier = null,
+                sql = "DROP TABLE IF EXISTS cloudkit_contacts_metadata_old;",
+                parameters = 0
+            )
+            driver.execute(
+                identifier = null,
                 sql = "DROP TABLE IF EXISTS contact_offers_old;",
                 parameters = 0
             )
@@ -223,18 +315,33 @@ fun AfterVersion7(
     }
 
     while (true) {
-        log.debug { "Fetching batch..." }
-        val batch = fetchBatch()
+        log.debug { "Fetching metadata batch..." }
+        val metadataBatch = fetchMetadataBatch()
 
-        if (batch.isEmpty()) {
+        if (metadataBatch.isEmpty()) {
             break
         }
 
-        log.debug { "Migrating batch of ${batch.size}..." }
-        insertBatch(batch)
+        log.debug { "Migrating metadata batch of ${metadataBatch.size}..." }
+        insertMetadataBatch(metadataBatch)
 
-        log.debug { "Deleting batch of ${batch.size}..." }
-        deleteBatch(batch)
+        log.debug { "Deleting metadata batch of ${metadataBatch.size}..." }
+        deleteMetadataBatch(metadataBatch)
+    }
+
+    while (true) {
+        log.debug { "Fetching contacts batch..." }
+        val contactsBatch = fetchContactsBatch()
+
+        if (contactsBatch.isEmpty()) {
+            break
+        }
+
+        log.debug { "Migrating contacts batch of ${contactsBatch.size}..." }
+        insertContactsBatch(contactsBatch)
+
+        log.debug { "Deleting contacts batch of ${contactsBatch.size}..." }
+        deleteContactsBatch(contactsBatch)
     }
 
     log.debug { "Dropping tables..." }

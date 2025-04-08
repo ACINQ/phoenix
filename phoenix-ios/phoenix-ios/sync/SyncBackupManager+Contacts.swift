@@ -474,6 +474,8 @@ extension SyncBackupManager {
 						throw CKError(.operationCancelled)
 					}
 					
+					log.trace("Fetching out-of-date CKRecords (\(recordIDsToFetch.count))...")
+					
 					let results: [CKRecord.ID : Result<CKRecord, Error>] = try await database.records(
 						for: recordIDsToFetch,
 						desiredKeys: [] // fetch only basic CKRecord metadata
