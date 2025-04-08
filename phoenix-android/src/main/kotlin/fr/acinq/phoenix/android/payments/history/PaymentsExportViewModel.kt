@@ -28,14 +28,20 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.BuildConfig
+import fr.acinq.phoenix.android.security.EncryptedData
 import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
 import fr.acinq.phoenix.csv.WalletPaymentCsvWriter
 import fr.acinq.phoenix.managers.DatabaseManager
+import fr.acinq.phoenix.managers.WalletManager
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileWriter
 
 sealed class CsvExportState {
@@ -46,8 +52,20 @@ sealed class CsvExportState {
     data class Failed(val error: Throwable) : CsvExportState()
 }
 
-class CsvExportViewModel(
+sealed class DatabaseExportState {
+    data object Init : DatabaseExportState()
+    data object Exporting : DatabaseExportState()
+    data class Success(val uri: Uri) : DatabaseExportState()
+    sealed class Failed : DatabaseExportState() {
+        data class Generic(val cause: Throwable) : Failed()
+        data object CannotWriteToUri : Failed()
+        data object EncryptionError : Failed()
+    }
+}
+
+class PaymentsExportViewModel(
     private val dbManager: DatabaseManager,
+    private val walletManager: WalletManager,
 ) : ViewModel() {
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -60,7 +78,10 @@ class CsvExportViewModel(
     var includesDescription by mutableStateOf(true)
     var includesNotes by mutableStateOf(true)
     var includesOriginDestination by mutableStateOf(true)
-    var state by mutableStateOf<CsvExportState>(CsvExportState.Init)
+
+    var csvExportState by mutableStateOf<CsvExportState>(CsvExportState.Init)
+        private set
+    var databaseExportState by mutableStateOf<DatabaseExportState>(DatabaseExportState.Init)
         private set
 
     private val authority = "${BuildConfig.APPLICATION_ID}.provider"
@@ -70,17 +91,17 @@ class CsvExportViewModel(
     }
 
     fun reset() {
-        state = CsvExportState.Init
+        csvExportState = CsvExportState.Init
     }
 
     fun generateCSV(context: Context) {
         viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
             log.error("failed to generate CSV: ", e)
-            state = CsvExportState.Failed(e)
+            csvExportState = CsvExportState.Failed(e)
         }) {
-            if (state is CsvExportState.Generating) return@launch
+            if (csvExportState is CsvExportState.Generating) return@launch
             if (startTimestampMillis == null) throw IllegalArgumentException("start timestamp is undefined")
-            state = CsvExportState.Generating
+            csvExportState = CsvExportState.Generating
             val csvConfig = WalletPaymentCsvWriter.Configuration(
                 includesFiat = includesFiat,
                 includesDescription = includesDescription,
@@ -118,14 +139,63 @@ class CsvExportViewModel(
             writer.close()
             val uri = FileProvider.getUriForFile(context, authority, file)
             log.info("processed payments CSV export")
-            state = CsvExportState.Success(uri, content)
+            csvExportState = CsvExportState.Success(uri, content)
+        }
+    }
+
+    fun vacuumDatabase(context: Context, uri: Uri) {
+        viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
+            log.error("failed to export payments database: ", e)
+            databaseExportState = DatabaseExportState.Failed.Generic(e)
+        }) {
+            if (databaseExportState is DatabaseExportState.Exporting) return@launch
+            databaseExportState = DatabaseExportState.Exporting
+
+            // 1 - vacuum existing database into a temporary file in the cache dir
+            val exportDir = File(context.cacheDir, "payments")
+            if (!exportDir.exists()) exportDir.mkdir()
+            val file = File.createTempFile("phoenix-payments-db-", ".sqlite", exportDir)
+            dbManager.paymentsDb().driver.execute(null, "VACUUM INTO '${file.absolutePath}'", 0)
+            delay(1_000)
+            log.info("payments-db successfully vacuumed")
+
+            // 2 - encrypt file
+            val encryptedData = try {
+                FileInputStream(file).use { fis ->
+                    val data = fis.readBytes()
+                    EncryptedData.encrypt(
+                        version = EncryptedData.Version.V1,
+                        data = data,
+                        keyManager = walletManager.keyManager.filterNotNull().first()
+                    )
+                }
+            } catch (e: Exception) {
+                log.error("failed to encrypt payments-db: ", e)
+                databaseExportState = DatabaseExportState.Failed.EncryptionError
+                return@launch
+            }
+
+            // 3 - write encrypted file to the provided URI (which does not need permission since it's user provided)
+            context.contentResolver.openOutputStream(uri, "w")?.use { os ->
+                os.write(encryptedData.write())
+            } ?: run {
+                databaseExportState = DatabaseExportState.Failed.CannotWriteToUri
+                return@launch
+            }
+
+
+            log.info("payment-db export written to disk")
+            databaseExportState = DatabaseExportState.Success(uri)
+            delay(5_000)
+            file.delete()
+            log.debug("cleaned up cache data (${file.name})")
         }
     }
 
     private fun refreshOldestCompletedTimestamp() {
         viewModelScope.launch(Dispatchers.Main + CoroutineExceptionHandler { _, e ->
             log.error("failed to get oldest completed payment timestamp: ", e)
-            state = CsvExportState.Failed(e)
+            csvExportState = CsvExportState.Failed(e)
         }) {
             dbManager.paymentsDb().getOldestCompletedDate().let {
                 oldestCompletedTimestamp = it
@@ -136,10 +206,11 @@ class CsvExportViewModel(
 
     class Factory(
         private val dbManager: DatabaseManager,
+        private val walletManager: WalletManager
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return CsvExportViewModel(dbManager) as T
+            return PaymentsExportViewModel(dbManager, walletManager) as T
         }
     }
 }

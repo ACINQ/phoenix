@@ -120,6 +120,17 @@
     <string name="restore_seed_valid_details">Ya puedes proceder a restaurar la billetera</string>
     <string name="restore_seed_invalid">Esta semilla no es válida</string>
     <string name="restore_seed_invalid_details">Comprueba que hayas ingresado las palabras correctas en el orden adecuado.</string>
+
+    <string name="restore_payments_button">Importar historial de pagos</string>
+    <string name="restore_payments_button_details">Opcional. Use este botón para restaurar un archivo de base de datos de pagos desde otro dispositivo.</string>
+    <string name="restore_payments_success">Restaurará el historial de pagos</string>
+    <string name="restore_payments_success_button">Usar otro archivo</string>
+    <string name="restore_payments_error_header">No se pueden restaurar los pagos</string>
+    <string name="restore_payments_error_button">Inténtelo de nuevo</string>
+    <string name="restore_payments_error_encryption">El archivo no se puede descifrar. Asegúrese de usar un archivo de base de datos Phoenix (no un CSV) y de que este coincida con la billetera que está restaurando.</string>
+    <string name="restore_payments_error_open">No se puede abrir este archivo. Inténtalo de nuevo.</string>
+    <string name="restore_payments_error_writing">No se pudo escribir este archivo en la carpeta de datos de la aplicación. Inténtalo de nuevo.</string>
+
     <string name="restore_import_button">Restaurar</string>
 
     <!-- upgrade required dialog -->

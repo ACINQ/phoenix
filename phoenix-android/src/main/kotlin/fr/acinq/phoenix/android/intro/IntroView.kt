@@ -31,12 +31,10 @@ import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
-import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.extensions.findActivity
 import kotlinx.coroutines.*
 
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun IntroView(
     onFinishClick: () -> Unit

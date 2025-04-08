@@ -29,7 +29,7 @@ sealed class Screen(val route: String) {
     data object Send : Screen("send")
     data object PaymentDetails : Screen("payments")
     data object PaymentsHistory : Screen("payments/all")
-    data object PaymentsCsvExport : Screen("payments/export")
+    data object PaymentsExport : Screen("payments/export")
 
     // -- settings
     data object Settings : Screen("settings")

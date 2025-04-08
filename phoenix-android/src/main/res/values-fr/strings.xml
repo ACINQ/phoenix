@@ -658,21 +658,21 @@
     <string name="payments_history_thisweek">Plus tôt dans la semaine</string>
     <string name="payments_history_lastweek">Semaine dernière</string>
     <string name="payments_export_title">Exporter les paiements</string>
-    <string name="payments_export_instructions">Exporte vos paiements réussis dans un format CSV.</string>
-    <string name="payments_export_start_label">Date de début</string>
-    <string name="payments_export_end_label">Date de fin</string>
-    <string name="payments_export_context_label">Inclure origine et destinataire</string>
-    <string name="payments_export_description_label">Inclure la description</string>
-    <string name="payments_export_generate_button">Exporter</string>
-    <string name="payments_export_no_payments">Aucun paiement réussis</string>
-    <string name="payments_export_invalid_timestamps">Veuillez choisir une date de début/fin valide</string>
-    <string name="payments_export_in_progress">Export du paiement #%1$d</string>
+    <string name="payments_export_csv_instructions">Exporte vos paiements réussis dans un format CSV.</string>
+    <string name="payments_export_csv_start_label">Date de début</string>
+    <string name="payments_export_csv_end_label">Date de fin</string>
+    <string name="payments_export_csv_context_label">Inclure origine et destinataire</string>
+    <string name="payments_export_csv_description_label">Inclure la description</string>
+    <string name="payments_export_csv_generate_button">Exporter</string>
+    <string name="payments_export_csv_no_payments">Aucun paiement réussis</string>
+    <string name="payments_export_csv_invalid_timestamps">Veuillez choisir une date de début/fin valide</string>
+    <string name="payments_export_csv_in_progress">Export du paiement #%1$d</string>
     <string name="payments_export_success">%1$d paiement(s) exportés </string>
-    <string name="payments_export_share_subject">Phoenix - paiement du %1$s au %2$s</string>
-    <string name="payments_export_share_title">Partager les paiement Phoenix…</string>
-    <string name="payments_export_share_button">Partager le fichier</string>
-    <string name="payments_export_error">Échec de l\'export.</string>
-    <string name="payments_export_no_data">Aucun paiements trouvés.</string>
+    <string name="payments_export_csv_share_subject">Phoenix - paiement du %1$s au %2$s</string>
+    <string name="payments_export_csv_share_title">Partager les paiement Phoenix…</string>
+    <string name="payments_export_csv_share_button">Partager le fichier</string>
+    <string name="payments_export_csv_error">Échec de l\'export.</string>
+    <string name="payments_export_csv_no_data">Aucun paiements trouvés.</string>
 
     <!-- components -->
 

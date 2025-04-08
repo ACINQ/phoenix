@@ -120,6 +120,17 @@
     <string name="restore_seed_valid_details">Sie können jetzt fortfahren und Ihre Wallet wiederherstellen</string>
     <string name="restore_seed_invalid">Dieser Seed ist ungültig</string>
     <string name="restore_seed_invalid_details">Stellen Sie sicher, dass Sie die richtigen Wörter in der richtigen Reihenfolge eingegeben haben.</string>
+
+    <string name="restore_payments_button">Zahlungsverlauf importieren</string>
+    <string name="restore_payments_button_details">Optional. Mit dieser Schaltfläche können Sie eine Zahlungsdatenbankdatei von einem anderen Gerät wiederherstellen.</string>
+    <string name="restore_payments_success">Zahlungsverlauf wiederherstellen</string>
+    <string name="restore_payments_success_button">Andere Datei verwenden</string>
+    <string name="restore_payments_error_header">Zahlungen können nicht wiederhergestellt werden</string>
+    <string name="restore_payments_error_button">Erneut versuchen</string>
+    <string name="restore_payments_error_encryption">Die Datei kann nicht entschlüsselt werden. Stellen Sie sicher, dass Sie eine Phoenix-Datenbankdatei (keine CSV-Datei) verwenden und dass diese Datei mit dem wiederherzustellenden Wallet übereinstimmt.</string>
+    <string name="restore_payments_error_open">Diese Datei kann nicht geöffnet werden. Versuchen Sie es erneut.</string>
+    <string name="restore_payments_error_writing">Diese Datei konnte nicht in den Datenordner der Anwendung geschrieben werden. Versuchen Sie es erneut.</string>
+
     <string name="restore_import_button">Wiederherstellen</string>
 
     <!-- upgrade required dialog -->

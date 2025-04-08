@@ -20,8 +20,6 @@ import co.touchlab.sqliter.DatabaseConfiguration
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.native.NativeSqliteDriver
 import app.cash.sqldelight.driver.native.wrapConnection
-import fr.acinq.bitcoin.Chain
-import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.phoenix.db.migrations.v10.AfterVersion10
 import fr.acinq.phoenix.db.migrations.v11.AfterVersion11
 import fr.acinq.phoenix.db.sqldelight.AppDatabase
@@ -29,22 +27,19 @@ import fr.acinq.phoenix.db.sqldelight.ChannelsDatabase
 import fr.acinq.phoenix.db.sqldelight.PaymentsDatabase
 import fr.acinq.phoenix.utils.PlatformContext
 import fr.acinq.phoenix.utils.getDatabaseFilesDirectoryPath
-import fr.acinq.phoenix.utils.extensions.phoenixName
 
 actual fun createChannelsDbDriver(
     ctx: PlatformContext,
-    chain: Chain,
-    nodeIdHash: String
+    fileName: String
 ): SqlDriver {
     val schema = ChannelsDatabase.Schema
-    val name = "channels-${chain.phoenixName}-$nodeIdHash.sqlite"
 
     // The foreign_keys constraint needs to be set via the DatabaseConfiguration:
     // https://github.com/cashapp/sqldelight/issues/1356
 
     val dbDir = getDatabaseFilesDirectoryPath(ctx)
     val configuration = DatabaseConfiguration(
-        name = name,
+        name = fileName,
         version = schema.version.toInt(),
         extendedConfig = DatabaseConfiguration.Extended(
             basePath = dbDir,
@@ -62,16 +57,14 @@ actual fun createChannelsDbDriver(
 
 actual fun createPaymentsDbDriver(
     ctx: PlatformContext,
-    chain: Chain,
-    nodeIdHash: String,
-    onError: (String) -> Unit,
+    fileName: String,
+    onError: (String) -> Unit
 ): SqlDriver {
     val schema = PaymentsDatabase.Schema
-    val name = "payments-${chain.phoenixName}-$nodeIdHash.sqlite"
 
     val dbDir = getDatabaseFilesDirectoryPath(ctx)
     val configuration = DatabaseConfiguration(
-        name = name,
+        name = fileName,
         version = schema.version.toInt(),
         extendedConfig = DatabaseConfiguration.Extended(
             basePath = dbDir,
