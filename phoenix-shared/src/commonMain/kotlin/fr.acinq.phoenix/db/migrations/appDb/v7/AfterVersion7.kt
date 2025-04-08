@@ -15,11 +15,16 @@ import fr.acinq.phoenix.data.ContactOffer
 import fr.acinq.phoenix.db.serialization.contacts.Serialization
 import fr.acinq.phoenix.utils.extensions.toByteArray
 
+enum class AfterVersion7Result {
+    MigrationWasAlreadyCompleted,
+    MigrationNowCompleted
+}
+
 fun AfterVersion7(
     appDbDriver: SqlDriver,
     paymentsDbDriver: SqlDriver,
     loggerFactory: LoggerFactory
-) {
+): AfterVersion7Result {
 
     @Suppress("UNUSED_PARAMETER")
     fun mapContact(
@@ -214,7 +219,7 @@ fun AfterVersion7(
     log.debug { "Checking tables..." }
     if (!existsTables()) {
         log.debug { "Tables already dropped. Migration must have previously completed." }
-        return
+        return AfterVersion7Result.MigrationWasAlreadyCompleted
     }
 
     while (true) {
@@ -235,4 +240,6 @@ fun AfterVersion7(
     log.debug { "Dropping tables..." }
     dropTables()
     log.debug { "Done" }
+
+    return AfterVersion7Result.MigrationNowCompleted
 }

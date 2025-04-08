@@ -16,6 +16,7 @@ import fr.acinq.phoenix.data.ContactAddress
 import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.db.SqliteAppDb
+import fr.acinq.phoenix.db.migrations.appDb.v7.AfterVersion7Result
 import fr.acinq.phoenix.db.sqldelight.PaymentsDatabase
 import fr.acinq.phoenix.utils.extensions.incomingOfferMetadata
 import fr.acinq.phoenix.utils.extensions.outgoingInvoiceRequest
@@ -173,50 +174,18 @@ class SqliteContactsDb(
      * Run this to migrate the contacts from the appDb to the paymentsDb.
      * This function can be run everytime the app is launched.
      */
-    internal suspend fun migrateContactsIfNeeded(appDb: SqliteAppDb) {
+    internal suspend fun migrateContactsIfNeeded(appDb: SqliteAppDb) = withContext(Dispatchers.Default) {
 
-        val KEY_MIGRATION_DONE = "contacts_migration"
-
-        log.debug { "Checking KEY_MIGRATION_DONE ..." }
-        val migrationDone = appDb.getValue(KEY_MIGRATION_DONE) { Boolean.fromByteArray(it) }?.first ?: false
-        if (migrationDone) {
-            log.debug { "Migration already complete" }
-            return
-        }
-
-        log.debug { "Starting migration..." }
-
-        withContext(Dispatchers.Default) {
-            fr.acinq.phoenix.db.migrations.appDb.v7.AfterVersion7(
-                appDbDriver = appDb.driver,
-                paymentsDbDriver = driver,
-                loggerFactory = loggerFactory
-            )
-        }
-
-        log.debug { "Migration now complete" }
-        appDb.setValue(true.toByteArray(), KEY_MIGRATION_DONE)
-
-        // We updated the database directly, which skips the SqlDelight hooks.
-        // Which means things like `monitorContactsFlow()` won't get triggered.
-        // So we need to manually update the contactsList.
-        launch {
-            _contactsList.value = withContext(Dispatchers.Default) {
-                contactQueries.listContacts()
-            }
+        val result = fr.acinq.phoenix.db.migrations.appDb.v7.AfterVersion7(
+            appDbDriver = appDb.driver,
+            paymentsDbDriver = driver,
+            loggerFactory = loggerFactory
+        )
+        if (result == AfterVersion7Result.MigrationNowCompleted) {
+            // We updated the database directly, which skips the SqlDelight hooks.
+            // Which means things like `monitorContactsFlow()` won't get triggered.
+            // So we need to manually update the contactsList.
+            _contactsList.value = contactQueries.listContacts()
         }
     }
-}
-
-fun Boolean.toByteArray(): ByteArray {
-    val out = ByteArrayOutput()
-    out.writeBoolean(this)
-    return out.toByteArray()
-}
-
-fun Boolean.Companion.fromByteArray(bin: ByteArray): Boolean? {
-    val input = ByteArrayInput(bin)
-    return try {
-        input.readBoolean()
-    } catch (e: Exception) { null }
 }
