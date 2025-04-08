@@ -1,6 +1,7 @@
 package fr.acinq.phoenix.db.contacts
 
 import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.coroutines.mapToList
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.data.ContactInfo
@@ -69,18 +70,12 @@ class ContactQueries(val database: PaymentsDatabase) {
 
     fun listContacts(): List<ContactInfo> {
         return database.transactionWithResult {
-            queries.listContacts().executeAsList().map { contactRow ->
-                contactRow.data_
-            }
+            queries.listContacts().executeAsList()
         }
     }
 
     fun monitorContactsFlow(context: CoroutineContext): Flow<List<ContactInfo>> {
-        return queries.listContacts().asFlow().map {
-            withContext(context) {
-                listContacts()
-            }
-        }
+        return queries.listContacts().asFlow().mapToList(context)
     }
 
     fun deleteContact(contactId: UUID) {

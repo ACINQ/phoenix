@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS contacts (
 );
 
 listContacts:
-SELECT *
+SELECT data
 FROM contacts;
 
 getContact:
