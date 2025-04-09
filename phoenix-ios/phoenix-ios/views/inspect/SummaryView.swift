@@ -16,14 +16,14 @@ struct SummaryView: View {
 		case DetailsView
 		case EditInfoView
 		case CpfpView(onChainPayment: Lightning_kmpOnChainOutgoingPayment)
-		case ContactView(contact: ContactInfo)
+		case ContactView(contact: ContactInfo?, info: AddToContactsInfo?)
 		
 		var description: String {
 			switch self {
-			case .DetailsView    : return "DetailsView"
-			case .EditInfoView   : return "EditInfoView"
-			case .CpfpView(_)    : return "CpfpView"
-			case .ContactView(_) : return "ContactView"
+			case .DetailsView       : return "DetailsView"
+			case .EditInfoView      : return "EditInfoView"
+			case .CpfpView(_)       : return "CpfpView"
+			case .ContactView(_, _) : return "ContactView"
 			}
 		}
 	}
@@ -151,6 +151,9 @@ struct SummaryView: View {
 		}
 		.onChange(of: paymentInfo) { _ in
 			paymentInfoChanged()
+		}
+		.onReceive(Biz.business.databaseManager.contactsListPublisher()) { _ in
+			contactsChanged()
 		}
 		.task {
 			await monitorBlockchain()
@@ -506,6 +509,7 @@ struct SummaryView: View {
 			paymentInfo: $paymentInfo,
 			causedBy: $causedBy,
 			showOriginalFiatValue: $showOriginalFiatValue,
+			addToContacts: addToContacts,
 			showContactView: showContactView,
 			switchToPayment: switchToPayment
 		)
@@ -857,13 +861,13 @@ struct SummaryView: View {
 				onChainPayment: onChainPayment
 			)
 			
-		case .ContactView(let contact):
+		case .ContactView(let contact, let info):
 			ManageContact(
 				location: manageContactLocation(),
 				popTo: nil,
-				offer: nil,
+				info: info,
 				contact: contact,
-				contactUpdated: { _ in }
+				contactUpdated: contactUpdated
 			)
 		}
 	}
@@ -1099,17 +1103,11 @@ struct SummaryView: View {
 		} else {
 			log.trace("subsequent appearance")
 			
-			// We are returning from the DetailsView/EditInfoView (via the NavigationController)
+			// We are returning from a subview (e.g. DetailsView, EditInfoView) via the NavigationController
+
 			// The payment metadata may have changed (e.g. description/notes modified).
 			// So we need to refresh the payment info.
-			
-			Biz.business.paymentsManager.getPayment(id: paymentInfo.payment.id) {
-				(result: WalletPaymentInfo?, _) in
-				
-				if let result {
-					paymentInfo = result
-				}
-			}
+			forceRefreshPaymentInfo()
 			
 			if let destination = popToDestination {
 				log.debug("popToDestination: \(destination)")
@@ -1125,6 +1123,44 @@ struct SummaryView: View {
 				case .TransactionsView:
 					presentationMode.wrappedValue.dismiss()
 				}
+			}
+		}
+	}
+	
+	func contactUpdated(_ updatedContact: ContactInfo?) {
+		log.trace("contactUpdated()")
+		
+		// Nothing to do here.
+		// It's better to wait for the `contactsChanged` notification.
+		//
+		// That's because after we receive the `contactsChanged` notification,
+		// we're sure that a re-fetch of the payment will contain the correct contact info.
+		//
+		// Whereas, if we fetch right now, there's a chance we're too early,
+		// and the contact info could be out-of-date.
+	}
+	
+	func contactsChanged() {
+		log.trace("contactsChanged()")
+		
+		if didAppear {
+			forceRefreshPaymentInfo()
+		}
+	}
+	
+	func forceRefreshPaymentInfo() {
+		log.trace("forceRefreshPaymentInfo()")
+		
+		Biz.business.paymentsManager.getPayment(id: paymentInfo.payment.id) {
+			(result: WalletPaymentInfo?, _) in
+			
+			if let result {
+				if let contact = result.contact {
+					log.debug("result.contact = \(contact.name)")
+				} else {
+					log.debug("result.contact = <nil>")
+				}
+				paymentInfo = result
 			}
 		}
 	}
@@ -1198,10 +1234,72 @@ struct SummaryView: View {
 		}
 	}
 	
+	func addToContacts() {
+		log.trace("addToContacts()")
+		
+		guard paymentInfo.contact == nil else {
+			log.info("addToContacts(): ignoring: contact already exists")
+			return
+		}
+		
+		guard let info = paymentInfo.addToContactsInfo() else {
+			log.info("addToContacts(): ignoring: missing required info")
+			return
+		}
+		
+		let count: Int = Biz.business.databaseManager.contactsDbValue()?.contactsListCount() ?? 0
+		if count == 0 {
+			// User doesn't have any contacts.
+			// No choice but to create a new contact.
+			addContact_createNew(info)
+			
+		} else {
+			
+			smartModalState.display(dismissable: true) {
+				AddContactOptionsSheet(
+					createNewContact: { addContact_createNew(info) },
+					addToExistingContact: { addContact_selectExisting(info) }
+				)
+			}
+		}
+	}
+	
+	private func addContact_createNew(
+		_ info: AddToContactsInfo
+	) {
+		log.trace("addContact_createNew()")
+		
+		navigateTo(.ContactView(contact: nil, info: info))
+	}
+	
+	private func addContact_selectExisting(
+		_ info: AddToContactsInfo
+	) {
+		log.trace("addContact_selectExisting()")
+		
+		smartModalState.display(dismissable: true) {
+			ContactsListSheet(didSelectContact: { existingContact in
+				log.debug("didSelectContact")
+				smartModalState.onNextDidDisappear {
+					addContact_addToExisting(existingContact, info)
+				}
+			})
+		}
+	}
+	
+	private func addContact_addToExisting(
+		_ existingContact: ContactInfo,
+		_ info: AddToContactsInfo
+	) {
+		log.trace("addContact_addToExisting()")
+		
+		navigateTo(.ContactView(contact: existingContact, info: info))
+	}
+	
 	func showContactView(_ contact: ContactInfo) {
 		log.trace("showContactView()")
 		
-		navigateTo(.ContactView(contact: contact))
+		navigateTo(.ContactView(contact: contact, info: nil))
 	}
 	
 	func switchToPayment(_ paymentId: Lightning_kmpUUID) {

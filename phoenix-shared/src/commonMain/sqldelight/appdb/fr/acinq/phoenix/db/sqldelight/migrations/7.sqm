@@ -1,0 +1,26 @@
+-- Migration: v7 -> v8
+--
+-- Changes:
+-- * Migrating contacts to paymentsDb
+--
+
+DROP INDEX IF EXISTS contact_id_index;
+
+--- The original `contact_offers` table has a FOREIGN KEY constraint.
+--- This is going to cause a problem when we rename the contacts table.
+--- And there's no way to drop a constraint in sqlite.
+--- So we need to migrate the old table to a new one without the constraint.
+CREATE TABLE IF NOT EXISTS contact_offers_old (
+    offer_id BLOB NOT NULL PRIMARY KEY,
+    contact_id TEXT NOT NULL,
+    offer TEXT NOT NULL,
+    created_at INTEGER NOT NULL
+);
+INSERT INTO contact_offers_old SELECT * FROM contact_offers;
+DROP TABLE IF EXISTS contact_offers;
+
+ALTER TABLE contacts RENAME TO contacts_old;
+
+DROP INDEX IF EXISTS record_creation_idx;
+ALTER TABLE cloudkit_contacts_metadata RENAME TO cloudkit_contacts_metadata_old;
+DROP TABLE IF EXISTS cloudkit_contacts_queue;

@@ -147,7 +147,7 @@ fun SendView(
                     SendSpliceOutView(requestedAmount = data.uri.amount, address = data.uri.address, onBackClick = onBackClick, onSpliceOutSuccess = { navController.popToHome() })
                 }
                 is SendManager.ParseResult.Lnurl.Pay -> {
-                    LnurlPayView(payIntent = data.paymentIntent, onBackClick, onPaymentSent = { navController.popToHome() })
+                    LnurlPayView(pay = data, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() })
                 }
                 is SendManager.ParseResult.Lnurl.Withdraw -> {
                     LnurlWithdrawView(withdraw = data.lnurlWithdraw, onBackClick = onBackClick, onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) }, onWithdrawDone = { navController.popToHome() })
@@ -204,7 +204,7 @@ fun SendView(
             if (parseState is ParsePaymentState.ChooseOnchainOrOffer) {
                 ChoosePaymentModeDialog(
                     onPayOnchainClick = { vm.parsePaymentState = ParsePaymentState.Success(SendManager.ParseResult.Uri(parseState.uri)) },
-                    onPayOffchainClick = { vm.parsePaymentState = ParsePaymentState.Success(SendManager.ParseResult.Bolt12Offer(parseState.offer)) },
+                    onPayOffchainClick = { vm.parsePaymentState = ParsePaymentState.Success(SendManager.ParseResult.Bolt12Offer(offer = parseState.offer, lightningAddress = null)) },
                     onDismiss = { vm.resetParsing() }
                 )
             }
@@ -252,7 +252,7 @@ private fun PrepareSendView(
         )
 
         // contacts list
-        val contacts by business.contactsManager.contactsList.collectAsState()
+        val contacts by business.databaseManager.contactsList.collectAsState(emptyList())
         Column(modifier = Modifier
             .weight(1f)
             .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -276,7 +276,7 @@ private fun PrepareSendView(
                         items(filteredContacts) {
                             ContactRow(
                                 contactInfo = it,
-                                onClick = { it.mostRelevantOffer?.let { vm.parsePaymentData(it.encode()) } },
+                                onClick = { it.offers.firstOrNull()?.let { vm.parsePaymentData(it.offer.encode()) } },
                                 enabled = !isProcessingData
                             )
                         }

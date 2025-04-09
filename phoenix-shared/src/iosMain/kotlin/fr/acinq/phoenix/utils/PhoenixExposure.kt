@@ -12,14 +12,6 @@ import fr.acinq.phoenix.data.inFlightPaymentsCount
  * Workarounds for various shortcomings between Kotlin and iOS.
  */
 
-/**
- * `id` is a reserved variable in objective-c,
- * so we can't properly access it from within iOS.
- */
-fun ContactInfo.kotlinId(): UUID {
-    return this.id
-}
-
 //fun NodeParamsManager.Companion._liquidityLeaseRate(amount: Satoshi): LiquidityAds_LeaseRate {
 //    val result = this.liquidityLeaseRate(amount)
 //    return LiquidityAds_LeaseRate(result)

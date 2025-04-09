@@ -27,13 +27,14 @@ import fr.acinq.lightning.utils.*
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.WalletPaymentMetadata
+import fr.acinq.phoenix.db.contacts.SqliteContactsDb
 import fr.acinq.phoenix.db.payments.*
 import fr.acinq.phoenix.db.payments.PaymentsMetadataQueries
 import fr.acinq.phoenix.db.sqldelight.PaymentsDatabase
-import fr.acinq.phoenix.managers.ContactsManager
 import fr.acinq.phoenix.utils.MetadataQueue
 import kotlin.collections.List
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -42,13 +43,13 @@ class SqlitePaymentsDb(
     val driver: SqlDriver,
     val database: PaymentsDatabase,
     val metadataQueue: MetadataQueue?,
-    private val contactsManager: ContactsManager?,
     val loggerFactory: LoggerFactory
 ) : IncomingPaymentsDb by SqliteIncomingPaymentsDb(database, metadataQueue),
     OutgoingPaymentsDb by SqliteOutgoingPaymentsDb(database, metadataQueue),
     PaymentsDb {
 
     val metadataQueries = PaymentsMetadataQueries(database)
+    val contacts = SqliteContactsDb(driver, database, loggerFactory)
 
     val log = loggerFactory.newLogger(SqlitePaymentsDb::class)
 
@@ -161,33 +162,55 @@ class SqlitePaymentsDb(
      * - fetch contact details for incoming/outgoing bolt12 payments.
      */
     private fun List<WalletPaymentInfo>.postProcess(): List<WalletPaymentInfo> = this.map { paymentInfo ->
-        val payment = paymentInfo.payment
-        when {
-            payment is Bolt12IncomingPayment || (payment is LightningOutgoingPayment && payment.details is LightningOutgoingPayment.Details.Blinded) -> {
-                paymentInfo.copy(contact = contactsManager?.contactForPayment(payment))
-            }
-            else -> paymentInfo
-        }
+        // There's no need to check payment types here - all those checks are already done in ContactsManager.
+        contacts.contactForPaymentInfo(paymentInfo)?.let {
+            paymentInfo.copy(contact = it)
+        } ?: paymentInfo
     }
 
     @Suppress("UNUSED_PARAMETER")
-    private fun mapPaymentsAndMetadata(data_: ByteArray, payment_id: UUID?,
-                                       lnurl_base_type: LnurlBase.TypeVersion?, lnurl_base_blob: ByteArray?, lnurl_description: String?, lnurl_metadata_type: LnurlMetadata.TypeVersion?, lnurl_metadata_blob: ByteArray?,
-                                       lnurl_successAction_type: LnurlSuccessAction.TypeVersion?, lnurl_successAction_blob: ByteArray?,
-                                       user_description: String?, user_notes: String?, modified_at: Long?, original_fiat_type: String?, original_fiat_rate: Double?): WalletPaymentInfo {
+    private fun mapPaymentsAndMetadata(
+        data_: ByteArray,
+        payment_id: UUID?,
+        lnurl_base_type: LnurlBase.TypeVersion?,
+        lnurl_base_blob: ByteArray?,
+        lnurl_description: String?,
+        lnurl_metadata_type: LnurlMetadata.TypeVersion?,
+        lnurl_metadata_blob: ByteArray?,
+        lnurl_successAction_type: LnurlSuccessAction.TypeVersion?,
+        lnurl_successAction_blob: ByteArray?,
+        user_description: String?,
+        user_notes: String?,
+        modified_at: Long?,
+        original_fiat_type: String?,
+        original_fiat_rate: Double?,
+        lightning_address: String?
+    ): WalletPaymentInfo {
         val payment = try {
             WalletPaymentAdapter.decode(data_)
         } catch (e: Exception) {
             log.error(e) { "failed to deserialize payment: ${e.message}" }
             throw e
         }
-
+        val metadata = PaymentsMetadataQueries.mapAll(
+            id = payment.id,
+            lnurl_base_type = lnurl_base_type,
+            lnurl_base_blob = lnurl_base_blob,
+            lnurl_description = lnurl_description,
+            lnurl_metadata_type = lnurl_metadata_type,
+            lnurl_metadata_blob = lnurl_metadata_blob,
+            lnurl_successAction_type = lnurl_successAction_type,
+            lnurl_successAction_blob = lnurl_successAction_blob,
+            user_description = user_description,
+            user_notes = user_notes,
+            modified_at = modified_at,
+            original_fiat_type = original_fiat_type,
+            original_fiat_rate = original_fiat_rate,
+            lightning_address = lightning_address
+        )
         return WalletPaymentInfo(
             payment = payment,
-            metadata = PaymentsMetadataQueries.mapAll(payment.id,
-                lnurl_base_type, lnurl_base_blob, lnurl_description, lnurl_metadata_type, lnurl_metadata_blob,
-                lnurl_successAction_type, lnurl_successAction_blob,
-                user_description, user_notes, modified_at, original_fiat_type, original_fiat_rate),
+            metadata = metadata,
             contact = null
         )
     }
@@ -288,5 +311,8 @@ class SqlitePaymentsDb(
         }
     }
 
-    fun close() = driver.close()
+    fun close() {
+        contacts.cancel()
+        driver.close()
+    }
 }

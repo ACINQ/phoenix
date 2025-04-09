@@ -63,13 +63,9 @@ fun ContactsListView(
     onEditContact: (ContactInfo) -> Unit,
     isOnSurface: Boolean,
 ) {
-    val contactsState = if (canEditContact) {
-        business.contactsManager.contactsList.collectAsState(null)
-    } else {
-        business.contactsManager.contactsWithOfferList.collectAsState(null)
-    }
+    val contactsList by business.databaseManager.contactsList.collectAsState(null)
 
-    contactsState.value?.let { contacts ->
+    contactsList?.let { contacts ->
         var nameFilterInput by remember { mutableStateOf("") }
         TextInput(
             text = nameFilterInput,
@@ -118,8 +114,8 @@ private fun ContactsList(
         LazyColumn(state = listState) {
             itemsIndexed(contacts) { index, contact ->
                 val onClick = {
-                    contact.mostRelevantOffer?.let {
-                        navController.navigate("${Screen.Send.route}?input=${it.encode()}")
+                    contact.offers.firstOrNull()?.let {
+                        navController.navigate("${Screen.Send.route}?input=${it.offer.encode()}")
                     } ?: run { if (canEditContact) { onEditContact(contact) } }
                 }
                 if (isOnSurface) {

@@ -37,8 +37,10 @@ struct SendView: View {
 	@State var sortedContacts: [ContactInfo] = []
 	@State var filteredContacts: [ContactInfo]? = nil
 	
-	@State var search_offers: [String: [String]] = [:]
-	@State var search_lnid: [String: [String]] = [:]
+	@State var selectedContactId: Lightning_kmpUUID? = nil
+	
+	@State var search_offers: [Lightning_kmpUUID: [String]] = [:]
+	@State var search_addresses: [Lightning_kmpUUID: [String]] = [:]
 	@State var search_domains: [String] = []
 	
 	@State var isParsing: Bool = false
@@ -154,7 +156,7 @@ struct SendView: View {
 		.onAppear() {
 			onAppear()
 		}
-		.onReceive(Biz.business.contactsManager.contactsListPublisher()) {
+		.onReceive(Biz.business.databaseManager.contactsListPublisher()) {
 			contactsListChanged($0)
 		}
 		.onChange(of: inputFieldText) { _ in
@@ -356,10 +358,10 @@ struct SendView: View {
 		
 		Section {
 			ForEach(visibleContacts) { item in
-				Button {
-					selectContact(item)
-				} label: {
-					contactRow(item)
+				if let selectedContactId, selectedContactId == item.id {
+					contactRow_selected(item)
+				} else {
+					contactRow_unselected(item)
 				}
 			}
 			if hasZeroMatchesForSearch {
@@ -373,16 +375,142 @@ struct SendView: View {
 	}
 	
 	@ViewBuilder
-	func contactRow(_ item: ContactInfo) -> some View {
+	func contactRow_unselected(_ item: ContactInfo) -> some View {
 		
-		HStack(alignment: VerticalAlignment.center, spacing: 8) {
-			ContactPhoto(fileName: item.photoUri, size: 32)
-			Text(item.name)
-				.font(.title3)
-				.foregroundColor(.primary)
-			Spacer()
+		Button {
+			selectContact(item)
+		} label: {
+			HStack(alignment: VerticalAlignment.center, spacing: 8) {
+				ContactPhoto(fileName: item.photoUri, size: 32)
+				Text(item.name)
+					.font(.title3)
+					.foregroundColor(.primary)
+				Spacer()
+			}
+			.padding(.all, 4)
+		}
+	}
+	
+	@ViewBuilder
+	func contactRow_selected(_ item: ContactInfo) -> some View {
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 12) {
+			
+			Button {
+				unselectContact()
+			} label: {
+				HStack(alignment: VerticalAlignment.center, spacing: 8) {
+					ContactPhoto(fileName: item.photoUri, size: 32)
+					Text(item.name)
+						.font(.title3)
+						.foregroundColor(.primary)
+					Spacer()
+				}
+			}
+			
+			ForEach(item.offers) { offer in
+				contactRow_offer(offer)
+			}
+			ForEach(item.addresses) { address in
+				contactRow_address(address)
+			}
 		}
 		.padding(.all, 4)
+	}
+	
+	@ViewBuilder
+	func contactRow_offer(_ offer: ContactOffer) -> some View {
+		
+		HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+			bullet()
+			
+			Button {
+				payOffer(offer)
+			} label: {
+				
+				let label = offer.label?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+				let text = offer.offer.encode()
+				
+				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+					Group {
+						if label.isEmpty {
+							Text(text)
+								.lineLimit(1)
+								.truncationMode(.middle)
+						} else {
+							Text(label)
+								.lineLimit(1)
+								.truncationMode(.tail)
+							Text(": \(text)")
+								.lineLimit(1)
+								.truncationMode(.middle)
+								.foregroundStyle(Color.secondary)
+								.layoutPriority(-1)
+						}
+					} // </Group>
+					.font(.callout)
+					
+					Spacer()
+					
+					Image(systemName: "paperplane.fill")
+				}
+			} // </Button>
+			.buttonStyle(.borderless) // prevents trigger when row tapped
+			
+		} // </HStack>
+	}
+	
+	@ViewBuilder
+	func contactRow_address(_ address: ContactAddress) -> some View {
+		
+		HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+			bullet()
+			
+			Button {
+				payAddress(address)
+			} label: {
+				
+				let label = address.label?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+				let text = address.address.trimmingCharacters(in: .whitespacesAndNewlines)
+				
+				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+					Group {
+						if label.isEmpty {
+							Text(text)
+								.lineLimit(1)
+								.truncationMode(.middle)
+						} else {
+							Text(label)
+								.lineLimit(1)
+								.truncationMode(.tail)
+							Text(": \(text)")
+								.lineLimit(1)
+								.truncationMode(.middle)
+								.foregroundStyle(Color.secondary)
+								.layoutPriority(-1)
+						}
+					} // </Group>
+					.font(.callout)
+					
+					Spacer()
+					
+					Image(systemName: "paperplane.fill")
+				}
+			} // </Button>
+			.buttonStyle(.borderless) // prevents trigger when row tapped
+			
+		} // </HStack>
+	}
+	
+	@ViewBuilder
+	func bullet() -> some View {
+		
+		Image(systemName: "circlebadge.fill")
+			.imageScale(.small)
+			.font(.system(size: 10))
+			.foregroundStyle(.tertiary)
+			.padding(.leading, 4)
+			.padding(.trailing, 8)
 	}
 	
 	@ViewBuilder
@@ -499,6 +627,10 @@ struct SendView: View {
 			popToDestination = nil
 			presentationMode.wrappedValue.dismiss()
 		}
+		
+		if selectedContactId != nil {
+			selectedContactId = nil
+		}
 	}
 	
 	// --------------------------------------------------
@@ -508,39 +640,47 @@ struct SendView: View {
 	func contactsListChanged(_ updatedList: [ContactInfo]) {
 		log.trace("contactsListChanged()")
 		
-		sortedContacts = updatedList
+		sortedContacts = updatedList.sorted {(a, b) in
+			// return true if `a` should be ordered before `b`; otherwise return false
+			return a.name.localizedCaseInsensitiveCompare(b.name) == .orderedAscending
+		}
 		
-		var offers: [String: [String]] = [:]
-		for contact in sortedContacts {
-			let key: String = contact.id
-			let values: [String] = contact.offers.map { $0.encode().lowercased() }
+		do {
+			var offers: [Lightning_kmpUUID: [String]] = [:]
+			for contact in sortedContacts {
+				let key: Lightning_kmpUUID = contact.id
+				let values: [String] = contact.offers.map {
+					$0.offer.encode().lowercased()
+				}
+				offers[key] = values
+			}
 			
-			offers[key] = values
+			search_offers = offers
 		}
-		
-		search_offers = offers
-		
-		// Todo:
-		// - update search_lnid after we add support
-		// - update search_domains after we add support
-		//
-		// Temp: For now, search_domains will just contain the list of "well known" domains
-		
-		var domains: [String] = []
-		if BusinessManager.isTestnet {
-			domains.append("testnet.phoenixwallet.me")
+		do {
+			var addresses: [Lightning_kmpUUID: [String]] = [:]
+			for contact in sortedContacts {
+				let key: Lightning_kmpUUID = contact.id
+				let values: [String] = contact.addresses.map {
+					$0.address.trimmingCharacters(in: .whitespacesAndNewlines)
+				}
+				addresses[key] = values
+			}
+			
+			search_addresses = addresses
 		}
-		domains.append("phoenixwallet.me")
-		domains.append("bitrefill.me")
-		domains.append("strike.me")
-		domains.append("coincorner.io")
-		domains.append("sparkwallet.me")
-		domains.append("ln.tips")
-		domains.append("getalby.com")
-		domains.append("walletofsatoshi.com")
-		domains.append("stacker.news")
-		
-		search_domains = domains
+		do {
+			var domains = ContactAddress.wellKnownDomains(includeTestnet: BusinessManager.isTestnet)
+			for contact in sortedContacts {
+				contact.addresses.forEach { address in
+					if let domain = address.domain {
+						domains.insert(domain)
+					}
+				}
+			}
+			
+			search_domains = domains.sorted()
+		}
 	}
 	
 	func inputFieldTextChanged() {
@@ -570,6 +710,12 @@ struct SendView: View {
 			
 			if let offers = search_offers[contact.id] {
 				if offers.contains(searchtext) {
+					return true
+				}
+			}
+			
+			if let addresses = search_addresses[contact.id] {
+				if addresses.contains(where: { $0.contains(searchtext) }) {
 					return true
 				}
 			}
@@ -719,9 +865,39 @@ struct SendView: View {
 	func selectContact(_ contact: ContactInfo) {
 		log.trace("selectContact: \(contact.id)")
 		
-		if let offer = contact.mostRelevantOffer {
-			parseUserInput(offer.encode())
+		let count = contact.offers.count + contact.addresses.count
+		if count == 1 {
+			// When there's exactly one payment option available, we just immediately use it.
+			if let offer = contact.offers.first {
+				payOffer(offer)
+			} else if let address = contact.addresses.first {
+				payAddress(address)
+			}
+			
+		} else {
+			// Otherwise we show the list of payment options to the user
+			withAnimation {
+				selectedContactId = contact.id
+			}
 		}
+	}
+	
+	func unselectContact() {
+		log.trace("unselectContact()")
+		
+		withAnimation {
+			selectedContactId = nil
+		}
+	}
+	
+	func payOffer(_ offer: ContactOffer) {
+		log.trace("payOffer()")
+		parseUserInput(offer.offer.encode())
+	}
+	
+	func payAddress(_ address: ContactAddress) {
+		log.trace("payAddress()")
+		parseUserInput(address.address)
 	}
 	
 	func cancelParseRequest() {

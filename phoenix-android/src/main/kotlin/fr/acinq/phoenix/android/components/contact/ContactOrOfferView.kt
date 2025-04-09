@@ -24,6 +24,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,10 +54,10 @@ sealed class OfferContactState {
  */
 @Composable
 fun ContactOrOfferView(offer: OfferTypes.Offer) {
-    val contactsManager = business.contactsManager
+    val contactsDb by business.databaseManager.contactsDb.collectAsState(null)
     val contactState = remember { mutableStateOf<OfferContactState>(OfferContactState.Init) }
     LaunchedEffect(Unit) {
-        contactState.value = contactsManager.getContactForOffer(offer)?.let { OfferContactState.Found(it) } ?: OfferContactState.NotFound
+        contactState.value = contactsDb?.contactForOffer(offer)?.let { OfferContactState.Found(it) } ?: OfferContactState.NotFound
     }
 
     when (val state = contactState.value) {

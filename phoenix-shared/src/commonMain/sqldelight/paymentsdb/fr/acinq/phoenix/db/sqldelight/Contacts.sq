@@ -1,0 +1,36 @@
+import fr.acinq.lightning.utils.UUID;
+import fr.acinq.phoenix.data.ContactInfo;
+
+CREATE TABLE IF NOT EXISTS contacts (
+     id BLOB AS UUID NOT NULL PRIMARY KEY,
+     data BLOB AS ContactInfo NOT NULL,
+     created_at INTEGER NOT NULL,
+     updated_at INTEGER DEFAULT NULL
+);
+
+listContacts:
+SELECT data
+FROM contacts;
+
+getContact:
+SELECT data
+FROM contacts
+WHERE id = :contactId;
+
+scanContacts:
+SELECT id, created_at FROM contacts;
+
+existsContact:
+SELECT COUNT(*) FROM contacts
+WHERE id = ?;
+
+insertContact:
+INSERT INTO contacts(id, data, created_at, updated_at)
+VALUES (:id, :data, :createdAt, :updatedAt);
+
+updateContact:
+UPDATE contacts SET data=:data, updated_at=:updatedAt
+WHERE id=:contactId;
+
+deleteContact:
+DELETE FROM contacts WHERE id=:contactId;
