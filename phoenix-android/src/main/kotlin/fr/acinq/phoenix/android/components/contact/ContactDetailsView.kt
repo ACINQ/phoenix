@@ -35,6 +35,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -123,7 +124,7 @@ private fun ContactNameAndPhoto(
     onDismiss: () -> Unit,
     onOffersClick: () -> Unit,
 ) {
-    val contactsManager = business.contactsManager
+    val contactsManager by business.databaseManager.contactsDb.collectAsState(null)
     val scope = rememberCoroutineScope()
 
     var name by remember(contact) { mutableStateOf(contact.name) }
@@ -171,9 +172,11 @@ private fun ContactNameAndPhoto(
                         iconTint = negativeColor,
                         onClick = {
                             scope.launch {
-                                contactsManager.deleteContact(contact.id)
-                                onContactChange(null)
-                                onDismiss()
+                                contactsManager?.run {
+                                    deleteContact(contact.id)
+                                    onContactChange(null)
+                                    onDismiss()
+                                }
                             }
                         },
                         padding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
@@ -186,10 +189,12 @@ private fun ContactNameAndPhoto(
                         enabled = contact.name != name || contact.photoUri != photoUri || contact.useOfferKey != useOfferKey,
                         onClick = {
                             scope.launch {
-                                val newContact = contact.copy(name = name, photoUri = photoUri, useOfferKey = useOfferKey, offers = contact.offers)
-                                contactsManager.saveContact(newContact)
-                                onContactChange(newContact)
-                                onDismiss()
+                                contactsManager?.run {
+                                    val newContact = contact.copy(name = name, photoUri = photoUri, useOfferKey = useOfferKey, offers = contact.offers)
+                                    saveContact(newContact)
+                                    onContactChange(newContact)
+                                    onDismiss()
+                                }
                             }
                         },
                     )

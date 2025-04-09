@@ -63,9 +63,9 @@ fun ContactsListView(
     onEditContact: (ContactInfo) -> Unit,
     isOnSurface: Boolean,
 ) {
-    val contactsState = business.contactsManager.contactsList.collectAsState(null)
+    val contactsList by business.databaseManager.contactsList.collectAsState(null)
 
-    contactsState.value?.let { contacts ->
+    contactsList?.let { contacts ->
         var nameFilterInput by remember { mutableStateOf("") }
         TextInput(
             text = nameFilterInput,

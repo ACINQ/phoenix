@@ -108,30 +108,20 @@ class SqliteContactsDb(
      * There's generally no need to query the database since we have everything in memory.
      */
 
-    fun contactForId(contactId: UUID): ContactInfo? {
-        return contactsMap.value[contactId]
-    }
-
-    fun contactIdForOfferId(offerId: ByteVector32): UUID? {
-        return offerMap.value[offerId]
-    }
-
-    fun contactForOfferId(offerId: ByteVector32): ContactInfo? {
-        return contactIdForOfferId(offerId)?.let { contactId ->
+    fun contactForPaymentInfo(paymentInfo: WalletPaymentInfo): ContactInfo? {
+        return contactIdForPaymentInfo(paymentInfo)?.let { contactId ->
             contactForId(contactId)
         }
-    }
-
-    fun contactIdForOffer(offer: OfferTypes.Offer): UUID? {
-        return contactIdForOfferId(offer.offerId)
     }
 
     fun contactForOffer(offer: OfferTypes.Offer): ContactInfo? {
         return contactForOfferId(offer.offerId)
     }
 
-    fun contactIdForPayerPubKey(payerPubKey: PublicKey): UUID? {
-        return publicKeyMap.value[payerPubKey]
+    private fun contactForOfferId(offerId: ByteVector32): ContactInfo? {
+        return contactIdForOfferId(offerId)?.let { contactId ->
+            contactForId(contactId)
+        }
     }
 
     fun contactForPayerPubKey(payerPubKey: PublicKey): ContactInfo? {
@@ -140,17 +130,29 @@ class SqliteContactsDb(
         }
     }
 
-    fun contactIdForLightningAddress(address: String): UUID? {
-        return addressMap.value[ContactAddress.hash(address)]
-    }
-
     fun contactForLightningAddress(address: String): ContactInfo? {
         return contactIdForLightningAddress(address)?.let { contactId ->
             contactForId(contactId)
         }
     }
 
-    fun contactIdForPaymentInfo(paymentInfo: WalletPaymentInfo): UUID? {
+    private fun contactForId(contactId: UUID): ContactInfo? {
+        return contactsMap.value[contactId]
+    }
+
+    private fun contactIdForOfferId(offerId: ByteVector32): UUID? {
+        return offerMap.value[offerId]
+    }
+
+    private fun contactIdForPayerPubKey(payerPubKey: PublicKey): UUID? {
+        return publicKeyMap.value[payerPubKey]
+    }
+
+    private fun contactIdForLightningAddress(address: String): UUID? {
+        return addressMap.value[ContactAddress.hash(address)]
+    }
+
+    private fun contactIdForPaymentInfo(paymentInfo: WalletPaymentInfo): UUID? {
         return if (paymentInfo.payment is IncomingPayment) {
             paymentInfo.payment.incomingOfferMetadata()?.let { offerMetadata ->
                 contactIdForPayerPubKey(offerMetadata.payerKey)
@@ -161,12 +163,6 @@ class SqliteContactsDb(
             } ?: paymentInfo.payment.outgoingInvoiceRequest()?.let { invoiceRequest ->
                 contactIdForOfferId(invoiceRequest.offer.offerId)
             }
-        }
-    }
-
-    fun contactForPaymentInfo(paymentInfo: WalletPaymentInfo): ContactInfo? {
-        return contactIdForPaymentInfo(paymentInfo)?.let { contactId ->
-            contactForId(contactId)
         }
     }
 

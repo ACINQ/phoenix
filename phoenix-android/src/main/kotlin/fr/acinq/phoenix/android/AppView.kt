@@ -157,10 +157,7 @@ fun AppView(
     ) {
         // we keep a view model storing payments so that we don't have to fetch them every time
         val paymentsViewModel = viewModel<PaymentsViewModel>(
-            factory = PaymentsViewModel.Factory(
-                paymentsManager = business.paymentsManager,
-                contactsManager = business.contactsManager,
-            )
+            factory = PaymentsViewModel.Factory(business.paymentsManager,)
         )
         val noticesViewModel = viewModel<NoticesViewModel>(
             factory = NoticesViewModel.Factory(

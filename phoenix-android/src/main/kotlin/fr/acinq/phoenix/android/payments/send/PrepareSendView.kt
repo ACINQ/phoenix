@@ -252,7 +252,7 @@ private fun PrepareSendView(
         )
 
         // contacts list
-        val contacts by business.contactsManager.contactsList.collectAsState()
+        val contacts by business.databaseManager.contactsList.collectAsState(emptyList())
         Column(modifier = Modifier
             .weight(1f)
             .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {

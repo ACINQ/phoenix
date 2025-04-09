@@ -78,7 +78,7 @@ fun SendToOfferView(
     val peer by business.peerManager.peerState.collectAsState()
     val trampolineFees = peer?.walletParams?.trampolineFees?.firstOrNull()
 
-    val vm = viewModel<SendOfferViewModel>(factory = SendOfferViewModel.Factory(offer, business.peerManager, business.nodeParamsManager, business.contactsManager), key = offer.encode())
+    val vm = viewModel<SendOfferViewModel>(factory = SendOfferViewModel.Factory(offer, business.peerManager, business.nodeParamsManager, business.databaseManager), key = offer.encode())
     val requestedAmount = offer.amount
     var amount by remember { mutableStateOf(requestedAmount) }
     val amountErrorMessage: String = remember(amount) {

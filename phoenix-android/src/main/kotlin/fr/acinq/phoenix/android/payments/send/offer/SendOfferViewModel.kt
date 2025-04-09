@@ -30,11 +30,13 @@ import fr.acinq.lightning.io.PaymentNotSent
 import fr.acinq.lightning.io.PaymentSent
 import fr.acinq.lightning.payment.OutgoingPaymentFailure
 import fr.acinq.lightning.wire.OfferTypes
-import fr.acinq.phoenix.managers.ContactsManager
+import fr.acinq.phoenix.managers.DatabaseManager
 import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.managers.PeerManager
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import kotlin.time.Duration.Companion.seconds
@@ -57,7 +59,7 @@ class SendOfferViewModel(
     val offer: OfferTypes.Offer,
     val peerManager: PeerManager,
     val nodeParamsManager: NodeParamsManager,
-    val contactsManager: ContactsManager,
+    val databaseManager: DatabaseManager,
 ) : ViewModel() {
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -70,7 +72,7 @@ class SendOfferViewModel(
         viewModelScope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, e ->
             log.error("error when paying offer payment: ", e)
         }) {
-            val contact = contactsManager.contactForOffer(offer)
+            val contact = databaseManager.contactsDb.filterNotNull().first().contactForOffer(offer)
             val useRandomKey = contact == null || !contact.useOfferKey
             val payerKey = when (useRandomKey) {
                 true -> Lightning.randomKey()
@@ -99,11 +101,11 @@ class SendOfferViewModel(
         private val offer: OfferTypes.Offer,
         private val peerManager: PeerManager,
         private val nodeParamsManager: NodeParamsManager,
-        private val contactsManager: ContactsManager,
+        private val databaseManager: DatabaseManager,
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return SendOfferViewModel(offer, peerManager, nodeParamsManager, contactsManager) as T
+            return SendOfferViewModel(offer, peerManager, nodeParamsManager, databaseManager) as T
         }
     }
 }

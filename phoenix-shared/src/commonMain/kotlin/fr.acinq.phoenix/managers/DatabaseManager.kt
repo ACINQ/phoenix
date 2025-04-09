@@ -19,12 +19,15 @@ import fr.acinq.phoenix.db.payments.CloudKitInterface
 import fr.acinq.phoenix.utils.MetadataQueue
 import fr.acinq.phoenix.utils.PlatformContext
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 
 class DatabaseManager(
@@ -49,6 +52,12 @@ class DatabaseManager(
 
     private val _databases = MutableStateFlow<PhoenixDatabases?>(null)
     val databases: StateFlow<PhoenixDatabases?> = _databases.asStateFlow()
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val contactsList = _databases.filterNotNull().flatMapLatest { it.payments.contacts.contactsList }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val contactsDb = _databases.filterNotNull().mapLatest { it.payments.contacts }
 
     val metadataQueue = MetadataQueue(currencyManager)
 

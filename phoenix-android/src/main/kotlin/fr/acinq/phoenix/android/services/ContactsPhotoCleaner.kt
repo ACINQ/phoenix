@@ -46,7 +46,7 @@ class ContactsPhotoCleaner(context: Context, workerParams: WorkerParameters) : C
             val application = (applicationContext as PhoenixApplication)
             val business = application.business.value
 
-            val contacts = business?.contactsManager?.contactsList?.filterNotNull()?.first() ?: emptyList()
+            val contacts = business?.databaseManager?.contactsList?.filterNotNull()?.first() ?: emptyList()
             val contactsPhotoDir = ContactsPhotoHelper.contactsDir(applicationContext)
             val contactsPhotoNames = contactsPhotoDir.listFiles()?.map { it.name }?.toSet() ?: emptySet()
             val toDelete = contactsPhotoNames.subtract(contacts.map { it.photoUri }.toSet()).filterNotNull()

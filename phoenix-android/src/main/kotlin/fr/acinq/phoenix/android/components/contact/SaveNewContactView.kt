@@ -25,6 +25,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -74,7 +75,7 @@ fun SaveNewContactDialog(
     var photoUri by remember { mutableStateOf<String?>(null) }
     var useOfferKey by remember { mutableStateOf(true) }
 
-    val contactsManager = business.contactsManager
+    val contactsDb by business.databaseManager.contactsDb.collectAsState(null)
 
     ModalBottomSheet(
         onDismiss = onDismiss,
@@ -136,29 +137,31 @@ fun SaveNewContactDialog(
                 text = stringResource(id = R.string.contact_add_contact_button),
                 icon = R.drawable.ic_check,
                 onClick = {
-                    scope.launch {
-                        offerErrorMessage = ""
-                        when (val res = OfferTypes.Offer.decode(offer)) {
-                            is Try.Success -> {
-                                val decodedOffer = res.result
-                                val existingContact = contactsManager.contactForOffer(decodedOffer)
-                                if (existingContact != null) {
-                                    offerErrorMessage = context.getString(R.string.contact_error_offer_known, existingContact.name)
-                                } else {
-                                    val contactOffer = ContactOffer(res.result, label = null, createdAt = currentTimestampMillis())
-                                    val newContact = ContactInfo(
-                                        id = UUID.randomUUID(),
-                                        name = name,
-                                        photoUri = photoUri,
-                                        useOfferKey = useOfferKey,
-                                        offers = listOf(contactOffer),
-                                        addresses = emptyList()
-                                    )
-                                    contactsManager.saveContact(newContact)
-                                    onSaved(newContact)
+                    contactsDb?.let { db ->
+                        scope.launch {
+                            offerErrorMessage = ""
+                            when (val res = OfferTypes.Offer.decode(offer)) {
+                                is Try.Success -> {
+                                    val decodedOffer = res.result
+                                    val existingContact = db.contactForOffer(decodedOffer)
+                                    if (existingContact != null) {
+                                        offerErrorMessage = context.getString(R.string.contact_error_offer_known, existingContact.name)
+                                    } else {
+                                        val contactOffer = ContactOffer(res.result, label = null, createdAt = currentTimestampMillis())
+                                        val newContact = ContactInfo(
+                                            id = UUID.randomUUID(),
+                                            name = name,
+                                            photoUri = photoUri,
+                                            useOfferKey = useOfferKey,
+                                            offers = listOf(contactOffer),
+                                            addresses = emptyList()
+                                        )
+                                        db.saveContact(newContact)
+                                        onSaved(newContact)
+                                    }
                                 }
+                                is Try.Failure -> { offerErrorMessage = context.getString(R.string.contact_error_offer_invalid) }
                             }
-                            is Try.Failure -> { offerErrorMessage = context.getString(R.string.contact_error_offer_invalid) }
                         }
                     }
                 },

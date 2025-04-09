@@ -1644,7 +1644,7 @@ struct ManageContact: View {
 		// Check for duplicates in the database
 		
 		var databaseDuplicate: ContactInfo? = nil
-		if let matchingContact = contactsDb.contactForOfferId(offerId: row.raw.id) {
+		if let matchingContact = contactsDb.contactForOffer(offer: row.raw.offer) {
 			if let currentContact = contact {
 				if currentContact.id != matchingContact.id {
 					databaseDuplicate = matchingContact
