@@ -118,12 +118,6 @@ class SqliteContactsDb(
         return contactForOfferId(offer.offerId)
     }
 
-    private fun contactForOfferId(offerId: ByteVector32): ContactInfo? {
-        return contactIdForOfferId(offerId)?.let { contactId ->
-            contactForId(contactId)
-        }
-    }
-
     fun contactForPayerPubKey(payerPubKey: PublicKey): ContactInfo? {
         return contactIdForPayerPubKey(payerPubKey)?.let { contactId ->
             contactForId(contactId)
@@ -138,6 +132,12 @@ class SqliteContactsDb(
 
     private fun contactForId(contactId: UUID): ContactInfo? {
         return contactsMap.value[contactId]
+    }
+
+    private fun contactForOfferId(offerId: ByteVector32): ContactInfo? {
+        return contactIdForOfferId(offerId)?.let { contactId ->
+            contactForId(contactId)
+        }
     }
 
     private fun contactIdForOfferId(offerId: ByteVector32): UUID? {

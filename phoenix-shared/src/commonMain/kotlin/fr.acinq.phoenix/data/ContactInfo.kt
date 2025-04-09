@@ -25,8 +25,6 @@ import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.wire.OfferTypes
 import io.ktor.utils.io.charsets.Charsets
 import io.ktor.utils.io.core.toByteArray
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 
 data class ContactOffer(
     val id: ByteVector32,
