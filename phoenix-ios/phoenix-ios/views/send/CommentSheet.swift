@@ -17,6 +17,13 @@ struct CommentSheet: View {
 	
 	let sendButtonAction: (() -> Void)?
 	
+	enum ButtonHeight: Preference {}
+	let buttonHeightReader = GeometryPreferenceReader(
+		key: AppendValue<ButtonHeight>.self,
+		value: { [$0.size.height] }
+	)
+	@State var buttonHeight: CGFloat? = nil
+	
 	@EnvironmentObject var smartModalState: SmartModalState
 	
 	init(comment: Binding<String>, maxCommentLength: Int, sendButtonAction: (() -> Void)? = nil) {
@@ -90,14 +97,34 @@ struct CommentSheet: View {
 				
 				Spacer()
 				
-				Button {
-					clearButtonTapped()
-				} label: {
-					Text("Clear")
-				}
-				.disabled(text.count == 0)
-			}
+				HStack(alignment: VerticalAlignment.center, spacing: 10) {
+					Button {
+						clearButtonTapped()
+					} label: {
+						Text("Clear")
+					}
+					.disabled(text.count == 0)
+					.read(buttonHeightReader)
+					
+					if sendButtonAction == nil {
+						
+						if let buttonHeight {
+							Divider()
+								.frame(width: 1, height: (buttonHeight * 0.8))
+								.background(Color.borderColor)
+						}
+						
+						Button {
+							doneButtonTapped()
+						} label: {
+							Text("Done")
+						}
+						.read(buttonHeightReader)
+					}
+				} // </HStack>
+			} // </HStack>
 			.padding(.top, 4)
+			.assignMaxPreference(for: buttonHeightReader.key, to: $buttonHeight)
 			
 			if sendButtonAction != nil {
 				sendButton
@@ -162,6 +189,12 @@ struct CommentSheet: View {
 		log.trace("clearButtonTapped()")
 		
 		text = ""
+	}
+	
+	func doneButtonTapped() {
+		log.trace("doneButtonTapped()")
+		
+		smartModalState.close()
 	}
 	
 	func closeButtonTapped() {

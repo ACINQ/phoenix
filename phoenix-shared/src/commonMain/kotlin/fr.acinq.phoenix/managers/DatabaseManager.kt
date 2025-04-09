@@ -61,7 +61,7 @@ class DatabaseManager(
                 val nodeIdHash = nodeParams.nodeId.hash160().byteVector().toHex()
                 val channelsDbDriver = createChannelsDbDriver(ctx, chain, nodeIdHash)
                 val channelsDb = createSqliteChannelsDb(channelsDbDriver)
-                val paymentsDbDriver = createPaymentsDbDriver(ctx, chain, nodeIdHash)
+                val paymentsDbDriver = createPaymentsDbDriver(ctx, chain, nodeIdHash) { log.e { "payments-db migration error: $it" } }
                 val paymentsDb = createSqlitePaymentsDb(paymentsDbDriver, metadataQueue, loggerFactory)
                 val cloudKitDb = makeCloudKitDb(appDb, paymentsDb)
                 log.debug { "databases object created" }

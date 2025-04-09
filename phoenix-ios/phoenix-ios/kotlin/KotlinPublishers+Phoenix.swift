@@ -360,24 +360,8 @@ extension PhoenixShared.NotificationsManager {
 extension PaymentsManager {
 	
 	fileprivate struct _Key {
-		static var paymentsCountPublisher = 0
 		static var lastCompletedPaymentPublisher = 0
 		static var lastIncomingPaymentPublisher = 0
-	}
-	
-	func paymentsCountPublisher() -> AnyPublisher<Int64, Never> {
-		
-		self.getSetAssociatedObject(storageKey: &_Key.paymentsCountPublisher) {
-			
-			// Transforming from Kotlin:
-			// `paymentsCount: StateFlow<Long>`
-			//
-			KotlinCurrentValueSubject<KotlinLong>(
-				self.paymentsCount
-			)
-			.compactMap { $0?.int64Value }
-			.eraseToAnyPublisher()
-		}
 	}
 	
 	func lastCompletedPaymentPublisher() -> AnyPublisher<Lightning_kmpWalletPayment, Never> {

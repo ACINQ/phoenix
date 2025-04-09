@@ -776,7 +776,7 @@ struct HomeView : MVIView {
 		let balance = model.balance?.msat ?? 0
 		let incomingBalance = swapInWallet.totalBalance.sat
 		
-		if balance > 0 || incomingBalance > 0 || model.paymentsCount > 0 {
+		if balance > 0 || incomingBalance > 0 {
 			if Prefs.shared.isNewWallet {
 				Prefs.shared.isNewWallet = false
 			}

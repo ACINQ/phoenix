@@ -219,16 +219,6 @@ class SqlitePaymentsDb(
         database.paymentsQueries.getOldestCompletedAt().executeAsOneOrNull()?.completed_at
     }
 
-    fun countPaymentsAsFlow(): Flow<Long> {
-        return database.paymentsQueries.count()
-            .asFlow()
-            .map {
-                withContext(Dispatchers.Default) {
-                    database.transactionWithResult { it.executeAsOne() }
-                }
-            }
-    }
-
     suspend fun countCompletedInRange(startDate: Long, endDate: Long): Long = withContext(Dispatchers.Default) {
         database.paymentsQueries.countCompletedInRange(completed_at_from = startDate, completed_at_to = endDate).executeAsOne()
     }

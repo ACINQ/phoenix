@@ -21,6 +21,7 @@ import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.native.NativeSqliteDriver
 import app.cash.sqldelight.driver.native.wrapConnection
 import fr.acinq.bitcoin.Chain
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.phoenix.db.migrations.v10.AfterVersion10
 import fr.acinq.phoenix.db.migrations.v11.AfterVersion11
 import fr.acinq.phoenix.db.sqldelight.AppDatabase
@@ -62,7 +63,8 @@ actual fun createChannelsDbDriver(
 actual fun createPaymentsDbDriver(
     ctx: PlatformContext,
     chain: Chain,
-    nodeIdHash: String
+    nodeIdHash: String,
+    onError: (String) -> Unit,
 ): SqlDriver {
     val schema = PaymentsDatabase.Schema
     val name = "payments-${chain.phoenixName}-$nodeIdHash.sqlite"
@@ -79,7 +81,7 @@ actual fun createPaymentsDbDriver(
             wrapConnection(connection) { schema.create(it) }
         },
         upgrade = { connection, oldVersion, newVersion ->
-            wrapConnection(connection) { schema.migrate(it, oldVersion.toLong(), newVersion.toLong(), AfterVersion10, AfterVersion11) }
+            wrapConnection(connection) { schema.migrate(it, oldVersion.toLong(), newVersion.toLong(), AfterVersion10(onError), AfterVersion11(onError)) }
         }
     )
     return NativeSqliteDriver(configuration)

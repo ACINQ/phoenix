@@ -331,6 +331,7 @@
     <string name="spendchanneladdress_error_unsigned_tx">Malformed unsigned tx [%1$s]</string>
     <string name="spendchanneladdress_error_remote_funding_pubkey">Malformed remote funding pubkey [%1$s]</string>
     <string name="spendchanneladdress_error_tx">Malformed transaction [%1$s]</string>
+    <string name="spendchanneladdress_error_invalid_sig">Invalid signature</string>
 
     <!-- home: balance section & misc -->
 
@@ -761,8 +762,9 @@
 
     <!-- payments history -->
 
-    <string name="payments_history_title">Local payments (%1$d)</string>
+    <string name="payments_history_title">Local payments</string>
     <string name="payments_history_export_button">Export</string>
+    <string name="payments_history_empty">No payments yet…</string>
     <string name="payments_history_today">Today</string>
     <string name="payments_history_yesterday">Yesterday</string>
     <string name="payments_history_thisweek">Earlier this week</string>

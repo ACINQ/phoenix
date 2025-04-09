@@ -54,6 +54,7 @@ class SwapInAddressesViewModel(private val peerManager: PeerManager) : ViewModel
                         -1 // legacy address goes to the bottom
                     }
                 }
+                if (newAddresses.isEmpty()) return@collect
                 val (legacy, taprootList) = newAddresses.last() to newAddresses.dropLast(1)
                 log.info("swap-in taproot addresses update: ${taprootAddresses.size} -> ${taprootList.size}")
                 taprootAddresses.clear()

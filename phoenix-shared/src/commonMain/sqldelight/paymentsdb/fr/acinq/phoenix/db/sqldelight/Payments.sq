@@ -53,10 +53,6 @@ getOldestCompletedAt:
 SELECT min(completed_at) AS completed_at
 FROM payments;
 
-count:
-SELECT count(id)
-FROM payments;
-
 countCompletedInRange:
 SELECT   count(id)
 FROM     payments
