@@ -70,6 +70,9 @@ struct SummaryView: View {
 	)
 	@State var buttonHeight: CGFloat? = nil
 	
+	// If we don't store this as a variable, the publisher seems to fire continuously.
+	let contactsListPublisher = Biz.business.databaseManager.contactsListPublisher()
+	
 	@StateObject var blockchainMonitorState = BlockchainMonitorState()
 	
 	@Environment(\.dynamicTypeSize) var dynamicTypeSize: DynamicTypeSize
@@ -152,7 +155,7 @@ struct SummaryView: View {
 		.onChange(of: paymentInfo) { _ in
 			paymentInfoChanged()
 		}
-		.onReceive(Biz.business.databaseManager.contactsListPublisher()) { _ in
+		.onReceive(contactsListPublisher) { _ in
 			contactsChanged()
 		}
 		.task {
