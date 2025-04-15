@@ -16508,6 +16508,9 @@
         }
       }
     },
+    "Error reading tag" : {
+
+    },
     "Error: %@" : {
       "localizations" : {
         "ar" : {
@@ -26998,7 +27001,13 @@
     "nfc" : {
       "comment" : "button label - try to make it short"
     },
+    "NFC cababilities not available on this device" : {
+
+    },
     "NFC capabilities not available on this device" : {
+
+    },
+    "NFC reader is already scanning" : {
 
     },
     "No" : {
@@ -27564,6 +27573,9 @@
         }
       }
     },
+    "No URI or text detected in NFC tag" : {
+
+    },
     "No, I don't want to use an onion address" : {
       "localizations" : {
         "ar" : {
@@ -27849,6 +27861,9 @@
           }
         }
       }
+    },
+    "Nothing scanned" : {
+
     },
     "Notifications" : {
       "localizations" : {
