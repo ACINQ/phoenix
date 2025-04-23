@@ -2,6 +2,7 @@ package fr.acinq.phoenix.controllers.config
 
 import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.*
 import fr.acinq.lightning.channel.states.*
 import fr.acinq.lightning.io.WrappedChannelCommand
@@ -13,12 +14,17 @@ import fr.acinq.phoenix.controllers.config.CloseChannelsConfiguration.Model.Chan
 import fr.acinq.phoenix.utils.Parser
 import fr.acinq.phoenix.utils.extensions.localBalance
 import fr.acinq.lightning.logging.info
+import fr.acinq.phoenix.managers.AppConfigurationManager
 import fr.acinq.phoenix.managers.phoenixFinalWallet
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class AppCloseChannelsConfigurationController(
     loggerFactory: LoggerFactory,
     private val peerManager: PeerManager,
+    private val appConfigurationManager: AppConfigurationManager,
     private val chain: Chain,
     private val isForceClose: Boolean
 ) : AppController<CloseChannelsConfiguration.Model, CloseChannelsConfiguration.Intent>(
@@ -28,6 +34,7 @@ class AppCloseChannelsConfigurationController(
     constructor(business: PhoenixBusiness, isForceClose: Boolean): this(
         loggerFactory = business.loggerFactory,
         peerManager = business.peerManager,
+        appConfigurationManager = business.appConfigurationManager,
         chain = business.chain,
         isForceClose = isForceClose
     )
@@ -113,8 +120,10 @@ class AppCloseChannelsConfigurationController(
             }
         } else null
 
+
         launch {
             val peer = peerManager.getPeer()
+            val mempoolFeerate =  appConfigurationManager.mempoolFeerate.filterNotNull().first()
             val filteredChannels = peer.channels.filter {
                 isClosable(it.value)
             }
@@ -124,7 +133,7 @@ class AppCloseChannelsConfigurationController(
             filteredChannels.keys.forEach { channelId ->
                 val command: ChannelCommand = if (scriptPubKey != null) {
                     logger.info { "(mutual) closing channel=${channelId.toHex()}" }
-                    ChannelCommand.Close.MutualClose(scriptPubKey = scriptPubKey, feerates = null)
+                    ChannelCommand.Close.MutualClose(replyTo = CompletableDeferred(), scriptPubKey = scriptPubKey, feerate = FeeratePerKw(mempoolFeerate.halfHour))
                 } else {
                     logger.info { "(force) closing channel=${channelId.toHex()}" }
                     ChannelCommand.Close.ForceClose

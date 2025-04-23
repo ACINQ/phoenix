@@ -22,6 +22,7 @@ import fr.acinq.bitcoin.TxId
 import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.Feature
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.ChannelCommand
 import fr.acinq.lightning.channel.states.*
 import fr.acinq.lightning.io.WrappedChannelCommand
@@ -34,6 +35,7 @@ import fr.acinq.phoenix.utils.extensions.isBeingCreated
 import fr.acinq.lightning.logging.info
 import fr.acinq.lightning.logging.warning
 import fr.acinq.phoenix.managers.phoenixSwapInWallet
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -113,9 +115,11 @@ object IosMigrationHelper {
 
             log.info { "migrating ${channelsToMigrate.size} channels to $swapInAddress" }
             // Close all channels in parallel
+            val mempoolFeerate = biz.appConfigurationManager.mempoolFeerate.filterNotNull().first()
             val command = ChannelCommand.Close.MutualClose(
+                replyTo = CompletableDeferred(),
                 scriptPubKey = closingScript,
-                feerates = null
+                feerate = FeeratePerKw(mempoolFeerate.halfHour)
             )
             channelsToMigrate.forEach {
                 peer.send(WrappedChannelCommand(ByteVector32.fromValidHex(it.channelId), command))

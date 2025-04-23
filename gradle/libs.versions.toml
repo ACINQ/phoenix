@@ -1,5 +1,5 @@
 [versions]
-lightningkmp = "1.9.1"
+lightningkmp = "1.10.0"
 secp256k1 = "0.17.1"
 
 kotlin = "2.1.10"
