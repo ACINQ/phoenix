@@ -188,7 +188,7 @@ private fun WordInputView(
         },
         keyboardOptions = KeyboardOptions(
             capitalization = KeyboardCapitalization.None,
-            autoCorrect = false,
+            autoCorrectEnabled = false,
             keyboardType = KeyboardType.Password,
             imeAction = ImeAction.None
         ),

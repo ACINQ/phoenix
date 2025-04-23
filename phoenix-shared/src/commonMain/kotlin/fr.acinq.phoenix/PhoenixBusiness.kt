@@ -87,7 +87,6 @@ class PhoenixBusiness(
     val connectionsManager by lazy { ConnectionsManager(this) }
     val lnurlManager by lazy { LnurlManager(this) }
     val notificationsManager by lazy { NotificationsManager(this) }
-    val contactsManager by lazy { ContactsManager(this) }
     val blockchainExplorer by lazy { BlockchainExplorer(chain) }
     val sendManager by lazy { SendManager(this) }
 
@@ -113,7 +112,6 @@ class PhoenixBusiness(
         appConnectionsDaemon?.cancel()
         networkMonitor.stop()
         notificationsManager.cancel()
-        contactsManager.cancel()
         currencyManager.cancel()
         paymentsManager.cancel()
         walletManager.cancel()

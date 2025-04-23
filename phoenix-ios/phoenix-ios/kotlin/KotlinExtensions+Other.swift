@@ -199,3 +199,43 @@ extension Array where Element == LocalChannelInfo {
 		return LocalChannelInfo.companion.inFlightPaymentsCount(channels: self)
 	}
 }
+
+extension ContactAddress {
+	
+	var domain: String? {
+		
+		if let atRange = address.range(of: "@") {
+			
+			let domainRange = atRange.upperBound ..< address.endIndex
+			let domainText = String(address[domainRange]).lowercased()
+			
+			let sanitized = domainText.trimmingCharacters(in: .whitespacesAndNewlines)
+			if !sanitized.isEmpty {
+				return sanitized
+			}
+		}
+		
+		return nil
+	}
+	
+	class func wellKnownDomains(includeTestnet: Bool) -> Set<String> {
+		
+		var result: Set<String> = Set([
+			"phoenixwallet.me",
+			"bitrefill.me",
+			"strike.me",
+			"coincorner.io",
+			"sparkwallet.me",
+			"ln.tips",
+			"getalby.com",
+			"walletofsatoshi.com",
+			"stacker.news"
+		])
+		
+		if includeTestnet {
+			result.insert("testnet.phoenixwallet.me")
+		}
+		
+		return result
+	}
+}

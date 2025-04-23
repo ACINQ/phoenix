@@ -28,7 +28,6 @@ import kotlinx.coroutines.launch
 class PaymentsManager(
     private val loggerFactory: LoggerFactory,
     private val configurationManager: AppConfigurationManager,
-    private val contactsManager: ContactsManager,
     private val databaseManager: DatabaseManager,
     private val electrumClient: ElectrumClient,
     private val nodeParamsManager: NodeParamsManager,
@@ -37,7 +36,6 @@ class PaymentsManager(
     constructor(business: PhoenixBusiness) : this(
         loggerFactory = business.loggerFactory,
         configurationManager = business.appConfigurationManager,
-        contactsManager = business.contactsManager,
         databaseManager = business.databaseManager,
         electrumClient = business.electrumClient,
         nodeParamsManager = business.nodeParamsManager,
@@ -50,7 +48,7 @@ class PaymentsManager(
     val lastCompletedPayment: StateFlow<WalletPayment?> = _lastCompletedPayment
 
     fun makePageFetcher(): PaymentsPageFetcher {
-        return PaymentsPageFetcher(loggerFactory, databaseManager, contactsManager)
+        return PaymentsPageFetcher(loggerFactory, databaseManager)
     }
 
     init {
@@ -119,14 +117,16 @@ class PaymentsManager(
     suspend fun getPayment(
         id: UUID
     ): WalletPaymentInfo? {
-        return paymentsDb().getPayment(id)?.let {
-            val payment = it.first
-            val contact = contactsManager.contactForPayment(payment)
-            WalletPaymentInfo(
-                payment = payment,
+        val db = paymentsDb()
+        return db.getPayment(id)?.let {
+            val paymentInfo = WalletPaymentInfo(
+                payment = it.first,
                 metadata = it.second ?: WalletPaymentMetadata(),
-                contact = contact
+                contact = null
             )
+            db.contacts.contactForPaymentInfo(paymentInfo)?.let { contact ->
+                paymentInfo.copy(contact = contact)
+            } ?: paymentInfo
         }
     }
 }

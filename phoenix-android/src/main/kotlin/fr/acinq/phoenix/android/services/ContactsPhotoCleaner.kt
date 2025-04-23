@@ -28,6 +28,8 @@ import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.components.contact.ContactsPhotoHelper
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -44,7 +46,7 @@ class ContactsPhotoCleaner(context: Context, workerParams: WorkerParameters) : C
             val application = (applicationContext as PhoenixApplication)
             val business = application.business.value
 
-            val contacts = business?.appDb?.listContacts() ?: emptyList()
+            val contacts = business?.databaseManager?.contactsList?.filterNotNull()?.first() ?: emptyList()
             val contactsPhotoDir = ContactsPhotoHelper.contactsDir(applicationContext)
             val contactsPhotoNames = contactsPhotoDir.listFiles()?.map { it.name }?.toSet() ?: emptySet()
             val toDelete = contactsPhotoNames.subtract(contacts.map { it.photoUri }.toSet()).filterNotNull()

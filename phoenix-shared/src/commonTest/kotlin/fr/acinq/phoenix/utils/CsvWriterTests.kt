@@ -64,7 +64,7 @@ class CsvWriterTests {
         )
 
         val expected = "date,id,type,amount_msat,amount_fiat,fee_credit_msat,mining_fee_sat,mining_fee_fiat,service_fee_msat,service_fee_fiat,payment_hash,tx_id,destination,description\n" +
-                "2023-02-01T16:51:12.445Z,7149cca7-d1d7-428d-8ee1-d9f43e44e9d8,swap_in,100000000,22.9998 USD,0,4000,0.9199 USD,0,0.0000 USD,,343a4bfa6531a2e06757908ff70ba53bec23a922da6335d0cff2bfafa2360805,Via Lightning network\n"
+                "2023-02-01T16:51:12.445Z,7149cca7-d1d7-428d-8ee1-d9f43e44e9d8,swap_in,100000000,22.9998 USD,0,4000,0.9199 USD,0,0.0000 USD,,343a4bfa6531a2e06757908ff70ba53bec23a922da6335d0cff2bfafa2360805,,Via Lightning network\n"
 
         csvWriter.add(payment, metadata)
         val actual = csvWriter.dumpAndClear()
@@ -95,7 +95,7 @@ class CsvWriterTests {
         )
 
         val expected = "date,id,type,amount_msat,amount_fiat,fee_credit_msat,mining_fee_sat,mining_fee_fiat,service_fee_msat,service_fee_fiat,payment_hash,tx_id,destination,description\n" +
-                "2023-02-01T16:51:12.445Z,1823d0c9-3658-438a-8ab8-496dcd80c180,lightning_received,12000000,2.7599 USD,0,0,0.0000 USD,0,0.0000 USD,1823d0c93658338a0ab8496dcd80c1801eb44269f25bbb868bddfb40a64492c6,,\"fake invoice\n" +
+                "2023-02-01T16:51:12.445Z,1823d0c9-3658-438a-8ab8-496dcd80c180,lightning_received,12000000,2.7599 USD,0,0,0.0000 USD,0,0.0000 USD,1823d0c93658338a0ab8496dcd80c1801eb44269f25bbb868bddfb40a64492c6,,,\"fake invoice\n" +
                 "---\n" +
                 "Via Lightning network\"\n"
         csvWriter.add(payment, metadata)
@@ -126,7 +126,7 @@ class CsvWriterTests {
         )
 
         val expected = "date,id,type,amount_msat,amount_fiat,fee_credit_msat,mining_fee_sat,mining_fee_fiat,service_fee_msat,service_fee_fiat,payment_hash,tx_id,destination,description\n" +
-                "2023-02-01T16:56:22.248Z,2226371f-c13d-4f41-b2c2-99a1596ba895,lightning_sent,-4354435,1.0015 USD,0,0,0.0000 USD,3435,0.0007 USD,81568b1adc7b206cf4ecd656e8e38b67c6bdd20083dacfb39e119fab56c99dbb,,\"1 Blockaccino\n" +
+                "2023-02-01T16:56:22.248Z,2226371f-c13d-4f41-b2c2-99a1596ba895,lightning_sent,-4354435,1.0015 USD,0,0,0.0000 USD,3435,0.0007 USD,81568b1adc7b206cf4ecd656e8e38b67c6bdd20083dacfb39e119fab56c99dbb,,03be9f16ffcfe10ec7381506601b1b75c9638d5e5aa8c4e7a546573ee09bc68fa2,\"1 Blockaccino\n" +
                 "---\n" +
                 "Con quesito\"\n"
         csvWriter.add(payment, metadata)
@@ -157,7 +157,7 @@ class CsvWriterTests {
         )
 
         val expected = "date,id,type,amount_msat,amount_fiat,fee_credit_msat,mining_fee_sat,mining_fee_fiat,service_fee_msat,service_fee_fiat,payment_hash,tx_id,destination,description\n" +
-                "2023-02-01T16:58:01.099Z,3dd49641-f9c0-462a-932f-766c944aa0d0,lightning_sent,-103010,0.0236 USD,0,0,0.0000 USD,3010,0.0006 USD,81568b1adc7b206cf4ecd656e8e38b67c6bdd20083dacfb39e119fab56c99dbb,,\"1 Blockaccino\n" +
+                "2023-02-01T16:58:01.099Z,3dd49641-f9c0-462a-932f-766c944aa0d0,lightning_sent,-103010,0.0236 USD,0,0,0.0000 USD,3010,0.0006 USD,81568b1adc7b206cf4ecd656e8e38b67c6bdd20083dacfb39e119fab56c99dbb,,03be9f16ffcfe10ec7381506601b1b75c9638d5e5aa8c4e7a546573ee09bc68fa2,\"1 Blockaccino\n" +
                 "---\n" +
                 "This note, um, has a comma\"\n"
         csvWriter.add(payment, metadata)
@@ -188,7 +188,7 @@ class CsvWriterTests {
         )
 
         val expected = "date,id,type,amount_msat,amount_fiat,fee_credit_msat,mining_fee_sat,mining_fee_fiat,service_fee_msat,service_fee_fiat,payment_hash,tx_id,destination,description\n" +
-                "2023-02-01T16:59:00.742Z,2886283a-a250-444a-9dd7-2f22656c4c9b,lightning_sent,-103010,0.0236 USD,0,0,0.0000 USD,3010,0.0006 USD,81568b1adc7b206cf4ecd656e8e38b67c6bdd20083dacfb39e119fab56c99dbb,,\"1 Blockaccino\n" +
+                "2023-02-01T16:59:00.742Z,2886283a-a250-444a-9dd7-2f22656c4c9b,lightning_sent,-103010,0.0236 USD,0,0,0.0000 USD,3010,0.0006 USD,81568b1adc7b206cf4ecd656e8e38b67c6bdd20083dacfb39e119fab56c99dbb,,03be9f16ffcfe10ec7381506601b1b75c9638d5e5aa8c4e7a546573ee09bc68fa2,\"1 Blockaccino\n" +
                 "---\n" +
                 "This \"\"note\"\" has quotes\"\n"
         csvWriter.add(payment, metadata)
@@ -219,7 +219,7 @@ class CsvWriterTests {
         )
 
         val expected = "date,id,type,amount_msat,amount_fiat,fee_credit_msat,mining_fee_sat,mining_fee_fiat,service_fee_msat,service_fee_fiat,payment_hash,tx_id,destination,description\n" +
-                "2023-02-01T17:00:26.945Z,2886283a-a250-444a-9dd7-2f22656c4c9b,lightning_sent,-103010,0.0236 USD,0,0,0.0000 USD,3010,0.0006 USD,81568b1adc7b206cf4ecd656e8e38b67c6bdd20083dacfb39e119fab56c99dbb,,\"1 Blockaccino\n" +
+                "2023-02-01T17:00:26.945Z,2886283a-a250-444a-9dd7-2f22656c4c9b,lightning_sent,-103010,0.0236 USD,0,0,0.0000 USD,3010,0.0006 USD,81568b1adc7b206cf4ecd656e8e38b67c6bdd20083dacfb39e119fab56c99dbb,,03be9f16ffcfe10ec7381506601b1b75c9638d5e5aa8c4e7a546573ee09bc68fa2,\"1 Blockaccino\n" +
                 "---\n" +
                 "This note has multiple lines:\n" +
                 "Brie\n" +
@@ -252,7 +252,7 @@ class CsvWriterTests {
         )
 
         val expected = "date,id,type,amount_msat,amount_fiat,fee_credit_msat,mining_fee_sat,mining_fee_fiat,service_fee_msat,service_fee_fiat,payment_hash,tx_id,destination,description\n" +
-                "2023-02-01T16:51:12.445Z,d8ca850a-4406-4ebe-a4a8-be73553f589b,swap_in,100000000,22.9998 USD,0,2000,0.4599 USD,5000000,1.1499 USD,,343a4bfa6531a2e06757908ff70ba53bec23a922da6335d0cff2bfafa2360805,Via dual-funding flow\n"
+                "2023-02-01T16:51:12.445Z,d8ca850a-4406-4ebe-a4a8-be73553f589b,swap_in,100000000,22.9998 USD,0,2000,0.4599 USD,5000000,1.1499 USD,,343a4bfa6531a2e06757908ff70ba53bec23a922da6335d0cff2bfafa2360805,,Via dual-funding flow\n"
         csvWriter.add(payment, metadata)
         val actual = csvWriter.dumpAndClear()
 
@@ -287,7 +287,7 @@ class CsvWriterTests {
         )
 
         val expected = "date,id,type,amount_msat,amount_fiat,fee_credit_msat,mining_fee_sat,mining_fee_fiat,service_fee_msat,service_fee_fiat,payment_hash,tx_id,destination,description\n" +
-                "2023-02-01T22:16:54.498Z,d8ca850a-4406-4ebe-a4a8-be73553f589b,legacy_swap_out,-12820000,3.0366 USD,0,2820,0.6679 USD,0,0.0000 USD,,,\n"
+                "2023-02-01T22:16:54.498Z,d8ca850a-4406-4ebe-a4a8-be73553f589b,legacy_swap_out,-12820000,3.0366 USD,0,2820,0.6679 USD,0,0.0000 USD,,,tb1qlywh0dk40k87gqphpfs8kghd96hmnvus7r8hhf,\n"
         csvWriter.add(payment, metadata)
         val actual = csvWriter.dumpAndClear()
 
@@ -315,7 +315,7 @@ class CsvWriterTests {
         )
 
         val expected = "date,id,type,amount_msat,amount_fiat,fee_credit_msat,mining_fee_sat,mining_fee_fiat,service_fee_msat,service_fee_fiat,payment_hash,tx_id,destination,description\n" +
-                "2023-02-02T15:58:53.694Z,861b22e3-b584-493a-ab5a-55512d3b3228,channel_close,-10090000,2.3875 USD,0,1400,0.3312 USD,0,0.0000 USD,,343a4bfa6531a2e06757908ff70ba53bec23a922da6335d0cff2bfafa2360805,\n"
+                "2023-02-02T15:58:53.694Z,861b22e3-b584-493a-ab5a-55512d3b3228,channel_close,-10090000,2.3875 USD,0,1400,0.3312 USD,0,0.0000 USD,,343a4bfa6531a2e06757908ff70ba53bec23a922da6335d0cff2bfafa2360805,tb1qz5gxe2450uadavle8wwcc5ngquqfj5xp4dy0ja,\n"
         csvWriter.add(payment, metadata)
         val actual = csvWriter.dumpAndClear()
 

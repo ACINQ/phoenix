@@ -35,6 +35,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -66,6 +67,7 @@ import fr.acinq.phoenix.android.utils.invisibleOutlinedTextFieldColors
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.data.ContactInfo
+import fr.acinq.phoenix.data.ContactOffer
 import kotlinx.coroutines.launch
 
 
@@ -103,8 +105,8 @@ fun ContactDetailsView(
                         scope.launch { pagerState.animateScrollToPage(1) }
                     }
                 )
-                1 -> ContactOffers(
-                    offers = contact.offers,
+                1 -> ListOffersForContact(
+                    contactOffers = contact.offers,
                     onBackClick = {
                         scope.launch { pagerState.animateScrollToPage(0) }
                     }
@@ -122,7 +124,7 @@ private fun ContactNameAndPhoto(
     onDismiss: () -> Unit,
     onOffersClick: () -> Unit,
 ) {
-    val contactsManager = business.contactsManager
+    val contactsManager by business.databaseManager.contactsDb.collectAsState(null)
     val scope = rememberCoroutineScope()
 
     var name by remember(contact) { mutableStateOf(contact.name) }
@@ -170,9 +172,11 @@ private fun ContactNameAndPhoto(
                         iconTint = negativeColor,
                         onClick = {
                             scope.launch {
-                                contactsManager.deleteContact(contact.id)
-                                onContactChange(null)
-                                onDismiss()
+                                contactsManager?.run {
+                                    deleteContact(contact.id)
+                                    onContactChange(null)
+                                    onDismiss()
+                                }
                             }
                         },
                         padding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
@@ -185,9 +189,12 @@ private fun ContactNameAndPhoto(
                         enabled = contact.name != name || contact.photoUri != photoUri || contact.useOfferKey != useOfferKey,
                         onClick = {
                             scope.launch {
-                                val newContact = contactsManager.updateContact(contact.id, name, photoUri, useOfferKey, contact.offers)
-                                onContactChange(newContact)
-                                onDismiss()
+                                contactsManager?.run {
+                                    val newContact = contact.copy(name = name, photoUri = photoUri, useOfferKey = useOfferKey, offers = contact.offers)
+                                    saveContact(newContact)
+                                    onContactChange(newContact)
+                                    onDismiss()
+                                }
                             }
                         },
                     )
@@ -224,18 +231,18 @@ private fun ContactNameAndPhoto(
 }
 
 @Composable
-private fun ContactOffers(
+private fun ListOffersForContact(
+    contactOffers: List<ContactOffer>,
     onBackClick: () -> Unit,
-    offers: List<OfferTypes.Offer>,
 ) {
     val navController = navController
     Column(modifier = Modifier.fillMaxSize()) {
         DefaultScreenHeader(title = stringResource(id = R.string.contact_offers_list), onBackClick = onBackClick)
         HSeparator()
         Column(modifier = Modifier.fillMaxWidth()) {
-            offers.forEach { offer ->
+            contactOffers.forEach { contactOffer ->
                 OfferAttachedToContactRow(
-                    offer = offer,
+                    contactOffer = contactOffer,
                     onOfferClick = { navController.navigate("${Screen.Send.route}?input=${it.encode()}") },
                 )
             }
@@ -245,19 +252,19 @@ private fun ContactOffers(
 
 @Composable
 private fun OfferAttachedToContactRow(
-    offer: OfferTypes.Offer,
+    contactOffer: ContactOffer,
     onOfferClick: (OfferTypes.Offer) -> Unit
 ) {
     val context = LocalContext.current
-    val encoded = remember(offer) { offer.encode() }
-    Clickable(onClick = { onOfferClick(offer) }) {
+    val encoded = remember(contactOffer) { contactOffer.offer.encode() }
+    Clickable(onClick = { onOfferClick(contactOffer.offer) }) {
         Row(
             modifier = Modifier.height(IntrinsicSize.Min),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Spacer(modifier = Modifier.width(24.dp))
             Text(
-                text = offer.encode(),
+                text = encoded,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f)

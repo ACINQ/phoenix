@@ -30,15 +30,12 @@ import fr.acinq.lightning.crypto.KeyManager
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.io.NativeSocketException
-import fr.acinq.lightning.io.OfferInvoiceReceived
 import fr.acinq.lightning.io.OfferNotPaid
 import fr.acinq.lightning.io.PaymentNotSent
 import fr.acinq.lightning.io.PaymentProgress
 import fr.acinq.lightning.io.PaymentSent
-import fr.acinq.lightning.io.PayOffer
 import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.io.PeerEvent
-import fr.acinq.lightning.io.SendPaymentResult
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.payment.LiquidityPolicy
@@ -50,13 +47,9 @@ import fr.acinq.lightning.utils.toByteArray
 import fr.acinq.lightning.utils.toNSData
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.lightning.wire.OfferTypes
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterIsInstance
+import fr.acinq.phoenix.managers.SendManager
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import platform.Foundation.NSData
 import kotlin.time.Duration.Companion.seconds
 
@@ -350,48 +343,4 @@ fun WalletState.WalletWithConfirmations._spendExpiredSwapIn(
 
 suspend fun Peer.fundingRate(amount: Satoshi): LiquidityAds.FundingRate? {
     return this.remoteFundingRates.filterNotNull().first().findRate(amount)
-}
-
-suspend fun Peer.altPayOffer(
-    paymentId: UUID,
-    amount: MilliSatoshi,
-    offer: OfferTypes.Offer,
-    payerKey: PrivateKey,
-    payerNote: String?,
-    fetchInvoiceTimeoutInSeconds: Int
-): SendPaymentResult {
-    val res = CompletableDeferred<SendPaymentResult>()
-    this.launch {
-        res.complete(eventsFlow
-            .filterIsInstance<SendPaymentResult>()
-            .filter { it.request.paymentId == paymentId }
-            .first()
-        )
-    }
-    send(PayOffer(paymentId, payerKey, payerNote, amount, offer, fetchInvoiceTimeoutInSeconds.seconds))
-    return res.await()
-}
-
-suspend fun Peer.betterPayOffer(
-    paymentId: UUID,
-    amount: MilliSatoshi,
-    offer: OfferTypes.Offer,
-    payerKey: PrivateKey,
-    payerNote: String?,
-    fetchInvoiceTimeoutInSeconds: Int
-): OfferNotPaid? {
-    val res = CompletableDeferred<OfferNotPaid?>()
-    launch {
-        eventsFlow.collect {
-            if (it is OfferNotPaid && it.request.paymentId == paymentId) {
-                res.complete(it)
-                cancel()
-            } else if (it is OfferInvoiceReceived && it.request.paymentId == paymentId) {
-                res.complete(null)
-                cancel()
-            }
-        }
-    }
-    send(PayOffer(paymentId, payerKey, payerNote, amount, offer, fetchInvoiceTimeoutInSeconds.seconds))
-    return res.await()
 }
