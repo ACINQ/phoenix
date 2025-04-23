@@ -17,12 +17,10 @@
 package fr.acinq.phoenix.db
 
 import app.cash.sqldelight.db.SqlDriver
-import fr.acinq.bitcoin.Chain
-import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.phoenix.utils.PlatformContext
 
-expect fun createChannelsDbDriver(ctx: PlatformContext, chain: Chain, nodeIdHash: String): SqlDriver
+expect fun createChannelsDbDriver(ctx: PlatformContext, fileName: String): SqlDriver
 
-expect fun createPaymentsDbDriver(ctx: PlatformContext, chain: Chain, nodeIdHash: String, onError: (String) -> Unit): SqlDriver
+expect fun createPaymentsDbDriver(ctx: PlatformContext, fileName: String, onError: (String) -> Unit): SqlDriver
 
 expect fun createAppDbDriver(ctx: PlatformContext): SqlDriver

@@ -17,6 +17,7 @@
 package fr.acinq.phoenix.android.utils
 
 
+import android.annotation.SuppressLint
 import android.text.Html
 import android.text.Spanned
 import android.text.format.DateUtils
@@ -164,12 +165,12 @@ object Converter {
     fun Long.toAbsoluteDateString(): String = DateFormat.getDateInstance().format(Date(this))
 
     /** Converts this millis timestamp into an year-month-day string. */
+    @SuppressLint("SimpleDateFormat")
     fun Long.toBasicAbsoluteDateString(): String = SimpleDateFormat("yyyy-MM-dd").format(Date(this))
 
-    @Composable
-    public fun html(id: Int): Spanned {
-        return html(stringResource(id = id))
-    }
+    /** Converts this millis timestamp into an year-month-day string. */
+    @SuppressLint("SimpleDateFormat")
+    fun Long.toBasicAbsoluteDateTimeString(): String = SimpleDateFormat("yyyyMMdd-HHmmss").format(Date(this))
 
     public fun html(source: String): Spanned {
         return Html.fromHtml(

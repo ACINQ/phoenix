@@ -616,21 +616,21 @@
     <string name="payments_history_thisweek">Đầu tuần này</string>
     <string name="payments_history_lastweek">Tuần trước</string>
     <string name="payments_export_title">Truy xuất các thanh toán</string>
-    <string name="payments_export_instructions">Truy xuất các thanh toán địa phương đã thành công của bạn dưới định dạng CSV (giá trị phân tách bằng dấu phẩy).</string>
-    <string name="payments_export_start_label">Ngày bắt đầu</string>
-    <string name="payments_export_end_label">Ngày kết thúc</string>
-    <string name="payments_export_context_label">Bao gồm điểm đi/điểm đến</string>
-    <string name="payments_export_description_label">Bao gồm mô tả</string>
-    <string name="payments_export_generate_button">Truy xuất</string>
-    <string name="payments_export_no_payments">Chưa có khoản thanh toán thành công nào</string>
-    <string name="payments_export_invalid_timestamps">Vui lòng chọn ngày bắt đầu/kết thúc hợp lệ</string>
-    <string name="payments_export_in_progress">Đang truy xuất thanh toán #%1$d</string>
+    <string name="payments_export_csv_instructions">Truy xuất các thanh toán địa phương đã thành công của bạn dưới định dạng CSV (giá trị phân tách bằng dấu phẩy).</string>
+    <string name="payments_export_csv_start_label">Ngày bắt đầu</string>
+    <string name="payments_export_csv_end_label">Ngày kết thúc</string>
+    <string name="payments_export_csv_context_label">Bao gồm điểm đi/điểm đến</string>
+    <string name="payments_export_csv_description_label">Bao gồm mô tả</string>
+    <string name="payments_export_csv_generate_button">Truy xuất</string>
+    <string name="payments_export_csv_no_payments">Chưa có khoản thanh toán thành công nào</string>
+    <string name="payments_export_csv_invalid_timestamps">Vui lòng chọn ngày bắt đầu/kết thúc hợp lệ</string>
+    <string name="payments_export_csv_in_progress">Đang truy xuất thanh toán #%1$d</string>
     <string name="payments_export_success">Các thanh toán %1$d đã được truy xuất thành công</string>
-    <string name="payments_export_share_subject">Phoenix - các thanh toán từ %1$s tới %2$s</string>
-    <string name="payments_export_share_title">Chia sẻ các thanh toán Phoenix…</string>
-    <string name="payments_export_share_button">Chia sẻ tập tin</string>
-    <string name="payments_export_error">Truy xuất không thành công.</string>
-    <string name="payments_export_no_data">Không tìm thấy khoản thanh toán nào.</string>
+    <string name="payments_export_csv_share_subject">Phoenix - các thanh toán từ %1$s tới %2$s</string>
+    <string name="payments_export_csv_share_title">Chia sẻ các thanh toán Phoenix…</string>
+    <string name="payments_export_csv_share_button">Chia sẻ tập tin</string>
+    <string name="payments_export_csv_error">Truy xuất không thành công.</string>
+    <string name="payments_export_csv_no_data">Không tìm thấy khoản thanh toán nào.</string>
 
     <!-- components -->
 

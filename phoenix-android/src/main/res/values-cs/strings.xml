@@ -613,21 +613,21 @@
     <string name="payments_history_thisweek">Začátkem týdne</string>
     <string name="payments_history_lastweek">Poslední týden</string>
     <string name="payments_export_title">Exportovat platby</string>
-    <string name="payments_export_instructions">Exportovat úspěšné místní platby do formátu CSV (hodnoty oddělené čárkou).</string>
-    <string name="payments_export_start_label">Od data</string>
-    <string name="payments_export_end_label">Do data</string>
-    <string name="payments_export_context_label">Zahrnout původ/cíl</string>
-    <string name="payments_export_description_label">Zahrnout popis</string>
-    <string name="payments_export_generate_button">Exportovat</string>
-    <string name="payments_export_no_payments">Zatím žádné úspěšné platby</string>
-    <string name="payments_export_invalid_timestamps">Vyberte prosím platné od/do datum</string>
-    <string name="payments_export_in_progress">Exportování platby #%1$d</string>
+    <string name="payments_export_csv_instructions">Exportovat úspěšné místní platby do formátu CSV (hodnoty oddělené čárkou).</string>
+    <string name="payments_export_csv_start_label">Od data</string>
+    <string name="payments_export_csv_end_label">Do data</string>
+    <string name="payments_export_csv_context_label">Zahrnout původ/cíl</string>
+    <string name="payments_export_csv_description_label">Zahrnout popis</string>
+    <string name="payments_export_csv_generate_button">Exportovat</string>
+    <string name="payments_export_csv_no_payments">Zatím žádné úspěšné platby</string>
+    <string name="payments_export_csv_invalid_timestamps">Vyberte prosím platné od/do datum</string>
+    <string name="payments_export_csv_in_progress">Exportování platby #%1$d</string>
     <string name="payments_export_success">%1$d úspěšně exportovaných plateb</string>
-    <string name="payments_export_share_subject">Phoenix - platby od %1$s do %2$s</string>
-    <string name="payments_export_share_title">Sdílet Phoenix platby…</string>
-    <string name="payments_export_share_button">Sdílet soubor</string>
-    <string name="payments_export_error">Export selhal.</string>
-    <string name="payments_export_no_data">Nenalezeny žádné platby.</string>
+    <string name="payments_export_csv_share_subject">Phoenix - platby od %1$s do %2$s</string>
+    <string name="payments_export_csv_share_title">Sdílet Phoenix platby…</string>
+    <string name="payments_export_csv_share_button">Sdílet soubor</string>
+    <string name="payments_export_csv_error">Export selhal.</string>
+    <string name="payments_export_csv_no_data">Nenalezeny žádné platby.</string>
 
     <!-- components -->
 

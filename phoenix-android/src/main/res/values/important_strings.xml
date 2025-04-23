@@ -126,7 +126,17 @@
     <string name="restore_seed_valid_details">You can now proceed and restore your wallet</string>
     <string name="restore_seed_invalid">This seed is not valid</string>
     <string name="restore_seed_invalid_details">Make sure you entered the correct words in the right order.</string>
-    <string name="restore_import_button">Restore</string>
+
+    <string name="restore_payments_button">Import payments history</string>
+    <string name="restore_payments_button_details">Optional. Use this button to restore a payments database file from another device.</string>
+    <string name="restore_payments_success">Will restore payments history</string>
+    <string name="restore_payments_success_button">Use another file</string>
+    <string name="restore_payments_error_header">Cannot restore payments</string>
+    <string name="restore_payments_error_button">Try again</string>
+    <string name="restore_payments_error_encryption">The file cannot be decrypted. Make sure you are using a Phoenix database file (not a CSV), and that this file matches the wallet you\'re restoring.</string>
+    <string name="restore_payments_error_open">This file cannot be opened. Try again.</string>
+    <string name="restore_payments_error_writing">This file could not be written to the application\'s data folder. Try again.</string>
+    <string name="restore_import_button">Restore wallet</string>
 
     <!-- upgrade required dialog -->
 

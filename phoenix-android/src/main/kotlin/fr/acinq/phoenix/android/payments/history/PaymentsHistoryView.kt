@@ -42,13 +42,13 @@ import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.android.PaymentsViewModel
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.CardHeader
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.ItemCard
 import fr.acinq.phoenix.android.components.TextWithIcon
+import fr.acinq.phoenix.android.payments.details.PaymentLine
 import fr.acinq.phoenix.android.utils.logger
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
