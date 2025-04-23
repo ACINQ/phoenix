@@ -128,7 +128,7 @@ struct PaymentCell : View {
 				case WalletPaymentState.successOffChain : Image(systemName: "checkmark.circle.fill")
 				case WalletPaymentState.pendingOnChain  : Image(systemName: "clock.fill")
 				case WalletPaymentState.pendingOffChain : Image(systemName: "clock.fill")
-				case WalletPaymentState.failure         : Image(systemName: "x.circle.fill")
+				case WalletPaymentState.failure         : Image(systemName: "xmark")
 				@unknown default                        : Image(systemName: "magnifyingglass.circle.fill")
 			}
 		}
@@ -141,7 +141,7 @@ struct PaymentCell : View {
 	func paymentAmount() -> some View {
 		
 		let (amount, isFailure, isOutgoing) = paymentAmountInfo()
-		if isLiquidityWithFeesDisplayedElsewhere() {
+		if isFailure || isLiquidityWithFeesDisplayedElsewhere() {
 			
 			Text(verbatim: "")
 				.accessibilityHidden(true)
