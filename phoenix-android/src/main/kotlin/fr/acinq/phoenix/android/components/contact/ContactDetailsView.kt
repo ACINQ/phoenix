@@ -136,8 +136,9 @@ private fun ColumnScope.ContactNameAndPhoto(
     val navController = navController
     val contactsDb by business.databaseManager.contactsDb.collectAsState(null)
 
+    val contactId = remember { contact?.id ?: UUID.randomUUID() }
     var name by remember(contact) { mutableStateOf(contact?.name ?: "") }
-    var nameErrorMessage by remember { mutableStateOf<String>("") }
+    var nameErrorMessage by remember { mutableStateOf("") }
     var photoUri by remember(contact) { mutableStateOf(contact?.photoUri) }
     var useOfferKey by remember(contact) { mutableStateOf(contact?.useOfferKey ?: true) }
 
@@ -209,7 +210,7 @@ private fun ColumnScope.ContactNameAndPhoto(
                     }
                     scope.launch {
                         contactsDb?.run {
-                            val newContact = ContactInfo(id = contact?.id ?: UUID.randomUUID(), name = name, photoUri = photoUri, useOfferKey = useOfferKey, offers = contactOffers, addresses = contactAddresses)
+                            val newContact = ContactInfo(id = contactId, name = name, photoUri = photoUri, useOfferKey = useOfferKey, offers = contactOffers, addresses = contactAddresses)
                             saveContact(newContact)
                             onContactChange(newContact)
                         }
@@ -289,6 +290,7 @@ private fun ColumnScope.ContactNameAndPhoto(
         )
 
         ListPaymentCodesForContact(
+            contactId = contactId,
             newOffer = newOffer,
             paymentCodeList = paymentsCodeList.values.toList(),
             onSaveContactPaymentCode = {
@@ -303,6 +305,7 @@ private fun ColumnScope.ContactNameAndPhoto(
 
 @Composable
 private fun ListPaymentCodesForContact(
+    contactId: UUID,
     newOffer: OfferTypes.Offer?,
     paymentCodeList: List<ContactPaymentCode>,
     onSaveContactPaymentCode: (ContactPaymentCode) -> Unit,
@@ -400,6 +403,7 @@ private fun ListPaymentCodesForContact(
     val onDismiss = { showNewPaymentCodeDialog = false ; selectedPaymentCode = null }
     selectedPaymentCode?.let { paymentCode ->
         ContactOfferDetailDialog(
+            contactId = contactId,
             paymentCode = paymentCode,
             onSavePaymentCode = {
                 onSaveContactPaymentCode(it)
@@ -414,6 +418,7 @@ private fun ListPaymentCodesForContact(
     } ?: run {
         if (showNewPaymentCodeDialog) {
             ContactOfferDetailDialog(
+                contactId = contactId,
                 paymentCode = null,
                 onSavePaymentCode = {
                     onSaveContactPaymentCode(it)
@@ -431,6 +436,7 @@ private fun ListPaymentCodesForContact(
 
 @Composable
 private fun ContactOfferDetailDialog(
+    contactId: UUID,
     paymentCode: ContactPaymentCode?,
     onSavePaymentCode: (ContactPaymentCode) -> Unit,
     onDeletePaymentCode: (ByteVector32) -> Unit,
@@ -550,9 +556,12 @@ private fun ContactOfferDetailDialog(
                     fun attemptOffer(contactsDb: SqliteContactsDb, code: String, onFailure: (String, Boolean) -> Unit) {
                         when (val result = Parser.readOffer(code)) {
                             null -> onFailure(context.getString(R.string.contact_error_offer_invalid), false)
-                            else -> when (val match = contactsDb.contactForOffer(result)) {
-                                null -> onSavePaymentCode(ContactOffer(offer = result, label = label.takeIf { it.isNotBlank() }, createdAt = currentTimestampMillis()))
-                                else -> onFailure(context.getString(R.string.contact_error_offer_known, match.name), true)
+                            else -> {
+                                val match = contactsDb.contactForOffer(result)
+                                when {
+                                    match == null || match.id == contactId -> onSavePaymentCode(ContactOffer(offer = result, label = label.takeIf { it.isNotBlank() }, createdAt = currentTimestampMillis()))
+                                    else -> onFailure(context.getString(R.string.contact_error_offer_known, match.name), true)
+                                }
                             }
                         }
                     }
