@@ -29,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.android.components.SplashClickableContent
 import fr.acinq.phoenix.data.ContactInfo
 
@@ -44,7 +43,6 @@ import fr.acinq.phoenix.data.ContactInfo
 @Composable
 fun ContactCompactView(
     contact: ContactInfo,
-    currentOffer: OfferTypes.Offer?,
     onContactChange: (ContactInfo?) -> Unit,
 ) {
     var showSheet by remember { mutableStateOf(false) }
@@ -60,7 +58,6 @@ fun ContactCompactView(
     if (showSheet) {
         ContactDetailsView(
             contact = contact,
-            currentOffer = currentOffer,
             onDismiss = { showSheet = false },
             onContactChange = onContactChange,
         )

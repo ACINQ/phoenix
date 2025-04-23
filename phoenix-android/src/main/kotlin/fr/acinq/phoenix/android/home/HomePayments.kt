@@ -30,7 +30,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.utils.UUID
-import fr.acinq.phoenix.android.PaymentsViewModel
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.payments.details.PaymentLine
@@ -39,7 +38,7 @@ import fr.acinq.phoenix.data.WalletPaymentInfo
 
 
 @Composable
-fun ColumnScope.PaymentsList(
+fun ColumnScope.LatestPaymentsList(
     modifier: Modifier = Modifier,
     balanceDisplayMode: HomeAmountDisplayMode,
     onPaymentClick: (UUID) -> Unit,
@@ -56,46 +55,27 @@ fun ColumnScope.PaymentsList(
                     .widthIn(max = 250.dp)
             )
         } else {
-            LatestPaymentsList(
-                payments = payments,
-                onPaymentClick = onPaymentClick,
-                onPaymentsHistoryClick = onPaymentsHistoryClick,
-                isAmountRedacted = balanceDisplayMode == HomeAmountDisplayMode.REDACTED,
-            )
-        }
-    }
-}
-
-@Composable
-private fun ColumnScope.LatestPaymentsList(
-    payments: List<WalletPaymentInfo>,
-    onPaymentClick: (UUID) -> Unit,
-    onPaymentsHistoryClick: () -> Unit,
-    isAmountRedacted: Boolean,
-) {
-    val morePaymentsButton: @Composable () -> Unit = {
-        FilledButton(
-            text = stringResource(id = R.string.home_payments_more_button),
-            icon = R.drawable.ic_chevron_down,
-            iconTint = MaterialTheme.typography.caption.color,
-            onClick = onPaymentsHistoryClick,
-            backgroundColor = Color.Transparent,
-            textStyle = MaterialTheme.typography.caption.copy(fontSize = 12.sp),
-        )
-    }
-
-    LazyColumn(
-        modifier = Modifier.weight(1f, fill = true),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        items(payments) {
-            PaymentLine(it, null, onPaymentClick, isAmountRedacted)
-        }
-        if (payments.isNotEmpty()) {
-            item {
-                Spacer(Modifier.height(16.dp))
-                morePaymentsButton()
-                Spacer(Modifier.height(80.dp))
+            LazyColumn(
+                modifier = Modifier.weight(1f, fill = true),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                items(payments) {
+                    PaymentLine(it, onPaymentClick, balanceDisplayMode == HomeAmountDisplayMode.REDACTED)
+                }
+                if (payments.isNotEmpty()) {
+                    item {
+                        Spacer(Modifier.height(16.dp))
+                        FilledButton(
+                            text = stringResource(id = R.string.home_payments_more_button),
+                            icon = R.drawable.ic_chevron_down,
+                            iconTint = MaterialTheme.typography.caption.color,
+                            onClick = onPaymentsHistoryClick,
+                            backgroundColor = Color.Transparent,
+                            textStyle = MaterialTheme.typography.caption.copy(fontSize = 12.sp),
+                        )
+                        Spacer(Modifier.height(80.dp))
+                    }
+                }
             }
         }
     }

@@ -33,7 +33,6 @@ import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.dialogs.IconPopup
 import fr.acinq.phoenix.android.components.contact.ContactDetailsView
 import fr.acinq.phoenix.android.components.contact.ContactsListView
-import fr.acinq.phoenix.android.components.contact.SaveNewContactDialog
 import fr.acinq.phoenix.data.ContactInfo
 
 @Composable
@@ -58,19 +57,22 @@ fun SettingsContactsView(
                 )
             }
         )
-        ContactsListView(onEditContact = { selectedContact = it }, canEditContact = true, isOnSurface = false)
+        ContactsListView(onContactClick = { selectedContact = it }, isOnSurface = false)
     }
 
     selectedContact?.let {
         ContactDetailsView(
-            contact = it,
-            currentOffer = null,
             onDismiss = { selectedContact = null },
+            contact = it,
             onContactChange = {},
         )
     } ?: run {
         if (isAddingNewContact) {
-            SaveNewContactDialog(initialOffer = null, onDismiss = { isAddingNewContact = false }, onSaved = { isAddingNewContact = false })
+            ContactDetailsView(
+                onDismiss = { isAddingNewContact = false },
+                contact = null,
+                onContactChange = { isAddingNewContact = false },
+            )
         }
     }
 }

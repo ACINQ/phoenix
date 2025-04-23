@@ -237,7 +237,7 @@ fun HomeView(
                 )
             }
 
-            PaymentsList(
+            LatestPaymentsList(
                 modifier = Modifier.nestedScroll(nestedScrollConnection),
                 balanceDisplayMode = balanceDisplayMode,
                 onPaymentClick = onPaymentClick,

@@ -239,6 +239,7 @@
     <string name="btn_share">Share</string>
     <string name="btn_ok">OK</string>
     <string name="btn_save">Save</string>
+    <string name="btn_delete">Delete</string>
     <string name="btn_confirm">Confirm</string>
     <string name="btn_cancel">Cancel</string>
     <string name="btn_close">Close</string>
@@ -521,19 +522,38 @@
     <!-- offer contact -->
 
     <string name="contact_add_contact_button">Add contact</string>
+    <string name="contact_pay_button">Send a payment</string>
+
+    <string name="contact_attach_offer_new">Create new contact…</string>
+
+    <string name="contact_error_name_empty">Name cannot be left empty</string>
     <string name="contact_error_offer_invalid">Invalid Bolt12 code</string>
-    <string name="contact_error_offer_known">This Bolt12 code already attached to contact %1$s</string>
-    <string name="contact_save_button">Save</string>
-    <string name="contact_delete_button">Delete</string>
+    <string name="contact_error_offer_known">Code already attached to \"%1$s\"</string>
+    <string name="contact_error_address_invalid">Invalid Lightning address</string>
+    <string name="contact_error_address_known">Address already attached to \"%1$s\"</string>
+    <string name="contact_error_invalid">This code or address is invalid</string>
+
+    <string name="contact_codedialog_title_generic">Add a payment code for this contact</string>
+    <string name="contact_codedialog_title_offer">Edit Bolt12 code</string>
+    <string name="contact_codedialog_title_address">Add a payment code for this contact.</string>
+
+    <string name="contact_codedialog_label_label">Label (optional)</string>
+    <string name="contact_codedialog_label_generic">Bolt12 code or Lightning address</string>
+    <string name="contact_codedialog_label_address">Lightning address</string>
+    <string name="contact_codedialog_label_offer">Bolt12 offer code</string>
+
+    <string name="contact_delete_code_confirm">Do you want to delete this payment code?</string>
+    <string name="contact_delete_contact_confirm">Do you want to delete this contact?</string>
 
     <string name="contact_add_title">Attach a name to a Bolt12 code</string>
     <string name="contact_name_label">Name</string>
-    <string name="contact_photo_label">Photo</string>
-    <string name="contact_offer_label">Bolt12 code</string>
+    <string name="contact_name_hint">Enter a name</string>
     <string name="contact_offer_key_title">Pay with your Bolt12 key</string>
     <string name="contact_offer_key_enabled">If they know your own Bolt12 payment code, they will be able to tell when payments are from you.</string>
     <string name="contact_offer_key_disabled">Use a throwaway id when you pay this contact.</string>
-    <string name="contact_offers_list">Bolt12 payment codes</string>
+    <string name="contact_codes_list">Payment codes</string>
+    <string name="contact_codes_add_new">Add Bolt12 code or Lightning address…</string>
+    <string name="contact_codes_add_new_short">Add new…</string>
 
     <string name="contact_search_name">Search by name</string>
     <string name="contact_none">No contacts found…</string>
@@ -914,7 +934,7 @@
 
     <!-- settings: contacts list -->
 
-    <string name="settings_contacts_help">This screen allows you to link a BOLT12 code to a name.\n\nThe contacts data are stored locally.</string>
+    <string name="settings_contacts_help">This screen allows you to link a Bolt12 code or a Lightning address to a name.\n\nThese contacts data are specific to Phoenix and stored locally.</string>
 
     <!-- experimental -->
 
