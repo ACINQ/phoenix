@@ -99,7 +99,6 @@ private fun OfferSentBy(payerPubkey: PublicKey?, hasPayerNote: Boolean) {
             is OfferContactState.Found -> {
                 ContactCompactView(
                     contact = res.contact,
-                    currentOffer = null,
                     onContactChange = { contactState.value = if (it == null) OfferContactState.NotFound else OfferContactState.Found(it) },
                 )
             }

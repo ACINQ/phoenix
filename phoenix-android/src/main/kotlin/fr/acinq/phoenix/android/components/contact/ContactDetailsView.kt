@@ -16,8 +16,11 @@
 
 package fr.acinq.phoenix.android.components.contact
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -26,13 +29,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -43,165 +48,232 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.lightning.utils.UUID
+import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.BorderButton
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Clickable
-import fr.acinq.phoenix.android.components.DefaultScreenHeader
-import fr.acinq.phoenix.android.components.HSeparator
+import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.SwitchView
 import fr.acinq.phoenix.android.components.TextInput
+import fr.acinq.phoenix.android.components.dialogs.ConfirmDialog
+import fr.acinq.phoenix.android.components.dialogs.FullScreenDialog
 import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
+import fr.acinq.phoenix.android.components.scanner.ScannerView
 import fr.acinq.phoenix.android.navController
-import fr.acinq.phoenix.android.utils.copyToClipboard
+import fr.acinq.phoenix.android.utils.extensions.safeLet
 import fr.acinq.phoenix.android.utils.invisibleOutlinedTextFieldColors
+import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
+import fr.acinq.phoenix.data.ContactAddress
 import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.data.ContactOffer
+import fr.acinq.phoenix.data.ContactPaymentCode
+import fr.acinq.phoenix.db.contacts.SqliteContactsDb
+import fr.acinq.phoenix.utils.Parser
 import kotlinx.coroutines.launch
 
 
 /**
- * A contact detail is a bottom sheet dialog that display the contact's name, photo, and
- * associated offers/lnids.
+ * A contact detail is a bottom sheet dialog that displays the contact's name, photo, and
+ * associated offers/ln addresses.
  *
- * The contact may be edited and deleted from that screen.
+ * It can be used to create, edit, or delete a contact.
+ *
+ * @param contact if null, this dialog is used to create a new contact
+ * @param onContactChange if the [ContactInfo] argument is null, the contact has been deleted
+ * @param newOffer if not null, the contact will be initialised/updated with this offer.
  */
 @Composable
 fun ContactDetailsView(
-    contact: ContactInfo,
-    currentOffer: OfferTypes.Offer?,
     onDismiss: () -> Unit,
-    onContactChange: ((ContactInfo?) -> Unit)?,
+    contact: ContactInfo?,
+    onContactChange: (ContactInfo?) -> Unit,
+    newOffer: OfferTypes.Offer? = null,
 ) {
-    val scope = rememberCoroutineScope()
-
     ModalBottomSheet(
         onDismiss = onDismiss,
         skipPartiallyExpanded = true,
         isContentScrollable = false,
         contentHeight = 550.dp,
-        internalPadding = PaddingValues(0.dp)
+        internalPadding = PaddingValues(0.dp),
+        containerColor = Color.Transparent,
+        dragHandle = null
     ) {
-        val pagerState = rememberPagerState(pageCount = { 2 })
-        HorizontalPager(state = pagerState, verticalAlignment = Alignment.Top, modifier = Modifier.height(700.dp)) { index ->
-            when (index) {
-                0 -> ContactNameAndPhoto(
-                    contact = contact,
-                    currentOffer = currentOffer,
-                    onContactChange = onContactChange,
-                    onDismiss = onDismiss,
-                    onOffersClick = {
-                        scope.launch { pagerState.animateScrollToPage(1) }
-                    }
-                )
-                1 -> ListOffersForContact(
-                    contactOffers = contact.offers,
-                    onBackClick = {
-                        scope.launch { pagerState.animateScrollToPage(0) }
-                    }
-                )
-            }
-        }
+        ContactNameAndPhoto(
+            contact = contact,
+            newOffer = newOffer,
+            onContactChange = { newContact ->
+                onContactChange(newContact)
+                onDismiss()
+            },
+        )
     }
 }
 
 @Composable
-private fun ContactNameAndPhoto(
-    contact: ContactInfo,
-    @Suppress("UNUSED_PARAMETER") currentOffer: OfferTypes.Offer?,
-    onContactChange: ((ContactInfo?) -> Unit)?,
-    onDismiss: () -> Unit,
-    onOffersClick: () -> Unit,
+private fun ColumnScope.ContactNameAndPhoto(
+    contact: ContactInfo?,
+    newOffer: OfferTypes.Offer?,
+    onContactChange: (ContactInfo?) -> Unit,
 ) {
-    val contactsManager by business.databaseManager.contactsDb.collectAsState(null)
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val navController = navController
+    val contactsDb by business.databaseManager.contactsDb.collectAsState(null)
 
-    var name by remember(contact) { mutableStateOf(contact.name) }
-    var photoUri by remember(contact) { mutableStateOf(contact.photoUri) }
-    var useOfferKey by remember(contact) { mutableStateOf(contact.useOfferKey) }
+    val contactId = remember { contact?.id ?: UUID.randomUUID() }
+    var name by remember(contact) { mutableStateOf(contact?.name ?: "") }
+    var nameErrorMessage by remember { mutableStateOf("") }
+    var photoUri by remember(contact) { mutableStateOf(contact?.photoUri) }
+    var useOfferKey by remember(contact) { mutableStateOf(contact?.useOfferKey ?: true) }
+
+    var paymentsCodeList by remember(contact) {
+        val newCodes = newOffer?.let { listOf(ContactOffer(offer = newOffer, label = "", createdAt = currentTimestampMillis())) } ?: emptyList()
+        val existingCodes = contact?.paymentCodes ?: emptyList()
+        val paymentCodesMap: Map<ByteVector32, ContactPaymentCode> = (newCodes + existingCodes).associateBy { it.id }
+        mutableStateOf(paymentCodesMap)
+    }
+    val contactOffers = remember(paymentsCodeList) { paymentsCodeList.values.filterIsInstance<ContactOffer>() }
+    val contactAddresses = remember(paymentsCodeList) { paymentsCodeList.values.filterIsInstance<ContactAddress>() }
+
+    val hasContactChanged = remember(contact, name, photoUri, useOfferKey, paymentsCodeList) {
+        contact == null || contact.name != name || contact.photoUri != photoUri || contact.useOfferKey != useOfferKey || contact.offers != contactOffers || contact.addresses != contactAddresses
+    }
+
+    Box(modifier = Modifier.fillMaxWidth()) {
+        Row (
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = MaterialTheme.colors.background, shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
+                .align(Alignment.BottomCenter)
+        ) {
+            var showDeleteContactConfirmation by remember { mutableStateOf(false) }
+            if (showDeleteContactConfirmation) {
+                ConfirmDialog(
+                    message = stringResource(R.string.contact_delete_code_confirm),
+                    onConfirm = {
+                        safeLet(contactsDb, contact?.id) { db, id ->
+                            scope.launch {
+                                db.deleteContact(id)
+                                onContactChange(null)
+                            }
+                        }
+                        showDeleteContactConfirmation = false
+                    },
+                    onDismiss = { showDeleteContactConfirmation = false }
+                )
+            }
+
+            Button(
+                text = stringResource(id = R.string.btn_delete),
+                icon = R.drawable.ic_trash,
+                iconTint = negativeColor,
+                padding = PaddingValues(horizontal = 8.dp, vertical = 20.dp),
+                horizontalArrangement = Arrangement.Center,
+                maxLines = 1,
+                backgroundColor = Color.Transparent,
+                enabled = contact != null,
+                enabledEffect = false,
+                modifier = Modifier.weight(1f).alpha(if (contact != null) 1f else .2f),
+                onClick = { showDeleteContactConfirmation = true },
+            )
+            Spacer(modifier = Modifier.width(100.dp))
+            Button(
+                text = stringResource(id = R.string.btn_save),
+                icon = R.drawable.ic_check,
+                padding = PaddingValues(horizontal = 8.dp, vertical = 20.dp),
+                horizontalArrangement = Arrangement.Center,
+                maxLines = 1,
+                backgroundColor = Color.Transparent,
+                enabled = hasContactChanged,
+                enabledEffect = false,
+                modifier = Modifier.weight(1f).alpha(if (hasContactChanged) 1f else .2f),
+                onClick = {
+                    if (name.isBlank()) {
+                        nameErrorMessage = context.getString(R.string.contact_error_name_empty)
+                        return@Button
+                    }
+                    scope.launch {
+                        contactsDb?.run {
+                            val newContact = ContactInfo(id = contactId, name = name, photoUri = photoUri, useOfferKey = useOfferKey, offers = contactOffers, addresses = contactAddresses)
+                            saveContact(newContact)
+                            onContactChange(newContact)
+                        }
+                    }
+                },
+            )
+        }
+        Column(modifier = Modifier.align(Alignment.TopCenter)) {
+            Surface(shape = CircleShape, elevation = 2.dp) {
+                ContactPhotoView(photoUri = photoUri, name = contact?.name, onChange = { photoUri = it }, imageSize = 135.dp, borderSize = 0.dp)
+            }
+            Spacer(Modifier.height(3.dp))
+        }
+    }
 
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
             .fillMaxWidth()
-            .padding(bottom = 50.dp),
+            .weight(1f)
+            .background(MaterialTheme.colors.background)
+            .padding(top = 8.dp, bottom = 50.dp),
     ) {
         Column(
-            modifier = Modifier.padding(top = 0.dp, start = 24.dp, end = 24.dp, bottom = 0.dp),
+            modifier = Modifier.padding(horizontal = 12.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            if (onContactChange != null) {
-                ContactPhotoView(photoUri = photoUri, name = contact.name, onChange = { photoUri = it }, imageSize = 120.dp, borderSize = 4.dp)
-            } else {
-                ContactPhotoView(photoUri = photoUri, name = contact.name, onChange = null, imageSize = 120.dp, borderSize = 4.dp)
-            }
-            Spacer(modifier = Modifier.height(24.dp))
             TextInput(
                 text = name,
                 onTextChange = { name = it },
                 textStyle = MaterialTheme.typography.h3.copy(textAlign = TextAlign.Center),
+                placeholder = { Text(text = stringResource(R.string.contact_name_hint), style = MaterialTheme.typography.h3.copy(textAlign = TextAlign.Center, color = mutedTextColor), modifier = Modifier.fillMaxWidth()) },
                 staticLabel = null,
                 textFieldColors = invisibleOutlinedTextFieldColors(),
+                errorMessage = nameErrorMessage,
                 showResetButton = false,
-                enabled = onContactChange != null,
                 enabledEffect = false,
             )
 
-            if (onContactChange != null) {
-                Spacer(modifier = Modifier.height(16.dp))
-                Row(
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(color = MaterialTheme.colors.surface, shape = RoundedCornerShape(16.dp))
+            ) {
+                Button(
+                    text = stringResource(R.string.contact_pay_button),
+                    icon = R.drawable.ic_send,
+                    enabled = paymentsCodeList.isNotEmpty(),
+                    padding = PaddingValues(horizontal = 8.dp, vertical = 16.dp),
                     horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp)
-                ) {
-                    Button(
-                        text = stringResource(id = R.string.contact_delete_button),
-                        icon = R.drawable.ic_trash,
-                        iconTint = negativeColor,
-                        onClick = {
-                            scope.launch {
-                                contactsManager?.run {
-                                    deleteContact(contact.id)
-                                    onContactChange(null)
-                                    onDismiss()
-                                }
-                            }
-                        },
-                        padding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
-                        shape = CircleShape,
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    BorderButton(
-                        text = stringResource(id = R.string.contact_save_button),
-                        icon = R.drawable.ic_check,
-                        enabled = contact.name != name || contact.photoUri != photoUri || contact.useOfferKey != useOfferKey,
-                        onClick = {
-                            scope.launch {
-                                contactsManager?.run {
-                                    val newContact = contact.copy(name = name, photoUri = photoUri, useOfferKey = useOfferKey, offers = contact.offers)
-                                    saveContact(newContact)
-                                    onContactChange(newContact)
-                                    onDismiss()
-                                }
-                            }
-                        },
-                    )
-                }
+                    maxLines = 1,
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        paymentsCodeList.values.firstOrNull()?.let {
+                            navController.navigate("${Screen.Send.route}?input=${it.paymentCode}&forceNavOnBack=true")
+                        }
+                    },
+                )
             }
         }
-        Spacer(modifier = Modifier.height(48.dp))
+
+        Spacer(modifier = Modifier.height(16.dp))
         SwitchView(
             text = stringResource(id = R.string.contact_offer_key_title),
             description = if (useOfferKey) {
@@ -211,69 +283,313 @@ private fun ContactNameAndPhoto(
             },
             checked = useOfferKey,
             onCheckedChange = { useOfferKey = it },
-            enabled = onContactChange != null,
-            modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp)
+            modifier = Modifier
+                .padding(horizontal = 12.dp, vertical = 6.dp)
+                .background(MaterialTheme.colors.surface, shape = RoundedCornerShape(16.dp))
+                .padding(horizontal = 12.dp, vertical = 6.dp)
         )
 
-        Clickable(onClick = onOffersClick) {
+        ListPaymentCodesForContact(
+            contactId = contactId,
+            newOffer = newOffer,
+            paymentCodeList = paymentsCodeList.values.toList(),
+            onSaveContactPaymentCode = {
+                paymentsCodeList = paymentsCodeList + (it.id to it)
+            },
+            onDeletePaymentCode = {
+                paymentsCodeList = paymentsCodeList - it
+            }
+        )
+    }
+}
+
+@Composable
+private fun ListPaymentCodesForContact(
+    contactId: UUID,
+    newOffer: OfferTypes.Offer?,
+    paymentCodeList: List<ContactPaymentCode>,
+    onSaveContactPaymentCode: (ContactPaymentCode) -> Unit,
+    onDeletePaymentCode: (ByteVector32) -> Unit,
+) {
+    var showNewPaymentCodeDialog by remember { mutableStateOf(false) }
+    var selectedPaymentCode by remember { mutableStateOf<ContactPaymentCode?>(null) }
+
+    Text(
+        text = stringResource(R.string.contact_codes_list),
+        style = MaterialTheme.typography.subtitle2,
+        modifier = Modifier.padding(horizontal = 28.dp, vertical = 6.dp)
+    )
+
+    if (paymentCodeList.isEmpty()) {
+        Clickable(onClick = { showNewPaymentCodeDialog = true }) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(horizontal = 12.dp)
+                    .background(MaterialTheme.colors.surface, shape = RoundedCornerShape(16.dp))
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
             ) {
-                Text(text = stringResource(id = R.string.contact_offers_list))
-                Spacer(modifier = Modifier.weight(1f))
-                PhoenixIcon(resourceId = R.drawable.ic_chevron_right, tint = mutedTextColor)
+                Surface(shape = CircleShape, color = MaterialTheme.typography.caption.color.copy(alpha = .3f), modifier = Modifier.size(18.dp)) {
+                    PhoenixIcon(R.drawable.ic_plus, tint = MaterialTheme.colors.surface, modifier = Modifier.size(8.dp))
+                }
+                Spacer(Modifier.width(8.dp))
+                Text(text = stringResource(R.string.contact_codes_add_new), style = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.primary))
             }
+        }
+    } else {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp)
+                .background(MaterialTheme.colors.surface, shape = RoundedCornerShape(16.dp))
+        ) {
+            paymentCodeList.forEach { paymentCode ->
+                val isNewOffer = newOffer != null && paymentCode is ContactOffer && paymentCode.offer == newOffer
+                val data = when (paymentCode) {
+                    is ContactOffer -> paymentCode.offer.encode()
+                    is ContactAddress -> paymentCode.address
+                }
+                Clickable(onClick = { selectedPaymentCode = paymentCode }) {
+                    Row(
+                        modifier = Modifier
+                            .height(IntrinsicSize.Min)
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        val label = paymentCode.label?.takeIf { it.isNotBlank() }
+                        if (label != null) {
+                            Text(
+                                text = label,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                style = MaterialTheme.typography.body1
+                            )
+                            Spacer(Modifier.width(12.dp))
+                            Text(
+                                text = data,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.widthIn(min = 40.dp),
+                                style = MaterialTheme.typography.subtitle2,
+                                fontWeight = if (isNewOffer) FontWeight.Bold else FontWeight.Normal,
+                            )
+                        } else {
+                            Text(
+                                text = data,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f),
+                                fontWeight = if (isNewOffer) FontWeight.Bold else FontWeight.Normal,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+        Clickable(onClick = { showNewPaymentCodeDialog = true }) {
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 28.dp, vertical = 12.dp)
+            ) {
+                Surface(shape = CircleShape, color = MaterialTheme.typography.caption.color.copy(alpha = .5f), modifier = Modifier.size(18.dp)) {
+                    PhoenixIcon(R.drawable.ic_plus, tint = mutedBgColor, modifier = Modifier.size(8.dp))
+                }
+                Spacer(Modifier.width(8.dp))
+                Text(text = stringResource(R.string.contact_codes_add_new_short), style = MaterialTheme.typography.subtitle2)
+            }
+        }
+    }
+
+    val onDismiss = { showNewPaymentCodeDialog = false ; selectedPaymentCode = null }
+    selectedPaymentCode?.let { paymentCode ->
+        ContactOfferDetailDialog(
+            contactId = contactId,
+            paymentCode = paymentCode,
+            onSavePaymentCode = {
+                onSaveContactPaymentCode(it)
+                onDismiss()
+            },
+            onDeletePaymentCode = {
+                onDeletePaymentCode(it)
+                onDismiss()
+            },
+            onDismiss = onDismiss
+        )
+    } ?: run {
+        if (showNewPaymentCodeDialog) {
+            ContactOfferDetailDialog(
+                contactId = contactId,
+                paymentCode = null,
+                onSavePaymentCode = {
+                    onSaveContactPaymentCode(it)
+                    onDismiss()
+                },
+                onDeletePaymentCode = {
+                    onDeletePaymentCode(it)
+                    onDismiss()
+                },
+                onDismiss = onDismiss
+            )
         }
     }
 }
 
 @Composable
-private fun ListOffersForContact(
-    contactOffers: List<ContactOffer>,
-    onBackClick: () -> Unit,
+private fun ContactOfferDetailDialog(
+    contactId: UUID,
+    paymentCode: ContactPaymentCode?,
+    onSavePaymentCode: (ContactPaymentCode) -> Unit,
+    onDeletePaymentCode: (ByteVector32) -> Unit,
+    onDismiss: () -> Unit
 ) {
-    val navController = navController
-    Column(modifier = Modifier.fillMaxSize()) {
-        DefaultScreenHeader(title = stringResource(id = R.string.contact_offers_list), onBackClick = onBackClick)
-        HSeparator()
-        Column(modifier = Modifier.fillMaxWidth()) {
-            contactOffers.forEach { contactOffer ->
-                OfferAttachedToContactRow(
-                    contactOffer = contactOffer,
-                    onOfferClick = { navController.navigate("${Screen.Send.route}?input=${it.encode()}") },
+    ModalBottomSheet(
+        onDismiss = onDismiss,
+        skipPartiallyExpanded = true,
+        isContentScrollable = true,
+        internalPadding = PaddingValues(horizontal = 16.dp),
+    ) {
+        val context = LocalContext.current
+        val contactsDb by business.databaseManager.contactsDb.collectAsState(null)
+        var code by remember { mutableStateOf(
+            when (paymentCode) {
+                is ContactOffer -> paymentCode.offer.encode()
+                is ContactAddress -> paymentCode.address
+                null -> ""
+            }
+        )}
+        var label by remember { mutableStateOf(paymentCode?.label ?: "") }
+        var errorMessage by remember { mutableStateOf<String?>(null) }
+        var showScannerView by remember { mutableStateOf(false) }
+
+        if (showScannerView) {
+            FullScreenDialog(onDismiss = { showScannerView = false }) {
+                Box(Modifier.fillMaxSize()) {
+                    ScannerView(
+                        onScannedText = {
+                            code = Parser.trimMatchingPrefix(Parser.removeExcessInput(it), Parser.bitcoinPrefixes + Parser.lightningPrefixes)
+                            errorMessage = null
+                            showScannerView = false
+                        },
+                        isPaused = false,
+                        onDismiss = { showScannerView = false }
+                    )
+                }
+            }
+        }
+
+        Text(
+            text = when (paymentCode) {
+                is ContactOffer -> stringResource(R.string.contact_codedialog_title_offer)
+                is ContactAddress -> stringResource(R.string.contact_codedialog_title_address)
+                null -> stringResource(R.string.contact_codedialog_title_generic)
+            },
+            style = MaterialTheme.typography.body2,
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center,
+        )
+        Spacer(Modifier.height(24.dp))
+        TextInput(
+            text = label,
+            onTextChange = { label = it },
+            staticLabel = stringResource(R.string.contact_codedialog_label_label),
+            maxLines = 1,
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(Modifier.height(8.dp))
+        TextInput(
+            text = code,
+            onTextChange = {
+                errorMessage = null
+                code = it
+            },
+            staticLabel = when (paymentCode) {
+                is ContactOffer -> stringResource(R.string.contact_codedialog_label_offer)
+                is ContactAddress -> stringResource(R.string.contact_codedialog_label_address)
+                null -> stringResource(R.string.contact_codedialog_label_generic)
+            },
+            trailingIcon = when (paymentCode) {
+                is ContactOffer, null -> {
+                    {
+                        Button(
+                            onClick = { showScannerView = true },
+                            icon = R.drawable.ic_scan_qr,
+                            iconTint = MaterialTheme.colors.primary
+                        )
+                    }
+                }
+                is ContactAddress -> null
+            },
+            errorMessage = errorMessage,
+            maxLines = 3,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(Modifier.height(24.dp))
+
+        Row(modifier = Modifier.fillMaxWidth()) {
+            if (paymentCode != null) {
+                var showDeleteCodeConfirmation by remember { mutableStateOf(false) }
+                if (showDeleteCodeConfirmation) {
+                    ConfirmDialog(
+                        message = stringResource(R.string.contact_delete_code_confirm),
+                        onConfirm = { onDeletePaymentCode(paymentCode.id) ; showDeleteCodeConfirmation = false },
+                        onDismiss = { showDeleteCodeConfirmation = false }
+                    )
+                }
+
+                Spacer(Modifier.height(16.dp))
+                FilledButton(
+                    text = stringResource(R.string.btn_delete),
+                    icon = R.drawable.ic_trash,
+                    onClick = { showDeleteCodeConfirmation = true },
+                    backgroundColor = Color.Transparent,
+                    textStyle = MaterialTheme.typography.button,
+                    iconTint = negativeColor,
                 )
             }
-        }
-    }
-}
+            Spacer(Modifier.weight(1f))
+            FilledButton(
+                text = stringResource(R.string.btn_save),
+                icon = R.drawable.ic_check,
+                onClick = {
 
-@Composable
-private fun OfferAttachedToContactRow(
-    contactOffer: ContactOffer,
-    onOfferClick: (OfferTypes.Offer) -> Unit
-) {
-    val context = LocalContext.current
-    val encoded = remember(contactOffer) { contactOffer.offer.encode() }
-    Clickable(onClick = { onOfferClick(contactOffer.offer) }) {
-        Row(
-            modifier = Modifier.height(IntrinsicSize.Min),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Spacer(modifier = Modifier.width(24.dp))
-            Text(
-                text = encoded,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f)
-            )
-            Button(
-                icon = R.drawable.ic_copy,
-                onClick = { copyToClipboard(context, encoded, "Copy offer") },
-                padding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
+                    fun attemptOffer(contactsDb: SqliteContactsDb, code: String, onFailure: (String, Boolean) -> Unit) {
+                        when (val result = Parser.readOffer(code)) {
+                            null -> onFailure(context.getString(R.string.contact_error_offer_invalid), false)
+                            else -> {
+                                val match = contactsDb.contactForOffer(result)
+                                when {
+                                    match == null || match.id == contactId -> onSavePaymentCode(ContactOffer(offer = result, label = label.takeIf { it.isNotBlank() }, createdAt = currentTimestampMillis()))
+                                    else -> onFailure(context.getString(R.string.contact_error_offer_known, match.name), true)
+                                }
+                            }
+                        }
+                    }
+
+                    fun attemptAddress(contactsDb: SqliteContactsDb, code: String, onFailure: (String) -> Unit) {
+                        when (Parser.parseEmailLikeAddress(code)) {
+                            null -> onFailure(context.getString(R.string.contact_error_address_invalid))
+                            else -> when (val match = contactsDb.contactForLightningAddress(code)) {
+                                null -> onSavePaymentCode(ContactAddress(address = code, label = label.takeIf { it.isNotBlank() }, createdAt = currentTimestampMillis()))
+                                else -> onFailure(context.getString(R.string.contact_error_address_known, match.name))
+                            }
+                        }
+                    }
+
+                    contactsDb?.let { db ->
+                        when (paymentCode) {
+                            is ContactOffer -> attemptOffer(db, code, onFailure = { message, _ -> errorMessage = message })
+                            is ContactAddress -> attemptAddress(db, code, onFailure = { errorMessage = it })
+                            null -> attemptOffer(db, code, onFailure = { message, isFatal ->
+                                if (isFatal) errorMessage = message
+                                else attemptAddress(db, code, onFailure = { errorMessage = context.getString(R.string.contact_error_invalid) })
+                            })
+                        }
+                    }
+                }
             )
         }
+
+        Spacer(Modifier.height(40.dp))
     }
 }

@@ -25,6 +25,7 @@ import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.logging.error
 import fr.acinq.lightning.utils.*
 import fr.acinq.lightning.wire.LiquidityAds
+import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.db.contacts.SqliteContactsDb
@@ -36,7 +37,7 @@ import kotlin.collections.List
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.withContext
 
 class SqlitePaymentsDb(
@@ -127,28 +128,28 @@ class SqlitePaymentsDb(
     }
 
     fun listPaymentsAsFlow(count: Long, skip: Long): Flow<List<WalletPaymentInfo>> {
-        return database.paymentsQueries.list(limit = count, offset = skip, mapper = ::mapPaymentsAndMetadata)
-            .asFlow()
-            .map {
-                withContext(Dispatchers.Default) { it.executeAsList().postProcess() }
-            }
+        return combine(
+            database.paymentsQueries.list(limit = count, offset = skip, mapper = ::mapPaymentsAndMetadata).asFlow().mapToList(Dispatchers.Default),
+            contacts.contactsList,
+            transform = ::combinePaymentAndContact
+        )
     }
 
     fun listOutgoingInFlightPaymentsAsFlow(count: Long, skip: Long): Flow<List<WalletPaymentInfo>> {
-        return database.paymentsQueries.listInFlight(limit = count, offset = skip, mapper = ::mapPaymentsAndMetadata)
-            .asFlow()
-            .map {
-                withContext(Dispatchers.Default) { it.executeAsList().postProcess() }
-            }
+        return combine(
+            database.paymentsQueries.listInFlight(limit = count, offset = skip, mapper = ::mapPaymentsAndMetadata).asFlow().mapToList(Dispatchers.Default),
+            contacts.contactsList,
+            transform = ::combinePaymentAndContact
+        )
     }
 
     // Recent payments includes in-flight (not completed) payments.
     fun listRecentPaymentsAsFlow(count: Long, skip: Long, sinceDate: Long): Flow<List<WalletPaymentInfo>> {
-        return database.paymentsQueries.listRecent(min_ts = sinceDate, limit = count, offset = skip, mapper = ::mapPaymentsAndMetadata)
-            .asFlow()
-            .map {
-                withContext(Dispatchers.Default) { it.executeAsList().postProcess() }
-            }
+        return combine(
+            database.paymentsQueries.listRecent(min_ts = sinceDate, limit = count, offset = skip, mapper = ::mapPaymentsAndMetadata).asFlow().mapToList(Dispatchers.Default),
+            contacts.contactsList,
+            transform = ::combinePaymentAndContact
+        )
     }
 
     suspend fun listCompletedPayments(count: Long, skip: Long, startDate: Long, endDate: Long): List<WalletPaymentInfo> {
@@ -158,13 +159,10 @@ class SqlitePaymentsDb(
         }
     }
 
-    /**
-     * - fetch contact details for incoming/outgoing bolt12 payments.
-     */
-    private fun List<WalletPaymentInfo>.postProcess(): List<WalletPaymentInfo> = this.map { paymentInfo ->
-        // There's no need to check payment types here - all those checks are already done in ContactsManager.
-        contacts.contactForPaymentInfo(paymentInfo)?.let {
-            paymentInfo.copy(contact = it)
+    @Suppress("UNUSED_PARAMETER")
+    private fun combinePaymentAndContact(paymentInfoList: List<WalletPaymentInfo>, contactList: List<ContactInfo>): List<WalletPaymentInfo> = paymentInfoList.map { paymentInfo ->
+        contacts.contactForPayment(paymentInfo.payment, paymentInfo.metadata)?.let { newContact ->
+            paymentInfo.copy(contact = newContact)
         } ?: paymentInfo
     }
 
@@ -186,12 +184,14 @@ class SqlitePaymentsDb(
         original_fiat_rate: Double?,
         lightning_address: String?
     ): WalletPaymentInfo {
+
         val payment = try {
             WalletPaymentAdapter.decode(data_)
         } catch (e: Exception) {
             log.error(e) { "failed to deserialize payment: ${e.message}" }
             throw e
         }
+
         val metadata = PaymentsMetadataQueries.mapAll(
             id = payment.id,
             lnurl_base_type = lnurl_base_type,
@@ -208,11 +208,8 @@ class SqlitePaymentsDb(
             original_fiat_rate = original_fiat_rate,
             lightning_address = lightning_address
         )
-        return WalletPaymentInfo(
-            payment = payment,
-            metadata = metadata,
-            contact = null
-        )
+
+        return WalletPaymentInfo(payment, metadata, null)
     }
 
     suspend fun getOldestCompletedDate(): Long? = withContext(Dispatchers.Default) {

@@ -3,18 +3,14 @@ package fr.acinq.phoenix.db.contacts
 import app.cash.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.PublicKey
-import fr.acinq.bitcoin.io.ByteArrayInput
-import fr.acinq.bitcoin.io.ByteArrayOutput
-import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.db.Bolt12IncomingPayment
+import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.logging.LoggerFactory
-import fr.acinq.lightning.logging.debug
-import fr.acinq.lightning.serialization.InputExtensions.readBoolean
-import fr.acinq.lightning.serialization.OutputExtensions.writeBoolean
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.data.ContactAddress
 import fr.acinq.phoenix.data.ContactInfo
-import fr.acinq.phoenix.data.WalletPaymentInfo
+import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.db.SqliteAppDb
 import fr.acinq.phoenix.db.migrations.appDb.v7.AfterVersion7Result
 import fr.acinq.phoenix.db.sqldelight.PaymentsDatabase
@@ -108,8 +104,8 @@ class SqliteContactsDb(
      * There's generally no need to query the database since we have everything in memory.
      */
 
-    fun contactForPaymentInfo(paymentInfo: WalletPaymentInfo): ContactInfo? {
-        return contactIdForPaymentInfo(paymentInfo)?.let { contactId ->
+    fun contactForPayment(payment: WalletPayment, metadata: WalletPaymentMetadata?): ContactInfo? {
+        return contactIdForPayment(payment, metadata)?.let { contactId ->
             contactForId(contactId)
         }
     }
@@ -152,15 +148,15 @@ class SqliteContactsDb(
         return addressMap.value[ContactAddress.hash(address)]
     }
 
-    private fun contactIdForPaymentInfo(paymentInfo: WalletPaymentInfo): UUID? {
-        return if (paymentInfo.payment is IncomingPayment) {
-            paymentInfo.payment.incomingOfferMetadata()?.let { offerMetadata ->
+    private fun contactIdForPayment(payment: WalletPayment, metadata: WalletPaymentMetadata?): UUID? {
+        return if (payment is Bolt12IncomingPayment) {
+            payment.incomingOfferMetadata()?.let { offerMetadata ->
                 contactIdForPayerPubKey(offerMetadata.payerKey)
             }
         } else {
-            paymentInfo.metadata.lightningAddress?.let { address ->
+            metadata?.lightningAddress?.let { address ->
                 contactIdForLightningAddress(address)
-            } ?: paymentInfo.payment.outgoingInvoiceRequest()?.let { invoiceRequest ->
+            } ?: payment.outgoingInvoiceRequest()?.let { invoiceRequest ->
                 contactIdForOfferId(invoiceRequest.offer.offerId)
             }
         }

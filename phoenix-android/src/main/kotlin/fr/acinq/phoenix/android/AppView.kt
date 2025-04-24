@@ -252,10 +252,11 @@ fun AppView(
                         )
                     }
                     composable(
-                        route = "${Screen.Send.route}?input={input}&openScanner={openScanner}",
+                        route = "${Screen.Send.route}?input={input}&openScanner={openScanner}&forceNavOnBack={forceNavOnBack}",
                         arguments = listOf(
                             navArgument("input") { type = NavType.StringType ; nullable = true },
-                            navArgument("openScanner") { type = NavType.BoolType ; defaultValue = false }
+                            navArgument("openScanner") { type = NavType.BoolType ; defaultValue = false },
+                            navArgument("forceNavOnBack") { type = NavType.BoolType ; defaultValue = false },
                         ),
                         deepLinks = listOf(
                             navDeepLink { uriPattern = "lightning:{data}" },
@@ -289,7 +290,8 @@ fun AppView(
                             SendView(
                                 initialInput = input,
                                 fromDeepLink = !isIntentFromNavigation,
-                                immediatelyOpenScanner = it.arguments?.getBoolean("openScanner") ?: false
+                                immediatelyOpenScanner = it.arguments?.getBoolean("openScanner") ?: false,
+                                forceNavOnBack = it.arguments?.getBoolean("forceNavOnBack") ?: false,
                             )
                         }
                     }

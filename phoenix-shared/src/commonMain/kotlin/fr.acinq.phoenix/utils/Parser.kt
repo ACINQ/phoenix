@@ -78,7 +78,7 @@ object Parser {
     }
 
     fun readOffer(input: String): OfferTypes.Offer? {
-        val cleanInput = trimMatchingPrefix(removeExcessInput(input), lightningPrefixes)
+        val cleanInput = trimMatchingPrefix(removeExcessInput(input), bitcoinPrefixes + lightningPrefixes)
         return when (val res = OfferTypes.Offer.decode(cleanInput)) {
             is Try.Success -> res.get()
             is Try.Failure -> {

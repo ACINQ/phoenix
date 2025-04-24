@@ -198,7 +198,7 @@ fun PaymentsHistoryView(
                 }
                 itemsIndexed(items = payments) { index, item ->
                     ItemCard(index = index, maxItemsCount = payments.size) {
-                        PaymentLine(item, null, onPaymentClick)
+                        PaymentLine(item, onPaymentClick)
                     }
                 }
             }

@@ -103,11 +103,16 @@ import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.data.lnurl.LnurlError
 import fr.acinq.phoenix.managers.SendManager
 
+/**
+ * @param fromDeepLink Default false. If true, the back button always pops to Home.
+ * @param forceNavOnBack Default false. If true, the back button always pops the backstack. Otherwise, be smart and maybe reset the parser instead.
+ */
 @Composable
 fun SendView(
     initialInput: String?,
     immediatelyOpenScanner: Boolean,
     fromDeepLink: Boolean,
+    forceNavOnBack: Boolean,
 ) {
     val navController = navController
     val vm = viewModel<PrepareSendViewModel>(factory = PrepareSendViewModel.Factory(sendManager = business.sendManager))
@@ -115,14 +120,11 @@ fun SendView(
     val keyboardManager = LocalSoftwareKeyboardController.current
 
     val onBackClick: () -> Unit = {
-        if (fromDeepLink) {
-            navController.popToHome()
-        } else {
-            if (vm.parsePaymentState is ParsePaymentState.Ready) {
-                navController.popBackStack()
-            } else {
-                vm.resetParsing()
-            }
+        when {
+            fromDeepLink -> navController.popToHome()
+            forceNavOnBack -> navController.popBackStack()
+            vm.parsePaymentState is ParsePaymentState.Ready -> navController.popBackStack()
+            else -> vm.resetParsing()
         }
     }
 
@@ -251,11 +253,13 @@ private fun PrepareSendView(
             isError = parsePaymentState.hasFailed,
         )
 
-        // contacts list
-        val contacts by business.databaseManager.contactsList.collectAsState(emptyList())
-        Column(modifier = Modifier
-            .weight(1f)
-            .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        // list of contacts
+        val contactsState = business.databaseManager.contactsList.collectAsState(emptyList())
+        val contacts = contactsState.value.filter { it.paymentCodes.isNotEmpty() }
+        Column(
+            modifier = Modifier.weight(1f).fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             if (contacts.isEmpty()) {
                 Spacer(modifier = Modifier.height(24.dp))
                 TextWithIcon(text = stringResource(id = R.string.preparesend_contacts_none), icon = R.drawable.ic_user, textStyle = MaterialTheme.typography.caption.copy(fontSize = 16.sp), iconTint = MaterialTheme.typography.caption.color, iconSize = 24.dp, space = 8.dp)
@@ -276,7 +280,7 @@ private fun PrepareSendView(
                         items(filteredContacts) {
                             ContactRow(
                                 contactInfo = it,
-                                onClick = { it.offers.firstOrNull()?.let { vm.parsePaymentData(it.offer.encode()) } },
+                                onClick = { it.paymentCodes.firstOrNull()?.let { vm.parsePaymentData(it.paymentCode) } },
                                 enabled = !isProcessingData
                             )
                         }

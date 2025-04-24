@@ -52,9 +52,7 @@ class PaymentsManager(
     }
 
     init {
-
         launch { monitorLastCompletedPayment() }
-
         launch { monitorUnconfirmedTransactions() }
     }
 
@@ -70,7 +68,7 @@ class PaymentsManager(
 
     /** Watches transactions that are unconfirmed, checks their confirmation status at each block, and updates relevant payments. */
     private suspend fun monitorUnconfirmedTransactions() {
-        val paymentsDb = paymentsDb()
+        val paymentsDb = databaseManager.paymentsDb()
         // We need to recheck anytime either:
         // - the list of unconfirmed txs changes
         // - a new block is mined
@@ -93,12 +91,8 @@ class PaymentsManager(
         }
     }
 
-    private suspend fun paymentsDb(): SqlitePaymentsDb {
-        return databaseManager.paymentsDb()
-    }
-
     suspend fun updateMetadata(id: UUID, userDescription: String?) {
-        paymentsDb().updateUserInfo(id = id, userDescription = userDescription, userNotes = null)
+        databaseManager.paymentsDb().updateUserInfo(id = id, userDescription = userDescription, userNotes = null)
     }
 
     /**
@@ -106,7 +100,7 @@ class PaymentsManager(
      * payment(s) that triggered that change.
      */
     suspend fun listPaymentsForTxId(txId: TxId): List<WalletPayment> {
-        return paymentsDb().listPaymentsForTxId(txId)
+        return databaseManager.paymentsDb().listPaymentsForTxId(txId)
     }
 
     /** Returns the first incoming payment related to a transaction id. Useful to find the incoming payment that triggered a liquidity purchase. */
@@ -114,19 +108,14 @@ class PaymentsManager(
         return listPaymentsForTxId(txId).filterIsInstance<IncomingPayment>().firstOrNull()
     }
 
-    suspend fun getPayment(
-        id: UUID
-    ): WalletPaymentInfo? {
-        val db = paymentsDb()
+    suspend fun getPayment(id: UUID): WalletPaymentInfo? {
+        val db = databaseManager.paymentsDb()
         return db.getPayment(id)?.let {
-            val paymentInfo = WalletPaymentInfo(
+            WalletPaymentInfo(
                 payment = it.first,
                 metadata = it.second ?: WalletPaymentMetadata(),
-                contact = null
+                contact = db.contacts.contactForPayment(it.first, it.second)
             )
-            db.contacts.contactForPaymentInfo(paymentInfo)?.let { contact ->
-                paymentInfo.copy(contact = contact)
-            } ?: paymentInfo
         }
     }
 }

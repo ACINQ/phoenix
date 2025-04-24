@@ -59,8 +59,7 @@ import fr.acinq.phoenix.data.ContactInfo
 
 @Composable
 fun ContactsListView(
-    canEditContact: Boolean,
-    onEditContact: (ContactInfo) -> Unit,
+    onContactClick: (ContactInfo) -> Unit,
     isOnSurface: Boolean,
 ) {
     val contactsList by business.databaseManager.contactsList.collectAsState(null)
@@ -75,12 +74,10 @@ fun ContactsListView(
             singleLine = true,
             onTextChange = { nameFilterInput = it },
             textFieldColors = mutedTextFieldColors(),
-            modifier = Modifier.padding(horizontal = 12.dp)
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
         )
-        Spacer(modifier = Modifier.height(6.dp))
         ContactsList(
-            canEditContact = canEditContact,
-            onEditContact = onEditContact,
+            onContactClick = onContactClick,
             contacts = if (nameFilterInput.isNotBlank()) {
                 contacts.filter { it.name.contains(nameFilterInput, ignoreCase = true) }
             } else {
@@ -93,12 +90,10 @@ fun ContactsListView(
 
 @Composable
 private fun ContactsList(
-    canEditContact: Boolean,
-    onEditContact: (ContactInfo) -> Unit,
+    onContactClick: (ContactInfo) -> Unit,
     contacts: List<ContactInfo>,
     isOnSurface: Boolean,
 ) {
-    val navController = navController
     val listState = rememberLazyListState()
 
     if (contacts.isEmpty()) {
@@ -113,25 +108,20 @@ private fun ContactsList(
     } else {
         LazyColumn(state = listState) {
             itemsIndexed(contacts) { index, contact ->
-                val onClick = {
-                    contact.offers.firstOrNull()?.let {
-                        navController.navigate("${Screen.Send.route}?input=${it.offer.encode()}")
-                    } ?: run { if (canEditContact) { onEditContact(contact) } }
-                }
                 if (isOnSurface) {
                     Clickable(
                         modifier = Modifier.padding(horizontal = 8.dp),
-                        onClick = onClick,
+                        onClick = { onContactClick(contact) },
                     ) {
-                        ContactRow(contact = contact, canEditContact = canEditContact, onEditContact = onEditContact)
+                        ContactRow(contact = contact)
                     }
                 } else {
                     ItemCard(
                         index = index,
                         maxItemsCount = contacts.size,
-                        onClick = onClick
+                        onClick = { onContactClick(contact) }
                     ) {
-                        ContactRow(contact = contact, canEditContact = canEditContact, onEditContact = onEditContact)
+                        ContactRow(contact = contact)
                     }
                 }
             }
@@ -140,7 +130,7 @@ private fun ContactsList(
 }
 
 @Composable
-private fun ContactRow(contact: ContactInfo, canEditContact: Boolean, onEditContact: (ContactInfo) -> Unit) {
+private fun ContactRow(contact: ContactInfo) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.height(IntrinsicSize.Min),
@@ -159,12 +149,5 @@ private fun ContactRow(contact: ContactInfo, canEditContact: Boolean, onEditCont
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
-        if (canEditContact) {
-            Button(
-                icon = R.drawable.ic_edit,
-                onClick = { onEditContact(contact) },
-                modifier = Modifier.fillMaxHeight(),
-            )
-        }
     }
 }

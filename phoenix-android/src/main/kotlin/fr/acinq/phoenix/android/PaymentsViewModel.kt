@@ -59,7 +59,6 @@ class PaymentsViewModel(
     private val paymentsPageFetcher: PaymentsPageFetcher = paymentsManager.makePageFetcher()
     val paymentsPage = paymentsPageFetcher.paymentsPage
 
-
     init {
         paymentsPageFetcher.subscribeToAll(offset = 0, count = pageSize)
         homePageFetcher.subscribeToAll(offset = 0, count = paymentsCountInHome)

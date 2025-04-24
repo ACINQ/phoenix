@@ -26,12 +26,22 @@ import fr.acinq.lightning.wire.OfferTypes
 import io.ktor.utils.io.charsets.Charsets
 import io.ktor.utils.io.core.toByteArray
 
+sealed class ContactPaymentCode {
+    abstract val id: ByteVector32
+    abstract val label: String?
+    abstract val createdAt: Long
+    abstract val paymentCode: String
+}
+
 data class ContactOffer(
-    val id: ByteVector32,
+    override val id: ByteVector32,
     val offer: OfferTypes.Offer,
-    val label: String?,
-    val createdAt: Long
-) {
+    override val label: String?,
+    override val createdAt: Long
+) : ContactPaymentCode() {
+
+    override val paymentCode: String by lazy { offer.encode() }
+
     constructor(offer: OfferTypes.Offer, label: String?, createdAt: Long? = null) : this(
         id = offer.offerId, // see note below
         offer = offer,
@@ -46,11 +56,14 @@ data class ContactOffer(
 }
 
 data class ContactAddress(
-    val id: ByteVector32,
+    override val id: ByteVector32,
     val address: String,
-    val label: String?,
-    val createdAt: Long
-) {
+    override val label: String?,
+    override val createdAt: Long
+) : ContactPaymentCode() {
+
+    override val paymentCode: String = address
+
     constructor(address: String, label: String?, createdAt: Long? = null) : this(
         id = hash(address), // see note below
         address = address,
@@ -95,4 +108,8 @@ data class ContactInfo(
         addresses = addresses,
         publicKeys = offers.map { it.offer.contactInfos.map { it.nodeId } }.flatten()
     )
+
+    /** List the offers and LN addresses attached to the contact, ordered by creation date (most recent on top). */
+    val paymentCodes: List<ContactPaymentCode> by lazy { (offers + addresses).sortedByDescending { it.createdAt } }
+
 }
