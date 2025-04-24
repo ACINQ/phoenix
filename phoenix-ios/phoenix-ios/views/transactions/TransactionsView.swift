@@ -525,22 +525,7 @@ struct TransactionsView: View {
 			)
 		}
 		
-		let updatedPaymentsPageRows = paymentsPage.rows.map { row in
-			let updatedContact = contactsDb.contactForPayment(payment: row.payment, metadata: row.metadata)
-			return WalletPaymentInfo(
-				payment  : row.payment,
-				metadata : row.metadata,
-				contact  : updatedContact
-			)
-		}
-		let updatedPage = PaymentsPage(
-			offset : paymentsPage.offset,
-			count  : paymentsPage.count,
-			rows   : updatedPaymentsPageRows
-		)
-		
 		cachedRows = updatedCachedRows
-		paymentsPageChanged(updatedPage)
 	}
 	
 	func syncStateChanged(_ state: SyncBackupManager_State) {
