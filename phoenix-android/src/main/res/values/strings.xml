@@ -105,38 +105,37 @@
 
     <string name="receive_help_qr">QR Code of the invoice/address</string>
 
-    <string name="receive_bitcoin_title">Bitcoin</string>
-    <string name="receive_bitcoin_help">This QR code is a classic Bitcoin address.\n\nIt can be read by almost any Bitcoin service/wallet, but payments will be slower to arrive.</string>
     <string name="receive_bitcoin_address_label">Address</string>
     <string name="receive_bitcoin_generating">Synchronizing address…</string>
-    <string name="receive_bitcoin_error">Could not generate a bitcoin address</string>
     <string name="receive_bitcoin_share_title">Bitcoin address</string>
     <string name="receive_bitcoin_share_subject">Share this Bitcoin address with…</string>
 
-    <string name="receive_lightning_title">Lightning</string>
-    <string name="receive_lightning_help">This QR code is a Lightning invoice.\n\nLightning payments are very fast and usually cheaper, but some wallets and services may not support them yet.\n\nIn that case, swipe to the left to get a regular Bitcoin address.</string>
     <string name="receive_lightning_generating">Generating…</string>
+    <string name="receive_lightning_switch_bolt11">Single use</string>
+    <string name="receive_lightning_switch_bolt12">Reusable</string>
     <string name="receive_lightning_amount_label">Amount</string>
-    <string name="receive_lightning_desc_label">Desc</string>
+    <string name="receive_lightning_desc_label">Description</string>
     <string name="receive_lightning_error">Could not generate invoice</string>
-    <string name="receive_lightning_share_subject">Lightning invoice</string>
-    <string name="receive_lightning_share_title">Share this Lightning invoice with…</string>
-    <string name="receive_lnurl_button">Scan</string>
+    <string name="receive_lightning_share_subject">Lightning payment</string>
+    <string name="receive_lightning_share_title">Share this Lightning payment code with…</string>
 
-    <string name="receive_offer_share_title">Bolt12 payment code</string>
-    <string name="receive_offer_share_subject">Share this Bolt12 payment code with…</string>
+    <string name="receive_label_bitcoin">Bitcoin address</string>
+    <string name="receive_label_bip353">Lightning address</string>
+    <string name="receive_label_bolt11">Lightning Bolt11</string>
+    <string name="receive_label_bolt12">Lightning Bolt12</string>
+    <string name="receive_label_bip21">Bitcoin URI</string>
 
-    <string name="receive_offer_copy_bip353">Copy human-readable address</string>
-    <string name="receive_offer_copy_bolt12">Copy payment code</string>
-    <string name="receive_offer_copy_bip21">Copy full URI</string>
+    <string name="receive_bip353_title">What is this?</string>
+    <string name="receive_bip353_info">This Lightning address uses the modern Bip353 standard that works with Bolt12 payment requests.\n\nIt is more private than LNURL-based Lightning addresses, and can even be self-hosted.\n\nHowever, it\'s is bleeding edge tech ; some wallets or services do not understand it yet and won\'t be able to pay you.</string>
+    <string name="receive_bip353_link">Learn more.</string>
 
-    <string name="receive_lightning_edit_button">Edit</string>
-    <string name="receive_lightning_edit_title">Edit invoice</string>
+    <string name="receive_lightning_edit_title_bolt11">Customise this Bolt11 invoice</string>
+    <string name="receive_lightning_edit_title_bolt12">Customise this Bolt12 invoice</string>
     <string name="receive_lightning_edit_amount_label">Amount (optional)</string>
     <string name="receive_lightning_edit_amount_placeholder">Amount to receive</string>
     <string name="receive_lightning_edit_desc_label">Description (optional)</string>
     <string name="receive_lightning_edit_desc_placeholder">Enter a description for this invoice</string>
-    <string name="receive_lightning_edit_generate_button">Create invoice</string>
+    <string name="receive_lightning_edit_generate_button">Generate</string>
 
     <!-- send -->
 

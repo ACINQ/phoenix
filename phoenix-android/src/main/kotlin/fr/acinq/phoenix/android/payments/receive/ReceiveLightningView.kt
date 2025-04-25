@@ -16,13 +16,11 @@
 
 package fr.acinq.phoenix.android.payments.receive
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -40,16 +38,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -61,104 +56,144 @@ import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.toMilliSatoshi
+import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountInput
 import fr.acinq.phoenix.android.components.AmountWithFiatBelow
 import fr.acinq.phoenix.android.components.BorderButton
-import fr.acinq.phoenix.android.components.Button
-import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.Clickable
 import fr.acinq.phoenix.android.components.FilledButton
-import fr.acinq.phoenix.android.components.HSeparator
-import fr.acinq.phoenix.android.components.ProgressView
+import fr.acinq.phoenix.android.components.MutedFilledButton
+import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.TextInput
+import fr.acinq.phoenix.android.components.TransparentFilledButton
+import fr.acinq.phoenix.android.components.VSeparator
+import fr.acinq.phoenix.android.components.buttons.SegmentedControl
+import fr.acinq.phoenix.android.components.buttons.SegmentedControlButton
 import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.feedback.InfoMessage
 import fr.acinq.phoenix.android.components.feedback.WarningMessage
+import fr.acinq.phoenix.android.components.openLink
+import fr.acinq.phoenix.android.internalData
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
-import fr.acinq.phoenix.android.utils.borderColor
-import fr.acinq.phoenix.android.utils.copyToClipboard
-import fr.acinq.phoenix.android.utils.share
+import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.data.availableForReceive
 import fr.acinq.phoenix.data.canRequestLiquidity
 import java.text.DecimalFormat
 
 
 @Composable
-fun LightningInvoiceView(
+fun ColumnScope.LightningInvoiceView(
     vm: ReceiveViewModel,
     onFeeManagementClick: () -> Unit,
     defaultDescription: String,
     defaultExpiry: Long,
-    maxWidth: Dp,
+    columnWidth: Dp,
     isPageActive: Boolean,
 ) {
+    val context = LocalContext.current
+
     var customDesc by remember { mutableStateOf(defaultDescription) }
     var customAmount by remember { mutableStateOf<MilliSatoshi?>(null) }
+    var isReusable by remember { mutableStateOf(false) }
     var feeWarningDialogShownTimestamp by remember { mutableLongStateOf(0L) }
 
-    val onEdit = { vm.isEditingLightningInvoice = true }
+    val bip353AddressState = internalData.getBip353Address.collectAsState(initial = null)
+
+    var showEditInvoiceDialog by remember { mutableStateOf(false) }
+    var showCopyDialog by remember { mutableStateOf(false) }
+    var showShareDialog by remember { mutableStateOf(false) }
+    var showBip353InfoDialog by remember { mutableStateOf(false) }
 
     val state = vm.lightningInvoiceState
-    val isEditing = vm.isEditingLightningInvoice
+    val invoiceData = remember(state) { if (state is LightningInvoiceState.Done) state.paymentData else null }
 
     // refresh LN invoice when it has been paid
     val paymentsManager = business.paymentsManager
     LaunchedEffect(key1 = Unit) {
         paymentsManager.lastCompletedPayment.collect { completedPayment ->
-            if (state is LightningInvoiceState.Show && completedPayment is Bolt11IncomingPayment && state.invoice.paymentHash == completedPayment.paymentHash) {
-                vm.generateInvoice(amount = customAmount, description = customDesc, expirySeconds = defaultExpiry)
+            if (state is LightningInvoiceState.Done.Bolt11 && completedPayment is Bolt11IncomingPayment && state.invoice.paymentHash == completedPayment.paymentHash) {
+                vm.generateInvoice(amount = customAmount, description = customDesc, expirySeconds = defaultExpiry, isReusable)
                 feeWarningDialogShownTimestamp = 0 // reset the dialog tracker to show it asap for a new invoice
             }
         }
     }
 
+    LaunchedEffect(key1 = isReusable) {
+        vm.generateInvoice(amount = customAmount, description = customDesc, expirySeconds = defaultExpiry, isReusable = isReusable)
+    }
+
     InvoiceHeader(
+        text = stringResource(if (isReusable) R.string.receive_label_bolt12 else R.string.receive_label_bolt11),
         icon = R.drawable.ic_zap,
-        helpMessage = stringResource(id = R.string.receive_lightning_help),
-        content = { Text(text = stringResource(id = R.string.receive_lightning_title)) },
     )
 
-    if (isEditing) {
-        EditInvoiceView(
-            amount = customAmount,
-            description = customDesc,
-            onAmountChange = { customAmount = it },
-            onDescriptionChange = { customDesc = it },
-            onCancel = { vm.isEditingLightningInvoice = false },
-            onSubmit = { vm.generateInvoice(amount = customAmount, description = customDesc, expirySeconds = defaultExpiry) },
-            onFeeManagementClick = onFeeManagementClick,
-            onDialogShown = { feeWarningDialogShownTimestamp = currentTimestampMillis() }
-        )
-    } else {
-        when (state) {
-            is LightningInvoiceState.Init, is LightningInvoiceState.Generating -> {
-                if (state is LightningInvoiceState.Init) {
-                    LaunchedEffect(key1 = Unit) {
-                        vm.generateInvoice(amount = customAmount, description = customDesc, expirySeconds = defaultExpiry)
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        QRCodeView(bitmap = vm.lightningQRBitmap, data = invoiceData, width = columnWidth, loadingLabel = stringResource(id = R.string.receive_lightning_generating))
+
+        Spacer(modifier = Modifier.height(16.dp))
+        SegmentedControl(modifier = Modifier.width(columnWidth)) {
+            SegmentedControlButton(onClick = { isReusable = false }, text = stringResource(R.string.receive_lightning_switch_bolt11), selected = !isReusable)
+            SegmentedControlButton(onClick = { isReusable = true }, text = stringResource(R.string.receive_lightning_switch_bolt12), selected = isReusable)
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+        Clickable(
+            modifier = Modifier.width(columnWidth),
+            shape = RoundedCornerShape(16.dp),
+            onClick = { showEditInvoiceDialog = true },
+            enabled = state is LightningInvoiceState.Done
+        ) {
+            Column(modifier = Modifier.padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(modifier = Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    PhoenixIcon(R.drawable.ic_edit, tint = MaterialTheme.colors.primary)
+                    VSeparator(color = mutedTextColor.copy(alpha = .4f))
+                    Column(modifier = Modifier.padding(top = 2.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        if (state is LightningInvoiceState.Done) {
+                            if (state.description.isNullOrBlank() && state.amount == null) {
+                                Text(text = "Add amount and description", style = MaterialTheme.typography.subtitle2)
+                            }
+                            state.description?.takeIf { it.isNotBlank() }?.let { desc ->
+                                QRCodeLabel(label = stringResource(R.string.receive_lightning_desc_label)) {
+                                    Text(
+                                        text = desc,
+                                        maxLines = 2,
+                                        overflow = TextOverflow.Ellipsis,
+                                        style = MaterialTheme.typography.body2.copy(fontSize = 14.sp),
+                                    )
+                                }
+                            }
+                            state.amount?.let { amount ->
+                                QRCodeLabel(label = stringResource(R.string.receive_lightning_amount_label)) {
+                                    AmountWithFiatBelow(
+                                        amount = amount,
+                                        amountTextStyle = MaterialTheme.typography.body2.copy(fontSize = 14.sp),
+                                        fiatTextStyle = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
-                Box(contentAlignment = Alignment.Center) {
-                    QRCodeView(bitmap = vm.lightningQRBitmap, data = null, maxWidth = maxWidth)
-                    Card(shape = RoundedCornerShape(16.dp)) { ProgressView(text = stringResource(id = R.string.receive_lightning_generating)) }
-                }
-                Spacer(modifier = Modifier.height(32.dp))
-                CopyShareEditButtons(onCopy = { }, onShare = { }, onEdit = onEdit, maxWidth = maxWidth)
             }
-            is LightningInvoiceState.Show -> {
-                DisplayLightningInvoice(
-                    invoice = state.invoice,
-                    bitmap = vm.lightningQRBitmap,
+        }
+
+        when (state) {
+            is LightningInvoiceState.Init, is LightningInvoiceState.Generating -> {}
+            is LightningInvoiceState.Done -> {
+                EvaluateLiquidityIssuesForPayment(
+                    amount = state.amount,
                     onFeeManagementClick = onFeeManagementClick,
-                    onEdit = onEdit,
-                    maxWidth = maxWidth,
                     showDialogImmediately = isPageActive && currentTimestampMillis() - feeWarningDialogShownTimestamp > 30_000,
-                    onDialogShown = { feeWarningDialogShownTimestamp = currentTimestampMillis() }
+                    onDialogShown = { feeWarningDialogShownTimestamp = currentTimestampMillis() },
                 )
+                Spacer(modifier = Modifier.height(32.dp))
+                TorWarning()
+                Spacer(modifier = Modifier.height(32.dp))
             }
             is LightningInvoiceState.Error -> {
                 ErrorMessage(
@@ -169,156 +204,185 @@ fun LightningInvoiceView(
         }
     }
 
-    var showOfferDialog by remember { mutableStateOf(false) }
-    if (showOfferDialog) {
-        DisplayOfferDialog(onDismiss = { showOfferDialog = false }, offerState = vm.offerState)
+    Spacer(modifier = Modifier.weight(1f))
+
+    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        bip353AddressState.value?.let {
+            Clickable(onClick = { showBip353InfoDialog = true }, shape = RoundedCornerShape(16.dp)) {
+                Text(text = stringResource(id = R.string.utils_bip353_with_prefix, it), style = MaterialTheme.typography.body2, fontSize = 15.sp, modifier = Modifier.padding(8.dp))
+            }
+        }
+        Spacer(Modifier.height(16.dp))
+        CopyShareButtons(
+            onCopy = { showCopyDialog = true },
+            onShare = { showShareDialog = true }
+        )
+        Spacer(Modifier.height(32.dp))
     }
 
-    if ((state is LightningInvoiceState.Init || state is LightningInvoiceState.Show) && !isEditing) {
-        Spacer(modifier = Modifier.height(16.dp))
-        TorWarning()
-        HSeparator(width = 50.dp)
-        Spacer(modifier = Modifier.height(24.dp))
-        FilledButton(
-            text = stringResource(id = R.string.receive_toggle_offer_button),
-            icon = R.drawable.ic_qrcode,
-            onClick = { showOfferDialog = true },
+    if (showEditInvoiceDialog) {
+        EditInvoiceView(
+            isReusable = isReusable,
+            amount = customAmount,
+            description = customDesc,
+            onAmountChange = { customAmount = it },
+            onDescriptionChange = { customDesc = it },
+            onDismiss = { showEditInvoiceDialog = false },
+            onSubmit = {
+                vm.generateInvoice(amount = customAmount, description = customDesc, expirySeconds = defaultExpiry, isReusable = isReusable)
+                showEditInvoiceDialog = false
+            },
         )
+    }
+
+    if (showCopyDialog) {
+        CopyLightningDialog(
+            bip353Address = bip353AddressState.value,
+            offer = if (state is LightningInvoiceState.Done.Bolt12) state.offer else null,
+            invoice = if (state is LightningInvoiceState.Done.Bolt11) state.invoice else null,
+            onDismiss = { showCopyDialog = false }
+        )
+    }
+
+    if (showShareDialog) {
+        ShareLightningDialog(
+            offer = if (state is LightningInvoiceState.Done.Bolt12) state.offer else null,
+            invoice = if (state is LightningInvoiceState.Done.Bolt11) state.invoice else null,
+            onDismiss = { showShareDialog = false }
+        )
+    }
+
+    if (showBip353InfoDialog) {
+        ModalBottomSheet(onDismiss = { showBip353InfoDialog = false }) {
+            Text(text = stringResource(R.string.receive_bip353_title), style = MaterialTheme.typography.h4)
+            Spacer(Modifier.height(8.dp))
+            Text(text = stringResource(R.string.receive_bip353_info))
+            Spacer(Modifier.height(16.dp))
+            MutedFilledButton(
+                text = stringResource(R.string.receive_bip353_link),
+                icon = R.drawable.ic_external_link,
+                iconTint = MaterialTheme.colors.primary,
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                onClick = { openLink(context, "https://bolt12.org") }
+            )
+        }
     }
 }
 
 @Composable
-private fun DisplayLightningInvoice(
-    invoice: Bolt11Invoice,
-    bitmap: ImageBitmap?,
-    onEdit: () -> Unit,
-    onFeeManagementClick: () -> Unit,
-    maxWidth: Dp,
-    showDialogImmediately: Boolean,
-    onDialogShown: () -> Unit,
+private fun CopyLightningDialog(
+    bip353Address: String?,
+    invoice: Bolt11Invoice?,
+    offer: OfferTypes.Offer?,
+    onDismiss: () -> Unit
 ) {
-    val context = LocalContext.current
-    val prString = remember(invoice) { invoice.write() }
-    val amount = invoice.amount
-    val description = invoice.description.takeUnless { it.isNullOrBlank() }
-
-    QRCodeView(data = prString, bitmap = bitmap, maxWidth = maxWidth)
-
-    EvaluateLiquidityIssuesForPayment(
-        amount = amount,
-        onFeeManagementClick = onFeeManagementClick,
-        showDialogImmediately = showDialogImmediately,
-        onDialogShown = onDialogShown,
-    )
-
-    if (amount != null || description != null) {
-        Column(
-            modifier = Modifier
-                .clip(RoundedCornerShape(12.dp))
-                .clickable(onClick = onEdit, role = Role.Button, onClickLabel = stringResource(id = R.string.receive_lightning_edit_title))
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            if (!description.isNullOrBlank()) {
-                QRCodeDetail(
-                    label = stringResource(id = R.string.receive_lightning_desc_label),
-                    value = description,
-                    maxLines = 2
-                )
-            }
-            if (amount != null) {
-                QRCodeDetail(label = stringResource(id = R.string.receive_lightning_amount_label)) {
-                    AmountWithFiatBelow(
-                        amount = amount,
-                        amountTextStyle = MaterialTheme.typography.body2.copy(fontSize = 14.sp),
-                        fiatTextStyle = MaterialTheme.typography.subtitle2,
-                    )
-                }
-            }
+    ModalBottomSheet(
+        onDismiss = onDismiss,
+        internalPadding = PaddingValues(bottom = 20.dp)
+    ) {
+        Text(text = stringResource(R.string.btn_copy), style = MaterialTheme.typography.h4, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+        Spacer(Modifier.height(16.dp))
+        invoice?.let {
+            CopyButtonDialog(label = stringResource(id = R.string.receive_label_bolt11), value = it.write(), icon = R.drawable.ic_zap)
         }
-    } else {
-        Spacer(modifier = Modifier.height(16.dp))
+        offer?.encode()?.let {
+            CopyButtonDialog(label = stringResource(id = R.string.receive_label_bolt12), value = it, icon = R.drawable.ic_zap)
+            CopyButtonDialog(label = stringResource(id = R.string.receive_label_bip21), value = "bitcoin:?lno=$it", icon = R.drawable.ic_zap)
+        }
+        if (!bip353Address.isNullOrBlank()) {
+            CopyButtonDialog(label = stringResource(id = R.string.receive_label_bip353), value = stringResource(id = R.string.utils_bip353_with_prefix, bip353Address), icon = R.drawable.ic_arobase)
+        }
     }
-    Spacer(modifier = Modifier.height(16.dp))
-    CopyShareEditButtons(
-        onCopy = { copyToClipboard(context, data = prString) },
-        onShare = { share(context, "lightning:$prString", context.getString(R.string.receive_lightning_share_subject), context.getString(R.string.receive_lightning_share_title)) },
-        onEdit = onEdit,
-        maxWidth = maxWidth
-    )
+}
+
+@Composable
+private fun ShareLightningDialog(
+    invoice: Bolt11Invoice?,
+    offer: OfferTypes.Offer?,
+    onDismiss: () -> Unit
+) {
+    ModalBottomSheet(
+        onDismiss = onDismiss,
+        internalPadding = PaddingValues(bottom = 20.dp)
+    ) {
+        Text(text = stringResource(R.string.btn_share), style = MaterialTheme.typography.h4, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+        offer?.encode()?.let {
+            ShareButtonDialog(label = stringResource(id = R.string.receive_label_bolt12), value = it, icon = R.drawable.ic_zap)
+            ShareButtonDialog(label = stringResource(id = R.string.receive_label_bip21), value = "bitcoin:?lno=$it", icon = R.drawable.ic_zap)
+        }
+        invoice?.let {
+            ShareButtonDialog(label = stringResource(id = R.string.receive_label_bolt11), value = it.write(), icon = R.drawable.ic_zap)
+        }
+    }
 }
 
 @Composable
 private fun EditInvoiceView(
+    isReusable: Boolean,
     amount: MilliSatoshi?,
     description: String?,
     onDescriptionChange: (String) -> Unit,
     onAmountChange: (MilliSatoshi?) -> Unit,
-    onCancel: () -> Unit,
+    onDismiss: () -> Unit,
     onSubmit: () -> Unit,
-    onFeeManagementClick: () -> Unit,
-    onDialogShown: () -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .width(320.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .border(
-                border = BorderStroke(1.dp, borderColor),
-                shape = RoundedCornerShape(16.dp)
-            )
-            .background(MaterialTheme.colors.surface),
-        horizontalAlignment = Alignment.CenterHorizontally,
+    ModalBottomSheet(
+        onDismiss = onDismiss,
+        skipPartiallyExpanded = true,
+        isContentScrollable = true,
+        internalPadding = PaddingValues(0.dp),
+        containerColor = MaterialTheme.colors.background,
     ) {
-        Spacer(modifier = Modifier.height(12.dp))
-
-        TextInput(
-            text = description ?: "",
-            onTextChange = onDescriptionChange,
-            staticLabel = stringResource(id = R.string.receive_lightning_edit_desc_label),
-            placeholder = { Text(text = stringResource(id = R.string.receive_lightning_edit_desc_placeholder), maxLines = 2, overflow = TextOverflow.Ellipsis) },
-            maxChars = 140,
-            minLines = 2,
-            maxLines = Int.MAX_VALUE,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp),
+        Text(
+            text = stringResource(if (isReusable) R.string.receive_lightning_edit_title_bolt12 else R.string.receive_lightning_edit_title_bolt11),
+            style = MaterialTheme.typography.h4,
+            modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center
         )
         Spacer(Modifier.height(16.dp))
-
-        AmountInput(
-            amount = amount,
-            staticLabel = stringResource(id = R.string.receive_lightning_edit_amount_label),
-            placeholder = { Text(text = stringResource(id = R.string.receive_lightning_edit_amount_placeholder), maxLines = 1, overflow = TextOverflow.Ellipsis) },
-            onAmountChange = { complexAmount -> onAmountChange(complexAmount?.amount) },
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp),
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Row {
-            Button(
-                icon = R.drawable.ic_arrow_back,
-                onClick = onCancel,
+                .padding(horizontal = 12.dp)
+                .background(shape = RoundedCornerShape(24.dp), color = MaterialTheme.colors.surface)
+                .padding(16.dp)
+        ) {
+            TextInput(
+                text = description ?: "",
+                onTextChange = onDescriptionChange,
+                staticLabel = stringResource(id = R.string.receive_lightning_edit_desc_label),
+                placeholder = { Text(text = stringResource(id = R.string.receive_lightning_edit_desc_placeholder), maxLines = 2, overflow = TextOverflow.Ellipsis) },
+                maxChars = 140,
+                minLines = 2,
+                maxLines = Int.MAX_VALUE,
+                modifier = Modifier.fillMaxWidth(),
             )
-            Spacer(modifier = Modifier.weight(1f))
-            Button(
+            Spacer(Modifier.height(16.dp))
+            AmountInput(
+                amount = amount,
+                staticLabel = stringResource(id = R.string.receive_lightning_edit_amount_label),
+                placeholder = { Text(text = stringResource(id = R.string.receive_lightning_edit_amount_placeholder), maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                onAmountChange = { complexAmount -> onAmountChange(complexAmount?.amount) },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            FilledButton(
                 text = stringResource(id = R.string.receive_lightning_edit_generate_button),
                 icon = R.drawable.ic_qrcode,
+                shape = RoundedCornerShape(16.dp),
                 onClick = onSubmit,
-                horizontalArrangement = Arrangement.End,
+                modifier = Modifier.fillMaxWidth()
             )
         }
-    }
 
-    EvaluateLiquidityIssuesForPayment(
-        amount = amount,
-        onFeeManagementClick = onFeeManagementClick,
-        showDialogImmediately = false, // do not show the dialog immediately when editing the invoice, it's annoying
-        onDialogShown = onDialogShown,
-    )
+        Spacer(modifier = Modifier.height(8.dp))
+        TransparentFilledButton(
+            text = stringResource(id = R.string.btn_cancel),
+            textStyle = MaterialTheme.typography.caption,
+            onClick = onDismiss,
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(32.dp))
+    }
 }
 
 @Composable
@@ -331,6 +395,9 @@ fun EvaluateLiquidityIssuesForPayment(
     val channelsMap by business.peerManager.channelsFlow.collectAsState()
     val canRequestLiquidity = remember(channelsMap) { channelsMap.canRequestLiquidity() }
     val availableForReceive = remember(channelsMap) { channelsMap.availableForReceive() }
+
+    val areChannelsUnusable = remember(channelsMap) { channelsMap?.values?.none { it.isUsable } ?: false }
+    if (areChannelsUnusable) return
 
     // TODO: add a delay before evaluating liquidity to make sure we have all data necessary before displaying a warning, in order to avoid the dialog being displayed too eagerly with some flickering
 
@@ -508,7 +575,7 @@ private fun IncomingLiquidityWarning(
             }
         }
     }
-    Spacer(modifier = Modifier.height(8.dp))
+    Spacer(modifier = Modifier.height(16.dp))
     Clickable(onClick = { showSheet = true }, shape = RoundedCornerShape(12.dp)) {
         if (isSevere) {
             WarningMessage(
@@ -526,6 +593,34 @@ private fun IncomingLiquidityWarning(
                 alignment = Alignment.CenterHorizontally,
                 padding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
             )
+        }
+    }
+}
+
+@Composable
+private fun TorWarning() {
+    val isTorEnabled by userPrefs.getIsTorEnabled.collectAsState(initial = null)
+
+    if (isTorEnabled == true) {
+
+        var showTorWarningDialog by remember { mutableStateOf(false) }
+
+        Clickable(onClick = { showTorWarningDialog = true }, shape = RoundedCornerShape(12.dp)) {
+            WarningMessage(
+                header = stringResource(id = R.string.receive_tor_warning_title),
+                details = null,
+                alignment = Alignment.CenterHorizontally,
+            )
+        }
+
+        if (showTorWarningDialog) {
+            ModalBottomSheet(
+                onDismiss = { showTorWarningDialog = false },
+            ) {
+                Text(text = stringResource(id = R.string.receive_tor_warning_title), style = MaterialTheme.typography.h4)
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(text = stringResource(id = R.string.receive_tor_warning_dialog_content_1))
+            }
         }
     }
 }

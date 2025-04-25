@@ -204,13 +204,14 @@ fun HSeparator(
 @Composable
 fun VSeparator(
     padding: PaddingValues = PaddingValues(0.dp),
+    color: Color = borderColor,
     height: Dp? = null
 ) {
     Box(
         (height?.run { Modifier.height(height) } ?: Modifier.fillMaxHeight())
             .width(1.dp)
             .padding(padding)
-            .background(color = borderColor)
+            .background(color = color)
     )
 }
 

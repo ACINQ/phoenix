@@ -162,21 +162,6 @@
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Prichádzajúca likvidita nie je dostatočná a máte zakázanú automatickú správu kanálov.</string>
 
-    <!-- receive: offer labels -->
-
-    <string name="receive_toggle_offer_button">Zobraziť opakovane použiteľný QR kód</string>
-
-    <string name="receive_offer_howto_intro_1">🎉 Tu je vaša žiadosť o opakovanú platbu!</string>
-    <string name="receive_offer_howto_intro_2">Klepnutím sa dozviete, ako ho používať</string>
-    <string name="receive_offer_howto_details_1">Táto požiadavka na platbu Bolt12 je ekvivalentom adresy Bitcoin v službe Lightning.</string>
-    <string name="receive_offer_howto_details_2">Na rozdiel od tradičných faktúr Lightning nevyprší jej platnosť a môže sa použiť opakovane.</string>
-    <string name="receive_offer_howto_details_3">Široké zdieľanie : za dary, prepitné alebo aby vám zaplatili vaši priatelia.</string>
-    <string name="receive_offer_howto_details_4_title">🛟 Kto podporuje Bolt12?</string>
-    <string name="receive_offer_howto_details_4">V súčasnosti podporuje Bolt12 len málo služieb. Ak služba odmietne túto faktúru, dajte jej vedieť, že o ňu prichádza!</string>
-    <string name="receive_offer_howto_details_5_title">🔋 Obmedzenia batérie</string>
-    <string name="receive_offer_howto_details_5">Skontrolujte, či systém Android neaplikuje na Phoenix režim šetrenia batérie. V opačnom prípade nebudete môcť prijímať platby, ak je aplikácia zatvorená alebo na pozadí. Problémy spôsobí aj povolenie TOR vo Phoenixe.</string>
-    <string name="receive_offer_howto_details_faq_link">Viac informácií</string>
-
     <!-- receive: Tor warning -->
 
     <string name="receive_tor_warning_title">Tor je povolen</string>

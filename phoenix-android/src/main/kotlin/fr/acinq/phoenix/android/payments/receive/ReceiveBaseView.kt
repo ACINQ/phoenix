@@ -18,7 +18,6 @@ package fr.acinq.phoenix.android.payments.receive
 
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -29,7 +28,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -49,12 +47,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -64,13 +60,13 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.dialogs.FullScreenDialog
-import fr.acinq.phoenix.android.components.dialogs.IconPopup
 import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.components.feedback.WarningMessage
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.images.QRCodeHelper
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.extensions.safeLet
+import fr.acinq.phoenix.android.utils.share
 import fr.acinq.phoenix.android.utils.updateScreenBrightnesss
 import kotlinx.coroutines.launch
 
@@ -82,24 +78,16 @@ fun ReceiveView(
 ) {
     val vm: ReceiveViewModel = viewModel(factory = ReceiveViewModel.Factory(business.chain, business.peerManager, business.nodeParamsManager, business.walletManager))
 
-    DefaultScreenLayout(horizontalAlignment = Alignment.CenterHorizontally, isScrollable = true) {
+    DefaultScreenLayout(horizontalAlignment = Alignment.CenterHorizontally, isScrollable = false) {
         DefaultScreenHeader(
-            onBackClick = if (vm.isEditingLightningInvoice) {
-                { vm.isEditingLightningInvoice = false }
-            } else {
-                onBackClick
-            },
+            onBackClick = onBackClick,
             content = {
-                if (vm.isEditingLightningInvoice) {
-                    Text(text = stringResource(id = R.string.receive_lightning_edit_title))
-                }
                 Spacer(modifier = Modifier.weight(1f))
-                BorderButton(
-                    text = stringResource(id = R.string.receive_lnurl_button),
-                    icon = R.drawable.ic_scan,
+                TransparentFilledButton(
+                    icon = R.drawable.ic_scan_qr,
+                    iconTint = MaterialTheme.colors.primary,
                     onClick = onScanDataClick,
-                    shape = CircleShape,
-                    padding = PaddingValues(8.dp),
+                    padding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
                     space = 6.dp,
                 )
                 Spacer(modifier = Modifier.width(16.dp))
@@ -115,48 +103,44 @@ private fun ReceiveViewPages(
     onFeeManagementClick: () -> Unit,
 ) {
     val pagerState = rememberPagerState(pageCount = { 2 })
-    // we need to be responsive in some subcomponents, like the edit-invoice buttons
     BoxWithConstraints {
         HorizontalPager(
             modifier = Modifier.fillMaxHeight(),
             state = pagerState,
-            contentPadding = PaddingValues(
-                horizontal = when {
-                    maxWidth <= 240.dp -> 30.dp
-                    maxWidth <= 320.dp -> 40.dp
-                    maxWidth <= 480.dp -> 44.dp
-                    else -> 52.dp
-                }
-            ),
-            verticalAlignment = Alignment.Top
+            contentPadding = PaddingValues(horizontal = 44.dp),
         ) { index ->
-            val maxWidth = maxWidth
+            val columnWidth = remember(maxWidth) {
+                when {
+                    maxWidth <= 240.dp -> 160.dp
+                    maxWidth <= 320.dp -> 240.dp
+                    maxWidth <= 480.dp -> 270.dp
+                    else -> 320.dp
+                }
+            }
+            val topPadding = remember(maxHeight) {
+                when {
+                    maxHeight > 800.dp -> 80.dp
+                    maxHeight > 600.dp -> 60.dp
+                    maxHeight > 400.dp -> 40.dp
+                    else -> 20.dp
+                }
+            }
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        horizontal = when {
-                            maxWidth <= 320.dp -> 6.dp
-                            maxWidth <= 480.dp -> 8.dp
-                            else -> 10.dp
-                        },
-                        vertical = when {
-                            maxHeight <= 800.dp -> 32.dp
-                            else -> 50.dp
-                        }
-                    ),
+                    .fillMaxSize().verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Spacer(Modifier.height(topPadding))
                 when (index) {
                     0 -> {
                         val defaultInvoiceExpiry by userPrefs.getInvoiceDefaultExpiry.collectAsState(null)
                         val defaultInvoiceDesc by userPrefs.getInvoiceDefaultDesc.collectAsState(null)
                         safeLet(defaultInvoiceDesc, defaultInvoiceExpiry) { desc, expiry ->
                             LightningInvoiceView(vm = vm, onFeeManagementClick = onFeeManagementClick,
-                                defaultDescription = desc, defaultExpiry = expiry, maxWidth = maxWidth, isPageActive = pagerState.currentPage == 0)
+                                defaultDescription = desc, defaultExpiry = expiry, columnWidth = columnWidth, isPageActive = pagerState.currentPage == 0)
                         } ?: ProgressView(text = stringResource(id = R.string.utils_loading_prefs))
                     }
-                    1 -> BitcoinAddressView(vm = vm, maxWidth = maxWidth)
+                    1 -> BitcoinAddressView(vm = vm, columnWidth = columnWidth)
                 }
             }
         }
@@ -165,60 +149,46 @@ private fun ReceiveViewPages(
 
 @Composable
 fun InvoiceHeader(
+    text: String,
     icon: Int,
-    helpMessage: String,
-    content: @Composable RowScope.() -> Unit,
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        IconPopup(
-            icon = icon,
-            iconSize = 24.dp,
-            iconPadding = 4.dp,
-            colorAtRest = MaterialTheme.colors.primary,
-            spaceRight = 8.dp,
-            spaceLeft = null,
-            popupMessage = helpMessage
-        )
-        content()
-    }
-    Spacer(modifier = Modifier.height(16.dp))
+    TextWithIcon(
+        text = text,
+        icon = icon,
+        textStyle = MaterialTheme.typography.caption.copy(fontSize = 16.sp), maxLines = 1,
+        iconTint = MaterialTheme.typography.caption.color,
+    )
+    Spacer(Modifier.height(16.dp))
 }
 
 @Composable
 fun QRCodeView(
     data: String?,
     bitmap: ImageBitmap?,
-    details: @Composable () -> Unit = {},
-    maxWidth: Dp,
+    width: Dp = Dp.Unspecified,
+    loadingLabel: String,
 ) {
     val context = LocalContext.current
-    Column(
+    Box(
         modifier = Modifier
-            .padding(horizontal = 4.dp)
-            .width(
-                when {
-                    maxWidth <= 240.dp -> 160.dp
-                    maxWidth <= 320.dp -> 240.dp
-                    maxWidth <= 480.dp -> 270.dp
-                    else -> 320.dp
-                }
-            )
+            .width(width)
             .clip(RoundedCornerShape(16.dp))
             .border(
                 border = BorderStroke(1.dp, MaterialTheme.colors.primary),
                 shape = RoundedCornerShape(16.dp)
             )
             .background(Color.White),
-        horizontalAlignment = Alignment.CenterHorizontally,
+        contentAlignment = Alignment.Center,
     ) {
         QRCodeImage(bitmap = bitmap, onLongClick = { data?.let { copyToClipboard(context, it) } })
-        details()
+        if (bitmap == null) {
+            Card(shape = RoundedCornerShape(16.dp)) { ProgressView(text = loadingLabel) }
+        }
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun QRCodeImage(
+private fun QRCodeImage(
     bitmap: ImageBitmap?,
     onLongClick: () -> Unit,
 ) {
@@ -240,6 +210,7 @@ fun QRCodeImage(
             )
         }
     }
+
     Surface(
         Modifier
             .combinedClickable(
@@ -296,86 +267,59 @@ fun QRCodeImage(
 }
 
 @Composable
-fun QRCodeDetail(label: String, value: String, maxLines: Int = Int.MAX_VALUE) {
-    QRCodeDetail(label) {
-        SelectionContainer {
-            Text(
-                text = value,
-                style = MaterialTheme.typography.body2.copy(fontSize = 14.sp),
-                maxLines = maxLines,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
+fun QRCodeLabel(label: String, content: @Composable () -> Unit) {
+    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text(text = label, style = MaterialTheme.typography.subtitle2)
+        Column { content() }
     }
 }
 
 @Composable
-fun QRCodeDetail(label: String, content: @Composable () -> Unit) {
-    Row(modifier = Modifier.padding(horizontal = 4.dp)) {
-        Text(
-            text = label.uppercase(),
-            style = MaterialTheme.typography.subtitle1.copy(fontSize = 12.sp, textAlign = TextAlign.End),
-            modifier = Modifier
-                .alignBy(FirstBaseline)
-                .width(80.dp)
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Column(
-            modifier = Modifier
-                .alignBy(FirstBaseline)
-                .widthIn(min = 100.dp)
-        ) {
-            content()
-        }
-    }
-}
-
-@Composable
-fun CopyShareEditButtons(
+fun CopyShareButtons(
     onCopy: () -> Unit,
     onShare: () -> Unit,
-    onEdit: (() -> Unit)?,
-    maxWidth: Dp,
 ) {
     Row(modifier = Modifier.padding(horizontal = 4.dp)) {
-        BorderButton(icon = R.drawable.ic_copy, onClick = onCopy)
-        Spacer(modifier = Modifier.width(if (maxWidth <= 360.dp) 12.dp else 16.dp))
-        BorderButton(icon = R.drawable.ic_share, onClick = onShare)
-        if (onEdit != null) {
-            Spacer(modifier = Modifier.width(if (maxWidth <= 360.dp) 12.dp else 16.dp))
-            BorderButton(
-                text = if (maxWidth <= 360.dp) null else stringResource(id = R.string.receive_lightning_edit_button),
-                icon = R.drawable.ic_edit,
-                onClick = onEdit
-            )
+        BorderButton(text = stringResource(R.string.btn_copy), icon = R.drawable.ic_copy, onClick = onCopy)
+        Spacer(modifier = Modifier.width(12.dp))
+        BorderButton(text = stringResource(R.string.btn_share), icon = R.drawable.ic_share, onClick = onShare)
+    }
+}
+
+@Composable
+fun CopyButtonDialog(label: String, value: String, icon: Int) {
+    val context = LocalContext.current
+    Clickable(onClick = { copyToClipboard(context, data = value) }, modifier = Modifier.padding(horizontal = 16.dp), shape = RoundedCornerShape(16.dp)) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp)
+        ) {
+            TextWithIcon(text = label, textStyle = MaterialTheme.typography.body2, icon = icon)
+            Spacer(modifier = Modifier.height(1.dp))
+            Text(text = value, style = MaterialTheme.typography.caption.copy(fontSize = 14.sp), maxLines = 1, overflow = TextOverflow.MiddleEllipsis, modifier = Modifier.widthIn(max = 280.dp))
         }
     }
 }
 
 @Composable
-fun TorWarning() {
-    val isTorEnabled by userPrefs.getIsTorEnabled.collectAsState(initial = null)
-
-    if (isTorEnabled == true) {
-
-        var showTorWarningDialog by remember { mutableStateOf(false) }
-
-        Clickable(onClick = { showTorWarningDialog = true }, shape = RoundedCornerShape(12.dp)) {
-            WarningMessage(
-                header = stringResource(id = R.string.receive_tor_warning_title),
-                details = null,
-                alignment = Alignment.CenterHorizontally,
-            )
-        }
-
-        if (showTorWarningDialog) {
-            ModalBottomSheet(
-                onDismiss = { showTorWarningDialog = false },
-            ) {
-                Text(text = stringResource(id = R.string.receive_tor_warning_title), style = MaterialTheme.typography.h4)
-                Spacer(modifier = Modifier.height(12.dp))
-                Text(text = stringResource(id = R.string.receive_tor_warning_dialog_content_1))
-            }
+fun ShareButtonDialog(label: String, value: String, icon: Int) {
+    val context = LocalContext.current
+    Clickable(
+        onClick = { share(context, value, context.getString(R.string.receive_lightning_share_subject), context.getString(R.string.receive_lightning_share_title)) },
+        modifier = Modifier.padding(horizontal = 16.dp),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp)
+        ) {
+            TextWithIcon(text = label, textStyle = MaterialTheme.typography.body2, icon = icon)
+            Spacer(modifier = Modifier.height(1.dp))
+            Text(text = value, style = MaterialTheme.typography.caption.copy(fontSize = 14.sp), maxLines = 1, overflow = TextOverflow.MiddleEllipsis, modifier = Modifier.widthIn(max = 280.dp))
         }
     }
 }

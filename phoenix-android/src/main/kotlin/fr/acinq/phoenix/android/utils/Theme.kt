@@ -22,24 +22,30 @@ import android.view.WindowManager
 import androidx.annotation.AttrRes
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
-import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.runtime.*
+import androidx.compose.material.Colors
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Shapes
+import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.Typography
+import androidx.compose.material.darkColors
+import androidx.compose.material.lightColors
+import androidx.compose.material.ripple
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import fr.acinq.phoenix.android.LocalTheme
-import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.isDarkTheme
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.extensions.findActivitySafe
@@ -225,13 +231,10 @@ fun PhoenixAndroidTheme(
             typography = typography(palette),
             shapes = shapes
         ) {
-            val entry = navController.currentBackStackEntryAsState()
-            val statusBarColor = systemStatusBarColor(entry.value)
-            val navBarColor = systemNavBarColor(entry.value)
-            LaunchedEffect(navBarColor, statusBarColor) {
+            // we must enforce icon colors when the user manually selects the dark theme
+            LaunchedEffect(userTheme) {
                 systemUiController.run {
-                    setStatusBarColor(statusBarColor, darkIcons = !isDarkTheme)
-                    setNavigationBarColor(navBarColor, darkIcons = !isDarkTheme)
+                    setStatusBarColor(Color.Transparent, darkIcons = !isDarkTheme)
                 }
             }
             val rippleIndication = ripple(color = if (isDarkTheme) gray300 else gray600)
@@ -241,9 +244,6 @@ fun PhoenixAndroidTheme(
         }
     }
 }
-
-@Composable
-fun mutedItalicTypo(): TextStyle = MaterialTheme.typography.body1.copy(fontStyle = FontStyle.Italic, color = mutedTextColor)
 
 val monoTypo @Composable get() = MaterialTheme.typography.body1.copy(fontFamily = FontFamily.Monospace, fontSize = 12.sp)
 
@@ -262,25 +262,6 @@ val borderColor @Composable get() = if (isDarkTheme) gray800 else gray50
 /** top gradient is darker/lighter than the background, but not quite black/white */
 private val topGradientColor @Composable get() = if (isDarkTheme) gray1000 else gray10
 private val bottomGradientColor @Composable get() = MaterialTheme.colors.background
-
-@Composable
-private fun systemStatusBarColor(entry: NavBackStackEntry?): Color {
-    return when {
-        entry?.destination?.route == Screen.PaymentsHistory.route -> MaterialTheme.colors.background
-        else -> topGradientColor
-    }
-}
-
-@Composable
-fun systemNavBarColor(entry: NavBackStackEntry?): Color {
-    return when {
-        entry?.destination?.route == Screen.Home.route -> MaterialTheme.colors.surface
-        entry?.destination?.route?.startsWith(Screen.PaymentDetails.route) ?: false -> MaterialTheme.colors.surface
-        entry?.destination?.route?.startsWith(Screen.Send.route, ignoreCase = true) ?: false -> MaterialTheme.colors.surface
-        else -> MaterialTheme.colors.background
-    }
-}
-
 
 @Composable
 fun invisibleOutlinedTextFieldColors() = TextFieldDefaults.outlinedTextFieldColors(

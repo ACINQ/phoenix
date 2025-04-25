@@ -88,25 +88,17 @@
 
     <string name="receive_help_qr">Código QR de la factura o dirección</string>
 
-    <string name="receive_bitcoin_title">Bitcoin</string>
-    <string name="receive_bitcoin_help">Este código QR es una dirección clásica de Bitcoin.\n\nCasi cualquier servicio o billetera de Bitcoin puede leerlo, pero los pagos tardarán más en llegar.</string>
     <string name="receive_bitcoin_address_label">Dirección</string>
-    <string name="receive_bitcoin_error">No se pudo generar una dirección de Bitcoin</string>
     <string name="receive_bitcoin_share_title">Dirección de Bitcoin</string>
     <string name="receive_bitcoin_share_subject">Compartir esta dirección de Bitcoin con…</string>
 
-    <string name="receive_lightning_title">Lightning</string>
-    <string name="receive_lightning_help">Este código QR es una factura de Lightning.\n\nLos pagos mediante Lightning son muy rápidos y normalmente más baratos, pero es posible que aún no sean compatibles con algunas billeteras y servicios.\n\nEn ese caso, desliza el dedo hacia la izquierda para obtener una dirección normal de Bitcoin.</string>
     <string name="receive_lightning_generating">Generando…</string>
     <string name="receive_lightning_amount_label">Importe</string>
     <string name="receive_lightning_desc_label">Desc</string>
     <string name="receive_lightning_error">No se pudo generar la factura</string>
     <string name="receive_lightning_share_subject">Factura de Lightning</string>
     <string name="receive_lightning_share_title">Compartir esta dirección de Lightning con…</string>
-    <string name="receive_lnurl_button">Escanear</string>
 
-    <string name="receive_lightning_edit_button">Editar</string>
-    <string name="receive_lightning_edit_title">Editar factura</string>
     <string name="receive_lightning_edit_amount_label">Importe (opcional)</string>
     <string name="receive_lightning_edit_amount_placeholder">Importe que se recibirá</string>
     <string name="receive_lightning_edit_desc_label">Descripción (opcional)</string>
