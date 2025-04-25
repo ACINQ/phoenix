@@ -606,7 +606,6 @@
     <string name="payments_export_csv_no_payments">Aún no se realizaron pagos correctamente</string>
     <string name="payments_export_csv_invalid_timestamps">Elige una fecha inicial/final que sea válida</string>
     <string name="payments_export_csv_in_progress">Exportando pago #%1$d</string>
-    <string name="payments_export_success">%1$d pagos exportados correctamente</string>
     <string name="payments_export_csv_share_subject">Phoenix - pagos de %1$s a %2$s</string>
     <string name="payments_export_csv_share_title">Comparte pagos de Phoenix…</string>
     <string name="payments_export_csv_share_button">Compartir archivo</string>

@@ -625,7 +625,6 @@
     <string name="payments_export_csv_no_payments">Chưa có khoản thanh toán thành công nào</string>
     <string name="payments_export_csv_invalid_timestamps">Vui lòng chọn ngày bắt đầu/kết thúc hợp lệ</string>
     <string name="payments_export_csv_in_progress">Đang truy xuất thanh toán #%1$d</string>
-    <string name="payments_export_success">Các thanh toán %1$d đã được truy xuất thành công</string>
     <string name="payments_export_csv_share_subject">Phoenix - các thanh toán từ %1$s tới %2$s</string>
     <string name="payments_export_csv_share_title">Chia sẻ các thanh toán Phoenix…</string>
     <string name="payments_export_csv_share_button">Chia sẻ tập tin</string>

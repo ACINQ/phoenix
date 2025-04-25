@@ -665,7 +665,6 @@
     <string name="payments_export_csv_no_payments">Zatiaľ žiadne úspešné platby</string>
     <string name="payments_export_csv_invalid_timestamps">Vyberte prosím platný od/do dátum</string>
     <string name="payments_export_csv_in_progress">Exportuje sa platba #%1$d</string>
-    <string name="payments_export_success">%1$d úspešne exportovaných platieb</string>
     <string name="payments_export_csv_share_subject">Phoenix - platby od %1$s do %2$s</string>
     <string name="payments_export_csv_share_title">Zdieľať Phoenix platby…</string>
     <string name="payments_export_csv_share_button">Zdieľať súbor</string>

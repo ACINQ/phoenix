@@ -630,7 +630,6 @@
     <string name="payments_export_csv_no_payments">Noch keine erfolgreichen Zahlungen</string>
     <string name="payments_export_csv_invalid_timestamps">Bitte wählen Sie ein gültiges Anfangs-/Enddatum</string>
     <string name="payments_export_csv_in_progress">Exportiere Zahlung #%1$d</string>
-    <string name="payments_export_success">%1$d Zahlungen erfolgreich exportiert</string>
     <string name="payments_export_csv_share_subject">Phoenix-Zahlungen vom %1$s bis %2$s</string>
     <string name="payments_export_csv_share_title">Phoenix-Zahlungen teilen…</string>
     <string name="payments_export_csv_share_button">Datei teilen</string>
