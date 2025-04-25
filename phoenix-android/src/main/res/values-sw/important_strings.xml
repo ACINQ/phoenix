@@ -210,6 +210,8 @@
     <string name="mutualclose_input_instructions">Tuma fedha zote kwa pochi ya Bitcoin. Njia zote za malipo zitafungwa.</string>
     <string name="mutualclose_confirm_title">Thibitisha kufunga</string>
     <string name="mutualclose_confirm_details">Fedha zote zitatumwa kwa:</string>
+    <string name="mutualclose_confirm_fee">Ada inakadiriwa:</string>
+    <string name="mutualclose_confirm_fee_unknown">Gharama ya ada haikukadiriwa.</string>
 
     <string name="forceclose_title">Funga njia kwa nguvu</string>
     <string name="forceclose_instructions">Skrini hii inakuwezesha kufunga njia zako moja kwa moja.\n\nHii sio kitufe cha "rekebisha-kila-kitu" cha uchawi: iko hapa kama kipimo cha usalama na <b>inapaswa kutumiwa tu katika hali za dharura</b>. Kwa mfano, ikiwa mshirika wako (ACINQ) atatoweka kabisa, kukuzuia kutumia pesa zako. Katika visa vingine vyote, <b>ikiwa unakutana na matatizo na Phoenix unapaswa kuwasiliana na msaada</b>.\n\nKufunga njia kwa nguvu kutakugharimu pesa (kulipia ada za mtandaoni) na kutasababisha fedha zako kufungwa kwa siku kadhaa.\n\n<b>Usiondoe programu hadi njia zako zifungwe kikamilifu, au utapoteza pesa.</b>\n\n<b>Usitumie kipengele hiki ikiwa hujui kabisa kinachofanya.</b></string>

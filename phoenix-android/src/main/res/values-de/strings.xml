@@ -198,7 +198,6 @@
     <string name="mutualclose_checking_balance">Prüfe Guthaben…</string>
     <string name="mutualclose_balance">Guthaben: <b>%1$s</b> (≈ %2$s)</string>
     <string name="mutualclose_no_channels">Die Wallet hat keine Kanäle, die für eine Schließung in Frage kommen.</string>
-    <string name="mutualclose_button">Meine Wallet leeren</string>
     <string name="mutualclose_error_chain_mismatch">Diese Adresse nutzt eine andere Blockchain</string>
     <string name="mutualclose_error_chain_reqparams">Diese Adresse verwendet nicht unterstützte Funktionen</string>
     <string name="mutualclose_error_chain_generic">Diese Adresse wird nicht unterstützt</string>

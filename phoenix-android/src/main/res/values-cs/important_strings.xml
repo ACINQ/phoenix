@@ -207,6 +207,8 @@
     <string name="mutualclose_input_instructions">Všechny prostředky odešlete do Bitcoin peněženky. Všechny platební kanály budou uzavřeny.</string>
     <string name="mutualclose_confirm_title">Potvrzení uzavření</string>
     <string name="mutualclose_confirm_details">Všechny finanční prostředky budou zaslány na adresu:</string>
+    <string name="mutualclose_confirm_fee">Odhadovaný poplatek:</string>
+    <string name="mutualclose_confirm_fee_unknown">Výši poplatku se nepodařilo odhadnout.</string>
 
     <string name="forceclose_title">Vynucené uzavření kanálů</string>
     <string name="forceclose_instructions">Na této obrazovce můžete jednostranně uzavřít kanály.\n\nToto není kouzelné tlačítko \"opravit vše\": je zde jako bezpečnostní opatření a <b>mělo by se používat pouze v krajních situacích</b>. Například pokud váš peer (ACINQ) trvale zmizí a znemožní vám utrácet peníze. Ve všech ostatních případech, <b>pokud máte s Phoenixem problémy, měli byste kontaktovat podporu</b>.\n\nVynucené uzavření kanálů vás bude stát peníze (na pokrytí On-Chain poplatků) a způsobí, že vaše prostředky budou na několik dní zablokovány.\n\n<b>Aplikaci odinstalujte až po úplném uzavření kanálů, jinak přijdete o peníze.</b>\n\n<b>Nepoužívejte tuto funkci, pokud plně nerozumíte tomu, co děláte.</b></string>

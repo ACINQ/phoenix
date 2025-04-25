@@ -207,7 +207,7 @@
     <string name="mutualclose_checking_balance">Vérification du solde…</string>
     <string name="mutualclose_balance">Solde: <b>%1$s</b> (≈ %2$s)</string>
     <string name="mutualclose_no_channels">Ce portefeuille n\'a pas de canaux éligibles à une clôture.</string>
-    <string name="mutualclose_button">Vider mon portefeuille</string>
+    <string name="mutualclose_button">Vérifier la clôture</string>
     <string name="mutualclose_error_chain_mismatch">Cette adresse utilise une blockchain différente</string>
     <string name="mutualclose_error_chain_reqparams">Cette adresse utilise des fonctionnalités non supportées</string>
     <string name="mutualclose_error_chain_generic">Cette adresse n\'est pas compatible</string>

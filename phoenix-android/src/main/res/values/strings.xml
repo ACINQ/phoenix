@@ -251,7 +251,7 @@
     <string name="mutualclose_checking_balance">Checking balance…</string>
     <string name="mutualclose_balance">Balance: <b>%1$s</b> (≈ %2$s)</string>
     <string name="mutualclose_no_channels">The wallet does not have any channels that are eligible for closing.</string>
-    <string name="mutualclose_button">Drain my wallet</string>
+    <string name="mutualclose_button">Review closing</string>
     <string name="mutualclose_error_chain_mismatch">This address uses a different blockchain</string>
     <string name="mutualclose_error_chain_reqparams">This address uses unsupported features</string>
     <string name="mutualclose_error_chain_generic">This address is not supported</string>

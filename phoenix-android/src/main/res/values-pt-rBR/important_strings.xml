@@ -207,6 +207,8 @@
     <string name="mutualclose_input_instructions">Envie todos os fundos para uma carteira de Bitcoin. Todos os canais de pagamento serão fechados.</string>
     <string name="mutualclose_confirm_title">Confirmar fechamento</string>
     <string name="mutualclose_confirm_details">Todos os fundos serão enviados para:</string>
+    <string name="mutualclose_confirm_fee">Taxa estimada em:</string>
+    <string name="mutualclose_confirm_fee_unknown">O custo da taxa não pôde ser estimado.</string>
 
     <string name="forceclose_title">Forçar o fechamento de canais</string>
     <string name="forceclose_instructions">Essa tela permite que você feche unilateralmente seus canais.\n\nEste não é um botão mágico para "consertar tudo": ele está aqui como uma medida de segurança e <b>deve ser usado somente em cenários extremos</b>. Por exemplo, se seu par (ACINQ) desaparecer permanentemente, impedindo-o de gastar seu dinheiro.Em todos os outros casos, <b>se tiver problemas com o Phoenix, entre em contato com o suporte</b>.\n\nO fechamento forçado de canais lhe custará dinheiro (para cobrir as taxas na cadeia) e fará com que seus fundos fiquem bloqueados por dias.\n\n<b>Não desinstale o aplicativo até que seus canais estejam totalmente fechados, ou você perderá dinheiro.</b>\n\n<b>Não use esse recurso se você não entender completamente o que ele faz.</b></string>

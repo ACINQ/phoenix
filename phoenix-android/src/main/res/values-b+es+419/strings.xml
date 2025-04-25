@@ -196,7 +196,6 @@
     <string name="mutualclose_checking_balance">Comprobando saldo…</string>
     <string name="mutualclose_balance">Saldo: <b>%1$s</b> (≈ %2$s)</string>
     <string name="mutualclose_no_channels">La billetera no tiene canales que se puedan cerrar.</string>
-    <string name="mutualclose_button">Vaciar mi billetera</string>
     <string name="mutualclose_error_chain_mismatch">Esta dirección usa una cadena de bloques diferente</string>
     <string name="mutualclose_error_chain_reqparams">Esta dirección usa funciones no compatibles</string>
     <string name="mutualclose_error_chain_generic">Esta dirección no es compatible</string>

@@ -211,7 +211,6 @@
     <string name="mutualclose_checking_balance">Kontrolujem zostatok…</string>
     <string name="mutualclose_balance">Zostatok: <b>%1$s</b> (≈ %2$s)</string>
     <string name="mutualclose_no_channels">Peňaženka nemá žiadne kanály, ktoré by bolo možné zavrieť.</string>
-    <string name="mutualclose_button">Vyprázdniť peňaženku</string>
     <string name="mutualclose_error_chain_mismatch">Táto adresa používa iný blockchain</string>
     <string name="mutualclose_error_chain_reqparams">Táto adresa používa nepodporované funkcie</string>
     <string name="mutualclose_error_chain_generic">Táto adresa nie je podporovaná</string>

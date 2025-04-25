@@ -204,6 +204,8 @@
     <string name="mutualclose_input_instructions">Sende das gesamte Guthaben an eine Bitcoin-Wallet. Alle Zahlungskanäle werden geschlossen.</string>
     <string name="mutualclose_confirm_title">Kanal-Schließung bestätigen</string>
     <string name="mutualclose_confirm_details">Das gesamte Guthaben wir hier hin gesendet:</string>
+    <string name="mutualclose_confirm_fee">Gebühr geschätzt auf:</string>
+    <string name="mutualclose_confirm_fee_unknown">Gebührenhöhe konnte nicht geschätzt werden.</string>
 
     <string name="forceclose_title">Force-Close durchführen</string>
     <string name="forceclose_instructions">Hiermit können Sie die Schließung Ihrer Kanäle erzwingen.\n\nDies ist kein \"magisches Allheilmittel\", um eventuelle Probleme zu lösen: Es ist lediglich eine Sicherheitsfunktion und <b>sollte nur im äußersten Notfall verwendet werden</b>. Zum Beispiel, wenn Ihr Peer (ACINQ) dauerhaft verschwindet und Sie Ihr Guthaben nicht mehr nutzen können. <b>In allen anderen Fällen, in denen Sie Probleme mit Phoenix haben, sollten Sie sich an den Support wenden</b>.\n\nEin Force-Close kostet Sie Geld (zur Deckung der On-Chain-Gebühren) und führt dazu, dass Ihr Guthaben für einige Tage eingefroren wird.\n\n<b>Deinstallieren Sie die App nicht, bevor Ihre Kanäle vollständig geschlossen sind, anderenfalls werden Sie Geld verlieren.</b>\n\n<b>Verwenden Sie diese Funktion nicht, wenn Sie nicht genau wissen, was sie bewirkt.</b></string>

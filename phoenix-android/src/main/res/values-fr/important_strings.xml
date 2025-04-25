@@ -208,6 +208,8 @@
     <string name="mutualclose_input_instructions">Envoie tous les fonds du wallet vers une addresse Bitcoin. Tous vos canaux de paiement seront fermés.</string>
     <string name="mutualclose_confirm_title">Confirmer la fermeture</string>
     <string name="mutualclose_confirm_details">Tous vos fonds seront envoyés à:</string>
+    <string name="mutualclose_confirm_fee">Frais estimés à:</string>
+    <string name="mutualclose_confirm_fee_unknown">Impossible d\'estimer le coût des frais.</string>
 
     <string name="forceclose_title">Fermeture unilatérale</string>
     <string name="forceclose_instructions">Cet écran vous permet de forcer la fermeture de vos canaux de paiement de façon unilatérale.\n\nIl s\'agit d\'une mesure de sécurité à <b>n\'utiliser qu\'en dernier recours</b>, par exemple si votre noeud pair (ACINQ) devait disparaître de façon permanente, vous empêchant d\'effectuer des paiements. Dans tous les autres cas, <b>si vous avez des difficultés à utiliser Phoenix, vous devriez contacter le support</b>.\n\nLa fermeture unilatérale vous coûtera de l\'argent (pour les frais on-chain), et verrouillera l\'accès aux fonds pour plusieurs jours.\n\n<b>Ne désinstallez pas l\'application tant que les canaux ne sont pas complètement fermés, ou vous perdrez l\'accès aux fonds.</b>\n\n<b>N\'utilisez pas cette fonctionnalité si vous ne comprenez pas ce qu\'elle fait.</b></string>

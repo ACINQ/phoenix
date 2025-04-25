@@ -230,7 +230,6 @@
     <string name="mutualclose_checking_balance">Inakagua salio…</string>
     <string name="mutualclose_balance">Salio: <b>%1$s</b> (≈ %2$s)</string>
     <string name="mutualclose_no_channels">Pochi haina kanali zinazostahiki kufungwa.</string>
-    <string name="mutualclose_button">Mwaga pochi yangu</string>
     <string name="mutualclose_error_chain_mismatch">Anwani hii inatumia blockchain tofauti</string>
     <string name="mutualclose_error_chain_reqparams">Anwani hii inatumia vipengele visivyosaidiwa</string>
     <string name="mutualclose_error_chain_generic">Anwani hii haisaidiwi</string>
