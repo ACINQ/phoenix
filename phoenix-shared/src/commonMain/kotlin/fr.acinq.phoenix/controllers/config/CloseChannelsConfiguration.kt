@@ -2,6 +2,7 @@ package fr.acinq.phoenix.controllers.config
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Satoshi
+import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.phoenix.controllers.MVI
 
 object CloseChannelsConfiguration {
@@ -35,7 +36,7 @@ object CloseChannelsConfiguration {
     }
 
     sealed class Intent : MVI.Intent() {
-        data class MutualCloseAllChannels(val address: String) : Intent()
+        data class MutualCloseAllChannels(val address: String, val feerate: FeeratePerKw) : Intent()
         object ForceCloseAllChannels : Intent()
     }
 }

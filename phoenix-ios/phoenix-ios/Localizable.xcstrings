@@ -26409,6 +26409,9 @@
         }
       }
     },
+    "minus miner fees of:" : {
+
+    },
     "Missing off-chain amount too low." : {
       "localizations" : {
         "ar" : {
