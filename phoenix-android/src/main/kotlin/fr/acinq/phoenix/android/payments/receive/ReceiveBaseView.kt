@@ -19,6 +19,7 @@ package fr.acinq.phoenix.android.payments.receive
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.LocalOverscrollFactory
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
@@ -33,6 +34,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -60,8 +62,6 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.dialogs.FullScreenDialog
-import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
-import fr.acinq.phoenix.android.components.feedback.WarningMessage
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.images.QRCodeHelper
 import fr.acinq.phoenix.android.utils.copyToClipboard
@@ -120,27 +120,33 @@ private fun ReceiveViewPages(
             val topPadding = remember(maxHeight) {
                 when {
                     maxHeight > 800.dp -> 80.dp
-                    maxHeight > 600.dp -> 60.dp
-                    maxHeight > 400.dp -> 40.dp
-                    else -> 20.dp
+                    maxHeight > 600.dp -> 40.dp
+                    maxHeight > 400.dp -> 20.dp
+                    else -> 0.dp
                 }
             }
-            Column(
-                modifier = Modifier
-                    .fillMaxSize().verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally
+            CompositionLocalProvider(
+                LocalOverscrollFactory provides null
             ) {
-                Spacer(Modifier.height(topPadding))
-                when (index) {
-                    0 -> {
-                        val defaultInvoiceExpiry by userPrefs.getInvoiceDefaultExpiry.collectAsState(null)
-                        val defaultInvoiceDesc by userPrefs.getInvoiceDefaultDesc.collectAsState(null)
-                        safeLet(defaultInvoiceDesc, defaultInvoiceExpiry) { desc, expiry ->
-                            LightningInvoiceView(vm = vm, onFeeManagementClick = onFeeManagementClick,
-                                defaultDescription = desc, defaultExpiry = expiry, columnWidth = columnWidth, isPageActive = pagerState.currentPage == 0)
-                        } ?: ProgressView(text = stringResource(id = R.string.utils_loading_prefs))
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize().verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Spacer(Modifier.height(topPadding))
+                    when (index) {
+                        0 -> {
+                            val defaultInvoiceExpiry by userPrefs.getInvoiceDefaultExpiry.collectAsState(null)
+                            val defaultInvoiceDesc by userPrefs.getInvoiceDefaultDesc.collectAsState(null)
+                            safeLet(defaultInvoiceDesc, defaultInvoiceExpiry) { desc, expiry ->
+                                LightningInvoiceView(
+                                    vm = vm, onFeeManagementClick = onFeeManagementClick,
+                                    defaultDescription = desc, defaultExpiry = expiry, columnWidth = columnWidth, isPageActive = pagerState.currentPage == 0
+                                )
+                            } ?: ProgressView(text = stringResource(id = R.string.utils_loading_prefs))
+                        }
+                        1 -> BitcoinAddressView(vm = vm, columnWidth = columnWidth)
                     }
-                    1 -> BitcoinAddressView(vm = vm, columnWidth = columnWidth)
                 }
             }
         }
@@ -269,8 +275,8 @@ private fun QRCodeImage(
 @Composable
 fun QRCodeLabel(label: String, content: @Composable () -> Unit) {
     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(text = label, style = MaterialTheme.typography.subtitle2)
-        Column { content() }
+        Text(text = label, style = MaterialTheme.typography.subtitle2, modifier = Modifier.alignByBaseline())
+        Column(modifier = Modifier.alignByBaseline()) { content() }
     }
 }
 
@@ -279,10 +285,10 @@ fun CopyShareButtons(
     onCopy: () -> Unit,
     onShare: () -> Unit,
 ) {
-    Row(modifier = Modifier.padding(horizontal = 4.dp)) {
-        BorderButton(text = stringResource(R.string.btn_copy), icon = R.drawable.ic_copy, onClick = onCopy)
+    Row(modifier = Modifier.padding(horizontal = 4.dp, vertical = 16.dp)) {
+        BorderButton(text = stringResource(R.string.btn_copy), icon = R.drawable.ic_copy, onClick = onCopy, shape = RoundedCornerShape(16.dp))
         Spacer(modifier = Modifier.width(12.dp))
-        BorderButton(text = stringResource(R.string.btn_share), icon = R.drawable.ic_share, onClick = onShare)
+        BorderButton(text = stringResource(R.string.btn_share), icon = R.drawable.ic_share, onClick = onShare, shape = RoundedCornerShape(16.dp))
     }
 }
 

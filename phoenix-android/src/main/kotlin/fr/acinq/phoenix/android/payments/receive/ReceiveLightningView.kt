@@ -69,7 +69,6 @@ import fr.acinq.phoenix.android.components.MutedFilledButton
 import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.TextInput
 import fr.acinq.phoenix.android.components.TransparentFilledButton
-import fr.acinq.phoenix.android.components.VSeparator
 import fr.acinq.phoenix.android.components.buttons.SegmentedControl
 import fr.acinq.phoenix.android.components.buttons.SegmentedControlButton
 import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
@@ -80,7 +79,6 @@ import fr.acinq.phoenix.android.components.openLink
 import fr.acinq.phoenix.android.internalData
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
-import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.data.availableForReceive
 import fr.acinq.phoenix.data.canRequestLiquidity
 import java.text.DecimalFormat
@@ -102,7 +100,7 @@ fun ColumnScope.LightningInvoiceView(
     var isReusable by remember { mutableStateOf(false) }
     var feeWarningDialogShownTimestamp by remember { mutableLongStateOf(0L) }
 
-    val bip353AddressState = internalData.getBip353Address.collectAsState(initial = null)
+    val bip353Address by internalData.getBip353Address.collectAsState(initial = null)
 
     var showEditInvoiceDialog by remember { mutableStateOf(false) }
     var showCopyDialog by remember { mutableStateOf(false) }
@@ -149,11 +147,10 @@ fun ColumnScope.LightningInvoiceView(
             enabled = state is LightningInvoiceState.Done
         ) {
             Column(modifier = Modifier.padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Row(modifier = Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                Row(modifier = Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.Top) {
                     PhoenixIcon(R.drawable.ic_edit, tint = MaterialTheme.colors.primary)
-                    VSeparator(color = mutedTextColor.copy(alpha = .4f))
-                    Column(modifier = Modifier.padding(top = 2.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        if (state is LightningInvoiceState.Done) {
+                    if (state is LightningInvoiceState.Done) {
+                        Column(modifier = Modifier.padding(top = 2.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             if (state.description.isNullOrBlank() && state.amount == null) {
                                 Text(text = "Add amount and description", style = MaterialTheme.typography.subtitle2)
                             }
@@ -182,6 +179,18 @@ fun ColumnScope.LightningInvoiceView(
             }
         }
 
+        Spacer(Modifier.height(8.dp))
+
+        if (isReusable) {
+            bip353Address?.let {
+                Clickable(onClick = { showBip353InfoDialog = true }, shape = RoundedCornerShape(16.dp)) {
+                    Text(text = stringResource(id = R.string.utils_bip353_with_prefix, it), style = MaterialTheme.typography.body2, fontSize = 15.sp, modifier = Modifier.padding(8.dp))
+                }
+            }
+        }
+
+        CopyShareButtons(onCopy = { showCopyDialog = true }, onShare = { showShareDialog = true })
+
         when (state) {
             is LightningInvoiceState.Init, is LightningInvoiceState.Generating -> {}
             is LightningInvoiceState.Done -> {
@@ -191,9 +200,7 @@ fun ColumnScope.LightningInvoiceView(
                     showDialogImmediately = isPageActive && currentTimestampMillis() - feeWarningDialogShownTimestamp > 30_000,
                     onDialogShown = { feeWarningDialogShownTimestamp = currentTimestampMillis() },
                 )
-                Spacer(modifier = Modifier.height(32.dp))
                 TorWarning()
-                Spacer(modifier = Modifier.height(32.dp))
             }
             is LightningInvoiceState.Error -> {
                 ErrorMessage(
@@ -202,22 +209,6 @@ fun ColumnScope.LightningInvoiceView(
                 )
             }
         }
-    }
-
-    Spacer(modifier = Modifier.weight(1f))
-
-    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-        bip353AddressState.value?.let {
-            Clickable(onClick = { showBip353InfoDialog = true }, shape = RoundedCornerShape(16.dp)) {
-                Text(text = stringResource(id = R.string.utils_bip353_with_prefix, it), style = MaterialTheme.typography.body2, fontSize = 15.sp, modifier = Modifier.padding(8.dp))
-            }
-        }
-        Spacer(Modifier.height(16.dp))
-        CopyShareButtons(
-            onCopy = { showCopyDialog = true },
-            onShare = { showShareDialog = true }
-        )
-        Spacer(Modifier.height(32.dp))
     }
 
     if (showEditInvoiceDialog) {
@@ -237,7 +228,7 @@ fun ColumnScope.LightningInvoiceView(
 
     if (showCopyDialog) {
         CopyLightningDialog(
-            bip353Address = bip353AddressState.value,
+            bip353Address = bip353Address,
             offer = if (state is LightningInvoiceState.Done.Bolt12) state.offer else null,
             invoice = if (state is LightningInvoiceState.Done.Bolt11) state.invoice else null,
             onDismiss = { showCopyDialog = false }
@@ -606,11 +597,13 @@ private fun TorWarning() {
         var showTorWarningDialog by remember { mutableStateOf(false) }
 
         Clickable(onClick = { showTorWarningDialog = true }, shape = RoundedCornerShape(12.dp)) {
+            Spacer(modifier = Modifier.height(16.dp))
             WarningMessage(
                 header = stringResource(id = R.string.receive_tor_warning_title),
                 details = null,
                 alignment = Alignment.CenterHorizontally,
             )
+            Spacer(modifier = Modifier.height(16.dp))
         }
 
         if (showTorWarningDialog) {

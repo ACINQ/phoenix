@@ -148,6 +148,6 @@ class InternalDataRepository(private val internalData: DataStore<Preferences>) {
     val getLastReadWalletNoticeIndex: Flow<Int> = safeData.map { it[REMOTE_WALLET_NOTICE_READ_INDEX] ?: -1 }
     suspend fun saveLastReadWalletNoticeIndex(index: Int) = internalData.edit { it[REMOTE_WALLET_NOTICE_READ_INDEX] = index }
 
-    val getBip353Address: Flow<String> = safeData.map { it[BIP_353_ADDRESS] ?: "" }
+    val getBip353Address: Flow<String?> = safeData.map { it[BIP_353_ADDRESS] }
     suspend fun saveBip353Address(address: String) = internalData.edit { it[BIP_353_ADDRESS] = address }
 }

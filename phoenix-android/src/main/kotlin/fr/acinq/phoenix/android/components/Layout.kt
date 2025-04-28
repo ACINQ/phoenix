@@ -123,7 +123,8 @@ fun DefaultScreenLayout(
         modifier = Modifier
             .fillMaxSize() // cancelled if scrollable!
             .then(if (isScrollable) Modifier.verticalScroll(rememberScrollState()) else Modifier)
-            .then(if (backgroundColor != null) Modifier.background(backgroundColor) else Modifier),
+            .then(if (backgroundColor != null) Modifier.background(backgroundColor) else Modifier)
+            .padding(bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()),
         verticalArrangement = verticalArrangement,
         horizontalAlignment = horizontalAlignment,
     ) {

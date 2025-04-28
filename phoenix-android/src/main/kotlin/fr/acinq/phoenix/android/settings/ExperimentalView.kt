@@ -74,7 +74,7 @@ class ExperimentalViewModel(val peerManager: PeerManager, val internalDataReposi
     init {
         viewModelScope.launch {
             val address = internalDataRepository.getBip353Address.first()
-            if (address.isBlank()) {
+            if (address.isNullOrBlank()) {
                 claimAddressState = ClaimAddressState.None
             } else {
                 claimAddressState = ClaimAddressState.Done(address)

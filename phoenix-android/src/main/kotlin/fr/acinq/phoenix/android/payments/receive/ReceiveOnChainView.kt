@@ -19,10 +19,8 @@ package fr.acinq.phoenix.android.payments.receive
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -30,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -60,21 +59,15 @@ fun ColumnScope.BitcoinAddressView(
                     text = it,
                     maxLines = 3,
                     overflow = TextOverflow.MiddleEllipsis,
-                    style = MaterialTheme.typography.body2.copy(fontSize = 14.sp),
+                    fontFamily = FontFamily.Monospace,
+                    fontSize = 12.sp
                 )
             }
-        }
-    }
 
-    Spacer(modifier = Modifier.weight(1f))
-
-    address?.let {
-        Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             CopyShareButtons(
                 onCopy = { copyToClipboard(context, data = it) },
                 onShare = { share(context, "bitcoin:$it", context.getString(R.string.receive_bitcoin_share_subject), context.getString(R.string.receive_bitcoin_share_title)) },
             )
-            Spacer(Modifier.height(32.dp))
         }
     }
 }

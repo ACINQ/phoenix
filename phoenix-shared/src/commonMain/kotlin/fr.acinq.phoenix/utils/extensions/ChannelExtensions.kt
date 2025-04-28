@@ -17,11 +17,9 @@
 package fr.acinq.phoenix.utils.extensions
 
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.channel.*
 import fr.acinq.lightning.channel.states.*
 import fr.acinq.lightning.utils.msat
-
 
 
 fun ChannelState.isTerminated(): Boolean {
@@ -71,6 +69,7 @@ fun ChannelState.localBalance(): MilliSatoshi? {
         is Closed -> 0.msat
         is Aborted -> null
         // balance is unknown
+        is Negotiating -> null
         is LegacyWaitForFundingLocked -> null
         is LegacyWaitForFundingConfirmed -> null
         is WaitForAcceptChannel -> null
