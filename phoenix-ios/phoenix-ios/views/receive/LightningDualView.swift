@@ -383,11 +383,7 @@ struct LightningDualView: View {
 		let bAddress = "₿\(address)"
 		
 		Group {
-			if #available(iOS 18, *) {
-				Text(verbatim: "\(Image(systemName: "bitcoinsign.circle")) \(address)")
-			} else {
-				Text(Image(systemName: "bitcoinsign.circle")) + Text(verbatim: " \(address)")
-			}
+			Text(Image(systemName: "bitcoinsign.circle")) + Text(verbatim: " \(address)")
 		}
 		.contextMenu {
 			Button {
