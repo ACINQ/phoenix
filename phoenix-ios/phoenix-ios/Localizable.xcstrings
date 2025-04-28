@@ -331,6 +331,7 @@
       }
     },
     "..." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -26812,6 +26813,7 @@
       }
     },
     "NEW" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -33631,6 +33633,9 @@
         }
       }
     },
+    "Reusable" : {
+
+    },
     "Review" : {
       "localizations" : {
         "ar" : {
@@ -36180,6 +36185,7 @@
       }
     },
     "Show one-time invoice" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -36878,6 +36884,7 @@
       }
     },
     "Show reusable QR" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -36996,6 +37003,9 @@
           }
         }
       }
+    },
+    "Single use" : {
+
     },
     "Skip" : {
       "localizations" : {
