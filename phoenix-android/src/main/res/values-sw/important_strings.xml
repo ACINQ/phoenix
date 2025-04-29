@@ -179,6 +179,7 @@
     <string name="send_error_lnurl_invalid">Imeshindwa kuchakata kiungo hiki cha LNURL. Hakikisha ni halali.</string>
     <string name="send_error_lnurl_unsupported">Aina hii ya LNURL haijaungwa mkono bado.</string>
     <string name="send_error_invalid_generic">Data hii inatumia muundo usiojulikana na haiwezi kuchakatwa.</string>
+    <string name="send_error_bip353_connect">Haiwezi kuepua data ya anwani hii. Huenda unakumbana na tatizo la muunganisho.</string>
     <string name="send_error_bip353_name_not_found">Jina \"%1$s\" halijapatikana kwenye \"%2$s\".</string>
     <string name="send_error_bip353_invalid_uri">Anwani hii inatumia rasilimali ya Bip21 isiyo halali.</string>
     <string name="send_error_bip353_invalid_offer">Anwani hii inatumia ombi batili la Bolt12.</string>

@@ -43188,6 +43188,9 @@
         }
       }
     },
+    "Unable to retrieve data for this address. You may be experiencing a connectivity issue." : {
+      "comment" : "Error message - could not retrieve dns records for that address"
+    },
     "Unconfirmed Balance" : {
       "localizations" : {
         "ar" : {

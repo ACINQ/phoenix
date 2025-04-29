@@ -174,6 +174,7 @@
     <string name="send_error_lnurl_invalid">Error al procesar este enlace LNURL. Comprueba que sea válido.</string>
     <string name="send_error_lnurl_unsupported">Este tipo de LNURL aún no es compatible.</string>
     <string name="send_error_invalid_generic">Estos datos usan un formato desconocido por lo que no se pueden procesar.</string>
+    <string name="send_error_bip353_connect">No se pueden recuperar los datos de esta dirección. Es posible que esté experimentando un problema de conectividad.</string>
     <string name="send_error_bip353_name_not_found">El nombre \"%1$s\" no se encuentra en \"%2$s\".</string>
     <string name="send_error_bip353_invalid_uri">Esta dirección utiliza un recurso Bip21 no válido.</string>
     <string name="send_error_bip353_invalid_offer">Esta dirección utiliza una oferta Bolt12 no válida.</string>

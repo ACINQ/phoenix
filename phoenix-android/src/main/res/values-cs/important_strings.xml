@@ -171,6 +171,7 @@
     <string name="send_error_lnurl_invalid">Tento LNURL odkaz se nepodařilo zpracovat. Ujistěte se, že je platný.</string>
     <string name="send_error_lnurl_unsupported">Tento typ LNURL zatím není podporován.</string>
     <string name="send_error_invalid_generic">Tato data používají neznámý formát a nelze je zpracovat.</string>
+    <string name="send_error_bip353_connect">Nelze načíst data pro tuto adresu. Možná máte problém s připojením.</string>
     <string name="send_error_bip353_name_not_found">Název \"%1$s\" nebyl nalezen na \"%2$s\".</string>
     <string name="send_error_bip353_invalid_uri">Tato adresa používá neplatný zdroj Bip21.</string>
     <string name="send_error_bip353_invalid_offer">Tato adresa používá neplatnou nabídku Bolt12.</string>

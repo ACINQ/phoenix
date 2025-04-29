@@ -177,6 +177,7 @@
     <string name="send_error_lnurl_invalid">Ce lien LNURL n\'a pas pu être traité. Assurez-vous qu\'il soit valide.</string>
     <string name="send_error_lnurl_unsupported">Ce type de lien LNURL n\'est pas supporté.</string>
     <string name="send_error_invalid_generic">Ce contenu est mal formatté ou bien n\'est pas géré par Phoenix.</string>
+    <string name="send_error_bip353_connect">Impossible de récupérer les données relatives à cette adresse. Vous rencontrez peut-être un problème de connectivité.</string>
     <string name="send_error_bip353_name_not_found">Le nom \"%1$s\" est introuvable sur \"%2$s\"</string>
     <string name="send_error_bip353_invalid_uri">Cette adresse utilise une ressource Bip21 non valide.</string>
     <string name="send_error_bip353_invalid_offer">Cette adresse utilise une offre Bolt12 invalide.</string>

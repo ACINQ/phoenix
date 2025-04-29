@@ -101,6 +101,7 @@ extension SendManager {
 	
 	typealias BadRequestReason_AlreadyPaidInvoice = BadRequestReasonAlreadyPaidInvoice
 	typealias BadRequestReason_PaymentPending = BadRequestReasonPaymentPending
+	typealias BadRequestReason_Bip353Unresolved = BadRequestReasonBip353Unresolved
 	typealias BadRequestReason_Bip353InvalidOffer = BadRequestReasonBip353InvalidOffer
 	typealias BadRequestReason_Bip353InvalidUri = BadRequestReasonBip353InvalidUri
 	typealias BadRequestReason_Bip353NameNotFound = BadRequestReasonBip353NameNotFound
