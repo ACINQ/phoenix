@@ -30,12 +30,15 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -59,7 +62,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Popup
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
@@ -166,11 +171,12 @@ private fun ColumnScope.ContactNameAndPhoto(
                 .fillMaxWidth()
                 .background(color = MaterialTheme.colors.background, shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
                 .align(Alignment.BottomCenter)
+                .padding(bottom = 24.dp)
         ) {
             var showDeleteContactConfirmation by remember { mutableStateOf(false) }
             if (showDeleteContactConfirmation) {
                 ConfirmDialog(
-                    message = stringResource(R.string.contact_delete_code_confirm),
+                    message = stringResource(R.string.contact_delete_contact_confirm),
                     onConfirm = {
                         safeLet(contactsDb, contact?.id) { db, id ->
                             scope.launch {
@@ -194,7 +200,9 @@ private fun ColumnScope.ContactNameAndPhoto(
                 backgroundColor = Color.Transparent,
                 enabled = contact != null,
                 enabledEffect = false,
-                modifier = Modifier.weight(1f).alpha(if (contact != null) 1f else .2f),
+                modifier = Modifier
+                    .weight(1f)
+                    .alpha(if (contact != null) 1f else .2f),
                 onClick = { showDeleteContactConfirmation = true },
             )
             Spacer(modifier = Modifier.width(100.dp))
@@ -207,7 +215,9 @@ private fun ColumnScope.ContactNameAndPhoto(
                 backgroundColor = Color.Transparent,
                 enabled = hasContactChanged,
                 enabledEffect = false,
-                modifier = Modifier.weight(1f).alpha(if (hasContactChanged) 1f else .2f),
+                modifier = Modifier
+                    .weight(1f)
+                    .alpha(if (hasContactChanged) 1f else .2f),
                 onClick = {
                     if (name.isBlank()) {
                         nameErrorMessage = context.getString(R.string.contact_error_name_empty)
@@ -261,6 +271,14 @@ private fun ColumnScope.ContactNameAndPhoto(
                     .fillMaxWidth()
                     .background(color = MaterialTheme.colors.surface, shape = RoundedCornerShape(16.dp))
             ) {
+                val paymentCodes = paymentsCodeList.values.toList()
+                val onSendClick: (String) -> Unit = { navController.navigate("${Screen.Send.route}?input=$it&forceNavOnBack=true") }
+                var showSendToAddressPickerDialog by remember { mutableStateOf(false) }
+
+                if (showSendToAddressPickerDialog) {
+                    SendToAddressPickerDialog(paymentCodes = paymentCodes, onCodeClick = onSendClick, onDismiss = { showSendToAddressPickerDialog = false})
+                }
+
                 Button(
                     text = stringResource(R.string.contact_pay_button),
                     icon = R.drawable.ic_send,
@@ -270,8 +288,10 @@ private fun ColumnScope.ContactNameAndPhoto(
                     maxLines = 1,
                     modifier = Modifier.weight(1f),
                     onClick = {
-                        paymentsCodeList.values.firstOrNull()?.let {
-                            navController.navigate("${Screen.Send.route}?input=${it.paymentCode}&forceNavOnBack=true")
+                        when {
+                            paymentCodes.isEmpty() -> Unit
+                            paymentCodes.size == 1 -> onSendClick(paymentCodes.first().paymentCode)
+                            else -> showSendToAddressPickerDialog = true
                         }
                     },
                 )
@@ -369,7 +389,7 @@ private fun ListPaymentCodesForContact(
                                 overflow = TextOverflow.Ellipsis,
                                 style = MaterialTheme.typography.body1
                             )
-                            Spacer(Modifier.width(12.dp))
+                            Spacer(Modifier.width(8.dp))
                             Text(
                                 text = data,
                                 maxLines = 1,
@@ -574,9 +594,12 @@ private fun ContactOfferDetailDialog(
                     fun attemptAddress(contactsDb: SqliteContactsDb, code: String, onFailure: (String) -> Unit) {
                         when (Parser.parseEmailLikeAddress(code)) {
                             null -> onFailure(context.getString(R.string.contact_error_address_invalid))
-                            else -> when (val match = contactsDb.contactForLightningAddress(code)) {
-                                null -> onSavePaymentCode(ContactAddress(address = code, label = label.takeIf { it.isNotBlank() }, createdAt = currentTimestampMillis()))
-                                else -> onFailure(context.getString(R.string.contact_error_address_known, match.name))
+                            else -> {
+                                val match = contactsDb.contactForLightningAddress(code)
+                                when {
+                                    match == null || match.id == contactId -> onSavePaymentCode(ContactAddress(address = code, label = label.takeIf { it.isNotBlank() }, createdAt = currentTimestampMillis()))
+                                    else -> onFailure(context.getString(R.string.contact_error_address_known, match.name))
+                                }
                             }
                         }
                     }
@@ -596,5 +619,45 @@ private fun ContactOfferDetailDialog(
         }
 
         Spacer(Modifier.height(40.dp))
+    }
+}
+
+@Composable
+private fun SendToAddressPickerDialog(paymentCodes: List<ContactPaymentCode>, onCodeClick: (String) -> Unit, onDismiss: () -> Unit) {
+    Popup(
+        alignment = Alignment.TopEnd,
+        offset = IntOffset(x = 0, y = 58),
+        onDismissRequest = onDismiss,
+    ) {
+        Surface(
+            modifier = Modifier.widthIn(min = 200.dp, max = 250.dp),
+            shape = RoundedCornerShape(8.dp),
+            color = MaterialTheme.colors.surface,
+            elevation = 6.dp,
+        ) {
+            Column(modifier = Modifier.fillMaxWidth().heightIn(max = 300.dp)) {
+                LazyColumn {
+                    items(paymentCodes) { paymentCode ->
+                        Clickable(onClick = { onCodeClick(paymentCode.paymentCode) }) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(12.dp, 8.dp),
+                                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            ) {
+                                val (main, details) = remember(paymentCode) {
+                                    if (paymentCode.label.isNullOrBlank()) {
+                                        paymentCode.paymentCode to null
+                                    } else {
+                                        paymentCode.label!! to paymentCode.paymentCode
+                                    }
+                                }
+                                PhoenixIcon(R.drawable.ic_send, tint = MaterialTheme.colors.primary, modifier = Modifier.size(14.dp).align(Alignment.CenterVertically))
+                                Text(text = main, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.alignByBaseline())
+                                details?.let { Text(text = it, style = MaterialTheme.typography.subtitle2, maxLines = 1, overflow = TextOverflow.MiddleEllipsis, modifier = Modifier.alignByBaseline()) }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
