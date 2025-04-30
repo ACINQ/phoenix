@@ -214,7 +214,7 @@
     <string name="mutualclose_error_chain_mismatch">Táto adresa používa iný blockchain</string>
     <string name="mutualclose_error_chain_reqparams">Táto adresa používa nepodporované funkcie</string>
     <string name="mutualclose_error_chain_generic">Táto adresa nie je podporovaná</string>
-    <string name="mutualclose_done">Počet zatvorených kanálov: %1$d. Podrobnosti nájdete na domovskej obrazovke.</string>
+    <string name="mutualclose_done">Uzatváranie bolo iniciované. Uzatváracia transakcia je vo vašom zozname transakcií.</string>
 
     <string name="forceclose_no_channels">Žiadne kanály na zatvorenie.</string>
 

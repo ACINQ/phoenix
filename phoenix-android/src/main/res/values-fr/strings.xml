@@ -211,7 +211,7 @@
     <string name="mutualclose_error_chain_mismatch">Cette adresse utilise une blockchain différente</string>
     <string name="mutualclose_error_chain_reqparams">Cette adresse utilise des fonctionnalités non supportées</string>
     <string name="mutualclose_error_chain_generic">Cette adresse n\'est pas compatible</string>
-    <string name="mutualclose_done">%1$d canaux ont été fermés. Vous pourrez trouver le détail dans la page d\'accueil.</string>
+    <string name="mutualclose_done">La clôture a été initiée. La transaction de clôture figure dans votre liste de transactions.</string>
 
     <string name="forceclose_no_channels">Aucun canaux éligible à une clôture.</string>
 

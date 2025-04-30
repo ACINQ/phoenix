@@ -199,7 +199,7 @@
     <string name="mutualclose_error_chain_mismatch">Esta dirección usa una cadena de bloques diferente</string>
     <string name="mutualclose_error_chain_reqparams">Esta dirección usa funciones no compatibles</string>
     <string name="mutualclose_error_chain_generic">Esta dirección no es compatible</string>
-    <string name="mutualclose_done">%1$d canal(es) cerrado(s). Puedes encontrar los detalles en la pantalla de inicio.</string>
+    <string name="mutualclose_done">Se ha iniciado el cierre. La transacción de cierre está en su lista de transacciones.</string>
 
     <string name="forceclose_no_channels">No hay canales que se puedan cerrar.</string>
 

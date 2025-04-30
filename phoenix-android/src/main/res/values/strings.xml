@@ -255,7 +255,7 @@
     <string name="mutualclose_error_chain_mismatch">This address uses a different blockchain</string>
     <string name="mutualclose_error_chain_reqparams">This address uses unsupported features</string>
     <string name="mutualclose_error_chain_generic">This address is not supported</string>
-    <string name="mutualclose_done">%1$d channel(s) have been closed. You can find the details in the home screen.</string>
+    <string name="mutualclose_done">Closing has been initiated. The closing transaction is in your transactions list.</string>
 
     <string name="forceclose_no_channels">No channels eligible for closing.</string>
 

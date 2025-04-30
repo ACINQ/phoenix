@@ -203,7 +203,7 @@
     <string name="mutualclose_error_chain_mismatch">Địa chỉ này sử dụng một blockchain khác</string>
     <string name="mutualclose_error_chain_reqparams">Địa chỉ này sử dụng các tính năng không được hỗ trợ</string>
     <string name="mutualclose_error_chain_generic">Địa chỉ này không được hỗ trợ</string>
-    <string name="mutualclose_done">(Các) Kênh %1$d đã được đóng. Bạn có thể tìm thấy thông tin chi tiết trên trang chủ.</string>
+    <string name="mutualclose_done">Đã bắt đầu đóng. Giao dịch đóng nằm trong danh sách giao dịch của bạn.</string>
 
     <string name="forceclose_no_channels">Không kênh nào đủ điều kiện đóng.</string>
 
