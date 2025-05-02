@@ -85,58 +85,7 @@ extension Lightning_kmpWalletPayment {
 	
 	func standardFees() -> (Int64, String, String)? {
 		
-		if let incomingPayment = self as? Lightning_kmpIncomingPayment {
-		
-			var msat: Int64 = 0
-			if let lightningIncomingPayment = incomingPayment as? Lightning_kmpLightningIncomingPayment {
-				
-				msat = lightningIncomingPayment.parts.map { part in
-					if let htlc = part as? Lightning_kmpLightningIncomingPayment.PartHtlc {
-						if htlc.fundingFee?.fundingTxId != nil {
-							return Int64(0) // should be separated into miner & service fees
-						} else {
-							return htlc.fees.msat
-						}
-					} else {
-						return part.fees.msat
-					}
-				}.reduce(0, +)
-				
-				
-			} else if let newChannel = incomingPayment as? Lightning_kmpNewChannelIncomingPayment {
-				
-				msat = newChannel.serviceFee.msat
-				
-			} else if let spliceIn = incomingPayment as? Lightning_kmpSpliceInIncomingPayment {
-				
-				msat = spliceIn.serviceFee.msat
-			}
-			
-			if msat > 0 {
-				
-				let title = String(localized: "Service Fees", comment: "Label in SummaryInfoGrid")
-				let exp = String(localized:
-					"""
-					In order to receive this payment, a new payment channel was opened. \
-					This is not always required.
-					""",
-					comment: "Fees explanation"
-				)
-				
-				return (msat, title, exp)
-				
-			} else if !incomingPayment.isSpliceIn && !incomingPayment.isLightningPaymentWithFundingTxId {
-				
-				// I think it's nice to see "Fees: 0 sat" :)
-				
-				let msat = Int64(0)
-				let title = String(localized: "Fees", comment: "Label in SummaryInfoGrid")
-				let exp = ""
-				
-				return (msat, title, exp)
-			}
-			
-		} else if let outgoingPayment = self as? Lightning_kmpLightningOutgoingPayment {
+		if let outgoingPayment = self as? Lightning_kmpLightningOutgoingPayment {
 		
 			let msat = outgoingPayment.routingFee.msat // excludes swapOutFee
 			if msat == 0 {
@@ -193,6 +142,14 @@ extension Lightning_kmpWalletPayment {
 			} else if let spliceIn = incomingPayment as? Lightning_kmpSpliceInIncomingPayment {
 				
 				sat = spliceIn.miningFee.sat
+				
+			} else if let lightningIncoming = incomingPayment as? Lightning_kmpLightningIncomingPayment {
+
+				if let purchaseDetails = lightningIncoming.liquidityPurchaseDetails {
+
+					sat = purchaseDetails.miningFee.sat
+
+				}
 			}
 			
 			if sat > 0 {
@@ -207,16 +164,18 @@ extension Lightning_kmpWalletPayment {
 				return (msat, title, exp)
 			}
 			
-		} else if let _ = self as? Lightning_kmpChannelCloseOutgoingPayment {
+		} else if let channelCloseOutgoingPayment = self as? Lightning_kmpChannelCloseOutgoingPayment {
+
+			let msat = channelCloseOutgoingPayment.fees.msat
+
+			let title = String(localized: "Miner Fees", comment: "Label in SummaryInfoGrid")
+			let exp = String(
+				localized: "Bitcoin network fees paid for on-chain transaction.",
+				comment: "Fees explanation"
+			)
+
+			return (msat, title, exp)
 			
-			// Currently ACINQ pays the miner fees.
-			// But this will change soon, and the user will get to choose the feerate to pay.
-			// This will allow the user to control the speed of the closing transaction.
-			// And the UI will reflect this information.
-			// But for now we just don't want to show the miner fee for this TX type.
-			
-			return nil
-						
 		} else if let onChainOutgoingPayment = self as? Lightning_kmpOnChainOutgoingPayment {
 			
 			let sat = onChainOutgoingPayment.miningFee.sat
@@ -236,7 +195,25 @@ extension Lightning_kmpWalletPayment {
 	
 	func serviceFees() -> (Int64, String, String)? {
 		
-		if let lp = self as? Lightning_kmpAutomaticLiquidityPurchasePayment {
+		if let incomingPayment = self as? Lightning_kmpIncomingPayment {
+
+			if let lightningIncoming = incomingPayment as? Lightning_kmpLightningIncomingPayment {
+				if let purchaseDetails = lightningIncoming.liquidityPurchaseDetails {
+
+					let sat = purchaseDetails.purchase.fees.serviceFee
+					let msat = Utils.toMsat(sat: sat)
+
+					let title = String(localized: "Service Fees", comment: "Label in SummaryInfoGrid")
+					let exp = String(
+						localized: "Fees paid for the liquidity service.",
+						comment: "Fees explanation"
+					)
+
+					return (msat, title, exp)
+				}
+			}
+
+		} else if let lp = self as? Lightning_kmpAutomaticLiquidityPurchasePayment {
 			
 			let sat = lp.liquidityPurchase.fees.serviceFee
 			let msat = Utils.toMsat(sat: sat)

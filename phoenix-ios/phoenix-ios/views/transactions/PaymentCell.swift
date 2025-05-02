@@ -219,15 +219,6 @@ struct PaymentCell : View {
 			} else {
 				return String(localized: "\(timestamp) ∙ to \(contact.name)")
 			}
-			
-		} else if let liquidity = payment as? Lightning_kmpAutomaticLiquidityPurchasePayment {
-			let amount = Utils.formatBitcoin(sat: liquidity.liquidityPurchase.amount, bitcoinUnit: .sat)
-			return "\(timestamp)  ∙  +\(amount.string)"
-			
-		} else if let liquidity = payment as? Lightning_kmpManualLiquidityPurchasePayment {
-			let amount = Utils.formatBitcoin(sat: liquidity.liquidityPurchase.amount, bitcoinUnit: .sat)
-			return "\(timestamp)  ∙  +\(amount.string)"
-			
 		} else {
 			return timestamp
 		}
@@ -237,13 +228,6 @@ struct PaymentCell : View {
 		
 		if info.contact != nil {
 			// Also going to display contact name
-			return true
-		}
-		
-		if info.payment is Lightning_kmpAutomaticLiquidityPurchasePayment ||
-		   info.payment is Lightning_kmpManualLiquidityPurchasePayment
-		{
-			// Also going to display liquidity amount
 			return true
 		}
 		

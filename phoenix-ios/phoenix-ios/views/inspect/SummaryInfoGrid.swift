@@ -51,6 +51,7 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 			// because the compiler will sometimes choke while processing this method.
 			
 			paymentServiceRow()
+			liquidityAmountRow()
 			paymentDescriptionRow()
 			paymentMessageRow()
 			customNotesRow()
@@ -106,6 +107,41 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 		}
 	}
 	
+	@ViewBuilder
+	func liquidityAmountRow() -> some View {
+		let identifier: String = #function
+
+		if let sat = paymentInfo.liquidityAddedAmount() {
+
+			InfoGridRow(
+				identifier: identifier,
+				vAlignment: .firstTextBaseline,
+				hSpacing: horizontalSpacingBetweenColumns,
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
+			) {
+
+				keyColumn("Liquidity")
+					.accessibilityLabel("Liquidity")
+
+			} valueColumn: {
+
+				let msat = Utils.toMsat(sat: sat)
+				let amount = formattedAmount(msat: msat)
+
+				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+					Text(amount.digits)
+					Text(verbatim: " ")
+					Text_CurrencyName(currency: amount.currency, fontTextStyle: .body)
+
+				} // </HStack>
+				.onTapGesture { toggleCurrencyType() }
+				.accessibilityLabel("\(amount.string)")
+
+			} // </InfoGridRow>
+		}
+	}
+
 	@ViewBuilder
 	func paymentDescriptionRow() -> some View {
 		let identifier: String = #function

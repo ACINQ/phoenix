@@ -3,6 +3,7 @@ package fr.acinq.phoenix.controllers.config
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.*
 import fr.acinq.lightning.channel.states.*
@@ -137,7 +138,7 @@ class AppCloseChannelsConfigurationController(
             closingChannelIds = closingChannelIds?.plus(filteredChannels.keys) ?: filteredChannels.keys
 
             filteredChannels.keys.forEach { channelId ->
-                logger.info { "(mutual) closing channel=${channelId.toHex()}" }
+                logger.info { "(mutual) closing channel=${channelId.toHex()} with feerate=${FeeratePerByte(intent.feerate)}" }
                 val command = ChannelCommand.Close.MutualClose(
                     replyTo = CompletableDeferred(),
                     scriptPubKey = scriptPubKey,

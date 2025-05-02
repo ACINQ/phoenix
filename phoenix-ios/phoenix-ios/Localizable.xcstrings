@@ -21305,6 +21305,7 @@
     },
     "In order to receive this payment, a new payment channel was opened. This is not always required." : {
       "comment" : "Fees explanation",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -24397,6 +24398,9 @@
         }
       }
     },
+    "Liquidity" : {
+
+    },
     "Liquidity requested" : {
       "localizations" : {
         "ar" : {
@@ -26305,6 +26309,9 @@
           }
         }
       }
+    },
+    "Minus miner fees estimated to:" : {
+
     },
     "Missing off-chain amount too low." : {
       "localizations" : {
@@ -46228,9 +46235,6 @@
           }
         }
       }
-    },
-    "Minus miner fees estimated to:" : {
-
     },
     "With Phoenix, receiving and sending bitcoin is safe, easy, and fast." : {
       "extractionState" : "manual",

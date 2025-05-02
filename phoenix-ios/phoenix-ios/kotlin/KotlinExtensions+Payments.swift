@@ -141,6 +141,19 @@ extension WalletPaymentInfo {
 		}
 	}
 	
+	func liquidityAddedAmount() -> Int64? {
+
+		var sat: Int64? = nil
+
+		if let purchase = payment as? Lightning_kmpAutomaticLiquidityPurchasePayment {
+			sat = purchase.liquidityPurchase.amount.sat
+		} else if let purchase = payment as? Lightning_kmpManualLiquidityPurchasePayment {
+			sat = purchase.liquidityPurchase.amount.sat
+		}
+
+		return sat
+	}
+
 	func canAddToContacts() -> Bool {
 		return addToContactsInfo() != nil
 	}
