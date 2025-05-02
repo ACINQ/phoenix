@@ -559,9 +559,9 @@ struct LightningDualView: View {
 		
 		switch activeType {
 		case .bolt11_invoice:
-			return String(localized: "Lightning Invoice", comment: "Secondary title")
+			return String(localized: "Lightning Bolt11", comment: "Secondary title")
 		case .bolt12_offer:
-			return String(localized: "Lightning Offer", comment: "Secondary title")
+			return String(localized: "Lightning Bolt12", comment: "Secondary title")
 		}
 	}
 	
@@ -569,9 +569,9 @@ struct LightningDualView: View {
 		
 		switch activeType {
 		case .bolt11_invoice:
-			return String(localized: "(Lightning invoice)", comment: "Type of text being copied")
+			return String(localized: "(Lightning Bolt11)", comment: "Type of text being copied")
 		case .bolt12_offer:
-			return String(localized: "(Lightning offer)", comment: "Type of text being copied")
+			return String(localized: "(Lightning Bolt12)", comment: "Type of text being copied")
 		}
 	}
 	
@@ -875,7 +875,7 @@ struct LightningDualView: View {
 				sources.append(SourceInfo(
 					type: .text,
 					isDefault: true,
-					title: String(localized: "Lightning invoice", comment: "Type of text being copied"),
+					title: String(localized: "Lightning Bolt11", comment: "Type of text being copied"),
 					subtitle: invoiceText,
 					callback: exportText(invoiceText)
 				))
@@ -896,7 +896,7 @@ struct LightningDualView: View {
 				sources.append(SourceInfo(
 					type: .text,
 					isDefault: true,
-					title: String(localized: "Human-readable address", comment: "Type of text being copied"),
+					title: String(localized: "Lightning address", comment: "Type of text being copied"),
 					subtitle: bAddress,
 					callback: exportText(bAddress)
 				))
@@ -905,7 +905,7 @@ struct LightningDualView: View {
 				sources.append(SourceInfo(
 					type: .text,
 					isDefault: false,
-					title: String(localized: "Payment code", comment: "Type of text being copied"),
+					title: String(localized: "Lightning Bolt12", comment: "Type of text being copied"),
 					subtitle: offerText,
 					callback: exportText(offerText)
 				))

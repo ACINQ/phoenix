@@ -695,87 +695,11 @@
         }
       }
     },
-    "(Lightning invoice)" : {
-      "comment" : "Type of text being copied",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(فاتورة البرق)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(Lightning faktura)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(Blitzrechnung)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(Factura de Lightning)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(Factura de Lightning)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(requête Lightning)"
-          }
-        }
-      }
+    "(Lightning Bolt11)" : {
+      "comment" : "Type of text being copied"
     },
-    "(Lightning offer)" : {
-      "comment" : "Type of text being copied",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(عرض البرق)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(Blesková nabídka)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(Blitzangebot)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(Oferta relámpago)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(Oferta relámpago)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(Offre Lightning)"
-          }
-        }
-      }
+    "(Lightning Bolt12)" : {
+      "comment" : "Type of text being copied"
     },
     "(Phoenix can be running in the background.)" : {
       "extractionState" : "manual",
@@ -20011,6 +19935,7 @@
     },
     "Human-readable address" : {
       "comment" : "Type of text being copied",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -23882,8 +23807,17 @@
         }
       }
     },
+    "Lightning address" : {
+      "comment" : "Type of text being copied"
+    },
     "Lightning addresses:" : {
 
+    },
+    "Lightning Bolt11" : {
+      "comment" : "Secondary title\nType of text being copied"
+    },
+    "Lightning Bolt12" : {
+      "comment" : "Secondary title\nType of text being copied"
     },
     "Lightning fee" : {
       "localizations" : {
@@ -24097,6 +24031,7 @@
     },
     "Lightning invoice" : {
       "comment" : "Type of text being copied",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -24138,6 +24073,7 @@
     },
     "Lightning Invoice" : {
       "comment" : "Secondary title",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -24179,6 +24115,7 @@
     },
     "Lightning Offer" : {
       "comment" : "Secondary title",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -29517,47 +29454,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Des canaux de paiements sont automatiquement créés lorsque vous recevez des paiements. Utilisez l’écran **Recevoir** pour créer des requêtes de paiement Lightning."
-          }
-        }
-      }
-    },
-    "Payment code" : {
-      "comment" : "Type of text being copied",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "رمز الدفع"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kód platby"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zahlungscode"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Código de pago"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Código de pago"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Code de paiement"
           }
         }
       }
