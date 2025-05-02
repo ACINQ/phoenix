@@ -119,7 +119,7 @@ fun SendToOfferView(
             )
         }
     ) {
-        offer.description?.let {
+        offer.description?.takeIf { it.isNotBlank() }?.let {
             SplashLabelRow(label = stringResource(R.string.send_description_label)) {
                 Text(text = it)
             }
