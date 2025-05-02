@@ -172,11 +172,18 @@ struct LightningDualView: View {
 				.padding(.vertical)
 			
 			actionButtons()
-				.padding(.bottom)
 			
 			detailedInfo()
 				.padding(.horizontal, 20)
 				.padding(.vertical)
+
+			if activeType == .bolt12_offer, let address = bip353Address {
+				bip353AddressView(address)
+					.lineLimit(2)
+					.multilineTextAlignment(.center)
+					.font(.footnote)
+					.padding(.top)
+			}
 			
 			if activeType == .bolt12_offer {
 				howToUseButton()
@@ -333,13 +340,6 @@ struct LightningDualView: View {
 				.font(.footnote)
 				.foregroundColor(.secondary)
 			
-			if activeType == .bolt12_offer, let address = bip353Address {
-				bip353AddressView(address)
-					.lineLimit(2)
-					.multilineTextAlignment(.center)
-					.font(.footnote)
-					.foregroundColor(.secondary)
-			}
 		} // </VStack>
 	}
 	
