@@ -25,7 +25,6 @@ struct SpendOnChainFunds: View {
 	@State var minerFeeInfo: MinerFeeInfo? = nil
 	@State var satsPerByte: String = ""
 	@State var parsedSatsPerByte: Result<NSNumber, TextFieldNumberStylerError> = Result.failure(.emptyInput)
-	
 	@State var mempoolRecommendedResponse: MempoolRecommendedResponse? = nil
 	
 	@State var isSending: Bool = false
@@ -473,20 +472,19 @@ struct SpendOnChainFunds: View {
 			return
 		}
 		
+		let btcAddr = bitcoinUri.address
+		
 		let target: MinerFeeSheet.Target
 		switch source {
-			case .expiredSwapIns : target = .expiredSwapIn
-			case .finalWallet    : target = .finalWallet
+			case .expiredSwapIns : target = .expiredSwapIn(btcAddress: btcAddr)
+			case .finalWallet    : target = .finalWallet(btcAddress: btcAddr)
 		}
-		let sats: Bitcoin_kmpSatoshi = spendableBalance
 		
 		dismissKeyboardIfVisible()
 		smartModalState.display(dismissable: true) {
 			
 			MinerFeeSheet(
 				target: target,
-				amount: sats,
-				btcAddress: bitcoinUri.address,
 				minerFeeInfo: $minerFeeInfo,
 				satsPerByte: $satsPerByte,
 				parsedSatsPerByte: $parsedSatsPerByte,

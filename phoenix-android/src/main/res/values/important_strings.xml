@@ -192,9 +192,11 @@
     <!-- closing channels -->
 
     <string name="mutualclose_input_label">Bitcoin address</string>
-    <string name="mutualclose_input_instructions">Send all funds to a Bitcoin wallet. All payments channels will be closed.</string>
+    <string name="mutualclose_input_instructions">Send all funds to a Bitcoin address. All payments channels will be closed.</string>
     <string name="mutualclose_confirm_title">Confirm closing</string>
     <string name="mutualclose_confirm_details">All the funds will be sent to:</string>
+    <string name="mutualclose_confirm_fee">Miner fees estimated to:</string>
+    <string name="mutualclose_confirm_fee_unknown">Fee cost could not be estimated.</string>
 
     <string name="forceclose_title">Force-close channels</string>
     <string name="forceclose_instructions">This screen allows you to unilaterally close your channels.\n\nThis is not a \"fix-everything\" magic button: it is here as a safety measure and <b>should only be used in extreme scenarios</b>. For example, if your peer (ACINQ) disappears permanently, preventing you from spending your money. In all other cases, <b>if you experience issues with Phoenix you should contact support</b>.\n\nForce closing channels will cost you money (to cover the on-chain fees) and will cause your funds to be locked for days.\n\n<b>Do not uninstall the app until your channels are fully closed, or you will lose money.</b>\n\n<b>Do not use this feature if you don\'t fully understand what it does.</b></string>

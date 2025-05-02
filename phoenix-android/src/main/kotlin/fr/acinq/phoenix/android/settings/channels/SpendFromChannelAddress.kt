@@ -155,7 +155,7 @@ fun SpendFromChannelAddress(
                             header = stringResource(id = R.string.spendchanneladdress_error_generic),
                             details = when (state) {
                                 is SpendFromChannelAddressViewState.Error.Generic -> {
-                                    state.cause.localizedMessage
+                                    state.cause.message
                                 }
                                 is SpendFromChannelAddressViewState.Error.AmountMissing -> {
                                     stringResource(id = R.string.spendchanneladdress_error_amount)

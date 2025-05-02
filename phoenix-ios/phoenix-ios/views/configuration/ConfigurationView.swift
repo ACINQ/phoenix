@@ -384,7 +384,7 @@ struct ConfigurationList: View {
 			
 			if hasWallet {
 				navLink_label(.DrainWallet) {
-					Label { Text("Drain wallet") } icon: {
+					Label { Text("Close channels") } icon: {
 						Image(systemName: "xmark.circle")
 					}
 				}

@@ -204,7 +204,7 @@ private fun SpliceOutErrorView(state: SpliceOutState) {
         is SpliceOutState.Error.Thrown -> {
             ErrorMessage(
                 header = stringResource(id = R.string.send_spliceout_error_failure),
-                details = state.e.localizedMessage,
+                details = state.e.message,
                 alignment = Alignment.CenterHorizontally,
             )
         }

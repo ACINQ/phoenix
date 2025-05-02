@@ -16,6 +16,8 @@ struct DrainWalletView_Confirm: MVISubView {
 
 	@ObservedObject var mvi: MVIState<CloseChannelsConfiguration.Model, CloseChannelsConfiguration.Intent>
 	let bitcoinAddress: String
+	let minerFeeInfo: MinerFeeInfo
+	
 	let popTo: (PopToDestination) -> Void
 	
 	@State var actionFired: Bool = false
@@ -39,7 +41,7 @@ struct DrainWalletView_Confirm: MVISubView {
 	var view: some View {
 		
 		layers()
-			.navigationTitle(NSLocalizedString("Confirm Drain", comment: "Navigation bar title"))
+			.navigationTitle(NSLocalizedString("Confirm Closing", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationStackDestination(isPresented: navLinkTagBinding()) {
 				navLinkView()
@@ -76,14 +78,22 @@ struct DrainWalletView_Confirm: MVISubView {
 	func section_info() -> some View {
 		
 		let balance_info = formattedBalanceString()
+		let fees_info = formattedFeesString()
 		
 		Section {
 			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 				
-				Text("Your account balance of:")
+				Text("Your balance of:")
 					.padding(.bottom, 5)
 				
 				Text(verbatim: balance_info)
+					.font(.body.weight(.semibold))
+					.padding(.bottom, 15)
+				
+				Text("Minus miner fees estimated to:")
+					.padding(.bottom, 5)
+				
+				Text(verbatim: fees_info)
 					.font(.body.weight(.semibold))
 					.padding(.bottom, 15)
 				
@@ -188,7 +198,7 @@ struct DrainWalletView_Confirm: MVISubView {
 		)
 	}
 	
-	func formattedBalances() -> (FormattedAmount, FormattedAmount?) {
+	func formattedBalanceString() -> String {
 		
 		let balance_sats = mvi.balanceSats()
 		
@@ -198,16 +208,27 @@ struct DrainWalletView_Confirm: MVISubView {
 			balance_fiat = Utils.formatFiat(sat: balance_sats, exchangeRate: exchangeRate)
 		}
 		
-		return (balance_bitcoin, balance_fiat)
-	}
-	
-	func formattedBalanceString() -> String {
-		
-		let (balance_bitcoin, balance_fiat) = formattedBalances()
-		if let balance_fiat = balance_fiat {
+		if let balance_fiat {
 			return "\(balance_bitcoin.string) (≈ \(balance_fiat.string))"
 		} else {
 			return balance_bitcoin.string
+		}
+	}
+	
+	func formattedFeesString() -> String {
+		
+		let fee_sats = minerFeeInfo.minerFee
+		
+		let fee_bitcoin = Utils.formatBitcoin(sat: fee_sats, bitcoinUnit: currencyPrefs.bitcoinUnit)
+		var fee_fiat: FormattedAmount? = nil
+		if let exchangeRate = currencyPrefs.fiatExchangeRate() {
+			fee_fiat = Utils.formatFiat(sat: fee_sats, exchangeRate: exchangeRate)
+		}
+		
+		if let fee_fiat {
+			return "\(fee_bitcoin.string) (≈ \(fee_fiat.string))"
+		} else {
+			return fee_bitcoin.string
 		}
 	}
 	
@@ -265,7 +286,10 @@ struct DrainWalletView_Confirm: MVISubView {
 			actionFired = true
 			expectedTxCount = nonZeroChannelCount()
 			navigateTo(.ActionView)
-			mvi.intent(CloseChannelsConfiguration.IntentMutualCloseAllChannels(address: bitcoinAddress))
+			mvi.intent(CloseChannelsConfiguration.IntentMutualCloseAllChannels(
+				address: bitcoinAddress,
+				feerate: minerFeeInfo.feerate
+			))
 		}
 	}
 }

@@ -180,11 +180,10 @@
     <string name="mutualclose_checking_balance">Kontroluji zůstatek…</string>
     <string name="mutualclose_balance">Zůstatek: <b>%1$s</b> (≈ %2$s)</string>
     <string name="mutualclose_no_channels">Peněženka nemá žádné kanály, které by bylo možné uzavřít.</string>
-    <string name="mutualclose_button">Vyprázdnit peněženku</string>
     <string name="mutualclose_error_chain_mismatch">Tato adresa používá jiný blockchain</string>
     <string name="mutualclose_error_chain_reqparams">Tato adresa používá nepodporované funkce</string>
     <string name="mutualclose_error_chain_generic">Tato adresa není podporována</string>
-    <string name="mutualclose_done">Počet uzavřených kanálů: %1$d. Podrobnosti najdete na domovské obrazovce.</string>
+    <string name="mutualclose_done">Uzavření bylo zahájeno. Uzavřená transakce je ve vašem seznamu transakcí.</string>
 
     <string name="forceclose_no_channels">Žádné kanály k uzavření.</string>
 

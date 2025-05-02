@@ -185,11 +185,10 @@
     <string name="mutualclose_checking_balance">Verificando saldo…</string>
     <string name="mutualclose_balance">Saldo: <b>%1$s</b> (≈ %2$s)</string>
     <string name="mutualclose_no_channels">A carteira não possui canais que possam ser fechados.</string>
-    <string name="mutualclose_button">Esvaziar minha carteira</string>
     <string name="mutualclose_error_chain_mismatch">Este endereço usa um blockchain diferente</string>
     <string name="mutualclose_error_chain_reqparams">Este endereço usa funções não suportadas</string>
     <string name="mutualclose_error_chain_generic">Este endereço não é suportado</string>
-    <string name="mutualclose_done">%1$d canal(is) fechado(s). Você pode encontrar os detalhes na tela inicial.</string>
+    <string name="mutualclose_done">O fechamento foi iniciado. A transação de fechamento está na sua lista de transações.</string>
 
     <string name="forceclose_no_channels">Não há canais que possam ser fechados.</string>
 

@@ -11,14 +11,13 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 struct MinerFeeSheet: View {
 	
 	enum Target {
-		case spliceOut
-		case expiredSwapIn
-		case finalWallet
+		case spliceOut(btcAddress: String, amount: Bitcoin_kmpSatoshi)
+		case expiredSwapIn(btcAddress: String)
+		case finalWallet(btcAddress: String)
+		case simpleClose(channelIds: [Bitcoin_kmpByteVector32])
 	}
 	
 	let target: Target
-	let amount: Bitcoin_kmpSatoshi
-	let btcAddress: String
 	
 	@Binding var minerFeeInfo: MinerFeeInfo?
 	@Binding var satsPerByte: String
@@ -32,6 +31,7 @@ struct MinerFeeSheet: View {
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@EnvironmentObject var deviceInfo: DeviceInfo
 	@EnvironmentObject var smartModalState: SmartModalState
 	
 	enum Field: Hashable {
@@ -89,6 +89,7 @@ struct MinerFeeSheet: View {
 				content()
 				footer()
 			}
+			.frame(maxHeight: scrollViewMaxHeight)
 		}
 		.onChange(of: satsPerByte) { _ in
 			satsPerByteChanged()
@@ -368,6 +369,15 @@ struct MinerFeeSheet: View {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
+	var scrollViewMaxHeight: CGFloat {
+		
+		if deviceInfo.isShortHeight {
+			return CGFloat.infinity
+		} else {
+			return deviceInfo.windowSize.height * 0.6
+		}
+	}
+	
 	var isInvalidSatsPerByte: Bool {
 		switch parsedSatsPerByte {
 		case .success(_):
@@ -518,11 +528,9 @@ struct MinerFeeSheet: View {
 			feeBelowMinimum = true
 		} else {
 			feeBelowMinimum = false
-			switch target {
-				case .spliceOut     : updateMinerFeeInfo_SpliceOut(satsPerByte_number)
-				case .expiredSwapIn : updateMinerFeeInfo_ExpiredSwapIn(satsPerByte_number)
-				case .finalWallet   : updateMinerFeeInfo_FinalWallet(satsPerByte_number)
-			}
+			
+			let satsPerByte_satoshi = Bitcoin_kmpSatoshi(sat: satsPerByte_number.int64Value)
+			updateMinerFeeInfo(satsPerByte_satoshi)
 		}
 	}
 	
@@ -560,7 +568,28 @@ struct MinerFeeSheet: View {
 	// MARK: Utilities
 	// --------------------------------------------------
 	
-	func updateMinerFeeInfo_SpliceOut(_ satsPerByte_number: NSNumber) {
+	func updateMinerFeeInfo(_ satsPerByte_satoshi: Bitcoin_kmpSatoshi) {
+		
+		let feePerByte = Lightning_kmpFeeratePerByte(feerate: satsPerByte_satoshi)
+		let feePerKw = Lightning_kmpFeeratePerKw(feeratePerByte: feePerByte)
+		
+		switch target {
+		case .spliceOut(let btcAddress, let amount):
+			updateMinerFeeInfo_SpliceOut(feePerKw, btcAddress, amount)
+		case .expiredSwapIn(let btcAddress):
+			updateMinerFeeInfo_ExpiredSwapIn(feePerKw, btcAddress)
+		case .finalWallet(let btcAddress):
+			updateMinerFeeInfo_FinalWallet(feePerKw, btcAddress)
+		case .simpleClose(let channelIds):
+			updateMinerFeeInfo_SimpleClose(feePerKw, channelIds)
+		}
+	}
+	
+	func updateMinerFeeInfo_SpliceOut(
+		_ feePerKw: Lightning_kmpFeeratePerKw,
+		_ btcAddress: String,
+		_ amount: Bitcoin_kmpSatoshi
+	) {
 		log.trace("updateMinerFeeInfo_SpliceOut()")
 		
 		let chain = Biz.business.chain
@@ -572,11 +601,6 @@ struct MinerFeeSheet: View {
 		}
 		
 		let originalSatsPerByte = satsPerByte
-		
-		let satsPerByte_satoshi = Bitcoin_kmpSatoshi(sat: satsPerByte_number.int64Value)
-		let feePerByte = Lightning_kmpFeeratePerByte(feerate: satsPerByte_satoshi)
-		let feePerKw = Lightning_kmpFeeratePerKw(feeratePerByte: feePerByte)
-		
 		Task { @MainActor in
 			do {
 				let pair = try await peer.estimateFeeForSpliceOut(
@@ -608,7 +632,10 @@ struct MinerFeeSheet: View {
 		} // </Task>
 	}
 	
-	func updateMinerFeeInfo_ExpiredSwapIn(_ satsPerByte_number: NSNumber) {
+	func updateMinerFeeInfo_ExpiredSwapIn(
+		_ feePerKw: Lightning_kmpFeeratePerKw,
+		_ btcAddress: String
+	) {
 		log.trace("updateMinerFeeInfo_ExpiredSwapIn()")
 		
 		let chain = Biz.business.chain
@@ -618,10 +645,6 @@ struct MinerFeeSheet: View {
 		else {
 			return
 		}
-		
-		let satsPerByte_satoshi = Bitcoin_kmpSatoshi(sat: satsPerByte_number.int64Value)
-		let feePerByte = Lightning_kmpFeeratePerByte(feerate: satsPerByte_satoshi)
-		let feePerKw = Lightning_kmpFeeratePerKw(feeratePerByte: feePerByte)
 		
 	#if DEBUG
 		let siw = Biz.business.balanceManager.swapInWalletValue()
@@ -654,7 +677,10 @@ struct MinerFeeSheet: View {
 		)
 	}
 	
-	func updateMinerFeeInfo_FinalWallet(_ satsPerByte_number: NSNumber) {
+	func updateMinerFeeInfo_FinalWallet(
+		_ feePerKw: Lightning_kmpFeeratePerKw,
+		_ btcAddress: String
+	) {
 		log.trace("updateMinerFeeInfo_FinalWallet()")
 		
 		guard
@@ -663,10 +689,6 @@ struct MinerFeeSheet: View {
 		else {
 			return
 		}
-		
-		let satsPerByte_satoshi = Bitcoin_kmpSatoshi(sat: satsPerByte_number.int64Value)
-		let feePerByte = Lightning_kmpFeeratePerByte(feerate: satsPerByte_satoshi)
-		let feePerKw = Lightning_kmpFeeratePerKw(feeratePerByte: feePerByte)
 		
 		let pair: KotlinPair<Bitcoin_kmpTransaction, Bitcoin_kmpSatoshi>? =
 			finalWallet.buildSendAllTransaction(
@@ -687,6 +709,33 @@ struct MinerFeeSheet: View {
 			transaction: tx,
 			feerate: feePerKw,
 			minerFee: minerFee
+		)
+	}
+	
+	func updateMinerFeeInfo_SimpleClose(
+		_ feePerKw: Lightning_kmpFeeratePerKw,
+		_ channelIds: [Bitcoin_kmpByteVector32]
+	) {
+		log.trace("updateMinerFeeInfo_SimpleClose()")
+		
+		guard let peer = Biz.business.peerManager.peerStateValue() else {
+			return
+		}
+		
+		var sats: Int64 = 0
+		for channelId in channelIds {
+			if let result = peer.estimateFeeForMutualClose(channelId: channelId, targetFeerate: feePerKw) {
+				sats += result.total.sat
+			} else {
+				log.info("No fee estimate for channel \(channelId.toHex())")
+			}
+		}
+		
+		minerFeeInfo = MinerFeeInfo(
+			pubKeyScript: nil,
+			transaction: nil,
+			feerate: feePerKw,
+			minerFee: Bitcoin_kmpSatoshi(sat: sats)
 		)
 	}
 }

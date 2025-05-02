@@ -1577,15 +1577,14 @@ struct ValidateView: View {
 			return
 		}
 		
-		let sat = Utils.truncateToSat(msat: msat)
+		let btcAddr = model.uri.address
+		let amount = Bitcoin_kmpSatoshi(sat: Utils.truncateToSat(msat: msat))
 		
 		dismissKeyboardIfVisible()
 		smartModalState.display(dismissable: true) {
 			
 			MinerFeeSheet(
-				target: .spliceOut,
-				amount: Bitcoin_kmpSatoshi(sat: sat),
-				btcAddress: model.uri.address,
+				target: .spliceOut(btcAddress: btcAddr, amount: amount),
 				minerFeeInfo: $minerFeeInfo,
 				satsPerByte: $satsPerByte,
 				parsedSatsPerByte: $parsedSatsPerByte,

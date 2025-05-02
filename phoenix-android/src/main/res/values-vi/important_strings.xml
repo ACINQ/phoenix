@@ -200,6 +200,8 @@
     <string name="mutualclose_input_instructions">Gửi toàn bộ các quỹ tiền tới ví Bitcoin. Tất cả các kênh thanh toán sẽ bị đóng.</string>
     <string name="mutualclose_confirm_title">Xác nhận đóng</string>
     <string name="mutualclose_confirm_details">Toàn bộ các quỹ tiền sẽ được gửi tới:</string>
+    <string name="mutualclose_confirm_fee">Phí ước tính là:</string>
+    <string name="mutualclose_confirm_fee_unknown">Không thể ước tính chi phí phí.</string>
 
     <string name="forceclose_title">Buộc đóng các kênh</string>
     <string name="forceclose_instructions">Màn hình này cho phép bạn đơn phương đóng các kênh của mình.\n\nĐây không phải là nút thần kỳ \"sửa chữa mọi thứ\": mà chỉ là một biện pháp an toàn và <b>chỉ nên được sử dụng trong các tình huống cực đoan</b>. Ví dụ: khi máy ngang hàng của bạn (ACINQ) biến mất vĩnh viễn, khiến bạn không thể sử dụng tiền. Trong tất cả các trường hợp khác, <b>nếu bạn gặp sự cố với Phoenix, bạn nên liên hệ với bộ phận hỗ trợ</b>.\n\nViệc buộc đóng các kênh sẽ khiến bạn mất tiền (trả phí on-chain) và sẽ khiến các khoản vốn của bạn bị khóa trong nhiều ngày.\n\n<b>Không được gỡ bỏ ứng dụng cho đến khi các kênh của bạn đuợc đóng hoàn toàn, nếu không bạn sẽ mất tiền.</b>\n\n<b>Không sử dụng tính năng này nếu bạn không hiểu hết chức năng của nó.</b></string>
