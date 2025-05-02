@@ -52,7 +52,14 @@ class ParseResultHelper {
 				localized: "This address uses an invalid Bolt12 offer.",
 				comment: "Error message - dns record contains an invalid offer"
 			)
-			
+
+		case is SendManager.BadRequestReason_Bip353Unresolved:
+
+			msg = String(
+				localized: "Unable to retrieve data for this address. You may be experiencing a connectivity issue.",
+				comment: "Error message - could not retrieve dns records for that address"
+			)
+
 		case is SendManager.BadRequestReason_Bip353NoDNSSEC:
 			
 			msg = String(

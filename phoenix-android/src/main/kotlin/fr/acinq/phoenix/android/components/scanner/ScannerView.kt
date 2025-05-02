@@ -32,9 +32,12 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.systemGestureExclusion
 import androidx.compose.material.MaterialTheme
@@ -101,8 +104,8 @@ fun BoxScope.ScannerView(
 
     AndroidView(
         modifier = Modifier.fillMaxSize(),
-        factory = { context ->
-            val view = PreviewView(context)
+        factory = { ctx ->
+            val view = PreviewView(ctx)
             view.post {
                 cameraController.cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
                 cameraController.setEnabledUseCases(CameraController.IMAGE_ANALYSIS)
@@ -126,7 +129,6 @@ fun BoxScope.ScannerView(
             .padding(24.dp)
             .systemGestureExclusion()
     ) {
-        Spacer(Modifier.height(36.dp))
         TextWithIcon(
             text = stringResource(R.string.scan_help),
             icon = R.drawable.ic_tap,
@@ -145,6 +147,7 @@ fun BoxScope.ScannerView(
             onClick = onDismiss,
             modifier = Modifier.fillMaxWidth()
         )
+        Spacer(Modifier.height(WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()))
     }
 
     CameraPermissionsView()

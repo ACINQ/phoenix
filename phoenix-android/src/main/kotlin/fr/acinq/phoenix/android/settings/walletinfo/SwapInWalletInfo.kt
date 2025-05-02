@@ -55,8 +55,8 @@ import fr.acinq.phoenix.android.components.CardHeader
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.HSeparator
-import fr.acinq.phoenix.android.components.dialogs.IconPopup
 import fr.acinq.phoenix.android.components.TextWithIcon
+import fr.acinq.phoenix.android.components.dialogs.IconPopup
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString

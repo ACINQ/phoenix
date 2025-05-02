@@ -16,7 +16,6 @@
 
 package fr.acinq.phoenix.android.payments.history
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -123,10 +122,7 @@ fun PaymentsHistoryView(
         }
     }
 
-    DefaultScreenLayout(
-        isScrollable = false,
-        backgroundColor = MaterialTheme.colors.background
-    ) {
+    DefaultScreenLayout(isScrollable = false,) {
         DefaultScreenHeader(
             content = {
                 Text(text = stringResource(id = R.string.payments_history_title))
@@ -181,9 +177,7 @@ fun PaymentsHistoryView(
         ) {
             groupedPayments.forEach { (header, payments) ->
                 item {
-                    Column(modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colors.background)) {
+                    Column(modifier = Modifier.fillMaxWidth()) {
                         CardHeader(
                             text = when (header) {
                                 PaymentsGroup.Today -> stringResource(id = R.string.payments_history_today)

@@ -120,7 +120,7 @@ private fun AddressStateView(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
             }
-            Text(text = address, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(text = address, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.MiddleEllipsis)
             Button(
                 icon = R.drawable.ic_copy,
                 onClick = { copyToClipboard(context, address, "Copy address") },

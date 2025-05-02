@@ -169,21 +169,6 @@
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Tính thanh khoản đầu vào không đủ cho khoản tiền này, ngoài ra bạn đã tắt chế độ quản lý kênh tự động.</string>
 
-    <!-- receive: offer labels -->
-
-    <string name="receive_toggle_offer_button">Hiển thị mã QR có thể sử dụng lại</string>
-
-    <string name="receive_offer_howto_intro_1">🎉 Đây là mã QR có thể sử dụng lại của bạn!</string>
-    <string name="receive_offer_howto_intro_2">Nhấn để tìm hiểu cách sử dụng</string>
-    <string name="receive_offer_howto_details_1">Yêu cầu thanh toán Bolt12 này tương đương với Lightning với địa chỉ Bitcoin.</string>
-    <string name="receive_offer_howto_details_2">Không giống như hóa đơn Lightning truyền thống, nó không hết hạn và có thể được sử dụng lại.</string>
-    <string name="receive_offer_howto_details_3">Chia sẻ rộng rãi: để quyên góp, mẹo hoặc để được bạn bè trả tiền.</string>
-    <string name="receive_offer_howto_details_4_title">🛟 Ai ủng hộ Bolt12?</string>
-    <string name="receive_offer_howto_details_4">Hiện tại, rất ít dịch vụ hỗ trợ Bolt12. Nếu một dịch vụ từ chối hóa đơn này, hãy cho họ biết họ đang bỏ lỡ!</string>
-    <string name="receive_offer_howto_details_5_title">🔋 Hạn chế về pin</string>
-    <string name="receive_offer_howto_details_5">Kiểm tra xem Android có áp dụng chế độ tiết kiệm pin cho Phoenix hay không. Nếu không, bạn sẽ không thể nhận thanh toán nếu ứng dụng bị đóng hoặc chạy ở chế độ nền. Kích hoạt TOR ở Phoenix cũng sẽ gây ra sự cố.</string>
-    <string name="receive_offer_howto_details_faq_link">Tìm hiểu thêm</string>
-
     <!-- receive: Tor warning -->
 
     <string name="receive_tor_warning_title">Tor đã được bật</string>
@@ -198,6 +183,7 @@
     <string name="send_error_lnurl_invalid">Không thể xử lý liên kết LNURL này. Hãy đảm bảo liên kết này có hiệu lực.</string>
     <string name="send_error_lnurl_unsupported">Loại LNURL này chưa được hỗ trợ.</string>
     <string name="send_error_invalid_generic">Dữ liệu này sử dụng định dạng không xác định và không thể xử lý được.</string>
+    <string name="send_error_bip353_connect">Không thể truy xuất dữ liệu cho địa chỉ này. Có thể bạn đang gặp sự cố kết nối.</string>
     <string name="send_error_bip353_name_not_found">Không tìm thấy tên \"%1$s\" trên \"%2$s\".</string>
     <string name="send_error_bip353_invalid_uri">Địa chỉ này sử dụng tài nguyên Bip21 không hợp lệ.</string>
     <string name="send_error_bip353_invalid_offer">Địa chỉ này sử dụng ưu đãi Bolt12 không hợp lệ.</string>

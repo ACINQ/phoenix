@@ -162,21 +162,6 @@
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">A liquidez recebida é insuficiente e você desativou o gerenciamento automatizado de canais.</string>
 
-    <!-- receive: offer labels -->
-
-    <string name="receive_toggle_offer_button">Mostrar código QR reutilizável</string>
-
-    <string name="receive_offer_howto_intro_1">🎉 Aqui está sua solicitação de pagamento reutilizável!</string>
-    <string name="receive_offer_howto_intro_2">Toque para saber como usá-lo</string>
-    <string name="receive_offer_howto_details_1">Essa solicitação de pagamento Bolt12 é o equivalente do Lightning a um endereço Bitcoin.</string>
-    <string name="receive_offer_howto_details_2">Ao contrário das faturas tradicionais do Lightning, ela não expira e pode ser reutilizada.</string>
-    <string name="receive_offer_howto_details_3">Compartilhe-a amplamente: para doações, dicas ou para ser pago por seus amigos.</string>
-    <string name="receive_offer_howto_details_4_title">🛟 Quem apóia o Bolt12?</string>
-    <string name="receive_offer_howto_details_4">No momento, poucos serviços oferecem suporte ao Bolt12. Se um serviço rejeitar essa fatura, informe-o de que está perdendo!</string>
-    <string name="receive_offer_howto_details_5_title">🔋 Restrições de bateria</string>
-    <string name="receive_offer_howto_details_5">Verifique se o Android não aplica um modo de economia de bateria ao Phoenix. Caso contrário, você não poderá receber pagamentos se o aplicativo estiver fechado ou em segundo plano. A ativação do TOR no Phoenix também causará problemas.</string>
-    <string name="receive_offer_howto_details_faq_link">Saiba mais</string>
-
     <!-- receive: Tor warning -->
 
     <string name="receive_tor_warning_title">O Tor está ativado</string>
@@ -191,6 +176,7 @@
     <string name="send_error_lnurl_invalid">Falha ao processar esse link LNURL. Verifique se ele é válido.</string>
     <string name="send_error_lnurl_unsupported">Este tipo de LNURL ainda não é suportado.</string>
     <string name="send_error_invalid_generic">Esses dados usam um formato desconhecido e não podem ser processados.</string>
+    <string name="send_error_bip353_connect">Não é possível recuperar dados para este endereço. Você pode estar enfrentando um problema de conectividade.</string>
     <string name="send_error_bip353_name_not_found">O nome \"%1$s\" não foi encontrado em \"%2$s\".</string>
     <string name="send_error_bip353_invalid_uri">Este endereço usa um recurso Bip21 inválido.</string>
     <string name="send_error_bip353_invalid_offer">Este endereço usa uma oferta Bolt12 inválida.</string>

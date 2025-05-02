@@ -164,21 +164,6 @@
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Inbound liquidity is insufficient for this amount, and you have disabled automated channel management.</string>
 
-    <!-- receive: offer labels -->
-
-    <string name="receive_toggle_offer_button">Show reusable QR code</string>
-
-    <string name="receive_offer_howto_intro_1">🎉 Here is your reusable payment request!</string>
-    <string name="receive_offer_howto_intro_2">Tap to learn how to use it</string>
-    <string name="receive_offer_howto_details_1">This Bolt12 payment request is the Lightning equivalent to a Bitcoin address.</string>
-    <string name="receive_offer_howto_details_2">Unlike traditional Lightning invoices, it does not expire and can be reused.</string>
-    <string name="receive_offer_howto_details_3">Share it widely : for donations, tips, or to get paid by your friends.</string>
-    <string name="receive_offer_howto_details_4_title">🛟 Who supports Bolt12?</string>
-    <string name="receive_offer_howto_details_4">For the moment, few services support Bolt12. If a service rejects this invoice, let them know they\'re missing out!</string>
-    <string name="receive_offer_howto_details_5_title">🔋 Battery restrictions</string>
-    <string name="receive_offer_howto_details_5">Check that Android does not apply a battery saving mode to Phoenix. Otherwise, you won\'t be able to receive payments if the app is closed or in the background. Enabling TOR in Phoenix will also cause issues.</string>
-    <string name="receive_offer_howto_details_faq_link">Learn more</string>
-
     <!-- receive: Tor warning -->
 
     <string name="receive_tor_warning_title">Tor is enabled</string>
@@ -193,6 +178,7 @@
     <string name="send_error_lnurl_invalid">Failed to process this LNURL link. Make sure it is valid.</string>
     <string name="send_error_lnurl_unsupported">This type of LNURL is not supported yet.</string>
     <string name="send_error_invalid_generic">This is not a supported payment request.</string>
+    <string name="send_error_bip353_connect">Unable to retrieve data for this address. You may be experiencing a connectivity issue.</string>
     <string name="send_error_bip353_name_not_found">Name \"%1$s\" is not found on \"%2$s\".</string>
     <string name="send_error_bip353_invalid_uri">This address uses an invalid Bip21 resource.</string>
     <string name="send_error_bip353_invalid_offer">This address uses an invalid Bolt12 offer.</string>

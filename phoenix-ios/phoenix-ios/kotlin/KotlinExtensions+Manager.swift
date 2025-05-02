@@ -83,6 +83,13 @@ extension DatabaseManager {
 	}
 }
 
+extension NodeParamsManager {
+	
+	func nodeParamsValue() -> Lightning_kmpNodeParams? {
+		return nodeParams.value as? Lightning_kmpNodeParams
+	}
+}
+
 extension PeerManager {
 	
 	func peerStateValue() -> Lightning_kmpPeer? {

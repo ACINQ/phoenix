@@ -121,15 +121,18 @@ fun HomeView(
             }
             constrain(topBarRef) {
                 top.linkTo(parent.top, margin = 8.dp)
+                alpha = 1f
             }
             constrain(balanceRef) {
                 top.linkTo(topBarRef.bottom, margin = 36.dp)
                 centerHorizontallyTo(collapsibleRef)
+                alpha = 1f
             }
             constrain(separatorRef) {
                 bottom.linkTo(collapsibleRef.bottom)
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
+                alpha = 1f
             }
             constrain(noticesRef) {
                 top.linkTo(separatorRef.bottom, margin = 16.dp)
@@ -145,15 +148,18 @@ fun HomeView(
             }
             constrain(topBarRef) {
                 bottom.linkTo(parent.top)
+                alpha = 0f
             }
             constrain(balanceRef) {
                 bottom.linkTo(parent.top)
                 centerHorizontallyTo(parent)
+                alpha = 0f
             }
             constrain(separatorRef) {
                 bottom.linkTo(parent.top)
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
+                alpha = 0f
             }
             constrain(noticesRef) {
                 top.linkTo(separatorRef.bottom)

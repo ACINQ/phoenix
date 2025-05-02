@@ -89,30 +89,18 @@
 
     <string name="receive_help_qr">QR kód faktúry/adresy</string>
 
-    <string name="receive_bitcoin_title">Bitcoin</string>
-    <string name="receive_bitcoin_help">Tento QR kód je klasická Bitcoinová adresa. \n\nDokáže ho prečítať takmer každá Bitcoinová služba/peňaženka, ale spracovanie platieb bude trvať dlhšie.</string>
     <string name="receive_bitcoin_address_label">Adresa</string>
     <string name="receive_bitcoin_generating">Synchronizácia adresy…</string>
-    <string name="receive_bitcoin_error">Nepodarilo sa vygenerovať Bitcoinovú adresu</string>
     <string name="receive_bitcoin_share_title">Bitcoinová adresa</string>
     <string name="receive_bitcoin_share_subject">Zdieľať túto Bitcoinovú adresu s…</string>
 
-    <string name="receive_lightning_title">Lightning</string>
-    <string name="receive_lightning_help">Tento QR kód je Lightningová faktúra.\n\nLightningové platby sú veľmi rýchle a obvykle lacnejšie, ale niektoré peňaženky a služby ich možno zatiaľ nepodporujú.\n\nV takom prípade prejdite doprava a získate bežnú Bitcoinovú adresu.</string>
     <string name="receive_lightning_generating">Vytváranie…</string>
     <string name="receive_lightning_amount_label">Suma</string>
     <string name="receive_lightning_desc_label">Popis</string>
     <string name="receive_lightning_error">Nepodarilo sa vygenerovať faktúru</string>
     <string name="receive_lightning_share_subject">Lightningová faktúra</string>
     <string name="receive_lightning_share_title">Zdieľať túto Lightningovú faktúru s…</string>
-    <string name="receive_lnurl_button">Skenovanie</string>
 
-    <string name="receive_offer_share_title">Statická Lightningová faktúra</string>
-    <string name="receive_offer_share_subject">Zdieľajte túto statickú Lightningovú faktúru s…</string>
-
-
-    <string name="receive_lightning_edit_button">Upraviť</string>
-    <string name="receive_lightning_edit_title">Upraviť faktúru</string>
     <string name="receive_lightning_edit_amount_label">Suma (voliteľné)</string>
     <string name="receive_lightning_edit_amount_placeholder">Suma na prijatie</string>
     <string name="receive_lightning_edit_desc_label">Popis (voliteľné)</string>

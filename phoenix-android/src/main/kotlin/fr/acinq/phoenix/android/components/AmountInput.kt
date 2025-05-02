@@ -240,10 +240,9 @@ fun AmountInput(
                 colors = outlinedTextFieldColors(),
                 interactionSource = interactionSource,
                 shape = RoundedCornerShape(8.dp),
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp, top = if (staticLabel != null) 12.dp else 0.dp)
+                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(bottom = 8.dp, top = if (staticLabel != null) 12.dp else 0.dp)
             )
         }
-
         staticLabel?.let {
             Text(
                 text = staticLabel,

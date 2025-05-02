@@ -314,7 +314,7 @@ fun TechnicalRowWithCopy(label: String, value: String, helpMessage: String? = nu
         val context = LocalContext.current
         Clickable(onClick = { copyToClipboard(context = context, data = value) }, shape = RoundedCornerShape(12.dp)) {
             Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)) {
-                Text(text = value, maxLines = 4, overflow = TextOverflow.Ellipsis)
+                Text(text = value, maxLines = 4, overflow = TextOverflow.MiddleEllipsis)
                 Spacer(modifier = Modifier.height(4.dp))
                 TextWithIcon(
                     text = stringResource(id = R.string.btn_copy),
@@ -359,7 +359,7 @@ fun TransactionRow(txId: TxId) {
         onClick = { openLink(context, link) },
         onLongClick = { copyToClipboard(context, txId.toString()) }
     ) {
-        TextWithIcon(text = txId.toString(), icon = R.drawable.ic_external_link, maxLines = 1, textOverflow = TextOverflow.Ellipsis, space = 4.dp)
+        TextWithIcon(text = txId.toString(), icon = R.drawable.ic_external_link, maxLines = 1, textOverflow = TextOverflow.MiddleEllipsis, space = 4.dp)
     }
 }
 
@@ -372,6 +372,6 @@ fun ChannelIdRow(channelId: ByteVector32, label: String = stringResource(id = R.
         onClick = { navController.navigate("${Screen.ChannelDetails.route}?id=${channelId.toHex()}") },
         onLongClick = { copyToClipboard(context, channelId.toHex()) }
     ) {
-        TextWithIcon(text = channelId.toHex(), icon = R.drawable.ic_zap, maxLines = 1, textOverflow = TextOverflow.Ellipsis, space = 4.dp)
+        TextWithIcon(text = channelId.toHex(), icon = R.drawable.ic_zap, maxLines = 1, textOverflow = TextOverflow.MiddleEllipsis, space = 4.dp)
     }
 }
