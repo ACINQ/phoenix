@@ -231,7 +231,7 @@ private fun PrepareSendView(
     val parsePaymentState = vm.parsePaymentState
     val isProcessingData = vm.parsePaymentState.isProcessing || vm.readImageState.isProcessing
 
-    DefaultScreenLayout(isScrollable = false) {
+    DefaultScreenLayout(isScrollable = false, navBarColor = MaterialTheme.colors.surface) {
         DefaultScreenHeader(title = stringResource(id = R.string.preparesend_title), onBackClick = onBackClick)
 
         // show error message when reading an image from disk fails
