@@ -195,7 +195,7 @@
     <string name="mutualclose_input_instructions">Send all funds to a Bitcoin address. All payments channels will be closed.</string>
     <string name="mutualclose_confirm_title">Confirm closing</string>
     <string name="mutualclose_confirm_details">All the funds will be sent to:</string>
-    <string name="mutualclose_confirm_fee">Fee estimated to:</string>
+    <string name="mutualclose_confirm_fee">Miner fees estimated to:</string>
     <string name="mutualclose_confirm_fee_unknown">Fee cost could not be estimated.</string>
 
     <string name="forceclose_title">Force-close channels</string>

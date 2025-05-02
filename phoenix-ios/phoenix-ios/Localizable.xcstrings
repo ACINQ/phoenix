@@ -10811,43 +10811,43 @@
         }
       }
     },
-    "Confirm Drain" : {
+    "Confirm Closing" : {
       "comment" : "Navigation bar title",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "تأكيد الاستنزاف"
+            "value" : "تأكيد الإغلاق"
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Potvrzení odtoku"
+            "value" : "Potvrdit uzavření"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Abfluss bestätigen"
+            "value" : "Abschluss bestätigen"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Confirmar"
+            "value" : "Confirmar cierre"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Confirmar vaciado"
+            "value" : "Confirmar cierre"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Confirmer la fermeture"
+            "value" : "Confirmer la clôture"
           }
         }
       }
@@ -15275,47 +15275,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vaciar mi billetera"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vider mon portefeuille"
-          }
-        }
-      }
-    },
-    "Drain wallet" : {
-      "comment" : "Navigation bar title",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "محفظة الصرف"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vyprázdnit peněženku"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Geldbeutel entleeren"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vaciar billetera"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vaciar billetera"
           }
         },
         "fr" : {
@@ -26346,9 +26305,6 @@
           }
         }
       }
-    },
-    "minus miner fees of:" : {
-
     },
     "Missing off-chain amount too low." : {
       "localizations" : {
@@ -46273,6 +46229,9 @@
         }
       }
     },
+    "Minus miner fees estimated to:" : {
+
+    },
     "With Phoenix, receiving and sending bitcoin is safe, easy, and fast." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -47855,6 +47814,7 @@
       }
     },
     "Your account balance of:" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -47933,6 +47893,9 @@
           }
         }
       }
+    },
+    "Your balance of:" : {
+
     },
     "Your channel are not connected yet. Wait for a stable connection and try again." : {
       "localizations" : {

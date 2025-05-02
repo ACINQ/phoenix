@@ -50,7 +50,7 @@ struct DrainWalletView: MVIView {
 	var view: some View {
 
 		layers()
-			.navigationTitle(NSLocalizedString("Drain wallet", comment: "Navigation bar title"))
+			.navigationTitle(NSLocalizedString("Close channels", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
 				navLinkView()

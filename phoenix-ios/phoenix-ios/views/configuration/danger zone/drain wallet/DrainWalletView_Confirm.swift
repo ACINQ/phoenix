@@ -41,7 +41,7 @@ struct DrainWalletView_Confirm: MVISubView {
 	var view: some View {
 		
 		layers()
-			.navigationTitle(NSLocalizedString("Confirm Drain", comment: "Navigation bar title"))
+			.navigationTitle(NSLocalizedString("Confirm Closing", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationStackDestination(isPresented: navLinkTagBinding()) {
 				navLinkView()
@@ -83,14 +83,14 @@ struct DrainWalletView_Confirm: MVISubView {
 		Section {
 			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 				
-				Text("Your account balance of:")
+				Text("Your balance of:")
 					.padding(.bottom, 5)
 				
 				Text(verbatim: balance_info)
 					.font(.body.weight(.semibold))
 					.padding(.bottom, 15)
 				
-				Text("minus miner fees of:")
+				Text("Minus miner fees estimated to:")
 					.padding(.bottom, 5)
 				
 				Text(verbatim: fees_info)
