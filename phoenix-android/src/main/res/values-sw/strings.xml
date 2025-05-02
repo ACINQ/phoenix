@@ -218,7 +218,7 @@
     <string name="mutualclose_error_chain_mismatch">Anwani hii inatumia blockchain tofauti</string>
     <string name="mutualclose_error_chain_reqparams">Anwani hii inatumia vipengele visivyosaidiwa</string>
     <string name="mutualclose_error_chain_generic">Anwani hii haisaidiwi</string>
-    <string name="mutualclose_done">Ufungaji umeanzishwa. Shughuli ya kufunga iko kwenye orodha yako ya miamala.</ string >
+    <string name="mutualclose_done">Ufungaji umeanzishwa. Shughuli ya kufunga iko kwenye orodha yako ya miamala.</string >
 
     <string name="forceclose_no_channels">Hakuna kanali zinazostahiki kufungwa.</string>
 
