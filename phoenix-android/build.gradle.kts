@@ -21,11 +21,11 @@ val chain: String by project
 
 android {
     namespace = "fr.acinq.phoenix.android"
-    compileSdk = 34
+    compileSdk = 35
     defaultConfig {
         applicationId = "fr.acinq.phoenix.testnet"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 103
         versionName = gitCommitHash()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -111,11 +111,11 @@ dependencies {
 
     // -- AndroidX: jetpack compose
     implementation("androidx.compose.ui:ui:${libs.versions.androidx.compose.common.get()}")
-    implementation("androidx.compose.foundation:foundation:${libs.versions.androidx.compose.common.get()}")
-    implementation("androidx.compose.foundation:foundation-layout:${libs.versions.androidx.compose.common.get()}")
     implementation("androidx.compose.ui:ui-tooling:${libs.versions.androidx.compose.common.get()}")
     implementation("androidx.compose.ui:ui-util:${libs.versions.androidx.compose.common.get()}")
     implementation("androidx.compose.ui:ui-viewbinding:${libs.versions.androidx.compose.common.get()}")
+    implementation("androidx.compose.foundation:foundation:${libs.versions.androidx.compose.common.get()}")
+    implementation("androidx.compose.foundation:foundation-layout:${libs.versions.androidx.compose.common.get()}")
     implementation("androidx.compose.runtime:runtime-livedata:${libs.versions.androidx.compose.common.get()}")
     implementation("androidx.compose.material:material:${libs.versions.androidx.compose.common.get()}")
     implementation("androidx.compose.animation:animation:${libs.versions.androidx.compose.common.get()}")

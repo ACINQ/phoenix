@@ -90,32 +90,23 @@
 
     <string name="receive_help_qr">Mã QR của hóa đơn/địa chỉ</string>
 
-    <string name="receive_bitcoin_title">Bitcoin</string>
-    <string name="receive_bitcoin_help">Mã QR này là một địa chỉ Bitcoin thông thường.\n\nMã có thể đọc được bởi hầu hết mọi dịch vụ/ví Bitcoin, tuy nhiên thanh toán sẽ đến chậm hơn.</string>
     <string name="receive_bitcoin_address_label">Địa chỉ</string>
     <string name="receive_bitcoin_generating">Đang đồng bộ hóa địa chỉ…</string>
-    <string name="receive_bitcoin_error">Không thể tạo địa chỉ Bitcoin</string>
     <string name="receive_bitcoin_share_title">Địa chỉ Bitcoin</string>
     <string name="receive_bitcoin_share_subject">Chia sẻ địa chỉ Bitcoin này với…</string>
 
-    <string name="receive_lightning_title">Lightning</string>
-    <string name="receive_lightning_help">Mã QR này là 1 hóa đơn Lightning.\n\nThanh toán Lightning rất nhanh và thường rẻ hơn, tuy nhiên nó có thể chưa được hỗ trợ bởi một số loại ví và một số dịch vụ.\n\nTrong trường hợp đó, hãy vuốt sang phải để nhận địa chỉ Bitcoin thông thường.</string>
     <string name="receive_lightning_generating">Đang tạo…</string>
     <string name="receive_lightning_amount_label">Số tiền</string>
     <string name="receive_lightning_desc_label">Mô tả</string>
     <string name="receive_lightning_error">Không thể xuất hóa đơn</string>
     <string name="receive_lightning_share_subject">Hoá đơn Lightning</string>
     <string name="receive_lightning_share_title">Chia sẻ hóa đơn Lightning này với…</string>
-    <string name="receive_lnurl_button">Quét</string>
 
-    <string name="receive_lightning_edit_button">Chỉnh sửa</string>
-    <string name="receive_lightning_edit_title">Chỉnh sửa hoá đơn</string>
     <string name="receive_lightning_edit_amount_label">Số tiền (không bắt buộc)</string>
     <string name="receive_lightning_edit_amount_placeholder">Số tiền sẽ nhận</string>
     <string name="receive_lightning_edit_desc_label">Mô tả (không bắt buộc)</string>
     <string name="receive_lightning_edit_desc_placeholder">Nhập mô tả cho hóa đơn này</string>
     <string name="receive_lightning_edit_generate_button">Lập hoá đơn</string>
-
 
     <!-- send -->
 

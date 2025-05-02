@@ -138,7 +138,7 @@ fun SendToBolt11View(
         Spacer(modifier = Modifier.height(16.dp))
         SplashLabelRow(label = stringResource(R.string.send_destination_label), icon = R.drawable.ic_zap) {
             SelectionContainer {
-                Text(text = invoice.nodeId.toHex(), maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text(text = invoice.nodeId.toHex(), maxLines = 2, overflow = TextOverflow.MiddleEllipsis)
             }
         }
         if (invoice.isAmountlessTrampoline()) {

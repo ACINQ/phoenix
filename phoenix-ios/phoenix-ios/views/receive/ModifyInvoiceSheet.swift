@@ -11,12 +11,10 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 struct ModifyInvoiceSheet: View {
 
 	@Binding var savedAmount: CurrencyAmount?
-	let initialAmount: Lightning_kmpMilliSatoshi?
+	@Binding var description: String
 	
 	let openCurrencyConverter: () -> Void
-	let didSave: (Lightning_kmpMilliSatoshi?, String) -> Void
-	
-	@State var desc: String
+	let didSave: (Lightning_kmpMilliSatoshi?, String?) -> Void
 	
 	@State var currency: Currency = Currency.bitcoin(.sat)
 	@State var currencyList: [Currency] = [Currency.bitcoin(.sat)]
@@ -40,14 +38,12 @@ struct ModifyInvoiceSheet: View {
 
 	init(
 		savedAmount: Binding<CurrencyAmount?>,
-		amount: Lightning_kmpMilliSatoshi?,
-		desc: String,
+		description: Binding<String>,
 		openCurrencyConverter: @escaping () -> Void,
-		didSave: @escaping (Lightning_kmpMilliSatoshi?, String) -> Void
+		didSave: @escaping (Lightning_kmpMilliSatoshi?, String?) -> Void
 	) {
 		self._savedAmount = savedAmount
-		self.initialAmount = amount
-		self._desc = State<String>(initialValue: desc)
+		self._description = description
 		self.openCurrencyConverter = openCurrencyConverter
 		self.didSave = didSave
 	}
@@ -103,18 +99,21 @@ struct ModifyInvoiceSheet: View {
 
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 				TextField(
-					NSLocalizedString("Description (optional)", comment: "TextField placeholder; translate: optional"),
-					text: $desc
+					String(
+						localized: "Description (optional)",
+						comment: "TextField placeholder; translate: optional"
+					),
+					text: $description
 				)
 				
 				// Clear button (appears when TextField's text is non-empty)
 				Button {
-					desc = ""
+					description = ""
 				} label: {
 					Image(systemName: "multiply.circle.fill")
 						.foregroundColor(.secondary)
 				}
-				.isHidden(desc == "")
+				.isHidden(description.isEmpty)
 			}
 			.padding([.top, .bottom], 8)
 			.padding(.leading, 16)
@@ -244,20 +243,6 @@ struct ModifyInvoiceSheet: View {
 			amount = formattedAmt.digits
 			currency = savedAmount.currency
 			
-		} else if let initialAmount {
-			
-			// Since there's an amount in bitcoin, we use the user's preferred bitcoin unit.
-			// We try to use the user's preferred currency.
-			
-			let formattedAmt = Utils.formatBitcoin(
-				msat: initialAmount,
-				bitcoinUnit: currencyPrefs.bitcoinUnit,
-				policy: .showMsatsIfNonZero
-			)
-			parsedAmount = Result.success(formattedAmt.amount)
-			amount = formattedAmt.digits
-			currency = Currency.bitcoin(currencyPrefs.bitcoinUnit)
-			
 		} else {
 			
 			// There's no amount, so we default to the user's preferred currency
@@ -377,8 +362,6 @@ struct ModifyInvoiceSheet: View {
 		log.trace("didTapSaveButton()")
 		
 		var msat: Lightning_kmpMilliSatoshi? = nil
-		let trimmedDesc = desc.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-		
 		if let amt = try? parsedAmount.get(), amt > 0 {
 			
 			savedAmount = CurrencyAmount(currency: currency, amount: amt)
@@ -402,8 +385,11 @@ struct ModifyInvoiceSheet: View {
 			savedAmount = nil
 		}
 		
+		let trimmedDesc = description.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+		let finalDesc = trimmedDesc.isEmpty ? nil : trimmedDesc
+		
 		smartModalState.close(animationCompletion: {
-			didSave(msat, trimmedDesc)
+			didSave(msat, finalDesc)
 		})
 	}
 }

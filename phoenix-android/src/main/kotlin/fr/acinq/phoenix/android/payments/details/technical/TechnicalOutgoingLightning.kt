@@ -96,7 +96,7 @@ fun TechnicalOutgoingLightning(
                 }
                 TechnicalRow(label = stringResource(id = R.string.paymentdetails_part_hops_label)) {
                     part.route.forEach {
-                        Text("-> ${it.nextNodeId.toHex()}", maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text("-> ${it.nextNodeId.toHex()}", maxLines = 1, overflow = TextOverflow.MiddleEllipsis)
                     }
                 }
                 TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_sent_label), amount = part.amount, rateThen = originalFiatRate)

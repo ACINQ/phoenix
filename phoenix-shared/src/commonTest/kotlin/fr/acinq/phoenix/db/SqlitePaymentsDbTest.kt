@@ -45,6 +45,11 @@ import fr.acinq.phoenix.utils.PlatformContext
 import fr.acinq.phoenix.utils.extensions.WalletPaymentState
 import fr.acinq.phoenix.utils.extensions.state
 import fr.acinq.phoenix.utils.testLoggerFactory
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.newSingleThreadContext
+import kotlinx.coroutines.test.setMain
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
@@ -68,10 +73,15 @@ expect abstract class UsingContextTest() {
 @Suppress("DEPRECATION")
 class SqlitePaymentsDbTest : UsingContextTest() {
 
-    val onError: (String) -> Unit = { testLoggerFactory.newLogger(this::class).e { "error in migration test: $it" }}
+    private val onError: (String) -> Unit = { testLoggerFactory.newLogger(this::class).e { "error in migration test: $it" }}
 
+    @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
+    private val mainThreadSurrogate = newSingleThreadContext("UI thread")
+
+    @OptIn(ExperimentalCoroutinesApi::class)
     @BeforeTest
     fun setupDatabases() {
+        Dispatchers.setMain(mainThreadSurrogate)
         val sampleDbs = "src/commonTest/resources/sampledbs"
         val v1: List<Path> = FileSystem.SYSTEM.list("$sampleDbs/v1".toPath())
         val v6: List<Path> = FileSystem.SYSTEM.list("$sampleDbs/v6".toPath())
@@ -81,7 +91,7 @@ class SqlitePaymentsDbTest : UsingContextTest() {
 
     @Test
     fun `read v1 db`() = runTest {
-        val driver = createPaymentsDbDriver(getPlatformContext(), chain = Chain.Testnet3, nodeIdHash = "fedc36138a62ceadc8a93861d2c46f5ca5e8b418", onError = onError)
+        val driver = createPaymentsDbDriver(getPlatformContext(), fileName = "payments-testnet-fedc36138a62ceadc8a93861d2c46f5ca5e8b418.sqlite", onError = onError)
         val paymentsDb = createSqlitePaymentsDb(driver, metadataQueue = null, loggerFactory = testLoggerFactory)
 
         val payments = paymentsDb.database.paymentsQueries.list(limit = Long.MAX_VALUE, offset = 0)
@@ -109,7 +119,7 @@ class SqlitePaymentsDbTest : UsingContextTest() {
 
     @Test
     fun `read v1 db - additional`() = runTest {
-        val driver = createPaymentsDbDriver(getPlatformContext(), chain = Chain.Testnet3, nodeIdHash = "a224978853d2f4c94ac8e2dbb2acf8344e0146d0", onError = onError)
+        val driver = createPaymentsDbDriver(getPlatformContext(), fileName = "payments-testnet-a224978853d2f4c94ac8e2dbb2acf8344e0146d0.sqlite", onError = onError)
         val paymentsDb = createSqlitePaymentsDb(driver, metadataQueue = null, loggerFactory = testLoggerFactory)
 
         val payments = paymentsDb.database.paymentsQueries.list(limit = Long.MAX_VALUE, offset = 0)
@@ -137,7 +147,7 @@ class SqlitePaymentsDbTest : UsingContextTest() {
 
     @Test
     fun `read v6 db`() = runTest {
-        val driver = createPaymentsDbDriver(getPlatformContext(), chain = Chain.Testnet3, nodeIdHash = "700486fc7a90d5922d6f993f2941ab9f9f1a9d85", onError = onError)
+        val driver = createPaymentsDbDriver(getPlatformContext(), fileName = "payments-testnet-700486fc7a90d5922d6f993f2941ab9f9f1a9d85.sqlite", onError = onError)
         val paymentsDb = createSqlitePaymentsDb(driver, metadataQueue = null, loggerFactory = testLoggerFactory)
 
         val payments = paymentsDb.database.paymentsQueries.list(limit = Long.MAX_VALUE, offset = 0)
@@ -165,7 +175,7 @@ class SqlitePaymentsDbTest : UsingContextTest() {
 
     @Test
     fun `read v10 db - large dataset`() = runTest {
-        val driver = createPaymentsDbDriver(getPlatformContext(), chain = Chain.Testnet3, nodeIdHash = "28903aff", onError = onError)
+        val driver = createPaymentsDbDriver(getPlatformContext(), fileName = "payments-testnet-28903aff.sqlite", onError = onError)
         val paymentsDb = createSqlitePaymentsDb(driver, metadataQueue = null, loggerFactory = testLoggerFactory)
 
         val payments = paymentsDb.database.paymentsQueries.list(limit = Long.MAX_VALUE, offset = 0)
@@ -261,7 +271,7 @@ class SqlitePaymentsDbTest : UsingContextTest() {
 
     @Test
     fun `read v10 db - fees`() = runTest {
-        val driver = createPaymentsDbDriver(getPlatformContext(), chain = Chain.Testnet3, nodeIdHash = "f921bddf", onError = onError)
+        val driver = createPaymentsDbDriver(getPlatformContext(), fileName = "payments-testnet-f921bddf.sqlite", onError = onError)
         val paymentsDb = createSqlitePaymentsDb(driver, metadataQueue = null, loggerFactory = testLoggerFactory)
 
         // On-chain deposit of 200k sat that triggered a liquidity purchase.
@@ -320,7 +330,7 @@ class SqlitePaymentsDbTest : UsingContextTest() {
 
     @Test
     fun `read v10 db - liquidity`() = runTest {
-        val driver = createPaymentsDbDriver(getPlatformContext(), chain = Chain.Testnet3, nodeIdHash = "6a5e6f", onError = onError)
+        val driver = createPaymentsDbDriver(getPlatformContext(), fileName = "payments-testnet-6a5e6f.sqlite", onError = onError)
         val paymentsDb = createSqlitePaymentsDb(driver, metadataQueue = null, loggerFactory = testLoggerFactory)
 
         // swap-in 200_000 sat + liquidity purchase from channel balance => received 198_433 sat after fees.

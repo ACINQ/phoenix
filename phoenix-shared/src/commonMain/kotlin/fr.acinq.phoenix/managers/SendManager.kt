@@ -81,6 +81,7 @@ class SendManager(
         data class ChainMismatch(val expected: Chain) : BadRequestReason()
         data class ServiceError(val url: Url, val error: LnurlError.RemoteFailure) : BadRequestReason()
         data class InvalidLnurl(val url: Url) : BadRequestReason()
+        data class Bip353Unresolved(val username: String, val domain: String) : BadRequestReason()
         data class Bip353NameNotFound(val username: String, val domain: String) : BadRequestReason()
         data class Bip353InvalidUri(val path: String) : BadRequestReason()
         data class Bip353InvalidOffer(val path: String) : BadRequestReason()
@@ -285,7 +286,11 @@ class SendManager(
 
         val dnsPath = "$username.user._bitcoin-payment.$domain."
 
-        val json = DnsResolvers.getRandom().getTxtRecord(dnsPath)
+        val json = try {
+            DnsResolvers.getRandom().getTxtRecord(dnsPath)
+        } catch (e: Exception) {
+            throw BadRequestReason.Bip353Unresolved(username, domain)
+        }
         log.debug { "dns resolved to ${json.toString().take(100)}" }
 
         val status = json["Status"]?.jsonPrimitive?.intOrNull

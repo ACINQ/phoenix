@@ -89,26 +89,18 @@
 
     <string name="receive_help_qr">QR-Code der Rechnung/Adresse</string>
 
-    <string name="receive_bitcoin_title">Bitcoin</string>
-    <string name="receive_bitcoin_help">Dieser QR-Code ist eine klassische Bitcoin-Adresse.\n\nEr kann von fast allen Bitcoin-Wallets gelesen werden, allerdings werden die Zahlungen langsamer sein.</string>
     <string name="receive_bitcoin_address_label">Adresse</string>
     <string name="receive_bitcoin_generating">Adresse synchronisieren..</string>
-    <string name="receive_bitcoin_error">Bitcoin-Adresse konnte nicht generiert werden</string>
     <string name="receive_bitcoin_share_title">Bitcoin-Adresse</string>
     <string name="receive_bitcoin_share_subject">Teile diese Bitcoin-Adresse mit…</string>
 
-    <string name="receive_lightning_title">Lightning</string>
-    <string name="receive_lightning_help">Dieser QR-Code ist eine Lightning-Rechnung.\n\nLightning-Zahlungen sind sehr schnell und normalerweise günstiger, werden aber von manchen Wallets nicht unterstützt.\n\nIn diesem Fall bitte nach links wischen, um eine klassische Bitcoin-Adresse zu verwenden.</string>
     <string name="receive_lightning_generating">Wird erstellt…</string>
     <string name="receive_lightning_amount_label">Betrag</string>
     <string name="receive_lightning_desc_label">Desc</string>
     <string name="receive_lightning_error">Rechnung konnte nicht erstellt werden</string>
     <string name="receive_lightning_share_subject">Lightning-Rechnung</string>
     <string name="receive_lightning_share_title">Teile diese Lightning-Rechnung mit…</string>
-    <string name="receive_lnurl_button">Scannen</string>
 
-    <string name="receive_lightning_edit_button">Ändern</string>
-    <string name="receive_lightning_edit_title">Rechnung ändern</string>
     <string name="receive_lightning_edit_amount_label">Betrag (optional)</string>
     <string name="receive_lightning_edit_amount_placeholder">Zu empfangender Betrag</string>
     <string name="receive_lightning_edit_desc_label">Beschreibung (optional)</string>

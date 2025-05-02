@@ -913,62 +913,46 @@
         "v" : "%lld restants"
       }
     },
-    "(Lightning invoice)" : {
-      "ar" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "(فاتورة البرق)"
-      },
+    "(Lightning Bolt11)" : {
       "cs" : {
         "ts" : "2024-04-30T15:55:52Z",
-        "v" : "(Lightning faktura)"
+        "v" : "(Lightning Bolt11)"
       },
       "de" : {
         "ts" : "2024-08-12T21:16:31Z",
-        "v" : "(Blitzrechnung)"
+        "v" : "(Lightning Bolt11)"
       },
       "en" : {
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
         "ts" : "2024-04-30T15:55:52Z",
-        "v" : "(Factura de Lightning)"
+        "v" : "(Lightning Bolt11)"
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
-        "v" : "(Factura de Lightning)"
+        "v" : "(Lightning Bolt11)"
       },
       "fr" : {
         "ts" : "2024-04-30T15:55:52Z",
-        "v" : "(requête Lightning)"
+        "v" : "(Lightning Bolt11)"
       }
     },
-    "(Lightning offer)" : {
-      "ar" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "(عرض البرق)"
-      },
-      "cs" : {
-        "ts" : "2024-08-12T21:18:59Z",
-        "v" : "(Blesková nabídka)"
-      },
-      "de" : {
-        "ts" : "2024-08-12T21:21:28Z",
-        "v" : "(Blitzangebot)"
-      },
+    "(Lightning Bolt12)" : {
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
       },
       "es" : {
         "ts" : "2024-08-12T21:22:49Z",
-        "v" : "(Oferta relámpago)"
+        "v" : "(Lightning Bolt12)"
       },
       "es-419" : {
         "ts" : "2024-08-12T21:24:40Z",
-        "v" : "(Oferta relámpago)"
+        "v" : "(Lightning Bolt12)"
       },
       "fr" : {
         "ts" : "2025-02-27T20:32:25Z",
-        "v" : "(Offre Lightning)"
+        "v" : "(Lightning Bolt12)"
       }
     },
     "(Phoenix can be running in the background.)" : {

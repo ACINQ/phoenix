@@ -100,33 +100,18 @@
 
     <string name="receive_help_qr">QR Code ya ankara/anwani</string>
 
-    <string name="receive_bitcoin_title">Bitcoin</string>
-    <string name="receive_bitcoin_help">QR Code hii ni anwani ya kawaida ya Bitcoin.\n\nInaweza kusomwa na karibu huduma yoyote ya Bitcoin, lakini malipo yatachelewa kufika.</string>
     <string name="receive_bitcoin_address_label">Anwani</string>
     <string name="receive_bitcoin_generating">Inasawazisha anwani…</string>
-    <string name="receive_bitcoin_error">Haikuweza kuzalisha anwani ya bitcoin</string>
     <string name="receive_bitcoin_share_title">Anwani ya Bitcoin</string>
     <string name="receive_bitcoin_share_subject">Shiriki anwani hii ya Bitcoin na…</string>
 
-    <string name="receive_lightning_title">Umeme</string>
-    <string name="receive_lightning_help">Hii ni QR code ya hati ya Lightning.\n\nMalipo ya Lightning ni ya haraka sana na kawaida huwa na gharama ndogo, lakini baadhi ya pochi na huduma zinaweza kutosa kuziunga mkono bado.\n\nKatika hali hiyo, piga kushoto kupata anwani ya kawaida ya Bitcoin.</string>
     <string name="receive_lightning_generating">Inatengeneza…</string>
     <string name="receive_lightning_amount_label">Kiasi</string>
     <string name="receive_lightning_desc_label">Maelezo</string>
     <string name="receive_lightning_error">Haiwezi kutengeneza hati</string>
     <string name="receive_lightning_share_subject">Hati ya Lightning</string>
     <string name="receive_lightning_share_title">Shiriki hati ya Lightning na…</string>
-    <string name="receive_lnurl_button">Piga picha</string>
 
-    <string name="receive_offer_share_title">Mkodishaji wa Bolt12</string>
-    <string name="receive_offer_share_subject">Shiriki msimbo huu wa Bolt12 na…</string>
-
-    <string name="receive_offer_copy_bip353">Nakili anwani inayosomwa kwa mtu</string>
-    <string name="receive_offer_copy_bolt12">Nakili msimbo wa malipo</string>
-    <string name="receive_offer_copy_bip21">Nakili URI kamili</string>
-
-    <string name="receive_lightning_edit_button">Hariri</string>
-    <string name="receive_lightning_edit_title">Hariri hati</string>
     <string name="receive_lightning_edit_amount_label">Kiasi (hiari)</string>
     <string name="receive_lightning_edit_amount_placeholder">Kiasi cha kupokea</string>
     <string name="receive_lightning_edit_desc_label">Maelezo (hiari)</string>

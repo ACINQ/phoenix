@@ -172,6 +172,7 @@ private fun IntroLayout(
             bottomContent()
             Spacer(modifier = Modifier.height(32.dp))
             navContent()
+            Spacer(modifier = Modifier.height(WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()))
         }
     }
 }

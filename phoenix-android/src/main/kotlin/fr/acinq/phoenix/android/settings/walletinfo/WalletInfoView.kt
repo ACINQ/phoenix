@@ -257,7 +257,7 @@ fun UtxoRow(utxo: WalletState.Utxo, progress: Pair<Int?, Int>?) {
             text = utxo.outPoint.txid.toString(),
             modifier = Modifier.weight(1f),
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
+            overflow = TextOverflow.MiddleEllipsis,
             fontSize = 14.sp
         )
         AmountView(

@@ -61,7 +61,6 @@ import fr.acinq.phoenix.android.components.contact.ContactOrOfferView
 import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.payments.details.splash.translatePaymentError
-import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 
 @Composable
@@ -90,16 +89,9 @@ fun SendToOfferView(
                 R.string.send_error_amount_below_requested,
                 (requestedAmount).toPrettyString(prefBitcoinUnit, withUnit = true)
             )
-
-            requestedAmount != null && currentAmount > requestedAmount * 2 -> context.getString(
-                R.string.send_error_amount_overpaying,
-                (requestedAmount * 2).toPrettyString(prefBitcoinUnit, withUnit = true)
-            )
-
             else -> ""
         }
     }
-    val isOverpaymentEnabled by userPrefs.getIsOverpaymentEnabled.collectAsState(initial = false)
 
     var message by remember { mutableStateOf("") }
     var showMessageDialog by remember { mutableStateOf(false) }
@@ -109,7 +101,7 @@ fun SendToOfferView(
         topContent = {
             AmountHeroInput(
                 initialAmount = requestedAmount,
-                enabled = (requestedAmount == null || isOverpaymentEnabled) && vm.state !is OfferState.FetchingInvoice,
+                enabled = vm.state !is OfferState.FetchingInvoice,
                 onAmountChange = { newAmount ->
                     if (newAmount?.amount != amount) vm.state = OfferState.Init
                     amount = newAmount?.amount
@@ -119,7 +111,7 @@ fun SendToOfferView(
             )
         }
     ) {
-        offer.description?.let {
+        offer.description?.takeIf { it.isNotBlank() }?.let {
             SplashLabelRow(label = stringResource(R.string.send_description_label)) {
                 Text(text = it)
             }

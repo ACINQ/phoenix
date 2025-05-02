@@ -87,25 +87,17 @@
 
     <string name="receive_help_qr">Fatura ou código QR do endereço</string>
 
-    <string name="receive_bitcoin_title">Bitcoin</string>
-    <string name="receive_bitcoin_help">Este código QR é um endereço Bitcoin clássico.\n\nQuase qualquer serviço ou carteira Bitcoin pode lê-lo, mas os pagamentos levarão mais tempo para chegar.</string>
     <string name="receive_bitcoin_address_label">Endereço</string>
-    <string name="receive_bitcoin_error">Não foi possível gerar um endereço Bitcoin</string>
     <string name="receive_bitcoin_share_title">Endereço Bitcoin</string>
     <string name="receive_bitcoin_share_subject">Compartilhe este endereço Bitcoin com…</string>
 
-    <string name="receive_lightning_title">Lightning</string>
-    <string name="receive_lightning_help">Este código QR é uma fatura Lightning.\n\nOs pagamentos Lightning são muito rápidos e geralmente mais baratos, mas podem ainda não ser suportados por algumas carteiras e serviços.\n\nNesse caso, deslize para a esquerda para obter um endereço Bitcoin normal.</string>
     <string name="receive_lightning_generating">Gerando…</string>
     <string name="receive_lightning_amount_label">Valor</string>
     <string name="receive_lightning_desc_label">Desc</string>
     <string name="receive_lightning_error">Não foi possível gerar a fatura</string>
     <string name="receive_lightning_share_subject">fatura relâmpago</string>
     <string name="receive_lightning_share_title">Compartilhe este endereço do Lightning com…</string>
-    <string name="receive_lnurl_button">Verificar</string>
 
-    <string name="receive_lightning_edit_button">Editar</string>
-    <string name="receive_lightning_edit_title">Editar fatura</string>
     <string name="receive_lightning_edit_amount_label">Valor (opcional)</string>
     <string name="receive_lightning_edit_amount_placeholder">Valor a ser recebido</string>
     <string name="receive_lightning_edit_desc_label">Descrição (opcional)</string>

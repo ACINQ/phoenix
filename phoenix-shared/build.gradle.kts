@@ -108,6 +108,7 @@ kotlin {
             dependencies {
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
                 implementation("io.ktor:ktor-client-mock:${libs.versions.ktor.get()}")
                 implementation("com.squareup.okio:okio:${libs.versions.okio.get()}")
             }

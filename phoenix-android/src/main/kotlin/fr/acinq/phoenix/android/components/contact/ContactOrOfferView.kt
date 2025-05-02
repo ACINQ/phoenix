@@ -78,7 +78,7 @@ fun ContactOrOfferView(offer: OfferTypes.Offer) {
 
     when (val state = contactState.value) {
         is OfferContactState.Init -> {
-            Text(text = offer.encode(), maxLines = 2, overflow = TextOverflow.Ellipsis)
+            Text(text = offer.encode(), maxLines = 2, overflow = TextOverflow.MiddleEllipsis)
         }
         is OfferContactState.Found -> {
             ContactCompactView(
@@ -112,7 +112,7 @@ private fun DetachedOfferView(
 
     val encoded = remember(offer) { offer.encode() }
     SplashClickableContent(onClick = { showContactPickerDialog = true }) {
-        Text(text = encoded, maxLines = 2, overflow = TextOverflow.Ellipsis)
+        Text(text = encoded, maxLines = 2, overflow = TextOverflow.MiddleEllipsis)
         Spacer(modifier = Modifier.height(8.dp))
         Row {
             PhoenixIcon(resourceId = R.drawable.ic_user, tint = mutedTextColor)
