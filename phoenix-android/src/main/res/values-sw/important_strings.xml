@@ -228,6 +228,9 @@
     <string name="inappnotif_mempool_full_message">Ada za mtandaoni ziko juu.</string>
     <string name="inappnotif_mempool_full_action">Angalia jinsi Phoenix inavyoathirika</string>
 
+    <string name="inappnotif_tor_disconnected_message">Haiwezi kufikia mtandao wa Tor. Phoenix haitafanya kazi ipasavyo.</string>
+    <string name="inappnotif_tor_disconnected_action">Irekebishe</string>
+
     <string name="inappnotif_payment_onchain_pending_title">Fedha za mtandaoni zinangosubiria (+%1$s)</string>
     <string name="inappnotif_payments_rejection_overview_one">Malipo moja ya kuingia yamekataliwa hivi karibuni</string>
     <string name="inappnotif_payments_rejection_overview_many">%1$d malipo ya kuingia yamekataliwa hivi karibuni</string>
@@ -284,6 +287,14 @@
     <string name="tor_dialog_disable_details_1">Ukizima chaguo hili, anwani yako ya IP inaweza kufichuliwa kwa watoa huduma mbalimbali.</string>
     <string name="tor_dialog_disable_details_2">Je, una uhakika unataka kuendelea?</string>
     <string name="tor_dialog_processing">Inachakata mabadiliko…</string>
+
+    <string name="tor_disconnected_dialog_title">Hakuna ufikiaji wa mtandao wa Tor</string>
+    <string name="tor_disconnected_dialog_action">Irekebishe</string>
+    <string name="tor_disconnected_dialog_details_1">Phoenix inahitaji ufikiaji wa Tor ili kufanya kazi ipasavyo.</string>
+    <string name="tor_disconnected_dialog_details_2">Hakikisha programu yako ya Tor Proxy VPN inatumika, na kwamba imeunganishwa kwenye Tor.</string>
+    <string name="tor_disconnected_dialog_details_3">Ikiwa huna programu ya Tor VPN, sakinisha. Tunapendekeza Orbot.</string>
+    <string name="tor_disconnected_dialog_open_settings">Fungua mipangilio ya Tor</string>
+    <string name="tor_disconnected_dialog_open_orbot_page">Fungua ukurasa wa Orbot</string>
 
   <!-- about -->
 

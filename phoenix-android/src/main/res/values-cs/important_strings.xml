@@ -225,6 +225,9 @@
     <string name="inappnotif_mempool_full_message">Bitcoin mempool je plný a On-Chain poplatky jsou vysoké.</string>
     <string name="inappnotif_mempool_full_action">Podívejte se, jak je ovlivněn Phoenix</string>
 
+    <string name="inappnotif_tor_disconnected_message">Nelze se připojit k síti Tor. Phoenix nebude fungovat správně.</string>
+    <string name="inappnotif_tor_disconnected_action">Opravit to</string>
+
     <string name="inappnotif_payment_onchain_pending_title">On-Chain finanční prostředky čekají na vyřízení (+%1$s)</string>
     <string name="inappnotif_payments_rejection_overview_one">Příchozí platba byla nedávno odmítnuta</string>
     <string name="inappnotif_payments_rejection_overview_many">%1$d nedávno odmítnutých příchozích plateb</string>
@@ -281,6 +284,14 @@
     <string name="tor_dialog_disable_details_1">Pokud tuto možnost zakážete, vaše IP adresa může být odhalena různým poskytovatelům služeb.</string>
     <string name="tor_dialog_disable_details_2">Opravdu chcete pokračovat?</string>
     <string name="tor_dialog_processing">Zpracování změn…</string>
+
+    <string name="tor_disconnected_dialog_title">Žádný přístup k síti Tor</string>
+    <string name="tor_disconnected_dialog_action">Opravit</string>
+    <string name="tor_disconnected_dialog_details_1">Phoenix potřebuje pro správné fungování přístup k síti Tor.</string>
+    <string name="tor_disconnected_dialog_details_2">Ujistěte se, že vaše aplikace Tor Proxy VPN je spuštěná a že je připojena k síti Tor.</string>
+    <string name="tor_disconnected_dialog_details_3">Pokud nemáte aplikaci Tor VPN, nainstalujte si ji. Doporučujeme Orbot.</string>
+    <string name="tor_disconnected_dialog_open_settings">Otevřít nastavení Tor</string>
+    <string name="tor_disconnected_dialog_open_orbot_page">Otevřít stránku Orbot</string>
 
     <!-- about -->
 

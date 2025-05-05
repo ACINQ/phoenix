@@ -52,6 +52,7 @@ import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.openLink
 import fr.acinq.phoenix.android.utils.borderColor
+import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.data.Notification
 
 @Composable
@@ -61,6 +62,7 @@ fun HomeNotices(
     notifications: List<Pair<Set<UUID>, Notification>>,
     onNavigateToSwapInWallet: () -> Unit,
     onNavigateToNotificationsList: () -> Unit,
+    onShowTorDisconnectedClick: () -> Unit,
 ) {
     val filteredNotices = remember(notices) { notices.filterIsInstance<Notice.ShowInHome>().sortedBy { it.priority } }
     val recentRejectedOffchainCount = remember (notifications) {
@@ -79,7 +81,8 @@ fun HomeNotices(
                 notice = it,
                 messagesCount = notices.size + notifications.size,
                 onNavigateToSwapInWallet = onNavigateToSwapInWallet,
-                onNavigateToNotificationsList = onNavigateToNotificationsList
+                onNavigateToNotificationsList = onNavigateToNotificationsList,
+                onShowTorDisconnectedClick = onShowTorDisconnectedClick,
             )
         }
     }
@@ -93,6 +96,7 @@ private fun FirstNoticeView(
     messagesCount: Int,
     onNavigateToSwapInWallet: () -> Unit,
     onNavigateToNotificationsList: () -> Unit,
+    onShowTorDisconnectedClick: () -> Unit,
 ) {
     val context = LocalContext.current
     val navController = LocalNavController.current
@@ -128,6 +132,8 @@ private fun FirstNoticeView(
             is Notice.MempoolFull -> onNavigateToNotificationsList
 
             is Notice.RemoteMessage -> onNavigateToNotificationsList
+
+            is Notice.TorDisconnected -> onShowTorDisconnectedClick
         }
     } else {
         onNavigateToNotificationsList
@@ -172,11 +178,15 @@ private fun FirstNoticeView(
             }
 
             is Notice.SwapInCloseToTimeout -> {
-                NoticeTextView(text = stringResource(id = R.string.inappnotif_swapin_timeout_message), icon = R.drawable.ic_alert_triangle)
+                NoticeTextView(text = stringResource(id = R.string.inappnotif_swapin_timeout_message), icon = R.drawable.ic_alert_triangle, isNegative = true)
             }
 
             is Notice.RemoteMessage -> {
                 NoticeTextView(text = notice.notice.message, icon = R.drawable.ic_info)
+            }
+
+            is Notice.TorDisconnected -> {
+                NoticeTextView(text = stringResource(R.string.inappnotif_tor_disconnected_message), icon = R.drawable.ic_alert_triangle, isNegative = true)
             }
         }
 
@@ -235,9 +245,10 @@ private fun PaymentsRejectedShortView(
 private fun RowScope.NoticeTextView(
     text: String,
     icon: Int? = null,
+    isNegative: Boolean = false,
 ) {
     if (icon != null) {
-        PhoenixIcon(resourceId = icon, tint = MaterialTheme.colors.primary, modifier = Modifier.align(Alignment.Top))
+        PhoenixIcon(resourceId = icon, tint = if (isNegative) negativeColor else MaterialTheme.colors.primary, modifier = Modifier.align(Alignment.Top))
         Spacer(modifier = Modifier.width(10.dp))
     }
     Text(

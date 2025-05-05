@@ -232,6 +232,9 @@
     <string name="inappnotif_mempool_full_message">Phí on-chain cao.</string>
     <string name="inappnotif_mempool_full_action">Xem những ảnh hưởng tới Phoenix.</string>
 
+    <string name="inappnotif_tor_disconnected_message">Không thể truy cập mạng Tor. Phoenix sẽ không hoạt động bình thường.</string>
+    <string name="inappnotif_tor_disconnected_action">Sửa lỗi</string>
+
     <string name="inappnotif_payment_onchain_pending_title">Các khoản vốn on-chain đang chờ xử lý (+%1$s)</string>.
     <string name="inappnotif_payments_rejection_overview_one">Một khoản tiền đến đã bị từ chối gần đây.</string>
     <string name="inappnotif_payments_rejection_overview_many">Khoản thanh toán đến %1$d đã bị từ chối gần đây</string>
@@ -288,6 +291,14 @@
     <string name="tor_dialog_disable_details_1">Nếu bạn vô hiệu hóa tùy chọn này, địa chỉ IP của bạn có thể bị tiết lộ cho nhiều nhà cung cấp dịch vụ khác nhau.</string>
     <string name="tor_dialog_disable_details_2">Bạn có chắc chắn muốn tiếp tục không?</string>
     <string name="tor_dialog_processing">Đang xử lý các thay đổi…</string>
+
+    <string name="tor_disconnected_dialog_title">Không thể truy cập vào mạng Tor</string>
+    <string name="tor_disconnected_dialog_action">Sửa lỗi</string>
+    <string name="tor_disconnected_dialog_details_1">Phoenix cần truy cập vào Tor để hoạt động bình thường.</string>
+    <string name="tor_disconnected_dialog_details_2">Đảm bảo ứng dụng Tor Proxy VPN của bạn đang hoạt động và được kết nối với Tor.</string>
+    <string name="tor_disconnected_dialog_details_3">Nếu bạn không có ứng dụng Tor VPN, hãy cài đặt một ứng dụng. Chúng tôi khuyên dùng Orbot.</string>
+    <string name="tor_disconnected_dialog_open_settings">Mở cài đặt Tor</string>
+    <string name="tor_disconnected_dialog_open_orbot_page">Mở trang Orbot</string>
 
     <!-- about -->
 

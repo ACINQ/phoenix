@@ -222,6 +222,9 @@
     <string name="inappnotif_mempool_full_message">Der Bitcoin mempool ist voll und die on-chain Gebühren sind hoch.</string>
     <string name="inappnotif_mempool_full_action">Erfahren Sie inwiefern Phoenix davon betroffen ist</string>
 
+    <string name="inappnotif_tor_disconnected_message">Kein Zugriff auf das Tor-Netzwerk. Phoenix funktioniert nicht korrekt.</string>
+    <string name="inappnotif_tor_disconnected_action">Beheben</string>
+
     <string name="inappnotif_payment_onchain_pending_title">On-chain Guthaben ausstehend (+%1$s)</string>
     <string name="inappnotif_payments_rejection_overview_one">1 kürzlich abgelehnter Zahlungseingang</string>
     <string name="inappnotif_payments_rejection_overview_many">%1$d kürzlich abgelehnte Zahlungseingänge</string>
@@ -278,6 +281,14 @@
     <string name="tor_dialog_disable_details_1">Wenn Sie diese Option deaktivieren, kann Ihre IP-Adresse verschiedenen Dienstanbietern offengelegt werden.</string>
     <string name="tor_dialog_disable_details_2">Möchten Sie wirklich fortfahren?</string>
     <string name="tor_dialog_processing">Änderungen werden verarbeitet…</string>
+
+    <string name="tor_disconnected_dialog_title">Kein Zugriff auf das Tor-Netzwerk</string>
+    <string name="tor_disconnected_dialog_action">Beheben</string>
+    <string name="tor_disconnected_dialog_details_1">Phoenix benötigt Zugriff auf Tor, um ordnungsgemäß zu funktionieren.</string>
+    <string name="tor_disconnected_dialog_details_2">Stellen Sie sicher, dass Ihre Tor-Proxy-VPN-App aktiv und mit Tor verbunden ist.</string>
+    <string name="tor_disconnected_dialog_details_3">Falls Sie keine Tor-VPN-App haben, installieren Sie eine. Wir empfehlen Orbot.</string>
+    <string name="tor_disconnected_dialog_open_settings">Tor-Einstellungen öffnen</string>
+    <string name="tor_disconnected_dialog_open_orbot_page">Orbot-Seite öffnen</string>
 
     <!-- about -->
 

@@ -19,7 +19,11 @@ package fr.acinq.phoenix.android.home
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -34,6 +38,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.Dimension
 import androidx.constraintlayout.compose.MotionLayout
@@ -45,11 +50,18 @@ import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.NoticesViewModel
 import fr.acinq.phoenix.android.PaymentsViewModel
+import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.business
+import fr.acinq.phoenix.android.components.MutedFilledButton
 import fr.acinq.phoenix.android.components.PrimarySeparator
+import fr.acinq.phoenix.android.components.TransparentFilledButton
+import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.components.mvi.MVIView
+import fr.acinq.phoenix.android.components.openLink
 import fr.acinq.phoenix.android.home.releasenotes.ReleaseNoteDialog
+import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.FCMHelper
 import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
 import fr.acinq.phoenix.android.utils.extensions.findActivity
@@ -93,6 +105,11 @@ fun HomeView(
             onTorClick = onTorClick,
             onElectrumClick = onElectrumClick
         )
+    }
+
+    var showTorDisconnectedDialog by remember { mutableStateOf(false) }
+    if (showTorDisconnectedDialog) {
+        TorDisconnectedDialog(onDismiss = { showTorDisconnectedDialog = false })
     }
 
     val payments by paymentsViewModel.homePaymentsFlow.collectAsState()
@@ -240,6 +257,7 @@ fun HomeView(
                     notifications = notifications,
                     onNavigateToSwapInWallet = onNavigateToSwapInWallet,
                     onNavigateToNotificationsList = onShowNotifications,
+                    onShowTorDisconnectedClick = { showTorDisconnectedDialog = true }
                 )
             }
 
@@ -256,4 +274,39 @@ fun HomeView(
 
     val releaseNoteCode by internalData.showReleaseNoteSinceCode.collectAsState(initial = null)
     releaseNoteCode?.let { ReleaseNoteDialog(sinceCode = it) }
+}
+
+
+@Composable
+fun TorDisconnectedDialog(
+    onDismiss: () -> Unit,
+) {
+    ModalBottomSheet(onDismiss = onDismiss) {
+        val navController = navController
+        val context = LocalContext.current
+
+        Text(text = stringResource(R.string.tor_disconnected_dialog_title), style = MaterialTheme.typography.h4)
+        Spacer(Modifier.height(8.dp))
+        Text(text = stringResource(R.string.tor_disconnected_dialog_details_1))
+        Spacer(Modifier.height(8.dp))
+        Text(text = stringResource(R.string.tor_disconnected_dialog_details_2))
+        Spacer(Modifier.height(8.dp))
+        Text(text = stringResource(R.string.tor_disconnected_dialog_details_3))
+        Spacer(Modifier.height(24.dp))
+        MutedFilledButton(
+            text = stringResource(R.string.tor_disconnected_dialog_open_settings),
+            icon = R.drawable.ic_settings,
+            onClick = { navController.navigate(Screen.TorConfig.route) },
+            modifier = Modifier.fillMaxWidth(),
+            maxLines = 1
+        )
+        Spacer(Modifier.height(8.dp))
+        TransparentFilledButton(
+            text = stringResource(R.string.tor_disconnected_dialog_open_orbot_page),
+            icon = R.drawable.ic_external_link,
+            onClick = { openLink(context, "https://orbot.app") },
+            modifier = Modifier.fillMaxWidth(),
+            maxLines = 1
+        )
+    }
 }

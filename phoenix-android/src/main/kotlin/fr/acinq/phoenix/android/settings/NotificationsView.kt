@@ -28,7 +28,10 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -45,6 +48,7 @@ import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.home.TorDisconnectedDialog
 import fr.acinq.phoenix.android.services.ChannelsWatcher
 import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
@@ -121,6 +125,11 @@ private fun PermamentNotice(
     val userPrefs = application.userPrefs
     val nc = LocalNavController.current
     val scope = rememberCoroutineScope()
+
+    var showTorDisconnectedDialog by remember { mutableStateOf(false) }
+    if (showTorDisconnectedDialog) {
+        TorDisconnectedDialog(onDismiss = { showTorDisconnectedDialog = false })
+    }
 
     when (notice) {
         Notice.BackupSeedReminder -> {
@@ -228,6 +237,15 @@ private fun PermamentNotice(
                         internalData.saveLastReadWalletNoticeIndex(notice.notice.index)
                     }
                 },
+            )
+        }
+
+        is Notice.TorDisconnected -> {
+            ImportantNotification(
+                icon = R.drawable.ic_tor_shield,
+                message = stringResource(R.string.inappnotif_tor_disconnected_message),
+                actionText = stringResource(R.string.inappnotif_tor_disconnected_action),
+                onActionClick = { showTorDisconnectedDialog = true }
             )
         }
     }

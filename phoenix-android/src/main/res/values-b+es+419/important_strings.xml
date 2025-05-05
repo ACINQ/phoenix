@@ -223,6 +223,9 @@
     <string name="inappnotif_mempool_full_message">Las comisiones en la cadena son elevadas.</string>
     <string name="inappnotif_mempool_full_action">Ver cómo afecta a Phoenix</string>
 
+    <string name="inappnotif_tor_disconnected_message">No se puede acceder a la red Tor. Phoenix no funcionará correctamente.</string>
+    <string name="inappnotif_tor_disconnected_action">Solución</string>
+
     <string name="inappnotif_payment_onchain_pending_title">Fondos pendientes en la cadena (+%1$s)</string>
     <string name="inappnotif_payments_rejection_overview_one">Recientemente se rechazó un pago entrante</string>
     <string name="inappnotif_payments_rejection_overview_many">%1$d pagos entrantes rechazados recientemente</string>
@@ -279,6 +282,14 @@
     <string name="tor_dialog_disable_details_1">Si deshabilita esta opción, su dirección IP puede ser revelada a varios proveedores de servicios.</string>
     <string name="tor_dialog_disable_details_2">¿Está seguro de que desea continuar?</string>
     <string name="tor_dialog_processing">Procesando cambios…</string>
+
+    <string name="tor_disconnected_dialog_title">Sin acceso a la red Tor</string>
+    <string name="tor_disconnected_dialog_action">Solución</string>
+    <string name="tor_disconnected_dialog_details_1">Phoenix necesita acceso a Tor para funcionar correctamente.</string>
+    <string name="tor_disconnected_dialog_details_2">Asegúrate de que tu aplicación Tor Proxy VPN esté funcionando y conectada a Tor.</string>
+    <string name="tor_disconnected_dialog_details_3">Si no tienes una aplicación Tor VPN, instala una. Recomendamos Orbot.</string>
+    <string name="tor_disconnected_dialog_open_settings">Abrir la configuración de Tor</string>
+    <string name="tor_disconnected_dialog_open_orbot_page">Abrir la página de Orbot</string>
 
     <!-- about -->
 

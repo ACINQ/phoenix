@@ -227,6 +227,9 @@
     <string name="inappnotif_mempool_full_message">On-chain fees are high.</string>
     <string name="inappnotif_mempool_full_action">See how Phoenix is affected</string>
 
+    <string name="inappnotif_tor_disconnected_message">Cannot access the Tor network. Phoenix will not function correctly.</string>
+    <string name="inappnotif_tor_disconnected_action">Fix it</string>
+
     <string name="inappnotif_payment_onchain_pending_title">On-chain funds pending (+%1$s)</string>
     <string name="inappnotif_payments_rejection_overview_one">An incoming payment has been recently rejected</string>
     <string name="inappnotif_payments_rejection_overview_many">%1$d incoming payments recently rejected</string>
@@ -284,6 +287,14 @@
     <string name="tor_dialog_disable_details_1">If you disable this option, your IP address may be revealed to various service providers.</string>
     <string name="tor_dialog_disable_details_2">Are you sure you want to proceed ?</string>
     <string name="tor_dialog_processing">Processing changes…</string>
+
+    <string name="tor_disconnected_dialog_title">No access to the Tor network</string>
+    <string name="tor_disconnected_dialog_action">Fix it</string>
+    <string name="tor_disconnected_dialog_details_1">Phoenix needs access to Tor to function properly.</string>
+    <string name="tor_disconnected_dialog_details_2">Make sure your Tor Proxy VPN app is up and running, and that it\'s connected to Tor.</string>
+    <string name="tor_disconnected_dialog_details_3">If you don\'t have a Tor VPN app, install one. We recommend Orbot.</string>
+    <string name="tor_disconnected_dialog_open_settings">Open Tor settings</string>
+    <string name="tor_disconnected_dialog_open_orbot_page">Open Orbot page</string>
 
     <!-- about -->
 

@@ -166,6 +166,7 @@ fun AppView(
             factory = NoticesViewModel.Factory(
                 appConfigurationManager = business.appConfigurationManager,
                 peerManager = business.peerManager,
+                connectionsManager = business.connectionsManager,
             )
         )
         MonitorNotices(vm = noticesViewModel)
