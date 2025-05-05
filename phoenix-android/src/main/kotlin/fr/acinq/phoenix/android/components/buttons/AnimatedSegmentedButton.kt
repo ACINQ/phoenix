@@ -4,7 +4,9 @@ import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.animateBounds
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -13,7 +15,6 @@ import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,8 +25,6 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.layout.layoutId
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.utils.mutedTextColor
 
@@ -102,44 +101,37 @@ fun SegmentedControl(
     }
 }
 
-/**
- * A button used as a child of [SegmentedControl].
- */
+/** A button used as a child of [SegmentedControl]. */
 @Composable
 fun SegmentedControlButton(
     onClick: () -> Unit,
-    text: String,
     selected: Boolean,
     modifier: Modifier = Modifier,
     buttonShape: Shape = RoundedCornerShape(16.dp),
+    content: @Composable () -> Unit,
 ) {
-    Box(
+    Column(
         modifier = modifier
             .then(if (selected) Modifier.layoutId(SelectedButtonId) else Modifier)
             .clip(buttonShape)
-            .selectable(selected = selected, onClick = onClick),
-        contentAlignment = Alignment.Center,
+            .selectable(selected = selected, onClick = onClick)
+            .padding(horizontal = 4.dp, vertical = 10.dp)
+            .alpha(if (selected) 1f else 0.3f),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(
-            modifier = Modifier.padding(12.dp).alpha(if (selected) 1f else 0.3f),
-            text = text,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            textAlign = TextAlign.Center,
-        )
+        content()
     }
 }
 
-/**
- * The animated button background that displays behind the currently selected button.
- */
+/** The animated button background that displays behind the currently selected button. */
 @Composable
 private fun SelectedBackground(modifier: Modifier = Modifier, buttonShape: Shape) {
     Surface(
         modifier = modifier.layoutId(SelectedBackgroundId),
         color = MaterialTheme.colors.surface,
         shape = buttonShape,
-        border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.primary),
+        border = BorderStroke(width = 1.dp, color = mutedTextColor.copy(alpha = .4f)),
     ) {}
 }
 

@@ -126,8 +126,9 @@ fun ColumnScope.LightningInvoiceView(
     }
 
     InvoiceHeader(
-        text = stringResource(if (isReusable) R.string.receive_label_bolt12 else R.string.receive_label_bolt11),
+        text = stringResource(R.string.receive_label_lightning),
         icon = R.drawable.ic_zap,
+        helpMessage = stringResource(R.string.receive_label_lightning_help),
     )
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -135,8 +136,36 @@ fun ColumnScope.LightningInvoiceView(
 
         Spacer(modifier = Modifier.height(16.dp))
         SegmentedControl(modifier = Modifier.width(columnWidth)) {
-            SegmentedControlButton(onClick = { isReusable = false }, text = stringResource(R.string.receive_lightning_switch_bolt11), selected = !isReusable)
-            SegmentedControlButton(onClick = { isReusable = true }, text = stringResource(R.string.receive_lightning_switch_bolt12), selected = isReusable)
+            SegmentedControlButton(onClick = { isReusable = false }, selected = !isReusable) {
+                Text(
+                    text = stringResource(R.string.receive_lightning_switch_bolt11),
+                    fontSize = 16.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center,
+                )
+                Spacer(Modifier.height(1.dp))
+                Text(
+                    text = stringResource(R.string.receive_lightning_switch_bolt11_desc),
+                    textAlign = TextAlign.Center,
+                    fontSize = 11.sp,
+                )
+            }
+            SegmentedControlButton(onClick = { isReusable = true }, selected = isReusable) {
+                Text(
+                    text = stringResource(R.string.receive_lightning_switch_bolt12),
+                    fontSize = 16.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center,
+                )
+                Spacer(Modifier.height(1.dp))
+                Text(
+                    text = stringResource(R.string.receive_lightning_switch_bolt12_desc),
+                    textAlign = TextAlign.Center,
+                    fontSize = 11.sp,
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(8.dp))

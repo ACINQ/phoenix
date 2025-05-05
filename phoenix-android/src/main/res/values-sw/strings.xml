@@ -105,6 +105,9 @@
     <string name="receive_bitcoin_share_title">Anwani ya Bitcoin</string>
     <string name="receive_bitcoin_share_subject">Shiriki anwani hii ya Bitcoin na…</string>
 
+    <string name="receive_label_bitcoin_help">QR Code hii ni anwani ya kawaida ya Bitcoin.\n\nInaweza kusomwa na karibu huduma yoyote ya Bitcoin, lakini malipo yatachelewa kufika.</string>
+    <string name="receive_label_lightning_help">Hii ni QR code ya hati ya Lightning.\n\nMalipo ya Lightning ni ya haraka sana na kawaida huwa na gharama ndogo, lakini baadhi ya pochi na huduma zinaweza kutosa kuziunga mkono bado.\n\nKatika hali hiyo, piga kushoto kupata anwani ya kawaida ya Bitcoin.</string>
+
     <string name="receive_lightning_generating">Inatengeneza…</string>
     <string name="receive_lightning_amount_label">Kiasi</string>
     <string name="receive_lightning_desc_label">Maelezo</string>

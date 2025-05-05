@@ -62,6 +62,7 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.dialogs.FullScreenDialog
+import fr.acinq.phoenix.android.components.dialogs.IconTextPopup
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.images.QRCodeHelper
 import fr.acinq.phoenix.android.utils.copyToClipboard
@@ -157,14 +158,15 @@ private fun ReceiveViewPages(
 fun InvoiceHeader(
     text: String,
     icon: Int,
+    helpMessage: String,
 ) {
-    TextWithIcon(
+    IconTextPopup(
         text = text,
         icon = icon,
-        textStyle = MaterialTheme.typography.caption.copy(fontSize = 16.sp), maxLines = 1,
-        iconTint = MaterialTheme.typography.caption.color,
+        textStyle = MaterialTheme.typography.body1.copy(fontSize = 16.sp),
+        popupMessage = helpMessage,
     )
-    Spacer(Modifier.height(16.dp))
+    Spacer(Modifier.height(8.dp))
 }
 
 @Composable
@@ -286,9 +288,9 @@ fun CopyShareButtons(
     onShare: () -> Unit,
 ) {
     Row(modifier = Modifier.padding(horizontal = 4.dp, vertical = 16.dp)) {
-        BorderButton(text = stringResource(R.string.btn_copy), icon = R.drawable.ic_copy, onClick = onCopy, shape = RoundedCornerShape(16.dp))
-        Spacer(modifier = Modifier.width(12.dp))
-        BorderButton(text = stringResource(R.string.btn_share), icon = R.drawable.ic_share, onClick = onShare, shape = RoundedCornerShape(16.dp))
+        BorderButton(icon = R.drawable.ic_copy, onClick = onCopy)
+        Spacer(modifier = Modifier.width(16.dp))
+        BorderButton(icon = R.drawable.ic_share, onClick = onShare)
     }
 }
 

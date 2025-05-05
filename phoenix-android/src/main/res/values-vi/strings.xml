@@ -95,7 +95,12 @@
     <string name="receive_bitcoin_share_title">Địa chỉ Bitcoin</string>
     <string name="receive_bitcoin_share_subject">Chia sẻ địa chỉ Bitcoin này với…</string>
 
+    <string name="receive_label_bitcoin_help">Mã QR này là một địa chỉ Bitcoin thông thường.\n\nMã có thể đọc được bởi hầu hết mọi dịch vụ/ví Bitcoin, tuy nhiên thanh toán sẽ đến chậm hơn.</string>
+    <string name="receive_label_lightning_help">Mã QR này là 1 hóa đơn Lightning.\n\nThanh toán Lightning rất nhanh và thường rẻ hơn, tuy nhiên nó có thể chưa được hỗ trợ bởi một số loại ví và một số dịch vụ.\n\nTrong trường hợp đó, hãy vuốt sang phải để nhận địa chỉ Bitcoin thông thường.</string>
+
     <string name="receive_lightning_generating">Đang tạo…</string>
+    <string name="receive_lightning_switch_bolt11">Sử dụng một lần</string>
+    <string name="receive_lightning_switch_bolt12">Có thể tái sử dụng</string>
     <string name="receive_lightning_amount_label">Số tiền</string>
     <string name="receive_lightning_desc_label">Mô tả</string>
     <string name="receive_lightning_error">Không thể xuất hóa đơn</string>

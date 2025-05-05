@@ -90,7 +90,12 @@
     <string name="receive_bitcoin_share_title">Adresse Bitcoin</string>
     <string name="receive_bitcoin_share_subject">Partagez cette adresse Bitcoin avec…</string>
 
+    <string name="receive_label_bitcoin_help">Ce QR code représente une adresse Bitcoin classique.\n\nCelle-ci est compréhensible par presque tous les services et wallets Bitcoin, mais les paiements seront plus lents à arriver.</string>
+    <string name="receive_label_lightning_help">Ce QR code est une requête de paiement Lightning.\n\nLes paiements Lightning sont très rapides et habituellement moins cher, mais certains wallets et services ne les comprennent pas encore.\n\nDans ce cas, passez sur l\'écran de droite pour afficher une adresse Bitcoin classique.</string>
+
     <string name="receive_lightning_generating">Création d\'une requête de paiement…</string>
+    <string name="receive_lightning_switch_bolt11">Usage unique</string>
+    <string name="receive_lightning_switch_bolt12">Réutilisable</string>
     <string name="receive_lightning_amount_label">Montant</string>
     <string name="receive_lightning_desc_label">Desc</string>
     <string name="receive_lightning_error">Échec de la création de la requête</string>

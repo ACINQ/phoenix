@@ -92,7 +92,12 @@
     <string name="receive_bitcoin_share_title">Dirección de Bitcoin</string>
     <string name="receive_bitcoin_share_subject">Compartir esta dirección de Bitcoin con…</string>
 
+    <string name="receive_label_bitcoin_help">Este código QR es una dirección clásica de Bitcoin.\n\nCasi cualquier servicio o billetera de Bitcoin puede leerlo, pero los pagos tardarán más en llegar.</string>
+    <string name="receive_label_lightning_help">Este código QR es una factura de Lightning.\n\nLos pagos mediante Lightning son muy rápidos y normalmente más baratos, pero es posible que aún no sean compatibles con algunas billeteras y servicios.\n\nEn ese caso, desliza el dedo hacia la izquierda para obtener una dirección normal de Bitcoin.</string>
+
     <string name="receive_lightning_generating">Generando…</string>
+    <string name="receive_lightning_switch_bolt11">Un solo uso</string>
+    <string name="receive_lightning_switch_bolt12">Reutilizable</string>
     <string name="receive_lightning_amount_label">Importe</string>
     <string name="receive_lightning_desc_label">Desc</string>
     <string name="receive_lightning_error">No se pudo generar la factura</string>

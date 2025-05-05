@@ -112,7 +112,9 @@
 
     <string name="receive_lightning_generating">Generating…</string>
     <string name="receive_lightning_switch_bolt11">Single use</string>
+    <string name="receive_lightning_switch_bolt11_desc">Bolt11</string>
     <string name="receive_lightning_switch_bolt12">Reusable</string>
+    <string name="receive_lightning_switch_bolt12_desc">Bolt12</string>
     <string name="receive_lightning_amount_label">Amount</string>
     <string name="receive_lightning_desc_label">Description</string>
     <string name="receive_lightning_error">Could not generate invoice</string>
@@ -120,7 +122,10 @@
     <string name="receive_lightning_share_title">Share this Lightning payment code with…</string>
 
     <string name="receive_label_bitcoin">Bitcoin address</string>
+    <string name="receive_label_bitcoin_help">This QR code is a classic Bitcoin address.\n\nIt can be read by almost any Bitcoin service/wallet, but payments will be slower to arrive.</string>
     <string name="receive_label_bip353">Lightning address</string>
+    <string name="receive_label_lightning">Lightning</string>
+    <string name="receive_label_lightning_help">This QR code is a Lightning invoice.\n\nLightning payments are very fast and usually cheaper, but some wallets and services may not support them yet.\n\nIn that case, swipe to the left to get a regular Bitcoin address.</string>
     <string name="receive_label_bolt11">Lightning Bolt11</string>
     <string name="receive_label_bolt12">Lightning Bolt12</string>
     <string name="receive_label_bip21">Bitcoin URI</string>

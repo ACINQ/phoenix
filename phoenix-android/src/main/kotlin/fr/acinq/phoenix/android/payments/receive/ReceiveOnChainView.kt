@@ -48,6 +48,7 @@ fun ColumnScope.BitcoinAddressView(
     InvoiceHeader(
         text = stringResource(id = R.string.receive_label_bitcoin),
         icon = R.drawable.ic_chain,
+        helpMessage = stringResource(R.string.receive_label_bitcoin_help)
     )
 
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(columnWidth)) {
