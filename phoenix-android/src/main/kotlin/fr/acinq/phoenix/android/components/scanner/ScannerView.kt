@@ -20,6 +20,7 @@ package fr.acinq.phoenix.android.components.scanner
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.provider.Settings
 import androidx.camera.core.CameraSelector
@@ -42,6 +43,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.systemGestureExclusion
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -65,6 +67,8 @@ import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.TextWithIcon
+import fr.acinq.phoenix.android.utils.extensions.findActivity
+import fr.acinq.phoenix.android.utils.extensions.findActivitySafe
 import fr.acinq.phoenix.android.utils.images.ZxingQrCodeAnalyzer
 import java.util.concurrent.Executors
 
@@ -100,6 +104,13 @@ fun BoxScope.ScannerView(
         if (isPaused) return@LaunchedEffect
         val currentAttempt = currentCallbackAttempt ?: return@LaunchedEffect
         onScannedText(currentAttempt)
+    }
+
+    DisposableEffect(context) {
+        context.findActivitySafe()?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LOCKED
+        onDispose {
+            context.findActivitySafe()?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        }
     }
 
     AndroidView(
