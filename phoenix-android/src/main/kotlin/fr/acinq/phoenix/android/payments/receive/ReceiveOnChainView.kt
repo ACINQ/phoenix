@@ -16,66 +16,58 @@
 
 package fr.acinq.phoenix.android.payments.receive
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.components.HSeparator
-import fr.acinq.phoenix.android.components.ProgressView
-import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.share
 
 @Composable
-fun BitcoinAddressView(
+fun ColumnScope.BitcoinAddressView(
     vm: ReceiveViewModel,
-    maxWidth: Dp
+    columnWidth: Dp
 ) {
     val context = LocalContext.current
+    val (address, image) = remember(vm.bitcoinAddressState) { vm.bitcoinAddressState?.let { it.currentAddress to it.image } ?: (null to null) }
 
     InvoiceHeader(
+        text = stringResource(id = R.string.receive_label_bitcoin),
         icon = R.drawable.ic_chain,
-        helpMessage = stringResource(id = R.string.receive_bitcoin_help),
-        content = { Text(text = stringResource(id = R.string.receive_bitcoin_title)) },
+        helpMessage = stringResource(R.string.receive_label_bitcoin_help)
     )
 
-    when (val state = vm.currentSwapAddress) {
-        is BitcoinAddressState.Init -> {
-            Box(contentAlignment = Alignment.Center) {
-                QRCodeView(bitmap = null, data = null, maxWidth = maxWidth)
-                Card(shape = RoundedCornerShape(16.dp)) { ProgressView(text = stringResource(id = R.string.receive_bitcoin_generating)) }
-            }
-            Spacer(modifier = Modifier.height(32.dp))
-            CopyShareEditButtons(onCopy = { }, onShare = { }, onEdit = null, maxWidth = maxWidth)
-        }
-        is BitcoinAddressState.Show -> {
-            QRCodeView(data = state.currentAddress, bitmap = state.image, maxWidth = maxWidth)
-            Spacer(modifier = Modifier.height(32.dp))
-            CopyShareEditButtons(
-                onCopy = { copyToClipboard(context, data = state.currentAddress) },
-                onShare = { share(context, "bitcoin:${state.currentAddress}", context.getString(R.string.receive_bitcoin_share_subject), context.getString(R.string.receive_bitcoin_share_title)) },
-                onEdit = null,
-                maxWidth = maxWidth,
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-            HSeparator(width = 50.dp)
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(columnWidth)) {
+        QRCodeView(bitmap = image, data = address, loadingLabel = stringResource(id = R.string.receive_bitcoin_generating))
+        address?.let {
             Spacer(modifier = Modifier.height(16.dp))
-            QRCodeDetail(label = stringResource(id = R.string.receive_bitcoin_address_label), value = state.currentAddress)
-        }
-        is BitcoinAddressState.Error -> {
-            ErrorMessage(
-                header = stringResource(id = R.string.receive_bitcoin_error),
-                details = state.e.message
+            QRCodeLabel(label = stringResource(R.string.receive_bitcoin_address_label)) {
+                Text(
+                    text = it,
+                    maxLines = 3,
+                    overflow = TextOverflow.MiddleEllipsis,
+                    fontFamily = FontFamily.Monospace,
+                    fontSize = 12.sp
+                )
+            }
+
+            CopyShareButtons(
+                onCopy = { copyToClipboard(context, data = it) },
+                onShare = { share(context, "bitcoin:$it", context.getString(R.string.receive_bitcoin_share_subject), context.getString(R.string.receive_bitcoin_share_title)) },
             )
         }
     }

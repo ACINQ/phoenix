@@ -19,19 +19,21 @@ package fr.acinq.phoenix.android.components.dialogs
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -43,7 +45,11 @@ fun ModalBottomSheet(
     modifier: Modifier = Modifier,
     skipPartiallyExpanded: Boolean = false,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    containerColor: Color = MaterialTheme.colors.surface,
+    contentColor: Color = MaterialTheme.colors.onSurface,
     scrimAlpha: Float = 0.2f,
+    dragHandle: @Composable (() -> Unit)? = { BottomSheetDefaults. DragHandle() },
+    contentWindowInsets: @Composable () -> WindowInsets = { BottomSheetDefaults.windowInsets },
     contentHeight: Dp = Dp.Unspecified,
     internalPadding: PaddingValues = PaddingValues(top = 0.dp, start = 20.dp, end = 20.dp, bottom = 64.dp),
     isContentScrollable: Boolean = true,
@@ -58,8 +64,10 @@ fun ModalBottomSheet(
         },
         sheetMaxWidth = 500.dp,
         modifier = modifier,
-        containerColor = MaterialTheme.colors.surface,
-        contentColor = MaterialTheme.colors.onSurface,
+        containerColor = containerColor,
+        contentColor = contentColor,
+        dragHandle = dragHandle,
+        contentWindowInsets = contentWindowInsets,
         scrimColor = MaterialTheme.colors.onBackground.copy(alpha = scrimAlpha),
     ) {
         Column(

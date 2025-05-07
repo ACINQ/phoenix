@@ -205,7 +205,7 @@ extension SyncBackupManager {
 								
 								rows.append(item.contact)
 								
-								let contactId = item.contact.uuid
+								let contactId = item.contact.id
 								let creationDate = item.record.creationDate ?? Date()
 								let creation = self.dateToMillis(creationDate)
 								let metadata = self.metadataForRecord(item.record)
@@ -474,6 +474,8 @@ extension SyncBackupManager {
 						throw CKError(.operationCancelled)
 					}
 					
+					log.trace("Fetching out-of-date CKRecords (\(recordIDsToFetch.count))...")
+					
 					let results: [CKRecord.ID : Result<CKRecord, Error>] = try await database.records(
 						for: recordIDsToFetch,
 						desiredKeys: [] // fetch only basic CKRecord metadata
@@ -686,16 +688,10 @@ extension SyncBackupManager {
 		_ contact: ContactInfo
 	) -> Data? {
 		
-		let wrapper = CloudContact(contact: contact)
-		let cbor = wrapper.cborSerialize().toSwiftData()
+		let wrapper = CloudContact.V1(contact: contact)
+		let serializedData = wrapper.serialize().toSwiftData()
 		
-		#if DEBUG
-		let jsonData = wrapper.jsonSerialize().toSwiftData()
-		let jsonStr = String(data: jsonData, encoding: .utf8)
-		log.debug("Uploading record (JSON representation):\n\(jsonStr ?? "<nil>")")
-		#endif
-		
-		let cleartext: Data = cbor
+		let cleartext: Data = serializedData
 		var ciphertext: Data? = nil
 		do {
 			let box = try ChaChaPoly.seal(cleartext, using: self.cloudKey)
@@ -720,34 +716,6 @@ extension SyncBackupManager {
 		log.debug(" - recordID: \(record.recordID)")
 		log.debug(" - creationDate: \(record.creationDate ?? Date.distantPast)")
 		
-		var wrapper: CloudContact? = nil
-		if let ciphertext = record[contacts_record_column_data] as? Data {
-			
-			var cleartext: Data? = nil
-			do {
-				let box = try ChaChaPoly.SealedBox(combined: ciphertext)
-				cleartext = try ChaChaPoly.open(box, using: self.cloudKey)
-			} catch {
-				log.error("Error decrypting record.data: skipping \(record.recordID)")
-			}
-			
-			if let cleartext {
-				do {
-					let cleartext_kotlin = cleartext.toKotlinByteArray()
-					wrapper = try CloudContact.companion.cborDeserialize(blob: cleartext_kotlin)
-					
-				//	#if DEBUG
-				//	let jsonData = wrapper.jsonSerialize().toSwiftData()
-				//	let jsonStr = String(data: jsonData, encoding: .utf8)
-				//	log.debug(" - raw JSON:\n\(jsonStr ?? "<nil>")")
-				//	#endif
-
-				} catch {
-					log.error("Error deserializing record.data: skipping \(record.recordID)")
-				}
-			}
-		}
-		
 		var photoUri: String? = nil
 		if let asset = record[contacts_record_column_photo] as? CKAsset {
 			
@@ -766,11 +734,29 @@ extension SyncBackupManager {
 		}
 		
 		var contact: ContactInfo? = nil
-		if let wrapper {
+		if let ciphertext = record[contacts_record_column_data] as? Data {
+			
+			var cleartext: Data? = nil
 			do {
-				contact = try wrapper.unwrap(photoUri: photoUri)
+				let box = try ChaChaPoly.SealedBox(combined: ciphertext)
+				cleartext = try ChaChaPoly.open(box, using: self.cloudKey)
 			} catch {
-				log.error("Error unwrapping record.data: skipping \(record.recordID)")
+				log.error("Error decrypting record.data: skipping \(record.recordID)")
+			}
+			
+			if let cleartext {
+				let cleartext_kotlin = cleartext.toKotlinByteArray()
+				contact = CloudContact.companion.deserialize(
+					blob: cleartext_kotlin,
+					photoUri: photoUri
+				)
+			}
+		}
+		
+		if contact == nil, let photoUri {
+			// Edge case cleanup
+			Task {
+				await PhotosManager.shared.deleteFromDisk(fileName: photoUri)
 			}
 		}
 		

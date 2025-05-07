@@ -40,6 +40,10 @@ struct LightningDualView: View {
 	@State var notificationPermissions = NotificationsManager.shared.permissions.value
 	
 	@State var modificationAmount: CurrencyAmount? = nil
+	@State var description: String = Prefs.shared.defaultPaymentDescription ?? ""
+	
+	@State var amountMsat: Lightning_kmpMilliSatoshi? = nil
+	@State var needsUpdateInvoiceOrOffer: Bool = true
 	
 	let lastIncomingPaymentPublisher = Biz.business.paymentsManager.lastIncomingPaymentPublisher()
 	
@@ -90,6 +94,9 @@ struct LightningDualView: View {
 		.onChange(of: mvi.model) {
 			modelChanged($0)
 		}
+		.onChange(of: activeType) {
+			activeTypeChanged($0)
+		}
 		.onReceive(lastIncomingPaymentPublisher) {
 			lastIncomingPaymentChanged($0)
 		}
@@ -112,9 +119,6 @@ struct LightningDualView: View {
 				ActivityView(activityItems: items, applicationActivities: nil)
 			
 			} // </switch>
-		}
-		.task {
-			await generateQrCode()
 		}
 	}
 	
@@ -163,14 +167,23 @@ struct LightningDualView: View {
 					.padding(.horizontal)
 			}
 			
-			detailedInfo()
+			typePicker()
 				.padding(.horizontal, 20)
 				.padding(.vertical)
 			
 			actionButtons()
-				.padding(.bottom)
 			
-			switchTypeButton()
+			detailedInfo()
+				.padding(.horizontal, 20)
+				.padding(.vertical)
+
+			if activeType == .bolt12_offer, let address = bip353Address {
+				bip353AddressView(address)
+					.lineLimit(2)
+					.multilineTextAlignment(.center)
+					.font(.footnote)
+					.padding(.top)
+			}
 			
 			if activeType == .bolt12_offer {
 				howToUseButton()
@@ -301,77 +314,66 @@ struct LightningDualView: View {
 	}
 	
 	@ViewBuilder
+	func typePicker() -> some View {
+		
+		Picker(
+			selection: typePickerBinding(),
+			label: Text("Type")
+		) {
+			Text("Single use").tag(LightningType.bolt11_invoice)
+			Text("Reusable").tag(LightningType.bolt12_offer)
+		}
+		.pickerStyle(SegmentedPickerStyle())
+	}
+	
+	@ViewBuilder
 	func detailedInfo() -> some View {
 		
 		VStack(alignment: .center, spacing: 10) {
 		
-			if activeType == .bolt11_invoice {
-				invoiceAmountView()
-					.font(.footnote)
-					.foregroundColor(.secondary)
+			invoiceAmountView()
+				.font(.footnote)
+				.foregroundColor(.secondary)
 			
-				invoiceDescriptionView()
-					.lineLimit(1)
-					.font(.footnote)
-					.foregroundColor(.secondary)
-				
-			} else {
-				
-				if let address = bip353Address {
-					bip353AddressView(address)
-						.lineLimit(2)
-						.multilineTextAlignment(.center)
-						.font(.footnote)
-						.foregroundColor(.secondary)
-					
-				} else {
-					
-					offerAddressView()
-						.lineLimit(1)
-						.truncationMode(.middle)
-						.font(.footnote)
-						.foregroundColor(.secondary)
-				}
-			}
-		}
+			invoiceDescriptionView()
+				.lineLimit(1)
+				.font(.footnote)
+				.foregroundColor(.secondary)
+			
+		} // </VStack>
 	}
 	
 	@ViewBuilder
 	func invoiceAmountView() -> some View {
 		
-		if let m = mvi.model as? Receive.Model_Generated {
-			if let msat = m.amount?.msat {
-				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
-					
-					let btcAmt = Utils.formatBitcoin(msat: msat, bitcoinUnit: currencyPrefs.bitcoinUnit)
-					Text(btcAmt.string)
-					
-					if let exchangeRate = currencyPrefs.fiatExchangeRate() {
-						let fiatAmt = Utils.formatFiat(msat: msat, exchangeRate: exchangeRate)
-						Text(verbatim: "  /  \(fiatAmt.digits) ")
-						Text_CurrencyName(currency: fiatAmt.currency, fontTextStyle: .caption2)
-					}
-				}
+		if let msat = amountMsat {
+			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 				
-			} else {
-				Text("any amount")
+				let btcAmt = Utils.formatBitcoin(msat: msat, bitcoinUnit: currencyPrefs.bitcoinUnit)
+				Text(btcAmt.string)
+				
+				if let exchangeRate = currencyPrefs.fiatExchangeRate() {
+					let fiatAmt = Utils.formatFiat(msat: msat, exchangeRate: exchangeRate)
+					Text(verbatim: "  /  \(fiatAmt.digits) ")
+					Text_CurrencyName(currency: fiatAmt.currency, fontTextStyle: .caption2)
+				}
 			}
+			
 		} else {
-			Text("...")
+			Text("any amount")
 		}
 	}
 	
 	@ViewBuilder
 	func invoiceDescriptionView() -> some View {
 		
-		if let m = mvi.model as? Receive.Model_Generated {
-			if let desc = m.desc, desc.count > 0 {
-				Text(desc)
-			} else {
-				Text("no description", comment: "placeholder: invoice is description-less")
-			}
+		let trimmedDesc = description.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+		let finalDesc = trimmedDesc.isEmpty ? nil : trimmedDesc
+		
+		if let finalDesc {
+			Text(finalDesc)
 		} else {
-			Text("...")
+			Text("no description", comment: "placeholder: invoice is description-less")
 		}
 	}
 	
@@ -381,11 +383,7 @@ struct LightningDualView: View {
 		let bAddress = "₿\(address)"
 		
 		Group {
-			if #available(iOS 18, *) {
-				Text(verbatim: "\(Image(systemName: "bitcoinsign.circle")) \(address)")
-			} else {
-				Text(Image(systemName: "bitcoinsign.circle")) + Text(verbatim: " \(address)")
-			}
+			Text(Image(systemName: "bitcoinsign.circle")) + Text(verbatim: " \(address)")
 		}
 		.contextMenu {
 			Button {
@@ -397,31 +395,12 @@ struct LightningDualView: View {
 	}
 	
 	@ViewBuilder
-	func offerAddressView() -> some View {
-		
-		if let offerStr = qrCode.value?.original {
-			Text(offerStr)
-				.contextMenu {
-					Button {
-						copyTextToPasteboard(offerStr)
-					} label: {
-						Text("Copy")
-					}
-				}
-		} else {
-			Text(verbatim: "…")
-		}
-	}
-	
-	@ViewBuilder
 	func actionButtons() -> some View {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 30) {
 			copyButton()
 			shareButton()
-			if activeType == .bolt11_invoice {
-				editButton()
-			}
+			editButton()
 		}
 		.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
 	}
@@ -519,47 +498,6 @@ struct LightningDualView: View {
 	}
 	
 	@ViewBuilder
-	func switchTypeButton() -> some View {
-		
-		switch activeType {
-		case .bolt11_invoice:
-			ZStack(alignment: .topLeading) {
-				Button {
-					toggleActiveType()
-				} label: {
-					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 2) {
-						Image(systemName: "qrcode")
-						Text("Show reusable QR")
-					}
-				}
-				.buttonStyle(.bordered)
-				.buttonBorderShape(.capsule)
-				
-				Text("NEW")
-					.font(.footnote)
-					.padding(.vertical, 2.5)
-					.padding(.horizontal, 7.5)
-					.foregroundColor(.white)
-					.background(Capsule().fill(Color.appAccent))
-					.offset(x: -15, y: -20)
-					.rotationEffect(.degrees(-45))
-			}
-			
-		case .bolt12_offer:
-			Button {
-				toggleActiveType()
-			} label: {
-				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 2) {
-					Image(systemName: "qrcode")
-					Text("Show one-time invoice")
-				}
-			}
-			.buttonStyle(.bordered)
-			.buttonBorderShape(.capsule)
-		}
-	}
-	
-	@ViewBuilder
 	func howToUseButton() -> some View {
 		
 		Button {
@@ -621,9 +559,9 @@ struct LightningDualView: View {
 		
 		switch activeType {
 		case .bolt11_invoice:
-			return String(localized: "Lightning Invoice", comment: "Secondary title")
+			return String(localized: "Lightning Bolt11", comment: "Secondary title")
 		case .bolt12_offer:
-			return String(localized: "Lightning Offer", comment: "Secondary title")
+			return String(localized: "Lightning Bolt12", comment: "Secondary title")
 		}
 	}
 	
@@ -631,10 +569,18 @@ struct LightningDualView: View {
 		
 		switch activeType {
 		case .bolt11_invoice:
-			return String(localized: "(Lightning invoice)", comment: "Type of text being copied")
+			return String(localized: "(Lightning Bolt11)", comment: "Type of text being copied")
 		case .bolt12_offer:
-			return String(localized: "(Lightning offer)", comment: "Type of text being copied")
+			return String(localized: "(Lightning Bolt12)", comment: "Type of text being copied")
 		}
+	}
+	
+	func typePickerBinding() -> Binding<LightningType> {
+		
+		return Binding<LightningType>(
+			get: { activeType },
+			set: { activeType = $0 }
+		)
 	}
 	
 	func invoiceAmount() -> Lightning_kmpMilliSatoshi? {
@@ -673,35 +619,81 @@ struct LightningDualView: View {
 			return
 		}
 		didAppear = true
-			
-		let defaultDesc = Prefs.shared.defaultPaymentDescription
-		mvi.intent(Receive.IntentAsk(
-			amount: nil,
-			desc: defaultDesc,
-			expirySeconds: Prefs.shared.invoiceExpirationSeconds
-		))
+		
+		updateInvoiceOrOffer()
 	}
 	
 	// --------------------------------------------------
-	// MARK: Tasks
+	// MARK: Utils
 	// --------------------------------------------------
 	
-	func generateQrCode() async {
+	func updateInvoiceOrOffer() {
+		log.trace("updateInvoiceOrOffer()")
 		
-		do {
-			let offerData = try await Biz.business.nodeParamsManager.defaultOffer()
-			let offerString = offerData.defaultOffer.encode()
+		let trimmedDesc = description.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+		let finalDesc = trimmedDesc.isEmpty ? nil : trimmedDesc
+		
+		if activeType == .bolt11_invoice {
+			mvi.intent(Receive.IntentAsk(
+				amount: amountMsat,
+				desc: finalDesc,
+				expirySeconds: Prefs.shared.invoiceExpirationSeconds
+			))
 			
-			offerStr = offerString
-			if activeType == .bolt12_offer {
-				qrCode.generate(value: QRCodeValue(
-					original: offerString,
-					rendered: offerString // is this supposed to be uppercase ?
-				))
+		} else {
+			guard let nodeParams = Biz.business.nodeParamsManager.nodeParamsValue() else {
+				log.warning("nodeParams is nil")
+				return
 			}
 			
-		} catch {
-			log.error("nodeParamsManager.defaultOffer(): error: \(error)")
+			// Requirement in lightning-kmp:
+			// > an offer description must be provided if the amount isn't null
+			//
+			var fixedDesc = finalDesc
+			if amountMsat != nil {
+				fixedDesc = finalDesc ?? ""
+			}
+			
+			let offerPair = Lightning_kmpOfferManagerCompanion.shared.deterministicOffer(
+				chainHash: NodeParamsManager.companion.chain.chainHash,
+				nodePrivateKey: nodeParams.nodePrivateKey,
+				trampolineNodeId: NodeParamsManager.companion.trampolineNodeId,
+				amount: amountMsat,
+				description: fixedDesc,
+				pathId: nil
+			)
+			offerStr = offerPair.first!.encode()
+		}
+	}
+	
+	func updateQRCode() {
+		log.trace("updateQRCode()")
+		
+		switch activeType {
+		case .bolt11_invoice:
+			log.debug("activeType == .bolt11_invoice")
+			
+			if let m = mvi.model as? Receive.Model_Generated {
+				// Issue #196: Use uppercase lettering for invoices and address QRs
+				qrCode.generate(value: QRCodeValue(
+					original: m.request,
+					rendered: m.request.uppercased()
+				))
+			} else {
+				qrCode.clear()
+			}
+			
+		case .bolt12_offer:
+			log.debug("activeType == .bolt12_offer")
+			
+			if let offerStr {
+				qrCode.generate(value: QRCodeValue(
+					original: offerStr,
+					rendered: offerStr
+				))
+			} else {
+				qrCode.clear()
+			}
 		}
 	}
 	
@@ -712,14 +704,8 @@ struct LightningDualView: View {
 	func modelChanged(_ model: Receive.Model) {
 		log.trace("modelChanged()")
 		
-		if activeType == .bolt11_invoice, let m = model as? Receive.Model_Generated {
-			log.debug("updating qr code...")
-			
-			// Issue #196: Use uppercase lettering for invoices and address QRs
-			qrCode.generate(value: QRCodeValue(
-				original: m.request,
-				rendered: m.request.uppercased()
-			))
+		if activeType == .bolt11_invoice, model is Receive.Model_Generated {
+			updateQRCode()
 		}
 	}
 	
@@ -754,7 +740,7 @@ struct LightningDualView: View {
 				}
 			}
 			
-		} else if let b12Payment = lightningPayment as? Lightning_kmpBolt12IncomingPayment {
+		} else if let _ = lightningPayment as? Lightning_kmpBolt12IncomingPayment {
 			
 			if activeType == .bolt12_offer {
 				didCompletePayment = true
@@ -784,14 +770,23 @@ struct LightningDualView: View {
 		)
 	}
 	
-	func modifyInvoiceSheetDidSave(_ msat: Lightning_kmpMilliSatoshi?, _ desc: String) {
+	func modifyInvoiceSheetDidSave(_ msat: Lightning_kmpMilliSatoshi?, _ desc: String?) {
 		log.trace("modifyInvoiceSheetDidSave()")
 		
-		mvi.intent(Receive.IntentAsk(
-			amount: msat,
-			desc: desc,
-			expirySeconds: Prefs.shared.invoiceExpirationSeconds
-		))
+		amountMsat = msat
+		updateInvoiceOrOffer()
+		updateQRCode()
+		
+		// Do we update both the invoice AND offer right now ?
+		//
+		// Updating the invoice isn't "free" because we have to store the result in the database.
+		// Thus when `activeType == .bolt12_offer` we don't want to update the invoice here.
+		// So here's what we do:
+		// - we set a flag: `needsUpdateInvoiceOrOffer`
+		// - which means we've only updated either the invoice or the offer
+		// - and if the activeType changes, we'll need to update the counterpart
+		//
+		needsUpdateInvoiceOrOffer = true
 	}
 	
 	func currencyConverterDidChange(_ amount: CurrencyAmount?) {
@@ -803,22 +798,29 @@ struct LightningDualView: View {
 	func currencyConvertDidClose() {
 		log.trace("currencyConverterDidClose()")
 		
-		var amount: Lightning_kmpMilliSatoshi? = nil
-		var desc: String? = nil
-		if let model = mvi.model as? Receive.Model_Generated {
-			amount = model.amount
-			desc = model.desc
-		}
-		
 		smartModalState.display(dismissable: true) {
 			
 			ModifyInvoiceSheet(
 				savedAmount: $modificationAmount,
-				amount: amount,
-				desc: desc ?? "",
+				description: $description,
 				openCurrencyConverter: openCurrencyConverter,
 				didSave: modifyInvoiceSheetDidSave
 			)
+		}
+	}
+	
+	func activeTypeChanged(_ newType: LightningType) {
+		log.trace("activeTypeChanged()")
+		
+		if needsUpdateInvoiceOrOffer {
+			updateInvoiceOrOffer()
+		}
+		updateQRCode()
+		
+		if case .bolt12_offer = newType {
+			if bip353Address == nil {
+				bip353Address = AppSecurity.shared.getBip353Address()
+			}
 		}
 	}
 	
@@ -873,7 +875,7 @@ struct LightningDualView: View {
 				sources.append(SourceInfo(
 					type: .text,
 					isDefault: true,
-					title: String(localized: "Lightning invoice", comment: "Type of text being copied"),
+					title: String(localized: "Lightning Bolt11", comment: "Type of text being copied"),
 					subtitle: invoiceText,
 					callback: exportText(invoiceText)
 				))
@@ -894,7 +896,7 @@ struct LightningDualView: View {
 				sources.append(SourceInfo(
 					type: .text,
 					isDefault: true,
-					title: String(localized: "Human-readable address", comment: "Type of text being copied"),
+					title: String(localized: "Lightning address", comment: "Type of text being copied"),
 					subtitle: bAddress,
 					callback: exportText(bAddress)
 				))
@@ -903,7 +905,7 @@ struct LightningDualView: View {
 				sources.append(SourceInfo(
 					type: .text,
 					isDefault: false,
-					title: String(localized: "Payment code", comment: "Type of text being copied"),
+					title: String(localized: "Lightning Bolt12", comment: "Type of text being copied"),
 					subtitle: offerText,
 					callback: exportText(offerText)
 				))
@@ -939,57 +941,14 @@ struct LightningDualView: View {
 	func didTapEditButton() -> Void {
 		log.trace("didTapEditButton()")
 		
-		// The edit button is only displayed for Bolt 11 invoices.
-		
-		if let model = mvi.model as? Receive.Model_Generated {
+		smartModalState.display(dismissable: true) {
 			
-			smartModalState.display(dismissable: true) {
-				
-				ModifyInvoiceSheet(
-					savedAmount: $modificationAmount,
-					amount: model.amount,
-					desc: model.desc ?? "",
-					openCurrencyConverter: openCurrencyConverter,
-					didSave: modifyInvoiceSheetDidSave
-				)
-			}
-		}
-	}
-	
-	func toggleActiveType() {
-		log.trace("toggleActiveType()")
-		
-		switch activeType {
-		case .bolt11_invoice:
-			// Switching to Bolt 12 offer
-			activeType = .bolt12_offer
-			
-			if let offerStr {
-				qrCode.generate(value: QRCodeValue(
-					original: offerStr,
-					rendered: offerStr
-				))
-			} else {
-				qrCode.clear()
-			}
-			
-			if bip353Address == nil {
-				bip353Address = AppSecurity.shared.getBip353Address()
-			}
-			
-		case .bolt12_offer:
-			// Switching to Bolt 11 invoice
-			activeType = .bolt11_invoice
-			
-			if let m = mvi.model as? Receive.Model_Generated {
-				// Issue #196: Use uppercase lettering for invoices and address QRs
-				qrCode.generate(value: QRCodeValue(
-					original: m.request,
-					rendered: m.request.uppercased()
-				))
-			} else {
-				qrCode.clear()
-			}
+			ModifyInvoiceSheet(
+				savedAmount: $modificationAmount,
+				description: $description,
+				openCurrencyConverter: openCurrencyConverter,
+				didSave: modifyInvoiceSheetDidSave
+			)
 		}
 	}
 	

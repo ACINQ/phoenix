@@ -287,6 +287,9 @@
         }
       }
     },
+    ": %@" : {
+
+    },
     "? confirmations" : {
       "localizations" : {
         "ar" : {
@@ -328,6 +331,7 @@
       }
     },
     "..." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -691,87 +695,11 @@
         }
       }
     },
-    "(Lightning invoice)" : {
-      "comment" : "Type of text being copied",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(فاتورة البرق)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(Lightning faktura)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(Blitzrechnung)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(Factura de Lightning)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(Factura de Lightning)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(requête Lightning)"
-          }
-        }
-      }
+    "(Lightning Bolt11)" : {
+      "comment" : "Type of text being copied"
     },
-    "(Lightning offer)" : {
-      "comment" : "Type of text being copied",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(عرض البرق)"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(Blesková nabídka)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(Blitzangebot)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(Oferta relámpago)"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(Oferta relámpago)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(Offre Lightning)"
-          }
-        }
-      }
+    "(Lightning Bolt12)" : {
+      "comment" : "Type of text being copied"
     },
     "(Phoenix can be running in the background.)" : {
       "extractionState" : "manual",
@@ -4900,6 +4828,12 @@
         }
       }
     },
+    "Add to contacts" : {
+
+    },
+    "Add to existing contact" : {
+
+    },
     "adding to existing channel" : {
       "comment" : "Transaction Info: Explanation",
       "localizations" : {
@@ -8292,6 +8226,7 @@
       }
     },
     "Bolt12 offer:" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -8332,6 +8267,7 @@
       }
     },
     "Bolt12 offers" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -8370,6 +8306,9 @@
           }
         }
       }
+    },
+    "Bolt12 offers:" : {
+
     },
     "broadcast" : {
       "localizations" : {
@@ -10872,43 +10811,43 @@
         }
       }
     },
-    "Confirm Drain" : {
+    "Confirm Closing" : {
       "comment" : "Navigation bar title",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "تأكيد الاستنزاف"
+            "value" : "تأكيد الإغلاق"
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Potvrzení odtoku"
+            "value" : "Potvrdit uzavření"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Abfluss bestätigen"
+            "value" : "Abschluss bestätigen"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Confirmar"
+            "value" : "Confirmar cierre"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Confirmar vaciado"
+            "value" : "Confirmar cierre"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Confirmer la fermeture"
+            "value" : "Confirmer la clôture"
           }
         }
       }
@@ -12410,6 +12349,9 @@
           }
         }
       }
+    },
+    "Create new contact" : {
+
     },
     "Create new wallet" : {
       "localizations" : {
@@ -15343,46 +15285,11 @@
         }
       }
     },
-    "Drain wallet" : {
-      "comment" : "Navigation bar title",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "محفظة الصرف"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vyprázdnit peněženku"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Geldbeutel entleeren"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vaciar billetera"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vaciar billetera"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vider mon portefeuille"
-          }
-        }
-      }
+    "Duplicate in %@" : {
+
+    },
+    "Duplicate within this contact" : {
+
     },
     "Duration" : {
       "localizations" : {
@@ -19987,6 +19894,7 @@
     },
     "Human-readable address" : {
       "comment" : "Type of text being copied",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -21397,6 +21305,7 @@
     },
     "In order to receive this payment, a new payment channel was opened. This is not always required." : {
       "comment" : "Fees explanation",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -22761,6 +22670,9 @@
         }
       }
     },
+    "Invalid format" : {
+
+    },
     "Invalid Lightning Request" : {
       "comment" : "toast warning",
       "extractionState" : "manual",
@@ -22844,6 +22756,7 @@
       }
     },
     "Invalid offer" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -23448,6 +23361,9 @@
         }
       }
     },
+    "label (optional)" : {
+
+    },
     "Last attempt failed" : {
       "localizations" : {
         "ar" : {
@@ -23851,6 +23767,18 @@
         }
       }
     },
+    "Lightning address" : {
+      "comment" : "Type of text being copied"
+    },
+    "Lightning addresses:" : {
+
+    },
+    "Lightning Bolt11" : {
+      "comment" : "Secondary title\nType of text being copied"
+    },
+    "Lightning Bolt12" : {
+      "comment" : "Secondary title\nType of text being copied"
+    },
     "Lightning fee" : {
       "localizations" : {
         "ar" : {
@@ -24063,6 +23991,7 @@
     },
     "Lightning invoice" : {
       "comment" : "Type of text being copied",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -24104,6 +24033,7 @@
     },
     "Lightning Invoice" : {
       "comment" : "Secondary title",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -24145,6 +24075,7 @@
     },
     "Lightning Offer" : {
       "comment" : "Secondary title",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -24467,6 +24398,9 @@
         }
       }
     },
+    "Liquidity" : {
+
+    },
     "Liquidity requested" : {
       "localizations" : {
         "ar" : {
@@ -24546,6 +24480,9 @@
           }
         }
       }
+    },
+    "lno1... (paste offer here)" : {
+
     },
     "lnurl-auth" : {
       "localizations" : {
@@ -26373,6 +26310,9 @@
         }
       }
     },
+    "Minus miner fees estimated to:" : {
+
+    },
     "Missing off-chain amount too low." : {
       "localizations" : {
         "ar" : {
@@ -26776,6 +26716,7 @@
       }
     },
     "NEW" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -27577,6 +27518,9 @@
           }
         }
       }
+    },
+    "none" : {
+
     },
     "None" : {
       "comment" : "TextField placeholder",
@@ -29476,47 +29420,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Des canaux de paiements sont automatiquement créés lorsque vous recevez des paiements. Utilisez l’écran **Recevoir** pour créer des requêtes de paiement Lightning."
-          }
-        }
-      }
-    },
-    "Payment code" : {
-      "comment" : "Type of text being copied",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "رمز الدفع"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kód platby"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zahlungscode"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Código de pago"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Código de pago"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Code de paiement"
           }
         }
       }
@@ -33592,6 +33495,9 @@
         }
       }
     },
+    "Reusable" : {
+
+    },
     "Review" : {
       "localizations" : {
         "ar" : {
@@ -36141,6 +36047,7 @@
       }
     },
     "Show one-time invoice" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -36839,6 +36746,7 @@
       }
     },
     "Show reusable QR" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -36957,6 +36865,9 @@
           }
         }
       }
+    },
+    "Single use" : {
+
     },
     "Skip" : {
       "localizations" : {
@@ -43139,6 +43050,9 @@
         }
       }
     },
+    "Unable to retrieve data for this address. You may be experiencing a connectivity issue." : {
+      "comment" : "Error message - could not retrieve dns records for that address"
+    },
     "Unconfirmed Balance" : {
       "localizations" : {
         "ar" : {
@@ -47904,6 +47818,7 @@
       }
     },
     "Your account balance of:" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -47982,6 +47897,9 @@
           }
         }
       }
+    },
+    "Your balance of:" : {
+
     },
     "Your channel are not connected yet. Wait for a stable connection and try again." : {
       "localizations" : {

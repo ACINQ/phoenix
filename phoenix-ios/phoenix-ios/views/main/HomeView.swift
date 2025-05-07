@@ -57,8 +57,6 @@ struct HomeView : MVIView {
 	@State var bizNotifications_payment: [PhoenixShared.NotificationsManager.NotificationItem] = []
 	@State var bizNotifications_watchtower: [PhoenixShared.NotificationsManager.NotificationItem] = []
 	
-	let contactsPublisher = Biz.business.contactsManager.contactsListPublisher()
-	
 	@State var didAppear = false
 		
 	enum NoticeBoxContentHeight: Preference {}
@@ -144,9 +142,6 @@ struct HomeView : MVIView {
 			}
 			.onReceive(bizNotificationsPublisher) {
 				bizNotificationsChanged($0)
-			}
-			.onReceive(contactsPublisher) {
-				contactsChanged($0)
 			}
 	}
 
@@ -877,28 +872,6 @@ struct HomeView : MVIView {
 				return false
 			}
 		})
-	}
-	
-	func contactsChanged(_ contacts: [ContactInfo]) {
-		log.trace("contactsChanged()")
-		
-		// Update WalletPaymentInfo.contact for all rows
-		
-		let contactsManager = Biz.business.contactsManager
-		let updatedRows = paymentsPage.rows.map { info in
-			let updatedContact = contactsManager.contactForPayment(payment: info.payment)
-			return WalletPaymentInfo(
-				payment  : info.payment,
-				metadata : info.metadata,
-				contact  : updatedContact
-			)
-		}
-		let updatedPage = PaymentsPage(
-			offset : paymentsPage.offset,
-			count  : paymentsPage.count,
-			rows   : updatedRows
-		)
-		paymentsPage = updatedPage
 	}
 	
 	fileprivate func footerCellDidAppear() {

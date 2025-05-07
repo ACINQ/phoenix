@@ -120,6 +120,17 @@
     <string name="restore_seed_valid_details">Sie können jetzt fortfahren und Ihre Wallet wiederherstellen</string>
     <string name="restore_seed_invalid">Dieser Seed ist ungültig</string>
     <string name="restore_seed_invalid_details">Stellen Sie sicher, dass Sie die richtigen Wörter in der richtigen Reihenfolge eingegeben haben.</string>
+
+    <string name="restore_payments_button">Zahlungsverlauf importieren</string>
+    <string name="restore_payments_button_details">Optional. Mit dieser Schaltfläche können Sie eine Zahlungsdatenbankdatei von einem anderen Gerät wiederherstellen.</string>
+    <string name="restore_payments_success">Zahlungsverlauf wiederherstellen</string>
+    <string name="restore_payments_success_button">Andere Datei verwenden</string>
+    <string name="restore_payments_error_header">Zahlungen können nicht wiederhergestellt werden</string>
+    <string name="restore_payments_error_button">Erneut versuchen</string>
+    <string name="restore_payments_error_encryption">Die Datei kann nicht entschlüsselt werden. Stellen Sie sicher, dass Sie eine Phoenix-Datenbankdatei (keine CSV-Datei) verwenden und dass diese Datei mit dem wiederherzustellenden Wallet übereinstimmt.</string>
+    <string name="restore_payments_error_open">Diese Datei kann nicht geöffnet werden. Versuchen Sie es erneut.</string>
+    <string name="restore_payments_error_writing">Diese Datei konnte nicht in den Datenordner der Anwendung geschrieben werden. Versuchen Sie es erneut.</string>
+
     <string name="restore_import_button">Wiederherstellen</string>
 
     <!-- upgrade required dialog -->
@@ -148,21 +159,6 @@
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Eingangskapazität ist unzureichend und automatisches Kanal-Management ist deaktiviert.</string>
 
-    <!-- receive: offer labels -->
-
-    <string name="receive_toggle_offer_button">Wiederverwendbaren QR-Code anzeigen</string>
-
-    <string name="receive_offer_howto_intro_1">🎉 Ihr wiederverwendbarer Zahlungsanforderung</string>
-    <string name="receive_offer_howto_intro_2">Tippen Sie hier, um zu erfahren, wie Sie ihn verwenden können</string>
-    <string name="receive_offer_howto_details_1">Diese Bolt12-Zahlungsanforderung ist das Lightning-Äquivalent zu einer Bitcoin-Adresse.</string>
-    <string name="receive_offer_howto_details_2">Im Gegensatz zu herkömmlichen Lightning-Rechnungen läuft sie nicht ab und kann wiederverwendet werden.</string>
-    <string name="receive_offer_howto_details_3">Teilen Sie es weiter: für Spenden, Trinkgelder oder um von Ihren Freunden bezahlt zu werden.</string>
-    <string name="receive_offer_howto_details_4_title">🛟 Wer unterstützt Bolt12?</string>
-    <string name="receive_offer_howto_details_4">Im Moment unterstützen nur wenige Dienste Bolt12. Wenn ein Dienst diese Rechnung ablehnt, lassen Sie ihn wissen, dass er etwas verpasst!</string>
-    <string name="receive_offer_howto_details_5_title">🔋 Einschränkungen für Batterien</string>
-    <string name="receive_offer_howto_details_5">Überprüfen Sie, dass Android keinen Batteriesparmodus auf Phoenix anwendet. Andernfalls können Sie keine Zahlungen empfangen, wenn die App geschlossen ist oder sich im Hintergrund befindet. Die Aktivierung von TOR in Phoenix kann ebenfalls zu Problemen führen.</string>
-    <string name="receive_offer_howto_details_faq_link">Erfahren Sie mehr</string>
-
     <!-- receive: Tor warning -->
 
     <string name="receive_tor_warning_title">Tor ist aktiviert</string>
@@ -177,6 +173,7 @@
     <string name="send_error_lnurl_invalid">Dieser LNURL-Link konnte nicht verarbeitet werden. Stellen Sie sicher, dass er gültig ist.</string>
     <string name="send_error_lnurl_unsupported">Dieser LNURL-Typ wird noch nicht unterstützt.</string>
     <string name="send_error_invalid_generic">Diese Daten haben ein unbekanntes Format und können nicht verarbeitet werden.</string>
+    <string name="send_error_bip353_connect">Daten für diese Adresse konnten nicht abgerufen werden. Möglicherweise liegt ein Verbindungsproblem vor.</string>
     <string name="send_error_bip353_name_not_found">Name \"%1$s\" wird auf \"%2$s\" nicht gefunden.</string>
     <string name="send_error_bip353_invalid_uri">Diese Adresse verwendet eine ungültige Bip21 Ressource.</string>
     <string name="send_error_bip353_invalid_offer">Diese Adresse verwendet ein ungültiges Bolt12-Angebot.</string>
@@ -193,6 +190,8 @@
     <string name="mutualclose_input_instructions">Sende das gesamte Guthaben an eine Bitcoin-Wallet. Alle Zahlungskanäle werden geschlossen.</string>
     <string name="mutualclose_confirm_title">Kanal-Schließung bestätigen</string>
     <string name="mutualclose_confirm_details">Das gesamte Guthaben wir hier hin gesendet:</string>
+    <string name="mutualclose_confirm_fee">Gebühr geschätzt auf:</string>
+    <string name="mutualclose_confirm_fee_unknown">Gebührenhöhe konnte nicht geschätzt werden.</string>
 
     <string name="forceclose_title">Force-Close durchführen</string>
     <string name="forceclose_instructions">Hiermit können Sie die Schließung Ihrer Kanäle erzwingen.\n\nDies ist kein \"magisches Allheilmittel\", um eventuelle Probleme zu lösen: Es ist lediglich eine Sicherheitsfunktion und <b>sollte nur im äußersten Notfall verwendet werden</b>. Zum Beispiel, wenn Ihr Peer (ACINQ) dauerhaft verschwindet und Sie Ihr Guthaben nicht mehr nutzen können. <b>In allen anderen Fällen, in denen Sie Probleme mit Phoenix haben, sollten Sie sich an den Support wenden</b>.\n\nEin Force-Close kostet Sie Geld (zur Deckung der On-Chain-Gebühren) und führt dazu, dass Ihr Guthaben für einige Tage eingefroren wird.\n\n<b>Deinstallieren Sie die App nicht, bevor Ihre Kanäle vollständig geschlossen sind, anderenfalls werden Sie Geld verlieren.</b>\n\n<b>Verwenden Sie diese Funktion nicht, wenn Sie nicht genau wissen, was sie bewirkt.</b></string>
@@ -222,6 +221,9 @@
 
     <string name="inappnotif_mempool_full_message">Der Bitcoin mempool ist voll und die on-chain Gebühren sind hoch.</string>
     <string name="inappnotif_mempool_full_action">Erfahren Sie inwiefern Phoenix davon betroffen ist</string>
+
+    <string name="inappnotif_tor_disconnected_message">Kein Zugriff auf das Tor-Netzwerk. Phoenix funktioniert nicht korrekt.</string>
+    <string name="inappnotif_tor_disconnected_action">Beheben</string>
 
     <string name="inappnotif_payment_onchain_pending_title">On-chain Guthaben ausstehend (+%1$s)</string>
     <string name="inappnotif_payments_rejection_overview_one">1 kürzlich abgelehnter Zahlungseingang</string>
@@ -279,6 +281,14 @@
     <string name="tor_dialog_disable_details_1">Wenn Sie diese Option deaktivieren, kann Ihre IP-Adresse verschiedenen Dienstanbietern offengelegt werden.</string>
     <string name="tor_dialog_disable_details_2">Möchten Sie wirklich fortfahren?</string>
     <string name="tor_dialog_processing">Änderungen werden verarbeitet…</string>
+
+    <string name="tor_disconnected_dialog_title">Kein Zugriff auf das Tor-Netzwerk</string>
+    <string name="tor_disconnected_dialog_action">Beheben</string>
+    <string name="tor_disconnected_dialog_details_1">Phoenix benötigt Zugriff auf Tor, um ordnungsgemäß zu funktionieren.</string>
+    <string name="tor_disconnected_dialog_details_2">Stellen Sie sicher, dass Ihre Tor-Proxy-VPN-App aktiv und mit Tor verbunden ist.</string>
+    <string name="tor_disconnected_dialog_details_3">Falls Sie keine Tor-VPN-App haben, installieren Sie eine. Wir empfehlen Orbot.</string>
+    <string name="tor_disconnected_dialog_open_settings">Tor-Einstellungen öffnen</string>
+    <string name="tor_disconnected_dialog_open_orbot_page">Orbot-Seite öffnen</string>
 
     <!-- about -->
 

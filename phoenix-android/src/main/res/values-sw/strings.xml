@@ -100,33 +100,21 @@
 
     <string name="receive_help_qr">QR Code ya ankara/anwani</string>
 
-    <string name="receive_bitcoin_title">Bitcoin</string>
-    <string name="receive_bitcoin_help">QR Code hii ni anwani ya kawaida ya Bitcoin.\n\nInaweza kusomwa na karibu huduma yoyote ya Bitcoin, lakini malipo yatachelewa kufika.</string>
     <string name="receive_bitcoin_address_label">Anwani</string>
     <string name="receive_bitcoin_generating">Inasawazisha anwani…</string>
-    <string name="receive_bitcoin_error">Haikuweza kuzalisha anwani ya bitcoin</string>
     <string name="receive_bitcoin_share_title">Anwani ya Bitcoin</string>
     <string name="receive_bitcoin_share_subject">Shiriki anwani hii ya Bitcoin na…</string>
 
-    <string name="receive_lightning_title">Umeme</string>
-    <string name="receive_lightning_help">Hii ni QR code ya hati ya Lightning.\n\nMalipo ya Lightning ni ya haraka sana na kawaida huwa na gharama ndogo, lakini baadhi ya pochi na huduma zinaweza kutosa kuziunga mkono bado.\n\nKatika hali hiyo, piga kushoto kupata anwani ya kawaida ya Bitcoin.</string>
+    <string name="receive_label_bitcoin_help">QR Code hii ni anwani ya kawaida ya Bitcoin.\n\nInaweza kusomwa na karibu huduma yoyote ya Bitcoin, lakini malipo yatachelewa kufika.</string>
+    <string name="receive_label_lightning_help">Hii ni QR code ya hati ya Lightning.\n\nMalipo ya Lightning ni ya haraka sana na kawaida huwa na gharama ndogo, lakini baadhi ya pochi na huduma zinaweza kutosa kuziunga mkono bado.\n\nKatika hali hiyo, piga kushoto kupata anwani ya kawaida ya Bitcoin.</string>
+
     <string name="receive_lightning_generating">Inatengeneza…</string>
     <string name="receive_lightning_amount_label">Kiasi</string>
     <string name="receive_lightning_desc_label">Maelezo</string>
     <string name="receive_lightning_error">Haiwezi kutengeneza hati</string>
     <string name="receive_lightning_share_subject">Hati ya Lightning</string>
     <string name="receive_lightning_share_title">Shiriki hati ya Lightning na…</string>
-    <string name="receive_lnurl_button">Piga picha</string>
 
-    <string name="receive_offer_share_title">Mkodishaji wa Bolt12</string>
-    <string name="receive_offer_share_subject">Shiriki msimbo huu wa Bolt12 na…</string>
-
-    <string name="receive_offer_copy_bip353">Nakili anwani inayosomwa kwa mtu</string>
-    <string name="receive_offer_copy_bolt12">Nakili msimbo wa malipo</string>
-    <string name="receive_offer_copy_bip21">Nakili URI kamili</string>
-
-    <string name="receive_lightning_edit_button">Hariri</string>
-    <string name="receive_lightning_edit_title">Hariri hati</string>
     <string name="receive_lightning_edit_amount_label">Kiasi (hiari)</string>
     <string name="receive_lightning_edit_amount_placeholder">Kiasi cha kupokea</string>
     <string name="receive_lightning_edit_desc_label">Maelezo (hiari)</string>
@@ -230,11 +218,10 @@
     <string name="mutualclose_checking_balance">Inakagua salio…</string>
     <string name="mutualclose_balance">Salio: <b>%1$s</b> (≈ %2$s)</string>
     <string name="mutualclose_no_channels">Pochi haina kanali zinazostahiki kufungwa.</string>
-    <string name="mutualclose_button">Mwaga pochi yangu</string>
     <string name="mutualclose_error_chain_mismatch">Anwani hii inatumia blockchain tofauti</string>
     <string name="mutualclose_error_chain_reqparams">Anwani hii inatumia vipengele visivyosaidiwa</string>
     <string name="mutualclose_error_chain_generic">Anwani hii haisaidiwi</string>
-    <string name="mutualclose_done">%1$d kanali zimefungwa. Unaweza kuona maelezo kwenye skrini ya nyumbani.</string>
+    <string name="mutualclose_done">Ufungaji umeanzishwa. Shughuli ya kufunga iko kwenye orodha yako ya miamala.</string >
 
     <string name="forceclose_no_channels">Hakuna kanali zinazostahiki kufungwa.</string>
 
@@ -456,17 +443,12 @@
     <string name="contact_add_contact_button">Ongeza mawasiliano</string>
     <string name="contact_error_offer_invalid">Msimbo wa Bolt12 si sahihi</string>
     <string name="contact_error_offer_known">Ankara tayari imeunganishwa na %1$s</string>
-    <string name="contact_save_button">Hifadhi</string>
-    <string name="contact_delete_button">Futa</string>
 
     <string name="contact_add_title">Unganisha jina na nambari ya malipo</string>
     <string name="contact_name_label">Jina</string>
-    <string name="contact_photo_label">Picha</string>
-    <string name="contact_offer_label">Nambari ya Bolt12</string>
     <string name="contact_offer_key_title">Lipa kwa funguo yako ya ofa</string>
     <string name="contact_offer_key_enabled">Ikiwa wanajua nambari yako ya Bolt12, wataweza kujua wakati malipo yanafanywa na wewe.</string>
     <string name="contact_offer_key_disabled">Tumia kitambulisho cha muda wakati unalipa mawasiliano haya.</string>
-    <string name="contact_offers_list">Nambari za malipo za Bolt12</string>
 
     <string name="contact_search_name">Tafuta kwa jina</string>
     <string name="contact_none">Hakuna mawasiliano yaliyo pata…</string>
@@ -682,21 +664,20 @@
     <string name="payments_history_thisweek">Mapema wiki hii</string>
     <string name="payments_history_lastweek">Wiki iliyopita</string>
     <string name="payments_export_title">Hamisha malipo</string>
-    <string name="payments_export_instructions">Hamisha malipo yako ya ndani yaliyofanikiwa kwa format ya CSV (maadili yaliyoonyeshwa kwa koma).</string>
-    <string name="payments_export_start_label">Tarehe ya mwanzo</string>
-    <string name="payments_export_end_label">Tarehe ya mwisho</string>
-    <string name="payments_export_context_label">Jumuisha asili/malengo</string>
-    <string name="payments_export_description_label">Jumuisha maelezo</string>
-    <string name="payments_export_generate_button">Hamisha</string>
-    <string name="payments_export_no_payments">Hakuna malipo yaliyofanikiwa bado</string>
-    <string name="payments_export_invalid_timestamps">Tafadhali chagua tarehe sahihi ya mwanzo/mwisho</string>
-    <string name="payments_export_in_progress">Ikihamisha malipo #%1$d</string>
-    <string name="payments_export_success">%1$d malipo yametiwa alama kwa mafanikio</string>
-    <string name="payments_export_share_subject">Phoenix - malipo kutoka %1$s hadi %2$s</string>
-    <string name="payments_export_share_title">Shiriki malipo ya Phoenix…</string>
-    <string name="payments_export_share_button">Shiriki faili</string>
-    <string name="payments_export_error">Uhamisho umeshindwa.</string>
-    <string name="payments_export_no_data">Hakuna malipo yaliyoonekana.</string>
+    <string name="payments_export_csv_instructions">Hamisha malipo yako ya ndani yaliyofanikiwa kwa format ya CSV (maadili yaliyoonyeshwa kwa koma).</string>
+    <string name="payments_export_csv_start_label">Tarehe ya mwanzo</string>
+    <string name="payments_export_csv_end_label">Tarehe ya mwisho</string>
+    <string name="payments_export_csv_context_label">Jumuisha asili/malengo</string>
+    <string name="payments_export_csv_description_label">Jumuisha maelezo</string>
+    <string name="payments_export_csv_generate_button">Hamisha</string>
+    <string name="payments_export_csv_no_payments">Hakuna malipo yaliyofanikiwa bado</string>
+    <string name="payments_export_csv_invalid_timestamps">Tafadhali chagua tarehe sahihi ya mwanzo/mwisho</string>
+    <string name="payments_export_csv_in_progress">Ikihamisha malipo #%1$d</string>
+    <string name="payments_export_csv_share_subject">Phoenix - malipo kutoka %1$s hadi %2$s</string>
+    <string name="payments_export_csv_share_title">Shiriki malipo ya Phoenix…</string>
+    <string name="payments_export_csv_share_button">Shiriki faili</string>
+    <string name="payments_export_csv_error">Uhamisho umeshindwa.</string>
+    <string name="payments_export_csv_no_data">Hakuna malipo yaliyoonekana.</string>
 
     <!-- Components -->
 

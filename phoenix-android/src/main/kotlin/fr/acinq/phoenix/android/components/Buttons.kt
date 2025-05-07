@@ -51,6 +51,7 @@ import fr.acinq.bitcoin.TxId
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.utils.copyToClipboard
+import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.utils.BlockchainExplorer
 
 
@@ -92,7 +93,7 @@ fun BorderButton(
     )
 }
 
-/** A rounded button with a solid background using app theme's primary color. */
+/** A rounded button with a primary background color. */
 @Composable
 fun FilledButton(
     modifier: Modifier = Modifier,
@@ -123,6 +124,53 @@ fun FilledButton(
         textStyle = textStyle,
         padding = padding,
         modifier = modifier
+    )
+}
+
+@Composable
+fun MutedFilledButton(
+    modifier: Modifier = Modifier,
+    text: String? = null,
+    icon: Int? = null,
+    iconTint: Color = MaterialTheme.colors.onSurface,
+    maxLines: Int = Int.MAX_VALUE,
+    enabled: Boolean = true,
+    enabledEffect: Boolean = true,
+    space: Dp = 12.dp,
+    padding: PaddingValues = PaddingValues(12.dp),
+    onClick: () -> Unit,
+) {
+    FilledButton(
+        shape = RoundedCornerShape(12.dp),
+        backgroundColor = mutedBgColor,
+        textStyle = MaterialTheme.typography.button,
+        iconTint = iconTint,
+        modifier = modifier, text = text, icon = icon, maxLines = maxLines, enabled = enabled,
+        enabledEffect = enabledEffect, space = space, padding = padding, onClick = onClick,
+    )
+}
+
+@Composable
+fun TransparentFilledButton(
+    modifier: Modifier = Modifier,
+    text: String? = null,
+    textStyle: TextStyle = MaterialTheme.typography.button,
+    icon: Int? = null,
+    iconTint: Color = MaterialTheme.colors.onSurface,
+    maxLines: Int = Int.MAX_VALUE,
+    enabled: Boolean = true,
+    enabledEffect: Boolean = true,
+    space: Dp = 12.dp,
+    padding: PaddingValues = PaddingValues(12.dp),
+    onClick: () -> Unit,
+) {
+    FilledButton(
+        shape = RoundedCornerShape(12.dp),
+        backgroundColor = Color.Transparent,
+        textStyle = textStyle,
+        iconTint = iconTint,
+        modifier = modifier, text = text, icon = icon, maxLines = maxLines, enabled = enabled,
+        enabledEffect = enabledEffect, space = space, padding = padding, onClick = onClick,
     )
 }
 

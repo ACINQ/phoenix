@@ -22,6 +22,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -76,11 +78,11 @@ fun SplashOfferPayerNote(payerNote: String) {
 
 @Composable
 private fun OfferSentBy(payerPubkey: PublicKey?, hasPayerNote: Boolean) {
-    val contactsManager = business.contactsManager
+    val contactsDb by business.databaseManager.contactsDb.collectAsState(null)
     val contactState = remember { mutableStateOf<OfferContactState>(OfferContactState.Init) }
-    LaunchedEffect(Unit) {
+    LaunchedEffect(contactsDb) {
         contactState.value = payerPubkey?.let {
-            contactsManager.getContactForPayerPubkey(it)
+            contactsDb?.contactForPayerPubKey(it)
         }?.let { OfferContactState.Found(it) } ?: OfferContactState.NotFound
     }
 
@@ -97,7 +99,6 @@ private fun OfferSentBy(payerPubkey: PublicKey?, hasPayerNote: Boolean) {
             is OfferContactState.Found -> {
                 ContactCompactView(
                     contact = res.contact,
-                    currentOffer = null,
                     onContactChange = { contactState.value = if (it == null) OfferContactState.NotFound else OfferContactState.Found(it) },
                 )
             }

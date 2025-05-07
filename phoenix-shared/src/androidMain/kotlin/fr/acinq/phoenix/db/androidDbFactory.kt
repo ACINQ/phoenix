@@ -20,20 +20,18 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import fr.acinq.bitcoin.Chain
-import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.phoenix.db.migrations.v10.AfterVersion10
 import fr.acinq.phoenix.db.migrations.v11.AfterVersion11
 import fr.acinq.phoenix.db.sqldelight.AppDatabase
 import fr.acinq.phoenix.db.sqldelight.ChannelsDatabase
 import fr.acinq.phoenix.db.sqldelight.PaymentsDatabase
 import fr.acinq.phoenix.utils.PlatformContext
-import fr.acinq.phoenix.utils.extensions.phoenixName
 
-actual fun createChannelsDbDriver(ctx: PlatformContext, chain: Chain, nodeIdHash: String): SqlDriver {
+actual fun createChannelsDbDriver(ctx: PlatformContext, fileName: String): SqlDriver {
     return AndroidSqliteDriver(
         schema = ChannelsDatabase.Schema,
         context = ctx.applicationContext,
-        name = "channels-${chain.phoenixName}-$nodeIdHash.sqlite",
+        name = fileName,
         callback = object : AndroidSqliteDriver.Callback(schema = ChannelsDatabase.Schema) {
             override fun onConfigure(db: SupportSQLiteDatabase) {
                 super.onConfigure(db)
@@ -43,12 +41,11 @@ actual fun createChannelsDbDriver(ctx: PlatformContext, chain: Chain, nodeIdHash
     )
 }
 
-actual fun createPaymentsDbDriver(ctx: PlatformContext, chain: Chain, nodeIdHash: String, onError: (String) -> Unit): SqlDriver {
-
+actual fun createPaymentsDbDriver(ctx: PlatformContext, fileName: String, onError: (String) -> Unit): SqlDriver {
     return AndroidSqliteDriver(
         schema = PaymentsDatabase.Schema,
         context = ctx.applicationContext,
-        name = "payments-${chain.phoenixName}-$nodeIdHash.sqlite",
+        name = fileName,
         callback = object : AndroidSqliteDriver.Callback(
             schema = PaymentsDatabase.Schema,
             AfterVersion10(onError),

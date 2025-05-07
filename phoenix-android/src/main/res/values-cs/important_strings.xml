@@ -123,6 +123,17 @@
     <string name="restore_seed_valid_details">Nyní můžete pokračovat a obnovit peněženku</string>
     <string name="restore_seed_invalid">Tento Seed není platný</string>
     <string name="restore_seed_invalid_details">Ujistěte se, že jste zadali správná slova ve správném pořadí.</string>
+
+    <string name="restore_payments_button">Importovat historii plateb</string>
+    <string name="restore_payments_button_details">Volitelné. Toto tlačítko použijte k obnovení souboru databáze plateb z jiného zařízení.</string>
+    <string name="restore_payments_success">Obnoví historii plateb</string>
+    <string name="restore_payments_success_button">Použít jiný soubor</string>
+    <string name="restore_payments_error_header">Nelze obnovit platby</string>
+    <string name="restore_payments_error_button">Zkuste to znovu</string>
+    <string name="restore_payments_error_encryption">Soubor nelze dešifrovat. Ujistěte se, že používáte databázový soubor Phoenix (ne CSV) a že tento soubor odpovídá peněžence, kterou obnovujete.</string>
+    <string name="restore_payments_error_open">Tento soubor nelze otevřít. Zkuste to znovu.</string>
+    <string name="restore_payments_error_writing">Tento soubor nelze zapsat do datové složky aplikace. Zkuste to znovu.</string>
+
     <string name="restore_import_button">Obnovení</string>
 
     <!-- upgrade required dialog -->
@@ -151,21 +162,6 @@
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Příchozí likvidita není dostatečná a máte zakázanou automatickou správu kanálů.</string>
 
-    <!-- receive: offer labels -->
-
-    <string name="receive_toggle_offer_button">Zobrazit znovupoužitelný QR kód</string>
-
-    <string name="receive_offer_howto_intro_1">🎉 Zde je vaše znovupoužitelná žádost o platbu!</string>
-    <string name="receive_offer_howto_intro_2">Klepnutím se dozvíte, jak ji používat</string>
-    <string name="receive_offer_howto_details_1">Tento Bolt12 požadavek na platbu je ekvivalentem Bitcoin adresy v Lightningu.</string>
-    <string name="receive_offer_howto_details_2">Na rozdíl od tradičních Lightning faktur nevyprší její platnost a lze ji používat opakovaně.</string>
-    <string name="receive_offer_howto_details_3">Sdílejte ji ve velkém : na dary, spropitné nebo aby vám zaplatili vaši přátelé.</string>
-    <string name="receive_offer_howto_details_4_title">🛟 Kdo podporuje Bolt12?</string>
-    <string name="receive_offer_howto_details_4">V tuto chvíli podporuje Bolt12 jen několik služeb. Pokud služba tuto fakturu odmítne, dejte jí vědět o co přichází!</string>
-    <string name="receive_offer_howto_details_5_title">🔋 Omezení baterie</string>
-    <string name="receive_offer_howto_details_5">Zkontrolujte, zda Android na aplikaci Phoenix nepoužívá režim úspory baterie. V opačném případě nebudete moci přijímat platby, pokud je aplikace zavřená nebo na pozadí. Povolení TORu ve Phoenixu také způsobí problémy.</string>
-    <string name="receive_offer_howto_details_faq_link">Další informace</string>
-
     <!-- scanning errors -->
 
     <string name="send_error_invoice_expired">Platnost této faktury vypršela.</string>
@@ -175,6 +171,7 @@
     <string name="send_error_lnurl_invalid">Tento LNURL odkaz se nepodařilo zpracovat. Ujistěte se, že je platný.</string>
     <string name="send_error_lnurl_unsupported">Tento typ LNURL zatím není podporován.</string>
     <string name="send_error_invalid_generic">Tato data používají neznámý formát a nelze je zpracovat.</string>
+    <string name="send_error_bip353_connect">Nelze načíst data pro tuto adresu. Možná máte problém s připojením.</string>
     <string name="send_error_bip353_name_not_found">Název \"%1$s\" nebyl nalezen na \"%2$s\".</string>
     <string name="send_error_bip353_invalid_uri">Tato adresa používá neplatný zdroj Bip21.</string>
     <string name="send_error_bip353_invalid_offer">Tato adresa používá neplatnou nabídku Bolt12.</string>
@@ -196,6 +193,8 @@
     <string name="mutualclose_input_instructions">Všechny prostředky odešlete do Bitcoin peněženky. Všechny platební kanály budou uzavřeny.</string>
     <string name="mutualclose_confirm_title">Potvrzení uzavření</string>
     <string name="mutualclose_confirm_details">Všechny finanční prostředky budou zaslány na adresu:</string>
+    <string name="mutualclose_confirm_fee">Odhadovaný poplatek:</string>
+    <string name="mutualclose_confirm_fee_unknown">Výši poplatku se nepodařilo odhadnout.</string>
 
     <string name="forceclose_title">Vynucené uzavření kanálů</string>
     <string name="forceclose_instructions">Na této obrazovce můžete jednostranně uzavřít kanály.\n\nToto není kouzelné tlačítko \"opravit vše\": je zde jako bezpečnostní opatření a <b>mělo by se používat pouze v krajních situacích</b>. Například pokud váš peer (ACINQ) trvale zmizí a znemožní vám utrácet peníze. Ve všech ostatních případech, <b>pokud máte s Phoenixem problémy, měli byste kontaktovat podporu</b>.\n\nVynucené uzavření kanálů vás bude stát peníze (na pokrytí On-Chain poplatků) a způsobí, že vaše prostředky budou na několik dní zablokovány.\n\n<b>Aplikaci odinstalujte až po úplném uzavření kanálů, jinak přijdete o peníze.</b>\n\n<b>Nepoužívejte tuto funkci, pokud plně nerozumíte tomu, co děláte.</b></string>
@@ -225,6 +224,9 @@
 
     <string name="inappnotif_mempool_full_message">Bitcoin mempool je plný a On-Chain poplatky jsou vysoké.</string>
     <string name="inappnotif_mempool_full_action">Podívejte se, jak je ovlivněn Phoenix</string>
+
+    <string name="inappnotif_tor_disconnected_message">Nelze se připojit k síti Tor. Phoenix nebude fungovat správně.</string>
+    <string name="inappnotif_tor_disconnected_action">Opravit to</string>
 
     <string name="inappnotif_payment_onchain_pending_title">On-Chain finanční prostředky čekají na vyřízení (+%1$s)</string>
     <string name="inappnotif_payments_rejection_overview_one">Příchozí platba byla nedávno odmítnuta</string>
@@ -282,6 +284,14 @@
     <string name="tor_dialog_disable_details_1">Pokud tuto možnost zakážete, vaše IP adresa může být odhalena různým poskytovatelům služeb.</string>
     <string name="tor_dialog_disable_details_2">Opravdu chcete pokračovat?</string>
     <string name="tor_dialog_processing">Zpracování změn…</string>
+
+    <string name="tor_disconnected_dialog_title">Žádný přístup k síti Tor</string>
+    <string name="tor_disconnected_dialog_action">Opravit</string>
+    <string name="tor_disconnected_dialog_details_1">Phoenix potřebuje pro správné fungování přístup k síti Tor.</string>
+    <string name="tor_disconnected_dialog_details_2">Ujistěte se, že vaše aplikace Tor Proxy VPN je spuštěná a že je připojena k síti Tor.</string>
+    <string name="tor_disconnected_dialog_details_3">Pokud nemáte aplikaci Tor VPN, nainstalujte si ji. Doporučujeme Orbot.</string>
+    <string name="tor_disconnected_dialog_open_settings">Otevřít nastavení Tor</string>
+    <string name="tor_disconnected_dialog_open_orbot_page">Otevřít stránku Orbot</string>
 
     <!-- about -->
 

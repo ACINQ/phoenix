@@ -40,6 +40,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.R
@@ -152,9 +153,10 @@ fun TextInput(
                     !errorMessage.isNullOrBlank() -> MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.onPrimary, fontSize = 13.sp)
                     else -> MaterialTheme.typography.subtitle2.copy(fontSize = 13.sp)
                 },
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
                     .align(Alignment.BottomStart)
-                    .padding(start = 10.dp)
+                    .padding(start = 10.dp, end = 32.dp)
                     .clip(RoundedCornerShape(8.dp))
                     .background(if (!errorMessage.isNullOrBlank()) negativeColor else MaterialTheme.colors.surface)
                     .padding(horizontal = 8.dp, vertical = 2.dp)

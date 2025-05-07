@@ -48,6 +48,7 @@ typealias Lightning_kmpNativeSocketException = Lightning_kmp_coreNativeSocketExc
 typealias Lightning_kmpNewChannelIncomingPayment = Lightning_kmp_coreNewChannelIncomingPayment
 typealias Lightning_kmpNodeEvents = Lightning_kmp_coreNodeEvents
 typealias Lightning_kmpNodeParams = Lightning_kmp_coreNodeParams
+typealias Lightning_kmpOfferManagerCompanion = Lightning_kmp_coreOfferManagerCompanion
 typealias Lightning_kmpOfferNotPaid = Lightning_kmp_coreOfferNotPaid
 typealias Lightning_kmpOfferPaymentMetadata = Lightning_kmp_coreOfferPaymentMetadata
 typealias Lightning_kmpOfferTypesOffer = Lightning_kmp_coreOfferTypesOffer
@@ -100,6 +101,7 @@ extension SendManager {
 	
 	typealias BadRequestReason_AlreadyPaidInvoice = BadRequestReasonAlreadyPaidInvoice
 	typealias BadRequestReason_PaymentPending = BadRequestReasonPaymentPending
+	typealias BadRequestReason_Bip353Unresolved = BadRequestReasonBip353Unresolved
 	typealias BadRequestReason_Bip353InvalidOffer = BadRequestReasonBip353InvalidOffer
 	typealias BadRequestReason_Bip353InvalidUri = BadRequestReasonBip353InvalidUri
 	typealias BadRequestReason_Bip353NameNotFound = BadRequestReasonBip353NameNotFound

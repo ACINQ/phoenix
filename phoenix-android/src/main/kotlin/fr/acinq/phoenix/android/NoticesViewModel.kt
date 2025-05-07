@@ -29,11 +29,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
 import fr.acinq.phoenix.data.WalletNotice
 import fr.acinq.phoenix.managers.AppConfigurationManager
+import fr.acinq.phoenix.managers.ConnectionsManager
 import fr.acinq.phoenix.managers.PeerManager
-import fr.acinq.phoenix.utils.extensions.confirmed
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
@@ -45,7 +47,8 @@ sealed class Notice() {
 
     data class RemoteMessage(val notice: WalletNotice) : ShowInHome(1)
     data object CriticalUpdateAvailable : ShowInHome(2)
-    data object SwapInCloseToTimeout : ShowInHome(3)
+    data object TorDisconnected : ShowInHome(3)
+    data object SwapInCloseToTimeout : ShowInHome(4)
     data object BackupSeedReminder : ShowInHome(5)
     data object MempoolFull : ShowInHome(10)
     data object UpdateAvailable : ShowInHome(20)
@@ -59,6 +62,7 @@ sealed class Notice() {
 class NoticesViewModel(
     val appConfigurationManager: AppConfigurationManager,
     val peerManager: PeerManager,
+    val connectionsManager: ConnectionsManager,
     val internalDataRepository: InternalDataRepository,
     val context: Context
 
@@ -82,6 +86,8 @@ class NoticesViewModel(
         val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
         isPowerSaverModeOn = powerManager.isPowerSaveMode
         context.registerReceiver(receiver, IntentFilter(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED))
+
+        viewModelScope.launch { monitorTorConnection() }
     }
 
     override fun onCleared() {
@@ -125,6 +131,22 @@ class NoticesViewModel(
         }
     }
 
+    private suspend fun monitorTorConnection() {
+        combine(
+            appConfigurationManager.isTorEnabled.filterNotNull(),
+            connectionsManager.connections
+        ) { isTorEnabled, connections ->
+            isTorEnabled && connections.peer !is Connection.ESTABLISHED
+        }.collect { hasIssue ->
+            if (hasIssue) {
+                delay(3_000) // this pause avoids displaying the notification too eagerly
+                addNotice(Notice.TorDisconnected)
+            } else {
+                removeNotice<Notice.TorDisconnected>()
+            }
+        }
+    }
+
     private suspend fun monitorWalletNotice() {
         combine(appConfigurationManager.walletNotice, internalDataRepository.getLastReadWalletNoticeIndex) { notice, lastReadIndex ->
             notice to lastReadIndex
@@ -150,12 +172,13 @@ class NoticesViewModel(
     class Factory(
         private val appConfigurationManager: AppConfigurationManager,
         private val peerManager: PeerManager,
+        private val connectionsManager: ConnectionsManager,
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
             val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as? PhoenixApplication)
             @Suppress("UNCHECKED_CAST")
             return NoticesViewModel(
-                appConfigurationManager, peerManager,
+                appConfigurationManager, peerManager, connectionsManager,
                 internalDataRepository = application.internalDataRepository,
                 application.applicationContext
             ) as T

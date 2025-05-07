@@ -26,7 +26,7 @@ struct DrainWalletView_Action: MVISubView {
 	var view: some View {
 		
 		content()
-			.navigationTitle(NSLocalizedString("Drain wallet", comment: "Navigation bar title"))
+			.navigationTitle(NSLocalizedString("Close channels", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationBarBackButtonHidden()
 	}

@@ -117,17 +117,19 @@ fun DefaultScreenLayout(
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     backgroundColor: Color? = null,
+    navBarColor: Color = Color.Transparent,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(
         modifier = Modifier
-            .fillMaxSize() // cancelled if scrollable!
+            .fillMaxSize() // ignored if scrollable!
             .then(if (isScrollable) Modifier.verticalScroll(rememberScrollState()) else Modifier)
             .then(if (backgroundColor != null) Modifier.background(backgroundColor) else Modifier),
         verticalArrangement = verticalArrangement,
         horizontalAlignment = horizontalAlignment,
     ) {
         content()
+        Spacer(modifier = Modifier.height(WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()).fillMaxWidth().background(navBarColor))
     }
 }
 
@@ -204,13 +206,14 @@ fun HSeparator(
 @Composable
 fun VSeparator(
     padding: PaddingValues = PaddingValues(0.dp),
+    color: Color = borderColor,
     height: Dp? = null
 ) {
     Box(
         (height?.run { Modifier.height(height) } ?: Modifier.fillMaxHeight())
             .width(1.dp)
             .padding(padding)
-            .background(color = borderColor)
+            .background(color = color)
     )
 }
 

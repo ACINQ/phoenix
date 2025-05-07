@@ -21,7 +21,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.data.WalletPaymentInfo
-import fr.acinq.phoenix.managers.ContactsManager
 import fr.acinq.phoenix.managers.PaymentsManager
 import fr.acinq.phoenix.managers.PaymentsPageFetcher
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -37,8 +36,7 @@ import org.slf4j.LoggerFactory
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PaymentsViewModel(
-    private val paymentsManager: PaymentsManager,
-    private val contactsManager: ContactsManager,
+    paymentsManager: PaymentsManager,
 ) : ViewModel() {
 
     companion object {
@@ -61,7 +59,6 @@ class PaymentsViewModel(
     private val paymentsPageFetcher: PaymentsPageFetcher = paymentsManager.makePageFetcher()
     val paymentsPage = paymentsPageFetcher.paymentsPage
 
-
     init {
         paymentsPageFetcher.subscribeToAll(offset = 0, count = pageSize)
         homePageFetcher.subscribeToAll(offset = 0, count = paymentsCountInHome)
@@ -83,11 +80,10 @@ class PaymentsViewModel(
 
     class Factory(
         private val paymentsManager: PaymentsManager,
-        private val contactsManager: ContactsManager,
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return PaymentsViewModel(paymentsManager, contactsManager) as T
+            return PaymentsViewModel(paymentsManager) as T
         }
     }
 }

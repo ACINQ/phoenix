@@ -29,11 +29,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -70,12 +73,12 @@ import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.openLink
 import fr.acinq.phoenix.android.components.screenlock.LockPrompt
 import fr.acinq.phoenix.android.home.HomeView
-import fr.acinq.phoenix.android.init.CreateWalletView
-import fr.acinq.phoenix.android.init.InitWallet
-import fr.acinq.phoenix.android.init.RestoreWalletView
+import fr.acinq.phoenix.android.initwallet.create.CreateWalletView
+import fr.acinq.phoenix.android.initwallet.InitWallet
+import fr.acinq.phoenix.android.initwallet.restore.RestoreWalletView
 import fr.acinq.phoenix.android.intro.IntroView
 import fr.acinq.phoenix.android.payments.details.PaymentDetailsView
-import fr.acinq.phoenix.android.payments.history.CsvExportView
+import fr.acinq.phoenix.android.payments.history.PaymentsExportView
 import fr.acinq.phoenix.android.payments.history.PaymentsHistoryView
 import fr.acinq.phoenix.android.payments.send.liquidity.RequestLiquidityView
 import fr.acinq.phoenix.android.payments.receive.ReceiveView
@@ -157,15 +160,13 @@ fun AppView(
     ) {
         // we keep a view model storing payments so that we don't have to fetch them every time
         val paymentsViewModel = viewModel<PaymentsViewModel>(
-            factory = PaymentsViewModel.Factory(
-                paymentsManager = business.paymentsManager,
-                contactsManager = business.contactsManager,
-            )
+            factory = PaymentsViewModel.Factory(business.paymentsManager,)
         )
         val noticesViewModel = viewModel<NoticesViewModel>(
             factory = NoticesViewModel.Factory(
                 appConfigurationManager = business.appConfigurationManager,
                 peerManager = business.peerManager,
+                connectionsManager = business.connectionsManager,
             )
         )
         MonitorNotices(vm = noticesViewModel)
@@ -178,6 +179,7 @@ fun AppView(
                     .background(appBackground())
                     .fillMaxWidth()
                     .fillMaxHeight()
+                    .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
             ) {
                 NavHost(
                     navController = navController,
@@ -226,7 +228,7 @@ fun AppView(
                         CreateWalletView(onSeedWritten = { navController.navigate(Screen.Startup.route) })
                     }
                     composable(Screen.RestoreWallet.route) {
-                        RestoreWalletView(onSeedWritten = { navController.navigate(Screen.Startup.route) })
+                        RestoreWalletView(onRestoreDone = { navController.navigate(Screen.Startup.route) })
                     }
                     composable(Screen.Home.route) {
                         RequireStarted(walletState) {
@@ -250,15 +252,16 @@ fun AppView(
                     composable(Screen.Receive.route) {
                         ReceiveView(
                             onBackClick = { navController.popBackStack() },
-                            onScanDataClick = { navController.navigate(Screen.Send.route) },
+                            onScanDataClick = { navController.navigate("${Screen.Send.route}?openScanner=true&forceNavOnBack=true") },
                             onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) },
                         )
                     }
                     composable(
-                        route = "${Screen.Send.route}?input={input}&openScanner={openScanner}",
+                        route = "${Screen.Send.route}?input={input}&openScanner={openScanner}&forceNavOnBack={forceNavOnBack}",
                         arguments = listOf(
                             navArgument("input") { type = NavType.StringType ; nullable = true },
-                            navArgument("openScanner") { type = NavType.BoolType ; defaultValue = false }
+                            navArgument("openScanner") { type = NavType.BoolType ; defaultValue = false },
+                            navArgument("forceNavOnBack") { type = NavType.BoolType ; defaultValue = false },
                         ),
                         deepLinks = listOf(
                             navDeepLink { uriPattern = "lightning:{data}" },
@@ -292,7 +295,8 @@ fun AppView(
                             SendView(
                                 initialInput = input,
                                 fromDeepLink = !isIntentFromNavigation,
-                                immediatelyOpenScanner = it.arguments?.getBoolean("openScanner") ?: false
+                                immediatelyOpenScanner = it.arguments?.getBoolean("openScanner") ?: false,
+                                forceNavOnBack = it.arguments?.getBoolean("forceNavOnBack") ?: false,
                             )
                         }
                     }
@@ -340,11 +344,11 @@ fun AppView(
                             onBackClick = { navController.popBackStack() },
                             paymentsViewModel = paymentsViewModel,
                             onPaymentClick = { navigateToPaymentDetails(navController, id = it, isFromEvent = false) },
-                            onCsvExportClick = { navController.navigate(Screen.PaymentsCsvExport.route) },
+                            onCsvExportClick = { navController.navigate(Screen.PaymentsExport.route) },
                         )
                     }
-                    composable(Screen.PaymentsCsvExport.route) {
-                        CsvExportView(onBackClick = {
+                    composable(Screen.PaymentsExport.route) {
+                        PaymentsExportView(onBackClick = {
                             navController.navigate(Screen.PaymentsHistory.route) {
                                 popUpTo(Screen.PaymentsHistory.route) { inclusive = true }
                             }

@@ -66,7 +66,7 @@ fun SplashAutoLiquidityPurchase(
         SplashLabelRow(
             label = stringResource(id = R.string.paymentdetails_liquidity_caused_by_label),
             helpMessage = stringResource(id = R.string.paymentdetails_liquidity_caused_by_help),
-            helpLink = stringResource(id = R.string.paymentdetails_liquidity_caused_by_help_link) to "https://acinq.co/faq#what-is-inbound-liquidity",
+            helpLink = stringResource(id = R.string.paymentdetails_liquidity_caused_by_help_link) to "https://phoenix.acinq.co/faq#what-is-inbound-liquidity",
         ) {
             Button(
                 text = it.id.toString(),

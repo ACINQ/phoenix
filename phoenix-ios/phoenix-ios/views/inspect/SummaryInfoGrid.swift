@@ -14,6 +14,7 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 	@Binding var causedBy: Lightning_kmpWalletPayment?
 	@Binding var showOriginalFiatValue: Bool
 	
+	let addToContacts: () -> Void
 	let showContactView: (_ contact: ContactInfo) -> Void
 	let switchToPayment: (_ paymentId: Lightning_kmpUUID) -> Void
 	
@@ -50,6 +51,7 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 			// because the compiler will sometimes choke while processing this method.
 			
 			paymentServiceRow()
+			liquidityAmountRow()
 			paymentDescriptionRow()
 			paymentMessageRow()
 			customNotesRow()
@@ -105,6 +107,41 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 		}
 	}
 	
+	@ViewBuilder
+	func liquidityAmountRow() -> some View {
+		let identifier: String = #function
+
+		if let sat = paymentInfo.liquidityAddedAmount() {
+
+			InfoGridRow(
+				identifier: identifier,
+				vAlignment: .firstTextBaseline,
+				hSpacing: horizontalSpacingBetweenColumns,
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
+			) {
+
+				keyColumn("Liquidity")
+					.accessibilityLabel("Liquidity")
+
+			} valueColumn: {
+
+				let msat = Utils.toMsat(sat: sat)
+				let amount = formattedAmount(msat: msat)
+
+				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+					Text(amount.digits)
+					Text(verbatim: " ")
+					Text_CurrencyName(currency: amount.currency, fontTextStyle: .body)
+
+				} // </HStack>
+				.onTapGesture { toggleCurrencyType() }
+				.accessibilityLabel("\(amount.string)")
+
+			} // </InfoGridRow>
+		}
+	}
+
 	@ViewBuilder
 	func paymentDescriptionRow() -> some View {
 		let identifier: String = #function
@@ -308,7 +345,8 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 	func sentByRow() -> some View {
 		let identifier: String = #function
 		
-		if paymentInfo.payment.isIncoming() {
+		if paymentInfo.payment.isIncoming() &&
+			(paymentInfo.contact != nil || paymentInfo.canAddToContacts() || paymentInfo.hasAttachedMessage()) {
 			
 			InfoGridRow(
 				identifier: identifier,
@@ -336,7 +374,14 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 					
 					VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
 						Text("Unknown")
-						if paymentInfo.attachedMessage() != nil {
+						if paymentInfo.canAddToContacts() {
+							Button {
+								addToContacts()
+							} label: {
+								Text("Add to contacts")
+							}
+						}
+						if paymentInfo.hasAttachedMessage() {
 							Text("Be careful with messages from unknown sources")
 								.foregroundColor(.secondary)
 								.font(.subheadline)
@@ -352,7 +397,7 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 	func recipientRow() -> some View {
 		let identifier: String = #function
 		
-		if paymentInfo.payment.isOutgoing(), let contact = paymentInfo.contact {
+		if paymentInfo.payment.isOutgoing() && (paymentInfo.contact != nil || paymentInfo.canAddToContacts()) {
 			
 			InfoGridRow(
 				identifier: identifier,
@@ -366,12 +411,26 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 				
 			} valueColumn: {
 				
-				HStack(alignment: VerticalAlignment.center, spacing: 4) {
-					ContactPhoto(fileName: contact.photoUri, size: 32)
-					Text(contact.name)
-				} // <HStack>
-				.onTapGesture {
-					showContactView(contact)
+				if let contact = paymentInfo.contact {
+					
+					HStack(alignment: VerticalAlignment.center, spacing: 4) {
+						ContactPhoto(fileName: contact.photoUri, size: 32)
+						Text(contact.name)
+					} // <HStack>
+					.onTapGesture {
+						showContactView(contact)
+					}
+					
+				} else {
+					
+					VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+						Text("Unknown")
+						Button {
+							addToContacts()
+						} label: {
+							Text("Add to contacts")
+						}
+					}
 				}
 				
 			} // </InfoGridRow>

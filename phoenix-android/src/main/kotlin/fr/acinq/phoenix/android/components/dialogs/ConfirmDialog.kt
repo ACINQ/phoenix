@@ -19,6 +19,7 @@ package fr.acinq.phoenix.android.components.dialogs
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -29,7 +30,7 @@ import fr.acinq.phoenix.android.components.Button
 
 @Composable
 fun ConfirmDialog(
-    title: String?,
+    title: String? = null,
     message: String,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
@@ -54,11 +55,11 @@ fun ConfirmDialog(
         title = title,
         onDismiss = onDismiss,
         buttons = {
-            Button(text = stringResource(id = R.string.btn_cancel), onClick = onDismiss)
-            Button(text = stringResource(id = R.string.btn_confirm), onClick = onConfirm)
+            Button(text = stringResource(id = R.string.btn_cancel), onClick = onDismiss, shape = RoundedCornerShape(16.dp))
+            Button(text = stringResource(id = R.string.btn_confirm), onClick = onConfirm, shape = RoundedCornerShape(16.dp))
         }
     ) {
-        Column(Modifier.padding(horizontal = 24.dp, vertical = if (title == null) 24.dp else 0.dp)) {
+        Column(Modifier.padding(start = 24.dp, end = 24.dp, top = if (title == null) 24.dp else 0.dp)) {
             content()
         }
     }

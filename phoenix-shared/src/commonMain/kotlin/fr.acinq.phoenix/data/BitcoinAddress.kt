@@ -51,6 +51,7 @@ data class BitcoinUri(
                 append("amount", "${btcPart}.${satPart}")
             }
             paymentRequest?.let { append("lightning", it.write()) }
+            offer?.let { append("lno", it.encode()) }
         }
         return "bitcoin:$address?${(params + ignoredParams).formUrlEncode()}"
     }

@@ -18,7 +18,9 @@ struct ContactsList: View {
 	let popTo: (PopToDestination) -> Void
 	
 	@State var sortedContacts: [ContactInfo] = []
-	@State var offers: [String: [String]] = [:]
+	
+	@State var search_offers: [Lightning_kmpUUID: [String]] = [:]
+	@State var search_addresses: [Lightning_kmpUUID: [String]] = [:]
 	
 	@State var searchText = ""
 	@State var filteredContacts: [ContactInfo]? = nil
@@ -66,7 +68,7 @@ struct ContactsList: View {
 		.onAppear() {
 			onAppear()
 		}
-		.onReceive(Biz.business.contactsManager.contactsListPublisher()) {
+		.onReceive(Biz.business.databaseManager.contactsListPublisher()) {
 			contactsListChanged($0)
 		}
 		.onChange(of: searchText) { _ in
@@ -196,7 +198,7 @@ struct ContactsList: View {
 			ManageContact(
 				location: .embedded,
 				popTo: popToWrapper,
-				offer: nil,
+				info: nil,
 				contact: nil,
 				contactUpdated: { _ in }
 			)
@@ -206,7 +208,7 @@ struct ContactsList: View {
 				ManageContact(
 					location: .embedded,
 					popTo: popToWrapper,
-					offer: nil,
+					info: nil,
 					contact: selectedItem,
 					contactUpdated: { _ in }
 				)
@@ -279,17 +281,35 @@ struct ContactsList: View {
 	func contactsListChanged(_ updatedList: [ContactInfo]) {
 		log.trace("contactsListChanged()")
 		
-		sortedContacts = updatedList
-		
-		var updatedOffers: [String: [String]] = [:]
-		for contact in sortedContacts {
-			let key: String = contact.id
-			let values: [String] = contact.offers.map { $0.encode().lowercased() }
-			
-			updatedOffers[key] = values
+		sortedContacts = updatedList.sorted {(a, b) in
+			// return true if `a` should be ordered before `b`; otherwise return false
+			return a.name.localizedCaseInsensitiveCompare(b.name) == .orderedAscending
 		}
 		
-		offers = updatedOffers
+		do {
+			var offers: [Lightning_kmpUUID: [String]] = [:]
+			for contact in sortedContacts {
+				let key: Lightning_kmpUUID = contact.id
+				let values: [String] = contact.offers.map {
+					$0.offer.encode().lowercased()
+				}
+				offers[key] = values
+			}
+			
+			search_offers = offers
+		}
+		do {
+			var addresses: [Lightning_kmpUUID: [String]] = [:]
+			for contact in sortedContacts {
+				let key: Lightning_kmpUUID = contact.id
+				let values: [String] = contact.addresses.map {
+					$0.address.trimmingCharacters(in: .whitespacesAndNewlines)
+				}
+				addresses[key] = values
+			}
+			
+			search_addresses = addresses
+		}
 	}
 	
 	func searchTextChanged() {
@@ -316,8 +336,14 @@ struct ContactsList: View {
 				return true
 			}
 			
-			if let offers = offers[contact.id] {
+			if let offers = search_offers[contact.id] {
 				if offers.contains(searchtext) {
+					return true
+				}
+			}
+			
+			if let addresses = search_addresses[contact.id] {
+				if addresses.contains(where: { $0.contains(searchtext) }) {
 					return true
 				}
 			}
@@ -367,11 +393,11 @@ struct ContactsList: View {
 		
 		Task { @MainActor in
 			
-			let contactsManager = Biz.business.contactsManager
 			do {
-				try await contactsManager.deleteContact(contactId: contact.uuid)
+				let contactsDb = try await Biz.business.databaseManager.contactsDb()
+				try await contactsDb.deleteContact(contactId: contact.id)
 			} catch {
-				log.error("contactsManager.deleteContact(): error: \(error)")
+				log.error("contactsDb.deleteContact(): error: \(error)")
 			}
 		}
 	}

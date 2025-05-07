@@ -97,17 +97,24 @@ import fr.acinq.phoenix.android.popToHome
 import fr.acinq.phoenix.android.utils.extensions.toLocalisedMessage
 import fr.acinq.phoenix.android.utils.gray300
 import fr.acinq.phoenix.android.utils.gray800
+import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.readClipboard
 import fr.acinq.phoenix.data.ContactInfo
+import fr.acinq.phoenix.data.ContactPaymentCode
 import fr.acinq.phoenix.data.lnurl.LnurlError
 import fr.acinq.phoenix.managers.SendManager
 
+/**
+ * @param fromDeepLink Default false. If true, the back button always pops to Home.
+ * @param forceNavOnBack Default false. If true, the back button always pops the backstack. Otherwise, be smart and maybe reset the parser instead.
+ */
 @Composable
 fun SendView(
     initialInput: String?,
     immediatelyOpenScanner: Boolean,
     fromDeepLink: Boolean,
+    forceNavOnBack: Boolean,
 ) {
     val navController = navController
     val vm = viewModel<PrepareSendViewModel>(factory = PrepareSendViewModel.Factory(sendManager = business.sendManager))
@@ -115,14 +122,11 @@ fun SendView(
     val keyboardManager = LocalSoftwareKeyboardController.current
 
     val onBackClick: () -> Unit = {
-        if (fromDeepLink) {
-            navController.popToHome()
-        } else {
-            if (vm.parsePaymentState is ParsePaymentState.Ready) {
-                navController.popBackStack()
-            } else {
-                vm.resetParsing()
-            }
+        when {
+            fromDeepLink -> navController.popToHome()
+            forceNavOnBack -> navController.popBackStack()
+            vm.parsePaymentState is ParsePaymentState.Ready -> navController.popBackStack()
+            else -> vm.resetParsing()
         }
     }
 
@@ -147,7 +151,7 @@ fun SendView(
                     SendSpliceOutView(requestedAmount = data.uri.amount, address = data.uri.address, onBackClick = onBackClick, onSpliceOutSuccess = { navController.popToHome() })
                 }
                 is SendManager.ParseResult.Lnurl.Pay -> {
-                    LnurlPayView(payIntent = data.paymentIntent, onBackClick, onPaymentSent = { navController.popToHome() })
+                    LnurlPayView(pay = data, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() })
                 }
                 is SendManager.ParseResult.Lnurl.Withdraw -> {
                     LnurlWithdrawView(withdraw = data.lnurlWithdraw, onBackClick = onBackClick, onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) }, onWithdrawDone = { navController.popToHome() })
@@ -204,7 +208,7 @@ fun SendView(
             if (parseState is ParsePaymentState.ChooseOnchainOrOffer) {
                 ChoosePaymentModeDialog(
                     onPayOnchainClick = { vm.parsePaymentState = ParsePaymentState.Success(SendManager.ParseResult.Uri(parseState.uri)) },
-                    onPayOffchainClick = { vm.parsePaymentState = ParsePaymentState.Success(SendManager.ParseResult.Bolt12Offer(parseState.offer)) },
+                    onPayOffchainClick = { vm.parsePaymentState = ParsePaymentState.Success(SendManager.ParseResult.Bolt12Offer(offer = parseState.offer, lightningAddress = null)) },
                     onDismiss = { vm.resetParsing() }
                 )
             }
@@ -227,7 +231,7 @@ private fun PrepareSendView(
     val parsePaymentState = vm.parsePaymentState
     val isProcessingData = vm.parsePaymentState.isProcessing || vm.readImageState.isProcessing
 
-    DefaultScreenLayout(isScrollable = false) {
+    DefaultScreenLayout(isScrollable = false, navBarColor = MaterialTheme.colors.surface) {
         DefaultScreenHeader(title = stringResource(id = R.string.preparesend_title), onBackClick = onBackClick)
 
         // show error message when reading an image from disk fails
@@ -251,11 +255,13 @@ private fun PrepareSendView(
             isError = parsePaymentState.hasFailed,
         )
 
-        // contacts list
-        val contacts by business.contactsManager.contactsList.collectAsState()
-        Column(modifier = Modifier
-            .weight(1f)
-            .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        // list of contacts
+        val contactsState = business.databaseManager.contactsList.collectAsState(emptyList())
+        val contacts = contactsState.value.filter { it.paymentCodes.isNotEmpty() }
+        Column(
+            modifier = Modifier.weight(1f).fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             if (contacts.isEmpty()) {
                 Spacer(modifier = Modifier.height(24.dp))
                 TextWithIcon(text = stringResource(id = R.string.preparesend_contacts_none), icon = R.drawable.ic_user, textStyle = MaterialTheme.typography.caption.copy(fontSize = 16.sp), iconTint = MaterialTheme.typography.caption.color, iconSize = 24.dp, space = 8.dp)
@@ -276,7 +282,7 @@ private fun PrepareSendView(
                         items(filteredContacts) {
                             ContactRow(
                                 contactInfo = it,
-                                onClick = { it.mostRelevantOffer?.let { vm.parsePaymentData(it.encode()) } },
+                                onSendClick = { vm.parsePaymentData(it.paymentCode) },
                                 enabled = !isProcessingData
                             )
                         }
@@ -422,19 +428,55 @@ private fun RowScope.ReadDataButton(
 @Composable
 private fun ContactRow(
     contactInfo: ContactInfo,
-    onClick: () -> Unit,
+    onSendClick: (ContactPaymentCode) -> Unit,
     enabled: Boolean,
 ) {
-    Clickable(modifier = Modifier.fillMaxWidth(), onClick = onClick, enabled = enabled) {
-        Row(
+    var showPaymentCodesList by remember { mutableStateOf(false) }
+
+    Clickable(modifier = Modifier.fillMaxWidth(), onClick = {
+        when {
+            contactInfo.paymentCodes.isEmpty() -> Unit
+            contactInfo.paymentCodes.size == 1 -> onSendClick(contactInfo.paymentCodes.first())
+            else -> showPaymentCodesList = !showPaymentCodesList
+        }
+    }, enabled = enabled) {
+        Column(
             modifier = Modifier
+                .then(if (showPaymentCodesList) Modifier.background(mutedTextColor.copy(alpha = .1f)) else Modifier)
                 .padding(horizontal = 16.dp, vertical = 10.dp)
-                .enableOrFade(enabled),
-            verticalAlignment = Alignment.CenterVertically
         ) {
-            ContactPhotoView(photoUri = contactInfo.photoUri, name = contactInfo.name, onChange = null, imageSize = 38.dp, borderSize = 1.dp)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(text = contactInfo.name, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 18.sp)
+            Row(
+                modifier = Modifier.enableOrFade(enabled),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                ContactPhotoView(photoUri = contactInfo.photoUri, name = contactInfo.name, onChange = null, imageSize = 38.dp, borderSize = 1.dp)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = contactInfo.name, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 18.sp)
+            }
+            if (showPaymentCodesList) {
+                Spacer(Modifier.height(8.dp))
+                LazyColumn(modifier = Modifier.heightIn(max = 300.dp)) {
+                    items(contactInfo.paymentCodes) { paymentCode ->
+                        Clickable(onClick = { onSendClick(paymentCode) }) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(12.dp, 8.dp),
+                                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            ) {
+                                val (main, details) = remember(paymentCode) {
+                                    if (paymentCode.label.isNullOrBlank()) {
+                                        paymentCode.paymentCode to null
+                                    } else {
+                                        paymentCode.label!! to paymentCode.paymentCode
+                                    }
+                                }
+                                PhoenixIcon(R.drawable.ic_send, tint = MaterialTheme.colors.primary, modifier = Modifier.size(14.dp).align(Alignment.CenterVertically))
+                                Text(text = main, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.alignByBaseline())
+                                details?.let { Text(text = it, style = MaterialTheme.typography.subtitle2, maxLines = 1, overflow = TextOverflow.MiddleEllipsis, modifier = Modifier.alignByBaseline()) }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

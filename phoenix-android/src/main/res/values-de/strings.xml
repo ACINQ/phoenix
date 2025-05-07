@@ -89,26 +89,23 @@
 
     <string name="receive_help_qr">QR-Code der Rechnung/Adresse</string>
 
-    <string name="receive_bitcoin_title">Bitcoin</string>
-    <string name="receive_bitcoin_help">Dieser QR-Code ist eine klassische Bitcoin-Adresse.\n\nEr kann von fast allen Bitcoin-Wallets gelesen werden, allerdings werden die Zahlungen langsamer sein.</string>
     <string name="receive_bitcoin_address_label">Adresse</string>
     <string name="receive_bitcoin_generating">Adresse synchronisieren..</string>
-    <string name="receive_bitcoin_error">Bitcoin-Adresse konnte nicht generiert werden</string>
     <string name="receive_bitcoin_share_title">Bitcoin-Adresse</string>
     <string name="receive_bitcoin_share_subject">Teile diese Bitcoin-Adresse mit…</string>
 
-    <string name="receive_lightning_title">Lightning</string>
-    <string name="receive_lightning_help">Dieser QR-Code ist eine Lightning-Rechnung.\n\nLightning-Zahlungen sind sehr schnell und normalerweise günstiger, werden aber von manchen Wallets nicht unterstützt.\n\nIn diesem Fall bitte nach links wischen, um eine klassische Bitcoin-Adresse zu verwenden.</string>
+    <string name="receive_label_bitcoin_help">Dieser QR-Code ist eine klassische Bitcoin-Adresse.\n\nEr kann von fast allen Bitcoin-Wallets gelesen werden, allerdings werden die Zahlungen langsamer sein.</string>
+    <string name="receive_label_lightning_help">Dieser QR-Code ist eine Lightning-Rechnung.\n\nLightning-Zahlungen sind sehr schnell und normalerweise günstiger, werden aber von manchen Wallets nicht unterstützt.\n\nIn diesem Fall bitte nach links wischen, um eine klassische Bitcoin-Adresse zu verwenden.</string>
+
     <string name="receive_lightning_generating">Wird erstellt…</string>
+    <string name="receive_lightning_switch_bolt11">Einmal verwendbar</string>
+    <string name="receive_lightning_switch_bolt12">Wiederverwendbar</string>
     <string name="receive_lightning_amount_label">Betrag</string>
     <string name="receive_lightning_desc_label">Desc</string>
     <string name="receive_lightning_error">Rechnung konnte nicht erstellt werden</string>
     <string name="receive_lightning_share_subject">Lightning-Rechnung</string>
     <string name="receive_lightning_share_title">Teile diese Lightning-Rechnung mit…</string>
-    <string name="receive_lnurl_button">Scannen</string>
 
-    <string name="receive_lightning_edit_button">Ändern</string>
-    <string name="receive_lightning_edit_title">Rechnung ändern</string>
     <string name="receive_lightning_edit_amount_label">Betrag (optional)</string>
     <string name="receive_lightning_edit_amount_placeholder">Zu empfangender Betrag</string>
     <string name="receive_lightning_edit_desc_label">Beschreibung (optional)</string>
@@ -198,11 +195,10 @@
     <string name="mutualclose_checking_balance">Prüfe Guthaben…</string>
     <string name="mutualclose_balance">Guthaben: <b>%1$s</b> (≈ %2$s)</string>
     <string name="mutualclose_no_channels">Die Wallet hat keine Kanäle, die für eine Schließung in Frage kommen.</string>
-    <string name="mutualclose_button">Meine Wallet leeren</string>
     <string name="mutualclose_error_chain_mismatch">Diese Adresse nutzt eine andere Blockchain</string>
     <string name="mutualclose_error_chain_reqparams">Diese Adresse verwendet nicht unterstützte Funktionen</string>
     <string name="mutualclose_error_chain_generic">Diese Adresse wird nicht unterstützt</string>
-    <string name="mutualclose_done">%1$d Kanal/Kanäle wurde(n) geschlossen. Die Details finden Sie auf dem Start-Bildschirm.</string>
+    <string name="mutualclose_done">Der Abschluss wurde eingeleitet. Die Abschlusstransaktion befindet sich in Ihrer Transaktionsliste.</string>
 
     <string name="forceclose_no_channels">Keine Kanäle, die für eine Schließung in Frage kommen.</string>
 
@@ -621,21 +617,20 @@
     <string name="payments_history_thisweek">Diese Woche</string>
     <string name="payments_history_lastweek">Letzte Woche</string>
     <string name="payments_export_title">Zahlungen exportieren</string>
-    <string name="payments_export_instructions">Exportieren Sie Ihre erfolgreichen Zahlungen im CSV-Format (comma separated value).</string>
-    <string name="payments_export_start_label">Anfangsdatum</string>
-    <string name="payments_export_end_label">Enddatum</string>
-    <string name="payments_export_context_label">Ursprung/Ziel einbeziehen</string>
-    <string name="payments_export_description_label">Beschreibung einbeziehen</string>
-    <string name="payments_export_generate_button">Exportieren</string>
-    <string name="payments_export_no_payments">Noch keine erfolgreichen Zahlungen</string>
-    <string name="payments_export_invalid_timestamps">Bitte wählen Sie ein gültiges Anfangs-/Enddatum</string>
-    <string name="payments_export_in_progress">Exportiere Zahlung #%1$d</string>
-    <string name="payments_export_success">%1$d Zahlungen erfolgreich exportiert</string>
-    <string name="payments_export_share_subject">Phoenix-Zahlungen vom %1$s bis %2$s</string>
-    <string name="payments_export_share_title">Phoenix-Zahlungen teilen…</string>
-    <string name="payments_export_share_button">Datei teilen</string>
-    <string name="payments_export_error">Export ist fehlgeschlagen.</string>
-    <string name="payments_export_no_data">Keine Zahlungen gefunden.</string>
+    <string name="payments_export_csv_instructions">Exportieren Sie Ihre erfolgreichen Zahlungen im CSV-Format (comma separated value).</string>
+    <string name="payments_export_csv_start_label">Anfangsdatum</string>
+    <string name="payments_export_csv_end_label">Enddatum</string>
+    <string name="payments_export_csv_context_label">Ursprung/Ziel einbeziehen</string>
+    <string name="payments_export_csv_description_label">Beschreibung einbeziehen</string>
+    <string name="payments_export_csv_generate_button">Exportieren</string>
+    <string name="payments_export_csv_no_payments">Noch keine erfolgreichen Zahlungen</string>
+    <string name="payments_export_csv_invalid_timestamps">Bitte wählen Sie ein gültiges Anfangs-/Enddatum</string>
+    <string name="payments_export_csv_in_progress">Exportiere Zahlung #%1$d</string>
+    <string name="payments_export_csv_share_subject">Phoenix-Zahlungen vom %1$s bis %2$s</string>
+    <string name="payments_export_csv_share_title">Phoenix-Zahlungen teilen…</string>
+    <string name="payments_export_csv_share_button">Datei teilen</string>
+    <string name="payments_export_csv_error">Export ist fehlgeschlagen.</string>
+    <string name="payments_export_csv_no_data">Keine Zahlungen gefunden.</string>
 
     <!-- components -->
 

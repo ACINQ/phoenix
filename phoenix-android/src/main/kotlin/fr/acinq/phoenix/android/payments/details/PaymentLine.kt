@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.payments.history
+package fr.acinq.phoenix.android.payments.details
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -70,7 +70,6 @@ import fr.acinq.phoenix.utils.extensions.state
 @Composable
 fun PaymentLine(
     paymentInfo: WalletPaymentInfo,
-    contactInfo: ContactInfo?,
     onPaymentClick: (UUID) -> Unit,
     isAmountRedacted: Boolean = false,
 ) {
@@ -86,7 +85,7 @@ fun PaymentLine(
         Spacer(modifier = Modifier.width(16.dp))
         Column {
             Row {
-                PaymentDescription(paymentInfo = paymentInfo, contactInfo = contactInfo, modifier = Modifier.weight(1.0f))
+                PaymentDescription(paymentInfo = paymentInfo, modifier = Modifier.weight(1.0f))
                 Spacer(modifier = Modifier.width(16.dp))
                 val hideAmount = payment.state() == WalletPaymentState.Failure || (payment is AutomaticLiquidityPurchasePayment && payment.incomingPaymentReceivedAt != null)
                 if (!hideAmount) {
@@ -109,7 +108,7 @@ fun PaymentLine(
             } else {
                 Row {
                     Text(text = payment.createdAt.toRelativeDateString(), style = MaterialTheme.typography.caption.copy(fontSize = 12.sp), maxLines = 1)
-                    PaymentContactInfo(paymentInfo = paymentInfo, contactInfo = contactInfo)
+                    PaymentContactInfo(paymentInfo = paymentInfo)
                 }
             }
         }
@@ -119,11 +118,12 @@ fun PaymentLine(
 @Composable
 private fun PaymentDescription(
     paymentInfo: WalletPaymentInfo,
-    contactInfo: ContactInfo?,
     modifier: Modifier = Modifier
 ) {
     val payment = paymentInfo.payment
+    val contactInfo = paymentInfo.contact
     val metadata = paymentInfo.metadata
+
     val peer by business.peerManager.peerState.collectAsState()
 
     val desc = when (payment.isLegacyMigration(metadata, peer)) {
@@ -233,10 +233,10 @@ private fun PaymentIconComponent(
 @Composable
 private fun PaymentContactInfo(
     paymentInfo: WalletPaymentInfo,
-    contactInfo: ContactInfo?,
 ) {
-    if (contactInfo != null) {
-        FromToNameView(isOutgoing = paymentInfo.payment is OutgoingPayment, userName = contactInfo.name)
+    val contact = paymentInfo.contact
+    if (contact != null) {
+        FromToNameView(isOutgoing = paymentInfo.payment is OutgoingPayment, userName = contact.name)
     } else {
         val lnid = paymentInfo.metadata.lnurl?.pay?.metadata?.lnid?.takeIf { it.isNotBlank() }
         if (!lnid.isNullOrBlank()) {

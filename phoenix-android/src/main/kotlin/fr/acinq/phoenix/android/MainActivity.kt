@@ -22,6 +22,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
@@ -33,7 +34,6 @@ import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.services.NodeService
 import fr.acinq.phoenix.android.utils.PhoenixAndroidTheme
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -55,8 +55,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         appViewModel.serviceState.observe(this) {
             log.debug("wallet state update=${it.name}")

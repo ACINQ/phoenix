@@ -25,6 +25,11 @@ struct DrainWalletView: MVIView {
 
 	@State var btcAddressInputResult: Result<BitcoinUri, BtcAddressInput.DetailedError> = .failure(.emptyInput)
 	
+	@State var minerFeeInfo: MinerFeeInfo? = nil
+	@State var satsPerByte: String = ""
+	@State var parsedSatsPerByte: Result<NSNumber, TextFieldNumberStylerError> = Result.failure(.emptyInput)
+	@State var mempoolRecommendedResponse: MempoolRecommendedResponse? = nil
+	
 	// <iOS_16_workarounds>
 	@State var navLinkTag: NavLinkTag? = nil
 	@State var popToDestination: PopToDestination? = nil
@@ -32,9 +37,10 @@ struct DrainWalletView: MVIView {
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
-	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
+	@EnvironmentObject var smartModalState: SmartModalState
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -44,7 +50,7 @@ struct DrainWalletView: MVIView {
 	var view: some View {
 
 		layers()
-			.navigationTitle(NSLocalizedString("Drain wallet", comment: "Navigation bar title"))
+			.navigationTitle(NSLocalizedString("Close channels", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
 				navLinkView()
@@ -62,6 +68,9 @@ struct DrainWalletView: MVIView {
 		}
 		.onAppear {
 			onAppear()
+		}
+		.task {
+			await fetchMempoolRecommendedFees()
 		}
 	}
 	
@@ -170,11 +179,11 @@ struct DrainWalletView: MVIView {
 			VStack(alignment: HorizontalAlignment.center, spacing: 5) {
 				
 				Button {
-					reviewButtonTapped()
+					prepareButtonTapped()
 				} label: {
 					HStack(alignment: VerticalAlignment.center, spacing: 5) {
-						Text("Review")
-						Image(systemName: "arrow.forward")
+						Text("Prepare Transaction")
+						Image(systemName: "hammer")
 							.imageScale(.small)
 					}
 				}
@@ -201,10 +210,11 @@ struct DrainWalletView: MVIView {
 		
 		switch tag {
 		case .ConfirmView:
-			if case .success(let bitcoinUri) = btcAddressInputResult {
+			if case .success(let bitcoinUri) = btcAddressInputResult, let minerFeeInfo {
 				DrainWalletView_Confirm(
 					mvi: mvi,
 					bitcoinAddress: bitcoinUri.address,
+					minerFeeInfo: minerFeeInfo,
 					popTo: popToWrapper
 				)
 			} else {
@@ -276,6 +286,20 @@ struct DrainWalletView: MVIView {
 	}
 	
 	// --------------------------------------------------
+	// MARK: Tasks
+	// --------------------------------------------------
+	
+	func fetchMempoolRecommendedFees() async {
+		
+		for try await response in MempoolMonitor.shared.stream() {
+			mempoolRecommendedResponse = response
+			if Task.isCancelled {
+				return
+			}
+		}
+	}
+	
+	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
 	
@@ -289,9 +313,48 @@ struct DrainWalletView: MVIView {
 		}
 	}
 	
+	func prepareButtonTapped() {
+		log.trace("prepareButtonTapped()")
+		
+		guard let model = mvi.model as? CloseChannelsConfiguration.ModelReady else {
+			return
+		}
+		
+		let channelIds = model.channels.map { $0.id }
+		let target = MinerFeeSheet.Target.simpleClose(channelIds: channelIds)
+		
+		dismissKeyboardIfVisible()
+		smartModalState.display(dismissable: true) {
+			
+			MinerFeeSheet(
+				target: target,
+				minerFeeInfo: $minerFeeInfo,
+				satsPerByte: $satsPerByte,
+				parsedSatsPerByte: $parsedSatsPerByte,
+				mempoolRecommendedResponse: $mempoolRecommendedResponse
+			)
+		} onWillDisappear: {
+			if minerFeeInfo != nil {
+				reviewButtonTapped()
+			}
+		}
+	}
+	
 	func reviewButtonTapped() {
 		log.trace("reviewButtonTapped()")
 		
 		navigateTo(.ConfirmView)
+	}
+	
+	func dismissKeyboardIfVisible() -> Void {
+		log.trace("dismissKeyboardIfVisible()")
+		
+		let keyWindow = UIApplication.shared.connectedScenes
+			.filter({ $0.activationState == .foregroundActive })
+			.map({ $0 as? UIWindowScene })
+			.compactMap({ $0 })
+			.first?.windows
+			.filter({ $0.isKeyWindow }).first
+		keyWindow?.endEditing(true)
 	}
 }

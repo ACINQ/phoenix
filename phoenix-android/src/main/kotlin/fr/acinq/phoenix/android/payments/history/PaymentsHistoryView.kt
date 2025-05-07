@@ -16,7 +16,6 @@
 
 package fr.acinq.phoenix.android.payments.history
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -42,13 +41,13 @@ import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.android.PaymentsViewModel
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.CardHeader
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.ItemCard
 import fr.acinq.phoenix.android.components.TextWithIcon
+import fr.acinq.phoenix.android.payments.details.PaymentLine
 import fr.acinq.phoenix.android.utils.logger
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
@@ -123,10 +122,7 @@ fun PaymentsHistoryView(
         }
     }
 
-    DefaultScreenLayout(
-        isScrollable = false,
-        backgroundColor = MaterialTheme.colors.background
-    ) {
+    DefaultScreenLayout(isScrollable = false,) {
         DefaultScreenHeader(
             content = {
                 Text(text = stringResource(id = R.string.payments_history_title))
@@ -181,9 +177,7 @@ fun PaymentsHistoryView(
         ) {
             groupedPayments.forEach { (header, payments) ->
                 item {
-                    Column(modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colors.background)) {
+                    Column(modifier = Modifier.fillMaxWidth()) {
                         CardHeader(
                             text = when (header) {
                                 PaymentsGroup.Today -> stringResource(id = R.string.payments_history_today)
@@ -198,7 +192,7 @@ fun PaymentsHistoryView(
                 }
                 itemsIndexed(items = payments) { index, item ->
                     ItemCard(index = index, maxItemsCount = payments.size) {
-                        PaymentLine(item, null, onPaymentClick)
+                        PaymentLine(item, onPaymentClick)
                     }
                 }
             }

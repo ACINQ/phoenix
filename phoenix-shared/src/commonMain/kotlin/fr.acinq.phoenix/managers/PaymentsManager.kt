@@ -28,7 +28,6 @@ import kotlinx.coroutines.launch
 class PaymentsManager(
     private val loggerFactory: LoggerFactory,
     private val configurationManager: AppConfigurationManager,
-    private val contactsManager: ContactsManager,
     private val databaseManager: DatabaseManager,
     private val electrumClient: ElectrumClient,
     private val nodeParamsManager: NodeParamsManager,
@@ -37,7 +36,6 @@ class PaymentsManager(
     constructor(business: PhoenixBusiness) : this(
         loggerFactory = business.loggerFactory,
         configurationManager = business.appConfigurationManager,
-        contactsManager = business.contactsManager,
         databaseManager = business.databaseManager,
         electrumClient = business.electrumClient,
         nodeParamsManager = business.nodeParamsManager,
@@ -50,13 +48,11 @@ class PaymentsManager(
     val lastCompletedPayment: StateFlow<WalletPayment?> = _lastCompletedPayment
 
     fun makePageFetcher(): PaymentsPageFetcher {
-        return PaymentsPageFetcher(loggerFactory, databaseManager, contactsManager)
+        return PaymentsPageFetcher(loggerFactory, databaseManager)
     }
 
     init {
-
         launch { monitorLastCompletedPayment() }
-
         launch { monitorUnconfirmedTransactions() }
     }
 
@@ -72,7 +68,7 @@ class PaymentsManager(
 
     /** Watches transactions that are unconfirmed, checks their confirmation status at each block, and updates relevant payments. */
     private suspend fun monitorUnconfirmedTransactions() {
-        val paymentsDb = paymentsDb()
+        val paymentsDb = databaseManager.paymentsDb()
         // We need to recheck anytime either:
         // - the list of unconfirmed txs changes
         // - a new block is mined
@@ -95,12 +91,8 @@ class PaymentsManager(
         }
     }
 
-    private suspend fun paymentsDb(): SqlitePaymentsDb {
-        return databaseManager.paymentsDb()
-    }
-
     suspend fun updateMetadata(id: UUID, userDescription: String?) {
-        paymentsDb().updateUserInfo(id = id, userDescription = userDescription, userNotes = null)
+        databaseManager.paymentsDb().updateUserInfo(id = id, userDescription = userDescription, userNotes = null)
     }
 
     /**
@@ -108,7 +100,7 @@ class PaymentsManager(
      * payment(s) that triggered that change.
      */
     suspend fun listPaymentsForTxId(txId: TxId): List<WalletPayment> {
-        return paymentsDb().listPaymentsForTxId(txId)
+        return databaseManager.paymentsDb().listPaymentsForTxId(txId)
     }
 
     /** Returns the first incoming payment related to a transaction id. Useful to find the incoming payment that triggered a liquidity purchase. */
@@ -116,16 +108,13 @@ class PaymentsManager(
         return listPaymentsForTxId(txId).filterIsInstance<IncomingPayment>().firstOrNull()
     }
 
-    suspend fun getPayment(
-        id: UUID
-    ): WalletPaymentInfo? {
-        return paymentsDb().getPayment(id)?.let {
-            val payment = it.first
-            val contact = contactsManager.contactForPayment(payment)
+    suspend fun getPayment(id: UUID): WalletPaymentInfo? {
+        val db = databaseManager.paymentsDb()
+        return db.getPayment(id)?.let {
             WalletPaymentInfo(
-                payment = payment,
+                payment = it.first,
                 metadata = it.second ?: WalletPaymentMetadata(),
-                contact = contact
+                contact = db.contacts.contactForPayment(it.first, it.second)
             )
         }
     }

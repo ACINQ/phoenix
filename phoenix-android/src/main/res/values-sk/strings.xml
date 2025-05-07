@@ -89,30 +89,23 @@
 
     <string name="receive_help_qr">QR kód faktúry/adresy</string>
 
-    <string name="receive_bitcoin_title">Bitcoin</string>
-    <string name="receive_bitcoin_help">Tento QR kód je klasická Bitcoinová adresa. \n\nDokáže ho prečítať takmer každá Bitcoinová služba/peňaženka, ale spracovanie platieb bude trvať dlhšie.</string>
     <string name="receive_bitcoin_address_label">Adresa</string>
     <string name="receive_bitcoin_generating">Synchronizácia adresy…</string>
-    <string name="receive_bitcoin_error">Nepodarilo sa vygenerovať Bitcoinovú adresu</string>
     <string name="receive_bitcoin_share_title">Bitcoinová adresa</string>
     <string name="receive_bitcoin_share_subject">Zdieľať túto Bitcoinovú adresu s…</string>
 
-    <string name="receive_lightning_title">Lightning</string>
-    <string name="receive_lightning_help">Tento QR kód je Lightningová faktúra.\n\nLightningové platby sú veľmi rýchle a obvykle lacnejšie, ale niektoré peňaženky a služby ich možno zatiaľ nepodporujú.\n\nV takom prípade prejdite doprava a získate bežnú Bitcoinovú adresu.</string>
+    <string name="receive_label_bitcoin_help">Tento QR kód je klasická Bitcoinová adresa. \n\nDokáže ho prečítať takmer každá Bitcoinová služba/peňaženka, ale spracovanie platieb bude trvať dlhšie.</string>
+    <string name="receive_label_lightning_help">Tento QR kód je Lightningová faktúra.\n\nLightningové platby sú veľmi rýchle a obvykle lacnejšie, ale niektoré peňaženky a služby ich možno zatiaľ nepodporujú.\n\nV takom prípade prejdite doprava a získate bežnú Bitcoinovú adresu.</string>
+
     <string name="receive_lightning_generating">Vytváranie…</string>
+    <string name="receive_lightning_switch_bolt11">Použite raz</string>
+    <string name="receive_lightning_switch_bolt12">Opakovane použiteľné</string>
     <string name="receive_lightning_amount_label">Suma</string>
     <string name="receive_lightning_desc_label">Popis</string>
     <string name="receive_lightning_error">Nepodarilo sa vygenerovať faktúru</string>
     <string name="receive_lightning_share_subject">Lightningová faktúra</string>
     <string name="receive_lightning_share_title">Zdieľať túto Lightningovú faktúru s…</string>
-    <string name="receive_lnurl_button">Skenovanie</string>
 
-    <string name="receive_offer_share_title">Statická Lightningová faktúra</string>
-    <string name="receive_offer_share_subject">Zdieľajte túto statickú Lightningovú faktúru s…</string>
-
-
-    <string name="receive_lightning_edit_button">Upraviť</string>
-    <string name="receive_lightning_edit_title">Upraviť faktúru</string>
     <string name="receive_lightning_edit_amount_label">Suma (voliteľné)</string>
     <string name="receive_lightning_edit_amount_placeholder">Suma na prijatie</string>
     <string name="receive_lightning_edit_desc_label">Popis (voliteľné)</string>
@@ -211,11 +204,10 @@
     <string name="mutualclose_checking_balance">Kontrolujem zostatok…</string>
     <string name="mutualclose_balance">Zostatok: <b>%1$s</b> (≈ %2$s)</string>
     <string name="mutualclose_no_channels">Peňaženka nemá žiadne kanály, ktoré by bolo možné zavrieť.</string>
-    <string name="mutualclose_button">Vyprázdniť peňaženku</string>
     <string name="mutualclose_error_chain_mismatch">Táto adresa používa iný blockchain</string>
     <string name="mutualclose_error_chain_reqparams">Táto adresa používa nepodporované funkcie</string>
     <string name="mutualclose_error_chain_generic">Táto adresa nie je podporovaná</string>
-    <string name="mutualclose_done">Počet zatvorených kanálov: %1$d. Podrobnosti nájdete na domovskej obrazovke.</string>
+    <string name="mutualclose_done">Uzatváranie bolo iniciované. Uzatváracia transakcia je vo vašom zozname transakcií.</string>
 
     <string name="forceclose_no_channels">Žiadne kanály na zatvorenie.</string>
 
@@ -438,13 +430,9 @@
     <string name="contact_add_contact_button">Pridať kontakt</string>
     <string name="contact_error_offer_invalid">Neplatný kód Bolt12</string>
     <string name="contact_error_offer_known">Faktúra už je priradená k %1$s</string>
-    <string name="contact_save_button">Uložiť</string>
-    <string name="contact_delete_button">Odstrániť</string>
 
     <string name="contact_add_title">Priradiť kontakt k ponuke BOLT12</string>
     <string name="contact_name_label">Meno</string>
-    <string name="contact_photo_label">Fotka</string>
-    <string name="contact_offer_label">Bolt12 kód</string>
 
     <string name="contact_search_name">Hľadať podľa mena</string>
     <string name="contact_none">Nenašli sa žiadne kontakty…</string>
@@ -660,21 +648,20 @@
     <string name="payments_history_thisweek">Začiatkom týždňa</string>
     <string name="payments_history_lastweek">Minulý týždeň</string>
     <string name="payments_export_title">Exportovať platby</string>
-    <string name="payments_export_instructions">Exportovať úspešné lokálne platby do formátu CSV (hodnoty oddelené čiarkou).</string>
-    <string name="payments_export_start_label">Od dátumu</string>
-    <string name="payments_export_end_label">Do dátumu</string>
-    <string name="payments_export_context_label">Zahrnúť pôvod/cieľ</string>
-    <string name="payments_export_description_label">Zahrnúť popis</string>
-    <string name="payments_export_generate_button">Exportovať</string>
-    <string name="payments_export_no_payments">Zatiaľ žiadne úspešné platby</string>
-    <string name="payments_export_invalid_timestamps">Vyberte prosím platný od/do dátum</string>
-    <string name="payments_export_in_progress">Exportuje sa platba #%1$d</string>
-    <string name="payments_export_success">%1$d úspešne exportovaných platieb</string>
-    <string name="payments_export_share_subject">Phoenix - platby od %1$s do %2$s</string>
-    <string name="payments_export_share_title">Zdieľať Phoenix platby…</string>
-    <string name="payments_export_share_button">Zdieľať súbor</string>
-    <string name="payments_export_error">Export zlyhal.</string>
-    <string name="payments_export_no_data">Nenájdené žiadne platby.</string>
+    <string name="payments_export_csv_instructions">Exportovať úspešné lokálne platby do formátu CSV (hodnoty oddelené čiarkou).</string>
+    <string name="payments_export_csv_start_label">Od dátumu</string>
+    <string name="payments_export_csv_end_label">Do dátumu</string>
+    <string name="payments_export_csv_context_label">Zahrnúť pôvod/cieľ</string>
+    <string name="payments_export_csv_description_label">Zahrnúť popis</string>
+    <string name="payments_export_csv_generate_button">Exportovať</string>
+    <string name="payments_export_csv_no_payments">Zatiaľ žiadne úspešné platby</string>
+    <string name="payments_export_csv_invalid_timestamps">Vyberte prosím platný od/do dátum</string>
+    <string name="payments_export_csv_in_progress">Exportuje sa platba #%1$d</string>
+    <string name="payments_export_csv_share_subject">Phoenix - platby od %1$s do %2$s</string>
+    <string name="payments_export_csv_share_title">Zdieľať Phoenix platby…</string>
+    <string name="payments_export_csv_share_button">Zdieľať súbor</string>
+    <string name="payments_export_csv_error">Export zlyhal.</string>
+    <string name="payments_export_csv_no_data">Nenájdené žiadne platby.</string>
 
     <!-- components -->
 

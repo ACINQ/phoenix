@@ -126,7 +126,17 @@
     <string name="restore_seed_valid_details">You can now proceed and restore your wallet</string>
     <string name="restore_seed_invalid">This seed is not valid</string>
     <string name="restore_seed_invalid_details">Make sure you entered the correct words in the right order.</string>
-    <string name="restore_import_button">Restore</string>
+
+    <string name="restore_payments_button">Import payments history</string>
+    <string name="restore_payments_button_details">Optional. Use this button to restore a payments database file from another device.</string>
+    <string name="restore_payments_success">Will restore payments history</string>
+    <string name="restore_payments_success_button">Use another file</string>
+    <string name="restore_payments_error_header">Cannot restore payments</string>
+    <string name="restore_payments_error_button">Try again</string>
+    <string name="restore_payments_error_encryption">The file cannot be decrypted. Make sure you are using a Phoenix database file (not a CSV), and that this file matches the wallet you\'re restoring.</string>
+    <string name="restore_payments_error_open">This file cannot be opened. Try again.</string>
+    <string name="restore_payments_error_writing">This file could not be written to the application\'s data folder. Try again.</string>
+    <string name="restore_import_button">Restore wallet</string>
 
     <!-- upgrade required dialog -->
 
@@ -154,21 +164,6 @@
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Inbound liquidity is insufficient for this amount, and you have disabled automated channel management.</string>
 
-    <!-- receive: offer labels -->
-
-    <string name="receive_toggle_offer_button">Show reusable QR code</string>
-
-    <string name="receive_offer_howto_intro_1">🎉 Here is your reusable payment request!</string>
-    <string name="receive_offer_howto_intro_2">Tap to learn how to use it</string>
-    <string name="receive_offer_howto_details_1">This Bolt12 payment request is the Lightning equivalent to a Bitcoin address.</string>
-    <string name="receive_offer_howto_details_2">Unlike traditional Lightning invoices, it does not expire and can be reused.</string>
-    <string name="receive_offer_howto_details_3">Share it widely : for donations, tips, or to get paid by your friends.</string>
-    <string name="receive_offer_howto_details_4_title">🛟 Who supports Bolt12?</string>
-    <string name="receive_offer_howto_details_4">For the moment, few services support Bolt12. If a service rejects this invoice, let them know they\'re missing out!</string>
-    <string name="receive_offer_howto_details_5_title">🔋 Battery restrictions</string>
-    <string name="receive_offer_howto_details_5">Check that Android does not apply a battery saving mode to Phoenix. Otherwise, you won\'t be able to receive payments if the app is closed or in the background. Enabling TOR in Phoenix will also cause issues.</string>
-    <string name="receive_offer_howto_details_faq_link">Learn more</string>
-
     <!-- receive: Tor warning -->
 
     <string name="receive_tor_warning_title">Tor is enabled</string>
@@ -183,6 +178,7 @@
     <string name="send_error_lnurl_invalid">Failed to process this LNURL link. Make sure it is valid.</string>
     <string name="send_error_lnurl_unsupported">This type of LNURL is not supported yet.</string>
     <string name="send_error_invalid_generic">This is not a supported payment request.</string>
+    <string name="send_error_bip353_connect">Unable to retrieve data for this address. You may be experiencing a connectivity issue.</string>
     <string name="send_error_bip353_name_not_found">Name \"%1$s\" is not found on \"%2$s\".</string>
     <string name="send_error_bip353_invalid_uri">This address uses an invalid Bip21 resource.</string>
     <string name="send_error_bip353_invalid_offer">This address uses an invalid Bolt12 offer.</string>
@@ -196,9 +192,11 @@
     <!-- closing channels -->
 
     <string name="mutualclose_input_label">Bitcoin address</string>
-    <string name="mutualclose_input_instructions">Send all funds to a Bitcoin wallet. All payments channels will be closed.</string>
+    <string name="mutualclose_input_instructions">Send all funds to a Bitcoin address. All payments channels will be closed.</string>
     <string name="mutualclose_confirm_title">Confirm closing</string>
     <string name="mutualclose_confirm_details">All the funds will be sent to:</string>
+    <string name="mutualclose_confirm_fee">Miner fees estimated to:</string>
+    <string name="mutualclose_confirm_fee_unknown">Fee cost could not be estimated.</string>
 
     <string name="forceclose_title">Force-close channels</string>
     <string name="forceclose_instructions">This screen allows you to unilaterally close your channels.\n\nThis is not a \"fix-everything\" magic button: it is here as a safety measure and <b>should only be used in extreme scenarios</b>. For example, if your peer (ACINQ) disappears permanently, preventing you from spending your money. In all other cases, <b>if you experience issues with Phoenix you should contact support</b>.\n\nForce closing channels will cost you money (to cover the on-chain fees) and will cause your funds to be locked for days.\n\n<b>Do not uninstall the app until your channels are fully closed, or you will lose money.</b>\n\n<b>Do not use this feature if you don\'t fully understand what it does.</b></string>
@@ -228,6 +226,9 @@
 
     <string name="inappnotif_mempool_full_message">On-chain fees are high.</string>
     <string name="inappnotif_mempool_full_action">See how Phoenix is affected</string>
+
+    <string name="inappnotif_tor_disconnected_message">Cannot access the Tor network. Phoenix will not function correctly.</string>
+    <string name="inappnotif_tor_disconnected_action">Fix it</string>
 
     <string name="inappnotif_payment_onchain_pending_title">On-chain funds pending (+%1$s)</string>
     <string name="inappnotif_payments_rejection_overview_one">An incoming payment has been recently rejected</string>
@@ -286,6 +287,14 @@
     <string name="tor_dialog_disable_details_1">If you disable this option, your IP address may be revealed to various service providers.</string>
     <string name="tor_dialog_disable_details_2">Are you sure you want to proceed ?</string>
     <string name="tor_dialog_processing">Processing changes…</string>
+
+    <string name="tor_disconnected_dialog_title">No access to the Tor network</string>
+    <string name="tor_disconnected_dialog_action">Fix it</string>
+    <string name="tor_disconnected_dialog_details_1">Phoenix needs access to Tor to function properly.</string>
+    <string name="tor_disconnected_dialog_details_2">Make sure your Tor Proxy VPN app is up and running, and that it\'s connected to Tor.</string>
+    <string name="tor_disconnected_dialog_details_3">If you don\'t have a Tor VPN app, install one. We recommend Orbot.</string>
+    <string name="tor_disconnected_dialog_open_settings">Open Tor settings</string>
+    <string name="tor_disconnected_dialog_open_orbot_page">Open Orbot page</string>
 
     <!-- about -->
 

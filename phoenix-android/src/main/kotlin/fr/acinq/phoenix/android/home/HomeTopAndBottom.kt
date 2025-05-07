@@ -293,54 +293,56 @@ fun BottomBar(
     onReceiveClick: () -> Unit,
     onSendClick: () -> Unit,
 ) {
-    Box(
-        modifier
+    Column(
+        modifier = modifier
             .fillMaxWidth()
-            .height(82.dp)
             .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
             .background(MaterialTheme.colors.surface)
     ) {
-        Row {
-            Button(
-                icon = R.drawable.ic_settings,
-                onClick = onSettingsClick,
-                iconTint = MaterialTheme.colors.onSurface,
-                padding = PaddingValues(20.dp),
-                modifier = Modifier.fillMaxHeight()
-            )
-            VSeparator(PaddingValues(top = 20.dp, bottom = 20.dp))
-            Button(
-                text = stringResource(id = R.string.menu_receive),
-                icon = R.drawable.ic_receive,
-                onClick = onReceiveClick,
-                iconTint = MaterialTheme.colors.onSurface,
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .weight(1f)
-            )
-            VSeparator(PaddingValues(top = 20.dp, bottom = 20.dp))
-            Button(
-                text = stringResource(id = R.string.menu_send),
-                icon = R.drawable.ic_scan_qr,
-                onClick = onSendClick,
-                iconTint = MaterialTheme.colors.onSurface,
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .weight(1f)
-            )
+        Box(modifier = Modifier.fillMaxWidth().height(82.dp)) {
+            Row {
+                Button(
+                    icon = R.drawable.ic_settings,
+                    onClick = onSettingsClick,
+                    iconTint = MaterialTheme.colors.onSurface,
+                    padding = PaddingValues(20.dp),
+                    modifier = Modifier.fillMaxHeight()
+                )
+                VSeparator(PaddingValues(top = 20.dp, bottom = 20.dp))
+                Button(
+                    text = stringResource(id = R.string.menu_receive),
+                    icon = R.drawable.ic_receive,
+                    onClick = onReceiveClick,
+                    iconTint = MaterialTheme.colors.onSurface,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(1f)
+                )
+                VSeparator(PaddingValues(top = 20.dp, bottom = 20.dp))
+                Button(
+                    text = stringResource(id = R.string.menu_send),
+                    icon = R.drawable.ic_scan_qr,
+                    onClick = onSendClick,
+                    iconTint = MaterialTheme.colors.onSurface,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(1f)
+                )
+            }
+            Row(
+                Modifier
+                    .padding(horizontal = 32.dp)
+                    .align(Alignment.BottomCenter)
+            ) {
+                Surface(
+                    shape = CircleShape,
+                    color = MaterialTheme.colors.primary,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(3.dp)
+                ) { }
+            }
         }
-        Row(
-            Modifier
-                .padding(horizontal = 32.dp)
-                .align(Alignment.BottomCenter)
-        ) {
-            Surface(
-                shape = CircleShape,
-                color = MaterialTheme.colors.primary,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(3.dp)
-            ) { }
-        }
+        Spacer(Modifier.height(WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()))
     }
 }

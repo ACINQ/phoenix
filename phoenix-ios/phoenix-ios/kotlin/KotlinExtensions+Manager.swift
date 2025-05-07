@@ -61,14 +61,32 @@ extension ConnectionsManager {
 	}
 }
 
-extension ContactsManager {
+extension SqliteContactsDb {
 	
 	func contactsListCurrentValue() -> [ContactInfo] {
 		return contactsList.value as? [ContactInfo] ?? []
 	}
 	
-	func contactsMapCurrentValue() -> [Lightning_kmpUUID: ContactInfo] {
-		return contactsMap.value as? [Lightning_kmpUUID: ContactInfo] ?? [:]
+	func contactsListCount() -> Int {
+		return contactsListCurrentValue().count
+	}
+}
+
+extension DatabaseManager {
+	
+	func databasesValue() -> PhoenixDatabases? {
+		return databases.value as? PhoenixDatabases
+	}
+	
+	func contactsDbValue() -> SqliteContactsDb? {
+		return databasesValue()?.payments.contacts
+	}
+}
+
+extension NodeParamsManager {
+	
+	func nodeParamsValue() -> Lightning_kmpNodeParams? {
+		return nodeParams.value as? Lightning_kmpNodeParams
 	}
 }
 

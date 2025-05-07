@@ -130,6 +130,17 @@
     <string name="restore_seed_valid_details">Bạn có thể tiếp tục và khôi phục ví của mình</string>
     <string name="restore_seed_invalid">Hạt giống không hợp lệ</string>
     <string name="restore_seed_invalid_details">Hãy đảm bảo nhập đúng từ theo đúng thứ tự.</string>
+
+    <string name="restore_payments_button">Nhập lịch sử thanh toán</string>
+    <string name="restore_payments_button_details">Tùy chọn. Sử dụng nút này để khôi phục tệp cơ sở dữ liệu thanh toán từ thiết bị khác.</string>
+    <string name="restore_payments_success">Sẽ khôi phục lịch sử thanh toán</string>
+    <string name="restore_payments_success_button">Sử dụng tệp khác</string>
+    <string name="restore_payments_error_header">Không thể khôi phục thanh toán</string>
+    <string name="restore_payments_error_button">Thử lại</string>
+    <string name="restore_payments_error_encryption">Không thể giải mã tệp. Đảm bảo bạn đang sử dụng tệp cơ sở dữ liệu Phoenix (không phải CSV) và tệp này khớp với ví bạn đang khôi phục.</string>
+    <string name="restore_payments_error_open">Không thể mở tệp này. Hãy thử lại.</string>
+    <string name="restore_payments_error_writing">Không thể ghi tệp này vào thư mục dữ liệu của ứng dụng. Hãy thử lại.</string>
+
     <string name="restore_import_button">Khôi phục</string>
 
     <!-- upgrade required dialog -->
@@ -158,21 +169,6 @@
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Tính thanh khoản đầu vào không đủ cho khoản tiền này, ngoài ra bạn đã tắt chế độ quản lý kênh tự động.</string>
 
-    <!-- receive: offer labels -->
-
-    <string name="receive_toggle_offer_button">Hiển thị mã QR có thể sử dụng lại</string>
-
-    <string name="receive_offer_howto_intro_1">🎉 Đây là mã QR có thể sử dụng lại của bạn!</string>
-    <string name="receive_offer_howto_intro_2">Nhấn để tìm hiểu cách sử dụng</string>
-    <string name="receive_offer_howto_details_1">Yêu cầu thanh toán Bolt12 này tương đương với Lightning với địa chỉ Bitcoin.</string>
-    <string name="receive_offer_howto_details_2">Không giống như hóa đơn Lightning truyền thống, nó không hết hạn và có thể được sử dụng lại.</string>
-    <string name="receive_offer_howto_details_3">Chia sẻ rộng rãi: để quyên góp, mẹo hoặc để được bạn bè trả tiền.</string>
-    <string name="receive_offer_howto_details_4_title">🛟 Ai ủng hộ Bolt12?</string>
-    <string name="receive_offer_howto_details_4">Hiện tại, rất ít dịch vụ hỗ trợ Bolt12. Nếu một dịch vụ từ chối hóa đơn này, hãy cho họ biết họ đang bỏ lỡ!</string>
-    <string name="receive_offer_howto_details_5_title">🔋 Hạn chế về pin</string>
-    <string name="receive_offer_howto_details_5">Kiểm tra xem Android có áp dụng chế độ tiết kiệm pin cho Phoenix hay không. Nếu không, bạn sẽ không thể nhận thanh toán nếu ứng dụng bị đóng hoặc chạy ở chế độ nền. Kích hoạt TOR ở Phoenix cũng sẽ gây ra sự cố.</string>
-    <string name="receive_offer_howto_details_faq_link">Tìm hiểu thêm</string>
-
     <!-- receive: Tor warning -->
 
     <string name="receive_tor_warning_title">Tor đã được bật</string>
@@ -187,6 +183,7 @@
     <string name="send_error_lnurl_invalid">Không thể xử lý liên kết LNURL này. Hãy đảm bảo liên kết này có hiệu lực.</string>
     <string name="send_error_lnurl_unsupported">Loại LNURL này chưa được hỗ trợ.</string>
     <string name="send_error_invalid_generic">Dữ liệu này sử dụng định dạng không xác định và không thể xử lý được.</string>
+    <string name="send_error_bip353_connect">Không thể truy xuất dữ liệu cho địa chỉ này. Có thể bạn đang gặp sự cố kết nối.</string>
     <string name="send_error_bip353_name_not_found">Không tìm thấy tên \"%1$s\" trên \"%2$s\".</string>
     <string name="send_error_bip353_invalid_uri">Địa chỉ này sử dụng tài nguyên Bip21 không hợp lệ.</string>
     <string name="send_error_bip353_invalid_offer">Địa chỉ này sử dụng ưu đãi Bolt12 không hợp lệ.</string>
@@ -203,6 +200,8 @@
     <string name="mutualclose_input_instructions">Gửi toàn bộ các quỹ tiền tới ví Bitcoin. Tất cả các kênh thanh toán sẽ bị đóng.</string>
     <string name="mutualclose_confirm_title">Xác nhận đóng</string>
     <string name="mutualclose_confirm_details">Toàn bộ các quỹ tiền sẽ được gửi tới:</string>
+    <string name="mutualclose_confirm_fee">Phí ước tính là:</string>
+    <string name="mutualclose_confirm_fee_unknown">Không thể ước tính chi phí phí.</string>
 
     <string name="forceclose_title">Buộc đóng các kênh</string>
     <string name="forceclose_instructions">Màn hình này cho phép bạn đơn phương đóng các kênh của mình.\n\nĐây không phải là nút thần kỳ \"sửa chữa mọi thứ\": mà chỉ là một biện pháp an toàn và <b>chỉ nên được sử dụng trong các tình huống cực đoan</b>. Ví dụ: khi máy ngang hàng của bạn (ACINQ) biến mất vĩnh viễn, khiến bạn không thể sử dụng tiền. Trong tất cả các trường hợp khác, <b>nếu bạn gặp sự cố với Phoenix, bạn nên liên hệ với bộ phận hỗ trợ</b>.\n\nViệc buộc đóng các kênh sẽ khiến bạn mất tiền (trả phí on-chain) và sẽ khiến các khoản vốn của bạn bị khóa trong nhiều ngày.\n\n<b>Không được gỡ bỏ ứng dụng cho đến khi các kênh của bạn đuợc đóng hoàn toàn, nếu không bạn sẽ mất tiền.</b>\n\n<b>Không sử dụng tính năng này nếu bạn không hiểu hết chức năng của nó.</b></string>
@@ -232,6 +231,9 @@
 
     <string name="inappnotif_mempool_full_message">Phí on-chain cao.</string>
     <string name="inappnotif_mempool_full_action">Xem những ảnh hưởng tới Phoenix.</string>
+
+    <string name="inappnotif_tor_disconnected_message">Không thể truy cập mạng Tor. Phoenix sẽ không hoạt động bình thường.</string>
+    <string name="inappnotif_tor_disconnected_action">Sửa lỗi</string>
 
     <string name="inappnotif_payment_onchain_pending_title">Các khoản vốn on-chain đang chờ xử lý (+%1$s)</string>.
     <string name="inappnotif_payments_rejection_overview_one">Một khoản tiền đến đã bị từ chối gần đây.</string>
@@ -289,6 +291,14 @@
     <string name="tor_dialog_disable_details_1">Nếu bạn vô hiệu hóa tùy chọn này, địa chỉ IP của bạn có thể bị tiết lộ cho nhiều nhà cung cấp dịch vụ khác nhau.</string>
     <string name="tor_dialog_disable_details_2">Bạn có chắc chắn muốn tiếp tục không?</string>
     <string name="tor_dialog_processing">Đang xử lý các thay đổi…</string>
+
+    <string name="tor_disconnected_dialog_title">Không thể truy cập vào mạng Tor</string>
+    <string name="tor_disconnected_dialog_action">Sửa lỗi</string>
+    <string name="tor_disconnected_dialog_details_1">Phoenix cần truy cập vào Tor để hoạt động bình thường.</string>
+    <string name="tor_disconnected_dialog_details_2">Đảm bảo ứng dụng Tor Proxy VPN của bạn đang hoạt động và được kết nối với Tor.</string>
+    <string name="tor_disconnected_dialog_details_3">Nếu bạn không có ứng dụng Tor VPN, hãy cài đặt một ứng dụng. Chúng tôi khuyên dùng Orbot.</string>
+    <string name="tor_disconnected_dialog_open_settings">Mở cài đặt Tor</string>
+    <string name="tor_disconnected_dialog_open_orbot_page">Mở trang Orbot</string>
 
     <!-- about -->
 

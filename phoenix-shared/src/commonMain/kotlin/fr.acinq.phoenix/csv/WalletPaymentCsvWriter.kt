@@ -120,6 +120,7 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
             if (configuration.includesFiat) convertToFiat(details.serviceFee, originalFiat) else "",
             details.paymentHash?.toHex() ?: "",
             if (configuration.includesOriginDestination) details.txId?.toString() ?: "" else "",
+            if (configuration.includesOriginDestination) details.destination ?: "" else "",
             if (configuration.includesDescription) listOf(
                 details.description, metadata?.userDescription, metadata?.userNotes, metadata?.lnurl?.pay?.metadata?.longDesc
             ).mapNotNull { it.takeIf { !it.isNullOrBlank() } }.joinToString("\n---\n") else "",

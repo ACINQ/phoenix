@@ -248,7 +248,8 @@ class CloudKitPaymentsDb(
                             user_notes = row.user_notes,
                             modified_at = row.modified_at,
                             original_fiat_type = row.original_fiat?.first,
-                            original_fiat_rate = row.original_fiat?.second
+                            original_fiat_rate = row.original_fiat?.second,
+                            lightning_address = row.lightning_address
                         )
                     }
                 } // </payments_metadata table>

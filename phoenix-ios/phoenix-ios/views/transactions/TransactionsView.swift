@@ -30,7 +30,7 @@ struct TransactionsView: View {
 	
 	@State var selectedItem: WalletPaymentInfo? = nil
 	
-	let contactsPublisher = Biz.business.contactsManager.contactsListPublisher()
+	let contactsPublisher = Biz.business.databaseManager.contactsListPublisher()
 	
 	let syncStatePublisher = Biz.syncManager!.syncBackupManager.statePublisher
 	@State var isDownloadingTxs: Bool = false
@@ -511,33 +511,21 @@ struct TransactionsView: View {
 	func contactsChanged(_ contacts: [ContactInfo]) {
 		log.trace("contactsChanged()")
 		
-		let contactsManager = Biz.business.contactsManager
+		guard let contactsDb = Biz.business.databaseManager.contactsDbValue() else {
+			log.warning("contactsDb is nil")
+			return
+		}
 		
 		let updatedCachedRows = cachedRows.map { row in
-			let updatedContact = contactsManager.contactForPayment(payment: row.payment)
+			let updatedContact = contactsDb.contactForPayment(payment: row.payment, metadata: row.metadata)
 			return WalletPaymentInfo(
 				payment  : row.payment,
 				metadata : row.metadata,
 				contact  : updatedContact
 			)
 		}
-		
-		let updatedPaymentsPageRows = paymentsPage.rows.map { row in
-			let updatedContact = contactsManager.contactForPayment(payment: row.payment)
-			return WalletPaymentInfo(
-				payment  : row.payment,
-				metadata : row.metadata,
-				contact  : updatedContact
-			)
-		}
-		let updatedPage = PaymentsPage(
-			offset : paymentsPage.offset,
-			count  : paymentsPage.count,
-			rows   : updatedPaymentsPageRows
-		)
 		
 		cachedRows = updatedCachedRows
-		paymentsPageChanged(updatedPage)
 	}
 	
 	func syncStateChanged(_ state: SyncBackupManager_State) {

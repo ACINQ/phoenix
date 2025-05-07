@@ -1,7 +1,10 @@
 package fr.acinq.phoenix.controllers.config
 
+import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.lightning.blockchain.fee.FeeratePerByte
+import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.*
 import fr.acinq.lightning.channel.states.*
 import fr.acinq.lightning.io.WrappedChannelCommand
@@ -13,12 +16,18 @@ import fr.acinq.phoenix.controllers.config.CloseChannelsConfiguration.Model.Chan
 import fr.acinq.phoenix.utils.Parser
 import fr.acinq.phoenix.utils.extensions.localBalance
 import fr.acinq.lightning.logging.info
+import fr.acinq.phoenix.data.BitcoinUri
+import fr.acinq.phoenix.managers.AppConfigurationManager
 import fr.acinq.phoenix.managers.phoenixFinalWallet
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class AppCloseChannelsConfigurationController(
     loggerFactory: LoggerFactory,
     private val peerManager: PeerManager,
+    private val appConfigurationManager: AppConfigurationManager,
     private val chain: Chain,
     private val isForceClose: Boolean
 ) : AppController<CloseChannelsConfiguration.Model, CloseChannelsConfiguration.Intent>(
@@ -28,6 +37,7 @@ class AppCloseChannelsConfigurationController(
     constructor(business: PhoenixBusiness, isForceClose: Boolean): this(
         loggerFactory = business.loggerFactory,
         peerManager = business.peerManager,
+        appConfigurationManager = business.appConfigurationManager,
         chain = business.chain,
         isForceClose = isForceClose
     )
@@ -105,13 +115,19 @@ class AppCloseChannelsConfigurationController(
     }
 
     override fun process(intent: CloseChannelsConfiguration.Intent) {
-        val scriptPubKey = if (intent is CloseChannelsConfiguration.Intent.MutualCloseAllChannels) {
-            try {
-                Parser.parseBip21Uri(chain, intent.address).right!!.script
-            } catch (e: Exception) {
-                throw IllegalArgumentException("Address is invalid. Caller MUST validate user input via readBitcoinAddress")
-            }
-        } else null
+        when (intent) {
+            is CloseChannelsConfiguration.Intent.MutualCloseAllChannels -> process_mutualClose(intent)
+            is CloseChannelsConfiguration.Intent.ForceCloseAllChannels -> process_forceClose(intent)
+        }
+    }
+
+    fun process_mutualClose(intent: CloseChannelsConfiguration.Intent.MutualCloseAllChannels) {
+        val scriptPubKey: ByteVector?
+        try {
+            scriptPubKey = Parser.parseBip21Uri(chain, intent.address).right!!.script
+        } catch (e: Exception) {
+            throw IllegalArgumentException("Address is invalid. Caller MUST validate user input via readBitcoinAddress")
+        }
 
         launch {
             val peer = peerManager.getPeer()
@@ -122,13 +138,30 @@ class AppCloseChannelsConfigurationController(
             closingChannelIds = closingChannelIds?.plus(filteredChannels.keys) ?: filteredChannels.keys
 
             filteredChannels.keys.forEach { channelId ->
-                val command: ChannelCommand = if (scriptPubKey != null) {
-                    logger.info { "(mutual) closing channel=${channelId.toHex()}" }
-                    ChannelCommand.Close.MutualClose(scriptPubKey = scriptPubKey, feerates = null)
-                } else {
-                    logger.info { "(force) closing channel=${channelId.toHex()}" }
-                    ChannelCommand.Close.ForceClose
-                }
+                logger.info { "(mutual) closing channel=${channelId.toHex()} with feerate=${FeeratePerByte(intent.feerate)}" }
+                val command = ChannelCommand.Close.MutualClose(
+                    replyTo = CompletableDeferred(),
+                    scriptPubKey = scriptPubKey,
+                    feerate = intent.feerate
+                )
+                val peerEvent = WrappedChannelCommand(channelId, command)
+                peer.send(peerEvent)
+            }
+        }
+    }
+
+    fun process_forceClose(intent: CloseChannelsConfiguration.Intent.ForceCloseAllChannels) {
+        launch {
+            val peer = peerManager.getPeer()
+            val filteredChannels = peer.channels.filter {
+                isClosable(it.value)
+            }
+
+            closingChannelIds = closingChannelIds?.plus(filteredChannels.keys) ?: filteredChannels.keys
+
+            filteredChannels.keys.forEach { channelId ->
+                logger.info { "(force) closing channel=${channelId.toHex()}" }
+                val command = ChannelCommand.Close.ForceClose
                 val peerEvent = WrappedChannelCommand(channelId, command)
                 peer.send(peerEvent)
             }

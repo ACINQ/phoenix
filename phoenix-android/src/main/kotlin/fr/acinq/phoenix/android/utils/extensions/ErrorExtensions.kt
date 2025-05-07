@@ -39,6 +39,7 @@ fun SendManager.ParseResult.BadRequest.toLocalisedMessage(): String {
         is SendManager.BadRequestReason.InvalidLnurl -> stringResource(R.string.send_error_lnurl_invalid)
         is SendManager.BadRequestReason.UnsupportedLnurl -> stringResource(R.string.send_error_lnurl_unsupported)
         is SendManager.BadRequestReason.UnknownFormat -> stringResource(R.string.send_error_invalid_generic)
+        is SendManager.BadRequestReason.Bip353Unresolved -> stringResource(R.string.send_error_bip353_connect, reason.domain)
         is SendManager.BadRequestReason.Bip353NameNotFound -> stringResource(id = R.string.send_error_bip353_name_not_found, reason.username, reason.domain)
         is SendManager.BadRequestReason.Bip353InvalidUri -> stringResource(id = R.string.send_error_bip353_invalid_uri)
         is SendManager.BadRequestReason.Bip353InvalidOffer -> stringResource(id = R.string.send_error_bip353_invalid_offer)

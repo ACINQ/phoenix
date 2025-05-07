@@ -86,33 +86,27 @@
 
     <string name="receive_help_qr">QR Code de l\'adresse ou de la requête de paiement</string>
 
-    <string name="receive_bitcoin_title">Bitcoin</string>
-    <string name="receive_bitcoin_help">Ce QR code représente une adresse Bitcoin classique.\n\nCelle-ci est compréhensible par presque tous les services et wallets Bitcoin, mais les paiements seront plus lents à arriver.</string>
     <string name="receive_bitcoin_address_label">Adresse</string>
-    <string name="receive_bitcoin_error">Échec de la génération de l\'adresse</string>
     <string name="receive_bitcoin_share_title">Adresse Bitcoin</string>
     <string name="receive_bitcoin_share_subject">Partagez cette adresse Bitcoin avec…</string>
 
-    <string name="receive_lightning_title">Lightning</string>
-    <string name="receive_lightning_help">Ce QR code est une requête de paiement Lightning.\n\nLes paiements Lightning sont très rapides et habituellement moins cher, mais certains wallets et services ne les comprennent pas encore.\n\nDans ce cas, passez sur l\'écran de droite pour afficher une adresse Bitcoin classique.</string>
+    <string name="receive_label_bitcoin_help">Ce QR code représente une adresse Bitcoin classique.\n\nCelle-ci est compréhensible par presque tous les services et wallets Bitcoin, mais les paiements seront plus lents à arriver.</string>
+    <string name="receive_label_lightning_help">Ce QR code est une requête de paiement Lightning.\n\nLes paiements Lightning sont très rapides et habituellement moins cher, mais certains wallets et services ne les comprennent pas encore.\n\nDans ce cas, passez sur l\'écran de droite pour afficher une adresse Bitcoin classique.</string>
+
     <string name="receive_lightning_generating">Création d\'une requête de paiement…</string>
+    <string name="receive_lightning_switch_bolt11">Usage unique</string>
+    <string name="receive_lightning_switch_bolt12">Réutilisable</string>
     <string name="receive_lightning_amount_label">Montant</string>
     <string name="receive_lightning_desc_label">Desc</string>
     <string name="receive_lightning_error">Échec de la création de la requête</string>
     <string name="receive_lightning_share_subject">Paiement Lightning</string>
     <string name="receive_lightning_share_title">Partagez cette requête de paiement Lightning avec…</string>
-    <string name="receive_lnurl_button">Scan</string>
 
-    <string name="receive_lightning_edit_button">Éditer</string>
-    <string name="receive_lightning_edit_title">Éditer une requête</string>
     <string name="receive_lightning_edit_amount_label">Montant (optionnel)</string>
     <string name="receive_lightning_edit_amount_placeholder">Montant demandé</string>
     <string name="receive_lightning_edit_desc_label">Description (optionnel)</string>
     <string name="receive_lightning_edit_desc_placeholder">Entrez une description pour cette requête</string>
     <string name="receive_lightning_edit_generate_button">Créer une requête</string>
-
-    <string name="receive_offer_share_title">Code de paiement Bolt12</string>
-    <string name="receive_offer_share_subject">Partager ce code de paiement Bolt12</string>
 
     <!-- send -->
 
@@ -207,11 +201,11 @@
     <string name="mutualclose_checking_balance">Vérification du solde…</string>
     <string name="mutualclose_balance">Solde: <b>%1$s</b> (≈ %2$s)</string>
     <string name="mutualclose_no_channels">Ce portefeuille n\'a pas de canaux éligibles à une clôture.</string>
-    <string name="mutualclose_button">Vider mon portefeuille</string>
+    <string name="mutualclose_button">Vérifier la clôture</string>
     <string name="mutualclose_error_chain_mismatch">Cette adresse utilise une blockchain différente</string>
     <string name="mutualclose_error_chain_reqparams">Cette adresse utilise des fonctionnalités non supportées</string>
     <string name="mutualclose_error_chain_generic">Cette adresse n\'est pas compatible</string>
-    <string name="mutualclose_done">%1$d canaux ont été fermés. Vous pourrez trouver le détail dans la page d\'accueil.</string>
+    <string name="mutualclose_done">La clôture a été initiée. La transaction de clôture figure dans votre liste de transactions.</string>
 
     <string name="forceclose_no_channels">Aucun canaux éligible à une clôture.</string>
 
@@ -429,15 +423,9 @@
     <string name="contact_add_contact_button">Ajouter un contact</string>
 
     <string name="contact_name_label">Nom</string>
-    <string name="contact_photo_label">Photo</string>
-    <string name="contact_offer_label">Requête de paiement Bolt12</string>
     <string name="contact_offer_key_title">Payer avec la clé de votre code Bolt12</string>
     <string name="contact_offer_key_enabled">S\'il connaît votre code de paiement Bolt12, il pourra savoir quand des paiement viennent de votre part.</string>
     <string name="contact_offer_key_disabled">Utiliser un identifiant jetable quand vous payez ce contact.</string>
-    <string name="contact_offers_list">Codes de paiement Bolt12</string>
-
-    <string name="contact_save_button">Sauver</string>
-    <string name="contact_delete_button">Supprimer</string>
 
     <string name="contact_error_offer_invalid">Code Bolt12 invalide</string>
     <string name="contact_error_offer_known">Ce code Bolt12 est déjà associée au contact %1$s</string>
@@ -658,21 +646,20 @@
     <string name="payments_history_thisweek">Plus tôt dans la semaine</string>
     <string name="payments_history_lastweek">Semaine dernière</string>
     <string name="payments_export_title">Exporter les paiements</string>
-    <string name="payments_export_instructions">Exporte vos paiements réussis dans un format CSV.</string>
-    <string name="payments_export_start_label">Date de début</string>
-    <string name="payments_export_end_label">Date de fin</string>
-    <string name="payments_export_context_label">Inclure origine et destinataire</string>
-    <string name="payments_export_description_label">Inclure la description</string>
-    <string name="payments_export_generate_button">Exporter</string>
-    <string name="payments_export_no_payments">Aucun paiement réussis</string>
-    <string name="payments_export_invalid_timestamps">Veuillez choisir une date de début/fin valide</string>
-    <string name="payments_export_in_progress">Export du paiement #%1$d</string>
-    <string name="payments_export_success">%1$d paiement(s) exportés </string>
-    <string name="payments_export_share_subject">Phoenix - paiement du %1$s au %2$s</string>
-    <string name="payments_export_share_title">Partager les paiement Phoenix…</string>
-    <string name="payments_export_share_button">Partager le fichier</string>
-    <string name="payments_export_error">Échec de l\'export.</string>
-    <string name="payments_export_no_data">Aucun paiements trouvés.</string>
+    <string name="payments_export_csv_instructions">Exporte vos paiements réussis dans un format CSV.</string>
+    <string name="payments_export_csv_start_label">Date de début</string>
+    <string name="payments_export_csv_end_label">Date de fin</string>
+    <string name="payments_export_csv_context_label">Inclure origine et destinataire</string>
+    <string name="payments_export_csv_description_label">Inclure la description</string>
+    <string name="payments_export_csv_generate_button">Exporter</string>
+    <string name="payments_export_csv_no_payments">Aucun paiement réussis</string>
+    <string name="payments_export_csv_invalid_timestamps">Veuillez choisir une date de début/fin valide</string>
+    <string name="payments_export_csv_in_progress">Export du paiement #%1$d</string>
+    <string name="payments_export_csv_share_subject">Phoenix - paiement du %1$s au %2$s</string>
+    <string name="payments_export_csv_share_title">Partager les paiement Phoenix…</string>
+    <string name="payments_export_csv_share_button">Partager le fichier</string>
+    <string name="payments_export_csv_error">Échec de l\'export.</string>
+    <string name="payments_export_csv_no_data">Aucun paiements trouvés.</string>
 
     <!-- components -->
 
