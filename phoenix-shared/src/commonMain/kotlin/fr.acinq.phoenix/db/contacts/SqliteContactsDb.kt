@@ -20,6 +20,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,6 +28,7 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.time.Duration.Companion.seconds
 
 
 class SqliteContactsDb(
@@ -174,6 +176,7 @@ class SqliteContactsDb(
             loggerFactory = loggerFactory
         )
         if (result == AfterVersion7Result.MigrationNowCompleted) {
+            delay(5.seconds)
             // We updated the database directly, which skips the SqlDelight hooks.
             // Which means things like `monitorContactsFlow()` won't get triggered.
             // So we need to manually update the contactsList.

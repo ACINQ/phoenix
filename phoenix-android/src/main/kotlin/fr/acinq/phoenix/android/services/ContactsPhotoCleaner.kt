@@ -33,6 +33,7 @@ import kotlinx.coroutines.flow.first
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 /** Clean up unused photo files for contacts. */
@@ -40,9 +41,9 @@ class ContactsPhotoCleaner(context: Context, workerParams: WorkerParameters) : C
     private val log = LoggerFactory.getLogger(this::class.java)
 
     override suspend fun doWork(): Result {
-        log.debug("starting $NAME")
+        log.info("starting $NAME")
         try {
-            delay(5.seconds)
+            delay(5.minutes)
             val application = (applicationContext as PhoenixApplication)
             val business = application.business.value
 
@@ -50,7 +51,7 @@ class ContactsPhotoCleaner(context: Context, workerParams: WorkerParameters) : C
             val contactsPhotoDir = ContactsPhotoHelper.contactsDir(applicationContext)
             val contactsPhotoNames = contactsPhotoDir.listFiles()?.map { it.name }?.toSet() ?: emptySet()
             val toDelete = contactsPhotoNames.subtract(contacts.map { it.photoUri }.toSet()).filterNotNull()
-            log.debug("deleting ${toDelete.size} unused photo file(s)")
+            log.debug("info ${toDelete.size} unused photo file(s)")
             toDelete.forEach { imageName ->
                 File(contactsPhotoDir, imageName).takeIf { it.exists() && it.isFile && it.canWrite() }?.delete()
             }

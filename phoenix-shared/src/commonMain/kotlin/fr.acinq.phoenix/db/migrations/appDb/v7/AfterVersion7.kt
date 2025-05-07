@@ -7,6 +7,7 @@ import fr.acinq.bitcoin.byteVector32
 import fr.acinq.bitcoin.utils.Try
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.logging.debug
+import fr.acinq.lightning.logging.info
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.wire.OfferTypes
@@ -322,7 +323,7 @@ fun AfterVersion7(
             break
         }
 
-        log.debug { "Migrating metadata batch of ${metadataBatch.size}..." }
+        log.info { "Migrating metadata batch of ${metadataBatch.size}..." }
         insertMetadataBatch(metadataBatch)
 
         log.debug { "Deleting metadata batch of ${metadataBatch.size}..." }
@@ -330,14 +331,14 @@ fun AfterVersion7(
     }
 
     while (true) {
-        log.debug { "Fetching contacts batch..." }
+        log.info { "Fetching contacts batch..." }
         val contactsBatch = fetchContactsBatch()
 
         if (contactsBatch.isEmpty()) {
             break
         }
 
-        log.debug { "Migrating contacts batch of ${contactsBatch.size}..." }
+        log.info { "Migrating contacts batch of ${contactsBatch.size}..." }
         insertContactsBatch(contactsBatch)
 
         log.debug { "Deleting contacts batch of ${contactsBatch.size}..." }
@@ -346,7 +347,7 @@ fun AfterVersion7(
 
     log.debug { "Dropping tables..." }
     dropTables()
-    log.debug { "Done" }
+    log.info { "Completed AppDb v7 migration" }
 
     return AfterVersion7Result.MigrationNowCompleted
 }
