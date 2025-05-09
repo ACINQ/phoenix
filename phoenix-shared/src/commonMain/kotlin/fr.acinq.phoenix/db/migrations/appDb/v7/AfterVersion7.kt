@@ -160,7 +160,7 @@ fun AfterVersion7(
 
             val batch = driver.executeQuery(
                 identifier = null,
-                sql = "SELECT * FROM contacts_old LIMIT 10;",
+                sql = "SELECT id, name, photo_uri, use_offer_key, created_at, updated_at FROM contacts_old LIMIT 10;",
                 parameters = 0,
                 mapper = { cursor ->
                     val result = buildList {

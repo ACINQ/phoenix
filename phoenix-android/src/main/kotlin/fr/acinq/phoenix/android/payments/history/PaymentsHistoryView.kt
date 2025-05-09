@@ -103,6 +103,9 @@ fun PaymentsHistoryView(
 ) {
     val log = logger("PaymentsHistory")
     val listState = rememberLazyListState()
+    LaunchedEffect(Unit) {
+        paymentsViewModel.subscribeToPayments(offset = 0, count = PaymentsViewModel.pageSize)
+    }
     val paymentsPage by paymentsViewModel.paymentsPage.collectAsState()
     val payments by paymentsViewModel.paymentsFlow.collectAsState()
 
@@ -137,62 +140,66 @@ fun PaymentsHistoryView(
             onBackClick = onBackClick,
         )
 
-        LaunchedEffect(key1 = listState) {
-            snapshotFlow { listState.layoutInfo.visibleItemsInfo.takeIf { it.isNotEmpty() }?.run { first().index to last().index } }
-                .filterNotNull()
-                .distinctUntilChanged()
-                .map { (topIndex, bottomIndex) ->
-                    val listSize = groupedPayments.entries.size + payments.size // we must take group headers into account
-                    val isFirstVisible = topIndex == 0
-                    val isLastVisible = bottomIndex + 10 >= listSize - 1
-                    val hasMorePaymentsAbove = paymentsPage.offset > 0
-                    val hasMorePaymentsBelow = paymentsPage.rows.isNotEmpty()
-                    log.debug("[$topIndex:$bottomIndex ($listSize) isFirstVisible=$isFirstVisible hasMoreAbove=$hasMorePaymentsAbove isLastVisible=$isLastVisible hasMoreBelow=$hasMorePaymentsBelow")
-                    if (hasMorePaymentsBelow && isLastVisible) {
-                        paymentsPage.offset + PaymentsViewModel.pageSize / 2
-                    } else if (hasMorePaymentsAbove && isFirstVisible) {
-                        paymentsPage.offset - PaymentsViewModel.pageSize / 2
-                    } else null
-                }
-                .filterNotNull()
-                .distinctUntilChanged()
-                .collect { offset ->
-                    paymentsViewModel.subscribeToPayments(offset, PaymentsViewModel.pageSize)
-                }
-        }
+        when {
+            groupedPayments.isEmpty() -> {
+                TextWithIcon(
+                    text = stringResource(R.string.payments_history_empty),
+                    textStyle = MaterialTheme.typography.caption,
+                    icon = R.drawable.ic_sleep,
+                    iconTint = MaterialTheme.typography.caption.color,
+                    modifier = Modifier.padding(top = 20.dp).align(Alignment.CenterHorizontally)
+                )
+            }
+            else -> {
 
-        if (groupedPayments.isEmpty()) {
-            TextWithIcon(
-                text = stringResource(R.string.payments_history_empty),
-                textStyle = MaterialTheme.typography.caption,
-                icon = R.drawable.ic_sleep,
-                iconTint = MaterialTheme.typography.caption.color,
-                modifier = Modifier.padding(top = 60.dp).align(Alignment.CenterHorizontally)
-            )
-        }
-
-        LazyColumn(
-            state = listState,
-            contentPadding = PaddingValues(bottom = 60.dp)
-        ) {
-            groupedPayments.forEach { (header, payments) ->
-                item {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        CardHeader(
-                            text = when (header) {
-                                PaymentsGroup.Today -> stringResource(id = R.string.payments_history_today)
-                                PaymentsGroup.Yesterday -> stringResource(id = R.string.payments_history_yesterday)
-                                PaymentsGroup.ThisWeek -> stringResource(id = R.string.payments_history_thisweek)
-                                PaymentsGroup.LastWeek -> stringResource(id = R.string.payments_history_lastweek)
-                                is PaymentsGroup.Other -> "${header.month.getDisplayName(TextStyle.FULL, Locale.getDefault()).uppercase()} ${header.year}"
-                            },
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
+                LaunchedEffect(key1 = listState) {
+                    snapshotFlow { listState.layoutInfo.visibleItemsInfo.takeIf { it.isNotEmpty() }?.run { first().index to last().index } }
+                        .filterNotNull()
+                        .distinctUntilChanged()
+                        .map { (topIndex, bottomIndex) ->
+                            val listSize = groupedPayments.entries.size + (payments?.size ?: 0) // we must take group headers into account
+                            val isFirstVisible = topIndex == 0
+                            val isLastVisible = bottomIndex + 10 >= listSize - 1
+                            val hasMorePaymentsAbove = paymentsPage.offset > 0
+                            val hasMorePaymentsBelow = paymentsPage.rows.isNotEmpty()
+                            log.debug("[$topIndex:$bottomIndex ($listSize) isFirstVisible=$isFirstVisible hasMoreAbove=$hasMorePaymentsAbove isLastVisible=$isLastVisible hasMoreBelow=$hasMorePaymentsBelow")
+                            if (hasMorePaymentsBelow && isLastVisible) {
+                                paymentsPage.offset + PaymentsViewModel.pageSize / 2
+                            } else if (hasMorePaymentsAbove && isFirstVisible) {
+                                paymentsPage.offset - PaymentsViewModel.pageSize / 2
+                            } else null
+                        }
+                        .filterNotNull()
+                        .distinctUntilChanged()
+                        .collect { offset ->
+                            paymentsViewModel.subscribeToPayments(offset, PaymentsViewModel.pageSize)
+                        }
                 }
-                itemsIndexed(items = payments) { index, item ->
-                    ItemCard(index = index, maxItemsCount = payments.size) {
-                        PaymentLine(item, onPaymentClick)
+
+                LazyColumn(
+                    state = listState,
+                    contentPadding = PaddingValues(bottom = 60.dp)
+                ) {
+                    groupedPayments.forEach { (header, payments) ->
+                        item {
+                            Column(modifier = Modifier.fillMaxWidth()) {
+                                CardHeader(
+                                    text = when (header) {
+                                        PaymentsGroup.Today -> stringResource(id = R.string.payments_history_today)
+                                        PaymentsGroup.Yesterday -> stringResource(id = R.string.payments_history_yesterday)
+                                        PaymentsGroup.ThisWeek -> stringResource(id = R.string.payments_history_thisweek)
+                                        PaymentsGroup.LastWeek -> stringResource(id = R.string.payments_history_lastweek)
+                                        is PaymentsGroup.Other -> "${header.month.getDisplayName(TextStyle.FULL, Locale.getDefault()).uppercase()} ${header.year}"
+                                    },
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
+                        }
+                        itemsIndexed(/*key = { _, item -> item.id.toString() },*/ items = payments) { index, item ->
+                            ItemCard(index = index, maxItemsCount = payments.size) {
+                                PaymentLine(item, onPaymentClick)
+                            }
+                        }
                     }
                 }
             }
