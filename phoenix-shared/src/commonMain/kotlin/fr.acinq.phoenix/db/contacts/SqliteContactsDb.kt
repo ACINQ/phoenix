@@ -24,6 +24,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -45,7 +46,7 @@ class SqliteContactsDb(
     val contactsList = _contactsList.asStateFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val contactsMap = _contactsList.mapLatest { list ->
+    val contactsMap = contactsList.mapLatest { list ->
         list.associateBy { it.id }
     }.stateIn(
         scope = this,
@@ -54,7 +55,7 @@ class SqliteContactsDb(
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val offerMap = _contactsList.mapLatest { list ->
+    val offerMap = contactsList.mapLatest { list ->
         list.flatMap { contact ->
             contact.offers.map { it.id to contact.id }
         }.toMap()
@@ -65,7 +66,7 @@ class SqliteContactsDb(
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val publicKeyMap = _contactsList.mapLatest { list ->
+    val publicKeyMap = contactsList.mapLatest { list ->
         list.flatMap { contact ->
             contact.publicKeys.map { it to contact.id }
         }.toMap()
@@ -76,7 +77,7 @@ class SqliteContactsDb(
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val addressMap = _contactsList.mapLatest { list ->
+    val addressMap = contactsList.mapLatest { list ->
         list.flatMap { contact ->
             contact.addresses.map { it.id to contact.id }
         }.toMap()

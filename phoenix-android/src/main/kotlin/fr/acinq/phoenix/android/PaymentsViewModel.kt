@@ -40,11 +40,14 @@ class PaymentsViewModel(
 ) : ViewModel() {
 
     companion object {
-        const val pageSize = 40
+        const val pageSize = 60
         const val paymentsCountInHome = 10
     }
 
     private val log = LoggerFactory.getLogger(this::class.java)
+
+    private val paymentsPageFetcher: PaymentsPageFetcher = paymentsManager.makePageFetcher()
+    val paymentsPage = paymentsPageFetcher.paymentsPage
 
     private val _paymentsFlow = MutableStateFlow<Map<UUID, WalletPaymentInfo>>(HashMap())
     val paymentsFlow: StateFlow<Map<UUID, WalletPaymentInfo>> = _paymentsFlow.asStateFlow()
@@ -56,9 +59,6 @@ class PaymentsViewModel(
         initialValue = emptyList(),
     )
 
-    private val paymentsPageFetcher: PaymentsPageFetcher = paymentsManager.makePageFetcher()
-    val paymentsPage = paymentsPageFetcher.paymentsPage
-
     init {
         paymentsPageFetcher.subscribeToAll(offset = 0, count = pageSize)
         homePageFetcher.subscribeToAll(offset = 0, count = paymentsCountInHome)
@@ -67,8 +67,32 @@ class PaymentsViewModel(
         viewModelScope.launch(CoroutineExceptionHandler { _, e ->
             log.error("error when collecting payments-page items: ", e)
         }) {
-            paymentsPageFetcher.paymentsPage.collect { page ->
-                _paymentsFlow.value += page.rows.associateBy { it.payment.id }
+            monitorPaymentsPage()
+        }
+    }
+
+    private suspend fun monitorPaymentsPage() {
+        paymentsPageFetcher.paymentsPage.collect { page ->
+            val existingPayments = paymentsFlow.value
+            when {
+                existingPayments.isEmpty() -> {
+                    _paymentsFlow.value = page.rows.associateBy { it.payment.id }
+                }
+                page.offset == 0 -> {
+                    // we are refreshing the first page with what may be new payments; these payments must be put on top of the map.
+                    var newPayments = existingPayments.toMutableMap()
+                    page.rows.forEach { row ->
+                        when {
+                            newPayments.containsKey(row.id) -> newPayments[row.id] = row
+                            row.payment.run { completedAt ?: createdAt } > newPayments.values.first().payment.run { completedAt ?: createdAt } -> newPayments = (mapOf(row.payment.id to row) + newPayments).toMutableMap()
+                            else -> newPayments = (newPayments + (row.payment.id to row)).toMutableMap()
+                        }
+                    }
+                    _paymentsFlow.value = newPayments
+                }
+                else -> {
+                    _paymentsFlow.value += page.rows.associateBy { it.payment.id }
+                }
             }
         }
     }
