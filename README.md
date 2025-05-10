@@ -4,7 +4,7 @@
 
 ![Phoenix Logo](.readme/phoenix_text.png)
 
-Phoenix is a Bitcoin wallet developed by [ACINQ](https://acinq.co), that allows you to send and receive bitcoins securely over the Lightning Network. It is self-custodial, which means that **you hold the keys** of the wallet. It provides a simple and clean UX. Thanks to native Lightning support, payments are faster and cheaper.
+Phoenix is a Bitcoin wallet developed by [ACINQ](https://acinq.co), that allows you to send and receive bitcoin securely over the Lightning Network. It is self-custodial, which means that **you hold the keys** of the wallet. It provides a simple and clean UX. Thanks to native Lightning support, payments are faster and cheaper.
 
 ---
 
