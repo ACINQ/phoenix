@@ -19,8 +19,6 @@ package fr.acinq.phoenix.db
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.db.SqlDriver
-import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.logging.LoggerFactory
@@ -28,7 +26,6 @@ import fr.acinq.lightning.logging.error
 import fr.acinq.lightning.utils.*
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.data.ContactAddress
-import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.db.contacts.SqliteContactsDb
@@ -135,8 +132,7 @@ class SqlitePaymentsDb(
     fun listPaymentsAsFlow(count: Long, skip: Long): Flow<List<WalletPaymentInfo>> {
         return combine(
             database.paymentsQueries.list(limit = count, offset = skip, mapper = ::mapPaymentsAndMetadata).asFlow().mapToList(Dispatchers.Default),
-            contacts.contactsMap,
-            contacts.offerMap, contacts.publicKeyMap, contacts.addressMap,
+            contacts.indexesFlow,
             transform = ::combinePaymentAndContact
         )
     }
@@ -144,8 +140,7 @@ class SqlitePaymentsDb(
     fun listOutgoingInFlightPaymentsAsFlow(count: Long, skip: Long): Flow<List<WalletPaymentInfo>> {
         return combine(
             database.paymentsQueries.listInFlight(limit = count, offset = skip, mapper = ::mapPaymentsAndMetadata).asFlow().mapToList(Dispatchers.Default),
-            contacts.contactsMap,
-            contacts.offerMap, contacts.publicKeyMap, contacts.addressMap,
+            contacts.indexesFlow,
             transform = ::combinePaymentAndContact
         )
     }
@@ -154,8 +149,7 @@ class SqlitePaymentsDb(
     fun listRecentPaymentsAsFlow(count: Long, skip: Long, sinceDate: Long): Flow<List<WalletPaymentInfo>> {
         return combine(
             database.paymentsQueries.listRecent(min_ts = sinceDate, limit = count, offset = skip, mapper = ::mapPaymentsAndMetadata).asFlow().mapToList(Dispatchers.Default),
-            contacts.contactsMap,
-            contacts.offerMap, contacts.publicKeyMap, contacts.addressMap,
+            contacts.indexesFlow,
             transform = ::combinePaymentAndContact
         )
     }
@@ -167,16 +161,16 @@ class SqlitePaymentsDb(
         }
     }
 
-    private fun combinePaymentAndContact(paymentInfoList: List<WalletPaymentInfo>, contactsMap: Map<UUID, ContactInfo>, offersMap: Map<ByteVector32, UUID>, pubkeyMap: Map<PublicKey, UUID>, addressesMap: Map<ByteVector32, UUID>): List<WalletPaymentInfo> = paymentInfoList.map { paymentInfo ->
+    private fun combinePaymentAndContact(paymentInfoList: List<WalletPaymentInfo>, indexes: SqliteContactsDb.ContactIndexes): List<WalletPaymentInfo> = paymentInfoList.map { paymentInfo ->
         val payment = paymentInfo.payment
         val metadata = paymentInfo.metadata
         val contactId: UUID? = when (payment) {
-            is Bolt12IncomingPayment -> payment.incomingOfferMetadata()?.let { pubkeyMap[it.payerKey] }
-            is LightningOutgoingPayment -> payment.outgoingInvoiceRequest()?.let { offersMap[it.offer.offerId] }
-            else -> metadata.lightningAddress?.let { addressesMap[ContactAddress.hash(it)] }
+            is Bolt12IncomingPayment -> payment.incomingOfferMetadata()?.let { indexes.publicKeysMap[it.payerKey] }
+            is LightningOutgoingPayment -> payment.outgoingInvoiceRequest()?.let { indexes.offersMap[it.offer.offerId] }
+            else -> metadata.lightningAddress?.let { indexes.addressesMap[ContactAddress.hash(it)] }
         }
 
-        contactId?.let { contactsMap[it] }?.let {
+        contactId?.let { indexes.contactsMap[it] }?.let {
             paymentInfo.copy(contact = it)
         } ?: paymentInfo
     }

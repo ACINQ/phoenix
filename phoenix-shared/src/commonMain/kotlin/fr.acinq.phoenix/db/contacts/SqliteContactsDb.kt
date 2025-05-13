@@ -24,7 +24,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -45,46 +44,31 @@ class SqliteContactsDb(
     private val _contactsList = MutableStateFlow<List<ContactInfo>>(emptyList())
     val contactsList = _contactsList.asStateFlow()
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val contactsMap = contactsList.mapLatest { list ->
-        list.associateBy { it.id }
-    }.stateIn(
-        scope = this,
-        started = SharingStarted.Eagerly,
-        initialValue = mapOf()
+    data class ContactIndexes(
+        val contactsMap: Map<UUID, ContactInfo>,
+        val offersMap: Map<ByteVector32, UUID>,
+        val publicKeysMap: Map<PublicKey, UUID>,
+        val addressesMap: Map<ByteVector32, UUID>,
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val offerMap = contactsList.mapLatest { list ->
-        list.flatMap { contact ->
-            contact.offers.map { it.id to contact.id }
-        }.toMap()
+    val indexesFlow = contactsList.mapLatest { list ->
+        ContactIndexes(
+            contactsMap = list.associateBy { it.id },
+            offersMap = list.flatMap { contact ->
+                contact.offers.map { it.id to contact.id }
+            }.toMap(),
+            publicKeysMap = list.flatMap { contact ->
+                contact.publicKeys.map { it to contact.id }
+            }.toMap(),
+            addressesMap = list.flatMap { contact ->
+                contact.addresses.map { it.id to contact.id }
+            }.toMap()
+        )
     }.stateIn(
         scope = this,
         started = SharingStarted.Eagerly,
-        initialValue = mapOf()
-    )
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val publicKeyMap = contactsList.mapLatest { list ->
-        list.flatMap { contact ->
-            contact.publicKeys.map { it to contact.id }
-        }.toMap()
-    }.stateIn(
-        scope = this,
-        started = SharingStarted.Eagerly,
-        initialValue = mapOf()
-    )
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val addressMap = contactsList.mapLatest { list ->
-        list.flatMap { contact ->
-            contact.addresses.map { it.id to contact.id }
-        }.toMap()
-    }.stateIn(
-        scope = this,
-        started = SharingStarted.Eagerly,
-        initialValue = mapOf()
+        initialValue = ContactIndexes(emptyMap(), emptyMap(), emptyMap(), emptyMap())
     )
 
     init {
@@ -130,7 +114,7 @@ class SqliteContactsDb(
     }
 
     private fun contactForId(contactId: UUID): ContactInfo? {
-        return contactsMap.value[contactId]
+        return indexesFlow.value.contactsMap[contactId]
     }
 
     private fun contactForOfferId(offerId: ByteVector32): ContactInfo? {
@@ -140,15 +124,15 @@ class SqliteContactsDb(
     }
 
     private fun contactIdForOfferId(offerId: ByteVector32): UUID? {
-        return offerMap.value[offerId]
+        return indexesFlow.value.offersMap[offerId]
     }
 
     private fun contactIdForPayerPubKey(payerPubKey: PublicKey): UUID? {
-        return publicKeyMap.value[payerPubKey]
+        return indexesFlow.value.publicKeysMap[payerPubKey]
     }
 
     private fun contactIdForLightningAddress(address: String): UUID? {
-        return addressMap.value[ContactAddress.hash(address)]
+        return indexesFlow.value.addressesMap[ContactAddress.hash(address)]
     }
 
     private fun contactIdForPayment(payment: WalletPayment, metadata: WalletPaymentMetadata?): UUID? {
