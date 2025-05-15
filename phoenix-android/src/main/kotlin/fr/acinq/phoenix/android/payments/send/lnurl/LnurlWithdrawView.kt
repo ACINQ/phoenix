@@ -60,6 +60,8 @@ fun LnurlWithdrawView(
     val vm = viewModel<LnurlWithdrawViewModel>(factory = LnurlWithdrawViewModel.Factory(business.sendManager))
     val withdrawState = vm.state.value
 
+    val isAmountDisabled = remember(withdraw, withdrawState) { withdraw.minWithdrawable == withdraw.maxWithdrawable || withdrawState is LnurlWithdrawViewState.SendingInvoice }
+
     SplashLayout(
         header = { DefaultScreenHeader(onBackClick = onBackClick) },
         topContent = {
@@ -82,7 +84,7 @@ fun LnurlWithdrawView(
                 },
                 validationErrorMessage = amountErrorMessage,
                 inputTextSize = 42.sp,
-                enabled = withdraw.minWithdrawable != withdraw.maxWithdrawable && withdrawState is LnurlWithdrawViewState.SendingInvoice,
+                enabled = !isAmountDisabled,
             )
         }
     ) {
