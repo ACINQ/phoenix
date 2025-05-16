@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.components.screenlock
+package fr.acinq.phoenix.android.components.auth.pincode
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row

@@ -17,21 +17,21 @@
 package fr.acinq.phoenix.android.payments.send.liquidity
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -60,15 +60,15 @@ import fr.acinq.phoenix.android.components.AmountView
 import fr.acinq.phoenix.android.components.AmountWithFiatBelow
 import fr.acinq.phoenix.android.components.BackButtonWithBalance
 import fr.acinq.phoenix.android.components.BorderButton
-import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Checkbox
-import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.dialogs.IconPopup
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.SatoshiSlider
 import fr.acinq.phoenix.android.components.SplashLabelRow
 import fr.acinq.phoenix.android.components.SplashLayout
+import fr.acinq.phoenix.android.components.TransparentFilledButton
+import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
 import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.components.enableOrFade
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
@@ -77,6 +77,7 @@ import fr.acinq.phoenix.android.components.feedback.SuccessMessage
 import fr.acinq.phoenix.android.payments.send.spliceout.spliceFailureDetails
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
+import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.android.utils.orange
 
 object LiquidityLimits {
@@ -329,26 +330,36 @@ private fun ReviewLiquidityRequest(
         ModalBottomSheet(
             onDismiss = { showSheet = false },
             skipPartiallyExpanded = true,
+            internalPadding = PaddingValues(12.dp),
+            containerColor = MaterialTheme.colors.background,
         ) {
-            Text(text = annotatedStringResource(id = R.string.liquidityads_disclaimer_body1))
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = stringResource(id = R.string.liquidityads_disclaimer_body2))
-            Spacer(modifier = Modifier.height(8.dp))
-            Checkbox(text = stringResource(id = R.string.utils_ack), checked = confirmLiquidity, onCheckedChange = { confirmLiquidity = it })
+            Column(
+                modifier = Modifier.background(color = MaterialTheme.colors.surface, shape = RoundedCornerShape(24.dp)).padding(16.dp)
+            ) {
+                Text(text = annotatedStringResource(id = R.string.liquidityads_disclaimer_body1))
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = stringResource(id = R.string.liquidityads_disclaimer_body2))
+                Spacer(modifier = Modifier.height(16.dp))
+                Surface(color = mutedBgColor, shape = RoundedCornerShape(12.dp)) {
+                    Checkbox(text = stringResource(id = R.string.utils_ack), checked = confirmLiquidity, onCheckedChange = { confirmLiquidity = it }, padding = PaddingValues(16.dp), modifier = Modifier.fillMaxWidth())
+                }
 
-            Spacer(modifier = Modifier.height(24.dp))
-            FilledButton(
-                text = stringResource(id = R.string.btn_confirm),
-                icon = R.drawable.ic_check,
-                onClick = onConfirm,
-                enabled = confirmLiquidity,
-                modifier = Modifier.align(Alignment.End),
-            )
-            Button(
+                Spacer(modifier = Modifier.height(24.dp))
+                SmartSpendButton(
+                    text = stringResource(id = R.string.btn_confirm),
+                    icon = R.drawable.ic_check,
+                    onSpend = onConfirm,
+                    shape = RoundedCornerShape(12.dp),
+                    enabled = confirmLiquidity,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            TransparentFilledButton(
                 text = stringResource(id = R.string.btn_cancel),
+                icon = R.drawable.ic_cross,
                 onClick = { showSheet = false },
-                shape = CircleShape,
-                modifier = Modifier.align(Alignment.End),
+                modifier = Modifier.fillMaxWidth(),
             )
         }
     }
