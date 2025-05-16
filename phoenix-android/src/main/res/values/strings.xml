@@ -160,6 +160,7 @@
     <string name="send_trampoline_amountless_warning_details">The invoice for this payment does not request a specific amount. This may be exploited by malicious nodes during the payment.\n\nTo be safe, <b>ask the recipient to specify an amount</b> when generating the invoice.</string>
     <string name="send_connecting_button">Waiting for channels…</string>
     <string name="send_pay_button">Pay</string>
+    <string name="send_confirm_pay_button">Confirm &amp; Pay</string>
     <string name="send_pay_retry_button">Try again</string>
 
     <string name="send_offer_payer_note_label">Message</string>
@@ -568,9 +569,9 @@
 
     <!-- settings: access control -->
 
-    <string name="accessctrl_title">Application access</string>
+    <string name="accessctrl_title">Access control</string>
 
-    <string name="accessctrl_auth_error_header">Screen lock cannot be enabled</string>
+    <string name="accessctrl_auth_error_header">System screen lock unavailable</string>
     <string name="accessctrl_auth_error_no_hw">No suitable authentication hardware on this device.</string>
     <string name="accessctrl_auth_error_hw_unavailable">The biometric hardware is not available. Try again later.</string>
     <string name="accessctrl_auth_error_none_enrolled">Please enroll a PIN/Schema/Fingerprint in Android first.</string>
@@ -583,12 +584,15 @@
     <string name="accessctrl_auth_error_too_old">This version of Android is not compatible.</string>
     <string name="accessctrl_auth_error_unhandled">Unhandled error code: %1$d</string>
 
-    <string name="accessctrl_biometric_lock_switch_label">System Screen Lock</string>
-    <string name="accessctrl_biometric_lock_switch_desc">Access to the app is controlled with the Android\'s system Screen Lock/Fingerprint</string>
-    <string name="accessctrl_pin_lock_switch_label">Custom PIN</string>
-    <string name="accessctrl_pin_lock_switch_desc">Access to the app is controlled with a 6-digits PIN code specific to Phoenix</string>
+    <string name="accessctrl_screenlock_biometrics_label">System authentication</string>
+    <string name="accessctrl_screenlock_biometrics_desc">To open the app, you must pass the Android\'s system credentials</string>
+    <string name="accessctrl_screenlock_pin_label">Lock PIN</string>
+    <string name="accessctrl_screenlock_pin_desc">Enter a PIN code to be able to open the app</string>
 
-    <string name="accessctrl_autolock_title">Lock timeout</string>
+    <string name="accessctrl_spendlock_pin_label">Spending PIN</string>
+    <string name="accessctrl_spendlock_pin_desc">Enter a PIN code to be able to spend funds</string>
+
+    <string name="accessctrl_autolock_label">Lock timeout</string>
     <string name="accessctrl_autolock_desc">After %1$s minute(s) of inactivity</string>
     <string name="accessctrl_autolock_desc_never">Never</string>
 

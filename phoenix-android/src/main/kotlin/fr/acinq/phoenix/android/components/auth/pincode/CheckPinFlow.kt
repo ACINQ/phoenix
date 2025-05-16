@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 ACINQ SAS
+ * Copyright 2025 ACINQ SAS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.components.screenlock
+package fr.acinq.phoenix.android.components.auth.pincode
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.android.R
+
 
 @Composable
 fun CheckPinFlow(
     onCancel: () -> Unit,
     onPinValid: () -> Unit,
+    vm: CheckPinViewModel,
 ) {
     val context = LocalContext.current
-    val vm = viewModel<CheckPinFlowViewModel>(factory = CheckPinFlowViewModel.Factory)
+    val isUIFrozen = vm.state !is CheckPinState.CanType
 
-    val isUIFrozen = vm.state !is CheckPinFlowState.CanType
+    LaunchedEffect(Unit) { vm.evaluateLockState() }
 
     BasePinDialog(
-        onDismiss = {
-            onCancel()
-        },
+        onDismiss = onCancel,
         initialPin = vm.pinInput,
         onPinSubmit = {
             vm.pinInput = it
@@ -43,22 +43,22 @@ fun CheckPinFlow(
         },
         stateLabel = {
             when(val state = vm.state) {
-                is CheckPinFlowState.Init, is CheckPinFlowState.CanType -> {
+                is CheckPinState.Init, is CheckPinState.CanType -> {
                     PinDialogTitle(text = stringResource(id = R.string.pincode_check_title))
                 }
-                is CheckPinFlowState.Locked -> {
+                is CheckPinState.Locked -> {
                     PinDialogTitle(text = stringResource(id = R.string.pincode_locked_label, state.timeToWait.toString()), icon = R.drawable.ic_clock)
                 }
-                is CheckPinFlowState.Checking -> {
+                is CheckPinState.Checking -> {
                     PinDialogTitle(text = stringResource(id = R.string.pincode_checking_label))
                 }
-                is CheckPinFlowState.MalformedInput -> {
+                is CheckPinState.MalformedInput -> {
                     PinDialogError(text = stringResource(id = R.string.pincode_error_malformed))
                 }
-                is CheckPinFlowState.IncorrectPin -> {
+                is CheckPinState.IncorrectPin -> {
                     PinDialogError(text = stringResource(id = R.string.pincode_failure_label))
                 }
-                is CheckPinFlowState.Error -> {
+                is CheckPinState.Error -> {
                     PinDialogError(text = stringResource(id = R.string.pincode_error_generic))
                 }
             }

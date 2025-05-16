@@ -45,10 +45,10 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.BorderButton
 import fr.acinq.phoenix.android.components.FeerateSlider
-import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.SplashLabelRow
 import fr.acinq.phoenix.android.components.TextWithIcon
+import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.payments.send.spliceout.spliceFailureDetails
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
@@ -112,11 +112,11 @@ fun CpfpView(
                 Text("Effective feerate: ${state.actualFeerate}", style = MaterialTheme.typography.body1.copy(fontSize = 14.sp), textAlign = TextAlign.Center)
                 Spacer(modifier = Modifier.height(24.dp))
 
-                FilledButton(
-                    text = if (!mayDoPayments) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.cpfp_execute_button),
+                SmartSpendButton(
+                    text = stringResource(id = R.string.cpfp_execute_button),
                     icon = R.drawable.ic_check,
                     enabled = mayDoPayments,
-                    onClick = { vm.executeCpfp(channelId, state.actualFeerate) }
+                    onSpend = { vm.executeCpfp(channelId, state.actualFeerate) }
                 )
             }
             is CpfpState.Executing -> {

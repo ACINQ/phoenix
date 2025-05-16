@@ -52,6 +52,7 @@ import fr.acinq.phoenix.android.components.SplashClickableContent
 import fr.acinq.phoenix.android.components.SplashLabelRow
 import fr.acinq.phoenix.android.components.SplashLayout
 import fr.acinq.phoenix.android.components.TextInput
+import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.fiatRate
 import fr.acinq.phoenix.android.preferredAmountUnit
@@ -182,16 +183,14 @@ fun LnurlPayView(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
-                val mayDoPayments by business.peerManager.mayDoPayments.collectAsState()
-                FilledButton(
-                    text = if (!mayDoPayments) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.lnurl_pay_pay_button),
-                    icon = R.drawable.ic_send,
-                    enabled = mayDoPayments && amount != null && amountErrorMessage.isBlank() && trampolineFees != null,
-                ) {
-                    safeLet(trampolineFees, amount) { fees, amt ->
-                        vm.requestAndPayInvoice(pay, amt, fees, comment?.takeIf { it.isNotBlank() }, onPaymentSent)
+                SmartSpendButton(
+                    enabled = amount != null && amountErrorMessage.isBlank() && trampolineFees != null,
+                    onSpend = {
+                        safeLet(trampolineFees, amount) { fees, amt ->
+                            vm.requestAndPayInvoice(pay, amt, fees, comment?.takeIf { it.isNotBlank() }, onPaymentSent)
+                        }
                     }
-                }
+                )
             }
             is LnurlPayViewState.RequestingInvoice -> {
                 ProgressView(text = stringResource(id = R.string.lnurl_pay_requesting_invoice))

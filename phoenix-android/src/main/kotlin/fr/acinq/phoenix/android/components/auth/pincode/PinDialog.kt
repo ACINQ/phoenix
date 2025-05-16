@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 ACINQ SAS
+ * Copyright 2025 ACINQ SAS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.components.screenlock
+package fr.acinq.phoenix.android.components.auth.pincode
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -40,7 +41,7 @@ import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
-import fr.acinq.phoenix.android.components.screenlock.PinDialog.PIN_LENGTH
+import fr.acinq.phoenix.android.components.auth.pincode.PinDialog.PIN_LENGTH
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
 
@@ -52,13 +53,13 @@ internal fun BasePinDialog(
     enabled: Boolean,
     initialPin: String = "",
 ) {
-
     var pinValue by remember(initialPin) { mutableStateOf(initialPin) }
 
     ModalBottomSheet(
         onDismiss = onDismiss,
         skipPartiallyExpanded = true,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        internalPadding = PaddingValues(0.dp),
     ) {
         Spacer(modifier = Modifier.height(12.dp))
         stateLabel()
