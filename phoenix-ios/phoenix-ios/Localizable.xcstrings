@@ -943,6 +943,9 @@
         }
       }
     },
+    "(wait a few seconds and then retry)" : {
+
+    },
     "**disabled**: sent payments will be anonymous" : {
       "localizations" : {
         "ar" : {
@@ -5600,6 +5603,9 @@
           }
         }
       }
+    },
+    "Amount required for card payment" : {
+
     },
     "Amount sent (fees included)" : {
       "localizations" : {
@@ -10528,6 +10534,9 @@
           }
         }
       }
+    },
+    "Communicating with card reader." : {
+
     },
     "completed at" : {
       "comment" : "Label in DetailsView_IncomingPayment",
@@ -15976,6 +15985,9 @@
         }
       }
     },
+    "Ending communication with card reader." : {
+
+    },
     "Enter a valid amount" : {
       "comment" : "error message",
       "localizations" : {
@@ -19529,6 +19541,9 @@
         }
       }
     },
+    "Hold your device near the reader." : {
+
+    },
     "Home screen" : {
       "comment" : "Navigation bar title",
       "localizations" : {
@@ -19609,6 +19624,15 @@
           }
         }
       }
+    },
+    "Host card emulation not available.\nLimited to European Economic Area." : {
+
+    },
+    "Host card emulation not available.\nRequires iOS 17.4 or later." : {
+
+    },
+    "Host card emulation session error\n%@" : {
+
     },
     "Host returned error response." : {
       "localizations" : {
@@ -26875,6 +26899,12 @@
           }
         }
       }
+    },
+    "nfc" : {
+      "comment" : "button label - try to make it short"
+    },
+    "NFC capabilities not available on this device" : {
+
     },
     "No" : {
       "extractionState" : "manual",
@@ -40504,6 +40534,7 @@
       }
     },
     "This appears to be a website (not a lightning invoice):" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -40542,6 +40573,9 @@
           }
         }
       }
+    },
+    "This appears to be a website:" : {
+
     },
     "This doesn't appear to be a Lightning invoice" : {
       "comment" : "Error message - scanning lightning invoice",
