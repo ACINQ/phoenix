@@ -412,8 +412,19 @@
     <string name="accessctrl_auth_error_too_old">Esta versión de Android no es compatible.</string>
     <string name="accessctrl_auth_error_unhandled">Código de error no controlado: %1$d</string>
 
-    <string name="accessctrl_biometric_lock_switch_label">Bloqueo de pantalla del sistema</string>
-    <string name="accessctrl_biometric_lock_switch_desc">Bloquea el acceso a la aplicación con el bloqueo de pantalla o la huella dactilar de Android.</string>
+    <string name="accessctrl_screenlock_header">Acceso a la aplicación</string>
+    <string name="accessctrl_screenlock_biometrics_label">Autenticación del sistema</string>
+    <string name="accessctrl_screenlock_biometrics_desc">Asegura el acceso a la aplicación con las credenciales del usuario de Android</string>
+    <string name="accessctrl_screenlock_pin_label">Screen lock PIN</string>
+    <string name="accessctrl_screenlock_pin_desc">Asegura el acceso a la aplicación con un código PIN de 6 dígitos</string>
+
+    <string name="accessctrl_autolock_label">Tiempo de espera de bloqueo</string>
+    <string name="accessctrl_autolock_desc">Después de %1$s minutos de inactividad</string>
+    <string name="accessctrl_autolock_desc_never">Nunca</string>
+
+    <string name="accessctrl_spendlock_header">Enviando pagos</string>
+    <string name="accessctrl_spendlock_pin_label">Spending PIN</string>
+    <string name="accessctrl_spendlock_pin_desc">Si está habilitado, se requiere un código PIN para gastar fondos de la billetera.</string>
 
     <!-- lnurl-auth -->
 
@@ -692,5 +703,23 @@
 
     <string name="reset_wallet_success">La billetera se restableció correctamente</string>
     <string name="reset_wallet_failure_title">Error de restablecimiento</string>
+
+    <!-- Diálogo de código PIN -->
+
+    <string name="pincode_check_screenlock_title">Ingrese el PIN para abrir la aplicación</string>
+    <string name="pincode_check_spending_payment_title">Ingrese el PIN para pagar</string>
+    <string name="pincode_check_spending_displayseed_title">Ingrese el PIN para ver la semilla</string>]
+    <string name="pincode_check_disabling_title">Ingrese el PIN para continuar</string>]
+    <string name="pincode_new_screenlock_title">Crea el código PIN para acceder a la aplicación</string>
+    <string name="pincode_new_spending_title">Crear PIN de pago</string>
+    <string name="pincode_confirm_title">Confirmar nuevo PIN</string>
+
+    <string name="pincode_checking_label">Consulta de PIN…</string>
+    <string name="pincode_failure_label">Inválido</string>
+    <string name="pincode_locked_label">Bloqueado por %1$s</string>
+
+    <string name="pincode_error_generic">Se ha producido un error</string>
+    <string name="pincode_error_confirm_do_not_match">¡El PIN no coincide!</string>
+    <string name="pincode_error_write">Error al guardar el PIN</string>
 
 </resources>

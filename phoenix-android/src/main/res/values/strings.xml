@@ -584,17 +584,19 @@
     <string name="accessctrl_auth_error_too_old">This version of Android is not compatible.</string>
     <string name="accessctrl_auth_error_unhandled">Unhandled error code: %1$d</string>
 
+    <string name="accessctrl_screenlock_header">Accessing the application</string>
     <string name="accessctrl_screenlock_biometrics_label">System authentication</string>
-    <string name="accessctrl_screenlock_biometrics_desc">To open the app, you must pass the Android\'s system credentials</string>
-    <string name="accessctrl_screenlock_pin_label">Lock PIN</string>
-    <string name="accessctrl_screenlock_pin_desc">Enter a PIN code to be able to open the app</string>
-
-    <string name="accessctrl_spendlock_pin_label">Spending PIN</string>
-    <string name="accessctrl_spendlock_pin_desc">Enter a PIN code to be able to spend funds</string>
+    <string name="accessctrl_screenlock_biometrics_desc">Secures app entry behind the Android user credentials</string>
+    <string name="accessctrl_screenlock_pin_label">Screen lock PIN</string>
+    <string name="accessctrl_screenlock_pin_desc">Secures app entry behind a 6-digits PIN code</string>
 
     <string name="accessctrl_autolock_label">Lock timeout</string>
     <string name="accessctrl_autolock_desc">After %1$s minute(s) of inactivity</string>
     <string name="accessctrl_autolock_desc_never">Never</string>
+
+    <string name="accessctrl_spendlock_header">Sending payments</string>
+    <string name="accessctrl_spendlock_pin_label">Spending PIN</string>
+    <string name="accessctrl_spendlock_pin_desc">If enabled, a PIN code is required to spend funds from the wallet.</string>
 
     <!-- lnurl-auth -->
 
@@ -956,12 +958,15 @@
 
     <!-- PIN code dialog -->
 
-    <string name="pincode_check_title">Enter PIN</string>
-    <string name="pincode_new_title">Enter new PIN</string>
-    <string name="pincode_confirm_title">Confirm new PIN</string>
+    <string name="pincode_check_screenlock_title">Enter PIN to open the wallet</string>
+    <string name="pincode_check_spending_payment_title">Enter PIN for payment</string>
+    <string name="pincode_check_spending_displayseed_title">Enter PIN to view the seed</string>]
+    <string name="pincode_check_disabling_title">Enter PIN to continue</string>
+    <string name="pincode_new_screenlock_title">Create screen lock PIN</string>
+    <string name="pincode_new_spending_title">Create spending PIN</string>
+    <string name="pincode_confirm_title">Confirm PIN</string>
 
     <string name="pincode_checking_label">Checking PIN…</string>
-    <string name="pincode_success_label">Authenticated</string>
     <string name="pincode_failure_label">Incorrect</string>
     <string name="pincode_locked_label">Locked for %1$s</string>
 

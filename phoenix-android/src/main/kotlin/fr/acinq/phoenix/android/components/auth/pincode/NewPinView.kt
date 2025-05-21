@@ -31,23 +31,26 @@ fun NewPinFlow(
     onCancel: () -> Unit,
     onDone: () -> Unit,
     vm: NewPinViewModel,
+    prompt: @Composable () -> Unit,
 ) {
     val context = LocalContext.current
+    val onDismiss = {
+        vm.reset()
+        onCancel()
+    }
     when (val state = vm.state) {
         is NewPinState.EnterNewPin -> {
             EnterNewPinDialog(
                 state = state,
-                onDismiss = onCancel,
-                onPinEntered = { vm.moveToConfirmPin(it) }
+                onDismiss = onDismiss,
+                onPinEntered = { vm.moveToConfirmPin(it) },
+                prompt = prompt,
             )
         }
         is NewPinState.ConfirmNewPin -> {
             ConfirmNewPinDialog(
                 state = state,
-                onDismiss = {
-                    vm.reset()
-                    onCancel()
-                },
+                onDismiss = onDismiss,
                 onPinConfirmed = {
                     vm.checkAndSavePin(
                         context = context,
@@ -69,18 +72,16 @@ private fun EnterNewPinDialog(
     state: NewPinState.EnterNewPin,
     onDismiss: () -> Unit,
     onPinEntered: (String) -> Unit,
+    prompt: @Composable () -> Unit,
 ) {
     BasePinDialog(
         onDismiss = onDismiss,
         onPinSubmit = onPinEntered,
-        stateLabel = {
-            when (state) {
-                is NewPinState.EnterNewPin.Init, is NewPinState.EnterNewPin.Frozen.Validating -> {
-                    PinDialogTitle(text = stringResource(id = R.string.pincode_new_title))
-                }
-                is NewPinState.EnterNewPin.Frozen.InvalidPin -> {
-                    PinDialogError(text = stringResource(id = R.string.pincode_error_malformed))
-                }
+        prompt = prompt,
+        stateLabel = when (state) {
+            is NewPinState.EnterNewPin.Init, is NewPinState.EnterNewPin.Frozen.Validating -> null
+            is NewPinState.EnterNewPin.Frozen.InvalidPin -> {
+                { PinStateError(text = stringResource(id = R.string.pincode_error_malformed)) }
             }
         },
         enabled = state is NewPinState.EnterNewPin.Init
@@ -94,29 +95,30 @@ private fun ConfirmNewPinDialog(
     onPinConfirmed: (String) -> Unit,
 ) {
     var pin by remember { mutableStateOf("") }
+
+    if (state is NewPinState.ConfirmNewPin.Init) {
+        LaunchedEffect(key1 = Unit) {
+            pin = ""
+        }
+    }
+
     BasePinDialog(
         onDismiss = onDismiss,
         onPinSubmit = {
             pin = it
             onPinConfirmed(it)
         },
-        stateLabel = {
-            when (state) {
-                is NewPinState.ConfirmNewPin.Init -> {
-                    PinDialogTitle(text = stringResource(id = R.string.pincode_confirm_title))
-                    LaunchedEffect(key1 = Unit) {
-                        pin = ""
-                    }
-                }
-                is NewPinState.ConfirmNewPin.Frozen.PinsDoNoMatch -> {
-                    PinDialogError(text = stringResource(id = R.string.pincode_error_confirm_do_not_match))
-                }
-                is NewPinState.ConfirmNewPin.Frozen.Writing -> {
-                    PinDialogTitle(text = stringResource(id = R.string.pincode_checking_label))
-                }
-                is NewPinState.ConfirmNewPin.Frozen.CannotWriteToDisk -> {
-                    PinDialogError(text = stringResource(id = R.string.pincode_error_write))
-                }
+        prompt = { PinDialogTitle(text = stringResource(id = R.string.pincode_confirm_title)) },
+        stateLabel = when (state) {
+            is NewPinState.ConfirmNewPin.Init -> null
+            is NewPinState.ConfirmNewPin.Frozen.PinsDoNoMatch -> {
+                { PinStateError(text = stringResource(id = R.string.pincode_error_confirm_do_not_match)) }
+            }
+            is NewPinState.ConfirmNewPin.Frozen.Writing -> {
+                { PinStateMessage(text = stringResource(id = R.string.pincode_checking_label)) }
+            }
+            is NewPinState.ConfirmNewPin.Frozen.CannotWriteToDisk -> {
+                { PinStateError(text = stringResource(id = R.string.pincode_error_write)) }
             }
         },
         initialPin = pin,

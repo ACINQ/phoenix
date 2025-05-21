@@ -28,6 +28,7 @@ fun CheckPinFlow(
     onCancel: () -> Unit,
     onPinValid: () -> Unit,
     vm: CheckPinViewModel,
+    prompt: @Composable () -> Unit,
 ) {
     val context = LocalContext.current
     val isUIFrozen = vm.state !is CheckPinState.CanType
@@ -41,26 +42,23 @@ fun CheckPinFlow(
             vm.pinInput = it
             vm.checkPinAndSaveOutcome(context, it, onPinValid)
         },
-        stateLabel = {
-            when(val state = vm.state) {
-                is CheckPinState.Init, is CheckPinState.CanType -> {
-                    PinDialogTitle(text = stringResource(id = R.string.pincode_check_title))
-                }
-                is CheckPinState.Locked -> {
-                    PinDialogTitle(text = stringResource(id = R.string.pincode_locked_label, state.timeToWait.toString()), icon = R.drawable.ic_clock)
-                }
-                is CheckPinState.Checking -> {
-                    PinDialogTitle(text = stringResource(id = R.string.pincode_checking_label))
-                }
-                is CheckPinState.MalformedInput -> {
-                    PinDialogError(text = stringResource(id = R.string.pincode_error_malformed))
-                }
-                is CheckPinState.IncorrectPin -> {
-                    PinDialogError(text = stringResource(id = R.string.pincode_failure_label))
-                }
-                is CheckPinState.Error -> {
-                    PinDialogError(text = stringResource(id = R.string.pincode_error_generic))
-                }
+        prompt = prompt,
+        stateLabel = when(val state = vm.state) {
+            is CheckPinState.Init, is CheckPinState.CanType -> null
+            is CheckPinState.Locked -> {
+                { PinStateMessage(text = stringResource(id = R.string.pincode_locked_label, state.timeToWait.toString()), icon = R.drawable.ic_clock) }
+            }
+            is CheckPinState.Checking -> {
+                { PinStateMessage(text = stringResource(id = R.string.pincode_checking_label)) }
+            }
+            is CheckPinState.MalformedInput -> {
+                { PinStateError(text = stringResource(id = R.string.pincode_error_malformed)) }
+            }
+            is CheckPinState.IncorrectPin -> {
+                { PinStateError(text = stringResource(id = R.string.pincode_failure_label)) }
+            }
+            is CheckPinState.Error -> {
+                { PinStateError(text = stringResource(id = R.string.pincode_error_generic)) }
             }
         },
         enabled = !isUIFrozen,

@@ -34,6 +34,7 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.ProgressView
+import fr.acinq.phoenix.android.components.auth.pincode.PinDialogTitle
 import fr.acinq.phoenix.android.components.auth.spendinglock.CheckSpendingPinFlow
 import fr.acinq.phoenix.android.userPrefs
 import kotlinx.coroutines.launch
@@ -51,7 +52,8 @@ fun SmartSpendButton(
     text: String = stringResource(R.string.send_pay_button),
     icon: Int = R.drawable.ic_send,
     shape: Shape = CircleShape,
-    ignoreChannelsState: Boolean = false
+    ignoreChannelsState: Boolean = false,
+    prompt: @Composable () -> Unit = { PinDialogTitle(text = stringResource(id = R.string.pincode_check_spending_payment_title)) }
 ) {
     val scope = rememberCoroutineScope()
     val needPinCodeToPayFlow = userPrefs.getIsSpendingPinEnabled.collectAsState(null)
@@ -60,7 +62,11 @@ fun SmartSpendButton(
 
     var showSendingPinCheck by remember { mutableStateOf(false) }
     if (showSendingPinCheck) {
-        CheckSpendingPinFlow(onCancel = { showSendingPinCheck = false }, onPinValid = { scope.launch { onSpend() } })
+        CheckSpendingPinFlow(
+            onCancel = { showSendingPinCheck = false },
+            onPinValid = { scope.launch { onSpend() } },
+            prompt = prompt
+        )
     }
 
     when {

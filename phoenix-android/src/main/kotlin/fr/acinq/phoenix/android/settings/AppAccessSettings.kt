@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.AppViewModel
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.auth.pincode.PinDialogTitle
 import fr.acinq.phoenix.android.components.auth.screenlock.CheckScreenLockPinFlow
 import fr.acinq.phoenix.android.components.auth.screenlock.NewScreenLockPinFlow
 import fr.acinq.phoenix.android.components.auth.spendinglock.CheckSpendingPinFlow
@@ -64,7 +65,7 @@ fun AppAccessSettings(
     DefaultScreenLayout {
         DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.accessctrl_title))
 
-        CardHeader(text = "Opening the app")
+        CardHeader(text = stringResource(R.string.accessctrl_screenlock_header))
         Card {
             isBiometricLockEnabled?.let {
                 if (biometricAuthStatus == BiometricManager.BIOMETRIC_SUCCESS) {
@@ -94,7 +95,7 @@ fun AppAccessSettings(
             }
         }
 
-        CardHeader(text = "Spending control")
+        CardHeader(text = stringResource(R.string.accessctrl_spendlock_header))
         Card {
             SpendLockCustomPinView()
         }
@@ -217,7 +218,8 @@ private fun ScreenLockCustomPinView(
                     isInDisablingCustomPinFlow = false
                 }
                 Toast.makeText(context, "Pin disabled", Toast.LENGTH_SHORT).show()
-            }
+            },
+            prompt = { PinDialogTitle(text = stringResource(id = R.string.pincode_check_disabling_title)) }
         )
     }
 
@@ -273,7 +275,7 @@ private fun SpendLockCustomPinView() {
                     userPrefs.saveIsSpendLockPinEnabled(true)
                     isNewPinFlow = false
                 }
-                Toast.makeText(context, "Spending PIN code saved!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Spending PIN saved!", Toast.LENGTH_SHORT).show()
             }
         )
     }
@@ -287,7 +289,8 @@ private fun SpendLockCustomPinView() {
                     isDisablingPinFlow = false
                 }
                 Toast.makeText(context, "Spending PIN disabled", Toast.LENGTH_SHORT).show()
-            }
+            },
+            prompt = { PinDialogTitle(text = stringResource(id = R.string.pincode_check_disabling_title)) }
         )
     }
 

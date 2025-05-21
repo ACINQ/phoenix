@@ -423,8 +423,19 @@
     <string name="accessctrl_auth_error_too_old">Diese Android-Version ist nicht kompatibel.</string>
     <string name="accessctrl_auth_error_unhandled">Unbehandelter Fehlercode: %1$d</string>
 
-    <string name="accessctrl_biometric_lock_switch_label">System-Bildschirmsperre</string>
-    <string name="accessctrl_biometric_lock_switch_desc">Sperren Sie den Zugriff auf die App mit der Android-Bildschirmsperre/Fingerabdruck</string>
+    <string name="accessctrl_screenlock_header">Öffnen der Applikation</string>
+    <string name="accessctrl_screenlock_biometrics_label">System-Authentifizierung</string>
+    <string name="accessctrl_screenlock_biometrics_desc">Sichert die App-Eingabe mit den Anmeldedaten des Android-Benutzers</string>
+    <string name="accessctrl_screenlock_pin_label">Screen lock PIN</string>
+    <string name="accessctrl_screenlock_pin_desc">Sichert die App-Eingabe mit einem 6-stelligen PIN-Code</string>
+
+    <string name="accessctrl_autolock_label">Sperrzeit</string>
+    <string name="accessctrl_autolock_desc">Nach %1$s Minute(n) der Inaktivität</string>
+    <string name="accessctrl_autolock_desc_never">Niemals</string>
+
+    <string name="accessctrl_spendlock_header">Senden von Zahlungen</string>
+    <string name="accessctrl_spendlock_pin_label">Spending PIN</string>
+    <string name="accessctrl_spendlock_pin_desc">Wenn diese Option aktiviert ist, ist zum Ausgeben von Guthaben aus dem Wallet ein PIN-Code erforderlich.</string>
 
     <!-- lnurl-auth -->
 
@@ -744,5 +755,23 @@
     <string name="swapin_signer_invalid_tx_header">Ungültige Transaktion ohne Vorzeichen</string>
     <string name="swapin_signer_invalid_tx_details">Prüfe, ob die Eingabe vollständig ist und kein Zeichen fehlt.</string>
     <string name="swapin_signer_error_header">Eingabe fehlgeschlagen</string>
+
+    <!-- PIN-Code-Dialog -->
+
+    <string name="pincode_check_screenlock_title">Geben Sie die PIN ein, um die App zu öffnen</string>
+    <string name="pincode_check_spending_payment_title">Geben Sie die PIN zum Bezahlen ein</string>
+    <string name="pincode_check_spending_displayseed_title">Geben Sie den PIN-Code ein, um den Seed anzuzeigen</string>]
+    <string name="pincode_check_disabling_title">Geben Sie die PIN ein, um fortzufahren</string>]
+    <string name="pincode_new_screenlock_title">Erstellen Sie den PIN-Code für den Zugriff auf die App</string>
+    <string name="pincode_new_spending_title">Erstellen Sie den PIN-Code für Zahlungen</string>
+    <string name="pincode_confirm_title">Bestätigen Sie die neue PIN</string>
+
+    <string name="pincode_checking_label">PIN-Überprüfung…</string>
+    <string name="pincode_failure_label">Ungültig</string>
+    <string name="pincode_locked_label">Gesperrt für %1$s</string>
+
+    <string name="pincode_error_generic">Ein Fehler ist aufgetreten</string>
+    <string name="pincode_error_confirm_do_not_match">PIN stimmt nicht überein!</string>
+    <string name="pincode_error_write">Fehler beim Speichern der PIN</string>
 
 </resources>

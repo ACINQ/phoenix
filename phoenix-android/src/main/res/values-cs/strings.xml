@@ -411,8 +411,19 @@
     <string name="accessctrl_auth_error_too_old">Tato verze systému Android není kompatibilní.</string>
     <string name="accessctrl_auth_error_unhandled">Neošetřená chyba: %1$d</string>
 
-    <string name="accessctrl_biometric_lock_switch_label">Zámek obrazovky systému</string>
-    <string name="accessctrl_biometric_lock_switch_desc">Zamknout přístup k aplikaci pomocí zámku obrazoky/otisku prstu</string>
+    <string name="accessctrl_screenlock_header">Přístup k aplikacím</string>
+    <string name="accessctrl_screenlock_biometrics_label">Ověřování systému</string>
+    <string name="accessctrl_screenlock_biometrics_desc">Zabezpečuje přístup k aplikaci pomocí uživatelského účtu Android.</string>
+    <string name="accessctrl_screenlock_pin_label">Screen lock PIN</string>
+    <string name="accessctrl_screenlock_pin_desc">Zabezpečuje přístup k aplikaci pomocí 6místného PIN kódu specifického pro Phoenix.</string>
+
+    <string name="accessctrl_autolock_label">Časový limit uzamčení</string>
+    <string name="accessctrl_autolock_desc">Po %1$s minutách nečinnosti</string>
+    <string name="accessctrl_autolock_desc_never">Nikdy</string>
+
+    <string name="accessctrl_spendlock_header">Odesílání finančních prostředků</string>
+    <string name="accessctrl_spendlock_pin_label">Spending PIN</string>
+    <string name="accessctrl_spendlock_pin_desc">Pokud je tato možnost povolena, je pro utrácení finančních prostředků z Phoenixu vyžadován PIN.</string>
 
     <!-- lnurl-auth -->
 
@@ -733,5 +744,24 @@
     <string name="bip353_claim_button">Vyžádat si mou adresu</string>
     <string name="bip353_claiming">Nárokování adresy…</string>
     <string name="bip353_error">Vyžádání adresy selhalo</string>
+
+    <!-- PIN code dialog -->
+
+    <string name="pincode_check_screenlock_title">Zadejte PIN pro otevření peněženky</string>
+    <string name="pincode_check_spending_payment_title">Zadejte PIN pro platbu</string>
+    <string name="pincode_check_spending_displayseed_title">Zadejte PIN pro zobrazení seed kódu</string>]
+    <string name="pincode_check_disabling_title">Zadejte PIN pro pokračování</string>
+    <string name="pincode_new_screenlock_title">Vytvořit PIN pro přístup k aplikaci</string>
+    <string name="pincode_new_spending_title">Vytvořit PIN pro odesílání plateb</string>
+    <string name="pincode_confirm_title">Potvrdit PIN</string>
+
+    <string name="pincode_checking_label">Kontrola PINu…</string>
+    <string name="pincode_failure_label">Nesprávný</string>
+    <string name="pincode_locked_label">Uzamčeno pro %1$s</string>
+
+    <string name="pincode_error_generic">Chyba došlo</string>
+    <string name="pincode_error_malformed">Chybný PIN</string>
+    <string name="pincode_error_confirm_do_not_match">PIN se neshoduje!</string>
+    <string name="pincode_error_write">Chyba při ukládání PINu</string>
 
 </resources>
