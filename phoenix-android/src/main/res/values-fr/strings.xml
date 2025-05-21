@@ -447,14 +447,19 @@
     <string name="accessctrl_auth_error_too_old">Cette version d\'Android est incompatible.</string>
     <string name="accessctrl_auth_error_unhandled">Code d\'erreur non géré : %1$d</string>
 
-    <string name="accessctrl_screenlock_biometrics_label">Verrouillage écran système</string>
-    <string name="accessctrl_screenlock_biometrics_desc">Contrôle l\'accès à l\'application via le système de verrouillage système d\'Android.</string>
-    <string name="accessctrl_screenlock_pin_label">PIN Personnalisé</string>
-    <string name="accessctrl_screenlock_pin_desc">Contrôle l\'accès à l\'application via un code PIN à 6 chiffres spécifique à Phoenix.</string>
+    <string name="accessctrl_screenlock_header">Accéder à l\'application</string>
+    <string name="accessctrl_screenlock_biometrics_label">Authentification système</string>
+    <string name="accessctrl_screenlock_biometrics_desc">Sécurise l\'accès à l\'application avec le compte utilisateur Android.</string>
+    <string name="accessctrl_screenlock_pin_label">Screen lock PIN</string>
+    <string name="accessctrl_screenlock_pin_desc">Sécurise l\'accès à l\'application avec un code PIN à 6 chiffres spécifique à Phoenix.</string>
 
     <string name="accessctrl_autolock_label">Délai de verrouillage</string>
     <string name="accessctrl_autolock_desc">Après %1$s minute(s) d\'inactivité</string>
     <string name="accessctrl_autolock_desc_never">Jamais</string>
+
+    <string name="accessctrl_spendlock_header">Envoyer des fonds</string>
+    <string name="accessctrl_spendlock_pin_label">Spending PIN</string>
+    <string name="accessctrl_spendlock_pin_desc">Si cette option est activée, un code PIN est nécessaire pour dépenser des fonds depuis Phoenix.</string>
 
     <!-- lnurl-auth -->
 
@@ -792,17 +797,20 @@
 
     <!-- PIN code dialog -->
 
-    <string name="pincode_check_title">Saisir le PIN</string>
-    <string name="pincode_new_title">Saisir un nouveau PIN</string>
+    <string name="pincode_check_screenlock_title">Entrer le code PIN pour ouvrir l\'appli</string>
+    <string name="pincode_check_spending_payment_title">Entrer le code PIN pour payer</string>
+    <string name="pincode_check_spending_displayseed_title">Entrer le code PIN pour voir la seed</string>]
+    <string name="pincode_check_disabling_title">Entrer le code PIN pour poursuivre</string>]
+    <string name="pincode_new_screenlock_title">Créer le code PIN d\'accès à l\'appli</string>
+    <string name="pincode_new_spending_title">Créer le code PIN de paiement</string>
     <string name="pincode_confirm_title">Confirmer le nouveau PIN</string>
 
     <string name="pincode_checking_label">Vérification du PIN…</string>
-    <string name="pincode_success_label">Authentifié</string>
-    <string name="pincode_failure_label">Incorrect</string>
-    <string name="pincode_locked_label">Bloqué pendant %1$s</string>
+    <string name="pincode_failure_label">Non valide</string>
+    <string name="pincode_locked_label">Verrouillé pour %1$s</string>
 
     <string name="pincode_error_generic">Une erreur est survenue</string>
     <string name="pincode_error_confirm_do_not_match">PIN non correspondant !</string>
-    <string name="pincode_error_write">Erreur lors de l\'enregistrement du PIN</string>
+    <string name="pincode_error_write">Erreur lors de la sauvegarde du PIN</string>
 
 </resources>

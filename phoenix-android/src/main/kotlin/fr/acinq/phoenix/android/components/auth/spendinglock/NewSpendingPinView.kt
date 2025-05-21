@@ -17,13 +17,19 @@
 package fr.acinq.phoenix.android.components.auth.spendinglock
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.auth.pincode.NewPinFlow
+import fr.acinq.phoenix.android.components.auth.pincode.PinDialogTitle
 
 @Composable
 fun NewSpendingPinFlow(
     onCancel: () -> Unit,
     onDone: () -> Unit
 ) {
-    NewPinFlow(onCancel = onCancel, onDone = onDone, vm = viewModel<NewSpendingPinViewModel>(factory = NewSpendingPinViewModel.Factory))
+    val vm = viewModel<NewSpendingPinViewModel>(factory = NewSpendingPinViewModel.Factory)
+    NewPinFlow(onCancel = onCancel, onDone = onDone, vm = vm, prompt = {
+        PinDialogTitle(text = stringResource(id = R.string.pincode_new_spending_title))
+    })
 }

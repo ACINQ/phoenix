@@ -23,7 +23,9 @@ import fr.acinq.phoenix.android.components.auth.pincode.CheckPinFlow
 @Composable
 fun CheckSpendingPinFlow(
     onCancel: () -> Unit,
-    onPinValid: () -> Unit
+    onPinValid: () -> Unit,
+    prompt: @Composable () -> Unit,
 ) {
-    CheckPinFlow(onCancel = onCancel, onPinValid = onPinValid, vm = viewModel<CheckSpendingPinViewModel>(factory = CheckSpendingPinViewModel.Factory))
+    val vm = viewModel<CheckSpendingPinViewModel>(factory = CheckSpendingPinViewModel.Factory)
+    CheckPinFlow(onCancel = onCancel, onPinValid = onPinValid, vm = vm, prompt = prompt)
 }
