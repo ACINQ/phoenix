@@ -20,11 +20,13 @@ actor SyncBackupManager_Actor {
 	private var isEnabled: Bool
 	private var needsCreateRecordZone: Bool
 	private var needsDeleteRecordZone: Bool
-	private var needsDownloadPayments = false
-	private var needsDownloadContacts = false
+	private var needsDownloadPayments: Bool
+	private var needsDownloadContacts: Bool
+	private var needsDownloadCards: Bool
 	
 	private var paymentsQueueCount: Int = 0
 	private var contactsQueueCount: Int = 0
+	private var cardsQueueCount: Int = 0
 	
 	private var state: SyncBackupManager_State
 	private var pendingSettings: SyncBackupManager_PendingSettings? = nil
@@ -37,18 +39,21 @@ actor SyncBackupManager_Actor {
 		isEnabled: Bool,
 		recordZoneCreated: Bool,
 		hasDownloadedPayments: Bool,
-		hasDownloadedContacts: Bool
+		hasDownloadedContacts: Bool,
+		hasDownloadedCards: Bool
 	) {
 		self.isEnabled = isEnabled
 		if isEnabled {
 			needsCreateRecordZone = !recordZoneCreated
 			needsDownloadPayments = !hasDownloadedPayments
 			needsDownloadContacts = !hasDownloadedContacts
+			needsDownloadCards = !hasDownloadedCards
 			needsDeleteRecordZone = false
 		} else {
 			needsCreateRecordZone = false
 			needsDownloadPayments = false
 			needsDownloadContacts = false
+			needsDownloadCards = false
 			needsDeleteRecordZone = recordZoneCreated
 		}
 		
@@ -186,6 +191,34 @@ actor SyncBackupManager_Actor {
 		}
 	}
 	
+	func cardsQueueCountChanged(
+		_ count: Int,
+		wait: SyncBackupManager_State_Waiting?
+	) -> SyncBackupManager_State? {
+		
+		log.trace("cardsQueueCountChanged(\(count))")
+		
+		cardsQueueCount = count
+		guard count > 0 else {
+			return nil
+		}
+		switch state {
+			case .uploading(let details):
+				details.setCards_totalCount(count)
+				return nil
+			case .synced:
+				if let wait = wait {
+					log.debug("state = waiting(randomizedUploadDelay)")
+					state = .waiting(details: wait)
+					return state
+				} else {
+					return simplifiedStateFlow()
+				}
+			default:
+				return nil
+		}
+	}
+	
 	func didCreateRecordZone() -> SyncBackupManager_State? {
 		log.trace("didCreateRecordZone()")
 		
@@ -224,7 +257,7 @@ actor SyncBackupManager_Actor {
 		log.trace("didDownloadPayments()")
 		
 		needsDownloadPayments = false
-		if needsDownloadContacts {
+		if needsDownloadContacts || needsDownloadCards {
 			return nil
 		} else {
 			switch state {
@@ -240,7 +273,23 @@ actor SyncBackupManager_Actor {
 		log.trace("didDownloadContacts()")
 		
 		needsDownloadContacts = false
-		if needsDownloadPayments {
+		if needsDownloadPayments || needsDownloadCards {
+			return nil
+		} else {
+			switch state {
+				case .downloading:
+					return simplifiedStateFlow()
+				default:
+					return nil
+			}
+		}
+	}
+	
+	func didDownloadCards() -> SyncBackupManager_State? {
+		log.trace("didDownloadCards()")
+		
+		needsDownloadCards = false
+		if needsDownloadPayments || needsDownloadContacts {
 			return nil
 		} else {
 			switch state {
@@ -367,6 +416,7 @@ actor SyncBackupManager_Actor {
 				needsCreateRecordZone = true
 				needsDownloadPayments = true
 				needsDownloadContacts = true
+				needsDownloadCards = true
 				needsDeleteRecordZone = false
 				
 				switch state {
@@ -402,6 +452,7 @@ actor SyncBackupManager_Actor {
 				needsCreateRecordZone = false
 				needsDownloadPayments = false
 				needsDownloadContacts = false
+				needsDownloadCards = false
 				needsDeleteRecordZone = true
 				
 				switch state {
@@ -461,15 +512,17 @@ actor SyncBackupManager_Actor {
 		} else if isEnabled {
 			if needsCreateRecordZone {
 				state = .updatingCloud_creatingRecordZone()
-			} else if needsDownloadPayments || needsDownloadContacts {
+			} else if needsDownloadPayments || needsDownloadContacts || needsDownloadCards {
 				state = .downloading(details: SyncBackupManager_State_Downloading(
 					needsDownloadPayments: needsDownloadPayments,
-					needsDownloadContacts: needsDownloadContacts
+					needsDownloadContacts: needsDownloadContacts,
+					needsDownloadCards: needsDownloadCards
 				))
-			} else if paymentsQueueCount > 0 || contactsQueueCount > 0 {
+			} else if paymentsQueueCount > 0 || contactsQueueCount > 0 || cardsQueueCount > 0 {
 				state = .uploading(details: SyncBackupManager_State_Uploading(
 					payments_totalCount: paymentsQueueCount,
-					contacts_totalCount: contactsQueueCount
+					contacts_totalCount: contactsQueueCount,
+					cards_totalCount: cardsQueueCount
 				))
 			} else {
 				state = .synced

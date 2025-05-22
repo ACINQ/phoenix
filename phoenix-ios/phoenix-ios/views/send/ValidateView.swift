@@ -1842,8 +1842,8 @@ struct ValidateView: View {
 				
 				paymentInProgress = false
 				
-				if let problem = PayOfferProblem.fromResponse(response) {
-					payOfferProblem = problem
+				if let response {
+					payOfferProblem = PayOfferProblem.fromResponse(response)
 					Biz.endLongLivedTask(id: paymentId.description())
 					
 				} else {
@@ -2113,8 +2113,7 @@ struct ValidateView: View {
 		
 		if let newAmt = result {
 
-			let newCurrencyList = Currency.displayable(currencyPrefs: currencyPrefs, plus: newAmt.currency)
-
+			let newCurrencyList = Currency.displayable(currencyPrefs: currencyPrefs, plus: [newAmt.currency])
 			if currencyList != newCurrencyList {
 				currencyList = newCurrencyList
 			}

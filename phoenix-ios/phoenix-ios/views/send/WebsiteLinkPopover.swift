@@ -27,7 +27,7 @@ struct WebsiteLinkPopover: View {
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 			
-			Text("This appears to be a website (not a lightning invoice):")
+			Text("This appears to be a website:")
 				.padding(.bottom, 10)
 			
 			Text(verbatim: link.absoluteString)
