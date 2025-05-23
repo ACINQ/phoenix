@@ -1,4 +1,5 @@
 import SwiftUI
+import CoreNFC
 import PhoenixShared
 
 fileprivate let filename = "SendView"
@@ -62,6 +63,8 @@ struct SendView: View {
 		value: { [$0.size.width] }
 	)
 	@State var maxButtonWidth: CGFloat? = nil
+	
+	@ScaledMetric var labelImageSize: CGFloat = 22
 	
 	// <iOS_16_workarounds>
 	@State var navLinkTag: NavLinkTag? = nil
@@ -189,41 +192,6 @@ struct SendView: View {
 	}
 	
 	@ViewBuilder
-	func list() -> some View {
-		
-		List {
-			section_suggestions()
-			section_contacts()
-		}
-		.listStyle(.insetGrouped)
-		.listBackgroundColor(.primaryBackground)
-		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
-	}
-	
-	@ViewBuilder
-	func footer() -> some View {
-		
-		HStack(alignment: VerticalAlignment.top, spacing: 0) {
-			Spacer()
-			actionButton_paste()
-			Spacer()
-			actionButton_chooseImage()
-			Spacer()
-			actionButton_scanQrCode()
-			Spacer()
-		}
-		.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
-		.padding(.horizontal)
-		.padding(.top, 20)
-		.padding(.bottom, deviceInfo.isFaceID ? 10 : 20)
-		.background(
-			Color.mutedBackground
-				.cornerRadius(15, corners: [.topLeft, .topRight])
-				.edgesIgnoringSafeArea([.horizontal, .bottom])
-		)
-	}
-	
-	@ViewBuilder
 	func smartInputField() -> some View {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 0) {
@@ -252,7 +220,111 @@ struct SendView: View {
 	}
 	
 	@ViewBuilder
-	func actionButtonFactory(
+	func list() -> some View {
+		
+		List {
+			section_suggestions()
+			section_contacts()
+		}
+		.listStyle(.insetGrouped)
+		.listBackgroundColor(.primaryBackground)
+		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
+	}
+	
+	@ViewBuilder
+	func footer() -> some View {
+		
+		ViewThatFits {
+			footer_standard()
+			footer_compact()
+			footer_accessibility()
+		}
+		.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
+		.background(
+			Color.mutedBackground
+				.cornerRadius(15, corners: [.topLeft, .topRight])
+				.edgesIgnoringSafeArea([.horizontal, .bottom])
+		)
+	}
+	
+	@ViewBuilder
+	func footer_standard() -> some View {
+		
+		HStack(alignment: VerticalAlignment.top, spacing: 0) {
+			Spacer()
+			roundButton_paste()
+				.frame(width: maxButtonWidth)
+				.read(maxButtonWidthReader)
+			Spacer()
+			roundButton_chooseImage()
+				.frame(width: maxButtonWidth)
+				.read(maxButtonWidthReader)
+			Spacer()
+			roundButton_nfc()
+				.frame(width: maxButtonWidth)
+				.read(maxButtonWidthReader)
+			Spacer()
+			roundButton_scanQrCode()
+				.frame(width: maxButtonWidth)
+				.read(maxButtonWidthReader)
+			Spacer()
+		}
+		.padding(.top, 20)
+		.padding(.bottom, deviceInfo.isFaceID ? 10 : 20)
+	}
+	
+	@ViewBuilder
+	func footer_compact() -> some View {
+		
+		HStack(alignment: VerticalAlignment.top, spacing: 0) {
+			roundButton_paste()
+			Spacer()
+			roundButton_chooseImage()
+			Spacer()
+			roundButton_nfc()
+			Spacer()
+			roundButton_scanQrCode()
+		}
+		.padding(.horizontal)
+		.padding(.top, 20)
+		.padding(.bottom, deviceInfo.isFaceID ? 10 : 20)
+	}
+	
+	@ViewBuilder
+	func footer_accessibility() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 20) {
+			HStack(alignment: VerticalAlignment.top, spacing: 0) {
+				Spacer()
+				labelButton_paste()
+					.frame(width: maxButtonWidth, alignment: .leading)
+					.read(maxButtonWidthReader)
+				Spacer()
+				Spacer()
+				labelButton_scanQrCode()
+					.frame(width: maxButtonWidth, alignment: .leading)
+					.read(maxButtonWidthReader)
+				Spacer()
+			}
+			HStack(alignment: VerticalAlignment.top, spacing: 0) {
+				Spacer()
+				labelButton_chooseImage()
+					.frame(width: maxButtonWidth, alignment: .leading)
+					.read(maxButtonWidthReader)
+				Spacer()
+				Spacer()
+				labelButton_nfc()
+					.frame(width: maxButtonWidth, alignment: .leading)
+					.read(maxButtonWidthReader)
+				Spacer()
+			}
+		}
+		.padding(.top, 10)
+		.padding(.bottom, deviceInfo.isFaceID ? 10 : 20)
+	}
+	
+	@ViewBuilder
+	func roundButtonFactory(
 		text: String,
 		image: Image,
 		width: CGFloat = 20,
@@ -288,32 +360,29 @@ struct SendView: View {
 				
 			} // </VStack>
 		} // </Button>
-		.frame(width: maxButtonWidth)
-		.read(maxButtonWidthReader)
 		.accessibilityElement()
 		.accessibilityLabel(text)
 		.accessibilityAddTraits(.isButton)
 	}
 	
 	@ViewBuilder
-	func actionButton_paste() -> some View {
+	func roundButton_paste() -> some View {
 		
-		actionButtonFactory(
-			text: NSLocalizedString("paste", comment: "button label - try to make it short"),
+		roundButtonFactory(
+			text: String(localized: "paste", comment: "button label - try to make it short"),
 			image: Image(systemName: "arrow.right.doc.on.clipboard"),
 			width: 20, height: 20,
 			xOffset: 0, yOffset: 0
 		) {
 			pasteFromClipboard()
 		}
-	//	.disabled(!clipboardHasString)
 	}
 	
 	@ViewBuilder
-	func actionButton_chooseImage() -> some View {
+	func roundButton_chooseImage() -> some View {
 		
-		actionButtonFactory(
-			text: NSLocalizedString("choose image", comment: "button label - try to make it short"),
+		roundButtonFactory(
+			text: String(localized: "choose image", comment: "button label - try to make it short"),
 			image: Image(systemName: "photo"),
 			width: 20, height: 20,
 			xOffset: 0, yOffset: 0
@@ -323,15 +392,104 @@ struct SendView: View {
 	}
 	
 	@ViewBuilder
-	func actionButton_scanQrCode() -> some View {
+	func roundButton_nfc() -> some View {
 		
-		actionButtonFactory(
-			text: NSLocalizedString("scan qr code", comment: "button label - try to make it short"),
+		roundButtonFactory(
+			text: String(localized: "nfc", comment: "button label - try to make it short"),
+			image: Image(systemName: "dot.radiowaves.forward"),
+			width: 21, height: 21,
+			xOffset: 0, yOffset: 0
+		) {
+			startNfc()
+		}
+	}
+	
+	@ViewBuilder
+	func roundButton_scanQrCode() -> some View {
+		
+		roundButtonFactory(
+			text: String(localized: "scan qr code", comment: "button label - try to make it short"),
 			image: Image(systemName: "qrcode.viewfinder"),
 			width: 20, height: 20,
 			xOffset: 0, yOffset: 0
 		) {
 			scanQrCode()
+		}
+	}
+	
+	@ViewBuilder
+	func labelButton_paste() -> some View {
+		
+		Button {
+			pasteFromClipboard()
+		} label: {
+			Label {
+				Text("paste", comment: "button label - try to make it short")
+					.foregroundColor(.primaryForeground)
+			} icon: {
+				Image(systemName: "arrow.right.doc.on.clipboard")
+					.resizable()
+					.scaledToFit()
+					.frame(width: labelImageSize, height: labelImageSize)
+					.foregroundColor(.appAccent)
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func labelButton_chooseImage() -> some View {
+		
+		Button {
+			chooseImage()
+		} label: {
+			Label {
+				Text("choose image", comment: "button label - try to make it short")
+					.foregroundColor(.primaryForeground)
+			} icon: {
+				Image(systemName: "photo")
+					.resizable()
+					.scaledToFit()
+					.frame(width: labelImageSize, height: labelImageSize)
+					.foregroundColor(.appAccent)
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func labelButton_nfc() -> some View {
+		
+		Button {
+			startNfc()
+		} label: {
+			Label {
+				Text("nfc", comment: "button label - try to make it short")
+					.foregroundColor(.primaryForeground)
+			} icon: {
+				Image(systemName: "dot.radiowaves.forward")
+					.resizable()
+					.scaledToFit()
+					.frame(width: labelImageSize, height: labelImageSize)
+					.foregroundColor(.appAccent)
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func labelButton_scanQrCode() -> some View {
+		
+		Button {
+			scanQrCode()
+		} label: {
+			Label {
+				Text("scan qr code", comment: "button label - try to make it short")
+					.foregroundColor(.primaryForeground)
+			} icon: {
+				Image(systemName: "qrcode.viewfinder")
+					.resizable()
+					.scaledToFit()
+					.frame(width: labelImageSize, height: labelImageSize)
+					.foregroundColor(.appAccent)
+			}
 		}
 	}
 	
@@ -850,6 +1008,20 @@ struct SendView: View {
 		activeSheet = .imagePicker
 	}
 	
+	func startNfc() {
+		log.trace("startNfc()")
+		
+		NfcReader.shared.readCard { (result: Result<NFCNDEFMessage, NfcReader.ReadError>) in
+			
+			switch result {
+			case .success(let ndefMsg):
+				handleNdefMessage(ndefMsg)
+			case .failure(let error):
+				handleNfcError(error)
+			}
+		}
+	}
+	
 	func scanQrCode() {
 		log.trace("scanQrCode()")
 		activeSheet = .qrCodeScanner
@@ -936,6 +1108,64 @@ struct SendView: View {
 	// --------------------------------------------------
 	// MARK: Parsing
 	// --------------------------------------------------
+	
+	func handleNdefMessage(_ ndefMsg: NFCNDEFMessage) {
+		log.trace("handleNdefMessage()")
+		
+		var uri_values: [URL] = []
+		var text_values: [String] = []
+		
+		ndefMsg.records.forEach { payload in
+			if let uri = payload.wellKnownTypeURIPayload() {
+				log.debug("found uri = \(uri)")
+				uri_values.append(uri)
+				
+			} else if let text = payload.wellKnownTypeTextPayload().0 {
+				log.debug("found text = \(text)")
+				text_values.append(text)
+			}
+		}
+		
+		if let uri = uri_values.first {
+			parseUserInput(uri.absoluteString)
+		} else if let text = text_values.first {
+			parseUserInput(text)
+		} else {
+			
+			let msg = String(localized: "No URI or text detected in NFC tag")
+			toast.pop(msg,
+				colorScheme: colorScheme.opposite,
+				style: .chrome,
+				duration: 5.0,
+				alignment: .middle,
+				showCloseButton: true
+			)
+		}
+	}
+	
+	func handleNfcError(_ error: NfcReader.ReadError) {
+		log.trace("handleNfcError()")
+		
+		let msg: String
+		switch error {
+		case .readingNotAvailable:
+			msg = String(localized: "NFC cababilities not available on this device")
+		case .alreadyStarted:
+			msg = String(localized: "NFC reader is already scanning")
+		case .scanningTerminated(_):
+			msg = String(localized: "Nothing scanned")
+		case .errorReadingTag:
+			msg = String(localized: "Error reading tag")
+		}
+
+		toast.pop(msg,
+			colorScheme: colorScheme.opposite,
+			style: .chrome,
+			duration: 5.0,
+			alignment: .middle,
+			showCloseButton: true
+		)
+	}
 	
 	func parseUserInput(_ input: String) {
 		log.trace("parseUserInput()")
