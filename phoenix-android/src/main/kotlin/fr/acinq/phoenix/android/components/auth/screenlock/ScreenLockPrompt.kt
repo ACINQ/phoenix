@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.components.screenlock
+package fr.acinq.phoenix.android.components.auth.screenlock
 
 import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
@@ -48,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.ProgressView
+import fr.acinq.phoenix.android.components.auth.pincode.CheckPinFlow
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.BiometricsHelper
 import fr.acinq.phoenix.android.utils.extensions.findActivity
@@ -58,7 +61,7 @@ import kotlinx.coroutines.launch
  * Screen shown when authentication through biometrics or PIN is required, depending on the user's settings.
  */
 @Composable
-fun LockPrompt(
+fun ScreenLockPrompt(
     promptScreenLockImmediately: Boolean,
     onLock: () -> Unit,
     onUnlock: () -> Unit,
@@ -67,8 +70,8 @@ fun LockPrompt(
     val scope = rememberCoroutineScope()
 
     val userPrefs = userPrefs
-    val isBiometricLockEnabledState by userPrefs.getIsBiometricLockEnabled.collectAsState(initial = null)
-    val isCustomPinLockEnabledState by userPrefs.getIsCustomPinLockEnabled.collectAsState(initial = null)
+    val isBiometricLockEnabledState by userPrefs.getIsScreenLockBiometricsEnabled.collectAsState(initial = null)
+    val isCustomPinLockEnabledState by userPrefs.getIsScreenLockPinEnabled.collectAsState(initial = null)
     var showPinLockDialog by rememberSaveable { mutableStateOf(false) }
 
     Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colors.background)) {
@@ -82,7 +85,7 @@ fun LockPrompt(
                 BiometricsHelper.getPrompt(
                     activity = context.findActivity(),
                     onSuccess = {
-                        scope.launch { userPrefs.savePinCodeSuccess() }
+                        scope.launch { userPrefs.saveScreenLockPinCodeSuccess() }
                         onUnlock()
                     },
                     onFailure = { onLock() },
@@ -103,7 +106,7 @@ fun LockPrompt(
             }
 
             if (showPinLockDialog) {
-                CheckPinFlow(
+                CheckScreenLockPinFlow(
                     onCancel = { showPinLockDialog = false },
                     onPinValid = { onUnlock() }
                 )
@@ -145,7 +148,7 @@ fun LockPrompt(
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()))
         } ?: run {
             Spacer(modifier = Modifier.weight(1f))
             ProgressView(

@@ -63,6 +63,7 @@ import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.SplashLabelRow
 import fr.acinq.phoenix.android.components.TextInput
 import fr.acinq.phoenix.android.components.InlineTransactionLink
+import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.feedback.SuccessMessage
 import fr.acinq.phoenix.android.fiatRate
@@ -246,12 +247,11 @@ private fun AvailableForRefundView(
                         }
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        Button(
+                        SmartSpendButton(
                             text = stringResource(id = R.string.swapinrefund_send_button),
-                            icon = R.drawable.ic_send,
-                            onClick = { vm.executeRefund(currentState.transaction) },
-                            padding = PaddingValues(16.dp),
+                            onSpend = { vm.executeRefund(currentState.transaction) },
                             modifier = Modifier.fillMaxWidth(),
+                            enabled = true,
                         )
                     }
 

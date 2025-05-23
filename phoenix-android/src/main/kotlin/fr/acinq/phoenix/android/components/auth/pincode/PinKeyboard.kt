@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.components.screenlock
+package fr.acinq.phoenix.android.components.auth.pincode
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,40 +25,51 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.Button
+import fr.acinq.phoenix.android.userPrefs
 
 @Composable
 fun PinKeyboard(
     onPinPress: (Int) -> Unit,
     onResetPress: () -> Unit,
+    onDeleteLAst: () -> Unit,
     isEnabled: Boolean,
 ) {
+    val isPinShuffled by userPrefs.getIsPinKeyboardShuffled.collectAsState(null)
+    val pins = remember { arrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 0) }
+    if (isPinShuffled == true) {
+        pins.shuffle()
+    }
+
     Column(
         modifier = Modifier.widthIn(max = 400.dp).padding(horizontal = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row {
-            PinButton(pin = 1, onClick = onPinPress, isEnabled = isEnabled)
-            PinButton(pin = 2, onClick = onPinPress, isEnabled = isEnabled)
-            PinButton(pin = 3, onClick = onPinPress, isEnabled = isEnabled)
+            pins.slice(0..2).forEach { pin ->
+                PinButton(pin = pin, onClick = onPinPress, isEnabled = isEnabled)
+            }
         }
         Row {
-            PinButton(pin = 4, onClick = onPinPress, isEnabled = isEnabled)
-            PinButton(pin = 5, onClick = onPinPress, isEnabled = isEnabled)
-            PinButton(pin = 6, onClick = onPinPress, isEnabled = isEnabled)
+            pins.slice(3..5).forEach { pin ->
+                PinButton(pin = pin, onClick = onPinPress, isEnabled = isEnabled)
+            }
         }
         Row {
-            PinButton(pin = 7, onClick = onPinPress, isEnabled = isEnabled)
-            PinButton(pin = 8, onClick = onPinPress, isEnabled = isEnabled)
-            PinButton(pin = 9, onClick = onPinPress, isEnabled = isEnabled)
+            pins.slice(6..8).forEach { pin ->
+                PinButton(pin = pin, onClick = onPinPress, isEnabled = isEnabled)
+            }
         }
         Row {
-            Spacer(modifier = Modifier.weight(1f))
-            PinButton(pin = 0, onClick = onPinPress, isEnabled = isEnabled)
+            DeleteButton(onClick = onDeleteLAst, isEnabled = isEnabled)
+            PinButton(pin = pins.last(), onClick = onPinPress, isEnabled = isEnabled)
             ResetButton(onClick = onResetPress, isEnabled = isEnabled)
         }
     }
@@ -69,17 +80,35 @@ private fun RowScope.PinButton(pin: Int, onClick: (Int) -> Unit, isEnabled: Bool
     Button(
         text = pin.toString(),
         onClick = { onClick(pin) },
-        modifier = Modifier.height(76.dp).weight(1f),
+        modifier = Modifier
+            .height(76.dp)
+            .weight(1f),
         enabled = isEnabled,
         textStyle = MaterialTheme.typography.h3,
     )
 }
+
 @Composable
 private fun RowScope.ResetButton(onClick: () -> Unit, isEnabled: Boolean) {
     Button(
         icon = R.drawable.ic_trash,
         onClick = onClick,
-        modifier = Modifier.height(76.dp).weight(1f),
+        modifier = Modifier
+            .height(76.dp)
+            .weight(1f),
+        enabled = isEnabled,
+        textStyle = MaterialTheme.typography.h3,
+    )
+}
+
+@Composable
+private fun RowScope.DeleteButton(onClick: () -> Unit, isEnabled: Boolean) {
+    Button(
+        icon = R.drawable.ic_delete,
+        onClick = onClick,
+        modifier = Modifier
+            .height(76.dp)
+            .weight(1f),
         enabled = isEnabled,
         textStyle = MaterialTheme.typography.h3,
     )
