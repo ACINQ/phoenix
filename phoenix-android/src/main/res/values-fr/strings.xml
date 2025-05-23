@@ -461,6 +461,9 @@
     <string name="accessctrl_spendlock_pin_label">Spending PIN</string>
     <string name="accessctrl_spendlock_pin_desc">Si cette option est activée, un code PIN est nécessaire pour dépenser des fonds depuis Phoenix.</string>
 
+    <string name="accessctrl_misc_header">Divers</string>
+    <string name="accessctrl_shuffle_pin">Clavier PIN aléatoire</string>
+
     <!-- lnurl-auth -->
 
     <string name="lnurl_auth_legacy_notice">Mode de compatibilité</string>

@@ -468,6 +468,9 @@
     <string name="accessctrl_spendlock_pin_label">Spending PIN</string>
     <string name="accessctrl_spendlock_pin_desc">Ak je povolené, na minutie finančných prostriedkov z Phoenixu je potrebný PIN kód.</string>
 
+    <string name="accessctrl_misc_header">Rôzne</string>
+    <string name="accessctrl_shuffle_pin">Náhodne prehrávať klávesnicu s PIN kódom</string>
+
     <!-- lnurl-auth -->
 
     <string name="lnurl_auth_legacy_notice">Legacy mód</string>

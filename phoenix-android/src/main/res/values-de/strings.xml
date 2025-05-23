@@ -437,6 +437,9 @@
     <string name="accessctrl_spendlock_pin_label">Spending PIN</string>
     <string name="accessctrl_spendlock_pin_desc">Wenn diese Option aktiviert ist, ist zum Ausgeben von Guthaben aus dem Wallet ein PIN-Code erforderlich.</string>
 
+    <string name="accessctrl_misc_header">Sonstiges</string>
+    <string name="accessctrl_shuffle_pin">PIN-Tastatur mischen</string>
+
     <!-- lnurl-auth -->
 
     <string name="lnurl_auth_legacy_notice">Legacy-Modus</string>

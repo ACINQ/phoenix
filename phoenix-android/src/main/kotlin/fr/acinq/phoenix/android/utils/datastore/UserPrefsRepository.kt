@@ -82,6 +82,7 @@ class UserPrefsRepository(private val data: DataStore<Preferences>) {
         val PREFS_AUTO_LOCK_DELAY = longPreferencesKey("PREFS_AUTO_LOCK_DELAY")
         val PREFS_SPEND_LOCK_PIN_ENABLED = booleanPreferencesKey("PREFS_SPEND_LOCK_CUSTOM_PIN_ENABLED")
         val PREFS_SPEND_LOCK_PIN_ATTEMPT_COUNT = intPreferencesKey("PREFS_SPEND_LOCK_CUSTOM_PIN_ATTEMPT_COUNT")
+        val PREFS_SHUFFLE_PIN_KEYBOARD = booleanPreferencesKey("PREFS_SHUFFLE_PIN_KEYBOARD")
         // payments options
         private val INVOICE_DEFAULT_DESC = stringPreferencesKey("INVOICE_DEFAULT_DESC")
         private val INVOICE_DEFAULT_EXPIRY = longPreferencesKey("INVOICE_DEFAULT_EXPIRY")
@@ -198,6 +199,9 @@ class UserPrefsRepository(private val data: DataStore<Preferences>) {
     suspend fun saveSpendingPinCodeSuccess() = data.edit {
         it[PREFS_SPEND_LOCK_PIN_ATTEMPT_COUNT] = 0
     }
+
+    val getIsPinKeyboardShuffled: Flow<Boolean?> = safeData.map { it[PREFS_SHUFFLE_PIN_KEYBOARD] ?: false }
+    suspend fun saveIsPinKeyboardShuffled(isShuffled: Boolean) = data.edit { it[PREFS_SHUFFLE_PIN_KEYBOARD] = isShuffled }
 
     val getInvoiceDefaultDesc: Flow<String> = safeData.map { it[INVOICE_DEFAULT_DESC]?.takeIf { it.isNotBlank() } ?: "" }
     suspend fun saveInvoiceDefaultDesc(description: String) = data.edit { it[INVOICE_DEFAULT_DESC] = description }
