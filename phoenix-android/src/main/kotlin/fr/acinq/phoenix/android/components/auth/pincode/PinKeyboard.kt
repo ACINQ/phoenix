@@ -39,6 +39,7 @@ import fr.acinq.phoenix.android.userPrefs
 fun PinKeyboard(
     onPinPress: (Int) -> Unit,
     onResetPress: () -> Unit,
+    onDeleteLAst: () -> Unit,
     isEnabled: Boolean,
 ) {
     val isPinShuffled by userPrefs.getIsPinKeyboardShuffled.collectAsState(null)
@@ -67,7 +68,7 @@ fun PinKeyboard(
             }
         }
         Row {
-            Spacer(modifier = Modifier.weight(1f))
+            DeleteButton(onClick = onDeleteLAst, isEnabled = isEnabled)
             PinButton(pin = pins.last(), onClick = onPinPress, isEnabled = isEnabled)
             ResetButton(onClick = onResetPress, isEnabled = isEnabled)
         }
@@ -91,6 +92,19 @@ private fun RowScope.PinButton(pin: Int, onClick: (Int) -> Unit, isEnabled: Bool
 private fun RowScope.ResetButton(onClick: () -> Unit, isEnabled: Boolean) {
     Button(
         icon = R.drawable.ic_trash,
+        onClick = onClick,
+        modifier = Modifier
+            .height(76.dp)
+            .weight(1f),
+        enabled = isEnabled,
+        textStyle = MaterialTheme.typography.h3,
+    )
+}
+
+@Composable
+private fun RowScope.DeleteButton(onClick: () -> Unit, isEnabled: Boolean) {
+    Button(
+        icon = R.drawable.ic_delete,
         onClick = onClick,
         modifier = Modifier
             .height(76.dp)

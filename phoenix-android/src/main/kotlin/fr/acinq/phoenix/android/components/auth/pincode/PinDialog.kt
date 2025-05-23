@@ -103,6 +103,7 @@ internal fun BasePinDialog(
                     }
                 },
                 onResetPress = { pinValue = "" },
+                onDeleteLAst = { pinValue = pinValue.dropLast(1) },
                 isEnabled = enabled && pinValue.length in 0..6
             )
             Spacer(modifier = Modifier.height(WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()))
