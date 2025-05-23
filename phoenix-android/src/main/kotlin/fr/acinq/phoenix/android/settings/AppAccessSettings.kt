@@ -95,9 +95,31 @@ fun AppAccessSettings(
             }
         }
 
+        val isSpendLockPinEnabled by userPrefs.getIsSpendingPinEnabled.collectAsState(null)
         CardHeader(text = stringResource(R.string.accessctrl_spendlock_header))
         Card {
-            SpendLockCustomPinView()
+            isSpendLockPinEnabled?.let {
+                SpendLockCustomPinView(it)
+            } ?: ProgressView(text = stringResource(R.string.utils_loading_prefs))
+        }
+
+        if (isCustomPinLockEnabled == true || isSpendLockPinEnabled == true) {
+            CardHeader(text = stringResource(R.string.accessctrl_misc_header))
+            Card {
+                val scope = rememberCoroutineScope()
+                val isPinShuffled by userPrefs.getIsPinKeyboardShuffled.collectAsState(null)
+                isPinShuffled?.let {
+                    SettingSwitch(
+                        title = stringResource(id = R.string.accessctrl_shuffle_pin),
+                        icon = R.drawable.ic_dices,
+                        enabled = true,
+                        isChecked = it,
+                        onCheckChangeAttempt = {
+                            scope.launch { userPrefs.saveIsPinKeyboardShuffled(it) }
+                        }
+                    )
+                }
+            }
         }
     }
 }
@@ -233,19 +255,11 @@ private fun ScreenLockCustomPinView(
 }
 
 @Composable
-private fun SpendLockCustomPinView() {
+private fun SpendLockCustomPinView(isSpendingPinEnabled: Boolean) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val userPrefs = userPrefs
     var errorMessage by remember { mutableStateOf("") }
-
-    val isSpendLockPinEnabledFlow = userPrefs.getIsSpendingPinEnabled.collectAsState(null)
-    val isSpendingPinEnabled = isSpendLockPinEnabledFlow.value
-
-    if (isSpendingPinEnabled == null) {
-        ProgressView(text = stringResource(R.string.utils_loading_prefs))
-        return
-    }
 
     var isNewPinFlow by rememberSaveable { mutableStateOf(false) }
     var isDisablingPinFlow by rememberSaveable { mutableStateOf(false) }

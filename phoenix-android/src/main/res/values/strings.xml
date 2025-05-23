@@ -598,6 +598,9 @@
     <string name="accessctrl_spendlock_pin_label">Spending PIN</string>
     <string name="accessctrl_spendlock_pin_desc">If enabled, a PIN code is required to spend funds from the wallet.</string>
 
+    <string name="accessctrl_misc_header">Misc</string>
+    <string name="accessctrl_shuffle_pin">Shuffle PIN keypad</string>
+
     <!-- lnurl-auth -->
 
     <string name="lnurl_auth_legacy_notice">Legacy mode</string>

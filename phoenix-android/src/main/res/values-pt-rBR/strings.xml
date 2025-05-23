@@ -423,6 +423,9 @@
     <string name="accessctrl_spendlock_pin_label">Spending PIN</string>
     <string name="accessctrl_spendlock_pin_desc">Se ativado, um PIN será necessário para gastar fundos do Phoenix.</string>
 
+    <string name="accessctrl_misc_header">Diversos</string>
+    <string name="accessctrl_shuffle_pin">Embaralhar o teclado PIN</string>
+
     <!-- lnurl-auth -->
 
     <string name="lnurl_auth_legacy_notice">Modo legado</string>

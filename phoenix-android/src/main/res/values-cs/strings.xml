@@ -425,6 +425,9 @@
     <string name="accessctrl_spendlock_pin_label">Spending PIN</string>
     <string name="accessctrl_spendlock_pin_desc">Pokud je tato možnost povolena, je pro utrácení finančních prostředků z Phoenixu vyžadován PIN.</string>
 
+    <string name="accessctrl_misc_header">Různé</string>
+    <string name="accessctrl_shuffle_pin">Náhodně přehrávat klávesnici s PINem</string>
+
     <!-- lnurl-auth -->
 
     <string name="lnurl_auth_legacy_notice">Legacy mód</string>
