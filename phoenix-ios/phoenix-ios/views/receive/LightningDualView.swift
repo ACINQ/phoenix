@@ -1,5 +1,6 @@
 import SwiftUI
 import PhoenixShared
+import CoreNFC
 
 fileprivate let filename = "LightningDualView"
 #if DEBUG && true
@@ -44,8 +45,10 @@ struct LightningDualView: View {
 	
 	@State var amountMsat: Lightning_kmpMilliSatoshi? = nil
 	@State var needsUpdateInvoiceOrOffer: Bool = true
+
+	@State var modificationTitleType: ModifyInvoiceSheet.TitleType = .normal
 	
-	let lastIncomingPaymentPublisher = Biz.business.paymentsManager.lastIncomingPaymentPublisher()
+	@State var nfcActive: Bool = false
 	
 	// For the cicular buttons: [copy, share, edit]
 	enum MaxButtonWidth: Preference {}
@@ -54,6 +57,8 @@ struct LightningDualView: View {
 		value: { [$0.size.width] }
 	)
 	@State var maxButtonWidth: CGFloat? = nil
+	
+	let lastIncomingPaymentPublisher = Biz.business.paymentsManager.lastIncomingPaymentPublisher()
 	
 	// To workaround a bug in SwiftUI, we're using multiple namespaces for our animation.
 	// In particular, animating the border around the qrcode doesn't work well.
@@ -181,13 +186,17 @@ struct LightningDualView: View {
 				bip353AddressView(address)
 					.lineLimit(2)
 					.multilineTextAlignment(.center)
-					.font(.footnote)
+					.font(.callout)
 					.padding(.top)
 			}
 			
 			if activeType == .bolt12_offer {
 				howToUseButton()
 					.padding(.top)
+			}
+
+			if nfcActive {
+				nfcActivity()
 			}
 			
 			if notificationPermissions == .disabled {
@@ -332,12 +341,12 @@ struct LightningDualView: View {
 		VStack(alignment: .center, spacing: 10) {
 		
 			invoiceAmountView()
-				.font(.footnote)
+				.font(.callout)
 				.foregroundColor(.secondary)
 			
 			invoiceDescriptionView()
 				.lineLimit(1)
-				.font(.footnote)
+				.font(.callout)
 				.foregroundColor(.secondary)
 			
 		} // </VStack>
@@ -401,6 +410,7 @@ struct LightningDualView: View {
 			copyButton()
 			shareButton()
 			editButton()
+			nfcButton()
 		}
 		.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
 	}
@@ -453,7 +463,7 @@ struct LightningDualView: View {
 	func copyButton() -> some View {
 		
 		actionButton(
-			text: NSLocalizedString("copy", comment: "button label - try to make it short"),
+			text: String(localized: "copy", comment: "button label - try to make it short"),
 			image: Image(systemName: "square.on.square"),
 			width: 20, height: 20,
 			xOffset: 0, yOffset: 0
@@ -470,7 +480,7 @@ struct LightningDualView: View {
 	func shareButton() -> some View {
 		
 		actionButton(
-			text: NSLocalizedString("share", comment: "button label - try to make it short"),
+			text: String(localized: "share", comment: "button label - try to make it short"),
 			image: Image(systemName: "square.and.arrow.up"),
 			width: 21, height: 21,
 			xOffset: 0, yOffset: -1
@@ -487,7 +497,7 @@ struct LightningDualView: View {
 	func editButton() -> some View {
 		
 		actionButton(
-			text: NSLocalizedString("edit", comment: "button label - try to make it short"),
+			text: String(localized: "edit", comment: "button label - try to make it short"),
 			image: Image(systemName: "square.and.pencil"),
 			width: 19, height: 19,
 			xOffset: 1, yOffset: -1
@@ -498,12 +508,43 @@ struct LightningDualView: View {
 	}
 	
 	@ViewBuilder
+	func nfcButton() -> some View {
+		
+		actionButton(
+			text: String(localized: "nfc", comment: "button label - try to make it short"),
+			image: Image(systemName: "dot.radiowaves.forward"),
+			width: 21, height: 21,
+			xOffset: 0, yOffset: 0
+		) {
+			didTapNfcButton()
+		}
+		.disabled(nfcActive)
+	}
+	
+	@ViewBuilder
 	func howToUseButton() -> some View {
 		
 		Button {
 			showBolt12Sheet()
 		} label: {
 			Label("How to use", systemImage: "info.circle")
+		}
+	}
+	
+	@ViewBuilder
+	func nfcActivity() -> some View {
+		
+		if nfcActive {
+			
+			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+				
+				HorizontalActivity(color: .appAccent, diameter: 10, speed: 1.6)
+					.frame(width: 240, height: 10)
+					.padding(.horizontal)
+					.padding(.bottom, 4)
+				
+			} // </VStack>
+			.padding(.top)
 		}
 	}
 	
@@ -611,7 +652,7 @@ struct LightningDualView: View {
 	// MARK: View Transitions
 	// --------------------------------------------------
 	
-	func onAppear() -> Void {
+	func onAppear() {
 		log.trace("onAppear()")
 		
 		// Careful: this function may be called multiple times
@@ -789,6 +830,10 @@ struct LightningDualView: View {
 		needsUpdateInvoiceOrOffer = true
 	}
 	
+	func modifyInvoiceSheetDidCancel() {
+		log.trace("modifyInvoiceSheetDidCancel()")
+	}
+	
 	func currencyConverterDidChange(_ amount: CurrencyAmount?) {
 		log.trace("currencyConverterDidChange()")
 		
@@ -801,10 +846,12 @@ struct LightningDualView: View {
 		smartModalState.display(dismissable: true) {
 			
 			ModifyInvoiceSheet(
+				titleType: modificationTitleType,
 				savedAmount: $modificationAmount,
 				description: $description,
 				openCurrencyConverter: openCurrencyConverter,
-				didSave: modifyInvoiceSheetDidSave
+				didSave: modifyInvoiceSheetDidSave,
+				didCancel: modifyInvoiceSheetDidCancel
 			)
 		}
 	}
@@ -941,14 +988,78 @@ struct LightningDualView: View {
 	func didTapEditButton() -> Void {
 		log.trace("didTapEditButton()")
 		
+		modificationTitleType = .normal
 		smartModalState.display(dismissable: true) {
 			
 			ModifyInvoiceSheet(
+				titleType: modificationTitleType,
 				savedAmount: $modificationAmount,
 				description: $description,
 				openCurrencyConverter: openCurrencyConverter,
-				didSave: modifyInvoiceSheetDidSave
+				didSave: modifyInvoiceSheetDidSave,
+				didCancel: modifyInvoiceSheetDidCancel
 			)
+		}
+	}
+	
+	func didTapNfcButton() {
+		log.trace("didTapNfcButton()")
+		
+		// We're going to build a BIP-321 URI
+		
+		var queryItems: [URLQueryItem] = []
+		
+		if activeType == .bolt11_invoice {
+			guard let m = mvi.model as? Receive.Model_Generated else {
+				log.warning("mvi.model !is Model_Generated")
+				return
+			}
+			
+			if let msat = m.amount {
+				
+				// BIP-321:
+				//
+				// > If an amount is provided, it MUST be specified in decimal BTC.
+				// > All amounts MUST contain no commas and use a period (.) as the
+				// > separating character to separate whole numbers and decimal fractions.
+				// > I.e. amount=50.00 or amount=50 is treated as 50 BTC,
+				// > and amount=50,000.00 is invalid.
+				
+				let formatter = NumberFormatter()
+				formatter.usesGroupingSeparator = false
+				formatter.decimalSeparator = "."
+				formatter.minimumFractionDigits = 0
+				formatter.maximumFractionDigits = 11
+				
+				let btc = Utils.convertBitcoin(msat: msat, to: .btc)
+				if let btcStr = formatter.string(from: NSNumber(value: btc)) {
+					queryItems.append(URLQueryItem(name: "amount", value: btcStr))
+				}
+			}
+			
+			queryItems.append(URLQueryItem(name: "lightning", value: m.request))
+			
+		} else {
+			guard let offer = offerStr else {
+				log.warning("offerStr is nil")
+				return
+			}
+			
+			queryItems.append(URLQueryItem(name: "lno", value: offer))
+		}
+		
+		var comps = URLComponents()
+		comps.scheme = "bitcoin"
+		comps.queryItems = queryItems
+		
+		if let url = comps.url {
+			log.debug("url: \(url.absoluteString)")
+			
+			if #available(iOS 17.4, *) {
+				startHostCardEmulation(url)
+			} else {
+				handleHceWriterError(.hceNotAvailable)
+			}
 		}
 	}
 	
@@ -1017,5 +1128,71 @@ struct LightningDualView: View {
 		let uiImg = UIImage(cgImage: cgImage)
 		activeSheet = ActiveSheet.sharingImage(image: uiImg)
 	}
+	
+	// --------------------------------------------------
+	// MARK: Host Card Emulation
+	// --------------------------------------------------
+	
+	@available(iOS 17.4, *)
+	func startHostCardEmulation(_ url: URL) {
+		log.trace("startHostCardEmulation()")
+		
+		let file = Ndef.ndefDataForUrl(url)
+		
+		nfcActive = true
+		Task { @MainActor in
+			if let error = await HceWriter.shared.start(ndefFile: file) {
+				handleHceWriterError(error)
+			}
+			nfcActive = false
+		}
+	}
+	
+	func handleHceWriterError(_ error: HceWriterError) {
+		
+		let msg: String
+		switch error {
+		case .nfcNotAvailable:
+			msg = String(localized: "NFC capabilities not available on this device")
+			
+		case .hceNotAvailable:
+			msg = String(localized:
+				"""
+				Host card emulation not available.
+				Requires iOS 17.4 or later.
+				"""
+			)
+			
+		case .hceNotEligible:
+			msg = String(localized:
+				"""
+				Host card emulation not available.
+				Limited to European Economic Area.
+				"""
+			)
+			
+		case .sessionError(let sessionError, _):
+			let details: String
+			switch sessionError {
+			case .acquirePresentmentIntent:
+				details = String(localized: "(wait a few seconds and then retry)")
+			case .initializeSession:
+				details = "(cannot initialize CardSession)"
+			case .startEmulation:
+				details = "(cannot start emulation session)"
+			case .eventStream:
+				details = "(event stream termination)"
+			}
+			
+			msg = String(localized: "Host card emulation session error\n\(details)")
+		}
+		
+		toast.pop(msg,
+			colorScheme: colorScheme.opposite,
+			style: .chrome,
+			duration: 5.0,
+			alignment: .bottom,
+			showCloseButton: true
+		)
+	}
 }
-
