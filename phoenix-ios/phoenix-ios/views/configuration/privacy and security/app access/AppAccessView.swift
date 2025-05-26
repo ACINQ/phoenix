@@ -164,13 +164,9 @@ struct AppAccessView : View {
 			
 			// Implicit divider added here
 			
-			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
-				
-				passcodeFallbackOption()
-				
-			} // </VStack>
-			.padding(.top, 5)
-			.padding(.bottom, 10)
+			toggle_passcodeFallbackOption()
+				.padding(.top, 5)
+				.padding(.bottom, 10)
 			
 		} header: {
 			Text("Biometrics")
@@ -198,8 +194,9 @@ struct AppAccessView : View {
 	@ViewBuilder
 	func toggle_biometrics() -> some View {
 		
-		Toggle(isOn: $biometricsEnabled) {
-			Label {
+		ToggleAlignment {
+			
+			LabelAlignment {
 				switch biometricSupport {
 				case .touchID_available:
 					Text("Touch ID")
@@ -222,6 +219,7 @@ struct AppAccessView : View {
 				default:
 					Text("Biometrics") + Text(" (not available)").foregroundColor(.secondary)
 				}
+				
 			} icon: {
 				Image(systemName: isTouchID() ? "touchid" : "faceid")
 					.renderingMode(.template)
@@ -229,24 +227,26 @@ struct AppAccessView : View {
 					.foregroundColor(Color.appAccent)
 			}
 			
-		} // </Toggle>
-		.onChange(of: biometricsEnabled) { value in
-			self.toggleBiometrics(value)
-		}
-		.disabled(!biometricSupport.isAvailable() || !isRecoveryPhrasedBackedUp)
+		} toggle: {
+			
+			Toggle("", isOn: $biometricsEnabled)
+				.labelsHidden()
+				.disabled(!biometricSupport.isAvailable() || !isRecoveryPhrasedBackedUp)
+				.onChange(of: biometricsEnabled) { value in
+					self.toggleBiometrics(value)
+				}
+			
+		} // </ToggleAlignment>
 	}
 	
 	@ViewBuilder
-	func passcodeFallbackOption() -> some View {
+	func toggle_passcodeFallbackOption() -> some View {
 		
-		HStack(alignment: VerticalAlignment.centerTopLine) { // <- Custom VerticalAlignment
+		ToggleAlignment {
 			
-			Label {
+			LabelAlignment {
 				VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 					Text("Allow passcode fallback")
-						.alignmentGuide(VerticalAlignment.centerTopLine) { (d: ViewDimensions) in
-							d[VerticalAlignment.center]
-						}
 					
 					Group {
 						if isTouchID() {
@@ -269,20 +269,16 @@ struct AppAccessView : View {
 					.foregroundColor(Color.appAccent)
 			} // </Label>
 			
-			Spacer()
+		} toggle: {
 			
 			Toggle("", isOn: $passcodeFallbackEnabled)
 				.labelsHidden()
 				.disabled(!biometricsEnabled || !isRecoveryPhrasedBackedUp)
-				.padding(.trailing, 2)
-				.alignmentGuide(VerticalAlignment.centerTopLine) { (d: ViewDimensions) in
-					d[VerticalAlignment.center]
-				}
 				.onChange(of: passcodeFallbackEnabled) { value in
 					self.togglePasscodeFallback(value)
 				}
 			
-		} // </HStack>
+		} // </ToggleAlignment>
 	}
 	
 	@ViewBuilder
