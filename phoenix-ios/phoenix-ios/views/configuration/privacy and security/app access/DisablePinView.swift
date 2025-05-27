@@ -32,7 +32,11 @@ struct DisablePinView: View {
 	
 	@State var vibrationTrigger: Int = 0
 	@State var shakeTrigger: Int = 0
-	@State var failCount: Int = 0
+	
+	@State var invalidPin: InvalidPin = InvalidPin.none() // updated in onAppear
+	
+	let timer = Timer.publish(every: 0.5, on: .current, in: .common).autoconnect()
+	@State var currentDate = Date()
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
@@ -57,13 +61,19 @@ struct DisablePinView: View {
 			Color.primaryBackground.edgesIgnoringSafeArea(.all)
 			content()
 		}
+		.onAppear {
+			onAppear()
+		}
+		.onReceive(timer) { _ in
+			currentDate = Date()
+		}
 	}
 	
 	@ViewBuilder
 	func content() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-			prompt()
+			numberPadHeader()
 			NumberPadView(
 				buttonPressed: numberPadButtonPressed,
 				showHideButton: false,
@@ -75,7 +85,32 @@ struct DisablePinView: View {
 	}
 	
 	@ViewBuilder
-	func prompt() -> some View {
+	func numberPadHeader() -> some View {
+		
+		// When we switch between the `prompt` and the `countdown`,
+		// we don't want the other UI components to change position.
+		// In other words, they shouldn't move up or down on the screen.
+		// To accomplish this, we make sure they both have the same height.
+		
+		ZStack(alignment: Alignment.center) {
+			
+			let delay = retryDelay()
+			
+			countdown(delay ?? "1 second", invisible: delay == nil)
+			prompt(invisible: delay != nil)
+		}
+	}
+	
+	@ViewBuilder
+	func countdown(_ delay: String, invisible: Bool) -> some View {
+		
+		Text("Retry in \(delay)")
+			.font(.headline)
+			.foregroundStyle(invisible ? Color.clear : Color.primary)
+	}
+	
+	@ViewBuilder
+	func prompt(invisible: Bool) -> some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			Spacer()
@@ -83,31 +118,34 @@ struct DisablePinView: View {
 			Group {
 				if pin.count < PIN_LENGTH {
 					Text("Enter PIN to confirm")
+						.foregroundStyle(invisible ? Color.clear : Color.primary)
 				} else if isCorrectPin {
-					Label("Correct", systemImage: "checkmark").foregroundStyle(Color.appPositive)
+					Label("Correct", systemImage: "checkmark")
+						.foregroundStyle(invisible ? Color.clear : Color.appPositive)
 				} else {
-					Label("Incorrect", systemImage: "xmark").foregroundStyle(Color.appNegative)
+					Label("Incorrect", systemImage: "xmark")
+						.foregroundStyle(invisible ? Color.clear : Color.appNegative)
 				}
 			}
 			.padding(.bottom)
 			
-			promptCircles()
+			promptCircles(invisible)
 			
 			Spacer()
 		} // </VStack>
 	}
 	
 	@ViewBuilder
-	func promptCircles() -> some View {
+	func promptCircles(_ invisible: Bool) -> some View {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 10) {
 		
 			let pinCount = pin.count
 			ForEach(0 ..< PIN_LENGTH, id: \.self) { idx in
 				if idx < pinCount {
-					filledCircle()
+					filledCircle(invisible)
 				} else {
-					emptyCircle()
+					emptyCircle(invisible)
 				}
 			}
 			
@@ -116,25 +154,25 @@ struct DisablePinView: View {
 	}
 	
 	@ViewBuilder
-	func emptyCircle() -> some View {
+	func emptyCircle(_ invisible: Bool) -> some View {
 		
 		Image(systemName: "circle")
 			.renderingMode(.template)
 			.resizable()
 			.scaledToFit()
 			.frame(width: 24, height: 24)
-			.foregroundColor(circleColor)
+			.foregroundColor(invisible ? Color.clear : circleColor)
 	}
 	
 	@ViewBuilder
-	func filledCircle() -> some View {
+	func filledCircle(_ invisible: Bool) -> some View {
 		
 		Image(systemName: "circle.fill")
 			.renderingMode(.template)
 			.resizable()
 			.scaledToFit()
 			.frame(width: 24, height: 24)
-			.foregroundColor(circleColor)
+			.foregroundColor(invisible ? Color.clear : circleColor)
 	}
 	
 	@ViewBuilder
@@ -165,6 +203,47 @@ struct DisablePinView: View {
 			return Color.appPositive
 		} else {
 			return Color.appNegative
+		}
+	}
+	
+	func retryDelay() -> String? {
+		
+		guard let remaining = invalidPin.waitTimeFrom(currentDate)?.rounded() else {
+			return nil
+		}
+		
+		let minutes = Int(remaining / 60.0)
+		let seconds = Int(remaining) % 60
+		
+		let nf = NumberFormatter()
+		nf.minimumIntegerDigits = 2
+		let secondsStr = nf.string(from: NSNumber(value: seconds)) ?? "00"
+		
+		return "\(minutes):\(secondsStr)"
+	}
+	
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
+	
+	func onAppear() {
+		log.trace("onAppear()")
+		
+		switch type {
+		case .lockPin:
+			invalidPin = AppSecurity.shared.getInvalidLockPin() ?? InvalidPin.none()
+		case .spendingPin:
+			invalidPin = AppSecurity.shared.getInvalidSpendingPin() ?? InvalidPin.none()
+		}
+		currentDate = Date.now
+		
+		if let delay = invalidPin.waitTimeFrom(currentDate) {
+			
+			numberPadDisabled = true
+			DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+				numberPadDisabled = false
+				pin = ""
+			}
 		}
 	}
 	
@@ -203,30 +282,10 @@ struct DisablePinView: View {
 		}
 	}
 	
-	func handleIncorrectPin() {
-		log.trace("handleIncorrectPin()")
-		
-		vibrationTrigger += 1
-		withAnimation {
-			shakeTrigger += 1
-		}
-		
-		failCount += 1
-		isCorrectPin = false
-		numberPadDisabled = true
-		DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
-			if failCount < 3 {
-				pin = ""
-				numberPadDisabled = false
-			} else {
-				dismissView(.UserCancelled)
-				SceneDelegate.get().lockWallet()
-			}
-		}
-	}
-	
 	func handleCorrectPin() {
 		log.trace("handleCorrectPin()")
+		
+		invalidPin = InvalidPin.none()
 		
 		isCorrectPin = true
 		numberPadDisabled = true
@@ -246,6 +305,51 @@ struct DisablePinView: View {
 				}
 			}
 			
+		}
+	}
+	
+	func handleIncorrectPin() {
+		log.trace("handleIncorrectPin()")
+		
+		vibrationTrigger += 1
+		withAnimation {
+			shakeTrigger += 1
+		}
+		
+		isCorrectPin = false
+		numberPadDisabled = true
+		DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
+			pin = ""
+			numberPadDisabled = false
+			incrementInvalidPin()
+		}
+	}
+	
+	func incrementInvalidPin() {
+		log.trace("incrementInvalidPin()")
+		
+		let newInvalidPin: InvalidPin
+		if invalidPin.count > 0 && invalidPin.elapsed > 24.hours() {
+			// We reset the count after 24 hours
+			newInvalidPin = InvalidPin.one()
+		} else {
+			newInvalidPin = invalidPin.increment()
+		}
+		
+		switch type {
+		case .lockPin:
+			AppSecurity.shared.setInvalidLockPin(newInvalidPin) { _ in }
+		case .spendingPin:
+			AppSecurity.shared.setInvalidSpendingPin(newInvalidPin) { _ in }
+		}
+		
+		invalidPin = newInvalidPin
+		currentDate = Date.now
+		
+		if newInvalidPin.hasWaitTime(currentDate) && type == .lockPin {
+			
+			dismissView(.UserCancelled)
+			SceneDelegate.get().lockWallet()
 		}
 	}
 	

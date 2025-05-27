@@ -274,7 +274,12 @@ struct SetNewPinView: View {
 				if error != nil {
 					self.dismissView(.Failed)
 				} else {
-					AppSecurity.shared.setPasscodeFallback(enabled: false) { error in
+					// Enabling the lock pin implies disabling the passcode fallback.
+					AppSecurity.shared.setPasscodeFallback(enabled: false) { _ in }
+					
+					// If there still exists an InvalidLockPin in the keychain,
+					// it should be cleared now.
+					AppSecurity.shared.setInvalidLockPin(nil) { _ in
 						self.dismissView(.PinSet)
 					}
 				}
@@ -285,7 +290,11 @@ struct SetNewPinView: View {
 				if error != nil {
 					self.dismissView(.Failed)
 				} else {
-					self.dismissView(.PinSet)
+					// If there still exists an InvalidSpendingPin in the keychain,
+					// now is a good time to clear it.
+					AppSecurity.shared.setInvalidLockPin(nil) { _ in
+						self.dismissView(.PinSet)
+					}
 				}
 			}
 		}

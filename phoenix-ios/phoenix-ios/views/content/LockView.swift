@@ -378,6 +378,16 @@ struct LockView: View {
 		
 		enabledSecurity = AppSecurity.shared.enabledSecurityPublisher.value
 		invalidPin = AppSecurity.shared.getInvalidLockPin() ?? InvalidPin.none()
+		currentDate = Date.now
+		
+		if let delay = invalidPin.waitTimeFrom(currentDate) {
+			
+			numberPadDisabled = true
+			DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+				numberPadDisabled = false
+				pin = ""
+			}
+		}
 		
 		if canPrompt {
 			if enabledSecurity.contains(.biometrics) {
