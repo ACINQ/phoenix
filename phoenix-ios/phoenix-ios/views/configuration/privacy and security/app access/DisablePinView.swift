@@ -23,7 +23,8 @@ struct DisablePinView: View {
 		}
 	}
 	
-	let willClose: (EndResult) -> Void
+	let type: PinType
+	let willClose: (PinType, EndResult) -> Void
 	
 	@State var pin: String = ""
 	@State var isCorrectPin: Bool = false
@@ -43,7 +44,7 @@ struct DisablePinView: View {
 	var body: some View {
 		
 		layers()
-			.navigationTitle(NSLocalizedString("Disable PIN", comment: "Navigation bar title"))
+			.navigationTitle(String(localized: "Disable PIN", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationBarBackButtonHidden(true)
 			.navigationBarItems(leading: cancelButton())
@@ -190,7 +191,11 @@ struct DisablePinView: View {
 	func verifyPin() {
 		log.trace("verifyPin()")
 		
-		let correctPin = AppSecurity.shared.getCustomPin()
+		let correctPin: String?
+		switch type {
+			case .lockPin     : correctPin = AppSecurity.shared.getLockPin()
+			case .spendingPin : correctPin = AppSecurity.shared.getSpendingPin()
+		}
 		if pin == correctPin {
 			handleCorrectPin()
 		} else {
@@ -226,10 +231,21 @@ struct DisablePinView: View {
 		isCorrectPin = true
 		numberPadDisabled = true
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
-			AppSecurity.shared.setCustomPin(pin: nil) { error in
-				let result: EndResult = (error == nil) ? .PinDisabled : .Failed
-				dismissView(result)
+			
+			switch type {
+			case .lockPin:
+				AppSecurity.shared.setLockPin(nil) { error in
+					let result: EndResult = (error == nil) ? .PinDisabled : .Failed
+					dismissView(result)
+				}
+				
+			case .spendingPin:
+				AppSecurity.shared.setSpendingPin(nil) { error in
+					let result: EndResult = (error == nil) ? .PinDisabled : .Failed
+					dismissView(result)
+				}
 			}
+			
 		}
 	}
 	
@@ -242,7 +258,7 @@ struct DisablePinView: View {
 	func dismissView(_ result: EndResult) {
 		log.info("dismissView(\(result))")
 		
-		willClose(result)
+		willClose(type, result)
 		presentationMode.wrappedValue.dismiss()
 	}
 }

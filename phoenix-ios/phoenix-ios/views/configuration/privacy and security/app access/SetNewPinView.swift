@@ -23,7 +23,8 @@ struct SetNewPinView: View {
 		}
 	}
 	
-	let willClose: (EndResult) -> Void
+	let type: PinType
+	let willClose: (PinType, EndResult) -> Void
 	
 	enum EditMode {
 		case Pin1
@@ -50,7 +51,7 @@ struct SetNewPinView: View {
 	var body: some View {
 		
 		layers()
-			.navigationTitle(NSLocalizedString("Set PIN", comment: "Navigation bar title"))
+			.navigationTitle(String(localized: "Set PIN", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationBarBackButtonHidden(true)
 			.navigationBarItems(leading: cancelButton())
@@ -267,11 +268,23 @@ struct SetNewPinView: View {
 	func savePinAndDismiss() {
 		log.trace("savePinAndDismiss()")
 		
-		AppSecurity.shared.setCustomPin(pin: pin1) { error in
-			if error != nil {
-				self.dismissView(.Failed)
-			} else {
-				AppSecurity.shared.setPasscodeFallback(enabled: false) { error in
+		switch type {
+		case .lockPin:
+			AppSecurity.shared.setLockPin(pin1) { error in
+				if error != nil {
+					self.dismissView(.Failed)
+				} else {
+					AppSecurity.shared.setPasscodeFallback(enabled: false) { error in
+						self.dismissView(.PinSet)
+					}
+				}
+			}
+			
+		case .spendingPin:
+			AppSecurity.shared.setSpendingPin(pin1) { error in
+				if error != nil {
+					self.dismissView(.Failed)
+				} else {
 					self.dismissView(.PinSet)
 				}
 			}
@@ -287,7 +300,7 @@ struct SetNewPinView: View {
 	func dismissView(_ result: EndResult) {
 		log.info("dismissView(\(result))")
 		
-		willClose(result)
+		willClose(type, result)
 		presentationMode.wrappedValue.dismiss()
 	}
 }

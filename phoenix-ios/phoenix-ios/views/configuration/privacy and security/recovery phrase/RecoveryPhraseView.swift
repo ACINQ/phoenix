@@ -619,13 +619,13 @@ struct RecoveryPhraseList: View {
 				
 				if case .success(let recoveryPhrase) = result {
 					Succeed(recoveryPhrase)
-				} else if enabledSecurity.contains(.customPin) { // custom pin fallback
+				} else if enabledSecurity.contains(.lockPin) { // lock pin fallback
 					AuthWithPin()
 				} else {
 					Fail()
 				}
 			}
-		} else if enabledSecurity.contains(.customPin) {
+		} else if enabledSecurity.contains(.lockPin) {
 			AuthWithPin()
 			
 		} else {

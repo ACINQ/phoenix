@@ -14,6 +14,32 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 let PIN_LENGTH = 6
 
+enum PinType: CustomStringConvertible {
+	case lockPin
+	case spendingPin
+	
+	var keychain_accountName_pin: String {
+		switch self {
+			case .lockPin     : return keychain_accountName_lockPin
+			case .spendingPin : return keychain_accountName_spendingPin
+		}
+	}
+	
+	var keychain_accountName_invalid: String {
+		switch self {
+			case .lockPin     : return keychain_accountName_invalidLockPin
+			case .spendingPin : return keychain_accountName_invalidSpendingPin
+		}
+	}
+	
+	var description: String {
+		switch self {
+			case .lockPin     : return "lockPin"
+			case .spendingPin : return "spendingPin"
+		}
+	}
+}
+
 /// Represents the availability of Biometrics on the current device.
 /// Devices either support TouchID or FaceID,
 /// but the user needs to have enabled and enrolled in the service.
@@ -142,8 +168,11 @@ class AppSecurity {
 					enabledSecurity.insert(.passcodeFallback)
 				}
 			}
-			if hasCustomPin() {
-				enabledSecurity.insert(.customPin)
+			if hasLockPin() {
+				enabledSecurity.insert(.lockPin)
+			}
+			if hasSpendingPin() {
+				enabledSecurity.insert(.spendingPin)
 			}
 		}
 		
@@ -602,17 +631,18 @@ class AppSecurity {
 	}
 	
 	// --------------------------------------------------------------------------------
-	// MARK: Custom PIN
+	// MARK: PIN
 	// --------------------------------------------------------------------------------
 	
-	public func setCustomPin(
-		pin        : String?,
+	private func setPin(
+		_ pin      : String?,
+		_ type     : PinType,
 		completion : @escaping (_ error: Error?) -> Void
 	) -> Void {
-		log.trace("setCustomPin(\(pin == nil ? "<nil>" : "<non-nil>"))")
+		log.trace("setPin(\(pin == nil ? "<nil>" : "<non-nil>"), \(type)")
 		
 		if let pin {
-			precondition(pin.isValidPIN, "Attempting to set invalid PIN")
+			precondition(pin.isValidPIN, "Attempting to set invalid PIN for type \(type)")
 		}
 		
 		let succeed = {
@@ -635,7 +665,7 @@ class AppSecurity {
 		queue.async {
 			
 			let keychain = GenericPasswordStore()
-			let account = keychain_accountName_customPin
+			let account = type.keychain_accountName_pin
 			let accessGroup = self.privateAccessGroup()
 			
 			if let pin {
@@ -649,7 +679,7 @@ class AppSecurity {
 										mixins: mixins)
 					
 				} catch {
-					log.error("keychain.storeKey(account: customPin): error: \(error)")
+					log.error("keychain.storeKey(account: \(account)): error: \(error)")
 					return fail(error)
 				}
 				
@@ -661,7 +691,7 @@ class AppSecurity {
 					)
 				
 				} catch {
-					log.error("keychain.deleteKey(account: customPin): error: \(error)")
+					log.error("keychain.deleteKey(account: \(account)): error: \(error)")
 					return fail(error)
 				}
 			}
@@ -671,10 +701,10 @@ class AppSecurity {
 		} // </queue.async>
 	}
 	
-	public func getCustomPin() -> String? {
+	private func getPin(_ type: PinType) -> String? {
 		
 		let keychain = GenericPasswordStore()
-		let account = keychain_accountName_customPin
+		let account = type.keychain_accountName_pin
 		let accessGroup = privateAccessGroup()
 		
 		var pin: String? = nil
@@ -689,25 +719,21 @@ class AppSecurity {
 			}
 			
 		} catch {
-			log.error("keychain.readKey(account: customPin): error: \(error)")
+			log.error("keychain.readKey(account: \(account)): error: \(error)")
 		}
 		
 		return pin
 	}
 	
-	public func hasCustomPin() -> Bool {
-		
-		return getCustomPin() != nil
-	}
-	
-	public func setInvalidPin(
-		invalidPin : InvalidPin?,
-		completion : @escaping (_ error: Error?) -> Void
+	private func setInvalidPin(
+		_ invalidPin : InvalidPin?,
+		_ type       : PinType,
+		completion   : @escaping (_ error: Error?) -> Void
 	) -> Void {
 		if let invalidPin {
-			log.trace("setInvalidPin(<count = \(invalidPin.count)>)")
+			log.trace("setInvalidPin(<count = \(invalidPin.count)>, \(type))")
 		} else {
-			log.trace("setInvalidPin(<nil>)")
+			log.trace("setInvalidPin(<nil>, \(type))")
 		}
 		
 		let succeed = {
@@ -736,7 +762,7 @@ class AppSecurity {
 		queue.async {
 			
 			let keychain = GenericPasswordStore()
-			let account = keychain_accountName_invalidPin
+			let account = type.keychain_accountName_invalid
 			let accessGroup = self.privateAccessGroup()
 			
 			if let invalidPinData {
@@ -750,7 +776,7 @@ class AppSecurity {
 										mixins: mixins)
 					
 				} catch {
-					log.error("keychain.storeKey(account: invalidPin): error: \(error)")
+					log.error("keychain.storeKey(account: \(account)): error: \(error)")
 					return fail(error)
 				}
 				
@@ -762,7 +788,7 @@ class AppSecurity {
 					)
 				
 				} catch {
-					log.error("keychain.deleteKey(account: invalidPin): error: \(error)")
+					log.error("keychain.deleteKey(account: \(account)): error: \(error)")
 					return fail(error)
 				}
 			}
@@ -772,10 +798,10 @@ class AppSecurity {
 		} // </queue.async>
 	}
 	
-	public func getInvalidPin() -> InvalidPin? {
+	private func getInvalidPin(_ type: PinType) -> InvalidPin? {
 		
 		let keychain = GenericPasswordStore()
-		let account = keychain_accountName_invalidPin
+		let account = type.keychain_accountName_invalid
 		let accessGroup = privateAccessGroup()
 		
 		var invalidPin: InvalidPin? = nil
@@ -789,15 +815,75 @@ class AppSecurity {
 				do {
 					invalidPin = try JSONDecoder().decode(InvalidPin.self, from: value)
 				} catch {
-					log.error("JSON.decode(InvalidPin): error: \(error)")
+					log.error("JSON.decode(account: \(account)): error: \(error)")
 				}
 			}
 			
 		} catch {
-			log.error("keychain.readKey(account: invalidPin): error: \(error)")
+			log.error("keychain.readKey(account: \(account)): error: \(error)")
 		}
 		
 		return invalidPin
+	}
+	
+	// --------------------------------------------------------------------------------
+	// MARK: Lock PIN
+	// --------------------------------------------------------------------------------
+	
+	public func setLockPin(
+		_ pin      : String?,
+		completion : @escaping (_ error: Error?) -> Void
+	) {
+		setPin(pin, .lockPin, completion: completion)
+	}
+	
+	public func getLockPin() -> String? {
+		return getPin(.lockPin)
+	}
+	
+	public func hasLockPin() -> Bool {
+		return getLockPin() != nil
+	}
+	
+	public func setInvalidLockPin(
+		_ invalidPin : InvalidPin?,
+		completion   : @escaping (_ error: Error?) -> Void
+	) {
+		setInvalidPin(invalidPin, .lockPin, completion: completion)
+	}
+	
+	public func getInvalidLockPin() -> InvalidPin? {
+		return getInvalidPin(.lockPin)
+	}
+	
+	// --------------------------------------------------------------------------------
+	// MARK: Spending PIN
+	// --------------------------------------------------------------------------------
+	
+	public func setSpendingPin(
+		_ pin      : String?,
+		completion : @escaping (_ error: Error?) -> Void
+	) {
+		setPin(pin, .spendingPin, completion: completion)
+	}
+	
+	public func getSpendingPin() -> String? {
+		return getPin(.spendingPin)
+	}
+	
+	public func hasSpendingPin() -> Bool {
+		return getSpendingPin() != nil
+	}
+	
+	public func setInvalidSpendingPin(
+		_ invalidPin : InvalidPin?,
+		completion   : @escaping (_ error: Error?) -> Void
+	) {
+		setInvalidPin(invalidPin, .spendingPin, completion: completion)
+	}
+	
+	public func getInvalidSpendingPin() -> InvalidPin? {
+		return getInvalidPin(.spendingPin)
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -1064,8 +1150,8 @@ class AppSecurity {
 		if getPasscodeFallbackEnabled() {
 			// Biometrics + Passcode Fallback
 			policy = .deviceOwnerAuthentication
-		} else if hasCustomPin() {
-			// Biometrics + Custom PIN Fallback
+		} else if hasLockPin() {
+			// Biometrics + Lock PIN Fallback
 			policy = .deviceOwnerAuthenticationWithBiometrics
 			context.localizedFallbackTitle = "" // do not show (cancel button ==> custom pin)
 			context.localizedCancelTitle = String(localized: "Enter Phoenix PIN")
@@ -1142,7 +1228,7 @@ class AppSecurity {
 		
 		do {
 			try keychain.deleteKey(
-				account: keychain_accountName_customPin,
+				account: keychain_accountName_lockPin,
 				accessGroup: privateAccessGroup()
 			)
 			log.info("Deleted keychain item: act(customPin) grp(private)")

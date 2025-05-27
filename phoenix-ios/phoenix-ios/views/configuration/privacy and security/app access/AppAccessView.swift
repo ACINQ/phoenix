@@ -12,21 +12,32 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct AppAccessView : View {
 	
-	enum NavLinkTag: String, Codable {
-		case SetCustomPinView
-		case EditCustomPinView
-		case DisableCustomPinView
+	enum NavLinkTag: Hashable, CustomStringConvertible {
+		case SetPinView(type: PinType)
+		case EditPinView(type: PinType)
+		case DisablePinView(type: PinType)
+		
+		var description: String {
+			switch self {
+				case .SetPinView(let type)     : return "SetPinView(\(type))"
+				case .EditPinView(let type)    : return "EditPinView(\(type))"
+				case .DisablePinView(let type) : return "DisablePinView(\(type))"
+			}
+		}
 	}
 	
 	@State var biometricSupport = AppSecurity.shared.deviceBiometricSupport()
 	@State var biometricsEnabled: Bool = false
 	@State var passcodeFallbackEnabled: Bool = false
-	@State var customPinEnabled: Bool = false
-	@State var customPinSet: Bool = false
+	@State var lockPinEnabled: Bool = false
+	@State var lockPinSet: Bool = false
+	@State var spendingPinEnabled: Bool = false
+	@State var spendingPinSet: Bool = false
 	
 	@State var ignoreToggle_biometricsEnabled = false
 	@State var ignoreToggle_passcodeFallbackEnabled = false
-	@State var ignoreToggle_customPinEnabled = false
+	@State var ignoreToggle_lockPinEnabled = false
+	@State var ignoreToggle_spendingPinEnabled = false
 	
 	@State private var backupSeedState: BackupSeedState = .safelyBackedUp
 	let backupSeedStatePublisher: AnyPublisher<BackupSeedState, Never>
@@ -53,9 +64,10 @@ struct AppAccessView : View {
 		
 		_biometricsEnabled = State(initialValue: enabledSecurity.contains(.biometrics))
 		_passcodeFallbackEnabled = State(initialValue: enabledSecurity.contains(.passcodeFallback))
-		_customPinEnabled = State(initialValue: enabledSecurity.contains(.customPin))
-		
-		_customPinSet = State(initialValue: AppSecurity.shared.hasCustomPin())
+		_lockPinEnabled = State(initialValue: enabledSecurity.contains(.lockPin))
+		_lockPinSet = State(initialValue: enabledSecurity.contains(.lockPin))
+		_spendingPinEnabled = State(initialValue: enabledSecurity.contains(.spendingPin))
+		_spendingPinSet = State(initialValue: enabledSecurity.contains(.spendingPin))
 		
 		if let walletId = Biz.walletId {
 			backupSeedStatePublisher = Prefs.shared.backupSeedStatePublisher(walletId)
@@ -72,7 +84,7 @@ struct AppAccessView : View {
 	var body: some View {
 		
 		layers()
-			.navigationTitle(NSLocalizedString("App Access", comment: "Navigation bar title"))
+			.navigationTitle(String(localized: "App Access", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
 				navLinkView()
@@ -106,8 +118,8 @@ struct AppAccessView : View {
 			if !isRecoveryPhrasedBackedUp {
 				section_warning()
 			}
-			section_biometrics()
-			section_pin()
+			section_openingTheApp()
+			section_spendingControl()
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
@@ -157,37 +169,30 @@ struct AppAccessView : View {
 	}
 	
 	@ViewBuilder
-	func section_biometrics() -> some View {
+	func section_openingTheApp() -> some View {
 		
 		Section {
 			toggle_biometrics()
-			
-			// Implicit divider added here
-			
 			toggle_passcodeFallbackOption()
-				.padding(.top, 5)
-				.padding(.bottom, 10)
+			toggle_lockPin()
+			button_changeLockPin()
 			
 		} header: {
-			Text("Biometrics")
+			Text("Opening the app")
 			
 		} // </Section>
 	}
 	
 	@ViewBuilder
-	func section_pin() -> some View {
+	func section_spendingControl() -> some View {
 		
 		Section {
-			toggle_customPin()
-			
-			// Implicit divider added here
-			
-			button_changePin()
-				.padding(.top, 5)
-				.padding(.bottom, 10)
+			toggle_spendingPin()
+			button_changeSpendingPin()
 			
 		} header: {
-			Text("PIN")
+			Text("Spending Control")
+			
 		} // </Section>
 	}
 	
@@ -197,35 +202,44 @@ struct AppAccessView : View {
 		ToggleAlignment {
 			
 			LabelAlignment {
-				switch biometricSupport {
-				case .touchID_available:
-					Text("Touch ID")
+				VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
 					
-				case .touchID_notAvailable:
-					Text("Touch ID") + Text(" (not available)").foregroundColor(.secondary)
-				
-				case .touchID_notEnrolled:
-					Text("Touch ID") + Text(" (not enrolled)").foregroundColor(.secondary)
-				
-				case .faceID_available:
-					Text("Face ID")
-				
-				case .faceID_notAvailable:
-					Text("Face ID") + Text(" (not available)").foregroundColor(.secondary)
-				
-				case .faceID_notEnrolled:
-					Text("Face ID") + Text(" (not enrolled)").foregroundColor(.secondary)
-				
-				default:
-					Text("Biometrics") + Text(" (not available)").foregroundColor(.secondary)
-				}
+					switch biometricSupport {
+					case .touchID_available:
+						Text("Touch ID")
+						
+					case .touchID_notAvailable:
+						Text("Touch ID") + Text(" (not available)").foregroundColor(.secondary)
+						
+					case .touchID_notEnrolled:
+						Text("Touch ID") + Text(" (not enrolled)").foregroundColor(.secondary)
+						
+					case .faceID_available:
+						Text("Face ID")
+						
+					case .faceID_notAvailable:
+						Text("Face ID") + Text(" (not available)").foregroundColor(.secondary)
+						
+					case .faceID_notEnrolled:
+						Text("Face ID") + Text(" (not enrolled)").foregroundColor(.secondary)
+						
+					default:
+						Text("Biometrics") + Text(" (not available)").foregroundColor(.secondary)
+					} // </switch>
+					
+					Text("Pass iOS biometrics to open the app.")
+						.lineLimit(nil)
+						.font(.callout)
+						.foregroundColor(.secondary)
+					
+				} // </VStack>
 				
 			} icon: {
 				Image(systemName: isTouchID() ? "touchid" : "faceid")
 					.renderingMode(.template)
 					.imageScale(.medium)
 					.foregroundColor(Color.appAccent)
-			}
+			} // </LabelAlignment>
 			
 		} toggle: {
 			
@@ -245,16 +259,14 @@ struct AppAccessView : View {
 		ToggleAlignment {
 			
 			LabelAlignment {
-				VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+				VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
 					Text("Allow passcode fallback")
 					
 					Group {
 						if isTouchID() {
-							Text("If Touch ID fails, you can enter your iOS passcode to access Phoenix.")
-								.padding(.top, 8)
+							Text("If Touch ID fails, you can enter your iOS passcode to open the app.")
 						} else {
-							Text("If Face ID fails, you can enter your iOS passcode to access Phoenix.")
-								.padding(.top, 8)
+							Text("If Face ID fails, you can enter your iOS passcode to open the app.")
 						}
 					}
 					.lineLimit(nil)
@@ -263,11 +275,11 @@ struct AppAccessView : View {
 					
 				} // </VStack>
 			} icon: {
-				Image(systemName: "circle.grid.3x3")
+				Image(systemName: "keyboard")
 					.renderingMode(.template)
 					.imageScale(.medium)
 					.foregroundColor(Color.appAccent)
-			} // </Label>
+			} // </LabelAlignment>
 			
 		} toggle: {
 			
@@ -282,32 +294,41 @@ struct AppAccessView : View {
 	}
 	
 	@ViewBuilder
-	func toggle_customPin() -> some View {
+	func toggle_lockPin() -> some View {
 		
-		Toggle(isOn: $customPinEnabled) {
-			Label {
-				Text("Custom PIN")
+		ToggleAlignment {
+			LabelAlignment {
+				VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
+					Text("Lock PIN")
+					Text("Enter custom PIN to open the app.")
+						.lineLimit(nil)
+						.font(.callout)
+						.foregroundColor(.secondary)
+				}
 			} icon: {
 				Image(systemName: "circle.grid.3x3")
 					.renderingMode(.template)
 					.imageScale(.medium)
 					.foregroundColor(Color.appAccent)
-			}
-		} // </Toggle>
-		.disabled(!isRecoveryPhrasedBackedUp)
-		.onChange(of: customPinEnabled) { value in
-			self.toggleCustomPin(value)
-		}
+			} // </LabelAlignment>
+		} toggle: {
+			Toggle("", isOn: $lockPinEnabled)
+				.labelsHidden()
+				.disabled(!isRecoveryPhrasedBackedUp)
+				.onChange(of: lockPinEnabled) { value in
+					self.toggleLockPin(value)
+				}
+		} // </ToggleAlignment>
 	}
 	
 	@ViewBuilder
-	func button_changePin() -> some View {
+	func button_changeLockPin() -> some View {
 		
 		Button {
-			changePin()
+			changeLockPin()
 		} label: {
 			Label {
-				Text("Change PIN")
+				Text("Change lock PIN")
 			} icon: {
 				Image(systemName: "arrow.triangle.2.circlepath")
 					.renderingMode(.template)
@@ -315,7 +336,53 @@ struct AppAccessView : View {
 					.foregroundColor(Color.appAccent)
 			}
 		}
-		.disabled(!customPinEnabled || !customPinSet || !isRecoveryPhrasedBackedUp)
+		.disabled(!lockPinEnabled || !lockPinSet || !isRecoveryPhrasedBackedUp)
+	}
+	
+	@ViewBuilder
+	func toggle_spendingPin() -> some View {
+		
+		ToggleAlignment {
+			LabelAlignment {
+				VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
+					Text("Spending PIN")
+					Text("Enter a PIN code to be able to spend funds.")
+						.lineLimit(nil)
+						.font(.callout)
+						.foregroundColor(.secondary)
+				}
+			} icon: {
+				Image(systemName: "circle.grid.3x3")
+					.renderingMode(.template)
+					.imageScale(.medium)
+					.foregroundColor(Color.appAccent)
+			} // </LabelAlignment>
+		} toggle: {
+			Toggle("", isOn: $spendingPinEnabled)
+				.labelsHidden()
+				.disabled(!isRecoveryPhrasedBackedUp)
+				.onChange(of: spendingPinEnabled) { value in
+					self.toggleSpendingPin(value)
+				}
+		} // </ToggleAlignment>
+	}
+	
+	@ViewBuilder
+	func button_changeSpendingPin() -> some View {
+		
+		Button {
+			changeSpendingPin()
+		} label: {
+			LabelAlignment {
+				Text("Change spending PIN")
+			} icon: {
+				Image(systemName: "arrow.triangle.2.circlepath")
+					.renderingMode(.template)
+					.imageScale(.medium)
+					.foregroundColor(Color.appAccent)
+			} // </LabelAlignment>
+		} // </Button>
+		.disabled(!spendingPinEnabled || !spendingPinSet || !isRecoveryPhrasedBackedUp)
 	}
 	
 	@ViewBuilder
@@ -332,9 +399,14 @@ struct AppAccessView : View {
 	private func navLinkView(_ tag: NavLinkTag) -> some View {
 		
 		switch tag {
-			case .SetCustomPinView     : SetNewPinView(willClose: setNewPinView_willClose)
-			case .EditCustomPinView    : EditPinView(willClose: editPinView_willClose)
-			case .DisableCustomPinView : DisablePinView(willClose: disablePinView_willClose)
+		case .SetPinView(let type):
+			SetNewPinView(type: type, willClose: setNewPinView_willClose)
+			
+		case .EditPinView(let type):
+			EditPinView(type: type, willClose: editPinView_willClose)
+			
+		case .DisablePinView(let type):
+			DisablePinView(type: type, willClose: disablePinView_willClose)
 		}
 	}
 	
@@ -394,37 +466,65 @@ struct AppAccessView : View {
 		backupSeedState = newState
 	}
 	
-	func setNewPinView_willClose(_ result: SetNewPinView.EndResult) {
-		log.trace("setNewPinView_willClose(\(result))")
+	func setNewPinView_willClose(_ type: PinType, _ result: SetNewPinView.EndResult) {
+		log.trace("setNewPinView_willClose(\(type), \(result))")
 		
-		switch result {
-		case .Failed: fallthrough
-		case .UserCancelled:
-			ignoreToggle_customPinEnabled = true
-			customPinEnabled = false
-		
-		case .PinSet:
-			customPinSet = true
+		switch type {
+		case .lockPin:
+			switch result {
+			case .Failed: fallthrough
+			case .UserCancelled:
+				ignoreToggle_lockPinEnabled = true
+				lockPinEnabled = false
+			
+			case .PinSet:
+				lockPinSet = true
+			}
+			
+		case .spendingPin:
+			switch result {
+			case .Failed: fallthrough
+			case .UserCancelled:
+				ignoreToggle_spendingPinEnabled = true
+				spendingPinEnabled = false
+			
+			case .PinSet:
+				spendingPinSet = true
+			}
 		}
 	}
 	
-	func editPinView_willClose(_ result: EditPinView.EndResult) {
-		log.trace("editPinView_willClose()")
+	func editPinView_willClose(_ type: PinType, _ result: EditPinView.EndResult) {
+		log.trace("editPinView_willClose(\(type), \(result))")
 		
 		// Nothing to do here (UI remains the same)
 	}
 	
-	func disablePinView_willClose(_ result: DisablePinView.EndResult) {
-		log.trace("disablePinView_willClose(\(result))")
+	func disablePinView_willClose(_ type: PinType, _ result: DisablePinView.EndResult) {
+		log.trace("disablePinView_willClose(\(type), \(result))")
 		
-		switch result {
-		case .Failed: fallthrough
-		case .UserCancelled:
-			ignoreToggle_customPinEnabled = true
-			customPinEnabled = true
-		
-		case .PinDisabled:
-			customPinSet = false
+		switch type {
+		case .lockPin:
+			switch result {
+			case .Failed: fallthrough
+			case .UserCancelled:
+				ignoreToggle_lockPinEnabled = true
+				lockPinEnabled = true
+			
+			case .PinDisabled:
+				lockPinSet = false
+			}
+			
+		case .spendingPin:
+			switch result {
+			case .Failed: fallthrough
+			case .UserCancelled:
+				ignoreToggle_spendingPinEnabled = true
+				spendingPinEnabled = true
+			
+			case .PinDisabled:
+				spendingPinSet = false
+			}
 		}
 	}
 	
@@ -433,7 +533,7 @@ struct AppAccessView : View {
 	// --------------------------------------------------
 	
 	func navigateTo(_ tag: NavLinkTag) {
-		log.trace("navigateTo(\(tag.rawValue))")
+		log.trace("navigateTo(\(tag))")
 		
 		if #available(iOS 17, *) {
 			navCoordinator.path.append(tag)
@@ -515,10 +615,10 @@ struct AppAccessView : View {
 			self.passcodeFallbackEnabled = true // failed to disable == enabled
 		}
 		
-		if flag && customPinEnabled {
+		if flag && lockPinEnabled {
 			
 			// User is trying to enable "system passcode fallback",
-			// but they already have the "custom pin" enabled.
+			// but they already have the "lock pin" enabled.
 			
 			smartModalState.display(dismissable: true) {
 				WhichPinSheet(currentChoice: .customPin)
@@ -561,39 +661,61 @@ struct AppAccessView : View {
 		}
 	}
 	
-	func toggleCustomPin(_ flag: Bool) {
-		log.trace("toggleCustomPin()")
+	func toggleLockPin(_ flag: Bool) {
+		log.trace("toggleLockPin()")
 		
-		if ignoreToggle_customPinEnabled {
-			ignoreToggle_customPinEnabled = false
+		if ignoreToggle_lockPinEnabled {
+			ignoreToggle_lockPinEnabled = false
 			return
 		}
 		
 		if flag && passcodeFallbackEnabled {
 			
 			// User is trying to enable "system passcode fallback",
-			// but they already have the "custom pin" enabled.
+			// but they already have the "lock pin" enabled.
 			
 			smartModalState.display(dismissable: true) {
 				WhichPinSheet(currentChoice: .systemPasscode)
 				
 			} onWillDisappear: {
-				ignoreToggle_customPinEnabled = true
-				customPinEnabled = false
+				ignoreToggle_lockPinEnabled = true
+				lockPinEnabled = false
 			}
 			
 		} else if flag { // toggle => ON
-			navigateTo(.SetCustomPinView)
+			navigateTo(.SetPinView(type: .lockPin))
 			
 		} else { // toggle => OFF
-			navigateTo(.DisableCustomPinView)
+			navigateTo(.DisablePinView(type: .lockPin))
 		}
 	}
 	
-	func changePin() {
-		log.trace("changePin()")
+	func changeLockPin() {
+		log.trace("changeLockPin()")
 		
-		navigateTo(.EditCustomPinView)
+		navigateTo(.EditPinView(type: .lockPin))
+	}
+	
+	func toggleSpendingPin(_ flag: Bool) {
+		log.trace("toggleSpendingPin()")
+		
+		if ignoreToggle_spendingPinEnabled {
+			ignoreToggle_spendingPinEnabled = false
+			return
+		}
+		
+		if flag { // toggle => ON
+			navigateTo(.SetPinView(type: .spendingPin))
+			
+		} else { // toggle => OFF
+			navigateTo(.DisablePinView(type: .spendingPin))
+		}
+	}
+	
+	func changeSpendingPin() {
+		log.trace("changeSpendingPin()")
+		
+		navigateTo(.EditPinView(type: .spendingPin))
 	}
 }
 

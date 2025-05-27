@@ -176,7 +176,7 @@ struct LockView: View {
 				}
 			} // </.biometrics>
 			
-			if enabledSecurity.contains(.customPin) {
+			if enabledSecurity.contains(.lockPin) {
 				Button {
 					showPinPrompt()
 				} label: {
@@ -192,7 +192,7 @@ struct LockView: View {
 	@ViewBuilder
 	func pinPrompt() -> some View {
 		
-		if enabledSecurity.contains(.customPin), pinPromptVisible {
+		if enabledSecurity.contains(.lockPin), pinPromptVisible {
 			
 			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 				
@@ -377,7 +377,7 @@ struct LockView: View {
 		refreshBiometricsSupport(biometricsSupport)
 		
 		enabledSecurity = AppSecurity.shared.enabledSecurityPublisher.value
-		invalidPin = AppSecurity.shared.getInvalidPin() ?? InvalidPin.none()
+		invalidPin = AppSecurity.shared.getInvalidLockPin() ?? InvalidPin.none()
 		
 		if canPrompt {
 			if enabledSecurity.contains(.biometrics) {
@@ -388,7 +388,7 @@ struct LockView: View {
 					// Biometics is enabled, but there's some kind of problem with it.
 					// Attention should be on biometricsErrorMsg
 				}
-			} else if enabledSecurity.contains(.customPin) {
+			} else if enabledSecurity.contains(.lockPin) {
 				let fast = firstAppearance ? true : false
 				showPinPrompt(fastAnimation: fast)
 			}
@@ -451,7 +451,7 @@ struct LockView: View {
 				
 			case .failure(let error):
 				log.debug("tryUnlockWithBiometrics: error: \(String(describing: error))")
-				if enabledSecurity.contains(.customPin) {
+				if enabledSecurity.contains(.lockPin) {
 					showPinPrompt()
 				}
 			}
@@ -501,7 +501,7 @@ struct LockView: View {
 	func verifyPin() {
 		log.trace("verifyPin()")
 		
-		let correctPin = AppSecurity.shared.getCustomPin()
+		let correctPin = AppSecurity.shared.getLockPin()
 		if pin == correctPin {
 			handleCorrectPin()
 		} else {
@@ -521,7 +521,7 @@ struct LockView: View {
 		}
 		
 		// Delete InvalidPin info from keychain (if it exists)
-		AppSecurity.shared.setInvalidPin(invalidPin: nil) { _ in }
+		AppSecurity.shared.setInvalidLockPin(nil) { _ in }
 		invalidPin = InvalidPin.none()
 	}
 	
@@ -541,7 +541,7 @@ struct LockView: View {
 			newInvalidPin = invalidPin.increment()
 		}
 		
-		AppSecurity.shared.setInvalidPin(invalidPin: newInvalidPin) { _ in }
+		AppSecurity.shared.setInvalidLockPin(newInvalidPin) { _ in }
 		invalidPin = newInvalidPin
 		currentDate = Date.now
 		

@@ -172,7 +172,7 @@ struct AuthenticateWithPinSheet: View {
 	func verifyPin() {
 		log.trace("verifyPin()")
 		
-		let correctPin = AppSecurity.shared.getCustomPin()
+		let correctPin = AppSecurity.shared.getLockPin()
 		if pin == correctPin {
 			handleCorrectPin()
 		} else {
