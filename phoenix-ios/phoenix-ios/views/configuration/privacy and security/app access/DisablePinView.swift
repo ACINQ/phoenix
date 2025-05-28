@@ -290,21 +290,21 @@ struct DisablePinView: View {
 		isCorrectPin = true
 		numberPadDisabled = true
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
-			
 			switch type {
 			case .lockPin:
+				AppSecurity.shared.setInvalidLockPin(nil) { _ in }
 				AppSecurity.shared.setLockPin(nil) { error in
 					let result: EndResult = (error == nil) ? .PinDisabled : .Failed
 					dismissView(result)
 				}
 				
 			case .spendingPin:
+				AppSecurity.shared.setInvalidSpendingPin(nil) { _ in }
 				AppSecurity.shared.setSpendingPin(nil) { error in
 					let result: EndResult = (error == nil) ? .PinDisabled : .Failed
 					dismissView(result)
 				}
 			}
-			
 		}
 	}
 	
