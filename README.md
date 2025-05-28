@@ -23,6 +23,15 @@ Phoenix is available for Android and iOS:
 - for iOS: [on the App Store](https://apps.apple.com/us/app/phoenix-wallet/id1544097028) - requires iOS 15+.
 - for Android: [on Google Play](https://play.google.com/store/apps/details?id=fr.acinq.phoenix.mainnet), or [get the APK from the releases](https://github.com/ACINQ/phoenix/releases) - requires Android 8+.
 
+Package ID:
+```
+fr.acinq.phoenix.mainnet
+```
+SHA-256 Fingerprint:
+```
+ED:55:0B:D5:D6:07:D3:42:B6:1B:BB:BB:94:FF:D4:DD:E4:3F:84:51:71:F6:3D:3A:E4:75:73:A9:5A:13:26:29
+```
+
 ## Build and test Phoenix
 
 Phoenix is separated in 3 modules:
