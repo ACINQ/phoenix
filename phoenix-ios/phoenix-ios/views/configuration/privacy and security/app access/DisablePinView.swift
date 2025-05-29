@@ -229,12 +229,7 @@ struct DisablePinView: View {
 	func onAppear() {
 		log.trace("onAppear()")
 		
-		switch type {
-		case .lockPin:
-			invalidPin = AppSecurity.shared.getInvalidLockPin() ?? InvalidPin.none()
-		case .spendingPin:
-			invalidPin = AppSecurity.shared.getInvalidSpendingPin() ?? InvalidPin.none()
-		}
+		invalidPin = AppSecurity.shared.getInvalidPin(type) ?? InvalidPin.none()
 		currentDate = Date.now
 		
 		if let delay = invalidPin.waitTimeFrom(currentDate) {
@@ -270,11 +265,7 @@ struct DisablePinView: View {
 	func verifyPin() {
 		log.trace("verifyPin()")
 		
-		let correctPin: String?
-		switch type {
-			case .lockPin     : correctPin = AppSecurity.shared.getLockPin()
-			case .spendingPin : correctPin = AppSecurity.shared.getSpendingPin()
-		}
+		let correctPin = AppSecurity.shared.getPin(type)
 		if pin == correctPin {
 			handleCorrectPin()
 		} else {
@@ -290,20 +281,10 @@ struct DisablePinView: View {
 		isCorrectPin = true
 		numberPadDisabled = true
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
-			switch type {
-			case .lockPin:
-				AppSecurity.shared.setInvalidLockPin(nil) { _ in }
-				AppSecurity.shared.setLockPin(nil) { error in
-					let result: EndResult = (error == nil) ? .PinDisabled : .Failed
-					dismissView(result)
-				}
-				
-			case .spendingPin:
-				AppSecurity.shared.setInvalidSpendingPin(nil) { _ in }
-				AppSecurity.shared.setSpendingPin(nil) { error in
-					let result: EndResult = (error == nil) ? .PinDisabled : .Failed
-					dismissView(result)
-				}
+			AppSecurity.shared.setInvalidPin(nil, type) { _ in }
+			AppSecurity.shared.setPin(nil, type) { error in
+				let result: EndResult = (error == nil) ? .PinDisabled : .Failed
+				dismissView(result)
 			}
 		}
 	}
@@ -336,13 +317,7 @@ struct DisablePinView: View {
 			newInvalidPin = invalidPin.increment()
 		}
 		
-		switch type {
-		case .lockPin:
-			AppSecurity.shared.setInvalidLockPin(newInvalidPin) { _ in }
-		case .spendingPin:
-			AppSecurity.shared.setInvalidSpendingPin(newInvalidPin) { _ in }
-		}
-		
+		AppSecurity.shared.setInvalidPin(newInvalidPin, type) { _ in }
 		invalidPin = newInvalidPin
 		currentDate = Date.now
 		

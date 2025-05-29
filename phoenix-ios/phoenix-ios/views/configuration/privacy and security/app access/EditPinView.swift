@@ -282,12 +282,7 @@ struct EditPinView: View {
 	func onAppear() {
 		log.trace("onAppear()")
 		
-		switch type {
-		case .lockPin:
-			invalidPin = AppSecurity.shared.getInvalidLockPin() ?? InvalidPin.none()
-		case .spendingPin:
-			invalidPin = AppSecurity.shared.getInvalidSpendingPin() ?? InvalidPin.none()
-		}
+		invalidPin = AppSecurity.shared.getInvalidPin(type) ?? InvalidPin.none()
 		currentDate = Date.now
 		
 		if let delay = invalidPin.waitTimeFrom(currentDate) {
@@ -345,11 +340,7 @@ struct EditPinView: View {
 	func verifyPin() {
 		log.trace("verifyPin(type: \(type))")
 		
-		let correctPin: String?
-		switch type {
-			case .lockPin     : correctPin = AppSecurity.shared.getLockPin()
-			case .spendingPin : correctPin = AppSecurity.shared.getSpendingPin()
-		}
+		let correctPin = AppSecurity.shared.getPin(type)
 		if pin0 == correctPin {
 			handleCorrectPin()
 		} else {
@@ -396,13 +387,7 @@ struct EditPinView: View {
 			newInvalidPin = invalidPin.increment()
 		}
 		
-		switch type {
-		case .lockPin:
-			AppSecurity.shared.setInvalidLockPin(newInvalidPin) { _ in }
-		case .spendingPin:
-			AppSecurity.shared.setInvalidSpendingPin(newInvalidPin) { _ in }
-		}
-		
+		AppSecurity.shared.setInvalidPin(newInvalidPin, type) { _ in }
 		invalidPin = newInvalidPin
 		currentDate = Date.now
 		
@@ -460,20 +445,10 @@ struct EditPinView: View {
 	func savePinAndDismiss() {
 		log.trace("savePinAndDismiss()")
 		
-		switch type {
-		case .lockPin:
-			AppSecurity.shared.setInvalidLockPin(nil) { _ in }
-			AppSecurity.shared.setLockPin(pin1) { error in
-				let result: EndResult = (error == nil) ? .PinChanged : .Failed
-				dismissView(result)
-			}
-			
-		case .spendingPin:
-			AppSecurity.shared.setInvalidSpendingPin(nil) { _ in }
-			AppSecurity.shared.setSpendingPin(pin1) { error in
-				let result: EndResult = (error == nil) ? .PinChanged : .Failed
-				dismissView(result)
-			}
+		AppSecurity.shared.setInvalidPin(nil, type) { _ in }
+		AppSecurity.shared.setPin(pin1, type) { error in
+			let result: EndResult = (error == nil) ? .PinChanged : .Failed
+			dismissView(result)
 		}
 	}
 	

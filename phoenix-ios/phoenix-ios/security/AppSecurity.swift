@@ -634,7 +634,7 @@ class AppSecurity {
 	// MARK: PIN
 	// --------------------------------------------------------------------------------
 	
-	private func setPin(
+	func setPin(
 		_ pin      : String?,
 		_ type     : PinType,
 		completion : @escaping (_ error: Error?) -> Void
@@ -701,7 +701,7 @@ class AppSecurity {
 		} // </queue.async>
 	}
 	
-	private func getPin(_ type: PinType) -> String? {
+	func getPin(_ type: PinType) -> String? {
 		
 		let keychain = GenericPasswordStore()
 		let account = type.keychain_accountName_pin
@@ -725,7 +725,7 @@ class AppSecurity {
 		return pin
 	}
 	
-	private func setInvalidPin(
+	func setInvalidPin(
 		_ invalidPin : InvalidPin?,
 		_ type       : PinType,
 		completion   : @escaping (_ error: Error?) -> Void
@@ -798,7 +798,7 @@ class AppSecurity {
 		} // </queue.async>
 	}
 	
-	private func getInvalidPin(_ type: PinType) -> InvalidPin? {
+	func getInvalidPin(_ type: PinType) -> InvalidPin? {
 		
 		let keychain = GenericPasswordStore()
 		let account = type.keychain_accountName_invalid

@@ -4432,6 +4432,7 @@
       }
     },
     "Acceptable range" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -16206,6 +16207,7 @@
       }
     },
     "Enter PIN to authenticate" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -25505,6 +25507,7 @@
       }
     },
     "max:" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -25996,6 +25999,7 @@
       }
     },
     "min:" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -32160,6 +32164,7 @@
     },
     "range" : {
       "comment" : "button label - try to make it short",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

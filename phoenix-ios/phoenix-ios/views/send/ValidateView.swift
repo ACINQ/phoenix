@@ -295,18 +295,19 @@ struct ValidateView: View {
 	@ViewBuilder
 	func optionalButtons() -> some View {
 		
-		if showMetadataButton() || showRangeButton() || showTipButton() || showCommentButton() {
+		let metadataVisible = metadataButtonVisible()
+		let tipVisible = tipButtonVisible()
+		let commentVisible = commentButtonVisible()
+		
+		if metadataVisible || tipVisible || commentVisible {
 			HStack(alignment: VerticalAlignment.center, spacing: 20) {
-				if showMetadataButton() {
+				if metadataVisible {
 					metadataButton()
 				}
-				if showRangeButton() {
-					rangeButton()
-				}
-				if showTipButton() {
+				if tipVisible {
 					tipButton()
 				}
-				if showCommentButton() {
+				if commentVisible {
 					commentButton()
 				}
 			}
@@ -369,19 +370,6 @@ struct ValidateView: View {
 	}
 	
 	@ViewBuilder
-	func rangeButton() -> some View {
-		
-		actionButton(
-			text: NSLocalizedString("range", comment: "button label - try to make it short"),
-			image: Image(systemName: "target"),
-			width: 20, height: 20,
-			xOffset: 0, yOffset: 0
-		) {
-			rangeButtonTapped()
-		}
-	}
-	
-	@ViewBuilder
 	func tipButton() -> some View {
 		
 		actionButton(
@@ -425,7 +413,7 @@ struct ValidateView: View {
 			if needsPrepare {
 				showMinerFeeSheet()
 			} else {
-				sendPayment()
+				maybeSendPayment()
 			}
 		} label: {
 			HStack {
@@ -636,7 +624,7 @@ struct ValidateView: View {
 		}
 	}
 	
-	func showMetadataButton() -> Bool {
+	func metadataButtonVisible() -> Bool {
 		
 		guard let lnurlPay = lnurlPay() else {
 			return false
@@ -655,32 +643,7 @@ struct ValidateView: View {
 		return false
 	}
 	
-	func showRangeButton() -> Bool {
-		
-		// We've decided this button isn't particularly useful,
-		// and the error messages explaining min or max are sufficient.
-		return false
-		
-	/*
-		// The "range" button is used for:
-		// - lnurl-pay
-		// - lnurl-withdraw
-		//
-		// when those requests have a range (as opposed to a specific required amount)
-		
-		if let lnurlPay = lnurlPay() {
-			return lnurlPay.maxSendable.msat > lnurlPay.minSendable.msat
-			
-		} else if let lnurlWithdraw = lnurlWithdraw() {
-			return lnurlWithdraw.maxWithdrawable.msat > lnurlWithdraw.minWithdrawable.msat
-			
-		} else {
-			return false
-		}
-	*/
-	}
-	
-	func showTipButton() -> Bool {
+	func tipButtonVisible() -> Bool {
 		
 		if isOnChainFlow {
 			return true
@@ -704,7 +667,7 @@ struct ValidateView: View {
 		return parsedAmountMsat() == nil
 	}
 	
-	func showCommentButton() -> Bool {
+	func commentButtonVisible() -> Bool {
 		
 		guard let lnurlPay = lnurlPay() else {
 			return false
@@ -717,13 +680,13 @@ struct ValidateView: View {
 	func disconnectedText() -> String {
 		
 		if !connectionsMonitor.connections.internet.isEstablished() {
-			return NSLocalizedString("waiting for internet", comment: "button text")
+			return String(localized: "waiting for internet", comment: "button text")
 		}
 		if !connectionsMonitor.connections.peer.isEstablished() {
-			return NSLocalizedString("connecting to peer", comment: "button text")
+			return String(localized: "connecting to peer", comment: "button text")
 		}
 		if !connectionsMonitor.connections.electrum.isEstablished() {
-			return NSLocalizedString("connecting to electrum", comment: "button text")
+			return String(localized: "connecting to electrum", comment: "button text")
 		}
 		return ""
 	}
@@ -736,7 +699,7 @@ struct ValidateView: View {
 		
 		if isOnChainFlow {
 			
-			return NSLocalizedString("continue to next step", comment: "VoiceOver hint")
+			return String(localized: "continue to next step", comment: "VoiceOver hint")
 			
 		} else {
 			
@@ -1408,27 +1371,6 @@ struct ValidateView: View {
 		}
 	}
 	
-	func rangeButtonTapped() {
-		log.trace("rangeButtonTapped()")
-		
-		var range: MsatRange? = priceRange()
-		
-		if range == nil && isAmountlessInvoice() {
-			if let parsedAmtMst = parsedAmountMsat() {
-				range = MsatRange(min: parsedAmtMst, max: parsedAmtMst + parsedAmtMst)
-			}
-		}
-		
-		if let range {
-			
-			dismissKeyboardIfVisible()
-			smartModalState.display(dismissable: true) {
-				
-				RangeSheet(range: range, valueChanged: amountChanged_rangeSheet)
-			}
-		}
-	}
-	
 	func tipButtonTapped() {
 		log.trace("tipButtonTapped()")
 		
@@ -1596,6 +1538,99 @@ struct ValidateView: View {
 		}
 	}
 	
+	func maybeShowCapacityImpactWarning() {
+		log.trace("maybeShowCapacityImpactWarning()")
+		
+		guard !Prefs.shared.doNotShowChannelImpactWarning else {
+			log.debug("Prefs.shared.doNotShowChannelImpact = true")
+			return
+		}
+		guard !hasShownChannelCapacityWarning else {
+			log.debug("hasShownChannelCapacityWarning = true")
+			return
+		}
+		
+		smartModalState.display(dismissable: false) {
+			ChannelSizeImpactWarning()
+		} onWillDisappear: {
+			hasShownChannelCapacityWarning = true
+		}
+	}
+	
+	func cancelParseRequest() {
+		log.trace("cancelParseRequest()")
+		
+		isParsing = false
+		parseIndex += 1
+		parseProgress = nil
+	}
+	
+	func cancelLnurlFetch() {
+		log.trace("cancelLnurlFetch()")
+		
+		payIndex += 1
+		
+		paymentInProgress = false
+		isLnurlFetch = false
+	}
+	
+	func popToRootView() {
+		log.trace("popToRootView()")
+		
+		if #available(iOS 17, *) {
+			navCoordinator.path.removeAll()
+		} else { // iOS 16
+			popTo(.RootView(followedBy: nil))
+			presentationMode.wrappedValue.dismiss()
+		}
+	}
+	
+	func currencyConverterAmountChanged(_ result: CurrencyAmount?) {
+		log.trace("currencyConverterAmountChanged()")
+		
+		if let newAmt = result {
+
+			let newCurrencyList = Currency.displayable(currencyPrefs: currencyPrefs, plus: newAmt.currency)
+
+			if currencyList != newCurrencyList {
+				currencyList = newCurrencyList
+			}
+
+			currency = newAmt.currency
+			currencyPickerChoice = newAmt.currency.shortName
+
+			let formattedAmt = Utils.format(currencyAmount: newAmt, policy: .showMsatsIfNonZero)
+			parsedAmount = Result.success(newAmt.amount)
+			amount = formattedAmt.digits
+
+		} else {
+
+			parsedAmount = Result.failure(.emptyInput)
+			amount = ""
+		}
+	}
+	
+	func showAppStatusPopover() {
+		log.trace("showAppStatusPopover()")
+		
+		popoverState.display(dismissable: true) {
+			AppStatusPopover()
+		}
+	}
+	
+	func didCopyLink() {
+		log.trace("didCopyLink()")
+		
+		toast.pop(
+			NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
+			colorScheme: colorScheme.opposite
+		)
+	}
+	
+	// --------------------------------------------------
+	// MARK: Contacts
+	// --------------------------------------------------
+	
 	func manageExistingContact() {
 		log.trace("manageExistingContact()")
 		
@@ -1713,31 +1748,28 @@ struct ValidateView: View {
 		contact = updatedContact
 	}
 	
-	func maybeShowCapacityImpactWarning() {
-		log.trace("maybeShowCapacityImpactWarning()")
-		
-		guard !Prefs.shared.doNotShowChannelImpactWarning else {
-			log.debug("Prefs.shared.doNotShowChannelImpact = true")
-			return
-		}
-		guard !hasShownChannelCapacityWarning else {
-			log.debug("hasShownChannelCapacityWarning = true")
-			return
-		}
-		
-		smartModalState.display(dismissable: false) {
-			ChannelSizeImpactWarning()
-		} onWillDisappear: {
-			hasShownChannelCapacityWarning = true
-		}
-	}
+	// --------------------------------------------------
+	// MARK: Sending
+	// --------------------------------------------------
 	
-	func saveTipPercentInPrefs() {
-		log.trace("saveTipPercentInPrefs()")
+	func maybeSendPayment() {
+		log.trace("maybeSendPayment()")
 		
-		if let nums = paymentNumbers(), nums.tipMsat > 0 {
-			let tipPercent = Int(nums.tipPercent * 100.0)
-			Prefs.shared.addRecentTipPercent(tipPercent)
+		dismissKeyboardIfVisible()
+		
+		let enabledSecurity = AppSecurity.shared.enabledSecurityPublisher.value
+		if enabledSecurity.contains(.spendingPin) {
+			
+			smartModalState.display(dismissable: false) {
+				AuthenticateWithPinSheet(type: .spendingPin) { result in
+					if result == .Authenticated {
+						sendPayment()
+					}
+				}
+			}
+			
+		} else {
+			sendPayment()
 		}
 	}
 	
@@ -1928,7 +1960,7 @@ struct ValidateView: View {
 			return
 		}
 		
-		if showCommentButton() && comment.count == 0 && !hasPromptedForComment {
+		if commentButtonVisible() && comment.count == 0 && !hasPromptedForComment {
 			
 			let maxCommentLength = model.paymentIntent.maxCommentLength?.intValue ?? 140
 			
@@ -1938,7 +1970,7 @@ struct ValidateView: View {
 				CommentSheet(
 					comment: $comment,
 					maxCommentLength: maxCommentLength,
-					sendButtonAction: { sendPayment() }
+					sendButtonAction: { maybeSendPayment() }
 				)
 			
 			} onWillDisappear: {
@@ -2080,78 +2112,17 @@ struct ValidateView: View {
 		} // </Task>
 	}
 	
-	func cancelParseRequest() {
-		log.trace("cancelParseRequest()")
+	func saveTipPercentInPrefs() {
+		log.trace("saveTipPercentInPrefs()")
 		
-		isParsing = false
-		parseIndex += 1
-		parseProgress = nil
-	}
-	
-	func cancelLnurlFetch() {
-		log.trace("cancelLnurlFetch()")
-		
-		payIndex += 1
-		
-		paymentInProgress = false
-		isLnurlFetch = false
-	}
-	
-	func popToRootView() {
-		log.trace("popToRootView()")
-		
-		if #available(iOS 17, *) {
-			navCoordinator.path.removeAll()
-		} else { // iOS 16
-			popTo(.RootView(followedBy: nil))
-			presentationMode.wrappedValue.dismiss()
+		if let nums = paymentNumbers(), nums.tipMsat > 0 {
+			let tipPercent = Int(nums.tipPercent * 100.0)
+			Prefs.shared.addRecentTipPercent(tipPercent)
 		}
-	}
-	
-	func currencyConverterAmountChanged(_ result: CurrencyAmount?) {
-		log.trace("currencyConverterAmountChanged()")
-		
-		if let newAmt = result {
-
-			let newCurrencyList = Currency.displayable(currencyPrefs: currencyPrefs, plus: newAmt.currency)
-
-			if currencyList != newCurrencyList {
-				currencyList = newCurrencyList
-			}
-
-			currency = newAmt.currency
-			currencyPickerChoice = newAmt.currency.shortName
-
-			let formattedAmt = Utils.format(currencyAmount: newAmt, policy: .showMsatsIfNonZero)
-			parsedAmount = Result.success(newAmt.amount)
-			amount = formattedAmt.digits
-
-		} else {
-
-			parsedAmount = Result.failure(.emptyInput)
-			amount = ""
-		}
-	}
-	
-	func showAppStatusPopover() {
-		log.trace("showAppStatusPopover()")
-		
-		popoverState.display(dismissable: true) {
-			AppStatusPopover()
-		}
-	}
-	
-	func didCopyLink() {
-		log.trace("didCopyLink()")
-		
-		toast.pop(
-			NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
-			colorScheme: colorScheme.opposite
-		)
 	}
 	
 	// --------------------------------------------------
-	// MARK: SendManger
+	// MARK: Parsing
 	// --------------------------------------------------
 	
 	func parseUserInput(_ input: String) {
