@@ -16,10 +16,12 @@
 
 package fr.acinq.phoenix.android
 
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.nfc.NfcAdapter
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -28,11 +30,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
 import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.*
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.services.NodeService
 import fr.acinq.phoenix.android.utils.PhoenixAndroidTheme
+import fr.acinq.phoenix.android.utils.nfc.NfcHelper
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
@@ -55,6 +58,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private var nfcAdapter: NfcAdapter? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -63,6 +68,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         intent?.fixUri()
+        onNewIntent(intent)
+
+        nfcAdapter = NfcAdapter.getDefaultAdapter(this)
 
         // lock screen when screen is off
         val intentFilter = IntentFilter(Intent.ACTION_SCREEN_ON)
@@ -91,17 +99,26 @@ class MainActivity : AppCompatActivity() {
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        // force the intent flag to single top, in order to avoid [handleDeepLink] finish the current activity.
-        // this would otherwise clear the app view model, i.e. loose the state which virtually reboots the app
-        // TODO: look into detaching the app state from the activity
-        log.info("receive new_intent with data=${intent?.data}")
-        intent?.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+        log.info("receive new_intent with action=${intent?.action} data=${intent?.data}")
 
-        intent?.fixUri()
-        try {
-            this.navController?.handleDeepLink(intent)
-        } catch (e: Exception) {
-            log.warn("could not handle deeplink: {}", e.localizedMessage)
+        when (intent?.action) {
+            NfcAdapter.ACTION_NDEF_DISCOVERED, NfcAdapter.ACTION_TAG_DISCOVERED -> {
+                NfcHelper.readNfcIntent(intent) {
+                    this.navController?.navigate("${Screen.Send.route}?input=$it")
+                }
+            }
+            else -> {
+                // force the intent flag to single top, in order to avoid [handleDeepLink] finish the current activity.
+                // this would otherwise clear the app view model, i.e. loose the state which virtually reboots the app
+                // TODO: look into detaching the app state from the activity
+                intent?.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+                intent?.fixUri()
+                try {
+                    this.navController?.handleDeepLink(intent)
+                } catch (e: Exception) {
+                    log.warn("could not handle deeplink: {}", e.localizedMessage)
+                }
+            }
         }
     }
 
@@ -115,6 +132,33 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         tryReconnect()
+        startNfcReader()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        stopNfcReader()
+    }
+
+    /** Lets Phoenix take priority over other apps to handle the NFC tag. Avoids having Android show the apps picker dialog. */
+    private fun startNfcReader() {
+        val pendingIntent = PendingIntent.getActivity(applicationContext, 0, Intent(applicationContext, MainActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
+        val filters = IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED).apply {
+            try {
+                addDataScheme("bitcoin")
+                addDataScheme("lightning")
+                addDataScheme("lnurl")
+                addDataScheme("lnurlw")
+                addDataScheme("lnurlp")
+                addDataScheme("keyauth")
+                addDataScheme("phoenix")
+            } catch (_: Exception) {}
+        }
+        nfcAdapter?.enableForegroundDispatch(this, pendingIntent, arrayOf(filters), null)
+    }
+
+    private fun stopNfcReader() {
+        nfcAdapter?.disableForegroundDispatch(this)
     }
 
     private fun tryReconnect() {
