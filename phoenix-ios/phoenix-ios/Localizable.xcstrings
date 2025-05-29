@@ -14381,8 +14381,12 @@
         }
       }
     },
+    "Disable Lock PIN" : {
+      "comment" : "Navigation bar title"
+    },
     "Disable PIN" : {
       "comment" : "Navigation bar title",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -14421,6 +14425,9 @@
           }
         }
       }
+    },
+    "Disable Spending PIN" : {
+      "comment" : "Navigation bar title"
     },
     "Disabled" : {
       "localizations" : {
@@ -15511,6 +15518,9 @@
         }
       }
     },
+    "Edit Lock PIN" : {
+      "comment" : "Navigation bar title"
+    },
     "Edit payment request" : {
       "localizations" : {
         "ar" : {
@@ -15553,6 +15563,7 @@
     },
     "Edit PIN" : {
       "comment" : "Navigation bar title",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -15591,6 +15602,9 @@
           }
         }
       }
+    },
+    "Edit Spending PIN" : {
+      "comment" : "Navigation bar title"
     },
     "elapsed" : {
       "comment" : "Label in SummaryInfoGrid",
@@ -35317,8 +35331,12 @@
         }
       }
     },
+    "Set Lock PIN" : {
+      "comment" : "Navigation bar title"
+    },
     "Set PIN" : {
       "comment" : "Navigation bar title",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -35357,6 +35375,9 @@
           }
         }
       }
+    },
+    "Set Spending PIN" : {
+      "comment" : "Navigation bar title"
     },
     "Settings" : {
       "comment" : "Navigation bar title",

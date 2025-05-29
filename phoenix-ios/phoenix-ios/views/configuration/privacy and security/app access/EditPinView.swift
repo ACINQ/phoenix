@@ -59,7 +59,7 @@ struct EditPinView: View {
 	var body: some View {
 		
 		layers()
-			.navigationTitle(String(localized: "Edit PIN", comment: "Navigation bar title"))
+			.navigationTitle(self.navigationTitle)
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationBarBackButtonHidden(true)
 			.navigationBarItems(leading: cancelButton())
@@ -225,6 +225,16 @@ struct EditPinView: View {
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
+	
+	var navigationTitle: String {
+		
+		switch type {
+		case .lockPin:
+			return String(localized: "Edit Lock PIN", comment: "Navigation bar title")
+		case .spendingPin:
+			return String(localized: "Edit Spending PIN", comment: "Navigation bar title")
+		}
+	}
 	
 	var pinCount: Int {
 		switch editMode {

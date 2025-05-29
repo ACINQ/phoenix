@@ -51,7 +51,7 @@ struct SetNewPinView: View {
 	var body: some View {
 		
 		layers()
-			.navigationTitle(String(localized: "Set PIN", comment: "Navigation bar title"))
+			.navigationTitle(self.navigationTitle)
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationBarBackButtonHidden(true)
 			.navigationBarItems(leading: cancelButton())
@@ -171,6 +171,16 @@ struct SetNewPinView: View {
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
+	
+	var navigationTitle: String {
+		
+		switch type {
+		case .lockPin:
+			return String(localized: "Set Lock PIN", comment: "Navigation bar title")
+		case .spendingPin:
+			return String(localized: "Set Spending PIN", comment: "Navigation bar title")
+		}
+	}
 	
 	var pinCount: Int {
 		

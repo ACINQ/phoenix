@@ -48,7 +48,7 @@ struct DisablePinView: View {
 	var body: some View {
 		
 		layers()
-			.navigationTitle(String(localized: "Disable PIN", comment: "Navigation bar title"))
+			.navigationTitle(self.navigationTitle)
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationBarBackButtonHidden(true)
 			.navigationBarItems(leading: cancelButton())
@@ -194,6 +194,16 @@ struct DisablePinView: View {
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
+	
+	var navigationTitle: String {
+		
+		switch type {
+		case .lockPin:
+			return String(localized: "Disable Lock PIN", comment: "Navigation bar title")
+		case .spendingPin:
+			return String(localized: "Disable Spending PIN", comment: "Navigation bar title")
+		}
+	}
 	
 	var circleColor: Color {
 		
