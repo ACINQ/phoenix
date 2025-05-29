@@ -401,10 +401,18 @@ struct EditPinView: View {
 		invalidPin = newInvalidPin
 		currentDate = Date.now
 		
-		if newInvalidPin.hasWaitTime(currentDate) && type == .lockPin {
-			
-			dismissView(.UserCancelled)
-			SceneDelegate.get().lockWallet()
+		if let delay = invalidPin.waitTimeFrom(currentDate) {
+			switch type {
+			case .lockPin:
+				dismissView(.UserCancelled)
+				SceneDelegate.get().lockWallet()
+				
+			case .spendingPin:
+				numberPadDisabled = true
+				DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+					numberPadDisabled = false
+				}
+			}
 		}
 	}
 	
