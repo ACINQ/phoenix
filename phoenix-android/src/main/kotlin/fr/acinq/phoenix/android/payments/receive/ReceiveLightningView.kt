@@ -79,6 +79,7 @@ import fr.acinq.phoenix.android.components.openLink
 import fr.acinq.phoenix.android.internalData
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.extensions.findActivitySafe
 import fr.acinq.phoenix.data.availableForReceive
 import fr.acinq.phoenix.data.canRequestLiquidity
 import java.text.DecimalFormat
@@ -218,11 +219,19 @@ fun ColumnScope.LightningInvoiceView(
             }
         }
 
-        CopyShareButtons(onCopy = { showCopyDialog = true }, onShare = { showShareDialog = true })
 
         when (state) {
             is LightningInvoiceState.Init, is LightningInvoiceState.Generating -> {}
             is LightningInvoiceState.Done -> {
+                CopyShareButtons(
+                    paymentRequest = when (state) {
+                        is LightningInvoiceState.Done.Bolt11 -> "bitcoin:?lightning=${state.paymentData}"
+                        is LightningInvoiceState.Done.Bolt12 -> "bitcoin:?lno=${state.paymentData}"
+                    },
+                    onCopy = { showCopyDialog = true },
+                    onShare = { showShareDialog = true }
+                )
+
                 EvaluateLiquidityIssuesForPayment(
                     amount = state.amount,
                     onFeeManagementClick = onFeeManagementClick,

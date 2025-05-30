@@ -121,6 +121,9 @@
     <string name="receive_lightning_share_subject">Lightning payment</string>
     <string name="receive_lightning_share_title">Share this Lightning payment code with…</string>
 
+    <string name="receive_nfc_button">Nfc</string>
+    <string name="receive_nfc_title">Hold near the NFC reader</string>
+
     <string name="receive_label_bitcoin">Bitcoin address</string>
     <string name="receive_label_bitcoin_help">This QR code is a classic Bitcoin address.\n\nIt can be read by almost any Bitcoin service/wallet, but payments will be slower to arrive.</string>
     <string name="receive_label_bip353">Lightning address</string>
@@ -965,5 +968,11 @@
     <string name="pincode_error_malformed">Malformed PIN</string>
     <string name="pincode_error_confirm_do_not_match">PIN mismatch!</string>
     <string name="pincode_error_write">Error when saving PIN</string>
+
+    <string name="hce_service_desc">APDU service for Phoenix to emulate a NFC tag</string>
+    <string name="hce_aid_desc">AID for the NFC tag emulated by Phoenix</string>
+    <string name="nfc_not_available">NFC is not available</string>
+    <string name="nfc_disabled">NFC is disabled</string>
+    <string name="hce_not_supported">Tag emulation is not supported</string>
 
 </resources>

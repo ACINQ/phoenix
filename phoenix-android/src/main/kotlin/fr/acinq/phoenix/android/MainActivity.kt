@@ -21,8 +21,10 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.nfc.NfcAdapter
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -33,6 +35,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import fr.acinq.lightning.utils.Connection
+import fr.acinq.phoenix.android.services.HceService
+import fr.acinq.phoenix.android.services.HceState
+import fr.acinq.phoenix.android.services.HceStateRepository
 import fr.acinq.phoenix.android.services.NodeService
 import fr.acinq.phoenix.android.utils.PhoenixAndroidTheme
 import fr.acinq.phoenix.android.utils.nfc.NfcHelper
@@ -159,6 +164,36 @@ class MainActivity : AppCompatActivity() {
 
     private fun stopNfcReader() {
         nfcAdapter?.disableForegroundDispatch(this)
+    }
+
+    fun isHceSupported() : Boolean {
+        val adapter = nfcAdapter
+        return adapter != null && adapter.isEnabled && packageManager.hasSystemFeature(PackageManager.FEATURE_NFC_HOST_CARD_EMULATION)
+    }
+
+    fun startHceService(paymentRequest: String) {
+        if (nfcAdapter == null) {
+            Toast.makeText(this, applicationContext.getString(R.string.nfc_not_available), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (nfcAdapter?.isEnabled == false) {
+            Toast.makeText(this, applicationContext.getString(R.string.nfc_disabled), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (!packageManager.hasSystemFeature(PackageManager.FEATURE_NFC_HOST_CARD_EMULATION)) {
+            Toast.makeText(this, applicationContext.getString(R.string.hce_not_supported), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val intent = Intent(this@MainActivity, HceService::class.java)
+        startService(intent)
+        HceStateRepository.updateState(HceState.Active(paymentRequest))
+    }
+
+    fun stopHceService() {
+        stopService(Intent(this@MainActivity, HceService::class.java))
     }
 
     private fun tryReconnect() {

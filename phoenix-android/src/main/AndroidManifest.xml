@@ -2,14 +2,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- camera is not mandatory -->
+    <!-- camera, not mandatory -->
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
-    <!-- nfc support is not mandatory -->
+    <!-- nfc support, not mandatory -->
     <uses-feature
         android:name="android.hardware.nfc"
         android:required="false" />
+    <!-- hce support, not mandatory-->
+    <uses-feature android:name="android.hardware.nfc.hce"
+        android:required="false"/>
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -100,6 +103,20 @@
             android:foregroundServiceType="shortService"
             android:exported="false"
             android:stopWithTask="false" />
+
+        <!-- apdu service for tag emulation -->
+        <service android:name=".services.HceService"
+            android:exported="true"
+            android:enabled="true"
+            android:permission="android.permission.BIND_NFC_SERVICE">
+            <intent-filter>
+                <action android:name="android.nfc.cardemulation.action.HOST_APDU_SERVICE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <meta-data android:name="android.nfc.cardemulation.host_apdu_service"
+                android:resource="@xml/apduservice" />
+
+        </service>
 
         <!-- broadcast receivers -->
         <receiver
