@@ -64,7 +64,7 @@ public class Ndef {
 		]
 		
 		let urlData = url.absoluteString.data(using: .utf8) ?? Data()
-		var urlBytes =  urlData.toByteArray()
+		let urlBytes =  urlData.toByteArray()
 		
 		// NDEF Message header:
 		
@@ -160,7 +160,7 @@ public class Ndef {
 		]
 		
 		let textData = text.data(using: .utf8) ?? Data()
-		var textBytes = textData.toByteArray()
+		let textBytes = textData.toByteArray()
 		
 		// NDEF Message header:
 		

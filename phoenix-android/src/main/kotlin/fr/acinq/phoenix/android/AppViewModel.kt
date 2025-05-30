@@ -92,7 +92,7 @@ class AppViewModel(
 
     private fun monitorUserLockPrefs() {
         viewModelScope.launch {
-            combine(userPrefs.getIsBiometricLockEnabled, userPrefs.getIsCustomPinLockEnabled) { isBiometricEnabled, isCustomPinEnabled ->
+            combine(userPrefs.getIsScreenLockBiometricsEnabled, userPrefs.getIsScreenLockPinEnabled) { isBiometricEnabled, isCustomPinEnabled ->
                 isBiometricEnabled to isCustomPinEnabled
             }.collect { (isBiometricEnabled, isCustomPinEnabled) ->
                 if (!isBiometricEnabled && !isCustomPinEnabled) {

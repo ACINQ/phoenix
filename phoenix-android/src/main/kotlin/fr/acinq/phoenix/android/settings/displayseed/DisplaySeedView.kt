@@ -18,11 +18,13 @@ package fr.acinq.phoenix.android.settings.displayseed
 
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -37,6 +39,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.auth.pincode.PinDialogTitle
+import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
 import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.feedback.WarningMessage
@@ -66,17 +70,19 @@ fun DisplaySeedView() {
         Card(internalPadding = PaddingValues(16.dp)) {
             Text(text = annotatedStringResource(id = R.string.displayseed_instructions))
         }
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+
+        Card(backgroundColor = Color.Transparent, modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             when (val state = vm.state.value) {
                 is DisplaySeedViewModel.ReadingSeedState.Init -> {
-                    Button(
+                    SmartSpendButton(
                         text = stringResource(R.string.displayseed_authenticate_button),
                         icon = R.drawable.ic_key,
                         modifier = Modifier.fillMaxWidth(),
-                        onClick = { vm.readSeed(SeedManager.getSeedState(context)) }
+                        shape = RoundedCornerShape(12.dp),
+                        enabled = true,
+                        onSpend = { vm.readSeed(SeedManager.getSeedState(context)) },
+                        prompt = { PinDialogTitle(text = stringResource(R.string.pincode_check_spending_displayseed_title)) },
+                        ignoreChannelsState = false,
                     )
                 }
                 is DisplaySeedViewModel.ReadingSeedState.ReadingSeed -> {

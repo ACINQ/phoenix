@@ -61,6 +61,7 @@ import fr.acinq.phoenix.android.components.InlineTransactionLink
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.SplashLabelRow
 import fr.acinq.phoenix.android.components.TextInput
+import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.scanner.ScannerView
 import fr.acinq.phoenix.android.utils.annotatedStringResource
@@ -252,15 +253,11 @@ private fun ColumnScope.AvailableForRefund(
                 }
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Button(
+                SmartSpendButton(
                     text = stringResource(id = R.string.swapinrefund_send_button),
-                    icon = R.drawable.ic_send,
-                    onClick = { onExecuteRefund(state.transaction) },
-                    padding = PaddingValues(16.dp),
+                    onSpend = { onExecuteRefund(state.transaction) },
                     modifier = Modifier.fillMaxWidth(),
-                    backgroundColor = MaterialTheme.colors.primary,
-                    textStyle = MaterialTheme.typography.button.copy(color = MaterialTheme.colors.onPrimary),
-                    iconTint = MaterialTheme.colors.onPrimary,
+                    enabled = true,
                 )
             }
             is FinalWalletRefundState.Publishing -> {

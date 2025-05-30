@@ -77,9 +77,12 @@ class UserPrefsRepository(private val data: DataStore<Preferences>) {
         val PREFS_ELECTRUM_ADDRESS_PINNED_KEY = stringPreferencesKey("PREFS_ELECTRUM_ADDRESS_PINNED_KEY")
         // access control
         val PREFS_SCREEN_LOCK_BIOMETRICS = booleanPreferencesKey("PREFS_SCREEN_LOCK")
-        val PREFS_SCREEN_LOCK_CUSTOM_PIN_ENABLED = booleanPreferencesKey("PREFS_SCREEN_LOCK_CUSTOM_PIN_ENABLED")
-        val PREFS_CUSTOM_PIN_ATTEMPT_COUNT = intPreferencesKey("PREFS_CUSTOM_PIN_ATTEMPT_COUNT")
+        val PREFS_SCREEN_LOCK_PIN_ENABLED = booleanPreferencesKey("PREFS_SCREEN_LOCK_CUSTOM_PIN_ENABLED")
+        val PREFS_SCREEN_LOCK_PIN_ATTEMPT_COUNT = intPreferencesKey("PREFS_CUSTOM_PIN_ATTEMPT_COUNT")
         val PREFS_AUTO_LOCK_DELAY = longPreferencesKey("PREFS_AUTO_LOCK_DELAY")
+        val PREFS_SPEND_LOCK_PIN_ENABLED = booleanPreferencesKey("PREFS_SPEND_LOCK_CUSTOM_PIN_ENABLED")
+        val PREFS_SPEND_LOCK_PIN_ATTEMPT_COUNT = intPreferencesKey("PREFS_SPEND_LOCK_CUSTOM_PIN_ATTEMPT_COUNT")
+        val PREFS_SHUFFLE_PIN_KEYBOARD = booleanPreferencesKey("PREFS_SHUFFLE_PIN_KEYBOARD")
         // payments options
         private val INVOICE_DEFAULT_DESC = stringPreferencesKey("INVOICE_DEFAULT_DESC")
         private val INVOICE_DEFAULT_EXPIRY = longPreferencesKey("INVOICE_DEFAULT_EXPIRY")
@@ -161,20 +164,20 @@ class UserPrefsRepository(private val data: DataStore<Preferences>) {
 
     // -- security
 
-    val getIsBiometricLockEnabled: Flow<Boolean> = safeData.map { it[PREFS_SCREEN_LOCK_BIOMETRICS] ?: false }
-    suspend fun saveIsBiometricLockEnabled(isEnabled: Boolean) = data.edit { it[PREFS_SCREEN_LOCK_BIOMETRICS] = isEnabled }
+    val getIsScreenLockBiometricsEnabled: Flow<Boolean> = safeData.map { it[PREFS_SCREEN_LOCK_BIOMETRICS] ?: false }
+    suspend fun saveIsScreenLockBiometricsEnabled(isEnabled: Boolean) = data.edit { it[PREFS_SCREEN_LOCK_BIOMETRICS] = isEnabled }
 
-    val getIsCustomPinLockEnabled: Flow<Boolean> = safeData.map { it[PREFS_SCREEN_LOCK_CUSTOM_PIN_ENABLED] ?: false }
-    suspend fun saveIsCustomPinLockEnabled(isEnabled: Boolean) = data.edit { it[PREFS_SCREEN_LOCK_CUSTOM_PIN_ENABLED] = isEnabled }
+    val getIsScreenLockPinEnabled: Flow<Boolean> = safeData.map { it[PREFS_SCREEN_LOCK_PIN_ENABLED] ?: false }
+    suspend fun saveIsScreenLockPinEnabled(isEnabled: Boolean) = data.edit { it[PREFS_SCREEN_LOCK_PIN_ENABLED] = isEnabled }
 
-    val getPinCodeAttempt: Flow<Int> = safeData.map {
-        it[PREFS_CUSTOM_PIN_ATTEMPT_COUNT] ?: 0
+    val getScreenLockPinCodeAttempt: Flow<Int> = safeData.map {
+        it[PREFS_SCREEN_LOCK_PIN_ATTEMPT_COUNT] ?: 0
     }
-    suspend fun savePinCodeFailure() = data.edit {
-        it[PREFS_CUSTOM_PIN_ATTEMPT_COUNT] = (it[PREFS_CUSTOM_PIN_ATTEMPT_COUNT] ?: 0) + 1
+    suspend fun saveScreenLockPinCodeFailure() = data.edit {
+        it[PREFS_SCREEN_LOCK_PIN_ATTEMPT_COUNT] = (it[PREFS_SCREEN_LOCK_PIN_ATTEMPT_COUNT] ?: 0) + 1
     }
-    suspend fun savePinCodeSuccess() = data.edit {
-        it[PREFS_CUSTOM_PIN_ATTEMPT_COUNT] = 0
+    suspend fun saveScreenLockPinCodeSuccess() = data.edit {
+        it[PREFS_SCREEN_LOCK_PIN_ATTEMPT_COUNT] = 0
     }
 
     val getAutoLockDelay: Flow<Duration> = safeData.map {
@@ -183,6 +186,22 @@ class UserPrefsRepository(private val data: DataStore<Preferences>) {
     suspend fun saveAutoLockDelay(delay: Duration) = data.edit {
         it[PREFS_AUTO_LOCK_DELAY] = delay.inWholeMilliseconds
     }
+
+    val getIsSpendingPinEnabled: Flow<Boolean> = safeData.map { it[PREFS_SPEND_LOCK_PIN_ENABLED] ?: false }
+    suspend fun saveIsSpendLockPinEnabled(isEnabled: Boolean) = data.edit { it[PREFS_SPEND_LOCK_PIN_ENABLED] = isEnabled }
+
+    val getSpendingPinCodeAttempt: Flow<Int> = safeData.map {
+        it[PREFS_SPEND_LOCK_PIN_ATTEMPT_COUNT] ?: 0
+    }
+    suspend fun saveSpendingPinCodeFailure() = data.edit {
+        it[PREFS_SPEND_LOCK_PIN_ATTEMPT_COUNT] = (it[PREFS_SPEND_LOCK_PIN_ATTEMPT_COUNT] ?: 0) + 1
+    }
+    suspend fun saveSpendingPinCodeSuccess() = data.edit {
+        it[PREFS_SPEND_LOCK_PIN_ATTEMPT_COUNT] = 0
+    }
+
+    val getIsPinKeyboardShuffled: Flow<Boolean?> = safeData.map { it[PREFS_SHUFFLE_PIN_KEYBOARD] ?: false }
+    suspend fun saveIsPinKeyboardShuffled(isShuffled: Boolean) = data.edit { it[PREFS_SHUFFLE_PIN_KEYBOARD] = isShuffled }
 
     val getInvoiceDefaultDesc: Flow<String> = safeData.map { it[INVOICE_DEFAULT_DESC]?.takeIf { it.isNotBlank() } ?: "" }
     suspend fun saveInvoiceDefaultDesc(description: String) = data.edit { it[INVOICE_DEFAULT_DESC] = description }

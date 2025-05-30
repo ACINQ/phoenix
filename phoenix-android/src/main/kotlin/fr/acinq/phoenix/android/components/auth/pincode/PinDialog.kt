@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 ACINQ SAS
+ * Copyright 2025 ACINQ SAS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,24 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.components.screenlock
+package fr.acinq.phoenix.android.components.auth.pincode
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -40,55 +48,66 @@ import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
-import fr.acinq.phoenix.android.components.screenlock.PinDialog.PIN_LENGTH
+import fr.acinq.phoenix.android.components.auth.pincode.PinDialog.PIN_LENGTH
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
 
 @Composable
 internal fun BasePinDialog(
-    stateLabel: @Composable () -> Unit,
+    prompt: @Composable () -> Unit,
+    stateLabel: (@Composable () -> Unit)?,
     onDismiss: () -> Unit,
     onPinSubmit: (String) -> Unit,
     enabled: Boolean,
     initialPin: String = "",
 ) {
-
     var pinValue by remember(initialPin) { mutableStateOf(initialPin) }
 
     ModalBottomSheet(
         onDismiss = onDismiss,
         skipPartiallyExpanded = true,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        internalPadding = PaddingValues(horizontal = 12.dp),
+        containerColor = MaterialTheme.colors.background,
     ) {
-        Spacer(modifier = Modifier.height(12.dp))
-        stateLabel()
-        Spacer(modifier = Modifier.height(36.dp))
-        Box {
-            PinDisplay(cursorPosition = -1)
-            PinDisplay(cursorPosition = pinValue.length)
-        }
-        Spacer(modifier = Modifier.height(40.dp))
-        PinKeyboard(
-            onPinPress = { digit ->
-                when (pinValue.length + 1) {
-                    in 0..<PIN_LENGTH -> {
-                        pinValue += digit
-                    }
-
-                    PIN_LENGTH -> {
-                        pinValue += digit
-                        onPinSubmit(pinValue)
-                    }
-
-                    else -> {
-                        // ignore or error
+        prompt()
+        Spacer(Modifier.height(16.dp))
+        Column(modifier = Modifier.background(MaterialTheme.colors.surface, shape = RoundedCornerShape(24.dp)), horizontalAlignment = Alignment.CenterHorizontally) {
+            Spacer(modifier = Modifier.height(32.dp))
+            Box(contentAlignment = Alignment.Center, modifier = Modifier.heightIn(min = 32.dp)) {
+                if (stateLabel == null) {
+                    PinDisplay(cursorPosition = -1)
+                    PinDisplay(cursorPosition = pinValue.length)
+                } else {
+                    Surface(shape = RoundedCornerShape(12.dp), color = MaterialTheme.colors.surface) {
+                        stateLabel()
                     }
                 }
-            },
-            onResetPress = { pinValue = "" },
-            isEnabled = enabled && pinValue.length in 0..6
-        )
-        Spacer(modifier = Modifier.height(40.dp))
+            }
+            Spacer(modifier = Modifier.height(40.dp))
+            PinKeyboard(
+                onPinPress = { digit ->
+                    when (pinValue.length + 1) {
+                        in 0..<PIN_LENGTH -> {
+                            pinValue += digit
+                        }
+
+                        PIN_LENGTH -> {
+                            pinValue += digit
+                            onPinSubmit(pinValue)
+                        }
+
+                        else -> {
+                            // ignore or error
+                        }
+                    }
+                },
+                onResetPress = { pinValue = "" },
+                onDeleteLAst = { pinValue = pinValue.dropLast(1) },
+                isEnabled = enabled && pinValue.length in 0..6
+            )
+            Spacer(modifier = Modifier.height(WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()))
+        }
     }
 }
 
@@ -120,10 +139,18 @@ fun PinDialogTitle(text: String, icon: Int? = null, tint: Color = MaterialTheme.
 }
 
 @Composable
-fun PinDialogError(text: String) {
+fun PinStateMessage(text: String, icon: Int? = null, tint: Color = MaterialTheme.colors.onSurface) {
+    if (icon == null) {
+        Text(text = text)
+    } else {
+        TextWithIcon(text = text, icon = icon, iconTint = tint)
+    }
+}
+
+@Composable
+fun PinStateError(text: String) {
     TextWithIcon(
         text = text,
-        textStyle = MaterialTheme.typography.h4,
         icon = R.drawable.ic_cross_circle,
         iconTint = negativeColor
     )

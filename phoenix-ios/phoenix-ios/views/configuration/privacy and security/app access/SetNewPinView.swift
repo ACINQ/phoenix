@@ -23,7 +23,8 @@ struct SetNewPinView: View {
 		}
 	}
 	
-	let willClose: (EndResult) -> Void
+	let type: PinType
+	let willClose: (PinType, EndResult) -> Void
 	
 	enum EditMode {
 		case Pin1
@@ -50,7 +51,7 @@ struct SetNewPinView: View {
 	var body: some View {
 		
 		layers()
-			.navigationTitle(NSLocalizedString("Set PIN", comment: "Navigation bar title"))
+			.navigationTitle(self.navigationTitle)
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationBarBackButtonHidden(true)
 			.navigationBarItems(leading: cancelButton())
@@ -171,6 +172,16 @@ struct SetNewPinView: View {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
+	var navigationTitle: String {
+		
+		switch type {
+		case .lockPin:
+			return String(localized: "Set Lock PIN", comment: "Navigation bar title")
+		case .spendingPin:
+			return String(localized: "Set Spending PIN", comment: "Navigation bar title")
+		}
+	}
+	
 	var pinCount: Int {
 		
 		switch editMode {
@@ -267,11 +278,17 @@ struct SetNewPinView: View {
 	func savePinAndDismiss() {
 		log.trace("savePinAndDismiss()")
 		
-		AppSecurity.shared.setCustomPin(pin: pin1) { error in
+		AppSecurity.shared.setPin(pin1, type) { error in
 			if error != nil {
 				self.dismissView(.Failed)
 			} else {
-				AppSecurity.shared.setPasscodeFallback(enabled: false) { error in
+				if type == .lockPin {
+					// Enabling the lock pin implies disabling the passcode fallback.
+					AppSecurity.shared.setPasscodeFallback(enabled: false) { _ in }
+				}
+				
+				// If there still exists an InvalidPin in the keychain, it should be cleared now.
+				AppSecurity.shared.setInvalidPin(nil, type) { _ in
 					self.dismissView(.PinSet)
 				}
 			}
@@ -287,7 +304,7 @@ struct SetNewPinView: View {
 	func dismissView(_ result: EndResult) {
 		log.info("dismissView(\(result))")
 		
-		willClose(result)
+		willClose(type, result)
 		presentationMode.wrappedValue.dismiss()
 	}
 }

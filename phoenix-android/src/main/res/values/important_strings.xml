@@ -203,7 +203,7 @@
     <string name="forceclose_address_label">Funds will eventually be sent to the final wallet:</string>
 
     <string name="forceclose_confirm_title">Confirm force-closing</string>
-    <string name="forceclose_confirm_details">All the funds will be sent to your final wallet, after a delay.</string>
+    <string name="forceclose_confirm_details">All the funds will be sent to your final wallet, after a significant delay.</string>
     <string name="forceclose_button">Force-close all my channels</string>
 
     <!-- in-app notifications -->

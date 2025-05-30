@@ -71,7 +71,7 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.openLink
-import fr.acinq.phoenix.android.components.screenlock.LockPrompt
+import fr.acinq.phoenix.android.components.auth.screenlock.ScreenLockPrompt
 import fr.acinq.phoenix.android.home.HomeView
 import fr.acinq.phoenix.android.initwallet.create.CreateWalletView
 import fr.acinq.phoenix.android.initwallet.InitWallet
@@ -501,9 +501,9 @@ fun AppView(
             }
 
             val isScreenLocked by appVM.isScreenLocked
-            val isBiometricLockEnabledState = userPrefs.getIsBiometricLockEnabled.collectAsState(initial = null)
+            val isBiometricLockEnabledState = userPrefs.getIsScreenLockBiometricsEnabled.collectAsState(initial = null)
             val isBiometricLockEnabled = isBiometricLockEnabledState.value
-            val isCustomPinLockEnabledState = userPrefs.getIsCustomPinLockEnabled.collectAsState(initial = null)
+            val isCustomPinLockEnabledState = userPrefs.getIsScreenLockPinEnabled.collectAsState(initial = null)
             val isCustomPinLockEnabled = isCustomPinLockEnabledState.value
 
             if ((isBiometricLockEnabled == true || isCustomPinLockEnabled == true) && isScreenLocked) {
@@ -511,7 +511,7 @@ fun AppView(
                     // back button minimises the app
                     context.findActivitySafe()?.moveTaskToBack(false)
                 }
-                LockPrompt(
+                ScreenLockPrompt(
                     promptScreenLockImmediately = appVM.promptScreenLockImmediately.value,
                     onLock = { appVM.lockScreen() },
                     onUnlock = {
