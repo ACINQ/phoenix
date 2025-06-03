@@ -239,7 +239,7 @@ struct RecoveryPhraseList: View {
 				.padding(.vertical, 5)
 				
 				let enabledSecurity = AppSecurity.shared.enabledSecurityPublisher.value
-				if enabledSecurity != .none {
+				if enabledSecurity.hasAppLock() || enabledSecurity.hasSpendingPin() {
 					Text("(requires authentication)")
 						.font(.footnote)
 						.foregroundColor(.secondary)

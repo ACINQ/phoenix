@@ -1187,61 +1187,85 @@ class AppSecurity {
 		let keychain = GenericPasswordStore()
 		
 		do {
-			try keychain.deleteKey(
+			let result = try keychain.deleteKey(
 				account: keychain_accountName_keychain,
 				accessGroup: privateAccessGroup() // <- old location
 			)
-			log.info("Deleted keychain item: act(keychain) grp(private)")
+			if result == .itemDeleted {
+				log.info("Deleted keychain item: act(keychain) grp(private)")
+			}
 		} catch {
 			log.error("Unable to delete keychain item: act(keychain) grp(private): \(error)")
 		}
 		
 		do {
-			try keychain.deleteKey(
+			let result = try keychain.deleteKey(
 				account: keychain_accountName_keychain,
 				accessGroup: sharedAccessGroup() // <- new location
 			)
-			log.info("Deleted keychain item: act(keychain) grp(shared)")
+			if result == .itemDeleted {
+				log.info("Deleted keychain item: act(keychain) grp(shared)")
+			}
 		} catch {
 			log.error("Unable to delete keychain item: act(keychain) grp(shared): \(error)")
 		}
 		
 		do {
-			try keychain.deleteKey(
+			let result = try keychain.deleteKey(
 				account: keychain_accountName_biometrics,
 				accessGroup: privateAccessGroup()
 			)
-			log.info("Deleted keychain item: act(biometrics) grp(private)")
+			if result == .itemDeleted {
+				log.info("Deleted keychain item: act(biometrics) grp(private)")
+			}
 		} catch {
 			log.error("Unable to delete keychain item: act(biometrics) grp(private): \(error)")
 		}
 		
 		do {
-			try keychain.deleteKey(
+			let result = try keychain.deleteKey(
 				account: keychain_accountName_softBiometrics,
 				accessGroup: privateAccessGroup()
 			)
-			log.info("Deleted keychain item: act(softBiometrics) grp(private)")
+			if result == .itemDeleted {
+				log.info("Deleted keychain item: act(softBiometrics) grp(private)")
+			}
 		} catch {
 			log.error("Unable to delete keychain item: act(softBiometrics) grp(private): \(error)")
 		}
 		
 		do {
-			try keychain.deleteKey(
+			let result = try keychain.deleteKey(
 				account: keychain_accountName_lockPin,
 				accessGroup: privateAccessGroup()
 			)
-			log.info("Deleted keychain item: act(customPin) grp(private)")
+			if result == .itemDeleted {
+				log.info("Deleted keychain item: act(lockPin) grp(private)")
+			}
 		} catch {
-			log.error("Unable to delete keychain item: act(customPin) grp(private): \(error)")
+			log.error("Unable to delete keychain item: act(lockPin) grp(private): \(error)")
 		}
 		
 		do {
-			try keychain.deleteKey(
+			let result = try keychain.deleteKey(
+				account: keychain_accountName_spendingPin,
+				accessGroup: privateAccessGroup()
+			)
+			if result == .itemDeleted {
+				log.info("Deleted keychain item: act(spendingPin) grp(private)")
+			}
+		} catch {
+			log.error("Unable to delete keychain item: act(spendingPin) grp(private): \(error)")
+		}
+		
+		do {
+			let result = try keychain.deleteKey(
 				account: keychain_accountName_bip353Address,
 				accessGroup: privateAccessGroup()
 			)
-			log.info("Deleted keychain item: act(bip353Address) grp(private)")
+			if result == .itemDeleted {
+				log.info("Deleted keychain item: act(bip353Address) grp(private)")
+			}
 		} catch {
 			log.error("Unable to delete keychain item: act(bip353Address) grp(private): \(error)")
 		}

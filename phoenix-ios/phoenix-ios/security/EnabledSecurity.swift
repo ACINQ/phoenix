@@ -14,6 +14,14 @@ struct EnabledSecurity: OptionSet, CustomStringConvertible {
 
 	static let none: EnabledSecurity = []
 	
+	func hasAppLock() -> Bool {
+		return contains(.biometrics) || contains(.advancedSecurity) || contains(.lockPin)
+	}
+	
+	func hasSpendingPin() -> Bool {
+		return contains(.spendingPin)
+	}
+	
 	var description: String {
 		var items = [String]()
 		items.reserveCapacity(3)

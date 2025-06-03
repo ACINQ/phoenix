@@ -95,7 +95,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		log.trace("sceneDidEnterBackground()")
 		
 		let currentSecurity = AppSecurity.shared.enabledSecurityPublisher.value
-		if !currentSecurity.isEmpty {
+		if currentSecurity.hasAppLock() {
 			
 			LockState.shared.isUnlocked = false
 			showLockWindow()
@@ -294,7 +294,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		
 			if let error = error {
 				self.showErrorWindow(error)
-			} else if enabledSecurity.isEmpty {
+			} else if !enabledSecurity.hasAppLock() {
 				LockState.shared.isUnlocked = true
 			} else {
 				self.showLockWindow()
