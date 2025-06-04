@@ -16,7 +16,6 @@
 
 package fr.acinq.phoenix.android
 
-import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -35,12 +34,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import fr.acinq.lightning.utils.Connection
+import fr.acinq.phoenix.android.components.nfc.NfcState
+import fr.acinq.phoenix.android.components.nfc.NfcStateRepository
 import fr.acinq.phoenix.android.services.HceService
-import fr.acinq.phoenix.android.services.HceState
-import fr.acinq.phoenix.android.services.HceStateRepository
 import fr.acinq.phoenix.android.services.NodeService
 import fr.acinq.phoenix.android.utils.PhoenixAndroidTheme
-import fr.acinq.phoenix.android.utils.nfc.NfcHelper
+import fr.acinq.phoenix.android.utils.nfc.NfcReaderCallback
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
@@ -108,9 +107,7 @@ class MainActivity : AppCompatActivity() {
 
         when (intent?.action) {
             NfcAdapter.ACTION_NDEF_DISCOVERED, NfcAdapter.ACTION_TAG_DISCOVERED -> {
-                NfcHelper.readNfcIntent(intent) {
-                    this.navController?.navigate("${Screen.Send.route}?input=$it")
-                }
+                // ignored
             }
             else -> {
                 // force the intent flag to single top, in order to avoid [handleDeepLink] finish the current activity.
@@ -137,7 +134,6 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         tryReconnect()
-        startNfcReader()
     }
 
     override fun onPause() {
@@ -145,25 +141,29 @@ class MainActivity : AppCompatActivity() {
         stopNfcReader()
     }
 
-    /** Lets Phoenix take priority over other apps to handle the NFC tag. Avoids having Android show the apps picker dialog. */
-    private fun startNfcReader() {
-        val pendingIntent = PendingIntent.getActivity(applicationContext, 0, Intent(applicationContext, MainActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
-        val filters = IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED).apply {
-            try {
-                addDataScheme("bitcoin")
-                addDataScheme("lightning")
-                addDataScheme("lnurl")
-                addDataScheme("lnurlw")
-                addDataScheme("lnurlp")
-                addDataScheme("keyauth")
-                addDataScheme("phoenix")
-            } catch (_: Exception) {}
-        }
-        nfcAdapter?.enableForegroundDispatch(this, pendingIntent, arrayOf(filters), null)
+    fun isNfcReaderAvailable() : Boolean {
+        return nfcAdapter?.isEnabled == true
     }
 
-    private fun stopNfcReader() {
-        nfcAdapter?.disableForegroundDispatch(this)
+    fun startNfcReader() {
+        if (NfcStateRepository.isEmulating()) {
+            Toast.makeText(applicationContext, applicationContext.getString(R.string.nfc_err_busy), Toast.LENGTH_SHORT).show()
+            return
+        }
+        NfcStateRepository.updateState(NfcState.ShowReader)
+        nfcAdapter?.enableReaderMode(this@MainActivity, NfcReaderCallback(onFoundData = {
+            runOnUiThread {
+                log.info("nfc reader found valid ndef data, redirecting to send-screen with input=$it")
+                this.navController?.navigate("${Screen.Send.route}?input=$it")
+            }
+        }), NfcAdapter.FLAG_READER_NFC_A or NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK, Bundle())
+    }
+
+    fun stopNfcReader() {
+        if (NfcStateRepository.isReading()) {
+            NfcStateRepository.updateState(NfcState.Inactive)
+        }
+        nfcAdapter?.disableReaderMode(this@MainActivity)
     }
 
     fun isHceSupported() : Boolean {
@@ -173,23 +173,28 @@ class MainActivity : AppCompatActivity() {
 
     fun startHceService(paymentRequest: String) {
         if (nfcAdapter == null) {
-            Toast.makeText(this, applicationContext.getString(R.string.nfc_not_available), Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, applicationContext.getString(R.string.nfc_err_not_available), Toast.LENGTH_SHORT).show()
             return
         }
 
         if (nfcAdapter?.isEnabled == false) {
-            Toast.makeText(this, applicationContext.getString(R.string.nfc_disabled), Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, applicationContext.getString(R.string.nfc_err_disabled), Toast.LENGTH_SHORT).show()
             return
         }
 
         if (!packageManager.hasSystemFeature(PackageManager.FEATURE_NFC_HOST_CARD_EMULATION)) {
-            Toast.makeText(this, applicationContext.getString(R.string.hce_not_supported), Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, applicationContext.getString(R.string.nfc_err_hce_not_supported), Toast.LENGTH_SHORT).show()
             return
         }
 
+        if (NfcStateRepository.isReading()) {
+            Toast.makeText(applicationContext, applicationContext.getString(R.string.nfc_err_busy), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        NfcStateRepository.updateState(NfcState.EmulatingTag(paymentRequest))
         val intent = Intent(this@MainActivity, HceService::class.java)
         startService(intent)
-        HceStateRepository.updateState(HceState.Active(paymentRequest))
     }
 
     fun stopHceService() {

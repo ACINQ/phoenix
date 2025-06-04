@@ -16,10 +16,10 @@
   -->
 
 <host-apdu-service xmlns:android="http://schemas.android.com/apk/res/android"
-    android:description="@string/hce_service_desc"
+    android:description="@string/nfc_hce_service_desc"
     android:requireDeviceUnlock="true">
     <aid-group
-        android:description="@string/hce_aid_desc"
+        android:description="@string/nfc_hce_aid_desc"
         android:category="other">
         <aid-filter android:name="D2760000850101" />
     </aid-group>

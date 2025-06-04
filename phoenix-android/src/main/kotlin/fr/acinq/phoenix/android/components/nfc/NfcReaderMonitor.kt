@@ -39,44 +39,45 @@ import fr.acinq.phoenix.android.components.MutedFilledButton
 import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.utils.extensions.findActivitySafe
 
-
-/** Displays a blocking bottom sheet when the HCE service is started, using the state in [NfcStateRepository]. */
 @Composable
-fun HceMonitorDialog() {
+fun NfcReaderMonitor() {
     val context = LocalContext.current
+    val state by NfcStateRepository.state.collectAsState(initial = null)
     val activity = context.findActivitySafe() ?: return
 
-    val state by NfcStateRepository.state.collectAsState(initial = null)
-
-    val onDone = { activity.stopHceService() }
+    val onDismiss = { activity.stopNfcReader() }
 
     when (state) {
-        is NfcState.EmulatingTag -> ModalBottomSheet(
-            onDismiss = onDone,
-            scrimAlpha = .5f,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            internalPadding = PaddingValues(horizontal = 24.dp),
-            dismissOnScrimClick = false,
-        ) {
-            Text(text = stringResource(R.string.nfc_hce_emulation_title), style = MaterialTheme.typography.h4)
-            Spacer(Modifier.height(16.dp))
-            Image(
-                painter = painterResource(id = R.drawable.ic_nfc),
-                contentDescription = stringResource(R.string.nfc_button),
-                modifier = Modifier.size(64.dp),
-                colorFilter = ColorFilter.tint(MaterialTheme.colors.primary)
-            )
-            Spacer(Modifier.height(24.dp))
-            MutedFilledButton(
-                text = stringResource(R.string.btn_cancel),
-                icon = R.drawable.ic_cross,
-                onClick = onDone,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(Modifier.height(24.dp))
-        }
-        is NfcState.ShowReader -> {}
-        is NfcState.Inactive -> {}
         null -> {}
+        is NfcState.Inactive -> {}
+        is NfcState.EmulatingTag -> {}
+        is NfcState.ShowReader -> {
+            ModalBottomSheet(
+                onDismiss = onDismiss,
+                scrimAlpha = .5f,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                internalPadding = PaddingValues(horizontal = 24.dp),
+                dismissOnScrimClick = false,
+            ) {
+                Text(text = stringResource(R.string.nfc_reader_title), style = MaterialTheme.typography.h4)
+                Spacer(Modifier.height(16.dp))
+                Image(
+                    painter = painterResource(id = R.drawable.ic_nfc),
+                    contentDescription = stringResource(R.string.nfc_button),
+                    modifier = Modifier.size(64.dp),
+                    colorFilter = ColorFilter.tint(MaterialTheme.colors.primary)
+                )
+                Spacer(Modifier.height(16.dp))
+                Text(text = stringResource(R.string.nfc_reader_desc), style = MaterialTheme.typography.subtitle2)
+                Spacer(Modifier.height(24.dp))
+                MutedFilledButton(
+                    text = stringResource(R.string.btn_cancel),
+                    icon = R.drawable.ic_cross,
+                    onClick = onDismiss,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(Modifier.height(24.dp))
+            }
+        }
     }
 }

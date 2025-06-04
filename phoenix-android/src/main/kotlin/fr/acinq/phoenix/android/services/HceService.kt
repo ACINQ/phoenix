@@ -22,6 +22,8 @@ import android.nfc.NdefMessage
 import android.nfc.cardemulation.HostApduService
 import android.os.Bundle
 import fr.acinq.bitcoin.byteVector
+import fr.acinq.phoenix.android.components.nfc.NfcState
+import fr.acinq.phoenix.android.components.nfc.NfcStateRepository
 import fr.acinq.phoenix.android.utils.nfc.ApduCommands
 import fr.acinq.phoenix.android.utils.nfc.ApduCommands.A_ERROR
 import fr.acinq.phoenix.android.utils.nfc.ApduCommands.A_OKAY
@@ -31,14 +33,13 @@ import fr.acinq.phoenix.android.utils.nfc.ApduCommands.READ_CC_RESPONSE
 import fr.acinq.phoenix.android.utils.nfc.ApduCommands.READ_NDEF_BINARY
 import fr.acinq.phoenix.android.utils.nfc.ApduCommands.READ_NDEF_BINARY_LENGTH
 import fr.acinq.phoenix.android.utils.nfc.ApduCommands.SELECT_AID
+import fr.acinq.phoenix.android.utils.nfc.ApduCommands.SELECT_AID_LE
 import fr.acinq.phoenix.android.utils.nfc.ApduCommands.SELECT_CC_FILE
 import fr.acinq.phoenix.android.utils.nfc.ApduCommands.SELECT_NDEF_FILE
 import fr.acinq.phoenix.android.utils.nfc.NfcHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 
@@ -47,7 +48,7 @@ import org.slf4j.LoggerFactory
  * This service emulates a NDEF type 4 tag. See the NFC Forum specs section 5.4 for the expected
  * sequence of messages/responses. We hardcode most of them in [ApduCommands].
  *
- * Uses [HceStateRepository] to pass the payment request to emit.
+ * Uses [NfcStateRepository] to pass the payment request to emit.
  *
  * The message will be a Ndef text record with TNF WELL-KNOWN.
  */
@@ -67,9 +68,9 @@ class HceService : HostApduService() {
         super.onStartCommand(intent, flags, startId)
         log.debug("onStartCommand")
         serviceScope.launch {
-            HceStateRepository.state.collect {
+            NfcStateRepository.state.collect {
                 ndefMessage = when (it) {
-                    is HceState.Active -> HceMessage(it.paymentRequest)
+                    is NfcState.EmulatingTag -> HceMessage(it.paymentRequest)
                     else -> null
                 }
             }
@@ -82,11 +83,15 @@ class HceService : HostApduService() {
         log.debug("processing apdu command={} extras={}", commandApdu?.byteVector()?.toHex(), extras)
 
         if (commandApdu == null) return A_ERROR
-        if (HceStateRepository.state.value is HceState.Inactive) return A_ERROR
+        val nfcState = NfcStateRepository.state.value
+        if (nfcState is NfcState.Inactive) {
+            log.debug("trying to emulate tag in state={}, aborting", nfcState)
+            return A_ERROR
+        }
         val message = ndefMessage ?: return A_ERROR
 
         return when {
-            SELECT_AID.contentEquals(commandApdu) -> {
+            SELECT_AID.contentEquals(commandApdu) or SELECT_AID_LE.contentEquals(commandApdu) -> {
                 log.debug("selecting ndef tag AID, returning {}", A_OKAY.toHexString())
                 A_OKAY
             }
@@ -113,11 +118,12 @@ class HceService : HostApduService() {
             }
 
             commandApdu.size > 2 && commandApdu.sliceArray(0..1).contentEquals(READ_NDEF_BINARY) -> {
+                // we may receive several commands in a row if the message is large enough
                 val response = getBinaryResponse(commandApdu, message)
                 val expectedResponse = message.message.records[0].payload.toHexString() + A_OKAY.toHexString()
                 if (expectedResponse.contains(response.toHexString())) {
-                    log.info("sent payment request via nfc: ${message.paymentRequest}")
-                    HceStateRepository.updateState(HceState.Inactive)
+                    log.info("done sending payment request via nfc: ${message.paymentRequest}")
+                    NfcStateRepository.updateState(NfcState.Inactive)
                 }
                 log.debug("reading ndef message, returning {}", response.toHexString())
                 response
@@ -138,23 +144,24 @@ class HceService : HostApduService() {
                 return A_ERROR
             }
 
+            // the full response before applying offset
+            val response = message.messageLength + message.messageBytes
+
+            // the reader may want the data in chunks
             val offset = commandApdu.sliceArray(2..3).toHexString().toInt(16)
-            val length = commandApdu[4].toInt() and 0xFF
+            val chunkSize = commandApdu[4].toInt() and 0xFF
+            log.debug("offset=$offset length=$chunkSize for full_response=${response.toHexString()} =")
 
-            val fullResponse = message.messageLength + message.messageBytes
-
-            if (offset >= fullResponse.size) {
-                log.error("offset $offset is beyond full response size ${fullResponse.size}")
+            if (offset >= response.size) {
+                log.error("offset $offset is beyond full response size ${response.size}")
                 return A_ERROR
             }
 
-            log.debug("full_response=${fullResponse.toHexString()} with offset=$offset length=$length")
+            val responseAfterOffset = response.sliceArray(offset until response.size)
+            val chunkSizeForOffset = minOf(chunkSize, responseAfterOffset.size)
+            val chunk = responseAfterOffset.copyOfRange(0, chunkSizeForOffset) + A_OKAY
 
-            val slicedResponse = fullResponse.sliceArray(offset until fullResponse.size)
-            val realLength = minOf(length, slicedResponse.size)
-            val response = slicedResponse.copyOfRange(0, realLength) + A_OKAY
-
-            return response
+            return chunk
         } catch (e: Exception) {
             log.error("error when getting binary response: {}", e.localizedMessage)
             return A_ERROR
@@ -172,7 +179,9 @@ class HceService : HostApduService() {
     override fun onDestroy() {
         super.onDestroy()
         log.info("service removed")
-        HceStateRepository.updateState(HceState.Inactive)
+        if (NfcStateRepository.state.value is NfcState.EmulatingTag) {
+            NfcStateRepository.updateState(NfcState.Inactive)
+        }
     }
 
     private data class HceMessage(val paymentRequest: String) {
@@ -187,18 +196,3 @@ class HceService : HostApduService() {
         }
     }
 }
-
-sealed class HceState {
-    data object Inactive: HceState()
-    data class Active(val paymentRequest: String): HceState()
-}
-
-object HceStateRepository {
-    private val _state = MutableStateFlow<HceState?>(null)
-    val state = _state.asStateFlow()
-
-    fun updateState(s: HceState) {
-        _state.value = s
-    }
-}
-

@@ -16,36 +16,9 @@
 
 package fr.acinq.phoenix.android.utils.nfc
 
-import android.content.Intent
-import android.nfc.NdefMessage
 import android.nfc.NdefRecord
-import android.nfc.NfcAdapter
-import android.nfc.Tag
-import androidx.core.content.IntentCompat
-import org.slf4j.LoggerFactory
 
 object NfcHelper {
-
-    private val log = LoggerFactory.getLogger(this::class.java)
-
-    fun readNfcIntent(intent: Intent, onResultFound: (String) -> Unit) {
-        val tag = IntentCompat.getParcelableExtra(intent, NfcAdapter.EXTRA_TAG, Tag::class.java)
-        log.info("nfc tag discovered with tag=${tag}")
-
-        val nfcMessages = IntentCompat.getParcelableArrayExtra(intent, NfcAdapter.EXTRA_NDEF_MESSAGES, NdefMessage::class.java)
-            ?.filterIsInstance<NdefMessage>()
-
-        nfcMessages?.map { message ->
-            message.records.mapNotNull {
-                NdefParser.parseNdefRecord(it)
-            }
-        }?.flatten()?.firstOrNull()?.let {
-            log.debug("found data in tag: $it")
-            onResultFound(it)
-        } ?: run {
-            log.debug("no data found in tag")
-        }
-    }
 
     fun createTextRecord(text: String, id: ByteArray): NdefRecord {
         val languageBytes = "en".toByteArray(Charsets.US_ASCII)
@@ -63,4 +36,15 @@ object NfcHelper {
         } else {
             fillByteArrayToFixedDimension(byteArrayOf(0x00) + array, fixedSize)
         }
+
+    fun intToByteArray(value: Int): ByteArray {
+        if (value == 0) return byteArrayOf(0)
+        val bytes = mutableListOf<Byte>()
+        var temp = value
+        while (temp != 0) {
+            bytes.add(0, (temp and 0xFF).toByte()) // prepend to preserve big-endian order
+            temp = temp ushr 8
+        }
+        return bytes.toByteArray()
+    }
 }

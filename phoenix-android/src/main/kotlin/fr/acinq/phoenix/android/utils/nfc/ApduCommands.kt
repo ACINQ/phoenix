@@ -24,7 +24,9 @@ object ApduCommands {
 
     // structure is CLA-INS-P1-P2 -- NDEF AID -- LE field
     // This AID is also the one defined in res/xml/apduservice.xml
-    val SELECT_AID = ByteVector("00A4040007" + "D2760000850101" + "00")
+    val SELECT_AID = ByteVector("00a4040007" + "d2760000850101")
+    // LE field is optional, we should accept the command if LE is set
+    val SELECT_AID_LE = SELECT_AID.concat(0x00)
 
     // file id of the CC file is 0xe103
     val SELECT_CC_FILE = ByteVector(SELECT_FILE + "E103")
@@ -32,10 +34,10 @@ object ApduCommands {
     val SELECT_NDEF_FILE = ByteVector(SELECT_FILE + "E104")
 
     // file identifier = ndef
-    // maximum ndef file size = 528b
+    // maximum ndef file size = 1024b
     // read/write access 00
     val READ_CC = ByteVector("00B000000F")
-    val READ_CC_RESPONSE = ByteVector("000F20003B00340406" + "E104" + "0210" + "0000" + "9000").toByteArray()
+    val READ_CC_RESPONSE = ByteVector("000F20003B00340406" + "E104" + "4000" + "0000" + "9000").toByteArray()
 
     val READ_NDEF_BINARY_LENGTH = ByteVector("00B0000002")
     val READ_NDEF_BINARY = ByteVector("00B0").toByteArray()

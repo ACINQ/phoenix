@@ -22,11 +22,12 @@ import org.slf4j.LoggerFactory
 object NdefParser {
     private val log = LoggerFactory.getLogger(this::class.java)
 
+    @OptIn(ExperimentalStdlibApi::class)
     fun parseNdefRecord(record: NdefRecord): String? {
         val tnf = record.tnf
         val type = record.type
         val payload = record.payload
-        log.info("parsing ndef record tnf=$tnf type=$type payload=${payload.decodeToString()}")
+        log.info("parsing ndef record tnf=$tnf type=${type.toHexString()} payload=${payload.decodeToString()}")
 
         return try {
             when (tnf) {
