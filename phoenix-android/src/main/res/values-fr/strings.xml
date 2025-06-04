@@ -450,7 +450,7 @@
     <string name="accessctrl_screenlock_header">Accéder à l\'application</string>
     <string name="accessctrl_screenlock_biometrics_label">Authentification système</string>
     <string name="accessctrl_screenlock_biometrics_desc">Sécurise l\'accès à l\'application avec le compte utilisateur Android.</string>
-    <string name="accessctrl_screenlock_pin_label">Screen lock PIN</string>
+    <string name="accessctrl_screenlock_pin_label">Lock PIN</string>
     <string name="accessctrl_screenlock_pin_desc">Sécurise l\'accès à l\'application avec un code PIN à 6 chiffres spécifique à Phoenix.</string>
 
     <string name="accessctrl_autolock_label">Délai de verrouillage</string>

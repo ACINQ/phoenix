@@ -473,7 +473,7 @@
     <string name="accessctrl_screenlock_header">Idhini ya kufikia programu</string>
     <string name="accessctrl_screenlock_biometrics_label">Uthibitishaji wa mfumo</string>
     <string name="accessctrl_screenlock_biometrics_desc">Hulinda ufikiaji wa programu kwa kutumia akaunti ya mtumiaji wa Android.</string>
-    <string name="accessctrl_screenlock_pin_label">Screen lock PIN</string>
+    <string name="accessctrl_screenlock_pin_label">Lock PIN</string>
     <string name="accessctrl_screenlock_pin_desc">Hulinda ufikiaji wa programu kwa PIN ya tarakimu 6 mahususi ya Phoenix.</string>
 
     <string name="accessctrl_autolock_label">Muda wa kufunga umeisha</string>

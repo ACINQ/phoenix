@@ -414,7 +414,7 @@
     <string name="accessctrl_screenlock_header">Přístup k aplikacím</string>
     <string name="accessctrl_screenlock_biometrics_label">Ověřování systému</string>
     <string name="accessctrl_screenlock_biometrics_desc">Zabezpečuje přístup k aplikaci pomocí uživatelského účtu Android.</string>
-    <string name="accessctrl_screenlock_pin_label">Screen lock PIN</string>
+    <string name="accessctrl_screenlock_pin_label">Lock PIN</string>
     <string name="accessctrl_screenlock_pin_desc">Zabezpečuje přístup k aplikaci pomocí 6místného PIN kódu specifického pro Phoenix.</string>
 
     <string name="accessctrl_autolock_label">Časový limit uzamčení</string>

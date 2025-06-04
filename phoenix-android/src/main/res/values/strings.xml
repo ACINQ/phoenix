@@ -571,7 +571,7 @@
 
     <string name="accessctrl_title">Access control</string>
 
-    <string name="accessctrl_auth_error_header">System screen lock unavailable</string>
+    <string name="accessctrl_auth_error_header">System authentication unavailable</string>
     <string name="accessctrl_auth_error_no_hw">No suitable authentication hardware on this device.</string>
     <string name="accessctrl_auth_error_hw_unavailable">The biometric hardware is not available. Try again later.</string>
     <string name="accessctrl_auth_error_none_enrolled">Please enroll a PIN/Schema/Fingerprint in Android first.</string>
@@ -587,7 +587,7 @@
     <string name="accessctrl_screenlock_header">Accessing the application</string>
     <string name="accessctrl_screenlock_biometrics_label">System authentication</string>
     <string name="accessctrl_screenlock_biometrics_desc">Secures app entry behind the Android user credentials</string>
-    <string name="accessctrl_screenlock_pin_label">Screen lock PIN</string>
+    <string name="accessctrl_screenlock_pin_label">Lock PIN</string>
     <string name="accessctrl_screenlock_pin_desc">Secures app entry behind a 6-digits PIN code</string>
 
     <string name="accessctrl_autolock_label">Lock timeout</string>
@@ -961,12 +961,12 @@
 
     <!-- PIN code dialog -->
 
-    <string name="pincode_check_screenlock_title">Enter PIN to open the wallet</string>
-    <string name="pincode_check_spending_payment_title">Enter PIN for payment</string>
-    <string name="pincode_check_spending_displayseed_title">Enter PIN to view the seed</string>]
+    <string name="pincode_check_screenlock_title">Enter Lock PIN</string>
+    <string name="pincode_check_spending_payment_title">Enter Spending PIN</string>
+    <string name="pincode_check_spending_displayseed_title">Enter Spending PIN to view the seed</string>]
     <string name="pincode_check_disabling_title">Enter PIN to continue</string>
-    <string name="pincode_new_screenlock_title">Create screen lock PIN</string>
-    <string name="pincode_new_spending_title">Create spending PIN</string>
+    <string name="pincode_new_screenlock_title">Create Lock PIN</string>
+    <string name="pincode_new_spending_title">Create Spending PIN</string>
     <string name="pincode_confirm_title">Confirm PIN</string>
 
     <string name="pincode_checking_label">Checking PIN…</string>

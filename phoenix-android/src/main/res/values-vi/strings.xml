@@ -425,7 +425,7 @@
     <string name="accessctrl_screenlock_header">Truy cập ứng dụng</string>
     <string name="accessctrl_screenlock_biometrics_label">Xác thực hệ thống</string>
     <string name="accessctrl_screenlock_biometrics_desc">Bảo mật quyền truy cập vào ứng dụng bằng tài khoản người dùng Android.</string>
-    <string name="accessctrl_screenlock_pin_label">Screen lock PIN</string>
+    <string name="accessctrl_screenlock_pin_label">Lock PIN</string>
     <string name="accessctrl_screenlock_pin_desc">Bảo mật quyền truy cập vào ứng dụng bằng mã PIN 6 chữ số dành riêng cho Phoenix.</string>
 
     <string name="accessctrl_autolock_label">Thời gian chờ khóa</string>

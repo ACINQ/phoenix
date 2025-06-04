@@ -457,7 +457,7 @@
     <string name="accessctrl_screenlock_header">Prístup k aplikáciám</string>
     <string name="accessctrl_screenlock_biometrics_label">Overenie systému</string>
     <string name="accessctrl_screenlock_biometrics_desc">Zabezpečuje prístup k aplikácii pomocou používateľského účtu systému Android.</string>
-    <string name="accessctrl_screenlock_pin_label">Screen lock PIN</string>
+    <string name="accessctrl_screenlock_pin_label">Lock PIN</string>
     <string name="accessctrl_screenlock_pin_desc">Zabezpečuje prístup k aplikácii pomocou 6-miestneho PIN kódu špecifického pre Phoenix.</string>
 
     <string name="accessctrl_autolock_label">Časový limit uzamknutia</string>

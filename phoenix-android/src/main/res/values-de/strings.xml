@@ -426,7 +426,7 @@
     <string name="accessctrl_screenlock_header">Öffnen der Applikation</string>
     <string name="accessctrl_screenlock_biometrics_label">System-Authentifizierung</string>
     <string name="accessctrl_screenlock_biometrics_desc">Sichert die App-Eingabe mit den Anmeldedaten des Android-Benutzers</string>
-    <string name="accessctrl_screenlock_pin_label">Screen lock PIN</string>
+    <string name="accessctrl_screenlock_pin_label">Lock PIN</string>
     <string name="accessctrl_screenlock_pin_desc">Sichert die App-Eingabe mit einem 6-stelligen PIN-Code</string>
 
     <string name="accessctrl_autolock_label">Sperrzeit</string>
