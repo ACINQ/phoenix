@@ -66,6 +66,7 @@ fun ColumnScope.BitcoinAddressView(
             }
 
             CopyShareButtons(
+                paymentRequest = "bitcoin:$address",
                 onCopy = { copyToClipboard(context, data = it) },
                 onShare = { share(context, "bitcoin:$it", context.getString(R.string.receive_bitcoin_share_subject), context.getString(R.string.receive_bitcoin_share_title)) },
             )

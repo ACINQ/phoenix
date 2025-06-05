@@ -48,6 +48,7 @@ struct LightningDualView: View {
 
 	@State var modificationTitleType: ModifyInvoiceSheet.TitleType = .normal
 	
+	@State var nfcEligible: Bool = false
 	@State var nfcActive: Bool = false
 	
 	// For the cicular buttons: [copy, share, edit]
@@ -124,6 +125,14 @@ struct LightningDualView: View {
 				ActivityView(activityItems: items, applicationActivities: nil)
 			
 			} // </switch>
+		}
+		.task {
+			// Don't show NFC button unless their device is eligible to use it.
+			if #available(iOS 17.4, *) {
+				if await CardSession.isEligible {
+					nfcEligible = true
+				}
+			}
 		}
 	}
 	
@@ -410,7 +419,9 @@ struct LightningDualView: View {
 			copyButton()
 			shareButton()
 			editButton()
-			nfcButton()
+			if nfcEligible {
+				nfcButton()
+			}
 		}
 		.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
 	}

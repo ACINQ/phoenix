@@ -4432,6 +4432,7 @@
       }
     },
     "Acceptable range" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -8798,7 +8799,11 @@
         }
       }
     },
+    "Change lock PIN" : {
+
+    },
     "Change PIN" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -8837,6 +8842,9 @@
           }
         }
       }
+    },
+    "Change spending PIN" : {
+
     },
     "Channel closing" : {
       "comment" : "Payment description for channel closing",
@@ -12725,6 +12733,7 @@
       }
     },
     "Custom PIN" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -14372,8 +14381,12 @@
         }
       }
     },
+    "Disable Lock PIN" : {
+      "comment" : "Navigation bar title"
+    },
     "Disable PIN" : {
       "comment" : "Navigation bar title",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -14412,6 +14425,9 @@
           }
         }
       }
+    },
+    "Disable Spending PIN" : {
+      "comment" : "Navigation bar title"
     },
     "Disabled" : {
       "localizations" : {
@@ -15502,6 +15518,9 @@
         }
       }
     },
+    "Edit Lock PIN" : {
+      "comment" : "Navigation bar title"
+    },
     "Edit payment request" : {
       "localizations" : {
         "ar" : {
@@ -15544,6 +15563,7 @@
     },
     "Edit PIN" : {
       "comment" : "Navigation bar title",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -15582,6 +15602,9 @@
           }
         }
       }
+    },
+    "Edit Spending PIN" : {
+      "comment" : "Navigation bar title"
     },
     "elapsed" : {
       "comment" : "Label in SummaryInfoGrid",
@@ -15988,6 +16011,9 @@
     "Ending communication with card reader." : {
 
     },
+    "Enter a PIN code to be able to spend funds." : {
+
+    },
     "Enter a valid amount" : {
       "comment" : "error message",
       "localizations" : {
@@ -16069,6 +16095,9 @@
           }
         }
       }
+    },
+    "Enter custom PIN to open the app." : {
+
     },
     "Enter keywords from your seed" : {
       "comment" : "TextField placeholder",
@@ -16192,6 +16221,7 @@
       }
     },
     "Enter PIN to authenticate" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -20567,6 +20597,7 @@
       }
     },
     "If Face ID fails, you can enter your iOS passcode to access Phoenix." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -20605,6 +20636,9 @@
           }
         }
       }
+    },
+    "If Face ID fails, you can enter your iOS passcode to open the app." : {
+
     },
     "If the bucket needs to be resized to allow for more water, that will require an on-chain operation with a mining fee." : {
       "localizations" : {
@@ -20688,6 +20722,7 @@
       }
     },
     "If Touch ID fails, you can enter your iOS passcode to access Phoenix." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -20726,6 +20761,9 @@
           }
         }
       }
+    },
+    "If Touch ID fails, you can enter your iOS passcode to open the app." : {
+
     },
     "If you disable Tor, your IP address may be revealed to various service providers." : {
       "localizations" : {
@@ -24671,6 +24709,9 @@
         }
       }
     },
+    "Lock PIN" : {
+
+    },
     "Logged In" : {
       "comment" : "lnurl-auth: success text",
       "localizations" : {
@@ -25480,6 +25521,7 @@
       }
     },
     "max:" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -25971,6 +26013,7 @@
       }
     },
     "min:" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -28501,6 +28544,9 @@
         }
       }
     },
+    "Opening the app" : {
+
+    },
     "opens browser" : {
       "localizations" : {
         "ar" : {
@@ -28903,6 +28949,9 @@
         }
       }
     },
+    "Pass iOS biometrics to open the app." : {
+
+    },
     "paste" : {
       "comment" : "button label - try to make it short",
       "localizations" : {
@@ -28939,7 +28988,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "pâte"
+            "value" : "coller"
           }
         }
       }
@@ -31000,6 +31049,7 @@
       }
     },
     "PIN" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -32128,6 +32178,7 @@
     },
     "range" : {
       "comment" : "button label - try to make it short",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -35280,8 +35331,12 @@
         }
       }
     },
+    "Set Lock PIN" : {
+      "comment" : "Navigation bar title"
+    },
     "Set PIN" : {
       "comment" : "Navigation bar title",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -35320,6 +35375,9 @@
           }
         }
       }
+    },
+    "Set Spending PIN" : {
+      "comment" : "Navigation bar title"
     },
     "Settings" : {
       "comment" : "Navigation bar title",
@@ -37194,6 +37252,12 @@
           }
         }
       }
+    },
+    "Spending Control" : {
+
+    },
+    "Spending PIN" : {
+
     },
     "Splice already in progress" : {
       "localizations" : {

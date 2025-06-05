@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 ACINQ SAS
+ * Copyright 2025 ACINQ SAS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,44 +14,43 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.components.screenlock
+package fr.acinq.phoenix.android.components.auth.pincode
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.userPrefs
 
 @Composable
 fun NewPinFlow(
     onCancel: () -> Unit,
-    onDone: () -> Unit
+    onDone: () -> Unit,
+    vm: NewPinViewModel,
+    prompt: @Composable () -> Unit,
 ) {
     val context = LocalContext.current
-    val vm = viewModel<NewPinFlowViewModel>(factory = NewPinFlowViewModel.Factory)
-
+    val onDismiss = {
+        vm.reset()
+        onCancel()
+    }
     when (val state = vm.state) {
-        is NewPinFlowState.EnterNewPin -> {
+        is NewPinState.EnterNewPin -> {
             EnterNewPinDialog(
                 state = state,
-                onDismiss = onCancel,
-                onPinEntered = { vm.moveToConfirmPin(it) }
+                onDismiss = onDismiss,
+                onPinEntered = { vm.moveToConfirmPin(it) },
+                prompt = prompt,
             )
         }
-        is NewPinFlowState.ConfirmNewPin -> {
+        is NewPinState.ConfirmNewPin -> {
             ConfirmNewPinDialog(
                 state = state,
-                onDismiss = {
-                    vm.reset()
-                    onCancel()
-                },
+                onDismiss = onDismiss,
                 onPinConfirmed = {
                     vm.checkAndSavePin(
                         context = context,
@@ -70,60 +69,59 @@ fun NewPinFlow(
 
 @Composable
 private fun EnterNewPinDialog(
-    state: NewPinFlowState.EnterNewPin,
+    state: NewPinState.EnterNewPin,
     onDismiss: () -> Unit,
     onPinEntered: (String) -> Unit,
+    prompt: @Composable () -> Unit,
 ) {
     BasePinDialog(
         onDismiss = onDismiss,
         onPinSubmit = onPinEntered,
-        stateLabel = {
-            when (state) {
-                is NewPinFlowState.EnterNewPin.Init, is NewPinFlowState.EnterNewPin.Frozen.Validating -> {
-                    PinDialogTitle(text = stringResource(id = R.string.pincode_new_title))
-                }
-                is NewPinFlowState.EnterNewPin.Frozen.InvalidPin -> {
-                    PinDialogError(text = stringResource(id = R.string.pincode_error_malformed))
-                }
+        prompt = prompt,
+        stateLabel = when (state) {
+            is NewPinState.EnterNewPin.Init, is NewPinState.EnterNewPin.Frozen.Validating -> null
+            is NewPinState.EnterNewPin.Frozen.InvalidPin -> {
+                { PinStateError(text = stringResource(id = R.string.pincode_error_malformed)) }
             }
         },
-        enabled = state is NewPinFlowState.EnterNewPin.Init
+        enabled = state is NewPinState.EnterNewPin.Init
     )
 }
 
 @Composable
 private fun ConfirmNewPinDialog(
-    state: NewPinFlowState.ConfirmNewPin,
+    state: NewPinState.ConfirmNewPin,
     onDismiss: () -> Unit,
     onPinConfirmed: (String) -> Unit,
 ) {
     var pin by remember { mutableStateOf("") }
+
+    if (state is NewPinState.ConfirmNewPin.Init) {
+        LaunchedEffect(key1 = Unit) {
+            pin = ""
+        }
+    }
+
     BasePinDialog(
         onDismiss = onDismiss,
         onPinSubmit = {
             pin = it
             onPinConfirmed(it)
         },
-        stateLabel = {
-            when (state) {
-                is NewPinFlowState.ConfirmNewPin.Init -> {
-                    PinDialogTitle(text = stringResource(id = R.string.pincode_confirm_title))
-                    LaunchedEffect(key1 = Unit) {
-                        pin = ""
-                    }
-                }
-                is NewPinFlowState.ConfirmNewPin.Frozen.PinsDoNoMatch -> {
-                    PinDialogError(text = stringResource(id = R.string.pincode_error_confirm_do_not_match))
-                }
-                is NewPinFlowState.ConfirmNewPin.Frozen.Writing -> {
-                    PinDialogTitle(text = stringResource(id = R.string.pincode_checking_label))
-                }
-                is NewPinFlowState.ConfirmNewPin.Frozen.CannotWriteToDisk -> {
-                    PinDialogError(text = stringResource(id = R.string.pincode_error_write))
-                }
+        prompt = { PinDialogTitle(text = stringResource(id = R.string.pincode_confirm_title)) },
+        stateLabel = when (state) {
+            is NewPinState.ConfirmNewPin.Init -> null
+            is NewPinState.ConfirmNewPin.Frozen.PinsDoNoMatch -> {
+                { PinStateError(text = stringResource(id = R.string.pincode_error_confirm_do_not_match)) }
+            }
+            is NewPinState.ConfirmNewPin.Frozen.Writing -> {
+                { PinStateMessage(text = stringResource(id = R.string.pincode_checking_label)) }
+            }
+            is NewPinState.ConfirmNewPin.Frozen.CannotWriteToDisk -> {
+                { PinStateError(text = stringResource(id = R.string.pincode_error_write)) }
             }
         },
         initialPin = pin,
-        enabled = state is NewPinFlowState.ConfirmNewPin.Init
+        enabled = state is NewPinState.ConfirmNewPin.Init
     )
 }

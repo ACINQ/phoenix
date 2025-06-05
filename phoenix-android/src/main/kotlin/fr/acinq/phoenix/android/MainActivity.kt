@@ -20,7 +20,10 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
+import android.nfc.NfcAdapter
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -28,11 +31,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
 import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.*
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import fr.acinq.lightning.utils.Connection
+import fr.acinq.phoenix.android.components.nfc.NfcState
+import fr.acinq.phoenix.android.components.nfc.NfcStateRepository
+import fr.acinq.phoenix.android.services.HceService
 import fr.acinq.phoenix.android.services.NodeService
 import fr.acinq.phoenix.android.utils.PhoenixAndroidTheme
+import fr.acinq.phoenix.android.utils.nfc.NfcReaderCallback
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
@@ -55,6 +62,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private var nfcAdapter: NfcAdapter? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -63,6 +72,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         intent?.fixUri()
+        onNewIntent(intent)
+
+        nfcAdapter = NfcAdapter.getDefaultAdapter(this)
 
         // lock screen when screen is off
         val intentFilter = IntentFilter(Intent.ACTION_SCREEN_ON)
@@ -91,17 +103,24 @@ class MainActivity : AppCompatActivity() {
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        // force the intent flag to single top, in order to avoid [handleDeepLink] finish the current activity.
-        // this would otherwise clear the app view model, i.e. loose the state which virtually reboots the app
-        // TODO: look into detaching the app state from the activity
-        log.info("receive new_intent with data=${intent?.data}")
-        intent?.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+        log.info("receive new_intent with action=${intent?.action} data=${intent?.data}")
 
-        intent?.fixUri()
-        try {
-            this.navController?.handleDeepLink(intent)
-        } catch (e: Exception) {
-            log.warn("could not handle deeplink: {}", e.localizedMessage)
+        when (intent?.action) {
+            NfcAdapter.ACTION_NDEF_DISCOVERED, NfcAdapter.ACTION_TAG_DISCOVERED -> {
+                // ignored
+            }
+            else -> {
+                // force the intent flag to single top, in order to avoid [handleDeepLink] finish the current activity.
+                // this would otherwise clear the app view model, i.e. loose the state which virtually reboots the app
+                // TODO: look into detaching the app state from the activity
+                intent?.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+                intent?.fixUri()
+                try {
+                    this.navController?.handleDeepLink(intent)
+                } catch (e: Exception) {
+                    log.warn("could not handle deeplink: {}", e.localizedMessage)
+                }
+            }
         }
     }
 
@@ -115,6 +134,71 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         tryReconnect()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        stopNfcReader()
+    }
+
+    fun isNfcReaderAvailable() : Boolean {
+        return nfcAdapter?.isEnabled == true
+    }
+
+    fun startNfcReader() {
+        if (NfcStateRepository.isEmulating()) {
+            Toast.makeText(applicationContext, applicationContext.getString(R.string.nfc_err_busy), Toast.LENGTH_SHORT).show()
+            return
+        }
+        NfcStateRepository.updateState(NfcState.ShowReader)
+        nfcAdapter?.enableReaderMode(this@MainActivity, NfcReaderCallback(onFoundData = {
+            runOnUiThread {
+                log.info("nfc reader found valid ndef data, redirecting to send-screen with input=$it")
+                this.navController?.navigate("${Screen.Send.route}?input=$it")
+            }
+        }), NfcAdapter.FLAG_READER_NFC_A or NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK, Bundle())
+    }
+
+    fun stopNfcReader() {
+        if (NfcStateRepository.isReading()) {
+            NfcStateRepository.updateState(NfcState.Inactive)
+        }
+        nfcAdapter?.disableReaderMode(this@MainActivity)
+    }
+
+    fun isHceSupported() : Boolean {
+        val adapter = nfcAdapter
+        return adapter != null && adapter.isEnabled && packageManager.hasSystemFeature(PackageManager.FEATURE_NFC_HOST_CARD_EMULATION)
+    }
+
+    fun startHceService(paymentRequest: String) {
+        if (nfcAdapter == null) {
+            Toast.makeText(this, applicationContext.getString(R.string.nfc_err_not_available), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (nfcAdapter?.isEnabled == false) {
+            Toast.makeText(this, applicationContext.getString(R.string.nfc_err_disabled), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (!packageManager.hasSystemFeature(PackageManager.FEATURE_NFC_HOST_CARD_EMULATION)) {
+            Toast.makeText(this, applicationContext.getString(R.string.nfc_err_hce_not_supported), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (NfcStateRepository.isReading()) {
+            Toast.makeText(applicationContext, applicationContext.getString(R.string.nfc_err_busy), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        NfcStateRepository.updateState(NfcState.EmulatingTag(paymentRequest))
+        val intent = Intent(this@MainActivity, HceService::class.java)
+        startService(intent)
+    }
+
+    fun stopHceService() {
+        stopService(Intent(this@MainActivity, HceService::class.java))
     }
 
     private fun tryReconnect() {

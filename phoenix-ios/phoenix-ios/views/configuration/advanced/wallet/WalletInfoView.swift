@@ -580,7 +580,7 @@ struct WalletInfoView: View {
 	// --------------------------------------------------
 	
 	func deepLinkChanged(_ value: DeepLink?) {
-		log.trace("deepLinkChanged() => \(value?.rawValue ?? "nil")")
+		log.trace("deepLinkChanged() => \(value?.description ?? "nil")")
 		
 		if #available(iOS 17, *) {
 			// Nothing to do here.
@@ -604,6 +604,7 @@ struct WalletInfoView: View {
 				// Navigate towards deep link (if needed)
 				var newNavLinkTag: NavLinkTag? = nil
 				switch value {
+					case .payment(_)         : break
 					case .paymentHistory     : break
 					case .backup             : break
 					case .drainWallet        : break

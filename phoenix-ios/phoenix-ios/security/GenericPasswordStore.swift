@@ -307,11 +307,17 @@ struct GenericPasswordStore {
 	// MARK: Delete
 	// --------------------------------------------------
 	
+	enum DeleteKeyResult {
+		case itemDeleted
+		case itemNotFound
+	}
+	
 	/// Removes any existing key with the given account.
+	@discardableResult
 	func deleteKey(
 		account     : String,
 		accessGroup : String // always required (see notes atop)
-	) throws {
+	) throws -> DeleteKeyResult {
 		
 		var query = [String: Any]()
 		query[kSecClass as String] = kSecClassGenericPassword
@@ -320,7 +326,8 @@ struct GenericPasswordStore {
 		query[kSecUseDataProtectionKeychain as String] = true
 		
 		switch SecItemDelete(query as CFDictionary) {
-			case errSecItemNotFound, errSecSuccess: break // OK to ignore ItemNotFound
+			case errSecSuccess      : return .itemDeleted
+			case errSecItemNotFound : return .itemNotFound // OK to ignore ItemNotFound
 			case let status:
 				throw KeyStoreError("Unexpected deletion error: \(status.message)")
 		}

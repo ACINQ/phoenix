@@ -66,9 +66,16 @@ struct HomeView : MVIView {
 	)
 	@State var noticeBoxContentHeight: CGFloat? = nil
 	
-	enum HomeViewSheet {
+	enum HomeViewSheet: Identifiable, Equatable {
 		case paymentView(payment: WalletPaymentInfo)
 		case notificationsView
+		
+		var id: String {
+			switch self {
+				case .paymentView(let payment) : return "paymentView(\(payment.id))"
+				case .notificationsView        : return "notificationsView"
+			}
+		}
 	}
 	
 	@State var activeSheet: HomeViewSheet? = nil
@@ -119,6 +126,9 @@ struct HomeView : MVIView {
 			.onChange(of: mvi.model) { newModel in
 				onModelChange(model: newModel)
 			}
+			.onChange(of: deepLinkManager.deepLink) {
+				deepLinkChanged($0)
+			}
 			.onChange(of: currencyPrefs.hideAmounts) { _ in
 				hideAmountsChanged()
 			}
@@ -161,11 +171,8 @@ struct HomeView : MVIView {
 			paymentsList()
 		}
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.sheet(isPresented: Binding( // SwiftUI only allows for 1 ".sheet"
-			get: { activeSheet != nil },
-			set: { if !$0 { activeSheet = nil }}
-		)) {
-			switch activeSheet! {
+		.sheet(item: $activeSheet) { (sheet: HomeViewSheet) in
+			switch sheet {
 			case .paymentView(let selectedPayment):
 				
 				PaymentView(
@@ -758,6 +765,12 @@ struct HomeView : MVIView {
 		if !didAppear {
 			didAppear = true
 			paymentsPageFetcher_subscribe()
+			
+			if let deepLink = deepLinkManager.deepLink {
+				DispatchQueue.main.async {
+					deepLinkChanged(deepLink)
+				}
+			}
 		}
 	}
 	
@@ -774,6 +787,33 @@ struct HomeView : MVIView {
 		if balance > 0 || incomingBalance > 0 {
 			if Prefs.shared.isNewWallet {
 				Prefs.shared.isNewWallet = false
+			}
+		}
+	}
+	
+	func deepLinkChanged(_ value: DeepLink?) {
+		log.trace("deepLinkChanged() => \(value?.description ?? "nil")")
+		
+		if let value {
+			switch value {
+			case .payment(let paymentId):
+				Biz.business.paymentsManager.getPayment(id: paymentId) { result, _ in
+					if let result {
+						activeSheet = .paymentView(payment: result)
+					} else {
+						log.warning("deepLinkChanged(): getPayment failed")
+					}
+				}
+				
+			case .paymentHistory     : break
+			case .backup             : break
+			case .drainWallet        : break
+			case .electrum           : break
+			case .backgroundPayments : break
+			case .liquiditySettings  : break
+			case .forceCloseChannels : break
+			case .swapInWallet       : break
+			case .finalWallet        : break
 			}
 		}
 	}

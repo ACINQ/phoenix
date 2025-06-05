@@ -83,6 +83,7 @@ import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.contact.ContactPhotoView
 import fr.acinq.phoenix.android.components.enableOrFade
+import fr.acinq.phoenix.android.components.nfc.NfcReaderMonitor
 import fr.acinq.phoenix.android.components.openLink
 import fr.acinq.phoenix.android.components.scanner.ScannerView
 import fr.acinq.phoenix.android.isDarkTheme
@@ -94,6 +95,7 @@ import fr.acinq.phoenix.android.payments.send.lnurl.LnurlWithdrawView
 import fr.acinq.phoenix.android.payments.send.offer.SendToOfferView
 import fr.acinq.phoenix.android.payments.send.spliceout.SendSpliceOutView
 import fr.acinq.phoenix.android.popToHome
+import fr.acinq.phoenix.android.utils.extensions.findActivitySafe
 import fr.acinq.phoenix.android.utils.extensions.toLocalisedMessage
 import fr.acinq.phoenix.android.utils.gray300
 import fr.acinq.phoenix.android.utils.gray800
@@ -170,7 +172,7 @@ fun SendView(
                     vm.resetParsing()
                     keyboardManager?.hide()
                     showScanner = true
-                }
+                },
             )
 
             // show dialogs when a parsing error occurs
@@ -224,7 +226,7 @@ fun SendView(
 private fun PrepareSendView(
     vm: PrepareSendViewModel,
     onBackClick: () -> Unit,
-    onShowScanner: () -> Unit
+    onShowScanner: () -> Unit,
 ) {
     val context = LocalContext.current
     var freeFormInput by remember { mutableStateOf("") }
@@ -327,6 +329,8 @@ private fun PrepareSendView(
             }
         }
     }
+
+    NfcReaderMonitor()
 }
 
 @Composable
@@ -346,6 +350,9 @@ private fun RowScope.SendButtonsRow(
     }
     ReadDataButton(label = stringResource(id = R.string.preparesend_imagepicker_button), icon = R.drawable.ic_image, onClick = { imagePickerLauncher.launch("image/*") }, enabled = enabled)
     ReadDataButton(label = stringResource(id = R.string.preparesend_paste_button), icon = R.drawable.ic_paste, onClick = { readClipboard(context)?.let { onSubmit(it) } }, enabled = enabled)
+    if (context.findActivitySafe()?.isNfcReaderAvailable() == true) {
+        ReadDataButton(label = stringResource(id = R.string.nfc_button), icon = R.drawable.ic_nfc, onClick = { context.findActivitySafe()?.startNfcReader() }, enabled = enabled)
+    }
     ReadDataButton(label = stringResource(id = R.string.preparesend_scan_button), icon = R.drawable.ic_scan_qr, onClick = onShowScanner, enabled = enabled)
 }
 

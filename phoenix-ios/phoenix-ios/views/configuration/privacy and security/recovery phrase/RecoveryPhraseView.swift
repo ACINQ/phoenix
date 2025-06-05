@@ -239,7 +239,7 @@ struct RecoveryPhraseList: View {
 				.padding(.vertical, 5)
 				
 				let enabledSecurity = AppSecurity.shared.enabledSecurityPublisher.value
-				if enabledSecurity != .none {
+				if enabledSecurity.hasAppLock() || enabledSecurity.hasSpendingPin() {
 					Text("(requires authentication)")
 						.font(.footnote)
 						.foregroundColor(.secondary)
@@ -587,12 +587,18 @@ struct RecoveryPhraseList: View {
 			isDecrypting = false
 		}
 		
-		let AuthWithPin = {
+		let AuthWithPin = { (type: PinType) in
 			smartModalState.display(dismissable: false) {
-				AuthenticateWithPinSheet { result in
+				AuthenticateWithPinSheet(type: type) { result in
 					switch result {
-					case .Authenticated(let recoveryPhrase):
-						Succeed(recoveryPhrase)
+					case .Authenticated:
+						AppSecurity.shared.tryUnlockWithKeychain { (recoveryPhrase, _, _) in
+							if let recoveryPhrase {
+								Succeed(recoveryPhrase)
+							} else {
+								Fail()
+							}
+						}
 					case .UserCancelled:
 						Fail()
 					case .Failed:
@@ -605,28 +611,44 @@ struct RecoveryPhraseList: View {
 		let enabledSecurity = AppSecurity.shared.enabledSecurityPublisher.value
 		if enabledSecurity == .none {
 			AppSecurity.shared.tryUnlockWithKeychain { (recoveryPhrase, _, _) in
-				
 				if let recoveryPhrase {
 					Succeed(recoveryPhrase)
 				} else {
 					Fail()
 				}
 			}
+			
+		} else if enabledSecurity.contains(.spendingPin) {
+			
+			// The spendingPin takes precedence over the various locking mechanisms.
+			// For example:
+			// - for "opening the app", the user has enabled:
+			//   - Face ID
+			//   - Lock PIN
+			// - for "spending control", the user has enabled:
+			//   - Spending PIN
+			//
+			// Thus, regular employees (with access to lock PIN) should NOT
+			// be allowed to display the seed (which would allow them to spend
+			// the funds from another wallet).
+			
+			AuthWithPin(.spendingPin)
+			
 		} else if enabledSecurity.contains(.biometrics) {
-			let prompt = NSLocalizedString("Unlock your seed.", comment: "Biometrics prompt")
+			let prompt = String(localized: "Unlock your seed.", comment: "Biometrics prompt")
 			
 			AppSecurity.shared.tryUnlockWithBiometrics(prompt: prompt) { result in
 				
 				if case .success(let recoveryPhrase) = result {
 					Succeed(recoveryPhrase)
-				} else if enabledSecurity.contains(.customPin) { // custom pin fallback
-					AuthWithPin()
+				} else if enabledSecurity.contains(.lockPin) { // lock pin fallback
+					AuthWithPin(.lockPin)
 				} else {
 					Fail()
 				}
 			}
-		} else if enabledSecurity.contains(.customPin) {
-			AuthWithPin()
+		} else if enabledSecurity.contains(.lockPin) {
+			AuthWithPin(.lockPin)
 			
 		} else {
 			log.error("Unhandled security configuration")

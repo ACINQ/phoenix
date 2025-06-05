@@ -19,16 +19,33 @@ package fr.acinq.phoenix.android.settings
 
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.bitcoin.BitcoinError
@@ -38,17 +55,29 @@ import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
-import fr.acinq.phoenix.android.*
+import fr.acinq.phoenix.android.CF
+import fr.acinq.phoenix.android.LocalBitcoinUnit
+import fr.acinq.phoenix.android.LocalFiatCurrency
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.*
-import fr.acinq.phoenix.android.components.dialogs.ConfirmDialog
+import fr.acinq.phoenix.android.business
+import fr.acinq.phoenix.android.components.Button
+import fr.acinq.phoenix.android.components.Card
+import fr.acinq.phoenix.android.components.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.DefaultScreenLayout
+import fr.acinq.phoenix.android.components.FeerateSlider
+import fr.acinq.phoenix.android.components.ProgressView
+import fr.acinq.phoenix.android.components.TextInput
+import fr.acinq.phoenix.android.components.TextWithIcon
+import fr.acinq.phoenix.android.components.TransparentFilledButton
+import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
+import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.components.scanner.ScannerView
+import fr.acinq.phoenix.android.fiatRate
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.extensions.safeLet
 import fr.acinq.phoenix.android.utils.monoTypo
-import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.controllers.config.CloseChannelsConfiguration
 import fr.acinq.phoenix.data.BitcoinUriError
 import fr.acinq.phoenix.utils.Parser
@@ -194,24 +223,26 @@ fun MutualCloseView(
                             )
 
                             if (showConfirmationDialog) {
-                                ConfirmDialog(
-                                    title = stringResource(id = R.string.mutualclose_confirm_title),
-                                    content = {
-                                        Text(text = stringResource(R.string.mutualclose_confirm_details))
+                                ModalBottomSheet(
+                                    onDismiss = { showConfirmationDialog = false },
+                                    internalPadding = PaddingValues(horizontal = 12.dp),
+                                    containerColor = MaterialTheme.colors.background,
+                                ) {
+                                    Column(
+                                        modifier = Modifier.background(color = MaterialTheme.colors.surface, shape = RoundedCornerShape(24.dp)).padding(16.dp)
+                                    ) {
+                                        Text(text = stringResource(R.string.mutualclose_confirm_title), style = MaterialTheme.typography.h4)
                                         Spacer(modifier = Modifier.height(16.dp))
-                                        TextWithIcon(
-                                            text = address,
-                                            icon = R.drawable.ic_chain,
-                                            textStyle = monoTypo.copy(fontSize = 14.sp),
-                                            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(mutedBgColor).padding(horizontal = 12.dp, vertical = 8.dp),
-                                        )
+                                        Text(text = stringResource(R.string.mutualclose_confirm_details))
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(text = address, style = monoTypo.copy(fontSize = 14.sp, fontWeight = FontWeight.Bold))
                                         Spacer(Modifier.height(24.dp))
                                         when (val fee = totalFeeEstimate) {
                                             null -> TextWithIcon(text = stringResource(R.string.mutualclose_confirm_fee_unknown), icon = R.drawable.ic_alert_triangle)
                                             else -> Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                                                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                                                     Text(text = stringResource(R.string.mutualclose_confirm_fee))
-                                                    Text(text = "${fee.toPrettyString(LocalBitcoinUnit.current, withUnit = true)}.", style = MaterialTheme.typography.body2)
+                                                    Text(text = stringResource(R.string.utils_converted_amount,"${fee.toPrettyString(LocalBitcoinUnit.current, withUnit = true)}."), style = MaterialTheme.typography.body2)
                                                 }
                                                 if (isUsingLowFeerate) {
                                                     Text(
@@ -221,14 +252,29 @@ fun MutualCloseView(
                                                 }
                                             }
                                         }
-                                    },
-                                    onDismiss = { showConfirmationDialog = false },
-                                    onConfirm = {
-                                        addressErrorMessage = ""
-                                        feerate?.let { postIntent(CloseChannelsConfiguration.Intent.MutualCloseAllChannels(address, FeeratePerKw(FeeratePerByte(it)))) }
-                                        showConfirmationDialog = false
+                                        Spacer(modifier = Modifier.height(24.dp))
+                                        SmartSpendButton(
+                                            text = stringResource(id = R.string.btn_confirm),
+                                            icon = R.drawable.ic_check,
+                                            onSpend = {
+                                                addressErrorMessage = ""
+                                                feerate?.let { postIntent(CloseChannelsConfiguration.Intent.MutualCloseAllChannels(address, FeeratePerKw(FeeratePerByte(it)))) }
+                                                showConfirmationDialog = false
+                                            },
+                                            shape = RoundedCornerShape(12.dp),
+                                            enabled = true,
+                                            modifier = Modifier.fillMaxWidth(),
+                                        )
                                     }
-                                )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    TransparentFilledButton(
+                                        text = stringResource(id = R.string.btn_cancel),
+                                        icon = R.drawable.ic_cross,
+                                        onClick = { showConfirmationDialog = false },
+                                        modifier = Modifier.fillMaxWidth(),
+                                    )
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                }
                             }
                         }
                     }
