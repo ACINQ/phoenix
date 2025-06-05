@@ -16,11 +16,16 @@
 
 package fr.acinq.phoenix.android.settings
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -31,7 +36,8 @@ import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
-import fr.acinq.phoenix.android.components.dialogs.ConfirmDialog
+import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
+import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.monoTypo
@@ -85,15 +91,40 @@ fun ForceCloseView(
                         )
                     }
                     if (showConfirmationDialog) {
-                        ConfirmDialog(
-                            title = stringResource(id = R.string.forceclose_confirm_title),
-                            message = stringResource(R.string.forceclose_confirm_details),
+                        ModalBottomSheet(
                             onDismiss = { showConfirmationDialog = false },
-                            onConfirm = {
-                                postIntent(CloseChannelsConfiguration.Intent.ForceCloseAllChannels)
-                                showConfirmationDialog = false
+                            internalPadding = PaddingValues(horizontal = 12.dp),
+                            containerColor = MaterialTheme.colors.background,
+                        ) {
+                            Column(
+                                modifier = Modifier.background(color = MaterialTheme.colors.surface, shape = RoundedCornerShape(24.dp)).padding(16.dp)
+                            ) {
+                                Text(text = stringResource(id = R.string.forceclose_confirm_title), style = MaterialTheme.typography.h4)
+                                Spacer(Modifier.height(16.dp))
+                                Text(text = stringResource(R.string.forceclose_confirm_details))
+                                Spacer(modifier = Modifier.height(24.dp))
+                                SmartSpendButton(
+                                    text = stringResource(id = R.string.btn_confirm),
+                                    icon = R.drawable.ic_check,
+                                    onSpend = {
+                                        postIntent(CloseChannelsConfiguration.Intent.ForceCloseAllChannels)
+                                        showConfirmationDialog = false
+                                    },
+                                    shape = RoundedCornerShape(12.dp),
+                                    enabled = true,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    ignoreChannelsState = true,
+                                )
                             }
-                        )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            TransparentFilledButton(
+                                text = stringResource(id = R.string.btn_cancel),
+                                icon = R.drawable.ic_cross,
+                                onClick = { showConfirmationDialog = false },
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
                     }
                 }
                 is CloseChannelsConfiguration.Model.ChannelsClosed -> {

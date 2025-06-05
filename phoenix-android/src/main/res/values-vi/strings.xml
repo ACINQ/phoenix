@@ -422,8 +422,19 @@
     <string name="accessctrl_auth_error_too_old">Phiên bản Android này không tương thích.</string>
     <string name="accessctrl_auth_error_unhandled">Lỗi mã chưa được xử lý: %1$d</string>
 
-    <string name="accessctrl_biometric_lock_switch_label">Khóa màn hình</string>
-    <string name="accessctrl_biometric_lock_switch_desc">Khóa quyền truy cập vào ứng dụng bằng khóa màn hình/khoá vân tay của Android</string>
+    <string name="accessctrl_screenlock_header">Truy cập ứng dụng</string>
+    <string name="accessctrl_screenlock_biometrics_label">Xác thực hệ thống</string>
+    <string name="accessctrl_screenlock_biometrics_desc">Bảo mật quyền truy cập vào ứng dụng bằng tài khoản người dùng Android.</string>
+    <string name="accessctrl_screenlock_pin_label">Lock PIN</string>
+    <string name="accessctrl_screenlock_pin_desc">Bảo mật quyền truy cập vào ứng dụng bằng mã PIN 6 chữ số dành riêng cho Phoenix.</string>
+
+    <string name="accessctrl_autolock_label">Thời gian chờ khóa</string>
+    <string name="accessctrl_autolock_desc">Sau %1$s phút không hoạt động</string>
+    <string name="accessctrl_autolock_desc_never">Không bao giờ</string>
+
+    <string name="accessctrl_spendlock_header">Gửi tiền</string>
+    <string name="accessctrl_spendlock_pin_label">Spending PIN</string>
+    <string name="accessctrl_spendlock_pin_desc">Nếu được bật, bạn sẽ cần nhập mã PIN để chi tiêu tiền từ Phoenix.</string>
 
     <!-- lnurl-auth -->
 
@@ -739,5 +750,23 @@
     <string name="swapin_signer_invalid_tx_details">Kiểm tra thông tin nhập đã đầy đủ và không thiếu ký tự nào.</string>
     <string name="swapin_signer_error_header">Đăng nhập đầu vào không thành công</string>
 
+    <!-- PIN code dialog -->
+
+    <string name="pincode_check_screenlock_title">Nhập mã PIN để mở ví</string>
+    <string name="pincode_check_spending_payment_title">Nhập mã PIN để thanh toán</string>
+    <string name="pincode_check_spending_displayseed_title">Nhập mã PIN để xem hạt giống</string>]
+    <string name="pincode_check_disabling_title">Nhập mã PIN để tiếp tục</string>
+    <string name="pincode_new_screenlock_title">Tạo mã PIN để truy cập ứng dụng</string>
+    <string name="pincode_new_spending_title">Tạo mã PIN để gửi thanh toán</string>
+    <string name="pincode_confirm_title">Xác nhận mã PIN</string>
+
+    <string name="pincode_checking_label">Đang kiểm tra mã PIN…</string>
+    <string name="pincode_failure_label">Không đúng</string>
+    <string name="pincode_locked_label">Đã khóa trong %1$s</string>
+
+    <string name="pincode_error_generic">Một đã xảy ra lỗi</string>
+    <string name="pincode_error_malformed">Mã PIN không đúng định dạng</string>
+    <string name="pincode_error_confirm_do_not_match">Mã PIN không khớp!</string>
+    <string name="pincode_error_write">Lỗi khi lưu mã PIN</string>
 
 </resources>

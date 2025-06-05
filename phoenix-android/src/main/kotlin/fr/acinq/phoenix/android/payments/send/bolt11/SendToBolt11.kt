@@ -26,7 +26,6 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -38,6 +37,7 @@ import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.extensions.safeLet
@@ -160,13 +160,9 @@ fun SendToBolt11View(
         }
         Spacer(modifier = Modifier.height(36.dp))
         val scope = rememberCoroutineScope()
-        val mayDoPayments by business.peerManager.mayDoPayments.collectAsState()
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            FilledButton(
-                text = if (!mayDoPayments) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.send_pay_button),
-                icon = R.drawable.ic_send,
-                enabled = mayDoPayments && amount != null && amountErrorMessage.isBlank() && trampolineFees != null,
-            ) {
+        SmartSpendButton(
+            enabled = amount != null && amountErrorMessage.isBlank() && trampolineFees != null,
+            onSpend = {
                 safeLet(amount, trampolineFees) { amt, fees ->
                     scope.launch {
                         sendManager.payBolt11Invoice(
@@ -179,6 +175,6 @@ fun SendToBolt11View(
                     }
                 }
             }
-        }
+        )
     }
 }

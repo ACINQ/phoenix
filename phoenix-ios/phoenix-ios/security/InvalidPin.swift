@@ -42,6 +42,10 @@ struct InvalidPin: Equatable, Codable {
 		return (diff > 0.0) ? diff : nil
 	}
 	
+	func hasWaitTime(_ now: Date) -> Bool {
+		return waitTimeFrom(now) != nil
+	}
+	
 	var elapsed: TimeInterval {
 		return timestamp.timeIntervalSinceNow * -1.0
 	}

@@ -73,10 +73,10 @@ struct PaymentsBackupView: View {
 		
 		if backupTransactions_enabled {
 			
-			Label {
+			LabelAlignment {
 				VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
 					Text("Your payment history and contacts will be stored in iCloud.")
-					
+
 					Text(
 						"""
 						The data stored in the cloud is encrypted, \
@@ -96,7 +96,7 @@ struct PaymentsBackupView: View {
 			
 		} else {
 			
-			Label {
+			LabelAlignment {
 				VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
 					Text("Your payment history and contacts are only stored on this device.")
 					
@@ -120,24 +120,21 @@ struct PaymentsBackupView: View {
 	@ViewBuilder
 	func cellularDataOption() -> some View {
 		
-		HStack(alignment: VerticalAlignment.centerTopLine) { // <- Custom VerticalAlignment
+		ToggleAlignment {
 			
-			Label {
+			LabelAlignment {
 				VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
 					Text("Use cellular data")
-						.alignmentGuide(VerticalAlignment.centerTopLine) { (d: ViewDimensions) in
-							d[VerticalAlignment.center]
-						}
 					
 					let explanation = backupTransactions_useCellularData ?
-						NSLocalizedString(
-							"Uploads can occur over cellular connections.",
-							comment: "Explanation for 'Use cellular data' toggle"
-						) :
-						NSLocalizedString(
-							"Uploads will only occur over WiFi.",
-							comment: "Explanation for 'Use cellular data' toggle"
-						)
+					NSLocalizedString(
+						"Uploads can occur over cellular connections.",
+						comment: "Explanation for 'Use cellular data' toggle"
+					) :
+					NSLocalizedString(
+						"Uploads will only occur over WiFi.",
+						comment: "Explanation for 'Use cellular data' toggle"
+					)
 					
 					Text(explanation)
 						.lineLimit(nil) // text is getting truncated for some reason
@@ -149,68 +146,56 @@ struct PaymentsBackupView: View {
 					.renderingMode(.template)
 					.imageScale(.medium)
 					.foregroundColor(Color.appAccent)
-			} // </Label>
+			} // </LabelAlignment>
 			
-			Spacer()
+		} toggle: {
 			
 			Toggle("", isOn: $backupTransactions_useCellularData)
 				.labelsHidden()
-				.padding(.trailing, 2)
-				.alignmentGuide(VerticalAlignment.centerTopLine) { (d: ViewDimensions) in
-					d[VerticalAlignment.center]
-				}
 			
-		} // </HStack>
+		} // </ToggleAlignment>
 	}
 	
 	@ViewBuilder
 	func uploadDelaysOption() -> some View {
 		
-		HStack(alignment: VerticalAlignment.centerTopLine) { // <- Custom VerticalAlignment
+		ToggleAlignment {
 			
 			Label {
 				VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
 					Text("Randomize upload delays")
 						.alignmentGuide(VerticalAlignment.centerTopLine) { (d: ViewDimensions) in
-							d[explicit: VerticalAlignment.center] ?? d[VerticalAlignment.center]
+							d[VerticalAlignment.center]
 						}
 					
 					let explanation = backupTransactions_useUploadDelay ?
-						NSLocalizedString(
-							"Avoids payment correlation using timestamp metadata.",
-							comment: "Explanation for 'Randomize upload delays' toggle"
-						) :
-						NSLocalizedString(
-							"Payments are uploaded to the cloud immediately upon completion.",
-							comment: "Explanation for 'Randomize upload delays' toggle"
-						)
+					NSLocalizedString(
+						"Avoids payment correlation using timestamp metadata.",
+						comment: "Explanation for 'Randomize upload delays' toggle"
+					) :
+					NSLocalizedString(
+						"Payments are uploaded to the cloud immediately upon completion.",
+						comment: "Explanation for 'Randomize upload delays' toggle"
+					)
 					
 					Text(explanation)
 						.lineLimit(nil) // text is getting truncated for some reason
 						.font(.callout)
 						.foregroundColor(Color.secondary)
-						
 				} // </VStack>
 			} icon: {
 				Image(systemName: "timer")
 					.renderingMode(.template)
 					.imageScale(.medium)
 					.foregroundColor(Color.appAccent)
-					.alignmentGuide(VerticalAlignment.centerTopLine) { (d: ViewDimensions) in
-						d[VerticalAlignment.center]
-					}
-			} // </Label>
+			} // </LabelAlignment>
 			
-			Spacer()
+		} toggle: {
 			
 			Toggle("", isOn: $backupTransactions_useUploadDelay)
 				.labelsHidden()
-				.padding(.trailing, 2)
-				.alignmentGuide(VerticalAlignment.centerTopLine) { (d: ViewDimensions) in
-					d[VerticalAlignment.center]
-				}
 			
-		} // </HStack>
+		} // </ToggleAlignment>
 	}
 	
 	func didToggle_backupTransactions_enabled(_ flag: Bool) {

@@ -454,8 +454,22 @@
     <string name="accessctrl_auth_error_too_old">Táto verzia systému Android nie je kompatibilná.</string>
     <string name="accessctrl_auth_error_unhandled">Neošetrená chyba: %1$d</string>
 
-    <string name="accessctrl_biometric_lock_switch_label">Zámok obrazovky systému</string>
-    <string name="accessctrl_biometric_lock_switch_desc">Zamknúť prístup k aplikácii pomocou zámku obrazovky/odtlačku prsta</string>
+    <string name="accessctrl_screenlock_header">Prístup k aplikáciám</string>
+    <string name="accessctrl_screenlock_biometrics_label">Overenie systému</string>
+    <string name="accessctrl_screenlock_biometrics_desc">Zabezpečuje prístup k aplikácii pomocou používateľského účtu systému Android.</string>
+    <string name="accessctrl_screenlock_pin_label">Lock PIN</string>
+    <string name="accessctrl_screenlock_pin_desc">Zabezpečuje prístup k aplikácii pomocou 6-miestneho PIN kódu špecifického pre Phoenix.</string>
+
+    <string name="accessctrl_autolock_label">Časový limit uzamknutia</string>
+    <string name="accessctrl_autolock_desc">Po %1$s minútach nečinnosti</string>
+    <string name="accessctrl_autolock_desc_never">Nikdy</string>
+
+    <string name="accessctrl_spendlock_header">Odosielanie finančných prostriedkov</string>
+    <string name="accessctrl_spendlock_pin_label">Spending PIN</string>
+    <string name="accessctrl_spendlock_pin_desc">Ak je povolené, na minutie finančných prostriedkov z Phoenixu je potrebný PIN kód.</string>
+
+    <string name="accessctrl_misc_header">Rôzne</string>
+    <string name="accessctrl_shuffle_pin">Náhodne prehrávať klávesnicu s PIN kódom</string>
 
     <!-- lnurl-auth -->
 
@@ -776,7 +790,26 @@
     <string name="swapin_signer_invalid_tx_details">Skontrolujte, či je vstup kompletný a nechýba žiadny znak.</string>
     <string name="swapin_signer_error_header">Nepodarilo sa podpísať vstup</string>
 
-  <!-- settings: contacts list -->
-  <string name="settings_contacts_help">Táto obrazovka umožňuje prepojiť kód BOLT12 s názvom.\n\nDáta kontaktov sú uložené lokálne.</string>
+    <!-- settings: contacts list -->
+    <string name="settings_contacts_help">Táto obrazovka umožňuje prepojiť kód BOLT12 s názvom.\n\nDáta kontaktov sú uložené lokálne.</string>
+
+    <!-- PIN code dialog -->
+
+    <string name="pincode_check_screenlock_title">Zadajte PIN na otvorenie peňaženky</string>
+    <string name="pincode_check_spending_payment_title">Zadajte PIN na platbu</string>
+    <string name="pincode_check_spending_displayseed_title">Zadajte PIN na zobrazenie seed kódu</string>]
+    <string name="pincode_check_disabling_title">Zadajte PIN na pokračovanie</string>
+    <string name="pincode_new_screenlock_title">Vytvoriť PIN na prístup k aplikácii</string>
+    <string name="pincode_new_spending_title">Vytvoriť PIN na odosielanie platieb</string>
+    <string name="pincode_confirm_title">Potvrdiť PIN</string>
+
+    <string name="pincode_checking_label">Kontroluje sa PIN…</string>
+    <string name="pincode_failure_label">Nesprávny</string>
+    <string name="pincode_locked_label">Uzamknuté pre %1$s</string>
+
+    <string name="pincode_error_generic">Chyba vyskytla sa chyba</string>
+    <string name="pincode_error_malformed">Nesprávny PIN</string>
+    <string name="pincode_error_confirm_do_not_match">Nezhoda PIN kódu!</string>
+    <string name="pincode_error_write">Chyba pri ukladaní PIN kódu</string>
 
 </resources>

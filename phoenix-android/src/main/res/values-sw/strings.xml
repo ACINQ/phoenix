@@ -470,8 +470,19 @@
     <string name="accessctrl_auth_error_too_old">Toleo hili la Android halifai.</string>
     <string name="accessctrl_auth_error_unhandled">Kificho kisichoshughulikiwa: %1$d</string>
 
-    <string name="accessctrl_biometric_lock_switch_label">Kufunga skrini</string>
-    <string name="accessctrl_biometric_lock_switch_desc">Funga upatikanaji wa programu kwa kutumia kufunga skrini/alama ya vidole ya Android</string>
+    <string name="accessctrl_screenlock_header">Idhini ya kufikia programu</string>
+    <string name="accessctrl_screenlock_biometrics_label">Uthibitishaji wa mfumo</string>
+    <string name="accessctrl_screenlock_biometrics_desc">Hulinda ufikiaji wa programu kwa kutumia akaunti ya mtumiaji wa Android.</string>
+    <string name="accessctrl_screenlock_pin_label">Lock PIN</string>
+    <string name="accessctrl_screenlock_pin_desc">Hulinda ufikiaji wa programu kwa PIN ya tarakimu 6 mahususi ya Phoenix.</string>
+
+    <string name="accessctrl_autolock_label">Muda wa kufunga umeisha</string>
+    <string name="accessctrl_autolock_desc">Baada ya dakika %1$s za kutotumika</string>
+    <string name="accessctrl_autolock_desc_never">Kamwe</string>
+
+    <string name="accessctrl_spendlock_header">Inatuma pesa</string>
+    <string name="accessctrl_spendlock_pin_label">Spending PIN</string>
+    <string name="accessctrl_spendlock_pin_desc">Ikiwashwa, PIN inahitajika ili kutumia pesa kutoka Phoenix.</string>
 
     <!-- lnurl-auth -->
 
@@ -805,5 +816,24 @@
     <string name="bip353_claim_button">Dai anwani yangu</string>
     <string name="bip353_claiming">Ikidai anwani…</string>
     <string name="bip353_error">Imeshindwa kudai anwani</string>
+
+    <!-- PIN code dialog -->
+
+    <string name="pincode_check_screenlock_title">Weka PIN ili kufungua pochi</string>
+    <string name="pincode_check_spending_payment_title">Weka PIN ili kulipa</string>
+    <string name="pincode_check_spending_displayseed_title">Weka PIN ili kuona mbegu</string>]
+    <string name="pincode_check_disabling_title">Weka PIN ili kuendelea</string>
+    <string name="pincode_new_screenlock_title">Unda PIN ili kufikia programu</string>
+    <string name="pincode_new_spending_title">Unda PIN ya kutuma malipo</string>
+    <string name="pincode_confirm_title">Thibitisha PIN</string>
+
+    <string name="pincode_checking_label">Inakagua PIN…</string>
+    <string name="pincode_failure_label">Si sahihi</string>
+    <string name="pincode_locked_label">Imefungwa kwa %1$s</string>
+
+    <string name="pincode_error_generic">Hitilafu imetokea</string>
+    <string name="pincode_error_malformed">PIN Iliyoharibika</string>
+    <string name="pincode_error_confirm_do_not_match">PIN hailingani!</string>
+    <string name="pincode_error_write">Hitilafu wakati wa kuhifadhi PIN</string>
 
 </resources>

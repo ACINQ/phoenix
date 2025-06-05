@@ -40,6 +40,7 @@ struct LiquidityAdsView: View {
 	
 	@EnvironmentObject var popoverState: PopoverState
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@EnvironmentObject var smartModalState: SmartModalState
 	
 	var popoverPresent: Bool {
 		return popoverPresent_minerFee || popoverPresent_serviceFee || popoverPresent_duration
@@ -430,7 +431,7 @@ struct LiquidityAdsView: View {
 		VStack(alignment: HorizontalAlignment.center, spacing: 8) {
 			
 			Button {
-				purchaseLiquidity()
+				maybePurchaseLiquidity()
 			} label: {
 				HStack(alignment: VerticalAlignment.center, spacing: 8) {
 					if isPurchasing {
@@ -850,6 +851,25 @@ struct LiquidityAdsView: View {
 			channelsNotAvailable = _channelsNotAvailable
 			isEstimating = false
 		} // </Task>
+	}
+	
+	func maybePurchaseLiquidity() {
+		log.trace("maybePurchaseLiquidity()")
+		
+		let enabledSecurity = AppSecurity.shared.enabledSecurityPublisher.value
+		if enabledSecurity.contains(.spendingPin) {
+			
+			smartModalState.display(dismissable: false) {
+				AuthenticateWithPinSheet(type: .spendingPin) { result in
+					if result == .Authenticated {
+						purchaseLiquidity()
+					}
+				}
+			}
+			
+		} else {
+			purchaseLiquidity()
+		}
 	}
 	
 	func purchaseLiquidity() {

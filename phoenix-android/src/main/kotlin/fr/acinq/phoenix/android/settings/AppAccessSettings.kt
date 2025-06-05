@@ -33,8 +33,11 @@ import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.AppViewModel
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
-import fr.acinq.phoenix.android.components.screenlock.CheckPinFlow
-import fr.acinq.phoenix.android.components.screenlock.NewPinFlow
+import fr.acinq.phoenix.android.components.auth.pincode.PinDialogTitle
+import fr.acinq.phoenix.android.components.auth.screenlock.CheckScreenLockPinFlow
+import fr.acinq.phoenix.android.components.auth.screenlock.NewScreenLockPinFlow
+import fr.acinq.phoenix.android.components.auth.spendinglock.CheckSpendingPinFlow
+import fr.acinq.phoenix.android.components.auth.spendinglock.NewSpendingPinFlow
 import fr.acinq.phoenix.android.components.settings.ListPreferenceButton
 import fr.acinq.phoenix.android.components.settings.PreferenceItem
 import fr.acinq.phoenix.android.components.settings.Setting
@@ -55,44 +58,66 @@ fun AppAccessSettings(
     val context = LocalContext.current
     val biometricAuthStatus = BiometricsHelper.authStatus(context)
     val userPrefs = userPrefs
-    val isBiometricLockEnabled by userPrefs.getIsBiometricLockEnabled.collectAsState(null)
-    val isCustomPinLockEnabled by userPrefs.getIsCustomPinLockEnabled.collectAsState(null)
+    val isBiometricLockEnabled by userPrefs.getIsScreenLockBiometricsEnabled.collectAsState(null)
+    val isCustomPinLockEnabled by userPrefs.getIsScreenLockPinEnabled.collectAsState(null)
     val autoLockDelay by userPrefs.getAutoLockDelay.collectAsState(null)
 
     DefaultScreenLayout {
         DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.accessctrl_title))
 
+        CardHeader(text = stringResource(R.string.accessctrl_screenlock_header))
         Card {
             isBiometricLockEnabled?.let {
                 if (biometricAuthStatus == BiometricManager.BIOMETRIC_SUCCESS) {
-                    BiometricScreenLockView(
+                    ScreenLockBiometricsView(
                         isBiometricLockEnabled = it,
-                        onBiometricLockChange = { userPrefs.saveIsBiometricLockEnabled(it) }
+                        onBiometricLockChange = { userPrefs.saveIsScreenLockBiometricsEnabled(it) }
                     )
                 } else {
                     CannotUseBiometrics(status = biometricAuthStatus)
                 }
             } ?: ProgressView(text = stringResource(id = R.string.utils_loading_prefs))
-        }
 
-        Card {
             isCustomPinLockEnabled?.let { pinEnabled ->
-                CustomPinLockView(
-                    isCustomPinLockEnabled = pinEnabled,
-                )
+                ScreenLockCustomPinView(isCustomPinLockEnabled = pinEnabled,)
             } ?: ProgressView(text = stringResource(id = R.string.utils_loading_prefs))
-        }
 
-        if (isBiometricLockEnabled == true || isCustomPinLockEnabled == true) {
-            autoLockDelay?.let {
-                val scope = rememberCoroutineScope()
-                Card {
-                    AutoLockDelayPicker(it, onUpdateDelay = { newDelay ->
+            if (isBiometricLockEnabled == true || isCustomPinLockEnabled == true) {
+                autoLockDelay?.let {
+                    val scope = rememberCoroutineScope()
+                    AutoScreenLockDelayPicker(it, onUpdateDelay = { newDelay ->
                         scope.launch {
                             userPrefs.saveAutoLockDelay(newDelay)
                             appViewModel.scheduleAutoLock()
                         }
                     })
+                }
+            }
+        }
+
+        val isSpendLockPinEnabled by userPrefs.getIsSpendingPinEnabled.collectAsState(null)
+        CardHeader(text = stringResource(R.string.accessctrl_spendlock_header))
+        Card {
+            isSpendLockPinEnabled?.let {
+                SpendLockCustomPinView(it)
+            } ?: ProgressView(text = stringResource(R.string.utils_loading_prefs))
+        }
+
+        if (isCustomPinLockEnabled == true || isSpendLockPinEnabled == true) {
+            CardHeader(text = stringResource(R.string.accessctrl_misc_header))
+            Card {
+                val scope = rememberCoroutineScope()
+                val isPinShuffled by userPrefs.getIsPinKeyboardShuffled.collectAsState(null)
+                isPinShuffled?.let {
+                    SettingSwitch(
+                        title = stringResource(id = R.string.accessctrl_shuffle_pin),
+                        icon = R.drawable.ic_dices,
+                        enabled = true,
+                        isChecked = it,
+                        onCheckChangeAttempt = {
+                            scope.launch { userPrefs.saveIsPinKeyboardShuffled(it) }
+                        }
+                    )
                 }
             }
         }
@@ -113,7 +138,7 @@ private fun CannotUseBiometrics(
 }
 
 @Composable
-private fun BiometricScreenLockView(
+private fun ScreenLockBiometricsView(
     isBiometricLockEnabled: Boolean,
     onBiometricLockChange: suspend (Boolean) -> Unit,
 ) {
@@ -123,8 +148,8 @@ private fun BiometricScreenLockView(
     var errorMessage by remember { mutableStateOf("") }
 
     SettingSwitch(
-        title = stringResource(id = R.string.accessctrl_biometric_lock_switch_label),
-        description = stringResource(id = R.string.accessctrl_biometric_lock_switch_desc),
+        title = stringResource(id = R.string.accessctrl_screenlock_biometrics_label),
+        description = stringResource(id = R.string.accessctrl_screenlock_biometrics_desc),
         icon = R.drawable.ic_fingerprint,
         enabled = true,
         isChecked = isBiometricLockEnabled,
@@ -164,9 +189,8 @@ private fun BiometricScreenLockView(
     }
 }
 
-
 @Composable
-private fun CustomPinLockView(
+private fun ScreenLockCustomPinView(
     isCustomPinLockEnabled: Boolean,
 ) {
     val context = LocalContext.current
@@ -178,8 +202,8 @@ private fun CustomPinLockView(
     var isInDisablingCustomPinFlow by rememberSaveable { mutableStateOf(false) }
 
     SettingSwitch(
-        title = stringResource(id = R.string.accessctrl_pin_lock_switch_label),
-        description = stringResource(id = R.string.accessctrl_pin_lock_switch_desc),
+        title = stringResource(id = R.string.accessctrl_screenlock_pin_label),
+        description = stringResource(id = R.string.accessctrl_screenlock_pin_desc),
         icon = R.drawable.ic_pin,
         enabled = !isInDisablingCustomPinFlow && !isInNewPinFlow,
         isChecked = isCustomPinLockEnabled,
@@ -195,11 +219,11 @@ private fun CustomPinLockView(
     )
 
     if (isInNewPinFlow) {
-        NewPinFlow(
+        NewScreenLockPinFlow(
             onCancel = { isInNewPinFlow = false },
             onDone = {
                 scope.launch {
-                    userPrefs.saveIsCustomPinLockEnabled(true)
+                    userPrefs.saveIsScreenLockPinEnabled(true)
                     isInNewPinFlow = false
                 }
                 Toast.makeText(context, "Pin code saved!", Toast.LENGTH_SHORT).show()
@@ -208,15 +232,16 @@ private fun CustomPinLockView(
     }
 
     if (isInDisablingCustomPinFlow) {
-        CheckPinFlow(
+        CheckScreenLockPinFlow(
             onCancel = { isInDisablingCustomPinFlow = false },
             onPinValid = {
                 scope.launch {
-                    userPrefs.saveIsCustomPinLockEnabled(false)
+                    userPrefs.saveIsScreenLockPinEnabled(false)
                     isInDisablingCustomPinFlow = false
                 }
                 Toast.makeText(context, "Pin disabled", Toast.LENGTH_SHORT).show()
-            }
+            },
+            prompt = { PinDialogTitle(text = stringResource(id = R.string.pincode_check_disabling_title)) }
         )
     }
 
@@ -230,7 +255,70 @@ private fun CustomPinLockView(
 }
 
 @Composable
-private fun AutoLockDelayPicker(
+private fun SpendLockCustomPinView(isSpendingPinEnabled: Boolean) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val userPrefs = userPrefs
+    var errorMessage by remember { mutableStateOf("") }
+
+    var isNewPinFlow by rememberSaveable { mutableStateOf(false) }
+    var isDisablingPinFlow by rememberSaveable { mutableStateOf(false) }
+
+    SettingSwitch(
+        title = stringResource(id = R.string.accessctrl_spendlock_pin_label),
+        description = stringResource(id = R.string.accessctrl_spendlock_pin_desc),
+        icon = R.drawable.ic_pin,
+        enabled = !isDisablingPinFlow && !isNewPinFlow,
+        isChecked = isSpendingPinEnabled,
+        onCheckChangeAttempt = { isChecked ->
+            errorMessage = ""
+            if (isChecked) {
+                // user is enabling custom PIN
+                isNewPinFlow = true
+            } else {
+                isDisablingPinFlow = true
+            }
+        }
+    )
+
+    if (isNewPinFlow) {
+        NewSpendingPinFlow(
+            onCancel = { isNewPinFlow = false },
+            onDone = {
+                scope.launch {
+                    userPrefs.saveIsSpendLockPinEnabled(true)
+                    isNewPinFlow = false
+                }
+                Toast.makeText(context, "Spending PIN saved!", Toast.LENGTH_SHORT).show()
+            }
+        )
+    }
+
+    if (isDisablingPinFlow) {
+        CheckSpendingPinFlow(
+            onCancel = { isDisablingPinFlow = false },
+            onPinValid = {
+                scope.launch {
+                    userPrefs.saveIsSpendLockPinEnabled(false)
+                    isDisablingPinFlow = false
+                }
+                Toast.makeText(context, "Spending PIN disabled", Toast.LENGTH_SHORT).show()
+            },
+            prompt = { PinDialogTitle(text = stringResource(id = R.string.pincode_check_disabling_title)) }
+        )
+    }
+
+    if (errorMessage.isNotBlank()) {
+        Text(
+            text = errorMessage,
+            modifier = Modifier.padding(start = 46.dp, top = 0.dp, bottom = 16.dp, end = 16.dp),
+            color = negativeColor,
+        )
+    }
+}
+
+@Composable
+private fun AutoScreenLockDelayPicker(
     currentDelay: Duration,
     onUpdateDelay: (Duration) -> Unit,
 ) {
@@ -240,7 +328,7 @@ private fun AutoLockDelayPicker(
         PreferenceItem(item = Duration.INFINITE, title = "Never"),
     )
     ListPreferenceButton(
-        title = stringResource(id = R.string.accessctrl_autolock_title),
+        title = stringResource(id = R.string.accessctrl_autolock_label),
         subtitle = {
             if (currentDelay == Duration.INFINITE) {
                 Text(text = stringResource(id = R.string.accessctrl_autolock_desc_never))

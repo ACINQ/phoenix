@@ -57,6 +57,7 @@ import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.SplashLabelRow
 import fr.acinq.phoenix.android.components.SplashLayout
 import fr.acinq.phoenix.android.components.TextInput
+import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
 import fr.acinq.phoenix.android.components.contact.ContactOrOfferView
 import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
@@ -191,22 +192,17 @@ private fun SendOfferStateButton(
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            val mayDoPayments by business.peerManager.mayDoPayments.collectAsState()
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                FilledButton(
-                    text = if (!mayDoPayments) {
-                        stringResource(id = R.string.send_connecting_button)
-                    } else if (state is OfferState.Complete.Failed) {
-                        stringResource(id = R.string.send_pay_retry_button)
-                    } else {
-                        stringResource(id = R.string.send_pay_button)
-                    },
-                    icon = R.drawable.ic_send,
-                    enabled = mayDoPayments && amount != null && !isAmountInError,
-                ) {
+            SmartSpendButton(
+                enabled = amount != null && !isAmountInError,
+                text = if (state is OfferState.Complete.Failed) {
+                    stringResource(id = R.string.send_pay_retry_button)
+                } else {
+                    stringResource(id = R.string.send_pay_button)
+                },
+                onSpend = {
                     amount?.let { onSendClick(it, offer) }
-                }
-            }
+                },
+            )
         }
 
         is OfferState.FetchingInvoice -> {

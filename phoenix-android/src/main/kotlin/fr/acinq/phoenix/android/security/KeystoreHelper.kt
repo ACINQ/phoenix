@@ -36,6 +36,8 @@ object KeystoreHelper {
 
   /** The alias of the key used to encrypt a [EncryptedPin.V1] PIN. */
   const val KEY_FOR_PINCODE_V1 = "PHOENIX_KEY_FOR_PINCODE_V1"
+  /** The alias of the key used to encrypt a [EncryptedSpendingPin.V1] PIN. */
+  const val KEY_FOR_SPENDINGPINCODE_V1 = "PHOENIX_KEY_FOR_SPENDINGPINCODE_V1"
 
   private val ENC_ALGO = KeyProperties.KEY_ALGORITHM_AES
   private val ENC_BLOCK_MODE = KeyProperties.BLOCK_MODE_CBC

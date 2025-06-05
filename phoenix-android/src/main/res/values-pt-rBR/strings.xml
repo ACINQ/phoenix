@@ -409,8 +409,22 @@
     <string name="accessctrl_auth_error_too_old">Esta versão do Android não é compatível.</string>
     <string name="accessctrl_auth_error_unhandled">Código de erro não tratado: %1$d</string>
 
-    <string name="accessctrl_biometric_lock_switch_label">Bloqueio de tela do sistema</string>
-    <string name="accessctrl_biometric_lock_switch_desc">Bloqueie o acesso ao aplicativo com bloqueio de tela do Android ou impressão digital.</string>
+    <string name="accessctrl_screenlock_header">Acesso ao aplicativo</string>
+    <string name="accessctrl_screenlock_biometrics_label">Autenticação do sistema</string>
+    <string name="accessctrl_screenlock_biometrics_desc">Protege o acesso ao aplicativo com a conta de usuário do Android.</string>
+    <string name="accessctrl_screenlock_pin_label">Lock PIN</string>
+    <string name="accessctrl_screenlock_pin_desc">Protege o acesso ao aplicativo com um PIN de 6 dígitos específico do Phoenix.</string>
+
+    <string name="accessctrl_autolock_label">Tempo limite de bloqueio</string>
+    <string name="accessctrl_autolock_desc">Após %1$s minuto(s) de inatividade</string>
+    <string name="accessctrl_autolock_desc_never">Nunca</string>
+
+    <string name="accessctrl_spendlock_header">Enviando fundos</string>
+    <string name="accessctrl_spendlock_pin_label">Spending PIN</string>
+    <string name="accessctrl_spendlock_pin_desc">Se ativado, um PIN será necessário para gastar fundos do Phoenix.</string>
+
+    <string name="accessctrl_misc_header">Diversos</string>
+    <string name="accessctrl_shuffle_pin">Embaralhar o teclado PIN</string>
 
     <!-- lnurl-auth -->
 
@@ -689,5 +703,23 @@
 
     <string name="reset_wallet_success">A carteira foi redefinida com sucesso</string>
     <string name="reset_wallet_failure_title">Redefinir erro</string>
+
+    <!-- PIN code dialog -->
+
+    <string name="pincode_check_screenlock_title">Digite o PIN para abrir o aplicativo</string>
+    <string name="pincode_check_spending_payment_title">Digite o PIN para pagar</string>
+    <string name="pincode_check_spending_displayseed_title">Digite o código PIN para visualizar a semente</string>]
+    <string name="pincode_check_disabling_title">Digite o PIN para continuar</string>]
+    <string name="pincode_new_screenlock_title">Crie o código PIN para acessar o aplicativo</string>
+    <string name="pincode_new_spending_title">Criar o PIN de pagamento</string>
+    <string name="pincode_confirm_title">Confirmar novo PIN</string>
+
+    <string name="pincode_checking_label">Verificação de PIN…</string>
+    <string name="pincode_failure_label">Inválido</string>
+    <string name="pincode_locked_label">Bloqueado por %1$s</string>
+
+    <string name="pincode_error_generic">Ocorreu um erro</string>
+    <string name="pincode_error_confirm_do_not_match">PIN não corresponde!</string>
+    <string name="pincode_error_write">Erro ao salvar o PIN</string>
 
 </resources>
