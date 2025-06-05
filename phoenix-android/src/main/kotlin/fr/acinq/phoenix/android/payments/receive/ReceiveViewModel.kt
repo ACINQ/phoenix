@@ -134,19 +134,19 @@ class ReceiveViewModel(
             val swapAddressFormat = userPrefs.getSwapAddressFormat.first()
             if (swapAddressFormat == SwapAddressFormat.LEGACY) {
                 val legacySwapInAddress = peerManager.getPeer().phoenixSwapInWallet.legacySwapInAddress
-                val image = QRCodeHelper.generateBitmap(legacySwapInAddress).asImageBitmap()
+                val image = QRCodeHelper.generateBitmap("bitcoin:$legacySwapInAddress").asImageBitmap()
                 bitcoinAddressState = BitcoinAddressState(0, legacySwapInAddress, image)
             } else {
                 // immediately set an address using the index saved in settings, so that the user does not have to wait for the wallet to synchronise
                 val keyManager = walletManager.keyManager.filterNotNull().first()
                 val startIndex = internalDataRepository.getLastUsedSwapIndex.first()
                 val startAddress = keyManager.swapInOnChainWallet.getSwapInProtocol(startIndex).address(chain)
-                val image = QRCodeHelper.generateBitmap(startAddress).asImageBitmap()
+                val image = QRCodeHelper.generateBitmap("bitcoin:$startAddress").asImageBitmap()
                 bitcoinAddressState = BitcoinAddressState(startIndex, startAddress, image)
 
                 // monitor the actual address from the swap-in wallet -- might take some time since the wallet must check all previous addresses
                 peerManager.getPeer().phoenixSwapInWallet.swapInAddressFlow.filterNotNull().collect { (newAddress, newIndex) ->
-                    val newImage = QRCodeHelper.generateBitmap(newAddress).asImageBitmap()
+                    val newImage = QRCodeHelper.generateBitmap("bitcoin:$newAddress").asImageBitmap()
                     internalDataRepository.saveLastUsedSwapIndex(newIndex)
                     bitcoinAddressState = BitcoinAddressState(newIndex, newAddress, newImage)
                 }

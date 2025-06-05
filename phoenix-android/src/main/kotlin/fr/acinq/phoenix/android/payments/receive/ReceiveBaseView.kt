@@ -23,7 +23,20 @@ import androidx.compose.foundation.LocalOverscrollFactory
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -60,13 +73,23 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.BorderButton
+import fr.acinq.phoenix.android.components.Button
+import fr.acinq.phoenix.android.components.Card
+import fr.acinq.phoenix.android.components.Clickable
+import fr.acinq.phoenix.android.components.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.DefaultScreenLayout
+import fr.acinq.phoenix.android.components.ProgressView
+import fr.acinq.phoenix.android.components.TextWithIcon
+import fr.acinq.phoenix.android.components.TransparentFilledButton
 import fr.acinq.phoenix.android.components.dialogs.FullScreenDialog
 import fr.acinq.phoenix.android.components.dialogs.IconTextPopup
+import fr.acinq.phoenix.android.components.nfc.HceMonitorDialog
 import fr.acinq.phoenix.android.userPrefs
-import fr.acinq.phoenix.android.utils.images.QRCodeHelper
 import fr.acinq.phoenix.android.utils.copyToClipboard
+import fr.acinq.phoenix.android.utils.extensions.findActivitySafe
 import fr.acinq.phoenix.android.utils.extensions.safeLet
+import fr.acinq.phoenix.android.utils.images.QRCodeHelper
 import fr.acinq.phoenix.android.utils.share
 import fr.acinq.phoenix.android.utils.updateScreenBrightnesss
 import kotlinx.coroutines.launch
@@ -95,6 +118,7 @@ fun ReceiveView(
             },
         )
         ReceiveViewPages(vm, onFeeManagementClick)
+        HceMonitorDialog()
     }
 }
 
@@ -284,6 +308,7 @@ fun QRCodeLabel(label: String, content: @Composable () -> Unit) {
 
 @Composable
 fun CopyShareButtons(
+    paymentRequest: String?,
     onCopy: () -> Unit,
     onShare: () -> Unit,
 ) {
@@ -291,6 +316,17 @@ fun CopyShareButtons(
         BorderButton(icon = R.drawable.ic_copy, onClick = onCopy)
         Spacer(modifier = Modifier.width(16.dp))
         BorderButton(icon = R.drawable.ic_share, onClick = onShare)
+        paymentRequest?.let {
+            val context = LocalContext.current
+            val activity = context.findActivitySafe() ?: return
+            if (!activity.isHceSupported()) return
+
+            Spacer(modifier = Modifier.width(16.dp))
+            BorderButton(
+                icon = R.drawable.ic_nfc,
+                onClick = { activity.startHceService(paymentRequest) }
+            )
+        }
     }
 }
 

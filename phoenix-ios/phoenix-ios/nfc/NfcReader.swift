@@ -129,26 +129,5 @@ class NfcReader: NSObject, NFCNDEFReaderSessionDelegate {
 			finishWithSuccess(message)
 		}
 	}
-	
-	func readerSession(_ session: NFCNDEFReaderSession, didDetect tags: [any NFCNDEFTag]) {
-		log.trace("readerSession(_, didDetectTags:)")
-		log.trace("messages.count = \(tags.count)")
-		
-		if tags.count > 1 {
-			log.warning("NfcReader: Multiple tags detected: this is unsupported, only the first will be read")
-		}
-		
-		if let tag = tags.first {
-			tag.readNDEF { [self] (result, error) in
-				
-				if let result {
-					finishWithSuccess(result)
-					
-				} else if let error {
-					log.error("readNDEF: error = \(error)")
-					finishWithError(.errorReadingTag)
-				}
-			}
-		}
-	}
+
 }

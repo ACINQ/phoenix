@@ -29,6 +29,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -53,9 +54,11 @@ fun ModalBottomSheet(
     contentHeight: Dp = Dp.Unspecified,
     internalPadding: PaddingValues = PaddingValues(top = 0.dp, start = 20.dp, end = 20.dp, bottom = 64.dp),
     isContentScrollable: Boolean = true,
+    dismissOnScrimClick: Boolean = true,
+    dismissOnBack: Boolean = true,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded)
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded, confirmValueChange = { dismissOnScrimClick })
     ModalBottomSheet(
         sheetState = sheetState,
         onDismissRequest = {
@@ -69,6 +72,7 @@ fun ModalBottomSheet(
         dragHandle = dragHandle,
         contentWindowInsets = contentWindowInsets,
         scrimColor = MaterialTheme.colors.onBackground.copy(alpha = scrimAlpha),
+        properties = ModalBottomSheetProperties(shouldDismissOnBackPress = dismissOnBack)
     ) {
         Column(
             horizontalAlignment = horizontalAlignment,
