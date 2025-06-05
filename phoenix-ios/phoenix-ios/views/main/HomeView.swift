@@ -765,6 +765,12 @@ struct HomeView : MVIView {
 		if !didAppear {
 			didAppear = true
 			paymentsPageFetcher_subscribe()
+			
+			if let deepLink = deepLinkManager.deepLink {
+				DispatchQueue.main.async {
+					deepLinkChanged(deepLink)
+				}
+			}
 		}
 	}
 	

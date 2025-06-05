@@ -265,14 +265,19 @@ class NotificationsManager: NSObject, UNUserNotificationCenterDelegate {
 	) {
 		log.trace("userNotificationCenter(_:didReceive::)")
 		
-		if let id = response.notification.request.content.targetContentIdentifier {
+		DispatchQueue.main.async {
+			self.userDidTapNotification(response.notification)
+			completionHandler()
+		}
+	}
+	
+	func userDidTapNotification(_ notification: UNNotification) {
+		log.trace("userDidTapNotification()")
+		
+		if let id = notification.request.content.targetContentIdentifier {
 			if let paymentId = Lightning_kmpUUID.companion.tryFromString(string: id) {
 				GlobalEnvironment.deepLinkManager.broadcast(.payment(paymentId: paymentId))
 			}
-		}
-		
-		DispatchQueue.main.async {
-			completionHandler()
 		}
 	}
 	
