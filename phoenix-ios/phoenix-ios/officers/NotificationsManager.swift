@@ -78,7 +78,7 @@ enum NotificationPermissions: CustomStringConvertible {
 /// - monitoring iOS for our permission status
 /// - common handling for the display of notifications to the uer
 ///
-class NotificationsManager {
+class NotificationsManager: NSObject, UNUserNotificationCenterDelegate {
 	
 	/// Singleton instance
 	public static let shared = NotificationsManager()
@@ -102,7 +102,9 @@ class NotificationsManager {
 	private var cancellables = Set<AnyCancellable>()
 	
 	/// Must use shared instance
-	private init() {
+	private override init() {
+		
+		super.init()
 		
 		settings.sink { (settings: UNNotificationSettings?) in
 			
@@ -121,6 +123,8 @@ class NotificationsManager {
 		NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification).sink { _ in
 			self.didBecomeActiveNotification()
 		}.store(in: &cancellables)
+		
+		UNUserNotificationCenter.current().delegate = self
 		
 		refreshSettings()
 		refreshBackgroundRefreshStatus()
@@ -247,6 +251,33 @@ class NotificationsManager {
 			}
 			
 			self.refreshSettings()
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Delegate
+	// --------------------------------------------------
+	
+	func userNotificationCenter(
+		 _ center: UNUserNotificationCenter,
+		 didReceive response: UNNotificationResponse,
+		 withCompletionHandler completionHandler: @escaping () -> Void
+	) {
+		log.trace("userNotificationCenter(_:didReceive::)")
+		
+		DispatchQueue.main.async {
+			self.userDidTapNotification(response.notification)
+			completionHandler()
+		}
+	}
+	
+	func userDidTapNotification(_ notification: UNNotification) {
+		log.trace("userDidTapNotification()")
+		
+		if let id = notification.request.content.targetContentIdentifier {
+			if let paymentId = Lightning_kmpUUID.companion.tryFromString(string: id) {
+				GlobalEnvironment.deepLinkManager.broadcast(.payment(paymentId: paymentId))
+			}
 		}
 	}
 	

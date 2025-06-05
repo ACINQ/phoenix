@@ -365,3 +365,11 @@ fun OfferManager.Companion._deterministicOffer(
         pathId = pathId
     )
 }
+
+fun UUID.Companion.tryFromString(string: String): UUID? {
+    return try {
+        UUID.fromString(string)
+    } catch (e: Exception) {
+        null
+    }
+}

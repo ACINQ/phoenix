@@ -7,7 +7,8 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-enum DeepLink: String, Equatable {
+enum DeepLink: Equatable, CustomStringConvertible {
+	case payment(paymentId: Lightning_kmpUUID)
 	case paymentHistory
 	case backup
 	case drainWallet
@@ -17,6 +18,21 @@ enum DeepLink: String, Equatable {
 	case forceCloseChannels
 	case swapInWallet
 	case finalWallet
+	
+	var description: String {
+		switch self {
+			case .payment(let id)    : return "payment(\(id))"
+			case .paymentHistory     : return "paymentHistory"
+			case .backup             : return "backup"
+			case .drainWallet        : return "drainWallet"
+			case .electrum           : return "electrum"
+			case .backgroundPayments : return "backgroundPayments"
+			case .liquiditySettings  : return "liquiditySettings"
+			case .forceCloseChannels : return "forceCloseChannels"
+			case .swapInWallet       : return "swapInWallet"
+			case .finalWallet        : return "finalWallet"
+		}
+	}
 }
 
 class DeepLinkManager: ObservableObject {
@@ -27,7 +43,7 @@ class DeepLinkManager: ObservableObject {
 	private var deepLinkIdx = 0
 	
 	func broadcast(_ value: DeepLink) {
-		log.trace("broadcast(\(value.rawValue))")
+		log.trace("broadcast(\(value))")
 		
 		self.deepLinkIdx += 1
 		self.deepLink = value
@@ -67,7 +83,7 @@ class DeepLinkManager: ObservableObject {
 	}
 	
 	func unbroadcast(_ value: DeepLink) {
-		log.trace("unbroadcast(\(value.rawValue))")
+		log.trace("unbroadcast(\(value))")
 		
 		if self.deepLink == value {
 		
@@ -93,9 +109,9 @@ enum PopToDestination: CustomStringConvertible {
 	public var description: String {
 		switch self {
 		case .RootView(let followedBy):
-			return "RootView(followedBy: \(followedBy?.rawValue ?? "nil"))"
+			return "RootView(followedBy: \(followedBy?.description ?? "nil"))"
 		case .ConfigurationView(let followedBy):
-			return "ConfigurationView(follwedBy: \(followedBy?.rawValue ?? "nil"))"
+			return "ConfigurationView(follwedBy: \(followedBy?.description ?? "nil"))"
 		case .TransactionsView:
 			return "TransactionsView"
 		}

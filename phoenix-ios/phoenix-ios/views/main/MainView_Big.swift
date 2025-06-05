@@ -609,10 +609,11 @@ struct MainView_Big: View {
 	}
 	
 	private func deepLinkChanged(_ value: DeepLink?) {
-		log.trace("deepLinkChanged() => \(value?.rawValue ?? "nil")")
+		log.trace("deepLinkChanged() => \(value?.description ?? "nil")")
 		
 		if let value = value {
 			switch value {
+				case .payment(_)         : break
 				case .paymentHistory     : showTransactions()
 				case .backup             : showSettings()
 				case .drainWallet        : showSettings()
@@ -627,8 +628,8 @@ struct MainView_Big: View {
 			if #available(iOS 17, *) {
 				
 				switch value {
-				case .paymentHistory:
-					break
+				case .payment(_): break
+				case .paymentHistory: break
 					
 				case .backup:
 					navCoordinator_settings.path.removeAll()

@@ -652,7 +652,7 @@ struct MainView_Small: View {
 	}
 	
 	func deepLinkChanged(_ value: DeepLink?) {
-		log.trace("deepLinkChanged() => \(value?.rawValue ?? "nil")")
+		log.trace("deepLinkChanged() => \(value?.description ?? "nil")")
 		
 		if #available(iOS 17, *) {
 			
@@ -660,6 +660,10 @@ struct MainView_Small: View {
 				navCoordinator.path.removeAll()
 				
 				switch value {
+				case .payment(_):
+					// Handled by HomeView
+					break
+					
 				case .paymentHistory:
 					navCoordinator.path.append(NavLinkTag.TransactionsView)
 					
@@ -707,6 +711,7 @@ struct MainView_Small: View {
 				var newNavLinkTag: NavLinkTag? = nil
 				var delay: TimeInterval = 1.5 // seconds; multiply by number of screens we need to navigate
 				switch value {
+					case .payment(_)         : break // Handled by HomeView
 					case .paymentHistory     : newNavLinkTag = .TransactionsView  ; delay *= 1
 					case .backup             : newNavLinkTag = .ConfigurationView ; delay *= 2
 					case .drainWallet        : newNavLinkTag = .ConfigurationView ; delay *= 2
@@ -718,7 +723,7 @@ struct MainView_Small: View {
 					case .finalWallet        : newNavLinkTag = .ConfigurationView ; delay *= 2
 				}
 				
-				if let newNavLinkTag = newNavLinkTag {
+				if let newNavLinkTag {
 					
 					self.swiftUiBugWorkaround = newNavLinkTag
 					self.swiftUiBugWorkaroundIdx += 1
