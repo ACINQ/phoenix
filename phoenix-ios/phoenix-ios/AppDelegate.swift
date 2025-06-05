@@ -86,12 +86,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			self._applicationDidEnterBackground()
 		}.store(in: &appCancellables)
 		
+		// Setup XPC for inter-process communication with notifySrvExt
 		XPC.shared.receivedMessagePublisher.sink { (msg: XpcMessage) in
 			self.didReceivePaymentViaAppExtension()
 		
 		}.store(in: &appCancellables)
-				
+		
 		XPC.shared.resume()
+		
+		// Setup NotificationsManager
+		// Important:
+		//   The `UNUserNotificationCenterDelegate` must be set before this function returns.
+		//   That's currently done in NotificationsManager.init.
 		NotificationsManager.shared.requestPermissionForProvisionalNotifications()
 		
 		return true
@@ -100,8 +106,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	// The following functions are not called,
 	// because Firebase broke it with their stupid swizzling stuff.
 	// 
-	func applicationDidBecomeActive(_ application: UIApplication) {/* :( */}
-	func applicationWillResignActive(_ application: UIApplication) {/* :( */}
+	func applicationDidBecomeActive(_ application: UIApplication) {/* required by UIApplicationDelegate */}
+	func applicationWillResignActive(_ application: UIApplication) {/* required by UIApplicationDelegate */}
 //	func applicationWillEnterForeground(_ application: UIApplication) {/* :( */}
 //	func applicationDidEnterBackground(_ application: UIApplication) {/* :( */}
 	

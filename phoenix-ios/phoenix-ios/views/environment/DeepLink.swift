@@ -8,6 +8,7 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
 enum DeepLink: Equatable, CustomStringConvertible {
+	case payment(paymentId: Lightning_kmpUUID)
 	case paymentHistory
 	case backup
 	case drainWallet

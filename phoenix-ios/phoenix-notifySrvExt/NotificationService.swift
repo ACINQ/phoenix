@@ -553,6 +553,10 @@ class NotificationService: UNNotificationServiceExtension {
 					}
 				}
 				
+				if let payment = receivedPayments.first {
+					bestAttemptContent.targetContentIdentifier = payment.id.description()
+				}
+				
 			} else {
 				bestAttemptContent.title = String(
 					localized: "Received multiple payments",

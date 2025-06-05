@@ -604,6 +604,7 @@ struct WalletInfoView: View {
 				// Navigate towards deep link (if needed)
 				var newNavLinkTag: NavLinkTag? = nil
 				switch value {
+					case .payment(_)         : break
 					case .paymentHistory     : break
 					case .backup             : break
 					case .drainWallet        : break

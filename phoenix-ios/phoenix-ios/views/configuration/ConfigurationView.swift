@@ -584,6 +584,7 @@ struct ConfigurationList: View {
 				var newNavLinkTag: NavLinkTag? = nil
 				var delay: TimeInterval = 1.5 // seconds; multiply by number of screens we need to navigate
 				switch value {
+					case .payment(_)         : break
 					case .paymentHistory     : break
 					case .backup             : newNavLinkTag = .RecoveryPhrase       ; delay *= 1
 					case .drainWallet        : newNavLinkTag = .DrainWallet          ; delay *= 1
