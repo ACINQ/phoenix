@@ -559,7 +559,7 @@ struct ConfigurationList: View {
 	}
 	
 	func deepLinkChanged(_ value: DeepLink?) {
-		log.trace("deepLinkChanged() => \(value?.rawValue ?? "nil")")
+		log.trace("deepLinkChanged() => \(value?.description ?? "nil")")
 		
 		if #available(iOS 17, *) {
 			// Nothing to do here.

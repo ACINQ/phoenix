@@ -652,7 +652,7 @@ struct MainView_Small: View {
 	}
 	
 	func deepLinkChanged(_ value: DeepLink?) {
-		log.trace("deepLinkChanged() => \(value?.rawValue ?? "nil")")
+		log.trace("deepLinkChanged() => \(value?.description ?? "nil")")
 		
 		if #available(iOS 17, *) {
 			
@@ -718,7 +718,7 @@ struct MainView_Small: View {
 					case .finalWallet        : newNavLinkTag = .ConfigurationView ; delay *= 2
 				}
 				
-				if let newNavLinkTag = newNavLinkTag {
+				if let newNavLinkTag {
 					
 					self.swiftUiBugWorkaround = newNavLinkTag
 					self.swiftUiBugWorkaroundIdx += 1

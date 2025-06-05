@@ -609,7 +609,7 @@ struct MainView_Big: View {
 	}
 	
 	private func deepLinkChanged(_ value: DeepLink?) {
-		log.trace("deepLinkChanged() => \(value?.rawValue ?? "nil")")
+		log.trace("deepLinkChanged() => \(value?.description ?? "nil")")
 		
 		if let value = value {
 			switch value {
