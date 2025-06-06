@@ -92,7 +92,7 @@ fun SettingsView(
         CardHeader(text = stringResource(id = R.string.settings_danger_title))
         Card {
             MenuButton(text = stringResource(R.string.settings_mutual_close), icon = R.drawable.ic_cross_circle, onClick = { nc.navigate(Screen.MutualClose.route) })
-            MenuButton(text = stringResource(id = R.string.settings_reset_wallet), icon = R.drawable.ic_trash, onClick = { nc.navigate(Screen.ResetWallet.route) })
+            MenuButton(text = stringResource(id = R.string.settings_reset_wallet), icon = R.drawable.ic_remove, onClick = { nc.navigate(Screen.ResetWallet.route) })
             MenuButton(
                 text = stringResource(R.string.settings_force_close),
                 textStyle = MaterialTheme.typography.button.copy(color = negativeColor),

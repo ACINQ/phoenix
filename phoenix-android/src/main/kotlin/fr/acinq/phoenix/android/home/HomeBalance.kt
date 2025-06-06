@@ -49,7 +49,7 @@ import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
-import fr.acinq.phoenix.android.LocalBitcoinUnit
+import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountView
@@ -58,10 +58,10 @@ import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.TextWithIcon
-import fr.acinq.phoenix.android.fiatRate
+import fr.acinq.phoenix.android.primaryFiatRate
 import fr.acinq.phoenix.android.preferredAmountUnit
 import fr.acinq.phoenix.android.userPrefs
-import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
 import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.android.utils.negativeColor
@@ -134,7 +134,7 @@ private fun OnChainBalance(
             ) {
                 TextWithIcon(
                     text = if (balanceDisplayMode == HomeAmountDisplayMode.REDACTED) "****" else {
-                        stringResource(id = R.string.home_onchain_incoming, availableOnchainBalance.toPrettyString(preferredAmountUnit, fiatRate, withUnit = true))
+                        stringResource(id = R.string.home_onchain_incoming, availableOnchainBalance.toPrettyString(preferredAmountUnit, primaryFiatRate, withUnit = true))
                     },
                     textStyle = MaterialTheme.typography.caption,
                     icon = R.drawable.ic_chain,
@@ -153,7 +153,7 @@ private fun OnChainBalance(
 
                 if (showOnchainDialog) {
                     val liquidityPolicyInPrefs by userPrefs.getLiquidityPolicy.collectAsState(null)
-                    val bitcoinUnit = LocalBitcoinUnit.current
+                    val bitcoinUnit = LocalBitcoinUnits.current.primary
                     Dialog(
                         onDismiss = { showOnchainDialog = false },
                         buttons = null
@@ -247,7 +247,7 @@ private fun OnChainBalanceEntry(label: String, icon: Int, amount: MilliSatoshi, 
     ) {
         Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
             TextWithIcon(
-                text = "$label: +${amount.toPrettyString(LocalBitcoinUnit.current, withUnit = true)}",
+                text = "$label: +${amount.toPrettyString(LocalBitcoinUnits.current.primary, withUnit = true)}",
                 textStyle = MaterialTheme.typography.body2,
                 icon = icon,
             )

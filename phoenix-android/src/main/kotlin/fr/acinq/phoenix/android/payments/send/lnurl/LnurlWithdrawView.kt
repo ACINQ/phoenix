@@ -33,10 +33,11 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
-import fr.acinq.phoenix.android.fiatRate
+import fr.acinq.phoenix.android.components.inputs.AmountHeroInput
+import fr.acinq.phoenix.android.primaryFiatRate
 import fr.acinq.phoenix.android.payments.receive.EvaluateLiquidityIssuesForPayment
 import fr.acinq.phoenix.android.preferredAmountUnit
-import fr.acinq.phoenix.android.utils.Converter.toPrettyStringWithFallback
+import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyStringWithFallback
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.extensions.toLocalisedMessage
 import fr.acinq.phoenix.data.lnurl.LnurlWithdraw
@@ -51,7 +52,7 @@ fun LnurlWithdrawView(
 ) {
     val context = LocalContext.current
     val prefUnit = preferredAmountUnit
-    val rate = fiatRate
+    val rate = primaryFiatRate
 
     val maxWithdrawable = withdraw.maxWithdrawable
     var amount by remember { mutableStateOf<MilliSatoshi?>(maxWithdrawable) }

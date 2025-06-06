@@ -56,7 +56,7 @@ import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
 import fr.acinq.lightning.db.SpliceInIncomingPayment
 import fr.acinq.lightning.db.SpliceOutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
-import fr.acinq.phoenix.android.LocalBitcoinUnit
+import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountWithFiatBeside
@@ -75,8 +75,8 @@ import fr.acinq.phoenix.android.components.settings.SettingWithCopy
 import fr.acinq.phoenix.android.components.InlineTransactionLink
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.navigateToPaymentDetails
-import fr.acinq.phoenix.android.utils.Converter.toPrettyString
-import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
+import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
+import fr.acinq.phoenix.android.utils.converters.MSatDisplayPolicy
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.monoTypo
 import fr.acinq.phoenix.android.utils.mutedBgColor
@@ -178,7 +178,7 @@ private fun ChannelSummaryView(
 private fun CommitmentDetailsView(
     commitment: LocalChannelInfo.CommitmentInfo
 ) {
-    val btcUnit = LocalBitcoinUnit.current
+    val btcUnit = LocalBitcoinUnits.current.primary
     val paymentsManager = business.paymentsManager
     val linkedPayments by produceState<List<WalletPayment>>(initialValue = emptyList()) {
         value = paymentsManager.listPaymentsForTxId(commitment.fundingTxId)

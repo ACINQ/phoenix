@@ -108,6 +108,7 @@ fun FilledButton(
     textStyle: TextStyle = MaterialTheme.typography.button.copy(color = MaterialTheme.colors.onPrimary),
     padding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
     backgroundColor: Color = MaterialTheme.colors.primary,
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.Center,
     onClick: () -> Unit,
 ) {
     Button(
@@ -123,7 +124,8 @@ fun FilledButton(
         backgroundColor = backgroundColor,
         textStyle = textStyle,
         padding = padding,
-        modifier = modifier
+        modifier = modifier,
+        horizontalArrangement = horizontalArrangement,
     )
 }
 
@@ -139,6 +141,7 @@ fun MutedFilledButton(
     space: Dp = 12.dp,
     padding: PaddingValues = PaddingValues(12.dp),
     onClick: () -> Unit,
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.Center,
 ) {
     FilledButton(
         shape = RoundedCornerShape(12.dp),
@@ -147,6 +150,7 @@ fun MutedFilledButton(
         iconTint = iconTint,
         modifier = modifier, text = text, icon = icon, maxLines = maxLines, enabled = enabled,
         enabledEffect = enabledEffect, space = space, padding = padding, onClick = onClick,
+        horizontalArrangement = horizontalArrangement,
     )
 }
 
@@ -167,6 +171,30 @@ fun TransparentFilledButton(
     FilledButton(
         shape = RoundedCornerShape(12.dp),
         backgroundColor = Color.Transparent,
+        textStyle = textStyle,
+        iconTint = iconTint,
+        modifier = modifier, text = text, icon = icon, maxLines = maxLines, enabled = enabled,
+        enabledEffect = enabledEffect, space = space, padding = padding, onClick = onClick,
+    )
+}
+
+@Composable
+fun SurfaceFilledButton(
+    modifier: Modifier = Modifier,
+    text: String? = null,
+    textStyle: TextStyle = MaterialTheme.typography.button,
+    icon: Int? = null,
+    iconTint: Color = MaterialTheme.colors.onSurface,
+    maxLines: Int = Int.MAX_VALUE,
+    enabled: Boolean = true,
+    enabledEffect: Boolean = true,
+    space: Dp = 12.dp,
+    padding: PaddingValues = PaddingValues(12.dp),
+    onClick: () -> Unit,
+) {
+    FilledButton(
+        shape = RoundedCornerShape(12.dp),
+        backgroundColor = MaterialTheme.colors.surface,
         textStyle = textStyle,
         iconTint = iconTint,
         modifier = modifier, text = text, icon = icon, maxLines = maxLines, enabled = enabled,

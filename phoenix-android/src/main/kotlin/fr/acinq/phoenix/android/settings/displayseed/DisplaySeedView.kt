@@ -82,7 +82,7 @@ fun DisplaySeedView() {
                         enabled = true,
                         onSpend = { vm.readSeed(SeedManager.getSeedState(context)) },
                         prompt = { PinDialogTitle(text = stringResource(R.string.pincode_check_spending_displayseed_title)) },
-                        ignoreChannelsState = false,
+                        ignoreChannelsState = true,
                     )
                 }
                 is DisplaySeedViewModel.ReadingSeedState.ReadingSeed -> {

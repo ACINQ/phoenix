@@ -57,17 +57,17 @@ import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.lightning.wire.OfferTypes
-import fr.acinq.phoenix.android.LocalBitcoinUnit
+import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.AmountInput
+import fr.acinq.phoenix.android.components.inputs.AmountInput
 import fr.acinq.phoenix.android.components.AmountWithFiatBelow
 import fr.acinq.phoenix.android.components.BorderButton
 import fr.acinq.phoenix.android.components.Clickable
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.MutedFilledButton
 import fr.acinq.phoenix.android.components.PhoenixIcon
-import fr.acinq.phoenix.android.components.TextInput
+import fr.acinq.phoenix.android.components.inputs.TextInput
 import fr.acinq.phoenix.android.components.TransparentFilledButton
 import fr.acinq.phoenix.android.components.buttons.SegmentedControl
 import fr.acinq.phoenix.android.components.buttons.SegmentedControlButton
@@ -78,8 +78,7 @@ import fr.acinq.phoenix.android.components.feedback.WarningMessage
 import fr.acinq.phoenix.android.components.openLink
 import fr.acinq.phoenix.android.internalData
 import fr.acinq.phoenix.android.userPrefs
-import fr.acinq.phoenix.android.utils.Converter.toPrettyString
-import fr.acinq.phoenix.android.utils.extensions.findActivitySafe
+import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.data.availableForReceive
 import fr.acinq.phoenix.data.canRequestLiquidity
 import java.text.DecimalFormat
@@ -459,7 +458,7 @@ fun EvaluateLiquidityIssuesForPayment(
             }
         }
         is LiquidityPolicy.Auto -> {
-            val btcUnit = LocalBitcoinUnit.current
+            val btcUnit = LocalBitcoinUnits.current.primary
             when {
 
                 // ====================================

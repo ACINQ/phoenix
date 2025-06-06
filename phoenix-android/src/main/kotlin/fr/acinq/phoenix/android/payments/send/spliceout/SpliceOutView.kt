@@ -43,15 +43,17 @@ import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.ChannelFundingResponse
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
-import fr.acinq.phoenix.android.LocalBitcoinUnit
+import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
 import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
+import fr.acinq.phoenix.android.components.inputs.AmountHeroInput
+import fr.acinq.phoenix.android.components.inputs.FeerateSlider
 import fr.acinq.phoenix.android.internalData
-import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.MempoolFeerate
@@ -66,7 +68,7 @@ fun SendSpliceOutView(
     onSpliceOutSuccess: () -> Unit,
 ) {
     val context = LocalContext.current
-    val prefBtcUnit = LocalBitcoinUnit.current
+    val prefBtcUnit = LocalBitcoinUnits.current.primary
     val keyboardManager = LocalSoftwareKeyboardController.current
 
     val peerManager = business.peerManager

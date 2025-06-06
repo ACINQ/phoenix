@@ -31,7 +31,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.dialogs.Dialog
-import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateString
+import fr.acinq.phoenix.android.utils.converters.DateFormatter.toAbsoluteDateString
 import fr.acinq.phoenix.android.utils.mutedBgColor
 import kotlinx.datetime.*
 

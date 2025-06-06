@@ -25,9 +25,11 @@ import androidx.navigation.NavController
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.utils.UserTheme
 import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
+import fr.acinq.phoenix.android.utils.datastore.PreferredBitcoinUnits
 import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
 import fr.acinq.phoenix.controllers.ControllerFactory
 import fr.acinq.phoenix.data.*
+import fr.acinq.phoenix.managers.AppConfigurationManager
 
 
 typealias CF = ControllerFactory
@@ -36,9 +38,9 @@ val LocalTheme = staticCompositionLocalOf { UserTheme.SYSTEM }
 val LocalBusiness = staticCompositionLocalOf<PhoenixBusiness?> { null }
 val LocalControllerFactory = staticCompositionLocalOf<ControllerFactory?> { null }
 val LocalNavController = staticCompositionLocalOf<NavController?> { null }
-val LocalBitcoinUnit = compositionLocalOf { BitcoinUnit.Sat }
-val LocalFiatCurrency = compositionLocalOf { FiatCurrency.USD }
-val LocalExchangeRates = compositionLocalOf<List<ExchangeRate>> { listOf() }
+val LocalBitcoinUnits = compositionLocalOf { PreferredBitcoinUnits(primary = BitcoinUnit.Sat) }
+val LocalFiatCurrencies = compositionLocalOf { AppConfigurationManager.PreferredFiatCurrencies(primary = FiatCurrency.USD, others = emptyList()) }
+val LocalExchangeRatesMap = compositionLocalOf<Map<FiatCurrency, ExchangeRate.BitcoinPriceRate>> { emptyMap() }
 val LocalShowInFiat = compositionLocalOf { false }
 val isDarkTheme: Boolean
     @Composable
@@ -50,27 +52,11 @@ val navController: NavController
 
 val preferredAmountUnit: CurrencyUnit
     @Composable
-    get() = if (LocalShowInFiat.current) LocalFiatCurrency.current else LocalBitcoinUnit.current
+    get() = if (LocalShowInFiat.current) LocalFiatCurrencies.current.primary else LocalBitcoinUnits.current.primary
 
-val fiatRate: ExchangeRate.BitcoinPriceRate?
+val primaryFiatRate: ExchangeRate.BitcoinPriceRate?
     @Composable
-    get() = LocalFiatCurrency.current.let { prefFiat ->
-        return when (val rate = LocalExchangeRates.current.find { it.fiatCurrency == prefFiat }) {
-            is ExchangeRate.BitcoinPriceRate -> rate
-            is ExchangeRate.UsdPriceRate -> {
-                (LocalExchangeRates.current.find { it.fiatCurrency == FiatCurrency.USD } as? ExchangeRate.BitcoinPriceRate)?.let { usdRate ->
-                    // create a BTC/Fiat price rate using the USD/BTC rate and the Fiat/USD rate.
-                    ExchangeRate.BitcoinPriceRate(
-                        fiatCurrency = rate.fiatCurrency,
-                        price = rate.price * usdRate.price,
-                        source = rate.source,
-                        timestampMillis = rate.timestampMillis
-                    )
-                }
-            }
-            else -> null
-        }
-    }
+    get() = LocalFiatCurrencies.current.primary.let { prefFiat -> LocalExchangeRatesMap.current[prefFiat] }
 
 val internalData: InternalDataRepository
     @Composable

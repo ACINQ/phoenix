@@ -219,7 +219,7 @@
     <string name="utils_rounded">≈</string>
     <string name="utils_converted_amount">≈ %1$s</string>
     <string name="utils_unknown_amount" translatable="false">!?</string>
-    <string name="utils_no_conversion">BTC exchange rate unavailable</string>
+    <string name="utils_no_conversion">Exchange rate unavailable</string>
 
     <string name="utils_date_just_now">just now</string>
     <string name="utils_unknown">N/A</string>
@@ -668,6 +668,7 @@
     <!-- settings: display preferences -->
 
     <string name="prefs_display_title">Display options</string>
+    <string name="prefs_filter_name">Filter by name</string>
     <string name="prefs_display_coin_label">Bitcoin unit</string>
     <string name="prefs_display_coin_sat_label">Satoshi (sat)</string>
     <string name="prefs_display_coin_sat_desc">1 sat is 0.00000001 btc</string>
@@ -676,7 +677,7 @@
     <string name="prefs_display_coin_mbtc_label">Milli-Bitcoin (mbtc)</string>
     <string name="prefs_display_coin_mbtc_desc">1 mbtc is 0.001 btc</string>
     <string name="prefs_display_coin_btc_label">Bitcoin (btc)</string>
-    <string name="prefs_display_fiat_label">Fiat currency</string>
+    <string name="prefs_display_fiat_label">Primary fiat currency</string>
     <string name="prefs_display_theme_label">Application theme</string>
     <string name="prefs_display_theme_dark_label">Dark theme</string>
     <string name="prefs_display_theme_light_label">Light theme</string>
@@ -992,5 +993,15 @@
     <string name="nfc_hce_emulation_title">Hold near the NFC reader</string>
     <string name="nfc_reader_title">Ready to scan</string>
     <string name="nfc_reader_desc">Hold near the NFC device to read it</string>
+
+    <!-- Currency converter -->
+
+    <string name="converter_title">Currency Converter</string>
+    <string name="converter_done_button">Done</string>
+    <string name="converter_placeholder_label">Enter amount in %1$s</string>
+    <string name="converter_add_new_button">Add new currency…</string>
+    <string name="unitdropdown_more">Other…</string>
+    <string name="currencypicker_title">Select a currency</string>
+    <string name="currencypicker_no_match">No match found…</string>
 
 </resources>

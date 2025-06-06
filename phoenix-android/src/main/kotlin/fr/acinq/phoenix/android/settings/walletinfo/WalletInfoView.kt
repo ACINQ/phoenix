@@ -41,12 +41,12 @@ import fr.acinq.lightning.blockchain.electrum.WalletState
 import fr.acinq.lightning.blockchain.electrum.balance
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
-import fr.acinq.phoenix.android.LocalBitcoinUnit
+import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.settings.SettingWithCopy
-import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.monoTypo
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.managers.finalOnChainWalletPath
@@ -202,7 +202,7 @@ private fun OnchainBalanceView(
     confirmed: Satoshi?,
     unconfirmed: Satoshi?,
 ) {
-    val btcUnit = LocalBitcoinUnit.current
+    val btcUnit = LocalBitcoinUnits.current.primary
     Row(modifier = Modifier.fillMaxWidth()) {
         when (confirmed) {
             null -> Text(text = stringResource(id = R.string.walletinfo_loading_data), color = mutedTextColor)
@@ -271,7 +271,7 @@ fun UtxoRow(utxo: WalletState.Utxo, progress: Pair<Int?, Int>?) {
 
 @Composable
 internal fun BalanceRow(balance: MilliSatoshi?) {
-    val btcUnit = LocalBitcoinUnit.current
+    val btcUnit = LocalBitcoinUnits.current.primary
     if (balance == null) {
         ProgressView(text = stringResource(id = R.string.walletinfo_loading_data), padding = PaddingValues(0.dp))
     } else {

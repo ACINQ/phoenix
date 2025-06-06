@@ -56,25 +56,25 @@ import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.CF
-import fr.acinq.phoenix.android.LocalBitcoinUnit
-import fr.acinq.phoenix.android.LocalFiatCurrency
+import fr.acinq.phoenix.android.LocalBitcoinUnits
+import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
-import fr.acinq.phoenix.android.components.FeerateSlider
+import fr.acinq.phoenix.android.components.inputs.FeerateSlider
 import fr.acinq.phoenix.android.components.ProgressView
-import fr.acinq.phoenix.android.components.TextInput
+import fr.acinq.phoenix.android.components.inputs.TextInput
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.TransparentFilledButton
 import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
 import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.components.scanner.ScannerView
-import fr.acinq.phoenix.android.fiatRate
-import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.primaryFiatRate
+import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.extensions.safeLet
 import fr.acinq.phoenix.android.utils.monoTypo
@@ -130,8 +130,8 @@ fun MutualCloseView(
                                 Text(
                                     annotatedStringResource(
                                         id = R.string.mutualclose_balance,
-                                        it.toPrettyString(LocalBitcoinUnit.current, withUnit = true),
-                                        it.toPrettyString(LocalFiatCurrency.current, fiatRate, withUnit = true)
+                                        it.toPrettyString(LocalBitcoinUnits.current.primary, withUnit = true),
+                                        it.toPrettyString(LocalFiatCurrencies.current.primary, primaryFiatRate, withUnit = true)
                                     )
                                 )
                             } ?: ProgressView(text = stringResource(R.string.mutualclose_checking_balance))
@@ -242,7 +242,7 @@ fun MutualCloseView(
                                             else -> Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                                                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                                                     Text(text = stringResource(R.string.mutualclose_confirm_fee))
-                                                    Text(text = stringResource(R.string.utils_converted_amount,"${fee.toPrettyString(LocalBitcoinUnit.current, withUnit = true)}."), style = MaterialTheme.typography.body2)
+                                                    Text(text = stringResource(R.string.utils_converted_amount,"${fee.toPrettyString(LocalBitcoinUnits.current.primary, withUnit = true)}."), style = MaterialTheme.typography.body2)
                                                 }
                                                 if (isUsingLowFeerate) {
                                                     Text(

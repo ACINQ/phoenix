@@ -29,7 +29,7 @@ import androidx.lifecycle.viewModelScope
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.security.EncryptedData
-import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
+import fr.acinq.phoenix.android.utils.converters.DateFormatter.toAbsoluteDateTimeString
 import fr.acinq.phoenix.csv.WalletPaymentCsvWriter
 import fr.acinq.phoenix.managers.DatabaseManager
 import fr.acinq.phoenix.managers.WalletManager
