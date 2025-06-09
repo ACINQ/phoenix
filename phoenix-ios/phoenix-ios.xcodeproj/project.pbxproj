@@ -231,6 +231,7 @@
 		DC74174B270F332700F7E3E3 /* KotlinTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC74174A270F332700F7E3E3 /* KotlinTypes.swift */; };
 		DC74174D270F455D00F7E3E3 /* AES256.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC74174C270F455D00F7E3E3 /* AES256.swift */; };
 		DC784A112B31EA180018DC4A /* LiquidityAdsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC784A102B31EA180018DC4A /* LiquidityAdsView.swift */; };
+		DC78A5F92DF22ABE003A7DD8 /* NotificationServiceQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC78A5F82DF22AB8003A7DD8 /* NotificationServiceQueue.swift */; };
 		DC7BAA002CADAAE70074B568 /* WalletIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC7BA9FF2CADAAE70074B568 /* WalletIdentifier.swift */; };
 		DC7DA9F62AD84DF200F86B99 /* String+Substring.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC7DA9F52AD84DF200F86B99 /* String+Substring.swift */; };
 		DC808E9B2D5541F50019AE30 /* UsingTorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC808E9A2D5541F10019AE30 /* UsingTorSheet.swift */; };
@@ -659,6 +660,7 @@
 		DC74174A270F332700F7E3E3 /* KotlinTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinTypes.swift; sourceTree = "<group>"; };
 		DC74174C270F455D00F7E3E3 /* AES256.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AES256.swift; sourceTree = "<group>"; };
 		DC784A102B31EA180018DC4A /* LiquidityAdsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidityAdsView.swift; sourceTree = "<group>"; };
+		DC78A5F82DF22AB8003A7DD8 /* NotificationServiceQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationServiceQueue.swift; sourceTree = "<group>"; };
 		DC7BA9FF2CADAAE70074B568 /* WalletIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletIdentifier.swift; sourceTree = "<group>"; };
 		DC7DA9F52AD84DF200F86B99 /* String+Substring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Substring.swift"; sourceTree = "<group>"; };
 		DC808E9A2D5541F10019AE30 /* UsingTorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsingTorSheet.swift; sourceTree = "<group>"; };
@@ -1522,10 +1524,11 @@
 		DCB511C8281AED58001BC525 /* phoenix-notifySrvExt */ = {
 			isa = PBXGroup;
 			children = (
-				DC641C6E282085F500862DCD /* phoenix-notifySrvExt.entitlements */,
-				DCB511C9281AED58001BC525 /* NotificationService.swift */,
-				DC641C6A2820803100862DCD /* PhoenixManager.swift */,
 				DCB511CB281AED58001BC525 /* Info.plist */,
+				DCB511C9281AED58001BC525 /* NotificationService.swift */,
+				DC78A5F82DF22AB8003A7DD8 /* NotificationServiceQueue.swift */,
+				DC641C6E282085F500862DCD /* phoenix-notifySrvExt.entitlements */,
+				DC641C6A2820803100862DCD /* PhoenixManager.swift */,
 			);
 			path = "phoenix-notifySrvExt";
 			sourceTree = "<group>";
@@ -2289,6 +2292,7 @@
 			files = (
 				DC641C752821706600862DCD /* Currency.swift in Sources */,
 				DC641C7228208B4D00862DCD /* GroupPrefs.swift in Sources */,
+				DC78A5F92DF22ABE003A7DD8 /* NotificationServiceQueue.swift in Sources */,
 				DCEB2798282D7B070096B87E /* KotlinExtensions+Other.swift in Sources */,
 				DC641C7328208B7F00862DCD /* UserDefaults+Codable.swift in Sources */,
 				DCA6DED1282ABA930073C658 /* KeychainConstants.swift in Sources */,

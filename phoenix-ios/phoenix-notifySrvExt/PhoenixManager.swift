@@ -13,25 +13,6 @@ typealias ConnectionsListener = (Connections) -> Void
 typealias PaymentListener = (Lightning_kmpIncomingPayment) -> Void
 
 /**
- * What happens if multiple push notifications arrive ?
- *
- * iOS will launch the notification-service-extension upon receiving the first push notification.
- * Subsequent push notifications are queued by the OS. After the app extension finishes processing
- * the first notification (by invoking the `contentHandler`), then iOS will:
- *
- * - display the first push notification
- * - dealloc the `UNNotificationServiceExtension`
- * - Initialize a new `UNNotificationServiceExtension` instance
- * - And invoke it's `didReceive(_:)` function with the next item in the queue
- *
- * Note that it does **NOT** create a new app extension process.
- * It re-uses the existing process, and launches a new `UNNotificationServiceExtension` within it.
- *
- * This means that the following instances are recycled (continue existing in memory):
- * - PhoenixManager.shared
- * - XPC.shared
- *
- * ---------------------
  * # Architecture notes:
  *
  * In a previous implementation, we created the `PhoenixBusiness` instance once,
