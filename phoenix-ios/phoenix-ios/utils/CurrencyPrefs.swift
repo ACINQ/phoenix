@@ -40,8 +40,8 @@ class CurrencyPrefs: ObservableObject {
 		currencyType = GroupPrefs.shared.currencyType
 		fiatCurrency = GroupPrefs.shared.fiatCurrency
 		bitcoinUnit = GroupPrefs.shared.bitcoinUnit
-		hideAmounts = Prefs.shared.hideAmounts
-		showOriginalFiatValue = Prefs.shared.showOriginalFiatAmount
+		hideAmounts = Prefs.current.hideAmounts
+		showOriginalFiatValue = Prefs.current.showOriginalFiatAmount
 		
 		GroupPrefs.shared.fiatCurrencyPublisher.sink {[weak self](newValue: FiatCurrency) in
 			self?.fiatCurrency = newValue
@@ -51,7 +51,7 @@ class CurrencyPrefs: ObservableObject {
 			self?.bitcoinUnit = newValue
 		}.store(in: &cancellables)
 		
-		Prefs.shared.showOriginalFiatAmountPublisher.sink {[weak self](newValue: Bool) in
+		Prefs.current.showOriginalFiatAmountPublisher.sink {[weak self](newValue: Bool) in
 			self?.showOriginalFiatValue = newValue
 		}.store(in: &cancellables)
 		
@@ -109,7 +109,7 @@ class CurrencyPrefs: ObservableObject {
 		
 		delayedSave.save(withDelay: 10.0) {
 			GroupPrefs.shared.currencyType = self.currencyType
-			Prefs.shared.hideAmounts = self.hideAmounts
+			Prefs.current.hideAmounts = self.hideAmounts
 		}
 	}
 	

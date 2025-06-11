@@ -41,7 +41,7 @@ struct LightningDualView: View {
 	@State var notificationPermissions = NotificationsManager.shared.permissions.value
 	
 	@State var modificationAmount: CurrencyAmount? = nil
-	@State var description: String = Prefs.shared.defaultPaymentDescription ?? ""
+	@State var description: String = Prefs.current.defaultPaymentDescription ?? ""
 	
 	@State var amountMsat: Lightning_kmpMilliSatoshi? = nil
 	@State var needsUpdateInvoiceOrOffer: Bool = true
@@ -689,7 +689,7 @@ struct LightningDualView: View {
 			mvi.intent(Receive.IntentAsk(
 				amount: amountMsat,
 				desc: finalDesc,
-				expirySeconds: Prefs.shared.invoiceExpirationSeconds
+				expirySeconds: Prefs.current.invoiceExpirationSeconds
 			))
 			
 		} else {

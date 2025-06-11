@@ -283,7 +283,7 @@ struct ChannelsConfigurationView: View {
 	}
 	
 	func localBalanceColor() -> Color {
-		if BusinessManager.isTestnet {
+		if Biz.isTestnet {
 			return Color.appAccentTestnet
 		} else {
 			return Color.appAccentMainnet

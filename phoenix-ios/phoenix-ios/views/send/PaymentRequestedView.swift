@@ -47,7 +47,7 @@ struct PaymentRequestedView: View {
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
 			
-			if BusinessManager.showTestnetBackground {
+			if Biz.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.ignoresSafeArea(.all, edges: .all)

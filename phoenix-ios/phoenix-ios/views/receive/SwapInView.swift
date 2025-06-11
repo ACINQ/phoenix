@@ -352,7 +352,7 @@ struct SwapInView: View {
 		let address: String
 		switch swapInAddressType {
 		case .taproot:
-			let index = swapInAddressInfo?.index ?? Prefs.shared.swapInAddressIndex
+			let index = swapInAddressInfo?.index ?? Prefs.current.swapInAddressIndex
 			address = keyManager.swapInOnChainWallet
 				.getSwapInProtocol(addressIndex: Int32(index))
 				.address(chain: chain)

@@ -72,10 +72,10 @@ struct RecoveryPhraseList: View {
 		self.walletId = walletId
 		self.syncSeedManager = Biz.syncManager!.syncSeedManager
 		
-		let manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(walletId)
+		let manualBackup_taskDone = Prefs.current.backupSeed.manualBackupDone
 		self._manualBackup_taskDone = State<Bool>(initialValue: manualBackup_taskDone)
 		
-		let backupSeed_enabled = Prefs.shared.backupSeed.isEnabled
+		let backupSeed_enabled = Prefs.current.backupSeed.isEnabled
 		self._backupSeed_enabled = State<Bool>(initialValue: backupSeed_enabled)
 		
 		self._legal_taskDone = State<Bool>(initialValue: manualBackup_taskDone)
@@ -564,7 +564,7 @@ struct RecoveryPhraseList: View {
 		if taskDone != manualBackup_taskDone {
 			
 			manualBackup_taskDone = taskDone
-			Prefs.shared.backupSeed.manualBackup_setTaskDone(taskDone, walletId)
+			Prefs.current.backupSeed.manualBackupDone = taskDone
 		}
 	}
 	

@@ -110,7 +110,7 @@ struct SwapInAddresses: View {
 	
 	func taprootAddressCount() -> Int {
 		
-		let lastIndex = swapInAddressInfo?.index ?? Prefs.shared.swapInAddressIndex
+		let lastIndex = swapInAddressInfo?.index ?? Prefs.current.swapInAddressIndex
 		return lastIndex + 1
 	}
 	

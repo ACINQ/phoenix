@@ -16,16 +16,9 @@ enum WalletRestoreType {
 	case fromCloudBackup(name: String?)
 }
 
-/// Short-hand for `BusinessManager.shared`
-/// 
-let Biz = BusinessManager.shared
-
 /// Manages the `PhoenixBusiness` instance, which is the shared logic written in Kotlin Multiplatform.
 ///
 class BusinessManager {
-	
-	/// Singleton instance
-	public static let shared = BusinessManager()
 	
 	/// There are some places in the code where we need to access the testnet state from a background thread.
 	/// This is problematic because calling into Kotlin via `business.chain.isTestnet()`
@@ -34,9 +27,8 @@ class BusinessManager {
 	/// So we're caching this value here for background access.
 	/// Also, this makes it easier to test mainnet UI & colors.
 	///
-	private static var _isTestnet: Bool? = nil
-	public static let isTestnet = _isTestnet!
-	public static let showTestnetBackground = _isTestnet!
+	public let isTestnet: Bool
+	public let showTestnetBackground: Bool
 	
 	/// The current business instance.
 	///
@@ -76,8 +68,6 @@ class BusinessManager {
 	private var isInBackground = false
 	
 	private var walletInfo: WalletManager.WalletInfo? = nil
-	private var pushToken: String? = nil
-	private var fcmToken: String? = nil
 	private var peerConnectionState: Lightning_kmpConnection? = nil
 	
 	private var longLivedTasks = [String: UIBackgroundTaskIdentifier]()
@@ -90,10 +80,11 @@ class BusinessManager {
 	// MARK: Init
 	// --------------------------------------------------
 	
-	private init() { // must use shared instance
+	init() {
 		
 		business = PhoenixBusiness(ctx: PlatformContext.default)
-		BusinessManager._isTestnet = !business.chain.isMainnet()
+		isTestnet = !business.chain.isMainnet()
+		showTestnetBackground = !business.chain.isMainnet()
 		
 		let nc = NotificationCenter.default
 		
@@ -103,6 +94,16 @@ class BusinessManager {
 		
 		nc.publisher(for: UIApplication.willEnterForegroundNotification).sink { _ in
 			self.applicationWillEnterForeground()
+		}.store(in: &appCancellables)
+		
+		let ad = AppDelegate.get()
+		
+		ad.pushTokenPublisher.sink { _ in
+			self.pushTokenChanged()
+		}.store(in: &appCancellables)
+		
+		ad.fcmTokenPublisher.sink { _ in
+			self.fcmTokenChanged()
 		}.store(in: &appCancellables)
 		
 		WatchTower.shared.prepare()
@@ -357,8 +358,8 @@ class BusinessManager {
 			.sink { (newInfo: Lightning_kmpSwapInWallet.SwapInAddressInfo?) in
 				
 				if let newInfo {
-					if Prefs.shared.swapInAddressIndex < newInfo.index {
-						Prefs.shared.swapInAddressIndex = newInfo.index
+					if Prefs.current.swapInAddressIndex < newInfo.index {
+						Prefs.current.swapInAddressIndex = newInfo.index
 					}
 				}
 			}
@@ -374,7 +375,7 @@ class BusinessManager {
 				for try await channels in channelsStream {
 					let shouldMigrate = IosMigrationHelper.shared.shouldMigrateChannels(channels: channels)
 					if !shouldMigrate {
-						let peer = try await Biz.business.peerManager.getPeer()
+						let peer = try await self.business.peerManager.getPeer()
 						try await peer.startWatchSwapInWallet()
 					}
 					break
@@ -456,34 +457,35 @@ class BusinessManager {
 		maybeRegisterFcmToken()
 		
 		let walletId = WalletIdentifier(chain: business.chain, walletInfo: _walletInfo)
+		let prefs = Prefs.wallet(walletId)
 		
-		if let walletRestoreType = walletRestoreType {
+		if let walletRestoreType {
 			switch walletRestoreType {
 			case .fromManualEntry:
 				//
 				// User is restoring wallet after manually typing in the recovery phrase.
 				// So we can mark the manual_backup task as completed.
 				//
-				Prefs.shared.backupSeed.manualBackup_setTaskDone(true, walletId)
+				prefs.backupSeed.manualBackupDone = true
 				//
 				// And ensure cloud backup is disabled for the wallet.
 				//
-				Prefs.shared.backupSeed.isEnabled = false
-				Prefs.shared.backupSeed.setName(nil, walletId)
-				Prefs.shared.backupSeed.setHasUploadedSeed(false, walletId)
+				prefs.backupSeed.isEnabled = false
+				prefs.backupSeed.name = nil
+				prefs.backupSeed.hasUploadedSeed = false
 				
 			case .fromCloudBackup(let name):
 				//
 				// User is restoring wallet from an existing iCloud backup.
 				// So we can mark the iCloud backpu as completed.
 				//
-				Prefs.shared.backupSeed.isEnabled = true
-				Prefs.shared.backupSeed.setName(name, walletId)
-				Prefs.shared.backupSeed.setHasUploadedSeed(true, walletId)
+				prefs.backupSeed.isEnabled = true
+				prefs.backupSeed.name = name
+				prefs.backupSeed.hasUploadedSeed = true
 				//
 				// And ensure manual backup is diabled for the wallet.
 				//
-				Prefs.shared.backupSeed.manualBackup_setTaskDone(false, walletId)
+				prefs.backupSeed.manualBackupDone = false
 			}
 		}
 
@@ -529,19 +531,15 @@ class BusinessManager {
 	// MARK: Push Token
 	// --------------------------------------------------
 	
-	public func setPushToken(_ value: String) {
-		log.trace("setPushToken()")
-		assertMainThread()
+	private func pushTokenChanged() {
+		log.trace("pushTokenChanged()")
 		
-		self.pushToken = value
-		maybeRegisterFcmToken()
+		// Reserved for debugging use (AWS)
 	}
 	
-	public func setFcmToken(_ value: String) {
-		log.trace("setFcmToken()")
-		assertMainThread()
+	private func fcmTokenChanged() {
+		log.trace("fcmTokenChanged()")
 		
-		self.fcmToken = value
 		maybeRegisterFcmToken()
 	}
 	
@@ -561,22 +559,21 @@ class BusinessManager {
 		log.trace("maybeRegisterFcmToken()")
 		assertMainThread()
 		
-		if walletInfo == nil {
+		guard walletInfo != nil else {
 			log.debug("maybeRegisterFcmToken: walletInfo is nil")
 			return
 		}
-		if fcmToken == nil {
+		guard let fcmToken = AppDelegate.get().fcmTokenPublisher.value else {
 			log.debug("maybeRegisterFcmToken: fcmToken is nil")
 			return
 		}
-		if !(peerConnectionState is Lightning_kmpConnection.ESTABLISHED) {
+		guard (peerConnectionState is Lightning_kmpConnection.ESTABLISHED) else {
 			log.debug("maybeRegisterFcmToken: peerConnection not established")
 			return
 		}
 		
-		let token = self.fcmToken
-		log.debug("registering fcm token: \(token?.description ?? "<nil>")")
-		business.registerFcmToken(token: token) { error in
+		log.debug("registering fcm token: \(fcmToken.description)")
+		business.registerFcmToken(token: fcmToken) { error in
 			if let e = error {
 				log.error("failed to register fcm token: \(e.localizedDescription)")
 			}

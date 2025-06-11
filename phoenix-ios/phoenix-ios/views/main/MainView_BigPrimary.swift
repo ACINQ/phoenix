@@ -89,7 +89,7 @@ struct MainView_BigPrimary: View {
 			Color.primaryBackground
 				.ignoresSafeArea()
 
-			if BusinessManager.showTestnetBackground {
+			if Biz.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.ignoresSafeArea()

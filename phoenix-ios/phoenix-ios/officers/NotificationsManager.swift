@@ -179,10 +179,8 @@ class NotificationsManager: NSObject, UNUserNotificationCenterDelegate {
 			self.backgroundRefreshStatus.send(newStatus)
 		}
 		
-		if Thread.isMainThread {
+		runOnMainThread {
 			refreshBlock()
-		} else {
-			DispatchQueue.main.async { refreshBlock() }
 		}
 	}
 	
@@ -316,10 +314,8 @@ class NotificationsManager: NSObject, UNUserNotificationCenterDelegate {
 		
 		UNUserNotificationCenter.current().getNotificationSettings { settings in
 			
-			if Thread.isMainThread {
+			runOnMainThread {
 				handler(settings)
-			} else {
-				DispatchQueue.main.async { handler(settings) }
 			}
 		}
 	}

@@ -62,7 +62,7 @@ struct InitializationView: MVIView {
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
 			
-			if BusinessManager.showTestnetBackground {
+			if Biz.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
@@ -224,7 +224,7 @@ struct InitializationView: MVIView {
 	// --------------------------------------------------
 	
 	var logoImageName: String {
-		if BusinessManager.isTestnet {
+		if Biz.isTestnet {
 			return "logo_blue"
 		} else {
 			return "logo_green"

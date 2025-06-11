@@ -42,7 +42,7 @@ struct ManualRestoreView: MVIView {
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
 
-			if BusinessManager.showTestnetBackground {
+			if Biz.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar

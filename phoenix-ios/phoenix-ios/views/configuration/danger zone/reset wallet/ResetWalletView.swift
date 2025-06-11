@@ -26,14 +26,14 @@ struct ResetWalletView: MVIView {
 	
 	@State var reviewRequested = false
 	
-	let backupTransactions_enabled_publisher = Prefs.shared.backupTransactions.isEnabledPublisher
-	@State var backupTransactions_enabled = Prefs.shared.backupTransactions.isEnabled
+	let backupTransactions_enabled_publisher = Prefs.current.backupTransactions.isEnabledPublisher
+	@State var backupTransactions_enabled = Prefs.current.backupTransactions.isEnabled
 	
-	let backupSeed_enabled_publisher = Prefs.shared.backupSeed.isEnabled_publisher
-	@State var backupSeed_enabled = Prefs.shared.backupSeed.isEnabled
+	let backupSeed_enabled_publisher = Prefs.current.backupSeed.isEnabledPublisher
+	@State var backupSeed_enabled = Prefs.current.backupSeed.isEnabled
 	
-	let manualBackup_taskDone_publisher = Prefs.shared.backupSeed.manualBackup_taskDone_publisher
-	@State var manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(Biz.walletId!)
+	let manualBackup_taskDone_publisher = Prefs.current.backupSeed.manualBackupDonePublisher
+	@State var manualBackup_taskDone = Prefs.current.backupSeed.manualBackupDone
 	
 	// <iOS_16_workarounds>
 	@State var navLinkTag: NavLinkTag? = nil
@@ -72,8 +72,8 @@ struct ResetWalletView: MVIView {
 		.onReceive(backupSeed_enabled_publisher) {
 			self.backupSeed_enabled = $0
 		}
-		.onReceive(manualBackup_taskDone_publisher) {
-			self.manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(walletId)
+		.onReceive(manualBackup_taskDone_publisher) { _ in
+			self.manualBackup_taskDone = Prefs.current.backupSeed.manualBackupDone
 		}
 	}
 	

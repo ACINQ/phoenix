@@ -13,7 +13,7 @@ struct ContentView: View {
 	@ObservedObject var lockState = LockState.shared
 	@State var unlockedOnce = false
 	
-	@State var hasMergedChannelsForSplicing = Prefs.shared.hasMergedChannelsForSplicing
+	@State var hasMergedChannelsForSplicing = Prefs.current.hasMergedChannelsForSplicing
 	
 	@EnvironmentObject var shortSheetState: ShortSheetState
 	@State var shortSheetItem: ShortSheetItem? = nil
@@ -63,7 +63,7 @@ struct ContentView: View {
 		.onChange(of: lockState.walletExistence) { (newValue: WalletExistence) in
 			walletExistenceChanged(newValue)
 		}
-		.onReceive(Prefs.shared.hasMergedChannelsForSplicingPublisher) { (newValue: Bool) in
+		.onReceive(Prefs.current.hasMergedChannelsForSplicingPublisher) { (newValue: Bool) in
 			hasMergedChannelsForSplicing = newValue
 		}
 		.onReceive(shortSheetState.itemPublisher) { (item: ShortSheetItem?) in
@@ -105,7 +105,7 @@ struct ContentView: View {
 		log.trace("walletExistenceChanged(value = \(value))")
 		
 		if value == .doesNotExist {
-			Prefs.shared.hasMergedChannelsForSplicing = true
+			Prefs.current.hasMergedChannelsForSplicing = true
 		}
 	}
 	

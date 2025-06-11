@@ -828,7 +828,7 @@ struct SendView: View {
 			search_addresses = addresses
 		}
 		do {
-			var domains = ContactAddress.wellKnownDomains(includeTestnet: BusinessManager.isTestnet)
+			var domains = ContactAddress.wellKnownDomains(includeTestnet: Biz.isTestnet)
 			for contact in sortedContacts {
 				contact.addresses.forEach { address in
 					if let domain = address.domain {

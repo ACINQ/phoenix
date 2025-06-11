@@ -66,7 +66,7 @@ class AppMigration {
 		// - recentPaymentsSeconds -> recentPayments (enum)
 		//
 		if previousBuild.isVersion(lessThan: "44") {
-			Prefs.shared.performMigration("44", completionPublisher)
+			Prefs.current.performMigration("44", completionPublisher)
 		}
 		
 		// v2.0.6 (build 65)

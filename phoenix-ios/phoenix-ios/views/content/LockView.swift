@@ -288,7 +288,7 @@ struct LockView: View {
 	// --------------------------------------------------
 	
 	var logoImageName: String {
-		if BusinessManager.isTestnet {
+		if Biz.isTestnet {
 			return "logo_blue"
 		} else {
 			return "logo_green"

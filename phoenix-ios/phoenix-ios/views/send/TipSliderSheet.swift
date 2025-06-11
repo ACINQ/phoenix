@@ -385,7 +385,7 @@ struct TipSliderSheet: View {
 	func recentTipPercents() -> [Int] {
 		
 		// Most recent item is at index 0
-		var recents = Prefs.shared.recentTipPercents
+		var recents = Prefs.current.recentTipPercents
 		
 		// Remove items outside the valid range
 		let minPercent = Int(minPercentDouble() * 100.0)

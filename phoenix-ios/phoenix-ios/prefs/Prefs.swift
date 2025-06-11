@@ -9,21 +9,48 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-fileprivate enum Key: String {
+fileprivate enum Key {
 	case theme
 	case defaultPaymentDescription
 	case recentTipPercents
 	case isNewWallet
 	case invoiceExpirationDays
-	case hideAmounts = "hideAmountsOnHomeScreen"
+	case hideAmounts
 	case showOriginalFiatAmount
 	case recentPaymentsConfig
 	case hasMergedChannelsForSplicing
 	case swapInAddressIndex
-	case hasUpgradedSeedCloudBackups_v2
+	case hasUpgradedSeedCloudBackups
 	case serverMessageReadIndex
 	case allowOverpayment
 	case doNotShowChannelImpactWarning
+	
+	/// We used to declare, `enum Key: String`, but discovered that it's a bit of a footgun.
+	/// It's just too easy to type `Key.name.rawValue`, as we've done so many times before.
+	/// So we switched to a variable name that puts the value in the proper context.
+	///
+	var prefix: String {
+		switch self {
+			case .theme                         : return "theme"
+			case .defaultPaymentDescription     : return "defaultPaymentDescription"
+			case .recentTipPercents             : return "recentTipPercents"
+			case .isNewWallet                   : return "isNewWallet"
+			case .invoiceExpirationDays         : return "invoiceExpirationDays"
+			case .hideAmounts                   : return "hideAmountsOnHomeScreen"
+			case .showOriginalFiatAmount        : return "showOriginalFiatAmount"
+			case .recentPaymentsConfig          : return "recentPaymentsConfig"
+			case .hasMergedChannelsForSplicing  : return "hasMergedChannelsForSplicing"
+			case .swapInAddressIndex            : return "swapInAddressIndex"
+			case .hasUpgradedSeedCloudBackups   : return "hasUpgradedSeedCloudBackups_v2"
+			case .serverMessageReadIndex        : return "serverMessageReadIndex"
+			case .allowOverpayment              : return "allowOverpayment"
+			case .doNotShowChannelImpactWarning : return "doNotShowChannelImpactWarning"
+		}
+	}
+	
+	func value(_ suffix: String) -> String {
+		return "\(self.prefix)-\(suffix)"
+	}
 }
 
 fileprivate enum KeyDeprecated: String {
@@ -40,14 +67,38 @@ fileprivate enum KeyDeprecated: String {
 ///
 class Prefs {
 	
-	public static let shared = Prefs()
+	private static var instances: [String: Prefs] = [:]
 	
-	private init() {
-		UserDefaults.standard.register(defaults: [
-			Key.isNewWallet.rawValue: true,
-			Key.invoiceExpirationDays.rawValue: 7,
-			Key.showOriginalFiatAmount.rawValue: true
-		])
+	public static var current: Prefs {
+		if let walletId = Biz.walletId {
+			return wallet(walletId)
+		} else {
+			return wallet("default")
+		}
+	}
+	
+	public static func wallet(_ walletId: WalletIdentifier) -> Prefs {
+		return wallet(walletId.prefsKeySuffix)
+	}
+	
+	public static func wallet(_ id: String) -> Prefs {
+		if let instance = instances[id] {
+			return instance
+		} else {
+			let instance = Prefs(id: id)
+			instances[id] = instance
+			return instance
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Setup
+	// --------------------------------------------------
+	
+	private let id: String
+	
+	private init(id: String) {
+		self.id = id
 	}
 	
 	var defaults: UserDefaults {
@@ -58,30 +109,28 @@ class Prefs {
 	// MARK: User Options
 	// --------------------------------------------------
 	
-	lazy private(set) var themePublisher: AnyPublisher<Theme, Never> = {
-		defaults.publisher(for: \.theme, options: [.initial, .new])
-			.map({ (data: Data?) -> Theme in
-				data?.jsonDecode() ?? self.defaultTheme
-			})
-			.removeDuplicates()
-			.eraseToAnyPublisher()
+	lazy private(set) var themePublisher = {
+		CurrentValueSubject<Theme, Never>(self.theme)
 	}()
 
-	private let defaultTheme = Theme.system
-
 	var theme: Theme {
-		get { defaults.theme?.jsonDecode() ?? defaultTheme }
-		set { defaults.theme = newValue.jsonEncode() }
+		get { defaults.data(forKey: Key.theme.value(id))?.jsonDecode() ?? Theme.system }
+		set {
+			defaults.set(newValue, forKey: Key.theme.value(id))
+			runOnMainThread {
+				self.themePublisher.send(newValue)
+			}
+		}
 	}
 	
 	var defaultPaymentDescription: String? {
-		get { defaults.defaultPaymentDescription }
-		set { defaults.defaultPaymentDescription = newValue }
+		get { defaults.string(forKey: Key.defaultPaymentDescription.value(id)) }
+		set { defaults.set(newValue, forKey: Key.defaultPaymentDescription.value(id)) }
 	}
 	
 	var invoiceExpirationDays: Int {
-		get { defaults.invoiceExpirationDays }
-		set { defaults.invoiceExpirationDays = newValue	}
+		get { defaults.integer(forKey: Key.invoiceExpirationDays.value(id), defaultValue: 7) }
+		set { defaults.set(newValue, forKey: Key.invoiceExpirationDays.value(id)) }
 	}
 	
 	var invoiceExpirationSeconds: Int64 {
@@ -89,97 +138,103 @@ class Prefs {
 	}
 	
 	var hideAmounts: Bool {
-		get { defaults.hideAmounts }
-		set { defaults.hideAmounts = newValue }
+		get { defaults.bool(forKey: Key.hideAmounts.value(id)) }
+		set { defaults.set(newValue, forKey: Key.hideAmounts.value(id)) }
 	}
 	
-	lazy private(set) var showOriginalFiatAmountPublisher: AnyPublisher<Bool, Never> = {
-		defaults.publisher(for: \.showOriginalFiatAmount, options: [.initial, .new])
-			.removeDuplicates()
-			.eraseToAnyPublisher()
+	lazy private(set) var showOriginalFiatAmountPublisher = {
+		CurrentValueSubject<Bool, Never>(self.showOriginalFiatAmount)
 	}()
 	
 	var showOriginalFiatAmount: Bool {
-		get { defaults.showOriginalFiatAmount }
-		set { defaults.showOriginalFiatAmount = newValue }
-	}
-	
-	lazy private(set) var recentPaymentsConfigPublisher: AnyPublisher<RecentPaymentsConfig, Never> = {
-		defaults.publisher(for: \.recentPaymentsConfig, options: [.initial, .new])
-			.map({ (data: Data?) -> RecentPaymentsConfig in
-				data?.jsonDecode() ?? self.defaultRecentPaymentsConfig
-			})
-			.removeDuplicates()
-			.eraseToAnyPublisher()
-	}()
-	
-	let defaultRecentPaymentsConfig = RecentPaymentsConfig.mostRecent(count: 3)
-	
-	var recentPaymentsConfig: RecentPaymentsConfig {
-		get { defaults.recentPaymentsConfig?.jsonDecode() ?? defaultRecentPaymentsConfig }
-		set { defaults.recentPaymentsConfig = newValue.jsonEncode() }
-	}
-	
-	lazy private(set) var hasMergedChannelsForSplicingPublisher: AnyPublisher<Bool, Never> = {
-		defaults.publisher(for: \.hasMergedChannelsForSplicing, options: [.initial, .new])
-			.removeDuplicates()
-			.eraseToAnyPublisher()
-	}()
-	
-	var hasMergedChannelsForSplicing: Bool {
-		get { defaults.hasMergedChannelsForSplicing }
-		set { defaults.hasMergedChannelsForSplicing = newValue }
-	}
-	
-	var hasUpgradedSeedCloudBackups: Bool {
-		get { defaults.hasUpgradedSeedCloudBackups }
-		set { defaults.hasUpgradedSeedCloudBackups = newValue }
-	}
-  
-	lazy private(set) var serverMessageReadIndexPublisher: AnyPublisher<Int?, Never> = {
-		defaults.publisher(for: \.serverMessageReadIndex, options: [.initial, .new])
-			.map({ (number: NSNumber?) -> Int? in
-				number?.intValue
-			})
-			.removeDuplicates()
-			.eraseToAnyPublisher()
-	}()
-	
-	var serverMessageReadIndex: Int? {
-		get { defaults.serverMessageReadIndex?.intValue }
+		get { defaults.bool(forKey: Key.showOriginalFiatAmount.value(id), defaultValue: true) }
 		set {
-			if let number = newValue {
-				defaults.serverMessageReadIndex = NSNumber(value: number)
-			} else {
-				defaults.serverMessageReadIndex = nil
+			defaults.set(newValue, forKey: Key.showOriginalFiatAmount.value(id))
+			runOnMainThread {
+				self.showOriginalFiatAmountPublisher.send(newValue)
 			}
 		}
 	}
 	
-	lazy private(set) var allowOverpaymentPublisher: AnyPublisher<Bool, Never> = {
-		defaults.publisher(for: \.allowOverpayment, options: [.initial, .new])
-			.removeDuplicates()
-			.eraseToAnyPublisher()
+	lazy private(set) var recentPaymentsConfigPublisher = {
+		CurrentValueSubject<RecentPaymentsConfig, Never>(self.recentPaymentsConfig)
+	}()
+	
+	var recentPaymentsConfig: RecentPaymentsConfig {
+		get {
+			defaults.data(forKey: Key.recentPaymentsConfig.value(id))?.jsonDecode() ??
+			RecentPaymentsConfig.mostRecent(count: 3)
+		}
+		set {
+			defaults.set(newValue.jsonEncode(), forKey: Key.recentPaymentsConfig.value(id))
+			runOnMainThread {
+				self.recentPaymentsConfigPublisher.send(newValue)
+			}
+		}
+	}
+	
+	lazy private(set) var hasMergedChannelsForSplicingPublisher = {
+		CurrentValueSubject<Bool, Never>(self.hasMergedChannelsForSplicing)
+	}()
+	
+	var hasMergedChannelsForSplicing: Bool {
+		get { defaults.bool(forKey: Key.hasMergedChannelsForSplicing.value(id)) }
+		set {
+			defaults.set(newValue, forKey: Key.hasMergedChannelsForSplicing.value(id))
+			runOnMainThread {
+				self.hasMergedChannelsForSplicingPublisher.send(newValue)
+			}
+		}
+	}
+	
+	var hasUpgradedSeedCloudBackups: Bool {
+		get { defaults.bool(forKey: Key.hasUpgradedSeedCloudBackups.value(id)) }
+		set { defaults.set(newValue, forKey: Key.hasUpgradedSeedCloudBackups.value(id)) }
+	}
+  
+	lazy private(set) var serverMessageReadIndexPublisher = {
+		CurrentValueSubject<Int?, Never>(self.serverMessageReadIndex)
+	}()
+	
+	var serverMessageReadIndex: Int? {
+		get { defaults.number(forKey: Key.serverMessageReadIndex.value(id))?.intValue }
+		set {
+			if let number = newValue {
+				defaults.set(NSNumber(value: number), forKey: Key.serverMessageReadIndex.value(id))
+			} else {
+				defaults.removeObject(forKey: Key.serverMessageReadIndex.value(id))
+			}
+			runOnMainThread {
+				self.serverMessageReadIndexPublisher.send(newValue)
+			}
+		}
+	}
+	
+	lazy private(set) var allowOverpaymentPublisher = {
+		CurrentValueSubject<Bool, Never>(self.allowOverpayment)
 	}()
 	
 	var allowOverpayment: Bool {
-		get { defaults.allowOverpayment }
-		set { defaults.allowOverpayment = newValue }
+		get { defaults.bool(forKey: Key.allowOverpayment.value(id)) }
+		set {
+			defaults.set(newValue, forKey: Key.allowOverpayment.value(id))
+			runOnMainThread {
+				self.allowOverpaymentPublisher.send(newValue)
+			}
+		}
 	}
 
 	var doNotShowChannelImpactWarning: Bool {
-		get { defaults.doNotShowChannelImpactWarning }
-		set { defaults.doNotShowChannelImpactWarning = newValue }
+		get { defaults.bool(forKey: Key.doNotShowChannelImpactWarning.value(id)) }
+		set { defaults.set(newValue, forKey: Key.doNotShowChannelImpactWarning.value(id)) }
 	}
 	
 	// --------------------------------------------------
 	// MARK: Wallet State
 	// --------------------------------------------------
 	
-	lazy private(set) var isNewWalletPublisher: AnyPublisher<Bool, Never> = {
-		defaults.publisher(for: \.isNewWallet, options: [.initial, .new])
-			.removeDuplicates()
-			.eraseToAnyPublisher()
+	lazy private(set) var isNewWalletPublisher: PassthroughSubject<Bool, Never> = {
+		return PassthroughSubject<Bool, Never>()
 	}()
 	
 	/**
@@ -188,13 +243,18 @@ class Prefs {
 	 * Just that the wallet had either a non-zero balance, or a transaction, at least once.
 	 */
 	var isNewWallet: Bool {
-		get { defaults.isNewWallet }
-		set { defaults.isNewWallet = newValue }
+		get { defaults.bool(forKey: Key.isNewWallet.value(id), defaultValue: true) }
+		set {
+			defaults.set(newValue, forKey: Key.isNewWallet.value(id))
+			runOnMainThread {
+				self.isNewWalletPublisher.send(newValue)
+			}
+		}
 	}
 	
 	var swapInAddressIndex: Int {
-		get { defaults.swapInAddressIndex }
-		set { defaults.swapInAddressIndex = newValue }
+		get { defaults.integer(forKey: Key.swapInAddressIndex.value(id)) }
+		set { defaults.set(newValue, forKey: Key.swapInAddressIndex.value(id)) }
 	}
 	
 	// --------------------------------------------------
@@ -208,7 +268,7 @@ class Prefs {
 	
 	/// Most recent is at index 0
 	var recentTipPercents: [Int] {
-		get { defaults.recentTipPercents?.jsonDecode() ?? [] }
+		get { defaults.data(forKey: Key.recentTipPercents.value(id))?.jsonDecode() ?? [] }
 	}
 	
 	func addRecentTipPercent(_ percent: Int) {
@@ -221,51 +281,51 @@ class Prefs {
 			recents.removeLast()
 		}
 		
-		defaults.recentTipPercents = recents.jsonEncode()
+		defaults.set(recents.jsonEncode(), forKey: Key.recentTipPercents.value(id))
 	}
 
 	// --------------------------------------------------
 	// MARK: Backup
 	// --------------------------------------------------
 	
-	lazy private(set) var backupTransactions: Prefs_BackupTransactions = {
-		return Prefs_BackupTransactions()
+	lazy private(set) var backupSeed: Prefs_BackupSeed = {
+		return Prefs_BackupSeed(id: id)
 	}()
 	
-	lazy private(set) var backupSeed: Prefs_BackupSeed = {
-		return Prefs_BackupSeed()
+	lazy private(set) var backupTransactions: Prefs_BackupTransactions = {
+		return Prefs_BackupTransactions(id: id)
 	}()
 	
 	// --------------------------------------------------
 	// MARK: Reset Wallet
 	// --------------------------------------------------
 
-	func resetWallet(_ walletId: WalletIdentifier) {
+	func resetWallet() {
 
 		// Purposefully not resetting:
 		// - Key.theme: App feels weird when this changes unexpectedly.
 
-		defaults.removeObject(forKey: Key.defaultPaymentDescription.rawValue)
-		defaults.removeObject(forKey: Key.recentTipPercents.rawValue)
-		defaults.removeObject(forKey: Key.isNewWallet.rawValue)
-		defaults.removeObject(forKey: Key.invoiceExpirationDays.rawValue)
-		defaults.removeObject(forKey: Key.hideAmounts.rawValue)
-		defaults.removeObject(forKey: Key.showOriginalFiatAmount.rawValue)
-		defaults.removeObject(forKey: Key.recentPaymentsConfig.rawValue)
-		defaults.removeObject(forKey: Key.hasMergedChannelsForSplicing.rawValue)
-		defaults.removeObject(forKey: Key.swapInAddressIndex.rawValue)
-		defaults.removeObject(forKey: Key.hasUpgradedSeedCloudBackups_v2.rawValue)
-		defaults.removeObject(forKey: Key.serverMessageReadIndex.rawValue)
-		defaults.removeObject(forKey: Key.allowOverpayment.rawValue)
-		defaults.removeObject(forKey: Key.doNotShowChannelImpactWarning.rawValue)
+		defaults.removeObject(forKey: Key.defaultPaymentDescription.value(id))
+		defaults.removeObject(forKey: Key.recentTipPercents.value(id))
+		defaults.removeObject(forKey: Key.isNewWallet.value(id))
+		defaults.removeObject(forKey: Key.invoiceExpirationDays.value(id))
+		defaults.removeObject(forKey: Key.hideAmounts.value(id))
+		defaults.removeObject(forKey: Key.showOriginalFiatAmount.value(id))
+		defaults.removeObject(forKey: Key.recentPaymentsConfig.value(id))
+		defaults.removeObject(forKey: Key.hasMergedChannelsForSplicing.value(id))
+		defaults.removeObject(forKey: Key.swapInAddressIndex.value(id))
+		defaults.removeObject(forKey: Key.hasUpgradedSeedCloudBackups.value(id))
+		defaults.removeObject(forKey: Key.serverMessageReadIndex.value(id))
+		defaults.removeObject(forKey: Key.allowOverpayment.value(id))
+		defaults.removeObject(forKey: Key.doNotShowChannelImpactWarning.value(id))
 
-		defaults.removeObject(forKey: KeyDeprecated.showChannelsRemoteBalance.rawValue)
-		defaults.removeObject(forKey: KeyDeprecated.recentPaymentSeconds.rawValue)
-		defaults.removeObject(forKey: KeyDeprecated.maxFees.rawValue)
-		defaults.removeObject(forKey: KeyDeprecated.hasUpgradedSeedCloudBackups_v1.rawValue)
+	//	defaults.removeObject(forKey: KeyDeprecated.showChannelsRemoteBalance.rawValue)
+	//	defaults.removeObject(forKey: KeyDeprecated.recentPaymentSeconds.rawValue)
+	//	defaults.removeObject(forKey: KeyDeprecated.maxFees.rawValue)
+	//	defaults.removeObject(forKey: KeyDeprecated.hasUpgradedSeedCloudBackups_v1.rawValue)
 		
-		self.backupTransactions.resetWallet(walletId)
-		self.backupSeed.resetWallet(walletId)
+		self.backupSeed.resetWallet()
+		self.backupTransactions.resetWallet()
 	}
 
 	// --------------------------------------------------
@@ -289,7 +349,7 @@ class Prefs {
 		log.trace("performMigration_toBuild44()")
 		
 		let oldKey = KeyDeprecated.recentPaymentSeconds.rawValue
-		let newKey = Key.recentPaymentsConfig.rawValue
+		let newKey = Key.recentPaymentsConfig.prefix
 		
 		if defaults.object(forKey: oldKey) != nil {
 			let seconds = defaults.integer(forKey: oldKey)
@@ -303,78 +363,5 @@ class Prefs {
 			
 			defaults.removeObject(forKey: oldKey)
 		}
-	}
-}
-
-extension UserDefaults {
-
-	@objc fileprivate var theme: Data? {
-		get { data(forKey: Key.theme.rawValue) }
-		set { set(newValue, forKey: Key.theme.rawValue) }
-	}
-
-	@objc fileprivate var defaultPaymentDescription: String? {
-		get { string(forKey: Key.defaultPaymentDescription.rawValue) }
-		set { setValue(newValue, forKey: Key.defaultPaymentDescription.rawValue) }
-	}
-
-	@objc fileprivate var invoiceExpirationDays: Int {
-		get { integer(forKey: Key.invoiceExpirationDays.rawValue) }
-		set { set(newValue, forKey: Key.invoiceExpirationDays.rawValue) }
-	}
-
-	@objc fileprivate var hideAmounts: Bool {
-		get { bool(forKey: Key.hideAmounts.rawValue) }
-		set { set(newValue, forKey: Key.hideAmounts.rawValue) }
-	}
-	
-	@objc fileprivate var showOriginalFiatAmount: Bool {
-		get { bool(forKey: Key.showOriginalFiatAmount.rawValue) }
-		set { set(newValue, forKey: Key.showOriginalFiatAmount.rawValue) }
-	}
-	
-	@objc fileprivate var recentPaymentsConfig: Data? {
-		get { data(forKey: Key.recentPaymentsConfig.rawValue) }
-		set { set(newValue, forKey: Key.recentPaymentsConfig.rawValue) }
-	}
-
-	@objc fileprivate var isNewWallet: Bool {
-		get { bool(forKey: Key.isNewWallet.rawValue) }
-		set { set(newValue, forKey: Key.isNewWallet.rawValue) }
-	}
-
-	@objc fileprivate var recentTipPercents: Data? {
-		get { data(forKey: Key.recentTipPercents.rawValue) }
-		set { set(newValue, forKey: Key.recentTipPercents.rawValue) }
-	}
-	
-	@objc fileprivate var hasMergedChannelsForSplicing: Bool {
-		get { bool(forKey: Key.hasMergedChannelsForSplicing.rawValue) }
-		set { set(newValue, forKey: Key.hasMergedChannelsForSplicing.rawValue) }
-	}
-	
-	@objc fileprivate var swapInAddressIndex: Int {
-		get { integer(forKey: Key.swapInAddressIndex.rawValue) }
-		set { set(newValue, forKey: Key.swapInAddressIndex.rawValue) }
-	}
-  
-	@objc fileprivate var hasUpgradedSeedCloudBackups: Bool {
-		get { bool(forKey: Key.hasUpgradedSeedCloudBackups_v2.rawValue) }
-		set { set(newValue, forKey: Key.hasUpgradedSeedCloudBackups_v2.rawValue) }
-	}
-	
-	@objc fileprivate var serverMessageReadIndex: NSNumber? {
-		get { object(forKey: Key.serverMessageReadIndex.rawValue) as? NSNumber }
-		set { set(newValue, forKey: Key.serverMessageReadIndex.rawValue) }
-	}
-	
-	@objc fileprivate var allowOverpayment: Bool {
-		get { bool(forKey: Key.allowOverpayment.rawValue) }
-		set { set(newValue, forKey: Key.allowOverpayment.rawValue) }
-	}
-
-	@objc fileprivate var doNotShowChannelImpactWarning: Bool {
-		get { bool(forKey: Key.doNotShowChannelImpactWarning.rawValue) }
-		set { set(newValue, forKey: Key.doNotShowChannelImpactWarning.rawValue) }
 	}
 }

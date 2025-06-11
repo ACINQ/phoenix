@@ -69,11 +69,7 @@ struct AppAccessView : View {
 		_spendingPinEnabled = State(initialValue: enabledSecurity.contains(.spendingPin))
 		_spendingPinSet = State(initialValue: enabledSecurity.contains(.spendingPin))
 		
-		if let walletId = Biz.walletId {
-			backupSeedStatePublisher = Prefs.shared.backupSeedStatePublisher(walletId)
-		} else {
-			backupSeedStatePublisher = PassthroughSubject<BackupSeedState, Never>().eraseToAnyPublisher()
-		}
+		backupSeedStatePublisher = Prefs.current.backupSeedStatePublisher()
 	}
 	
 	// --------------------------------------------------

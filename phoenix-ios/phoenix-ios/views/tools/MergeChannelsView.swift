@@ -605,7 +605,7 @@ struct MergeChannelsView: View {
 	func closeView() {
 		log.trace("closeView()")
 		
-		Prefs.shared.hasMergedChannelsForSplicing = true
+		Prefs.current.hasMergedChannelsForSplicing = true
 		if location == .sheet {
 			presentationMode.wrappedValue.dismiss()
 		}
