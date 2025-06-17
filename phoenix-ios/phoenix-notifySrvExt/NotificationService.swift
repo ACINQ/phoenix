@@ -27,6 +27,7 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
  *
  * This means that the following instances are recycled (continue existing in memory):
  * - PhoenixManager.shared
+ * - NotificationServiceQueue.shared
  * - XPC.shared
  */
 class NotificationService: UNNotificationServiceExtension {
@@ -48,7 +49,7 @@ class NotificationService: UNNotificationServiceExtension {
 	}
 	
 	private var contentHandler: ((UNNotificationContent) -> Void)?
-	private var bestAttemptContent: UNMutableNotificationContent?
+	private var remoteNotificationContent: UNMutableNotificationContent?
 	
 	private var xpcStarted: Bool = false
 	private var phoenixStarted: Bool = false
@@ -77,7 +78,7 @@ class NotificationService: UNNotificationServiceExtension {
 		log.trace("request.content.userInfo: \(request.content.userInfo)")
 		
 		self.contentHandler = contentHandler
-		self.bestAttemptContent = (request.content.mutableCopy() as? UNMutableNotificationContent)
+		self.remoteNotificationContent = (request.content.mutableCopy() as? UNMutableNotificationContent)
 		
 		// IMPORTANT: This function is called on a NON-main thread.
 		// 
@@ -101,7 +102,7 @@ class NotificationService: UNNotificationServiceExtension {
 		
 		// IMPORTANT: This function is called on a NON-main thread.
 		DispatchQueue.main.async {
-			self.displayPushNotification()
+			self.finish()
 		}
 	}
 	
@@ -188,7 +189,7 @@ class NotificationService: UNNotificationServiceExtension {
 		// }
 		
 		if let reason = userInfo["reason"] as? String {
-			log.debug("reason: (\(reason))")
+			log.debug("userInfo.reason: '\(reason)'")
 			
 			switch reason {
 				case "IncomingPayment"       : pushNotificationReason = .incomingPayment
@@ -197,7 +198,7 @@ class NotificationService: UNNotificationServiceExtension {
 				default                      : pushNotificationReason = .unknown
 			}
 		} else {
-			log.debug("reason: !string")
+			log.debug("userInfo.reason: !string")
 			pushNotificationReason = .unknown
 		}
 		
@@ -214,7 +215,7 @@ class NotificationService: UNNotificationServiceExtension {
 		pushNotificationReason = .unknown
 		log.debug("pushNotificationReason = \(pushNotificationReason)")
 		
-		return displayPushNotification()
+		return finish()
 	}
 	
 	// --------------------------------------------------
@@ -242,9 +243,9 @@ class NotificationService: UNNotificationServiceExtension {
 			repeats          : false
 		) {[weak self](_: Timer) -> Void in
 			
-			if let self = self {
+			if let self {
 				log.debug("totalTimer.fire()")
-				self.displayPushNotification()
+				self.finish()
 			}
 		}
 	}
@@ -298,9 +299,9 @@ class NotificationService: UNNotificationServiceExtension {
 			repeats          : false
 		) {[weak self](_: Timer) -> Void in
 			
-			if let self = self {
+			if let self {
 				log.debug("postReceivedPaymentTimer.fire()")
-				self.displayPushNotification()
+				self.finish()
 			}
 		}
 	}
@@ -367,7 +368,7 @@ class NotificationService: UNNotificationServiceExtension {
 				// Because whatever we emit from this app extension won't be displayed to the user.
 				// That is, the modified push content we emit isn't actually shown to the user.
 				
-				displayPushNotification()
+				finish()
 			}
 		}
 	}
@@ -455,8 +456,8 @@ class NotificationService: UNNotificationServiceExtension {
 	// MARK: Finish
 	// --------------------------------------------------
 	
-	private func displayPushNotification() {
-		log.trace("displayPushNotification()")
+	private func finish() {
+		log.trace("finish()")
 		assertMainThread()
 		
 		guard !srvExtDone else {
@@ -464,8 +465,8 @@ class NotificationService: UNNotificationServiceExtension {
 		}
 		srvExtDone = true
 		
-		guard let contentHandler, let bestAttemptContent else {
-			log.error("displayPushNotification(): invalid state")
+		guard let contentHandler, let remoteNotificationContent else {
+			log.error("finish(): invalid state")
 			return
 		}
 		
@@ -478,113 +479,142 @@ class NotificationService: UNNotificationServiceExtension {
 		stopXpc()
 		stopPhoenix()
 		
-		updateBestAttemptContent()
-		contentHandler(bestAttemptContent)
+		updateRemoteNotificationContent(remoteNotificationContent)
+		displayLocalNotificationsForAdditionalPayments()
+		contentHandler(remoteNotificationContent)
 	}
 	
-	private func updateBestAttemptContent() {
-		log.trace("updateBestAttemptContent_incomingPayment()")
+	private func updateRemoteNotificationContent(
+		_ content: UNMutableNotificationContent
+	) {
+		log.trace("updateRemoteNotificationContent()")
+		
+		// The first thing we need to do is switch on the type of notification that we received
 		
 		switch pushNotificationReason {
 		case .incomingPayment:
 			// We expected to receive 1 or more incoming payments
-			updateBestAttemptContent_incomingPayment()
+			
+			if let item = NotificationServiceQueue.shared.dequeue() {
+				updateNotificationContent_localNotification(content, item)
+			} else if let payment = popFirstReceivedPayment() {
+				updateNotificationContent_receivedPayment(content, payment)
+			} else {
+				updateNotificationContent_missedPayment(content)
+			}
 		
 		case .incomingOnionMessage:
 			// This is probably an incoming Bolt 12 payment.
 			// But it could be anything, so let's code defensively.
 			
-			if !receivedPayments.isEmpty {
-				updateBestAttemptContent_incomingPayment()
+			if let item = NotificationServiceQueue.shared.dequeue() {
+				updateNotificationContent_localNotification(content, item)
+			} else if let payment = popFirstReceivedPayment() {
+				updateNotificationContent_receivedPayment(content, payment)
 			} else {
-				updateBestAttemptContent_unknown()
+				updateNotificationContent_unknown(content)
 			}
 			
 		case .pendingSettlement:
-			updateBestAttemptContent_incomingPayment()
+			updateNotificationContent_pendingSettlement(content)
 		
 		case .unknown:
-			updateBestAttemptContent_incomingPayment()
+			updateNotificationContent_unknown(content)
 		}
 	}
 	
-	private func updateBestAttemptContent_incomingPayment() {
-		log.trace("updateBestAttemptContent_incomingPayment()")
+	private func displayLocalNotificationsForAdditionalPayments() {
+		log.trace("displayLocalNotificationsForAdditionalPayments()")
 		
-		guard let bestAttemptContent else {
-			log.warning("updateBestAttemptContent: bestAttemptContent is nil")
-			return
-		}
-		
-		if receivedPayments.isEmpty {
+		for additionalPayment in receivedPayments {
+			log.debug("processing additional payment...")
 			
-			if pushNotificationReason == .pendingSettlement {
-				bestAttemptContent.title = String(localized: "Please start Phoenix", comment: "")
-				bestAttemptContent.body = String(localized: "An incoming settlement is pending.", comment: "")
-			} else {
-				bestAttemptContent.title = String(localized: "Missed incoming payment", comment: "")
-			}
+			let identifier = UUID().uuidString
+			let content = UNMutableNotificationContent()
+			updateNotificationContent_receivedPayment(content, additionalPayment)
 			
-		} else { // received 1 or more payments
+			// Display local notification
+			let request = UNNotificationRequest(identifier: identifier, content: content, trigger: nil)
+			UNUserNotificationCenter.current().add(request)
 			
-			var msat: Int64 = 0
-			for payment in receivedPayments {
-				msat += payment.amount.msat
-			}
-			
-			let amountString = formatAmount(msat: msat)
-			
-			if receivedPayments.count == 1 {
-				bestAttemptContent.title = String(
-					localized: "Received payment",
-					comment: "Push notification title"
-				)
-				
-				if !GroupPrefs.shared.discreetNotifications {
-					let paymentInfo = WalletPaymentInfo(
-						payment: receivedPayments.first!,
-						metadata: WalletPaymentMetadata.empty(),
-						contact: nil
-					)
-					if let desc = paymentInfo.paymentDescription(), desc.count > 0 {
-						bestAttemptContent.body = "\(amountString): \(desc)"
-					} else {
-						bestAttemptContent.body = amountString
-					}
-				}
-				
-				if let payment = receivedPayments.first {
-					bestAttemptContent.targetContentIdentifier = payment.id.description()
-				}
-				
-			} else {
-				bestAttemptContent.title = String(
-					localized: "Received multiple payments",
-					comment: "Push notification title"
-				)
-				
-				if !GroupPrefs.shared.discreetNotifications {
-					bestAttemptContent.body = amountString
-				}
-			}
-			
-			// The user can independently enable/disable:
-			// - alerts
-			// - badges
-			// So we may only be able to badge the app icon, and that's it.
-			
-			GroupPrefs.shared.badgeCount += receivedPayments.count
-			bestAttemptContent.badge = NSNumber(value: GroupPrefs.shared.badgeCount)
+			// Add to queue
+			NotificationServiceQueue.shared.enqueue(identifier: identifier, content: content)
 		}
 	}
-
-	private func updateBestAttemptContent_unknown() {
-		log.trace("updateBestAttemptContent_unknown()")
+	
+	// --------------------------------------------------
+	// MARK: Notification Content
+	// --------------------------------------------------
+	
+	private func updateNotificationContent_localNotification(
+		_ content: UNMutableNotificationContent,
+		_ item: NotificationServiceQueue.Item
+	) {
+		log.trace("updateNotification_localNotification()")
 		
-		guard let bestAttemptContent else {
-			log.warning("updateBestAttemptContent: bestAttemptContent is nil")
-			return
+		content.title = item.content.title
+		content.body = item.content.body
+		content.badge = item.content.badge
+		content.targetContentIdentifier = item.content.targetContentIdentifier
+		
+		UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [item.identifier])
+	}
+	
+	private func updateNotificationContent_receivedPayment(
+		_ content: UNMutableNotificationContent,
+		_ payment: Lightning_kmpIncomingPayment
+	) {
+		log.trace("updateNotificationContent_incomingPayment()")
+		
+		content.title = String(localized: "Received payment", comment: "Push notification title")
+			
+		if !GroupPrefs.shared.discreetNotifications {
+			let paymentInfo = WalletPaymentInfo(
+				payment: payment,
+				metadata: WalletPaymentMetadata.empty(),
+				contact: nil
+			)
+			
+			let amountString = formatAmount(msat: payment.amount.msat)
+			if let desc = paymentInfo.paymentDescription(), desc.count > 0 {
+				content.body = "\(amountString): \(desc)"
+			} else {
+				content.body = amountString
+			}
 		}
+		
+		content.targetContentIdentifier = payment.id.description()
+		
+		// The user can independently enable/disable:
+		// - alerts
+		// - badges
+		// So we may only be able to badge the app icon, and that's it.
+		
+		GroupPrefs.shared.badgeCount += 1
+		content.badge = NSNumber(value: GroupPrefs.shared.badgeCount)
+	}
+	
+	private func updateNotificationContent_missedPayment(
+		_ content: UNMutableNotificationContent
+	) {
+		log.trace("updateNotificationContent_missedPayment()")
+		
+		content.title = String(localized: "Missed incoming payment", comment: "")
+	}
+	
+	private func updateNotificationContent_pendingSettlement(
+		_ content: UNMutableNotificationContent
+	) {
+		log.trace("updateNotificationContent_pendingSettlement")
+		
+		content.title = String(localized: "Please start Phoenix", comment: "")
+		content.body = String(localized: "An incoming settlement is pending.", comment: "")
+	}
+	
+	private func updateNotificationContent_unknown(
+		_ content: UNMutableNotificationContent
+	) {
+		log.trace("updateNotificationContent_unknown()")
 		
 		let fiatCurrency = GroupPrefs.shared.fiatCurrency
 		let exchangeRate = PhoenixManager.shared.exchangeRate(fiatCurrency: fiatCurrency)
@@ -592,12 +622,25 @@ class NotificationService: UNNotificationServiceExtension {
 		if let exchangeRate {
 			let fiatAmt = Utils.formatFiat(amount: exchangeRate.price, fiatCurrency: exchangeRate.fiatCurrency)
 			
-			bestAttemptContent.title = String(localized: "Current bitcoin price", comment: "")
-			bestAttemptContent.body = fiatAmt.string
+			content.title = String(localized: "Current bitcoin price", comment: "")
+			content.body = fiatAmt.string
 			
 		} else {
-			bestAttemptContent.title = String(localized: "Current bitcoin price", comment: "")
-			bestAttemptContent.body = "?"
+			content.title = String(localized: "Current bitcoin price", comment: "")
+			content.body = "?"
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Utils
+	// --------------------------------------------------
+	
+	private func popFirstReceivedPayment() -> Lightning_kmpIncomingPayment? {
+		
+		if receivedPayments.isEmpty {
+			return nil
+		} else {
+			return receivedPayments.removeFirst()
 		}
 	}
 	
