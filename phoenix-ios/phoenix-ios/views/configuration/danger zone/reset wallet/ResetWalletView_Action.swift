@@ -453,14 +453,14 @@ struct ResetWalletView_Action: View {
 		log.trace("action_deleteTransactionHistory()")
 		
 		self.deleteTxHistoryState = .disablingPref
-		Prefs.shared.backupTransactions.isEnabled = false
+		Prefs.current.backupTransactions.isEnabled = false
 	}
 	
 	func action_deleteSeedBackup() {
 		log.trace("action_deleteSeedBackup()")
 		
 		self.deleteSeedState = .disablingPref
-		Prefs.shared.backupSeed.isEnabled = false
+		Prefs.current.backupSeed.isEnabled = false
 	}
 	
 	func action_deleteLocalData() {

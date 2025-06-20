@@ -273,8 +273,8 @@ struct RestoreView: View {
 		AppSecurity.shared.addKeychainEntry(recoveryPhrase: recoveryPhrase) { (error: Error?) in
 			if error == nil {
 				Biz.loadWallet(
-					recoveryPhrase: recoveryPhrase,
-					walletRestoreType: .fromCloudBackup(name: seedBackup.name)
+					trigger: .restoreFromCloudBackup(name: seedBackup.name),
+					recoveryPhrase: recoveryPhrase
 				)
 			}
 		}

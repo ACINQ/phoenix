@@ -171,7 +171,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		// List for changes to the themePublisher,
 		// and update the windows accordingly.
 		//
-		Prefs.shared.themePublisher.sink {[weak self](theme: Theme) in
+		Prefs.global.themePublisher.sink {[weak self](theme: Theme) in
 			
 			guard let self = self else {
 				return
@@ -234,12 +234,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 				
 				// Apple doesn't specify which thread this notification is posted on.
 				// Should be the main thread, but just in case, let's be safe.
-				if Thread.isMainThread {
+				runOnMainThread {
 					LockState.shared.protectedDataAvailable = true
-				} else {
-					DispatchQueue.main.async {
-						LockState.shared.protectedDataAvailable = true
-					}
 				}
 			}.store(in: &cancellables)
 		}
@@ -282,14 +278,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 				// So we perform a standard wallet reset (which clears all values).
 				AppSecurity.shared.resetWallet()
 				
-			} else {
-				// The user has a wallet. (UI may or may not be locked.)
-				LockState.shared.walletExistence = .exists
-			}
-			
-			if let recoveryPhrase {
-				// Load wallet into memory. (UI may or may not be locked.)
-				Biz.loadWallet(recoveryPhrase: recoveryPhrase)
+			} else if let recoveryPhrase {
+				// The user has a wallet.
+				// Load it into memory immediately.
+				// The UI may or may not be locked.
+				Biz.loadWallet(trigger: .appLaunch, recoveryPhrase: recoveryPhrase)
 			}
 		
 			if let error = error {
@@ -397,7 +390,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 			// prevent your UI from supporting the system color prior to app re-launch.
 			// There may be other variations I didn't try, but this solution is currently the most stable.
 			//
-			window?.overrideUserInterfaceStyle = Prefs.shared.theme.toInterfaceStyle()
+			window?.overrideUserInterfaceStyle = Prefs.global.theme.toInterfaceStyle()
 		}
 		
 		window?.makeKeyAndVisible()
@@ -443,7 +436,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 			lockWindow = UIWindow(windowScene: windowScene)
 			lockWindow?.rootViewController = controller
 			lockWindow?.tintColor = UIColor.appAccent
-			lockWindow?.overrideUserInterfaceStyle = Prefs.shared.theme.toInterfaceStyle()
+			lockWindow?.overrideUserInterfaceStyle = Prefs.global.theme.toInterfaceStyle()
 			lockWindow?.windowLevel = .alert + 1
 		}
 		
@@ -509,7 +502,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 			resetWalletWindow = UIWindow(windowScene: windowScene)
 			resetWalletWindow?.rootViewController = controller
 			resetWalletWindow?.tintColor = UIColor.appAccent
-			resetWalletWindow?.overrideUserInterfaceStyle = Prefs.shared.theme.toInterfaceStyle()
+			resetWalletWindow?.overrideUserInterfaceStyle = Prefs.global.theme.toInterfaceStyle()
 			resetWalletWindow?.windowLevel = .normal + 1
 		}
 		
@@ -546,7 +539,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 			errorWindow = UIWindow(windowScene: windowScene)
 			errorWindow?.rootViewController = controller
 			errorWindow?.tintColor = UIColor.appAccent
-			errorWindow?.overrideUserInterfaceStyle = Prefs.shared.theme.toInterfaceStyle()
+			errorWindow?.overrideUserInterfaceStyle = Prefs.global.theme.toInterfaceStyle()
 			errorWindow?.windowLevel = .alert + 1
 		}
 		

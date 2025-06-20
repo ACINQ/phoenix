@@ -13,7 +13,7 @@ struct ContentView: View {
 	@ObservedObject var lockState = LockState.shared
 	@State var unlockedOnce = false
 	
-	@State var hasMergedChannelsForSplicing = Prefs.shared.hasMergedChannelsForSplicing
+	@State var hasMergedChannelsForSplicing = false
 	
 	@EnvironmentObject var shortSheetState: ShortSheetState
 	@State var shortSheetItem: ShortSheetItem? = nil
@@ -31,6 +31,7 @@ struct ContentView: View {
 				primaryView()
 					.zIndex(0) // needed for proper animation
 					.onAppear {
+						log.debug("unlockedOnce = true")
 						unlockedOnce = true
 					}
 					.accessibilityHidden(shortSheetItem != nil || popoverItem != nil)
@@ -62,9 +63,6 @@ struct ContentView: View {
 		} // </ZStack>
 		.onChange(of: lockState.walletExistence) { (newValue: WalletExistence) in
 			walletExistenceChanged(newValue)
-		}
-		.onReceive(Prefs.shared.hasMergedChannelsForSplicingPublisher) { (newValue: Bool) in
-			hasMergedChannelsForSplicing = newValue
 		}
 		.onReceive(shortSheetState.itemPublisher) { (item: ShortSheetItem?) in
 			withAnimation {
@@ -104,14 +102,29 @@ struct ContentView: View {
 	func walletExistenceChanged(_ value: WalletExistence) {
 		log.trace("walletExistenceChanged(value = \(value))")
 		
-		if value == .doesNotExist {
-			Prefs.shared.hasMergedChannelsForSplicing = true
-		}
-	}
-	
-	func hasMergedChannelsForSplicingChanged(_ value: Bool) {
-		log.trace("hasMergedChannelsForSplicingChanged(value = \(value))")
+		// In this view, we are only focused on a very narrow use-case:
+		// - IF the wallet is already loaded (restored wallets don't apply here)
+		// - AND we've never performed the merge-channels operation on it before
+		// - THEN we display the MergeChannelsView in full-screen mode.
+		//
+		// In all other situations (e.g. user creates new wallet, user restores existing wallet),
+		// the MergeChannelsView should NOT be displayed from this location.
 		
-		hasMergedChannelsForSplicing = value
+		switch value {
+		case .unknown:
+			hasMergedChannelsForSplicing = false
+		case .doesNotExist:
+			hasMergedChannelsForSplicing = true
+			Prefs.current.hasMergedChannelsForSplicing = true
+			//    ^^^^^^^ will get synced to the wallet-specific prefs when the user creates/restores one
+		case .exists(let walletId):
+			if !unlockedOnce {
+				log.debug("unlockedOnce == false; updating hasMergedChannelsForSplicing...")
+				hasMergedChannelsForSplicing = Prefs.wallet(walletId).hasMergedChannelsForSplicing
+				log.debug("hasMergedChannelsForSplicing = \(hasMergedChannelsForSplicing)")
+			} else {
+				log.debug("unlockedOnce == true; skipping hasMergedChannelsForSplicing update")
+			}
+		}
 	}
 }

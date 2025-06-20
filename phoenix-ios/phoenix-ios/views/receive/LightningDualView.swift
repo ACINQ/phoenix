@@ -41,7 +41,7 @@ struct LightningDualView: View {
 	@State var notificationPermissions = NotificationsManager.shared.permissions.value
 	
 	@State var modificationAmount: CurrencyAmount? = nil
-	@State var description: String = Prefs.shared.defaultPaymentDescription ?? ""
+	@State var description: String = Prefs.current.defaultPaymentDescription ?? ""
 	
 	@State var amountMsat: Lightning_kmpMilliSatoshi? = nil
 	@State var needsUpdateInvoiceOrOffer: Bool = true
@@ -66,12 +66,13 @@ struct LightningDualView: View {
 	@Namespace private var qrCodeAnimation_inner
 	@Namespace private var qrCodeAnimation_outer
 	
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
+	
 	@Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
 	@Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	@EnvironmentObject var popoverState: PopoverState
 	@EnvironmentObject var smartModalState: SmartModalState
@@ -689,7 +690,7 @@ struct LightningDualView: View {
 			mvi.intent(Receive.IntentAsk(
 				amount: amountMsat,
 				desc: finalDesc,
-				expirySeconds: Prefs.shared.invoiceExpirationSeconds
+				expirySeconds: Prefs.current.invoiceExpirationSeconds
 			))
 			
 		} else {

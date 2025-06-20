@@ -15,10 +15,7 @@ struct InitializationView: MVIView {
 		case RestoreView
 	}
 	
-	@StateObject var mvi = MVIState({ $0.initialization() })
-	
-	@Environment(\.controllerFactory) var factoryEnv
-	var factory: ControllerFactory { return factoryEnv }
+	@StateObject var mvi = MVIState({ Biz.business.controllers.initialization() })
 
 	@State var mnemonicLanguage = Biz.mnemonicLanguagePublisher.value
 	
@@ -62,7 +59,7 @@ struct InitializationView: MVIView {
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
 			
-			if BusinessManager.showTestnetBackground {
+			if Biz.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
@@ -224,7 +221,7 @@ struct InitializationView: MVIView {
 	// --------------------------------------------------
 	
 	var logoImageName: String {
-		if BusinessManager.isTestnet {
+		if Biz.isTestnet {
 			return "logo_blue"
 		} else {
 			return "logo_green"
@@ -270,7 +267,7 @@ struct InitializationView: MVIView {
 
 		AppSecurity.shared.addKeychainEntry(recoveryPhrase: recoveryPhrase) { (error: Error?) in
 			if error == nil {
-				Biz.loadWallet(recoveryPhrase: recoveryPhrase, seed: model.seed)
+				Biz.loadWallet(trigger: .newWallet, recoveryPhrase: recoveryPhrase, seed: model.seed)
 			}
 		}
 	}

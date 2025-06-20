@@ -5,9 +5,7 @@ import SwiftUI
 struct GlobalEnvironment: ViewModifier {
 	
 	static var deviceInfo = DeviceInfo()
-	static var currencyPrefs = CurrencyPrefs()
 	static var deepLinkManager = DeepLinkManager()
-	static var controllerFactory = Biz.business.controllers
 	
 	let popoverState: PopoverState
 	let shortSheetState: ShortSheetState
@@ -38,9 +36,7 @@ struct GlobalEnvironment: ViewModifier {
 	
 	static func reset() {
 		deviceInfo = DeviceInfo()
-		currencyPrefs = CurrencyPrefs()
 		deepLinkManager = DeepLinkManager()
-		controllerFactory = Biz.business.controllers
 		instance_main = nil
 		instance_sheet = nil
 	}
@@ -57,9 +53,7 @@ struct GlobalEnvironment: ViewModifier {
 	func body(content: Self.Content) -> some View {
 		content
 			.environmentObject(Self.deviceInfo)
-			.environmentObject(Self.currencyPrefs)
 			.environmentObject(Self.deepLinkManager)
-			.environment(\.controllerFactory, Self.controllerFactory)
 			.environmentObject(self.popoverState)
 			.environmentObject(self.shortSheetState)
 			.environmentObject(self.smartModalState)

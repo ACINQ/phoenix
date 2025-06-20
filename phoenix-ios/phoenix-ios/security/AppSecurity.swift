@@ -108,13 +108,8 @@ class AppSecurity {
 	
 	private func publishEnabledSecurity(_ value: EnabledSecurity) {
 		
-		let block = {
+		runOnMainThread {
 			self.enabledSecurityPublisher.send(value)
-		}
-		if Thread.isMainThread {
-			block()
-		} else {
-			DispatchQueue.main.async { block() }
 		}
 	}
 	
@@ -1347,14 +1342,9 @@ class AppSecurity {
 				
 				// Apple doesn't specify which thread this notification is posted on.
 				// Should be the main thread, but just in case, let's be safe.
-				if Thread.isMainThread {
+				runOnMainThread {
 					self.migrateKeychainItemToSharedGroup()
 					completionPublisher.value -= 1
-				} else {
-					DispatchQueue.main.async {
-						self.migrateKeychainItemToSharedGroup()
-						completionPublisher.value -= 1
-					}
 				}
 				
 				cancellables.removeAll()

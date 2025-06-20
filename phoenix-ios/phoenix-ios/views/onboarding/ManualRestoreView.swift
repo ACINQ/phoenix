@@ -10,10 +10,7 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct ManualRestoreView: MVIView {
 
-	@StateObject var mvi = MVIState({ $0.restoreWallet() })
-	
-	@Environment(\.controllerFactory) var factoryEnv
-	var factory: ControllerFactory { return factoryEnv }
+	@StateObject var mvi = MVIState({ Biz.business.controllers.restoreWallet() })
 	
 	@State var acceptedWarning = false
 	
@@ -42,7 +39,7 @@ struct ManualRestoreView: MVIView {
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
 
-			if BusinessManager.showTestnetBackground {
+			if Biz.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
@@ -91,9 +88,9 @@ struct ManualRestoreView: MVIView {
 		AppSecurity.shared.addKeychainEntry(recoveryPhrase: recoveryPhrase) { (error: Error?) in
 			if error == nil {
 				Biz.loadWallet(
+					trigger: .restoreFromManualEntry,
 					recoveryPhrase: recoveryPhrase,
-					seed: model.seed,
-					walletRestoreType: .fromManualEntry
+					seed: model.seed
 				)
 			}
 		}

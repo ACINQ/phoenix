@@ -288,7 +288,7 @@ struct LockView: View {
 	// --------------------------------------------------
 	
 	var logoImageName: String {
-		if BusinessManager.isTestnet {
+		if Biz.isTestnet {
 			return "logo_blue"
 		} else {
 			return "logo_green"
@@ -568,7 +568,7 @@ struct LockView: View {
 		log.trace("closeLockView()")
 		assertMainThread()
 		
-		Biz.loadWallet(recoveryPhrase: recoveryPhrase)
+		Biz.loadWallet(trigger: .appUnlock, recoveryPhrase: recoveryPhrase)
 		withAnimation(.easeInOut) {
 			lockState.isUnlocked = true
 		}

@@ -20,7 +20,7 @@ struct CurrencyConverterRow: View, ViewName {
 	
 	@State var isInvalidAmount: Bool = false
 	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
 	
 	enum Field: Hashable {
 		case amountTextfield

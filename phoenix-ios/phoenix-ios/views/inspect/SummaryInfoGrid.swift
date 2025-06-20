@@ -32,8 +32,9 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 	let maxKeyColumnWidth: CGFloat = 200
 	// </InfoGridView Protocol>
 	
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
+	
 	@Environment(\.openURL) var openURL
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	// --------------------------------------------------
 	// MARK: View Builders

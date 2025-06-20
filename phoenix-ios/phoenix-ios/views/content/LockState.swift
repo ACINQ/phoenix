@@ -1,12 +1,12 @@
 import Foundation
 
-enum WalletExistence: CustomStringConvertible {
+enum WalletExistence: Equatable, CustomStringConvertible {
 	
 	/// We don't know if a wallet exists or not.
 	/// We're still waiting for initialization to complete.
 	case unknown
 	
-	case exists
+	case exists(walletId: WalletIdentifier)
 	case doesNotExist
 	
 	var description: String {

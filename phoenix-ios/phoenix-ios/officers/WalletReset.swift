@@ -214,10 +214,8 @@ class WalletReset {
 		log.trace("step4()")
 		progress.send(.resetingUserDefaults)
 		
-		let walletId = Biz.walletId!
-		
-		Prefs.shared.resetWallet(walletId)
-		GroupPrefs.shared.resetWallet()
+		Prefs.current.resetWallet()
+		GroupPrefs.current.resetWallet()
 		
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
 			self.step5()
@@ -253,7 +251,7 @@ class WalletReset {
 		LockState.shared.isUnlocked = true
 		
 		// walletExistence = .doesNotExist => User prompted to create/restore wallet => does not need upgrade screen
-		Prefs.shared.hasMergedChannelsForSplicing = true
+		Prefs.current.hasMergedChannelsForSplicing = true
 		
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
 			self.finish()

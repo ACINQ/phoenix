@@ -1,7 +1,7 @@
 import Foundation
 import PhoenixShared
 
-struct WalletIdentifier {
+struct WalletIdentifier: Equatable {
 	let chain: Bitcoin_kmpChain
 	let encryptedNodeId: String
 	

@@ -51,7 +51,7 @@ class AppMigration {
 		//
 		if previousBuild.isVersion(lessThan: "40") {
 			migrateDbFilesToGroup()
-			GroupPrefs.shared.performMigration("40", completionPublisher)
+			GroupPrefs.performMigration("40", completionPublisher)
 			AppSecurity.shared.performMigration("40", completionPublisher)
 		}
 		
@@ -66,13 +66,36 @@ class AppMigration {
 		// - recentPaymentsSeconds -> recentPayments (enum)
 		//
 		if previousBuild.isVersion(lessThan: "44") {
-			Prefs.shared.performMigration("44", completionPublisher)
+			Prefs.performMigration("44", completionPublisher)
 		}
 		
 		// v2.0.6 (build 65)
 		// - UserDefault value (liquidityPolicy) moved to shared group
 		if currentBuild.isVersion(greaterThanOrEqualTo: "65") && previousBuild.isVersion(lessThan: "65") {
-			GroupPrefs.shared.performMigration("65", completionPublisher)
+			GroupPrefs.performMigration("65", completionPublisher)
+		}
+		
+		// v2.7.0 (build 92)
+		// - Prefs & GroupPrefs moved to wallet-specific keys
+		if currentBuild.isVersion(greaterThanOrEqualTo: "92") { //}&& previousBuild.isVersion(lessThan: "92") {
+		#if DEBUG
+			log.debug("--------------------------------------------------")
+			log.debug("# PREFS: PHASE 0:")
+			Prefs.printAllKeyValues()
+			log.debug("# GROUP_PREFS: PHASE 0:")
+			GroupPrefs.printAllKeyValues()
+			log.debug("--------------------------------------------------")
+		#endif
+			Prefs.performMigration("92", completionPublisher)
+			GroupPrefs.performMigration("92", completionPublisher)
+		#if DEBUG
+			log.debug("--------------------------------------------------")
+			log.debug("# PREFS: PHASE 1:")
+			Prefs.printAllKeyValues()
+			log.debug("# GROUP_PREFS: PHASE 1:")
+			GroupPrefs.printAllKeyValues()
+			log.debug("--------------------------------------------------")
+		#endif
 		}
 		
 		completionPublisher.value -= 1

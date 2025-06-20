@@ -11,9 +11,9 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 class NoticeMonitor: ObservableObject {
 	
-	@Published private var isNewWallet = Prefs.shared.isNewWallet
-	@Published private var backupSeed_enabled = Prefs.shared.backupSeed.isEnabled
-	@Published private var manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(Biz.walletId!)
+	@Published private var isNewWallet = Prefs.current.isNewWallet
+	@Published private var backupSeed_enabled = Prefs.current.backupSeed.isEnabled
+	@Published private var manualBackup_taskDone = Prefs.current.backupSeed.manualBackupDone
 	
 	@Published private var walletContext: WalletContext? = nil
 	
@@ -28,21 +28,21 @@ class NoticeMonitor: ObservableObject {
 	
 	init() {
 		
-		Prefs.shared.isNewWalletPublisher
+		Prefs.current.isNewWalletPublisher
 			.sink {[weak self](value: Bool) in
 				self?.isNewWallet = value
 			}
 			.store(in: &cancellables)
 		
-		Prefs.shared.backupSeed.isEnabled_publisher
+		Prefs.current.backupSeed.isEnabledPublisher
 			.sink {[weak self](enabled: Bool) in
 				self?.backupSeed_enabled = enabled
 			}
 			.store(in: &cancellables)
 		
-		Prefs.shared.backupSeed.manualBackup_taskDone_publisher
+		Prefs.current.backupSeed.manualBackupDonePublisher
 			.sink {[weak self] _ in
-				self?.manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(Biz.walletId!)
+				self?.manualBackup_taskDone = Prefs.current.backupSeed.manualBackupDone
 			}
 			.store(in: &cancellables)
 		

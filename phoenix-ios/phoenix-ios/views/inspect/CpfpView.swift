@@ -73,9 +73,10 @@ struct CpfpView: View {
 	)
 	@State var priorityBoxHeight: CGFloat? = nil
 	
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
+	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	// --------------------------------------------------

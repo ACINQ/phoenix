@@ -9,8 +9,8 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct TorConfigurationView: View {
 
-	@State var toggleState = GroupPrefs.shared.isTorEnabled
-	@State var isTorEnabled = GroupPrefs.shared.isTorEnabled
+	@State var toggleState = GroupPrefs.current.isTorEnabled
+	@State var isTorEnabled = GroupPrefs.current.isTorEnabled
 	
 	@State var ignoreToggleStateChange = false
 
@@ -116,7 +116,7 @@ struct TorConfigurationView: View {
 		log.trace("usingTorSheet_didConfirm()")
 		
 		isTorEnabled = true
-		GroupPrefs.shared.isTorEnabled = true
+		GroupPrefs.current.isTorEnabled = true
 		
 		popoverState.display(dismissable: false) {
 			RestartPopover()
@@ -134,7 +134,7 @@ struct TorConfigurationView: View {
 		log.trace("disablingTorSheet_didConfirm()")
 		
 		isTorEnabled = false
-		GroupPrefs.shared.isTorEnabled = false
+		GroupPrefs.current.isTorEnabled = false
 		
 		popoverState.display(dismissable: false) {
 			RestartPopover()

@@ -17,9 +17,10 @@ struct PaymentRequestedView: View {
 	
 	let popTo: (PopToDestination) -> Void // For iOS 16
 	
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
+	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	
 	let lastIncomingPaymentPublisher = Biz.business.paymentsManager.lastIncomingPaymentPublisher()
@@ -47,7 +48,7 @@ struct PaymentRequestedView: View {
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
 			
-			if BusinessManager.showTestnetBackground {
+			if Biz.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.ignoresSafeArea(.all, edges: .all)

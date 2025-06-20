@@ -38,8 +38,9 @@ struct LiquidityAdsView: View {
 	@State var popoverPresent_serviceFee = false
 	@State var popoverPresent_duration = false
 	
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
+	
 	@EnvironmentObject var popoverState: PopoverState
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var smartModalState: SmartModalState
 	
 	var popoverPresent: Bool {

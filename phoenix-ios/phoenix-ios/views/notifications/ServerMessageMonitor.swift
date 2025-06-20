@@ -25,7 +25,7 @@ class ServerMessageMonitor: ObservableObject {
 	
 	init() {
 		
-		Prefs.shared.serverMessageReadIndexPublisher
+		Prefs.current.serverMessageReadIndexPublisher
 			.sink {[weak self] (value: Int?) in
 				self?.readIndexDidChange(value)
 			}
