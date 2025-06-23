@@ -58,7 +58,7 @@ struct ConfigurationList: View {
 	
 	@State var didAppear = false
 	
-	@State var biometricSupport = AppSecurity.shared.deviceBiometricSupport()
+	@State var biometricSupport = AppSecurity.deviceBiometricSupport()
 	
 	// <iOS_16_workarounds>
 	@State var navLinkTag: NavLinkTag? = nil
@@ -495,7 +495,7 @@ struct ConfigurationList: View {
 		} else {
 			// Returning from subview
 			
-			biometricSupport = AppSecurity.shared.deviceBiometricSupport()
+			biometricSupport = AppSecurity.deviceBiometricSupport()
 		}
 	}
 	

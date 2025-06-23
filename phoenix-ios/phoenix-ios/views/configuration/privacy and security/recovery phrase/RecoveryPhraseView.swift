@@ -238,7 +238,7 @@ struct RecoveryPhraseList: View {
 				.disabled(isDecrypting)
 				.padding(.vertical, 5)
 				
-				let enabledSecurity = AppSecurity.shared.enabledSecurityPublisher.value
+				let enabledSecurity = AppSecurity.current.enabledSecurityPublisher.value
 				if enabledSecurity.hasAppLock() || enabledSecurity.hasSpendingPin() {
 					Text("(requires authentication)")
 						.font(.footnote)
@@ -592,7 +592,7 @@ struct RecoveryPhraseList: View {
 				AuthenticateWithPinSheet(type: type) { result in
 					switch result {
 					case .Authenticated:
-						AppSecurity.shared.tryUnlockWithKeychain { (recoveryPhrase, _, _) in
+						AppSecurity.current.tryUnlockWithKeychain { (recoveryPhrase, _, _) in
 							if let recoveryPhrase {
 								Succeed(recoveryPhrase)
 							} else {
@@ -608,9 +608,9 @@ struct RecoveryPhraseList: View {
 			}
 		}
 		
-		let enabledSecurity = AppSecurity.shared.enabledSecurityPublisher.value
+		let enabledSecurity = AppSecurity.current.enabledSecurityPublisher.value
 		if enabledSecurity == .none {
-			AppSecurity.shared.tryUnlockWithKeychain { (recoveryPhrase, _, _) in
+			AppSecurity.current.tryUnlockWithKeychain { (recoveryPhrase, _, _) in
 				if let recoveryPhrase {
 					Succeed(recoveryPhrase)
 				} else {
@@ -637,7 +637,7 @@ struct RecoveryPhraseList: View {
 		} else if enabledSecurity.contains(.biometrics) {
 			let prompt = String(localized: "Unlock your seed.", comment: "Biometrics prompt")
 			
-			AppSecurity.shared.tryUnlockWithBiometrics(prompt: prompt) { result in
+			AppSecurity.current.tryUnlockWithBiometrics(prompt: prompt) { result in
 				
 				if case .success(let recoveryPhrase) = result {
 					Succeed(recoveryPhrase)

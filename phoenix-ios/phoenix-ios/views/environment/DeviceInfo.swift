@@ -53,7 +53,7 @@ class DeviceInfo: ObservableObject {
 	}
 	
 	var isFaceID: Bool {
-		switch AppSecurity.shared.deviceBiometricSupport() {
+		switch AppSecurity.deviceBiometricSupport() {
 			case .faceID_available    : return true
 			case .faceID_notAvailable : return true
 			case .faceID_notEnrolled  : return true

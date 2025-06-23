@@ -85,7 +85,7 @@ struct ManualRestoreView: MVIView {
 			language  : model.language
 		)
 
-		AppSecurity.shared.addKeychainEntry(recoveryPhrase: recoveryPhrase) { (error: Error?) in
+		AppSecurity.current.addKeychainEntry(recoveryPhrase: recoveryPhrase) { (error: Error?) in
 			if error == nil {
 				Biz.loadWallet(
 					trigger: .restoreFromManualEntry,

@@ -239,7 +239,7 @@ struct DisablePinView: View {
 	func onAppear() {
 		log.trace("onAppear()")
 		
-		invalidPin = AppSecurity.shared.getInvalidPin(type) ?? InvalidPin.none()
+		invalidPin = AppSecurity.current.getInvalidPin(type) ?? InvalidPin.none()
 		currentDate = Date.now
 		
 		if let delay = invalidPin.waitTimeFrom(currentDate) {
@@ -275,7 +275,7 @@ struct DisablePinView: View {
 	func verifyPin() {
 		log.trace("verifyPin()")
 		
-		let correctPin = AppSecurity.shared.getPin(type)
+		let correctPin = AppSecurity.current.getPin(type)
 		if pin == correctPin {
 			handleCorrectPin()
 		} else {
@@ -291,8 +291,8 @@ struct DisablePinView: View {
 		isCorrectPin = true
 		numberPadDisabled = true
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
-			AppSecurity.shared.setInvalidPin(nil, type) { _ in }
-			AppSecurity.shared.setPin(nil, type) { error in
+			AppSecurity.current.setInvalidPin(nil, type) { _ in }
+			AppSecurity.current.setPin(nil, type) { error in
 				let result: EndResult = (error == nil) ? .PinDisabled : .Failed
 				dismissView(result)
 			}
@@ -327,7 +327,7 @@ struct DisablePinView: View {
 			newInvalidPin = invalidPin.increment()
 		}
 		
-		AppSecurity.shared.setInvalidPin(newInvalidPin, type) { _ in }
+		AppSecurity.current.setInvalidPin(newInvalidPin, type) { _ in }
 		invalidPin = newInvalidPin
 		currentDate = Date.now
 		

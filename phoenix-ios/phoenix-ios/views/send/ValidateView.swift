@@ -1758,7 +1758,7 @@ struct ValidateView: View {
 		
 		dismissKeyboardIfVisible()
 		
-		let enabledSecurity = AppSecurity.shared.enabledSecurityPublisher.value
+		let enabledSecurity = AppSecurity.current.enabledSecurityPublisher.value
 		if enabledSecurity.contains(.spendingPin) {
 			
 			smartModalState.display(dismissable: false) {

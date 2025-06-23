@@ -193,6 +193,10 @@
 		DC5F96B82E0455760052CDE6 /* GroupPrefs+Global.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96B62E0455700052CDE6 /* GroupPrefs+Global.swift */; };
 		DC5F96BA2E0457530052CDE6 /* Prefs+Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96B92E04574E0052CDE6 /* Prefs+Constants.swift */; };
 		DC5F96BB2E0457530052CDE6 /* Prefs+Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96B92E04574E0052CDE6 /* Prefs+Constants.swift */; };
+		DC5F96BD2E09D6CB0052CDE6 /* AppSecurity+Wallet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96BC2E09D6C60052CDE6 /* AppSecurity+Wallet.swift */; };
+		DC5F96C02E09D7190052CDE6 /* AppSecurity+Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96BF2E09D7130052CDE6 /* AppSecurity+Constants.swift */; };
+		DC5F96C12E09D7190052CDE6 /* AppSecurity+Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96BF2E09D7130052CDE6 /* AppSecurity+Constants.swift */; };
+		DC5F96C42E09DE700052CDE6 /* AppSecurity+Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96C22E09DE680052CDE6 /* AppSecurity+Util.swift */; };
 		DC63A3762B965D54008E040E /* InboundFeeSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC63A3752B965D54008E040E /* InboundFeeSheet.swift */; };
 		DC63BDF429AE44380067A361 /* NotificationsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC63BDF329AE44380067A361 /* NotificationsManager.swift */; };
 		DC63BDF729AEB30C0067A361 /* BackgroundPaymentsConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC63BDF629AEB30C0067A361 /* BackgroundPaymentsConfig.swift */; };
@@ -295,8 +299,6 @@
 		DCA6DECC282AAA740073C658 /* SharedSecurity.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA6DECB282AAA740073C658 /* SharedSecurity.swift */; };
 		DCA6DECD282AB10C0073C658 /* SharedSecurity.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA6DECB282AAA740073C658 /* SharedSecurity.swift */; };
 		DCA6DECE282AB12B0073C658 /* SecurityFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCACF6F82566D0BA0009B01E /* SecurityFile.swift */; };
-		DCA6DED0282AB7E20073C658 /* KeychainConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA6DECF282AB7E20073C658 /* KeychainConstants.swift */; };
-		DCA6DED1282ABA930073C658 /* KeychainConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA6DECF282AB7E20073C658 /* KeychainConstants.swift */; };
 		DCA7263B2C80BA0E00600716 /* SyncBackupManager+Payments.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA7263A2C80BA0E00600716 /* SyncBackupManager+Payments.swift */; };
 		DCA7263D2C80BC0800600716 /* SyncBackupManager+Contacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA7263C2C80BC0800600716 /* SyncBackupManager+Contacts.swift */; };
 		DCA849E02813311D000FADE1 /* aes256Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA849DF2813311D000FADE1 /* aes256Tests.swift */; };
@@ -642,6 +644,9 @@
 		DC5F96B32E04534E0052CDE6 /* GroupPrefs+Wallet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GroupPrefs+Wallet.swift"; sourceTree = "<group>"; };
 		DC5F96B62E0455700052CDE6 /* GroupPrefs+Global.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GroupPrefs+Global.swift"; sourceTree = "<group>"; };
 		DC5F96B92E04574E0052CDE6 /* Prefs+Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Prefs+Constants.swift"; sourceTree = "<group>"; };
+		DC5F96BC2E09D6C60052CDE6 /* AppSecurity+Wallet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppSecurity+Wallet.swift"; sourceTree = "<group>"; };
+		DC5F96BF2E09D7130052CDE6 /* AppSecurity+Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppSecurity+Constants.swift"; sourceTree = "<group>"; };
+		DC5F96C22E09DE680052CDE6 /* AppSecurity+Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppSecurity+Util.swift"; sourceTree = "<group>"; };
 		DC63A3752B965D54008E040E /* InboundFeeSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboundFeeSheet.swift; sourceTree = "<group>"; };
 		DC63BDF329AE44380067A361 /* NotificationsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsManager.swift; sourceTree = "<group>"; };
 		DC63BDF629AEB30C0067A361 /* BackgroundPaymentsConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundPaymentsConfig.swift; sourceTree = "<group>"; };
@@ -724,7 +729,6 @@
 		DCA5391B29F7202F001BD3D5 /* ChannelInfoPopup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelInfoPopup.swift; sourceTree = "<group>"; };
 		DCA6DEC52829BDEB0073C658 /* XPC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XPC.swift; sourceTree = "<group>"; };
 		DCA6DECB282AAA740073C658 /* SharedSecurity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedSecurity.swift; sourceTree = "<group>"; };
-		DCA6DECF282AB7E20073C658 /* KeychainConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainConstants.swift; sourceTree = "<group>"; };
 		DCA7263A2C80BA0E00600716 /* SyncBackupManager+Payments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SyncBackupManager+Payments.swift"; sourceTree = "<group>"; };
 		DCA7263C2C80BC0800600716 /* SyncBackupManager+Contacts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SyncBackupManager+Contacts.swift"; sourceTree = "<group>"; };
 		DCA849DF2813311D000FADE1 /* aes256Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = aes256Tests.swift; sourceTree = "<group>"; };
@@ -1525,17 +1529,19 @@
 		DCACF6F42566D0BA0009B01E /* security */ = {
 			isa = PBXGroup;
 			children = (
-				DCA6DECF282AB7E20073C658 /* KeychainConstants.swift */,
-				DCA6DECB282AAA740073C658 /* SharedSecurity.swift */,
 				DCACF6F72566D0BA0009B01E /* AppSecurity.swift */,
-				DCACF6F82566D0BA0009B01E /* SecurityFile.swift */,
+				DC5F96BF2E09D7130052CDE6 /* AppSecurity+Constants.swift */,
+				DC5F96C22E09DE680052CDE6 /* AppSecurity+Util.swift */,
+				DC5F96BC2E09D6C60052CDE6 /* AppSecurity+Wallet.swift */,
 				DC99E90825B78FA800FB20F7 /* EnabledSecurity.swift */,
-				DCACF6F62566D0BA0009B01E /* GenericPasswordStore.swift */,
 				DCACF6F92566D0BA0009B01E /* GenericPasswordConvertible.swift */,
-				DCACF6F52566D0BA0009B01E /* KeyStoreError.swift */,
-				DCE77A5527C5240500F0FA24 /* TLSConnectionCheck.swift */,
-				DC6ACC572B10F0220079179B /* RecoveryPhrase.swift */,
+				DCACF6F62566D0BA0009B01E /* GenericPasswordStore.swift */,
 				DC2ABAD42BEC092B00C11C9C /* InvalidPin.swift */,
+				DCACF6F52566D0BA0009B01E /* KeyStoreError.swift */,
+				DC6ACC572B10F0220079179B /* RecoveryPhrase.swift */,
+				DCACF6F82566D0BA0009B01E /* SecurityFile.swift */,
+				DCA6DECB282AAA740073C658 /* SharedSecurity.swift */,
+				DCE77A5527C5240500F0FA24 /* TLSConnectionCheck.swift */,
 			);
 			path = security;
 			sourceTree = "<group>";
@@ -2022,6 +2028,7 @@
 				DC9CF83D2D2C6D37003F3B0F /* ScrollView_18.swift in Sources */,
 				DC33C5632A7C15D40053D785 /* MainView_BigPrimary.swift in Sources */,
 				DC6F19C12C470F70004EC469 /* PickerResult.swift in Sources */,
+				DC5F96C42E09DE700052CDE6 /* AppSecurity+Util.swift in Sources */,
 				DC78A5FB2DF881FC003A7DD8 /* MultiBusinessManager.swift in Sources */,
 				DC4CBC7E2D650C5200129BDB /* DetailsInfoGrid.swift in Sources */,
 				DCEE8998288605FD00FE42DD /* PaymentCell.swift in Sources */,
@@ -2064,10 +2071,10 @@
 				DC27E4CB2791D17A00C777CC /* RecoveryPhraseView.swift in Sources */,
 				DC08FC732DAEABC20003E88C /* ByteArrayConversions.swift in Sources */,
 				DCB410892902D5BF00CE4FF9 /* PaymentsSection.swift in Sources */,
-				DCA6DED0282AB7E20073C658 /* KeychainConstants.swift in Sources */,
 				DCACF6FC2566D0BA0009B01E /* AppSecurity.swift in Sources */,
 				DC08FC232DA978050003E88C /* CapabilitiesContainer.swift in Sources */,
 				DCCD045D27EE0173007D57A5 /* EditInfoView.swift in Sources */,
+				DC5F96BD2E09D6CB0052CDE6 /* AppSecurity+Wallet.swift in Sources */,
 				DC2DC86A2906AC620079E570 /* FiatCurrencySelector.swift in Sources */,
 				DC4CBC9E2D68E6F300129BDB /* DisplayAmounts.swift in Sources */,
 				DC1D2B4B2593EB860036AD38 /* Currency.swift in Sources */,
@@ -2297,6 +2304,7 @@
 				F4AED298257A50CD009485C1 /* LogsConfigurationView.swift in Sources */,
 				DC08A51A27FB6C5F0041603B /* TopTab.swift in Sources */,
 				DC2210D72DE4F4590096D8D2 /* ToggleAlignment.swift in Sources */,
+				DC5F96C02E09D7190052CDE6 /* AppSecurity+Constants.swift in Sources */,
 				DC27E4CF2792079600C777CC /* CenterTopLineAlignment.swift in Sources */,
 				DC5E28CE2C64108A0037B3D3 /* NavigationLinkStyle.swift in Sources */,
 				DCEAE5B92943D64B00320C46 /* MsatRange.swift in Sources */,
@@ -2343,7 +2351,6 @@
 				DCEB2798282D7B070096B87E /* KotlinExtensions+Other.swift in Sources */,
 				DC641C7328208B7F00862DCD /* UserDefaults+Codable.swift in Sources */,
 				DC5F96B82E0455760052CDE6 /* GroupPrefs+Global.swift in Sources */,
-				DCA6DED1282ABA930073C658 /* KeychainConstants.swift in Sources */,
 				DCEB2796282D7AAB0096B87E /* KotlinTypes.swift in Sources */,
 				DC9130A02AE045FA00F9B8C6 /* Sequence+Sum.swift in Sources */,
 				DCCFE6C02B713FBE002FFF11 /* LogFileHandler.swift in Sources */,
@@ -2364,6 +2371,7 @@
 				DC78A6022DF8C18F003A7DD8 /* UserDefaults+DefaultValue.swift in Sources */,
 				DC641C762821716A00862DCD /* UserDefaults+Serialization.swift in Sources */,
 				DCCFE6BF2B713FBB002FFF11 /* LogFileManager.swift in Sources */,
+				DC5F96C12E09D7190052CDE6 /* AppSecurity+Constants.swift in Sources */,
 				DCF9CFD52862656E001AD33F /* Asserts.swift in Sources */,
 				DC641C7C282172BB00862DCD /* DelayedSave.swift in Sources */,
 				DCA6DECE282AB12B0073C658 /* SecurityFile.swift in Sources */,

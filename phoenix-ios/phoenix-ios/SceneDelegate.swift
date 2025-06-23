@@ -94,7 +94,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	func sceneDidEnterBackground(_ scene: UIScene) {
 		log.trace("sceneDidEnterBackground()")
 		
-		let currentSecurity = AppSecurity.shared.enabledSecurityPublisher.value
+		let currentSecurity = AppSecurity.current.enabledSecurityPublisher.value
 		if currentSecurity.hasAppLock() {
 			
 			LockState.shared.isUnlocked = false
@@ -251,7 +251,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		}
 		firstUnlockAttempted = true
 		
-		AppSecurity.shared.tryUnlockWithKeychain {
+		AppSecurity.current.tryUnlockWithKeychain {
 			(recoveryPhrase: RecoveryPhrase?, enabledSecurity: EnabledSecurity, error: UnlockError?) in
 
 			// There are multiple potential configurations:
@@ -276,7 +276,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 				// We have the same problem with the Custom PIN.
 				// And also the Bip353Address.
 				// So we perform a standard wallet reset (which clears all values).
-				AppSecurity.shared.resetWallet()
+				AppSecurity.current.resetWallet()
 				
 			} else if let recoveryPhrase {
 				// The user has a wallet.

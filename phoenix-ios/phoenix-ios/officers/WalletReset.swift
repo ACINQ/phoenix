@@ -230,7 +230,7 @@ class WalletReset {
 		log.trace("step5()")
 		progress.send(.deletingKeychainItems)
 		
-		AppSecurity.shared.resetWallet()
+		AppSecurity.current.resetWallet()
 		
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
 			self.step6()

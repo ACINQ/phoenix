@@ -239,7 +239,7 @@ struct InitializationView: MVIView {
 	func createMnemonics() -> Void {
 		log.trace("createMnemonics()")
 		
-		let swiftEntropy = AppSecurity.shared.generateEntropy()
+		let swiftEntropy = AppSecurity.generateEntropy()
 		let kotlinEntropy = swiftEntropy.toKotlinByteArray()
 		
 		let intent = Initialization.IntentGenerateWallet(
@@ -265,7 +265,7 @@ struct InitializationView: MVIView {
 			language  : model.language
 		)
 
-		AppSecurity.shared.addKeychainEntry(recoveryPhrase: recoveryPhrase) { (error: Error?) in
+		AppSecurity.current.addKeychainEntry(recoveryPhrase: recoveryPhrase) { (error: Error?) in
 			if error == nil {
 				Biz.loadWallet(trigger: .newWallet, recoveryPhrase: recoveryPhrase, seed: model.seed)
 			}

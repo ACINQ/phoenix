@@ -52,14 +52,14 @@ class AppMigration {
 		if previousBuild.isVersion(lessThan: "40") {
 			migrateDbFilesToGroup()
 			GroupPrefs.performMigration("40", completionPublisher)
-			AppSecurity.shared.performMigration("40", completionPublisher)
+			AppSecurity.current.performMigration("40", completionPublisher)
 		}
 		
 		// v1.5.2 (build 41)
 		// - hot-fix for `!protectedDataAvailable`
 		//
 		if previousBuild.isVersion(lessThan: "41") {
-			AppSecurity.shared.performMigration("41", completionPublisher)
+			AppSecurity.current.performMigration("41", completionPublisher)
 		}
 		
 		// v1.6.0 (build 44)

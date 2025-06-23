@@ -270,7 +270,7 @@ struct RestoreView: View {
 			languageCode : seedBackup.language
 		)
 		
-		AppSecurity.shared.addKeychainEntry(recoveryPhrase: recoveryPhrase) { (error: Error?) in
+		AppSecurity.current.addKeychainEntry(recoveryPhrase: recoveryPhrase) { (error: Error?) in
 			if error == nil {
 				Biz.loadWallet(
 					trigger: .restoreFromCloudBackup(name: seedBackup.name),
