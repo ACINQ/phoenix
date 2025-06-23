@@ -197,6 +197,9 @@
 		DC5F96C02E09D7190052CDE6 /* AppSecurity+Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96BF2E09D7130052CDE6 /* AppSecurity+Constants.swift */; };
 		DC5F96C12E09D7190052CDE6 /* AppSecurity+Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96BF2E09D7130052CDE6 /* AppSecurity+Constants.swift */; };
 		DC5F96C42E09DE700052CDE6 /* AppSecurity+Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96C22E09DE680052CDE6 /* AppSecurity+Util.swift */; };
+		DC5F96C62E09E6320052CDE6 /* Prefs+Keys.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96C52E09E62F0052CDE6 /* Prefs+Keys.swift */; };
+		DC5F96C72E09E6320052CDE6 /* Prefs+Keys.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96C52E09E62F0052CDE6 /* Prefs+Keys.swift */; };
+		DC5F96CA2E09F3050052CDE6 /* Prefs+Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96C82E09F3010052CDE6 /* Prefs+Util.swift */; };
 		DC63A3762B965D54008E040E /* InboundFeeSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC63A3752B965D54008E040E /* InboundFeeSheet.swift */; };
 		DC63BDF429AE44380067A361 /* NotificationsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC63BDF329AE44380067A361 /* NotificationsManager.swift */; };
 		DC63BDF729AEB30C0067A361 /* BackgroundPaymentsConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC63BDF629AEB30C0067A361 /* BackgroundPaymentsConfig.swift */; };
@@ -647,6 +650,8 @@
 		DC5F96BC2E09D6C60052CDE6 /* AppSecurity+Wallet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppSecurity+Wallet.swift"; sourceTree = "<group>"; };
 		DC5F96BF2E09D7130052CDE6 /* AppSecurity+Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppSecurity+Constants.swift"; sourceTree = "<group>"; };
 		DC5F96C22E09DE680052CDE6 /* AppSecurity+Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppSecurity+Util.swift"; sourceTree = "<group>"; };
+		DC5F96C52E09E62F0052CDE6 /* Prefs+Keys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Prefs+Keys.swift"; sourceTree = "<group>"; };
+		DC5F96C82E09F3010052CDE6 /* Prefs+Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Prefs+Util.swift"; sourceTree = "<group>"; };
 		DC63A3752B965D54008E040E /* InboundFeeSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboundFeeSheet.swift; sourceTree = "<group>"; };
 		DC63BDF329AE44380067A361 /* NotificationsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsManager.swift; sourceTree = "<group>"; };
 		DC63BDF629AEB30C0067A361 /* BackgroundPaymentsConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundPaymentsConfig.swift; sourceTree = "<group>"; };
@@ -1322,6 +1327,8 @@
 				DC641C7F2821767D00862DCD /* Prefs+BackupTransactions.swift */,
 				DC5F96B92E04574E0052CDE6 /* Prefs+Constants.swift */,
 				DC5F96AA2E0327980052CDE6 /* Prefs+Global.swift */,
+				DC5F96C52E09E62F0052CDE6 /* Prefs+Keys.swift */,
+				DC5F96C82E09F3010052CDE6 /* Prefs+Util.swift */,
 				DC5F96B02E03609D0052CDE6 /* Prefs+Wallet.swift */,
 				DCB876312735AAB500657570 /* UserDefaults+Codable.swift */,
 				DC78A6002DF8C181003A7DD8 /* UserDefaults+DefaultValue.swift */,
@@ -2017,6 +2024,7 @@
 				DC82EED629789853007A5853 /* TxHistoryExporter.swift in Sources */,
 				DC98D3982AF2AE41005BD177 /* ReceiveView.swift in Sources */,
 				DC9E7EC32A12955300A5F1D0 /* LiquidityHTML.swift in Sources */,
+				DC5F96C72E09E6320052CDE6 /* Prefs+Keys.swift in Sources */,
 				DC78A5FD2DF88D37003A7DD8 /* DownloadMonitor.swift in Sources */,
 				DC6F19BF2C46FB0F004EC469 /* NSItemProvider+Async.swift in Sources */,
 				DCCFE6C22B7140FA002FFF11 /* LoggerFactory+Foreground.swift in Sources */,
@@ -2220,6 +2228,7 @@
 				DCC3E57F2D08A63900CCDA40 /* XPC+Foreground.swift in Sources */,
 				DC99E94025BA141000FB20F7 /* LocalWebView.swift in Sources */,
 				53BEFA633D95514CA5C0422A /* ChannelsConfigurationView.swift in Sources */,
+				DC5F96CA2E09F3050052CDE6 /* Prefs+Util.swift in Sources */,
 				DCED09D42625DBC4005D5EE2 /* AnimationCompletion.swift in Sources */,
 				DCE77A5627C5240500F0FA24 /* TLSConnectionCheck.swift in Sources */,
 				DCCC7FD526B0A006008ACD9B /* SquareSize.swift in Sources */,
@@ -2347,6 +2356,7 @@
 			files = (
 				DC641C752821706600862DCD /* Currency.swift in Sources */,
 				DC641C7228208B4D00862DCD /* GroupPrefs.swift in Sources */,
+				DC5F96C62E09E6320052CDE6 /* Prefs+Keys.swift in Sources */,
 				DC78A5F92DF22ABE003A7DD8 /* NotificationServiceQueue.swift in Sources */,
 				DCEB2798282D7B070096B87E /* KotlinExtensions+Other.swift in Sources */,
 				DC641C7328208B7F00862DCD /* UserDefaults+Codable.swift in Sources */,
