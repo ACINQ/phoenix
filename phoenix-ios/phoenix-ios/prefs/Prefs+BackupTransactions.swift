@@ -8,7 +8,15 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-/// Preferences pertaining to backing up payment history in the user's own iCloud account.
+fileprivate typealias Key = PrefsKey
+
+/// Standard app preferences, stored in the iOS UserDefaults system.
+/// 
+/// This set pertains to backing up payment history in the user's own iCloud account.
+///
+/// - Note:
+/// The values here are NOT shared with other extensions bundled in the app, such as the
+/// notification-service-extension. For preferences shared with extensions, see `GroupPrefs`.
 ///
 class Prefs_BackupTransactions {
 	
@@ -41,10 +49,10 @@ class Prefs_BackupTransactions {
 	var isEnabled: Bool {
 		get {
 			maybeLogDefaultAccess(#function)
-			return defaults.bool(forKey: PrefsKey.backupTxs_enabled.value(id), defaultValue: true)
+			return defaults.bool(forKey: Key.backupTxs_enabled.value(id), defaultValue: true)
 		}
 		set {
-			defaults.set(newValue, forKey: PrefsKey.backupTxs_enabled.value(id))
+			defaults.set(newValue, forKey: Key.backupTxs_enabled.value(id))
 			runOnMainThread {
 				self.isEnabledPublisher.send(newValue)
 			}
@@ -54,60 +62,60 @@ class Prefs_BackupTransactions {
 	var useCellular: Bool {
 		get {
 			maybeLogDefaultAccess(#function)
-			return defaults.bool(forKey: PrefsKey.backupTxs_useCellularData.value(id), defaultValue: true)
+			return defaults.bool(forKey: Key.backupTxs_useCellularData.value(id), defaultValue: true)
 		}
 		set {
-			defaults.set(newValue, forKey: PrefsKey.backupTxs_useCellularData.value(id))
+			defaults.set(newValue, forKey: Key.backupTxs_useCellularData.value(id))
 		}
 	}
 	
 	var useUploadDelay: Bool {
 		get {
 			maybeLogDefaultAccess(#function)
-			return defaults.bool(forKey: PrefsKey.backupTxs_useUploadDelay.value(id), defaultValue: false)
+			return defaults.bool(forKey: Key.backupTxs_useUploadDelay.value(id), defaultValue: false)
 		}
 		set {
-			defaults.set(newValue, forKey: PrefsKey.backupTxs_useUploadDelay.value(id))
+			defaults.set(newValue, forKey: Key.backupTxs_useUploadDelay.value(id))
 		}
 	}
 	
 	var recordZoneCreated: Bool {
 		get {
 			maybeLogDefaultAccess(#function)
-			return defaults.bool(forKey: PrefsKey.recordZoneCreated.value(id))
+			return defaults.bool(forKey: Key.recordZoneCreated.value(id))
 		}
 		set {
-			defaults.set(newValue, forKey: PrefsKey.recordZoneCreated.value(id))
+			defaults.set(newValue, forKey: Key.recordZoneCreated.value(id))
 		}
 	}
 	
 	var hasDownloadedPayments: Bool {
 		get {
 			maybeLogDefaultAccess(#function)
-			return defaults.bool(forKey: PrefsKey.hasDownloadedPayments.value(id))
+			return defaults.bool(forKey: Key.hasDownloadedPayments.value(id))
 		}
 		set {
-			defaults.set(newValue, forKey: PrefsKey.hasDownloadedPayments.value(id))
+			defaults.set(newValue, forKey: Key.hasDownloadedPayments.value(id))
 		}
 	}
 	
 	var hasDownloadedContacts: Bool {
 		get {
 			maybeLogDefaultAccess(#function)
-			return defaults.bool(forKey: PrefsKey.hasDownloadedContacts.value(id))
+			return defaults.bool(forKey: Key.hasDownloadedContacts.value(id))
 		}
 		set {
-			defaults.set(newValue, forKey: PrefsKey.hasDownloadedContacts.value(id))
+			defaults.set(newValue, forKey: Key.hasDownloadedContacts.value(id))
 		}
 	}
 	
 	var hasReUploadedPayments: Bool {
 		get {
 			maybeLogDefaultAccess(#function)
-			return defaults.bool(forKey: PrefsKey.hasReUploadedPayments.value(id))
+			return defaults.bool(forKey: Key.hasReUploadedPayments.value(id))
 		}
 		set {
-			defaults.set(newValue, forKey: PrefsKey.hasReUploadedPayments.value(id))
+			defaults.set(newValue, forKey: Key.hasReUploadedPayments.value(id))
 		}
 	}
 	
@@ -125,29 +133,29 @@ class Prefs_BackupTransactions {
 	}
 	
 	#if DEBUG
-	static func valueDescription(_ key: String, _ value: Any) -> String? {
+	static func valueDescription(_ prefix: String, _ value: Any) -> String? {
 		
-		switch key {
-		case PrefsKey.backupTxs_enabled.prefix:
-			return Prefs.printBool(value)
+		switch prefix {
+		case Key.backupTxs_enabled.prefix:
+			return printBool(value)
 			
-		case PrefsKey.backupTxs_useCellularData.prefix:
-			return Prefs.printBool(value)
+		case Key.backupTxs_useCellularData.prefix:
+			return printBool(value)
 			
-		case PrefsKey.backupTxs_useUploadDelay.prefix:
-			return Prefs.printBool(value)
+		case Key.backupTxs_useUploadDelay.prefix:
+			return printBool(value)
 			
-		case PrefsKey.recordZoneCreated.prefix:
-			return Prefs.printBool(value)
+		case Key.recordZoneCreated.prefix:
+			return printBool(value)
 			
-		case PrefsKey.hasDownloadedPayments.prefix:
-			return Prefs.printBool(value)
+		case Key.hasDownloadedPayments.prefix:
+			return printBool(value)
 			
-		case PrefsKey.hasDownloadedContacts.prefix:
-			return Prefs.printBool(value)
+		case Key.hasDownloadedContacts.prefix:
+			return printBool(value)
 			
-		case PrefsKey.hasReUploadedPayments.prefix:
-			return Prefs.printBool(value)
+		case Key.hasReUploadedPayments.prefix:
+			return printBool(value)
 			
 		default:
 			return nil

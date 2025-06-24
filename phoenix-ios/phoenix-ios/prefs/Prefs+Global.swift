@@ -8,12 +8,15 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
+fileprivate typealias Key = PrefsKey
+
 /// Standard app preferences, stored in the iOS UserDefaults system.
 ///
-/// Note that the values here are NOT shared with other extensions bundled in the app,
-/// such as the notification-service-extension. For preferences shared with extensions, see GroupPrefs.
-///
 /// This set is shared between wallets (not pertaining to any particular wallet).
+///
+/// - Note:
+/// The values here are NOT shared with other extensions bundled in the app, such as the
+/// notification-service-extension. For preferences shared with extensions, see `GroupPrefs`.
 ///
 class Prefs_Global {
 	
@@ -41,10 +44,10 @@ class Prefs_Global {
 
 	var theme: Theme {
 		get {
-			defaults.data(forKey: PrefsKey.theme.value(id))?.jsonDecode() ?? Theme.system
+			defaults.data(forKey: Key.theme.value(id))?.jsonDecode() ?? Theme.system
 		}
 		set {
-			defaults.set(newValue, forKey: PrefsKey.theme.value(id))
+			defaults.set(newValue, forKey: Key.theme.value(id))
 			runOnMainThread {
 				self.themePublisher.send(newValue)
 			}
@@ -56,10 +59,10 @@ class Prefs_Global {
 	// --------------------------------------------------
 	
 	#if DEBUG
-	static func valueDescription(_ key: String, _ value: Any) -> String? {
+	static func valueDescription(_ prefix: String, _ value: Any) -> String? {
 		
-		switch key {
-		case PrefsKey.theme.prefix:
+		switch prefix {
+		case Key.theme.prefix:
 			let desc = if let data = value as? Data, let theme: Theme = data.jsonDecode() {
 				theme.rawValue
 			} else { "unknown" }

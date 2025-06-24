@@ -7,12 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		53BEF2924096C8E7976D46E3 /* shapes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF8EAA43946FC1C7A6E7E /* shapes.swift */; };
+		53BEF2924096C8E7976D46E3 /* Shapes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF8EAA43946FC1C7A6E7E /* Shapes.swift */; };
 		53BEF4D5663CD782DC63DF63 /* AppColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFA112E0701FFD6B84217 /* AppColors.swift */; };
 		53BEFA633D95514CA5C0422A /* ChannelsConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF648B3A03C66B611BC06 /* ChannelsConfigurationView.swift */; };
-		53BEFBECABE13063AB28A4D6 /* publishers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF60DF224046E5DE0FDCC /* publishers.swift */; };
 		53BEFD54160278C5E393E319 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFE171C182513A5762686 /* HomeView.swift */; };
-		53BEFF4EDB40975C2123C63D /* ui.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFFB3CB63090BBCFF6A36 /* ui.swift */; };
+		53BEFF4EDB40975C2123C63D /* KeyWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFFB3CB63090BBCFF6A36 /* KeyWindow.swift */; };
 		53BEFFEBEA9EBE7B27B53AF4 /* PaymentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF4DAE061532668494988 /* PaymentView.swift */; };
 		7555FF7F242A565900829871 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF7E242A565900829871 /* AppDelegate.swift */; };
 		7555FF81242A565900829871 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF80242A565900829871 /* SceneDelegate.swift */; };
@@ -197,9 +196,19 @@
 		DC5F96C02E09D7190052CDE6 /* AppSecurity+Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96BF2E09D7130052CDE6 /* AppSecurity+Constants.swift */; };
 		DC5F96C12E09D7190052CDE6 /* AppSecurity+Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96BF2E09D7130052CDE6 /* AppSecurity+Constants.swift */; };
 		DC5F96C42E09DE700052CDE6 /* AppSecurity+Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96C22E09DE680052CDE6 /* AppSecurity+Util.swift */; };
-		DC5F96C62E09E6320052CDE6 /* Prefs+Keys.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96C52E09E62F0052CDE6 /* Prefs+Keys.swift */; };
 		DC5F96C72E09E6320052CDE6 /* Prefs+Keys.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96C52E09E62F0052CDE6 /* Prefs+Keys.swift */; };
-		DC5F96CA2E09F3050052CDE6 /* Prefs+Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96C82E09F3010052CDE6 /* Prefs+Util.swift */; };
+		DC5F96CA2E09F3050052CDE6 /* Prefs+Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96C82E09F3010052CDE6 /* Prefs+Debug.swift */; };
+		DC5F96CC2E0AF3310052CDE6 /* AppSecurity+Keys.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96CB2E0AF32D0052CDE6 /* AppSecurity+Keys.swift */; };
+		DC5F96CD2E0AF3310052CDE6 /* AppSecurity+Keys.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96CB2E0AF32D0052CDE6 /* AppSecurity+Keys.swift */; };
+		DC5F96CF2E0AFE630052CDE6 /* GroupPrefs+Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96CE2E0AFE5E0052CDE6 /* GroupPrefs+Debug.swift */; };
+		DC5F96D02E0AFE630052CDE6 /* GroupPrefs+Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96CE2E0AFE5E0052CDE6 /* GroupPrefs+Debug.swift */; };
+		DC5F96D22E0AFF050052CDE6 /* GroupPrefs+Keys.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96D12E0AFF000052CDE6 /* GroupPrefs+Keys.swift */; };
+		DC5F96D32E0AFF050052CDE6 /* GroupPrefs+Keys.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96D12E0AFF000052CDE6 /* GroupPrefs+Keys.swift */; };
+		DC5F96D52E0B0A970052CDE6 /* ColorScheme+Opposite.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96D42E0B0A8F0052CDE6 /* ColorScheme+Opposite.swift */; };
+		DC5F96D72E0B0C0F0052CDE6 /* ActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96D62E0B0C0C0052CDE6 /* ActivityView.swift */; };
+		DC5F96D92E0B0C820052CDE6 /* View+IsHidden.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96D82E0B0C7E0052CDE6 /* View+IsHidden.swift */; };
+		DC5F96DD2E0B0CBF0052CDE6 /* View+AnyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96DC2E0B0CBB0052CDE6 /* View+AnyView.swift */; };
+		DC5F96DF2E0B0CEF0052CDE6 /* View+CornerRadius.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96DE2E0B0CEA0052CDE6 /* View+CornerRadius.swift */; };
 		DC63A3762B965D54008E040E /* InboundFeeSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC63A3752B965D54008E040E /* InboundFeeSheet.swift */; };
 		DC63BDF429AE44380067A361 /* NotificationsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC63BDF329AE44380067A361 /* NotificationsManager.swift */; };
 		DC63BDF729AEB30C0067A361 /* BackgroundPaymentsConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC63BDF629AEB30C0067A361 /* BackgroundPaymentsConfig.swift */; };
@@ -467,12 +476,11 @@
 
 /* Begin PBXFileReference section */
 		53BEF4DAE061532668494988 /* PaymentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentView.swift; sourceTree = "<group>"; };
-		53BEF60DF224046E5DE0FDCC /* publishers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = publishers.swift; sourceTree = "<group>"; };
 		53BEF648B3A03C66B611BC06 /* ChannelsConfigurationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChannelsConfigurationView.swift; sourceTree = "<group>"; };
-		53BEF8EAA43946FC1C7A6E7E /* shapes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = shapes.swift; sourceTree = "<group>"; };
+		53BEF8EAA43946FC1C7A6E7E /* Shapes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Shapes.swift; sourceTree = "<group>"; };
 		53BEFA112E0701FFD6B84217 /* AppColors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppColors.swift; sourceTree = "<group>"; };
 		53BEFE171C182513A5762686 /* HomeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
-		53BEFFB3CB63090BBCFF6A36 /* ui.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ui.swift; sourceTree = "<group>"; };
+		53BEFFB3CB63090BBCFF6A36 /* KeyWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyWindow.swift; sourceTree = "<group>"; };
 		7555FF7B242A565900829871 /* Phoenix.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Phoenix.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FF7E242A565900829871 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7555FF80242A565900829871 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -651,7 +659,15 @@
 		DC5F96BF2E09D7130052CDE6 /* AppSecurity+Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppSecurity+Constants.swift"; sourceTree = "<group>"; };
 		DC5F96C22E09DE680052CDE6 /* AppSecurity+Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppSecurity+Util.swift"; sourceTree = "<group>"; };
 		DC5F96C52E09E62F0052CDE6 /* Prefs+Keys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Prefs+Keys.swift"; sourceTree = "<group>"; };
-		DC5F96C82E09F3010052CDE6 /* Prefs+Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Prefs+Util.swift"; sourceTree = "<group>"; };
+		DC5F96C82E09F3010052CDE6 /* Prefs+Debug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Prefs+Debug.swift"; sourceTree = "<group>"; };
+		DC5F96CB2E0AF32D0052CDE6 /* AppSecurity+Keys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppSecurity+Keys.swift"; sourceTree = "<group>"; };
+		DC5F96CE2E0AFE5E0052CDE6 /* GroupPrefs+Debug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GroupPrefs+Debug.swift"; sourceTree = "<group>"; };
+		DC5F96D12E0AFF000052CDE6 /* GroupPrefs+Keys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GroupPrefs+Keys.swift"; sourceTree = "<group>"; };
+		DC5F96D42E0B0A8F0052CDE6 /* ColorScheme+Opposite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ColorScheme+Opposite.swift"; sourceTree = "<group>"; };
+		DC5F96D62E0B0C0C0052CDE6 /* ActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityView.swift; sourceTree = "<group>"; };
+		DC5F96D82E0B0C7E0052CDE6 /* View+IsHidden.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+IsHidden.swift"; sourceTree = "<group>"; };
+		DC5F96DC2E0B0CBB0052CDE6 /* View+AnyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+AnyView.swift"; sourceTree = "<group>"; };
+		DC5F96DE2E0B0CEA0052CDE6 /* View+CornerRadius.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+CornerRadius.swift"; sourceTree = "<group>"; };
 		DC63A3752B965D54008E040E /* InboundFeeSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboundFeeSheet.swift; sourceTree = "<group>"; };
 		DC63BDF329AE44380067A361 /* NotificationsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsManager.swift; sourceTree = "<group>"; };
 		DC63BDF629AEB30C0067A361 /* BackgroundPaymentsConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundPaymentsConfig.swift; sourceTree = "<group>"; };
@@ -911,28 +927,32 @@
 		53BEF1337AFCFF0AE82A46BD /* utils */ = {
 			isa = PBXGroup;
 			children = (
-				DC78A5FE2DF8A679003A7DD8 /* RunOnMainThread.swift */,
+				DC5F96D62E0B0C0C0052CDE6 /* ActivityView.swift */,
+				DC74174C270F455D00F7E3E3 /* AES256.swift */,
+				DCED09D32625DBC4005D5EE2 /* AnimationCompletion.swift */,
 				53BEFA112E0701FFD6B84217 /* AppColors.swift */,
 				DCFC72032862237400D6B293 /* Asserts.swift */,
 				DC384D80265C12B700131772 /* Cache.swift */,
-				53BEFFB3CB63090BBCFF6A36 /* ui.swift */,
-				53BEF60DF224046E5DE0FDCC /* publishers.swift */,
-				53BEF8EAA43946FC1C7A6E7E /* shapes.swift */,
-				DC18C41C256FF91100A2D083 /* Utils.swift */,
-				DC641C81282188E700862DCD /* Utils+CurrencyPrefs.swift */,
+				DC5F96D42E0B0A8F0052CDE6 /* ColorScheme+Opposite.swift */,
 				DC1D2B4A2593EB850036AD38 /* Currency.swift */,
 				DC641C7D2821744000862DCD /* Currency+CurrencyPrefs.swift */,
 				DC118C0B27B561210080BBAC /* CurrencyAmount.swift */,
-				DC1D2B4F2594CE900036AD38 /* FormattedAmount.swift */,
 				DC72C33325A51AAC008A927A /* CurrencyPrefs.swift */,
-				DCB04684260D162C007FDA37 /* ViewName.swift */,
-				DCED09D32625DBC4005D5EE2 /* AnimationCompletion.swift */,
 				DCD777D126DE9FE800979A12 /* DelayedSave.swift */,
-				DC74174C270F455D00F7E3E3 /* AES256.swift */,
 				DCAEF8F627628BEB00015993 /* Either.swift */,
-				DCDD9ECD28637474001800A3 /* Orientation.swift */,
+				DC1D2B4F2594CE900036AD38 /* FormattedAmount.swift */,
+				53BEFFB3CB63090BBCFF6A36 /* KeyWindow.swift */,
 				DC355E222A45FAF2008E8A8E /* NestedObservableObject.swift */,
+				DCDD9ECD28637474001800A3 /* Orientation.swift */,
+				DC78A5FE2DF8A679003A7DD8 /* RunOnMainThread.swift */,
+				53BEF8EAA43946FC1C7A6E7E /* Shapes.swift */,
 				DCCFE6A52B63028A002FFF11 /* UnfairLock.swift */,
+				DC18C41C256FF91100A2D083 /* Utils.swift */,
+				DC641C81282188E700862DCD /* Utils+CurrencyPrefs.swift */,
+				DC5F96DC2E0B0CBB0052CDE6 /* View+AnyView.swift */,
+				DC5F96DE2E0B0CEA0052CDE6 /* View+CornerRadius.swift */,
+				DC5F96D82E0B0C7E0052CDE6 /* View+IsHidden.swift */,
+				DCB04684260D162C007FDA37 /* ViewName.swift */,
 				DC7BA9FF2CADAAE70074B568 /* WalletIdentifier.swift */,
 			);
 			path = utils;
@@ -1319,16 +1339,18 @@
 			isa = PBXGroup;
 			children = (
 				DC641C702820889C00862DCD /* GroupPrefs.swift */,
+				DC5F96CE2E0AFE5E0052CDE6 /* GroupPrefs+Debug.swift */,
 				DC5F96A72E00B6230052CDE6 /* GroupPrefs+Foreground.swift */,
 				DC5F96B62E0455700052CDE6 /* GroupPrefs+Global.swift */,
+				DC5F96D12E0AFF000052CDE6 /* GroupPrefs+Keys.swift */,
 				DC5F96B32E04534E0052CDE6 /* GroupPrefs+Wallet.swift */,
 				DC18C417256FE22300A2D083 /* Prefs.swift */,
 				DCB4108629028EF900CE4FF9 /* Prefs+BackupSeed.swift */,
 				DC641C7F2821767D00862DCD /* Prefs+BackupTransactions.swift */,
 				DC5F96B92E04574E0052CDE6 /* Prefs+Constants.swift */,
+				DC5F96C82E09F3010052CDE6 /* Prefs+Debug.swift */,
 				DC5F96AA2E0327980052CDE6 /* Prefs+Global.swift */,
 				DC5F96C52E09E62F0052CDE6 /* Prefs+Keys.swift */,
-				DC5F96C82E09F3010052CDE6 /* Prefs+Util.swift */,
 				DC5F96B02E03609D0052CDE6 /* Prefs+Wallet.swift */,
 				DCB876312735AAB500657570 /* UserDefaults+Codable.swift */,
 				DC78A6002DF8C181003A7DD8 /* UserDefaults+DefaultValue.swift */,
@@ -1538,6 +1560,7 @@
 			children = (
 				DCACF6F72566D0BA0009B01E /* AppSecurity.swift */,
 				DC5F96BF2E09D7130052CDE6 /* AppSecurity+Constants.swift */,
+				DC5F96CB2E0AF32D0052CDE6 /* AppSecurity+Keys.swift */,
 				DC5F96C22E09DE680052CDE6 /* AppSecurity+Util.swift */,
 				DC5F96BC2E09D6C60052CDE6 /* AppSecurity+Wallet.swift */,
 				DC99E90825B78FA800FB20F7 /* EnabledSecurity.swift */,
@@ -2007,6 +2030,7 @@
 				DC9AD20D2C9C90A20019BEE9 /* ParseResultHelper.swift in Sources */,
 				DC7DA9F62AD84DF200F86B99 /* String+Substring.swift in Sources */,
 				DCE2B9B52C939631000430B8 /* ValidateView.swift in Sources */,
+				DC5F96D92E0B0C820052CDE6 /* View+IsHidden.swift in Sources */,
 				DC20BDF22C23403100338AA2 /* PaymentSummary.swift in Sources */,
 				DC4CBC9A2D68E00900129BDB /* Details_Outgoing_Splice.swift in Sources */,
 				DC2ABAD52BEC092B00C11C9C /* InvalidPin.swift in Sources */,
@@ -2015,6 +2039,7 @@
 				DC2F431627B6983B0006FCC4 /* CopyShareOptionsSheet.swift in Sources */,
 				DCACF6FE2566D0BA0009B01E /* GenericPasswordConvertible.swift in Sources */,
 				DC949E6A2B45B1EC00E80BB5 /* LiquidityAdsHelp.swift in Sources */,
+				DC5F96D72E0B0C0F0052CDE6 /* ActivityView.swift in Sources */,
 				DC33369826BAF721000E3F49 /* ShortSheet.swift in Sources */,
 				DC1B71C52CCBE31900914D80 /* AddToContactsInfo.swift in Sources */,
 				DC3780412C077E0300937C8E /* PriorityBoxStyle.swift in Sources */,
@@ -2042,6 +2067,7 @@
 				DCEE8998288605FD00FE42DD /* PaymentCell.swift in Sources */,
 				DCDD9ED428637EBB001800A3 /* ToolsButton.swift in Sources */,
 				DCDD9ED0286377B7001800A3 /* MainView_Big.swift in Sources */,
+				DC5F96D32E0AFF050052CDE6 /* GroupPrefs+Keys.swift in Sources */,
 				DC355E1F2A44A235008E8A8E /* NotificationCell.swift in Sources */,
 				DC1706D926A71D8E00BAFCD0 /* UnlockErrorView.swift in Sources */,
 				DC2DC8682906AC0B0079E570 /* BitcoinUnitSelector.swift in Sources */,
@@ -2105,16 +2131,18 @@
 				DC8D94142CA7015F00EE844E /* ChannelFundingProblem.swift in Sources */,
 				DC46BAF326CACCF700E760A6 /* KotlinExtensions+Other.swift in Sources */,
 				DCB5D2DF280879460020B8F5 /* DeviceInfo.swift in Sources */,
+				DC5F96DF2E0B0CEF0052CDE6 /* View+CornerRadius.swift in Sources */,
 				DCACF6FB2566D0BA0009B01E /* GenericPasswordStore.swift in Sources */,
 				DC98D3962AF170AC005BD177 /* PaymentWarningPopover.swift in Sources */,
 				DC48D2C42593DE30008D138C /* TextFieldCurrencyStyler.swift in Sources */,
 				DC18C41D256FF91100A2D083 /* Utils.swift in Sources */,
-				53BEFF4EDB40975C2123C63D /* ui.swift in Sources */,
+				53BEFF4EDB40975C2123C63D /* KeyWindow.swift in Sources */,
 				DCACF6FD2566D0BA0009B01E /* SecurityFile.swift in Sources */,
 				DC118C0C27B561210080BBAC /* CurrencyAmount.swift in Sources */,
 				DC04C2632A9009890021F2E8 /* MergeChannelsView.swift in Sources */,
 				DC46BAF726CACCF700E760A6 /* KotlinExtensions+Conversion.swift in Sources */,
 				DC78A5FF2DF8A67E003A7DD8 /* RunOnMainThread.swift in Sources */,
+				DC5F96DD2E0B0CBF0052CDE6 /* View+AnyView.swift in Sources */,
 				DCBA60D42C93544C00878895 /* InsetGroupBoxStyle.swift in Sources */,
 				DCCFE6A42B63021E002FFF11 /* KotlinLogger.swift in Sources */,
 				DCCFE6AE2B64310E002FFF11 /* LoggerFactory.swift in Sources */,
@@ -2223,12 +2251,11 @@
 				DCDD9ED2286377C5001800A3 /* MainView_Small.swift in Sources */,
 				DC4CBC752D64DAC600129BDB /* Details_Incoming_Bolt11.swift in Sources */,
 				C8D7AFF5BC5754DBBEEB2688 /* ElectrumConfigurationView.swift in Sources */,
-				53BEFBECABE13063AB28A4D6 /* publishers.swift in Sources */,
 				DC2210D92DE4F7E30096D8D2 /* LabelAlignment.swift in Sources */,
 				DCC3E57F2D08A63900CCDA40 /* XPC+Foreground.swift in Sources */,
 				DC99E94025BA141000FB20F7 /* LocalWebView.swift in Sources */,
 				53BEFA633D95514CA5C0422A /* ChannelsConfigurationView.swift in Sources */,
-				DC5F96CA2E09F3050052CDE6 /* Prefs+Util.swift in Sources */,
+				DC5F96CA2E09F3050052CDE6 /* Prefs+Debug.swift in Sources */,
 				DCED09D42625DBC4005D5EE2 /* AnimationCompletion.swift in Sources */,
 				DCE77A5627C5240500F0FA24 /* TLSConnectionCheck.swift in Sources */,
 				DCCC7FD526B0A006008ACD9B /* SquareSize.swift in Sources */,
@@ -2263,7 +2290,8 @@
 				C8D7A70EFE0F071ACA0AE246 /* QRCodeScanner.swift in Sources */,
 				DC2CE55028A52AD90070A2E1 /* RecentPaymentsConfig.swift in Sources */,
 				DC5A935329846044004F19FD /* FileHandle+Async.swift in Sources */,
-				53BEF2924096C8E7976D46E3 /* shapes.swift in Sources */,
+				53BEF2924096C8E7976D46E3 /* Shapes.swift in Sources */,
+				DC5F96D02E0AFE630052CDE6 /* GroupPrefs+Debug.swift in Sources */,
 				DC2B74C32C121571001BA1FD /* Bolt12Sheet.swift in Sources */,
 				DC0D2EA72939273B00284608 /* KotlinExtensions+Payments.swift in Sources */,
 				DC72C33925A663CA008A927A /* QRCode.swift in Sources */,
@@ -2309,6 +2337,7 @@
 				DC4CBC9C2D68E65500129BDB /* Details_Outgoing_SpliceCpfp.swift in Sources */,
 				DCB62F472A5DF19D00912A71 /* KotlinPublishers+Lightning.swift in Sources */,
 				DCA4DA372C66A0960010363C /* CurrencySelector.swift in Sources */,
+				DC5F96CD2E0AF3310052CDE6 /* AppSecurity+Keys.swift in Sources */,
 				DC355E252A45FDD3008E8A8E /* NoticeMonitor.swift in Sources */,
 				F4AED298257A50CD009485C1 /* LogsConfigurationView.swift in Sources */,
 				DC08A51A27FB6C5F0041603B /* TopTab.swift in Sources */,
@@ -2323,6 +2352,7 @@
 				C8D7AB09E80CE2B6AE270A97 /* TorConfigurationView.swift in Sources */,
 				DC27E4C42791C58C00C777CC /* PaymentsBackupView.swift in Sources */,
 				DC59377127516297003B4B53 /* Sequence+Sum.swift in Sources */,
+				DC5F96D52E0B0A970052CDE6 /* ColorScheme+Opposite.swift in Sources */,
 				DC5F96B72E0455760052CDE6 /* GroupPrefs+Global.swift in Sources */,
 				DCA125752A27EDDB00DA2F7F /* MempoolRecommendedResponse.swift in Sources */,
 				DCFBC5592AE2CFEF00E3A418 /* BizNotificationCell.swift in Sources */,
@@ -2356,7 +2386,6 @@
 			files = (
 				DC641C752821706600862DCD /* Currency.swift in Sources */,
 				DC641C7228208B4D00862DCD /* GroupPrefs.swift in Sources */,
-				DC5F96C62E09E6320052CDE6 /* Prefs+Keys.swift in Sources */,
 				DC78A5F92DF22ABE003A7DD8 /* NotificationServiceQueue.swift in Sources */,
 				DCEB2798282D7B070096B87E /* KotlinExtensions+Other.swift in Sources */,
 				DC641C7328208B7F00862DCD /* UserDefaults+Codable.swift in Sources */,
@@ -2374,6 +2403,7 @@
 				DCEB2799282D7B260096B87E /* KotlinExtensions+Conversion.swift in Sources */,
 				DCC3E5822D08A65400CCDA40 /* XPC+Background.swift in Sources */,
 				DCEB2795282D7A9F0096B87E /* KotlinPublishers+Phoenix.swift in Sources */,
+				DC5F96CF2E0AFE630052CDE6 /* GroupPrefs+Debug.swift in Sources */,
 				DC641C6B2820803100862DCD /* PhoenixManager.swift in Sources */,
 				DC641C7B2821726F00862DCD /* FormattedAmount.swift in Sources */,
 				DC5F96A52E00A6B30052CDE6 /* WalletIdentifier.swift in Sources */,
@@ -2396,6 +2426,7 @@
 				DCCFE6A72B630836002FFF11 /* KotlinLogger.swift in Sources */,
 				DC641C78282171EA00862DCD /* KotlinAssociatedObject.swift in Sources */,
 				DC5631C82C59466000DCB5BF /* KotlinExtensions+Manager.swift in Sources */,
+				DC5F96D22E0AFF050052CDE6 /* GroupPrefs+Keys.swift in Sources */,
 				DC5F96A62E00AD3D0052CDE6 /* RunOnMainThread.swift in Sources */,
 				DC5F96BA2E0457530052CDE6 /* Prefs+Constants.swift in Sources */,
 				DCCFE6B32B680DF5002FFF11 /* LoggerFactory.swift in Sources */,
@@ -2406,6 +2437,7 @@
 				DCCFE6C52B714226002FFF11 /* LoggerFactory+Background.swift in Sources */,
 				DC641C83282189AC00862DCD /* Utils.swift in Sources */,
 				DC0D2EA8293928E100284608 /* KotlinExtensions+Payments.swift in Sources */,
+				DC5F96CC2E0AF3310052CDE6 /* AppSecurity+Keys.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -9,12 +9,14 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-
+fileprivate typealias Key = PrefsKey
+fileprivate typealias KeyDeprecated = PrefsKeyDeprecated
 
 /// Standard app preferences, stored in the iOS UserDefaults system.
 ///
-/// Note that the values here are NOT shared with other extensions bundled in the app,
-/// such as the notification-service-extension. For preferences shared with extensions, see GroupPrefs.
+/// - Note:
+/// The values here are NOT shared with other extensions bundled in the app, such as the
+/// notification-service-extension. For preferences shared with extensions, see `GroupPrefs`.
 ///
 class Prefs {
 	
@@ -51,21 +53,137 @@ class Prefs {
 	}
 	
 	// --------------------------------------------------
-	// MARK: Proxy
+	// MARK: Migration
 	// --------------------------------------------------
-	
-	static func loadWallet(_ walletId: WalletIdentifier) {
-		Prefs_Wallet.loadWallet(walletId)
-	}
 	
 	static func performMigration(
 		_ targetBuild: String,
 		_ completionPublisher: CurrentValueSubject<Int, Never>
 	) {
-		Prefs_Wallet.performMigration(targetBuild, completionPublisher)
+		log.trace("performMigration(to: \(targetBuild))")
+		
+		// NB: The first version released in the App Store was version 1.0.0 (build 17)
+		
+		if targetBuild.isVersion(equalTo: "44") {
+			performMigration_toBuild44()
+		}
+		if targetBuild.isVersion(equalTo: "92") {
+			performMigration_toBuild92()
+		}
 	}
 	
-	static func printAllKeyValues() {
-		Prefs_Wallet.printAllKeyValues()
+	private static func performMigration_toBuild44() {
+		log.trace(#function)
+		
+		let d = self.defaults
+		let oldKey = KeyDeprecated.recentPaymentSeconds.rawValue
+		let newKey = Key.recentPaymentsConfig.deprecatedValue
+		
+		if d.object(forKey: oldKey) != nil {
+			let seconds = d.integer(forKey: oldKey)
+			if seconds <= 0 {
+				let newValue = RecentPaymentsConfig.inFlightOnly
+				d.set(newValue.jsonEncode(), forKey: newKey)
+			} else {
+				let newValue = RecentPaymentsConfig.withinTime(seconds: seconds)
+				d.set(newValue.jsonEncode(), forKey: newKey)
+			}
+			
+			d.removeObject(forKey: oldKey)
+		}
+	}
+	
+	private static func performMigration_toBuild92() {
+		log.trace(#function)
+		
+		// Migration to a per-wallet design:
+		//
+		// The migration is split into 2 steps.
+		// Step 1 is performed here:
+		//
+		// - Move all keys from key "keyName" to "keyName-default"
+		//
+		// Note that step 1 is performed as soon as the app is launched,
+		// during the normal migration process.
+		// That is, before we've unlocked the wallet, and before we know the walletId.
+		//
+		// For step 2, see "loadWallet".
+		
+		let d = self.defaults
+		
+		for key in Key.allCases {
+			let oldKey = key.deprecatedValue
+			if let value = d.object(forKey: oldKey) {
+				
+				let newId = (key.group == .global) ? PREFS_GLOBAL_ID : PREFS_DEFAULT_ID
+				let newKey = key.value(newId)
+				if d.object(forKey: newKey) == nil {
+					log.debug("move: \(oldKey) > \(newKey)")
+					d.set(value, forKey: newKey)
+				} else {
+					log.debug("delete: \(oldKey)")
+				}
+				
+				d.removeObject(forKey: oldKey)
+			}
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Load Wallet
+	// --------------------------------------------------
+	
+	static func loadWallet(_ walletId: WalletIdentifier) {
+		log.trace(#function)
+		
+		// Migration to a per-wallet design:
+		//
+		// In general, each pref should be keyed to the corresponding walletId.
+		// E.g. "foo-<walletId>" = "bar"
+		//
+		// However, there are also preferences that the user may want to configure
+		// BEFORE they've created/restored their wallet. For example:
+		// - tor settings
+		// - electrum settings
+		//
+		// We allow this by also having a "default" set of preferences.
+		// E.g. "foo-default" = "bar"
+		//
+		// And once the user loads a wallet, then we simply copy these "default" values
+		// into the corresponding wallet:
+		//
+		// COPY: "foo-default" => "foo-<walletId>"
+		
+		let d = self.defaults
+		let oldId = PREFS_DEFAULT_ID
+		let newId = walletId.prefsKeySuffix
+		
+		for key in Key.allCases {
+			let oldKey = key.value(oldId)
+			if let value = d.object(forKey: oldKey) {
+				
+				let newKey = key.value(newId)
+				if d.object(forKey: newKey) == nil {
+					log.debug("move: \(oldKey) > \(newKey)")
+					d.set(value, forKey: newKey)
+				} else {
+					log.debug("delete: \(oldKey)")
+				}
+				
+				d.removeObject(forKey: oldKey)
+			}
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Reset Wallet
+	// --------------------------------------------------
+	
+	static func didResetWallet(_ id: String) {
+		log.trace(#function)
+		
+		DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+			instances.removeValue(forKey: id)
+		}
 	}
 }

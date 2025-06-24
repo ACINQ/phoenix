@@ -8,6 +8,14 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
+fileprivate typealias Key = PrefsKey
+fileprivate typealias KeyDeprecated = PrefsKeyDeprecated
+
+/// Standard app preferences, stored in the iOS UserDefaults system.
+///
+/// Note that the values here are NOT shared with other extensions bundled in the app,
+/// such as the notification-service-extension. For preferences shared with extensions, see GroupPrefs.
+///
 class Prefs_Wallet {
 	
 	private static var defaults: UserDefaults {
@@ -35,20 +43,20 @@ class Prefs_Wallet {
 	var defaultPaymentDescription: String? {
 		get {
 			maybeLogDefaultAccess(#function)
-			return defaults.string(forKey: PrefsKey.defaultPaymentDescription.value(id))
+			return defaults.string(forKey: Key.defaultPaymentDescription.value(id))
 		}
 		set {
-			defaults.set(newValue, forKey: PrefsKey.defaultPaymentDescription.value(id))
+			defaults.set(newValue, forKey: Key.defaultPaymentDescription.value(id))
 		}
 	}
 	
 	var invoiceExpirationDays: Int {
 		get {
 			maybeLogDefaultAccess(#function)
-			return defaults.integer(forKey: PrefsKey.invoiceExpirationDays.value(id), defaultValue: 7)
+			return defaults.integer(forKey: Key.invoiceExpirationDays.value(id), defaultValue: 7)
 		}
 		set {
-			defaults.set(newValue, forKey: PrefsKey.invoiceExpirationDays.value(id))
+			defaults.set(newValue, forKey: Key.invoiceExpirationDays.value(id))
 		}
 	}
 	
@@ -59,10 +67,10 @@ class Prefs_Wallet {
 	var hideAmounts: Bool {
 		get {
 			maybeLogDefaultAccess(#function)
-			return defaults.bool(forKey: PrefsKey.hideAmounts.value(id))
+			return defaults.bool(forKey: Key.hideAmounts.value(id))
 		}
 		set {
-			defaults.set(newValue, forKey: PrefsKey.hideAmounts.value(id))
+			defaults.set(newValue, forKey: Key.hideAmounts.value(id))
 		}
 	}
 	
@@ -73,10 +81,10 @@ class Prefs_Wallet {
 	var showOriginalFiatAmount: Bool {
 		get {
 			maybeLogDefaultAccess(#function)
-			return defaults.bool(forKey: PrefsKey.showOriginalFiatAmount.value(id), defaultValue: true)
+			return defaults.bool(forKey: Key.showOriginalFiatAmount.value(id), defaultValue: true)
 		}
 		set {
-			defaults.set(newValue, forKey: PrefsKey.showOriginalFiatAmount.value(id))
+			defaults.set(newValue, forKey: Key.showOriginalFiatAmount.value(id))
 			runOnMainThread {
 				self.showOriginalFiatAmountPublisher.send(newValue)
 			}
@@ -90,11 +98,11 @@ class Prefs_Wallet {
 	var recentPaymentsConfig: RecentPaymentsConfig {
 		get {
 			maybeLogDefaultAccess(#function)
-			return defaults.data(forKey: PrefsKey.recentPaymentsConfig.value(id))?.jsonDecode() ??
+			return defaults.data(forKey: Key.recentPaymentsConfig.value(id))?.jsonDecode() ??
 			RecentPaymentsConfig.mostRecent(count: 3)
 		}
 		set {
-			defaults.set(newValue.jsonEncode(), forKey: PrefsKey.recentPaymentsConfig.value(id))
+			defaults.set(newValue.jsonEncode(), forKey: Key.recentPaymentsConfig.value(id))
 			runOnMainThread {
 				self.recentPaymentsConfigPublisher.send(newValue)
 			}
@@ -104,20 +112,20 @@ class Prefs_Wallet {
 	var hasMergedChannelsForSplicing: Bool {
 		get {
 			maybeLogDefaultAccess(#function)
-			return defaults.bool(forKey: PrefsKey.hasMergedChannelsForSplicing.value(id))
+			return defaults.bool(forKey: Key.hasMergedChannelsForSplicing.value(id))
 		}
 		set {
-			defaults.set(newValue, forKey: PrefsKey.hasMergedChannelsForSplicing.value(id))
+			defaults.set(newValue, forKey: Key.hasMergedChannelsForSplicing.value(id))
 		}
 	}
 	
 	var hasUpgradedSeedCloudBackups: Bool {
 		get {
 			maybeLogDefaultAccess(#function)
-			return defaults.bool(forKey: PrefsKey.hasUpgradedSeedCloudBackups.value(id))
+			return defaults.bool(forKey: Key.hasUpgradedSeedCloudBackups.value(id))
 		}
 		set {
-			defaults.set(newValue, forKey: PrefsKey.hasUpgradedSeedCloudBackups.value(id))
+			defaults.set(newValue, forKey: Key.hasUpgradedSeedCloudBackups.value(id))
 		}
 	}
   
@@ -128,10 +136,10 @@ class Prefs_Wallet {
 	var serverMessageReadIndex: Int? {
 		get {
 			maybeLogDefaultAccess(#function)
-			return defaults.number(forKey: PrefsKey.serverMessageReadIndex.value(id))?.intValue
+			return defaults.number(forKey: Key.serverMessageReadIndex.value(id))?.intValue
 		}
 		set {
-			let key = PrefsKey.serverMessageReadIndex.value(id)
+			let key = Key.serverMessageReadIndex.value(id)
 			if let number = newValue {
 				defaults.set(NSNumber(value: number), forKey: key)
 			} else {
@@ -150,10 +158,10 @@ class Prefs_Wallet {
 	var allowOverpayment: Bool {
 		get {
 			maybeLogDefaultAccess(#function)
-			return defaults.bool(forKey: PrefsKey.allowOverpayment.value(id))
+			return defaults.bool(forKey: Key.allowOverpayment.value(id))
 		}
 		set {
-			defaults.set(newValue, forKey: PrefsKey.allowOverpayment.value(id))
+			defaults.set(newValue, forKey: Key.allowOverpayment.value(id))
 			runOnMainThread {
 				self.allowOverpaymentPublisher.send(newValue)
 			}
@@ -163,10 +171,10 @@ class Prefs_Wallet {
 	var doNotShowChannelImpactWarning: Bool {
 		get {
 			maybeLogDefaultAccess(#function)
-			return defaults.bool(forKey: PrefsKey.doNotShowChannelImpactWarning.value(id))
+			return defaults.bool(forKey: Key.doNotShowChannelImpactWarning.value(id))
 		}
 		set {
-			defaults.set(newValue, forKey: PrefsKey.doNotShowChannelImpactWarning.value(id))
+			defaults.set(newValue, forKey: Key.doNotShowChannelImpactWarning.value(id))
 		}
 	}
 	
@@ -186,10 +194,10 @@ class Prefs_Wallet {
 	var isNewWallet: Bool {
 		get {
 			maybeLogDefaultAccess(#function)
-			return defaults.bool(forKey: PrefsKey.isNewWallet.value(id), defaultValue: true)
+			return defaults.bool(forKey: Key.isNewWallet.value(id), defaultValue: true)
 		}
 		set {
-			defaults.set(newValue, forKey: PrefsKey.isNewWallet.value(id))
+			defaults.set(newValue, forKey: Key.isNewWallet.value(id))
 			runOnMainThread {
 				self.isNewWalletPublisher.send(newValue)
 			}
@@ -199,10 +207,10 @@ class Prefs_Wallet {
 	var swapInAddressIndex: Int {
 		get {
 			maybeLogDefaultAccess(#function)
-			return defaults.integer(forKey: PrefsKey.swapInAddressIndex.value(id))
+			return defaults.integer(forKey: Key.swapInAddressIndex.value(id))
 		}
 		set {
-			defaults.set(newValue, forKey: PrefsKey.swapInAddressIndex.value(id))
+			defaults.set(newValue, forKey: Key.swapInAddressIndex.value(id))
 		}
 	}
 	
@@ -219,7 +227,7 @@ class Prefs_Wallet {
 	var recentTipPercents: [Int] {
 		get {
 			maybeLogDefaultAccess(#function)
-			return defaults.data(forKey: PrefsKey.recentTipPercents.value(id))?.jsonDecode() ?? []
+			return defaults.data(forKey: Key.recentTipPercents.value(id))?.jsonDecode() ?? []
 		}
 	}
 	
@@ -233,7 +241,7 @@ class Prefs_Wallet {
 			recents.removeLast()
 		}
 		
-		defaults.set(recents.jsonEncode(), forKey: PrefsKey.recentTipPercents.value(id))
+		defaults.set(recents.jsonEncode(), forKey: Key.recentTipPercents.value(id))
 	}
 
 	// --------------------------------------------------
@@ -249,113 +257,23 @@ class Prefs_Wallet {
 	}()
 	
 	// --------------------------------------------------
-	// MARK: Load Wallet
-	// --------------------------------------------------
-	
-	static func loadWallet(_ walletId: WalletIdentifier) {
-		log.trace(#function)
-		
-		let d = self.defaults
-		let oldId = PREFS_DEFAULT_ID
-		let newId = walletId.prefsKeySuffix
-		
-		for key in PrefsKey.allCases {
-			let oldKey = key.value(oldId)
-			if let value = d.object(forKey: oldKey) {
-				
-				let newKey = key.value(newId)
-				if d.object(forKey: newKey) == nil {
-					log.debug("move: \(oldKey) > \(newKey)")
-					d.set(value, forKey: newKey)
-				} else {
-					log.debug("delete: \(oldKey)")
-				}
-				
-				d.removeObject(forKey: oldKey)
-			}
-		}
-	}
-	
-	// --------------------------------------------------
 	// MARK: Reset Wallet
 	// --------------------------------------------------
 
 	func resetWallet() {
 		log.trace(#function)
 		
-		for key in PrefsKey.allCases {
+		for key in Key.allCases {
 			defaults.removeObject(forKey: key.value(id))
 		}
 
-		defaults.removeObject(forKey: PrefsKeyDeprecated.showChannelsRemoteBalance.rawValue)
-		defaults.removeObject(forKey: PrefsKeyDeprecated.recentPaymentSeconds.rawValue)
-		defaults.removeObject(forKey: PrefsKeyDeprecated.maxFees.rawValue)
-		defaults.removeObject(forKey: PrefsKeyDeprecated.hasUpgradedSeedCloudBackups_v1.rawValue)
-		defaults.removeObject(forKey: "\(PrefsKeyDeprecated.hasDownloadedContacts_v1.rawValue)-\(id)")
-	}
-
-	// --------------------------------------------------
-	// MARK: Migration
-	// --------------------------------------------------
-	
-	static func performMigration(
-		_ targetBuild: String,
-		_ completionPublisher: CurrentValueSubject<Int, Never>
-	) {
-		log.trace("performMigration(to: \(targetBuild))")
+		defaults.removeObject(forKey: KeyDeprecated.showChannelsRemoteBalance.rawValue)
+		defaults.removeObject(forKey: KeyDeprecated.recentPaymentSeconds.rawValue)
+		defaults.removeObject(forKey: KeyDeprecated.maxFees.rawValue)
+		defaults.removeObject(forKey: KeyDeprecated.hasUpgradedSeedCloudBackups_v1.rawValue)
+		defaults.removeObject(forKey: "\(KeyDeprecated.hasDownloadedContacts_v1.rawValue)-\(id)")
 		
-		// NB: The first version released in the App Store was version 1.0.0 (build 17)
-		
-		if targetBuild.isVersion(equalTo: "44") {
-			performMigration_toBuild44()
-		}
-		if targetBuild.isVersion(equalTo: "92") {
-			performMigration_toBuild92()
-		}
-	}
-	
-	private static func performMigration_toBuild44() {
-		log.trace(#function)
-		
-		let d = self.defaults
-		let oldKey = PrefsKeyDeprecated.recentPaymentSeconds.rawValue
-		let newKey = PrefsKey.recentPaymentsConfig.deprecatedValue
-		
-		if d.object(forKey: oldKey) != nil {
-			let seconds = d.integer(forKey: oldKey)
-			if seconds <= 0 {
-				let newValue = RecentPaymentsConfig.inFlightOnly
-				d.set(newValue.jsonEncode(), forKey: newKey)
-			} else {
-				let newValue = RecentPaymentsConfig.withinTime(seconds: seconds)
-				d.set(newValue.jsonEncode(), forKey: newKey)
-			}
-			
-			d.removeObject(forKey: oldKey)
-		}
-	}
-	
-	private static func performMigration_toBuild92() {
-		log.trace(#function)
-		
-		let d = self.defaults
-		
-		for key in PrefsKey.allCases {
-			let oldKey = key.deprecatedValue
-			if let value = d.object(forKey: oldKey) {
-				
-				let newId = (key.group == .global) ? PREFS_GLOBAL_ID : PREFS_DEFAULT_ID
-				let newKey = key.value(newId)
-				if d.object(forKey: newKey) == nil {
-					log.debug("move: \(oldKey) > \(newKey)")
-					d.set(value, forKey: newKey)
-				} else {
-					log.debug("delete: \(oldKey)")
-				}
-				
-				d.removeObject(forKey: oldKey)
-			}
-		}
+		Prefs.didResetWallet(id)
 	}
 	
 	// --------------------------------------------------
@@ -372,70 +290,50 @@ class Prefs_Wallet {
 	}
 	
 	#if DEBUG
-	static func printAllKeyValues() {
+	static func valueDescription(_ prefix: String, _ value: Any) -> String? {
 		
-		let output = self.defaults.dump(
-			isKnownKey: self.isKnownKey,
-			valueDescription: self.valueDescription
-		)
-		log.debug("\(output)")
-	}
-	
-	private static func isKnownKey(_ key: String) -> Bool {
-		
-		for knownKey in PrefsKey.allCases {
-			if key.hasPrefix(knownKey.prefix) {
-				return true
-			}
-		}
-		
-		return false
-	}
-	
-	private static func valueDescription(_ key: String, _ value: Any) -> String {
-		
-		switch key {
-		case PrefsKey.defaultPaymentDescription.prefix:
-			return Prefs.printString(value)
+		switch prefix {
+		case Key.defaultPaymentDescription.prefix:
+			return printString(value)
 			
-		case PrefsKey.invoiceExpirationDays.prefix:
-			return Prefs.printInt(value)
+		case Key.invoiceExpirationDays.prefix:
+			return printInt(value)
 		
-		case PrefsKey.hideAmounts.prefix:
-			return Prefs.printBool(value)
+		case Key.hideAmounts.prefix:
+			return printBool(value)
 		
-		case PrefsKey.showOriginalFiatAmount.prefix:
-			return Prefs.printBool(value)
+		case Key.showOriginalFiatAmount.prefix:
+			return printBool(value)
 			
-		case PrefsKey.recentPaymentsConfig.prefix:
+		case Key.recentPaymentsConfig.prefix:
 			let desc = if let data = value as? Data, let rpc: RecentPaymentsConfig = data.jsonDecode() {
 				rpc.id
 			} else { "unknown" }
 			
 			return "<RecentPaymentsConfig: \(desc)>"
 		
-		case PrefsKey.hasMergedChannelsForSplicing.prefix:
-			return Prefs.printBool(value)
+		case Key.hasMergedChannelsForSplicing.prefix:
+			return printBool(value)
 			
-		case PrefsKey.hasUpgradedSeedCloudBackups.prefix:
-			return Prefs.printBool(value)
+		case Key.hasUpgradedSeedCloudBackups.prefix:
+			return printBool(value)
 			
-		case PrefsKey.serverMessageReadIndex.prefix:
-			return Prefs.printInt(value)
+		case Key.serverMessageReadIndex.prefix:
+			return printInt(value)
 			
-		case PrefsKey.allowOverpayment.prefix:
-			return Prefs.printBool(value)
+		case Key.allowOverpayment.prefix:
+			return printBool(value)
 			
-		case PrefsKey.doNotShowChannelImpactWarning.prefix:
-			return Prefs.printBool(value)
+		case Key.doNotShowChannelImpactWarning.prefix:
+			return printBool(value)
 			
-		case PrefsKey.isNewWallet.prefix:
-			return Prefs.printBool(value)
+		case Key.isNewWallet.prefix:
+			return printBool(value)
 			
-		case PrefsKey.swapInAddressIndex.prefix:
-			return Prefs.printInt(value)
+		case Key.swapInAddressIndex.prefix:
+			return printInt(value)
 		
-		case PrefsKey.recentTipPercents.prefix:
+		case Key.recentTipPercents.prefix:
 			let desc = if let data = value as? Data, let array: [Int] = data.jsonDecode() {
 				array.description
 			} else { "unknown" }
@@ -443,10 +341,7 @@ class Prefs_Wallet {
 			return "<[Int]: \(desc)>"
 			
 		default:
-			return Prefs_BackupSeed.valueDescription(key, value) ??
-			       Prefs_BackupTransactions.valueDescription(key, value) ??
-			       Prefs_Global.valueDescription(key, value) ??
-			       "<?>"
+			return nil
 		}
 	}
 	#endif

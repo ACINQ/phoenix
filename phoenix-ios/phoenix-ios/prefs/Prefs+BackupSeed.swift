@@ -8,13 +8,21 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
+fileprivate typealias Key = PrefsKey
+
 enum BackupSeedState {
 	case notBackedUp
 	case backupInProgress
 	case safelyBackedUp
 }
 
-/// Preferences pertaining to backing up the recovery phrase (seed) in the user's own iCloud account.
+/// Standard app preferences, stored in the iOS UserDefaults system.
+///
+/// This set pertains to backing up the recovery phrase (seed) in the user's own iCloud account.
+///
+/// - Note:
+/// The values here are NOT shared with other extensions bundled in the app, such as the
+/// notification-service-extension. For preferences shared with extensions, see `GroupPrefs`.
 ///
 class Prefs_BackupSeed {
 	
@@ -47,10 +55,10 @@ class Prefs_BackupSeed {
 	var isEnabled: Bool {
 		get {
 			maybeLogDefaultAccess(#function)
-			return defaults.bool(forKey: PrefsKey.backupSeed_enabled.value(id), defaultValue: false)
+			return defaults.bool(forKey: Key.backupSeed_enabled.value(id), defaultValue: false)
 		}
 		set {
-			defaults.set(newValue, forKey: PrefsKey.backupSeed_enabled.value(id))
+			defaults.set(newValue, forKey: Key.backupSeed_enabled.value(id))
 			runOnMainThread {
 				self.isEnabledPublisher.send(newValue)
 			}
@@ -64,10 +72,10 @@ class Prefs_BackupSeed {
 	var hasUploadedSeed: Bool {
 		get {
 			maybeLogDefaultAccess(#function)
-			return defaults.bool(forKey: PrefsKey.backupSeed_hasUploadedSeed.value(id))
+			return defaults.bool(forKey: Key.backupSeed_hasUploadedSeed.value(id))
 		}
 		set {
-			defaults.setValue(newValue, forKey: PrefsKey.backupSeed_hasUploadedSeed.value(id))
+			defaults.setValue(newValue, forKey: Key.backupSeed_hasUploadedSeed.value(id))
 			runOnMainThread {
 				self.hasUploadedSeedPublisher.send(newValue)
 			}
@@ -81,7 +89,7 @@ class Prefs_BackupSeed {
 	var name: String? {
 		get {
 			maybeLogDefaultAccess(#function)
-			return defaults.string(forKey: PrefsKey.backupSeed_name.value(id))
+			return defaults.string(forKey: Key.backupSeed_name.value(id))
 		}
 		set {
 			if self.name == newValue {
@@ -89,7 +97,7 @@ class Prefs_BackupSeed {
 			}
 			let trimmedName = (newValue ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
 			let newName = trimmedName.isEmpty ? nil : trimmedName
-			defaults.setValue(newName, forKey: PrefsKey.backupSeed_name.value(id))
+			defaults.setValue(newName, forKey: Key.backupSeed_name.value(id))
 			runOnMainThread {
 				self.namePublisher.send(newName)
 				self.hasUploadedSeed = false
@@ -104,10 +112,10 @@ class Prefs_BackupSeed {
 	var manualBackupDone: Bool {
 		get {
 			maybeLogDefaultAccess(#function)
-			return defaults.bool(forKey: PrefsKey.manualBackupDone.value(id))
+			return defaults.bool(forKey: Key.manualBackupDone.value(id))
 		}
 		set {
-			defaults.setValue(newValue, forKey: PrefsKey.manualBackupDone.value(id))
+			defaults.setValue(newValue, forKey: Key.manualBackupDone.value(id))
 			runOnMainThread {
 				self.manualBackupDonePublisher.send(newValue)
 			}
@@ -157,20 +165,20 @@ class Prefs_BackupSeed {
 	}
 	
 	#if DEBUG
-	static func valueDescription(_ key: String, _ value: Any) -> String? {
+	static func valueDescription(_ prefix: String, _ value: Any) -> String? {
 		
-		switch key {
-		case PrefsKey.backupSeed_enabled.prefix:
-			return Prefs.printBool(value)
+		switch prefix {
+		case Key.backupSeed_enabled.prefix:
+			return printBool(value)
 			
-		case PrefsKey.backupSeed_hasUploadedSeed.prefix:
-			return Prefs.printBool(value)
+		case Key.backupSeed_hasUploadedSeed.prefix:
+			return printBool(value)
 			
-		case PrefsKey.backupSeed_name.prefix:
-			return Prefs.printString(value)
+		case Key.backupSeed_name.prefix:
+			return printString(value)
 			
-		case PrefsKey.manualBackupDone.prefix:
-			return Prefs.printBool(value)
+		case Key.manualBackupDone.prefix:
+			return printBool(value)
 			
 		default:
 			return nil

@@ -1,5 +1,7 @@
 import Foundation
 
+/// Names of keys stored in the iOS UserDefaults system.
+///
 enum PrefsKey: CaseIterable {
 //	Wallet:
 	case defaultPaymentDescription

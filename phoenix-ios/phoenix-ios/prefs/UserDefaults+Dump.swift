@@ -2,6 +2,7 @@ import Foundation
 
 extension UserDefaults {
 	
+	#if DEBUG
 	func dump(
 		isKnownKey: (String) -> Bool,
 		valueDescription: (String, Any) -> String
@@ -82,4 +83,23 @@ extension UserDefaults {
 		
 		return output
 	}
+	#endif
 }
+
+#if DEBUG
+func printString(_ value: Any) -> String {
+	let desc = (value as? String) ?? "unknown"
+	return "<String: \(desc)>"
+}
+
+func printBool(_ value: Any) -> String {
+	let desc = (value as? NSNumber)?.boolValue.description ?? "unknown"
+	return "<Bool: \(desc)>"
+}
+
+func printInt(_ value: Any) -> String {
+	let desc = (value as? NSNumber)?.intValue.description ?? "unknown"
+	return "<Int: \(desc)>"
+}
+#endif
+
