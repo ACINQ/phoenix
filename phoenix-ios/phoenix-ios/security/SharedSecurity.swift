@@ -9,6 +9,8 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
+fileprivate typealias Key = AppSecurityKey
+
 enum ReadSecurityFileError: Error {
 	case fileNotFound
 	case errorReadingFile(underlying: Error)
@@ -38,18 +40,6 @@ class SharedSecurity {
 	public static let shared = SharedSecurity()
 	
 	private init() {/* must use shared instance */}
-	
-	// --------------------------------------------------------------------------------
-	// MARK: Access Groups
-	// --------------------------------------------------------------------------------
-	
-	/// Represents the keychain domain for our app group.
-	/// I.E. can be accessed by our app extensions (e.g. notification-service-extension).
-	///
-	public func sharedAccessGroup() -> String {
-		
-		return "group.co.acinq.phoenix"
-	}
 	
 	// --------------------------------------------------------------------------------
 	// MARK: Security JSON File
@@ -122,8 +112,8 @@ class SharedSecurity {
 		let fetchedKey: SymmetricKey?
 		do {
 			fetchedKey = try keychain.readKey(
-				account     : keychain_accountName_keychain,
-				accessGroup : sharedAccessGroup()
+				account     : Key.lockingKey_keychain.deprecatedValue,
+				accessGroup : Key.lockingKey_keychain.accessGroup.value
 			)
 		} catch {
 			log.error("readKeychainEntry(): error: readingKey: \(String(describing: error))")

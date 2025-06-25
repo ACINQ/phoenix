@@ -193,8 +193,6 @@
 		DC5F96BA2E0457530052CDE6 /* Prefs+Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96B92E04574E0052CDE6 /* Prefs+Constants.swift */; };
 		DC5F96BB2E0457530052CDE6 /* Prefs+Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96B92E04574E0052CDE6 /* Prefs+Constants.swift */; };
 		DC5F96BD2E09D6CB0052CDE6 /* AppSecurity+Wallet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96BC2E09D6C60052CDE6 /* AppSecurity+Wallet.swift */; };
-		DC5F96C02E09D7190052CDE6 /* AppSecurity+Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96BF2E09D7130052CDE6 /* AppSecurity+Constants.swift */; };
-		DC5F96C12E09D7190052CDE6 /* AppSecurity+Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96BF2E09D7130052CDE6 /* AppSecurity+Constants.swift */; };
 		DC5F96C42E09DE700052CDE6 /* AppSecurity+Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96C22E09DE680052CDE6 /* AppSecurity+Util.swift */; };
 		DC5F96C72E09E6320052CDE6 /* Prefs+Keys.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96C52E09E62F0052CDE6 /* Prefs+Keys.swift */; };
 		DC5F96CA2E09F3050052CDE6 /* Prefs+Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96C82E09F3010052CDE6 /* Prefs+Debug.swift */; };
@@ -656,7 +654,6 @@
 		DC5F96B62E0455700052CDE6 /* GroupPrefs+Global.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GroupPrefs+Global.swift"; sourceTree = "<group>"; };
 		DC5F96B92E04574E0052CDE6 /* Prefs+Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Prefs+Constants.swift"; sourceTree = "<group>"; };
 		DC5F96BC2E09D6C60052CDE6 /* AppSecurity+Wallet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppSecurity+Wallet.swift"; sourceTree = "<group>"; };
-		DC5F96BF2E09D7130052CDE6 /* AppSecurity+Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppSecurity+Constants.swift"; sourceTree = "<group>"; };
 		DC5F96C22E09DE680052CDE6 /* AppSecurity+Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppSecurity+Util.swift"; sourceTree = "<group>"; };
 		DC5F96C52E09E62F0052CDE6 /* Prefs+Keys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Prefs+Keys.swift"; sourceTree = "<group>"; };
 		DC5F96C82E09F3010052CDE6 /* Prefs+Debug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Prefs+Debug.swift"; sourceTree = "<group>"; };
@@ -1559,7 +1556,6 @@
 			isa = PBXGroup;
 			children = (
 				DCACF6F72566D0BA0009B01E /* AppSecurity.swift */,
-				DC5F96BF2E09D7130052CDE6 /* AppSecurity+Constants.swift */,
 				DC5F96CB2E0AF32D0052CDE6 /* AppSecurity+Keys.swift */,
 				DC5F96C22E09DE680052CDE6 /* AppSecurity+Util.swift */,
 				DC5F96BC2E09D6C60052CDE6 /* AppSecurity+Wallet.swift */,
@@ -2342,7 +2338,6 @@
 				F4AED298257A50CD009485C1 /* LogsConfigurationView.swift in Sources */,
 				DC08A51A27FB6C5F0041603B /* TopTab.swift in Sources */,
 				DC2210D72DE4F4590096D8D2 /* ToggleAlignment.swift in Sources */,
-				DC5F96C02E09D7190052CDE6 /* AppSecurity+Constants.swift in Sources */,
 				DC27E4CF2792079600C777CC /* CenterTopLineAlignment.swift in Sources */,
 				DC5E28CE2C64108A0037B3D3 /* NavigationLinkStyle.swift in Sources */,
 				DCEAE5B92943D64B00320C46 /* MsatRange.swift in Sources */,
@@ -2411,7 +2406,6 @@
 				DC78A6022DF8C18F003A7DD8 /* UserDefaults+DefaultValue.swift in Sources */,
 				DC641C762821716A00862DCD /* UserDefaults+Serialization.swift in Sources */,
 				DCCFE6BF2B713FBB002FFF11 /* LogFileManager.swift in Sources */,
-				DC5F96C12E09D7190052CDE6 /* AppSecurity+Constants.swift in Sources */,
 				DCF9CFD52862656E001AD33F /* Asserts.swift in Sources */,
 				DC641C7C282172BB00862DCD /* DelayedSave.swift in Sources */,
 				DCA6DECE282AB12B0073C658 /* SecurityFile.swift in Sources */,

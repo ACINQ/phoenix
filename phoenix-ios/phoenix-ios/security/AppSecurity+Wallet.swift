@@ -11,30 +11,32 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
+fileprivate typealias Key = AppSecurityKey
+
 let PIN_LENGTH = 6
 
 enum PinType: CustomStringConvertible {
 	case lockPin
 	case spendingPin
 	
-	var keychain_accountName_pin: String {
-		switch self {
-			case .lockPin     : return keychain_accountName_lockPin
-			case .spendingPin : return keychain_accountName_spendingPin
-		}
-	}
-	
-	var keychain_accountName_invalid: String {
-		switch self {
-			case .lockPin     : return keychain_accountName_invalidLockPin
-			case .spendingPin : return keychain_accountName_invalidSpendingPin
-		}
-	}
-	
 	var description: String {
 		switch self {
 			case .lockPin     : return "lockPin"
 			case .spendingPin : return "spendingPin"
+		}
+	}
+	
+	fileprivate var keyPin: Key {
+		switch self {
+			case .lockPin     : return Key.lockPin
+			case .spendingPin : return Key.spendingPin
+		}
+	}
+	
+	fileprivate var keyInvalid: Key {
+		switch self {
+			case .lockPin     : return Key.invalidLockPin
+			case .spendingPin : return Key.invalidSpendingPin
 		}
 	}
 }
@@ -102,7 +104,7 @@ class AppSecurity_Wallet {
 	}
 	
 	// --------------------------------------------------------------------------------
-	// MARK: Private Utilities
+	// MARK: Utilities
 	// --------------------------------------------------------------------------------
 	
 	/// Performs disk IO - use in background thread.
@@ -162,24 +164,20 @@ class AppSecurity_Wallet {
 		return enabledSecurity
 	}
 	
-	// --------------------------------------------------------------------------------
-	// MARK: Access Groups
-	// --------------------------------------------------------------------------------
-	
-	/// Represents the keychain domain for this app.
-	/// I.E. can NOT be accessed by our app extensions.
-	///
-	fileprivate func privateAccessGroup() -> String {
+	private func commonMixins() -> [String: Any] {
 		
-		return "XD77LN4376.co.acinq.phoenix"
-	}
-	
-	/// Represents the keychain domain for our app group.
-	/// I.E. can be accessed by our app extensions (e.g. notification-service-extension).
-	///
-	fileprivate func sharedAccessGroup() -> String {
+		var mixins = [String: Any]()
 		
-		return SharedSecurity.shared.sharedAccessGroup()
+		// kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly:
+		//
+		// > After the first unlock, the data remains accessible until the next restart.
+		// > This is recommended for items that need to be accessed by background applications.
+		// > Items with this attribute do not migrate to a new device. Thus, after restoring
+		// > from a backup of a different device, these items will not be present.
+		//
+		mixins[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+		
+		return mixins
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -366,12 +364,10 @@ class AppSecurity_Wallet {
 				// which we only need to do once when launching the app.
 				// So we shouldn't need access to the keychain item when the device is locked.
 				
-				var mixins = [String: Any]()
-				mixins[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
-				
+				let mixins = self.commonMixins()
 				try keychain.storeKey( lockingKey,
-				              account: keychain_accountName_keychain,
-				          accessGroup: self.sharedAccessGroup(),
+				              account: Key.lockingKey_keychain.value(self.id),
+				          accessGroup: Key.lockingKey_keychain.accessGroup.value,
 				               mixins: mixins)
 				
 			} catch {
@@ -389,8 +385,8 @@ class AppSecurity_Wallet {
 			// Now we can safely delete the previous entry in the OS keychain (if it exists)
 			do {
 				try keychain.deleteKey(
-					account     : keychain_accountName_biometrics,
-					accessGroup : self.privateAccessGroup()
+					account     : Key.lockingKey_biometrics.value(self.id),
+					accessGroup : Key.lockingKey_biometrics.accessGroup.value
 				)
 				
 			} catch {/* ignored */}
@@ -426,14 +422,12 @@ class AppSecurity_Wallet {
 		queue.async {
 			
 			let keychain = GenericPasswordStore()
-			let account = keychain_accountName_softBiometrics
-			let accessGroup = self.privateAccessGroup()
+			let account     = Key.softBiometrics.value(self.id)
+			let accessGroup = Key.softBiometrics.accessGroup.value
 			
 			if enabled {
 				do {
-					var mixins = [String: Any]()
-					mixins[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
-					
+					let mixins = self.commonMixins()
 					try keychain.storeKey( "true",
 					              account: account,
 					          accessGroup: accessGroup,
@@ -464,8 +458,8 @@ class AppSecurity_Wallet {
 	public func getSoftBiometricsEnabled() -> Bool {
 		
 		let keychain = GenericPasswordStore()
-		let account = keychain_accountName_softBiometrics
-		let accessGroup = self.privateAccessGroup()
+		let account     = Key.softBiometrics.value(self.id)
+		let accessGroup = Key.softBiometrics.accessGroup.value
 		
 		var enabled = false
 		do {
@@ -508,14 +502,12 @@ class AppSecurity_Wallet {
 		queue.async {
 			
 			let keychain = GenericPasswordStore()
-			let account = keychain_accountName_passcodeFallback
-			let accessGroup = self.privateAccessGroup()
+			let account     = Key.passcodeFallback.value(self.id)
+			let accessGroup = Key.passcodeFallback.accessGroup.value
 			
 			if enabled {
 				do {
-					var mixins = [String: Any]()
-					mixins[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
-					
+					let mixins = self.commonMixins()
 					try keychain.storeKey( "true",
 									  account: account,
 								 accessGroup: accessGroup,
@@ -547,8 +539,8 @@ class AppSecurity_Wallet {
 	public func getPasscodeFallbackEnabled() -> Bool {
 		
 		let keychain = GenericPasswordStore()
-		let account = keychain_accountName_passcodeFallback
-		let accessGroup = privateAccessGroup()
+		let account     = Key.passcodeFallback.value(self.id)
+		let accessGroup = Key.passcodeFallback.accessGroup.value
 		
 		var enabled = false
 		do {
@@ -600,14 +592,12 @@ class AppSecurity_Wallet {
 		queue.async {
 			
 			let keychain = GenericPasswordStore()
-			let account = type.keychain_accountName_pin
-			let accessGroup = self.privateAccessGroup()
+			let account     = type.keyPin.value(self.id)
+			let accessGroup = type.keyPin.accessGroup.value
 			
 			if let pin {
 				do {
-					var mixins = [String: Any]()
-					mixins[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
-					
+					let mixins = self.commonMixins()
 					try keychain.storeKey( pin,
 									  account: account,
 								 accessGroup: accessGroup,
@@ -639,8 +629,8 @@ class AppSecurity_Wallet {
 	func getPin(_ type: PinType) -> String? {
 		
 		let keychain = GenericPasswordStore()
-		let account = type.keychain_accountName_pin
-		let accessGroup = privateAccessGroup()
+		let account     = type.keyPin.value(id)
+		let accessGroup = type.keyPin.accessGroup.value
 		
 		var pin: String? = nil
 		do {
@@ -697,14 +687,12 @@ class AppSecurity_Wallet {
 		queue.async {
 			
 			let keychain = GenericPasswordStore()
-			let account = type.keychain_accountName_invalid
-			let accessGroup = self.privateAccessGroup()
+			let account     = type.keyInvalid.value(self.id)
+			let accessGroup = type.keyInvalid.accessGroup.value
 			
 			if let invalidPinData {
 				do {
-					var mixins = [String: Any]()
-					mixins[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
-					
+					let mixins = self.commonMixins()
 					try keychain.storeKey( invalidPinData,
 									  account: account,
 								 accessGroup: accessGroup,
@@ -736,8 +724,8 @@ class AppSecurity_Wallet {
 	func getInvalidPin(_ type: PinType) -> InvalidPin? {
 		
 		let keychain = GenericPasswordStore()
-		let account = type.keychain_accountName_invalid
-		let accessGroup = privateAccessGroup()
+		let account     = type.keyInvalid.value(id)
+		let accessGroup = type.keyInvalid.accessGroup.value
 		
 		var invalidPin: InvalidPin? = nil
 		do {
@@ -830,13 +818,11 @@ class AppSecurity_Wallet {
 	) -> Result<Void, Error> {
 		
 		let keychain = GenericPasswordStore()
-		let account = keychain_accountName_bip353Address
-		let accessGroup = privateAccessGroup()
+		let account     = Key.bip353Address.value(id)
+		let accessGroup = Key.bip353Address.accessGroup.value
 		
 		do {
-			var mixins = [String: Any]()
-			mixins[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
-			
+			let mixins = self.commonMixins()
 			try keychain.storeKey( address,
 							  account: account,
 						 accessGroup: accessGroup,
@@ -852,8 +838,8 @@ class AppSecurity_Wallet {
 	public func getBip353Address() -> String? {
 		
 		let keychain = GenericPasswordStore()
-		let account = keychain_accountName_bip353Address
-		let accessGroup = privateAccessGroup()
+		let account     = Key.bip353Address.value(id)
+		let accessGroup = Key.bip353Address.accessGroup.value
 		
 		var addr: String? = nil
 		do {
@@ -961,13 +947,14 @@ class AppSecurity_Wallet {
 		mixins[kSecUseAuthenticationContext as String] = context
 		
 		let keychain = GenericPasswordStore()
-		let account = keychain_accountName_biometrics
+		let account     = Key.lockingKey_biometrics.value(id)
+		let accessGroup = Key.lockingKey_biometrics.accessGroup.value
 	
 		let fetchedKey: SymmetricKey?
 		do {
 			fetchedKey = try keychain.readKey(
 				account     : account,
-				accessGroup : self.privateAccessGroup(),
+				accessGroup : accessGroup,
 				mixins      : mixins
 			)
 		} catch {
@@ -1121,246 +1108,37 @@ class AppSecurity_Wallet {
 			
 		let keychain = GenericPasswordStore()
 		
-		do {
-			let result = try keychain.deleteKey(
-				account: keychain_accountName_keychain,
-				accessGroup: privateAccessGroup() // <- old location
-			)
-			if result == .itemDeleted {
-				log.info("Deleted keychain item: act(keychain) grp(private)")
-			}
-		} catch {
-			log.error("Unable to delete keychain item: act(keychain) grp(private): \(error)")
-		}
-		
-		do {
-			let result = try keychain.deleteKey(
-				account: keychain_accountName_keychain,
-				accessGroup: sharedAccessGroup() // <- new location
-			)
-			if result == .itemDeleted {
-				log.info("Deleted keychain item: act(keychain) grp(shared)")
-			}
-		} catch {
-			log.error("Unable to delete keychain item: act(keychain) grp(shared): \(error)")
-		}
-		
-		do {
-			let result = try keychain.deleteKey(
-				account: keychain_accountName_biometrics,
-				accessGroup: privateAccessGroup()
-			)
-			if result == .itemDeleted {
-				log.info("Deleted keychain item: act(biometrics) grp(private)")
-			}
-		} catch {
-			log.error("Unable to delete keychain item: act(biometrics) grp(private): \(error)")
-		}
-		
-		do {
-			let result = try keychain.deleteKey(
-				account: keychain_accountName_softBiometrics,
-				accessGroup: privateAccessGroup()
-			)
-			if result == .itemDeleted {
-				log.info("Deleted keychain item: act(softBiometrics) grp(private)")
-			}
-		} catch {
-			log.error("Unable to delete keychain item: act(softBiometrics) grp(private): \(error)")
-		}
-		
-		do {
-			let result = try keychain.deleteKey(
-				account: keychain_accountName_lockPin,
-				accessGroup: privateAccessGroup()
-			)
-			if result == .itemDeleted {
-				log.info("Deleted keychain item: act(lockPin) grp(private)")
-			}
-		} catch {
-			log.error("Unable to delete keychain item: act(lockPin) grp(private): \(error)")
-		}
-		
-		do {
-			let result = try keychain.deleteKey(
-				account: keychain_accountName_spendingPin,
-				accessGroup: privateAccessGroup()
-			)
-			if result == .itemDeleted {
-				log.info("Deleted keychain item: act(spendingPin) grp(private)")
-			}
-		} catch {
-			log.error("Unable to delete keychain item: act(spendingPin) grp(private): \(error)")
-		}
-		
-		do {
-			let result = try keychain.deleteKey(
-				account: keychain_accountName_bip353Address,
-				accessGroup: privateAccessGroup()
-			)
-			if result == .itemDeleted {
-				log.info("Deleted keychain item: act(bip353Address) grp(private)")
-			}
-		} catch {
-			log.error("Unable to delete keychain item: act(bip353Address) grp(private): \(error)")
-		}
-		
-		publishEnabledSecurity(EnabledSecurity())
-	}
-	
-	// --------------------------------------------------------------------------------
-	// MARK: Migration
-	// --------------------------------------------------------------------------------
-	
-	public func performMigration(
-		_ targetBuild: String,
-		_ completionPublisher: CurrentValueSubject<Int, Never>
-	) -> Void {
-		log.trace("performMigration(to: \(targetBuild))")
-		
-		// NB: The first version released in the App Store was version 1.0.0 (build 17)
-		
-		if targetBuild.isVersion(equalTo: "40") {
-			performMigration_toBuild40()
-		}
-		
-		if targetBuild.isVersion(equalTo: "41") {
-			performMigration_toBuild41(completionPublisher)
-		}
-	}
-	
-	private func performMigration_toBuild40() {
-		log.trace("performMigration_toBuild40()")
-		
-		// Step 1 of 2:
-		// Migrate "security.json" file to group container directory.
-		
-		let fm = FileManager.default
-		
-		if let appSupportDir = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask).first,
-		   let groupDir = fm.containerURL(forSecurityApplicationGroupIdentifier: "group.co.acinq.phoenix")
-		{
-			let oldFile = appSupportDir.appendingPathComponent("security.json", isDirectory: false)
-			let newFile = groupDir.appendingPathComponent("security.json", isDirectory: false)
-			
-			if fm.fileExists(atPath: oldFile.path) {
-				
-				try? fm.moveItem(at: oldFile, to: newFile)
-			}
-		}
-		
-		// Step 2 of 2:
-		// Migrate keychain entry to group container.
-		
-		migrateKeychainItemToSharedGroup()
-	}
-	
-	private func performMigration_toBuild41(_ completionPublisher: CurrentValueSubject<Int, Never>) {
-		log.trace("performMigration_toBuild41()")
-		
-		// There was a bug in versions prior to build 41,
-		// where we didn't check the UIApplication's `isProtectedDataAvailable` flag.
-		//
-		// If that value happened to be false, and we attempted to read from the keychain,
-		// we would have received an item-not-found error.
-		//
-		// If this occurred during performMigration_toBuild40(),
-		// this would have resulted in the app failing to read the keychain item forever (in build 40).
-		// So in build 41, we have to perform this migration again,
-		// but this time not until `isProtectedDataAvailable` is true.
-		
-		if UIApplication.shared.isProtectedDataAvailable {
-			migrateKeychainItemToSharedGroup()
-			
-		} else {
-			
-			completionPublisher.value += 1
-			var cancellables = Set<AnyCancellable>()
-			
-			let nc = NotificationCenter.default
-			nc.publisher(for: UIApplication.protectedDataDidBecomeAvailableNotification).sink { _ in
-				
-				// Apple doesn't specify which thread this notification is posted on.
-				// Should be the main thread, but just in case, let's be safe.
-				runOnMainThread {
-					self.migrateKeychainItemToSharedGroup()
-					completionPublisher.value -= 1
-				}
-				
-				cancellables.removeAll()
-			}.store(in: &cancellables)
-		}
-	}
-	
-	private func migrateKeychainItemToSharedGroup() {
-		log.trace("migrateKeychainItemToSharedGroup()")
-		
-		let keychain = GenericPasswordStore()
-		
-		// Step 1 of 4:
-		// - Read the OLD keychain item.
-		// - If it exists, then we need to migrate it to the new location.
-		var savedKey: SymmetricKey? = nil
-		do {
-			savedKey = try keychain.readKey(
-				account     : keychain_accountName_keychain,
-				accessGroup : privateAccessGroup() // <- old location
-			)
-		} catch {
-			log.error("keychain.readKey(account: keychain, group: nil): error: \(error)")
-		}
-		
-		if let lockingKey = savedKey {
-			// The OLD keychain item exists, so we're going to migrate it.
-			
-			var migrated = false
+		for key in Key.allCases {
 			do {
-				// Step 2 of 4:
-				// - Delete the NEW keychain item.
-				// - It shouldn't exist, but if it does it will cause an error on the next step.
-				try keychain.deleteKey(
-					account     : keychain_accountName_keychain,
-					accessGroup : sharedAccessGroup() // <- new location
+				let result = try keychain.deleteKey(
+					account     : key.value(id),
+					accessGroup : key.accessGroup.value
 				)
-			} catch {
-				log.error("keychain.deleteKey(account: keychain, group: shared): error: \(error)")
-			}
-			do {
-				var mixins = [String: Any]()
-				mixins[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
-				
-				// Step 3 of 4:
-				// - Copy the OLD keychain item to the NEW location.
-				// - If this step fails, an exception is thrown, and we do NOT advance to step 4.
-				try keychain.storeKey( lockingKey,
-				              account: keychain_accountName_keychain,
-				          accessGroup: sharedAccessGroup(), // <- new location
-				               mixins: mixins
-				)
-				migrated = true
-				
-				// Step 4 of 4:
-				// - Finally, delete the OLD keychain item.
-				// - This prevents any duplicate migration attempts in the future.
-				try keychain.deleteKey(
-					account     : keychain_accountName_keychain,
-					accessGroup : privateAccessGroup() // <- old location
-				)
-				
-			} catch {
-				if !migrated {
-					log.error("keychain.storeKey(account: keychain, group: shared): error: \(error)")
-				} else {
-					log.error("keychain.deleteKey(account: keychain, group: private): error: \(error)")
+				if result == .itemDeleted {
+					log.info(
+						"""
+						Deleted keychain item: \
+						acct(\(key.debugName)) grp(\(key.accessGroup.debugName))
+						"""
+					)
 				}
+			} catch {
+				log.error(
+					"""
+					Unable to delete keychain item: \
+					acct(\(key.debugName)) grp(\(key.accessGroup.debugName)): \(error)
+					"""
+				)
 			}
 		}
+		
+		AppSecurity.didResetWallet(id)
 	}
 }
 
-// --------------------------------------------------------------------------------
+// --------------------------------------------------
 // MARK: - Utilities
-// --------------------------------------------------------------------------------
+// --------------------------------------------------
 
 fileprivate func genericError(_ code: Int, _ description: String? = nil) -> NSError {
 	
