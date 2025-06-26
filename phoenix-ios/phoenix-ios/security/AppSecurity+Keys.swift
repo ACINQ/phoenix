@@ -25,7 +25,6 @@ enum AccessGroup {
 /// 
 enum AppSecurityKey: CaseIterable {
 	case lockingKey_keychain
-	case lockingKey_biometrics
 	case softBiometrics
 	case passcodeFallback
 	case lockPin
@@ -36,7 +35,6 @@ enum AppSecurityKey: CaseIterable {
 	
 	var prefix: String { switch self {
 		case .lockingKey_keychain   : return "securityFile_keychain"
-		case .lockingKey_biometrics : return "securityFile_biometrics"
 		case .softBiometrics        : return "biometrics"
 		case .passcodeFallback      : return "passcodeFallback"
 		case .lockPin               : return "customPin"
@@ -48,7 +46,6 @@ enum AppSecurityKey: CaseIterable {
 	
 	var debugName: String { switch self {
 		case .lockingKey_keychain   : return "lockingKey_keychain"
-		case .lockingKey_biometrics : return "lockingKey_biometrics"
 		case .softBiometrics        : return "softBiometrics"
 		case .passcodeFallback      : return "passcodeFallback"
 		case .lockPin               : return "lockPin"
@@ -63,7 +60,6 @@ enum AppSecurityKey: CaseIterable {
 	
 	var accessGroup: AccessGroup { switch self {
 		case .lockingKey_keychain   : return .appAndExtensions
-		case .lockingKey_biometrics : return .appOnly
 		case .softBiometrics        : return .appOnly
 		case .passcodeFallback      : return .appOnly
 		case .lockPin               : return .appOnly
@@ -76,4 +72,8 @@ enum AppSecurityKey: CaseIterable {
 	func value(_ suffix: String) -> String {
 		return "\(self.prefix)-\(suffix)"
 	}
+}
+
+enum AppSecurityKeyDeprecated: String {
+	case lockingKey_biometrics = "securityFile_biometrics"
 }

@@ -1,7 +1,7 @@
 import Foundation
 
 fileprivate let filename = "Prefs"
-#if DEBUG && true
+#if DEBUG
 fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)

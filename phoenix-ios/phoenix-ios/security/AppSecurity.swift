@@ -21,7 +21,7 @@ class AppSecurity {
 		if let walletId = Biz.walletId {
 			return wallet(walletId)
 		} else {
-			return wallet(PREFS_DEFAULT_ID)
+			return wallet(KEYCHAIN_DEFAULT_ID)
 		}
 	}
 	
@@ -219,7 +219,7 @@ class AppSecurity {
 				return
 			}
 			
-			let newAccount = key.value(PREFS_DEFAULT_ID)
+			let newAccount = key.value(KEYCHAIN_DEFAULT_ID)
 			var dstExists = false
 			do {
 				dstExists = try keychain.keyExists(account: newAccount, accessGroup: accessGroup)
@@ -238,11 +238,11 @@ class AppSecurity {
 				log.debug("keychain.moveKey: \(oldAccount) => \(newAccount)")
 				
 				do {
-					try keychain.storeKey(value, account: newAccount, accessGroup: accessGroup)
+					try keychain.addKey(value, account: newAccount, accessGroup: accessGroup)
 				} catch {
 					log.error(
 						"""
-						keychain.storeKey(acct: \(newAccount), grp: \(key.accessGroup.debugName)): \
+						keychain.addKey(acct: \(newAccount), grp: \(key.accessGroup.debugName)): \
 						error: \(error)
 						""")
 					return

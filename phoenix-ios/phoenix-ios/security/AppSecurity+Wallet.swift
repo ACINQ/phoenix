@@ -12,6 +12,7 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
 fileprivate typealias Key = AppSecurityKey
+fileprivate typealias KeyDeprecated = AppSecurityKeyDeprecated
 
 let PIN_LENGTH = 6
 
@@ -88,7 +89,7 @@ class AppSecurity_Wallet {
 	init(id: String) {
 		self.id = id
 	#if DEBUG
-		self.isDefault = (id == PREFS_DEFAULT_ID)
+		self.isDefault = (id == KEYCHAIN_DEFAULT_ID)
 	#endif
 	}
 	
@@ -385,8 +386,8 @@ class AppSecurity_Wallet {
 			// Now we can safely delete the previous entry in the OS keychain (if it exists)
 			do {
 				try keychain.deleteKey(
-					account     : Key.lockingKey_biometrics.value(self.id),
-					accessGroup : Key.lockingKey_biometrics.accessGroup.value
+					account     : KeyDeprecated.lockingKey_biometrics.rawValue,
+					accessGroup : AccessGroup.appOnly.value
 				)
 				
 			} catch {/* ignored */}
@@ -947,8 +948,8 @@ class AppSecurity_Wallet {
 		mixins[kSecUseAuthenticationContext as String] = context
 		
 		let keychain = GenericPasswordStore()
-		let account     = Key.lockingKey_biometrics.value(id)
-		let accessGroup = Key.lockingKey_biometrics.accessGroup.value
+		let account     = KeyDeprecated.lockingKey_biometrics.rawValue
+		let accessGroup = AccessGroup.appOnly.value
 	
 		let fetchedKey: SymmetricKey?
 		do {
