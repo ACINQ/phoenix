@@ -677,7 +677,7 @@
     <string name="prefs_display_coin_mbtc_label">Milli-Bitcoin (mbtc)</string>
     <string name="prefs_display_coin_mbtc_desc">1 mbtc is 0.001 btc</string>
     <string name="prefs_display_coin_btc_label">Bitcoin (btc)</string>
-    <string name="prefs_display_fiat_label">Primary fiat currency</string>
+    <string name="prefs_display_fiat_label">Fiat currency</string>
     <string name="prefs_display_theme_label">Application theme</string>
     <string name="prefs_display_theme_dark_label">Dark theme</string>
     <string name="prefs_display_theme_light_label">Light theme</string>
