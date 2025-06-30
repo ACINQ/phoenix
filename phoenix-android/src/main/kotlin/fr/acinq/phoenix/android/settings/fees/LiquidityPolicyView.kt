@@ -51,14 +51,12 @@ import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.MempoolFeerate
-import fr.acinq.phoenix.data.canRequestLiquidity
 import kotlinx.coroutines.launch
 
 @Composable
 fun LiquidityPolicyView(
     onBackClick: () -> Unit,
     onAdvancedClick: () -> Unit,
-    onRequestLiquidityClick: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val userPrefs = userPrefs
@@ -164,22 +162,6 @@ fun LiquidityPolicyView(
                     },
                 )
             }
-
-            val channelsState by business.peerManager.channelsFlow.collectAsState()
-            if (channelsState.canRequestLiquidity()) {
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Button(
-                        text = stringResource(id = R.string.liquiditypolicy_request_button),
-                        icon = R.drawable.ic_bucket,
-                        onClick = {
-                            keyboardManager?.hide()
-                            onRequestLiquidityClick()
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            }
-
         } else {
             Card(modifier = Modifier.fillMaxWidth()) {
                 ProgressView(text = stringResource(id = R.string.liquiditypolicy_loading))

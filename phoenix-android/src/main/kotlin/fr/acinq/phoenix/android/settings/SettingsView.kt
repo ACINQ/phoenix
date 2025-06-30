@@ -23,9 +23,14 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.NoticesViewModel
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.Screen
@@ -35,8 +40,10 @@ import fr.acinq.phoenix.android.components.CardHeader
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.MenuButton
+import fr.acinq.phoenix.android.components.inputs.CurrencyConverter
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.negativeColor
+import fr.acinq.phoenix.data.canRequestLiquidity
 
 
 @Composable
@@ -46,6 +53,8 @@ fun SettingsView(
     val nc = navController
     val notices = noticesViewModel.notices
     val notifications = business.notificationsManager.notifications.collectAsState()
+
+    var showCurrencyConverter by remember { mutableStateOf(false) }
 
     DefaultScreenLayout {
         DefaultScreenHeader(onBackClick = { nc.navigate(Screen.Home.route) }) {
@@ -61,14 +70,26 @@ fun SettingsView(
             MenuButton(text = stringResource(R.string.settings_about), icon = R.drawable.ic_help_circle, onClick = { nc.navigate(Screen.About.route) })
             MenuButton(text = stringResource(R.string.settings_display_prefs), icon = R.drawable.ic_brush, onClick = { nc.navigate(Screen.Preferences.route) })
             MenuButton(text = stringResource(R.string.settings_payment_settings), icon = R.drawable.ic_tool, onClick = { nc.navigate(Screen.PaymentSettings.route) })
-            MenuButton(text = stringResource(R.string.settings_liquidity_policy), icon = R.drawable.ic_settings, onClick = { nc.navigate(Screen.LiquidityPolicy.route) })
             MenuButton(text = stringResource(R.string.settings_payment_history), icon = R.drawable.ic_list, onClick = { nc.navigate(Screen.PaymentsHistory.route) })
             MenuButton(text = stringResource(R.string.settings_contacts), icon = R.drawable.ic_user, onClick = { nc.navigate(Screen.Contacts.route) })
+            val notifsCount = (notifications.value + notices).size
             MenuButton(
-                text = stringResource(R.string.settings_notifications) + ((notices.size + notifications.value.size).takeIf { it > 0 }?.let { " ($it)"} ?: ""),
+                text = stringResource(R.string.settings_notifications) + (notifsCount.takeIf { it > 0 }?.let { " ($it)"} ?: ""),
                 icon = R.drawable.ic_notification,
-                onClick = { nc.navigate(Screen.Notifications.route) }
+                onClick = { nc.navigate(Screen.Notifications.route) },
+                textStyle = if (notifsCount > 0) MaterialTheme.typography.body2 else MaterialTheme.typography.body1
             )
+            MenuButton(text = stringResource(R.string.settings_converter), icon = R.drawable.ic_world, onClick = { showCurrencyConverter = true })
+        }
+
+        // -- general
+        CardHeader(text = stringResource(id = R.string.settings_fees_title))
+        Card {
+            MenuButton(text = stringResource(R.string.settings_liquidity_policy), icon = R.drawable.ic_wand, onClick = { nc.navigate(Screen.LiquidityPolicy.route) })
+            val channelsState by business.peerManager.channelsFlow.collectAsState()
+            if (channelsState.canRequestLiquidity()) {
+                MenuButton(text = stringResource(R.string.settings_add_liquidity), icon = R.drawable.ic_bucket, onClick = { nc.navigate(Screen.LiquidityRequest.route) })
+            }
         }
 
         // -- privacy & security
@@ -103,5 +124,9 @@ fun SettingsView(
         }
 
         Spacer(Modifier.height(32.dp))
+    }
+
+    if (showCurrencyConverter) {
+        CurrencyConverter(initialAmount = null, initialUnit = LocalBitcoinUnits.current.primary, onDone = { _, _ -> showCurrencyConverter = false })
     }
 }

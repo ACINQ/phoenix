@@ -478,7 +478,6 @@ fun AppView(
                         LiquidityPolicyView(
                             onBackClick = { navController.popBackStack() },
                             onAdvancedClick = { navController.navigate(Screen.AdvancedLiquidityPolicy.route) },
-                            onRequestLiquidityClick = { navController.navigate(Screen.LiquidityRequest.route) },
                         )
                     }
                     composable(Screen.LiquidityRequest.route, deepLinks = listOf(navDeepLink { uriPattern ="phoenix:requestliquidity" })) {
