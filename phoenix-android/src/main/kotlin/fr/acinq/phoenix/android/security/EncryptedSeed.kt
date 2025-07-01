@@ -27,85 +27,87 @@ import javax.crypto.SecretKey
 
 sealed class EncryptedSeed {
 
-  /** Serializes an encrypted seed as a byte array. */
-  abstract fun serialize(): ByteArray
+    /** Serializes an encrypted seed as a byte array. */
+    abstract fun serialize(): ByteArray
 
-  fun name(): String = javaClass.canonicalName ?: javaClass.simpleName
+    fun name(): String = javaClass.canonicalName ?: javaClass.simpleName
 
-  /** Version 2 encrypts the seed with a [SecretKey] from the Android Keystore. */
-  sealed class V2(val keyAlias: String) : EncryptedSeed() {
-    abstract val iv: ByteArray
-    abstract val ciphertext: ByteArray
+    /** Version 2 encrypts the seed with a [SecretKey] from the Android Keystore. */
+    sealed class V2(val keyAlias: String) : EncryptedSeed() {
+        abstract val iv: ByteArray
+        abstract val ciphertext: ByteArray
 
-    /** This seed is encrypted with a key that does *NOT* require user unlock. */
-    class NoAuth(override val iv: ByteArray, override val ciphertext: ByteArray) : V2(KeystoreHelper.KEY_NO_AUTH) {
-      fun decrypt(): ByteArray = getDecryptionCipher().doFinal(ciphertext)
+        /** This seed is encrypted with a key that does *NOT* require user unlock. */
+        class NoAuth(override val iv: ByteArray, override val ciphertext: ByteArray) : V2(KeystoreHelper.KEY_NO_AUTH) {
+            fun decrypt(): ByteArray = getDecryptionCipher().doFinal(ciphertext)
 
-      companion object {
-        fun encrypt(seed: ByteArray): NoAuth = tryWith(GeneralSecurityException()) {
-          val cipher = KeystoreHelper.getEncryptionCipher(KeystoreHelper.KEY_NO_AUTH)
-          NoAuth(cipher.iv, cipher.doFinal(seed))
+            companion object {
+                fun encrypt(seed: ByteArray): NoAuth = tryWith(GeneralSecurityException()) {
+                    val cipher = KeystoreHelper.getEncryptionCipher(KeystoreHelper.KEY_NO_AUTH)
+                    NoAuth(cipher.iv, cipher.doFinal(seed))
+                }
+            }
         }
-      }
-    }
 
-    fun getDecryptionCipher() = KeystoreHelper.getDecryptionCipher(keyAlias, iv)
+        fun getDecryptionCipher() = KeystoreHelper.getDecryptionCipher(keyAlias, iv)
 
-    /** Serialize to a V2 ByteArray. */
-    override fun serialize(): ByteArray {
-      if (iv.size != IV_LENGTH) {
-        throw RuntimeException("cannot serialize seed: iv not of the correct length")
-      }
-      val array = ByteArrayOutputStream()
-      array.write(SEED_FILE_VERSION_2.toInt())
-      array.write(when (keyAlias) {
-        KeystoreHelper.KEY_NO_AUTH -> NO_AUTH_KEY_VERSION
-        else -> throw UnhandledEncryptionKeyAlias(keyAlias)
-      }.toInt())
-      array.write(iv)
-      array.write(ciphertext)
-      return array.toByteArray()
+        /** Serialize to a V2 ByteArray. */
+        override fun serialize(): ByteArray {
+            if (iv.size != IV_LENGTH) {
+                throw RuntimeException("cannot serialize seed: iv not of the correct length")
+            }
+            val array = ByteArrayOutputStream()
+            array.write(SEED_FILE_VERSION_2.toInt())
+            array.write(
+                when (keyAlias) {
+                    KeystoreHelper.KEY_NO_AUTH -> NO_AUTH_KEY_VERSION
+                    else -> throw UnhandledEncryptionKeyAlias(keyAlias)
+                }.toInt()
+            )
+            array.write(iv)
+            array.write(ciphertext)
+            return array.toByteArray()
+        }
+
+        companion object {
+            private const val IV_LENGTH = 16
+            private const val NO_AUTH_KEY_VERSION = 1
+            private const val REMOVED_DO_NOT_USE = 2
+
+            fun deserialize(stream: ByteArrayInputStream): V2 {
+                val keyVersion = stream.read()
+                val iv = ByteArray(IV_LENGTH)
+                stream.read(iv, 0, IV_LENGTH)
+                val cipherText = ByteArray(stream.available())
+                stream.read(cipherText, 0, stream.available())
+                return when (keyVersion) {
+                    NO_AUTH_KEY_VERSION -> NoAuth(iv, cipherText)
+                    else -> throw UnhandledEncryptionKeyVersion(keyVersion)
+                }
+            }
+        }
     }
 
     companion object {
-      private const val IV_LENGTH = 16
-      private const val NO_AUTH_KEY_VERSION = 1
-      private const val REMOVED_DO_NOT_USE = 2
+        val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-      fun deserialize(stream: ByteArrayInputStream): V2 {
-        val keyVersion = stream.read()
-        val iv = ByteArray(IV_LENGTH)
-        stream.read(iv, 0, IV_LENGTH)
-        val cipherText = ByteArray(stream.available())
-        stream.read(cipherText, 0, stream.available())
-        return when (keyVersion) {
-          NO_AUTH_KEY_VERSION -> NoAuth(iv, cipherText)
-          else -> throw UnhandledEncryptionKeyVersion(keyVersion)
+        const val SEED_FILE_VERSION_2: Byte = 2
+
+        /** Reads an array of byte and de-serializes it as an [EncryptedSeed] object. */
+        fun deserialize(serialized: ByteArray): EncryptedSeed {
+            val stream = ByteArrayInputStream(serialized)
+            val version = stream.read()
+            return when (version) {
+                SEED_FILE_VERSION_2.toInt() -> V2.deserialize(stream)
+                else -> throw UnhandledSeedVersion(version)
+            }
         }
-      }
-    }
-  }
 
-  companion object {
-    val log: Logger = LoggerFactory.getLogger(this::class.java)
-
-    const val SEED_FILE_VERSION_2: Byte = 2
-
-    /** Reads an array of byte and de-serializes it as an [EncryptedSeed] object. */
-    fun deserialize(serialized: ByteArray): EncryptedSeed {
-      val stream = ByteArrayInputStream(serialized)
-      val version = stream.read()
-      return when (version) {
-        SEED_FILE_VERSION_2.toInt() -> V2.deserialize(stream)
-        else -> throw UnhandledSeedVersion(version)
-      }
+        fun toMnemonics(array: ByteArray): List<String> = String(Hex.decode(String(array, Charsets.UTF_8)), Charsets.UTF_8).split(" ")
+        fun fromMnemonics(words: List<String>): ByteArray = Hex.encode(words.joinToString(" ").encodeToByteArray()).encodeToByteArray()
     }
 
-    fun toMnemonics(array: ByteArray): List<String> = String(Hex.decode(String(array, Charsets.UTF_8)), Charsets.UTF_8).split(" ")
-    fun fromMnemonics(words: List<String>): ByteArray = Hex.encode(words.joinToString(" ").encodeToByteArray()).encodeToByteArray()
-  }
-
-  class UnhandledEncryptionKeyVersion(key: Int): RuntimeException("unhandled encryption key version=$key")
-  class UnhandledEncryptionKeyAlias(alias: String): RuntimeException("unhandled encryption key alias=$alias")
-  class UnhandledSeedVersion(version: Int): RuntimeException("unhandled encrypted seed version=$version")
+    class UnhandledEncryptionKeyVersion(key: Int) : RuntimeException("unhandled encryption key version=$key")
+    class UnhandledEncryptionKeyAlias(alias: String) : RuntimeException("unhandled encryption key alias=$alias")
+    class UnhandledSeedVersion(version: Int) : RuntimeException("unhandled encrypted seed version=$version")
 }
