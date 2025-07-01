@@ -1,5 +1,6 @@
 import SwiftUI
 import PhoenixShared
+import CryptoKit
 
 fileprivate let filename = "InitializationView"
 #if DEBUG && true
@@ -239,7 +240,12 @@ struct InitializationView: MVIView {
 	func createMnemonics() -> Void {
 		log.trace("createMnemonics()")
 		
-		let swiftEntropy = AppSecurity.generateEntropy()
+		let randomKey = SymmetricKey(size: .bits128)
+		let swiftEntropy: Data = randomKey.withUnsafeBytes {(bytes: UnsafeRawBufferPointer) -> Data in
+			return Data(bytes: bytes.baseAddress!, count: bytes.count)
+		}
+		assert(swiftEntropy.count == (128 / 8))
+		
 		let kotlinEntropy = swiftEntropy.toKotlinByteArray()
 		
 		let intent = Initialization.IntentGenerateWallet(
@@ -265,9 +271,18 @@ struct InitializationView: MVIView {
 			language  : model.language
 		)
 
-		AppSecurity.current.addKeychainEntry(recoveryPhrase: recoveryPhrase) { (error: Error?) in
-			if error == nil {
-				Biz.loadWallet(trigger: .newWallet, recoveryPhrase: recoveryPhrase, seed: model.seed)
+		let chain = Biz.business.chain
+		AppSecurity.shared.addWallet(chain: chain, recoveryPhrase: recoveryPhrase, seed: model.seed) { result in
+			switch result {
+			case .failure(let reason):
+				log.error("Error adding wallet: \(reason)")
+				
+			case .success():
+				Biz.loadWallet(
+					trigger        : .newWallet,
+					recoveryPhrase : recoveryPhrase,
+					seed           : model.seed
+				)
 			}
 		}
 	}

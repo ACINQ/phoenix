@@ -1,18 +1,22 @@
 import Foundation
 
-fileprivate let filename = "AppSecurity"
+fileprivate let filename = "Keychain"
 #if DEBUG
 fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-fileprivate typealias Key = AppSecurityKey
+fileprivate typealias Key = KeychainKey
 
-extension AppSecurity {
+extension Keychain {
 	
 	#if DEBUG
-	func printKeysAndValues(_ id: String?) {
+	static func printKeysAndValues(_ walletId: WalletIdentifier) {
+		printKeysAndValues(walletId.keyId)
+	}
+	
+	static func printKeysAndValues(_ id: String?) {
 		
 		let keychain = GenericPasswordStore()
 		
@@ -21,7 +25,7 @@ extension AppSecurity {
 		
 		for key in Key.allCases {
 			
-			let account: String = if let id { key.value(id) } else { key.deprecatedValue }
+			let account: String = if let id { key.account(id) } else { key.deprecatedValue }
 			let accessGroup: String = key.accessGroup.value
 			
 			do {
@@ -41,7 +45,7 @@ extension AppSecurity {
 		}
 	}
 	
-	func valueDescription(_ prefix: String, _ value: Data) -> String {
+	static func valueDescription(_ prefix: String, _ value: Data) -> String {
 		
 		let pinDescription = {() -> String in
 			if let str = String(data: value, encoding: .utf8), str.isValidPIN {
@@ -60,7 +64,7 @@ extension AppSecurity {
 		}
 		
 		return switch prefix {
-		case Key.lockingKey_keychain.prefix:
+		case Key.lockingKey.prefix:
 			"<Key: \(value.count) bytes>"
 			
 		case Key.softBiometrics.prefix:

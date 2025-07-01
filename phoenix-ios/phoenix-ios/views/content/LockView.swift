@@ -11,7 +11,7 @@ struct LockView: View {
 	
 	@ObservedObject var lockState = LockState.shared
 	
-	@State var enabledSecurity: EnabledSecurity = AppSecurity.current.enabledSecurityPublisher.value
+	@State var enabledSecurity: EnabledSecurity = Keychain.current.enabledSecurityPublisher.value
 	@State var invalidPin: InvalidPin = InvalidPin.none() // updated in onAppear
 	
 	@State var isTouchID = true
@@ -373,11 +373,11 @@ struct LockView: View {
 		// Note that after returning background, the biometric status may have changed.
 		// For example: .touchID_notEnrolled => .touchID_available
 		
-		let biometricsSupport = AppSecurity.deviceBiometricSupport()
+		let biometricsSupport = DeviceInfo.biometricSupport()
 		refreshBiometricsSupport(biometricsSupport)
 		
-		enabledSecurity = AppSecurity.current.enabledSecurityPublisher.value
-		invalidPin = AppSecurity.current.getInvalidLockPin() ?? InvalidPin.none()
+		enabledSecurity = Keychain.current.enabledSecurityPublisher.value
+		invalidPin = Keychain.current.getInvalidLockPin() ?? InvalidPin.none()
 		currentDate = Date.now
 		
 		if let delay = invalidPin.waitTimeFrom(currentDate) {
@@ -452,7 +452,7 @@ struct LockView: View {
 		}
 		biometricsAttemptInProgress = true
 		
-		AppSecurity.current.tryUnlockWithBiometrics {(result: Result<RecoveryPhrase, Error>) in
+		Keychain.current.tryUnlockWithBiometrics {(result: Result<RecoveryPhrase, Error>) in
 			
 			biometricsAttemptInProgress = false
 			switch result {
@@ -511,7 +511,7 @@ struct LockView: View {
 	func verifyPin() {
 		log.trace("verifyPin()")
 		
-		let correctPin = AppSecurity.current.getLockPin()
+		let correctPin = Keychain.current.getLockPin()
 		if pin == correctPin {
 			handleCorrectPin()
 		} else {
@@ -522,7 +522,7 @@ struct LockView: View {
 	func handleCorrectPin() {
 		log.trace("handleCorrectPin()")
 		
-		AppSecurity.current.tryUnlockWithKeychain { recoveryPhrase, configuration, error in
+		Keychain.current.tryUnlockWithKeychain { (recoveryPhrase, error) in
 			if let recoveryPhrase {
 				closeLockView(recoveryPhrase)
 			} else if let error {
@@ -531,7 +531,7 @@ struct LockView: View {
 		}
 		
 		// Delete InvalidPin info from keychain (if it exists)
-		AppSecurity.current.setInvalidLockPin(nil) { _ in }
+		Keychain.current.setInvalidLockPin(nil) { _ in }
 		invalidPin = InvalidPin.none()
 	}
 	
@@ -551,7 +551,7 @@ struct LockView: View {
 			newInvalidPin = invalidPin.increment()
 		}
 		
-		AppSecurity.current.setInvalidLockPin(newInvalidPin) { _ in }
+		Keychain.current.setInvalidLockPin(newInvalidPin) { _ in }
 		invalidPin = newInvalidPin
 		currentDate = Date.now
 		

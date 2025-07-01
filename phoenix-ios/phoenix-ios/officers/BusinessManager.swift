@@ -72,9 +72,11 @@ class BusinessManager {
 	/// 
 	public let mnemonicLanguagePublisher = CurrentValueSubject<MnemonicLanguage, Never>(MnemonicLanguage.english)
 	
-	private var isInBackground = false
+	/// General wallet info (e.g. nodeId)
+	///
+	public var walletInfo: WalletManager.WalletInfo? = nil
 	
-	private var walletInfo: WalletManager.WalletInfo? = nil
+	private var isInBackground = false
 	private var peerConnectionState: Lightning_kmpConnection? = nil
 	
 	private var longLivedTasks = [String: UIBackgroundTaskIdentifier]()
@@ -466,12 +468,15 @@ class BusinessManager {
 		
 		Prefs.loadWallet(walletId)
 		GroupPrefs.loadWallet(walletId)
+		AppSecurity.shared.loadWallet(walletId)
 	#if DEBUG
 		log.debug("--------------------------------------------------")
 		log.debug("# PREFS: PHASE 2:")
 		Prefs.printAllKeyValues()
 		log.debug("# GROUP_PREFS: PHASE 2:")
 		GroupPrefs.printAllKeyValues()
+		log.debug("# KEYCHAIN(current): PHASE 1:")
+		Keychain.printKeysAndValues(walletId)
 		log.debug("--------------------------------------------------")
 	#endif
 		
@@ -530,19 +535,6 @@ class BusinessManager {
 		} else {
 			return nil
 		}
-	}
-
-	/// The current nodeIdHash (from the current unlocked wallet).
-	///
-	/// Always fetch this on demand - don't cache it.
-	/// Because it might change if the user closes his/her wallet.
-	///
-	var nodeIdHash: String? {
-		return walletInfo?.nodeIdHash
-	}
-	
-	var nodeId: String? {
-		return walletInfo?.nodeId.toHex()
 	}
 
 	// --------------------------------------------------

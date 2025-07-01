@@ -94,7 +94,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	func sceneDidEnterBackground(_ scene: UIScene) {
 		log.trace("sceneDidEnterBackground()")
 		
-		let currentSecurity = AppSecurity.current.enabledSecurityPublisher.value
+		let currentSecurity = Keychain.current.enabledSecurityPublisher.value
 		if currentSecurity.hasAppLock() {
 			
 			LockState.shared.isUnlocked = false
@@ -251,48 +251,48 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		}
 		firstUnlockAttempted = true
 		
-		AppSecurity.current.tryUnlockWithKeychain {
-			(recoveryPhrase: RecoveryPhrase?, enabledSecurity: EnabledSecurity, error: UnlockError?) in
-
-			// There are multiple potential configurations:
-			//
-			// - no wallet         => recoveryPhrase == nil, enabledSecurity is empty
-			// - no security       => recoveryPhrase != nil, enabledSecurity is empty
-			// - standard security => recoveryPhrase != nil, enabledSecurity is non-empty
-			// - advanced security => recoveryPhrase == nil, enabledSecurity is non-empty
-			//
-			// Another way to think about it:
-			// - standard security => biometrics only protect the UI, wallet can immediately be loaded
-			// - advanced security => biometrics required to unlock both the UI and the seed
-
-			if recoveryPhrase == nil && enabledSecurity.isEmpty && error == nil {
-				// The user doesn't have a wallet yet.
-				LockState.shared.walletExistence = .doesNotExist
-				
-				// Issue #282 - Face ID remains enabled between app installs.
-				// Items stored in the iOS keychain remain persisted between iOS installs.
-				// So we need to clear the flag here.
-				//
-				// We have the same problem with the Custom PIN.
-				// And also the Bip353Address.
-				// So we perform a standard wallet reset (which clears all values).
-				AppSecurity.current.resetWallet()
-				
-			} else if let recoveryPhrase {
-				// The user has a wallet.
-				// Load it into memory immediately.
-				// The UI may or may not be locked.
-				Biz.loadWallet(trigger: .appLaunch, recoveryPhrase: recoveryPhrase)
-			}
-		
-			if let error = error {
-				self.showErrorWindow(error)
-			} else if !enabledSecurity.hasAppLock() {
-				LockState.shared.isUnlocked = true
-			} else {
-				self.showLockWindow()
-			}
-		}
+//		Keychain.current.tryUnlockWithKeychain {
+//			(recoveryPhrase: RecoveryPhrase?, enabledSecurity: EnabledSecurity, error: UnlockError?) in
+//
+//			// There are multiple potential configurations:
+//			//
+//			// - no wallet         => recoveryPhrase == nil, enabledSecurity is empty
+//			// - no security       => recoveryPhrase != nil, enabledSecurity is empty
+//			// - standard security => recoveryPhrase != nil, enabledSecurity is non-empty
+//			// - advanced security => recoveryPhrase == nil, enabledSecurity is non-empty
+//			//
+//			// Another way to think about it:
+//			// - standard security => biometrics only protect the UI, wallet can immediately be loaded
+//			// - advanced security => biometrics required to unlock both the UI and the seed
+//
+//			if recoveryPhrase == nil && enabledSecurity.isEmpty && error == nil {
+//				// The user doesn't have a wallet yet.
+//				LockState.shared.walletExistence = .doesNotExist
+//				
+//				// Issue #282 - Face ID remains enabled between app installs.
+//				// Items stored in the iOS keychain remain persisted between iOS installs.
+//				// So we need to clear the flag here.
+//				//
+//				// We have the same problem with the Custom PIN.
+//				// And also the Bip353Address.
+//				// So we perform a standard wallet reset (which clears all values).
+//				Keychain.current.resetWallet()
+//				
+//			} else if let recoveryPhrase {
+//				// The user has a wallet.
+//				// Load it into memory immediately.
+//				// The UI may or may not be locked.
+//				Biz.loadWallet(trigger: .appLaunch, recoveryPhrase: recoveryPhrase)
+//			}
+//		
+//			if let error = error {
+//				self.showErrorWindow(error)
+//			} else if !enabledSecurity.hasAppLock() {
+//				LockState.shared.isUnlocked = true
+//			} else {
+//				self.showLockWindow()
+//			}
+//		}
 	}
 	
 	// --------------------------------------------------

@@ -226,60 +226,7 @@ struct ErrorDetailsView: View, ViewName {
 	}
 	
 	func errorText() -> String {
-		
-		var txt: String = ""
-		
-		txt += "readSecurityFileError: "
-		if let err = danger.readSecurityFileError {
-			switch err {
-				case .fileNotFound:
-					txt += "fileNotFound"
-				case .errorReadingFile(let underlying):
-					txt += "readingFile:\n\(String(describing: underlying))"
-				case .errorDecodingFile(let underlying):
-					txt += "decodingFile:\n\(String(describing: underlying))"
-			}
-		} else {
-			txt += "none"
-		}
-		
-		txt += "\n\n"
-		
-		txt += "readKeychainError: "
-		if let err = danger.readKeychainError {
-			switch err {
-				case .keychainOptionNotEnabled:
-					txt += "keychainOptionNotEnabled"
-				case .keychainBoxCorrupted(let underlying):
-					txt += "keychainBoxCorrupted:\n\(String(describing: underlying))"
-				case .errorReadingKey(let underlying):
-					txt += "errorReadingKey:\n\(String(describing: underlying))"
-				case .keyNotFound:
-					txt += "keyNotFound"
-				case .errorOpeningBox(let underlying):
-					txt += "errorOpeningBox:\n\(String(describing: underlying))"
-			}
-		} else {
-			txt += "none"
-		}
-		
-		txt += "\n\n"
-		
-		txt += "readRecoveryPhraseError: "
-		if let err = danger.readRecoveryPhraseError {
-			switch err {
-				case .invalidCiphertext:
-					txt += "invalidCiphertext"
-				case .invalidJSON:
-					txt += "invalidJSON"
-			}
-		} else {
-			txt += "none"
-		}
-
-		txt += "\n"
-		
-		return txt
+		return "\(danger)\n" // UnlockError implements CustomStringConvertible protocol
 	}
 	
 	func closePopover() {

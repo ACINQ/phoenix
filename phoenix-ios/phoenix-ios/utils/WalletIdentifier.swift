@@ -3,18 +3,16 @@ import PhoenixShared
 
 struct WalletIdentifier: Equatable {
 	let chain: Bitcoin_kmpChain
+	let nodeId: String
 	let encryptedNodeId: String
 	
-	init(chain: Bitcoin_kmpChain, encryptedNodeId: String) {
-		self.chain = chain
-		self.encryptedNodeId = encryptedNodeId
-	}
-	
 	init(chain: Bitcoin_kmpChain, walletInfo: WalletManager.WalletInfo) {
-		self.init(chain: chain, encryptedNodeId: walletInfo.encryptedNodeId)
+		self.chain = chain
+		self.nodeId = walletInfo.nodeIdString
+		self.encryptedNodeId = walletInfo.encryptedNodeId
 	}
 	
-	var prefsKeySuffix: String {
+	var keyId: String {
 		if chain.isMainnet() {
 			return encryptedNodeId
 		} else {

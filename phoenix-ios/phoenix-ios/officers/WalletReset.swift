@@ -171,7 +171,7 @@ class WalletReset {
 		let dbDir = groupDir.appendingPathComponent("databases", isDirectory: true)
 		
 		let chainName: String = Biz.business.chain.phoenixName
-		let nodeIdHash: String = Biz.nodeIdHash!
+		let nodeIdHash: String = Biz.walletInfo!.nodeIdHash
 		
 		log.debug("dbDir: \(dbDir.path)")
 		log.debug("chainName: \(chainName)")
@@ -230,7 +230,7 @@ class WalletReset {
 		log.trace("step5()")
 		progress.send(.deletingKeychainItems)
 		
-		AppSecurity.current.resetWallet()
+		Keychain.current.resetWallet()
 		
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
 			self.step6()

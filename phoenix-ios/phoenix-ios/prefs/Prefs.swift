@@ -31,7 +31,7 @@ class Prefs {
 	}
 	
 	static func wallet(_ walletId: WalletIdentifier) -> Prefs_Wallet {
-		return wallet(walletId.prefsKeySuffix)
+		return wallet(walletId.keyId)
 	}
 	
 	static func wallet(_ id: String) -> Prefs_Wallet {
@@ -156,7 +156,7 @@ class Prefs {
 		
 		let d = self.defaults
 		let oldId = PREFS_DEFAULT_ID
-		let newId = walletId.prefsKeySuffix
+		let newId = walletId.keyId
 		
 		for key in Key.allCases {
 			let oldKey = key.value(oldId)

@@ -106,7 +106,7 @@ struct WalletInfoView: View {
 			
 			VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
 				
-				let nodeId = Biz.nodeId ?? "?"
+				let nodeId = Biz.walletInfo?.nodeIdString ?? "?"
 				
 				HStack(alignment: VerticalAlignment.center, spacing: 0) {
 					Text("Node id").font(.headline.bold())

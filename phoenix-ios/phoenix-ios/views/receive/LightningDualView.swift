@@ -878,7 +878,7 @@ struct LightningDualView: View {
 		
 		if case .bolt12_offer = newType {
 			if bip353Address == nil {
-				bip353Address = AppSecurity.current.getBip353Address()
+				bip353Address = Keychain.current.getBip353Address()
 			}
 		}
 	}

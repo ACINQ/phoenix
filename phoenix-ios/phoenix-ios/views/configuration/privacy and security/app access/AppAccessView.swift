@@ -26,7 +26,7 @@ struct AppAccessView : View {
 		}
 	}
 	
-	@State var biometricSupport = AppSecurity.deviceBiometricSupport()
+	@State var biometricSupport = DeviceInfo.biometricSupport()
 	@State var biometricsEnabled: Bool = false
 	@State var passcodeFallbackEnabled: Bool = false
 	@State var lockPinEnabled: Bool = false
@@ -60,7 +60,7 @@ struct AppAccessView : View {
 	// --------------------------------------------------
 	
 	init() {
-		let enabledSecurity: EnabledSecurity = AppSecurity.current.enabledSecurityPublisher.value
+		let enabledSecurity: EnabledSecurity = Keychain.current.enabledSecurityPublisher.value
 		
 		_biometricsEnabled = State(initialValue: enabledSecurity.contains(.biometrics))
 		_passcodeFallbackEnabled = State(initialValue: enabledSecurity.contains(.passcodeFallback))
@@ -444,7 +444,7 @@ struct AppAccessView : View {
 	func onAppear() -> Void {
 		log.trace("onAppear()")
 		
-		log.debug("enabledSecurity = \(AppSecurity.current.enabledSecurityPublisher.value)")
+		log.debug("enabledSecurity = \(Keychain.current.enabledSecurityPublisher.value)")
 	}
 	
 	func onWillEnterForeground() -> Void {
@@ -453,7 +453,7 @@ struct AppAccessView : View {
 		// When the app returns from being in the background, the biometric status may have changed.
 		// For example: .touchID_notEnrolled => .touchID_available
 		
-		self.biometricSupport = AppSecurity.deviceBiometricSupport()
+		self.biometricSupport = DeviceInfo.biometricSupport()
 	}
 	
 	func backupSeedStateChanged(_ newState: BackupSeedState) {
@@ -548,7 +548,7 @@ struct AppAccessView : View {
 		
 		if flag { // toggle => ON
 			
-			AppSecurity.current.setSoftBiometrics(enabled: true) { (error: Error?) in
+			Keychain.current.setSoftBiometrics(enabled: true) { (error: Error?) in
 				if error != nil {
 					self.ignoreToggle_biometricsEnabled = true
 					self.biometricsEnabled = false // failed to enable == disabled
@@ -572,11 +572,11 @@ struct AppAccessView : View {
 			
 			let prompt = NSLocalizedString("Authenticate to disable biometrics.", comment: "User prompt")
 			
-			AppSecurity.current.tryUnlockWithBiometrics(prompt: prompt) { result in
+			Keychain.current.tryUnlockWithBiometrics(prompt: prompt) { result in
 				
 				switch result {
 				case .success(_):
-					AppSecurity.current.setSoftBiometrics(enabled: false) { (error: Error?) in
+					Keychain.current.setSoftBiometrics(enabled: false) { (error: Error?) in
 						if error != nil {
 							failedToDisable()
 						}
@@ -624,7 +624,7 @@ struct AppAccessView : View {
 			
 		} else if flag { // toggle => ON
 			
-			AppSecurity.current.setPasscodeFallback(enabled: true) { (error: Error?) in
+			Keychain.current.setPasscodeFallback(enabled: true) { (error: Error?) in
 				if error != nil {
 					failedToEnable()
 				}
@@ -641,13 +641,13 @@ struct AppAccessView : View {
 			
 			let prompt = String(localized: "Authenticate to disable passcode fallback.", comment: "User prompt")
 			
-			AppSecurity.current.tryUnlockWithBiometrics(prompt: prompt) { result in
+			Keychain.current.tryUnlockWithBiometrics(prompt: prompt) { result in
 				
 				switch result {
 				case .failure(_):
 					failedToDisable()
 				case .success(_):
-					AppSecurity.current.setPasscodeFallback(enabled: false) { (error: Error?) in
+					Keychain.current.setPasscodeFallback(enabled: false) { (error: Error?) in
 						if error != nil {
 							failedToDisable()
 						}

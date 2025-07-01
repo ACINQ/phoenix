@@ -4,15 +4,15 @@ import CryptoKit
 import LocalAuthentication
 import SwiftUI
 
-fileprivate let filename = "AppSecurity+Wallet"
+fileprivate let filename = "Keychain+Wallet"
 #if DEBUG && true
 fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-fileprivate typealias Key = AppSecurityKey
-fileprivate typealias KeyDeprecated = AppSecurityKeyDeprecated
+fileprivate typealias Key = KeychainKey
+fileprivate typealias KeyDeprecated = KeychainKeyDeprecated
 
 let PIN_LENGTH = 6
 
@@ -42,31 +42,7 @@ enum PinType: CustomStringConvertible {
 	}
 }
 
-struct UnlockError {
-	let readSecurityFileError: ReadSecurityFileError?
-	let readKeychainError: ReadKeychainError?
-	let readRecoveryPhraseError: ReadRecoveryPhraseError?
-	
-	init(_ readSecurityFileError: ReadSecurityFileError?) {
-		self.readSecurityFileError = readSecurityFileError
-		self.readKeychainError = nil
-		self.readRecoveryPhraseError = nil
-	}
-	
-	init(_ readKeychainError: ReadKeychainError?) {
-		self.readSecurityFileError = nil
-		self.readKeychainError = readKeychainError
-		self.readRecoveryPhraseError = nil
-	}
-	
-	init(_ readRecoveryPhraseError: ReadRecoveryPhraseError?) {
-		self.readSecurityFileError = nil
-		self.readKeychainError = nil
-		self.readRecoveryPhraseError = readRecoveryPhraseError
-	}
-}
-
-class AppSecurity_Wallet {
+class Keychain_Wallet {
 	
 	private let id: String
 #if DEBUG
@@ -80,11 +56,16 @@ class AppSecurity_Wallet {
 	/// Serial queue ensures that only one operation is reading/modifying the
 	/// keychain and/or security file at any given time.
 	///
-	private let queue = DispatchQueue(label: "AppSecurity")
+	private let queue = DispatchQueue(label: "Keychain")
 	
-	// --------------------------------------------------------------------------------
+	private var _cached_softBiometrics: Optional<Bool> = nil
+	private var _cached_passcodeFallback: Optional<Bool> = nil
+	private var _cached_lockPin: Optional<String?> = nil
+	private var _cached_spendingPin: Optional<String?> = nil
+	
+	// --------------------------------------------------
 	// MARK: Init
-	// --------------------------------------------------------------------------------
+	// --------------------------------------------------
 	
 	init(id: String) {
 		self.id = id
@@ -93,9 +74,9 @@ class AppSecurity_Wallet {
 	#endif
 	}
 	
-	// --------------------------------------------------------------------------------
+	// --------------------------------------------------
 	// MARK: Publisher
-	// --------------------------------------------------------------------------------
+	// --------------------------------------------------
 	
 	private func publishEnabledSecurity(_ value: EnabledSecurity) {
 		
@@ -104,66 +85,50 @@ class AppSecurity_Wallet {
 		}
 	}
 	
-	// --------------------------------------------------------------------------------
-	// MARK: Utilities
-	// --------------------------------------------------------------------------------
-	
-	/// Performs disk IO - use in background thread.
-	///
-	private func readFromDisk() -> SecurityFile {
+	private func updateEnabledSecurity() {
 		
-		let result = SharedSecurity.shared.readSecurityJsonFromDisk()
-		let securityFile = try? result.get()
-		
-		return securityFile ?? SecurityFile()
-	}
-	
-	/// Performs disk IO - use in background thread.
-	///
-	private func writeToDisk(securityFile: SecurityFile) throws {
-		
-		var url = SharedSecurity.shared.securityJsonUrl
-		
-		let jsonData = try JSONEncoder().encode(securityFile)
-		try jsonData.write(to: url, options: [.atomic])
-		
-		do {
-			var resourceValues = URLResourceValues()
-			resourceValues.isExcludedFromBackup = true
-			try url.setResourceValues(resourceValues)
+		queue.async {
+			var enabledSecurity = EnabledSecurity.none
+			var keyInfo: KeyInfo_ChaChaPoly? = nil
 			
-		} catch {
-			// Don't throw from this error as it's an optimization
-			log.error("Error excluding \(url.lastPathComponent) from backup \(error)")
-		}
-	}
-	
-	private func calculateEnabledSecurity(_ securityFile: SecurityFile) -> EnabledSecurity {
-		
-		var enabledSecurity = EnabledSecurity.none
-		
-		if securityFile.biometrics != nil {
-			enabledSecurity.insert(.biometrics)
-			enabledSecurity.insert(.advancedSecurity)
-			
-		} else if securityFile.keychain != nil {
-			if getSoftBiometricsEnabled() {
-				enabledSecurity.insert(.biometrics)
+			let securityFile = try? SecurityFileManager.shared.readFromDisk().get()
+			if let v0 = securityFile as? SecurityFile.V0 {
 				
-				if getPasscodeFallbackEnabled() {
-					enabledSecurity.insert(.passcodeFallback)
+				if v0.biometrics != nil {
+					enabledSecurity.insert(.biometrics)
+					enabledSecurity.insert(.advancedSecurity)
+					
+				} else {
+					keyInfo = v0.keychain
+				}
+				
+			} else if let v1 = securityFile as? SecurityFile.V1 {
+				keyInfo = v1.wallets[self.id]?.keychain
+			}
+			
+			if keyInfo != nil {
+				if self._getSoftBiometricsEnabled() {
+					enabledSecurity.insert(.biometrics)
+					
+					if self._getPasscodeFallbackEnabled() {
+						enabledSecurity.insert(.passcodeFallback)
+					}
+				}
+				if self._getPin(.lockPin) != nil {
+					enabledSecurity.insert(.lockPin)
+				}
+				if self.getPin(.spendingPin) != nil {
+					enabledSecurity.insert(.spendingPin)
 				}
 			}
-			if hasLockPin() {
-				enabledSecurity.insert(.lockPin)
-			}
-			if hasSpendingPin() {
-				enabledSecurity.insert(.spendingPin)
-			}
+			
+			self.publishEnabledSecurity(enabledSecurity)
 		}
-		
-		return enabledSecurity
 	}
+	
+	// --------------------------------------------------
+	// MARK: Utilities
+	// --------------------------------------------------
 	
 	private func commonMixins() -> [String: Any] {
 		
@@ -181,9 +146,9 @@ class AppSecurity_Wallet {
 		return mixins
 	}
 	
-	// --------------------------------------------------------------------------------
+	// --------------------------------------------------
 	// MARK: Keychain
-	// --------------------------------------------------------------------------------
+	// --------------------------------------------------
 	
 	/// Attempts to extract the mnemonics using the keychain.
 	/// If the user hasn't enabled any additional security options, this will succeed.
@@ -192,24 +157,22 @@ class AppSecurity_Wallet {
 	public func tryUnlockWithKeychain(
 		completion: @escaping (
 			_ recoveryPhrase: RecoveryPhrase?,
-			_ configuration: EnabledSecurity,
 			_ error: UnlockError?
 		) -> Void
 	) {
+		log.trace("tryUnlockWithKeychain()")
 		
-		let finish = {(recoveryPhrase: RecoveryPhrase?, configuration: EnabledSecurity) -> Void in
-			
+		let succeed = {(recoveryPhrase: RecoveryPhrase?) -> Void in
+			self.updateEnabledSecurity()
 			DispatchQueue.main.async {
-				self.publishEnabledSecurity(configuration)
-				completion(recoveryPhrase, configuration, nil)
+				completion(recoveryPhrase, nil)
 			}
 		}
 		
-		let dangerZone = {(error: UnlockError, configuration: EnabledSecurity) -> Void in
-			
+		let fail = {(error: UnlockError) -> Void in
+			self.updateEnabledSecurity()
 			DispatchQueue.main.async {
-				self.publishEnabledSecurity(configuration)
-				completion(nil, configuration, error)
+				completion(nil, error)
 			}
 		}
 		
@@ -219,51 +182,48 @@ class AppSecurity_Wallet {
 			
 			// Fetch the "security.json" file.
 			// If the file doesn't exist, an empty SecurityFile is returned.
-			let diskResult = SharedSecurity.shared.readSecurityJsonFromDisk()
+			let diskResult = SecurityFileManager.shared.readFromDisk()
 			
 			switch diskResult {
 			case .failure(let reason):
 				
-				let securityFile = SecurityFile()
-				let configuration = self.calculateEnabledSecurity(securityFile)
-				
 				switch reason {
 				case .fileNotFound:
-					return finish(nil, configuration)
+					return succeed(nil)
 					
 				case .errorReadingFile: fallthrough
 				case .errorDecodingFile:
-					return dangerZone(UnlockError(reason), configuration)
+					return fail(.readSecurityFileError(underlying: reason))
 				}
 				
 			case .success(let securityFile):
+				
+				var keyInfo: KeyInfo_ChaChaPoly? = nil
+				if let v0 = securityFile as? SecurityFile.V0 {
+					keyInfo = v0.keychain
 					
-				let configuration = self.calculateEnabledSecurity(securityFile)
-					
-				let keychainResult = SharedSecurity.shared.readKeychainEntry(securityFile)
+				} else if let v1 = securityFile as? SecurityFile.V1 {
+					keyInfo = v1.wallets[self.id]?.keychain
+				}
+				
+				guard let keyInfo else {
+					return succeed(nil)
+				}
+				
+				let keychainResult = SharedSecurity.shared.readKeychainEntry(KEYCHAIN_DEFAULT_ID, keyInfo)
 				switch keychainResult {
 				case .failure(let reason):
-							
-					switch reason {
-					case .keychainOptionNotEnabled:
-						return finish(nil, configuration)
-						
-					case .keychainBoxCorrupted: fallthrough
-					case .errorReadingKey: fallthrough
-					case .keyNotFound: fallthrough
-					case .errorOpeningBox:
-						return dangerZone(UnlockError(reason), configuration)
-					}
+					return fail(.readKeychainError(underlying: reason))
 					
 				case .success(let cleartextData):
 					
 					let decodeResult = SharedSecurity.shared.decodeRecoveryPhrase(cleartextData)
 					switch decodeResult {
 					case .failure(let reason):
-						return dangerZone(UnlockError(reason), configuration)
+						return fail(.readRecoveryPhraseError(underlying: reason))
 						
 					case .success(let recoveryPhrase):
-						return finish(recoveryPhrase, configuration)
+						return succeed(recoveryPhrase)
 						
 					} // </switch decodeResult>
 				} // </switch keychainResult>
@@ -271,143 +231,49 @@ class AppSecurity_Wallet {
 		} // </queue.async>
 	}
 	
-	/// Updates the keychain & security file to include a keychain entry.
-	/// This is a destructive action - existing entries will be removed from
-	/// both the keychain & security file.
-	///
-	/// It is designed to be called either:
-	/// - we need to bootstrap the system on first launch
-	/// - the user is explicitly disabling existing security options
-	///
-	public func addKeychainEntry(
-		recoveryPhrase : RecoveryPhrase,
-		completion     : @escaping (_ error: Error?) -> Void
-	) {
+	public func setLockingKey(
+		_ lockingKey : SymmetricKey
+	) -> Result<Void, Error> {
 		
-		let succeed = {(securityFile: SecurityFile) -> Void in
-			DispatchQueue.main.async {
-				let newEnabledSecurity = self.calculateEnabledSecurity(securityFile)
-				self.publishEnabledSecurity(newEnabledSecurity)
-				completion(nil)
-			}
-		}
+		let keychain = GenericPasswordStore()
+		let key = Key.lockingKey
 		
-		let fail = {(_ error: Error) -> Void in
-			DispatchQueue.main.async {
-				completion(error)
-			}
-		}
-		
-		let recoveryPhraseData: Data
 		do {
-			recoveryPhraseData = try JSONEncoder().encode(recoveryPhrase)
-		} catch {
-			log.error("recoveryPhrase.jsonEncoding error")
-			return fail(error)
-		}
-		
-		// Disk IO ahead - get off the main thread.
-		// Also - go thru the serial queue for proper thread safety.
-		queue.async {
+			// Access control considerations:
+			//
+			// This is only for fetching the databaseKey,
+			// which we only need to do once when launching the app.
+			// So we shouldn't need access to the keychain item when the device is locked.
 			
-			let lockingKey = SymmetricKey(size: .bits256)
-			
-			let sealedBox: ChaChaPoly.SealedBox
-			do {
-				sealedBox = try ChaChaPoly.seal(recoveryPhraseData, using: lockingKey)
-			} catch {
-				return fail(error)
-			}
-			
-			let keyInfo = KeyInfo_ChaChaPoly(sealedBox: sealedBox)
-			let securityFile = SecurityFile(keychain: keyInfo)
-			
-			// Order matters !
-			// Don't lock out the user from their wallet !
-			//
-			// There are 3 scenarios in which this method may be called:
-			//
-			// 1. App was launched for the first time.
-			//    There are no entries in the keychain.
-			//    The security.json file doesn't exist.
-			//
-			// 2. User has existing security options, but is choosing to disable them.
-			//    There are existing entries in the keychain.
-			//    The security.json file exists, and contains entries.
-			//
-			// 3. Something bad happened during app launch.
-			//    We discovered a corrupt security.json file,
-			//    or necessary keychain entries have gone missing.
-			//    When this occurs, the system invokes the various `backup` functions.
-			//    This creates a copy of the security.json file & keychain entries.
-			//    Afterwards this function is called.
-			//    And we can treat this scenario as the equivalent of a first app launch.
-			//
-			// So situation #2 is the dangerous one.
-			// Consider what happens if:
-			//
-			// - we delete the existing entry from the OS keychain
-			// - then the app crashes
-			//
-			// Answer => we just lost the user's data ! :(
-			//
-			// So we're careful to to perform operations in a particular order here:
-			//
-			// - add new entry to OS keychain (account=keychain)
-			// - write security.json file to disk
-			// - then we can safely remove the old entries from the OS keychain (account=biometrics)
-			
-			let keychain = GenericPasswordStore()
-			do {
-				// Access control considerations:
-				//
-				// This is only for fetching the databaseKey,
-				// which we only need to do once when launching the app.
-				// So we shouldn't need access to the keychain item when the device is locked.
-				
-				let mixins = self.commonMixins()
-				try keychain.storeKey( lockingKey,
-				              account: Key.lockingKey_keychain.value(self.id),
-				          accessGroup: Key.lockingKey_keychain.accessGroup.value,
-				               mixins: mixins)
+			let mixins = self.commonMixins()
+			try keychain.storeKey( lockingKey,
+			              account: key.account(self.id),
+			          accessGroup: key.accessGroup.value,
+			               mixins: mixins)
 				
 			} catch {
-				log.error("keychain.storeKey(account: keychain): error: \(error)")
-				return fail(error)
+				log.error("keychain.storeKey(acct: \(key.debugName)): error: \(error)")
+				return .failure(error)
 			}
 			
-			do {
-				try self.writeToDisk(securityFile: securityFile)
-			} catch {
-				log.error("writeToDisk(securityFile): error: \(error)")
-				return fail(error)
-			}
-			
-			// Now we can safely delete the previous entry in the OS keychain (if it exists)
-			do {
-				try keychain.deleteKey(
-					account     : KeyDeprecated.lockingKey_biometrics.rawValue,
-					accessGroup : AccessGroup.appOnly.value
-				)
-				
-			} catch {/* ignored */}
-			
-			succeed(securityFile)
-			
-		} // </queue.async>
+			updateEnabledSecurity()
+			return .success
 	}
+	
+	// --------------------------------------------------
+	// MARK: Soft Biometrics
+	// --------------------------------------------------
 	
 	public func setSoftBiometrics(
 		enabled    : Bool,
 		completion : @escaping (_ error: Error?) -> Void
-	) -> Void {
+	) {
 		log.trace("setSoftBiometrics(\(enabled))")
 		
 		let succeed = {
-			let securityFile = self.readFromDisk()
+			self._cached_softBiometrics = enabled
+			self.updateEnabledSecurity()
 			DispatchQueue.main.async {
-				let newEnabledSecurity = self.calculateEnabledSecurity(securityFile)
-				self.publishEnabledSecurity(newEnabledSecurity)
 				completion(nil)
 			}
 		}
@@ -423,71 +289,83 @@ class AppSecurity_Wallet {
 		queue.async {
 			
 			let keychain = GenericPasswordStore()
-			let account     = Key.softBiometrics.value(self.id)
-			let accessGroup = Key.softBiometrics.accessGroup.value
+			let key = Key.softBiometrics
 			
 			if enabled {
 				do {
 					let mixins = self.commonMixins()
 					try keychain.storeKey( "true",
-					              account: account,
-					          accessGroup: accessGroup,
+					              account: key.account(self.id),
+					          accessGroup: key.accessGroup.value,
 					               mixins: mixins)
 					
 				} catch {
-					log.error("keychain.storeKey(account: softBiometrics): error: \(error)")
+					log.error("keychain.storeKey(acct: \(key.debugName)): error: \(error)")
 					return fail(error)
 				}
 				
 			} else {
 				do {
 					try keychain.deleteKey(
-						account     : account,
-						accessGroup : accessGroup
-					)
+						account     : key.account(self.id),
+						accessGroup : key.accessGroup.value)
+					
 				} catch {
-					log.error("keychain.deleteKey(account: softBiometrics): error: \(error)")
+					log.error("keychain.deleteKey(acct: \(key.debugName)): error: \(error)")
 					return fail(error)
 				}
 			}
 			
 			succeed()
-		
 		} // </queue.async>
 	}
 	
 	public func getSoftBiometricsEnabled() -> Bool {
 		
+		return queue.sync {
+			_getSoftBiometricsEnabled()
+		}
+	}
+	
+	private func _getSoftBiometricsEnabled() -> Bool {
+		
+		if let cachedValue = _cached_softBiometrics {
+			return cachedValue
+		}
+		
 		let keychain = GenericPasswordStore()
-		let account     = Key.softBiometrics.value(self.id)
-		let accessGroup = Key.softBiometrics.accessGroup.value
+		let key = Key.softBiometrics
 		
 		var enabled = false
 		do {
 			let value: String? = try keychain.readKey(
-				account     : account,
-				accessGroup : accessGroup
+				account     : key.account(self.id),
+				accessGroup : key.accessGroup.value
 			)
 			enabled = value != nil
 			
 		} catch {
-			log.error("keychain.readKey(account: softBiometrics): error: \(error)")
+			log.error("keychain.readKey(acct: \(key.debugName)): error: \(error)")
 		}
 		
+		_cached_softBiometrics = enabled
 		return enabled
 	}
+	
+	// --------------------------------------------------
+	// MARK: Passcode Fallback
+	// --------------------------------------------------
 	
 	public func setPasscodeFallback(
 		enabled    : Bool,
 		completion : @escaping (_ error: Error?) -> Void
-	) -> Void {
+	) {
 		log.trace("setPasscodeFallback(\(enabled))")
 		
 		let succeed = {
-			let securityFile = self.readFromDisk()
+			self._cached_passcodeFallback = enabled
+			self.updateEnabledSecurity()
 			DispatchQueue.main.async {
-				let newEnabledSecurity = self.calculateEnabledSecurity(securityFile)
-				self.publishEnabledSecurity(newEnabledSecurity)
 				completion(nil)
 			}
 		}
@@ -503,70 +381,79 @@ class AppSecurity_Wallet {
 		queue.async {
 			
 			let keychain = GenericPasswordStore()
-			let account     = Key.passcodeFallback.value(self.id)
-			let accessGroup = Key.passcodeFallback.accessGroup.value
+			let key = Key.passcodeFallback
 			
 			if enabled {
 				do {
 					let mixins = self.commonMixins()
 					try keychain.storeKey( "true",
-									  account: account,
-								 accessGroup: accessGroup,
+					              account: key.account(self.id),
+					          accessGroup: key.accessGroup.value,
 										mixins: mixins)
 					
 				} catch {
-					log.error("keychain.storeKey(account: passcodeFallback): error: \(error)")
+					log.error("keychain.storeKey(acct: \(key.debugName): error: \(error)")
 					return fail(error)
 				}
 				
 			} else {
 				do {
 					try keychain.deleteKey(
-						account     : account,
-						accessGroup : accessGroup
+						account     : key.account(self.id),
+						accessGroup : key.accessGroup.value
 					)
 				
 				} catch {
-					log.error("keychain.deleteKey(account: passcodeFallback): error: \(error)")
+					log.error("keychain.deleteKey(acct: \(key.debugName)): error: \(error)")
 					return fail(error)
 				}
 			}
 			
 			succeed()
-		
 		} // </queue.async>
 	}
 	
 	public func getPasscodeFallbackEnabled() -> Bool {
 		
+		return queue.sync {
+			_getPasscodeFallbackEnabled()
+		}
+	}
+	
+	private func _getPasscodeFallbackEnabled() -> Bool {
+		
+		if let cachedValue = _cached_passcodeFallback {
+			return cachedValue
+		}
+		
 		let keychain = GenericPasswordStore()
-		let account     = Key.passcodeFallback.value(self.id)
-		let accessGroup = Key.passcodeFallback.accessGroup.value
+		let key = Key.passcodeFallback
 		
 		var enabled = false
 		do {
 			let value: String? = try keychain.readKey(
-				account     : account,
-				accessGroup : accessGroup
+				account     : key.account(self.id),
+				accessGroup : key.accessGroup.value
 			)
 			enabled = value != nil
 			
 		} catch {
-			log.error("keychain.readKey(account: passcodeFallback): error: \(error)")
+			log.error("keychain.readKey(acct: \(key.debugName)): error: \(error)")
 		}
 		
+		_cached_passcodeFallback = enabled
 		return enabled
 	}
 	
-	// --------------------------------------------------------------------------------
+	// --------------------------------------------------
 	// MARK: PIN
-	// --------------------------------------------------------------------------------
+	// --------------------------------------------------
 	
 	func setPin(
 		_ pin      : String?,
 		_ type     : PinType,
 		completion : @escaping (_ error: Error?) -> Void
-	) -> Void {
+	) {
 		log.trace("setPin(\(pin == nil ? "<nil>" : "<non-nil>"), \(type)")
 		
 		if let pin {
@@ -574,10 +461,12 @@ class AppSecurity_Wallet {
 		}
 		
 		let succeed = {
-			let securityFile = self.readFromDisk()
+			switch type {
+				case .lockPin     : self._cached_lockPin = pin
+				case .spendingPin : self._cached_spendingPin = pin
+			}
+			self.updateEnabledSecurity()
 			DispatchQueue.main.async {
-				let newEnabledSecurity = self.calculateEnabledSecurity(securityFile)
-				self.publishEnabledSecurity(newEnabledSecurity)
 				completion(nil)
 			}
 		}
@@ -593,51 +482,70 @@ class AppSecurity_Wallet {
 		queue.async {
 			
 			let keychain = GenericPasswordStore()
-			let account     = type.keyPin.value(self.id)
-			let accessGroup = type.keyPin.accessGroup.value
+			let key = type.keyPin
 			
 			if let pin {
 				do {
 					let mixins = self.commonMixins()
 					try keychain.storeKey( pin,
-									  account: account,
-								 accessGroup: accessGroup,
+					              account: key.account(self.id),
+					          accessGroup: key.accessGroup.value,
 										mixins: mixins)
 					
 				} catch {
-					log.error("keychain.storeKey(account: \(account)): error: \(error)")
+					log.error("keychain.storeKey(acct: \(key.debugName)): error: \(error)")
 					return fail(error)
 				}
 				
 			} else {
 				do {
 					try keychain.deleteKey(
-						account     : account,
-						accessGroup : accessGroup
+						account     : key.account(self.id),
+						accessGroup : key.accessGroup.value
 					)
 				
 				} catch {
-					log.error("keychain.deleteKey(account: \(account)): error: \(error)")
+					log.error("keychain.deleteKey(acct: \(key.debugName)): error: \(error)")
 					return fail(error)
 				}
 			}
 			
 			succeed()
-		
 		} // </queue.async>
 	}
 	
 	func getPin(_ type: PinType) -> String? {
 		
+		return queue.sync {
+			_getPin(type)
+		}
+	}
+	
+	private func _getPin(_ type: PinType) -> String? {
+		
+		switch type {
+		case .lockPin:
+			if let cachedValue = _cached_lockPin {
+				return cachedValue
+			} else {
+				log.warning("_getPin(.lockPin): no cached value")
+			}
+		case .spendingPin:
+			if let cachedValue = _cached_spendingPin {
+				return cachedValue
+			} else {
+				log.warning("_getPin(.spendingPin): no cached value")
+			}
+		}
+		
 		let keychain = GenericPasswordStore()
-		let account     = type.keyPin.value(id)
-		let accessGroup = type.keyPin.accessGroup.value
+		let key = type.keyPin
 		
 		var pin: String? = nil
 		do {
 			let value: String? = try keychain.readKey(
-				account     : account,
-				accessGroup : accessGroup
+				account     : key.account(self.id),
+				accessGroup : key.accessGroup.value
 			)
 			
 			if let value, value.isValidPIN {
@@ -645,9 +553,13 @@ class AppSecurity_Wallet {
 			}
 			
 		} catch {
-			log.error("keychain.readKey(account: \(account)): error: \(error)")
+			log.error("keychain.readKey(acct: \(key.debugName)): error: \(error)")
 		}
 		
+		switch type {
+			case .lockPin     : _cached_lockPin = pin
+			case .spendingPin : _cached_spendingPin = pin
+		}
 		return pin
 	}
 	
@@ -688,71 +600,68 @@ class AppSecurity_Wallet {
 		queue.async {
 			
 			let keychain = GenericPasswordStore()
-			let account     = type.keyInvalid.value(self.id)
-			let accessGroup = type.keyInvalid.accessGroup.value
+			let key = type.keyInvalid
 			
 			if let invalidPinData {
 				do {
 					let mixins = self.commonMixins()
 					try keychain.storeKey( invalidPinData,
-									  account: account,
-								 accessGroup: accessGroup,
+					              account: key.account(self.id),
+					          accessGroup: key.accessGroup.value,
 										mixins: mixins)
 					
 				} catch {
-					log.error("keychain.storeKey(account: \(account)): error: \(error)")
+					log.error("keychain.storeKey(acct: \(key.debugName)): error: \(error)")
 					return fail(error)
 				}
 				
 			} else {
 				do {
 					try keychain.deleteKey(
-						account     : account,
-						accessGroup : accessGroup
+						account     : key.account(self.id),
+						accessGroup : key.accessGroup.value
 					)
 				
 				} catch {
-					log.error("keychain.deleteKey(account: \(account)): error: \(error)")
+					log.error("keychain.deleteKey(acct: \(key.debugName)): error: \(error)")
 					return fail(error)
 				}
 			}
 			
 			succeed()
-		
 		} // </queue.async>
 	}
 	
 	func getInvalidPin(_ type: PinType) -> InvalidPin? {
 		
 		let keychain = GenericPasswordStore()
-		let account     = type.keyInvalid.value(id)
-		let accessGroup = type.keyInvalid.accessGroup.value
+		let key = type.keyInvalid
 		
 		var invalidPin: InvalidPin? = nil
 		do {
 			let value: Data? = try keychain.readKey(
-				account     : account,
-				accessGroup : accessGroup
+				account     : key.account(self.id),
+				accessGroup : key.accessGroup.value
 			)
 			
 			if let value {
 				do {
 					invalidPin = try JSONDecoder().decode(InvalidPin.self, from: value)
 				} catch {
-					log.error("JSON.decode(account: \(account)): error: \(error)")
+					log.error("JSON.decode(acct: \(key.debugName)): error: \(error)")
 				}
 			}
 			
 		} catch {
-			log.error("keychain.readKey(account: \(account)): error: \(error)")
+			log.error("keychain.readKey(acct: \(key.debugName)): error: \(error)")
 		}
 		
 		return invalidPin
 	}
 	
-	// --------------------------------------------------------------------------------
+	// --------------------------------------------------
 	// MARK: Lock PIN
-	// --------------------------------------------------------------------------------
+	// --------------------------------------------------
 	
 	public func setLockPin(
 		_ pin      : String?,
@@ -780,9 +689,9 @@ class AppSecurity_Wallet {
 		return getInvalidPin(.lockPin)
 	}
 	
-	// --------------------------------------------------------------------------------
+	// --------------------------------------------------
 	// MARK: Spending PIN
-	// --------------------------------------------------------------------------------
+	// --------------------------------------------------
 	
 	public func setSpendingPin(
 		_ pin      : String?,
@@ -810,23 +719,22 @@ class AppSecurity_Wallet {
 		return getInvalidPin(.spendingPin)
 	}
 	
-	// --------------------------------------------------------------------------------
+	// --------------------------------------------------
 	// MARK: BIP353 Address
-	// --------------------------------------------------------------------------------
+	// --------------------------------------------------
 	
 	public func setBip353Address(
 		_ address: String
 	) -> Result<Void, Error> {
 		
 		let keychain = GenericPasswordStore()
-		let account     = Key.bip353Address.value(id)
-		let accessGroup = Key.bip353Address.accessGroup.value
+		let key = Key.bip353Address
 		
 		do {
 			let mixins = self.commonMixins()
 			try keychain.storeKey( address,
-							  account: account,
-						 accessGroup: accessGroup,
+			              account: key.account(self.id),
+			          accessGroup: key.accessGroup.value,
 								mixins: mixins)
 			
 			return .success
@@ -839,14 +747,13 @@ class AppSecurity_Wallet {
 	public func getBip353Address() -> String? {
 		
 		let keychain = GenericPasswordStore()
-		let account     = Key.bip353Address.value(id)
-		let accessGroup = Key.bip353Address.accessGroup.value
+		let key = Key.bip353Address
 		
 		var addr: String? = nil
 		do {
 			let value: String? = try keychain.readKey(
-				account     : account,
-				accessGroup : accessGroup
+				account     : key.account(self.id),
+				accessGroup : key.accessGroup.value
 			)
 			
 			if let value {
@@ -854,15 +761,15 @@ class AppSecurity_Wallet {
 			}
 			
 		} catch {
-			log.error("keychain.readKey(account: bip353Address): error: \(error)")
+			log.error("keychain.readKey(acct: \(key.debugName)): error: \(error)")
 		}
 		
 		return addr
 	}
 	
-	// --------------------------------------------------------------------------------
+	// --------------------------------------------------
 	// MARK: Biometrics
-	// --------------------------------------------------------------------------------
+	// --------------------------------------------------
 	
 	private func biometricsPrompt() -> String {
 		
@@ -878,18 +785,38 @@ class AppSecurity_Wallet {
 		completion: @escaping (_ result: Result<RecoveryPhrase, Error>) -> Void
 	) {
 		
+		let fail = {(_ error: Error) -> Void in
+			DispatchQueue.main.async {
+				completion(Result.failure(error))
+			}
+		}
+		
 		// Disk IO ahead - get off the main thread.
 		// Also - go thru the serial queue for proper thread safety.
 		queue.async {
 			
-			// Fetch the "security.json" file.
-			// If the file doesn't exist, an empty SecurityFile is returned.
-			let securityFile = self.readFromDisk()
+			let securityFile = try? SecurityFileManager.shared.readFromDisk().get()
 			
-			if securityFile.biometrics != nil {
-				self.tryUnlockWithHardBiometrics(securityFile, prompt, completion)
+			if let v0 = securityFile as? SecurityFile.V0 {
+				if v0.biometrics != nil {
+					self.tryUnlockWithHardBiometrics(v0, prompt, completion)
+				} else {
+					if let keyInfo = v0.keychain {
+						self.tryUnlockWithSoftBiometrics(keyInfo, prompt, completion)
+					} else {
+						fail(genericError(404, "keyInfo not found"))
+					}
+				}
+				
+			} else if let v1 = securityFile as? SecurityFile.V1 {
+				if let keyInfo = v1.wallets[self.id]?.keychain {
+					self.tryUnlockWithSoftBiometrics(keyInfo, prompt, completion)
+				} else {
+					fail(genericError(404, "keyInfo not found"))
+				}
+				
 			} else {
-				self.tryUnlockWithSoftBiometrics(securityFile, prompt, completion)
+				fail(genericError(404, "securityFile not found"))
 			}
 		}
 	}
@@ -901,7 +828,7 @@ class AppSecurity_Wallet {
 	/// with ability to receive payments when app is running in the background.
 	///
 	private func tryUnlockWithHardBiometrics(
-		_ securityFile : SecurityFile,
+		_ securityFile : SecurityFile.V0,
 		_ prompt       : String? = nil,
 		_ completion   : @escaping (_ result: Result<RecoveryPhrase, Error>) -> Void
 	) {
@@ -918,27 +845,28 @@ class AppSecurity_Wallet {
 			}
 		}
 		
-		// The "advanced security" technique removed in v1.4.
-		// Replaced with notification-service-extension,
-		// with ability to receive payments when app is running in the background.
+		// The "advanced security" technique was removed in v1.4.
+		// We introduced the notification-service-extension,
+		// with the ability to receive payments when app is running in the background.
 		//
 		let disableAdvancedSecurityAndSucceed = {(_ recoveryPhrase: RecoveryPhrase) in
 			
-			self.addKeychainEntry(recoveryPhrase: recoveryPhrase) { _ in
-				succeed(recoveryPhrase)
-			}
+			// TODO
+			fail(genericError(501, "Not implemented"))
+		//	self.addKeychainEntry(recoveryPhrase: recoveryPhrase) { _ in
+		//		succeed(recoveryPhrase)
+		//	}
 		}
 		
 		// The security.json file tells us which security options have been enabled.
 		// This function should only be called if the `biometrics` entry is present.
 		guard
-			let keyInfo_biometrics = securityFile.biometrics as? KeyInfo_ChaChaPoly,
+			let keyInfo_biometrics = securityFile.biometrics,
 			let sealedBox_biometrics = try? keyInfo_biometrics.toSealedBox()
 		else {
 			
 			return fail(genericError(400, "SecurityFile.biometrics entry is corrupt"))
 		}
-		
 		
 		let context = LAContext()
 		context.localizedReason = prompt ?? self.biometricsPrompt()
@@ -1021,9 +949,9 @@ class AppSecurity_Wallet {
 	}
 	
 	private func tryUnlockWithSoftBiometrics(
-		_ securityFile : SecurityFile,
-		_ prompt       : String? = nil,
-		_ completion   : @escaping (_ result: Result<RecoveryPhrase, Error>) -> Void
+		_ keyInfo    : KeyInfo_ChaChaPoly,
+		_ prompt     : String? = nil,
+		_ completion : @escaping (_ result: Result<RecoveryPhrase, Error>) -> Void
 	) {
 		
 		let succeed = {(_ recoveryPhrase: RecoveryPhrase) in
@@ -1038,7 +966,7 @@ class AppSecurity_Wallet {
 			}
 		}
 		
-		let keychainResult = SharedSecurity.shared.readKeychainEntry(securityFile)
+		let keychainResult = SharedSecurity.shared.readKeychainEntry(KEYCHAIN_DEFAULT_ID, keyInfo)
 		switch keychainResult {
 		case .failure(let error):
 			fail(error)
@@ -1096,7 +1024,7 @@ class AppSecurity_Wallet {
 	public func resetWallet() {
 		
 		let fm = FileManager.default
-		let securityJsonUrl = SharedSecurity.shared.securityJsonUrl
+		let securityJsonUrl = SharedSecurity.shared.securityJsonUrl_V0
 		
 		if fm.fileExists(atPath: securityJsonUrl.path) {
 			do {
@@ -1112,7 +1040,7 @@ class AppSecurity_Wallet {
 		for key in Key.allCases {
 			do {
 				let result = try keychain.deleteKey(
-					account     : key.value(id),
+					account     : key.account(self.id),
 					accessGroup : key.accessGroup.value
 				)
 				if result == .itemDeleted {
@@ -1133,7 +1061,7 @@ class AppSecurity_Wallet {
 			}
 		}
 		
-		AppSecurity.didResetWallet(id)
+		Keychain.didResetWallet(id)
 	}
 }
 
@@ -1148,5 +1076,5 @@ fileprivate func genericError(_ code: Int, _ description: String? = nil) -> NSEr
 		userInfo[NSLocalizedDescriptionKey] = description
 	}
 		
-	return NSError(domain: "AppSecurity", code: code, userInfo: userInfo)
+	return NSError(domain: "Keychain", code: code, userInfo: userInfo)
 }

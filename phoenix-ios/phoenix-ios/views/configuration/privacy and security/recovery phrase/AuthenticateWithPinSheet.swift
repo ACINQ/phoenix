@@ -221,7 +221,7 @@ struct AuthenticateWithPinSheet: View {
 	func onAppear() {
 		log.trace("onAppear()")
 		
-		invalidPin = AppSecurity.current.getInvalidPin(type) ?? InvalidPin.none()
+		invalidPin = Keychain.current.getInvalidPin(type) ?? InvalidPin.none()
 		currentDate = Date.now
 		
 		if let delay = invalidPin.waitTimeFrom(currentDate) {
@@ -257,7 +257,7 @@ struct AuthenticateWithPinSheet: View {
 	func verifyPin() {
 		log.trace("verifyPin()")
 		
-		let correctPin = AppSecurity.current.getPin(type)
+		let correctPin = Keychain.current.getPin(type)
 		if pin == correctPin {
 			handleCorrectPin()
 		} else {
@@ -268,7 +268,7 @@ struct AuthenticateWithPinSheet: View {
 	func handleCorrectPin() {
 		log.trace("handleCorrectPin()")
 		
-		AppSecurity.current.setInvalidPin(nil, type) { _ in }
+		Keychain.current.setInvalidPin(nil, type) { _ in }
 		
 		isCorrectPin = true
 		numberPadDisabled = true
@@ -305,7 +305,7 @@ struct AuthenticateWithPinSheet: View {
 			newInvalidPin = invalidPin.increment()
 		}
 		
-		AppSecurity.current.setInvalidPin(newInvalidPin, type) { _ in }
+		Keychain.current.setInvalidPin(newInvalidPin, type) { _ in }
 		invalidPin = newInvalidPin
 		currentDate = Date.now
 		

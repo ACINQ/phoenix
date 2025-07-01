@@ -134,7 +134,7 @@ class PhoenixManager {
 		DispatchQueue.global().async {
 			
 			// Fetch the "security.json" file
-			let diskResult = SharedSecurity.shared.readSecurityJsonFromDisk()
+			let diskResult = SharedSecurity.shared.readSecurityJsonFromDisk_V0()
 			
 			switch diskResult {
 			case .failure(_):
@@ -142,7 +142,12 @@ class PhoenixManager {
 				
 			case .success(let securityFile):
 				
-				let keychainResult = SharedSecurity.shared.readKeychainEntry(securityFile)
+				guard let keyInfo = securityFile.keychain else {
+					unlockWithRecoveryPhrase(nil)
+					return
+				}
+				
+				let keychainResult = SharedSecurity.shared.readKeychainEntry(KEYCHAIN_DEFAULT_ID, keyInfo)
 				switch keychainResult {
 				case .failure(_):
 					unlockWithRecoveryPhrase(nil)

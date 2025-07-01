@@ -292,7 +292,7 @@ struct EditPinView: View {
 	func onAppear() {
 		log.trace("onAppear()")
 		
-		invalidPin = AppSecurity.current.getInvalidPin(type) ?? InvalidPin.none()
+		invalidPin = Keychain.current.getInvalidPin(type) ?? InvalidPin.none()
 		currentDate = Date.now
 		
 		if let delay = invalidPin.waitTimeFrom(currentDate) {
@@ -350,7 +350,7 @@ struct EditPinView: View {
 	func verifyPin() {
 		log.trace("verifyPin(type: \(type))")
 		
-		let correctPin = AppSecurity.current.getPin(type)
+		let correctPin = Keychain.current.getPin(type)
 		if pin0 == correctPin {
 			handleCorrectPin()
 		} else {
@@ -397,7 +397,7 @@ struct EditPinView: View {
 			newInvalidPin = invalidPin.increment()
 		}
 		
-		AppSecurity.current.setInvalidPin(newInvalidPin, type) { _ in }
+		Keychain.current.setInvalidPin(newInvalidPin, type) { _ in }
 		invalidPin = newInvalidPin
 		currentDate = Date.now
 		
@@ -463,8 +463,8 @@ struct EditPinView: View {
 	func savePinAndDismiss() {
 		log.trace("savePinAndDismiss()")
 		
-		AppSecurity.current.setInvalidPin(nil, type) { _ in }
-		AppSecurity.current.setPin(pin1, type) { error in
+		Keychain.current.setInvalidPin(nil, type) { _ in }
+		Keychain.current.setPin(pin1, type) { error in
 			let result: EndResult = (error == nil) ? .PinChanged : .Failed
 			dismissView(result)
 		}

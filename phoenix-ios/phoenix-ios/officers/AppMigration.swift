@@ -52,14 +52,14 @@ class AppMigration {
 		if previousBuild.isVersion(lessThan: "40") {
 			migrateDbFilesToGroup()
 			GroupPrefs.performMigration("40", completionPublisher)
-			AppSecurity.performMigration("40", completionPublisher)
+			Keychain.performMigration("40", completionPublisher)
 		}
 		
 		// v1.5.2 (build 41)
 		// - hot-fix for `!protectedDataAvailable`
 		//
 		if previousBuild.isVersion(lessThan: "41") {
-			AppSecurity.performMigration("41", completionPublisher)
+			Keychain.performMigration("41", completionPublisher)
 		}
 		
 		// v1.6.0 (build 44)
@@ -84,16 +84,21 @@ class AppMigration {
 			Prefs.printAllKeyValues()
 			log.debug("# GROUP_PREFS: PHASE 0:")
 			GroupPrefs.printAllKeyValues()
+			log.debug("# KEYCHAIN(nil): PHASE 0:")
+			Keychain.printKeysAndValues(nil)
 			log.debug("--------------------------------------------------")
 		#endif
 			Prefs.performMigration("92", completionPublisher)
 			GroupPrefs.performMigration("92", completionPublisher)
+			Keychain.performMigration("92", completionPublisher)
 		#if DEBUG
 			log.debug("--------------------------------------------------")
 			log.debug("# PREFS: PHASE 1:")
 			Prefs.printAllKeyValues()
 			log.debug("# GROUP_PREFS: PHASE 1:")
 			GroupPrefs.printAllKeyValues()
+			log.debug("# KEYCHAIN(default): PHASE 1:")
+			Keychain.printKeysAndValues(KEYCHAIN_DEFAULT_ID)
 			log.debug("--------------------------------------------------")
 		#endif
 		}

@@ -84,9 +84,14 @@ struct ManualRestoreView: MVIView {
 			mnemonics : model.mnemonics,
 			language  : model.language
 		)
-
-		AppSecurity.current.addKeychainEntry(recoveryPhrase: recoveryPhrase) { (error: Error?) in
-			if error == nil {
+		
+		let chain = Biz.business.chain
+		AppSecurity.shared.addWallet(chain: chain, recoveryPhrase: recoveryPhrase, seed: model.seed) { result in
+			switch result {
+			case .failure(let reason):
+				log.error("Error adding wallet: \(reason)")
+				
+			case .success():
 				Biz.loadWallet(
 					trigger: .restoreFromManualEntry,
 					recoveryPhrase: recoveryPhrase,
