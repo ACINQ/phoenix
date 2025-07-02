@@ -235,9 +235,7 @@ class Keychain_Wallet {
 		_ lockingKey : SymmetricKey
 	) -> Result<Void, Error> {
 		
-		let keychain = GenericPasswordStore()
 		let key = Key.lockingKey
-		
 		do {
 			// Access control considerations:
 			//
@@ -246,18 +244,20 @@ class Keychain_Wallet {
 			// So we shouldn't need access to the keychain item when the device is locked.
 			
 			let mixins = self.commonMixins()
-			try keychain.storeKey( lockingKey,
-			              account: key.account(self.id),
-			          accessGroup: key.accessGroup.value,
-			               mixins: mixins)
+			try SystemKeychain.storeItem(
+				value       : lockingKey,
+				account     : key.account(self.id),
+				accessGroup : key.accessGroup.value,
+				mixins      : mixins
+			)
 				
-			} catch {
-				log.error("keychain.storeKey(acct: \(key.debugName)): error: \(error)")
-				return .failure(error)
-			}
-			
-			updateEnabledSecurity()
-			return .success
+		} catch {
+			log.error("keychain.storeKey(acct: \(key.debugName)): error: \(error)")
+			return .failure(error)
+		}
+		
+		updateEnabledSecurity()
+		return .success
 	}
 	
 	// --------------------------------------------------
@@ -288,16 +288,17 @@ class Keychain_Wallet {
 		// Also - go thru the serial queue for proper thread safety.
 		queue.async {
 			
-			let keychain = GenericPasswordStore()
 			let key = Key.softBiometrics
 			
 			if enabled {
 				do {
 					let mixins = self.commonMixins()
-					try keychain.storeKey( "true",
-					              account: key.account(self.id),
-					          accessGroup: key.accessGroup.value,
-					               mixins: mixins)
+					try SystemKeychain.storeItem(
+						value       : "true",
+						account     : key.account(self.id),
+						accessGroup : key.accessGroup.value,
+						mixins      : mixins
+					)
 					
 				} catch {
 					log.error("keychain.storeKey(acct: \(key.debugName)): error: \(error)")
@@ -306,12 +307,12 @@ class Keychain_Wallet {
 				
 			} else {
 				do {
-					try keychain.deleteKey(
+					try SystemKeychain.deleteItem(
 						account     : key.account(self.id),
 						accessGroup : key.accessGroup.value)
 					
 				} catch {
-					log.error("keychain.deleteKey(acct: \(key.debugName)): error: \(error)")
+					log.error("keychain.delete(acct: \(key.debugName)): error: \(error)")
 					return fail(error)
 				}
 			}
@@ -333,19 +334,18 @@ class Keychain_Wallet {
 			return cachedValue
 		}
 		
-		let keychain = GenericPasswordStore()
 		let key = Key.softBiometrics
 		
 		var enabled = false
 		do {
-			let value: String? = try keychain.readKey(
+			let value: String? = try SystemKeychain.readItem(
 				account     : key.account(self.id),
 				accessGroup : key.accessGroup.value
 			)
 			enabled = value != nil
 			
 		} catch {
-			log.error("keychain.readKey(acct: \(key.debugName)): error: \(error)")
+			log.error("keychain.read(acct: \(key.debugName)): error: \(error)")
 		}
 		
 		_cached_softBiometrics = enabled
@@ -380,16 +380,17 @@ class Keychain_Wallet {
 		// Also - go thru the serial queue for proper thread safety.
 		queue.async {
 			
-			let keychain = GenericPasswordStore()
 			let key = Key.passcodeFallback
 			
 			if enabled {
 				do {
 					let mixins = self.commonMixins()
-					try keychain.storeKey( "true",
-					              account: key.account(self.id),
-					          accessGroup: key.accessGroup.value,
-										mixins: mixins)
+					try SystemKeychain.storeItem(
+						value       : "true",
+						account     : key.account(self.id),
+						accessGroup : key.accessGroup.value,
+						mixins      : mixins
+					)
 					
 				} catch {
 					log.error("keychain.storeKey(acct: \(key.debugName): error: \(error)")
@@ -398,13 +399,13 @@ class Keychain_Wallet {
 				
 			} else {
 				do {
-					try keychain.deleteKey(
+					try SystemKeychain.deleteItem(
 						account     : key.account(self.id),
 						accessGroup : key.accessGroup.value
 					)
 				
 				} catch {
-					log.error("keychain.deleteKey(acct: \(key.debugName)): error: \(error)")
+					log.error("keychain.delete(acct: \(key.debugName)): error: \(error)")
 					return fail(error)
 				}
 			}
@@ -426,19 +427,18 @@ class Keychain_Wallet {
 			return cachedValue
 		}
 		
-		let keychain = GenericPasswordStore()
 		let key = Key.passcodeFallback
 		
 		var enabled = false
 		do {
-			let value: String? = try keychain.readKey(
+			let value: String? = try SystemKeychain.readItem(
 				account     : key.account(self.id),
 				accessGroup : key.accessGroup.value
 			)
 			enabled = value != nil
 			
 		} catch {
-			log.error("keychain.readKey(acct: \(key.debugName)): error: \(error)")
+			log.error("keychain.read(acct: \(key.debugName)): error: \(error)")
 		}
 		
 		_cached_passcodeFallback = enabled
@@ -481,31 +481,32 @@ class Keychain_Wallet {
 		// Also - go thru the serial queue for proper thread safety.
 		queue.async {
 			
-			let keychain = GenericPasswordStore()
 			let key = type.keyPin
 			
 			if let pin {
 				do {
 					let mixins = self.commonMixins()
-					try keychain.storeKey( pin,
-					              account: key.account(self.id),
-					          accessGroup: key.accessGroup.value,
-										mixins: mixins)
+					try SystemKeychain.storeItem(
+						value       : pin,
+						account     : key.account(self.id),
+						accessGroup : key.accessGroup.value,
+						mixins      : mixins
+					)
 					
 				} catch {
-					log.error("keychain.storeKey(acct: \(key.debugName)): error: \(error)")
+					log.error("keychain.store(acct: \(key.debugName)): error: \(error)")
 					return fail(error)
 				}
 				
 			} else {
 				do {
-					try keychain.deleteKey(
+					try SystemKeychain.deleteItem(
 						account     : key.account(self.id),
 						accessGroup : key.accessGroup.value
 					)
 				
 				} catch {
-					log.error("keychain.deleteKey(acct: \(key.debugName)): error: \(error)")
+					log.error("keychain.delete(acct: \(key.debugName)): error: \(error)")
 					return fail(error)
 				}
 			}
@@ -538,12 +539,11 @@ class Keychain_Wallet {
 			}
 		}
 		
-		let keychain = GenericPasswordStore()
 		let key = type.keyPin
 		
 		var pin: String? = nil
 		do {
-			let value: String? = try keychain.readKey(
+			let value: String? = try SystemKeychain.readItem(
 				account     : key.account(self.id),
 				accessGroup : key.accessGroup.value
 			)
@@ -553,7 +553,7 @@ class Keychain_Wallet {
 			}
 			
 		} catch {
-			log.error("keychain.readKey(acct: \(key.debugName)): error: \(error)")
+			log.error("keychain.read(acct: \(key.debugName)): error: \(error)")
 		}
 		
 		switch type {
@@ -599,31 +599,32 @@ class Keychain_Wallet {
 		// Also - go thru the serial queue for proper thread safety.
 		queue.async {
 			
-			let keychain = GenericPasswordStore()
 			let key = type.keyInvalid
 			
 			if let invalidPinData {
 				do {
 					let mixins = self.commonMixins()
-					try keychain.storeKey( invalidPinData,
-					              account: key.account(self.id),
-					          accessGroup: key.accessGroup.value,
-										mixins: mixins)
+					try SystemKeychain.storeItem(
+						value       : invalidPinData,
+						account     : key.account(self.id),
+						accessGroup : key.accessGroup.value,
+						mixins      : mixins
+					)
 					
 				} catch {
-					log.error("keychain.storeKey(acct: \(key.debugName)): error: \(error)")
+					log.error("keychain.store(acct: \(key.debugName)): error: \(error)")
 					return fail(error)
 				}
 				
 			} else {
 				do {
-					try keychain.deleteKey(
+					try SystemKeychain.deleteItem(
 						account     : key.account(self.id),
 						accessGroup : key.accessGroup.value
 					)
 				
 				} catch {
-					log.error("keychain.deleteKey(acct: \(key.debugName)): error: \(error)")
+					log.error("keychain.delete(acct: \(key.debugName)): error: \(error)")
 					return fail(error)
 				}
 			}
@@ -634,12 +635,11 @@ class Keychain_Wallet {
 	
 	func getInvalidPin(_ type: PinType) -> InvalidPin? {
 		
-		let keychain = GenericPasswordStore()
 		let key = type.keyInvalid
 		
 		var invalidPin: InvalidPin? = nil
 		do {
-			let value: Data? = try keychain.readKey(
+			let value: Data? = try SystemKeychain.readItem(
 				account     : key.account(self.id),
 				accessGroup : key.accessGroup.value
 			)
@@ -653,7 +653,7 @@ class Keychain_Wallet {
 			}
 			
 		} catch {
-			log.error("keychain.readKey(acct: \(key.debugName)): error: \(error)")
+			log.error("keychain.read(acct: \(key.debugName)): error: \(error)")
 		}
 		
 		return invalidPin
@@ -727,31 +727,31 @@ class Keychain_Wallet {
 		_ address: String
 	) -> Result<Void, Error> {
 		
-		let keychain = GenericPasswordStore()
 		let key = Key.bip353Address
 		
 		do {
 			let mixins = self.commonMixins()
-			try keychain.storeKey( address,
-			              account: key.account(self.id),
-			          accessGroup: key.accessGroup.value,
-								mixins: mixins)
+			try SystemKeychain.storeItem(
+				value       : address,
+				account     : key.account(self.id),
+				accessGroup : key.accessGroup.value,
+				mixins      : mixins
+			)
 			
 			return .success
 		} catch {
-			log.error("keychain.storeKey(account: bip353Address): error: \(error)")
+			log.error("keychain.store(account: bip353Address): error: \(error)")
 			return .failure(error)
 		}
 	}
 		
 	public func getBip353Address() -> String? {
 		
-		let keychain = GenericPasswordStore()
 		let key = Key.bip353Address
 		
 		var addr: String? = nil
 		do {
-			let value: String? = try keychain.readKey(
+			let value: String? = try SystemKeychain.readItem(
 				account     : key.account(self.id),
 				accessGroup : key.accessGroup.value
 			)
@@ -761,7 +761,7 @@ class Keychain_Wallet {
 			}
 			
 		} catch {
-			log.error("keychain.readKey(acct: \(key.debugName)): error: \(error)")
+			log.error("keychain.read(acct: \(key.debugName)): error: \(error)")
 		}
 		
 		return addr
@@ -857,9 +857,9 @@ class Keychain_Wallet {
 				case .failure(let reason):
 					fail(reason)
 					
-				case .success(let success):
+				case .success():
 					// Remove deprecated key from keychain
-					let _ = try? GenericPasswordStore().deleteKey(
+					let _ = try? SystemKeychain.deleteItem(
 						account     : KeyDeprecated.lockingKey_biometrics.rawValue,
 						accessGroup : AccessGroup.appOnly.value
 					)
@@ -884,13 +884,12 @@ class Keychain_Wallet {
 		var mixins = [String: Any]()
 		mixins[kSecUseAuthenticationContext as String] = context
 		
-		let keychain = GenericPasswordStore()
 		let account     = KeyDeprecated.lockingKey_biometrics.rawValue
 		let accessGroup = AccessGroup.appOnly.value
 	
 		let fetchedKey: SymmetricKey?
 		do {
-			fetchedKey = try keychain.readKey(
+			fetchedKey = try SystemKeychain.readItem(
 				account     : account,
 				accessGroup : accessGroup,
 				mixins      : mixins
@@ -1043,12 +1042,10 @@ class Keychain_Wallet {
 				log.error("Unable to delete security.json: \(error)")
 			}
 		}
-			
-		let keychain = GenericPasswordStore()
 		
 		for key in Key.allCases {
 			do {
-				let result = try keychain.deleteKey(
+				let result = try SystemKeychain.deleteItem(
 					account     : key.account(self.id),
 					accessGroup : key.accessGroup.value
 				)

@@ -18,8 +18,6 @@ extension Keychain {
 	
 	static func printKeysAndValues(_ id: String?) {
 		
-		let keychain = GenericPasswordStore()
-		
 		var output: String = ""
 		output += "# \(id ?? "unknown"):\n"
 		
@@ -29,7 +27,7 @@ extension Keychain {
 			let accessGroup: String = key.accessGroup.value
 			
 			do {
-				let value: Data? = try keychain.readKey(account: account, accessGroup: accessGroup)
+				let value: Data? = try SystemKeychain.readItem(account: account, accessGroup: accessGroup)
 				if let value {
 					let desc = valueDescription(key.prefix, value)
 					
@@ -38,7 +36,7 @@ extension Keychain {
 			} catch {
 				log.debug(
 					"""
-					keychain.readKey(acct: \(key.debugName), grp: \(key.accessGroup.debugName)): \
+					keychain.read(acct: \(key.debugName), grp: \(key.accessGroup.debugName)): \
 					error: \(error)
 					""")
 			}

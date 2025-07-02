@@ -45,13 +45,11 @@ class Keychain {
 	
 	private static func migrateKey(oldAccount: String, newAccount: String, accessGroup: String) {
 		
-		let keychain = GenericPasswordStore()
-		
 		var value: Data? = nil
 		do {
-			value = try keychain.readKey(account: oldAccount, accessGroup: accessGroup)
+			value = try SystemKeychain.readItem(account: oldAccount, accessGroup: accessGroup)
 		} catch {
-			log.error("keychain.readKey(acct: \(oldAccount), grp: \(accessGroup)): error: \(error)")
+			log.error("keychain.readItem(acct: \(oldAccount), grp: \(accessGroup)): error: \(error)")
 			return
 		}
 		
@@ -61,29 +59,29 @@ class Keychain {
 		
 		var dstExists = false
 		do {
-			dstExists = try keychain.keyExists(account: newAccount, accessGroup: accessGroup)
+			dstExists = try SystemKeychain.itemExists(account: newAccount, accessGroup: accessGroup)
 		} catch {
-			log.error("keychain.keyExists(acct: \(newAccount), grp: \(accessGroup)): error: \(error)")
+			log.error("keychain.exists(acct: \(newAccount), grp: \(accessGroup)): error: \(error)")
 			return
 		}
 		
 		if dstExists {
-			log.debug("keychain.deleteKey: \(oldAccount)")
+			log.debug("keychain.delete: \(oldAccount)")
 		} else {
-			log.debug("keychain.moveKey: \(oldAccount) => \(newAccount)")
+			log.debug("keychain.move: \(oldAccount) => \(newAccount)")
 			
 			do {
-				try keychain.addKey(value, account: newAccount, accessGroup: accessGroup)
+				try SystemKeychain.addItem(value: value, account: newAccount, accessGroup: accessGroup)
 			} catch {
-				log.error("keychain.addKey(acct: \(newAccount), grp: \(accessGroup)): error: \(error)")
+				log.error("keychain.add(acct: \(newAccount), grp: \(accessGroup)): error: \(error)")
 				return
 			}
 		}
 		
 		do {
-			try keychain.deleteKey(account: oldAccount, accessGroup: accessGroup)
+			try SystemKeychain.deleteItem(account: oldAccount, accessGroup: accessGroup)
 		} catch {
-			log.error("keychain.deleteKey(acct: \(oldAccount), grp: \(accessGroup)): error: \(error)")
+			log.error("keychain.delete(acct: \(oldAccount), grp: \(accessGroup)): error: \(error)")
 		}
 	}
 	
@@ -160,7 +158,6 @@ class Keychain {
 	private static func migrateKeychainItemToSharedGroup() {
 		log.trace("migrateKeychainItemToSharedGroup()")
 		
-		let keychain = GenericPasswordStore()
 		let account = Key.lockingKey.deprecatedValue
 		
 		let oldAccessGroup = AccessGroup.appOnly.value
@@ -171,12 +168,12 @@ class Keychain {
 		// - If it exists, then we need to migrate it to the new location.
 		var savedKey: SymmetricKey? = nil
 		do {
-			savedKey = try keychain.readKey(
+			savedKey = try SystemKeychain.readItem(
 				account     : account,
 				accessGroup : oldAccessGroup // <- old location
 			)
 		} catch {
-			log.error("keychain.readKey(account: keychain, group: nil): error: \(error)")
+			log.error("keychain.read(account: keychain, group: nil): error: \(error)")
 		}
 		
 		if let lockingKey = savedKey {
@@ -187,12 +184,12 @@ class Keychain {
 				// Step 2 of 4:
 				// - Delete the NEW keychain item.
 				// - It shouldn't exist, but if it does it will cause an error on the next step.
-				try keychain.deleteKey(
+				try SystemKeychain.deleteItem(
 					account     : account,
 					accessGroup : newAccessGroup // <- new location
 				)
 			} catch {
-				log.error("keychain.deleteKey(account: keychain, group: shared): error: \(error)")
+				log.error("keychain.delete(account: keychain, group: shared): error: \(error)")
 			}
 			do {
 				var mixins = [String: Any]()
@@ -201,26 +198,27 @@ class Keychain {
 				// Step 3 of 4:
 				// - Copy the OLD keychain item to the NEW location.
 				// - If this step fails, an exception is thrown, and we do NOT advance to step 4.
-				try keychain.storeKey( lockingKey,
-				              account: account,
-				          accessGroup: newAccessGroup, // <- new location
-				               mixins: mixins
+				try SystemKeychain.storeItem(
+					value       : lockingKey,
+					account     : account,
+					accessGroup : newAccessGroup, // <- new location
+					mixins      : mixins
 				)
 				migrated = true
 				
 				// Step 4 of 4:
 				// - Finally, delete the OLD keychain item.
 				// - This prevents any duplicate migration attempts in the future.
-				try keychain.deleteKey(
+				try SystemKeychain.deleteItem(
 					account     : account,
 					accessGroup : oldAccessGroup // <- old location
 				)
 				
 			} catch {
 				if !migrated {
-					log.error("keychain.storeKey(account: keychain, group: shared): error: \(error)")
+					log.error("keychain.store(account: keychain, group: shared): error: \(error)")
 				} else {
-					log.error("keychain.deleteKey(account: keychain, group: private): error: \(error)")
+					log.error("keychain.delete(account: keychain, group: private): error: \(error)")
 				}
 			}
 		}

@@ -118,12 +118,10 @@ class SharedSecurity {
 			return .failure(.keychainBoxCorrupted(underlying: error))
 		}
 		
-		let keychain = GenericPasswordStore()
-		
 		// Read the lockingKey from the OS keychain
 		let fetchedKey: SymmetricKey?
 		do {
-			fetchedKey = try keychain.readKey(
+			fetchedKey = try SystemKeychain.readItem(
 				account     : Key.lockingKey.deprecatedValue,
 				accessGroup : Key.lockingKey.accessGroup.value
 			)
