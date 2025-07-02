@@ -851,11 +851,21 @@ class Keychain_Wallet {
 		//
 		let disableAdvancedSecurityAndSucceed = {(_ recoveryPhrase: RecoveryPhrase) in
 			
-			// TODO
-			fail(genericError(501, "Not implemented"))
-		//	self.addKeychainEntry(recoveryPhrase: recoveryPhrase) { _ in
-		//		succeed(recoveryPhrase)
-		//	}
+			let chain = Biz.business.chain
+			AppSecurity.shared.addWallet(chain: chain, recoveryPhrase: recoveryPhrase) { result in
+				switch result {
+				case .failure(let reason):
+					fail(reason)
+					
+				case .success(let success):
+					// Remove deprecated key from keychain
+					let _ = try? GenericPasswordStore().deleteKey(
+						account     : KeyDeprecated.lockingKey_biometrics.rawValue,
+						accessGroup : AccessGroup.appOnly.value
+					)
+					succeed(recoveryPhrase)
+				}
+			}
 		}
 		
 		// The security.json file tells us which security options have been enabled.
@@ -864,7 +874,6 @@ class Keychain_Wallet {
 			let keyInfo_biometrics = securityFile.biometrics,
 			let sealedBox_biometrics = try? keyInfo_biometrics.toSealedBox()
 		else {
-			
 			return fail(genericError(400, "SecurityFile.biometrics entry is corrupt"))
 		}
 		

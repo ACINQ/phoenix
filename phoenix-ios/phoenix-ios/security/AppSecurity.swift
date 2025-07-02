@@ -170,6 +170,7 @@ class AppSecurity {
 			return
 		}
 		
+		// Move all: "key-default" > "key-<walletId>"
 		Keychain.loadWallet(walletId)
 		
 		let name = UUID().uuidString.replacingOccurrences(of: "-", with: "").prefix(maxLength: 6)
