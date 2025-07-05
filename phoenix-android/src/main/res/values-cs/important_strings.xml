@@ -20,7 +20,11 @@
   ~
   ~ Most technical resource strings should stay in the default `strings.xml` file.
 -->
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+<resources>
+
+    <!-- generic -->
+
+    <string name="utils_ack">Rozumím.</string>
 
     <!-- system notifications -->
 
@@ -36,14 +40,14 @@
     <string name="notif_missed_title">Zmeškaná příchozí platba</string>
     <string name="notif_missed_unavailable">Nepodařilo se spustit Phoenix na pozadí.</string>
 
-    <string name="notif_rejected_deposit_title">On-Chain záloha čeká na vyřízení (+%1$s)</string>
-    <string name="notif_rejected_payment_title">Zamítnutí platby (+%1$s)</string>
-    <string name="notif_rejected_policy_disabled">Automatická správa kanálů je zakázána. Můžete to změnit v nastavení.</string>
-    <string name="notif_rejected_policy_disabled_timeout">Automatická správa kanálů je zakázána. Platnost této zálohy vyprší %1$s.</string>
-    <string name="notif_rejected_over_absolute">Poplatek činil %1$s, ale váš maximální poplatek byl nastaven na %2$s. Můžete to upravit v nastavení.</string>
-    <string name="notif_rejected_over_absolute_timeout">Poplatek činil %1$s, ale váš maximální poplatek byl nastaven na %2$s. Platnost této zálohy vyprší %3$s.</string>
-    <string name="notif_rejected_over_relative">Poplatek činil %1$s, což je více než %2$s%% z přijaté částky. Můžete to upravit v nastavení.</string>
-    <string name="notif_rejected_over_relative_timeout">Poplatek činil %1$s, což je více než %2$s%% z přijaté částky. Platnost této zálohy vyprší %3$s.</string>
+    <string name="notif_rejected_deposit_title">On-chain vklad čeká na zpracování (+%1$s)</string>
+    <string name="notif_rejected_payment_title">Platba zamítnuta (+%1$s)</string>
+    <string name="notif_rejected_policy_disabled">Automatická správa kanálů je zakázána. Kliknutím zobrazíte podrobnosti.</string>
+    <string name="notif_rejected_policy_disabled_timeout">Automatická správa kanálů je zakázána. Platnost tohoto vkladu vyprší za %1$s.</string>
+    <string name="notif_rejected_over_absolute">Poplatek činil %1$s, ale váš maximální poplatek byl nastaven na %2$s. Kliknutím zobrazíte podrobnosti.</string>
+    <string name="notif_rejected_over_absolute_timeout">Poplatek činil %1$s, ale váš maximální poplatek byl nastaven na %2$s. Platnost tohoto vkladu vyprší za %3$s.</string>
+    <string name="notif_rejected_over_relative">Poplatek činil %1$s, což je více než %2$s%% z přijaté částky. Kliknutím zobrazíte podrobnosti.</string>
+    <string name="notif_rejected_over_relative_timeout">Poplatek činil %1$s, což je více než %2$s%% z přijaté částky. Platnost tohoto vkladu vyprší za %3$s.</string>
     <string name="notif_rejected_amount_too_low">Výše platby je příliš nízká.</string>
     <string name="notif_rejected_generic_error">Při financování došlo k chybě. Zkuste to prosím později.</string>
 
@@ -57,7 +61,7 @@
     <string name="settings_advanced_title">Pokročilé</string>
     <string name="settings_danger_title">Nebezpečná zóna</string>
 
-    <string name="settings_display_prefs">Zobrazit</string>
+    <string name="settings_display_prefs">Zobrazení</string>
     <string name="settings_wallet_info">Informace o peněžence</string>
     <string name="settings_liquidity_policy">Správa kanálů</string>
     <string name="settings_display_seed">Obnovovací fráze</string>
@@ -78,19 +82,19 @@
     <!-- home: swap help -->
 
     <string name="home_swapin_confirming_title">Potvrzuji</string>
-    <string name="home_swapin_confirming_desc">Nejprve se čeká na potvrzení, než bude možné je vyměnit za Lightning.</string>
+    <string name="home_swapin_confirming_desc">Nejprve se čeká na potvrzení, než je bude možné přehodit na Lightning.</string>
 
-    <string name="home_swapin_ready_title">Čekání na výměnu</string>
-    <string name="home_swapin_ready_desc_auto">Vklady se přidají do Lightningu, až budou poplatky za těžbu nižší než %1$s.</string>
+    <string name="home_swapin_ready_title">Čekání na přehození</string>
+    <string name="home_swapin_ready_desc_auto">Vklady se přehodí do Lightningu, až budou poplatky za těžbu nižší než %1$s.</string>
     <string name="home_swapin_ready_desc_disabled">Vklady zůstanou on-chain, protože automatická správa kanálů je vypnutá.</string>
-    <string name="home_swapin_ready_desc_generic">Nasadí se do Lightningu, až budou splněny podmínky.</string>
-    <string name="home_swapin_ready_expiring">Pozor! Některé prostředky brzy vyprší a již nebudou způsobilé pro výměnu za Lightning.</string>
+    <string name="home_swapin_ready_desc_generic">Přehodí se do Lightningu, až budou splněny podmínky.</string>
+    <string name="home_swapin_ready_expiring">Pozor! Platnost některých prostředků brzy vyprší a již nebude možné je přehodit na Lightning.</string>
 
     <string name="home_swapin_expired_title">Platnost vypršela</string>
-    <string name="home_swapin_expired_desc">Po 4 měsících čekání již nelze vyměnit za Lightning. Tyto prostředky je nutné utratit ručně.</string>
+    <string name="home_swapin_expired_desc">Po 4 měsících čekání není možné prostředky přehodit na Lightning. Tyto prostředky je nutné utratit ručně.</string>
 
     <string name="home_final_title">Konečná peněženka</string>
-    <string name="home_final_desc">Tyto prostředky pocházejí z uzavřených kanálů Lightning. Musí být vynaloženy ručně.</string>
+    <string name="home_final_desc">Tyto prostředky pocházejí z uzavřených kanálů Lightning. Musí být utraceny ručně.</string>
 
     <string name="home_background_restriction_title">Omezeno zpracovávání na pozadí</string>
     <string name="home_background_restriction_body_1">Phoenix nebude moci přijímat platby, pokud je na pozadí nebo pokud je zavřený.</string>.
@@ -111,10 +115,9 @@
     <string name="initwallet_restore">Obnovit moji peněženku</string>
 
     <string name="restore_disclaimer_message_1_title">Phoenix je pouze na Lightning</string>
-    <string name="restore_disclaimer_message_1_body">Phoenix zobrazí pouze fondy, které již byly spravovány Phoenixem. Prostředky připojené k seedu vygenerovanému jinou aplikací se zde nezobrazí (to se týká i prostředků na řetězci).</string>
-    <string name="restore_disclaimer_message_2_title">Souběžné použití stejného klíče</string>
-    <string name="restore_disclaimer_message_2_body">Nepoužívejte stejný seed současně na různých zařízeních. Může to způsobit konflikty mezi oběma instancemi Phoenixu a vést k uzavření kanálů Lightning.</string>
-    <string name="utils_ack">Rozumím.</string>
+    <string name="restore_disclaimer_message_1_body">Phoenix zobrazí pouze prostředky, které již byly spravovány Phoenixem. Prostředky navázané na seed z jiné aplikace se zde nezobrazí (to se týká i on-chain prostředků).</string>
+    <string name="restore_disclaimer_message_2_title">Vyvarujte se používání stejného seedu zároveň na jiných zařízeních</string>
+    <string name="restore_disclaimer_message_2_body">Nepoužívejte stejný seed současně na různých zařízeních. Může to způsobit konflikty mezi oběma instancemi Phoenixu a vést k uzavření Lightning kanálů.</string>
 
     <string name="restore_instructions">Seed vaší peněženky je seznam 12 anglických slov. Každé slovo z tohoto seznamu napište do níže uvedeného pole.</string>
     <string name="restore_input_label">Zadejte slovo #%1$s</string>
@@ -125,16 +128,15 @@
     <string name="restore_seed_invalid_details">Ujistěte se, že jste zadali správná slova ve správném pořadí.</string>
 
     <string name="restore_payments_button">Importovat historii plateb</string>
-    <string name="restore_payments_button_details">Volitelné. Toto tlačítko použijte k obnovení souboru databáze plateb z jiného zařízení.</string>
+    <string name="restore_payments_button_details">Volitelné. Použijte toto tlačítko k obnovení souboru databáze plateb z jiného zařízení.</string>
     <string name="restore_payments_success">Obnoví historii plateb</string>
     <string name="restore_payments_success_button">Použít jiný soubor</string>
     <string name="restore_payments_error_header">Nelze obnovit platby</string>
     <string name="restore_payments_error_button">Zkuste to znovu</string>
     <string name="restore_payments_error_encryption">Soubor nelze dešifrovat. Ujistěte se, že používáte databázový soubor Phoenix (ne CSV) a že tento soubor odpovídá peněžence, kterou obnovujete.</string>
     <string name="restore_payments_error_open">Tento soubor nelze otevřít. Zkuste to znovu.</string>
-    <string name="restore_payments_error_writing">Tento soubor nelze zapsat do datové složky aplikace. Zkuste to znovu.</string>
-
-    <string name="restore_import_button">Obnovení</string>
+    <string name="restore_payments_error_writing">Tento soubor nelze zapsat do složky s daty aplikace. Zkuste to znovu.</string>
+    <string name="restore_import_button">Obnovit peněženku</string>
 
     <!-- upgrade required dialog -->
 
@@ -157,12 +159,17 @@
 
     <string name="receive_lightning_warning_message_above_limit">Pro příjem této částky se očekává poplatek %1$s, ale tento poplatek je vyšší než váš limit %2$s.\n\nZvyšte tento limit v nastavení správy kanálů.</string>
     <string name="receive_lightning_warning_message_above_limit_or_liquidity">Pro příjem této částky se očekává poplatek %1$s, ale tento poplatek je vyšší než váš limit %2$s.\n\nZvyšte tento limit v nastavení správy kanálů nebo požádejte o dodatečnou likviditu.</string>
-    <string name="receive_lightning_warning_message_above_limit_percent">Pro příjem této částky se očekává poplatek %1$s, ale tento poplatek je vyšší než váš limit %2$s%%.\n\nZvyšte tento limit v nastavení správy kanálů.</string>
-    <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Očekává se, že tuto částku obdrží poplatek ve výši %1$s, a tento poplatek je vyšší než %2$s%% částky.\n\nZvyšte tento limit v nastavení správy kanálů nebo požádejte o dodatečnou likviditu.</string>
+    <string name="receive_lightning_warning_message_above_limit_percent">Pro přijetí této částky se očekává poplatek %1$s, ale to je více než %2$s%% částky.\n\nZvyšte tento limit v nastavení správy kanálů.</string>
+    <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Pro přijetí této částky se očekává poplatek %1$s, ale to je více než %2$s%% částky.\n\nZvyšte tento limit v nastavení správy kanálů nebo požádejte o dodatečnou likviditu.</string>
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Příchozí likvidita není dostatečná a máte zakázanou automatickou správu kanálů.</string>
 
-    <!-- scanning errors -->
+    <!-- receive: Tor warning -->
+
+    <string name="receive_tor_warning_title">Tor je povolen</string>
+    <string name="receive_tor_warning_dialog_content_1">Phoenix může mít problém s přijímáním plateb na pozadí. Ujistěte se, že aplikace necháváte otevřenou v popředí a máte stabilní připojení.</string>
+
+    <!-- send errors -->
 
     <string name="send_error_invoice_expired">Platnost této faktury vypršela.</string>
     <string name="send_error_payment_pending">Tato platba se již zpracovává. Počkejte prosím na její dokončení.</string>
@@ -174,13 +181,8 @@
     <string name="send_error_bip353_connect">Nelze načíst data pro tuto adresu. Možná máte problém s připojením.</string>
     <string name="send_error_bip353_name_not_found">Název \"%1$s\" nebyl nalezen na \"%2$s\".</string>
     <string name="send_error_bip353_invalid_uri">Tato adresa používá neplatný zdroj Bip21.</string>
-    <string name="send_error_bip353_invalid_offer">Tato adresa používá neplatnou nabídku Bolt12.</string>
+    <string name="send_error_bip353_invalid_offer">Tato adresa používá neplatnou Bolt12 žádost.</string>
     <string name="send_error_bip353_dnssec">Tato adresa je hostována na nezabezpečeném DNS. DNSSEC musí být povolen.</string>
-
-    <!-- receive: Tor warning -->
-
-    <string name="receive_tor_warning_title">Tor je povolen</string>
-    <string name="receive_tor_warning_dialog_content_1">Phoenix nemůže přijímat platby na pozadí </string>
 
     <!-- validation -->
 
@@ -193,11 +195,11 @@
     <string name="mutualclose_input_instructions">Všechny prostředky odešlete do Bitcoin peněženky. Všechny platební kanály budou uzavřeny.</string>
     <string name="mutualclose_confirm_title">Potvrzení uzavření</string>
     <string name="mutualclose_confirm_details">Všechny finanční prostředky budou zaslány na adresu:</string>
-    <string name="mutualclose_confirm_fee">Odhadovaný poplatek:</string>
+    <string name="mutualclose_confirm_fee">Odhadovaný poplatek za těžbu:</string>
     <string name="mutualclose_confirm_fee_unknown">Výši poplatku se nepodařilo odhadnout.</string>
 
     <string name="forceclose_title">Vynucené uzavření kanálů</string>
-    <string name="forceclose_instructions">Na této obrazovce můžete jednostranně uzavřít kanály.\n\nToto není kouzelné tlačítko \"opravit vše\": je zde jako bezpečnostní opatření a <b>mělo by se používat pouze v krajních situacích</b>. Například pokud váš peer (ACINQ) trvale zmizí a znemožní vám utrácet peníze. Ve všech ostatních případech, <b>pokud máte s Phoenixem problémy, měli byste kontaktovat podporu</b>.\n\nVynucené uzavření kanálů vás bude stát peníze (na pokrytí On-Chain poplatků) a způsobí, že vaše prostředky budou na několik dní zablokovány.\n\n<b>Aplikaci odinstalujte až po úplném uzavření kanálů, jinak přijdete o peníze.</b>\n\n<b>Nepoužívejte tuto funkci, pokud plně nerozumíte tomu, co děláte.</b></string>
+    <string name="forceclose_instructions">Na této obrazovce můžete jednostranně uzavřít kanály.\n\nToto není kouzelné tlačítko \"opravit vše\": je zde jako bezpečnostní opatření a <b>mělo by se používat pouze v krajních situacích</b>. Například pokud váš peer (ACINQ) trvale zmizí a znemožní vám utrácet peníze. Ve všech ostatních případech, <b>pokud máte s Phoenixem problémy, měli byste kontaktovat podporu</b>.\n\nVynucené uzavření kanálů vás bude stát peníze (na pokrytí on-chain poplatků) a způsobí, že vaše prostředky budou na několik dní zablokovány.\n\n<b>Aplikaci odinstalujte až po úplném uzavření kanálů, jinak přijdete o peníze.</b>\n\n<b>Nepoužívejte tuto funkci, pokud plně nerozumíte tomu, co děláte.</b></string>
     <string name="forceclose_address_label">Finanční prostředky budou nakonec odeslány do konečné peněženky:</string>
 
     <string name="forceclose_confirm_title">Potvrdit vynucené uzavření</string>
@@ -222,13 +224,13 @@
     <string name="inappnotif_upgrade_critical_message">K dispozici je kritická aktualizace. Měli byste co nejdříve aktualizovat aplikaci Phoenix.</string>
     <string name="inappnotif_upgrade_button">Aktualizace v Google Play</string>
 
-    <string name="inappnotif_mempool_full_message">Bitcoin mempool je plný a On-Chain poplatky jsou vysoké.</string>
+    <string name="inappnotif_mempool_full_message">Bitcoin mempool je plný a on-chain poplatky jsou vysoké.</string>
     <string name="inappnotif_mempool_full_action">Podívejte se, jak je ovlivněn Phoenix</string>
 
     <string name="inappnotif_tor_disconnected_message">Nelze se připojit k síti Tor. Phoenix nebude fungovat správně.</string>
-    <string name="inappnotif_tor_disconnected_action">Opravit to</string>
+    <string name="inappnotif_tor_disconnected_action">Opravit</string>
 
-    <string name="inappnotif_payment_onchain_pending_title">On-Chain finanční prostředky čekají na vyřízení (+%1$s)</string>
+    <string name="inappnotif_payment_onchain_pending_title">On-chain finanční prostředky čekají na vyřízení (+%1$s)</string>
     <string name="inappnotif_payments_rejection_overview_one">Příchozí platba byla nedávno odmítnuta</string>
     <string name="inappnotif_payments_rejection_overview_many">%1$d nedávno odmítnutých příchozích plateb</string>
     <string name="inappnotif_payment_rejected_title">Platba odmítnuta (+%1$s)</string>
@@ -256,17 +258,18 @@
 
     <!-- payment details -->
 
-    <string name="paymentdetails_liquidity_purchase_label">Likvidity</string>
     <string name="paymentdetails_funding_fees_label">Poplatky těžařům</string>
-    <string name="paymentdetails_funding_fees_desc">Poplatky placené těžařům Bitcoinové sítě za zpracování On-Chain transakce.</string>
+    <string name="paymentdetails_funding_fees_desc">Poplatky placené těžařům Bitcoinové sítě za zpracování on-chain transakce.</string>
     <string name="paymentdetails_service_fees_label">Poplatky za službu</string>
     <string name="paymentdetails_service_fees_desc">Poplatky za vytvoření nového platebního kanálu. Toto není vždy vyžadováno.</string>
+
+    <string name="paymentdetails_liquidity_purchase_label">Likvidita</string>
     <string name="paymentdetails_liquidity_service_fee_label">Poplatky za službu</string>
     <string name="paymentdetails_liquidity_service_fee_help">Poplatky za službu likvidity.</string>
     <string name="paymentdetails_liquidity_miner_fee_label">Poplatky těžařům</string>
     <string name="paymentdetails_liquidity_miner_fee_help">Poplatky placené těžařům Bitcoinové sítě za zpracování on-chain transakce.</string>
     <string name="paymentdetails_liquidity_caused_by_label">Způsobeno</string>
-    <string name="paymentdetails_liquidity_caused_by_help">Tato likvidita byla vyžadována pro získání platby.</string>
+    <string name="paymentdetails_liquidity_caused_by_help">Tato likvidita byla vyžadována pro přijetí platby.</string>
     <string name="paymentdetails_liquidity_caused_by_help_link">Podívejte se, jak optimalizovat</string>
 
     <!-- lnurl -->
@@ -277,20 +280,20 @@
 
     <!-- Tor -->
 
-    <string name="tor_dialog_enable_title_1">Používání Tor</string>
-    <string name="tor_dialog_enable_details_1">To vyžaduje instalaci aplikace Tor Proxy VPN třetí strany, jako je Orbot.</string>
+    <string name="tor_dialog_enable_title_1">Povolit Tor</string>
+    <string name="tor_dialog_enable_details_1">Toto nastavení vyžaduje instalaci aplikace třetí strany Tor Proxy VPN (jakou je třeba Orbot).</string>
     <string name="tor_dialog_enable_details_2">Tor může zlepšit soukromí, ale může způsobit problémy s výkonem a zmeškané platby.</string>
-    <string name="tor_dialog_disable_title">Deaktivace Tor</string>
+    <string name="tor_dialog_disable_title">Vypnout Tor</string>
     <string name="tor_dialog_disable_details_1">Pokud tuto možnost zakážete, vaše IP adresa může být odhalena různým poskytovatelům služeb.</string>
     <string name="tor_dialog_disable_details_2">Opravdu chcete pokračovat?</string>
     <string name="tor_dialog_processing">Zpracování změn…</string>
 
-    <string name="tor_disconnected_dialog_title">Žádný přístup k síti Tor</string>
+    <string name="tor_disconnected_dialog_title">Bez přístupu k síti Tor</string>
     <string name="tor_disconnected_dialog_action">Opravit</string>
     <string name="tor_disconnected_dialog_details_1">Phoenix potřebuje pro správné fungování přístup k síti Tor.</string>
     <string name="tor_disconnected_dialog_details_2">Ujistěte se, že vaše aplikace Tor Proxy VPN je spuštěná a že je připojena k síti Tor.</string>
-    <string name="tor_disconnected_dialog_details_3">Pokud nemáte aplikaci Tor VPN, nainstalujte si ji. Doporučujeme Orbot.</string>
-    <string name="tor_disconnected_dialog_open_settings">Otevřít nastavení Tor</string>
+    <string name="tor_disconnected_dialog_details_3">Pokud nemáte Tor VPN aplikaci, nainstalujte si ji. Doporučujeme Orbot.</string>
+    <string name="tor_disconnected_dialog_open_settings">Otevřít nastavení Toru</string>
     <string name="tor_disconnected_dialog_open_orbot_page">Otevřít stránku Orbot</string>
 
     <!-- about -->
@@ -299,7 +302,7 @@
     <string name="about_seed_title">Zabezpečení klíče</string>
     <string name="about_seed_content">Tuto peněženku si spravujete sami (self-custody): <b>Vy jediní jste zodpovědni za správu 12-ti slovného klíče (Seedu)</b>.\n\nTento klíč umožňuje přístup k vašim prostředkům. Nikomu ho neprozrazujte a dejte si pozor na phishing.</string>
     <string name="about_rates_title">Směnné kurzy</string>
-    <string name="about_rates_content">Směnné kurzy bitcoinu/fiatu jsou získávány z různých rozhraní API třetích stran:\n\n- Blockchain.info\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nTyto sazby nemusí být přesné. Před odesláním platby vždy zkontrolujte skutečnou částku v bitcoinech.</string>
+    <string name="about_rates_content">Směnné kurzy bitcoinu/fiatu jsou získávány z různých API třetích stran:\n\n- Blockchain.info\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nTyto sazby nemusí být přesné. Před odesláním platby si vždy zkontrolujte skutečnou částku v bitcoinech.</string>
 
     <!-- introduction screens -->
 
@@ -319,16 +322,17 @@
     <!-- wallet info -->
 
     <string name="walletinfo_onchain_swapin">Swap-in peněženka</string>
-    <string name="walletinfo_onchain_swapin_help">Prostředky zaslané do této On-Chain peněženky se automaticky převádějí do Lightningu.</string>
+    <string name="walletinfo_onchain_swapin_help">Prostředky zaslané do této on-chain peněženky se automaticky převádějí do Lightningu.</string>
     <string name="walletinfo_onchain_swapin_help_faq_link">Podívejte se, jak to funguje</string>
     <string name="walletinfo_onchain_swapin_policy_view">Klepnutím na položku provedete konfiguraci.</string>
+    <string name="walletinfo_onchain_swapin_empty">Neprobíhají žádné výměny.</string>
+
     <string name="walletinfo_onchain_swapin_policy_auto_details">Pokud je poplatek <b>menší než %1$s</b>, budou prostředky na Blockchainu automaticky převedeny do služby Lightning.</string>
     <string name="walletinfo_onchain_swapin_policy_auto_details_timeout">Prostředky, které nebyly vyměněny <b>po %1$d měsících</b>, lze získat zpět na řetězci.</string>
     <string name="walletinfo_onchain_swapin_policy_disabled_details">Automatizovaná poplatková politika <b>je vypnutá</b>. Prostředky nebudou vyměňovány. Zůstanou na této peněžence.</string>
+
     <string name="walletinfo_onchain_swapin_last_attempt">Poslední pokus (%1$s).</string>
     <string name="walletinfo_onchain_swapin_last_attempt_disabled">Automatizovaná poplatková politika je vypnutá.</string>
-    <string name="walletinfo_onchain_swapin_empty">Neprobíhají žádné výměny.</string>
-
     <string name="walletinfo_onchain_swapin_timeout_1day">Platnost této výměny vyprší za den!</string>
     <string name="walletinfo_onchain_swapin_timeout">Tato výměna vyprší za %1$s dní.</string>
 
@@ -338,11 +342,11 @@
     <string name="walletinfo_onchain_swapin_refund_title">Zrušené prostředky</string>
     <string name="walletinfo_onchain_swapin_refund_description">Tyto prostředky nebyly převedeny včas. Klepnutím na tlačítko tyto prostředky utratíte.</string>
 
-    <string name="walletinfo_onchain_final_about">On-Chain peněženka odvozená od vašeho seedu.\n\nKonečná peněženka je místo, kam se ve výchozím nastavení posílají prostředky, když jsou vaše Lightning kanály uzavřeny (obvykle je prázdná).</string>
+    <string name="walletinfo_onchain_final_about">On-chain peněženka odvozená od vašeho seedu.\n\nKonečná peněženka je místo, kam se ve výchozím nastavení posílají prostředky, když jsou vaše Lightning kanály uzavřeny (obvykle je prázdná).</string>
 
     <!-- settings: liquidity policy for channels creation -->
 
-    <string name="liquiditypolicy_instructions">Příchozí platby někdy vyžadují On-Chain transakce. K tomu nedochází vždy, pouze v případě potřeby.</string>
+    <string name="liquiditypolicy_instructions">Příchozí platby někdy vyžadují on-chain transakce. K tomu nedochází vždy, pouze v případě potřeby.</string>
     <string name="liquiditypolicy_fees_estimation">Poplatky se v současné době odhadují přibližně na <b>%1$s</b> (≈%2$s).</string>
     <string name="liquiditypolicy_disable_label">Automatizovaná správa kanálů</string>
     <string name="liquiditypolicy_disable_desc">Příchozí platby, které vyžadují operace na Blockchainu, budou odmítnuty.</string>
@@ -450,7 +454,6 @@
     <string name="outgoing_failuremessage_unknown">Došlo k neznámé chybě a platba se nezdařila.</string>
     <string name="outgoing_failuremessage_restarted">Peněženka byla restartována během zpracování platby.</string>
 
-
     <!-- low feerate disclaimer -->
 
     <string name="spliceout_low_feerate_dialog_title">Nízký poplatek!</string>
@@ -486,11 +489,11 @@
     <string name="finalwallet_refund_title">Utratit prostředky z konečné peněženky</string>
     <string name="finalwallet_refund_available_none">Nejsou k dispozici žádné prostředky</string>
     <string name="finalwallet_refund_available">Dostupná částka</string>
-    <string name="finalwallet_refund_instructions">Na této obrazovce můžete utratit prostředky z konečné peněženky. Tyto prostředky pocházejí z kanálů, které byly v minulosti uzavřeny. To nemá vliv na váš stávající kanál Lightning.</string>
+    <string name="finalwallet_refund_instructions">Na této obrazovce můžete utratit prostředky z konečné peněženky. Tyto prostředky pocházejí z kanálů, které byly v minulosti uzavřeny. Toto neovlivní vaše stávající Lightning kanály.</string>
 
     <!-- experimental features -->
 
-    <string name="bip353_subtitle">Toto je lidsky čitelná adresa pro vaši žádost o platbu Bolt12.</string>
-    <string name="bip353_subtitle2">Chcete hezčí adresu? Použijte služby třetích stran, nebo si adresu hostujte sami!</string>
+    <string name="bip353_subtitle">Toto je lidsky čitelná adresa pro vaši žádost o platbu typu Bolt12.</string>
+    <string name="bip353_subtitle2">Chcete hezčí adresu? Můžete použít služby třetích stran, nebo si adresu začít hostovat!</string>
 
 </resources>
