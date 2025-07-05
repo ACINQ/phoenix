@@ -67,7 +67,7 @@
     <string name="settings_display_seed">Obnovovací fráze</string>
     <string name="settings_access_control">Kontrola přístupu</string>
     <string name="settings_list_channels">Platební kanály</string>
-    <string name="settings_logs">Logs</string>
+    <string name="settings_logs">Logy</string>
     <string name="settings_electrum">Electrum server</string>
     <string name="settings_reset_wallet">Obnovení peněženky</string>
     <string name="settings_mutual_close">Uzavření kanálů</string>
@@ -81,7 +81,7 @@
 
     <!-- home: swap help -->
 
-    <string name="home_swapin_confirming_title">Potvrzuji</string>
+    <string name="home_swapin_confirming_title">Potvrzování</string>
     <string name="home_swapin_confirming_desc">Nejprve se čeká na potvrzení, než je bude možné přehodit na Lightning.</string>
 
     <string name="home_swapin_ready_title">Čekání na přehození</string>
@@ -386,8 +386,8 @@
 
     <string name="liquidityads_no_channels_header">Zatím žádné kanály!</string>
     <string name="liquidityads_no_channels_details">Pro použití této funkce potřebujete nejprve prostředky v peněžence.</string>
-    <string name="liquidityads_header">Plánujte si dopředu likviditu</string>
-    <string name="liquidityads_instructions">Příchozí likvidita vám umožní vyhnout se poplatkům za on-chain transakce u budoucích plateb přijatých přes Lightning.\n\nPokud si nyní zažádáte o větší likviditu, můžete později ušetřit poplatky.</string>
+    <string name="liquidityads_header">Plánujte si likviditu dopředu</string>
+    <string name="liquidityads_instructions">Příchozí likvidita vám umožní vyhnout se poplatkům za on-chain transakce u budoucích plateb přijatých přes Lightning.\n\nPokud si nyní zažádáte o větší likviditu, můžete později ušetřit na poplatcích.</string>
     <string name="liquidityads_faq_link">Více informací</string>
     <string name="liquidityads_current_liquidity">Aktuální likvidita: </string>
 
@@ -402,7 +402,7 @@
     <string name="liquidityads_estimate_details_duration_value">1 rok</string>
     <string name="liquidityads_estimate_details_duration_help">Jak budete přijímat prostředky, likvidita bude spotřebovávána a stane se součástí vašeho zůstatku. Po jednom roce bude zbývající nevyužitá likvidita vrácena poskytovateli.</string>
     <string name="liquidityads_estimate_above_25">Celkový poplatek je vyšší než 25 % požadované částky.</string>
-    <string name="liquidityads_over_balance">Celkové poplatky přesahují váš zůstatek.</string>
+    <string name="liquidityads_over_balance">Celkové poplatky převyšují váš zůstatek.</string>
 
     <string name="liquidityads_review_button">Zhodnotit</string>
     <string name="liquidityads_disclaimer_body1">Žádáte o <b>počáteční</b> množství likvidity. Likvidita není v průběhu času konstantní: jak budete v průběhu přijímat prostředky přes Lightning, likvidita se bude spotřebovávat a stane se vaším zůstatkem.</string>
