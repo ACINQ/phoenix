@@ -122,7 +122,7 @@ class SharedSecurity {
 		let fetchedKey: SymmetricKey?
 		do {
 			fetchedKey = try SystemKeychain.readItem(
-				account     : Key.lockingKey.deprecatedValue,
+				account     : Key.lockingKey.account(id),
 				accessGroup : Key.lockingKey.accessGroup.value
 			)
 		} catch {

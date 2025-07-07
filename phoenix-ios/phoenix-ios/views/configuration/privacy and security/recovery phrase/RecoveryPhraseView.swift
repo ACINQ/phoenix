@@ -592,8 +592,8 @@ struct RecoveryPhraseList: View {
 				AuthenticateWithPinSheet(type: type) { result in
 					switch result {
 					case .Authenticated:
-						Keychain.current.tryUnlockWithKeychain { (recoveryPhrase, _) in
-							if let recoveryPhrase {
+						Keychain.current.unlockWithKeychain { result in
+							if case .success(let recoveryPhrase) = result, let recoveryPhrase {
 								Succeed(recoveryPhrase)
 							} else {
 								Fail()
@@ -610,8 +610,8 @@ struct RecoveryPhraseList: View {
 		
 		let enabledSecurity = Keychain.current.enabledSecurityPublisher.value
 		if enabledSecurity == .none {
-			Keychain.current.tryUnlockWithKeychain { (recoveryPhrase, _) in
-				if let recoveryPhrase {
+			Keychain.current.unlockWithKeychain { result in
+				if case .success(let recoveryPhrase) = result, let recoveryPhrase {
 					Succeed(recoveryPhrase)
 				} else {
 					Fail()
@@ -637,7 +637,7 @@ struct RecoveryPhraseList: View {
 		} else if enabledSecurity.contains(.biometrics) {
 			let prompt = String(localized: "Unlock your seed.", comment: "Biometrics prompt")
 			
-			Keychain.current.tryUnlockWithBiometrics(prompt: prompt) { result in
+			Keychain.current.unlockWithBiometrics(prompt: prompt) { result in
 				
 				if case .success(let recoveryPhrase) = result {
 					Succeed(recoveryPhrase)

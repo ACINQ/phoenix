@@ -1,6 +1,6 @@
 import Foundation
+import PhoenixShared
 import CryptoKit
-
 
 /// Represents the "security.json" file, where we store the wrapped/encrypted seed.
 ///
@@ -12,9 +12,12 @@ import CryptoKit
 ///
 class SecurityFile {
 	
-	protocol VAny {}
+	enum Version {
+		case v0(file: SecurityFile.V0)
+		case v1(file: SecurityFile.V1)
+	}
 	
-	struct V0: VAny, Decodable {
+	struct V0: Decodable {
 		static let filename = "security.json"
 		
 		/// The "keychain" option represents the default security.
@@ -42,7 +45,7 @@ class SecurityFile {
 		}
 	}
 	
-	struct V1: VAny, Codable {
+	struct V1: Codable {
 		static let filename = "security.v1.json"
 		
 		let wallets: [String: Wallet]
@@ -58,19 +61,49 @@ class SecurityFile {
 			}
 		}
 		
-		init() {
-			self.wallets = [String: Wallet]()
-		}
-		
-		init(wallets: [String: Wallet]) {
+		private init(wallets: [String: Wallet]) {
 			self.wallets = wallets
 		}
 		
-		func copyWithWallet(_ wallet: Wallet, forKey key: String) -> V1 {
+		init() {
+			self.wallets = [:]
+		}
+		
+		init(wallet: Wallet, id: WalletIdentifier) {
+			self.wallets = [id.keychainKeyId: wallet]
+		}
+		
+		func copyWithWallet(_ wallet: Wallet, id: WalletIdentifier) -> V1 {
+			
 			var newWallets = self.wallets
-			newWallets[key] = wallet
+			newWallets[id.keychainKeyId] = wallet
 			
 			return V1(wallets: newWallets)
+		}
+		
+		struct KeyInfo {
+			let chain: Bitcoin_kmpChain
+			let nodeId: String
+		}
+		
+		static func splitKey(_ id: String) -> KeyInfo? {
+			
+			// See `WalletIdentifier.keychainKeyId` for string format
+			
+			let comps = id.split(separator: "-")
+			if comps.count == 1 {
+				return KeyInfo(chain: Bitcoin_kmpChain.Mainnet(), nodeId: id)
+				
+			} else if comps.count == 2 {
+				let chainName = String(comps[1])
+				guard let chain = Bitcoin_kmpChain.fromString(chainName) else {
+					return nil
+				}
+				return KeyInfo(chain: chain, nodeId: String(comps[0]))
+				
+			} else {
+				return nil
+			}
 		}
 	}
 }

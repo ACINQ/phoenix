@@ -27,7 +27,7 @@ class GroupPrefs {
 	private static var instances: [String: GroupPrefs_Wallet] = [:]
 	
 	static func wallet(_ walletId: WalletIdentifier) -> GroupPrefs_Wallet {
-		return wallet(walletId.keyId)
+		return wallet(walletId.prefsKeyId)
 	}
 	
 	static func wallet(_ id: String) -> GroupPrefs_Wallet {
@@ -164,7 +164,7 @@ class GroupPrefs {
 		
 		let d = Self.defaults
 		let oldId = PREFS_DEFAULT_ID
-		let newId = walletId.keyId
+		let newId = walletId.prefsKeyId
 		
 		for key in Key.allCases {
 			let oldKey = key.value(oldId)

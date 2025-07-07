@@ -572,7 +572,7 @@ struct AppAccessView : View {
 			
 			let prompt = NSLocalizedString("Authenticate to disable biometrics.", comment: "User prompt")
 			
-			Keychain.current.tryUnlockWithBiometrics(prompt: prompt) { result in
+			Keychain.current.unlockWithBiometrics(prompt: prompt) { result in
 				
 				switch result {
 				case .success(_):
@@ -641,7 +641,7 @@ struct AppAccessView : View {
 			
 			let prompt = String(localized: "Authenticate to disable passcode fallback.", comment: "User prompt")
 			
-			Keychain.current.tryUnlockWithBiometrics(prompt: prompt) { result in
+			Keychain.current.unlockWithBiometrics(prompt: prompt) { result in
 				
 				switch result {
 				case .failure(_):

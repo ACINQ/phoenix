@@ -119,6 +119,7 @@ struct MainView_BigPrimary: View {
 		}
 		.sheet(isPresented: $showingMergeChannelsView) {
 			MergeChannelsView(location: .sheet)
+				.modifier(GlobalEnvironment.sheetInstance())
 		}
 	}
 	

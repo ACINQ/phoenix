@@ -20,7 +20,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	var errorWindow: UIWindow?
 	
 	var isAppLaunch = true
-	var firstUnlockAttempted = false
+	var readSecurityFileAttempted = false
 
 	static func get() -> SceneDelegate {
 		
@@ -202,7 +202,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 			
 			log.debug("LockState.shared.protectedDataAvailable = \(protectedDataAvailable)")
 			if protectedDataAvailable {
-				self?.tryFirstUnlock()
+				self?.readSecurityFile()
 			}
 		}.store(in: &cancellables)
 		
@@ -241,58 +241,102 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		}
 	}
 	
-	private func tryFirstUnlock() {
-		log.trace("tryFirstUnlock()")
+	private func readSecurityFile() {
+		log.trace(#function)
 		assertMainThread()
 		
-		guard !firstUnlockAttempted else {
-			log.debug("tryFirstUnlock() - ignoring, task already completed")
+		guard !readSecurityFileAttempted else {
+			log.debug("readSecurityFile() - ignoring, task already completed")
 			return
 		}
-		firstUnlockAttempted = true
+		readSecurityFileAttempted = true
 		
-//		Keychain.current.tryUnlockWithKeychain {
-//			(recoveryPhrase: RecoveryPhrase?, enabledSecurity: EnabledSecurity, error: UnlockError?) in
-//
-//			// There are multiple potential configurations:
-//			//
-//			// - no wallet         => recoveryPhrase == nil, enabledSecurity is empty
-//			// - no security       => recoveryPhrase != nil, enabledSecurity is empty
-//			// - standard security => recoveryPhrase != nil, enabledSecurity is non-empty
-//			// - advanced security => recoveryPhrase == nil, enabledSecurity is non-empty
-//			//
-//			// Another way to think about it:
-//			// - standard security => biometrics only protect the UI, wallet can immediately be loaded
-//			// - advanced security => biometrics required to unlock both the UI and the seed
-//
-//			if recoveryPhrase == nil && enabledSecurity.isEmpty && error == nil {
-//				// The user doesn't have a wallet yet.
-//				LockState.shared.walletExistence = .doesNotExist
-//				
-//				// Issue #282 - Face ID remains enabled between app installs.
-//				// Items stored in the iOS keychain remain persisted between iOS installs.
-//				// So we need to clear the flag here.
-//				//
-//				// We have the same problem with the Custom PIN.
-//				// And also the Bip353Address.
-//				// So we perform a standard wallet reset (which clears all values).
-//				Keychain.current.resetWallet()
-//				
-//			} else if let recoveryPhrase {
-//				// The user has a wallet.
-//				// Load it into memory immediately.
-//				// The UI may or may not be locked.
-//				Biz.loadWallet(trigger: .appLaunch, recoveryPhrase: recoveryPhrase)
-//			}
-//		
-//			if let error = error {
-//				self.showErrorWindow(error)
-//			} else if !enabledSecurity.hasAppLock() {
-//				LockState.shared.isUnlocked = true
-//			} else {
-//				self.showLockWindow()
-//			}
-//		}
+		SecurityFileManager.shared.asyncReadFromDisk { result in
+			
+			switch result {
+			case .failure(let reason):
+				
+				switch reason {
+				case .errorReadingFile(_): fallthrough
+				case .errorDecodingFile(_):
+					self.showErrorWindow(UnlockError.readSecurityFileError(underlying: reason))
+					
+				case .fileNotFound:
+					self.noWalletsAvailable()
+					
+				} // <switch reason>
+
+			case .success(let securityFile):
+				
+				switch securityFile {
+				case .v0(let v0):
+					if v0.keychain != nil || v0.biometrics != nil {
+						self.tryWalletUnlock(KEYCHAIN_DEFAULT_ID)
+					} else {
+						self.noWalletsAvailable()
+					}
+					
+				case .v1(let v1):
+					
+					switch v1.wallets.count {
+					case 0:
+						self.noWalletsAvailable()
+						
+					case 1:
+						if let id = v1.wallets.first?.key {
+							self.tryWalletUnlock(id)
+						} else {
+							self.noWalletsAvailable()
+						}
+						
+					default: // walletCount >= 2
+						break
+					}
+					
+				} // </switch securityFile>
+			} // </switch result>
+		} // </asyncReadFromDisk>
+	}
+	
+	private func noWalletsAvailable() {
+		log.trace(#function)
+		assertMainThread()
+		
+		// The user doesn't have a wallet yet.
+		LockState.shared.walletExistence = .doesNotExist
+		
+		// Issue #282 - Face ID remains enabled between app installs.
+		// Items stored in the iOS keychain remain persisted between iOS installs.
+		// So we need to clear the flag here.
+		//
+		// We have the same problem with the Custom PIN.
+		// And all other values stored in the keychain.
+		// So we perform a keychain reset (which clears all values).
+		Keychain.current.resetWallet()
+	}
+	
+	private func tryWalletUnlock(_ id: String) {
+		log.trace(#function)
+		assertMainThread()
+		
+		Keychain.wallet(id).firstUnlockWithKeychain {
+			(recoveryPhrase: RecoveryPhrase?, enabledSecurity: EnabledSecurity, error: UnlockError?) in
+			
+			if let recoveryPhrase {
+				// The user has a wallet.
+				// Load it into memory immediately.
+				// The UI may or may not be locked.
+				Biz.loadWallet(trigger: .appLaunch, recoveryPhrase: recoveryPhrase)
+			}
+		
+			if let error {
+				self.showErrorWindow(error)
+			} else if enabledSecurity.hasAppLock() {
+				self.showLockWindow()
+			} else {
+				LockState.shared.isUnlocked = true
+			}
+		}
 	}
 	
 	// --------------------------------------------------

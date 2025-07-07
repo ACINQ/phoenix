@@ -11,16 +11,36 @@ struct UnlockErrorView: View {
 	
 	let danger: UnlockError
 	
+	@ViewBuilder
+	var body: some View {
+		
+		_UnlockErrorView(danger: danger)
+			.modifier(GlobalEnvironment.errorInstance())
+	}
+}
+
+fileprivate struct _UnlockErrorView: View {
+	
+	let danger: UnlockError
+	
 	@EnvironmentObject var popoverState: PopoverState
 	@State var popoverItem: PopoverItem? = nil
 	
 	@StateObject var toast = Toast()
 	
+	@ViewBuilder
 	var body: some View {
+		
+		layers()
+			.modifier(GlobalEnvironment.errorInstance())
+	}
+	
+	@ViewBuilder
+	func layers() -> some View {
 		
 		ZStack {
 			
-			main.zIndex(0) // needed for proper animation
+			main().zIndex(0) // needed for proper animation
 
 			if let popoverItem = popoverItem {
 				PopoverWrapper(dismissable: popoverState.dismissable) {
@@ -40,7 +60,7 @@ struct UnlockErrorView: View {
 	}
 	
 	@ViewBuilder
-	var main: some View {
+	func main() -> some View {
 		
 		ZStack {
 			
@@ -148,7 +168,7 @@ struct UnlockErrorView: View {
 	}
 }
 
-struct ErrorDetailsView: View, ViewName {
+fileprivate struct ErrorDetailsView: View, ViewName {
 	
 	let danger: UnlockError
 	@ObservedObject var toast: Toast

@@ -12,6 +12,7 @@ struct GlobalEnvironment: ViewModifier {
 	let smartModalState: SmartModalState
 	
 	private static var instance_main: GlobalEnvironment? = nil
+	private static var instance_error: GlobalEnvironment? = nil
 	private static var instance_sheet: GlobalEnvironment? = nil
 	
 	static func mainInstance() -> GlobalEnvironment {
@@ -22,6 +23,16 @@ struct GlobalEnvironment: ViewModifier {
 			)
 		}
 		return instance_main!
+	}
+	
+	static func errorInstance() -> GlobalEnvironment {
+		if instance_error == nil {
+			instance_error = GlobalEnvironment(
+				popoverState: PopoverState(),
+				shortSheetState: ShortSheetState()
+			)
+		}
+		return instance_error!
 	}
 	
 	static func sheetInstance() -> GlobalEnvironment {
@@ -38,6 +49,7 @@ struct GlobalEnvironment: ViewModifier {
 		deviceInfo = DeviceInfo()
 		deepLinkManager = DeepLinkManager()
 		instance_main = nil
+		instance_error = nil
 		instance_sheet = nil
 	}
 	

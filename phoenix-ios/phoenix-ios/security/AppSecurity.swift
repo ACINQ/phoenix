@@ -50,10 +50,9 @@ class AppSecurity {
 			}
 			
 		case .success(let existingFile):
-			if let expected = existingFile as? SecurityFile.V1 {
-				securityFile = expected
-			} else {
-				return .failure(.existingSecurityFileV0)
+			switch existingFile {
+				case .v0(_)      : return .failure(.existingSecurityFileV0)
+				case .v1(let v1) : securityFile = v1
 			}
 		}
 		
@@ -107,11 +106,10 @@ class AppSecurity {
 			// In the past, there was no solution for them. They had to uninstall & reinstall the app.
 			// With this implementation, we can finally offer them a simple solution.
 			
-			let walletId = WalletIdentifier(chain: chain, walletInfo: walletInfo)
 			Keychain.wallet(walletId).resetWallet()
 		}
 		
-		let newSecurityFile = securityFile.copyWithWallet(newWallet, forKey: nodeId)
+		let newSecurityFile = securityFile.copyWithWallet(newWallet, id: walletId)
 		
 		switch SecurityFileManager.shared.writeToDisk(newSecurityFile) {
 		case .failure(let reason):
@@ -157,9 +155,10 @@ class AppSecurity {
 			return
 			
 		case .success(let securityFile):
-			if let oldVersion = securityFile as? SecurityFile.V0 {
+			switch securityFile {
+			case .v0(let oldVersion):
 				v0 = oldVersion
-			} else {
+			case .v1(_):
 				log.debug("No upgrade needed")
 				return
 			}
@@ -181,8 +180,7 @@ class AppSecurity {
 			photo: nil
 		)
 		
-		let newWallets: [String: SecurityFile.V1.Wallet] = [walletId.nodeId: newWallet]
-		let newSecurityFile = SecurityFile.V1(wallets: newWallets)
+		let newSecurityFile = SecurityFile.V1(wallet: newWallet, id: walletId)
 		
 		switch SecurityFileManager.shared.writeToDisk(newSecurityFile) {
 		case .failure(let reason):

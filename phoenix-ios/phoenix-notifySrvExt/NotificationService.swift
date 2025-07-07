@@ -596,10 +596,8 @@ class NotificationService: UNNotificationServiceExtension {
 		// - badges
 		// So we may only be able to badge the app icon, and that's it.
 		
-		if let groupPrefs {
-			GroupPrefs.global.badgeCount += 1
-			content.badge = NSNumber(value: GroupPrefs.global.badgeCount)
-		}
+		GroupPrefs.global.badgeCount += 1
+		content.badge = NSNumber(value: GroupPrefs.global.badgeCount)
 	}
 	
 	private func updateNotificationContent_missedPayment(

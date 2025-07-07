@@ -85,14 +85,21 @@ class Keychain_Wallet {
 		}
 	}
 	
-	private func updateEnabledSecurity() {
+	private func calculateEnabledSecurity() -> EnabledSecurity {
 		
-		queue.async {
-			var enabledSecurity = EnabledSecurity.none
-			var keyInfo: KeyInfo_ChaChaPoly? = nil
+		#if DEBUG
+		dispatchPrecondition(condition: .onQueue(queue))
+		#endif
+		
+		var enabledSecurity = EnabledSecurity.none
+		var keyInfo: KeyInfo_ChaChaPoly? = nil
+		
+		switch SecurityFileManager.shared.readFromDisk() {
+		case .failure(_): break
+		case .success(let version):
 			
-			let securityFile = try? SecurityFileManager.shared.readFromDisk().get()
-			if let v0 = securityFile as? SecurityFile.V0 {
+			switch version {
+			case .v0(let v0):
 				
 				if v0.biometrics != nil {
 					enabledSecurity.insert(.biometrics)
@@ -102,27 +109,37 @@ class Keychain_Wallet {
 					keyInfo = v0.keychain
 				}
 				
-			} else if let v1 = securityFile as? SecurityFile.V1 {
+			case .v1(let v1):
+				
 				keyInfo = v1.wallets[self.id]?.keychain
 			}
-			
-			if keyInfo != nil {
-				if self._getSoftBiometricsEnabled() {
-					enabledSecurity.insert(.biometrics)
-					
-					if self._getPasscodeFallbackEnabled() {
-						enabledSecurity.insert(.passcodeFallback)
-					}
-				}
-				if self._getPin(.lockPin) != nil {
-					enabledSecurity.insert(.lockPin)
-				}
-				if self.getPin(.spendingPin) != nil {
-					enabledSecurity.insert(.spendingPin)
+		}
+		
+		if keyInfo != nil {
+			if self._getSoftBiometricsEnabled() {
+				enabledSecurity.insert(.biometrics)
+				
+				if self._getPasscodeFallbackEnabled() {
+					enabledSecurity.insert(.passcodeFallback)
 				}
 			}
-			
-			self.publishEnabledSecurity(enabledSecurity)
+			if self._getPin(.lockPin) != nil {
+				enabledSecurity.insert(.lockPin)
+			}
+			if self._getPin(.spendingPin) != nil {
+				enabledSecurity.insert(.spendingPin)
+			}
+		}
+		
+		return enabledSecurity
+	}
+	
+	private func updateEnabledSecurity() {
+		
+		queue.async {
+			self.publishEnabledSecurity(
+				self.calculateEnabledSecurity()
+			)
 		}
 	}
 	
@@ -147,93 +164,130 @@ class Keychain_Wallet {
 	}
 	
 	// --------------------------------------------------
-	// MARK: Keychain
+	// MARK: Unlock
 	// --------------------------------------------------
+	
+	public func firstUnlockWithKeychain(
+		completion: @escaping (
+			_ recoveryPhrase: RecoveryPhrase?,
+			_ enabledSecurity: EnabledSecurity,
+			_ error: UnlockError?
+		) -> Void
+	) {
+		log.trace(#function)
+		
+		// Disk IO ahead - get off the main thread.
+		// Also - go thru the serial queue for proper thread safety.
+		queue.async {
+			let result = self._unlockWithKeychain()
+			
+			let recoveryPhrase: RecoveryPhrase?
+			let error: UnlockError?
+			switch result {
+			case .success(let success):
+				recoveryPhrase = success
+				error = nil
+				
+			case .failure(let failure):
+				recoveryPhrase = nil
+				error = failure
+			}
+			
+			let enabledSecurity = self.calculateEnabledSecurity()
+			self.publishEnabledSecurity(enabledSecurity)
+			DispatchQueue.main.async {
+				completion(recoveryPhrase, enabledSecurity, error)
+			}
+		}
+	}
 	
 	/// Attempts to extract the mnemonics using the keychain.
 	/// If the user hasn't enabled any additional security options, this will succeed.
 	/// Otherwise it will fail, and the completion closure will specify the additional security in place.
 	///
-	public func tryUnlockWithKeychain(
-		completion: @escaping (
-			_ recoveryPhrase: RecoveryPhrase?,
-			_ error: UnlockError?
-		) -> Void
+	public func unlockWithKeychain(
+		completion: @escaping (Result<RecoveryPhrase?, UnlockError>) -> Void
 	) {
-		log.trace("tryUnlockWithKeychain()")
-		
-		let succeed = {(recoveryPhrase: RecoveryPhrase?) -> Void in
-			self.updateEnabledSecurity()
-			DispatchQueue.main.async {
-				completion(recoveryPhrase, nil)
-			}
-		}
-		
-		let fail = {(error: UnlockError) -> Void in
-			self.updateEnabledSecurity()
-			DispatchQueue.main.async {
-				completion(nil, error)
-			}
-		}
+		log.trace(#function)
 		
 		// Disk IO ahead - get off the main thread.
 		// Also - go thru the serial queue for proper thread safety.
 		queue.async {
+			let result = self._unlockWithKeychain()
+			DispatchQueue.main.async {
+				completion(result)
+			}
+		}
+	}
+	
+	/// Attempts to extract the mnemonics using the keychain.
+	/// If the user hasn't enabled any additional security options, this will succeed.
+	/// Otherwise it will fail, and the completion closure will specify the additional security in place.
+	///
+	private func _unlockWithKeychain() -> Result<RecoveryPhrase?, UnlockError> {
+		
+		#if DEBUG
+		dispatchPrecondition(condition: .onQueue(queue))
+		#endif
+		
+		// Fetch the "security.json" file.
+		// If the file doesn't exist, an empty SecurityFile is returned.
+		let diskResult = SecurityFileManager.shared.readFromDisk()
+		
+		switch diskResult {
+		case .failure(let reason):
 			
-			// Fetch the "security.json" file.
-			// If the file doesn't exist, an empty SecurityFile is returned.
-			let diskResult = SecurityFileManager.shared.readFromDisk()
-			
-			switch diskResult {
-			case .failure(let reason):
-				
-				switch reason {
-				case .fileNotFound:
-					return succeed(nil)
+			switch reason {
+			case .fileNotFound:
+				return .success(nil)
 					
 				case .errorReadingFile: fallthrough
 				case .errorDecodingFile:
-					return fail(.readSecurityFileError(underlying: reason))
-				}
+				return .failure(.readSecurityFileError(underlying: reason))
+			}
+			
+		case .success(let securityFile):
+			
+			var keyInfo: KeyInfo_ChaChaPoly?
+			switch securityFile {
+			case .v0(let v0):
+				keyInfo = v0.keychain
+			case .v1(let v1):
+				keyInfo = v1.wallets[self.id]?.keychain
+			}
+			
+			guard let keyInfo else {
+				return .success(nil)
+			}
+			
+			let keychainResult = SharedSecurity.shared.readKeychainEntry(self.id, keyInfo)
+			switch keychainResult {
+			case .failure(let reason):
+				return .failure(.readKeychainError(underlying: reason))
 				
-			case .success(let securityFile):
-				
-				var keyInfo: KeyInfo_ChaChaPoly? = nil
-				if let v0 = securityFile as? SecurityFile.V0 {
-					keyInfo = v0.keychain
+			case .success(let cleartextData):
 					
-				} else if let v1 = securityFile as? SecurityFile.V1 {
-					keyInfo = v1.wallets[self.id]?.keychain
-				}
-				
-				guard let keyInfo else {
-					return succeed(nil)
-				}
-				
-				let keychainResult = SharedSecurity.shared.readKeychainEntry(KEYCHAIN_DEFAULT_ID, keyInfo)
-				switch keychainResult {
+				let decodeResult = SharedSecurity.shared.decodeRecoveryPhrase(cleartextData)
+				switch decodeResult {
 				case .failure(let reason):
-					return fail(.readKeychainError(underlying: reason))
+					return .failure(.readRecoveryPhraseError(underlying: reason))
 					
-				case .success(let cleartextData):
+				case .success(let recoveryPhrase):
+					return .success(recoveryPhrase)
 					
-					let decodeResult = SharedSecurity.shared.decodeRecoveryPhrase(cleartextData)
-					switch decodeResult {
-					case .failure(let reason):
-						return fail(.readRecoveryPhraseError(underlying: reason))
-						
-					case .success(let recoveryPhrase):
-						return succeed(recoveryPhrase)
-						
-					} // </switch decodeResult>
-				} // </switch keychainResult>
-			} // </switch diskResult>
-		} // </queue.async>
+				} // </switch decodeResult>
+			} // </switch keychainResult>
+		} // </switch diskResult>
 	}
+	
+	// --------------------------------------------------
+	// MARK: Locking Key
+	// --------------------------------------------------
 	
 	public func setLockingKey(
 		_ lockingKey : SymmetricKey
 	) -> Result<Void, Error> {
+		log.trace(#function)
 		
 		let key = Key.lockingKey
 		do {
@@ -330,6 +384,10 @@ class Keychain_Wallet {
 	
 	private func _getSoftBiometricsEnabled() -> Bool {
 		
+		#if DEBUG
+		dispatchPrecondition(condition: .onQueue(queue))
+		#endif
+		
 		if let cachedValue = _cached_softBiometrics {
 			return cachedValue
 		}
@@ -422,6 +480,10 @@ class Keychain_Wallet {
 	}
 	
 	private func _getPasscodeFallbackEnabled() -> Bool {
+		
+		#if DEBUG
+		dispatchPrecondition(condition: .onQueue(queue))
+		#endif
 		
 		if let cachedValue = _cached_passcodeFallback {
 			return cachedValue
@@ -523,6 +585,10 @@ class Keychain_Wallet {
 	}
 	
 	private func _getPin(_ type: PinType) -> String? {
+		
+		#if DEBUG
+		dispatchPrecondition(condition: .onQueue(queue))
+		#endif
 		
 		switch type {
 		case .lockPin:
@@ -726,6 +792,7 @@ class Keychain_Wallet {
 	public func setBip353Address(
 		_ address: String
 	) -> Result<Void, Error> {
+		log.trace(#function)
 		
 		let key = Key.bip353Address
 		
@@ -771,19 +838,13 @@ class Keychain_Wallet {
 	// MARK: Biometrics
 	// --------------------------------------------------
 	
-	private func biometricsPrompt() -> String {
-		
-		return NSLocalizedString( "App is locked",
-		                 comment: "Biometrics prompt to unlock the Phoenix app"
-		)
-	}
-	
 	/// Attempts to extract the seed using biometrics (e.g. touchID, faceID)
 	///
-	public func tryUnlockWithBiometrics(
+	public func unlockWithBiometrics(
 		prompt: String? = nil,
 		completion: @escaping (_ result: Result<RecoveryPhrase, Error>) -> Void
 	) {
+		log.trace(#function)
 		
 		let fail = {(_ error: Error) -> Void in
 			DispatchQueue.main.async {
@@ -795,30 +856,33 @@ class Keychain_Wallet {
 		// Also - go thru the serial queue for proper thread safety.
 		queue.async {
 			
-			let securityFile = try? SecurityFileManager.shared.readFromDisk().get()
-			
-			if let v0 = securityFile as? SecurityFile.V0 {
-				if v0.biometrics != nil {
-					self.tryUnlockWithHardBiometrics(v0, prompt, completion)
-				} else {
-					if let keyInfo = v0.keychain {
-						self.tryUnlockWithSoftBiometrics(keyInfo, prompt, completion)
+			let result = SecurityFileManager.shared.readFromDisk()
+			switch result {
+			case .failure(_):
+				fail(genericError(404, "securityFile not found"))
+				
+			case .success(let securityFile):
+				switch securityFile {
+				case .v0(let v0):
+					if v0.biometrics != nil {
+						self.unlockWithHardBiometrics(v0, prompt, completion)
+					} else {
+						if let keyInfo = v0.keychain {
+							self.unlockWithSoftBiometrics(keyInfo, prompt, completion)
+						} else {
+							fail(genericError(404, "keyInfo not found"))
+						}
+					}
+					
+				case .v1(let v1):
+					if let keyInfo = v1.wallets[self.id]?.keychain {
+						self.unlockWithSoftBiometrics(keyInfo, prompt, completion)
 					} else {
 						fail(genericError(404, "keyInfo not found"))
 					}
-				}
-				
-			} else if let v1 = securityFile as? SecurityFile.V1 {
-				if let keyInfo = v1.wallets[self.id]?.keychain {
-					self.tryUnlockWithSoftBiometrics(keyInfo, prompt, completion)
-				} else {
-					fail(genericError(404, "keyInfo not found"))
-				}
-				
-			} else {
-				fail(genericError(404, "securityFile not found"))
-			}
-		}
+				} // </switch securityFile>
+			} // </switch result>
+		} // </queue.async>
 	}
 	
 	/// This function is called when "advanced security" is detected.
@@ -827,11 +891,12 @@ class Keychain_Wallet {
 	/// It was replaced with the notification-service-extension,
 	/// with ability to receive payments when app is running in the background.
 	///
-	private func tryUnlockWithHardBiometrics(
+	private func unlockWithHardBiometrics(
 		_ securityFile : SecurityFile.V0,
 		_ prompt       : String? = nil,
 		_ completion   : @escaping (_ result: Result<RecoveryPhrase, Error>) -> Void
 	) {
+		log.trace(#function)
 		
 		let succeed = {(_ recoveryPhrase: RecoveryPhrase) in
 			DispatchQueue.main.async {
@@ -940,7 +1005,7 @@ class Keychain_Wallet {
 		//
 		// So we're going to fake it here.
 		
-		self.tryGenericBiometrics {(success, error) in
+		self.biometricsChallenge {(success, error) in
 		
 			if let error = error {
 				fail(error)
@@ -956,11 +1021,12 @@ class Keychain_Wallet {
 	#endif
 	}
 	
-	private func tryUnlockWithSoftBiometrics(
+	private func unlockWithSoftBiometrics(
 		_ keyInfo    : KeyInfo_ChaChaPoly,
 		_ prompt     : String? = nil,
 		_ completion : @escaping (_ result: Result<RecoveryPhrase, Error>) -> Void
 	) {
+		log.trace(#function)
 		
 		let succeed = {(_ recoveryPhrase: RecoveryPhrase) in
 			DispatchQueue.main.async {
@@ -987,7 +1053,7 @@ class Keychain_Wallet {
 				fail(error)
 				
 			case .success(let recoveryPhrase):
-				self.tryGenericBiometrics { (success, error) in
+				self.biometricsChallenge { (success, error) in
 					if success {
 						succeed(recoveryPhrase)
 					} else {
@@ -998,10 +1064,10 @@ class Keychain_Wallet {
 		} // </switch keychainResult>
 	}
 	
-	private func tryGenericBiometrics(
-		prompt     : String? = nil,
-		completion : @escaping (Bool, Error?) -> Void
+	private func biometricsChallenge(
+		_ completion: @escaping (Bool, Error?) -> Void
 	) -> Void {
+		log.trace(#function)
 		
 		let context = LAContext()
 		
@@ -1021,8 +1087,16 @@ class Keychain_Wallet {
 		}
 		
 		context.evaluatePolicy( policy,
-		       localizedReason: prompt ?? self.biometricsPrompt(),
+		       localizedReason: self.biometricsPrompt(),
 		                 reply: completion)
+	}
+	
+	private func biometricsPrompt() -> String {
+		
+		return String(
+			localized : "App is locked",
+			comment   : "Biometrics prompt to unlock the Phoenix app"
+		)
 	}
 	
 	// --------------------------------------------------
@@ -1030,6 +1104,7 @@ class Keychain_Wallet {
 	// --------------------------------------------------
 	
 	public func resetWallet() {
+		log.trace(#function)
 		
 		let fm = FileManager.default
 		let securityJsonUrl = SharedSecurity.shared.securityJsonUrl_V0

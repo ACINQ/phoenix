@@ -452,7 +452,7 @@ struct LockView: View {
 		}
 		biometricsAttemptInProgress = true
 		
-		Keychain.current.tryUnlockWithBiometrics {(result: Result<RecoveryPhrase, Error>) in
+		Keychain.current.unlockWithBiometrics {(result: Result<RecoveryPhrase, Error>) in
 			
 			biometricsAttemptInProgress = false
 			switch result {
@@ -460,7 +460,7 @@ struct LockView: View {
 				closeLockView(recoveryPhrase)
 				
 			case .failure(let error):
-				log.debug("tryUnlockWithBiometrics: error: \(String(describing: error))")
+				log.debug("tryUnlockWithBiometrics: error: \(error)")
 				if enabledSecurity.contains(.lockPin) {
 					showPinPrompt()
 				}
@@ -522,11 +522,17 @@ struct LockView: View {
 	func handleCorrectPin() {
 		log.trace("handleCorrectPin()")
 		
-		Keychain.current.tryUnlockWithKeychain { (recoveryPhrase, error) in
-			if let recoveryPhrase {
-				closeLockView(recoveryPhrase)
-			} else if let error {
-				log.error("Failed to unlock keychain: \(error)")
+		Keychain.current.unlockWithKeychain { result in
+			switch result {
+			case .failure(let reason):
+				log.error("Failed to unlock keychain: \(reason)")
+				
+			case .success(let recoveryPhrase):
+				if let recoveryPhrase {
+					closeLockView(recoveryPhrase)
+				} else {
+					log.error("Failed to unlock keychain: wallet does not exist")
+				}
 			}
 		}
 		

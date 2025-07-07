@@ -26,7 +26,7 @@ class Keychain {
 	}
 	
 	static func wallet(_ walletId: WalletIdentifier) -> Keychain_Wallet {
-		return wallet(walletId.keyId)
+		return wallet(walletId.keychainKeyId)
 	}
 	
 	static func wallet(_ id: String) -> Keychain_Wallet {
@@ -293,7 +293,7 @@ class Keychain {
 		// MOVE: "foo-default" => "foo-<walletId>"
 		
 		let oldId = KEYCHAIN_DEFAULT_ID
-		let newId = walletId.keyId
+		let newId = walletId.keychainKeyId
 		
 		for key in Key.allCases {
 			migrateKey(

@@ -20,11 +20,16 @@ class SecurityFileManager {
 	
 	/// Cached version decreases trips to disk.
 	///
-	private var cachedSecurityFile: SecurityFile.VAny? = nil
+	private var cachedSecurityFile: SecurityFile.Version? = nil
 	
 	private init() { /* must use shared instance */ }
 	
-	func readFromDisk() -> Result<SecurityFile.VAny, ReadSecurityFileError> {
+	// --------------------------------------------------
+	// MARK: Read
+	// --------------------------------------------------
+	
+	func readFromDisk() -> Result<SecurityFile.Version, ReadSecurityFileError> {
+		log.trace(#function)
 		
 		return queue.sync {
 			
@@ -34,8 +39,9 @@ class SecurityFileManager {
 			
 			switch SharedSecurity.shared.readSecurityJsonFromDisk_V1() {
 			case .success(let v1):
-				cachedSecurityFile = v1
-				return .success(v1)
+				let result = SecurityFile.Version.v1(file: v1)
+				cachedSecurityFile = result
+				return .success(result)
 				
 			case .failure(let reason):
 				switch reason {
@@ -52,8 +58,9 @@ class SecurityFileManager {
 			
 			switch SharedSecurity.shared.readSecurityJsonFromDisk_V0() {
 			case .success(let v0):
-				cachedSecurityFile = v0
-				return .success(v0)
+				let result = SecurityFile.Version.v0(file: v0)
+				cachedSecurityFile = result
+				return .success(result)
 				
 			case .failure(let reason):
 				return .failure(reason)
@@ -61,13 +68,33 @@ class SecurityFileManager {
 		}
 	}
 	
-	func writeToDisk(_ securityFile: SecurityFile.V1) -> Result<Void, WriteSecurityFileError> {
+	func asyncReadFromDisk(
+		completion: @escaping (Result<SecurityFile.Version, ReadSecurityFileError>) -> Void
+	) {
+		log.trace(#function)
+		
+		DispatchQueue.global(qos: .userInitiated).async {
+			let result = self.readFromDisk()
+			DispatchQueue.main.async {
+				completion(result)
+			}
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Write
+	// --------------------------------------------------
+	
+	func writeToDisk(
+		_ securityFile: SecurityFile.V1
+	) -> Result<Void, WriteSecurityFileError> {
+		log.trace(#function)
 		
 		return queue.sync {
 			
 			var shouldDeleteV0File: Bool = false
 			if let cached = cachedSecurityFile {
-				if cached is SecurityFile.V0 {
+				if case .v0(_) = cached {
 					shouldDeleteV0File = true
 				}
 			}
@@ -87,7 +114,7 @@ class SecurityFileManager {
 			} catch {
 				return .failure(.errorWritingFile(underlying: error))
 			}
-			cachedSecurityFile = securityFile
+			cachedSecurityFile = .v1(file: securityFile)
 			
 			do {
 				var resourceValues = URLResourceValues()
@@ -110,6 +137,20 @@ class SecurityFileManager {
 			}
 			
 			return .success
+		}
+	}
+	
+	func asyncWriteToDisk(
+		_ securityFile: SecurityFile.V1,
+		completion: @escaping (Result<Void, WriteSecurityFileError>) -> Void
+	) {
+		log.trace(#function)
+		
+		DispatchQueue.global(qos: .userInitiated).async {
+			let result = self.writeToDisk(securityFile)
+			DispatchQueue.main.async {
+				completion(result)
+			}
 		}
 	}
 }

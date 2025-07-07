@@ -12,7 +12,19 @@ struct WalletIdentifier: Equatable {
 		self.encryptedNodeId = walletInfo.encryptedNodeId
 	}
 	
-	var keyId: String {
+	var keychainKeyId: String {
+		if chain.isMainnet() {
+			return nodeId
+		} else {
+			return "\(nodeId)-\(chain.phoenixName)"
+		}
+	}
+	
+	var prefsKeyId: String {
+		// The UserDefaults system stores files in plaintext, and the corresponding
+		// plist file(s) may be accessible to other apps (especially on macOS).
+		// So we're using the encryptedNodeId here to avoid leaking this information.
+		
 		if chain.isMainnet() {
 			return encryptedNodeId
 		} else {
