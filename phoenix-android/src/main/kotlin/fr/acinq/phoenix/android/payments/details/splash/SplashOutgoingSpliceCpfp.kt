@@ -26,12 +26,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
 import fr.acinq.lightning.utils.UUID
-import fr.acinq.phoenix.android.LocalBitcoinUnit
+import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.SplashLabelRow
-import fr.acinq.phoenix.android.utils.Converter.toPrettyString
-import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
-import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
+import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
+import fr.acinq.phoenix.android.utils.converters.DateFormatter.toRelativeDateString
+import fr.acinq.phoenix.android.utils.converters.MSatDisplayPolicy
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.extensions.smartDescription
 import fr.acinq.phoenix.android.utils.mutedTextColor
@@ -93,7 +93,7 @@ private fun SplashDestination() {
 
 @Composable
 private fun SplashFee(payment: SpliceCpfpOutgoingPayment) {
-    val btcUnit = LocalBitcoinUnit.current
+    val btcUnit = LocalBitcoinUnits.current.primary
     Spacer(modifier = Modifier.height(8.dp))
     SplashLabelRow(label = stringResource(id = R.string.paymentdetails_fees_label)) {
         Text(text = payment.fees.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW_IF_ZERO_SATS))

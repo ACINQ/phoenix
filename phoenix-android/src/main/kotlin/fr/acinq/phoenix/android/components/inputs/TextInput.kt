@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 ACINQ SAS
+ * Copyright 2025 ACINQ SAS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,20 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.components
-
+package fr.acinq.phoenix.android.components.inputs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -29,22 +36,28 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldColors
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.*
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.utils.*
+import fr.acinq.phoenix.android.components.FilledButton
+import fr.acinq.phoenix.android.components.enableOrFade
+import fr.acinq.phoenix.android.utils.errorOutlinedTextFieldColors
+import fr.acinq.phoenix.android.utils.negativeColor
+import fr.acinq.phoenix.android.utils.outlinedTextFieldColors
 
 @Composable
 fun TextInput(
@@ -163,136 +176,4 @@ fun TextInput(
             )
         }
     }
-}
-
-/**
- * @param onValueChange the value in this callback will be null if the input is not valid and an error is
- *      displayed in the component. If the value is not null, then the value can be assumed to be valid.
- * @param acceptDecimal if false, an error will be raised when the user enters a value with a decimal part
- *      and the input will be invalid.
- */
-@Composable
-fun NumberInput(
-    modifier: Modifier = Modifier,
-    label: @Composable (() -> Unit)? = null,
-    placeholder: @Composable (() -> Unit)? = null,
-    trailingIcon: @Composable (() -> Unit)? = null,
-    enabled: Boolean = true,
-    initialValue: Double?,
-    onValueChange: (Double?) -> Unit,
-    minValue: Double = 0.0,
-    minErrorMessage: String? = null,
-    maxValue: Double = Double.MAX_VALUE,
-    maxErrorMessage: String? = null,
-    acceptDecimal: Boolean = true,
-) {
-    val context = LocalContext.current
-    val focusManager = LocalFocusManager.current
-    var internalText by remember { mutableStateOf(initialValue?.let { if (acceptDecimal) it.toString() else it.toLong().toString() } ?: "") }
-    var errorMessage by remember { mutableStateOf("") }
-
-    fun processValueChange(newValue: String) {
-        errorMessage = ""
-        internalText = newValue
-        if (newValue.isBlank()) {
-            errorMessage = context.getString(R.string.validation_empty)
-            onValueChange(null)
-        } else {
-            val doubleValue = newValue.toDoubleOrNull()
-            when {
-                doubleValue == null -> {
-                    errorMessage = context.getString(R.string.validation_invalid_number)
-                    onValueChange(null)
-                }
-                !acceptDecimal && doubleValue.rem(1) != 0.0 -> {
-                    errorMessage = context.getString(R.string.validation_no_decimal)
-                    onValueChange(null)
-                }
-                doubleValue < minValue -> {
-                    errorMessage = minErrorMessage ?: context.getString(R.string.validation_below_min, minValue.toString())
-                    onValueChange(null)
-                }
-                doubleValue > maxValue -> {
-                    errorMessage = maxErrorMessage ?: context.getString(R.string.validation_above_max, maxValue.toString())
-                    onValueChange(null)
-                }
-                else -> {
-                    onValueChange(doubleValue)
-                }
-            }
-        }
-    }
-
-    Column {
-        OutlinedTextField(
-            value = internalText,
-            onValueChange = { processValueChange(it) },
-            isError = errorMessage.isNotEmpty(),
-            enabled = enabled,
-            label = label,
-            placeholder = placeholder,
-            trailingIcon = trailingIcon,
-            singleLine = true,
-            maxLines = 1,
-            keyboardOptions = KeyboardOptions.Default.copy(
-                imeAction = ImeAction.Done,
-                keyboardType = KeyboardType.Number,
-                capitalization = KeyboardCapitalization.None,
-                autoCorrectEnabled = false,
-            ),
-            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-            colors = outlinedTextFieldColors(),
-            shape = RoundedCornerShape(8.dp),
-            modifier = modifier.enableOrFade(enabled)
-        )
-        Spacer(Modifier.height(4.dp))
-        Text(
-            text = if (enabled) errorMessage else "",
-            style = MaterialTheme.typography.body1.copy(color = negativeColor, fontSize = 13.sp),
-            modifier = Modifier.padding(horizontal = 16.dp)
-        )
-    }
-}
-
-
-@Composable
-fun RowScope.InlineNumberInput(
-    modifier: Modifier = Modifier,
-    placeholder: @Composable (() -> Unit)? = null,
-    trailingIcon: @Composable (() -> Unit)? = null,
-    enabled: Boolean = true,
-    value: Double?,
-    onValueChange: (Double?) -> Unit,
-    isError: Boolean,
-    acceptDecimal: Boolean = true,
-) {
-    val focusManager = LocalFocusManager.current
-    var internalText by remember { mutableStateOf(value?.let { if (acceptDecimal) it.toString() else it.toLong().toString() } ?: "") }
-
-    OutlinedTextField(
-        value = internalText,
-        onValueChange = {
-            internalText = it
-            onValueChange(it.toDoubleOrNull())
-        },
-        isError = isError,
-        enabled = enabled,
-        label = null,
-        placeholder = placeholder,
-        trailingIcon = trailingIcon,
-        singleLine = true,
-        maxLines = 1,
-        keyboardOptions = KeyboardOptions.Default.copy(
-            imeAction = ImeAction.Done,
-            keyboardType = KeyboardType.Number,
-            capitalization = KeyboardCapitalization.None,
-            autoCorrectEnabled = false,
-        ),
-        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-        colors = outlinedTextFieldColors(),
-        shape = RoundedCornerShape(8.dp),
-        modifier = modifier
-            .alignByBaseline()
-            .enableOrFade(enabled)
-    )
 }

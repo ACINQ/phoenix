@@ -1,17 +1,13 @@
 package fr.acinq.phoenix.data
 
-import fr.acinq.bitcoin.Satoshi
-import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.ServerAddress
-import fr.acinq.lightning.utils.sat
-import fr.acinq.lightning.wire.InitTlv
 import fr.acinq.phoenix.utils.extensions.isOnion
 import kotlinx.serialization.Serializable
 
 
-interface CurrencyUnit {
+sealed interface CurrencyUnit {
     /** Code that should be displayed in the UI. */
     val displayCode: String
 }
@@ -33,8 +29,6 @@ enum class BitcoinUnit(override val displayCode: String) : CurrencyUnit {
             null
         }
     }
-
-
 }
 
 /**

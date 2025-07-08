@@ -63,8 +63,8 @@ import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.Bolt12Invoice
 import fr.acinq.lightning.utils.msat
-import fr.acinq.phoenix.android.LocalBitcoinUnit
-import fr.acinq.phoenix.android.LocalFiatCurrency
+import fr.acinq.phoenix.android.LocalBitcoinUnits
+import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.business
@@ -74,7 +74,7 @@ import fr.acinq.phoenix.android.components.dialogs.IconPopup
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.openLink
 import fr.acinq.phoenix.android.components.txUrl
-import fr.acinq.phoenix.android.fiatRate
+import fr.acinq.phoenix.android.primaryFiatRate
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.payments.details.technical.TechnicalIncomingBolt11
 import fr.acinq.phoenix.android.payments.details.technical.TechnicalIncomingBolt12
@@ -88,10 +88,10 @@ import fr.acinq.phoenix.android.payments.details.technical.TechnicalOutgoingLigh
 import fr.acinq.phoenix.android.payments.details.technical.TechnicalOutgoingManualLiquidity
 import fr.acinq.phoenix.android.payments.details.technical.TechnicalOutgoingSplice
 import fr.acinq.phoenix.android.payments.details.technical.TechnicalOutgoingSpliceCpfp
-import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
-import fr.acinq.phoenix.android.utils.Converter.toFiat
-import fr.acinq.phoenix.android.utils.Converter.toPrettyString
-import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
+import fr.acinq.phoenix.android.utils.converters.AmountConverter.toFiat
+import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
+import fr.acinq.phoenix.android.utils.converters.DateFormatter.toAbsoluteDateTimeString
+import fr.acinq.phoenix.android.utils.converters.MSatDisplayPolicy
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.data.ExchangeRate
@@ -287,9 +287,9 @@ fun TechnicalRowAmount(
     rateThen: ExchangeRate.BitcoinPriceRate?,
     mSatDisplayPolicy: MSatDisplayPolicy = MSatDisplayPolicy.SHOW,
 ) {
-    val rate = fiatRate
-    val prefFiat = LocalFiatCurrency.current
-    val prefBtcUnit = LocalBitcoinUnit.current
+    val rate = primaryFiatRate
+    val prefFiat = LocalFiatCurrencies.current.primary
+    val prefBtcUnit = LocalBitcoinUnits.current.primary
 
     TechnicalRow(label = label) {
         AmountView(amount = amount, showUnit = true, forceUnit = prefBtcUnit, mSatDisplayPolicy = mSatDisplayPolicy)

@@ -56,11 +56,11 @@ import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.dialogs.Dialog
-import fr.acinq.phoenix.android.components.FeerateSlider
+import fr.acinq.phoenix.android.components.inputs.FeerateSlider
 import fr.acinq.phoenix.android.components.InlineTransactionLink
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.SplashLabelRow
-import fr.acinq.phoenix.android.components.TextInput
+import fr.acinq.phoenix.android.components.inputs.TextInput
 import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.scanner.ScannerView

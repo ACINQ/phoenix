@@ -37,8 +37,8 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
-import fr.acinq.phoenix.android.utils.Converter.toBasicAbsoluteDateString
-import fr.acinq.phoenix.android.utils.Converter.toBasicAbsoluteDateTimeString
+import fr.acinq.phoenix.android.utils.converters.DateFormatter.toBasicAbsoluteDateString
+import fr.acinq.phoenix.android.utils.converters.DateFormatter.toBasicAbsoluteDateTimeString
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.shareFile
 

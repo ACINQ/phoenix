@@ -35,15 +35,15 @@ import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.payment.OutgoingPaymentFailure
 import fr.acinq.lightning.utils.UUID
-import fr.acinq.phoenix.android.LocalBitcoinUnit
+import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.SplashLabelRow
 import fr.acinq.phoenix.android.components.WebLink
 import fr.acinq.phoenix.android.components.contact.ContactOrOfferView
-import fr.acinq.phoenix.android.utils.Converter.toPrettyString
-import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
-import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
+import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
+import fr.acinq.phoenix.android.utils.converters.DateFormatter.toRelativeDateString
+import fr.acinq.phoenix.android.utils.converters.MSatDisplayPolicy
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.extensions.smartDescription
 import fr.acinq.phoenix.android.utils.mutedTextColor
@@ -138,7 +138,7 @@ private fun SplashDestination(payment: LightningOutgoingPayment, metadata: Walle
 
 @Composable
 private fun SplashFee(payment: LightningOutgoingPayment) {
-    val btcUnit = LocalBitcoinUnit.current
+    val btcUnit = LocalBitcoinUnits.current.primary
     if (payment.state() == WalletPaymentState.SuccessOffChain) {
         Spacer(modifier = Modifier.height(8.dp))
         SplashLabelRow(label = stringResource(id = R.string.paymentdetails_fees_label)) {

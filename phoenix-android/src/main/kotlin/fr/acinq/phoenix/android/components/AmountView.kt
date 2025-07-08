@@ -36,8 +36,8 @@ import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.utils.Converter.toPrettyString
-import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
+import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
+import fr.acinq.phoenix.android.utils.converters.MSatDisplayPolicy
 import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
 import fr.acinq.phoenix.data.CurrencyUnit
 import fr.acinq.phoenix.data.FiatCurrency
@@ -60,9 +60,9 @@ fun AmountView(
     val scope = rememberCoroutineScope()
     val userPrefs = userPrefs
     val unit = forceUnit ?: if (LocalShowInFiat.current) {
-        LocalFiatCurrency.current
+        LocalFiatCurrencies.current.primary
     } else {
-        LocalBitcoinUnit.current
+        LocalBitcoinUnits.current.primary
     }
     val inFiat = LocalShowInFiat.current
     val interactionSource = remember { MutableInteractionSource() }
@@ -85,7 +85,7 @@ fun AmountView(
             )
         }
         Text(
-            text = if (isRedacted) "****" else amount.toPrettyString(unit, fiatRate, mSatDisplayPolicy = mSatDisplayPolicy),
+            text = if (isRedacted) "****" else amount.toPrettyString(unit, primaryFiatRate, mSatDisplayPolicy = mSatDisplayPolicy),
             style = amountTextStyle,
             modifier = Modifier.alignBy(FirstBaseline)
         )
@@ -112,9 +112,9 @@ fun AmountWithAltView(
     isOutgoing: Boolean? = null,
 ) {
     val (topUnit, bottomUnit) = if (LocalShowInFiat.current) {
-        LocalFiatCurrency.current to LocalBitcoinUnit.current
+        LocalFiatCurrencies.current.primary to LocalBitcoinUnits.current.primary
     } else {
-        LocalBitcoinUnit.current to LocalFiatCurrency.current
+        LocalBitcoinUnits.current.primary to LocalFiatCurrencies.current.primary
     }
 
     Column(
@@ -149,14 +149,14 @@ fun ColumnScope.AmountWithFiatBelow(
     amountTextStyle: TextStyle = MaterialTheme.typography.body1,
     fiatTextStyle: TextStyle = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
 ) {
-    val prefBtcUnit = LocalBitcoinUnit.current
-    val prefFiatCurrency = LocalFiatCurrency.current
+    val prefBtcUnit = LocalBitcoinUnits.current.primary
+    val prefFiatCurrency = LocalFiatCurrencies.current.primary
     Text(
         text = amount.toPrettyString(prefBtcUnit, withUnit = true),
         style = amountTextStyle,
     )
     Text(
-        text = stringResource(id = R.string.utils_converted_amount, amount.toPrettyString(prefFiatCurrency, fiatRate, withUnit = true)),
+        text = stringResource(id = R.string.utils_converted_amount, amount.toPrettyString(prefFiatCurrency, primaryFiatRate, withUnit = true)),
         style = fiatTextStyle,
     )
 }
@@ -168,8 +168,8 @@ fun AmountWithFiatBeside(
     amountTextStyle: TextStyle = MaterialTheme.typography.body1,
     fiatTextStyle: TextStyle = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
 ) {
-    val prefBtcUnit = LocalBitcoinUnit.current
-    val prefFiatCurrency = LocalFiatCurrency.current
+    val prefBtcUnit = LocalBitcoinUnits.current.primary
+    val prefFiatCurrency = LocalFiatCurrencies.current.primary
     Row {
         Text(
             text = amount.toPrettyString(prefBtcUnit, withUnit = true),
@@ -178,7 +178,7 @@ fun AmountWithFiatBeside(
         )
         Spacer(modifier = Modifier.width(6.dp))
         Text(
-            text = stringResource(id = R.string.utils_converted_amount, amount.toPrettyString(prefFiatCurrency, fiatRate, withUnit = true)),
+            text = stringResource(id = R.string.utils_converted_amount, amount.toPrettyString(prefFiatCurrency, primaryFiatRate, withUnit = true)),
             style = fiatTextStyle,
             modifier = Modifier.alignByBaseline(),
         )
@@ -195,7 +195,7 @@ fun AmountWithFiatRowView(
     fiatTextStyle: TextStyle = MaterialTheme.typography.caption,
     separatorSpace: Dp = 4.dp,
 ) {
-    val prefBtcUnit = LocalBitcoinUnit.current
+    val prefBtcUnit = LocalBitcoinUnits.current.primary
     Row {
         AmountView(amount = amount, amountTextStyle = amountTextStyle, unitTextStyle = unitTextStyle, separatorSpace = separatorSpace, modifier = modifier, forceUnit = prefBtcUnit, onClick = null)
         Spacer(modifier = Modifier.width(4.dp))
@@ -210,8 +210,8 @@ fun AmountInFiatView(
     modifier: Modifier = Modifier,
     style: TextStyle = MaterialTheme.typography.caption
 ) {
-    val prefFiatCurrency = LocalFiatCurrency.current
-    val rate = fiatRate
+    val prefFiatCurrency = LocalFiatCurrencies.current.primary
+    val rate = primaryFiatRate
     val fiatAmount = remember(amount) { amount.toPrettyString(prefFiatCurrency, rate, withUnit = true) }
     Text(text = stringResource(id = R.string.utils_converted_amount, fiatAmount), style = style, modifier = modifier)
 }

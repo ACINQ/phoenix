@@ -29,13 +29,13 @@ import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.msat
-import fr.acinq.phoenix.android.LocalBitcoinUnit
+import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.SplashLabelRow
-import fr.acinq.phoenix.android.utils.Converter.toPrettyString
-import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
-import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
+import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
+import fr.acinq.phoenix.android.utils.converters.DateFormatter.toRelativeDateString
+import fr.acinq.phoenix.android.utils.converters.MSatDisplayPolicy
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.extensions.smartDescription
 import fr.acinq.phoenix.android.utils.isLegacyMigration
@@ -106,7 +106,7 @@ private fun SplashDestination(payment: ChannelCloseOutgoingPayment) {
 
 @Composable
 private fun SplashFee(payment: ChannelCloseOutgoingPayment) {
-    val btcUnit = LocalBitcoinUnit.current
+    val btcUnit = LocalBitcoinUnits.current.primary
     if (payment.fees > 0.msat) {
         Spacer(modifier = Modifier.height(8.dp))
         SplashLabelRow(label = stringResource(id = R.string.paymentdetails_fees_label)) {

@@ -57,6 +57,7 @@
     <!-- settings list -->
 
     <string name="settings_general_title">Mazingira</string>
+    <string name="settings_fees_title">Ada</string>
     <string name="settings_security_title">Faragha &amp; Usalama</string>
     <string name="settings_advanced_title">Kisasa</string>
     <string name="settings_danger_title">Eneo la hatari</string>
@@ -77,7 +78,9 @@
     <string name="settings_payment_settings">Chaguzi za malipo</string>
     <string name="settings_payment_history">Historia ya malipo</string>
     <string name="settings_notifications">Arifa</string>
-    <string name="settings_contacts">Anuani zangu</string>
+    <string name="settings_contacts">Anwani</string>
+    <string name="settings_converter">Kigeuzi cha sarafu</string>
+    <string name="settings_add_liquidity">Ongeza ukwasi</string>
 
     <!-- home: swap help -->
 

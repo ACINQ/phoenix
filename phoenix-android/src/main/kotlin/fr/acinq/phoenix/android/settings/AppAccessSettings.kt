@@ -38,8 +38,8 @@ import fr.acinq.phoenix.android.components.auth.screenlock.CheckScreenLockPinFlo
 import fr.acinq.phoenix.android.components.auth.screenlock.NewScreenLockPinFlow
 import fr.acinq.phoenix.android.components.auth.spendinglock.CheckSpendingPinFlow
 import fr.acinq.phoenix.android.components.auth.spendinglock.NewSpendingPinFlow
-import fr.acinq.phoenix.android.components.settings.ListPreferenceButton
-import fr.acinq.phoenix.android.components.settings.PreferenceItem
+import fr.acinq.phoenix.android.components.prefs.ListPreferenceButton
+import fr.acinq.phoenix.android.components.prefs.PreferenceItem
 import fr.acinq.phoenix.android.components.settings.Setting
 import fr.acinq.phoenix.android.components.settings.SettingSwitch
 import fr.acinq.phoenix.android.userPrefs

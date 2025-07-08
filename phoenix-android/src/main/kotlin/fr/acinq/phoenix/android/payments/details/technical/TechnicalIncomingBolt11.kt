@@ -19,20 +19,17 @@ package fr.acinq.phoenix.android.payments.details.technical
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
-import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.db.Bolt11IncomingPayment
 import fr.acinq.lightning.db.LightningIncomingPayment
-import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.CardHeader
 import fr.acinq.phoenix.android.payments.details.Bolt11InvoiceSection
 import fr.acinq.phoenix.android.payments.details.TechnicalRow
 import fr.acinq.phoenix.android.payments.details.TechnicalRowAmount
-import fr.acinq.phoenix.android.payments.details.TechnicalRowSelectable
 import fr.acinq.phoenix.android.payments.details.TimestampSection
-import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
-import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
+import fr.acinq.phoenix.android.utils.converters.DateFormatter.toAbsoluteDateTimeString
+import fr.acinq.phoenix.android.utils.converters.MSatDisplayPolicy
 import fr.acinq.phoenix.data.ExchangeRate
 
 @Composable

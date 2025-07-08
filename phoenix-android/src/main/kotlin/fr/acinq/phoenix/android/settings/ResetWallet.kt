@@ -45,8 +45,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.byteVector
-import fr.acinq.phoenix.android.LocalBitcoinUnit
-import fr.acinq.phoenix.android.LocalFiatCurrency
+import fr.acinq.phoenix.android.LocalBitcoinUnits
+import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.MainActivity
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
@@ -60,9 +60,9 @@ import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.feedback.SuccessMessage
 import fr.acinq.phoenix.android.components.feedback.WarningMessage
-import fr.acinq.phoenix.android.fiatRate
+import fr.acinq.phoenix.android.primaryFiatRate
 import fr.acinq.phoenix.android.security.SeedManager
-import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.utils.extensions.phoenixName
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -250,8 +250,8 @@ private fun ReviewReset(
             WarningMessage(
                 header = stringResource(
                     id = R.string.reset_wallet_confirm_seed_balance,
-                    it.toPrettyString(LocalBitcoinUnit.current, withUnit = true),
-                    it.toPrettyString(LocalFiatCurrency.current, rate = fiatRate, withUnit = true)
+                    it.toPrettyString(LocalBitcoinUnits.current.primary, withUnit = true),
+                    it.toPrettyString(LocalFiatCurrencies.current.primary, rate = primaryFiatRate, withUnit = true)
                 ),
                 details = stringResource(id = R.string.reset_wallet_confirm_seed_responsibility),
                 padding = PaddingValues(start = 2.dp),
@@ -277,7 +277,7 @@ private fun ReviewReset(
     Card {
         Button(
             text = stringResource(id = R.string.reset_wallet_confirm_button),
-            icon = R.drawable.ic_trash,
+            icon = R.drawable.ic_remove,
             iconTint = negativeColor,
             onClick = onConfirmClick,
             enabled = backupChecked && disclaimerChecked,

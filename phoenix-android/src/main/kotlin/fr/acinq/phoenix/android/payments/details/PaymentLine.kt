@@ -54,13 +54,12 @@ import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountView
-import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
+import fr.acinq.phoenix.android.utils.converters.DateFormatter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.isLegacyMigration
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.android.utils.extensions.smartDescription
-import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.utils.extensions.WalletPaymentState
 import fr.acinq.phoenix.utils.extensions.incomingOfferMetadata

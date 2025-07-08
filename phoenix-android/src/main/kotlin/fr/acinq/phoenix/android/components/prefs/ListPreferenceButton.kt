@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.components.settings
+package fr.acinq.phoenix.android.components.prefs
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,9 +28,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Clickable
+import fr.acinq.phoenix.android.components.PhoenixIcon
+import fr.acinq.phoenix.android.components.inputs.TextInput
+import fr.acinq.phoenix.android.components.TransparentFilledButton
 import fr.acinq.phoenix.android.components.dialogs.Dialog
+import fr.acinq.phoenix.android.components.settings.Setting
+import fr.acinq.phoenix.android.utils.mutedTextFieldColors
 
 
 internal data class PreferenceItem<T>(val item: T, val title: String, val description: String? = null)
@@ -85,26 +89,50 @@ private fun <T> ListPreferenceDialog(
         Column(
             modifier = Modifier.fillMaxWidth()
         ) {
-            Column(modifier = Modifier.padding(vertical = 8.dp)) {
-                if (description != null) {
-                    Text(text = description, modifier = Modifier.padding(horizontal = 32.dp))
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-                LazyColumn(modifier = Modifier.weight(1f, fill = false)) {
-                    itemsIndexed(preferences) { index, item ->
-                        PreferenceDialogItem(
-                            item = item,
-                            selected = index == initialPrefIndex,
-                            onClick = onSubmit
-                        )
-                    }
+            Spacer(Modifier.height(8.dp))
+            if (description != null) {
+                Text(text = description, modifier = Modifier.padding(horizontal = 32.dp))
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            var search by remember { mutableStateOf("") }
+            val filteredPrefs = remember(preferences, search) {
+                if (search.isBlank()) {
+                    preferences
+                } else {
+                    preferences.filter { it.title.contains(search, ignoreCase = true) || (it.description != null && it.description.contains(search, ignoreCase = true) ) }
                 }
             }
-            Button(
-                onClick = onCancel,
-                text = stringResource(id = R.string.btn_cancel),
-                modifier = Modifier.align(Alignment.End)
-            )
+
+            if (preferences.size > 12) {
+                TextInput(
+                    text = search,
+                    onTextChange = { search = it },
+                    staticLabel = null,
+                    leadingIcon = { PhoenixIcon(resourceId = R.drawable.ic_inspect, tint = MaterialTheme.typography.caption.color) },
+                    placeholder = { Text(text = stringResource(id = R.string.prefs_filter_name)) },
+                    singleLine = true,
+                    textFieldColors = mutedTextFieldColors(),
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                )
+            }
+
+            LazyColumn(modifier = Modifier.weight(1f, fill = false)) {
+                itemsIndexed(filteredPrefs) { index, item ->
+                    PreferenceDialogItem(
+                        item = item,
+                        selected = index == initialPrefIndex,
+                        onClick = onSubmit
+                    )
+                }
+            }
+
+            Row(modifier = Modifier.fillMaxWidth().padding(8.dp), horizontalArrangement = Arrangement.End) {
+                TransparentFilledButton(
+                    onClick = onCancel,
+                    text = stringResource(id = R.string.btn_cancel),
+                )
+            }
         }
     }
 }

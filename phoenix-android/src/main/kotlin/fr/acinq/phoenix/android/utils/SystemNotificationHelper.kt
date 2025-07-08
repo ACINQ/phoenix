@@ -30,7 +30,6 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
 import androidx.core.net.toUri
-import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.MilliSatoshi
@@ -39,8 +38,8 @@ import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.MainActivity
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateString
-import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
+import fr.acinq.phoenix.android.utils.converters.DateFormatter.toAbsoluteDateString
 import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.ExchangeRate
@@ -262,9 +261,9 @@ object SystemNotificationHelper {
     ): Notification {
         val isFiat = userPrefs.getIsAmountInFiat.first() && rates.isNotEmpty()
         val unit = if (isFiat) {
-            userPrefs.getFiatCurrency.first()
+            userPrefs.getFiatCurrencies.first().primary
         } else {
-            userPrefs.getBitcoinUnit.first()
+            userPrefs.getBitcoinUnits.first().primary
         }
         val rate = if (isFiat) {
             when (val rate = rates.find { it.fiatCurrency == unit }) {
