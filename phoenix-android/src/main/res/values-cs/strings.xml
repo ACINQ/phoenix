@@ -134,8 +134,8 @@
     <string name="receive_bip353_info">Tato Lightningová adresa používá moderní Bip353 standard, který pracuje s žádostmi o platbu Bolt12.\n\nPoskytuje více soukromí než Lightningová adresa založená na LNURL a dokonce si ji můžete i hostovat sami.\n\nKaždopádně je to nejnovější technologie; některé peněženky či služby tomuto formátu zatím nerozumí a nebudou schopny vám odeslat peníze.</string>
     <string name="receive_bip353_link">Více informací</string>
 
-    <string name="receive_lightning_edit_title_bolt11">Upravit tuto Bolt11 fakturu</string>
-    <string name="receive_lightning_edit_title_bolt12">Upravit tuto Bolt12 fakturu</string>
+    <string name="receive_lightning_edit_title_bolt11">Upravení této Bolt11 faktury</string>
+    <string name="receive_lightning_edit_title_bolt12">Upravení této Bolt12 faktury</string>
     <string name="receive_lightning_edit_amount_label">Částka (volitelné)</string>
     <string name="receive_lightning_edit_amount_placeholder">Částka k obdržení</string>
     <string name="receive_lightning_edit_desc_label">Popis (volitelné)</string>
@@ -219,7 +219,7 @@
     <string name="utils_rounded">≈</string>
     <string name="utils_converted_amount">≈ %1$s</string>
     <string name="utils_unknown_amount" translatable="false">!?</string>
-    <string name="utils_no_conversion">Směnný kurz BTC není k dispozici</string>
+    <string name="utils_no_conversion">Směnný kurz není dostupný</string>
 
     <string name="utils_date_just_now">Právě teď</string>
     <string name="utils_unknown">N/A</string>
@@ -405,7 +405,7 @@
     <string name="paymentdetails_status_unconfirmed_zero">0 potvrzení</string>
     <string name="paymentdetails_status_unconfirmed_zero_bump">Klepnutím zrychlíte</string>
     <string name="paymentdetails_status_unconfirmed_default">%1$d potvrzení</string>
-    <string name="paymentdetails_status_confirmed">Potrvzeno On-Chain</string>
+    <string name="paymentdetails_status_confirmed">Potrvzeno on-chain</string>
 
     <string name="paymentdetails_offer_note_label">Zpráva</string>
     <string name="paymentdetails_offer_sender_label">Poslal(a)</string>
@@ -428,14 +428,14 @@
     <string name="paymentdetails_no_description">Žádný popis</string>
     <string name="paymentdetails_info_uniclose">K této platbě došlo po konfliktu v kanálu.</string>
 
-    <string name="paymentdetails_desc_splice_out">On-Chain platba</string>
+    <string name="paymentdetails_desc_splice_out">On-chain platba</string>
     <string name="paymentdetails_desc_closing_channel">Zavírání kanálu</string>
     <string name="paymentdetails_desc_legacy_migration">Migrace ze staré aplikace</string>
     <string name="paymentdetails_desc_cpfp">Postrčit transakci</string>
     <string name="paymentdetails_desc_liquidity_manual">Manuální likvidita (+%1$s)</string>
     <string name="paymentdetails_desc_liquidity_automated">Správa kanálů</string>
     <string name="paymentdetails_desc_swapout">Swap-out do %1$s</string>
-    <string name="paymentdetails_desc_swapin">On-Chain vklad</string>
+    <string name="paymentdetails_desc_swapin">On-chain vklad</string>
 
     <string name="paymentdetails_desc_to">pro %1$s</string>
     <string name="paymentdetails_desc_from">od %1$s</string>
@@ -668,6 +668,7 @@
     <!-- settings: display preferences -->
 
     <string name="prefs_display_title">Zobrazit možnosti</string>
+    <string name="prefs_filter_name">Filtrovat podle jména</string>
     <string name="prefs_display_coin_label">Jednotka Bitcoinu</string>
     <string name="prefs_display_coin_sat_label">Satoshi (sat)</string>
     <string name="prefs_display_coin_sat_desc">1 sat je 0.00000001 btc</string>
@@ -917,7 +918,7 @@
     <string name="reset_wallet_title">Resetovat peněženku</string>
     <string name="reset_wallet_instructions_header">Smazat veškerá data peněženky z tohoto zařízení</string>
     <string name="reset_wallet_instructions_details">Toto resetuje aplikaci tak, jako byste ji právě nainstalovali.</string>
-    <string name="reset_wallet_review_button">Zobrazit</string>
+    <string name="reset_wallet_review_button">Pokračovat</string>
 
     <string name="reset_wallet_confirm_title">Potvrdit reset</string>
     <string name="reset_wallet_confirm_header">Peněženka bude kompletně smazána z <b>tohoto zařízení</b>.</string>
@@ -989,8 +990,18 @@
     <string name="nfc_err_hce_not_supported">Emulace tagu není podporována</string>
 
     <string name="nfc_button">NFC</string>
-    <string name="nfc_hce_emulation_title">Podržte v blízkosti NFC čtečky</string>
+    <string name="nfc_hce_emulation_title">Podržte telefon v blízkosti NFC čtečky</string>
     <string name="nfc_reader_title">Připraveno na scan</string>
-    <string name="nfc_reader_desc">Podržením v blízkosti zařízení NFC jej přečtete</string>
+    <string name="nfc_reader_desc">Podržte telefon v blízkosti NFC zařízení</string>
+
+    <!-- Currency converter -->
+
+    <string name="converter_title">Převodník Měn</string>
+    <string name="converter_done_button">Hotovo</string>
+    <string name="converter_placeholder_label">Vložte částku v %1$ | 919 satss</string>
+    <string name="converter_add_new_button">Přidat novou měnu…</string>
+    <string name="unitdropdown_more">Ostatní…</string>
+    <string name="currencypicker_title">Vyberte měnu</string>
+    <string name="currencypicker_no_match">Nebyla nalezena žádná shoda…</string>
 
 </resources>

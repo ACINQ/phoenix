@@ -57,7 +57,6 @@
     <!-- settings list -->
 
     <string name="settings_general_title">Obecné</string>
-    <string name="settings_fees_title">Poplatky</string>
     <string name="settings_security_title">Ochrana soukromí a zabezpečení</string>
     <string name="settings_advanced_title">Pokročilé</string>
     <string name="settings_danger_title">Nebezpečná zóna</string>
@@ -78,9 +77,7 @@
     <string name="settings_payment_settings">Možnosti platby</string>
     <string name="settings_payment_history">Historie plateb</string>
     <string name="settings_notifications">Oznámení</string>
-    <string name="settings_contacts">Kontakty</string>
-    <string name="settings_converter">Převodník měn</string>
-    <string name="settings_add_liquidity">Přidat likviditu</string>
+    <string name="settings_contacts">Moje kontakty</string>
 
     <!-- home: swap help -->
 
@@ -143,14 +140,14 @@
 
     <!-- upgrade required dialog -->
 
-    <string name="upgraderequired_title">Vyžadovaná aktualizace</string>
+    <string name="upgraderequired_title">Vyžadována aktualizace</string>
     <string name="upgraderequired_message">Tato verze aplikace Phoenix (v%1$s) není kompatibilní s vaší peněženkou. Aktualizujte ji nebo použijte kompatibilní verzi.</string>
-    <string name="upgraderequired_button">Aktualizace v Google Play</string>
+    <string name="upgraderequired_button">Aktualizujte v Google Play</string>
 
     <!-- receive view: warning about fee/liquidity -->
 
     <string name="receive_lightning_warning_title_surefail">Platba selže</string>
-    <string name="receive_lightning_warning_title_fee_expected">Očekávaný poplatek</string>
+    <string name="receive_lightning_warning_title_fee_expected">Očekává se poplatek</string>
     <string name="receive_lightning_warning_hint_show_details">Více informací</string>
 
     <string name="receive_lightning_sheet_dismiss">Zavřít</string>
@@ -169,8 +166,8 @@
 
     <!-- receive: Tor warning -->
 
-    <string name="receive_tor_warning_title">Tor je povolen</string>
-    <string name="receive_tor_warning_dialog_content_1">Phoenix může mít problém s přijímáním plateb na pozadí. Ujistěte se, že aplikace necháváte otevřenou v popředí a máte stabilní připojení.</string>
+    <string name="receive_tor_warning_title">Je povolen Tor</string>
+    <string name="receive_tor_warning_dialog_content_1">Phoenix může mít problém s přijímáním plateb na pozadí. Ujistěte se, že aplikaci necháváte otevřenou v popředí a máte stabilní připojení.</string>
 
     <!-- send errors -->
 
@@ -362,7 +359,7 @@
     <string name="liquiditypolicy_advanced_menu">Rozšířené nastavení</string>
     <string name="liquiditypolicy_advanced_disable">Správa kanálů je zakázána. Lze ji povolit v nastavení na obrazovce Správy kanálů.</string>
     <string name="liquiditypolicy_advanced_disclaimer_header">Pozor!</string>
-    <string name="liquiditypolicy_advanced_disclaimer_message">Tato obrazovka je určena pro pokročilé uživatele. Neměňte tato nastavení, pokud nerozumíte jejich účelu.</string>
+    <string name="liquiditypolicy_advanced_disclaimer_message">Tato stránka je určena pro pokročilé uživatele. Neměňte tato nastavení, pokud nerozumíte jejich účelu.</string>
 
     <string name="liquiditypolicy_advanced_verifications_title">Dodatečná ověření</string>
     <string name="liquiditypolicy_advanced_fees_prop_label">Procentní kontrola</string>
@@ -407,7 +404,7 @@
     <string name="liquidityads_estimate_above_25">Celkový poplatek je vyšší než 25 % požadované částky.</string>
     <string name="liquidityads_over_balance">Celkové poplatky převyšují váš zůstatek.</string>
 
-    <string name="liquidityads_review_button">Zhodnotit</string>
+    <string name="liquidityads_review_button">Pokračovat</string>
     <string name="liquidityads_disclaimer_body1">Žádáte o <b>počáteční</b> množství likvidity. Likvidita není v průběhu času konstantní: jak budete v průběhu přijímat prostředky přes Lightning, likvidita se bude spotřebovávat a stane se vaším zůstatkem.</string>
     <string name="liquidityads_disclaimer_body2">Po jednom roce bude zbývající nevyužitá likvidita vrácena poskytovateli.</string>
 
@@ -496,7 +493,7 @@
 
     <!-- experimental features -->
 
-    <string name="bip353_subtitle">Toto je lidsky čitelná adresa pro vaši žádost o platbu typu Bolt12.</string>
+    <string name="bip353_subtitle">Toto je lidsky čitelná adresa pro vaši Bolt12 fakturu.</string>
     <string name="bip353_subtitle2">Chcete hezčí adresu? Můžete použít služby třetích stran, nebo si adresu začít hostovat!</string>
 
 </resources>
