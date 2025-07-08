@@ -48,8 +48,8 @@ import fr.acinq.lightning.blockchain.electrum.balance
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
-import fr.acinq.phoenix.android.LocalBitcoinUnit
-import fr.acinq.phoenix.android.LocalFiatCurrency
+import fr.acinq.phoenix.android.LocalBitcoinUnits
+import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountWithFiatBelow
@@ -58,17 +58,17 @@ import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.dialogs.Dialog
-import fr.acinq.phoenix.android.components.FeerateSlider
+import fr.acinq.phoenix.android.components.inputs.FeerateSlider
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.SplashLabelRow
-import fr.acinq.phoenix.android.components.TextInput
+import fr.acinq.phoenix.android.components.inputs.TextInput
 import fr.acinq.phoenix.android.components.InlineTransactionLink
 import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.feedback.SuccessMessage
-import fr.acinq.phoenix.android.fiatRate
+import fr.acinq.phoenix.android.primaryFiatRate
 import fr.acinq.phoenix.android.components.scanner.ScannerView
-import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.utils.Parser
@@ -139,8 +139,8 @@ private fun AvailableForRefundView(
                     Text(
                         text = annotatedStringResource(
                             id = R.string.swapinrefund_available_label,
-                            availableForRefund.toPrettyString(LocalBitcoinUnit.current, withUnit = true),
-                            availableForRefund.toPrettyString(LocalFiatCurrency.current, fiatRate, withUnit = true)
+                            availableForRefund.toPrettyString(LocalBitcoinUnits.current.primary, withUnit = true),
+                            availableForRefund.toPrettyString(LocalFiatCurrencies.current.primary, primaryFiatRate, withUnit = true)
                         )
                     )
                 }

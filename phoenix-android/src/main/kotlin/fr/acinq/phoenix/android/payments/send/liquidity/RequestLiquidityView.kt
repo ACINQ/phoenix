@@ -53,7 +53,7 @@ import fr.acinq.lightning.channel.ChannelManagementFees
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.sum
 import fr.acinq.lightning.utils.toMilliSatoshi
-import fr.acinq.phoenix.android.LocalBitcoinUnit
+import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountView
@@ -64,7 +64,7 @@ import fr.acinq.phoenix.android.components.Checkbox
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.dialogs.IconPopup
 import fr.acinq.phoenix.android.components.ProgressView
-import fr.acinq.phoenix.android.components.SatoshiSlider
+import fr.acinq.phoenix.android.components.inputs.SatoshiSlider
 import fr.acinq.phoenix.android.components.SplashLabelRow
 import fr.acinq.phoenix.android.components.SplashLayout
 import fr.acinq.phoenix.android.components.TransparentFilledButton
@@ -75,7 +75,7 @@ import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.feedback.InfoMessage
 import fr.acinq.phoenix.android.components.feedback.SuccessMessage
 import fr.acinq.phoenix.android.payments.send.spliceout.spliceFailureDetails
-import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.android.utils.orange
@@ -154,7 +154,7 @@ private fun RequestLiquidityTopSection(inboundLiquidity: MilliSatoshi?) {
                 Spacer(modifier = Modifier.width(3.dp))
                 AmountView(
                     amount = it,
-                    forceUnit = LocalBitcoinUnit.current,
+                    forceUnit = LocalBitcoinUnits.current.primary,
                     amountTextStyle = MaterialTheme.typography.subtitle2,
                     unitTextStyle = MaterialTheme.typography.subtitle2,
                     modifier = Modifier.alignByBaseline(),
@@ -377,7 +377,7 @@ private fun LiquiditySuccessDetails(liquidityDetails: ChannelFundingResponse.Suc
     SuccessMessage(
         header = stringResource(id = R.string.liquidityads_success),
         details = liquidityDetails.liquidityPurchase?.amount?.let {
-            stringResource(id = R.string.liquidityads_success_amount, it.toPrettyString(unit = LocalBitcoinUnit.current, withUnit = true))
+            stringResource(id = R.string.liquidityads_success_amount, it.toPrettyString(unit = LocalBitcoinUnits.current.primary, withUnit = true))
         },
         alignment = Alignment.CenterHorizontally,
     )

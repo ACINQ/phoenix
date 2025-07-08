@@ -37,27 +37,26 @@ import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
-import fr.acinq.phoenix.android.LocalFiatCurrency
+import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.dialogs.IconPopup
+import fr.acinq.phoenix.android.components.inputs.InlineSatoshiInput
 import fr.acinq.phoenix.android.components.settings.SettingSwitch
-import fr.acinq.phoenix.android.fiatRate
+import fr.acinq.phoenix.android.primaryFiatRate
 import fr.acinq.phoenix.android.userPrefs
-import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.MempoolFeerate
-import fr.acinq.phoenix.data.canRequestLiquidity
 import kotlinx.coroutines.launch
 
 @Composable
 fun LiquidityPolicyView(
     onBackClick: () -> Unit,
     onAdvancedClick: () -> Unit,
-    onRequestLiquidityClick: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val userPrefs = userPrefs
@@ -163,22 +162,6 @@ fun LiquidityPolicyView(
                     },
                 )
             }
-
-            val channelsState by business.peerManager.channelsFlow.collectAsState()
-            if (channelsState.canRequestLiquidity()) {
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Button(
-                        text = stringResource(id = R.string.liquiditypolicy_request_button),
-                        icon = R.drawable.ic_bucket,
-                        onClick = {
-                            keyboardManager?.hide()
-                            onRequestLiquidityClick()
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            }
-
         } else {
             Card(modifier = Modifier.fillMaxWidth()) {
                 ProgressView(text = stringResource(id = R.string.liquiditypolicy_loading))
@@ -257,7 +240,7 @@ private fun EditMaxFee(
         when (mempoolFeerate) {
             null -> ProgressView(text = stringResource(id = R.string.liquiditypolicy_fees_estimation_loading), progressCircleSize = 16.dp, padding = PaddingValues(0.dp))
             else -> {
-                val fiatCurrency = LocalFiatCurrency.current
+                val fiatCurrency = LocalFiatCurrencies.current.primary
                 Row {
                     PhoenixIcon(resourceId = R.drawable.ic_info, modifier = Modifier.offset(y = 2.dp))
                     Spacer(modifier = Modifier.width(8.dp))
@@ -265,7 +248,7 @@ private fun EditMaxFee(
                         text = annotatedStringResource(
                             id = R.string.liquiditypolicy_fees_estimation,
                             mempoolFeerate.swapEstimationFee(hasNoChannels).toPrettyString(BitcoinUnit.Sat, withUnit = true),
-                            mempoolFeerate.swapEstimationFee(hasNoChannels).toPrettyString(fiatCurrency, fiatRate, withUnit = true)
+                            mempoolFeerate.swapEstimationFee(hasNoChannels).toPrettyString(fiatCurrency, primaryFiatRate, withUnit = true)
                         )
                     )
                 }

@@ -114,6 +114,7 @@
     <!-- settings list -->
 
     <string name="settings_general_title">Configuración general</string>
+    <string name="settings_fees_title">Tarifas</string>
     <string name="settings_security_title">Privacidad y seguridad</string>
     <string name="settings_advanced_title">Avanzado</string>
     <string name="settings_danger_title">Zona de peligro</string>
@@ -134,7 +135,9 @@
     <string name="settings_payment_settings">Opciones de pago</string>
     <string name="settings_payment_history">Historial de pagos</string>
     <string name="settings_notifications">Notificaciones</string>
-    <string name="settings_contacts">Mis contactos</string>
+    <string name="settings_contacts">Contactos</string>
+    <string name="settings_converter">Conversor de divisas</string>
+    <string name="settings_add_liquidity">Añadir liquidez</string>
 
     <!-- upgrade required dialog -->
 

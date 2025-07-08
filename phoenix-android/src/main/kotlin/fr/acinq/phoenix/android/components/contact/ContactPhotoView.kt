@@ -206,7 +206,7 @@ fun ContactPhotoView(
             )
             Button(
                 text = stringResource(id = R.string.contact_photo_remove),
-                icon = R.drawable.ic_trash,
+                icon = R.drawable.ic_remove,
                 iconTint = negativeColor,
                 onClick = {
                     onChange?.invoke(null)

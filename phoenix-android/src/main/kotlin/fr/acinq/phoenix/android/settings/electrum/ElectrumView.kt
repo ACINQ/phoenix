@@ -43,6 +43,7 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
+import fr.acinq.phoenix.android.components.inputs.TextInput
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.components.settings.Setting
 import fr.acinq.phoenix.android.utils.*

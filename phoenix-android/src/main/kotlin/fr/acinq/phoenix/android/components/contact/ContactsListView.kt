@@ -17,10 +17,8 @@
 package fr.acinq.phoenix.android.components.contact
 
 import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -45,15 +43,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Clickable
 import fr.acinq.phoenix.android.components.ItemCard
 import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.ProgressView
-import fr.acinq.phoenix.android.components.TextInput
-import fr.acinq.phoenix.android.navController
+import fr.acinq.phoenix.android.components.inputs.TextInput
 import fr.acinq.phoenix.android.utils.mutedTextFieldColors
 import fr.acinq.phoenix.data.ContactInfo
 

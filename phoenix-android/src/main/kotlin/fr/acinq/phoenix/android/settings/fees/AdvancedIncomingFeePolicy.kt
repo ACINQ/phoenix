@@ -45,7 +45,7 @@ import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.CardHeader
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
-import fr.acinq.phoenix.android.components.InlineNumberInput
+import fr.acinq.phoenix.android.components.inputs.InlineNumberInput
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.settings.SettingSwitch
 import fr.acinq.phoenix.android.components.feedback.WarningMessage

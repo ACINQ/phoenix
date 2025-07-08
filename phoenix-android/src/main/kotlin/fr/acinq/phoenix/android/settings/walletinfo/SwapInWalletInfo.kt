@@ -46,7 +46,7 @@ import fr.acinq.lightning.blockchain.electrum.balance
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
-import fr.acinq.phoenix.android.LocalBitcoinUnit
+import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.Button
@@ -58,8 +58,8 @@ import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.dialogs.IconPopup
 import fr.acinq.phoenix.android.userPrefs
-import fr.acinq.phoenix.android.utils.Converter.toPrettyString
-import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
+import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
+import fr.acinq.phoenix.android.utils.converters.DateFormatter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.data.Notification
@@ -76,7 +76,7 @@ fun SwapInWallet(
     onAdvancedClick: () -> Unit,
     onSpendRefundable: () -> Unit,
 ) {
-    val btcUnit = LocalBitcoinUnit.current
+    val btcUnit = LocalBitcoinUnits.current.primary
 
     val liquidityPolicyInPrefs by userPrefs.getLiquidityPolicy.collectAsState(null)
     val swapInWallet by business.peerManager.swapInWallet.collectAsState()
@@ -219,7 +219,7 @@ private fun ReadyForSwapView(
             Spacer(modifier = Modifier.height(8.dp))
             HSeparator(width = 50.dp)
             Spacer(modifier = Modifier.height(8.dp))
-            val btcUnit = LocalBitcoinUnit.current
+            val btcUnit = LocalBitcoinUnits.current.primary
             Text(
                 text = stringResource(id = R.string.walletinfo_onchain_swapin_last_attempt, lastSwapFailedNotification.createdAt.toRelativeDateString()),
                 style = MaterialTheme.typography.body2,

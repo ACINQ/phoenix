@@ -30,11 +30,11 @@ import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.sum
-import fr.acinq.phoenix.android.LocalBitcoinUnit
+import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.SplashLabelRow
-import fr.acinq.phoenix.android.utils.Converter.toPrettyString
-import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
+import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
+import fr.acinq.phoenix.android.utils.converters.MSatDisplayPolicy
 import fr.acinq.phoenix.android.utils.extensions.smartDescription
 import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.utils.extensions.state
@@ -64,7 +64,7 @@ private fun SplashFee(payment: LegacyPayToOpenIncomingPayment) {
             label = stringResource(id = R.string.paymentdetails_service_fees_label),
             helpMessage = stringResource(R.string.paymentdetails_service_fees_desc)
         ) {
-            Text(text = serviceFee.toPrettyString(LocalBitcoinUnit.current, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW))
+            Text(text = serviceFee.toPrettyString(LocalBitcoinUnits.current.primary, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW))
         }
     }
 
@@ -75,7 +75,7 @@ private fun SplashFee(payment: LegacyPayToOpenIncomingPayment) {
             label = stringResource(id = R.string.paymentdetails_funding_fees_label),
             helpMessage = stringResource(R.string.paymentdetails_funding_fees_desc)
         ) {
-            Text(text = miningFee.toPrettyString(LocalBitcoinUnit.current, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.HIDE))
+            Text(text = miningFee.toPrettyString(LocalBitcoinUnits.current.primary, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.HIDE))
         }
     }
 }

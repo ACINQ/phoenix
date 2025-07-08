@@ -252,7 +252,7 @@ class NodeService : Service() {
              internalData.saveShowReleaseNoteSinceCode(lastVersionUsed)
         }
         val liquidityPolicy = userPrefs.getLiquidityPolicy.first()
-        val preferredFiatCurrency = userPrefs.getFiatCurrency.first()
+        val preferredFiatCurrency = userPrefs.getFiatCurrencies.first().primary
 
         monitorPaymentsJob = serviceScope.launch { monitorPaymentsWhenHeadless(business.nodeParamsManager, business.currencyManager, userPrefs) }
         monitorNodeEventsJob = serviceScope.launch { monitorNodeEvents(business.peerManager, business.nodeParamsManager) }

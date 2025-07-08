@@ -17,12 +17,12 @@
 package fr.acinq.phoenix.utils
 
 import fr.acinq.lightning.utils.msat
-import fr.acinq.phoenix.android.utils.Converter.toMilliSatoshi
+import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toMilliSatoshi
 import fr.acinq.phoenix.data.BitcoinUnit
 import junit.framework.Assert.assertEquals
 import org.junit.Test
 
-class ConverterTest {
+class AmountFormatterTest {
     @Test
     fun test_double_to_msat_rounding() {
         // 1 msat

@@ -50,6 +50,7 @@
     <!-- settings list -->
 
     <string name="settings_general_title">Allgemein</string>
+    <string name="settings_fees_title">Gebühren</string>
     <string name="settings_security_title">Privatsphäre &amp; Sicherheit</string>
     <string name="settings_advanced_title">Erweitert</string>
     <string name="settings_danger_title">Gefahrenzone</string>
@@ -70,7 +71,9 @@
     <string name="settings_payment_settings">Zahlungs-Optionen</string>
     <string name="settings_payment_history">Zahlungs-Historie</string>
     <string name="settings_notifications">Benachrichtigungen</string>
-    <string name="settings_contacts">Meine Kontakte</string>
+    <string name="settings_contacts">Kontakte</string>
+    <string name="settings_converter">Währungsrechner</string>
+    <string name="settings_add_liquidity">Liquidität hinzufügen</string>
 
     <!-- home: swap help -->
 

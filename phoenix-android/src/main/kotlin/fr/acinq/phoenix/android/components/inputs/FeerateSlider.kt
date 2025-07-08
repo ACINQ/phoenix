@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.components
+package fr.acinq.phoenix.android.components.inputs
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.LocalTextStyle
@@ -29,10 +29,13 @@ import androidx.compose.ui.unit.sp
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.components.FilledButton
+import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.data.MempoolFeerate
 
+/** A feerate picker using a [SatoshiLogSlider] + speed estimation, depending on the [mempoolFeerate] param. */
 @Composable
 fun FeerateSlider(
     feerate: Satoshi,
