@@ -998,7 +998,7 @@
 
     <string name="converter_title">Převodník Měn</string>
     <string name="converter_done_button">Hotovo</string>
-    <string name="converter_placeholder_label">Vložte částku v %1$ | 919 satss</string>
+    <string name="converter_placeholder_label">Vložte částku v %1$s</string>
     <string name="converter_add_new_button">Přidat novou měnu…</string>
     <string name="unitdropdown_more">Ostatní…</string>
     <string name="currencypicker_title">Vyberte měnu</string>
