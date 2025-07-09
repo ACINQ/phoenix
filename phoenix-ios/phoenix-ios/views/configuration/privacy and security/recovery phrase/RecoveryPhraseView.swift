@@ -238,7 +238,7 @@ struct RecoveryPhraseList: View {
 				.disabled(isDecrypting)
 				.padding(.vertical, 5)
 				
-				let enabledSecurity = Keychain.current.enabledSecurityPublisher.value
+				let enabledSecurity = Keychain.current.enabledSecurity
 				if enabledSecurity.hasAppLock() || enabledSecurity.hasSpendingPin() {
 					Text("(requires authentication)")
 						.font(.footnote)
@@ -608,7 +608,7 @@ struct RecoveryPhraseList: View {
 			}
 		}
 		
-		let enabledSecurity = Keychain.current.enabledSecurityPublisher.value
+		let enabledSecurity = Keychain.current.enabledSecurity
 		if enabledSecurity == .none {
 			Keychain.current.unlockWithKeychain { result in
 				if case .success(let recoveryPhrase) = result, let recoveryPhrase {

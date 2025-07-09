@@ -161,7 +161,7 @@ struct PaymentsBackupView: View {
 		
 		ToggleAlignment {
 			
-			Label {
+			LabelAlignment {
 				VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
 					Text("Randomize upload delays")
 						.alignmentGuide(VerticalAlignment.centerTopLine) { (d: ViewDimensions) in

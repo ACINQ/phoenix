@@ -213,6 +213,13 @@
 		DC5F96EA2E1314FD0052CDE6 /* SecurityErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96E92E1314FA0052CDE6 /* SecurityErrors.swift */; };
 		DC5F96EB2E1314FD0052CDE6 /* SecurityErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96E92E1314FA0052CDE6 /* SecurityErrors.swift */; };
 		DC5F96EE2E13250F0052CDE6 /* AppSecurity.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96EC2E13250C0052CDE6 /* AppSecurity.swift */; };
+		DC5F96F02E1D61720052CDE6 /* WalletImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96EF2E1D61690052CDE6 /* WalletImage.swift */; };
+		DC5F96F32E1D76F00052CDE6 /* WalletSwitcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96F22E1D76EB0052CDE6 /* WalletSwitcher.swift */; };
+		DC5F96F82E1DA3D60052CDE6 /* PinType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96F72E1DA3D30052CDE6 /* PinType.swift */; };
+		DC5F96F92E1DA3D60052CDE6 /* PinType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96F72E1DA3D30052CDE6 /* PinType.swift */; };
+		DC5F96FB2E1DB6620052CDE6 /* WalletIconPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96FA2E1DB6520052CDE6 /* WalletIconPicker.swift */; };
+		DC5F96FD2E1EB2ED0052CDE6 /* WalletIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96FC2E1EB2EA0052CDE6 /* WalletIcon.swift */; };
+		DC5F96FF2E1F168A0052CDE6 /* HiddenWalletSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96FE2E1F16760052CDE6 /* HiddenWalletSheet.swift */; };
 		DC63A3762B965D54008E040E /* InboundFeeSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC63A3752B965D54008E040E /* InboundFeeSheet.swift */; };
 		DC63BDF429AE44380067A361 /* NotificationsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC63BDF329AE44380067A361 /* NotificationsManager.swift */; };
 		DC63BDF729AEB30C0067A361 /* BackgroundPaymentsConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC63BDF629AEB30C0067A361 /* BackgroundPaymentsConfig.swift */; };
@@ -675,6 +682,12 @@
 		DC5F96E62E0F36240052CDE6 /* SecurityFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityFileManager.swift; sourceTree = "<group>"; };
 		DC5F96E92E1314FA0052CDE6 /* SecurityErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityErrors.swift; sourceTree = "<group>"; };
 		DC5F96EC2E13250C0052CDE6 /* AppSecurity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSecurity.swift; sourceTree = "<group>"; };
+		DC5F96EF2E1D61690052CDE6 /* WalletImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletImage.swift; sourceTree = "<group>"; };
+		DC5F96F22E1D76EB0052CDE6 /* WalletSwitcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletSwitcher.swift; sourceTree = "<group>"; };
+		DC5F96F72E1DA3D30052CDE6 /* PinType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinType.swift; sourceTree = "<group>"; };
+		DC5F96FA2E1DB6520052CDE6 /* WalletIconPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletIconPicker.swift; sourceTree = "<group>"; };
+		DC5F96FC2E1EB2EA0052CDE6 /* WalletIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletIcon.swift; sourceTree = "<group>"; };
+		DC5F96FE2E1F16760052CDE6 /* HiddenWalletSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HiddenWalletSheet.swift; sourceTree = "<group>"; };
 		DC63A3752B965D54008E040E /* InboundFeeSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboundFeeSheet.swift; sourceTree = "<group>"; };
 		DC63BDF329AE44380067A361 /* NotificationsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsManager.swift; sourceTree = "<group>"; };
 		DC63BDF629AEB30C0067A361 /* BackgroundPaymentsConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundPaymentsConfig.swift; sourceTree = "<group>"; };
@@ -912,21 +925,24 @@
 		53BEF0E7A62D4973FCC99476 /* widgets */ = {
 			isa = PBXGroup;
 			children = (
-				DC0E31BA26EFDED4002071C6 /* VSlider.swift */,
-				C8D7A607F036B3184C3D6EED /* QRCodeScanner.swift */,
-				DC72C33825A663CA008A927A /* QRCode.swift */,
-				DC99E93F25BA141000FB20F7 /* LocalWebView.swift */,
-				DC0994AF263A074C003031CA /* InfoGrid.swift */,
+				DC08A51727FB39530041603B /* AnimatedChevron.swift */,
+				DC6D26E229E76557006A7814 /* AnimatedClock.swift */,
+				DC67E40A27F3798600496C04 /* AnimatedMenu.swift */,
+				DC3345D12C2C761800EDD2D4 /* CameraPicker.swift */,
+				DC6F04262C3895E300627B4F /* ContactPhoto.swift */,
 				DCFD079026D84A380020DD8E /* HorizontalActivity.swift */,
 				DCEC6A1727A82A98002C20BA /* ImagePicker.swift */,
-				DC67E40A27F3798600496C04 /* AnimatedMenu.swift */,
-				DC08A51727FB39530041603B /* AnimatedChevron.swift */,
+				DC0994AF263A074C003031CA /* InfoGrid.swift */,
+				DCB30E532A0AABAF00E7D7A2 /* InfoPopoverWindow.swift */,
+				DC99E93F25BA141000FB20F7 /* LocalWebView.swift */,
+				DC6F19C02C470F70004EC469 /* PickerResult.swift */,
+				DC72C33825A663CA008A927A /* QRCode.swift */,
+				C8D7A607F036B3184C3D6EED /* QRCodeScanner.swift */,
 				DC08A51927FB6C5F0041603B /* TopTab.swift */,
 				DC39D4F02874DDF40030F18D /* View+If.swift */,
-				DC6D26E229E76557006A7814 /* AnimatedClock.swift */,
-				DCB30E532A0AABAF00E7D7A2 /* InfoPopoverWindow.swift */,
-				DC3345D12C2C761800EDD2D4 /* CameraPicker.swift */,
-				DC6F19C02C470F70004EC469 /* PickerResult.swift */,
+				DC0E31BA26EFDED4002071C6 /* VSlider.swift */,
+				DC5F96FC2E1EB2EA0052CDE6 /* WalletIcon.swift */,
+				DC5F96EF2E1D61690052CDE6 /* WalletImage.swift */,
 			);
 			path = widgets;
 			sourceTree = "<group>";
@@ -1088,6 +1104,7 @@
 			isa = PBXGroup;
 			children = (
 				C8D7AFF1A7C09789C6CF2D06 /* ConfigurationView.swift */,
+				DC5F96F12E1D76DE0052CDE6 /* wallet switcher */,
 				DCACF6E02566CEC40009B01E /* general */,
 				DC949E6B2B45FC5E00E80BB5 /* fees */,
 				DCACF6E42566CF850009B01E /* privacy and security */,
@@ -1202,7 +1219,6 @@
 				DC3345CF2C2B4C1200EDD2D4 /* ManageContact.swift */,
 				DC5567442C2F1A6900008E11 /* ContactsList.swift */,
 				DC9933312CC03D7500EB3100 /* ContactsListSheet.swift */,
-				DC6F04262C3895E300627B4F /* ContactPhoto.swift */,
 				DC9933332CC0426300EB3100 /* AddContactOptionsSheet.swift */,
 			);
 			path = contacts;
@@ -1326,6 +1342,16 @@
 				DC37803C2C05215600937C8E /* ScanBitcoinAddressSheet.swift */,
 			);
 			path = "drain wallet";
+			sourceTree = "<group>";
+		};
+		DC5F96F12E1D76DE0052CDE6 /* wallet switcher */ = {
+			isa = PBXGroup;
+			children = (
+				DC5F96FE2E1F16760052CDE6 /* HiddenWalletSheet.swift */,
+				DC5F96FA2E1DB6520052CDE6 /* WalletIconPicker.swift */,
+				DC5F96F22E1D76EB0052CDE6 /* WalletSwitcher.swift */,
+			);
+			path = "wallet switcher";
 			sourceTree = "<group>";
 		};
 		DC63BDF229AE440A0067A361 /* officers */ = {
@@ -1575,6 +1601,7 @@
 				DC5F96CB2E0AF32D0052CDE6 /* Keychain+Keys.swift */,
 				DC5F96BC2E09D6C60052CDE6 /* Keychain+Wallet.swift */,
 				DCACF6F52566D0BA0009B01E /* KeyStoreError.swift */,
+				DC5F96F72E1DA3D30052CDE6 /* PinType.swift */,
 				DC6ACC572B10F0220079179B /* RecoveryPhrase.swift */,
 				DC5F96E92E1314FA0052CDE6 /* SecurityErrors.swift */,
 				DCACF6F82566D0BA0009B01E /* SecurityFile.swift */,
@@ -2130,6 +2157,7 @@
 				DC4CBC882D66416800129BDB /* Details_Incoming_NewChannel.swift in Sources */,
 				DC4864DA29D4E52C00ACD539 /* BgRefreshDisabledPopover.swift in Sources */,
 				DCE7233027B167240017CF56 /* SyncSeedManager_Actor.swift in Sources */,
+				DC5F96F92E1DA3D60052CDE6 /* PinType.swift in Sources */,
 				DCBA371B2758076F00610EC8 /* SyncSeedManager.swift in Sources */,
 				DC39D4F12874DDF40030F18D /* View+If.swift in Sources */,
 				DC370A8B2B7FFFC70093C56F /* SwapInAddresses.swift in Sources */,
@@ -2209,6 +2237,7 @@
 				DC118BFE27B451890080BBAC /* MetadataSheet.swift in Sources */,
 				DC5F96E42E0C5A4F0052CDE6 /* Keychain+Constants.swift in Sources */,
 				DCFD079126D84A380020DD8E /* HorizontalActivity.swift in Sources */,
+				DC5F96F02E1D61720052CDE6 /* WalletImage.swift in Sources */,
 				DC641C6D2820826000862DCD /* AppMigration.swift in Sources */,
 				DC08A51827FB39530041603B /* AnimatedChevron.swift in Sources */,
 				C8D7ABC95B979B59AF5A7CA7 /* InitializationView.swift in Sources */,
@@ -2290,6 +2319,7 @@
 				DC1E75722B73DD500026F36E /* LogFileParser.swift in Sources */,
 				DC49DA8E258BB882005BC4BC /* ScaledButtonStyle.swift in Sources */,
 				DCAEF8D9275E69B000015993 /* SyncSeedManager_State.swift in Sources */,
+				DC5F96FD2E1EB2ED0052CDE6 /* WalletIcon.swift in Sources */,
 				DCB04685260D162C007FDA37 /* ViewName.swift in Sources */,
 				DC4CF3CE2BE96C36003A957F /* DisablePinView.swift in Sources */,
 				DC4CBC822D6619B700129BDB /* Details_Incoming_Bolt12.swift in Sources */,
@@ -2326,7 +2356,9 @@
 				DC71E7332728645B0063613D /* CurrencyConverterView.swift in Sources */,
 				DCA3B41F2A5471C900E6B231 /* MinerFeeInfo.swift in Sources */,
 				DC6F04232C35EB9900627B4F /* SummaryInfoGrid.swift in Sources */,
+				DC5F96F32E1D76F00052CDE6 /* WalletSwitcher.swift in Sources */,
 				DCACF6F02566D0A60009B01E /* Data+Hexadecimal.swift in Sources */,
+				DC5F96FB2E1DB6620052CDE6 /* WalletIconPicker.swift in Sources */,
 				DCE3C7AB2A6AD3CC00F4D385 /* MempoolMonitor.swift in Sources */,
 				DC3780392C04D60400937C8E /* KotlinEnums.swift in Sources */,
 				DCBA60CD2C909C7600878895 /* SendView.swift in Sources */,
@@ -2350,6 +2382,7 @@
 				DC6F04272C3895E300627B4F /* ContactPhoto.swift in Sources */,
 				DC4CBC9C2D68E65500129BDB /* Details_Outgoing_SpliceCpfp.swift in Sources */,
 				DCB62F472A5DF19D00912A71 /* KotlinPublishers+Lightning.swift in Sources */,
+				DC5F96FF2E1F168A0052CDE6 /* HiddenWalletSheet.swift in Sources */,
 				DCA4DA372C66A0960010363C /* CurrencySelector.swift in Sources */,
 				DC5F96CD2E0AF3310052CDE6 /* Keychain+Keys.swift in Sources */,
 				DC355E252A45FDD3008E8A8E /* NoticeMonitor.swift in Sources */,
@@ -2430,6 +2463,7 @@
 				DCA6DECE282AB12B0073C658 /* SecurityFile.swift in Sources */,
 				DCCFE6BE2B713FB8002FFF11 /* LogFileInfo.swift in Sources */,
 				DC49FE9C2AC49E0400D8D2E2 /* KotlinExtensions+Lightning.swift in Sources */,
+				DC5F96F82E1DA3D60052CDE6 /* PinType.swift in Sources */,
 				DCBBEEA82D1314CA00B0A9EB /* CurrencyAmount.swift in Sources */,
 				DC6ACC592B10F4FE0079179B /* RecoveryPhrase.swift in Sources */,
 				DCA6DEC72829BFD70073C658 /* XPC.swift in Sources */,

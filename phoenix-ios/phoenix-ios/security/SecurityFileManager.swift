@@ -8,6 +8,32 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
+struct WalletMetadata {
+	let hidden: Bool
+	let name: String
+	let photo: String
+	
+	init(hidden: Bool, name: String, photo: String) {
+		self.hidden = hidden
+		self.name = name
+		self.photo = photo
+	}
+	
+	init(wallet: SecurityFile.V1.Wallet) {
+		self.hidden = wallet.hidden
+		self.name = wallet.name
+		self.photo = wallet.photo
+	}
+	
+	static func `default`() -> WalletMetadata {
+		return WalletMetadata(
+			hidden : false,
+			name   : "?",
+			photo  : WalletIcon.default.filename
+		)
+	}
+}
+
 class SecurityFileManager {
 	
 	/// Singleton instance
@@ -23,6 +49,28 @@ class SecurityFileManager {
 	private var cachedSecurityFile: SecurityFile.Version? = nil
 	
 	private init() { /* must use shared instance */ }
+	
+	// --------------------------------------------------
+	// MARK: State
+	// --------------------------------------------------
+	
+	func currentWalletMetadata() -> WalletMetadata? {
+		
+		return queue.sync {
+			
+			if case .v1(let v1) = self.cachedSecurityFile {
+				let currentId = Biz.walletId?.keychainKeyId ?? KEYCHAIN_DEFAULT_ID
+				if let wallet = v1.wallets[currentId] {
+					return WalletMetadata(
+						hidden: wallet.hidden,
+						name: wallet.name,
+						photo: wallet.photo
+					)
+				}
+			}
+			return nil
+		}
+	}
 	
 	// --------------------------------------------------
 	// MARK: Read
@@ -69,15 +117,33 @@ class SecurityFileManager {
 	}
 	
 	func asyncReadFromDisk(
+		qos: DispatchQoS.QoSClass = .userInitiated,
 		completion: @escaping (Result<SecurityFile.Version, ReadSecurityFileError>) -> Void
 	) {
 		log.trace(#function)
 		
-		DispatchQueue.global(qos: .userInitiated).async {
+		DispatchQueue.global(qos: qos).async {
 			let result = self.readFromDisk()
 			DispatchQueue.main.async {
 				completion(result)
 			}
+		}
+	}
+	
+	func asyncReadFromDisk(
+		qos: DispatchQoS.QoSClass = .userInitiated
+	) async throws(ReadSecurityFileError) -> SecurityFile.Version {
+		
+		let result = await withCheckedContinuation { continuation in
+			asyncReadFromDisk(qos: qos) { result in
+				continuation.resume(returning: result)
+			}
+		}
+		switch result {
+		case .failure(let error):
+			throw error
+		case .success(let securityFile):
+			return securityFile
 		}
 	}
 	
@@ -142,6 +208,7 @@ class SecurityFileManager {
 	
 	func asyncWriteToDisk(
 		_ securityFile: SecurityFile.V1,
+		qos: DispatchQoS.QoSClass = .userInitiated,
 		completion: @escaping (Result<Void, WriteSecurityFileError>) -> Void
 	) {
 		log.trace(#function)
@@ -151,6 +218,21 @@ class SecurityFileManager {
 			DispatchQueue.main.async {
 				completion(result)
 			}
+		}
+	}
+	
+	func asyncWriteToDisk(
+		_ securityFile: SecurityFile.V1,
+		qos: DispatchQoS.QoSClass = .userInitiated
+	) async throws(WriteSecurityFileError) -> Void {
+		
+		let result = await withCheckedContinuation { continuation in
+			asyncWriteToDisk(securityFile, qos: qos) { result in
+				continuation.resume(returning: result)
+			}
+		}
+		if case .failure(let error) = result {
+			throw error
 		}
 	}
 }

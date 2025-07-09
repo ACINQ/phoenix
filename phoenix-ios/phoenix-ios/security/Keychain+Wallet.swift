@@ -16,32 +16,6 @@ fileprivate typealias KeyDeprecated = KeychainKeyDeprecated
 
 let PIN_LENGTH = 6
 
-enum PinType: CustomStringConvertible {
-	case lockPin
-	case spendingPin
-	
-	var description: String {
-		switch self {
-			case .lockPin     : return "lockPin"
-			case .spendingPin : return "spendingPin"
-		}
-	}
-	
-	fileprivate var keyPin: Key {
-		switch self {
-			case .lockPin     : return Key.lockPin
-			case .spendingPin : return Key.spendingPin
-		}
-	}
-	
-	fileprivate var keyInvalid: Key {
-		switch self {
-			case .lockPin     : return Key.invalidLockPin
-			case .spendingPin : return Key.invalidSpendingPin
-		}
-	}
-}
-
 class Keychain_Wallet {
 	
 	private let id: String
@@ -77,6 +51,10 @@ class Keychain_Wallet {
 	// --------------------------------------------------
 	// MARK: Publisher
 	// --------------------------------------------------
+	
+	var enabledSecurity: EnabledSecurity {
+		return enabledSecurityPublisher.value
+	}
 	
 	private func publishEnabledSecurity(_ value: EnabledSecurity) {
 		
@@ -135,6 +113,7 @@ class Keychain_Wallet {
 	}
 	
 	private func updateEnabledSecurity() {
+		log.trace(#function)
 		
 		queue.async {
 			self.publishEnabledSecurity(
@@ -665,7 +644,7 @@ class Keychain_Wallet {
 		// Also - go thru the serial queue for proper thread safety.
 		queue.async {
 			
-			let key = type.keyInvalid
+			let key = type.keyInvalidPin
 			
 			if let invalidPinData {
 				do {
@@ -701,7 +680,7 @@ class Keychain_Wallet {
 	
 	func getInvalidPin(_ type: PinType) -> InvalidPin? {
 		
-		let key = type.keyInvalid
+		let key = type.keyInvalidPin
 		
 		var invalidPin: InvalidPin? = nil
 		do {

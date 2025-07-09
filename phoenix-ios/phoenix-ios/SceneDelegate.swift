@@ -94,7 +94,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	func sceneDidEnterBackground(_ scene: UIScene) {
 		log.trace("sceneDidEnterBackground()")
 		
-		let currentSecurity = Keychain.current.enabledSecurityPublisher.value
+		let currentSecurity = Keychain.current.enabledSecurity
 		if currentSecurity.hasAppLock() {
 			
 			LockState.shared.isUnlocked = false

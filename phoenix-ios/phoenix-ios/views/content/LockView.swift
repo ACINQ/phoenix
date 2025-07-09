@@ -11,7 +11,7 @@ struct LockView: View {
 	
 	@ObservedObject var lockState = LockState.shared
 	
-	@State var enabledSecurity: EnabledSecurity = Keychain.current.enabledSecurityPublisher.value
+	@State var enabledSecurity: EnabledSecurity = Keychain.current.enabledSecurity
 	@State var invalidPin: InvalidPin = InvalidPin.none() // updated in onAppear
 	
 	@State var isTouchID = true
@@ -376,7 +376,7 @@ struct LockView: View {
 		let biometricsSupport = DeviceInfo.biometricSupport()
 		refreshBiometricsSupport(biometricsSupport)
 		
-		enabledSecurity = Keychain.current.enabledSecurityPublisher.value
+		enabledSecurity = Keychain.current.enabledSecurity
 		invalidPin = Keychain.current.getInvalidLockPin() ?? InvalidPin.none()
 		currentDate = Date.now
 		

@@ -54,10 +54,14 @@ class SecurityFile {
 			let keychain: KeyInfo_ChaChaPoly
 			let hidden: Bool
 			let name: String
-			let photo: String?
+			let photo: String
 			
-			func renamedTo(_ newName: String) -> Wallet {
-				Wallet(keychain: self.keychain, hidden: self.hidden, name: newName, photo: self.photo)
+			func updated(
+				name updatedName: String,
+				photo updatedPhoto: String,
+				hidden updatedHidden: Bool
+			) -> Wallet {
+				Wallet(keychain: self.keychain, hidden: updatedHidden, name: updatedName, photo: updatedPhoto)
 			}
 		}
 		
@@ -73,8 +77,11 @@ class SecurityFile {
 			self.wallets = [id.keychainKeyId: wallet]
 		}
 		
+		func getWallet(_ id: WalletIdentifier) -> Wallet? {
+			return wallets[id.keychainKeyId]
+		}
+		
 		func copyWithWallet(_ wallet: Wallet, id: WalletIdentifier) -> V1 {
-			
 			var newWallets = self.wallets
 			newWallets[id.keychainKeyId] = wallet
 			

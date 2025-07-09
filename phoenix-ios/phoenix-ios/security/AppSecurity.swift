@@ -74,12 +74,13 @@ class AppSecurity {
 		}
 		
 		let name = UUID().uuidString.replacingOccurrences(of: "-", with: "").prefix(maxLength: 6)
+		let photo = WalletIcon.random().filename
 		
 		let newWallet = SecurityFile.V1.Wallet(
 			keychain: KeyInfo_ChaChaPoly(sealedBox: sealedBox),
 			hidden: false,
 			name: name,
-			photo: nil
+			photo: photo
 		)
 		
 		if let _ = securityFile.wallets[nodeId] {
@@ -173,11 +174,13 @@ class AppSecurity {
 		Keychain.loadWallet(walletId)
 		
 		let name = UUID().uuidString.replacingOccurrences(of: "-", with: "").prefix(maxLength: 6)
+		let photo = WalletIcon.random().filename
+		
 		let newWallet = SecurityFile.V1.Wallet(
 			keychain: keyInfo,
 			hidden: false,
 			name: name,
-			photo: nil
+			photo: photo
 		)
 		
 		let newSecurityFile = SecurityFile.V1(wallet: newWallet, id: walletId)

@@ -903,6 +903,9 @@
         }
       }
     },
+    "(The only way to access a hidden wallet is by typing in the Lock PIN)" : {
+
+    },
     "(This is your address - derived from your seed. You alone possess your seed.)" : {
       "localizations" : {
         "ar" : {
@@ -3988,6 +3991,9 @@
           }
         }
       }
+    },
+    "A hidden wallet requires a **Lock PIN** to be set." : {
+
     },
     "A less efficient and less private format that does not rotate addresses. However, it is compatible with almost every service and wallet." : {
       "localizations" : {
@@ -10788,6 +10794,9 @@
         }
       }
     },
+    "Configure Lock PIN" : {
+
+    },
     "Confirm" : {
       "localizations" : {
         "ar" : {
@@ -12691,6 +12700,9 @@
           }
         }
       }
+    },
+    "Current wallet" : {
+
     },
     "Custom electrum server: bad certificate !" : {
       "localizations" : {
@@ -19534,6 +19546,12 @@
         }
       }
     },
+    "Hidden wallet" : {
+
+    },
+    "Hidden wallet requirements" : {
+
+    },
     "High Priority" : {
       "localizations" : {
         "ar" : {
@@ -25155,6 +25173,9 @@
           }
         }
       }
+    },
+    "Manage or switch wallets" : {
+
     },
     "Manual Backup" : {
       "comment" : "Navigation bar title",
@@ -34238,6 +34259,9 @@
         }
       }
     },
+    "Select built-in icon" : {
+
+    },
     "Select image" : {
       "localizations" : {
         "ar" : {
@@ -34317,6 +34341,9 @@
           }
         }
       }
+    },
+    "Select photo" : {
+
     },
     "Send" : {
       "localizations" : {
@@ -45339,6 +45366,9 @@
         }
       }
     },
+    "Wallet Image" : {
+
+    },
     "Wallet info" : {
       "comment" : "Navigation Bar Title",
       "localizations" : {
@@ -45420,6 +45450,9 @@
           }
         }
       }
+    },
+    "Wallet will not be visible in selector screens. To access the wallet you must enter it's lock PIN." : {
+
     },
     "wallet: %@" : {
       "localizations" : {

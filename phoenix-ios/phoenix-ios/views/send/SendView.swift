@@ -539,7 +539,7 @@ struct SendView: View {
 			selectContact(item)
 		} label: {
 			HStack(alignment: VerticalAlignment.center, spacing: 8) {
-				ContactPhoto(fileName: item.photoUri, size: 32)
+				ContactPhoto(filename: item.photoUri, size: 32)
 				Text(item.name)
 					.font(.title3)
 					.foregroundColor(.primary)
@@ -558,7 +558,7 @@ struct SendView: View {
 				unselectContact()
 			} label: {
 				HStack(alignment: VerticalAlignment.center, spacing: 8) {
-					ContactPhoto(fileName: item.photoUri, size: 32)
+					ContactPhoto(filename: item.photoUri, size: 32)
 					Text(item.name)
 						.font(.title3)
 						.foregroundColor(.primary)

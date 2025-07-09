@@ -60,7 +60,7 @@ struct AppAccessView : View {
 	// --------------------------------------------------
 	
 	init() {
-		let enabledSecurity: EnabledSecurity = Keychain.current.enabledSecurityPublisher.value
+		let enabledSecurity: EnabledSecurity = Keychain.current.enabledSecurity
 		
 		_biometricsEnabled = State(initialValue: enabledSecurity.contains(.biometrics))
 		_passcodeFallbackEnabled = State(initialValue: enabledSecurity.contains(.passcodeFallback))
@@ -444,7 +444,7 @@ struct AppAccessView : View {
 	func onAppear() -> Void {
 		log.trace("onAppear()")
 		
-		log.debug("enabledSecurity = \(Keychain.current.enabledSecurityPublisher.value)")
+		log.debug("enabledSecurity = \(Keychain.current.enabledSecurity)")
 	}
 	
 	func onWillEnterForeground() -> Void {

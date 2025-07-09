@@ -812,6 +812,7 @@ struct HomeView : MVIView {
 			case .forceCloseChannels : break
 			case .swapInWallet       : break
 			case .finalWallet        : break
+			case .appAccess          : break
 			}
 		}
 	}
