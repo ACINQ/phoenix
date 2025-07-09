@@ -214,10 +214,7 @@ private val shapes = Shapes(
 )
 
 @Composable
-fun PhoenixAndroidTheme(
-    navController: NavController,
-    content: @Composable () -> Unit
-) {
+fun PhoenixAndroidTheme(content: @Composable () -> Unit) {
     val userTheme by userPrefs.getUserTheme.collectAsState(initial = UserTheme.SYSTEM)
     val systemUiController = rememberSystemUiController()
 

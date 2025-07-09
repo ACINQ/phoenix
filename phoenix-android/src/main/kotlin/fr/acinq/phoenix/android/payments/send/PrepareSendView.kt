@@ -71,7 +71,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.Screen
+import fr.acinq.phoenix.android.navigation.Screen
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Clickable
@@ -94,7 +94,7 @@ import fr.acinq.phoenix.android.payments.send.lnurl.LnurlPayView
 import fr.acinq.phoenix.android.payments.send.lnurl.LnurlWithdrawView
 import fr.acinq.phoenix.android.payments.send.offer.SendToOfferView
 import fr.acinq.phoenix.android.payments.send.spliceout.SendSpliceOutView
-import fr.acinq.phoenix.android.popToHome
+import fr.acinq.phoenix.android.navigation.popToHome
 import fr.acinq.phoenix.android.utils.extensions.findActivitySafe
 import fr.acinq.phoenix.android.utils.extensions.toLocalisedMessage
 import fr.acinq.phoenix.android.utils.gray300

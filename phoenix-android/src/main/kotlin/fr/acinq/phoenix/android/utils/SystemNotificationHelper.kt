@@ -257,7 +257,6 @@ object SystemNotificationHelper {
         id: UUID,
         amount: MilliSatoshi,
         rates: List<ExchangeRate>,
-        isHeadless: Boolean,
     ): Notification {
         val isFiat = userPrefs.getIsAmountInFiat.first() && rates.isNotEmpty()
         val unit = if (isFiat) {
@@ -293,7 +292,7 @@ object SystemNotificationHelper {
             setAutoCancel(true)
         }.build().also {
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-                NotificationManagerCompat.from(context).notify(if (isHeadless) HEADLESS_NOTIF_ID else Random().nextInt(), it)
+                NotificationManagerCompat.from(context).notify(HEADLESS_NOTIF_ID, it)
             }
         }
     }

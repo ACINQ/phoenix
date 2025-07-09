@@ -74,7 +74,7 @@ fun RestoreWalletView(
 
                     SeedFileState.Unknown -> {
                         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center, modifier = Modifier.fillMaxSize()) {
-                            Text(stringResource(id = R.string.startup_wait))
+                            Text(stringResource(id = R.string.startup_preparing))
                         }
                     }
 

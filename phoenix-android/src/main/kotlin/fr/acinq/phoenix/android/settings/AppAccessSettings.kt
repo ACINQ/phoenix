@@ -53,7 +53,7 @@ import kotlin.time.Duration.Companion.minutes
 @Composable
 fun AppAccessSettings(
     onBackClick: () -> Unit,
-    appViewModel: AppViewModel,
+    onScheduleAutoLock: () -> Unit,
 ) {
     val context = LocalContext.current
     val biometricAuthStatus = BiometricsHelper.authStatus(context)
@@ -88,7 +88,7 @@ fun AppAccessSettings(
                     AutoScreenLockDelayPicker(it, onUpdateDelay = { newDelay ->
                         scope.launch {
                             userPrefs.saveAutoLockDelay(newDelay)
-                            appViewModel.scheduleAutoLock()
+                            onScheduleAutoLock()
                         }
                     })
                 }

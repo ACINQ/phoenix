@@ -52,22 +52,22 @@
     <!-- Startup -->
 
     <string name="startup_binding_service">Liaison au service…</string>
-    <string name="startup_wait">Préparation du portefeuille…</string>
+    <string name="startup_preparing">Préparation du portefeuille…</string>
     <string name="startup_checking_seed">Déverrouillage…</string>
     <string name="startup_unlocked">Accès accordé…</string>
     <string name="startup_unlock_failure">Échec du déverrouillage</string>
     <string name="startup_unlock_failure_fallback">Déverrouiller avec la seed</string>
 
-    <string name="startup_fallback_instructions">Saisissez vos 12 mots de récupération pour déverrouiller le wallet.\n\nLes mots doivent être saisis dans le bon ordre et séparés par un seul espace.</string>
-    <string name="startup_fallback_input_label">Saisir le mot #%1$d</string>
-    <string name="startup_fallback_input_label_error">Pas plus de 12 mots !</string>
-    <string name="startup_fallback_incomplete">Saisissez la seed entière pour continuer.</string>
-    <string name="startup_fallback_invalid">Cette seed n\'est pas valide. Assurez-vous que les mots sont corrects et dans l\'ordre.</string>
-    <string name="startup_fallback_checking">Vérification de la seed…</string>
-    <string name="startup_fallback_error_default">Une erreur est survenue. Merci de réessayer.</string>
-    <string name="startup_fallback_error_incorrect_seed">Cette seed ne correspond pas à votre wallet.</string>
-    <string name="startup_fallback_success_match">La seed correspond.\nÉcriture sur le disque…</string>
-    <string name="startup_fallback_success_starting">Démarrage de Phoenix…</string>
+    <string name="startup_recovery_instructions">Saisissez vos 12 mots de récupération pour déverrouiller le wallet.\n\nLes mots doivent être saisis dans le bon ordre et séparés par un seul espace.</string>
+    <string name="startup_recovery_input_label">Saisir le mot #%1$d</string>
+    <string name="startup_recovery_input_label_error">Pas plus de 12 mots !</string>
+    <string name="startup_recovery_incomplete">Saisissez la seed entière pour continuer.</string>
+    <string name="startup_recovery_invalid">Cette seed n\'est pas valide. Assurez-vous que les mots sont corrects et dans l\'ordre.</string>
+    <string name="startup_recovery_checking">Vérification de la seed…</string>
+    <string name="startup_recovery_error_default">Une erreur est survenue. Merci de réessayer.</string>
+    <string name="startup_recovery_error_incorrect_seed">Cette seed ne correspond pas à votre wallet.</string>
+    <string name="startup_recovery_success_match">La seed correspond.\nÉcriture sur le disque…</string>
+    <string name="startup_recovery_success_starting">Démarrage de Phoenix…</string>
 
     <string name="startup_starting">Démarrage…</string>
     <string name="startup_error_generic">L\'application n\'a pas pu démarrer.</string>

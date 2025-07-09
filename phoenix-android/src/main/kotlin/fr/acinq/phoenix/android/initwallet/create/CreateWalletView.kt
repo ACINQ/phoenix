@@ -101,7 +101,7 @@ fun CreateWalletView(
                 }
             }
             SeedFileState.Unknown -> {
-                Text(stringResource(id = R.string.startup_wait))
+                Text(stringResource(id = R.string.startup_preparing))
             }
             else -> {
                 // we should not be here

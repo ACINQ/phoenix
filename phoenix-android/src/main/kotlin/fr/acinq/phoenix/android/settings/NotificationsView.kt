@@ -49,6 +49,7 @@ import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.home.TorDisconnectedDialog
+import fr.acinq.phoenix.android.navigation.Screen
 import fr.acinq.phoenix.android.services.ChannelsWatcher
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.converters.DateFormatter.toAbsoluteDateTimeString

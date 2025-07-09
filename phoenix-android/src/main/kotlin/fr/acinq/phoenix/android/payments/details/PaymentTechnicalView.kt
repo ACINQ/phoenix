@@ -66,7 +66,7 @@ import fr.acinq.lightning.utils.msat
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.Screen
+import fr.acinq.phoenix.android.navigation.Screen
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountView
 import fr.acinq.phoenix.android.components.Clickable

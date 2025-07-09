@@ -70,9 +70,9 @@ abstract class InitViewModel : ViewModel() {
         }) {
             log.debug("writing mnemonics to disk...")
             writingState = WritingSeedState.Writing(mnemonics)
-            val existing = SeedManager.loadSeedFromDisk(context)
+            val existing = SeedManager.loadEncryptedSeedFromDisk(context)
             if (existing == null) {
-                val encrypted = EncryptedSeed.V2.NoAuth.encrypt(EncryptedSeed.fromMnemonics(mnemonics))
+                val encrypted = EncryptedSeed.V2.SingleSeed.encrypt(EncryptedSeed.fromMnemonics(mnemonics))
                 SeedManager.writeSeedToDisk(context, encrypted)
                 writingState = WritingSeedState.WrittenToDisk(encrypted)
                 if (isNewWallet) {

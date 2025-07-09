@@ -53,24 +53,24 @@
     <!-- Startup -->
 
     <string name="startup_binding_service">Pripájanie služby…</string>
-    <string name="startup_wait">Pripravovanie peňaženky…</string>
+    <string name="startup_preparing">Pripravovanie peňaženky…</string>
     <string name="startup_checking_seed">Odomykanie…</string>
     <string name="startup_unlocked">Prístup povolený…</string>
     <string name="startup_unlock_failure">Odomknutie zlyhalo</string>
     <string name="startup_unlock_failure_keystore">Chyba Android keystore</string>
     <string name="startup_unlock_failure_fallback">Odomknutie pomocou seedu</string>
 
-    <string name="startup_fallback_instructions">Zadajte svojich 12 slov obnovovacej frázy na odomknutie peňaženky.\n\nSlová musia byť zadané v správnom poradí a oddelené jednou medzerou.</string>
-    <string name="startup_fallback_input_label">Zadajte slovo #%1$d</string>
-    <string name="startup_fallback_input_label_error">Nie viac ako 12 slov!</string>
-    <string name="startup_fallback_incomplete">Pre pokračovanie zadajte kompletný seed.</string>
-    <string name="startup_fallback_invalid">Tento seed nie je platný. Uistite sa, že slová sú správne a v správnom poradí.</string>
-    <string name="startup_fallback_unlock_button">Odomknúť peňaženku</string>
-    <string name="startup_fallback_checking">Kontrola seedu…</string>
-    <string name="startup_fallback_error_default">Vyskytla sa chyba. Skúste to prosím znova.</string>
-    <string name="startup_fallback_error_incorrect_seed">Tento seed nezodpovedá vašej peňaženke.</string>
-    <string name="startup_fallback_success_match">Seed sa zhoduje.\nZapisuje sa na disk…</string>
-    <string name="startup_fallback_success_starting">Spúšťa sa Phoenix…</string>
+    <string name="startup_recovery_instructions">Zadajte svojich 12 slov obnovovacej frázy na odomknutie peňaženky.\n\nSlová musia byť zadané v správnom poradí a oddelené jednou medzerou.</string>
+    <string name="startup_recovery_input_label">Zadajte slovo #%1$d</string>
+    <string name="startup_recovery_input_label_error">Nie viac ako 12 slov!</string>
+    <string name="startup_recovery_incomplete">Pre pokračovanie zadajte kompletný seed.</string>
+    <string name="startup_recovery_invalid">Tento seed nie je platný. Uistite sa, že slová sú správne a v správnom poradí.</string>
+    <string name="startup_recovery_unlock_button">Odomknúť peňaženku</string>
+    <string name="startup_recovery_checking">Kontrola seedu…</string>
+    <string name="startup_recovery_error_default">Vyskytla sa chyba. Skúste to prosím znova.</string>
+    <string name="startup_recovery_error_incorrect_seed">Tento seed nezodpovedá vašej peňaženke.</string>
+    <string name="startup_recovery_success_match">Seed sa zhoduje.\nZapisuje sa na disk…</string>
+    <string name="startup_recovery_success_starting">Spúšťa sa Phoenix…</string>
 
     <string name="startup_starting">Spúšťanie…</string>
     <string name="startup_error_generic">Aplikáciu nebolo možné spustiť.</string>

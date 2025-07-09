@@ -27,18 +27,14 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import fr.acinq.lightning.channel.states.Closing
 import fr.acinq.lightning.utils.currentTimestampMillis
-import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.BuildConfig
+import fr.acinq.phoenix.android.BusinessRepo
 import fr.acinq.phoenix.android.PhoenixApplication
-import fr.acinq.phoenix.android.security.EncryptedSeed
+import fr.acinq.phoenix.android.StartBusinessResult
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
-import fr.acinq.phoenix.data.StartupParams
 import fr.acinq.phoenix.data.WatchTowerOutcome
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
-import fr.acinq.phoenix.managers.NotificationsManager
-import fr.acinq.phoenix.utils.MnemonicLanguage
-import fr.acinq.phoenix.utils.PlatformContext
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withTimeout
@@ -51,98 +47,117 @@ import java.util.concurrent.TimeUnit
 class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
-        log.info("starting channels-watcher job")
-        var notificationsManager: NotificationsManager? = null
+        log.info("starting $name")
 
         val application = applicationContext as PhoenixApplication
         val internalData = application.internalDataRepository
-        val userPrefs = application.userPrefs
 
-        val business = PhoenixBusiness(PlatformContext(applicationContext))
+        // TODO: save outcome result by node id
+
+        if (BusinessRepo.businessFlow.first().isNotEmpty()) {
+            log.info("there already are active businesses, aborting $name")
+            internalData.saveChannelsWatcherOutcome(Outcome.Nominal(currentTimestampMillis()))
+            return Result.success()
+        }
+
+        val seedMap = SeedManager.loadAndDecryptAll(applicationContext)
+        if (seedMap.isNullOrEmpty()) {
+            log.info("could not load any seed, aborting $name")
+            internalData.saveChannelsWatcherOutcome(Outcome.Unknown(currentTimestampMillis()))
+            return Result.success()
+        }
+
         try {
-            notificationsManager = business.notificationsManager
-            when (val encryptedSeed = SeedManager.loadSeedFromDisk(applicationContext)) {
-                is EncryptedSeed.V2.NoAuth -> {
-                    val seed = business.walletManager.mnemonicsToSeed(EncryptedSeed.toMnemonics(encryptedSeed.decrypt()), wordList = MnemonicLanguage.English.wordlist())
-                    business.walletManager.loadWallet(seed)
-
-                    val isTorEnabled = userPrefs.getIsTorEnabled.first()
-                    val liquidityPolicy = userPrefs.getLiquidityPolicy.first()
-                    val electrumServer = userPrefs.getElectrumServer.first()
-
-                    business.appConfigurationManager.updateElectrumConfig(electrumServer)
-                    business.start(StartupParams(isTorEnabled = isTorEnabled, liquidityPolicy = liquidityPolicy))
-                }
-                else -> {
+            val businessMap = seedMap.map { (nodeId, words) ->
+                val res = BusinessRepo.startNewBusiness(words = words, isHeadless = true)
+                if (res is StartBusinessResult.Failure) {
+                    log.info("failed to start business for node_id=$nodeId")
                     internalData.saveChannelsWatcherOutcome(Outcome.Unknown(currentTimestampMillis()))
                     return Result.success()
                 }
-            }
 
-            business.appConnectionsDaemon!!.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.Peer)
-            business.appConnectionsDaemon!!.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.Http)
-            val peer = withTimeout(5_000) {
-                business.peerManager.getPeer()
-            }
-
-            val channelsAtBoot = peer.bootChannelsFlow.filterNotNull().first()
-            if (channelsAtBoot.isEmpty()) {
-                log.info("no channels found, nothing to watch")
-                internalData.saveChannelsWatcherOutcome(Outcome.Nominal(currentTimestampMillis()))
-                return Result.success()
-            } else {
-                log.info("watching ${channelsAtBoot.size} channel(s)")
-            }
-
-            // connect electrum (and only electrum), and wait for the watcher to catch-up
-            withTimeout(ELECTRUM_TIMEOUT_MILLIS) {
-                business.electrumWatcher.openUpToDateFlow().first()
-            }
-            log.info("electrum watcher is up-to-date")
-            business.appConnectionsDaemon?.decrementDisconnectCount(AppConnectionsDaemon.ControlTarget.Electrum)
-
-            val revokedCommitsBeforeWatching = channelsAtBoot.map { (channelId, state) ->
-                (state as? Closing)?.revokedCommitPublished?.let { channelId to it }
-            }.filterNotNull().toMap()
-
-            log.info("there were initially ${revokedCommitsBeforeWatching.size} channel(s) with revoked commitments")
-            log.info("checking for new revoked commitments on ${peer.channels.size} channel(s)")
-            val unknownRevokedAfterWatching = peer.channels.filter { (channelId, state) ->
-                state is Closing && state.revokedCommitPublished.any {
-                    val isKnown = revokedCommitsBeforeWatching[channelId]?.contains(it) ?: false
-                    if (!isKnown) {
-                        log.warn("found unknown revoked commit for channel=${channelId.toHex()}, tx=${it.commitTx}")
-                    }
-                    !isKnown
+                val business = BusinessRepo.businessFlow.value[nodeId]
+                if (business == null) {
+                    log.info("failed to access business for node_id=$nodeId")
+                    internalData.saveChannelsWatcherOutcome(Outcome.Unknown(currentTimestampMillis()))
+                    return Result.success()
                 }
-            }.keys
 
-            if (unknownRevokedAfterWatching.isNotEmpty()) {
-                log.warn("new revoked commits found, notifying user")
-                notificationsManager.saveWatchTowerOutcome(WatchTowerOutcome.RevokedFound(channels = unknownRevokedAfterWatching))
-                internalData.saveChannelsWatcherOutcome(Outcome.RevokedFound(currentTimestampMillis()))
-                SystemNotificationHelper.notifyRevokedCommits(applicationContext)
-            } else {
-                log.info("no revoked commit found, channels-watcher job completed successfully")
-                notificationsManager.saveWatchTowerOutcome(WatchTowerOutcome.Nominal(channelsWatchedCount = peer.channels.size))
-                internalData.saveChannelsWatcherOutcome(Outcome.Nominal(currentTimestampMillis()))
+                nodeId to business
+            }.toMap()
+
+            businessMap.forEach { (_, business) ->
+                val notificationsManager = business.notificationsManager
+
+                business.appConnectionsDaemon!!.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.Peer)
+                business.appConnectionsDaemon!!.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.Http)
+
+                val peer = withTimeout(5_000) {
+                    business.peerManager.getPeer()
+                }
+
+                val channelsAtBoot = peer.bootChannelsFlow.filterNotNull().first()
+                if (channelsAtBoot.isEmpty()) {
+                    log.info("no channels found, nothing to watch")
+                    internalData.saveChannelsWatcherOutcome(Outcome.Nominal(currentTimestampMillis()))
+                    return Result.success()
+                } else {
+                    log.info("watching ${channelsAtBoot.size} channel(s)")
+                }
+
+                // connect electrum (and only electrum), and wait for the watcher to catch-up
+                withTimeout(ELECTRUM_TIMEOUT_MILLIS) {
+                    business.electrumWatcher.openUpToDateFlow().first()
+                }
+                log.info("electrum watcher is up-to-date")
+                business.appConnectionsDaemon?.decrementDisconnectCount(AppConnectionsDaemon.ControlTarget.Electrum)
+
+                val revokedCommitsBeforeWatching = channelsAtBoot.map { (channelId, state) ->
+                    (state as? Closing)?.revokedCommitPublished?.let { channelId to it }
+                }.filterNotNull().toMap()
+
+                log.info("there were initially ${revokedCommitsBeforeWatching.size} channel(s) with revoked commitments")
+                log.info("checking for new revoked commitments on ${peer.channels.size} channel(s)")
+                val unknownRevokedAfterWatching = peer.channels.filter { (channelId, state) ->
+                    state is Closing && state.revokedCommitPublished.any {
+                        val isKnown = revokedCommitsBeforeWatching[channelId]?.contains(it) ?: false
+                        if (!isKnown) {
+                            log.warn("found unknown revoked commit for channel=${channelId.toHex()}, tx=${it.commitTx}")
+                        }
+                        !isKnown
+                    }
+                }.keys
+
+                if (unknownRevokedAfterWatching.isNotEmpty()) {
+                    log.warn("new revoked commits found, notifying user")
+                    notificationsManager.saveWatchTowerOutcome(WatchTowerOutcome.RevokedFound(channels = unknownRevokedAfterWatching))
+                    internalData.saveChannelsWatcherOutcome(Outcome.RevokedFound(currentTimestampMillis()))
+                    SystemNotificationHelper.notifyRevokedCommits(applicationContext)
+                } else {
+                    log.info("no revoked commit found, channels-watcher job completed successfully")
+                    notificationsManager.saveWatchTowerOutcome(WatchTowerOutcome.Nominal(channelsWatchedCount = peer.channels.size))
+                    internalData.saveChannelsWatcherOutcome(Outcome.Nominal(currentTimestampMillis()))
+                }
             }
 
             return Result.success()
+
         } catch (e: Exception) {
             log.error("failed to run channels-watcher job: ", e)
-            notificationsManager?.saveWatchTowerOutcome(WatchTowerOutcome.Unknown())
+//            notificationsManager?.saveWatchTowerOutcome(WatchTowerOutcome.Unknown())
             internalData.saveChannelsWatcherOutcome(Outcome.Unknown(currentTimestampMillis()))
             return Result.failure()
         } finally {
-            business.appConnectionsDaemon?.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.All)
-            business.stop()
-            log.info("stopped channels-watcher business")
+            if (BusinessRepo.isHeadless.first()) {
+                BusinessRepo.stopAllBusinesses()
+            }
+            log.info("finished $name")
         }
     }
 
     companion object {
         private val log = LoggerFactory.getLogger(ChannelsWatcher::class.java)
+        private val name = "channels-watcher-job"
         const val TAG = BuildConfig.APPLICATION_ID + ".ChannelsWatcher"
         private const val ELECTRUM_TIMEOUT_MILLIS = 5 * 60_000L
 
@@ -169,8 +184,10 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
 
         @Serializable
         data class Unknown(override val timestamp: Long) : Outcome()
+
         @Serializable
         data class Nominal(override val timestamp: Long) : Outcome()
+
         @Serializable
         data class RevokedFound(override val timestamp: Long) : Outcome()
     }

@@ -74,7 +74,7 @@ import fr.acinq.phoenix.android.components.settings.Setting
 import fr.acinq.phoenix.android.components.settings.SettingWithCopy
 import fr.acinq.phoenix.android.components.InlineTransactionLink
 import fr.acinq.phoenix.android.navController
-import fr.acinq.phoenix.android.navigateToPaymentDetails
+import fr.acinq.phoenix.android.navigation.navigateToPaymentDetails
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.converters.MSatDisplayPolicy
 import fr.acinq.phoenix.android.utils.copyToClipboard

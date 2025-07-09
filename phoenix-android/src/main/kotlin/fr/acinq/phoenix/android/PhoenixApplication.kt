@@ -18,56 +18,43 @@ package fr.acinq.phoenix.android
 
 import android.app.Application
 import android.content.Context
-import android.content.Intent
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.utils.Logging
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
+import fr.acinq.phoenix.android.utils.datastore.GlobalPrefsRepository
 import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
 import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
-import fr.acinq.phoenix.managers.AppConnectionsDaemon
-import fr.acinq.phoenix.utils.PlatformContext
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import org.slf4j.LoggerFactory
 
 /** This datastore persists user's preferences (theme, currencies, ...). */
 val Context.userPrefs: DataStore<Preferences> by preferencesDataStore(name = "userprefs")
+
 /** This datastore persists miscellaneous internal data representing various states of the app. */
 val Context.internalData: DataStore<Preferences> by preferencesDataStore(name = "internaldata")
+
+/** This datastore persists preferences across node ids. */
+val Context.globalPrefs: DataStore<Preferences> by preferencesDataStore(name = "globalprefs")
 
 class PhoenixApplication : Application() {
 
     private val log = LoggerFactory.getLogger(this::class.java)
-    private val _business = MutableStateFlow<PhoenixBusiness?>(null)
-    val business = _business.asStateFlow()
 
     lateinit var internalDataRepository: InternalDataRepository
     lateinit var userPrefs: UserPrefsRepository
+    lateinit var globalPrefs: GlobalPrefsRepository
 
     override fun onCreate() {
         super.onCreate()
-        _business.value = PhoenixBusiness(PlatformContext(applicationContext))
+        BusinessRepo.initialize(applicationContext)
         Logging.setupLogger(applicationContext)
+        log.info("creating app")
         SystemNotificationHelper.registerNotificationChannels(applicationContext)
+
         internalDataRepository = InternalDataRepository(applicationContext.internalData)
         userPrefs = UserPrefsRepository(applicationContext.userPrefs)
+        globalPrefs = GlobalPrefsRepository(applicationContext.globalPrefs)
     }
 
-    fun shutdownBusiness() {
-        log.debug("shutting down business={}", business.value)
-        business.value?.appConnectionsDaemon?.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.All)
-        business.value?.stop()
-    }
-    fun resetBusiness() {
-        _business.value = PhoenixBusiness(PlatformContext(this))
-        log.debug("business has been reset to {}", business)
-    }
-
-    suspend fun clearPreferences() {
-        internalDataRepository.clear()
-        userPrefs.clear()
-    }
 }

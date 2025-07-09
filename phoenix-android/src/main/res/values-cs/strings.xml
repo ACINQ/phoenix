@@ -67,7 +67,7 @@
     <!-- Startup -->
 
     <string name="startup_binding_service">Připojování služby…</string>
-    <string name="startup_wait">Připravování peněženky…</string>
+    <string name="startup_preparing">Připravování peněženky…</string>
     <string name="startup_checking_seed">Odemykání…</string>
     <string name="startup_unlocked">Přístup udělen…</string>
     <string name="startup_unlock_failure">Odemykání selhalo</string>

@@ -25,48 +25,74 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import fr.acinq.phoenix.android.BuildConfig
-import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.BusinessRepo
+import fr.acinq.phoenix.android.StartBusinessResult
 import fr.acinq.phoenix.android.components.contact.ContactsPhotoHelper
-import kotlinx.coroutines.delay
+import fr.acinq.phoenix.android.security.SeedManager
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.util.concurrent.TimeUnit
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 
 /** Clean up unused photo files for contacts. */
 class ContactsPhotoCleaner(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
     override suspend fun doWork(): Result {
-        log.info("starting $NAME")
+        log.info("starting $name")
         try {
-            delay(5.minutes)
-            val application = (applicationContext as PhoenixApplication)
-            val business = application.business.value
 
-            val contacts = business?.databaseManager?.contactsList?.filterNotNull()?.first() ?: emptyList()
+            // get the active business map, or create it no business is active
+            val businessMap = BusinessRepo.businessFlow.value.takeIf { it.isNotEmpty() }
+                ?: run {
+                    val seedMap = SeedManager.loadAndDecryptAll(applicationContext)
+                    if (seedMap.isNullOrEmpty()) {
+                        log.info("no seeds available, terminating $name")
+                        return Result.success()
+                    }
+
+                    seedMap.map { (nodeId, words) ->
+                        val res = BusinessRepo.startNewBusiness(words = words, isHeadless = true)
+                        if (res is StartBusinessResult.Failure) {
+                            log.info("failed to start business for node_id=$nodeId")
+                            return Result.failure()
+                        }
+
+                        val business = BusinessRepo.businessFlow.value[nodeId]
+                        if (business == null) {
+                            log.info("failed to access business for node_id=$nodeId")
+                            return Result.success()
+                        }
+
+                        nodeId to business
+                    }.toMap()
+                }
+
             val contactsPhotoDir = ContactsPhotoHelper.contactsDir(applicationContext)
-            val contactsPhotoNames = contactsPhotoDir.listFiles()?.map { it.name }?.toSet() ?: emptySet()
-            val toDelete = contactsPhotoNames.subtract(contacts.map { it.photoUri }.toSet()).filterNotNull()
+            val toDelete = businessMap.map { (_, business) ->
+                val contacts = business.databaseManager.contactsList.filterNotNull().first()
+                val contactsPhotoNames = contactsPhotoDir.listFiles()?.map { it.name }?.toSet() ?: emptySet()
+                contactsPhotoNames.subtract(contacts.map { it.photoUri }.toSet()).filterNotNull()
+            }.flatten()
+
             log.debug("info ${toDelete.size} unused photo file(s)")
             toDelete.forEach { imageName ->
                 File(contactsPhotoDir, imageName).takeIf { it.exists() && it.isFile && it.canWrite() }?.delete()
             }
+
             return Result.success()
         } catch (e: Exception) {
-            log.error("error in $NAME: ", e)
+            log.error("error in $name: ", e)
             return Result.failure()
         } finally {
-            log.debug("terminated $NAME")
+            log.debug("finished $name")
         }
     }
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java)
-        private const val NAME = "contacts-photo-cleaner"
+        private const val name = "contacts-photo-cleaner"
         private const val TAG = BuildConfig.APPLICATION_ID + ".ContactPhotoCleaner"
 
         /** Schedule [ContactsPhotoCleaner] to run roughly every 2 weeks. */
@@ -76,7 +102,7 @@ class ContactsPhotoCleaner(context: Context, workerParams: WorkerParameters) : C
         }
 
         fun scheduleASAP(context: Context) {
-            log.info("scheduling $NAME once")
+            log.info("scheduling $name once")
             val work = OneTimeWorkRequest.Builder(ContactsPhotoCleaner::class.java).addTag(TAG).build()
             WorkManager.getInstance(context).enqueueUniqueWork(TAG, ExistingWorkPolicy.REPLACE, work)
         }

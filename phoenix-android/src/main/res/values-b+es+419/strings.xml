@@ -52,24 +52,24 @@
     <!-- Startup -->
 
     <string name="startup_binding_service">Vinculando el servicio…</string>
-    <string name="startup_wait">Preparando la billetera…</string>
+    <string name="startup_preparing">Preparando la billetera…</string>
     <string name="startup_checking_seed">Desbloqueando…</string>
     <string name="startup_unlocked">Acceso concedido…</string>
     <string name="startup_unlock_failure">Error al desbloquear</string>
     <string name="startup_unlock_failure_keystore">Error de Android Keystore</string>
     <string name="startup_unlock_failure_fallback">Desbloquear con semilla</string>
 
-    <string name="startup_fallback_instructions">Ingresa tus 12 palabras de recuperación para desbloquear la billetera.\n\nLas palabras deben ingresarse en el orden correcto y estar separadas por un solo espacio.</string>
-    <string name="startup_fallback_input_label">Escribe la palabra #%1$d</string>
-    <string name="startup_fallback_input_label_error">¡No ingreses más de 12 palabras!</string>
-    <string name="startup_fallback_incomplete">Ingresa la semilla completa para continuar.</string>
-    <string name="startup_fallback_invalid">Esta semilla no es válida. Comprueba que las palabras estén correctas y en orden.</string>
-    <string name="startup_fallback_unlock_button">Desbloquear billetera</string>
-    <string name="startup_fallback_checking">Comprobando la semilla…</string>
-    <string name="startup_fallback_error_default">Se produjo un error. Intenta de nuevo.</string>
-    <string name="startup_fallback_error_incorrect_seed">Esta semilla no coincide con la billetera.</string>
-    <string name="startup_fallback_success_match">La semilla coincide.\nEscribiendo en el disco…</string>
-    <string name="startup_fallback_success_starting">Iniciando Phoenix…</string>
+    <string name="startup_recovery_instructions">Ingresa tus 12 palabras de recuperación para desbloquear la billetera.\n\nLas palabras deben ingresarse en el orden correcto y estar separadas por un solo espacio.</string>
+    <string name="startup_recovery_input_label">Escribe la palabra #%1$d</string>
+    <string name="startup_recovery_input_label_error">¡No ingreses más de 12 palabras!</string>
+    <string name="startup_recovery_incomplete">Ingresa la semilla completa para continuar.</string>
+    <string name="startup_recovery_invalid">Esta semilla no es válida. Comprueba que las palabras estén correctas y en orden.</string>
+    <string name="startup_recovery_unlock_button">Desbloquear billetera</string>
+    <string name="startup_recovery_checking">Comprobando la semilla…</string>
+    <string name="startup_recovery_error_default">Se produjo un error. Intenta de nuevo.</string>
+    <string name="startup_recovery_error_incorrect_seed">Esta semilla no coincide con la billetera.</string>
+    <string name="startup_recovery_success_match">La semilla coincide.\nEscribiendo en el disco…</string>
+    <string name="startup_recovery_success_starting">Iniciando Phoenix…</string>
 
     <string name="startup_starting">Iniciando…</string>
     <string name="startup_error_generic">No se pudo iniciar la aplicación.</string>

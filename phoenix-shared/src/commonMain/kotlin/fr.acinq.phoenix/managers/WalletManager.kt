@@ -61,8 +61,6 @@ class WalletManager(
     }
 
     /**
-     * TODO: Remove this object and and use keyManager methods directly.
-     *
      * Utility wrapper for keys needed by the iOS app.
      * - nodeIdHash:
      *   We need to store data in the local filesystem that's associated with the

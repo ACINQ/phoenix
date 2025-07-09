@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 ACINQ SAS
+ * Copyright 2025 ACINQ SAS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android
-
-import androidx.navigation.NavController
+package fr.acinq.phoenix.android.navigation
 
 sealed class Screen(val route: String) {
     data object Intro : Screen("intro")
@@ -42,9 +40,9 @@ sealed class Screen(val route: String) {
     data object SpendChannelAddress : Screen("settings/spendchanneladdress")
     data object MutualClose : Screen("settings/mutualclose")
     data object ForceClose : Screen("settings/forceclose")
-    data object Preferences : Screen("settings/preferences")
+    data object DisplayPrefs : Screen("settings/displayPrefs")
     data object About : Screen("settings/about")
-    data object AppLock : Screen("settings/applock")
+    data object AppAccess : Screen("settings/appaccess")
     data object PaymentSettings : Screen("settings/paymentsettings")
     data object Logs : Screen("settings/logs")
     data object WalletInfo : Screen("settings/walletinfo") {
@@ -62,12 +60,4 @@ sealed class Screen(val route: String) {
     data object Contacts: Screen("settings/contacts")
     data object ResetWallet: Screen("settings/resetwallet")
     data object Experimental: Screen("settings/experimental")
-}
-
-/** Navigates to Home and pops everything from the backstack up to Home. This effectively resets the nav stack. */
-fun NavController.popToHome() {
-    val navController = this
-    navigate(Screen.Home.route) {
-        popUpTo(navController.graph.id) { inclusive = true }
-    }
 }

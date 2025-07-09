@@ -51,7 +51,7 @@ import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.NoticesViewModel
 import fr.acinq.phoenix.android.PaymentsViewModel
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.Screen
+import fr.acinq.phoenix.android.navigation.Screen
 import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.MutedFilledButton

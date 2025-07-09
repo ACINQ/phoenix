@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.PowerManager
+import android.text.format.DateUtils
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -30,7 +31,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import fr.acinq.lightning.utils.Connection
-import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
+import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.data.WalletNotice
 import fr.acinq.phoenix.managers.AppConfigurationManager
 import fr.acinq.phoenix.managers.ConnectionsManager
@@ -60,12 +61,10 @@ sealed class Notice() {
 }
 
 class NoticesViewModel(
+    val application: PhoenixApplication,
     val appConfigurationManager: AppConfigurationManager,
     val peerManager: PeerManager,
-    val connectionsManager: ConnectionsManager,
-    val internalDataRepository: InternalDataRepository,
-    val context: Context
-
+    private val connectionsManager: ConnectionsManager,
 ) : ViewModel() {
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -83,16 +82,19 @@ class NoticesViewModel(
         viewModelScope.launch { monitorWalletContext() }
         viewModelScope.launch { monitorSwapInCloseToTimeout() }
         viewModelScope.launch { monitorWalletNotice() }
-        val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+
+        val powerManager = application.applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
         isPowerSaverModeOn = powerManager.isPowerSaveMode
-        context.registerReceiver(receiver, IntentFilter(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED))
+        application.applicationContext.registerReceiver(receiver, IntentFilter(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED))
 
         viewModelScope.launch { monitorTorConnection() }
+        viewModelScope.launch { monitorSeedBackupPref() }
+        viewModelScope.launch { monitorChannelsWatcherOutcome() }
     }
 
     override fun onCleared() {
         super.onCleared()
-        context.unregisterReceiver(receiver)
+        application.applicationContext.unregisterReceiver(receiver)
     }
 
     fun addNotice(notice: Notice) {
@@ -148,7 +150,7 @@ class NoticesViewModel(
     }
 
     private suspend fun monitorWalletNotice() {
-        combine(appConfigurationManager.walletNotice, internalDataRepository.getLastReadWalletNoticeIndex) { notice, lastReadIndex ->
+        combine(appConfigurationManager.walletNotice, application.internalDataRepository.getLastReadWalletNoticeIndex) { notice, lastReadIndex ->
             notice to lastReadIndex
         }.collect { (notice, lastReadIndex) ->
             log.debug("collecting wallet-notice={}", notice)
@@ -169,6 +171,26 @@ class NoticesViewModel(
         }
     }
 
+    private suspend fun monitorSeedBackupPref() {
+        application.internalDataRepository.showSeedBackupNotice.collect {
+            if (it) {
+                addNotice(Notice.BackupSeedReminder)
+            } else {
+                removeNotice<Notice.BackupSeedReminder>()
+            }
+        }
+    }
+
+    private suspend fun monitorChannelsWatcherOutcome() {
+        application.internalDataRepository.getChannelsWatcherOutcome.filterNotNull().collect {
+            if (currentTimestampMillis() - it.timestamp > 6 * DateUtils.DAY_IN_MILLIS) {
+                addNotice(Notice.WatchTowerLate)
+            } else {
+                removeNotice<Notice.WatchTowerLate>()
+            }
+        }
+    }
+
     class Factory(
         private val appConfigurationManager: AppConfigurationManager,
         private val peerManager: PeerManager,
@@ -178,9 +200,7 @@ class NoticesViewModel(
             val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as? PhoenixApplication)
             @Suppress("UNCHECKED_CAST")
             return NoticesViewModel(
-                appConfigurationManager, peerManager, connectionsManager,
-                internalDataRepository = application.internalDataRepository,
-                application.applicationContext
+                application, appConfigurationManager, peerManager, connectionsManager,
             ) as T
         }
     }

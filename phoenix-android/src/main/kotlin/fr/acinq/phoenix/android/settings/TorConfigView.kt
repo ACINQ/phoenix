@@ -65,7 +65,6 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun TorConfigView(
-    appViewModel: AppViewModel,
     onBackClick: () -> Unit,
     onBusinessTeardown: () -> Unit,
 ) {
@@ -150,18 +149,19 @@ fun TorConfigView(
                         icon = R.drawable.ic_check_circle,
                         onClick = {
                             log.info("shutting down app")
-                            val service = appViewModel.service ?: return@Button
-                            scope.launch {
-                                isTearingDownBusiness = true
-                                service.shutdown()
-                                application.shutdownBusiness()
-                                business.appConfigurationManager.updateTorUsage(!isTorEnabled)
-                                userPrefs.saveIsTorEnabled(!isTorEnabled)
-                                application.resetBusiness()
-                                delay(500)
-                                showConfirmTorDialog = false
-                                onBusinessTeardown()
-                            }
+                            TODO("restart business.....")
+//                            val service = appViewModel.service ?: return@Button
+//                            scope.launch {
+//                                isTearingDownBusiness = true
+//                                service.shutdown()
+//                                application.shutdownBusiness()
+//                                business.appConfigurationManager.updateTorUsage(!isTorEnabled)
+//                                userPrefs.saveIsTorEnabled(!isTorEnabled)
+//                                application.resetBusiness()
+//                                delay(500)
+//                                showConfirmTorDialog = false
+//                                onBusinessTeardown()
+//                            }
                         },
                         enabled = isTorEnabled || hasReadMessage,
                         shape = RoundedCornerShape(16.dp)

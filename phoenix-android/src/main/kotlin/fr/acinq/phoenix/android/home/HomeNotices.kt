@@ -47,7 +47,7 @@ import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.LocalNavController
 import fr.acinq.phoenix.android.Notice
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.Screen
+import fr.acinq.phoenix.android.navigation.Screen
 import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.openLink

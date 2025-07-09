@@ -66,30 +66,30 @@
 
     <!-- Startup -->
 
-    <string name="startup_binding_service">Binding service…</string>
-    <string name="startup_wait">Preparing wallet…</string>
-    <string name="startup_checking_seed">Unlocking…</string>
-    <string name="startup_unlocked">Access granted…</string>
-    <string name="startup_unlock_failure">Unlock failed</string>
-    <string name="startup_unlock_failure_keystore">Android keystore error</string>
-    <string name="startup_unlock_failure_fallback">Unlock with seed</string>
-
-    <string name="startup_fallback_instructions">Enter your 12-words recovery to unlock the wallet.\n\nWords must be entered in the correct order, and separated with a single space.</string>
-    <string name="startup_fallback_input_label">Enter word #%1$d</string>
-    <string name="startup_fallback_input_label_error">No more than 12 words!</string>
-    <string name="startup_fallback_incomplete">Enter the complete seed to proceed further.</string>
-    <string name="startup_fallback_invalid">This seed is not valid. Make sure the words are correct and in order.</string>
-    <string name="startup_fallback_unlock_button">Unlock wallet</string>
-    <string name="startup_fallback_checking">Checking seed…</string>
-    <string name="startup_fallback_error_default">An error occurred. Please try again.</string>
-    <string name="startup_fallback_error_incorrect_seed">This seed does not match your wallet data.</string>
-    <string name="startup_fallback_error_keystore_error">Failed to perform keystore operations.</string>
-    <string name="startup_fallback_success_match">Seed matches.\nWriting to disk…</string>
-    <string name="startup_fallback_success_starting">Starting Phoenix…</string>
-
     <string name="startup_init">Initialising…</string>
+    <string name="startup_preparing">Preparing wallet…</string>
+    <string name="startup_loading_seed">Decrypting…</string>
     <string name="startup_starting">Starting…</string>
-    <string name="startup_error_generic">The application could not start.</string>
+    <string name="startup_started">Opening app…</string>
+
+    <string name="startup_recovery_instructions">Enter your 12-words recovery to unlock the wallet.\n\nWords must be entered in the correct order, and separated with a single space.</string>
+    <string name="startup_recovery_input_label">Enter word #%1$d</string>
+    <string name="startup_recovery_input_label_error">No more than 12 words!</string>
+    <string name="startup_recovery_invalid">This seed is not valid</string>
+    <string name="startup_recovery_invalid_details">Make sure the words are correct and in order.</string>
+    <string name="startup_recovery_import_button">Import seed</string>
+    <string name="startup_recovery_reset_button">Reset</string>
+    <string name="startup_recovery_checking">Checking seed…</string>
+    <string name="startup_recovery_error_default">An error occurred. Please try again.</string>
+    <string name="startup_recovery_error_incorrect_seed">This seed does not match your wallet data.</string>
+    <string name="startup_recovery_error_keystore_error">Failed to perform keystore operations.</string>
+    <string name="startup_recovery_success_match">Seed matches.\nWriting to disk…</string>
+
+    <string name="startup_error_generic">The application could not start</string>
+    <string name="startup_error_try_again">Restart the app and try again.</string>
+    <string name="startup_error_decryption_general">Failed to decrypt wallet</string>
+    <string name="startup_error_decryption_keystore">Android keystore failure</string>
+    <string name="startup_error_recovery_button">Enter recovery phrase</string>
 
     <!-- Payment line -->
 

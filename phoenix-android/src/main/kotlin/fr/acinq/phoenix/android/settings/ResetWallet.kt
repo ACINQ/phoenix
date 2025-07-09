@@ -16,7 +16,6 @@
 
 package fr.acinq.phoenix.android.settings
 
-import android.content.Context
 import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
@@ -41,13 +40,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
-import fr.acinq.bitcoin.Chain
+import com.google.firebase.messaging.FirebaseMessaging
+import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.byteVector
+import fr.acinq.phoenix.android.BusinessRepo
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.MainActivity
+import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.BorderButton
@@ -68,60 +72,66 @@ import fr.acinq.phoenix.utils.extensions.phoenixName
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 
 
 sealed class ResetWalletStep {
-    object Init : ResetWalletStep()
-    object Confirm : ResetWalletStep()
+    data object Init : ResetWalletStep()
+    data object Confirm : ResetWalletStep()
     sealed class Deleting : ResetWalletStep() {
-        object Init: Deleting()
-        object Databases: Deleting()
-        object Prefs: Deleting()
-        object Seed: Deleting()
+        data object Init: Deleting()
+        data object Databases: Deleting()
+        data object Prefs: Deleting()
+        data object Seed: Deleting()
     }
     sealed class Result : ResetWalletStep() {
-        object Success : Result()
+        data object Success : Result()
         sealed class Failure : Result() {
             data class Error(val e: Throwable) : Failure()
         }
     }
 }
 
-class ResetWalletViewModel : ViewModel() {
-    val log = LoggerFactory.getLogger(this::class.java)
+class ResetWalletViewModel(val application: PhoenixApplication) : ViewModel() {
+    private val log = LoggerFactory.getLogger(this::class.java)
 
     val state = mutableStateOf<ResetWalletStep>(ResetWalletStep.Init)
 
-    fun deleteWalletData(
-        context: Context,
-        chain: Chain,
-        nodeIdHash: String,
-        onShutdownBusiness: () -> Unit,
-        onShutdownService: () -> Unit,
-        onPrefsClear: suspend () -> Unit,
-        onBusinessReset: () -> Unit,
-    ) {
+    fun deleteWalletData() {
         if (state.value != ResetWalletStep.Confirm) return
         state.value = ResetWalletStep.Deleting.Init
+
         viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
             state.value = ResetWalletStep.Result.Failure.Error(e)
             log.error("failed to reset wallet data: ", e)
         }) {
+
+
             delay(350)
-            onShutdownService()
-            onShutdownBusiness()
+            val (activeNodeId, activeBusiness) = BusinessRepo.activeBusiness.filterNotNull().first()
+            val nodeIdHash = PublicKey.fromHex(activeNodeId).hash160().byteVector().toHex()
+            val chain = activeBusiness.chain
+            BusinessRepo.stopBusiness(activeNodeId)
             delay(250)
 
             state.value = ResetWalletStep.Deleting.Databases
+            val context = application.applicationContext
             context.deleteDatabase("appdb.sqlite")
             context.deleteDatabase("payments-${chain.phoenixName}-$nodeIdHash.sqlite")
             context.deleteDatabase("channels-${chain.phoenixName}-$nodeIdHash.sqlite")
             delay(500)
 
             state.value = ResetWalletStep.Deleting.Prefs
-            onPrefsClear()
+            application.userPrefs.clear()
+            application.internalDataRepository.clear()
+            application.globalPrefs.clear()
+            FirebaseMessaging.getInstance().deleteToken().addOnCompleteListener { task ->
+                if (task.isSuccessful) BusinessRepo.refreshFcmToken()
+            }
+
             delay(400)
 
             state.value = ResetWalletStep.Deleting.Seed
@@ -130,21 +140,27 @@ class ResetWalletViewModel : ViewModel() {
             datadir.delete()
             delay(300)
 
-            onBusinessReset()
             state.value = ResetWalletStep.Result.Success
+        }
+    }
+
+    class Factory(val application: PhoenixApplication) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
+            val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as? PhoenixApplication)
+            @Suppress("UNCHECKED_CAST")
+            return ResetWalletViewModel(application) as T
         }
     }
 }
 
 @Composable
 fun ResetWallet(
-    onShutdownBusiness: () -> Unit,
-    onShutdownService: () -> Unit,
-    onPrefsClear: suspend () -> Unit,
-    onBusinessReset: () -> Unit,
     onBackClick: () -> Unit,
 ) {
     val vm = viewModel<ResetWalletViewModel>()
+
+    TODO("confirm the node id to delete the correct wallet and not just the active one.")
 
     DefaultScreenLayout {
         when (vm.state.value) {
@@ -167,22 +183,7 @@ fun ResetWallet(
                 InitReset(onReviewClick = { vm.state.value = ResetWalletStep.Confirm })
             }
             ResetWalletStep.Confirm -> {
-                val context = LocalContext.current
-                val business = business
-                val nodeIdHash = business.nodeParamsManager.nodeParams.value!!.nodeId.hash160().byteVector().toHex()
-                ReviewReset(
-                    onConfirmClick = {
-                        vm.deleteWalletData(
-                            context = context,
-                            chain = business.chain,
-                            nodeIdHash = nodeIdHash,
-                            onShutdownBusiness = onShutdownBusiness,
-                            onShutdownService = onShutdownService,
-                            onPrefsClear = onPrefsClear,
-                            onBusinessReset = onBusinessReset,
-                        )
-                    }
-                )
+                ReviewReset(onConfirmClick = vm::deleteWalletData)
             }
             is ResetWalletStep.Deleting -> {
                 DeletingWallet(state)

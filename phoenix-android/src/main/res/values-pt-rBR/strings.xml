@@ -51,24 +51,24 @@
     <!-- Startup -->
 
     <string name="startup_binding_service">Vinculando o serviço…</string>
-    <string name="startup_wait">Preparando a carteira…</string>
+    <string name="startup_preparing">Preparando a carteira…</string>
     <string name="startup_checking_seed">Desbloqueando…</string>
     <string name="startup_unlocked">Acesso concedido…</string>
     <string name="startup_unlock_failure">Falha no desbloqueio</string>
     <string name="startup_unlock_failure_keystore">Erro do Android Keystore</string>
     <string name="startup_unlock_failure_fallback">Desbloquear com seed</string>
 
-    <string name="startup_fallback_instructions">Digite suas 12 palavras de recuperação para desbloquear a carteira.\n\nAs palavras devem ser digitadas na ordem correta e separadas por um único espaço.</string>
-    <string name="startup_fallback_input_label">Digite a palavra #%1$d</string>
-    <string name="startup_fallback_input_label_error">Não insira mais de 12 palavras!</string>
-    <string name="startup_fallback_incomplete">Insira a semente completa para continuar.</string>
-    <string name="startup_fallback_invalid">Esta semente é inválida. Verifique se as palavras estão corretas e em ordem.</string>
-    <string name="startup_fallback_unlock_button">Desbloquear carteira</string>
-    <string name="startup_fallback_checking">Verificando a semente…</string>
-    <string name="startup_fallback_error_default">Ocorreu um erro. Tente novamente.</string>
-    <string name="startup_fallback_error_incorrect_seed">Esta semente não corresponde à carteira.</string>
-    <string name="startup_fallback_success_match">Correspondências iniciais.\nGravando no disco…</string>
-    <string name="startup_fallback_success_starting">Iniciando o Phoenix…</string>
+    <string name="startup_recovery_instructions">Digite suas 12 palavras de recuperação para desbloquear a carteira.\n\nAs palavras devem ser digitadas na ordem correta e separadas por um único espaço.</string>
+    <string name="startup_recovery_input_label">Digite a palavra #%1$d</string>
+    <string name="startup_recovery_input_label_error">Não insira mais de 12 palavras!</string>
+    <string name="startup_recovery_incomplete">Insira a semente completa para continuar.</string>
+    <string name="startup_recovery_invalid">Esta semente é inválida. Verifique se as palavras estão corretas e em ordem.</string>
+    <string name="startup_recovery_unlock_button">Desbloquear carteira</string>
+    <string name="startup_recovery_checking">Verificando a semente…</string>
+    <string name="startup_recovery_error_default">Ocorreu um erro. Tente novamente.</string>
+    <string name="startup_recovery_error_incorrect_seed">Esta semente não corresponde à carteira.</string>
+    <string name="startup_recovery_success_match">Correspondências iniciais.\nGravando no disco…</string>
+    <string name="startup_recovery_success_starting">Iniciando o Phoenix…</string>
 
     <string name="startup_starting">Iniciando…</string>
     <string name="startup_error_generic">Não foi possível iniciar o aplicativo.</string>

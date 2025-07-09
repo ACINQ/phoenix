@@ -70,7 +70,7 @@ import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.Screen
+import fr.acinq.phoenix.android.navigation.Screen
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Clickable

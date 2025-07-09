@@ -46,7 +46,7 @@ class DisplaySeedViewModel : ViewModel() {
         }) {
             state.value = ReadingSeedState.ReadingSeed
             when {
-                seedFileState is SeedFileState.Present && seedFileState.encryptedSeed is EncryptedSeed.V2.NoAuth -> {
+                seedFileState is SeedFileState.Present && seedFileState.encryptedSeed is EncryptedSeed.V2.SingleSeed -> {
                     val words = EncryptedSeed.toMnemonics(seedFileState.encryptedSeed.decrypt())
                     delay(300)
                     state.value = ReadingSeedState.Decrypted(words)

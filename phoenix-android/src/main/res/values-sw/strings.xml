@@ -64,24 +64,24 @@
     <!-- Startup -->
 
     <string name="startup_binding_service">Kuunganisha huduma…</string>
-    <string name="startup_wait">Kuandaa pochi…</string>
+    <string name="startup_preparing">Kuandaa pochi…</string>
     <string name="startup_checking_seed">Kufungua…</string>
     <string name="startup_unlocked">Ufikiaji umekubaliwa…</string>
     <string name="startup_unlock_failure">Kufungua kumeshindikana</string>
     <string name="startup_unlock_failure_keystore">Hitilafu ya kitunzaji cha Android</string>
     <string name="startup_unlock_failure_fallback">Fungua kwa mbegu</string>
 
-    <string name="startup_fallback_instructions">Ingiza maneno yako 12 ya urejesho ili kufungua pochi.\n\nManeno lazima yaingizwe kwa mpangilio sahihi, na kutenganishwa na nafasi moja.</string>
-    <string name="startup_fallback_input_label">Ingiza neno #%1$d</string>
-    <string name="startup_fallback_input_label_error">Maneno yasizidi 12!</string>
-    <string name="startup_fallback_incomplete">Ingiza mbegu kamili ili kuendelea zaidi.</string>
-    <string name="startup_fallback_invalid">Mbegu hii si sahihi. Hakikisha maneno yako ni sahihi na yamepangwa kwa mpangilio.</string>
-    <string name="startup_fallback_unlock_button">Fungua pochi</string>
-    <string name="startup_fallback_checking">Kuangalia mbegu…</string>
-    <string name="startup_fallback_error_default">Hitilafu imetokea. Tafadhali jaribu tena.</string>
-    <string name="startup_fallback_error_incorrect_seed">Mbegu hii haifanani na pochi yako.</string>
-    <string name="startup_fallback_success_match">Mbegu inafanana.\nInaandika kwa diski…</string>
-    <string name="startup_fallback_success_starting">Inaanzisha Phoenix…</string>
+    <string name="startup_recovery_instructions">Ingiza maneno yako 12 ya urejesho ili kufungua pochi.\n\nManeno lazima yaingizwe kwa mpangilio sahihi, na kutenganishwa na nafasi moja.</string>
+    <string name="startup_recovery_input_label">Ingiza neno #%1$d</string>
+    <string name="startup_recovery_input_label_error">Maneno yasizidi 12!</string>
+    <string name="startup_recovery_incomplete">Ingiza mbegu kamili ili kuendelea zaidi.</string>
+    <string name="startup_recovery_invalid">Mbegu hii si sahihi. Hakikisha maneno yako ni sahihi na yamepangwa kwa mpangilio.</string>
+    <string name="startup_recovery_unlock_button">Fungua pochi</string>
+    <string name="startup_recovery_checking">Kuangalia mbegu…</string>
+    <string name="startup_recovery_error_default">Hitilafu imetokea. Tafadhali jaribu tena.</string>
+    <string name="startup_recovery_error_incorrect_seed">Mbegu hii haifanani na pochi yako.</string>
+    <string name="startup_recovery_success_match">Mbegu inafanana.\nInaandika kwa diski…</string>
+    <string name="startup_recovery_success_starting">Inaanzisha Phoenix…</string>
 
     <string name="startup_starting">Inaanzisha…</string>
     <string name="startup_error_generic">Programu haikuweza kuanza.</string>

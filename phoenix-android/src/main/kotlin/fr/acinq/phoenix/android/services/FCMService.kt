@@ -31,10 +31,10 @@ class FCMService : FirebaseMessagingService() {
         )
 
         val reason = remoteMessage.data["reason"]
-        val encryptedSeed = SeedManager.loadSeedFromDisk(applicationContext)
+        val encryptedSeed = SeedManager.loadEncryptedSeedFromDisk(applicationContext)
 
         when {
-            encryptedSeed !is EncryptedSeed.V2.NoAuth -> {
+            encryptedSeed !is EncryptedSeed.V2.SingleSeed -> {
                 log.warn("ignored fcm message with unhandled seed=${encryptedSeed?.name()}")
             }
             remoteMessage.priority != RemoteMessage.PRIORITY_HIGH -> {
@@ -54,8 +54,8 @@ class FCMService : FirebaseMessagingService() {
     }
 
     private fun startPhoenixForegroundService(reason: String?) {
-        ContextCompat.startForegroundService(applicationContext, Intent(applicationContext, NodeService::class.java)
-            .apply { reason?.let { putExtra(NodeService.EXTRA_REASON, it) } })
+        ContextCompat.startForegroundService(applicationContext, Intent(applicationContext, PaymentsForegroundService::class.java)
+            .apply { reason?.let { putExtra(PaymentsForegroundService.EXTRA_REASON, it) } })
     }
 
     override fun onNewToken(token: String) {

@@ -28,6 +28,7 @@ class BootReceiver : BroadcastReceiver() {
         if (Intent.ACTION_BOOT_COMPLETED == intent.action) {
             ChannelsWatcher.schedule(context)
             InflightPaymentsWatcher.scheduleOnce(context)
+            DailyConnect.schedule(context)
         }
     }
 }

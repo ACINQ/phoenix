@@ -40,8 +40,6 @@ import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.cancel
 import kotlinx.serialization.json.Json
 import kotlin.time.Duration.Companion.seconds
@@ -104,8 +102,8 @@ class PhoenixBusiness(
      * It's recommended that you close the network connections (electrum + peer)
      * BEFORE invoking this function, to ensure a clean disconnect from the server.
      */
-    fun stop(closeDatabases: Boolean = true) {
-        logger.info { "stopping business (close_db=$closeDatabases)" }
+    fun stop() {
+        logger.info { "stopping business" }
         electrumClient.stop()
         electrumWatcher.stop()
         electrumWatcher.cancel()
@@ -119,10 +117,8 @@ class PhoenixBusiness(
         peerManager.peerState.value?.cancel()
         peerManager.cancel()
         appConfigurationManager.cancel()
-        if (closeDatabases) {
             appDb.close()
             databaseManager.close()
-        }
         databaseManager.cancel()
         lnurlManager.cancel()
         logger.info { "stopped business" }

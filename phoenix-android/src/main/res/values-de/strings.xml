@@ -53,24 +53,24 @@
     <!-- Startup -->
 
     <string name="startup_binding_service">Dienst wird eingebunden…</string>
-    <string name="startup_wait">Wallet wird vorbereitet…</string>
+    <string name="startup_preparing">Wallet wird vorbereitet…</string>
     <string name="startup_checking_seed">Entsperren…</string>
     <string name="startup_unlocked">Zugang gewährt..</string>
     <string name="startup_unlock_failure">Entsperren fehlgeschlagen</string>
     <string name="startup_unlock_failure_keystore">Android Keystore-Fehler</string>
     <string name="startup_unlock_failure_fallback">Mit Saatgut freischalten</string>
 
-    <string name="startup_fallback_instructions">Gib deine 12 Wörter ein, um die Brieftasche zu entsperren.\n\nDie Wörter müssen in der richtigen Reihenfolge und mit einem Leerzeichen getrennt eingegeben werden.</string>
-    <string name="startup_fallback_input_label">Wort #%1$d eingeben</string>
-    <string name="startup_fallback_input_label_error">Nicht mehr als 12 Wörter!</string>
-    <string name="startup_fallback_incomplete">Gib den vollständigen Samen ein, um fortzufahren.</string>
-    <string name="startup_fallback_invalid">Dieses Saatgut ist nicht gültig. Achte darauf, dass die Wörter richtig und in der richtigen Reihenfolge sind.</string>
-    <string name="startup_fallback_unlock_button">Brieftasche entsperren</string>
-    <string name="startup_fallback_checking">Saatgut prüfen..</string>
-    <string name="startup_fallback_error_default">Es ist ein Fehler aufgetreten. Bitte versuche es noch einmal.</string>
-    <string name="startup_fallback_error_incorrect_seed">Dieses Saatgut passt nicht zu deinem Geldbeutel.</string>
-    <string name="startup_fallback_success_match">Suchtreffer.\nDas Schreiben auf die Festplatte..</string>
-    <string name="startup_fallback_success_starting">Ab Phoenix..</string>
+    <string name="startup_recovery_instructions">Gib deine 12 Wörter ein, um die Brieftasche zu entsperren.\n\nDie Wörter müssen in der richtigen Reihenfolge und mit einem Leerzeichen getrennt eingegeben werden.</string>
+    <string name="startup_recovery_input_label">Wort #%1$d eingeben</string>
+    <string name="startup_recovery_input_label_error">Nicht mehr als 12 Wörter!</string>
+    <string name="startup_recovery_incomplete">Gib den vollständigen Samen ein, um fortzufahren.</string>
+    <string name="startup_recovery_invalid">Dieses Saatgut ist nicht gültig. Achte darauf, dass die Wörter richtig und in der richtigen Reihenfolge sind.</string>
+    <string name="startup_recovery_unlock_button">Brieftasche entsperren</string>
+    <string name="startup_recovery_checking">Saatgut prüfen..</string>
+    <string name="startup_recovery_error_default">Es ist ein Fehler aufgetreten. Bitte versuche es noch einmal.</string>
+    <string name="startup_recovery_error_incorrect_seed">Dieses Saatgut passt nicht zu deinem Geldbeutel.</string>
+    <string name="startup_recovery_success_match">Suchtreffer.\nDas Schreiben auf die Festplatte..</string>
+    <string name="startup_recovery_success_starting">Ab Phoenix..</string>
 
     <string name="startup_starting">Starten…</string>
     <string name="startup_error_generic">Die App konnte nicht gestartet werden.</string>

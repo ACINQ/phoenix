@@ -16,8 +16,11 @@
 
 package fr.acinq.phoenix.android.security
 
+import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.phoenix.android.utils.extensions.tryWith
+import fr.acinq.phoenix.utils.MnemonicLanguage
 import fr.acinq.secp256k1.Hex
+import kotlinx.serialization.json.Json
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayInputStream
@@ -38,13 +41,30 @@ sealed class EncryptedSeed {
         abstract val ciphertext: ByteArray
 
         /** This seed is encrypted with a key that does *NOT* require user unlock. */
-        class NoAuth(override val iv: ByteArray, override val ciphertext: ByteArray) : V2(KeystoreHelper.KEY_NO_AUTH) {
+        class SingleSeed(override val iv: ByteArray, override val ciphertext: ByteArray) : V2(KeystoreHelper.KEY_NO_AUTH) {
             fun decrypt(): ByteArray = getDecryptionCipher().doFinal(ciphertext)
 
             companion object {
-                fun encrypt(seed: ByteArray): NoAuth = tryWith(GeneralSecurityException()) {
+                fun encrypt(seed: ByteArray): SingleSeed = tryWith(GeneralSecurityException()) {
                     val cipher = KeystoreHelper.getEncryptionCipher(KeystoreHelper.KEY_NO_AUTH)
-                    NoAuth(cipher.iv, cipher.doFinal(seed))
+                    SingleSeed(cipher.iv, cipher.doFinal(seed))
+                }
+            }
+        }
+
+        class MultipleSeed(override val iv: ByteArray, override val ciphertext: ByteArray) : V2(KeystoreHelper.KEY_NO_AUTH) {
+            private fun decrypt(): ByteArray = getDecryptionCipher().doFinal(ciphertext)
+
+            fun decryptAndGetSeedMap(): Map<String, ByteArray> {
+                val payload = decrypt().decodeToString()
+                val json = Json.decodeFromString<Map<String, ByteArray>>(payload)
+                return json
+            }
+
+            companion object {
+                fun encrypt(seed: ByteArray): SingleSeed = tryWith(GeneralSecurityException()) {
+                    val cipher = KeystoreHelper.getEncryptionCipher(KeystoreHelper.KEY_NO_AUTH)
+                    SingleSeed(cipher.iv, cipher.doFinal(seed))
                 }
             }
         }
@@ -60,7 +80,7 @@ sealed class EncryptedSeed {
             array.write(SEED_FILE_VERSION_2.toInt())
             array.write(
                 when (keyAlias) {
-                    KeystoreHelper.KEY_NO_AUTH -> NO_AUTH_KEY_VERSION
+                    KeystoreHelper.KEY_NO_AUTH -> SINGLE_SEED_VERSION
                     else -> throw UnhandledEncryptionKeyAlias(keyAlias)
                 }.toInt()
             )
@@ -71,8 +91,9 @@ sealed class EncryptedSeed {
 
         companion object {
             private const val IV_LENGTH = 16
-            private const val NO_AUTH_KEY_VERSION = 1
+            private const val SINGLE_SEED_VERSION = 1
             private const val REMOVED_DO_NOT_USE = 2
+            private const val MULTIPLE_SEED_VERSION = 3
 
             fun deserialize(stream: ByteArrayInputStream): V2 {
                 val keyVersion = stream.read()
@@ -81,7 +102,8 @@ sealed class EncryptedSeed {
                 val cipherText = ByteArray(stream.available())
                 stream.read(cipherText, 0, stream.available())
                 return when (keyVersion) {
-                    NO_AUTH_KEY_VERSION -> NoAuth(iv, cipherText)
+                    SINGLE_SEED_VERSION -> SingleSeed(iv, cipherText)
+                    MULTIPLE_SEED_VERSION -> SingleSeed(iv, cipherText)
                     else -> throw UnhandledEncryptionKeyVersion(keyVersion)
                 }
             }
@@ -103,6 +125,17 @@ sealed class EncryptedSeed {
             }
         }
 
+        /** Returns a mnemonics from a byte array, or null if it's invalid. */
+        fun toMnemonicsSafe(array: ByteArray): List<String>? {
+            return try {
+                val mnemonics = EncryptedSeed.toMnemonics(array)
+                MnemonicCode.validate(mnemonics = mnemonics, wordlist = MnemonicLanguage.English.wordlist())
+                mnemonics
+            } catch (e: Exception) {
+                log.error("seed is invalid", e)
+                null
+            }
+        }
         fun toMnemonics(array: ByteArray): List<String> = String(Hex.decode(String(array, Charsets.UTF_8)), Charsets.UTF_8).split(" ")
         fun fromMnemonics(words: List<String>): ByteArray = Hex.encode(words.joinToString(" ").encodeToByteArray()).encodeToByteArray()
     }

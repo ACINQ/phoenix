@@ -36,7 +36,7 @@ import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.SplashLabelRow
 import fr.acinq.phoenix.android.navController
-import fr.acinq.phoenix.android.navigateToPaymentDetails
+import fr.acinq.phoenix.android.navigation.navigateToPaymentDetails
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.converters.DateFormatter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.converters.MSatDisplayPolicy
