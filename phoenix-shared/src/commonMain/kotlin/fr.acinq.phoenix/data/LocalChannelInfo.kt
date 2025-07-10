@@ -105,6 +105,7 @@ data class LocalChannelInfo(
     /** Returns the count of payments being sent or received by this channel. */
     val inFlightPaymentsCount: Int by lazy {
         when (state) {
+            is Closing, is Closed, is Aborted -> 0
             is ChannelStateWithCommitments -> {
                 buildSet {
                     state.commitments.latest.localCommit.spec.htlcs.forEach { add(it.add.paymentHash) }
