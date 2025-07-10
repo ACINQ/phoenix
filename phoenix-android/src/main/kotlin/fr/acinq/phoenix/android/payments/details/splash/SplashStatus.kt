@@ -61,7 +61,7 @@ import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.openLink
 import fr.acinq.phoenix.android.components.txUrl
 import fr.acinq.phoenix.android.payments.send.cpfp.CpfpView
-import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
+import fr.acinq.phoenix.android.utils.converters.DateFormatter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.positiveColor

@@ -44,14 +44,14 @@ import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.BorderButton
-import fr.acinq.phoenix.android.components.FeerateSlider
+import fr.acinq.phoenix.android.components.inputs.FeerateSlider
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.SplashLabelRow
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.payments.send.spliceout.spliceFailureDetails
-import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.data.BitcoinUnit

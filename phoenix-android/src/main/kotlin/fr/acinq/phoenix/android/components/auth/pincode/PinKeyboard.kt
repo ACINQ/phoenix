@@ -19,7 +19,6 @@ package fr.acinq.phoenix.android.components.auth.pincode
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
@@ -91,7 +90,7 @@ private fun RowScope.PinButton(pin: Int, onClick: (Int) -> Unit, isEnabled: Bool
 @Composable
 private fun RowScope.ResetButton(onClick: () -> Unit, isEnabled: Boolean) {
     Button(
-        icon = R.drawable.ic_trash,
+        icon = R.drawable.ic_remove,
         onClick = onClick,
         modifier = Modifier
             .height(76.dp)

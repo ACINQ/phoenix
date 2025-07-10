@@ -35,7 +35,7 @@ import fr.acinq.phoenix.android.payments.details.TechnicalRow
 import fr.acinq.phoenix.android.payments.details.TechnicalRowAmount
 import fr.acinq.phoenix.android.payments.details.TimestampSection
 import fr.acinq.phoenix.android.payments.details.TransactionRow
-import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
+import fr.acinq.phoenix.android.utils.converters.MSatDisplayPolicy
 import fr.acinq.phoenix.data.ExchangeRate
 
 

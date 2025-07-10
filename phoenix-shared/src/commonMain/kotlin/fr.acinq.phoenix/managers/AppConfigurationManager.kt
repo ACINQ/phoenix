@@ -23,6 +23,7 @@ import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 import kotlin.math.*
 import kotlin.time.*
@@ -276,6 +277,7 @@ class AppConfigurationManager(
     }
 
     // Fiat preferences
+    @Serializable
     data class PreferredFiatCurrencies(
         val primary: FiatCurrency,
         val others: Set<FiatCurrency>

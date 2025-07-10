@@ -42,27 +42,25 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.AmountHeroInput
+import fr.acinq.phoenix.android.components.inputs.AmountHeroInput
 import fr.acinq.phoenix.android.components.BackButtonWithBalance
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.dialogs.Dialog
-import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.SplashClickableContent
 import fr.acinq.phoenix.android.components.SplashLabelRow
 import fr.acinq.phoenix.android.components.SplashLayout
-import fr.acinq.phoenix.android.components.TextInput
+import fr.acinq.phoenix.android.components.inputs.TextInput
 import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
-import fr.acinq.phoenix.android.fiatRate
+import fr.acinq.phoenix.android.primaryFiatRate
 import fr.acinq.phoenix.android.preferredAmountUnit
-import fr.acinq.phoenix.android.utils.Converter.toPrettyStringWithFallback
+import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyStringWithFallback
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.extensions.safeLet
 import fr.acinq.phoenix.android.utils.extensions.toLocalisedMessage
 import fr.acinq.phoenix.android.utils.images.ImageDecoder
 import fr.acinq.phoenix.data.lnurl.LnurlError
-import fr.acinq.phoenix.data.lnurl.LnurlPay
 import fr.acinq.phoenix.managers.SendManager
 
 @Composable
@@ -74,7 +72,7 @@ fun LnurlPayView(
     val context = LocalContext.current
     val balance = business.balanceManager.balance.collectAsState(null).value
     val prefUnit = preferredAmountUnit
-    val rate = fiatRate
+    val rate = primaryFiatRate
 
     val peer by business.peerManager.peerState.collectAsState()
     val trampolineFees = peer?.walletParams?.trampolineFees?.firstOrNull()

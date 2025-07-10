@@ -504,13 +504,13 @@
 
     <string name="prefs_display_title">Ansicht einstellen</string>
     <string name="prefs_display_coin_label">Bitcoin-Einheit</string>
-    <string name="prefs_display_coin_sat_label">Satoshi (sat)</string>
+    <string name="prefs_display_coin_sat_label">Satoshi</string>
     <string name="prefs_display_coin_sat_desc">1 sat entspricht 0.00000001 btc</string>
-    <string name="prefs_display_coin_bit_label">Bit (bit)</string>
+    <string name="prefs_display_coin_bit_label">Bit</string>
     <string name="prefs_display_coin_bit_desc">1 bit entspricht 0.000001 btc</string>
-    <string name="prefs_display_coin_mbtc_label">Milli-Bitcoin (mbtc)</string>
+    <string name="prefs_display_coin_mbtc_label">Milli-Bitcoin</string>
     <string name="prefs_display_coin_mbtc_desc">1 mbtc entspricht 0.001 btc</string>
-    <string name="prefs_display_coin_btc_label">Bitcoin (btc)</string>
+    <string name="prefs_display_coin_btc_label">Bitcoin</string>
     <string name="prefs_display_fiat_label">Fiat-Währung</string>
     <string name="prefs_display_theme_label">App-Theme</string>
     <string name="prefs_display_theme_dark_label">Dark Theme</string>

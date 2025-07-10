@@ -14,41 +14,26 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.utils
+package fr.acinq.phoenix.android.utils.converters
 
 
-import android.annotation.SuppressLint
-import android.text.Html
-import android.text.Spanned
-import android.text.format.DateUtils
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.TrampolineFees
-import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.toMilliSatoshi
-import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.utils.converters.AmountConverter.toFiat
+import fr.acinq.phoenix.android.utils.converters.AmountConverter.toUnit
 import fr.acinq.phoenix.data.*
 import org.slf4j.LoggerFactory
-import java.math.BigDecimal
 import java.math.RoundingMode
-import java.text.DateFormat
 import java.text.DecimalFormat
 import java.text.NumberFormat
-import java.text.SimpleDateFormat
-import java.util.*
-import kotlin.math.abs
 
 enum class MSatDisplayPolicy {
     HIDE, SHOW, SHOW_IF_ZERO_SATS
 }
 
-object Converter {
+object AmountFormatter {
 
-    private val log = LoggerFactory.getLogger(Converter::class.java)
-
-    private val DECIMAL_SEPARATOR = DecimalFormat().decimalFormatSymbols.decimalSeparator.toString()
     private var SAT_FORMAT_WITH_MILLIS: NumberFormat = DecimalFormat("###,###,###,##0.###")
     private var SAT_FORMAT: NumberFormat = DecimalFormat("###,###,###,##0").apply { roundingMode = RoundingMode.DOWN }
     private var BIT_FORMAT_WITH_MILLIS: NumberFormat = DecimalFormat("###,###,###,##0.00###")
@@ -57,10 +42,19 @@ object Converter {
     private var MBTC_FORMAT: NumberFormat = DecimalFormat("###,###,###,##0.00000").apply { roundingMode = RoundingMode.DOWN }
     private var BTC_FORMAT_WITH_MILLIS: NumberFormat = DecimalFormat("###,###,###,##0.00000000###")
     private var BTC_FORMAT: NumberFormat = DecimalFormat("###,###,###,##0.00000000").apply { roundingMode = RoundingMode.DOWN }
-    private var FIAT_FORMAT: NumberFormat = NumberFormat.getInstance().apply {
+
+    /** Fiat format has always 2 decimals, with rounding. */
+    var FIAT_FORMAT: NumberFormat = NumberFormat.getInstance().apply {
         minimumFractionDigits = 2
         maximumFractionDigits = 2
         roundingMode = RoundingMode.CEILING // prevent converting very small bitcoin amounts to 0 in fiat
+    }
+    /** Fiat format but at most 2 decimals and without the thousand grouping. Useful when field is not read-only, where grouping would cause issues. */
+    var FIAT_FORMAT_WRITABLE: NumberFormat = NumberFormat.getInstance().apply {
+        minimumFractionDigits = 0
+        maximumFractionDigits = 2
+        roundingMode = RoundingMode.CEILING
+        isGroupingUsed = false
     }
 
     private fun getCoinFormat(unit: BitcoinUnit, withMillis: Boolean) = when {
@@ -74,33 +68,11 @@ object Converter {
         else -> BTC_FORMAT
     }
 
-    /** Converts a [Double] amount to [MilliSatoshi], assuming that this amount is in fiat. */
-    fun Double.toMilliSatoshi(fiatRate: Double): MilliSatoshi = (this / fiatRate).toMilliSatoshi(BitcoinUnit.Btc)
-
-    /** Converts a [Double] amount to [MilliSatoshi], assuming that this amount is in Bitcoin. */
-    fun Double.toMilliSatoshi(unit: BitcoinUnit): MilliSatoshi = when (unit) {
-        BitcoinUnit.Sat -> this.toBigDecimal().movePointRight(3).toLong().msat
-        BitcoinUnit.Bit -> this.toBigDecimal().movePointRight(5).toLong().msat
-        BitcoinUnit.MBtc -> this.toBigDecimal().movePointRight(8).toLong().msat
-        BitcoinUnit.Btc -> this.toBigDecimal().movePointRight(11).toLong().msat
-    }
-
-    /** Converts [MilliSatoshi] to another Bitcoin unit. */
-    fun MilliSatoshi.toUnit(unit: BitcoinUnit): Double = when (unit) {
-        BitcoinUnit.Sat -> this.msat.toBigDecimal().movePointLeft(3).toDouble()
-        BitcoinUnit.Bit -> this.msat.toBigDecimal().movePointLeft(5).toDouble()
-        BitcoinUnit.MBtc -> this.msat.toBigDecimal().movePointLeft(8).toDouble()
-        BitcoinUnit.Btc -> this.msat.toBigDecimal().movePointLeft(11).toDouble()
-    }
-
     /** Format the [Double] as a String using [DecimalFormat]. */
     fun Double?.toPlainString(limitDecimal: Boolean = false): String = this?.takeIf { it > 0 }?.run {
         val df = if (limitDecimal) DecimalFormat("0.00") else DecimalFormat("0.########")
         df.format(this)
     } ?: ""
-
-    /** Converts [MilliSatoshi] to a fiat amount. */
-    fun MilliSatoshi.toFiat(rate: Double): Double = this.toUnit(BitcoinUnit.Btc) * rate
 
     fun Double?.toPrettyString(
         unit: CurrencyUnit,
@@ -144,54 +116,5 @@ object Converter {
 
     fun Satoshi.toPrettyString(unit: CurrencyUnit, rate: ExchangeRate.BitcoinPriceRate? = null, withUnit: Boolean = false, mSatDisplayPolicy: MSatDisplayPolicy = MSatDisplayPolicy.HIDE): String {
         return this.toMilliSatoshi().toPrettyString(unit, rate, withUnit, mSatDisplayPolicy)
-    }
-
-    /** Converts this millis timestamp into a relative string date. */
-    @Composable
-    fun Long.toRelativeDateString(): String {
-        val now = System.currentTimeMillis()
-        val delay: Long = this - now
-        return if (abs(delay) < 60 * 1000L) { // less than 1 minute ago
-            stringResource(id = R.string.utils_date_just_now)
-        } else {
-            DateUtils.getRelativeTimeSpanString(this, now, delay).toString()
-        }
-    }
-
-    /** Converts this millis timestamp into a pretty, absolute string date time using the locale format. */
-    fun Long.toAbsoluteDateTimeString(): String = DateFormat.getDateTimeInstance().format(Date(this))
-
-    /** Converts this millis timestamp into a pretty, absolute string date using the locale format. */
-    fun Long.toAbsoluteDateString(): String = DateFormat.getDateInstance().format(Date(this))
-
-    /** Converts this millis timestamp into an year-month-day string. */
-    @SuppressLint("SimpleDateFormat")
-    fun Long.toBasicAbsoluteDateString(): String = SimpleDateFormat("yyyy-MM-dd").format(Date(this))
-
-    /** Converts this millis timestamp into an year-month-day string. */
-    @SuppressLint("SimpleDateFormat")
-    fun Long.toBasicAbsoluteDateTimeString(): String = SimpleDateFormat("yyyyMMdd-HHmmss").format(Date(this))
-
-    public fun html(source: String): Spanned {
-        return Html.fromHtml(
-            source, Html.FROM_HTML_MODE_COMPACT
-                    and Html.FROM_HTML_SEPARATOR_LINE_BREAK_HEADING
-                    and Html.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH
-                    and Html.FROM_HTML_SEPARATOR_LINE_BREAK_LIST
-                    and Html.FROM_HTML_SEPARATOR_LINE_BREAK_LIST_ITEM
-        )
-    }
-
-    /** Convert a per millionths Long to a percentage Long. For example, 100 per millionths is 0.01%. */
-    val TrampolineFees.proportionalFeeAsPercentage: Double
-        get() = feeProportional.toBigDecimal().divide(BigDecimal.valueOf(10_000)).toDouble()
-
-    /** Convert a per millionths Long to a percentage Long. For example, 100 per millionths is 0.01%. */
-    val TrampolineFees.proportionalFeeAsPercentageString: String
-        get() = DecimalFormat("0.####").format(this.proportionalFeeAsPercentage)
-
-    /** Convert a percentage Long to a fee per millionths Long. For example, 0.01% becomes 100. */
-    fun percentageToPerMillionths(percent: Double): Long {
-        return (percent * 10_000L).toLong().coerceAtLeast(0L)
     }
 }

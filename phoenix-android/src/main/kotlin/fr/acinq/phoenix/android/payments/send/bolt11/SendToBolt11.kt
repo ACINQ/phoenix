@@ -33,13 +33,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.payment.Bolt11Invoice
-import fr.acinq.phoenix.android.LocalBitcoinUnit
+import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
+import fr.acinq.phoenix.android.components.inputs.AmountHeroInput
 import fr.acinq.phoenix.android.userPrefs
-import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.extensions.safeLet
 import fr.acinq.phoenix.utils.extensions.isAmountlessTrampoline
 import kotlinx.coroutines.launch
@@ -51,7 +52,7 @@ fun SendToBolt11View(
     onPaymentSent: () -> Unit,
 ) {
     val context = LocalContext.current
-    val prefBitcoinUnit = LocalBitcoinUnit.current
+    val prefBitcoinUnit = LocalBitcoinUnits.current.primary
 
     val balance = business.balanceManager.balance.collectAsState(null).value
     val sendManager = business.sendManager

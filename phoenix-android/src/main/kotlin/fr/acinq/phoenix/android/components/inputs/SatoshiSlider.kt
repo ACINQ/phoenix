@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.components
+package fr.acinq.phoenix.android.components.inputs
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.components.enableOrFade
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import kotlin.math.roundToInt
 

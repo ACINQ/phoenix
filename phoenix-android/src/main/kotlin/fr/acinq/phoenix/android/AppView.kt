@@ -45,6 +45,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -114,10 +115,13 @@ import fr.acinq.phoenix.android.settings.walletinfo.SwapInWallet
 import fr.acinq.phoenix.android.settings.walletinfo.WalletInfoView
 import fr.acinq.phoenix.android.startup.StartupView
 import fr.acinq.phoenix.android.utils.appBackground
+import fr.acinq.phoenix.android.utils.datastore.PreferredBitcoinUnits
 import fr.acinq.phoenix.android.utils.extensions.findActivitySafe
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.BitcoinUnit
+import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency
+import fr.acinq.phoenix.managers.AppConfigurationManager
 import io.ktor.http.encodeURLParameter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -145,17 +149,35 @@ fun AppView(
 
     val context = LocalContext.current
     val isAmountInFiat = userPrefs.getIsAmountInFiat.collectAsState(false)
-    val fiatCurrency = userPrefs.getFiatCurrency.collectAsState(initial = FiatCurrency.USD)
-    val bitcoinUnit = userPrefs.getBitcoinUnit.collectAsState(initial = BitcoinUnit.Sat)
+    val bitcoinUnits = userPrefs.getBitcoinUnits.collectAsState(initial = PreferredBitcoinUnits(primary = BitcoinUnit.Sat))
+    val fiatCurrencies = userPrefs.getFiatCurrencies.collectAsState(initial = AppConfigurationManager.PreferredFiatCurrencies(primary = FiatCurrency.USD, others = emptyList()))
     val fiatRates by business.currencyManager.ratesFlow.collectAsState(emptyList())
+    val fiatRatesMap by produceState(initialValue = emptyMap<FiatCurrency, ExchangeRate.BitcoinPriceRate>(), key1 = fiatRates) {
+        val usdPriceRate = fiatRates.filterIsInstance<ExchangeRate.BitcoinPriceRate>().firstOrNull { it.fiatCurrency == FiatCurrency.USD }
+        value = if (usdPriceRate != null) {
+            fiatRates.associate { rate ->
+                rate.fiatCurrency to when (rate) {
+                    is ExchangeRate.BitcoinPriceRate -> rate
+                    is ExchangeRate.UsdPriceRate -> ExchangeRate.BitcoinPriceRate(
+                        fiatCurrency = rate.fiatCurrency,
+                        price = rate.price * usdPriceRate.price,
+                        source = rate.source,
+                        timestampMillis = rate.timestampMillis
+                    )
+                }
+            }
+        } else {
+            emptyMap()
+        }
+    }
 
     CompositionLocalProvider(
         LocalBusiness provides business,
         LocalControllerFactory provides business.controllers,
         LocalNavController provides navController,
-        LocalExchangeRates provides fiatRates,
-        LocalBitcoinUnit provides bitcoinUnit.value,
-        LocalFiatCurrency provides fiatCurrency.value,
+        LocalExchangeRatesMap provides fiatRatesMap,
+        LocalBitcoinUnits provides bitcoinUnits.value,
+        LocalFiatCurrencies provides fiatCurrencies.value,
         LocalShowInFiat provides isAmountInFiat.value,
     ) {
         // we keep a view model storing payments so that we don't have to fetch them every time
@@ -456,7 +478,6 @@ fun AppView(
                         LiquidityPolicyView(
                             onBackClick = { navController.popBackStack() },
                             onAdvancedClick = { navController.navigate(Screen.AdvancedLiquidityPolicy.route) },
-                            onRequestLiquidityClick = { navController.navigate(Screen.LiquidityRequest.route) },
                         )
                     }
                     composable(Screen.LiquidityRequest.route, deepLinks = listOf(navDeepLink { uriPattern ="phoenix:requestliquidity" })) {

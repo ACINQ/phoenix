@@ -500,13 +500,13 @@
 
     <string name="prefs_display_title">Tùy chọn hiển thị</string>
     <string name="prefs_display_coin_label">Đơn vị Bitcoin</string>
-    <string name="prefs_display_coin_sat_label">Satoshi (sat)</string>
+    <string name="prefs_display_coin_sat_label">Satoshi</string>
     <string name="prefs_display_coin_sat_desc">1 sat bằng 0.00000001 btc</string>
-    <string name="prefs_display_coin_bit_label">Bit (bit)</string>
+    <string name="prefs_display_coin_bit_label">Bit</string>
     <string name="prefs_display_coin_bit_desc">1 bit bằng 0.000001 btc</string>
-    <string name="prefs_display_coin_mbtc_label">Milli-Bitcoin (mbtc)</string>
+    <string name="prefs_display_coin_mbtc_label">Milli-Bitcoin</string>
     <string name="prefs_display_coin_mbtc_desc">1 mbtc bằng 0.001 btc</string>
-    <string name="prefs_display_coin_btc_label">Bitcoin (btc)</string>
+    <string name="prefs_display_coin_btc_label">Bitcoin</string>
     <string name="prefs_display_fiat_label">Tiền tệ pháp định</string>
     <string name="prefs_display_theme_label">Giao diện ứng dụng</string>
     <string name="prefs_display_theme_dark_label">Giao diện tối</string>

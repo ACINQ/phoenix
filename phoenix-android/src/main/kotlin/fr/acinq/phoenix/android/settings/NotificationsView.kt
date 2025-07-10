@@ -50,9 +50,9 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.home.TorDisconnectedDialog
 import fr.acinq.phoenix.android.services.ChannelsWatcher
-import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
-import fr.acinq.phoenix.android.utils.Converter.toPrettyString
-import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
+import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
+import fr.acinq.phoenix.android.utils.converters.DateFormatter.toAbsoluteDateTimeString
+import fr.acinq.phoenix.android.utils.converters.DateFormatter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.extensions.safeLet
 import fr.acinq.phoenix.data.Notification
 import fr.acinq.phoenix.data.WatchTowerOutcome
@@ -257,7 +257,7 @@ private fun PaymentNotification(
     onNotificationRead: (UUID) -> Unit,
 ) {
     val nc = LocalNavController.current
-    val btcUnit = LocalBitcoinUnit.current
+    val btcUnit = LocalBitcoinUnits.current.primary
     when (notification) {
         is Notification.PaymentRejected -> {
             DimissibleNotification(

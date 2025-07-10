@@ -18,7 +18,6 @@ package fr.acinq.phoenix.android.payments.send.offer
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -45,10 +44,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.wire.OfferTypes
-import fr.acinq.phoenix.android.LocalBitcoinUnit
+import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.AmountHeroInput
+import fr.acinq.phoenix.android.components.inputs.AmountHeroInput
 import fr.acinq.phoenix.android.components.AmountWithFiatRowView
 import fr.acinq.phoenix.android.components.BackButtonWithBalance
 import fr.acinq.phoenix.android.components.Clickable
@@ -56,13 +55,13 @@ import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.SplashLabelRow
 import fr.acinq.phoenix.android.components.SplashLayout
-import fr.acinq.phoenix.android.components.TextInput
+import fr.acinq.phoenix.android.components.inputs.TextInput
 import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
 import fr.acinq.phoenix.android.components.contact.ContactOrOfferView
 import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.payments.details.splash.translatePaymentError
-import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 
 @Composable
 fun SendToOfferView(
@@ -71,7 +70,7 @@ fun SendToOfferView(
     onPaymentSent: () -> Unit,
 ) {
     val context = LocalContext.current
-    val prefBitcoinUnit = LocalBitcoinUnit.current
+    val prefBitcoinUnit = LocalBitcoinUnits.current.primary
     val keyboardManager = LocalSoftwareKeyboardController.current
 
     val balance = business.balanceManager.balance.collectAsState(null).value

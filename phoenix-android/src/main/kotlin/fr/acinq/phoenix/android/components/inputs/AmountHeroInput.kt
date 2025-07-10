@@ -1,4 +1,20 @@
-package fr.acinq.phoenix.android.components
+/*
+ * Copyright 2025 ACINQ SAS
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package fr.acinq.phoenix.android.components.inputs
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clipScrollableContainer
@@ -45,14 +61,17 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.phoenix.android.LocalBitcoinUnit
-import fr.acinq.phoenix.android.LocalFiatCurrency
+import fr.acinq.phoenix.android.LocalBitcoinUnits
+import fr.acinq.phoenix.android.LocalExchangeRatesMap
+import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.fiatRate
-import fr.acinq.phoenix.android.utils.Converter.toFiat
-import fr.acinq.phoenix.android.utils.Converter.toPlainString
-import fr.acinq.phoenix.android.utils.Converter.toPrettyString
-import fr.acinq.phoenix.android.utils.Converter.toUnit
+import fr.acinq.phoenix.android.utils.converters.AmountConversionResult
+import fr.acinq.phoenix.android.utils.converters.AmountConverter
+import fr.acinq.phoenix.android.utils.converters.AmountConverter.toFiat
+import fr.acinq.phoenix.android.utils.converters.AmountConverter.toUnit
+import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPlainString
+import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
+import fr.acinq.phoenix.android.utils.converters.ComplexAmount
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.CurrencyUnit
@@ -76,18 +95,21 @@ fun AmountHeroInput(
     enabled: Boolean = true,
 ) {
     val context = LocalContext.current
-    val prefBitcoinUnit = LocalBitcoinUnit.current
-    val prefFiat = LocalFiatCurrency.current
-    val rate = fiatRate
-    val units = listOf<CurrencyUnit>(BitcoinUnit.Sat, BitcoinUnit.Bit, BitcoinUnit.MBtc, BitcoinUnit.Btc, prefFiat)
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    var unit: CurrencyUnit by remember { mutableStateOf(prefBitcoinUnit) }
+    val prefBitcoinUnits = LocalBitcoinUnits.current
+    val prefFiatCurrencies = LocalFiatCurrencies.current
+
+    val rates = LocalExchangeRatesMap.current
+    var unit: CurrencyUnit by remember { mutableStateOf(prefBitcoinUnits.primary) }
+    val units = remember(prefBitcoinUnits, prefFiatCurrencies) { prefBitcoinUnits.all + prefFiatCurrencies.primary + prefFiatCurrencies.others }
+
     var inputValue by remember(initialAmount) {
         mutableStateOf(TextFieldValue(
             when (val u = unit) {
                 is FiatCurrency -> {
+                    val rate = rates[unit]
                     if (rate != null) {
                         initialAmount?.toFiat(rate.price).toPlainString(limitDecimal = true)
                     } else "?!"
@@ -99,27 +121,74 @@ fun AmountHeroInput(
             }
         ))
     }
-    var convertedValue: String by remember(initialAmount) {
-        mutableStateOf(initialAmount?.toPrettyString(if (unit is FiatCurrency) prefBitcoinUnit else prefFiat, rate, withUnit = true) ?: "")
+    var inputAmount by remember { mutableStateOf(initialAmount) }
+    val convertedValue: String by remember(inputAmount, unit) {
+        val s = when (unit) {
+            is FiatCurrency -> {
+                val inBtc = inputAmount?.toPrettyString(prefBitcoinUnits.primary, withUnit = true)
+                val fiat = prefFiatCurrencies.primary
+                val inPrimary = if (unit != fiat) {
+                    rates[fiat]?.price?.let { rate ->
+                        inputAmount?.toFiat(rate)?.toPrettyString(unit = fiat, withUnit = true)
+                    }
+                } else null
+
+                inBtc?.let {
+                    inPrimary?.let {
+                        "$inBtc / $inPrimary"
+                    } ?: inBtc
+                }
+            }
+            is BitcoinUnit -> {
+                val fiat = prefFiatCurrencies.primary
+                rates[fiat]?.price?.let { rate ->
+                    inputAmount?.toFiat(rate)?.toPrettyString(unit = fiat, withUnit = true)
+                }
+            }
+            else -> null
+        }
+
+        mutableStateOf(s ?: "")
     }
 
     var internalErrorMessage: String by remember { mutableStateOf(validationErrorMessage) }
     val errorMessage = validationErrorMessage.ifBlank { internalErrorMessage.ifBlank { null } }
+
+    fun updateFieldsForInputChange() {
+        internalErrorMessage = ""
+        val res = AmountConverter.convertToComplexAmount(
+            input = inputValue.text,
+            unit = unit,
+            rate = rates[unit],
+        )
+        when (res) {
+            is AmountConversionResult.Error -> {
+                inputAmount = null
+                internalErrorMessage = when (res) {
+                    is AmountConversionResult.Error.InvalidInput -> context.getString(R.string.validation_invalid_number)
+                    is AmountConversionResult.Error.RateUnavailable -> context.getString(R.string.utils_no_conversion)
+                    is AmountConversionResult.Error.AmountTooLarge -> context.getString(R.string.send_error_amount_too_large)
+                    is AmountConversionResult.Error.AmountNegative -> context.getString(R.string.send_error_amount_negative)
+                }
+            }
+
+            null -> {
+                inputAmount = null
+                onAmountChange(null)
+            }
+            is ComplexAmount -> {
+                inputAmount = res.amount
+                onAmountChange(res)
+            }
+        }
+    }
 
     val input: @Composable () -> Unit = {
         BasicTextField(
             value = inputValue,
             onValueChange = { newValue ->
                 inputValue = newValue
-                AmountInputHelper.convertToComplexAmount(
-                    context = context,
-                    input = inputValue.text,
-                    unit = unit,
-                    prefBitcoinUnit = prefBitcoinUnit,
-                    rate = rate,
-                    onConverted = { convertedValue = it },
-                    onError = { internalErrorMessage = it }
-                ).let { onAmountChange(it) }
+                updateFieldsForInputChange()
             },
             modifier = inputModifier
                 .clipScrollableContainer(Orientation.Horizontal)
@@ -145,41 +214,30 @@ fun AmountHeroInput(
 
     val unitDropdown: @Composable () -> Unit = {
         UnitDropdown(
-            selectedUnit = unit,
+            amount = inputAmount,
+            unit = unit,
             units = units,
-            onUnitChange = { newUnit ->
-                val currentAmount = AmountInputHelper.convertToComplexAmount(
-                    context = context,
-                    input = inputValue.text,
-                    unit = unit,
-                    prefBitcoinUnit = prefBitcoinUnit,
-                    rate = rate,
-                    onConverted = { },
-                    onError = { }
-                )?.amount
-                // update the actual input value to the converted amount
-                when (newUnit) {
-                    is FiatCurrency -> {
-                        inputValue = TextFieldValue(if (rate == null) "?!" else currentAmount?.toFiat(rate.price).toPlainString(limitDecimal = false))
-                    }
-                    is BitcoinUnit -> {
-                        inputValue = TextFieldValue(currentAmount?.toUnit(newUnit).toPlainString())
+            onUnitChange = { newAmount, newUnit ->
+                if (newAmount != null) {
+                    when (newUnit) {
+                        is FiatCurrency -> {
+                            val fiat = newAmount.fiat
+                            if (fiat != null && fiat.currency == newUnit) {
+                                inputValue = TextFieldValue(fiat.value.toPlainString(limitDecimal = true))
+                            }
+                        }
+                        is BitcoinUnit -> {
+                            inputValue = TextFieldValue(newAmount.amount.toUnit(newUnit).toPlainString())
+                        }
                     }
                 }
                 unit = newUnit
-                AmountInputHelper.convertToComplexAmount(
-                    context = context,
-                    input = inputValue.text,
-                    unit = unit,
-                    prefBitcoinUnit = prefBitcoinUnit,
-                    rate = rate,
-                    onConverted = { convertedValue = it },
-                    onError = { internalErrorMessage = it }
-                ).let { onAmountChange(it) }
+                updateFieldsForInputChange()
             },
+            canAddMoreUnits = true,
             onDismiss = { },
             modifier = dropdownModifier,
-            enabled = enabled
+            enabled = enabled,
         )
     }
 
@@ -220,8 +278,8 @@ fun AmountHeroInput(
             val dashedLineHeight = dashedLinePlaceables.maxOf { it.height }
             val layoutHeight = listOf(inputHeight, unitHeight).maxOrNull() ?: (0 + dashedLineHeight)
 
-            val inputBaseline = inputSlotPlaceables.map { it[FirstBaseline] }.maxOrNull() ?: 0
-            val unitBaseline = unitSlotPlaceables.map { it[FirstBaseline] }.maxOrNull() ?: 0
+            val inputBaseline = inputSlotPlaceables.maxOfOrNull { it[FirstBaseline] } ?: 0
+            val unitBaseline = unitSlotPlaceables.maxOfOrNull { it[FirstBaseline] } ?: 0
 
             layout(layoutWidth, layoutHeight) {
                 var x = 0

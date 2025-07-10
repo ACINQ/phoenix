@@ -25,24 +25,26 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import fr.acinq.phoenix.android.LocalBitcoinUnit
-import fr.acinq.phoenix.android.LocalFiatCurrency
+import fr.acinq.phoenix.android.LocalBitcoinUnits
+import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
-import fr.acinq.phoenix.android.components.settings.ListPreferenceButton
-import fr.acinq.phoenix.android.components.settings.PreferenceItem
+import fr.acinq.phoenix.android.components.prefs.ListPreferenceButton
+import fr.acinq.phoenix.android.components.prefs.PreferenceItem
 import fr.acinq.phoenix.android.components.settings.Setting
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.UserTheme
+import fr.acinq.phoenix.android.utils.datastore.PreferredBitcoinUnits
 import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
 import fr.acinq.phoenix.android.utils.extensions.label
-import fr.acinq.phoenix.android.utils.extensions.labels
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.managers.AppConfigurationManager
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -68,12 +70,12 @@ fun DisplayPrefsView() {
 private fun BitcoinUnitPreference(userPrefs: UserPrefsRepository, scope: CoroutineScope) {
     var prefsEnabled by remember { mutableStateOf(true) }
     val preferences = listOf(
-        PreferenceItem(item = BitcoinUnit.Sat, title = BitcoinUnit.Sat.label(), description = stringResource(id = R.string.prefs_display_coin_sat_desc)),
-        PreferenceItem(item = BitcoinUnit.Bit, title = BitcoinUnit.Bit.label(), description = stringResource(id = R.string.prefs_display_coin_bit_desc)),
-        PreferenceItem(item = BitcoinUnit.MBtc, title = BitcoinUnit.MBtc.label(), description = stringResource(id = R.string.prefs_display_coin_mbtc_desc)),
-        PreferenceItem(item = BitcoinUnit.Btc, title = BitcoinUnit.Btc.label()),
+        PreferenceItem(item = BitcoinUnit.Sat, title = "${BitcoinUnit.Sat.label()} (${BitcoinUnit.Sat.displayCode})", description = stringResource(id = R.string.prefs_display_coin_sat_desc)),
+        PreferenceItem(item = BitcoinUnit.Bit, title = "${BitcoinUnit.Bit.label()} (${BitcoinUnit.Bit.displayCode})", description = stringResource(id = R.string.prefs_display_coin_bit_desc)),
+        PreferenceItem(item = BitcoinUnit.MBtc, title = "${BitcoinUnit.MBtc.label()} (${BitcoinUnit.MBtc.displayCode})", description = stringResource(id = R.string.prefs_display_coin_mbtc_desc)),
+        PreferenceItem(item = BitcoinUnit.Btc, title = "${BitcoinUnit.Btc.label()} (${BitcoinUnit.Btc.displayCode})"),
     )
-    val currentPref = LocalBitcoinUnit.current
+    val currentPref = LocalBitcoinUnits.current.primary
     ListPreferenceButton(
         title = stringResource(id = R.string.prefs_display_coin_label),
         subtitle = { TextWithIcon(text = currentPref.label(), icon = R.drawable.ic_bitcoin) },
@@ -83,7 +85,9 @@ private fun BitcoinUnitPreference(userPrefs: UserPrefsRepository, scope: Corouti
         onPreferenceSubmit = {
             prefsEnabled = false
             scope.launch {
-                userPrefs.saveBitcoinUnit(it.item)
+                val previousBitcoinUnits = userPrefs.getBitcoinUnits.first()
+                val newBitcoinUnits = PreferredBitcoinUnits(primary = it.item, others = previousBitcoinUnits.others - it.item)
+                userPrefs.saveBitcoinUnits(newBitcoinUnits)
                 prefsEnabled = true
             }
         }
@@ -95,24 +99,26 @@ private fun FiatCurrencyPreference(userPrefs: UserPrefsRepository, scope: Corout
     var prefEnabled by remember { mutableStateOf(true) }
 
     val preferences = FiatCurrency.values.map {
-        val (title, desc) = it.labels()
+        val (title, desc) = it.label()
         PreferenceItem(item = it, title = title, description = desc)
     }
 
     val appConfigurationManager = business.appConfigurationManager
 
-    val currentPref = LocalFiatCurrency.current
+    val currentPref = LocalFiatCurrencies.current.primary
     ListPreferenceButton(
         title = stringResource(id = R.string.prefs_display_fiat_label),
-        subtitle = { Text(text = currentPref.labels().first) },
+        subtitle = { Text(text = currentPref.label().first) },
         enabled = prefEnabled,
         selectedItem = currentPref,
         preferences = preferences,
         onPreferenceSubmit = {
             prefEnabled = false
             scope.launch {
-                userPrefs.saveFiatCurrency(it.item)
-                appConfigurationManager.updatePreferredFiatCurrencies(AppConfigurationManager.PreferredFiatCurrencies(primary = it.item, others = emptySet()))
+                val previousFiatCurrencies = userPrefs.getFiatCurrencies.first()
+                val prefCurrencies = AppConfigurationManager.PreferredFiatCurrencies(primary = it.item, others = previousFiatCurrencies.others - it.item)
+                userPrefs.saveFiatCurrencyList(prefCurrencies)
+                appConfigurationManager.updatePreferredFiatCurrencies(prefCurrencies)
                 prefEnabled = true
             }
         }
@@ -122,7 +128,7 @@ private fun FiatCurrencyPreference(userPrefs: UserPrefsRepository, scope: Corout
 @Composable
 private fun UserThemePreference(userPrefs: UserPrefsRepository, scope: CoroutineScope) {
     var prefEnabled by remember { mutableStateOf(true) }
-    val preferences = UserTheme.values().map {
+    val preferences = UserTheme.entries.map {
         PreferenceItem(it, title = it.label())
     }
     val currentPref by userPrefs.getUserTheme.collectAsState(initial = UserTheme.SYSTEM)

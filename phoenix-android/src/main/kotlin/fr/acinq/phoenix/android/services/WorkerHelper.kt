@@ -34,7 +34,7 @@ object WorkerHelper {
         val electrumServer = userPrefs.getElectrumServer.first()
         val isTorEnabled = userPrefs.getIsTorEnabled.first()
         val liquidityPolicy = userPrefs.getLiquidityPolicy.first()
-        val preferredFiatCurrency = userPrefs.getFiatCurrency.first()
+        val preferredFiatCurrency = userPrefs.getFiatCurrencies.first().primary
 
         // preparing business
         val seed = business.walletManager.mnemonicsToSeed(EncryptedSeed.toMnemonics(mnemonics), wordList = MnemonicLanguage.English.wordlist())

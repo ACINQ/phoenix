@@ -60,6 +60,7 @@
     <!-- settings list -->
 
     <string name="settings_general_title">Quản lý chung</string>
+    <string name="settings_fees_title">Phí</string>
     <string name="settings_security_title">Quyền riêng tư &amp; Bảo mật</string>
     <string name="settings_advanced_title">Cài đặt nâng cao</string>
     <string name="settings_danger_title">Vùng nguy hiểm</string>
@@ -80,7 +81,9 @@
     <string name="settings_payment_settings">Phương thức thanh toán</string>
     <string name="settings_payment_history">Lịch sử thanh toán</string>
     <string name="settings_notifications">Thông báo</string>
-    <string name="settings_contacts">Danh bạ của tôi</string>
+    <string name="settings_contacts">Liên hệ</string>
+    <string name="settings_converter">Bộ chuyển đổi tiền tệ</string>
+    <string name="settings_add_liquidity">Thêm tính thanh khoản</string>
 
     <!-- home: swap help -->
 

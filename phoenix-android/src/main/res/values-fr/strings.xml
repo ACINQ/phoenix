@@ -528,13 +528,13 @@
 
     <string name="prefs_display_title">Options d\'affichage</string>
     <string name="prefs_display_coin_label">Dénomination Bitcoin</string>
-    <string name="prefs_display_coin_sat_label">Satoshi (sat)</string>
+    <string name="prefs_display_coin_sat_label">Satoshi</string>
     <string name="prefs_display_coin_sat_desc">1 sat = 0.00000001 btc</string>
-    <string name="prefs_display_coin_bit_label">Bit (bit)</string>
+    <string name="prefs_display_coin_bit_label">Bit</string>
     <string name="prefs_display_coin_bit_desc">1 bit = 0.000001 btc</string>
-    <string name="prefs_display_coin_mbtc_label">Milli-Bitcoin (mbtc)</string>
+    <string name="prefs_display_coin_mbtc_label">Milli-Bitcoin</string>
     <string name="prefs_display_coin_mbtc_desc">1 mbtc = 0.001 btc</string>
-    <string name="prefs_display_coin_btc_label">Bitcoin (btc)</string>
+    <string name="prefs_display_coin_btc_label">Bitcoin</string>
     <string name="prefs_display_fiat_label">Monnaie fiduciare</string>
     <string name="prefs_display_theme_label">Thème de l\'application</string>
     <string name="prefs_display_theme_dark_label">Thème sombre</string>

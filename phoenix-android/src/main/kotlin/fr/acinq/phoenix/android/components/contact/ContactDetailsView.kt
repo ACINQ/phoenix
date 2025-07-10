@@ -77,7 +77,7 @@ import fr.acinq.phoenix.android.components.Clickable
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.SwitchView
-import fr.acinq.phoenix.android.components.TextInput
+import fr.acinq.phoenix.android.components.inputs.TextInput
 import fr.acinq.phoenix.android.components.dialogs.ConfirmDialog
 import fr.acinq.phoenix.android.components.dialogs.FullScreenDialog
 import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
@@ -192,7 +192,7 @@ private fun ColumnScope.ContactNameAndPhoto(
 
             Button(
                 text = stringResource(id = R.string.btn_delete),
-                icon = R.drawable.ic_trash,
+                icon = R.drawable.ic_remove,
                 iconTint = negativeColor,
                 padding = PaddingValues(horizontal = 8.dp, vertical = 20.dp),
                 horizontalArrangement = Arrangement.Center,
@@ -565,7 +565,7 @@ private fun ContactOfferDetailDialog(
                 Spacer(Modifier.height(16.dp))
                 FilledButton(
                     text = stringResource(R.string.btn_delete),
-                    icon = R.drawable.ic_trash,
+                    icon = R.drawable.ic_remove,
                     onClick = { showDeleteCodeConfirmation = true },
                     backgroundColor = Color.Transparent,
                     textStyle = MaterialTheme.typography.button,

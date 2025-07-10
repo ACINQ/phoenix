@@ -33,6 +33,7 @@ import fr.acinq.phoenix.data.ElectrumConfig
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.lnurl.LnurlAuth
 import fr.acinq.phoenix.db.migrations.v10.json.SatoshiSerializer
+import fr.acinq.phoenix.managers.AppConfigurationManager
 import fr.acinq.phoenix.managers.NodeParamsManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -65,11 +66,12 @@ class UserPrefsRepository(private val data: DataStore<Preferences>) {
     private companion object {
         // display
         private val BITCOIN_UNIT = stringPreferencesKey("BITCOIN_UNIT")
+        private val BITCOIN_UNITS = stringPreferencesKey("BITCOIN_UNITS")
         private val FIAT_CURRENCY = stringPreferencesKey("FIAT_CURRENCY")
+        private val FIAT_CURRENCIES = stringPreferencesKey("FIAT_CURRENCIES")
         private val SHOW_AMOUNT_IN_FIAT = booleanPreferencesKey("SHOW_AMOUNT_IN_FIAT")
         private val HOME_AMOUNT_DISPLAY_MODE = stringPreferencesKey("HOME_AMOUNT_DISPLAY_MODE")
         private val THEME = stringPreferencesKey("THEME")
-        private val HIDE_BALANCE = booleanPreferencesKey("HIDE_BALANCE")
         // electrum
         val PREFS_ELECTRUM_ADDRESS_HOST = stringPreferencesKey("PREFS_ELECTRUM_ADDRESS_HOST")
         val PREFS_ELECTRUM_ADDRESS_PORT = intPreferencesKey("PREFS_ELECTRUM_ADDRESS_PORT")
@@ -101,11 +103,45 @@ class UserPrefsRepository(private val data: DataStore<Preferences>) {
         private val SHOW_NOTIFICATION_PERMISSION_REMINDER = booleanPreferencesKey("SHOW_NOTIFICATION_PERMISSION_REMINDER")
     }
 
-    val getBitcoinUnit: Flow<BitcoinUnit> = safeData.map { it[BITCOIN_UNIT]?.let { BitcoinUnit.valueOfOrNull(it) } ?: BitcoinUnit.Sat }
-    suspend fun saveBitcoinUnit(coinUnit: BitcoinUnit) = data.edit { it[BITCOIN_UNIT] = coinUnit.name }
+    val getBitcoinUnits: Flow<PreferredBitcoinUnits> = safeData.map {
+        it[BITCOIN_UNITS]?.let {
+            try {
+                Json.decodeFromString<PreferredBitcoinUnits>(it)
+            } catch (e: Exception) {
+                log.error("failed to decode bitcoin units: $it: ${e.message}")
+                null
+            }
+        } ?: PreferredBitcoinUnits(primary = it[BITCOIN_UNIT]?.let { BitcoinUnit.valueOfOrNull(it) } ?: BitcoinUnit.Sat)
+    }
+    suspend fun saveBitcoinUnits(units: PreferredBitcoinUnits) = data.edit {
+        try {
+            it[BITCOIN_UNITS] = Json.encodeToString(units)
+        } catch (e: Exception) {
+            log.error("failed to save bitcoin units list: $units: ${e.message}")
+        }
+    }
 
-    val getFiatCurrency: Flow<FiatCurrency> = safeData.map { it[FIAT_CURRENCY]?.let { FiatCurrency.valueOfOrNull(it) } ?: FiatCurrency.USD }
-    suspend fun saveFiatCurrency(currency: FiatCurrency) = data.edit { it[FIAT_CURRENCY] = currency.name }
+    val getFiatCurrencies: Flow<AppConfigurationManager.PreferredFiatCurrencies> = safeData.map {
+        it[FIAT_CURRENCIES]?.let {
+            try {
+                Json.decodeFromString<AppConfigurationManager.PreferredFiatCurrencies>(it)
+            } catch (e: Exception) {
+                log.error("failed to decode fiat currencies list: $it: ${e.message}")
+                null
+            }
+        } ?: AppConfigurationManager.PreferredFiatCurrencies(
+            // fallback to the legacy property
+            primary = it[FIAT_CURRENCY]?.let { FiatCurrency.valueOfOrNull(it) } ?: FiatCurrency.USD,
+            others = emptySet()
+        )
+    }
+    suspend fun saveFiatCurrencyList(preferredCurrencies: AppConfigurationManager.PreferredFiatCurrencies) = data.edit {
+        try {
+            it[FIAT_CURRENCIES] = Json.encodeToString(preferredCurrencies)
+        } catch (e: Exception) {
+            log.error("failed to save fiat currencies list: ${e.message}")
+        }
+    }
 
     val getIsAmountInFiat: Flow<Boolean> = safeData.map { it[SHOW_AMOUNT_IN_FIAT] ?: false }
     suspend fun saveIsAmountInFiat(inFiat: Boolean) = data.edit { it[SHOW_AMOUNT_IN_FIAT] = inFiat }
@@ -124,9 +160,6 @@ class UserPrefsRepository(private val data: DataStore<Preferences>) {
 
     val getUserTheme: Flow<UserTheme> = safeData.map { UserTheme.safeValueOf(it[THEME]) }
     suspend fun saveUserTheme(theme: UserTheme) = data.edit { it[THEME] = theme.name }
-
-    val getHideBalance: Flow<Boolean> = safeData.map { it[HIDE_BALANCE] ?: false }
-    suspend fun saveHideBalance(hideBalance: Boolean) = data.edit { it[HIDE_BALANCE] = hideBalance }
 
     val getElectrumServer: Flow<ElectrumConfig.Custom?> = safeData.map {
         val host = it[PREFS_ELECTRUM_ADDRESS_HOST]?.takeIf { it.isNotBlank() }
@@ -340,4 +373,12 @@ enum class SwapAddressFormat(val code: Int) {
             else -> TAPROOT_ROTATE
         }
     }
+}
+
+@Serializable
+data class PreferredBitcoinUnits(
+    val primary: BitcoinUnit,
+    val others: List<BitcoinUnit> = emptyList()
+) {
+    val all by lazy { listOf(primary) + others }
 }

@@ -53,6 +53,7 @@
     <!-- settings list -->
 
     <string name="settings_general_title">Všeobecné</string>
+    <string name="settings_fees_title">Poplatky</string>
     <string name="settings_security_title">Ochrana súkromia a zabezpečenie</string>
     <string name="settings_advanced_title">Pokročilé</string>
     <string name="settings_danger_title">Nebezpečná zóna</string>
@@ -73,7 +74,9 @@
     <string name="settings_payment_settings">Nastavenia platieb</string>
     <string name="settings_payment_history">História platieb</string>
     <string name="settings_notifications">Notifikácie</string>
-    <string name="settings_contacts">Moje kontakty</string>
+    <string name="settings_contacts">Kontakty</string>
+    <string name="settings_converter">Prevodník mien</string>
+    <string name="settings_add_liquidity">Pridať likviditu</string>
 
     <!-- home: swap help -->
 

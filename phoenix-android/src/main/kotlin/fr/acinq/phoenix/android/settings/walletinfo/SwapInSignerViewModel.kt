@@ -128,6 +128,7 @@ class SwapInSignerViewModel(
         }) {
             val keyManager = walletManager.keyManager.filterNotNull().first()
             val userPrivateKey = keyManager.swapInOnChainWallet.userPrivateKey
+            val userPublicKey = keyManager.swapInOnChainWallet.userPublicKey
 
             // read tx input
             val tx = try {
@@ -160,7 +161,14 @@ class SwapInSignerViewModel(
 
             // generate nonce
             val (userPrivateNonce, userNonce) = try {
-                Musig2.generateNonce(randomBytes32(), userPrivateKey, listOf(swapInProtocol.userPublicKey, swapInProtocol.serverPublicKey))
+                Musig2.generateNonce(
+                    sessionId = randomBytes32(),
+                    privateKey = userPrivateKey,
+                    publicKey = userPublicKey,
+                    publicKeys = listOf(swapInProtocol.userPublicKey, swapInProtocol.serverPublicKey),
+                    message = null,
+                    extraInput = null
+                )
             } catch (e: Exception) {
                 log.error("(taproot) unable to generate nonce: ", e)
                 state.value = TaprootSwapInSignerState.Failed.NonceGenerationFailure(e)

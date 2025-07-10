@@ -88,7 +88,8 @@ fun MenuButton(
                 role = Role.Button,
                 onClickLabel = onClickLabel,
             )
-            .padding(padding),
+            .padding(padding)
+            .enableOrFade(enabled),
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically,
     ) {
