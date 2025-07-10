@@ -47,9 +47,11 @@ import fr.acinq.phoenix.android.LocalExchangeRatesMap
 import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
+import fr.acinq.phoenix.android.components.Clickable
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.TransparentFilledButton
 import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
+import fr.acinq.phoenix.android.components.dialogs.PopupDialog
 import fr.acinq.phoenix.android.components.prefs.CurrenciesPickerDialog
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.converters.AmountConverter.toFiat
@@ -58,6 +60,7 @@ import fr.acinq.phoenix.android.utils.converters.AmountConversionResult
 import fr.acinq.phoenix.android.utils.converters.AmountConverter
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.FIAT_FORMAT_WRITABLE
 import fr.acinq.phoenix.android.utils.converters.ComplexAmount
+import fr.acinq.phoenix.android.utils.converters.DateFormatter.toAbsoluteDateTimeString
 import fr.acinq.phoenix.android.utils.datastore.PreferredBitcoinUnits
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.CurrencyUnit
@@ -243,7 +246,15 @@ private fun FiatConverterInput(
                 modifier = Modifier.weight(1f),
                 backgroundColor = MaterialTheme.colors.surface,
                 placeholder = { Text(text = stringResource(R.string.converter_placeholder_label, fiat.displayCode), style = MaterialTheme.typography.caption) },
-                leadingContent = { Text(text = fiat.flag, modifier = Modifier.size(20.dp), textAlign = TextAlign.Right) },
+                leadingContent = {
+                    var showTimestamp by remember { mutableStateOf(false) }
+                    if (showTimestamp) {
+                        PopupDialog(onDismiss = { showTimestamp = false }, message = stringResource(R.string.converter_timestamp_refresh, rate.timestampMillis.toAbsoluteDateTimeString()))
+                    }
+                    Clickable(onClick = { showTimestamp = true }) {
+                        Text(text = fiat.flag, modifier = Modifier.size(20.dp), textAlign = TextAlign.Right)
+                    }
+                },
                 trailingContent = { Text(text = fiat.displayCode) }
             )
         }

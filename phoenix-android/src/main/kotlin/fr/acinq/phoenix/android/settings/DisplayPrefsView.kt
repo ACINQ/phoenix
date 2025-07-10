@@ -70,10 +70,10 @@ fun DisplayPrefsView() {
 private fun BitcoinUnitPreference(userPrefs: UserPrefsRepository, scope: CoroutineScope) {
     var prefsEnabled by remember { mutableStateOf(true) }
     val preferences = listOf(
-        PreferenceItem(item = BitcoinUnit.Sat, title = BitcoinUnit.Sat.label(), description = stringResource(id = R.string.prefs_display_coin_sat_desc)),
-        PreferenceItem(item = BitcoinUnit.Bit, title = BitcoinUnit.Bit.label(), description = stringResource(id = R.string.prefs_display_coin_bit_desc)),
-        PreferenceItem(item = BitcoinUnit.MBtc, title = BitcoinUnit.MBtc.label(), description = stringResource(id = R.string.prefs_display_coin_mbtc_desc)),
-        PreferenceItem(item = BitcoinUnit.Btc, title = BitcoinUnit.Btc.label()),
+        PreferenceItem(item = BitcoinUnit.Sat, title = "${BitcoinUnit.Sat.label()} (${BitcoinUnit.Sat.displayCode})", description = stringResource(id = R.string.prefs_display_coin_sat_desc)),
+        PreferenceItem(item = BitcoinUnit.Bit, title = "${BitcoinUnit.Bit.label()} (${BitcoinUnit.Bit.displayCode})", description = stringResource(id = R.string.prefs_display_coin_bit_desc)),
+        PreferenceItem(item = BitcoinUnit.MBtc, title = "${BitcoinUnit.MBtc.label()} (${BitcoinUnit.MBtc.displayCode})", description = stringResource(id = R.string.prefs_display_coin_mbtc_desc)),
+        PreferenceItem(item = BitcoinUnit.Btc, title = "${BitcoinUnit.Btc.label()} (${BitcoinUnit.Btc.displayCode})"),
     )
     val currentPref = LocalBitcoinUnits.current.primary
     ListPreferenceButton(
