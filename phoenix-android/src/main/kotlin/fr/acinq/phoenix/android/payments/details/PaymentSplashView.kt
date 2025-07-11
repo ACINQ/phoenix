@@ -40,9 +40,9 @@ import fr.acinq.lightning.db.SpliceInIncomingPayment
 import fr.acinq.lightning.db.SpliceOutgoingPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.BorderButton
-import fr.acinq.phoenix.android.components.DefaultScreenHeader
-import fr.acinq.phoenix.android.components.SplashLayout
+import fr.acinq.phoenix.android.components.buttons.BorderButton
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.layouts.SplashLayout
 import fr.acinq.phoenix.android.payments.details.splash.SplashAutoLiquidityPurchase
 import fr.acinq.phoenix.android.payments.details.splash.SplashChannelClose
 import fr.acinq.phoenix.android.payments.details.splash.SplashIncomingBolt11

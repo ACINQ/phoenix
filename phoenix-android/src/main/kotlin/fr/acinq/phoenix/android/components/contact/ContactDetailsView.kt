@@ -72,11 +72,11 @@ import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.navigation.Screen
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.Button
-import fr.acinq.phoenix.android.components.Clickable
-import fr.acinq.phoenix.android.components.FilledButton
+import fr.acinq.phoenix.android.components.buttons.Button
+import fr.acinq.phoenix.android.components.buttons.Clickable
+import fr.acinq.phoenix.android.components.buttons.FilledButton
 import fr.acinq.phoenix.android.components.PhoenixIcon
-import fr.acinq.phoenix.android.components.SwitchView
+import fr.acinq.phoenix.android.components.buttons.SwitchView
 import fr.acinq.phoenix.android.components.inputs.TextInput
 import fr.acinq.phoenix.android.components.dialogs.ConfirmDialog
 import fr.acinq.phoenix.android.components.dialogs.FullScreenDialog

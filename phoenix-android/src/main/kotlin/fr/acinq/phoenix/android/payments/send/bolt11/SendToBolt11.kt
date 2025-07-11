@@ -37,8 +37,12 @@ import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
 import fr.acinq.phoenix.android.components.inputs.AmountHeroInput
+import fr.acinq.phoenix.android.components.buttons.BackButtonWithBalance
+import fr.acinq.phoenix.android.components.layouts.SplashLabelRow
+import fr.acinq.phoenix.android.components.layouts.SplashLayout
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.extensions.safeLet

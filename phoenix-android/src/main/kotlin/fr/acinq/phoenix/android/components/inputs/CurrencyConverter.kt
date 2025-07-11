@@ -47,9 +47,9 @@ import fr.acinq.phoenix.android.LocalExchangeRatesMap
 import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.Clickable
+import fr.acinq.phoenix.android.components.buttons.Clickable
 import fr.acinq.phoenix.android.components.HSeparator
-import fr.acinq.phoenix.android.components.TransparentFilledButton
+import fr.acinq.phoenix.android.components.buttons.TransparentFilledButton
 import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.components.dialogs.PopupDialog
 import fr.acinq.phoenix.android.components.prefs.CurrenciesPickerDialog

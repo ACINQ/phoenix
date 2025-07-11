@@ -53,13 +53,13 @@ import fr.acinq.lightning.blockchain.electrum.ElectrumConnectionStatus
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.Card
+import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.components.dialogs.Dialog
-import fr.acinq.phoenix.android.components.FilledButton
+import fr.acinq.phoenix.android.components.buttons.FilledButton
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.TextWithIcon
-import fr.acinq.phoenix.android.components.openLink
-import fr.acinq.phoenix.android.components.txUrl
+import fr.acinq.phoenix.android.components.buttons.openLink
+import fr.acinq.phoenix.android.components.buttons.txUrl
 import fr.acinq.phoenix.android.payments.send.cpfp.CpfpView
 import fr.acinq.phoenix.android.utils.converters.DateFormatter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.annotatedStringResource

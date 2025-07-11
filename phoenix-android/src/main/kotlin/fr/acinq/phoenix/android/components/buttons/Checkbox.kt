@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.components
+package fr.acinq.phoenix.android.components.buttons
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import fr.acinq.phoenix.android.components.enableOrFade
 import fr.acinq.phoenix.android.isDarkTheme
 import fr.acinq.phoenix.android.utils.gray300
 import fr.acinq.phoenix.android.utils.gray600

@@ -31,7 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.Button
+import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.userPrefs
 
 @Composable

@@ -69,11 +69,11 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.navigation.Screen
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountView
-import fr.acinq.phoenix.android.components.Clickable
+import fr.acinq.phoenix.android.components.buttons.Clickable
 import fr.acinq.phoenix.android.components.dialogs.IconPopup
 import fr.acinq.phoenix.android.components.TextWithIcon
-import fr.acinq.phoenix.android.components.openLink
-import fr.acinq.phoenix.android.components.txUrl
+import fr.acinq.phoenix.android.components.buttons.openLink
+import fr.acinq.phoenix.android.components.buttons.txUrl
 import fr.acinq.phoenix.android.primaryFiatRate
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.payments.details.technical.TechnicalIncomingBolt11

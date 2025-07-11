@@ -53,10 +53,10 @@ import androidx.navigation.compose.NavHost
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import fr.acinq.phoenix.android.components.Button
+import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.auth.screenlock.ScreenLockPrompt
 import fr.acinq.phoenix.android.components.dialogs.Dialog
-import fr.acinq.phoenix.android.components.openLink
+import fr.acinq.phoenix.android.components.buttons.openLink
 import fr.acinq.phoenix.android.navigation.Screen
 import fr.acinq.phoenix.android.navigation.baseNavGraph
 import fr.acinq.phoenix.android.navigation.baseSettingsNavGraph

@@ -48,9 +48,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.Button
+import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.ProgressView
-import fr.acinq.phoenix.android.components.auth.pincode.CheckPinFlow
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.BiometricsHelper
 import fr.acinq.phoenix.android.utils.extensions.findActivity

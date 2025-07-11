@@ -36,11 +36,11 @@ import fr.acinq.phoenix.android.LocalBusiness
 import fr.acinq.phoenix.android.Notice
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.navigation.Screen
-import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.components.CardHeader
-import fr.acinq.phoenix.android.components.DefaultScreenHeader
-import fr.acinq.phoenix.android.components.DefaultScreenLayout
-import fr.acinq.phoenix.android.components.MenuButton
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.layouts.CardHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
+import fr.acinq.phoenix.android.components.buttons.MenuButton
 import fr.acinq.phoenix.android.components.inputs.CurrencyConverter
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.negativeColor

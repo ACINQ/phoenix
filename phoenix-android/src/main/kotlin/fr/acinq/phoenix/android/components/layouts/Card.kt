@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.components
+package fr.acinq.phoenix.android.components.layouts
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.LocalIndication

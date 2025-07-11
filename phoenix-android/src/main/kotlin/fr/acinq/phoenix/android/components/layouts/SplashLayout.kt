@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.components
+package fr.acinq.phoenix.android.components.layouts
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.components.buttons.Clickable
 import fr.acinq.phoenix.android.components.dialogs.IconPopup
 
 

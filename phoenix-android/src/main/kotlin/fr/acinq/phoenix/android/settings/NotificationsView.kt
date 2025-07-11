@@ -47,7 +47,13 @@ import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.PhoenixIcon
+import fr.acinq.phoenix.android.components.TextWithIcon
+import fr.acinq.phoenix.android.components.buttons.openLink
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.layouts.CardHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
 import fr.acinq.phoenix.android.home.TorDisconnectedDialog
 import fr.acinq.phoenix.android.navigation.Screen
 import fr.acinq.phoenix.android.services.ChannelsWatcher
@@ -349,7 +355,7 @@ private fun ImportantNotification(
             Column(modifier = Modifier.alignByBaseline()) {
                 Text(text = message, style = MaterialTheme.typography.body1.copy(fontSize = 16.sp))
                 safeLet(actionText, onActionClick) { text, onClick ->
-                    Button(
+                    fr.acinq.phoenix.android.components.buttons.Button(
                         text = text, textStyle = MaterialTheme.typography.body2.copy(fontSize = 16.sp),
                         icon = R.drawable.ic_chevron_right,
                         modifier = Modifier.offset(x = (-16).dp),

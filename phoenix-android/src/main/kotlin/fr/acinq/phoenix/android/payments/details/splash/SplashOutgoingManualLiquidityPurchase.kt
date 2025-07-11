@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.db.ManualLiquidityPurchasePayment
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.SplashLabelRow
+import fr.acinq.phoenix.android.components.layouts.SplashLabelRow
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.converters.DateFormatter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.converters.MSatDisplayPolicy

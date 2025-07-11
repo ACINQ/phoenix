@@ -53,10 +53,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.BorderButton
-import fr.acinq.phoenix.android.components.Clickable
+import fr.acinq.phoenix.android.components.buttons.BorderButton
+import fr.acinq.phoenix.android.components.buttons.Clickable
 import fr.acinq.phoenix.android.components.PhoenixIcon
-import fr.acinq.phoenix.android.components.WebLink
+import fr.acinq.phoenix.android.components.buttons.WebLink
 import fr.acinq.phoenix.android.utils.mutedTextColor
 
 

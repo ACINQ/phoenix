@@ -54,12 +54,12 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.navigation.Screen
 import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.MutedFilledButton
+import fr.acinq.phoenix.android.components.buttons.MutedFilledButton
 import fr.acinq.phoenix.android.components.PrimarySeparator
-import fr.acinq.phoenix.android.components.TransparentFilledButton
+import fr.acinq.phoenix.android.components.buttons.TransparentFilledButton
 import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.components.mvi.MVIView
-import fr.acinq.phoenix.android.components.openLink
+import fr.acinq.phoenix.android.components.buttons.openLink
 import fr.acinq.phoenix.android.home.releasenotes.ReleaseNoteDialog
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.FCMHelper

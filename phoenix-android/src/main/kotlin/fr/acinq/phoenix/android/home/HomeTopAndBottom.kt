@@ -42,13 +42,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.BorderButton
-import fr.acinq.phoenix.android.components.Button
+import fr.acinq.phoenix.android.components.buttons.BorderButton
+import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.dialogs.Dialog
-import fr.acinq.phoenix.android.components.FilledButton
+import fr.acinq.phoenix.android.components.buttons.FilledButton
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.VSeparator
-import fr.acinq.phoenix.android.components.openLink
+import fr.acinq.phoenix.android.components.buttons.openLink
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.extensions.isBadCertificate
 import fr.acinq.phoenix.android.utils.negativeColor

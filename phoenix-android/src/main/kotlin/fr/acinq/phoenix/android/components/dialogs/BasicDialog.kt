@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.Button
+import fr.acinq.phoenix.android.components.buttons.Button
 
 @Composable
 fun Dialog(

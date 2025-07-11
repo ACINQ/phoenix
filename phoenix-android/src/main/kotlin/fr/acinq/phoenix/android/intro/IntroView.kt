@@ -30,7 +30,7 @@ import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.buttons.FilledButton
 import fr.acinq.phoenix.android.utils.extensions.findActivity
 import kotlinx.coroutines.*
 

@@ -49,12 +49,12 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.inputs.AmountHeroInput
 import fr.acinq.phoenix.android.components.AmountWithFiatRowView
-import fr.acinq.phoenix.android.components.BackButtonWithBalance
-import fr.acinq.phoenix.android.components.Clickable
-import fr.acinq.phoenix.android.components.FilledButton
+import fr.acinq.phoenix.android.components.buttons.BackButtonWithBalance
+import fr.acinq.phoenix.android.components.buttons.Clickable
+import fr.acinq.phoenix.android.components.buttons.FilledButton
 import fr.acinq.phoenix.android.components.ProgressView
-import fr.acinq.phoenix.android.components.SplashLabelRow
-import fr.acinq.phoenix.android.components.SplashLayout
+import fr.acinq.phoenix.android.components.layouts.SplashLabelRow
+import fr.acinq.phoenix.android.components.layouts.SplashLayout
 import fr.acinq.phoenix.android.components.inputs.TextInput
 import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
 import fr.acinq.phoenix.android.components.contact.ContactOrOfferView

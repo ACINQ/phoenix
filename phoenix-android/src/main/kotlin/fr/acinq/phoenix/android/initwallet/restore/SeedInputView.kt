@@ -57,8 +57,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.components.Clickable
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.buttons.Clickable
 import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.feedback.SuccessMessage
